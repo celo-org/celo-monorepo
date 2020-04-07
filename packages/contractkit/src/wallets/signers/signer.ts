@@ -1,9 +1,3 @@
-// @ts-ignore-next-line
-import { account as Account, bytes as Bytes, hash as Hash, nat as Nat, RLP } from 'eth-lib'
-// @ts-ignore-next-line
-import * as helpers from 'web3-core-helpers'
-// @ts-ignore-next-line
-import { BN } from 'bn.js'
 import { EIP712TypedData } from '../../utils/sign-typed-data-utils'
 import { RLPEncodedTx } from '../../utils/signing-utils'
 
@@ -16,10 +10,12 @@ export interface Signer {
   signTransaction: (
     addToV: number,
     encodedTx: RLPEncodedTx
-  ) => Promise<{ v: number; r: Buffer; s: Buffer }>
+  ) => Promise<{ v: string; r: string; s: string }>
   signPersonalMessage: (
     data: string
   ) => Promise<{ v: number; r: Buffer | Uint8Array; s: Buffer | Uint8Array }>
-  signTypedData: (typedData: EIP712TypedData) => Promise<{ v: number; r: Buffer; s: Buffer }>
+  signTypedData: (
+    typedData: EIP712TypedData
+  ) => Promise<{ v: number; r: Buffer | Uint8Array; s: Buffer | Uint8Array }>
   getNativeKey: () => string
 }

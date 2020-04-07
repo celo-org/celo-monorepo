@@ -2,18 +2,21 @@ import {
   ensureLeading0x,
   normalizeAddressWith0x,
   privateKeyToAddress,
+  trimLeading0x,
 } from '@celo/utils/lib/address'
 // @ts-ignore-next-line
 import { account as Account } from 'eth-lib'
 import Web3 from 'web3'
 import { EncodedTransaction, Tx } from 'web3-core'
-import { EIP712TypedData } from '../utils/sign-typed-data-utils'
 import {
   chainIdTransformationForSigning,
   getHashFromEncoded,
   recoverTransaction,
+  recoverEIP712TypedDataSigner,
+  recoverMessageSigner,
 } from '../utils/signing-utils'
 import { LedgerWallet } from './ledger-wallet'
+import * as ethUtil from 'ethereumjs-util'
 
 const PRIVATE_KEY1 = '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
 const ACCOUNT_ADDRESS1 = normalizeAddressWith0x(privateKeyToAddress(PRIVATE_KEY1))
@@ -53,6 +56,46 @@ const ledgerAddreses: { [myKey: string]: { address: string; privateKey: string }
 
 const CHAIN_ID = 44378
 
+// Sample data from the official EIP-712 example:
+// https://github.com/ethereum/EIPs/blob/master/assets/eip-712/Example.js
+const TYPED_DATA = {
+  types: {
+    EIP712Domain: [
+      { name: 'name', type: 'string' },
+      { name: 'version', type: 'string' },
+      { name: 'chainId', type: 'uint256' },
+      { name: 'verifyingContract', type: 'address' },
+    ],
+    Person: [
+      { name: 'name', type: 'string' },
+      { name: 'wallet', type: 'address' },
+    ],
+    Mail: [
+      { name: 'from', type: 'Person' },
+      { name: 'to', type: 'Person' },
+      { name: 'contents', type: 'string' },
+    ],
+  },
+  primaryType: 'Mail',
+  domain: {
+    name: 'Ether Mail',
+    version: '1',
+    chainId: 1,
+    verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC',
+  },
+  message: {
+    from: {
+      name: 'Cow',
+      wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+    },
+    to: {
+      name: 'Bob',
+      wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+    },
+    contents: 'Hello, Bob!',
+  },
+}
+
 describe('LedgerWallet class', () => {
   let wallet: LedgerWallet
 
@@ -80,10 +123,11 @@ describe('LedgerWallet class', () => {
         },
         signPersonalMessage: async (derivationPath: string, data: string) => {
           if (ledgerAddreses[derivationPath]) {
-            const hash = getHashFromEncoded(ensureLeading0x(data))
-            const signature = Account.makeSigner(0)(hash, ledgerAddreses[derivationPath].privateKey)
-            const [v, r, s] = Account.decodeSignature(signature)
-            return { v: Number(v) + 27, r, s }
+            const trimmedKey = trimLeading0x(ledgerAddreses[derivationPath].privateKey)
+            const pkBuffer = Buffer.from(trimmedKey, 'hex')
+            const dataBuff = Buffer.from(data, 'hex')
+            const signature = ethUtil.ecsign(dataBuff, pkBuffer)
+            return signature
           }
           throw new Error('Invalid Path')
         },
@@ -124,13 +168,7 @@ describe('LedgerWallet class', () => {
     })
 
     test('fails calling signTypedData', async () => {
-      const typedData: EIP712TypedData = {
-        types: { test: [{ name: 'test', type: 'string' }] },
-        domain: { test: 'test' },
-        message: { test: 'test' },
-        primaryType: 'test',
-      }
-      await expect(wallet.signTypedData(ACCOUNT_ADDRESS1, typedData)).rejects.toThrowError()
+      await expect(wallet.signTypedData(ACCOUNT_ADDRESS1, TYPED_DATA)).rejects.toThrowError()
     })
   })
 
@@ -175,13 +213,7 @@ describe('LedgerWallet class', () => {
           })
 
           test('fails calling signTypedData', async () => {
-            const typedData: EIP712TypedData = {
-              types: { test: [{ name: 'test', type: 'string' }] },
-              domain: { test: 'test' },
-              message: { test: 'test' },
-              primaryType: 'test',
-            }
-            await expect(wallet.signTypedData(unknownAddress, typedData)).rejects.toThrowError()
+            await expect(wallet.signTypedData(unknownAddress, TYPED_DATA)).rejects.toThrowError()
           })
         })
 
@@ -205,7 +237,7 @@ describe('LedgerWallet class', () => {
               }
             })
 
-            test('succeds', async () => {
+            test('succeeds', async () => {
               await expect(wallet.signTransaction(celoTransaction)).resolves.not.toBeUndefined()
             })
 
@@ -220,14 +252,26 @@ describe('LedgerWallet class', () => {
         })
 
         describe('when calling signPersonalMessage', () => {
-          test('succeds', async () => {
-            const hexStr: string = ACCOUNT_ADDRESS_NEVER
-            await expect(
-              wallet.signPersonalMessage(knownAddress, hexStr)
-            ).resolves.not.toBeUndefined()
+          test('succeeds', async () => {
+            const hexStr: string = ACCOUNT_ADDRESS1
+            const signedMessage = await wallet.signPersonalMessage(knownAddress, hexStr)
+            expect(signedMessage).not.toBeUndefined()
+            const recoveredSigner = recoverMessageSigner(hexStr, signedMessage)
+            expect(normalizeAddressWith0x(recoveredSigner)).toBe(
+              normalizeAddressWith0x(knownAddress)
+            )
           })
+        })
 
-          test.todo('returns a valid sign')
+        describe('when calling signTypedData', () => {
+          test('succeeds', async () => {
+            const signedMessage = await wallet.signTypedData(knownAddress, TYPED_DATA)
+            expect(signedMessage).not.toBeUndefined()
+            const recoveredSigner = recoverEIP712TypedDataSigner(TYPED_DATA, signedMessage)
+            expect(normalizeAddressWith0x(recoveredSigner)).toBe(
+              normalizeAddressWith0x(knownAddress)
+            )
+          })
         })
       })
     })

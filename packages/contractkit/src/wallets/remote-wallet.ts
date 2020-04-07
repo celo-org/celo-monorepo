@@ -1,8 +1,6 @@
 import { EncodedTransaction, Tx } from 'web3-core'
 import { Address } from '../base'
 import { EIP712TypedData } from '../utils/sign-typed-data-utils'
-// @ts-ignore-next-line
-import { BN } from 'bn.js'
 import { Wallet, WalletBase } from './wallet'
 import { Signer } from './signers/signer'
 

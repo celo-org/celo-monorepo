@@ -1,9 +1,6 @@
-// @ts-ignore-next-line
-import { account as Account, nat as Nat } from 'eth-lib'
 import { DefaultAzureCredential } from '@azure/identity'
 import { KeyClient, CryptographyClient, KeyVaultKey } from '@azure/keyvault-keys'
-// @ts-ignore-next-line
-import BN, { BN } from 'bn.js'
+import BN = require('bn.js')
 import { ec as EC } from 'elliptic'
 import { ecdsaRecover } from 'secp256k1'
 
@@ -87,7 +84,6 @@ export class AzureKeyVaultClient {
     // thus it must be transposed to the lower intersection.
     // https://github.com/bitcoin/bips/blob/master/bip-0062.mediawiki#Low_S_values_in_signatures
     if (!AzureKeyVaultClient.isCanonical(S, secp256k1Curve.curve.n)) {
-      console.log('not canon')
       S = secp256k1Curve.curve.n.sub(S)
     }
 

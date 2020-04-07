@@ -3,10 +3,9 @@ import debugFactory from 'debug'
 // @ts-ignore-next-line
 import { account as Account, bytes as Bytes, hash as Hash, RLP } from 'eth-lib'
 import { EncodedTransaction, Tx } from 'web3-core'
-// @ts-ignore-next-line
 import * as helpers from 'web3-core-helpers'
-// @ts-ignore-next-line
-import { BN } from 'bn.js'
+import * as ethUtil from 'ethereumjs-util'
+import { generateTypedDataHash, EIP712TypedData } from './sign-typed-data-utils'
 
 const debug = debugFactory('kit:tx:sign')
 
@@ -109,11 +108,11 @@ export function signatureFormatter(signature: {
   v: string
   r: string
   s: string
-}): { v: string; r: string; s: string } {
+}): { v: number; r: Buffer; s: Buffer } {
   return {
-    v: makeEven(trimLeadingZero(ensureLeading0x(signature.v))),
-    r: makeEven(trimLeadingZero(ensureLeading0x(signature.r))),
-    s: makeEven(trimLeadingZero(ensureLeading0x(signature.s))),
+    v: parseInt(makeEven(trimLeadingZero(ensureLeading0x(signature.v)))),
+    r: Buffer.from(makeEven(trimLeadingZero(ensureLeading0x(signature.r)))),
+    s: Buffer.from(makeEven(trimLeadingZero(ensureLeading0x(signature.s)))),
   }
 }
 
@@ -178,6 +177,24 @@ export function recoverTransaction(rawTx: string): [Tx, string] {
   return [celoTx, signer]
 }
 
-export function toPaddedBuffer(value: BN) {
-  return Bytes.pad(32, Bytes.fromNat('0x' + value.toString(16)))
+export function recoverMessageSigner(signingDataHex: string, signedData: string): string {
+  const dataBuff = ethUtil.toBuffer(signingDataHex)
+  const msgHashBuff = ethUtil.hashPersonalMessage(dataBuff)
+  const signature = ethUtil.fromRpcSig(signedData)
+
+  const publicKey = ethUtil.ecrecover(msgHashBuff, signature.v, signature.r, signature.s)
+  const address = ethUtil.pubToAddress(publicKey, true)
+  return ensureLeading0x(address.toString('hex'))
+}
+
+export function recoverEIP712TypedDataSigner(
+  typedData: EIP712TypedData,
+  signedData: string
+): string {
+  const dataBuff = generateTypedDataHash(typedData)
+  const signature = ethUtil.fromRpcSig(signedData)
+
+  const publicKey = ethUtil.ecrecover(dataBuff, signature.v, signature.r, signature.s)
+  const address = ethUtil.pubToAddress(publicKey, true)
+  return ensureLeading0x(address.toString('hex'))
 }

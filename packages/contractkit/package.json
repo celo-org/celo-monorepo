@@ -38,7 +38,6 @@
     "bignumber.js": "^9.0.0",
     "cross-fetch": "3.0.4",
     "debug": "^4.1.1",
-    "dotenv": "^8.2.0",
     "elliptic": "6.5.2",
     "eth-lib": "^0.2.8",
     "ethereumjs-util": "^5.2.0",
@@ -62,7 +61,8 @@
     "jest": "^25.2.4",
     "ts-node": "8.3.0",
     "typedoc": "^0.16.9",
-    "typedoc-plugin-markdown": "^2.2.16"
+    "typedoc-plugin-markdown": "^2.2.16",
+    "dotenv": "^8.2.0"
   },
   "engines": {
     "node": ">=8.13.0"

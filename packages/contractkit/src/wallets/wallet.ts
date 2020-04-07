@@ -3,6 +3,7 @@ import {
   chainIdTransformationForSigning,
   encodeTransaction,
   rlpEncodedTx,
+  signatureFormatter,
 } from '../utils/signing-utils'
 import * as ethUtil from 'ethereumjs-util'
 import { EncodedTransaction, Tx } from 'web3-core'
@@ -69,7 +70,8 @@ export abstract class WalletBase implements Wallet {
     const signer = this.getSigner(fromAddress)
     const signature = await signer!.signTransaction(addToV, rlpEncoded)
 
-    return encodeTransaction(rlpEncoded, signature)
+    const formattedSignature = signatureFormatter(signature)
+    return encodeTransaction(rlpEncoded, formattedSignature)
   }
 
   /**

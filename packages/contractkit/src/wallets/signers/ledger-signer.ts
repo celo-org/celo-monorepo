@@ -1,15 +1,10 @@
-// @ts-ignore-next-line
-import { account as Account } from 'eth-lib'
-// @ts-ignore-next-line
-import * as helpers from 'web3-core-helpers'
-// @ts-ignore-next-line
-import { BN } from 'bn.js'
 import { trimLeading0x } from '@celo/utils/lib/address'
 import { EIP712TypedData, generateTypedDataHash } from '../../utils/sign-typed-data-utils'
-import { RLPEncodedTx, signatureFormatter } from '../../utils/signing-utils'
+import { RLPEncodedTx } from '../../utils/signing-utils'
 import { Signer } from './signer'
 import { TransportStatusError } from '@ledgerhq/errors'
 import { transportErrorFriendlyMessage } from '../../utils/ledger-utils'
+import * as ethUtil from 'ethereumjs-util'
 
 /**
  * Signs the EVM transaction with a Ledger device
@@ -30,7 +25,7 @@ export class LedgerSigner implements Signer {
   async signTransaction(
     addToV: number,
     encodedTx: RLPEncodedTx
-  ): Promise<{ v: number; r: Buffer; s: Buffer }> {
+  ): Promise<{ v: string; r: string; s: string }> {
     try {
       const signature = await this.ledger!.signTransaction(
         this.derivationPath,
@@ -43,12 +38,7 @@ export class LedgerSigner implements Signer {
         addToV += 1 // add signature v bit.
       }
       signature.v = addToV.toString(16)
-      const formattedSignature = signatureFormatter(signature)
-      return {
-        v: parseInt(formattedSignature.v),
-        r: Buffer.from(formattedSignature.r),
-        s: Buffer.from(formattedSignature.s),
-      }
+      return signature
     } catch (error) {
       if (error instanceof TransportStatusError) {
         transportErrorFriendlyMessage(error)
@@ -57,10 +47,20 @@ export class LedgerSigner implements Signer {
     }
   }
 
-  async signPersonalMessage(data: string): Promise<{ v: number; r: Buffer; s: Buffer }> {
+  async signPersonalMessage(
+    data: string
+  ): Promise<{ v: number; r: Buffer | Uint8Array; s: Buffer | Uint8Array }> {
     try {
-      const sig = await this.ledger!.signPersonalMessage(this.derivationPath, trimLeading0x(data))
-      return { v: parseInt(sig.v), r: Buffer.from(sig.r), s: Buffer.from(sig.s) }
+      const dataBuff = ethUtil.toBuffer(data)
+      const msgHashBuff = ethUtil.hashPersonalMessage(dataBuff)
+      const trimmedMsgHash = trimLeading0x(msgHashBuff.toString('hex'))
+      const signature = await this.ledger!.signPersonalMessage(this.derivationPath, trimmedMsgHash)
+
+      return {
+        v: signature.v,
+        r: ethUtil.toBuffer(signature.r),
+        s: ethUtil.toBuffer(signature.s),
+      }
     } catch (error) {
       if (error instanceof TransportStatusError) {
         transportErrorFriendlyMessage(error)
@@ -72,12 +72,14 @@ export class LedgerSigner implements Signer {
   async signTypedData(typedData: EIP712TypedData): Promise<{ v: number; r: Buffer; s: Buffer }> {
     try {
       const dataBuff = generateTypedDataHash(typedData)
-      const sig = await this.ledger!.signPersonalMessage(
-        this.derivationPath,
-        trimLeading0x(dataBuff.toString())
-      )
+      const trimmedData = trimLeading0x(dataBuff.toString('hex'))
+      const sig = await this.ledger!.signPersonalMessage(this.derivationPath, trimmedData)
 
-      return { v: parseInt(sig.v), r: Buffer.from(sig.r), s: Buffer.from(sig.s) }
+      return {
+        v: parseInt(sig.v),
+        r: Buffer.from(sig.r),
+        s: Buffer.from(sig.s),
+      }
     } catch (error) {
       if (error instanceof TransportStatusError) {
         transportErrorFriendlyMessage(error)

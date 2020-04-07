@@ -1,8 +1,6 @@
-import { Address } from '@celo/utils/lib/address'
-import { AzureHSMSigner } from './signers/remote-azure-signer'
+import { Address, ensureLeading0x } from '@celo/utils/lib/address'
+import { AzureHSMSigner } from './signers/azure-hsm-signer'
 import { AzureKeyVaultClient } from './signers/azure-key-vault-client'
-// @ts-ignore-next-line
-import { BN } from 'bn.js'
 import { Wallet } from './wallet'
 import { RemoteWallet } from './remote-wallet'
 import { Signer } from './signers/signer'
@@ -10,14 +8,18 @@ import * as ethUtil from 'ethereumjs-util'
 
 // Azure Key Vault implementation of a RemoteWallet
 export class AzureHSMWallet extends RemoteWallet implements Wallet {
-  private readonly keyVaultClient: AzureKeyVaultClient
+  private readonly vaultName: string
+  private keyVaultClient: AzureKeyVaultClient | undefined
 
   constructor(vaultName: string) {
     super()
-    this.keyVaultClient = new AzureKeyVaultClient(vaultName)
+    this.vaultName = vaultName
   }
 
   protected async loadAccountSigners(): Promise<Map<Address, Signer>> {
+    if (!this.keyVaultClient) {
+      this.keyVaultClient = this.generateNewKeyVaultClient(this.vaultName)
+    }
     const keys = await this.keyVaultClient.getKeys()
     const addressToSigner = new Map<Address, Signer>()
     for (let key of keys) {
@@ -35,18 +37,26 @@ export class AzureHSMWallet extends RemoteWallet implements Wallet {
     return addressToSigner
   }
 
+  // Extracted for testing purpose
+  private generateNewKeyVaultClient(vaultName: string) {
+    return new AzureKeyVaultClient(vaultName)
+  }
+
   /**
    * Returns the EVM address for the given key
    * Useful for initially getting the 'from' field given a keyName
    * @param keyName Azure KeyVault key name
    */
   async getAddressFromKeyName(keyName: string): Promise<Address> {
-    const publicKey = await this.keyVaultClient.getPublicKey(keyName)
+    if (!this.keyVaultClient) {
+      throw new Error('AzureHSMWallet needs to be initialized first')
+    }
+    const publicKey = await this.keyVaultClient!.getPublicKey(keyName)
     const pkBuffer = publicKey.toBuffer()
     if (!ethUtil.isValidPublic(pkBuffer, true)) {
       throw new Error(`Invalid secp256k1 public key for keyname ${keyName}`)
     }
     const address = ethUtil.pubToAddress(pkBuffer, true)
-    return '0x' + address.toString('hex')
+    return ensureLeading0x(address.toString('hex'))
   }
 }

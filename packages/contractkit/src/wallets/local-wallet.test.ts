@@ -2,7 +2,11 @@ import { normalizeAddressWith0x, privateKeyToAddress } from '@celo/utils/lib/add
 import Web3 from 'web3'
 import { EncodedTransaction, Tx } from 'web3-core'
 import { EIP712TypedData } from '../utils/sign-typed-data-utils'
-import { recoverTransaction } from '../utils/signing-utils'
+import {
+  recoverTransaction,
+  recoverMessageSigner,
+  recoverEIP712TypedDataSigner,
+} from '../utils/signing-utils'
 import { LocalWallet } from './local-wallet'
 
 const PRIVATE_KEY1 = '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
@@ -116,18 +120,65 @@ describe('Local wallet class', () => {
 
         describe('when calling signPersonalMessage', () => {
           test('succeeds', async () => {
-            const hexStr: string = '0xa1'
-            await expect(
-              wallet.signPersonalMessage(knownAddress, hexStr)
-            ).resolves.not.toBeUndefined()
+            const hexStr: string = ACCOUNT_ADDRESS1
+            const signedMessage = await wallet.signPersonalMessage(knownAddress, hexStr)
+            expect(signedMessage).not.toBeUndefined()
+            const recoveredSigner = recoverMessageSigner(hexStr, signedMessage)
+            expect(normalizeAddressWith0x(recoveredSigner)).toBe(
+              normalizeAddressWith0x(knownAddress)
+            )
           })
-
-          test.todo('returns a valid sign')
         })
 
         describe('when calling signTypedData', () => {
-          test.todo('succeeds, needs a valid typedData to be tested')
-          test.todo('returns a valid sign')
+          test('succeeds', async () => {
+            // Sample data from the official EIP-712 example:
+            // https://github.com/ethereum/EIPs/blob/master/assets/eip-712/Example.js
+            const typedData = {
+              types: {
+                EIP712Domain: [
+                  { name: 'name', type: 'string' },
+                  { name: 'version', type: 'string' },
+                  { name: 'chainId', type: 'uint256' },
+                  { name: 'verifyingContract', type: 'address' },
+                ],
+                Person: [
+                  { name: 'name', type: 'string' },
+                  { name: 'wallet', type: 'address' },
+                ],
+                Mail: [
+                  { name: 'from', type: 'Person' },
+                  { name: 'to', type: 'Person' },
+                  { name: 'contents', type: 'string' },
+                ],
+              },
+              primaryType: 'Mail',
+              domain: {
+                name: 'Ether Mail',
+                version: '1',
+                chainId: 1,
+                verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC',
+              },
+              message: {
+                from: {
+                  name: 'Cow',
+                  wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+                },
+                to: {
+                  name: 'Bob',
+                  wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+                },
+                contents: 'Hello, Bob!',
+              },
+            }
+
+            const signedMessage = await wallet.signTypedData(knownAddress, typedData)
+            expect(signedMessage).not.toBeUndefined()
+            const recoveredSigner = recoverEIP712TypedDataSigner(typedData, signedMessage)
+            expect(normalizeAddressWith0x(recoveredSigner)).toBe(
+              normalizeAddressWith0x(knownAddress)
+            )
+          })
         })
       })
     })

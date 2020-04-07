@@ -9,7 +9,7 @@
           "--inspect-brk",
           "${workspaceRoot}/node_modules/.bin/jest",
           "--runInBand",
-          "./src/wallets/azure-hsm-wallet.test.ts"
+          "./src/wallets/*-wallet.test.ts"
         ],
         "console": "integratedTerminal",
         "internalConsoleOptions": "neverOpen",

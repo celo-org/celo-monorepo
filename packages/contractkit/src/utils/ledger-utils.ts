@@ -1,6 +1,4 @@
 import debugFactory from 'debug'
-// @ts-ignore-next-line
-import { BN } from 'bn.js'
 
 const debug = debugFactory('kit:wallet:ledger')
 
