@@ -176,7 +176,7 @@ export const handler = async (argv: StartArgv) => {
       name: `${x}-node`,
       validating: mining,
       syncmode: syncMode,
-      ethstats,
+      ethstats: withProxy ? undefined : ethstats,
       privateKey: validatorPrivateKeys[x],
       port: port + x,
       rpcport: rpcport + x * 2,
@@ -192,11 +192,8 @@ export const handler = async (argv: StartArgv) => {
         isProxy: true,
         syncmode: syncMode,
         ethstats,
-        privateKey: proxyPrivateKeys[x],
         port: port + x + 1000,
         proxyport: port + x + 333,
-        rpcport: rpcport + x * 2 + 1000,
-        wsport: wsport + x * 2 + 1000,
       }
 
       proxy.proxiedValidatorAddress = validators[x].address

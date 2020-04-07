@@ -904,7 +904,6 @@ export async function startGeth(
     '--debug',
     '--port',
     port.toString(),
-    '--rpcvhosts=*',
     '--networkid',
     gethConfig.networkId.toString(),
     `--verbosity=${verbosity}`,
@@ -922,6 +921,7 @@ export async function startGeth(
       '--rpcport',
       rpcport.toString(),
       '--rpccorsdomain=*',
+      '--rpcvhosts=*',
       '--rpcapi=eth,net,web3,debug,admin,personal,txpool,istanbul'
     )
   }
@@ -985,12 +985,16 @@ export async function startGeth(
     gethArgs.push(`--proxy.proxyenodeurlpair=${instance.proxies[0]!};${instance.proxies[1]!}`)
   }
 
-  if (privateKey || ethstats) {
+  if (privateKey) {
     gethArgs.push('--password=/dev/null', `--unlock=0`)
   }
 
   if (ethstats) {
-    gethArgs.push(`--ethstats=${instance.name}@${ethstats}`, '--etherbase=0')
+    gethArgs.push(`--ethstats=${instance.name}@${ethstats}`)
+
+    if (isProxied && !isProxy) {
+      gethArgs.push('--etherbase=0')
+    }
   }
 
   const gethProcess = spawnWithLog(gethBinaryPath, gethArgs, `${datadir}/logs.txt`, verbose)
