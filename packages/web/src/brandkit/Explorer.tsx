@@ -10,32 +10,18 @@ import { NameSpaces, useTranslation } from 'src/i18n'
 import { fonts } from 'src/styles'
 import { IconData, Icons } from './IconsPage'
 
-function useFilteredResult(query: string, initial) {
-  const [result, setResult] = React.useState(initial)
-
-  React.useEffect(
-    debounce(() => {
-      setResult(search(query, initial))
-    }, 50),
-    [initial, query]
-  )
-
-  return result
-}
-
 export function Explorer({ icons }: Icons) {
-  const { query, onQueryChange } = useSearch()
   const { t } = useTranslation(NameSpaces.brand)
-  const results = useFilteredResult(query, icons).map((result) => result.id)
-  const visibleIcons = new Set(results)
+  const { query, onQueryChange } = useSearch()
+  const visibleIcons = useVisibleIconIDs(query, icons)
   return (
     <View style={{ minHeight: '100vh' }}>
       <Search value={query} onChange={onQueryChange} />
-      {query ? (
-        <Text style={[fonts.micro, brandStyles.gap]}>
-          {t('icons.matching', { count: results.length })}
-        </Text>
-      ) : null}
+      <Text style={[fonts.micro, brandStyles.gap, styles.matches, query && styles.visible]}>
+        {visibleIcons.size === 0
+          ? t('icons.matching_0')
+          : t('icons.matching', { count: visibleIcons.size })}
+      </Text>
       <View style={brandStyles.tiling}>
         {icons.map((icon) => (
           <View key={icon.id} style={!visibleIcons.has(icon.id) && styles.offScreen}>
@@ -61,12 +47,37 @@ const styles = StyleSheet.create({
   offScreen: {
     display: 'none',
   },
+  matches: {
+    opacity: 0,
+    transitionDuration: '200ms',
+    transitionProperty: 'opacity',
+  },
+  visible: {
+    opacity: 1,
+  },
 })
 
-const fields = ['name', 'description', 'tags']
+function useVisibleIconIDs(query: string, initial: IconData[]): Set<string> {
+  const [results, setResult] = React.useState(React.useMemo(() => toIDSet(initial), [initial]))
+
+  React.useEffect(
+    debounce(() => {
+      setResult(toIDSet(search(query, initial)))
+    }, 50),
+    [initial, query]
+  )
+
+  return results
+}
+
+const FIELDS = ['name', 'description', 'tags']
 
 function search(query: string, icons: IconData[]) {
-  const searcher = new FuzzySearch(icons, fields)
+  const searcher = new FuzzySearch(icons, FIELDS)
   const result = searcher.search(query)
   return result
+}
+
+function toIDSet(initial: IconData[]): Set<string> {
+  return new Set(initial.map((icon) => icon.id))
 }
