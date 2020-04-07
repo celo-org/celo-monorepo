@@ -3093,6 +3093,29 @@
     web3-eth-contract "1.2.4"
     web3-utils "1.2.4"
 
+"@celo/contractkit@0.3.2":
+  version "0.3.2"
+  resolved "https://registry.yarnpkg.com/@celo/contractkit/-/contractkit-0.3.2.tgz#fa7e37394fe94cdef547c4fa1c97d3547b1f718d"
+  integrity sha512-x+3/Xo1h5ST8CwNdoTERUFWTZ3b5rykpgmMalp6lwUhwq88X81gDeJ0jWBTLy0Vju/OUiYDNYXYhwSvBPklgtg==
+  dependencies:
+    "@celo/utils" "0.1.8"
+    "@ledgerhq/hw-app-eth" "^5.11.0"
+    "@ledgerhq/hw-transport" "^5.11.0"
+    "@types/debug" "^4.1.5"
+    bignumber.js "^9.0.0"
+    cross-fetch "3.0.4"
+    debug "^4.1.1"
+    eth-lib "^0.2.8"
+    ethereumjs-util "^5.2.0"
+    fp-ts "2.1.1"
+    io-ts "2.0.1"
+    web3 "1.2.4"
+    web3-core "1.2.4"
+    web3-core-helpers "1.2.4"
+    web3-eth-abi "1.2.4"
+    web3-eth-contract "1.2.4"
+    web3-utils "1.2.4"
+
 "@celo/contractkit@^0.1.5", "@celo/contractkit@^0.1.6":
   version "0.1.6"
   resolved "https://registry.yarnpkg.com/@celo/contractkit/-/contractkit-0.1.6.tgz#c4f6d5003694cc28853f7331b5c0597a208a389d"

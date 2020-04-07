@@ -10,8 +10,8 @@ interface Config {
   }
   salt: {
     key: string
-    unverifiedQueryCount: number
-    verifiedQueryCount: number
+    unverifiedQueryMax: number
+    additionalVerifiedQueryMax: number
     queryPerTransaction: number
   }
   db: {
@@ -28,14 +28,13 @@ if (DEV_MODE) {
   console.debug('Running in dev mode')
   config = {
     blockchain: {
-      // TODO [amyslawson] figure out where to point these
       provider: 'https://alfajores-forno.celo-testnet.org',
       blockscout: 'https://alfajores-blockscout.celo-testnet.org',
     },
     salt: {
       key: 'fakeSecretKey',
-      unverifiedQueryCount: 2,
-      verifiedQueryCount: 30,
+      unverifiedQueryMax: 2,
+      additionalVerifiedQueryMax: 30,
       queryPerTransaction: 2,
     },
     db: {
@@ -54,8 +53,8 @@ if (DEV_MODE) {
     },
     salt: {
       key: functionConfig.salt.key,
-      unverifiedQueryCount: functionConfig.salt.unverifiedQueryCount,
-      verifiedQueryCount: functionConfig.salt.verifiedQueryCount,
+      unverifiedQueryMax: functionConfig.salt.unverifiedQueryCount,
+      additionalVerifiedQueryMax: functionConfig.salt.verifiedQueryCount,
       queryPerTransaction: functionConfig.salt.queryPerTransaction,
     },
     db: {
