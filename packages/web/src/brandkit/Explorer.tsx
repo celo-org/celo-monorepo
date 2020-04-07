@@ -8,9 +8,9 @@ import Search, { useSearch } from 'src/brandkit/Search'
 import { AssetTypes } from 'src/brandkit/tracking'
 import { NameSpaces, useTranslation } from 'src/i18n'
 import { colors, fonts } from 'src/styles'
-import { IconData, Icons } from './IconsPage'
+import { IconData, Props } from './IconsPage'
 
-export function Explorer({ icons }: Icons) {
+export function Explorer({ icons }: Props) {
   const { t } = useTranslation(NameSpaces.brand)
   const { query, onQueryChange } = useSearch()
   const visibleIcons = useVisibleIconIDs(query, icons)

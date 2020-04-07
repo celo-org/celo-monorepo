@@ -1,5 +1,6 @@
 import { Attachment, FieldSet, Table } from 'airtable'
 import getConfig from 'next/config'
+import AssetProps from 'src/../fullstack/AssetProps'
 import cache from '../server/cache'
 import airtableInit from './airtable'
 
@@ -79,7 +80,7 @@ interface Tag {
   Name: string
 }
 
-function normalize(asset: Fields, id: string, tags: Record<string, Tag>) {
+function normalize(asset: Fields, id: string, tags: Record<string, Tag>): AssetProps {
   return {
     name: asset.Name,
     description: asset.Description,
