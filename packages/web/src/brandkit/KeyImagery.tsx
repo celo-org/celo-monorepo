@@ -104,19 +104,20 @@ const Illustrations = React.memo(function _Illustrations({ data }: IlloProps) {
       </H2>
       <Text style={[brandStyles.gap, fonts.p]}>{t('keyImagery.illoText')}</Text>
       <View style={[brandStyles.tiling, styles.illustrationsArea]}>
-        {data.map((illo) => (
-          <Showcase
-            key={illo.id}
-            ratio={1.3}
-            assetType={AssetTypes.illustration}
-            description={illo.description}
-            name={illo.name}
-            preview={illo.preview}
-            uri={illo.uri}
-            loading={false}
-            size={size}
-          />
-        ))}
+        {data &&
+          data.map((illo) => (
+            <Showcase
+              key={illo.id}
+              ratio={1.3}
+              assetType={AssetTypes.illustration}
+              description={illo.description}
+              name={illo.name}
+              preview={illo.preview}
+              uri={illo.uri}
+              loading={false}
+              size={size}
+            />
+          ))}
       </View>
     </View>
   )
@@ -135,19 +136,20 @@ const AbstractGraphics = React.memo(function _AbstractGraphics({ data }: Graphic
       </H2>
       <Text style={[brandStyles.gap, fonts.p]}>{t('keyImagery.abstractText')}</Text>
       <View style={brandStyles.tiling}>
-        {data.map((graphic) => (
-          <Showcase
-            key={graphic.id}
-            ratio={344 / 172}
-            assetType={AssetTypes.graphic}
-            description={graphic.description}
-            name={graphic.name}
-            preview={graphic.preview}
-            uri={graphic.uri}
-            loading={false}
-            size={'100%'}
-          />
-        ))}
+        {data &&
+          data.map((graphic) => (
+            <Showcase
+              key={graphic.id}
+              ratio={344 / 172}
+              assetType={AssetTypes.graphic}
+              description={graphic.description}
+              name={graphic.name}
+              preview={graphic.preview}
+              uri={graphic.uri}
+              loading={false}
+              size={'100%'}
+            />
+          ))}
       </View>
     </View>
   )

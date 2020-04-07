@@ -44,7 +44,7 @@ export default React.memo(function Showcase({
         { width: size },
       ]}
     >
-      <Fade>
+      <Fade duration={FADE_MS}>
         <View style={styles.previewContainer}>
           <AspectRatio ratio={ratio}>
             {loading ? (
@@ -69,6 +69,8 @@ export default React.memo(function Showcase({
     </View>
   )
 })
+
+const FADE_MS = 400
 
 const styles = StyleSheet.create({
   title: { marginVertical: 5 },
