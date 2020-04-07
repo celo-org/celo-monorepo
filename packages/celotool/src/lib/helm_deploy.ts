@@ -609,10 +609,6 @@ async function helmParameters(celoEnv: string, useExistingGenesis: boolean) {
       'IN_MEMORY_DISCOVERY_TABLE',
       'false'
     )}`,
-    `--set geth.clean_validator_rountstate_folder=${fetchEnvOrFallback(
-      'CLEAN_VALIDATOR_ROUNTSTATE_FOLDER',
-      'false'
-    )}`,
     `--set geth.proxiedValidators=${fetchEnvOrFallback(envVar.PROXIED_VALIDATORS, '0')}`,
     ...productionTagOverrides,
     ...(await helmIPParameters(celoEnv)),
