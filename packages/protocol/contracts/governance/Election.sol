@@ -9,6 +9,7 @@ import "./interfaces/IValidators.sol";
 import "../common/CalledByVm.sol";
 import "../common/Initializable.sol";
 import "../common/FixidityLib.sol";
+import "../common/Freezable.sol";
 import "../common/linkedlists/AddressSortedLinkedList.sol";
 import "../common/UsingPrecompiles.sol";
 import "../common/UsingRegistry.sol";
@@ -22,6 +23,7 @@ contract Election is
   Initializable,
   UsingRegistry,
   UsingPrecompiles,
+  Freezable,
   CalledByVm
 {
   using AddressSortedLinkedList for SortedLinkedList.List;
@@ -883,7 +885,7 @@ contract Election is
    *   method.
    * @return The list of elected validators.
    */
-  function electValidatorSigners() external view returns (address[] memory) {
+  function electValidatorSigners() external view onlyWhenNotFrozen returns (address[] memory) {
     return electNValidatorSigners(electableValidators.min, electableValidators.max);
   }
 
