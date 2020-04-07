@@ -85,7 +85,7 @@ export default function Main() {
         }
         citation={<Text style={styles.citation}>Katie Haun, Andreessen Horowitz</Text>}
       />
-      <ArticleData title={t('mediumArticlesTitle')} />
+      <ArticleData title={t('mediumArticlesTitle')} tagged={'alliance'} />
       <Benefits />
       <WheelWithForm />
       <ConnectionFooter includeDividerLine={false} />

@@ -44,7 +44,7 @@ export enum ConsensusType {
 export interface Validator {
   address: string
   blsPublicKey: string
-  balance: string
+  balance?: string
 }
 
 export interface AccountAndBalance {
@@ -249,7 +249,7 @@ export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
   })
 }
 
-const generateIstanbulExtraData = (validators: Validator[]) => {
+export const generateIstanbulExtraData = (validators: Validator[]) => {
   const istanbulVanity = 32
   const blsSignatureVanity = 96
   const ecdsaSignatureVanity = 65

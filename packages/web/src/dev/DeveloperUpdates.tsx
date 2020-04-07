@@ -6,6 +6,7 @@ import { H3 } from 'src/fonts/Fonts'
 import EmailForm, { DEVELOPER_LIST } from 'src/forms/EmailForm'
 import { I18nProps, withNamespaces } from 'src/i18n'
 
+import sendCoinIcon from 'src/icons/send-green-coin-lg-bg.png'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import { hashNav } from 'src/shared/menu-items'
 import {
@@ -16,8 +17,6 @@ import {
   TwitterChannel,
 } from 'src/shared/SocialChannels'
 import { fonts, standardStyles, textStyles } from 'src/styles'
-
-const newsImg = require('src/dev/devNews.png')
 
 export default withNamespaces('dev')(
   memo(function DeveloperUpdates({ t }: I18nProps) {
@@ -35,7 +34,7 @@ export default withNamespaces('dev')(
           <Cell span={Spans.half}>
             <Fade>
               <View style={standardStyles.centered}>
-                <Image resizeMode="contain" source={newsImg} style={styles.image} />
+                <Image resizeMode="contain" source={sendCoinIcon} style={styles.image} />
                 <H3 style={[textStyles.center]}>{t('updates.devNews')}</H3>
                 <Text style={[fonts.p, textStyles.center, standardStyles.elementalMarginBottom]}>
                   {t('updates.latestUpdates')}

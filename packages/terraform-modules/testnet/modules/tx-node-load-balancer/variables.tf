@@ -38,7 +38,12 @@ variable network_name {
   description = "Name of the GCP network the tx-node load balancer is in"
 }
 
+variable private_tx_node_self_links {
+  type        = list(string)
+  description = "A list including the self_links of each private/internal tx-node"
+}
+
 variable tx_node_self_links {
   type        = list(string)
-  description = "A list including the self_links of each tx-node"
+  description = "A list including the self_links of each public/external tx-node"
 }

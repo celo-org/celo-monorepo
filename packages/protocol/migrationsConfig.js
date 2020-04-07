@@ -13,7 +13,8 @@ BigNumber.config({
   EXPONENTIAL_AT: 1e9,
 })
 
-const MINUTE = 60
+const SECOND = 1
+const MINUTE = 60 * SECOND
 const HOUR = 60 * MINUTE
 const DAY = 24 * HOUR
 const WEEK = 7 * DAY
@@ -29,9 +30,9 @@ const DefaultConfig = {
   blockchainParameters: {
     gasForNonGoldCurrencies: 50000,
     minimumClientVersion: {
-      major: 1,
+      major: 0,
       minor: 9,
-      patch: 8,
+      patch: 0,
     },
     blockGasLimit: 20000000,
   },
@@ -241,6 +242,65 @@ const DefaultConfig = {
   },
 }
 
+const NetworkConfigs = {
+  testing: {
+    downtimeSlasher: {
+      slashableDowntime: 6,
+    },
+    election: {
+      minElectableValidators: '1',
+    },
+    epochRewards: {
+      frozen: false,
+    },
+    exchange: {
+      frozen: false,
+    },
+    goldToken: {
+      frozen: false,
+    },
+    stableToken: {
+      frozen: false,
+    },
+    reserve: {
+      initialBalance: 100000000,
+    },
+  },
+  baklava: {
+    blockchainParameters: {
+      minimumClientVersion: {
+        major: 0,
+        minor: 10,
+        patch: 0,
+      },
+    },
+    election: {
+      minElectableValidators: '25', // About half of the expected genesis set.
+    },
+    governance: {
+      // Set to be able to complete a proposal in about a day, but give everyone a chance to participate.
+      dequeueFrequency: 4 * HOUR,
+      approvalStageDuration: 4 * HOUR,
+      referendumStageDuration: DAY,
+      executionStageDuration: WEEK,
+    },
+    lockedGold: {
+      unlockingPeriod: 6 * HOUR, // 1/12 of the mainnet period.
+    },
+    validators: {
+      groupLockedGoldRequirements: {
+        duration: 15 * DAY, // 1/12 of the mainnet duration.
+      },
+      validatorLockedGoldRequirements: {
+        duration: 5 * DAY, // 1/12 of the mainnet duration.
+      },
+      membershipHistoryLength: 15, // Number of epochs in the group lockup period.
+    },
+  },
+}
+
+NetworkConfigs.baklavastaging = NetworkConfigs.baklava
+
 const linkedLibraries = {
   FixidityLib: [
     'LockedGold',
@@ -272,13 +332,17 @@ const argv = minimist(process.argv.slice(2), {
   default: {
     build_directory: path.join(__dirname, 'build'),
   },
-  string: ['migration_override', 'build_directory'],
+  string: ['migration_override', 'build_directory', 'network'],
 })
 
-const config = DefaultConfig
+const config = lodash.cloneDeep(DefaultConfig)
 
 const migrationOverride = argv.migration_override ? JSON.parse(argv.migration_override) : {}
-// use lodash merge to deeply override defaults
+
+// Use lodash merge to deeply override defaults.
+if (argv.network && NetworkConfigs[argv.network]) {
+  lodash.merge(config, NetworkConfigs[argv.network])
+}
 lodash.merge(config, migrationOverride)
 
 module.exports = {
