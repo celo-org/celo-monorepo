@@ -34,7 +34,7 @@ The `refundAddress` is the address where funds that have not been released will 
 
 ## Use Cases for ReleaseGold
 
-Two anticipated use cases for ReleaseGold contracts are for “holder” and “earners”. Note that these are not specified in ReleaseGold explicitly, rather they represent sample personas of beneficiaries for which ReleaseGold was designed.
+Two anticipated use cases for ReleaseGold contracts are for “holders” and “earners”. Note that these are not specified in ReleaseGold explicitly, rather they represent sample personas of beneficiaries for which ReleaseGold was designed.
 
 In the “holder” case, a recipient has purchased or been awarded an amount of cGLD, but is subject to a distribution schedule limiting the amount of cGLD that can be liquidated at any given time. These recipients will likely be able to validate and vote with the full ReleaseGold balance, and also are not subject to the contract’s revocation by another party (eg. an employer).
 
