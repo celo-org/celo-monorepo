@@ -258,8 +258,31 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   }
 
   async getValidatorFromSigner(address: Address, blockNumber?: number): Promise<Validator> {
-    const account = await this.signerToAccount(address, blockNumber)
-    return this.getValidator(account, blockNumber)
+    try {
+      const account = await this.signerToAccount(address, blockNumber)
+      if (eqAddress(account, NULL_ADDRESS)) {
+        return {
+          name: 'Unregistered validator',
+          address,
+          ecdsaPublicKey: '',
+          blsPublicKey: '',
+          affiliation: '',
+          score: new BigNumber(0),
+          signer: address,
+        }
+      }
+      return this.getValidator(account, blockNumber)
+    } catch (err) {
+      return {
+        name: 'Unregistered validator',
+        address,
+        ecdsaPublicKey: '',
+        blsPublicKey: '',
+        affiliation: '',
+        score: new BigNumber(0),
+        signer: address,
+      }
+    }
   }
 
   /** Get ValidatorGroup information */
