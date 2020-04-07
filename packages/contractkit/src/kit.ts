@@ -8,6 +8,7 @@ import { Address, CeloContract, CeloToken } from './base'
 import { WrapperCache } from './contract-cache'
 import { CeloProvider } from './providers/celo-provider'
 import { toTxResult, TransactionResult } from './utils/tx-result'
+import { Wallet } from './wallets/wallet'
 import { Web3ContractCache } from './web3-contract-cache'
 import { AttestationsConfig } from './wrappers/Attestations'
 import { ElectionConfig } from './wrappers/Election'
@@ -25,20 +26,22 @@ const debug = debugFactory('kit:kit')
 /**
  * Creates a new instance of `ContractKit` give a nodeUrl
  * @param url CeloBlockchain node url
+ * @optional wallet to reuse or add a wallet different that the default (example ledger-wallet)
  */
-export function newKit(url: string) {
-  return newKitFromWeb3(new Web3(url))
+export function newKit(url: string, wallet?: Wallet) {
+  return newKitFromWeb3(new Web3(url), wallet)
 }
 
 /**
  * Creates a new instance of `ContractKit` give a web3 instance
  * @param web3 Web3 instance
+ * @optional wallet to reuse or add a wallet different that the default (example ledger-wallet)
  */
-export function newKitFromWeb3(web3: Web3) {
+export function newKitFromWeb3(web3: Web3, wallet?: Wallet) {
   if (!web3.currentProvider) {
     throw new Error('Must have a valid Provider')
   }
-  return new ContractKit(web3)
+  return new ContractKit(web3, wallet)
 }
 
 function assertIsCeloProvider(provider: any): asserts provider is CeloProvider {
@@ -64,6 +67,7 @@ export interface NetworkConfig {
 
 export interface KitOptions {
   gasInflationFactor: number
+  gasPrice: string
   feeCurrency?: Address
   from?: Address
 }
@@ -85,12 +89,14 @@ export class ContractKit {
   readonly contracts: WrapperCache
 
   private config: KitOptions
-  constructor(readonly web3: Web3) {
+  constructor(readonly web3: Web3, wallet?: Wallet) {
     this.config = {
       gasInflationFactor: 1.3,
+      // gasPrice:0 means the node will compute gasPrice on its own
+      gasPrice: '0',
     }
     if (!(web3.currentProvider instanceof CeloProvider)) {
-      const celoProviderInstance = new CeloProvider(web3.currentProvider)
+      const celoProviderInstance = new CeloProvider(web3.currentProvider, wallet)
       // as any because of web3 migration
       web3.setProvider(celoProviderInstance as any)
     }
@@ -205,6 +211,14 @@ export class ContractKit {
     return this.config.gasInflationFactor
   }
 
+  set gasPrice(price: number) {
+    this.config.gasPrice = price.toString(10)
+  }
+
+  get gasPrice() {
+    return parseInt(this.config.gasPrice, 10)
+  }
+
   /**
    * Set the ERC20 address for the token to use to pay for transaction fees.
    * The ERC20 must be whitelisted for gas.
@@ -292,8 +306,7 @@ export class ContractKit {
     const defaultTx: Tx = {
       from: this.config.from,
       feeCurrency: this.config.feeCurrency,
-      // gasPrice:0 means the node will compute gasPrice on it's own
-      gasPrice: '0',
+      gasPrice: this.config.gasPrice,
     }
 
     if (this.config.feeCurrency) {

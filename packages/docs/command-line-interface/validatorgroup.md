@@ -102,6 +102,23 @@ EXAMPLE
 
 _See code: [packages/cli/src/commands/validatorgroup/register.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validatorgroup/register.ts)_
 
+### Reset-slashing-multiplier
+
+Reset validator group slashing multiplier.
+
+```
+USAGE
+  $ celocli validatorgroup:reset-slashing-multiplier GROUPADDRESS
+
+ARGUMENTS
+  GROUPADDRESS  ValidatorGroup's address
+
+EXAMPLE
+  reset-slashing-multiplier 0x97f7333c51897469E8D98E7af8653aAb468050a3
+```
+
+_See code: [packages/cli/src/commands/validatorgroup/reset-slashing-multiplier.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validatorgroup/reset-slashing-multiplier.ts)_
+
 ### Show
 
 Show information about an existing Validator Group

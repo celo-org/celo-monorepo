@@ -11,3 +11,7 @@ export const getAppState = (state: RootState) => {
 export const getAppLocked = (state: RootState) => {
   return state.app.locked
 }
+
+export const getLastTimeBackgrounded = (state: RootState) => {
+  return state.app.lastTimeBackgrounded
+}
