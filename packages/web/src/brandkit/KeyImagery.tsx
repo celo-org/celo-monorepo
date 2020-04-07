@@ -56,13 +56,13 @@ KeyImageryWrapped.getInitialProps = async ({ req }): Promise<Props> => {
       AssetBase.default(AssetBase.AssetSheet.AbstractGraphics),
     ])
   } else {
-    results = await Promise.all([fetchAsset('illostrations'), fetchAsset('abstract-graphics')])
+    results = await Promise.all([fetchAsset('illustrations'), fetchAsset('abstract-graphics')])
   }
 
   return { illos: results[0], graphics: results[1] }
 }
 
-function fetchAsset(kind: string) {
+function fetchAsset(kind: 'illustrations' | 'abstract-graphics') {
   return fetch(`/api/experience/assets/${kind}`).then((result) => result.json())
 }
 
