@@ -1330,6 +1330,30 @@ exports[`Experience/Icons renders 1`] = `
                 />
               </div>
               <div
+                className="css-text-901oao"
+                dir="auto"
+                style={
+                  Object {
+                    "MozTransitionProperty": "opacity",
+                    "WebkitTransitionDuration": "200ms",
+                    "WebkitTransitionProperty": "opacity",
+                    "color": "rgba(15,185,114,1.00)",
+                    "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                    "fontSize": "16px",
+                    "fontWeight": "500",
+                    "lineHeight": "18px",
+                    "marginLeft": "10px",
+                    "marginRight": "10px",
+                    "opacity": 0,
+                    "textRendering": "geometricPrecision",
+                    "transitionDuration": "200ms",
+                    "transitionProperty": "opacity",
+                  }
+                }
+              >
+                icons.matching
+              </div>
+              <div
                 className="css-view-1dbjc4n"
                 style={
                   Object {

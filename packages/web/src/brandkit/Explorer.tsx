@@ -7,7 +7,7 @@ import IconShowcase from 'src/brandkit/common/Showcase'
 import Search, { useSearch } from 'src/brandkit/Search'
 import { AssetTypes } from 'src/brandkit/tracking'
 import { NameSpaces, useTranslation } from 'src/i18n'
-import { fonts } from 'src/styles'
+import { colors, fonts } from 'src/styles'
 import { IconData, Icons } from './IconsPage'
 
 export function Explorer({ icons }: Icons) {
@@ -15,9 +15,9 @@ export function Explorer({ icons }: Icons) {
   const { query, onQueryChange } = useSearch()
   const visibleIcons = useVisibleIconIDs(query, icons)
   return (
-    <View style={{ minHeight: '100vh' }}>
+    <View style={styles.root}>
       <Search value={query} onChange={onQueryChange} />
-      <Text style={[fonts.micro, brandStyles.gap, styles.matches, query && styles.visible]}>
+      <Text style={[fonts.h6, brandStyles.gap, styles.matches, query && styles.visible]}>
         {visibleIcons.size === 0
           ? t('icons.matching_0')
           : t('icons.matching', { count: visibleIcons.size })}
@@ -43,11 +43,15 @@ export function Explorer({ icons }: Icons) {
   )
 }
 
+export default Explorer
+
 const styles = StyleSheet.create({
+  root: { minHeight: '100vh' },
   offScreen: {
     display: 'none',
   },
   matches: {
+    color: colors.primaryPress,
     opacity: 0,
     transitionDuration: '200ms',
     transitionProperty: 'opacity',
