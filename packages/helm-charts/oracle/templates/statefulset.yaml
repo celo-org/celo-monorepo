@@ -3,7 +3,7 @@ kind: Service
 metadata:
   name: oracle
   labels:
-    component: oracle
+{{ include "labels" . | indent 4 }}
 spec:
   clusterIP: None
   selector:
@@ -12,12 +12,9 @@ spec:
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ .Values.environmentName }}-oracle
-  # annotations:
-    # prometheus.io/scrape: true
+  name: {{ include "name" . }}
   labels:
-    # TODO add labels
-    component: oracle
+{{ include "labels" . | indent 4 }}
 spec:
   podManagementPolicy: Parallel
   updateStrategy:
@@ -26,13 +23,11 @@ spec:
   serviceName: oracle
   selector:
     matchLabels:
-      # TODO add labels
-      component: oracle
+{{ include "labels" . | indent 6 }}
   template:
     metadata:
       labels:
-# TODO add labels
-        component: oracle
+{{ include "labels" . | indent 8 }}
     spec:
       containers:
       - name: geth
@@ -41,10 +36,3 @@ spec:
         env:
         - name: WEB3_PROVIDER_URL
           value: {{ .Values.oracle.web3ProviderUrl }}
-        # ports:
-        # - name: prometheus-server
-        #   containerPort: 9090
-        # resources:
-        #   requests:
-        #     memory: {{ .Values.pod.memoryRequest }}
-        #     cpu: {{ .Values.pod.cpuRequest }}
