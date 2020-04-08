@@ -1081,8 +1081,12 @@ contract('ReleaseGold', (accounts: string[]) => {
 
       describe('when the contract has finished releasing', () => {
         beforeEach(async () => {
-          const timeToTravel = 12 * MONTH
-          await timeTravel(timeToTravel, web3)
+          const [, , numReleasePeriods, releasePeriod] = await releaseGoldInstance.releaseSchedule()
+          const grantTime = numReleasePeriods
+            .times(releasePeriod)
+            .plus(5 * MINUTE)
+            .toNumber()
+          await timeTravel(grantTime, web3)
         })
 
         it('should revert before `EXPIRATION_TIME` after release schedule end', async () => {
@@ -1091,9 +1095,8 @@ contract('ReleaseGold', (accounts: string[]) => {
 
         describe('when `EXPIRATION_TIME` has passed after release schedule completion', () => {
           beforeEach(async () => {
-            const [releaseGoldStartTime, , , ,] = await releaseGoldInstance.releaseSchedule()
             const expirationTime = await releaseGoldInstance.EXPIRATION_TIME()
-            const timeToTravel = releaseGoldStartTime.plus(expirationTime).toNumber()
+            const timeToTravel = expirationTime.toNumber()
             await timeTravel(timeToTravel, web3)
           })
           describe('when not called by releaseOwner', () => {
@@ -1171,11 +1174,12 @@ contract('ReleaseGold', (accounts: string[]) => {
     describe('when the contract is not expirable', () => {
       beforeEach(async () => {
         await createNewReleaseGoldInstance(releaseGoldDefaultSchedule, web3)
-        const [releaseGoldStartTime, , , ,] = await releaseGoldInstance.releaseSchedule()
-        const expirationTime = await releaseGoldInstance.EXPIRATION_TIME()
-        const timeToTravel = releaseGoldStartTime.plus(expirationTime).toNumber()
-        await timeTravel(timeToTravel, web3)
         await releaseGoldInstance.setCanExpire(false, { from: beneficiary })
+        const [, , numReleasePeriods, releasePeriod] = await releaseGoldInstance.releaseSchedule()
+        const expirationTime = await releaseGoldInstance.EXPIRATION_TIME()
+        const grantTime = numReleasePeriods.times(releasePeriod).plus(5 * MINUTE)
+        const timeToTravel = grantTime.plus(expirationTime).toNumber()
+        await timeTravel(timeToTravel, web3)
       })
 
       describe('when `expire` is called', () => {
