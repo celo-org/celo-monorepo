@@ -1,6 +1,5 @@
 import { envVar, fetchEnv } from 'src/lib/env-utils'
 import { installGenericHelmChart, removeGenericHelmChart } from 'src/lib/helm_deploy'
-import { getInternalTxNodeLoadBalancerIP } from 'src/lib/vm-testnet-utils'
 
 const helmChartPath = '../helm-charts/oracle'
 

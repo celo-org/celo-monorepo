@@ -36,5 +36,5 @@ async function helmParameters(celoEnv: string) {
 }
 
 function releaseName(celoEnv: string) {
-  return `${celoEnv}-oracle`
+  return `${celoEnv}-mock-oracle`
 }
