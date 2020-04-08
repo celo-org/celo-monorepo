@@ -15,7 +15,7 @@ interface Fields extends FieldSet {
   Preview?: Attachment[]
   Zip: Attachment[]
   Terms: boolean
-  Tags: string[]
+  Tags?: string[]
   Order: number
 }
 
@@ -86,7 +86,7 @@ function normalize(asset: Fields, id: string, tags: Record<string, Tag>): AssetP
     description: asset.Description,
     preview: getPreview(asset),
     uri: getURI(asset),
-    tags: asset.Tags.map((tagID) => tags[tagID].Name),
+    tags: (asset.Tags || []).map((tagID) => tags[tagID].Name),
     id,
   }
 }
