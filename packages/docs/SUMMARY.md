@@ -53,6 +53,7 @@
     - [Stability Fees](celo-codebase/protocol/stability/stability-fees.md)
     - [Tobin Tax](celo-codebase/protocol/stability/tobin-tax.md)
   - [Privacy](celo-codebase/protocol/privacy.md)
+  - [ReleaseGold](celo-codebase/protocol/release-gold/README.md)
 - [Celo Wallet](celo-codebase/wallet/README.md)
   - [Running the Wallet Locally](celo-codebase/wallet/intro.md)
   - [Wallet Functionality](celo-codebase/wallet/how-the-wallet-works/README.md)
