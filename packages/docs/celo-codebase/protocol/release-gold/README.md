@@ -60,7 +60,7 @@ Similar to vesting-type schedules with cliffs used for other assets, ReleaseGold
 
 In deployed ReleaseGold accounts, you can conceptually think of cGLD in two states -- released, and unreleased. There are other states including locked, but for the purposes of the contract, these are the two primary states to consider.
 
-Released cGLD can be withdrawn to the `beneficiary` where they can be used freely. Unreleased cGLD comes with some restrictions. Foremost, it cannot be withdrawn by the beneficiary. If `canVote` and `canValidate` are set to false, the beneficiary cannot vote or validate, respectively.
+Released cGLD can be withdrawn to the `beneficiary` where it can be used freely. Unreleased cGLD comes with some restrictions. Foremost, it cannot be withdrawn by the beneficiary. If `canVote` and `canValidate` are set to false, the beneficiary cannot vote or validate, respectively.
 
 If the contract permits voting and validating using the unreleased balance, the specific keys to perform these actions must first be authorized. For example, if the `beneficiary` desires to vote using their ReleaseGold contract, they must authorize a voting key to vote on the contract’s behalf.
 
