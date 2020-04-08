@@ -80,39 +80,6 @@ type dnsResolverFunction = (
  * It verifies if a DNS domain includes in the TXT records an entry with name
  * `celo-site-verification` and a valid signature in base64
  */
-export const verifyDomainClaimFromMetadata = async (
-  claim: DomainClaim,
-  address: string,
-  metadataURLGetter: MetadataURLGetter,
-  dnsResolver: dnsResolverFunction = resolveTxt
-) => {
-  const metadataURL = await metadataURLGetter(claim.domain)
-  const domain = claim.domain
-
-  if (!isValidUrl(metadataURL)) {
-    return `Metadata URL of ${claim.domain} could not be retrieved`
-  }
-
-  let metadata: IdentityMetadataWrapper
-  let claimFound
-  try {
-    metadata = await IdentityMetadataWrapper.fetchFromURL(metadataURL)
-    const existingClaims = metadata
-      .filterClaims(ClaimTypes.DOMAIN)
-      .filter((el) => el.domain === domain)
-
-    if (existingClaims.length < 1) {
-      return `The domain ${domain} is not part of your metadata`
-    }
-    claimFound = existingClaims[0]
-  } catch (error) {
-    return `Metadata could not be fetched for ${claim.domain} at 
-      ${metadataURL}: ${error.toString()}`
-  }
-
-  return verifyDomainRecord(claimFound, address, dnsResolver)
-}
-
 export const verifyDomainRecord = async (
   claim: DomainClaim,
   address: string,
