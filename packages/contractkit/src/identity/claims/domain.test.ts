@@ -4,7 +4,7 @@ import { NativeSigner, Signer, verifySignature } from '@celo/utils/lib/signature
 import { newKitFromWeb3 } from '../../kit'
 import { IdentityMetadataWrapper } from '../metadata'
 import { createDomainClaim, DomainClaim, serializeClaim } from './claim'
-import { MetadataURLGetter, verifyDomainClaimFromMetadata } from './verify'
+import { verifyDomainRecord } from './verify'
 
 testWithGanache('Domain claims', (web3) => {
   const kit = newKitFromWeb3(web3)
@@ -20,11 +20,9 @@ testWithGanache('Domain claims', (web3) => {
   describe('verifying', () => {
     let claim: DomainClaim
     let metadata: IdentityMetadataWrapper
-    let metadataUrlGetter: MetadataURLGetter
     let signature: string
     let signatureBase64: string
     let signer: Signer
-    const myUrl = 'https://test.com'
     const domain = 'test.com'
     const originalFetchFromURLImplementation = IdentityMetadataWrapper.fetchFromURL
     const dnsResolver = (
@@ -40,7 +38,6 @@ testWithGanache('Domain claims', (web3) => {
     }
 
     beforeEach(async () => {
-      metadataUrlGetter = (_addr: string) => Promise.resolve(myUrl)
       signer = NativeSigner(kit.web3.eth.sign, address)
       metadata = IdentityMetadataWrapper.fromEmpty(address)
       claim = createDomainClaim(domain)
@@ -83,17 +80,12 @@ testWithGanache('Domain claims', (web3) => {
 
     describe('when the metadata URL is set', () => {
       it('indicates that the metadata contain the right claim', async () => {
-        const output = await verifyDomainClaimFromMetadata(
-          claim,
-          address,
-          metadataUrlGetter,
-          dnsResolver
-        )
+        const output = await verifyDomainRecord(claim, address, dnsResolver)
         expect(output).toBeUndefined()
       })
 
       it('indicates that the metadata does not contain the proper domain claim', async () => {
-        const error = await verifyDomainClaimFromMetadata(claim, address, metadataUrlGetter)
+        const error = await verifyDomainRecord(claim, address)
         expect(error).toContain('Unable to verify domain claim')
       })
     })
