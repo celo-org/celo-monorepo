@@ -10,7 +10,6 @@
 
 * [verifyAccountClaim](_identity_claims_verify_.md#const-verifyaccountclaim)
 * [verifyClaim](_identity_claims_verify_.md#verifyclaim)
-* [verifyDomainClaimFromMetadata](_identity_claims_verify_.md#const-verifydomainclaimfrommetadata)
 * [verifyDomainRecord](_identity_claims_verify_.md#const-verifydomainrecord)
 
 ## Type aliases
@@ -76,33 +75,14 @@ If valid, returns undefined. If invalid or unable to verify, returns a string wi
 
 ___
 
-### `Const` verifyDomainClaimFromMetadata
+### `Const` verifyDomainRecord
 
-▸ **verifyDomainClaimFromMetadata**(`claim`: [DomainClaim](_identity_claims_claim_.md#domainclaim), `address`: string, `metadataURLGetter`: [MetadataURLGetter](_identity_claims_verify_.md#metadataurlgetter), `dnsResolver`: dnsResolverFunction): *Promise‹undefined | string›*
+▸ **verifyDomainRecord**(`claim`: [DomainClaim](_identity_claims_claim_.md#domainclaim), `address`: string, `dnsResolver`: dnsResolverFunction): *Promise‹undefined | "Unable to verify domain claim"›*
 
 *Defined in [contractkit/src/identity/claims/verify.ts:83](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/verify.ts#L83)*
 
 It verifies if a DNS domain includes in the TXT records an entry with name
 `celo-site-verification` and a valid signature in base64
-
-**Parameters:**
-
-Name | Type | Default |
------- | ------ | ------ |
-`claim` | [DomainClaim](_identity_claims_claim_.md#domainclaim) | - |
-`address` | string | - |
-`metadataURLGetter` | [MetadataURLGetter](_identity_claims_verify_.md#metadataurlgetter) | - |
-`dnsResolver` | dnsResolverFunction | resolveTxt |
-
-**Returns:** *Promise‹undefined | string›*
-
-___
-
-### `Const` verifyDomainRecord
-
-▸ **verifyDomainRecord**(`claim`: [DomainClaim](_identity_claims_claim_.md#domainclaim), `address`: string, `dnsResolver`: dnsResolverFunction): *Promise‹undefined | "Unable to verify domain claim"›*
-
-*Defined in [contractkit/src/identity/claims/verify.ts:116](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/verify.ts#L116)*
 
 **Parameters:**
 
