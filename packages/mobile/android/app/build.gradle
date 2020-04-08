@@ -74,7 +74,8 @@ import com.android.build.OutputFile
 
 project.ext.react = [
         entryFile        : "index.js",
-        enableHermes: true,  // clean and rebuild if changing
+        // Disable hermes as it's not yet compatible with react-native-firebase v6 :'(
+        enableHermes: false,  // clean and rebuild if changing
         extraPackagerArgs: ["--max-workers=2"],
         bundleInIntegration: true,
         devDisabledInIntegration: true,
