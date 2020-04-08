@@ -88,17 +88,17 @@ export const verifyDomainRecord = async (
   const found = await new Promise((resolve) => {
     dnsResolver(claim.domain, (error, domainRecords) => {
       if (error) {
-        console.log(`Unable to fetch domain TXT records: ${error.toString()}`)
+        console.debug(`Unable to fetch domain TXT records: ${error.toString()}`)
         resolve(false)
       } else {
         domainRecords.forEach((record) => {
           record.forEach((entry) => {
             if (entry.startsWith(DOMAIN_TXT_HEADER)) {
-              console.log(`TXT Record celo-site-verification found`)
+              console.debug(`TXT Record celo-site-verification found`)
               const signatureBase64 = entry.substring(DOMAIN_TXT_HEADER.length + 1)
               const signature = Buffer.from(signatureBase64, 'base64').toString('binary')
               if (verifySignature(serializeClaim(claim), signature, address)) {
-                console.log(`Signature verified successfully`)
+                console.debug(`Signature verified successfully`)
                 resolve(true)
               }
             }
@@ -112,6 +112,6 @@ export const verifyDomainRecord = async (
   if (found) {
     return
   }
-  console.log(`Domain not validated correctly`)
+  console.debug(`Domain not validated correctly`)
   return `Unable to verify domain claim`
 }
