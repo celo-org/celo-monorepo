@@ -239,7 +239,6 @@ There are number of new environment variables, and you may use this table as a r
 | CELO_VALIDATOR_GROUP_RG_ADDRESS         | The `ReleaseGold` contract address for the Validator Group                                                                                          |
 | CELO_VALIDATOR_RG_ADDRESS         | The `ReleaseGold` contract address for the Validator                                                                                          |
 | CELO_VALIDATOR_GROUP_SIGNER_ADDRESS        | The address of the Validator Group signer authorized by the Validator Group Account                                                              |
-| CELO_VALIDATOR_GROUP_SIGNER_PUBLIC_KEY     | The ECDSA public key associated with the Validator Group signer address                                                                    |
 | CELO_VALIDATOR_GROUP_SIGNER_SIGNATURE      | The proof-of-possession of the Validator Group signer key                                                                                  |
 | CELO_VALIDATOR_SIGNER_ADDRESS        | The address of the Validator signer authorized by the Validator Account                                                              |
 | CELO_VALIDATOR_SIGNER_PUBLIC_KEY     | The ECDSA public key associated with the Validator signer address                                                                    |
@@ -402,7 +401,6 @@ Save the signer address, public key, and proof-of-possession signature to your l
 
 ```bash
 export CELO_VALIDATOR_GROUP_SIGNER_SIGNATURE=<YOUR-VALIDATOR-GROUP-SIGNER-SIGNATURE>
-export CELO_VALIDATOR_GROUP_SIGNER_PUBLIC_KEY=<YOUR-VALIDATOR-GROUP-SIGNER-PUBLIC-KEY>
 ```
 
 Authorize your Validator Group signing key:
@@ -476,7 +474,7 @@ Produce the proof-of-possession needed to authorize the keys:
 docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE --nousb account proof-of-possession $CELO_VALIDATOR_VOTE_SIGNER_ADDRESS $CELO_VALIDATOR_RG_ADDRESS
 export CELO_VALIDATOR_VOTE_SIGNER_SIGNATURE=<YOUR-VALIDATOR-VOTE-SIGNER-SIGNATURE>
 
-docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE --nousb account proof-of-possession $CELO_VALIDATOR_GROUP_VOTE_SIGNER_ADDRESS $CELO_VALIDATOR_RG_ADDRESS
+docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE --nousb account proof-of-possession $CELO_VALIDATOR_GROUP_VOTE_SIGNER_ADDRESS $CELO_VALIDATOR_GROUP_RG_ADDRESS
 export CELO_VALIDATOR_GROUP_VOTE_SIGNER_SIGNATURE=<YOUR-VALIDATOR-GROUP-VOTE-SIGNER-SIGNATURE>
 ```
 
