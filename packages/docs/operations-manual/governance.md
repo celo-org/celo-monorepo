@@ -31,7 +31,7 @@ celocli governance:view --proposalID=<PROPOSAL_ID>
 When a proposal is Queued, you can upvote the proposal to indicate you'd like it to be considered.
 
 ```bash
-celocli governance:upvote --proposalID=<PROPOSAL_ID> --from=<YOUR_VOTER_ADDRESS>
+celocli governance:upvote --proposalID=<PROPOSAL_ID> --from=<YOUR-VALIDATOR-VOTE-SIGNER-ADDRESS>
 ```
 
 At a defined frequency, which can be checked with the `celocli network:parameters` command, proposals can be dequeued, with the highest upvoted proposals being dequeued first.
@@ -41,7 +41,7 @@ After a proposal is dequeued, it will first enter the Approval phase. In this ph
 Once a proposal has reached the Referendum phase, it is open to community for voting. 
 
 ```bash
-celocli governance:vote --proposalID=<PROPOSAL_ID> --value=<Abstain|Yes|No> --from=<YOUR_VOTER_ADDRESS>
+celocli governance:vote --proposalID=<PROPOSAL_ID> --value=<Abstain|Yes|No> --from=<YOUR-VALIDATOR-VOTE-SIGNER-ADDRESS>
 ```
 
 ## Executing a Proposal
