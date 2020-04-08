@@ -157,7 +157,7 @@ export const registerTokenToDb = async (
     const regRef = app.database().ref('registrations')
     // TODO(Rossy) add support for multiple tokens per address
     await regRef.child(address).update({ fcmToken })
-    Logger.info(TAG, 'Firebase FCM token registed successfully', fcmToken)
+    Logger.info(TAG, 'Firebase FCM token registered successfully', fcmToken)
   } catch (error) {
     Logger.error(TAG, 'Failed to register Firebase FCM token', error)
     throw error
