@@ -19,6 +19,7 @@ contract GasPriceMinimum is Ownable, Initializable, UsingRegistry, CalledByVm {
   event TargetDensitySet(uint256 targetDensity);
   event GasPriceMinimumFloorSet(uint256 gasPriceMinimumFloor);
   event AdjustmentSpeedSet(uint256 adjustmentSpeed);
+  event GasPriceMinimumUpdated(uint256 gasPriceMinimum);
 
   uint256 public gasPriceMinimum;
   uint256 public gasPriceMinimumFloor;
@@ -118,6 +119,7 @@ contract GasPriceMinimum is Ownable, Initializable, UsingRegistry, CalledByVm {
     returns (uint256)
   {
     gasPriceMinimum = getUpdatedGasPriceMinimum(blockGasTotal, blockGasLimit);
+    emit GasPriceMinimumUpdated(gasPriceMinimum);
     return gasPriceMinimum;
   }
 

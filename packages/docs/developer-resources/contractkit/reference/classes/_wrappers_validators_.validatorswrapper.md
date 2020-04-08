@@ -24,14 +24,16 @@ Contract for voting for validators and managing validator groups.
 * [getEpochNumber](_wrappers_validators_.validatorswrapper.md#getepochnumber)
 * [getEpochSize](_wrappers_validators_.validatorswrapper.md#getepochsize)
 * [getRegisteredValidatorGroupsAddresses](_wrappers_validators_.validatorswrapper.md#getregisteredvalidatorgroupsaddresses)
+* [getSlashingMultiplierResetPeriod](_wrappers_validators_.validatorswrapper.md#getslashingmultiplierresetperiod)
 * [getValidatorGroupSize](_wrappers_validators_.validatorswrapper.md#getvalidatorgroupsize)
 * [getValidatorMembershipHistory](_wrappers_validators_.validatorswrapper.md#getvalidatormembershiphistory)
 * [getValidatorMembershipHistoryExtraData](_wrappers_validators_.validatorswrapper.md#getvalidatormembershiphistoryextradata)
 * [isValidator](_wrappers_validators_.validatorswrapper.md#isvalidator)
 * [isValidatorGroup](_wrappers_validators_.validatorswrapper.md#isvalidatorgroup)
-* [queueCommissionUpdate](_wrappers_validators_.validatorswrapper.md#queuecommissionupdate)
 * [registerValidator](_wrappers_validators_.validatorswrapper.md#registervalidator)
 * [removeMember](_wrappers_validators_.validatorswrapper.md#removemember)
+* [resetSlashingMultiplier](_wrappers_validators_.validatorswrapper.md#resetslashingmultiplier)
+* [setNextCommissionUpdate](_wrappers_validators_.validatorswrapper.md#setnextcommissionupdate)
 * [updateBlsPublicKey](_wrappers_validators_.validatorswrapper.md#updateblspublickey)
 * [updateCommission](_wrappers_validators_.validatorswrapper.md#updatecommission)
 
@@ -93,7 +95,7 @@ Name | Type |
     this.contract.methods.affiliate
   )
 
-*Defined in [contractkit/src/wrappers/Validators.ts:413](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L413)*
+*Defined in [contractkit/src/wrappers/Validators.ts:429](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L429)*
 
 Affiliates a validator with a group, allowing it to be added as a member.
 De-affiliates with the previously affiliated group if present.
@@ -116,7 +118,7 @@ ___
 
 • **deaffiliate**: *function* = proxySend(this.kit, this.contract.methods.deaffiliate)
 
-*Defined in [contractkit/src/wrappers/Validators.ts:423](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L423)*
+*Defined in [contractkit/src/wrappers/Validators.ts:439](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L439)*
 
 De-affiliates a validator, removing it from the group for which it is a member.
 Fails if the account is not a validator with non-zero affiliation.
@@ -150,7 +152,11 @@ ___
     this.contract.methods.forceDeaffiliateIfValidator
   )
 
-*Defined in [contractkit/src/wrappers/Validators.ts:425](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L425)*
+*Defined in [contractkit/src/wrappers/Validators.ts:445](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L445)*
+
+Removes a validator from the group for which it is a member.
+
+**`param`** The validator to deaffiliate from their affiliated validator group.
 
 #### Type declaration:
 
@@ -172,7 +178,7 @@ ___
     valueToBigNumber
   )
 
-*Defined in [contractkit/src/wrappers/Validators.ts:126](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L126)*
+*Defined in [contractkit/src/wrappers/Validators.ts:129](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L129)*
 
 Returns the Locked Gold requirements for specific account.
 
@@ -194,7 +200,7 @@ ___
 
 • **getEpochNumber**: *function* = proxyCall(this.contract.methods.getEpochNumber, undefined, valueToBigNumber)
 
-*Defined in [contractkit/src/wrappers/Validators.ts:352](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L352)*
+*Defined in [contractkit/src/wrappers/Validators.ts:368](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L368)*
 
 Registers a validator unaffiliated with any validator group.
 
@@ -227,7 +233,7 @@ ___
 
 • **getEpochSize**: *function* = proxyCall(this.contract.methods.getEpochSize, undefined, valueToBigNumber)
 
-*Defined in [contractkit/src/wrappers/Validators.ts:354](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L354)*
+*Defined in [contractkit/src/wrappers/Validators.ts:370](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L370)*
 
 #### Type declaration:
 
@@ -247,13 +253,37 @@ ___
     this.contract.methods.getRegisteredValidatorGroups
   )
 
-*Defined in [contractkit/src/wrappers/Validators.ts:322](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L322)*
+*Defined in [contractkit/src/wrappers/Validators.ts:338](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L338)*
 
 Get list of registered validator group addresses
 
 #### Type declaration:
 
 ▸ (): *Promise‹[Address](../modules/_base_.md#address)[]›*
+
+___
+
+###  getSlashingMultiplierResetPeriod
+
+• **getSlashingMultiplierResetPeriod**: *function* = proxyCall(
+    this.contract.methods.slashingMultiplierResetPeriod,
+    undefined,
+    valueToBigNumber
+  )
+
+*Defined in [contractkit/src/wrappers/Validators.ts:138](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L138)*
+
+Returns the reset period for slashing multiplier.
+
+#### Type declaration:
+
+▸ (...`args`: InputArgs): *Promise‹Output›*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`...args` | InputArgs |
 
 ___
 
@@ -265,7 +295,7 @@ ___
     valueToInt
   )
 
-*Defined in [contractkit/src/wrappers/Validators.ts:309](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L309)*
+*Defined in [contractkit/src/wrappers/Validators.ts:325](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L325)*
 
 Get the size (amount of members) of a ValidatorGroup
 
@@ -290,7 +320,7 @@ ___
       zip((epoch, group): GroupMembership => ({ epoch: valueToInt(epoch), group }), res[0], res[1])
   )
 
-*Defined in [contractkit/src/wrappers/Validators.ts:288](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L288)*
+*Defined in [contractkit/src/wrappers/Validators.ts:304](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L304)*
 
 Returns the Validator's group membership history
 
@@ -318,7 +348,7 @@ ___
     (res) => ({ lastRemovedFromGroupTimestamp: valueToInt(res[2]), tail: valueToInt(res[3]) })
   )
 
-*Defined in [contractkit/src/wrappers/Validators.ts:300](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L300)*
+*Defined in [contractkit/src/wrappers/Validators.ts:316](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L316)*
 
 Returns extra data from the Validator's group membership history
 
@@ -342,7 +372,7 @@ ___
 
 • **isValidator**: *function* = proxyCall(this.contract.methods.isValidator)
 
-*Defined in [contractkit/src/wrappers/Validators.ts:194](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L194)*
+*Defined in [contractkit/src/wrappers/Validators.ts:208](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L208)*
 
 Returns whether a particular account has a registered validator.
 
@@ -366,7 +396,7 @@ ___
 
 • **isValidatorGroup**: *function* = proxyCall(this.contract.methods.isValidatorGroup)
 
-*Defined in [contractkit/src/wrappers/Validators.ts:201](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L201)*
+*Defined in [contractkit/src/wrappers/Validators.ts:215](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L215)*
 
 Returns whether a particular account has a registered validator group.
 
@@ -386,33 +416,6 @@ Name | Type |
 
 ___
 
-###  queueCommissionUpdate
-
-• **queueCommissionUpdate**: *function* = proxySend(
-    this.kit,
-    this.contract.methods.queueCommissionUpdate,
-    tupleParser(valueToFixidityString)
-  )
-
-*Defined in [contractkit/src/wrappers/Validators.ts:83](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L83)*
-
-Queues an update to a validator group's commission.
-
-**`param`** Fixidity representation of the commission this group receives on epoch
-  payments made to its members. Must be in the range [0, 1.0].
-
-#### Type declaration:
-
-▸ (`commission`: BigNumber.Value): *[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹void›*
-
-**Parameters:**
-
-Name | Type |
------- | ------ |
-`commission` | BigNumber.Value |
-
-___
-
 ###  registerValidator
 
 • **registerValidator**: *function* = proxySend(
@@ -421,7 +424,7 @@ ___
     tupleParser(stringToBytes, stringToBytes, stringToBytes)
   )
 
-*Defined in [contractkit/src/wrappers/Validators.ts:356](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L356)*
+*Defined in [contractkit/src/wrappers/Validators.ts:372](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L372)*
 
 #### Type declaration:
 
@@ -441,7 +444,7 @@ ___
 
 • **removeMember**: *function* = proxySend(this.kit, this.contract.methods.removeMember)
 
-*Defined in [contractkit/src/wrappers/Validators.ts:457](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L457)*
+*Defined in [contractkit/src/wrappers/Validators.ts:483](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L483)*
 
 Removes a member from a ValidatorGroup
 The ValidatorGroup is specified by the `from` of the tx.
@@ -460,6 +463,54 @@ Name | Type |
 
 ___
 
+###  resetSlashingMultiplier
+
+• **resetSlashingMultiplier**: *function* = proxySend(this.kit, this.contract.methods.resetSlashingMultiplier)
+
+*Defined in [contractkit/src/wrappers/Validators.ts:454](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L454)*
+
+Resets a group's slashing multiplier if it has been >= the reset period since
+the last time the group was slashed.
+
+#### Type declaration:
+
+▸ (...`args`: InputArgs): *[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹Output›*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`...args` | InputArgs |
+
+___
+
+###  setNextCommissionUpdate
+
+• **setNextCommissionUpdate**: *function* = proxySend(
+    this.kit,
+    this.contract.methods.setNextCommissionUpdate,
+    tupleParser(valueToFixidityString)
+  )
+
+*Defined in [contractkit/src/wrappers/Validators.ts:86](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L86)*
+
+Queues an update to a validator group's commission.
+
+**`param`** Fixidity representation of the commission this group receives on epoch
+  payments made to its members. Must be in the range [0, 1.0].
+
+#### Type declaration:
+
+▸ (`commission`: BigNumber.Value): *[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹void›*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`commission` | BigNumber.Value |
+
+___
+
 ###  updateBlsPublicKey
 
 • **updateBlsPublicKey**: *function* = proxySend(
@@ -468,7 +519,7 @@ ___
     tupleParser(stringToBytes, stringToBytes)
   )
 
-*Defined in [contractkit/src/wrappers/Validators.ts:180](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L180)*
+*Defined in [contractkit/src/wrappers/Validators.ts:194](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L194)*
 
 Updates a validator's BLS key.
 
@@ -500,7 +551,7 @@ ___
     this.contract.methods.updateCommission
   )
 
-*Defined in [contractkit/src/wrappers/Validators.ts:93](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L93)*
+*Defined in [contractkit/src/wrappers/Validators.ts:96](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L96)*
 
 Updates a validator group's commission based on the previously queued update
 
@@ -528,7 +579,7 @@ Contract address
 
 ▸ **addMember**(`group`: [Address](../modules/_base_.md#address), `validator`: [Address](../modules/_base_.md#address)): *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹boolean››*
 
-*Defined in [contractkit/src/wrappers/Validators.ts:435](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L435)*
+*Defined in [contractkit/src/wrappers/Validators.ts:461](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L461)*
 
 Adds a member to the end of a validator group's list of members.
 Fails if `validator` has not set their affiliation to this account.
@@ -548,7 +599,7 @@ ___
 
 ▸ **currentSignerSet**(): *Promise‹[Address](../modules/_base_.md#address)[]›*
 
-*Defined in [contractkit/src/wrappers/Validators.ts:525](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L525)*
+*Defined in [contractkit/src/wrappers/Validators.ts:551](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L551)*
 
 Returns the current set of validator signer addresses
 
@@ -560,7 +611,7 @@ ___
 
 ▸ **currentValidatorAccountsSet**(): *Promise‹object[]›*
 
-*Defined in [contractkit/src/wrappers/Validators.ts:535](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L535)*
+*Defined in [contractkit/src/wrappers/Validators.ts:561](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L561)*
 
 Returns the current set of validator signer and account addresses
 
@@ -572,7 +623,7 @@ ___
 
 ▸ **deregisterValidator**(`validatorAddress`: [Address](../modules/_base_.md#address)): *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹boolean››*
 
-*Defined in [contractkit/src/wrappers/Validators.ts:370](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L370)*
+*Defined in [contractkit/src/wrappers/Validators.ts:386](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L386)*
 
 De-registers a validator, removing it from the group for which it is a member.
 
@@ -590,7 +641,7 @@ ___
 
 ▸ **deregisterValidatorGroup**(`validatorGroupAddress`: [Address](../modules/_base_.md#address)): *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹boolean››*
 
-*Defined in [contractkit/src/wrappers/Validators.ts:398](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L398)*
+*Defined in [contractkit/src/wrappers/Validators.ts:414](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L414)*
 
 De-registers a validator Group
 
@@ -608,7 +659,7 @@ ___
 
 ▸ **findValidatorMembershipHistoryIndex**(`epoch`: number, `history`: [GroupMembership](../interfaces/_wrappers_validators_.groupmembership.md)[]): *number*
 
-*Defined in [contractkit/src/wrappers/Validators.ts:567](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L567)*
+*Defined in [contractkit/src/wrappers/Validators.ts:593](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L593)*
 
 Returns the index into `history` for `epoch`.
 
@@ -629,7 +680,7 @@ ___
 
 ▸ **getConfig**(): *Promise‹[ValidatorsConfig](../interfaces/_wrappers_validators_.validatorsconfig.md)›*
 
-*Defined in [contractkit/src/wrappers/Validators.ts:135](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L135)*
+*Defined in [contractkit/src/wrappers/Validators.ts:147](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L147)*
 
 Returns current configuration parameters.
 
@@ -641,7 +692,7 @@ ___
 
 ▸ **getGroupLockedGoldRequirements**(): *Promise‹[LockedGoldRequirements](../interfaces/_wrappers_validators_.lockedgoldrequirements.md)›*
 
-*Defined in [contractkit/src/wrappers/Validators.ts:114](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L114)*
+*Defined in [contractkit/src/wrappers/Validators.ts:117](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L117)*
 
 Returns the Locked Gold requirements for validator groups.
 
@@ -655,7 +706,7 @@ ___
 
 ▸ **getRegisteredValidatorGroups**(): *Promise‹[ValidatorGroup](../interfaces/_wrappers_validators_.validatorgroup.md)[]›*
 
-*Defined in [contractkit/src/wrappers/Validators.ts:333](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L333)*
+*Defined in [contractkit/src/wrappers/Validators.ts:349](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L349)*
 
 Get list of registered validator groups
 
@@ -667,7 +718,7 @@ ___
 
 ▸ **getRegisteredValidators**(`blockNumber?`: undefined | number): *Promise‹[Validator](../interfaces/_wrappers_validators_.validator.md)[]›*
 
-*Defined in [contractkit/src/wrappers/Validators.ts:327](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L327)*
+*Defined in [contractkit/src/wrappers/Validators.ts:343](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L343)*
 
 Get list of registered validators
 
@@ -685,7 +736,7 @@ ___
 
 ▸ **getRegisteredValidatorsAddresses**(`blockNumber?`: undefined | number): *Promise‹[Address](../modules/_base_.md#address)[]›*
 
-*Defined in [contractkit/src/wrappers/Validators.ts:316](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L316)*
+*Defined in [contractkit/src/wrappers/Validators.ts:332](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L332)*
 
 Get list of registered validator addresses
 
@@ -703,7 +754,7 @@ ___
 
 ▸ **getValidator**(`address`: [Address](../modules/_base_.md#address), `blockNumber?`: undefined | number): *Promise‹[Validator](../interfaces/_wrappers_validators_.validator.md)›*
 
-*Defined in [contractkit/src/wrappers/Validators.ts:229](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L229)*
+*Defined in [contractkit/src/wrappers/Validators.ts:243](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L243)*
 
 Get Validator information
 
@@ -722,7 +773,7 @@ ___
 
 ▸ **getValidatorFromSigner**(`address`: [Address](../modules/_base_.md#address), `blockNumber?`: undefined | number): *Promise‹[Validator](../interfaces/_wrappers_validators_.validator.md)›*
 
-*Defined in [contractkit/src/wrappers/Validators.ts:246](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L246)*
+*Defined in [contractkit/src/wrappers/Validators.ts:260](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L260)*
 
 **Parameters:**
 
@@ -739,7 +790,7 @@ ___
 
 ▸ **getValidatorGroup**(`address`: [Address](../modules/_base_.md#address), `getAffiliates`: boolean, `blockNumber?`: undefined | number): *Promise‹[ValidatorGroup](../interfaces/_wrappers_validators_.validatorgroup.md)›*
 
-*Defined in [contractkit/src/wrappers/Validators.ts:252](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L252)*
+*Defined in [contractkit/src/wrappers/Validators.ts:266](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L266)*
 
 Get ValidatorGroup information
 
@@ -759,7 +810,7 @@ ___
 
 ▸ **getValidatorLockedGoldRequirements**(): *Promise‹[LockedGoldRequirements](../interfaces/_wrappers_validators_.lockedgoldrequirements.md)›*
 
-*Defined in [contractkit/src/wrappers/Validators.ts:102](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L102)*
+*Defined in [contractkit/src/wrappers/Validators.ts:105](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L105)*
 
 Returns the Locked Gold requirements for validators.
 
@@ -773,7 +824,7 @@ ___
 
 ▸ **getValidatorMembershipHistoryIndex**(`validator`: [Validator](../interfaces/_wrappers_validators_.validator.md), `blockNumber?`: undefined | number): *Promise‹object›*
 
-*Defined in [contractkit/src/wrappers/Validators.ts:547](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L547)*
+*Defined in [contractkit/src/wrappers/Validators.ts:573](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L573)*
 
 Returns the group membership for `validator`.
 
@@ -794,7 +845,7 @@ ___
 
 ▸ **getValidatorRewards**(`epochNumber`: number): *Promise‹[ValidatorReward](../interfaces/_wrappers_validators_.validatorreward.md)[]›*
 
-*Defined in [contractkit/src/wrappers/Validators.ts:499](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L499)*
+*Defined in [contractkit/src/wrappers/Validators.ts:525](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L525)*
 
 Retrieves ValidatorRewards for epochNumber.
 
@@ -812,7 +863,7 @@ ___
 
 ▸ **meetsValidatorBalanceRequirements**(`address`: [Address](../modules/_base_.md#address)): *Promise‹boolean›*
 
-*Defined in [contractkit/src/wrappers/Validators.ts:208](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L208)*
+*Defined in [contractkit/src/wrappers/Validators.ts:222](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L222)*
 
 Returns whether an account meets the requirements to register a validator.
 
@@ -832,7 +883,7 @@ ___
 
 ▸ **meetsValidatorGroupBalanceRequirements**(`address`: [Address](../modules/_base_.md#address)): *Promise‹boolean›*
 
-*Defined in [contractkit/src/wrappers/Validators.ts:221](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L221)*
+*Defined in [contractkit/src/wrappers/Validators.ts:235](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L235)*
 
 Returns whether an account meets the requirements to register a group.
 
@@ -852,7 +903,7 @@ ___
 
 ▸ **registerValidatorGroup**(`commission`: BigNumber): *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹boolean››*
 
-*Defined in [contractkit/src/wrappers/Validators.ts:387](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L387)*
+*Defined in [contractkit/src/wrappers/Validators.ts:403](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L403)*
 
 Registers a validator group with no member validators.
 Fails if the account is already a validator or validator group.
@@ -872,7 +923,7 @@ ___
 
 ▸ **reorderMember**(`groupAddr`: [Address](../modules/_base_.md#address), `validator`: [Address](../modules/_base_.md#address), `newIndex`: number): *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹boolean››*
 
-*Defined in [contractkit/src/wrappers/Validators.ts:466](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L466)*
+*Defined in [contractkit/src/wrappers/Validators.ts:492](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L492)*
 
 Reorders a member within a validator group.
 Fails if `validator` is not a member of the account's validator group.
@@ -893,7 +944,7 @@ ___
 
 ▸ **signerToAccount**(`signerAddress`: [Address](../modules/_base_.md#address), `blockNumber?`: undefined | number): *Promise‹string›*
 
-*Defined in [contractkit/src/wrappers/Validators.ts:167](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L167)*
+*Defined in [contractkit/src/wrappers/Validators.ts:181](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L181)*
 
 Returns the account associated with `signer`.
 
@@ -916,7 +967,7 @@ ___
 
 ▸ **validatorSignerToAccount**(`signerAddress`: [Address](../modules/_base_.md#address)): *Promise‹string›*
 
-*Defined in [contractkit/src/wrappers/Validators.ts:156](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L156)*
+*Defined in [contractkit/src/wrappers/Validators.ts:170](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L170)*
 
 Returns the account associated with `signer`.
 

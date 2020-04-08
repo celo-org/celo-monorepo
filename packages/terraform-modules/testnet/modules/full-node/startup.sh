@@ -167,12 +167,10 @@ docker pull $GETH_NODE_DOCKER_IMAGE
 IN_MEMORY_DISCOVERY_TABLE_FLAG=""
 [[ ${in_memory_discovery_table} == "true" ]] && IN_MEMORY_DISCOVERY_TABLE_FLAG="--use-in-memory-discovery-table"
 
-RPC_APIS="eth,net,web3,debug"
+RPC_APIS=${rpc_apis}
 
 if [[ ${proxy} == "true" ]]; then
   ADDITIONAL_GETH_FLAGS="--proxy.proxy --proxy.internalendpoint :30503 --proxy.proxiedvalidatoraddress $PROXIED_VALIDATOR_ADDRESS"
-else
-  RPC_APIS="$RPC_APIS,txpool"
 fi
 
 DATA_DIR=/root/.celo
@@ -230,6 +228,7 @@ docker run \
       --verbosity=${geth_verbosity} \
       --ethstats=${node_name}@${ethstats_host} \
       --metrics \
+      --pprof \
       $IN_MEMORY_DISCOVERY_TABLE_FLAG \
       $ADDITIONAL_GETH_FLAGS"
 
