@@ -15,6 +15,7 @@
 
 ## Operations Manual
 
+- [Governance](operations-manual/governance.md)
 - [Key Management](operations-manual/key-management.md)
 - [Securing Celo Nodes and Services](operations-manual/securing-nodes-and-services.md)
 - [Upgrading a Node](operations-manual/node-upgrades.md)
@@ -381,6 +382,7 @@
 - [Account](command-line-interface/account.md)
 - [Election](command-line-interface/election.md)
 - [Exchange](command-line-interface/exchange.md)
+- [Governance](command-line-interface/governance.md)
 - [Locked Gold](command-line-interface/lockedgold.md)
 - [Network](command-line-interface/network.md)
 - [Node](command-line-interface/node.md)
