@@ -276,6 +276,10 @@ const NetworkConfigs = {
     goldToken: {
       frozen: false,
     },
+    governance: {
+      skipSetConstitution: true,
+      skipTransferOwnership: true,
+    },
     stableToken: {
       frozen: false,
     },
