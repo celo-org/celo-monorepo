@@ -514,7 +514,7 @@ Epoch lengths in the Baklava network are set to be the number of blocks produced
 ```bash
 # On your local machine
 # Note that this command will wait for the next epoch transition, which may be up to 24 hours in the future.
-celocli election:activate --from $CELO_VALIDATOR_RG_ADDRESS --wait && celocli election:activate --from $CELO_VALIDATOR_GROUP_RG_ADDRESS --wait
+celocli election:activate --from $CELO_VALIDATOR_VOTE_SIGNER_ADDRESS --wait && celocli election:activate --from $CELO_VALIDATOR_GROUP_VOTE_SIGNER_ADDRESS --wait
 ```
 
 Check that your votes were activated by re-running the following commands:
