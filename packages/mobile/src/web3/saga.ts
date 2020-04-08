@@ -187,7 +187,7 @@ export function* getOrCreateAccount() {
 
 export function* assignAccountFromPrivateKey(privateKey: string) {
   try {
-    const pincode = yield call(getPincode)
+    const pincode = yield call(getPincode, false)
     if (!pincode) {
       Logger.error(TAG + '@assignAccountFromPrivateKey', 'Got falsy pin')
       throw Error('Cannot create account without having the pin set')
@@ -265,7 +265,7 @@ export function* unlockAccount(account: string) {
       return true
     }
 
-    const pincode = yield call(getPincode)
+    const pincode = yield call(getPincode, true)
     const fornoMode = yield select(fornoSelector)
     if (fornoMode) {
       if (accountAlreadyAddedInFornoMode) {
@@ -353,7 +353,7 @@ export function* ensureAccountInWeb3Keystore() {
         TAG + '@ensureAccountInWeb3Keystore',
         'Importing account from private key to web3 keystore'
       )
-      const pincode = yield call(getPincode)
+      const pincode = yield call(getPincode, true)
       const privateKey: string = yield call(readPrivateKeyFromLocalDisk, currentAccount, pincode)
       const account: string = yield call(
         addAccountToWeb3Keystore,

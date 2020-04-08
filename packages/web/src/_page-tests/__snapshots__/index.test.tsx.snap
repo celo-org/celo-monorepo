@@ -549,7 +549,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              stayConnected
+              Stay Connected
             </div>
             <div
               className="css-view-1dbjc4n"
@@ -576,7 +576,7 @@ exports[`HomePage renders 1`] = `
                 onKeyDown={[Function]}
                 onKeyPress={[Function]}
                 onSelect={[Function]}
-                placeholder="common:email*"
+                placeholder="Email*"
                 readOnly={false}
                 required={true}
                 spellCheck={true}
@@ -827,7 +827,7 @@ exports[`HomePage renders 1`] = `
               }
             }
           >
-            hero3
+            Celo is an open platform that makes financial tools accessible to anyone with a mobile phone
           </h2>
         </div>
       </div>
@@ -1440,7 +1440,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              recentNews
+              Recent News
               <div
                 className="css-view-1dbjc4n"
                 style={
@@ -1560,7 +1560,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              systemsApproach
+              We embrace a full-stack approach, reimagining technology at each layer
             </h2>
             <h2
               aria-level="2"
@@ -1579,7 +1579,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              designedWithCommunities
+              Our innovations are designed with communities around the world
             </h2>
           </div>
         </div>
@@ -1856,7 +1856,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              buildOnCelo
+              Build on Celo
             </div>
             <div
               className="css-text-901oao"
@@ -1871,7 +1871,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              buildOnCeloCopy
+              Celo is a platform that is open and open-source, allowing for an ecosystem of powerful applications built on top, including easier cash transfer programs, peer-to-peer lending, collaborative small-scale insurance, and other digital assets and wallets.
             </div>
             <div
               className="css-view-1dbjc4n"
@@ -1946,7 +1946,7 @@ exports[`HomePage renders 1`] = `
                       }
                     }
                   >
-                    learnMore
+                    Learn More
                     <div
                       className="css-view-1dbjc4n"
                       style={
@@ -2123,7 +2123,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              mobileFirstPlatform
+              Mobile-First Platform
             </div>
             <div
               className="css-text-901oao"
@@ -2138,7 +2138,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              mobileFirstPlatformCopy
+              To create a truly inclusive financial system, we started by building an infrastructure to serve those excluded from the current system. Celo’s protocol includes unique features that create a seamless user experience on mobile phones.
             </div>
           </div>
           <div
@@ -2284,7 +2284,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              poweredByCommunity
+              Powered by our community
             </div>
             <div
               className="css-text-901oao"
@@ -2299,7 +2299,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              poweredByCommunityCopy
+              Celo's platform is powered by the community. Users can earn currency by hosting software that forwards mobile devices' requests or validates their transactions.
             </div>
           </div>
           <div
@@ -2423,7 +2423,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              whitePaper
+              White Paper
             </div>
             <div
               className="css-text-901oao"
@@ -2439,7 +2439,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              whitepaperCopy
+              Celo is a proof-of-stake based blockchain with smart contracts. The technology uses a phone number-based identity system with address-based encryption and eigentrust-based reputation.
             </div>
             <div
               className="css-view-1dbjc4n"
@@ -2531,7 +2531,7 @@ exports[`HomePage renders 1`] = `
                   }
                   target="_blank"
                 >
-                  downloadPDF
+                  Download .PDF
                 </a>
               </div>
             </div>
@@ -2603,7 +2603,7 @@ exports[`HomePage renders 1`] = `
                   }
                 }
               >
-                stabilityAnalysis
+                Stability Analysis
               </div>
               <div
                 className="css-text-901oao"
@@ -2619,7 +2619,7 @@ exports[`HomePage renders 1`] = `
                   }
                 }
               >
-                stabilityAnalysisCopy
+                Celo’s stablecoins are stable value currencies, implemented by an algorithmic reserve-backed stabilization mechanism. The first stablecoin, cUSD, tracks the value of the US Dollar.
               </div>
             </div>
             <div
@@ -2712,7 +2712,7 @@ exports[`HomePage renders 1`] = `
                   }
                   target="_blank"
                 >
-                  downloadPDF
+                  Download .PDF
                 </a>
               </div>
             </div>
@@ -2821,7 +2821,7 @@ exports[`HomePage renders 1`] = `
           }
         }
       >
-        timeline.subtitle
+        Milestones
       </h3>
       <h2
         aria-level="2"
@@ -2840,7 +2840,7 @@ exports[`HomePage renders 1`] = `
           }
         }
       >
-        timeline.title
+        Celo's Journey
       </h2>
       <div
         className="css-text-901oao"
@@ -2855,7 +2855,7 @@ exports[`HomePage renders 1`] = `
           }
         }
       >
-        timeline.intro
+        The Celo Community's past and upcoming milestones, focused on finding use cases, innovating on technology, and preparing for Mainnet release.
       </div>
     </div>
   </div>
@@ -2918,7 +2918,181 @@ exports[`HomePage renders 1`] = `
           }
         }
       >
-        timeline.pastTitle
+        Previous Milestones
+      </div>
+      <div
+        className="css-view-1dbjc4n"
+        style={
+          Object {
+            "WebkitBoxDirection": "normal",
+            "WebkitBoxFlex": 1,
+            "WebkitBoxOrient": "horizontal",
+            "WebkitFlexBasis": "0%",
+            "WebkitFlexDirection": "row",
+            "WebkitFlexGrow": 1,
+            "WebkitFlexShrink": 1,
+            "flexBasis": "0%",
+            "flexDirection": "row",
+            "flexGrow": 1,
+            "flexShrink": 1,
+            "marginLeft": "15px",
+            "marginRight": "15px",
+            "maxWidth": "450px",
+            "msFlexDirection": "row",
+            "msFlexNegative": 1,
+            "msFlexPositive": 1,
+            "msFlexPreferredSize": "0%",
+          }
+        }
+      >
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitTransform": "translateY(10px)",
+              "backgroundColor": "rgba(251,204,92,1.00)",
+              "transform": "translateY(10px)",
+              "width": "2px",
+            }
+          }
+        />
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxFlex": 1,
+              "WebkitFlexBasis": "0%",
+              "WebkitFlexGrow": 1,
+              "WebkitFlexShrink": 1,
+              "flexBasis": "0%",
+              "flexGrow": 1,
+              "flexShrink": 1,
+              "marginBottom": "0px",
+              "marginTop": "0px",
+              "msFlexNegative": 1,
+              "msFlexPositive": 1,
+              "msFlexPreferredSize": "0%",
+              "paddingBottom": "30px",
+              "paddingLeft": "25px",
+              "paddingRight": "25px",
+            }
+          }
+        >
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "WebkitTransform": "translateX(-36px) translateY(1px)",
+                "position": "absolute",
+                "transform": "translateX(-36px) translateY(1px)",
+              }
+            }
+          >
+            <div
+              className="react-reveal"
+              style={
+                Object {
+                  "opacity": undefined,
+                }
+              }
+            >
+              <svg
+                fill="none"
+                height={18}
+                style={Object {}}
+                viewBox="0 0 83 98"
+                width={18}
+              >
+                <g
+                  style={
+                    Object {
+                      "mixBlendMode": "normal",
+                    }
+                  }
+                >
+                  <path
+                    d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+                    fill="#FBCC5C"
+                  />
+                </g>
+              </svg>
+            </div>
+          </div>
+          <div
+            className="react-reveal"
+            style={
+              Object {
+                "opacity": undefined,
+              }
+            }
+          >
+            <div
+              className="css-text-901oao"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(216,161,31,1.00)",
+                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                  "fontSize": "16px",
+                  "fontWeight": "bold",
+                  "lineHeight": "20px",
+                  "textRendering": "geometricPrecision",
+                }
+              }
+            >
+              April 2020
+            </div>
+          </div>
+          <div
+            className="react-reveal"
+            style={
+              Object {
+                "opacity": undefined,
+              }
+            }
+          >
+            <div
+              className="css-text-901oao"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(46,51,56,1.00)",
+                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                  "fontSize": "16px",
+                  "fontWeight": "bold",
+                  "lineHeight": "20px",
+                  "textRendering": "geometricPrecision",
+                }
+              }
+            >
+              New Baklava Testnet
+            </div>
+          </div>
+          <div
+            className="react-reveal"
+            style={
+              Object {
+                "opacity": undefined,
+              }
+            }
+          >
+            <div
+              className="css-text-901oao"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(46,51,56,1.00)",
+                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                  "fontSize": "16px",
+                  "lineHeight": "20px",
+                  "textRendering": "geometricPrecision",
+                }
+              }
+            >
+              Validators stand up new testnet with feature complete software
+            </div>
+          </div>
+        </div>
       </div>
       <div
         className="css-view-1dbjc4n"
@@ -3065,7 +3239,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              timeline.milestones.SDK_Release.title
+              SDK Release
             </div>
           </div>
           <div
@@ -3089,7 +3263,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              timeline.milestones.SDK_Release.text
+              ContractKit and DAppKit simplify development of dApps
             </div>
           </div>
         </div>
@@ -3239,7 +3413,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              timeline.milestones.Baklava_Testnet.title
+              Baklava Testnet – The Great Celo Stake Off
             </div>
           </div>
           <div
@@ -3263,7 +3437,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              timeline.milestones.Baklava_Testnet.text
+              Validators gain operational experience and chance to earn Mainnet Celo Gold, software hardened
             </div>
           </div>
         </div>
@@ -3413,7 +3587,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              timeline.milestones.100_Community.title
+              100th Community Event
             </div>
           </div>
           <div
@@ -3437,7 +3611,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              timeline.milestones.100_Community.text
+              100 events hosted in 100 days in more than 35 countries
             </div>
           </div>
         </div>
@@ -3587,7 +3761,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              timeline.milestones.Alfajores_Testnet.title
+              Alfajores Testnet Release
             </div>
           </div>
           <div
@@ -3611,7 +3785,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              timeline.milestones.Alfajores_Testnet.text
+              First full network release for protocol and app developers
             </div>
           </div>
         </div>
@@ -3761,7 +3935,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              timeline.milestones.MIT_Stability_Challenge.title
+              MIT Stability Challenge
             </div>
           </div>
           <div
@@ -3785,7 +3959,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              timeline.milestones.MIT_Stability_Challenge.text
+              Stability Protocol tested and improved
             </div>
           </div>
         </div>
@@ -3935,7 +4109,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              timeline.milestones.Wallet_in_market_testing_begins.title
+              Mobile Wallet in Market Testing Begins
             </div>
           </div>
           <div
@@ -3959,7 +4133,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              timeline.milestones.Wallet_in_market_testing_begins.text
+              Ongoing research in emerging markets
             </div>
           </div>
         </div>
@@ -4100,7 +4274,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              timeline.milestones.First_user_research_trip.title
+              First User Research Trip
             </div>
           </div>
           <div
@@ -4124,7 +4298,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              timeline.milestones.First_user_research_trip.text
+              Field research on mobile money adoption in Kenya
             </div>
           </div>
         </div>
@@ -4165,7 +4339,7 @@ exports[`HomePage renders 1`] = `
           }
         }
       >
-        timeline.legendTitle
+        Milestone Key
       </div>
       <div
         className="css-view-1dbjc4n"
@@ -4229,7 +4403,7 @@ exports[`HomePage renders 1`] = `
               }
             }
           >
-            timeline.legend.half
+            In Progress
           </div>
         </div>
         <div
@@ -4283,7 +4457,7 @@ exports[`HomePage renders 1`] = `
               }
             }
           >
-            timeline.legend.empty
+            Pending
           </div>
         </div>
       </div>
@@ -4303,7 +4477,7 @@ exports[`HomePage renders 1`] = `
           }
         }
       >
-        timeline.upcomingTitle
+        Upcoming Milestones
       </div>
       <div
         className="css-view-1dbjc4n"
@@ -4432,7 +4606,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              timeline.milestones.New_Baklava_Testnet.title
+              Security Audits Complete
             </div>
           </div>
           <div
@@ -4456,163 +4630,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              timeline.milestones.New_Baklava_Testnet.text
-            </div>
-          </div>
-        </div>
-      </div>
-      <div
-        className="css-view-1dbjc4n"
-        style={
-          Object {
-            "WebkitBoxDirection": "normal",
-            "WebkitBoxOrient": "horizontal",
-            "WebkitFlexDirection": "row",
-            "flexDirection": "row",
-            "marginLeft": "15px",
-            "marginRight": "15px",
-            "maxWidth": "450px",
-            "msFlexDirection": "row",
-          }
-        }
-      >
-        <div
-          className="css-view-1dbjc4n"
-          style={
-            Object {
-              "visibility": "hidden",
-              "width": "2px",
-            }
-          }
-        />
-        <div
-          className="css-view-1dbjc4n"
-          style={
-            Object {
-              "WebkitBoxFlex": 1,
-              "WebkitFlexBasis": "0%",
-              "WebkitFlexGrow": 1,
-              "WebkitFlexShrink": 1,
-              "flexBasis": "0%",
-              "flexGrow": 1,
-              "flexShrink": 1,
-              "marginBottom": "0px",
-              "marginTop": "0px",
-              "msFlexNegative": 1,
-              "msFlexPositive": 1,
-              "msFlexPreferredSize": "0%",
-              "paddingBottom": "30px",
-              "paddingLeft": "25px",
-              "paddingRight": "25px",
-            }
-          }
-        >
-          <div
-            className="css-view-1dbjc4n"
-            style={
-              Object {
-                "WebkitTransform": "translateX(-35px) translateY(1px)",
-                "position": "absolute",
-                "transform": "translateX(-35px) translateY(1px)",
-              }
-            }
-          >
-            <div
-              className="react-reveal"
-              style={
-                Object {
-                  "opacity": undefined,
-                }
-              }
-            >
-              <svg
-                fill="none"
-                height={18}
-                style={Object {}}
-                viewBox="0 0 12 15"
-                width={15.84}
-              >
-                <path
-                  d="M0.694644 8.03832L0.694854 8.03733C1.11106 6.0762 2.01314 4.31934 3.15316 2.97222C4.29262 1.62577 5.67668 0.756708 6.97518 0.535182L6.99246 0.532234L7.00949 0.528084C7.08947 0.50859 7.14342 0.507067 7.2886 0.507067H7.30252L7.31641 0.506293C8.43398 0.444037 9.44602 0.844847 10.2113 1.6515C11.3029 2.84313 11.7636 4.74522 11.3503 6.96114L11.3497 6.96425C11.0041 8.88501 10.1393 10.6528 8.99112 11.9944C7.84052 13.3387 6.43203 14.226 5.00847 14.4498C3.7403 14.6396 2.60967 14.2904 1.79643 13.4367L1.79645 13.4366L1.79296 13.433C0.645198 12.252 0.211033 10.2946 0.694644 8.03832Z"
-                  stroke="#FBCC5C"
-                />
-                <path
-                  d="M0.205748 7.93311H11.6464C10.6896 11.5534 7.99538 14.4869 5.08425 14.9436C3.67491 15.155 2.37395 14.7675 1.43439 13.7811C0.133461 12.4424 -0.300169 10.2934 0.205748 7.93311Z"
-                  fill="#FBCC5C"
-                />
-              </svg>
-            </div>
-          </div>
-          <div
-            className="react-reveal"
-            style={
-              Object {
-                "opacity": undefined,
-              }
-            }
-          >
-            <div
-              className="css-text-901oao"
-              dir="auto"
-              style={
-                Object {
-                  "color": "rgba(216,161,31,1.00)",
-                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                  "fontSize": "16px",
-                  "fontWeight": "bold",
-                  "lineHeight": "20px",
-                  "textRendering": "geometricPrecision",
-                }
-              }
-            />
-          </div>
-          <div
-            className="react-reveal"
-            style={
-              Object {
-                "opacity": undefined,
-              }
-            }
-          >
-            <div
-              className="css-text-901oao"
-              dir="auto"
-              style={
-                Object {
-                  "color": "rgba(46,51,56,1.00)",
-                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                  "fontSize": "16px",
-                  "fontWeight": "bold",
-                  "lineHeight": "20px",
-                  "textRendering": "geometricPrecision",
-                }
-              }
-            >
-              timeline.milestones.Security_audits_complete.title
-            </div>
-          </div>
-          <div
-            className="react-reveal"
-            style={
-              Object {
-                "opacity": undefined,
-              }
-            }
-          >
-            <div
-              className="css-text-901oao"
-              dir="auto"
-              style={
-                Object {
-                  "color": "rgba(46,51,56,1.00)",
-                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                  "fontSize": "16px",
-                  "lineHeight": "20px",
-                  "textRendering": "geometricPrecision",
-                }
-              }
-            >
-              timeline.milestones.Security_audits_complete.text
+              Resolve any outstanding issues to harden codebase
             </div>
           </div>
         </div>
@@ -4749,7 +4767,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              timeline.milestones.Mainnet_Release_Candidate_1.title
+              Mainnet Release Candidate 1
             </div>
           </div>
           <div
@@ -4773,7 +4791,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              timeline.milestones.Mainnet_Release_Candidate_1.text
+              Validators stand up release candidate network with production-ready software
             </div>
           </div>
         </div>
@@ -4910,7 +4928,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              timeline.milestones.Validator_Elections_Start.title
+              Validator Elections Start
             </div>
           </div>
           <div
@@ -4934,7 +4952,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              timeline.milestones.Validator_Elections_Start.text
+              When sufficient validators and groups are registered and staked, validator elections and epoch rewards can be enabled via on-chain governance proposal
             </div>
           </div>
         </div>
@@ -5071,7 +5089,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              timeline.milestones.Rewards_Activated.title
+              Celo Gold Voter Rewards Activate
             </div>
           </div>
           <div
@@ -5095,7 +5113,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              timeline.milestones.Rewards_Activated.text
+              Voter rewards can be enabled via on-chain governance proposal
             </div>
           </div>
         </div>
@@ -5232,7 +5250,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              timeline.milestones.Mainnet_Release_Candidate_X.title
+              Mainnet Release Candidate X
             </div>
           </div>
           <div
@@ -5256,7 +5274,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              timeline.milestones.Mainnet_Release_Candidate_X.text
+              Possible additional release candidates in the event critical issues are discovered
             </div>
           </div>
         </div>
@@ -5393,7 +5411,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              timeline.milestones.Celo_Gold_is_live.title
+              Celo Gold Live
             </div>
           </div>
           <div
@@ -5417,7 +5435,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              timeline.milestones.Celo_Gold_is_live.text
+              When the network is running smoothly, Celo Gold transfers can be enabled via on-chain governance proposal
             </div>
           </div>
         </div>
@@ -5554,7 +5572,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              timeline.milestones.Celo_Dollar_is_live.title
+              Celo Dollars Live
             </div>
           </div>
           <div
@@ -5578,7 +5596,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              timeline.milestones.Celo_Dollar_is_live.text
+              When Oracles can provide pricing for Celo Gold, Celo Dollar transfers can be enabled via on-chain governance proposal
             </div>
           </div>
         </div>
@@ -5715,7 +5733,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              timeline.milestones.Mainnet_Mobile_Wallet_Release.title
+              Mainnet Mobile Wallet Release
             </div>
           </div>
           <div
@@ -5739,7 +5757,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              timeline.milestones.Mainnet_Mobile_Wallet_Release.text
+              The Mainnet Mobile Wallet will be fully available for download on iOS and Android
             </div>
           </div>
         </div>
@@ -5826,7 +5844,7 @@ exports[`HomePage renders 1`] = `
               }
             }
           >
-            workOnCelo
+            Work on Celo in Berlin, Buenos Aires, San Francisco, and around the world
           </h2>
         </div>
       </div>
@@ -5919,7 +5937,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              viewRoles
+              View Open Roles
               <div
                 className="css-view-1dbjc4n"
                 style={
@@ -6513,7 +6531,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              hero.backers
+              See More Backers
               <div
                 className="css-view-1dbjc4n"
                 style={
@@ -6617,7 +6635,7 @@ exports[`HomePage renders 1`] = `
           }
         }
       >
-        startConversation
+        Start A Conversation
       </div>
       <div
         className="css-text-901oao"
@@ -6632,7 +6650,7 @@ exports[`HomePage renders 1`] = `
           }
         }
       >
-        reachOut
+        Reach out to participate in Celo’s ecosystem
       </div>
       <div
         className="css-view-1dbjc4n"
@@ -6659,7 +6677,7 @@ exports[`HomePage renders 1`] = `
           onKeyDown={[Function]}
           onKeyPress={[Function]}
           onSelect={[Function]}
-          placeholder="common:email*"
+          placeholder="Email*"
           readOnly={false}
           required={true}
           spellCheck={true}
@@ -6764,7 +6782,7 @@ exports[`HomePage renders 1`] = `
               }
             }
           >
-            submit
+            Submit
           </a>
         </div>
         <div
@@ -6831,7 +6849,7 @@ exports[`HomePage renders 1`] = `
           }
         }
       >
-        stayConnected
+        Stay Connected
       </div>
       <div
         className="css-text-901oao"
@@ -6846,7 +6864,7 @@ exports[`HomePage renders 1`] = `
           }
         }
       >
-        receiveUpdates
+        Receive the latest updates to your inbox
       </div>
       <div
         className="css-view-1dbjc4n"
@@ -6873,7 +6891,7 @@ exports[`HomePage renders 1`] = `
           onKeyDown={[Function]}
           onKeyPress={[Function]}
           onSelect={[Function]}
-          placeholder="common:email*"
+          placeholder="Email*"
           readOnly={false}
           required={true}
           spellCheck={true}
@@ -6978,7 +6996,7 @@ exports[`HomePage renders 1`] = `
               }
             }
           >
-            signUp
+            Sign Up
           </a>
         </div>
         <div

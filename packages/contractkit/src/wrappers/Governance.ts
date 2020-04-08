@@ -35,12 +35,20 @@ export interface ProposalStageDurations {
   [ProposalStage.Execution]: BigNumber // seconds
 }
 
+export interface ParticipationParameters {
+  baseline: BigNumber
+  baselineFloor: BigNumber
+  baselineUpdateFactor: BigNumber
+  baselineQuorumFactor: BigNumber
+}
+
 export interface GovernanceConfig {
   concurrentProposals: BigNumber
   dequeueFrequency: BigNumber // seconds
   minDeposit: BigNumber
   queueExpiry: BigNumber
   stageDurations: ProposalStageDurations
+  participationParameters: ParticipationParameters
 }
 
 export interface ProposalMetadata {
@@ -72,6 +80,7 @@ export interface ProposalRecord {
   upvotes: BigNumber
   votes: Votes
   proposal: Proposal
+  passing: boolean
 }
 
 export interface UpvoteRecord {
@@ -148,6 +157,20 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   }
 
   /**
+   * Returns the participation parameters.
+   * @returns The participation parameters.
+   */
+  async getParticipationParameters(): Promise<ParticipationParameters> {
+    const res = await this.contract.methods.getParticipationParameters().call()
+    return {
+      baseline: new BigNumber(res[0]),
+      baselineFloor: new BigNumber(res[1]),
+      baselineUpdateFactor: new BigNumber(res[2]),
+      baselineQuorumFactor: new BigNumber(res[3]),
+    }
+  }
+
+  /**
    * Returns whether or not a particular account is voting on proposals.
    * @param account The address of the account.
    * @returns Whether or not the account is voting on proposals.
@@ -164,6 +187,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
       this.minDeposit(),
       this.queueExpiry(),
       this.stageDurations(),
+      this.getParticipationParameters(),
     ])
     return {
       concurrentProposals: res[0],
@@ -171,6 +195,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
       minDeposit: res[2],
       queueExpiry: res[3],
       stageDurations: res[4],
+      participationParameters: res[5],
     }
   }
 
@@ -273,6 +298,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     const metadata = await this.getProposalMetadata(proposalID)
     const proposal = await this.getProposal(proposalID)
     const stage = await this.getProposalStage(proposalID)
+    const passing = await this.isProposalPassing(proposalID)
 
     let upvotes = ZERO_BN
     let votes = { [VoteValue.Yes]: ZERO_BN, [VoteValue.No]: ZERO_BN, [VoteValue.Abstain]: ZERO_BN }
@@ -288,6 +314,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
       stage,
       upvotes,
       votes,
+      passing,
     }
   }
 

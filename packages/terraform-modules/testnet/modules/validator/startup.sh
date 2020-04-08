@@ -254,6 +254,8 @@ docker run \
     --istanbul.requesttimeout=${istanbul_request_timeout_ms} \
     --maxpeers=${max_peers} \
     --metrics \
+    --pprof \
+    --allow-insecure-unlock \
     $IN_MEMORY_DISCOVERY_TABLE_FLAG \
     $PROXIED_FLAGS"
 

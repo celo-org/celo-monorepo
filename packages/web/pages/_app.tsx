@@ -4,7 +4,7 @@ import * as React from 'react'
 import { View } from 'react-native'
 import config from 'react-reveal/globals'
 import scrollIntoView from 'scroll-into-view'
-import { canTrack, initializeAnalytics } from 'src/analytics/analytics'
+import analytics, { canTrack, initializeAnalytics } from 'src/analytics/analytics'
 import Header from 'src/header/Header.3'
 import { ScreenSizeProvider } from 'src/layout/ScreenSize'
 import Footer from 'src/shared/Footer'
@@ -30,6 +30,9 @@ class MyApp extends App {
     if (await canTrack()) {
       await initSentry()
     }
+    this.props.router.events.on('routeChangeComplete', async () => {
+      await analytics.page()
+    })
   }
 
   // there are a few pages we dont want the header on

@@ -1,10 +1,7 @@
-import { NavigationParams } from 'react-navigation'
 import i18n from 'src/i18n'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import Logger from 'src/utils/Logger'
-const numeral = require('numeral')
-require('numeral/locales/es')
 
 const TAG = 'app/actions'
 
@@ -27,7 +24,6 @@ export enum Actions {
   SET_FEED_CACHE = 'APP/SET_FEED_CACHE',
   SET_ANALYTICS_ENABLED = 'APP/SET_ANALYTICS_ENABLED',
   SET_LOCK_WITH_PIN_ENABLED = 'APP/SET_LOCK_WITH_PIN_ENABLED',
-  NAVIGATE_PIN_PROTECTED = 'APP/NAVIGATE_PIN_PROTECTED',
   LOCK = 'APP/LOCK',
   UNLOCK = 'APP/UNLOCK',
 }
@@ -79,12 +75,6 @@ interface SetLockWithPinEnabled {
   enabled: boolean
 }
 
-export interface NavigatePinProtected {
-  type: Actions.NAVIGATE_PIN_PROTECTED
-  routeName: string
-  params?: NavigationParams
-}
-
 export interface Lock {
   type: Actions.LOCK
 }
@@ -104,7 +94,6 @@ export type ActionTypes =
   | ExitBackupFlow
   | SetAnalyticsEnabled
   | SetLockWithPinEnabled
-  | NavigatePinProtected
   | Lock
   | Unlock
 
@@ -124,7 +113,6 @@ export const setNumberVerified = (numberVerified: boolean) => ({
 })
 
 export const setLanguage = (language: string, nextScreen?: Screens) => {
-  numeral.locale(language.substring(0, 2))
   i18n
     .changeLanguage(language)
     .catch((reason: any) => Logger.error(TAG, 'Failed to change i18n language', reason))
@@ -167,19 +155,10 @@ export const setLockWithPinEnabled = (enabled: boolean): SetLockWithPinEnabled =
   enabled,
 })
 
-export const navigatePinProtected = (
-  routeName: string,
-  params?: NavigationParams
-): NavigatePinProtected => ({
-  type: Actions.NAVIGATE_PIN_PROTECTED,
-  routeName,
-  params,
-})
-
-export const lock = (): Lock => ({
+export const appLock = (): Lock => ({
   type: Actions.LOCK,
 })
 
-export const unlock = (): Unlock => ({
+export const appUnlock = (): Unlock => ({
   type: Actions.UNLOCK,
 })

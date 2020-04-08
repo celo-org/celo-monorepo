@@ -1,7 +1,7 @@
 {
   "name": "@celo/celocli",
   "description": "CLI Tool for transacting with the Celo protocol",
-  "version": "0.0.35-dev",
+  "version": "0.0.37-dev",
   "author": "Celo",
   "license": "Apache-2.0",
   "repository": "celo-org/celo-monorepo",
@@ -27,12 +27,13 @@
     "lint": "tslint -c tslint.json --project tsconfig.json",
     "prepack": "yarn run build && oclif-dev manifest && oclif-dev readme",
     "test:reset": "yarn --cwd ../protocol devchain generate-tar .tmp/devchain.tar.gz --migration_override ../dev-utils/src/migration-override.json --upto 24 --release_gold_contracts scripts/truffle/releaseGoldExampleConfigs.json",
-    "test:livechain": "yarn --cwd ../protocol devchain run-tar .tmp/devchain.tar.gz", 
+    "test:livechain": "yarn --cwd ../protocol devchain run-tar .tmp/devchain.tar.gz",
     "test": "TZ=UTC jest --runInBand"
   },
   "dependencies": {
-    "@celo/contractkit": "0.3.2-dev",
+    "@celo/contractkit": "0.3.3-dev",
     "@celo/utils": "0.1.9-dev",
+    "@ledgerhq/hw-transport-node-hid": "^5.11.0",
     "@oclif/command": "^1",
     "@oclif/config": "^1",
     "@oclif/plugin-help": "^2",
@@ -51,6 +52,7 @@
     "moment": "2.24.0",
     "humanize-duration": "^3.21.0",
     "path": "^0.12.7",
+    "prompts": "^2.0.1",
     "tslib": "^1",
     "web3": "1.2.4"
   },
