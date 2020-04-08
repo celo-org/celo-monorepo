@@ -10,7 +10,7 @@ export default class Trace extends BaseCommand {
   static flags = {
     ...BaseCommand.flags,
     blockNumber: flags.integer({ description: 'Block number to trace' }),
-    tracer: flags.string({ description: 'Tracer name' }),
+    tracer: flags.string({ description: 'Tracer name', default: 'callTracer' }),
     tracerFile: flags.string({ description: 'File containing javascript tracer code' }),
     transaction: flags.string({ description: 'Transaction hash to trace' }),
   }
@@ -20,8 +20,8 @@ export default class Trace extends BaseCommand {
   async run() {
     const res = this.parse(Trace)
     const tracer =
-      res.flags.tracer ||
-      (res.flags.tracerFile ? fs.readFileSync(res.flags.tracerFile).toString() : '')
+      (res.flags.tracerFile ? fs.readFileSync(res.flags.tracerFile).toString() : '') ||
+      res.flags.tracer
 
     if (res.flags.transaction) {
       printValueMapRecursive(await traceTransaction(this.kit.web3, res.flags.transaction, tracer))
