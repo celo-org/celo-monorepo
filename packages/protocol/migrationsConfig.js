@@ -7,6 +7,14 @@ const path = require('path')
 const lodash = require('lodash')
 const web3 = require('web3')
 
+const argv = minimist(process.argv.slice(2), {
+  default: {
+    build_directory: path.join(__dirname, 'build'),
+  },
+  string: ['migration_override', 'build_directory', 'network'],
+})
+const network = require('./truffle-config.js').networks[argv.network]
+
 // Almost never use exponential notation in toString
 // http://mikemcl.github.io/bignumber.js/#exponential-at
 BigNumber.config({ EXPONENTIAL_AT: 1e9 })
@@ -48,6 +56,7 @@ const DefaultConfig = {
     maxElectableValidators: '100',
     maxVotesPerAccount: 100,
     electabilityThreshold: 1 / 1000,
+    frozen: true,
   },
   epochRewards: {
     targetVotingYieldParameters: {
@@ -208,15 +217,58 @@ const DefaultConfig = {
 }
 
 const NetworkConfigs = {
+  development: {
+    downtimeSlasher: {
+      slashableDowntime: 60, // epoch length is 100 for unit tests
+    },
+    election: {
+      minElectableValidators: '10',
+      frozen: false,
+    },
+    epochRewards: {
+      frozen: false,
+    },
+    exchange: {
+      frozen: false,
+      minimumReports: 1,
+    },
+    goldToken: {
+      frozen: false,
+    },
+    governanceApproverMultiSig: {
+      signatories: [network.from],
+      numRequiredConfirmations: 1,
+      numInternalRequiredConfirmations: 1,
+    },
+    reserve: {
+      initialBalance: 100000000,
+      otherAddresses: ['0x7457d5E02197480Db681D3fdF256c7acA21bDc12'], // Add an arbitrary "otherReserveAddress" so that reserve spending can be tested.
+    },
+    reserveSpenderMultiSig: {
+      signatories: [network.from],
+      numRequiredConfirmations: 1,
+      numInternalRequiredConfirmations: 1,
+    },
+    stableToken: {
+      oracles: [network.from],
+      frozen: false,
+    },
+  },
   testing: {
     downtimeSlasher: {
       slashableDowntime: 6,
     },
     election: {
       minElectableValidators: '1',
+      frozen: false,
     },
     epochRewards: {
       frozen: false,
+      targetVotingYieldParameters: {
+        initial: 0.00016,
+        max: 0.0005,
+        adjustmentFactor: 0.1,
+      },
     },
     exchange: {
       frozen: false,
@@ -306,13 +358,6 @@ const linkedLibraries = {
   AddressSortedLinkedListWithMedian: ['SortedOracles', 'AddressSortedLinkedListWithMedianTest'],
   Signatures: ['Accounts', 'TestAttestations', 'Attestations', 'LockedGold', 'Escrow'],
 }
-
-const argv = minimist(process.argv.slice(2), {
-  default: {
-    build_directory: path.join(__dirname, 'build'),
-  },
-  string: ['migration_override', 'build_directory', 'network'],
-})
 
 const config = lodash.cloneDeep(DefaultConfig)
 
