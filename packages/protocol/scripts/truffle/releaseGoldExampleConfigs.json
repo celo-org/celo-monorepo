@@ -1,6 +1,7 @@
 [
   {
-    "releaseStartTime": "MAINNET+0",
+    "identifier": "0x111111111",
+    "releaseStartTime": "MAINNET",
     "releaseCliffTime": 1,
     "numReleasePeriods": 1,
     "releasePeriod": 100000000,
@@ -15,7 +16,8 @@
     "canVote": true
   },
   {
-    "releaseStartTime": "MAINNET+0",
+    "identifier": "0x222222222",
+    "releaseStartTime": "MAINNET",
     "releaseCliffTime": 1,
     "numReleasePeriods": 1,
     "releasePeriod": 100000000,

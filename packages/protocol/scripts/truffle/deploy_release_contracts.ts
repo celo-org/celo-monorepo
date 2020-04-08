@@ -18,6 +18,8 @@ let argv: any
 let registry: any
 let releases: any
 let startGold: any
+let deployedGrants: any
+let deployedGrantsFile: string
 let ReleaseGoldMultiSig: ReleaseGoldMultiSigContract
 let ReleaseGoldMultiSigProxy: ReleaseGoldMultiSigProxyContract
 let ReleaseGold: ReleaseGoldContract
@@ -27,10 +29,18 @@ async function handleGrant(releaseGoldConfig: any, currGrant: number) {
   console.info('Processing grant number ' + currGrant)
 
   const message =
-    'Are you sure you want to deploy this contract?\n Total Grant Value: ' +
+    'Please review this grant before you deploy:\n\tTotal Grant Value: ' +
     Number(releaseGoldConfig.numReleasePeriods) *
       Number(releaseGoldConfig.amountReleasedPerPeriod) +
-    '? (y/n)'
+    '\n\tGrant Recipient ID: ' +
+    releaseGoldConfig.identifier +
+    '\n\tGrant Beneficiary address: ' +
+    releaseGoldConfig.beneficiary +
+    '\n\tGrant Start Date: ' +
+    releaseGoldConfig.releaseStartTime +
+    '\n\tGrant Cliff time (in seconds): ' +
+    releaseGoldConfig.releaseCliffTime +
+    '\n\tDeploy this grant? (y/n)'
   if (!argv.yesreally) {
     const response = await prompts({
       type: 'confirm',
@@ -116,14 +126,23 @@ async function handleGrant(releaseGoldConfig: any, currGrant: number) {
 
   const record = {
     GrantNumber: currGrant,
+    Identifier: releaseGoldConfig.identifier,
     Beneficiary: releaseGoldConfig.beneficiary,
-    ProxyAddress: releaseGoldProxy.address,
+    ContractAddress: releaseGoldProxy.address,
     MultiSigProxyAddress: releaseGoldMultiSigProxy.address,
     MultiSigTxHash: multiSigTxHash,
     ReleaseGoldTxHash: releaseGoldTxHash,
   }
-  console.info(record)
+
+  deployedGrants.push(releaseGoldConfig.identifier)
   releases.push(record)
+  // Must write to file after every grant to avoid losing info on crash.
+  fs.writeFileSync(deployedGrantsFile, JSON.stringify(deployedGrants, null, 1))
+  if (argv.output_file) {
+    fs.writeFileSync(argv.output_file, JSON.stringify(releases, null, 2))
+  } else {
+    console.info('Deployed grant ', record)
+  }
 }
 
 async function handleJSONFile(err, data) {
@@ -139,19 +158,55 @@ async function handleJSONFile(err, data) {
     return
   }
 
+  console.info('Filtering out grants that have already been deployed.')
+  const filteredGrants = grants.filter((grant: any) => {
+    if (deployedGrants.includes(grant.identifier)) {
+      console.info(
+        chalk.yellow(
+          '\tIgnoring ',
+          grant.identifier,
+          ' because identifier has already been deployed'
+        )
+      )
+    }
+    return !deployedGrants.includes(grant.identifier)
+  })
+
+  if (filteredGrants.length === 0) {
+    console.info(
+      chalk.yellow(
+        "All grants in provided json '" +
+          argv.grants +
+          "' have already been deployed according to '" +
+          deployedGrantsFile +
+          "'."
+      )
+    )
+    console.info(chalk.red('Exiting.'))
+    process.exit(0)
+  }
+  console.info(
+    'Filtering complete.\n' +
+      chalk.yellow(
+        'Please review this list of identifiers and verify it matches your expectation of grants to deploy:'
+      )
+  )
+  for (const grant of filteredGrants) {
+    console.info('\t' + grant.identifier)
+  }
   // Each grant type has a defined template - either they can validate and can't be revoked,
   // or vice versa. Their distribution ratios and liquidity provisions should be the same.
   // We check the first grant here and use that as a template for all grants
   // to verify the grant file is uniformly typed to hopefully avoid user errors.
   const template = {
-    revocable: grants[0].revocable,
-    canVote: grants[0].canVote,
-    canValidate: grants[0].canValidate,
-    subjectToLiquidityProvision: grants[0].subjectToLiquidityProvision,
-    initialDistributionRatio: grants[0].initialDistributionRatio,
+    revocable: filteredGrants[0].revocable,
+    canVote: filteredGrants[0].canVote,
+    canValidate: filteredGrants[0].canValidate,
+    subjectToLiquidityProvision: filteredGrants[0].subjectToLiquidityProvision,
+    initialDistributionRatio: filteredGrants[0].initialDistributionRatio,
   }
   if (!argv.yesreally) {
-    grants.map((grant) => {
+    filteredGrants.map((grant) => {
       if (
         grant.revocable !== template.revocable ||
         grant.canVote !== template.canVote ||
@@ -169,10 +224,10 @@ async function handleJSONFile(err, data) {
     })
   }
 
-  const totalGoldGrant = grants.reduce((sum: number, curr: any) => {
+  const totalGoldGrant = filteredGrants.reduce((sum: number, curr: any) => {
     return sum + Number(curr.amountReleasedPerPeriod) * Number(curr.numReleasePeriods)
   }, 0)
-  const totalTransferFees = Number(argv.start_gold) * Number(grants.length)
+  const totalTransferFees = Number(argv.start_gold) * Number(filteredGrants.length)
   const totalValue = new BigNumber(totalTransferFees + totalGoldGrant)
   const fromBalance = new BigNumber(await web3.eth.getBalance(argv.from))
   if (fromBalance.lt(await web3.utils.toWei(totalValue.toFixed()))) {
@@ -209,24 +264,11 @@ async function handleJSONFile(err, data) {
     }
   }
   let currGrant = 1
-  for (const releaseGoldConfig of grants) {
+  for (const releaseGoldConfig of filteredGrants) {
     await handleGrant(releaseGoldConfig, currGrant)
     currGrant++
   }
-  // tslint:disable-next-line: no-console
-  console.log(chalk.green('Grants deployed successfully.'))
-  if (argv.output_file) {
-    fs.writeFile(argv.output_file, JSON.stringify(releases, null, 4), (writeError) => {
-      if (writeError) {
-        console.error(writeError)
-        return
-      }
-      console.info('Wrote release results to file ' + argv.output_file + '.')
-    })
-  } else {
-    // tslint:disable-next-line: no-console
-    console.log(releases)
-  }
+  console.info(chalk.green('Grants deployed successfully.'))
 }
 
 module.exports = async (callback: (error?: any) => number) => {
@@ -241,6 +283,8 @@ module.exports = async (callback: (error?: any) => number) => {
     ReleaseGoldProxy = artifacts.require('ReleaseGoldProxy')
     releases = []
     startGold = web3.utils.toWei(argv.start_gold)
+    deployedGrantsFile = 'scripts/truffle/deployedGrants.json'
+    deployedGrants = JSON.parse(fs.readFileSync(deployedGrantsFile, 'utf-8'))
     fs.readFile(argv.grants, handleJSONFile)
   } catch (error) {
     callback(error)
