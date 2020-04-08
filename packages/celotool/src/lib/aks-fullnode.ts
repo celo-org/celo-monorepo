@@ -1,4 +1,5 @@
 import { range } from 'lodash'
+import { getAKSNodeResourceGroup } from './azure'
 import { createNamespaceIfNotExists } from './cluster'
 import { envVar, fetchEnv } from './env-utils'
 import {
@@ -70,7 +71,6 @@ async function helmParameters(celoEnv: string, kubeNamespace: string) {
     `--set storage.size=${parseInt(fetchEnv(envVar.AZURE_TX_NODES_DISK_SIZE), 10)}`,
     `--set geth.image.repository=${fetchEnv(envVar.GETH_NODE_DOCKER_IMAGE_REPOSITORY)}`,
     `--set geth.image.tag=${fetchEnv(envVar.GETH_NODE_DOCKER_IMAGE_TAG)}`,
-    // `--set geth.image.imagePullPolicy=Always`,
     `--set geth.public_ips='{${staticIps}}'`,
     `--set genesis.networkId=${fetchEnv(envVar.NETWORK_ID)}`,
     `--set genesis.network=${celoEnv}`,
@@ -79,7 +79,7 @@ async function helmParameters(celoEnv: string, kubeNamespace: string) {
 
 async function createStaticIPs(celoEnv: string) {
   console.info(`Creating static IPs on Azure for ${celoEnv}`)
-  const resourceGroup = fetchEnv(envVar.AZURE_KUBERNETES_RESOURCE_GROUP)
+  const resourceGroup = await getAKSNodeResourceGroup()
   const replicaCount = getReplicaCount()
 
   const staticIps = await Promise.all(
@@ -103,7 +103,7 @@ async function deallocateIPs(celoEnv: string) {
   console.info(`Deallocating static IPs on Azure for ${celoEnv}`)
 
   const replicaCount = getReplicaCount()
-  const resourceGroup = fetchEnv(envVar.AZURE_KUBERNETES_RESOURCE_GROUP)
+  const resourceGroup = await getAKSNodeResourceGroup()
 
   await Promise.all(
     range(replicaCount).map((i) => deallocateIP(`${celoEnv}-validators-${i}`, resourceGroup))

@@ -55,3 +55,12 @@ async function setupCluster(celoEnv: string) {
   await redeployTiller()
   await installAndEnableMetricsDeps(false)
 }
+
+export async function getAKSNodeResourceGroup() {
+  const clusterName = fetchEnv(envVar.AZURE_KUBERNETES_CLUSTER_NAME)
+  const resourceGroup = fetchEnv(envVar.AZURE_KUBERNETES_RESOURCE_GROUP)
+  const [nodeResourceGroup] = await execCmdWithExitOnFailure(
+    `az aks show --name ${clusterName} --resource-group ${resourceGroup} --query nodeResourceGroup -o tsv`
+  )
+  return nodeResourceGroup.trim()
+}
