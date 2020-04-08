@@ -3,16 +3,17 @@ import * as functions from 'firebase-functions'
 import { authenticateUser } from './common/identity'
 import { incrementQueryCount } from './database/wrappers/account'
 import { computeBLSSalt } from './salt-generation/bls-salt'
-import { getRemainingQueryCount } from './salt-generation/query-quota'
+import { QueryQuota } from './salt-generation/query-quota'
 
 export const getSalt = functions.https.onRequest(async (request, response) => {
   try {
+    const queryQuota: QueryQuota = new QueryQuota()
     if (!isValidInput(request.body)) {
       response.status(400).send('Invalid input parameters')
       return
     }
     authenticateUser()
-    const remainingQueryCount = await getRemainingQueryCount(
+    const remainingQueryCount = await queryQuota.getRemainingQueryCount(
       request.body.account,
       request.body.phoneNumber
     )

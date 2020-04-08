@@ -1,15 +1,16 @@
 import { getSalt } from '../src/index'
 import { computeBLSSalt } from '../src/salt-generation/bls-salt'
-import { getRemainingQueryCount } from '../src/salt-generation/query-quota'
+import { QueryQuota } from '../src/salt-generation/query-quota'
 
 const BLS_SALT = '6546544323114343'
+const queryQuota: QueryQuota = new QueryQuota()
 
 jest.mock('../src/common/identity', () => ({
   authenticateUser: jest.fn().mockReturnValue(true),
 }))
 
 jest.mock('../src/salt-generation/query-quota')
-const mockReaminingQueryCount = getRemainingQueryCount as jest.Mock
+const mockReaminingQueryCount = queryQuota.getRemainingQueryCount as jest.Mock
 mockReaminingQueryCount.mockResolvedValue(2)
 
 jest.mock('../src/salt-generation/bls-salt')
