@@ -19,7 +19,7 @@ export async function removeHelmRelease(celoEnv: string) {
 async function helmParameters(celoEnv: string) {
   return [
     `--set environmentName=${celoEnv}`,
-    `--set replicas=4`,
+    `--set replicas=${fetchEnv(envVar.ORACLES)}`,
     `--set image.repository=${fetchEnv(envVar.ORACLE_DOCKER_IMAGE_REPOSITORY)}`,
     `--set image.tag=${fetchEnv(envVar.ORACLE_DOCKER_IMAGE_TAG)}`,
     `--set oracle.web3ProviderUrl=http://localhost:8545`,
