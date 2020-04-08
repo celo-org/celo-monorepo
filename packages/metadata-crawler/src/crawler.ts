@@ -64,22 +64,23 @@ async function handleItem(item: { url: string; address: string }) {
     let claims = metadata.filterClaims(ClaimTypes.DOMAIN)
     const accounts = metadata.filterClaims(ClaimTypes.ACCOUNT)
 
-    const numClaims = claims.length
-    for (let i = 0; i < numClaims; i++) {
-      const claim = claims[i]
-      const addressWith0x = '0x' + item.address
-      logger.debug('Claim: %s', serializeClaim(claim))
-      logger.debug('Accounts: %s', JSON.stringify(accounts))
-      logger.debug('Verifying %s for address %s', claim.domain, addressWith0x)
+    await Promise.all(
+      claims.map(async (claim) => {
+        const addressWith0x = '0x' + item.address
+        logger.debug('Claim: %s', serializeClaim(claim))
+        logger.debug('Accounts: %s', JSON.stringify(accounts))
+        logger.debug('Verifying %s for address %s', claim.domain, addressWith0x)
 
-      const verificationStatus = await verifyDomainRecord(claim, addressWith0x).catch((error) =>
-        logger.error('Error in verifyDomainClaim %s', error)
-      )
-      if (verificationStatus === undefined)
-        // If undefined means the claim was verified successfully
-        await createVerificationClaims(item.address, claim.domain, true, accounts)
-      else logger.debug(verificationStatus)
-    }
+        const verificationStatus = await verifyDomainRecord(
+          claim,
+          addressWith0x
+        ).catch((error: any) => logger.error('Error in verifyDomainClaim %s', error))
+        if (verificationStatus === undefined)
+          // If undefined means the claim was verified successfully
+          await createVerificationClaims(item.address, claim.domain, true, accounts)
+        else logger.debug(verificationStatus)
+      })
+    )
   } catch (err) {
     logger.error('Cannot read metadata %s', err)
   }
