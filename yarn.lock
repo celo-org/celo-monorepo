@@ -3013,26 +3013,10 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
-"@celo/client@0.0.266":
-  version "0.0.266"
-  resolved "https://registry.yarnpkg.com/@celo/client/-/client-0.0.266.tgz#0b37b3d1d1981cad6c9a235b33d9331810c718d1"
-  integrity sha512-fKjtPXeVnsf+1+5Tt+H2HeUPjNiv2L4Cgd3UH/e1oqlV1Oy/Pnp/9A0blHBqkUXRCF7RD/MRxyQyyI88FN1fEw==
-
-"@celo/contractkit@0.1.5":
-  version "0.1.5"
-  resolved "https://registry.yarnpkg.com/@celo/contractkit/-/contractkit-0.1.5.tgz#097052ac8f672f03480a1226f11f0c398c35c75e"
-  integrity sha512-vW8/ZluqJXx4SOB64XyFZjR3Z6qzcCUjXk6ec5613NH8DC/7jzxPCnbPsnxL4R+zuEajDWKfjjeH94Y1uLgVGA==
-  dependencies:
-    "@0x/subproviders" "^5.0.0"
-    "@celo/utils" "0.1.0"
-    "@types/debug" "^4.1.5"
-    bignumber.js "^7.2.0"
-    debug "^4.1.1"
-    eth-lib "^0.2.8"
-    web3 "1.0.0-beta.37"
-    web3-core-helpers "1.0.0-beta.37"
-    web3-eth-abi "1.0.0-beta.37"
-    web3-utils "1.0.0-beta.37"
+"@celo/client@0.0.298":
+  version "0.0.298"
+  resolved "https://registry.yarnpkg.com/@celo/client/-/client-0.0.298.tgz#9098d8b148413473ab5c94c33df8d0b39d0e28b5"
+  integrity sha512-kf2sbTmIEYbykpdFad3350gS1kON6xjzCnEXIlSBu6tzoBqFOHA3bh43YypW8/U111DfmFE5wKUCKUfSONVzOQ==
 
 "@celo/contractkit@0.2.0":
   version "0.2.0"
@@ -3080,6 +3064,29 @@
     "@celo/utils" "0.1.8"
     "@types/debug" "^4.1.5"
     bignumber.js "^7.2.0"
+    cross-fetch "3.0.4"
+    debug "^4.1.1"
+    eth-lib "^0.2.8"
+    ethereumjs-util "^5.2.0"
+    fp-ts "2.1.1"
+    io-ts "2.0.1"
+    web3 "1.2.4"
+    web3-core "1.2.4"
+    web3-core-helpers "1.2.4"
+    web3-eth-abi "1.2.4"
+    web3-eth-contract "1.2.4"
+    web3-utils "1.2.4"
+
+"@celo/contractkit@0.3.2":
+  version "0.3.2"
+  resolved "https://registry.yarnpkg.com/@celo/contractkit/-/contractkit-0.3.2.tgz#fa7e37394fe94cdef547c4fa1c97d3547b1f718d"
+  integrity sha512-x+3/Xo1h5ST8CwNdoTERUFWTZ3b5rykpgmMalp6lwUhwq88X81gDeJ0jWBTLy0Vju/OUiYDNYXYhwSvBPklgtg==
+  dependencies:
+    "@celo/utils" "0.1.8"
+    "@ledgerhq/hw-app-eth" "^5.11.0"
+    "@ledgerhq/hw-transport" "^5.11.0"
+    "@types/debug" "^4.1.5"
+    bignumber.js "^9.0.0"
     cross-fetch "3.0.4"
     debug "^4.1.1"
     eth-lib "^0.2.8"
@@ -3150,26 +3157,6 @@
     lodash "^4.17.15"
     typechain "1.0.5"
     web3 "1.2.4"
-
-"@celo/utils@0.1.0":
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/@celo/utils/-/utils-0.1.0.tgz#081e0c9a7ea3e7b50cbc88e89b0f7ff8d5578499"
-  integrity sha512-sSE17+lu0dqG+Zo+H/aZYFXq436+Kd9xhXk5a36RtONXuJY8q6jfaXMFoBJ0Wft19rJM24e9F2aM84HM/IiUTQ==
-  dependencies:
-    "@umpirsky/country-list" "git://github.com/umpirsky/country-list#05fda51"
-    bigi "^1.1.0"
-    bignumber.js "^7.2.0"
-    bn.js "4.11.8"
-    buffer-reverse "^1.0.1"
-    country-data "^0.0.31"
-    crypto-js "^3.1.9-1"
-    elliptic "^6.4.1"
-    ethereumjs-util "^5.2.0"
-    futoin-hkdf "^1.0.3"
-    google-libphonenumber "^3.2.4"
-    keccak256 "^1.0.0"
-    lodash "^4.17.14"
-    web3-utils "1.0.0-beta.37"
 
 "@celo/utils@0.1.5":
   version "0.1.5"
@@ -29439,9 +29426,9 @@ react-native-gesture-handler@^1.5.2:
     invariant "^2.2.4"
     prop-types "^15.7.2"
 
-"react-native-geth@https://github.com/celo-org/react-native-geth#6f993d9":
+"react-native-geth@https://github.com/celo-org/react-native-geth#8583b07":
   version "0.1.0-development"
-  resolved "https://github.com/celo-org/react-native-geth#6f993d958645cbe85db4d070d31947f52e6d5f89"
+  resolved "https://github.com/celo-org/react-native-geth#8583b070005266ec544b58e5b7a476248292d89e"
 
 react-native-iphone-x-helper@^1.0.3:
   version "1.2.1"

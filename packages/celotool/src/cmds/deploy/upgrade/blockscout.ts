@@ -45,7 +45,7 @@ export const handler = async (argv: BlockscoutUpgradeArgv) => {
       'Running upgrade with --reset flag which will reset the database and reinstall the helm chart'
     )
 
-    await removeHelmRelease(argv.celoEnv)
+    await removeHelmRelease(helmReleaseName)
 
     console.info('Sleep for 30 seconds to have all connections killed')
     await sleep(30000)

@@ -258,9 +258,34 @@ const NetworkConfigs = {
       membershipHistoryLength: 15, // Number of epochs in the group lockup period.
     },
   },
+  alfajores: {
+    election: {
+      minElectableValidators: '1',
+    },
+    epochRewards: {
+      frozen: false,
+    },
+    exchange: {
+      frozen: false,
+      minimumReports: 1,
+    },
+    goldToken: {
+      frozen: false,
+    },
+    stableToken: {
+      frozen: false,
+    },
+    reserve: {
+      initialBalance: 100000000,
+    },
+    oracles: {
+      reportExpiry: 1000 * DAY,
+    },
+  },
 }
 
 NetworkConfigs.baklavastaging = NetworkConfigs.baklava
+NetworkConfigs.alfajoresstaging = NetworkConfigs.alfajores
 
 const linkedLibraries = {
   FixidityLib: [
