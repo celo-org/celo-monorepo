@@ -121,6 +121,7 @@ sdkmanager 'platforms;android-28'
 #### Install iOS Dev Tools
 
 Install [Xcode 10.3](https://download.developer.apple.com/Developer_Tools/Xcode_10.3/Xcode_10.3.xip) (an Apple Developer Account is needed to access this link).
+(If after signing in the the direct link does not work try finding on https://developer.apple.com/download/more/)
 
 We do not recommend installing Xcode through the App Store as it can auto update and become incompatible with our projects (until we decide to upgrade).
 
