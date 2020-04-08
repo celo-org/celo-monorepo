@@ -9,21 +9,22 @@ MONTH = YEAR / 12
 
 def constructObject(row):
   grant = {}
-  grant["releaseStartTime"] = row[6]
+  grant['identifier'] = 'TODO'
+  grant['releaseStartTime'] = row[6]
   vestingSchedule = row[10]
-  grant["releaseCliffTime"] = int(row[12])
-  grant["numReleasePeriods"] = int(row[11])
-  grant["releasePeriod"] = int(row[13])
+  grant['releaseCliffTimek] = int(row[12])
+  grant['numReleasePeriods'] = int(row[11])
+  grant['releasePeriod'] = int(row[13])
   totalGrant = Decimal(row[3].replace(',',''))
-  grant["amountReleasedPerPeriod"] = str(round(totalGrant / Decimal(grant["numReleasePeriods"]), 18))
-  grant["revocable"] = True
+  grant['amountReleasedPerPeriod'] = str(round(totalGrant / Decimal(grant['numReleasePeriods']), 18))
+  grant['revocable'] = True
   grant['beneficiary'] = row[2]
-  grant["releaseOwner"] = "0x65578A43610f2Ccb46A283f325AB47F1bd9D687C"
-  grant["refundAddress"] = "0x671D520ae3E89Ea5383A5d7162bCed79FD25CdEe"
-  grant["subjectToLiquidityProvision"] = True
-  grant["initialDistributionRatio"] = 1000
-  grant["canValidate"] = False
-  grant["canVote"] = True
+  grant['releaseOwner'] = '0x65578A43610f2Ccb46A283f325AB47F1bd9D687C'
+  grant['refundAddress'] = '0x671D520ae3E89Ea5383A5d7162bCed79FD25CdEe'
+  grant['subjectToLiquidityProvision'] = True
+  grant['initialDistributionRatio'] = 1000
+  grant['canValidate'] = False
+  grant['canVote'] = True
   return grant
 
 with open('grant_csvs/apiraus.csv', newline='') as grants:
