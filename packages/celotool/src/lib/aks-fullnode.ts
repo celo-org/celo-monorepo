@@ -8,6 +8,7 @@ import {
   removeGenericHelmChart,
   upgradeGenericHelmChart,
 } from './helm_deploy'
+import { scaleResource } from './kubernetes'
 import { execCmdWithExitOnFailure } from './utils'
 
 const helmChartPath = '../helm-charts/celo-fullnode'
@@ -44,6 +45,7 @@ export async function upgradeFullNodeChart(celoEnv: string, reset: boolean = fal
   const releaseName = getReleaseName(celoEnv)
 
   if (reset) {
+    await scaleResource(celoEnv, 'StatefulSet', `${celoEnv}-fullnodes`, 0)
     await deletePersistentVolumeClaims(celoEnv, ['celo-fullnode'])
   }
   return upgradeGenericHelmChart(
@@ -67,7 +69,7 @@ async function helmParameters(celoEnv: string, kubeNamespace: string) {
   return [
     `--set namespace=${kubeNamespace}`,
     `--set replicaCount=${replicaCount}`,
-    `--set storage.size=${parseInt(fetchEnv(envVar.AZURE_TX_NODES_DISK_SIZE), 10)}`,
+    `--set storage.size=${parseInt(fetchEnv(envVar.AZURE_TX_NODES_DISK_SIZE), 10)}Gi`,
     `--set geth.image.repository=${fetchEnv(envVar.GETH_NODE_DOCKER_IMAGE_REPOSITORY)}`,
     `--set geth.image.tag=${fetchEnv(envVar.GETH_NODE_DOCKER_IMAGE_TAG)}`,
     `--set geth.public_ips='{${staticIps}}'`,
@@ -111,6 +113,7 @@ async function deallocateIPs(celoEnv: string) {
 
 async function deallocateIP(name: string, resourceGroup: string) {
   console.info(`Deallocating IP address ${name} on ${resourceGroup}`)
+  // TODO(jcortejoso): wait until ip is not associated to any resource
   return execCmdWithExitOnFailure(
     `az network public-ip delete --resource-group ${resourceGroup} --name ${name}`
   )
