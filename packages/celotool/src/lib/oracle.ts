@@ -1,3 +1,4 @@
+import { getFornoUrl } from 'src/lib/endpoints'
 import { envVar, fetchEnv } from 'src/lib/env-utils'
 import { AccountType, getPrivateKeysFor } from 'src/lib/generate_utils'
 import { installGenericHelmChart, removeGenericHelmChart } from 'src/lib/helm_deploy'
@@ -29,7 +30,7 @@ async function helmParameters(celoEnv: string) {
     `--set replicas=${fetchEnv(envVar.ORACLES)}`,
     `--set image.repository=${fetchEnv(envVar.ORACLE_DOCKER_IMAGE_REPOSITORY)}`,
     `--set image.tag=${fetchEnv(envVar.ORACLE_DOCKER_IMAGE_TAG)}`,
-    `--set oracle.web3ProviderUrl=https://alfajoresstaging-forno.celo-testnet.org`,
+    `--set oracle.web3ProviderUrl=${getFornoUrl(celoEnv)}`,
     `--set oracle.privateKeys={${oraclePrivateKeys.join(',')}}`,
   ]
 }
