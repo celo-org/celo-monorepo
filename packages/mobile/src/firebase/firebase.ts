@@ -139,7 +139,7 @@ export function* initializeCloudMessaging(app: ReactNativeFirebase.Module, addre
   }
 
   app.messaging().setBackgroundMessageHandler((remoteMessage) => {
-    Logger.info(TAG, 'recieved Notification while app in Background')
+    Logger.info(TAG, 'received Notification while app in Background')
     Sentry.captureMessage(
       `Received Unknown RNFirebaseBackgroundMessage ${JSON.stringify(remoteMessage)}`
     )
