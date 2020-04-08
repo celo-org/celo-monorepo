@@ -166,7 +166,7 @@ contract('MultiSig', (accounts: any) => {
       // @ts-ignore: TODO(mcortesi): fix typings
       await multiSig.confirmTransaction(txId, { from: accounts[1] })
       assert.isTrue(await multiSig.isOwner(accounts[2]))
-      assert.sameMembers([accounts[0], accounts[2], accounts[3]], await multiSig.getOwners())
+      assert.sameMembers([accounts[0], accounts[1], accounts[2]], await multiSig.getOwners())
     })
 
     it('should not allow an external account to add an owner', async () => {
