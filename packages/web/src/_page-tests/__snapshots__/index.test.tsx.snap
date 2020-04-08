@@ -623,6 +623,49 @@ exports[`HomePage renders 1`] = `
               />
               <div
                 className="css-view-1dbjc4n"
+              >
+                <div
+                  className="css-view-1dbjc4n"
+                  style={
+                    Object {
+                      "MozTransitionProperty": "max-height",
+                      "WebkitTransitionDuration": "600ms",
+                      "WebkitTransitionProperty": "max-height",
+                      "height": "auto",
+                      "marginBottom": "5px",
+                      "marginTop": "5px",
+                      "maxHeight": "0px",
+                      "transitionDuration": "600ms",
+                      "transitionProperty": "max-height",
+                    }
+                  }
+                >
+                  <div
+                    className="css-text-901oao"
+                    dir="auto"
+                    style={
+                      Object {
+                        "MozTransitionProperty": "opacity",
+                        "WebkitTransitionDuration": "700ms",
+                        "WebkitTransitionProperty": "opacity",
+                        "color": "rgba(255,127,109,1.00)",
+                        "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                        "fontSize": "16px",
+                        "fontWeight": "500",
+                        "lineHeight": "18px",
+                        "opacity": 0,
+                        "textRendering": "geometricPrecision",
+                        "transitionDuration": "700ms",
+                        "transitionProperty": "opacity",
+                      }
+                    }
+                  >
+                    Please enter a valid email
+                  </div>
+                </div>
+              </div>
+              <div
+                className="css-view-1dbjc4n"
                 onClick={[Function]}
                 onMouseDown={[Function]}
                 onMouseEnter={[Function]}
@@ -688,13 +731,84 @@ exports[`HomePage renders 1`] = `
                 className="css-view-1dbjc4n"
                 style={
                   Object {
-                    "paddingBottom": "10px",
-                    "paddingTop": "10px",
                     "position": "absolute",
-                    "top": "135px",
+                    "top": "65px",
                   }
                 }
               />
+            </div>
+            <div
+              className="css-view-1dbjc4n"
+              style={
+                Object {
+                  "marginTop": "10px",
+                }
+              }
+            >
+              <div
+                className="css-view-1dbjc4n"
+                style={
+                  Object {
+                    "MozTransitionProperty": "max-height",
+                    "WebkitTransitionDuration": "600ms",
+                    "WebkitTransitionProperty": "max-height",
+                    "height": "auto",
+                    "marginBottom": "5px",
+                    "marginTop": "5px",
+                    "maxHeight": "0px",
+                    "transitionDuration": "600ms",
+                    "transitionProperty": "max-height",
+                  }
+                }
+              >
+                <div
+                  className="css-text-901oao"
+                  dir="auto"
+                  style={
+                    Object {
+                      "MozTransitionProperty": "opacity",
+                      "WebkitTransitionDuration": "700ms",
+                      "WebkitTransitionProperty": "opacity",
+                      "color": "rgba(53,208,127,1.00)",
+                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                      "fontSize": "16px",
+                      "fontWeight": "500",
+                      "lineHeight": "18px",
+                      "opacity": 0,
+                      "textRendering": "geometricPrecision",
+                      "transitionDuration": "700ms",
+                      "transitionProperty": "opacity",
+                    }
+                  }
+                >
+                  <svg
+                    fill="none"
+                    height={16}
+                    style={Object {}}
+                    viewBox="0 0 11 9"
+                    width={16}
+                  >
+                    <path
+                      clipRule="evenodd"
+                      d="M10.7932 1.85263L3.96211 8.64309L0.180176 4.88366L1.85967 3.19411L3.96211 5.28404L9.11373 0.163086L10.7932 1.85263Z"
+                      fill="#35D07F"
+                      fillRule="evenodd"
+                      style={Object {}}
+                    />
+                  </svg>
+                  <span
+                    className="css-text-901oao css-textHasAncestor-16my406"
+                    dir="auto"
+                    style={
+                      Object {
+                        "marginLeft": "10px",
+                      }
+                    }
+                  >
+                    Submitted
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -6724,6 +6838,49 @@ exports[`HomePage renders 1`] = `
         />
         <div
           className="css-view-1dbjc4n"
+        >
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "MozTransitionProperty": "max-height",
+                "WebkitTransitionDuration": "600ms",
+                "WebkitTransitionProperty": "max-height",
+                "height": "auto",
+                "marginBottom": "5px",
+                "marginTop": "5px",
+                "maxHeight": "0px",
+                "transitionDuration": "600ms",
+                "transitionProperty": "max-height",
+              }
+            }
+          >
+            <div
+              className="css-text-901oao"
+              dir="auto"
+              style={
+                Object {
+                  "MozTransitionProperty": "opacity",
+                  "WebkitTransitionDuration": "700ms",
+                  "WebkitTransitionProperty": "opacity",
+                  "color": "rgba(255,127,109,1.00)",
+                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                  "fontSize": "16px",
+                  "fontWeight": "500",
+                  "lineHeight": "18px",
+                  "opacity": 0,
+                  "textRendering": "geometricPrecision",
+                  "transitionDuration": "700ms",
+                  "transitionProperty": "opacity",
+                }
+              }
+            >
+              Please enter a valid email
+            </div>
+          </div>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
           onClick={[Function]}
           onMouseDown={[Function]}
           onMouseEnter={[Function]}
@@ -6789,13 +6946,84 @@ exports[`HomePage renders 1`] = `
           className="css-view-1dbjc4n"
           style={
             Object {
-              "paddingBottom": "10px",
-              "paddingTop": "10px",
               "position": "absolute",
-              "top": "135px",
+              "top": "65px",
             }
           }
         />
+      </div>
+      <div
+        className="css-view-1dbjc4n"
+        style={
+          Object {
+            "marginTop": "10px",
+          }
+        }
+      >
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "MozTransitionProperty": "max-height",
+              "WebkitTransitionDuration": "600ms",
+              "WebkitTransitionProperty": "max-height",
+              "height": "auto",
+              "marginBottom": "5px",
+              "marginTop": "5px",
+              "maxHeight": "0px",
+              "transitionDuration": "600ms",
+              "transitionProperty": "max-height",
+            }
+          }
+        >
+          <div
+            className="css-text-901oao"
+            dir="auto"
+            style={
+              Object {
+                "MozTransitionProperty": "opacity",
+                "WebkitTransitionDuration": "700ms",
+                "WebkitTransitionProperty": "opacity",
+                "color": "rgba(53,208,127,1.00)",
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "fontWeight": "500",
+                "lineHeight": "18px",
+                "opacity": 0,
+                "textRendering": "geometricPrecision",
+                "transitionDuration": "700ms",
+                "transitionProperty": "opacity",
+              }
+            }
+          >
+            <svg
+              fill="none"
+              height={16}
+              style={Object {}}
+              viewBox="0 0 11 9"
+              width={16}
+            >
+              <path
+                clipRule="evenodd"
+                d="M10.7932 1.85263L3.96211 8.64309L0.180176 4.88366L1.85967 3.19411L3.96211 5.28404L9.11373 0.163086L10.7932 1.85263Z"
+                fill="#35D07F"
+                fillRule="evenodd"
+                style={Object {}}
+              />
+            </svg>
+            <span
+              className="css-text-901oao css-textHasAncestor-16my406"
+              dir="auto"
+              style={
+                Object {
+                  "marginLeft": "10px",
+                }
+              }
+            >
+              Submitted
+            </span>
+          </div>
+        </div>
       </div>
     </div>
     <div
@@ -6938,6 +7166,49 @@ exports[`HomePage renders 1`] = `
         />
         <div
           className="css-view-1dbjc4n"
+        >
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "MozTransitionProperty": "max-height",
+                "WebkitTransitionDuration": "600ms",
+                "WebkitTransitionProperty": "max-height",
+                "height": "auto",
+                "marginBottom": "5px",
+                "marginTop": "5px",
+                "maxHeight": "0px",
+                "transitionDuration": "600ms",
+                "transitionProperty": "max-height",
+              }
+            }
+          >
+            <div
+              className="css-text-901oao"
+              dir="auto"
+              style={
+                Object {
+                  "MozTransitionProperty": "opacity",
+                  "WebkitTransitionDuration": "700ms",
+                  "WebkitTransitionProperty": "opacity",
+                  "color": "rgba(255,127,109,1.00)",
+                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                  "fontSize": "16px",
+                  "fontWeight": "500",
+                  "lineHeight": "18px",
+                  "opacity": 0,
+                  "textRendering": "geometricPrecision",
+                  "transitionDuration": "700ms",
+                  "transitionProperty": "opacity",
+                }
+              }
+            >
+              Please enter a valid email
+            </div>
+          </div>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
           onClick={[Function]}
           onMouseDown={[Function]}
           onMouseEnter={[Function]}
@@ -7003,13 +7274,84 @@ exports[`HomePage renders 1`] = `
           className="css-view-1dbjc4n"
           style={
             Object {
-              "paddingBottom": "10px",
-              "paddingTop": "10px",
               "position": "absolute",
-              "top": "135px",
+              "top": "65px",
             }
           }
         />
+      </div>
+      <div
+        className="css-view-1dbjc4n"
+        style={
+          Object {
+            "marginTop": "10px",
+          }
+        }
+      >
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "MozTransitionProperty": "max-height",
+              "WebkitTransitionDuration": "600ms",
+              "WebkitTransitionProperty": "max-height",
+              "height": "auto",
+              "marginBottom": "5px",
+              "marginTop": "5px",
+              "maxHeight": "0px",
+              "transitionDuration": "600ms",
+              "transitionProperty": "max-height",
+            }
+          }
+        >
+          <div
+            className="css-text-901oao"
+            dir="auto"
+            style={
+              Object {
+                "MozTransitionProperty": "opacity",
+                "WebkitTransitionDuration": "700ms",
+                "WebkitTransitionProperty": "opacity",
+                "color": "rgba(53,208,127,1.00)",
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "fontWeight": "500",
+                "lineHeight": "18px",
+                "opacity": 0,
+                "textRendering": "geometricPrecision",
+                "transitionDuration": "700ms",
+                "transitionProperty": "opacity",
+              }
+            }
+          >
+            <svg
+              fill="none"
+              height={16}
+              style={Object {}}
+              viewBox="0 0 11 9"
+              width={16}
+            >
+              <path
+                clipRule="evenodd"
+                d="M10.7932 1.85263L3.96211 8.64309L0.180176 4.88366L1.85967 3.19411L3.96211 5.28404L9.11373 0.163086L10.7932 1.85263Z"
+                fill="#35D07F"
+                fillRule="evenodd"
+                style={Object {}}
+              />
+            </svg>
+            <span
+              className="css-text-901oao css-textHasAncestor-16my406"
+              dir="auto"
+              style={
+                Object {
+                  "marginLeft": "10px",
+                }
+              }
+            >
+              Submitted
+            </span>
+          </div>
+        </div>
       </div>
     </div>
   </div>

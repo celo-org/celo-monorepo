@@ -39,7 +39,7 @@ type NakedProps = {
   kind: BTN.NAKED | BTN.DARKNAKED
 } & AllButtonProps
 
-type PrimaryProps = {
+export type PrimaryProps = {
   onDarkBackground?: boolean
   size?: SIZE
   kind: BTN.PRIMARY | BTN.SECONDARY | BTN.TERTIARY
