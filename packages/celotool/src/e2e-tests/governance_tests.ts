@@ -406,10 +406,8 @@ describe('governance tests', () => {
 
       // Prepare for member swapping.
       const groupWeb3 = new Web3(groupWeb3Url)
-      const provider = groupWeb3.currentProvider
 
       const groupKit = newKitFromWeb3(groupWeb3)
-      groupWeb3.setProvider(provider)
 
       const group: string = (await groupWeb3.eth.getAccounts())[0]
 
@@ -967,10 +965,8 @@ describe('governance tests', () => {
       const groupWeb3Url = 'ws://localhost:8555'
 
       const groupWeb3 = new Web3(groupWeb3Url)
-      const provider = groupWeb3.currentProvider
 
       const groupKit = newKitFromWeb3(groupWeb3)
-      groupWeb3.setProvider(provider)
 
       const group: string = (await groupWeb3.eth.getAccounts())[0]
 
