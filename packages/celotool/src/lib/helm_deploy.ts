@@ -364,6 +364,10 @@ export async function createStaticIPs(celoEnv: string) {
     await Promise.all(
       range(numValdiators).map((i) => registerIPAddress(`${celoEnv}-validators-${i}`))
     )
+    const numPrivateTxNodes = parseInt(fetchEnv(envVar.PRIVATE_TX_NODES), 10)
+    await Promise.all(
+      range(numPrivateTxNodes).map((i) => registerIPAddress(`${celoEnv}-tx-nodes-private-${i}`))
+    )
   }
 
   return
@@ -382,6 +386,17 @@ export async function upgradeStaticIPs(celoEnv: string) {
       'validators',
       prevValidatorNodeCount,
       newValidatorNodeCount
+    )
+    const prevPrivateTxNodeCount = await getStatefulSetReplicas(
+      celoEnv,
+      `${celoEnv}-tx-nodes-private`
+    )
+    const newPrivateTxNodeCount = parseInt(fetchEnv(envVar.PRIVATE_TX_NODES), 10)
+    await upgradeNodeTypeStaticIPs(
+      celoEnv,
+      'tx-nodes-private',
+      prevPrivateTxNodeCount,
+      newPrivateTxNodeCount
     )
   }
 }
@@ -454,15 +469,19 @@ export async function deleteStaticIPs(celoEnv: string) {
 
   await deleteIPAddress(`${celoEnv}-bootnode`)
 
-  const numValdiators = parseInt(fetchEnv(envVar.VALIDATORS), 10)
-  await Promise.all(range(numValdiators).map((i) => deleteIPAddress(`${celoEnv}-validators-${i}`)))
-  return
+  const numValidators = parseInt(fetchEnv(envVar.VALIDATORS), 10)
+  await Promise.all(range(numValidators).map((i) => deleteIPAddress(`${celoEnv}-validators-${i}`)))
+
+  const numPrivateTxNodes = parseInt(fetchEnv(envVar.PRIVATE_TX_NODES), 10)
+  await Promise.all(
+    range(numPrivateTxNodes).map((i) => deleteIPAddress(`${celoEnv}-tx-nodes-private-${i}`))
+  )
 }
 
 export async function deletePersistentVolumeClaims(celoEnv: string) {
   console.info(`Deleting persistent volume claims for ${celoEnv}`)
   try {
-    const componentLabels = ['validators', 'tx_nodes', 'proxy']
+    const componentLabels = ['validators', 'tx_nodes', 'proxy', 'tx_nodes_private']
     for (const component of componentLabels) {
       const [output] = await execCmd(
         `kubectl delete pvc --selector='component=${component}' --namespace ${celoEnv}`
@@ -494,8 +513,8 @@ async function helmIPParameters(celoEnv: string) {
 
   ipAddressParameters.push(...singleAddressParameters)
 
-  const listOfAddresses = txAddresses.join('/')
-  ipAddressParameters.push(`--set geth.tx_node_ip_addresses=${listOfAddresses}`)
+  const listOfTxNodeAddresses = txAddresses.join('/')
+  ipAddressParameters.push(`--set geth.tx_node_ip_addresses=${listOfTxNodeAddresses}`)
 
   if (useStaticIPsForGethNodes()) {
     ipAddressParameters.push(
@@ -515,6 +534,19 @@ async function helmIPParameters(celoEnv: string) {
     ipAddressParameters.push(...singleValidatorAddressParameters)
     const listOfValidatorAddresses = validatorsAddresses.join('/')
     ipAddressParameters.push(`--set geth.validator_ip_addresses=${listOfValidatorAddresses}`)
+
+    const numPrivateTxNodes = parseInt(fetchEnv(envVar.PRIVATE_TX_NODES), 10)
+    const privateTxAddresses = await Promise.all(
+      range(numPrivateTxNodes).map((i) => retrieveIPAddress(`${celoEnv}-tx-nodes-private-${i}`))
+    )
+    const privateTxAddressParameters = privateTxAddresses.map(
+      (address, i) => `--set geth.private_tx_nodes_${i}IpAddress=${address}`
+    )
+    ipAddressParameters.push(...privateTxAddressParameters)
+    const listOfPrivateTxNodeAddresses = privateTxAddresses.join('/')
+    ipAddressParameters.push(
+      `--set geth.private_tx_node_ip_addresses=${listOfPrivateTxNodeAddresses}`
+    )
   }
 
   return ipAddressParameters
@@ -563,6 +595,7 @@ async function helmParameters(celoEnv: string, useExistingGenesis: boolean) {
     `--set geth.faultyValidators="${fetchEnvOrFallback('FAULTY_VALIDATORS', '0')}"`,
     `--set geth.faultyValidatorType="${fetchEnvOrFallback('FAULTY_VALIDATOR_TYPE', '0')}"`,
     `--set geth.tx_nodes="${fetchEnv('TX_NODES')}"`,
+    `--set geth.private_tx_nodes="${fetchEnv(envVar.PRIVATE_TX_NODES)}"`,
     `--set geth.ssd_disks="${fetchEnvOrFallback(envVar.GETH_NODES_SSD_DISKS, 'true')}"`,
     `--set mnemonic="${fetchEnv('MNEMONIC')}"`,
     `--set contracts.cron_jobs.enabled=${fetchEnv('CONTRACT_CRONJOBS_ENABLED')}`,
@@ -657,13 +690,15 @@ export async function resetAndUpgradeHelmChart(celoEnv: string, useExistingGenes
   const txNodesSetName = `${celoEnv}-tx-nodes`
   const validatorsSetName = `${celoEnv}-validators`
   const bootnodeName = `${celoEnv}-bootnode`
-  const proxyName = `${celoEnv}-proxy`
+  const proxySetName = `${celoEnv}-proxy`
+  const privateTxNodesSetname = `${celoEnv}-tx-nodes-private`
 
   // scale down nodes
   await scaleResource(celoEnv, 'StatefulSet', txNodesSetName, 0)
   await scaleResource(celoEnv, 'StatefulSet', validatorsSetName, 0)
   // allow to fail for the cases where a testnet does not include the proxy statefulset yet
-  await scaleResource(celoEnv, 'StatefulSet', proxyName, 0, true)
+  await scaleResource(celoEnv, 'StatefulSet', proxySetName, 0, true)
+  await scaleResource(celoEnv, 'StatefulSet', privateTxNodesSetname, 0, true)
   await scaleResource(celoEnv, 'Deployment', bootnodeName, 0)
 
   await deletePersistentVolumeClaims(celoEnv)
@@ -676,13 +711,15 @@ export async function resetAndUpgradeHelmChart(celoEnv: string, useExistingGenes
   const numTxNodes = parseInt(fetchEnv(envVar.TX_NODES), 10)
   // assumes 1 proxy per proxied validator
   const numProxies = parseInt(fetchEnvOrFallback(envVar.PROXIED_VALIDATORS, '0'), 10)
+  const numPrivateTxNodes = parseInt(fetchEnv(envVar.PRIVATE_TX_NODES), 10)
 
   // Note(trevor): helm upgrade only compares the current chart to the
   // previously deployed chart when deciding what needs changing, so we need
   // to manually scale up to account for when a node count is the same
   await scaleResource(celoEnv, 'StatefulSet', txNodesSetName, numTxNodes)
   await scaleResource(celoEnv, 'StatefulSet', validatorsSetName, numValdiators)
-  await scaleResource(celoEnv, 'StatefulSet', proxyName, numProxies)
+  await scaleResource(celoEnv, 'StatefulSet', proxySetName, numProxies)
+  await scaleResource(celoEnv, 'StatefulSet', privateTxNodesSetname, numPrivateTxNodes)
   await scaleResource(celoEnv, 'Deployment', bootnodeName, 1)
 }
 
