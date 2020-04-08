@@ -15,6 +15,8 @@ import {
   AccountsInstance,
   ElectionTestContract,
   ElectionTestInstance,
+  FreezerContract,
+  FreezerInstance,
   MockLockedGoldContract,
   MockLockedGoldInstance,
   MockRandomContract,
@@ -27,6 +29,7 @@ import {
 
 const Accounts: AccountsContract = artifacts.require('Accounts')
 const ElectionTest: ElectionTestContract = artifacts.require('ElectionTest')
+const Freezer: FreezerContract = artifacts.require('Freezer')
 const MockLockedGold: MockLockedGoldContract = artifacts.require('MockLockedGold')
 const MockValidators: MockValidatorsContract = artifacts.require('MockValidators')
 const MockRandom: MockRandomContract = artifacts.require('MockRandom')
@@ -44,6 +47,7 @@ const EPOCH = 100
 contract('Election', (accounts: string[]) => {
   let accountsInstance: AccountsInstance
   let election: ElectionTestInstance
+  let freezer: FreezerInstance
   let registry: RegistryInstance
   let mockLockedGold: MockLockedGoldInstance
   let mockValidators: MockValidatorsInstance
@@ -60,10 +64,12 @@ contract('Election', (accounts: string[]) => {
     accountsInstance = await Accounts.new()
     await Promise.all(accounts.map((account) => accountsInstance.createAccount({ from: account })))
     election = await ElectionTest.new()
+    freezer = await Freezer.new()
     mockLockedGold = await MockLockedGold.new()
     mockValidators = await MockValidators.new()
     registry = await Registry.new()
     await registry.setAddressFor(CeloContractName.Accounts, accountsInstance.address)
+    await registry.setAddressFor(CeloContractName.Freezer, freezer.address)
     await registry.setAddressFor(CeloContractName.LockedGold, mockLockedGold.address)
     await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
     await election.initialize(
