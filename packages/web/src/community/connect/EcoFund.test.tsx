@@ -1,4 +1,4 @@
-import { fireEvent, render, waitForElement } from '@testing-library/react'
+import { fireEvent, render } from '@testing-library/react'
 import * as React from 'react'
 import { ApplicationFields, RecommendationFields } from 'src/../fullstack/EcoFundFields'
 import EcoFund from 'src/community/EcoFund'
