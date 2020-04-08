@@ -1,9 +1,11 @@
 import firebase, { ReactNativeFirebase } from '@react-native-firebase/app'
 import '@react-native-firebase/database'
 import '@react-native-firebase/messaging'
+// We can't combine the 2 imports otherwise it only imports the type and fails at runtime
+// tslint:disable-next-line: no-duplicate-imports
+import { FirebaseMessagingTypes } from '@react-native-firebase/messaging'
 import * as Sentry from '@sentry/react-native'
 import DeviceInfo from 'react-native-device-info'
-// import { Notification, NotificationOpen } from 'react-native-firebase/notifications'
 import { eventChannel, EventChannel } from 'redux-saga'
 import { call, put, select, spawn, take } from 'redux-saga/effects'
 import { NotificationReceiveState } from 'src/account/types'
@@ -21,7 +23,10 @@ const TAG = 'firebase/firebase'
 
 // only exported for testing
 export function* watchFirebaseNotificationChannel(
-  channel: EventChannel<{ notification: Notification; stateType: NotificationReceiveState }>
+  channel: EventChannel<{
+    message: FirebaseMessagingTypes.RemoteMessage
+    stateType: NotificationReceiveState
+  }>
 ) {
   try {
     Logger.info(`${TAG}/watchFirebaseNotificationChannel`, 'Started channel watching')
@@ -32,7 +37,7 @@ export function* watchFirebaseNotificationChannel(
         continue
       }
       Logger.info(`${TAG}/watchFirebaseNotificationChannel`, 'Notification received in the channel')
-      yield call(handleNotification, data.notification, data.stateType)
+      yield call(handleNotification, data.message, data.stateType)
     }
   } catch (error) {
     Logger.error(
@@ -94,41 +99,44 @@ export function* initializeCloudMessaging(app: ReactNativeFirebase.Module, addre
   })
 
   // Listen for notification messages while the app is open
-  // const channelOnNotification: EventChannel<{
-  // notification: Notification
-  // stateType: NotificationReceiveState
-  // }> = eventChannel((emitter) => {
-  // const unsuscribe = () => {
-  // Logger.info(TAG, 'Notification channel closed, reseting callbacks. This is likely an error.')
-  // app.notifications().onNotification(() => null)
-  // app.notifications().onNotificationOpened(() => null)
-  // }
+  const channelOnNotification: EventChannel<{
+    message: FirebaseMessagingTypes.RemoteMessage
+    stateType: NotificationReceiveState
+  }> = eventChannel((emitter) => {
+    const unsuscribe = () => {
+      Logger.info(TAG, 'Notification channel closed, reseting callbacks. This is likely an error.')
+      app.messaging().onMessage(() => null)
+      app.messaging().onNotificationOpenedApp(() => null)
+    }
 
-  // app.notifications().onNotification((notification: Notification) => {
-  // Logger.info(TAG, 'Notification received while open')
-  // emitter({ notification, stateType: NotificationReceiveState.APP_ALREADY_OPEN })
-  // })
+    app.messaging().onMessage((message) => {
+      Logger.info(TAG, 'Notification received while open')
+      emitter({
+        message,
+        stateType: NotificationReceiveState.APP_ALREADY_OPEN,
+      })
+    })
 
-  // app.notifications().onNotificationOpened((notification: NotificationOpen) => {
-  // Logger.info(TAG, 'App opened via a notification')
-  // emitter({
-  // notification: notification.notification,
-  // stateType: NotificationReceiveState.APP_FOREGROUNDED,
-  // })
-  // })
-  // return unsuscribe
-  // })
-  // yield spawn(watchFirebaseNotificationChannel, channelOnNotification)
+    app.messaging().onNotificationOpenedApp((message) => {
+      Logger.info(TAG, 'App opened via a notification')
+      emitter({
+        message,
+        stateType: NotificationReceiveState.APP_FOREGROUNDED,
+      })
+    })
+    return unsuscribe
+  })
+  yield spawn(watchFirebaseNotificationChannel, channelOnNotification)
 
-  // const initialNotification = yield call([app.notifications(), 'getInitialNotification'])
-  // if (initialNotification) {
-  // Logger.info(TAG, 'App opened fresh via a notification')
-  // yield call(
-  // handleNotification,
-  // initialNotification.notification,
-  // NotificationReceiveState.APP_OPENED_FRESH
-  // )
-  // }
+  const initialNotification = yield call([app.messaging(), 'getInitialNotification'])
+  if (initialNotification) {
+    Logger.info(TAG, 'App opened fresh via a notification')
+    yield call(
+      handleNotification,
+      initialNotification.notification,
+      NotificationReceiveState.APP_OPENED_FRESH
+    )
+  }
 
   app.messaging().setBackgroundMessageHandler((remoteMessage) => {
     Logger.info(TAG, 'recieved Notification while app in Background')
