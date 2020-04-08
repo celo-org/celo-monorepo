@@ -5,16 +5,12 @@ import { validatorTable } from '../validator/list'
 
 async function performElections(kit: ContractKit) {
   const election = await kit.contracts.getElection()
-  const election3 = await kit._web3Contracts.getElection()
   try {
     const signers = await election.electValidatorSigners()
     return signers
   } catch (err) {
     console.warn('Warning: error running actual elections, retrying with minimum validators at 0')
-    const config = await election.getConfig()
-    return election3.methods
-      .electNValidatorSigners(0, config.electableValidators.max.toFixed())
-      .call()
+    return election.electValidatorSigners(0)
   }
 }
 
