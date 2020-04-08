@@ -153,7 +153,18 @@ export class ElectionWrapper extends BaseWrapper<Election> {
    * @return The list of elected validators.
    * @dev See https://en.wikipedia.org/wiki/D%27Hondt_method#Allocation for more information.
    */
-  electValidatorSigners = proxyCall(this.contract.methods.electValidatorSigners)
+  async electValidatorSigners(min?: number, max?: number): Promise<Address[]> {
+    if (min !== undefined || max !== undefined) {
+      const config = await this.getConfig()
+      const minArg = min === undefined ? config.electableValidators.min : min
+      const maxArg = max === undefined ? config.electableValidators.max : max
+      return this.contract.methods
+        .electNValidatorSigners(minArg.toString(10), maxArg.toString(10))
+        .call()
+    } else {
+      return this.contract.methods.electValidatorSigners().call()
+    }
+  }
 
   /**
    * Returns the total votes for `group`.
