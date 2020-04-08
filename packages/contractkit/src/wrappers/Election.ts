@@ -403,33 +403,24 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     voteWeight: BigNumber
   ): Promise<{ lesser: Address; greater: Address }> {
     const currentVotes = await this.getEligibleValidatorGroupsVotes()
-
     const selectedGroup = currentVotes.find((votes) => eqAddress(votes.address, votedGroup))
+    const voteTotal = selectedGroup ? selectedGroup.votes.plus(voteWeight) : voteWeight
+    let greaterKey = NULL_ADDRESS
+    let lesserKey = NULL_ADDRESS
 
-    // modify the list
-    if (selectedGroup) {
-      selectedGroup.votes = selectedGroup.votes.plus(voteWeight)
-    } else {
-      currentVotes.push({
-        address: votedGroup,
-        name: '',
-        votes: voteWeight,
-        // Not used for the purposes of finding lesser and greater.
-        capacity: new BigNumber(0),
-        eligible: true,
-      })
+    // This leverages the fact that the currentVotes are already sorted from
+    // greatest to lowest value
+    for (const vote of currentVotes) {
+      if (!eqAddress(vote.address, votedGroup)) {
+        if (vote.votes.isLessThanOrEqualTo(voteTotal)) {
+          lesserKey = vote.address
+          break
+        }
+        greaterKey = vote.address
+      }
     }
 
-    // re-sort
-    currentVotes.sort((a, b) => a.votes.comparedTo(b.votes))
-
-    // find new index
-    const newIdx = currentVotes.findIndex((votes) => eqAddress(votes.address, votedGroup))
-
-    return {
-      lesser: newIdx === 0 ? NULL_ADDRESS : currentVotes[newIdx - 1].address,
-      greater: newIdx === currentVotes.length - 1 ? NULL_ADDRESS : currentVotes[newIdx + 1].address,
-    }
+    return { lesserKey, greaterKey }
   }
 
   /**
