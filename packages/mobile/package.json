@@ -7,7 +7,6 @@
   "scripts": {
     "lint": "tslint -c tslint.json --project tsconfig.json",
     "build": "yarn run build:ts && yarn run build:metro",
-    "build:sdk": "yarn --cwd ../walletkit build:for-env",
     "build:ts": "tsc --noEmit",
     "build:metro": "echo 'NOT WORKING RIGHT NOW'",
     "build:gen-graphql-types": "graphql-codegen --config codegen.yml",
