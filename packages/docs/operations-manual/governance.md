@@ -51,3 +51,9 @@ If a Governance Proposal receives enough votes and passes in the Referendum phas
 ```bash
 celocli governance:execute --proposalID:<PROPOSAL_ID> --from=<YOUR_VOTER_ADDRESS>
 ```
+
+## Creating a Proposal
+
+{% hint style="warning" %}
+**Under construction** guide to creating a proposal is coming soon
+{% endhint %}
