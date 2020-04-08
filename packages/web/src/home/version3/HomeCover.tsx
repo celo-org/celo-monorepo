@@ -6,19 +6,13 @@ import TextAnimation from 'src/home/TextAnimation'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import Responsive from 'src/shared/Responsive'
 import { BANNER_HEIGHT, HEADER_HEIGHT } from 'src/shared/Styles'
-import { colors, fonts, standardStyles, textStyles } from 'src/styles'
+import { colors, fonts, standardStyles } from 'src/styles'
 import { getDeviceMemory, hasGoodConnection } from 'src/utils/utils'
 type Props = I18nProps
 
 interface State {
   playing: boolean
   mode: Mode
-}
-
-function After({ t }) {
-  return (
-    <Text style={[fonts.h6, textStyles.center, styles.foreground]}>{t('stayConnectedThanks')}</Text>
-  )
 }
 
 const DURATION = 3000
@@ -91,12 +85,7 @@ class HomeCover extends React.PureComponent<Props, State> {
                         <Text style={[fonts.navigation, styles.foreground]}>
                           {this.props.t('stayConnected')}
                         </Text>
-                        <EmailForm
-                          submitText={'Sign Up'}
-                          route={'/contacts'}
-                          whenComplete={<After t={this.props.t} />}
-                          isDarkMode={true}
-                        />
+                        <EmailForm submitText={'Sign Up'} route={'/contacts'} isDarkMode={true} />
                       </View>
                     </View>
                   </Responsive>
