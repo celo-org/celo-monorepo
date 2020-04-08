@@ -116,11 +116,6 @@ const networks = {
     ...defaultConfig,
     from: INTEGRATION_TESTING_FROM,
   },
-  // testnet for integration tests
-  integrationtesting: {
-    ...defaultConfig,
-    from: INTEGRATION_TESTING_FROM,
-  },
   argentinastaging: freeGasConfig,
   argentinaproduction: freeGasConfig,
 

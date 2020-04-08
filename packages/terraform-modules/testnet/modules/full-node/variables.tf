@@ -105,3 +105,9 @@ variable proxy {
   description = "Whether the node is a proxy for a validator"
   default     = false
 }
+
+variable rpc_apis {
+  type        = string
+  description = "Comma separated string including which RPC APIs to expose"
+  default     = "eth,net,web3"
+}

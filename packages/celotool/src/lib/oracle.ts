@@ -1,5 +1,6 @@
 import { envVar, fetchEnv } from 'src/lib/env-utils'
 import { installGenericHelmChart, removeGenericHelmChart } from 'src/lib/helm_deploy'
+import { getInternalTxNodeLoadBalancerIP } from 'src/lib/vm-testnet-utils'
 
 const helmChartPath = '../helm-charts/oracle'
 
@@ -8,14 +9,14 @@ export async function installHelmChart(celoEnv: string) {
     celoEnv,
     releaseName(celoEnv),
     helmChartPath,
-    helmParameters(celoEnv)
+    await helmParameters(celoEnv)
   )
 }
 export async function removeHelmRelease(celoEnv: string) {
   await removeGenericHelmChart(releaseName(celoEnv))
 }
 
-function helmParameters(celoEnv: string) {
+async function helmParameters(celoEnv: string) {
   return [
     `--set environmentName=${celoEnv}`,
     `--set replicas=4`,
