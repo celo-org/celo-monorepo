@@ -7,7 +7,7 @@ import config from '../config'
 export function computeBLSSalt(queryPhoneNumber: string) {
   try {
     const privateKey = new Buffer(config.salt.key)
-    return BLINDBLS.computePRF(privateKey, new Buffer(queryPhoneNumber.replace('+', '')))
+    return BLINDBLS.computePRF(privateKey, new Buffer(queryPhoneNumber))
   } catch (e) {
     console.error('Failed to compute salt', e)
     throw e

@@ -1,11 +1,9 @@
 import { PhoneNumberUtils } from '@celo/utils'
 import * as functions from 'firebase-functions'
-import { confirmUser } from './common/identity'
+import { authenticateUser } from './common/identity'
 import { incrementQueryCount } from './database/wrappers/account'
 import { computeBLSSalt } from './salt-generation/bls-salt'
 import { getRemainingQueryCount } from './salt-generation/query-quota'
-
-export const NUM_ATTESTATIONS_REQUIRED = 3
 
 export const getSalt = functions.https.onRequest(async (request, response) => {
   try {
@@ -13,7 +11,7 @@ export const getSalt = functions.https.onRequest(async (request, response) => {
       response.status(400).send('Invalid input parameters')
       return
     }
-    confirmUser()
+    authenticateUser()
     const remainingQueryCount = await getRemainingQueryCount(
       request.body.account,
       request.body.phoneNumber
@@ -51,5 +49,5 @@ function hasValidPhoneNumberParam(requestBody: any): boolean {
 }
 
 function hasValidQueryPhoneNumberParam(requestBody: any): boolean {
-  return requestBody.queryPhoneNumber && PhoneNumberUtils.isE164Number(requestBody.queryPhoneNumber)
+  return requestBody.queryPhoneNumber
 }

@@ -1,7 +1,7 @@
 import * as functions from 'firebase-functions'
-import knex from 'knex'
 
-const DEV_MODE = process.env.NODE_ENV !== 'production' || process.env.FUNCTIONS_EMULATOR === 'true'
+export const DEV_MODE =
+  process.env.NODE_ENV !== 'production' || process.env.FUNCTIONS_EMULATOR === 'true'
 
 interface Config {
   blockchain: {
@@ -19,6 +19,9 @@ interface Config {
     password: string
     database: string
     host: string
+  }
+  attestations: {
+    numberAttestationsRequired: number
   }
 }
 
@@ -43,6 +46,9 @@ if (DEV_MODE) {
       database: 'phoneNumberPrivacy',
       host: 'fakeHost',
     },
+    attestations: {
+      numberAttestationsRequired: 3,
+    },
   }
 } else {
   const functionConfig = functions.config()
@@ -63,16 +69,9 @@ if (DEV_MODE) {
       database: functionConfig.db.name,
       host: `/cloudsql/${functionConfig.db.host}`,
     },
+    attestations: {
+      numberAttestationsRequired: functionConfig.attestations.numberAttestationsRequired,
+    },
   }
 }
-
-export const connectToDatabase = () => {
-  console.debug('Creating knex instance')
-  return knex({
-    client: 'pg',
-    connection: config.db,
-    debug: DEV_MODE,
-  })
-}
-
 export default config

@@ -18,7 +18,7 @@ export async function getPerformedQueryCount(account: string): Promise<number> {
 /*
  * Increments query count in database.
  */
-export async function incrementQueryCount(account: string) {
+export async function incrementQueryCount(account: string): Promise<void | number> {
   const data = {
     [ACCOUNTS_COLUMNS.address]: account,
     [ACCOUNTS_COLUMNS.createdAt]: new Date(),

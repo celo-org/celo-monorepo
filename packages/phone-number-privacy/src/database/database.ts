@@ -1,11 +1,21 @@
-import { connectToDatabase } from '../config'
+import knex from 'knex'
+import config, { DEV_MODE } from '../config'
 
-const knex = connectToDatabase()
+export const connectToDatabase = () => {
+  console.debug('Creating knex instance')
+  return knex({
+    client: 'pg',
+    connection: config.db,
+    debug: DEV_MODE,
+  })
+}
+
+const db = connectToDatabase()
 
 export function getDatabase() {
-  return knex
+  return db
 }
 
 export async function setSerializable() {
-  await knex.raw('BEGIN TRANSACTION ISOLATION LEVEL SERIALIZABLE;')
+  await db.raw('BEGIN TRANSACTION ISOLATION LEVEL SERIALIZABLE;')
 }
