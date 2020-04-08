@@ -1,20 +1,22 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: oracle
+  name: {{ template "name" . }}
   labels:
 {{ include "labels" . | indent 4 }}
+{{ include "oracle-client-component-label" . | indent 4 }}
 spec:
   clusterIP: None
   selector:
-    component: oracle
+{{ include "oracle-client-component-label" . | indent 4 }}
 ---
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ include "name" . }}
+  name: {{ template "name" . }}
   labels:
 {{ include "labels" . | indent 4 }}
+{{ include "oracle-client-component-label" . | indent 4 }}
 spec:
   podManagementPolicy: Parallel
   updateStrategy:
@@ -24,13 +26,15 @@ spec:
   selector:
     matchLabels:
 {{ include "labels" . | indent 6 }}
+{{ include "oracle-client-component-label" . | indent 6 }}
   template:
     metadata:
       labels:
 {{ include "labels" . | indent 8 }}
+{{ include "oracle-client-component-label" . | indent 8 }}
     spec:
       containers:
-      - name: geth
+      - name: oracle-client
         image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
         imagePullPolicy: Always
         env:

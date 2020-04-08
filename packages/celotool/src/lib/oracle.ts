@@ -22,8 +22,6 @@ async function helmParameters(celoEnv: string) {
     `--set replicas=4`,
     `--set image.repository=${fetchEnv(envVar.ORACLE_DOCKER_IMAGE_REPOSITORY)}`,
     `--set image.tag=${fetchEnv(envVar.ORACLE_DOCKER_IMAGE_TAG)}`,
-    `--set pod.memoryRequest=250m`,
-    `--set pod.cpuRequest=256M`,
     `--set oracle.web3ProviderUrl=http://localhost:8545`,
   ]
 }
