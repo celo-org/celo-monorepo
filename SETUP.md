@@ -127,6 +127,10 @@ We do not recommend installing Xcode through the App Store as it can auto update
 
 Note that using the method above, you can have multiple versions of Xcode installed in parallel by using different app names. For instance `Xcode10.3.app` and `Xcode11.app` inside the `/Applications` folder.
 
+Install Cocopods `gem install cocoapods`
+
+From ios folder in mobile package run `bundle exec pod install`
+
 ### Linux
 
 #### Install Node, Yarn and friends
