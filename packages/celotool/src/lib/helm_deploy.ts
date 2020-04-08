@@ -478,10 +478,9 @@ export async function deleteStaticIPs(celoEnv: string) {
   )
 }
 
-export async function deletePersistentVolumeClaims(celoEnv: string) {
+export async function deletePersistentVolumeClaims(celoEnv: string, componentLabels: string[]) {
   console.info(`Deleting persistent volume claims for ${celoEnv}`)
   try {
-    const componentLabels = ['validators', 'tx_nodes', 'proxy', 'tx_nodes_private']
     for (const component of componentLabels) {
       const [output] = await execCmd(
         `kubectl delete pvc --selector='component=${component}' --namespace ${celoEnv}`
@@ -692,6 +691,7 @@ export async function resetAndUpgradeHelmChart(celoEnv: string, useExistingGenes
   const bootnodeName = `${celoEnv}-bootnode`
   const proxySetName = `${celoEnv}-proxy`
   const privateTxNodesSetname = `${celoEnv}-tx-nodes-private`
+  const persistentVolumeClaimsLabels = ['validators', 'tx_nodes', 'proxy', 'tx_nodes_private']
 
   // scale down nodes
   await scaleResource(celoEnv, 'StatefulSet', txNodesSetName, 0)
@@ -701,7 +701,7 @@ export async function resetAndUpgradeHelmChart(celoEnv: string, useExistingGenes
   await scaleResource(celoEnv, 'StatefulSet', privateTxNodesSetname, 0, true)
   await scaleResource(celoEnv, 'Deployment', bootnodeName, 0)
 
-  await deletePersistentVolumeClaims(celoEnv)
+  await deletePersistentVolumeClaims(celoEnv, persistentVolumeClaimsLabels)
   await sleep(10000)
 
   await upgradeHelmChart(celoEnv, useExistingGenesis)

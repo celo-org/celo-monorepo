@@ -1,0 +1,22 @@
+{{ range $index, $e := until (int .Values.replicaCount ) }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "celo-fullnode.fullname" $ }}-{{ $index }}
+  labels:
+{{ include "standard.labels" $  | indent 4 }}
+spec:
+  type: {{ $.Values.service.type }}
+{{- if $.Values.geth.use_static_ips }}
+  loadBalancerIP: {{ index $.Values.geth.public_ips $index -}}
+{{- end }}
+  ports:
+    - port: 30303
+      targetPort: discovery-tcp
+      protocol: TCP
+      name: discovery-tcp
+  selector:
+    statefulset.kubernetes.io/pod-name: {{ template "celo-fullnode.fullname" $ }}-{{ $index }}
+---
+{{ end }}

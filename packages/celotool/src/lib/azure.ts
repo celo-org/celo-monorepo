@@ -4,13 +4,24 @@ import { installAndEnableMetricsDeps, redeployTiller } from './helm_deploy'
 import { execCmd, execCmdWithExitOnFailure } from './utils'
 
 // switchToClusterFromEnv configures kubectl to connect to the AKS cluster
-// TODO(trevor): add project switching as well
 export async function switchToClusterFromEnv(
   celoEnv: string,
   checkOrPromptIfStagingOrProduction = true
 ) {
   if (checkOrPromptIfStagingOrProduction) {
     await doCheckOrPromptIfStagingOrProduction()
+  }
+
+  // Azure subscription switch
+  const tenantId = fetchEnv(envVar.AZURE_TENANT_ID)
+  let currentTenantId = null
+  try {
+    ;[currentTenantId] = await execCmd('az account show --query tenantId -o tsv')
+  } catch (error) {
+    console.info('No azure account subscription currently set')
+  }
+  if (currentTenantId === null || currentTenantId.trim() !== tenantId) {
+    await execCmdWithExitOnFailure(`az account set --subscription ${tenantId}`)
   }
 
   let currentCluster = null
