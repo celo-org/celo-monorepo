@@ -439,7 +439,7 @@ ___
 
 ▸ **getElectedValidators**(`epochNumber`: number): *Promise‹[Validator](../interfaces/_wrappers_validators_.validator.md)[]›*
 
-*Defined in [contractkit/src/wrappers/Election.ts:439](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L439)*
+*Defined in [contractkit/src/wrappers/Election.ts:430](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L430)*
 
 Retrieves the set of validatorsparticipating in BFT at epochNumber.
 
@@ -469,7 +469,7 @@ ___
 
 ▸ **getGroupVoterRewards**(`epochNumber`: number): *Promise‹[GroupVoterReward](../interfaces/_wrappers_election_.groupvoterreward.md)[]›*
 
-*Defined in [contractkit/src/wrappers/Election.ts:452](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L452)*
+*Defined in [contractkit/src/wrappers/Election.ts:443](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L443)*
 
 Retrieves GroupVoterRewards at epochNumber.
 
@@ -573,7 +573,7 @@ ___
 
 ▸ **getVoterRewards**(`address`: [Address](../modules/_base_.md#address), `epochNumber`: number): *Promise‹[VoterReward](../interfaces/_wrappers_election_.voterreward.md)[]›*
 
-*Defined in [contractkit/src/wrappers/Election.ts:476](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L476)*
+*Defined in [contractkit/src/wrappers/Election.ts:467](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L467)*
 
 Retrieves VoterRewards for address at epochNumber.
 
