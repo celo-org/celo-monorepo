@@ -23,7 +23,8 @@ export type Milestone = FutureStone | DoneStone
 const stones: Milestone[] = [
   {
     key: 'New_Baklava_Testnet',
-    status: Status.inprogress,
+    status: Status.complete,
+    date: 'April 2020',
   },
   {
     key: 'Security_audits_complete',

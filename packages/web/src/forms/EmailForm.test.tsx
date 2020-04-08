@@ -1,36 +1,29 @@
 import { fireEvent, render, waitForDomChange } from '@testing-library/react'
 import * as React from 'react'
-import { Text, View } from 'react-native'
 import EmailForm from 'src/forms/EmailForm'
 
 describe('EmailForm', () => {
   describe('when first shown to visitor', () => {
     it('sets the submit button text', () => {
       const submitBTNText = 'Pres here'
-      const { getByText, queryByText } = render(
-        <EmailForm submitText={submitBTNText} whenComplete={<View />} />
-      )
+      const { getByText, queryByText } = render(<EmailForm submitText={submitBTNText} />)
 
       expect(getByText(submitBTNText)).toBeVisible()
 
-      expect(queryByText('common:validationErrors.email')).not.toBeInTheDocument()
+      expect(queryByText('common:validationErrors.email')).not.toBeVisible()
     })
 
-    it('does not show whenComplete', () => {
-      const { queryByText } = render(
-        <EmailForm submitText={'test'} whenComplete={<Text>when complete</Text>} />
-      )
+    it('does not show success message', () => {
+      const { queryByText } = render(<EmailForm submitText={'test'} />)
 
-      expect(queryByText('when complete')).not.toBeInTheDocument()
+      expect(queryByText('common:shortSuccess')).not.toBeVisible()
     })
   })
 
   describe('when blank form is submitted', () => {
     it('shows error message', () => {
       const submitBTNText = 'Pres here'
-      const { getByText, queryByText } = render(
-        <EmailForm submitText={submitBTNText} whenComplete={<View />} />
-      )
+      const { getByText, queryByText } = render(<EmailForm submitText={submitBTNText} />)
 
       fireEvent.click(getByText(submitBTNText))
 
@@ -39,11 +32,10 @@ describe('EmailForm', () => {
   })
 
   describe('when filled out form is submitted', () => {
-    it('shows does not show error message and shows the whenComplete element', async () => {
+    it('shows does not show error message and shows success message', async () => {
       const submitBTNText = 'Pres here'
-      const testID = 'Prosper'
-      const { getByText, queryByText, getByPlaceholderText, getByTestId } = render(
-        <EmailForm submitText={submitBTNText} whenComplete={<View testID={testID} />} />
+      const { getByText, queryByText, getByPlaceholderText } = render(
+        <EmailForm submitText={submitBTNText} />
       )
 
       fireEvent.change(getByPlaceholderText('common:email*'), {
@@ -52,8 +44,9 @@ describe('EmailForm', () => {
 
       fireEvent.click(getByText(submitBTNText))
       await waitForDomChange()
-      expect(queryByText('common:validationErrors.email')).not.toBeInTheDocument()
-      expect(getByTestId(testID)).toBeInTheDocument()
+      expect(queryByText('common:validationErrors.email')).not.toBeVisible()
+
+      expect(queryByText('common:shortSuccess')).toBeVisible()
     })
   })
 })
