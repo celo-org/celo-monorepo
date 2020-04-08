@@ -3,7 +3,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ template "celo-fullnode.fullname" $ }}-{{ $index }}
+  name: {{ template "common.fullname" $ }}-{{ $index }}
   labels:
 {{ include "standard.labels" $  | indent 4 }}
 spec:
@@ -16,7 +16,11 @@ spec:
       targetPort: discovery-tcp
       protocol: TCP
       name: discovery-tcp
+    - port: 8545
+      targetPort: rpc
+      protocol: TCP
+      name: rpc
   selector:
-    statefulset.kubernetes.io/pod-name: {{ template "celo-fullnode.fullname" $ }}-{{ $index }}
+    statefulset.kubernetes.io/pod-name: {{ template "common.fullname" $ }}-{{ $index }}
 ---
 {{ end }}

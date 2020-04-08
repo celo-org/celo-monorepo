@@ -104,20 +104,20 @@ release: {{ .Release.Name }}
     {{ end }}
     {{- if .unlock | default false }}
     ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --unlock=${ACCOUNT_ADDRESS} --password /root/.celo/account/accountSecret --allow-insecure-unlock"
-    {{- end -}}
+    {{- end }}
     {{- if .expose }}
     RPC_APIS="{{ .rpc_apis | default "eth,net,web3,debug,txpool" }}"
     ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --rpc --rpcaddr 0.0.0.0 --rpcapi=${RPC_APIS} --rpccorsdomain='*' --rpcvhosts=* --ws --wsaddr 0.0.0.0 --wsorigins=* --wsapi=${RPC_APIS}"
-    {{- end -}}
+    {{- end }}
     {{- if .ping_ip_from_packet | default false }}
     ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --ping-ip-from-packet"
-    {{- end -}}
+    {{- end }}
     {{- if .in_memory_discovery_table_flag | default false }}
     ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --use-in-memory-discovery-table"
-    {{- end -}}
+    {{- end }}
     {{- if .proxy_allow_private_ip_flag | default false }}
     ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --proxy.allowprivateip"
-    {{- end -}}
+    {{- end }}
   
     geth \
       --bootnodes=$(cat /root/.celo/bootnodeEnode) \
@@ -150,10 +150,12 @@ release: {{ .Release.Name }}
     protocol: UDP
   - name: discovery-tcp
     containerPort: 30303
+{{- if .expose }}
   - name: rpc
     containerPort: 8545
   - name: ws
     containerPort: 8546
+{{ end }}
   resources:
 {{ toYaml .Values.geth.resources | indent 4 }}
   volumeMounts:

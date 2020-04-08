@@ -32,4 +32,4 @@ spec:
       initContainers:
 {{ include "common.init-genesis-container" .  | indent 6 }}
       containers:
-{{ include "common.full-node-container" . | indent 6 }}
+{{ include "common.full-node-container" (dict "Values" $.Values "Release" $.Release "Chart" $.Chart "expose" true ) | indent 6 }}

@@ -30,8 +30,7 @@ export async function installFullNodeChart(celoEnv: string) {
   const kubeNamespace = getKubeNamespace(celoEnv)
   const releaseName = getReleaseName(celoEnv)
   await createNamespaceIfNotExists(kubeNamespace)
-  const params = await helmParameters(celoEnv, kubeNamespace)
-  console.info(`helmParams: ${params}`)
+
   return installGenericHelmChart(
     kubeNamespace,
     releaseName,
@@ -43,10 +42,9 @@ export async function installFullNodeChart(celoEnv: string) {
 export async function upgradeFullNodeChart(celoEnv: string, reset: boolean = false) {
   const kubeNamespace = getKubeNamespace(celoEnv)
   const releaseName = getReleaseName(celoEnv)
-  const persistentVolumeClaimsLabels = ['']
 
   if (reset) {
-    await deletePersistentVolumeClaims(celoEnv, persistentVolumeClaimsLabels)
+    await deletePersistentVolumeClaims(celoEnv, ['celo-fullnode'])
   }
   return upgradeGenericHelmChart(
     kubeNamespace,
@@ -58,8 +56,9 @@ export async function upgradeFullNodeChart(celoEnv: string, reset: boolean = fal
 
 export async function removeHelmRelease(celoEnv: string) {
   const releaseName = getReleaseName(celoEnv)
-  await deallocateIPs(celoEnv)
   await removeGenericHelmChart(releaseName)
+  await deletePersistentVolumeClaims(celoEnv, ['celo-fullnode'])
+  await deallocateIPs(celoEnv)
 }
 
 async function helmParameters(celoEnv: string, kubeNamespace: string) {
