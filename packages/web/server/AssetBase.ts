@@ -90,6 +90,7 @@ function normalize(asset: Fields, id: string, tags: Record<string, Tag>): AssetP
     id,
   }
 }
+export const _normalize = normalize
 
 function getPreview(asset: Fields) {
   const previewField = asset.Preview || asset[ASSSET_FIELD_LIGHT]
