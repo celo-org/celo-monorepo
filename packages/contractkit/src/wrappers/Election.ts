@@ -420,7 +420,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
       }
     }
 
-    return { lesserKey, greaterKey }
+    return { lesser: lesserKey, greater: greaterKey }
   }
 
   /**
