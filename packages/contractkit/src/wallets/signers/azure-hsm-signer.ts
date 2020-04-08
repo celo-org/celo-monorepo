@@ -27,8 +27,8 @@ export class AzureHSMSigner implements Signer {
     const sigVT = addToV + signature.v
     return {
       v: sigVT.toString(16),
-      r: signature.r.toString(16),
-      s: signature.s.toString(16),
+      r: signature.r.toString('hex'),
+      s: signature.s.toString('hex'),
     }
   }
 
@@ -42,8 +42,8 @@ export class AzureHSMSigner implements Signer {
 
     return {
       v: sigV,
-      r: ethUtil.toBuffer(signature.r),
-      s: ethUtil.toBuffer(signature.s),
+      r: signature.r,
+      s: signature.s,
     }
   }
 
@@ -56,8 +56,8 @@ export class AzureHSMSigner implements Signer {
 
     return {
       v: sigV,
-      r: ethUtil.toBuffer(signature.r),
-      s: ethUtil.toBuffer(signature.s),
+      r: signature.r,
+      s: signature.s,
     }
   }
 

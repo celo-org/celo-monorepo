@@ -34,7 +34,6 @@
     "@ledgerhq/hw-transport": "^5.11.0",
     "@types/debug": "^4.1.5",
     "@types/secp256k1": "^3.5.3",
-    "bn.js": "^5.1.1",
     "bignumber.js": "^9.0.0",
     "cross-fetch": "3.0.4",
     "debug": "^4.1.1",

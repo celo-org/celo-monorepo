@@ -1,10 +1,11 @@
 import {
   Address,
+  ensureLeading0x,
   normalizeAddressWith0x,
   privateKeyToAddress,
   trimLeading0x,
 } from '@celo/utils/lib/address'
-import BN = require('bn.js')
+import { BigNumber } from 'bignumber.js'
 import * as ethUtil from 'ethereumjs-util'
 import Web3 from 'web3'
 import { EncodedTransaction, Tx } from 'web3-core'
@@ -112,20 +113,20 @@ describe('AzureHSMWallet class', () => {
             getKeys: async (): Promise<string[]> => {
               return Array.from(keyVaultAddresses.keys())
             },
-            getPublicKey: async (keyName: string): Promise<BN> => {
+            getPublicKey: async (keyName: string): Promise<BigNumber> => {
               if (!keyVaultAddresses.has(keyName)) {
                 throw new Error(`Key ${keyName} not found in KeyVault ${VAULT_NAME}`)
               }
               const privKey = keyVaultAddresses.get(keyName)!.privateKey
               const pubKey = ethUtil.privateToPublic(ethUtil.toBuffer(privKey))
-              return new BN(pubKey as Buffer)
+              return new BigNumber(ensureLeading0x(pubKey.toString('hex')))
             },
             signMessage: async (message: Buffer, keyName: string): Promise<Signature> => {
               if (keyVaultAddresses.has(keyName)) {
                 const trimmedKey = trimLeading0x(keyVaultAddresses.get(keyName)!.privateKey)
                 const pkBuffer = Buffer.from(trimmedKey, 'hex')
                 const signature = ethUtil.ecsign(message, pkBuffer)
-                return new Signature(signature.v - 27, new BN(signature.r), new BN(signature.s))
+                return new Signature(signature.v - 27, signature.r, signature.s)
               }
               throw new Error(`Unable to locate key: ${keyName}`)
             },

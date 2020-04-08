@@ -52,7 +52,7 @@ export class AzureHSMWallet extends RemoteWallet implements Wallet {
       throw new Error('AzureHSMWallet needs to be initialized first')
     }
     const publicKey = await this.keyVaultClient!.getPublicKey(keyName)
-    const pkBuffer = publicKey.toBuffer()
+    const pkBuffer = ethUtil.toBuffer(ensureLeading0x(publicKey.toString(16)))
     if (!ethUtil.isValidPublic(pkBuffer, true)) {
       throw new Error(`Invalid secp256k1 public key for keyname ${keyName}`)
     }

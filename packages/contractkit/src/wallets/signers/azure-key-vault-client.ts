@@ -1,7 +1,9 @@
 import { DefaultAzureCredential } from '@azure/identity'
 import { CryptographyClient, KeyClient, KeyVaultKey } from '@azure/keyvault-keys'
-import BN = require('bn.js')
+import { ensureLeading0x } from '@celo/utils/src/address'
+import { BigNumber } from 'bignumber.js'
 import { ec as EC } from 'elliptic'
+import * as ethUtil from 'ethereumjs-util'
 import { ecdsaRecover } from 'secp256k1'
 
 /**
@@ -36,7 +38,7 @@ export class AzureKeyVaultClient {
     return keyNames
   }
 
-  public async getPublicKey(keyName: string): Promise<BN> {
+  public async getPublicKey(keyName: string): Promise<BigNumber> {
     const signingKey = await this.getKey(keyName)
 
     const pubKeyPrefix = Buffer.from(new Uint8Array([this.publicKeyPrefix]))
@@ -45,7 +47,7 @@ export class AzureKeyVaultClient {
       Buffer.from(signingKey.key!.x!),
       Buffer.from(signingKey.key!.y!),
     ])
-    const publicKey = new BN(rawPublicKey)
+    const publicKey = AzureKeyVaultClient.bufferToBigNumber(rawPublicKey)
     return publicKey
   }
 
@@ -77,17 +79,20 @@ export class AzureKeyVaultClient {
 
     // Canonicalize signature
     const secp256k1Curve = new EC('secp256k1')
-    const R = new BN(Buffer.from(rawSignature.slice(0, 32)))
-    let S = new BN(Buffer.from(rawSignature.slice(32, 64)))
+    const R = AzureKeyVaultClient.bufferToBigNumber(Buffer.from(rawSignature.slice(0, 32)))
+    let S = AzureKeyVaultClient.bufferToBigNumber(Buffer.from(rawSignature.slice(32, 64)))
 
     // The Azure Signature MAY not be canonical, which is illegal in Ethereum
     // thus it must be transposed to the lower intersection.
     // https://github.com/bitcoin/bips/blob/master/bip-0062.mediawiki#Low_S_values_in_signatures
-    if (!AzureKeyVaultClient.isCanonical(S, secp256k1Curve.curve.n)) {
+    const N = AzureKeyVaultClient.bufferToBigNumber(secp256k1Curve.curve.n)
+    if (!AzureKeyVaultClient.isCanonical(S, N)) {
       S = secp256k1Curve.curve.n.sub(S)
     }
 
-    const canonicalizedSignature = Buffer.concat([R.toBuffer('be', 32), S.toBuffer('be', 32)])
+    const rBuff = AzureKeyVaultClient.bigNumberToBuffer(R)
+    const sBuff = AzureKeyVaultClient.bigNumberToBuffer(S)
+    const canonicalizedSignature = Buffer.concat([rBuff, sBuff])
     const publicKey = await this.getPublicKey(keyName)
 
     // Azure doesn't provide the recovery key in the signature
@@ -96,12 +101,12 @@ export class AzureKeyVaultClient {
       publicKey,
       message
     )
-    return new Signature(recoveryParam, R, S)
+    return new Signature(recoveryParam, rBuff, sBuff)
   }
 
   public async hasKey(keyName: string): Promise<boolean> {
     try {
-      await this.keyClient.getKey(keyName!)
+      await this.keyClient.getKey(keyName)
     } catch (e) {
       if (e.message.includes('this is not a valid private key')) {
         return false
@@ -114,20 +119,24 @@ export class AzureKeyVaultClient {
   /**
    * Returns true if the signature is in the "bottom" of the curve
    */
-  private static isCanonical(S: BN, curveN: BN): boolean {
-    // @ts-ignore-next-line - linter uses incorrect BN definition
-    return S.cmp(curveN.ushrn(1)) <= 0
+  private static isCanonical(S: BigNumber, curveN: BigNumber): boolean {
+    return S.comparedTo(curveN.shiftedBy(1)) <= 0
   }
 
   /**
    * Attempts each recovery key to find a match
    */
-  private static recoverKeyIndex(signature: Uint8Array, publicKey: BN, hash: Uint8Array): number {
+  private static recoverKeyIndex(
+    signature: Uint8Array,
+    publicKey: BigNumber,
+    hash: Uint8Array
+  ): number {
     for (let i = 0; i < 4; i++) {
       const compressed = false
       try {
         const recoveredPublicKeyByteArr = ecdsaRecover(signature, i, hash, compressed)
-        const recoveredPublicKey = new BN(Buffer.from(recoveredPublicKeyByteArr))
+        const publicKeyBuff = Buffer.from(recoveredPublicKeyByteArr)
+        const recoveredPublicKey = AzureKeyVaultClient.bufferToBigNumber(publicKeyBuff)
         if (publicKey.eq(recoveredPublicKey)) {
           return i
         }
@@ -145,11 +154,9 @@ export class AzureKeyVaultClient {
       const signingKey = await this.keyClient.getKey(keyName)
 
       if (
-        typeof signingKey === 'undefined' ||
-        typeof signingKey.id === 'undefined' ||
-        typeof signingKey.key === 'undefined' ||
-        typeof signingKey.key.x === 'undefined' ||
-        typeof signingKey.key.y === 'undefined'
+        typeof signingKey?.id === 'undefined' ||
+        typeof signingKey?.key?.x === 'undefined' ||
+        typeof signingKey?.key?.y === 'undefined'
       ) {
         throw new Error(`Invalid key data returned from Azure: ${signingKey}`)
       }
@@ -162,14 +169,21 @@ export class AzureKeyVaultClient {
       throw new Error(`Unexpected KeyVault error ${e.message}`)
     }
   }
+
+  private static bufferToBigNumber(input: Buffer): BigNumber {
+    return new BigNumber(ensureLeading0x(input.toString('hex')))
+  }
+  private static bigNumberToBuffer(input: BigNumber): Buffer {
+    return ethUtil.toBuffer(ensureLeading0x(input.toString(16))) as Buffer
+  }
 }
 
 export class Signature {
   public v: number
-  public r: BN
-  public s: BN
+  public r: Buffer
+  public s: Buffer
 
-  constructor(v: number, r: BN, s: BN) {
+  constructor(v: number, r: Buffer, s: Buffer) {
     this.v = v
     this.r = r
     this.s = s
