@@ -54,6 +54,7 @@ interface ReleaseSchedule {
 
 interface RevocationInfo {
   revocable: boolean
+  canExpire: boolean
   releasedBalanceAtRevoke: BigNumber
   revokeTime: number
 }
@@ -152,6 +153,7 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
 
     return {
       revocable: revocationInfo.revocable,
+      canExpire: revocationInfo.canExpire,
       releasedBalanceAtRevoke: valueToBigNumber(revocationInfo.releasedBalanceAtRevoke),
       revokeTime: valueToInt(revocationInfo.revokeTime),
     }
@@ -395,6 +397,12 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
    * Sets the contract's liquidity provision to true
    */
   setLiquidityProvision = proxySend(this.kit, this.contract.methods.setLiquidityProvision)
+
+  /**
+   * Sets the contract's `canExpire` field to `_canExpire`
+   * @param _canExpire If the contract can expire `EXPIRATION_TIME` after the release schedule finishes.
+   */
+  setCanExpire = proxySend(this.kit, this.contract.methods.setCanExpire)
 
   /**
    * Sets the contract's max distribution

@@ -1,8 +1,8 @@
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { ErrorDisplay } from 'src/forms/ErrorDisplay'
+import { TextInput } from 'src/forms/TextInput'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
-import { TextInput } from './FormComponents'
 
 interface LabelProps {
   name: string
