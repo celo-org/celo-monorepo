@@ -159,16 +159,28 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   }
 
   /**
-   * Returns the required ratio of yes:no votes needed to exceed in order to pass the proposal.
+   * Returns the required ratio of yes:no votes needed to exceed in order to pass the proposal transaction.
    * @param tx Transaction to determine the constitution for running.
    */
-  async getConstitution(tx: ProposalTransaction): Promise<BigNumber.Value> {
+  async getTransactionConstitution(tx: ProposalTransaction): Promise<BigNumber.Value> {
     // Extract the leading four bytes of the call data, which specifies the function.
     const callSignature = ensureLeading0x(trimLeading0x(tx.input).slice(0, 8))
     const value = await this.contract.methods
       .getConstitution(tx.to ?? NULL_ADDRESS, callSignature)
       .call()
     return fromFixed(new BigNumber(value))
+  }
+
+  /**
+   * Returns the required ratio of yes:no votes needed to exceed in order to pass the proposal.
+   * @param proposal Proposal to determine the constitution for running.
+   */
+  async getConstitution(proposal: Proposal): Promise<BigNumber.Value> {
+    let constitution = new BigNumber(0)
+    for (const tx of proposal) {
+      constitution = BigNumber.max(await this.getTransactionConstitution(tx), constitution)
+    }
+    return constitution
   }
 
   /**

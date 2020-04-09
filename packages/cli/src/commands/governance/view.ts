@@ -38,13 +38,10 @@ export default class View extends BaseCommand {
 
     // Identify the transaction with the highest constitutional requirement.
     const proposal = await governance.getProposal(id)
-    let constitution = new BigNumber(0)
-    for (const tx of proposal) {
-      constitution = BigNumber.max(await governance.getConstitution(tx), constitution)
-    }
 
-    // Get the minimum number of participation required to pass a proposal.
+    // Get the minimum participation and agreement required to pass a proposal.
     const participationParams = await governance.getParticipationParameters()
+    const constitution = await governance.getConstitution(proposal)
 
     printValueMapRecursive({
       ...record,
