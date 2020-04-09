@@ -359,8 +359,12 @@ celocli releasegold:authorize --contract $CELO_VALIDATOR_RG_ADDRESS --role valid
 
 Using the newly authorized Validator key, register the Account as a Validator:
 
+{% hint style="info" %}
+Running the following command requires the keys for the validator signer address. This command can be run on the validator machine, or if the keys are also available on your local machine, it can be run there.
+{% endhint %}
+
 ```bash
-# On the Validator machine
+# On a machine with CELO_VALIDATOR_SIGNER_ADDRESS unlocked.
 celocli validator:register --blsKey $CELO_VALIDATOR_SIGNER_BLS_PUBLIC_KEY --blsSignature $CELO_VALIDATOR_SIGNER_BLS_SIGNATURE --ecdsaKey $CELO_VALIDATOR_SIGNER_PUBLIC_KEY --from $CELO_VALIDATOR_SIGNER_ADDRESS
 ```
 
@@ -394,7 +398,7 @@ To generate the proof-of-possession, run the following command:
 
 ```bash
 # On your local machine
-docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE --nousb account proof-of-possession $CELO_VALIDATOR_GROUP_VOTE_SIGNER_ADDRESS $CELO_VALIDATOR_GROUP_RG_ADDRESS
+docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE --nousb account proof-of-possession $CELO_VALIDATOR_GROUP_SIGNER_ADDRESS $CELO_VALIDATOR_GROUP_RG_ADDRESS
 ```
 
 Save the signer address, public key, and proof-of-possession signature to your local machine:
@@ -514,7 +518,7 @@ Epoch lengths in the Baklava network are set to be the number of blocks produced
 ```bash
 # On your local machine
 # Note that this command will wait for the next epoch transition, which may be up to 24 hours in the future.
-celocli election:activate --from $CELO_VALIDATOR_RG_ADDRESS --wait && celocli election:activate --from $CELO_VALIDATOR_GROUP_RG_ADDRESS --wait
+celocli election:activate --from $CELO_VALIDATOR_VOTE_SIGNER_ADDRESS --wait && celocli election:activate --from $CELO_VALIDATOR_GROUP_VOTE_SIGNER_ADDRESS --wait
 ```
 
 Check that your votes were activated by re-running the following commands:
