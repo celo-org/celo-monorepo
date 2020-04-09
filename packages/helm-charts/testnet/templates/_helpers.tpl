@@ -264,16 +264,17 @@ spec:
 
           RPC_APIS={{ .rpc_apis }}
 
+          ADDITIONAL_FLAGS=""
           {{ if .proxy }}
           VALIDATOR_HEX_ADDRESS=`cat /root/.celo/validator_address`
           ADDITIONAL_FLAGS="--proxy.proxiedvalidatoraddress $VALIDATOR_HEX_ADDRESS --proxy.proxy --proxy.internalendpoint :30503 $PROXY_ALLOW_PRIVATE_IP_FLAG"
           {{ end }}
-          {{- if .unlock | default false }}
+          {{ if .unlock | default false }}
           ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --unlock=${ACCOUNT_ADDRESS} --password /root/.celo/account/accountSecret --allow-insecure-unlock"
-          {{- end -}}
-          {{- if .expose }}
+          {{ end }}
+          {{ if .expose }}
           ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --rpc --rpcaddr 0.0.0.0 --rpcapi=${RPC_APIS} --rpccorsdomain='*' --rpcvhosts=* --ws --wsaddr 0.0.0.0 --wsorigins=* --wsapi=${RPC_APIS}"
-          {{ end -}}
+          {{ end }}
 
           geth \
             --bootnodes=enode://`cat /root/.celo/bootnodeEnode` \
