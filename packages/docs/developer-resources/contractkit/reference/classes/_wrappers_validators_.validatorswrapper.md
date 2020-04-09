@@ -659,7 +659,7 @@ ___
 
 ▸ **findValidatorMembershipHistoryIndex**(`epoch`: number, `history`: [GroupMembership](../interfaces/_wrappers_validators_.groupmembership.md)[]): *number*
 
-*Defined in [contractkit/src/wrappers/Validators.ts:609](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L609)*
+*Defined in [contractkit/src/wrappers/Validators.ts:607](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L607)*
 
 Returns the index into `history` for `epoch`.
 
@@ -824,7 +824,7 @@ ___
 
 ▸ **getValidatorMembershipHistoryIndex**(`validator`: [Validator](../interfaces/_wrappers_validators_.validator.md), `blockNumber?`: undefined | number): *Promise‹object›*
 
-*Defined in [contractkit/src/wrappers/Validators.ts:589](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L589)*
+*Defined in [contractkit/src/wrappers/Validators.ts:587](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L587)*
 
 Returns the group membership for `validator`.
 
