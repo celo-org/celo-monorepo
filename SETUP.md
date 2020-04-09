@@ -144,7 +144,6 @@ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
 source ~/.bashrc
 
 # Setting up the right version of Nvm
-nvm install 8
 nvm install 10
 nvm alias default 10
 
