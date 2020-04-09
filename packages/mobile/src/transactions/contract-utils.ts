@@ -1,8 +1,7 @@
 import { values } from 'lodash'
+import { estimateGas } from 'src/web3/utils'
 import { Tx } from 'web3-core'
 import { TransactionObject, TransactionReceipt } from 'web3-eth'
-
-const gasInflateFactor = 1.5
 
 export type TxLogger = (event: SendTransactionLogEvent) => void
 
@@ -174,7 +173,7 @@ export async function sendTransactionAsync<T>(
     }
 
     if (estimatedGas === undefined) {
-      estimatedGas = Math.round((await tx.estimateGas(txParams)) * gasInflateFactor)
+      estimatedGas = (await estimateGas(tx, txParams)).toNumber()
       logger(EstimatedGas(estimatedGas))
     }
 

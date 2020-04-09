@@ -32,13 +32,14 @@ import {
 } from 'src/invite/actions'
 import { createInviteCode } from 'src/invite/utils'
 import { navigateHome } from 'src/navigator/NavigationService'
-import { getSendTxGas } from 'src/send/saga'
+import { getSendFee, getSendTxGas } from 'src/send/saga'
 import { fetchDollarBalance, transferStableToken } from 'src/stableToken/actions'
-import { createTransaction, fetchTokenBalanceInWeiWithRetry } from 'src/tokens/saga'
+import { createTokenTransferTransaction, fetchTokenBalanceInWeiWithRetry } from 'src/tokens/saga'
 import { generateStandbyTransactionId } from 'src/transactions/actions'
 import { waitForTransactionWithId } from 'src/transactions/saga'
 import { sendTransaction } from 'src/transactions/send'
 import { getAppStoreId } from 'src/utils/appstore'
+import { divideByWei } from 'src/utils/formatting'
 import Logger from 'src/utils/Logger'
 import { addLocalAccount, getContractKit } from 'src/web3/contracts'
 import { getConnectedUnlockedAccount, getOrCreateAccount, waitWeb3LastBlock } from 'src/web3/saga'
@@ -52,7 +53,7 @@ const INVITE_FEE = '0.25'
 export async function getInviteTxGas(
   account: string,
   currency: CURRENCY_ENUM,
-  amount: string,
+  amount: BigNumber.Value,
   comment: string
 ) {
   const contractKit = getContractKit()
@@ -353,19 +354,26 @@ export function* withdrawFundsFromTempAccount(
   if (!fornoMode) {
     yield call(contractKit.web3.eth.personal.unlockAccount, tempAccount, TEMP_PW, 600)
   }
-  const tempAccountBalance = new BigNumber(
-    contractKit.web3.utils.fromWei(tempAccountBalanceWei.toString())
+  const tempAccountBalance = divideByWei(tempAccountBalanceWei)
+
+  Logger.debug(TAG + '@withdrawFundsFromTempAccount', 'Calculating withdrawal fee')
+  const sendTokenFee: BigNumber = yield call(getSendFee, tempAccount, CURRENCY_ENUM.DOLLAR, {
+    recipientAddress: newAccount,
+    amount: tempAccountBalance,
+    comment: SENTINEL_INVITE_COMMENT,
+  })
+  Logger.debug(TAG + '@withdrawFundsFromTempAccount', `Using fee of ${sendTokenFee.toString()}`)
+
+  const tx: CeloTransactionObject<boolean> = yield call(
+    createTokenTransferTransaction,
+    CURRENCY_ENUM.DOLLAR,
+    {
+      recipientAddress: newAccount,
+      comment: SENTINEL_INVITE_COMMENT,
+      amount: tempAccountBalance.minus(sendTokenFee),
+    }
   )
 
-  Logger.debug(TAG + '@withdrawFundsFromTempAccount', 'Creating send transaction')
-  const tx: CeloTransactionObject<boolean> = yield call(createTransaction, CURRENCY_ENUM.DOLLAR, {
-    recipientAddress: newAccount,
-    comment: SENTINEL_INVITE_COMMENT,
-    // TODO: appropriately withdraw the balance instead of using gas fees will be less than 1 cent
-    amount: tempAccountBalance.minus(0.01).toString(),
-  })
-
-  Logger.debug(TAG + '@withdrawFundsFromTempAccount', 'Sending transaction')
   yield call(sendTransaction, tx.txo, tempAccount, TAG, 'Transfer from temp wallet')
   Logger.debug(TAG + '@withdrawFundsFromTempAccount', 'Done withdrawal')
 }
