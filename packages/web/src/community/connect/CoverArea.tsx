@@ -4,7 +4,7 @@ import { StyleSheet, Text, View } from 'react-native'
 import Fade from 'react-reveal/Fade'
 import FullCircle from 'src/community/connect/FullCircle'
 import { H1 } from 'src/fonts/Fonts'
-import EmailForm, { After } from 'src/forms/EmailForm'
+import EmailForm from 'src/forms/EmailForm'
 import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
 import Arrow from 'src/icons/Arrow'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
@@ -64,12 +64,7 @@ class CoverArea extends React.PureComponent<Props> {
                 <Text style={[fonts.p, textStyles.readingOnDark, styles.formName]}>
                   {t('cover.joinMovement')}
                 </Text>
-                <EmailForm
-                  submitText={t('common:signUp')}
-                  route={'/contacts'}
-                  whenComplete={<After t={t} isDarkMode={true} />}
-                  isDarkMode={true}
-                />
+                <EmailForm submitText={t('common:signUp')} route={'/contacts'} isDarkMode={true} />
               </View>
             </Fade>
           </Cell>
