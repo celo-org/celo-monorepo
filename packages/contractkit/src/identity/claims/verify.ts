@@ -1,5 +1,6 @@
 import { eqAddress } from '@celo/utils/lib/address'
 import { isValidUrl } from '@celo/utils/lib/io'
+import { ContractKit } from '../..'
 import { Address } from '../../base'
 import { IdentityMetadataWrapper } from '../metadata'
 import { AccountClaim } from './account'
@@ -18,13 +19,14 @@ import { ClaimTypes } from './types'
 export async function verifyClaim(
   claim: Claim,
   address: string,
-  metadataURLGetter: MetadataURLGetter
+  metadataURLGetter: MetadataURLGetter,
+  kit: ContractKit
 ) {
   switch (claim.type) {
     case ClaimTypes.KEYBASE:
       return verifyKeybaseClaim(claim, address)
     case ClaimTypes.ACCOUNT:
-      return verifyAccountClaim(claim, address, metadataURLGetter)
+      return verifyAccountClaim(claim, address, metadataURLGetter, kit)
     default:
       break
   }
@@ -40,7 +42,8 @@ export type MetadataURLGetter = (address: Address) => Promise<string>
 export const verifyAccountClaim = async (
   claim: AccountClaim,
   address: string,
-  metadataURLGetter: MetadataURLGetter
+  metadataURLGetter: MetadataURLGetter,
+  kit: ContractKit
 ) => {
   const metadataURL = await metadataURLGetter(claim.address)
 
@@ -51,7 +54,7 @@ export const verifyAccountClaim = async (
 
   let metadata: IdentityMetadataWrapper
   try {
-    metadata = await IdentityMetadataWrapper.fetchFromURL(metadataURL)
+    metadata = await IdentityMetadataWrapper.fetchFromURL(metadataURL, kit)
   } catch (error) {
     return `Metadata could not be fetched for ${
       claim.address

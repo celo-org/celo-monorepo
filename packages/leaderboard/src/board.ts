@@ -103,7 +103,12 @@ async function getClaims(
         break
       case ClaimTypes.ACCOUNT:
         try {
-          const status = await verifyAccountClaim(claim, '0x' + address, accounts.getMetadataURL)
+          const status = await verifyAccountClaim(
+            claim,
+            '0x' + address,
+            accounts.getMetadataURL,
+            kit
+          )
           if (status) console.error('Cannot verify claim:', status)
           else {
             console.log('Claim success', address, claim.address)
@@ -152,7 +157,7 @@ async function readAssoc(lst: string[]) {
         if (url == '') metadata = IdentityMetadataWrapper.fromEmpty(a)
         else {
           try {
-            metadata = await IdentityMetadataWrapper.fetchFromURL(url)
+            metadata = await IdentityMetadataWrapper.fetchFromURL(url, kit)
           } catch (err) {
             console.error('Error reading metadata', a, err.toString())
             metadata = IdentityMetadataWrapper.fromEmpty(a)

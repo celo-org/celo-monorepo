@@ -83,14 +83,14 @@ testWithGanache('Account claims', (web3) => {
       })
 
       it('indicates that the metadata url could not be retrieved', async () => {
-        const error = await verifyClaim(claim, address, metadataUrlGetter)
+        const error = await verifyClaim(claim, address, metadataUrlGetter, kit)
         expect(error).toContain('could not be retrieved')
       })
     })
 
     describe('when the metadata URL is set, but does not contain the address claim', () => {
       it('indicates that the metadata does not contain the counter claim', async () => {
-        const error = await verifyClaim(claim, address, metadataUrlGetter)
+        const error = await verifyClaim(claim, address, metadataUrlGetter, kit)
         expect(error).toContain('did not claim')
       })
     })
@@ -104,7 +104,7 @@ testWithGanache('Account claims', (web3) => {
       })
 
       it('returns undefined succesfully', async () => {
-        const error = await verifyClaim(claim, address, metadataUrlGetter)
+        const error = await verifyClaim(claim, address, metadataUrlGetter, kit)
         expect(error).toBeUndefined()
       })
     })

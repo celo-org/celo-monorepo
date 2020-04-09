@@ -37,7 +37,7 @@ async function getMetadata(kit: ContractKit, address: string) {
   console.log(address, 'has url', url)
   if (url === '') return IdentityMetadataWrapper.fromEmpty(address)
   try {
-    let data = await IdentityMetadataWrapper.fetchFromURL(url)
+    let data = await IdentityMetadataWrapper.fetchFromURL(url, kit)
     return data
   } catch (err) {
     console.error('Cannot fetch metadata', err)
@@ -65,7 +65,12 @@ async function getClaims(
         break
       case ClaimTypes.ACCOUNT:
         try {
-          const status = await verifyAccountClaim(claim, '0x' + address, accounts.getMetadataURL)
+          const status = await verifyAccountClaim(
+            claim,
+            '0x' + address,
+            accounts.getMetadataURL,
+            kit
+          )
           if (status) console.error('Cannot verify claim:', status)
           else {
             console.log('Claim success', address, claim.address)

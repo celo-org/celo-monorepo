@@ -33,7 +33,7 @@ export abstract class ClaimCommand extends BaseCommand {
     const filePath = args.file
     try {
       cli.action.start(`Read Metadata from ${filePath}`)
-      const data = IdentityMetadataWrapper.fromFile(filePath)
+      const data = IdentityMetadataWrapper.fromFile(filePath, this.kit)
       cli.action.stop()
       return data
     } catch (error) {
@@ -93,7 +93,7 @@ export const displayMetadata = async (metadata: IdentityMetadataWrapper, kit: Co
     const verifiable = VERIFIABLE_CLAIM_TYPES.includes(claim.type)
     const validatable = VALIDATABLE_CLAIM_TYPES.includes(claim.type)
     const status = verifiable
-      ? await verifyClaim(claim, metadata.data.meta.address, metadataURLGetter)
+      ? await verifyClaim(claim, metadata.data.meta.address, metadataURLGetter, kit)
       : validatable
       ? await validateClaim(claim, metadata.data.meta.address, kit)
       : 'N/A'
@@ -145,9 +145,10 @@ export const displayMetadata = async (metadata: IdentityMetadataWrapper, kit: Co
 
 export const modifyMetadata = async (
   filePath: string,
-  operation: (metadata: IdentityMetadataWrapper) => Promise<void>
+  operation: (metadata: IdentityMetadataWrapper) => Promise<void>,
+  kit: ContractKit
 ) => {
-  const metadata = IdentityMetadataWrapper.fromFile(filePath)
+  const metadata = await IdentityMetadataWrapper.fromFile(filePath, kit)
   await operation(metadata)
   writeFileSync(filePath, metadata.toString())
 }

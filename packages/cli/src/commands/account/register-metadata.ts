@@ -37,9 +37,10 @@ export default class RegisterMetadata extends BaseCommand {
 
     const metadataURL = res.flags.url
 
+    const accounts = await this.kit.contracts.getAccounts()
     if (!res.flags.force) {
       try {
-        const metadata = await IdentityMetadataWrapper.fetchFromURL(metadataURL)
+        const metadata = await IdentityMetadataWrapper.fetchFromURL(metadataURL, this.kit)
         console.info('Metadata contains the following claims: \n')
         await displayMetadata(metadata, this.kit)
         console.info() // Print a newline.
@@ -50,7 +51,6 @@ export default class RegisterMetadata extends BaseCommand {
       }
     }
 
-    const accounts = await this.kit.contracts.getAccounts()
     await displaySendTx('registerMetadata', accounts.setMetadataURL(metadataURL))
   }
 }
