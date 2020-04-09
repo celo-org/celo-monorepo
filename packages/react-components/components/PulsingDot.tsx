@@ -85,7 +85,12 @@ export default class PulsingDot extends React.PureComponent<Props, State> {
               borderRadius: this.circleStartSize / 2,
               opacity: fadeOpacity,
               transform: [
-                { scale: circleScale },
+                {
+                  scale: circleScale.interpolate({
+                    inputRange: [],
+                    outputRange: [],
+                  }),
+                },
                 { perspective: 1000 }, // without this line this Animation will not render on Android
               ],
             },
