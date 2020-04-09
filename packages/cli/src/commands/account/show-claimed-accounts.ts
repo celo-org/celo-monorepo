@@ -14,7 +14,7 @@ async function getMetadata(kit: ContractKit, address: string) {
   const url = await accounts.getMetadataURL(address)
   console.log(address, 'has url', url)
   if (url === '') return IdentityMetadataWrapper.fromEmpty(address)
-  else return IdentityMetadataWrapper.fetchFromURL(url, kit)
+  else return IdentityMetadataWrapper.fetchFromURL(kit, url)
 }
 
 function dedup(lst: string[]): string[] {
@@ -26,14 +26,8 @@ async function getClaims(
   address: string,
   data: IdentityMetadataWrapper
 ): Promise<string[]> {
-  const accounts = await kit.contracts.getAccounts()
   const getClaim = async (claim: AccountClaim) => {
-    const error = await verifyAccountClaim(
-      claim,
-      ensureLeading0x(address),
-      accounts.getMetadataURL,
-      kit
-    )
+    const error = await verifyAccountClaim(kit, claim, ensureLeading0x(address))
     return error ? null : claim.address.toLowerCase()
   }
   const res = (await Promise.all(data.filterClaims(ClaimTypes.ACCOUNT).map(getClaim))).filter(

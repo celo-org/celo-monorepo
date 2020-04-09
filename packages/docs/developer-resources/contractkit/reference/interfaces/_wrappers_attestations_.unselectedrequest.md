@@ -18,7 +18,7 @@
 
 • **attestationRequestFeeToken**: *string*
 
-*Defined in [contractkit/src/wrappers/Attestations.ts:64](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L64)*
+*Defined in [contractkit/src/wrappers/Attestations.ts:56](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L56)*
 
 ___
 
@@ -26,7 +26,7 @@ ___
 
 • **attestationsRequested**: *number*
 
-*Defined in [contractkit/src/wrappers/Attestations.ts:63](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L63)*
+*Defined in [contractkit/src/wrappers/Attestations.ts:55](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L55)*
 
 ___
 
@@ -34,4 +34,4 @@ ___
 
 • **blockNumber**: *number*
 
-*Defined in [contractkit/src/wrappers/Attestations.ts:62](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L62)*
+*Defined in [contractkit/src/wrappers/Attestations.ts:54](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L54)*

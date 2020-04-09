@@ -17,7 +17,7 @@
 
 • **attestationExpiryBlocks**: *number*
 
-*Defined in [contractkit/src/wrappers/Attestations.ts:37](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L37)*
+*Defined in [contractkit/src/wrappers/Attestations.ts:29](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L29)*
 
 ___
 
@@ -25,4 +25,4 @@ ___
 
 • **attestationRequestFees**: *[AttestationsToken](_wrappers_attestations_.attestationstoken.md)[]*
 
-*Defined in [contractkit/src/wrappers/Attestations.ts:38](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L38)*
+*Defined in [contractkit/src/wrappers/Attestations.ts:30](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L30)*

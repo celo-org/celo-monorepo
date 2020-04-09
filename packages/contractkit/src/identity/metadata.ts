@@ -35,16 +35,16 @@ export class IdentityMetadataWrapper {
     })
   }
 
-  static async fetchFromURL(url: string, kit: ContractKit) {
+  static async fetchFromURL(kit: ContractKit, url: string) {
     const resp = await fetch(url)
     if (!resp.ok) {
       throw new Error(`Request failed with status ${resp.status}`)
     }
-    return this.fromRawString(await resp.text(), kit)
+    return this.fromRawString(kit, await resp.text())
   }
 
-  static fromFile(path: string, kit: ContractKit) {
-    return this.fromRawString(readFileSync(path, 'utf-8'), kit)
+  static fromFile(kit: ContractKit, path: string) {
+    return this.fromRawString(kit, readFileSync(path, 'utf-8'))
   }
 
   static async verifySigner(kit: ContractKit, hash: any, signature: any, metadata: any) {
@@ -53,23 +53,19 @@ export class IdentityMetadataWrapper {
       // If this fails, signature may still be one of `address`' signers
       const accounts = await kit.contracts.getAccounts()
       if (await accounts.isAccount(metadata.address)) {
-        const signers = [
-          await accounts.getAttestationSigner(metadata.address),
-          await accounts.getVoteSigner(metadata.address),
-          await accounts.getValidatorSigner(metadata.address),
-        ]
-        for (const signer of signers) {
-          if (verifySignature(hash, signature, signer)) {
-            return true
-          }
-        }
+        const signers = await Promise.all([
+          accounts.getVoteSigner(metadata.address),
+          accounts.getValidatorSigner(metadata.address),
+          accounts.getAttestationSigner(metadata.address),
+        ])
+        return signers.some((signer) => verifySignature(hash, signature, signer))
       }
       return false
     }
     return true
   }
 
-  static async fromRawString(rawData: string, kit: ContractKit) {
+  static async fromRawString(kit: ContractKit, rawData: string) {
     const data = JSON.parse(rawData)
 
     const validatedData = IdentityMetadataType.decode(data)

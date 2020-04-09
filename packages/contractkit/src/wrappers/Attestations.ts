@@ -256,7 +256,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     metadataURL: string
   }): Promise<AttestationServiceRunningCheckResult> {
     try {
-      const metadata = await IdentityMetadataWrapper.fetchFromURL(arg.metadataURL, this.kit)
+      const metadata = await IdentityMetadataWrapper.fetchFromURL(this.kit, arg.metadataURL)
       const attestationServiceURLClaim = metadata.findClaim(ClaimTypes.ATTESTATION_SERVICE_URL)
 
       if (attestationServiceURLClaim === undefined) {

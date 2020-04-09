@@ -42,7 +42,7 @@ export default class TestAttestationService extends BaseCommand {
 
     let metadata: IdentityMetadataWrapper
     try {
-      metadata = await IdentityMetadataWrapper.fetchFromURL(metadataURL, this.kit)
+      metadata = await IdentityMetadataWrapper.fetchFromURL(this.kit, metadataURL)
     } catch (error) {
       console.error(`Metadata could not be retrieved from ${metadataURL}: ${error.toString()}`)
       return

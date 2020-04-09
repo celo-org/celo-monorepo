@@ -29,7 +29,7 @@ testWithGanache('account metadata cmds', (web3: Web3) => {
     }
 
     const readFile = () => {
-      return IdentityMetadataWrapper.fromFile(emptyFilePath, kit)
+      return IdentityMetadataWrapper.fromFile(kit, emptyFilePath)
     }
 
     test('account:create-metadata cmd', async () => {
