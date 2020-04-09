@@ -37,7 +37,13 @@ export const handler = async (argv: LoadTestUpgradeArgv) => {
 }
 
 function upgrade(argv: LoadTestUpgradeArgv) {
-  return upgradeHelmChart(argv.celoEnv, argv.blockscoutMeasurePercent, argv.delay, argv.replicas)
+  return upgradeHelmChart(
+    argv.celoEnv,
+    argv.blockscoutMeasurePercent,
+    argv.delay,
+    argv.replicas,
+    argv.threads
+  )
 }
 
 // scales down all pods, upgrades, then scales back up
@@ -49,6 +55,7 @@ async function resetAndUpgrade(argv: LoadTestUpgradeArgv) {
 
   await sleep(3000)
 
+  setArgvDefaults(argv)
   await upgrade(argv)
 
   await sleep(3000)

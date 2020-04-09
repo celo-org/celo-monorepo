@@ -50,17 +50,19 @@ spec:
             RID=${BASH_REMATCH[1]}
             echo $RID > /root/.celo/rid
 
-            echo "Generating private key for rid=$RID"
-            celotooljs.sh generate bip32 \
-              --mnemonic "$MNEMONIC" \
-              --accountType load_testing \
-              --index $RID \
-              > /root/.celo/pkey
+            for thread in $(seq 1 {{ .Values.threads | default "1" }}); do
+              echo "Generating private key for rid=$RID thread=$thread"
+              celotooljs.sh generate bip32 \
+                --mnemonic "$MNEMONIC" \
+                --accountType load_testing \
+                --index $RID$thread \
+                > /root/.celo/pkey$thread
 
-            echo "Generating account address for rid=$RID"
-            celotooljs.sh generate account-address \
-              --private-key `cat /root/.celo/pkey` \
-              > /root/.celo/address
+              echo "Generating account address for rid=$RID thread=$thread"
+              celotooljs.sh generate account-address \
+                --private-key `cat /root/.celo/pkey$thread` \
+                >> /root/.celo/address
+            done
         env:
         - name: REPLICA_NAME
           valueFrom:
@@ -75,7 +77,22 @@ spec:
         - name: data
           mountPath: /root/.celo
 {{ include "common.init-genesis-container" .  | indent 6 }}
-{{ include "common.import-geth-account-container" .  | indent 6 }}
+      - name: import-geth-account
+        image: {{ .Values.geth.image.repository }}:{{ .Values.geth.image.tag }}
+        imagePullPolicy: {{ .Values.imagePullPolicy }}
+        command: ["/bin/sh"]
+        args:
+        - "-c"
+        - |
+          for thread in $(seq 1 {{ .Values.threads | default "1" }}); do
+            geth account import --password /root/.celo/account/accountSecret /root/.celo/pkey$thread || true
+          done
+        volumeMounts:
+        - name: data
+          mountPath: /root/.celo
+        - name: account
+          mountPath: "/root/.celo/account"
+          readOnly: true
       containers:
       - name: geth
         image: {{ .Values.geth.image.repository }}:{{ .Values.geth.image.tag }}
@@ -87,7 +104,12 @@ spec:
           set -euo pipefail
           cp /var/geth/static-nodes.json /root/.celo/static-nodes.json
 
-          ACCOUNT_ADDRESS=`cat /root/.celo/address`
+          #ACCOUNT_ADDRESS=`cat /root/.celo/address`
+          ACCOUNT_ADDRESS=$(awk '{print $1}' /root/.celo/address | paste -s -d, -)
+          PASSWORD=$(cat /root/.celo/account/accountSecret)
+          for thread in $(seq 1 {{ .Values.threads | default "1" }}); do
+            echo $PASSWORD >> /passwords.txt
+          done
 
           geth \
           --rpc \
@@ -95,14 +117,14 @@ spec:
           --allow-insecure-unlock \
           --rpcvhosts=* \
           --networkid={{ .Values.geth.networkID }} \
-          --nodekey=/root/.celo/pkey \
+          --nodekey=/root/.celo/pkey1 \
           --syncmode=lightest \
           --consoleformat=json \
           --consoleoutput=stdout \
           --verbosity={{ .Values.geth.verbosity }} \
-          --unlock=${ACCOUNT_ADDRESS} \
-          --etherbase=${ACCOUNT_ADDRESS} \
-          --password=/root/.celo/account/accountSecret
+          --unlock=$ACCOUNT_ADDRESS \
+          --allow-insecure-unlock \
+          --password=/passwords.txt
         ports:
         - name: discovery-udp
           containerPort: 30303
@@ -143,7 +165,8 @@ spec:
               --delay {{ .Values.delay }} \
               --mnemonic "$MNEMONIC" \
               --blockscout-url {{ .Values.blockscout.url }} \
-              --blockscoutMeasurePercent {{ .Values.blockscout.measurePercent }}
+              --blockscoutMeasurePercent {{ .Values.blockscout.measurePercent }} \
+              --client-count {{ .Values.threads | default "1" }}
         resources:
           requests:
             memory: 256Mi
