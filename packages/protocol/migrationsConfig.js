@@ -78,7 +78,7 @@ const DefaultConfig = {
     communityRewardFraction: 1 / 4,
     // TODO(asa): Must be set before RC1
     carbonOffsettingPartner: '0x0000000000000000000000000000000000000000',
-    carbonOffsettingFraction: 1 / 200,
+    carbonOffsettingFraction: 1 / 1000,
     frozen: true,
   },
   exchange: {
