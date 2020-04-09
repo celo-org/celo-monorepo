@@ -68,6 +68,10 @@ export default class PulsingDot extends React.PureComponent<Props, State> {
 
   render() {
     const { circleScale, fadeOpacity } = this.state
+    // let circleScaleNum: number
+    this.state.circleScale.addListener(
+      ({ value }) => ((this.state.circleScale as any)._value = value)
+    )
     return (
       <View
         style={[
