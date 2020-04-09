@@ -359,8 +359,12 @@ celocli releasegold:authorize --contract $CELO_VALIDATOR_RG_ADDRESS --role valid
 
 Using the newly authorized Validator key, register the Account as a Validator:
 
+{% hint style="info" %}
+Running the following command requires the keys for the validator signer address. This command can be run on the validator machine, or if the keys are also available on your local machine, it can be run there.
+{% endhint %}
+
 ```bash
-# On the Validator machine
+# On a machine with CELO_VALIDATOR_SIGNER_ADDRESS unlocked.
 celocli validator:register --blsKey $CELO_VALIDATOR_SIGNER_BLS_PUBLIC_KEY --blsSignature $CELO_VALIDATOR_SIGNER_BLS_SIGNATURE --ecdsaKey $CELO_VALIDATOR_SIGNER_PUBLIC_KEY --from $CELO_VALIDATOR_SIGNER_ADDRESS
 ```
 
