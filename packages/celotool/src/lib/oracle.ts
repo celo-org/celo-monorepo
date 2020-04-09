@@ -1,3 +1,4 @@
+import { ensureLeading0x } from '@celo/utils/src/address'
 import { getFornoUrl } from 'src/lib/endpoints'
 import { envVar, fetchEnv } from 'src/lib/env-utils'
 import { AccountType, getPrivateKeysFor } from 'src/lib/generate_utils'
@@ -24,7 +25,7 @@ async function helmParameters(celoEnv: string) {
     AccountType.PRICE_ORACLE,
     fetchEnv(envVar.MNEMONIC),
     replicas
-  ).map((pkey) => `0x${pkey}`)
+  ).map((pkey) => ensureLeading0x(pkey))
   return [
     `--set environmentName=${celoEnv}`,
     `--set replicas=${fetchEnv(envVar.ORACLES)}`,
