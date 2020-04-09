@@ -1,7 +1,7 @@
 import { createNamespaceIfNotExists } from './cluster'
 import { doCheckOrPromptIfStagingOrProduction, envVar, fetchEnv } from './env-utils'
 import { installAndEnableMetricsDeps, redeployTiller } from './helm_deploy'
-import { execCmd, execCmdWithExitOnFailure } from './utils'
+import { execCmd, execCmdWithExitOnFailure, outputIncludes } from './utils'
 
 // switchToClusterFromEnv configures kubectl to connect to the AKS cluster
 // TODO(trevor): add project switching as well
@@ -43,4 +43,22 @@ async function setupCluster(celoEnv: string) {
 
   await redeployTiller()
   await installAndEnableMetricsDeps(false)
+  await installAADPodIdentity()
+}
+
+// installAADPodIdentity installs the resources necessary for AAD pod level identities
+async function installAADPodIdentity() {
+  // The helm chart for AAD Pod Identity is not compatible with helm v2.
+  // Until we upgrade to helm v3, we rely on using kubectl directly.
+  const releaseExists = await outputIncludes(
+    `kubectl get daemonset -n default`,
+    `nmi`, // nmi is a daemonset that we use to determine if all resources are installed
+    `aad-pod-identity exists, skipping install`
+  )
+  if (!releaseExists) {
+    console.info('Installing AAD Pod Identity...')
+    await execCmdWithExitOnFailure(
+      `kubectl apply -f https://raw.githubusercontent.com/Azure/aad-pod-identity/8a5f2ed5941496345592c42e1d6cbd12c32aeebf/deploy/infra/deployment.yaml`
+    )
+  }
 }
