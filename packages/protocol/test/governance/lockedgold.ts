@@ -308,10 +308,10 @@ contract('LockedGold', (accounts: string[]) => {
           assertEqualBN(await lockedGold.getTotalLockedGold(), value)
         })
 
-        it('should emit a GoldLocked event', async () => {
+        it('should emit a GoldRelocked event', async () => {
           assert.equal(resp.logs.length, 1)
           const log = resp.logs[0]
-          assertLogMatches(log, 'GoldLocked', {
+          assertLogMatches(log, 'GoldRelocked', {
             account,
             value: new BigNumber(value),
           })
@@ -346,10 +346,10 @@ contract('LockedGold', (accounts: string[]) => {
           assertEqualBN(await lockedGold.getTotalLockedGold(), value)
         })
 
-        it('should emit a GoldLocked event', async () => {
+        it('should emit a GoldRelocked event', async () => {
           assert.equal(resp.logs.length, 1)
           const log = resp.logs[0]
-          assertLogMatches(log, 'GoldLocked', {
+          assertLogMatches(log, 'GoldRelocked', {
             account,
             value: new BigNumber(value),
           })
