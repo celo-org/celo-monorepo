@@ -103,7 +103,7 @@ export class ProposalBuilder {
     this.builders.push(async () => {
       const proxy = await this.kit._web3Contracts.getContract(contract)
       return this.fromWeb3tx(setImplementationOnProxy(newImplementationAddress), {
-        to: proxy._address,
+        to: proxy.options.address,
         value: '0',
       })
     })

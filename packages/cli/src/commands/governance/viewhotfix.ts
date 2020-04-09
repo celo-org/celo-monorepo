@@ -38,7 +38,7 @@ export default class ViewHotfix extends BaseCommand {
     printValueMap({ passing })
 
     const tally = await governance.hotfixWhitelistValidatorTally(hash)
-      const quorum = await governance.minQuorumSize()
+    const quorum = await governance.minQuorumSize()
     printValueMap({
       tally,
       quorum,
@@ -52,6 +52,7 @@ export default class ViewHotfix extends BaseCommand {
         accounts,
         async (validator) =>
           (await governance.isHotfixWhitelistedBy(hash, validator.signer)) ||
+          /* tslint:disable-next-line no-return-await */
           (await governance.isHotfixWhitelistedBy(hash, validator.account))
       )
       printValueMapRecursive({

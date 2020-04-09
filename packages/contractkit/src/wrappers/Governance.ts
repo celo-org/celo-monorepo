@@ -1,3 +1,4 @@
+import { ensureLeading0x, NULL_ADDRESS, trimLeading0x } from '@celo/utils/lib/address'
 import { concurrentMap } from '@celo/utils/lib/async'
 import { zip } from '@celo/utils/lib/collections'
 import { fromFixed } from '@celo/utils/lib/fixidity'
@@ -165,6 +166,19 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   }
 
   /**
+   * Returns the required ratio of yes:no votes needed to exceed in order to pass the proposal.
+   * @param tx Transaction to determine the constitution for running.
+   */
+  async getConstitution(tx: ProposalTransaction): Promise<BigNumber.Value> {
+    // Extract the leading four bytes of the call data, which specifies the function.
+    const callSignature = ensureLeading0x(trimLeading0x(tx.input).slice(0, 8))
+    const value = await this.contract.methods
+      .getConstitution(tx.to ?? NULL_ADDRESS, callSignature)
+      .call()
+    return fromFixed(new BigNumber(value))
+  }
+
+  /**
    * Returns the participation parameters.
    * @returns The participation parameters.
    */
@@ -326,30 +340,6 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
       passing,
     }
   }
-
-  /**
-   * Returns the required ratio of yes:no votes needed to exceed in order to pass the proposal.
-   * @param tx Transaction to determine the constitution for running.
-   */
-  async getConstitution(tx: ProposalTransaction): Promise<BigNumber.Value> {
-    const callSignature = tx.input.slice(0, 10)
-    const value = await this.contract.methods.getConstitution(tx.to, callSignature).call()
-    return fromFixed(new BigNumber(value))
-  }
-
-  /**
-   * Returns the parameters that effect participation required to pass a proposal.
-   */
-  getParticipationParameters: () => Promise<GovernanceParticipationParameters> = proxyCall(
-    this.contract.methods.getParticipationParameters,
-    undefined,
-    (res) => ({
-      baseline: valueToBigNumber(res[0]),
-      baselineFloor: valueToBigNumber(res[1]),
-      baselineUpdateFactor: valueToBigNumber(res[2]),
-      baselineQuorumFactor: valueToBigNumber(res[3]),
-    })
-  )
 
   /**
    * Returns whether a given proposal is passing relative to the constitution's threshold.
