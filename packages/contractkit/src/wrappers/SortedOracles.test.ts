@@ -207,23 +207,14 @@ testWithGanache('SortedOracles Wrapper', (web3) => {
    * thing to check is if there have been changes to the migrations
    */
   describe('#getRates', () => {
+    const expectedRates = [2, 1.5, 1, 0.5]
     beforeEach(async () => {
-      for (let i = 0; i < stableTokenOracles.length; i++) {
-        // reports these values:
-        // 1/2, 2/2, 3/2, 4/2
-        // resulting in: 0.5, 1, 1.5, 2
-        const tx = await sortedOracles.report(
-          CeloContract.StableToken,
-          (i + 1) / 2,
-          stableTokenOracles[i]
-        )
-        await tx.sendAndWaitForReceipt()
-      }
+      await reportAsOracles(stableTokenOracles, expectedRates)
     })
     it('SBAT getRates', async () => {
-      const rates = await sortedOracles.getRates(CeloContract.StableToken)
-      expect(rates.length).toBeGreaterThan(0)
-      for (const rate of rates) {
+      const actualRates = await sortedOracles.getRates(CeloContract.StableToken)
+      expect(actualRates.length).toBeGreaterThan(0)
+      for (const rate of actualRates) {
         expect(rate).toHaveProperty('address')
         expect(rate).toHaveProperty('rate')
         expect(rate).toHaveProperty('medianRelation')
@@ -231,7 +222,6 @@ testWithGanache('SortedOracles Wrapper', (web3) => {
     })
 
     it('returns the correct rate', async () => {
-      const expectedRates = [2, 1.5, 1, 0.5]
       const response = await sortedOracles.getRates(CeloContract.StableToken)
       const actualRates = response.map((r) => r.rate.toNumber())
       expect(actualRates).toEqual(expectedRates)
