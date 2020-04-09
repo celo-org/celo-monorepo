@@ -239,7 +239,6 @@ There are number of new environment variables, and you may use this table as a r
 | CELO_VALIDATOR_GROUP_RG_ADDRESS         | The `ReleaseGold` contract address for the Validator Group                                                                                          |
 | CELO_VALIDATOR_RG_ADDRESS         | The `ReleaseGold` contract address for the Validator                                                                                          |
 | CELO_VALIDATOR_GROUP_SIGNER_ADDRESS        | The address of the Validator Group signer authorized by the Validator Group Account                                                              |
-| CELO_VALIDATOR_GROUP_SIGNER_PUBLIC_KEY     | The ECDSA public key associated with the Validator Group signer address                                                                    |
 | CELO_VALIDATOR_GROUP_SIGNER_SIGNATURE      | The proof-of-possession of the Validator Group signer key                                                                                  |
 | CELO_VALIDATOR_SIGNER_ADDRESS        | The address of the Validator signer authorized by the Validator Account                                                              |
 | CELO_VALIDATOR_SIGNER_PUBLIC_KEY     | The ECDSA public key associated with the Validator signer address                                                                    |
@@ -265,7 +264,7 @@ There are number of new environment variables, and you may use this table as a r
 
 ### Create Accounts from the `ReleaseGold` contracts
 
-In order to use the balances from `ReleaseGold` contracts, we need to create associated Accounts. In the Baklava network, after they have been deployed we will publish a document mapping the Beneficiary address to `ReleaseGold` contract addresses.
+In order to use the balances from `ReleaseGold` contracts, we need to create associated Accounts. In the Baklava network, you can look up your Beneficiary address in [the published mapping](https://gist.githubusercontent.com/nategraf/a87f9c2e488ab2d38a0a3c09f5d4ca2b/raw) to find your `ReleaseGold` contract addresses. If you are a genesis validator, your two Beneficary addresses will be the provided `CELO_VALIDATOR_ADDRESS` and `CELO_VALIDATOR_GROUP_ADDRESS`.
 
 ```bash
 # On your local machine
@@ -360,9 +359,13 @@ celocli releasegold:authorize --contract $CELO_VALIDATOR_RG_ADDRESS --role valid
 
 Using the newly authorized Validator key, register the Account as a Validator:
 
+{% hint style="info" %}
+Running the following command requires the keys for the validator signer address. This command can be run on the validator machine, or if the keys are also available on your local machine, it can be run there.
+{% endhint %}
+
 ```bash
-# On the Validator machine
-celocli validator:register --blsKey $CELO_VALIDATOR_SIGNER_BLS_PUBLIC_KEY --blsSignature $CELO_VALIDATOR_SIGNER_SIGNATURE --ecdsaKey $CELO_VALIDATOR_SIGNER_PUBLIC_KEY --from $CELO_VALIDATOR_SIGNER_ADDRESS
+# On a machine with CELO_VALIDATOR_SIGNER_ADDRESS unlocked.
+celocli validator:register --blsKey $CELO_VALIDATOR_SIGNER_BLS_PUBLIC_KEY --blsSignature $CELO_VALIDATOR_SIGNER_BLS_SIGNATURE --ecdsaKey $CELO_VALIDATOR_SIGNER_PUBLIC_KEY --from $CELO_VALIDATOR_SIGNER_ADDRESS
 ```
 
 You can view information about your Validator by running the following command:
@@ -395,14 +398,13 @@ To generate the proof-of-possession, run the following command:
 
 ```bash
 # On your local machine
-docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE --nousb account proof-of-possession $CELO_VALIDATOR_GROUP_SIGNER_ADDRESS $CELO_VALIDATOR_GROUP_RG_ADDRESS
+docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE --nousb account proof-of-possession $CELO_VALIDATOR_GROUP_VOTE_SIGNER_ADDRESS $CELO_VALIDATOR_GROUP_RG_ADDRESS
 ```
 
 Save the signer address, public key, and proof-of-possession signature to your local machine:
 
 ```bash
 export CELO_VALIDATOR_GROUP_SIGNER_SIGNATURE=<YOUR-VALIDATOR-GROUP-SIGNER-SIGNATURE>
-export CELO_VALIDATOR_GROUP_SIGNER_PUBLIC_KEY=<YOUR-VALIDATOR-GROUP-SIGNER-PUBLIC-KEY>
 ```
 
 Authorize your Validator Group signing key:
@@ -476,7 +478,7 @@ Produce the proof-of-possession needed to authorize the keys:
 docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE --nousb account proof-of-possession $CELO_VALIDATOR_VOTE_SIGNER_ADDRESS $CELO_VALIDATOR_RG_ADDRESS
 export CELO_VALIDATOR_VOTE_SIGNER_SIGNATURE=<YOUR-VALIDATOR-VOTE-SIGNER-SIGNATURE>
 
-docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE --nousb account proof-of-possession $CELO_VALIDATOR_GROUP_VOTE_SIGNER_ADDRESS $CELO_VALIDATOR_RG_ADDRESS
+docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE --nousb account proof-of-possession $CELO_VALIDATOR_GROUP_VOTE_SIGNER_ADDRESS $CELO_VALIDATOR_GROUP_RG_ADDRESS
 export CELO_VALIDATOR_GROUP_VOTE_SIGNER_SIGNATURE=<YOUR-VALIDATOR-GROUP-VOTE-SIGNER-SIGNATURE>
 ```
 
@@ -516,7 +518,7 @@ Epoch lengths in the Baklava network are set to be the number of blocks produced
 ```bash
 # On your local machine
 # Note that this command will wait for the next epoch transition, which may be up to 24 hours in the future.
-celocli election:activate --from $CELO_VALIDATOR_RG_ADDRESS --wait && celocli election:activate --from $CELO_VALIDATOR_GROUP_RG_ADDRESS --wait
+celocli election:activate --from $CELO_VALIDATOR_VOTE_SIGNER_ADDRESS --wait && celocli election:activate --from $CELO_VALIDATOR_GROUP_VOTE_SIGNER_ADDRESS --wait
 ```
 
 Check that your votes were activated by re-running the following commands:
