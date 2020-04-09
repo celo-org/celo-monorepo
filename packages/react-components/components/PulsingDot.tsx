@@ -4,7 +4,7 @@ import { Animated, StyleSheet, View, ViewStyle } from 'react-native'
 const CIRCLE_START = 1
 const CIRCLE_END = 3
 const DELAY = 200
-const DURATION = 1000
+const DURATION = 1500
 
 interface Props {
   color: string
@@ -68,8 +68,8 @@ export default class PulsingDot extends React.PureComponent<Props, State> {
               height: circleStartSize,
               borderRadius: circleStartSize / 2,
               opacity: pulse.interpolate({
-                inputRange: [0, 0.5, 1],
-                outputRange: [1, 0.9, 0],
+                inputRange: [0, 0.5, 0.75, 1],
+                outputRange: [1, 1, 0.9, 0],
               }),
               transform: [
                 {
