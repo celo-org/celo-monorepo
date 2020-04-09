@@ -17,7 +17,7 @@ description: >-
 The Celo CLI is published as a node module on NPM. Assuming you have [npm installed](https://www.npmjs.com/get-npm), you can install the Celo CLI using the following command:
 
 ```bash
-npm install -g @celo/celocli@baklava
+npm install -g @celo/celocli
 ```
 
 {% hint style="info" %}
@@ -25,7 +25,7 @@ We are currently deploying the CLI with only Node v10.x LTS support. If you are 
 {% endhint %}
 
 {% hint style="info" %}
-If you have trouble installing globally (i.e. with the `-g` flag), try installing to a local directory instead with `npm install @celo/celocli@baklava` and run with `npx celocli`.
+If you have trouble installing globally (i.e. with the `-g` flag), try installing to a local directory instead with `npm install @celo/celocli` and run with `npx celocli`.
 {% endhint %}
 
 ### Overview
