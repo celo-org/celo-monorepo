@@ -123,8 +123,8 @@ export class ProposalBuilder {
    * @param params Optional parameters for how the transaction should be executed.
    */
   addTx(tx: CeloTransactionObject<any>, params: Partial<ProposalTxParams> = {}) {
-    const to = params.to ?? tx.defaultParams?.to
-    const value = params.value ?? tx.defaultParams?.value
+    const to = tx.defaultParams?.to ? tx.defaultParams.to : params.to
+    const value = tx.defaultParams?.value ? tx.defaultParams.value : params.value
     if (!to || !value) {
       throw new Error("Transaction parameters 'to' and/or 'value' not provided")
     }
