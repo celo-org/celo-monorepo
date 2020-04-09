@@ -168,6 +168,7 @@ module "tx_node" {
   name                                  = "tx-node"
   network_id                            = var.network_id
   network_name                          = data.google_compute_network.network.name
+  gcmode                                = "full"
   node_count                            = var.tx_node_count
   rpc_apis                              = "eth,net,web3"
 }
@@ -193,6 +194,7 @@ module "tx_node_private" {
   name                                  = "tx-node-private"
   network_id                            = var.network_id
   network_name                          = data.google_compute_network.network.name
+  gcmode                                = "archive"
   node_count                            = var.private_tx_node_count
   rpc_apis                              = "eth,net,web3,debug,txpool"
 }

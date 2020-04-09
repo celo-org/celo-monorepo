@@ -56,6 +56,10 @@ contract MockElection is IElection {
     return true;
   }
 
+  function revokeAllActive(address, address, address, uint256) external returns (bool) {
+    return true;
+  }
+
   function revokeActive(address, uint256, address, address, uint256) external returns (bool) {
     return true;
   }
