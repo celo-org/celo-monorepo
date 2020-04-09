@@ -32,7 +32,7 @@ async function helmParameters(celoEnv: string) {
     `--set image.repository=${fetchEnv(envVar.ORACLE_DOCKER_IMAGE_REPOSITORY)}`,
     `--set image.tag=${fetchEnv(envVar.ORACLE_DOCKER_IMAGE_TAG)}`,
     `--set oracle.web3ProviderUrl=${getFornoUrl(celoEnv)}`,
-    `--set oracle.privateKeys={${oraclePrivateKeys.join(',')}}`,
+    `--set oracle.privateKeys=\\{${oraclePrivateKeys.join(',')}\\}`,
   ]
 }
 
