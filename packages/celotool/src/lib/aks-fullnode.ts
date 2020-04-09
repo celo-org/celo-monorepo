@@ -1,4 +1,5 @@
 import { range } from 'lodash'
+import sleep from 'sleep-promise'
 import { getAKSNodeResourceGroup } from './azure'
 import { createNamespaceIfNotExists } from './cluster'
 import { envVar, fetchEnv } from './env-utils'
@@ -107,6 +108,10 @@ async function deallocateIPs(celoEnv: string) {
   const resourceGroup = await getAKSNodeResourceGroup()
 
   await Promise.all(
+    range(replicaCount).map((i) => waitDeattachingStaticIPs(`${celoEnv}-validators-${i}`))
+  )
+
+  await Promise.all(
     range(replicaCount).map((i) => deallocateIP(`${celoEnv}-validators-${i}`, resourceGroup))
   )
 }
@@ -117,4 +122,30 @@ async function deallocateIP(name: string, resourceGroup: string) {
   return execCmdWithExitOnFailure(
     `az network public-ip delete --resource-group ${resourceGroup} --name ${name}`
   )
+}
+
+async function waitDeattachingStaticIPs(celoEnv: string) {
+  const replicaCount = getReplicaCount()
+  const resourceGroup = await getAKSNodeResourceGroup()
+
+  await Promise.all(
+    range(replicaCount).map((i) =>
+      waitDeattachingStaticIP(`${celoEnv}-validators-${i}`, resourceGroup)
+    )
+  )
+}
+
+async function waitDeattachingStaticIP(name: string, resourceGroup: string) {
+  const retries = 10
+  const sleepTime = 5
+  for (let i = 0; i <= retries; i++) {
+    const [allocated] = await execCmdWithExitOnFailure(
+      `az network public-ip show --resource-group ${resourceGroup} --name ${name} --query ipConfiguration.id -o tsv`
+    )
+    if (allocated.trim() === '') {
+      return true
+    }
+    sleep(sleepTime)
+  }
+  return false
 }
