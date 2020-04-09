@@ -11,10 +11,11 @@
 - [Baklava Testnet](getting-started/baklava-testnet.md)
   - [Running a Validator](getting-started/running-a-validator-in-baklava.md)
   - [Running a Full Node](getting-started/running-a-full-node.md)
-- [Glossary](getting-started/glossary.md)
+- [Glossary](GLOSSARY.md)
 
 ## Operations Manual
 
+- [Governance](operations-manual/governance.md)
 - [Key Management](operations-manual/key-management.md)
 - [Securing Celo Nodes and Services](operations-manual/securing-nodes-and-services.md)
 - [Upgrading a Node](operations-manual/node-upgrades.md)
@@ -53,6 +54,7 @@
     - [Stability Fees](celo-codebase/protocol/stability/stability-fees.md)
     - [Tobin Tax](celo-codebase/protocol/stability/tobin-tax.md)
   - [Privacy](celo-codebase/protocol/privacy.md)
+  - [ReleaseGold](celo-codebase/protocol/release-gold/README.md)
 - [Celo Wallet](celo-codebase/wallet/README.md)
   - [Running the Wallet Locally](celo-codebase/wallet/intro.md)
   - [Wallet Functionality](celo-codebase/wallet/how-the-wallet-works/README.md)
@@ -65,6 +67,8 @@
 - [Quick Start](developer-resources/start.md)
   - [Hello Celo](developer-resources/walkthroughs/hellocelo.md)
   - [Hello Contracts](developer-resources/walkthroughs/hellocontracts.md)
+  - [Hello Contract (Truffle + Remote Node)](developer-resources/walkthroughs/hello-contract-remote-node.md)
+  - [Celo Truffle Box](developer-resources/walkthroughs/celo-truffle-box.md)
   <!-- - [Building a dApp with Contracts on Celo]() -->
 - [Overview]()
   <!-- - [The Celo Protocol]()
@@ -380,6 +384,7 @@
 - [Account](command-line-interface/account.md)
 - [Election](command-line-interface/election.md)
 - [Exchange](command-line-interface/exchange.md)
+- [Governance](command-line-interface/governance.md)
 - [Locked Gold](command-line-interface/lockedgold.md)
 - [Network](command-line-interface/network.md)
 - [Node](command-line-interface/node.md)

@@ -9,10 +9,6 @@ import { colors, fonts, standardStyles } from 'src/styles'
 
 type Props = I18nProps
 
-function After({ t }) {
-  return <Text style={fonts.h6}>{t('stayConnectedThanks')}</Text>
-}
-
 class HomeEmail extends React.PureComponent<Props> {
   render() {
     const { t } = this.props
@@ -28,12 +24,7 @@ class HomeEmail extends React.PureComponent<Props> {
         <Cell tabletSpan={Spans.full} span={Spans.half} style={styles.cell}>
           <Text style={[fonts.h3, standardStyles.elementalMargin]}>{t('startConversation')}</Text>
           <Text style={fonts.p}>{t('reachOut')}</Text>
-          <EmailForm
-            submitText={t('submit')}
-            route={'/partnerships-email'}
-            whenComplete={<After t={this.props.t} />}
-            isDarkMode={false}
-          />
+          <EmailForm submitText={t('submit')} route={'/partnerships-email'} isDarkMode={false} />
         </Cell>
         <Responsive large={styles.largeBorder}>
           <View style={styles.border} />
@@ -41,12 +32,7 @@ class HomeEmail extends React.PureComponent<Props> {
         <Cell tabletSpan={Spans.full} span={Spans.half} style={styles.cell}>
           <Text style={[fonts.h3, standardStyles.elementalMargin]}>{t('stayConnected')}</Text>
           <Text style={fonts.p}>{t('receiveUpdates')}</Text>
-          <EmailForm
-            submitText={t('signUp')}
-            route={'/contacts'}
-            whenComplete={<After t={this.props.t} />}
-            isDarkMode={false}
-          />
+          <EmailForm submitText={t('signUp')} route={'/contacts'} isDarkMode={false} />
         </Cell>
       </GridRow>
     )
