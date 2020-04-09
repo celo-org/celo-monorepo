@@ -37,7 +37,7 @@
   },
   "dependencies": {
     "@celo/client": "0.0.266",
-    "@celo/contractkit": "0.3.3-dev",
+    "@celo/contractkit": "0.3.4-dev",
     "@celo/react-components": "1.0.0",
     "@celo/react-native-sms-retriever": "git+https://github.com/celo-org/react-native-sms-retriever#b88e502",
     "@celo/utils": "0.1.9-dev",
