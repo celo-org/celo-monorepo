@@ -218,6 +218,25 @@ EXAMPLE
 
 _See code: [packages/cli/src/commands/releasegold/set-beneficiary.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/releasegold/set-beneficiary.ts)_
 
+### Set-can-expire
+
+Set the canExpire flag for the given ReleaseGold contract
+
+```
+USAGE
+  $ celocli releasegold:set-can-expire
+
+OPTIONS
+  --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
+  --value=(true|false|True|False)                        (required) canExpire value
+  --yesreally                                            Override prompt to set expiration flag (be careful!)
+
+EXAMPLE
+  set-can-expire --contract 0x5409ED021D9299bf6814279A6A1411A7e866A631 --value true
+```
+
+_See code: [packages/cli/src/commands/releasegold/set-can-expire.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/releasegold/set-can-expire.ts)_
+
 ### Set-liquidity-provision
 
 Set the liquidity provision to true, allowing the beneficiary to withdraw released gold.
