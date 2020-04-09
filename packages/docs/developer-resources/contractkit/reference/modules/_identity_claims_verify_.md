@@ -13,7 +13,7 @@
 
 ▸ **verifyAccountClaim**(`kit`: [ContractKit](../classes/_kit_.contractkit.md), `claim`: [AccountClaim](_identity_claims_account_.md#accountclaim), `address`: string): *Promise‹undefined | string›*
 
-*Defined in [contractkit/src/identity/claims/verify.ts:33](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/verify.ts#L33)*
+*Defined in [contractkit/src/identity/claims/verify.ts:29](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/verify.ts#L29)*
 
 **Parameters:**
 
