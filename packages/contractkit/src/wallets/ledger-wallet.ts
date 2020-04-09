@@ -22,12 +22,24 @@ import { Wallet } from './wallet'
 export const CELO_BASE_DERIVATION_PATH = "44'/52752'/0'/0"
 const ADDRESS_QTY = 5
 
+export enum AddressValidation {
+  onlyInitialization,
+  everyTransaction,
+  oncePerAddress,
+  never,
+}
+
 export async function newLedgerWalletWithSetup(
   transport: any,
   derivationPathIndexes?: number[],
-  baseDerivationPath?: string
+  baseDerivationPath?: string,
+  ledgerAddressValidation?: AddressValidation
 ): Promise<LedgerWallet> {
-  const wallet = new LedgerWallet(derivationPathIndexes, baseDerivationPath)
+  const wallet = new LedgerWallet(
+    derivationPathIndexes,
+    baseDerivationPath,
+    ledgerAddressValidation
+  )
   await wallet.init(transport)
   return wallet
 }
@@ -36,7 +48,10 @@ const debug = debugFactory('kit:wallet:ledger')
 
 export class LedgerWallet implements Wallet {
   // Account addresses are hex-encoded, lower case alphabets
-  private readonly addressDerivationPath = new Map<Address, string>()
+  private readonly addressDerivationPath = new Map<
+    Address,
+    { derivationPath: string; validated: boolean }
+  >()
   private addressesRetrieved = false
   private setupFinished = false
   private setupLocked = false
@@ -51,7 +66,8 @@ export class LedgerWallet implements Wallet {
    */
   constructor(
     readonly derivationPathIndexes: number[] = Array.from(Array(ADDRESS_QTY).keys()),
-    readonly baseDerivationPath: string = CELO_BASE_DERIVATION_PATH
+    readonly baseDerivationPath: string = CELO_BASE_DERIVATION_PATH,
+    readonly ledgerAddressValidation: AddressValidation = AddressValidation.oncePerAddress
   ) {
     const invalidDPs = derivationPathIndexes.some(
       (value) => !(Number.isInteger(value) && value >= 0)
@@ -100,19 +116,45 @@ export class LedgerWallet implements Wallet {
   private async retrieveAccounts() {
     const pairAddresses = await this.retrieveAccountsFromLedger()
     pairAddresses.forEach((pair) =>
-      this.addressDerivationPath.set(normalizeAddressWith0x(pair.address), pair.derivationPath)
+      this.addressDerivationPath.set(normalizeAddressWith0x(pair.address), {
+        derivationPath: pair.derivationPath,
+        validated: pair.validated,
+      })
     )
   }
 
   private async retrieveAccountsFromLedger() {
     const addresses = []
+    const validationRequired = this.validationRequired(false)
     // Each address must be retrieved synchronously, (ledger lock)
     for (const value of this.derivationPathIndexes) {
       const derivationPath = `${this.baseDerivationPath}/${value}`
-      const addressInfo = await this.ledger!.getAddress(derivationPath)
-      addresses.push({ address: addressInfo.address, derivationPath })
+      const addressInfo = await this.ledger!.getAddress(derivationPath, validationRequired)
+      addresses.push({
+        address: addressInfo.address,
+        derivationPath,
+        validated: validationRequired,
+      })
     }
     return addresses
+  }
+
+  private validationRequired(initialized: boolean, validated?: boolean): boolean {
+    if (!initialized) {
+      return this.ledgerAddressValidation === AddressValidation.onlyInitialization
+    }
+    switch (this.ledgerAddressValidation) {
+      case AddressValidation.never: {
+        return false
+      }
+      case AddressValidation.everyTransaction: {
+        return true
+      }
+      case AddressValidation.oncePerAddress: {
+        return !validated
+      }
+    }
+    return false
   }
 
   getAccounts(): Address[] {
@@ -133,8 +175,9 @@ export class LedgerWallet implements Wallet {
     this.initializationRequired()
     try {
       const rlpEncoded = rlpEncodedTx(txParams)
+      const path = await this.getDerivationPathFor(txParams.from!.toString())
       const signature = await this.ledger!.signTransaction(
-        this.getDerivationPathFor(txParams.from!.toString()),
+        path,
         trimLeading0x(rlpEncoded.rlpEncode) // the ledger requires the rlpEncode without the leading 0x
       )
       // EIP155 support. check/recalc signature v value.
@@ -165,7 +208,7 @@ export class LedgerWallet implements Wallet {
       if (!isHexString(data)) {
         throw Error('ledger-wallet@signPersonalMessage: Expected data has to be an Hex String ')
       }
-      const path = this.getDerivationPathFor(address)
+      const path = await this.getDerivationPathFor(address)
       const sig = await this.ledger!.signPersonalMessage(path, trimLeading0x(data))
       const rpcSig = ethUtil.toRpcSig(
         sig.v,
@@ -194,7 +237,7 @@ export class LedgerWallet implements Wallet {
       }
       const dataBuff = generateTypedDataHash(typedData)
 
-      const path = this.getDerivationPathFor(address)
+      const path = await this.getDerivationPathFor(address)
       const sig = await this.ledger!.signPersonalMessage(path, trimLeading0x(dataBuff.toString()))
 
       const rpcSig = ethUtil.toRpcSig(
@@ -211,11 +254,15 @@ export class LedgerWallet implements Wallet {
     }
   }
 
-  private getDerivationPathFor(account: Address): string {
+  private async getDerivationPathFor(account: Address): Promise<string> {
     if (account) {
       const maybeDP = this.addressDerivationPath.get(normalizeAddressWith0x(account))
       if (maybeDP != null) {
-        return maybeDP
+        if (this.validationRequired(true, maybeDP.validated)) {
+          await this.ledger!.getAddress(maybeDP.derivationPath, true)
+          maybeDP.validated = true
+        }
+        return maybeDP.derivationPath
       }
     }
     throw Error(`ledger-wallet@getDerivationPathFor: Derivation Path not found for ${account}`)
