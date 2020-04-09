@@ -955,7 +955,7 @@ export async function startGeth(
   }
 
   if (gatewayFee) {
-    gethArgs.push(`--light.gatewayfee=${gatewayFee.toString()}`)
+    instance.args.push(`--light.gatewayfee=${gatewayFee.toString()}`)
   }
 
   if (validating) {
