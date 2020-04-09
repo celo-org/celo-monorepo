@@ -98,6 +98,7 @@ contract Governance is
   SortedLinkedList.List private queue;
   uint256[] public dequeued;
   uint256[] public emptyIndices;
+  uint256 public numEmptyIndices;
   ParticipationParameters private participationParameters;
 
   event ApproverSet(address indexed approver);
@@ -460,6 +461,8 @@ contract Governance is
     if (expired) {
       queue.remove(proposalId);
       emit ProposalExpired(proposalId);
+      // delete proposal structs from storage which never get dequeued
+      delete proposals[proposalId];
     }
     return expired;
   }
@@ -477,7 +480,9 @@ contract Governance is
     require(_isDequeuedProposal(proposal, proposalId, index), "Proposal not dequeued");
     Proposals.Stage stage = proposal.getDequeuedStage(stageDurations);
     if (_isDequeuedProposalExpired(proposal, stage)) {
-      deleteDequeuedProposal(proposal, proposalId, index);
+      removeDequeuedProposal(proposal, index);
+      // delete dequeued proposal structs which expire before executing
+      delete proposals[proposalId];
     }
     return (proposal, stage);
   }
@@ -662,7 +667,8 @@ contract Governance is
       );
       proposal.execute();
       emit ProposalExecuted(proposalId);
-      deleteDequeuedProposal(proposal, proposalId, index);
+      // do not delete executed proposal structs for storage posterity
+      removeDequeuedProposal(proposal, index);
     }
     return notExpired;
   }
@@ -972,22 +978,19 @@ contract Governance is
       uint256[] memory dequeuedIds = queue.popN(numProposalsToDequeue);
       for (uint256 i = 0; i < numProposalsToDequeue; i = i.add(1)) {
         uint256 proposalId = dequeuedIds[i];
-        Proposals.Proposal storage proposal = proposals[proposalId];
-        if (_isQueuedProposalExpired(proposal)) {
-          emit ProposalExpired(proposalId);
+        if (removeIfQueuedAndExpired(proposalId)) {
           continue;
         }
+        Proposals.Proposal storage proposal = proposals[proposalId];
         refundedDeposits[proposal.proposer] = refundedDeposits[proposal.proposer].add(
           proposal.deposit
         );
         // solhint-disable-next-line not-rely-on-time
         proposal.timestamp = now;
-        if (emptyIndices.length > 0) {
-          uint256 indexOfLastEmptyIndex = emptyIndices.length.sub(1);
+        if (numEmptyIndices > 0) {
+          uint256 indexOfLastEmptyIndex = numEmptyIndices.sub(1);
           dequeued[emptyIndices[indexOfLastEmptyIndex]] = proposalId;
-          // TODO(asa): We can save gas by not deleting here
-          delete emptyIndices[indexOfLastEmptyIndex];
-          emptyIndices.length = indexOfLastEmptyIndex;
+          numEmptyIndices = indexOfLastEmptyIndex;
         } else {
           dequeued.push(proposalId);
         }
@@ -1123,23 +1126,30 @@ contract Governance is
   }
 
   /**
-   * @notice Deletes a dequeued proposal.
+   * @notice Adds an index of the dequeued array to empty tracking.
+   * @param index The empty dequeue array index.
+   * @dev inspired by https://ethereum.stackexchange.com/questions/3373
+   */
+  function pushEmptyDequeueIndex(uint256 index) private {
+    if (numEmptyIndices == emptyIndices.length) {
+      emptyIndices.length = emptyIndices.length.add(1);
+    }
+    numEmptyIndices = numEmptyIndices.add(1);
+    emptyIndices[numEmptyIndices] = index;
+  }
+
+  /**
+   * @notice Removes a proposal from the dequeued list.
    * @param proposal The proposal struct.
-   * @param proposalId The ID of the proposal to delete.
    * @param index The index of the proposal ID in `dequeued`.
    * @dev Must always be preceded by `isDequeuedProposal`, which checks `index`.
    */
-  function deleteDequeuedProposal(
-    Proposals.Proposal storage proposal,
-    uint256 proposalId,
-    uint256 index
-  ) private {
+  function removeDequeuedProposal(Proposals.Proposal storage proposal, uint256 index) private {
     if (proposal.isApproved() && proposal.networkWeight > 0) {
       updateParticipationBaseline(proposal);
     }
     dequeued[index] = 0;
-    emptyIndices.push(index);
-    delete proposals[proposalId];
+    pushEmptyDequeueIndex(index);
   }
 
   /**
