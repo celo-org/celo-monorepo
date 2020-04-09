@@ -336,6 +336,7 @@ contract Election is
     nonReentrant
     returns (bool)
   {
+    address account = getAccounts().voteSignerToAccount(msg.sender);
     uint256 value = getActiveVotesForGroupByAccount(group, account);
     return revokeActive(group, value, lesser, greater, index);
   }
@@ -358,7 +359,7 @@ contract Election is
     address lesser,
     address greater,
     uint256 index
-  ) external nonReentrant returns (bool) {
+  ) public nonReentrant returns (bool) {
     // TODO(asa): Dedup with revokePending.
     require(group != address(0), "Group address zero");
     address account = getAccounts().voteSignerToAccount(msg.sender);
