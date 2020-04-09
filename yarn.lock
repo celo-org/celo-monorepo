@@ -3174,10 +3174,10 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
-"@celo/client@0.0.298":
-  version "0.0.298"
-  resolved "https://registry.yarnpkg.com/@celo/client/-/client-0.0.298.tgz#9098d8b148413473ab5c94c33df8d0b39d0e28b5"
-  integrity sha512-kf2sbTmIEYbykpdFad3350gS1kON6xjzCnEXIlSBu6tzoBqFOHA3bh43YypW8/U111DfmFE5wKUCKUfSONVzOQ==
+"@celo/client@0.0.300":
+  version "0.0.300"
+  resolved "https://registry.yarnpkg.com/@celo/client/-/client-0.0.300.tgz#60c0658905a1fb8bbbe75befed4a493057c53fd5"
+  integrity sha512-xem/Ucy0DckNUjP90zxtPIDLOMwYIUD6GpZDAgh9G84LB/tDnVl8OOfbVBGrl7ouOTR+K92nBbNDdweMHkEImw==
 
 "@celo/contractkit@0.2.9":
   version "0.2.9"
