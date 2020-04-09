@@ -199,11 +199,11 @@ ___
 
 ###  getFreezer
 
-▸ **getFreezer**(): *Promise‹any›*
+▸ **getFreezer**(): *Promise‹Freezer‹››*
 
 *Defined in [contractkit/src/web3-contract-cache.ts:101](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L101)*
 
-**Returns:** *Promise‹any›*
+**Returns:** *Promise‹Freezer‹››*
 
 ___
 
@@ -315,11 +315,11 @@ ___
 
 ###  getTransferWhitelist
 
-▸ **getTransferWhitelist**(): *Promise‹any›*
+▸ **getTransferWhitelist**(): *Promise‹TransferWhitelist‹››*
 
 *Defined in [contractkit/src/web3-contract-cache.ts:134](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L134)*
 
-**Returns:** *Promise‹any›*
+**Returns:** *Promise‹TransferWhitelist‹››*
 
 ___
 

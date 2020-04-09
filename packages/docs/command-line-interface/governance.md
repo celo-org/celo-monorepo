@@ -4,47 +4,6 @@ description: Interact with on-chain governance proposals and hotfixes
 
 ## Commands
 
-<<<<<<< HEAD
-
-### Approve
-
-Approve a dequeued governance proposal
-
-```
-USAGE
-  $ celocli governance:approve
-
-OPTIONS
-  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Approver's address
-  --proposalID=proposalID                            (required) UUID of proposal to approve
-  --useMultiSig                                      True means the request will be sent through multisig.
-
-EXAMPLES
-  approve --proposalID 99 --from 0x5409ed021d9299bf6814279a6a1411a7e866a631
-  approve --proposalID 99 --from 0x5409ed021d9299bf6814279a6a1411a7e866a631 --useMultiSig
-```
-
-_See code: [packages/cli/src/commands/governance/approve.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/governance/approve.ts)_
-
-### Approvehotfix
-
-Approve a governance hotfix
-
-```
-USAGE
-  $ celocli governance:approvehotfix
-
-OPTIONS
-  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Approver's address
-  --hash=hash                                        (required) Hash of hotfix transactions
-
-EXAMPLE
-  approvehotfix --hash 0x614dccb5ac13cba47c2430bdee7829bb8c8f3603a8ace22e7680d317b39e3658 --from
-  0x5409ed021d9299bf6814279a6a1411a7e866a631
-```
-
-_See code: [packages/cli/src/commands/governance/approvehotfix.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/governance/approvehotfix.ts)_
-
 ### Dequeue
 
 Try to dequeue governance proposal
@@ -61,10 +20,6 @@ EXAMPLE
 ```
 
 _See code: [packages/cli/src/commands/governance/dequeue.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/governance/dequeue.ts)_
-
-=======
-
-> > > > > > > a607670b2... update docs
 
 ### Execute
 
@@ -244,12 +199,14 @@ USAGE
   $ celocli governance:viewhotfix
 
 OPTIONS
-  --hash=hash  (required) Hash of hotfix transactions
-  --notyet     Whether to list validators who have or have not yet whitelisted
+  --hash=hash        (required) Hash of hotfix transactions
+  --nonwhitelisters  If set, displays validators that have not whitelisted the hotfix.
+  --whitelisters     If set, displays validators that have whitelisted the hotfix.
 
 EXAMPLES
   viewhotfix --hash 0x614dccb5ac13cba47c2430bdee7829bb8c8f3603a8ace22e7680d317b39e3658
-  viewhotfix --hash 0x614dccb5ac13cba47c2430bdee7829bb8c8f3603a8ace22e7680d317b39e3658 --notyet
+  viewhotfix --hash 0x614dccb5ac13cba47c2430bdee7829bb8c8f3603a8ace22e7680d317b39e3658 --whitelisters
+  viewhotfix --hash 0x614dccb5ac13cba47c2430bdee7829bb8c8f3603a8ace22e7680d317b39e3658 --nonwhitelisters
 ```
 
 _See code: [packages/cli/src/commands/governance/viewhotfix.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/governance/viewhotfix.ts)_

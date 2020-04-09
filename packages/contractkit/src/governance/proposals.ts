@@ -42,7 +42,7 @@ export interface ProposalTransactionJSON {
 }
 
 /**
- * Convert a compiled proposal to a human-readble JSON form using network information.
+ * Convert a compiled proposal to a human-readable JSON form using network information.
  * @param kit Contract kit instance used to resolve addresses to contract names.
  * @param proposal A constructed proposal object.
  * @returns The JSON encoding of the proposal.
@@ -123,8 +123,8 @@ export class ProposalBuilder {
    * @param params Optional parameters for how the transaction should be executed.
    */
   addTx(tx: CeloTransactionObject<any>, params: Partial<ProposalTxParams> = {}) {
-    const to = params.to || (tx.defaultParams && tx.defaultParams.to)
-    const value = params.value || (tx.defaultParams && tx.defaultParams.value)
+    const to = params.to ?? tx.defaultParams?.to
+    const value = params.value ?? tx.defaultParams?.value
     if (!to || !value) {
       throw new Error("Transaction parameters 'to' and/or 'value' not provided")
     }

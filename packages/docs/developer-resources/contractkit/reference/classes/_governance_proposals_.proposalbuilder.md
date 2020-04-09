@@ -44,7 +44,7 @@ Name | Type | Default |
 
 ▸ **addJsonTx**(`tx`: [ProposalTransactionJSON](../interfaces/_governance_proposals_.proposaltransactionjson.md)): *number*
 
-*Defined in [contractkit/src/governance/proposals.ts:136](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proposals.ts#L136)*
+*Defined in [contractkit/src/governance/proposals.ts:139](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proposals.ts#L139)*
 
 Adds a JSON encoded proposal transaction to the builder list.
 
@@ -60,7 +60,7 @@ ___
 
 ###  addProxyRepointingTx
 
-▸ **addProxyRepointingTx**(`proxyAddress`: string, `newImplementationAddress`: string): *void*
+▸ **addProxyRepointingTx**(`contract`: [CeloContract](../enums/_base_.celocontract.md), `newImplementationAddress`: string): *void*
 
 *Defined in [contractkit/src/governance/proposals.ts:102](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proposals.ts#L102)*
 
@@ -70,7 +70,7 @@ Adds a transaction to set the implementation on a proxy to the given address.
 
 Name | Type | Description |
 ------ | ------ | ------ |
-`proxyAddress` | string | Address of the proxy which should have its implementation set. |
+`contract` | [CeloContract](../enums/_base_.celocontract.md) | Celo contract name of the proxy which should have its implementation set. |
 `newImplementationAddress` | string | Address of the new contract implementation.  |
 
 **Returns:** *void*
@@ -81,7 +81,7 @@ ___
 
 ▸ **addTx**(`tx`: [CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹any›, `params`: Partial‹ProposalTxParams›): *void*
 
-*Defined in [contractkit/src/governance/proposals.ts:122](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proposals.ts#L122)*
+*Defined in [contractkit/src/governance/proposals.ts:125](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proposals.ts#L125)*
 
 Adds a Celo transaction to the list for proposal construction.
 
@@ -100,7 +100,7 @@ ___
 
 ▸ **addWeb3Tx**(`tx`: TransactionObject‹any›, `params`: ProposalTxParams): *number*
 
-*Defined in [contractkit/src/governance/proposals.ts:114](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proposals.ts#L114)*
+*Defined in [contractkit/src/governance/proposals.ts:117](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proposals.ts#L117)*
 
 Adds a Web3 transaction to the list for proposal construction.
 

@@ -4,7 +4,7 @@ Contract handling slashing for Validator double-signing
 
 ## Hierarchy
 
-* [BaseWrapper](_wrappers_basewrapper_.basewrapper.md)‹[DoubleSigningSlasher](../enums/_base_.celocontract.md#doublesigningslasher)›
+* [BaseWrapper](_wrappers_basewrapper_.basewrapper.md)‹DoubleSigningSlasher›
 
   ↳ **DoubleSigningSlasherWrapper**
 
@@ -33,7 +33,7 @@ Contract handling slashing for Validator double-signing
 
 ###  constructor
 
-\+ **new DoubleSigningSlasherWrapper**(`kit`: [ContractKit](_kit_.contractkit.md), `contract`: [DoubleSigningSlasher](../enums/_base_.celocontract.md#doublesigningslasher)): *[DoubleSigningSlasherWrapper](_wrappers_doublesigningslasher_.doublesigningslasherwrapper.md)*
+\+ **new DoubleSigningSlasherWrapper**(`kit`: [ContractKit](_kit_.contractkit.md), `contract`: DoubleSigningSlasher): *[DoubleSigningSlasherWrapper](_wrappers_doublesigningslasher_.doublesigningslasherwrapper.md)*
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[constructor](_wrappers_basewrapper_.basewrapper.md#constructor)*
 
@@ -44,7 +44,7 @@ Contract handling slashing for Validator double-signing
 Name | Type |
 ------ | ------ |
 `kit` | [ContractKit](_kit_.contractkit.md) |
-`contract` | [DoubleSigningSlasher](../enums/_base_.celocontract.md#doublesigningslasher) |
+`contract` | DoubleSigningSlasher |
 
 **Returns:** *[DoubleSigningSlasherWrapper](_wrappers_doublesigningslasher_.doublesigningslasherwrapper.md)*
 

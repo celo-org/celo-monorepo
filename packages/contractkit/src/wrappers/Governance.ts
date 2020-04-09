@@ -53,13 +53,6 @@ export interface GovernanceConfig {
   participationParameters: ParticipationParameters
 }
 
-export interface GovernanceParticipationParameters {
-  baseline: BigNumber
-  baselineFloor: BigNumber
-  baselineUpdateFactor: BigNumber
-  baselineQuorumFactor: BigNumber
-}
-
 export interface ProposalMetadata {
   proposer: Address
   deposit: BigNumber

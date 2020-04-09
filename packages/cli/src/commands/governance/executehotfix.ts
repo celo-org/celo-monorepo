@@ -3,7 +3,7 @@ import {
   ProposalBuilder,
   ProposalTransactionJSON,
 } from '@celo/contractkit/lib/governance/proposals'
-import { trimLeading0x } from '@celo/utils/lib/address'
+import { hexToBuffer } from '@celo/utils/lib/address'
 import { flags } from '@oclif/command'
 import { readFileSync } from 'fs-extra'
 import { BaseCommand } from '../../base'
@@ -36,7 +36,7 @@ export default class ExecuteHotfix extends BaseCommand {
     const builder = new ProposalBuilder(this.kit)
     jsonTransactions.forEach((tx) => builder.addJsonTx(tx))
     const hotfix = await builder.build()
-    const saltBuff = Buffer.from(trimLeading0x(res.flags.salt), 'hex')
+    const saltBuff = hexToBuffer(res.flags.salt)
     const hash = hotfixToHash(this.kit, hotfix, saltBuff)
 
     const governance = await this.kit.contracts.getGovernance()

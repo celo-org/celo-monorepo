@@ -11,11 +11,11 @@ export default class ViewHotfix extends BaseCommand {
     ...BaseCommand.flags,
     hash: flags.string({ required: true, description: 'Hash of hotfix transactions' }),
     whitelisters: flags.boolean({
-      description: 'If set, diplays validtors that have whitelisted the hotfix.',
+      description: 'If set, displays validators that have whitelisted the hotfix.',
       exclusive: ['nonwhitelisters'],
     }),
     nonwhitelisters: flags.boolean({
-      description: 'If set, diplays validtors that have not whitelisted the hotfix.',
+      description: 'If set, displays validators that have not whitelisted the hotfix.',
       exclusive: ['whitelisters'],
     }),
   }

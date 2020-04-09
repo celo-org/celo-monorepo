@@ -24,7 +24,7 @@
 
 ### `Const` HOTFIX_PARAM_ABI_TYPES
 
-• **HOTFIX_PARAM_ABI_TYPES**: *any* = getAbiTypes(GovernanceABI as any, 'executeHotfix')
+• **HOTFIX_PARAM_ABI_TYPES**: *string[]* = getAbiTypes(GovernanceABI as any, 'executeHotfix')
 
 *Defined in [contractkit/src/governance/proposals.ts:15](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proposals.ts#L15)*
 
@@ -72,7 +72,7 @@ ___
 
 *Defined in [contractkit/src/governance/proposals.ts:50](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proposals.ts#L50)*
 
-Convert a compiled proposal to a human-readble JSON form using network information.
+Convert a compiled proposal to a human-readable JSON form using network information.
 
 **Parameters:**
 

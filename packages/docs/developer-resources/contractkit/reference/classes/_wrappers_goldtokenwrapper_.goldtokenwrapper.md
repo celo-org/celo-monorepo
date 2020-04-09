@@ -4,7 +4,7 @@ ERC-20 contract for Celo native currency.
 
 ## Hierarchy
 
-* [BaseWrapper](_wrappers_basewrapper_.basewrapper.md)‹[GoldToken](../enums/_base_.celocontract.md#goldtoken)›
+* [BaseWrapper](_wrappers_basewrapper_.basewrapper.md)‹GoldToken›
 
   ↳ **GoldTokenWrapper**
 
@@ -41,7 +41,7 @@ ERC-20 contract for Celo native currency.
 
 ###  constructor
 
-\+ **new GoldTokenWrapper**(`kit`: [ContractKit](_kit_.contractkit.md), `contract`: [GoldToken](../enums/_base_.celocontract.md#goldtoken)): *[GoldTokenWrapper](_wrappers_goldtokenwrapper_.goldtokenwrapper.md)*
+\+ **new GoldTokenWrapper**(`kit`: [ContractKit](_kit_.contractkit.md), `contract`: GoldToken): *[GoldTokenWrapper](_wrappers_goldtokenwrapper_.goldtokenwrapper.md)*
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[constructor](_wrappers_basewrapper_.basewrapper.md#constructor)*
 
@@ -52,7 +52,7 @@ ERC-20 contract for Celo native currency.
 Name | Type |
 ------ | ------ |
 `kit` | [ContractKit](_kit_.contractkit.md) |
-`contract` | [GoldToken](../enums/_base_.celocontract.md#goldtoken) |
+`contract` | GoldToken |
 
 **Returns:** *[GoldTokenWrapper](_wrappers_goldtokenwrapper_.goldtokenwrapper.md)*
 

@@ -4,7 +4,7 @@ Stable token with variable supply (cUSD)
 
 ## Hierarchy
 
-* [BaseWrapper](_wrappers_basewrapper_.basewrapper.md)‹[StableToken](../enums/_base_.celocontract.md#stabletoken)›
+* [BaseWrapper](_wrappers_basewrapper_.basewrapper.md)‹StableToken›
 
   ↳ **StableTokenWrapper**
 
@@ -49,7 +49,7 @@ Stable token with variable supply (cUSD)
 
 ###  constructor
 
-\+ **new StableTokenWrapper**(`kit`: [ContractKit](_kit_.contractkit.md), `contract`: [StableToken](../enums/_base_.celocontract.md#stabletoken)): *[StableTokenWrapper](_wrappers_stabletokenwrapper_.stabletokenwrapper.md)*
+\+ **new StableTokenWrapper**(`kit`: [ContractKit](_kit_.contractkit.md), `contract`: StableToken): *[StableTokenWrapper](_wrappers_stabletokenwrapper_.stabletokenwrapper.md)*
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[constructor](_wrappers_basewrapper_.basewrapper.md#constructor)*
 
@@ -60,7 +60,7 @@ Stable token with variable supply (cUSD)
 Name | Type |
 ------ | ------ |
 `kit` | [ContractKit](_kit_.contractkit.md) |
-`contract` | [StableToken](../enums/_base_.celocontract.md#stabletoken) |
+`contract` | StableToken |
 
 **Returns:** *[StableTokenWrapper](_wrappers_stabletokenwrapper_.stabletokenwrapper.md)*
 

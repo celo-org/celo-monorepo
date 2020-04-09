@@ -4,7 +4,7 @@ Contract for handling reserve for stable currencies
 
 ## Hierarchy
 
-* [BaseWrapper](_wrappers_basewrapper_.basewrapper.md)‹[Reserve](../enums/_base_.celocontract.md#reserve)›
+* [BaseWrapper](_wrappers_basewrapper_.basewrapper.md)‹Reserve›
 
   ↳ **ReserveWrapper**
 
@@ -41,7 +41,7 @@ Contract for handling reserve for stable currencies
 
 ###  constructor
 
-\+ **new ReserveWrapper**(`kit`: [ContractKit](_kit_.contractkit.md), `contract`: [Reserve](../enums/_base_.celocontract.md#reserve)): *[ReserveWrapper](_wrappers_reserve_.reservewrapper.md)*
+\+ **new ReserveWrapper**(`kit`: [ContractKit](_kit_.contractkit.md), `contract`: Reserve): *[ReserveWrapper](_wrappers_reserve_.reservewrapper.md)*
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[constructor](_wrappers_basewrapper_.basewrapper.md#constructor)*
 
@@ -52,7 +52,7 @@ Contract for handling reserve for stable currencies
 Name | Type |
 ------ | ------ |
 `kit` | [ContractKit](_kit_.contractkit.md) |
-`contract` | [Reserve](../enums/_base_.celocontract.md#reserve) |
+`contract` | Reserve |
 
 **Returns:** *[ReserveWrapper](_wrappers_reserve_.reservewrapper.md)*
 

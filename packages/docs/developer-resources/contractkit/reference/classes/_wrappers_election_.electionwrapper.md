@@ -4,7 +4,7 @@ Contract for voting for validators and managing validator groups.
 
 ## Hierarchy
 
-* [BaseWrapper](_wrappers_basewrapper_.basewrapper.md)‹[Election](../enums/_base_.celocontract.md#election)›
+* [BaseWrapper](_wrappers_basewrapper_.basewrapper.md)‹Election›
 
   ↳ **ElectionWrapper**
 
@@ -60,7 +60,7 @@ Contract for voting for validators and managing validator groups.
 
 ###  constructor
 
-\+ **new ElectionWrapper**(`kit`: [ContractKit](_kit_.contractkit.md), `contract`: [Election](../enums/_base_.celocontract.md#election)): *[ElectionWrapper](_wrappers_election_.electionwrapper.md)*
+\+ **new ElectionWrapper**(`kit`: [ContractKit](_kit_.contractkit.md), `contract`: Election): *[ElectionWrapper](_wrappers_election_.electionwrapper.md)*
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[constructor](_wrappers_basewrapper_.basewrapper.md#constructor)*
 
@@ -71,7 +71,7 @@ Contract for voting for validators and managing validator groups.
 Name | Type |
 ------ | ------ |
 `kit` | [ContractKit](_kit_.contractkit.md) |
-`contract` | [Election](../enums/_base_.celocontract.md#election) |
+`contract` | Election |
 
 **Returns:** *[ElectionWrapper](_wrappers_election_.electionwrapper.md)*
 
