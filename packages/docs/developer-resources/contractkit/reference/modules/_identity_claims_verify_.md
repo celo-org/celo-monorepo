@@ -17,7 +17,7 @@
 
 Ƭ **MetadataURLGetter**: *function*
 
-*Defined in [contractkit/src/identity/claims/verify.ts:38](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/verify.ts#L38)*
+*Defined in [contractkit/src/identity/claims/verify.ts:40](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/verify.ts#L40)*
 
 A function that can asynchronously fetch the metadata URL for an account address
 Should virtually always be Accounts#getMetadataURL
@@ -36,9 +36,9 @@ Name | Type |
 
 ### `Const` verifyAccountClaim
 
-▸ **verifyAccountClaim**(`claim`: [AccountClaim](_identity_claims_account_.md#accountclaim), `address`: string, `metadataURLGetter`: [MetadataURLGetter](_identity_claims_verify_.md#metadataurlgetter)): *Promise‹undefined | string›*
+▸ **verifyAccountClaim**(`claim`: [AccountClaim](_identity_claims_account_.md#accountclaim), `address`: string, `metadataURLGetter`: [MetadataURLGetter](_identity_claims_verify_.md#metadataurlgetter), `kit`: [ContractKit](../classes/_kit_.contractkit.md)): *Promise‹undefined | string›*
 
-*Defined in [contractkit/src/identity/claims/verify.ts:40](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/verify.ts#L40)*
+*Defined in [contractkit/src/identity/claims/verify.ts:42](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/verify.ts#L42)*
 
 **Parameters:**
 
@@ -47,6 +47,7 @@ Name | Type |
 `claim` | [AccountClaim](_identity_claims_account_.md#accountclaim) |
 `address` | string |
 `metadataURLGetter` | [MetadataURLGetter](_identity_claims_verify_.md#metadataurlgetter) |
+`kit` | [ContractKit](../classes/_kit_.contractkit.md) |
 
 **Returns:** *Promise‹undefined | string›*
 
@@ -54,9 +55,9 @@ ___
 
 ###  verifyClaim
 
-▸ **verifyClaim**(`claim`: [Claim](_identity_claims_claim_.md#claim), `address`: string, `metadataURLGetter`: [MetadataURLGetter](_identity_claims_verify_.md#metadataurlgetter)): *Promise‹undefined | string›*
+▸ **verifyClaim**(`claim`: [Claim](_identity_claims_claim_.md#claim), `address`: string, `metadataURLGetter`: [MetadataURLGetter](_identity_claims_verify_.md#metadataurlgetter), `kit`: [ContractKit](../classes/_kit_.contractkit.md)): *Promise‹undefined | string›*
 
-*Defined in [contractkit/src/identity/claims/verify.ts:18](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/verify.ts#L18)*
+*Defined in [contractkit/src/identity/claims/verify.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/verify.ts#L19)*
 
 Verifies a claim made by an account, i.e. whether a claim can be verified to be correct
 
@@ -67,6 +68,7 @@ Name | Type | Description |
 `claim` | [Claim](_identity_claims_claim_.md#claim) | The claim to verify |
 `address` | string | The address that is making the claim |
 `metadataURLGetter` | [MetadataURLGetter](_identity_claims_verify_.md#metadataurlgetter) | A function that can retrieve the metadata URL for a given account address,                          should be Accounts.getMetadataURL() |
+`kit` | [ContractKit](../classes/_kit_.contractkit.md) | - |
 
 **Returns:** *Promise‹undefined | string›*
 
