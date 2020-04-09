@@ -43,7 +43,7 @@ export async function getSendTxGas(
   Logger.debug(`${TAG}/getSendTxGas`, 'Getting gas estimate for send tx')
   const tx = await createTokenTransferTransaction(currency, params)
   const txParams = { from: account, feeCurrency: await getCurrencyAddress(currency) }
-  const gas = estimateGas(tx.txo, txParams)
+  const gas = await estimateGas(tx.txo, txParams)
   Logger.debug(`${TAG}/getSendTxGas`, `Estimated gas of ${gas.toString()}`)
   return gas
 }

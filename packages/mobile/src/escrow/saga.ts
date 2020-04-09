@@ -196,7 +196,7 @@ export async function getReclaimEscrowGas(account: string, paymentID: string) {
     from: account,
     feeCurrency: await getCurrencyAddress(CURRENCY_ENUM.DOLLAR),
   }
-  const gas = estimateGas(tx, txParams)
+  const gas = await estimateGas(tx, txParams)
   Logger.debug(`${TAG}/getReclaimEscrowGas`, `Estimated gas of ${gas.toString()}}`)
   return gas
 }

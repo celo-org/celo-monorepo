@@ -354,15 +354,28 @@ export function* withdrawFundsFromTempAccount(
   if (!fornoMode) {
     yield call(contractKit.web3.eth.personal.unlockAccount, tempAccount, TEMP_PW, 600)
   }
-  const tempAccountBalance = divideByWei(tempAccountBalanceWei)
 
-  Logger.debug(TAG + '@withdrawFundsFromTempAccount', 'Calculating withdrawal fee')
-  const sendTokenFee: BigNumber = yield call(getSendFee, tempAccount, CURRENCY_ENUM.DOLLAR, {
+  Logger.debug(
+    TAG + '@withdrawFundsFromTempAccount',
+    `Temp account balance is ${tempAccountBalanceWei.toString()}. Calculating withdrawal fee`
+  )
+  const tempAccountBalance = divideByWei(tempAccountBalanceWei)
+  const sendTokenFeeInWei: BigNumber = yield call(getSendFee, tempAccount, CURRENCY_ENUM.DOLLAR, {
     recipientAddress: newAccount,
     amount: tempAccountBalance,
     comment: SENTINEL_INVITE_COMMENT,
   })
-  Logger.debug(TAG + '@withdrawFundsFromTempAccount', `Using fee of ${sendTokenFee.toString()}`)
+  const sendTokenFee = divideByWei(sendTokenFeeInWei).times(5)
+
+  if (sendTokenFee.isGreaterThanOrEqualTo(tempAccountBalance)) {
+    throw new Error('Fee is too large for amount in temp wallet')
+  }
+
+  const netSendAmount = tempAccountBalance.minus(sendTokenFee)
+  Logger.debug(
+    TAG + '@withdrawFundsFromTempAccount',
+    `Withdrwaing net amount of ${netSendAmount.toString()}`
+  )
 
   const tx: CeloTransactionObject<boolean> = yield call(
     createTokenTransferTransaction,
@@ -370,7 +383,7 @@ export function* withdrawFundsFromTempAccount(
     {
       recipientAddress: newAccount,
       comment: SENTINEL_INVITE_COMMENT,
-      amount: tempAccountBalance.minus(sendTokenFee),
+      amount: netSendAmount,
     }
   )
 
