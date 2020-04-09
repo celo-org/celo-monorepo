@@ -1,5 +1,5 @@
 import { InitialArgv } from 'src/cmds/deploy/initial'
-import { switchToClusterFromEnv } from 'src/lib/cluster'
+import { switchToClusterFromEnv } from 'src/lib/azure'
 import { installHelmChart } from 'src/lib/oracle'
 import yargs from 'yargs'
 
@@ -12,6 +12,6 @@ export const builder = (argv: yargs.Argv) => {
 }
 
 export const handler = async (argv: InitialArgv) => {
-  await switchToClusterFromEnv()
+  await switchToClusterFromEnv(argv.celoEnv)
   await installHelmChart(argv.celoEnv)
 }
