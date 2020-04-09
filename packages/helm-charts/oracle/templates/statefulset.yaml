@@ -32,6 +32,7 @@ spec:
       labels:
 {{ include "labels" . | indent 8 }}
 {{ include "oracle-client-component-label" . | indent 8 }}
+        aadpodidbinding: {{ template "name" . }}-identity-binding
     spec:
       containers:
       - name: oracle-client

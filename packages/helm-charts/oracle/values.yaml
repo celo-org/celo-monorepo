@@ -1,0 +1,15 @@
+environmentName: test
+replicas: 1
+image:
+  repository: test
+  tag: test
+
+oracle:
+  web3ProviderUrl: test
+  privateKeys:
+    - '0x000'
+
+azure:
+  identity:
+    id: test
+    clientId: test

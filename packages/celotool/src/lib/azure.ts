@@ -62,3 +62,21 @@ async function installAADPodIdentity() {
     )
   }
 }
+
+// createIdentityIfNotExists creates an identity if it doesn't already exist.
+// Returns an object including basic info on the identity.
+export async function createIdentityIfNotExists(identityName: string) {
+  // This command is idempotent-- if the identity exists, the existing one is given
+  const [results] = await execCmdWithExitOnFailure(
+    `az identity create -n ${identityName} -g ${resourceGroup()} -o json`
+  )
+  return JSON.parse(results)
+}
+
+export function resourceGroup() {
+  return fetchEnv(envVar.AZURE_KUBERNETES_RESOURCE_GROUP)
+}
+
+export function clusterName() {
+  return fetchEnv(envVar.AZURE_KUBERNETES_CLUSTER_NAME)
+}
