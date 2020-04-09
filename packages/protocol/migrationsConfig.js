@@ -7,6 +7,14 @@ const path = require('path')
 const lodash = require('lodash')
 const web3 = require('web3')
 
+const argv = minimist(process.argv.slice(2), {
+  default: {
+    build_directory: path.join(__dirname, 'build'),
+  },
+  string: ['migration_override', 'build_directory', 'network'],
+})
+const network = require('./truffle-config.js').networks[argv.network]
+
 // Almost never use exponential notation in toString
 // http://mikemcl.github.io/bignumber.js/#exponential-at
 BigNumber.config({ EXPONENTIAL_AT: 1e9 })
@@ -48,6 +56,7 @@ const DefaultConfig = {
     maxElectableValidators: '100',
     maxVotesPerAccount: 100,
     electabilityThreshold: 1 / 1000,
+    frozen: true,
   },
   epochRewards: {
     targetVotingYieldParameters: {
@@ -204,15 +213,58 @@ const DefaultConfig = {
 }
 
 const NetworkConfigs = {
+  development: {
+    downtimeSlasher: {
+      slashableDowntime: 60, // epoch length is 100 for unit tests
+    },
+    election: {
+      minElectableValidators: '10',
+      frozen: false,
+    },
+    epochRewards: {
+      frozen: false,
+    },
+    exchange: {
+      frozen: false,
+      minimumReports: 1,
+    },
+    goldToken: {
+      frozen: false,
+    },
+    governanceApproverMultiSig: {
+      signatories: [network.from],
+      numRequiredConfirmations: 1,
+      numInternalRequiredConfirmations: 1,
+    },
+    reserve: {
+      initialBalance: 100000000,
+      otherAddresses: ['0x7457d5E02197480Db681D3fdF256c7acA21bDc12'], // Add an arbitrary "otherReserveAddress" so that reserve spending can be tested.
+    },
+    reserveSpenderMultiSig: {
+      signatories: [network.from],
+      numRequiredConfirmations: 1,
+      numInternalRequiredConfirmations: 1,
+    },
+    stableToken: {
+      oracles: [network.from],
+      frozen: false,
+    },
+  },
   testing: {
     downtimeSlasher: {
       slashableDowntime: 6,
     },
     election: {
       minElectableValidators: '1',
+      frozen: false,
     },
     epochRewards: {
       frozen: false,
+      targetVotingYieldParameters: {
+        initial: 0.00016,
+        max: 0.0005,
+        adjustmentFactor: 0.1,
+      },
     },
     exchange: {
       frozen: false,
@@ -247,6 +299,20 @@ const NetworkConfigs = {
     },
     lockedGold: {
       unlockingPeriod: 6 * HOUR, // 1/12 of the mainnet period.
+    },
+    stableToken: {
+      oracles: [
+        '0x0d473f73AAf1C2bf7EBd2be7196C71dBa6C1724b',
+        '0x8F7ca85A9E4A18B551b765706bd0B6f26927D86F',
+        '0x3EaEe6C693420Ae86643EB2837978da8eEbf973f',
+        '0xDd3E5FcE22938c0f482004527D468a8799C4a61E',
+        '0xFb2Ee4Da251fC6A9DF7eb8d5c4ea1DeC99d127eA',
+        '0xd321C7356DFB5b6F4AD9e5B58C51B46409fe1442',
+        '0xbbbC38f6a383293522d4aEDaA98b7d2D73E90A73',
+        '0xB9E0b0B8fdA1001392c8fFd19f6B7ad5286589F2',
+        '0x44740e3eedfD3a2A2e7662de9165a6E20bBcC72C',
+        '0x7a2cb0438e7B9801C29B39Ff94439aFf930CDf9F',
+      ],
     },
     validators: {
       groupLockedGoldRequirements: {
@@ -313,13 +379,6 @@ const linkedLibraries = {
   AddressSortedLinkedListWithMedian: ['SortedOracles', 'AddressSortedLinkedListWithMedianTest'],
   Signatures: ['Accounts', 'TestAttestations', 'Attestations', 'LockedGold', 'Escrow'],
 }
-
-const argv = minimist(process.argv.slice(2), {
-  default: {
-    build_directory: path.join(__dirname, 'build'),
-  },
-  string: ['migration_override', 'build_directory', 'network'],
-})
 
 const config = lodash.cloneDeep(DefaultConfig)
 
