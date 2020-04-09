@@ -60,9 +60,9 @@ const DefaultConfig = {
   },
   epochRewards: {
     targetVotingYieldParameters: {
-      initial: 0, // Change to 0.00016 once mainnet activated // (x + 1) ^ 365 = 1.06
+      initial: 0.00016, // (x + 1) ^ 365 = 1.06
       max: 0.0005, // (x + 1) ^ 365 = 1.20
-      adjustmentFactor: 0, // Change to 1 / 3650 once mainnet activated 1 / 3650
+      adjustmentFactor: 0, // Change to 1 / 3650 once mainnet activated
     },
     rewardsMultiplierParameters: {
       max: 2,
@@ -71,7 +71,9 @@ const DefaultConfig = {
         overspend: 5,
       },
     },
-    targetVotingGoldFraction: 2 / 3,
+    // Intentionally set lower than the expected value at steady state to account for the fact that
+    // users may take some time to start voting with their cGLD.
+    targetVotingGoldFraction: 1 / 3,
     maxValidatorEpochPayment: '205479452054794520547', // (75,000 / 365) * 10 ^ 18
     communityRewardFraction: 1 / 4,
     // TODO(asa): Must be set before RC1
@@ -150,7 +152,7 @@ const DefaultConfig = {
   },
   stableToken: {
     decimals: 18,
-    goldPrice: 10,
+    goldPrice: 1,
     tokenName: 'Celo Dollar',
     tokenSymbol: 'cUSD',
     inflationRate: 1,
