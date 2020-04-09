@@ -1,4 +1,4 @@
-import { NetworkConfig, testWithGanache } from '@celo/dev-utils/lib/ganache-test'
+import { NetworkConfig, testWithGanache, timeTravel } from '@celo/dev-utils/lib/ganache-test'
 import { Address, CeloContract } from '../base'
 import { newKitFromWeb3 } from '../kit'
 import { OracleRate, SortedOraclesWrapper } from './SortedOracles'
@@ -24,6 +24,20 @@ testWithGanache('SortedOracles Wrapper', (web3) => {
   let sortedOracles: SortedOraclesWrapper
   let stableTokenAddress: Address
   let nonOracleAddress: Address
+
+  async function reportAsOracles(oracles: Address[], rates: number[] = []): Promise<void> {
+    // Create some arbitrary values to report if none were passed in
+    if (rates.length === 0) {
+      for (const _oracle of oracles) {
+        rates.push(Math.random() * 2)
+      }
+    }
+
+    for (let i = 0; i < rates.length; i++) {
+      const tx = await sortedOracles.report(CeloContract.StableToken, rates[i], oracles[i])
+      await tx.sendAndWaitForReceipt()
+    }
+  }
 
   beforeAll(async () => {
     sortedOracles = await kit.contracts.getSortedOracles()
@@ -51,14 +65,7 @@ testWithGanache('SortedOracles Wrapper', (web3) => {
       describe('when inserting into the middle of the existing rates', () => {
         beforeEach(async () => {
           const rates = [15, 20, 17]
-          for (let i = 0; i < stableTokenOracles.length - 1; i++) {
-            const tx = await sortedOracles.report(
-              CeloContract.StableToken,
-              rates[i],
-              stableTokenOracles[i]
-            )
-            await tx.sendAndWaitForReceipt()
-          }
+          await reportAsOracles(stableTokenOracles, rates)
         })
 
         const expectedLesserKey = stableTokenOracles[0]
@@ -111,6 +118,81 @@ testWithGanache('SortedOracles Wrapper', (web3) => {
           const resultingRates = await sortedOracles.getRates(CeloContract.StableToken)
           expect(resultingRates).toMatchObject(initialRates)
         }
+      })
+    })
+  })
+
+  describe('#removeExpiredReports', () => {
+    beforeEach(async () => {
+      await reportAsOracles(stableTokenOracles)
+    })
+
+    describe('when expired reports exist', () => {
+      beforeEach(async () => {
+        const expirySeconds = (await sortedOracles.reportExpirySeconds()).toNumber()
+        await timeTravel(expirySeconds + 5, web3)
+      })
+
+      it('should successfully remove a report', async () => {
+        const initialReportCount = await sortedOracles.numRates(CeloContract.StableToken)
+        const tx = await sortedOracles.removeExpiredReports(CeloContract.StableToken, 1)
+        await tx.sendAndWaitForReceipt({ from: oracleAddress })
+        expect(await sortedOracles.numRates(CeloContract.StableToken)).toEqual(
+          initialReportCount - 1
+        )
+      })
+    })
+
+    describe('when reports exist but are not expired', () => {
+      it('should not remove any reports', async () => {
+        const initialReportCount = await sortedOracles.numRates(CeloContract.StableToken)
+        const tx = await sortedOracles.removeExpiredReports(CeloContract.StableToken, 1)
+        await tx.sendAndWaitForReceipt({ from: oracleAddress })
+        expect(await sortedOracles.numRates(CeloContract.StableToken)).toEqual(initialReportCount)
+      })
+    })
+  })
+
+  describe('#isOldestReportExpired', () => {
+    let expirySeconds: number
+
+    beforeEach(async () => {
+      expirySeconds = (await sortedOracles.reportExpirySeconds()).toNumber()
+    })
+
+    describe('when at least one expired report exists', () => {
+      beforeEach(async () => {
+        const tx = await sortedOracles.report(CeloContract.StableToken, 1.2, oracleAddress)
+        await tx.sendAndWaitForReceipt()
+        await timeTravel(expirySeconds + 5, web3)
+
+        // create new oracle reports for all accounts other than `oracleAddress`
+        const recentOracles = stableTokenOracles.filter((o) => o !== oracleAddress)
+        await reportAsOracles(recentOracles)
+      })
+
+      it('returns with true and the address of the last reporting oracle', async () => {
+        const [isExpired, address] = await sortedOracles.isOldestReportExpired(
+          CeloContract.StableToken
+        )
+        expect(isExpired).toEqual(true)
+        expect(address).toEqual(oracleAddress)
+      })
+    })
+    describe('when the oldest is not expired', () => {
+      beforeEach(async () => {
+        const tx = await sortedOracles.report(CeloContract.StableToken, 1.2, oracleAddress)
+        await tx.sendAndWaitForReceipt()
+        await timeTravel(expirySeconds / 2, web3)
+        await reportAsOracles(stableTokenOracles.filter((o) => o !== oracleAddress))
+      })
+
+      it('returns with false and the address of the last reporting oracle', async () => {
+        const [isExpired, address] = await sortedOracles.isOldestReportExpired(
+          CeloContract.StableToken
+        )
+        expect(isExpired).toEqual(false)
+        expect(address).toEqual(oracleAddress)
       })
     })
   })
