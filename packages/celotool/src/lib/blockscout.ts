@@ -1,8 +1,18 @@
 import fs from 'fs'
-import { fetchEnv, fetchEnvOrFallback, isVmBased } from './env-utils'
+import { envVar, fetchEnv, fetchEnvOrFallback, isVmBased } from './env-utils'
 import { installGenericHelmChart, removeGenericHelmChart } from './helm_deploy'
 import { execCmdWithExitOnFailure, outputIncludes } from './utils'
 import { getInternalTxNodeLoadBalancerIP } from './vm-testnet-utils'
+
+export function getInstanceName(celoEnv: string) {
+  const dbSuffix = fetchEnvOrFallback(envVar.BLOCKSCOUT_DB_SUFFIX, '')
+  return `${celoEnv}${dbSuffix}`
+}
+
+export function getReleaseName(celoEnv: string) {
+  const dbSuffix = fetchEnvOrFallback(envVar.BLOCKSCOUT_DB_SUFFIX, '')
+  return `${celoEnv}-blockscout${dbSuffix}`
+}
 
 export async function installHelmChart(
   celoEnv: string,
@@ -62,17 +72,20 @@ async function helmParameters(
   blockscoutDBConnectionName: string
 ) {
   const params = [
-    `--set domain.name=${fetchEnv('CLUSTER_DOMAIN_NAME')}`,
-    `--set blockscout.image.repository=${fetchEnv('BLOCKSCOUT_DOCKER_IMAGE_REPOSITORY')}`,
-    `--set blockscout.image.tag=${fetchEnv('BLOCKSCOUT_DOCKER_IMAGE_TAG')}`,
+    `--set domain.name=${fetchEnv(envVar.CLUSTER_DOMAIN_NAME)}`,
+    `--set blockscout.image.repository=${fetchEnv(envVar.BLOCKSCOUT_DOCKER_IMAGE_REPOSITORY)}`,
+    `--set blockscout.image.tag=${fetchEnv(envVar.BLOCKSCOUT_DOCKER_IMAGE_TAG)}`,
     `--set blockscout.db.username=${blockscoutDBUsername}`,
     `--set blockscout.db.password=${blockscoutDBPassword}`,
     `--set blockscout.db.connection_name=${blockscoutDBConnectionName.trim()}`,
-    `--set blockscout.db.drop=${fetchEnvOrFallback('BLOCKSCOUT_DROP_DB', 'false')}`,
-    `--set blockscout.replicas=${fetchEnv('BLOCKSCOUT_WEB_REPLICAS')}`,
-    `--set blockscout.subnetwork="${fetchEnvOrFallback('BLOCKSCOUT_SUBNETWORK_NAME', celoEnv)}"`,
-    `--set promtosd.scrape_interval=${fetchEnv('PROMTOSD_SCRAPE_INTERVAL')}`,
-    `--set promtosd.export_interval=${fetchEnv('PROMTOSD_EXPORT_INTERVAL')}`,
+    `--set blockscout.db.drop=${fetchEnvOrFallback(envVar.BLOCKSCOUT_DROP_DB, 'false')}`,
+    `--set blockscout.replicas=${fetchEnv(envVar.BLOCKSCOUT_WEB_REPLICAS)}`,
+    `--set blockscout.subnetwork="${fetchEnvOrFallback(
+      envVar.BLOCKSCOUT_SUBNETWORK_NAME,
+      celoEnv
+    )}"`,
+    `--set promtosd.scrape_interval=${fetchEnv(envVar.PROMTOSD_SCRAPE_INTERVAL)}`,
+    `--set promtosd.export_interval=${fetchEnv(envVar.PROMTOSD_EXPORT_INTERVAL)}`,
   ]
   if (isVmBased()) {
     const txNodeLbIp = await getInternalTxNodeLoadBalancerIP(celoEnv)
@@ -104,7 +117,7 @@ metadata:
   namespace: ${celoEnv}
 spec:
   rules:
-  - host: ${celoEnv}-blockscout.${fetchEnv('CLUSTER_DOMAIN_NAME')}.org
+  - host: ${celoEnv}-blockscout.${fetchEnv(envVar.CLUSTER_DOMAIN_NAME)}.org
     http:
       paths:
       - backend:
@@ -113,7 +126,7 @@ spec:
         path: /
   tls:
   - hosts:
-    - ${celoEnv}-blockscout.${fetchEnv('CLUSTER_DOMAIN_NAME')}.org
+    - ${celoEnv}-blockscout.${fetchEnv(envVar.CLUSTER_DOMAIN_NAME)}.org
     secretName: ${celoEnv}-blockscout-web-tls
 `
     fs.writeFileSync(ingressFilePath, ingressResource)

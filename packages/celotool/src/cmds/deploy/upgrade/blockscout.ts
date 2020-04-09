@@ -1,11 +1,13 @@
 import sleep from 'sleep-promise'
 import {
   createDefaultIngressIfNotExists,
+  getInstanceName,
+  getReleaseName,
   removeHelmRelease,
   upgradeHelmChart,
 } from 'src/lib/blockscout'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
-import { fetchEnvOrFallback } from 'src/lib/env-utils'
+import { envVar, fetchEnvOrFallback } from 'src/lib/env-utils'
 import { resetCloudSQLInstance, retrieveCloudSQLConnectionInfo } from 'src/lib/helm_deploy'
 import { execCmdWithExitOnFailure } from 'src/lib/utils'
 import yargs from 'yargs'
@@ -28,9 +30,9 @@ type BlockscoutUpgradeArgv = UpgradeArgv & { reset: boolean }
 export const handler = async (argv: BlockscoutUpgradeArgv) => {
   await switchToClusterFromEnv()
 
-  const dbSuffix = fetchEnvOrFallback('BLOCKSCOUT_DB_SUFFIX', '')
-  const instanceName = `${argv.celoEnv}${dbSuffix}`
-  const helmReleaseName = `${argv.celoEnv}-blockscout${dbSuffix}`
+  const dbSuffix = fetchEnvOrFallback(envVar.BLOCKSCOUT_DB_SUFFIX, '')
+  const instanceName = getInstanceName(argv.celoEnv)
+  const helmReleaseName = getReleaseName(argv.celoEnv)
 
   const [
     blockscoutDBUsername,

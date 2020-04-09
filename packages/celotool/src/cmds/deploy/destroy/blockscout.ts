@@ -1,7 +1,6 @@
 import { DestroyArgv } from 'src/cmds/deploy/destroy'
-import { removeHelmRelease } from 'src/lib/blockscout'
+import { getInstanceName, getReleaseName, removeHelmRelease } from 'src/lib/blockscout'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
-import { fetchEnvOrFallback } from 'src/lib/env-utils'
 import { deleteCloudSQLInstance } from 'src/lib/helm_deploy'
 import { execCmdWithExitOnFailure, outputIncludes } from 'src/lib/utils'
 
@@ -13,9 +12,8 @@ export const builder = {}
 export const handler = async (argv: DestroyArgv) => {
   await switchToClusterFromEnv()
 
-  const dbSuffix = fetchEnvOrFallback('BLOCKSCOUT_DB_SUFFIX', '')
-  const instanceName = `${argv.celoEnv}${dbSuffix}`
-  const helmReleaseName = `${argv.celoEnv}-blockscout${dbSuffix}`
+  const instanceName = getInstanceName(argv.celoEnv)
+  const helmReleaseName = getReleaseName(argv.celoEnv)
 
   // Delete replica before deleting the master
   await deleteCloudSQLInstance(instanceName + '-replica')
