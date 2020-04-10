@@ -5,7 +5,9 @@ import * as net from 'react-native-tcp'
 import { DEFAULT_FORNO_URL } from 'src/config'
 import { IPC_PATH } from 'src/geth/geth'
 import networkConfig from 'src/geth/networkConfig'
+import { store } from 'src/redux/store'
 import Logger from 'src/utils/Logger'
+import { contractKitReadySelector } from 'src/web3/selectors'
 import Web3 from 'web3'
 import { provider } from 'web3-core'
 
@@ -16,7 +18,12 @@ const web3: Web3 = getWeb3()
 let contractKit = newKitFromWeb3(web3)
 
 export function getContractKit() {
-  return contractKit
+  const contractKitReady = contractKitReadySelector(store.getState())
+  if (contractKitReady) {
+    return contractKit
+  } else {
+    throw new Error('Contract Kit not yet ready')
+  }
 }
 
 export function isInitiallyFornoMode() {

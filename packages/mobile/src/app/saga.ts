@@ -66,6 +66,7 @@ const mapStateToProps = (state: PersistedRootState): PersistedStateProps | null 
 
 // Upon every app restart, web3 is initialized according to .env file
 // This updates to the chosen forno mode in store
+/*
 export function* toggleToProperSyncMode() {
   Logger.info(TAG + '@toggleToProperSyncMode/', 'Ensuring proper sync mode...')
   yield take(REHYDRATE)
@@ -75,6 +76,7 @@ export function* toggleToProperSyncMode() {
     yield put(toggleFornoMode(fornoMode))
   }
 }
+*/
 
 export function* navigateToProperScreen() {
   yield all([take(REHYDRATE), take(NavActions.SET_NAVIGATOR)])
@@ -201,7 +203,7 @@ export function* handleSetAppState(action: SetAppState) {
 
 export function* appSaga() {
   yield spawn(navigateToProperScreen)
-  yield spawn(toggleToProperSyncMode)
+  // yield spawn(toggleToProperSyncMode) TODO anna should no longer be necessary
   yield spawn(watchDeepLinks)
   yield spawn(watchAppState)
   yield takeLatest(Actions.SET_APP_STATE, handleSetAppState)

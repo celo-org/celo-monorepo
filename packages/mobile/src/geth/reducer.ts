@@ -1,4 +1,5 @@
 import { Actions, ActionTypes } from 'src/geth/actions'
+import Logger from 'src/utils/Logger'
 
 export enum InitializationState {
   NOT_YET_INITIALIZED = 'NOT_YET_INITIALIZED',
@@ -23,6 +24,7 @@ const initialState: State = {
 export function gethReducer(state: State = initialState, action: ActionTypes) {
   switch (action.type) {
     case Actions.SET_INIT_STATE:
+      Logger.debug('gethReducer', `setting init state to ${action.state}`)
       return {
         ...state,
         initialized: action.state,
