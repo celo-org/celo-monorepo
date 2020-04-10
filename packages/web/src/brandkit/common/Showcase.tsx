@@ -1,7 +1,6 @@
 import * as React from 'react'
-import Fade from 'react-reveal/Fade'
-
 import { Image, StyleSheet, Text, View } from 'react-native'
+import Fade from 'react-reveal/Fade'
 import { brandStyles } from 'src/brandkit/common/constants'
 import DownloadButton from 'src/brandkit/common/DownloadButton'
 import { AssetTypes } from 'src/brandkit/tracking'
@@ -34,7 +33,7 @@ export default React.memo(function Showcase({
     name,
     assetType,
   ])
-  const titleStyle = React.useMemo(() => [fonts.h6, styles.title], [styles.title])
+  const titleStyle = [fonts.h6, styles.title]
   return (
     <View
       style={[

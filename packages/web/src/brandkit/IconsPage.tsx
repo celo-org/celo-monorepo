@@ -28,6 +28,7 @@ const IconPage: NextPage<Props> = React.memo(function IconsPage({ icons }: Props
 
 IconPage.getInitialProps = async ({ req }) => {
   let icons = []
+  // req exists if and only if this is being run on serverside
   if (req) {
     const AssetBase = await import('src/../server/AssetBase')
     icons = await AssetBase.default(AssetBase.AssetSheet.Icons)

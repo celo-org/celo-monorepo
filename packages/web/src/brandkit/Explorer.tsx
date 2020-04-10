@@ -62,7 +62,7 @@ const styles = StyleSheet.create({
 })
 
 function useVisibleIconIDs(query: string, initial: IconData[]): Set<string> {
-  const [results, setResult] = React.useState(React.useMemo(() => toIDSet(initial), [initial]))
+  const [results, setResult] = React.useState(null)
 
   React.useEffect(
     debounce(() => {
@@ -71,7 +71,7 @@ function useVisibleIconIDs(query: string, initial: IconData[]): Set<string> {
     [initial, query]
   )
 
-  return results
+  return results || toIDSet(initial)
 }
 
 const FIELDS = ['name', 'description', 'tags']

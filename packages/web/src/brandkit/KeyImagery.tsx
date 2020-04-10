@@ -49,6 +49,7 @@ const KeyImageryWrapped: NextPage<Props> = React.memo(function KeyImagery({
 
 KeyImageryWrapped.getInitialProps = async ({ req }): Promise<Props> => {
   let results
+  // req exists if and only if this is being run on serverside
   if (req) {
     const AssetBase = await import('src/../server/AssetBase')
     results = await Promise.all([
@@ -68,7 +69,7 @@ function fetchAsset(kind: 'illustrations' | 'abstract-graphics') {
 
 export default KeyImageryWrapped
 
-const Overview = React.memo(function _Overview() {
+function Overview() {
   const { t } = useTranslation(NameSpaces.brand)
   return (
     <View>
@@ -76,7 +77,7 @@ const Overview = React.memo(function _Overview() {
       <CCLicense textI18nKey="keyImagery.license" />
     </View>
   )
-})
+}
 
 function useIlloSize() {
   const { screen } = useScreenSize()
