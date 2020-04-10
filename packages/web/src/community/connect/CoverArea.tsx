@@ -5,12 +5,13 @@ import { H1, H4 } from 'src/fonts/Fonts'
 import EmailForm from 'src/forms/EmailForm'
 import { NameSpaces, useTranslation } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
-import { useScreenSize } from 'src/layout/ScreenSize'
+import { ScreenSizes, useScreenSize } from 'src/layout/ScreenSize'
 import { HEADER_HEIGHT } from 'src/shared/Styles'
 import { colors, standardStyles, textStyles } from 'src/styles'
 
 export default React.memo(function CoverArea() {
   const { t } = useTranslation(NameSpaces.community)
+  const { isMobile } = useScreenSize()
   return (
     <GridRow
       allStyle={[standardStyles.centered, styles.fullScreen]}
@@ -19,16 +20,18 @@ export default React.memo(function CoverArea() {
       mobileStyle={styles.mobileRoot}
     >
       <Cell span={Spans.full} style={styles.content}>
-        <CeloRoles />
-        <FourWords />
-        <View
-          style={[
-            standardStyles.centered,
-            styles.ctaArea,
-            // isMobile ? standardStyles.elementalMarginTop : standardStyles.blockMarginTop,
-            styles.fadeIn,
-          ]}
-        >
+        {isMobile ? (
+          <>
+            <CeloRoles />
+            <FourWords />
+          </>
+        ) : (
+          <View>
+            <CeloRoles />
+            <FourWords />
+          </View>
+        )}
+        <View style={[standardStyles.centered, styles.fadeIn, styles.ctaArea]}>
           <H4 style={[textStyles.center, standardStyles.elementalMargin]}>
             {t('cover.joinMovement')}
           </H4>
@@ -40,9 +43,9 @@ export default React.memo(function CoverArea() {
 })
 
 const FourWords = React.memo(function _FourWords() {
-  const { isTablet } = useScreenSize()
+  const { screen } = useScreenSize()
   return (
-    <View style={[standardStyles.centered, isTablet && standardStyles.elementalMargin]}>
+    <View style={[standardStyles.centered, getWordContainerStyle(screen)]}>
       <H1 style={textStyles.center}>
         <Text style={[styles.fadeIn, styles.developers]}>Developers. </Text>
         <Text style={[styles.fadeIn, styles.designers]}>Designers. </Text>
@@ -53,10 +56,20 @@ const FourWords = React.memo(function _FourWords() {
   )
 })
 
+function getWordContainerStyle(screen: ScreenSizes) {
+  switch (screen) {
+    case ScreenSizes.DESKTOP:
+      return standardStyles.blockMarginTop
+    case ScreenSizes.TABLET:
+      return standardStyles.blockMarginTopTablet
+  }
+}
+
 const styles = StyleSheet.create({
   fullScreen: {
     width: '100vw',
     minHeight: `100vh`,
+    paddingTop: HEADER_HEIGHT,
   },
   mobileRoot: {
     paddingTop: HEADER_HEIGHT,
@@ -88,8 +101,8 @@ const styles = StyleSheet.create({
     animationDelay: '6400ms',
   },
   ctaArea: {
-    animationDelay: '7500ms',
-    maxWidth: 550,
+    animationDelay: '7000ms',
+    maxWidth: 500,
     width: '100%',
   },
   fadeIn: {
