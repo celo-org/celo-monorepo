@@ -8,7 +8,7 @@ import { TransactionObject } from 'web3-eth'
 
 const TAG = 'web3/utils'
 
-// Estimate gas taking into account the cofigured inflation factor
+// Estimate gas taking into account the configured inflation factor
 export async function estimateGas(tx: TransactionObject<any>, txParams: Tx) {
   const gas = new BigNumber(await tx.estimateGas(txParams))
   return gas.times(GAS_INFLATION_FACTOR).integerValue()

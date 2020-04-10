@@ -365,7 +365,8 @@ export function* withdrawFundsFromTempAccount(
     amount: tempAccountBalance,
     comment: SENTINEL_INVITE_COMMENT,
   })
-  const sendTokenFee = divideByWei(sendTokenFeeInWei).times(5)
+  // Inflate fee by 10% to harden against minor gas changes
+  const sendTokenFee = divideByWei(sendTokenFeeInWei).times(1.1)
 
   if (sendTokenFee.isGreaterThanOrEqualTo(tempAccountBalance)) {
     throw new Error('Fee is too large for amount in temp wallet')
@@ -374,7 +375,7 @@ export function* withdrawFundsFromTempAccount(
   const netSendAmount = tempAccountBalance.minus(sendTokenFee)
   Logger.debug(
     TAG + '@withdrawFundsFromTempAccount',
-    `Withdrwaing net amount of ${netSendAmount.toString()}`
+    `Withdrawing net amount of ${netSendAmount.toString()}`
   )
 
   const tx: CeloTransactionObject<boolean> = yield call(
@@ -382,8 +383,8 @@ export function* withdrawFundsFromTempAccount(
     CURRENCY_ENUM.DOLLAR,
     {
       recipientAddress: newAccount,
-      comment: SENTINEL_INVITE_COMMENT,
       amount: netSendAmount,
+      comment: SENTINEL_INVITE_COMMENT,
     }
   )
 
