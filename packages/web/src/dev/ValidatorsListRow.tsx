@@ -90,7 +90,7 @@ class ValidatorsListRow extends React.PureComponent<Props & I18nProps> {
                 {formatNumber(+group.votes, 1)}% of {formatNumber(+group.receivableVotes, 1)}%
               </Text>
               <ProgressCutBar
-                bars={Math.floor(+group.receivableVotes * 2) || 1}
+                bars={Math.min(Math.floor(+group.receivableVotes * 2) || 1, 6)}
                 progress={Math.floor(+group.votes)}
               />
             </Text>
