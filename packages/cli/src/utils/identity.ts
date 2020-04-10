@@ -139,9 +139,9 @@ export const displayMetadata = async (metadata: IdentityMetadataWrapper, kit: Co
 }
 
 export const modifyMetadata = async (
+  kit: ContractKit,
   filePath: string,
-  operation: (metadata: IdentityMetadataWrapper) => Promise<void>,
-  kit: ContractKit
+  operation: (metadata: IdentityMetadataWrapper) => Promise<void>
 ) => {
   const metadata = await IdentityMetadataWrapper.fromFile(kit, filePath)
   await operation(metadata)
