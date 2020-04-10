@@ -53,6 +53,10 @@ spec:
               fieldPath: metadata.name
         - name: CELO_NODE
           value: {{ .Values.oracle.web3ProviderUrl }}
+        - name: KEY_VAULT
+          value: {{ .Values.azure.keyvault.vaultName }}
+        - name: KEY_NAME
+          value: {{ .Values.azure.keyvault.keyName }}
         volumeMounts:
         - name: private-key-volume
           readOnly: true

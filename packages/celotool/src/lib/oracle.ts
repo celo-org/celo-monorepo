@@ -45,6 +45,8 @@ async function helmParameters(celoEnv: string) {
     `--set azure.subscriptionId=${subscriptionId()}`,
     `--set azure.identity.id=${identity.id}`,
     `--set azure.identity.clientId=${identity.clientId}`,
+    `--set azure.keyvault.vaultName=${keyVaultName()}`,
+    `--set azure.keyvault.keyName=${keyName()}`,
   ]
 }
 
@@ -79,4 +81,8 @@ function oracleIdentityName(celoEnv: string) {
 
 function keyVaultName() {
   return fetchEnv(envVar.AZURE_ORACLE_KEY_VAULT_NAME)
+}
+
+function keyName() {
+  return fetchEnv(envVar.AZURE_ORACLE_KEY_NAME)
 }
