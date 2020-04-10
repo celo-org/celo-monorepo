@@ -4,7 +4,6 @@ import { installAndEnableMetricsDeps, redeployTiller } from './helm_deploy'
 import { execCmd, execCmdWithExitOnFailure, outputIncludes } from './utils'
 
 // switchToClusterFromEnv configures kubectl to connect to the AKS cluster
-// TODO(trevor): add project switching as well
 export async function switchToClusterFromEnv(
   celoEnv: string,
   checkOrPromptIfStagingOrProduction = true
@@ -28,7 +27,7 @@ export async function switchToClusterFromEnv(
     // a warning and prompt is shown asking if the existing context should be
     // overwritten. To avoid this, --overwrite-existing force overwrites.
     await execCmdWithExitOnFailure(
-      `az aks get-credentials --resource-group ${resourceGroup} --name ${clusterName} --overwrite-existing`
+      `az aks get-credentials --resource-group ${resourceGroup} --name ${clusterName} --subscription ${subscriptionId()} --overwrite-existing`
     )
   }
   await setupCluster(celoEnv)
@@ -79,4 +78,8 @@ export function resourceGroup() {
 
 export function clusterName() {
   return fetchEnv(envVar.AZURE_KUBERNETES_CLUSTER_NAME)
+}
+
+export function subscriptionId() {
+  return fetchEnv(envVar.AZURE_SUBSCRIPTION_ID)
 }

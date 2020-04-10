@@ -1,5 +1,10 @@
 import { ensureLeading0x } from '@celo/utils/src/address'
-import { clusterName, createIdentityIfNotExists, resourceGroup } from 'src/lib/azure'
+import {
+  clusterName,
+  createIdentityIfNotExists,
+  resourceGroup,
+  subscriptionId,
+} from 'src/lib/azure'
 import { getFornoUrl } from 'src/lib/endpoints'
 import { envVar, fetchEnv } from 'src/lib/env-utils'
 import { AccountType, getPrivateKeysFor } from 'src/lib/generate_utils'
@@ -37,6 +42,7 @@ async function helmParameters(celoEnv: string) {
     `--set image.tag=${fetchEnv(envVar.ORACLE_DOCKER_IMAGE_TAG)}`,
     `--set oracle.web3ProviderUrl=${getFornoUrl(celoEnv)}`,
     `--set oracle.privateKeys=\\{${oraclePrivateKeys.join(',')}\\}`,
+    `--set azure.subscriptionId=${subscriptionId()}`,
     `--set azure.identity.id=${identity.id}`,
     `--set azure.identity.clientId=${identity.clientId}`,
   ]
@@ -59,9 +65,8 @@ async function createOracleIdentityIfNotExists(celoEnv: string) {
   )
 
   // Allow the oracle identity to access the correct key vault
-  const keyVaultName = 'codyoracleprototype'
   await execCmdWithExitOnFailure(
-    `az keyvault set-policy --name ${keyVaultName} --key-permissions {get, list, sign} --object-id ${
+    `az keyvault set-policy --name ${keyVaultName()} --key-permissions {get, list, sign} --object-id ${
       identity.principalId
     } -g ${resourceGroup()}`
   )
@@ -70,4 +75,8 @@ async function createOracleIdentityIfNotExists(celoEnv: string) {
 
 function oracleIdentityName(celoEnv: string) {
   return `${celoEnv}-oracle`
+}
+
+function keyVaultName() {
+  return fetchEnv(envVar.AZURE_ORACLE_KEY_VAULT_NAME)
 }
