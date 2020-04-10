@@ -68,8 +68,7 @@ function* transferStableTokenToEscrow(action: EscrowTransferPaymentAction) {
 
     Logger.debug(TAG + '@transferToEscrow', 'Transfering to escrow')
 
-    const transferTxId = generateStandbyTransactionId(escrow.address)
-    yield call(registerStandbyTransaction, transferTxId, amount.toString(), escrow.address)
+    yield call(registerStandbyTransaction, action.txId, amount.toString(), escrow.address)
 
     const transferTx = escrow.transfer(
       phoneHash,
@@ -80,7 +79,7 @@ function* transferStableTokenToEscrow(action: EscrowTransferPaymentAction) {
       NUM_ATTESTATIONS_REQUIRED
     )
     // TODO check types
-    yield call(sendAndMonitorTransaction, transferTxId, transferTx, account)
+    yield call(sendAndMonitorTransaction, action.txId, transferTx, account)
     yield put(fetchSentEscrowPayments())
   } catch (e) {
     Logger.error(TAG + '@transferToEscrow', 'Error transfering to escrow', e)

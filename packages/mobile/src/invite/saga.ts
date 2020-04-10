@@ -178,9 +178,12 @@ export function* sendInvite(
 
     // If this invitation has a payment attached to it, send the payment to the escrow.
     if (currency === CURRENCY_ENUM.DOLLAR && amount) {
+      const escrowTxId = generateStandbyTransactionId(temporaryAddress + '-escrow')
       try {
         const phoneHash = getPhoneHash(e164Number)
-        yield put(transferEscrowedPayment(phoneHash, amount, temporaryAddress))
+        yield put(transferEscrowedPayment(phoneHash, amount, temporaryAddress, escrowTxId))
+        yield call(waitForTransactionWithId, escrowTxId)
+        Logger.debug(TAG + '@sendInviteSaga', 'Escrowed money to new wallet')
       } catch (e) {
         Logger.error(TAG, 'Error sending payment to unverified user: ', e)
         yield put(showError(ErrorMessages.ESCROW_TRANSFER_FAILED))
