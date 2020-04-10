@@ -1,7 +1,8 @@
-import { CeloContract } from '@celo/contractkit/lib'
+import { CeloContract, NULL_ADDRESS } from '@celo/contractkit/lib'
 import { ContractFactories } from '@celo/contractkit/lib/web3-contract-cache'
 import { BaseCommand } from '../../base'
 import { printValueMapRecursive } from '../../utils/cli'
+import { PROXY_ABI } from '@celo/contractkit/src/governance/proxy'
 
 export default class Contracts extends BaseCommand {
   static description = 'Prints Celo contract addesses.'
@@ -36,11 +37,28 @@ export default class Contracts extends BaseCommand {
       CeloContract.Validators,
     ]
     const res = await Promise.all(
-      lst.map(async (name) => ({ name, contract: await this.kit._web3Contracts.getContract(name) }))
+      lst.map(async (name) => {
+        try {
+          const contract = await this.kit._web3Contracts.getContract(name)
+          const proxy = new this.kit.web3.eth.Contract(PROXY_ABI)
+          proxy.options.address = contract.options.address
+          return {
+            name,
+            contract:
+              contract.options.address +
+              ' (implementation at ' +
+              (await proxy.methods._getImplementation().call()) +
+              ')',
+          }
+        } catch (err) {
+          console.log(err)
+          return { name, contract: NULL_ADDRESS }
+        }
+      })
     )
     const obj: any = {}
     for (const { name, contract } of res) {
-      obj[name] = contract.options.address
+      obj[name] = contract
     }
     printValueMapRecursive(obj)
   }
