@@ -22,6 +22,7 @@ import {
   watchSendInvite,
   withdrawFundsFromTempAccount,
 } from 'src/invite/saga'
+import { getSendFee } from 'src/send/saga'
 import { fetchDollarBalance } from 'src/stableToken/actions'
 import { transactionConfirmed } from 'src/transactions/actions'
 import { getContractKit } from 'src/web3/contracts'
@@ -106,6 +107,7 @@ describe(watchRedeemInvite, () => {
       .provide([
         [call(waitWeb3LastBlock), true],
         [call(getOrCreateAccount), mockAccount],
+        [matchers.call.fn(getSendFee), 0.1],
       ])
       .withState(state)
       .dispatch(redeemInvite(mockKey))
