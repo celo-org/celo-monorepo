@@ -145,6 +145,11 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
    * Query proposal dequeue frequency.
    * @returns Current proposal dequeue frequency in seconds.
    */
+  lastDequeue = proxyCall(this.contract.methods.lastDequeue, undefined, valueToBigNumber)
+  /**
+   * Query proposal dequeue frequency.
+   * @returns Current proposal dequeue frequency in seconds.
+   */
   dequeueFrequency = proxyCall(this.contract.methods.dequeueFrequency, undefined, valueToBigNumber)
   /**
    * Query minimum deposit required to make a proposal.
@@ -336,6 +341,11 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
    * @param proposalID Governance proposal UUID
    */
   isProposalPassing = proxyCall(this.contract.methods.isProposalPassing, tupleParser(valueToString))
+
+  /**
+   * Withdraws refunded proposal deposits.
+   */
+  withdraw = proxySend(this.kit, this.contract.methods.withdraw)
 
   /**
    * Submits a new governance proposal.

@@ -298,6 +298,12 @@ class CheckBuilder {
       this.withGovernance(async (g) => deposit.gte(await g.minDeposit()))
     )
 
+  hasRefundedDeposits = (account: Address) =>
+    this.addCheck(
+      `Account has refunded governance deposits`,
+      this.withGovernance(async (g) => !(await g.getRefundedDeposits(account)).isZero())
+    )
+
   hasEnoughLockedGold = (value: BigNumber) => {
     const valueInEth = this.kit.web3.utils.fromWei(value.toFixed(), 'ether')
     return this.addCheck(
