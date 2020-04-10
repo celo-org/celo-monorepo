@@ -34,7 +34,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>19</string>
+	<string>26</string>
 	<key>FirebaseDynamicLinksCustomDomains</key>
 	<array>
 		<string>https://l.celo.org</string>
