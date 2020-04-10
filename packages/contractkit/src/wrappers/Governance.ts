@@ -463,11 +463,11 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   /*
    * Returns information pertaining to a voter in governance.
    */
-  async getVoter(voter: Address): Promise<Voter> {
+  async getVoter(account: Address): Promise<Voter> {
     const res = await Promise.all([
-      this.getUpvoteRecord(voter),
-      this.getVoteRecords(voter),
-      this.getRefundedDeposits(voter),
+      this.getUpvoteRecord(account),
+      this.getVoteRecords(account),
+      this.getRefundedDeposits(account),
     ])
     return {
       upvote: res[0],

@@ -1534,9 +1534,14 @@ contract('Governance', (accounts: string[]) => {
 
     it("should set the voter's vote record", async () => {
       await governance.vote(proposalId, index, value)
-      const [recordProposalId, recordValue] = await governance.getVoteRecord(account, index)
-      assert.equal(recordProposalId.toNumber(), proposalId)
-      assert.equal(recordValue.toNumber(), value)
+      const [recordProposalId, recordValue, recordWeight] = await governance.getVoteRecord(
+        account,
+        index
+      )
+      console.log(proposalId, value, weight)
+      assertEqualBN(recordProposalId, proposalId)
+      assertEqualBN(recordValue, value)
+      assertEqualBN(recordWeight, weight)
     })
 
     it('should set the most recent referendum proposal voted on', async () => {

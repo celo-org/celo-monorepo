@@ -7,7 +7,7 @@ import { newCheckBuilder } from '../../utils/checks'
 import { printValueMap, printValueMapRecursive } from '../../utils/cli'
 
 export default class Show extends BaseCommand {
-  static description = 'Show information about a governance proposal, hotfix, or voter.'
+  static description = 'Show information about a governance proposal, hotfix, or account.'
 
   static flags = {
     ...BaseCommand.flags,
@@ -84,7 +84,8 @@ export default class Show extends BaseCommand {
         })
       }
     } else if (account) {
-      printValueMapRecursive(await governance.getVoter(account))
+      const accounts = await this.kit.contracts.getAccounts()
+      printValueMapRecursive(await governance.getVoter(await accounts.signerToAccount(account)))
     }
   }
 }

@@ -156,6 +156,31 @@ EXAMPLE
 
 _See code: [packages/cli/src/commands/governance/propose.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/governance/propose.ts)_
 
+### Show
+
+Show information about a governance proposal, hotfix, or account.
+
+```
+USAGE
+  $ celocli governance:show
+
+OPTIONS
+  --account=account        Address of account or voter
+  --hotfix=hotfix          Hash of hotfix proposal
+  --notwhitelisted         List validators who have not whitelisted the speicified hotfix
+  --proposalID=proposalID  UUID of proposal to view
+  --raw                    Display proposal in raw bytes format
+
+EXAMPLES
+  show --proposalID 99
+  show --proposalID 99 --raw
+  show --hotfix 0x614dccb5ac13cba47c2430bdee7829bb8c8f3603a8ace22e7680d317b39e3658
+  show --hotfix 0x614dccb5ac13cba47c2430bdee7829bb8c8f3603a8ace22e7680d317b39e3658 --notwhitelisted
+  show --account 0x47e172f6cfb6c7d01c1574fa3e2be7cc73269d95
+```
+
+_See code: [packages/cli/src/commands/governance/show.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/governance/show.ts)_
+
 ### Upvote
 
 Upvote a queued governance proposal
@@ -173,44 +198,6 @@ EXAMPLE
 ```
 
 _See code: [packages/cli/src/commands/governance/upvote.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/governance/upvote.ts)_
-
-### View
-
-View governance proposal information from ID
-
-```
-USAGE
-  $ celocli governance:view
-
-OPTIONS
-  --proposalID=proposalID  (required) UUID of proposal to view
-  --raw                    Display proposal in raw bytes format
-
-EXAMPLES
-  view --proposalID 99
-  view --proposalID 99 --raw
-```
-
-_See code: [packages/cli/src/commands/governance/view.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/governance/view.ts)_
-
-### Viewhotfix
-
-View information associated with hotfix
-
-```
-USAGE
-  $ celocli governance:viewhotfix
-
-OPTIONS
-  --hash=hash  (required) Hash of hotfix transactions
-  --notyet     Whether to list validators who have or have not yet whitelisted
-
-EXAMPLES
-  viewhotfix --hash 0x614dccb5ac13cba47c2430bdee7829bb8c8f3603a8ace22e7680d317b39e3658
-  viewhotfix --hash 0x614dccb5ac13cba47c2430bdee7829bb8c8f3603a8ace22e7680d317b39e3658 --notyet
-```
-
-_See code: [packages/cli/src/commands/governance/viewhotfix.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/governance/viewhotfix.ts)_
 
 ### Vote
 
