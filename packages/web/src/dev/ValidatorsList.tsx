@@ -105,7 +105,7 @@ class ValidatorsList extends React.PureComponent<ValidatorsListProps & I18nProps
     orderAsc: true,
   }
   private orderAccessors = {
-    name: (_) => _.name.toLowerCase(),
+    name: (_) => (_.name || '').toLowerCase(),
     total: (_) => _.numMembers * 1000 + _.elected,
     votes: (_) => +_.votesAbsolute || 0,
     gold: (_) => _.gold || 0,
