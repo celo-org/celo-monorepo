@@ -1,4 +1,4 @@
-import { trimLeading0x } from '@celo/utils/lib/address'
+import { ensureLeading0x, trimLeading0x } from '@celo/utils/lib/address'
 import { TransportStatusError } from '@ledgerhq/errors'
 import * as ethUtil from 'ethereumjs-util'
 import { transportErrorFriendlyMessage } from '../../utils/ledger-utils'
@@ -47,19 +47,18 @@ export class LedgerSigner implements Signer {
     }
   }
 
-  async signPersonalMessage(
-    data: string
-  ): Promise<{ v: number; r: Buffer | Uint8Array; s: Buffer | Uint8Array }> {
+  async signPersonalMessage(data: string): Promise<{ v: number; r: Buffer; s: Buffer }> {
     try {
-      const dataBuff = ethUtil.toBuffer(data)
-      const msgHashBuff = ethUtil.hashPersonalMessage(dataBuff)
-      const trimmedMsgHash = trimLeading0x(msgHashBuff.toString('hex'))
-      const signature = await this.ledger!.signPersonalMessage(this.derivationPath, trimmedMsgHash)
+      // Ledger's signPersonalMessage adds the 'Ethereum' header
+      const signature = await this.ledger!.signPersonalMessage(
+        this.derivationPath,
+        trimLeading0x(data)
+      )
 
       return {
         v: signature.v,
-        r: ethUtil.toBuffer(signature.r),
-        s: ethUtil.toBuffer(signature.s),
+        r: ethUtil.toBuffer(ensureLeading0x(signature.r)) as Buffer,
+        s: ethUtil.toBuffer(ensureLeading0x(signature.s)) as Buffer,
       }
     } catch (error) {
       if (error instanceof TransportStatusError) {
@@ -77,8 +76,8 @@ export class LedgerSigner implements Signer {
 
       return {
         v: parseInt(sig.v, 10),
-        r: Buffer.from(sig.r),
-        s: Buffer.from(sig.s),
+        r: ethUtil.toBuffer(ensureLeading0x(sig.r)) as Buffer,
+        s: ethUtil.toBuffer(ensureLeading0x(sig.s)) as Buffer,
       }
     } catch (error) {
       if (error instanceof TransportStatusError) {

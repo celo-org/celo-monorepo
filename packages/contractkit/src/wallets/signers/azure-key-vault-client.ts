@@ -1,6 +1,6 @@
 import { DefaultAzureCredential } from '@azure/identity'
 import { CryptographyClient, KeyClient, KeyVaultKey } from '@azure/keyvault-keys'
-import { ensureLeading0x } from '@celo/utils/src/address'
+import { ensureLeading0x } from '@celo/utils/lib/address'
 import { BigNumber } from 'bignumber.js'
 import { ec as EC } from 'elliptic'
 import * as ethUtil from 'ethereumjs-util'

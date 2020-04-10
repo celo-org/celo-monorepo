@@ -1,4 +1,3 @@
-import { EIP712TypedData } from '../../utils/sign-typed-data-utils'
 import { RLPEncodedTx } from '../../utils/signing-utils'
 
 export interface Signer {
@@ -11,11 +10,6 @@ export interface Signer {
     addToV: number,
     encodedTx: RLPEncodedTx
   ) => Promise<{ v: string; r: string; s: string }>
-  signPersonalMessage: (
-    data: string
-  ) => Promise<{ v: number; r: Buffer | Uint8Array; s: Buffer | Uint8Array }>
-  signTypedData: (
-    typedData: EIP712TypedData
-  ) => Promise<{ v: number; r: Buffer | Uint8Array; s: Buffer | Uint8Array }>
+  signPersonalMessage: (data: string) => Promise<{ v: number; r: Buffer; s: Buffer }>
   getNativeKey: () => string
 }

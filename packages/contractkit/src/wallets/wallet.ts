@@ -2,7 +2,7 @@ import { isHexString, normalizeAddressWith0x } from '@celo/utils/lib/address'
 import * as ethUtil from 'ethereumjs-util'
 import { EncodedTransaction, Tx } from 'web3-core'
 import { Address } from '../base'
-import { EIP712TypedData } from '../utils/sign-typed-data-utils'
+import { EIP712TypedData, generateTypedDataHash } from '../utils/sign-typed-data-utils'
 import {
   chainIdTransformationForSigning,
   encodeTransaction,
@@ -102,8 +102,11 @@ export abstract class WalletBase implements Wallet {
       throw Error('wallet@signTypedData: TypedData Missing')
     }
 
+    const dataBuff = generateTypedDataHash(typedData)
+    const trimmedData = dataBuff.toString('hex')
+
     const signer = this.getSigner(address)
-    const sig = await signer.signTypedData(typedData)
+    const sig = await signer.signPersonalMessage(trimmedData)
 
     return ethUtil.toRpcSig(sig.v, sig.r, sig.s)
   }

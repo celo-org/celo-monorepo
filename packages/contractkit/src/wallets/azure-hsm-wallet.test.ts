@@ -5,15 +5,12 @@ import {
   privateKeyToAddress,
   trimLeading0x,
 } from '@celo/utils/lib/address'
+import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import { BigNumber } from 'bignumber.js'
 import * as ethUtil from 'ethereumjs-util'
 import Web3 from 'web3'
 import { EncodedTransaction, Tx } from 'web3-core'
-import {
-  recoverEIP712TypedDataSigner,
-  recoverMessageSigner,
-  recoverTransaction,
-} from '../utils/signing-utils'
+import { recoverTransaction, verifyEIP712TypedDataSigner } from '../utils/signing-utils'
 import { AzureHSMWallet } from './azure-hsm-wallet'
 import { Signature } from './signers/azure-key-vault-client'
 
@@ -136,6 +133,27 @@ describe('AzureHSMWallet class', () => {
   })
 
   describe('without initializing', () => {
+    const knownAddress = ACCOUNT_ADDRESS1
+    let celoTransaction: Tx
+    beforeEach(() => {
+      return new Promise(async (resolve) => {
+        celoTransaction = {
+          from: knownAddress,
+          to: knownAddress,
+          chainId: CHAIN_ID,
+          value: Web3.utils.toWei('1', 'ether'),
+          nonce: 0,
+          gas: '10',
+          gasPrice: '99',
+          feeCurrency: '0x124356',
+          gatewayFeeRecipient: '0x1234',
+          gatewayFee: '0x5678',
+          data: '0xabcdef',
+        }
+        resolve()
+      })
+    })
+
     test('fails calling getAccounts', () => {
       try {
         wallet.getAccounts()
@@ -152,15 +170,8 @@ describe('AzureHSMWallet class', () => {
       }
     })
 
-    test('fails calling getAccounts', async () => {
-      const txParams: Tx = {
-        nonce: 1,
-        gas: 'test',
-        to: 'test',
-        from: ACCOUNT_ADDRESS1,
-        chainId: CHAIN_ID,
-      }
-      await expect(wallet.signTransaction(txParams)).rejects.toThrowError()
+    test('fails calling signTransaction', async () => {
+      await expect(wallet.signTransaction(celoTransaction)).rejects.toThrowError()
     })
 
     test('fails calling signPersonalMessage', async () => {
@@ -199,7 +210,7 @@ describe('AzureHSMWallet class', () => {
               celoTransaction = {
                 from: unknownAddress,
                 to: unknownAddress,
-                chainId: 2,
+                chainId: CHAIN_ID,
                 value: Web3.utils.toWei('1', 'ether'),
                 nonce: 0,
                 gas: '10',
@@ -259,7 +270,7 @@ describe('AzureHSMWallet class', () => {
               celoTransaction = {
                 from: knownAddress,
                 to: otherAddress,
-                chainId: 2,
+                chainId: CHAIN_ID,
                 value: Web3.utils.toWei('1', 'ether'),
                 nonce: 0,
                 gas: '10',
@@ -293,10 +304,8 @@ describe('AzureHSMWallet class', () => {
               const hexStr: string = ACCOUNT_ADDRESS1
               const signedMessage = await wallet.signPersonalMessage(knownAddress, hexStr)
               expect(signedMessage).not.toBeUndefined()
-              const recoveredSigner = recoverMessageSigner(hexStr, signedMessage)
-              expect(normalizeAddressWith0x(recoveredSigner)).toBe(
-                normalizeAddressWith0x(knownAddress)
-              )
+              const valid = verifySignature(hexStr, signedMessage, knownAddress)
+              expect(valid).toBeTruthy()
             })
           })
 
@@ -304,10 +313,8 @@ describe('AzureHSMWallet class', () => {
             test('succeeds', async () => {
               const signedMessage = await wallet.signTypedData(knownAddress, TYPED_DATA)
               expect(signedMessage).not.toBeUndefined()
-              const recoveredSigner = recoverEIP712TypedDataSigner(TYPED_DATA, signedMessage)
-              expect(normalizeAddressWith0x(recoveredSigner)).toBe(
-                normalizeAddressWith0x(knownAddress)
-              )
+              const valid = verifyEIP712TypedDataSigner(TYPED_DATA, signedMessage, knownAddress)
+              expect(valid).toBeTruthy()
             })
           })
         })

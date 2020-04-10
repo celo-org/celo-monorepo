@@ -6,6 +6,7 @@ import * as ethUtil from 'ethereumjs-util'
 import { EncodedTransaction, Tx } from 'web3-core'
 import * as helpers from 'web3-core-helpers'
 import { EIP712TypedData, generateTypedDataHash } from './sign-typed-data-utils'
+import { verifySignature } from '@celo/utils/lib/signatureUtils'
 
 const debug = debugFactory('kit:tx:sign')
 
@@ -187,14 +188,13 @@ export function recoverMessageSigner(signingDataHex: string, signedData: string)
   return ensureLeading0x(address.toString('hex'))
 }
 
-export function recoverEIP712TypedDataSigner(
+export function verifyEIP712TypedDataSigner(
   typedData: EIP712TypedData,
-  signedData: string
-): string {
+  signedData: string,
+  expectedAddress: string
+): boolean {
   const dataBuff = generateTypedDataHash(typedData)
-  const signature = ethUtil.fromRpcSig(signedData)
-
-  const publicKey = ethUtil.ecrecover(dataBuff, signature.v, signature.r, signature.s)
-  const address = ethUtil.pubToAddress(publicKey, true)
-  return ensureLeading0x(address.toString('hex'))
+  const trimmedData = dataBuff.toString('hex')
+  const valid = verifySignature(ensureLeading0x(trimmedData), signedData, expectedAddress)
+  return valid
 }

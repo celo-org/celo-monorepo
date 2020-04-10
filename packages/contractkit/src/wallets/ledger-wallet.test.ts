@@ -4,6 +4,8 @@ import {
   privateKeyToAddress,
   trimLeading0x,
 } from '@celo/utils/lib/address'
+import { verifySignature } from '@celo/utils/lib/signatureUtils'
+import TransportNodeHid from '@ledgerhq/hw-transport-node-hid'
 // @ts-ignore-next-line
 import { account as Account } from 'eth-lib'
 import * as ethUtil from 'ethereumjs-util'
@@ -12,11 +14,15 @@ import { EncodedTransaction, Tx } from 'web3-core'
 import {
   chainIdTransformationForSigning,
   getHashFromEncoded,
-  recoverEIP712TypedDataSigner,
-  recoverMessageSigner,
   recoverTransaction,
+  verifyEIP712TypedDataSigner,
 } from '../utils/signing-utils'
 import { LedgerWallet } from './ledger-wallet'
+
+// Update this variable when testing using a physical device
+const USE_PHYSICAL_LEDGER = false
+// Increase timeout to give developer time to respond on device
+const TEST_TIMEOUT_IN_MS = USE_PHYSICAL_LEDGER ? 30 * 1000 : 1 * 1000
 
 const PRIVATE_KEY1 = '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
 const ACCOUNT_ADDRESS1 = normalizeAddressWith0x(privateKeyToAddress(PRIVATE_KEY1))
@@ -54,7 +60,7 @@ const ledgerAddreses: { [myKey: string]: { address: string; privateKey: string }
   },
 }
 
-const CHAIN_ID = 44378
+const CHAIN_ID = 44313
 
 // Sample data from the official EIP-712 example:
 // https://github.com/ethereum/EIPs/blob/master/assets/eip-712/Example.js
@@ -98,8 +104,28 @@ const TYPED_DATA = {
 
 describe('LedgerWallet class', () => {
   let wallet: LedgerWallet
+  let hardwareWallet: LedgerWallet
+  let knownAddress = ACCOUNT_ADDRESS1
+  let otherAddress = ACCOUNT_ADDRESS2
+  const unknownAddress = ACCOUNT_ADDRESS_NEVER
 
-  beforeEach(() => {
+  beforeEach(async (resolve) => {
+    jest.setTimeout(TEST_TIMEOUT_IN_MS)
+
+    if (USE_PHYSICAL_LEDGER) {
+      try {
+        // Use physical ledger if present
+        // Recreation of the connection will fail, therefore we use a single object
+        if (!hardwareWallet) {
+          const transport: Transport = await TransportNodeHid.open('')
+          hardwareWallet = await new LedgerWallet(undefined, undefined, transport)
+        }
+      } catch (e) {
+        throw new Error(
+          'Failed to connect to ledger. Ensure the Celo app is open and not already connected with a separate client'
+        )
+      }
+    }
     wallet = new LedgerWallet()
     jest.spyOn<any, any>(wallet, 'generateNewLedger').mockImplementation((_transport: any) => {
       return {
@@ -123,19 +149,46 @@ describe('LedgerWallet class', () => {
         },
         signPersonalMessage: async (derivationPath: string, data: string) => {
           if (ledgerAddreses[derivationPath]) {
+            const dataBuff = ethUtil.toBuffer(ensureLeading0x(data))
+            const msgHashBuff = ethUtil.hashPersonalMessage(dataBuff)
+
             const trimmedKey = trimLeading0x(ledgerAddreses[derivationPath].privateKey)
             const pkBuffer = Buffer.from(trimmedKey, 'hex')
-            const dataBuff = Buffer.from(data, 'hex')
-            const signature = ethUtil.ecsign(dataBuff, pkBuffer)
-            return signature
+            const signature = ethUtil.ecsign(msgHashBuff, pkBuffer)
+            return {
+              v: signature.v,
+              r: signature.r.toString('hex'),
+              s: signature.s.toString('hex'),
+            }
           }
           throw new Error('Invalid Path')
         },
       }
     })
+    resolve()
   })
 
   describe('without initializing', () => {
+    let celoTransaction: Tx
+    beforeAll(() => {
+      return new Promise(async (resolve) => {
+        celoTransaction = {
+          from: knownAddress,
+          to: knownAddress,
+          chainId: CHAIN_ID,
+          value: Web3.utils.toWei('1', 'ether'),
+          nonce: 0,
+          gas: '10',
+          gasPrice: '99',
+          feeCurrency: '0x124356',
+          gatewayFeeRecipient: '0x1234',
+          gatewayFee: '0x5678',
+          data: '0xabcdef',
+        }
+        resolve()
+      })
+    })
+
     test('fails calling getAccounts', () => {
       try {
         wallet.getAccounts()
@@ -152,15 +205,8 @@ describe('LedgerWallet class', () => {
       }
     })
 
-    test('fails calling getAccounts', async () => {
-      const txParams: Tx = {
-        nonce: 1,
-        gas: 'test',
-        to: 'test',
-        from: ACCOUNT_ADDRESS1,
-        chainId: CHAIN_ID,
-      }
-      await expect(wallet.signTransaction(txParams)).rejects.toThrowError()
+    test('fails calling signTransaction', async () => {
+      await expect(wallet.signTransaction(celoTransaction)).rejects.toThrowError()
     })
 
     test('fails calling signPersonalMessage', async () => {
@@ -173,16 +219,24 @@ describe('LedgerWallet class', () => {
   })
 
   describe('after initializing', () => {
-    beforeEach(async () => {
+    beforeEach(async (resolve) => {
+      if (USE_PHYSICAL_LEDGER) {
+        wallet = hardwareWallet
+      }
       await wallet.init()
-    })
+      if (USE_PHYSICAL_LEDGER) {
+        knownAddress = wallet.getAccounts()[0]
+        otherAddress = wallet.getAccounts()[1]
+      }
+      resolve()
+    }, TEST_TIMEOUT_IN_MS)
 
     test('starts 5 accounts', () => {
       expect(wallet.getAccounts().length).toBe(5)
     })
 
     test('returns true if it has the accounts', () => {
-      expect(wallet.hasAccount(ACCOUNT_ADDRESS1)).toBeTruthy()
+      expect(wallet.hasAccount(knownAddress)).toBeTruthy()
     })
 
     test('returns false if it has the accounts', () => {
@@ -190,37 +244,54 @@ describe('LedgerWallet class', () => {
     })
 
     describe('with an account', () => {
-      const knownAddress = ACCOUNT_ADDRESS1
-      const otherAddress = ACCOUNT_ADDRESS2
+      let celoTransaction: Tx
+      beforeEach(() => {
+        return new Promise(async (resolve) => {
+          celoTransaction = {
+            from: unknownAddress,
+            to: unknownAddress,
+            chainId: CHAIN_ID,
+            value: Web3.utils.toWei('1', 'ether'),
+            nonce: 0,
+            gas: '10',
+            gasPrice: '99',
+            feeCurrency: '0x124356',
+            gatewayFeeRecipient: '0x1234',
+            gatewayFee: '0x5678',
+            data: '0xabcdef',
+          }
+          resolve()
+        })
+      })
 
       describe('signing', () => {
         describe('using an unknown address', () => {
-          const unknownAddress: string = ACCOUNT_ADDRESS_NEVER
           test('fails calling signTransaction', async () => {
-            const txParams: Tx = {
-              nonce: 1,
-              gas: 'test',
-              to: 'test',
-              from: unknownAddress,
-              chainId: CHAIN_ID,
-            }
-            await expect(wallet.signTransaction(txParams)).rejects.toThrowError()
+            await expect(wallet.signTransaction(celoTransaction)).rejects.toThrowError()
           })
 
-          test('fails calling signPersonalMessage', async () => {
-            const hexStr: string = '0xa1'
-            await expect(wallet.signPersonalMessage(unknownAddress, hexStr)).rejects.toThrowError()
-          })
+          test(
+            'fails calling signPersonalMessage',
+            async () => {
+              const hexStr: string = '0xa1'
+              await expect(
+                wallet.signPersonalMessage(unknownAddress, hexStr)
+              ).rejects.toThrowError()
+            },
+            TEST_TIMEOUT_IN_MS
+          )
 
-          test('fails calling signTypedData', async () => {
-            await expect(wallet.signTypedData(unknownAddress, TYPED_DATA)).rejects.toThrowError()
-          })
+          test(
+            'fails calling signTypedData',
+            async () => {
+              await expect(wallet.signTypedData(unknownAddress, TYPED_DATA)).rejects.toThrowError()
+            },
+            TEST_TIMEOUT_IN_MS
+          )
         })
 
         describe('using a known address', () => {
           describe('when calling signTransaction', () => {
-            let celoTransaction: Tx
-
             beforeEach(() => {
               celoTransaction = {
                 from: knownAddress,
@@ -237,41 +308,53 @@ describe('LedgerWallet class', () => {
               }
             })
 
-            test('succeeds', async () => {
-              await expect(wallet.signTransaction(celoTransaction)).resolves.not.toBeUndefined()
-            })
+            test(
+              'succeeds',
+              async () => {
+                await expect(wallet.signTransaction(celoTransaction)).resolves.not.toBeUndefined()
+              },
+              TEST_TIMEOUT_IN_MS
+            )
 
-            test('with same signer', async () => {
-              const signedTx: EncodedTransaction = await wallet.signTransaction(celoTransaction)
-              const [, recoveredSigner] = recoverTransaction(signedTx.raw)
-              expect(normalizeAddressWith0x(recoveredSigner)).toBe(
-                normalizeAddressWith0x(knownAddress)
-              )
-            })
+            test(
+              'with same signer',
+              async () => {
+                const signedTx: EncodedTransaction = await wallet.signTransaction(celoTransaction)
+                const [, recoveredSigner] = recoverTransaction(signedTx.raw)
+                expect(normalizeAddressWith0x(recoveredSigner)).toBe(
+                  normalizeAddressWith0x(knownAddress)
+                )
+              },
+              TEST_TIMEOUT_IN_MS
+            )
           })
         })
 
         describe('when calling signPersonalMessage', () => {
-          test('succeeds', async () => {
-            const hexStr: string = ACCOUNT_ADDRESS1
-            const signedMessage = await wallet.signPersonalMessage(knownAddress, hexStr)
-            expect(signedMessage).not.toBeUndefined()
-            const recoveredSigner = recoverMessageSigner(hexStr, signedMessage)
-            expect(normalizeAddressWith0x(recoveredSigner)).toBe(
-              normalizeAddressWith0x(knownAddress)
-            )
-          })
+          test(
+            'succeeds',
+            async () => {
+              const hexStr: string = ACCOUNT_ADDRESS1
+              const signedMessage = await wallet.signPersonalMessage(knownAddress, hexStr)
+              expect(signedMessage).not.toBeUndefined()
+              const valid = verifySignature(hexStr, signedMessage, knownAddress)
+              expect(valid).toBeTruthy()
+            },
+            TEST_TIMEOUT_IN_MS
+          )
         })
 
         describe('when calling signTypedData', () => {
-          test('succeeds', async () => {
-            const signedMessage = await wallet.signTypedData(knownAddress, TYPED_DATA)
-            expect(signedMessage).not.toBeUndefined()
-            const recoveredSigner = recoverEIP712TypedDataSigner(TYPED_DATA, signedMessage)
-            expect(normalizeAddressWith0x(recoveredSigner)).toBe(
-              normalizeAddressWith0x(knownAddress)
-            )
-          })
+          test(
+            'succeeds',
+            async () => {
+              const signedMessage = await wallet.signTypedData(knownAddress, TYPED_DATA)
+              expect(signedMessage).not.toBeUndefined()
+              const valid = verifyEIP712TypedDataSigner(TYPED_DATA, signedMessage, knownAddress)
+              expect(valid).toBeTruthy()
+            },
+            TEST_TIMEOUT_IN_MS
+          )
         })
       })
     })

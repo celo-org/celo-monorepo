@@ -1,3 +1,4 @@
+import { sleep } from '@celo/utils/lib/async'
 import { EncodedTransaction, Tx } from 'web3-core'
 import { Address } from '../base'
 import { EIP712TypedData } from '../utils/sign-typed-data-utils'
@@ -10,6 +11,7 @@ import { Wallet, WalletBase } from './wallet'
 export abstract class RemoteWallet extends WalletBase implements Wallet {
   private setupFinished = false
   private setupLocked = false
+  private INIT_TIMEOUT_IN_MS = 10 * 1000
 
   /**
    * Discovers wallet accounts and caches results in memory
@@ -17,6 +19,7 @@ export abstract class RemoteWallet extends WalletBase implements Wallet {
    */
   async init() {
     if (this.setupLocked || this.setupFinished) {
+      await this.initCompleted()
       return
     }
     try {
@@ -29,6 +32,22 @@ export abstract class RemoteWallet extends WalletBase implements Wallet {
     } finally {
       this.setupLocked = false
     }
+  }
+
+  /**
+   * Monitor the initialization state until it reaches completion or time out
+   */
+  private async initCompleted() {
+    let initTimeout = this.INIT_TIMEOUT_IN_MS
+    const sleepIntervalInMs = 1 * 1000
+    while (initTimeout > 0) {
+      initTimeout -= sleepIntervalInMs
+      if (this.setupFinished) {
+        return
+      }
+      await sleep(sleepIntervalInMs)
+    }
+    throw new Error('Initialization took too long. Ensure the wallet signer is available')
   }
 
   /**

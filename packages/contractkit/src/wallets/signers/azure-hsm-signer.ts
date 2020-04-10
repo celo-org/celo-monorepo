@@ -1,6 +1,5 @@
-import { trimLeading0x } from '@celo/utils/lib/address'
+import { trimLeading0x, ensureLeading0x } from '@celo/utils/lib/address'
 import * as ethUtil from 'ethereumjs-util'
-import { EIP712TypedData, generateTypedDataHash } from '../../utils/sign-typed-data-utils'
 import { getHashFromEncoded, RLPEncodedTx } from '../../utils/signing-utils'
 import { AzureKeyVaultClient } from './azure-key-vault-client'
 import { Signer } from './signer'
@@ -32,26 +31,10 @@ export class AzureHSMSigner implements Signer {
     }
   }
 
-  async signPersonalMessage(
-    data: string
-  ): Promise<{ v: number; r: Buffer | Uint8Array; s: Buffer | Uint8Array }> {
-    const dataBuff = ethUtil.toBuffer(data)
+  async signPersonalMessage(data: string): Promise<{ v: number; r: Buffer; s: Buffer }> {
+    const dataBuff = ethUtil.toBuffer(ensureLeading0x(data))
     const msgHashBuff = ethUtil.hashPersonalMessage(dataBuff)
     const signature = await this.keyVaultClient.signMessage(Buffer.from(msgHashBuff), this.keyName)
-    const sigV = signature.v + 27
-
-    return {
-      v: sigV,
-      r: signature.r,
-      s: signature.s,
-    }
-  }
-
-  async signTypedData(
-    typedData: EIP712TypedData
-  ): Promise<{ v: number; r: Buffer | Uint8Array; s: Buffer | Uint8Array }> {
-    const dataBuff = generateTypedDataHash(typedData)
-    const signature = await this.keyVaultClient.signMessage(dataBuff, this.keyName)
     const sigV = signature.v + 27
 
     return {

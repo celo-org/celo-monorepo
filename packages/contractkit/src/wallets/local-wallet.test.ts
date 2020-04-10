@@ -1,13 +1,49 @@
 import { normalizeAddressWith0x, privateKeyToAddress } from '@celo/utils/lib/address'
+import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import Web3 from 'web3'
 import { EncodedTransaction, Tx } from 'web3-core'
-import { EIP712TypedData } from '../utils/sign-typed-data-utils'
-import {
-  recoverEIP712TypedDataSigner,
-  recoverMessageSigner,
-  recoverTransaction,
-} from '../utils/signing-utils'
+import { recoverTransaction, verifyEIP712TypedDataSigner } from '../utils/signing-utils'
 import { LocalWallet } from './local-wallet'
+
+// Sample data from the official EIP-712 example:
+// https://github.com/ethereum/EIPs/blob/master/assets/eip-712/Example.js
+const TYPED_DATA = {
+  types: {
+    EIP712Domain: [
+      { name: 'name', type: 'string' },
+      { name: 'version', type: 'string' },
+      { name: 'chainId', type: 'uint256' },
+      { name: 'verifyingContract', type: 'address' },
+    ],
+    Person: [
+      { name: 'name', type: 'string' },
+      { name: 'wallet', type: 'address' },
+    ],
+    Mail: [
+      { name: 'from', type: 'Person' },
+      { name: 'to', type: 'Person' },
+      { name: 'contents', type: 'string' },
+    ],
+  },
+  primaryType: 'Mail',
+  domain: {
+    name: 'Ether Mail',
+    version: '1',
+    chainId: 1,
+    verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC',
+  },
+  message: {
+    from: {
+      name: 'Cow',
+      wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+    },
+    to: {
+      name: 'Bob',
+      wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+    },
+    contents: 'Hello, Bob!',
+  },
+}
 
 const PRIVATE_KEY1 = '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
 const ACCOUNT_ADDRESS1 = normalizeAddressWith0x(privateKeyToAddress(PRIVATE_KEY1))
@@ -57,16 +93,30 @@ describe('Local wallet class', () => {
 
     describe('signing', () => {
       describe('using an unknown address', () => {
+        let celoTransaction: Tx
         const unknownAddress: string = ACCOUNT_ADDRESS2
+
+        beforeEach(() => {
+          return new Promise(async (resolve) => {
+            celoTransaction = {
+              from: unknownAddress,
+              to: unknownAddress,
+              chainId: 2,
+              value: Web3.utils.toWei('1', 'ether'),
+              nonce: 0,
+              gas: '10',
+              gasPrice: '99',
+              feeCurrency: '0x124356',
+              gatewayFeeRecipient: '0x1234',
+              gatewayFee: '0x5678',
+              data: '0xabcdef',
+            }
+            resolve()
+          })
+        })
+
         test('fails calling signTransaction', async () => {
-          const tsParams: Tx = {
-            nonce: 1,
-            gas: 'test',
-            to: 'test',
-            from: unknownAddress,
-            chainId: 1,
-          }
-          await expect(wallet.signTransaction(tsParams)).rejects.toThrowError()
+          await expect(wallet.signTransaction(celoTransaction)).rejects.toThrowError()
         })
 
         test('fails calling signPersonalMessage', async () => {
@@ -75,13 +125,7 @@ describe('Local wallet class', () => {
         })
 
         test('fails calling signTypedData', async () => {
-          const typedData: EIP712TypedData = {
-            types: { test: [{ name: 'test', type: 'string' }] },
-            domain: { test: 'test' },
-            message: { test: 'test' },
-            primaryType: 'test',
-          }
-          await expect(wallet.signTypedData(unknownAddress, typedData)).rejects.toThrowError()
+          await expect(wallet.signTypedData(unknownAddress, TYPED_DATA)).rejects.toThrowError()
         })
       })
 
@@ -123,61 +167,17 @@ describe('Local wallet class', () => {
             const hexStr: string = ACCOUNT_ADDRESS1
             const signedMessage = await wallet.signPersonalMessage(knownAddress, hexStr)
             expect(signedMessage).not.toBeUndefined()
-            const recoveredSigner = recoverMessageSigner(hexStr, signedMessage)
-            expect(normalizeAddressWith0x(recoveredSigner)).toBe(
-              normalizeAddressWith0x(knownAddress)
-            )
+            const valid = verifySignature(hexStr, signedMessage, knownAddress)
+            expect(valid).toBeTruthy()
           })
         })
 
         describe('when calling signTypedData', () => {
           test('succeeds', async () => {
-            // Sample data from the official EIP-712 example:
-            // https://github.com/ethereum/EIPs/blob/master/assets/eip-712/Example.js
-            const typedData = {
-              types: {
-                EIP712Domain: [
-                  { name: 'name', type: 'string' },
-                  { name: 'version', type: 'string' },
-                  { name: 'chainId', type: 'uint256' },
-                  { name: 'verifyingContract', type: 'address' },
-                ],
-                Person: [
-                  { name: 'name', type: 'string' },
-                  { name: 'wallet', type: 'address' },
-                ],
-                Mail: [
-                  { name: 'from', type: 'Person' },
-                  { name: 'to', type: 'Person' },
-                  { name: 'contents', type: 'string' },
-                ],
-              },
-              primaryType: 'Mail',
-              domain: {
-                name: 'Ether Mail',
-                version: '1',
-                chainId: 1,
-                verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC',
-              },
-              message: {
-                from: {
-                  name: 'Cow',
-                  wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
-                },
-                to: {
-                  name: 'Bob',
-                  wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
-                },
-                contents: 'Hello, Bob!',
-              },
-            }
-
-            const signedMessage = await wallet.signTypedData(knownAddress, typedData)
+            const signedMessage = await wallet.signTypedData(knownAddress, TYPED_DATA)
             expect(signedMessage).not.toBeUndefined()
-            const recoveredSigner = recoverEIP712TypedDataSigner(typedData, signedMessage)
-            expect(normalizeAddressWith0x(recoveredSigner)).toBe(
-              normalizeAddressWith0x(knownAddress)
-            )
+            const valid = verifyEIP712TypedDataSigner(TYPED_DATA, signedMessage, knownAddress)
+            expect(valid).toBeTruthy()
           })
         })
       })

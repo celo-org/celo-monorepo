@@ -1,8 +1,7 @@
-import { trimLeading0x } from '@celo/utils/lib/address'
+import { ensureLeading0x, trimLeading0x } from '@celo/utils/lib/address'
 // @ts-ignore-next-line
 import { account as Account } from 'eth-lib'
 import * as ethUtil from 'ethereumjs-util'
-import { EIP712TypedData, generateTypedDataHash } from '../../utils/sign-typed-data-utils'
 import { getHashFromEncoded, RLPEncodedTx } from '../../utils/signing-utils'
 import { Signer } from './signer'
 
@@ -35,23 +34,10 @@ export class LocalSigner implements Signer {
     const trimmedKey = trimLeading0x(this.privateKey)
     const pkBuffer = Buffer.from(trimmedKey, 'hex')
 
-    const dataBuff = ethUtil.toBuffer(data)
+    const dataBuff = ethUtil.toBuffer(ensureLeading0x(data))
     const msgHashBuff = ethUtil.hashPersonalMessage(dataBuff)
 
     const sig = ethUtil.ecsign(msgHashBuff, pkBuffer)
-    return {
-      v: parseInt(sig.v, 10),
-      r: Buffer.from(sig.r),
-      s: Buffer.from(sig.s),
-    }
-  }
-
-  async signTypedData(typedData: EIP712TypedData): Promise<{ v: number; r: Buffer; s: Buffer }> {
-    const dataBuff = generateTypedDataHash(typedData)
-    // ecsign needs a privateKey without 0x
-    const trimmedKey = trimLeading0x(this.privateKey)
-    const pkBuffer = Buffer.from(trimmedKey, 'hex')
-    const sig = ethUtil.ecsign(dataBuff, pkBuffer)
     return {
       v: parseInt(sig.v, 10),
       r: Buffer.from(sig.r),
