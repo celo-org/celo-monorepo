@@ -5438,7 +5438,7 @@ Deploy a Full Node or Validator and win prizes.
                 className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
                 data-focusable={true}
                 dir="auto"
-                href="https://docs.celo.org/getting-started/running-a-validator"
+                href="https://docs.celo.org/getting-started/baklava-testnet/running-a-validator-in-baklava"
                 onClick={[Function]}
                 onMouseEnter={[Function]}
                 role="link"
