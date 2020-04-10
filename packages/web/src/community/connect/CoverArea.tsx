@@ -1,63 +1,75 @@
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import CeloRoles from 'src/community/connect/CeloRoles'
-import { H4 } from 'src/fonts/Fonts'
+import { H1, H4 } from 'src/fonts/Fonts'
 import EmailForm from 'src/forms/EmailForm'
-import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
+import { NameSpaces, useTranslation } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
-import { ScreenProps, withScreenSize } from 'src/layout/ScreenSize'
-import { colors, fonts, standardStyles, textStyles } from 'src/styles'
+import { useScreenSize } from 'src/layout/ScreenSize'
+import { HEADER_HEIGHT } from 'src/shared/Styles'
+import { colors, standardStyles, textStyles } from 'src/styles'
 
-type Props = ScreenProps & I18nProps
-class CoverArea extends React.PureComponent<Props> {
-  render() {
-    const { t } = this.props
-    return (
-      <GridRow
-        allStyle={standardStyles.centered}
-        desktopStyle={[standardStyles.sectionMarginBottom, styles.fullScreen]}
-        tabletStyle={standardStyles.sectionMarginBottomTablet}
-        mobileStyle={standardStyles.sectionMarginBottomMobile}
-      >
-        <Cell span={Spans.full} style={standardStyles.centered}>
-          <CeloRoles />
-          <FourWords />
-          <View
-            style={[
-              standardStyles.centered,
-              styles.ctaArea,
-              standardStyles.blockMarginTop,
-              styles.fadeIn,
-            ]}
-          >
-            <H4 style={[textStyles.center, standardStyles.elementalMargin]}>
-              {t('cover.joinMovement')}
-            </H4>
-            <EmailForm submitText={t('common:signUp')} route={'/contacts'} isDarkMode={false} />
-          </View>
-        </Cell>
-      </GridRow>
-    )
-  }
-}
-
-function FourWords() {
+export default React.memo(function CoverArea() {
+  const { t } = useTranslation(NameSpaces.community)
   return (
-    <View style={standardStyles.centered}>
-      <Text style={[fonts.specialOneOff, textStyles.center]}>
+    <GridRow
+      allStyle={[standardStyles.centered, styles.fullScreen]}
+      desktopStyle={styles.root}
+      tabletStyle={styles.root}
+      mobileStyle={styles.mobileRoot}
+    >
+      <Cell span={Spans.full} style={styles.content}>
+        <CeloRoles />
+        <FourWords />
+        <View
+          style={[
+            standardStyles.centered,
+            styles.ctaArea,
+            // isMobile ? standardStyles.elementalMarginTop : standardStyles.blockMarginTop,
+            styles.fadeIn,
+          ]}
+        >
+          <H4 style={[textStyles.center, standardStyles.elementalMargin]}>
+            {t('cover.joinMovement')}
+          </H4>
+          <EmailForm submitText={t('common:signUp')} route={'/contacts'} isDarkMode={false} />
+        </View>
+      </Cell>
+    </GridRow>
+  )
+})
+
+const FourWords = React.memo(function _FourWords() {
+  const { isTablet } = useScreenSize()
+  return (
+    <View style={[standardStyles.centered, isTablet && standardStyles.elementalMargin]}>
+      <H1 style={textStyles.center}>
         <Text style={[styles.fadeIn, styles.developers]}>Developers. </Text>
         <Text style={[styles.fadeIn, styles.designers]}>Designers. </Text>
         <Text style={[styles.fadeIn, styles.dreamers]}>Dreamers. </Text>
         <Text style={[styles.fadeIn, styles.doers]}>Doers. </Text>
-      </Text>
+      </H1>
     </View>
   )
-}
+})
 
 const styles = StyleSheet.create({
   fullScreen: {
     width: '100vw',
-    height: '100vh',
+    minHeight: `100vh`,
+  },
+  mobileRoot: {
+    paddingTop: HEADER_HEIGHT,
+  },
+  root: { flexDirection: 'column' },
+  content: {
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'space-around',
+    flexGrow: 1,
+    flexBasis: '100%',
+    height: '100%',
+    marginTop: 15,
   },
   developers: {
     color: colors.primaryPress,
@@ -69,21 +81,18 @@ const styles = StyleSheet.create({
   },
   dreamers: {
     color: colors.redScreen,
-    animationDelay: '5200ms',
+    animationDelay: '4900ms',
   },
   doers: {
     color: colors.blueScreen,
     animationDelay: '6400ms',
   },
   ctaArea: {
-    animationDelay: '8s',
-    paddingHorizontal: 65,
-    marginBottom: 50,
-    maxWidth: 600,
+    animationDelay: '7500ms',
+    maxWidth: 550,
     width: '100%',
   },
   fadeIn: {
-    marginHorizontal: 20,
     animationDuration: `500ms`,
     animationFillMode: 'both',
     animationIterationCount: 1,
@@ -100,5 +109,3 @@ const styles = StyleSheet.create({
     ],
   },
 })
-
-export default withNamespaces(NameSpaces.community)(withScreenSize(CoverArea))

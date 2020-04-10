@@ -14,7 +14,7 @@ export default class LottieBase extends React.Component<Props> {
   componentDidMount = () => {
     this.animation = lottie.loadAnimation({
       container: this.elementRef.current,
-      renderer: 'canvas',
+      renderer: 'svg',
       loop: this.props.loop,
       autoplay: true,
       animationData: this.props.data,

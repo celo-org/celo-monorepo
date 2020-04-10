@@ -180,14 +180,6 @@ export const fontInfo: Record<string, TextStyle> = {
     fontFamily: typeFaces.futura,
     textRendering: 'geometricPrecision',
   },
-  specialOneOff: {
-    fontFamily: typeFaces.garamond,
-    textRendering: 'geometricPrecision',
-    // @ts-ignore
-    fontSize: 'calc(33px + 0.25vw)',
-    // @ts-ignore
-    lineHeight: `calc(33px + 0.25vw)`,
-  },
 }
 
 export const fonts = StyleSheet.create(fontInfo)
