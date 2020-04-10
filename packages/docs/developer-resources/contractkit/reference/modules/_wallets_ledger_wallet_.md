@@ -2,6 +2,10 @@
 
 ## Index
 
+### Enumerations
+
+* [AddressValidation](../enums/_wallets_ledger_wallet_.addressvalidation.md)
+
 ### Classes
 
 * [LedgerWallet](../classes/_wallets_ledger_wallet_.ledgerwallet.md)
@@ -26,9 +30,9 @@
 
 ###  newLedgerWalletWithSetup
 
-▸ **newLedgerWalletWithSetup**(`transport`: any, `derivationPathIndexes?`: number[], `baseDerivationPath?`: undefined | string): *Promise‹[LedgerWallet](../classes/_wallets_ledger_wallet_.ledgerwallet.md)›*
+▸ **newLedgerWalletWithSetup**(`transport`: any, `derivationPathIndexes?`: number[], `baseDerivationPath?`: undefined | string, `ledgerAddressValidation?`: [AddressValidation](../enums/_wallets_ledger_wallet_.addressvalidation.md)): *Promise‹[LedgerWallet](../classes/_wallets_ledger_wallet_.ledgerwallet.md)›*
 
-*Defined in [contractkit/src/wallets/ledger-wallet.ts:25](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/ledger-wallet.ts#L25)*
+*Defined in [contractkit/src/wallets/ledger-wallet.ts:32](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/ledger-wallet.ts#L32)*
 
 **Parameters:**
 
@@ -37,5 +41,6 @@ Name | Type |
 `transport` | any |
 `derivationPathIndexes?` | number[] |
 `baseDerivationPath?` | undefined &#124; string |
+`ledgerAddressValidation?` | [AddressValidation](../enums/_wallets_ledger_wallet_.addressvalidation.md) |
 
 **Returns:** *Promise‹[LedgerWallet](../classes/_wallets_ledger_wallet_.ledgerwallet.md)›*
