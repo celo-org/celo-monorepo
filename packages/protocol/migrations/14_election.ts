@@ -1,8 +1,12 @@
+/* tslint:disable:no-console */
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
-import { deploymentForCoreContract } from '@celo/protocol/lib/web3-utils'
+import {
+  deploymentForCoreContract,
+  getDeployedProxiedContract,
+} from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
 import { toFixed } from '@celo/utils/lib/fixidity'
-import { ElectionInstance } from 'types'
+import { ElectionInstance, FreezerInstance } from 'types'
 
 const initializeArgs = async (): Promise<any[]> => {
   return [
@@ -18,5 +22,15 @@ module.exports = deploymentForCoreContract<ElectionInstance>(
   web3,
   artifacts,
   CeloContractName.Election,
-  initializeArgs
+  initializeArgs,
+  async (election: ElectionInstance) => {
+    if (config.election.frozen) {
+      console.log(`\tFreezing validator elections`)
+      const freezer: FreezerInstance = await getDeployedProxiedContract<FreezerInstance>(
+        'Freezer',
+        artifacts
+      )
+      await freezer.freeze(election.address)
+    }
+  }
 )

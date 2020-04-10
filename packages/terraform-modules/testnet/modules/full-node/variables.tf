@@ -100,6 +100,12 @@ variable node_count {
   description = "Number of nodes to create"
 }
 
+variable gcmode {
+  type        = string
+  description = "Celo-blockchain --gcmode option"
+  default     = "full"
+}
+
 variable proxy {
   type        = bool
   description = "Whether the node is a proxy for a validator"

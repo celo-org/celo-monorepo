@@ -106,7 +106,12 @@ export default class ValidatorStatus extends BaseCommand {
     cli.action.start(`Calculating status information`)
     const epochSize = await validators.getEpochSize()
     const electionCache = new ElectionResultsCache(election, epochSize.toNumber())
-    const frontRunnerSigners = await election.electValidatorSigners()
+    let frontRunnerSigners: string[] = []
+    try {
+      frontRunnerSigners = await election.electValidatorSigners()
+    } catch (err) {
+      console.warn('Warning: Elections not available')
+    }
 
     const validatorStatuses = await concurrentMap(10, signers, (s) =>
       this.getStatus(s, blocks, electionCache, frontRunnerSigners)
@@ -123,8 +128,12 @@ export default class ValidatorStatus extends BaseCommand {
     frontRunnerSigners: Address[]
   ): Promise<ValidatorStatusEntry> {
     const accounts = await this.kit.contracts.getAccounts()
+    const validators = await this.kit.contracts.getValidators()
     const validator = await accounts.signerToAccount(signer)
-    const name = (await accounts.getName(validator)) || ''
+    let name = 'Unregistered validator'
+    if (await validators.isValidator(validator)) {
+      name = (await accounts.getName(validator)) || ''
+    }
     const proposedCount = blocks.filter((b) => eqAddress(b.miner, signer)).length
     let signatures = 0
     let eligible = 0

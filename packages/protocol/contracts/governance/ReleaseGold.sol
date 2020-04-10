@@ -31,6 +31,8 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
   struct RevocationInfo {
     // Indicates if the contract is revocable.
     bool revocable;
+    // Indicates if the contract can expire `EXPIRATION_TIME` after releasing finishes.
+    bool canExpire;
     // Released gold instance balance at time of revocation.
     uint256 releasedBalanceAtRevoke;
     // The time at which the release schedule was revoked.
@@ -83,6 +85,7 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
   event ReleaseGoldInstanceDestroyed(address indexed beneficiary, address indexed atAddress);
   event DistributionLimitSet(address indexed beneficiary, uint256 maxDistribution);
   event LiquidityProvisionSet(address indexed beneficiary);
+  event CanExpireSet(bool canExpire);
   event BeneficiarySet(address indexed beneficiary);
 
   modifier onlyReleaseOwner() {
@@ -141,6 +144,7 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
   }
 
   modifier onlyExpired() {
+    require(revocationInfo.canExpire, "Contract must be expirable");
     uint256 releaseEndTime = releaseSchedule.releaseStartTime.add(
       releaseSchedule.numReleasePeriods.mul(releaseSchedule.releasePeriod)
     );
@@ -203,6 +207,10 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
     releaseSchedule.releasePeriod = releasePeriod;
     releaseSchedule.releaseCliff = releaseStartTime.add(releaseCliffTime);
     releaseSchedule.releaseStartTime = releaseStartTime;
+    // Expiry is opt-in for folks who can validate, opt-out for folks who cannot.
+    // This is because folks who are running Validators or Groups are likely to want to keep
+    // cGLD in the ReleaseGold contract even after it becomes withdrawable.
+    revocationInfo.canExpire = !canValidate;
     require(releaseSchedule.numReleasePeriods >= 1, "There must be at least one releasing period");
     require(
       releaseSchedule.amountReleasedPerPeriod > 0,
@@ -248,7 +256,6 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
     } else {
       maxDistribution = MAX_UINT;
     }
-
     liquidityProvisionMet = (subjectToLiquidityProvision) ? false : true;
     canValidate = _canValidate;
     canVote = _canVote;
@@ -273,6 +280,19 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
   }
 
   /**
+   * @notice Controls if the contract can be expired.
+   * @param _canExpire If the contract is expirable.
+   */
+  function setCanExpire(bool _canExpire) external onlyBeneficiary {
+    require(
+      revocationInfo.canExpire != _canExpire,
+      "Expiration flag is already set to desired value"
+    );
+    revocationInfo.canExpire = _canExpire;
+    emit CanExpireSet(revocationInfo.canExpire);
+  }
+
+  /**
    * @notice Controls the maximum distribution ratio.
    *         Calculates `distributionRatio`/1000 of current `totalBalance()`
    *         and sets this value as the maximum allowed gold to be currently withdrawn.
@@ -281,6 +301,10 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
    */
   function setMaxDistribution(uint256 distributionRatio) external onlyReleaseOwner {
     require(distributionRatio <= 1000, "Max distribution ratio must be within bounds");
+    require(
+      maxDistribution != MAX_UINT,
+      "Cannot set max distribution lower if already set to 1000"
+    );
     // If ratio is 1000, we set maxDistribution to maxUint to account for future rewards.
     if (distributionRatio == 1000) {
       maxDistribution = MAX_UINT;
@@ -373,11 +397,6 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
    * @dev Only callable `EXPIRATION_TIME` after the final gold release.
    */
   function expire() external nonReentrant onlyReleaseOwner onlyExpired {
-    IValidators validators = getValidators();
-    require(
-      !validators.isValidator(address(this)) && !validators.isValidatorGroup(address(this)),
-      "Cannot call `expire` on an instance registered as a validator or group"
-    );
     require(!isRevoked(), "Release schedule instance must not already be revoked");
     revocationInfo.revokeTime = block.timestamp;
     revocationInfo.releasedBalanceAtRevoke = totalWithdrawn;
