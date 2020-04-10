@@ -25,9 +25,9 @@ export const createAttestationServiceURLClaim = (url: string): AttestationServic
 })
 
 export async function validateAttestationServiceUrl(
+  kit: ContractKit,
   claim: AttestationServiceURLClaim,
-  address: Address,
-  kit: ContractKit
+  address: Address
 ): Promise<string | undefined> {
   try {
     const randomMessage = kit.web3.utils.randomHex(32)
