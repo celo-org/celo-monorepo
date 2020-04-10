@@ -4,6 +4,7 @@ import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
 import BigNumber from 'bignumber.js'
 import { Clipboard, Linking, Platform } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
+import { asyncRandomBytes } from 'react-native-secure-randombytes'
 import SendIntentAndroid from 'react-native-send-intent'
 import SendSMS from 'react-native-sms'
 import { call, delay, put, race, select, spawn, take, takeLeading } from 'redux-saga/effects'
@@ -142,7 +143,10 @@ export function* sendInvite(
   yield call(getConnectedUnlockedAccount)
   try {
     const contractKit = getContractKit()
-    const temporaryWalletAccount = contractKit.web3.eth.accounts.create()
+    const randomness = yield call(asyncRandomBytes, 64)
+    const temporaryWalletAccount = contractKit.web3.eth.accounts.create(
+      randomness.toString('ascii')
+    )
     const temporaryAddress = temporaryWalletAccount.address
     const inviteCode = createInviteCode(temporaryWalletAccount.privateKey)
 
