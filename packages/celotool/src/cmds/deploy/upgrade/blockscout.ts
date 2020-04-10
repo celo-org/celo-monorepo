@@ -54,7 +54,10 @@ export const handler = async (argv: BlockscoutUpgradeArgv) => {
     console.info(`Delete blockscout-migration`)
     try {
       await execCmdWithExitOnFailure(
-        `kubectl delete job ${argv.celoEnv}-blockscout-migration -n ${argv.celoEnv}`
+        `kubectl delete job ${argv.celoEnv}-blockscout${fetchEnvOrFallback(
+          'BLOCKSCOUT_DB_SUFFIX',
+          ''
+        )}-migration -n ${argv.celoEnv}`
       )
     } catch (error) {
       console.error(error)
