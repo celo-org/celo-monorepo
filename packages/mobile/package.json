@@ -7,7 +7,6 @@
   "scripts": {
     "lint": "tslint -c tslint.json --project tsconfig.json",
     "build": "yarn run build:ts && yarn run build:metro",
-    "build:sdk": "yarn --cwd ../walletkit build:for-env",
     "build:ts": "tsc --noEmit",
     "build:metro": "echo 'NOT WORKING RIGHT NOW'",
     "build:gen-graphql-types": "graphql-codegen --config codegen.yml",
@@ -38,7 +37,7 @@
   },
   "dependencies": {
     "@celo/client": "0.0.266",
-    "@celo/contractkit": "0.3.3-dev",
+    "@celo/contractkit": "0.3.4-dev",
     "@celo/react-components": "1.0.0",
     "@celo/react-native-sms-retriever": "git+https://github.com/celo-org/react-native-sms-retriever#b88e502",
     "@celo/utils": "0.1.9-dev",

@@ -43,6 +43,19 @@ export abstract class BaseCommand extends LocalCommand {
       hidden: true,
       description: 'Set it to use a ledger wallet',
     }),
+    ledgerAddresses: flags.integer({
+      default: 2,
+      hidden: true,
+      exclusive: ['ledgerCustomAddresses'],
+      description: 'If --userLedger is set, this will get the first N addresses for local signing',
+    }),
+    ledgerCustomAddresses: flags.string({
+      default: '[0,1]',
+      hidden: true,
+      exclusive: ['ledgerAddresses'],
+      description:
+        'If --userLedger is set, this will get the array of index addresses for local signing. Example --ledgerCustomAddresses "[4,99]"',
+    }),
   }
 
   // This specifies whether the node needs to be synced before the command
@@ -92,7 +105,14 @@ export abstract class BaseCommand extends LocalCommand {
       let transport: Transport
       try {
         transport = await TransportNodeHid.open('')
-        this._wallet = await newLedgerWalletWithSetup(transport)
+        const derivationPathIndexes = res.raw.some(
+          (value) => (value as any).flag === 'ledgerCustomAddresses'
+        )
+          ? JSON.parse(res.flags.ledgerCustomAddresses)
+          : Array.from(Array(res.flags.ledgerAddresses).keys())
+
+        console.log('Retrieving derivation Paths', derivationPathIndexes)
+        this._wallet = await newLedgerWalletWithSetup(transport, derivationPathIndexes)
       } catch (err) {
         console.log('Check if the ledger is connected and logged.')
         throw err
