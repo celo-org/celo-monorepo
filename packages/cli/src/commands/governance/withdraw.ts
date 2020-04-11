@@ -17,12 +17,16 @@ export default class Withdraw extends BaseCommand {
     const res = this.parse(Withdraw)
     console.log(res.flags.from)
     this.kit.defaultAccount = res.flags.from
-    const governance = await this.kit.contracts.getGovernance()
-
+    // console.log(res.flags.from)
     await newCheckBuilder(this, res.flags.from)
       .hasRefundedDeposits(res.flags.from)
       .runChecks()
 
-    await displaySendTx('withdraw', governance.withdraw(), {}, 'DepositWithdrawn')
+    if (false) {
+      // Failing here, what is this.kit?
+      const governance = await this.kit.contracts.getGovernance()
+
+      await displaySendTx('withdraw', governance.withdraw(), {}, 'DepositWithdrawn')
+    }
   }
 }
