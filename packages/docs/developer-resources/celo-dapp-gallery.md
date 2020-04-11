@@ -8,6 +8,12 @@ Savings Circles let you pool funds with your friends to save for large purchases
 
 Github: https://github.com/celo-org/savings-circle-demo
 
+## Dunia Pay Wallet 
+
+At Dunia Payment , we are building an electronic wallet that will let poeple in Sub Saharan Africa send and receive money directly on their phone.The app will use the celo light client to process transaciton faster even in low internet connexion area common in Africa.The wallet will be built on top of the celo platform and also using a set of external open source smart contracts.
+
+Github : https://github.com/duniapay/Dunia-Wallet-Celo
+
 ## Add your app to this list!
 
 _Are you building on Celo? To add your project, please submit a pull request updating this page!_
