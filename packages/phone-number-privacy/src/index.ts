@@ -3,7 +3,7 @@ import * as functions from 'firebase-functions'
 import { authenticateUser } from './common/identity'
 import { incrementQueryCount } from './database/wrappers/account'
 import { computeBLSSalt } from './salt-generation/bls-salt'
-import { QueryQuota } from './salt-generation/query-quota'
+import QueryQuota from './salt-generation/query-quota'
 
 export const getSalt = functions.https.onRequest(async (request, response) => {
   try {

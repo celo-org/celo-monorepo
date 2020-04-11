@@ -3,7 +3,7 @@ import config from '../config'
 import { getPerformedQueryCount } from '../database/wrappers/account'
 import { getContractKit } from '../web3/contracts'
 
-export class QueryQuota {
+export default class QueryQuota {
   /*
    * Returns how many queries the account can make based on the
    * calculated query quota and the number of queries already performed.
@@ -33,7 +33,7 @@ export class QueryQuota {
   }
 
   async isVerified(account: string, phoneNumber: string): Promise<boolean> {
-    const attestationsWrapper: AttestationsWrapper = ((await getContractKit()) as any).contracts.getAttestations()
+    const attestationsWrapper: AttestationsWrapper = await ((await getContractKit()) as any).contracts.getAttestations()
     const attestationStats = await attestationsWrapper.getAttestationStat(phoneNumber, account)
     const numAttestationsCompleted = attestationStats.completed
     const numAttestationsRemaining =

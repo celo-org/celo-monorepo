@@ -1,17 +1,18 @@
 import { getSalt } from '../src/index'
 import { computeBLSSalt } from '../src/salt-generation/bls-salt'
-import { QueryQuota } from '../src/salt-generation/query-quota'
 
 const BLS_SALT = '6546544323114343'
-const queryQuota: QueryQuota = new QueryQuota()
 
 jest.mock('../src/common/identity', () => ({
   authenticateUser: jest.fn().mockReturnValue(true),
 }))
 
-jest.mock('../src/salt-generation/query-quota')
-const mockReaminingQueryCount = queryQuota.getRemainingQueryCount as jest.Mock
-mockReaminingQueryCount.mockResolvedValue(2)
+let mockGetRemainingQueryCount = jest.fn()
+jest.mock('../src/salt-generation/query-quota', () => {
+  return jest.fn().mockImplementation(() => {
+    return { getRemainingQueryCount: mockGetRemainingQueryCount }
+  })
+})
 
 jest.mock('../src/salt-generation/bls-salt')
 const mockBlsSalt = computeBLSSalt as jest.Mock
@@ -47,8 +48,9 @@ describe(`POST /getSalt endpoint`, () => {
       getSalt(req, res)
     })
     it('returns 400 on query count 0', () => {
-      mockReaminingQueryCount.mockResolvedValue(0)
+      mockGetRemainingQueryCount = jest.fn(() => 0)
       const res = {
+        json: () => {},
         status: (status: any) => {
           expect(status).toEqual(400)
           // tslint:disable-next-line: no-empty
@@ -59,7 +61,7 @@ describe(`POST /getSalt endpoint`, () => {
       getSalt(req, res)
     })
     it('returns 500 on bls error', () => {
-      mockReaminingQueryCount.mockResolvedValue(2)
+      mockGetRemainingQueryCount = jest.fn()
       mockBlsSalt.mockImplementation(() => {
         throw Error()
       })

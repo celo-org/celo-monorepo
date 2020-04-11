@@ -1,5 +1,5 @@
 import { getPerformedQueryCount } from '../../src/database/wrappers/account'
-import { QueryQuota } from '../../src/salt-generation/query-quota'
+import QueryQuota from '../../src/salt-generation/query-quota'
 
 const ACCOUNT = '0x78dc5D2D739606d31509C31d654056A45185ECb6'
 const PHONE_NUMBER = '+1234567890'
@@ -8,10 +8,6 @@ const queryQuota: QueryQuota = new QueryQuota()
 jest.mock('../../src/database/wrappers/account')
 const mockPerformedQueryCount = getPerformedQueryCount as jest.Mock
 
-// TODO (amyslawson) figure out how to change this mock for different unit tests
-// jest.mock('@celo/contractkit')
-// import { newKit } from '@celo/contractkit'
-// const mockNewKit = newKit as jest.Mock
 jest.mock('@celo/contractkit', () => {
   const utils = require('../utils')
   const attestation = utils.createMockAttestation(3, 3)
