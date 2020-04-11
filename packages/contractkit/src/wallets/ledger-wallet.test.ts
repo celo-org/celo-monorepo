@@ -180,7 +180,7 @@ describe('LedgerWallet class', () => {
           nonce: 0,
           gas: '10',
           gasPrice: '99',
-          feeCurrency: '0x124356',
+          feeCurrency: '0x',
           gatewayFeeRecipient: '0x1234',
           gatewayFee: '0x5678',
           data: '0xabcdef',
@@ -255,7 +255,7 @@ describe('LedgerWallet class', () => {
             nonce: 0,
             gas: '10',
             gasPrice: '99',
-            feeCurrency: '0x124356',
+            feeCurrency: '0x',
             gatewayFeeRecipient: '0x1234',
             gatewayFee: '0x5678',
             data: '0xabcdef',
@@ -301,7 +301,7 @@ describe('LedgerWallet class', () => {
                 nonce: 0,
                 gas: '10',
                 gasPrice: '99',
-                feeCurrency: '0x124356',
+                feeCurrency: '0x',
                 gatewayFeeRecipient: '0x1234',
                 gatewayFee: '0x5678',
                 data: '0xabcdef',
@@ -316,7 +316,7 @@ describe('LedgerWallet class', () => {
               TEST_TIMEOUT_IN_MS
             )
 
-            test(
+            test.only(
               'with same signer',
               async () => {
                 const signedTx: EncodedTransaction = await wallet.signTransaction(celoTransaction)

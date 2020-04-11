@@ -19,9 +19,10 @@ import { Signature } from './signers/azure-key-vault-client'
 require('dotenv').config()
 
 const USING_MOCK =
-  typeof process.env.KEY_NAME === 'undefined' || process.env.KEY_NAME === '<KEY_NAME>'
-const KEY_NAME = USING_MOCK ? 'secp' : process.env.KEY_NAME
-const VAULT_NAME = USING_MOCK ? 'mockVault' : process.env.VAULT_NAME
+  typeof process.env.AZURE_KEY_NAME === 'undefined' ||
+  process.env.AZURE_KEY_NAME === '<AZURE_KEY_NAME>'
+const AZURE_KEY_NAME = USING_MOCK ? 'secp' : process.env.AZURE_KEY_NAME
+const AZURE_VAULT_NAME = USING_MOCK ? 'mockVault' : process.env.AZURE_VAULT_NAME
 const PRIVATE_KEY1 = '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
 const ACCOUNT_ADDRESS1 = normalizeAddressWith0x(privateKeyToAddress(PRIVATE_KEY1))
 const PRIVATE_KEY2 = '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890fdeccc'
@@ -96,11 +97,11 @@ describe('AzureHSMWallet class', () => {
       expect(process.env.AZURE_CLIENT_ID).toBeDefined()
       expect(process.env.AZURE_CLIENT_SECRET).toBeDefined()
       expect(process.env.AZURE_TENANT_ID).toBeDefined()
-      expect(process.env.VAULT_NAME).toBeDefined()
-      expect(process.env.KEY_NAME).toBeDefined()
+      expect(process.env.AZURE_VAULT_NAME).toBeDefined()
+      expect(process.env.AZURE_KEY_NAME).toBeDefined()
     }
 
-    wallet = new AzureHSMWallet(VAULT_NAME!)
+    wallet = new AzureHSMWallet(AZURE_VAULT_NAME!)
 
     if (USING_MOCK) {
       jest
@@ -112,7 +113,7 @@ describe('AzureHSMWallet class', () => {
             },
             getPublicKey: async (keyName: string): Promise<BigNumber> => {
               if (!keyVaultAddresses.has(keyName)) {
-                throw new Error(`Key ${keyName} not found in KeyVault ${VAULT_NAME}`)
+                throw new Error(`Key ${keyName} not found in KeyVault ${AZURE_VAULT_NAME}`)
               }
               const privKey = keyVaultAddresses.get(keyName)!.privateKey
               const pubKey = ethUtil.privateToPublic(ethUtil.toBuffer(privKey))
@@ -194,7 +195,7 @@ describe('AzureHSMWallet class', () => {
 
     test('hasKey should return true for keys that are present', async () => {
       // Valid key should be present
-      const address = await wallet.getAddressFromKeyName(KEY_NAME!)
+      const address = await wallet.getAddressFromKeyName(AZURE_KEY_NAME!)
       expect(await wallet.hasAccount(address)).toBeTruthy()
     })
 
@@ -228,7 +229,7 @@ describe('AzureHSMWallet class', () => {
             try {
               await wallet.getAddressFromKeyName(unknownKey)
             } catch (e) {
-              expect(e.message).toBe(`Key ${unknownKey} not found in KeyVault ${VAULT_NAME}`)
+              expect(e.message).toBe(`Key ${unknownKey} not found in KeyVault ${AZURE_VAULT_NAME}`)
             }
           })
 
@@ -260,7 +261,7 @@ describe('AzureHSMWallet class', () => {
 
         describe('using a known key', () => {
           let celoTransaction: Tx
-          const knownKey: string = KEY_NAME!
+          const knownKey: string = AZURE_KEY_NAME!
           let knownAddress: Address
           const otherAddress: string = ACCOUNT_ADDRESS1
 
