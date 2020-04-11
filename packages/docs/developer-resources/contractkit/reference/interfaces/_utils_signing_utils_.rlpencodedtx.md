@@ -17,7 +17,7 @@
 
 • **rlpEncode**: *any*
 
-*Defined in [contractkit/src/utils/signing-utils.ts:34](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/signing-utils.ts#L34)*
+*Defined in [contractkit/src/utils/signing-utils.ts:36](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/signing-utils.ts#L36)*
 
 ___
 
@@ -25,4 +25,4 @@ ___
 
 • **transaction**: *Tx*
 
-*Defined in [contractkit/src/utils/signing-utils.ts:33](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/signing-utils.ts#L33)*
+*Defined in [contractkit/src/utils/signing-utils.ts:35](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/signing-utils.ts#L35)*
