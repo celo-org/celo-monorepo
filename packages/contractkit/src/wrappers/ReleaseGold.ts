@@ -11,6 +11,7 @@ import {
   CeloTransactionObject,
   proxyCall,
   proxySend,
+  stringIdentity,
   stringToBytes,
   toTransactionObject,
   tupleParser,
@@ -282,7 +283,7 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
   transfer: (to: Address, value: BigNumber.Value) => CeloTransactionObject<void> = proxySend(
     this.kit,
     this.contract.methods.transfer,
-    tupleParser(valueToString, valueToString)
+    tupleParser(stringIdentity, valueToString)
   )
 
   /**
