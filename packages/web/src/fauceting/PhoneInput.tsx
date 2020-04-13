@@ -10,7 +10,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native'
-import { TextInput } from 'src/forms/FormComponents'
+import { TextInput } from 'src/forms/TextInput'
 import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
 import { ScreenProps, withScreenSize } from 'src/layout/ScreenSize'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'

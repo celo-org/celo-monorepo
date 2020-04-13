@@ -17,13 +17,13 @@ Celo has various mechanisms to reduce the impact of the loss or compromise of ke
 An account may have at most one authorized signer key of each type at any time. Once a signer key is authorized, the only way to deauthorize that key is to authorize a new key that has never previously been used as a signer key, either for this account or another. It follows then that a newly deauthorized key cannot be reauthorized for any account.
 {% endhint %}
 
-# Key Security
+## Key Security
 
 The Account key is the most sensitive key because it can authorize the other keys and access locked gold. As it should be used quite infrequently, it is highly recommended for important Account keys (i.e. Validators or accounts with high balances) to remain as secure as possible. We recommend them to be offline, ideally in cold storage, or on a hardware wallet.
 
 Signing keys are less sensitive, and more frequently used, than the Account key, but should still be safe-guarded. Validator signing keys, in particular, could be used to execute a double-signing attack if compromised, which may result in [slashing](../celo-codebase/protocol/proof-of-stake/penalties).
 
-# Key Rotation
+## Key Rotation
 
 If a signing key is lost or compromised, the Account key can authorize a new signing key which replaces the old one. This prevents losing a signing key from becoming a catastrophic event and it is strongly recommended to regularly rotate keys to limit the impact of an undiscovered compromise.
 
