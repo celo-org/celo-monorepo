@@ -90,8 +90,6 @@ Here are the steps we need to go through to deploy the contract to the test net.
 5. Create and sign the contract deployment transaction
 6. Send transaction to the network
 
-{% tabs %}
-{% tab title="celo\_deploy.js" %}
 ```javascript
 const Kit = require('@celo/contractkit')
 
@@ -107,8 +105,6 @@ async function awaitWrapper(){
 
 awaitWrapper()
 ```
-{% endtab %}
-{% endtabs %}
 
 Make sure the dependencies are installed with:
 
@@ -138,8 +134,6 @@ Then add your account to the `kit` with the private key:
 
 Before we can use truffle for the migration, we need to set up the proper configuration in `truffle-config.js`.  At the top of `truffle-config.js`, let's set up the `kit` by connecting to the test network and adding the account we just funded.
 
-{% tabs %}
-{% tab title="truffle-config.js" %}
 ```javascript
 const Kit = require('@celo/contractkit')
 const kit = Kit.newKit('https://alfajores-forno.celo-testnet.org')
@@ -152,8 +146,6 @@ async function awaitWrapper(){
 }
 awaitWrapper()
 ```
-{% endtab %}
-{% endtabs %}
 
 Then, in the `networks` object, we can add the initialized `kit`provider to an `alfajores` property.
 
@@ -189,26 +181,18 @@ $ truffle compile
 
 This command will generate a `HelloWorld.json` file in the `./build/contracts/` directory. `HelloWorld.json` contains a lot of data about the contract, compiler and low level details. Import this file into the deployment script with:
 
-{% tabs %}
-{% tab title="celo_deploy.js" %}
 ```javascript
 const HelloWorld = require('./build/contracts/HelloWorld.json')
 ```
-{% endtab %}
-{% endtabs %}
 
 We are finally ready to deploy the contract. Use the `kit`to create a custom transaction that includes the contract bytecode.
 
-{% tabs %}
-{% tab title="celo_deploy.js" %}
 ```javascript
     let tx = await kit.sendTransaction({
         from: account.address,
         data: HelloWorld.bytecode // from ./build/contracts/HelloWorld.json
     })
 ```
-{% endtab %}
-{% endtabs %}
 
 {% hint style="info" %}
 To deploy a contract on Celo, use the `kit.sendTransaction()` function with no `to:` field and the contract bytecode in the `data` field. The account that you are sending the transaction from must have enough cGLD to pay the transaction fee, unless you specify another currency as the `feeCurrency`, then you need enough of that currency to pay the transaction fee.
@@ -216,8 +200,6 @@ To deploy a contract on Celo, use the `kit.sendTransaction()` function with no `
 
 The entire deployment script is less than 20 lines of code.
 
-{% tabs %}
-{% tab title="celo_deploy.js" %}
 ```javascript
 const Kit = require('@celo/contractkit')
 const HelloWorld = require('./build/contracts/HelloWorld.json')
@@ -240,8 +222,6 @@ async function awaitWrapper(){
 
 awaitWrapper()
 ```
-{% endtab %}
-{% endtabs %}
 
 Congratulations! You have deployed your first contract onto Celo! You can verify your contract deployment on [Blockscout](https://alfajores-blockscout.celo-testnet.org/). You can get the transaction hash from the receipt and look it up on the block explorer. 
 
