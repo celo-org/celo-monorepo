@@ -20,7 +20,7 @@
 
 • **epochNumber**: *number*
 
-*Defined in [contractkit/src/wrappers/LockedGold.ts:37](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/LockedGold.ts#L37)*
+*Defined in [src/wrappers/LockedGold.ts:37](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/LockedGold.ts#L37)*
 
 ___
 
@@ -28,7 +28,7 @@ ___
 
 • **penalty**: *BigNumber*
 
-*Defined in [contractkit/src/wrappers/LockedGold.ts:34](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/LockedGold.ts#L34)*
+*Defined in [src/wrappers/LockedGold.ts:34](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/LockedGold.ts#L34)*
 
 ___
 
@@ -36,7 +36,7 @@ ___
 
 • **reporter**: *[Address](../modules/_base_.md#address)*
 
-*Defined in [contractkit/src/wrappers/LockedGold.ts:35](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/LockedGold.ts#L35)*
+*Defined in [src/wrappers/LockedGold.ts:35](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/LockedGold.ts#L35)*
 
 ___
 
@@ -44,7 +44,7 @@ ___
 
 • **reward**: *BigNumber*
 
-*Defined in [contractkit/src/wrappers/LockedGold.ts:36](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/LockedGold.ts#L36)*
+*Defined in [src/wrappers/LockedGold.ts:36](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/LockedGold.ts#L36)*
 
 ___
 
@@ -52,4 +52,4 @@ ___
 
 • **slashed**: *[Address](../modules/_base_.md#address)*
 
-*Defined in [contractkit/src/wrappers/LockedGold.ts:33](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/LockedGold.ts#L33)*
+*Defined in [src/wrappers/LockedGold.ts:33](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/LockedGold.ts#L33)*

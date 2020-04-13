@@ -5,9 +5,9 @@
 ### Enumeration members
 
 * [everyTransaction](_wallets_ledger_wallet_.addressvalidation.md#everytransaction)
+* [firstTransactionPerAddress](_wallets_ledger_wallet_.addressvalidation.md#firsttransactionperaddress)
+* [initializationOnly](_wallets_ledger_wallet_.addressvalidation.md#initializationonly)
 * [never](_wallets_ledger_wallet_.addressvalidation.md#never)
-* [oncePerAddress](_wallets_ledger_wallet_.addressvalidation.md#onceperaddress)
-* [onlyInitialization](_wallets_ledger_wallet_.addressvalidation.md#onlyinitialization)
 
 ## Enumeration members
 
@@ -15,7 +15,23 @@
 
 • **everyTransaction**:
 
-*Defined in [contractkit/src/wallets/ledger-wallet.ts:27](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/ledger-wallet.ts#L27)*
+*Defined in [src/wallets/ledger-wallet.ts:30](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/ledger-wallet.ts#L30)*
+
+___
+
+###  firstTransactionPerAddress
+
+• **firstTransactionPerAddress**:
+
+*Defined in [src/wallets/ledger-wallet.ts:32](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/ledger-wallet.ts#L32)*
+
+___
+
+###  initializationOnly
+
+• **initializationOnly**:
+
+*Defined in [src/wallets/ledger-wallet.ts:28](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/ledger-wallet.ts#L28)*
 
 ___
 
@@ -23,20 +39,4 @@ ___
 
 • **never**:
 
-*Defined in [contractkit/src/wallets/ledger-wallet.ts:29](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/ledger-wallet.ts#L29)*
-
-___
-
-###  oncePerAddress
-
-• **oncePerAddress**:
-
-*Defined in [contractkit/src/wallets/ledger-wallet.ts:28](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/ledger-wallet.ts#L28)*
-
-___
-
-###  onlyInitialization
-
-• **onlyInitialization**:
-
-*Defined in [contractkit/src/wallets/ledger-wallet.ts:26](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/ledger-wallet.ts#L26)*
+*Defined in [src/wallets/ledger-wallet.ts:34](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/ledger-wallet.ts#L34)*

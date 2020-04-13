@@ -22,10 +22,15 @@ import { Wallet } from './wallet'
 export const CELO_BASE_DERIVATION_PATH = "44'/52752'/0'/0"
 const ADDRESS_QTY = 5
 
+// Validates an address using the Ledger
 export enum AddressValidation {
-  onlyInitialization,
+  // Validates every address required only when the ledger is initialized
+  initializationOnly,
+  // Validates the address every time a transaction is made
   everyTransaction,
-  oncePerAddress,
+  // Validates the address the first time a transaction is made for that specific address
+  firstTransactionPerAddress,
+  // Never validates the addresses
   never,
 }
 
@@ -67,7 +72,7 @@ export class LedgerWallet implements Wallet {
   constructor(
     readonly derivationPathIndexes: number[] = Array.from(Array(ADDRESS_QTY).keys()),
     readonly baseDerivationPath: string = CELO_BASE_DERIVATION_PATH,
-    readonly ledgerAddressValidation: AddressValidation = AddressValidation.oncePerAddress
+    readonly ledgerAddressValidation: AddressValidation = AddressValidation.firstTransactionPerAddress
   ) {
     const invalidDPs = derivationPathIndexes.some(
       (value) => !(Number.isInteger(value) && value >= 0)
@@ -141,7 +146,7 @@ export class LedgerWallet implements Wallet {
 
   private validationRequired(initialized: boolean, validated?: boolean): boolean {
     if (!initialized) {
-      return this.ledgerAddressValidation === AddressValidation.onlyInitialization
+      return this.ledgerAddressValidation === AddressValidation.initializationOnly
     }
     switch (this.ledgerAddressValidation) {
       case AddressValidation.never: {
@@ -150,11 +155,15 @@ export class LedgerWallet implements Wallet {
       case AddressValidation.everyTransaction: {
         return true
       }
-      case AddressValidation.oncePerAddress: {
+      case AddressValidation.firstTransactionPerAddress: {
         return !validated
       }
+      case AddressValidation.initializationOnly: {
+        // Already initialized, so no need to validate in this state
+        return false
+      }
     }
-    return false
+    throw new Error('ledger-wallet@validationRequired: invalid ledgerValidation value')
   }
 
   getAccounts(): Address[] {
@@ -191,7 +200,15 @@ export class LedgerWallet implements Wallet {
       return encodeTransaction(rlpEncoded, signatureFormatter(signature))
     } catch (error) {
       if (error instanceof TransportStatusError) {
-        this.transportErrorFriendlyMessage(error)
+        // The Ledger fails if it doesn't know the feeCurrency
+        if (error.statusCode === 27264 && error.statusText === 'INCORRECT_DATA') {
+          debug('Possible invalid feeCurrency field')
+          throw new Error(
+            'ledger-wallet@singTransaction: Incorrect Data. Verify that the feeCurrency is a valid one'
+          )
+        } else {
+          this.transportErrorFriendlyMessage(error)
+        }
       }
       throw error
     }

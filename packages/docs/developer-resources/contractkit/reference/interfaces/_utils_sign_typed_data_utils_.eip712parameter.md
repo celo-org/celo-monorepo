@@ -17,7 +17,7 @@
 
 • **name**: *string*
 
-*Defined in [contractkit/src/utils/sign-typed-data-utils.ts:6](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/sign-typed-data-utils.ts#L6)*
+*Defined in [src/utils/sign-typed-data-utils.ts:6](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/sign-typed-data-utils.ts#L6)*
 
 ___
 
@@ -25,4 +25,4 @@ ___
 
 • **type**: *string*
 
-*Defined in [contractkit/src/utils/sign-typed-data-utils.ts:7](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/sign-typed-data-utils.ts#L7)*
+*Defined in [src/utils/sign-typed-data-utils.ts:7](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/sign-typed-data-utils.ts#L7)*

@@ -268,7 +268,7 @@ describe('LedgerWallet class', () => {
       const knownAddress = ACCOUNT_ADDRESS1
 
       beforeEach(() => {
-        wallet = new LedgerWallet(undefined, undefined, AddressValidation.onlyInitialization)
+        wallet = new LedgerWallet(undefined, undefined, AddressValidation.initializationOnly)
         mockForceValidation = jest.fn((): void => {
           // do nothing
         })
@@ -306,9 +306,14 @@ describe('LedgerWallet class', () => {
 
     describe('once per address', () => {
       const knownAddress = ACCOUNT_ADDRESS1
+      const otherAddress = ACCOUNT_ADDRESS2
 
       beforeEach(() => {
-        wallet = new LedgerWallet(undefined, undefined, AddressValidation.oncePerAddress)
+        wallet = new LedgerWallet(
+          undefined,
+          undefined,
+          AddressValidation.firstTransactionPerAddress
+        )
         mockForceValidation = jest.fn((): void => {
           // do nothing
         })
@@ -322,10 +327,14 @@ describe('LedgerWallet class', () => {
         expect(mockForceValidation.mock.calls.length).toBe(1)
         await wallet.signPersonalMessage(knownAddress, ACCOUNT_ADDRESS_NEVER)
         expect(mockForceValidation.mock.calls.length).toBe(1)
+        await wallet.signPersonalMessage(otherAddress, ACCOUNT_ADDRESS_NEVER)
+        expect(mockForceValidation.mock.calls.length).toBe(2)
+        await wallet.signPersonalMessage(otherAddress, ACCOUNT_ADDRESS_NEVER)
+        expect(mockForceValidation.mock.calls.length).toBe(2)
       })
     })
 
-    describe('by default (acts as oncePerAddress)', () => {
+    describe('by default (acts as firstTransactionPerAddress)', () => {
       const knownAddress = ACCOUNT_ADDRESS1
 
       beforeEach(() => {
