@@ -73,7 +73,7 @@ const DefaultConfig = {
     },
     // Intentionally set lower than the expected value at steady state to account for the fact that
     // users may take some time to start voting with their cGLD.
-    targetVotingGoldFraction: 1 / 3,
+    targetVotingGoldFraction: 1 / 2,
     maxValidatorEpochPayment: '205479452054794520547', // (75,000 / 365) * 10 ^ 18
     communityRewardFraction: 1 / 4,
     // TODO(asa): Must be set before RC1
