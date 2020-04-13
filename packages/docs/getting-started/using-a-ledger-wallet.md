@@ -125,11 +125,11 @@ The following commands are an example of how you might authorize a vote signing 
 
 ```bash
 # Plug in the Ledger containing the vote signing key to authorize and run the following command to securely generate the proof-of-possession.
-celocli accounts:proof-of-possession --account $ACCOUNT_ADDRESS --signer $VOTE_SINGER_ADDRESS --useLedger
+celocli accounts:proof-of-possession --account $ACCOUNT_ADDRESS --signer $VOTE_SIGNER_ADDRESS --useLedger
 
 # If you wish to authorize a vote signing key for your account, plug in the Ledger containing the account key and run the following command to authorize the vote signing key.
-celocli account:authorize --from $ACCOUNT_ADDRESS --role vote --signer $VOTE_SINGER_ADDRESS --signature $PROOF_OF_POSSESSION --useLedger
+celocli account:authorize --from $ACCOUNT_ADDRESS --role vote --signer $VOTE_SIGNER_ADDRESS --signature $PROOF_OF_POSSESSION --useLedger
 
 # If instead you wish to authorize a vote signing key for your ReleaseGold account, plug in the Ledger containing the beneficiary key for the ReleaseGold contract and run the following command.
-celocli release-gold:authorize --contract $RELEASE_GOLD_CONTRACT_ADDRESS --role vote --signer $VOTE_SINGER_ADDRESS --signature $PROOF_OF_POSSESSION --useLedger
+celocli release-gold:authorize --contract $RELEASE_GOLD_CONTRACT_ADDRESS --role vote --signer $VOTE_SIGNER_ADDRESS --signature $PROOF_OF_POSSESSION --useLedger
 ```
