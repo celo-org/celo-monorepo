@@ -25,7 +25,7 @@
 
 • **getAccounts**: *function*
 
-*Defined in [src/wallets/wallet.ts:6](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L6)*
+*Defined in [contractkit/src/wallets/wallet.ts:6](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L6)*
 
 #### Type declaration:
 
@@ -37,7 +37,7 @@ ___
 
 • **hasAccount**: *function*
 
-*Defined in [src/wallets/wallet.ts:7](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L7)*
+*Defined in [contractkit/src/wallets/wallet.ts:7](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L7)*
 
 #### Type declaration:
 
@@ -55,7 +55,7 @@ ___
 
 • **signPersonalMessage**: *function*
 
-*Defined in [src/wallets/wallet.ts:10](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L10)*
+*Defined in [contractkit/src/wallets/wallet.ts:10](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L10)*
 
 #### Type declaration:
 
@@ -74,7 +74,7 @@ ___
 
 • **signTransaction**: *function*
 
-*Defined in [src/wallets/wallet.ts:8](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L8)*
+*Defined in [contractkit/src/wallets/wallet.ts:8](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L8)*
 
 #### Type declaration:
 
@@ -92,7 +92,7 @@ ___
 
 • **signTypedData**: *function*
 
-*Defined in [src/wallets/wallet.ts:9](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L9)*
+*Defined in [contractkit/src/wallets/wallet.ts:9](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L9)*
 
 #### Type declaration:
 

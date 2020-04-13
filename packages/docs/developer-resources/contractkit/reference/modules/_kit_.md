@@ -22,7 +22,7 @@
 
 ▸ **newKit**(`url`: string, `wallet?`: [Wallet](../interfaces/_wallets_wallet_.wallet.md)): *[ContractKit](../classes/_kit_.contractkit.md)‹›*
 
-*Defined in [src/kit.ts:31](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L31)*
+*Defined in [contractkit/src/kit.ts:31](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L31)*
 
 Creates a new instance of `ContractKit` give a nodeUrl
 
@@ -43,7 +43,7 @@ ___
 
 ▸ **newKitFromWeb3**(`web3`: Web3, `wallet?`: [Wallet](../interfaces/_wallets_wallet_.wallet.md)): *[ContractKit](../classes/_kit_.contractkit.md)‹›*
 
-*Defined in [src/kit.ts:40](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L40)*
+*Defined in [contractkit/src/kit.ts:40](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L40)*
 
 Creates a new instance of `ContractKit` give a web3 instance
 

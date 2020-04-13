@@ -37,7 +37,7 @@
 
 \+ **new IdentityMetadataWrapper**(`data`: [IdentityMetadata](../modules/_identity_metadata_.md#identitymetadata)): *[IdentityMetadataWrapper](_identity_metadata_.identitymetadatawrapper.md)*
 
-*Defined in [src/identity/metadata.ts:104](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/metadata.ts#L104)*
+*Defined in [contractkit/src/identity/metadata.ts:104](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/metadata.ts#L104)*
 
 **Parameters:**
 
@@ -53,7 +53,7 @@ Name | Type |
 
 • **data**: *[IdentityMetadata](../modules/_identity_metadata_.md#identitymetadata)*
 
-*Defined in [src/identity/metadata.ts:26](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/metadata.ts#L26)*
+*Defined in [contractkit/src/identity/metadata.ts:26](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/metadata.ts#L26)*
 
 ## Accessors
 
@@ -61,7 +61,7 @@ Name | Type |
 
 • **get claims**(): *object | object | object | object | object[]*
 
-*Defined in [src/identity/metadata.ts:110](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/metadata.ts#L110)*
+*Defined in [contractkit/src/identity/metadata.ts:110](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/metadata.ts#L110)*
 
 **Returns:** *object | object | object | object | object[]*
 
@@ -71,7 +71,7 @@ Name | Type |
 
 ▸ **addClaim**(`claim`: [Claim](../modules/_identity_claims_claim_.md#claim), `signer`: Signer): *Promise‹void›*
 
-*Defined in [src/identity/metadata.ts:125](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/metadata.ts#L125)*
+*Defined in [contractkit/src/identity/metadata.ts:125](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/metadata.ts#L125)*
 
 **Parameters:**
 
@@ -88,7 +88,7 @@ ___
 
 ▸ **filterClaims**<**K**>(`type`: K): *Array‹[ClaimPayload](../modules/_identity_claims_claim_.md#claimpayload)‹K››*
 
-*Defined in [src/identity/metadata.ts:152](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/metadata.ts#L152)*
+*Defined in [contractkit/src/identity/metadata.ts:152](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/metadata.ts#L152)*
 
 **Type parameters:**
 
@@ -108,7 +108,7 @@ ___
 
 ▸ **findClaim**<**K**>(`type`: K): *[ClaimPayload](../modules/_identity_claims_claim_.md#claimpayload)‹K› | undefined*
 
-*Defined in [src/identity/metadata.ts:148](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/metadata.ts#L148)*
+*Defined in [contractkit/src/identity/metadata.ts:148](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/metadata.ts#L148)*
 
 **Type parameters:**
 
@@ -128,7 +128,7 @@ ___
 
 ▸ **hashOfClaims**(): *string*
 
-*Defined in [src/identity/metadata.ts:114](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/metadata.ts#L114)*
+*Defined in [contractkit/src/identity/metadata.ts:114](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/metadata.ts#L114)*
 
 **Returns:** *string*
 
@@ -138,7 +138,7 @@ ___
 
 ▸ **toString**(): *string*
 
-*Defined in [src/identity/metadata.ts:118](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/metadata.ts#L118)*
+*Defined in [contractkit/src/identity/metadata.ts:118](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/metadata.ts#L118)*
 
 **Returns:** *string*
 
@@ -148,7 +148,7 @@ ___
 
 ▸ **fetchFromURL**(`kit`: [ContractKit](_kit_.contractkit.md), `url`: string): *Promise‹[IdentityMetadataWrapper](_identity_metadata_.identitymetadatawrapper.md)‹››*
 
-*Defined in [src/identity/metadata.ts:38](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/metadata.ts#L38)*
+*Defined in [contractkit/src/identity/metadata.ts:38](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/metadata.ts#L38)*
 
 **Parameters:**
 
@@ -165,7 +165,7 @@ ___
 
 ▸ **fromEmpty**(`address`: string): *[IdentityMetadataWrapper](_identity_metadata_.identitymetadatawrapper.md)‹›*
 
-*Defined in [src/identity/metadata.ts:28](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/metadata.ts#L28)*
+*Defined in [contractkit/src/identity/metadata.ts:28](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/metadata.ts#L28)*
 
 **Parameters:**
 
@@ -181,7 +181,7 @@ ___
 
 ▸ **fromFile**(`kit`: [ContractKit](_kit_.contractkit.md), `path`: string): *Promise‹[IdentityMetadataWrapper](_identity_metadata_.identitymetadatawrapper.md)‹››*
 
-*Defined in [src/identity/metadata.ts:46](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/metadata.ts#L46)*
+*Defined in [contractkit/src/identity/metadata.ts:46](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/metadata.ts#L46)*
 
 **Parameters:**
 
@@ -198,7 +198,7 @@ ___
 
 ▸ **fromRawString**(`kit`: [ContractKit](_kit_.contractkit.md), `rawData`: string): *Promise‹[IdentityMetadataWrapper](_identity_metadata_.identitymetadatawrapper.md)‹››*
 
-*Defined in [src/identity/metadata.ts:68](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/metadata.ts#L68)*
+*Defined in [contractkit/src/identity/metadata.ts:68](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/metadata.ts#L68)*
 
 **Parameters:**
 
@@ -215,7 +215,7 @@ ___
 
 ▸ **verifySigner**(`kit`: [ContractKit](_kit_.contractkit.md), `hash`: any, `signature`: any, `metadata`: any): *Promise‹boolean›*
 
-*Defined in [src/identity/metadata.ts:50](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/metadata.ts#L50)*
+*Defined in [contractkit/src/identity/metadata.ts:50](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/metadata.ts#L50)*
 
 **Parameters:**
 

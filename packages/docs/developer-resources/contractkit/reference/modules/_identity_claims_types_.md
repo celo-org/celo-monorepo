@@ -24,7 +24,7 @@
 
 • **SINGULAR_CLAIM_TYPES**: *[ClaimTypes](../enums/_identity_claims_types_.claimtypes.md)[]* = [ClaimTypes.NAME, ClaimTypes.ATTESTATION_SERVICE_URL]
 
-*Defined in [src/identity/claims/types.ts:23](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/types.ts#L23)*
+*Defined in [contractkit/src/identity/claims/types.ts:23](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/types.ts#L23)*
 
 ___
 
@@ -32,7 +32,7 @@ ___
 
 • **SignatureType**: *StringC‹›* = t.string
 
-*Defined in [src/identity/claims/types.ts:3](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/types.ts#L3)*
+*Defined in [contractkit/src/identity/claims/types.ts:3](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/types.ts#L3)*
 
 ___
 
@@ -40,7 +40,7 @@ ___
 
 • **TimestampType**: *NumberC‹›* = t.number
 
-*Defined in [src/identity/claims/types.ts:4](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/types.ts#L4)*
+*Defined in [contractkit/src/identity/claims/types.ts:4](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/types.ts#L4)*
 
 ___
 
@@ -48,7 +48,7 @@ ___
 
 • **VALIDATABLE_CLAIM_TYPES**: *[ClaimTypes](../enums/_identity_claims_types_.claimtypes.md)[]* = [ClaimTypes.ATTESTATION_SERVICE_URL]
 
-*Defined in [src/identity/claims/types.ts:21](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/types.ts#L21)*
+*Defined in [contractkit/src/identity/claims/types.ts:21](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/types.ts#L21)*
 
 ___
 
@@ -56,7 +56,7 @@ ___
 
 • **VERIFIABLE_CLAIM_TYPES**: *[ClaimTypes](../enums/_identity_claims_types_.claimtypes.md)[]* = [ClaimTypes.KEYBASE, ClaimTypes.ACCOUNT]
 
-*Defined in [src/identity/claims/types.ts:18](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/types.ts#L18)*
+*Defined in [contractkit/src/identity/claims/types.ts:18](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/types.ts#L18)*
 
 ## Functions
 
@@ -64,6 +64,6 @@ ___
 
 ▸ **now**(): *number*
 
-*Defined in [src/identity/claims/types.ts:6](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/types.ts#L6)*
+*Defined in [contractkit/src/identity/claims/types.ts:6](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/types.ts#L6)*
 
 **Returns:** *number*

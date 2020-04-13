@@ -20,7 +20,7 @@
 
 • **groupLockedGoldRequirements**: *[LockedGoldRequirements](_wrappers_validators_.lockedgoldrequirements.md)*
 
-*Defined in [src/wrappers/Validators.ts:59](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L59)*
+*Defined in [contractkit/src/wrappers/Validators.ts:59](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L59)*
 
 ___
 
@@ -28,7 +28,7 @@ ___
 
 • **maxGroupSize**: *BigNumber*
 
-*Defined in [src/wrappers/Validators.ts:61](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L61)*
+*Defined in [contractkit/src/wrappers/Validators.ts:61](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L61)*
 
 ___
 
@@ -36,7 +36,7 @@ ___
 
 • **membershipHistoryLength**: *BigNumber*
 
-*Defined in [src/wrappers/Validators.ts:62](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L62)*
+*Defined in [contractkit/src/wrappers/Validators.ts:62](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L62)*
 
 ___
 
@@ -44,7 +44,7 @@ ___
 
 • **slashingMultiplierResetPeriod**: *BigNumber*
 
-*Defined in [src/wrappers/Validators.ts:63](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L63)*
+*Defined in [contractkit/src/wrappers/Validators.ts:63](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L63)*
 
 ___
 
@@ -52,4 +52,4 @@ ___
 
 • **validatorLockedGoldRequirements**: *[LockedGoldRequirements](_wrappers_validators_.lockedgoldrequirements.md)*
 
-*Defined in [src/wrappers/Validators.ts:60](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L60)*
+*Defined in [contractkit/src/wrappers/Validators.ts:60](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L60)*
