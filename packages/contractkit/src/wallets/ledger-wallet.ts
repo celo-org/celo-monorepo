@@ -17,6 +17,7 @@ import {
   rlpEncodedTx,
   signatureFormatter,
 } from '../utils/signing-utils'
+import { byContractAddress } from './ledger-utils/tokens'
 import { Wallet } from './wallet'
 
 export const CELO_BASE_DERIVATION_PATH = "44'/52752'/0'/0"
@@ -185,6 +186,13 @@ export class LedgerWallet implements Wallet {
     try {
       const rlpEncoded = rlpEncodedTx(txParams)
       const path = await this.getDerivationPathFor(txParams.from!.toString())
+      const tokenInfo = byContractAddress(
+        rlpEncoded.transaction.to!,
+        rlpEncoded.transaction.chainId!
+      )
+      if (tokenInfo) {
+        await this.ledger!.provideERC20TokenInformation(tokenInfo)
+      }
       const signature = await this.ledger!.signTransaction(
         path,
         trimLeading0x(rlpEncoded.rlpEncode) // the ledger requires the rlpEncode without the leading 0x
