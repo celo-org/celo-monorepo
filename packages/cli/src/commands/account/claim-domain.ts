@@ -18,7 +18,7 @@ export default class ClaimDomain extends ClaimCommand {
   self = ClaimDomain
   async run() {
     const res = this.parse(ClaimDomain)
-    const metadata = this.readMetadata()
+    const metadata = await this.readMetadata()
     await this.addClaim(metadata, createDomainClaim(res.flags.domain))
     this.writeMetadata(metadata)
   }
