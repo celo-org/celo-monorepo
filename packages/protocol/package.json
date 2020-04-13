@@ -44,7 +44,7 @@
     "@celo/utils": "0.1.9-dev",
     "apollo-client": "^2.4.13",
     "bip39": "^3.0.2",
-    "bls12377js": "https://github.com/celo-org/bls12377js#ca0092230efcc5e6c190689d564d8c61b5ba710e",
+    "bls12377js": "https://github.com/celo-org/bls12377js#3755c6b9d27a2d93c82eeb95d7d1dac3ebe321ad",
     "chai-subset": "^1.6.0",
     "csv-parser": "^2.0.0",
     "csv-stringify": "^4.3.1",

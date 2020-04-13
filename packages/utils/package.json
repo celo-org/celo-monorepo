@@ -21,7 +21,7 @@
     "@umpirsky/country-list": "git://github.com/umpirsky/country-list#05fda51",
     "bigi": "^1.1.0",
     "bignumber.js": "^9.0.0",
-    "bls12377js": "https://github.com/celo-org/bls12377js#ca0092230efcc5e6c190689d564d8c61b5ba710e",
+    "bls12377js": "https://github.com/celo-org/bls12377js#3755c6b9d27a2d93c82eeb95d7d1dac3ebe321ad",
     "bn.js": "4.11.8",
     "buffer-reverse": "^1.0.1",
     "country-data": "^0.0.31",

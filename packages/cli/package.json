@@ -39,7 +39,7 @@
     "@oclif/plugin-help": "^2",
     "bip32": "^1.0.2",
     "bip39": "^2.5.0",
-    "bls12377js": "https://github.com/celo-org/bls12377js#ca0092230efcc5e6c190689d564d8c61b5ba710e",
+    "bls12377js": "https://github.com/celo-org/bls12377js#3755c6b9d27a2d93c82eeb95d7d1dac3ebe321ad",
     "chalk": "^2.4.2",
     "cli-table": "^0.3.1",
     "cli-ux": "^5.3.1",

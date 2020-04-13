@@ -10533,9 +10533,9 @@ bls12377js@celo-org/bls12377js#566137fd6b9568ef105a3aeaf8e36ff03da91d49:
     ts-node "^8.4.1"
     typescript "^3.6.4"
 
-"bls12377js@https://github.com/celo-org/bls12377js#400bcaeec9e7620b040bfad833268f5289699cac":
+"bls12377js@https://github.com/celo-org/bls12377js#3755c6b9d27a2d93c82eeb95d7d1dac3ebe321ad":
   version "0.1.0"
-  resolved "https://github.com/celo-org/bls12377js#400bcaeec9e7620b040bfad833268f5289699cac"
+  resolved "https://github.com/celo-org/bls12377js#3755c6b9d27a2d93c82eeb95d7d1dac3ebe321ad"
   dependencies:
     "@stablelib/blake2xs" "0.10.4"
     "@types/node" "^12.11.7"
@@ -10545,9 +10545,9 @@ bls12377js@celo-org/bls12377js#566137fd6b9568ef105a3aeaf8e36ff03da91d49:
     ts-node "^8.4.1"
     typescript "^3.6.4"
 
-"bls12377js@https://github.com/celo-org/bls12377js#ca0092230efcc5e6c190689d564d8c61b5ba710e":
+"bls12377js@https://github.com/celo-org/bls12377js#400bcaeec9e7620b040bfad833268f5289699cac":
   version "0.1.0"
-  resolved "https://github.com/celo-org/bls12377js#ca0092230efcc5e6c190689d564d8c61b5ba710e"
+  resolved "https://github.com/celo-org/bls12377js#400bcaeec9e7620b040bfad833268f5289699cac"
   dependencies:
     "@stablelib/blake2xs" "0.10.4"
     "@types/node" "^12.11.7"
