@@ -7,6 +7,7 @@ import { I18nProps, withNamespaces } from 'src/i18n'
 import Chevron, { Direction } from 'src/icons/chevron'
 import { colors } from 'src/styles'
 import { cutAddress, formatNumber } from 'src/utils/utils'
+import Checkmark from 'src/icons/Checkmark'
 
 class Text extends RNText {
   render() {
@@ -31,6 +32,7 @@ export interface CeloGroup {
   rewards: number
   rewardsStyle: any
   numMembers: number
+  claims: string[]
   validators: Array<{
     name: string
     address: string
@@ -40,6 +42,7 @@ export interface CeloGroup {
     online: boolean
     uptime: number
     attestation: number
+    claims: string[]
   }>
 }
 
@@ -66,6 +69,10 @@ class ValidatorsListRow extends React.PureComponent<Props & I18nProps> {
             <Text style={[styles.tableCellTitleRows]}>
               <Text style={[styles.tableCellTitleFirstRow]} numberOfLines={1} ellipsizeMode="tail">
                 {group.name}
+
+                {!!group.claims.length && (<Text style={[styles.checkmark]}>
+                  <Checkmark color={colors.black} size={8} />
+                </Text>)}
               </Text>
               <Text style={[styles.tableCellTitleSecRow]}>
                 <Text style={[styles.address]}>{cutAddress(group.address)}</Text>

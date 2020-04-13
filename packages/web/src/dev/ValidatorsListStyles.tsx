@@ -220,4 +220,16 @@ export const styles = StyleSheet.create({
   barKo: {
     backgroundColor: colors.red,
   },
+
+  // Checkmark
+  checkmark: {
+    display: 'inline-block',
+    width: 14,
+    height: 14,
+    lineHeight: 14,
+    backgroundColor: colors.white,
+    borderRadius: '50%',
+    textAlign: 'center',
+    marginLeft: 6,
+  } as any,
 })

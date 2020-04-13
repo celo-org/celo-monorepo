@@ -49,12 +49,16 @@ interface CeloValidatorGroup {
     lockedGold: string
     name: string
     usd: string
+    claims: any
   }
   accumulatedActive: string
   accumulatedRewards: string
   affiliates: {
     edges: Array<{
       node: {
+        account: {
+          claims: any
+        }
         address: string
         attestationsFulfilled: number
         attestationsRequested: number
@@ -150,6 +154,12 @@ class ValidatorsList extends React.PureComponent<ValidatorsListProps & I18nProps
       .map(({ receivableVotes }) => new BigNumber(receivableVotes))
       .reduce((acc: BigNumber, _) => acc.plus(_), new BigNumber(0))
 
+    const getClaims = (claims: any): string[] =>
+      claims.edges
+        .map(({ node }) => node)
+        .filter(({ verified }) => verified)
+        .map(({ element }) => element)
+
     const cleanData = celoValidatorGroups
       .map(
         ({ account, affiliates, votes, receivableVotes, commission, numMembers, rewardsRatio }) => {
@@ -174,6 +184,7 @@ class ValidatorsList extends React.PureComponent<ValidatorsListProps & I18nProps
             rewards,
             rewardsStyle,
             numMembers,
+            claims: getClaims(group.claims),
             validators: affiliates.edges.map(({ node: validator }) => {
               const {
                 address,
@@ -196,6 +207,7 @@ class ValidatorsList extends React.PureComponent<ValidatorsListProps & I18nProps
                 uptime: (+score * 100) / 10 ** 24,
                 attestation:
                   Math.max(0, attestationsFulfilled / (attestationsRequested || -1)) * 100,
+                claims: getClaims(validator.account.claims),
               }
             }),
           }
