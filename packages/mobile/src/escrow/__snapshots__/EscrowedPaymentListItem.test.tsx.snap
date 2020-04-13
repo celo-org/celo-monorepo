@@ -77,21 +77,39 @@ exports[`EscrowedPaymentReminderNotification renders correctly 1`] = `
           <Text
             style={
               Object {
-                "color": "#81868B",
-                "fontFamily": "Hind-Regular",
+                "color": "#2E3338",
+                "fontFamily": "Hind-SemiBold",
                 "fontSize": 14,
                 "lineHeight": 18,
               }
             }
           >
-            escrowPaymentNotificationTitle
+            Invited and paid 
+            +14155550000
+             (
+            <Text
+              numberOfLines={1}
+              style={
+                Array [
+                  undefined,
+                  Object {
+                    "color": undefined,
+                  },
+                ]
+              }
+            >
+              
+              $
+              0.00
+            </Text>
+            )
           </Text>
           <View
             style={
               Object {
                 "justifyContent": "space-between",
                 "minHeight": 60,
-                "paddingTop": 8,
+                "paddingTop": 2,
               }
             }
           >
@@ -111,7 +129,7 @@ exports[`EscrowedPaymentReminderNotification renders correctly 1`] = `
               style={
                 Object {
                   "flexDirection": "row",
-                  "marginTop": 5,
+                  "marginTop": 12,
                 }
               }
             >

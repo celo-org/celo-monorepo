@@ -9,11 +9,10 @@ import { eqAddress } from '@celo/utils/src/address'
 import { retryAsync } from '@celo/utils/src/async'
 import { extractAttestationCodeFromMessage } from '@celo/utils/src/attestations'
 import { compressedPubKey } from '@celo/utils/src/commentEncryption'
-import { TxPromises } from '@celo/walletkit'
 import { Platform } from 'react-native'
 import { Task } from 'redux-saga'
 import { all, call, delay, fork, put, race, select, take, takeEvery } from 'redux-saga/effects'
-import { e164NumberSelector } from 'src/account/reducer'
+import { e164NumberSelector } from 'src/account/selectors'
 import { showError, showMessage } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
@@ -32,9 +31,9 @@ import {
 } from 'src/identity/actions'
 import { acceptedAttestationCodesSelector, attestationCodesSelector } from 'src/identity/reducer'
 import { startAutoSmsRetrieval } from 'src/identity/smsRetrieval'
-import { sendTransaction, sendTransactionPromises } from 'src/transactions/send'
+import { sendTransaction } from 'src/transactions/send'
 import Logger from 'src/utils/Logger'
-import { contractKit } from 'src/web3/contracts'
+import { getContractKit } from 'src/web3/contracts'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
 import { privateCommentKeySelector } from 'src/web3/selectors'
 
@@ -66,6 +65,8 @@ export interface AttestationCode {
 }
 
 export function* checkVerification() {
+  const contractKit = getContractKit()
+
   const attestationsWrapper: AttestationsWrapper = yield call([
     contractKit.contracts,
     contractKit.contracts.getAttestations,
@@ -129,6 +130,8 @@ export function* doVerificationFlow() {
     const privDataKey = yield select(privateCommentKeySelector)
     const dataKey = compressedPubKey(Buffer.from(privDataKey, 'hex'))
 
+    const contractKit = getContractKit()
+
     const attestationsWrapper: AttestationsWrapper = yield call([
       contractKit.contracts,
       contractKit.contracts.getAttestations,
@@ -142,6 +145,7 @@ export function* doVerificationFlow() {
 
     // Get all relevant info about the account's verification status
     yield put(setVerificationStatus(VerificationStatus.GettingStatus))
+
     const status: AttestationsStatus = yield call(
       getAttestationsStatus,
       attestationsWrapper,
@@ -357,14 +361,7 @@ function* requestAttestations(
 
   const selectIssuersTx = attestationsWrapper.selectIssuers(e164Number)
 
-  const txPromises: TxPromises = yield call(
-    sendTransactionPromises,
-    selectIssuersTx.txo,
-    account,
-    TAG,
-    'Select Issuer'
-  )
-  yield txPromises.receipt
+  yield call(sendTransaction, selectIssuersTx.txo, account, TAG, 'Select Issuer')
 
   CeloAnalytics.track(CustomEventNames.verification_requested_attestations)
 }
@@ -548,11 +545,10 @@ function* waitForAttestationCode(issuer: string) {
 
 function* setAccount(accountsWrapper: AccountsWrapper, address: string, dataKey: string) {
   Logger.debug(TAG, 'Setting wallet address and public data encryption key')
-  const upToDate = yield call(isAccountUpToDate, accountsWrapper, address, dataKey)
+  const upToDate: boolean = yield call(isAccountUpToDate, accountsWrapper, address, dataKey)
   if (upToDate) {
     return
   }
-  // @ts-ignore datakey type seems wrong
   const setAccountTx = accountsWrapper.setAccount('', dataKey, address)
   yield call(sendTransaction, setAccountTx.txo, address, TAG, 'Set Wallet Address & DEK')
   CeloAnalytics.track(CustomEventNames.verification_set_account)

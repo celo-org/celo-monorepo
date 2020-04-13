@@ -7,7 +7,7 @@ import Svg from 'svgs'
 
 function Phone() {
   return (
-    <>
+    <View style={styles.container}>
       <View style={styles.absoluteCenter}>
         <GreenLine />
       </View>
@@ -15,7 +15,6 @@ function Phone() {
         <Path
           d="M17.8473 2.64592L139.728 17.2761C147.016 18.1508 152.5 24.333 152.5 31.6727V327.146C152.5 334.517 146.969 340.716 139.645 341.552L17.7584 355.469C8.56117 356.519 0.5 349.326 0.5 340.069V18.0355C0.5 8.74263 8.62072 1.53839 17.8473 2.64592Z"
           stroke="white"
-          style={[styles.animations, styles.appear]}
         />
         <Line
           x1="1"
@@ -27,18 +26,16 @@ function Phone() {
           strokeWidth="40"
         />
       </Svg>
-    </>
+    </View>
   )
 }
 
 function GreenLine() {
   return (
-    <View
-      style={[standardStyles.row, standardStyles.centered, styles.lightspeed, styles.animations]}
-    >
-      <View style={styles.line} />
-      <View style={styles.onLine}>
-        <OvalCoin color={colors.primary} size={20} />
+    <View style={[standardStyles.row, standardStyles.centered]}>
+      <View style={[styles.line, styles.arrow, styles.animations]} />
+      <View style={[styles.arrowhead, styles.animations]}>
+        <OvalCoin color={colors.primary} size={16} />
       </View>
     </View>
   )
@@ -46,7 +43,7 @@ function GreenLine() {
 
 export default React.memo(Phone)
 
-const LINE_OFFSET = 150
+const LINE_DISTANCE = 280
 
 const svgStyle = {
   zIndex: 1,
@@ -55,53 +52,54 @@ const svgStyle = {
 const styles = StyleSheet.create({
   absoluteCenter: {
     position: 'absolute',
+    left: 0,
+    right: 0,
     height: '100%',
     justifyContent: 'center',
     alignItems: 'center',
   },
+  container: {
+    maxHeight: 350,
+    height: '100%',
+  },
   animations: {
-    animationDuration: '1.2s',
+    animationDuration: '1s',
     animationIterationCount: 1,
     animationTimingFunction: 'linear',
     animationFillMode: 'both',
   },
-  appear: {
+  arrowhead: {
     animationKeyframes: [
       {
         '0%': {
           opacity: 0.5,
+          transform: [{ translateX: -LINE_DISTANCE }],
         },
         '100%': {
           opacity: 1,
+          transform: [{ translateX: -5 }],
         },
       },
     ],
   },
-  lightspeed: {
+  arrow: {
+    transformOrigin: 'left',
     animationKeyframes: [
       {
         '0%': {
-          transform: [{ translateX: `calc(-${LINE_OFFSET * 3}px)` }],
-        },
-        '40%': {
-          transform: [
-            {
-              translateX: `calc(-${LINE_OFFSET}px)`,
-            },
-          ],
+          opacity: 0.6,
+          transform: [{ scaleX: 0 }],
         },
         '100%': {
-          transform: [{ translateX: 0 }],
+          opacity: 1,
+          transform: [{ scaleX: 1 }],
         },
       },
     ],
   },
   line: {
-    borderBottomColor: colors.primary,
-    borderBottomWidth: 1,
-    width: `calc(50vw + ${LINE_OFFSET}px)`,
-  },
-  onLine: {
-    transform: [{ translateX: -5 }],
+    width: LINE_DISTANCE,
+    height: 1,
+    backgroundColor: colors.primary,
   },
 })

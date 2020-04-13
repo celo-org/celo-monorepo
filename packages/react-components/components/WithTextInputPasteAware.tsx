@@ -12,26 +12,37 @@ interface PasteAwareProps {
   onChangeText: (text: string) => void
 }
 
+interface PasteAwareState {
+  isPasteIconVisible: boolean
+  clipboardContent: string | null
+}
+
 export default function withTextInputPasteAware<P extends TextInputProps>(
   WrappedTextInput: React.ComponentType<P>,
   pasteIconContainerStyle?: ViewStyle
 ) {
   return class WithTextInputLabeling extends React.Component<P & PasteAwareProps> {
-    state = {
+    state: PasteAwareState = {
       isPasteIconVisible: false,
+      clipboardContent: null,
     }
 
+    _interval?: number
     _isMounted = false
 
     async componentDidMount() {
       this._isMounted = true
       AppState.addEventListener('change', this.checkClipboardContents)
+      this._interval = window.setInterval(async () => {
+        await this.checkClipboardContents()
+      }, 1000) // Every 1s
       await this.checkClipboardContents()
     }
 
     componentWillUnmount() {
       this._isMounted = false
       AppState.removeEventListener('change', this.checkClipboardContents)
+      clearInterval(this._interval)
     }
 
     checkClipboardContents = async () => {
@@ -41,24 +52,29 @@ export default function withTextInputPasteAware<P extends TextInputProps>(
           return
         }
 
+        const { shouldShowClipboard, value } = this.props
         if (
           clipboardContent &&
-          clipboardContent !== this.props.value &&
-          this.props.shouldShowClipboard(clipboardContent)
+          !(value && clipboardContent.toLowerCase().includes(value.toLowerCase())) &&
+          shouldShowClipboard(clipboardContent)
         ) {
-          this.setState({ isPasteIconVisible: true })
+          this.setState({ isPasteIconVisible: true, clipboardContent })
         } else {
-          this.setState({ isPasteIconVisible: false })
+          this.setState({ isPasteIconVisible: false, clipboardContent: null })
         }
       } catch (error) {
         console.error('Error checking clipboard contents', error)
       }
     }
 
-    onPressPate = async () => {
-      const clipboardContents = await Clipboard.getString()
-      this.setState({ isPasteIconVisible: false })
-      this.props.onChangeText(clipboardContents)
+    onPressPate = () => {
+      const { clipboardContent } = this.state
+      if (!clipboardContent) {
+        console.error('Attempted to paste but clipboard content empty. Should never happen.')
+        return
+      }
+      this.setState({ isPasteIconVisible: false, clipboardContent: null })
+      this.props.onChangeText(clipboardContent)
     }
 
     render() {

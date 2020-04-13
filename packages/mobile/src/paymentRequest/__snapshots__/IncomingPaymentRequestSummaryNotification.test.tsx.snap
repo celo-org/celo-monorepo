@@ -115,6 +115,7 @@ exports[`IncomingPaymentRequestSummaryNotification renders correctly 1`] = `
                  for 
               </Text>
               <Text
+                numberOfLines={1}
                 style={
                   Array [
                     Object {
@@ -124,12 +125,14 @@ exports[`IncomingPaymentRequestSummaryNotification renders correctly 1`] = `
                       "lineHeight": 20,
                     },
                     Object {
-                      "fontFamily": "Hind-SemiBold",
+                      "color": "#81868B",
                     },
                   ]
                 }
               >
-                200000.00
+                
+                $
+                266,000.00
               </Text>
             </Text>
             <View>
@@ -324,21 +327,39 @@ exports[`IncomingPaymentRequestSummaryNotification when more 1 requests renders 
             <Text
               style={
                 Object {
-                  "color": "#81868B",
-                  "fontFamily": "Hind-Regular",
+                  "color": "#2E3338",
+                  "fontFamily": "Hind-SemiBold",
                   "fontSize": 14,
                   "lineHeight": 18,
                 }
               }
+              testID="IncomingPaymentRequestNotification/FAKE_ID_1/Title"
             >
-              incomingPaymentRequestNotificationTitle
+              +491522345678
+               requested
+               
+              <Text
+                numberOfLines={1}
+                style={
+                  Array [
+                    undefined,
+                    Object {
+                      "color": undefined,
+                    },
+                  ]
+                }
+              >
+                
+                $
+                266,000.00
+              </Text>
             </Text>
             <View
               style={
                 Object {
                   "justifyContent": "space-between",
                   "minHeight": 60,
-                  "paddingTop": 8,
+                  "paddingTop": 2,
                 }
               }
             >
@@ -358,7 +379,7 @@ exports[`IncomingPaymentRequestSummaryNotification when more 1 requests renders 
                 style={
                   Object {
                     "flexDirection": "row",
-                    "marginTop": 5,
+                    "marginTop": 12,
                   }
                 }
               >
@@ -559,6 +580,7 @@ exports[`IncomingPaymentRequestSummaryNotification when more than 2 requests ren
                  for 
               </Text>
               <Text
+                numberOfLines={1}
                 style={
                   Array [
                     Object {
@@ -568,12 +590,14 @@ exports[`IncomingPaymentRequestSummaryNotification when more than 2 requests ren
                       "lineHeight": 20,
                     },
                     Object {
-                      "fontFamily": "Hind-SemiBold",
+                      "color": "#81868B",
                     },
                   ]
                 }
               >
-                200000.00
+                
+                $
+                266,000.00
               </Text>
             </Text>
             <View>

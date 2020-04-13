@@ -1,35 +1,30 @@
 {
   "aboutTheChallenge": "About the Challenge",
-  "aboutChallengeText":
-    "We're looking for node operators and admins who can help develop the Celo menu. Spin up a validator or full node, build operational experience, and help the community prepare for opening night.",
+  "aboutChallengeText": "We're looking for node operators and admins who can help develop the Celo menu. Spin up a validator or full node, build operational experience, and help the community prepare for opening night.",
   "aboutTheChallengeButton": "Get Involved",
   "expandLeaderboard": "Expand Leaderboard",
   "collapseLeaderboard": "Collapse Leaderboard",
   "makeWithCelo": "Build Celo",
-  "makeWithCeloSubtitle":
-    "Get a taste of Baklava, Celo’s incentivized testnet, and participate in The Great Celo Stake Off",
+  "makeWithCeloSubtitle": "Get a taste of Baklava, Celo’s incentivized testnet, and participate in The Great Celo Stake Off",
   "greatStakeOff": "The Great Celo\nStake Off",
   "greatStakeOffSubtitle": "Win prizes by operating and hardening\nthe Baklava Testnet",
   "purposeTitle": "Purpose",
-  "purposeText":
-    "Learn how to run a node on Celo’s peer-to-peer network and take a slice of up to <0>2 million Celo Gold in rewards.</0>*",
+  "purposeText": "Learn how to run a node on Celo’s peer-to-peer network and take a slice of up to <0>2 million Celo Gold in rewards.</0>*",
   "purposeAsterisk": "* subject to <0>Terms and Conditions</0>",
   "challengeTitle": "The Challenge",
-  "challengeText":
-    "Let the staking season commence! Starting December 4th, all chefs, bakers, and validators are invited to compete for the ultimate glory: honor, food, and Celo Gold.",
+  "challengeText": "Starting December 4th, all chefs, bakers, and validators were invited to compete for the ultimate glory: honor, food, and Celo Gold.",
   "whoTitle": "Who",
-  "whoText":
-    "If you have a technical background and you’re interested in open source, security, or building & operating infrastructure, you’d make a perfect Celo validator!",
+  "whoText": "If you have a technical background and you’re interested in open source, security, or building & operating infrastructure, you’d make a perfect Celo validator!",
   "challengeBtnText": "Join the Stake Off",
   "ranking": "Ranking Baklava Validators",
   "unitOfMeasure": "Baklava Testnet Units (BTUs)",
   "leaderboardTitle": "The Great Celo Stake Off\nLeaderboard",
-  "prizeInfo":
-    "The top 50 eligible participants may receive Celo Gold, subject to <0>Terms & Conditions</0>",
-  "buildCoverTitle": "Get a Taste of Alfajores",
-  "buildCoverSubtitle": "Developer resources for the Celo Protocol and Celo Wallet",
+  "prizeInfo": "The top 50 eligible participants may receive Celo Gold, subject to <0>Terms & Conditions</0>",
+  "developerSDKTitle": "Celo SDK",
+  "developerSDKsubtitle": "Innovative tools to build native mobile dApps",
   "viewGitHub": "View on Github",
   "getStarted": "Get Wallet",
+  "getInvolved": "Get Involved",
   "seeTutorial": "See Tutorial",
   "featureTitle": "Platform Features",
   "techTitle": "Full Stack Approach",
@@ -47,15 +42,13 @@
     "mainTitle": "Make Celo your own",
     "topTitle": "Engage with Celo",
     "contributeTitle": "Contribute To Celo",
-    "contributeText":
-      "There are a variety of resources to support contributions to Celo, including: grants, security bounties, an Ecosystem Fund, fellowships, and more.",
+    "contributeText": "There are a variety of resources to support contributions to Celo, including: grants, security bounties, an Ecosystem Fund, fellowships, and more.",
     "contributeBtn": "Get Involved",
     "validators": {
       "noun": "For Validators and Full Nodes",
       "verb": "Operate Celo",
       "network": "Baklava Testnet",
-      "caption":
-        "Participate in testing and hardening the Celo Protocol.\nDeploy a Full Node or Validator and win prizes.",
+      "caption": "Participate in testing and hardening the Celo Protocol.\nDeploy a Full Node or Validator and win prizes.",
       "primaryAction": "Register",
       "secondaryAction": "Start Validating"
     },
@@ -63,7 +56,7 @@
       "noun": "For Developers",
       "verb": "Extend & Enrich the Ecosystem",
       "network": "Alfajores Testnet",
-      "caption": "Try out the Celo Protocol and Celo Wallet.\nBuild apps for the Celo platform.",
+      "caption": "Try out the Celo Protocol and Celo Wallet.\nBuild dApps for the Celo platform.",
       "primaryAction": "Get Wallet",
       "secondaryAction": "Explore Celo CLI"
     },
@@ -101,8 +94,8 @@
   "coverAction": {
     "docs": {
       "title": "Documentation",
-      "text": "Learn about the technology behind the Celo Protocol and Celo Wallet",
-      "link": "See Documentation"
+      "text": "Learn about the SDK and how it works",
+      "link": "Visit Docs"
     },
     "faucet": {
       "title": "Add Funds",
@@ -110,20 +103,19 @@
       "link": "Get Funds"
     },
     "code": {
-      "title": "Browse the Code",
-      "text": "Explore and contribute to the Celo codebase",
+      "title": "Code",
+      "text": "Read and contribute to the SDK codebase",
       "link": "View on GitHub"
     },
-    "sdk": {
-      "title": "SDK",
-      "text": "Build on the Celo Platform",
-      "link": "See Documentation"
+    "tutorial": {
+      "title": "Tutorials",
+      "text": "Get started, learn how to deploy contracts, and more",
+      "link": "Get Started"
     }
   },
   "levelLabel": {
     "mobile": "Applications",
-    "mobileText":
-      "Seamless experience enabled by stablecoins and mobile-friendly proof of stake protocol.",
+    "mobileText": "Seamless experience enabled by stablecoins and mobile-friendly proof of stake protocol.",
     "protocol": "Core Contracts",
     "protocolText": "Stablecoins built on the underlying smart contract platform.",
     "proof": "Blockchain",
@@ -138,8 +130,7 @@
     "fastUltraLight": "Very Fast Sync for Ultra-light Clients",
     "gasMultiCurrency": "Gas Payable in Multiple Currencies",
     "programmable": "Programmable (Full EVM Compatibility)",
-    "programmableText":
-      "Programmable smart contract platform compatible with Ethereum Virtual Machine.",
+    "programmableText": "Programmable smart contract platform compatible with Ethereum Virtual Machine.",
     "gasText": "Option to pay transaction fees in stable currency.",
     "ultraText": "Block headers optimized for fast mobile phone synchronization.",
     "custodyText": "Users have access to and control of their account secret keys.",
@@ -150,17 +141,16 @@
   },
   "mobile": {
     "title": "Applications",
-    "text":
-      "Send or Request Celo Dollar easily with anyone in your address book, powered by decentralized phone number verification",
+    "text": "Send or Request cUSD easily with anyone in your address book, powered by decentralized phone number verification",
     "nonCustodial": "Non-custodial wallet",
     "mobileUltra": "Mobile ultralight client",
-    "exchange": "Exchange between Celo Dollar and Celo Gold",
-    "qr": "QR Code Support"
+    "exchange": "Exchange between cUSD and cGLD",
+    "qr": "QR Code Support",
+    "sdk": "Mobile first SDK"
   },
   "protocol": {
     "title": "Core Contracts",
-    "text":
-      "Designed to support an ecology of stable value currencies. The first stablecoin, cUSD, is pegged to the US Dollar.",
+    "text": "Designed to support an ecology of stable value currencies. The first stablecoin, cUSD, tracks the value of the US Dollar.",
     "algoReserve": "Algorithmic reserve-backed stabilization mechanism",
     "cryptoCollat": "Crypto-asset collateralized",
     "native": "Native support for multiple stablecoins"
@@ -168,8 +158,7 @@
   "proof": {
     "title": "Blockchain",
     "text": "Open source smart contract platform built on decentralized infrastructure.",
-    "permissionless":
-      "Proof of Stake based consensus with high throughput, low latency, and zero carbon",
+    "permissionless": "Proof of Stake based consensus with high throughput, low latency, and zero carbon",
     "rewardsWeighted": "Incentives for serving mobile devices",
     "onChain": "On-chain governance"
   },
@@ -182,5 +171,11 @@
   },
   "stackBrowseTitle": "Browse the Code",
   "stackBrowseCopy": "Explore and contribute to the Celo codebase",
-  "stackBrowseButton": "View On Github"
+  "stackBrowseButton": "View On Github",
+  "sandbox": {
+    "overtitle": "Try it Out",
+    "title": "Sample Celo Integration",
+    "explainer": "This code snippet uses an account to transfer cUSD.",
+    "btn": "Try out the Code"
+  }
 }

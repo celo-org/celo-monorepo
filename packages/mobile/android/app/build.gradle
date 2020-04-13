@@ -102,12 +102,21 @@ apply from: project(':react-native-config').projectDir.getPath() + "/dotenv.grad
 apply from: "./react.gradle"
 apply from: "../../../../node_modules/@sentry/react-native/sentry.gradle"
 
-
- /**
- * Build for Detox has to have a universal apk and should be minSdkVersion >= 18
+/**
+ * Build for Detox should be minSdkVersion >= 18
  * Use the taskname to recognize the build is for detox
  */
-def isDetoxTestBuild = !gradle.startParameter.taskNames.contains("assembleAndroidTest")
+def isDetoxTestBuild = gradle.startParameter.taskNames.contains("assembleAndroidTest")
+
+/**
+ * Set this to true to create two separate APKs instead of one:
+ *   - An APK that only works on ARM devices
+ *   - An APK that only works on x86 devices
+ * The advantage is the size of the APK is reduced by about 4MB.
+ * Upload all the APKs to the Play Store and people will download
+ * the correct one based on the CPU architecture of their device.
+ */
+def enableSeparateBuildPerCPUArchitecture = true
 
 /**
  * Run Proguard to shrink the Java bytecode in release builds.
@@ -148,10 +157,10 @@ android {
 
     defaultConfig {
         applicationId "org.celo.mobile"
-        minSdkVersion isDetoxTestBuild ? rootProject.ext.minSdkVersion : 18
+        minSdkVersion isDetoxTestBuild ? 18 : rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode appVersionCode
-        versionName "1.6.0"
+        versionName "1.7.0"
         testBuildType System.getProperty('testBuildType', 'debug')
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         resValue "string", "build_config_package", "org.celo.mobile"
@@ -177,15 +186,7 @@ android {
     splits {
         abi {
             reset()
-            /**
-             * Set this to true to create two separate APKs instead of one:
-             *   - An APK that only works on ARM devices
-             *   - An APK that only works on x86 devices
-             * The advantage is the size of the APK is reduced by about 4MB.
-             * Upload all the APKs to the Play Store and people will download
-             * the correct one based on the CPU architecture of their device.
-             */
-            enable isDetoxTestBuild
+            enable enableSeparateBuildPerCPUArchitecture
             universalApk false  // If true, also generate a universal APK
             include "armeabi-v7a", "x86", "arm64-v8a", "x86_64"
         }
@@ -277,6 +278,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-auth'
     implementation 'com.google.firebase:firebase-invites'
     implementation 'com.google.firebase:firebase-storage'
+    implementation "com.google.firebase:firebase-dynamic-links"
     implementation 'ru.ivanarh.ndcrash:jndcrash-libunwind:0.7'
     implementation 'androidx.appcompat:appcompat:1.1.0-rc01'
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0-alpha02'
@@ -317,7 +319,7 @@ if (enableFirebase.toBoolean()){
 // https://github.com/facebook/react-native/issues/26400#issuecomment-539395814
 configurations.all {
      resolutionStrategy {
-       force "com.facebook.soloader:soloader:0.8.0"
+       force "com.facebook.soloader:soloader:0.8.1"
      }
 }
 

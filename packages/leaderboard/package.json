@@ -6,10 +6,11 @@
   "author": "Celo",
   "license": "Apache-2.0",
   "dependencies": {
-    "@celo/contractkit": "^0.2.10-dev",
+    "@celo/contractkit": "0.3.4-dev",
     "@types/pg": "^7.11.2",
     "google-spreadsheet": "^2.0.8",
     "pg": "^7.12.1",
+    "googleapis": "^39.2.0",
     "ts-node": "^8.5.4"
   },
   "devDependencies": {},

@@ -1,10 +1,14 @@
-import { hotfixToHash } from '@celo/contractkit/lib/governance/proposals'
+import {
+  hotfixToHash,
+  ProposalBuilder,
+  ProposalTransactionJSON,
+} from '@celo/contractkit/lib/governance/proposals'
 import { flags } from '@oclif/command'
+import { readFileSync } from 'fs-extra'
 import { BaseCommand } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
-import { buildProposalFromJsonFile } from '../../utils/governance'
 
 export default class ExecuteHotfix extends BaseCommand {
   static description = 'Execute a governance hotfix prepared for the current epoch'
@@ -23,7 +27,13 @@ export default class ExecuteHotfix extends BaseCommand {
   async run() {
     const res = this.parse(ExecuteHotfix)
     const account = res.flags.from
-    const hotfix = await buildProposalFromJsonFile(this.kit, res.flags.jsonTransactions)
+
+    const jsonString = readFileSync(res.flags.jsonTransactions).toString()
+    const jsonTransactions: ProposalTransactionJSON[] = JSON.parse(jsonString)
+
+    const builder = new ProposalBuilder(this.kit)
+    jsonTransactions.forEach((tx) => builder.addJsonTx(tx))
+    const hotfix = await builder.build()
     const saltBuff = Buffer.from(res.flags.salt, 'hex')
     const hash = hotfixToHash(this.kit, hotfix, saltBuff)
 

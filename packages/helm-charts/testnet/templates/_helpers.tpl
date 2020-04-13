@@ -126,6 +126,7 @@ metadata:
   labels:
     component: {{ .component_label }}
 spec:
+  sessionAffinity: ClientIP
   ports:
   - port: 8545
     name: rpc
@@ -151,7 +152,7 @@ spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:
         requests:
-          storage: 100Gi
+          storage: 2Gi
   {{ end }}
   podManagementPolicy: Parallel
   replicas: {{ .replicas }}
@@ -181,7 +182,6 @@ spec:
             celotooljs.sh generate bip32 --mnemonic "$MNEMONIC" --accountType {{ .mnemonic_account_type }} --index $RID > /root/.celo/pkey
             echo 'Generating address'
             celotooljs.sh generate account-address --private-key `cat /root/.celo/pkey` > /root/.celo/address
-
             {{ if .proxy }}
             # Generating the account address of the validator
             echo "Generating the account address of the validator $RID"
@@ -189,7 +189,6 @@ spec:
             celotooljs.sh generate account-address --private-key `cat /root/.celo/validator_pkey` > /root/.celo/validator_address
             rm -f /root/.celo/validator_pkey
             {{ end }}
-
             echo -n "Generating IP address for node: "
             if [ -z $IP_ADDRESSES ]; then
               echo 'No $IP_ADDRESSES'
@@ -212,7 +211,7 @@ spec:
             cat /root/.celo/ipAddress
 
             echo -n "Generating Bootnode enode address for node: "
-            celotooljs.sh generate public-key --mnemonic "$MNEMONIC" --accountType load_testing --index 0 > /root/.celo/bootnodeEnodeAddress
+            celotooljs.sh generate public-key --mnemonic "$MNEMONIC" --accountType bootnode --index 0 > /root/.celo/bootnodeEnodeAddress
 
             cat /root/.celo/bootnodeEnodeAddress
             [[ "$BOOTNODE_IP_ADDRESS" == 'none' ]] && BOOTNODE_IP_ADDRESS=${{ .Release.Namespace | upper }}_BOOTNODE_SERVICE_HOST
@@ -242,6 +241,9 @@ spec:
         volumeMounts:
         - name: data
           mountPath: /root/.celo
+{{ if .unlock | default false }}
+{{ include "common.import-geth-account-container" .  | indent 6 }}
+{{ end }}
       containers:
       - name: geth
         image: {{ .Values.geth.image.repository }}:{{ .Values.geth.image.tag }}
@@ -251,26 +253,33 @@ spec:
         - "-c"
         - |-
           set -euo pipefail
-          ACCOUNT_ADDRESS=`cat /root/.celo/address`
-          NAT_FLAG="--nat=extip:`cat /root/.celo/ipAddress`"
+          ACCOUNT_ADDRESS=$(cat /root/.celo/address)
+          NAT_FLAG="--nat=extip:$(cat /root/.celo/ipAddress)"
           PING_IP_FROM_PACKET_FLAG=""
           [[ "$PING_IP_FROM_PACKET" == "true" ]] && PING_IP_FROM_PACKET_FLAG="--ping-ip-from-packet"
           IN_MEMORY_DISCOVERY_TABLE_FLAG=""
           [[ "$IN_MEMORY_DISCOVERY_TABLE" == "true" ]] && IN_MEMORY_DISCOVERY_TABLE_FLAG="--use-in-memory-discovery-table"
+          PROXY_ALLOW_PRIVATE_IP_FLAG=""
+          [[ "$GETH_DEBUG" == "true" ]] && PROXY_ALLOW_PRIVATE_IP_FLAG="--proxy.allowprivateip"
 
-          RPC_APIS="eth,net,web3,debug"
+          RPC_APIS={{ .rpc_apis }}
 
+          ADDITIONAL_FLAGS=""
           {{ if .proxy }}
           VALIDATOR_HEX_ADDRESS=`cat /root/.celo/validator_address`
-          ADDITIONAL_FLAGS="--proxy.proxiedvalidatoraddress $VALIDATOR_HEX_ADDRESS {{ .geth_flags | default "" }} --proxy.allowprivateip"
-          {{ else }}
-          ADDITIONAL_FLAGS='{{ .geth_flags | default "" }}'
-          RPC_APIS=${RPC_APIS},txpool
+          ADDITIONAL_FLAGS="--proxy.proxiedvalidatoraddress $VALIDATOR_HEX_ADDRESS --proxy.proxy --proxy.internalendpoint :30503 $PROXY_ALLOW_PRIVATE_IP_FLAG"
           {{ end }}
+          {{ if .unlock | default false }}
+          ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --unlock=${ACCOUNT_ADDRESS} --password /root/.celo/account/accountSecret --allow-insecure-unlock"
+          {{ end }}
+          {{ if .expose }}
+          ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --rpc --rpcaddr 0.0.0.0 --rpcapi=${RPC_APIS} --rpccorsdomain='*' --rpcvhosts=* --ws --wsaddr 0.0.0.0 --wsorigins=* --wsapi=${RPC_APIS}"
+          {{ end }}
+
           geth \
             --bootnodes=enode://`cat /root/.celo/bootnodeEnode` \
-            --lightserv 90 \
-            --lightpeers 1000 \
+            --light.serve 90 \
+            --light.maxpeers 1000 \
             --maxpeers 1100 \
             --rpc \
             --rpcaddr 0.0.0.0 \
@@ -285,6 +294,7 @@ spec:
             --etherbase=${ACCOUNT_ADDRESS} \
             --networkid=${NETWORK_ID} \
             --syncmode=full \
+            --gcmode={{ .gcmode | default "full" }} \
             ${NAT_FLAG} \
             --ethstats=${HOSTNAME}@${ETHSTATS_SVC} \
             --consoleformat=json \
@@ -297,6 +307,8 @@ spec:
         env:
         - name: ETHSTATS_SVC
           value: {{ template "ethereum.fullname" . }}-ethstats.{{ .Release.Namespace }}
+        - name: GETH_DEBUG
+          value: "{{ default "false" .Values.geth.debug }}"
         - name: NETWORK_ID
           valueFrom:
             configMapKeyRef:

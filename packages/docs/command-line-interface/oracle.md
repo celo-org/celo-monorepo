@@ -34,18 +34,12 @@ ARGUMENTS
   TOKEN  (StableToken) [default: StableToken] Token to report on
 
 OPTIONS
-  --denominator=denominator                          (required) [default: 1] Amount of cGLD equal to the numerator.
-                                                     Defaults to 1 if left blank
-
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the oracle account
-
-  --numerator=numerator                              (required) Amount of the specified token equal to the amount of
-                                                     cGLD in the denominator
+  --value=value                                      (required) Amount of the specified token equal to 1 cGLD
 
 EXAMPLES
-  report StableToken --numerator 1.02 --from 0x8c349AAc7065a35B7166f2659d6C35D75A3893C1
-  report StableToken --numerator 102 --denominator 100 --from 0x8c349AAc7065a35B7166f2659d6C35D75A3893C1
-  report --numerator 0.99 --from 0x8c349AAc7065a35B7166f2659d6C35D75A3893C1
+  report StableToken --value 1.02 --from 0x8c349AAc7065a35B7166f2659d6C35D75A3893C1
+  report --value 0.99 --from 0x8c349AAc7065a35B7166f2659d6C35D75A3893C1
 ```
 
 _See code: [packages/cli/src/commands/oracle/report.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/oracle/report.ts)_

@@ -4,10 +4,11 @@ import {
   deploymentForCoreContract,
   getDeployedProxiedContract,
 } from '@celo/protocol/lib/web3-utils'
-import { FeeCurrencyWhitelistInstance, GoldTokenInstance } from 'types'
+import { config } from '@celo/protocol/migrationsConfig'
+import { FeeCurrencyWhitelistInstance, FreezerInstance, GoldTokenInstance } from 'types'
 
 const initializeArgs = async () => {
-  return []
+  return [config.registry.predeployedProxyAddress]
 }
 
 module.exports = deploymentForCoreContract<GoldTokenInstance>(
@@ -21,5 +22,13 @@ module.exports = deploymentForCoreContract<GoldTokenInstance>(
       FeeCurrencyWhitelistInstance
     >('FeeCurrencyWhitelist', artifacts)
     await feeCurrencyWhitelist.addToken(goldToken.address)
+
+    if (config.goldToken.frozen) {
+      const freezer: FreezerInstance = await getDeployedProxiedContract<FreezerInstance>(
+        'Freezer',
+        artifacts
+      )
+      await freezer.freeze(goldToken.address)
+    }
   }
 )

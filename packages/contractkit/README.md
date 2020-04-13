@@ -7,7 +7,7 @@ ContractKit supports the following functionality:
 - Connect to a node
 - Access web3 object to interact with node's Json RPC API
 - Send Transaction with celo's extra fields: (feeCurrency)
-- Simple interface to interact with cGold and cDollar
+- Simple interface to interact with cGLD and cUSD
 - Simple interface to interact with Celo Core contracts
 - Utilities
 
@@ -18,9 +18,9 @@ ContractKit supports the following functionality:
 To install:
 
 ```bash
-npm install @celo/contractkit
+npm install @celo/contractkit@baklava
 // or
-yarn add @celo/contractkit
+yarn add @celo/contractkit@baklava
 ```
 
 You will need node version `8.13.0` or higher.
@@ -57,9 +57,9 @@ async function getKit(myAddress: string) {
 }
 ```
 
-### Interacting with cGold & cDollar
+### Interacting with cGLD & cUSD
 
-celo-blockchain has two initial coins: cGold and cDollar (stableToken).
+celo-blockchain has two initial coins: cGLD and cUSD (stableToken).
 Both implement the ERC20 standard, and to interact with them is as simple as:
 
 ```ts
@@ -80,7 +80,7 @@ const hash = await tx.getHash()
 const receipt = await tx.waitReceipt()
 ```
 
-To interact with cDollar, is the same but with a different contract:
+To interact with cUSD, is the same but with a different contract:
 
 ```ts
 const stabletoken = await kit.contracts.getStableToken()

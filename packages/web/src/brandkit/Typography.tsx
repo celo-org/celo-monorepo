@@ -5,6 +5,7 @@ import DownloadButton from 'src/brandkit/common/DownloadButton'
 import Page, { TYPE_PATH } from 'src/brandkit/common/Page'
 import PageHeadline from 'src/brandkit/common/PageHeadline'
 import SectionTitle from 'src/brandkit/common/SectionTitle'
+import { GARMOND_TRACKING, JOST_TRACKING } from 'src/brandkit/tracking'
 import UseageExamples from 'src/brandkit/typography/UseageExample'
 import { H2, H3 } from 'src/fonts/Fonts'
 import { I18nProps, NameSpaces, Trans, withNamespaces } from 'src/i18n'
@@ -56,7 +57,7 @@ const Overview = withNamespaces(NameSpaces.brand)(
           <Text style={fonts.h5}>{t('typography.facesTitle')}</Text>
           <Text style={[fonts.p, standardStyles.elementalMargin]}>
             <Trans ns={NameSpaces.brand} i18nKey={'typography.facesText'}>
-              <InlineAnchor href="https://medium.com/celohq/the-why-of-the-celo-coin-part-1-of-3-5e5701805847">
+              <InlineAnchor href="https://medium.com/celoOrg/the-why-of-the-celo-coin-part-1-of-3-5e5701805847">
                 philosophy
               </InlineAnchor>
             </Trans>
@@ -65,13 +66,19 @@ const Overview = withNamespaces(NameSpaces.brand)(
           <Text style={[fonts.p, standardStyles.elementalMarginBottom]}>
             {t('typography.mainFontText')}
           </Text>
-          <DownloadButton uri="https://fonts.google.com/specimen/EB+Garamond" />
+          <DownloadButton
+            uri="https://fonts.google.com/specimen/EB+Garamond"
+            trackingData={GARMOND_TRACKING}
+          />
           <View style={standardStyles.blockMarginTopTablet}>
             <H3 style={styles.hero}>{t('typography.subFontTitle')}</H3>
             <Text style={[fonts.p, standardStyles.elementalMarginBottom]}>
               {t('typography.subFontText')}
             </Text>
-            <DownloadButton uri="https://indestructibletype.com/Jost.html" />
+            <DownloadButton
+              uri="https://indestructibletype.com/Jost.html"
+              trackingData={JOST_TRACKING}
+            />
           </View>
         </View>
       </View>

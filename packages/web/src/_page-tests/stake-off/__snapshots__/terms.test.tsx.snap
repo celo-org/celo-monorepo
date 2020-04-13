@@ -101,7 +101,7 @@ exports[`Terms renders 1`] = `
           }
         }
       >
-        gameOfStakesTermsTitle
+        The Great Celo Stake Off
       </h1>
       <h3
         aria-level="3"
@@ -120,7 +120,7 @@ exports[`Terms renders 1`] = `
           }
         }
       >
-        termsAndConditions
+        Terms and Conditions
       </h3>
     </div>
   </div>
@@ -211,7 +211,7 @@ exports[`Terms renders 1`] = `
           }
         }
       >
-        Thank you for joining the Great Celo Stake Off (“TGCSO”), the incentivized testnet for the Celo Protocol. TGCSO allows eligible participants (“Participants”) to engage with the betanet version of the Celo Protocol (“Protocol”) and, related to that participation and subject to these Terms and Conditions, Participants will have the opportunity to receive Celo Gold at the Mainnet launch of the Celo Protocol.   TGCSO will commence on the date prescribed by C Labs (the “Company”) and continue until terminated by the Company in its sole discretion (“TGCSO Period”). Participation in TGCSO is subject to these Terms and Conditions (the “Terms”) and the Company’s Privacy Policy (“Privacy Policy”), and all other agreements or terms as set forth by the Company. These Terms constitute a binding obligation between you and the Company. As used herein, “Celo Gold” means the native unit of value on the Mainnet Celo Protocol. 
+        Thank you for joining the Great Celo Stake Off (“TGCSO”), the incentivized testnet for the Celo Protocol. TGCSO allows eligible participants (“Participants”) to engage with the betanet version of the Celo Protocol (“Protocol”) and, related to that participation and subject to these Terms and Conditions, Participants will have the opportunity to receive Celo Gold at the Mainnet launch of the Celo Protocol.   TGCSO will commence on the date prescribed by cLabs (the “Company”) and continue until terminated by the Company in its sole discretion (“TGCSO Period”). Participation in TGCSO is subject to these Terms and Conditions (the “Terms”) and the Company’s Privacy Policy (“Privacy Policy”), and all other agreements or terms as set forth by the Company. These Terms constitute a binding obligation between you and the Company. As used herein, “Celo Gold” means the native unit of value on the Mainnet Celo Protocol. 
               
 YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING IN TGCSO, YOU MUST STRICTLY ADHERE TO THE TERMS. IF, AS PART OF YOUR VOLUNTARY PARTICIPATION, YOU MEET THE CRITERIA LISTED BELOW, YOU MAY BE ELIGIBLE TO RECEIVE CERTAIN AMOUNTS OF CELO GOLD UNITS AND/OR CELO GOLD UPON THE MAINNET LAUNCH OF THE CELO PROTOCOL. YOU AGREE THAT ANY CELO GOLD UNITS OR CELO GOLD RECEIVED BY YOU WILL BE FOR YOUR SERVICES IN TESTING AND CONTRIBUTING TO THE CELO TECHNOLOGIES AS DEFINED BELOW AND AS PART OF THIS TGCSO.
               
@@ -284,13 +284,17 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
               data-focusable={true}
               dir="auto"
               href="https://celo.org/privacy"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
               role="link"
               style={
                 Object {
+                  "WebkitTextDecorationStyle": "solid",
                   "cursor": "pointer",
                   "display": "inline",
                   "opacity": 1,
                   "textDecoration": "underline",
+                  "textDecorationStyle": "solid",
                 }
               }
             >
@@ -354,13 +358,17 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
               data-focusable={true}
               dir="auto"
               href="https://forum.celo.org"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
               role="link"
               style={
                 Object {
+                  "WebkitTextDecorationStyle": "solid",
                   "cursor": "pointer",
                   "display": "inline",
                   "opacity": 1,
                   "textDecoration": "underline",
+                  "textDecorationStyle": "solid",
                 }
               }
             >
@@ -666,13 +674,17 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
               data-focusable={true}
               dir="auto"
               href="mailto:stakeoff@celo.org"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
               role="link"
               style={
                 Object {
+                  "WebkitTextDecorationStyle": "solid",
                   "cursor": "pointer",
                   "display": "inline",
                   "opacity": 1,
                   "textDecoration": "underline",
+                  "textDecorationStyle": "solid",
                 }
               }
             >
@@ -749,13 +761,17 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
                   data-focusable={true}
                   dir="auto"
                   href="https://celo.org/code-of-conduct"
+                  onClick={[Function]}
+                  onMouseEnter={[Function]}
                   role="link"
                   style={
                     Object {
+                      "WebkitTextDecorationStyle": "solid",
                       "cursor": "pointer",
                       "display": "inline",
                       "opacity": 1,
                       "textDecoration": "underline",
+                      "textDecorationStyle": "solid",
                     }
                   }
                 >
@@ -1419,13 +1435,17 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
               data-focusable={true}
               dir="auto"
               href="mailto:stakeoff@celo.org"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
               role="link"
               style={
                 Object {
+                  "WebkitTextDecorationStyle": "solid",
                   "cursor": "pointer",
                   "display": "inline",
                   "opacity": 1,
                   "textDecoration": "underline",
+                  "textDecorationStyle": "solid",
                 }
               }
             >

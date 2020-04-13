@@ -1,9 +1,7 @@
+import { sleep } from '@celo/utils/lib/async'
 import * as admin from 'firebase-admin'
-import * as rlp from 'rlp'
-import Web3 from 'web3'
 import { CeloAdapter } from './celo-adapter'
 import * as fbHelper from './database-helper'
-import { wait } from './utils'
 
 const serviceAccount = require('./serviceAccountKey.json')
 admin.initializeApp({
@@ -50,23 +48,19 @@ async function populatePool(pool: fbHelper.AccountPool) {
 function fakeAction(pool: fbHelper.AccountPool) {
   return pool.doWithAccount(async (account) => {
     console.log('GOT Accounts', account)
-    await wait(5000)
+    await sleep(5000)
   })
 }
 
 // @ts-ignore
 async function web3Playground() {
-  const web3 = await new Web3('http://localhost:8545')
   const pk = 'b2f37985e95fb350f83040b4b7cdc5ea925a2a6417aab481358ff5c79bd7b6b7'
   const to = '0x35e48988157f5cf7fdcfe62805174ee385f7e5df'
   // Values for `alfajores`
-  const celo = new CeloAdapter(
-    web3,
+  const celo = new CeloAdapter({
+    nodeUrl: 'http://localhost:8545',
     pk,
-    '0x299E74bdCD90d4E10f7957EF074ceE32d7e9089a',
-    '0x202ec0cbd312425C266dd473754Ad1719948Bd35',
-    '0x4813BFD311E132ade22c70dFf7e5DB045d26D070'
-  )
+  })
 
   const printBalance = async (addr: string) => {
     console.log(`Account: ${addr}`)
@@ -84,21 +78,11 @@ async function web3Playground() {
   // console.log('receipt', await tx.waitReceipt())
 
   const tx2 = await celo.transferDollars(to, '50000000000000')
-  console.log('txhash', await tx2.getHash())
-  console.log('receipt', await tx2.waitReceipt())
+  console.log('txhash', await tx2.send())
 
   console.log('After')
   await printBalance(celo.defaultAddress)
   await printBalance(to)
-}
-
-// @ts-ignore
-function convertToCeloRawTx(rawTransaction: string) {
-  const decoded = rlp.decode(rawTransaction)
-  // @ts-ignore
-  decoded.splice(3, 0, new Buffer(0), new Buffer(0))
-  // @ts-ignore
-  return '0x' + rlp.encode(decoded).toString('hex')
 }
 
 async function main() {

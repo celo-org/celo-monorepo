@@ -1,11 +1,11 @@
 import BigNumber from 'bignumber.js'
-import { Exchange } from '../generated/types/Exchange'
+import { Exchange } from '../generated/Exchange'
 import {
   BaseWrapper,
   CeloTransactionObject,
   identity,
   proxyCall,
-  proxySend,
+  toTransactionObject,
   tupleParser,
   valueToBigNumber,
   valueToFrac,
@@ -47,6 +47,11 @@ export class ExchangeWrapper extends BaseWrapper<Exchange> {
    * commit to the gold bucket
    */
   minimumReports = proxyCall(this.contract.methods.minimumReports, undefined, valueToBigNumber)
+  /**
+   * Query last bucket update
+   * @returns The timestamp of the last time exchange buckets were updated.
+   */
+  lastBucketUpdate = proxyCall(this.contract.methods.lastBucketUpdate, undefined, valueToBigNumber)
 
   /**
    * @dev Returns the amount of buyToken a user would get for sellAmount of sellToken
@@ -101,20 +106,34 @@ export class ExchangeWrapper extends BaseWrapper<Exchange> {
    * @param sellGold `true` if gold is the sell token
    * @return The amount of buyToken that was transfered
    */
-  exchange: (
+  async exchange(
     sellAmount: BigNumber.Value,
     minBuyAmount: BigNumber.Value,
     sellGold: boolean
-  ) => CeloTransactionObject<string> = proxySend(
-    this.kit,
-    this.contract.methods.exchange,
-    tupleParser(valueToString, valueToString, identity)
-  )
+  ): Promise<CeloTransactionObject<string>> {
+    if (sellGold) {
+      const goldToken = await this.kit.contracts.getGoldToken()
+      await goldToken.increaseAllowance(this.address, sellAmount).send()
+    } else {
+      const stableToken = await this.kit.contracts.getStableToken()
+      await stableToken.increaseAllowance(this.address, sellAmount).send()
+    }
+    return toTransactionObject(
+      this.kit,
+      this.contract.methods.exchange(
+        valueToString(sellAmount),
+        valueToString(minBuyAmount),
+        sellGold
+      ),
+      // Don't estimate gas as the increaseAllowance may not be mined yet.
+      { from: this.kit.defaultAccount, gas: 1000000 }
+    )
+  }
 
   /**
-   * Exchanges amount of cGold in exchange for at least minUsdAmount of cUsd
+   * Exchanges amount of cGLD in exchange for at least minUsdAmount of cUsd
    * Requires the amount to have been approved to the exchange
-   * @param amount The amount of cGold the user is selling to the exchange
+   * @param amount The amount of cGLD the user is selling to the exchange
    * @param minUsdAmount The minimum amount of cUsd the user has to receive for this
    * transaction to succeed
    */
@@ -122,41 +141,41 @@ export class ExchangeWrapper extends BaseWrapper<Exchange> {
     this.exchange(amount, minUSDAmount, true)
 
   /**
-   * Exchanges amount of cUsd in exchange for at least minGoldAmount of cGold
+   * Exchanges amount of cUsd in exchange for at least minGoldAmount of cGLD
    * Requires the amount to have been approved to the exchange
    * @param amount The amount of cUsd the user is selling to the exchange
-   * @param minGoldAmount The minimum amount of cGold the user has to receive for this
+   * @param minGoldAmount The minimum amount of cGLD the user has to receive for this
    * transaction to succeed
    */
   sellDollar = (amount: BigNumber.Value, minGoldAmount: BigNumber.Value) =>
     this.exchange(amount, minGoldAmount, false)
 
   /**
-   * Returns the amount of cGold a user would get for sellAmount of cUsd
+   * Returns the amount of cGLD a user would get for sellAmount of cUsd
    * @param sellAmount The amount of cUsd the user is selling to the exchange
-   * @return The corresponding cGold amount.
+   * @return The corresponding cGLD amount.
    */
   quoteUsdSell = (sellAmount: BigNumber.Value) => this.getBuyTokenAmount(sellAmount, false)
 
   /**
-   * Returns the amount of cUsd a user would get for sellAmount of cGold
-   * @param sellAmount The amount of cGold the user is selling to the exchange
+   * Returns the amount of cUsd a user would get for sellAmount of cGLD
+   * @param sellAmount The amount of cGLD the user is selling to the exchange
    * @return The corresponding cUsd amount.
    */
   quoteGoldSell = (sellAmount: BigNumber.Value) => this.getBuyTokenAmount(sellAmount, true)
 
   /**
-   * Returns the amount of cGold a user would need to exchange to receive buyAmount of
+   * Returns the amount of cGLD a user would need to exchange to receive buyAmount of
    * cUsd.
    * @param buyAmount The amount of cUsd the user would like to purchase.
-   * @return The corresponding cGold amount.
+   * @return The corresponding cGLD amount.
    */
   quoteUsdBuy = (buyAmount: BigNumber.Value) => this.getSellTokenAmount(buyAmount, false)
 
   /**
    * Returns the amount of cUsd a user would need to exchange to receive buyAmount of
-   * cGold.
-   * @param buyAmount The amount of cGold the user would like to purchase.
+   * cGLD.
+   * @param buyAmount The amount of cGLD the user would like to purchase.
    * @return The corresponding cUsd amount.
    */
   quoteGoldBuy = (buyAmount: BigNumber.Value) => this.getSellTokenAmount(buyAmount, true)
@@ -193,14 +212,14 @@ export class ExchangeWrapper extends BaseWrapper<Exchange> {
   /**
    * Returns the exchange rate for cUsd estimated at the buyAmount
    * @param buyAmount The amount of cUsd in wei to estimate the exchange rate at
-   * @return The exchange rate (number of cGold received for one cUsd)
+   * @return The exchange rate (number of cGLD received for one cUsd)
    */
   getUsdExchangeRate = (buyAmount: BigNumber.Value) => this.getExchangeRate(buyAmount, false)
 
   /**
-   * Returns the exchange rate for cGold estimated at the buyAmount
-   * @param buyAmount The amount of cGold in wei to estimate the exchange rate at
-   * @return The exchange rate (number of cUsd received for one cGold)
+   * Returns the exchange rate for cGLD estimated at the buyAmount
+   * @param buyAmount The amount of cGLD in wei to estimate the exchange rate at
+   * @return The exchange rate (number of cUsd received for one cGLD)
    */
   getGoldExchangeRate = (buyAmount: BigNumber.Value) => this.getExchangeRate(buyAmount, true)
 }

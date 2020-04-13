@@ -1,0 +1,19 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ .Release.Namespace }}-celostats-server
+  labels:
+    app: celostats
+    chart: celostats
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    component: celostats-server
+spec:
+  selector:
+    app: celostats
+    release: {{ .Release.Name }}
+    component: celostats-server
+  type: {{ .Values.celostats.service.type }}
+  ports:
+  - port: 80
+    targetPort: http

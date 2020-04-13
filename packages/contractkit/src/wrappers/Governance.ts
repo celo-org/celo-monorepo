@@ -1,9 +1,9 @@
 import { concurrentMap } from '@celo/utils/lib/async'
 import { zip } from '@celo/utils/lib/collections'
 import BigNumber from 'bignumber.js'
-import { Transaction } from 'web3/eth/types'
+import { Transaction } from 'web3-eth'
 import { Address } from '../base'
-import { Governance } from '../generated/types/Governance'
+import { Governance } from '../generated/Governance'
 import {
   BaseWrapper,
   bufferToBytes,
@@ -35,12 +35,20 @@ export interface ProposalStageDurations {
   [ProposalStage.Execution]: BigNumber // seconds
 }
 
+export interface ParticipationParameters {
+  baseline: BigNumber
+  baselineFloor: BigNumber
+  baselineUpdateFactor: BigNumber
+  baselineQuorumFactor: BigNumber
+}
+
 export interface GovernanceConfig {
   concurrentProposals: BigNumber
   dequeueFrequency: BigNumber // seconds
   minDeposit: BigNumber
   queueExpiry: BigNumber
   stageDurations: ProposalStageDurations
+  participationParameters: ParticipationParameters
 }
 
 export interface ProposalMetadata {
@@ -59,7 +67,7 @@ export const proposalToParams = (proposal: Proposal, descriptionURL: string): Pr
   const data = proposal.map((tx) => stringToBuffer(tx.input))
   return [
     proposal.map((tx) => tx.value),
-    proposal.map((tx) => tx.to),
+    proposal.map((tx) => tx.to!),
     bufferToBytes(Buffer.concat(data)),
     data.map((inp) => inp.length),
     descriptionURL,
@@ -72,6 +80,7 @@ export interface ProposalRecord {
   upvotes: BigNumber
   votes: Votes
   proposal: Proposal
+  passing: boolean
 }
 
 export interface UpvoteRecord {
@@ -148,6 +157,27 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   }
 
   /**
+   * Returns the participation parameters.
+   * @returns The participation parameters.
+   */
+  async getParticipationParameters(): Promise<ParticipationParameters> {
+    const res = await this.contract.methods.getParticipationParameters().call()
+    return {
+      baseline: new BigNumber(res[0]),
+      baselineFloor: new BigNumber(res[1]),
+      baselineUpdateFactor: new BigNumber(res[2]),
+      baselineQuorumFactor: new BigNumber(res[3]),
+    }
+  }
+
+  /**
+   * Returns whether or not a particular account is voting on proposals.
+   * @param account The address of the account.
+   * @returns Whether or not the account is voting on proposals.
+   */
+  isVoting: (account: string) => Promise<boolean> = proxyCall(this.contract.methods.isVoting)
+
+  /**
    * Returns current configuration parameters.
    */
   async getConfig(): Promise<GovernanceConfig> {
@@ -157,6 +187,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
       this.minDeposit(),
       this.queueExpiry(),
       this.stageDurations(),
+      this.getParticipationParameters(),
     ])
     return {
       concurrentProposals: res[0],
@@ -164,6 +195,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
       minDeposit: res[2],
       queueExpiry: res[3],
       stageDurations: res[4],
+      participationParameters: res[5],
     }
   }
 
@@ -211,6 +243,24 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   )
 
   /**
+   * Returns whether a dequeued proposal is expired.
+   * @param proposalID Governance proposal UUID
+   */
+  isDequeuedProposalExpired: (proposalID: BigNumber.Value) => Promise<boolean> = proxyCall(
+    this.contract.methods.isDequeuedProposalExpired,
+    tupleParser(valueToString)
+  )
+
+  /**
+   * Returns whether a dequeued proposal is expired.
+   * @param proposalID Governance proposal UUID
+   */
+  isQueuedProposalExpired = proxyCall(
+    this.contract.methods.isQueuedProposalExpired,
+    tupleParser(valueToString)
+  )
+
+  /**
    * Returns the approver address for proposals and hotfixes.
    */
   getApprover = proxyCall(this.contract.methods.approver)
@@ -248,6 +298,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     const metadata = await this.getProposalMetadata(proposalID)
     const proposal = await this.getProposal(proposalID)
     const stage = await this.getProposalStage(proposalID)
+    const passing = await this.isProposalPassing(proposalID)
 
     let upvotes = ZERO_BN
     let votes = { [VoteValue.Yes]: ZERO_BN, [VoteValue.No]: ZERO_BN, [VoteValue.Abstain]: ZERO_BN }
@@ -263,6 +314,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
       stage,
       upvotes,
       votes,
+      passing,
     }
   }
 
@@ -348,10 +400,11 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   /**
    * Returns the (existing) proposal dequeue as list of proposal IDs.
    */
-  async getDequeue() {
+  async getDequeue(filterZeroes = false) {
     const dequeue = await this.contract.methods.getDequeue().call()
     // filter non-zero as dequeued indices are reused and `deleteDequeuedProposal` zeroes
-    return dequeue.map(valueToBigNumber).filter((id) => !id.isZero())
+    const dequeueIds = dequeue.map(valueToBigNumber)
+    return filterZeroes ? dequeueIds.filter((id) => !id.isZero()) : dequeueIds
   }
 
   /**
@@ -556,8 +609,8 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   /**
    * Returns the number of validators required to reach a Byzantine quorum
    */
-  byzantineQuorumValidators = proxyCall(
-    this.contract.methods.byzantineQuorumValidatorsInCurrentSet,
+  minQuorumSize = proxyCall(
+    this.contract.methods.minQuorumSizeInCurrentSet,
     undefined,
     valueToBigNumber
   )

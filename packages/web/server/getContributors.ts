@@ -45,19 +45,25 @@ function normalize(asset: Fields): Contributor {
     purpose: asset['Unique Purpose'],
     team: asset.Team,
     company: asset.Company,
-    photo: getPreview(asset),
+    photo: getImageURI(asset, Sizes.large),
+    preview: getImageURI(asset, Sizes.small),
     url: asset['Social Media Link'],
   }
 }
 
-function getPreview(asset: Fields) {
+enum Sizes {
+  large = 'large',
+  small = 'small',
+}
+
+function getImageURI(asset: Fields, size: Sizes) {
   const previewField = asset.Photo
 
   return (
     (previewField &&
       previewField[0] &&
       previewField[0].thumbnails &&
-      previewField[0].thumbnails.large.url) ||
+      previewField[0].thumbnails[size].url) ||
     ''
   )
 }

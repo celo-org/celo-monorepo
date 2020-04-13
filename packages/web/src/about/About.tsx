@@ -1,7 +1,10 @@
+import fetch from 'cross-fetch'
 import * as React from 'react'
-import { Image, ImageBackground, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import shuffleSeed from 'shuffle-seed'
 import AudioIcon from 'src/about/AudioIcon'
 import Backers from 'src/about/Backers'
+import { Contributor } from 'src/about/Contributor'
 import { sacredEconBack, team } from 'src/about/images'
 import PressMedia from 'src/about/PressMedia'
 import Team from 'src/about/Team'
@@ -13,15 +16,15 @@ import OpenGraph from 'src/header/OpenGraph'
 import { I18nProps, NameSpaces, Trans, withNamespaces } from 'src/i18n'
 import BookLayout from 'src/layout/BookLayout'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
-import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
 import LogoLightBg from 'src/logos/LogoLightBg'
+import BeautifulQuote from 'src/shared/BeautifulQuote'
 import Button, { BTN } from 'src/shared/Button.3'
 import InlineAnchor from 'src/shared/InlineAnchor'
 import menuItems from 'src/shared/menu-items'
 import { fonts, standardStyles, textStyles } from 'src/styles'
 
 interface Props {
-  randomSeed: number
+  contributors: Contributor[]
 }
 
 async function pronunceCelo() {
@@ -31,12 +34,21 @@ async function pronunceCelo() {
 }
 
 export class About extends React.Component<Props & I18nProps> {
-  static getInitialProps() {
-    return { randomSeed: Math.random() }
+  static async getInitialProps({ req }) {
+    let contributors
+    if (req) {
+      const getContributors = await import('src/../server/getContributors')
+      contributors = await getContributors.default()
+    } else {
+      contributors = await fetch(`/api/contributors`).then((result) => result.json())
+    }
+
+    const shuffledTeam = shuffleSeed.shuffle(contributors, Math.random())
+    return { contributors: shuffledTeam }
   }
 
   render() {
-    const { t, randomSeed } = this.props
+    const { t, contributors } = this.props
 
     return (
       <>
@@ -95,7 +107,11 @@ export class About extends React.Component<Props & I18nProps> {
             </Text>
           </BookLayout>
           <CeloValues />
-          <BeautifulQuote />
+          <BeautifulQuote
+            quote={t('beautifulLifeQuote')}
+            imgSource={sacredEconBack}
+            citation={`– ${t('beautifulLifeSource')}`}
+          />
           <BookLayout label={t('SacredEconTitle')} startBlock={true}>
             <Text style={[fonts.p, standardStyles.blockMarginBottomTablet]}>
               <Trans
@@ -120,11 +136,11 @@ export class About extends React.Component<Props & I18nProps> {
             </Text>
             <Button
               kind={BTN.PRIMARY}
-              href="https://medium.com/celohq/celos-theory-of-change-b916de44945d"
+              href="https://medium.com/celoOrg/celos-theory-of-change-b916de44945d"
               text={t('learnMore')}
             />
           </BookLayout>
-          <Team randomSeed={randomSeed} />
+          <Team contributors={contributors} />
           <Backers />
           <PressMedia />
         </View>
@@ -133,58 +149,13 @@ export class About extends React.Component<Props & I18nProps> {
   }
 }
 
-const BeautifulQuote = withScreenSize(
-  withNamespaces('about')(function _BeautifulQuote({ t, screen }: ScreenProps & I18nProps) {
-    const isMobile = screen === ScreenSizes.MOBILE
-    return (
-      <ImageBackground
-        source={sacredEconBack}
-        style={[styles.sacredEconImage, standardStyles.centered]}
-        resizeMode={'cover'}
-      >
-        <Text
-          style={[
-            fonts.h1,
-            isMobile ? styles.quoteMobile : styles.quote,
-            textStyles.invert,
-            textStyles.center,
-          ]}
-        >
-          {t('beautifulLifeQuote')}
-        </Text>
-        <Text
-          style={[
-            isMobile ? fonts.h1Mobile : fonts.h1,
-            textStyles.invert,
-            textStyles.center,
-            standardStyles.blockMarginTopTablet,
-          ]}
-        >
-          –&nbsp;{t('beautifulLifeSource')}
-        </Text>
-      </ImageBackground>
-    )
-  })
-)
-
 function Strong({ children }) {
   return <Text style={textStyles.heavy}>{children}</Text>
 }
 
 const styles = StyleSheet.create({
-  sacredEconImage: { width: '100%', height: 510, padding: 15 },
   teamImage: { width: '100%', height: 650 },
   logoArea: { justifyContent: 'flex-end' },
-  quote: {
-    fontSize: 65,
-    lineHeight: 72,
-    fontStyle: 'italic',
-  },
-  quoteMobile: {
-    fontSize: 42,
-    lineHeight: 50,
-    fontStyle: 'italic',
-  },
 })
 
 export default withNamespaces('about')(About)

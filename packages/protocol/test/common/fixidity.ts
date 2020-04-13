@@ -172,7 +172,7 @@ contract('FixidityLib', () => {
       assertGteBN(result, lowerBound)
     })
 
-    it('should retian mulPrecision precision', async () => {
+    it('should retain mulPrecision precision', async () => {
       const a = fixed1.idiv(mulPrecision)
       const b = fixed1.times(mulPrecision)
       const result = await fixidityTest.multiply(a, b)
@@ -207,6 +207,13 @@ contract('FixidityLib', () => {
 
     it('should fail to invert 0', async () => {
       await assertRevert(fixidityTest.reciprocal(zero))
+    })
+
+    it('should invert smallest value', async () => {
+      const result1 = await fixidityTest.newFixedFraction(1, new BigNumber(1e24))
+      assertEqualBN(result1, toFixed(1e-24))
+      const result2 = await fixidityTest.reciprocal(result1)
+      assertEqualBN(result2, toFixed(1e24))
     })
   })
 

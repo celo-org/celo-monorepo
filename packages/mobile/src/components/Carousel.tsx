@@ -6,7 +6,7 @@ import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
 import * as React from 'react'
-import { StyleSheet, Text, View, ViewStyle } from 'react-native'
+import { Platform, StyleSheet, Text, View, ViewStyle } from 'react-native'
 import { BoxShadow } from 'react-native-shadow'
 import RNCarousel, { Pagination } from 'react-native-snap-carousel'
 
@@ -25,13 +25,20 @@ export interface CarouselItem {
 
 function renderItem({ item, index }: { item: CarouselItem; index: number }) {
   return (
-    <View>
-      <BoxShadow setting={shadowOpt}>
+    <View style={styles.itemWrapper}>
+      {Platform.OS === 'android' ? (
+        <BoxShadow setting={shadowOpt}>
+          <View style={styles.itemContainer}>
+            {item.icon}
+            <Text style={styles.itemText}>{item.text}</Text>
+          </View>
+        </BoxShadow>
+      ) : (
         <View style={styles.itemContainer}>
           {item.icon}
           <Text style={styles.itemText}>{item.text}</Text>
         </View>
-      </BoxShadow>
+      )}
     </View>
   )
 }
@@ -73,12 +80,15 @@ function Carousel(props: OwnProps) {
   )
 }
 
+const RADIUS = 8
+const OPACITY = 0.15
+
 const shadowOpt = {
   width: ITEM_WIDTH,
   height: ITEM_HEIGHT,
   color: '#6b7b8b',
-  opacity: 0.02,
   border: 1,
+  opacity: 0.02,
   radius: 12,
   x: 0,
   y: 0,
@@ -101,10 +111,15 @@ const styles = StyleSheet.create({
     // Android only
     elevation: 1,
     // iOS only
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    shadowColor: '#000000',
-    shadowOffset: { height: 4, width: 4 },
+    shadowOpacity: OPACITY,
+    shadowRadius: RADIUS,
+    shadowColor: colors.dark,
+    shadowOffset: { height: 0, width: 0 },
+  },
+  itemWrapper: {
+    paddingVertical: 15,
+    position: 'relative',
+    overflow: 'visible',
   },
   itemText: {
     ...fontStyles.bodyLarge,
@@ -112,10 +127,12 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   carouselContainer: {
-    height: ITEM_HEIGHT,
+    height: ITEM_HEIGHT + 30,
+    overflow: 'visible',
   },
   paginationContainer: {
-    marginTop: 5,
+    marginTop: 0,
+    paddingVertical: 0,
   },
 })
 

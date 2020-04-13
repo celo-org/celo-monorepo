@@ -1,6 +1,5 @@
 pragma solidity ^0.5.3;
 
-import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
@@ -10,6 +9,7 @@ import "./interfaces/IEscrow.sol";
 import "../common/Initializable.sol";
 import "../common/UsingRegistry.sol";
 import "../common/Signatures.sol";
+import "../common/libraries/ReentrancyGuard.sol";
 
 contract Escrow is IEscrow, ReentrancyGuard, Ownable, Initializable, UsingRegistry {
   using SafeMath for uint256;
@@ -61,6 +61,10 @@ contract Escrow is IEscrow, ReentrancyGuard, Ownable, Initializable, UsingRegist
   // Maps senders' addresses to a list of sent escrowed payment IDs.
   mapping(address => address[]) public sentPaymentIds;
 
+  /**
+   * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
+   * @param registryAddress The address of the registry core smart contract.
+   */
   function initialize(address registryAddress) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
@@ -95,10 +99,17 @@ contract Escrow is IEscrow, ReentrancyGuard, Ownable, Initializable, UsingRegist
       "Invalid privacy inputs: Can't require attestations if no identifier"
     );
 
+    IAttestations attestations = IAttestations(registry.getAddressFor(ATTESTATIONS_REGISTRY_ID));
+    require(
+      minAttestations <= attestations.getMaxAttestations(),
+      "minAttestations larger than limit"
+    );
+
     uint256 sentIndex = sentPaymentIds[msg.sender].push(paymentId).sub(1);
     uint256 receivedIndex = receivedPaymentIds[identifier].push(paymentId).sub(1);
 
     EscrowedPayment storage newPayment = escrowedPayments[paymentId];
+    require(newPayment.timestamp == 0, "paymentId already used");
     newPayment.recipientIdentifier = identifier;
     newPayment.sender = msg.sender;
     newPayment.token = token;

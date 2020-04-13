@@ -14,7 +14,7 @@ export default class ProofOfPossession extends BaseCommand {
     }),
     account: Flags.address({
       required: true,
-      description: 'Address of the account that needs to proove possession of the signer key.',
+      description: 'Address of the account that needs to prove possession of the signer key.',
     }),
   }
 
@@ -25,10 +25,7 @@ export default class ProofOfPossession extends BaseCommand {
   async run() {
     const res = this.parse(ProofOfPossession)
     const accounts = await this.kit.contracts.getAccounts()
-    const pop = await accounts.generateProofOfSigningKeyPossession(
-      res.flags.account,
-      res.flags.signer
-    )
+    const pop = await accounts.generateProofOfKeyPossession(res.flags.account, res.flags.signer)
     printValueMap({ signature: serializeSignature(pop) })
   }
 }

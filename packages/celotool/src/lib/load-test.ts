@@ -51,8 +51,8 @@ async function helmParameters(
   const enodes = await getEnodesWithExternalIPAddresses(celoEnv)
   const staticNodesJsonB64 = Buffer.from(JSON.stringify(enodes)).toString('base64')
   // Uses the genesis file from google storage to ensure it's the correct genesis for the network
-  const genesis = await getGenesisBlockFromGoogleStorage(celoEnv)
-  const genesisFileJsonB64 = Buffer.from(JSON.stringify(genesis)).toString('base64')
+  const genesisContents = await getGenesisBlockFromGoogleStorage(celoEnv)
+  const genesisFileJsonB64 = Buffer.from(genesisContents).toString('base64')
   return [
     `--set geth.accountSecret="${fetchEnv(envVar.GETH_ACCOUNT_SECRET)}"`,
     `--set blockscout.measurePercent=${blockscoutProb}`,

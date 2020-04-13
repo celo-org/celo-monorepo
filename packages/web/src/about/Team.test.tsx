@@ -3,27 +3,20 @@ import 'jest-fetch-mock'
 import * as React from 'react'
 import Team from 'src/about/Team'
 
-jest.mock('src/brandkit/common/Fetch', () => {
-  return function Fetch({ children }) {
-    return children({
-      data: [
-        {
-          name: 'johnny',
-          purpose: 'reliability',
-          company: 'Decentralized ltd',
-          photo: 'x.jpg',
-          url: '/things',
-        },
-      ],
-      loading: false,
-      error: null,
-    })
-  }
-})
+const CONTRIBUTORS = [
+  {
+    name: 'johnny',
+    purpose: 'reliability',
+    company: 'Decentralized ltd',
+    photo: 'x.jpg',
+    preview: 'y.png',
+    url: '/things',
+  },
+]
 
 describe(Team, () => {
   it('displays an image for each contributor', async () => {
-    const { getByText, getByAltText } = render(<Team randomSeed={1} />)
+    const { getByText, getByAltText } = render(<Team contributors={CONTRIBUTORS} />)
 
     await waitForElement(() => getByText('johnny'))
 
@@ -31,7 +24,7 @@ describe(Team, () => {
   })
 
   it('displays company name', async () => {
-    const { getByText } = render(<Team randomSeed={1} />)
+    const { getByText } = render(<Team contributors={CONTRIBUTORS} />)
 
     await waitForElement(() => getByText('johnny'))
 

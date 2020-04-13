@@ -1,5 +1,9 @@
 import sleep from 'sleep-promise'
-import { installHelmChart, removeHelmRelease, upgradeHelmChart } from 'src/lib/blockscout'
+import {
+  createDefaultIngressIfNotExists,
+  removeHelmRelease,
+  upgradeHelmChart,
+} from 'src/lib/blockscout'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
 import { fetchEnvOrFallback } from 'src/lib/env-utils'
 import { resetCloudSQLInstance, retrieveCloudSQLConnectionInfo } from 'src/lib/helm_deploy'
@@ -25,6 +29,10 @@ export const handler = async (argv: BlockscoutUpgradeArgv) => {
   await switchToClusterFromEnv()
 
   const instanceName = `${argv.celoEnv}${fetchEnvOrFallback('BLOCKSCOUT_DB_SUFFIX', '')}`
+  const helmReleaseName = `${argv.celoEnv}-blockscout${fetchEnvOrFallback(
+    'BLOCKSCOUT_DB_SUFFIX',
+    ''
+  )}`
 
   const [
     blockscoutDBUsername,
@@ -37,34 +45,30 @@ export const handler = async (argv: BlockscoutUpgradeArgv) => {
       'Running upgrade with --reset flag which will reset the database and reinstall the helm chart'
     )
 
-    await removeHelmRelease(argv.celoEnv)
+    await removeHelmRelease(helmReleaseName)
 
     console.info('Sleep for 30 seconds to have all connections killed')
     await sleep(30000)
-
     await resetCloudSQLInstance(instanceName)
-
-    await installHelmChart(
-      argv.celoEnv,
-      blockscoutDBUsername,
-      blockscoutDBPassword,
-      blockscoutDBConnectionName
-    )
   } else {
     console.info(`Delete blockscout-migration`)
     try {
       await execCmdWithExitOnFailure(
-        `kubectl delete job ${argv.celoEnv}-blockscout-migration -n ${argv.celoEnv}`
+        `kubectl delete job ${argv.celoEnv}-blockscout${fetchEnvOrFallback(
+          'BLOCKSCOUT_DB_SUFFIX',
+          ''
+        )}-migration -n ${argv.celoEnv}`
       )
     } catch (error) {
       console.error(error)
     }
-
-    await upgradeHelmChart(
-      argv.celoEnv,
-      blockscoutDBUsername,
-      blockscoutDBPassword,
-      blockscoutDBConnectionName
-    )
   }
+  await upgradeHelmChart(
+    argv.celoEnv,
+    helmReleaseName,
+    blockscoutDBUsername,
+    blockscoutDBPassword,
+    blockscoutDBConnectionName
+  )
+  await createDefaultIngressIfNotExists(argv.celoEnv, helmReleaseName)
 }

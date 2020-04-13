@@ -1,5 +1,4 @@
 export const welcomeRocketIcon = require('src/images/welcome-rocket-icon.png')
-export const backupIcon = require('src/images/backup-icon.png')
 export const clockIcon = require('src/images/clock-icon.png')
 export const homeIcon = require('src/images/home-icon.png')
 export const profileIcon = require('src/images/profile-icon.png')

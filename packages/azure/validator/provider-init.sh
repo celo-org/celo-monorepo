@@ -1,0 +1,1 @@
+../scripts/provider-init.sh

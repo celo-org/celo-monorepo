@@ -21,10 +21,8 @@ class BuildPage extends React.PureComponent<I18nProps> {
         <OpenGraph
           image={previewImage}
           path={menuItems.BUILD.link}
-          title={'Build with Celo | Celo Developers'}
-          description={
-            "Documentation for Celo's open-source protocol. Celo is a proof-of-stake based blockchain with smart contracts that allows for an ecosystem of powerful applications built on top."
-          }
+          title={'Celo Validators'}
+          description={'Learn how to run a node on Celo’s peer-to-peer network'}
         />
         <Cover />
         <FullStack />

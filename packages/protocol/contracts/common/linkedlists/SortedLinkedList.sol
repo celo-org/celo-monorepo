@@ -17,6 +17,7 @@ library SortedLinkedList {
 
   /**
    * @notice Inserts an element into a doubly linked list.
+   * @param list A storage pointer to the underlying list.
    * @param key The key of the element to insert.
    * @param value The element value.
    * @param lesserKey The key of the element less than the element to insert.
@@ -46,6 +47,7 @@ library SortedLinkedList {
 
   /**
    * @notice Removes an element from the doubly linked list.
+   * @param list A storage pointer to the underlying list.
    * @param key The key of the element to remove.
    */
   function remove(List storage list, bytes32 key) public {
@@ -55,6 +57,7 @@ library SortedLinkedList {
 
   /**
    * @notice Updates an element in the list.
+   * @param list A storage pointer to the underlying list.
    * @param key The element key.
    * @param value The element value.
    * @param lesserKey The key of the element will be just left of `key` after the update.
@@ -77,6 +80,7 @@ library SortedLinkedList {
 
   /**
    * @notice Inserts an element at the tail of the doubly linked list.
+   * @param list A storage pointer to the underlying list.
    * @param key The key of the element to insert.
    */
   function push(List storage list, bytes32 key) public {
@@ -85,13 +89,14 @@ library SortedLinkedList {
 
   /**
    * @notice Removes N elements from the head of the list and returns their keys.
+   * @param list A storage pointer to the underlying list.
    * @param n The number of elements to pop.
    * @return The keys of the popped elements.
    */
   function popN(List storage list, uint256 n) public returns (bytes32[] memory) {
     require(n <= list.list.numElements, "not enough elements");
     bytes32[] memory keys = new bytes32[](n);
-    for (uint256 i = 0; i < n; i++) {
+    for (uint256 i = 0; i < n; i = i.add(1)) {
       bytes32 key = list.list.head;
       keys[i] = key;
       remove(list, key);
@@ -101,6 +106,7 @@ library SortedLinkedList {
 
   /**
    * @notice Returns whether or not a particular key is present in the sorted list.
+   * @param list A storage pointer to the underlying list.
    * @param key The element key.
    * @return Whether or not the key is in the sorted list.
    */
@@ -110,6 +116,7 @@ library SortedLinkedList {
 
   /**
    * @notice Returns the value for a particular key in the sorted list.
+   * @param list A storage pointer to the underlying list.
    * @param key The element key.
    * @return The element value.
    */
@@ -119,6 +126,7 @@ library SortedLinkedList {
 
   /**
    * @notice Gets all elements from the doubly linked list.
+   * @param list A storage pointer to the underlying list.
    * @return An unpacked list of elements from largest to smallest.
    */
   function getElements(List storage list) public view returns (bytes32[] memory, uint256[] memory) {
@@ -132,6 +140,7 @@ library SortedLinkedList {
 
   /**
    * @notice Gets all element keys from the doubly linked list.
+   * @param list A storage pointer to the underlying list.
    * @return All element keys from head to tail.
    */
   function getKeys(List storage list) public view returns (bytes32[] memory) {
@@ -140,6 +149,7 @@ library SortedLinkedList {
 
   /**
    * @notice Returns first N greatest elements of the list.
+   * @param list A storage pointer to the underlying list.
    * @param n The number of elements to return.
    * @return The keys of the first n elements.
    * @dev Reverts if n is greater than the number of elements in the list.
@@ -151,6 +161,7 @@ library SortedLinkedList {
   // TODO(asa): Gas optimizations by passing in elements to isValueBetween
   /**
    * @notice Returns the keys of the elements greaterKey than and less than the provided value.
+   * @param list A storage pointer to the underlying list.
    * @param value The element value.
    * @param lesserKey The key of the element which could be just left of the new value.
    * @param greaterKey The key of the element which could be just right of the new value.
@@ -166,7 +177,7 @@ library SortedLinkedList {
     //   1. The value is less than the current lowest value
     //   2. The value is greater than the current greatest value
     //   3. The value is just greater than the value for `lesserKey`
-    //   4. The value is just less than the value for `greaerKey`
+    //   4. The value is just less than the value for `greaterKey`
     if (lesserKey == bytes32(0) && isValueBetween(list, value, lesserKey, list.list.tail)) {
       return (lesserKey, list.list.tail);
     } else if (
@@ -190,6 +201,7 @@ library SortedLinkedList {
 
   /**
    * @notice Returns whether or not a given element is between two other elements.
+   * @param list A storage pointer to the underlying list.
    * @param value The element value.
    * @param lesserKey The key of the element whose value should be lesserKey.
    * @param greaterKey The key of the element whose value should be greaterKey.

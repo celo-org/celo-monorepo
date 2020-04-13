@@ -1,3 +1,4 @@
+import { CeloContract } from '@celo/contractkit'
 import { RESTDataSource } from 'apollo-datasource-rest'
 import BigNumber from 'bignumber.js'
 import { BLOCKSCOUT_API, FAUCET_ADDRESS, VERIFICATION_REWARDS_ADDRESS } from './config'
@@ -8,7 +9,7 @@ import {
   TokenTransactionArgs,
   TransferEvent,
 } from './schema'
-import { formatCommentString, getContractAddresses } from './utils'
+import { formatCommentString, getContractAddresses, getContractKit } from './utils'
 
 // to get rid of 18 extra 0s in the values
 const WEI_PER_GOLD = Math.pow(10, 18)
@@ -57,6 +58,8 @@ export class BlockscoutAPI extends RESTDataSource {
   tokenAddressMapping: { [key: string]: string } | undefined
   attestationsAddress: string | undefined
   escrowAddress: string | undefined
+  goldTokenAddress: string | undefined
+  stableTokenAddress: string | undefined
   constructor() {
     super()
     this.baseURL = BLOCKSCOUT_API
@@ -74,7 +77,13 @@ export class BlockscoutAPI extends RESTDataSource {
   }
 
   async ensureTokenAddresses() {
-    if (this.tokenAddressMapping && this.attestationsAddress && this.escrowAddress) {
+    if (
+      this.tokenAddressMapping &&
+      this.attestationsAddress &&
+      this.escrowAddress &&
+      this.goldTokenAddress &&
+      this.stableTokenAddress
+    ) {
       // Already got addresses
       return
     } else {
@@ -82,6 +91,8 @@ export class BlockscoutAPI extends RESTDataSource {
       this.attestationsAddress = addresses.attestationsAddress
       this.tokenAddressMapping = addresses.tokenAddressMapping
       this.escrowAddress = addresses.escrowAddress
+      this.goldTokenAddress = addresses.goldTokenAddress
+      this.stableTokenAddress = addresses.stableTokenAddress
     }
   }
 
@@ -144,6 +155,10 @@ export class BlockscoutAPI extends RESTDataSource {
     }
 
     await this.ensureTokenAddresses()
+    const kit = await getContractKit()
+    const stableTokenAddress = (
+      await kit.registry.addressFor(CeloContract.StableToken)
+    ).toLowerCase()
     // Generate final events
     txHashToEventTransactions.forEach((transactions: BlockscoutTransaction[], txhash: string) => {
       // Exchange events have two corresponding transactions (in and out)
@@ -170,7 +185,49 @@ export class BlockscoutAPI extends RESTDataSource {
 
         // Otherwise, it's a regular token transfer
       } else {
-        const event = transactions[0]
+        const stableTokenTxs = transactions.filter(
+          (tx) => tx.contractAddress === stableTokenAddress && tx.value !== '0'
+        )
+
+        stableTokenTxs.sort((a, b) =>
+          new BigNumber(b.value).minus(new BigNumber(a.value)).toNumber()
+        )
+
+        if (stableTokenTxs.length < 1) {
+          return
+        }
+        const gasValue = new BigNumber(stableTokenTxs[0].gasUsed).multipliedBy(
+          new BigNumber(stableTokenTxs[0].gasPrice)
+        )
+        let event
+
+        switch (stableTokenTxs.length) {
+          // simple transfer
+          case 1:
+            event = stableTokenTxs[0]
+            break
+
+          // transfer with feeCurrency
+          // this figures out which 2 tx are the fee, and the other is the transfer
+          case 3:
+            const tx0Value = new BigNumber(stableTokenTxs[0].value)
+            const tx1Value = new BigNumber(stableTokenTxs[1].value)
+            const tx2Value = new BigNumber(stableTokenTxs[2].value)
+
+            if (tx0Value.plus(tx1Value).isEqualTo(gasValue)) {
+              event = stableTokenTxs[2]
+            } else if (tx0Value.plus(tx2Value).isEqualTo(gasValue)) {
+              event = stableTokenTxs[1]
+            } else {
+              event = stableTokenTxs[0]
+            }
+            break
+
+          // just a contract call
+          default:
+            return
+        }
+
         const comment = event.input ? formatCommentString(event.input) : ''
         const eventToAddress = event.to.toLowerCase()
         const eventFromAddress = event.from.toLowerCase()
@@ -249,6 +306,10 @@ export class BlockscoutAPI extends RESTDataSource {
     }
 
     await this.ensureTokenAddresses()
+    const kit = await getContractKit()
+    const stableTokenAddress = (
+      await kit.registry.addressFor(CeloContract.StableToken)
+    ).toLowerCase()
     // Generate final events
     txHashToEventTransactions.forEach((transactions: BlockscoutTransaction[], txhash: string) => {
       // Exchange events have two corresponding transactions (in and out)
@@ -295,7 +356,49 @@ export class BlockscoutAPI extends RESTDataSource {
 
         // Otherwise, it's a regular token transfer
       } else {
-        const event = transactions[0]
+        const stableTokenTxs = transactions.filter(
+          (tx) => tx.contractAddress === stableTokenAddress && tx.value !== '0'
+        )
+
+        stableTokenTxs.sort((a, b) =>
+          new BigNumber(b.value).minus(new BigNumber(a.value)).toNumber()
+        )
+
+        if (stableTokenTxs.length < 1) {
+          return
+        }
+        const gasValue = new BigNumber(stableTokenTxs[0].gasUsed).multipliedBy(
+          new BigNumber(stableTokenTxs[0].gasPrice)
+        )
+        let event
+
+        switch (stableTokenTxs.length) {
+          // simple transfer
+          case 1:
+            event = stableTokenTxs[0]
+            break
+
+          // transfer with feeCurrency
+          // this figures out which 2 tx are the fee, and the other is the transfer
+          case 3:
+            const tx0Value = new BigNumber(stableTokenTxs[0].value)
+            const tx1Value = new BigNumber(stableTokenTxs[1].value)
+            const tx2Value = new BigNumber(stableTokenTxs[2].value)
+
+            if (tx0Value.plus(tx1Value).isEqualTo(gasValue)) {
+              event = stableTokenTxs[2]
+            } else if (tx0Value.plus(tx2Value).isEqualTo(gasValue)) {
+              event = stableTokenTxs[1]
+            } else {
+              event = stableTokenTxs[0]
+            }
+            break
+
+          // just a contract call
+          default:
+            return
+        }
+
         const comment = event.input ? formatCommentString(event.input) : ''
         const eventToAddress = event.to.toLowerCase()
         const eventFromAddress = event.from.toLowerCase()

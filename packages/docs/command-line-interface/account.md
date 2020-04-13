@@ -14,6 +14,13 @@ USAGE
 
 OPTIONS
   -r, --role=vote|validator|attestation                (required) Role to delegate
+
+  --blsKey=0x                                          The BLS public key that the validator is using for consensus,
+                                                       should pass proof of possession. 96 bytes.
+
+  --blsPop=0x                                          The BLS public key proof-of-possession, which consists of a
+                                                       signature on the account address. 48 bytes.
+
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d    (required) Account Address
 
   --signature=signature                                (required) Signature (a.k.a proof-of-possession) of the signer
@@ -21,11 +28,18 @@ OPTIONS
 
   --signer=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Account Address
 
-EXAMPLE
+EXAMPLES
   authorize --from 0x5409ED021D9299bf6814279A6A1411A7e866A631 --role vote --signer
   0x6ecbe1db9ef729cbe972c83fb886247691fb6beb --signature
   0x1b9fca4bbb5bfb1dbe69ef1cddbd9b4202dcb6b134c5170611e1e36ecfa468d7b46c85328d504934fce6c2a1571603a50ae224d2b32685e84d4d
   1a1eebad8452eb
+  authorize --from 0x5409ED021D9299bf6814279A6A1411A7e866A631 --role vote --signer
+  0x6ecbe1db9ef729cbe972c83fb886247691fb6beb --signature
+  0x1b9fca4bbb5bfb1dbe69ef1cddbd9b4202dcb6b134c5170611e1e36ecfa468d7b46c85328d504934fce6c2a1571603a50ae224d2b32685e84d4d
+  1a1eebad8452eb --blsKey
+  0x4fa3f67fc913878b068d1fa1cdddc54913d3bf988dbe5a36a20fa888f20d4894c408a6773f3d7bde11154f2a3076b700d345a42fd25a0e5e83f4
+  db5586ac7979ac2053cd95d8f2efd3e959571ceccaa743e02cf4be3f5d7aaddb0b06fc9aff00 --blsPop
+  0xcdb77255037eb68897cd487fdd85388cbda448f617f874449d4b11588b0b7ad8ddc20d9bb450b513bb35664ea3923900
 ```
 
 _See code: [packages/cli/src/commands/account/authorize.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/authorize.ts)_
@@ -214,8 +228,8 @@ USAGE
   $ celocli account:proof-of-possession
 
 OPTIONS
-  --account=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the account that needs to proove
-                                                        possession of the signer key.
+  --account=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the account that needs to prove possession
+                                                        of the signer key.
 
   --signer=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d   (required) Address of the signer key to prove possession of.
 
@@ -254,6 +268,7 @@ USAGE
   $ celocli account:register-metadata
 
 OPTIONS
+  --force                                            Ignore metadata validity checks
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Addess of the account to set metadata for
   --url=https://www.celo.org                         (required) The url to the metadata you want to register
 

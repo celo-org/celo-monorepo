@@ -6,7 +6,7 @@ import { Address } from '@celo/contractkit/lib/base'
 import {
   ensureLeading0x,
   eqAddress,
-  normalizeAddress,
+  normalizeAddressWith0x,
   NULL_ADDRESS,
   privateKeyToAddress,
 } from '@celo/utils/lib/address'
@@ -326,8 +326,4 @@ function shouldBeConsidered(
     capacity.isGreaterThan(0) &&
     (!currentGroup || !eqAddress(currentGroup, normalizedGroupAddress))
   )
-}
-
-function normalizeAddressWith0x(address: string): string {
-  return ensureLeading0x(normalizeAddress(address))
 }

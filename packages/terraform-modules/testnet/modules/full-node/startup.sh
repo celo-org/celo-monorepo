@@ -141,7 +141,7 @@ echo "Configuring Docker..."
 gcloud auth configure-docker
 
 # use GCP logging for Docker containers
-echo '{"log-driver":"gcplogs"}' > /etc/docker/daemon.json
+echo '{"log-driver":"fluentd","log-opts":{"fluentd-address":"0.0.0.0:24224","tag":"docker_logs"}}' > /etc/docker/daemon.json
 systemctl restart docker
 
 # ---- Set Up and Run Geth ----
@@ -167,12 +167,10 @@ docker pull $GETH_NODE_DOCKER_IMAGE
 IN_MEMORY_DISCOVERY_TABLE_FLAG=""
 [[ ${in_memory_discovery_table} == "true" ]] && IN_MEMORY_DISCOVERY_TABLE_FLAG="--use-in-memory-discovery-table"
 
-RPC_APIS="eth,net,web3,debug"
+RPC_APIS=${rpc_apis}
 
 if [[ ${proxy} == "true" ]]; then
   ADDITIONAL_GETH_FLAGS="--proxy.proxy --proxy.internalendpoint :30503 --proxy.proxiedvalidatoraddress $PROXIED_VALIDATOR_ADDRESS"
-else
-  RPC_APIS="$RPC_APIS,txpool"
 fi
 
 DATA_DIR=/root/.celo
@@ -209,8 +207,8 @@ docker run \
     geth account import --password $DATA_DIR/account/accountSecret $DATA_DIR/pkey ; \
     geth \
       --bootnodes=enode://$BOOTNODE_ENODE \
-      --lightserv 90 \
-      --lightpeers 1000 \
+      --light.serve 90 \
+      --light.maxpeers 1000 \
       --maxpeers=${max_peers} \
       --rpc \
       --rpcaddr 0.0.0.0 \
@@ -225,11 +223,13 @@ docker run \
       --etherbase=$ACCOUNT_ADDRESS \
       --networkid=${network_id} \
       --syncmode=full \
+      --gcmode=${gcmode} \
       --consoleformat=json \
       --consoleoutput=stdout \
       --verbosity=${geth_verbosity} \
       --ethstats=${node_name}@${ethstats_host} \
       --metrics \
+      --pprof \
       $IN_MEMORY_DISCOVERY_TABLE_FLAG \
       $ADDITIONAL_GETH_FLAGS"
 

@@ -2,11 +2,10 @@ import { eqAddress, normalizeAddress } from '@celo/utils/lib/address'
 import { concurrentMap, concurrentValuesMap } from '@celo/utils/lib/async'
 import { zip } from '@celo/utils/lib/collections'
 import BigNumber from 'bignumber.js'
-import { EventLog } from 'web3/types'
+import { range } from 'lodash'
+import { EventLog } from 'web3-core'
 import { Address, NULL_ADDRESS } from '../base'
-import { Election } from '../generated/types/Election'
-import { Validator, ValidatorGroup } from './Validators'
-
+import { Election } from '../generated/Election'
 import {
   BaseWrapper,
   CeloTransactionObject,
@@ -18,6 +17,7 @@ import {
   valueToBigNumber,
   valueToInt,
 } from './BaseWrapper'
+import { Validator, ValidatorGroup } from './Validators'
 
 export interface ValidatorGroupVote {
   address: Address
@@ -74,6 +74,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     const { min, max } = await this.contract.methods.electableValidators().call()
     return { min: valueToBigNumber(min), max: valueToBigNumber(max) }
   }
+
   /**
    * Returns the current election threshold.
    * @returns Election threshold.
@@ -83,11 +84,43 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     undefined,
     valueToBigNumber
   )
+
+  /**
+   * Gets a validator address from the validator set at the given block number.
+   * @param index Index of requested validator in the validator set.
+   * @param blockNumber Block number to retrieve the validator set from.
+   * @return Address of validator at the requested index.
+   */
+  validatorSignerAddressFromSet: (
+    signerIndex: number,
+    blockNumber: number
+  ) => Promise<Address> = proxyCall(this.contract.methods.validatorSignerAddressFromSet)
+
+  /**
+   * Gets a validator address from the current validator set.
+   * @param index Index of requested validator in the validator set.
+   * @return Address of validator at the requested index.
+   */
   validatorSignerAddressFromCurrentSet: (index: number) => Promise<Address> = proxyCall(
     this.contract.methods.validatorSignerAddressFromCurrentSet,
     tupleParser<number, number>(identity)
   )
 
+  /**
+   * Gets the size of the validator set that must sign the given block number.
+   * @param blockNumber Block number to retrieve the validator set from.
+   * @return Size of the validator set.
+   */
+  numberValidatorsInSet: (blockNumber: number) => Promise<number> = proxyCall(
+    this.contract.methods.numberValidatorsInSet,
+    undefined,
+    valueToInt
+  )
+
+  /**
+   * Gets the size of the current elected validator set.
+   * @return Size of the current elected validator set.
+   */
   numberValidatorsInCurrentSet = proxyCall(
     this.contract.methods.numberValidatorsInCurrentSet,
     undefined,
@@ -95,7 +128,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
   )
 
   /**
-   * Returns get current validator signers using the precompiles.
+   * Returns the current validator signers using the precompiles.
    * @return List of current validator signers.
    */
   async getCurrentValidatorSigners(blockNumber?: number): Promise<Address[]> {
@@ -104,11 +137,34 @@ export class ElectionWrapper extends BaseWrapper<Election> {
   }
 
   /**
+   * Returns the validator signers for block `blockNumber`.
+   * @param blockNumber Block number to retrieve signers for.
+   * @return Address of each signer in the validator set.
+   */
+  async getValidatorSigners(blockNumber: number): Promise<Address[]> {
+    const numValidators = await this.numberValidatorsInSet(blockNumber)
+    return concurrentMap(10, range(0, numValidators, 1), (i: number) =>
+      this.validatorSignerAddressFromSet(i, blockNumber)
+    )
+  }
+
+  /**
    * Returns a list of elected validators with seats allocated to groups via the D'Hondt method.
    * @return The list of elected validators.
    * @dev See https://en.wikipedia.org/wiki/D%27Hondt_method#Allocation for more information.
    */
-  electValidatorSigners = proxyCall(this.contract.methods.electValidatorSigners)
+  async electValidatorSigners(min?: number, max?: number): Promise<Address[]> {
+    if (min !== undefined || max !== undefined) {
+      const config = await this.getConfig()
+      const minArg = min === undefined ? config.electableValidators.min : min
+      const maxArg = max === undefined ? config.electableValidators.max : max
+      return this.contract.methods
+        .electNValidatorSigners(minArg.toString(10), maxArg.toString(10))
+        .call()
+    } else {
+      return this.contract.methods.electValidatorSigners().call()
+    }
+  }
 
   /**
    * Returns the total votes for `group`.
@@ -120,6 +176,18 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     const votes = await this.contract.methods.getTotalVotesForGroup(group).call({}, blockNumber)
     return valueToBigNumber(votes)
   }
+
+  /**
+   * Returns the total votes for `group` made by `account`.
+   * @param group The address of the validator group.
+   * @param account The address of the voting account.
+   * @return The total votes for `group` made by `account`.
+   */
+  getTotalVotesForGroupByAccount = proxyCall(
+    this.contract.methods.getTotalVotesForGroupByAccount,
+    undefined,
+    valueToBigNumber
+  )
 
   /**
    * Returns the active votes for `group`.
@@ -326,7 +394,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
   /**
    * Returns the current eligible validator groups and their total votes.
    */
-  private async getEligibleValidatorGroupsVotes(): Promise<ValidatorGroupVote[]> {
+  async getEligibleValidatorGroupsVotes(): Promise<ValidatorGroupVote[]> {
     const res = await this.contract.methods.getTotalVotesForEligibleValidatorGroups().call()
     return zip(
       (a, b) => ({
@@ -346,33 +414,24 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     voteWeight: BigNumber
   ): Promise<{ lesser: Address; greater: Address }> {
     const currentVotes = await this.getEligibleValidatorGroupsVotes()
-
     const selectedGroup = currentVotes.find((votes) => eqAddress(votes.address, votedGroup))
+    const voteTotal = selectedGroup ? selectedGroup.votes.plus(voteWeight) : voteWeight
+    let greaterKey = NULL_ADDRESS
+    let lesserKey = NULL_ADDRESS
 
-    // modify the list
-    if (selectedGroup) {
-      selectedGroup.votes = selectedGroup.votes.plus(voteWeight)
-    } else {
-      currentVotes.push({
-        address: votedGroup,
-        name: '',
-        votes: voteWeight,
-        // Not used for the purposes of finding lesser and greater.
-        capacity: new BigNumber(0),
-        eligible: true,
-      })
+    // This leverages the fact that the currentVotes are already sorted from
+    // greatest to lowest value
+    for (const vote of currentVotes) {
+      if (!eqAddress(vote.address, votedGroup)) {
+        if (vote.votes.isLessThanOrEqualTo(voteTotal)) {
+          lesserKey = vote.address
+          break
+        }
+        greaterKey = vote.address
+      }
     }
 
-    // re-sort
-    currentVotes.sort((a, b) => a.votes.comparedTo(b.votes))
-
-    // find new index
-    const newIdx = currentVotes.findIndex((votes) => eqAddress(votes.address, votedGroup))
-
-    return {
-      lesser: newIdx === 0 ? NULL_ADDRESS : currentVotes[newIdx - 1].address,
-      greater: newIdx === currentVotes.length - 1 ? NULL_ADDRESS : currentVotes[newIdx + 1].address,
-    }
+    return { lesser: lesserKey, greater: greaterKey }
   }
 
   /**

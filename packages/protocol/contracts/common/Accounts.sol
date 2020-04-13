@@ -2,13 +2,13 @@ pragma solidity ^0.5.3;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
-import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
 
 import "./interfaces/IAccounts.sol";
 
 import "../common/Initializable.sol";
 import "../common/Signatures.sol";
 import "../common/UsingRegistry.sol";
+import "../common/libraries/ReentrancyGuard.sol";
 
 contract Accounts is IAccounts, Ownable, ReentrancyGuard, Initializable, UsingRegistry {
   using SafeMath for uint256;
@@ -60,6 +60,10 @@ contract Accounts is IAccounts, Ownable, ReentrancyGuard, Initializable, UsingRe
   event AccountWalletAddressSet(address indexed account, address walletAddress);
   event AccountCreated(address indexed account);
 
+  /**
+   * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
+   * @param registryAddress The address of the registry core smart contract.
+   */
   function initialize(address registryAddress) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
@@ -70,16 +74,26 @@ contract Accounts is IAccounts, Ownable, ReentrancyGuard, Initializable, UsingRe
    * @param name A string to set as the name of the account
    * @param dataEncryptionKey secp256k1 public key for data encryption. Preferably compressed.
    * @param walletAddress The wallet address to set for the account
+   * @param v The recovery id of the incoming ECDSA signature.
+   * @param r Output value r of the ECDSA signature.
+   * @param s Output value s of the ECDSA signature.
+   * @dev v, r, s constitute `signer`'s signature on `msg.sender` (unless the wallet address
+   *      is 0x0 or msg.sender).
    */
-  function setAccount(string calldata name, bytes calldata dataEncryptionKey, address walletAddress)
-    external
-  {
+  function setAccount(
+    string calldata name,
+    bytes calldata dataEncryptionKey,
+    address walletAddress,
+    uint8 v,
+    bytes32 r,
+    bytes32 s
+  ) external {
     if (!isAccount(msg.sender)) {
       createAccount();
     }
     setName(name);
     setAccountDataEncryptionKey(dataEncryptionKey);
-    setWalletAddress(walletAddress);
+    setWalletAddress(walletAddress, v, r, s);
   }
 
   /**
@@ -100,17 +114,31 @@ contract Accounts is IAccounts, Ownable, ReentrancyGuard, Initializable, UsingRe
    */
   function setName(string memory name) public {
     require(isAccount(msg.sender), "Unknown account");
-    accounts[msg.sender].name = name;
+    Account storage account = accounts[msg.sender];
+    account.name = name;
     emit AccountNameSet(msg.sender, name);
   }
 
   /**
    * @notice Setter for the wallet address for an account
    * @param walletAddress The wallet address to set for the account
+   * @param v The recovery id of the incoming ECDSA signature.
+   * @param r Output value r of the ECDSA signature.
+   * @param s Output value s of the ECDSA signature.
+   * @dev Wallet address can be zero. This means that the owner of the wallet
+   *  does not want to be paid directly without interaction, and instead wants users to
+   * contact them, using the data encryption key, and arrange a payment.
+   * @dev v, r, s constitute `signer`'s signature on `msg.sender` (unless the wallet address
+   *      is 0x0 or msg.sender).
    */
-  function setWalletAddress(address walletAddress) public {
+  function setWalletAddress(address walletAddress, uint8 v, bytes32 r, bytes32 s) public {
     require(isAccount(msg.sender), "Unknown account");
-    accounts[msg.sender].walletAddress = walletAddress;
+    if (!(walletAddress == msg.sender || walletAddress == address(0x0))) {
+      address signer = Signatures.getSignerOfAddress(msg.sender, v, r, s);
+      require(signer == walletAddress, "Invalid signature");
+    }
+    Account storage account = accounts[msg.sender];
+    account.walletAddress = walletAddress;
     emit AccountWalletAddressSet(msg.sender, walletAddress);
   }
 
@@ -120,7 +148,8 @@ contract Accounts is IAccounts, Ownable, ReentrancyGuard, Initializable, UsingRe
    */
   function setAccountDataEncryptionKey(bytes memory dataEncryptionKey) public {
     require(dataEncryptionKey.length >= 33, "data encryption key length <= 32");
-    accounts[msg.sender].dataEncryptionKey = dataEncryptionKey;
+    Account storage account = accounts[msg.sender];
+    account.dataEncryptionKey = dataEncryptionKey;
     emit AccountDataEncryptionKeySet(msg.sender, dataEncryptionKey);
   }
 
@@ -130,7 +159,8 @@ contract Accounts is IAccounts, Ownable, ReentrancyGuard, Initializable, UsingRe
    */
   function setMetadataURL(string calldata metadataURL) external {
     require(isAccount(msg.sender), "Unknown account");
-    accounts[msg.sender].metadataURL = metadataURL;
+    Account storage account = accounts[msg.sender];
+    account.metadataURL = metadataURL;
     emit AccountMetadataURLSet(msg.sender, metadataURL);
   }
 
@@ -174,10 +204,10 @@ contract Accounts is IAccounts, Ownable, ReentrancyGuard, Initializable, UsingRe
   /**
    * @notice Authorizes an address to sign consensus messages on behalf of the account.
    * @param signer The address of the signing key to authorize.
-   * @param ecdsaPublicKey The ECDSA public key corresponding to `signer`.
    * @param v The recovery id of the incoming ECDSA signature.
    * @param r Output value r of the ECDSA signature.
    * @param s Output value s of the ECDSA signature.
+   * @param ecdsaPublicKey The ECDSA public key corresponding to `signer`.
    * @dev v, r, s constitute `signer`'s signature on `msg.sender`.
    */
   function authorizeValidatorSignerWithPublicKey(
@@ -198,6 +228,38 @@ contract Accounts is IAccounts, Ownable, ReentrancyGuard, Initializable, UsingRe
   }
 
   /**
+   * @notice Authorizes an address to sign consensus messages on behalf of the account.
+   * @param signer The address of the signing key to authorize.
+   * @param ecdsaPublicKey The ECDSA public key corresponding to `signer`.
+   * @param blsPublicKey The BLS public key that the validator is using for consensus, should pass
+   *   proof of possession. 96 bytes.
+   * @param blsPop The BLS public key proof-of-possession, which consists of a signature on the
+   *   account address. 48 bytes.
+   * @param v The recovery id of the incoming ECDSA signature.
+   * @param r Output value r of the ECDSA signature.
+   * @param s Output value s of the ECDSA signature.
+   * @dev v, r, s constitute `signer`'s signature on `msg.sender`.
+   */
+  function authorizeValidatorSignerWithKeys(
+    address signer,
+    uint8 v,
+    bytes32 r,
+    bytes32 s,
+    bytes calldata ecdsaPublicKey,
+    bytes calldata blsPublicKey,
+    bytes calldata blsPop
+  ) external nonReentrant {
+    Account storage account = accounts[msg.sender];
+    authorize(signer, v, r, s);
+    account.signers.validator = signer;
+    require(
+      getValidators().updatePublicKeys(msg.sender, signer, ecdsaPublicKey, blsPublicKey, blsPop),
+      "Failed to update validator keys"
+    );
+    emit ValidatorSignerAuthorized(msg.sender, signer);
+  }
+
+  /**
    * @notice Authorizes an address to sign attestations on behalf of the account.
    * @param signer The address of the signing key to authorize.
    * @param v The recovery id of the incoming ECDSA signature.
@@ -213,7 +275,8 @@ contract Accounts is IAccounts, Ownable, ReentrancyGuard, Initializable, UsingRe
   }
 
   /**
-   * @notice Removes the currently authorized vote signer for the account
+   * @notice Removes the currently authorized vote signer for the account.
+   * Note that the signers cannot be reauthorized after they have been removed.
    */
   function removeVoteSigner() public {
     Account storage account = accounts[msg.sender];
@@ -223,6 +286,7 @@ contract Accounts is IAccounts, Ownable, ReentrancyGuard, Initializable, UsingRe
 
   /**
    * @notice Removes the currently authorized validator signer for the account
+   * Note that the signers cannot be reauthorized after they have been removed.
    */
   function removeValidatorSigner() public {
     Account storage account = accounts[msg.sender];
@@ -232,6 +296,7 @@ contract Accounts is IAccounts, Ownable, ReentrancyGuard, Initializable, UsingRe
 
   /**
    * @notice Removes the currently authorized attestation signer for the account
+   * Note that the signers cannot be reauthorized after they have been removed.
    */
   function removeAttestationSigner() public {
     Account storage account = accounts[msg.sender];
@@ -484,7 +549,7 @@ contract Accounts is IAccounts, Ownable, ReentrancyGuard, Initializable, UsingRe
   }
 
   /**
-   * @notice Authorizes some role of of `msg.sender`'s account to another address.
+   * @notice Authorizes some role of `msg.sender`'s account to another address.
    * @param authorized The address to authorize.
    * @param v The recovery id of the incoming ECDSA signature.
    * @param r Output value r of the ECDSA signature.

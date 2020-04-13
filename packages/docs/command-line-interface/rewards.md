@@ -15,6 +15,7 @@ USAGE
 OPTIONS
   --epochs=epochs                                         [default: 1] Show results for the last N epochs
   --group=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d      Validator Group to show rewards for
+  --slashing                                              Show rewards for slashing
   --validator=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  Validator to show rewards for
   --voter=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d      Voter to show rewards for
 

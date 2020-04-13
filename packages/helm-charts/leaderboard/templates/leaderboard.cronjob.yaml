@@ -50,6 +50,7 @@ spec:
             - |
               trap "touch /tmp/pod/main-terminated" EXIT
               yarn run ts-node src/board.ts
+              yarn run ts-node src/upload.ts
             env:
             - name: LEADERBOARD_DATABASE
               value: {{ .Values.leaderboard.database }}
@@ -67,6 +68,16 @@ spec:
                 secretKeyRef:
                   name: {{ .Release.Namespace }}-leaderboard
                   key: DATABASE_PASSWORD
+            - name: LEADERBOARD_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Namespace }}-leaderboard
+                  key: LEADERBOARD_TOKEN
+            - name: LEADERBOARD_CREDENTIALS
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Namespace }}-leaderboard
+                  key: LEADERBOARD_CREDENTIALS
             volumeMounts:
             - mountPath: /tmp/pod
               name: tmp-pod

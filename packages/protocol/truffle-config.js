@@ -20,6 +20,7 @@ const ALFAJORESSTAGING_FROM = '0xf4314cb9046bece6aa54bb9533155434d0c76909'
 const ALFAJORES_FROM = '0x456f41406B32c45D59E539e4BBA3D7898c3584dA'
 const PILOT_FROM = '0x387bCb16Bfcd37AccEcF5c9eB2938E30d3aB8BF2'
 const PILOTSTAGING_FROM = '0x545DEBe3030B570731EDab192640804AC8Cf65CA'
+const RC0_FROM = '0x469be98FE71AFf8F6e7f64F9b732e28A03596B5C'
 
 const gasLimit = 20000000
 
@@ -45,6 +46,13 @@ const networks = {
     gas: gasLimit,
     defaultBalance: 200000000,
     mnemonic: 'concert load couple harbor equip island argue ramp clarify fence smart topic',
+  },
+  rc0: {
+    host: '127.0.0.1',
+    port: 8545,
+    from: RC0_FROM,
+    network_id: 200312,
+    gasPrice: 100000000000,
   },
   coverage: {
     host: 'localhost',
@@ -105,11 +113,6 @@ const networks = {
     from: INTEGRATION_FROM,
   },
   testing: {
-    ...defaultConfig,
-    from: INTEGRATION_TESTING_FROM,
-  },
-  // testnet for integration tests
-  integrationtesting: {
     ...defaultConfig,
     from: INTEGRATION_TESTING_FROM,
   },

@@ -7,15 +7,7 @@ pragma solidity ^0.5.3;
 interface IStableToken {
   function mint(address, uint256) external returns (bool);
   function burn(uint256) external returns (bool);
-  function debitFrom(address, uint256) external;
-  function creditTo(address, uint256) external;
   function setInflationParameters(uint256, uint256) external;
-
-  function fractionMulExp(uint256, uint256, uint256, uint256, uint256, uint256)
-    external
-    view
-    returns (uint256, uint256);
-
   function valueToUnits(uint256) external view returns (uint256);
   function unitsToValue(uint256) external view returns (uint256);
   function getInflationParameters() external view returns (uint256, uint256, uint256, uint256);

@@ -15,8 +15,8 @@ contract GovernanceSlasher is Ownable, Initializable, UsingRegistry {
   event SlashingApproved(address indexed account, uint256 amount);
 
   /**
-   * @notice Initializer
-   * @param registryAddress Sets the registry address. Useful for testing.
+   * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
+   * @param registryAddress The address of the registry core smart contract.
    */
   function initialize(address registryAddress) external initializer {
     _transferOwnership(msg.sender);

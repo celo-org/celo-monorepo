@@ -1,16 +1,14 @@
-{{ range $index, $e := until (.Values.geth.tx_nodes | int) }}
-
-{{ $loadBalancerIP := index $.Values.geth (print "tx_nodes_" $index "IpAddress") }}
-
+{{- range $index, $e := until (.Values.geth.tx_nodes | int) -}}
+{{- $loadBalancerIP := index $.Values.geth (print "tx_nodes_" $index "IpAddress") }}
 {{ template "celo.node-service" (dict "Values" $.Values "Release" $.Release "Chart" $.Chart "index" $index "service_type" "LoadBalancer" "svc_name" "service" "node_name" "tx-nodes" "component_label" "tx_nodes" "load_balancer_ip" $loadBalancerIP ) }}
   ports:
   - name: discovery
     port: 30303
     protocol: UDP
 ---
-{{ template "celo.node-service" (dict "Values" $.Values "Release" $.Release "Chart" $.Chart "index" $index "service_type" "LoadBalancer" "svc_name" "service" "node_name" "tx-nodes" "svc_name_suffix" "-tcp" "component_label" "tx_nodes" "load_balancer_ip" $loadBalancerIP ) }}
+{{- template "celo.node-service" (dict "Values" $.Values "Release" $.Release "Chart" $.Chart "index" $index "service_type" "LoadBalancer" "svc_name" "service" "node_name" "tx-nodes" "svc_name_suffix" "-tcp" "component_label" "tx_nodes" "load_balancer_ip" $loadBalancerIP ) }}
   ports:
-  - name: discovery
+  - name: celo
     port: 30303
     protocol: TCP
   - name: rpc

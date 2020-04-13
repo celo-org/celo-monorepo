@@ -4,7 +4,7 @@ contract Initializable {
   bool public initialized;
 
   modifier initializer() {
-    require(!initialized);
+    require(!initialized, "contract already initialized");
     initialized = true;
     _;
   }

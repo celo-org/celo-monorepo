@@ -1,3 +1,4 @@
+import { eqAddress } from '@celo/utils/lib/address'
 import { isValidUrl } from '@celo/utils/lib/io'
 import { Address } from '../../base'
 import { IdentityMetadataWrapper } from '../metadata'
@@ -59,7 +60,7 @@ export const verifyAccountClaim = async (
 
   const accountClaims = metadata.filterClaims(ClaimTypes.ACCOUNT)
 
-  if (accountClaims.find((x) => x.address.toLowerCase() === address.toLowerCase()) === undefined) {
+  if (accountClaims.find((x) => eqAddress(x.address, address)) === undefined) {
     return `${claim.address} did not claim ${address}`
   }
 

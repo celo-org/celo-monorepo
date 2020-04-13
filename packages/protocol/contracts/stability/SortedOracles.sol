@@ -3,19 +3,20 @@ pragma solidity ^0.5.3;
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "./interfaces/ISortedOracles.sol";
+import "../common/FixidityLib.sol";
 import "../common/Initializable.sol";
 import "../common/linkedlists/AddressSortedLinkedListWithMedian.sol";
 import "../common/linkedlists/SortedLinkedListWithMedian.sol";
 
-// TODO: Move SortedOracles to Fixidity
 /**
  * @title Maintains a sorted list of oracle exchange rates between Celo Gold and other currencies.
  */
 contract SortedOracles is ISortedOracles, Ownable, Initializable {
   using SafeMath for uint256;
   using AddressSortedLinkedListWithMedian for SortedLinkedListWithMedian.List;
-  // All oracle rates are assumed to have a denominator of 2 ^ 64.
-  uint256 public constant DENOMINATOR = 0x10000000000000000;
+  using FixidityLib for FixidityLib.Fraction;
+
+  uint256 private constant FIXED1_UINT = 1000000000000000000000000;
 
   // Maps a token address to a sorted list of report values.
   mapping(address => SortedLinkedListWithMedian.List) private rates;
@@ -27,21 +28,15 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
   uint256 public reportExpirySeconds;
 
   event OracleAdded(address indexed token, address indexed oracleAddress);
-
   event OracleRemoved(address indexed token, address indexed oracleAddress);
-
   event OracleReported(
-    address token,
-    address oracle,
+    address indexed token,
+    address indexed oracle,
     uint256 timestamp,
-    uint256 numerator,
-    uint256 denominator
+    uint256 value
   );
-
   event OracleReportRemoved(address indexed token, address indexed oracle);
-
-  event MedianUpdated(address token, uint256 numerator, uint256 denominator);
-
+  event MedianUpdated(address indexed token, uint256 value);
   event ReportExpirySet(uint256 reportExpiry);
 
   modifier onlyOracle(address token) {
@@ -49,16 +44,22 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
     _;
   }
 
+  /**
+   * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
+   * @param _reportExpirySeconds The number of seconds before a report is considered expired.
+   */
   function initialize(uint256 _reportExpirySeconds) external initializer {
     _transferOwnership(msg.sender);
-    reportExpirySeconds = _reportExpirySeconds;
+    setReportExpiry(_reportExpirySeconds);
   }
 
   /**
    * @notice Sets the report expiry parameter.
-   * @param _reportExpirySeconds Desired value of report expiry.
+   * @param _reportExpirySeconds The number of seconds before a report is considered expired.
    */
-  function setReportExpiry(uint256 _reportExpirySeconds) external onlyOwner {
+  function setReportExpiry(uint256 _reportExpirySeconds) public onlyOwner {
+    require(_reportExpirySeconds > 0, "report expiry seconds must be > 0");
+    require(_reportExpirySeconds != reportExpirySeconds, "reportExpirySeconds hasn't changed");
     reportExpirySeconds = _reportExpirySeconds;
     emit ReportExpirySet(_reportExpirySeconds);
   }
@@ -80,7 +81,9 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
 
   /**
    * @notice Removes an Oracle.
+   * @param token The address of the token.
    * @param oracleAddress The address of the oracle.
+   * @param index The index of `oracleAddress` in the list of oracles.
    */
   function removeOracle(address token, address oracleAddress, uint256 index) external onlyOwner {
     require(
@@ -109,12 +112,10 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
       token != address(0) && n < timestamps[token].getNumElements(),
       "token addr null or trying to remove too many reports"
     );
-    for (uint256 i = 0; i < n; i++) {
-      address oldest = timestamps[token].getTail();
-      uint256 timestamp = timestamps[token].getValue(oldest);
-      // solhint-disable-next-line not-rely-on-time
-      if (now.sub(timestamp) >= reportExpirySeconds) {
-        removeReport(token, oldest);
+    for (uint256 i = 0; i < n; i = i.add(1)) {
+      (bool isExpired, address oldestAddress) = isOldestReportExpired(token);
+      if (isExpired) {
+        removeReport(token, oldestAddress);
       } else {
         break;
       }
@@ -122,23 +123,34 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
   }
 
   /**
+   * @notice Check if last report is expired.
+   * @param token The address of the token for which the Celo Gold exchange rate is being reported.
+   * @return bool isExpired and the address of the last report
+   */
+  function isOldestReportExpired(address token) public view returns (bool, address) {
+    require(token != address(0));
+    address oldest = timestamps[token].getTail();
+    uint256 timestamp = timestamps[token].getValue(oldest);
+    // solhint-disable-next-line not-rely-on-time
+    if (now.sub(timestamp) >= reportExpirySeconds) {
+      return (true, oldest);
+    }
+    return (false, oldest);
+  }
+
+  /**
    * @notice Updates an oracle value and the median.
    * @param token The address of the token for which the Celo Gold exchange rate is being reported.
-   * @param numerator The amount of tokens equal to `denominator` Celo Gold.
-   * @param denominator The amount of Celo Gold equal to `numerator` tokens.
+   * @param value The amount of `token` equal to one Celo Gold, expressed as a fixidity value.
    * @param lesserKey The element which should be just left of the new oracle value.
    * @param greaterKey The element which should be just right of the new oracle value.
    * @dev Note that only one of `lesserKey` or `greaterKey` needs to be correct to reduce friction.
    */
-  function report(
-    address token,
-    uint256 numerator,
-    uint256 denominator,
-    address lesserKey,
-    address greaterKey
-  ) external onlyOracle(token) {
+  function report(address token, uint256 value, address lesserKey, address greaterKey)
+    external
+    onlyOracle(token)
+  {
     uint256 originalMedian = rates[token].getMedianValue();
-    uint256 value = numerator.mul(DENOMINATOR).div(denominator);
     if (rates[token].contains(msg.sender)) {
       rates[token].update(msg.sender, value, lesserKey, greaterKey);
 
@@ -163,10 +175,10 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
       timestamps[token].getHead(),
       address(0)
     );
-    emit OracleReported(token, msg.sender, now, value, DENOMINATOR);
+    emit OracleReported(token, msg.sender, now, value);
     uint256 newMedian = rates[token].getMedianValue();
     if (newMedian != originalMedian) {
-      emit MedianUpdated(token, newMedian, DENOMINATOR);
+      emit MedianUpdated(token, newMedian);
     }
   }
 
@@ -185,7 +197,7 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
    * @return The median exchange rate for `token`.
    */
   function medianRate(address token) external view returns (uint256, uint256) {
-    return (rates[token].getMedianValue(), numRates(token) == 0 ? 0 : DENOMINATOR);
+    return (rates[token].getMedianValue(), numRates(token) == 0 ? 0 : FIXED1_UINT);
   }
 
   /**
@@ -242,11 +254,20 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
   }
 
   /**
+   * @notice Returns the list of oracles for a particular token.
+   * @param token The address of the token whose oracles should be returned.
+   * @return The list of oracles for a particular token.
+   */
+  function getOracles(address token) external view returns (address[] memory) {
+    return oracles[token];
+  }
+
+  /**
    * @notice Removes an oracle value and updates the median.
    * @param token The address of the token for which the Celo Gold exchange rate is being reported.
    * @param oracle The oracle whose value should be removed.
    * @dev This can be used to delete elements for oracles that have been removed.
-   * However, a > 1 elements reports list should alwas be maintained
+   * However, a > 1 elements reports list should always be maintained
    */
   function removeReport(address token, address oracle) private {
     if (numTimestamps(token) == 1 && reportExists(token, oracle)) return;
@@ -256,7 +277,7 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
     emit OracleReportRemoved(token, oracle);
     uint256 newMedian = rates[token].getMedianValue();
     if (newMedian != originalMedian) {
-      emit MedianUpdated(token, newMedian, numRates(token) == 0 ? 0 : DENOMINATOR);
+      emit MedianUpdated(token, newMedian);
     }
   }
 }

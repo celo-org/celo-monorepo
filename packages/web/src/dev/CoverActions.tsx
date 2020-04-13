@@ -6,10 +6,9 @@ import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
 import { CeloLinks } from 'src/shared/menu-items'
 import { standardStyles } from 'src/styles'
-const docImage = require('src/dev/Documentation.png')
-const sdkImage = require('src/dev/SDK.png')
-const faucetImage = require('src/dev/Faucet.png')
-const evmImg = require('src/dev/features/evm.png')
+const docImage = require('src/dev/stable-coin-paper-dark-bg.png')
+const sdkImage = require('src/dev/code-coins-dark.png')
+const tutorialImg = require('src/dev/educate-dark-bg.png')
 
 type Props = I18nProps & ScreenProps
 
@@ -24,7 +23,7 @@ export default withNamespaces('dev')(
           allStyle={standardStyles.centered}
         >
           <Cell
-            span={Spans.three4th}
+            span={Spans.full}
             style={screen === ScreenSizes.MOBILE ? styles.mainMobile : styles.main}
           >
             <CoverAction
@@ -32,41 +31,21 @@ export default withNamespaces('dev')(
               isMobile={screen === ScreenSizes.MOBILE}
               title={t('coverAction.docs.title')}
               text={t('coverAction.docs.text')}
-              link={{ text: t('coverAction.docs.link'), href: CeloLinks.docs }}
+              link={{ text: t('coverAction.docs.link'), href: CeloLinks.sdkDocs }}
             />
             <CoverAction
-              graphic={faucetImage}
+              graphic={tutorialImg}
               isMobile={screen === ScreenSizes.MOBILE}
-              title={t('coverAction.faucet.title')}
-              text={t('coverAction.faucet.text')}
-              link={{ text: t('coverAction.faucet.link'), href: CeloLinks.faucet }}
+              title={t('coverAction.tutorial.title')}
+              text={t('coverAction.tutorial.text')}
+              link={{ text: t('coverAction.tutorial.link'), href: CeloLinks.sdkTutorial }}
             />
-          </Cell>
-        </GridRow>
-        <GridRow
-          desktopStyle={standardStyles.sectionMarginBottom}
-          tabletStyle={standardStyles.sectionMarginBottomTablet}
-          mobileStyle={standardStyles.sectionMarginBottomMobile}
-          allStyle={standardStyles.centered}
-        >
-          <Cell
-            span={Spans.three4th}
-            style={screen === ScreenSizes.MOBILE ? styles.mainMobile : styles.main}
-          >
             <CoverAction
-              graphic={evmImg}
+              graphic={sdkImage}
               isMobile={screen === ScreenSizes.MOBILE}
               title={t('coverAction.code.title')}
               text={t('coverAction.code.text')}
               link={{ text: t('coverAction.code.link'), href: CeloLinks.gitHub }}
-            />
-
-            <CoverAction
-              graphic={sdkImage}
-              isMobile={screen === ScreenSizes.MOBILE}
-              title={t('coverAction.sdk.title')}
-              text={t('coverAction.sdk.text')}
-              link={{ text: t('coverAction.sdk.link'), href: CeloLinks.sdkDocs }}
             />
           </Cell>
         </GridRow>

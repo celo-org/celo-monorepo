@@ -147,7 +147,7 @@ exports[`Privacy renders 1`] = `
           }
         }
       >
-        Valid as of Jan 7, 2019
+        Valid as of Feb 24, 2020
       </div>
     </div>
     <div
@@ -2110,6 +2110,146 @@ exports[`Privacy renders 1`] = `
             }
           >
             United States
+          </div>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxFlex": 1,
+              "WebkitBoxOrient": "horizontal",
+              "WebkitBoxPack": "justify",
+              "WebkitFlexBasis": "auto",
+              "WebkitFlexDirection": "row",
+              "WebkitFlexGrow": 1,
+              "WebkitFlexShrink": 1,
+              "WebkitJustifyContent": "space-around",
+              "borderBottomColor": "rgba(238,238,238,1.00)",
+              "borderBottomWidth": "1px",
+              "flexBasis": "auto",
+              "flexDirection": "row",
+              "flexGrow": 1,
+              "flexShrink": 1,
+              "justifyContent": "space-around",
+              "msFlexDirection": "row",
+              "msFlexNegative": 1,
+              "msFlexPack": "distribute",
+              "msFlexPositive": 1,
+              "msFlexPreferredSize": "auto",
+            }
+          }
+        >
+          <div
+            className="css-text-901oao"
+            dir="auto"
+            style={
+              Object {
+                "WebkitAlignItems": "center",
+                "WebkitBoxAlign": "center",
+                "WebkitBoxFlex": 1,
+                "WebkitBoxPack": "center",
+                "WebkitFlexBasis": "0%",
+                "WebkitFlexGrow": 1,
+                "WebkitFlexShrink": 1,
+                "WebkitJustifyContent": "center",
+                "alignItems": "center",
+                "color": "rgba(46,51,56,1.00)",
+                "flexBasis": "0%",
+                "flexGrow": 1,
+                "flexShrink": 1,
+                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                "fontSize": "16px",
+                "justifyContent": "center",
+                "lineHeight": "20px",
+                "msFlexAlign": "center",
+                "msFlexNegative": 1,
+                "msFlexPack": "center",
+                "msFlexPositive": 1,
+                "msFlexPreferredSize": "0%",
+                "paddingBottom": "10px",
+                "paddingLeft": "10px",
+                "paddingRight": "10px",
+                "paddingTop": "10px",
+                "textRendering": "geometricPrecision",
+              }
+            }
+          >
+            ipstack
+          </div>
+          <div
+            className="css-text-901oao"
+            dir="auto"
+            style={
+              Object {
+                "WebkitAlignItems": "center",
+                "WebkitBoxAlign": "center",
+                "WebkitBoxFlex": 1,
+                "WebkitBoxPack": "center",
+                "WebkitFlexBasis": "0%",
+                "WebkitFlexGrow": 1,
+                "WebkitFlexShrink": 1,
+                "WebkitJustifyContent": "center",
+                "alignItems": "center",
+                "color": "rgba(46,51,56,1.00)",
+                "flexBasis": "0%",
+                "flexGrow": 1,
+                "flexShrink": 1,
+                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                "fontSize": "16px",
+                "justifyContent": "center",
+                "lineHeight": "20px",
+                "msFlexAlign": "center",
+                "msFlexNegative": 1,
+                "msFlexPack": "center",
+                "msFlexPositive": 1,
+                "msFlexPreferredSize": "0%",
+                "paddingBottom": "10px",
+                "paddingLeft": "10px",
+                "paddingRight": "10px",
+                "paddingTop": "10px",
+                "textRendering": "geometricPrecision",
+              }
+            }
+          >
+            IP Address Geolocation
+          </div>
+          <div
+            className="css-text-901oao"
+            dir="auto"
+            style={
+              Object {
+                "WebkitAlignItems": "center",
+                "WebkitBoxAlign": "center",
+                "WebkitBoxFlex": 1,
+                "WebkitBoxPack": "center",
+                "WebkitFlexBasis": "0%",
+                "WebkitFlexGrow": 1,
+                "WebkitFlexShrink": 1,
+                "WebkitJustifyContent": "center",
+                "alignItems": "center",
+                "color": "rgba(46,51,56,1.00)",
+                "flexBasis": "0%",
+                "flexGrow": 1,
+                "flexShrink": 1,
+                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                "fontSize": "16px",
+                "justifyContent": "center",
+                "lineHeight": "20px",
+                "msFlexAlign": "center",
+                "msFlexNegative": 1,
+                "msFlexPack": "center",
+                "msFlexPositive": 1,
+                "msFlexPreferredSize": "0%",
+                "paddingBottom": "10px",
+                "paddingLeft": "10px",
+                "paddingRight": "10px",
+                "paddingTop": "10px",
+                "textRendering": "geometricPrecision",
+              }
+            }
+          >
+            Austria
           </div>
         </div>
       </div>

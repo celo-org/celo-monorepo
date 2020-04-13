@@ -41,7 +41,8 @@ if [ "$ACTION" = "install" ]; then
 
     # This command assumes the secret being available on the cluster in the default namespace
     kubectl get secret blockscout-cloudsql-credentials --namespace default --export -o yaml |\
-      kubectl apply --namespace=$NAMESPACE -f -
+    grep -v creationTimestamp | grep -v resourceVersion | grep -v selfLink | grep -v uid | grep -v namespace |\
+    kubectl apply --namespace=$NAMESPACE -f -
   fi
 fi
 

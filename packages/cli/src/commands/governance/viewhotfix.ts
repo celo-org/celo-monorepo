@@ -32,7 +32,7 @@ export default class ViewHotfix extends BaseCommand {
     printValueMap({ passing })
     if (!passing) {
       const tally = await governance.hotfixWhitelistValidatorTally(hash)
-      const quorum = await governance.byzantineQuorumValidators()
+      const quorum = await governance.minQuorumSize()
       printValueMap({
         tally,
         quorum,

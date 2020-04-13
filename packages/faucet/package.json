@@ -7,35 +7,36 @@
   "main": "dist/index.js",
   "scripts": {
     "preserve": "yarn run build",
-    "serve": "cross-env NODE_ENV=production fi rebase serve",
+    "serve": "cross-env NODE_ENV=production firebase serve",
     "deploy:staging": "firebase deploy --project celo-faucet-staging",
     "deploy:prod": "firebase deploy --project celo-faucet",
     "clean": "tsc -b . --clean",
     "build": "tsc -b .",
     "lint": "tslint --project .",
     "transfer-funds": "ts-node scripts/transfer-funds.ts",
-    "cli": "ts-node scripts/cli.ts"
+    "cli": "ts-node scripts/cli.ts",
+    "build:rules": "firebase-bolt database-rules.bolt"
   },
   "dependencies": {
-    "@google-cloud/logging": "^5.3.1",
+    "@firebase/app": "^0.5.3",
+    "@google-cloud/logging": "^7.1.0",
+    "@celo/contractkit": "0.3.1",
+    "@celo/utils": "0.1.8",
     "debug": "^4.1.1",
-    "eth-lib": "^0.2.8",
-    "firebase": "^7.2.2",
-    "firebase-admin": "^8.6.1",
+    "firebase": "^7.8.0",
+    "firebase-admin": "^8.9.2",
     "firebase-functions": "^3.3.0",
-    "rlp": "^2.2.3",
-    "twilio": "^3.23.2",
-    "web3": "1.0.0-beta.37",
-    "web3-core-helpers": "1.0.0-beta.37"
+    "twilio": "^3.39.3",
+    "web3": "1.2.4",
+    "web3-core-helpers": "1.2.4"
   },
   "devDependencies": {
     "@types/debug": "^4.1.4",
     "@types/twilio": "^0.0.10",
-    "@types/web3": "^1.0.19",
     "@types/yargs": "^13.0.2",
     "cross-env": "5.2.0",
     "firebase-bolt": "^0.8.4",
-    "firebase-tools": "^7.6.2",
+    "firebase-tools": "^7.12.1",
     "rimraf": "2.6.3",
     "yargs": "14.0.0"
   },

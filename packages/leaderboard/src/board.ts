@@ -1,9 +1,8 @@
-import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
-import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
-import Web3 from 'web3'
-import { Client } from 'pg'
+import { ContractKit, newKit } from '@celo/contractkit'
 import { ClaimTypes, IdentityMetadataWrapper } from '@celo/contractkit/lib/identity'
 import { verifyAccountClaim } from '@celo/contractkit/lib/identity/claims/verify'
+import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
+import { Client } from 'pg'
 
 const GoogleSpreadsheet = require('google-spreadsheet')
 
@@ -25,10 +24,12 @@ const LEADERBOARD_DATABASE = process.env['LEADERBOARD_DATABASE'] || 'blockscout'
 const LEADERBOARD_SHEET =
   process.env['LEADERBOARD_SHEET'] || '1HCs1LZv1BOB1v2bVlH4qNPnxVRlYVhQ7CKhkMibE4EY'
 const LEADERBOARD_WEB3 = process.env['LEADERBOARD_WEB3'] || 'http://localhost:8545'
+const client = new Client({ database: LEADERBOARD_DATABASE })
 
-function readSheet() {
+async function readSheet() {
   // spreadsheet key is the long id in the sheets URL
   const doc = new GoogleSpreadsheet(LEADERBOARD_SHEET)
+  await client.connect()
 
   doc.getInfo(function(_err: any, info: any) {
     let sheet = info.worksheets[0]
@@ -65,8 +66,7 @@ function readSheet() {
 
 async function updateDB(lst: any[], remove: any[]) {
   console.log('Adding', lst)
-  const client = new Client({ database: LEADERBOARD_DATABASE })
-  await client.connect()
+
   await client.query(
     'INSERT INTO competitors (address, multiplier)' +
       " SELECT decode(m.address, 'hex') AS address, m.multiplier FROM json_populate_recordset(null::json_type, $1) AS m" +
@@ -78,8 +78,8 @@ async function updateDB(lst: any[], remove: any[]) {
     await client.query(
       "DELETE FROM competitors WHERE address = '\\x" + elem.address.toString() + "'"
     )
+    await client.query("DELETE FROM claims WHERE address = '\\x" + elem.address.toString() + "'")
   }
-  await client.end()
   await readAssoc(lst.map((a: any) => a.address.toString()))
 }
 
@@ -122,8 +122,6 @@ async function getClaims(
 async function processClaims(kit: ContractKit, address: string, info: IdentityMetadataWrapper) {
   try {
     const lst: string[] = await getClaims(kit, address, info)
-    const client = new Client({ database: LEADERBOARD_DATABASE })
-    await client.connect()
     await client.query(
       'INSERT INTO claims (address, claimed_address)' +
         " SELECT decode(m.address,'hex'), decode(m.claimed_address,'hex') FROM json_populate_recordset(null::json_assoc, $1) AS m" +
@@ -137,28 +135,36 @@ async function processClaims(kit: ContractKit, address: string, info: IdentityMe
         ),
       ]
     )
-    await client.end()
   } catch (err) {
     console.error('Cannot process claims', err)
   }
 }
 
 async function readAssoc(lst: string[]) {
-  const web3 = new Web3(LEADERBOARD_WEB3)
-  const kit: ContractKit = newKitFromWeb3(web3)
+  const kit: ContractKit = newKit(LEADERBOARD_WEB3)
   const accounts: AccountsWrapper = await kit.contracts.getAccounts()
-  lst.forEach(async (a) => {
-    try {
-      const url = await accounts.getMetadataURL(a)
-      console.log(a, 'has url', url)
-      let metadata: IdentityMetadataWrapper
-      if (url == '') metadata = IdentityMetadataWrapper.fromEmpty(a)
-      else metadata = await IdentityMetadataWrapper.fetchFromURL(url)
-      processClaims(kit, a, metadata)
-    } catch (err) {
-      console.error('Bad address', a, err.toString())
-    }
-  })
+  await Promise.all(
+    lst.map(async (a) => {
+      try {
+        const url = await accounts.getMetadataURL(a)
+        console.log(a, 'has url', url)
+        let metadata: IdentityMetadataWrapper
+        if (url == '') metadata = IdentityMetadataWrapper.fromEmpty(a)
+        else {
+          try {
+            metadata = await IdentityMetadataWrapper.fetchFromURL(url)
+          } catch (err) {
+            console.error('Error reading metadata', a, err.toString())
+            metadata = IdentityMetadataWrapper.fromEmpty(a)
+          }
+        }
+        await processClaims(kit, a, metadata)
+      } catch (err) {
+        console.error('Bad address', a, err.toString())
+      }
+    })
+  )
+  client.end()
 }
 
 readSheet()

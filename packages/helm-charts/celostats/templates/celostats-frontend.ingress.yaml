@@ -1,0 +1,26 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: {{ .Release.Namespace }}-celostats-frontend
+  labels:
+    app: celostats
+    chart: celostats
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    component: celostats-frontend
+  annotations:
+    kubernetes.io/tls-acme: "true"
+    kubernetes.io/ingress.class: nginx
+spec:
+  tls:
+  - hosts:
+    - {{ .Release.Namespace }}-celostats.{{ .Values.domain.name }}.org
+    secretName: {{ .Release.Namespace }}-celostats-frontend-tls
+  rules:
+  - host: {{ .Release.Namespace }}-celostats.{{ .Values.domain.name }}.org
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: {{ .Release.Namespace }}-celostats-frontend
+          servicePort: 80

@@ -308,10 +308,10 @@ contract('LockedGold', (accounts: string[]) => {
           assertEqualBN(await lockedGold.getTotalLockedGold(), value)
         })
 
-        it('should emit a GoldLocked event', async () => {
+        it('should emit a GoldRelocked event', async () => {
           assert.equal(resp.logs.length, 1)
           const log = resp.logs[0]
-          assertLogMatches(log, 'GoldLocked', {
+          assertLogMatches(log, 'GoldRelocked', {
             account,
             value: new BigNumber(value),
           })
@@ -346,10 +346,10 @@ contract('LockedGold', (accounts: string[]) => {
           assertEqualBN(await lockedGold.getTotalLockedGold(), value)
         })
 
-        it('should emit a GoldLocked event', async () => {
+        it('should emit a GoldRelocked event', async () => {
           assert.equal(resp.logs.length, 1)
           const log = resp.logs[0]
-          assertLogMatches(log, 'GoldLocked', {
+          assertLogMatches(log, 'GoldRelocked', {
             account,
             value: new BigNumber(value),
           })
@@ -421,6 +421,56 @@ contract('LockedGold', (accounts: string[]) => {
       it('should revert', async () => {
         await assertRevert(lockedGold.withdraw(index))
       })
+    })
+  })
+
+  describe('#addSlasher', () => {
+    beforeEach(async () => {
+      await registry.setAddressFor(CeloContractName.DowntimeSlasher, accounts[2])
+    })
+    it('can add slasher to whitelist', async () => {
+      await lockedGold.addSlasher(CeloContractName.DowntimeSlasher)
+      const bytes = web3.utils.soliditySha3({
+        type: 'string',
+        value: CeloContractName.DowntimeSlasher,
+      })
+      assert.equal(bytes, (await lockedGold.getSlashingWhitelist())[0])
+    })
+    it('can only be called by owner', async () => {
+      await assertRevert(
+        lockedGold.addSlasher(CeloContractName.DowntimeSlasher, { from: accounts[1] })
+      )
+    })
+    it('cannot add a slasher twice', async () => {
+      await lockedGold.addSlasher(CeloContractName.DowntimeSlasher)
+      await assertRevert(lockedGold.addSlasher(CeloContractName.DowntimeSlasher))
+    })
+  })
+
+  describe('#removeSlasher', () => {
+    beforeEach(async () => {
+      await registry.setAddressFor(CeloContractName.DowntimeSlasher, accounts[2])
+      await registry.setAddressFor(CeloContractName.GovernanceSlasher, accounts[3])
+      await lockedGold.addSlasher(CeloContractName.DowntimeSlasher)
+    })
+    it('removes item for whitelist', async () => {
+      await lockedGold.removeSlasher(CeloContractName.DowntimeSlasher, 0)
+      assert.equal(0, (await lockedGold.getSlashingWhitelist()).length)
+    })
+    it('can only be called by owner', async () => {
+      await assertRevert(
+        lockedGold.removeSlasher(CeloContractName.DowntimeSlasher, 0, { from: accounts[1] })
+      )
+    })
+    it('reverts when index too large', async () => {
+      await assertRevert(lockedGold.removeSlasher(CeloContractName.DowntimeSlasher, 100))
+    })
+    it('reverts when key does not exists', async () => {
+      await assertRevert(lockedGold.removeSlasher(CeloContractName.GovernanceSlasher, 100))
+    })
+    it('reverts when index and key have mismatch', async () => {
+      await lockedGold.addSlasher(CeloContractName.GovernanceSlasher)
+      await assertRevert(lockedGold.removeSlasher(CeloContractName.DowntimeSlasher, 1))
     })
   })
 

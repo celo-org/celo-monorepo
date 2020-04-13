@@ -28,6 +28,7 @@ export default class Unlock extends BaseCommand {
 
     await newCheckBuilder(this, res.flags.from)
       .isAccount(res.flags.from)
+      .isNotVoting(res.flags.from)
       .hasEnoughLockedGoldToUnlock(value)
       .runChecks()
 

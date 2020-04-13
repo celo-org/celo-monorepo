@@ -6,7 +6,9 @@ import * as path from 'path'
 
 export default async function setup() {
   console.log('\nstarting ganache...')
-  await baseSetup(path.resolve(path.join(__dirname, '../../.devchain')))
+  await baseSetup(path.resolve(path.join(__dirname, '../..')), '.tmp/devchain.tar.gz', {
+    from_targz: true,
+  })
   await waitForPortOpen('localhost', 8545, 60)
   console.log('...ganache started')
 }

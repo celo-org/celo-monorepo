@@ -2,6 +2,7 @@ import * as React from 'react'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import Fade from 'react-reveal/Fade'
 import { NameSpaces, useTranslation } from 'src/i18n'
+import eventsImg from 'src/icons/coin-talk_light-bg.png'
 import Discord from 'src/icons/Discord'
 import Discourse from 'src/icons/Discourse'
 import DrawCoin from 'src/icons/DrawCoin'
@@ -12,7 +13,6 @@ import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import Button, { BTN } from 'src/shared/Button.3'
 import menuItems, { CeloLinks } from 'src/shared/menu-items'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
-const eventsImg = require('src/dev/devEvents.png')
 
 interface ChannelProps {
   icon: React.ReactNode
@@ -95,9 +95,9 @@ export function TwitterChannel({ alignCenter, isDarkMode }: ExternalChannelProps
           &{' '}
           <Button
             style={[fonts.legal, isDarkMode && textStyles.invert]}
-            text={'@celoHQ'}
+            text={'@celoOrg'}
             kind={BTN.INLINE}
-            href="https://twitter.com/@celoHQ"
+            href={CeloLinks.twitter}
           />
         </>
       }

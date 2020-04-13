@@ -30,6 +30,8 @@ export const DEV_SETTINGS_ACTIVE_INITIALLY = stringToBoolean(
 )
 
 // VALUES
+export const GAS_INFLATION_FACTOR = 1.5 // Used when estimating gas for txs
+export const GAS_PRICE_INFLATION_FACTOR = 5 // Used when getting gas price, must match what Geth does
 export const BALANCE_OUT_OF_SYNC_THRESHOLD = 5 * 60 // 5 minutes
 export const ALERT_BANNER_DURATION = 5000
 export const NUMBER_INPUT_MAX_DECIMALS = 2
@@ -50,6 +52,7 @@ export const CELO_FAUCET_LINK = 'https://celo.org/app'
 export const CELO_TERMS_LINK = 'https://celo.org/terms'
 export const TOS_LINK = 'https://celo.org/user-agreement'
 export const FAQ_LINK = 'https://celo.org/faq'
+export const FORUM_LINK = 'https://forum.celo.org/c/support'
 export const CELO_SUPPORT_EMAIL_ADDRESS = 'support@celo.org'
 export const DEFAULT_FORNO_URL = `https://${DEFAULT_TESTNET}-forno.celo-testnet.org`
 

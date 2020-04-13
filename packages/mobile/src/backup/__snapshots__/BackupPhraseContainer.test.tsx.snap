@@ -31,45 +31,38 @@ exports[`renders correctly for input backup phrase 1`] = `
       }
     }
   >
-    <View
+    <TextInput
+      allowFontScaling={true}
+      autoCapitalize="none"
+      autoCorrect={false}
+      enablesReturnKeyAutomatically={true}
+      multiline={true}
+      onChangeText={[Function]}
+      placeholder="backupPhrasePlaceholder"
+      placeholderTextColor="#D1D5D8"
+      rejectResponderTermination={true}
+      shouldShowClipboard={[Function]}
       style={
-        Object {
-          "position": "relative",
-        }
+        Array [
+          Object {
+            "borderColor": "#D1D5D8",
+            "borderRadius": 4,
+            "borderWidth": 1,
+            "color": "#2E3338",
+            "fontFamily": "Hind-Regular",
+            "fontSize": 16,
+            "lineHeight": 24,
+            "minHeight": 125,
+            "padding": 14,
+            "paddingTop": 16,
+            "textAlignVertical": "top",
+          },
+          false,
+        ]
       }
-    >
-      <TextInput
-        allowFontScaling={true}
-        autoCapitalize="none"
-        autoCorrect={false}
-        enablesReturnKeyAutomatically={true}
-        multiline={true}
-        onChangeText={[Function]}
-        placeholder="backupPhrasePlaceholder"
-        placeholderTextColor="#D1D5D8"
-        rejectResponderTermination={true}
-        shouldShowClipboard={[Function]}
-        showClearButton={true}
-        style={
-          Array [
-            Object {
-              "borderColor": "#D1D5D8",
-              "borderRadius": 4,
-              "borderWidth": 1,
-              "color": "#2E3338",
-              "fontFamily": "Hind-Regular",
-              "fontSize": 16,
-              "lineHeight": 24,
-              "minHeight": 145,
-              "padding": 14,
-            },
-            false,
-          ]
-        }
-        underlineColorAndroid="transparent"
-        value="prosper winner find donate tape history measure umbrella agent patrol want rhythm old unable wash wrong need fluid hammer coach reveal plastic trust lake"
-      />
-    </View>
+      underlineColorAndroid="transparent"
+      value="prosper winner find donate tape history measure umbrella agent patrol want rhythm old unable wash wrong need fluid hammer coach reveal plastic trust lake"
+    />
   </View>
 </View>
 `;
@@ -105,47 +98,40 @@ exports[`renders correctly for input social backup phrase 1`] = `
       }
     }
   >
-    <View
+    <TextInput
+      allowFontScaling={true}
+      autoCapitalize="none"
+      autoCorrect={false}
+      enablesReturnKeyAutomatically={true}
+      multiline={true}
+      onChangeText={[Function]}
+      placeholder="backupPhrasePlaceholder"
+      placeholderTextColor="#D1D5D8"
+      rejectResponderTermination={true}
+      shouldShowClipboard={[Function]}
       style={
-        Object {
-          "position": "relative",
-        }
+        Array [
+          Object {
+            "borderColor": "#D1D5D8",
+            "borderRadius": 4,
+            "borderWidth": 1,
+            "color": "#2E3338",
+            "fontFamily": "Hind-Regular",
+            "fontSize": 16,
+            "lineHeight": 24,
+            "minHeight": 125,
+            "padding": 14,
+            "paddingTop": 16,
+            "textAlignVertical": "top",
+          },
+          Object {
+            "minHeight": 90,
+          },
+        ]
       }
-    >
-      <TextInput
-        allowFontScaling={true}
-        autoCapitalize="none"
-        autoCorrect={false}
-        enablesReturnKeyAutomatically={true}
-        multiline={true}
-        onChangeText={[Function]}
-        placeholder="backupPhrasePlaceholder"
-        placeholderTextColor="#D1D5D8"
-        rejectResponderTermination={true}
-        shouldShowClipboard={[Function]}
-        showClearButton={true}
-        style={
-          Array [
-            Object {
-              "borderColor": "#D1D5D8",
-              "borderRadius": 4,
-              "borderWidth": 1,
-              "color": "#2E3338",
-              "fontFamily": "Hind-Regular",
-              "fontSize": 16,
-              "lineHeight": 24,
-              "minHeight": 145,
-              "padding": 14,
-            },
-            Object {
-              "minHeight": 100,
-            },
-          ]
-        }
-        underlineColorAndroid="transparent"
-        value="prosper winner find donate tape history measure umbrella agent patrol want rhythm celo"
-      />
-    </View>
+      underlineColorAndroid="transparent"
+      value="prosper winner find donate tape history measure umbrella agent patrol want rhythm celo"
+    />
   </View>
 </View>
 `;

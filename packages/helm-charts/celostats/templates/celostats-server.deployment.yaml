@@ -1,0 +1,56 @@
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: {{ .Release.Namespace }}-celostats-server
+  labels:
+    app: celostats
+    chart: celostats
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    component: celostats-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: celostats
+      release: {{ .Release.Name }}
+      component: celostats-server
+  template:
+    metadata:
+      labels:
+        app: celostats
+        release: {{ .Release.Name }}
+        component: celostats-server
+    spec:
+      containers:
+      - name: celostats-server
+        image: {{ .Values.celostats.image.server.repository }}:{{ .Values.celostats.image.server.tag }}
+        imagePullPolicy: {{ .Values.imagePullPolicy }}
+        env:
+        - name: TRUSTED_ADDRESSES
+          value: {{ .Values.celostats.trusted_addresses }}
+        - name: BANNED_ADDRESSES
+          value: {{ .Values.celostats.banned_addresses }}
+        - name: RESERVED_ADDRESSES
+          value: {{ .Values.celostats.reserved_addresses }}
+        - name: JSONRPC
+          value: {{ .Values.celostats.jsonrpc }}
+        command:
+        - /bin/sh
+        - -c
+        args:
+        - |
+          sed -i "s%###NETWORK_NAME###%{{ .Values.celostats.network_name }}%g" /celostats-server/dist/js/netstats.min.js
+          sed -i "s%###BLOCKSCOUT_URL###%{{ .Values.celostats.blockscout_url }}%g" /celostats-server/dist/js/netstats.min.js
+          npm start
+        ports:
+        - name: http
+          containerPort: 3000
+        resources:
+          requests:
+            cpu: 100m
+            memory: 250Mi
+    {{- with .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}

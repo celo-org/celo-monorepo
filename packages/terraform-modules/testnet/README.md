@@ -37,5 +37,5 @@ A few infrastructure assumptions are made by this module and `celotool`:
 A service account must be able to create/list/modify/delete networks,
 firewalls, instances, objects, addresses, and disks.
 
-For C-Labs employees, a Google Cloud role `Terraform Testnet Admin` has been
+For cLabs employees, a Google Cloud role `Terraform Testnet Admin` has been
 created.

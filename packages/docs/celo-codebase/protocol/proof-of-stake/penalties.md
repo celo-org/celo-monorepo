@@ -1,9 +1,5 @@
 # Slashing
 
-{% hint style="success" %}
-**Roadmap:** Implementation of the design in this section is underway and is subject to change.
-{% endhint %}
-
 ## Overview
 
 Slashing accomplishes punishment of misbehaving validators by seizing a portion of their stake. Without these punishments, for example, the Celo Protocol would be subject to the [nothing at stake](https://github.com/ethereum/wiki/wiki/Proof-of-Stake-FAQ#what-is-the-nothing-at-stake-problem-and-how-can-it-be-fixed) problem. Validator misbehavior is classified as a set of slashing conditions below.
@@ -30,15 +26,15 @@ There are three categories of slashing conditions:
 
 Automatic slashing conditions are enforced entirely through the protocol, and require no external information. Any Celo Gold slashed from stakes is transferred to the [Community Fund](community-fund.md).
 
-**Persistent downtime -** If the absolute number of signatures for an elected validator during an epoch is less than a small fraction of total blocks in the epoch, the protocol automatically slashes the validator and group 100 Celo Gold, suppresses future rewards, and (most importantly in this case) ejects the validator from its current group.
-
 ### Provable
 
 Provable slashing conditions cannot be initiated automatically on chain but information provided from an external source can be definitively verified on-chain.
 
 In exchange for sending a transaction which initiates a successful provable slashing condition on-chain, the initiator receives a portion of the slashed amount (which will always be greater than the gas costs of the proof). The remainder of the slashed amount is sent to the [Community Fund](community-fund.md).
 
-**Double Signing -** A validator which can be shown to have produced BLS signatures for 2 distinct blocks at the same height but with different parent hashes will be slashed. Details are work in progress.
+**Persistent downtime -** A validator which can be shown to be absent from 480 consecutive BLS signatures will be slashed 20 Celo Gold, have future rewards suppressed, and (most importantly in this case) will be ejected from its current group.
+
+**Double Signing -** A validator which can be shown to have produced BLS signatures for 2 distinct blocks at the same height but with different hashes will be slashed 100 Celo Gold, have future rewards suppressed, and will be ejected from its current group.
 
 ### **Governed**
 
