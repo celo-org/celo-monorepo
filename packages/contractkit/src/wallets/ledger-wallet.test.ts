@@ -20,7 +20,7 @@ import {
 import { AddressValidation, LedgerWallet } from './ledger-wallet'
 
 // Update this variable when testing using a physical device
-const USE_PHYSICAL_LEDGER = true
+const USE_PHYSICAL_LEDGER = false
 // Increase timeout to give developer time to respond on device
 const TEST_TIMEOUT_IN_MS = USE_PHYSICAL_LEDGER ? 30 * 1000 : 1 * 1000
 
@@ -60,7 +60,7 @@ const ledgerAddresses: { [myKey: string]: { address: string; privateKey: string 
   },
 }
 
-const CHAIN_ID = 44313
+const CHAIN_ID = 44378
 
 // Sample data from the official EIP-712 example:
 // https://github.com/ethereum/EIPs/blob/master/assets/eip-712/Example.js
