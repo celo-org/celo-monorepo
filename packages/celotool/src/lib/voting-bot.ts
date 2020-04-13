@@ -1,11 +1,13 @@
 import { ContractKit, newKit } from '@celo/contractkit'
 import { CeloProvider } from '@celo/contractkit/lib/providers/celo-provider'
-import { getAccountAddressFromPrivateKey } from '@celo/walletkit'
 import { getFornoUrl } from 'src/lib/endpoints'
 import { envVar, fetchEnv } from 'src/lib/env-utils'
 import { AccountType, getPrivateKeysFor } from 'src/lib/generate_utils'
 import { installGenericHelmChart, removeGenericHelmChart } from 'src/lib/helm_deploy'
 import { ensure0x } from 'src/lib/utils'
+import Web3 from 'web3'
+
+const web3 = new Web3()
 
 const helmChartPath = '../helm-charts/voting-bot'
 
@@ -31,7 +33,7 @@ export async function setupVotingBotAccounts(celoEnv: string) {
   const botsWithoutGold: string[] = []
 
   for (const key of getPrivateKeysFor(AccountType.VOTING_BOT, mnemonic, numBotAccounts)) {
-    const botAccount = ensure0x(getAccountAddressFromPrivateKey(key))
+    const botAccount = ensure0x(web3.eth.accounts.privateKeyToAccount(key).address)
     const goldBalance = await goldToken.balanceOf(botAccount)
     if (goldBalance.isZero()) {
       botsWithoutGold.push(botAccount)
