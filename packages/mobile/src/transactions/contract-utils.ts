@@ -1,8 +1,7 @@
 import { values } from 'lodash'
+import { estimateGas } from 'src/web3/utils'
 import { Tx } from 'web3-core'
 import { TransactionObject, TransactionReceipt } from 'web3-eth'
-
-const gasInflateFactor = 1.5
 
 export type TxLogger = (event: SendTransactionLogEvent) => void
 
@@ -173,14 +172,8 @@ export async function sendTransactionAsync<T>(
       nonce,
     }
 
-    // This means we are connected to forno
-    // if (gasPrice) {
-    //   txParams.gatewayFeeRecipient = NULL_ADDRESS
-    //   txParams.gatewayFee = '0x' + new BigNumber(10000).toString(16)
-    // }
-
     if (estimatedGas === undefined) {
-      estimatedGas = Math.round((await tx.estimateGas(txParams)) * gasInflateFactor)
+      estimatedGas = (await estimateGas(tx, txParams)).toNumber()
       logger(EstimatedGas(estimatedGas))
     }
 

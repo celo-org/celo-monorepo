@@ -56,6 +56,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
   event UnlockingPeriodSet(uint256 period);
   event GoldLocked(address indexed account, uint256 value);
   event GoldUnlocked(address indexed account, uint256 value, uint256 available);
+  event GoldRelocked(address indexed account, uint256 value);
   event GoldWithdrawn(address indexed account, uint256 value);
   event SlasherWhitelistAdded(string indexed slasherIdentifier);
   event SlasherWhitelistRemoved(string indexed slasherIdentifier);
@@ -182,7 +183,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
       pendingWithdrawal.value = pendingWithdrawal.value.sub(value);
     }
     _incrementNonvotingAccountBalance(msg.sender, value);
-    emit GoldLocked(msg.sender, value);
+    emit GoldRelocked(msg.sender, value);
   }
 
   /**

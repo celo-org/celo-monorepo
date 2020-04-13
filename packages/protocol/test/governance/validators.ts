@@ -602,15 +602,26 @@ contract('Validators', (accounts: string[]) => {
           assert.deepEqual(membershipHistory[1], [NULL_ADDRESS])
         })
 
-        it('should emit the ValidatorRegistered event', async () => {
-          assert.equal(resp.logs.length, 1)
-          const log = resp.logs[0]
-          assertContainSubset(log, {
-            event: 'ValidatorRegistered',
+        it('should emit the ValidatorEcdsaPublicKeyUpdated, ValidatorBlsPublicKeyUpdated, and ValidatorRegistered events', async () => {
+          assert.equal(resp.logs.length, 3)
+          assertContainSubset(resp.logs[0], {
+            event: 'ValidatorEcdsaPublicKeyUpdated',
             args: {
               validator,
               ecdsaPublicKey: publicKey,
+            },
+          })
+          assertContainSubset(resp.logs[1], {
+            event: 'ValidatorBlsPublicKeyUpdated',
+            args: {
+              validator,
               blsPublicKey,
+            },
+          })
+          assertContainSubset(resp.logs[2], {
+            event: 'ValidatorRegistered',
+            args: {
+              validator,
             },
           })
         })
@@ -1756,7 +1767,7 @@ contract('Validators', (accounts: string[]) => {
     })
   })
 
-  describe('#queueCommissionUpdate()', () => {
+  describe('#setNextCommissionUpdate()', () => {
     describe('when the commission is different', () => {
       const newCommission = commission.plus(1)
       const group = accounts[0]
@@ -1766,7 +1777,7 @@ contract('Validators', (accounts: string[]) => {
 
         beforeEach(async () => {
           await registerValidatorGroup(group)
-          resp = await validators.queueCommissionUpdate(newCommission)
+          resp = await validators.setNextCommissionUpdate(newCommission)
         })
 
         it('should NOT set the validator group commission', async () => {
@@ -1796,13 +1807,13 @@ contract('Validators', (accounts: string[]) => {
 
       describe('when the commission is the same', () => {
         it('should revert', async () => {
-          await assertRevert(validators.queueCommissionUpdate(commission))
+          await assertRevert(validators.setNextCommissionUpdate(commission))
         })
       })
 
       describe('when the commission is greater than one', () => {
         it('should revert', async () => {
-          await assertRevert(validators.queueCommissionUpdate(fixed1.plus(1)))
+          await assertRevert(validators.setNextCommissionUpdate(fixed1.plus(1)))
         })
       })
     })
@@ -1819,7 +1830,7 @@ contract('Validators', (accounts: string[]) => {
       let resp: any
 
       beforeEach(async () => {
-        await validators.queueCommissionUpdate(newCommission)
+        await validators.setNextCommissionUpdate(newCommission)
         await mineBlocks(commissionUpdateDelay.toNumber(), web3)
         resp = await validators.updateCommission()
       })
@@ -1844,7 +1855,7 @@ contract('Validators', (accounts: string[]) => {
 
     describe('when activationBlock has NOT passed', () => {
       it('should revert', async () => {
-        await validators.queueCommissionUpdate(newCommission)
+        await validators.setNextCommissionUpdate(newCommission)
         await assertRevert(validators.updateCommission())
       })
     })
@@ -1857,7 +1868,7 @@ contract('Validators', (accounts: string[]) => {
 
     describe('when try to apply an already applied Commission', () => {
       it('should revert', async () => {
-        await validators.queueCommissionUpdate(newCommission)
+        await validators.setNextCommissionUpdate(newCommission)
         await mineBlocks(commissionUpdateDelay.toNumber(), web3)
         await validators.updateCommission()
         await assertRevert(validators.updateCommission())
@@ -2180,6 +2191,7 @@ contract('Validators', (accounts: string[]) => {
       await registry.setAddressFor(CeloContractName.StableToken, mockStableToken.address)
       // Fast-forward to the next epoch, so that the getMembershipInLastEpoch(validator) == group
       await mineToNextEpoch(web3)
+      await mockLockedGold.addSlasher(accounts[2])
     })
 
     describe('when the validator score is non-zero', () => {
@@ -2214,6 +2226,35 @@ contract('Validators', (accounts: string[]) => {
 
         it('should return the expected total payment', async () => {
           assertEqualBN(ret, expectedTotalPayment)
+        })
+      })
+
+      describe('when slashing multiplier is halved', () => {
+        const halfExpectedTotalPayment = expectedScore
+          .times(maxPayment)
+          .div(2)
+          .dp(0, BigNumber.ROUND_FLOOR)
+        const halfExpectedGroupPayment = halfExpectedTotalPayment
+          .times(fromFixed(commission))
+          .dp(0, BigNumber.ROUND_FLOOR)
+        const halfExpectedValidatorPayment = halfExpectedTotalPayment.minus(
+          halfExpectedGroupPayment
+        )
+        beforeEach(async () => {
+          await validators.halveSlashingMultiplier(group, { from: accounts[2] })
+          ret = await validators.distributeEpochPaymentsFromSigner.call(validator, maxPayment)
+          await validators.distributeEpochPaymentsFromSigner(validator, maxPayment)
+        })
+        it('should pay the validator only half', async () => {
+          assertEqualBN(await mockStableToken.balanceOf(validator), halfExpectedValidatorPayment)
+        })
+
+        it('should pay the group only half', async () => {
+          assertEqualBN(await mockStableToken.balanceOf(group), halfExpectedGroupPayment)
+        })
+
+        it('should return the expected total payment', async () => {
+          assertEqualBN(ret, halfExpectedTotalPayment)
         })
       })
 
@@ -2428,6 +2469,10 @@ contract('Validators', (accounts: string[]) => {
         await validators.halveSlashingMultiplier(group, { from: accounts[2] })
         parsedGroup = parseValidatorGroupParams(await validators.getValidatorGroup(group))
         assert(parsedGroup.lastSlashed > initialTimestamp)
+      })
+
+      it('should revert when called by non-slasher', async () => {
+        await assertRevert(validators.halveSlashingMultiplier(group, { from: accounts[0] }))
       })
     })
   })

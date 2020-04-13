@@ -33,7 +33,7 @@ export const handler = async (argv: Argv) => {
     `gcloud compute forwarding-rules list --format=json --project=${argv.project}`
   ).then(([body]) => JSON.parse(body))
 
-  const candidates = rules.filter((rule) => rule.target.includes('targetPools'))
+  const candidates = rules.filter((rule) => rule.target && rule.target.includes('targetPools'))
 
   console.info('Determining health of rules')
   const shouldDelete = await Promise.all(

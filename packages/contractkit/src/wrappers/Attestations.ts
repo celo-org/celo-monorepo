@@ -10,6 +10,7 @@ import { ClaimTypes, IdentityMetadataWrapper } from '../identity'
 import {
   BaseWrapper,
   proxyCall,
+  stringIdentity,
   toTransactionObject,
   tupleParser,
   valueToBigNumber,
@@ -82,7 +83,6 @@ function parseGetCompletableAttestations(response: GetCompletableAttestationsRes
   ).map(([blockNumber, issuer, metadataURL]) => ({ blockNumber, issuer, metadataURL }))
 }
 
-const stringIdentity = (x: string) => x
 export class AttestationsWrapper extends BaseWrapper<Attestations> {
   /**
    *  Returns the time an attestation can be completable before it is considered expired
@@ -256,7 +256,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     metadataURL: string
   }): Promise<AttestationServiceRunningCheckResult> {
     try {
-      const metadata = await IdentityMetadataWrapper.fetchFromURL(arg.metadataURL)
+      const metadata = await IdentityMetadataWrapper.fetchFromURL(this.kit, arg.metadataURL)
       const attestationServiceURLClaim = metadata.findClaim(ClaimTypes.ATTESTATION_SERVICE_URL)
 
       if (attestationServiceURLClaim === undefined) {

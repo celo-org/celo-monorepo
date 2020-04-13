@@ -31,13 +31,16 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
   struct RevocationInfo {
     // Indicates if the contract is revocable.
     bool revocable;
+    // Indicates if the contract can expire `EXPIRATION_TIME` after releasing finishes.
+    bool canExpire;
     // Released gold instance balance at time of revocation.
     uint256 releasedBalanceAtRevoke;
     // The time at which the release schedule was revoked.
     uint256 revokeTime;
   }
 
-  uint256 internal constant MAX_UINT = 0xffffffffffffffffffffffffffffffff;
+  // uint256(-1) == 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+  uint256 internal constant MAX_UINT = uint256(-1);
 
   // Duration (in seconds) after gold is fully released
   // when gold should be switched back to control of releaseOwner.
@@ -82,6 +85,7 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
   event ReleaseGoldInstanceDestroyed(address indexed beneficiary, address indexed atAddress);
   event DistributionLimitSet(address indexed beneficiary, uint256 maxDistribution);
   event LiquidityProvisionSet(address indexed beneficiary);
+  event CanExpireSet(bool canExpire);
   event BeneficiarySet(address indexed beneficiary);
 
   modifier onlyReleaseOwner() {
@@ -140,6 +144,7 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
   }
 
   modifier onlyExpired() {
+    require(revocationInfo.canExpire, "Contract must be expirable");
     uint256 releaseEndTime = releaseSchedule.releaseStartTime.add(
       releaseSchedule.numReleasePeriods.mul(releaseSchedule.releasePeriod)
     );
@@ -202,6 +207,10 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
     releaseSchedule.releasePeriod = releasePeriod;
     releaseSchedule.releaseCliff = releaseStartTime.add(releaseCliffTime);
     releaseSchedule.releaseStartTime = releaseStartTime;
+    // Expiry is opt-in for folks who can validate, opt-out for folks who cannot.
+    // This is because folks who are running Validators or Groups are likely to want to keep
+    // cGLD in the ReleaseGold contract even after it becomes withdrawable.
+    revocationInfo.canExpire = !canValidate;
     require(releaseSchedule.numReleasePeriods >= 1, "There must be at least one releasing period");
     require(
       releaseSchedule.amountReleasedPerPeriod > 0,
@@ -247,7 +256,6 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
     } else {
       maxDistribution = MAX_UINT;
     }
-
     liquidityProvisionMet = (subjectToLiquidityProvision) ? false : true;
     canValidate = _canValidate;
     canVote = _canVote;
@@ -272,6 +280,19 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
   }
 
   /**
+   * @notice Controls if the contract can be expired.
+   * @param _canExpire If the contract is expirable.
+   */
+  function setCanExpire(bool _canExpire) external onlyBeneficiary {
+    require(
+      revocationInfo.canExpire != _canExpire,
+      "Expiration flag is already set to desired value"
+    );
+    revocationInfo.canExpire = _canExpire;
+    emit CanExpireSet(revocationInfo.canExpire);
+  }
+
+  /**
    * @notice Controls the maximum distribution ratio.
    *         Calculates `distributionRatio`/1000 of current `totalBalance()`
    *         and sets this value as the maximum allowed gold to be currently withdrawn.
@@ -280,11 +301,16 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
    */
   function setMaxDistribution(uint256 distributionRatio) external onlyReleaseOwner {
     require(distributionRatio <= 1000, "Max distribution ratio must be within bounds");
+    require(
+      maxDistribution != MAX_UINT,
+      "Cannot set max distribution lower if already set to 1000"
+    );
     // If ratio is 1000, we set maxDistribution to maxUint to account for future rewards.
     if (distributionRatio == 1000) {
       maxDistribution = MAX_UINT;
     } else {
       uint256 totalBalance = getTotalBalance();
+      require(totalBalance > 0, "Do not set max distribution before factory sends the gold");
       maxDistribution = totalBalance.mul(distributionRatio).div(1000);
     }
     emit DistributionLimitSet(beneficiary, maxDistribution);
@@ -371,11 +397,6 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
    * @dev Only callable `EXPIRATION_TIME` after the final gold release.
    */
   function expire() external nonReentrant onlyReleaseOwner onlyExpired {
-    IValidators validators = getValidators();
-    require(
-      !validators.isValidator(address(this)) && !validators.isValidatorGroup(address(this)),
-      "Cannot call `expire` on an instance registered as a validator or group"
-    );
     require(!isRevoked(), "Release schedule instance must not already be revoked");
     revocationInfo.revokeTime = block.timestamp;
     revocationInfo.releasedBalanceAtRevoke = totalWithdrawn;
@@ -486,6 +507,18 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
   }
 
   /**
+   * @notice Funds a signer address so that transaction fees can be paid.
+   * @param signer The signer address to fund.
+   * @dev Note that this effectively decreases the total balance by 1 cGLD.
+   */
+  function fundSigner(address payable signer) private {
+    // Fund signer account with 1 cGLD.
+    uint256 value = 1 ether;
+    signer.transfer(value);
+    require(getRemainingTotalBalance() > 0, "no remaining balance");
+  }
+
+  /**
    * @notice A wrapper function for the authorize vote signer account method.
    * @param signer The address of the signing key to authorize.
    * @param v The recovery id of the incoming ECDSA signature.
@@ -494,12 +527,16 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
    * @dev The v,r and s signature should be a signed message by the beneficiary
    *      encrypting the authorized address.
    */
-  function authorizeVoteSigner(address signer, uint8 v, bytes32 r, bytes32 s)
+  function authorizeVoteSigner(address payable signer, uint8 v, bytes32 r, bytes32 s)
     external
     nonReentrant
     onlyCanVote
     onlyWhenInProperState
   {
+    // If no previous signer has been authorized, fund the new signer so that tx fees can be paid.
+    if (getAccounts().getVoteSigner(address(this)) == address(this)) {
+      fundSigner(signer);
+    }
     getAccounts().authorizeVoteSigner(signer, v, r, s);
   }
 
@@ -512,12 +549,16 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
    * @dev The v,r and s signature should be a signed message by the beneficiary
    *      encrypting the authorized address.
    */
-  function authorizeValidatorSigner(address signer, uint8 v, bytes32 r, bytes32 s)
+  function authorizeValidatorSigner(address payable signer, uint8 v, bytes32 r, bytes32 s)
     external
     nonReentrant
     onlyCanValidate
     onlyWhenInProperState
   {
+    // If no previous signer has been authorized, fund the new signer so that tx fees can be paid.
+    if (getAccounts().getValidatorSigner(address(this)) == address(this)) {
+      fundSigner(signer);
+    }
     getAccounts().authorizeValidatorSigner(signer, v, r, s);
   }
 
@@ -532,12 +573,16 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
    *      encrypting the authorized address.
    */
   function authorizeValidatorSignerWithPublicKey(
-    address signer,
+    address payable signer,
     uint8 v,
     bytes32 r,
     bytes32 s,
     bytes calldata ecdsaPublicKey
   ) external nonReentrant onlyCanValidate onlyWhenInProperState {
+    // If no previous signer has been authorized, fund the new signer so that tx fees can be paid.
+    if (getAccounts().getValidatorSigner(address(this)) == address(this)) {
+      fundSigner(signer);
+    }
     getAccounts().authorizeValidatorSignerWithPublicKey(signer, v, r, s, ecdsaPublicKey);
   }
 
@@ -556,7 +601,7 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
    *      encrypting the authorized address.
    */
   function authorizeValidatorSignerWithKeys(
-    address signer,
+    address payable signer,
     uint8 v,
     bytes32 r,
     bytes32 s,
@@ -564,6 +609,10 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
     bytes calldata blsPublicKey,
     bytes calldata blsPop
   ) external nonReentrant onlyCanValidate onlyWhenInProperState {
+    // If no previous signer has been authorized, fund the new signer so that tx fees can be paid.
+    if (getAccounts().getValidatorSigner(address(this)) == address(this)) {
+      fundSigner(signer);
+    }
     getAccounts().authorizeValidatorSignerWithKeys(
       signer,
       v,
@@ -584,7 +633,7 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
    * @dev The v,r and s signature should be a signed message by the beneficiary
    *      encrypting the authorized address.
    */
-  function authorizeAttestationSigner(address signer, uint8 v, bytes32 r, bytes32 s)
+  function authorizeAttestationSigner(address payable signer, uint8 v, bytes32 r, bytes32 s)
     external
     nonReentrant
     onlyCanValidate

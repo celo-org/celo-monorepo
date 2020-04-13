@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { Ul } from 'src/fonts/Fonts'
-import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
+import { useScreenSize } from 'src/layout/ScreenSize'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import OvalCoin from 'src/shared/OvalCoin'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
@@ -25,56 +25,54 @@ interface Props {
 
 const TRANS_DURATION = 500
 
-export default withScreenSize(
-  React.memo(function StackSection(props: Props & ScreenProps) {
-    const { title, text, buttonOne, buttonTwo, children, onPress, isSelected, screen } = props
-    const isMobile = props.screen === ScreenSizes.MOBILE
-    const containerStyle = isMobile ? styles.mobileContainer : styles.container
+export default React.memo(function StackSection(props: Props) {
+  const { title, text, buttonOne, buttonTwo, children, onPress, isSelected } = props
+  const { isMobile, isDesktop } = useScreenSize()
+  const containerStyle = isMobile ? styles.mobileContainer : styles.container
 
-    return (
-      <View
-        nativeID={props.id}
-        // @ts-ignore issue with transition* even though Stylesheet is fine with it
-        style={[containerStyle, styles.fade, isSelected ? styles.bright : styles.dim]}
-      >
-        <View style={styles.content}>
-          <Text
-            onPress={onPress}
-            style={[fonts.h6, standardStyles.elementalMarginBottom, textStyles.invert]}
-          >
-            {screen === ScreenSizes.DESKTOP && (
-              <View style={[styles.coin, isSelected ? styles.bright : styles.off]}>
-                <OvalCoin color={colors.primary} size={15} />
-              </View>
-            )}
+  return (
+    <View
+      nativeID={props.id}
+      // @ts-ignore issue with transition* even though Stylesheet is fine with it
+      style={[containerStyle, styles.fade, isSelected ? styles.bright : styles.dim]}
+    >
+      <View style={styles.content}>
+        <Text
+          onPress={onPress}
+          style={[fonts.h6, standardStyles.elementalMarginBottom, textStyles.invert]}
+        >
+          {isDesktop && (
+            <View style={[styles.coin, isSelected ? styles.bright : styles.off]}>
+              <OvalCoin color={colors.primary} size={15} />
+            </View>
+          )}
 
-            {title}
-          </Text>
-          <Text style={[fonts.p, textStyles.invert]}>{text}</Text>
-          <Ul style={styles.list}>{children}</Ul>
-        </View>
-        <View style={isMobile ? styles.mobileButtonArea : styles.buttonArea}>
-          <Button
-            text={buttonOne.title}
-            kind={BTN.PRIMARY}
-            size={SIZE.small}
-            href={buttonOne.href}
-            target={'blank'}
-          />
-          <View style={styles.separator} />
-          <Button
-            text={buttonTwo.title}
-            kind={BTN.SECONDARY}
-            size={SIZE.small}
-            href={buttonTwo.href}
-            target={'blank'}
-            align="flex-start"
-          />
-        </View>
+          {title}
+        </Text>
+        <Text style={[fonts.p, textStyles.invert]}>{text}</Text>
+        <Ul style={styles.list}>{children}</Ul>
       </View>
-    )
-  })
-)
+      <View style={isMobile ? styles.mobileButtonArea : styles.buttonArea}>
+        <Button
+          text={buttonOne.title}
+          kind={BTN.PRIMARY}
+          size={isDesktop ? SIZE.small : SIZE.normal}
+          href={buttonOne.href}
+          target={'blank'}
+        />
+        <View style={isMobile ? styles.separatorHorizontal : styles.separator} />
+        <Button
+          text={buttonTwo.title}
+          kind={BTN.SECONDARY}
+          size={isDesktop ? SIZE.small : SIZE.normal}
+          href={buttonTwo.href}
+          target={'blank'}
+          align="flex-start"
+        />
+      </View>
+    </View>
+  )
+})
 
 const styles = StyleSheet.create({
   container: {
@@ -103,6 +101,9 @@ const styles = StyleSheet.create({
   separator: {
     marginVertical: 10,
   },
+  separatorHorizontal: {
+    marginHorizontal: 20,
+  },
   mobile: {
     flexDirection: 'column',
   },
@@ -111,7 +112,6 @@ const styles = StyleSheet.create({
   },
   mobileButtonArea: {
     flexDirection: 'row',
-    justifyContent: 'space-evenly',
     marginBottom: 10,
   },
   coin: {
