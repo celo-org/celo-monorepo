@@ -125,7 +125,7 @@ const DefaultConfig = {
     unlockingPeriod: 3 * DAY,
   },
   oracles: {
-    reportExpiry: 10 * MINUTE,
+    reportExpiry: 5 * MINUTE,
   },
   random: {
     randomnessBlockRetentionWindow: HOUR / 5, // 1 hour to match attestationExpiryBlocks
