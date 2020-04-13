@@ -16,13 +16,16 @@ const INTERFACE: string = process.env.INTERFACE || '0.0.0.0'
 const app: any = express()
 
 app.get('/robots.txt', (req: express.Request, res: express.Response) => {
+  // @ts-ignore
   res.type('text/plain')
+  // @ts-ignore
   res.send('User-agent: *\nDisallow: /')
 })
 
 app.head('/', (req: express.Request, res: express.Response) => {
   // Preventing HEAD requests made by some browsers causing alerts
   // https://github.com/celo-org/celo-monorepo/issues/2189
+  // @ts-ignore
   res.end()
 })
 
