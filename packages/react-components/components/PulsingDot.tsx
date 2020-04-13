@@ -75,7 +75,7 @@ export default class PulsingDot extends React.PureComponent<Props, State> {
                 {
                   scale: pulse.interpolate({
                     inputRange: [0, 1],
-                    outputRange: [0, CIRCLE_END],
+                    outputRange: [1, CIRCLE_END],
                   }),
                 },
                 { perspective: 1000 }, // without this line this Animation will not render on Android
