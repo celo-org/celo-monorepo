@@ -3,7 +3,7 @@ import { cli } from 'cli-ux'
 import { BaseCommand } from '../../base'
 
 export default class GetRates extends BaseCommand {
-  static description = 'Get the current set oracle-reported rates for the given token'
+  static description = 'List oracle reports for a given token'
 
   static flags = {
     ...BaseCommand.flags,
@@ -13,7 +13,7 @@ export default class GetRates extends BaseCommand {
     {
       name: 'token',
       required: true,
-      description: 'Token to get the rates for',
+      description: 'Token to list the reports for',
       options: [CeloContract.StableToken],
       default: CeloContract.StableToken,
     },
@@ -25,12 +25,13 @@ export default class GetRates extends BaseCommand {
     const res = this.parse(GetRates)
     const sortedOracles = await this.kit.contracts.getSortedOracles()
 
-    const rates = await sortedOracles.getRates(res.args.token)
+    const reports = await sortedOracles.getReports(res.args.token)
     cli.table(
-      rates,
+      reports,
       {
         address: {},
         rate: { get: (r) => r.rate.toNumber() },
+        timestamp: { get: (r) => r.timestamp.toNumber() },
       },
       { 'no-truncate': !res.flags.truncate }
     )

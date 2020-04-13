@@ -7,10 +7,14 @@ import {
   BaseWrapper,
   CeloTransactionObject,
   proxyCall,
+  proxySend,
+  stringIdentity,
   toTransactionObject,
+  tupleParser,
   valueToBigNumber,
   valueToFrac,
   valueToInt,
+  valueToString,
 } from './BaseWrapper'
 
 export enum MedianRelation {
@@ -103,6 +107,12 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
     this.contract.methods.reportExpirySeconds,
     undefined,
     valueToBigNumber
+  )
+
+  removeExpiredReports = proxySend(
+    this.kit,
+    this.contract.methods.removeExpiredReports,
+    tupleParser(stringIdentity, valueToString)
   )
 
   /**
