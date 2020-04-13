@@ -2,13 +2,16 @@ import { PhoneNumberUtils } from '@celo/utils'
 import * as functions from 'firebase-functions'
 import { authenticateUser } from './common/identity'
 import { incrementQueryCount } from './database/wrappers/account'
+import { getNumberPairContacts, setNumberPairContacts } from './database/wrappers/number-pairs'
 import { computeBLSSalt } from './salt-generation/bls-salt'
 import QueryQuota from './salt-generation/query-quota'
 
 export const getSalt = functions.https.onRequest(async (request, response) => {
+  // TODO (amyslawson) refactor this internal logic and input validation to its own file
+  // when adding error handling
   try {
     const queryQuota: QueryQuota = new QueryQuota()
-    if (!isValidInput(request.body)) {
+    if (!isValidGetSaltInput(request.body)) {
       response.status(400).send('Invalid input parameters')
       return
     }
@@ -33,7 +36,7 @@ export const getSalt = functions.https.onRequest(async (request, response) => {
   }
 })
 
-function isValidInput(requestBody: any): boolean {
+function isValidGetSaltInput(requestBody: any): boolean {
   return (
     hasValidAccountParam(requestBody) &&
     hasValidPhoneNumberParam(requestBody) &&
@@ -51,4 +54,39 @@ function hasValidPhoneNumberParam(requestBody: any): boolean {
 
 function hasValidQueryPhoneNumberParam(requestBody: any): boolean {
   return requestBody.queryPhoneNumber
+}
+
+// TODO (amyslawson) consider pagination or streaming of contacts?
+export const getContactMatches = functions.https.onRequest(async (request, response) => {
+  // TODO (amyslawson) refactor this internal logic and input validation to its own file
+  // when adding error handling
+  try {
+    if (!isValidGetContactMatchesInput(request.body)) {
+      response.status(400).send('Invalid input parameters')
+      return
+    }
+    authenticateUser()
+    const matchedContacts = await getNumberPairContacts(
+      request.body.userPhoneNumber,
+      request.body.contactPhoneNumbers
+    )
+    await setNumberPairContacts(request.body.userPhoneNumber, request.body.contactPhoneNumbers)
+    // TODO (amyslawson) return salts with contact
+    response.json({ success: true, matchedContacts })
+  } catch (e) {
+    console.log('Failed to getContactMatches', e)
+    response.status(500).send(e)
+  }
+})
+
+function isValidGetContactMatchesInput(requestBody: any): boolean {
+  return hasValidUserPhoneNumberParam(requestBody) && hasValidContractPhoneNumbersParam(requestBody)
+}
+
+function hasValidUserPhoneNumberParam(requestBody: any): boolean {
+  return requestBody.userPhoneNumber
+}
+
+function hasValidContractPhoneNumbersParam(requestBody: any): boolean {
+  return requestBody.contactPhoneNumbers && Array.isArray(requestBody.contactPhoneNumbers)
 }
