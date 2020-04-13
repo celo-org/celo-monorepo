@@ -54,7 +54,7 @@ Click **Install** for the Celo app, this will install the Celo App Version 1.0.1
  npm install -g @celo/celocli
 ```
 
- You will now need to point the Celo CLI to a node that is synchronized with one of Celo’s networks. We’ll be using the [Alfajores Network](alfajores-testnet.md).
+ You will now need to point the Celo CLI to a node that is synchronized with one of Celo’s networks. We’ll be using the [Alfajores Network](https://docs.celo.org/getting-started/alfajores-testnet).
 
 Configure the Celo CLI so that it uses a cLabs node on the Alfajores network.
 
