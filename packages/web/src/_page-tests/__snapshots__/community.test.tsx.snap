@@ -133,11 +133,11 @@ exports[`Community renders 1`] = `
               dir="auto"
               style={
                 Object {
-                  "WebkitAnimationDelay": "1400ms",
+                  "WebkitAnimationDelay": "1650ms",
                   "WebkitAnimationDuration": "600ms",
                   "WebkitAnimationFillMode": "both",
                   "WebkitAnimationIterationCount": 1,
-                  "animationDelay": "1400ms",
+                  "animationDelay": "1650ms",
                   "animationDuration": "600ms",
                   "animationFillMode": "both",
                   "animationIterationCount": 1,
@@ -152,11 +152,11 @@ exports[`Community renders 1`] = `
               dir="auto"
               style={
                 Object {
-                  "WebkitAnimationDelay": "3400ms",
+                  "WebkitAnimationDelay": "3650ms",
                   "WebkitAnimationDuration": "600ms",
                   "WebkitAnimationFillMode": "both",
                   "WebkitAnimationIterationCount": 1,
-                  "animationDelay": "3400ms",
+                  "animationDelay": "3650ms",
                   "animationDuration": "600ms",
                   "animationFillMode": "both",
                   "animationIterationCount": 1,
@@ -171,11 +171,11 @@ exports[`Community renders 1`] = `
               dir="auto"
               style={
                 Object {
-                  "WebkitAnimationDelay": "4900ms",
+                  "WebkitAnimationDelay": "5250ms",
                   "WebkitAnimationDuration": "600ms",
                   "WebkitAnimationFillMode": "both",
                   "WebkitAnimationIterationCount": 1,
-                  "animationDelay": "4900ms",
+                  "animationDelay": "5250ms",
                   "animationDuration": "600ms",
                   "animationFillMode": "both",
                   "animationIterationCount": 1,
@@ -190,11 +190,11 @@ exports[`Community renders 1`] = `
               dir="auto"
               style={
                 Object {
-                  "WebkitAnimationDelay": "6500ms",
+                  "WebkitAnimationDelay": "6450ms",
                   "WebkitAnimationDuration": "600ms",
                   "WebkitAnimationFillMode": "both",
                   "WebkitAnimationIterationCount": 1,
-                  "animationDelay": "6500ms",
+                  "animationDelay": "6450ms",
                   "animationDuration": "600ms",
                   "animationFillMode": "both",
                   "animationIterationCount": 1,

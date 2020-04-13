@@ -96,19 +96,19 @@ const styles = StyleSheet.create({
   },
   developers: {
     color: colors.primaryPress,
-    animationDelay: '1400ms',
+    animationDelay: '1650ms',
   },
   designers: {
     color: colors.purpleScreen,
-    animationDelay: '3400ms',
+    animationDelay: '3650ms',
   },
   dreamers: {
     color: colors.redScreen,
-    animationDelay: '4900ms',
+    animationDelay: '5250ms',
   },
   doers: {
     color: colors.blueScreen,
-    animationDelay: '6500ms',
+    animationDelay: '6450ms',
   },
   ctaArea: {
     animationDelay: '7400ms',
