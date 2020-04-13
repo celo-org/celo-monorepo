@@ -15,6 +15,7 @@
 
 ## Operations Manual
 
+- [Governance](operations-manual/governance.md)
 - [Key Management](operations-manual/key-management.md)
 - [Securing Celo Nodes and Services](operations-manual/securing-nodes-and-services.md)
 - [Upgrading a Node](operations-manual/node-upgrades.md)
@@ -175,6 +176,7 @@
       - [wallets/azure-hsm-wallet](developer-resources/contractkit/reference/modules/_wallets_azure_hsm_wallet_.md)
       - [AzureHSMWallet](developer-resources/contractkit/reference/classes/_wallets_azure_hsm_wallet_.azurehsmwallet.md)
       - [wallets/ledger-wallet](developer-resources/contractkit/reference/modules/_wallets_ledger_wallet_.md)
+      - [AddressValidation](developer-resources/contractkit/reference/enums/_wallets_ledger_wallet_.addressvalidation.md)
       - [LedgerWallet](developer-resources/contractkit/reference/classes/_wallets_ledger_wallet_.ledgerwallet.md)
       - [wallets/local-wallet](developer-resources/contractkit/reference/modules/_wallets_local_wallet_.md)
       - [LocalWallet](developer-resources/contractkit/reference/classes/_wallets_local_wallet_.localwallet.md)
@@ -334,6 +336,7 @@
     - [Enums]()
       - [CeloContract](developer-resources/contractkit/reference/enums/_base_.celocontract.md)
       - [ClaimTypes](developer-resources/contractkit/reference/enums/_identity_claims_types_.claimtypes.md)
+      - [AddressValidation](developer-resources/contractkit/reference/enums/_wallets_ledger_wallet_.addressvalidation.md)
       - [AttestationState](developer-resources/contractkit/reference/enums/_wrappers_attestations_.attestationstate.md)
       - [ProposalStage](developer-resources/contractkit/reference/enums/_wrappers_governance_.proposalstage.md)
       - [VoteValue](developer-resources/contractkit/reference/enums/_wrappers_governance_.votevalue.md)
@@ -409,6 +412,7 @@
 - [Account](command-line-interface/account.md)
 - [Election](command-line-interface/election.md)
 - [Exchange](command-line-interface/exchange.md)
+- [Governance](command-line-interface/governance.md)
 - [Locked Gold](command-line-interface/lockedgold.md)
 - [Network](command-line-interface/network.md)
 - [Node](command-line-interface/node.md)

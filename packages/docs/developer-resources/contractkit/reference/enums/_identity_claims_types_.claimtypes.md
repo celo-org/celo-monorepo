@@ -18,7 +18,7 @@
 
 • **ACCOUNT**: = "ACCOUNT"
 
-*Defined in [contractkit/src/identity/claims/types.ts:10](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/types.ts#L10)*
+*Defined in [src/identity/claims/types.ts:10](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/types.ts#L10)*
 
 ___
 
@@ -26,7 +26,7 @@ ___
 
 • **ATTESTATION_SERVICE_URL**: = "ATTESTATION_SERVICE_URL"
 
-*Defined in [contractkit/src/identity/claims/types.ts:9](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/types.ts#L9)*
+*Defined in [src/identity/claims/types.ts:9](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/types.ts#L9)*
 
 ___
 
@@ -34,7 +34,7 @@ ___
 
 • **DOMAIN**: = "DOMAIN"
 
-*Defined in [contractkit/src/identity/claims/types.ts:11](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/types.ts#L11)*
+*Defined in [src/identity/claims/types.ts:11](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/types.ts#L11)*
 
 ___
 
@@ -42,7 +42,7 @@ ___
 
 • **KEYBASE**: = "KEYBASE"
 
-*Defined in [contractkit/src/identity/claims/types.ts:12](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/types.ts#L12)*
+*Defined in [src/identity/claims/types.ts:12](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/types.ts#L12)*
 
 ___
 
@@ -50,7 +50,7 @@ ___
 
 • **NAME**: = "NAME"
 
-*Defined in [contractkit/src/identity/claims/types.ts:13](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/types.ts#L13)*
+*Defined in [src/identity/claims/types.ts:13](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/types.ts#L13)*
 
 ___
 
@@ -58,7 +58,7 @@ ___
 
 • **PROFILE_PICTURE**: = "PROFILE_PICTURE"
 
-*Defined in [contractkit/src/identity/claims/types.ts:14](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/types.ts#L14)*
+*Defined in [src/identity/claims/types.ts:14](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/types.ts#L14)*
 
 ___
 
@@ -66,4 +66,4 @@ ___
 
 • **TWITTER**: = "TWITTER"
 
-*Defined in [contractkit/src/identity/claims/types.ts:15](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/types.ts#L15)*
+*Defined in [src/identity/claims/types.ts:15](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/types.ts#L15)*

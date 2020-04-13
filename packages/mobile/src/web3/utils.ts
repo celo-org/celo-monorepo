@@ -1,8 +1,18 @@
 import { ensureLeading0x } from '@celo/utils/src/address'
+import BigNumber from 'bignumber.js'
+import { GAS_INFLATION_FACTOR } from 'src/config'
 import Logger from 'src/utils/Logger'
 import { getContractKit } from 'src/web3/contracts'
+import { Tx } from 'web3-core'
+import { TransactionObject } from 'web3-eth'
 
 const TAG = 'web3/utils'
+
+// Estimate gas taking into account the configured inflation factor
+export async function estimateGas(tx: TransactionObject<any>, txParams: Tx) {
+  const gas = new BigNumber(await tx.estimateGas(txParams))
+  return gas.times(GAS_INFLATION_FACTOR).integerValue()
+}
 
 // Note: This returns Promise<Block>
 export function getLatestBlock() {

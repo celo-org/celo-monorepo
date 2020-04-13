@@ -11,12 +11,30 @@ import { Wallet } from './wallet'
 export const CELO_BASE_DERIVATION_PATH = "44'/52752'/0'/0"
 const ADDRESS_QTY = 5
 
+// Validates an address using the Ledger
+export enum AddressValidation {
+  // Validates every address required only when the ledger is initialized
+  initializationOnly,
+  // Validates the address every time a transaction is made
+  everyTransaction,
+  // Validates the address the first time a transaction is made for that specific address
+  firstTransactionPerAddress,
+  // Never validates the addresses
+  never,
+}
+
 export async function newLedgerWalletWithSetup(
   transport: any,
   derivationPathIndexes?: number[],
-  baseDerivationPath?: string
+  baseDerivationPath?: string,
+  ledgerAddressValidation?: AddressValidation
 ): Promise<LedgerWallet> {
-  const wallet = new LedgerWallet(derivationPathIndexes, baseDerivationPath, transport)
+  const wallet = new LedgerWallet(
+    derivationPathIndexes,
+    baseDerivationPath,
+    transport,
+    ledgerAddressValidation
+  )
   await wallet.init()
   return wallet
 }
@@ -37,7 +55,8 @@ export class LedgerWallet extends RemoteWallet implements Wallet {
   constructor(
     readonly derivationPathIndexes: number[] = Array.from(Array(ADDRESS_QTY).keys()),
     readonly baseDerivationPath: string = CELO_BASE_DERIVATION_PATH,
-    readonly transport: any = {}
+    readonly transport: any = {},
+    readonly ledgerAddressValidation: AddressValidation = AddressValidation.firstTransactionPerAddress
   ) {
     super()
     const invalidDPs = derivationPathIndexes.some(
@@ -72,12 +91,16 @@ export class LedgerWallet extends RemoteWallet implements Wallet {
 
   private async retrieveAccounts(): Promise<Map<Address, Signer>> {
     const addressToSigner = new Map<Address, Signer>()
+    const validationRequired = this.ledgerAddressValidation === AddressValidation.initializationOnly
 
     // Each address must be retrieved synchronously, (ledger lock)
     for (const value of this.derivationPathIndexes) {
       const derivationPath = `${this.baseDerivationPath}/${value}`
-      const addressInfo = await this.ledger!.getAddress(derivationPath)
-      addressToSigner.set(addressInfo.address, new LedgerSigner(this.ledger, derivationPath))
+      const addressInfo = await this.ledger!.getAddress(derivationPath, validationRequired)
+      addressToSigner.set(
+        addressInfo.address,
+        new LedgerSigner(this.ledger, derivationPath, this.ledgerAddressValidation)
+      )
     }
     return addressToSigner
   }

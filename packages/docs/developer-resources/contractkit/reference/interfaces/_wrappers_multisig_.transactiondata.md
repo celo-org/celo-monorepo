@@ -20,7 +20,7 @@
 
 • **confirmations**: *string[]*
 
-*Defined in [contractkit/src/wrappers/MultiSig.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MultiSig.ts#L19)*
+*Defined in [src/wrappers/MultiSig.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MultiSig.ts#L19)*
 
 ___
 
@@ -28,7 +28,7 @@ ___
 
 • **data**: *string*
 
-*Defined in [contractkit/src/wrappers/MultiSig.ts:17](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MultiSig.ts#L17)*
+*Defined in [src/wrappers/MultiSig.ts:17](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MultiSig.ts#L17)*
 
 ___
 
@@ -36,7 +36,7 @@ ___
 
 • **destination**: *string*
 
-*Defined in [contractkit/src/wrappers/MultiSig.ts:15](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MultiSig.ts#L15)*
+*Defined in [src/wrappers/MultiSig.ts:15](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MultiSig.ts#L15)*
 
 ___
 
@@ -44,7 +44,7 @@ ___
 
 • **executed**: *boolean*
 
-*Defined in [contractkit/src/wrappers/MultiSig.ts:18](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MultiSig.ts#L18)*
+*Defined in [src/wrappers/MultiSig.ts:18](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MultiSig.ts#L18)*
 
 ___
 
@@ -52,4 +52,4 @@ ___
 
 • **value**: *BigNumber*
 
-*Defined in [contractkit/src/wrappers/MultiSig.ts:16](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MultiSig.ts#L16)*
+*Defined in [src/wrappers/MultiSig.ts:16](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/MultiSig.ts#L16)*
