@@ -1,7 +1,7 @@
 import { concurrentMap } from '@celo/utils/lib/async'
 import { keccak256 } from 'ethereumjs-util'
-import Contract from 'web3/eth/contract'
-import { Transaction, TransactionObject } from 'web3/eth/types'
+import { Transaction, TransactionObject } from 'web3-eth'
+import { Contract } from 'web3-eth-contract'
 import { CeloContract } from '../base'
 import { obtainKitContractDetails } from '../explorer/base'
 import { BlockExplorer } from '../explorer/block-explorer'
@@ -78,7 +78,8 @@ export class ProposalBuilder {
     if (!to || !value) {
       throw new Error("Transaction parameters 'to' and/or 'value' not provided")
     }
-    this.addWeb3Tx(tx.txo, { to, value: valueToString(value) })
+    // TODO fix type of value
+    this.addWeb3Tx(tx.txo, { to, value: valueToString(value.toString()) })
   }
 
   addJsonTx = (tx: ProposalTransactionJSON) =>
@@ -93,6 +94,10 @@ export class ProposalBuilder {
       if (!txo) {
         throw new Error(`Arguments ${tx.args} did not match ${methodName} signature`)
       }
-      return this.fromWeb3tx(txo, { to: contract._address, value: tx.value })
+      if (tx.value === undefined) {
+        tx.value = '0'
+      }
+      // TODO fix types
+      return this.fromWeb3tx(txo, { to: (contract as any)._address, value: tx.value })
     })
 }

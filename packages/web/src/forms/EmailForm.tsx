@@ -1,11 +1,15 @@
 import * as React from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, View } from 'react-native'
+import { ErrorDisplay } from 'src/forms/ErrorDisplay'
 import Form, { emailIsValid } from 'src/forms/Form'
-import { TextInput } from 'src/forms/FormComponents'
-import { I18nProps, withNamespaces } from 'src/i18n'
-import Button, { BTN, SIZE } from 'src/shared/Button.3'
+import SubmitButton from 'src/forms/SubmitButton'
+import SuccessDisplay from 'src/forms/SuccessDisplay'
+import { TextInput } from 'src/forms/TextInput'
+import { NameSpaces, useTranslation } from 'src/i18n'
+import { useScreenSize } from 'src/layout/ScreenSize'
+import { SIZE } from 'src/shared/Button.3'
 import Responsive from 'src/shared/Responsive'
-import { colors, fonts, standardStyles, textStyles } from 'src/styles'
+import { colors, fonts, standardStyles } from 'src/styles'
 
 const NEWSLETTER_LIST = '1'
 export const DEVELOPER_LIST = '10'
@@ -14,14 +18,12 @@ interface OwnProps {
   submitText: string
   route?: string
   listID?: string
-  whenComplete: React.ReactNode
   isDarkMode?: boolean
-  afterSubmit?: () => void
 }
 
 const blankForm = { email: '', fullName: '', list: '' }
 
-type Props = I18nProps & OwnProps
+type Props = OwnProps
 
 // return array of all invalid fields
 const validateFields = ({ email }: { email: string }) => {
@@ -40,26 +42,21 @@ const emailErrorStyle = (errors: string[]) => {
   return {}
 }
 
-function EmailForm({
-  t,
+export default React.memo(function EmailForm({
   isDarkMode,
-  afterSubmit,
   submitText,
-  whenComplete,
   listID = NEWSLETTER_LIST,
   route = '/contacts',
 }: Props) {
   const inputTheme = isDarkMode ? styles.inputDarkMode : styles.inputLightMode
+  const { isDesktop } = useScreenSize()
+  const { t } = useTranslation(NameSpaces.common)
 
   return (
     <Form route={route} blankForm={{ ...blankForm, list: listID }} validateWith={validateFields}>
-      {({ formState, onInput, onAltSubmit }) => {
+      {({ formState, onInput, onSubmit }) => {
         const borderStyle = emailErrorStyle(formState.errors)
-        const onPress = () => {
-          if (onAltSubmit()) {
-            return afterSubmit && afterSubmit()
-          }
-        }
+
         return (
           <Responsive large={styles.container}>
             <View style={styles.mobileContainer}>
@@ -72,7 +69,7 @@ function EmailForm({
                     isDarkMode ? standardStyles.inputDarkFocused : standardStyles.inputFocused
                   }
                   onChange={onInput}
-                  placeholder={t('form.email') + '*'}
+                  placeholder={t('common:email') + '*'}
                   placeholderTextColor={
                     isDarkMode ? colors.placeholderDarkMode : colors.placeholderGray
                   }
@@ -82,42 +79,34 @@ function EmailForm({
                   required={true}
                 />
               </Responsive>
-
+              {!isDesktop && (
+                <View style={!!formState.errors.length && styles.feedbackMobile}>
+                  <ErrorDisplay field={'email'} isShowing={!!formState.errors.length} />
+                </View>
+              )}
               <Responsive large={[styles.submitBtn, styles.submitBtnDesktop]}>
-                <Button
-                  onPress={onPress}
+                <SubmitButton
+                  isLoading={formState.isLoading}
+                  onPress={onSubmit}
                   text={submitText}
-                  kind={BTN.PRIMARY}
                   size={SIZE.fullWidth}
                 />
               </Responsive>
-              <Responsive large={styles.feedback}>
-                <View style={styles.feedbackMobile}>
-                  {formState.isComplete && whenComplete}
-
-                  {formState.errors.length > 0 &&
-                    formState.errors.map((error) => (
-                      <Text style={[fonts.h6, textStyles.error]} key={error}>
-                        {t(`validationErrors.${error}`)}
-                      </Text>
-                    ))}
-                </View>
-              </Responsive>
+              <View style={styles.feedback}>
+                {isDesktop && (
+                  <ErrorDisplay field={'email'} isShowing={!!formState.errors.length} />
+                )}
+              </View>
+            </View>
+            <View style={styles.success}>
+              <SuccessDisplay isShowing={formState.isComplete} message={t('common:shortSuccess')} />
             </View>
           </Responsive>
         )
       }}
     </Form>
   )
-}
-
-export function After({ t, isDarkMode }) {
-  return (
-    <Text style={[fonts.h6, isDarkMode && textStyles.invert]}>
-      {t('common:stayConnectedThanks')}
-    </Text>
-  )
-}
+})
 
 const borderWidth = 1
 const borderRadius = 3
@@ -170,14 +159,12 @@ const styles = StyleSheet.create({
   },
   feedback: {
     position: 'absolute',
-    paddingVertical: 10,
     top: 65,
   },
   feedbackMobile: {
-    position: 'absolute',
-    paddingVertical: 10,
-    top: 135,
+    marginBottom: 5,
+  },
+  success: {
+    marginTop: 10,
   },
 })
-
-export default withNamespaces('applications')(EmailForm)

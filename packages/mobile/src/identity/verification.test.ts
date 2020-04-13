@@ -3,7 +3,7 @@ import { expectSaga } from 'redux-saga-test-plan'
 import * as matchers from 'redux-saga-test-plan/matchers'
 import { throwError } from 'redux-saga-test-plan/providers'
 import { call, delay, select } from 'redux-saga/effects'
-import { e164NumberSelector } from 'src/account/reducer'
+import { e164NumberSelector } from 'src/account/selectors'
 import { showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames, DefaultEventNames } from 'src/analytics/constants'
@@ -23,7 +23,7 @@ import {
   VERIFICATION_TIMEOUT,
   VerificationStatus,
 } from 'src/identity/verification'
-import { contractKit } from 'src/web3/contracts'
+import { getContractKit } from 'src/web3/contracts'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
 import { privateCommentKeySelector } from 'src/web3/selectors'
 import { sleep } from 'test/utils'
@@ -54,15 +54,6 @@ jest.mock('@celo/utils', () => {
     SignatureUtils: { parseSignature: mockParseSig, parseSignatureWithoutPrefix: mockParseSig },
   }
 })
-
-jest.mock('src/web3/contracts', () => ({
-  contractKit: {
-    contracts: {
-      getAttestations: jest.fn(),
-      getAccounts: jest.fn(),
-    },
-  },
-}))
 
 const attestationCode0: AttestationCode = {
   code:
@@ -184,6 +175,7 @@ describe('Start Verification Saga', () => {
 
 describe('Do Verification Saga', () => {
   it('succeeds for unverified users', async () => {
+    const contractKit = getContractKit()
     await expectSaga(doVerificationFlow)
       .provide([
         [call(getConnectedUnlockedAccount), mockAccount],
@@ -208,15 +200,17 @@ describe('Do Verification Saga', () => {
   })
 
   it('succeeds for partly verified users', async () => {
+    // @ts-ignore Jest mock
+    getContractKit().contracts.getAttestations.mockReturnValue(
+      mockAttestationsWrapperPartlyVerified
+    )
+    // @ts-ignore Jest mock
+    getContractKit().contracts.getAccounts.mockReturnValue(mockAccountsWrapper)
+
     await expectSaga(doVerificationFlow)
       .provide([
         [call(getConnectedUnlockedAccount), mockAccount],
         [select(privateCommentKeySelector), mockPrivateDEK.toString('hex')],
-        [
-          call([contractKit.contracts, contractKit.contracts.getAttestations]),
-          mockAttestationsWrapperPartlyVerified,
-        ],
-        [call([contractKit.contracts, contractKit.contracts.getAccounts]), mockAccountsWrapper],
         [select(e164NumberSelector), mockE164Number],
         [select(attestationCodesSelector), attestationCodes],
       ])
@@ -228,6 +222,7 @@ describe('Do Verification Saga', () => {
   })
 
   it('succeeds for verified users', async () => {
+    const contractKit = getContractKit()
     await expectSaga(doVerificationFlow)
       .provide([
         [call(getConnectedUnlockedAccount), mockAccount],
@@ -245,6 +240,7 @@ describe('Do Verification Saga', () => {
   })
 
   it('shows error on unexpected failure', async () => {
+    const contractKit = getContractKit()
     await expectSaga(doVerificationFlow)
       .provide([
         [call(getConnectedUnlockedAccount), mockAccount],
@@ -269,6 +265,7 @@ describe('Do Verification Saga', () => {
         throw new Error('Reveal error')
       }),
     }
+    const contractKit = getContractKit()
 
     await expectSaga(doVerificationFlow)
       .provide([

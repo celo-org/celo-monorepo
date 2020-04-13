@@ -21,6 +21,7 @@ export enum CeloContractName {
   ReserveSpenderMultiSig = 'ReserveSpenderMultiSig',
   SortedOracles = 'SortedOracles',
   StableToken = 'StableToken',
+  TransferWhitelist = 'TransferWhitelist',
   Validators = 'Validators',
 }
 

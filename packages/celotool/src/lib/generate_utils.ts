@@ -44,7 +44,7 @@ export enum ConsensusType {
 export interface Validator {
   address: string
   blsPublicKey: string
-  balance: string
+  balance?: string
 }
 
 export interface AccountAndBalance {
@@ -113,7 +113,7 @@ const validatorBalance = () =>
 const faucetBalance = () =>
   fetchEnvOrFallback(envVar.FAUCET_GENESIS_BALANCE, '10011000000000000000000') // 10,011 CG
 const oracleBalance = () =>
-  fetchEnvOrFallback(envVar.ORACLE_GENESIS_BALANCE, '100000000000000000000') // 100 CG
+  fetchEnvOrFallback(envVar.MOCK_ORACLE_GENESIS_BALANCE, '100000000000000000000') // 100 CG
 const votingBotBalance = () =>
   fetchEnvOrFallback(envVar.VOTING_BOT_BALANCE, '10000000000000000000000') // 10,000 CG
 
@@ -249,7 +249,7 @@ export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
   })
 }
 
-const generateIstanbulExtraData = (validators: Validator[]) => {
+export const generateIstanbulExtraData = (validators: Validator[]) => {
   const istanbulVanity = 32
   const blsSignatureVanity = 96
   const ecdsaSignatureVanity = 65

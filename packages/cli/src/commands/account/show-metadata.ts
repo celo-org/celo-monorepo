@@ -15,7 +15,7 @@ export default class ShowMetadata extends BaseCommand {
 
   async run() {
     const res = this.parse(ShowMetadata)
-    const metadata = IdentityMetadataWrapper.fromFile(res.args.file)
+    const metadata = await IdentityMetadataWrapper.fromFile(this.kit, res.args.file)
     console.info(`Metadata at ${res.args.file} contains the following claims: \n`)
     await displayMetadata(metadata, this.kit)
   }

@@ -112,11 +112,6 @@
       "other": "Other"
     }
   },
-  "validationErrors": {
-    "email": "Please enter a valid email address",
-    "generic": "Oops I’m blank!",
-    "unknownError": "Something went wrong"
-  },
   "ecoFund": {
     "title": "Celo Ecosystem Venture Fund",
     "poweredBy": "By Polychain",
@@ -129,6 +124,7 @@
   },
   "apply": "Apply",
   "recommend": "Recommend",
+  "recommendationSubmitted": "Recommendation Submitted",
   "website": "WEBSITE",
   "recap": "RECAP"
 }

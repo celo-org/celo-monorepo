@@ -24,12 +24,12 @@ We are big fans of Typescript, so if you used the tabs template, you can support
 
 ## Setup
 
-To add DAppKit, simply add `@celo/dappkit@0.0.8` to your package.json or
+To add DAppKit, simply add `@celo/dappkit@0.0.9` to your package.json or
 
 ```bash
-npm install @celo/dappkit@0.0.8
+npm install @celo/dappkit@0.0.9
 // or
-yarn add @celo/dappkit@0.0.8
+yarn add @celo/dappkit@0.0.9
 ```
 
 DAppKit's dependencies require a bit of adjustment to a vanilla Expo. The first are a lot of the Node.js modules that are expected. You can get those mostly by using the following modules
@@ -40,7 +40,7 @@ npm install node-libs-react-native vm-browserify
 yarn add node-libs-react-native vm-browserify
 ```
 
-You will need to add the following `rn-cli.config.js` to your project root
+You will need to add the following `metro.config.js` to your project root
 
 ```js
 const crypto = require.resolve('crypto-browserify')

@@ -4,8 +4,10 @@ import Button, { BTN } from 'src/shared/Button.3'
 interface Props {
   children: string
   href: string
+  target?: string
+  onPress?: () => void
 }
 
-export default function InlineAnchor({ children, href }: Props) {
-  return <Button text={children} href={href} kind={BTN.INLINE} />
+export default function InlineAnchor({ children, href, target, onPress }: Props) {
+  return <Button text={children} onPress={onPress} target={target} href={href} kind={BTN.INLINE} />
 }

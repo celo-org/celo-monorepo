@@ -10,11 +10,10 @@ import { PincodeType } from 'src/account/reducer'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
 import DevSkipButton from 'src/components/DevSkipButton'
 import { Namespaces, withTranslation } from 'src/i18n'
-import BackupIcon from 'src/icons/BackupIcon'
+import LockedPhoneIcon from 'src/icons/LockedPhoneIcon'
 import { nuxNavigationOptions } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import { isPhoneAuthSupported } from 'src/pincode/PincodeUtils.android'
 import { RootState } from 'src/redux/reducers'
 
 interface StateProps {
@@ -67,14 +66,15 @@ class PincodeEducation extends React.Component<Props> {
 
   render() {
     const { t, isSettingPin } = this.props
-    const phoneAuth = isPhoneAuthSupported()
+    // we want to disable PhoneAuth during onboarding only for now
+    const phoneAuth = false
 
     return (
       <SafeAreaView style={style.container}>
         <DevSkipButton nextScreen={Screens.EnterInviteCode} />
         <ScrollView contentContainerStyle={style.scrollContainer}>
           <View>
-            <BackupIcon style={style.pincodeLogo} />
+            <LockedPhoneIcon style={style.logo} height={150} width={150} />
             <Text style={style.h1} testID="SystemAuthTitle">
               {t('pincodeEducation.title')}
             </Text>
@@ -132,7 +132,7 @@ const style = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  pincodeLogo: {
+  logo: {
     alignSelf: 'center',
   },
   body: {

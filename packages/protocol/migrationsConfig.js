@@ -7,14 +7,24 @@ const path = require('path')
 const lodash = require('lodash')
 const web3 = require('web3')
 
+const argv = minimist(process.argv.slice(2), {
+  default: {
+    build_directory: path.join(__dirname, 'build'),
+  },
+  string: ['migration_override', 'build_directory', 'network'],
+})
+const network = require('./truffle-config.js').networks[argv.network]
+
 // Almost never use exponential notation in toString
 // http://mikemcl.github.io/bignumber.js/#exponential-at
 BigNumber.config({ EXPONENTIAL_AT: 1e9 })
 
-const MINUTE = 60
+const SECOND = 1
+const MINUTE = 60 * SECOND
 const HOUR = 60 * MINUTE
 const DAY = 24 * HOUR
 const WEEK = 7 * DAY
+const YEAR = 365 * DAY
 
 const DefaultConfig = {
   attestations: {
@@ -26,15 +36,15 @@ const DefaultConfig = {
   blockchainParameters: {
     gasForNonGoldCurrencies: 50000,
     minimumClientVersion: {
-      major: 1,
-      minor: 8,
-      patch: 23,
+      major: 0,
+      minor: 9,
+      patch: 0,
     },
     blockGasLimit: 20000000,
   },
   doubleSigningSlasher: {
     reward: '1000000000000000000000', // 1000 cGLD
-    penalty: '5000000000000000000000', // 5000 cGLD
+    penalty: '9000000000000000000000', // 9000 cGLD
   },
   downtimeSlasher: {
     reward: '10000000000000000000', // 10 cGLD
@@ -42,16 +52,17 @@ const DefaultConfig = {
     slashableDowntime: (12 * HOUR) / 5, // ~12 hours
   },
   election: {
-    minElectableValidators: '50',
+    minElectableValidators: '5', // Change to 50 once mainnet activated
     maxElectableValidators: '100',
     maxVotesPerAccount: 100,
     electabilityThreshold: 1 / 1000,
+    frozen: true,
   },
   epochRewards: {
     targetVotingYieldParameters: {
-      initial: 0.00016, // (x + 1) ^ 365 = 1.06
+      initial: 0, // Change to 0.00016 once mainnet activated // (x + 1) ^ 365 = 1.06
       max: 0.0005, // (x + 1) ^ 365 = 1.20
-      adjustmentFactor: 1 / 365,
+      adjustmentFactor: 0, // Change to 1 / 3650 once mainnet activated 1 / 3650
     },
     rewardsMultiplierParameters: {
       max: 2,
@@ -63,14 +74,15 @@ const DefaultConfig = {
     targetVotingGoldFraction: 2 / 3,
     maxValidatorEpochPayment: '205479452054794520547', // (75,000 / 365) * 10 ^ 18
     communityRewardFraction: 1 / 4,
+    carbonOffsettingPartner: '0x0000000000000000000000000000000000000000',
+    carbonOffsettingFraction: 1 / 200,
     frozen: true,
   },
   exchange: {
     spread: 5 / 1000,
-    reserveFraction: 1 / 100,
+    reserveFraction: 1 / 20,
     updateFrequency: 5 * MINUTE, // 5 minutes
-    // TODO(asa): This is too low
-    minimumReports: 1,
+    minimumReports: 5,
     frozen: true,
   },
   gasPriceMinimum: {
@@ -82,11 +94,11 @@ const DefaultConfig = {
     frozen: true,
   },
   governance: {
-    queueExpiry: 4 * WEEK,
-    dequeueFrequency: WEEK,
-    concurrentProposals: 10,
-    approvalStageDuration: 3 * DAY,
-    referendumStageDuration: WEEK,
+    queueExpiry: WEEK, // Change to 4 weeks once mainnet activated
+    dequeueFrequency: MINUTE, // Change to 1 week once mainnet activated
+    concurrentProposals: 3, // Change to 10 once mainnet activated
+    approvalStageDuration: 30 * MINUTE, // Change to 3 days once mainnet activated
+    referendumStageDuration: HOUR, // Change to 1 week once mainnet activated
     executionStageDuration: WEEK,
     minDeposit: 100, // 100 cGLD
     participationBaseline: 8 / 10,
@@ -95,10 +107,15 @@ const DefaultConfig = {
     participationBaselineQuorumFactor: 1,
   },
   governanceApproverMultiSig: {
-    //Placeholder until addresses for 2/5 multsig are generated.
-    signatories: [`0x5409ed021d9299bf6814279a6a1411a7e866a631`],
-    numRequiredConfirmations: 1,
-    numInternalRequiredConfirmations: 1,
+    // 2/4 multsig
+    signatories: [
+      '0x32830A3f65DF98aFCFA18bAd35009Aa51163D606',
+      '0x7c593219ad21e172c1fdc6bfdc359699fa428adb',
+      '0x31af68f73fb93815b3eB9a6FA76e63113De5f733',
+      '0x47fE4b9fFDB9712fC5793B1b5E86d96a4664cf02',
+    ],
+    numRequiredConfirmations: 2,
+    numInternalRequiredConfirmations: 2,
     useMultiSig: true,
   },
   lockedGold: {
@@ -116,19 +133,19 @@ const DefaultConfig = {
   reserve: {
     tobinTaxStalenessThreshold: HOUR, // 1 hour
     dailySpendingRatio: toFixed(0.05).toFixed(), // 5%
-    // TODO(Roman): Set these appropriately.
-    frozenGold: 0,
-    frozenDays: 0,
     spenders: [],
-    otherAddresses: [],
-    assetAllocationSymbols: ['cGLD', 'BTC', 'ETH'], // TODO(roman)
-    assetAllocationWeights: [0.5, 0.25, 0.25], // TODO(roman)
+    otherAddresses: ['0xd0a57D8acFe9979d33933d8A52971E6DC9E2DbF0'],
+    assetAllocationSymbols: ['cGLD', 'BTC', 'ETH', 'DAI'],
+    assetAllocationWeights: [0.5, 0.2, 0.1, 0.2],
   },
   reserveSpenderMultiSig: {
-    //Placeholder until addresses for 2/2 multsig are generated.
-    signatories: [`0x5409ed021d9299bf6814279a6a1411a7e866a631`],
-    numRequiredConfirmations: 1,
-    numInternalRequiredConfirmations: 1,
+    // 2/2 multsig
+    signatories: [
+      '0x49eFFA2ceF5FccA5540f421d6b28e76184cc0fDF',
+      '0x4550F1576fAC966Ac8b9F42e1D5D66D3A14dD8D3',
+    ],
+    numRequiredConfirmations: 2,
+    numInternalRequiredConfirmations: 2,
   },
   stableToken: {
     decimals: 18,
@@ -136,7 +153,7 @@ const DefaultConfig = {
     tokenName: 'Celo Dollar',
     tokenSymbol: 'cUSD',
     inflationRate: 1,
-    inflationPeriod: 1.5 * 365 * DAY, // 1.5 years
+    inflationPeriod: 1.5 * YEAR,
     initialBalances: {
       addresses: [],
       values: [],
@@ -145,7 +162,23 @@ const DefaultConfig = {
     frozen: true,
   },
   transferWhitelist: {
-    addresses: [], // TODO(Alec): get whitelist of addresses.
+    addresses: [
+      '0x49eFFA2ceF5FccA5540f421d6b28e76184cc0fDF',
+      '0x4550F1576fAC966Ac8b9F42e1D5D66D3A14dD8D3',
+      '0xd0a57D8acFe9979d33933d8A52971E6DC9E2DbF0',
+      '0x36940810BfDB329B31e38d3e97aFD673081B497C',
+      '0xfCf982bb4015852e706100B14E21f947a5Bb718E',
+      '0xe90bB6dE0996D41cb0A843A06839EEf38c6E5456',
+      '0xbA8761304CEc7bE0f83C6F8Fa7EBBa3eE0b6Ae97',
+      '0xb566bB6D1850A345FA39EF38fefaC4E892348d51',
+      '0xDb39DBE5abE42466F122b24c44518b1089ef8fC8',
+      '0x671D520ae3E89Ea5383A5d7162bCed79FD25CdEe',
+      '0x469be98FE71AFf8F6e7f64F9b732e28A03596B5C',
+      '0x8f55CE88b4F62F22c663f5A539414dcCeF969c32',
+      '0xF607d4dd519B4bc963C9c48E8650E67C51DbC35b',
+      '0x515033209a0A29034DC3F037cC72a6014b902341',
+      '0x6E36F0D3cF12aa592FF88D03938584562c9239cA',
+    ],
     registryIds: [
       web3.utils.soliditySha3(CeloContractName.Governance),
       web3.utils.soliditySha3(CeloContractName.LockedGold),
@@ -166,7 +199,7 @@ const DefaultConfig = {
       adjustmentSpeed: 0.1,
     },
     membershipHistoryLength: 60,
-    commissionUpdateDelay: 51840, // Approximately 3 days
+    commissionUpdateDelay: (3 * DAY) / 5, // Approximately 3 days with 5s block times
     maxGroupSize: 5,
     slashingPenaltyResetPeriod: 30 * DAY,
 
@@ -178,6 +211,122 @@ const DefaultConfig = {
     votesRatioOfLastVsFirstGroup: 2.0,
   },
 }
+
+const NetworkConfigs = {
+  development: {
+    downtimeSlasher: {
+      slashableDowntime: 60, // epoch length is 100 for unit tests
+    },
+    election: {
+      minElectableValidators: '10',
+      frozen: false,
+    },
+    epochRewards: {
+      frozen: false,
+    },
+    exchange: {
+      frozen: false,
+      minimumReports: 1,
+    },
+    goldToken: {
+      frozen: false,
+    },
+    governanceApproverMultiSig: {
+      signatories: [network.from],
+      numRequiredConfirmations: 1,
+      numInternalRequiredConfirmations: 1,
+    },
+    reserve: {
+      initialBalance: 100000000,
+      otherAddresses: ['0x7457d5E02197480Db681D3fdF256c7acA21bDc12'], // Add an arbitrary "otherReserveAddress" so that reserve spending can be tested.
+    },
+    reserveSpenderMultiSig: {
+      signatories: [network.from],
+      numRequiredConfirmations: 1,
+      numInternalRequiredConfirmations: 1,
+    },
+    stableToken: {
+      oracles: [network.from],
+      frozen: false,
+    },
+  },
+  testing: {
+    downtimeSlasher: {
+      slashableDowntime: 6,
+    },
+    election: {
+      minElectableValidators: '1',
+      frozen: false,
+    },
+    epochRewards: {
+      frozen: false,
+      targetVotingYieldParameters: {
+        initial: 0.00016,
+        max: 0.0005,
+        adjustmentFactor: 0.1,
+      },
+    },
+    exchange: {
+      frozen: false,
+    },
+    goldToken: {
+      frozen: false,
+    },
+    stableToken: {
+      frozen: false,
+    },
+    reserve: {
+      initialBalance: 100000000,
+    },
+  },
+  baklava: {
+    blockchainParameters: {
+      minimumClientVersion: {
+        major: 0,
+        minor: 10,
+        patch: 0,
+      },
+    },
+    election: {
+      minElectableValidators: '25', // About half of the expected genesis set.
+    },
+    governance: {
+      // Set to be able to complete a proposal in about a day, but give everyone a chance to participate.
+      dequeueFrequency: 4 * HOUR,
+      approvalStageDuration: 4 * HOUR,
+      referendumStageDuration: DAY,
+      executionStageDuration: WEEK,
+    },
+    lockedGold: {
+      unlockingPeriod: 6 * HOUR, // 1/12 of the mainnet period.
+    },
+    stableToken: {
+      oracles: [
+        '0x0d473f73AAf1C2bf7EBd2be7196C71dBa6C1724b',
+        '0x8F7ca85A9E4A18B551b765706bd0B6f26927D86F',
+        '0x3EaEe6C693420Ae86643EB2837978da8eEbf973f',
+        '0xDd3E5FcE22938c0f482004527D468a8799C4a61E',
+        '0xFb2Ee4Da251fC6A9DF7eb8d5c4ea1DeC99d127eA',
+        '0xd321C7356DFB5b6F4AD9e5B58C51B46409fe1442',
+        '0xbbbC38f6a383293522d4aEDaA98b7d2D73E90A73',
+        '0xB9E0b0B8fdA1001392c8fFd19f6B7ad5286589F2',
+        '0x44740e3eedfD3a2A2e7662de9165a6E20bBcC72C',
+        '0x7a2cb0438e7B9801C29B39Ff94439aFf930CDf9F',
+      ],
+    },
+    validators: {
+      groupLockedGoldRequirements: {
+        duration: 15 * DAY, // 1/12 of the mainnet duration.
+      },
+      validatorLockedGoldRequirements: {
+        duration: 5 * DAY, // 1/12 of the mainnet duration.
+      },
+      membershipHistoryLength: 15, // Number of epochs in the group lockup period.
+    },
+  },
+}
+
+NetworkConfigs.baklavastaging = NetworkConfigs.baklava
 
 const linkedLibraries = {
   FixidityLib: [
@@ -206,17 +355,14 @@ const linkedLibraries = {
   Signatures: ['Accounts', 'TestAttestations', 'Attestations', 'LockedGold', 'Escrow'],
 }
 
-const argv = minimist(process.argv.slice(2), {
-  default: {
-    build_directory: path.join(__dirname, 'build'),
-  },
-  string: ['migration_override', 'build_directory'],
-})
-
-const config = DefaultConfig
+const config = lodash.cloneDeep(DefaultConfig)
 
 const migrationOverride = argv.migration_override ? JSON.parse(argv.migration_override) : {}
-// use lodash merge to deeply override defaults
+
+// Use lodash merge to deeply override defaults.
+if (argv.network && NetworkConfigs[argv.network]) {
+  lodash.merge(config, NetworkConfigs[argv.network])
+}
 lodash.merge(config, migrationOverride)
 
 module.exports = {

@@ -14,7 +14,7 @@ contract Registry is IRegistry, Ownable, Initializable {
 
   mapping(bytes32 => address) public registry;
 
-  event RegistryUpdated(string identifier, bytes32 indexed identifierHash, address addr);
+  event RegistryUpdated(string identifier, bytes32 indexed identifierHash, address indexed addr);
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.

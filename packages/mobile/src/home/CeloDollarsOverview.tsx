@@ -1,43 +1,47 @@
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
+import { CURRENCIES, CURRENCY_ENUM } from '@celo/utils/src'
 import * as React from 'react'
-import { WithTranslation } from 'react-i18next'
+import { Trans, WithTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import componentWithAnalytics from 'src/analytics/wrapper'
+import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import useBalanceAutoRefresh from 'src/home/useBalanceAutoRefresh'
 import { Namespaces, withTranslation } from 'src/i18n'
-import { convertDollarsToLocalAmount } from 'src/localCurrency/convert'
-import { useLocalCurrencyCode, useLocalCurrencySymbol } from 'src/localCurrency/hooks'
-import { getLocalCurrencyExchangeRate } from 'src/localCurrency/selectors'
+import { LocalCurrencyCode } from 'src/localCurrency/consts'
+import { useLocalCurrencyCode } from 'src/localCurrency/hooks'
 import useSelector from 'src/redux/useSelector'
-import { getMoneyDisplayValue } from 'src/utils/formatting'
 
 type Props = WithTranslation
 
 function CeloDollarsOverview({ t }: Props) {
   useBalanceAutoRefresh()
   const localCurrencyCode = useLocalCurrencyCode()
-  const localCurrencySymbol = useLocalCurrencySymbol()
   const dollarBalance = useSelector((state) => state.stableToken.balance)
-  const localExchangeRate = useSelector(getLocalCurrencyExchangeRate)
-  const localBalance = convertDollarsToLocalAmount(dollarBalance, localExchangeRate)
-  const localValue =
-    localBalance || dollarBalance === null
-      ? getMoneyDisplayValue(localBalance || 0)
-      : getMoneyDisplayValue(dollarBalance || 0)
+
+  const isUsdLocalCurrency = localCurrencyCode === LocalCurrencyCode.USD
+  const dollarBalanceAmount = dollarBalance
+    ? { value: dollarBalance, currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code }
+    : null
 
   return (
     <View style={styles.container}>
-      <Text style={styles.balance}>
-        <Text style={fontStyles.semiBold}>{localCurrencySymbol}</Text>
-        <Text style={fontStyles.semiBold}>{localValue}</Text>
-        <Text style={styles.code}> {localBalance ? localCurrencyCode : ''}</Text>
-      </Text>
-      {!!localCurrencyCode && (
-        <Text style={styles.localBalance}>
-          <Text>{getMoneyDisplayValue(dollarBalance || 0)} </Text>
-          <Text>{t('global:celoDollars')}</Text>
+      {dollarBalanceAmount && (
+        <Text style={styles.balance}>
+          <CurrencyDisplay style={fontStyles.semiBold} amount={dollarBalanceAmount} />
+        </Text>
+      )}
+      {!isUsdLocalCurrency && dollarBalanceAmount && (
+        <Text style={styles.dollarBalance}>
+          <Trans i18nKey="dollarBalance" ns={Namespaces.walletFlow5}>
+            <CurrencyDisplay
+              amount={dollarBalanceAmount}
+              showLocalAmount={false}
+              hideSymbol={true}
+            />{' '}
+            Celo Dollars
+          </Trans>
         </Text>
       )}
     </View>
@@ -61,13 +65,10 @@ const styles = StyleSheet.create({
     height: 48,
     color: colors.dark,
   },
-  localBalance: {
+  dollarBalance: {
     ...fontStyles.light,
     fontSize: 18,
     color: '#B0B5B9',
-  },
-  code: {
-    fontSize: 22,
   },
 })
 

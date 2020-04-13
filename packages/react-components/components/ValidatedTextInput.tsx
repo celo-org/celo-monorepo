@@ -13,7 +13,7 @@ interface OwnProps {
   keyboardType: KeyboardType
   numberOfDecimals?: number
   placeholder?: string
-  lng?: string
+  decimalSeparator?: string
 }
 
 export interface PhoneValidatorProps {
@@ -60,13 +60,13 @@ export default class ValidatedTextInput<V extends ValidatorProps> extends React.
   }
 
   getMaxLength = () => {
-    const { numberOfDecimals, validator, value, lng } = this.props
+    const { numberOfDecimals, validator, value, decimalSeparator } = this.props
 
     if (validator !== ValidatorKind.Decimal || !numberOfDecimals) {
       return undefined
     }
 
-    const decimalPos = lng && lng.startsWith('es') ? value.indexOf(',') : value.indexOf('.')
+    const decimalPos = value.indexOf(decimalSeparator ?? '.')
     if (decimalPos === -1) {
       return undefined
     }

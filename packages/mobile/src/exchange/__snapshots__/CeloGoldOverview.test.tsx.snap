@@ -31,13 +31,21 @@ exports[`renders correctly when not ready 1`] = `
     }
   >
     <Text
+      numberOfLines={1}
       style={
-        Object {
-          "fontFamily": "Hind-SemiBold",
-        }
+        Array [
+          Object {
+            "fontFamily": "Hind-SemiBold",
+          },
+          Object {
+            "color": undefined,
+          },
+        ]
       }
     >
-      55.00
+      
+      
+      55.000
     </Text>
   </Text>
   <Text
@@ -49,7 +57,21 @@ exports[`renders correctly when not ready 1`] = `
       }
     }
   >
-    loadingExchangeRate
+    Equal to 
+    <Text
+      numberOfLines={1}
+      style={
+        Array [
+          undefined,
+          Object {
+            "color": undefined,
+          },
+        ]
+      }
+    >
+      
+      -
+    </Text>
   </Text>
 </View>
 `;
@@ -85,13 +107,21 @@ exports[`renders correctly when ready 1`] = `
     }
   >
     <Text
+      numberOfLines={1}
       style={
-        Object {
-          "fontFamily": "Hind-SemiBold",
-        }
+        Array [
+          Object {
+            "fontFamily": "Hind-SemiBold",
+          },
+          Object {
+            "color": undefined,
+          },
+        ]
       }
     >
-      55.00
+      
+      
+      55.000
     </Text>
   </Text>
   <Text
@@ -103,7 +133,22 @@ exports[`renders correctly when ready 1`] = `
       }
     }
   >
-    equalToAmount
+    Equal to 
+    <Text
+      numberOfLines={1}
+      style={
+        Array [
+          undefined,
+          Object {
+            "color": undefined,
+          },
+        ]
+      }
+    >
+      
+      $
+      731.50
+    </Text>
   </Text>
 </View>
 `;

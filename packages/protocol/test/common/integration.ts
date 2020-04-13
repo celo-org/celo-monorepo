@@ -23,6 +23,7 @@ import {
   LockedGoldInstance,
   RegistryInstance,
   ReserveInstance,
+  ReserveSpenderMultiSigInstance,
   StableTokenInstance,
 } from 'types'
 
@@ -61,7 +62,7 @@ async function slashingOfGroups(
   const groups = await election.getGroupsVotedForByAccount(account)
   const res = []
   //
-  for (let i = groups.length - 1; i >= 0; i++) {
+  for (let i = groups.length - 1; i >= 0; i--) {
     const group = groups[i]
     const totalVotes = await election.getTotalVotesForGroup(group)
     const votes = await election.getTotalVotesForGroupByAccount(group, account)
@@ -86,6 +87,25 @@ async function findLessersAndGreaters(
   const changes = linkedListChanges(groups, changed)
   return { ...changes, indices: changed.map((a) => a.index) }
 }
+
+contract('Integration: Running elections', (_accounts: string[]) => {
+  let election: ElectionInstance
+
+  before(async () => {
+    election = await getDeployedProxiedContract('Election', artifacts)
+  })
+
+  describe('When getting the elected validators', () => {
+    it('should elect all 30 validators', async () => {
+      const elected = await election.electValidatorSigners()
+      assert.equal(elected.length, 30)
+    })
+    it('should elect specified number validators with electNValidatorSigners', async () => {
+      const elected = await election.electNValidatorSigners(1, 20)
+      assert.equal(elected.length, 20)
+    })
+  })
+})
 
 contract('Integration: Governance slashing', (accounts: string[]) => {
   const proposalId = 1
@@ -365,7 +385,9 @@ contract('Integration: Governance', (accounts: string[]) => {
 contract('Integration: Exchange', (accounts: string[]) => {
   const sellAmount = new BigNumber('1000000000000000000')
   const minBuyAmount = 1
+  const transferAmount = 10
   let exchange: ExchangeInstance
+  let multiSig: ReserveSpenderMultiSigInstance
   let reserve: ReserveInstance
   let goldToken: GoldTokenInstance
   let stableToken: StableTokenInstance
@@ -377,6 +399,7 @@ contract('Integration: Exchange', (accounts: string[]) => {
 
   before(async () => {
     exchange = await getDeployedProxiedContract('Exchange', artifacts)
+    multiSig = await getDeployedProxiedContract('ReserveSpenderMultiSig', artifacts)
     reserve = await getDeployedProxiedContract('Reserve', artifacts)
     goldToken = await getDeployedProxiedContract('GoldToken', artifacts)
     stableToken = await getDeployedProxiedContract('StableToken', artifacts)
@@ -445,6 +468,35 @@ contract('Integration: Exchange', (accounts: string[]) => {
       const finalReserve = await goldToken.balanceOf(reserve.address)
 
       assert.isTrue(finalReserve.lt(originalReserve))
+    })
+  })
+
+  describe('When transferring gold', () => {
+    const otherReserveAddress = '0x7457d5E02197480Db681D3fdF256c7acA21bDc12'
+    let originalOtherAccount
+    beforeEach(async () => {
+      originalReserve = await goldToken.balanceOf(reserve.address)
+      originalOtherAccount = await goldToken.balanceOf(otherReserveAddress)
+    })
+
+    it(`should transfer gold`, async () => {
+      // @ts-ignore
+      const txData = reserve.contract.methods
+        .transferGold(otherReserveAddress, transferAmount)
+        .encodeABI()
+      await multiSig.submitTransaction(reserve.address, 0, txData, {
+        from: accounts[0],
+      })
+      assert.isTrue(
+        (await goldToken.balanceOf(reserve.address)).isEqualTo(
+          originalReserve.minus(transferAmount)
+        )
+      )
+      assert.isTrue(
+        (await goldToken.balanceOf(otherReserveAddress)).isEqualTo(
+          originalOtherAccount.plus(transferAmount)
+        )
+      )
     })
   })
 })

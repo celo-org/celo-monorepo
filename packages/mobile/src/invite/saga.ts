@@ -1,12 +1,11 @@
+import { CeloTransactionObject } from '@celo/contractkit'
 import { trimLeading0x } from '@celo/utils/src/address'
 import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
-import { getEscrowContract, getGoldTokenContract, getStableTokenContract } from '@celo/walletkit'
 import BigNumber from 'bignumber.js'
 import { Clipboard, Linking, Platform } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 import SendIntentAndroid from 'react-native-send-intent'
 import SendSMS from 'react-native-sms'
-import VersionCheck from 'react-native-version-check'
 import { call, delay, put, race, select, spawn, take, takeLeading } from 'redux-saga/effects'
 import { showError, showMessage } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
@@ -33,15 +32,16 @@ import {
 } from 'src/invite/actions'
 import { createInviteCode } from 'src/invite/utils'
 import { navigateHome } from 'src/navigator/NavigationService'
-import { getSendTxGas } from 'src/send/saga'
+import { getSendFee, getSendTxGas } from 'src/send/saga'
 import { fetchDollarBalance, transferStableToken } from 'src/stableToken/actions'
-import { createTransaction, fetchTokenBalanceInWeiWithRetry } from 'src/tokens/saga'
+import { createTokenTransferTransaction, fetchTokenBalanceInWeiWithRetry } from 'src/tokens/saga'
 import { generateStandbyTransactionId } from 'src/transactions/actions'
 import { waitForTransactionWithId } from 'src/transactions/saga'
 import { sendTransaction } from 'src/transactions/send'
 import { getAppStoreId } from 'src/utils/appstore'
+import { divideByWei } from 'src/utils/formatting'
 import Logger from 'src/utils/Logger'
-import { addLocalAccount, web3 } from 'src/web3/contracts'
+import { addLocalAccount, getContractKit } from 'src/web3/contracts'
 import { getConnectedUnlockedAccount, getOrCreateAccount, waitWeb3LastBlock } from 'src/web3/saga'
 import { fornoSelector } from 'src/web3/selectors'
 
@@ -52,25 +52,26 @@ const INVITE_FEE = '0.25'
 
 export async function getInviteTxGas(
   account: string,
-  contractGetter: typeof getStableTokenContract | typeof getGoldTokenContract,
-  amount: string,
+  currency: CURRENCY_ENUM,
+  amount: BigNumber.Value,
   comment: string
 ) {
-  const escrowContract = await getEscrowContract(web3)
-  return getSendTxGas(account, contractGetter, {
+  const contractKit = getContractKit()
+  const escrowContract = await contractKit.contracts.getEscrow()
+  return getSendTxGas(account, currency, {
     amount,
     comment,
-    recipientAddress: escrowContract._address,
+    recipientAddress: escrowContract.address,
   })
 }
 
 export async function getInviteFee(
   account: string,
-  contractGetter: typeof getStableTokenContract | typeof getGoldTokenContract,
+  currency: CURRENCY_ENUM,
   amount: string,
   comment: string
 ) {
-  const gas = await getInviteTxGas(account, contractGetter, amount, comment)
+  const gas = await getInviteTxGas(account, currency, amount, comment)
   return (await calculateFee(gas)).plus(getInvitationVerificationFeeInWei())
 }
 
@@ -79,26 +80,24 @@ export function getInvitationVerificationFeeInDollars() {
 }
 
 export function getInvitationVerificationFeeInWei() {
-  return new BigNumber(web3.utils.toWei(INVITE_FEE))
+  return new BigNumber(getContractKit().web3.utils.toWei(INVITE_FEE))
 }
 
 export async function generateInviteLink(inviteCode: string) {
   let bundleId = DeviceInfo.getBundleId()
   bundleId = bundleId.replace(/\.(debug|dev)$/g, '.alfajores')
-  const encodedInvite = encodeURIComponent(`invite-code=${inviteCode}`)
 
-  // Android part
-  const playStoreLink = await VersionCheck.getPlayStoreUrl({ packageName: bundleId })
-  const playStoreUrl = `${playStoreLink}&referrer=${encodedInvite}`
-
-  // iOS part
-  const appStoreId = await getAppStoreId(bundleId)
-  const appStoreUrl = await VersionCheck.getAppStoreUrl({ appID: appStoreId })
+  // trying to fetch appStoreId needed to build a dynamic link
+  let appStoreId
+  try {
+    appStoreId = await getAppStoreId(bundleId)
+  } catch (error) {
+    Logger.error(TAG, 'Failed to load AppStore ID: ' + error.toString())
+  }
 
   const shortUrl = await generateShortInviteLink({
-    link: `https://celo.org/build/wallet`,
-    playStoreUrl,
-    appStoreUrl,
+    link: `https://celo.org/build/wallet?invite-code=${inviteCode}`,
+    appStoreId,
     bundleId,
   })
 
@@ -142,7 +141,8 @@ export function* sendInvite(
 ) {
   yield call(getConnectedUnlockedAccount)
   try {
-    const temporaryWalletAccount = web3.eth.accounts.create()
+    const contractKit = getContractKit()
+    const temporaryWalletAccount = contractKit.web3.eth.accounts.create()
     const temporaryAddress = temporaryWalletAccount.address
     const inviteCode = createInviteCode(temporaryWalletAccount.privateKey)
 
@@ -263,7 +263,8 @@ export function* redeemInviteSaga({ inviteCode }: RedeemInviteAction) {
 
 export function* doRedeemInvite(inviteCode: string) {
   try {
-    const tempAccount = web3.eth.accounts.privateKeyToAccount(inviteCode).address
+    const contractKit = getContractKit()
+    const tempAccount = contractKit.web3.eth.accounts.privateKeyToAccount(inviteCode).address
     Logger.debug(TAG + '@doRedeemInvite', 'Invite code contains temp account', tempAccount)
     const tempAccountBalanceWei: BigNumber = yield call(
       fetchTokenBalanceInWeiWithRetry,
@@ -312,20 +313,24 @@ export function* skipInvite() {
 function* addTempAccountToWallet(inviteCode: string) {
   Logger.debug(TAG + '@addTempAccountToWallet', 'Attempting to add temp wallet')
   try {
+    const contractKit = getContractKit()
     let tempAccount: string | null = null
     const fornoMode = yield select(fornoSelector)
     if (fornoMode) {
-      tempAccount = web3.eth.accounts.privateKeyToAccount(inviteCode).address
+      tempAccount = contractKit.web3.eth.accounts.privateKeyToAccount(inviteCode).address
       Logger.debug(
         TAG + '@redeemInviteCode',
         'web3 is connected:',
-        String(yield call(web3.eth.net.isListening))
+        String(yield call(contractKit.web3.eth.net.isListening))
       )
-      addLocalAccount(web3, inviteCode)
+      addLocalAccount(inviteCode)
     } else {
       // Import account into the local geth node
-      // @ts-ignore
-      tempAccount = yield call(web3.eth.personal.importRawKey, trimLeading0x(inviteCode), TEMP_PW)
+      tempAccount = yield call(
+        contractKit.web3.eth.personal.importRawKey,
+        trimLeading0x(inviteCode),
+        TEMP_PW
+      )
     }
     Logger.debug(TAG + '@addTempAccountToWallet', 'Account added', tempAccount!)
   } catch (e) {
@@ -345,21 +350,45 @@ export function* withdrawFundsFromTempAccount(
 ) {
   Logger.debug(TAG + '@withdrawFundsFromTempAccount', 'Unlocking temporary account')
   const fornoMode = yield select(fornoSelector)
+  const contractKit = getContractKit()
   if (!fornoMode) {
-    yield call(web3.eth.personal.unlockAccount, tempAccount, TEMP_PW, 600)
+    yield call(contractKit.web3.eth.personal.unlockAccount, tempAccount, TEMP_PW, 600)
   }
-  const tempAccountBalance = new BigNumber(web3.utils.fromWei(tempAccountBalanceWei.toString()))
 
-  Logger.debug(TAG + '@withdrawFundsFromTempAccount', 'Creating send transaction')
-  const tx = yield call(createTransaction, getStableTokenContract, {
+  Logger.debug(
+    TAG + '@withdrawFundsFromTempAccount',
+    `Temp account balance is ${tempAccountBalanceWei.toString()}. Calculating withdrawal fee`
+  )
+  const tempAccountBalance = divideByWei(tempAccountBalanceWei)
+  const sendTokenFeeInWei: BigNumber = yield call(getSendFee, tempAccount, CURRENCY_ENUM.DOLLAR, {
     recipientAddress: newAccount,
+    amount: tempAccountBalance,
     comment: SENTINEL_INVITE_COMMENT,
-    // TODO: appropriately withdraw the balance instead of using gas fees will be less than 1 cent
-    amount: tempAccountBalance.minus(0.01).toString(),
   })
+  // Inflate fee by 10% to harden against minor gas changes
+  const sendTokenFee = divideByWei(sendTokenFeeInWei).times(1.1)
 
-  Logger.debug(TAG + '@withdrawFundsFromTempAccount', 'Sending transaction')
-  yield call(sendTransaction, tx, tempAccount, TAG, 'Transfer from temp wallet')
+  if (sendTokenFee.isGreaterThanOrEqualTo(tempAccountBalance)) {
+    throw new Error('Fee is too large for amount in temp wallet')
+  }
+
+  const netSendAmount = tempAccountBalance.minus(sendTokenFee)
+  Logger.debug(
+    TAG + '@withdrawFundsFromTempAccount',
+    `Withdrawing net amount of ${netSendAmount.toString()}`
+  )
+
+  const tx: CeloTransactionObject<boolean> = yield call(
+    createTokenTransferTransaction,
+    CURRENCY_ENUM.DOLLAR,
+    {
+      recipientAddress: newAccount,
+      amount: netSendAmount,
+      comment: SENTINEL_INVITE_COMMENT,
+    }
+  )
+
+  yield call(sendTransaction, tx.txo, tempAccount, TAG, 'Transfer from temp wallet')
   Logger.debug(TAG + '@withdrawFundsFromTempAccount', 'Done withdrawal')
 }
 

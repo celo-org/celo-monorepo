@@ -22,32 +22,16 @@ import {
   watchSendInvite,
   withdrawFundsFromTempAccount,
 } from 'src/invite/saga'
+import { getSendFee } from 'src/send/saga'
 import { fetchDollarBalance } from 'src/stableToken/actions'
 import { transactionConfirmed } from 'src/transactions/actions'
+import { getContractKit } from 'src/web3/contracts'
 import { getConnectedUnlockedAccount, getOrCreateAccount, waitWeb3LastBlock } from 'src/web3/saga'
-import { createMockStore, mockContractKitBalance, mockContractKitContract } from 'test/utils'
+import { createMockStore, mockContractKitBalance } from 'test/utils'
 import { mockAccount, mockE164Number } from 'test/values'
 
 const mockKey = '0x1129eb2fbccdc663f4923a6495c35b096249812b589f7c4cd1dba01e1edaf724'
 const mockKeyEncoded = 'ESnrL7zNxmP0kjpklcNbCWJJgStYn3xM0dugHh7a9yQ='
-const mockBalance = jest.fn()
-
-jest.mock('@celo/walletkit', () => {
-  const { createMockContract } = require('test/utils')
-  return {
-    ...jest.requireActual('@celo/walletkit'),
-    getAttestationsContract: async () =>
-      createMockContract({ getAttestationRequestFee: Math.pow(10, 18) }),
-    getStableTokenContract: jest.fn(async () =>
-      createMockContract({
-        balanceOf: mockBalance,
-        transfer: () => null,
-        transferWithComment: () => null,
-        decimals: () => '10',
-      })
-    ),
-  }
-})
 
 jest.mock('src/firebase/dynamicLinks', () => ({
   ...jest.requireActual('src/firebase/dynamicLinks'),
@@ -55,7 +39,7 @@ jest.mock('src/firebase/dynamicLinks', () => ({
 }))
 
 jest.mock('src/utils/appstore', () => ({
-  getAppStoreId: jest.fn(async () => 1482389446),
+  getAppStoreId: jest.fn(async () => '1482389446'),
 }))
 
 jest.mock('src/account/actions', () => ({
@@ -67,36 +51,7 @@ jest.mock('src/transactions/send', () => ({
   sendTransaction: async () => true,
 }))
 
-jest.mock('src/web3/contracts', () => ({
-  web3: {
-    eth: {
-      accounts: {
-        privateKeyToAccount: () => mockAccount,
-        wallet: {
-          add: () => null,
-        },
-        create: () => ({
-          address: mockAccount,
-          privateKey: '0x1129eb2fbccdc663f4923a6495c35b096249812b589f7c4cd1dba01e1edaf724',
-        }),
-      },
-      personal: {
-        importRawKey: () => mockAccount,
-        unlockAccount: async () => true,
-      },
-    },
-    utils: {
-      fromWei: (x: any) => x / 1e18,
-      sha3: () => `a sha3 hash`,
-    },
-  },
-  contractKit: {
-    contracts: {
-      getStableToken: () => mockContractKitContract,
-    },
-  },
-  isFornoMode: () => false,
-}))
+jest.mock('@celo/contractkit')
 
 SendIntentAndroid.sendSms = jest.fn()
 
@@ -148,14 +103,11 @@ describe(watchRedeemInvite, () => {
   })
 
   it('works with a valid private key and enough money on it', async () => {
-    mockContractKitBalance
-      .mockReturnValueOnce(new BigNumber(10)) // temp account
-      .mockReturnValueOnce(new BigNumber(10)) // temp account
-
     await expectSaga(watchRedeemInvite)
       .provide([
         [call(waitWeb3LastBlock), true],
         [call(getOrCreateAccount), mockAccount],
+        [matchers.call.fn(getSendFee), 0.1],
       ])
       .withState(state)
       .dispatch(redeemInvite(mockKey))
@@ -165,10 +117,6 @@ describe(watchRedeemInvite, () => {
   })
 
   it('fails with a valid private key but unsuccessful transfer', async () => {
-    mockContractKitBalance
-      .mockReturnValueOnce(new BigNumber(10)) // temp account
-      .mockReturnValueOnce(new BigNumber(0)) // new account
-
     await expectSaga(watchRedeemInvite)
       .provide([
         [call(waitWeb3LastBlock), true],
@@ -183,9 +131,10 @@ describe(watchRedeemInvite, () => {
   })
 
   it('fails with a valid private key but no money on key', async () => {
-    mockContractKitBalance
-      .mockReturnValueOnce(new BigNumber(0)) // temp account
-      .mockReturnValueOnce(new BigNumber(0)) // current account
+    const stableToken = await getContractKit().contracts.getStableToken()
+
+    // @ts-ignore Jest Mock
+    stableToken.balanceOf.mockResolvedValue(new BigNumber(0))
 
     await expectSaga(watchRedeemInvite)
       .provide([
@@ -197,11 +146,12 @@ describe(watchRedeemInvite, () => {
       .put(showError(ErrorMessages.EMPTY_INVITE_CODE))
       .put(redeemInviteFailure())
       .run()
+
+    // @ts-ignore Jest Mock
+    stableToken.balanceOf.mockReset()
   })
 
   it('fails with error creating account', async () => {
-    mockContractKitBalance.mockReturnValueOnce(new BigNumber(10)) // temp account
-
     await expectSaga(watchRedeemInvite)
       .provide([
         [call(waitWeb3LastBlock), true],
@@ -225,9 +175,8 @@ describe(generateInviteLink, () => {
     expect(result).toBe('http://celo.page.link/PARAMS')
     expect(generateShortInviteLink).toBeCalledTimes(1)
     expect(generateShortInviteLink).toHaveBeenCalledWith({
-      link: `https://celo.org/build/wallet`,
-      playStoreUrl: `https://play.store.link&referrer=invite-code%3D${mockKey}`,
-      appStoreUrl: 'https://app.store.link',
+      link: `https://celo.org/build/wallet?invite-code=${mockKey}`,
+      appStoreId: '1482389446',
       bundleId: 'org.celo.mobile.alfajores',
     })
   })

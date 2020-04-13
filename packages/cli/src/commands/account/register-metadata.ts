@@ -1,7 +1,10 @@
+import { IdentityMetadataWrapper } from '@celo/contractkit/lib/identity'
+import { flags } from '@oclif/command'
 import { BaseCommand } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
+import { displayMetadata } from '../../utils/identity'
 
 export default class RegisterMetadata extends BaseCommand {
   static description =
@@ -17,6 +20,7 @@ export default class RegisterMetadata extends BaseCommand {
       required: true,
       description: 'The url to the metadata you want to register',
     }),
+    force: flags.boolean({ description: 'Ignore metadata validity checks' }),
   }
 
   static examples = [
@@ -24,14 +28,29 @@ export default class RegisterMetadata extends BaseCommand {
   ]
 
   async run() {
-    const { flags } = this.parse(RegisterMetadata)
-    this.kit.defaultAccount = flags.from
+    const res = this.parse(RegisterMetadata)
+    this.kit.defaultAccount = res.flags.from
 
     await newCheckBuilder(this)
-      .isAccount(flags.from)
+      .isAccount(res.flags.from)
       .runChecks()
 
+    const metadataURL = res.flags.url
+
+    if (!res.flags.force) {
+      try {
+        const metadata = await IdentityMetadataWrapper.fetchFromURL(this.kit, metadataURL)
+        console.info('Metadata contains the following claims: \n')
+        await displayMetadata(metadata, this.kit)
+        console.info() // Print a newline.
+      } catch (error) {
+        console.error(`Metadata could not be retrieved from ${metadataURL}: ${error.toString()}`)
+        console.info('Exiting without performing changes...')
+        process.exit(-1)
+      }
+    }
+
     const accounts = await this.kit.contracts.getAccounts()
-    await displaySendTx('registerMetadata', accounts.setMetadataURL(flags.url))
+    await displaySendTx('registerMetadata', accounts.setMetadataURL(metadataURL))
   }
 }

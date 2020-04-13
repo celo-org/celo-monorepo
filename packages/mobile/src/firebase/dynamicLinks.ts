@@ -5,29 +5,31 @@ const TAG = 'firebase/dynamicLink'
 
 export async function generateShortInviteLink({
   link,
-  playStoreUrl,
-  appStoreUrl,
+  appStoreId,
   bundleId,
 }: {
   link: string
-  playStoreUrl: string
-  appStoreUrl: string
+  appStoreId: string | undefined
   bundleId: string
 }): Promise<string> {
   try {
-    const firebaseLink = new firebase.links.DynamicLink(link, 'https://celol.page.link')
+    const firebaseLink = new firebase.links.DynamicLink(link, 'https://l.celo.org')
 
-    firebaseLink.android.setFallbackUrl(playStoreUrl)
-    firebaseLink.android.setPackageName(bundleId)
+    if (bundleId) {
+      // bundleId is the same as packageName for Android
+      firebaseLink.android.setPackageName(bundleId)
+      firebaseLink.ios.setBundleId(bundleId)
+    }
 
-    firebaseLink.ios.setFallbackUrl(appStoreUrl)
-    firebaseLink.ios.setBundleId(bundleId)
+    if (appStoreId) {
+      firebaseLink.ios.setAppStoreId(appStoreId)
+    }
 
     // Please note other parameter than UNGUESSABLE is unsafe
     const shortUrl = await firebase.links().createShortDynamicLink(firebaseLink, 'UNGUESSABLE')
 
-    // It is NOT recommended to shorten this link because it
-    // can break deep links
+    // It is NOT recommended to shorten this link with another
+    // shortener (e.g. bit.ly) because it can break deep links
     return shortUrl
   } catch (error) {
     Logger.error(TAG, 'Failed to shorten invite URL: ' + error.toString())

@@ -22,7 +22,9 @@
     "postinstall": "yarn run lerna run postinstall && patch-package && yarn keys:decrypt",
     "keys:decrypt": "bash scripts/key_placer.sh decrypt",
     "keys:encrypt": "bash scripts/key_placer.sh encrypt",
-    "check:packages": "node ./scripts/check-packages.js"
+    "check:packages": "node ./scripts/check-packages.js",
+    "celotool": "yarn --cwd packages/celotool run --silent cli",
+    "celocli": "yarn --cwd packages/cli run --silent celocli"
   },
   "husky": {
     "hooks": {
@@ -75,6 +77,7 @@
     "sha3": "1.2.3",
     "bignumber.js": "9.0.0",
     "prettier": "^1.19.1",
-    "@types/prettier": "^1.19.0"
+    "@types/prettier": "^1.19.0",
+    "ganache-core": "https://github.com/celo-org/ganache-core.git#3dbc32b"
   }
 }

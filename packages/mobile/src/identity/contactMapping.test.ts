@@ -3,7 +3,7 @@ import { expectSaga } from 'redux-saga-test-plan'
 import { throwError } from 'redux-saga-test-plan/providers'
 import { call, select } from 'redux-saga/effects'
 import { setUserContactDetails } from 'src/account/actions'
-import { defaultCountryCodeSelector, e164NumberSelector } from 'src/account/reducer'
+import { defaultCountryCodeSelector, e164NumberSelector } from 'src/account/selectors'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { updateE164PhoneNumberAddresses } from 'src/identity/actions'
@@ -12,7 +12,7 @@ import { e164NumberToAddressSelector } from 'src/identity/reducer'
 import { setRecipientCache } from 'src/recipients/actions'
 import { contactsToRecipients } from 'src/recipients/recipient'
 import { getAllContacts } from 'src/utils/contacts'
-import { contractKit } from 'src/web3/contracts'
+import { getContractKit } from 'src/web3/contracts'
 import { getConnectedAccount } from 'src/web3/saga'
 import {
   mockAccount,
@@ -22,16 +22,6 @@ import {
   mockE164Number,
   mockE164Number2,
 } from 'test/values'
-
-// TODO implement a smarter way to have contract kit mocked well across the whole project
-jest.mock('src/web3/contracts', () => ({
-  contractKit: {
-    contracts: {
-      getAttestations: jest.fn(),
-      getAccounts: jest.fn(),
-    },
-  },
-}))
 
 const mockPhoneNumberLookup = {
   [getPhoneHash(mockE164Number)]: { [mockAccount]: { complete: 3, total: 3 } },
@@ -49,6 +39,7 @@ const allRecipients = { ...e164NumberRecipients, ...otherRecipients }
 
 describe('Import Contacts Saga', () => {
   it('imports contacts and creates contact mappings correctly', async () => {
+    const contractKit = getContractKit()
     await expectSaga(doImportContactsWrapper)
       .provide([
         [call(getConnectedAccount), null],
@@ -86,6 +77,7 @@ describe('Import Contacts Saga', () => {
   })
 
   it('shows errors correctly', async () => {
+    const contractKit = getContractKit()
     await expectSaga(doImportContactsWrapper)
       .provide([
         [call(getConnectedAccount), null],

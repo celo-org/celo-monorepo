@@ -8,18 +8,19 @@ import { I18nProps, withNamespaces } from 'src/i18n'
 import MediumLogo from 'src/icons/MediumLogo'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
-import menuItems, { hashNav } from 'src/shared/menu-items'
+import { CeloLinks, hashNav } from 'src/shared/menu-items'
 import { colors, standardStyles } from 'src/styles'
 
 interface OwnProps {
   loading: boolean
+  title: string
 }
 
 type Props = I18nProps & ArticleProps & OwnProps
 
 class ArticlesSection extends React.PureComponent<Props> {
   render() {
-    const { t, articles, loading } = this.props
+    const { t, articles, loading, title } = this.props
     return (
       <View nativeID={hashNav.connect.blog}>
         <GridRow
@@ -29,7 +30,7 @@ class ArticlesSection extends React.PureComponent<Props> {
         >
           <Cell span={Spans.full} style={standardStyles.centered}>
             <Fade bottom={true} distance={'20px'}>
-              <H2>{t('articles.title')}</H2>
+              <H2>{title}</H2>
             </Fade>
           </Cell>
         </GridRow>
@@ -45,7 +46,7 @@ class ArticlesSection extends React.PureComponent<Props> {
               text={t('common:readMoreFromOurBlog')}
               kind={BTN.DARKNAKED}
               size={SIZE.normal}
-              href={menuItems.MEDIUM.link}
+              href={CeloLinks.mediumPublication}
               target={'_blog'}
               iconRight={<MediumLogo height={16} color={colors.dark} wrapWithLink={false} />}
             />

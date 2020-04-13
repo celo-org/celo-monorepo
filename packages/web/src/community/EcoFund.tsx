@@ -4,7 +4,10 @@ import ah from 'src/community/ah-logo.png'
 import polychain from 'src/community/polychain-logo.png'
 import { H2 } from 'src/fonts/Fonts'
 import FormContainer, { emailIsValid, hasField } from 'src/forms/Form'
-import { ErrorMessage, Form, LabeledInput } from 'src/forms/FormComponents'
+import { Form } from 'src/forms/FormComponents'
+import { LabeledInput } from 'src/forms/LabeledInput'
+import SubmitButton from 'src/forms/SubmitButton'
+import SuccessDisplay from 'src/forms/SuccessDisplay'
 import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
@@ -118,30 +121,33 @@ class EcoFund extends React.PureComponent<I18nProps & ScreenProps, State> {
                 blankForm={blankApplicationForm}
                 validateWith={invalidApplicationFields}
               >
-                {({ onAltSubmit, onInput, formState }) => (
+                {({ onSubmit, onInput, formState }) => (
                   <Form>
                     {ApplicationKeys.map((key) => (
                       <LabeledInput
                         key={key}
+                        displayErrorAs={
+                          key === 'founderEmail' || key === 'coFounderEmail' ? 'email' : undefined
+                        }
                         label={ApplicationFields[key]}
                         value={formState.form[key]}
                         name={key}
                         multiline={key === 'product'}
                         onInput={onInput}
-                        hasError={formState.errors.includes(key)}
+                        allErrors={formState.errors}
                       />
                     ))}
-                    <Button
+                    <SubmitButton
+                      isLoading={formState.isLoading}
                       text={t('apply')}
-                      kind={BTN.PRIMARY}
-                      onPress={onAltSubmit}
+                      onPress={onSubmit}
                       size={SIZE.big}
+                      style={standardStyles.elementalMarginBottom}
                       align={'flex-start'}
                     />
-                    <AfterMessage
-                      errors={formState.errors}
-                      isComplete={formState.isComplete}
-                      t={t}
+                    <SuccessDisplay
+                      isShowing={formState.isComplete}
+                      message={t('common:applicationSubmitted')}
                     />
                   </Form>
                 )}
@@ -161,30 +167,31 @@ class EcoFund extends React.PureComponent<I18nProps & ScreenProps, State> {
                 blankForm={blankRecForm}
                 validateWith={invalidRecFields}
               >
-                {({ onAltSubmit, onInput, formState }) => (
+                {({ onSubmit: onSubmit, onInput, formState }) => (
                   <Form>
                     {RecommendationKeys.map((key) => (
                       <LabeledInput
                         key={key}
+                        displayErrorAs={key === 'founderEmail' ? 'email' : undefined}
                         label={RecommendationFields[key]}
                         value={formState.form[key]}
                         name={key}
                         multiline={key === 'why'}
                         onInput={onInput}
-                        hasError={formState.errors.includes(key)}
+                        allErrors={formState.errors}
                       />
                     ))}
-                    <Button
+                    <SubmitButton
+                      isLoading={formState.isLoading}
                       text={t('recommend')}
-                      kind={BTN.PRIMARY}
-                      onPress={onAltSubmit}
+                      onPress={onSubmit}
+                      style={standardStyles.elementalMarginBottom}
                       size={SIZE.big}
                       align={'flex-start'}
                     />
-                    <AfterMessage
-                      errors={formState.errors}
-                      isComplete={formState.isComplete}
-                      t={t}
+                    <SuccessDisplay
+                      isShowing={formState.isComplete}
+                      message={t('recommendationSubmitted')}
                     />
                   </Form>
                 )}
@@ -278,24 +285,3 @@ const styles = StyleSheet.create({
     width: '100%',
   },
 })
-
-function AfterMessage({
-  isComplete,
-  t,
-  errors,
-}: {
-  isComplete: boolean
-  errors: string[]
-  t: I18nProps['t']
-}) {
-  return (
-    <View style={standardStyles.elementalMarginTop}>
-      {isComplete && (
-        <Text style={[textStyles.center, fonts.p, standardStyles.elementalMarginTop]}>
-          {t('form.fellowshipSubmitted')}
-        </Text>
-      )}
-      <ErrorMessage allErrors={errors} field={'unknownError'} t={t} />
-    </View>
-  )
-}

@@ -1,20 +1,14 @@
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
-import BigNumber from 'bignumber.js'
-import React, { useCallback } from 'react'
-import { WithTranslation } from 'react-i18next'
+import { CURRENCIES, CURRENCY_ENUM } from '@celo/utils/src'
+import React from 'react'
+import { Trans, WithTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
-import { useExchangeRate } from 'src/exchange/hooks'
+import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import useBalanceAutoRefresh from 'src/home/useBalanceAutoRefresh'
 import { Namespaces, withTranslation } from 'src/i18n'
-import { LocalCurrencyCode } from 'src/localCurrency/consts'
-import { convertDollarsToLocalAmount } from 'src/localCurrency/convert'
-import { useLocalCurrencyCode } from 'src/localCurrency/hooks'
-import { getLocalCurrencyExchangeRate } from 'src/localCurrency/selectors'
 import useSelector from 'src/redux/useSelector'
-import { goldToDollarAmount } from 'src/utils/currencyExchange'
-import { getLocalCurrencyDisplayValue, getMoneyDisplayValue } from 'src/utils/formatting'
 
 interface OwnProps {
   testID: string
@@ -24,40 +18,29 @@ type Props = WithTranslation & OwnProps
 
 export function CeloGoldOverview({ t, testID }: Props) {
   useBalanceAutoRefresh()
-  const localCurrencyCode = useLocalCurrencyCode()
-  const displayLocalCurrency = useCallback(
-    (amount: BigNumber.Value) =>
-      getLocalCurrencyDisplayValue(amount, localCurrencyCode || LocalCurrencyCode.USD, true),
-    [localCurrencyCode]
-  )
-  const exchangeRate = useExchangeRate()
-  const goldToDollars = useCallback((amount) => goldToDollarAmount(amount, exchangeRate), [
-    exchangeRate,
-  ])
-  const localExchangeRate = useSelector(getLocalCurrencyExchangeRate)
-  const dollarsToLocal = useCallback(
-    (amount) => convertDollarsToLocalAmount(amount, localExchangeRate),
-    [localExchangeRate]
-  )
-
   const goldBalance = useSelector((state) => state.goldToken.balance)
-  const localValue = goldBalance ? dollarsToLocal(goldToDollars(goldBalance)) : null
+
+  const goldBalanceAmount = goldBalance
+    ? { value: goldBalance, currencyCode: CURRENCIES[CURRENCY_ENUM.GOLD].code }
+    : null
 
   return (
     <View style={styles.container} testID={testID}>
       <Text style={styles.title}>{t('global:celoGold')}</Text>
       <Text style={styles.balance}>
-        {goldBalance && (
-          <Text style={fontStyles.semiBold}>{getMoneyDisplayValue(goldBalance)}</Text>
+        {goldBalanceAmount && (
+          <CurrencyDisplay style={fontStyles.semiBold} amount={goldBalanceAmount} />
         )}
       </Text>
-      {!!localCurrencyCode && (
-        <Text style={styles.localBalance}>
-          {localValue
-            ? t('equalToAmount', { amount: displayLocalCurrency(localValue) })
-            : t('loadingExchangeRate')}
-        </Text>
-      )}
+      <Text style={styles.localBalance}>
+        {goldBalanceAmount ? (
+          <Trans i18nKey="equalToAmount" ns={Namespaces.exchangeFlow9}>
+            Equal to <CurrencyDisplay amount={goldBalanceAmount} showLocalAmount={true} />
+          </Trans>
+        ) : (
+          t('loadingExchangeRate')
+        )}
+      </Text>
     </View>
   )
 }
