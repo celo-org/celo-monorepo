@@ -33,7 +33,7 @@ export abstract class ClaimCommand extends BaseCommand {
     const filePath = args.file
     try {
       cli.action.start(`Read Metadata from ${filePath}`)
-      const data = IdentityMetadataWrapper.fromFile(filePath)
+      const data = IdentityMetadataWrapper.fromFile(this.kit, filePath)
       cli.action.stop()
       return data
     } catch (error) {
@@ -84,18 +84,13 @@ export const claimFlags = {
 export const claimArgs = [Args.file('file', { description: 'Path of the metadata file' })]
 
 export const displayMetadata = async (metadata: IdentityMetadataWrapper, kit: ContractKit) => {
-  const metadataURLGetter = async (address: string) => {
-    const accounts = await kit.contracts.getAccounts()
-    return accounts.getMetadataURL(address)
-  }
-
   const data = await concurrentMap(5, metadata.claims, async (claim) => {
     const verifiable = VERIFIABLE_CLAIM_TYPES.includes(claim.type)
     const validatable = VALIDATABLE_CLAIM_TYPES.includes(claim.type)
     const status = verifiable
-      ? await verifyClaim(claim, metadata.data.meta.address, metadataURLGetter)
+      ? await verifyClaim(kit, claim, metadata.data.meta.address)
       : validatable
-      ? await validateClaim(claim, metadata.data.meta.address, kit)
+      ? await validateClaim(kit, claim, metadata.data.meta.address)
       : 'N/A'
     let extra = ''
     switch (claim.type) {
@@ -144,10 +139,11 @@ export const displayMetadata = async (metadata: IdentityMetadataWrapper, kit: Co
 }
 
 export const modifyMetadata = async (
+  kit: ContractKit,
   filePath: string,
   operation: (metadata: IdentityMetadataWrapper) => Promise<void>
 ) => {
-  const metadata = IdentityMetadataWrapper.fromFile(filePath)
+  const metadata = await IdentityMetadataWrapper.fromFile(kit, filePath)
   await operation(metadata)
   writeFileSync(filePath, metadata.toString())
 }

@@ -145,9 +145,9 @@ exports[`Experience/Brandkit renders 1`] = `
                 Object {
                   "color": "rgba(46,51,56,1.00)",
                   "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                  "fontSize": "28px",
+                  "fontSize": "24px",
                   "fontWeight": "400",
-                  "lineHeight": "36px",
+                  "lineHeight": "28px",
                   "marginLeft": "20px",
                   "textRendering": "geometricPrecision",
                 }
