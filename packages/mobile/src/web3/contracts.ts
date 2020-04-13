@@ -18,6 +18,7 @@ const web3: Web3 = getWeb3()
 let contractKit = newKitFromWeb3(web3)
 
 export function getContractKit() {
+  // TODO(anna) don't get store until it's defined
   const contractKitReady = contractKitReadySelector(store.getState())
   if (contractKitReady) {
     return contractKit
