@@ -17,6 +17,7 @@
 
 - [Governance](operations-manual/governance.md)
 - [Key Management](operations-manual/key-management.md)
+  - [Using a Ledger Wallet](operations-manual/using-a-ledger-wallet.md)
 - [Securing Celo Nodes and Services](operations-manual/securing-nodes-and-services.md)
 - [Upgrading a Node](operations-manual/node-upgrades.md)
 
