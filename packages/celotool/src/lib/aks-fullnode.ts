@@ -44,17 +44,20 @@ export async function installFullNodeChart(celoEnv: string) {
 export async function upgradeFullNodeChart(celoEnv: string, reset: boolean = false) {
   const kubeNamespace = getKubeNamespace(celoEnv)
   const releaseName = getReleaseName(celoEnv)
+  const replicas = parseInt(fetchEnv(envVar.AZURE_TX_NODES_COUNT), 10)
 
   if (reset) {
     await scaleResource(celoEnv, 'StatefulSet', `${celoEnv}-fullnodes`, 0)
     await deletePersistentVolumeClaims(celoEnv, ['celo-fullnode'])
   }
-  return upgradeGenericHelmChart(
+  await upgradeGenericHelmChart(
     kubeNamespace,
     releaseName,
     helmChartPath,
     await helmParameters(celoEnv, kubeNamespace)
   )
+  await scaleResource(celoEnv, 'StatefulSet', `${celoEnv}-fullnodes`, replicas)
+  return
 }
 
 export async function removeHelmRelease(celoEnv: string) {
@@ -107,9 +110,7 @@ async function deallocateIPs(celoEnv: string) {
   const replicaCount = getReplicaCount()
   const resourceGroup = await getAKSNodeResourceGroup()
 
-  await Promise.all(
-    range(replicaCount).map((i) => waitDeattachingStaticIPs(`${celoEnv}-validators-${i}`))
-  )
+  await waitDeattachingStaticIPs(celoEnv)
 
   await Promise.all(
     range(replicaCount).map((i) => deallocateIP(`${celoEnv}-validators-${i}`, resourceGroup))
