@@ -210,10 +210,9 @@ USAGE
 OPTIONS
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d         (required) Address of the ReleaseGold Contract
   --new_beneficiary=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the new beneficiary
-  --yesreally                                                   Override prompt to set new beneficiary (be careful!)
 
 EXAMPLE
-  set-beneficiary --contract 0x5409ED021D9299bf6814279A6A1411A7e866A631 --new_beneficiary
+  set-beneficiary --contract 0x5409ED021D9299bf6814279A6A1411A7e866A631 --new-beneficiary
   0x6Ecbe1DB9EF729CBe972C83Fb886247691Fb6beb
 ```
 
