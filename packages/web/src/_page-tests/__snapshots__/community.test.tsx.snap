@@ -42,27 +42,27 @@ exports[`Community renders 1`] = `
           "WebkitBoxDirection": "normal",
           "WebkitBoxFlex": 1,
           "WebkitBoxOrient": "vertical",
-          "WebkitBoxPack": "justify",
+          "WebkitBoxPack": "center",
           "WebkitFlexBasis": "100%",
           "WebkitFlexDirection": "column",
           "WebkitFlexGrow": 1,
           "WebkitFlexShrink": 0,
-          "WebkitJustifyContent": "space-around",
+          "WebkitJustifyContent": "center",
           "alignItems": "center",
           "flexBasis": "100%",
           "flexDirection": "column",
           "flexGrow": 1,
           "flexShrink": 0,
           "height": "100%",
-          "justifyContent": "space-around",
+          "justifyContent": "center",
           "marginTop": "15px",
           "msFlexAlign": "center",
           "msFlexDirection": "column",
           "msFlexNegative": 0,
-          "msFlexPack": "distribute",
+          "msFlexPack": "center",
           "msFlexPositive": 1,
           "msFlexPreferredSize": "100%",
-          "paddingBottom": "10px",
+          "paddingBottom": "15px",
           "paddingLeft": "10px",
           "paddingRight": "10px",
           "paddingTop": "10px",
@@ -72,6 +72,11 @@ exports[`Community renders 1`] = `
     >
       <div
         className="css-view-1dbjc4n"
+        style={
+          Object {
+            "marginBottom": "20px",
+          }
+        }
       >
         <div
           className="css-view-1dbjc4n"
@@ -128,12 +133,12 @@ exports[`Community renders 1`] = `
               dir="auto"
               style={
                 Object {
-                  "WebkitAnimationDelay": "1500ms",
-                  "WebkitAnimationDuration": "500ms",
+                  "WebkitAnimationDelay": "1400ms",
+                  "WebkitAnimationDuration": "600ms",
                   "WebkitAnimationFillMode": "both",
                   "WebkitAnimationIterationCount": 1,
-                  "animationDelay": "1500ms",
-                  "animationDuration": "500ms",
+                  "animationDelay": "1400ms",
+                  "animationDuration": "600ms",
                   "animationFillMode": "both",
                   "animationIterationCount": 1,
                   "color": "rgba(15,185,114,1.00)",
@@ -148,11 +153,11 @@ exports[`Community renders 1`] = `
               style={
                 Object {
                   "WebkitAnimationDelay": "3400ms",
-                  "WebkitAnimationDuration": "500ms",
+                  "WebkitAnimationDuration": "600ms",
                   "WebkitAnimationFillMode": "both",
                   "WebkitAnimationIterationCount": 1,
                   "animationDelay": "3400ms",
-                  "animationDuration": "500ms",
+                  "animationDuration": "600ms",
                   "animationFillMode": "both",
                   "animationIterationCount": 1,
                   "color": "rgba(146,78,255,1.00)",
@@ -167,11 +172,11 @@ exports[`Community renders 1`] = `
               style={
                 Object {
                   "WebkitAnimationDelay": "4900ms",
-                  "WebkitAnimationDuration": "500ms",
+                  "WebkitAnimationDuration": "600ms",
                   "WebkitAnimationFillMode": "both",
                   "WebkitAnimationIterationCount": 1,
                   "animationDelay": "4900ms",
-                  "animationDuration": "500ms",
+                  "animationDuration": "600ms",
                   "animationFillMode": "both",
                   "animationIterationCount": 1,
                   "color": "rgba(255,101,83,1.00)",
@@ -185,12 +190,12 @@ exports[`Community renders 1`] = `
               dir="auto"
               style={
                 Object {
-                  "WebkitAnimationDelay": "6400ms",
-                  "WebkitAnimationDuration": "500ms",
+                  "WebkitAnimationDelay": "6500ms",
+                  "WebkitAnimationDuration": "600ms",
                   "WebkitAnimationFillMode": "both",
                   "WebkitAnimationIterationCount": 1,
-                  "animationDelay": "6400ms",
-                  "animationDuration": "500ms",
+                  "animationDelay": "6500ms",
+                  "animationDuration": "600ms",
                   "animationFillMode": "both",
                   "animationIterationCount": 1,
                   "color": "rgba(82,182,255,1.00)",
@@ -207,20 +212,20 @@ exports[`Community renders 1`] = `
         style={
           Object {
             "WebkitAlignItems": "center",
-            "WebkitAnimationDelay": "7000ms",
-            "WebkitAnimationDuration": "500ms",
+            "WebkitAnimationDelay": "7400ms",
+            "WebkitAnimationDuration": "600ms",
             "WebkitAnimationFillMode": "both",
             "WebkitAnimationIterationCount": 1,
             "WebkitBoxAlign": "center",
             "WebkitBoxPack": "center",
             "WebkitJustifyContent": "center",
             "alignItems": "center",
-            "animationDelay": "7000ms",
-            "animationDuration": "500ms",
+            "animationDelay": "7400ms",
+            "animationDuration": "600ms",
             "animationFillMode": "both",
             "animationIterationCount": 1,
             "justifyContent": "center",
-            "maxWidth": "500px",
+            "maxWidth": "475px",
             "msFlexAlign": "center",
             "msFlexPack": "center",
             "width": "100%",
@@ -238,7 +243,7 @@ exports[`Community renders 1`] = `
               "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
               "fontSize": "24px",
               "lineHeight": "32px",
-              "marginBottom": "20px",
+              "marginBottom": "10px",
               "marginTop": "20px",
               "textAlign": "center",
               "textRendering": "geometricPrecision",

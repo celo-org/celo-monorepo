@@ -19,20 +19,26 @@ export default React.memo(function CoverArea() {
       tabletStyle={styles.root}
       mobileStyle={styles.mobileRoot}
     >
-      <Cell span={Spans.full} style={styles.content}>
+      <Cell span={Spans.full} style={[styles.content, !isMobile && styles.contentDesktop]}>
         {isMobile ? (
           <>
             <CeloRoles />
             <FourWords />
           </>
         ) : (
-          <View>
+          <View style={standardStyles.elementalMarginBottom}>
             <CeloRoles />
             <FourWords />
           </View>
         )}
         <View style={[standardStyles.centered, styles.fadeIn, styles.ctaArea]}>
-          <H4 style={[textStyles.center, standardStyles.elementalMargin]}>
+          <H4
+            style={[
+              textStyles.center,
+              standardStyles.halfElement,
+              standardStyles.elementalMarginTop,
+            ]}
+          >
             {t('cover.joinMovement')}
           </H4>
           <EmailForm submitText={t('common:signUp')} route={'/contacts'} isDarkMode={false} />
@@ -75,6 +81,10 @@ const styles = StyleSheet.create({
     paddingTop: HEADER_HEIGHT,
   },
   root: { flexDirection: 'column' },
+  contentDesktop: {
+    justifyContent: 'center',
+    paddingBottom: 15,
+  },
   content: {
     flexDirection: 'column',
     alignItems: 'center',
@@ -86,7 +96,7 @@ const styles = StyleSheet.create({
   },
   developers: {
     color: colors.primaryPress,
-    animationDelay: '1500ms',
+    animationDelay: '1400ms',
   },
   designers: {
     color: colors.purpleScreen,
@@ -98,15 +108,15 @@ const styles = StyleSheet.create({
   },
   doers: {
     color: colors.blueScreen,
-    animationDelay: '6400ms',
+    animationDelay: '6500ms',
   },
   ctaArea: {
-    animationDelay: '7000ms',
-    maxWidth: 500,
+    animationDelay: '7400ms',
+    maxWidth: 475,
     width: '100%',
   },
   fadeIn: {
-    animationDuration: `500ms`,
+    animationDuration: `600ms`,
     animationFillMode: 'both',
     animationIterationCount: 1,
     animationKeyframes: [
