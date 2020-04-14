@@ -175,8 +175,8 @@
     "redux-mock-store": "^1.5.3",
     "redux-saga-test-plan": "^4.0.0-beta.2",
     "remote-redux-devtools": "^0.5.12",
-    "web3-core": "1.2.4",
-    "web3-eth": "1.2.4"
+    "web3-eth": "1.2.4",
+    "web3-core": "1.2.4"
   },
   "detox": {
     "test-runner": "jest",
