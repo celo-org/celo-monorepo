@@ -3242,7 +3242,7 @@
     web3-eth-contract "1.2.4"
     web3-utils "1.2.4"
 
-"@celo/contractkit@^0.1.5":
+"@celo/contractkit@^0.1.5", "@celo/contractkit@^0.1.6":
   version "0.1.6"
   resolved "https://registry.yarnpkg.com/@celo/contractkit/-/contractkit-0.1.6.tgz#c4f6d5003694cc28853f7331b5c0597a208a389d"
   integrity sha512-3mEmfOVaqOjyAT5mHWAESYdcKTvZPDDCkkh7GVDDpq7sPhnZ5dGX5oT26XzMLhe8TfdTQMzp6B22EDaPjOLx8A==
@@ -7293,6 +7293,14 @@
   version "7.11.2"
   resolved "https://registry.yarnpkg.com/@types/pg/-/pg-7.11.2.tgz#199dec09426c9359574dedede37313805ba3fca2"
   integrity sha512-4+rj7fnidA77jFURNanuPPc1HrQv+RkhI6s+K18G9zOKbOUUpChA/rbNMqFukNuZ89LoIt/I9dAlxf329TjCNw==
+  dependencies:
+    "@types/node" "*"
+    "@types/pg-types" "*"
+
+"@types/pg@^7.14.3":
+  version "7.14.3"
+  resolved "https://registry.yarnpkg.com/@types/pg/-/pg-7.14.3.tgz#eb166e4f4287923890b10ed20371f937938cb995"
+  integrity sha512-go5zddQ1FrUQHeBvqPzQ1svKo4KKucSwvqLsvwc/EIuQ9sxDA21b68xc/RwhzAK5pPCnez8NrkYatFIGdJBVvA==
   dependencies:
     "@types/node" "*"
     "@types/pg-types" "*"
@@ -11512,7 +11520,7 @@ bun@^0.0.12:
   dependencies:
     readable-stream "~1.0.32"
 
-bunyan-debug-stream@2.0.0:
+bunyan-debug-stream@2.0.0, bunyan-debug-stream@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/bunyan-debug-stream/-/bunyan-debug-stream-2.0.0.tgz#b9593e38753f594e3f9db3eb2fdebdc2af147a9f"
   integrity sha512-Ovl43CJ7nUwalLzdXc6E1nGIy6ift9Z/QpYXUtsjpDAg35ZFKXifKNZyfpMGuN3N7ijLLqbnxPsMMHsXDdXa9A==
@@ -28207,7 +28215,7 @@ pg@^7.12.1:
     pgpass "1.x"
     semver "4.3.2"
 
-pg@^7.18.2:
+pg@^7.18.0, pg@^7.18.2:
   version "7.18.2"
   resolved "https://registry.yarnpkg.com/pg/-/pg-7.18.2.tgz#4e219f05a00aff4db6aab1ba02f28ffa4513b0bb"
   integrity sha512-Mvt0dGYMwvEADNKy5PMQGlzPudKcKKzJds/VbOeZJpb6f/pI3mmoXX0JksPgI3l3JPP/2Apq7F36O63J7mgveA==
