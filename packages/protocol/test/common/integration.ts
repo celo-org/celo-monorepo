@@ -408,8 +408,8 @@ contract('Integration: Exchange', (accounts: string[]) => {
     stableToken = await getDeployedProxiedContract('StableToken', artifacts)
   })
 
-  describe('When selling gold', () => {
-    beforeEach(async () => {
+  describe.only('When selling gold', () => {
+    before(async () => {
       originalStable = await stableToken.balanceOf(accounts[0])
       originalGold = await goldToken.balanceOf(accounts[0])
       originalReserve = await goldToken.balanceOf(reserve.address)
@@ -439,14 +439,16 @@ contract('Integration: Exchange', (accounts: string[]) => {
     })
   })
 
+  // Note that this test relies on having purchased cUSD in the previous test.
   describe.only('When selling stable token', () => {
-    beforeEach(async () => {
+    before(async () => {
       originalStable = await stableToken.balanceOf(accounts[0])
       originalGold = await goldToken.balanceOf(accounts[0])
       originalReserve = await goldToken.balanceOf(reserve.address)
       console.log(originalStable.toFixed(), originalGold.toFixed(), originalReserve.toFixed())
       await stableToken.approve(exchange.address, sellAmount)
-      await exchange.exchange(sellAmount, minBuyAmount, false)
+      // Cannot sell more than was purchased in the previous test.
+      await exchange.exchange(sellAmount.div(20), minBuyAmount, false)
       finalStable = await stableToken.balanceOf(accounts[0])
       finalGold = await goldToken.balanceOf(accounts[0])
       finalReserve = await goldToken.balanceOf(reserve.address)
