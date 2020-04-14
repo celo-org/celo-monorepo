@@ -1,26 +1,8 @@
 ---
-description: List oracle reports for a given token
+description: Remove expired oracle reports for a specified token (currently just Celo Dollar, aka: "StableToken")
 ---
 
 ## Commands
-
-### Rates
-
-List oracle reports for a given token
-
-```
-USAGE
-  $ celocli oracle:rates TOKEN
-
-ARGUMENTS
-  TOKEN  (StableToken) [default: StableToken] Token to list the reports for
-
-EXAMPLES
-  rates StableToken
-  rates
-```
-
-_See code: [packages/cli/src/commands/oracle/rates.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/oracle/rates.ts)_
 
 ### Remove-expired-reports
 
@@ -64,3 +46,21 @@ EXAMPLES
 ```
 
 _See code: [packages/cli/src/commands/oracle/report.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/oracle/report.ts)_
+
+### Reports
+
+List oracle reports for a given token
+
+```
+USAGE
+  $ celocli oracle:reports TOKEN
+
+ARGUMENTS
+  TOKEN  (StableToken) [default: StableToken] Token to list the reports for
+
+EXAMPLES
+  reports StableToken
+  reports
+```
+
+_See code: [packages/cli/src/commands/oracle/reports.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/oracle/reports.ts)_
