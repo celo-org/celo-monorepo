@@ -6,7 +6,7 @@ metadata:
   annotations:
     service.beta.kubernetes.io/azure-load-balancer-mixed-protocols: "true"
   labels:
-{{ include "standard.labels" $  | indent 4 }}
+{{ include "common.standard.labels" $  | indent 4 }}
 spec:
   type: {{ $.Values.service.type }}
 {{- if $.Values.geth.use_static_ips }}
@@ -27,9 +27,9 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ template "common.fullname" $ }}-rpc
+  name: {{ template "common.fullname" . }}-rpc
   labels:
-{{ include "standard.labels" $  | indent 4 }}
+{{ include "common.standard.labels" .  | indent 4 }}
 spec:
   type: ClusterIP
   ports:
@@ -38,4 +38,4 @@ spec:
       protocol: TCP
       name: rpc
   selector:
-{{ include "standard.labels" .  | indent 4 }}
+{{ include "common.standard.labels" .  | indent 4 }}
