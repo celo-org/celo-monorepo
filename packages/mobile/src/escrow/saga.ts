@@ -39,6 +39,7 @@ import Logger from 'src/utils/Logger'
 import { addLocalAccount, getContractKit } from 'src/web3/contracts'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
 import { fornoSelector } from 'src/web3/selectors'
+import { estimateGas } from 'src/web3/utils'
 
 const TAG = 'escrow/saga'
 
@@ -195,7 +196,7 @@ export async function getReclaimEscrowGas(account: string, paymentID: string) {
     from: account,
     feeCurrency: await getCurrencyAddress(CURRENCY_ENUM.DOLLAR),
   }
-  const gas = new BigNumber(await tx.estimateGas(txParams))
+  const gas = await estimateGas(tx, txParams)
   Logger.debug(`${TAG}/getReclaimEscrowGas`, `Estimated gas of ${gas.toString()}}`)
   return gas
 }

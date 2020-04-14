@@ -294,6 +294,7 @@ spec:
             --etherbase=${ACCOUNT_ADDRESS} \
             --networkid=${NETWORK_ID} \
             --syncmode=full \
+            --gcmode={{ .gcmode | default "full" }} \
             ${NAT_FLAG} \
             --ethstats=${HOSTNAME}@${ETHSTATS_SVC} \
             --consoleformat=json \
