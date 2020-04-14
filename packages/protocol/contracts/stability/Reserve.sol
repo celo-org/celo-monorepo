@@ -27,7 +27,7 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
   address[] private _tokens;
   TobinTaxCache public tobinTaxCache;
   uint256 public tobinTaxStalenessThreshold;
-  uint256 public constant TOBIN_TAX_NUMERATOR = 5000000000000000000000; // 0.005
+  uint256 public tobinTax;
   mapping(address => bool) public isSpender;
 
   mapping(address => bool) public isOtherReserveAddress;
@@ -54,6 +54,7 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
   event OtherReserveAddressRemoved(address indexed otherReserveAddress, uint256 index);
   event AssetAllocationSet(bytes32[] symbols, uint256[] weights);
   event ReserveGoldTransferred(address indexed spender, address indexed to, uint256 value);
+  event TobinTaxSet(uint256 tobinTax);
 
   modifier isStableToken(address token) {
     require(isToken[token], "token addr was never registered");
@@ -94,6 +95,15 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
     require(value > 0, "value was zero");
     tobinTaxStalenessThreshold = value;
     emit TobinTaxStalenessThresholdSet(value);
+  }
+
+  /**
+   * @notice Sets the tobin tax.
+   * @param value The tobin tax.
+   */
+  function setTobinTax(uint256 value) public onlyOwner {
+    tobinTax = value;
+    emit TobinTaxSet(value);
   }
 
   /**
@@ -446,7 +456,7 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
     if (ratio.gte(FixidityLib.newFixed(2))) {
       return FixidityLib.wrap(0);
     } else {
-      return FixidityLib.wrap(TOBIN_TAX_NUMERATOR);
+      return FixidityLib.wrap(tobinTax);
     }
   }
 }
