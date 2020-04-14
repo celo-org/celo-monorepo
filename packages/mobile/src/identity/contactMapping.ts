@@ -130,7 +130,7 @@ function* lookupNewRecipients(
 
   yield put(incrementImportSyncProgress(allE164Numbers.length - newE164Numbers.length))
 
-  const contractKit = getContractKit()
+  const contractKit = yield call(getContractKit)
 
   const attestationsWrapper: AttestationsWrapper = yield call([
     contractKit.contracts,
@@ -249,7 +249,7 @@ export function* fetchPhoneAddresses(action: FetchPhoneAddressesAction) {
   e164Numbers.map((n) => (e164NumberToAddressUpdates[n] = undefined))
   yield put(updateE164PhoneNumberAddresses(e164NumberToAddressUpdates, {}))
 
-  const contractKit = getContractKit()
+  const contractKit = yield call(getContractKit)
   const attestationsWrapper: AttestationsWrapper = yield call([
     contractKit.contracts,
     contractKit.contracts.getAttestations,

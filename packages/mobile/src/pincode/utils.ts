@@ -1,4 +1,4 @@
-import { getContractKit } from 'src/web3/contracts'
+// import { getContractKit } from 'src/web3/contracts'
 import { readPrivateKeyFromLocalDisk } from 'src/web3/privateKey'
 
 export const PIN_LENGTH = 6
@@ -18,10 +18,13 @@ export function isPinCorrect(
         .then(() => resolve(pin))
         .catch(reject)
     } else {
-      getContractKit()
+      return true
+      /*
+      getContractKit() // TODO(anna) fix
         .web3.eth.personal.unlockAccount(currentAccount, pin, 1)
         .then((result: boolean) => (result ? resolve(pin) : reject()))
         .catch(reject)
+        */
     }
   })
 }

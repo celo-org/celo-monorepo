@@ -12,7 +12,7 @@ import { addStandbyTransaction, removeStandbyTransaction } from 'src/transaction
 import { TransactionStatus } from 'src/transactions/reducer'
 import { sendAndMonitorTransaction } from 'src/transactions/saga'
 import Logger from 'src/utils/Logger'
-import { getContractKit } from 'src/web3/contracts'
+import { getContractKit, getContractKitOutsideGenerator } from 'src/web3/contracts'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
 import * as utf8 from 'utf8'
 
@@ -47,7 +47,7 @@ export async function convertToContractDecimals(value: BigNumber, token: CURRENC
 
 export async function getTokenContract(token: CURRENCY_ENUM) {
   Logger.debug(TAG + '@getTokenContract', `Fetching contract for ${token}`)
-  const contractKit = getContractKit()
+  const contractKit = await getContractKitOutsideGenerator()
   switch (token) {
     case CURRENCY_ENUM.GOLD:
       return contractKit.contracts.getGoldToken()
@@ -189,7 +189,7 @@ export function tokenTransferFactory({
 }
 
 export async function getCurrencyAddress(currency: CURRENCY_ENUM) {
-  const contractKit = getContractKit()
+  const contractKit = await getContractKitOutsideGenerator()
   switch (currency) {
     case CURRENCY_ENUM.GOLD:
       return contractKit.registry.addressFor(CeloContract.GoldToken)

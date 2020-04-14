@@ -65,7 +65,7 @@ export interface AttestationCode {
 }
 
 export function* checkVerification() {
-  const contractKit = getContractKit()
+  const contractKit = yield call(getContractKit)
 
   const attestationsWrapper: AttestationsWrapper = yield call([
     contractKit.contracts,
@@ -130,7 +130,7 @@ export function* doVerificationFlow() {
     const privDataKey = yield select(privateCommentKeySelector)
     const dataKey = compressedPubKey(Buffer.from(privDataKey, 'hex'))
 
-    const contractKit = getContractKit()
+    const contractKit = yield call(getContractKit)
 
     const attestationsWrapper: AttestationsWrapper = yield call([
       contractKit.contracts,

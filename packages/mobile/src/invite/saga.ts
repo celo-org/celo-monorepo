@@ -40,7 +40,7 @@ import { waitForTransactionWithId } from 'src/transactions/saga'
 import { sendTransaction } from 'src/transactions/send'
 import { getAppStoreId } from 'src/utils/appstore'
 import Logger from 'src/utils/Logger'
-import { addLocalAccount, getContractKit } from 'src/web3/contracts'
+import { addLocalAccount, getContractKit, getContractKitOutsideGenerator } from 'src/web3/contracts'
 import { getConnectedUnlockedAccount, getOrCreateAccount, waitWeb3LastBlock } from 'src/web3/saga'
 import { fornoSelector } from 'src/web3/selectors'
 import Web3 from 'web3'
@@ -56,7 +56,7 @@ export async function getInviteTxGas(
   amount: string,
   comment: string
 ) {
-  const contractKit = getContractKit()
+  const contractKit = await getContractKitOutsideGenerator()
   const escrowContract = await contractKit.contracts.getEscrow()
   return getSendTxGas(account, currency, {
     amount,

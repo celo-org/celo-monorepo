@@ -1,10 +1,10 @@
 import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
 import { hexToBuffer } from '@celo/utils/src/address'
 import { encryptComment as encryptCommentRaw } from '@celo/utils/src/commentEncryption'
-import { getContractKit } from 'src/web3/contracts'
+import { getContractKitOutsideGenerator } from 'src/web3/contracts'
 
 export async function getCommentKey(address: string): Promise<Buffer | null> {
-  const contractKit = getContractKit()
+  const contractKit = await getContractKitOutsideGenerator()
   const accountsWrapper: AccountsWrapper = await contractKit.contracts.getAccounts()
   // getDataEncryptionKey actually returns a string instead of an array
   const hexString = [await accountsWrapper.getDataEncryptionKey(address)].join()

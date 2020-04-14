@@ -36,7 +36,7 @@ import { TransactionStatus } from 'src/transactions/reducer'
 import { sendAndMonitorTransaction } from 'src/transactions/saga'
 import { sendTransaction } from 'src/transactions/send'
 import Logger from 'src/utils/Logger'
-import { addLocalAccount, getContractKit } from 'src/web3/contracts'
+import { addLocalAccount, getContractKit, getContractKitOutsideGenerator } from 'src/web3/contracts'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
 import { fornoSelector } from 'src/web3/selectors'
 import Web3 from 'web3'
@@ -183,7 +183,7 @@ function* withdrawFromEscrow() {
 }
 
 async function createReclaimTransaction(paymentID: string) {
-  const contractKit = yield call(getContractKit)
+  const contractKit = await getContractKitOutsideGenerator()
 
   const escrow = await contractKit.contracts.getEscrow()
   return escrow.revoke(paymentID).txo
