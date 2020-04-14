@@ -35,6 +35,7 @@ export const SignedClaimType = t.type({
   signature: SignatureType,
 })
 
+export const DOMAIN_TXT_HEADER = 'celo-site-verification'
 export type DomainClaim = t.TypeOf<typeof DomainClaimType>
 export type NameClaim = t.TypeOf<typeof NameClaimType>
 export type Claim =
