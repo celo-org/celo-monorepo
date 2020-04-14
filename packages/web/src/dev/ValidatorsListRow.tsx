@@ -62,22 +62,28 @@ class ValidatorsListRow extends React.PureComponent<Props & I18nProps, State> {
     tooltip: false,
   }
   tooltipRef = React.createRef<any>()
+  removeDocumentListener: any
 
   constructor(...args) {
     super(...(args as [any]))
 
-    document.addEventListener(
-      'click',
-      (event) => {
-        if (!this.state.tooltip || !this.tooltipRef.current) {
-          return
-        }
-        if (!this.tooltipRef.current.parentNode.contains(event.target)) {
-          this.setState({ tooltip: false })
-        }
-      },
-      false
-    )
+    const onDocumentClick = (event) => {
+      if (!this.state.tooltip || !this.tooltipRef.current) {
+        return
+      }
+      if (!this.tooltipRef.current.parentNode.contains(event.target)) {
+        this.setState({ tooltip: false })
+      }
+    }
+
+    document.addEventListener('click', onDocumentClick, false)
+
+    this.removeDocumentListener = () =>
+      document.removeEventListener('click', onDocumentClick, false)
+  }
+
+  componentWillUnmount() {
+    this.removeDocumentListener()
   }
 
   render() {
