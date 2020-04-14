@@ -28,6 +28,7 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
   TobinTaxCache public tobinTaxCache;
   uint256 public tobinTaxStalenessThreshold;
   uint256 public tobinTax;
+  uint256 public tobinTaxReserveRatio;
   mapping(address => bool) public isSpender;
 
   mapping(address => bool) public isOtherReserveAddress;
@@ -55,6 +56,7 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
   event AssetAllocationSet(bytes32[] symbols, uint256[] weights);
   event ReserveGoldTransferred(address indexed spender, address indexed to, uint256 value);
   event TobinTaxSet(uint256 tobinTax);
+  event TobinTaxReserveRatioSet(uint256 tobinTaxReserveRatio);
 
   modifier isStableToken(address token) {
     require(isToken[token], "token addr was never registered");
@@ -110,6 +112,15 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
   function setTobinTax(uint256 value) public onlyOwner {
     tobinTax = value;
     emit TobinTaxSet(value);
+  }
+
+  /**
+   * @notice Sets the reserve ratio at which the tobin tax sets in.
+   * @param value The reserve ratio at which the tobin tax sets in.
+   */
+  function setTobinTaxReserveRatio(uint256 value) public onlyOwner {
+    tobinTaxReserveRatio = value;
+    emit TobinTaxReserveRatioSet(value);
   }
 
   /**
@@ -456,9 +467,8 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
    * @notice Computes a tobin tax based on the reserve ratio.
    */
   function computeTobinTax() private view returns (FixidityLib.Fraction memory) {
-    // The protocol calls for a 0.5% transfer tax on Celo Gold when the reserve ratio <= 2.
     FixidityLib.Fraction memory ratio = FixidityLib.wrap(getReserveRatio());
-    if (ratio.gte(FixidityLib.newFixed(2))) {
+    if (ratio.gte(FixidityLib.wrap(tobinTaxReserveRatio))) {
       return FixidityLib.wrap(0);
     } else {
       return FixidityLib.wrap(tobinTax);
