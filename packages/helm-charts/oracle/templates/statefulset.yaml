@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "name" . }}
+  labels:
+{{ include "labels" . | indent 4 }}
+{{ include "oracle-client-component-label" . | indent 4 }}
+spec:
+  clusterIP: None
+  selector:
+{{ include "oracle-client-component-label" . | indent 4 }}
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ template "name" . }}
+  labels:
+{{ include "labels" . | indent 4 }}
+{{ include "oracle-client-component-label" . | indent 4 }}
+spec:
+  podManagementPolicy: Parallel
+  updateStrategy:
+    type: RollingUpdate
+  replicas: {{ .Values.replicas }}
+  serviceName: oracle
+  selector:
+    matchLabels:
+{{ include "labels" . | indent 6 }}
+{{ include "oracle-client-component-label" . | indent 6 }}
+  template:
+    metadata:
+      labels:
+{{ include "labels" . | indent 8 }}
+{{ include "oracle-client-component-label" . | indent 8 }}
+    spec:
+      containers:
+      - name: oracle-client
+        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+        imagePullPolicy: Always
+        env:
+        - name: WEB3_PROVIDER_URL
+          value: {{ .Values.oracle.web3ProviderUrl }}
