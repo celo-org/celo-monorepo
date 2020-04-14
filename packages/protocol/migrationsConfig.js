@@ -59,7 +59,7 @@ const DefaultConfig = {
     maxElectableValidators: '100',
     maxVotesPerAccount: 100,
     electabilityThreshold: 1 / 1000,
-    frozen: true,
+    frozen: false,
   },
   epochRewards: {
     targetVotingYieldParameters: {
@@ -81,15 +81,15 @@ const DefaultConfig = {
     communityRewardFraction: 1 / 4,
     // TODO(asa): Must be set before RC1
     carbonOffsettingPartner: '0x0000000000000000000000000000000000000000',
-    carbonOffsettingFraction: 1 / 1000,
-    frozen: true,
+    carbonOffsettingFraction: 1 / 200,
+    frozen: false,
   },
   exchange: {
     spread: 5 / 1000,
     reserveFraction: 1 / 20,
     updateFrequency: 5 * MINUTE,
     minimumReports: 5,
-    frozen: true,
+    frozen: false,
   },
   gasPriceMinimum: {
     minimumFloor: 1000000000,
@@ -97,7 +97,7 @@ const DefaultConfig = {
     adjustmentSpeed: 1 / 2,
   },
   goldToken: {
-    frozen: true,
+    frozen: false,
   },
   governance: {
     queueExpiry: 4 * WEEK,
@@ -165,7 +165,7 @@ const DefaultConfig = {
       values: [],
     },
     oracles: [],
-    frozen: true,
+    frozen: false,
   },
   transferWhitelist: {
     addresses: [
