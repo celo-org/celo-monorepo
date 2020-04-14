@@ -1,4 +1,5 @@
 import Limit from 'express-rate-limit'
+import Sentry from './sentry'
 const MS = 1000
 const SECONDS = 60
 const MINUTES = 20
@@ -8,6 +9,7 @@ export default new Limit({
   message: 'breathe',
   onLimitReached(req) {
     console.log('limit reached while processing:', req.body)
+    Sentry.captureEvent({ message: 'rate limit reached', extra: req.body })
   },
   keyGenerator(req) {
     // FOR consideration, should each endpoint be separate?
