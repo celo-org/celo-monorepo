@@ -13,7 +13,7 @@ import {
   getHashFromEncoded,
   recoverTransaction,
 } from '../utils/signing-utils'
-import { LedgerWallet } from './ledger-wallet'
+import { AddressValidation, LedgerWallet } from './ledger-wallet'
 
 const PRIVATE_KEY1 = '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
 const ACCOUNT_ADDRESS1 = normalizeAddressWith0x(privateKeyToAddress(PRIVATE_KEY1))
@@ -53,42 +53,53 @@ const ledgerAddreses: { [myKey: string]: { address: string; privateKey: string }
 
 const CHAIN_ID = 44378
 
+function mockLedger(wallet: LedgerWallet, mockForceValidation: () => void) {
+  jest.spyOn<any, any>(wallet, 'generateNewLedger').mockImplementation((_transport: any) => {
+    return {
+      getAddress: async (derivationPath: string, forceValidation?: boolean) => {
+        if (forceValidation) {
+          mockForceValidation()
+        }
+        if (ledgerAddreses[derivationPath]) {
+          return { address: ledgerAddreses[derivationPath].address, derivationPath }
+        }
+        return {}
+      },
+      signTransaction: async (derivationPath: string, data: string) => {
+        if (ledgerAddreses[derivationPath]) {
+          const hash = getHashFromEncoded(ensureLeading0x(data))
+          const signature = Account.makeSigner(chainIdTransformationForSigning(CHAIN_ID))(
+            hash,
+            ledgerAddreses[derivationPath].privateKey
+          )
+          const [v, r, s] = Account.decodeSignature(signature)
+          return { v, r, s }
+        }
+        throw new Error('Invalid Path')
+      },
+      signPersonalMessage: async (derivationPath: string, data: string) => {
+        if (ledgerAddreses[derivationPath]) {
+          const hash = getHashFromEncoded(ensureLeading0x(data))
+          const signature = Account.makeSigner(0)(hash, ledgerAddreses[derivationPath].privateKey)
+          const [v, r, s] = Account.decodeSignature(signature)
+          return { v: Number(v) + 27, r, s }
+        }
+        throw new Error('Invalid Path')
+      },
+    }
+  })
+}
+
 describe('LedgerWallet class', () => {
   let wallet: LedgerWallet
+  let mockForceValidation: any
 
   beforeEach(() => {
     wallet = new LedgerWallet()
-    jest.spyOn<any, any>(wallet, 'generateNewLedger').mockImplementation((_transport: any) => {
-      return {
-        getAddress: async (derivationPath: string) => {
-          if (ledgerAddreses[derivationPath]) {
-            return { address: ledgerAddreses[derivationPath].address, derivationPath }
-          }
-          return {}
-        },
-        signTransaction: async (derivationPath: string, data: string) => {
-          if (ledgerAddreses[derivationPath]) {
-            const hash = getHashFromEncoded(ensureLeading0x(data))
-            const signature = Account.makeSigner(chainIdTransformationForSigning(CHAIN_ID))(
-              hash,
-              ledgerAddreses[derivationPath].privateKey
-            )
-            const [v, r, s] = Account.decodeSignature(signature)
-            return { v, r, s }
-          }
-          throw new Error('Invalid Path')
-        },
-        signPersonalMessage: async (derivationPath: string, data: string) => {
-          if (ledgerAddreses[derivationPath]) {
-            const hash = getHashFromEncoded(ensureLeading0x(data))
-            const signature = Account.makeSigner(0)(hash, ledgerAddreses[derivationPath].privateKey)
-            const [v, r, s] = Account.decodeSignature(signature)
-            return { v: Number(v) + 27, r, s }
-          }
-          throw new Error('Invalid Path')
-        },
-      }
+    mockForceValidation = jest.fn((): void => {
+      // do nothing
     })
+    mockLedger(wallet, mockForceValidation)
   })
 
   describe('without initializing', () => {
@@ -229,6 +240,118 @@ describe('LedgerWallet class', () => {
 
           test.todo('returns a valid sign')
         })
+      })
+    })
+  })
+
+  describe('asking for addresses validations', () => {
+    describe('never', () => {
+      const knownAddress = ACCOUNT_ADDRESS1
+
+      beforeEach(() => {
+        wallet = new LedgerWallet(undefined, undefined, AddressValidation.never)
+        mockForceValidation = jest.fn((): void => {
+          // do nothing
+        })
+        mockLedger(wallet, mockForceValidation)
+      })
+
+      it("won't validate", async () => {
+        await wallet.init({})
+        expect(mockForceValidation.mock.calls.length).toBe(0)
+        await wallet.signPersonalMessage(knownAddress, ACCOUNT_ADDRESS_NEVER)
+        expect(mockForceValidation.mock.calls.length).toBe(0)
+      })
+    })
+
+    describe('only in the initialization', () => {
+      const knownAddress = ACCOUNT_ADDRESS1
+
+      beforeEach(() => {
+        wallet = new LedgerWallet(undefined, undefined, AddressValidation.initializationOnly)
+        mockForceValidation = jest.fn((): void => {
+          // do nothing
+        })
+        mockLedger(wallet, mockForceValidation)
+      })
+
+      it('will validate the addresses only in the initialization', async () => {
+        await wallet.init({})
+        expect(mockForceValidation.mock.calls.length).toBe(5)
+        await wallet.signPersonalMessage(knownAddress, ACCOUNT_ADDRESS_NEVER)
+        expect(mockForceValidation.mock.calls.length).toBe(5)
+      })
+    })
+
+    describe('every transaction', () => {
+      const knownAddress = ACCOUNT_ADDRESS1
+
+      beforeEach(() => {
+        wallet = new LedgerWallet(undefined, undefined, AddressValidation.everyTransaction)
+        mockForceValidation = jest.fn((): void => {
+          // do nothing
+        })
+        mockLedger(wallet, mockForceValidation)
+      })
+
+      it('will validate every transaction', async () => {
+        await wallet.init({})
+        expect(mockForceValidation.mock.calls.length).toBe(0)
+        await wallet.signPersonalMessage(knownAddress, ACCOUNT_ADDRESS_NEVER)
+        expect(mockForceValidation.mock.calls.length).toBe(1)
+        await wallet.signPersonalMessage(knownAddress, ACCOUNT_ADDRESS_NEVER)
+        expect(mockForceValidation.mock.calls.length).toBe(2)
+      })
+    })
+
+    describe('once per address', () => {
+      const knownAddress = ACCOUNT_ADDRESS1
+      const otherAddress = ACCOUNT_ADDRESS2
+
+      beforeEach(() => {
+        wallet = new LedgerWallet(
+          undefined,
+          undefined,
+          AddressValidation.firstTransactionPerAddress
+        )
+        mockForceValidation = jest.fn((): void => {
+          // do nothing
+        })
+        mockLedger(wallet, mockForceValidation)
+      })
+
+      it('will validate only in the first transaction of the address', async () => {
+        await wallet.init({})
+        expect(mockForceValidation.mock.calls.length).toBe(0)
+        await wallet.signPersonalMessage(knownAddress, ACCOUNT_ADDRESS_NEVER)
+        expect(mockForceValidation.mock.calls.length).toBe(1)
+        await wallet.signPersonalMessage(knownAddress, ACCOUNT_ADDRESS_NEVER)
+        expect(mockForceValidation.mock.calls.length).toBe(1)
+        await wallet.signPersonalMessage(otherAddress, ACCOUNT_ADDRESS_NEVER)
+        expect(mockForceValidation.mock.calls.length).toBe(2)
+        await wallet.signPersonalMessage(otherAddress, ACCOUNT_ADDRESS_NEVER)
+        expect(mockForceValidation.mock.calls.length).toBe(2)
+      })
+    })
+
+    describe('by default (acts as firstTransactionPerAddress)', () => {
+      const knownAddress = ACCOUNT_ADDRESS1
+
+      beforeEach(() => {
+        wallet = new LedgerWallet()
+        mockForceValidation = jest.fn((): void => {
+          // do nothing
+        })
+        mockLedger(wallet, mockForceValidation)
+      })
+
+      it('will validate only in the first transaction of the address', async () => {
+        await wallet.init({})
+        expect(mockForceValidation.mock.calls.length).toBe(0)
+        await wallet.signPersonalMessage(knownAddress, ACCOUNT_ADDRESS_NEVER)
+        expect(mockForceValidation.mock.calls.length).toBe(1)
+        await wallet.signPersonalMessage(knownAddress, ACCOUNT_ADDRESS_NEVER)
+        expect(mockForceValidation.mock.calls.length).toBe(1)
       })
     })
   })

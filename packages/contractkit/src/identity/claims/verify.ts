@@ -2,7 +2,7 @@ import { eqAddress } from '@celo/utils/lib/address'
 import { isValidUrl } from '@celo/utils/lib/io'
 import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import { resolveTxt } from 'dns'
-import { Address } from '../../base'
+import { ContractKit } from '../..'
 import { IdentityMetadataWrapper } from '../metadata'
 import { AccountClaim } from './account'
 import { Claim, DOMAIN_TXT_HEADER, DomainClaim, serializeClaim } from './claim'
@@ -11,22 +11,17 @@ import { ClaimTypes } from './types'
 
 /**
  * Verifies a claim made by an account, i.e. whether a claim can be verified to be correct
+ * @param kit ContractKit object
  * @param claim The claim to verify
  * @param address The address that is making the claim
- * @param metadataURLGetter A function that can retrieve the metadata URL for a given account address,
- *                          should be Accounts.getMetadataURL()
  * @returns If valid, returns undefined. If invalid or unable to verify, returns a string with the error
  */
-export async function verifyClaim(
-  claim: Claim,
-  address: string,
-  metadataURLGetter: MetadataURLGetter
-) {
+export async function verifyClaim(kit: ContractKit, claim: Claim, address: string) {
   switch (claim.type) {
     case ClaimTypes.KEYBASE:
       return verifyKeybaseClaim(claim, address)
     case ClaimTypes.ACCOUNT:
-      return verifyAccountClaim(claim, address, metadataURLGetter)
+      return verifyAccountClaim(kit, claim, address)
     case ClaimTypes.DOMAIN:
       return verifyDomainRecord(claim, address)
     default:
@@ -35,18 +30,12 @@ export async function verifyClaim(
   return
 }
 
-/**
- * A function that can asynchronously fetch the metadata URL for an account address
- * Should virtually always be Accounts#getMetadataURL
- */
-export type MetadataURLGetter = (address: Address) => Promise<string>
-
 export const verifyAccountClaim = async (
+  kit: ContractKit,
   claim: AccountClaim,
-  address: string,
-  metadataURLGetter: MetadataURLGetter
+  address: string
 ) => {
-  const metadataURL = await metadataURLGetter(claim.address)
+  const metadataURL = await (await kit.contracts.getAccounts()).getMetadataURL(claim.address)
 
   console.info('metadataURL ' + JSON.stringify(metadataURL))
   if (!isValidUrl(metadataURL)) {
@@ -55,7 +44,7 @@ export const verifyAccountClaim = async (
 
   let metadata: IdentityMetadataWrapper
   try {
-    metadata = await IdentityMetadataWrapper.fetchFromURL(metadataURL)
+    metadata = await IdentityMetadataWrapper.fetchFromURL(kit, metadataURL)
   } catch (error) {
     return `Metadata could not be fetched for ${
       claim.address

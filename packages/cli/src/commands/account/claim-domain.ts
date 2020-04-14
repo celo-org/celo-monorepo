@@ -18,12 +18,11 @@ export default class ClaimDomain extends ClaimCommand {
   self = ClaimDomain
   async run() {
     const res = this.parse(ClaimDomain)
-    const metadata = this.readMetadata()
-    const newClaim = createDomainClaim(res.flags.domain)
+    const metadata = await this.readMetadata()
 
     // If the domain claim already exists we return the existing one allowing to generate always the same
     // signature for the same domain name
-    const addedClaim = await this.addClaim(metadata, newClaim)
+    const addedClaim = await this.addClaim(metadata, createDomainClaim(res.flags.domain))
     this.writeMetadata(metadata)
 
     const signature = await this.signer.sign(serializeClaim(addedClaim))
