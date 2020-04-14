@@ -29,7 +29,6 @@
 * [signTransaction](_wallets_ledger_wallet_.ledgerwallet.md#signtransaction)
 * [signTypedData](_wallets_ledger_wallet_.ledgerwallet.md#signtypeddata)
 * [compareLedgerAppVersions](_wallets_ledger_wallet_.ledgerwallet.md#static-compareledgerappversions)
-* [stringVersionToNumber](_wallets_ledger_wallet_.ledgerwallet.md#static-stringversiontonumber)
 
 ## Constructors
 
@@ -196,19 +195,3 @@ Name | Type |
 -1: version1 < version2,
  0: version1 == version2,
  1: version1 > version2
-
-___
-
-### `Static` stringVersionToNumber
-
-▸ **stringVersionToNumber**(`version`: string): *number*
-
-*Defined in [contractkit/src/wallets/ledger-wallet.ts:347](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/ledger-wallet.ts#L347)*
-
-**Parameters:**
-
-Name | Type |
------- | ------ |
-`version` | string |
-
-**Returns:** *number*

@@ -123,8 +123,8 @@ export class LedgerWallet implements Wallet {
   private async retrieveAppConfiguration() {
     this.appConfiguration = await this.ledger!.getAppConfiguration()
     if (!this.appConfiguration.arbitraryDataEnabled) {
-      console.log(
-        'Beware, your ledger does not allow the contract data. Some features may not work correctly'
+      console.warn(
+        'Beware, your ledger does not allow the use of contract data. Some features may not work correctly'
       )
     }
   }
@@ -344,7 +344,7 @@ export class LedgerWallet implements Wallet {
     return numberV1 < numberV2 ? -1 : numberV1 === numberV2 ? 0 : 1
   }
 
-  static stringVersionToNumber(version: string): number {
+  private static stringVersionToNumber(version: string): number {
     const parts = version.split('.')
     return parts.reduce((accum, part) => (accum + Number(part)) * 1000, 0)
   }
