@@ -145,10 +145,10 @@ release: {{ .Release.Name }}
       fieldRef:
         fieldPath: metadata.name
   ports:
-  - name: discovery-udp
+  - name: discovery
     containerPort: 30303
     protocol: UDP
-  - name: discovery-tcp
+  - name: ethereum
     containerPort: 30303
 {{- if .expose }}
   - name: rpc

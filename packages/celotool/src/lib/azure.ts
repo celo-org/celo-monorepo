@@ -64,3 +64,18 @@ export async function getAKSNodeResourceGroup() {
   )
   return nodeResourceGroup.trim()
 }
+
+export async function registerStaticIP(name: string, resourceGroup: string) {
+  console.info(`Registering IP address ${name} on ${resourceGroup}`)
+  const [address] = await execCmdWithExitOnFailure(
+    `az network public-ip create --resource-group ${resourceGroup} --name ${name} --allocation-method Static --sku Standard --query publicIp.ipAddress -o tsv`
+  )
+  return address.trim()
+}
+
+export async function deallocateStaticIP(name: string, resourceGroup: string) {
+  console.info(`Deallocating IP address ${name} on ${resourceGroup}`)
+  return execCmdWithExitOnFailure(
+    `az network public-ip delete --resource-group ${resourceGroup} --name ${name}`
+  )
+}

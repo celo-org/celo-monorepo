@@ -14,9 +14,8 @@ spec:
 {{- end }}
   ports:
     - port: 30303
-      targetPort: discovery-tcp
-      protocol: TCP
-      name: discovery-tcp
+      targetPort: ethereum
+      name: ethereum
     - port: 8545
       targetPort: rpc
       protocol: TCP
