@@ -84,7 +84,6 @@ describe(`POST /getSalt endpoint`, () => {
       getSalt(req, res)
     })
   })
-  mockBlsSalt.mockReturnValue(BLS_SALT)
   describe('with invalid input', () => {
     it('invalid phone number returns 400', () => {
       const queryPhoneNumber = '+5555555555'
@@ -136,7 +135,8 @@ describe(`POST /getSalt endpoint`, () => {
 describe(`POST /getContactMatches endpoint`, () => {
   describe('with valid input', () => {
     const userPhoneNumber = '5555555555'
-    const contactPhoneNumbers = ['1234567890']
+    const contactPhoneNumber1 = '1234567890'
+    const contactPhoneNumbers = [contactPhoneNumber1]
 
     const mockRequestData = {
       userPhoneNumber,
@@ -145,16 +145,18 @@ describe(`POST /getContactMatches endpoint`, () => {
     const req = { body: mockRequestData }
     it('provides matches', () => {
       mockGetNumberPairContacts.mockReturnValue(contactPhoneNumbers)
+      mockBlsSalt.mockReturnValue(BLS_SALT)
+      const expected = [{ phoneNumber: contactPhoneNumber1, salt: BLS_SALT }]
       const res = {
         json(body: any) {
           expect(body.success).toEqual(true)
-          expect(body.matchedContacts).toEqual(contactPhoneNumbers)
+          expect(body.matchedContacts).toEqual(expected)
         },
       }
       // @ts-ignore TODO fix req type to make it a mock express req
       getContactMatches(req, res)
     })
-    it('provides matches', () => {
+    it('provides matches empty array', () => {
       mockGetNumberPairContacts.mockReturnValue([])
       const res = {
         json(body: any) {

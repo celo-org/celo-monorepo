@@ -66,10 +66,9 @@ export const getContactMatches = functions.https.onRequest(async (request, respo
       return
     }
     authenticateUser()
-    const matchedContacts = await getNumberPairContacts(
-      request.body.userPhoneNumber,
-      request.body.contactPhoneNumbers
-    )
+    const matchedContacts: ContactMatch[] = (
+      await getNumberPairContacts(request.body.userPhoneNumber, request.body.contactPhoneNumbers)
+    ).map((numberPair) => ({ phoneNumber: numberPair, salt: computeBLSSalt(numberPair) }))
     await setNumberPairContacts(request.body.userPhoneNumber, request.body.contactPhoneNumbers)
     // TODO (amyslawson) return salts with contact
     response.json({ success: true, matchedContacts })
@@ -78,6 +77,11 @@ export const getContactMatches = functions.https.onRequest(async (request, respo
     response.status(500).send(e)
   }
 })
+
+interface ContactMatch {
+  phoneNumber: string
+  salt: Buffer
+}
 
 function isValidGetContactMatchesInput(requestBody: any): boolean {
   return hasValidUserPhoneNumberParam(requestBody) && hasValidContractPhoneNumbersParam(requestBody)
