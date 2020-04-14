@@ -20,8 +20,8 @@ const initializeArgs = async (): Promise<[
   number,
   string[],
   string[],
-  number,
-  number
+  string,
+  string
 ]> => {
   const registry: RegistryInstance = await getDeployedProxiedContract<RegistryInstance>(
     'Registry',
