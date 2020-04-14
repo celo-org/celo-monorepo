@@ -25,7 +25,7 @@
 
 \+ **new ProposalBuilder**(`kit`: [ContractKit](_kit_.contractkit.md), `builders`: Array‹function›): *[ProposalBuilder](_governance_proposals_.proposalbuilder.md)*
 
-*Defined in [src/governance/proposals.ts:51](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proposals.ts#L51)*
+*Defined in [contractkit/src/governance/proposals.ts:51](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proposals.ts#L51)*
 
 **Parameters:**
 
@@ -42,7 +42,7 @@ Name | Type | Default |
 
 ▸ **addJsonTx**(`tx`: [ProposalTransactionJSON](../interfaces/_governance_proposals_.proposaltransactionjson.md)): *number*
 
-*Defined in [src/governance/proposals.ts:85](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proposals.ts#L85)*
+*Defined in [contractkit/src/governance/proposals.ts:85](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proposals.ts#L85)*
 
 **Parameters:**
 
@@ -58,7 +58,7 @@ ___
 
 ▸ **addProxyRepointingTx**(`proxyAddress`: string, `newImplementationAddress`: string): *void*
 
-*Defined in [src/governance/proposals.ts:65](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proposals.ts#L65)*
+*Defined in [contractkit/src/governance/proposals.ts:65](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proposals.ts#L65)*
 
 **Parameters:**
 
@@ -75,7 +75,7 @@ ___
 
 ▸ **addTx**(`tx`: [CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹any›, `params`: Partial‹ProposalTxParams›): *void*
 
-*Defined in [src/governance/proposals.ts:75](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proposals.ts#L75)*
+*Defined in [contractkit/src/governance/proposals.ts:75](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proposals.ts#L75)*
 
 **Parameters:**
 
@@ -92,7 +92,7 @@ ___
 
 ▸ **addWeb3Tx**(`tx`: TransactionObject‹any›, `params`: ProposalTxParams): *number*
 
-*Defined in [src/governance/proposals.ts:72](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proposals.ts#L72)*
+*Defined in [contractkit/src/governance/proposals.ts:72](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proposals.ts#L72)*
 
 **Parameters:**
 
@@ -109,7 +109,7 @@ ___
 
 ▸ **build**(): *Promise‹object[]›*
 
-*Defined in [src/governance/proposals.ts:57](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proposals.ts#L57)*
+*Defined in [contractkit/src/governance/proposals.ts:57](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proposals.ts#L57)*
 
 **Returns:** *Promise‹object[]›*
 
@@ -119,7 +119,7 @@ ___
 
 ▸ **fromWeb3tx**(`tx`: TransactionObject‹any›, `params`: ProposalTxParams): *[ProposalTransaction](../modules/_wrappers_governance_.md#proposaltransaction)*
 
-*Defined in [src/governance/proposals.ts:59](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proposals.ts#L59)*
+*Defined in [contractkit/src/governance/proposals.ts:59](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proposals.ts#L59)*
 
 **Parameters:**
 

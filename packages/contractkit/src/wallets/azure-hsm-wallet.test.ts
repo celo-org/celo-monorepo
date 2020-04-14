@@ -27,6 +27,8 @@ const PRIVATE_KEY1 = '0x1234567890abcdef1234567890abcdef1234567890abcdef12345678
 const ACCOUNT_ADDRESS1 = normalizeAddressWith0x(privateKeyToAddress(PRIVATE_KEY1))
 const PRIVATE_KEY2 = '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890fdeccc'
 const ACCOUNT_ADDRESS2 = normalizeAddressWith0x(privateKeyToAddress(PRIVATE_KEY2))
+const PRIVATE_KEY_NEVER = '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890ffffff'
+const ACCOUNT_ADDRESS_NEVER = normalizeAddressWith0x(privateKeyToAddress(PRIVATE_KEY_NEVER))
 const CHAIN_ID = 44378
 
 const keyVaultAddresses: Map<string, { address: string; privateKey: string }> = new Map([
@@ -124,6 +126,8 @@ describe('AzureHSMWallet class', () => {
                 const trimmedKey = trimLeading0x(keyVaultAddresses.get(keyName)!.privateKey)
                 const pkBuffer = Buffer.from(trimmedKey, 'hex')
                 const signature = ethUtil.ecsign(message, pkBuffer)
+                // Azure HSM doesn't add the byte prefix (+27) while ecsign does
+                // Subtract 27 to properly mock the HSM signer
                 return new Signature(signature.v - 27, signature.r, signature.s)
               }
               throw new Error(`Unable to locate key: ${keyName}`)
@@ -137,27 +141,25 @@ describe('AzureHSMWallet class', () => {
     const knownAddress = ACCOUNT_ADDRESS1
     let celoTransaction: Tx
     beforeEach(() => {
-      return new Promise(async (resolve) => {
-        celoTransaction = {
-          from: knownAddress,
-          to: knownAddress,
-          chainId: CHAIN_ID,
-          value: Web3.utils.toWei('1', 'ether'),
-          nonce: 0,
-          gas: '10',
-          gasPrice: '99',
-          feeCurrency: '0x124356',
-          gatewayFeeRecipient: '0x1234',
-          gatewayFee: '0x5678',
-          data: '0xabcdef',
-        }
-        resolve()
-      })
+      celoTransaction = {
+        from: knownAddress,
+        to: knownAddress,
+        chainId: CHAIN_ID,
+        value: Web3.utils.toWei('1', 'ether'),
+        nonce: 0,
+        gas: '10',
+        gasPrice: '99',
+        feeCurrency: '0x124356',
+        gatewayFeeRecipient: '0x1234',
+        gatewayFee: '0x5678',
+        data: '0xabcdef',
+      }
     })
 
     test('fails calling getAccounts', () => {
       try {
         wallet.getAccounts()
+        throw new Error('Expected exception to be thrown')
       } catch (e) {
         expect(e.message).toBe('wallet needs to be initialized first')
       }
@@ -166,6 +168,7 @@ describe('AzureHSMWallet class', () => {
     test('fails calling hasAccount', () => {
       try {
         wallet.hasAccount(ACCOUNT_ADDRESS1)
+        throw new Error('Expected exception to be thrown')
       } catch (e) {
         expect(e.message).toBe('wallet needs to be initialized first')
       }
@@ -188,12 +191,12 @@ describe('AzureHSMWallet class', () => {
     beforeEach(async () => {
       await wallet.init()
     })
-    test('hasKey should return false for keys that are not present', async () => {
+    test('hasAccount should return false for keys that are not present', async () => {
       // Invalid key should not be present
       expect(await wallet.hasAccount('this is not a valid private key')).toBeFalsy()
     })
 
-    test('hasKey should return true for keys that are present', async () => {
+    test('hasAccount should return true for keys that are present', async () => {
       // Valid key should be present
       const address = await wallet.getAddressFromKeyName(AZURE_KEY_NAME!)
       expect(await wallet.hasAccount(address)).toBeTruthy()
@@ -204,30 +207,27 @@ describe('AzureHSMWallet class', () => {
         describe('using an unknown key', () => {
           let celoTransaction: Tx
           const unknownKey: string = 'invalidKey'
-          const unknownAddress: Address = ACCOUNT_ADDRESS1
+          const unknownAddress = ACCOUNT_ADDRESS_NEVER
 
           beforeEach(() => {
-            return new Promise(async (resolve) => {
-              celoTransaction = {
-                from: unknownAddress,
-                to: unknownAddress,
-                chainId: CHAIN_ID,
-                value: Web3.utils.toWei('1', 'ether'),
-                nonce: 0,
-                gas: '10',
-                gasPrice: '99',
-                feeCurrency: '0x124356',
-                gatewayFeeRecipient: '0x1234',
-                gatewayFee: '0x5678',
-                data: '0xabcdef',
-              }
-              resolve()
-            })
+            celoTransaction = {
+              from: unknownAddress,
+              chainId: CHAIN_ID,
+              value: Web3.utils.toWei('1', 'ether'),
+              nonce: 0,
+              gas: '10',
+              gasPrice: '99',
+              feeCurrency: '0x124356',
+              gatewayFeeRecipient: '0x1234',
+              gatewayFee: '0x5678',
+              data: '0xabcdef',
+            }
           })
 
           test('fails getting address from key', async () => {
             try {
               await wallet.getAddressFromKeyName(unknownKey)
+              throw new Error('Expected exception to be thrown')
             } catch (e) {
               expect(e.message).toBe(`Key ${unknownKey} not found in KeyVault ${AZURE_VAULT_NAME}`)
             }
@@ -236,6 +236,7 @@ describe('AzureHSMWallet class', () => {
           test('fails calling signTransaction', async () => {
             try {
               await wallet.signTransaction(celoTransaction)
+              throw new Error('Expected exception to be thrown')
             } catch (e) {
               expect(e.message).toBe(`Could not find address ${unknownAddress}`)
             }
@@ -245,6 +246,7 @@ describe('AzureHSMWallet class', () => {
             const hexStr: string = '0xa1'
             try {
               await wallet.signPersonalMessage(unknownAddress, hexStr)
+              throw new Error('Expected exception to be thrown')
             } catch (e) {
               expect(e.message).toBe(`Could not find address ${unknownAddress}`)
             }
@@ -253,6 +255,7 @@ describe('AzureHSMWallet class', () => {
           test('fails calling signTypedData', async () => {
             try {
               await wallet.signTypedData(unknownAddress, TYPED_DATA)
+              throw new Error('Expected exception to be thrown')
             } catch (e) {
               expect(e.message).toBe(`Could not find address ${unknownAddress}`)
             }
@@ -265,24 +268,21 @@ describe('AzureHSMWallet class', () => {
           let knownAddress: Address
           const otherAddress: string = ACCOUNT_ADDRESS1
 
-          beforeEach(() => {
-            return new Promise(async (resolve) => {
-              knownAddress = await wallet.getAddressFromKeyName(knownKey)
-              celoTransaction = {
-                from: knownAddress,
-                to: otherAddress,
-                chainId: CHAIN_ID,
-                value: Web3.utils.toWei('1', 'ether'),
-                nonce: 0,
-                gas: '10',
-                gasPrice: '99',
-                feeCurrency: '0x124356',
-                gatewayFeeRecipient: '0x1234',
-                gatewayFee: '0x5678',
-                data: '0xabcdef',
-              }
-              resolve()
-            })
+          beforeEach(async () => {
+            knownAddress = await wallet.getAddressFromKeyName(knownKey)
+            celoTransaction = {
+              from: knownAddress,
+              to: otherAddress,
+              chainId: CHAIN_ID,
+              value: Web3.utils.toWei('1', 'ether'),
+              nonce: 0,
+              gas: '10',
+              gasPrice: '99',
+              feeCurrency: '0x124356',
+              gatewayFeeRecipient: '0x1234',
+              gatewayFee: '0x5678',
+              data: '0xabcdef',
+            }
           })
 
           describe('when calling signTransaction', () => {

@@ -9,7 +9,7 @@ export interface Signer {
   signTransaction: (
     addToV: number,
     encodedTx: RLPEncodedTx
-  ) => Promise<{ v: string; r: string; s: string }>
+  ) => Promise<{ v: number; r: Buffer; s: Buffer }>
   signPersonalMessage: (data: string) => Promise<{ v: number; r: Buffer; s: Buffer }>
   getNativeKey: () => string
 }

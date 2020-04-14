@@ -35,7 +35,7 @@ export abstract class WalletBase implements Wallet {
    * Returns true if account has been registered
    * @param address Account to check
    */
-  hasAccount(address?: Address) {
+  hasAccount(address?: Address): boolean {
     if (address) {
       const normalizedAddress = normalizeAddressWith0x(address)
       return this.accountSigners.has(normalizedAddress)
@@ -70,7 +70,11 @@ export abstract class WalletBase implements Wallet {
     const signer = this.getSigner(fromAddress)
     const signature = await signer!.signTransaction(addToV, rlpEncoded)
 
-    const formattedSignature = signatureFormatter(signature)
+    const formattedSignature = signatureFormatter({
+      v: signature.v.toString(16),
+      r: signature.r.toString('hex'),
+      s: signature.s.toString('hex'),
+    })
     return encodeTransaction(rlpEncoded, formattedSignature)
   }
 

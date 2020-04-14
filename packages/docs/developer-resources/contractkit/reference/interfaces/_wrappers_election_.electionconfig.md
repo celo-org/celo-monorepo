@@ -18,7 +18,7 @@
 
 • **electabilityThreshold**: *BigNumber*
 
-*Defined in [src/wrappers/Election.ts:61](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L61)*
+*Defined in [contractkit/src/wrappers/Election.ts:61](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L61)*
 
 ___
 
@@ -26,7 +26,7 @@ ___
 
 • **electableValidators**: *[ElectableValidators](_wrappers_election_.electablevalidators.md)*
 
-*Defined in [src/wrappers/Election.ts:60](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L60)*
+*Defined in [contractkit/src/wrappers/Election.ts:60](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L60)*
 
 ___
 
@@ -34,4 +34,4 @@ ___
 
 • **maxNumGroupsVotedFor**: *BigNumber*
 
-*Defined in [src/wrappers/Election.ts:62](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L62)*
+*Defined in [contractkit/src/wrappers/Election.ts:62](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L62)*

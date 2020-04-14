@@ -154,7 +154,7 @@ describe('LedgerWallet class', () => {
   const unknownAddress = ACCOUNT_ADDRESS_NEVER
   let mockForceValidation: any
 
-  beforeEach(async (resolve) => {
+  beforeEach(async () => {
     jest.setTimeout(TEST_TIMEOUT_IN_MS)
 
     if (USE_PHYSICAL_LEDGER) {
@@ -176,34 +176,30 @@ describe('LedgerWallet class', () => {
       // do nothing
     })
     mockLedger(wallet, mockForceValidation)
-
-    resolve()
   })
 
   describe('without initializing', () => {
     let celoTransaction: Tx
     beforeAll(() => {
-      return new Promise(async (resolve) => {
-        celoTransaction = {
-          from: knownAddress,
-          to: knownAddress,
-          chainId: CHAIN_ID,
-          value: Web3.utils.toWei('1', 'ether'),
-          nonce: 0,
-          gas: '10',
-          gasPrice: '99',
-          feeCurrency: '0x',
-          gatewayFeeRecipient: '0x1234',
-          gatewayFee: '0x5678',
-          data: '0xabcdef',
-        }
-        resolve()
-      })
+      celoTransaction = {
+        from: knownAddress,
+        to: knownAddress,
+        chainId: CHAIN_ID,
+        value: Web3.utils.toWei('1', 'ether'),
+        nonce: 0,
+        gas: '10',
+        gasPrice: '99',
+        feeCurrency: '0x',
+        gatewayFeeRecipient: '0x1234',
+        gatewayFee: '0x5678',
+        data: '0xabcdef',
+      }
     })
 
     test('fails calling getAccounts', () => {
       try {
         wallet.getAccounts()
+        throw new Error('Expected exception to be thrown')
       } catch (e) {
         expect(e.message).toBe('wallet needs to be initialized first')
       }
@@ -212,6 +208,7 @@ describe('LedgerWallet class', () => {
     test('fails calling hasAccount', () => {
       try {
         wallet.hasAccount(ACCOUNT_ADDRESS1)
+        throw new Error('Expected exception to be thrown')
       } catch (e) {
         expect(e.message).toBe('wallet needs to be initialized first')
       }
@@ -231,7 +228,7 @@ describe('LedgerWallet class', () => {
   })
 
   describe('after initializing', () => {
-    beforeEach(async (resolve) => {
+    beforeEach(async () => {
       if (USE_PHYSICAL_LEDGER) {
         wallet = hardwareWallet
       }
@@ -240,7 +237,6 @@ describe('LedgerWallet class', () => {
         knownAddress = wallet.getAccounts()[0]
         otherAddress = wallet.getAccounts()[1]
       }
-      resolve()
     }, TEST_TIMEOUT_IN_MS)
 
     test('starts 5 accounts', () => {
@@ -258,22 +254,19 @@ describe('LedgerWallet class', () => {
     describe('with an account', () => {
       let celoTransaction: Tx
       beforeEach(() => {
-        return new Promise(async (resolve) => {
-          celoTransaction = {
-            from: unknownAddress,
-            to: unknownAddress,
-            chainId: CHAIN_ID,
-            value: Web3.utils.toWei('1', 'ether'),
-            nonce: 0,
-            gas: '10',
-            gasPrice: '99',
-            feeCurrency: '0x',
-            gatewayFeeRecipient: '0x1234',
-            gatewayFee: '0x5678',
-            data: '0xabcdef',
-          }
-          resolve()
-        })
+        celoTransaction = {
+          from: unknownAddress,
+          to: unknownAddress,
+          chainId: CHAIN_ID,
+          value: Web3.utils.toWei('1', 'ether'),
+          nonce: 0,
+          gas: '10',
+          gasPrice: '99',
+          feeCurrency: '0x',
+          gatewayFeeRecipient: '0x1234',
+          gatewayFee: '0x5678',
+          data: '0xabcdef',
+        }
       })
 
       describe('signing', () => {

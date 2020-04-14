@@ -64,6 +64,7 @@ describe('Local wallet class', () => {
   test('fails if you add an invalid private key', () => {
     try {
       wallet.addAccount('this is not a valid private key')
+      throw new Error('Expected exception to be thrown')
     } catch (e) {
       expect(e.message).toBe('private key length is invalid')
     }
@@ -97,22 +98,19 @@ describe('Local wallet class', () => {
         const unknownAddress: string = ACCOUNT_ADDRESS2
 
         beforeEach(() => {
-          return new Promise(async (resolve) => {
-            celoTransaction = {
-              from: unknownAddress,
-              to: unknownAddress,
-              chainId: 2,
-              value: Web3.utils.toWei('1', 'ether'),
-              nonce: 0,
-              gas: '10',
-              gasPrice: '99',
-              feeCurrency: '0x124356',
-              gatewayFeeRecipient: '0x1234',
-              gatewayFee: '0x5678',
-              data: '0xabcdef',
-            }
-            resolve()
-          })
+          celoTransaction = {
+            from: unknownAddress,
+            to: unknownAddress,
+            chainId: 2,
+            value: Web3.utils.toWei('1', 'ether'),
+            nonce: 0,
+            gas: '10',
+            gasPrice: '99',
+            feeCurrency: '0x124356',
+            gatewayFeeRecipient: '0x1234',
+            gatewayFee: '0x5678',
+            data: '0xabcdef',
+          }
         })
 
         test('fails calling signTransaction', async () => {

@@ -28,7 +28,7 @@ Signs the EVM transaction using the provided private key
 
 \+ **new LocalSigner**(`privateKey`: string): *[LocalSigner](_wallets_signers_local_signer_.localsigner.md)*
 
-*Defined in [src/wallets/signers/local-signer.ts:12](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/local-signer.ts#L12)*
+*Defined in [contractkit/src/wallets/signers/local-signer.ts:12](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/local-signer.ts#L12)*
 
 **Parameters:**
 
@@ -44,7 +44,7 @@ Name | Type |
 
 ▸ **getNativeKey**(): *string*
 
-*Defined in [src/wallets/signers/local-signer.ts:18](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/local-signer.ts#L18)*
+*Defined in [contractkit/src/wallets/signers/local-signer.ts:18](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/local-signer.ts#L18)*
 
 **Returns:** *string*
 
@@ -54,7 +54,7 @@ ___
 
 ▸ **signPersonalMessage**(`data`: string): *Promise‹object›*
 
-*Defined in [src/wallets/signers/local-signer.ts:32](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/local-signer.ts#L32)*
+*Defined in [contractkit/src/wallets/signers/local-signer.ts:36](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/local-signer.ts#L36)*
 
 **Parameters:**
 
@@ -70,7 +70,7 @@ ___
 
 ▸ **signTransaction**(`addToV`: number, `encodedTx`: [RLPEncodedTx](../interfaces/_utils_signing_utils_.rlpencodedtx.md)): *Promise‹object›*
 
-*Defined in [src/wallets/signers/local-signer.ts:22](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/local-signer.ts#L22)*
+*Defined in [contractkit/src/wallets/signers/local-signer.ts:22](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/local-signer.ts#L22)*
 
 **Parameters:**
 

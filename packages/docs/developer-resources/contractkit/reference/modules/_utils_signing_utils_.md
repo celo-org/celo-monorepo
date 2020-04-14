@@ -23,7 +23,7 @@
 
 ▸ **chainIdTransformationForSigning**(`chainId`: number): *number*
 
-*Defined in [src/utils/signing-utils.ts:41](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/signing-utils.ts#L41)*
+*Defined in [contractkit/src/utils/signing-utils.ts:41](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/signing-utils.ts#L41)*
 
 **Parameters:**
 
@@ -39,7 +39,7 @@ ___
 
 ▸ **encodeTransaction**(`rlpEncoded`: [RLPEncodedTx](../interfaces/_utils_signing_utils_.rlpencodedtx.md), `signature`: object): *Promise‹EncodedTransaction›*
 
-*Defined in [src/utils/signing-utils.ts:120](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/signing-utils.ts#L120)*
+*Defined in [contractkit/src/utils/signing-utils.ts:120](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/signing-utils.ts#L120)*
 
 **Parameters:**
 
@@ -61,7 +61,7 @@ ___
 
 ▸ **getHashFromEncoded**(`rlpEncode`: string): *string*
 
-*Defined in [src/utils/signing-utils.ts:45](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/signing-utils.ts#L45)*
+*Defined in [contractkit/src/utils/signing-utils.ts:45](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/signing-utils.ts#L45)*
 
 **Parameters:**
 
@@ -77,7 +77,7 @@ ___
 
 ▸ **recoverMessageSigner**(`signingDataHex`: string, `signedData`: string): *string*
 
-*Defined in [src/utils/signing-utils.ts:181](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/signing-utils.ts#L181)*
+*Defined in [contractkit/src/utils/signing-utils.ts:181](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/signing-utils.ts#L181)*
 
 **Parameters:**
 
@@ -94,7 +94,7 @@ ___
 
 ▸ **recoverTransaction**(`rawTx`: string): *[Tx, string]*
 
-*Defined in [src/utils/signing-utils.ts:155](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/signing-utils.ts#L155)*
+*Defined in [contractkit/src/utils/signing-utils.ts:155](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/signing-utils.ts#L155)*
 
 **Parameters:**
 
@@ -110,7 +110,7 @@ ___
 
 ▸ **rlpEncodedTx**(`tx`: Tx): *[RLPEncodedTx](../interfaces/_utils_signing_utils_.rlpencodedtx.md)*
 
-*Defined in [src/utils/signing-utils.ts:57](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/signing-utils.ts#L57)*
+*Defined in [contractkit/src/utils/signing-utils.ts:57](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/signing-utils.ts#L57)*
 
 **Parameters:**
 
@@ -126,7 +126,7 @@ ___
 
 ▸ **signatureFormatter**(`signature`: object): *object*
 
-*Defined in [src/utils/signing-utils.ts:108](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/signing-utils.ts#L108)*
+*Defined in [contractkit/src/utils/signing-utils.ts:108](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/signing-utils.ts#L108)*
 
 **Parameters:**
 
@@ -152,7 +152,7 @@ ___
 
 ▸ **verifyEIP712TypedDataSigner**(`typedData`: [EIP712TypedData](../interfaces/_utils_sign_typed_data_utils_.eip712typeddata.md), `signedData`: string, `expectedAddress`: string): *boolean*
 
-*Defined in [src/utils/signing-utils.ts:191](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/signing-utils.ts#L191)*
+*Defined in [contractkit/src/utils/signing-utils.ts:191](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/signing-utils.ts#L191)*
 
 **Parameters:**
 

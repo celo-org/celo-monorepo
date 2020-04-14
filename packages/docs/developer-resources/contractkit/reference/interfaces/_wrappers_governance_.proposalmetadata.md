@@ -20,7 +20,7 @@
 
 • **deposit**: *BigNumber*
 
-*Defined in [src/wrappers/Governance.ts:56](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L56)*
+*Defined in [contractkit/src/wrappers/Governance.ts:56](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L56)*
 
 ___
 
@@ -28,7 +28,7 @@ ___
 
 • **descriptionURL**: *string*
 
-*Defined in [src/wrappers/Governance.ts:59](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L59)*
+*Defined in [contractkit/src/wrappers/Governance.ts:59](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L59)*
 
 ___
 
@@ -36,7 +36,7 @@ ___
 
 • **proposer**: *[Address](../modules/_base_.md#address)*
 
-*Defined in [src/wrappers/Governance.ts:55](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L55)*
+*Defined in [contractkit/src/wrappers/Governance.ts:55](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L55)*
 
 ___
 
@@ -44,7 +44,7 @@ ___
 
 • **timestamp**: *BigNumber*
 
-*Defined in [src/wrappers/Governance.ts:57](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L57)*
+*Defined in [contractkit/src/wrappers/Governance.ts:57](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L57)*
 
 ___
 
@@ -52,4 +52,4 @@ ___
 
 • **transactionCount**: *number*
 
-*Defined in [src/wrappers/Governance.ts:58](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L58)*
+*Defined in [contractkit/src/wrappers/Governance.ts:58](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L58)*

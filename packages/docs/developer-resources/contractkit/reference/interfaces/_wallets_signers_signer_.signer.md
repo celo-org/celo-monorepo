@@ -24,7 +24,7 @@
 
 • **getNativeKey**: *function*
 
-*Defined in [src/wallets/signers/signer.ts:14](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/signer.ts#L14)*
+*Defined in [contractkit/src/wallets/signers/signer.ts:14](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/signer.ts#L14)*
 
 #### Type declaration:
 
@@ -36,7 +36,7 @@ ___
 
 • **signPersonalMessage**: *function*
 
-*Defined in [src/wallets/signers/signer.ts:13](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/signer.ts#L13)*
+*Defined in [contractkit/src/wallets/signers/signer.ts:13](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/signer.ts#L13)*
 
 #### Type declaration:
 
@@ -54,7 +54,7 @@ ___
 
 • **signTransaction**: *function*
 
-*Defined in [src/wallets/signers/signer.ts:9](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/signer.ts#L9)*
+*Defined in [contractkit/src/wallets/signers/signer.ts:9](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/signer.ts#L9)*
 
 Signs the message and returns an EVM transaction
 

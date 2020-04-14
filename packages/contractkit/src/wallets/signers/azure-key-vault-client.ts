@@ -20,6 +20,7 @@ export class AzureKeyVaultClient {
   // 0x04 prefix indicates that the key is not compressed
   // https://tools.ietf.org/html/rfc5480#section-2.2
   private readonly publicKeyPrefix: number = 0x04
+  private readonly secp256k1Curve = new EC('secp256k1')
 
   constructor(vaultName: string) {
     this.vaultName = vaultName
@@ -78,16 +79,15 @@ export class AzureKeyVaultClient {
     const rawSignature = signResult.result
 
     // Canonicalize signature
-    const secp256k1Curve = new EC('secp256k1')
     const R = AzureKeyVaultClient.bufferToBigNumber(Buffer.from(rawSignature.slice(0, 32)))
     let S = AzureKeyVaultClient.bufferToBigNumber(Buffer.from(rawSignature.slice(32, 64)))
 
     // The Azure Signature MAY not be canonical, which is illegal in Ethereum
     // thus it must be transposed to the lower intersection.
     // https://github.com/bitcoin/bips/blob/master/bip-0062.mediawiki#Low_S_values_in_signatures
-    const N = AzureKeyVaultClient.bufferToBigNumber(secp256k1Curve.curve.n)
+    const N = AzureKeyVaultClient.bufferToBigNumber(this.secp256k1Curve.curve.n)
     if (!AzureKeyVaultClient.isCanonical(S, N)) {
-      S = secp256k1Curve.curve.n.sub(S)
+      S = this.secp256k1Curve.curve.n.sub(S)
     }
 
     const rBuff = AzureKeyVaultClient.bigNumberToBuffer(R)

@@ -19,15 +19,16 @@ export class AzureHSMSigner implements Signer {
   async signTransaction(
     addToV: number,
     encodedTx: RLPEncodedTx
-  ): Promise<{ v: string; r: string; s: string }> {
+  ): Promise<{ v: number; r: Buffer; s: Buffer }> {
     const hash = getHashFromEncoded(encodedTx.rlpEncode)
     const bufferedMessage = Buffer.from(trimLeading0x(hash), 'hex')
     const signature = await this.keyVaultClient.signMessage(bufferedMessage, this.keyName)
-    const sigVT = addToV + signature.v
+    const sigV = addToV + signature.v
+
     return {
-      v: sigVT.toString(16),
-      r: signature.r.toString('hex'),
-      s: signature.s.toString('hex'),
+      v: sigV,
+      r: signature.r,
+      s: signature.s,
     }
   }
 
@@ -35,6 +36,8 @@ export class AzureHSMSigner implements Signer {
     const dataBuff = ethUtil.toBuffer(ensureLeading0x(data))
     const msgHashBuff = ethUtil.hashPersonalMessage(dataBuff)
     const signature = await this.keyVaultClient.signMessage(Buffer.from(msgHashBuff), this.keyName)
+    // Recovery ID should be a byte prefix
+    // https://bitcoin.stackexchange.com/questions/38351/ecdsa-v-r-s-what-is-v
     const sigV = signature.v + 27
 
     return {

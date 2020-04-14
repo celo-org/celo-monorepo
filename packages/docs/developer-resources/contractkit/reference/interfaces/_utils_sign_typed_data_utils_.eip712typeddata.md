@@ -19,7 +19,7 @@
 
 • **domain**: *[EIP712Object](_utils_sign_typed_data_utils_.eip712object.md)*
 
-*Defined in [src/utils/sign-typed-data-utils.ts:22](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/sign-typed-data-utils.ts#L22)*
+*Defined in [contractkit/src/utils/sign-typed-data-utils.ts:22](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/sign-typed-data-utils.ts#L22)*
 
 ___
 
@@ -27,7 +27,7 @@ ___
 
 • **message**: *[EIP712Object](_utils_sign_typed_data_utils_.eip712object.md)*
 
-*Defined in [src/utils/sign-typed-data-utils.ts:23](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/sign-typed-data-utils.ts#L23)*
+*Defined in [contractkit/src/utils/sign-typed-data-utils.ts:23](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/sign-typed-data-utils.ts#L23)*
 
 ___
 
@@ -35,7 +35,7 @@ ___
 
 • **primaryType**: *string*
 
-*Defined in [src/utils/sign-typed-data-utils.ts:24](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/sign-typed-data-utils.ts#L24)*
+*Defined in [contractkit/src/utils/sign-typed-data-utils.ts:24](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/sign-typed-data-utils.ts#L24)*
 
 ___
 
@@ -43,4 +43,4 @@ ___
 
 • **types**: *[EIP712Types](_utils_sign_typed_data_utils_.eip712types.md)*
 
-*Defined in [src/utils/sign-typed-data-utils.ts:21](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/sign-typed-data-utils.ts#L21)*
+*Defined in [contractkit/src/utils/sign-typed-data-utils.ts:21](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/sign-typed-data-utils.ts#L21)*

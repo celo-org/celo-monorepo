@@ -29,7 +29,7 @@ export class LedgerSigner implements Signer {
   async signTransaction(
     addToV: number,
     encodedTx: RLPEncodedTx
-  ): Promise<{ v: string; r: string; s: string }> {
+  ): Promise<{ v: number; r: Buffer; s: Buffer }> {
     try {
       const signature = await this.ledger!.signTransaction(
         await this.getValidatedDerivationPath(),
@@ -42,7 +42,11 @@ export class LedgerSigner implements Signer {
         addToV += 1 // add signature v bit.
       }
       signature.v = addToV.toString(16)
-      return signature
+      return {
+        v: signature.v,
+        r: ethUtil.toBuffer(ensureLeading0x(signature.r)) as Buffer,
+        s: ethUtil.toBuffer(ensureLeading0x(signature.s)) as Buffer,
+      }
     } catch (error) {
       if (error instanceof TransportStatusError) {
         transportErrorFriendlyMessage(error)
