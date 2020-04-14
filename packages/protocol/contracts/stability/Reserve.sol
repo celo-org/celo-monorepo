@@ -55,8 +55,8 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
   event OtherReserveAddressRemoved(address indexed otherReserveAddress, uint256 index);
   event AssetAllocationSet(bytes32[] symbols, uint256[] weights);
   event ReserveGoldTransferred(address indexed spender, address indexed to, uint256 value);
-  event TobinTaxSet(uint256 tobinTax);
-  event TobinTaxReserveRatioSet(uint256 tobinTaxReserveRatio);
+  event TobinTaxSet(uint256 value);
+  event TobinTaxReserveRatioSet(uint256 value);
 
   modifier isStableToken(address token) {
     require(isToken[token], "token addr was never registered");
@@ -74,7 +74,8 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
    * @param _frozenDays The number of days during which the frozen gold thaws.
    * @param _assetAllocationSymbols The symbols of the reserve assets.
    * @param _assetAllocationWeights The reserve asset weights.
-   * @param _tobinTax The tobin tax.
+   * @param _tobinTax The tobin tax value as a fixidity fraction.
+   * @param _tobinTaxReserveRatio When to turn on the tobin tax, as a fixidity fraction.
    */
   function initialize(
     address registryAddress,
@@ -112,6 +113,7 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
    * @param value The tobin tax.
    */
   function setTobinTax(uint256 value) public onlyOwner {
+    require(FixidityLib.wrap(value).lte(FixidityLib.fixed1()), "tobin tax cannot be larger than 1");
     tobinTax = value;
     emit TobinTaxSet(value);
   }
@@ -467,6 +469,7 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
 
   /**
    * @notice Computes a tobin tax based on the reserve ratio.
+   * @return The tobin tax expresesed as a fixidity fraction.
    */
   function computeTobinTax() private view returns (FixidityLib.Fraction memory) {
     FixidityLib.Fraction memory ratio = FixidityLib.wrap(getReserveRatio());
