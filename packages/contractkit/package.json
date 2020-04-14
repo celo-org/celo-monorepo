@@ -21,7 +21,7 @@
     "build:gen": "yarn --cwd ../protocol build",
     "prepublishOnly": "yarn build:gen && yarn build",
     "docs": "typedoc && ts-node scripts/linkdocs.ts",
-    "test:reset": "yarn --cwd ../protocol devchain generate-tar .tmp/devchain.tar.gz --migration_override ../dev-utils/src/migration-override.json --upto 25",
+    "test:reset": "yarn --cwd ../protocol devchain generate-tar .tmp/devchain.tar.gz --migration_override ../dev-utils/src/migration-override.json --upto 24",
     "test:livechain": "yarn --cwd ../protocol devchain run-tar .tmp/devchain.tar.gz",
     "test": "jest --runInBand",
     "lint": "tslint -c tslint.json --project ."
