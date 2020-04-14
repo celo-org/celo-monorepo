@@ -10,6 +10,8 @@ import Logger from 'src/utils/Logger'
 import { contractKitReadySelector } from 'src/web3/selectors'
 import Web3 from 'web3'
 import { provider } from 'web3-core'
+import { waitForRehydrate } from 'src/app/saga'
+import { call, cancel, cancelled, delay, fork, put, race, select, take } from 'redux-saga/effects'
 
 // Logging tag
 const tag = 'web3/contracts'
@@ -17,8 +19,27 @@ const tag = 'web3/contracts'
 const web3: Web3 = getWeb3()
 let contractKit = newKitFromWeb3(web3)
 
-export function getContractKit() {
-  // TODO(anna) don't get store until it's defined
+// TODO util functions can just be web3
+
+export async function nonGeneratorGetContractKit() {
+  // TODO(anna) Keep polling until store is defined
+  // 250 ms
+  // make sure not blocking US
+  // don't get store until it's defined
+  const contractKitReady = contractKitReadySelector(store.getState())
+  if (contractKitReady) {
+    return contractKit
+  } else {
+    throw new Error('Contract Kit not yet ready')
+  }
+}
+
+export function* getContractKit() {
+  // TODO(anna) Keep polling until store is defined
+  // 250 ms
+  // make sure not blocking US
+  // don't get store until it's defined
+  yield call(waitForRehydrate)
   const contractKitReady = contractKitReadySelector(store.getState())
   if (contractKitReady) {
     return contractKit

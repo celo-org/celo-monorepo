@@ -140,7 +140,7 @@ export function* sendInvite(
 ) {
   yield call(getConnectedUnlockedAccount)
   try {
-    const contractKit = getContractKit()
+    const contractKit = yield call(getContractKit)
     const temporaryWalletAccount = contractKit.web3.eth.accounts.create()
     const temporaryAddress = temporaryWalletAccount.address
     const inviteCode = createInviteCode(temporaryWalletAccount.privateKey)
@@ -262,7 +262,7 @@ export function* redeemInviteSaga({ inviteCode }: RedeemInviteAction) {
 
 export function* doRedeemInvite(inviteCode: string) {
   try {
-    const contractKit = getContractKit()
+    const contractKit = yield call(getContractKit)
     const tempAccount = contractKit.web3.eth.accounts.privateKeyToAccount(inviteCode).address
     Logger.debug(TAG + '@doRedeemInvite', 'Invite code contains temp account', tempAccount)
     const tempAccountBalanceWei: BigNumber = yield call(
@@ -312,7 +312,7 @@ export function* skipInvite() {
 function* addTempAccountToWallet(inviteCode: string) {
   Logger.debug(TAG + '@addTempAccountToWallet', 'Attempting to add temp wallet')
   try {
-    const contractKit = getContractKit()
+    const contractKit = yield call(getContractKit)
     let tempAccount: string | null = null
     const fornoMode = yield select(fornoSelector)
     if (fornoMode) {
@@ -349,7 +349,7 @@ export function* withdrawFundsFromTempAccount(
 ) {
   Logger.debug(TAG + '@withdrawFundsFromTempAccount', 'Unlocking temporary account')
   const fornoMode = yield select(fornoSelector)
-  const contractKit = getContractKit()
+  const contractKit = yield call(getContractKit)
   if (!fornoMode) {
     yield call(contractKit.web3.eth.personal.unlockAccount, tempAccount, TEMP_PW, 600)
   }
