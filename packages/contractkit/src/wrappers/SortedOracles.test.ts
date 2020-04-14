@@ -184,7 +184,7 @@ testWithGanache('SortedOracles Wrapper', (web3) => {
   describe('#reportExpirySeconds', () => {
     it('returns the number of seconds after which a report expires', async () => {
       const result = await sortedOracles.reportExpirySeconds()
-      expect(result).toEqBigNumber(NetworkConfig.oracle.reportExpiry)
+      expect(result).toEqBigNumber(NetworkConfig.oracles.reportExpiry)
     })
   })
 
