@@ -67,8 +67,11 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
    * @param registryAddress The address of the registry core smart contract.
    * @param _tobinTaxStalenessThreshold The initial number of seconds to cache tobin tax value for.
+   * @param _spendingRatio The relative daily spending limit for the reserve spender.
    * @param _frozenGold The balance of reserve gold that is frozen.
    * @param _frozenDays The number of days during which the frozen gold thaws.
+   * @param _assetAllocationSymbols The symbols of the reserve assets.
+   * @param _assetAllocationWeights The reserve asset weights.
    * @param _tobinTax The tobin tax.
    */
   function initialize(
@@ -98,6 +101,15 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
     require(value > 0, "value was zero");
     tobinTaxStalenessThreshold = value;
     emit TobinTaxStalenessThresholdSet(value);
+  }
+
+  /**
+   * @notice Sets the tobin tax.
+   * @param value The tobin tax.
+   */
+  function setTobinTax(uint256 value) public onlyOwner {
+    tobinTax = value;
+    emit TobinTaxSet(value);
   }
 
   /**
@@ -451,7 +463,6 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
 
   /**
    * @notice Computes a tobin tax based on the reserve ratio.
-   * @return The numerator of the tobin tax amount, where the denominator is 1000.
    */
   function computeTobinTax() private view returns (FixidityLib.Fraction memory) {
     // The protocol calls for a 0.5% transfer tax on Celo Gold when the reserve ratio <= 2.
