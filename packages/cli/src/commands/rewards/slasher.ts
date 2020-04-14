@@ -178,9 +178,7 @@ export default class Slasher extends BaseCommand {
     if (dryRun) {
       console.info(`encodeABI: ` + slashTx.txo.encodeABI())
       try {
-        const gas = Math.round(
-          (await slashTx.txo.estimateGas()) * this.kit.config.gasInflationFactor
-        )
+        const gas = Math.round((await slashTx.txo.estimateGas()) * this.kit.gasInflationFactor())
         console.info(`Dry-run succeeded, estimated gas: ${gas}`)
       } catch (error) {
         console.info(`Dry-run failed: ${error}`)
