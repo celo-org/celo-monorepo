@@ -84,7 +84,8 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
     uint256 _frozenDays,
     bytes32[] calldata _assetAllocationSymbols,
     uint256[] calldata _assetAllocationWeights,
-    uint256 _tobinTax
+    uint256 _tobinTax,
+    uint256 _tobinTaxReserveRatio
   ) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
@@ -93,6 +94,7 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
     setFrozenGold(_frozenGold, _frozenDays);
     setAssetAllocations(_assetAllocationSymbols, _assetAllocationWeights);
     setTobinTax(_tobinTax);
+    setTobinTaxReserveRatio(_tobinTaxReserveRatio);
   }
 
   /**

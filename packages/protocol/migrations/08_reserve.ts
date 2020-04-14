@@ -20,6 +20,7 @@ const initializeArgs = async (): Promise<[
   number,
   string[],
   string[],
+  number,
   number
 ]> => {
   const registry: RegistryInstance = await getDeployedProxiedContract<RegistryInstance>(
@@ -37,6 +38,7 @@ const initializeArgs = async (): Promise<[
     ),
     config.reserve.assetAllocationWeights.map((assetWeight) => toFixed(assetWeight).toFixed()),
     config.reserve.tobinTax,
+    config.reserve.tobinTaxReserveRatio,
   ]
 }
 
