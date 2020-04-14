@@ -7,14 +7,10 @@ import {
   BaseWrapper,
   CeloTransactionObject,
   proxyCall,
-  proxySend,
-  stringIdentity,
   toTransactionObject,
-  tupleParser,
   valueToBigNumber,
   valueToFrac,
   valueToInt,
-  valueToString,
 } from './BaseWrapper'
 
 export enum MedianRelation {
@@ -109,12 +105,6 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
     valueToBigNumber
   )
 
-  removeExpiredReports = proxySend(
-    this.kit,
-    this.contract.methods.removeExpiredReports,
-    tupleParser(stringIdentity, valueToString)
-  )
-
   /**
    * Checks if the oldest report for a given token is expired
    * @param token The token for which to check reports
@@ -134,9 +124,12 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
    */
   async removeExpiredReports(
     token: CeloToken,
-    numReports: number
+    numReports?: number
   ): Promise<CeloTransactionObject<void>> {
     const tokenAddress = await this.kit.registry.addressFor(token)
+    if (!numReports) {
+      numReports = (await this.getReports(token)).length - 1
+    }
     return toTransactionObject(
       this.kit,
       this.contract.methods.removeExpiredReports(tokenAddress, numReports)
