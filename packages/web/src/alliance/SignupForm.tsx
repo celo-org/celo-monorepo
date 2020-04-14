@@ -97,7 +97,9 @@ export default function SignupForm() {
             isShowing={formState.isComplete}
             message={t('common:applicationSubmitted')}
           />
-          <ErrorDisplay isShowing={!!formState.apiError} field={formState.apiError} />
+          <View style={standardStyles.centered}>
+            <ErrorDisplay isShowing={!!formState.apiError} field={formState.apiError} />
+          </View>
         </Form>
       )}
     </FormContainer>
@@ -110,7 +112,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 5,
   },
   buttonContainer: {
-    paddingTop: 15,
+    paddingVertical: 15,
     paddingHorizontal: 20,
   },
   stretch: {

@@ -73,7 +73,7 @@ export default class Form extends React.Component<Props, State> {
         : undefined
     this.setState({
       isComplete: response.ok,
-      form: this.props.blankForm,
+      form: response.ok ? this.props.blankForm : this.state.form,
       isLoading: false,
       errors: [],
       apiError,
