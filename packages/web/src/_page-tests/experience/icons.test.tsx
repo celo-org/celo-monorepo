@@ -9,12 +9,16 @@ const ICONS: IconData[] = [
     description: 'Organic Technology',
     preview: 'icon.png',
     uri: 'example.com/tree-icon.png',
+    tags: ['plant'],
+    id: '1',
   },
   {
     name: 'Forest',
     description: 'Ecological Technology',
     preview: 'icon.png',
     uri: 'example.com/forest-icon.png',
+    tags: ['plant'],
+    id: '2',
   },
 ]
 

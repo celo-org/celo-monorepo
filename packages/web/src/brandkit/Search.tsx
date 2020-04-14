@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { StyleSheet, Text, TextInputProps, View } from 'react-native'
 import { brandStyles } from 'src/brandkit/common/constants'
-import { TextInput } from 'src/forms/FormComponents'
+import TextInput from 'src/forms/TextInput'
 import { NameSpaces, useTranslation } from 'src/i18n'
 import { fonts, standardStyles } from 'src/styles'
 
