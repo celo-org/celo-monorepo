@@ -121,10 +121,15 @@ sdkmanager 'platforms;android-28'
 #### Install iOS Dev Tools
 
 Install [Xcode 10.3](https://download.developer.apple.com/Developer_Tools/Xcode_10.3/Xcode_10.3.xip) (an Apple Developer Account is needed to access this link).
+(If after signing in the the direct link does not work try finding on https://developer.apple.com/download/more/)
 
 We do not recommend installing Xcode through the App Store as it can auto update and become incompatible with our projects (until we decide to upgrade).
 
 Note that using the method above, you can have multiple versions of Xcode installed in parallel by using different app names. For instance `Xcode10.3.app` and `Xcode11.app` inside the `/Applications` folder.
+
+Install Cocopods `gem install cocoapods`
+
+From ios folder in mobile package run `bundle exec pod install`
 
 ### Linux
 

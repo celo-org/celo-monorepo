@@ -1,6 +1,11 @@
 import * as React from 'react'
 import { Animated, StyleSheet, View, ViewStyle } from 'react-native'
 
+const CIRCLE_START = 1
+const CIRCLE_END = 3
+const DELAY = 200
+const DURATION = 1500
+
 interface Props {
   color: string
   circleStartSize: number
@@ -9,21 +14,12 @@ interface Props {
 }
 
 interface State {
-  circleScale: Animated.Value
-  fadeOpacity: Animated.Value
+  pulse: Animated.Value
 }
 
 export default class PulsingDot extends React.PureComponent<Props, State> {
-  circleStartScale: number = 1
-  circleEndScale: number = 3
-  circleStartSize: number = this.props.circleStartSize
-  circleEndSize: number = this.circleStartSize * this.circleEndScale
-  circleAnimationLength: number = 1000
-  circleAnimationDelay: number = 700
-
   state = {
-    circleScale: new Animated.Value(this.circleStartScale),
-    fadeOpacity: new Animated.Value(1),
+    pulse: new Animated.Value(0),
   }
 
   componentDidMount() {
@@ -31,52 +27,36 @@ export default class PulsingDot extends React.PureComponent<Props, State> {
       return
     }
     Animated.loop(
-      Animated.parallel([
-        Animated.sequence([
-          Animated.timing(this.state.fadeOpacity, {
-            toValue: 0,
-            duration: this.circleAnimationLength,
-            delay: this.circleAnimationDelay,
-            isInteraction: false,
-            useNativeDriver: true,
-          }),
-          Animated.timing(this.state.fadeOpacity, {
-            toValue: 1,
-            duration: 0,
-            isInteraction: false,
-            useNativeDriver: true,
-          }),
-        ]),
-        Animated.sequence([
-          Animated.timing(this.state.circleScale, {
-            toValue: this.circleEndScale,
-            duration: this.circleAnimationLength,
-            delay: 500,
-            isInteraction: false,
-            useNativeDriver: true,
-          }),
-          Animated.timing(this.state.circleScale, {
-            toValue: this.circleStartScale,
-            duration: 0,
-            isInteraction: false,
-            useNativeDriver: true,
-          }),
-        ]),
+      Animated.sequence([
+        Animated.timing(this.state.pulse, {
+          toValue: 1,
+          duration: DURATION,
+          delay: DELAY,
+          isInteraction: false,
+          useNativeDriver: true,
+        }),
+        Animated.timing(this.state.pulse, {
+          toValue: 0,
+          delay: 0,
+          duration: 0,
+          isInteraction: false,
+          useNativeDriver: true,
+        }),
       ])
     ).start()
   }
 
   render() {
-    const { circleScale, fadeOpacity } = this.state
-    // let circleScaleNum: number
-    this.state.circleScale.addListener(
-      ({ value }) => ((this.state.circleScale as any)._value = value)
-    )
+    const { pulse } = this.state
+
+    const circleStartSize = this.props.circleStartSize * CIRCLE_START
+    const circleEndSize = this.props.circleStartSize * CIRCLE_END
+
     return (
       <View
         style={[
           style.circleContainer,
-          { width: this.circleEndSize, height: this.circleEndSize },
+          { width: circleEndSize, height: circleEndSize },
           this.props.style,
         ]}
       >
@@ -84,12 +64,20 @@ export default class PulsingDot extends React.PureComponent<Props, State> {
           style={[
             {
               backgroundColor: this.props.color,
-              width: this.circleStartSize,
-              height: this.circleStartSize,
-              borderRadius: this.circleStartSize / 2,
-              opacity: fadeOpacity,
+              width: circleStartSize,
+              height: circleStartSize,
+              borderRadius: circleStartSize / 2,
+              opacity: pulse.interpolate({
+                inputRange: [0, 0.5, 0.75, 1],
+                outputRange: [1, 1, 0.9, 0],
+              }),
               transform: [
-                { scale: circleScale },
+                {
+                  scale: pulse.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [1, CIRCLE_END],
+                  }),
+                },
                 { perspective: 1000 }, // without this line this Animation will not render on Android
               ],
             },
@@ -98,9 +86,9 @@ export default class PulsingDot extends React.PureComponent<Props, State> {
         <View
           style={{
             backgroundColor: this.props.color,
-            width: this.circleStartSize,
-            height: this.circleStartSize,
-            borderRadius: this.circleStartSize / 2,
+            width: circleStartSize,
+            height: circleStartSize,
+            borderRadius: circleStartSize / 2,
             position: 'absolute',
           }}
         />
