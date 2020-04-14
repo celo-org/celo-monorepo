@@ -1,11 +1,14 @@
 import { ensureLeading0x, trimLeading0x } from '@celo/utils/lib/address'
 import { TransportStatusError } from '@ledgerhq/errors'
+import debugFactory from 'debug'
 import * as ethUtil from 'ethereumjs-util'
 import { transportErrorFriendlyMessage } from '../../utils/ledger-utils'
 import { EIP712TypedData, generateTypedDataHash } from '../../utils/sign-typed-data-utils'
 import { RLPEncodedTx } from '../../utils/signing-utils'
 import { AddressValidation } from '../ledger-wallet'
 import { Signer } from './signer'
+
+const debug = debugFactory('kit:wallet:ledger')
 
 /**
  * Signs the EVM transaction with a Ledger device
@@ -49,7 +52,15 @@ export class LedgerSigner implements Signer {
       }
     } catch (error) {
       if (error instanceof TransportStatusError) {
-        transportErrorFriendlyMessage(error)
+        // The Ledger fails if it doesn't know the feeCurrency
+        if (error.statusCode === 27264 && error.statusText === 'INCORRECT_DATA') {
+          debug('Possible invalid feeCurrency field')
+          throw new Error(
+            'ledger-signer@singTransaction: Incorrect Data. Verify that the feeCurrency is a valid one'
+          )
+        } else {
+          transportErrorFriendlyMessage(error)
+        }
       }
       throw error
     }
