@@ -394,6 +394,9 @@ contract('Integration: Exchange', (accounts: string[]) => {
   let originalStable
   let originalGold
   let originalReserve
+  let finalStable: BigNumber
+  let finalGold: BigNumber
+  let finalReserve: BigNumber
 
   const decimals = 18
 
@@ -407,23 +410,21 @@ contract('Integration: Exchange', (accounts: string[]) => {
 
   describe('When selling gold', () => {
     beforeEach(async () => {
-      await goldToken.approve(exchange.address, sellAmount)
       originalStable = await stableToken.balanceOf(accounts[0])
       originalGold = await goldToken.balanceOf(accounts[0])
       originalReserve = await goldToken.balanceOf(reserve.address)
+      await goldToken.approve(exchange.address, sellAmount)
+      await exchange.exchange(sellAmount, minBuyAmount, true)
+      finalStable = await stableToken.balanceOf(accounts[0])
+      finalGold = await goldToken.balanceOf(accounts[0])
+      finalReserve = await goldToken.balanceOf(reserve.address)
     })
 
     it(`should increase user's stable`, async () => {
-      await exchange.exchange(sellAmount, minBuyAmount, true)
-      const finalStable = await stableToken.balanceOf(accounts[0])
-
       assert.isTrue(finalStable.gt(originalStable))
     })
 
     it(`should reduce user's gold`, async () => {
-      await exchange.exchange(sellAmount, minBuyAmount, true)
-      const finalGold = await goldToken.balanceOf(accounts[0])
-
       const block = await web3.eth.getBlock('latest')
       if (isSameAddress(block.miner, accounts[0])) {
         const blockReward = new BigNumber(2).times(new BigNumber(10).pow(decimals))
@@ -434,39 +435,32 @@ contract('Integration: Exchange', (accounts: string[]) => {
     })
 
     it(`should increase Reserve's gold`, async () => {
-      await exchange.exchange(sellAmount, minBuyAmount, true)
-      const finalReserve = await goldToken.balanceOf(reserve.address)
-
       assert.isTrue(finalReserve.gt(originalReserve))
     })
   })
 
-  describe('When selling stable token', () => {
+  describe.only('When selling stable token', () => {
     beforeEach(async () => {
       originalStable = await stableToken.balanceOf(accounts[0])
       originalGold = await goldToken.balanceOf(accounts[0])
       originalReserve = await goldToken.balanceOf(reserve.address)
+      console.log(originalStable.toFixed(), originalGold.toFixed(), originalReserve.toFixed())
       await stableToken.approve(exchange.address, sellAmount)
+      await exchange.exchange(sellAmount, minBuyAmount, false)
+      finalStable = await stableToken.balanceOf(accounts[0])
+      finalGold = await goldToken.balanceOf(accounts[0])
+      finalReserve = await goldToken.balanceOf(reserve.address)
     })
 
     it(`should reduce user's stable`, async () => {
-      await exchange.exchange(sellAmount, minBuyAmount, false)
-      const finalStable = await stableToken.balanceOf(accounts[0])
-
       assert.isTrue(finalStable.lt(originalStable))
     })
 
     it(`should increase user's gold`, async () => {
-      await exchange.exchange(sellAmount, minBuyAmount, false)
-      const finalGold = await goldToken.balanceOf(accounts[0])
-
       assert.isTrue(finalGold.gt(originalGold))
     })
 
     it(`should reduce Reserve's gold`, async () => {
-      await exchange.exchange(sellAmount, minBuyAmount, false)
-      const finalReserve = await goldToken.balanceOf(reserve.address)
-
       assert.isTrue(finalReserve.lt(originalReserve))
     })
   })
