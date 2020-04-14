@@ -15,7 +15,7 @@
 
 • **Equal**:
 
-*Defined in [contractkit/src/wrappers/SortedOracles.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/SortedOracles.ts#L20)*
+*Defined in [contractkit/src/wrappers/SortedOracles.ts:12](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/SortedOracles.ts#L12)*
 
 ___
 
@@ -23,7 +23,7 @@ ___
 
 • **Greater**:
 
-*Defined in [contractkit/src/wrappers/SortedOracles.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/SortedOracles.ts#L19)*
+*Defined in [contractkit/src/wrappers/SortedOracles.ts:11](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/SortedOracles.ts#L11)*
 
 ___
 
@@ -31,7 +31,7 @@ ___
 
 • **Lesser**:
 
-*Defined in [contractkit/src/wrappers/SortedOracles.ts:18](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/SortedOracles.ts#L18)*
+*Defined in [contractkit/src/wrappers/SortedOracles.ts:10](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/SortedOracles.ts#L10)*
 
 ___
 
@@ -39,4 +39,4 @@ ___
 
 • **Undefined**:
 
-*Defined in [contractkit/src/wrappers/SortedOracles.ts:17](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/SortedOracles.ts#L17)*
+*Defined in [contractkit/src/wrappers/SortedOracles.ts:9](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/SortedOracles.ts#L9)*

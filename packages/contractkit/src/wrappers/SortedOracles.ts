@@ -118,7 +118,9 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
   /**
    * Removes expired reports, if any exist
    * @param token The token to remove reports for
-   * @param numReports The number of expired reports to remove.
+   * @param numReports The upper-limit of reports to remove. For example, if there
+   * are 2 expired reports, and this param is 5, it will only remove the 2 that
+   * are expired.
    */
   async removeExpiredReports(
     token: CeloToken,
