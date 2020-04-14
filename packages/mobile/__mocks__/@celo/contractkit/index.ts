@@ -33,7 +33,7 @@ const Accounts = {}
 const TOBIN_TAX = { '0': '5000000000000000000000', '1': '1000000000000000000000000' } // Contract returns tuple representing fraction
 
 const Reserve = {
-  getOrComputeTobinTax: jest.fn(async () => TOBIN_TAX),
+  getOrComputeTobinTax: () => ({ txo: { call: jest.fn(async () => TOBIN_TAX) } }),
 }
 
 const web3 = new Web3()
