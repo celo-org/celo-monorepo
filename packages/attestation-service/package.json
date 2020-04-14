@@ -27,7 +27,7 @@
     "lint": "tslint -c tslint.json --project ."
   },
   "dependencies": {
-    "@celo/contractkit": "0.3.3-dev",
+    "@celo/contractkit": "0.3.4-dev",
     "@celo/utils": "0.1.9-dev",
     "bignumber.js": "^9.0.0",
     "body-parser": "1.19.0",

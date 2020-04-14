@@ -177,16 +177,14 @@ testWithGanache('SortedOracles Wrapper', (web3) => {
   describe('#medianRate', () => {
     it('returns the key for the median', async () => {
       const returnedMedian = await sortedOracles.medianRate(CeloContract.StableToken)
-      // The value `10` comes from: packages/protocol/migrationsConfig.js:
-      //   stableToken.goldPrice
-      expect(returnedMedian.rate).toEqBigNumber(10)
+      expect(returnedMedian.rate).toEqBigNumber(NetworkConfig.stableToken.goldPrice)
     })
   })
 
   describe('#reportExpirySeconds', () => {
     it('returns the number of seconds after which a report expires', async () => {
       const result = await sortedOracles.reportExpirySeconds()
-      expect(result).toEqBigNumber(600)
+      expect(result).toEqBigNumber(NetworkConfig.oracles.reportExpiry)
     })
   })
 
