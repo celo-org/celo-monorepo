@@ -26,6 +26,7 @@ export PGPASSWORD="" # Database password
 export PGHOST="127.0.0.1" # Database host
 export PGPORT="5432" # Database port
 export PGDATABASE="blockscout" # Database name
+export PROVIDER_URL="http://localhost:8545" # Provider Url
 ```
 
 You can start the crawler executing:
