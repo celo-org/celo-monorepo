@@ -17,20 +17,6 @@ function isNullOrUndefined(value: any): boolean {
   return value === null || value === undefined
 }
 
-function trimLeadingZero(hex: string) {
-  while (hex && hex.startsWith('0x0')) {
-    hex = '0x' + hex.slice(3)
-  }
-  return hex
-}
-
-function makeEven(hex: string) {
-  if (hex.length % 2 === 1) {
-    hex = hex.replace('0x', '0x0')
-  }
-  return hex
-}
-
 export interface RLPEncodedTx {
   transaction: Tx
   rlpEncode: any
@@ -105,18 +91,6 @@ export function rlpEncodedTx(tx: Tx): RLPEncodedTx {
   return { transaction, rlpEncode }
 }
 
-export function signatureFormatter(signature: {
-  v: string
-  r: string
-  s: string
-}): { v: number; r: Buffer; s: Buffer } {
-  return {
-    v: parseInt(makeEven(trimLeadingZero(ensureLeading0x(signature.v))), 16),
-    r: Buffer.from(makeEven(trimLeadingZero(ensureLeading0x(signature.r)))),
-    s: Buffer.from(makeEven(trimLeadingZero(ensureLeading0x(signature.s)))),
-  }
-}
-
 export async function encodeTransaction(
   rlpEncoded: RLPEncodedTx,
   signature: { v: number; r: Buffer; s: Buffer }
@@ -124,8 +98,8 @@ export async function encodeTransaction(
   const hash = getHashFromEncoded(rlpEncoded.rlpEncode)
 
   const v = stringNumberToHex(signature.v)
-  const r = signature.r.toString()
-  const s = signature.s.toString()
+  const r = ensureLeading0x(signature.r.toString('hex'))
+  const s = ensureLeading0x(signature.s.toString('hex'))
   const rawTx = RLP.decode(rlpEncoded.rlpEncode)
     .slice(0, 9)
     .concat([v, r, s])

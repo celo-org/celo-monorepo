@@ -44,7 +44,7 @@ export class LedgerSigner implements Signer {
       if (rv !== addToV && (rv & addToV) !== rv) {
         addToV += 1 // add signature v bit.
       }
-      signature.v = addToV.toString(16)
+      signature.v = addToV.toString(10)
       return {
         v: signature.v,
         r: ethUtil.toBuffer(ensureLeading0x(signature.r)) as Buffer,

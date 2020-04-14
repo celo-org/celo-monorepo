@@ -7,7 +7,6 @@ import {
   chainIdTransformationForSigning,
   encodeTransaction,
   rlpEncodedTx,
-  signatureFormatter,
 } from '../utils/signing-utils'
 import { Signer } from './signers/signer'
 
@@ -70,12 +69,7 @@ export abstract class WalletBase implements Wallet {
     const signer = this.getSigner(fromAddress)
     const signature = await signer!.signTransaction(addToV, rlpEncoded)
 
-    const formattedSignature = signatureFormatter({
-      v: signature.v.toString(16),
-      r: signature.r.toString('hex'),
-      s: signature.s.toString('hex'),
-    })
-    return encodeTransaction(rlpEncoded, formattedSignature)
+    return encodeTransaction(rlpEncoded, signature)
   }
 
   /**
