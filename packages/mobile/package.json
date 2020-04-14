@@ -57,6 +57,7 @@
     "date-fns": "^2.0.0-alpha.27",
     "dot-prop-immutable": "^1.4.0",
     "ethereumjs-util": "^5.2.0",
+    "express-rate-limit": "^5.1.1",
     "fuzzysort": "^1.1.4",
     "google-libphonenumber": "^3.2.4",
     "graphql": "^14.1.1",
@@ -175,8 +176,8 @@
     "redux-mock-store": "^1.5.3",
     "redux-saga-test-plan": "^4.0.0-beta.2",
     "remote-redux-devtools": "^0.5.12",
-    "web3-eth": "1.2.4",
-    "web3-core": "1.2.4"
+    "web3-core": "1.2.4",
+    "web3-eth": "1.2.4"
   },
   "detox": {
     "test-runner": "jest",

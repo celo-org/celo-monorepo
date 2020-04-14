@@ -8,7 +8,7 @@ type Field = string
 function getErrorTransKey(field: string) {
   let key = 'generic'
 
-  if (field === 'email' || key === 'unknownError') {
+  if (field === 'email' || field === 'unknownError' || field === 'pleaseWait') {
     key = field
   }
   return key
