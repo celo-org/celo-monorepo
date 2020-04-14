@@ -14,6 +14,8 @@ import { execCmdWithExitOnFailure } from 'src/lib/utils'
 const helmChartPath = '../helm-charts/oracle'
 
 export async function installHelmChart(celoEnv: string) {
+  await helmParameters(celoEnv)
+  return
   return installGenericHelmChart(
     celoEnv,
     releaseName(celoEnv),
@@ -59,16 +61,17 @@ async function createOracleIdentityIfNotExists(celoEnv: string) {
 
   // Grant the service principal permission to manage the oracle identity.
   // See: https://github.com/Azure/aad-pod-identity#6-set-permissions-for-mic
-  const [servicePrincipalClientId] = await execCmdWithExitOnFailure(
+  const [rawServicePrincipalClientId] = await execCmdWithExitOnFailure(
     `az aks show -n ${clusterName()} --query servicePrincipalProfile.clientId -g ${resourceGroup()} -o tsv`
   )
+  const servicePrincipalClientId = rawServicePrincipalClientId.trim()
   await execCmdWithExitOnFailure(
     `az role assignment create --role "Managed Identity Operator" --assignee ${servicePrincipalClientId} --scope ${identity.id}`
   )
 
   // Allow the oracle identity to access the correct key vault
   await execCmdWithExitOnFailure(
-    `az keyvault set-policy --name ${keyVaultName()} --key-permissions {get, list, sign} --object-id ${
+    `az keyvault set-policy --name ${keyVaultName()} --key-permissions {get,list,sign} --object-id ${
       identity.principalId
     } -g ${resourceGroup()}`
   )

@@ -219,6 +219,46 @@ const DefaultConfig = {
 }
 
 const NetworkConfigs = {
+  trevor3: {
+    downtimeSlasher: {
+      slashableDowntime: 60, // epoch length is 100 for unit tests
+    },
+    election: {
+      minElectableValidators: '10',
+      frozen: false,
+    },
+    epochRewards: {
+      frozen: false,
+    },
+    exchange: {
+      frozen: false,
+      minimumReports: 1,
+    },
+    goldToken: {
+      frozen: false,
+    },
+    governanceApproverMultiSig: {
+      signatories: [network.from],
+      numRequiredConfirmations: 1,
+      numInternalRequiredConfirmations: 1,
+    },
+    reserve: {
+      initialBalance: 100000000,
+      otherAddresses: ['0x7457d5E02197480Db681D3fdF256c7acA21bDc12'], // Add an arbitrary "otherReserveAddress" so that reserve spending can be tested.
+    },
+    reserveSpenderMultiSig: {
+      signatories: [network.from],
+      numRequiredConfirmations: 1,
+      numInternalRequiredConfirmations: 1,
+    },
+    stableToken: {
+      oracles: [
+        '0xf4314cb9046bece6aa54bb9533155434d0c76909',
+        '0x485d120a0e8c4aba1c1190b0e3b86632d391e9b6',
+      ],
+      frozen: false,
+    },
+  },
   development: {
     downtimeSlasher: {
       slashableDowntime: 60, // epoch length is 100 for unit tests

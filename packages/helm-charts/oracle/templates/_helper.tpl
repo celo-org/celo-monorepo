@@ -21,3 +21,10 @@ Label specific to the oracle client component
 {{- define "oracle-client-component-label" -}}
 app.kubernetes.io/component: oracle-client
 {{- end -}}
+
+{{/*
+The name of the deployment
+*/}}
+{{- define "azure-identity-binding-name" -}}
+{{ template "name" . }}-identity-binding
+{{- end -}}

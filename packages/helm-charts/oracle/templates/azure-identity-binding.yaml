@@ -4,4 +4,4 @@ metadata:
   name: {{ template "name" . }}-identity-binding
 spec:
   AzureIdentity: {{ template "name" . }}-identity
-  Selector: {{ template "name" . }}-identity-binding
+  Selector: {{ template "azure-identity-binding-name" . }}

@@ -32,7 +32,7 @@ spec:
       labels:
 {{ include "labels" . | indent 8 }}
 {{ include "oracle-client-component-label" . | indent 8 }}
-        aadpodidbinding: {{ template "name" . }}-identity-binding
+        aadpodidbinding: {{ template "azure-identity-binding-name" . }}
     spec:
       containers:
       - name: oracle-client
@@ -53,9 +53,9 @@ spec:
               fieldPath: metadata.name
         - name: CELO_NODE
           value: {{ .Values.oracle.web3ProviderUrl }}
-        - name: KEY_VAULT
+        - name: AZURE_KEY_VAULT
           value: {{ .Values.azure.keyvault.vaultName }}
-        - name: KEY_NAME
+        - name: AZURE_KEY_NAME
           value: {{ .Values.azure.keyvault.keyName }}
         volumeMounts:
         - name: private-key-volume
