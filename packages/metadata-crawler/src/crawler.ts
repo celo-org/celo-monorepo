@@ -2,7 +2,8 @@ import { Client } from 'pg'
 import { ClaimTypes, IdentityMetadataWrapper } from '@celo/contractkit/lib/identity'
 import { verifyDomainRecord } from '@celo/contractkit/lib/identity/claims/verify'
 import { normalizeAddress } from '@celo/utils/lib/address'
-import { serializeClaim } from '@celo/contractkit/lib/identity/claims/claim'
+import { ClaimPayload, serializeClaim } from '@celo/contractkit/lib/identity/claims/claim'
+import { newKit } from '@celo/contractkit'
 import { logger } from './logger'
 import { AccountClaim } from '@celo/contractkit/lib/identity/claims/account'
 
@@ -11,6 +12,7 @@ const PGPASSWORD = process.env['PGPASSWORD'] || ''
 const PGHOST = process.env['PGHOST'] || '127.0.0.1'
 const PGPORT = process.env['PGPORT'] || '5432'
 const PGDATABASE = process.env['PGDATABASE'] || 'blockscout'
+const PROVIDER_URL = process.env['PROVIDER_URL'] || 'http://localhost:8545'
 
 const client = new Client({
   user: PGUSER,
@@ -19,6 +21,8 @@ const client = new Client({
   port: Number(PGPORT),
   database: PGDATABASE,
 })
+
+const kit = newKit(PROVIDER_URL)
 
 async function jsonQuery(query: string) {
   let res = await client.query(`SELECT json_agg(t) FROM (${query}) t`)
@@ -60,12 +64,12 @@ async function addDatabaseVerificationClaims(address: string, domain: string, ve
 
 async function handleItem(item: { url: string; address: string }) {
   try {
-    let metadata = await IdentityMetadataWrapper.fetchFromURL(item.url)
+    let metadata = await IdentityMetadataWrapper.fetchFromURL(kit, item.url)
     let claims = metadata.filterClaims(ClaimTypes.DOMAIN)
     const accounts = metadata.filterClaims(ClaimTypes.ACCOUNT)
 
     await Promise.all(
-      claims.map(async (claim) => {
+      claims.map(async (claim: ClaimPayload<ClaimTypes.DOMAIN>) => {
         const addressWith0x = '0x' + item.address
         logger.debug('Claim: %s', serializeClaim(claim))
         logger.debug('Accounts: %s', JSON.stringify(accounts))
