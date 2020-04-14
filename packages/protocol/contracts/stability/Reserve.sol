@@ -113,15 +113,6 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
   }
 
   /**
-   * @notice Sets the tobin tax.
-   * @param value The tobin tax.
-   */
-  function setTobinTax(uint256 value) public onlyOwner {
-    tobinTax = value;
-    emit TobinTaxSet(value);
-  }
-
-  /**
    * @notice Set the ratio of reserve that is spendable per day.
    * @param ratio Spending ratio as unwrapped Fraction.
    */
