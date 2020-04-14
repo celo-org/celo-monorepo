@@ -21,10 +21,9 @@ The deployment timeline is as follows (all dates are subject to change):
 * 3/31 - 4/7: Infrastructure setup
 * 4/7 16:00 UTC: Block production begins
 * 4/7: Celo Core Contracts and `ReleaseGold` contracts are deployed
-* 4/8: Governance proposal to start Validator rewards
-* 4/9: Governance proposal to unfreeze Celo Gold voter rewards
-* 4/10: Mock Oracles deployed and governance proposal to unfreeze Celo Dollar exchange
-* 4/13: Faucet requests for non-genesis Validators accepted
+* 4/8: Governance proposal to start Validator rewards and voter rewards
+* 4/9: Mock Oracles deployed and governance proposal to unfreeze Celo Dollar exchange
+* 4/10: Faucet requests for non-genesis Validators accepted
 
 {% hint style="info" %}
 A [timeline](https://celo.org/#timeline) of the Celo project is available to provide further context.
@@ -63,7 +62,7 @@ docker pull $CELO_IMAGE
 The `us.gcr.io/celo-testnet/celo-node:baklava` image is built from commit [`c38f2fd30d2d7c4716a5181c9645121709b9004e`](https://github.com/celo-org/celo-blockchain/commit/c38f2fd30d2d7c4716a5181c9645121709b9004e) and contains the [genesis block](https://storage.cloud.google.com/genesis_blocks/baklava) and [bootnode information](https://storage.cloud.google.com/env_bootnodes/baklava) in addition to the Celo Geth binary.
 
 {% hint style="warning" %}
-Upgrading a node with version prior to `0.10.0`, released on April 4th, requires reset of the chain data. One way to accomplish this is by running `docker run -it -v $PWD:/root/.celo $CELO_IMAGE --nousb removedb`
+Upgrading a node with version prior to `0.10.0`, released on April 4th, requires reset of the chain data. One way to accomplish this is by removing the `celo` directory within the data directory. **Make sure not to remove your keystore**
 {% endhint %}
 
 ### Networking requirements
@@ -84,11 +83,23 @@ docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE init /celo/genesis.json
 export BOOTNODE_ENODES="$(docker run --rm --entrypoint cat $CELO_IMAGE /celo/bootnodes)"
 ```
 
-You can then run the proxy with the following command. Be sure to replace `<YOUR-VALIDATOR-NAME>` with the name you'd like to appear on Celostats.
+You can then run the proxy with the following command. Be sure to replace `<YOUR-VALIDATOR-NAME>` with the name you'd like to appear on Celostats. The validator name shown in [Celostats](https://baklava-celostats.celo-testnet.org/) will be the the name configured in the proxy.
+
+Additionally, you need to unlock the account configured in `etherbase` option. It is recommended to create a new account and independent account only for this purpose. Be sure to write a new password to `./.password` for this account (different to the Validator Signer password)
 
 ```bash
 # On the proxy machine
-docker run --name celo-proxy -it --restart unless-stopped -p 30303:30303 -p 30303:30303/udp -p 30503:30503 -p 30503:30503/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --nousb --syncmode full --proxy.proxy --proxy.proxiedvalidatoraddress $CELO_VALIDATOR_SIGNER_ADDRESS --proxy.internalendpoint :30503 --etherbase $CELO_VALIDATOR_SIGNER_ADDRESS --bootnodes $BOOTNODE_ENODES --ethstats=<YOUR-VALIDATOR-NAME>-proxy@baklava-ethstats.celo-testnet.org
+# Firts, we create a new account for the proxy
+docker run --name celo-proxy-password -it --rm  -v $PWD:/root/.celo $CELO_IMAGE account new --password /root/.celo/.password
+```
+
+Notice the public address returned by this command, that can be exported and used for running the proxy node:
+
+```bash
+# On the proxy machine
+export PROXY_ADDRESS=<PROXY-PUBLIC-ADDRESS>
+
+docker run --name celo-proxy -it --restart unless-stopped -p 30303:30303 -p 30303:30303/udp -p 30503:30503 -p 30503:30503/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --nousb --syncmode full --proxy.proxy --proxy.proxiedvalidatoraddress $CELO_VALIDATOR_SIGNER_ADDRESS --proxy.internalendpoint :30503 --etherbase $PROXY_ADDRESS --unlock $PROXY_ADDRESS --password /root/.celo/.password --allow-insecure-unlock --bootnodes $BOOTNODE_ENODES --ethstats=<YOUR-VALIDATOR-NAME>-proxy@baklava-celostats-server.celo-testnet.org
 ```
 
 {% hint style="info" %}
@@ -148,7 +159,7 @@ Once that is completed, go ahead and run the Validator. Be sure write your Valid
 ```bash
 # On the Validator machine
 docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE init /celo/genesis.json
-docker run --name celo-validator -it --restart unless-stopped -p 30303:30303 -p 30303:30303/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --mine --istanbul.blockperiod=5 --istanbul.requesttimeout=3000 --etherbase $CELO_VALIDATOR_SIGNER_ADDRESS --nodiscover --nousb --proxy.proxied --proxy.proxyenodeurlpair=enode://$PROXY_ENODE@$PROXY_INTERNAL_IP:30503\;enode://$PROXY_ENODE@$PROXY_EXTERNAL_IP:30303  --unlock=$CELO_VALIDATOR_SIGNER_ADDRESS --password /root/.celo/.password --ethstats=<YOUR-VALIDATOR-NAME>@baklava-celostats.celo-testnet.org
+docker run --name celo-validator -it --restart unless-stopped -p 30303:30303 -p 30303:30303/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --mine --istanbul.blockperiod=5 --istanbul.requesttimeout=3000 --etherbase $CELO_VALIDATOR_SIGNER_ADDRESS --nodiscover --nousb --proxy.proxied --proxy.proxyenodeurlpair=enode://$PROXY_ENODE@$PROXY_INTERNAL_IP:30503\;enode://$PROXY_ENODE@$PROXY_EXTERNAL_IP:30303 --unlock=$CELO_VALIDATOR_SIGNER_ADDRESS --password /root/.celo/.password --ethstats=<YOUR-VALIDATOR-NAME>@baklava-celostats-server.celo-testnet.org
 ```
 
 The `networkid` parameter value of `40120` indicates we are connecting to the new Baklava network.
@@ -240,7 +251,6 @@ There are number of new environment variables, and you may use this table as a r
 | CELO_VALIDATOR_GROUP_RG_ADDRESS         | The `ReleaseGold` contract address for the Validator Group                                                                                          |
 | CELO_VALIDATOR_RG_ADDRESS         | The `ReleaseGold` contract address for the Validator                                                                                          |
 | CELO_VALIDATOR_GROUP_SIGNER_ADDRESS        | The address of the Validator Group signer authorized by the Validator Group Account                                                              |
-| CELO_VALIDATOR_GROUP_SIGNER_PUBLIC_KEY     | The ECDSA public key associated with the Validator Group signer address                                                                    |
 | CELO_VALIDATOR_GROUP_SIGNER_SIGNATURE      | The proof-of-possession of the Validator Group signer key                                                                                  |
 | CELO_VALIDATOR_SIGNER_ADDRESS        | The address of the Validator signer authorized by the Validator Account                                                              |
 | CELO_VALIDATOR_SIGNER_PUBLIC_KEY     | The ECDSA public key associated with the Validator signer address                                                                    |
@@ -266,7 +276,7 @@ There are number of new environment variables, and you may use this table as a r
 
 ### Create Accounts from the `ReleaseGold` contracts
 
-In order to use the balances from `ReleaseGold` contracts, we need to create associated Accounts. In the Baklava network, after they have been deployed we will publish a document mapping the Beneficiary address to `ReleaseGold` contract addresses.
+In order to use the balances from `ReleaseGold` contracts, we need to create associated Accounts. In the Baklava network, you can look up your Beneficiary address in [the published mapping](https://gist.githubusercontent.com/nategraf/a87f9c2e488ab2d38a0a3c09f5d4ca2b/raw) to find your `ReleaseGold` contract addresses. If you are a genesis validator, your two Beneficary addresses will be the provided `CELO_VALIDATOR_ADDRESS` and `CELO_VALIDATOR_GROUP_ADDRESS`.
 
 ```bash
 # On your local machine
@@ -361,9 +371,13 @@ celocli releasegold:authorize --contract $CELO_VALIDATOR_RG_ADDRESS --role valid
 
 Using the newly authorized Validator key, register the Account as a Validator:
 
+{% hint style="info" %}
+Running the following command requires the keys for the validator signer address. This command can be run on the validator machine, or if the keys are also available on your local machine, it can be run there.
+{% endhint %}
+
 ```bash
-# On the Validator machine
-celocli validator:register --blsKey $CELO_VALIDATOR_SIGNER_BLS_PUBLIC_KEY --blsSignature $CELO_VALIDATOR_SIGNER_SIGNATURE --ecdsaKey $CELO_VALIDATOR_SIGNER_PUBLIC_KEY --from $CELO_VALIDATOR_SIGNER_ADDRESS
+# On a machine with CELO_VALIDATOR_SIGNER_ADDRESS unlocked.
+celocli validator:register --blsKey $CELO_VALIDATOR_SIGNER_BLS_PUBLIC_KEY --blsSignature $CELO_VALIDATOR_SIGNER_BLS_SIGNATURE --ecdsaKey $CELO_VALIDATOR_SIGNER_PUBLIC_KEY --from $CELO_VALIDATOR_SIGNER_ADDRESS
 ```
 
 You can view information about your Validator by running the following command:
@@ -403,7 +417,6 @@ Save the signer address, public key, and proof-of-possession signature to your l
 
 ```bash
 export CELO_VALIDATOR_GROUP_SIGNER_SIGNATURE=<YOUR-VALIDATOR-GROUP-SIGNER-SIGNATURE>
-export CELO_VALIDATOR_GROUP_SIGNER_PUBLIC_KEY=<YOUR-VALIDATOR-GROUP-SIGNER-PUBLIC-KEY>
 ```
 
 Authorize your Validator Group signing key:
@@ -477,7 +490,7 @@ Produce the proof-of-possession needed to authorize the keys:
 docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE --nousb account proof-of-possession $CELO_VALIDATOR_VOTE_SIGNER_ADDRESS $CELO_VALIDATOR_RG_ADDRESS
 export CELO_VALIDATOR_VOTE_SIGNER_SIGNATURE=<YOUR-VALIDATOR-VOTE-SIGNER-SIGNATURE>
 
-docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE --nousb account proof-of-possession $CELO_VALIDATOR_GROUP_VOTE_SIGNER_ADDRESS $CELO_VALIDATOR_RG_ADDRESS
+docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE --nousb account proof-of-possession $CELO_VALIDATOR_GROUP_VOTE_SIGNER_ADDRESS $CELO_VALIDATOR_GROUP_RG_ADDRESS
 export CELO_VALIDATOR_GROUP_VOTE_SIGNER_SIGNATURE=<YOUR-VALIDATOR-GROUP-VOTE-SIGNER-SIGNATURE>
 ```
 
@@ -517,7 +530,7 @@ Epoch lengths in the Baklava network are set to be the number of blocks produced
 ```bash
 # On your local machine
 # Note that this command will wait for the next epoch transition, which may be up to 24 hours in the future.
-celocli election:activate --from $CELO_VALIDATOR_RG_ADDRESS --wait && celocli election:activate --from $CELO_VALIDATOR_GROUP_RG_ADDRESS --wait
+celocli election:activate --from $CELO_VALIDATOR_VOTE_SIGNER_ADDRESS --wait && celocli election:activate --from $CELO_VALIDATOR_GROUP_VOTE_SIGNER_ADDRESS --wait
 ```
 
 Check that your votes were activated by re-running the following commands:
@@ -545,7 +558,7 @@ You can inspect the current state of the Validator elections by running:
 celocli election:list
 ```
 
-You can check the status of your Validator, including whether it is elected and signing blocks, at [baklava-celostats.celo-testnet.org](https://baklava-ethstats.celo-testnet.org) or by running:
+You can check the status of your Validator, including whether it is elected and signing blocks, at [baklava-celostats.celo-testnet.org](https://baklava-celostats.celo-testnet.org) or by running:
 
 ```bash
 # On your local machine

@@ -35,6 +35,8 @@
 * ["utils/tx-result"](modules/_utils_tx_result_.md)
 * ["utils/web3-utils"](modules/_utils_web3_utils_.md)
 * ["wallets/default-wallet"](modules/_wallets_default_wallet_.md)
+* ["wallets/ledger-utils/data"](modules/_wallets_ledger_utils_data_.md)
+* ["wallets/ledger-utils/tokens"](modules/_wallets_ledger_utils_tokens_.md)
 * ["wallets/ledger-wallet"](modules/_wallets_ledger_wallet_.md)
 * ["wallets/wallet"](modules/_wallets_wallet_.md)
 * ["web3-contract-cache"](modules/_web3_contract_cache_.md)

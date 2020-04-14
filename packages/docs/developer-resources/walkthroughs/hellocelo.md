@@ -145,7 +145,7 @@ We have an account with cGLD in it, now how do we send it to another account. Re
 
 The Gold Token wrapper has a method called `transfer(address, amount)` that allows you to send value to the specified address \(line 14\).
 
-You need to `send()` the transaction to the network after you construct it. This method returns a transaction object. We are will wait for the transaction receipt \(which will be returned when the transaction has been included in the blockchain\_ and print it when we get it. This receipt contains information about the transaction.
+You need to `send()` the transaction to the network after you construct it. This method returns a transaction object. We will wait for the transaction receipt \(which will be returned when the transaction has been included in the blockchain\_ and print it when we get it. This receipt contains information about the transaction.
 
 After we read the receipt, we check the balance of our account again, using the `balanceOf()` function. The logs print our updated balance!
 
