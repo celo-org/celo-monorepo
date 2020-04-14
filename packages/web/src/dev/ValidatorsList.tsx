@@ -231,6 +231,7 @@ class ValidatorsList extends React.PureComponent<ValidatorsListProps & I18nProps
           ...data,
         }
       })
+      .filter(({ address }, i, list) => list.findIndex((_) => _.address === address) === i)
     this.cachedCleanData = cleanData
     return cleanData
   }

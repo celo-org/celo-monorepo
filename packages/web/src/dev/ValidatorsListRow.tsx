@@ -9,6 +9,8 @@ import { colors } from 'src/styles'
 import { cutAddress, formatNumber } from 'src/utils/utils'
 import Checkmark from 'src/icons/Checkmark'
 
+const unknonValidatorName = 'Unnamed validator'
+
 class Text extends RNText {
   render() {
     return <RNText style={[styles.defaultText, this.props.style]}>{this.props.children}</RNText>
@@ -68,11 +70,13 @@ class ValidatorsListRow extends React.PureComponent<Props & I18nProps> {
             </Text>
             <Text style={[styles.tableCellTitleRows]}>
               <Text style={[styles.tableCellTitleFirstRow]} numberOfLines={1} ellipsizeMode="tail">
-                {group.name}
+                {group.name || unknonValidatorName}
 
-                {!!group.claims.length && (<Text style={[styles.checkmark]}>
-                  <Checkmark color={colors.black} size={8} />
-                </Text>)}
+                {!!group.claims.length && (
+                  <Text style={[styles.checkmark]}>
+                    <Checkmark color={colors.black} size={8} />
+                  </Text>
+                )}
               </Text>
               <Text style={[styles.tableCellTitleSecRow]}>
                 <Text style={[styles.address]}>{cutAddress(group.address)}</Text>
@@ -153,7 +157,7 @@ class ValidatorsListRow extends React.PureComponent<Props & I18nProps> {
                   <Text style={[styles.tableCell, styles.tableCellTitleNumber]}>{j + 1}</Text>
                   <Text style={[styles.tableCellTitleRows]}>
                     <Text style={[styles.tableCellTitleFirstRow, styles.tableSecondaryCell]}>
-                      {validator.name}
+                      {validator.name || unknonValidatorName}
                     </Text>
                     <Text
                       style={[styles.tableCellTitleSecRow, styles.tableCellTitleSecondarySecRow]}

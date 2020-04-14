@@ -199,7 +199,7 @@ export const styles = StyleSheet.create({
 
   // Bar
   barContainer: {
-    width: 40,
+    width: 35,
     height: 20,
     display: 'inline-flex',
     marginLeft: 8,
