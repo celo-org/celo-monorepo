@@ -107,9 +107,7 @@ export async function createCloudSQLInstance(celoEnv: string, instanceName: stri
   )
 
   console.info('Creating blockscout database')
-  try {
-    await execCmd(`gcloud sql databases create blockscout -i ${instanceName}`)
-  } catch (e) {}
+  await execCmdWithExitOnFailure(`gcloud sql databases create blockscout -i ${instanceName}`)
 
   console.info('Copying blockscout service account secret to namespace')
   await copySecret(CLOUDSQL_SECRET_NAME, 'default', celoEnv)
@@ -303,11 +301,7 @@ export async function resetCloudSQLInstance(instanceName: string) {
   )
 
   console.info('Creating blockscout database')
-  try {
-    await execCmd(`gcloud sql databases create blockscout -i ${instanceName}`)
-  } catch (e) {
-    console.log(e)
-  }
+  await execCmdWithExitOnFailure(`gcloud sql databases create blockscout -i ${instanceName}`)
 }
 
 async function registerIPAddress(name: string) {
