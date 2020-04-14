@@ -22,6 +22,8 @@ export enum ErrorMessages {
   REVEAL_ATTESTATION_FAILURE = 'nuxVerification2:revealAttestationFailure',
   VERIFICATION_FAILURE = 'nuxVerification2:verificationFailure',
   VERIFICATION_TIMEOUT = 'nuxVerification2:verificationTimeout',
+  SALT_FETCH_FAILURE = 'TODO',
+  SALT_QUOTA_EXCEEDED = 'TODO',
   INVALID_ACCOUNT = 'invalidAccount',
   CANT_SELECT_INVALID_PHONE = 'cantSelectInvalidPhone',
   CAN_NOT_REQUEST_FROM_UNVERIFIED = 'canNotRequestFromUnverified',

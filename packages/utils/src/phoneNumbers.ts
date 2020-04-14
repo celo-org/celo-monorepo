@@ -38,11 +38,12 @@ export function getCountryEmoji(
   return (country ? country.emoji : '') + ` +${countryCode}`
 }
 
-export const getPhoneHash = (phoneNumber: string): string => {
+export const getPhoneHash = (phoneNumber: string, salt?: string): string => {
   if (!phoneNumber || !isE164Number(phoneNumber)) {
     throw Error('Attempting to hash a non-e164 number: ' + phoneNumber)
   }
-  return Web3Utils.soliditySha3({ type: 'string', value: phoneNumber })
+  const value = salt ? phoneNumber + salt : phoneNumber
+  return Web3Utils.soliditySha3({ type: 'string', value })
 }
 
 export function getCountryCode(e164PhoneNumber: string) {
