@@ -2,6 +2,7 @@ import BigNumber from 'bignumber.js'
 import { expectSaga } from 'redux-saga-test-plan'
 import * as matchers from 'redux-saga-test-plan/matchers'
 import { call, select } from 'redux-saga/effects'
+import { GAS_PRICE_INFLATION_FACTOR } from 'src/config'
 import { getReclaimEscrowGas } from 'src/escrow/saga'
 import { feeEstimated, FeeType } from 'src/fees/actions'
 import { estimateFeeSaga } from 'src/fees/saga'
@@ -31,6 +32,7 @@ describe(estimateFeeSaga, () => {
           FeeType.INVITE,
           new BigNumber(10000)
             .times(GAS_AMOUNT)
+            .times(GAS_PRICE_INFLATION_FACTOR)
             .plus(getInvitationVerificationFeeInWei())
             .toString()
         )
@@ -45,7 +47,15 @@ describe(estimateFeeSaga, () => {
         [matchers.call.fn(getSendTxGas), new BigNumber(GAS_AMOUNT)],
         [select(stableTokenBalanceSelector), '1'],
       ])
-      .put(feeEstimated(FeeType.SEND, new BigNumber(10000).times(GAS_AMOUNT).toString()))
+      .put(
+        feeEstimated(
+          FeeType.SEND,
+          new BigNumber(10000)
+            .times(GAS_PRICE_INFLATION_FACTOR)
+            .times(GAS_AMOUNT)
+            .toString()
+        )
+      )
       .run()
   })
 
@@ -56,7 +66,15 @@ describe(estimateFeeSaga, () => {
         [matchers.call.fn(getReclaimEscrowGas), new BigNumber(GAS_AMOUNT)],
         [select(stableTokenBalanceSelector), '1'],
       ])
-      .put(feeEstimated(FeeType.SEND, new BigNumber(10000).times(GAS_AMOUNT).toString()))
+      .put(
+        feeEstimated(
+          FeeType.SEND,
+          new BigNumber(10000)
+            .times(GAS_PRICE_INFLATION_FACTOR)
+            .times(GAS_AMOUNT)
+            .toString()
+        )
+      )
       .run()
   })
 
