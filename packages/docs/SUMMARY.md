@@ -17,6 +17,7 @@
 
 - [Governance](operations-manual/governance.md)
 - [Key Management](operations-manual/key-management.md)
+  - [Using a Ledger Wallet](operations-manual/using-a-ledger-wallet.md)
 - [Securing Celo Nodes and Services](operations-manual/securing-nodes-and-services.md)
 - [Upgrading a Node](operations-manual/node-upgrades.md)
 
@@ -175,6 +176,7 @@
       - [wallets/default-wallet](developer-resources/contractkit/reference/modules/_wallets_default_wallet_.md)
       - [DefaultWallet](developer-resources/contractkit/reference/classes/_wallets_default_wallet_.defaultwallet.md)
       - [wallets/ledger-wallet](developer-resources/contractkit/reference/modules/_wallets_ledger_wallet_.md)
+      - [AddressValidation](developer-resources/contractkit/reference/enums/_wallets_ledger_wallet_.addressvalidation.md)
       - [LedgerWallet](developer-resources/contractkit/reference/classes/_wallets_ledger_wallet_.ledgerwallet.md)
       - [wallets/wallet](developer-resources/contractkit/reference/modules/_wallets_wallet_.md)
       - [Wallet](developer-resources/contractkit/reference/interfaces/_wallets_wallet_.wallet.md)
@@ -310,6 +312,7 @@
     - [Enums]()
       - [CeloContract](developer-resources/contractkit/reference/enums/_base_.celocontract.md)
       - [ClaimTypes](developer-resources/contractkit/reference/enums/_identity_claims_types_.claimtypes.md)
+      - [AddressValidation](developer-resources/contractkit/reference/enums/_wallets_ledger_wallet_.addressvalidation.md)
       - [AttestationState](developer-resources/contractkit/reference/enums/_wrappers_attestations_.attestationstate.md)
       - [ProposalStage](developer-resources/contractkit/reference/enums/_wrappers_governance_.proposalstage.md)
       - [VoteValue](developer-resources/contractkit/reference/enums/_wrappers_governance_.votevalue.md)
