@@ -836,22 +836,6 @@ export async function addStaticPeers(datadir: string, peers: string[], verbose: 
   fs.writeFileSync(staticPeersPath, enodesString)
 }
 
-export async function addProxyPeer(
-  runPath: string,
-  gethBinaryPath: string,
-  instance: GethInstanceConfig
-) {
-  if (instance.proxies) {
-    await spawnCmdWithExitOnFailure(gethBinaryPath, [
-      '--datadir',
-      getDatadir(runPath, instance),
-      'attach',
-      '--exec',
-      `istanbul.addProxy('${instance.proxies[0]!}', '${instance.proxies[1]!}')`,
-    ])
-  }
-}
-
 export async function startGeth(
   gethConfig: GethRunConfig,
   gethBinaryPath: string,
