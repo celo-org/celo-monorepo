@@ -43,6 +43,7 @@ import Logger from 'src/utils/Logger'
 import { addLocalAccount, getContractKit } from 'src/web3/contracts'
 import { getConnectedUnlockedAccount, getOrCreateAccount, waitWeb3LastBlock } from 'src/web3/saga'
 import { fornoSelector } from 'src/web3/selectors'
+import Web3 from 'web3'
 
 const TAG = 'invite/saga'
 export const TEMP_PW = 'ce10'
@@ -79,7 +80,7 @@ export function getInvitationVerificationFeeInDollars() {
 }
 
 export function getInvitationVerificationFeeInWei() {
-  return new BigNumber(getContractKit().web3.utils.toWei(INVITE_FEE))
+  return new BigNumber(Web3.utils.toWei(INVITE_FEE))
 }
 
 export async function generateInviteLink(inviteCode: string) {
@@ -353,9 +354,7 @@ export function* withdrawFundsFromTempAccount(
   if (!fornoMode) {
     yield call(contractKit.web3.eth.personal.unlockAccount, tempAccount, TEMP_PW, 600)
   }
-  const tempAccountBalance = new BigNumber(
-    contractKit.web3.utils.fromWei(tempAccountBalanceWei.toString())
-  )
+  const tempAccountBalance = new BigNumber(Web3.utils.fromWei(tempAccountBalanceWei.toString()))
 
   Logger.debug(TAG + '@withdrawFundsFromTempAccount', 'Creating send transaction')
   const tx: CeloTransactionObject<boolean> = yield call(createTransaction, CURRENCY_ENUM.DOLLAR, {

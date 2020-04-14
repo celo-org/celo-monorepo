@@ -39,6 +39,7 @@ import Logger from 'src/utils/Logger'
 import { addLocalAccount, getContractKit } from 'src/web3/contracts'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
 import { fornoSelector } from 'src/web3/selectors'
+import Web3 from 'web3'
 
 const TAG = 'escrow/saga'
 
@@ -48,7 +49,7 @@ function* transferStableTokenToEscrow(action: EscrowTransferPaymentAction) {
     const { phoneHash, amount, tempWalletAddress } = action
     const account: string = yield call(getConnectedUnlockedAccount)
 
-    const contractKit = getContractKit()
+    const contractKit = yield call(getContractKit)
 
     const stableToken: StableTokenWrapper = yield call([
       contractKit.contracts,
@@ -60,7 +61,7 @@ function* transferStableTokenToEscrow(action: EscrowTransferPaymentAction) {
     ])
 
     Logger.debug(TAG + '@transferToEscrow', 'Approving escrow transfer')
-    const convertedAmount = contractKit.web3.utils.toWei(amount.toString())
+    const convertedAmount = Web3.utils.toWei(amount.toString())
     const approvalTx = stableToken.approve(escrow.address, convertedAmount)
 
     yield call(sendTransaction, approvalTx.txo, account, TAG, 'approval')
@@ -110,7 +111,7 @@ function* withdrawFromEscrow() {
   try {
     Logger.debug(TAG + '@withdrawFromEscrow', 'Withdrawing escrowed payment')
 
-    const contractKit = getContractKit()
+    const contractKit = yield call(getContractKit)
 
     const escrow: EscrowWrapper = yield call([
       contractKit.contracts,
@@ -152,7 +153,7 @@ function* withdrawFromEscrow() {
       yield call(contractKit.web3.eth.personal.unlockAccount, tempWalletAddress, TEMP_PW, 600)
     }
 
-    const msgHash = contractKit.web3.utils.soliditySha3({ type: 'address', value: account })
+    const msgHash = Web3.utils.soliditySha3({ type: 'address', value: account })
 
     Logger.debug(TAG + '@withdrawFromEscrow', `Signing message hash ${msgHash}`)
     // using the temporary wallet account to sign a message. The message is the current account.
@@ -162,7 +163,7 @@ function* withdrawFromEscrow() {
     signature = signature.slice(2)
     const r = `0x${signature.slice(0, 64)}`
     const s = `0x${signature.slice(64, 128)}`
-    const v = contractKit.web3.utils.hexToNumber(ensureLeading0x(signature.slice(128, 130)))
+    const v = Web3.utils.hexToNumber(ensureLeading0x(signature.slice(128, 130)))
 
     const withdrawTx = escrow.withdraw(tempWalletAddress, v, r, s)
     const txID = generateStandbyTransactionId(account)
@@ -182,7 +183,7 @@ function* withdrawFromEscrow() {
 }
 
 async function createReclaimTransaction(paymentID: string) {
-  const contractKit = getContractKit()
+  const contractKit = yield call(getContractKit)
 
   const escrow = await contractKit.contracts.getEscrow()
   return escrow.revoke(paymentID).txo
@@ -247,7 +248,7 @@ function* doFetchSentPayments() {
   Logger.debug(TAG + '@doFetchSentPayments', 'Fetching valid sent escrowed payments')
 
   try {
-    const contractKit = getContractKit()
+    const contractKit = yield call(getContractKit)
 
     const escrow: EscrowWrapper = yield call([
       contractKit.contracts,

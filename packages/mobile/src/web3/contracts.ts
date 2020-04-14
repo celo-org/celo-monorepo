@@ -21,7 +21,7 @@ let contractKit = newKitFromWeb3(web3)
 
 // TODO util functions can just be web3
 
-export async function nonGeneratorGetContractKit() {
+export async function getContractKitOutsideGenerator() {
   // TODO(anna) Keep polling until store is defined
   // 250 ms
   // make sure not blocking US
