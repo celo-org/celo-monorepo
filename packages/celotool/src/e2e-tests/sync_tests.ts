@@ -1,3 +1,4 @@
+// tslint:disable: no-console
 import { assert } from 'chai'
 import Web3 from 'web3'
 import { GethInstanceConfig } from '../lib/interfaces/geth-instance-config'
