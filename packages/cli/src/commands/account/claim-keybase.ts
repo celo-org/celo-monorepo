@@ -36,7 +36,7 @@ export default class ClaimKeybase extends ClaimCommand {
     const res = this.parse(ClaimKeybase)
     const address = toChecksumAddress(res.flags.from)
     const username = res.flags.username
-    const metadata = this.readMetadata()
+    const metadata = await this.readMetadata()
     const claim = createKeybaseClaim(username)
     const signature = await this.signer.sign(hashOfClaim(claim))
     await this.addClaim(metadata, claim)

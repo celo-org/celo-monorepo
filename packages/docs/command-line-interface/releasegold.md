@@ -308,8 +308,8 @@ OPTIONS
   --value=10000000000000000000000                        (required) Value (in Wei) of Celo Dollars to transfer
 
 EXAMPLE
-  transfer --contract 0x5409ED021D9299bf6814279A6A1411A7e866A631 --to 0x6Ecbe1DB9EF729CBe972C83Fb886247691Fb6beb --value
-  10000000000000000000000
+  transfer-dollars --contract 0x5409ED021D9299bf6814279A6A1411A7e866A631 --to 0x6Ecbe1DB9EF729CBe972C83Fb886247691Fb6beb
+  --value 10000000000000000000000
 ```
 
 _See code: [packages/cli/src/commands/releasegold/transfer-dollars.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/releasegold/transfer-dollars.ts)_
