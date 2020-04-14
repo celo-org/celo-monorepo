@@ -57,7 +57,6 @@
     "date-fns": "^2.0.0-alpha.27",
     "dot-prop-immutable": "^1.4.0",
     "ethereumjs-util": "^5.2.0",
-    "express-rate-limit": "^5.1.1",
     "fuzzysort": "^1.1.4",
     "google-libphonenumber": "^3.2.4",
     "graphql": "^14.1.1",
