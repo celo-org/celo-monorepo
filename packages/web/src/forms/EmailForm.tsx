@@ -81,7 +81,7 @@ export default React.memo(function EmailForm({
               </Responsive>
               {!isDesktop && (
                 <View style={!!formState.errors.length && styles.feedbackMobile}>
-                  <ErrorDisplay field={formState.errors[0]} isShowing={!!formState.errors.length} />
+                  <ErrorDisplay field={'email'} isShowing={!!formState.errors.length} />
                 </View>
               )}
               <Responsive large={[styles.submitBtn, styles.submitBtnDesktop]}>
@@ -94,7 +94,7 @@ export default React.memo(function EmailForm({
               </Responsive>
               <View style={styles.feedback}>
                 {isDesktop && (
-                  <ErrorDisplay field={formState.errors[0]} isShowing={!!formState.errors.length} />
+                  <ErrorDisplay field={'email'} isShowing={!!formState.errors.length} />
                 )}
               </View>
             </View>
