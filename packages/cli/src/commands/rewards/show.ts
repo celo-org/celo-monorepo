@@ -167,7 +167,7 @@ export default class Show extends BaseCommand {
         voterRewards,
         {
           address: {},
-          aaddressPayment: { get: (e) => e.addressPayment.toFixed() },
+          addressPayment: { get: (e) => e.addressPayment.toFixed() },
           group: { get: (e) => e.group.address },
           averageValidatorScore: { get: (e) => averageValidatorScore(e.validators).toFixed() },
           epochNumber: {},
