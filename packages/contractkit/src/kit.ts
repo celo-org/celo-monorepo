@@ -8,6 +8,7 @@ import { Address, CeloContract, CeloToken } from './base'
 import { WrapperCache } from './contract-cache'
 import { CeloProvider } from './providers/celo-provider'
 import { toTxResult, TransactionResult } from './utils/tx-result'
+import { estimateGas } from './utils/web3-utils'
 import { Wallet } from './wallets/wallet'
 import { Web3ContractCache } from './web3-contract-cache'
 import { AttestationsConfig } from './wrappers/Attestations'
@@ -269,9 +270,9 @@ export class ContractKit {
     let gas = tx.gas
     if (gas == null) {
       gas = Math.round(
-        (await this.web3.eth.estimateGas({ ...tx })) * this.config.gasInflationFactor
+        (await estimateGas(tx, this.web3.eth.estimateGas, this.web3.eth.call)) *
+          this.config.gasInflationFactor
       )
-      debug('estimatedGas: %s', gas)
     }
 
     return toTxResult(
