@@ -1,14 +1,15 @@
 // Copied from '@ledgerhq/hw-app-eth/erc20' because we need to change the path of the blob and support for address+chainId
+import { normalizeAddressWith0x } from '@celo/utils/src/address'
+import { Address } from '../../base'
 import blob from './data'
 
 /**
- * Retrieve the token information by a given contract address if any
+ * Retrieve the token information by a given contract address and chainId if any
  */
-export const byContractAddress = (
-  contract: string,
+export const tokenInfoByAddressAndChainId = (
+  contract: Address,
   chainId: number
-): TokenInfo | null | undefined =>
-  get().byContract([asContractAddress(contract), chainId].join('-'))
+): TokenInfo | null | undefined => get().byContractKey(generateContractKey(contract, chainId))
 
 /**
  * list all the ERC20 tokens informations
@@ -16,7 +17,7 @@ export const byContractAddress = (
 export const list = (): TokenInfo[] => get().list()
 
 export interface TokenInfo {
-  contractAddress: string
+  contractAddress: Address
   ticker: string
   decimals: number
   chainId: number
@@ -25,13 +26,12 @@ export interface TokenInfo {
 }
 
 export interface API {
-  byContract: (arg0: string) => TokenInfo | null | undefined
+  byContractKey: (arg0: string) => TokenInfo | null | undefined
   list: () => TokenInfo[]
 }
 
-const asContractAddress = (addr: string) => {
-  const a = addr.toLowerCase()
-  return a.startsWith('0x') ? a : '0x' + a
+function generateContractKey(contract: Address, chainId: number): string {
+  return [normalizeAddressWith0x(contract), chainId].join('-')
 }
 
 // this internal get() will lazy load and cache the data from the erc20 data blob
@@ -54,7 +54,7 @@ const get: () => API = (() => {
       j += 1
       const ticker = item.slice(j, j + tickerLength).toString('ascii')
       j += tickerLength
-      const contractAddress: string = asContractAddress(item.slice(j, j + 20).toString('hex'))
+      const contractAddress: string = normalizeAddressWith0x(item.slice(j, j + 20).toString('hex'))
       j += 20
       const decimals = item.readUInt32BE(j)
       j += 4
@@ -70,12 +70,12 @@ const get: () => API = (() => {
         data: item,
       }
       entries.push(entry)
-      byContract[[contractAddress, chainId].join('-')] = entry
+      byContract[generateContractKey(contractAddress, chainId)] = entry
       i += length
     }
     const api = {
       list: () => entries,
-      byContract: (id: string) => byContract[id],
+      byContractKey: (id: string) => byContract[id],
     }
     cache = api
     return api
