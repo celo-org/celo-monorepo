@@ -22,6 +22,7 @@ import { Wallet } from './wallet'
 
 export const CELO_BASE_DERIVATION_PATH = "44'/52752'/0'/0"
 const ADDRESS_QTY = 5
+const CELO_APP_ACCEPTS_CONTRACT_DATA_FROM_VERSION = '1.0.2'
 
 // Validates an address using the Ledger
 export enum AddressValidation {
@@ -200,7 +201,12 @@ export class LedgerWallet implements Wallet {
     try {
       const rlpEncoded = rlpEncodedTx(txParams)
       const path = await this.getDerivationPathFor(txParams.from!.toString())
-      if (this.compareVersionWithTheLedgerApp('1.0.2') <= 0) {
+      if (
+        LedgerWallet.compareLedgerAppVersions(
+          this.appConfiguration.version,
+          CELO_APP_ACCEPTS_CONTRACT_DATA_FROM_VERSION
+        ) >= 0
+      ) {
         const tokenInfo = tokenInfoByAddressAndChainId(
           rlpEncoded.transaction.to!,
           rlpEncoded.transaction.chainId!
@@ -326,13 +332,19 @@ export class LedgerWallet implements Wallet {
     throw error
   }
 
-  private compareVersionWithTheLedgerApp(version: string): number {
-    const numberV = this.stringVersionToNumber(version)
-    const numberAppV = this.stringVersionToNumber(this.appConfiguration.version)
-    return numberV < numberAppV ? -1 : numberAppV === numberV ? 0 : 1
+  /**
+   * @return
+   * -1: version1 < version2,
+   *  0: version1 == version2,
+   *  1: version1 > version2
+   */
+  static compareLedgerAppVersions(version1: string, version2: string): number {
+    const numberV1 = this.stringVersionToNumber(version1)
+    const numberV2 = this.stringVersionToNumber(version2)
+    return numberV1 < numberV2 ? -1 : numberV1 === numberV2 ? 0 : 1
   }
 
-  private stringVersionToNumber(version: string): number {
+  static stringVersionToNumber(version: string): number {
     const parts = version.split('.')
     return parts.reduce((accum, part) => (accum + Number(part)) * 1000, 0)
   }
