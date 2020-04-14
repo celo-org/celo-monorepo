@@ -213,7 +213,7 @@ class ValidatorsList extends React.PureComponent<ValidatorsListProps & I18nProps
           }
         }
       )
-      .map((group) => {
+      .map((group, id) => {
         const data = group.validators.reduce(
           ({ elected, online, total, uptime, attestation }, validator) => ({
             elected: elected + +validator.elected,
@@ -227,6 +227,7 @@ class ValidatorsList extends React.PureComponent<ValidatorsListProps & I18nProps
         data.uptime = data.uptime / group.validators.length
         data.attestation = data.attestation / group.validators.length
         return {
+          id,
           ...group,
           ...data,
         }
@@ -243,6 +244,7 @@ class ValidatorsList extends React.PureComponent<ValidatorsListProps & I18nProps
     const dir = orderAsc ? 1 : -1
 
     return (data || [])
+      .sort((a: any, b: any) => b.id - a.id)
       .sort((a, b) => (dAccessor(a) > dAccessor(b) ? -1 : 1))
       .sort((a, b) => dir * (accessor(a) > accessor(b) ? 1 : -1))
   }
@@ -309,9 +311,9 @@ class ValidatorsList extends React.PureComponent<ValidatorsListProps & I18nProps
               />
             </View>
             {validatorGroups.map((group, i) => (
-              <View key={group.address} onClick={this.expand.bind(this, i)}>
+              <div key={group.id} onClick={this.expand.bind(this, i)}>
                 <ValidatorsListRow group={group} expanded={expanded === i} />
-              </View>
+              </div>
             ))}
           </View>
         </View>

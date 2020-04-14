@@ -9,7 +9,7 @@ import { colors } from 'src/styles'
 import { cutAddress, formatNumber } from 'src/utils/utils'
 import Checkmark from 'src/icons/Checkmark'
 
-const unknonValidatorName = 'Unnamed validator'
+const unknonValidatorName = 'n/a validator'
 
 class Text extends RNText {
   render() {
@@ -18,6 +18,7 @@ class Text extends RNText {
 }
 
 export interface CeloGroup {
+  id: number
   elected: number
   online: number
   total: number
@@ -52,13 +53,47 @@ interface Props {
   group: CeloGroup
   expanded: boolean
 }
+interface State {
+  tooltip?: boolean
+}
 
-class ValidatorsListRow extends React.PureComponent<Props & I18nProps> {
+class ValidatorsListRow extends React.PureComponent<Props & I18nProps, State> {
+  state = {
+    tooltip: false,
+  }
+  tooltipRef = React.createRef<any>()
+
+  constructor(...args) {
+    super(...(args as [any]))
+
+    document.addEventListener(
+      'click',
+      (event) => {
+        if (!this.state.tooltip || !this.tooltipRef.current) {
+          return
+        }
+        if (!this.tooltipRef.current.parentNode.contains(event.target)) {
+          this.setState({ tooltip: false })
+        }
+      },
+      false
+    )
+  }
+
   render() {
     const { group, expanded } = this.props
+    const { tooltip } = this.state
+    const stopPropagation = (event: any) => {
+      event.preventDefault()
+      event.stopPropagation()
+    }
+    const toggleTooltip = (event: any) => {
+      stopPropagation(event)
+      this.setState({ tooltip: !tooltip })
+    }
     return (
-      <View key={group.address}>
-        <View style={[styles.tableRow, styles.tableRowCont]}>
+      <div style={tooltip ? { zIndex: 2 } : {}}>
+        <View style={[styles.tableRow, styles.tableRowCont, tooltip ? { zIndex: 3 } : {}]}>
           <View style={[styles.tableCell, styles.tableCellTitle]}>
             <Text style={[styles.tableCell, styles.tableCellTitleArrow]}>
               <Chevron
@@ -69,12 +104,35 @@ class ValidatorsListRow extends React.PureComponent<Props & I18nProps> {
               />
             </Text>
             <Text style={[styles.tableCellTitleRows]}>
-              <Text style={[styles.tableCellTitleFirstRow]} numberOfLines={1} ellipsizeMode="tail">
-                {group.name || unknonValidatorName}
+              <Text style={[styles.tableCellTitleFirstRowWrapper]}>
+                <Text
+                  style={[styles.tableCellTitleFirstRow]}
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                >
+                  {group.name || unknonValidatorName}
+                </Text>
 
                 {!!group.claims.length && (
                   <Text style={[styles.checkmark]}>
-                    <Checkmark color={colors.black} size={8} />
+                    <div onClick={stopPropagation}>
+                      <div ref={this.tooltipRef} onClick={toggleTooltip}>
+                        <Checkmark color={colors.black} size={8} />
+                      </div>
+
+                      {tooltip && (
+                        <Text style={[styles.tooltip]}>
+                          {group.claims.map((domain, i) => (
+                            <Text key={domain} style={[styles.tooltipRow]}>
+                              {i}. <Text style={[styles.tooltipText]}>{domain}</Text>
+                              <Text style={[styles.checkmark]}>
+                                <Checkmark color={colors.black} size={8} />
+                              </Text>
+                            </Text>
+                          ))}
+                        </Text>
+                      )}
+                    </div>
                   </Text>
                 )}
               </Text>
@@ -146,9 +204,9 @@ class ValidatorsListRow extends React.PureComponent<Props & I18nProps> {
           </Text>
         </View>
         {expanded && (
-          <View>
+          <>
             {group.validators.map((validator, j) => (
-              <View key={`${group.address}.${j}`} style={[styles.tableRow]}>
+              <View key={`${group.id}.${j}`} style={[styles.pStatic, styles.tableRow]}>
                 <Text
                   style={[styles.tableCell, styles.tableCellTitle, styles.tableSecondaryCell]}
                   numberOfLines={1}
@@ -217,9 +275,9 @@ class ValidatorsListRow extends React.PureComponent<Props & I18nProps> {
                 </Text>
               </View>
             ))}
-          </View>
+          </>
         )}
-      </View>
+      </div>
     )
   }
 }
