@@ -265,6 +265,7 @@ export class ContractKit {
    *  - returns a `TransactionResult` instead of `PromiEvent`
    */
   async sendTransaction(tx: Tx): Promise<TransactionResult> {
+    console.log('---------------------------')
     tx = this.fillTxDefaults(tx)
 
     let gas = tx.gas
@@ -291,7 +292,16 @@ export class ContractKit {
 
     let gas = tx.gas
     if (gas == null) {
-      gas = Math.round((await txObj.estimateGas({ ...tx })) * this.config.gasInflationFactor)
+      const gasEstimator = (tx: Tx) => txObj.estimateGas({ ...tx })
+      const data = txObj.encodeABI()
+      // @ts-ignore
+      console.log({ data, ...tx, to: txObj._parent._address })
+      // @ts-ignore
+      const caller = (tx: Tx) =>
+        this.web3.eth.call({ data, ...tx, to: txObj._parent._address }, 76077)
+      gas = Math.round(
+        (await estimateGas(tx, gasEstimator, caller)) * this.config.gasInflationFactor
+      )
       debug('estimatedGas: %s', gas)
     }
 
