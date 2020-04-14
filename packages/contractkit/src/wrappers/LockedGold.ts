@@ -1,3 +1,4 @@
+import { eqAddress } from '@celo/utils/lib/address'
 import { AddressListItem, linkedListChanges, zip } from '@celo/utils/lib/collections'
 import BigNumber from 'bignumber.js'
 import { EventLog } from 'web3-core'
@@ -273,7 +274,7 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
     //
     for (let i = groups.length - 1; i >= 0; i--) {
       const group = groups[i]
-      const totalVotes = allGroups.find((a) => a.address === group)?.value
+      const totalVotes = allGroups.find((a) => eqAddress(a.address, group))?.value
       if (!totalVotes) {
         throw new Error(`Cannot find group ${group}`)
       }
