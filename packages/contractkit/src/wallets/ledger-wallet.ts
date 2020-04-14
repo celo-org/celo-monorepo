@@ -61,6 +61,10 @@ export class LedgerWallet implements Wallet {
   private addressesRetrieved = false
   private setupFinished = false
   private setupLocked = false
+  private appConfiguration: { arbitraryDataEnabled: number; version: string } = {
+    arbitraryDataEnabled: 0,
+    version: '0.0.0',
+  }
   private ledger: any
 
   /**
@@ -98,6 +102,7 @@ export class LedgerWallet implements Wallet {
       if (!this.ledger) {
         this.ledger = this.generateNewLedger(transport)
       }
+      await this.retrieveAppConfiguration()
       if (!this.addressesRetrieved) {
         debug('Fetching addresses from the ledger')
         await this.retrieveAccounts()
@@ -111,6 +116,15 @@ export class LedgerWallet implements Wallet {
       throw error
     } finally {
       this.setupLocked = false
+    }
+  }
+
+  private async retrieveAppConfiguration() {
+    this.appConfiguration = await this.ledger!.getAppConfiguration()
+    if (!this.appConfiguration.arbitraryDataEnabled) {
+      console.log(
+        'Beware, your ledger does not allow the contract data. Some features may not work correctly'
+      )
     }
   }
 
@@ -186,12 +200,14 @@ export class LedgerWallet implements Wallet {
     try {
       const rlpEncoded = rlpEncodedTx(txParams)
       const path = await this.getDerivationPathFor(txParams.from!.toString())
-      const tokenInfo = tokenInfoByAddressAndChainId(
-        rlpEncoded.transaction.to!,
-        rlpEncoded.transaction.chainId!
-      )
-      if (tokenInfo) {
-        await this.ledger!.provideERC20TokenInformation(tokenInfo)
+      if (this.compareVersionWithTheLedgerApp('1.0.2') <= 0) {
+        const tokenInfo = tokenInfoByAddressAndChainId(
+          rlpEncoded.transaction.to!,
+          rlpEncoded.transaction.chainId!
+        )
+        if (tokenInfo) {
+          await this.ledger!.provideERC20TokenInformation(tokenInfo)
+        }
       }
       const signature = await this.ledger!.signTransaction(
         path,
@@ -308,5 +324,16 @@ export class LedgerWallet implements Wallet {
       )
     }
     throw error
+  }
+
+  private compareVersionWithTheLedgerApp(version: string): number {
+    const numberV = this.stringVersionToNumber(version)
+    const numberAppV = this.stringVersionToNumber(this.appConfiguration.version)
+    return numberV < numberAppV ? -1 : numberAppV === numberV ? 0 : 1
+  }
+
+  private stringVersionToNumber(version: string): number {
+    const parts = version.split('.')
+    return parts.reduce((accum, part) => (accum + Number(part)) * 1000, 0)
   }
 }
