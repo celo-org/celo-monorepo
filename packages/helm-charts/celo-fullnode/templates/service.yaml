@@ -4,7 +4,9 @@ kind: Service
 metadata:
   name: {{ template "common.fullname" $ }}-{{ $index }}
   annotations:
+{{ if $.Values.service.azure_mixed_protocols -}}
     service.beta.kubernetes.io/azure-load-balancer-mixed-protocols: "true"
+{{- end }}
   labels:
 {{ include "common.standard.labels" $  | indent 4 }}
 spec:

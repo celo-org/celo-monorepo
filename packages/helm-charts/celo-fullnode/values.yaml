@@ -8,6 +8,7 @@ fullnameOverride: false
 service:
   type: LoadBalancer
   port: 80
+  azure_mixed_protocols: true
 
 ingress:
   enabled: false
