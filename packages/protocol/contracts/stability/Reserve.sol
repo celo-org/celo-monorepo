@@ -69,6 +69,7 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
    * @param _tobinTaxStalenessThreshold The initial number of seconds to cache tobin tax value for.
    * @param _frozenGold The balance of reserve gold that is frozen.
    * @param _frozenDays The number of days during which the frozen gold thaws.
+   * @param _tobinTax The tobin tax.
    */
   function initialize(
     address registryAddress,
@@ -77,7 +78,8 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
     uint256 _frozenGold,
     uint256 _frozenDays,
     bytes32[] calldata _assetAllocationSymbols,
-    uint256[] calldata _assetAllocationWeights
+    uint256[] calldata _assetAllocationWeights,
+    uint256 _tobinTax
   ) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
@@ -85,6 +87,7 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
     setDailySpendingRatio(_spendingRatio);
     setFrozenGold(_frozenGold, _frozenDays);
     setAssetAllocations(_assetAllocationSymbols, _assetAllocationWeights);
+    setTobinTax(_tobinTax);
   }
 
   /**

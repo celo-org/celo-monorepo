@@ -135,6 +135,7 @@ const DefaultConfig = {
   },
   reserve: {
     tobinTaxStalenessThreshold: HOUR, // 1 hour
+    tobinTax: toFixed(0.005).toFixed(), // 0.5%
     dailySpendingRatio: toFixed(0.05).toFixed(), // 5%
     spenders: [],
     otherAddresses: ['0xd0a57D8acFe9979d33933d8A52971E6DC9E2DbF0'],
