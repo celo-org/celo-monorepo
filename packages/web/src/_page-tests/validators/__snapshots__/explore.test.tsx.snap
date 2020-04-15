@@ -685,11 +685,10 @@ exports[`ValidatorsList renders 1`] = `
         </div>
       </div>
       <div
-        className="css-view-1dbjc4n"
         onClick={[Function]}
       >
         <div
-          className="css-view-1dbjc4n"
+          style={Object {}}
         >
           <div
             className="css-view-1dbjc4n"
@@ -730,8 +729,6 @@ exports[`ValidatorsList renders 1`] = `
                   "fontSize": "16px",
                   "msFlexDirection": "row",
                   "msFlexPositive": 1,
-                  "overflowX": "hidden",
-                  "overflowY": "hidden",
                   "paddingBottom": "12px",
                   "paddingLeft": "10px",
                   "paddingRight": "10px",
@@ -794,8 +791,6 @@ exports[`ValidatorsList renders 1`] = `
                     "flexDirection": "column",
                     "fontFamily": "Jost, futura-pt, futura, sans-serif",
                     "msFlexDirection": "column",
-                    "overflowX": "hidden",
-                    "overflowY": "hidden",
                   }
                 }
               >
@@ -804,18 +799,39 @@ exports[`ValidatorsList renders 1`] = `
                   dir="auto"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
+                      "WebkitBoxPack": "start",
+                      "WebkitJustifyContent": "flex-start",
+                      "alignItems": "center",
                       "color": "rgba(255,255,255,1.00)",
+                      "display": "flex",
                       "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                      "fontWeight": "500",
-                      "overflowX": "hidden",
-                      "overflowY": "hidden",
-                      "textDecoration": "underline",
-                      "textOverflow": "ellipsis",
-                      "whiteSpace": "nowrap",
+                      "justifyContent": "flex-start",
+                      "msFlexAlign": "center",
+                      "msFlexPack": "start",
                     }
                   }
                 >
-                  Test 1
+                  <span
+                    className="css-text-901oao css-textHasAncestor-16my406"
+                    dir="auto"
+                    style={
+                      Object {
+                        "color": "rgba(255,255,255,1.00)",
+                        "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                        "fontWeight": "500",
+                        "maxWidth": "140px",
+                        "overflowX": "hidden",
+                        "overflowY": "hidden",
+                        "textDecoration": "underline",
+                        "textOverflow": "ellipsis",
+                        "whiteSpace": "nowrap",
+                      }
+                    }
+                  >
+                    Test 1
+                  </span>
                 </span>
                 <span
                   className="css-text-901oao css-textHasAncestor-16my406"
@@ -1317,7 +1333,7 @@ exports[`ValidatorsList renders 1`] = `
                     "marginLeft": "8px",
                     "position": "relative",
                     "top": "4px",
-                    "width": "40px",
+                    "width": "35px",
                   }
                 }
               >
@@ -1395,11 +1411,10 @@ exports[`ValidatorsList renders 1`] = `
         </div>
       </div>
       <div
-        className="css-view-1dbjc4n"
         onClick={[Function]}
       >
         <div
-          className="css-view-1dbjc4n"
+          style={Object {}}
         >
           <div
             className="css-view-1dbjc4n"
@@ -1440,8 +1455,6 @@ exports[`ValidatorsList renders 1`] = `
                   "fontSize": "16px",
                   "msFlexDirection": "row",
                   "msFlexPositive": 1,
-                  "overflowX": "hidden",
-                  "overflowY": "hidden",
                   "paddingBottom": "12px",
                   "paddingLeft": "10px",
                   "paddingRight": "10px",
@@ -1504,8 +1517,6 @@ exports[`ValidatorsList renders 1`] = `
                     "flexDirection": "column",
                     "fontFamily": "Jost, futura-pt, futura, sans-serif",
                     "msFlexDirection": "column",
-                    "overflowX": "hidden",
-                    "overflowY": "hidden",
                   }
                 }
               >
@@ -1514,18 +1525,39 @@ exports[`ValidatorsList renders 1`] = `
                   dir="auto"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
+                      "WebkitBoxPack": "start",
+                      "WebkitJustifyContent": "flex-start",
+                      "alignItems": "center",
                       "color": "rgba(255,255,255,1.00)",
+                      "display": "flex",
                       "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                      "fontWeight": "500",
-                      "overflowX": "hidden",
-                      "overflowY": "hidden",
-                      "textDecoration": "underline",
-                      "textOverflow": "ellipsis",
-                      "whiteSpace": "nowrap",
+                      "justifyContent": "flex-start",
+                      "msFlexAlign": "center",
+                      "msFlexPack": "start",
                     }
                   }
                 >
-                  Test 2
+                  <span
+                    className="css-text-901oao css-textHasAncestor-16my406"
+                    dir="auto"
+                    style={
+                      Object {
+                        "color": "rgba(255,255,255,1.00)",
+                        "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                        "fontWeight": "500",
+                        "maxWidth": "140px",
+                        "overflowX": "hidden",
+                        "overflowY": "hidden",
+                        "textDecoration": "underline",
+                        "textOverflow": "ellipsis",
+                        "whiteSpace": "nowrap",
+                      }
+                    }
+                  >
+                    Test 2
+                  </span>
                 </span>
                 <span
                   className="css-text-901oao css-textHasAncestor-16my406"
@@ -2027,7 +2059,7 @@ exports[`ValidatorsList renders 1`] = `
                     "marginLeft": "8px",
                     "position": "relative",
                     "top": "4px",
-                    "width": "40px",
+                    "width": "35px",
                   }
                 }
               >
@@ -2105,11 +2137,10 @@ exports[`ValidatorsList renders 1`] = `
         </div>
       </div>
       <div
-        className="css-view-1dbjc4n"
         onClick={[Function]}
       >
         <div
-          className="css-view-1dbjc4n"
+          style={Object {}}
         >
           <div
             className="css-view-1dbjc4n"
@@ -2150,8 +2181,6 @@ exports[`ValidatorsList renders 1`] = `
                   "fontSize": "16px",
                   "msFlexDirection": "row",
                   "msFlexPositive": 1,
-                  "overflowX": "hidden",
-                  "overflowY": "hidden",
                   "paddingBottom": "12px",
                   "paddingLeft": "10px",
                   "paddingRight": "10px",
@@ -2214,8 +2243,6 @@ exports[`ValidatorsList renders 1`] = `
                     "flexDirection": "column",
                     "fontFamily": "Jost, futura-pt, futura, sans-serif",
                     "msFlexDirection": "column",
-                    "overflowX": "hidden",
-                    "overflowY": "hidden",
                   }
                 }
               >
@@ -2224,18 +2251,39 @@ exports[`ValidatorsList renders 1`] = `
                   dir="auto"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
+                      "WebkitBoxPack": "start",
+                      "WebkitJustifyContent": "flex-start",
+                      "alignItems": "center",
                       "color": "rgba(255,255,255,1.00)",
+                      "display": "flex",
                       "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                      "fontWeight": "500",
-                      "overflowX": "hidden",
-                      "overflowY": "hidden",
-                      "textDecoration": "underline",
-                      "textOverflow": "ellipsis",
-                      "whiteSpace": "nowrap",
+                      "justifyContent": "flex-start",
+                      "msFlexAlign": "center",
+                      "msFlexPack": "start",
                     }
                   }
                 >
-                  Test 3
+                  <span
+                    className="css-text-901oao css-textHasAncestor-16my406"
+                    dir="auto"
+                    style={
+                      Object {
+                        "color": "rgba(255,255,255,1.00)",
+                        "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                        "fontWeight": "500",
+                        "maxWidth": "140px",
+                        "overflowX": "hidden",
+                        "overflowY": "hidden",
+                        "textDecoration": "underline",
+                        "textOverflow": "ellipsis",
+                        "whiteSpace": "nowrap",
+                      }
+                    }
+                  >
+                    Test 3
+                  </span>
                 </span>
                 <span
                   className="css-text-901oao css-textHasAncestor-16my406"
@@ -2737,7 +2785,7 @@ exports[`ValidatorsList renders 1`] = `
                     "marginLeft": "8px",
                     "position": "relative",
                     "top": "4px",
-                    "width": "40px",
+                    "width": "35px",
                   }
                 }
               >
@@ -2815,11 +2863,10 @@ exports[`ValidatorsList renders 1`] = `
         </div>
       </div>
       <div
-        className="css-view-1dbjc4n"
         onClick={[Function]}
       >
         <div
-          className="css-view-1dbjc4n"
+          style={Object {}}
         >
           <div
             className="css-view-1dbjc4n"
@@ -2860,8 +2907,6 @@ exports[`ValidatorsList renders 1`] = `
                   "fontSize": "16px",
                   "msFlexDirection": "row",
                   "msFlexPositive": 1,
-                  "overflowX": "hidden",
-                  "overflowY": "hidden",
                   "paddingBottom": "12px",
                   "paddingLeft": "10px",
                   "paddingRight": "10px",
@@ -2924,8 +2969,6 @@ exports[`ValidatorsList renders 1`] = `
                     "flexDirection": "column",
                     "fontFamily": "Jost, futura-pt, futura, sans-serif",
                     "msFlexDirection": "column",
-                    "overflowX": "hidden",
-                    "overflowY": "hidden",
                   }
                 }
               >
@@ -2934,18 +2977,39 @@ exports[`ValidatorsList renders 1`] = `
                   dir="auto"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
+                      "WebkitBoxPack": "start",
+                      "WebkitJustifyContent": "flex-start",
+                      "alignItems": "center",
                       "color": "rgba(255,255,255,1.00)",
+                      "display": "flex",
                       "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                      "fontWeight": "500",
-                      "overflowX": "hidden",
-                      "overflowY": "hidden",
-                      "textDecoration": "underline",
-                      "textOverflow": "ellipsis",
-                      "whiteSpace": "nowrap",
+                      "justifyContent": "flex-start",
+                      "msFlexAlign": "center",
+                      "msFlexPack": "start",
                     }
                   }
                 >
-                  Test 4
+                  <span
+                    className="css-text-901oao css-textHasAncestor-16my406"
+                    dir="auto"
+                    style={
+                      Object {
+                        "color": "rgba(255,255,255,1.00)",
+                        "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                        "fontWeight": "500",
+                        "maxWidth": "140px",
+                        "overflowX": "hidden",
+                        "overflowY": "hidden",
+                        "textDecoration": "underline",
+                        "textOverflow": "ellipsis",
+                        "whiteSpace": "nowrap",
+                      }
+                    }
+                  >
+                    Test 4
+                  </span>
                 </span>
                 <span
                   className="css-text-901oao css-textHasAncestor-16my406"
@@ -3447,7 +3511,7 @@ exports[`ValidatorsList renders 1`] = `
                     "marginLeft": "8px",
                     "position": "relative",
                     "top": "4px",
-                    "width": "40px",
+                    "width": "35px",
                   }
                 }
               >
@@ -3525,11 +3589,10 @@ exports[`ValidatorsList renders 1`] = `
         </div>
       </div>
       <div
-        className="css-view-1dbjc4n"
         onClick={[Function]}
       >
         <div
-          className="css-view-1dbjc4n"
+          style={Object {}}
         >
           <div
             className="css-view-1dbjc4n"
@@ -3570,8 +3633,6 @@ exports[`ValidatorsList renders 1`] = `
                   "fontSize": "16px",
                   "msFlexDirection": "row",
                   "msFlexPositive": 1,
-                  "overflowX": "hidden",
-                  "overflowY": "hidden",
                   "paddingBottom": "12px",
                   "paddingLeft": "10px",
                   "paddingRight": "10px",
@@ -3634,8 +3695,6 @@ exports[`ValidatorsList renders 1`] = `
                     "flexDirection": "column",
                     "fontFamily": "Jost, futura-pt, futura, sans-serif",
                     "msFlexDirection": "column",
-                    "overflowX": "hidden",
-                    "overflowY": "hidden",
                   }
                 }
               >
@@ -3644,18 +3703,39 @@ exports[`ValidatorsList renders 1`] = `
                   dir="auto"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
+                      "WebkitBoxPack": "start",
+                      "WebkitJustifyContent": "flex-start",
+                      "alignItems": "center",
                       "color": "rgba(255,255,255,1.00)",
+                      "display": "flex",
                       "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                      "fontWeight": "500",
-                      "overflowX": "hidden",
-                      "overflowY": "hidden",
-                      "textDecoration": "underline",
-                      "textOverflow": "ellipsis",
-                      "whiteSpace": "nowrap",
+                      "justifyContent": "flex-start",
+                      "msFlexAlign": "center",
+                      "msFlexPack": "start",
                     }
                   }
                 >
-                  Test 5
+                  <span
+                    className="css-text-901oao css-textHasAncestor-16my406"
+                    dir="auto"
+                    style={
+                      Object {
+                        "color": "rgba(255,255,255,1.00)",
+                        "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                        "fontWeight": "500",
+                        "maxWidth": "140px",
+                        "overflowX": "hidden",
+                        "overflowY": "hidden",
+                        "textDecoration": "underline",
+                        "textOverflow": "ellipsis",
+                        "whiteSpace": "nowrap",
+                      }
+                    }
+                  >
+                    Test 5
+                  </span>
                 </span>
                 <span
                   className="css-text-901oao css-textHasAncestor-16my406"
@@ -4157,7 +4237,7 @@ exports[`ValidatorsList renders 1`] = `
                     "marginLeft": "8px",
                     "position": "relative",
                     "top": "4px",
-                    "width": "40px",
+                    "width": "35px",
                   }
                 }
               >
@@ -4235,11 +4315,10 @@ exports[`ValidatorsList renders 1`] = `
         </div>
       </div>
       <div
-        className="css-view-1dbjc4n"
         onClick={[Function]}
       >
         <div
-          className="css-view-1dbjc4n"
+          style={Object {}}
         >
           <div
             className="css-view-1dbjc4n"
@@ -4280,8 +4359,6 @@ exports[`ValidatorsList renders 1`] = `
                   "fontSize": "16px",
                   "msFlexDirection": "row",
                   "msFlexPositive": 1,
-                  "overflowX": "hidden",
-                  "overflowY": "hidden",
                   "paddingBottom": "12px",
                   "paddingLeft": "10px",
                   "paddingRight": "10px",
@@ -4344,8 +4421,6 @@ exports[`ValidatorsList renders 1`] = `
                     "flexDirection": "column",
                     "fontFamily": "Jost, futura-pt, futura, sans-serif",
                     "msFlexDirection": "column",
-                    "overflowX": "hidden",
-                    "overflowY": "hidden",
                   }
                 }
               >
@@ -4354,18 +4429,39 @@ exports[`ValidatorsList renders 1`] = `
                   dir="auto"
                   style={
                     Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
+                      "WebkitBoxPack": "start",
+                      "WebkitJustifyContent": "flex-start",
+                      "alignItems": "center",
                       "color": "rgba(255,255,255,1.00)",
+                      "display": "flex",
                       "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                      "fontWeight": "500",
-                      "overflowX": "hidden",
-                      "overflowY": "hidden",
-                      "textDecoration": "underline",
-                      "textOverflow": "ellipsis",
-                      "whiteSpace": "nowrap",
+                      "justifyContent": "flex-start",
+                      "msFlexAlign": "center",
+                      "msFlexPack": "start",
                     }
                   }
                 >
-                  Test 6
+                  <span
+                    className="css-text-901oao css-textHasAncestor-16my406"
+                    dir="auto"
+                    style={
+                      Object {
+                        "color": "rgba(255,255,255,1.00)",
+                        "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                        "fontWeight": "500",
+                        "maxWidth": "140px",
+                        "overflowX": "hidden",
+                        "overflowY": "hidden",
+                        "textDecoration": "underline",
+                        "textOverflow": "ellipsis",
+                        "whiteSpace": "nowrap",
+                      }
+                    }
+                  >
+                    Test 6
+                  </span>
                 </span>
                 <span
                   className="css-text-901oao css-textHasAncestor-16my406"
@@ -4867,7 +4963,7 @@ exports[`ValidatorsList renders 1`] = `
                     "marginLeft": "8px",
                     "position": "relative",
                     "top": "4px",
-                    "width": "40px",
+                    "width": "35px",
                   }
                 }
               >
