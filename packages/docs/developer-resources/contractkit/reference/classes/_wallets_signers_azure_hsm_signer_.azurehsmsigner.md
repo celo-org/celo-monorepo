@@ -45,7 +45,7 @@ Name | Type |
 
 ▸ **getNativeKey**(): *string*
 
-*Defined in [contractkit/src/wallets/signers/azure-hsm-signer.ts:50](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/azure-hsm-signer.ts#L50)*
+*Defined in [contractkit/src/wallets/signers/azure-hsm-signer.ts:56](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/azure-hsm-signer.ts#L56)*
 
 **Returns:** *string*
 
@@ -55,7 +55,7 @@ ___
 
 ▸ **signPersonalMessage**(`data`: string): *Promise‹object›*
 
-*Defined in [contractkit/src/wallets/signers/azure-hsm-signer.ts:35](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/azure-hsm-signer.ts#L35)*
+*Defined in [contractkit/src/wallets/signers/azure-hsm-signer.ts:38](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/azure-hsm-signer.ts#L38)*
 
 **Parameters:**
 
@@ -71,7 +71,7 @@ ___
 
 ▸ **signTransaction**(`addToV`: number, `encodedTx`: [RLPEncodedTx](../interfaces/_utils_signing_utils_.rlpencodedtx.md)): *Promise‹object›*
 
-*Defined in [contractkit/src/wallets/signers/azure-hsm-signer.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/azure-hsm-signer.ts#L19)*
+*Defined in [contractkit/src/wallets/signers/azure-hsm-signer.ts:22](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/azure-hsm-signer.ts#L22)*
 
 **Parameters:**
 

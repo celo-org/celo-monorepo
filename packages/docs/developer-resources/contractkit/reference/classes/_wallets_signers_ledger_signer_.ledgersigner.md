@@ -67,7 +67,7 @@ ___
 
 ▸ **signPersonalMessage**(`data`: string): *Promise‹object›*
 
-*Defined in [contractkit/src/wallets/signers/ledger-signer.ts:83](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/ledger-signer.ts#L83)*
+*Defined in [contractkit/src/wallets/signers/ledger-signer.ts:82](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/ledger-signer.ts#L82)*
 
 **Parameters:**
 
@@ -100,7 +100,7 @@ ___
 
 ▸ **signTypedData**(`typedData`: [EIP712TypedData](../interfaces/_utils_sign_typed_data_utils_.eip712typeddata.md)): *Promise‹object›*
 
-*Defined in [contractkit/src/wallets/signers/ledger-signer.ts:104](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/ledger-signer.ts#L104)*
+*Defined in [contractkit/src/wallets/signers/ledger-signer.ts:103](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/ledger-signer.ts#L103)*
 
 **Parameters:**
 

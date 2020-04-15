@@ -22,7 +22,7 @@
 
 \+ **new Signature**(`v`: number, `r`: Buffer, `s`: Buffer): *[Signature](_wallets_signers_azure_key_vault_client_.signature.md)*
 
-*Defined in [contractkit/src/wallets/signers/azure-key-vault-client.ts:189](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/azure-key-vault-client.ts#L189)*
+*Defined in [contractkit/src/wallets/signers/azure-key-vault-client.ts:205](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/azure-key-vault-client.ts#L205)*
 
 **Parameters:**
 
@@ -40,7 +40,7 @@ Name | Type |
 
 • **r**: *Buffer*
 
-*Defined in [contractkit/src/wallets/signers/azure-key-vault-client.ts:188](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/azure-key-vault-client.ts#L188)*
+*Defined in [contractkit/src/wallets/signers/azure-key-vault-client.ts:204](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/azure-key-vault-client.ts#L204)*
 
 ___
 
@@ -48,7 +48,7 @@ ___
 
 • **s**: *Buffer*
 
-*Defined in [contractkit/src/wallets/signers/azure-key-vault-client.ts:189](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/azure-key-vault-client.ts#L189)*
+*Defined in [contractkit/src/wallets/signers/azure-key-vault-client.ts:205](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/azure-key-vault-client.ts#L205)*
 
 ___
 
@@ -56,4 +56,4 @@ ___
 
 • **v**: *number*
 
-*Defined in [contractkit/src/wallets/signers/azure-key-vault-client.ts:187](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/azure-key-vault-client.ts#L187)*
+*Defined in [contractkit/src/wallets/signers/azure-key-vault-client.ts:203](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/azure-key-vault-client.ts#L203)*
