@@ -49,6 +49,7 @@ import ImportWalletEmpty from 'src/import/ImportWalletEmpty'
 import ImportWalletSocial from 'src/import/ImportWalletSocial'
 import EnterInviteCode from 'src/invite/EnterInviteCode'
 import JoinCelo from 'src/invite/JoinCelo'
+import RegulatoryTerms from 'src/invite/RegulatoryTerms'
 import Language from 'src/language/Language'
 import SelectLocalCurrency from 'src/localCurrency/SelectLocalCurrency'
 import { Screens, Stacks } from 'src/navigator/Screens'
@@ -122,6 +123,7 @@ const NuxStack = createStackNavigator(
   {
     [Screens.Language]: { screen: Language },
     [Screens.JoinCelo]: { screen: JoinCelo },
+    [Screens.RegulatoryTerms]: { screen: RegulatoryTerms },
     [Screens.PincodeEducation]: { screen: PincodeEducation },
     [Screens.PincodeSet]: { screen: PincodeSet },
     [Screens.EnterInviteCode]: { screen: EnterInviteCode },

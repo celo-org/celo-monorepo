@@ -15,14 +15,12 @@ import { hideAlert, showError } from 'src/alert/actions'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import DevSkipButton from 'src/components/DevSkipButton'
-import { CELO_TERMS_LINK } from 'src/config'
 import { Namespaces, withTranslation } from 'src/i18n'
 import NuxLogo from 'src/icons/NuxLogo'
 import { nuxNavigationOptions } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
-import { navigateToURI } from 'src/utils/linking'
 
 interface StateProps {
   language: string
@@ -105,15 +103,11 @@ export class JoinCelo extends React.Component<Props, State> {
     this.props.hideAlert()
   }
 
-  onPressGoToTerms = () => {
-    navigateToURI(CELO_TERMS_LINK)
-  }
-
   goToNextScreen = () => {
     const nextScreen =
       this.props.pincodeType === PincodeType.Unset
         ? Screens.PincodeEducation
-        : Screens.EnterInviteCode
+        : Screens.RegulatoryTerms
     navigate(nextScreen)
   }
 
@@ -159,7 +153,7 @@ export class JoinCelo extends React.Component<Props, State> {
           <Text style={fontStyles.h1} testID="InviteWallTitle">
             {t('welcomeCelo')}
           </Text>
-          <Text style={fontStyles.bodySmall}>{t('joinText.0')}</Text>
+          <Text style={fontStyles.bodySmall}>{t('joinText')}</Text>
           <TextInput
             onChangeText={this.onChangeNameInput}
             value={name}
@@ -186,12 +180,6 @@ export class JoinCelo extends React.Component<Props, State> {
               this.props.cachedNumber !== '' ? this.props.cachedNumber : undefined
             }
           />
-          <Text style={styles.disclaimer}>
-            {t('joinText.1')}
-            <Text onPress={this.onPressGoToTerms} style={styles.disclamerLink}>
-              {t('joinText.2')}
-            </Text>
-          </Text>
         </ScrollView>
         <Button
           standard={false}

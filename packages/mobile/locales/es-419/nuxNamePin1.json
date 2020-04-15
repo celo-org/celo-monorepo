@@ -4,11 +4,10 @@
   "welcomeCelo": "Te damos la bienvenida a Celo",
   "chooseCountryCode": "Código de país",
   "chooseCountry": "País",
-  "joinText": {
-    "0": "El Monedero Celo te ayuda a enviar, recibir y guardar valor en la red de Celo.",
-    "1":
-      "Al unirte a esta red, nos das permiso para recopilar información anónima sobre cómo utilizas la aplicación. Además, si verificas tu número de teléfono, se almacenará una copia ofuscada en la Red de Celo. Más información en ",
-    "2": "celo.org/terms"
+  "joinText": "El Monedero Celo te ayuda a enviar, recibir y guardar valor en la red de Celo.",
+  "terms": {
+    "privacy":
+      "Al unirte a esta red, nos das permiso para recopilar información anónima sobre cómo utilizas la aplicación. Además, si verificas tu número de teléfono, se almacenará una copia ofuscada en la Red de Celo. Más información en <0>celo.org/terms</0>"
   },
   "phoneNumber": "000 000 0000",
   "inviteCodeText": {

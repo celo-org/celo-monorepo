@@ -117,6 +117,7 @@ export function* navigateToProperScreen() {
     return
   }
 
+  // TODO store terms acceptance in redux and go to screen if not ACCEPTED
   if (!language) {
     navigate(Stacks.NuxStack)
   } else if (!inSync) {
