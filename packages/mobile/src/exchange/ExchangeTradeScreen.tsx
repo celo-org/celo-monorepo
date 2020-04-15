@@ -36,6 +36,7 @@ import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { getRateForMakerToken, getTakerAmount } from 'src/utils/currencyExchange'
+import { convertToPeriodDecimalSeparator } from 'src/utils/formatting'
 
 interface State {
   inputToken: CURRENCY_ENUM
@@ -193,7 +194,9 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
   // Output is either cGLD or cUSD based on input token
   // Local amounts are converted to cUSD
   getInputTokenAmount = () => {
-    const parsedInputAmount = parseInputAmount(this.state.inputAmount)
+    const parsedInputAmount = parseInputAmount(
+      convertToPeriodDecimalSeparator(this.state.inputAmount)
+    )
     if (this.state.inputToken === CURRENCY_ENUM.GOLD) {
       return parsedInputAmount
     }
@@ -268,7 +271,7 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
                 {t('exchangeAmount', { tokenName: this.getInputTokenDisplayText() })}
               </Text>
               <TouchableOpacity onPress={this.switchInputToken} testID="ExchangeSwitchInput">
-                <Text style={[fontStyles.subSmall, { textDecorationLine: 'underline' }]}>
+                <Text style={styles.switchToText}>
                   {t('switchTo', { tokenName: this.getOppositeInputTokenDisplayText() })}
                 </Text>
               </TouchableOpacity>
@@ -284,9 +287,8 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
               testID="ExchangeInput"
             />
           </View>
-          <HorizontalLine />
           <LineItemRow
-            textStyle={styles.exchangeBodyText}
+            textStyle={styles.subtotalBodyText}
             title={
               <Trans
                 i18nKey="inputSubtotal"
@@ -343,12 +345,23 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginTop: 38,
     alignItems: 'center',
+    marginBottom: 8,
   },
   exchangeBodyText: {
-    ...fontStyles.bodyBold,
+    ...fontStyles.bodySmall,
     fontSize: 15,
     lineHeight: 20,
-    fontWeight: '600',
+    fontWeight: '700',
+  },
+  subtotalBodyText: {
+    ...fontStyles.bodySmall,
+    fontSize: 15,
+    lineHeight: 20,
+  },
+  switchToText: {
+    ...fontStyles.subSmall,
+    textDecorationLine: 'underline',
+    fontSize: 13,
   },
   currencyInput: {
     ...fontStyles.body,
