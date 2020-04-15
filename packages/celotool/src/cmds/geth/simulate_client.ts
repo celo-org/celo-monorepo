@@ -74,6 +74,8 @@ export const handler = async (argv: SimulateClientArgv) => {
       recipientIndex
     )
 
+    const web3ProviderPort = 8545 + x
+
     console.log(
       `Account for sender index ${argv.index} thread ${x}, final index ${senderIndex}: ${senderAddress}`
     )
@@ -95,7 +97,8 @@ export const handler = async (argv: SimulateClientArgv) => {
       argv.delay,
       argv.blockscoutUrl,
       argv.blockscoutMeasurePercent,
-      argv.index
+      argv.index,
+      `http://localhost:${web3ProviderPort}`
     )
   }
 }

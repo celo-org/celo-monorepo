@@ -50,7 +50,7 @@ spec:
             RID=${BASH_REMATCH[1]}
             echo $RID > /root/.celo/rid
 
-            for thread in $(seq 1 {{ .Values.threads | default "1" }}); do
+            for thread in $(seq 0 {{ sub .Values.threads 1 | default "0" }}); do
               echo "Generating private key for rid=$RID thread=$thread"
               celotooljs.sh generate bip32 \
                 --mnemonic "$MNEMONIC" \
@@ -84,7 +84,7 @@ spec:
         args:
         - "-c"
         - |
-          for thread in $(seq 1 {{ .Values.threads | default "1" }}); do
+          for thread in $(seq 0 {{ sub .Values.threads 1 | default "0" }}); do
             geth account import --password /root/.celo/account/accountSecret /root/.celo/pkey$thread || true
           done
         volumeMounts:
@@ -94,9 +94,63 @@ spec:
           mountPath: "/root/.celo/account"
           readOnly: true
       containers:
-      - name: geth
-        image: {{ .Values.geth.image.repository }}:{{ .Values.geth.image.tag }}
-        imagePullPolicy: {{ .Values.imagePullPolicy }}
+      # - name: geth
+      #   image: {{ .Values.geth.image.repository }}:{{ .Values.geth.image.tag }}
+      #   imagePullPolicy: {{ .Values.imagePullPolicy }}
+      #   command: ["/bin/sh"]
+      #   args:
+      #   - "-c"
+      #   - |-
+      #     set -euo pipefail
+      #     cp /var/geth/static-nodes.json /root/.celo/static-nodes.json
+
+      #     #ACCOUNT_ADDRESS=`cat /root/.celo/address`
+      #     ACCOUNT_ADDRESS=$(awk '{print $1}' /root/.celo/address | paste -s -d, -)
+      #     PASSWORD=$(cat /root/.celo/account/accountSecret)
+      #     for thread in $(seq 0 {{ sub .Values.threads 1 | default "0" }}); do
+      #       echo $PASSWORD >> /passwords.txt
+      #     done
+
+      #     geth \
+      #     --rpc \
+      #     --rpcapi=eth,web3,debug,admin,personal,net \
+      #     --allow-insecure-unlock \
+      #     --rpcvhosts=* \
+      #     --networkid={{ .Values.geth.networkID }} \
+      #     --nodekey=/root/.celo/pkey1 \
+      #     --syncmode=lightest \
+      #     --consoleformat=json \
+      #     --consoleoutput=stdout \
+      #     --verbosity={{ .Values.geth.verbosity }} \
+      #     --unlock=$ACCOUNT_ADDRESS \
+      #     --allow-insecure-unlock \
+      #     --password=/passwords.txt
+      #   ports:
+      #   - name: discovery-udp
+      #     containerPort: 30303
+      #     protocol: UDP
+      #   - name: discovery-tcp
+      #     containerPort: 30303
+      #   - name: rpc
+      #     containerPort: 8545
+      #   - name: ws
+      #     containerPort: 8546
+      #   resources:
+      #     requests:
+      #       memory: 250Mi
+      #       cpu: 40m
+      #   volumeMounts:
+      #   - name: data
+      #     mountPath: /root/.celo
+      #   - name: config
+      #     mountPath: /var/geth
+      #   - name: account
+      #     mountPath: "/root/.celo/account"
+      #     readOnly: true
+{{ range $index, $e := until (.Values.threads | int) }}
+      - name: geth-{{ $index }}
+        image: {{ $.Values.geth.image.repository }}:{{ $.Values.geth.image.tag }}
+        imagePullPolicy: {{ $.Values.imagePullPolicy }}
         command: ["/bin/sh"]
         args:
         - "-c"
@@ -104,41 +158,29 @@ spec:
           set -euo pipefail
           cp /var/geth/static-nodes.json /root/.celo/static-nodes.json
 
-          #ACCOUNT_ADDRESS=`cat /root/.celo/address`
-          ACCOUNT_ADDRESS=$(awk '{print $1}' /root/.celo/address | paste -s -d, -)
+          ACCOUNT_ADDRESS=$(awk 'NR=={{ add $index 1 }}' /root/.celo/address)
           PASSWORD=$(cat /root/.celo/account/accountSecret)
-          for thread in $(seq 1 {{ .Values.threads | default "1" }}); do
-            echo $PASSWORD >> /passwords.txt
-          done
 
           geth \
           --rpc \
           --rpcapi=eth,web3,debug,admin,personal,net \
           --allow-insecure-unlock \
           --rpcvhosts=* \
-          --networkid={{ .Values.geth.networkID }} \
-          --nodekey=/root/.celo/pkey1 \
+          --networkid={{ $.Values.geth.networkID }} \
+          --nodekey=/root/.celo/pkey{{ $index }} \
           --syncmode=lightest \
           --consoleformat=json \
           --consoleoutput=stdout \
-          --verbosity={{ .Values.geth.verbosity }} \
+          --verbosity={{ $.Values.geth.verbosity }} \
           --unlock=$ACCOUNT_ADDRESS \
           --allow-insecure-unlock \
-          --password=/passwords.txt
-        ports:
-        - name: discovery-udp
-          containerPort: 30303
-          protocol: UDP
-        - name: discovery-tcp
-          containerPort: 30303
-        - name: rpc
-          containerPort: 8545
-        - name: ws
-          containerPort: 8546
+          --password=/root/.celo/account/accountSecret \
+          --port {{ add 30303 $index }} \
+          --rpcport {{ add 8545 $index }}
         resources:
           requests:
-            memory: 250Mi
-            cpu: 40m
+            memory: 100Mi
+            cpu: 25m
         volumeMounts:
         - name: data
           mountPath: /root/.celo
@@ -147,6 +189,7 @@ spec:
         - name: account
           mountPath: "/root/.celo/account"
           readOnly: true
+{{ end }}
       - name: simulate-client
         image: {{ .Values.celotool.image.repository }}:{{ .Values.celotool.image.tag }}
         imagePullPolicy: {{ .Values.imagePullPolicy }}
@@ -166,7 +209,7 @@ spec:
               --mnemonic "$MNEMONIC" \
               --blockscout-url {{ .Values.blockscout.url }} \
               --blockscoutMeasurePercent {{ .Values.blockscout.measurePercent }} \
-              --client-count {{ .Values.threads | default "1" }}
+              --client-count {{ .Values.threads | default "1" }} \
         resources:
           requests:
             memory: 256Mi

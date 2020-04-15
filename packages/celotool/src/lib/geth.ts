@@ -494,10 +494,11 @@ export const simulateClient = async (
   txPeriodMs: number, // time between new transactions in ms
   blockscoutUrl: string,
   blockscoutMeasurePercent: number, // percent of time in range [0, 100] to measure blockscout for a tx
-  index: number
+  index: number,
+  web3Provider: string = 'http://localhost:8545'
 ) => {
   // Assume the node is accessible via localhost with senderAddress unlocked
-  const kit = newKit('http://localhost:8545')
+  const kit = newKit(web3Provider)
   kit.defaultAccount = senderAddress
 
   const baseLogMessage: any = {
