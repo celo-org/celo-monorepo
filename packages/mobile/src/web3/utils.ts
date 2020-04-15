@@ -1,9 +1,8 @@
 import { ensureLeading0x } from '@celo/utils/src/address'
+import { call } from 'redux-saga/effects'
 import Logger from 'src/utils/Logger'
 import { getContractKit, getContractKitOutsideGenerator } from 'src/web3/contracts'
-import { all, call, cancelled, put, select, spawn, take, takeLatest } from 'redux-saga/effects'
-
-const Web3 = require('web3') // Have to import this way to avoid type errors with Web3.eth, see
+import Web3 from 'web3'
 
 const TAG = 'web3/utils'
 
@@ -37,5 +36,5 @@ export async function* getLatestNonce(address: string) {
 }
 
 export function getAccountAddressFromPrivateKey(privateKey: string): string {
-  return Web3.eth.accounts.privateKeyToAccount(ensureLeading0x(privateKey)).address
+  return new Web3().eth.accounts.privateKeyToAccount(ensureLeading0x(privateKey)).address
 }

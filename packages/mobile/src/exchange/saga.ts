@@ -45,7 +45,7 @@ export function* doFetchTobinTax({ makerAmount, makerToken }: FetchTobinTaxActio
     if (makerToken === CURRENCY_ENUM.GOLD) {
       yield call(getConnectedAccount)
 
-      const contractKit = getContractKit()
+      const contractKit = yield call(getContractKit)
       const reserve: ReserveWrapper = yield call([
         contractKit.contracts,
         contractKit.contracts.getReserve,
@@ -103,7 +103,7 @@ export function* doFetchExchangeRate(action: FetchExchangeRateAction) {
         ? makerAmountInWei
         : LARGE_DOLLARS_SELL_AMOUNT_IN_WEI
 
-    const contractKit = getContractKit()
+    const contractKit = yield call(getContractKit)
 
     const exchange: ExchangeWrapper = yield call([
       contractKit.contracts,
@@ -159,7 +159,7 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
 
     txId = yield createStandbyTx(makerToken, makerAmount, exchangeRate, account)
 
-    const contractKit = getContractKit()
+    const contractKit = yield call(getContractKit)
 
     const goldTokenContract: GoldTokenWrapper = yield call([
       contractKit.contracts,

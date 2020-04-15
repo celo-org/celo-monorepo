@@ -1,7 +1,8 @@
 import { newKitFromWeb3 } from '@celo/contractkit'
 import { privateKeyToAddress } from '@celo/utils/src/address'
-import { Platform } from 'react-native'
 import * as net from 'react-native-tcp'
+import { call } from 'redux-saga/effects'
+import { waitForRehydrate } from 'src/app/saga'
 import { DEFAULT_FORNO_URL } from 'src/config'
 import { IPC_PATH } from 'src/geth/geth'
 import networkConfig from 'src/geth/networkConfig'
@@ -10,16 +11,18 @@ import Logger from 'src/utils/Logger'
 import { contractKitReadySelector } from 'src/web3/selectors'
 import Web3 from 'web3'
 import { provider } from 'web3-core'
-import { waitForRehydrate } from 'src/app/saga'
-import { call, cancel, cancelled, delay, fork, put, race, select, take } from 'redux-saga/effects'
 
 // Logging tag
 const tag = 'web3/contracts'
 
-const web3: Web3 = getWeb3()
+const web3: Web3 = getWeb3ForUtils()
 let contractKit = newKitFromWeb3(web3)
 
 // TODO util functions can just be web3
+
+function getWeb3ForUtils(): Web3 {
+  return new Web3()
+}
 
 export async function getContractKitOutsideGenerator() {
   // TODO(anna) Keep polling until store is defined
@@ -98,21 +101,6 @@ function getHttpProvider(url: string): provider {
   //   Logger.showError('Error occurred')
   // })
   return httpProvider
-}
-
-function getWeb3(): Web3 {
-  Logger.info(
-    `${tag}@getWeb3`,
-    `Initializing web3, platform: ${Platform.OS}, forno mode: ${isInitiallyFornoMode()}`
-  )
-
-  if (isInitiallyFornoMode()) {
-    const url = DEFAULT_FORNO_URL
-    Logger.debug(`${tag}@getWeb3`, `Connecting to url ${url}`)
-    return new Web3(getHttpProvider(url))
-  } else {
-    return new Web3(getIpcProvider())
-  }
 }
 
 // Mutates web3 with new provider

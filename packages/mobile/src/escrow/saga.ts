@@ -36,10 +36,14 @@ import { TransactionStatus } from 'src/transactions/reducer'
 import { sendAndMonitorTransaction } from 'src/transactions/saga'
 import { sendTransaction } from 'src/transactions/send'
 import Logger from 'src/utils/Logger'
-import { addLocalAccount, getContractKit, getContractKitOutsideGenerator } from 'src/web3/contracts'
+import {
+  addLocalAccount,
+  getContractKit,
+  getContractKitOutsideGenerator,
+  web3,
+} from 'src/web3/contracts'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
 import { fornoSelector } from 'src/web3/selectors'
-import Web3 from 'web3'
 
 const TAG = 'escrow/saga'
 
@@ -61,7 +65,7 @@ function* transferStableTokenToEscrow(action: EscrowTransferPaymentAction) {
     ])
 
     Logger.debug(TAG + '@transferToEscrow', 'Approving escrow transfer')
-    const convertedAmount = Web3.utils.toWei(amount.toString())
+    const convertedAmount = web3.utils.toWei(amount.toString())
     const approvalTx = stableToken.approve(escrow.address, convertedAmount)
 
     yield call(sendTransaction, approvalTx.txo, account, TAG, 'approval')
@@ -153,7 +157,7 @@ function* withdrawFromEscrow() {
       yield call(contractKit.web3.eth.personal.unlockAccount, tempWalletAddress, TEMP_PW, 600)
     }
 
-    const msgHash = Web3.utils.soliditySha3({ type: 'address', value: account })
+    const msgHash = web3.utils.soliditySha3({ type: 'address', value: account })
 
     Logger.debug(TAG + '@withdrawFromEscrow', `Signing message hash ${msgHash}`)
     // using the temporary wallet account to sign a message. The message is the current account.
@@ -163,7 +167,7 @@ function* withdrawFromEscrow() {
     signature = signature.slice(2)
     const r = `0x${signature.slice(0, 64)}`
     const s = `0x${signature.slice(64, 128)}`
-    const v = Web3.utils.hexToNumber(ensureLeading0x(signature.slice(128, 130)))
+    const v = web3.utils.hexToNumber(ensureLeading0x(signature.slice(128, 130)))
 
     const withdrawTx = escrow.withdraw(tempWalletAddress, v, r, s)
     const txID = generateStandbyTransactionId(account)
