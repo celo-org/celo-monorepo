@@ -853,7 +853,7 @@ contract('Exchange', (accounts: string[]) => {
           const exchangeTx = await exchange.exchange(
             stableTokenBalance,
             expectedGoldAmount.integerValue(BigNumber.ROUND_FLOOR),
-            true,
+            false,
             {
               from: user,
             }
