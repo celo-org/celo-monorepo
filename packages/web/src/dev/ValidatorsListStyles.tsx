@@ -23,6 +23,10 @@ export const styles = StyleSheet.create({
     color: colors.grayHeavy,
   },
 
+  tooltipOn: {
+    zIndex: 2,
+  },
+
   // Table
   table: {
     width: 1020,

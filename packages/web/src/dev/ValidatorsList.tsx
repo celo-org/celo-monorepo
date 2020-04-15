@@ -43,34 +43,42 @@ const HeaderCell = React.memo(function HeaderCellFn({
   )
 })
 
+interface Edges<T> {
+  edges: Array<{
+    node: T
+  }>
+}
+
 interface CeloValidatorGroup {
   account: {
     address: string
     lockedGold: string
     name: string
     usd: string
-    claims: any
+    claims: Edges<{
+      verified: boolean
+      element: string
+    }>
   }
   accumulatedActive: string
   accumulatedRewards: string
-  affiliates: {
-    edges: Array<{
-      node: {
-        account: {
-          claims: any
-        }
-        address: string
-        attestationsFulfilled: number
-        attestationsRequested: number
-        lastElected: number
-        lastOnline: number
-        lockedGold: string
-        name: string
-        score: string
-        usd: string
-      }
-    }>
-  }
+  affiliates: Edges<{
+    account: {
+      claims: Edges<{
+        verified: boolean
+        element: string
+      }>
+    }
+    address: string
+    attestationsFulfilled: number
+    attestationsRequested: number
+    lastElected: number
+    lastOnline: number
+    lockedGold: string
+    name: string
+    score: string
+    usd: string
+  }>
   commission: string
   numMembers: number
   receivableVotes: string
@@ -154,8 +162,8 @@ class ValidatorsList extends React.PureComponent<ValidatorsListProps & I18nProps
       .map(({ receivableVotes }) => new BigNumber(receivableVotes))
       .reduce((acc: BigNumber, _) => acc.plus(_), new BigNumber(0))
 
-    const getClaims = (claims: any): string[] =>
-      claims.edges
+    const getClaims = (claims: CeloValidatorGroup['account']['claims'] = {} as any): string[] =>
+      (claims.edges || [])
         .map(({ node }) => node)
         .filter(({ verified }) => verified)
         .map(({ element }) => element)
@@ -236,14 +244,14 @@ class ValidatorsList extends React.PureComponent<ValidatorsListProps & I18nProps
     return cleanData
   }
 
-  sortData<T>(data: T[]): T[] {
+  sortData<T extends any & { id: number }>(data: T[]): T[] {
     const { orderBy, orderAsc } = this.state
     const accessor = this.orderAccessors[orderBy]
     const dAccessor = this.orderAccessors[this.defaultOrderAccessor]
     const dir = orderAsc ? 1 : -1
 
     return (data || [])
-      .sort((a: any, b: any) => b.id - a.id)
+      .sort((a, b) => b.id - a.id)
       .sort((a, b) => (dAccessor(a) > dAccessor(b) ? -1 : 1))
       .sort((a, b) => dir * (accessor(a) > accessor(b) ? 1 : -1))
   }

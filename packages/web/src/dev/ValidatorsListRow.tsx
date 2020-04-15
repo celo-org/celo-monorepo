@@ -4,12 +4,12 @@ import CopyToClipboard from 'src/dev/CopyToClipboard'
 import ProgressCutBar from 'src/dev/ProgressCutBar'
 import { styles } from 'src/dev/ValidatorsListStyles'
 import { I18nProps, withNamespaces } from 'src/i18n'
+import Checkmark from 'src/icons/Checkmark'
 import Chevron, { Direction } from 'src/icons/chevron'
 import { colors } from 'src/styles'
 import { cutAddress, formatNumber } from 'src/utils/utils'
-import Checkmark from 'src/icons/Checkmark'
 
-const unknonValidatorName = 'n/a validator'
+const unknonValidatorName = 'Unnamed validator'
 
 class Text extends RNText {
   render() {
