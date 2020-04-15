@@ -2,9 +2,12 @@ import { DefaultAzureCredential } from '@azure/identity'
 import { CryptographyClient, KeyClient, KeyVaultKey } from '@azure/keyvault-keys'
 import { ensureLeading0x } from '@celo/utils/lib/address'
 import { BigNumber } from 'bignumber.js'
+import debugFactory from 'debug'
 import { ec as EC } from 'elliptic'
 import * as ethUtil from 'ethereumjs-util'
 import { ecdsaRecover } from 'secp256k1'
+
+const debug = debugFactory('kit:wallet:akv-client')
 
 /**
  * Provides an abstraction on Azure Key Vault for performing signing operations
@@ -87,7 +90,8 @@ export class AzureKeyVaultClient {
     // https://github.com/bitcoin/bips/blob/master/bip-0062.mediawiki#Low_S_values_in_signatures
     const N = AzureKeyVaultClient.bufferToBigNumber(this.secp256k1Curve.curve.n)
     if (!AzureKeyVaultClient.isCanonical(S, N)) {
-      S = this.secp256k1Curve.curve.n.sub(S)
+      debug('Canonicalizing signature')
+      S = N.minus(S)
     }
 
     const rBuff = AzureKeyVaultClient.bigNumberToBuffer(R)
@@ -120,7 +124,7 @@ export class AzureKeyVaultClient {
    * Returns true if the signature is in the "bottom" of the curve
    */
   private static isCanonical(S: BigNumber, curveN: BigNumber): boolean {
-    return S.comparedTo(curveN.shiftedBy(1)) <= 0
+    return S.comparedTo(curveN.dividedBy(2)) <= 0
   }
 
   /**
@@ -137,6 +141,7 @@ export class AzureKeyVaultClient {
         const recoveredPublicKeyByteArr = ecdsaRecover(signature, i, hash, compressed)
         const publicKeyBuff = Buffer.from(recoveredPublicKeyByteArr)
         const recoveredPublicKey = AzureKeyVaultClient.bufferToBigNumber(publicKeyBuff)
+        debug('Recovered key: ' + recoveredPublicKey)
         if (publicKey.eq(recoveredPublicKey)) {
           return i
         }
