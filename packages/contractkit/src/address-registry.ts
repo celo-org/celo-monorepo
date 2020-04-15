@@ -26,8 +26,9 @@ export class AddressRegistry {
    */
   async addressFor(contract: CeloContract): Promise<Address> {
     if (!this.cache.has(contract)) {
+      const proxyStrippedContract = contract.replace('Proxy', '') as CeloContract
       debug('Fetching address from Registry for %s', contract)
-      const hash = Web3.utils.soliditySha3({ type: 'string', value: contract })
+      const hash = Web3.utils.soliditySha3({ type: 'string', value: proxyStrippedContract })
       const address = await this.registry.methods.getAddressFor(hash).call()
 
       debug('Fetched address:  %s = %s', address)
