@@ -20,7 +20,7 @@
 
 • **epochNumber**: *number*
 
-*Defined in [contractkit/src/wrappers/Validators.ts:45](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L45)*
+*Defined in [contractkit/src/wrappers/Validators.ts:50](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L50)*
 
 ___
 
@@ -28,7 +28,7 @@ ___
 
 • **group**: *[ValidatorGroup](_wrappers_validators_.validatorgroup.md)*
 
-*Defined in [contractkit/src/wrappers/Validators.ts:43](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L43)*
+*Defined in [contractkit/src/wrappers/Validators.ts:48](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L48)*
 
 ___
 
@@ -36,7 +36,7 @@ ___
 
 • **groupPayment**: *BigNumber*
 
-*Defined in [contractkit/src/wrappers/Validators.ts:44](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L44)*
+*Defined in [contractkit/src/wrappers/Validators.ts:49](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L49)*
 
 ___
 
@@ -44,7 +44,7 @@ ___
 
 • **validator**: *[Validator](_wrappers_validators_.validator.md)*
 
-*Defined in [contractkit/src/wrappers/Validators.ts:41](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L41)*
+*Defined in [contractkit/src/wrappers/Validators.ts:46](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L46)*
 
 ___
 
@@ -52,4 +52,4 @@ ___
 
 • **validatorPayment**: *BigNumber*
 
-*Defined in [contractkit/src/wrappers/Validators.ts:42](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L42)*
+*Defined in [contractkit/src/wrappers/Validators.ts:47](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L47)*

@@ -50,7 +50,7 @@ export async function startGanache(
     console.log(`Removing old chain tmp folder: ${chainCopy}`)
     fs.removeSync(chainCopy)
   }
-  console.log(`Creationg chain tmp folder: ${chainCopy}`)
+  console.log(`Creating chain tmp folder: ${chainCopy}`)
   fs.mkdirsSync(chainCopy)
 
   if (opts.from_targz) {

@@ -1,11 +1,13 @@
 import * as React from 'react'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import { H3 } from 'src/fonts/Fonts'
-import EmailForm, { After } from 'src/forms/EmailForm'
+import EmailForm from 'src/forms/EmailForm'
 import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
+import sendCoinIcon from 'src/icons/send-green-coin-lg-bg.png'
 import BookLayout from 'src/layout/BookLayout'
 import { GridRow } from 'src/layout/GridRow'
 import Button, { BTN } from 'src/shared/Button.3'
+import pagePaths from 'src/shared/menu-items'
 import {
   BrandChannel,
   DiscordChannel,
@@ -15,7 +17,6 @@ import {
   TwitterChannel,
 } from 'src/shared/SocialChannels'
 import { colors, fonts, standardStyles } from 'src/styles'
-
 interface Props {
   includeDividerLine: boolean
 }
@@ -32,7 +33,7 @@ function ConnectionFooter({ t, includeDividerLine }: I18nProps & Props) {
       </GridRow>
       <BookLayout label={t('conductLabel')}>
         <Text style={[fonts.p, standardStyles.elementalMarginBottom]}>{t('conductText')}</Text>
-        <Button kind={BTN.PRIMARY} text={t('conductBtn')} />
+        <Button kind={BTN.PRIMARY} text={t('conductBtn')} href={pagePaths.CODE_OF_CONDUCT.link} />
       </BookLayout>
       <BookLayout label={t('experienceLabel')} isWide={true}>
         <View style={styles.engageArea}>
@@ -48,22 +49,13 @@ function ConnectionFooter({ t, includeDividerLine }: I18nProps & Props) {
           <EventsChannel isDarkMode={false} />
         </View>
         <View>
-          <Image
-            resizeMode="contain"
-            source={{ uri: require('src/dev/devNews.png') }}
-            style={styles.emailLogo}
-          />
+          <Image resizeMode="contain" source={{ uri: sendCoinIcon }} style={styles.emailLogo} />
           <View style={styles.form}>
             <H3 style={styles.formTitle}>{t('stayConnected')}</H3>
             <Text style={[fonts.p, standardStyles.elementalMarginBottom]}>
               {t('receiveUpdates')}
             </Text>
-            <EmailForm
-              submitText={t('signUp')}
-              route={'/contacts'}
-              whenComplete={<After t={t} />}
-              isDarkMode={false}
-            />
+            <EmailForm submitText={t('signUp')} route={'/contacts'} isDarkMode={false} />
           </View>
         </View>
       </BookLayout>

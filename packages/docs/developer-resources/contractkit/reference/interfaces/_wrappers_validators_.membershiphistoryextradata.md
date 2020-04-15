@@ -17,7 +17,7 @@
 
 • **lastRemovedFromGroupTimestamp**: *number*
 
-*Defined in [contractkit/src/wrappers/Validators.ts:66](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L66)*
+*Defined in [contractkit/src/wrappers/Validators.ts:72](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L72)*
 
 ___
 
@@ -25,4 +25,4 @@ ___
 
 • **tail**: *number*
 
-*Defined in [contractkit/src/wrappers/Validators.ts:67](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L67)*
+*Defined in [contractkit/src/wrappers/Validators.ts:73](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L73)*

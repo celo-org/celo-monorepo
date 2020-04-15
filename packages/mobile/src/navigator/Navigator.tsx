@@ -23,6 +23,9 @@ import InviteReview from 'src/account/InviteReview'
 import Licenses from 'src/account/Licenses'
 import PhotosEducation from 'src/account/PhotosEducation'
 import Profile from 'src/account/Profile'
+import Security from 'src/account/Security'
+import Support from 'src/account/Support'
+import SupportContact from 'src/account/SupportContact'
 import AppLoading from 'src/app/AppLoading'
 import Debug from 'src/app/Debug'
 import ErrorScreen from 'src/app/ErrorScreen'
@@ -53,8 +56,8 @@ import TabNavigator from 'src/navigator/TabNavigator'
 import IncomingPaymentRequestListScreen from 'src/paymentRequest/IncomingPaymentRequestListScreen'
 import OutgoingPaymentRequestListScreen from 'src/paymentRequest/OutgoingPaymentRequestListScreen'
 import PaymentRequestConfirmation from 'src/paymentRequest/PaymentRequestConfirmation'
-import PincodeConfirmation from 'src/pincode/PincodeConfirmation'
 import PincodeEducation from 'src/pincode/PincodeEducation'
+import PincodeEnter from 'src/pincode/PincodeEnter'
 import PincodeSet from 'src/pincode/PincodeSet'
 import QRCode from 'src/qrcode/QRCode'
 import QRScanner from 'src/qrcode/QRScanner'
@@ -96,7 +99,7 @@ export const headerArea: CreateNavigatorConfig<
 }
 
 export const commonScreens = {
-  [Screens.PincodeConfirmation]: { screen: PincodeConfirmation },
+  [Screens.PincodeEnter]: { screen: PincodeEnter },
   [Screens.ErrorScreen]: { screen: ErrorScreen },
   [Screens.UpgradeScreen]: { screen: UpgradeScreen },
   [Screens.DappKitAccountAuth]: { screen: DappKitAccountScreen },
@@ -254,6 +257,7 @@ const SettingsStack = createStackNavigator(
     [Screens.Account]: { screen: Account },
     [Stacks.BackupStack]: { screen: BackupStack },
     [Screens.Language]: { screen: Language },
+    [Screens.Security]: { screen: Security },
     [Screens.Analytics]: { screen: Analytics },
     [Screens.DataSaver]: { screen: DataSaver },
     [Screens.EditProfile]: { screen: EditProfile },
@@ -262,6 +266,8 @@ const SettingsStack = createStackNavigator(
     [Screens.InviteReview]: { screen: InviteReview },
     [Screens.SelectLocalCurrency]: { screen: SelectLocalCurrency },
     [Screens.Licenses]: { screen: Licenses },
+    [Screens.Support]: { screen: Support },
+    [Screens.SupportContact]: { screen: SupportContact },
     [Screens.FiatExchange]: { screen: FiatExchange },
     ...verificationScreens,
   },
@@ -308,12 +314,12 @@ const AppStack = createStackNavigator(
 
 const AppNavigator = createSwitchNavigator(
   {
-    AppLoading,
+    [Screens.AppLoading]: AppLoading,
     [Stacks.NuxStack]: NuxStack,
     [Stacks.AppStack]: AppStack,
   },
   {
-    initialRouteName: 'AppLoading',
+    initialRouteName: Screens.AppLoading,
   }
 )
 

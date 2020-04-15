@@ -1,6 +1,6 @@
 // tslint:disable:no-console
 // tslint:disable-next-line:no-reference (Required to make this work w/ ts-node)
-/// <reference path="../../../contractkit/types/web3.d.ts" />
+/// <reference path="../../../contractkit/types/web3-celo.d.ts" />
 
 import { ContractKit, newKit } from '@celo/contractkit'
 import { BlockchainParametersWrapper } from '@celo/contractkit/lib/wrappers/BlockchainParameters'
@@ -18,7 +18,7 @@ describe('Blockchain parameters tests', function(this: any) {
   let parameters: BlockchainParametersWrapper
 
   const gethConfig: GethRunConfig = {
-    migrateTo: 19,
+    migrateTo: 20,
     runPath: TMP_PATH,
     keepData: false,
     networkId: 1101,
@@ -35,8 +35,16 @@ describe('Blockchain parameters tests', function(this: any) {
   }
 
   const hooks = getHooks(gethConfig)
-  before(hooks.before)
-  after(hooks.after)
+
+  before(async function(this: any) {
+    this.timeout(0)
+    await hooks.before()
+  })
+
+  after(async function(this: any) {
+    this.timeout(0)
+    await hooks.after()
+  })
 
   const validatorAddress: string = '0x47e172f6cfb6c7d01c1574fa3e2be7cc73269d95'
 
@@ -63,17 +71,15 @@ describe('Blockchain parameters tests', function(this: any) {
     })
     it('block limit should have been set using governance', async () => {
       this.timeout(0)
-      const current = await kit.web3.eth.getBlockNumber()
-      const block = await kit.web3.eth.getBlock(current)
-      assert.equal(block.gasLimit, 20000000)
+      const res = await parameters.getBlockGasLimit()
+      assert.equal(res, 20000000)
     })
     it('changing the block gas limit', async () => {
       this.timeout(0)
       await parameters.setBlockGasLimit(23000000).send({ from: validatorAddress })
       await sleep(5)
-      const current = await kit.web3.eth.getBlockNumber()
-      const block = await kit.web3.eth.getBlock(current)
-      assert.equal(block.gasLimit, 23000000)
+      const res = await parameters.getBlockGasLimit()
+      assert.equal(res, 23000000)
     })
     it('should exit when minimum version is updated', async () => {
       this.timeout(0)

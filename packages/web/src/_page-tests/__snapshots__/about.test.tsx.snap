@@ -119,7 +119,6 @@ exports[`About renders 1`] = `
             }
 
             .ReactModal__Overlay {
-              transform: translateY(-100vh);
               transition: transform 1000ms ease-in-out;
             }
             
@@ -182,7 +181,7 @@ exports[`About renders 1`] = `
             }
           }
         >
-          prosperityForAll
+          Prosperity for All
         </h1>
         <div
           className="css-view-1dbjc4n"
@@ -239,7 +238,7 @@ exports[`About renders 1`] = `
               }
             }
           >
-            whatIfMoney
+            What if money were beautiful?
           </h3>
         </div>
       </div>
@@ -370,7 +369,7 @@ exports[`About renders 1`] = `
           }
         }
       >
-        MissionTitle
+        Mission
       </h3>
     </div>
     <div
@@ -408,7 +407,7 @@ exports[`About renders 1`] = `
           }
         }
       >
-        MissionText
+        Our mission is to build a financial system that creates the conditions for prosperity—for everyone.
       </h1>
     </div>
   </div>
@@ -468,7 +467,7 @@ exports[`About renders 1`] = `
           }
         }
       >
-        MeaningTile
+        Meaning
       </h3>
     </div>
     <div
@@ -507,6 +506,7 @@ exports[`About renders 1`] = `
           }
         }
       >
+        Celo, pronounced 
         <span
           className="css-text-901oao css-textHasAncestor-16my406"
           dir="auto"
@@ -516,8 +516,9 @@ exports[`About renders 1`] = `
             }
           }
         >
-          "/ˈtselo/"
+          /ˈtselo/
         </span>
+         
         <div
           className="css-view-1dbjc4n"
           data-focusable={true}
@@ -593,6 +594,8 @@ exports[`About renders 1`] = `
             />
           </audio>
         </div>
+        
+means ‘purpose’ in Esperanto.
       </h1>
       <div
         className="css-text-901oao"
@@ -609,7 +612,11 @@ exports[`About renders 1`] = `
           }
         }
       >
-        MeaningCopy
+        The spirit of Esperanto and auxiliary languages, is to equip speakers with a means to connect, engage, and build trust with someone who speaks a different native tongue.
+
+In a similar spirit, we are aiming to create a new platform to connect people globally and bring financial stability to those who need it most. We believe blockchain technology is one of the most exciting innovations in recent history and as a team we look to push the boundaries of what is possible with it today.
+
+More importantly, we are driven by purpose – to solve real-world problems such as lack of access to sound currency, or friction for cash-transfer programs aimed to alleviate poverty.
       </div>
     </div>
   </div>
@@ -710,7 +717,7 @@ exports[`About renders 1`] = `
           }
         }
       >
-        ValuesTitle
+        Celo Values
       </h3>
     </div>
     <div
@@ -746,6 +753,7 @@ exports[`About renders 1`] = `
           }
         }
       >
+        Celo is founded on two core values: 
         <span
           className="css-text-901oao css-textHasAncestor-16my406"
           dir="auto"
@@ -755,8 +763,21 @@ exports[`About renders 1`] = `
             }
           }
         >
-          M
+          unique purpose
         </span>
+         and 
+        <span
+          className="css-text-901oao css-textHasAncestor-16my406"
+          dir="auto"
+          style={
+            Object {
+              "fontWeight": "bold",
+            }
+          }
+        >
+          connectedness
+        </span>
+        . These, in turn, lead to practices that foster personal growth and community.
       </div>
     </div>
   </div>
@@ -925,7 +946,7 @@ exports[`About renders 1`] = `
           }
         }
       >
-        value1Title
+        Unique Purpose
       </h4>
       <div
         className="css-text-901oao"
@@ -942,7 +963,7 @@ exports[`About renders 1`] = `
           }
         }
       >
-        value1Text
+        We believe that everyone has their own unique path of growth, and that personal fulfilment depends in large part on being able to reach one’s potential along that path. We embrace values that enable people to grow towards their full potential.
       </div>
     </div>
   </div>
@@ -1491,7 +1512,7 @@ exports[`About renders 1`] = `
           }
         }
       >
-        value2Title
+        Connectedness
       </h4>
       <div
         className="css-text-901oao"
@@ -1508,7 +1529,7 @@ exports[`About renders 1`] = `
           }
         }
       >
-        value2Text
+        We believe that people live primarily in connection to one another. We recognize that individuals are healthier and happier when they are members of a strong social community with meaningful relationships – that is, when they are living within a healthy and happy whole. We embrace values that strengthen community.
       </div>
     </div>
   </div>
@@ -1521,13 +1542,13 @@ exports[`About renders 1`] = `
         "WebkitBoxPack": "center",
         "WebkitJustifyContent": "center",
         "alignItems": "center",
-        "height": "510px",
         "justifyContent": "center",
+        "minHeight": "510px",
         "msFlexAlign": "center",
         "msFlexPack": "center",
         "paddingBottom": "15px",
-        "paddingLeft": "15px",
-        "paddingRight": "15px",
+        "paddingLeft": "30px",
+        "paddingRight": "30px",
         "paddingTop": "15px",
         "width": "100%",
       }
@@ -1588,12 +1609,16 @@ exports[`About renders 1`] = `
           "fontSize": "65px",
           "fontStyle": "italic",
           "lineHeight": "72px",
+          "maxWidth": "1200px",
           "textAlign": "center",
           "textRendering": "geometricPrecision",
         }
       }
     >
-      beautifulLifeQuote
+      “
+      How do we change the world?
+Change the story.
+      ”
     </div>
     <div
       className="css-text-901oao"
@@ -1610,8 +1635,7 @@ exports[`About renders 1`] = `
         }
       }
     >
-      – 
-      beautifulLifeSource
+      – Charles Eisenstein
     </div>
   </div>
   <div
@@ -1669,7 +1693,7 @@ exports[`About renders 1`] = `
           }
         }
       >
-        SacredEconTitle
+        Sacred Economics
       </h3>
     </div>
     <div
@@ -1705,6 +1729,7 @@ exports[`About renders 1`] = `
           }
         }
       >
+        Celo’s philosophy is grounded in the work of Charles Eisenstein’s 
         <div
           className="css-view-1dbjc4n"
           onClick={[Function]}
@@ -1725,6 +1750,8 @@ exports[`About renders 1`] = `
             data-focusable={true}
             dir="auto"
             href="http://sacred-economics.com/film/"
+            onClick={[Function]}
+            onMouseEnter={[Function]}
             role="link"
             style={
               Object {
@@ -1737,9 +1764,10 @@ exports[`About renders 1`] = `
               }
             }
           >
-            Sacred Econ
+            Sacred Economics
           </a>
         </div>
+        .
       </div>
       <div
         className="css-view-1dbjc4n"
@@ -1756,6 +1784,8 @@ exports[`About renders 1`] = `
           data-focusable={true}
           dir="auto"
           href="http://sacred-economics.com/film/"
+          onClick={[Function]}
+          onMouseEnter={[Function]}
           role="link"
           style={
             Object {
@@ -1803,7 +1833,7 @@ exports[`About renders 1`] = `
             }
           }
         >
-          learnMore
+          Learn More
         </a>
       </div>
     </div>
@@ -1863,7 +1893,7 @@ exports[`About renders 1`] = `
           }
         }
       >
-        theoryOfChangeTitle
+        Theory Of Change
       </h3>
     </div>
     <div
@@ -1899,7 +1929,7 @@ exports[`About renders 1`] = `
           }
         }
       >
-        theoryOfChangeText
+        A theory of change is a framework that describes how short-term actions will lead to long-term social impact. Celo’s aim is to create the conditions for prosperity, defined as: people fulfilling basic needs, growing along their own unique paths, and supporting each other. All of Celo’s projects have a specific hypothesis that tie our activities to one or more of these indicators of prosperity.
       </div>
       <div
         className="css-view-1dbjc4n"
@@ -1915,7 +1945,9 @@ exports[`About renders 1`] = `
           className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
           data-focusable={true}
           dir="auto"
-          href="https://medium.com/celohq/celos-theory-of-change-b916de44945d"
+          href="https://medium.com/celoOrg/celos-theory-of-change-b916de44945d"
+          onClick={[Function]}
+          onMouseEnter={[Function]}
           role="link"
           style={
             Object {
@@ -1963,7 +1995,7 @@ exports[`About renders 1`] = `
             }
           }
         >
-          learnMore
+          Learn More
         </a>
       </div>
     </div>
@@ -2027,7 +2059,7 @@ exports[`About renders 1`] = `
             }
           }
         >
-          teamTitle
+          Contributors
         </h3>
       </div>
       <div
@@ -2063,7 +2095,7 @@ exports[`About renders 1`] = `
             }
           }
         >
-          teamCopy
+          Meet the contributors working on Celo from around the world. Our collective experience ranges from public and private sector, technology, nonprofits, and NGOs.
            
         </div>
       </div>
@@ -2130,23 +2162,290 @@ exports[`About renders 1`] = `
           }
         >
           <div
-            aria-label="loading"
             className="css-view-1dbjc4n"
             style={
               Object {
-                "height": "50px",
-                "width": "50px",
+                "WebkitBoxDirection": "normal",
+                "WebkitBoxOrient": "vertical",
+                "WebkitFlexDirection": "column",
+                "flexDirection": "column",
+                "marginBottom": "50px",
+                "marginLeft": "5px",
+                "marginRight": "5px",
+                "marginTop": "5px",
+                "maxWidth": "300px",
+                "minWidth": "250px",
+                "msFlexDirection": "column",
+                "width": "90vw",
               }
             }
           >
-            <span
+            <div
+              className="css-view-1dbjc4n"
+              style={
+                Object {
+                  "display": "block",
+                  "overflowX": "hidden",
+                  "overflowY": "hidden",
+                }
+              }
+            >
+              <div
+                style={
+                  Object {
+                    "display": "block",
+                    "paddingBottom": "100%",
+                    "width": "100%",
+                  }
+                }
+              />
+              <div
+                style={
+                  Object {
+                    "bottom": "0px",
+                    "height": "100%",
+                    "left": "0px",
+                    "position": "absolute",
+                    "top": "0px",
+                    "width": "100%",
+                  }
+                }
+              >
+                <div
+                  className="css-view-1dbjc4n"
+                  style={
+                    Object {
+                      "WebkitFilter": "blur(20px)",
+                      "WebkitFlexBasis": "auto",
+                      "filter": "blur(20px)",
+                      "flexBasis": "auto",
+                      "height": "100%",
+                      "msFlexPreferredSize": "auto",
+                      "opacity": 0.5,
+                      "overflowX": "hidden",
+                      "overflowY": "hidden",
+                      "width": "100%",
+                      "zIndex": 0,
+                    }
+                  }
+                >
+                  <div
+                    className="css-view-1dbjc4n"
+                    style={
+                      Object {
+                        "WebkitFilter": "blur(20px)",
+                        "backgroundColor": "rgba(0,0,0,0.00)",
+                        "backgroundImage": "url(\\"test.jpg\\")",
+                        "backgroundPosition": "center",
+                        "backgroundRepeat": "no-repeat",
+                        "backgroundSize": "cover",
+                        "bottom": "0px",
+                        "filter": "blur(20px)",
+                        "height": "100%",
+                        "left": "0px",
+                        "position": "absolute",
+                        "right": "0px",
+                        "top": "0px",
+                        "width": "100%",
+                        "zIndex": -1,
+                      }
+                    }
+                  />
+                  <img
+                    alt=""
+                    className="css-accessibilityImage-9pa8cd"
+                    draggable={false}
+                    src="test.jpg"
+                  />
+                </div>
+              </div>
+            </div>
+            <div
+              className="css-view-1dbjc4n"
               style={
                 Object {
                   "height": "100%",
+                  "position": "absolute",
                   "width": "100%",
                 }
               }
-            />
+            >
+              <div
+                className="css-view-1dbjc4n"
+                style={
+                  Object {
+                    "display": "block",
+                    "overflowX": "hidden",
+                    "overflowY": "hidden",
+                  }
+                }
+              >
+                <div
+                  style={
+                    Object {
+                      "display": "block",
+                      "paddingBottom": "100%",
+                      "width": "100%",
+                    }
+                  }
+                />
+                <div
+                  style={
+                    Object {
+                      "bottom": "0px",
+                      "height": "100%",
+                      "left": "0px",
+                      "position": "absolute",
+                      "top": "0px",
+                      "width": "100%",
+                    }
+                  }
+                >
+                  <div
+                    aria-label="Photo of Jon"
+                    className="css-view-1dbjc4n"
+                    style={
+                      Object {
+                        "WebkitFlexBasis": "auto",
+                        "flexBasis": "auto",
+                        "height": "100%",
+                        "msFlexPreferredSize": "auto",
+                        "overflowX": "hidden",
+                        "overflowY": "hidden",
+                        "width": "100%",
+                        "zIndex": 0,
+                      }
+                    }
+                  >
+                    <div
+                      className="css-view-1dbjc4n"
+                      style={
+                        Object {
+                          "backgroundColor": "rgba(0,0,0,0.00)",
+                          "backgroundImage": "url(\\"test.jpg\\")",
+                          "backgroundPosition": "center",
+                          "backgroundRepeat": "no-repeat",
+                          "backgroundSize": "cover",
+                          "bottom": "0px",
+                          "height": "100%",
+                          "left": "0px",
+                          "position": "absolute",
+                          "right": "0px",
+                          "top": "0px",
+                          "width": "100%",
+                          "zIndex": -1,
+                        }
+                      }
+                    />
+                    <img
+                      alt="Photo of Jon"
+                      className="css-accessibilityImage-9pa8cd"
+                      draggable={false}
+                      src="test.jpg"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div
+              className="css-view-1dbjc4n"
+              style={
+                Object {
+                  "WebkitBoxDirection": "normal",
+                  "WebkitBoxOrient": "horizontal",
+                  "WebkitFlexDirection": "row",
+                  "flexDirection": "row",
+                  "msFlexDirection": "row",
+                }
+              }
+            >
+              <div
+                className="css-text-901oao"
+                dir="auto"
+                style={
+                  Object {
+                    "color": "rgba(46,51,56,1.00)",
+                    "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                    "fontSize": "20px",
+                    "fontWeight": "bold",
+                    "lineHeight": "28px",
+                    "marginRight": "5px",
+                    "marginTop": "8px",
+                    "textRendering": "geometricPrecision",
+                  }
+                }
+              >
+                Jon
+              </div>
+              <div
+                className="css-view-1dbjc4n"
+                style={
+                  Object {
+                    "WebkitBoxPack": "end",
+                    "WebkitJustifyContent": "flex-end",
+                    "justifyContent": "flex-end",
+                    "msFlexPack": "end",
+                    "paddingBottom": "1px",
+                  }
+                }
+              >
+                <a
+                  href="//www.example.com"
+                  target="_blank"
+                >
+                  <svg
+                    fill="none"
+                    height={12}
+                    style={Object {}}
+                    viewBox="0 0 14 14"
+                    width={12}
+                  >
+                    <path
+                      d="M14 0V7.17528H11.9502V3.49949L6.80322 8.64724L5.35403 7.19578L10.501 2.05008H6.82987V0H14Z"
+                      fill="#2E3338"
+                      style={Object {}}
+                    />
+                    <path
+                      d="M9.90044 9.22533H11.9502V14H0V2.05005H4.77599V4.10013H2.04978V11.9499H9.90044V9.22533Z"
+                      fill="#2E3338"
+                      style={Object {}}
+                    />
+                  </svg>
+                </a>
+              </div>
+            </div>
+            <div
+              className="css-text-901oao"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(46,51,56,1.00)",
+                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                  "fontSize": "16px",
+                  "lineHeight": "20px",
+                  "textRendering": "geometricPrecision",
+                }
+              }
+            >
+              Test Collective Inc
+            </div>
+            <div
+              className="css-text-901oao"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(46,51,56,1.00)",
+                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                  "fontSize": "26px",
+                  "fontStyle": "italic",
+                  "lineHeight": "28px",
+                  "marginTop": "8px",
+                  "textRendering": "geometricPrecision",
+                }
+              }
+            >
+              To ensure rightness
+            </div>
           </div>
         </div>
       </div>
@@ -2208,7 +2507,7 @@ exports[`About renders 1`] = `
           }
         }
       >
-        
+        Backers
       </h3>
     </div>
     <div
@@ -2243,7 +2542,7 @@ exports[`About renders 1`] = `
           }
         }
       >
-        celoBackersText
+        Celo is supported by over 80 companies and individuals, including prominent venture funds, C-level operators, academics, and experts across a wide range of fields, including in no particular order
       </div>
     </div>
   </div>
@@ -3744,7 +4043,7 @@ exports[`About renders 1`] = `
           }
         }
       >
-        pressText
+        For media inquiries, please contact us at
          
         <div
           className="css-view-1dbjc4n"
@@ -3766,6 +4065,8 @@ exports[`About renders 1`] = `
             data-focusable={true}
             dir="auto"
             href="mailto:press@celo.org"
+            onClick={[Function]}
+            onMouseEnter={[Function]}
             role="link"
             style={
               Object {

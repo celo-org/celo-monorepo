@@ -64,6 +64,10 @@
   "reclaim": "Reclaim",
   "celoGold": "Celo Oro",
   "celoDollars": "{{CeloDollars}}",
+  "balanceAvailable": "<0></0> disponibles",
+  "subtotal": "Total parcial",
+  "total": "Total",
+  "totalInDollars": "{{CeloDollars}} (@ <2></2>)",
   "oops": "¡Uy!",
   "somethingWrong": "Había un problema",
   "verifyFailed": "Falla durante la verificación",
@@ -72,6 +76,7 @@
   "quitApp": "Dejar",
   "loading": "Cargando…",
   "inviteFailed": "Falló el envío de la invitación",
+  "inviteOpenAppFailed": "No se pudo abrir la aplicación de mensajería, el código de invitación se copió al portapapeles",
   "importContactsFailed": "Error al importar contactos",
   "sendPaymentFailed": "Falla en el envío de pago",
   "paymentRequestFailed": "No se pudo enviar la solicitud de pago",
@@ -106,5 +111,6 @@
   "emptyList": "Lista vacía",
   "timeframes": {
     "30d": "30 dias"
-  }
+  },
+  "message": "Mensaje"
 }

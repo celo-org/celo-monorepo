@@ -1,0 +1,35 @@
+{
+  "name": "celo-phone-number-privacy",
+  "version": "1.0.0",
+  "description": "Generates unique salt for phone numbers.",
+  "author": "Celo",
+  "license": "Apache-2.0",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "yarn build && firebase serve --only functions",
+    "deploy:staging": "yarn build && firebase deploy --only functions --project celo-phone-number-privacy-stg",
+    "deploy:prod": "yarn build && firebase deploy --only functions --project celo-phone-number-privacy",
+    "config:get:staging": "firebase functions:config:get --project celo-phone-number-privacy-stg",
+    "config:get:prod": "firebase functions:config:get --project celo-phone-number-privacy",
+    "clean": "tsc -b . --clean",
+    "build": "tsc -b .",
+    "lint": "tslint --project .",
+    "test": "jest --runInBand",
+    "db:migrate": "NODE_ENV=development ts-node scripts/runMigrations.ts"
+  },
+  "dependencies": {
+    "@celo/contractkit": "0.3.2",
+    "@celo/utils": "0.1.8",
+    "bls12377js-blind": "https://github.com/celo-org/bls12377js-blind#3a5ac033fbe282d40002639e01db56313124e721",
+    "firebase-admin": "^8.9.2",
+    "firebase-functions": "^3.3.0",
+    "knex": "^0.20.13",
+    "pg": "^7.18.2"
+  },
+  "devDependencies": {
+    "firebase-functions-test": "^0.1.6"
+  },
+  "engines": {
+    "node": "10"
+  }
+}

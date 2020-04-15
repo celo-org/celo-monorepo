@@ -146,7 +146,7 @@ interface EngageProps {
 }
 
 export function EngageAsDeveloper({ children, action, noun }: EngageProps) {
-  const screen = useScreenSize()
+  const { screen } = useScreenSize()
   const { t } = useTranslation(NameSpaces.dev)
   return (
     <GridRow
@@ -193,7 +193,7 @@ export function EngageAsDeveloper({ children, action, noun }: EngageProps) {
 }
 
 export function EngageAsValidator() {
-  const screen = useScreenSize()
+  const { screen } = useScreenSize()
   const { t } = useTranslation(NameSpaces.dev)
   return (
     <GridRow
@@ -212,7 +212,7 @@ export function EngageAsValidator() {
           caption={t('engage.validators.caption')}
           primaryAction={{
             text: t('engage.validators.primaryAction'),
-            href: 'https://medium.com/celohq/announcing-the-great-celo-stake-off-12eb15dd5eb0',
+            href: 'https://medium.com/celoOrg/announcing-the-great-celo-stake-off-12eb15dd5eb0',
           }}
         />
       </Cell>
@@ -221,7 +221,7 @@ export function EngageAsValidator() {
           screen={screen}
           text={t('engage.tutorial.copy')}
           title={t('engage.tutorial.title')}
-          href="https://docs.celo.org/getting-started/running-a-validator"
+          href="https://docs.celo.org/getting-started/baklava-testnet/running-a-validator-in-baklava"
           btnText={t('engage.tutorial.btnText')}
           image={require('src/icons/download-dark.png')}
         />
@@ -229,7 +229,7 @@ export function EngageAsValidator() {
           screen={screen}
           text={t('engage.blog.copy')}
           title={t('engage.blog.title')}
-          href="https://medium.com/celohq/consensus-and-proof-of-stake-in-the-celo-protocol-3ff8eee331f6"
+          href="https://medium.com/celoOrg/consensus-and-proof-of-stake-in-the-celo-protocol-3ff8eee331f6"
           btnText={t('engage.blog.btnText')}
           image={require('src/icons/blog-dark.png')}
         />

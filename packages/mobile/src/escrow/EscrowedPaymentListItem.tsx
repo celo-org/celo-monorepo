@@ -1,20 +1,21 @@
 import BaseNotification from '@celo/react-components/components/BaseNotification'
 import fontStyles from '@celo/react-components/styles/fonts'
 import * as React from 'react'
-import { WithTranslation } from 'react-i18next'
+import { Trans, WithTranslation } from 'react-i18next'
 import { Image, Platform, StyleSheet, Text, View } from 'react-native'
 import SendIntentAndroid from 'react-native-send-intent'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
+import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import { EscrowedPayment } from 'src/escrow/actions'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { inviteFriendsIcon } from 'src/images/Images'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import { divideByWei, getCentAwareMoneyDisplay } from 'src/utils/formatting'
+import { divideByWei } from 'src/utils/formatting'
 import { navigateToURI } from 'src/utils/linking'
 import Logger from 'src/utils/Logger'
 
@@ -75,15 +76,27 @@ export class EscrowedPaymentListItem extends React.PureComponent<Props> {
 
   render() {
     const { t, payment } = this.props
+    const mobile = this.getDisplayName() || t('global:unknown').toLowerCase()
+
     return (
       <View style={styles.container}>
         <BaseNotification
-          title={t('escrowPaymentNotificationTitle', {
-            mobile: this.getDisplayName() || t('global:unknown'),
-            amount:
-              CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol +
-              getCentAwareMoneyDisplay(divideByWei(payment.amount)),
-          })}
+          title={
+            <Trans
+              i18nKey="escrowPaymentNotificationTitl"
+              ns={Namespaces.inviteFlow11}
+              values={{ mobile }}
+            >
+              Invited and paid {{ mobile }} (
+              <CurrencyDisplay
+                amount={{
+                  value: divideByWei(payment.amount),
+                  currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
+                }}
+              />
+              )
+            </Trans>
+          }
           icon={<Image source={inviteFriendsIcon} style={styles.image} resizeMode="contain" />}
           ctas={this.getCTA()}
         >

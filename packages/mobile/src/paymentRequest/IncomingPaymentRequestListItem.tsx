@@ -3,9 +3,10 @@ import ContactCircle from '@celo/react-components/components/ContactCircle'
 import fontStyles from '@celo/react-components/styles/fonts'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
-import { WithTranslation } from 'react-i18next'
+import { Trans, WithTranslation } from 'react-i18next'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import { TokenTransactionType } from 'src/apollo/types'
+import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import { declinePaymentRequest } from 'src/firebase/actions'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces, withTranslation } from 'src/i18n'
@@ -13,7 +14,6 @@ import { unknownUserIcon } from 'src/images/Images'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { getRecipientThumbnail, Recipient } from 'src/recipients/recipient'
-import { getCentAwareMoneyDisplay } from 'src/utils/formatting'
 import Logger from 'src/utils/Logger'
 
 interface OwnProps {
@@ -63,10 +63,13 @@ export class IncomingPaymentRequestListItem extends React.Component<Props> {
   }
 
   render() {
-    const { requester, t } = this.props
+    const { requester, id, t } = this.props
+    const name = requester.displayName
+
     return (
       <View style={styles.container}>
         <BaseNotification
+          testID={`IncomingPaymentRequestNotification/${id}`}
           icon={
             <ContactCircle
               size={AVATAR_SIZE}
@@ -77,11 +80,21 @@ export class IncomingPaymentRequestListItem extends React.Component<Props> {
               <Image source={unknownUserIcon} style={styles.unknownUser} />
             </ContactCircle>
           }
-          title={t('incomingPaymentRequestNotificationTitle', {
-            name: requester.displayName,
-            amount:
-              CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol + getCentAwareMoneyDisplay(this.props.amount),
-          })}
+          title={
+            <Trans
+              i18nKey="incomingPaymentRequestNotificationTitle"
+              ns={Namespaces.paymentRequestFlow}
+              values={{ name }}
+            >
+              {{ name }} requested{' '}
+              <CurrencyDisplay
+                amount={{
+                  value: this.props.amount,
+                  currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
+                }}
+              />
+            </Trans>
+          }
           ctas={this.getCTA()}
           onPress={this.onPay}
         >

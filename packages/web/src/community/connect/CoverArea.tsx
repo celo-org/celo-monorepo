@@ -1,209 +1,134 @@
 import * as React from 'react'
-import FadeIn from 'react-lazyload-fadein'
 import { StyleSheet, Text, View } from 'react-native'
-import Fade from 'react-reveal/Fade'
-import FullCircle from 'src/community/connect/FullCircle'
-import { H1 } from 'src/fonts/Fonts'
-import EmailForm, { After } from 'src/forms/EmailForm'
-import { I18nProps, withNamespaces } from 'src/i18n'
-import Arrow from 'src/icons/Arrow'
+import CeloRoles from 'src/community/connect/CeloRoles'
+import { H1, H4 } from 'src/fonts/Fonts'
+import EmailForm from 'src/forms/EmailForm'
+import { NameSpaces, useTranslation } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
-import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
+import { ScreenSizes, useScreenSize } from 'src/layout/ScreenSize'
 import { HEADER_HEIGHT } from 'src/shared/Styles'
-import { colors, fonts, standardStyles, textStyles } from 'src/styles'
+import { colors, standardStyles, textStyles } from 'src/styles'
 
-type Props = ScreenProps & I18nProps
-type VoidFunc = () => void
-class CoverArea extends React.PureComponent<Props> {
-  render() {
-    const { screen, t } = this.props
-    const isDesktop = screen === ScreenSizes.DESKTOP
-    return (
-      <View style={styles.darkBackground}>
-        <View
-          style={[standardStyles.centered, isDesktop ? styles.fullScreen : styles.economizeScreen]}
-        >
-          <View style={[standardStyles.centered, styles.aboveFold]}>
-            <View style={circleContainerStyle(screen)}>
-              <FadeIn duration={0} unmountIfInvisible={true}>
-                {(load: VoidFunc) => <FullCircle init={load} lightBackground={false} />}
-              </FadeIn>
-              {isDesktop && <FourWords screen={screen} />}
-            </View>
-          </View>
-          <View
-            style={[styles.arrow, isDesktop ? styles.arrowLargeScreen : styles.arrowSmallScreen]}
-          >
-            <Arrow color={colors.placeholderDarkMode} size={isDesktop ? 36 : 24} />
-          </View>
-        </View>
-
-        <GridRow
-          allStyle={standardStyles.centered}
-          desktopStyle={standardStyles.sectionMarginBottom}
-          tabletStyle={standardStyles.sectionMarginBottomTablet}
-          mobileStyle={standardStyles.sectionMarginBottomMobile}
-        >
-          <Cell span={Spans.half}>
-            {!isDesktop && (
-              <Fade bottom={true} distance={'40px'}>
-                <FourWords screen={screen} />
-              </Fade>
-            )}
-            <Fade bottom={true} distance={'80px'}>
-              <View style={[standardStyles.centered, isDesktop && styles.ctArea]}>
-                <H1
-                  style={[
-                    textStyles.invert,
-                    textStyles.center,
-                    standardStyles.elementalMarginBottom,
-                  ]}
-                >
-                  {t('cover.title')}
-                </H1>
-                <Text style={[fonts.p, textStyles.readingOnDark, styles.formName]}>
-                  {t('cover.joinMovement')}
-                </Text>
-                <EmailForm
-                  submitText={t('signUp')}
-                  route={'/contacts'}
-                  whenComplete={<After t={t} />}
-                  isDarkMode={true}
-                />
-              </View>
-            </Fade>
-          </Cell>
-        </GridRow>
-      </View>
-    )
-  }
-}
-
-function circleContainerStyle(screen: ScreenSizes) {
-  switch (screen) {
-    case ScreenSizes.DESKTOP:
-      return styles.circleContainerLarge
-    case ScreenSizes.TABLET:
-      return styles.circleContainerMedium
-    default:
-      return styles.circleContainer
-  }
-}
-
-function fourWordsStyle(screen: ScreenSizes) {
-  switch (screen) {
-    case ScreenSizes.DESKTOP:
-      return styles.fourWords
-    case ScreenSizes.TABLET:
-      return styles.fourWordsMobile
-    default:
-      return styles.fourWordsMobile
-  }
-}
-
-function FourWords({ screen }: { screen: ScreenSizes }) {
+export default React.memo(function CoverArea() {
+  const { t } = useTranslation(NameSpaces.community)
+  const { isMobile } = useScreenSize()
   return (
-    <View style={[standardStyles.centered, fourWordsStyle(screen)]}>
-      <Text style={[fonts.specialOneOff, textStyles.center]}>
-        <Text style={styles.greenColor}>Developers. </Text>
-        <Text style={styles.purpleColor}>Designers. </Text>
-      </Text>
-      <Text style={[fonts.specialOneOff, textStyles.center]}>
-        <Text style={styles.redColor}>Dreamers. </Text>
-        <Text style={styles.blueColor}>Doers. </Text>
-      </Text>
+    <GridRow
+      allStyle={[standardStyles.centered, styles.fullScreen]}
+      desktopStyle={styles.root}
+      tabletStyle={styles.root}
+      mobileStyle={styles.mobileRoot}
+    >
+      <Cell span={Spans.full} style={[styles.content, !isMobile && styles.contentDesktop]}>
+        {isMobile ? (
+          <>
+            <CeloRoles />
+            <FourWords />
+          </>
+        ) : (
+          <View style={standardStyles.elementalMarginBottom}>
+            <CeloRoles />
+            <FourWords />
+          </View>
+        )}
+        <View style={[standardStyles.centered, styles.fadeIn, styles.ctaArea]}>
+          <H4
+            style={[
+              textStyles.center,
+              standardStyles.halfElement,
+              standardStyles.elementalMarginTop,
+            ]}
+          >
+            {t('cover.joinMovement')}
+          </H4>
+          <EmailForm submitText={t('common:signUp')} route={'/contacts'} isDarkMode={false} />
+        </View>
+      </Cell>
+    </GridRow>
+  )
+})
+
+const FourWords = React.memo(function _FourWords() {
+  const { screen } = useScreenSize()
+  return (
+    <View style={[standardStyles.centered, getWordContainerStyle(screen)]}>
+      <H1 style={textStyles.center}>
+        <Text style={[styles.fadeIn, styles.developers]}>Developers. </Text>
+        <Text style={[styles.fadeIn, styles.designers]}>Designers. </Text>
+        <Text style={[styles.fadeIn, styles.dreamers]}>Dreamers. </Text>
+        <Text style={[styles.fadeIn, styles.doers]}>Doers. </Text>
+      </H1>
     </View>
   )
+})
+
+function getWordContainerStyle(screen: ScreenSizes) {
+  switch (screen) {
+    case ScreenSizes.DESKTOP:
+      return standardStyles.blockMarginTop
+    case ScreenSizes.TABLET:
+      return standardStyles.blockMarginTopTablet
+  }
 }
 
 const styles = StyleSheet.create({
   fullScreen: {
     width: '100vw',
-    height: '100vh',
-    maxHeight: '100vw', // so large tablets dont make the circle area oddly tall
+    minHeight: `100vh`,
+    paddingTop: HEADER_HEIGHT,
   },
-  economizeScreen: {
-    marginTop: HEADER_HEIGHT,
+  mobileRoot: {
+    paddingTop: HEADER_HEIGHT,
   },
-  aboveFold: { justifyContent: 'space-around', width: '100%', padding: 20 },
-  darkBackground: {
-    backgroundColor: colors.dark,
+  root: { flexDirection: 'column' },
+  contentDesktop: {
+    justifyContent: 'center',
+    paddingBottom: 15,
   },
-  greenColor: {
-    color: colors.primary,
+  content: {
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'space-around',
+    flexGrow: 1,
+    flexBasis: '100%',
+    height: '100%',
+    marginTop: 15,
   },
-  redColor: {
-    color: colors.red,
+  developers: {
+    color: colors.primaryPress,
+    animationDelay: '1650ms',
   },
-  blueColor: {
-    color: colors.lightBlue,
+  designers: {
+    color: colors.purpleScreen,
+    animationDelay: '3650ms',
   },
-  purpleColor: {
-    color: colors.purple,
+  dreamers: {
+    color: colors.redScreen,
+    animationDelay: '5250ms',
   },
-  fourWords: {
-    position: 'absolute',
-    top: 0,
-    bottom: 0,
-    left: 0,
-    right: 0,
+  doers: {
+    color: colors.blueScreen,
+    animationDelay: '6450ms',
+  },
+  ctaArea: {
+    animationDelay: '7400ms',
+    maxWidth: 475,
     width: '100%',
   },
-  fourWordsMobile: {
-    width: '100%',
-    marginBottom: 50,
-  },
-  circleContainer: {
-    width: '100%',
-  },
-  circleContainerMedium: {
-    width: '80vw',
-    maxWidth: '60vh',
-  },
-  circleContainerLarge: {
-    width: '73vh',
-    maxWidth: '75vw',
-    maxHeight: '80vh',
-  },
-  ctArea: {
-    paddingHorizontal: 65,
-    marginBottom: 50,
-  },
-  formName: {
-    marginVertical: 10,
-  },
-  arrowLargeScreen: {
-    alignItems: 'flex-end',
-    position: 'absolute',
-    bottom: 20,
-    right: 80,
-  },
-  arrowSmallScreen: {
-    bottom: -60,
-    marginTop: 10,
-    alignSelf: 'center',
-  },
-  arrow: {
-    animationDuration: `4s`,
-    animationDelay: '3s',
+  fadeIn: {
+    animationDuration: `600ms`,
     animationFillMode: 'both',
-    animationIterationCount: 8,
+    animationIterationCount: 1,
     animationKeyframes: [
       {
         '0%': {
           opacity: 0,
-          transform: [{ translate3d: '0, -300%, 0' }],
         },
-        '30%': {
-          opacity: 1,
-        },
+
         '100%': {
-          opacity: 0,
-          transform: [{ translate3d: '0, -100%, 0' }],
+          opacity: 1,
         },
       },
     ],
   },
 })
-
-export default withNamespaces('community')(withScreenSize(CoverArea))

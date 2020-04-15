@@ -1,22 +1,29 @@
+import { constitution } from '@celo/protocol/governanceConstitution'
 import {
   assertEqualBN,
   isSameAddress,
   stripHexEncoding,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
-import { getDeployedProxiedContract } from '@celo/protocol/lib/web3-utils'
+import {
+  getDeployedProxiedContract,
+  getFunctionSelectorsForContract,
+} from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
 import { linkedListChanges, zip } from '@celo/utils/lib/collections'
+import { toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import {
   ElectionInstance,
   ExchangeInstance,
   GoldTokenInstance,
+  GovernanceApproverMultiSigInstance,
   GovernanceInstance,
   GovernanceSlasherInstance,
   LockedGoldInstance,
   RegistryInstance,
   ReserveInstance,
+  ReserveSpenderMultiSigInstance,
   StableTokenInstance,
 } from 'types'
 
@@ -55,7 +62,7 @@ async function slashingOfGroups(
   const groups = await election.getGroupsVotedForByAccount(account)
   const res = []
   //
-  for (let i = groups.length - 1; i >= 0; i++) {
+  for (let i = groups.length - 1; i >= 0; i--) {
     const group = groups[i]
     const totalVotes = await election.getTotalVotesForGroup(group)
     const votes = await election.getTotalVotesForGroupByAccount(group, account)
@@ -81,11 +88,31 @@ async function findLessersAndGreaters(
   return { ...changes, indices: changed.map((a) => a.index) }
 }
 
+contract('Integration: Running elections', (_accounts: string[]) => {
+  let election: ElectionInstance
+
+  before(async () => {
+    election = await getDeployedProxiedContract('Election', artifacts)
+  })
+
+  describe('When getting the elected validators', () => {
+    it('should elect all 30 validators', async () => {
+      const elected = await election.electValidatorSigners()
+      assert.equal(elected.length, 30)
+    })
+    it('should elect specified number validators with electNValidatorSigners', async () => {
+      const elected = await election.electNValidatorSigners(1, 20)
+      assert.equal(elected.length, 20)
+    })
+  })
+})
+
 contract('Integration: Governance slashing', (accounts: string[]) => {
   const proposalId = 1
   const dequeuedIndex = 0
   let lockedGold: LockedGoldInstance
   let election: ElectionInstance
+  let multiSig: GovernanceApproverMultiSigInstance
   let governance: GovernanceInstance
   let governanceSlasher: GovernanceSlasherInstance
   let proposalTransactions: any
@@ -100,6 +127,7 @@ contract('Integration: Governance slashing', (accounts: string[]) => {
     // @ts-ignore
     await lockedGold.lock({ value: '10000000000000000000000000' })
 
+    multiSig = await getDeployedProxiedContract('GovernanceApproverMultiSig', artifacts)
     governance = await getDeployedProxiedContract('Governance', artifacts)
     governanceSlasher = await getDeployedProxiedContract('GovernanceSlasher', artifacts)
     value = await lockedGold.getAccountTotalLockedGold(accounts[0])
@@ -151,7 +179,11 @@ contract('Integration: Governance slashing', (accounts: string[]) => {
   describe('When approving that proposal', () => {
     before(async () => {
       await timeTravel(config.governance.dequeueFrequency, web3)
-      await governance.approve(proposalId, dequeuedIndex)
+      // @ts-ignore
+      const txData = governance.contract.methods.approve(proposalId, dequeuedIndex).encodeABI()
+      await multiSig.submitTransaction(governance.address, 0, txData, {
+        from: accounts[0],
+      })
     })
 
     it('should set the proposal to approved', async () => {
@@ -212,6 +244,7 @@ contract('Integration: Governance', (accounts: string[]) => {
   const proposalId = 1
   const dequeuedIndex = 0
   let lockedGold: LockedGoldInstance
+  let multiSig: GovernanceApproverMultiSigInstance
   let governance: GovernanceInstance
   let registry: RegistryInstance
   let proposalTransactions: any
@@ -222,6 +255,7 @@ contract('Integration: Governance', (accounts: string[]) => {
     // @ts-ignore
     await lockedGold.lock({ value: '10000000000000000000000000' })
     value = await lockedGold.getAccountTotalLockedGold(accounts[0])
+    multiSig = await getDeployedProxiedContract('GovernanceApproverMultiSig', artifacts)
     governance = await getDeployedProxiedContract('Governance', artifacts)
     registry = await getDeployedProxiedContract('Registry', artifacts)
     proposalTransactions = [
@@ -248,6 +282,35 @@ contract('Integration: Governance', (accounts: string[]) => {
         ),
       },
     ]
+  })
+
+  describe('Checking governance thresholds', () => {
+    for (const contractName of Object.keys(constitution).filter((k) => k !== 'proxy')) {
+      it('should have correct thresholds for ' + contractName, async () => {
+        const contract: any = await getDeployedProxiedContract<Truffle.ContractInstance>(
+          contractName,
+          artifacts
+        )
+
+        const selectors = getFunctionSelectorsForContract(contract, contractName, artifacts)
+        selectors.default = ['0x00000000']
+
+        const thresholds = { ...constitution.proxy, ...constitution[contractName] }
+        await Promise.all(
+          Object.keys(thresholds).map((func) =>
+            Promise.all(
+              selectors[func].map(async (selector) => {
+                assertEqualBN(
+                  await governance.getConstitution(contract.address, selector),
+                  toFixed(thresholds[func]),
+                  'Threshold set incorrectly for function ' + func
+                )
+              })
+            )
+          )
+        )
+      })
+    }
   })
 
   describe('When making a governance proposal', () => {
@@ -282,7 +345,11 @@ contract('Integration: Governance', (accounts: string[]) => {
   describe('When approving that proposal', () => {
     before(async () => {
       await timeTravel(config.governance.dequeueFrequency, web3)
-      await governance.approve(proposalId, dequeuedIndex)
+      // @ts-ignore
+      const txData = governance.contract.methods.approve(proposalId, dequeuedIndex).encodeABI()
+      await multiSig.submitTransaction(governance.address, 0, txData, {
+        from: accounts[0],
+      })
     })
 
     it('should set the proposal to approved', async () => {
@@ -318,43 +385,46 @@ contract('Integration: Governance', (accounts: string[]) => {
 contract('Integration: Exchange', (accounts: string[]) => {
   const sellAmount = new BigNumber('1000000000000000000')
   const minBuyAmount = 1
+  const transferAmount = 10
   let exchange: ExchangeInstance
+  let multiSig: ReserveSpenderMultiSigInstance
   let reserve: ReserveInstance
   let goldToken: GoldTokenInstance
   let stableToken: StableTokenInstance
   let originalStable
   let originalGold
   let originalReserve
+  let finalStable: BigNumber
+  let finalGold: BigNumber
+  let finalReserve: BigNumber
 
   const decimals = 18
 
   before(async () => {
     exchange = await getDeployedProxiedContract('Exchange', artifacts)
+    multiSig = await getDeployedProxiedContract('ReserveSpenderMultiSig', artifacts)
     reserve = await getDeployedProxiedContract('Reserve', artifacts)
     goldToken = await getDeployedProxiedContract('GoldToken', artifacts)
     stableToken = await getDeployedProxiedContract('StableToken', artifacts)
-    await exchange.unfreeze()
   })
 
   describe('When selling gold', () => {
-    beforeEach(async () => {
-      await goldToken.approve(exchange.address, sellAmount)
+    before(async () => {
       originalStable = await stableToken.balanceOf(accounts[0])
       originalGold = await goldToken.balanceOf(accounts[0])
       originalReserve = await goldToken.balanceOf(reserve.address)
+      await goldToken.approve(exchange.address, sellAmount)
+      await exchange.exchange(sellAmount, minBuyAmount, true)
+      finalStable = await stableToken.balanceOf(accounts[0])
+      finalGold = await goldToken.balanceOf(accounts[0])
+      finalReserve = await goldToken.balanceOf(reserve.address)
     })
 
     it(`should increase user's stable`, async () => {
-      await exchange.exchange(sellAmount, minBuyAmount, true)
-      const finalStable = await stableToken.balanceOf(accounts[0])
-
       assert.isTrue(finalStable.gt(originalStable))
     })
 
     it(`should reduce user's gold`, async () => {
-      await exchange.exchange(sellAmount, minBuyAmount, true)
-      const finalGold = await goldToken.balanceOf(accounts[0])
-
       const block = await web3.eth.getBlock('latest')
       if (isSameAddress(block.miner, accounts[0])) {
         const blockReward = new BigNumber(2).times(new BigNumber(10).pow(decimals))
@@ -365,40 +435,63 @@ contract('Integration: Exchange', (accounts: string[]) => {
     })
 
     it(`should increase Reserve's gold`, async () => {
-      await exchange.exchange(sellAmount, minBuyAmount, true)
-      const finalReserve = await goldToken.balanceOf(reserve.address)
-
       assert.isTrue(finalReserve.gt(originalReserve))
     })
   })
 
+  // Note that this test relies on having purchased cUSD in the previous test.
   describe('When selling stable token', () => {
-    beforeEach(async () => {
+    before(async () => {
       originalStable = await stableToken.balanceOf(accounts[0])
       originalGold = await goldToken.balanceOf(accounts[0])
       originalReserve = await goldToken.balanceOf(reserve.address)
       await stableToken.approve(exchange.address, sellAmount)
+      // Cannot sell more than was purchased in the previous test.
+      await exchange.exchange(sellAmount.div(20), minBuyAmount, false)
+      finalStable = await stableToken.balanceOf(accounts[0])
+      finalGold = await goldToken.balanceOf(accounts[0])
+      finalReserve = await goldToken.balanceOf(reserve.address)
     })
 
     it(`should reduce user's stable`, async () => {
-      await exchange.exchange(sellAmount, minBuyAmount, false)
-      const finalStable = await stableToken.balanceOf(accounts[0])
-
       assert.isTrue(finalStable.lt(originalStable))
     })
 
     it(`should increase user's gold`, async () => {
-      await exchange.exchange(sellAmount, minBuyAmount, false)
-      const finalGold = await goldToken.balanceOf(accounts[0])
-
       assert.isTrue(finalGold.gt(originalGold))
     })
 
     it(`should reduce Reserve's gold`, async () => {
-      await exchange.exchange(sellAmount, minBuyAmount, false)
-      const finalReserve = await goldToken.balanceOf(reserve.address)
-
       assert.isTrue(finalReserve.lt(originalReserve))
+    })
+  })
+
+  describe('When transferring gold', () => {
+    const otherReserveAddress = '0x7457d5E02197480Db681D3fdF256c7acA21bDc12'
+    let originalOtherAccount
+    beforeEach(async () => {
+      originalReserve = await goldToken.balanceOf(reserve.address)
+      originalOtherAccount = await goldToken.balanceOf(otherReserveAddress)
+    })
+
+    it(`should transfer gold`, async () => {
+      // @ts-ignore
+      const txData = reserve.contract.methods
+        .transferGold(otherReserveAddress, transferAmount)
+        .encodeABI()
+      await multiSig.submitTransaction(reserve.address, 0, txData, {
+        from: accounts[0],
+      })
+      assert.isTrue(
+        (await goldToken.balanceOf(reserve.address)).isEqualTo(
+          originalReserve.minus(transferAmount)
+        )
+      )
+      assert.isTrue(
+        (await goldToken.balanceOf(otherReserveAddress)).isEqualTo(
+          originalOtherAccount.plus(transferAmount)
+        )
+      )
     })
   })
 })

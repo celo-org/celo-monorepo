@@ -2,7 +2,7 @@ import Touchable from '@celo/react-components/components/Touchable'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import { debounce } from 'lodash'
-import * as React from 'react'
+import React, { useCallback } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 
 const BUTTON_TAP_DEBOUNCE_TIME = 300 // milliseconds
@@ -20,7 +20,7 @@ export enum BtnTypes {
 export interface ButtonProps {
   onPress: () => void
   style?: any
-  text: string
+  text: string | React.ReactNode
   accessibilityLabel?: string
   lineHeight?: number
   type: BtnTypes
@@ -30,95 +30,95 @@ export interface ButtonProps {
   children?: React.ReactNode
 }
 
-export default class Button extends React.Component<ButtonProps> {
+export default function Button(props: ButtonProps) {
   // Debounce onPress event so that it is called once on trigger and
   // consecutive calls in given period are ignored.
-  debouncedOnPress = debounce(this.props.onPress, BUTTON_TAP_DEBOUNCE_TIME, DEBOUNCE_OPTIONS)
+  const debouncedOnPress = useCallback(
+    debounce(props.onPress, BUTTON_TAP_DEBOUNCE_TIME, DEBOUNCE_OPTIONS),
+    [props.onPress]
+  )
 
-  componentDidUpdate(prevProps: ButtonProps, prevState: ButtonProps) {
-    if (this.props.onPress !== prevProps.onPress) {
-      this.debouncedOnPress.cancel()
-      this.debouncedOnPress = debounce(
-        this.props.onPress,
-        BUTTON_TAP_DEBOUNCE_TIME,
-        DEBOUNCE_OPTIONS
-      )
-    }
+  const {
+    testID,
+    style,
+    text,
+    accessibilityLabel,
+    lineHeight,
+    type,
+    disabled,
+    standard,
+    children,
+  } = props
+  let textColor
+  let backgroundColor
+  let borderColor
+
+  const isPrimary = type === BtnTypes.PRIMARY
+  const isSecondary = type === BtnTypes.SECONDARY
+  const isTertiary = type === BtnTypes.TERTIARY
+
+  switch (type) {
+    case BtnTypes.PRIMARY:
+      textColor = colors.white
+      backgroundColor = disabled ? colors.celoGreenInactive : colors.celoGreen
+      borderColor = disabled ? colors.celoGreenInactive : colors.celoGreen
+      break
+    case BtnTypes.SECONDARY:
+      textColor = disabled ? colors.celoGreenInactive : colors.celoGreen
+      backgroundColor = 'transparent'
+      borderColor = disabled ? colors.celoGreenInactive : colors.celoGreen
+      break
+    case BtnTypes.TERTIARY:
+      textColor = disabled ? colors.inactiveDark : colors.dark
+      backgroundColor = 'transparent'
+      borderColor = 'transparent'
+      break
+    default:
+      if (__DEV__) {
+        throw new Error('No Button Type Specified')
+      }
+      textColor = colors.white
+      backgroundColor = disabled ? colors.celoGreenInactive : colors.celoGreen
   }
 
-  render() {
-    const { text, accessibilityLabel, lineHeight, type, disabled, standard, children } = this.props
-    let textColor
-    let backgroundColor
-    let borderColor
-
-    const isPrimary = type === BtnTypes.PRIMARY
-    const isSecondary = type === BtnTypes.SECONDARY
-    const isTertiary = type === BtnTypes.TERTIARY
-
-    switch (type) {
-      case BtnTypes.PRIMARY:
-        textColor = colors.white
-        backgroundColor = disabled ? colors.celoGreenInactive : colors.celoGreen
-        borderColor = disabled ? colors.celoGreenInactive : colors.celoGreen
-        break
-      case BtnTypes.SECONDARY:
-        textColor = disabled ? colors.celoGreenInactive : colors.celoGreen
-        backgroundColor = 'transparent'
-        borderColor = disabled ? colors.celoGreenInactive : colors.celoGreen
-        break
-      case BtnTypes.TERTIARY:
-        textColor = disabled ? colors.inactiveDark : colors.dark
-        backgroundColor = 'transparent'
-        borderColor = 'transparent'
-        break
-      default:
-        if (__DEV__) {
-          throw new Error('No Button Type Specified')
-        }
-        textColor = colors.white
-        backgroundColor = disabled ? colors.celoGreenInactive : colors.celoGreen
-    }
-
-    return (
-      <View
+  return (
+    <View
+      style={[
+        styles.row,
+        (isPrimary || isSecondary || isTertiary) && standard ? { marginVertical: 10 } : null,
+        standard ? { marginBottom: 10 } : null,
+        style,
+        { backgroundColor },
+      ]}
+    >
+      <Touchable
+        onPress={debouncedOnPress}
+        disabled={disabled}
         style={[
-          style.row,
-          (isPrimary || isSecondary || isTertiary) && standard ? { marginVertical: 10 } : null,
-          standard ? { marginBottom: 10 } : null,
-          this.props.style,
+          styles.button,
           { backgroundColor },
+          lineHeight !== undefined ? { height: lineHeight } : { height: 50 },
+          standard && (isPrimary || isSecondary || isTertiary)
+            ? { borderColor, borderRadius: 3, borderWidth: 2 }
+            : { borderWidth: 0 },
         ]}
+        testID={testID}
       >
-        <Touchable
-          onPress={this.debouncedOnPress}
-          disabled={disabled}
-          style={[
-            style.button,
-            { backgroundColor },
-            lineHeight !== undefined ? { height: lineHeight } : { height: 50 },
-            standard && (isPrimary || isSecondary || isTertiary)
-              ? { borderColor, borderRadius: 3, borderWidth: 2 }
-              : { borderWidth: 0 },
-          ]}
-          testID={this.props.testID}
-        >
-          <View style={style.containerButton}>
-            {children}
-            <Text
-              accessibilityLabel={accessibilityLabel}
-              style={[fontStyles.buttonText, { color: textColor }, style.text]}
-            >
-              {text}
-            </Text>
-          </View>
-        </Touchable>
-      </View>
-    )
-  }
+        <View style={styles.containerButton}>
+          {children}
+          <Text
+            accessibilityLabel={accessibilityLabel}
+            style={[fontStyles.buttonText, { color: textColor }, styles.text]}
+          >
+            {text}
+          </Text>
+        </View>
+      </Touchable>
+    </View>
+  )
 }
 
-const style = StyleSheet.create({
+const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     alignItems: 'center',

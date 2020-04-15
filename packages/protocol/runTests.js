@@ -4,19 +4,13 @@ const glob = require('glob-fs')({
 })
 const { exec, waitForPortOpen } = require('./lib/test-utils')
 const minimist = require('minimist')
-const network = require('./truffle-config.js').networks.development
+const networkName = 'development'
+const network = require('./truffle-config.js').networks[networkName]
 
 const sleep = (seconds) => new Promise((resolve) => setTimeout(resolve, 1000 * seconds))
 
 // As documented https://circleci.com/docs/2.0/env-vars/#built-in-environment-variables
 const isCI = process.env.CI === 'true'
-
-// Migration overrides specifically for unit tests
-const migrationOverrides = {
-  downtimeSlasher: {
-    slashableDowntime: 60, // epoch length is 100 for unit tests
-  },
-}
 
 async function startGanache() {
   const server = ganache.server({
@@ -68,23 +62,25 @@ async function test() {
     }
     if (argv.coverage) {
       testArgs = testArgs.concat(['--network', 'coverage'])
+    } else {
+      testArgs = testArgs.concat(['--network', networkName])
     }
     if (argv.gas) {
       testArgs = testArgs.concat(['--color', '--gas'])
     }
-    // Add test specific migration overrides
-    testArgs = testArgs.concat(['--migration_override', JSON.stringify(migrationOverrides)])
 
-    if (argv._.length > 0) {
-      const testGlob = argv._.map((testName) => `test/\*\*/${testName}.ts`).join(' ')
-      const testFiles = glob.readdirSync(testGlob)
-      if (testFiles.length === 0) {
-        // tslint:disable-next-line: no-console
-        console.error(`No test files matched with ${testGlob}`)
-        process.exit(1)
-      }
-      testArgs = testArgs.concat(testFiles)
+    const testGlob =
+      argv._.length > 0
+        ? argv._.map((testName) => `test/\*\*/${testName}.ts`).join(' ')
+        : `test/\*\*/*.ts`
+    const testFiles = glob.readdirSync(testGlob)
+    if (testFiles.length === 0) {
+      // tslint:disable-next-line: no-console
+      console.error(`No test files matched with ${testGlob}`)
+      process.exit(1)
     }
+    testArgs = testArgs.concat(testFiles)
+
     await exec('yarn', testArgs)
     await closeGanache()
   } catch (e) {

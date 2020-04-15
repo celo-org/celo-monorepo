@@ -39,7 +39,7 @@ type NakedProps = {
   kind: BTN.NAKED | BTN.DARKNAKED
 } & AllButtonProps
 
-type PrimaryProps = {
+export type PrimaryProps = {
   onDarkBackground?: boolean
   size?: SIZE
   kind: BTN.PRIMARY | BTN.SECONDARY | BTN.TERTIARY
@@ -117,16 +117,9 @@ export default class Button extends React.PureComponent<ButtonsProps, State> {
   }
 
   render() {
-    const { text, href, align, iconRight, iconLeft } = this.props
+    const { text, align, iconRight, iconLeft } = this.props
     const ButtonComponent = this.getButtonComponent()
-    const renderedButton = (
-      // @ts-ignore
-      <ButtonComponent status={this.getStatus()} {...this.props}>
-        {iconLeft && <View style={baseStyles.iconLeft}>{iconLeft}</View>}
-        {text}
-        {iconRight && <View style={baseStyles.iconRight}>{iconRight}</View>}
-      </ButtonComponent>
-    )
+
     return (
       <Hoverable
         onHoverIn={this.onMouseEnter}
@@ -138,7 +131,11 @@ export default class Button extends React.PureComponent<ButtonsProps, State> {
         <View
           style={[{ alignItems: align }, this.props.kind === BTN.INLINE && inlineStyle.container]}
         >
-          {href ? <Link href={href}>{renderedButton}</Link> : renderedButton}
+          <ButtonComponent status={this.getStatus()} {...this.props}>
+            {iconLeft && <View style={baseStyles.iconLeft}>{iconLeft}</View>}
+            {text}
+            {iconRight && <View style={baseStyles.iconRight}>{iconRight}</View>}
+          </ButtonComponent>
         </View>
       </Hoverable>
     )
@@ -157,7 +154,7 @@ interface Props {
   kind?: BTN
   children: React.ReactNode
   size?: SIZE
-  style?: TextStyle
+  style?: TextStyle | TextStyle[]
   href?: string
   target?: string
   onDarkBackground?: boolean
@@ -166,26 +163,28 @@ interface Props {
 function ButtonPrimary(props: Props) {
   const { children, status, size, style, href, target, onDarkBackground } = props
   return (
-    <Text
-      href={href}
-      target={target}
-      accessibilityRole="link"
-      style={[
-        baseStyles.base,
-        baseStyles.verticallyAlign,
-        fonts.navigation,
-        sizeStyle(size),
-        primaryStyles[status],
-        textStyles.medium,
-        status === BTNStates.disabled && onDarkBackground
-          ? primaryStyles.darkText
-          : primaryStyles.text,
-        style,
-        status === BTNStates.disabled && baseStyles.notAllowed,
-      ]}
-    >
-      {children}
-    </Text>
+    <Link href={href} passHref={true}>
+      <Text
+        href={href}
+        target={target}
+        accessibilityRole="link"
+        style={[
+          baseStyles.base,
+          baseStyles.verticallyAlign,
+          fonts.navigation,
+          sizeStyle(size),
+          primaryStyles[status],
+          textStyles.medium,
+          status === BTNStates.disabled && onDarkBackground
+            ? primaryStyles.darkText
+            : primaryStyles.text,
+          style,
+          status === BTNStates.disabled && baseStyles.notAllowed,
+        ]}
+      >
+        {children}
+      </Text>
+    </Link>
   )
 }
 
@@ -194,24 +193,26 @@ function ButtonSecondary(props: Props) {
 
   return (
     <View style={secondaryStyles[status]}>
-      <Text
-        href={href}
-        target={target}
-        accessibilityRole="link"
-        style={[
-          baseStyles.base,
-          sizeStyle(size),
-          baseStyles.verticallyAlign,
-          fonts.navigation,
-          sizeStyle(size),
-          verticalSize(size),
-          textStyles.medium,
-          commonTextStyles[status],
-          style,
-        ]}
-      >
-        {children}
-      </Text>
+      <Link href={href} passHref={true}>
+        <Text
+          href={href}
+          target={target}
+          accessibilityRole="link"
+          style={[
+            baseStyles.base,
+            sizeStyle(size),
+            baseStyles.verticallyAlign,
+            fonts.navigation,
+            sizeStyle(size),
+            verticalSize(size),
+            textStyles.medium,
+            commonTextStyles[status],
+            style,
+          ]}
+        >
+          {children}
+        </Text>
+      </Link>
     </View>
   )
 }
@@ -219,24 +220,26 @@ function ButtonSecondary(props: Props) {
 function ButtonTertiary(props: Props) {
   const { children, status, size, style, href, target } = props
   return (
-    <Text
-      href={href}
-      target={target}
-      accessibilityRole="link"
-      style={[
-        baseStyles.base,
-        baseStyles.verticallyAlign,
-        sizeStyle(size),
-        baseStyles.floating,
-        fonts.navigation,
-        sizeStyle(size),
-        textStyles.medium,
-        commonTextStyles[status],
-        style,
-      ]}
-    >
-      {children}
-    </Text>
+    <Link href={href} passHref={true}>
+      <Text
+        href={href}
+        target={target}
+        accessibilityRole="link"
+        style={[
+          baseStyles.base,
+          baseStyles.verticallyAlign,
+          sizeStyle(size),
+          baseStyles.floating,
+          fonts.navigation,
+          sizeStyle(size),
+          textStyles.medium,
+          commonTextStyles[status],
+          style,
+        ]}
+      >
+        {children}
+      </Text>
+    </Link>
   )
 }
 
@@ -267,25 +270,27 @@ function ButtonNaked(props: Props) {
   const fontSize = nakedSize(size)
   return (
     <View style={[baseStyles.base, baseStyles.floating, nakedStyles.container]}>
-      <Text
-        accessibilityRole="link"
-        href={href}
-        target={target}
-        style={[
-          fonts.navigation,
-          baseStyles.verticallyAlign,
-          textStyle,
-          { fontSize },
-          textStyles.medium,
-          style,
-        ]}
-      >
-        {children}
+      <Link href={href}>
+        <Text
+          accessibilityRole="link"
+          href={href}
+          target={target}
+          style={[
+            fonts.navigation,
+            baseStyles.verticallyAlign,
+            textStyle,
+            { fontSize },
+            textStyles.medium,
+            style,
+          ]}
+        >
+          {children}
 
-        <View style={nakedStyles.chevron}>
-          <Chevron color={color} opacity={opacity} size={'0.75em'} />
-        </View>
-      </Text>
+          <View style={nakedStyles.chevron}>
+            <Chevron color={color} opacity={opacity} size={'0.75em'} />
+          </View>
+        </Text>
+      </Link>
     </View>
   )
 }
@@ -306,36 +311,40 @@ function ButtonNav(props: Props) {
   const { children, status, kind, style, href, target } = props
   const color = kind === BTN.DARKNAV ? colors.white : colors.dark
   return (
-    <Text
-      href={href}
-      target={target}
-      accessibilityRole="link"
-      style={[
-        baseStyles.base,
-        baseStyles.verticallyAlign,
-        baseStyles.floating,
-        fonts.navigation,
-        { color },
-        opacityStyle[status],
-        style,
-      ]}
-    >
-      {children}
-    </Text>
+    <Link href={href} passHref={true}>
+      <Text
+        href={href}
+        target={target}
+        accessibilityRole="link"
+        style={[
+          baseStyles.base,
+          baseStyles.verticallyAlign,
+          baseStyles.floating,
+          fonts.navigation,
+          { color },
+          opacityStyle[status],
+          style,
+        ]}
+      >
+        {children}
+      </Text>
+    </Link>
   )
 }
 
 function ButtonInline(props: Props) {
   const { children, status, style, href, target } = props
   return (
-    <Text
-      href={href}
-      target={target}
-      accessibilityRole="link"
-      style={[inlineStyle.text, inlineStyle.container, opacityStyle[status], style]}
-    >
-      {children}
-    </Text>
+    <Link href={href} passHref={true}>
+      <Text
+        href={href}
+        target={target}
+        accessibilityRole="link"
+        style={[inlineStyle.text, inlineStyle.container, opacityStyle[status], style]}
+      >
+        {children}
+      </Text>
+    </Link>
   )
 }
 

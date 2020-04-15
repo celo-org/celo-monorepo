@@ -8,6 +8,10 @@ Welcome to the Celo SDK Docs Homepage! Here, you can find resources for DAppKit 
 
 - **[Forno](forno/README.md)** is a hosted node service for interacting with the Celo network. This allow the user to get connected to the Celo Blockchain without having to run its own node.
 
+## Get Started
+To get started, check out the [Quick Start Guides](start.md)
+
+## Get Involved
 
 If you'd like to see the Celo SDK expanded to support your favorite technology or application, please join the conversation on the [Celo Forum](https://forum.celo.org/c/applications-and-ecosystem-development) or [Discord](https://discordapp.com/channels/600834479145353243/600834479145353245) and tell us what you'd like to build- we highly encourage contributions!
 

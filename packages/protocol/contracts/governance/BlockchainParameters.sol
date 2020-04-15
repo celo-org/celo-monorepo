@@ -22,13 +22,10 @@ contract BlockchainParameters is Ownable, Initializable {
   event BlockGasLimitSet(uint256 limit);
 
   /**
-   * @notice Initializes critical variables.
-   * @param major Minimum client version that can be used in the chain,
-   * major version.
-   * @param minor Minimum client version that can be used in the chain,
-   * minor version.
-   * @param patch Minimum client version that can be used in the chain,
-   * patch level.
+   * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
+   * @param major Minimum client version that can be used in the chain, major version.
+   * @param minor Minimum client version that can be used in the chain, minor version.
+   * @param patch Minimum client version that can be used in the chain, patch level.
    * @param _gasForNonGoldCurrencies Intrinsic gas for non-gold gas currencies.
    * @param gasLimit Block gas limit.
    */

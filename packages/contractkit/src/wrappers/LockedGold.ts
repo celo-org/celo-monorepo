@@ -1,8 +1,8 @@
 import { AddressListItem, linkedListChanges, zip } from '@celo/utils/lib/collections'
 import BigNumber from 'bignumber.js'
-import { EventLog } from 'web3/types'
+import { EventLog } from 'web3-core'
 import { Address } from '../base'
-import { LockedGold } from '../generated/types/LockedGold'
+import { LockedGold } from '../generated/LockedGold'
 import {
   BaseWrapper,
   CeloTransactionObject,
@@ -37,13 +37,14 @@ export interface AccountSlashed {
   epochNumber: number
 }
 
-interface PendingWithdrawal {
+export interface PendingWithdrawal {
   time: BigNumber
   value: BigNumber
 }
 
 export interface LockedGoldConfig {
   unlockingPeriod: BigNumber
+  totalLockedGold: BigNumber
 }
 
 /**
@@ -145,6 +146,17 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
   )
 
   /**
+   * Returns the total amount of locked gold in the system. Note that this does not include
+   *   gold that has been unlocked but not yet withdrawn.
+   * @returns The total amount of locked gold in the system.
+   */
+  getTotalLockedGold = proxyCall(
+    this.contract.methods.getTotalLockedGold,
+    undefined,
+    valueToBigNumber
+  )
+
+  /**
    * Returns the total amount of non-voting locked gold for an account.
    * @param account The account.
    * @return The total amount of non-voting locked gold for an account.
@@ -161,6 +173,7 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
   async getConfig(): Promise<LockedGoldConfig> {
     return {
       unlockingPeriod: valueToBigNumber(await this.contract.methods.unlockingPeriod().call()),
+      totalLockedGold: await this.getTotalLockedGold(),
     }
   }
 
@@ -223,18 +236,30 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
    * @param penalty The amount to slash as penalty.
    * @return List of (group, voting gold) to decrement from `account`.
    */
-  async computeParametersForSlashing(account: string, penalty: BigNumber) {
+  async computeInitialParametersForSlashing(account: string, penalty: BigNumber) {
     const election = await this.kit.contracts.getElection()
     const eligible = await election.getEligibleValidatorGroupsVotes()
     const groups: AddressListItem[] = eligible.map((x) => ({ address: x.address, value: x.votes }))
-    const changed = await this.computeDecrementsForSlashing(account, penalty)
+    return this.computeParametersForSlashing(account, penalty, groups)
+  }
+
+  async computeParametersForSlashing(
+    account: string,
+    penalty: BigNumber,
+    groups: AddressListItem[]
+  ) {
+    const changed = await this.computeDecrementsForSlashing(account, penalty, groups)
     const changes = linkedListChanges(groups, changed)
     return { ...changes, indices: changed.map((a) => a.index) }
   }
 
   // Returns how much voting gold will be decremented from the groups voted by an account
   // Implementation follows protocol/test/common/integration slashingOfGroups()
-  private async computeDecrementsForSlashing(account: Address, penalty: BigNumber) {
+  private async computeDecrementsForSlashing(
+    account: Address,
+    penalty: BigNumber,
+    allGroups: AddressListItem[]
+  ) {
     // first check how much voting gold has to be slashed
     const nonVoting = await this.getAccountNonvotingLockedGold(account)
     if (penalty.isLessThan(nonVoting)) {
@@ -246,9 +271,12 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
     const groups = await election.getGroupsVotedForByAccount(account)
     const res = []
     //
-    for (let i = groups.length - 1; i >= 0; i++) {
+    for (let i = groups.length - 1; i >= 0; i--) {
       const group = groups[i]
-      const totalVotes = await election.getTotalVotesForGroup(group)
+      const totalVotes = allGroups.find((a) => a.address === group)?.value
+      if (!totalVotes) {
+        throw new Error(`Cannot find group ${group}`)
+      }
       const votes = await election.getTotalVotesForGroupByAccount(group, account)
       const slashedVotes = votes.lt(difference) ? votes : difference
       res.push({ address: group, value: totalVotes.minus(slashedVotes), index: i })

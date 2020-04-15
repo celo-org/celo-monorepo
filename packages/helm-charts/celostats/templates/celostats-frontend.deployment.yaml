@@ -1,0 +1,55 @@
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: {{ .Release.Namespace }}-celostats-frontend
+  labels:
+    app: celostats
+    chart: celostats
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    component: celostats-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: celostats
+      release: {{ .Release.Name }}
+      component: celostats-frontend
+  template:
+    metadata:
+      labels:
+        app: celostats
+        release: {{ .Release.Name }}
+        component: celostats-frontend
+    spec:
+      containers:
+      - name: celostats-frontend
+        image: {{ .Values.celostats.image.frontend.repository }}:{{ .Values.celostats.image.frontend.tag }}
+        imagePullPolicy: {{ .Values.imagePullPolicy }}
+        env:
+        - name: ETHSTATS_SERVICE
+          value: https://{{ .Release.Namespace }}-celostats-server.{{ .Values.domain.name }}.org
+        - name: BLOCKSCOUT_URL
+          value: https://{{ .Release.Namespace }}-blockscout.{{ .Values.domain.name }}.org
+        - name: GRAPHQL_BLOCKSCOUT_URL
+          value: https://{{ .Release.Namespace }}-blockscout.{{ .Values.domain.name }}.org/graphiql
+        command:
+        - /bin/sh
+        - -c
+        args:
+        - |
+          /var/www/scripts/set-env-variables.js /var/www/app
+          ngsw-config /var/www/app/ /var/www/ngsw-config.json
+          nginx -g "daemon off;"
+        ports:
+        - name: http
+          containerPort: 80
+          protocol: TCP
+        resources:
+          requests:
+            cpu: 250m
+            memory: 250Mi
+    {{- with .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}

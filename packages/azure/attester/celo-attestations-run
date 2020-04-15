@@ -1,0 +1,41 @@
+#!/bin/bash
+
+set -e
+
+. /etc/default/celo
+
+SECRET_DIR=$(mktemp --directory --tmpdir=/dev/shm)
+cleanup () {
+    rm -rf ${SECRET_DIR}
+}
+trap cleanup EXIT
+
+DB_PASSWORD=$(get_secret $ATTESTER_KEY_VAULT 'attesterPostgreSQLPassword')
+DB_USERNAME=$ATTESTER_DB_USERNAME
+DATABASE_URL="postgres://${DB_USERNAME}:${DB_PASSWORD}@${ATTESTER_DB_HOSTNAME}:5432/postgres"
+
+CELO_PROVIDER=http://localhost:8545
+TWILIO_AUTH_TOKEN=$(get_secret $ATTESTER_KEY_VAULT 'attesterTwilioAuthToken')
+
+/usr/bin/docker run \
+  --name $1 \
+  --net=host \
+  --entrypoint /bin/bash \
+  -v $DATA_DIR:$DATA_DIR \
+  -e NODE_ENV=production \
+  -e PORT=80 \
+  -e DATABASE_URL="$DATABASE_URL" \
+  -e ATTESTATION_SIGNER_ADDRESS="$ATTESTER_ACCOUNT_ADDRESS" \
+  -e CELO_VALIDATOR_ADDRESS="$VALIDATOR_ACCOUNT_ADDRESS" \
+  -e CELO_PROVIDER="$CELO_PROVIDER" \
+  -e SMS_PROVIDERS="$SMS_PROVIDERS" \
+  -e TWILIO_ACCOUNT_SID="$ATTESTER_TWILIO_ACCOUNT_SID" \
+  -e TWILIO_MESSAGING_SERVICE_SID="$ATTESTER_TWILIO_MESSAGE_SERVICE_SID" \
+  -e TWILIO_AUTH_TOKEN="$TWILIO_AUTH_TOKEN" \
+  -e TWILIO_BLACKLIST="$TWILIO_BLACKLIST" \
+  $ATTESTATION_SERVICE_DOCKER_IMAGE -c "\
+  ( \
+      cd /celo-monorepo/packages/attestation-service && \
+      yarn run db:migrate && \
+      yarn start \
+  )"

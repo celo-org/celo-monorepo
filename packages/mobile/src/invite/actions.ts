@@ -14,7 +14,6 @@ export enum Actions {
   SKIP_INVITE = 'INVITE/SKIP_INVITE',
   SKIP_INVITE_SUCCESS = 'INVITE/SKIP_INVITE_SUCCESS',
   SKIP_INVITE_FAILURE = 'INVITE/SKIP_INVITE_FAILURE',
-  STORE_REDEEMED_INVITE_CODE = 'STORE_REDEEMED_INVITE_CODE',
 }
 
 export interface Invitees {
@@ -29,18 +28,23 @@ export enum InviteBy {
 export interface StoreInviteeDataAction {
   type: Actions.STORE_INVITEE_DATA
   address: string
+  inviteCode: string
   e164Number: string
 }
 
-export const storeInviteeData = (address: string, e164Number: string): StoreInviteeDataAction => ({
+export const storeInviteeData = (
+  address: string,
+  inviteCode: string,
+  e164Number: string
+): StoreInviteeDataAction => ({
   type: Actions.STORE_INVITEE_DATA,
   address,
+  inviteCode,
   e164Number,
 })
 
 export interface SendInviteAction {
   type: Actions.SEND_INVITE
-  recipientName: string
   e164Number: string
   inviteMode: InviteBy
   amount?: BigNumber
@@ -48,14 +52,12 @@ export interface SendInviteAction {
 }
 
 export const sendInvite = (
-  recipientName: string,
   e164Number: string,
   inviteMode: InviteBy,
   amount?: BigNumber,
   currency?: CURRENCY_ENUM
 ): SendInviteAction => ({
   type: Actions.SEND_INVITE,
-  recipientName,
   e164Number,
   inviteMode,
   amount,

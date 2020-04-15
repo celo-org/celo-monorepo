@@ -28,7 +28,7 @@ exports[`Faucet renders 1`] = `
       }
     }
   >
-    title
+    Fund your Testnet Account
   </h1>
   <div
     className="css-view-1dbjc4n"
@@ -86,7 +86,7 @@ exports[`Faucet renders 1`] = `
           }
         }
       >
-        addFunds
+        Add Funds
       </h3>
     </div>
     <div
@@ -121,7 +121,9 @@ exports[`Faucet renders 1`] = `
           }
         }
       >
-        addFundsText
+        Enter the address of your Alfajores Testnet account to receive additional funds. Each request adds 10 Celo Dollars and 5 Celo Gold.
+
+In the Celo Wallet, you can find your address by pressing the Settings cog icon at the top right. Press the address to copy it to your device’s clipboard.
       </div>
       <div
         className="css-view-1dbjc4n"
@@ -146,7 +148,7 @@ exports[`Faucet renders 1`] = `
           onKeyDown={[Function]}
           onKeyPress={[Function]}
           onSelect={[Function]}
-          placeholder="testnetAddress"
+          placeholder="Testnet Address"
           readOnly={false}
           spellCheck={true}
           style={
@@ -290,7 +292,7 @@ exports[`Faucet renders 1`] = `
                 }
               }
             >
-              getStarted
+              Get Started
             </a>
           </div>
           <div
@@ -373,7 +375,7 @@ exports[`Faucet renders 1`] = `
           }
         }
       >
-        getTestnetAddress
+        Create an Account
       </h3>
     </div>
     <div
@@ -408,6 +410,7 @@ exports[`Faucet renders 1`] = `
           }
         }
       >
+        If you have an Android device, you can set up a funded account on the Alfajores Testnet by requesting a 
         <div
           className="css-view-1dbjc4n"
           onClick={[Function]}
@@ -428,6 +431,8 @@ exports[`Faucet renders 1`] = `
             data-focusable={true}
             dir="auto"
             href="/developers/wallet"
+            onClick={[Function]}
+            onMouseEnter={[Function]}
             role="link"
             style={
               Object {
@@ -440,10 +445,10 @@ exports[`Faucet renders 1`] = `
               }
             }
           >
-            INVITE
+            Celo Wallet invite
           </a>
         </div>
-         
+        . You can also 
         <div
           className="css-view-1dbjc4n"
           onClick={[Function]}
@@ -464,6 +469,8 @@ exports[`Faucet renders 1`] = `
             data-focusable={true}
             dir="auto"
             href="https://docs.celo.org/getting-started/faucet#creating-an-empty-account-with-the-celo-client"
+            onClick={[Function]}
+            onMouseEnter={[Function]}
             role="link"
             style={
               Object {
@@ -476,7 +483,8 @@ exports[`Faucet renders 1`] = `
               }
             }
           >
-            CLI
+            create an account via the command line
+            .
           </a>
         </div>
       </div>
@@ -538,7 +546,7 @@ exports[`Faucet renders 1`] = `
           }
         }
       >
-        haveAnAccount
+        Have an Account?
       </h3>
     </div>
     <div
@@ -633,7 +641,7 @@ exports[`Faucet renders 1`] = `
           }
         }
       >
-        hittingIssues
+        Hitting Issues?
       </h3>
     </div>
     <div
@@ -699,10 +707,10 @@ exports[`Faucet renders 1`] = `
               }
             }
           >
-            askQustionsOnForum
+            Get Help from the Celo Community.
              
           </span>
-          findAnswers
+          Find answers and ask questions in the Forum
         </div>
         <div
           className="css-view-1dbjc4n"
@@ -747,6 +755,8 @@ exports[`Faucet renders 1`] = `
               data-focusable={true}
               dir="auto"
               href="https://forum.celo.org/"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
               role="link"
               style={
                 Object {
@@ -766,7 +776,7 @@ exports[`Faucet renders 1`] = `
                 }
               }
             >
-              testnetForum
+              Alfajores Testnet Forum
               <div
                 className="css-view-1dbjc4n"
                 style={
@@ -857,7 +867,7 @@ exports[`Faucet renders 1`] = `
           }
         }
       >
-        whatsNext
+        What's Next
       </h3>
     </div>
     <div
@@ -923,10 +933,10 @@ exports[`Faucet renders 1`] = `
               }
             }
           >
-            buildLocally
+            Build the Celo Wallet locally.
              
           </span>
-          buildLocallyText
+          Follow these instructions to build the Wallet from source, pointed at the Alfajores Testnet.
         </div>
         <div
           className="css-view-1dbjc4n"
@@ -971,6 +981,8 @@ exports[`Faucet renders 1`] = `
               data-focusable={true}
               dir="auto"
               href="https://docs.celo.org/celo-codebase/wallet/intro"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
               role="link"
               style={
                 Object {
@@ -990,7 +1002,7 @@ exports[`Faucet renders 1`] = `
                 }
               }
             >
-              buildLocallyLink
+              Read the Wallet Tutorial
               <div
                 className="css-view-1dbjc4n"
                 style={
@@ -1054,10 +1066,10 @@ exports[`Faucet renders 1`] = `
               }
             }
           >
-            viewAccountInfo
+            View account information. 
              
           </span>
-          checkYourBalance
+          Check your balance and transaction history
         </div>
         <div
           className="css-view-1dbjc4n"
@@ -1102,6 +1114,8 @@ exports[`Faucet renders 1`] = `
               data-focusable={true}
               dir="auto"
               href="http://alfajores-blockscout.celo-testnet.org/"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
               role="link"
               style={
                 Object {
@@ -1185,10 +1199,10 @@ exports[`Faucet renders 1`] = `
               }
             }
           >
-            interestedInNode
+            Interested in running your own node? 
              
           </span>
-          interestedInNodeText
+          Follow our step-by-step guide.
         </div>
         <div
           className="css-view-1dbjc4n"
@@ -1233,6 +1247,8 @@ exports[`Faucet renders 1`] = `
               data-focusable={true}
               dir="auto"
               href="https://docs.celo.org/getting-started/running-a-full-node"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
               role="link"
               style={
                 Object {
@@ -1252,7 +1268,7 @@ exports[`Faucet renders 1`] = `
                 }
               }
             >
-              learnMore
+              Read the Docs
               <div
                 className="css-view-1dbjc4n"
                 style={

@@ -549,7 +549,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              stayConnected
+              Stay Connected
             </div>
             <div
               className="css-view-1dbjc4n"
@@ -576,7 +576,7 @@ exports[`HomePage renders 1`] = `
                 onKeyDown={[Function]}
                 onKeyPress={[Function]}
                 onSelect={[Function]}
-                placeholder="form.email*"
+                placeholder="Email*"
                 readOnly={false}
                 required={true}
                 spellCheck={true}
@@ -621,6 +621,49 @@ exports[`HomePage renders 1`] = `
                 type="text"
                 value=""
               />
+              <div
+                className="css-view-1dbjc4n"
+              >
+                <div
+                  className="css-view-1dbjc4n"
+                  style={
+                    Object {
+                      "MozTransitionProperty": "max-height",
+                      "WebkitTransitionDuration": "600ms",
+                      "WebkitTransitionProperty": "max-height",
+                      "height": "auto",
+                      "marginBottom": "5px",
+                      "marginTop": "5px",
+                      "maxHeight": "0px",
+                      "transitionDuration": "600ms",
+                      "transitionProperty": "max-height",
+                    }
+                  }
+                >
+                  <div
+                    className="css-text-901oao"
+                    dir="auto"
+                    style={
+                      Object {
+                        "MozTransitionProperty": "opacity",
+                        "WebkitTransitionDuration": "700ms",
+                        "WebkitTransitionProperty": "opacity",
+                        "color": "rgba(255,127,109,1.00)",
+                        "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                        "fontSize": "16px",
+                        "fontWeight": "500",
+                        "lineHeight": "18px",
+                        "opacity": 0,
+                        "textRendering": "geometricPrecision",
+                        "transitionDuration": "700ms",
+                        "transitionProperty": "opacity",
+                      }
+                    }
+                  >
+                    Please enter a valid email
+                  </div>
+                </div>
+              </div>
               <div
                 className="css-view-1dbjc4n"
                 onClick={[Function]}
@@ -688,13 +731,84 @@ exports[`HomePage renders 1`] = `
                 className="css-view-1dbjc4n"
                 style={
                   Object {
-                    "paddingBottom": "10px",
-                    "paddingTop": "10px",
                     "position": "absolute",
-                    "top": "135px",
+                    "top": "65px",
                   }
                 }
               />
+            </div>
+            <div
+              className="css-view-1dbjc4n"
+              style={
+                Object {
+                  "marginTop": "10px",
+                }
+              }
+            >
+              <div
+                className="css-view-1dbjc4n"
+                style={
+                  Object {
+                    "MozTransitionProperty": "max-height",
+                    "WebkitTransitionDuration": "600ms",
+                    "WebkitTransitionProperty": "max-height",
+                    "height": "auto",
+                    "marginBottom": "5px",
+                    "marginTop": "5px",
+                    "maxHeight": "0px",
+                    "transitionDuration": "600ms",
+                    "transitionProperty": "max-height",
+                  }
+                }
+              >
+                <div
+                  className="css-text-901oao"
+                  dir="auto"
+                  style={
+                    Object {
+                      "MozTransitionProperty": "opacity",
+                      "WebkitTransitionDuration": "700ms",
+                      "WebkitTransitionProperty": "opacity",
+                      "color": "rgba(53,208,127,1.00)",
+                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                      "fontSize": "16px",
+                      "fontWeight": "500",
+                      "lineHeight": "18px",
+                      "opacity": 0,
+                      "textRendering": "geometricPrecision",
+                      "transitionDuration": "700ms",
+                      "transitionProperty": "opacity",
+                    }
+                  }
+                >
+                  <svg
+                    fill="none"
+                    height={16}
+                    style={Object {}}
+                    viewBox="0 0 11 9"
+                    width={16}
+                  >
+                    <path
+                      clipRule="evenodd"
+                      d="M10.7932 1.85263L3.96211 8.64309L0.180176 4.88366L1.85967 3.19411L3.96211 5.28404L9.11373 0.163086L10.7932 1.85263Z"
+                      fill="#35D07F"
+                      fillRule="evenodd"
+                      style={Object {}}
+                    />
+                  </svg>
+                  <span
+                    className="css-text-901oao css-textHasAncestor-16my406"
+                    dir="auto"
+                    style={
+                      Object {
+                        "marginLeft": "10px",
+                      }
+                    }
+                  >
+                    Submitted
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -753,6 +867,48 @@ exports[`HomePage renders 1`] = `
       }
     >
       <div
+        className="css-view-1dbjc4n"
+        style={
+          Object {
+            "WebkitFlexBasis": "auto",
+            "flexBasis": "auto",
+            "height": "126px",
+            "msFlexPreferredSize": "auto",
+            "overflowX": "hidden",
+            "overflowY": "hidden",
+            "width": "242px",
+            "zIndex": 0,
+          }
+        }
+      >
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "backgroundColor": "rgba(0,0,0,0.00)",
+              "backgroundImage": "url(\\"image.png\\")",
+              "backgroundPosition": "center",
+              "backgroundRepeat": "no-repeat",
+              "backgroundSize": "contain",
+              "bottom": "0px",
+              "height": "100%",
+              "left": "0px",
+              "position": "absolute",
+              "right": "0px",
+              "top": "0px",
+              "width": "100%",
+              "zIndex": -1,
+            }
+          }
+        />
+        <img
+          alt=""
+          className="css-accessibilityImage-9pa8cd"
+          draggable={false}
+          src="image.png"
+        />
+      </div>
+      <div
         className="react-reveal"
         style={
           Object {
@@ -764,12 +920,12 @@ exports[`HomePage renders 1`] = `
           className="css-view-1dbjc4n"
           style={
             Object {
-              "maxWidth": "600px",
+              "maxWidth": "550px",
             }
           }
         >
-          <h1
-            aria-level="1"
+          <h2
+            aria-level="2"
             className="css-reset-4rbku5 css-text-901oao"
             dir="auto"
             role="heading"
@@ -777,16 +933,16 @@ exports[`HomePage renders 1`] = `
               Object {
                 "color": "rgba(46,51,56,1.00)",
                 "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                "fontSize": "36px",
-                "lineHeight": "40px",
+                "fontSize": "28px",
+                "lineHeight": "32px",
                 "textAlign": "center",
                 "textRendering": "geometricPrecision",
                 "textTransform": "none",
               }
             }
           >
-            hero3
-          </h1>
+            Celo is an open platform that makes financial tools accessible to anyone with a mobile phone
+          </h2>
         </div>
       </div>
     </div>
@@ -808,7 +964,7 @@ exports[`HomePage renders 1`] = `
         "flexDirection": "column",
         "justifyContent": "center",
         "marginBottom": "30px",
-        "marginTop": "30px",
+        "marginTop": "20px",
         "maxWidth": "100vw",
         "msFlexAlign": "center",
         "msFlexDirection": "column",
@@ -824,36 +980,200 @@ exports[`HomePage renders 1`] = `
       className="css-view-1dbjc4n"
       style={
         Object {
-          "WebkitFlexBasis": "auto",
-          "flexBasis": "auto",
-          "height": "313px",
-          "msFlexPreferredSize": "auto",
-          "overflowX": "hidden",
-          "overflowY": "hidden",
-          "width": "622px",
-          "zIndex": 0,
+          "WebkitBoxFlex": 0,
+          "WebkitFlexGrow": 0,
+          "WebkitFlexShrink": 0,
+          "flexGrow": 0,
+          "flexShrink": 0,
+          "msFlexNegative": 0,
+          "msFlexPositive": 0,
+          "paddingBottom": "10px",
+          "paddingLeft": "10px",
+          "paddingRight": "10px",
+          "paddingTop": "10px",
+          "width": "100%",
         }
       }
     >
+      <style>
+        
+            .ReactModal__Body--open {
+              position: fixed;
+            }
+
+            .ReactModal__Content iframe {
+              position: absolute;
+              bottom: 60px;
+              left: 0;
+              width: calc(100% - 5px);
+              height: calc(90% - 60px);
+            }
+
+            .ReactModal__Overlay {
+              transition: transform 1000ms ease-in-out;
+            }
+            
+            .ReactModal__Overlay--after-open{
+              transform: translateY(0);
+            }
+
+            .ReactModal__Overlay--before-close {
+              transform: translateY(-100vh);
+            }
+          
+      </style>
       <div
         className="css-view-1dbjc4n"
+        data-focusable={true}
+        onKeyDown={[Function]}
+        onKeyUp={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
         style={
           Object {
+            "MozUserSelect": "none",
+            "WebkitUserSelect": "none",
             "backgroundColor": "rgba(0,0,0,0.00)",
-            "backgroundPosition": "center",
-            "backgroundRepeat": "no-repeat",
-            "backgroundSize": "cover",
-            "bottom": "0px",
-            "height": "100%",
-            "left": "0px",
-            "position": "absolute",
-            "right": "0px",
-            "top": "0px",
-            "width": "100%",
-            "zIndex": -1,
+            "cursor": "pointer",
+            "msTouchAction": "manipulation",
+            "msUserSelect": "none",
+            "touchAction": "manipulation",
+            "userSelect": "none",
           }
         }
-      />
+        tabIndex="0"
+      >
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "height": "360px",
+            }
+          }
+        >
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "display": "block",
+                "height": "360px",
+                "overflowX": "hidden",
+                "overflowY": "hidden",
+              }
+            }
+          >
+            <div
+              style={
+                Object {
+                  "display": "block",
+                  "paddingBottom": "319.3333333333333%",
+                  "width": "100%",
+                }
+              }
+            />
+            <div
+              style={
+                Object {
+                  "bottom": "0px",
+                  "height": "100%",
+                  "left": "0px",
+                  "position": "absolute",
+                  "top": "0px",
+                  "width": "100%",
+                }
+              }
+            >
+              <div
+                className="css-view-1dbjc4n"
+                style={
+                  Object {
+                    "WebkitFlexBasis": "auto",
+                    "flexBasis": "auto",
+                    "height": "100%",
+                    "msFlexPreferredSize": "auto",
+                    "overflowX": "hidden",
+                    "overflowY": "hidden",
+                    "width": "100%",
+                    "zIndex": 0,
+                  }
+                }
+              >
+                <div
+                  className="css-view-1dbjc4n"
+                  style={
+                    Object {
+                      "backgroundColor": "rgba(0,0,0,0.00)",
+                      "backgroundImage": "url(\\"image.png\\")",
+                      "backgroundPosition": "center",
+                      "backgroundRepeat": "no-repeat",
+                      "backgroundSize": "cover",
+                      "bottom": "0px",
+                      "height": "100%",
+                      "left": "0px",
+                      "position": "absolute",
+                      "right": "0px",
+                      "top": "0px",
+                      "width": "100%",
+                      "zIndex": -1,
+                    }
+                  }
+                />
+                <img
+                  alt=""
+                  className="css-accessibilityImage-9pa8cd"
+                  draggable={false}
+                  src="image.png"
+                />
+              </div>
+            </div>
+          </div>
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "WebkitAlignItems": "center",
+                "WebkitBoxAlign": "center",
+                "WebkitBoxPack": "center",
+                "WebkitJustifyContent": "center",
+                "alignItems": "center",
+                "height": "100%",
+                "justifyContent": "center",
+                "msFlexAlign": "center",
+                "msFlexPack": "center",
+                "position": "absolute",
+                "width": "100%",
+              }
+            }
+          >
+            <svg
+              fill="none"
+              height="68"
+              style={Object {}}
+              viewBox="0 0 68 68"
+              width="68"
+            >
+              <ellipse
+                cx="33.9123"
+                cy="34.0865"
+                fill="#35D07F"
+                rx="33.4196"
+                ry="33.4947"
+                style={Object {}}
+              />
+              <path
+                d="M46.8013 33.4895C47.4921 33.8694 47.4921 34.862 46.8013 35.2419L27.0396 46.1111C26.3731 46.4777 25.5576 45.9955 25.5576 45.2349L25.5576 23.4965C25.5576 22.7359 26.3731 22.2537 27.0396 22.6203L46.8013 33.4895Z"
+                fill="white"
+                style={Object {}}
+              />
+            </svg>
+          </div>
+        </div>
+      </div>
+      <div />
     </div>
   </div>
   <div
@@ -1066,7 +1386,7 @@ exports[`HomePage renders 1`] = `
           </div>
         </a>
         <a
-          href="https://www.coindesk.com/a16z-polychain-invest-25-million-into-crypto-payments-startup-celo"
+          href="https://www.coindesk.com/libra-minus-facebook-why-celo-is-2020s-buzzy-token-project"
           rel="noopener"
           target="_blank"
         >
@@ -1212,7 +1532,9 @@ exports[`HomePage renders 1`] = `
               className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
               data-focusable={true}
               dir="auto"
-              href="https://www.wsj.com/articles/startup-celo-aims-to-make-crypto-accessible-to-mainstream-mobile-users-11554204600"
+              href="https://www.coindesk.com/libra-minus-facebook-why-celo-is-2020s-buzzy-token-project"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
               role="link"
               style={
                 Object {
@@ -1232,7 +1554,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              recentNews
+              Recent News
               <div
                 className="css-view-1dbjc4n"
                 style={
@@ -1352,7 +1674,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              systemsApproach
+              We embrace a full-stack approach, reimagining technology at each layer
             </h2>
             <h2
               aria-level="2"
@@ -1371,7 +1693,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              designedWithCommunities
+              Our innovations are designed with communities around the world
             </h2>
           </div>
         </div>
@@ -1640,15 +1962,15 @@ exports[`HomePage renders 1`] = `
                 Object {
                   "color": "rgba(221,221,221,1.00)",
                   "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                  "fontSize": "28px",
+                  "fontSize": "24px",
                   "fontWeight": "400",
-                  "lineHeight": "36px",
+                  "lineHeight": "28px",
                   "marginBottom": "20px",
                   "textRendering": "geometricPrecision",
                 }
               }
             >
-              buildOnCelo
+              Build on Celo
             </div>
             <div
               className="css-text-901oao"
@@ -1663,7 +1985,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              buildOnCeloCopy
+              Celo is a platform that is open and open-source, allowing for an ecosystem of powerful applications built on top, including easier cash transfer programs, peer-to-peer lending, collaborative small-scale insurance, and other digital assets and wallets.
             </div>
             <div
               className="css-view-1dbjc4n"
@@ -1717,6 +2039,8 @@ exports[`HomePage renders 1`] = `
                     data-focusable={true}
                     dir="auto"
                     href="/validators"
+                    onClick={[Function]}
+                    onMouseEnter={[Function]}
                     role="link"
                     style={
                       Object {
@@ -1736,7 +2060,7 @@ exports[`HomePage renders 1`] = `
                       }
                     }
                   >
-                    learnMore
+                    Learn More
                     <div
                       className="css-view-1dbjc4n"
                       style={
@@ -1905,15 +2229,15 @@ exports[`HomePage renders 1`] = `
                 Object {
                   "color": "rgba(221,221,221,1.00)",
                   "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                  "fontSize": "28px",
+                  "fontSize": "24px",
                   "fontWeight": "400",
-                  "lineHeight": "36px",
+                  "lineHeight": "28px",
                   "marginBottom": "20px",
                   "textRendering": "geometricPrecision",
                 }
               }
             >
-              mobileFirstPlatform
+              Mobile-First Platform
             </div>
             <div
               className="css-text-901oao"
@@ -1928,7 +2252,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              mobileFirstPlatformCopy
+              To create a truly inclusive financial system, we started by building an infrastructure to serve those excluded from the current system. Celo’s protocol includes unique features that create a seamless user experience on mobile phones.
             </div>
           </div>
           <div
@@ -2066,15 +2390,15 @@ exports[`HomePage renders 1`] = `
                 Object {
                   "color": "rgba(221,221,221,1.00)",
                   "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                  "fontSize": "28px",
+                  "fontSize": "24px",
                   "fontWeight": "400",
-                  "lineHeight": "36px",
+                  "lineHeight": "28px",
                   "marginBottom": "20px",
                   "textRendering": "geometricPrecision",
                 }
               }
             >
-              poweredByCommunity
+              Powered by our community
             </div>
             <div
               className="css-text-901oao"
@@ -2089,7 +2413,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              poweredByCommunityCopy
+              Celo's platform is powered by the community. Users can earn currency by hosting software that forwards mobile devices' requests or validates their transactions.
             </div>
           </div>
           <div
@@ -2204,16 +2528,16 @@ exports[`HomePage renders 1`] = `
                 Object {
                   "color": "rgba(221,221,221,1.00)",
                   "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                  "fontSize": "28px",
+                  "fontSize": "24px",
                   "fontWeight": "400",
-                  "lineHeight": "36px",
+                  "lineHeight": "28px",
                   "marginBottom": "20px",
                   "textAlign": "center",
                   "textRendering": "geometricPrecision",
                 }
               }
             >
-              whitePaper
+              White Paper
             </div>
             <div
               className="css-text-901oao"
@@ -2229,7 +2553,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              whitepaperCopy
+              Celo is a proof-of-stake based blockchain with smart contracts. The technology uses a phone number-based identity system with address-based encryption and eigentrust-based reputation.
             </div>
             <div
               className="css-view-1dbjc4n"
@@ -2270,6 +2594,8 @@ exports[`HomePage renders 1`] = `
                   data-focusable={true}
                   dir="auto"
                   href="/papers/Celo_A_Multi_Asset_Cryptographic_Protocol_for_Decentralized_Social_Payments.pdf"
+                  onClick={[Function]}
+                  onMouseEnter={[Function]}
                   rel=" noopener noreferrer"
                   role="link"
                   style={
@@ -2319,7 +2645,7 @@ exports[`HomePage renders 1`] = `
                   }
                   target="_blank"
                 >
-                  downloadPDF
+                  Download .PDF
                 </a>
               </div>
             </div>
@@ -2381,9 +2707,9 @@ exports[`HomePage renders 1`] = `
                   Object {
                     "color": "rgba(221,221,221,1.00)",
                     "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                    "fontSize": "28px",
+                    "fontSize": "24px",
                     "fontWeight": "400",
-                    "lineHeight": "36px",
+                    "lineHeight": "28px",
                     "marginBottom": "20px",
                     "marginTop": "30px",
                     "textAlign": "center",
@@ -2391,7 +2717,7 @@ exports[`HomePage renders 1`] = `
                   }
                 }
               >
-                stabilityAnalysis
+                Stability Analysis
               </div>
               <div
                 className="css-text-901oao"
@@ -2407,7 +2733,7 @@ exports[`HomePage renders 1`] = `
                   }
                 }
               >
-                stabilityAnalysisCopy
+                Celo’s stablecoins are stable value currencies, implemented by an algorithmic reserve-backed stabilization mechanism. The first stablecoin, cUSD, tracks the value of the US Dollar.
               </div>
             </div>
             <div
@@ -2449,6 +2775,8 @@ exports[`HomePage renders 1`] = `
                   data-focusable={true}
                   dir="auto"
                   href="/papers/Celo_Stability_Analysis.pdf"
+                  onClick={[Function]}
+                  onMouseEnter={[Function]}
                   rel=" noopener noreferrer"
                   role="link"
                   style={
@@ -2498,9 +2826,3052 @@ exports[`HomePage renders 1`] = `
                   }
                   target="_blank"
                 >
-                  downloadPDF
+                  Download .PDF
                 </a>
               </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    className="css-view-1dbjc4n"
+    id="timeline"
+    style={
+      Object {
+        "WebkitAlignSelf": "center",
+        "WebkitBoxDirection": "normal",
+        "WebkitBoxOrient": "vertical",
+        "WebkitFlexDirection": "column",
+        "alignSelf": "center",
+        "flexDirection": "column",
+        "marginLeft": "10px",
+        "marginTop": "50px",
+        "maxWidth": "100vw",
+        "msFlexDirection": "column",
+        "msFlexItemAlign": "center",
+        "paddingLeft": "10px",
+        "paddingRight": "10px",
+        "width": "100%",
+      }
+    }
+  >
+    <div
+      className="css-view-1dbjc4n"
+      style={
+        Object {
+          "WebkitBoxFlex": 0,
+          "WebkitFlexGrow": 0,
+          "WebkitFlexShrink": 0,
+          "flexGrow": 0,
+          "flexShrink": 0,
+          "msFlexNegative": 0,
+          "msFlexPositive": 0,
+          "paddingBottom": "10px",
+          "paddingLeft": "10px",
+          "paddingRight": "10px",
+          "paddingTop": "10px",
+          "width": "100%",
+        }
+      }
+    >
+      <div
+        className="css-view-1dbjc4n"
+        style={
+          Object {
+            "WebkitFlexBasis": "auto",
+            "flexBasis": "auto",
+            "height": "55px",
+            "msFlexPreferredSize": "auto",
+            "overflowX": "hidden",
+            "overflowY": "hidden",
+            "width": "75px",
+            "zIndex": 0,
+          }
+        }
+      >
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "backgroundColor": "rgba(0,0,0,0.00)",
+              "backgroundImage": "url(\\"image.png\\")",
+              "backgroundPosition": "center",
+              "backgroundRepeat": "no-repeat",
+              "backgroundSize": "contain",
+              "bottom": "0px",
+              "height": "100%",
+              "left": "0px",
+              "position": "absolute",
+              "right": "0px",
+              "top": "0px",
+              "width": "100%",
+              "zIndex": -1,
+            }
+          }
+        />
+        <img
+          alt=""
+          className="css-accessibilityImage-9pa8cd"
+          draggable={false}
+          src="image.png"
+        />
+      </div>
+      <h3
+        aria-level="3"
+        className="css-reset-4rbku5 css-text-901oao"
+        dir="auto"
+        role="heading"
+        style={
+          Object {
+            "color": "rgba(46,51,56,1.00)",
+            "fontFamily": "Jost, futura-pt, futura, sans-serif",
+            "fontSize": "24px",
+            "lineHeight": "32px",
+            "marginTop": "15px",
+            "textRendering": "geometricPrecision",
+            "textTransform": "none",
+          }
+        }
+      >
+        Milestones
+      </h3>
+      <h2
+        aria-level="2"
+        className="css-reset-4rbku5 css-text-901oao"
+        dir="auto"
+        role="heading"
+        style={
+          Object {
+            "color": "rgba(46,51,56,1.00)",
+            "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+            "fontSize": "36px",
+            "lineHeight": "40px",
+            "marginBottom": "30px",
+            "textRendering": "geometricPrecision",
+            "textTransform": "none",
+          }
+        }
+      >
+        Celo's Journey
+      </h2>
+      <div
+        className="css-text-901oao"
+        dir="auto"
+        style={
+          Object {
+            "color": "rgba(46,51,56,1.00)",
+            "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+            "fontSize": "20px",
+            "lineHeight": "28px",
+            "textRendering": "geometricPrecision",
+          }
+        }
+      >
+        The Celo Community's past and upcoming milestones, focused on finding use cases, innovating on technology, and preparing for Mainnet release.
+      </div>
+    </div>
+  </div>
+  <div
+    className="css-view-1dbjc4n"
+    style={
+      Object {
+        "WebkitAlignSelf": "center",
+        "WebkitBoxDirection": "normal",
+        "WebkitBoxOrient": "vertical",
+        "WebkitFlexDirection": "column",
+        "alignSelf": "center",
+        "flexDirection": "column",
+        "marginLeft": "10px",
+        "maxWidth": "100vw",
+        "msFlexDirection": "column",
+        "msFlexItemAlign": "center",
+        "paddingLeft": "10px",
+        "paddingRight": "10px",
+        "width": "100%",
+      }
+    }
+  >
+    <div
+      className="css-view-1dbjc4n"
+      style={
+        Object {
+          "WebkitBoxFlex": 0,
+          "WebkitBoxPack": "justify",
+          "WebkitFlexGrow": 0,
+          "WebkitFlexShrink": 0,
+          "WebkitJustifyContent": "space-between",
+          "flexGrow": 0,
+          "flexShrink": 0,
+          "justifyContent": "space-between",
+          "msFlexNegative": 0,
+          "msFlexPack": "justify",
+          "msFlexPositive": 0,
+          "paddingBottom": "10px",
+          "paddingLeft": "10px",
+          "paddingRight": "10px",
+          "paddingTop": "10px",
+          "width": "100%",
+        }
+      }
+    >
+      <div
+        className="css-text-901oao"
+        dir="auto"
+        style={
+          Object {
+            "color": "rgba(46,51,56,1.00)",
+            "fontFamily": "Jost, futura-pt, futura, sans-serif",
+            "fontSize": "16px",
+            "fontWeight": "500",
+            "lineHeight": "18px",
+            "marginBottom": "20px",
+            "marginTop": "20px",
+            "textRendering": "geometricPrecision",
+          }
+        }
+      >
+        Previous Milestones
+      </div>
+      <div
+        className="css-view-1dbjc4n"
+        style={
+          Object {
+            "WebkitBoxDirection": "normal",
+            "WebkitBoxFlex": 1,
+            "WebkitBoxOrient": "horizontal",
+            "WebkitFlexBasis": "0%",
+            "WebkitFlexDirection": "row",
+            "WebkitFlexGrow": 1,
+            "WebkitFlexShrink": 1,
+            "flexBasis": "0%",
+            "flexDirection": "row",
+            "flexGrow": 1,
+            "flexShrink": 1,
+            "marginLeft": "15px",
+            "marginRight": "15px",
+            "maxWidth": "450px",
+            "msFlexDirection": "row",
+            "msFlexNegative": 1,
+            "msFlexPositive": 1,
+            "msFlexPreferredSize": "0%",
+          }
+        }
+      >
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitTransform": "translateY(10px)",
+              "backgroundColor": "rgba(251,204,92,1.00)",
+              "transform": "translateY(10px)",
+              "width": "2px",
+            }
+          }
+        />
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxFlex": 1,
+              "WebkitFlexBasis": "0%",
+              "WebkitFlexGrow": 1,
+              "WebkitFlexShrink": 1,
+              "flexBasis": "0%",
+              "flexGrow": 1,
+              "flexShrink": 1,
+              "marginBottom": "0px",
+              "marginTop": "0px",
+              "msFlexNegative": 1,
+              "msFlexPositive": 1,
+              "msFlexPreferredSize": "0%",
+              "paddingBottom": "30px",
+              "paddingLeft": "25px",
+              "paddingRight": "25px",
+            }
+          }
+        >
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "WebkitTransform": "translateX(-36px) translateY(1px)",
+                "position": "absolute",
+                "transform": "translateX(-36px) translateY(1px)",
+              }
+            }
+          >
+            <div
+              className="react-reveal"
+              style={
+                Object {
+                  "opacity": undefined,
+                }
+              }
+            >
+              <svg
+                fill="none"
+                height={18}
+                style={Object {}}
+                viewBox="0 0 83 98"
+                width={18}
+              >
+                <g
+                  style={
+                    Object {
+                      "mixBlendMode": "normal",
+                    }
+                  }
+                >
+                  <path
+                    d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+                    fill="#FBCC5C"
+                  />
+                </g>
+              </svg>
+            </div>
+          </div>
+          <div
+            className="react-reveal"
+            style={
+              Object {
+                "opacity": undefined,
+              }
+            }
+          >
+            <div
+              className="css-text-901oao"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(216,161,31,1.00)",
+                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                  "fontSize": "16px",
+                  "fontWeight": "bold",
+                  "lineHeight": "20px",
+                  "textRendering": "geometricPrecision",
+                }
+              }
+            >
+              April 2020
+            </div>
+          </div>
+          <div
+            className="react-reveal"
+            style={
+              Object {
+                "opacity": undefined,
+              }
+            }
+          >
+            <div
+              className="css-text-901oao"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(46,51,56,1.00)",
+                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                  "fontSize": "16px",
+                  "fontWeight": "bold",
+                  "lineHeight": "20px",
+                  "textRendering": "geometricPrecision",
+                }
+              }
+            >
+              New Baklava Testnet
+            </div>
+          </div>
+          <div
+            className="react-reveal"
+            style={
+              Object {
+                "opacity": undefined,
+              }
+            }
+          >
+            <div
+              className="css-text-901oao"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(46,51,56,1.00)",
+                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                  "fontSize": "16px",
+                  "lineHeight": "20px",
+                  "textRendering": "geometricPrecision",
+                }
+              }
+            >
+              Validators stand up new testnet with feature complete software
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        className="css-view-1dbjc4n"
+        style={
+          Object {
+            "WebkitBoxDirection": "normal",
+            "WebkitBoxFlex": 1,
+            "WebkitBoxOrient": "horizontal",
+            "WebkitFlexBasis": "0%",
+            "WebkitFlexDirection": "row",
+            "WebkitFlexGrow": 1,
+            "WebkitFlexShrink": 1,
+            "flexBasis": "0%",
+            "flexDirection": "row",
+            "flexGrow": 1,
+            "flexShrink": 1,
+            "marginLeft": "15px",
+            "marginRight": "15px",
+            "maxWidth": "450px",
+            "msFlexDirection": "row",
+            "msFlexNegative": 1,
+            "msFlexPositive": 1,
+            "msFlexPreferredSize": "0%",
+          }
+        }
+      >
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitTransform": "translateY(10px)",
+              "backgroundColor": "rgba(251,204,92,1.00)",
+              "transform": "translateY(10px)",
+              "width": "2px",
+            }
+          }
+        />
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxFlex": 1,
+              "WebkitFlexBasis": "0%",
+              "WebkitFlexGrow": 1,
+              "WebkitFlexShrink": 1,
+              "flexBasis": "0%",
+              "flexGrow": 1,
+              "flexShrink": 1,
+              "marginBottom": "0px",
+              "marginTop": "0px",
+              "msFlexNegative": 1,
+              "msFlexPositive": 1,
+              "msFlexPreferredSize": "0%",
+              "paddingBottom": "30px",
+              "paddingLeft": "25px",
+              "paddingRight": "25px",
+            }
+          }
+        >
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "WebkitTransform": "translateX(-36px) translateY(1px)",
+                "position": "absolute",
+                "transform": "translateX(-36px) translateY(1px)",
+              }
+            }
+          >
+            <div
+              className="react-reveal"
+              style={
+                Object {
+                  "opacity": undefined,
+                }
+              }
+            >
+              <svg
+                fill="none"
+                height={18}
+                style={Object {}}
+                viewBox="0 0 83 98"
+                width={18}
+              >
+                <g
+                  style={
+                    Object {
+                      "mixBlendMode": "normal",
+                    }
+                  }
+                >
+                  <path
+                    d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+                    fill="#FBCC5C"
+                  />
+                </g>
+              </svg>
+            </div>
+          </div>
+          <div
+            className="react-reveal"
+            style={
+              Object {
+                "opacity": undefined,
+              }
+            }
+          >
+            <div
+              className="css-text-901oao"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(216,161,31,1.00)",
+                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                  "fontSize": "16px",
+                  "fontWeight": "bold",
+                  "lineHeight": "20px",
+                  "textRendering": "geometricPrecision",
+                }
+              }
+            >
+              Feb 2020
+            </div>
+          </div>
+          <div
+            className="react-reveal"
+            style={
+              Object {
+                "opacity": undefined,
+              }
+            }
+          >
+            <div
+              className="css-text-901oao"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(46,51,56,1.00)",
+                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                  "fontSize": "16px",
+                  "fontWeight": "bold",
+                  "lineHeight": "20px",
+                  "textRendering": "geometricPrecision",
+                }
+              }
+            >
+              SDK Release
+            </div>
+          </div>
+          <div
+            className="react-reveal"
+            style={
+              Object {
+                "opacity": undefined,
+              }
+            }
+          >
+            <div
+              className="css-text-901oao"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(46,51,56,1.00)",
+                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                  "fontSize": "16px",
+                  "lineHeight": "20px",
+                  "textRendering": "geometricPrecision",
+                }
+              }
+            >
+              ContractKit and DAppKit simplify development of dApps
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        className="css-view-1dbjc4n"
+        style={
+          Object {
+            "WebkitBoxDirection": "normal",
+            "WebkitBoxFlex": 1,
+            "WebkitBoxOrient": "horizontal",
+            "WebkitFlexBasis": "0%",
+            "WebkitFlexDirection": "row",
+            "WebkitFlexGrow": 1,
+            "WebkitFlexShrink": 1,
+            "flexBasis": "0%",
+            "flexDirection": "row",
+            "flexGrow": 1,
+            "flexShrink": 1,
+            "marginLeft": "15px",
+            "marginRight": "15px",
+            "maxWidth": "450px",
+            "msFlexDirection": "row",
+            "msFlexNegative": 1,
+            "msFlexPositive": 1,
+            "msFlexPreferredSize": "0%",
+          }
+        }
+      >
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitTransform": "translateY(10px)",
+              "backgroundColor": "rgba(251,204,92,1.00)",
+              "transform": "translateY(10px)",
+              "width": "2px",
+            }
+          }
+        />
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxFlex": 1,
+              "WebkitFlexBasis": "0%",
+              "WebkitFlexGrow": 1,
+              "WebkitFlexShrink": 1,
+              "flexBasis": "0%",
+              "flexGrow": 1,
+              "flexShrink": 1,
+              "marginBottom": "0px",
+              "marginTop": "0px",
+              "msFlexNegative": 1,
+              "msFlexPositive": 1,
+              "msFlexPreferredSize": "0%",
+              "paddingBottom": "30px",
+              "paddingLeft": "25px",
+              "paddingRight": "25px",
+            }
+          }
+        >
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "WebkitTransform": "translateX(-36px) translateY(1px)",
+                "position": "absolute",
+                "transform": "translateX(-36px) translateY(1px)",
+              }
+            }
+          >
+            <div
+              className="react-reveal"
+              style={
+                Object {
+                  "opacity": undefined,
+                }
+              }
+            >
+              <svg
+                fill="none"
+                height={18}
+                style={Object {}}
+                viewBox="0 0 83 98"
+                width={18}
+              >
+                <g
+                  style={
+                    Object {
+                      "mixBlendMode": "normal",
+                    }
+                  }
+                >
+                  <path
+                    d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+                    fill="#FBCC5C"
+                  />
+                </g>
+              </svg>
+            </div>
+          </div>
+          <div
+            className="react-reveal"
+            style={
+              Object {
+                "opacity": undefined,
+              }
+            }
+          >
+            <div
+              className="css-text-901oao"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(216,161,31,1.00)",
+                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                  "fontSize": "16px",
+                  "fontWeight": "bold",
+                  "lineHeight": "20px",
+                  "textRendering": "geometricPrecision",
+                }
+              }
+            >
+              Nov 2019 - Feb 2020
+            </div>
+          </div>
+          <div
+            className="react-reveal"
+            style={
+              Object {
+                "opacity": undefined,
+              }
+            }
+          >
+            <div
+              className="css-text-901oao"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(46,51,56,1.00)",
+                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                  "fontSize": "16px",
+                  "fontWeight": "bold",
+                  "lineHeight": "20px",
+                  "textRendering": "geometricPrecision",
+                }
+              }
+            >
+              Baklava Testnet – The Great Celo Stake Off
+            </div>
+          </div>
+          <div
+            className="react-reveal"
+            style={
+              Object {
+                "opacity": undefined,
+              }
+            }
+          >
+            <div
+              className="css-text-901oao"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(46,51,56,1.00)",
+                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                  "fontSize": "16px",
+                  "lineHeight": "20px",
+                  "textRendering": "geometricPrecision",
+                }
+              }
+            >
+              Validators gain operational experience and chance to earn Mainnet Celo Gold, software hardened
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        className="css-view-1dbjc4n"
+        style={
+          Object {
+            "WebkitBoxDirection": "normal",
+            "WebkitBoxFlex": 1,
+            "WebkitBoxOrient": "horizontal",
+            "WebkitFlexBasis": "0%",
+            "WebkitFlexDirection": "row",
+            "WebkitFlexGrow": 1,
+            "WebkitFlexShrink": 1,
+            "flexBasis": "0%",
+            "flexDirection": "row",
+            "flexGrow": 1,
+            "flexShrink": 1,
+            "marginLeft": "15px",
+            "marginRight": "15px",
+            "maxWidth": "450px",
+            "msFlexDirection": "row",
+            "msFlexNegative": 1,
+            "msFlexPositive": 1,
+            "msFlexPreferredSize": "0%",
+          }
+        }
+      >
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitTransform": "translateY(10px)",
+              "backgroundColor": "rgba(251,204,92,1.00)",
+              "transform": "translateY(10px)",
+              "width": "2px",
+            }
+          }
+        />
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxFlex": 1,
+              "WebkitFlexBasis": "0%",
+              "WebkitFlexGrow": 1,
+              "WebkitFlexShrink": 1,
+              "flexBasis": "0%",
+              "flexGrow": 1,
+              "flexShrink": 1,
+              "marginBottom": "0px",
+              "marginTop": "0px",
+              "msFlexNegative": 1,
+              "msFlexPositive": 1,
+              "msFlexPreferredSize": "0%",
+              "paddingBottom": "30px",
+              "paddingLeft": "25px",
+              "paddingRight": "25px",
+            }
+          }
+        >
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "WebkitTransform": "translateX(-36px) translateY(1px)",
+                "position": "absolute",
+                "transform": "translateX(-36px) translateY(1px)",
+              }
+            }
+          >
+            <div
+              className="react-reveal"
+              style={
+                Object {
+                  "opacity": undefined,
+                }
+              }
+            >
+              <svg
+                fill="none"
+                height={18}
+                style={Object {}}
+                viewBox="0 0 83 98"
+                width={18}
+              >
+                <g
+                  style={
+                    Object {
+                      "mixBlendMode": "normal",
+                    }
+                  }
+                >
+                  <path
+                    d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+                    fill="#FBCC5C"
+                  />
+                </g>
+              </svg>
+            </div>
+          </div>
+          <div
+            className="react-reveal"
+            style={
+              Object {
+                "opacity": undefined,
+              }
+            }
+          >
+            <div
+              className="css-text-901oao"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(216,161,31,1.00)",
+                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                  "fontSize": "16px",
+                  "fontWeight": "bold",
+                  "lineHeight": "20px",
+                  "textRendering": "geometricPrecision",
+                }
+              }
+            >
+              Sep 2019
+            </div>
+          </div>
+          <div
+            className="react-reveal"
+            style={
+              Object {
+                "opacity": undefined,
+              }
+            }
+          >
+            <div
+              className="css-text-901oao"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(46,51,56,1.00)",
+                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                  "fontSize": "16px",
+                  "fontWeight": "bold",
+                  "lineHeight": "20px",
+                  "textRendering": "geometricPrecision",
+                }
+              }
+            >
+              100th Community Event
+            </div>
+          </div>
+          <div
+            className="react-reveal"
+            style={
+              Object {
+                "opacity": undefined,
+              }
+            }
+          >
+            <div
+              className="css-text-901oao"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(46,51,56,1.00)",
+                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                  "fontSize": "16px",
+                  "lineHeight": "20px",
+                  "textRendering": "geometricPrecision",
+                }
+              }
+            >
+              100 events hosted in 100 days in more than 35 countries
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        className="css-view-1dbjc4n"
+        style={
+          Object {
+            "WebkitBoxDirection": "normal",
+            "WebkitBoxFlex": 1,
+            "WebkitBoxOrient": "horizontal",
+            "WebkitFlexBasis": "0%",
+            "WebkitFlexDirection": "row",
+            "WebkitFlexGrow": 1,
+            "WebkitFlexShrink": 1,
+            "flexBasis": "0%",
+            "flexDirection": "row",
+            "flexGrow": 1,
+            "flexShrink": 1,
+            "marginLeft": "15px",
+            "marginRight": "15px",
+            "maxWidth": "450px",
+            "msFlexDirection": "row",
+            "msFlexNegative": 1,
+            "msFlexPositive": 1,
+            "msFlexPreferredSize": "0%",
+          }
+        }
+      >
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitTransform": "translateY(10px)",
+              "backgroundColor": "rgba(251,204,92,1.00)",
+              "transform": "translateY(10px)",
+              "width": "2px",
+            }
+          }
+        />
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxFlex": 1,
+              "WebkitFlexBasis": "0%",
+              "WebkitFlexGrow": 1,
+              "WebkitFlexShrink": 1,
+              "flexBasis": "0%",
+              "flexGrow": 1,
+              "flexShrink": 1,
+              "marginBottom": "0px",
+              "marginTop": "0px",
+              "msFlexNegative": 1,
+              "msFlexPositive": 1,
+              "msFlexPreferredSize": "0%",
+              "paddingBottom": "30px",
+              "paddingLeft": "25px",
+              "paddingRight": "25px",
+            }
+          }
+        >
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "WebkitTransform": "translateX(-36px) translateY(1px)",
+                "position": "absolute",
+                "transform": "translateX(-36px) translateY(1px)",
+              }
+            }
+          >
+            <div
+              className="react-reveal"
+              style={
+                Object {
+                  "opacity": undefined,
+                }
+              }
+            >
+              <svg
+                fill="none"
+                height={18}
+                style={Object {}}
+                viewBox="0 0 83 98"
+                width={18}
+              >
+                <g
+                  style={
+                    Object {
+                      "mixBlendMode": "normal",
+                    }
+                  }
+                >
+                  <path
+                    d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+                    fill="#FBCC5C"
+                  />
+                </g>
+              </svg>
+            </div>
+          </div>
+          <div
+            className="react-reveal"
+            style={
+              Object {
+                "opacity": undefined,
+              }
+            }
+          >
+            <div
+              className="css-text-901oao"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(216,161,31,1.00)",
+                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                  "fontSize": "16px",
+                  "fontWeight": "bold",
+                  "lineHeight": "20px",
+                  "textRendering": "geometricPrecision",
+                }
+              }
+            >
+              July 2019
+            </div>
+          </div>
+          <div
+            className="react-reveal"
+            style={
+              Object {
+                "opacity": undefined,
+              }
+            }
+          >
+            <div
+              className="css-text-901oao"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(46,51,56,1.00)",
+                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                  "fontSize": "16px",
+                  "fontWeight": "bold",
+                  "lineHeight": "20px",
+                  "textRendering": "geometricPrecision",
+                }
+              }
+            >
+              Alfajores Testnet Release
+            </div>
+          </div>
+          <div
+            className="react-reveal"
+            style={
+              Object {
+                "opacity": undefined,
+              }
+            }
+          >
+            <div
+              className="css-text-901oao"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(46,51,56,1.00)",
+                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                  "fontSize": "16px",
+                  "lineHeight": "20px",
+                  "textRendering": "geometricPrecision",
+                }
+              }
+            >
+              First full network release for protocol and app developers
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        className="css-view-1dbjc4n"
+        style={
+          Object {
+            "WebkitBoxDirection": "normal",
+            "WebkitBoxFlex": 1,
+            "WebkitBoxOrient": "horizontal",
+            "WebkitFlexBasis": "0%",
+            "WebkitFlexDirection": "row",
+            "WebkitFlexGrow": 1,
+            "WebkitFlexShrink": 1,
+            "flexBasis": "0%",
+            "flexDirection": "row",
+            "flexGrow": 1,
+            "flexShrink": 1,
+            "marginLeft": "15px",
+            "marginRight": "15px",
+            "maxWidth": "450px",
+            "msFlexDirection": "row",
+            "msFlexNegative": 1,
+            "msFlexPositive": 1,
+            "msFlexPreferredSize": "0%",
+          }
+        }
+      >
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitTransform": "translateY(10px)",
+              "backgroundColor": "rgba(251,204,92,1.00)",
+              "transform": "translateY(10px)",
+              "width": "2px",
+            }
+          }
+        />
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxFlex": 1,
+              "WebkitFlexBasis": "0%",
+              "WebkitFlexGrow": 1,
+              "WebkitFlexShrink": 1,
+              "flexBasis": "0%",
+              "flexGrow": 1,
+              "flexShrink": 1,
+              "marginBottom": "0px",
+              "marginTop": "0px",
+              "msFlexNegative": 1,
+              "msFlexPositive": 1,
+              "msFlexPreferredSize": "0%",
+              "paddingBottom": "30px",
+              "paddingLeft": "25px",
+              "paddingRight": "25px",
+            }
+          }
+        >
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "WebkitTransform": "translateX(-36px) translateY(1px)",
+                "position": "absolute",
+                "transform": "translateX(-36px) translateY(1px)",
+              }
+            }
+          >
+            <div
+              className="react-reveal"
+              style={
+                Object {
+                  "opacity": undefined,
+                }
+              }
+            >
+              <svg
+                fill="none"
+                height={18}
+                style={Object {}}
+                viewBox="0 0 83 98"
+                width={18}
+              >
+                <g
+                  style={
+                    Object {
+                      "mixBlendMode": "normal",
+                    }
+                  }
+                >
+                  <path
+                    d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+                    fill="#FBCC5C"
+                  />
+                </g>
+              </svg>
+            </div>
+          </div>
+          <div
+            className="react-reveal"
+            style={
+              Object {
+                "opacity": undefined,
+              }
+            }
+          >
+            <div
+              className="css-text-901oao"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(216,161,31,1.00)",
+                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                  "fontSize": "16px",
+                  "fontWeight": "bold",
+                  "lineHeight": "20px",
+                  "textRendering": "geometricPrecision",
+                }
+              }
+            >
+              Feb 2019
+            </div>
+          </div>
+          <div
+            className="react-reveal"
+            style={
+              Object {
+                "opacity": undefined,
+              }
+            }
+          >
+            <div
+              className="css-text-901oao"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(46,51,56,1.00)",
+                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                  "fontSize": "16px",
+                  "fontWeight": "bold",
+                  "lineHeight": "20px",
+                  "textRendering": "geometricPrecision",
+                }
+              }
+            >
+              MIT Stability Challenge
+            </div>
+          </div>
+          <div
+            className="react-reveal"
+            style={
+              Object {
+                "opacity": undefined,
+              }
+            }
+          >
+            <div
+              className="css-text-901oao"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(46,51,56,1.00)",
+                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                  "fontSize": "16px",
+                  "lineHeight": "20px",
+                  "textRendering": "geometricPrecision",
+                }
+              }
+            >
+              Stability Protocol tested and improved
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        className="css-view-1dbjc4n"
+        style={
+          Object {
+            "WebkitBoxDirection": "normal",
+            "WebkitBoxFlex": 1,
+            "WebkitBoxOrient": "horizontal",
+            "WebkitFlexBasis": "0%",
+            "WebkitFlexDirection": "row",
+            "WebkitFlexGrow": 1,
+            "WebkitFlexShrink": 1,
+            "flexBasis": "0%",
+            "flexDirection": "row",
+            "flexGrow": 1,
+            "flexShrink": 1,
+            "marginLeft": "15px",
+            "marginRight": "15px",
+            "maxWidth": "450px",
+            "msFlexDirection": "row",
+            "msFlexNegative": 1,
+            "msFlexPositive": 1,
+            "msFlexPreferredSize": "0%",
+          }
+        }
+      >
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitTransform": "translateY(10px)",
+              "backgroundColor": "rgba(251,204,92,1.00)",
+              "transform": "translateY(10px)",
+              "width": "2px",
+            }
+          }
+        />
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxFlex": 1,
+              "WebkitFlexBasis": "0%",
+              "WebkitFlexGrow": 1,
+              "WebkitFlexShrink": 1,
+              "flexBasis": "0%",
+              "flexGrow": 1,
+              "flexShrink": 1,
+              "marginBottom": "0px",
+              "marginTop": "0px",
+              "msFlexNegative": 1,
+              "msFlexPositive": 1,
+              "msFlexPreferredSize": "0%",
+              "paddingBottom": "30px",
+              "paddingLeft": "25px",
+              "paddingRight": "25px",
+            }
+          }
+        >
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "WebkitTransform": "translateX(-36px) translateY(1px)",
+                "position": "absolute",
+                "transform": "translateX(-36px) translateY(1px)",
+              }
+            }
+          >
+            <div
+              className="react-reveal"
+              style={
+                Object {
+                  "opacity": undefined,
+                }
+              }
+            >
+              <svg
+                fill="none"
+                height={18}
+                style={Object {}}
+                viewBox="0 0 83 98"
+                width={18}
+              >
+                <g
+                  style={
+                    Object {
+                      "mixBlendMode": "normal",
+                    }
+                  }
+                >
+                  <path
+                    d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+                    fill="#FBCC5C"
+                  />
+                </g>
+              </svg>
+            </div>
+          </div>
+          <div
+            className="react-reveal"
+            style={
+              Object {
+                "opacity": undefined,
+              }
+            }
+          >
+            <div
+              className="css-text-901oao"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(216,161,31,1.00)",
+                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                  "fontSize": "16px",
+                  "fontWeight": "bold",
+                  "lineHeight": "20px",
+                  "textRendering": "geometricPrecision",
+                }
+              }
+            >
+              Dec 2018
+            </div>
+          </div>
+          <div
+            className="react-reveal"
+            style={
+              Object {
+                "opacity": undefined,
+              }
+            }
+          >
+            <div
+              className="css-text-901oao"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(46,51,56,1.00)",
+                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                  "fontSize": "16px",
+                  "fontWeight": "bold",
+                  "lineHeight": "20px",
+                  "textRendering": "geometricPrecision",
+                }
+              }
+            >
+              Mobile Wallet in Market Testing Begins
+            </div>
+          </div>
+          <div
+            className="react-reveal"
+            style={
+              Object {
+                "opacity": undefined,
+              }
+            }
+          >
+            <div
+              className="css-text-901oao"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(46,51,56,1.00)",
+                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                  "fontSize": "16px",
+                  "lineHeight": "20px",
+                  "textRendering": "geometricPrecision",
+                }
+              }
+            >
+              Ongoing research in emerging markets
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        className="css-view-1dbjc4n"
+        style={
+          Object {
+            "WebkitBoxDirection": "normal",
+            "WebkitBoxOrient": "horizontal",
+            "WebkitFlexDirection": "row",
+            "flexDirection": "row",
+            "marginLeft": "15px",
+            "marginRight": "15px",
+            "maxWidth": "450px",
+            "msFlexDirection": "row",
+          }
+        }
+      >
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitTransform": "translateY(10px)",
+              "background": "linear-gradient(#FBCC5C, #FFFFFF)",
+              "backgroundColor": "rgba(251,204,92,1.00)",
+              "transform": "translateY(10px)",
+              "width": "2px",
+            }
+          }
+        />
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxFlex": 1,
+              "WebkitFlexBasis": "0%",
+              "WebkitFlexGrow": 1,
+              "WebkitFlexShrink": 1,
+              "flexBasis": "0%",
+              "flexGrow": 1,
+              "flexShrink": 1,
+              "marginBottom": "0px",
+              "marginTop": "0px",
+              "msFlexNegative": 1,
+              "msFlexPositive": 1,
+              "msFlexPreferredSize": "0%",
+              "paddingBottom": "30px",
+              "paddingLeft": "25px",
+              "paddingRight": "25px",
+            }
+          }
+        >
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "WebkitTransform": "translateX(-36px) translateY(1px)",
+                "position": "absolute",
+                "transform": "translateX(-36px) translateY(1px)",
+              }
+            }
+          >
+            <div
+              className="react-reveal"
+              style={
+                Object {
+                  "opacity": undefined,
+                }
+              }
+            >
+              <svg
+                fill="none"
+                height={18}
+                style={Object {}}
+                viewBox="0 0 83 98"
+                width={18}
+              >
+                <g
+                  style={
+                    Object {
+                      "mixBlendMode": "normal",
+                    }
+                  }
+                >
+                  <path
+                    d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+                    fill="#FBCC5C"
+                  />
+                </g>
+              </svg>
+            </div>
+          </div>
+          <div
+            className="react-reveal"
+            style={
+              Object {
+                "opacity": undefined,
+              }
+            }
+          >
+            <div
+              className="css-text-901oao"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(216,161,31,1.00)",
+                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                  "fontSize": "16px",
+                  "fontWeight": "bold",
+                  "lineHeight": "20px",
+                  "textRendering": "geometricPrecision",
+                }
+              }
+            >
+              Aug 2018
+            </div>
+          </div>
+          <div
+            className="react-reveal"
+            style={
+              Object {
+                "opacity": undefined,
+              }
+            }
+          >
+            <div
+              className="css-text-901oao"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(46,51,56,1.00)",
+                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                  "fontSize": "16px",
+                  "fontWeight": "bold",
+                  "lineHeight": "20px",
+                  "textRendering": "geometricPrecision",
+                }
+              }
+            >
+              First User Research Trip
+            </div>
+          </div>
+          <div
+            className="react-reveal"
+            style={
+              Object {
+                "opacity": undefined,
+              }
+            }
+          >
+            <div
+              className="css-text-901oao"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(46,51,56,1.00)",
+                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                  "fontSize": "16px",
+                  "lineHeight": "20px",
+                  "textRendering": "geometricPrecision",
+                }
+              }
+            >
+              Field research on mobile money adoption in Kenya
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      className="css-view-1dbjc4n"
+      style={
+        Object {
+          "WebkitBoxFlex": 0,
+          "WebkitFlexGrow": 0,
+          "WebkitFlexShrink": 0,
+          "flexGrow": 0,
+          "flexShrink": 0,
+          "msFlexNegative": 0,
+          "msFlexPositive": 0,
+          "paddingBottom": "10px",
+          "paddingLeft": "10px",
+          "paddingRight": "10px",
+          "paddingTop": "10px",
+          "width": "100%",
+        }
+      }
+    >
+      <div
+        className="css-text-901oao"
+        dir="auto"
+        style={
+          Object {
+            "color": "rgba(46,51,56,1.00)",
+            "fontFamily": "Jost, futura-pt, futura, sans-serif",
+            "fontSize": "16px",
+            "fontWeight": "500",
+            "lineHeight": "18px",
+            "marginBottom": "20px",
+            "marginTop": "20px",
+            "textRendering": "geometricPrecision",
+          }
+        }
+      >
+        Milestone Key
+      </div>
+      <div
+        className="css-view-1dbjc4n"
+        style={
+          Object {
+            "WebkitBoxDirection": "normal",
+            "WebkitBoxLines": "multiple",
+            "WebkitBoxOrient": "horizontal",
+            "WebkitFlexDirection": "row",
+            "WebkitFlexWrap": "wrap",
+            "flexDirection": "row",
+            "flexWrap": "wrap",
+            "msFlexDirection": "row",
+            "msFlexWrap": "wrap",
+          }
+        }
+      >
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxOrient": "horizontal",
+              "WebkitFlexDirection": "row",
+              "flexDirection": "row",
+              "marginLeft": "5px",
+              "marginRight": "15px",
+              "msFlexDirection": "row",
+            }
+          }
+        >
+          <svg
+            fill="none"
+            height={18}
+            style={Object {}}
+            viewBox="0 0 12 15"
+            width={15.84}
+          >
+            <path
+              d="M0.694644 8.03832L0.694854 8.03733C1.11106 6.0762 2.01314 4.31934 3.15316 2.97222C4.29262 1.62577 5.67668 0.756708 6.97518 0.535182L6.99246 0.532234L7.00949 0.528084C7.08947 0.50859 7.14342 0.507067 7.2886 0.507067H7.30252L7.31641 0.506293C8.43398 0.444037 9.44602 0.844847 10.2113 1.6515C11.3029 2.84313 11.7636 4.74522 11.3503 6.96114L11.3497 6.96425C11.0041 8.88501 10.1393 10.6528 8.99112 11.9944C7.84052 13.3387 6.43203 14.226 5.00847 14.4498C3.7403 14.6396 2.60967 14.2904 1.79643 13.4367L1.79645 13.4366L1.79296 13.433C0.645198 12.252 0.211033 10.2946 0.694644 8.03832Z"
+              stroke="#FBCC5C"
+            />
+            <path
+              d="M0.205748 7.93311H11.6464C10.6896 11.5534 7.99538 14.4869 5.08425 14.9436C3.67491 15.155 2.37395 14.7675 1.43439 13.7811C0.133461 12.4424 -0.300169 10.2934 0.205748 7.93311Z"
+              fill="#FBCC5C"
+            />
+          </svg>
+          <div
+            className="css-text-901oao"
+            dir="auto"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                "fontSize": "16px",
+                "lineHeight": "20px",
+                "marginBottom": "10px",
+                "marginLeft": "20px",
+                "marginRight": "20px",
+                "textRendering": "geometricPrecision",
+              }
+            }
+          >
+            In Progress
+          </div>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxOrient": "horizontal",
+              "WebkitFlexDirection": "row",
+              "flexDirection": "row",
+              "marginLeft": "5px",
+              "marginRight": "15px",
+              "msFlexDirection": "row",
+            }
+          }
+        >
+          <svg
+            fill="none"
+            height={18}
+            style={Object {}}
+            viewBox="0 0 12 15"
+            width={15.84}
+          >
+            <g
+              style={
+                Object {
+                  "mixBlendMode": "normal",
+                }
+              }
+            >
+              <path
+                d="M0.694644 8.03832L0.694854 8.03733C1.11106 6.0762 2.01314 4.31934 3.15316 2.97222C4.29262 1.62577 5.67668 0.756708 6.97518 0.535182L6.99246 0.532234L7.00949 0.528084C7.08947 0.50859 7.14342 0.507067 7.2886 0.507067H7.30252L7.31641 0.506293C8.43398 0.444037 9.44602 0.844847 10.2113 1.6515C11.3029 2.84313 11.7636 4.74522 11.3503 6.96114L11.3497 6.96425C11.0041 8.88501 10.1393 10.6528 8.99112 11.9944C7.84052 13.3387 6.43203 14.226 5.00847 14.4498C3.7403 14.6396 2.60967 14.2904 1.79643 13.4367L1.79645 13.4366L1.79296 13.433C0.645198 12.252 0.211033 10.2946 0.694644 8.03832Z"
+                stroke="#FBCC5C"
+                strokeWidth="1"
+              />
+            </g>
+          </svg>
+          <div
+            className="css-text-901oao"
+            dir="auto"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                "fontSize": "16px",
+                "lineHeight": "20px",
+                "marginBottom": "10px",
+                "marginLeft": "20px",
+                "marginRight": "20px",
+                "textRendering": "geometricPrecision",
+              }
+            }
+          >
+            Pending
+          </div>
+        </div>
+      </div>
+      <div
+        className="css-text-901oao"
+        dir="auto"
+        style={
+          Object {
+            "color": "rgba(46,51,56,1.00)",
+            "fontFamily": "Jost, futura-pt, futura, sans-serif",
+            "fontSize": "16px",
+            "fontWeight": "500",
+            "lineHeight": "18px",
+            "marginBottom": "20px",
+            "marginTop": "20px",
+            "textRendering": "geometricPrecision",
+          }
+        }
+      >
+        Upcoming Milestones
+      </div>
+      <div
+        className="css-view-1dbjc4n"
+        style={
+          Object {
+            "WebkitBoxDirection": "normal",
+            "WebkitBoxOrient": "horizontal",
+            "WebkitFlexDirection": "row",
+            "flexDirection": "row",
+            "marginLeft": "15px",
+            "marginRight": "15px",
+            "maxWidth": "450px",
+            "msFlexDirection": "row",
+          }
+        }
+      >
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "visibility": "hidden",
+              "width": "2px",
+            }
+          }
+        />
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxFlex": 1,
+              "WebkitFlexBasis": "0%",
+              "WebkitFlexGrow": 1,
+              "WebkitFlexShrink": 1,
+              "flexBasis": "0%",
+              "flexGrow": 1,
+              "flexShrink": 1,
+              "marginBottom": "0px",
+              "marginTop": "0px",
+              "msFlexNegative": 1,
+              "msFlexPositive": 1,
+              "msFlexPreferredSize": "0%",
+              "paddingBottom": "30px",
+              "paddingLeft": "25px",
+              "paddingRight": "25px",
+            }
+          }
+        >
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "WebkitTransform": "translateX(-35px) translateY(1px)",
+                "position": "absolute",
+                "transform": "translateX(-35px) translateY(1px)",
+              }
+            }
+          >
+            <div
+              className="react-reveal"
+              style={
+                Object {
+                  "opacity": undefined,
+                }
+              }
+            >
+              <svg
+                fill="none"
+                height={18}
+                style={Object {}}
+                viewBox="0 0 12 15"
+                width={15.84}
+              >
+                <path
+                  d="M0.694644 8.03832L0.694854 8.03733C1.11106 6.0762 2.01314 4.31934 3.15316 2.97222C4.29262 1.62577 5.67668 0.756708 6.97518 0.535182L6.99246 0.532234L7.00949 0.528084C7.08947 0.50859 7.14342 0.507067 7.2886 0.507067H7.30252L7.31641 0.506293C8.43398 0.444037 9.44602 0.844847 10.2113 1.6515C11.3029 2.84313 11.7636 4.74522 11.3503 6.96114L11.3497 6.96425C11.0041 8.88501 10.1393 10.6528 8.99112 11.9944C7.84052 13.3387 6.43203 14.226 5.00847 14.4498C3.7403 14.6396 2.60967 14.2904 1.79643 13.4367L1.79645 13.4366L1.79296 13.433C0.645198 12.252 0.211033 10.2946 0.694644 8.03832Z"
+                  stroke="#FBCC5C"
+                />
+                <path
+                  d="M0.205748 7.93311H11.6464C10.6896 11.5534 7.99538 14.4869 5.08425 14.9436C3.67491 15.155 2.37395 14.7675 1.43439 13.7811C0.133461 12.4424 -0.300169 10.2934 0.205748 7.93311Z"
+                  fill="#FBCC5C"
+                />
+              </svg>
+            </div>
+          </div>
+          <div
+            className="react-reveal"
+            style={
+              Object {
+                "opacity": undefined,
+              }
+            }
+          >
+            <div
+              className="css-text-901oao"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(216,161,31,1.00)",
+                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                  "fontSize": "16px",
+                  "fontWeight": "bold",
+                  "lineHeight": "20px",
+                  "textRendering": "geometricPrecision",
+                }
+              }
+            />
+          </div>
+          <div
+            className="react-reveal"
+            style={
+              Object {
+                "opacity": undefined,
+              }
+            }
+          >
+            <div
+              className="css-text-901oao"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(46,51,56,1.00)",
+                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                  "fontSize": "16px",
+                  "fontWeight": "bold",
+                  "lineHeight": "20px",
+                  "textRendering": "geometricPrecision",
+                }
+              }
+            >
+              Security Audits Complete
+            </div>
+          </div>
+          <div
+            className="react-reveal"
+            style={
+              Object {
+                "opacity": undefined,
+              }
+            }
+          >
+            <div
+              className="css-text-901oao"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(46,51,56,1.00)",
+                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                  "fontSize": "16px",
+                  "lineHeight": "20px",
+                  "textRendering": "geometricPrecision",
+                }
+              }
+            >
+              Resolve any outstanding issues to harden codebase
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        className="css-view-1dbjc4n"
+        style={
+          Object {
+            "WebkitBoxDirection": "normal",
+            "WebkitBoxOrient": "horizontal",
+            "WebkitFlexDirection": "row",
+            "flexDirection": "row",
+            "marginLeft": "15px",
+            "marginRight": "15px",
+            "maxWidth": "450px",
+            "msFlexDirection": "row",
+          }
+        }
+      >
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "visibility": "hidden",
+              "width": "2px",
+            }
+          }
+        />
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxFlex": 1,
+              "WebkitFlexBasis": "0%",
+              "WebkitFlexGrow": 1,
+              "WebkitFlexShrink": 1,
+              "flexBasis": "0%",
+              "flexGrow": 1,
+              "flexShrink": 1,
+              "marginBottom": "0px",
+              "marginTop": "0px",
+              "msFlexNegative": 1,
+              "msFlexPositive": 1,
+              "msFlexPreferredSize": "0%",
+              "paddingBottom": "30px",
+              "paddingLeft": "25px",
+              "paddingRight": "25px",
+            }
+          }
+        >
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "WebkitTransform": "translateX(-35px) translateY(1px)",
+                "position": "absolute",
+                "transform": "translateX(-35px) translateY(1px)",
+              }
+            }
+          >
+            <div
+              className="react-reveal"
+              style={
+                Object {
+                  "opacity": undefined,
+                }
+              }
+            >
+              <svg
+                fill="none"
+                height={18}
+                style={Object {}}
+                viewBox="0 0 12 15"
+                width={15.84}
+              >
+                <g
+                  style={
+                    Object {
+                      "mixBlendMode": "normal",
+                    }
+                  }
+                >
+                  <path
+                    d="M0.694644 8.03832L0.694854 8.03733C1.11106 6.0762 2.01314 4.31934 3.15316 2.97222C4.29262 1.62577 5.67668 0.756708 6.97518 0.535182L6.99246 0.532234L7.00949 0.528084C7.08947 0.50859 7.14342 0.507067 7.2886 0.507067H7.30252L7.31641 0.506293C8.43398 0.444037 9.44602 0.844847 10.2113 1.6515C11.3029 2.84313 11.7636 4.74522 11.3503 6.96114L11.3497 6.96425C11.0041 8.88501 10.1393 10.6528 8.99112 11.9944C7.84052 13.3387 6.43203 14.226 5.00847 14.4498C3.7403 14.6396 2.60967 14.2904 1.79643 13.4367L1.79645 13.4366L1.79296 13.433C0.645198 12.252 0.211033 10.2946 0.694644 8.03832Z"
+                    stroke="#FBCC5C"
+                    strokeWidth="1"
+                  />
+                </g>
+              </svg>
+            </div>
+          </div>
+          <div
+            className="react-reveal"
+            style={
+              Object {
+                "opacity": undefined,
+              }
+            }
+          >
+            <div
+              className="css-text-901oao"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(216,161,31,1.00)",
+                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                  "fontSize": "16px",
+                  "fontWeight": "bold",
+                  "lineHeight": "20px",
+                  "textRendering": "geometricPrecision",
+                }
+              }
+            />
+          </div>
+          <div
+            className="react-reveal"
+            style={
+              Object {
+                "opacity": undefined,
+              }
+            }
+          >
+            <div
+              className="css-text-901oao"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(46,51,56,1.00)",
+                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                  "fontSize": "16px",
+                  "fontWeight": "bold",
+                  "lineHeight": "20px",
+                  "textRendering": "geometricPrecision",
+                }
+              }
+            >
+              Mainnet Release Candidate 1
+            </div>
+          </div>
+          <div
+            className="react-reveal"
+            style={
+              Object {
+                "opacity": undefined,
+              }
+            }
+          >
+            <div
+              className="css-text-901oao"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(46,51,56,1.00)",
+                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                  "fontSize": "16px",
+                  "lineHeight": "20px",
+                  "textRendering": "geometricPrecision",
+                }
+              }
+            >
+              Validators stand up release candidate network with production-ready software
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        className="css-view-1dbjc4n"
+        style={
+          Object {
+            "WebkitBoxDirection": "normal",
+            "WebkitBoxOrient": "horizontal",
+            "WebkitFlexDirection": "row",
+            "flexDirection": "row",
+            "marginLeft": "15px",
+            "marginRight": "15px",
+            "maxWidth": "450px",
+            "msFlexDirection": "row",
+          }
+        }
+      >
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "visibility": "hidden",
+              "width": "2px",
+            }
+          }
+        />
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxFlex": 1,
+              "WebkitFlexBasis": "0%",
+              "WebkitFlexGrow": 1,
+              "WebkitFlexShrink": 1,
+              "flexBasis": "0%",
+              "flexGrow": 1,
+              "flexShrink": 1,
+              "marginBottom": "0px",
+              "marginTop": "0px",
+              "msFlexNegative": 1,
+              "msFlexPositive": 1,
+              "msFlexPreferredSize": "0%",
+              "paddingBottom": "30px",
+              "paddingLeft": "25px",
+              "paddingRight": "25px",
+            }
+          }
+        >
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "WebkitTransform": "translateX(-35px) translateY(1px)",
+                "position": "absolute",
+                "transform": "translateX(-35px) translateY(1px)",
+              }
+            }
+          >
+            <div
+              className="react-reveal"
+              style={
+                Object {
+                  "opacity": undefined,
+                }
+              }
+            >
+              <svg
+                fill="none"
+                height={18}
+                style={Object {}}
+                viewBox="0 0 12 15"
+                width={15.84}
+              >
+                <g
+                  style={
+                    Object {
+                      "mixBlendMode": "normal",
+                    }
+                  }
+                >
+                  <path
+                    d="M0.694644 8.03832L0.694854 8.03733C1.11106 6.0762 2.01314 4.31934 3.15316 2.97222C4.29262 1.62577 5.67668 0.756708 6.97518 0.535182L6.99246 0.532234L7.00949 0.528084C7.08947 0.50859 7.14342 0.507067 7.2886 0.507067H7.30252L7.31641 0.506293C8.43398 0.444037 9.44602 0.844847 10.2113 1.6515C11.3029 2.84313 11.7636 4.74522 11.3503 6.96114L11.3497 6.96425C11.0041 8.88501 10.1393 10.6528 8.99112 11.9944C7.84052 13.3387 6.43203 14.226 5.00847 14.4498C3.7403 14.6396 2.60967 14.2904 1.79643 13.4367L1.79645 13.4366L1.79296 13.433C0.645198 12.252 0.211033 10.2946 0.694644 8.03832Z"
+                    stroke="#FBCC5C"
+                    strokeWidth="1"
+                  />
+                </g>
+              </svg>
+            </div>
+          </div>
+          <div
+            className="react-reveal"
+            style={
+              Object {
+                "opacity": undefined,
+              }
+            }
+          >
+            <div
+              className="css-text-901oao"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(216,161,31,1.00)",
+                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                  "fontSize": "16px",
+                  "fontWeight": "bold",
+                  "lineHeight": "20px",
+                  "textRendering": "geometricPrecision",
+                }
+              }
+            />
+          </div>
+          <div
+            className="react-reveal"
+            style={
+              Object {
+                "opacity": undefined,
+              }
+            }
+          >
+            <div
+              className="css-text-901oao"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(46,51,56,1.00)",
+                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                  "fontSize": "16px",
+                  "fontWeight": "bold",
+                  "lineHeight": "20px",
+                  "textRendering": "geometricPrecision",
+                }
+              }
+            >
+              Validator Elections Start
+            </div>
+          </div>
+          <div
+            className="react-reveal"
+            style={
+              Object {
+                "opacity": undefined,
+              }
+            }
+          >
+            <div
+              className="css-text-901oao"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(46,51,56,1.00)",
+                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                  "fontSize": "16px",
+                  "lineHeight": "20px",
+                  "textRendering": "geometricPrecision",
+                }
+              }
+            >
+              When sufficient validators and groups are registered and staked, validator elections and epoch rewards can be enabled via on-chain governance proposal
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        className="css-view-1dbjc4n"
+        style={
+          Object {
+            "WebkitBoxDirection": "normal",
+            "WebkitBoxOrient": "horizontal",
+            "WebkitFlexDirection": "row",
+            "flexDirection": "row",
+            "marginLeft": "15px",
+            "marginRight": "15px",
+            "maxWidth": "450px",
+            "msFlexDirection": "row",
+          }
+        }
+      >
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "visibility": "hidden",
+              "width": "2px",
+            }
+          }
+        />
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxFlex": 1,
+              "WebkitFlexBasis": "0%",
+              "WebkitFlexGrow": 1,
+              "WebkitFlexShrink": 1,
+              "flexBasis": "0%",
+              "flexGrow": 1,
+              "flexShrink": 1,
+              "marginBottom": "0px",
+              "marginTop": "0px",
+              "msFlexNegative": 1,
+              "msFlexPositive": 1,
+              "msFlexPreferredSize": "0%",
+              "paddingBottom": "30px",
+              "paddingLeft": "25px",
+              "paddingRight": "25px",
+            }
+          }
+        >
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "WebkitTransform": "translateX(-35px) translateY(1px)",
+                "position": "absolute",
+                "transform": "translateX(-35px) translateY(1px)",
+              }
+            }
+          >
+            <div
+              className="react-reveal"
+              style={
+                Object {
+                  "opacity": undefined,
+                }
+              }
+            >
+              <svg
+                fill="none"
+                height={18}
+                style={Object {}}
+                viewBox="0 0 12 15"
+                width={15.84}
+              >
+                <g
+                  style={
+                    Object {
+                      "mixBlendMode": "normal",
+                    }
+                  }
+                >
+                  <path
+                    d="M0.694644 8.03832L0.694854 8.03733C1.11106 6.0762 2.01314 4.31934 3.15316 2.97222C4.29262 1.62577 5.67668 0.756708 6.97518 0.535182L6.99246 0.532234L7.00949 0.528084C7.08947 0.50859 7.14342 0.507067 7.2886 0.507067H7.30252L7.31641 0.506293C8.43398 0.444037 9.44602 0.844847 10.2113 1.6515C11.3029 2.84313 11.7636 4.74522 11.3503 6.96114L11.3497 6.96425C11.0041 8.88501 10.1393 10.6528 8.99112 11.9944C7.84052 13.3387 6.43203 14.226 5.00847 14.4498C3.7403 14.6396 2.60967 14.2904 1.79643 13.4367L1.79645 13.4366L1.79296 13.433C0.645198 12.252 0.211033 10.2946 0.694644 8.03832Z"
+                    stroke="#FBCC5C"
+                    strokeWidth="1"
+                  />
+                </g>
+              </svg>
+            </div>
+          </div>
+          <div
+            className="react-reveal"
+            style={
+              Object {
+                "opacity": undefined,
+              }
+            }
+          >
+            <div
+              className="css-text-901oao"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(216,161,31,1.00)",
+                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                  "fontSize": "16px",
+                  "fontWeight": "bold",
+                  "lineHeight": "20px",
+                  "textRendering": "geometricPrecision",
+                }
+              }
+            />
+          </div>
+          <div
+            className="react-reveal"
+            style={
+              Object {
+                "opacity": undefined,
+              }
+            }
+          >
+            <div
+              className="css-text-901oao"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(46,51,56,1.00)",
+                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                  "fontSize": "16px",
+                  "fontWeight": "bold",
+                  "lineHeight": "20px",
+                  "textRendering": "geometricPrecision",
+                }
+              }
+            >
+              Celo Gold Voter Rewards Activate
+            </div>
+          </div>
+          <div
+            className="react-reveal"
+            style={
+              Object {
+                "opacity": undefined,
+              }
+            }
+          >
+            <div
+              className="css-text-901oao"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(46,51,56,1.00)",
+                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                  "fontSize": "16px",
+                  "lineHeight": "20px",
+                  "textRendering": "geometricPrecision",
+                }
+              }
+            >
+              Voter rewards can be enabled via on-chain governance proposal
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        className="css-view-1dbjc4n"
+        style={
+          Object {
+            "WebkitBoxDirection": "normal",
+            "WebkitBoxOrient": "horizontal",
+            "WebkitFlexDirection": "row",
+            "flexDirection": "row",
+            "marginLeft": "15px",
+            "marginRight": "15px",
+            "maxWidth": "450px",
+            "msFlexDirection": "row",
+          }
+        }
+      >
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "visibility": "hidden",
+              "width": "2px",
+            }
+          }
+        />
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxFlex": 1,
+              "WebkitFlexBasis": "0%",
+              "WebkitFlexGrow": 1,
+              "WebkitFlexShrink": 1,
+              "flexBasis": "0%",
+              "flexGrow": 1,
+              "flexShrink": 1,
+              "marginBottom": "0px",
+              "marginTop": "0px",
+              "msFlexNegative": 1,
+              "msFlexPositive": 1,
+              "msFlexPreferredSize": "0%",
+              "paddingBottom": "30px",
+              "paddingLeft": "25px",
+              "paddingRight": "25px",
+            }
+          }
+        >
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "WebkitTransform": "translateX(-35px) translateY(1px)",
+                "position": "absolute",
+                "transform": "translateX(-35px) translateY(1px)",
+              }
+            }
+          >
+            <div
+              className="react-reveal"
+              style={
+                Object {
+                  "opacity": undefined,
+                }
+              }
+            >
+              <svg
+                fill="none"
+                height={18}
+                style={Object {}}
+                viewBox="0 0 12 15"
+                width={15.84}
+              >
+                <g
+                  style={
+                    Object {
+                      "mixBlendMode": "normal",
+                    }
+                  }
+                >
+                  <path
+                    d="M0.694644 8.03832L0.694854 8.03733C1.11106 6.0762 2.01314 4.31934 3.15316 2.97222C4.29262 1.62577 5.67668 0.756708 6.97518 0.535182L6.99246 0.532234L7.00949 0.528084C7.08947 0.50859 7.14342 0.507067 7.2886 0.507067H7.30252L7.31641 0.506293C8.43398 0.444037 9.44602 0.844847 10.2113 1.6515C11.3029 2.84313 11.7636 4.74522 11.3503 6.96114L11.3497 6.96425C11.0041 8.88501 10.1393 10.6528 8.99112 11.9944C7.84052 13.3387 6.43203 14.226 5.00847 14.4498C3.7403 14.6396 2.60967 14.2904 1.79643 13.4367L1.79645 13.4366L1.79296 13.433C0.645198 12.252 0.211033 10.2946 0.694644 8.03832Z"
+                    stroke="#FBCC5C"
+                    strokeWidth="1"
+                  />
+                </g>
+              </svg>
+            </div>
+          </div>
+          <div
+            className="react-reveal"
+            style={
+              Object {
+                "opacity": undefined,
+              }
+            }
+          >
+            <div
+              className="css-text-901oao"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(216,161,31,1.00)",
+                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                  "fontSize": "16px",
+                  "fontWeight": "bold",
+                  "lineHeight": "20px",
+                  "textRendering": "geometricPrecision",
+                }
+              }
+            />
+          </div>
+          <div
+            className="react-reveal"
+            style={
+              Object {
+                "opacity": undefined,
+              }
+            }
+          >
+            <div
+              className="css-text-901oao"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(46,51,56,1.00)",
+                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                  "fontSize": "16px",
+                  "fontWeight": "bold",
+                  "lineHeight": "20px",
+                  "textRendering": "geometricPrecision",
+                }
+              }
+            >
+              Mainnet Release Candidate X
+            </div>
+          </div>
+          <div
+            className="react-reveal"
+            style={
+              Object {
+                "opacity": undefined,
+              }
+            }
+          >
+            <div
+              className="css-text-901oao"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(46,51,56,1.00)",
+                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                  "fontSize": "16px",
+                  "lineHeight": "20px",
+                  "textRendering": "geometricPrecision",
+                }
+              }
+            >
+              Possible additional release candidates in the event critical issues are discovered
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        className="css-view-1dbjc4n"
+        style={
+          Object {
+            "WebkitBoxDirection": "normal",
+            "WebkitBoxOrient": "horizontal",
+            "WebkitFlexDirection": "row",
+            "flexDirection": "row",
+            "marginLeft": "15px",
+            "marginRight": "15px",
+            "maxWidth": "450px",
+            "msFlexDirection": "row",
+          }
+        }
+      >
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "visibility": "hidden",
+              "width": "2px",
+            }
+          }
+        />
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxFlex": 1,
+              "WebkitFlexBasis": "0%",
+              "WebkitFlexGrow": 1,
+              "WebkitFlexShrink": 1,
+              "flexBasis": "0%",
+              "flexGrow": 1,
+              "flexShrink": 1,
+              "marginBottom": "0px",
+              "marginTop": "0px",
+              "msFlexNegative": 1,
+              "msFlexPositive": 1,
+              "msFlexPreferredSize": "0%",
+              "paddingBottom": "30px",
+              "paddingLeft": "25px",
+              "paddingRight": "25px",
+            }
+          }
+        >
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "WebkitTransform": "translateX(-35px) translateY(1px)",
+                "position": "absolute",
+                "transform": "translateX(-35px) translateY(1px)",
+              }
+            }
+          >
+            <div
+              className="react-reveal"
+              style={
+                Object {
+                  "opacity": undefined,
+                }
+              }
+            >
+              <svg
+                fill="none"
+                height={18}
+                style={Object {}}
+                viewBox="0 0 12 15"
+                width={15.84}
+              >
+                <g
+                  style={
+                    Object {
+                      "mixBlendMode": "normal",
+                    }
+                  }
+                >
+                  <path
+                    d="M0.694644 8.03832L0.694854 8.03733C1.11106 6.0762 2.01314 4.31934 3.15316 2.97222C4.29262 1.62577 5.67668 0.756708 6.97518 0.535182L6.99246 0.532234L7.00949 0.528084C7.08947 0.50859 7.14342 0.507067 7.2886 0.507067H7.30252L7.31641 0.506293C8.43398 0.444037 9.44602 0.844847 10.2113 1.6515C11.3029 2.84313 11.7636 4.74522 11.3503 6.96114L11.3497 6.96425C11.0041 8.88501 10.1393 10.6528 8.99112 11.9944C7.84052 13.3387 6.43203 14.226 5.00847 14.4498C3.7403 14.6396 2.60967 14.2904 1.79643 13.4367L1.79645 13.4366L1.79296 13.433C0.645198 12.252 0.211033 10.2946 0.694644 8.03832Z"
+                    stroke="#FBCC5C"
+                    strokeWidth="1"
+                  />
+                </g>
+              </svg>
+            </div>
+          </div>
+          <div
+            className="react-reveal"
+            style={
+              Object {
+                "opacity": undefined,
+              }
+            }
+          >
+            <div
+              className="css-text-901oao"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(216,161,31,1.00)",
+                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                  "fontSize": "16px",
+                  "fontWeight": "bold",
+                  "lineHeight": "20px",
+                  "textRendering": "geometricPrecision",
+                }
+              }
+            />
+          </div>
+          <div
+            className="react-reveal"
+            style={
+              Object {
+                "opacity": undefined,
+              }
+            }
+          >
+            <div
+              className="css-text-901oao"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(46,51,56,1.00)",
+                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                  "fontSize": "16px",
+                  "fontWeight": "bold",
+                  "lineHeight": "20px",
+                  "textRendering": "geometricPrecision",
+                }
+              }
+            >
+              Celo Gold Live
+            </div>
+          </div>
+          <div
+            className="react-reveal"
+            style={
+              Object {
+                "opacity": undefined,
+              }
+            }
+          >
+            <div
+              className="css-text-901oao"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(46,51,56,1.00)",
+                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                  "fontSize": "16px",
+                  "lineHeight": "20px",
+                  "textRendering": "geometricPrecision",
+                }
+              }
+            >
+              When the network is running smoothly, Celo Gold transfers can be enabled via on-chain governance proposal
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        className="css-view-1dbjc4n"
+        style={
+          Object {
+            "WebkitBoxDirection": "normal",
+            "WebkitBoxOrient": "horizontal",
+            "WebkitFlexDirection": "row",
+            "flexDirection": "row",
+            "marginLeft": "15px",
+            "marginRight": "15px",
+            "maxWidth": "450px",
+            "msFlexDirection": "row",
+          }
+        }
+      >
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "visibility": "hidden",
+              "width": "2px",
+            }
+          }
+        />
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxFlex": 1,
+              "WebkitFlexBasis": "0%",
+              "WebkitFlexGrow": 1,
+              "WebkitFlexShrink": 1,
+              "flexBasis": "0%",
+              "flexGrow": 1,
+              "flexShrink": 1,
+              "marginBottom": "0px",
+              "marginTop": "0px",
+              "msFlexNegative": 1,
+              "msFlexPositive": 1,
+              "msFlexPreferredSize": "0%",
+              "paddingBottom": "30px",
+              "paddingLeft": "25px",
+              "paddingRight": "25px",
+            }
+          }
+        >
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "WebkitTransform": "translateX(-35px) translateY(1px)",
+                "position": "absolute",
+                "transform": "translateX(-35px) translateY(1px)",
+              }
+            }
+          >
+            <div
+              className="react-reveal"
+              style={
+                Object {
+                  "opacity": undefined,
+                }
+              }
+            >
+              <svg
+                fill="none"
+                height={18}
+                style={Object {}}
+                viewBox="0 0 12 15"
+                width={15.84}
+              >
+                <g
+                  style={
+                    Object {
+                      "mixBlendMode": "normal",
+                    }
+                  }
+                >
+                  <path
+                    d="M0.694644 8.03832L0.694854 8.03733C1.11106 6.0762 2.01314 4.31934 3.15316 2.97222C4.29262 1.62577 5.67668 0.756708 6.97518 0.535182L6.99246 0.532234L7.00949 0.528084C7.08947 0.50859 7.14342 0.507067 7.2886 0.507067H7.30252L7.31641 0.506293C8.43398 0.444037 9.44602 0.844847 10.2113 1.6515C11.3029 2.84313 11.7636 4.74522 11.3503 6.96114L11.3497 6.96425C11.0041 8.88501 10.1393 10.6528 8.99112 11.9944C7.84052 13.3387 6.43203 14.226 5.00847 14.4498C3.7403 14.6396 2.60967 14.2904 1.79643 13.4367L1.79645 13.4366L1.79296 13.433C0.645198 12.252 0.211033 10.2946 0.694644 8.03832Z"
+                    stroke="#FBCC5C"
+                    strokeWidth="1"
+                  />
+                </g>
+              </svg>
+            </div>
+          </div>
+          <div
+            className="react-reveal"
+            style={
+              Object {
+                "opacity": undefined,
+              }
+            }
+          >
+            <div
+              className="css-text-901oao"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(216,161,31,1.00)",
+                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                  "fontSize": "16px",
+                  "fontWeight": "bold",
+                  "lineHeight": "20px",
+                  "textRendering": "geometricPrecision",
+                }
+              }
+            />
+          </div>
+          <div
+            className="react-reveal"
+            style={
+              Object {
+                "opacity": undefined,
+              }
+            }
+          >
+            <div
+              className="css-text-901oao"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(46,51,56,1.00)",
+                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                  "fontSize": "16px",
+                  "fontWeight": "bold",
+                  "lineHeight": "20px",
+                  "textRendering": "geometricPrecision",
+                }
+              }
+            >
+              Celo Dollars Live
+            </div>
+          </div>
+          <div
+            className="react-reveal"
+            style={
+              Object {
+                "opacity": undefined,
+              }
+            }
+          >
+            <div
+              className="css-text-901oao"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(46,51,56,1.00)",
+                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                  "fontSize": "16px",
+                  "lineHeight": "20px",
+                  "textRendering": "geometricPrecision",
+                }
+              }
+            >
+              When Oracles can provide pricing for Celo Gold, Celo Dollar transfers can be enabled via on-chain governance proposal
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        className="css-view-1dbjc4n"
+        style={
+          Object {
+            "WebkitBoxDirection": "normal",
+            "WebkitBoxOrient": "horizontal",
+            "WebkitFlexDirection": "row",
+            "flexDirection": "row",
+            "marginLeft": "15px",
+            "marginRight": "15px",
+            "maxWidth": "450px",
+            "msFlexDirection": "row",
+          }
+        }
+      >
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "visibility": "hidden",
+              "width": "2px",
+            }
+          }
+        />
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxFlex": 1,
+              "WebkitFlexBasis": "0%",
+              "WebkitFlexGrow": 1,
+              "WebkitFlexShrink": 1,
+              "flexBasis": "0%",
+              "flexGrow": 1,
+              "flexShrink": 1,
+              "marginBottom": "0px",
+              "marginTop": "0px",
+              "msFlexNegative": 1,
+              "msFlexPositive": 1,
+              "msFlexPreferredSize": "0%",
+              "paddingBottom": "30px",
+              "paddingLeft": "25px",
+              "paddingRight": "25px",
+            }
+          }
+        >
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "WebkitTransform": "translateX(-35px) translateY(1px)",
+                "position": "absolute",
+                "transform": "translateX(-35px) translateY(1px)",
+              }
+            }
+          >
+            <div
+              className="react-reveal"
+              style={
+                Object {
+                  "opacity": undefined,
+                }
+              }
+            >
+              <svg
+                fill="none"
+                height={18}
+                style={Object {}}
+                viewBox="0 0 12 15"
+                width={15.84}
+              >
+                <g
+                  style={
+                    Object {
+                      "mixBlendMode": "normal",
+                    }
+                  }
+                >
+                  <path
+                    d="M0.694644 8.03832L0.694854 8.03733C1.11106 6.0762 2.01314 4.31934 3.15316 2.97222C4.29262 1.62577 5.67668 0.756708 6.97518 0.535182L6.99246 0.532234L7.00949 0.528084C7.08947 0.50859 7.14342 0.507067 7.2886 0.507067H7.30252L7.31641 0.506293C8.43398 0.444037 9.44602 0.844847 10.2113 1.6515C11.3029 2.84313 11.7636 4.74522 11.3503 6.96114L11.3497 6.96425C11.0041 8.88501 10.1393 10.6528 8.99112 11.9944C7.84052 13.3387 6.43203 14.226 5.00847 14.4498C3.7403 14.6396 2.60967 14.2904 1.79643 13.4367L1.79645 13.4366L1.79296 13.433C0.645198 12.252 0.211033 10.2946 0.694644 8.03832Z"
+                    stroke="#FBCC5C"
+                    strokeWidth="1"
+                  />
+                </g>
+              </svg>
+            </div>
+          </div>
+          <div
+            className="react-reveal"
+            style={
+              Object {
+                "opacity": undefined,
+              }
+            }
+          >
+            <div
+              className="css-text-901oao"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(216,161,31,1.00)",
+                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                  "fontSize": "16px",
+                  "fontWeight": "bold",
+                  "lineHeight": "20px",
+                  "textRendering": "geometricPrecision",
+                }
+              }
+            />
+          </div>
+          <div
+            className="react-reveal"
+            style={
+              Object {
+                "opacity": undefined,
+              }
+            }
+          >
+            <div
+              className="css-text-901oao"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(46,51,56,1.00)",
+                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                  "fontSize": "16px",
+                  "fontWeight": "bold",
+                  "lineHeight": "20px",
+                  "textRendering": "geometricPrecision",
+                }
+              }
+            >
+              Mainnet Mobile Wallet Release
+            </div>
+          </div>
+          <div
+            className="react-reveal"
+            style={
+              Object {
+                "opacity": undefined,
+              }
+            }
+          >
+            <div
+              className="css-text-901oao"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(46,51,56,1.00)",
+                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                  "fontSize": "16px",
+                  "lineHeight": "20px",
+                  "textRendering": "geometricPrecision",
+                }
+              }
+            >
+              The Mainnet Mobile Wallet will be fully available for download on iOS and Android
             </div>
           </div>
         </div>
@@ -2587,7 +5958,7 @@ exports[`HomePage renders 1`] = `
               }
             }
           >
-            workOnCelo
+            Work on Celo in Berlin, Buenos Aires, San Francisco, and around the world
           </h2>
         </div>
       </div>
@@ -2659,6 +6030,8 @@ exports[`HomePage renders 1`] = `
               data-focusable={true}
               dir="auto"
               href="/jobs"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
               role="link"
               style={
                 Object {
@@ -2678,7 +6051,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              viewRoles
+              View Open Roles
               <div
                 className="css-view-1dbjc4n"
                 style={
@@ -3251,6 +6624,8 @@ exports[`HomePage renders 1`] = `
               data-focusable={true}
               dir="auto"
               href="/about#backers"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
               role="link"
               style={
                 Object {
@@ -3270,7 +6645,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              hero.backers
+              See More Backers
               <div
                 className="css-view-1dbjc4n"
                 style={
@@ -3365,16 +6740,16 @@ exports[`HomePage renders 1`] = `
           Object {
             "color": "rgba(46,51,56,1.00)",
             "fontFamily": "Jost, futura-pt, futura, sans-serif",
-            "fontSize": "28px",
+            "fontSize": "24px",
             "fontWeight": "400",
-            "lineHeight": "36px",
+            "lineHeight": "28px",
             "marginBottom": "20px",
             "marginTop": "20px",
             "textRendering": "geometricPrecision",
           }
         }
       >
-        startConversation
+        Start A Conversation
       </div>
       <div
         className="css-text-901oao"
@@ -3389,7 +6764,7 @@ exports[`HomePage renders 1`] = `
           }
         }
       >
-        reachOut
+        Reach out to participate in Celo’s ecosystem
       </div>
       <div
         className="css-view-1dbjc4n"
@@ -3416,7 +6791,7 @@ exports[`HomePage renders 1`] = `
           onKeyDown={[Function]}
           onKeyPress={[Function]}
           onSelect={[Function]}
-          placeholder="form.email*"
+          placeholder="Email*"
           readOnly={false}
           required={true}
           spellCheck={true}
@@ -3461,6 +6836,49 @@ exports[`HomePage renders 1`] = `
           type="text"
           value=""
         />
+        <div
+          className="css-view-1dbjc4n"
+        >
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "MozTransitionProperty": "max-height",
+                "WebkitTransitionDuration": "600ms",
+                "WebkitTransitionProperty": "max-height",
+                "height": "auto",
+                "marginBottom": "5px",
+                "marginTop": "5px",
+                "maxHeight": "0px",
+                "transitionDuration": "600ms",
+                "transitionProperty": "max-height",
+              }
+            }
+          >
+            <div
+              className="css-text-901oao"
+              dir="auto"
+              style={
+                Object {
+                  "MozTransitionProperty": "opacity",
+                  "WebkitTransitionDuration": "700ms",
+                  "WebkitTransitionProperty": "opacity",
+                  "color": "rgba(255,127,109,1.00)",
+                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                  "fontSize": "16px",
+                  "fontWeight": "500",
+                  "lineHeight": "18px",
+                  "opacity": 0,
+                  "textRendering": "geometricPrecision",
+                  "transitionDuration": "700ms",
+                  "transitionProperty": "opacity",
+                }
+              }
+            >
+              Please enter a valid email
+            </div>
+          </div>
+        </div>
         <div
           className="css-view-1dbjc4n"
           onClick={[Function]}
@@ -3521,20 +6939,91 @@ exports[`HomePage renders 1`] = `
               }
             }
           >
-            submit
+            Submit
           </a>
         </div>
         <div
           className="css-view-1dbjc4n"
           style={
             Object {
-              "paddingBottom": "10px",
-              "paddingTop": "10px",
               "position": "absolute",
-              "top": "135px",
+              "top": "65px",
             }
           }
         />
+      </div>
+      <div
+        className="css-view-1dbjc4n"
+        style={
+          Object {
+            "marginTop": "10px",
+          }
+        }
+      >
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "MozTransitionProperty": "max-height",
+              "WebkitTransitionDuration": "600ms",
+              "WebkitTransitionProperty": "max-height",
+              "height": "auto",
+              "marginBottom": "5px",
+              "marginTop": "5px",
+              "maxHeight": "0px",
+              "transitionDuration": "600ms",
+              "transitionProperty": "max-height",
+            }
+          }
+        >
+          <div
+            className="css-text-901oao"
+            dir="auto"
+            style={
+              Object {
+                "MozTransitionProperty": "opacity",
+                "WebkitTransitionDuration": "700ms",
+                "WebkitTransitionProperty": "opacity",
+                "color": "rgba(53,208,127,1.00)",
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "fontWeight": "500",
+                "lineHeight": "18px",
+                "opacity": 0,
+                "textRendering": "geometricPrecision",
+                "transitionDuration": "700ms",
+                "transitionProperty": "opacity",
+              }
+            }
+          >
+            <svg
+              fill="none"
+              height={16}
+              style={Object {}}
+              viewBox="0 0 11 9"
+              width={16}
+            >
+              <path
+                clipRule="evenodd"
+                d="M10.7932 1.85263L3.96211 8.64309L0.180176 4.88366L1.85967 3.19411L3.96211 5.28404L9.11373 0.163086L10.7932 1.85263Z"
+                fill="#35D07F"
+                fillRule="evenodd"
+                style={Object {}}
+              />
+            </svg>
+            <span
+              className="css-text-901oao css-textHasAncestor-16my406"
+              dir="auto"
+              style={
+                Object {
+                  "marginLeft": "10px",
+                }
+              }
+            >
+              Submitted
+            </span>
+          </div>
+        </div>
       </div>
     </div>
     <div
@@ -3579,16 +7068,16 @@ exports[`HomePage renders 1`] = `
           Object {
             "color": "rgba(46,51,56,1.00)",
             "fontFamily": "Jost, futura-pt, futura, sans-serif",
-            "fontSize": "28px",
+            "fontSize": "24px",
             "fontWeight": "400",
-            "lineHeight": "36px",
+            "lineHeight": "28px",
             "marginBottom": "20px",
             "marginTop": "20px",
             "textRendering": "geometricPrecision",
           }
         }
       >
-        stayConnected
+        Stay Connected
       </div>
       <div
         className="css-text-901oao"
@@ -3603,7 +7092,7 @@ exports[`HomePage renders 1`] = `
           }
         }
       >
-        receiveUpdates
+        Receive the latest updates to your inbox
       </div>
       <div
         className="css-view-1dbjc4n"
@@ -3630,7 +7119,7 @@ exports[`HomePage renders 1`] = `
           onKeyDown={[Function]}
           onKeyPress={[Function]}
           onSelect={[Function]}
-          placeholder="form.email*"
+          placeholder="Email*"
           readOnly={false}
           required={true}
           spellCheck={true}
@@ -3675,6 +7164,49 @@ exports[`HomePage renders 1`] = `
           type="text"
           value=""
         />
+        <div
+          className="css-view-1dbjc4n"
+        >
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "MozTransitionProperty": "max-height",
+                "WebkitTransitionDuration": "600ms",
+                "WebkitTransitionProperty": "max-height",
+                "height": "auto",
+                "marginBottom": "5px",
+                "marginTop": "5px",
+                "maxHeight": "0px",
+                "transitionDuration": "600ms",
+                "transitionProperty": "max-height",
+              }
+            }
+          >
+            <div
+              className="css-text-901oao"
+              dir="auto"
+              style={
+                Object {
+                  "MozTransitionProperty": "opacity",
+                  "WebkitTransitionDuration": "700ms",
+                  "WebkitTransitionProperty": "opacity",
+                  "color": "rgba(255,127,109,1.00)",
+                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                  "fontSize": "16px",
+                  "fontWeight": "500",
+                  "lineHeight": "18px",
+                  "opacity": 0,
+                  "textRendering": "geometricPrecision",
+                  "transitionDuration": "700ms",
+                  "transitionProperty": "opacity",
+                }
+              }
+            >
+              Please enter a valid email
+            </div>
+          </div>
+        </div>
         <div
           className="css-view-1dbjc4n"
           onClick={[Function]}
@@ -3735,20 +7267,91 @@ exports[`HomePage renders 1`] = `
               }
             }
           >
-            signUp
+            Sign Up
           </a>
         </div>
         <div
           className="css-view-1dbjc4n"
           style={
             Object {
-              "paddingBottom": "10px",
-              "paddingTop": "10px",
               "position": "absolute",
-              "top": "135px",
+              "top": "65px",
             }
           }
         />
+      </div>
+      <div
+        className="css-view-1dbjc4n"
+        style={
+          Object {
+            "marginTop": "10px",
+          }
+        }
+      >
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "MozTransitionProperty": "max-height",
+              "WebkitTransitionDuration": "600ms",
+              "WebkitTransitionProperty": "max-height",
+              "height": "auto",
+              "marginBottom": "5px",
+              "marginTop": "5px",
+              "maxHeight": "0px",
+              "transitionDuration": "600ms",
+              "transitionProperty": "max-height",
+            }
+          }
+        >
+          <div
+            className="css-text-901oao"
+            dir="auto"
+            style={
+              Object {
+                "MozTransitionProperty": "opacity",
+                "WebkitTransitionDuration": "700ms",
+                "WebkitTransitionProperty": "opacity",
+                "color": "rgba(53,208,127,1.00)",
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "fontWeight": "500",
+                "lineHeight": "18px",
+                "opacity": 0,
+                "textRendering": "geometricPrecision",
+                "transitionDuration": "700ms",
+                "transitionProperty": "opacity",
+              }
+            }
+          >
+            <svg
+              fill="none"
+              height={16}
+              style={Object {}}
+              viewBox="0 0 11 9"
+              width={16}
+            >
+              <path
+                clipRule="evenodd"
+                d="M10.7932 1.85263L3.96211 8.64309L0.180176 4.88366L1.85967 3.19411L3.96211 5.28404L9.11373 0.163086L10.7932 1.85263Z"
+                fill="#35D07F"
+                fillRule="evenodd"
+                style={Object {}}
+              />
+            </svg>
+            <span
+              className="css-text-901oao css-textHasAncestor-16my406"
+              dir="auto"
+              style={
+                Object {
+                  "marginLeft": "10px",
+                }
+              }
+            >
+              Submitted
+            </span>
+          </div>
+        </div>
       </div>
     </div>
   </div>

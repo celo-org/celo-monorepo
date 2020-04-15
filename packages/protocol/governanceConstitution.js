@@ -1,38 +1,37 @@
 const DefaultConstitution = {
-  accounts: {
+  Accounts: {
     default: 0.6,
   },
-  attestations: {
+  Attestations: {
     default: 0.6,
     setRegistry: 0.9,
     setAttestationRequestFee: 0.6,
     setAttestationExpiryBlocks: 0.6,
     setSelectIssuersWaitBlocks: 0.6,
   },
-  blockChainParameters: {
+  BlockchainParameters: {
     default: 0.9,
-    setRegistry: 0.9,
     setMinimumClientVersion: 0.9,
     setBlockGasLimit: 0.8,
     setIntrinsicGasForAlternativeFeeCurrency: 0.8,
   },
-  doubleSigningSlasher: {
+  DoubleSigningSlasher: {
     default: 0.7,
     setSlashingIncentives: 0.7,
   },
-  downtimeSlasher: {
+  DowntimeSlasher: {
     default: 0.7,
     setSlashingIncentives: 0.7,
     setSlashableDowntime: 0.7,
   },
-  election: {
+  Election: {
     default: 0.8,
     setRegistry: 0.9,
     setElectableValidators: 0.8,
     setMaxNumGroupsVotedFor: 0.8,
     setElectabilityThreshold: 0.8,
   },
-  epochRewards: {
+  EpochRewards: {
     default: 0.8,
     setRegistry: 0.9,
     setCommunityRewardFraction: 0.8,
@@ -41,11 +40,11 @@ const DefaultConstitution = {
     setRewardsMultiplierParameters: 0.8,
     setTargetVotingYieldParameters: 0.8,
   },
-  escrow: {
-    default: 0.5,
+  Escrow: {
+    default: 0.6,
     setRegistry: 0.9,
   },
-  exchange: {
+  Exchange: {
     default: 0.8,
     setRegistry: 0.9,
     setUpdateFrequency: 0.8,
@@ -54,24 +53,29 @@ const DefaultConstitution = {
     setSpread: 0.8,
     setReserveFraction: 0.8,
   },
-  feeCurrencyWhitelist: {
+  FeeCurrencyWhitelist: {
     default: 0.8,
     addToken: 0.8,
   },
-  gasPriceMinimum: {
+  Freezer: {
+    default: 0.6,
+    freeze: 0.6,
+    unfreeze: 0.6,
+  },
+  GasPriceMinimum: {
     default: 0.7,
     setRegistry: 0.9,
     setAdjustmentSpeed: 0.7,
     setTargetDensity: 0.7,
     setGasPriceMinimumFloor: 0.7,
   },
-  goldToken: {
+  GoldToken: {
     default: 0.9,
     transfer: 0.6,
     transferWithComment: 0.6,
     approve: 0.6,
   },
-  governance: {
+  Governance: {
     default: 0.9,
     setRegistry: 0.9,
     setApprover: 0.9,
@@ -88,12 +92,11 @@ const DefaultConstitution = {
     setBaselineQuorumFactor: 0.9,
     setConstitution: 0.9,
   },
-  governanceSlasher: {
+  GovernanceSlasher: {
     default: 0.7,
-    setSlashingIncentives: 0.7,
     approveSlashing: 0.7,
   },
-  lockedGold: {
+  LockedGold: {
     default: 0.9,
     setRegistry: 0.9,
     setUnlockingPeriod: 0.8,
@@ -106,15 +109,15 @@ const DefaultConstitution = {
     _setAndInitializeImplementation: 0.9,
     _setImplementation: 0.9,
   },
-  random: {
+  Random: {
     default: 0.7,
     setRandomnessBlockRetentionWindow: 0.7,
   },
-  registry: {
+  Registry: {
     default: 0.9,
     setAddressFor: 0.9,
   },
-  reserve: {
+  Reserve: {
     default: 0.9,
     setRegistry: 0.9,
     setTobinTaxStalenessThreshold: 0.7,
@@ -127,13 +130,13 @@ const DefaultConstitution = {
     addSpender: 0.9,
     removeSpender: 0.8,
   },
-  sortedOracles: {
+  SortedOracles: {
     default: 0.7,
     setReportExpiry: 0.7,
     addOracle: 0.8,
     removeOracle: 0.7,
   },
-  stableToken: {
+  StableToken: {
     default: 0.8,
     setRegistry: 0.9,
     setInflationParameters: 0.9,
@@ -141,7 +144,7 @@ const DefaultConstitution = {
     transferWithComment: 0.6,
     approve: 0.6,
   },
-  validators: {
+  Validators: {
     default: 0.7,
     setRegistry: 0.9,
     setMaxGroupSize: 0.7,

@@ -1,0 +1,21 @@
+imagePullPolicy: IfNotPresent
+
+# Node labels for pod assignment
+# ref: https://kubernetes.io/docs/user-guide/node-selection/
+nodeSelector: {}
+
+celostats:
+  image:
+    server:
+      repository: gcr.io/celo-testnet/celostats-server
+      tag: latest
+    frontend:
+      repository: gcr.io/celo-testnet/celostats-frontend
+      tag: latest
+  service:
+    type: NodePort
+  trusted_addresses: []
+  banned_addresses: []
+
+domain:
+  name: celo-testnet

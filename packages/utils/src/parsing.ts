@@ -1,5 +1,4 @@
 import BigNumber from 'bignumber.js'
-const numeral = require('numeral')
 
 export const stringToBoolean = (inputString: string): boolean => {
   const lowercasedInput = inputString.toLowerCase().trim()
@@ -12,9 +11,7 @@ export const stringToBoolean = (inputString: string): boolean => {
 }
 
 export const parseInputAmount = (inputString: string): BigNumber => {
-  // Potential precision loss from using numeric values
-  // https://github.com/MikeMcl/bignumber.js/#use
-  return new BigNumber(numeral(inputString).value() || '0')
+  return new BigNumber(inputString || '0')
 }
 
 /**

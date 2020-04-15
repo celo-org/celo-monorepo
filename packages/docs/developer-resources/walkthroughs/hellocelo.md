@@ -105,7 +105,7 @@ Don't worry about what this means right now, just understand that it is easier t
 
 Because we are accessing the network remotely, we need to generate an account to sign transactions and fund that account with test cGLD.
 
-There is a short script in `getAccount.js` to either get a Celo account from a mnemonic in the `.secret` file, or create a random account if the file is empty. In the script, we use`ethers.js` to create a new account. [Ethers.js](https://docs.ethers.io/ethers.js/html/index.html) is a popular javascript library for handling Ethereum related functionality. Celo is a cousin of Ethereum, so this library will work well for generating new Celo accounts.
+There is a short script in `getAccount.js` to either get a Celo account from a mnemonic in the `.secret` file, or create a random account if the file is empty. In the script, we use`web3.js` to create a new private key/account pair. [Web3.js](https://web3js.readthedocs.io/en/v1.2.6/) is a popular javascript library for handling Ethereum related functionality. Celo is a cousin of Ethereum, so this library will work well for generating new Celo accounts.
 
 {% hint style="danger" %}
 This is not the standard way of managing Celo accounts. In a production environment, the [Celo Wallet](../../celo-codebase/wallet/) will manage accounts for you. Accessing accounts from the Celo Wallet will be discussed in future guides.
@@ -145,7 +145,7 @@ We have an account with cGLD in it, now how do we send it to another account. Re
 
 The Gold Token wrapper has a method called `transfer(address, amount)` that allows you to send value to the specified address \(line 14\).
 
-You need to `send()` the transaction to the network after you construct it. This method returns a transaction object. We are will wait for the transaction receipt \(which will be returned when the transaction has been included in the blockchain\_ and print it when we get it. This receipt contains information about the transaction.
+You need to `send()` the transaction to the network after you construct it. This method returns a transaction object. We will wait for the transaction receipt \(which will be returned when the transaction has been included in the blockchain\_ and print it when we get it. This receipt contains information about the transaction.
 
 After we read the receipt, we check the balance of our account again, using the `balanceOf()` function. The logs print our updated balance!
 

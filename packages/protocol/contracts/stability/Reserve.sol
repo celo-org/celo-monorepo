@@ -1,16 +1,15 @@
 pragma solidity ^0.5.3;
 
-import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 import "./interfaces/IReserve.sol";
 import "./interfaces/ISortedOracles.sol";
-import "./interfaces/IStableToken.sol";
 
 import "../common/FixidityLib.sol";
 import "../common/Initializable.sol";
 import "../common/UsingRegistry.sol";
+import "../common/libraries/ReentrancyGuard.sol";
 
 /**
  * @title Ensures price stability of StableTokens with respect to their pegs
@@ -41,15 +40,20 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
   uint256 public spendingLimit;
   FixidityLib.Fraction private spendingRatio;
 
+  uint256 public frozenReserveGoldStartBalance;
+  uint256 public frozenReserveGoldStartDay;
+  uint256 public frozenReserveGoldDays;
+
   event TobinTaxStalenessThresholdSet(uint256 value);
   event DailySpendingRatioSet(uint256 ratio);
-  event TokenAdded(address token);
-  event TokenRemoved(address token, uint256 index);
-  event SpenderAdded(address spender);
-  event SpenderRemoved(address spender);
-  event OtherReserveAddressAdded(address otherReserveAddress);
-  event OtherReserveAddressRemoved(address otherReserveAddress, uint256 index);
+  event TokenAdded(address indexed token);
+  event TokenRemoved(address indexed token, uint256 index);
+  event SpenderAdded(address indexed spender);
+  event SpenderRemoved(address indexed spender);
+  event OtherReserveAddressAdded(address indexed otherReserveAddress);
+  event OtherReserveAddressRemoved(address indexed otherReserveAddress, uint256 index);
   event AssetAllocationSet(bytes32[] symbols, uint256[] weights);
+  event ReserveGoldTransferred(address indexed spender, address indexed to, uint256 value);
 
   modifier isStableToken(address token) {
     require(isToken[token], "token addr was never registered");
@@ -59,19 +63,27 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
   function() external payable {} // solhint-disable no-empty-blocks
 
   /**
-   * @notice Initializes critical variables.
-   * @param registryAddress The address of the registry contract.
+   * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
+   * @param registryAddress The address of the registry core smart contract.
    * @param _tobinTaxStalenessThreshold The initial number of seconds to cache tobin tax value for.
+   * @param _frozenGold The balance of reserve gold that is frozen.
+   * @param _frozenDays The number of days during which the frozen gold thaws.
    */
   function initialize(
     address registryAddress,
     uint256 _tobinTaxStalenessThreshold,
-    uint256 _spendingRatio
+    uint256 _spendingRatio,
+    uint256 _frozenGold,
+    uint256 _frozenDays,
+    bytes32[] calldata _assetAllocationSymbols,
+    uint256[] calldata _assetAllocationWeights
   ) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
     setTobinTaxStalenessThreshold(_tobinTaxStalenessThreshold);
     setDailySpendingRatio(_spendingRatio);
+    setFrozenGold(_frozenGold, _frozenDays);
+    setAssetAllocations(_assetAllocationSymbols, _assetAllocationWeights);
   }
 
   /**
@@ -103,25 +115,37 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
   }
 
   /**
+   * @notice Sets the balance of reserve gold frozen from transfer.
+   * @param frozenGold The amount of cGLD frozen.
+   * @param frozenDays The number of days the frozen cGLD thaws over.
+   */
+  function setFrozenGold(uint256 frozenGold, uint256 frozenDays) public onlyOwner {
+    require(frozenGold <= address(this).balance, "Cannot freeze more than balance");
+    frozenReserveGoldStartBalance = frozenGold;
+    frozenReserveGoldStartDay = now / 1 days;
+    frozenReserveGoldDays = frozenDays;
+  }
+
+  /**
    * @notice Sets target allocations for Celo Gold and a diversified basket of non-Celo assets.
    * @param symbols The symbol of each asset in the Reserve portfolio.
    * @param weights The weight for the corresponding asset as unwrapped Fixidity.Fraction.
    */
-  function setAssetAllocations(bytes32[] calldata symbols, uint256[] calldata weights)
-    external
+  function setAssetAllocations(bytes32[] memory symbols, uint256[] memory weights)
+    public
     onlyOwner
   {
     require(symbols.length == weights.length, "Array length mismatch");
     FixidityLib.Fraction memory sum = FixidityLib.wrap(0);
-    for (uint256 i = 0; i < weights.length; i++) {
+    for (uint256 i = 0; i < weights.length; i = i.add(1)) {
       sum = sum.add(FixidityLib.wrap(weights[i]));
     }
     require(sum.equals(FixidityLib.fixed1()), "Sum of asset allocation must be 1");
-    for (uint256 i = 0; i < assetAllocationSymbols.length; i++) {
+    for (uint256 i = 0; i < assetAllocationSymbols.length; i = i.add(1)) {
       delete assetAllocationWeights[assetAllocationSymbols[i]];
     }
     assetAllocationSymbols = symbols;
-    for (uint256 i = 0; i < symbols.length; i++) {
+    for (uint256 i = 0; i < symbols.length; i = i.add(1)) {
       require(assetAllocationWeights[symbols[i]] == 0, "Cannot set weight twice");
       assetAllocationWeights[symbols[i]] = weights[i];
     }
@@ -130,8 +154,9 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
   }
 
   /**
-   * @notice Add a token that the reserve will stablize.
+   * @notice Add a token that the reserve will stabilize.
    * @param token The address of the token being stabilized.
+   * @return Returns true if the transaction succeeds.
    */
   function addToken(address token) external onlyOwner nonReentrant returns (bool) {
     require(!isToken[token], "token addr already registered");
@@ -152,6 +177,7 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
    * @notice Remove a token that the reserve will no longer stabilize.
    * @param token The address of the token no longer being stabilized.
    * @param index The index of the token in _tokens.
+   * @return Returns true if the transaction succeeds.
    */
   function removeToken(address token, uint256 index)
     external
@@ -164,9 +190,9 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
       "index into tokens list not mapped to token"
     );
     isToken[token] = false;
-    address lastItem = _tokens[_tokens.length - 1];
+    address lastItem = _tokens[_tokens.length.sub(1)];
     _tokens[index] = lastItem;
-    _tokens.length--;
+    _tokens.length = _tokens.length.sub(1);
     emit TokenRemoved(token, index);
     return true;
   }
@@ -174,6 +200,7 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
   /**
    * @notice Add a reserve address whose balance shall be included in the reserve ratio.
    * @param reserveAddress The reserve address to add.
+   * @return Returns true if the transaction succeeds.
    */
   function addOtherReserveAddress(address reserveAddress)
     external
@@ -192,6 +219,7 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
    * @notice Remove reserve address whose balance shall no longer be included in the reserve ratio.
    * @param reserveAddress The reserve address to remove.
    * @param index The index of the reserve address in otherReserveAddresses.
+   * @return Returns true if the transaction succeeds.
    */
   function removeOtherReserveAddress(address reserveAddress, uint256 index)
     external
@@ -204,9 +232,9 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
       "index into reserve list not mapped to address"
     );
     isOtherReserveAddress[reserveAddress] = false;
-    address lastItem = otherReserveAddresses[otherReserveAddresses.length - 1];
+    address lastItem = otherReserveAddresses[otherReserveAddresses.length.sub(1)];
     otherReserveAddresses[index] = lastItem;
-    otherReserveAddresses.length--;
+    otherReserveAddresses.length = otherReserveAddresses.length.sub(1);
     emit OtherReserveAddressRemoved(reserveAddress, index);
     return true;
   }
@@ -230,30 +258,45 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
   }
 
   /**
-   * @notice Transfer gold.
+   * @notice Transfer gold to a whitelisted address subject to reserve spending limits.
    * @param to The address that will receive the gold.
    * @param value The amount of gold to transfer.
+   * @return Returns true if the transaction succeeds.
    */
-  function transferGold(address to, uint256 value) external returns (bool) {
+  function transferGold(address payable to, uint256 value) external returns (bool) {
     require(isSpender[msg.sender], "sender not allowed to transfer Reserve funds");
     require(isOtherReserveAddress[to], "can only transfer to other reserve address");
-    return _transferGold(to, value);
-  }
-
-  function _transferGold(address to, uint256 value) internal returns (bool) {
     uint256 currentDay = now / 1 days;
     if (currentDay > lastSpendingDay) {
-      uint256 balance = getReserveGoldBalance();
+      uint256 balance = getUnfrozenReserveGoldBalance();
       lastSpendingDay = currentDay;
       spendingLimit = spendingRatio.multiply(FixidityLib.newFixed(balance)).fromFixed();
     }
     require(spendingLimit >= value, "Exceeding spending limit");
     spendingLimit = spendingLimit.sub(value);
-    require(getGoldToken().transfer(to, value), "transfer of gold token failed");
+    return _transferGold(to, value);
+  }
+
+  /**
+   * @notice Transfer unfrozen gold to any address.
+   * @param to The address that will receive the gold.
+   * @param value The amount of gold to transfer.
+   * @return Returns true if the transaction succeeds.
+   */
+  function _transferGold(address payable to, uint256 value) internal returns (bool) {
+    require(value <= getUnfrozenBalance(), "Exceeding unfrozen reserves");
+    to.transfer(value);
+    emit ReserveGoldTransferred(msg.sender, to, value);
     return true;
   }
 
-  function transferExchangeGold(address to, uint256 value)
+  /**
+   * @notice Transfer unfrozen gold to any address, used for one side of CP-DOTO.
+   * @param to The address that will receive the gold.
+   * @param value The amount of gold to transfer.
+   * @return Returns true if the transaction succeeds.
+   */
+  function transferExchangeGold(address payable to, uint256 value)
     external
     onlyRegisteredContract(EXCHANGE_REGISTRY_ID)
     returns (bool)
@@ -274,37 +317,93 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
     return (uint256(tobinTaxCache.numerator), FixidityLib.fixed1().unwrap());
   }
 
+  /**
+   * @notice Returns the list of stabilized token addresses.
+   * @return An array of addresses of stabilized tokens.
+   */
   function getTokens() external view returns (address[] memory) {
     return _tokens;
   }
 
+  /**
+   * @notice Returns the list other addresses included in the reserve total.
+   * @return An array of other addresses included in the reserve total.
+   */
   function getOtherReserveAddresses() external view returns (address[] memory) {
     return otherReserveAddresses;
   }
 
+  /**
+   * @notice Returns a list of token symbols that have been allocated.
+   * @return An array of token symbols that have been allocated.
+   */
   function getAssetAllocationSymbols() external view returns (bytes32[] memory) {
     return assetAllocationSymbols;
   }
 
+  /**
+   * @notice Returns a list of weights used for the allocation of reserve assets.
+   * @return An array of a list of weights used for the allocation of reserve assets.
+   */
   function getAssetAllocationWeights() external view returns (uint256[] memory) {
     uint256[] memory weights = new uint256[](assetAllocationSymbols.length);
-    for (uint256 i = 0; i < assetAllocationSymbols.length; i++) {
+    for (uint256 i = 0; i < assetAllocationSymbols.length; i = i.add(1)) {
       weights[i] = assetAllocationWeights[assetAllocationSymbols[i]];
     }
     return weights;
   }
 
+  /**
+   * @notice Returns the amount of unfrozen Celo Gold in the reserve.
+   * @return The total unfrozen Celo Gold in the reserve.
+   */
+  function getUnfrozenBalance() public view returns (uint256) {
+    uint256 balance = address(this).balance;
+    uint256 frozenReserveGold = getFrozenReserveGoldBalance();
+    return balance > frozenReserveGold ? balance.sub(frozenReserveGold) : 0;
+  }
+
+  /**
+   * @notice Returns the amount of Celo Gold included in the reserve.
+   * @return The Celo Gold amount included in the reserve.
+   */
   function getReserveGoldBalance() public view returns (uint256) {
-    uint256 reserveGoldBalance = address(this).balance;
-    for (uint256 i = 0; i < otherReserveAddresses.length; i++) {
+    return address(this).balance.add(getOtherReserveAddressesGoldBalance());
+  }
+
+  /**
+   * @notice Returns the amount of Celo Gold included in other reserve addresses.
+   * @return The Celo Gold amount included in other reserve addresses.
+   */
+  function getOtherReserveAddressesGoldBalance() public view returns (uint256) {
+    uint256 reserveGoldBalance = 0;
+    for (uint256 i = 0; i < otherReserveAddresses.length; i = i.add(1)) {
       reserveGoldBalance = reserveGoldBalance.add(otherReserveAddresses[i].balance);
     }
     return reserveGoldBalance;
   }
 
-  /*
-   * Internal functions
+  /**
+   * @notice Returns the amount of unfrozen Celo Gold included in the reserve.
+   * @return The unfrozen Celo Gold amount included in the reserve.
    */
+  function getUnfrozenReserveGoldBalance() public view returns (uint256) {
+    return getUnfrozenBalance().add(getOtherReserveAddressesGoldBalance());
+  }
+
+  /**
+   * @notice Returns the amount of frozen Celo Gold in the reserve.
+   * @return The total frozen Celo Gold in the reserve.
+   */
+  function getFrozenReserveGoldBalance() public view returns (uint256) {
+    uint256 currentDay = now / 1 days;
+    uint256 frozenDays = currentDay.sub(frozenReserveGoldStartDay);
+    if (frozenDays >= frozenReserveGoldDays) return 0;
+    return
+      frozenReserveGoldStartBalance.sub(
+        frozenReserveGoldStartBalance.mul(frozenDays).div(frozenReserveGoldDays)
+      );
+  }
 
   /**
    * @notice Computes the ratio of current reserve balance to total stable token valuation.
@@ -313,15 +412,15 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
   function getReserveRatio() public view returns (uint256) {
     address sortedOraclesAddress = registry.getAddressForOrDie(SORTED_ORACLES_REGISTRY_ID);
     ISortedOracles sortedOracles = ISortedOracles(sortedOraclesAddress);
-    uint256 reserveGoldBalance = getReserveGoldBalance();
+    uint256 reserveGoldBalance = getUnfrozenReserveGoldBalance();
     uint256 stableTokensValueInGold = 0;
     FixidityLib.Fraction memory cgldWeight = FixidityLib.wrap(assetAllocationWeights["cGLD"]);
 
-    for (uint256 i = 0; i < _tokens.length; i++) {
+    for (uint256 i = 0; i < _tokens.length; i = i.add(1)) {
       uint256 stableAmount;
       uint256 goldAmount;
       (stableAmount, goldAmount) = sortedOracles.medianRate(_tokens[i]);
-      uint256 stableTokenSupply = IERC20Token(_tokens[i]).totalSupply();
+      uint256 stableTokenSupply = IERC20(_tokens[i]).totalSupply();
       uint256 aStableTokenValueInGold = stableTokenSupply.mul(goldAmount).div(stableAmount);
       stableTokensValueInGold = stableTokensValueInGold.add(aStableTokenValueInGold);
     }
@@ -333,33 +432,21 @@ contract Reserve is IReserve, Ownable, Initializable, UsingRegistry, ReentrancyG
         .unwrap();
   }
 
+  /*
+   * Internal functions
+   */
+
   /**
    * @notice Computes a tobin tax based on the reserve ratio.
    * @return The numerator of the tobin tax amount, where the denominator is 1000.
    */
   function computeTobinTax() private view returns (FixidityLib.Fraction memory) {
-    // The protocol calls for a 0.5% transfer tax on Celo Gold when the reserve ratio < 2.
+    // The protocol calls for a 0.5% transfer tax on Celo Gold when the reserve ratio <= 2.
     FixidityLib.Fraction memory ratio = FixidityLib.wrap(getReserveRatio());
     if (ratio.gte(FixidityLib.newFixed(2))) {
       return FixidityLib.wrap(0);
     } else {
       return FixidityLib.wrap(TOBIN_TAX_NUMERATOR);
     }
-  }
-
-  /**
-   * @notice Mint tokens.
-   * @param to The address that will receive the minted tokens.
-   * @param token The address of the token to mint.
-   * @param value The amount of tokens to mint.
-   */
-  function mintToken(address to, address token, uint256 value)
-    private
-    isStableToken(token)
-    returns (bool)
-  {
-    IStableToken stableToken = IStableToken(token);
-    stableToken.mint(to, value);
-    return true;
   }
 }

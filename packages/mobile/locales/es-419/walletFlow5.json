@@ -62,8 +62,7 @@
       "Un recordatorio amistoso de que está utilizando la compilación de red {{testnet}} - los saldos aquí no son reales."
   },
   "dismiss": "Ocultar",
-  "localCurrencyEqual": "Igual a <2>{{localValue}} {{localCurrencyCode}}</2>",
-  "localCurrencyValue": "{{localValue}} {{localCurrencyCode}}",
+  "dollarBalance": "<0></0> $t(global:celoDollars)",
   "feedItemVerificationFeeTitle": "Celo",
   "feedItemVerificationFeeInfo": "$t(verificationFee)",
   "feedItemNetworkFeeTitle": "Celo",

@@ -11,10 +11,11 @@ contract('MultiSig', (accounts: any) => {
 
   const owners = [accounts[0], accounts[1]]
   const requiredSignatures = 2
+  const internalRequiredSignatures = 2
 
   beforeEach(async () => {
     multiSig = await MultiSig.new()
-    await multiSig.initialize(owners, requiredSignatures)
+    await multiSig.initialize(owners, requiredSignatures, internalRequiredSignatures)
   })
 
   describe('#initialize()', () => {
@@ -22,13 +23,20 @@ contract('MultiSig', (accounts: any) => {
       assert.deepEqual(await multiSig.getOwners(), owners)
     })
 
-    it('should have set the number of required signatures', async () => {
+    it('should have set the number of required signatures for external transactions', async () => {
       const required: number = (await multiSig.required()).toNumber()
       assert.equal(required, requiredSignatures)
     })
 
+    it('should have set the number of required signatures for internal transactions', async () => {
+      const required: number = (await multiSig.internalRequired()).toNumber()
+      assert.equal(required, internalRequiredSignatures)
+    })
+
     it('should not be callable again', async () => {
-      await assertRevert(multiSig.initialize(owners, requiredSignatures))
+      await assertRevert(
+        multiSig.initialize(owners, requiredSignatures, internalRequiredSignatures)
+      )
     })
   })
 
@@ -158,6 +166,7 @@ contract('MultiSig', (accounts: any) => {
       // @ts-ignore: TODO(mcortesi): fix typings
       await multiSig.confirmTransaction(txId, { from: accounts[1] })
       assert.isTrue(await multiSig.isOwner(accounts[2]))
+      assert.sameMembers([accounts[0], accounts[1], accounts[2]], await multiSig.getOwners())
     })
 
     it('should not allow an external account to add an owner', async () => {
@@ -168,20 +177,15 @@ contract('MultiSig', (accounts: any) => {
     it('should not allow adding the null address', async () => {
       // @ts-ignore
       const txData = multiSig.contract.methods.addOwner(NULL_ADDRESS).encodeABI()
-      // @ts-ignore: TODO(mcortesi): fix typings
       const tx = await multiSig.submitTransaction(multiSig.address, 0, txData, {
         from: accounts[0],
       })
-
       // @ts-ignore: TODO(mcortesi): fix typings
       const txEvent = _.find(tx.logs, {
         event: 'Confirmation',
       })
       const txId = txEvent.args.transactionId
-      // @ts-ignore: TODO(mcortesi): fix typings
-      const events = (await multiSig.confirmTransaction(txId, { from: accounts[1] })).logs
-      assert.equal(events.length, 2)
-      assert.equal(events[1].event, 'ExecutionFailure')
+      await assertRevert(multiSig.confirmTransaction(txId, { from: accounts[1] }))
     })
   })
 
@@ -206,6 +210,8 @@ contract('MultiSig', (accounts: any) => {
 
       assert.isFalse(await multiSig.isOwner(accounts[1]))
       assertEqualBN(await multiSig.required(), 1)
+      assertEqualBN(await multiSig.internalRequired(), 1)
+      assert.sameMembers([accounts[0]], await multiSig.getOwners())
     })
 
     it('should not allow an external account to remove an owner', async () => {
@@ -231,6 +237,7 @@ contract('MultiSig', (accounts: any) => {
       await multiSig.confirmTransaction(txId, { from: accounts[1] })
       assert.isTrue(await multiSig.isOwner(accounts[2]))
       assert.isFalse(await multiSig.isOwner(accounts[1]))
+      assert.sameMembers([accounts[0], accounts[2]], await multiSig.getOwners())
     })
 
     it('should not allow an external account to replace an owner', async () => {
@@ -241,20 +248,15 @@ contract('MultiSig', (accounts: any) => {
     it('should not allow an owner to be replaced by the null address', async () => {
       // @ts-ignore
       const txData = multiSig.contract.methods.replaceOwner(accounts[1], NULL_ADDRESS).encodeABI()
-      // @ts-ignore: TODO(mcortesi): fix typings
       const tx = await multiSig.submitTransaction(multiSig.address, 0, txData, {
         from: accounts[0],
       })
-
       // @ts-ignore: TODO(mcortesi): fix typings
       const txEvent = _.find(tx.logs, {
         event: 'Confirmation',
       })
       const txId = txEvent.args.transactionId
-      // @ts-ignore: TODO(mcortesi): fix typings
-      const events = (await multiSig.confirmTransaction(txId, { from: accounts[1] })).logs
-      assert.equal(events.length, 2)
-      assert.equal(events[1].event, 'ExecutionFailure')
+      await assertRevert(multiSig.confirmTransaction(txId, { from: accounts[1] }))
     })
   })
 
@@ -280,6 +282,31 @@ contract('MultiSig', (accounts: any) => {
     it('should not allow an external account to change the requirement', async () => {
       // @ts-ignore
       await assertRevert(multiSig.changeRequirement(3, { from: accounts[3] }))
+    })
+  })
+
+  describe('#changeInternalRequirement()', () => {
+    it('should allow the internal requirement to be changed via the MultiSig', async () => {
+      // @ts-ignore: TODO(mcortesi): fix typings
+      const txData = multiSig.contract.methods.changeInternalRequirement(1).encodeABI()
+      const tx = await multiSig.submitTransaction(multiSig.address, 0, txData, {
+        from: accounts[0],
+      })
+      // @ts-ignore: TODO(mcortesi): fix typings
+      const txEvent = _.find(tx.logs, {
+        event: 'Confirmation',
+      })
+      // @ts-ignore: TODO(mcortesi): fix typings
+      const txId = txEvent.args.transactionId
+
+      // @ts-ignore: TODO(mcortesi): fix typings
+      await multiSig.confirmTransaction(txId, { from: accounts[1] })
+      assertEqualBN(await multiSig.internalRequired(), 1)
+    })
+
+    it('should not allow an external account to change the internal requirement', async () => {
+      // @ts-ignore
+      await assertRevert(multiSig.changeInternalRequirement(3, { from: accounts[3] }))
     })
   })
 

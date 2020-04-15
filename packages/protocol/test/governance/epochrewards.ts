@@ -1,5 +1,6 @@
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
+  assertAlmostEqualBN,
   assertContainSubset,
   assertEqualBN,
   assertEqualDpBN,
@@ -12,6 +13,8 @@ import BigNumber from 'bignumber.js'
 import {
   EpochRewardsTestContract,
   EpochRewardsTestInstance,
+  FreezerContract,
+  FreezerInstance,
   MockElectionContract,
   MockElectionInstance,
   MockGoldTokenContract,
@@ -27,6 +30,7 @@ import {
 } from 'types'
 
 const EpochRewards: EpochRewardsTestContract = artifacts.require('EpochRewardsTest')
+const Freezer: FreezerContract = artifacts.require('Freezer')
 const MockElection: MockElectionContract = artifacts.require('MockElection')
 const MockGoldToken: MockGoldTokenContract = artifacts.require('MockGoldToken')
 const MockStableToken: MockStableTokenContract = artifacts.require('MockStableToken')
@@ -51,6 +55,7 @@ const getExpectedTargetTotalSupply = (timeDelta: BigNumber): BigNumber => {
 
 contract('EpochRewards', (accounts: string[]) => {
   let epochRewards: EpochRewardsTestInstance
+  let freezer: FreezerInstance
   let mockElection: MockElectionInstance
   let mockGoldToken: MockGoldTokenInstance
   let mockStableToken: MockStableTokenInstance
@@ -72,6 +77,8 @@ contract('EpochRewards', (accounts: string[]) => {
   }
   const targetVotingGoldFraction = toFixed(new BigNumber(2 / 3))
   const communityRewardFraction = toFixed(new BigNumber(1 / 4))
+  const carbonOffsettingFraction = toFixed(new BigNumber(1 / 200))
+  const carbonOffsettingPartner = '0x0000000000000000000000000000000000000000'
   const targetValidatorEpochPayment = new BigNumber(10000000000000)
   const exchangeRate = 7
   const sortedOraclesDenominator = new BigNumber('0x10000000000000000')
@@ -84,6 +91,8 @@ contract('EpochRewards', (accounts: string[]) => {
     const delta: number = desiredTime.minus(currentTime).toNumber()
     await timeTravel(delta, web3)
   }
+  const initialAssetAllocationSymbols = [web3.utils.padRight(web3.utils.utf8ToHex('cGLD'), 64)]
+  const initialAssetAllocationWeights = [toFixed(1)]
 
   beforeEach(async () => {
     epochRewards = await EpochRewards.new()
@@ -91,8 +100,10 @@ contract('EpochRewards', (accounts: string[]) => {
     mockGoldToken = await MockGoldToken.new()
     mockStableToken = await MockStableToken.new()
     mockSortedOracles = await MockSortedOracles.new()
+    freezer = await Freezer.new()
     registry = await Registry.new()
     await registry.setAddressFor(CeloContractName.Election, mockElection.address)
+    await registry.setAddressFor(CeloContractName.Freezer, freezer.address)
     await registry.setAddressFor(CeloContractName.GoldToken, mockGoldToken.address)
     await registry.setAddressFor(CeloContractName.SortedOracles, mockSortedOracles.address)
     await registry.setAddressFor(CeloContractName.StableToken, mockStableToken.address)
@@ -103,7 +114,6 @@ contract('EpochRewards', (accounts: string[]) => {
 
     await epochRewards.initialize(
       registry.address,
-      accounts[0],
       targetVotingYieldParams.initial,
       targetVotingYieldParams.max,
       targetVotingYieldParams.adjustmentFactor,
@@ -112,7 +122,9 @@ contract('EpochRewards', (accounts: string[]) => {
       rewardsMultiplier.adjustments.overspend,
       targetVotingGoldFraction,
       targetValidatorEpochPayment,
-      communityRewardFraction
+      communityRewardFraction,
+      carbonOffsettingPartner,
+      carbonOffsettingFraction
     )
   })
 
@@ -144,7 +156,6 @@ contract('EpochRewards', (accounts: string[]) => {
       await assertRevert(
         epochRewards.initialize(
           registry.address,
-          accounts[0],
           targetVotingYieldParams.initial,
           targetVotingYieldParams.max,
           targetVotingYieldParams.adjustmentFactor,
@@ -153,7 +164,9 @@ contract('EpochRewards', (accounts: string[]) => {
           rewardsMultiplier.adjustments.overspend,
           targetVotingGoldFraction,
           targetValidatorEpochPayment,
-          communityRewardFraction
+          communityRewardFraction,
+          carbonOffsettingPartner,
+          carbonOffsettingFraction
         )
       )
     })
@@ -407,6 +420,44 @@ contract('EpochRewards', (accounts: string[]) => {
     })
   })
 
+  describe('#setTargetVotingYield()', () => {
+    const newTarget = targetVotingYieldParams.initial.plus(1)
+
+    describe('when called by the owner', () => {
+      let resp: any
+
+      beforeEach(async () => {
+        resp = await epochRewards.setTargetVotingYield(newTarget)
+      })
+
+      it('should set the new target voting yield', async () => {
+        const [target, ,] = await epochRewards.getTargetVotingYieldParameters()
+        assertEqualBN(target, newTarget)
+      })
+
+      it('should emit the TargetVotingYieldSet event', async () => {
+        assert.equal(resp.logs.length, 1)
+        const log = resp.logs[0]
+        assertContainSubset(log, {
+          event: 'TargetVotingYieldSet',
+          args: {
+            target: newTarget,
+          },
+        })
+      })
+    })
+
+    describe('when called by a non-owner', () => {
+      it('should revert', async () => {
+        await assertRevert(
+          epochRewards.setTargetVotingYield(newTarget, {
+            from: nonOwner,
+          })
+        )
+      })
+    })
+  })
+
   describe('#getTargetGoldTotalSupply()', () => {
     describe('when it has been fewer than 15 years since genesis', () => {
       const timeDelta: BigNumber = YEAR.times(10)
@@ -529,7 +580,15 @@ contract('EpochRewards', (accounts: string[]) => {
     beforeEach(async () => {
       reserve = await Reserve.new()
       await registry.setAddressFor(CeloContractName.Reserve, reserve.address)
-      await reserve.initialize(registry.address, 60, toFixed(1))
+      await reserve.initialize(
+        registry.address,
+        60,
+        toFixed(1),
+        0,
+        0,
+        initialAssetAllocationSymbols,
+        initialAssetAllocationWeights
+      )
       await mockGoldToken.setTotalSupply(totalSupply)
       await web3.eth.sendTransaction({
         from: accounts[9],
@@ -596,7 +655,7 @@ contract('EpochRewards', (accounts: string[]) => {
 
   describe('#calculateTargetEpochRewards()', () => {
     describe('when there are active votes, a stable token exchange rate is set and the actual remaining supply is 10% more than the target remaining supply after rewards', () => {
-      const activeVotes = 1000000
+      const activeVotes = web3.utils.toWei('102398474')
       const timeDelta = YEAR.times(10)
       const numberValidators = 100
       let expectedMultiplier: BigNumber
@@ -613,7 +672,11 @@ contract('EpochRewards', (accounts: string[]) => {
         )
         expectedTargetGoldSupplyIncrease = expectedTargetEpochRewards
           .plus(expectedTargetTotalEpochPaymentsInGold)
-          .div(new BigNumber(1).minus(fromFixed(communityRewardFraction)))
+          .div(
+            new BigNumber(1)
+              .minus(fromFixed(communityRewardFraction))
+              .minus(fromFixed(carbonOffsettingFraction))
+          )
           .integerValue(BigNumber.ROUND_FLOOR)
         const expectedTargetTotalSupply = getExpectedTargetTotalSupply(timeDelta)
         const expectedTargetRemainingSupply = SUPPLY_CAP.minus(expectedTargetTotalSupply)
@@ -628,6 +691,10 @@ contract('EpochRewards', (accounts: string[]) => {
         await timeTravelToDelta(timeDelta)
       })
 
+      it('should fetch the expected rewards multiplier', async () => {
+        assertEqualBN(await epochRewards.getRewardsMultiplier(), toFixed(expectedMultiplier))
+      })
+
       it('should return the target validator epoch payment times the rewards multiplier', async () => {
         const expected = targetValidatorEpochPayment.times(expectedMultiplier)
         assertEqualBN((await epochRewards.calculateTargetEpochRewards())[0], expected)
@@ -639,6 +706,7 @@ contract('EpochRewards', (accounts: string[]) => {
           .times(expectedMultiplier)
         assertEqualBN((await epochRewards.calculateTargetEpochRewards())[1], expected)
       })
+
       it('should return the correct amount for the community reward', async () => {
         const validatorReward = targetValidatorEpochPayment
           .times(numberValidators)
@@ -646,11 +714,35 @@ contract('EpochRewards', (accounts: string[]) => {
         const votingReward = fromFixed(targetVotingYieldParams.initial).times(activeVotes)
         const expected = validatorReward
           .plus(votingReward)
-          .div(new BigNumber(1).minus(fromFixed(communityRewardFraction)))
+          .div(
+            new BigNumber(1)
+              .minus(fromFixed(communityRewardFraction))
+              .minus(fromFixed(carbonOffsettingFraction))
+          )
+          .integerValue(BigNumber.ROUND_FLOOR)
           .times(fromFixed(communityRewardFraction))
           .times(expectedMultiplier)
           .integerValue(BigNumber.ROUND_FLOOR)
-        assertEqualBN((await epochRewards.calculateTargetEpochRewards())[2], expected)
+        assertAlmostEqualBN((await epochRewards.calculateTargetEpochRewards())[2], expected, 1)
+      })
+
+      it('should return the correct amount for the carbon offsetting fund', async () => {
+        const validatorReward = targetValidatorEpochPayment
+          .times(numberValidators)
+          .div(exchangeRate)
+        const votingReward = fromFixed(targetVotingYieldParams.initial).times(activeVotes)
+        const expected = validatorReward
+          .plus(votingReward)
+          .div(
+            new BigNumber(1)
+              .minus(fromFixed(communityRewardFraction))
+              .minus(fromFixed(carbonOffsettingFraction))
+          )
+          .integerValue(BigNumber.ROUND_FLOOR)
+          .times(fromFixed(carbonOffsettingFraction))
+          .times(expectedMultiplier)
+          .integerValue(BigNumber.ROUND_FLOOR)
+        assertAlmostEqualBN((await epochRewards.calculateTargetEpochRewards())[3], expected, 1)
       })
     })
   })
@@ -664,7 +756,15 @@ contract('EpochRewards', (accounts: string[]) => {
       const totalSupply = new BigNumber(129762987346298761037469283746)
       reserve = await Reserve.new()
       await registry.setAddressFor(CeloContractName.Reserve, reserve.address)
-      await reserve.initialize(registry.address, 60, toFixed(1))
+      await reserve.initialize(
+        registry.address,
+        60,
+        toFixed(1),
+        0,
+        0,
+        initialAssetAllocationSymbols,
+        initialAssetAllocationWeights
+      )
       await reserve.addToken(mockStableToken.address)
       await mockGoldToken.setTotalSupply(totalSupply)
       const assetAllocationSymbols = [
@@ -808,18 +908,15 @@ contract('EpochRewards', (accounts: string[]) => {
 
   describe('when the contract is frozen', () => {
     beforeEach(async () => {
-      await epochRewards.freeze()
+      await freezer.freeze(epochRewards.address)
     })
 
-    it('should make calculateTargetEpochRewards return zeroes', async () => {
-      const [
-        validatorPayment,
-        voterRewards,
-        communityReward,
-      ] = await epochRewards.calculateTargetEpochRewards()
-      assertEqualBN(validatorPayment, 0)
-      assertEqualBN(voterRewards, 0)
-      assertEqualBN(communityReward, 0)
+    it('should make calculateTargetEpochRewards revert', async () => {
+      await assertRevert(epochRewards.calculateTargetEpochRewards())
+    })
+
+    it('should make updateTargetVotingYield revert', async () => {
+      await assertRevert(epochRewards.updateTargetVotingYield())
     })
   })
 })

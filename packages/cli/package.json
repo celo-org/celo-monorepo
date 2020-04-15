@@ -1,7 +1,7 @@
 {
   "name": "@celo/celocli",
   "description": "CLI Tool for transacting with the Celo protocol",
-  "version": "0.0.35-dev",
+  "version": "0.0.38-dev",
   "author": "Celo",
   "license": "Apache-2.0",
   "repository": "celo-org/celo-monorepo",
@@ -26,19 +26,20 @@
     "docs": "yarn oclif-dev readme --multi --dir=../docs/command-line-interface && yarn prettier ../docs/command-line-interface/*.md --write",
     "lint": "tslint -c tslint.json --project tsconfig.json",
     "prepack": "yarn run build && oclif-dev manifest && oclif-dev readme",
-    "test:reset": "yarn --cwd ../protocol devchain generate-tar .tmp/devchain.tar.gz --migration_override ../dev-utils/src/migration-override.json --upto 22",
-    "test:livechain": "yarn --cwd ../protocol devchain run-tar .tmp/devchain.tar.gz", 
+    "test:reset": "yarn --cwd ../protocol devchain generate-tar .tmp/devchain.tar.gz --migration_override ../dev-utils/src/migration-override.json --upto 24 --release_gold_contracts scripts/truffle/releaseGoldExampleConfigs.json",
+    "test:livechain": "yarn --cwd ../protocol devchain run-tar .tmp/devchain.tar.gz",
     "test": "TZ=UTC jest --runInBand"
   },
   "dependencies": {
-    "@celo/contractkit": "0.2.15-dev",
-    "@celo/utils": "0.1.8-dev",
+    "@celo/contractkit": "0.3.4-dev",
+    "@celo/utils": "0.1.9-dev",
+    "@ledgerhq/hw-transport-node-hid": "^5.11.0",
     "@oclif/command": "^1",
     "@oclif/config": "^1",
     "@oclif/plugin-help": "^2",
     "bip32": "^1.0.2",
     "bip39": "^2.5.0",
-    "bls12377js": "https://github.com/celo-org/bls12377js#ea09eba5c54fe63617af494a0c198fcc47582e0c",
+    "bls12377js": "https://github.com/celo-org/bls12377js#400bcaeec9e7620b040bfad833268f5289699cac",
     "chalk": "^2.4.2",
     "cli-table": "^0.3.1",
     "cli-ux": "^5.3.1",
@@ -49,9 +50,11 @@
     "firebase": "^7.2.2",
     "fs-extra": "^8.1.0",
     "moment": "2.24.0",
+    "humanize-duration": "^3.21.0",
     "path": "^0.12.7",
+    "prompts": "^2.0.1",
     "tslib": "^1",
-    "web3": "1.0.0-beta.37"
+    "web3": "1.2.4"
   },
   "devDependencies": {
     "@celo/dev-cli": "^2.0.3",
@@ -64,7 +67,7 @@
     "@types/fs-extra": "^8.0.0",
     "@types/mocha": "^5.2.7",
     "@types/node": "^10",
-    "@types/web3": "^1.0.18",
+    "@types/humanize-duration": "^3.18.0",
     "globby": "^8",
     "prettier": "1.19.1",
     "typescript": "^3.7.3"
@@ -107,6 +110,9 @@
       },
       "validatorgroup": {
         "description": "View and manage Validator Groups"
+      },
+      "releasegold": {
+        "description": "View and manage Release Gold contracts"
       }
     },
     "bin": "celocli",
