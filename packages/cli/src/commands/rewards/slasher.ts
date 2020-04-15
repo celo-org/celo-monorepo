@@ -43,6 +43,7 @@ export default class Slasher extends BaseCommand {
     }
     await checkBuilder.runChecks()
 
+    // Run manual or automatic
     const downtimeSlasher = await this.kit.contracts.getDowntimeSlasher()
     if (res.flags.slashValidator && res.flags.forDowntimeEndingAtBlock) {
       const validators = await this.kit.contracts.getValidators()
@@ -77,12 +78,12 @@ export default class Slasher extends BaseCommand {
   ) {
     const election = await this.kit.contracts.getElection()
     const validators = await this.kit.contracts.getValidators()
-
     // We need to wait for an extra block to estimateGas
     const extraWait = slashGas && !dryRun ? 0 : 1
 
     let validatorSet: Validator[] = []
     let validatorSigners: Address[] = []
+    // Negative validatorDownSince indicates validator is up
     let validatorDownSince: number[] = []
     let blockNumber = (await this.kit.web3.eth.getBlockNumber()) - 1
     let epochNumber = -1
@@ -99,6 +100,8 @@ export default class Slasher extends BaseCommand {
         if (epochNumber !== newEpochNumber) {
           epochNumber = newEpochNumber
           console.info(`New epoch: ${epochNumber}`)
+
+          // Map validator indices across epochs, initializing validatorDownSince to -1
           const oldEpochSigners = await election.getValidatorSigners(blockNumber - 1)
           const newEpochSigners = await election.getValidatorSigners(blockNumber)
           validatorSigners = newEpochSigners
@@ -120,6 +123,7 @@ export default class Slasher extends BaseCommand {
         const seal = istanbulExtra.parentAggregatedSeal
         const sealBlockNumber = blockNumber - 1
 
+        // Check for each validator in tip parentSeal
         for (let i = 0; i < validatorSet.length; i++) {
           const validatorUp = bitIsSet(seal.bitmap, i)
           if (validatorUp) {
@@ -178,7 +182,7 @@ export default class Slasher extends BaseCommand {
     if (dryRun) {
       console.info(`encodeABI: ` + slashTx.txo.encodeABI())
       try {
-        const gas = Math.round((await slashTx.txo.estimateGas()) * this.kit.gasInflationFactor())
+        const gas = Math.round((await slashTx.txo.estimateGas()) * this.kit.gasInflationFactor)
         console.info(`Dry-run succeeded, estimated gas: ${gas}`)
       } catch (error) {
         console.info(`Dry-run failed: ${error}`)
