@@ -9,7 +9,7 @@ import {
   removeGenericHelmChart,
   upgradeGenericHelmChart,
 } from './helm_deploy'
-import { scaleResource } from './kubernetes'
+import { deleteResource, scaleResource } from './kubernetes'
 import { execCmdWithExitOnFailure } from './utils'
 
 const helmChartPath = '../helm-charts/celo-fullnode'
@@ -91,8 +91,10 @@ async function allocateStaticIPs(celoEnv: string) {
 
   // Deallocate static ip if we are scaling down the replica count
   const existingStaticIPsCount = await getAzureStaticIPsCount(celoEnv, resourceGroup)
-  for (let i = existingStaticIPsCount; i > replicaCount; i--) {
-    await deallocateStaticIP(`${getStaticIPNamePrefix(celoEnv)}-0`, resourceGroup)
+  for (let i = existingStaticIPsCount - 1; i > replicaCount - 1; i--) {
+    await deleteResource(celoEnv, 'service', `${celoEnv}-fullnodes-${i}`, false)
+    await waitDeattachingStaticIP(`${getStaticIPNamePrefix(celoEnv)}-${i}`, resourceGroup)
+    await deallocateStaticIP(`${getStaticIPNamePrefix(celoEnv)}-${i}`, resourceGroup)
   }
 
   const staticIps = await Promise.all(

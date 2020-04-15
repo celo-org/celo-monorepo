@@ -5,11 +5,6 @@
 replicaCount: 1
 fullnameOverride: false
 
-service:
-  type: LoadBalancer
-  port: 80
-  azure_mixed_protocols: true
-
 ingress:
   enabled: false
   annotations: {}
@@ -72,6 +67,7 @@ geth:
   - 1.2.3.4
   - 5.6.7.8
   service_type: LoadBalancer
+  azure_mixed_protocols: true
   use_static_ips: true
   updateStrategy:
     type: RollingUpdate
