@@ -31,7 +31,7 @@
     "test": "TZ=UTC jest --runInBand"
   },
   "dependencies": {
-    "@celo/contractkit": "0.3.6-dev",
+    "@celo/contractkit": "0.3.7-dev",
     "@celo/utils": "0.1.10-dev",
     "@ledgerhq/hw-transport-node-hid": "^5.11.0",
     "@oclif/command": "^1",
