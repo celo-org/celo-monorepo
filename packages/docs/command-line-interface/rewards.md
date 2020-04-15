@@ -36,6 +36,7 @@ USAGE
 OPTIONS
   --automatic                                                        Automatically monitor and slash for downtime
   --dryRun                                                           Dry run
+  --endBlock=endBlock                                                Stop monitoring after block
 
   --forDowntimeBeginningAtBlock=forDowntimeBeginningAtBlock          Manually slash validator for downtime beginning at
                                                                      block
@@ -49,12 +50,16 @@ OPTIONS
 
   --maxSlashAttempts=maxSlashAttempts                                Attempt slashing a max of N times
 
+  --slashAgainAfter=slashAgainAfter                                  Slash same validator again after N blocks
+
   --slashValidator=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d        Manually slash this validator address
 
   --slashValidatorSigner=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  Manually slash this validator address
 
   --slashableDowntime=slashableDowntime                              Overrides downtime threshold for automatically
                                                                      slashing
+
+  --startBlock=startBlock                                            Start monitoring on block instead of tip
 
 EXAMPLE
   slasher --from 0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d --automatic

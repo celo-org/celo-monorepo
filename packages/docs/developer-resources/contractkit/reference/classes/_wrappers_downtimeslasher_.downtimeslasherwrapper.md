@@ -157,7 +157,7 @@ Contract address
 
 ▸ **slashEndSignerIndex**(`endBlock`: number, `endSignerIndex`: number): *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹void››*
 
-*Defined in [contractkit/src/wrappers/DowntimeSlasher.ts:102](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DowntimeSlasher.ts#L102)*
+*Defined in [contractkit/src/wrappers/DowntimeSlasher.ts:98](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DowntimeSlasher.ts#L98)*
 
 Slash a Validator for downtime.
 
@@ -196,7 +196,7 @@ ___
 
 ▸ **slashStartSignerIndex**(`startBlock`: number, `startSignerIndex`: number): *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹void››*
 
-*Defined in [contractkit/src/wrappers/DowntimeSlasher.ts:78](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DowntimeSlasher.ts#L78)*
+*Defined in [contractkit/src/wrappers/DowntimeSlasher.ts:74](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DowntimeSlasher.ts#L74)*
 
 Slash a Validator for downtime.
 
