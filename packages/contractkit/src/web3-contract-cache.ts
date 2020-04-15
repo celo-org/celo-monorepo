@@ -1,5 +1,5 @@
 import debugFactory from 'debug'
-import { CeloContract } from './base'
+import { CeloContract, ProxyContracts } from './base'
 import { newAccounts } from './generated/Accounts'
 import { newAttestations } from './generated/Attestations'
 import { newBlockchainParameters } from './generated/BlockchainParameters'
@@ -16,6 +16,7 @@ import { newGoldToken } from './generated/GoldToken'
 import { newGovernance } from './generated/Governance'
 import { newLockedGold } from './generated/LockedGold'
 import { newMultiSig } from './generated/MultiSig'
+import { newProxy } from './generated/Proxy'
 import { newRandom } from './generated/Random'
 import { newRegistry } from './generated/Registry'
 import { newReserve } from './generated/Reserve'
@@ -144,7 +145,9 @@ export class Web3ContractCache {
   async getContract<C extends keyof typeof ContractFactories>(contract: C, address?: string) {
     if (this.cacheMap[contract] == null) {
       debug('Initiating contract %s', contract)
-      const createFn = ContractFactories[contract] as CFType[C]
+      const createFn = ProxyContracts.includes(contract)
+        ? newProxy
+        : (ContractFactories[contract] as CFType[C])
       // @ts-ignore: Too compplex union type
       this.cacheMap[contract] = createFn(
         this.kit.web3,
