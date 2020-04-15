@@ -142,6 +142,9 @@ function mockLedger(wallet: LedgerWallet, mockForceValidation: () => void) {
         }
         throw new Error('Invalid Path')
       },
+      getAppConfiguration: async () => {
+        return { arbitraryDataEnabled: 1, version: '0.0.0' }
+      },
     }
   })
 }

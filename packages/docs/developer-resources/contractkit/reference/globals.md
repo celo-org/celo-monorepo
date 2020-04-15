@@ -36,6 +36,8 @@
 * ["utils/tx-result"](modules/_utils_tx_result_.md)
 * ["utils/web3-utils"](modules/_utils_web3_utils_.md)
 * ["wallets/azure-hsm-wallet"](modules/_wallets_azure_hsm_wallet_.md)
+* ["wallets/ledger-utils/data"](modules/_wallets_ledger_utils_data_.md)
+* ["wallets/ledger-utils/tokens"](modules/_wallets_ledger_utils_tokens_.md)
 * ["wallets/ledger-wallet"](modules/_wallets_ledger_wallet_.md)
 * ["wallets/local-wallet"](modules/_wallets_local_wallet_.md)
 * ["wallets/remote-wallet"](modules/_wallets_remote_wallet_.md)

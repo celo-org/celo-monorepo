@@ -26,7 +26,7 @@ Provides an abstraction on Azure Key Vault for performing signing operations
 
 \+ **new AzureKeyVaultClient**(`vaultName`: string): *[AzureKeyVaultClient](_wallets_signers_azure_key_vault_client_.azurekeyvaultclient.md)*
 
-*Defined in [contractkit/src/wallets/signers/azure-key-vault-client.ts:23](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/azure-key-vault-client.ts#L23)*
+*Defined in [contractkit/src/wallets/signers/azure-key-vault-client.ts:26](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/azure-key-vault-client.ts#L26)*
 
 **Parameters:**
 
@@ -42,7 +42,7 @@ Name | Type |
 
 ▸ **getKeyId**(`keyName`: string): *Promise‹string›*
 
-*Defined in [contractkit/src/wallets/signers/azure-key-vault-client.ts:55](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/azure-key-vault-client.ts#L55)*
+*Defined in [contractkit/src/wallets/signers/azure-key-vault-client.ts:58](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/azure-key-vault-client.ts#L58)*
 
 **Parameters:**
 
@@ -58,7 +58,7 @@ ___
 
 ▸ **getKeys**(): *Promise‹string[]›*
 
-*Defined in [contractkit/src/wallets/signers/azure-key-vault-client.ts:34](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/azure-key-vault-client.ts#L34)*
+*Defined in [contractkit/src/wallets/signers/azure-key-vault-client.ts:37](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/azure-key-vault-client.ts#L37)*
 
 **Returns:** *Promise‹string[]›*
 
@@ -68,7 +68,7 @@ ___
 
 ▸ **getPublicKey**(`keyName`: string): *Promise‹BigNumber›*
 
-*Defined in [contractkit/src/wallets/signers/azure-key-vault-client.ts:42](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/azure-key-vault-client.ts#L42)*
+*Defined in [contractkit/src/wallets/signers/azure-key-vault-client.ts:45](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/azure-key-vault-client.ts#L45)*
 
 **Parameters:**
 
@@ -84,7 +84,7 @@ ___
 
 ▸ **hasKey**(`keyName`: string): *Promise‹boolean›*
 
-*Defined in [contractkit/src/wallets/signers/azure-key-vault-client.ts:107](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/azure-key-vault-client.ts#L107)*
+*Defined in [contractkit/src/wallets/signers/azure-key-vault-client.ts:111](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/azure-key-vault-client.ts#L111)*
 
 **Parameters:**
 
@@ -100,7 +100,7 @@ ___
 
 ▸ **signMessage**(`message`: Buffer, `keyName`: string): *Promise‹[Signature](_wallets_signers_azure_key_vault_client_.signature.md)›*
 
-*Defined in [contractkit/src/wallets/signers/azure-key-vault-client.ts:62](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/azure-key-vault-client.ts#L62)*
+*Defined in [contractkit/src/wallets/signers/azure-key-vault-client.ts:65](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/azure-key-vault-client.ts#L65)*
 
 **Parameters:**
 

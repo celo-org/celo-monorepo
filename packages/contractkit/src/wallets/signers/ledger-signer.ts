@@ -5,10 +5,12 @@ import * as ethUtil from 'ethereumjs-util'
 import { transportErrorFriendlyMessage } from '../../utils/ledger-utils'
 import { EIP712TypedData, generateTypedDataHash } from '../../utils/sign-typed-data-utils'
 import { RLPEncodedTx } from '../../utils/signing-utils'
+import { compareLedgerAppVersions, tokenInfoByAddressAndChainId } from '../ledger-utils/tokens'
 import { AddressValidation } from '../ledger-wallet'
 import { Signer } from './signer'
 
 const debug = debugFactory('kit:wallet:ledger')
+const CELO_APP_ACCEPTS_CONTRACT_DATA_FROM_VERSION = '1.0.2'
 
 /**
  * Signs the EVM transaction with a Ledger device
@@ -18,11 +20,21 @@ export class LedgerSigner implements Signer {
   private derivationPath: string
   private validated: boolean = false
   private ledgerAddressValidation: AddressValidation
+  private appConfiguration: { arbitraryDataEnabled: number; version: string }
 
-  constructor(ledger: any, derivationPath: string, ledgerAddressValidation: AddressValidation) {
+  constructor(
+    ledger: any,
+    derivationPath: string,
+    ledgerAddressValidation: AddressValidation,
+    appConfiguration: { arbitraryDataEnabled: number; version: string } = {
+      arbitraryDataEnabled: 0,
+      version: '0.0.0',
+    }
+  ) {
     this.ledger = ledger
     this.derivationPath = derivationPath
     this.ledgerAddressValidation = ledgerAddressValidation
+    this.appConfiguration = appConfiguration
   }
 
   getNativeKey(): string {
@@ -34,6 +46,7 @@ export class LedgerSigner implements Signer {
     encodedTx: RLPEncodedTx
   ): Promise<{ v: number; r: Buffer; s: Buffer }> {
     try {
+      await this.checkForKnownToken(encodedTx)
       const signature = await this.ledger!.signTransaction(
         await this.getValidatedDerivationPath(),
         trimLeading0x(encodedTx.rlpEncode) // the ledger requires the rlpEncode without the leading 0x
@@ -134,6 +147,27 @@ export class LedgerSigner implements Signer {
       }
       default: {
         throw new Error('ledger-signer@validationRequired: invalid ledgerValidation value')
+      }
+    }
+  }
+
+  /**
+   * Display ERC20 info on ledger if contract is well known
+   * @param rlpEncoded Encoded transaction
+   */
+  private async checkForKnownToken(rlpEncoded: RLPEncodedTx) {
+    if (
+      compareLedgerAppVersions(
+        this.appConfiguration.version,
+        CELO_APP_ACCEPTS_CONTRACT_DATA_FROM_VERSION
+      ) >= 0
+    ) {
+      const tokenInfo = tokenInfoByAddressAndChainId(
+        rlpEncoded.transaction.to!,
+        rlpEncoded.transaction.chainId!
+      )
+      if (tokenInfo) {
+        await this.ledger!.provideERC20TokenInformation(tokenInfo)
       }
     }
   }

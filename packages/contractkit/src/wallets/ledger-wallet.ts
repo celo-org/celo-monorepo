@@ -91,6 +91,7 @@ export class LedgerWallet extends RemoteWallet implements Wallet {
 
   private async retrieveAccounts(): Promise<Map<Address, Signer>> {
     const addressToSigner = new Map<Address, Signer>()
+    const appConfiguration = await this.retrieveAppConfiguration()
     const validationRequired = this.ledgerAddressValidation === AddressValidation.initializationOnly
 
     // Each address must be retrieved synchronously, (ledger lock)
@@ -99,9 +100,27 @@ export class LedgerWallet extends RemoteWallet implements Wallet {
       const addressInfo = await this.ledger!.getAddress(derivationPath, validationRequired)
       addressToSigner.set(
         addressInfo.address,
-        new LedgerSigner(this.ledger, derivationPath, this.ledgerAddressValidation)
+        new LedgerSigner(
+          this.ledger,
+          derivationPath,
+          this.ledgerAddressValidation,
+          appConfiguration
+        )
       )
     }
     return addressToSigner
+  }
+
+  private async retrieveAppConfiguration(): Promise<{
+    arbitraryDataEnabled: number
+    version: string
+  }> {
+    const appConfiguration = await this.ledger!.getAppConfiguration()
+    if (!appConfiguration.arbitraryDataEnabled) {
+      console.warn(
+        'Beware, your ledger does not allow the use of contract data. Some features may not work correctly'
+      )
+    }
+    return appConfiguration
   }
 }
