@@ -2,6 +2,7 @@ import { Address } from '@celo/contractkit'
 import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
 import { GovernanceWrapper, ProposalStage } from '@celo/contractkit/lib/wrappers/Governance'
 import { LockedGoldWrapper } from '@celo/contractkit/lib/wrappers/LockedGold'
+import { MultiSigWrapper } from '@celo/contractkit/lib/wrappers/MultiSig'
 import { ValidatorsWrapper } from '@celo/contractkit/lib/wrappers/Validators'
 import { eqAddress, NULL_ADDRESS } from '@celo/utils/lib/address'
 import { verifySignature } from '@celo/utils/lib/signatureUtils'
@@ -386,6 +387,13 @@ class CheckBuilder {
         return vg.nextCommissionBlock.lte(blockNumber)
       })
     )
+
+  isMultiSigOwner = (from: string, multisig: MultiSigWrapper) => {
+    return this.addCheck('The provided address is an owner of the multisig', async () => {
+      const owners = await multisig.getOwners()
+      return owners.indexOf(from) > -1
+    })
+  }
 
   async runChecks() {
     console.log(`Running Checks:`)
