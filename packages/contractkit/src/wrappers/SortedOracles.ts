@@ -124,9 +124,12 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
    */
   async removeExpiredReports(
     token: CeloToken,
-    numReports: number
+    numReports?: number
   ): Promise<CeloTransactionObject<void>> {
     const tokenAddress = await this.kit.registry.addressFor(token)
+    if (!numReports) {
+      numReports = (await this.getReports(token)).length - 1
+    }
     return toTransactionObject(
       this.kit,
       this.contract.methods.removeExpiredReports(tokenAddress, numReports)
