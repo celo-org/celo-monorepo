@@ -44,29 +44,22 @@ export class DowntimeSlasherWrapper extends BaseWrapper<DowntimeSlasher> {
   isDown = proxyCall(this.contract.methods.isDown)
 
   /**
-   * Slash a Validator for downtime.
+   * Slash a Validator (specified by signer address) for downtime.
    * @param validator Validator to slash for downtime.
    * @param startBlock First block of the downtime, undefined if using endBlock.
    * @param endBlock Last block of the downtime.
    */
-  async slashValidator(
-    validatorAddress: Address,
-    startBlock?: number,
-    endBlock?: number
-  ): Promise<CeloTransactionObject<void>> {
+  async slashSigner(signerAddress: Address, startBlock?: number, endBlock?: number) {
     const election = await this.kit.contracts.getElection()
-    const validators = await this.kit.contracts.getValidators()
     if (endBlock) {
-      const validator = await validators.getValidator(validatorAddress, endBlock)
       return this.slashEndSignerIndex(
         endBlock,
-        findAddressIndex(validator.signer, await election.getValidatorSigners(endBlock))
+        findAddressIndex(signerAddress, await election.getValidatorSigners(endBlock))
       )
     } else if (startBlock) {
-      const validator = await validators.getValidator(validatorAddress, startBlock)
       return this.slashStartSignerIndex(
         startBlock,
-        findAddressIndex(validator.signer, await election.getValidatorSigners(startBlock))
+        findAddressIndex(signerAddress, await election.getValidatorSigners(startBlock))
       )
     } else {
       throw new Error(`No block specified`)

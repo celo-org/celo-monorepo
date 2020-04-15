@@ -34,14 +34,27 @@ USAGE
   $ celocli rewards:slasher
 
 OPTIONS
-  --automatic                                                  Automatically monitor and slash for downtime
-  --dryRun                                                     Dry run
-  --forDowntimeEndingAtBlock=forDowntimeEndingAtBlock          Manually slash validator for downtime ending at block
-  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d            (required) Slasher's address
-  --gas=gas                                                    Gas to supply for slashing transactions
-  --maxSlashAttempts=maxSlashAttempts                          Attempt slashing a max of N times
-  --slashValidator=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  Manually slash this validator address
-  --slashableDowntime=slashableDowntime                        Overrides downtime threshold for automatically slashing
+  --automatic                                                        Automatically monitor and slash for downtime
+  --dryRun                                                           Dry run
+
+  --forDowntimeBeginningAtBlock=forDowntimeBeginningAtBlock          Manually slash validator for downtime beginning at
+                                                                     block
+
+  --forDowntimeEndingAtBlock=forDowntimeEndingAtBlock                Manually slash validator for downtime ending at
+                                                                     block
+
+  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d                  (required) Slasher's address
+
+  --gas=gas                                                          Gas to supply for slashing transactions
+
+  --maxSlashAttempts=maxSlashAttempts                                Attempt slashing a max of N times
+
+  --slashValidator=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d        Manually slash this validator address
+
+  --slashValidatorSigner=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  Manually slash this validator address
+
+  --slashableDowntime=slashableDowntime                              Overrides downtime threshold for automatically
+                                                                     slashing
 
 EXAMPLE
   slasher --from 0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d --automatic
