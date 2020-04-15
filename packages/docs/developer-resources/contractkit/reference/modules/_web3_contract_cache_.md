@@ -20,7 +20,7 @@
 
 Ƭ **CFType**: *typeof ContractFactories*
 
-*Defined in [contractkit/src/web3-contract-cache.ts:56](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L56)*
+*Defined in [contractkit/src/web3-contract-cache.ts:57](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L57)*
 
 ## Object literals
 
@@ -28,13 +28,11 @@
 
 ### ▪ **ContractFactories**: *object*
 
-*Defined in [contractkit/src/web3-contract-cache.ts:30](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L30)*
+*Defined in [contractkit/src/web3-contract-cache.ts:31](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L31)*
 
 ###  __computed
 
 • **__computed**: *newValidators* = newValidators
-
-*Defined in [contractkit/src/web3-contract-cache.ts:31](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L31)*
 
 *Defined in [contractkit/src/web3-contract-cache.ts:32](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L32)*
 
@@ -79,3 +77,5 @@
 *Defined in [contractkit/src/web3-contract-cache.ts:52](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L52)*
 
 *Defined in [contractkit/src/web3-contract-cache.ts:53](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L53)*
+
+*Defined in [contractkit/src/web3-contract-cache.ts:54](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/web3-contract-cache.ts#L54)*
