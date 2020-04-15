@@ -1,5 +1,4 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
-import HorizontalLine from '@celo/react-components/components/HorizontalLine'
 import KeyboardAwareScrollView from '@celo/react-components/components/KeyboardAwareScrollView'
 import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
 import { fontStyles } from '@celo/react-components/styles/fonts'
