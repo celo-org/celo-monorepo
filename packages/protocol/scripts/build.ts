@@ -124,7 +124,9 @@ async function generateFilesForContractKit() {
   exec(`rm -rf ${CONTRACTKIT_GEN_DIR}`)
   const relativePath = path.relative(ROOT_DIR, CONTRACTKIT_GEN_DIR)
 
-  const globPattern = `${BUILD_DIR}/contracts/@(${CoreContracts.join('|')}).json`
+  const contractKitContracts = CoreContracts.concat('Proxy')
+
+  const globPattern = `${BUILD_DIR}/contracts/@(${contractKitContracts.join('|')}).json`
 
   const cwd = process.cwd()
 
