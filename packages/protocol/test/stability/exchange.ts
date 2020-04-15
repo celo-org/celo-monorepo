@@ -848,6 +848,31 @@ contract('Exchange', (accounts: string[]) => {
           // Gold Bucket value), minus the amount purchased during the exchange
           assertEqualBN(newStableBucket, updatedStableBucket.plus(stableTokenBalance))
         })
+
+        it('should emit an UpdatedBuckets event', async () => {
+          const exchangeTx = await exchange.exchange(
+            stableTokenBalance,
+            expectedGoldAmount.integerValue(BigNumber.ROUND_FLOOR),
+            true,
+            {
+              from: user,
+            }
+          )
+          const newGoldBucket = await exchange.goldBucket()
+          const newStableBucket = await exchange.stableBucket()
+
+          const exchangeLogs = exchangeTx.logs.filter((x) => x.event === 'UpdatedBuckets')
+          assert(exchangeLogs.length === 1, 'Did not receive event')
+
+          const log = exchangeLogs[0]
+          assertLogMatches2(log, {
+            event: 'UpdatedBuckets',
+            args: {
+              goldBucket: newGoldBucket,
+              stableBucket: newStableBucket,
+            },
+          })
+        })
       })
     })
 
