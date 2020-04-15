@@ -2,8 +2,8 @@ import { CeloContract } from '@celo/contractkit'
 import { cli } from 'cli-ux'
 import { BaseCommand } from '../../base'
 
-export default class GetRates extends BaseCommand {
-  static description = 'Get the current set oracle-reported rates for the given token'
+export default class Reports extends BaseCommand {
+  static description = 'List oracle reports for a given token'
 
   static flags = {
     ...BaseCommand.flags,
@@ -13,24 +13,25 @@ export default class GetRates extends BaseCommand {
     {
       name: 'token',
       required: true,
-      description: 'Token to get the rates for',
+      description: 'Token to list the reports for',
       options: [CeloContract.StableToken],
       default: CeloContract.StableToken,
     },
   ]
 
-  static example = ['rates StableToken', 'rates']
+  static example = ['reports StableToken', 'reports']
 
   async run() {
-    const res = this.parse(GetRates)
+    const res = this.parse(Reports)
     const sortedOracles = await this.kit.contracts.getSortedOracles()
 
-    const rates = await sortedOracles.getRates(res.args.token)
+    const reports = await sortedOracles.getReports(res.args.token)
     cli.table(
-      rates,
+      reports,
       {
         address: {},
         rate: { get: (r) => r.rate.toNumber() },
+        timestamp: { get: (r) => r.timestamp.toNumber() },
       },
       { 'no-truncate': !res.flags.truncate }
     )

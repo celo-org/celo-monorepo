@@ -43,30 +43,42 @@ const HeaderCell = React.memo(function HeaderCellFn({
   )
 })
 
+interface Edges<T> {
+  edges: Array<{
+    node: T
+  }>
+}
+
 interface CeloValidatorGroup {
   account: {
     address: string
     lockedGold: string
     name: string
     usd: string
+    claims: Edges<{
+      verified: boolean
+      element: string
+    }>
   }
   accumulatedActive: string
   accumulatedRewards: string
-  affiliates: {
-    edges: Array<{
-      node: {
-        address: string
-        attestationsFulfilled: number
-        attestationsRequested: number
-        lastElected: number
-        lastOnline: number
-        lockedGold: string
-        name: string
-        score: string
-        usd: string
-      }
-    }>
-  }
+  affiliates: Edges<{
+    account: {
+      claims: Edges<{
+        verified: boolean
+        element: string
+      }>
+    }
+    address: string
+    attestationsFulfilled: number
+    attestationsRequested: number
+    lastElected: number
+    lastOnline: number
+    lockedGold: string
+    name: string
+    score: string
+    usd: string
+  }>
   commission: string
   numMembers: number
   receivableVotes: string
@@ -105,7 +117,7 @@ class ValidatorsList extends React.PureComponent<ValidatorsListProps & I18nProps
     orderAsc: true,
   }
   private orderAccessors = {
-    name: (_) => _.name.toLowerCase(),
+    name: (_) => (_.name || '').toLowerCase(),
     total: (_) => _.numMembers * 1000 + _.elected,
     votes: (_) => +_.votesAbsolute || 0,
     gold: (_) => _.gold || 0,
@@ -150,6 +162,12 @@ class ValidatorsList extends React.PureComponent<ValidatorsListProps & I18nProps
       .map(({ receivableVotes }) => new BigNumber(receivableVotes))
       .reduce((acc: BigNumber, _) => acc.plus(_), new BigNumber(0))
 
+    const getClaims = (claims: CeloValidatorGroup['account']['claims'] = {} as any): string[] =>
+      (claims.edges || [])
+        .map(({ node }) => node)
+        .filter(({ verified }) => verified)
+        .map(({ element }) => element)
+
     const cleanData = celoValidatorGroups
       .map(
         ({ account, affiliates, votes, receivableVotes, commission, numMembers, rewardsRatio }) => {
@@ -174,6 +192,7 @@ class ValidatorsList extends React.PureComponent<ValidatorsListProps & I18nProps
             rewards,
             rewardsStyle,
             numMembers,
+            claims: getClaims(group.claims),
             validators: affiliates.edges.map(({ node: validator }) => {
               const {
                 address,
@@ -196,12 +215,13 @@ class ValidatorsList extends React.PureComponent<ValidatorsListProps & I18nProps
                 uptime: (+score * 100) / 10 ** 24,
                 attestation:
                   Math.max(0, attestationsFulfilled / (attestationsRequested || -1)) * 100,
+                claims: getClaims(validator.account.claims),
               }
             }),
           }
         }
       )
-      .map((group) => {
+      .map((group, id) => {
         const data = group.validators.reduce(
           ({ elected, online, total, uptime, attestation }, validator) => ({
             elected: elected + +validator.elected,
@@ -215,6 +235,7 @@ class ValidatorsList extends React.PureComponent<ValidatorsListProps & I18nProps
         data.uptime = data.uptime / group.validators.length
         data.attestation = data.attestation / group.validators.length
         return {
+          id,
           ...group,
           ...data,
         }
@@ -223,13 +244,14 @@ class ValidatorsList extends React.PureComponent<ValidatorsListProps & I18nProps
     return cleanData
   }
 
-  sortData<T>(data: T[]): T[] {
+  sortData<T extends any & { id: number }>(data: T[]): T[] {
     const { orderBy, orderAsc } = this.state
     const accessor = this.orderAccessors[orderBy]
     const dAccessor = this.orderAccessors[this.defaultOrderAccessor]
     const dir = orderAsc ? 1 : -1
 
     return (data || [])
+      .sort((a, b) => b.id - a.id)
       .sort((a, b) => (dAccessor(a) > dAccessor(b) ? -1 : 1))
       .sort((a, b) => dir * (accessor(a) > accessor(b) ? 1 : -1))
   }
@@ -296,9 +318,9 @@ class ValidatorsList extends React.PureComponent<ValidatorsListProps & I18nProps
               />
             </View>
             {validatorGroups.map((group, i) => (
-              <View key={group.address} onClick={this.expand.bind(this, i)}>
+              <div key={group.id} onClick={this.expand.bind(this, i)}>
                 <ValidatorsListRow group={group} expanded={expanded === i} />
-              </View>
+              </div>
             ))}
           </View>
         </View>
