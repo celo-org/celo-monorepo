@@ -14,7 +14,9 @@ export default class SetMaxDistribution extends ReleaseGoldCommand {
       description:
         'Amount in range [0, 1000] (3 significant figures) indicating % of total balance available for distribution.',
     }),
-    yesreally: flags.boolean({ description: 'Override prompt to set liquidity (be careful!)' }),
+    yesreally: flags.boolean({
+      description: 'Override prompt to set new maximum distribution (be careful!)',
+    }),
   }
 
   static args = []
