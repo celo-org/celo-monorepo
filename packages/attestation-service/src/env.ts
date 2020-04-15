@@ -32,13 +32,13 @@ export function getAttestationSignerAddress() {
 }
 
 export function getAccountAddress() {
-  if (
-    process.env.CELO_VALIDATOR_ADDRESS === undefined ||
-    !isValidAddress(process.env.CELO_VALIDATOR_ADDRESS)
-  ) {
-    console.error('Did not specify valid CELO_VALIDATOR_ADDRESS')
-    throw new Error('Did not specify valid CELO_VALIDATOR_ADDRESS')
+  const account = process.env.CELO_VALIDATOR_ADDRESS
+  const releaseGoldAccount = process.env.CELO_VALIDATOR_RG_ADDRESS
+  if (account !== undefined && isValidAddress(account)) {
+    return toChecksumAddress(account)
+  } else if (releaseGoldAccount !== undefined && isValidAddress(releaseGoldAccount)) {
+    return toChecksumAddress(releaseGoldAccount)
   }
-
-  return toChecksumAddress(process.env.CELO_VALIDATOR_ADDRESS)
+  console.error('Did not specify valid CELO_VALIDATOR_ADDRESS or CELO_VALIDATOR_RG_ADDRESS')
+  throw new Error('Did not specify valid CELO_VALIDATOR_ADDRESS or CELO_VALIDATOR_RG_ADDRESS')
 }
