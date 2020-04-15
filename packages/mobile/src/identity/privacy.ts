@@ -1,4 +1,5 @@
-import { getPhoneHash, isE164Number } from '@celo/utils/src/phoneNumbers'
+import { isE164Number } from '@celo/utils/src/phoneNumbers'
+import BlindThresholdBls from 'react-native-blind-threshold-bls'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { PHONE_NUM_PRIVACY_SERVICE } from 'src/config'
 import Logger from 'src/utils/Logger'
@@ -6,11 +7,13 @@ import Logger from 'src/utils/Logger'
 const TAG = 'identity/privacy'
 
 export async function getPhoneHashPrivate(e164Number: string) {
-  const salt = await getPhoneNumberSalt(e164Number)
-  return getPhoneHash(e164Number, salt)
+  BlindThresholdBls.sampleMethod('===' + e164Number, 1, console.log)
+  // const salt = await getPhoneNumberSalt(e164Number)
+  // return getPhoneHash(e164Number, salt)
 }
 
-async function getPhoneNumberSalt(e164Number: string) {
+// TODO don't export
+export async function getPhoneNumberSalt(e164Number: string) {
   Logger.debug(`${TAG}@getPhoneNumberSalt`, 'Getting phone number salt')
 
   if (!isE164Number(e164Number)) {
