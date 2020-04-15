@@ -65,6 +65,6 @@ Name | Type | Default |
 ------ | ------ | ------ |
 `claim` | [DomainClaim](_identity_claims_claim_.md#domainclaim) | - |
 `address` | string | - |
-`dnsResolver` | dnsResolverFunction | resolveTxt |
+`dnsResolver` | dnsResolverFunction | resolveTxt as any |
 
 **Returns:** *Promise‹undefined | "Unable to verify domain claim"›*
