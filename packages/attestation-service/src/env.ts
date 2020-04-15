@@ -39,5 +39,6 @@ export function getAccountAddress() {
     console.error('Did not specify valid CELO_VALIDATOR_ADDRESS')
     throw new Error('Did not specify valid CELO_VALIDATOR_ADDRESS')
   }
+  
   return toChecksumAddress(process.env.CELO_VALIDATOR_ADDRESS)
 }
