@@ -86,6 +86,7 @@ describe(checkWeb3SyncProgress, () => {
       })
       .mockReturnValueOnce(false)
 
+    // @ts-ignore
     await expectSaga(checkWeb3SyncProgress)
       .withState(state)
       .provide([[delay(100), true]])
