@@ -24,6 +24,10 @@ export class AzureKeyVaultClient {
   // https://tools.ietf.org/html/rfc5480#section-2.2
   private readonly publicKeyPrefix: number = 0x04
   private readonly secp256k1Curve = new EC('secp256k1')
+  private cryptographyClientSet: Map<string, CryptographyClient> = new Map<
+    string,
+    CryptographyClient
+  >()
 
   constructor(vaultName: string) {
     this.vaultName = vaultName
@@ -66,8 +70,7 @@ export class AzureKeyVaultClient {
     if (!(await this.hasKey(keyName))) {
       throw new Error(`Unable to locate key: ${keyName}`)
     }
-    const keyId = await this.getKeyId(keyName)
-    const cryptographyClient = new CryptographyClient(keyId, this.credential)
+    const cryptographyClient = await this.getCryptographyClient(keyName)
     // @ts-ignore-next-line (ECDSA256 is not included in the client enum but is valid)
     const signResult = await cryptographyClient.sign(this.SIGNING_ALGORITHM, message)
     // The output of this will be a 64 byte array.
@@ -180,6 +183,19 @@ export class AzureKeyVaultClient {
   }
   private static bigNumberToBuffer(input: BigNumber): Buffer {
     return ethUtil.toBuffer(ensureLeading0x(input.toString(16))) as Buffer
+  }
+
+  /**
+   * Provides the CryptographyClient for the requested key
+   * Creates a new client if it doesn't already exist
+   */
+  private async getCryptographyClient(keyName: string): Promise<CryptographyClient> {
+    if (!this.cryptographyClientSet.has(keyName)) {
+      const keyId = await this.getKeyId(keyName)
+      this.cryptographyClientSet.set(keyName, new CryptographyClient(keyId, this.credential))
+    }
+
+    return this.cryptographyClientSet.get(keyName)!
   }
 }
 

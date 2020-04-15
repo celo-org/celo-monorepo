@@ -8,11 +8,14 @@ import { Signer } from './signer'
  * Signs the EVM transaction using an HSM key in Azure Key Vault
  */
 export class AzureHSMSigner implements Signer {
-  private keyVaultClient: AzureKeyVaultClient
+  private static keyVaultClient: AzureKeyVaultClient
   private keyName: string
 
   constructor(keyVaultClient: AzureKeyVaultClient, keyName: string) {
-    this.keyVaultClient = keyVaultClient
+    if (!AzureHSMSigner.keyVaultClient) {
+      AzureHSMSigner.keyVaultClient = keyVaultClient
+    }
+
     this.keyName = keyName
   }
 
@@ -22,7 +25,7 @@ export class AzureHSMSigner implements Signer {
   ): Promise<{ v: number; r: Buffer; s: Buffer }> {
     const hash = getHashFromEncoded(encodedTx.rlpEncode)
     const bufferedMessage = Buffer.from(trimLeading0x(hash), 'hex')
-    const signature = await this.keyVaultClient.signMessage(bufferedMessage, this.keyName)
+    const signature = await AzureHSMSigner.keyVaultClient.signMessage(bufferedMessage, this.keyName)
     const sigV = addToV + signature.v
 
     return {
@@ -35,7 +38,10 @@ export class AzureHSMSigner implements Signer {
   async signPersonalMessage(data: string): Promise<{ v: number; r: Buffer; s: Buffer }> {
     const dataBuff = ethUtil.toBuffer(ensureLeading0x(data))
     const msgHashBuff = ethUtil.hashPersonalMessage(dataBuff)
-    const signature = await this.keyVaultClient.signMessage(Buffer.from(msgHashBuff), this.keyName)
+    const signature = await AzureHSMSigner.keyVaultClient.signMessage(
+      Buffer.from(msgHashBuff),
+      this.keyName
+    )
     // Recovery ID should be a byte prefix
     // https://bitcoin.stackexchange.com/questions/38351/ecdsa-v-r-s-what-is-v
     const sigV = signature.v + 27
