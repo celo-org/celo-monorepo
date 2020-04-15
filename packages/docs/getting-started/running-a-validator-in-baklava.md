@@ -250,9 +250,9 @@ There are number of new environment variables, and you may use this table as a r
 | NETWORK_ID                           | The Celo Baklava network chain ID                                                                                                    |
 | CELO_VALIDATOR_GROUP_RG_ADDRESS         | The `ReleaseGold` contract address for the Validator Group                                                                                          |
 | CELO_VALIDATOR_RG_ADDRESS         | The `ReleaseGold` contract address for the Validator                                                                                          |
-| CELO_VALIDATOR_GROUP_SIGNER_ADDRESS        | The address of the Validator signer authorized by the Validator Group Account                                                              |
+| CELO_VALIDATOR_GROUP_SIGNER_ADDRESS        | The address of the validator signer address authorized by the Validator Group Account                                                              |
 | CELO_VALIDATOR_GROUP_SIGNER_SIGNATURE      | The proof-of-possession of the Validator Group signer key                                                                                  |
-| CELO_VALIDATOR_SIGNER_ADDRESS        | The address of the Validator signer authorized by the Validator Account                                                              |
+| CELO_VALIDATOR_SIGNER_ADDRESS        | The address of the validator signer address authorized by the Validator Account                                                              |
 | CELO_VALIDATOR_SIGNER_PUBLIC_KEY     | The ECDSA public key associated with the Validator signer address                                                                    |
 | CELO_VALIDATOR_SIGNER_SIGNATURE      | The proof-of-possession of the Validator signer key                                                                                  |
 | CELO_VALIDATOR_SIGNER_BLS_PUBLIC_KEY | The BLS public key for the Validator instance                                                                                        |
