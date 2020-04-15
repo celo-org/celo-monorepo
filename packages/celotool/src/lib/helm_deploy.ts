@@ -744,7 +744,7 @@ export function makeHelmParameters(map: { [key: string]: string }) {
 export async function deleteFromCluster(celoEnv: string) {
   await removeHelmRelease(celoEnv)
   console.info(`Deleting namespace ${celoEnv}`)
-  await execCmdWithExitOnFailure(`kubectl delete namespace ${celoEnv}`)
+  // await execCmdWithExitOnFailure(`kubectl delete namespace ${celoEnv}`)
 }
 
 function useStaticIPsForGethNodes() {

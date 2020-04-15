@@ -15,11 +15,11 @@ import {
   REGISTRY_ADDRESS,
   TEMPLATE,
 } from './genesis_constants'
+import { GenesisConfig } from './interfaces/genesis-config'
 import { ensure0x, strip0x } from './utils'
 
 import bip32 = require('bip32')
 import bip39 = require('bip39')
-import { GenesisConfig } from './interfaces/genesis-config'
 
 const ec = new EC('secp256k1')
 
@@ -193,8 +193,12 @@ export const getFaucetedAccounts = (mnemonic: string) => {
 export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
   const mnemonic = fetchEnv(envVar.MNEMONIC)
   const validatorEnv = fetchEnv(envVar.VALIDATORS)
+  // Todo: Link this with value from migrationsConfig.js
+  const maxElectableValidators = 100
+  const validatorCount = Math.max(parseInt(validatorEnv, 10), maxElectableValidators)
   const genesisAccountsEnv = fetchEnvOrFallback(envVar.GENESIS_ACCOUNTS, '')
-  const validators = getValidatorsInformation(mnemonic, parseInt(validatorEnv, 10))
+  const validators = getValidatorsInformation(mnemonic, validatorCount)
+  console.info(`jcortejoso validators: ${validators}`)
 
   const consensusType = fetchEnv(envVar.CONSENSUS_TYPE) as ConsensusType
 

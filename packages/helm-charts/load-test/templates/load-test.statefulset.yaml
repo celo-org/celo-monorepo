@@ -156,6 +156,7 @@ spec:
         - "-c"
         - |-
           set -euo pipefail
+          cp -rp /root/.celo_share /root/.celo
           cp /var/geth/static-nodes.json /root/.celo/static-nodes.json
 
           ACCOUNT_ADDRESS=$(awk 'NR=={{ add $index 1 }}' /root/.celo/address)
@@ -183,11 +184,12 @@ spec:
             cpu: 25m
         volumeMounts:
         - name: data
-          mountPath: /root/.celo
+          mountPath: /root/.celo_share
+          readOnly: true
         - name: config
           mountPath: /var/geth
         - name: account
-          mountPath: "/root/.celo/account"
+          mountPath: "/root/.celo_share/account"
           readOnly: true
 {{ end }}
       - name: simulate-client

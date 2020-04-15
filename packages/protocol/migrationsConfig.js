@@ -1,5 +1,9 @@
-const { toFixed } = require('@celo/utils/lib/fixidity')
-const { CeloContractName } = require('@celo/protocol/lib/registry-utils')
+const {
+  toFixed
+} = require('@celo/utils/lib/fixidity')
+const {
+  CeloContractName
+} = require('@celo/protocol/lib/registry-utils')
 
 const BigNumber = require('bignumber.js')
 const minimist = require('minimist')

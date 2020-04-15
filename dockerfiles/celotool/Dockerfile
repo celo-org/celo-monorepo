@@ -9,6 +9,7 @@ RUN apt-get update && \
   curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - && \
   apt-get update -y && \
   apt-get install -y google-cloud-sdk && \
+  apt-get install -y libusb-dev libudev-dev && \
   rm -rf /var/lib/apt/lists/*
 
 
