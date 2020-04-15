@@ -95,7 +95,6 @@ const styles = StyleSheet.create({
   terms: {
     flex: 1,
     padding: 20,
-    marginBottom: 40,
   },
   header: {
     ...fontStyles.body,

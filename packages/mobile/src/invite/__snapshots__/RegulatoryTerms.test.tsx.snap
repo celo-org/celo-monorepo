@@ -49,7 +49,6 @@ exports[`RegulatoryTermsScreen renders correctly 1`] = `
         style={
           Object {
             "flex": 1,
-            "marginBottom": 40,
             "padding": 20,
           }
         }
