@@ -72,7 +72,7 @@ type dnsResolverFunction = (
 export const verifyDomainRecord = async (
   claim: DomainClaim,
   address: string,
-  dnsResolver: dnsResolverFunction = resolveTxt
+  dnsResolver: dnsResolverFunction = resolveTxt as any
 ) => {
   const found = await new Promise((resolve) => {
     dnsResolver(claim.domain, (error, domainRecords) => {
