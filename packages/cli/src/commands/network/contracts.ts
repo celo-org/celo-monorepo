@@ -1,8 +1,8 @@
 import { CeloContract, NULL_ADDRESS } from '@celo/contractkit/lib'
+import { PROXY_ABI } from '@celo/contractkit/lib/governance/proxy'
 import { ContractFactories } from '@celo/contractkit/lib/web3-contract-cache'
 import { BaseCommand } from '../../base'
 import { printValueMapRecursive } from '../../utils/cli'
-import { PROXY_ABI } from '@celo/contractkit/src/governance/proxy'
 
 export default class Contracts extends BaseCommand {
   static description = 'Prints Celo contract addesses.'
