@@ -76,7 +76,6 @@ const DefaultConfig = {
     targetVotingGoldFraction: 1 / 2,
     maxValidatorEpochPayment: '205479452054794520547', // (75,000 / 365) * 10 ^ 18
     communityRewardFraction: 1 / 4,
-    // TODO(asa): Must be set before RC1
     carbonOffsettingPartner: '0x0000000000000000000000000000000000000000',
     carbonOffsettingFraction: 1 / 1000,
     frozen: true,
@@ -89,7 +88,7 @@ const DefaultConfig = {
     frozen: true,
   },
   gasPriceMinimum: {
-    minimumFloor: 1000000000,
+    minimumFloor: 100000000,
     targetDensity: 1 / 2,
     adjustmentSpeed: 1 / 2,
   },
@@ -110,15 +109,16 @@ const DefaultConfig = {
     participationBaselineQuorumFactor: 1,
   },
   governanceApproverMultiSig: {
-    // 2/4 multsig
+    // 2/7 multsig, with 4/7 to make multisig changes.
+    // TODO(asa): Needs updating before RC1 deployment
     signatories: [
-      '0x32830A3f65DF98aFCFA18bAd35009Aa51163D606',
+      '0xBE0c3B35Ec3f759D9A67c4B7c539b0D5b52A4642',
       '0x7c593219ad21e172c1fdc6bfdc359699fa428adb',
       '0x31af68f73fb93815b3eB9a6FA76e63113De5f733',
       '0x47fE4b9fFDB9712fC5793B1b5E86d96a4664cf02',
     ],
     numRequiredConfirmations: 2,
-    numInternalRequiredConfirmations: 2,
+    numInternalRequiredConfirmations: 4,
     useMultiSig: true,
   },
   lockedGold: {
@@ -137,6 +137,7 @@ const DefaultConfig = {
     tobinTaxStalenessThreshold: HOUR, // 1 hour
     dailySpendingRatio: toFixed(0.05).toFixed(), // 5%
     spenders: [],
+    // TODO(asa): Needs updating before RC1 deployment
     otherAddresses: ['0xd0a57D8acFe9979d33933d8A52971E6DC9E2DbF0'],
     assetAllocationSymbols: ['cGLD', 'BTC', 'ETH', 'DAI'],
     assetAllocationWeights: [0.5, 0.2, 0.1, 0.2],
@@ -144,8 +145,8 @@ const DefaultConfig = {
   reserveSpenderMultiSig: {
     // 2/2 multsig
     signatories: [
-      '0x49eFFA2ceF5FccA5540f421d6b28e76184cc0fDF',
-      '0x4550F1576fAC966Ac8b9F42e1D5D66D3A14dD8D3',
+      '0x21E7082D7b0Bc12BF65296CF859E09Fe529d366d',
+      '0xbf4D39e774F438B6f8B8d7e56f26Fd2409F6ACF2',
     ],
     numRequiredConfirmations: 2,
     numInternalRequiredConfirmations: 2,
@@ -161,10 +162,12 @@ const DefaultConfig = {
       addresses: [],
       values: [],
     },
+    // TODO(asa): Needs updating before RC1 deployment
     oracles: [],
     frozen: true,
   },
   transferWhitelist: {
+    // TODO(asa): Needs updating before RC1 deployment
     addresses: [
       '0x49eFFA2ceF5FccA5540f421d6b28e76184cc0fDF',
       '0x4550F1576fAC966Ac8b9F42e1D5D66D3A14dD8D3',
@@ -244,7 +247,8 @@ const NetworkConfigs = {
     },
     reserve: {
       initialBalance: 100000000,
-      otherAddresses: ['0x7457d5E02197480Db681D3fdF256c7acA21bDc12'], // Add an arbitrary "otherReserveAddress" so that reserve spending can be tested.
+      // Add an arbitrary "otherReserveAddress" so that reserve spending can be tested.
+      otherAddresses: ['0x7457d5E02197480Db681D3fdF256c7acA21bDc12'],
     },
     reserveSpenderMultiSig: {
       signatories: [network.from],
