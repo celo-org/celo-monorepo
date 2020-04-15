@@ -12,6 +12,10 @@ const renderNodes = (reactNodes) => {
     return reactNodes
   }
 
+  if (React.isValidElement(reactNodes)) {
+    return reactNodes
+  }
+
   return Object.keys(reactNodes).map((key, i) => {
     const child = reactNodes[key]
     const isElement = React.isValidElement(child)

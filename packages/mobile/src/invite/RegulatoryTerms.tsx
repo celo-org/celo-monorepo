@@ -1,10 +1,11 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
 import fontStyles from '@celo/react-components/styles/fonts'
 import * as React from 'react'
-import { WithTranslation, Trans } from 'react-i18next'
+import { Trans, WithTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
+import { acceptTerms } from 'src/account/actions'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
 import DevSkipButton from 'src/components/DevSkipButton'
 import { CELO_TERMS_LINK } from 'src/config'
@@ -19,14 +20,21 @@ function mapStateToProps(state: RootState) {
   return {}
 }
 
-type Props = WithTranslation
+interface DispatchProps {
+  acceptTerms: typeof acceptTerms
+}
+
+const mapDispatchToProps: DispatchProps = {
+  acceptTerms,
+}
+
+type Props = WithTranslation & DispatchProps
 
 export class RegulatoryTerms extends React.Component<Props> {
   static navigationOptions = nuxNavigationOptions
 
   onPressAccept = () => {
-    // TODO progress to next screen
-    //  possibly store acceptance in redux?
+    this.props.acceptTerms()
     navigate(Screens.EnterInviteCode)
   }
 
@@ -70,9 +78,9 @@ export class RegulatoryTerms extends React.Component<Props> {
 }
 
 export default componentWithAnalytics(
-  connect<{}, {}, {}, RootState>(
+  connect<{}, DispatchProps, {}, RootState>(
     mapStateToProps,
-    {}
+    mapDispatchToProps
   )(withTranslation(Namespaces.nuxNamePin1)(RegulatoryTerms))
 )
 

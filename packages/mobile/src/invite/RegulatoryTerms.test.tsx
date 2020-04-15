@@ -3,8 +3,10 @@ import 'react-native'
 import { fireEvent, render } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
-import RegulatoryTerms from 'src/invite/RegulatoryTerms'
-import { createMockStore } from 'test/utils'
+import RegulatoryTerms, {
+  RegulatoryTerms as RegulatoryTermsClass,
+} from 'src/invite/RegulatoryTerms'
+import { createMockStore, getMockI18nProps } from 'test/utils'
 
 describe('RegulatoryTermsScreen', () => {
   it('renders correctly', () => {
@@ -18,15 +20,16 @@ describe('RegulatoryTermsScreen', () => {
   })
 
   describe('when accept button is pressed', () => {
-    xit('records that in redux', () => {
-      const store = createMockStore()
+    it('stores that info', async () => {
+      const store = createMockStore({})
+      const acceptTerms = jest.fn()
       const wrapper = render(
         <Provider store={store}>
-          <RegulatoryTerms />
+          <RegulatoryTermsClass {...getMockI18nProps()} acceptTerms={acceptTerms} />
         </Provider>
       )
-      fireEvent.press(wrapper.getByText('accept'))
-      expect(store).toEqual({})
+      fireEvent.press(wrapper.getByTestId('AcceptTermsButton'))
+      expect(acceptTerms).toHaveBeenCalled()
     })
   })
 })
