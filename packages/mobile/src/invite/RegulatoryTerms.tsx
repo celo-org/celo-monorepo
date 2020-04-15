@@ -99,6 +99,7 @@ const styles = StyleSheet.create({
   header: {
     ...fontStyles.body,
     ...fontStyles.semiBold,
+    marginBottom: 10,
   },
   disclaimer: {
     ...fontStyles.body,

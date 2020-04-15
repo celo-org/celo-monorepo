@@ -74,6 +74,7 @@ exports[`RegulatoryTermsScreen renders correctly 1`] = `
               "fontFamily": "Hind-SemiBold",
               "fontSize": 16,
               "lineHeight": 24,
+              "marginBottom": 10,
             }
           }
         >
@@ -112,6 +113,7 @@ exports[`RegulatoryTermsScreen renders correctly 1`] = `
               "fontFamily": "Hind-SemiBold",
               "fontSize": 16,
               "lineHeight": 24,
+              "marginBottom": 10,
             }
           }
         >
