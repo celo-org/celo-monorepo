@@ -83,7 +83,7 @@ const DefaultConfig = {
   },
   exchange: {
     spread: 5 / 1000,
-    reserveFraction: 1 / 20,
+    reserveFraction: 1 / 100,
     updateFrequency: 5 * MINUTE,
     minimumReports: 5,
     frozen: true,
