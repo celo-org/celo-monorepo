@@ -97,18 +97,18 @@ The Celo app is now ready for use and you should see `Application is ready` on t
 Accounts are automatically generated on your device. In the terminal on your computer, you can view the first account addresses with the following command:
 
 ```bash
-celocli node:accounts --useLedger --ledgerAddresses 1
+celocli account:list --useLedger --ledgerAddresses 1
 ```
 
 {% hint style="tip" %}
 If you wish to generate more than one address from your seed phrase, you can display the first `N` (e.g. 10) addresses use the `--ledgerAddresses` flag.
 ```bash
-celocli node:accounts --useLedger --ledgerAddresses N
+celocli account:list --useLedger --ledgerAddresses N
 ```
 
 To display addresses at specific indexes `M`and `N`(e. 2 and 654) use the `--ledgerCustomAddresses "[M, N]"`flag
 ```bash
-celocli node:accounts --useLedger --ledgerCustomAddresses "[M, N]"
+celocli account:list --useLedger --ledgerCustomAddresses "[M, N]"
 ```
  {% endhint %}
 

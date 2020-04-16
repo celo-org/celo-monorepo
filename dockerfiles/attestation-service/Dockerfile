@@ -29,4 +29,4 @@ ENV NODE_ENV production
 RUN yarn build
 
 WORKDIR /celo-monorepo/packages/attestation-service
-CMD ["node lib/index.js"]
+ENTRYPOINT ["node", "lib/index.js"]
