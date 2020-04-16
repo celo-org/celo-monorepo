@@ -48,7 +48,7 @@
     "pg": "7.12.1",
     "pg-hstore": "2.3.3",
     "prom-client": "11.2.0",
-    "sequelize": "5.13.1",
+    "sequelize": "5.15.1",
     "sequelize-cli": "5.5.0",
     "sqlite3": "4.0.9",
     "twilio": "^3.23.2",

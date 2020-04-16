@@ -48,7 +48,7 @@
     "firebase-bolt": "^0.8.4",
     "firebase-functions-test": "^0.1.6",
     "firebase-tools": "^7.6.2",
-    "minimist": "^1.2.0",
+    "minimist": "^1.2.3",
     "supertest": "^3.4.2"
   },
   "engines": {
