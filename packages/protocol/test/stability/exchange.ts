@@ -858,8 +858,6 @@ contract('Exchange', (accounts: string[]) => {
               from: user,
             }
           )
-          const newGoldBucket = await exchange.goldBucket()
-          const newStableBucket = await exchange.stableBucket()
 
           const exchangeLogs = exchangeTx.logs.filter((x) => x.event === 'BucketsUpdated')
           assert(exchangeLogs.length === 1, 'Did not receive event')
@@ -868,8 +866,8 @@ contract('Exchange', (accounts: string[]) => {
           assertLogMatches2(log, {
             event: 'BucketsUpdated',
             args: {
-              goldBucket: newGoldBucket,
-              stableBucket: newStableBucket,
+              goldBucket: updatedGoldBucket,
+              stableBucket: updatedStableBucket,
             },
           })
         })
