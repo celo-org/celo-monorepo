@@ -1,6 +1,11 @@
 FROM node:10
 WORKDIR /celo-monorepo
 
+RUN apt-get update && \
+  apt-get update -y && \
+  apt-get install -y libusb-dev && \
+  rm -rf /var/lib/apt/lists/*
+
 # ensure yarn.lock is evaluated by kaniko cache diff
 COPY lerna.json package.json yarn.lock ./
 COPY scripts/ scripts/
