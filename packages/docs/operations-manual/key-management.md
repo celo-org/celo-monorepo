@@ -12,18 +12,18 @@ The Celo protocol was designed with the understanding that there is often an inh
 
 ## Summary
 
-The table below outlines a summary of the various key types in the Celo protocol. Note that these key types are *mutually exclusive*. A key that has been designated as one key type can never be used for a different purpose. For more details on a specific key type, please see that key type's specific section below.
+The table below outlines a summary of the various key types in the Celo protocol. Note that these key types are *mutually exclusive*. A key that has been designated as one key type can never be used for a different purpose. Undesignated keys are the default type, and can be designated as any of the other types other than BLS keys, which are unique. For more details on a specific key type, please see that key type's specific section below.
 
 
-| Type                                | Description                                                                       | Ledger compatible |
-| ----------------------------------- |-----------------------------------------------------------------------------------|-------------------|
-| Undesignate                         | Default key type, cannot participate in proof-of-stake                            | Yes               |
-| Locked Gold Account (LGA)           | Used to lock and unlock cGLD and authorize other keys                             | Yes               |
-| Authorized vote signer              | Can vote on behalf of an LGA                                                      | Yes               |
-| Authorized validator (group) signer | Can register and manage a validator group on behalf of an LGA                     | No                |
-| Authorized validator signer         | Can register, manage a validator, and sign consensus messages on behalf of an LGA | No                |
-| Authorized validator BLS signer     | Used to sign blocks as a validator                                                | No                |
-| Authorized attestations signer      | Can sign attestations messages on behalf of a Locked Gold account                 | No                |
+| Type                                | Description                                                                                      | Ledger compatible |
+| ----------------------------------- |--------------------------------------------------------------------------------------------------|-----|
+| Undesignated                        | Default key type, cannot participate in proof-of-stake                                           | Yes |
+| Locked Gold Account                 | Used to lock and unlock cGLD and authorize other keys                                            | Yes |
+| Authorized vote signer              | Can vote on behalf of a Locked Gold Account                                                      | Yes |
+| Authorized validator (group) signer | Can register and manage a validator group on behalf of a Locked Gold Account                     | Yes |
+| Authorized validator signer         | Can register, manage a validator, and sign consensus messages on behalf of a Locked Gold Account | No  |
+| Authorized validator BLS signer     | Used to sign blocks as a validator                                                               | No  |
+| Authorized attestations signer      | Can sign attestations messages on behalf of a Locked Gold account                                | No  |
 
 
 {% hint style="warning" %}
@@ -64,7 +64,7 @@ Note that the vote signing key must first be used to generate a "proof-of-posses
 
 
 ### Authorizing a Vote Signer
-An undesignated key may be authorized as a vote signer on behalf of a Locked Gold Account by runnign the following commands:
+An undesignated key may be authorized as a vote signer on behalf of a Locked Gold Account by running the following commands:
 
 ```shell
 # Create a proof-of-possession. Note that the signer private key must be available.
@@ -94,7 +94,7 @@ Note that the validator signing key must first be used to generate a "proof-of-p
 
 
 ### Authorizing a Validator Signer
-An undesignated key may be authorized as a validator signer on behalf of a Locked Gold Account by runnign the following commands:
+An undesignated key may be authorized as a validator signer on behalf of a Locked Gold Account by running the following commands:
 
 ```shell
 # Create a proof-of-possession. Note that the signer private key must be available.
@@ -152,7 +152,7 @@ Note that the attestations signing key must first be used to generate a "proof-o
 
 
 ### Authorizing an Attestations Signer
-An undesignated key may be authorized as a vote signer on behalf of a Locked Gold Account by runnign the following commands:
+An undesignated key may be authorized as a vote signer on behalf of a Locked Gold Account by running the following commands:
 
 ```shell
 # Create a proof-of-possession. Note that the signer private key must be available.
