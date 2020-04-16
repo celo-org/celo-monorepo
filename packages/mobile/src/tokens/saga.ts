@@ -87,7 +87,7 @@ export function tokenFetchFactory({ actionName, token, actionCreator, tag }: Tok
 
 export interface BasicTokenTransfer {
   recipientAddress: string
-  amount: string
+  amount: BigNumber.Value
   comment: string
 }
 
@@ -108,7 +108,7 @@ interface TokenTransferFactory {
 }
 
 // TODO(martinvol) this should go to the SDK
-export async function createTransaction(
+export async function createTokenTransferTransaction(
   currency: CURRENCY_ENUM,
   transferAction: BasicTokenTransfer
 ) {
@@ -168,11 +168,15 @@ export function tokenTransferFactory({
       try {
         const account = yield call(getConnectedUnlockedAccount)
 
-        const tx: CeloTransactionObject<boolean> = yield call(createTransaction, currency, {
-          recipientAddress,
-          amount,
-          comment,
-        })
+        const tx: CeloTransactionObject<boolean> = yield call(
+          createTokenTransferTransaction,
+          currency,
+          {
+            recipientAddress,
+            amount,
+            comment,
+          }
+        )
 
         yield call(sendAndMonitorTransaction, txId, tx, account, currency)
       } catch (error) {

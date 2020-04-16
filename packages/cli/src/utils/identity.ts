@@ -33,7 +33,7 @@ export abstract class ClaimCommand extends BaseCommand {
     const filePath = args.file
     try {
       cli.action.start(`Read Metadata from ${filePath}`)
-      const data = IdentityMetadataWrapper.fromFile(filePath)
+      const data = IdentityMetadataWrapper.fromFile(this.kit, filePath)
       cli.action.stop()
       return data
     } catch (error) {
@@ -48,11 +48,12 @@ export abstract class ClaimCommand extends BaseCommand {
     return NativeSigner(this.kit.web3.eth.sign, address)
   }
 
-  protected async addClaim(metadata: IdentityMetadataWrapper, claim: Claim) {
+  protected async addClaim(metadata: IdentityMetadataWrapper, claim: Claim): Promise<Claim> {
     try {
       cli.action.start(`Add claim`)
-      await metadata.addClaim(claim, this.signer)
+      const addedClaim = await metadata.addClaim(claim, this.signer)
       cli.action.stop()
+      return addedClaim
     } catch (error) {
       cli.action.stop(`Error: ${error}`)
       throw error
@@ -84,18 +85,13 @@ export const claimFlags = {
 export const claimArgs = [Args.file('file', { description: 'Path of the metadata file' })]
 
 export const displayMetadata = async (metadata: IdentityMetadataWrapper, kit: ContractKit) => {
-  const metadataURLGetter = async (address: string) => {
-    const accounts = await kit.contracts.getAccounts()
-    return accounts.getMetadataURL(address)
-  }
-
   const data = await concurrentMap(5, metadata.claims, async (claim) => {
     const verifiable = VERIFIABLE_CLAIM_TYPES.includes(claim.type)
     const validatable = VALIDATABLE_CLAIM_TYPES.includes(claim.type)
     const status = verifiable
-      ? await verifyClaim(claim, metadata.data.meta.address, metadataURLGetter)
+      ? await verifyClaim(kit, claim, metadata.data.meta.address)
       : validatable
-      ? await validateClaim(claim, metadata.data.meta.address, kit)
+      ? await validateClaim(kit, claim, metadata.data.meta.address)
       : 'N/A'
     let extra = ''
     switch (claim.type) {
@@ -144,10 +140,11 @@ export const displayMetadata = async (metadata: IdentityMetadataWrapper, kit: Co
 }
 
 export const modifyMetadata = async (
+  kit: ContractKit,
   filePath: string,
   operation: (metadata: IdentityMetadataWrapper) => Promise<void>
 ) => {
-  const metadata = IdentityMetadataWrapper.fromFile(filePath)
+  const metadata = await IdentityMetadataWrapper.fromFile(kit, filePath)
   await operation(metadata)
   writeFileSync(filePath, metadata.toString())
 }
