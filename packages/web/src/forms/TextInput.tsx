@@ -46,3 +46,5 @@ export class TextInput extends React.PureComponent<
     )
   }
 }
+
+export default TextInput
