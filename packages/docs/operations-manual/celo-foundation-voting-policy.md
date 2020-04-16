@@ -55,7 +55,7 @@ In addition to meeting the standard criteria, outlined above, the Foundation ant
 
 At Celo Mainnet release, the Foundation will vote for the [top 50](https://docs.google.com/spreadsheets/d/e/2PACX-1vQwk10o6YV0uriR8LuYfLqB1irjmOX_-L6Jljn3BtKlmz_R_TsUU8aI-pMqGVlu4HQKIQlQaFkUhsyl/pubhtml?gid=1970613133&single=true) The Great Celo Stake Off (TGCSO) winners divided into the following two cohorts:
 * **Cohort 1:** open to TGCSO leaderboard participants at ranking 26-50, this cohort will receive votes for 3 months period
-* **Cohort 2:** open to TGCSO leaderboard participants at ranking 1-25, this cohort will receive votes for 3 months period
+* **Cohort 2:** open to TGCSO leaderboard participants at ranking 1-25, this cohort will receive votes for 6 months period
 
 Following Mainnet release, the Foundation will open the application process for a third cohort. This third cohort must meet basic requirements (as stated above) and it is anticipated that this third cohort may  begin to receive votes 3 months after Mainnet release, and will receive votes for the expected 9 month period.
 
