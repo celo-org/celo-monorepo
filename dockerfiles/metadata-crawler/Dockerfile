@@ -33,5 +33,4 @@ RUN yarn build
 
 WORKDIR /celo-monorepo/packages/metadata-crawler
 
-CMD ["yarn dev"]
-
+CMD ["node", "lib/crawler.js"]

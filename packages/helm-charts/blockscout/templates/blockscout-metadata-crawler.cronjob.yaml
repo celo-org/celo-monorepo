@@ -49,7 +49,7 @@ spec:
             - -c
             - |
               trap "touch /tmp/pod/main-terminated" EXIT
-              yarn dev
+              node lib/crawler.js
             env:
             - name: PGHOST
               value: "127.0.0.1"
