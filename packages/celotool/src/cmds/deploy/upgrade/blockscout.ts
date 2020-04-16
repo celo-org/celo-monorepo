@@ -45,7 +45,7 @@ export const handler = async (argv: BlockscoutUpgradeArgv) => {
       'Running upgrade with --reset flag which will reset the database and reinstall the helm chart'
     )
 
-    await removeHelmRelease(argv.celoEnv)
+    await removeHelmRelease(helmReleaseName)
 
     console.info('Sleep for 30 seconds to have all connections killed')
     await sleep(30000)
@@ -54,7 +54,10 @@ export const handler = async (argv: BlockscoutUpgradeArgv) => {
     console.info(`Delete blockscout-migration`)
     try {
       await execCmdWithExitOnFailure(
-        `kubectl delete job ${argv.celoEnv}-blockscout-migration -n ${argv.celoEnv}`
+        `kubectl delete job ${argv.celoEnv}-blockscout${fetchEnvOrFallback(
+          'BLOCKSCOUT_DB_SUFFIX',
+          ''
+        )}-migration -n ${argv.celoEnv}`
       )
     } catch (error) {
       console.error(error)
