@@ -17,10 +17,12 @@ import {
   rlpEncodedTx,
   signatureFormatter,
 } from '../utils/signing-utils'
+import { tokenInfoByAddressAndChainId } from './ledger-utils/tokens'
 import { Wallet } from './wallet'
 
 export const CELO_BASE_DERIVATION_PATH = "44'/52752'/0'/0"
 const ADDRESS_QTY = 5
+const CELO_APP_ACCEPTS_CONTRACT_DATA_FROM_VERSION = '1.0.2'
 
 // Validates an address using the Ledger
 export enum AddressValidation {
@@ -60,6 +62,10 @@ export class LedgerWallet implements Wallet {
   private addressesRetrieved = false
   private setupFinished = false
   private setupLocked = false
+  private appConfiguration: { arbitraryDataEnabled: number; version: string } = {
+    arbitraryDataEnabled: 0,
+    version: '0.0.0',
+  }
   private ledger: any
 
   /**
@@ -97,6 +103,7 @@ export class LedgerWallet implements Wallet {
       if (!this.ledger) {
         this.ledger = this.generateNewLedger(transport)
       }
+      await this.retrieveAppConfiguration()
       if (!this.addressesRetrieved) {
         debug('Fetching addresses from the ledger')
         await this.retrieveAccounts()
@@ -110,6 +117,15 @@ export class LedgerWallet implements Wallet {
       throw error
     } finally {
       this.setupLocked = false
+    }
+  }
+
+  private async retrieveAppConfiguration() {
+    this.appConfiguration = await this.ledger!.getAppConfiguration()
+    if (!this.appConfiguration.arbitraryDataEnabled) {
+      console.warn(
+        'Beware, your ledger does not allow the use of contract data. Some features may not work correctly'
+      )
     }
   }
 
@@ -185,6 +201,20 @@ export class LedgerWallet implements Wallet {
     try {
       const rlpEncoded = rlpEncodedTx(txParams)
       const path = await this.getDerivationPathFor(txParams.from!.toString())
+      if (
+        LedgerWallet.compareLedgerAppVersions(
+          this.appConfiguration.version,
+          CELO_APP_ACCEPTS_CONTRACT_DATA_FROM_VERSION
+        ) >= 0
+      ) {
+        const tokenInfo = tokenInfoByAddressAndChainId(
+          rlpEncoded.transaction.to!,
+          rlpEncoded.transaction.chainId!
+        )
+        if (tokenInfo) {
+          await this.ledger!.provideERC20TokenInformation(tokenInfo)
+        }
+      }
       const signature = await this.ledger!.signTransaction(
         path,
         trimLeading0x(rlpEncoded.rlpEncode) // the ledger requires the rlpEncode without the leading 0x
@@ -300,5 +330,22 @@ export class LedgerWallet implements Wallet {
       )
     }
     throw error
+  }
+
+  /**
+   * @return
+   * -1: version1 < version2,
+   *  0: version1 == version2,
+   *  1: version1 > version2
+   */
+  static compareLedgerAppVersions(version1: string, version2: string): number {
+    const numberV1 = this.stringVersionToNumber(version1)
+    const numberV2 = this.stringVersionToNumber(version2)
+    return numberV1 < numberV2 ? -1 : numberV1 === numberV2 ? 0 : 1
+  }
+
+  private static stringVersionToNumber(version: string): number {
+    const parts = version.split('.')
+    return parts.reduce((accum, part) => (accum + Number(part)) * 1000, 0)
   }
 }

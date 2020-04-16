@@ -8,12 +8,21 @@
 
 ### Properties
 
+* [lastBucketUpdate](_wrappers_exchange_.exchangeconfig.md#lastbucketupdate)
 * [minimumReports](_wrappers_exchange_.exchangeconfig.md#minimumreports)
 * [reserveFraction](_wrappers_exchange_.exchangeconfig.md#reservefraction)
 * [spread](_wrappers_exchange_.exchangeconfig.md#spread)
 * [updateFrequency](_wrappers_exchange_.exchangeconfig.md#updatefrequency)
 
 ## Properties
+
+###  lastBucketUpdate
+
+• **lastBucketUpdate**: *BigNumber*
+
+*Defined in [contractkit/src/wrappers/Exchange.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Exchange.ts#L20)*
+
+___
 
 ###  minimumReports
 

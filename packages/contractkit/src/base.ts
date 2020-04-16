@@ -26,6 +26,29 @@ export enum CeloContract {
   Validators = 'Validators',
 }
 
+export const ProxyContracts = [
+  'AccountsProxy',
+  'AttestationsProxy',
+  'BlockchainParametersProxy',
+  'DoubleSigningSlasherProxy',
+  'DowntimeSlasherProxy',
+  'ElectionProxy',
+  'EpochRewardsProxy',
+  'EscrowProxy',
+  'ExchangeProxy',
+  'FeeCurrencyWhitelistProxy',
+  'GasPriceMinimumProxy',
+  'GoldTokenProxy',
+  'GovernanceApproverMultiSigProxy',
+  'GovernanceProxy',
+  'LockedGoldProxy',
+  'ReserveProxy',
+  'ReserveSpenderMultiSigProxy',
+  'StableTokenProxy',
+  'SortedOraclesProxy',
+  'RegistryProxy',
+]
+
 export type CeloToken = CeloContract.GoldToken | CeloContract.StableToken
 
 export const AllContracts = Object.keys(CeloContract).map(
