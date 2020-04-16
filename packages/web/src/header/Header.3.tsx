@@ -28,7 +28,6 @@ const CookieConsent = dynamic(
 const menuItems = MAIN_MENU
 const DARK_PAGES = new Set([
   menu.HOME.link,
-  menu.COMMUNITY.link,
   menu.BUILD.link,
   menu.ALLIANCE_COLLECTIVE.link,
   menu.DEVELOPERS.link,
