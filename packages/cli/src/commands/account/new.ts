@@ -29,11 +29,16 @@ export default class NewAccount extends LocalCommand {
         'spanish',
       ],
       default: 'english',
-      description: 'Role to delegate',
+      description: 'Language for the mnemonic words',
     }),
   }
 
-  static examples = ['new']
+  static examples = [
+    'new',
+    'new --password 12341234',
+    'new --language spanish',
+    'new --password 12341234 --language japanese --indexAddress 5',
+  ]
 
   static languageOptions(language: string): MnemonicLanguages | undefined {
     if (language) {
