@@ -113,9 +113,7 @@ const DefaultConfig = {
     // TODO(asa): Needs updating before RC1 deployment
     signatories: [
       '0xBE0c3B35Ec3f759D9A67c4B7c539b0D5b52A4642',
-      '0x7c593219ad21e172c1fdc6bfdc359699fa428adb',
-      '0x31af68f73fb93815b3eB9a6FA76e63113De5f733',
-      '0x47fE4b9fFDB9712fC5793B1b5E86d96a4664cf02',
+      '0xD6d48412dA0804CF88258bfDf5AaFcBe5FEd7ecC',
     ],
     numRequiredConfirmations: 2,
     numInternalRequiredConfirmations: 4,
