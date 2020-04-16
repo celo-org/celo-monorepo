@@ -36,10 +36,32 @@ const query = gql`
         lockedGold
         name
         usd
+        claims(first: 10) {
+          edges {
+            node {
+              address
+              element
+              type
+              verified
+            }
+          }
+        }
       }
       affiliates(first: 20) {
         edges {
           node {
+            account {
+              claims(first: 10) {
+                edges {
+                  node {
+                    address
+                    element
+                    type
+                    verified
+                  }
+                }
+              }
+            }
             address
             lastElected
             lastOnline

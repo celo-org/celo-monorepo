@@ -1,6 +1,6 @@
 {
   "name": "@celo/contractkit",
-  "version": "0.3.6-dev",
+  "version": "0.3.7-dev",
   "description": "Celo's ContractKit to interact with Celo network",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
@@ -34,8 +34,8 @@
     "bignumber.js": "^9.0.0",
     "cross-fetch": "3.0.4",
     "debug": "^4.1.1",
-    "ethereumjs-util": "^5.2.0",
     "eth-lib": "^0.2.8",
+    "ethereumjs-util": "^5.2.0",
     "fp-ts": "2.1.1",
     "io-ts": "2.0.1",
     "web3": "1.2.4",
