@@ -130,7 +130,7 @@ class ValidatorsList extends React.PureComponent<Props, State> {
     orderAsc: true,
   }
   private orderAccessors = {
-    name: (_) => (_.name || '').toLowerCase(),
+    name: (_) => (_.name || '').toLowerCase() || null,
     total: (_) => _.numMembers * 1000 + _.elected,
     votes: (_) => +_.votesAbsolute || 0,
     gold: (_) => _.gold || 0,
@@ -263,10 +263,20 @@ class ValidatorsList extends React.PureComponent<Props, State> {
     const dAccessor = this.orderAccessors[this.defaultOrderAccessor]
     const dir = orderAsc ? 1 : -1
 
+    const compare = (a, b): number => {
+      if (a === null) {
+        return 1
+      }
+      if (b === null) {
+        return -1
+      }
+      return a > b ? 1 : -1
+    }
+
     return (data || [])
       .sort((a, b) => b.id - a.id)
-      .sort((a, b) => (dAccessor(a) > dAccessor(b) ? -1 : 1))
-      .sort((a, b) => dir * (accessor(a) > accessor(b) ? 1 : -1))
+      .sort((a, b) => compare(dAccessor(a), dAccessor(b)))
+      .sort((a, b) => dir * compare(accessor(a), accessor(b)))
   }
 
   render() {
