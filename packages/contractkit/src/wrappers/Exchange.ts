@@ -17,6 +17,7 @@ export interface ExchangeConfig {
   reserveFraction: BigNumber
   updateFrequency: BigNumber
   minimumReports: BigNumber
+  lastBucketUpdate: BigNumber
 }
 
 /**
@@ -176,12 +177,14 @@ export class ExchangeWrapper extends BaseWrapper<Exchange> {
       this.reserveFraction(),
       this.updateFrequency(),
       this.minimumReports(),
+      this.lastBucketUpdate(),
     ])
     return {
       spread: res[0],
       reserveFraction: res[1],
       updateFrequency: res[2],
       minimumReports: res[3],
+      lastBucketUpdate: res[4],
     }
   }
   /**
