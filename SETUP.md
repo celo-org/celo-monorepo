@@ -208,9 +208,9 @@ export PATH=$PATH:$GOPATH/bin
 
 #### Install gcloud cli 
 
-_Applies to cLabs employees only_
+_Required for cLabs employees only_
 
-We use the gcloud cli to decrypt the secrets in the monorepo. [Install the SDK](https://cloud.google.com/sdk/docs#install_the_latest_cloud_tools_version_cloudsdk_current_version) which includes the CLI. Once installed, initialize `gcloud` and log in.
+[Install the gcloud SDK](https://cloud.google.com/sdk/docs#install_the_latest_cloud_tools_version_cloudsdk_current_version) which includes the CLI. Once installed, initialize `gcloud` and log in.
 
 #### Optional: Install Rust
 
