@@ -205,6 +205,10 @@ export GOPATH=$HOME/go
 export PATH=$PATH:$GOPATH/bin
 ```
 
+#### Install gcloud cli 
+
+We use the gcloud cli to decrypt the secrets in the monorepo. [Install the SDK](https://cloud.google.com/sdk/docs#install_the_latest_cloud_tools_version_cloudsdk_current_version) which includes the CLI from. Once installed, initialize `gcloud` and log in.
+
 #### Optional: Install Rust
 
 We use Rust to build the [bls-zexe](https://github.com/celo-org/bls-zexe) repo, which Geth depends on. If you only use the monorepo, you probably don't need this.
