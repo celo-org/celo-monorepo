@@ -11,12 +11,12 @@ import sendCoinIcon from 'src/icons/send-green-coin-lg-bg.png'
 import { TweetLogo } from 'src/icons/TwitterLogo'
 import YouTube from 'src/icons/YouTube'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
+import { useScreenSize } from 'src/layout/ScreenSize'
 import RingsGlyph from 'src/logos/RingsGlyph'
-import FooterColumn from 'src/shared/FooterColumn'
 import ChangeStory from 'src/shared/ChangeStory'
+import FooterColumn from 'src/shared/FooterColumn'
 import InlineAnchor from 'src/shared/InlineAnchor'
 import menu, { CeloLinks, hashNav, MAIN_MENU } from 'src/shared/menu-items'
-import Responsive from 'src/shared/Responsive'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 const MENU = [menu.HOME, ...MAIN_MENU]
 const TECH_MENU = [menu.PAPERS, { name: 'Docs', link: CeloLinks.docs }]
@@ -35,6 +35,7 @@ const ICON_SIZE = 13
 
 export default function Footer() {
   const { t } = useTranslation(NameSpaces.common)
+  const { isMobile, isTablet } = useScreenSize()
   const socialMenu = [
     {
       name: 'Blog',
@@ -95,18 +96,22 @@ export default function Footer() {
           <EmailForm submitText={t('signUp')} route={'/contacts'} isDarkMode={false} />
         </Cell>
       </GridRow>
-      <GridRow>
-        <Cell span={Spans.third} tabletSpan={Spans.full}>
-          <View style={styles.rings}>
+      <GridRow tabletStyle={{ flexDirection: 'column', alignItems: 'center' }}>
+        <Cell span={Spans.third} tabletSpan={Spans.twoThird}>
+          <View
+            style={isMobile || isTablet ? [standardStyles.centered, styles.rings] : styles.rings}
+          >
             <RingsGlyph />
           </View>
           <Details />
         </Cell>
-        <Cell span={Spans.twoThird} tabletSpan={Spans.full} style={styles.linksArea}>
-          <FooterColumn heading={'Celo'} links={MENU} />
-          <FooterColumn heading={t('footer.technology')} links={TECH_MENU} />
-          <FooterColumn heading={t('footer.resources')} links={RESOURCE_MENU} />
-          <FooterColumn heading={t('footer.social')} links={socialMenu} />
+        <Cell span={Spans.twoThird} tabletSpan={Spans.full}>
+          <View style={styles.linksArea}>
+            <FooterColumn heading={'Celo'} links={MENU} />
+            <FooterColumn heading={t('footer.technology')} links={TECH_MENU} />
+            <FooterColumn heading={t('footer.resources')} links={RESOURCE_MENU} />
+            <FooterColumn heading={t('footer.social')} links={socialMenu} />
+          </View>
         </Cell>
       </GridRow>
       <GridRow
@@ -114,7 +119,7 @@ export default function Footer() {
         tabletStyle={standardStyles.blockMarginTablet}
         mobileStyle={standardStyles.blockMarginMobile}
       >
-        <Cell span={Spans.full} style={styles.shoe}>
+        <Cell span={Spans.full} style={isMobile ? standardStyles.centered : styles.toes}>
           <ChangeStory />
           <Copyright />
         </Cell>
@@ -125,18 +130,20 @@ export default function Footer() {
 
 const Details = React.memo(function _Details() {
   const { t } = useTranslation(NameSpaces.common)
+  const { isDesktop } = useScreenSize()
+  const fontStyling = [
+    isDesktop ? textStyles.left : textStyles.center,
+    styles.detailsText,
+    fonts.legal,
+  ]
   return (
     <View style={styles.details}>
-      <Responsive medium={[textStyles.left, styles.detailsText, fonts.legal]}>
-        <Text style={[textStyles.center, styles.detailsText, fonts.legal]}>{t('disclaimer')}</Text>
-      </Responsive>
-      <Responsive medium={[textStyles.left, styles.detailsText, fonts.legal]}>
-        <Text style={[textStyles.center, styles.detailsText, fonts.legal]}>
-          <Trans ns={NameSpaces.common} i18nKey={'footerReadMoreTerms'}>
-            <InlineAnchor href={menu.TERMS.link}>Terms of Service</InlineAnchor>
-          </Trans>
-        </Text>
-      </Responsive>
+      <Text style={fontStyling}>{t('disclaimer')}</Text>
+      <Text style={fontStyling}>
+        <Trans ns={NameSpaces.common} i18nKey={'footerReadMoreTerms'}>
+          <InlineAnchor href={menu.TERMS.link}>Terms of Service</InlineAnchor>
+        </Trans>
+      </Text>
     </View>
   )
 })
@@ -163,7 +170,7 @@ const styles = StyleSheet.create({
     maxWidth: 550,
   },
   emailLogo: { width: 50, height: 50, marginVertical: 10 },
-  shoe: {
+  toes: {
     flexDirection: 'row',
     justifyContent: 'space-between',
   },

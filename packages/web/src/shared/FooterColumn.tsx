@@ -36,7 +36,7 @@ export default function FooterColumn({ heading, links }: Props) {
 
 const styles = StyleSheet.create({
   root: {
-    paddingHorizontal: 30,
+    paddingHorizontal: 25,
   },
   link: {
     textDecorationLine: 'none',
