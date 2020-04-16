@@ -139,7 +139,7 @@ const DefaultConfig = {
     spenders: [],
     otherAddresses: ['0xd0a57D8acFe9979d33933d8A52971E6DC9E2DbF0'],
     assetAllocationSymbols: ['cGLD', 'BTC', 'ETH', 'DAI'],
-    assetAllocationWeights: [0.5, 0.2, 0.1, 0.2],
+    assetAllocationWeights: [0.5, 0.3, 0.15, 0.05],
   },
   reserveSpenderMultiSig: {
     // 2/2 multsig
