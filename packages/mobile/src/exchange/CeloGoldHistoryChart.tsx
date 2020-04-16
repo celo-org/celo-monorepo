@@ -170,9 +170,9 @@ function CeloGoldHistoryChart({ t, testID, i18n }: Props) {
   }
 
   const groupedExchangeHistory = _.groupBy(exchangeHistory.celoGoldExchangeRates, calculateGroup)
-  const latestGroup = calculateGroup(
+  const latestExchangeRate =
     exchangeHistory.celoGoldExchangeRates[exchangeHistory.celoGoldExchangeRates.length - 1]
-  )
+  const latestGroup = calculateGroup(latestExchangeRate)
   const chartData = _.range(
     Math.min(CHART_POINTS_NUMBER - 1, Object.keys(groupedExchangeHistory).length),
     0,
@@ -214,7 +214,6 @@ function CeloGoldHistoryChart({ t, testID, i18n }: Props) {
     domain = { y: [min - offset, max + offset] }
   }
   const rateWentUp = rateChange.gt(0)
-  const now = Date.now()
 
   return (
     <View style={styles.container} testID={testID}>
@@ -247,8 +246,10 @@ function CeloGoldHistoryChart({ t, testID, i18n }: Props) {
         <VictoryScatter dataComponent={<RenderPoint />} />
       </VictoryGroup>
       <View style={styles.range}>
-        <Text style={styles.timeframe}>{formatFeedDate(now - range, i18n)}</Text>
-        <Text style={styles.timeframe}>{formatFeedDate(now, i18n)}</Text>
+        <Text style={styles.timeframe}>
+          {formatFeedDate(latestExchangeRate.timestamp - range, i18n)}
+        </Text>
+        <Text style={styles.timeframe}>{formatFeedDate(latestExchangeRate.timestamp, i18n)}</Text>
       </View>
     </View>
   )

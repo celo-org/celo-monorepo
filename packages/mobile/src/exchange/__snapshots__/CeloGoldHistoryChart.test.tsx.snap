@@ -207,7 +207,7 @@ exports[`renders properly 1`] = `
         }
       }
     >
-      Mar 16
+      Jan 18
     </Text>
     <Text
       style={
@@ -217,7 +217,7 @@ exports[`renders properly 1`] = `
         }
       }
     >
-      Apr 15
+      Feb 17
     </Text>
   </View>
 </View>
@@ -430,7 +430,7 @@ exports[`renders while update is in progress 1`] = `
         }
       }
     >
-      Mar 16
+      Mar 17
     </Text>
     <Text
       style={
@@ -440,7 +440,7 @@ exports[`renders while update is in progress 1`] = `
         }
       }
     >
-      Apr 15
+      Apr 16
     </Text>
   </View>
 </View>
