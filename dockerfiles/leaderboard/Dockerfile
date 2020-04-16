@@ -11,7 +11,7 @@ COPY packages/utils/package.json packages/utils/
 COPY packages/dev-utils/package.json packages/dev-utils/
 COPY packages/protocol/package.json packages/protocol/
 COPY packages/contractkit/package.json packages/contractkit/
-COPY packages/leaderboard/package.json packages/leaderboard/
+COPY packages//metadata-crawler/package.json packages//metadata-crawler/
 
 RUN yarn install --frozen-lockfile --network-timeout 100000 && yarn cache clean
 
@@ -21,11 +21,11 @@ COPY packages/utils packages/utils/
 COPY packages/dev-utils packages/dev-utils/
 COPY packages/protocol packages/protocol/
 COPY packages/contractkit packages/contractkit/
-COPY packages/leaderboard packages/leaderboard/
+COPY packages/metadata-crawler packages/metadata-crawler/
 
 # build all
 RUN yarn build
 
-WORKDIR /celo-monorepo/packages/leaderboard
+WORKDIR /celo-monorepo/packages/metadata-crawler
 
 CMD ["yarn run ts-node src/board.ts ; yarn run ts-node src/upload.ts"]
