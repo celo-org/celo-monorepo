@@ -192,13 +192,11 @@ export const getFaucetedAccounts = (mnemonic: string) => {
 
 export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
   const mnemonic = fetchEnv(envVar.MNEMONIC)
-  const validatorEnv = fetchEnv(envVar.VALIDATORS)
+  const validatorEnv = parseInt(fetchEnv(envVar.VALIDATORS), 10)
   // Todo: Link this with value from migrationsConfig.js
-  const maxElectableValidators = 100
-  const validatorCount = Math.min(parseInt(validatorEnv, 10), maxElectableValidators)
+
   const genesisAccountsEnv = fetchEnvOrFallback(envVar.GENESIS_ACCOUNTS, '')
-  const validators = getValidatorsInformation(mnemonic, validatorCount)
-  console.info(`jcortejoso validators: ${validators}`)
+  const validators = getValidatorsInformation(mnemonic, validatorEnv)
 
   const consensusType = fetchEnv(envVar.CONSENSUS_TYPE) as ConsensusType
 
@@ -319,7 +317,10 @@ export const generateGenesis = ({
     genesis.mixHash = ISTANBUL_MIX_HASH
     genesis.difficulty = '0x1'
     if (validators) {
-      genesis.extraData = generateIstanbulExtraData(validators)
+      const maxElectableValidators = 100
+      const validatoElectedCount = Math.min(validators.length, maxElectableValidators)
+      genesis.extraData = generateIstanbulExtraData(validators.slice(0, validatoElectedCount))
+      console.info(`jcortejoso: validators: ${validators.slice(0, validatoElectedCount)}`)
     }
     genesis.config.istanbul = {
       // see github.com/celo-org/celo-blockchain/blob/master/consensus/istanbul/config.go#L21-L25
