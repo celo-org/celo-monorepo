@@ -6,7 +6,7 @@ import { printValueMap } from '../../utils/cli'
 
 export default class NewAccount extends LocalCommand {
   static description =
-    "Creates a new account locally using the Celo Derivation Path (m/44'/52752'/0/0) and print out the key information. Save this information for local transaction signing or import into a Celo node."
+    "Creates a new account locally using the Celo Derivation Path (m/44'/52752'/0/0/indexAddress) and print out the key information. Save this information for local transaction signing or import into a Celo node. Ledger: this command has been tested swapping mnemonics with the Ledger successfully (only supports english)"
 
   static flags = {
     ...LocalCommand.flags,
@@ -29,7 +29,8 @@ export default class NewAccount extends LocalCommand {
         'spanish',
       ],
       default: 'english',
-      description: 'Language for the mnemonic words',
+      description:
+        "Language for the mnemonic words. **WARNING**, some hardware wallets don't support other languages",
     }),
   }
 
