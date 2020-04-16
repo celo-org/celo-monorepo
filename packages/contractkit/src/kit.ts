@@ -298,8 +298,8 @@ export class ContractKit {
     if (gas == null) {
       const gasEstimator = (tx: Tx) => txObj.estimateGas({ ...tx })
       const data = txObj.encodeABI()
-      // @ts-ignore missing _parent property from TransactionObject type.
       const getCallTx = (tx: Tx) => {
+        // @ts-ignore missing _parent property from TransactionObject type.
         return { ...tx, data, to: txObj._parent._address }
       }
       const caller = (tx: Tx) => this.web3.eth.call(getCallTx(tx))
