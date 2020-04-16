@@ -110,9 +110,10 @@ export abstract class WalletBase implements Wallet {
   }
 
   private getSigner(address: string): Signer {
-    if (!this.accountSigners.has(address)) {
-      throw new Error(`Could not find address ${address}`)
+    const normalizedAddress = normalizeAddressWith0x(address)
+    if (!this.accountSigners.has(normalizedAddress)) {
+      throw new Error(`Could not find address ${normalizedAddress}`)
     }
-    return this.accountSigners.get(address.toString())!
+    return this.accountSigners.get(normalizedAddress)!
   }
 }
