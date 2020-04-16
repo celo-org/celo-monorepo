@@ -1,6 +1,6 @@
-const web3EthAbi = require('web3-eth-abi')
-import { ABIDefinition, DecodedParamsObject } from 'web3-eth-abi'
 import { Tx } from 'web3-core'
+import { ABIDefinition, DecodedParamsObject } from 'web3-eth-abi'
+const web3EthAbi = require('web3-eth-abi')
 
 export const getAbiTypes = (abi: ABIDefinition[], methodName: string) =>
   abi.find((entry) => entry.name! === methodName)!.inputs!.map((input) => input.type)

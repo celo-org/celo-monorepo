@@ -296,13 +296,12 @@ export class ContractKit {
 
     let gas = tx.gas
     if (gas == null) {
-      const gasEstimator = (tx: Tx) => txObj.estimateGas({ ...tx })
-      const data = txObj.encodeABI()
-      const getCallTx = (tx: Tx) => {
+      const gasEstimator = (_tx: Tx) => txObj.estimateGas({ ..._tx })
+      const getCallTx = (_tx: Tx) => {
         // @ts-ignore missing _parent property from TransactionObject type.
-        return { ...tx, data, to: txObj._parent._address }
+        return { ..._tx, data: txObj.encodeABI(), to: txObj._parent._address }
       }
-      const caller = (tx: Tx) => this.web3.eth.call(getCallTx(tx))
+      const caller = (_tx: Tx) => this.web3.eth.call(getCallTx(_tx))
       try {
         gas = Math.round(
           (await estimateGas(tx, gasEstimator, caller)) * this.config.gasInflationFactor
