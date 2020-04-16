@@ -6,6 +6,7 @@
 
 * [verifyAccountClaim](_identity_claims_verify_.md#const-verifyaccountclaim)
 * [verifyClaim](_identity_claims_verify_.md#verifyclaim)
+* [verifyDomainRecord](_identity_claims_verify_.md#const-verifydomainrecord)
 
 ## Functions
 
@@ -13,7 +14,7 @@
 
 ▸ **verifyAccountClaim**(`kit`: [ContractKit](../classes/_kit_.contractkit.md), `claim`: [AccountClaim](_identity_claims_account_.md#accountclaim), `address`: string): *Promise‹undefined | string›*
 
-*Defined in [contractkit/src/identity/claims/verify.ts:29](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/verify.ts#L29)*
+*Defined in [contractkit/src/identity/claims/verify.ts:33](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/verify.ts#L33)*
 
 **Parameters:**
 
@@ -31,7 +32,7 @@ ___
 
 ▸ **verifyClaim**(`kit`: [ContractKit](../classes/_kit_.contractkit.md), `claim`: [Claim](_identity_claims_claim_.md#claim), `address`: string): *Promise‹undefined | string›*
 
-*Defined in [contractkit/src/identity/claims/verify.ts:17](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/verify.ts#L17)*
+*Defined in [contractkit/src/identity/claims/verify.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/verify.ts#L19)*
 
 Verifies a claim made by an account, i.e. whether a claim can be verified to be correct
 
@@ -46,3 +47,24 @@ Name | Type | Description |
 **Returns:** *Promise‹undefined | string›*
 
 If valid, returns undefined. If invalid or unable to verify, returns a string with the error
+
+___
+
+### `Const` verifyDomainRecord
+
+▸ **verifyDomainRecord**(`claim`: [DomainClaim](_identity_claims_claim_.md#domainclaim), `address`: string, `dnsResolver`: dnsResolverFunction): *Promise‹undefined | "Unable to verify domain claim"›*
+
+*Defined in [contractkit/src/identity/claims/verify.ts:72](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/verify.ts#L72)*
+
+It verifies if a DNS domain includes in the TXT records an entry with name
+`celo-site-verification` and a valid signature in base64
+
+**Parameters:**
+
+Name | Type | Default |
+------ | ------ | ------ |
+`claim` | [DomainClaim](_identity_claims_claim_.md#domainclaim) | - |
+`address` | string | - |
+`dnsResolver` | dnsResolverFunction | resolveTxt as any |
+
+**Returns:** *Promise‹undefined | "Unable to verify domain claim"›*
