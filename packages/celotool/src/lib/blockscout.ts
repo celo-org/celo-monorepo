@@ -71,6 +71,7 @@ async function helmParameters(
   blockscoutDBPassword: string,
   blockscoutDBConnectionName: string
 ) {
+  const privateNodes = parseInt(fetchEnv(envVar.PRIVATE_TX_NODES), 10)
   const params = [
     `--set domain.name=${fetchEnv(envVar.CLUSTER_DOMAIN_NAME)}`,
     `--set blockscout.image.repository=${fetchEnv(envVar.BLOCKSCOUT_DOCKER_IMAGE_REPOSITORY)}`,
@@ -91,6 +92,12 @@ async function helmParameters(
     const txNodeLbIp = await getInternalTxNodeLoadBalancerIP(celoEnv)
     params.push(`--set blockscout.jsonrpc_http_url=http://${txNodeLbIp}:8545`)
     params.push(`--set blockscout.jsonrpc_ws_url=ws://${txNodeLbIp}:8546`)
+  } else if (privateNodes > 0) {
+    params.push(`--set blockscout.jsonrpc_http_url=http://tx-nodes-private:8545`)
+    params.push(`--set blockscout.jsonrpc_ws_url=ws://tx-nodes-private:8546`)
+  } else {
+    params.push(`--set blockscout.jsonrpc_http_url=http://tx-nodes:8545`)
+    params.push(`--set blockscout.jsonrpc_ws_url=ws://tx-nodes:8546`)
   }
   return params
 }

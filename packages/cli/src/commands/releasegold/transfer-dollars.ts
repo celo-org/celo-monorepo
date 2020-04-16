@@ -18,7 +18,7 @@ export default class TransferDollars extends ReleaseGoldCommand {
   static args = []
 
   static examples = [
-    'transfer --contract 0x5409ED021D9299bf6814279A6A1411A7e866A631 --to 0x6Ecbe1DB9EF729CBe972C83Fb886247691Fb6beb --value 10000000000000000000000',
+    'transfer-dollars --contract 0x5409ED021D9299bf6814279A6A1411A7e866A631 --to 0x6Ecbe1DB9EF729CBe972C83Fb886247691Fb6beb --value 10000000000000000000000',
   ]
 
   async run() {
@@ -26,12 +26,9 @@ export default class TransferDollars extends ReleaseGoldCommand {
     const { flags } = this.parse(TransferDollars)
     const isRevoked = await this.releaseGoldWrapper.isRevoked()
     this.kit.defaultAccount = isRevoked
-      ? await this.releaseGoldWrapper.getBeneficiary()
-      : await this.releaseGoldWrapper.getReleaseOwner()
+      ? await this.releaseGoldWrapper.getReleaseOwner()
+      : await this.releaseGoldWrapper.getBeneficiary()
 
-    await displaySendTx(
-      'revokeReleasing',
-      await this.releaseGoldWrapper.transfer(flags.to, flags.value)
-    )
+    await displaySendTx('transfer', this.releaseGoldWrapper.transfer(flags.to, flags.value))
   }
 }
