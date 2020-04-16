@@ -114,6 +114,7 @@ const DefaultConfig = {
     signatories: [
       '0xBE0c3B35Ec3f759D9A67c4B7c539b0D5b52A4642',
       '0xD6d48412dA0804CF88258bfDf5AaFcBe5FEd7ecC',
+      '0xFD74A4b05F12B9aB6020CB202aDE1BBa4Bc99aba',
     ],
     numRequiredConfirmations: 2,
     numInternalRequiredConfirmations: 4,
