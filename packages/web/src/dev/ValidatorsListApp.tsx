@@ -14,9 +14,7 @@ import menuItems from 'src/shared/menu-items'
 import Spinner from 'src/shared/Spinner'
 import { colors, standardStyles } from 'src/styles'
 
-let network
-
-function createApolloClient() {
+function createApolloClient(network: string) {
   return new ApolloClient({
     uri:
       getConfig().publicRuntimeConfig.BLOCKSCOUT[network] ||
@@ -89,8 +87,9 @@ const query = gql`
   }
 `
 
-class ValidatorsListApp extends React.PureComponent<I18nProps> {
+class ValidatorsListApp extends React.PureComponent<I18nProps & { network?: string }> {
   render() {
+    const { network } = this.props
     if (!getConfig().publicRuntimeConfig.FLAGS.VALIDATORS) {
       return null
     }
@@ -101,7 +100,7 @@ class ValidatorsListApp extends React.PureComponent<I18nProps> {
           path={menuItems.VALIDATORS_LIST.link}
           description="View status of Validators on the Celo Network"
         />
-        <ApolloProvider client={createApolloClient()}>
+        <ApolloProvider client={createApolloClient(network)}>
           <Query query={query}>
             {({ loading, error, data }: any) => {
               if (error) {
@@ -146,6 +145,6 @@ const styles = StyleSheet.create({
 export default withNamespaces('dev')(ValidatorsListApp)
 
 export const ValidatorsListAppWithNetwork = (networkName: string) => {
-  network = networkName
-  return withNamespaces('dev')(ValidatorsListApp)
+  const Comp = withNamespaces('dev')(ValidatorsListApp)
+  return () => <Comp network={networkName} />
 }

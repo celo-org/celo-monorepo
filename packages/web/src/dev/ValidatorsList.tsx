@@ -1,4 +1,5 @@
 import { BigNumber } from 'bignumber.js'
+import { SingletonRouter as Router, withRouter } from 'next/router'
 import * as React from 'react'
 import { Text as RNText, View } from 'react-native'
 import ValidatorsListRow, { CeloGroup } from 'src/dev/ValidatorsListRow'
@@ -6,12 +7,11 @@ import { styles } from 'src/dev/ValidatorsListStyles'
 import { H1 } from 'src/fonts/Fonts'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import Chevron, { Direction } from 'src/icons/chevron'
+import Button, { BTN } from 'src/shared/Button.3'
+import menu from 'src/shared/menu-items'
+import OvalCoin from 'src/shared/OvalCoin'
 import { colors, standardStyles, textStyles } from 'src/styles'
 import { weiToDecimal } from 'src/utils/utils'
-import menu from 'src/shared/menu-items'
-import Button, { BTN } from 'src/shared/Button.3'
-import { SingletonRouter as Router, withRouter } from 'next/router'
-import OvalCoin from 'src/shared/OvalCoin'
 
 const networkMenu = [
   // ['Mainnet', menu.VALIDATORS_LIST.link],
