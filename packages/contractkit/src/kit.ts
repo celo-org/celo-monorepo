@@ -8,6 +8,7 @@ import { Address, CeloContract, CeloToken } from './base'
 import { WrapperCache } from './contract-cache'
 import { CeloProvider } from './providers/celo-provider'
 import { toTxResult, TransactionResult } from './utils/tx-result'
+import { estimateGas } from './utils/web3-utils'
 import { Wallet } from './wallets/wallet'
 import { Web3ContractCache } from './web3-contract-cache'
 import { AttestationsConfig } from './wrappers/Attestations'
@@ -268,10 +269,15 @@ export class ContractKit {
 
     let gas = tx.gas
     if (gas == null) {
-      gas = Math.round(
-        (await this.web3.eth.estimateGas({ ...tx })) * this.config.gasInflationFactor
-      )
-      debug('estimatedGas: %s', gas)
+      try {
+        gas = Math.round(
+          (await estimateGas(tx, this.web3.eth.estimateGas, this.web3.eth.call)) *
+            this.config.gasInflationFactor
+        )
+        debug('estimatedGas: %s', gas)
+      } catch (e) {
+        throw new Error(e)
+      }
     }
 
     return toTxResult(
@@ -290,8 +296,20 @@ export class ContractKit {
 
     let gas = tx.gas
     if (gas == null) {
-      gas = Math.round((await txObj.estimateGas({ ...tx })) * this.config.gasInflationFactor)
-      debug('estimatedGas: %s', gas)
+      const gasEstimator = (_tx: Tx) => txObj.estimateGas({ ..._tx })
+      const getCallTx = (_tx: Tx) => {
+        // @ts-ignore missing _parent property from TransactionObject type.
+        return { ..._tx, data: txObj.encodeABI(), to: txObj._parent._address }
+      }
+      const caller = (_tx: Tx) => this.web3.eth.call(getCallTx(_tx))
+      try {
+        gas = Math.round(
+          (await estimateGas(tx, gasEstimator, caller)) * this.config.gasInflationFactor
+        )
+        debug('estimatedGas: %s', gas)
+      } catch (e) {
+        throw new Error(e)
+      }
     }
 
     return toTxResult(
