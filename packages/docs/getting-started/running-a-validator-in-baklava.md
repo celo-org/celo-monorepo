@@ -250,9 +250,9 @@ There are number of new environment variables, and you may use this table as a r
 | NETWORK_ID                           | The Celo Baklava network chain ID                                                                                                    |
 | CELO_VALIDATOR_GROUP_ADDRESS         | The `ReleaseGold` contract address for the Validator Group                                                                                          |
 | CELO_VALIDATOR_ADDRESS         | The `ReleaseGold` contract address for the Validator                                                                                          |
-| CELO_VALIDATOR_GROUP_SIGNER_ADDRESS        | The address of the validator signer address authorized by the Validator Group Account                                                              |
+| CELO_VALIDATOR_GROUP_SIGNER_ADDRESS        | The validator (group) signer address authorized by the Validator Group account.
 | CELO_VALIDATOR_GROUP_SIGNER_SIGNATURE      | The proof-of-possession of the Validator Group signer key                                                                                  |
-| CELO_VALIDATOR_SIGNER_ADDRESS        | The address of the validator signer address authorized by the Validator Account                                                              |
+| CELO_VALIDATOR_SIGNER_ADDRESS        | The validator signer address authorized by the Validator Account
 | CELO_VALIDATOR_SIGNER_PUBLIC_KEY     | The ECDSA public key associated with the Validator signer address                                                                    |
 | CELO_VALIDATOR_SIGNER_SIGNATURE      | The proof-of-possession of the Validator signer key                                                                                  |
 | CELO_VALIDATOR_SIGNER_BLS_PUBLIC_KEY | The BLS public key for the Validator instance                                                                                        |
@@ -279,7 +279,7 @@ There are number of new environment variables, and you may use this table as a r
 In order to participate on the network (lock gold, vote, validate) from a `ReleaseGold` contract, we need to create an Account at the address of the `ReleaseGold` contract. In the Baklava network, you can look up your Beneficiary address in [the published mapping](https://gist.githubusercontent.com/nategraf/a87f9c2e488ab2d38a0a3c09f5d4ca2b/raw) to find your `ReleaseGold` contract addresses. If you are a genesis validator, your two Beneficary addresses will be the provided `CELO_VALIDATOR_BENEFICIARY_ADDRESS` and `CELO_VALIDATOR_GROUP_BENEFICIARY_ADDRESS`.
 
 {% hint style="info" %}
-An earlier version of this document set the beneficiary addresses to `CELO_VALIDATOR_ADDRESS` and `CELO_VALIDATOR_GROUP_ADDRESS`, but the attestation service expects these to refer to the `ReleaseGold` contract, so please move your beneficiary addresses to reflect the environment variables above.
+An earlier version of this document set the beneficiary addresses to `CELO_VALIDATOR_ADDRESS` and `CELO_VALIDATOR_GROUP_ADDRESS`, but the attestation service expects these to refer to the `ReleaseGold` contract, so please set your beneficiary addresses to `CELO_VALIDATOR_BENEFICIARY_ADDRESS` and `CELO_VALIDATOR_GROUP_BENEFICIARY_ADDRESS` accordingly.
 {% endhint %}
 
 ```bash
@@ -333,8 +333,9 @@ celocli lockedgold:show $CELO_VALIDATOR_ADDRESS
 
 ### Register as a Validator
 
-In order to perform Validator actions with the Account created in the previous step, you will need to authorize a Validator signer key for the `ReleaseGold` contract account. You should have already generated this key and submitted it via gist.
-To authorize this key, we will first need to first generate a proof that the `ReleaseGold` contract account possesses the keys for this new signer:
+In order to perform Validator actions with the Account created in the previous step, you will need to authorize a Validator signer key for the `ReleaseGold` contract account.
+
+If you were part of the genesis validator set, you will have already generated this key and submitted it via gist. Note that if you are planning running more than one validator, each validator will need a distinct validator signer key.`
 
 ```bash
 # On the Validator machine
@@ -447,14 +448,14 @@ celocli validatorgroup:show $CELO_VALIDATOR_GROUP_ADDRESS
 
 ### Affiliate the Validator with the group
 
-Now that the Validator and the group are registered, you can affiliate the Validator with the group.
+Now that the Validator and the group are registered, you can affiliate the Validator with the group, indicating that Validator's desire to join the group.
 
 ```bash
 # On the Validator machine
 celocli validator:affiliate $CELO_VALIDATOR_GROUP_ADDRESS --from $CELO_VALIDATOR_SIGNER_ADDRESS
 ```
 
-You can then accept this from the group to complete the affiliation:
+The Validator Group can then accept the Validator as a member:
 
 ```bash
 # On your local machine
@@ -475,7 +476,7 @@ In order to get elected as a Validator, you will need to use the balance of your
 
 #### Authorize voter signing keys
 
-In order to vote with the balance of a `ReleaseGold` contract you will to authorize a voting key.
+In order to vote with the balance of a `ReleaseGold` contract you will need to authorize a voting key.
 
 Create the vote signer keys:
 
@@ -656,7 +657,7 @@ To actually be able to send SMS, you need to create a messaging service under [P
 
 **Nexmo**
 
-Here is the list of the enviromnet variables needed to use the Nexmo SMS broker:
+Here is the list of the environment variables needed to use the Nexmo SMS broker:
 
 | Variable        | Explanation                                                     |
 | --------------- | --------------------------------------------------------------- |
@@ -700,10 +701,7 @@ docker run --name celo-attestation-service -it --restart always --entrypoint /bi
 ## Registering Metadata
 
 We are using [Metadata](../celo-codebase/protocol/identity/metadata) to allow accounts to make certain claims without having to do so on-chain. Since the validator in question here is run under a `ReleaseGold` contract, users can use any `signer` address to make claims on behalf of the `ReleaseGold` contract. This guide will use the `ATTESTATION_SIGNER_ADDRESS` since it is likely the most recently used, but any can be used.
-For us to complete the metadata process, we have to make two claims:
-
-1.  Under which URL users can request attestations from
-2.  Which accounts belong together for the purpose of the leaderboard
+For us to complete the metadata process, we have to claim which URL users can request attestations from:
 
 Run the following commands on your local machine:
 
