@@ -585,7 +585,7 @@ As part of the [lightweight identity protocol](/celo-codebase/protocol/identity)
 Just like with the Validator and Vote signer, we'll want to authorize a separate Attestation signer. For that let's start our node on the Attestations machine (keep track of the password you use for this account):
 
 {% hint style="info" %}
-An earlier version of this document set the beneficiary addresses to `CELO_VALIDATOR_ADDRESS` and `CELO_VALIDATOR_GROUP_ADDRESS`, but the attestation service expects these to refer to the `ReleaseGold` contract, so please move your beneficiary addresses to reflect the environment variables above.
+An earlier version of this document set the beneficiary addresses to `CELO_VALIDATOR_ADDRESS` and `CELO_VALIDATOR_GROUP_ADDRESS`, but the attestation service expects these to refer to the `ReleaseGold` contract, so please set your beneficiary addresses to `CELO_VALIDATOR_BENEFICIARY_ADDRESS` and `CELO_VALIDATOR_GROUP_BENEFICIARY_ADDRESS` appropriately.
 
 `CELO_VALIDATOR_ADDRESS` should be your `ReleaseGold` contract address for the attestation service to work properly.
 {% endhint %}
@@ -612,7 +612,7 @@ With this proof, authorize the attestation signer on your local machine:
 # On your local machine
 export ATTESTATION_SIGNER_SIGNATURE=<ATTESTATION-SIGNER-SIGNATURE>
 export ATTESTATION_SIGNER_ADDRESS=<YOUR-ATTESTATION-SIGNER-ADDRESS>
-celocli releasegold:authorize --contract $CELO_VALIDATOR_ADDRESS --role attestation --signature $ATTESTATION_SIGNER_SIGNATURE --signer $ATTESTATION_SIGNER_ADDRESS
+celocli releasegold:authorize --contract $CELO_VALIDATOR_ADDRESS --role attestation --signature 0x$ATTESTATION_SIGNER_SIGNATURE --signer $ATTESTATION_SIGNER_ADDRESS
 ```
 
 You can now run the node for the attestation service in the background. In the below command remember to specify the password you used during the creation of the `ATTESTATION_SIGNER_ADDRESS` account:
