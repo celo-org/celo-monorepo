@@ -17,6 +17,7 @@ export async function installHelmChart(celoEnv: string) {
 
 export async function removeHelmRelease(celoEnv: string) {
   await removeGenericHelmChart(releaseName(celoEnv))
+  await deleteRBACResources(celoEnv)
 }
 
 async function helmParameters(celoEnv: string) {
@@ -143,4 +144,12 @@ async function getSecretTokenName(celoEnv: string) {
     )} -o=jsonpath="{.secrets[0]['name']}"`
   )
   return tokenName.trim()
+}
+
+async function deleteRBACResources(celoEnv: string) {
+  await execCmdWithExitOnFailure(`kubectl delete rolebinding -n ${celoEnv} ${releaseName(celoEnv)}`)
+  await execCmdWithExitOnFailure(`kubectl delete role -n ${celoEnv} ${releaseName(celoEnv)}`)
+  await execCmdWithExitOnFailure(
+    `kubectl delete serviceaccount -n ${celoEnv} ${releaseName(celoEnv)}`
+  )
 }
