@@ -1,21 +1,13 @@
-import { ensureLeading0x } from '@celo/utils/src/address'
-import {
-  clusterName,
-  createIdentityIfNotExists,
-  resourceGroup,
-  subscriptionId,
-} from 'src/lib/azure'
+import { clusterName, createIdentityIfNotExists, resourceGroup } from 'src/lib/azure'
 import { getFornoUrl } from 'src/lib/endpoints'
 import { envVar, fetchEnv } from 'src/lib/env-utils'
-import { AccountType, getPrivateKeysFor } from 'src/lib/generate_utils'
 import { installGenericHelmChart, removeGenericHelmChart } from 'src/lib/helm_deploy'
 import { execCmdWithExitOnFailure } from 'src/lib/utils'
 
 const helmChartPath = '../helm-charts/oracle'
 
 export async function installHelmChart(celoEnv: string) {
-  await helmParameters(celoEnv)
-  return
+  // await createOracleIdentityIfNotExists(celoEnv)
   return installGenericHelmChart(
     celoEnv,
     releaseName(celoEnv),
@@ -30,25 +22,18 @@ export async function removeHelmRelease(celoEnv: string) {
 
 async function helmParameters(celoEnv: string) {
   const identity = await createOracleIdentityIfNotExists(celoEnv)
-  const replicas = parseInt(fetchEnv(envVar.ORACLES), 10)
-  const oraclePrivateKeys = getPrivateKeysFor(
-    AccountType.PRICE_ORACLE,
-    fetchEnv(envVar.MNEMONIC),
-    replicas
-  ).map((pkey) => `"${ensureLeading0x(pkey)}"`)
-
+  const addresses = oracleAddresses()
   return [
     `--set environmentName=${celoEnv}`,
-    `--set replicas=${fetchEnv(envVar.ORACLES)}`,
+    `--set replicas=${addresses.length}`,
     `--set image.repository=${fetchEnv(envVar.ORACLE_DOCKER_IMAGE_REPOSITORY)}`,
     `--set image.tag=${fetchEnv(envVar.ORACLE_DOCKER_IMAGE_TAG)}`,
+    `--set oracle.addresses='{${addresses.join(',')}}'`,
     `--set oracle.web3ProviderUrl=${getFornoUrl(celoEnv)}`,
-    `--set oracle.privateKeys=\\{${oraclePrivateKeys.join(',')}\\}`,
-    `--set azure.subscriptionId=${subscriptionId()}`,
+    // `--set azure.subscriptionId=${subscriptionId()}`,
     `--set azure.identity.id=${identity.id}`,
     `--set azure.identity.clientId=${identity.clientId}`,
     `--set azure.keyvault.vaultName=${keyVaultName()}`,
-    `--set azure.keyvault.keyName=${keyName()}`,
   ]
 }
 
@@ -86,6 +71,8 @@ function keyVaultName() {
   return fetchEnv(envVar.AZURE_ORACLE_KEY_VAULT_NAME)
 }
 
-function keyName() {
-  return fetchEnv(envVar.AZURE_ORACLE_KEY_NAME)
+// oracleAddresses returns an array of the comma separated addresses found in ORACLE_ADDRESSES
+function oracleAddresses() {
+  const oracleAddressesStr = fetchEnv(envVar.ORACLE_ADDRESSES)
+  return oracleAddressesStr.split(',')
 }

@@ -47,17 +47,18 @@ async function setupCluster(celoEnv: string) {
 
 // installAADPodIdentity installs the resources necessary for AAD pod level identities
 async function installAADPodIdentity() {
-  // The helm chart for AAD Pod Identity is not compatible with helm v2.
-  // Until we upgrade to helm v3, we rely on using kubectl directly.
-  const releaseExists = await outputIncludes(
-    `kubectl get daemonset -n default`,
-    `nmi`, // nmi is a daemonset that we use to determine if all resources are installed
+  // The helm chart maintained directly by AAD Pod Identity is not compatible with helm v2.
+  // Until we upgrade to helm v3, we rely on our own helm chart adapted from:
+  // https://raw.githubusercontent.com/Azure/aad-pod-identity/8a5f2ed5941496345592c42e1d6cbd12c32aeebf/deploy/infra/deployment-rbac.yaml
+  const aadPodIdentityExists = await outputIncludes(
+    `helm list`,
+    `aad-pod-identity`,
     `aad-pod-identity exists, skipping install`
   )
-  if (!releaseExists) {
-    console.info('Installing AAD Pod Identity...')
+  if (!aadPodIdentityExists) {
+    console.info('Installing aad-pod-identity')
     await execCmdWithExitOnFailure(
-      `kubectl apply -f https://raw.githubusercontent.com/Azure/aad-pod-identity/8a5f2ed5941496345592c42e1d6cbd12c32aeebf/deploy/infra/deployment.yaml`
+      `helm install --name aad-pod-identity ../helm-charts/aad-pod-identity`
     )
   }
 }

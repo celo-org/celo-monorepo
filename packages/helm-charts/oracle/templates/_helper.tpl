@@ -23,8 +23,15 @@ app.kubernetes.io/component: oracle-client
 {{- end -}}
 
 {{/*
-The name of the deployment
+The name of the azure identity binding for all oracles
 */}}
 {{- define "azure-identity-binding-name" -}}
 {{ template "name" . }}-identity-binding
+{{- end -}}
+
+{{/*
+The name of the config map containing oracle addresses
+*/}}
+{{- define "oracle-addresses-config-map-name" -}}
+{{ template "name" . }}-addresses
 {{- end -}}
