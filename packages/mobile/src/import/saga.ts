@@ -1,7 +1,6 @@
+import { generateKeys, validateMnemonic } from '@celo/utils/lib/account'
 import { ensureLeading0x } from '@celo/utils/src/address'
 import BigNumber from 'bignumber.js'
-import { validateMnemonic } from 'bip39'
-import { mnemonicToSeedHex } from 'react-native-bip39'
 import { call, put, spawn, takeLeading } from 'redux-saga/effects'
 import { setBackupCompleted } from 'src/account/actions'
 import { showError } from 'src/alert/actions'
@@ -38,7 +37,8 @@ export function* importBackupPhraseSaga({ phrase, useEmptyWallet }: ImportBackup
       return
     }
 
-    const privateKey = yield call(mnemonicToSeedHex, phrase)
+    const keys = yield call(generateKeys, phrase)
+    const privateKey = keys.privateKey
     if (!privateKey) {
       throw new Error('Failed to convert mnemonic to hex')
     }

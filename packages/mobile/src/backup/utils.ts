@@ -1,5 +1,5 @@
+import { generateMnemonic, MnemonicLanguages } from '@celo/utils/lib/account'
 import * as _ from 'lodash'
-import { generateMnemonic, wordlists } from 'react-native-bip39'
 import { getKey } from 'src/utils/keyStore'
 import Logger from 'src/utils/Logger'
 
@@ -12,7 +12,7 @@ export const MNEMONIC_SPLITTER = 'celo'
 export async function createQuizWordList(mnemonic: string, language: string | null) {
   const disallowedWordSet = new Set(mnemonic.split(' '))
   const languageWordList = getWordlist(language)
-  const wordOptions: string = await generateMnemonic(1000, null, languageWordList)
+  const wordOptions: string = generateMnemonic(1000, languageWordList) // TODO CHECK
   return wordOptions.split(' ').filter((word: string) => !disallowedWordSet.has(word))
 }
 
@@ -39,15 +39,15 @@ export function selectQuizWordOptions(
 
 export function getWordlist(language: string | null) {
   if (!language) {
-    return wordlists.EN
+    return MnemonicLanguages.english
   }
 
   switch (language.slice(0, 2)) {
     case 'es': {
-      return wordlists.ES
+      return MnemonicLanguages.spanish
     }
     default: {
-      return wordlists.EN
+      return MnemonicLanguages.english
     }
   }
 }
