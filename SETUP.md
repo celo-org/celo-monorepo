@@ -16,6 +16,7 @@
       - [Install Android Dev Tools](#install-android-dev-tools-1)
     - [Some common stuff](#some-common-stuff)
       - [Install Go](#install-go)
+      - [Install gcloud cli](#install-gcloud-cli)
       - [Optional: Install Rust](#optional-install-rust)
       - [Optional: Install an Android Emulator](#optional-install-an-android-emulator)
       - [Optional: Genymotion](#optional-genymotion)
