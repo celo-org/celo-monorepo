@@ -195,7 +195,7 @@ export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
   const validatorEnv = fetchEnv(envVar.VALIDATORS)
   // Todo: Link this with value from migrationsConfig.js
   const maxElectableValidators = 100
-  const validatorCount = Math.max(parseInt(validatorEnv, 10), maxElectableValidators)
+  const validatorCount = Math.min(parseInt(validatorEnv, 10), maxElectableValidators)
   const genesisAccountsEnv = fetchEnvOrFallback(envVar.GENESIS_ACCOUNTS, '')
   const validators = getValidatorsInformation(mnemonic, validatorCount)
   console.info(`jcortejoso validators: ${validators}`)
