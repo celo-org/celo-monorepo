@@ -35,6 +35,7 @@ const DefaultConfig = {
   },
   blockchainParameters: {
     gasForNonGoldCurrencies: 50000,
+    // TODO(asa): Needs updating before RC1 deployment
     minimumClientVersion: {
       major: 0,
       minor: 9,
@@ -115,6 +116,7 @@ const DefaultConfig = {
       '0xBE0c3B35Ec3f759D9A67c4B7c539b0D5b52A4642',
       '0xD6d48412dA0804CF88258bfDf5AaFcBe5FEd7ecC',
       '0xFD74A4b05F12B9aB6020CB202aDE1BBa4Bc99aba',
+      '0x114a0f28f20a6cF1AD428C396f78248d0E76724e',
     ],
     numRequiredConfirmations: 2,
     numInternalRequiredConfirmations: 4,
