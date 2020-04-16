@@ -65,3 +65,9 @@ function getWordList(language?: MnemonicLanguages) {
       return bip39.wordlists.english
   }
 }
+
+export const AccountUtils = {
+  generateMnemonic,
+  validateMnemonic,
+  generateKeys,
+}

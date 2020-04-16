@@ -43,7 +43,9 @@ export default class NewAccount extends LocalCommand {
 
   static languageOptions(language: string): MnemonicLanguages | undefined {
     if (language) {
-      return (MnemonicLanguages[language as any] as unknown) as MnemonicLanguages
+      // @ts-ignore
+      const enumLanguage = MnemonicLanguages[language]
+      return enumLanguage as MnemonicLanguages
     }
     return undefined
   }
