@@ -270,10 +270,15 @@ export class ContractKit {
 
     let gas = tx.gas
     if (gas == null) {
-      gas = Math.round(
-        (await estimateGas(tx, this.web3.eth.estimateGas, this.web3.eth.call)) *
-          this.config.gasInflationFactor
-      )
+      try {
+        gas = Math.round(
+          (await estimateGas(tx, this.web3.eth.estimateGas, this.web3.eth.call)) *
+            this.config.gasInflationFactor
+        )
+        debug('estimatedGas: %s', gas)
+      } catch (e) {
+        throw new Error(e)
+      }
     }
 
     return toTxResult(
@@ -295,14 +300,18 @@ export class ContractKit {
       const gasEstimator = (tx: Tx) => txObj.estimateGas({ ...tx })
       const data = txObj.encodeABI()
       // @ts-ignore
-      console.log({ data, ...tx, to: txObj._parent._address })
-      // @ts-ignore
-      const caller = (tx: Tx) =>
-        this.web3.eth.call({ data, ...tx, to: txObj._parent._address }, 76077)
-      gas = Math.round(
-        (await estimateGas(tx, gasEstimator, caller)) * this.config.gasInflationFactor
-      )
-      debug('estimatedGas: %s', gas)
+      const getCallTx = (tx: Tx) => {
+        return { ...tx, data, to: txObj._parent._address }
+      }
+      const caller = (tx: Tx) => this.web3.eth.call(getCallTx(tx))
+      try {
+        gas = Math.round(
+          (await estimateGas(tx, gasEstimator, caller)) * this.config.gasInflationFactor
+        )
+        debug('estimatedGas: %s', gas)
+      } catch (e) {
+        throw new Error(e)
+      }
     }
 
     return toTxResult(
