@@ -97,18 +97,18 @@ The Celo app is now ready for use and you should see `Application is ready` on t
 Accounts are automatically generated on your device. In the terminal on your computer, display the first two public addresses.
 
 ```bash
-celocli node:accounts --useLedger
+celocli account:list --useLedger
 ```
 
 {% hint style="tip" %}
 To display the first `N` (e.g. 10) addresses use the `--ledgerAddresses` flag.
 ```bash
-celocli node:accounts --useLedger --ledgerAddresses N
+celocli account:list --useLedger --ledgerAddresses N
 ```
 
 To display addresses at specific indexes `M`and `N`(e. 2 and 654) use the `--ledgerCustomAddresses "[M, N]"`flag
 ```bash
-celocli node:accounts --useLedger --ledgerCustomAddresses "[M, N]"
+celocli account:list --useLedger --ledgerCustomAddresses "[M, N]"
 ```
  {% endhint %}
 
