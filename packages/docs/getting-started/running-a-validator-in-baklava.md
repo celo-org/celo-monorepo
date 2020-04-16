@@ -276,7 +276,11 @@ There are number of new environment variables, and you may use this table as a r
 
 ### Create Accounts from the `ReleaseGold` contracts
 
-In order to participate on the network (lock gold, vote, validate) from a `ReleaseGold` contract, we need to create an Account at the address of the `ReleaseGold` contract. In the Baklava network, you can look up your Beneficiary address in [the published mapping](https://gist.githubusercontent.com/nategraf/a87f9c2e488ab2d38a0a3c09f5d4ca2b/raw) to find your `ReleaseGold` contract addresses. If you are a genesis validator, your two Beneficary addresses will be the provided `CELO_VALIDATOR_ADDRESS` and `CELO_VALIDATOR_GROUP_ADDRESS`.
+In order to participate on the network (lock gold, vote, validate) from a `ReleaseGold` contract, we need to create an Account at the address of the `ReleaseGold` contract. In the Baklava network, you can look up your Beneficiary address in [the published mapping](https://gist.githubusercontent.com/nategraf/a87f9c2e488ab2d38a0a3c09f5d4ca2b/raw) to find your `ReleaseGold` contract addresses. If you are a genesis validator, your two Beneficary addresses will be the provided `CELO_VALIDATOR_BENEFICIARY_ADDRESS` and `CELO_VALIDATOR_GROUP_BENEFICIARY_ADDRESS`.
+
+{% hint style="info" %}
+An earlier version of this document set the beneficiary addresses to `CELO_VALIDATOR_ADDRESS` and `CELO_VALIDATOR_GROUP_ADDRESS`, but the attestation service expects these to refer to the `ReleaseGold` contract, so please move your beneficiary addresses to reflect the environment variables above.
+{% endhint %}
 
 ```bash
 # On your local machine
@@ -578,6 +582,12 @@ celocli validator:show $CELO_VALIDATOR_ADDRESS
 As part of the [lightweight identity protocol](/celo-codebase/protocol/identity), Validators are expected to run an [Attestation Service](https://github.com/celo-org/celo-monorepo/tree/master/packages/attestation-service) to provide attestations that allow users to map their phone number to an account on Celo. Be sure to allow TCP connections to your Attestations machine on port 80 for all IP addresses.
 
 Just like with the Validator and Vote signer, we'll want to authorize a separate Attestation signer. For that let's start our node on the Attestations machine (keep track of the password you use for this account):
+
+{% hint style="info" %}
+An earlier version of this document set the beneficiary addresses to `CELO_VALIDATOR_ADDRESS` and `CELO_VALIDATOR_GROUP_ADDRESS`, but the attestation service expects these to refer to the `ReleaseGold` contract, so please move your beneficiary addresses to reflect the environment variables above.
+
+`CELO_VALIDATOR_ADDRESS` should be your `ReleaseGold` contract address for the attestation service to work properly.
+{% endhint %}
 
 ```bash
 # On the Attestation machine
