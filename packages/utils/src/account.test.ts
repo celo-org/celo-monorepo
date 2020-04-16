@@ -1,5 +1,4 @@
-import { validateMnemonic } from 'bip39'
-import { generateKeys, generateMnemonic, MnemonicStrength } from './account'
+import { generateKeys, generateMnemonic, MnemonicStrength, validateMnemonic } from './account'
 
 describe('Mnemonic validation', () => {
   it('should generate 24 word mnemonic', () => {

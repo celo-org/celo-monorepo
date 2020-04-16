@@ -25,6 +25,10 @@ export function generateMnemonic(
   return bip39.generateMnemonic(strength, undefined, getWordList(language))
 }
 
+export function validateMnemonic(mnemonic: string, language?: MnemonicLanguages) {
+  return bip39.validateMnemonic(mnemonic, getWordList(language))
+}
+
 export function generateKeys(
   mnemonic: string,
   password?: string,
