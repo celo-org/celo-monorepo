@@ -62,7 +62,7 @@ class ValidatorsListRow extends React.PureComponent<Props & I18nProps, State> {
     tooltip: false,
   }
   tooltipRef = React.createRef<any>()
-  removeDocumentListener: any
+  removeDocumentListener: () => void
 
   constructor(...args) {
     super(...(args as [any]))

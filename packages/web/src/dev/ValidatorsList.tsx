@@ -8,6 +8,16 @@ import { I18nProps, withNamespaces } from 'src/i18n'
 import Chevron, { Direction } from 'src/icons/chevron'
 import { colors, standardStyles, textStyles } from 'src/styles'
 import { weiToDecimal } from 'src/utils/utils'
+import menu from 'src/shared/menu-items'
+import Button, { BTN } from 'src/shared/Button.3'
+import { SingletonRouter as Router, withRouter } from 'next/router'
+import OvalCoin from 'src/shared/OvalCoin'
+
+const networkMenu = [
+  // ['Mainnet', menu.VALIDATORS_LIST.link],
+  ['Baklava', menu.VALIDATORS_LIST__BAKLAVA.link],
+  ['Baklavastaging', menu.VALIDATORS_LIST_BAKLAVASTAGING.link],
+]
 
 class Text extends RNText {
   render() {
@@ -87,12 +97,15 @@ interface CeloValidatorGroup {
 }
 
 interface ValidatorsListProps {
+  router: Router
   data: {
     celoValidatorGroups: CeloValidatorGroup[]
     latestBlock: number
   }
   isLoading: boolean
 }
+
+type Props = ValidatorsListProps & I18nProps
 
 type orderByTypes =
   | 'name'
@@ -110,7 +123,7 @@ export interface State {
   orderAsc: boolean
 }
 
-class ValidatorsList extends React.PureComponent<ValidatorsListProps & I18nProps, State> {
+class ValidatorsList extends React.PureComponent<Props, State> {
   state = {
     expanded: undefined,
     orderBy: 'name' as orderByTypes,
@@ -266,6 +279,26 @@ class ValidatorsList extends React.PureComponent<ValidatorsListProps & I18nProps
           <H1 style={[textStyles.center, standardStyles.sectionMarginTablet, textStyles.invert]}>
             Validator Explorer
           </H1>
+          <View>
+            <View style={[styles.links]}>
+              {networkMenu.map(([name, link]) => (
+                <View
+                  key={name}
+                  style={[
+                    styles.linkWrapper,
+                    this.props.router.pathname !== link ? styles.linkWrapperInactive : {},
+                  ]}
+                >
+                  <Button kind={BTN.DARKNAV} href={link} text={name} />
+                  {this.props.router.pathname === link && (
+                    <View style={styles.activeTab}>
+                      <OvalCoin color={colors.gold} size={10} />
+                    </View>
+                  )}
+                </View>
+              ))}
+            </View>
+          </View>
           <View style={[styles.table, styles.pStatic]}>
             <View style={[styles.tableRow, styles.tableHeaderRow]}>
               <HeaderCell
@@ -329,4 +362,4 @@ class ValidatorsList extends React.PureComponent<ValidatorsListProps & I18nProps
   }
 }
 
-export default withNamespaces('dev')(ValidatorsList)
+export default withNamespaces('dev')(withRouter<Props>(ValidatorsList))

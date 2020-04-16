@@ -14,9 +14,13 @@ import menuItems from 'src/shared/menu-items'
 import Spinner from 'src/shared/Spinner'
 import { colors, standardStyles } from 'src/styles'
 
+let network
+
 function createApolloClient() {
   return new ApolloClient({
-    uri: getConfig().publicRuntimeConfig.BLOCKSCOUT.uri,
+    uri:
+      getConfig().publicRuntimeConfig.BLOCKSCOUT[network] ||
+      getConfig().publicRuntimeConfig.BLOCKSCOUT.uri,
     cache: new InMemoryCache(),
     // TODO: Remove this workaround when the backend service fixes not needed errors
     fetch: async (...args) => {
@@ -140,3 +144,8 @@ const styles = StyleSheet.create({
 })
 
 export default withNamespaces('dev')(ValidatorsListApp)
+
+export const ValidatorsListAppWithNetwork = (networkName: string) => {
+  network = networkName
+  return withNamespaces('dev')(ValidatorsListApp)
+}
