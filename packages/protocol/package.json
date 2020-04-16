@@ -68,7 +68,6 @@
     "truffle-artifactor": "^3.0.7",
     "truffle-plugin-blockscout-verify": "git+https://github.com/celo-org/truffle-plugin-blockscout-verify#91627b3f0867b190bba9183e14ca8633396a7e5c",
     "truffle-resolver": "^4.0.4",
-    "truffle-security": "^1.4.4",
     "twilio": "^3.23.2",
     "weak-map": "^1.0.5",
     "web3": "1.2.4",
