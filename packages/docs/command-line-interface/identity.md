@@ -13,7 +13,7 @@ USAGE
   $ celocli identity:test-attestation-service
 
 OPTIONS
-  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Your validator's account address
+  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Your validator's signer or account address
   --message=message                                  (required) The message of the SMS
   --phoneNumber=+14152223333                         (required) The phone number to send the test message to
 
