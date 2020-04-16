@@ -94,14 +94,14 @@ Exit by toggling all the way to the right to the `Back` option and select by pre
 
 The Celo app is now ready for use and you should see `Application is ready` on the screen.
 
-Accounts are automatically generated on your device. In the terminal on your computer, display the first two public addresses.
+Accounts are automatically generated on your device. In the terminal on your computer, you can view the first account addresses with the following command:
 
 ```bash
-celocli node:accounts --useLedger
+celocli node:accounts --useLedger --ledgerAddresses 1
 ```
 
 {% hint style="tip" %}
-To display the first `N` (e.g. 10) addresses use the `--ledgerAddresses` flag.
+If you wish to generate more than one address from your seed phrase, you can display the first `N` (e.g. 10) addresses use the `--ledgerAddresses` flag.
 ```bash
 celocli node:accounts --useLedger --ledgerAddresses N
 ```
@@ -111,6 +111,39 @@ To display addresses at specific indexes `M`and `N`(e. 2 and 654) use the `--led
 celocli node:accounts --useLedger --ledgerCustomAddresses "[M, N]"
 ```
  {% endhint %}
+
+## Performing a Test Transaction
+
+Before using your address on the Celo Mainnet, you may want to test it on the Celo Alfajores Testnet with the following instruction.
+
+Configure the Celo CLI so that it points to the Alfajores network.
+
+```bash
+celocli config:set --node https://alfajores-forno.celo-testnet.org/
+```
+Visit the Alfajores Faucet and send yourself some testnet Celo Gold at the following URL:
+
+https://celo.org/developers/faucet
+
+Check that you received the funds with the following command:
+
+```bash
+celocli account:balance <your-address>
+```
+
+Next, you'll need to enable "Contract Data" in the ledger app. Open the Celo App on your ledger device and go to Settings, then enable "Contract Data" to "Allowed". This setting is required because the celocli uses the ERC20 "pre-wrapped" version of Celo Gold and so sending transactions requires sending data to a smart contract.
+
+Perform a test transaction by running the following command:
+
+```bash
+celocli transfer:gold --from=<your-address> --to=0x0000000000000000000000000000000000000001 --value=10000 --useLedger
+```
+
+You'll need to then approve the transaction on the ledger device.
+
+Finally, you can see if your transaction was mined on the network by copying the transaction hash (txHash) outputted by the command, and searching for it on the Alfajores Block Explorer, available at the following URL:
+
+https://alfajores-blockscout.celo-testnet.org/
 
 ## Using celocli
 
