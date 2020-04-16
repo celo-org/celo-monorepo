@@ -78,6 +78,6 @@
     "bignumber.js": "9.0.0",
     "prettier": "^1.19.1",
     "@types/prettier": "^1.19.0",
-    "ganache-core": "https://github.com/celo-org/ganache-core.git#3dbc32b"
+    "ganache-core": "git+https://github.com/mrsmkl/ganache-core.git#7b0baf64c012d89c7b5a0380098852e73da790c2"
   }
 }

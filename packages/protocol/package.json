@@ -40,7 +40,7 @@
     "@0x/sol-profiler": "^3.0.0",
     "@0x/sol-trace": "^2.0.16",
     "@0x/subproviders": "^5.0.0",
-    "@celo/ganache-cli": "git+https://github.com/celo-org/ganache-cli.git#937e3d279606545fcfc2d1c04d77e57b26d605d6",
+    "@celo/ganache-cli": "git+https://github.com/mrsmkl/ganache-cli.git#630cf0ee6249b872c209b8da5be2f7f24a959258",
     "@celo/utils": "0.1.10-dev",
     "apollo-client": "^2.4.13",
     "bip39": "^3.0.2",
