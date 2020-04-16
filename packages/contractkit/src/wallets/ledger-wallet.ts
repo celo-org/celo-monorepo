@@ -1,3 +1,4 @@
+import { CELO_DERIVATION_PATH_BASE } from '@celo/utils/lib/account'
 import {
   ensureLeading0x,
   isHexString,
@@ -20,7 +21,7 @@ import {
 import { tokenInfoByAddressAndChainId } from './ledger-utils/tokens'
 import { Wallet } from './wallet'
 
-export const CELO_BASE_DERIVATION_PATH = "44'/52752'/0'/0"
+export const CELO_BASE_DERIVATION_PATH = CELO_DERIVATION_PATH_BASE.slice(2)
 const ADDRESS_QTY = 5
 const CELO_APP_ACCEPTS_CONTRACT_DATA_FROM_VERSION = '1.0.2'
 

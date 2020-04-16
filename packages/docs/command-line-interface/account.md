@@ -218,14 +218,27 @@ _See code: [packages/cli/src/commands/account/list.ts](https://github.com/celo-o
 
 ### New
 
-Creates a new account locally and print out the key information. Save this information for local transaction signing or import into a Celo node.
+Creates a new account locally using the Celo Derivation Path (m/44'/52752'/0/0/indexAddress) and print out the key information. Save this information for local transaction signing or import into a Celo node. Ledger: this command has been tested swapping mnemonics with the Ledger successfully (only supports english)
 
 ```
 USAGE
   $ celocli account:new
 
-EXAMPLE
+OPTIONS
+  --indexAddress=indexAddress
+      Choose the index address of the derivation path
+
+  --language=chinese_simplified|chinese_traditional|english|french|italian|japanese|korean|spanish
+      [default: english] Language for the mnemonic words. **WARNING**, some hardware wallets don't support other languages
+
+  --password=password
+      Choose a password to generate the keys
+
+EXAMPLES
   new
+  new --password 12341234
+  new --language spanish
+  new --password 12341234 --language japanese --indexAddress 5
 ```
 
 _See code: [packages/cli/src/commands/account/new.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/new.ts)_
