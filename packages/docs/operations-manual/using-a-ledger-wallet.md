@@ -94,14 +94,14 @@ Exit by toggling all the way to the right to the `Back` option and select by pre
 
 The Celo app is now ready for use and you should see `Application is ready` on the screen.
 
-Accounts are automatically generated on your device. In the terminal on your computer, display the first two public addresses.
+Accounts are automatically generated on your device. In the terminal on your computer, you can view the first account addresses with the following command:
 
 ```bash
-celocli node:accounts --useLedger
+celocli node:accounts --useLedger --ledgerAddresses 1
 ```
 
 {% hint style="tip" %}
-To display the first `N` (e.g. 10) addresses use the `--ledgerAddresses` flag.
+If you wish to generate more than one address from your seed phrase, you can display the first `N` (e.g. 10) addresses use the `--ledgerAddresses` flag.
 ```bash
 celocli node:accounts --useLedger --ledgerAddresses N
 ```
