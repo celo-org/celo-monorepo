@@ -112,6 +112,39 @@ celocli node:accounts --useLedger --ledgerCustomAddresses "[M, N]"
 ```
  {% endhint %}
 
+## Performing a Test Transaction
+
+Before using your address on the Celo Mainnet, you may want to test it on the Celo Alfajores Testnet with the following instruction.
+
+Configure the Celo CLI so that it points to the Alfajores network.
+
+```bash
+celocli config:set --node https://alfajores-forno.celo-testnet.org/
+```
+Visit the Alfajores Faucet and send yourself some testnet Celo Gold at the following URL:
+
+https://celo.org/developers/faucet
+
+Check that you received the funds with the following command:
+
+```bash
+celocli account:balance <your-address>
+```
+
+Next, you'll need to enable "Contract Data" in the ledger app. Open the Celo App on your ledger device and go to Settings, then enable "Contract Data" to "Allowed". This setting is required because the celocli uses the ERC20 "pre-wrapped" version of Celo Gold and so sending transactions requires sending data to a smart contract.
+
+Perform a test transaction by running the following command:
+
+```bash
+celocli transfer:gold --from=<your-address> --to=0x0000000000000000000000000000000000000001 --value=10000 --useLedger
+```
+
+You'll need to then approve the transaction on the ledger device.
+
+Finally, you can see if your transaction was mined on the network by copying the transaction hash (txHash) outputted by the command, and searching for it on the Alfajores Block Explorer, available at the following URL:
+
+https://alfajores-blockscout.celo-testnet.org/
+
 ## Using celocli
 
 You can now use `celocli` to securely sign transactions or key proof-of-possessions with your Ledger.
