@@ -21,6 +21,7 @@ export async function removeHelmRelease(celoEnv: string) {
 
 async function helmParameters(celoEnv: string) {
   const identity = await createOracleIdentityIfNotExists(celoEnv)
+  const tokenName = await createRBACResources(celoEnv)
   const addresses = oracleAddresses()
   return [
     `--set environmentName=${celoEnv}`,
@@ -29,6 +30,7 @@ async function helmParameters(celoEnv: string) {
     `--set image.tag=${fetchEnv(envVar.ORACLE_DOCKER_IMAGE_TAG)}`,
     `--set oracle.addresses='{${addresses.join(',')}}'`,
     `--set oracle.web3ProviderUrl=${getFornoUrl(celoEnv)}`,
+    `--set oracle.token_name=${tokenName}`,
     `--set azure.identity.id=${identity.id}`,
     `--set azure.identity.clientId=${identity.clientId}`,
     `--set azure.keyVault.name=${keyVaultName()}`,
@@ -73,4 +75,72 @@ function keyVaultName() {
 function oracleAddresses() {
   const oracleAddressesStr = fetchEnv(envVar.ORACLE_ADDRESSES)
   return oracleAddressesStr.split(',')
+}
+
+async function createRBACResources(celoEnv: string) {
+  await createOracleServiceAccount(celoEnv)
+  await createOracleRole(celoEnv)
+  await createOracleRoleBinding(celoEnv)
+  const tokenName = await getSecretTokenName(celoEnv)
+  return tokenName
+}
+
+async function createOracleServiceAccount(celoEnv: string) {
+  const serviceAccountYaml = `
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: ${releaseName(celoEnv)}
+  namespace: ${celoEnv}
+EOF
+`
+
+  await execCmdWithExitOnFailure(`cat <<EOF | kubectl apply --filename - ${serviceAccountYaml}`)
+}
+
+async function createOracleRole(celoEnv: string) {
+  const roleYaml = `
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: ${celoEnv}
+  name: ${releaseName(celoEnv)}
+rules:
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "update", "patch"]
+EOF
+`
+
+  await execCmdWithExitOnFailure(`cat <<EOF | kubectl apply --filename - ${roleYaml}`)
+}
+
+async function createOracleRoleBinding(celoEnv: string) {
+  const roleBindingYaml = `
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  namespace: ${celoEnv}
+  name: ${releaseName(celoEnv)}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: ${releaseName(celoEnv)}
+subjects:
+- kind: ServiceAccount
+  name: ${releaseName(celoEnv)}
+  namespace: ${celoEnv}
+EOF
+`
+
+  await execCmdWithExitOnFailure(`cat <<EOF | kubectl apply --filename - ${roleBindingYaml}`)
+}
+
+async function getSecretTokenName(celoEnv: string) {
+  const [tokenName] = await execCmdWithExitOnFailure(
+    `kubectl get serviceaccount --namespace=${celoEnv} ${releaseName(
+      celoEnv
+    )} -o=jsonpath="{.secrets[0]['name']}"`
+  )
+  return tokenName.trim()
 }
