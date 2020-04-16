@@ -3,5 +3,5 @@ kind: AzureIdentityBinding
 metadata:
   name: {{ template "name" . }}-identity-binding
 spec:
-  AzureIdentity: {{ template "name" . }}-identity
+  AzureIdentity: {{ template "azure-identity-name" . }}
   Selector: {{ template "azure-identity-binding-name" . }}

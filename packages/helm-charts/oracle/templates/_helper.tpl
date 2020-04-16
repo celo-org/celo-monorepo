@@ -30,8 +30,8 @@ The name of the azure identity binding for all oracles
 {{- end -}}
 
 {{/*
-The name of the config map containing oracle addresses
+The name of the azure identity for all oracles
 */}}
-{{- define "oracle-addresses-config-map-name" -}}
-{{ template "name" . }}-addresses
+{{- define "azure-identity-name" -}}
+{{ template "name" . }}-identity
 {{- end -}}

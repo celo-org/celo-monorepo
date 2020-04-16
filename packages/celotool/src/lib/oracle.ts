@@ -7,7 +7,6 @@ import { execCmdWithExitOnFailure } from 'src/lib/utils'
 const helmChartPath = '../helm-charts/oracle'
 
 export async function installHelmChart(celoEnv: string) {
-  // await createOracleIdentityIfNotExists(celoEnv)
   return installGenericHelmChart(
     celoEnv,
     releaseName(celoEnv),
@@ -30,10 +29,9 @@ async function helmParameters(celoEnv: string) {
     `--set image.tag=${fetchEnv(envVar.ORACLE_DOCKER_IMAGE_TAG)}`,
     `--set oracle.addresses='{${addresses.join(',')}}'`,
     `--set oracle.web3ProviderUrl=${getFornoUrl(celoEnv)}`,
-    // `--set azure.subscriptionId=${subscriptionId()}`,
     `--set azure.identity.id=${identity.id}`,
     `--set azure.identity.clientId=${identity.clientId}`,
-    `--set azure.keyvault.vaultName=${keyVaultName()}`,
+    `--set azure.keyVault.name=${keyVaultName()}`,
   ]
 }
 

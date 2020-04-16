@@ -1,7 +1,7 @@
 apiVersion: aadpodidentity.k8s.io/v1
 kind: AzureIdentity
 metadata:
-  name: {{ template "name" . }}-identity
+  name: {{ template "azure-identity-name" . }}
   annotations:
     aadpodidentity.k8s.io/Behavior: namespaced
 spec:

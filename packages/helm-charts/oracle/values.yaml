@@ -1,15 +1,15 @@
 environmentName: test
-replicas: 1
+replicas: 2
 image:
-  repository: test
-  tag: test
+  repository: oracletest.azurecr.io/test/oracle
+  tag: hsmtest
 
 oracle:
-  web3ProviderUrl: test
-  privateKeys:
-    - '0x000'
-
+  addresses: 0x0000000000000000000000000000000000000000,0x0000000000000000000000000000000000000001
+  web3ProviderUrl: https://alfajoresstaging-forno.celo-testnet.org
 azure:
   identity:
-    id: test
-    clientId: test
+    id: defaultId
+    clientId: defaultClientId
+  keyVault:
+    name: defaultKeyVaultName

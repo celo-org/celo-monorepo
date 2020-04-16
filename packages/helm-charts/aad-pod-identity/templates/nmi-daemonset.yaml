@@ -53,12 +53,7 @@ spec:
         - name: prometheus
           containerPort: {{ .Values.nmi.prometheusPort }}
         resources:
-          limits:
-            cpu: 200m
-            memory: 512Mi
-          requests:
-            cpu: 100m
-            memory: 256Mi
+{{ toYaml .Values.nmi.resources | indent 10 }}
         securityContext:
           privileged: true
           capabilities:

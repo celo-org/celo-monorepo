@@ -56,4 +56,4 @@ spec:
         - name: CELO_NODE
           value: {{ .Values.oracle.web3ProviderUrl }}
         - name: AZURE_KEY_VAULT
-          value: {{ .Values.azure.keyvault.vaultName }}
+          value: {{ .Values.azure.keyVault.name }}

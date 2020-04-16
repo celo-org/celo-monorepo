@@ -41,12 +41,7 @@ spec:
         - name: prometheus
           containerPort: {{ .Values.mic.prometheusPort }}
         resources:
-          limits:
-            cpu: 200m
-            memory: 1024Mi
-          requests:
-            cpu: 100m
-            memory: 256Mi
+{{ toYaml .Values.mic.resources | indent 10 }}
         volumeMounts:
         - name: k8s-azure-file
           mountPath: /etc/kubernetes/azure.json
