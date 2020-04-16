@@ -265,7 +265,6 @@ export class ContractKit {
    *  - returns a `TransactionResult` instead of `PromiEvent`
    */
   async sendTransaction(tx: Tx): Promise<TransactionResult> {
-    console.log('---------------------------')
     tx = this.fillTxDefaults(tx)
 
     let gas = tx.gas
@@ -299,7 +298,7 @@ export class ContractKit {
     if (gas == null) {
       const gasEstimator = (tx: Tx) => txObj.estimateGas({ ...tx })
       const data = txObj.encodeABI()
-      // @ts-ignore
+      // @ts-ignore missing _parent property from TransactionObject type.
       const getCallTx = (tx: Tx) => {
         return { ...tx, data, to: txObj._parent._address }
       }
