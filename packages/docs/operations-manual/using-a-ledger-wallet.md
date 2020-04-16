@@ -153,6 +153,9 @@ To use `celocli` with your Ledger, ensure the device is connected to your comput
 
 Then, simply append the `--useLedger` flag to any `celocli` commands with which you'd like to use a Ledger.
 
+There is another flag that you can use `--ledgerConfirmAddress`. This flag, allows you to verify from the Ledger the address
+that is sending the transaction.
+
 The following commands are an example of how you might authorize a vote signing key stored on a Ledger, for your account key, which is also stored on a Ledger, or for your ReleaseGold account, for which the beneficiary key is stored on a Ledger.
 
 
