@@ -4,6 +4,7 @@
 
 ### Functions
 
+* [estimateGas](_utils_web3_utils_.md#const-estimategas)
 * [getAbiTypes](_utils_web3_utils_.md#const-getabitypes)
 * [parseDecodedParams](_utils_web3_utils_.md#const-parsedecodedparams)
 * [traceBlock](_utils_web3_utils_.md#traceblock)
@@ -11,11 +12,45 @@
 
 ## Functions
 
+### `Const` estimateGas
+
+▸ **estimateGas**(`tx`: Tx, `gasEstimator`: function, `caller`: function): *Promise‹number›*
+
+*Defined in [contractkit/src/utils/web3-utils.ts:24](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/web3-utils.ts#L24)*
+
+**Parameters:**
+
+▪ **tx**: *Tx*
+
+▪ **gasEstimator**: *function*
+
+▸ (`tx`: Tx): *Promise‹number›*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`tx` | Tx |
+
+▪ **caller**: *function*
+
+▸ (`tx`: Tx): *Promise‹string›*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`tx` | Tx |
+
+**Returns:** *Promise‹number›*
+
+___
+
 ### `Const` getAbiTypes
 
 ▸ **getAbiTypes**(`abi`: ABIDefinition[], `methodName`: string): *string[]*
 
-*Defined in [contractkit/src/utils/web3-utils.ts:7](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/web3-utils.ts#L7)*
+*Defined in [contractkit/src/utils/web3-utils.ts:8](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/web3-utils.ts#L8)*
 
 **Parameters:**
 
@@ -32,7 +67,7 @@ ___
 
 ▸ **parseDecodedParams**(`params`: DecodedParamsObject): *object*
 
-*Defined in [contractkit/src/utils/web3-utils.ts:10](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/web3-utils.ts#L10)*
+*Defined in [contractkit/src/utils/web3-utils.ts:11](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/web3-utils.ts#L11)*
 
 **Parameters:**
 
@@ -52,7 +87,7 @@ ___
 
 ▸ **traceBlock**(`web3`: Web3, `blockNumber`: number, `tracer`: string): *Promise‹any[]›*
 
-*Defined in [contractkit/src/utils/web3-utils.ts:38](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/web3-utils.ts#L38)*
+*Defined in [contractkit/src/utils/web3-utils.ts:57](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/web3-utils.ts#L57)*
 
 **Parameters:**
 
@@ -70,7 +105,7 @@ ___
 
 ▸ **traceTransaction**(`web3`: Web3, `transaction`: string, `tracer`: string): *Promise‹any[]›*
 
-*Defined in [contractkit/src/utils/web3-utils.ts:23](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/web3-utils.ts#L23)*
+*Defined in [contractkit/src/utils/web3-utils.ts:42](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/web3-utils.ts#L42)*
 
 **Parameters:**
 

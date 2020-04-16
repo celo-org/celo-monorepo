@@ -321,6 +321,27 @@ contract Election is
   }
 
   /**
+   * @notice Revokes all active votes for `group`
+   * @param group The validator group to revoke votes from.
+   * @param lesser The group receiving fewer votes than the group for which the vote was revoked,
+   *   or 0 if that group has the fewest votes of any validator group.
+   * @param greater The group receiving more votes than the group for which the vote was revoked,
+   *   or 0 if that group has the most votes of any validator group.
+   * @param index The index of the group in the account's voting list.
+   * @return True upon success.
+   * @dev Fails if the account has not voted on a validator group.
+   */
+  function revokeAllActive(address group, address lesser, address greater, uint256 index)
+    external
+    nonReentrant
+    returns (bool)
+  {
+    address account = getAccounts().voteSignerToAccount(msg.sender);
+    uint256 value = getActiveVotesForGroupByAccount(group, account);
+    return revokeActive(group, value, lesser, greater, index);
+  }
+
+  /**
    * @notice Revokes `value` active votes for `group`
    * @param group The validator group to revoke votes from.
    * @param value The number of votes to revoke.
@@ -338,7 +359,7 @@ contract Election is
     address lesser,
     address greater,
     uint256 index
-  ) external nonReentrant returns (bool) {
+  ) public nonReentrant returns (bool) {
     // TODO(asa): Dedup with revokePending.
     require(group != address(0), "Group address zero");
     address account = getAccounts().voteSignerToAccount(msg.sender);

@@ -1,0 +1,1 @@
+export const mockContractAddress = '0x000000000000000000000000000000000000CE10'

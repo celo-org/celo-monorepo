@@ -15,7 +15,9 @@
 
 ## Operations Manual
 
+- [Governance](operations-manual/governance.md)
 - [Key Management](operations-manual/key-management.md)
+  - [Using a Ledger Wallet](operations-manual/using-a-ledger-wallet.md)
 - [Securing Celo Nodes and Services](operations-manual/securing-nodes-and-services.md)
 - [Upgrading a Node](operations-manual/node-upgrades.md)
 
@@ -173,7 +175,12 @@
       - [utils/web3-utils](developer-resources/contractkit/reference/modules/_utils_web3_utils_.md)
       - [wallets/default-wallet](developer-resources/contractkit/reference/modules/_wallets_default_wallet_.md)
       - [DefaultWallet](developer-resources/contractkit/reference/classes/_wallets_default_wallet_.defaultwallet.md)
+      - [wallets/ledger-utils/data](developer-resources/contractkit/reference/modules/_wallets_ledger_utils_data_.md)
+      - [wallets/ledger-utils/tokens](developer-resources/contractkit/reference/modules/_wallets_ledger_utils_tokens_.md)
+      - [API](developer-resources/contractkit/reference/interfaces/_wallets_ledger_utils_tokens_.api.md)
+      - [TokenInfo](developer-resources/contractkit/reference/interfaces/_wallets_ledger_utils_tokens_.tokeninfo.md)
       - [wallets/ledger-wallet](developer-resources/contractkit/reference/modules/_wallets_ledger_wallet_.md)
+      - [AddressValidation](developer-resources/contractkit/reference/enums/_wallets_ledger_wallet_.addressvalidation.md)
       - [LedgerWallet](developer-resources/contractkit/reference/classes/_wallets_ledger_wallet_.ledgerwallet.md)
       - [wallets/wallet](developer-resources/contractkit/reference/modules/_wallets_wallet_.md)
       - [Wallet](developer-resources/contractkit/reference/interfaces/_wallets_wallet_.wallet.md)
@@ -309,6 +316,7 @@
     - [Enums]()
       - [CeloContract](developer-resources/contractkit/reference/enums/_base_.celocontract.md)
       - [ClaimTypes](developer-resources/contractkit/reference/enums/_identity_claims_types_.claimtypes.md)
+      - [AddressValidation](developer-resources/contractkit/reference/enums/_wallets_ledger_wallet_.addressvalidation.md)
       - [AttestationState](developer-resources/contractkit/reference/enums/_wrappers_attestations_.attestationstate.md)
       - [ProposalStage](developer-resources/contractkit/reference/enums/_wrappers_governance_.proposalstage.md)
       - [VoteValue](developer-resources/contractkit/reference/enums/_wrappers_governance_.votevalue.md)
@@ -327,6 +335,8 @@
       - [EIP712TypedData](developer-resources/contractkit/reference/interfaces/_utils_sign_typed_data_utils_.eip712typeddata.md)
       - [EIP712Types](developer-resources/contractkit/reference/interfaces/_utils_sign_typed_data_utils_.eip712types.md)
       - [RLPEncodedTx](developer-resources/contractkit/reference/interfaces/_utils_signing_utils_.rlpencodedtx.md)
+      - [API](developer-resources/contractkit/reference/interfaces/_wallets_ledger_utils_tokens_.api.md)
+      - [TokenInfo](developer-resources/contractkit/reference/interfaces/_wallets_ledger_utils_tokens_.tokeninfo.md)
       - [Wallet](developer-resources/contractkit/reference/interfaces/_wallets_wallet_.wallet.md)
       - [ActionableAttestation](developer-resources/contractkit/reference/interfaces/_wrappers_attestations_.actionableattestation.md)
       - [AttestationStat](developer-resources/contractkit/reference/interfaces/_wrappers_attestations_.attestationstat.md)
@@ -383,6 +393,7 @@
 - [Account](command-line-interface/account.md)
 - [Election](command-line-interface/election.md)
 - [Exchange](command-line-interface/exchange.md)
+- [Governance](command-line-interface/governance.md)
 - [Locked Gold](command-line-interface/lockedgold.md)
 - [Network](command-line-interface/network.md)
 - [Node](command-line-interface/node.md)
