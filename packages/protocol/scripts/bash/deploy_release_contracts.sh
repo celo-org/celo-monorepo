@@ -7,12 +7,12 @@ set -euo pipefail
 # -n: Name of the network to upgrade
 # -f: Address of the account deploying the grant
 # -g: File containing grant information
-# -s: Amount of gold for beneficiary to start with for transactions
+# -s: (Optional) Amount of gold for beneficiary to start with for transactions
 # -o: (Optional) File to output results to
 # -really: (Optional) Reply "yes" to prompts about deploying grants (Be careful!)
 #
 # Example:
-# `./scripts/bash/deploy_release_contracts.sh -n development -f scripts/truffle/releaseGoldContracts.json -g 50`
+# `./scripts/bash/deploy_release_contracts.sh -n development -f 0x5409ED021D9299bf6814279A6A1411A7e866A631 -g scripts/truffle/releaseGoldExampleConfigs.json -r yes`
 
 NETWORK=""
 GRANTS_FILE=""

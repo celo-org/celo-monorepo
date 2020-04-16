@@ -1,13 +1,10 @@
-import {
-  _setInitialProxyImplementation,
-  getDeployedProxiedContract,
-} from '@celo/protocol/lib/web3-utils'
+import { _setInitialProxyImplementation } from '@celo/protocol/lib/web3-utils'
+import { DefaultConfig } from '@celo/protocol/migrationsConfig'
 import BigNumber from 'bignumber.js'
 import chalk from 'chalk'
 import fs = require('fs')
 import * as prompts from 'prompts'
 import {
-  RegistryInstance,
   ReleaseGoldContract,
   ReleaseGoldMultiSigContract,
   ReleaseGoldMultiSigProxyContract,
@@ -15,7 +12,6 @@ import {
 } from 'types'
 
 let argv: any
-let registry: any
 let releases: any
 let startGold: any
 let deployedGrants: any
@@ -112,7 +108,7 @@ async function handleGrant(releaseGoldConfig: any, currGrant: number) {
     releaseGoldConfig.initialDistributionRatio,
     releaseGoldConfig.canValidate,
     releaseGoldConfig.canVote,
-    registry.address
+    DefaultConfig.registry.predeployedProxyAddress
   )
   const proxiedReleaseGold = await ReleaseGold.at(releaseGoldProxy.address)
   await proxiedReleaseGold.transferOwnership(releaseGoldMultiSigProxy.address, { from: argv.from })
@@ -276,7 +272,6 @@ module.exports = async (callback: (error?: any) => number) => {
     argv = require('minimist')(process.argv.slice(5), {
       string: ['network', 'from', 'grants', 'start_gold', 'output_file', 'really'],
     })
-    registry = await getDeployedProxiedContract<RegistryInstance>('Registry', artifacts)
     ReleaseGoldMultiSig = artifacts.require('ReleaseGoldMultiSig')
     ReleaseGoldMultiSigProxy = artifacts.require('ReleaseGoldMultiSigProxy')
     ReleaseGold = artifacts.require('ReleaseGold')
