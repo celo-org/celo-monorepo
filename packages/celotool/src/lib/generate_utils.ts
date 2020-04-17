@@ -16,6 +16,7 @@ import {
   ISTANBUL_MIX_HASH,
   REGISTRY_ADDRESS,
   TEMPLATE,
+  GENESIS_MSG_HASH,
 } from './genesis_constants'
 import { GenesisConfig } from './interfaces/genesis-config'
 import { ensure0x, strip0x } from './utils'
@@ -249,12 +250,12 @@ export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
 }
 
 export const generateIstanbulExtraData = (validators: Validator[]) => {
-  const istanbulVanity = 32
+  const istanbulVanity = GENESIS_MSG_HASH
   const blsSignatureVanity = 96
   const ecdsaSignatureVanity = 65
   return (
     '0x' +
-    repeat('0', istanbulVanity * 2) +
+    istanbulVanity +
     rlp
       // @ts-ignore
       .encode([
