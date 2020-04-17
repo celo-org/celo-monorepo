@@ -3,10 +3,10 @@ import { handleGetContactMatches } from './match-making/get-contact-matches'
 import { handleGetSalt } from './salt-generation/get-salt'
 
 export const getSalt = functions.https.onRequest(async (request, response) => {
-  await handleGetSalt(request, response)
+  return handleGetSalt(request, response)
 })
 
 // TODO (amyslawson) consider pagination or streaming of contacts?
 export const getContactMatches = functions.https.onRequest(async (request, response) => {
-  await handleGetContactMatches(request, response)
+  return handleGetContactMatches(request, response)
 })
