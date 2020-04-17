@@ -1,10 +1,12 @@
 import * as React from 'react'
 import { NativeSyntheticEvent, TextInputChangeEventData } from 'react-native'
+import { ErrorKeys } from 'src/forms/ErrorDisplay'
 interface State {
   isComplete: boolean
   isLoading: boolean
   form: FormState
   errors: string[]
+  apiError?: ErrorKeys
 }
 
 type FormField = string
@@ -52,17 +54,29 @@ export default class Form extends React.Component<Props, State> {
   state: State
   constructor(props, context) {
     super(props, context)
-    this.state = { form: props.blankForm, isComplete: false, isLoading: false, errors: [] }
+    this.state = {
+      form: props.blankForm,
+      isComplete: false,
+      isLoading: false,
+      errors: [],
+    }
   }
 
   postForm = async () => {
     this.setState({ isLoading: true })
     const response = await postForm(this.props.route, this.form())
+    const apiError =
+      response.status === 429
+        ? ErrorKeys.pleaseWait
+        : !response.ok
+        ? ErrorKeys.unknownError
+        : undefined
     this.setState({
       isComplete: response.ok,
-      form: this.props.blankForm,
+      form: response.ok ? this.props.blankForm : this.state.form,
       isLoading: false,
-      errors: !response.ok ? ['unknownError'] : [],
+      errors: [],
+      apiError,
     })
   }
 
