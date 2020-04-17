@@ -15,11 +15,14 @@
 
 ## Operations Manual
 
-- [Governance](operations-manual/governance.md)
-- [Key Management](operations-manual/key-management.md)
-  - [Using a Ledger Wallet](operations-manual/using-a-ledger-wallet.md)
+- [Key Management](operations-manual/key-management/summary.md)
+  - [Detailed Role Descriptions](operations-manual/key-management/detailed.md)
+  - [Validator Signer Key Rotation](operations-manual/key-management/key-rotation.md)
+  - [Using a Ledger Wallet](operations-manual/key-management/ledger.md)
+- [Celo Foundation Voting Policy](operations-manual/celo-foundation-voting-policy.md)
 - [Securing Celo Nodes and Services](operations-manual/securing-nodes-and-services.md)
 - [Upgrading a Node](operations-manual/node-upgrades.md)
+- [Governance](operations-manual/governance.md)
 
 ## Celo Codebase
 

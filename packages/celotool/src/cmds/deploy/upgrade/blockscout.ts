@@ -1,11 +1,13 @@
 import sleep from 'sleep-promise'
 import {
   createDefaultIngressIfNotExists,
+  getInstanceName,
+  getReleaseName,
   removeHelmRelease,
   upgradeHelmChart,
 } from 'src/lib/blockscout'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
-import { fetchEnvOrFallback } from 'src/lib/env-utils'
+import { envVar, fetchEnvOrFallback } from 'src/lib/env-utils'
 import { resetCloudSQLInstance, retrieveCloudSQLConnectionInfo } from 'src/lib/helm_deploy'
 import { execCmdWithExitOnFailure } from 'src/lib/utils'
 import yargs from 'yargs'
@@ -28,17 +30,15 @@ type BlockscoutUpgradeArgv = UpgradeArgv & { reset: boolean }
 export const handler = async (argv: BlockscoutUpgradeArgv) => {
   await switchToClusterFromEnv()
 
-  const instanceName = `${argv.celoEnv}${fetchEnvOrFallback('BLOCKSCOUT_DB_SUFFIX', '')}`
-  const helmReleaseName = `${argv.celoEnv}-blockscout${fetchEnvOrFallback(
-    'BLOCKSCOUT_DB_SUFFIX',
-    ''
-  )}`
+  const dbSuffix = fetchEnvOrFallback(envVar.BLOCKSCOUT_DB_SUFFIX, '')
+  const instanceName = getInstanceName(argv.celoEnv)
+  const helmReleaseName = getReleaseName(argv.celoEnv)
 
   const [
     blockscoutDBUsername,
     blockscoutDBPassword,
     blockscoutDBConnectionName,
-  ] = await retrieveCloudSQLConnectionInfo(argv.celoEnv, instanceName)
+  ] = await retrieveCloudSQLConnectionInfo(argv.celoEnv, instanceName, dbSuffix)
 
   if (argv.reset === true) {
     console.info(
@@ -53,12 +53,8 @@ export const handler = async (argv: BlockscoutUpgradeArgv) => {
   } else {
     console.info(`Delete blockscout-migration`)
     try {
-      await execCmdWithExitOnFailure(
-        `kubectl delete job ${argv.celoEnv}-blockscout${fetchEnvOrFallback(
-          'BLOCKSCOUT_DB_SUFFIX',
-          ''
-        )}-migration -n ${argv.celoEnv}`
-      )
+      const jobName = `${argv.celoEnv}-blockscout${dbSuffix}-migration`
+      await execCmdWithExitOnFailure(`kubectl delete job ${jobName} -n ${argv.celoEnv}`)
     } catch (error) {
       console.error(error)
     }

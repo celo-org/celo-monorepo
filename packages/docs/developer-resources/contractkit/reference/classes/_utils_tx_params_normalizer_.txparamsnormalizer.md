@@ -24,7 +24,7 @@
 
 \+ **new TxParamsNormalizer**(`rpcCaller`: [RpcCaller](../interfaces/_utils_rpc_caller_.rpccaller.md)): *[TxParamsNormalizer](_utils_tx_params_normalizer_.txparamsnormalizer.md)*
 
-*Defined in [contractkit/src/utils/tx-params-normalizer.ts:16](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/tx-params-normalizer.ts#L16)*
+*Defined in [contractkit/src/utils/tx-params-normalizer.ts:17](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/tx-params-normalizer.ts#L17)*
 
 **Parameters:**
 
@@ -40,7 +40,7 @@ Name | Type |
 
 • **rpcCaller**: *[RpcCaller](../interfaces/_utils_rpc_caller_.rpccaller.md)*
 
-*Defined in [contractkit/src/utils/tx-params-normalizer.ts:18](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/tx-params-normalizer.ts#L18)*
+*Defined in [contractkit/src/utils/tx-params-normalizer.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/tx-params-normalizer.ts#L19)*
 
 ## Methods
 
@@ -48,7 +48,7 @@ Name | Type |
 
 ▸ **populate**(`celoTxParams`: Tx): *Promise‹Tx›*
 
-*Defined in [contractkit/src/utils/tx-params-normalizer.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/tx-params-normalizer.ts#L20)*
+*Defined in [contractkit/src/utils/tx-params-normalizer.ts:21](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/tx-params-normalizer.ts#L21)*
 
 **Parameters:**
 

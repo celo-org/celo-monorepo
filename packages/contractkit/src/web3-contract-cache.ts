@@ -28,7 +28,7 @@ import { ContractKit } from './kit'
 
 const debug = debugFactory('kit:web3-contract-cache')
 
-const ContractFactories = {
+export const ContractFactories = {
   [CeloContract.Accounts]: newAccounts,
   [CeloContract.Attestations]: newAttestations,
   [CeloContract.BlockchainParameters]: newBlockchainParameters,
@@ -54,7 +54,7 @@ const ContractFactories = {
   [CeloContract.Validators]: newValidators,
 }
 
-type CFType = typeof ContractFactories
+export type CFType = typeof ContractFactories
 type ContractCacheMap = { [K in keyof CFType]?: ReturnType<CFType[K]> }
 
 /**
