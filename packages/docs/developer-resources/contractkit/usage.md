@@ -1,6 +1,6 @@
 # ContractKit Usage
 
-The following are some examples of the capabilities of the `ContractKit`
+The following are some examples of the capabilities of the `ContractKit`, assuming it is already connected to a node.
 
 ## Setting Default Tx Options
 
@@ -9,8 +9,8 @@ The following are some examples of the capabilities of the `ContractKit`
 ```ts
 import { CeloContract } from '@celo/contractkit'
 
-// default from
-kit.defaultAccount = myAddress
+let accounts = await kit.web3.eth.getAccounts()
+kit.defaultAccount = accounts[0]
 // paid gas in cUSD
 await kit.setFeeCurrency(CeloContract.StableToken)
 ```
@@ -20,9 +20,20 @@ await kit.setFeeCurrency(CeloContract.StableToken)
 This method from the `kit` will return the cGLD, locked cGLD, cUSD and total balance of the address 
 
 ```ts
-await kit.getTotalBalance(myAddress)
+let totalBalance = await kit.getTotalBalance(myAddress)
 ```
 
+## Deploy a contract
+
+Deploying a contract with the default account already set. Simply send a transaction with no `to:` field. See more about [sending custom transactions](https://docs.celo.org/developer-guide/overview/introduction/contractkit/contracts-wrappers-registry#sending-custom-transactions)
+
+```ts
+let bytecode = '0x608060405234...' // compiled Solidity deployment bytecode
+
+let tx = await kit.sendTransaction({
+    data: bytecode
+})
+```
 
 ## Selling cGLD only if the rate is favorable
 
