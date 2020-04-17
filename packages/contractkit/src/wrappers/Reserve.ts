@@ -43,18 +43,17 @@ export class ReserveWrapper extends BaseWrapper<Reserve> {
     undefined,
     valueToBigNumber
   )
-  getReserveGoldBalance = proxyCall(
-    this.contract.methods.getReserveGoldBalance,
-    undefined,
-    valueToBigNumber
-  )
   getOtherReserveAddresses = proxyCall(this.contract.methods.getOtherReserveAddresses)
 
   /**
    * Returns the reserve cGLD balance.
    * @returns cGLD balance.
    */
-  getReserveGoldBalance = proxyCall(this.contract.methods.getReserveGoldBalance, undefined, valueToBigNumber)
+  getReserveGoldBalance = proxyCall(
+    this.contract.methods.getReserveGoldBalance,
+    undefined,
+    valueToBigNumber
+  )
 
   /**
    * Returns current configuration parameters.
