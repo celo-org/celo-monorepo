@@ -74,13 +74,13 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
       }
     }
 
-    /*
-    const bcp = await getDeployedProxiedContract<BlockchainParametersInstance>(
-      'BlockchainParameters',
-      artifacts
-    )
-    await bcp.setBlockGasLimit('10000000')
-    */
+    if (false) {
+      const bcp = await getDeployedProxiedContract<BlockchainParametersInstance>(
+        'BlockchainParameters',
+        artifacts
+      )
+      await bcp.setBlockGasLimit('10000000')
+    }
 
     const proxyAndImplementationOwnedByGovernance = [
       'Accounts',
