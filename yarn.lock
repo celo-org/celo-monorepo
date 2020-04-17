@@ -3179,25 +3179,6 @@
   resolved "https://registry.yarnpkg.com/@celo/client/-/client-0.0.300.tgz#60c0658905a1fb8bbbe75befed4a493057c53fd5"
   integrity sha512-xem/Ucy0DckNUjP90zxtPIDLOMwYIUD6GpZDAgh9G84LB/tDnVl8OOfbVBGrl7ouOTR+K92nBbNDdweMHkEImw==
 
-"@celo/contractkit@0.2.9":
-  version "0.2.9"
-  resolved "https://registry.yarnpkg.com/@celo/contractkit/-/contractkit-0.2.9.tgz#98c61e2f6a7f5d47dab43d1cf6b04c48d05acc13"
-  integrity sha512-CTepT44iDJM+0grRHsfdPqL0qMUmQ3Syu6BAnG1oBW9MA31796lRYs/QSRmfw3mzoHyDbJsnwKy0mCDQhDahiw==
-  dependencies:
-    "@0x/subproviders" "^5.0.0"
-    "@celo/utils" "0.1.5"
-    "@types/debug" "^4.1.5"
-    bignumber.js "^7.2.0"
-    cross-fetch "3.0.4"
-    debug "^4.1.1"
-    eth-lib "^0.2.8"
-    fp-ts "2.1.1"
-    io-ts "2.0.1"
-    web3 "1.0.0-beta.37"
-    web3-core-helpers "1.0.0-beta.37"
-    web3-eth-abi "1.0.0-beta.37"
-    web3-utils "1.0.0-beta.37"
-
 "@celo/contractkit@0.3.1":
   version "0.3.1"
   resolved "https://registry.yarnpkg.com/@celo/contractkit/-/contractkit-0.3.1.tgz#52415183a8d2711081b827c4f17777df3765b760"
@@ -7162,7 +7143,7 @@
   resolved "https://registry.yarnpkg.com/@types/mocha/-/mocha-5.2.7.tgz#315d570ccb56c53452ff8638738df60726d5b6ea"
   integrity sha512-NYrtPht0wGzhwe9+/idPaBB+TqkY9AhTvOLMkThm0IoEfLaiVQZwBwyJ5puCkO3AUCWrmcoePjp2mbFocKy4SQ==
 
-"@types/node-fetch@2.5.5":
+"@types/node-fetch@2.5.5", "@types/node-fetch@^2.5.5":
   version "2.5.5"
   resolved "https://registry.yarnpkg.com/@types/node-fetch/-/node-fetch-2.5.5.tgz#cd264e20a81f4600a6c52864d38e7fef72485e92"
   integrity sha512-IWwjsyYjGw+em3xTvWVQi5MgYKbRs0du57klfTaZkv/B24AEQ/p/IopNeqIYNy3EsfHOpg8ieQSDomPcsYMHpA==
@@ -7176,14 +7157,6 @@
   integrity sha512-XroxUzLpKuL+CVkQqXlffRkEPi4Gh3Oui/mWyS7ztKiyqVxiU+h3imCW5I2NQmde5jK+3q++36/Q96cyRWsweg==
   dependencies:
     "@types/node" "*"
-
-"@types/node-fetch@^2.5.5":
-  version "2.5.5"
-  resolved "https://registry.yarnpkg.com/@types/node-fetch/-/node-fetch-2.5.5.tgz#cd264e20a81f4600a6c52864d38e7fef72485e92"
-  integrity sha512-IWwjsyYjGw+em3xTvWVQi5MgYKbRs0du57klfTaZkv/B24AEQ/p/IopNeqIYNy3EsfHOpg8ieQSDomPcsYMHpA==
-  dependencies:
-    "@types/node" "*"
-    form-data "^3.0.0"
 
 "@types/node@*":
   version "10.0.0"
