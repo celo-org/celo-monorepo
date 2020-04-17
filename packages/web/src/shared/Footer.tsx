@@ -69,6 +69,7 @@ const SOCIAL_MENU = [
 export default function Footer() {
   const { t } = useTranslation(NameSpaces.common)
   const { isMobile, isTablet } = useScreenSize()
+  const year = new Date().getFullYear()
   return (
     <>
       <GridRow
@@ -127,7 +128,9 @@ export default function Footer() {
       >
         <Cell span={Spans.full} style={isMobile ? standardStyles.centered : styles.toes}>
           <ChangeStory />
-          <Copyright />
+          <Text style={[fonts.legal, isMobile && textStyles.center]}>
+            {t('footer.copyright', { year })}
+          </Text>
         </Cell>
       </GridRow>
     </>
@@ -140,11 +143,19 @@ function MobileLinks() {
     <>
       <View style={standardStyles.row}>
         <FooterColumn heading={'Celo'} links={MENU} />
-        <FooterColumn heading={t('footer.social')} links={SOCIAL_MENU} />
+        <FooterColumn
+          heading={t('footer.social')}
+          links={SOCIAL_MENU}
+          style={styles.endMobileColumn}
+        />
       </View>
       <View style={standardStyles.row}>
         <FooterColumn heading={t('footer.resources')} links={RESOURCE_MENU} />
-        <FooterColumn heading={t('footer.technology')} links={TECH_MENU} />
+        <FooterColumn
+          heading={t('footer.technology')}
+          links={TECH_MENU}
+          style={styles.endMobileColumn}
+        />
       </View>
     </>
   )
@@ -154,12 +165,12 @@ const Details = React.memo(function _Details() {
   const { t } = useTranslation(NameSpaces.common)
   const { isMobile } = useScreenSize()
   const fontStyling = [
-    !isMobile ? textStyles.left : textStyles.center,
-    styles.detailsText,
     fonts.legal,
+    styles.detailsText,
+    !isMobile ? textStyles.left : textStyles.center,
   ]
   return (
-    <View style={styles.details}>
+    <View style={[styles.details, isMobile && standardStyles.centered]}>
       <Text style={fontStyling}>{t('disclaimer')}</Text>
       <Text style={fontStyling}>
         <Trans ns={NameSpaces.common} i18nKey={'footerReadMoreTerms'}>
@@ -169,12 +180,6 @@ const Details = React.memo(function _Details() {
     </View>
   )
 })
-
-function Copyright() {
-  const year = new Date().getFullYear()
-  const { t } = useTranslation(NameSpaces.common)
-  return <Text style={fonts.legal}>{t('footer.copyright', { year })}</Text>
-}
 
 const styles = StyleSheet.create({
   linksArea: {
@@ -190,6 +195,7 @@ const styles = StyleSheet.create({
   },
   detailsText: {
     marginBottom: 20,
+    maxWidth: 350,
   },
   rings: { marginBottom: 50 },
   form: {
@@ -205,5 +211,8 @@ const styles = StyleSheet.create({
   },
   linkColumnEnd: {
     paddingEnd: 0,
+  },
+  endMobileColumn: {
+    marginLeft: 20,
   },
 })
