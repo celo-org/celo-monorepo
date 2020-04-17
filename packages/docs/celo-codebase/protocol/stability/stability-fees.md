@@ -24,9 +24,9 @@ When a transaction occurs, a modifier checks if the stability fee needs updating
 
 To apply periodic inflation, the inflation factor must be updated at regular intervals. Every time an event triggering an `inflationFactor` update\(eg a transfer\) occurs, the `updateInflationFactor` modifier is called \(pseudocode below\), which does the following:
 
-1.  Decide if on or more `inflationPeriod` have passed since we last updated inflation rate
+1.  Decide if on or more `inflationPeriod` have passed since the last time `inflationFactor` was updated
 2.  If so, find out how many have passed
-3.  Compute the new `inflationFactor` and update the last updated time:`
+3.  Compute the new `inflationFactor` and update the last updated time:
 
 `inflationFactor` = `inflationFactor` \* `inflationRate` ^ `# inflationPeriods since last update`
 
