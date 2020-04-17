@@ -52,7 +52,7 @@ const DefaultConfig = {
     slashableDowntime: (12 * HOUR) / 5, // ~12 hours
   },
   election: {
-    minElectableValidators: '5', // Change to 50 once mainnet activated
+    minElectableValidators: '22',
     maxElectableValidators: '100',
     maxVotesPerAccount: 100,
     electabilityThreshold: 1 / 1000,
@@ -60,9 +60,9 @@ const DefaultConfig = {
   },
   epochRewards: {
     targetVotingYieldParameters: {
-      initial: 0, // Change to 0.00016 once mainnet activated // (x + 1) ^ 365 = 1.06
+      initial: 0.00016, // (x + 1) ^ 365 = 1.06
       max: 0.0005, // (x + 1) ^ 365 = 1.20
-      adjustmentFactor: 0, // Change to 1 / 3650 once mainnet activated 1 / 3650
+      adjustmentFactor: 0, // Change to 1 / 3650 once mainnet activated
     },
     rewardsMultiplierParameters: {
       max: 2,
@@ -71,17 +71,20 @@ const DefaultConfig = {
         overspend: 5,
       },
     },
-    targetVotingGoldFraction: 2 / 3,
+    // Intentionally set lower than the expected value at steady state to account for the fact that
+    // users may take some time to start voting with their cGLD.
+    targetVotingGoldFraction: 1 / 2,
     maxValidatorEpochPayment: '205479452054794520547', // (75,000 / 365) * 10 ^ 18
     communityRewardFraction: 1 / 4,
+    // TODO(asa): Must be set before RC1
     carbonOffsettingPartner: '0x0000000000000000000000000000000000000000',
-    carbonOffsettingFraction: 1 / 200,
+    carbonOffsettingFraction: 1 / 1000,
     frozen: true,
   },
   exchange: {
     spread: 5 / 1000,
-    reserveFraction: 1 / 20,
-    updateFrequency: 5 * MINUTE, // 5 minutes
+    reserveFraction: 1 / 100,
+    updateFrequency: 5 * MINUTE,
     minimumReports: 5,
     frozen: true,
   },
@@ -94,14 +97,14 @@ const DefaultConfig = {
     frozen: true,
   },
   governance: {
-    queueExpiry: WEEK, // Change to 4 weeks once mainnet activated
-    dequeueFrequency: MINUTE, // Change to 1 week once mainnet activated
-    concurrentProposals: 3, // Change to 10 once mainnet activated
-    approvalStageDuration: 30 * MINUTE, // Change to 3 days once mainnet activated
-    referendumStageDuration: HOUR, // Change to 1 week once mainnet activated
-    executionStageDuration: WEEK,
+    queueExpiry: 4 * WEEK,
+    dequeueFrequency: DAY, // Change to 1 week once mainnet activated
+    concurrentProposals: 3,
+    approvalStageDuration: DAY, // Change to 3 days once mainnet activated
+    referendumStageDuration: 2 * DAY, // Change to 1 week once mainnet activated
+    executionStageDuration: 3 * DAY,
     minDeposit: 100, // 100 cGLD
-    participationBaseline: 8 / 10,
+    participationBaseline: 5 / 100, // Start with low participation requirements, let the protocol adjust
     participationBaselineFloor: 5 / 100,
     participationBaselineUpdateFactor: 1 / 5,
     participationBaselineQuorumFactor: 1,
@@ -122,7 +125,7 @@ const DefaultConfig = {
     unlockingPeriod: 3 * DAY,
   },
   oracles: {
-    reportExpiry: 10 * MINUTE,
+    reportExpiry: 5 * MINUTE,
   },
   random: {
     randomnessBlockRetentionWindow: HOUR / 5, // 1 hour to match attestationExpiryBlocks
@@ -136,7 +139,7 @@ const DefaultConfig = {
     spenders: [],
     otherAddresses: ['0xd0a57D8acFe9979d33933d8A52971E6DC9E2DbF0'],
     assetAllocationSymbols: ['cGLD', 'BTC', 'ETH', 'DAI'],
-    assetAllocationWeights: [0.5, 0.2, 0.1, 0.2],
+    assetAllocationWeights: [0.5, 0.3, 0.15, 0.05],
   },
   reserveSpenderMultiSig: {
     // 2/2 multsig
@@ -149,7 +152,7 @@ const DefaultConfig = {
   },
   stableToken: {
     decimals: 18,
-    goldPrice: 10,
+    goldPrice: 1,
     tokenName: 'Celo Dollar',
     tokenSymbol: 'cUSD',
     inflationRate: 1,
@@ -192,18 +195,21 @@ const DefaultConfig = {
     },
     validatorLockedGoldRequirements: {
       value: '10000000000000000000000', // 10k gold
+      // MUST BE KEPT IN SYNC WITH MEMBERSHIP HISTORY LENGTH
       duration: 60 * DAY,
     },
     validatorScoreParameters: {
       exponent: 10,
       adjustmentSpeed: 0.1,
     },
+    // MUST BE KEPT IN SYNC WITH VALIDATOR LOCKED GOLD DURATION
     membershipHistoryLength: 60,
     commissionUpdateDelay: (3 * DAY) / 5, // Approximately 3 days with 5s block times
     maxGroupSize: 5,
     slashingPenaltyResetPeriod: 30 * DAY,
 
-    // We register a number of C-Labs groups to contain an initial set of validators to run the network.
+    // Register a number of cLabs groups to contain an initial set of validators to run test
+    // networks.
     validatorKeys: [],
     attestationKeys: [],
     groupName: 'C-Labs',
@@ -272,6 +278,10 @@ const NetworkConfigs = {
     goldToken: {
       frozen: false,
     },
+    governance: {
+      skipSetConstitution: true,
+      skipTransferOwnership: true,
+    },
     stableToken: {
       frozen: false,
     },
@@ -324,9 +334,34 @@ const NetworkConfigs = {
       membershipHistoryLength: 15, // Number of epochs in the group lockup period.
     },
   },
+  alfajores: {
+    election: {
+      minElectableValidators: '1',
+    },
+    epochRewards: {
+      frozen: false,
+    },
+    exchange: {
+      frozen: false,
+      minimumReports: 1,
+    },
+    goldToken: {
+      frozen: false,
+    },
+    stableToken: {
+      frozen: false,
+    },
+    reserve: {
+      initialBalance: 100000000,
+    },
+    oracles: {
+      reportExpiry: 1000 * DAY,
+    },
+  },
 }
 
 NetworkConfigs.baklavastaging = NetworkConfigs.baklava
+NetworkConfigs.alfajoresstaging = NetworkConfigs.alfajores
 
 const linkedLibraries = {
   FixidityLib: [

@@ -205,6 +205,17 @@ EXAMPLE
 
 _See code: [packages/cli/src/commands/account/get-metadata.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/get-metadata.ts)_
 
+### List
+
+List the addresses from the node and the local instance
+
+```
+USAGE
+  $ celocli account:list
+```
+
+_See code: [packages/cli/src/commands/account/list.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/list.ts)_
+
 ### New
 
 Creates a new account locally and print out the key information. Save this information for local transaction signing or import into a Celo node.

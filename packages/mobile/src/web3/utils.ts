@@ -1,12 +1,21 @@
 import { ensureLeading0x } from '@celo/utils/src/address'
+// TODO(anna) these may need to become generator
+import BigNumber from 'bignumber.js'
 import { call } from 'redux-saga/effects'
+import { GAS_INFLATION_FACTOR } from 'src/config'
 import Logger from 'src/utils/Logger'
 import { getContractKit, getContractKitOutsideGenerator } from 'src/web3/contracts'
 import Web3 from 'web3'
+import { Tx } from 'web3-core'
+import { TransactionObject } from 'web3-eth'
 
 const TAG = 'web3/utils'
 
-// TODO(anna) these may need to become generator
+// Estimate gas taking into account the configured inflation factor
+export async function estimateGas(tx: TransactionObject<any>, txParams: Tx) {
+  const gas = new BigNumber(await tx.estimateGas(txParams))
+  return gas.times(GAS_INFLATION_FACTOR).integerValue()
+}
 
 // Note: This returns Promise<Block>
 export async function getLatestBlock() {

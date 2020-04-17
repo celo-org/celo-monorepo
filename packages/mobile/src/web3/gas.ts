@@ -1,5 +1,6 @@
 import { CURRENCY_ENUM } from '@celo/utils'
 import BigNumber from 'bignumber.js'
+import { GAS_PRICE_INFLATION_FACTOR } from 'src/config'
 import { getCurrencyAddress } from 'src/tokens/saga'
 import Logger from 'src/utils/Logger'
 import { getContractKitOutsideGenerator } from 'src/web3/contracts'
@@ -34,10 +35,11 @@ async function fetchGasPrice(currency: CURRENCY_ENUM) {
   const gasPriceMinimum = await contractKit.contracts.getGasPriceMinimum()
   const address = await getCurrencyAddress(currency)
   const latestGasPrice = await gasPriceMinimum.getGasPriceMinimum(address)
+  const inflatedGasPrice = latestGasPrice.times(GAS_PRICE_INFLATION_FACTOR)
   Logger.debug(
     TAG,
     'fetchGasPrice',
-    `Gas price fetched in ${currency} with value: ${latestGasPrice.toString()}`
+    `Result price in ${currency} with inflation: ${inflatedGasPrice.toString()}`
   )
-  return latestGasPrice
+  return inflatedGasPrice
 }
