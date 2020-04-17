@@ -15,12 +15,13 @@ import { provider } from 'web3-core'
 // Logging tag
 const tag = 'web3/contracts'
 
-const web3: Web3 = getWeb3ForUtils()
+export const web3: Web3 = getWeb3ForUtils()
 let contractKit = newKitFromWeb3(web3)
 
 // TODO util functions can just be web3
 
 function getWeb3ForUtils(): Web3 {
+  Logger.debug('getting web3')
   return new Web3()
 }
 
