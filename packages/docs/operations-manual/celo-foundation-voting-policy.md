@@ -1,6 +1,6 @@
 # Celo Foundation Validator Voting Policy
 
-The following describes how the Celo Foundation anticipates allocating its votes to validator groups, with special attention to the first allocated groups at the Celo Mainnet release and the months thereafter. 
+The following describes how the Celo Foundation anticipates allocating its votes to validator groups, with special attention to the first allocated groups at the Celo Mainnet release and the months thereafter.
 
 {% hint style="info" %}
 The policy described here can change at any time as determined by the Foundation Board.
@@ -9,10 +9,10 @@ The policy described here can change at any time as determined by the Foundation
 ## Policy Objectives
 
 The Foundation voting policy aims to:
-* Be fair by avoiding preferential treatment to certain groups; 
-* Vote in-line with the Foundation’s purpose, which is to encourage financial inclusion and prosperity for all; 
-* Encourage professional, secure, and reliable validators; 
-* Be equal opportunity by enabling new groups to have validators elected; and 
+* Be fair by avoiding preferential treatment to certain groups;
+* Vote in-line with the Foundation’s purpose, which is to encourage financial inclusion and prosperity for all;
+* Encourage professional, secure, and reliable validators;
+* Be equal opportunity by enabling new groups to have validators elected; and
 * Promote network stability by encouraging a gradual turnover in elected validators instead of abrupt election changes
 
 ## Process
@@ -20,6 +20,7 @@ The Foundation voting policy aims to:
 Every 3 months, the Foundation, through its Board, will distribute a portion of its total available votes to a cohort of validator groups. These validators must meet certain basic standards (details below) and alignment with the Foundation’s purpose. The total number of validator groups in a cohort can vary.
 
 Validator groups who will be selected for a cohort (and will thus receive a portion of the Foundation’s votes) will be informed by the following (non-exhaustive) considerations:
+
 1. The number of elected validators in earlier cohorts;
 2. Network stability;
 3. Celo Gold governance participation (e.g., how many Celo Gold holders are actively participating in voting); and
