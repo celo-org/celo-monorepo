@@ -18,6 +18,7 @@ import FooterColumn from 'src/shared/FooterColumn'
 import InlineAnchor from 'src/shared/InlineAnchor'
 import menu, { CeloLinks, hashNav, MAIN_MENU } from 'src/shared/menu-items'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
+import Lazy from 'react-lazyload'
 
 const MENU = [menu.HOME, ...MAIN_MENU]
 const TECH_MENU = [menu.PAPERS, { name: 'Docs', link: CeloLinks.docs }]
@@ -126,7 +127,10 @@ export default function Footer() {
         mobileStyle={standardStyles.blockMarginMobile}
       >
         <Cell span={Spans.full} style={isMobile ? standardStyles.centered : styles.toes}>
-          <ChangeStory />
+          <Lazy once={true}>
+            {' '}
+            <ChangeStory />
+          </Lazy>
           <Text style={[fonts.legal, styles.copyright, isMobile && textStyles.center]}>
             {t('footer.copyright', { year })}
           </Text>
