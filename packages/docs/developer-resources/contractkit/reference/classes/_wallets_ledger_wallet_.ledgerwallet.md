@@ -28,6 +28,7 @@
 * [signPersonalMessage](_wallets_ledger_wallet_.ledgerwallet.md#signpersonalmessage)
 * [signTransaction](_wallets_ledger_wallet_.ledgerwallet.md#signtransaction)
 * [signTypedData](_wallets_ledger_wallet_.ledgerwallet.md#signtypeddata)
+* [compareLedgerAppVersions](_wallets_ledger_wallet_.ledgerwallet.md#static-compareledgerappversions)
 
 ## Constructors
 
@@ -35,7 +36,7 @@
 
 \+ **new LedgerWallet**(`derivationPathIndexes`: number[], `baseDerivationPath`: string, `ledgerAddressValidation`: [AddressValidation](../enums/_wallets_ledger_wallet_.addressvalidation.md)): *[LedgerWallet](_wallets_ledger_wallet_.ledgerwallet.md)*
 
-*Defined in [contractkit/src/wallets/ledger-wallet.ts:63](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/ledger-wallet.ts#L63)*
+*Defined in [contractkit/src/wallets/ledger-wallet.ts:70](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/ledger-wallet.ts#L70)*
 
 **Parameters:**
 
@@ -53,7 +54,7 @@ Name | Type | Default | Description |
 
 • **baseDerivationPath**: *string*
 
-*Defined in [contractkit/src/wallets/ledger-wallet.ts:74](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/ledger-wallet.ts#L74)*
+*Defined in [contractkit/src/wallets/ledger-wallet.ts:81](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/ledger-wallet.ts#L81)*
 
 base derivation path. Default: "44'/52752'/0'/0"
 
@@ -63,7 +64,7 @@ ___
 
 • **derivationPathIndexes**: *number[]*
 
-*Defined in [contractkit/src/wallets/ledger-wallet.ts:73](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/ledger-wallet.ts#L73)*
+*Defined in [contractkit/src/wallets/ledger-wallet.ts:80](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/ledger-wallet.ts#L80)*
 
 number array of "address_index" for the base derivation path.
 Default: Array[0..9].
@@ -76,7 +77,7 @@ ___
 
 • **ledgerAddressValidation**: *[AddressValidation](../enums/_wallets_ledger_wallet_.addressvalidation.md)*
 
-*Defined in [contractkit/src/wallets/ledger-wallet.ts:75](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/ledger-wallet.ts#L75)*
+*Defined in [contractkit/src/wallets/ledger-wallet.ts:82](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/ledger-wallet.ts#L82)*
 
 ## Methods
 
@@ -84,7 +85,7 @@ ___
 
 ▸ **getAccounts**(): *[Address](../modules/_base_.md#address)[]*
 
-*Defined in [contractkit/src/wallets/ledger-wallet.ts:169](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/ledger-wallet.ts#L169)*
+*Defined in [contractkit/src/wallets/ledger-wallet.ts:186](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/ledger-wallet.ts#L186)*
 
 **Returns:** *[Address](../modules/_base_.md#address)[]*
 
@@ -94,7 +95,7 @@ ___
 
 ▸ **hasAccount**(`address?`: undefined | string): *boolean*
 
-*Defined in [contractkit/src/wallets/ledger-wallet.ts:174](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/ledger-wallet.ts#L174)*
+*Defined in [contractkit/src/wallets/ledger-wallet.ts:191](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/ledger-wallet.ts#L191)*
 
 **Parameters:**
 
@@ -110,7 +111,7 @@ ___
 
 ▸ **init**(`transport`: any): *Promise‹void›*
 
-*Defined in [contractkit/src/wallets/ledger-wallet.ts:88](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/ledger-wallet.ts#L88)*
+*Defined in [contractkit/src/wallets/ledger-wallet.ts:95](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/ledger-wallet.ts#L95)*
 
 **Parameters:**
 
@@ -126,7 +127,7 @@ ___
 
 ▸ **signPersonalMessage**(`address`: string, `data`: string): *Promise‹string›*
 
-*Defined in [contractkit/src/wallets/ledger-wallet.ts:222](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/ledger-wallet.ts#L222)*
+*Defined in [contractkit/src/wallets/ledger-wallet.ts:253](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/ledger-wallet.ts#L253)*
 
 **Parameters:**
 
@@ -145,7 +146,7 @@ ___
 
 ▸ **signTransaction**(`txParams`: Tx): *Promise‹EncodedTransaction›*
 
-*Defined in [contractkit/src/wallets/ledger-wallet.ts:183](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/ledger-wallet.ts#L183)*
+*Defined in [contractkit/src/wallets/ledger-wallet.ts:200](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/ledger-wallet.ts#L200)*
 
 **Parameters:**
 
@@ -161,7 +162,7 @@ ___
 
 ▸ **signTypedData**(`address`: [Address](../modules/_base_.md#address), `typedData`: [EIP712TypedData](../interfaces/_utils_sign_typed_data_utils_.eip712typeddata.md)): *Promise‹string›*
 
-*Defined in [contractkit/src/wallets/ledger-wallet.ts:249](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/ledger-wallet.ts#L249)*
+*Defined in [contractkit/src/wallets/ledger-wallet.ts:280](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/ledger-wallet.ts#L280)*
 
 **Parameters:**
 
@@ -173,3 +174,24 @@ Name | Type | Description |
 **Returns:** *Promise‹string›*
 
 Signature hex string (order: rsv)
+
+___
+
+### `Static` compareLedgerAppVersions
+
+▸ **compareLedgerAppVersions**(`version1`: string, `version2`: string): *number*
+
+*Defined in [contractkit/src/wallets/ledger-wallet.ts:342](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/ledger-wallet.ts#L342)*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`version1` | string |
+`version2` | string |
+
+**Returns:** *number*
+
+-1: version1 < version2,
+ 0: version1 == version2,
+ 1: version1 > version2

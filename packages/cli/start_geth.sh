@@ -11,8 +11,8 @@ GETH_BINARY=${1:-"/usr/local/bin/geth"}
 NETWORK_NAME=${2:-"alfajores"}
 # Default to testing the ultralight sync mode
 SYNCMODE=${3:-"ultralight"}
-# Default to 44785
-NETWORK_ID=${4:-"44785"}
+# Default to 44786
+NETWORK_ID=${4:-"44786"}
 DATA_DIR=${5:-"/tmp/tmp1"}
 GENESIS_FILE_PATH=${6:-"/celo/genesis.json"}
 STATIC_NODES_FILE_PATH=${7:-"/celo/static-nodes.json"}

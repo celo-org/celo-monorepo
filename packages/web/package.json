@@ -19,7 +19,8 @@
     "lint": "tslint -c tslint.json --project tsconfig.json",
     "kill-dev": "kill -9 $(lsof -ti :3000)",
     "clean-next-cache": "rm -rf .next",
-    "test": "jest --coverage --runInBand"
+    "test": "jest --coverage --runInBand",
+    "spec": "jest"
   },
   "dependencies": {
     "@celo/utils": "0.1.5",
@@ -41,6 +42,7 @@
     "fast-xml-parser": "^3.15.1",
     "fecha": "^3.0.3",
     "firebase": "^7.6.0",
+    "fuzzy-search": "^3.2.1",
     "glob": "^7.1.6",
     "graphql": "^14.5.8",
     "hamburgers": "^0.9.3",
