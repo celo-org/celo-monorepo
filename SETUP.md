@@ -30,7 +30,7 @@ This is a living document! Please edit and update it as part of your onboarding 
 
 ## Reading
 
-Review the README from each directory in [packages](packages/).
+Review the README from each directory in [packages](packages/). The [protocol](packages/protocol) and [mobile](packages/mobile) packages are good starting points.
 
 ## Getting Everything Installed
 
