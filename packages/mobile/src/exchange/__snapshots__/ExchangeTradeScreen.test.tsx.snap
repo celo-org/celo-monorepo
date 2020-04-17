@@ -29,6 +29,7 @@ exports[`ExchangeTradeScreen renders correctly 1`] = `
           Object {
             "alignItems": "center",
             "flexDirection": "row",
+            "marginBottom": 8,
             "marginTop": 38,
           }
         }
@@ -38,9 +39,9 @@ exports[`ExchangeTradeScreen renders correctly 1`] = `
             style={
               Object {
                 "color": "#2E3338",
-                "fontFamily": "Hind-Bold",
+                "fontFamily": "Hind-Regular",
                 "fontSize": 15,
-                "fontWeight": "600",
+                "fontWeight": "700",
                 "lineHeight": 20,
               }
             }
@@ -67,17 +68,13 @@ exports[`ExchangeTradeScreen renders correctly 1`] = `
           >
             <Text
               style={
-                Array [
-                  Object {
-                    "color": "#81868B",
-                    "fontFamily": "Hind-Regular",
-                    "fontSize": 14,
-                    "lineHeight": 20,
-                  },
-                  Object {
-                    "textDecorationLine": "underline",
-                  },
-                ]
+                Object {
+                  "color": "#81868B",
+                  "fontFamily": "Hind-Regular",
+                  "fontSize": 13,
+                  "lineHeight": 20,
+                  "textDecorationLine": "underline",
+                }
               }
             >
               switchTo
@@ -111,18 +108,6 @@ exports[`ExchangeTradeScreen renders correctly 1`] = `
       </View>
       <View
         style={
-          Object {
-            "borderStyle": "solid",
-            "borderTopColor": "#EEEEEE",
-            "borderTopWidth": 1,
-            "marginBottom": 15,
-            "marginTop": 10,
-            "width": "100%",
-          }
-        }
-      />
-      <View
-        style={
           Array [
             Object {
               "flexDirection": "row",
@@ -153,9 +138,8 @@ exports[`ExchangeTradeScreen renders correctly 1`] = `
                 },
                 Object {
                   "color": "#2E3338",
-                  "fontFamily": "Hind-Bold",
+                  "fontFamily": "Hind-Regular",
                   "fontSize": 15,
-                  "fontWeight": "600",
                   "lineHeight": 20,
                 },
               ]
@@ -192,9 +176,8 @@ exports[`ExchangeTradeScreen renders correctly 1`] = `
               },
               Object {
                 "color": "#2E3338",
-                "fontFamily": "Hind-Bold",
+                "fontFamily": "Hind-Regular",
                 "fontSize": 15,
-                "fontWeight": "600",
                 "lineHeight": 20,
               },
             ]

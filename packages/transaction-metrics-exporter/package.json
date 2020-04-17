@@ -8,7 +8,7 @@
   "private": true,
   "dependencies": {
     "@celo/contractkit": "0.3.6",
-    "@celo/utils": "0.1.10-dev",
+    "@celo/utils": "0.1.11-dev",
     "express": "^4.17.1",
     "prom-client": "11.2.0"
   },

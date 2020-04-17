@@ -147,27 +147,26 @@ https://alfajores-blockscout.celo-testnet.org/
 
 ## Using celocli
 
-You can now use `celocli` to securely sign transactions or key proof-of-possessions with your Ledger.
+You can now use `celocli` to securely sign transactions or proof-of-possessions with your Ledger.
 
 To use `celocli` with your Ledger, ensure the device is connected to your computer, unlocked, and the `Celo` app is open and displaying `Application is ready`.
 
-Then, simply append the `--useLedger` flag to any `celocli` commands with which you'd like to use a Ledger.
+Then, simply append the `--useLedger` flag to any `celocli` commands with which you'd like to use a Ledger. You may also append the `--ledgerConfirmAddress` flag, which will require that you manually verify on the Ledger the address from which the transaction is being sent.
 
-There is another flag that you can use `--ledgerConfirmAddress`. This flag allows you to verify from the Ledger the address
-that is sending the transaction.
-
-The following commands are an example of how you might authorize a vote signing key stored on a Ledger, for your account key, which is also stored on a Ledger, or for your ReleaseGold account, for which the beneficiary key is stored on a Ledger.
+The following commands are an example of how you might authorize a vote signer whose private key is stored on a Ledger, on behalf of your Locked Gold account, whose private key is also stored on a Ledger, or for your ReleaseGold Locked Gold Account, for which the beneficiary key is stored on a Ledger.
 
 
 ```bash
-# Plug in the Ledger containing the vote signing key to authorize and run the following command to securely generate the proof-of-possession.
-celocli accounts:proof-of-possession --account $ACCOUNT_ADDRESS --signer $VOTE_SIGNER_ADDRESS --useLedger
+# Plug in the Ledger containing the vote signer key and run the following command to securely generate the proof-of-possession.
+celocli accounts:proof-of-possession --account $LOCKED_GOLD_ACCOUNT --signer $SIGNER_TO_AUTHORIZE --useLedger
 
-# If you wish to authorize a vote signing key for your account, plug in the Ledger containing the account key and run the following command to authorize the vote signing key.
-celocli account:authorize --from $ACCOUNT_ADDRESS --role vote --signer $VOTE_SIGNER_ADDRESS --signature $PROOF_OF_POSSESSION --useLedger
+# If you wish to authorize a vote signer for your Locked Gold Account, plug in the Ledger containing
+# the Locked Gold Account key and run the following command.
+celocli account:authorize --from $LOCKED_GOLD_ACCOUNT --role vote --signer $SIGNER_TO_AUTHORIZE --signature $SIGNER_PROOF_OF_POSSESSION --useLedger
 
-# If instead you wish to authorize a vote signing key for your ReleaseGold account, plug in the Ledger containing the beneficiary key for the ReleaseGold contract and run the following command.
-celocli release-gold:authorize --contract $RELEASE_GOLD_CONTRACT_ADDRESS --role vote --signer $VOTE_SIGNER_ADDRESS --signature $PROOF_OF_POSSESSION --useLedger
+# If instead you wish to authorize a vote signer for a Locked Gold Account that was created via a ReleaseGold contract,
+# plug in the Ledger containing the beneficiary key and run the following command.
+celocli release-gold:authorize --contract $RELEASE_GOLD_CONTRACT_ADDRESS --role vote --signer $SIGNER_TO_AUTHORIZE --signature $SIGNER_PROOF_OF_POSSESSION --useLedger
 ```
 
 ## Troubleshooting

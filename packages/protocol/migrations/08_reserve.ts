@@ -19,7 +19,9 @@ const initializeArgs = async (): Promise<[
   number,
   number,
   string[],
-  string[]
+  string[],
+  string,
+  string
 ]> => {
   const registry: RegistryInstance = await getDeployedProxiedContract<RegistryInstance>(
     'Registry',
@@ -35,6 +37,8 @@ const initializeArgs = async (): Promise<[
       Web3Utils.padRight(Web3Utils.utf8ToHex(assetSymbol), 64)
     ),
     config.reserve.assetAllocationWeights.map((assetWeight) => toFixed(assetWeight).toFixed()),
+    config.reserve.tobinTax,
+    config.reserve.tobinTaxReserveRatio,
   ]
 }
 
