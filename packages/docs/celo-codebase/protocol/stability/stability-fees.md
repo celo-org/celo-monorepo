@@ -2,9 +2,9 @@
 
 ### **Parameters Governing the Stability Fee**
 
-`inflationRate` the value/unit change of stable tokens per period of time
-
 `inflationPeriod` how long we wait between rounds of applying inflation
+
+`inflationRate` the multiplier by which the inflation factor is adjusted per `inflationPeriod` 
 
 ### **Timing, Frequency, and Amount of Fee**
 
