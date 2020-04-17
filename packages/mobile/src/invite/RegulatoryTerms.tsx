@@ -6,6 +6,7 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import { acceptTerms } from 'src/account/actions'
+import { PincodeType } from 'src/account/reducer'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
 import DevSkipButton from 'src/components/DevSkipButton'
 import { CELO_TERMS_LINK } from 'src/config'
@@ -16,8 +17,12 @@ import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
 import { navigateToURI } from 'src/utils/linking'
 
-function mapStateToProps(state: RootState) {
-  return {}
+interface StateProps {
+  pincodeType: PincodeType
+}
+
+function mapStateToProps(state: RootState): StateProps {
+  return { pincodeType: state.account.pincodeType }
 }
 
 interface DispatchProps {
@@ -28,14 +33,22 @@ const mapDispatchToProps: DispatchProps = {
   acceptTerms,
 }
 
-type Props = WithTranslation & DispatchProps
+type Props = WithTranslation & DispatchProps & StateProps
 
 export class RegulatoryTerms extends React.Component<Props> {
   static navigationOptions = nuxNavigationOptions
 
   onPressAccept = () => {
     this.props.acceptTerms()
-    navigate(Screens.EnterInviteCode)
+    this.goToNextScreen()
+  }
+
+  goToNextScreen = () => {
+    if (this.props.pincodeType === PincodeType.Unset) {
+      navigate(Screens.PincodeEducation)
+    } else {
+      navigate(Screens.EnterInviteCode)
+    }
   }
 
   onPressGoToTerms = () => {
@@ -78,7 +91,7 @@ export class RegulatoryTerms extends React.Component<Props> {
 }
 
 export default componentWithAnalytics(
-  connect<{}, DispatchProps, {}, RootState>(
+  connect<StateProps, DispatchProps, {}, RootState>(
     mapStateToProps,
     mapDispatchToProps
   )(withTranslation(Namespaces.nuxNamePin1)(RegulatoryTerms))

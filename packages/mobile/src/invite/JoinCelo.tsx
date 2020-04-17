@@ -28,6 +28,7 @@ interface StateProps {
   cachedNumber: string
   cachedCountryCode: string
   pincodeType: PincodeType
+  acceptedTerms: boolean
 }
 
 interface DispatchProps {
@@ -62,6 +63,7 @@ const mapStateToProps = (state: RootState): StateProps => {
     cachedNumber: state.account.e164PhoneNumber,
     cachedCountryCode: state.account.defaultCountryCode,
     pincodeType: state.account.pincodeType,
+    acceptedTerms: state.account.acceptedTerms,
   }
 }
 
@@ -104,11 +106,13 @@ export class JoinCelo extends React.Component<Props, State> {
   }
 
   goToNextScreen = () => {
-    const nextScreen =
-      this.props.pincodeType === PincodeType.Unset
-        ? Screens.PincodeEducation
-        : Screens.RegulatoryTerms
-    navigate(nextScreen)
+    if (!this.props.acceptedTerms) {
+      navigate(Screens.RegulatoryTerms)
+    } else if (this.props.pincodeType === PincodeType.Unset) {
+      navigate(Screens.PincodeEducation)
+    } else {
+      navigate(Screens.EnterInviteCode)
+    }
   }
 
   onPressContinue = () => {
