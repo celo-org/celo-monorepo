@@ -10,7 +10,13 @@ import { getBlsPoP, getBlsPublicKey } from '@celo/utils/lib/bls'
 import { toFixed } from '@celo/utils/lib/fixidity'
 import { signMessage } from '@celo/utils/lib/signatureUtils'
 import { BigNumber } from 'bignumber.js'
-import { AccountsInstance, ElectionInstance, LockedGoldInstance, ValidatorsInstance } from 'types'
+import {
+  AccountsInstance,
+  BlockchainParametersInstance,
+  ElectionInstance,
+  LockedGoldInstance,
+  ValidatorsInstance,
+} from 'types'
 import Web3, * as Web3Class from 'web3'
 import { TransactionObject } from 'web3-eth'
 
@@ -403,4 +409,10 @@ module.exports = async (_deployer: any, networkName: string) => {
       to: election.address,
     })
   }
+
+  const bcp = await getDeployedProxiedContract<BlockchainParametersInstance>(
+    'BlockchainParameters',
+    artifacts
+  )
+  await bcp.setBlockGasLimit('10000000')
 }

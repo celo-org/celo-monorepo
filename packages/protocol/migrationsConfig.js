@@ -108,6 +108,8 @@ const DefaultConfig = {
     participationBaselineFloor: 5 / 100,
     participationBaselineUpdateFactor: 1 / 5,
     participationBaselineQuorumFactor: 1,
+    // TODO(asa): HACK!!!
+    skipTransferOwnership: true,
   },
   governanceApproverMultiSig: {
     // 2/4 multsig
