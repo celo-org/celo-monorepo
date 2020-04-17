@@ -14,11 +14,11 @@ Both, the `inflationRate` as well as the `inflationPeriod`, are specified for a 
 
 ### **Stability Fee Levied on Balance**
 
-Each account’s stable token balance is stored as ‘units’, and `inflationFactor` describes the units/value ratio. The Celo Dollar value of an account can therefore be computed as follows
+Each account’s stable token balance is stored as ‘units’, and `inflationFactor` describes the units/value ratio. The Celo Dollar value of an account can therefore be computed as follows.
 
 `Account cUSD Value = Account cUSD Units / inflationFactor`
 
-When a transaction occurs, a modifier checks if the stability fee needs updating and, if so, the `inflationFactor` is updated
+When a transaction occurs, a modifier checks if the stability fee needs updating and, if so, the `inflationFactor` is updated.
 
 ### **Updates to the Inflation Factor**
 
