@@ -27,6 +27,8 @@ Validator groups who will be selected for a cohort (and will thus receive a port
 
 Each validator group selected in the cohort will receive a portion of the Foundation votes for a period of 9 months. During this period, so long as a validator in the group is not slashed or otherwise engages in misbehavior, the validator group will continue to receive these votes. If the validator group is slashed or engages in misbehavior, however, the votes for that validator group will be withdrawn for the remainder of the period. If the validator group is slashed, it may reapply to the Foundation after a 6 month period. In addition, the Foundation may also withdraw its votes if the validator group or the validators in the group fail to meet other standards, including running an attestation service.
 
+![](https://storage.googleapis.com/celo-website/docs/celo-foundation-cohorts.jpg)
+
 ## Eligibility Criteria 
 
 ### Standard Criteria 
