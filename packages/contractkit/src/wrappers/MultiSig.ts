@@ -4,9 +4,13 @@ import { Address } from '../base'
 import { MultiSig } from '../generated/MultiSig'
 import {
   BaseWrapper,
+  CeloTransactionObject,
   proxyCall,
+  proxySend,
+  stringIdentity,
   stringToBytes,
   toTransactionObject,
+  tupleParser,
   valueToBigNumber,
   valueToInt,
 } from './BaseWrapper'
@@ -61,6 +65,11 @@ export class MultiSigWrapper extends BaseWrapper<MultiSig> {
     valueToBigNumber
   )
   getTransactionCount = proxyCall(this.contract.methods.transactionCount, undefined, valueToInt)
+  replaceOwner: (owner: Address, newOwner: Address) => CeloTransactionObject<void> = proxySend(
+    this.kit,
+    this.contract.methods.replaceOwner,
+    tupleParser(stringIdentity, stringIdentity)
+  )
 
   async getTransaction(i: number): Promise<TransactionData> {
     const { destination, value, data, executed } = await this.contract.methods
