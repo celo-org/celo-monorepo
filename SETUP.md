@@ -57,20 +57,22 @@ Install [Homebrew][homebrew], the best way of managing packages on OSX:
 
 #### Install Node, Yarn and friends
 
-We use Yarn to build all of the [celo-monorepo] repo.
+Install `nvm` (allows you to manage multiple versions of Node) by following the instructions here: [https://github.com/nvm-sh/nvm](https://github.com/nvm-sh/nvm).
 
-Install `nvm` (allows you to manage multiple versions of Node), Node 8 and `yarn`:
+Once `nvm` is successfully installed, restart the terminal and run the following commands to install the `npm` versions and typescript package that [celo-monorepo] will need:
 
 ```bash
-brew install nvm
-
-# follow the instructions from the command above to edit your .bash_profile
-# then restart the terminal
+# restart the terminal after installing nvm
 nvm install 8
 nvm install 10
 nvm alias default 10
-brew install yarn
 npm install -g typescript
+```
+
+We use Yarn to build all of the [celo-monorepo] repo. Install it using [Homebrew](#homebrew):
+
+```bash
+brew install yarn
 ```
 
 #### Java
@@ -136,31 +138,33 @@ From ios folder in mobile package run `bundle exec pod install`
 
 #### Install Node, Yarn and friends
 
-We use Yarn to build all of the [celo-monorepo] repo.
-
-Install `nvm` (allows you to manage multiple versions of Node), Node 8, Node 10 and `yarn`:
+Install NodeJS:
 
 ```bash
-# Installing Node
+# Installing NodeJS
 sudo apt-get update
 sudo apt-get install nodejs
+```
 
-# Installing Nvm
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
-source ~/.bashrc
+Install `nvm` (allows you to manage multiple versions of Node) by following the instructions here: [https://github.com/nvm-sh/nvm](https://github.com/nvm-sh/nvm).
 
-# Setting up the right version of Nvm
+Once `nvm` is successfully installed, restart the terminal and run the following commands to install the `npm` versions and typescript package that [celo-monorepo] will need:
+
+```bash
+# restart the terminal after installing nvm
 nvm install 8
 nvm install 10
 nvm alias default 10
+npm install -g typescript
+```
 
-# Installing Yarn - https://yarnpkg.com/en/docs/install#debian-stable
+We use Yarn to build all of the [celo-monorepo] repo. Install it by running the following:
+
+```bash
+# for documentation on yarn visit https://yarnpkg.com/en/docs/install#debian-stable
 curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
 echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
 sudo apt-get update && sudo apt-get install yarn
-
-# Install typescript
-npm install -g typescript
 ```
 
 #### Installing OpenJDK 8
