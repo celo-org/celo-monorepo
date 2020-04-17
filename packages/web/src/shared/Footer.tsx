@@ -1,4 +1,5 @@
 import * as React from 'react'
+import Lazy from 'react-lazyload'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import EmailForm from 'src/forms/EmailForm'
 import { NameSpaces, Trans, useTranslation } from 'src/i18n'
@@ -18,7 +19,6 @@ import FooterColumn from 'src/shared/FooterColumn'
 import InlineAnchor from 'src/shared/InlineAnchor'
 import menu, { CeloLinks, hashNav, MAIN_MENU } from 'src/shared/menu-items'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
-import Lazy from 'react-lazyload'
 
 const MENU = [menu.HOME, ...MAIN_MENU]
 const TECH_MENU = [menu.PAPERS, { name: 'Docs', link: CeloLinks.docs }]
