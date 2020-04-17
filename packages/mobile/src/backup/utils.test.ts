@@ -1,4 +1,4 @@
-import { MnemonicLanguages, MnemonicStrength, validateMnemonic } from '@celo/utils/lib/account'
+import { MnemonicLanguages, validateMnemonic } from '@celo/utils/lib/account'
 import {
   createQuizWordList,
   formatBackupPhraseOnEdit,
@@ -20,9 +20,13 @@ jest.mock('@celo/utils/lib/account', () => {
 
   return {
     ...jest.requireActual('@celo/utils/lib/account'),
-    generateMnemonic: (strength: MnemonicStrength = MnemonicStrength.s256_24words) => {
-      const numWords = strength === MnemonicStrength.s256_24words ? 24 : 12
-      return mockWordList.slice(0, numWords).join(' ')
+    generateMnemonic: (_strength: any) => {
+      const qty = 24
+      const index = Math.random() * (mockWordList.length - qty)
+      return mockWordList.slice(index, index + qty).join(' ')
+    },
+    getWordList(_language?: any) {
+      return mockWordList
     },
   }
 })
@@ -30,7 +34,7 @@ jest.mock('@celo/utils/lib/account', () => {
 describe('createQuizWordList', () => {
   it('creates list correctly without dupes', async () => {
     const wordList = await createQuizWordList(mockMnemonic, 'en')
-    expect(wordList.length).toBeGreaterThan(900)
+    expect(wordList.length).toEqual(24)
     const wordSet = new Set(wordList)
     const intersection = mockMnemonic.split(' ').filter((w) => wordSet.has(w))
     expect(intersection.length).toBe(0)

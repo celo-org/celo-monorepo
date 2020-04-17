@@ -1,4 +1,4 @@
-import { generateMnemonic, MnemonicLanguages } from '@celo/utils/lib/account'
+import { generateMnemonic, MnemonicLanguages, MnemonicStrength } from '@celo/utils/lib/account'
 import * as _ from 'lodash'
 import { getKey } from 'src/utils/keyStore'
 import Logger from 'src/utils/Logger'
@@ -12,7 +12,7 @@ export const MNEMONIC_SPLITTER = 'celo'
 export async function createQuizWordList(mnemonic: string, language: string | null) {
   const disallowedWordSet = new Set(mnemonic.split(' '))
   const languageWordList = getWordlist(language)
-  const wordOptions: string = generateMnemonic(1000, languageWordList) // TODO CHECK
+  const wordOptions: string = generateMnemonic(MnemonicStrength.s256_24words, languageWordList)
   return wordOptions.split(' ').filter((word: string) => !disallowedWordSet.has(word))
 }
 
