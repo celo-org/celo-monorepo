@@ -1,5 +1,6 @@
 # Detailed Description of Celo Account Roles
-This page provides a detailed description of the various account rolese found in the Celo protocol, as well as small examples of how to designate and account as playing a particular role.
+
+This page provides a detailed description of the various account roles found in the Celo protocol, as well as small examples of how to designate and account as playing a particular role.
 
 ## Celo Accounts
 
