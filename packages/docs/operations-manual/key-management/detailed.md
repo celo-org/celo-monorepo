@@ -73,8 +73,8 @@ An undesignated key may be authorized as a validator signer on behalf of a Locke
 
 ```shell
 # Create a proof-of-possession. Note that the signer private key must be available.
-# Note that the signing key should not be kept on a Ledger if it will be used to run a Validator
-celocli account:proof-of-possession --account $LOCKED_GOLD_ACCOUNT --signer $KEY_TO_AUTHORIZE --useLedger
+# Note that the signing key can be kept on a Ledger if it will be used to run a Validator Group.
+celocli account:proof-of-possession --account $LOCKED_GOLD_ACCOUNT --signer $KEY_TO_AUTHORIZE
 
 # Authorize the validator signing key. Note that the Locked Gold Account private key must be available.
 # Note that if a Validator has previously been registered on behalf of the Locked Gold Account it
