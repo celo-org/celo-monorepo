@@ -18,12 +18,11 @@ import FooterColumn from 'src/shared/FooterColumn'
 import InlineAnchor from 'src/shared/InlineAnchor'
 import menu, { CeloLinks, hashNav, MAIN_MENU } from 'src/shared/menu-items'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
+
 const MENU = [menu.HOME, ...MAIN_MENU]
 const TECH_MENU = [menu.PAPERS, { name: 'Docs', link: CeloLinks.docs }]
-
 const eventsLink = `${menu.COMMUNITY.link}#${hashNav.connect.events}`
 const ecoFundLink = `${menu.COMMUNITY.link}#${hashNav.connect.fund}`
-
 const RESOURCE_MENU = [
   menu.CODE_OF_CONDUCT,
   { name: 'Events', link: eventsLink },
