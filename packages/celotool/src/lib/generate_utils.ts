@@ -251,6 +251,10 @@ export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
 
 export const generateIstanbulExtraData = (validators: Validator[]) => {
   const istanbulVanity = GENESIS_MSG_HASH
+  // Vanity prefix is 32 bytes (1 hex char/.5 bytes * 32 bytes = 64 hex chars)
+  if (istanbulVanity.length !== 32 * 2) {
+    throw new Error('Istanbul vanity must be 32 bytes')
+  }
   const blsSignatureVanity = 96
   const ecdsaSignatureVanity = 65
   return (
