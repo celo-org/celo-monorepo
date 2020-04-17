@@ -1,3 +1,4 @@
+import { CELO_DERIVATION_PATH_BASE } from '@celo/utils/lib/account'
 import { TransportError, TransportStatusError } from '@ledgerhq/errors'
 import Ledger from '@ledgerhq/hw-app-eth'
 import debugFactory from 'debug'
@@ -8,7 +9,7 @@ import { LedgerSigner } from './signers/ledger-signer'
 import { Signer } from './signers/signer'
 import { Wallet } from './wallet'
 
-export const CELO_BASE_DERIVATION_PATH = "44'/52752'/0'/0"
+export const CELO_BASE_DERIVATION_PATH = CELO_DERIVATION_PATH_BASE.slice(2)
 const ADDRESS_QTY = 5
 
 // Validates an address using the Ledger

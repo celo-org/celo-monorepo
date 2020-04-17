@@ -1,7 +1,10 @@
 import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { CeloProvider } from '@celo/contractkit/lib/providers/celo-provider'
 import { AzureHSMWallet } from '@celo/contractkit/lib/wallets/azure-hsm-wallet'
-import { newLedgerWalletWithSetup } from '@celo/contractkit/lib/wallets/ledger-wallet'
+import {
+  AddressValidation,
+  newLedgerWalletWithSetup,
+} from '@celo/contractkit/lib/wallets/ledger-wallet'
 import { Wallet } from '@celo/contractkit/lib/wallets/wallet'
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid'
 import { Command, flags } from '@oclif/command'
@@ -45,13 +48,13 @@ export abstract class BaseCommand extends LocalCommand {
       description: 'Set it to use a ledger wallet',
     }),
     ledgerAddresses: flags.integer({
-      default: 2,
+      default: 1,
       hidden: true,
       exclusive: ['ledgerCustomAddresses'],
       description: 'If --useLedger is set, this will get the first N addresses for local signing',
     }),
     ledgerCustomAddresses: flags.string({
-      default: '[0,1]',
+      default: '[0]',
       hidden: true,
       exclusive: ['ledgerAddresses'],
       description:
@@ -65,6 +68,11 @@ export abstract class BaseCommand extends LocalCommand {
     azureVaultName: flags.string({
       hidden: true,
       description: 'If --useAKV is set, this is used to connect to the Azure KeyVault',
+    }),
+    ledgerConfirmAddress: flags.boolean({
+      default: false,
+      hidden: true,
+      description: 'Set it to ask confirmation for the address of the transaction from the ledger',
     }),
   }
 
@@ -122,7 +130,16 @@ export abstract class BaseCommand extends LocalCommand {
           : Array.from(Array(res.flags.ledgerAddresses).keys())
 
         console.log('Retrieving derivation Paths', derivationPathIndexes)
-        this._wallet = await newLedgerWalletWithSetup(transport, derivationPathIndexes)
+        let ledgerConfirmation = AddressValidation.never
+        if (res.flags.ledgerConfirmAddress) {
+          ledgerConfirmation = AddressValidation.everyTransaction
+        }
+        this._wallet = await newLedgerWalletWithSetup(
+          transport,
+          derivationPathIndexes,
+          undefined,
+          ledgerConfirmation
+        )
       } catch (err) {
         console.log('Check if the ledger is connected and logged.')
         throw err
