@@ -8,7 +8,6 @@ export default new Limit({
   max: 30, // max request within the time window per ip,
   message: 'breathe',
   onLimitReached(req) {
-    console.log('limit reached while processing:', req.body)
     Sentry.captureEvent({ message: 'rate limit reached', extra: req.body })
   },
   keyGenerator(req) {
