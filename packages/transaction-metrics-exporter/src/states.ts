@@ -69,6 +69,9 @@ export const stateGetters: StateGetter[] = [
       undefined,
       { goldTokenTotalSupply: 10 ** 27 }
     ),
+    getter('StableToken', 'totalSupply', (stableTokenTotalSupply) => ({
+      stableTokenTotalSupply: +stableTokenTotalSupply,
+    })),
     getter('EpochRewards', 'getTargetGoldTotalSupply', (rewardsAmount) => ({
       rewardsAmount: +rewardsAmount,
     })),

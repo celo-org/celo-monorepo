@@ -43,5 +43,6 @@
   "javascript.format.enable": false,
   "editor.tabSize": 2,
   "editor.detectIndentation": false,
-  "tslint.jsEnable": true
+  "tslint.jsEnable": true,
+  "git.ignoreLimitWarning": true
 }
