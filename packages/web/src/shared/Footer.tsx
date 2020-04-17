@@ -32,43 +32,43 @@ const RESOURCE_MENU = [
 ]
 
 const ICON_SIZE = 13
+const SOCIAL_MENU = [
+  {
+    name: 'Blog',
+    link: CeloLinks.mediumPublication,
+    icon: <MediumLogo height={ICON_SIZE} color={colors.dark} />,
+  },
+  {
+    name: 'GitHub',
+    link: CeloLinks.gitHub,
+    icon: <Octocat size={ICON_SIZE} color={colors.dark} />,
+  },
+  {
+    name: 'Twitter',
+    link: CeloLinks.twitter,
+    icon: <TweetLogo height={ICON_SIZE} color={colors.dark} />,
+  },
+  {
+    name: 'Forum',
+    link: CeloLinks.discourse,
+    icon: <Discourse size={ICON_SIZE} color={colors.dark} />,
+  },
+  {
+    name: 'Chat',
+    link: CeloLinks.discord,
+    icon: <Discord size={ICON_SIZE} color={colors.dark} />,
+  },
+  {
+    name: 'YouTube',
+    link: CeloLinks.discord,
+    icon: <YouTube size={ICON_SIZE} color={colors.dark} />,
+  },
+  { name: 'Instagram', link: CeloLinks.discord, icon: <Instagram size={ICON_SIZE} /> },
+]
 
 export default function Footer() {
   const { t } = useTranslation(NameSpaces.common)
   const { isMobile, isTablet } = useScreenSize()
-  const socialMenu = [
-    {
-      name: 'Blog',
-      link: CeloLinks.mediumPublication,
-      icon: <MediumLogo height={ICON_SIZE} color={colors.dark} />,
-    },
-    {
-      name: 'GitHub',
-      link: CeloLinks.gitHub,
-      icon: <Octocat size={ICON_SIZE} color={colors.dark} />,
-    },
-    {
-      name: 'Twitter',
-      link: CeloLinks.twitter,
-      icon: <TweetLogo height={ICON_SIZE} color={colors.dark} />,
-    },
-    {
-      name: 'Forum',
-      link: CeloLinks.discourse,
-      icon: <Discourse size={ICON_SIZE} color={colors.dark} />,
-    },
-    {
-      name: 'Chat',
-      link: CeloLinks.discord,
-      icon: <Discord size={ICON_SIZE} color={colors.dark} />,
-    },
-    {
-      name: 'YouTube',
-      link: CeloLinks.discord,
-      icon: <YouTube size={ICON_SIZE} color={colors.dark} />,
-    },
-    { name: 'Instagram', link: CeloLinks.discord, icon: <Instagram size={ICON_SIZE} /> },
-  ]
   return (
     <>
       <GridRow
@@ -96,22 +96,28 @@ export default function Footer() {
           <EmailForm submitText={t('signUp')} route={'/contacts'} isDarkMode={false} />
         </Cell>
       </GridRow>
-      <GridRow tabletStyle={{ flexDirection: 'column', alignItems: 'center' }}>
+      <GridRow tabletStyle={{ flexDirection: 'column' }}>
         <Cell span={Spans.third} tabletSpan={Spans.twoThird}>
-          <View
-            style={isMobile || isTablet ? [standardStyles.centered, styles.rings] : styles.rings}
-          >
+          <View style={isMobile ? [standardStyles.centered, styles.rings] : styles.rings}>
             <RingsGlyph />
           </View>
           <Details />
         </Cell>
         <Cell span={Spans.twoThird} tabletSpan={Spans.full}>
-          <View style={styles.linksArea}>
-            <FooterColumn heading={'Celo'} links={MENU} />
-            <FooterColumn heading={t('footer.technology')} links={TECH_MENU} />
-            <FooterColumn heading={t('footer.resources')} links={RESOURCE_MENU} />
-            <FooterColumn heading={t('footer.social')} links={socialMenu} />
-          </View>
+          {isMobile ? (
+            <MobileLinks />
+          ) : (
+            <View style={isTablet ? styles.linksAreaTablet : styles.linksArea}>
+              <FooterColumn style={styles.linkColumnStart} heading={'Celo'} links={MENU} />
+              <FooterColumn heading={t('footer.technology')} links={TECH_MENU} />
+              <FooterColumn heading={t('footer.resources')} links={RESOURCE_MENU} />
+              <FooterColumn
+                style={styles.linkColumnEnd}
+                heading={t('footer.social')}
+                links={SOCIAL_MENU}
+              />
+            </View>
+          )}
         </Cell>
       </GridRow>
       <GridRow
@@ -128,11 +134,27 @@ export default function Footer() {
   )
 }
 
+function MobileLinks() {
+  const { t } = useTranslation(NameSpaces.common)
+  return (
+    <>
+      <View style={standardStyles.row}>
+        <FooterColumn heading={'Celo'} links={MENU} />
+        <FooterColumn heading={t('footer.social')} links={SOCIAL_MENU} />
+      </View>
+      <View style={standardStyles.row}>
+        <FooterColumn heading={t('footer.resources')} links={RESOURCE_MENU} />
+        <FooterColumn heading={t('footer.technology')} links={TECH_MENU} />
+      </View>
+    </>
+  )
+}
+
 const Details = React.memo(function _Details() {
   const { t } = useTranslation(NameSpaces.common)
-  const { isDesktop } = useScreenSize()
+  const { isMobile } = useScreenSize()
   const fontStyling = [
-    isDesktop ? textStyles.left : textStyles.center,
+    !isMobile ? textStyles.left : textStyles.center,
     styles.detailsText,
     fonts.legal,
   ]
@@ -151,13 +173,17 @@ const Details = React.memo(function _Details() {
 function Copyright() {
   const year = new Date().getFullYear()
   const { t } = useTranslation(NameSpaces.common)
-  return <Text style={fonts.legal}>{t('copyRight', { year })}</Text>
+  return <Text style={fonts.legal}>{t('footer.copyright', { year })}</Text>
 }
 
 const styles = StyleSheet.create({
   linksArea: {
     flexDirection: 'row',
     justifyContent: 'space-around',
+  },
+  linksAreaTablet: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
   details: {
     paddingBottom: 20,
@@ -173,5 +199,11 @@ const styles = StyleSheet.create({
   toes: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+  },
+  linkColumnStart: {
+    paddingStart: 0,
+  },
+  linkColumnEnd: {
+    paddingEnd: 0,
   },
 })

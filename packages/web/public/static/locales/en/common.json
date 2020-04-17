@@ -20,12 +20,12 @@
   "cookiesPrivacyPolicy": "Privacy Policy.",
   "cookiesAgree": "Agree",
   "cookiesDisagree": "Disagree",
-  "copyRight": "Designed & Built by cLabs, © Celo {{year}}",
   "footerReadMoreTerms": "Read more in Celo <0>Terms of Service</0>",
   "footer": {
     "technology": "Technology",
     "resources": "Resources",
-    "social": "Social"
+    "social": "Social",
+    "copyright": "Designed & Built by cLabs, © Celo {{year}}"
   },
   "channels": {
     "brand": {

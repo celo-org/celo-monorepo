@@ -1,5 +1,6 @@
 import * as React from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, Text, View, ViewStyle } from 'react-native'
+import { useScreenSize } from 'src/layout/ScreenSize'
 import Button, { BTN } from 'src/shared/Button.3'
 import { fonts, standardStyles } from 'src/styles'
 
@@ -12,11 +13,13 @@ interface Link {
 interface Props {
   heading: string
   links: Link[]
+  style?: ViewStyle | ViewStyle[]
 }
 
-export default function FooterColumn({ heading, links }: Props) {
+export default React.memo(function FooterColumn({ heading, links, style }: Props) {
+  const { isMobile } = useScreenSize()
   return (
-    <View style={styles.root}>
+    <View style={[isMobile ? styles.rootMobile : styles.root, style]}>
       <Text style={[fonts.h6, standardStyles.elementalMarginBottom]}>{heading}</Text>
       {links.map(({ name, link, icon }) => (
         <View style={styles.linkContainer} key={link}>
@@ -32,9 +35,14 @@ export default function FooterColumn({ heading, links }: Props) {
       ))}
     </View>
   )
-}
+})
 
 const styles = StyleSheet.create({
+  rootMobile: {
+    marginTop: 35,
+    width: '50%',
+    paddingHorizontal: 10,
+  },
   root: {
     paddingHorizontal: 25,
   },
