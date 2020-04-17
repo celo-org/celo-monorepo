@@ -15,6 +15,7 @@
 
 ## Operations Manual
 
+- [Celo Foundation Voting Policy](operations-manual/celo-foundation-voting-policy.md)
 - [Governance](operations-manual/governance.md)
 - [Key Management](operations-manual/key-management.md)
   - [Using a Ledger Wallet](operations-manual/using-a-ledger-wallet.md)
