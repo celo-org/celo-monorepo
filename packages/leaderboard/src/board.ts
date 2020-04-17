@@ -97,14 +97,13 @@ async function getClaims(
     address = address.substr(2)
   }
   const res = [address]
-  const accounts = await kit.contracts.getAccounts()
   for (const claim of data.claims) {
     switch (claim.type) {
       case ClaimTypes.KEYBASE:
         break
       case ClaimTypes.ACCOUNT:
         try {
-          const status = await verifyAccountClaim(claim, '0x' + address, accounts.getMetadataURL)
+          const status = await verifyAccountClaim(kit, claim, '0x' + address)
           if (status) console.error('Cannot verify claim:', status)
           else {
             console.log('Claim success', address, claim.address)
@@ -153,7 +152,7 @@ async function readAssoc(lst: string[]) {
         if (url == '') metadata = IdentityMetadataWrapper.fromEmpty(a)
         else {
           try {
-            metadata = await IdentityMetadataWrapper.fetchFromURL(url)
+            metadata = await IdentityMetadataWrapper.fetchFromURL(kit, url)
           } catch (err) {
             console.error('Error reading metadata', a, err.toString())
             metadata = IdentityMetadataWrapper.fromEmpty(a)

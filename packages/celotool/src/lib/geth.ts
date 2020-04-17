@@ -149,6 +149,10 @@ export const getEnodesWithExternalIPAddresses = async (namespace: string) => {
   return getEnodesWithIpAddresses(namespace, true)
 }
 
+export function getPrivateTxNodeClusterIP(celoEnv: string) {
+  return retrieveClusterIPAddress('service', 'tx-nodes-private', celoEnv)
+}
+
 export const fetchPassword = (passwordFile: string) => {
   if (!fs.existsSync(passwordFile)) {
     console.error(`Password file at ${passwordFile} does not exists!`)
@@ -1179,32 +1183,12 @@ export async function migrateContracts(
 ) {
   const migrationOverrides = merge(
     {
-      downtimeSlasher: {
-        slashableDowntime: 6,
-      },
-      election: {
-        minElectableValidators: '1',
-      },
-      epochRewards: {
-        frozen: false,
-      },
-      exchange: {
-        frozen: false,
-      },
-      goldToken: {
-        frozen: false,
-      },
-      reserve: {
-        initialBalance: 100000000,
-      },
       stableToken: {
         initialBalances: {
           addresses: validators.map(ensure0x),
           values: validators.map(() => '10000000000000000000000'),
         },
         oracles: validators.map(ensure0x),
-        goldPrice: 10,
-        frozen: false,
       },
       validators: {
         validatorKeys: validatorPrivateKeys.map(ensure0x),

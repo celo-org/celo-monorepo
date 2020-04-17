@@ -21,8 +21,9 @@ export class ElectionResultsCache {
     if (cached) {
       return cached
     }
+    // For the first epoch, the contract might be unavailable
     const electedSigners = await this.election.getCurrentValidatorSigners(
-      this.firstBlockOfEpoch(epoch)
+      epoch === 1 ? blockNumber : this.firstBlockOfEpoch(epoch)
     )
     this.cache.set(epoch, electedSigners)
     return electedSigners

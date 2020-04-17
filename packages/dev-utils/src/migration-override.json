@@ -27,6 +27,9 @@
     ],
     "numRequiredConfirmations": 1
   },
+  "oracles": {
+    "reportExpiry": 300
+  },
   "reserve": {
     "initialBalance": 100000000,
     "otherAddresses": ["0x91c987bf62D25945dB517BDAa840A6c661374402"]
@@ -37,6 +40,7 @@
     "numRequiredConfirmations": 2
   },
   "stableToken": {
+    "goldPrice": 1,
     "initialBalances": {
       "addresses": [
         "0x5409ED021D9299bf6814279A6A1411A7e866A631",

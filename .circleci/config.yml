@@ -37,7 +37,6 @@ e2e-defaults: &e2e-defaults
     - image: celohq/circleci:geth1.9-2
   environment:
     CELO_BLOCKCHAIN_BRANCH_TO_TEST: master
-
 general:
   artifacts:
     - 'mobile/coverage'
@@ -161,8 +160,8 @@ jobs:
             # separate build to avoid ENOMEM in CI :(
             yarn build --scope @celo/utils
             yarn build --scope @celo/protocol
-            yarn build --ignore @celo/protocol --ignore docs --ignore @celo/web
-
+            yarn build --ignore @celo/protocol --ignore docs
+                
       - run:
           name: Check licenses
           command: |

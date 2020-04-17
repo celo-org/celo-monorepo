@@ -22,8 +22,8 @@
     "test:verbose": "jest --ci --verbose --runInBand --detectOpenHandles"
   },
   "dependencies": {
-    "@celo/contractkit": "0.3.1",
-    "@celo/utils": "0.1.8",
+    "@celo/contractkit": "0.3.6",
+    "@celo/utils": "0.1.9",
     "bignumber.js": "^9.0.0",
     "eth-lib": "^0.2.8",
     "ethereumjs-util": "^5.2.0",

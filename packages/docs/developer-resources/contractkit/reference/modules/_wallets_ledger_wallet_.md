@@ -2,6 +2,10 @@
 
 ## Index
 
+### Enumerations
+
+* [AddressValidation](../enums/_wallets_ledger_wallet_.addressvalidation.md)
+
 ### Classes
 
 * [LedgerWallet](../classes/_wallets_ledger_wallet_.ledgerwallet.md)
@@ -18,17 +22,17 @@
 
 ### `Const` CELO_BASE_DERIVATION_PATH
 
-• **CELO_BASE_DERIVATION_PATH**: *"44'/52752'/0'/0"* = "44'/52752'/0'/0"
+• **CELO_BASE_DERIVATION_PATH**: *string* = CELO_DERIVATION_PATH_BASE.slice(2)
 
-*Defined in [contractkit/src/wallets/ledger-wallet.ts:22](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/ledger-wallet.ts#L22)*
+*Defined in [contractkit/src/wallets/ledger-wallet.ts:24](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/ledger-wallet.ts#L24)*
 
 ## Functions
 
 ###  newLedgerWalletWithSetup
 
-▸ **newLedgerWalletWithSetup**(`transport`: any, `derivationPathIndexes?`: number[], `baseDerivationPath?`: undefined | string): *Promise‹[LedgerWallet](../classes/_wallets_ledger_wallet_.ledgerwallet.md)›*
+▸ **newLedgerWalletWithSetup**(`transport`: any, `derivationPathIndexes?`: number[], `baseDerivationPath?`: undefined | string, `ledgerAddressValidation?`: [AddressValidation](../enums/_wallets_ledger_wallet_.addressvalidation.md)): *Promise‹[LedgerWallet](../classes/_wallets_ledger_wallet_.ledgerwallet.md)›*
 
-*Defined in [contractkit/src/wallets/ledger-wallet.ts:25](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/ledger-wallet.ts#L25)*
+*Defined in [contractkit/src/wallets/ledger-wallet.ts:40](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/ledger-wallet.ts#L40)*
 
 **Parameters:**
 
@@ -37,5 +41,6 @@ Name | Type |
 `transport` | any |
 `derivationPathIndexes?` | number[] |
 `baseDerivationPath?` | undefined &#124; string |
+`ledgerAddressValidation?` | [AddressValidation](../enums/_wallets_ledger_wallet_.addressvalidation.md) |
 
 **Returns:** *Promise‹[LedgerWallet](../classes/_wallets_ledger_wallet_.ledgerwallet.md)›*
