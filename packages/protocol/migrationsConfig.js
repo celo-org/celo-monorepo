@@ -138,8 +138,7 @@ const DefaultConfig = {
     tobinTaxStalenessThreshold: HOUR, // 1 hour
     dailySpendingRatio: toFixed(0.05).toFixed(), // 5%
     spenders: [],
-    // TODO(asa): Needs updating before RC1 deployment
-    otherAddresses: ['0xd0a57D8acFe9979d33933d8A52971E6DC9E2DbF0'],
+    otherAddresses: ['0x246f4599eFD3fA67AC44335Ed5e749E518Ffd8bB'],
     assetAllocationSymbols: ['cGLD', 'BTC', 'ETH', 'DAI'],
     assetAllocationWeights: [0.5, 0.2, 0.1, 0.2],
   },
