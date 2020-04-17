@@ -21,7 +21,6 @@ Every 3 months, the Foundation, through its Board, will distribute a portion of 
 
 Validator groups who will be selected for a cohort (and will thus receive a portion of the Foundation’s votes) will be informed by the following (non-exhaustive) considerations:
 
-
 1. The number of elected validators in earlier cohorts;
 2. Network stability;
 3. Celo Gold governance participation (e.g., how many Celo Gold holders are actively participating in voting); and
