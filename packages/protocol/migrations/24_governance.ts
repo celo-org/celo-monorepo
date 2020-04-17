@@ -75,7 +75,8 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
     }
 
     const bcp = await getDeployedProxiedContract<BlockchainParametersInstance>(
-      'BlockchainParameters'
+      'BlockchainParameters',
+      artifacts
     )
     await bcp.setBlockGasLimit('10000000')
 
