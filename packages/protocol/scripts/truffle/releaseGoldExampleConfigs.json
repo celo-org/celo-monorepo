@@ -1,7 +1,7 @@
 [
   {
-    "releaseStartTime": "MAINNET+0",
-    "releaseCliffTime": 1,
+    "releaseStartTime": "MAINNET",
+    "releaseCliffTime": 0,
     "numReleasePeriods": 1,
     "releasePeriod": 100000000,
     "amountReleasedPerPeriod": 10002,
@@ -11,12 +11,12 @@
     "refundAddress": "0x0000000000000000000000000000000000000000",
     "subjectToLiquidityProvision": true,
     "initialDistributionRatio": 1000,
-    "canValidate": true,
-    "canVote": true
+    "canVote": true,
+    "canValidate": true
   },
   {
-    "releaseStartTime": "MAINNET+0",
-    "releaseCliffTime": 1,
+    "releaseStartTime": "MAINNET",
+    "releaseCliffTime": 0,
     "numReleasePeriods": 1,
     "releasePeriod": 100000000,
     "amountReleasedPerPeriod": 1,
@@ -26,7 +26,7 @@
     "refundAddress": "0x5409ED021D9299bf6814279A6A1411A7e866A631",
     "subjectToLiquidityProvision": false,
     "initialDistributionRatio": 1000,
-    "canValidate": false,
-    "canVote": true
+    "canVote": true,
+    "canValidate": false
   }
 ]

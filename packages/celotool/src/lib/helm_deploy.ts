@@ -271,11 +271,12 @@ export async function retrieveCloudSQLConnectionInfo(
   dbSuffix: string
 ) {
   await validateExistingCloudSQLInstance(instanceName)
+  const secretName = `${celoEnv}-blockscout${dbSuffix}`
   const [blockscoutDBUsername] = await execCmdWithExitOnFailure(
-    `kubectl get secret ${celoEnv}-blockscout${dbSuffix} -o jsonpath='{.data.DATABASE_USER}' -n ${celoEnv} | base64 --decode`
+    `kubectl get secret ${secretName} -o jsonpath='{.data.DATABASE_USER}' -n ${celoEnv} | base64 --decode`
   )
   const [blockscoutDBPassword] = await execCmdWithExitOnFailure(
-    `kubectl get secret ${celoEnv}-blockscout${dbSuffix} -o jsonpath='{.data.DATABASE_PASSWORD}' -n ${celoEnv} | base64 --decode`
+    `kubectl get secret ${secretName} -o jsonpath='{.data.DATABASE_PASSWORD}' -n ${celoEnv} | base64 --decode`
   )
   const [blockscoutDBConnectionName] = await execCmdWithExitOnFailure(
     `gcloud sql instances describe ${instanceName} --format="value(connectionName)"`

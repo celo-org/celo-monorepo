@@ -39,6 +39,7 @@ import Logger from 'src/utils/Logger'
 import { addLocalAccount, getContractKit } from 'src/web3/contracts'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
 import { fornoSelector } from 'src/web3/selectors'
+import { estimateGas } from 'src/web3/utils'
 
 const TAG = 'escrow/saga'
 
@@ -67,8 +68,7 @@ function* transferStableTokenToEscrow(action: EscrowTransferPaymentAction) {
 
     Logger.debug(TAG + '@transferToEscrow', 'Transfering to escrow')
 
-    const transferTxId = generateStandbyTransactionId(escrow.address)
-    yield call(registerStandbyTransaction, transferTxId, amount.toString(), escrow.address)
+    yield call(registerStandbyTransaction, action.txId, amount.toString(), escrow.address)
 
     const transferTx = escrow.transfer(
       phoneHash,
@@ -79,7 +79,7 @@ function* transferStableTokenToEscrow(action: EscrowTransferPaymentAction) {
       NUM_ATTESTATIONS_REQUIRED
     )
     // TODO check types
-    yield call(sendAndMonitorTransaction as any, transferTxId, transferTx, account)
+    yield call(sendAndMonitorTransaction, action.txId, transferTx, account)
     yield put(fetchSentEscrowPayments())
   } catch (e) {
     Logger.error(TAG + '@transferToEscrow', 'Error transfering to escrow', e)
@@ -195,7 +195,7 @@ export async function getReclaimEscrowGas(account: string, paymentID: string) {
     from: account,
     feeCurrency: await getCurrencyAddress(CURRENCY_ENUM.DOLLAR),
   }
-  const gas = new BigNumber(await tx.estimateGas(txParams))
+  const gas = await estimateGas(tx, txParams)
   Logger.debug(`${TAG}/getReclaimEscrowGas`, `Estimated gas of ${gas.toString()}}`)
   return gas
 }

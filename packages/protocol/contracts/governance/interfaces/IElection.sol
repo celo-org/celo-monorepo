@@ -10,6 +10,7 @@ interface IElection {
   function vote(address, uint256, address, address) external returns (bool);
   function activate(address) external returns (bool);
   function revokeActive(address, uint256, address, address, uint256) external returns (bool);
+  function revokeAllActive(address, address, address, uint256) external returns (bool);
   function revokePending(address, uint256, address, address, uint256) external returns (bool);
   function forceDecrementVotes(
     address,

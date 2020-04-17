@@ -62,6 +62,9 @@
   "validationErrors": {
     "email": "Please enter a valid email",
     "generic": "Oops I’m blank!",
-    "unknownError": "Something went wrong"
-  }
+    "unknownError": "Something went wrong",
+    "pleaseWait": "Please wait"
+  },
+  "shortSuccess": "Submitted",
+  "applicationSubmitted": "Application Submitted"
 }

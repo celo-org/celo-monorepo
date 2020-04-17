@@ -12,7 +12,7 @@ spec:
   template:
     spec:
       containers:
-      - name: blockscout-web
+      - name: blockscout-migration
         image: {{ .Values.blockscout.image.repository }}:{{ .Values.blockscout.image.tag }}
         imagePullPolicy: {{ .Values.imagePullPolicy }}
         command:

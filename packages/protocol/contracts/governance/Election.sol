@@ -9,6 +9,7 @@ import "./interfaces/IValidators.sol";
 import "../common/CalledByVm.sol";
 import "../common/Initializable.sol";
 import "../common/FixidityLib.sol";
+import "../common/Freezable.sol";
 import "../common/linkedlists/AddressSortedLinkedList.sol";
 import "../common/UsingPrecompiles.sol";
 import "../common/UsingRegistry.sol";
@@ -22,6 +23,7 @@ contract Election is
   Initializable,
   UsingRegistry,
   UsingPrecompiles,
+  Freezable,
   CalledByVm
 {
   using AddressSortedLinkedList for SortedLinkedList.List;
@@ -319,6 +321,27 @@ contract Election is
   }
 
   /**
+   * @notice Revokes all active votes for `group`
+   * @param group The validator group to revoke votes from.
+   * @param lesser The group receiving fewer votes than the group for which the vote was revoked,
+   *   or 0 if that group has the fewest votes of any validator group.
+   * @param greater The group receiving more votes than the group for which the vote was revoked,
+   *   or 0 if that group has the most votes of any validator group.
+   * @param index The index of the group in the account's voting list.
+   * @return True upon success.
+   * @dev Fails if the account has not voted on a validator group.
+   */
+  function revokeAllActive(address group, address lesser, address greater, uint256 index)
+    external
+    nonReentrant
+    returns (bool)
+  {
+    address account = getAccounts().voteSignerToAccount(msg.sender);
+    uint256 value = getActiveVotesForGroupByAccount(group, account);
+    return revokeActive(group, value, lesser, greater, index);
+  }
+
+  /**
    * @notice Revokes `value` active votes for `group`
    * @param group The validator group to revoke votes from.
    * @param value The number of votes to revoke.
@@ -336,7 +359,7 @@ contract Election is
     address lesser,
     address greater,
     uint256 index
-  ) external nonReentrant returns (bool) {
+  ) public nonReentrant returns (bool) {
     // TODO(asa): Dedup with revokePending.
     require(group != address(0), "Group address zero");
     address account = getAccounts().voteSignerToAccount(msg.sender);
@@ -883,7 +906,7 @@ contract Election is
    *   method.
    * @return The list of elected validators.
    */
-  function electValidatorSigners() external view returns (address[] memory) {
+  function electValidatorSigners() external view onlyWhenNotFrozen returns (address[] memory) {
     return electNValidatorSigners(electableValidators.min, electableValidators.max);
   }
 

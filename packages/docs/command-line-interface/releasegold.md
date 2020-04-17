@@ -201,22 +201,46 @@ _See code: [packages/cli/src/commands/releasegold/set-account-wallet-address.ts]
 
 ### Set-beneficiary
 
-Set the beneficiary of the ReleaseGold contract
+Set the beneficiary of the ReleaseGold contract. This command is gated via a multi-sig, so this is expected to be called twice: once by the contract's beneficiary and once by the contract's releaseOwner. Once both addresses call this command with the same parameters, the tx will execute.
 
 ```
 USAGE
   $ celocli releasegold:set-beneficiary
 
 OPTIONS
-  --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d         (required) Address of the ReleaseGold Contract
-  --new_beneficiary=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the new beneficiary
+  --beneficiary=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the new beneficiary
+  --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d     (required) Address of the ReleaseGold Contract
+
+  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d         (required) Address to submit multisig transaction from (one
+                                                            of the owners)
+
+  --yesreally                                               Override prompt to set new beneficiary (be careful!)
 
 EXAMPLE
-  set-beneficiary --contract 0x5409ED021D9299bf6814279A6A1411A7e866A631 --new-beneficiary
-  0x6Ecbe1DB9EF729CBe972C83Fb886247691Fb6beb
+  set-beneficiary --contract 0x5409ED021D9299bf6814279A6A1411A7e866A631 --from
+  0xE36Ea790bc9d7AB70C55260C66D52b1eca985f84 --beneficiary 0x6Ecbe1DB9EF729CBe972C83Fb886247691Fb6beb
 ```
 
 _See code: [packages/cli/src/commands/releasegold/set-beneficiary.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/releasegold/set-beneficiary.ts)_
+
+### Set-can-expire
+
+Set the canExpire flag for the given ReleaseGold contract
+
+```
+USAGE
+  $ celocli releasegold:set-can-expire
+
+OPTIONS
+  --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
+  --value=(true|false|True|False)                        (required) canExpire value
+  --yesreally                                            Override prompt to set expiration flag (be careful!)
+
+EXAMPLE
+  set-can-expire --contract 0x5409ED021D9299bf6814279A6A1411A7e866A631 --value true
+```
+
+_See code: [packages/cli/src/commands/releasegold/set-can-expire.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/releasegold/set-can-expire.ts)_
 
 ### Set-liquidity-provision
 
@@ -250,7 +274,7 @@ OPTIONS
   --distributionRatio=distributionRatio                  (required) Amount in range [0, 1000] (3 significant figures)
                                                          indicating % of total balance available for distribution.
 
-  --yesreally                                            Override prompt to set liquidity (be careful!)
+  --yesreally                                            Override prompt to set new maximum distribution (be careful!)
 
 EXAMPLE
   set-max-distribution --contract 0x5409ED021D9299bf6814279A6A1411A7e866A631 --distributionRatio 1000
@@ -289,8 +313,8 @@ OPTIONS
   --value=10000000000000000000000                        (required) Value (in Wei) of Celo Dollars to transfer
 
 EXAMPLE
-  transfer --contract 0x5409ED021D9299bf6814279A6A1411A7e866A631 --to 0x6Ecbe1DB9EF729CBe972C83Fb886247691Fb6beb --value
-  10000000000000000000000
+  transfer-dollars --contract 0x5409ED021D9299bf6814279A6A1411A7e866A631 --to 0x6Ecbe1DB9EF729CBe972C83Fb886247691Fb6beb
+  --value 10000000000000000000000
 ```
 
 _See code: [packages/cli/src/commands/releasegold/transfer-dollars.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/releasegold/transfer-dollars.ts)_

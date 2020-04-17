@@ -29,6 +29,8 @@ jest.mock('../src/utils.ts', () => {
   }
   contractGetter.mockReturnValue({
     tokenAddressMapping,
+    goldTokenAddress: '0x000000000000000000000000000000000000gold',
+    stableTokenAddress: '0x0000000000000000000000000000000000dollar',
     attestationsAddress: '0x0000000000000000000000000000000000a77357',
     escrowAddress: '0x0000000000000000000000000000000000a77327',
   })
@@ -129,7 +131,7 @@ describe('Blockscout', () => {
       value: 0.2,
       address: '0x0000000000000000000000000000000000a77357',
       comment: '',
-      symbol: 'Celo Gold',
+      symbol: 'Celo Dollar',
       hash: '0xcc2120e5d050fd68284dc01f6464b2ed8f7358ca80fccb20967af28eb7d79160',
     })
   })
@@ -210,7 +212,8 @@ describe('Blockscout', () => {
     `)
   })
 
-  it('should get gold transactions and label them properly', async () => {
+  // Skip for now until we have a way reliable to way to query cGLD transactions
+  xit('should get gold transactions and label them properly', async () => {
     const result = await blockscoutAPI.getTokenTransactions({
       address: '0x0000000000000000000000000000000000007E57',
       token: 'cGLD',

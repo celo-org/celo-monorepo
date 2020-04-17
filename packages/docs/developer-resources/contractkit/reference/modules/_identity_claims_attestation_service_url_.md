@@ -55,7 +55,7 @@ ___
 
 ###  validateAttestationServiceUrl
 
-▸ **validateAttestationServiceUrl**(`claim`: [AttestationServiceURLClaim](_identity_claims_attestation_service_url_.md#attestationserviceurlclaim), `address`: [Address](_base_.md#address), `kit`: [ContractKit](../classes/_kit_.contractkit.md)): *Promise‹string | undefined›*
+▸ **validateAttestationServiceUrl**(`kit`: [ContractKit](../classes/_kit_.contractkit.md), `claim`: [AttestationServiceURLClaim](_identity_claims_attestation_service_url_.md#attestationserviceurlclaim), `address`: [Address](_base_.md#address)): *Promise‹string | undefined›*
 
 *Defined in [contractkit/src/identity/claims/attestation-service-url.ts:27](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/attestation-service-url.ts#L27)*
 
@@ -63,8 +63,8 @@ ___
 
 Name | Type |
 ------ | ------ |
+`kit` | [ContractKit](../classes/_kit_.contractkit.md) |
 `claim` | [AttestationServiceURLClaim](_identity_claims_attestation_service_url_.md#attestationserviceurlclaim) |
 `address` | [Address](_base_.md#address) |
-`kit` | [ContractKit](../classes/_kit_.contractkit.md) |
 
 **Returns:** *Promise‹string | undefined›*

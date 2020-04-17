@@ -1,11 +1,13 @@
 import sleep from 'sleep-promise'
 import {
   createDefaultIngressIfNotExists,
+  getInstanceName,
+  getReleaseName,
   removeHelmRelease,
   upgradeHelmChart,
 } from 'src/lib/blockscout'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
-import { fetchEnvOrFallback } from 'src/lib/env-utils'
+import { envVar, fetchEnvOrFallback } from 'src/lib/env-utils'
 import { resetCloudSQLInstance, retrieveCloudSQLConnectionInfo } from 'src/lib/helm_deploy'
 import { execCmdWithExitOnFailure } from 'src/lib/utils'
 import yargs from 'yargs'
@@ -28,12 +30,9 @@ type BlockscoutUpgradeArgv = UpgradeArgv & { reset: boolean }
 export const handler = async (argv: BlockscoutUpgradeArgv) => {
   await switchToClusterFromEnv()
 
-  const dbSuffix = fetchEnvOrFallback('BLOCKSCOUT_DB_SUFFIX', '')
-  const instanceName = `${argv.celoEnv}${dbSuffix}`
-  const helmReleaseName = `${argv.celoEnv}-blockscout${fetchEnvOrFallback(
-    'BLOCKSCOUT_DB_SUFFIX',
-    ''
-  )}`
+  const dbSuffix = fetchEnvOrFallback(envVar.BLOCKSCOUT_DB_SUFFIX, '')
+  const instanceName = getInstanceName(argv.celoEnv)
+  const helmReleaseName = getReleaseName(argv.celoEnv)
 
   const [
     blockscoutDBUsername,
@@ -46,7 +45,7 @@ export const handler = async (argv: BlockscoutUpgradeArgv) => {
       'Running upgrade with --reset flag which will reset the database and reinstall the helm chart'
     )
 
-    await removeHelmRelease(argv.celoEnv)
+    await removeHelmRelease(helmReleaseName)
 
     console.info('Sleep for 30 seconds to have all connections killed')
     await sleep(30000)
@@ -54,9 +53,8 @@ export const handler = async (argv: BlockscoutUpgradeArgv) => {
   } else {
     console.info(`Delete blockscout-migration`)
     try {
-      await execCmdWithExitOnFailure(
-        `kubectl delete job ${argv.celoEnv}-blockscout${dbSuffix}-migration -n ${argv.celoEnv}`
-      )
+      const jobName = `${argv.celoEnv}-blockscout${dbSuffix}-migration`
+      await execCmdWithExitOnFailure(`kubectl delete job ${jobName} -n ${argv.celoEnv}`)
     } catch (error) {
       console.error(error)
     }

@@ -49,9 +49,9 @@ enum ErrorType {
 // see https://github.com/celo-org/celo-blockchain/blob/d4b48f3e79b01e8cb7dcf8606b0ed1f666a37a2f/mobile/geth.go#L143
 // and https://github.com/celo-org/celo-blockchain/blob/d4b48f3e79b01e8cb7dcf8606b0ed1f666a37a2f/mobile/geth_android.go
 const INSTANCE_FOLDER = Platform.select({
-  ios: 'iGeth',
-  android: 'GethDroid',
-  default: 'GethMobile',
+  ios: 'celoios',
+  android: 'celoandroid',
+  default: 'celomobile',
 })
 
 // Use relative path on iOS to workaround the 104 chars path limit for unix domain socket.
