@@ -300,7 +300,7 @@ Clone the [celo-monorepo] repo:
 ```bash
 mkdir ~/celo
 cd celo
-git clone git@github.com:celo-org/celo-monorepo.git
+git clone https://github.com/celo-org/celo-monorepo.git
 ```
 
 Then install packages:
