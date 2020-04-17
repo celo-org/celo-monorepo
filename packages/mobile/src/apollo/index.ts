@@ -6,7 +6,7 @@ import { introspectionQueryResultData } from 'src/apollo/types'
 import config from 'src/geth/networkConfig'
 import Logger from 'src/utils/Logger'
 
-const fragmentMatcher = new IntrospectionFragmentMatcher({
+export const fragmentMatcher = new IntrospectionFragmentMatcher({
   introspectionQueryResultData,
 })
 

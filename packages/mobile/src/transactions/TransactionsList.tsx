@@ -267,7 +267,6 @@ export class TransactionsList extends React.PureComponent<Props> {
         )
 
       const feedData = [...standbyTxs, ...transactions].map(mapInvite)
-      console.log(feedData)
 
       return <TransactionFeed kind={kind} loading={loading} error={error} data={feedData} />
     }
