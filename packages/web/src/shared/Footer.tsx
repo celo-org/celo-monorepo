@@ -97,9 +97,9 @@ export default function Footer() {
           <EmailForm submitText={t('signUp')} route={'/contacts'} isDarkMode={false} />
         </Cell>
       </GridRow>
-      <GridRow tabletStyle={{ flexDirection: 'column' }}>
+      <GridRow tabletStyle={styles.column}>
         <Cell span={Spans.third} tabletSpan={Spans.twoThird}>
-          <View style={isMobile ? [standardStyles.centered, styles.rings] : styles.rings}>
+          <View style={isMobile ? [standardStyles.centered, styles.ringsMobile] : styles.rings}>
             <RingsGlyph />
           </View>
           <Details />
@@ -128,7 +128,7 @@ export default function Footer() {
       >
         <Cell span={Spans.full} style={isMobile ? standardStyles.centered : styles.toes}>
           <ChangeStory />
-          <Text style={[fonts.legal, isMobile && textStyles.center]}>
+          <Text style={[fonts.legal, styles.copyright, isMobile && textStyles.center]}>
             {t('footer.copyright', { year })}
           </Text>
         </Cell>
@@ -182,6 +182,9 @@ const Details = React.memo(function _Details() {
 })
 
 const styles = StyleSheet.create({
+  column: {
+    flexDirection: 'column',
+  },
   linksArea: {
     flexDirection: 'row',
     justifyContent: 'space-around',
@@ -197,6 +200,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     maxWidth: 350,
   },
+  ringsMobile: { marginBottom: 30 },
   rings: { marginBottom: 50 },
   form: {
     maxWidth: 550,
@@ -214,5 +218,8 @@ const styles = StyleSheet.create({
   },
   endMobileColumn: {
     marginLeft: 20,
+  },
+  copyright: {
+    zIndex: 10, // ensure copyright is above the sliding div from ChangeStory animation
   },
 })
