@@ -9,7 +9,7 @@ export const DAYS_TO_BACKUP = 1
 export const DAYS_TO_DELAY = 1 / 24 // 1 hour delay
 export const MNEMONIC_SPLITTER = 'celo'
 
-export async function createQuizWordList(mnemonic: string, language: string | null) {
+export function createQuizWordList(mnemonic: string, language: string | null) {
   const disallowedWordSet = new Set(mnemonic.split(' '))
   const languageWordList = getWordlist(language)
   const wordOptions: string = generateMnemonic(MnemonicStrength.s256_24words, languageWordList)

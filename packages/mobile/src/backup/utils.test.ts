@@ -33,7 +33,7 @@ jest.mock('@celo/utils/lib/account', () => {
 
 describe('createQuizWordList', () => {
   it('creates list correctly without dupes', async () => {
-    const wordList = await createQuizWordList(mockMnemonic, 'en')
+    const wordList = createQuizWordList(mockMnemonic, 'en')
     expect(wordList.length).toEqual(24)
     const wordSet = new Set(wordList)
     const intersection = mockMnemonic.split(' ').filter((w) => wordSet.has(w))
@@ -44,7 +44,7 @@ describe('selectQuizWordOptions', () => {
   it('selects words correctly', async () => {
     global.Math.random = () => 0.5
 
-    const wordList = await createQuizWordList(mockMnemonic, 'en')
+    const wordList = createQuizWordList(mockMnemonic, 'en')
     const [correctWord, wordOptions] = selectQuizWordOptions(mockMnemonic, wordList, 4)
     expect(wordOptions).not.toBeUndefined()
     expect(wordOptions!.length).toBe(4)
