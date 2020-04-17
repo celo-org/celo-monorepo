@@ -47,7 +47,7 @@
   },
   "devDependencies": {
     "@celo/dev-utils": "0.0.1-dev",
-    "@celo/ganache-cli": "git+https://github.com/mrsmkl/ganache-cli.git#630cf0ee6249b872c209b8da5be2f7f24a959258",
+    "@celo/ganache-cli": "git+https://github.com/mrsmkl/ganache-cli.git#0bb8b0f78460e0a6163ed56d0ae48333431d1364",
     "@celo/protocol": "1.0.0",
     "@types/debug": "^4.1.5",
     "@types/ethereumjs-util": "^5.2.0",
