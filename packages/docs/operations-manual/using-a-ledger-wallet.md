@@ -153,6 +153,9 @@ To use `celocli` with your Ledger, ensure the device is connected to your comput
 
 Then, simply append the `--useLedger` flag to any `celocli` commands with which you'd like to use a Ledger.
 
+There is another flag that you can use `--ledgerConfirmAddress`. This flag allows you to verify from the Ledger the address
+that is sending the transaction.
+
 The following commands are an example of how you might authorize a vote signing key stored on a Ledger, for your account key, which is also stored on a Ledger, or for your ReleaseGold account, for which the beneficiary key is stored on a Ledger.
 
 
@@ -166,3 +169,12 @@ celocli account:authorize --from $ACCOUNT_ADDRESS --role vote --signer $VOTE_SIG
 # If instead you wish to authorize a vote signing key for your ReleaseGold account, plug in the Ledger containing the beneficiary key for the ReleaseGold contract and run the following command.
 celocli release-gold:authorize --contract $RELEASE_GOLD_CONTRACT_ADDRESS --role vote --signer $VOTE_SIGNER_ADDRESS --signature $PROOF_OF_POSSESSION --useLedger
 ```
+
+## Troubleshooting
+
+If you have issues connecting to the Ledger, try the following:
+
+* Check that the Ledger device is connected, powered on, and that you've unlocked it using the PIN.
+* Check that no other applications are using the device (close Ledger Live, or a local Celo Blockchain node)
+* Try unplugging and replugging the device. Some devices appear to trigger a warning on Macs saying: “USB Devices Disabled. Unplug the device using too much power to re-enable USB devices” which is usually resolved by reconnecting.
+* Ensure that your Ledger has the [latest firmware](https://support.ledger.com/hc/en-us/articles/360002731113-Update-device-firmware). For Ledger Nano S, a firmware version of 1.6 or later is required.
