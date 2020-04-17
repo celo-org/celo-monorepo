@@ -83,7 +83,7 @@ const DefaultConfig = {
   },
   exchange: {
     spread: 5 / 1000,
-    reserveFraction: 1 / 20,
+    reserveFraction: 1 / 100,
     updateFrequency: 5 * MINUTE,
     minimumReports: 5,
     frozen: true,
@@ -135,11 +135,13 @@ const DefaultConfig = {
   },
   reserve: {
     tobinTaxStalenessThreshold: HOUR, // 1 hour
+    tobinTax: toFixed(0.005).toFixed(), // 0.5%
+    tobinTaxReserveRatio: toFixed(2).toFixed(), // 2
     dailySpendingRatio: toFixed(0.05).toFixed(), // 5%
     spenders: [],
     otherAddresses: ['0xd0a57D8acFe9979d33933d8A52971E6DC9E2DbF0'],
     assetAllocationSymbols: ['cGLD', 'BTC', 'ETH', 'DAI'],
-    assetAllocationWeights: [0.5, 0.2, 0.1, 0.2],
+    assetAllocationWeights: [0.5, 0.3, 0.15, 0.05],
   },
   reserveSpenderMultiSig: {
     // 2/2 multsig
