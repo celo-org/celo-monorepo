@@ -71,6 +71,8 @@ export class App extends React.Component {
 
   render() {
     return (
+      /*
+      // @ts-ignore */
       <ApolloProvider client={apolloClient}>
         <Provider store={store}>
           <SafeAreaProvider>
