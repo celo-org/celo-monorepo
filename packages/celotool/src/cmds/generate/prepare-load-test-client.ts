@@ -47,8 +47,8 @@ export const handler = async (argv: Bip32Argv) => {
     const index = parseInt(`${argv.index}${t}`, 10)
     const privateKey = generatePrivateKey(argv.mnemonic, accountType, index)
     const address = privateKeyToAddress(privateKey)
-    fs.writeFileSync(`/root/.celo/pkey${t}`, privateKey)
-    fs.appendFileSync(`/root/.celo/address`, address)
+    fs.writeFileSync(`/root/.celo/pkey${t}`, `${privateKey}\n`)
+    fs.appendFileSync(`/root/.celo/address`, `${address}\n`)
     console.log(`Address for inder ${argv.index} and thread ${t} --> ${address}`)
   }
 }
