@@ -79,15 +79,6 @@ When you see text in angle brackets &lt;&gt;, replace them and the text inside w
 
 Private keys are the central primitive of any cryptographic system and need to be handled with extreme care. Loss of your private key can lead to irreversible loss of value.
 
-#### Unlocking
-
-Celo nodes store private keys encrypted on disk with a password, and need to be "unlocked" before use. Private keys can be unlocked in two ways:
-
-1.  By running the `celocli account:unlock` command. Note that the node must have the "personal" RPC API enabled in order for this command to work.
-2.  By setting the `--unlock` flag when starting the node.
-
-It is important to note that when a key is unlocked you need to be particularly careful about enabling access to the node's RPC APIs.
-
 #### Philosophy
 
 The Celo protocol was designed with the understanding that there is often an inherent tradeoff between the convenience of accessing a private key and the security with which that private key can be custodied. In general Celo is unopinionated about how keys are custodied, but also allows users to authorize private keys with specific, limited privileges. This allows users to custody each private key according to its sensitivity (i.e. what is the impact of this key being lost or stolen?) and usage patterns (i.e. how often and under which circumstances will this key need to be accessed).
@@ -114,6 +105,15 @@ For more details on a specific key type, please see the more detailed sections b
 A Locked Gold Account may have at most one authorized signer of each type at any time. Once a signer is authorized, the only way to deauthorize that signer is to authorize a new signer that has never previously been used as an authorized signer or Locked Gold Account. It follows then that a newly deauthorized signer cannot be reauthorized.
 {% endhint %}
 
+#### Unlocking
+
+Celo nodes store private keys encrypted on disk with a password, and need to be "unlocked" before use. Private keys can be unlocked in two ways:
+
+1.  By running the `celocli account:unlock` command. Note that the node must have the "personal" RPC API enabled in order for this command to work.
+2.  By setting the `--unlock` flag when starting the node.
+
+It is important to note that when a key is unlocked you need to be particularly careful about enabling access to the node's RPC APIs.
+
 ### Environment variables
 
 There are number of new environment variables, and you may use this table as a reference.
@@ -122,8 +122,8 @@ There are number of new environment variables, and you may use this table as a r
 | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------ |
 | CELO_IMAGE                           | The Docker image used for the Validator and proxy containers                                                                         |
 | NETWORK_ID                           | The Celo Baklava network chain ID                                                                                                    |
-| CELO_VALIDATOR_GROUP_ADDRESS         | The `ReleaseGold` beneficiary address for the Validator Group                                                                                          |
-| CELO_VALIDATOR_ADDRESS         | The `ReleaseGold` beneficiary address for the Validator                                                                                          |
+| CELO_VALIDATOR_GROUP_ADDRESS         | The account address for the Validator Group; the `ReleaseGold` beneficiary address for the Validator Group                                                                                          |
+| CELO_VALIDATOR_ADDRESS         | The account adddress for the Validator; the `ReleaseGold` beneficiary address for the Validator                                                                                          |
 | CELO_VALIDATOR_GROUP_RG_ADDRESS         | The `ReleaseGold` contract address for the Validator Group                                                                                          |
 | CELO_VALIDATOR_RG_ADDRESS         | The `ReleaseGold` contract address for the Validator                                                                                          |
 | CELO_VALIDATOR_GROUP_SIGNER_ADDRESS        | The validator (group) signer address authorized by the Validator Group account.
@@ -169,15 +169,15 @@ The setup of RC1 is similar to the new Baklava network and the deployment timeli
 A [timeline](https://forum.celo.org/t/release-candidate-1-rc1-timeline-and-details/428) of the Release Candidate 1 is available to provide further context.
 {% endhint %}
 
-## Setup for Genesis Validators (Before 4/7)
+## Address Generation for Genesis Validators (Before 4/17)
+
+Do we have any documentation on address generation?
+
+## Setup for Genesis Validators (Before 4/22)
 
 **If you provided your Validator signer address and BLS public key for genesis, the community is relying on your Validator to get the network started!**
 
 This section outlines the steps needed to configure your proxy and Validator nodes before block production begins.
-
-Please follow these steps if you ranked on The Great Celo Stake Off leaderboard and have provided details of your Validator signer and BLS addresses as explained in this [FAQ](https://forum.celo.org/t/faq-for-stake-off-Validators-on-release-candidate-and-new-baklava-networks/372/2).
-
-If this doesn't apply to you, but you are interested in trying out the Baklava testnet, please check back later for additional instructions on how to get testnet units of Celo Gold set up your Validator.
 
 ### Environment Variables
 
