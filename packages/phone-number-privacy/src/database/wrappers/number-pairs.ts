@@ -1,3 +1,4 @@
+import { ErrorMessages } from '../../common/utils'
 import { getDatabase } from '../database'
 import { NUMBER_PAIRS_COLUMN, NUMBER_PAIRS_TABLE } from '../models/numberPair'
 
@@ -8,13 +9,18 @@ export async function getNumberPairContacts(
   userPhone: string,
   contactPhones: string[]
 ): Promise<string[]> {
-  const contentPairs = await getDatabase()(NUMBER_PAIRS_TABLE)
-    .select(NUMBER_PAIRS_COLUMN.userPhoneHash)
-    .where(NUMBER_PAIRS_COLUMN.contactPhoneHash, userPhone)
+  try {
+    const contentPairs = await getDatabase()(NUMBER_PAIRS_TABLE)
+      .select(NUMBER_PAIRS_COLUMN.userPhoneHash)
+      .where(NUMBER_PAIRS_COLUMN.contactPhoneHash, userPhone)
 
-  return contentPairs
-    .map((contractPair) => contractPair[NUMBER_PAIRS_COLUMN.userPhoneHash])
-    .filter((number) => contactPhones.includes(number))
+    return contentPairs
+      .map((contractPair) => contractPair[NUMBER_PAIRS_COLUMN.userPhoneHash])
+      .filter((number) => contactPhones.includes(number))
+  } catch (e) {
+    console.error(ErrorMessages.DATABASE_GET_FAILURE, e)
+    return []
+  }
 }
 
 /*
@@ -35,10 +41,9 @@ export async function setNumberPairContacts(
   try {
     await getDatabase().batchInsert(NUMBER_PAIRS_TABLE, rows)
   } catch (e) {
-    // TODO (amyslawson) handle error
     if (e.code !== '23505') {
       // ignore duplicate insertion error (23505)
-      console.error('error batch inserting number-paid', e)
+      console.error(ErrorMessages.DATABASE_INSERT_FAILURE, e)
     }
   }
 }

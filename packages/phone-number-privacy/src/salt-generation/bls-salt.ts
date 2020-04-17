@@ -1,4 +1,5 @@
 import { BLINDBLS } from 'bls12377js-blind'
+import { ErrorMessages } from '../common/utils'
 import config from '../config'
 
 /*
@@ -9,7 +10,7 @@ export function computeBLSSalt(queryPhoneNumber: string) {
     const privateKey = new Buffer(config.salt.key)
     return BLINDBLS.computePRF(privateKey, new Buffer(queryPhoneNumber))
   } catch (e) {
-    console.error('Failed to compute salt', e)
+    console.error(ErrorMessages.SALT_COMPUTATION_FAILURE, e)
     throw e
   }
 }
