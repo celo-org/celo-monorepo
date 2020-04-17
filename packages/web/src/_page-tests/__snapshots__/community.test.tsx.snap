@@ -4658,6 +4658,43 @@ We believe that many of these features have great potential for positive impact,
                 </span>
               </div>
             </div>
+            <div
+              className="css-view-1dbjc4n"
+              style={
+                Object {
+                  "MozTransitionProperty": "max-height",
+                  "WebkitTransitionDuration": "600ms",
+                  "WebkitTransitionProperty": "max-height",
+                  "height": "auto",
+                  "marginBottom": "5px",
+                  "marginTop": "5px",
+                  "maxHeight": "0px",
+                  "transitionDuration": "600ms",
+                  "transitionProperty": "max-height",
+                }
+              }
+            >
+              <div
+                className="css-text-901oao"
+                dir="auto"
+                style={
+                  Object {
+                    "MozTransitionProperty": "opacity",
+                    "WebkitTransitionDuration": "700ms",
+                    "WebkitTransitionProperty": "opacity",
+                    "color": "rgba(255,127,109,1.00)",
+                    "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                    "fontSize": "16px",
+                    "fontWeight": "500",
+                    "lineHeight": "18px",
+                    "opacity": 0,
+                    "textRendering": "geometricPrecision",
+                    "transitionDuration": "700ms",
+                    "transitionProperty": "opacity",
+                  }
+                }
+              />
+            </div>
           </form>
         </div>
         <div
@@ -5442,6 +5479,43 @@ We believe that many of these features have great potential for positive impact,
                   Recommendation Submitted
                 </span>
               </div>
+            </div>
+            <div
+              className="css-view-1dbjc4n"
+              style={
+                Object {
+                  "MozTransitionProperty": "max-height",
+                  "WebkitTransitionDuration": "600ms",
+                  "WebkitTransitionProperty": "max-height",
+                  "height": "auto",
+                  "marginBottom": "5px",
+                  "marginTop": "5px",
+                  "maxHeight": "0px",
+                  "transitionDuration": "600ms",
+                  "transitionProperty": "max-height",
+                }
+              }
+            >
+              <div
+                className="css-text-901oao"
+                dir="auto"
+                style={
+                  Object {
+                    "MozTransitionProperty": "opacity",
+                    "WebkitTransitionDuration": "700ms",
+                    "WebkitTransitionProperty": "opacity",
+                    "color": "rgba(255,127,109,1.00)",
+                    "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                    "fontSize": "16px",
+                    "fontWeight": "500",
+                    "lineHeight": "18px",
+                    "opacity": 0,
+                    "textRendering": "geometricPrecision",
+                    "transitionDuration": "700ms",
+                    "transitionProperty": "opacity",
+                  }
+                }
+              />
             </div>
           </form>
         </div>
@@ -7372,6 +7446,43 @@ We believe that many of these features have great potential for positive impact,
                   Application Submitted
                 </span>
               </div>
+            </div>
+            <div
+              className="css-view-1dbjc4n"
+              style={
+                Object {
+                  "MozTransitionProperty": "max-height",
+                  "WebkitTransitionDuration": "600ms",
+                  "WebkitTransitionProperty": "max-height",
+                  "height": "auto",
+                  "marginBottom": "5px",
+                  "marginTop": "5px",
+                  "maxHeight": "0px",
+                  "transitionDuration": "600ms",
+                  "transitionProperty": "max-height",
+                }
+              }
+            >
+              <div
+                className="css-text-901oao"
+                dir="auto"
+                style={
+                  Object {
+                    "MozTransitionProperty": "opacity",
+                    "WebkitTransitionDuration": "700ms",
+                    "WebkitTransitionProperty": "opacity",
+                    "color": "rgba(255,127,109,1.00)",
+                    "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                    "fontSize": "16px",
+                    "fontWeight": "500",
+                    "lineHeight": "18px",
+                    "opacity": 0,
+                    "textRendering": "geometricPrecision",
+                    "transitionDuration": "700ms",
+                    "transitionProperty": "opacity",
+                  }
+                }
+              />
             </div>
           </div>
         </div>
