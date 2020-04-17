@@ -59,9 +59,10 @@ spec:
                 > /root/.celo/pkey$thread
 
               echo "Generating account address for rid=$RID thread=$thread"
-              celotooljs.sh generate account-address \
-                --private-key `cat /root/.celo/pkey$thread` \
-                >> /root/.celo/address
+              address=$(celotooljs.sh generate account-address \
+                --private-key $(cat /root/.celo/pkey$thread))
+              echo "$address" >> /root/.celo/address
+              echo "Public Address $address"
             done
         env:
         - name: REPLICA_NAME
@@ -211,7 +212,7 @@ spec:
               --mnemonic "$MNEMONIC" \
               --blockscout-url {{ .Values.blockscout.url }} \
               --blockscoutMeasurePercent {{ .Values.blockscout.measurePercent }} \
-              --client-count {{ .Values.threads | default "1" }} \
+              --client-count {{ .Values.threads | default "1" }}
         resources:
           requests:
             memory: 256Mi
