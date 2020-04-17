@@ -2,16 +2,16 @@
 
 - [Celo Engineering Setup](#celo-engineering-setup)
   - [Reading](#reading)
-  - [Getting Everything Installed](#getting-everything-installed)
+  - [Getting everything installed](#getting-everything-installed)
     - [MacOS](#macos)
-      - [Xcode](#xcode)
+      - [Xcode CLI](#xcode-CLI)
       - [Homebrew](#homebrew)
       - [Install Node, Yarn and friends](#install-node-yarn-and-friends)
     - [Linux](#linux)
       - [Install Node, Yarn and friends](#install-node-yarn-and-friends-1)
-    - [Some common stuff](#some-common-stuff)
+    - [Common stuff](#common-stuff)
       - [Install Go](#install-go)
-      - [Install gcloud cli](#install-gcloud-cli)
+      - [Install gcloud CLI](#install-gcloud-CLI)
       - [Optional: Install Rust](#optional-install-rust)
   - [Building celo-monorepo](#building-celo-monorepo)
   - [Deploying the mobile wallet](#deploying-the-mobile-wallet)
@@ -24,16 +24,15 @@ This is a living document! Please edit and update it as part of your onboarding 
 Review the README from each directory in [packages](packages/). The [protocol](packages/protocol) and [mobile](packages/mobile) packages are good starting points.
 
 
-## Getting Everything Installed
+## Getting everything installed
 
-Follow these steps to get everything that you need installed to develop and
-build the celo-monorepo codebase.
+Follow these steps to get everything that you need installed to build the celo-monorepo codebase on your computer.
 
 ### MacOS
 
-#### Xcode
+#### Xcode CLI
 
-Install Xcode and its command line tools:
+Install the Xcode command line tools:
 
 ```bash
 xcode-select --install
@@ -100,7 +99,7 @@ echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/source
 sudo apt-get update && sudo apt-get install yarn
 ```
 
-### Some common stuff
+### Common stuff
 
 #### Install Go
 
@@ -119,7 +118,7 @@ export GOPATH=$HOME/go
 export PATH=$PATH:$GOPATH/bin
 ```
 
-#### Install gcloud cli
+#### Install gcloud CLI
 
 _Required for cLabs employees only_
 
