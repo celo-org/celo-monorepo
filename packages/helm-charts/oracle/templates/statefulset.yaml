@@ -37,6 +37,26 @@ spec:
       - name: oracle-client
         image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
         imagePullPolicy: Always
+        command:
+          - bash
+          - "-c"
+          - |
+            [[ $REPLICA_NAME =~ -([0-9]+)$ ]] || exit 1
+            RID=${BASH_REMATCH[1]}
+            export ORACLE_KEY_PATH="/private-keys/private-key-$RID"
+            node /celo-oracle/lib/run_app.js
         env:
-        - name: WEB3_PROVIDER_URL
+        - name: REPLICA_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: CELO_NODE
           value: {{ .Values.oracle.web3ProviderUrl }}
+        volumeMounts:
+        - name: private-key-volume
+          readOnly: true
+          mountPath: "/private-keys"
+      volumes:
+        - name: private-key-volume
+          secret:
+            secretName: pkey-secret
