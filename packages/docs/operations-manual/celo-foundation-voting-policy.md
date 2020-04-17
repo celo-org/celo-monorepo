@@ -1,6 +1,6 @@
 # Celo Foundation Validator Voting Policy
 
-The following describes how the Celo Foundation anticipates allocating its votes to validator groups, with special attention to the first allocated groups at the Celo Mainnet release and the months thereafter. 
+The following describes how the Celo Foundation anticipates allocating its votes to validator groups, with special attention to the first allocated groups at the Celo Mainnet release and the months thereafter.
 
 {% hint style="info" %}
 The policy described here can change at any time as determined by the Foundation Board.
@@ -9,10 +9,10 @@ The policy described here can change at any time as determined by the Foundation
 ## Policy Objectives
 
 The Foundation voting policy aims to:
-* Be fair by avoiding preferential treatment to certain groups; 
-* Vote in-line with the Foundation’s purpose, which is to encourage financial inclusion and prosperity for all; 
-* Encourage professional, secure, and reliable validators; 
-* Be equal opportunity by enabling new groups to have validators elected; and 
+* Be fair by avoiding preferential treatment to certain groups;
+* Vote in-line with the Foundation’s purpose, which is to encourage financial inclusion and prosperity for all;
+* Encourage professional, secure, and reliable validators;
+* Be equal opportunity by enabling new groups to have validators elected; and
 * Promote network stability by encouraging a gradual turnover in elected validators instead of abrupt election changes
 
 ## Process
@@ -20,6 +20,8 @@ The Foundation voting policy aims to:
 Every 3 months, the Foundation, through its Board, will distribute a portion of its total available votes to a cohort of validator groups. These validators must meet certain basic standards (details below) and alignment with the Foundation’s purpose. The total number of validator groups in a cohort can vary.
 
 Validator groups who will be selected for a cohort (and will thus receive a portion of the Foundation’s votes) will be informed by the following (non-exhaustive) considerations:
+
+
 1. The number of elected validators in earlier cohorts;
 2. Network stability;
 3. Celo Gold governance participation (e.g., how many Celo Gold holders are actively participating in voting); and
@@ -57,7 +59,7 @@ In addition to meeting the standard criteria, outlined above, the Foundation ant
 
 At Celo Mainnet release, the Foundation will vote for the [top 50](https://docs.google.com/spreadsheets/d/e/2PACX-1vQwk10o6YV0uriR8LuYfLqB1irjmOX_-L6Jljn3BtKlmz_R_TsUU8aI-pMqGVlu4HQKIQlQaFkUhsyl/pubhtml?gid=1970613133&single=true) The Great Celo Stake Off (TGCSO) winners divided into the following two cohorts:
 * **Cohort 1:** open to TGCSO leaderboard participants at ranking 26-50, this cohort will receive votes for 3 months period
-* **Cohort 2:** open to TGCSO leaderboard participants at ranking 1-25, this cohort will receive votes for 3 months period
+* **Cohort 2:** open to TGCSO leaderboard participants at ranking 1-25, this cohort will receive votes for 6 months period
 
 Following Mainnet release, the Foundation will open the application process for a third cohort. This third cohort must meet basic requirements (as stated above) and it is anticipated that this third cohort may  begin to receive votes 3 months after Mainnet release, and will receive votes for the expected 9 month period.
 
