@@ -1,6 +1,6 @@
 {
   "name": "@celo/utils",
-  "version": "0.1.9-dev",
+  "version": "0.1.10-dev",
   "description": "Celo common utils",
   "author": "Celo",
   "license": "Apache-2.0",
@@ -33,7 +33,9 @@
     "keccak256": "^1.0.0",
     "lodash": "^4.17.14",
     "numeral": "^2.0.6",
-    "web3-utils": "1.2.4"
+    "web3-utils": "1.2.4",
+    "bip32":"2.0.5",
+    "bip39":"3.0.2"
   },
   "devDependencies": {
     "@celo/typescript": "0.0.1",
