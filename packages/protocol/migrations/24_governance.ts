@@ -10,7 +10,11 @@ import {
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
 import { toFixed } from '@celo/utils/lib/fixidity'
-import { GovernanceApproverMultiSigInstance, GovernanceInstance } from 'types'
+import {
+  BlockchainParametersInstance,
+  GovernanceApproverMultiSigInstance,
+  GovernanceInstance,
+} from 'types'
 
 const initializeArgs = async (networkName: string): Promise<any[]> => {
   const governanceApproverMultiSig: GovernanceApproverMultiSigInstance = await getDeployedProxiedContract<
@@ -68,6 +72,14 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
           )
         )
       }
+    }
+
+    if (false) {
+      const bcp = await getDeployedProxiedContract<BlockchainParametersInstance>(
+        'BlockchainParameters',
+        artifacts
+      )
+      await bcp.setBlockGasLimit('10000000')
     }
 
     const proxyAndImplementationOwnedByGovernance = [
