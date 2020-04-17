@@ -81,10 +81,10 @@ async function helmParameters(
     params.push(`--set blockscout.jsonrpc_ws_url=ws://${txNodeLbIp}:8546`)
   } else if (privateNodes > 0) {
     params.push(`--set blockscout.jsonrpc_http_url=http://tx-nodes-private:8545`)
-    params.push(`--set blockscout.jsonrpc_http_url=ws://tx-nodes-private:8546`)
+    params.push(`--set blockscout.jsonrpc_ws_url=ws://tx-nodes-private:8546`)
   } else {
     params.push(`--set blockscout.jsonrpc_http_url=http://tx-nodes:8545`)
-    params.push(`--set blockscout.jsonrpc_http_url=ws://tx-nodes:8546`)
+    params.push(`--set blockscout.jsonrpc_ws_url=ws://tx-nodes:8546`)
   }
   return params
 }

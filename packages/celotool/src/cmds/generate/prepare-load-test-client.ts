@@ -44,7 +44,8 @@ export const builder = (argv: yargs.Argv) => {
 export const handler = async (argv: Bip32Argv) => {
   const accountType = AccountType.LOAD_TESTING_ACCOUNT
   for (let t = 0; t < argv.threads; t++) {
-    const index = parseInt(`${argv.index}${t}`, 10)
+    const index = parseInt(argv.index.toString() + t.toString(), 10)
+
     const privateKey = generatePrivateKey(argv.mnemonic, accountType, index)
     const address = privateKeyToAddress(privateKey)
     fs.writeFileSync(`/root/.celo/pkey${t}`, `${privateKey}\n`)

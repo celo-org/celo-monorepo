@@ -1,9 +1,5 @@
-const {
-  toFixed
-} = require('@celo/utils/lib/fixidity')
-const {
-  CeloContractName
-} = require('@celo/protocol/lib/registry-utils')
+const { toFixed } = require('@celo/utils/lib/fixidity')
+const { CeloContractName } = require('@celo/protocol/lib/registry-utils')
 
 const BigNumber = require('bignumber.js')
 const minimist = require('minimist')
@@ -46,7 +42,7 @@ const DefaultConfig = {
       minor: 9,
       patch: 0,
     },
-    blockGasLimit: 20000000,
+    blockGasLimit: 10000000,
   },
   doubleSigningSlasher: {
     reward: '1000000000000000000000', // 1000 cGLD

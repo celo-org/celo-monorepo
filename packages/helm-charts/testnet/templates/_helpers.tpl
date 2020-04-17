@@ -340,8 +340,8 @@ spec:
           containerPort: 8546
         resources:
           requests:
-            memory: {{ .Values.geth.node.memory_request }}
-            cpu: {{ .Values.geth.node.cpu_request }}
+            memory: 4Gi
+            cpu: "1"
         volumeMounts:
         - name: data
           mountPath: /root/.celo

@@ -1,5 +1,6 @@
 /* tslint:disable no-console */
 import { newKit } from '@celo/contractkit'
+import sleep from 'sleep-promise'
 import { convertToContractDecimals } from 'src/lib/contract-utils'
 import { AccountType, generateAddress } from 'src/lib/generate_utils'
 import yargs from 'yargs'
@@ -55,22 +56,23 @@ export const handler = async (argv: Bip32Argv) => {
     kit.contracts.getStableToken(),
     kit.contracts.getReserve(),
   ])
-  const goldAmount = await convertToContractDecimals(0.01, goldToken)
-  const stableTokenAmount = await convertToContractDecimals(0.01, stableToken)
+  const goldAmount = await convertToContractDecimals(1, goldToken)
+  const stableTokenAmount = await convertToContractDecimals(1, stableToken)
 
-  for (let i = 0; i < argv.count; i++) {
-    for (let t = 0; t < argv.threads; t++) {
-      const index = parseInt(`${i}${t}`, 10)
+  for (let i = argv.count - 1; i >= 0; i--) {
+    for (let t = argv.threads - 1; t >= 0; t--) {
+      const index = parseInt(i.toString() + t.toString(), 10)
       const address = generateAddress(argv.mnemonic, accountType, index)
       console.log(
-        `Fauceting ${goldAmount.toFixed()} Gold and ${stableTokenAmount.toFixed()} StableToken to ${address}`
+        `${index} --> Fauceting ${goldAmount.toFixed()} Gold and ${stableTokenAmount.toFixed()} StableToken to ${address}`
       )
       if (await reserve.isSpender(account)) {
-        await reserve.transferGold(address, goldAmount.toFixed()).sendAndWaitForReceipt()
+        await reserve.transferGold(address, goldAmount.toFixed()).send()
       } else {
-        await goldToken.transfer(address, goldAmount.toFixed()).sendAndWaitForReceipt()
+        await goldToken.transfer(address, goldAmount.toFixed()).send()
       }
-      await stableToken.transfer(address, stableTokenAmount.toFixed()).sendAndWaitForReceipt()
+      await stableToken.transfer(address, stableTokenAmount.toFixed()).send()
     }
+    await sleep(100)
   }
 }

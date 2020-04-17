@@ -5,7 +5,9 @@ const WebsocketSubprovider = require('web3-provider-engine/subproviders/websocke
 const { TruffleArtifactAdapter } = require('@0x/sol-trace')
 const { CoverageSubprovider } = require('@0x/sol-coverage')
 
-const argv = require('minimist')(process.argv.slice(2), { string: ['truffle_override', 'network'] })
+const argv = require('minimist')(process.argv.slice(2), {
+  string: ['truffle_override', 'network'],
+})
 
 const SOLC_VERSION = '0.5.8'
 const ALFAJORES_NETWORKID = 44785
@@ -22,7 +24,7 @@ const PILOT_FROM = '0x387bCb16Bfcd37AccEcF5c9eB2938E30d3aB8BF2'
 const PILOTSTAGING_FROM = '0x545DEBe3030B570731EDab192640804AC8Cf65CA'
 const RC0_FROM = '0x469be98FE71AFf8F6e7f64F9b732e28A03596B5C'
 
-const gasLimit = 20000000
+const gasLimit = 10000000
 
 const defaultConfig = {
   host: '127.0.0.1',
@@ -33,7 +35,12 @@ const defaultConfig = {
   gasPrice: 100000000000,
 }
 
-const freeGasConfig = { ...defaultConfig, ...{ gasPrice: 0 } }
+const freeGasConfig = {
+  ...defaultConfig,
+  ...{
+    gasPrice: 0,
+  },
+}
 
 // Here to avoid recreating it each time
 let coverageProvider = null
@@ -152,9 +159,15 @@ const networks = {
 if (argv.truffle_override || !(argv.network in networks)) {
   const configOverride = argv.truffle_override ? JSON.parse(argv.truffle_override) : {}
   if (argv.network in networks) {
-    networks[argv.network] = { ...networks[argv.network], ...configOverride }
+    networks[argv.network] = {
+      ...networks[argv.network],
+      ...configOverride,
+    }
   } else {
-    networks[argv.network] = { ...defaultConfig, ...configOverride }
+    networks[argv.network] = {
+      ...defaultConfig,
+      ...configOverride,
+    }
   }
 }
 
