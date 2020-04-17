@@ -1,4 +1,190 @@
 # Mobile (Celo Wallet)
+      - [Java](#java)
+      - [Install Android Dev Tools](#install-android-dev-tools)
+      - [Install iOS Dev Tools](#install-ios-dev-tools)
+
+
+
+            - [Installing OpenJDK 8](#installing-openjdk-8)
+      - [Install Android Dev Tools](#install-android-dev-tools-1)
+
+
+
+
+
+
+      - [Optional: Install an Android Emulator](#optional-install-an-android-emulator)
+      - [Optional: Genymotion](#optional-genymotion)
+        - [MacOS](#macos-1)
+        - [Linux](#linux-1)
+    - [Building celo-monorepo](#building-celo-monorepo)
+  - [Using an Android test device locally](#using-an-android-test-device-locally)
+
+  // MacOS
+
+
+#### Optional: Install an Android Emulator
+
+Install the Android 28 system image and create an Android Virtual Device:
+
+```bash
+sdkmanager "system-images;android-28;google_apis;x86"
+avdmanager create avd --force --name Nexus_5X_API_28_x86 --device "Nexus 5X" -k "system-images;android-28;google_apis;x86" --abi "google_apis/x86"
+```
+
+Execute the following and add it to your `~/.bash_profile`:
+
+```bash
+export PATH=$ANDROID_HOME/emulator:$ANDROID_HOME/tools:$PATH
+```
+
+Run the emulator with:
+
+```bash
+emulator -avd Nexus_5X_API_28_x86
+```
+
+#### Optional: Install Genymotion Emulator Manager
+
+Optionally, as alternative to other emulators you can install Genymotion
+
+##### MacOS
+
+```bash
+brew cask install genymotion
+```
+
+Under OSX High Sierra and later, you'll get a message that you need to
+[approve it in System Preferences > Security & Privacy > General][approve kernel extension].
+
+Do that, and then repeat the line above.
+
+Then make sure the ADB path is set correctly in Genymotion — set
+`Preferences > ADB > Use custom Android SDK tools` to
+`/usr/local/share/android-sdk` (same as `$ANDROID_HOME`)
+
+##### Linux
+
+You can download the Linux version of Genymotion from the [fun zone!](https://www.genymotion.com/fun-zone/) (you need to sign in first).
+
+After having the binary you only need to run the installer:
+
+```
+sudo ./genymotion-3.0.2-linux_x64.bin
+```
+
+  #### Java
+
+We need Java to be able to build and run Android to deploy the mobile app to
+test devices. Android currently only builds correctly with Java 8. (Using
+OpenJDK because of [Oracle being Oracle][oracle being oracle])
+
+```bash
+brew install cask
+brew tap homebrew/cask-versions
+brew cask install homebrew/cask-versions/adoptopenjdk8
+```
+
+Optionally, install Jenv to manage multiple Java versions
+
+```bash
+brew install jenv
+eval "$(jenv init -)"
+jenv add /Library/Java/JavaVirtualMachines/<java8 version here>/Contents/Home
+```
+
+#### Install Android Dev Tools
+
+Install the Android SDK and platform tools:
+
+```bash
+brew cask install android-sdk
+brew cask install android-platform-tools
+```
+
+Next install [Android Studio][android studio] and add the [Android NDK][android ndk]
+
+Execute the following (and make sure the lines are in your `~/.bash_profile`):
+
+```bash
+export ANDROID_HOME=/usr/local/share/android-sdk
+export ANDROID_NDK=/usr/local/share/android-ndk
+export ANDROID_SDK_ROOT=/usr/local/share/android-sdk
+export GRADLE_OPTS='-Dorg.gradle.daemon=true -Dorg.gradle.parallel=true -Dorg.gradle.jvmargs="-Xmx4096m -XX:+HeapDumpOnOutOfMemoryError"'
+```
+
+Then install the Android 28 platform:
+
+```bash
+sdkmanager 'platforms;android-28'
+```
+
+#### Install iOS Dev Tools
+
+Install [Xcode 10.3](https://download.developer.apple.com/Developer_Tools/Xcode_10.3/Xcode_10.3.xip) (an Apple Developer Account is needed to access this link).
+(If after signing in the the direct link does not work try finding on https://developer.apple.com/download/more/)
+
+We do not recommend installing Xcode through the App Store as it can auto update and become incompatible with our projects (until we decide to upgrade).
+
+Note that using the method above, you can have multiple versions of Xcode installed in parallel by using different app names. For instance `Xcode10.3.app` and `Xcode11.app` inside the `/Applications` folder.
+
+Install Cocopods `gem install cocoapods`
+
+From ios folder in mobile package run `bundle exec pod install`
+
+//
+
+// linux
+
+#### Installing OpenJDK 8
+
+```
+sudo apt install openjdk-8-jdk
+```
+
+#### Install Android Dev Tools
+
+You can download the complete Android Studio and SDK from the [Android Developer download site](https://developer.android.com/studio/#downloads).
+
+The steps are:
+
+1.  Unpack the .zip file you downloaded to an appropriate location for your applications, such as within `/usr/local/` for your user profile, or `/opt/` for shared users.
+
+    If you're using a 64-bit version of Linux, make sure you first install the [required libraries for 64-bit machines](https://developer.android.com/studio/install#64bit-libs).
+
+1.  To launch Android Studio, open a terminal, navigate to the `android-studio/bin/` directory, and execute `studio.sh`.
+
+1.  Select whether you want to import previous Android Studio settings or not, then click OK.
+
+1.  The Android Studio Setup Wizard guides you through the rest of the setup, which includes downloading Android SDK components that are required for development.
+
+You can find the complete instructions about how to install the tools in Linux environments in the [Documentation page](https://developer.android.com/studio/install#linux).
+
+//
+
+## Using an Android test device locally
+
+First, follow [these instructions to enable Developer Options][android dev options]
+on your Android.
+
+Plug in a USB cable and you'll be prompted to accept the connection and shown a
+public key (corresponding to the `abd_key.pub` file in `~/.android`)
+
+Then, running:
+
+```bash
+adb devices
+```
+
+should show something like:
+
+```text
+List of devices attached
+8XEBB18414424157    device
+```
+
+If it lists a device as "unauthorized", make sure you've accepted the prompt or
+[troubleshoot here][device unauthorized].
 
 ## Overview
 
@@ -249,3 +435,9 @@ $ adb kill-server && adb start-server
 [jest]: https://jestjs.io/docs/en/snapshot-testing
 [redux-saga-test-plan]: https://github.com/jfairbank/redux-saga-test-plan
 [sms retriever]: https://developers.google.com/identity/sms-retriever/verify#1_construct_a_verification_message
+[android dev options]: https://developer.android.com/studio/debug/dev-options
+[android ndk]: https://developer.android.com/ndk/guides
+[android studio]: https://developer.android.com/studio
+[approve kernel extension]: https://developer.apple.com/library/content/technotes/tn2459/_index.html
+[oracle being oracle]: https://github.com/Homebrew/homebrew-cask-versions/issues/7253
+[device unauthorized]: https://stackoverflow.com/questions/23081263/adb-android-device-unauthorized
