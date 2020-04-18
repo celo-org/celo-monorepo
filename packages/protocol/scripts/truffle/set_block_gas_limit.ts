@@ -18,8 +18,7 @@ module.exports = async (callback: (error?: any) => number) => {
     console.log('Setting block gas limit to', config.blockchainParameters.blockGasLimit)
     await bcp.setBlockGasLimit(config.blockchainParameters.blockGasLimit)
     const governance = await getDeployedProxiedContract<GovernanceInstance>('Governance', artifacts)
-    if (true) {
-      //if (!config.governance.skipTransferOwnership) {
+    if (!config.governance.skipTransferOwnership) {
       await transferOwnershipOfProxyAndImplementation(
         'BlockchainParameters',
         governance.address,

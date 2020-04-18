@@ -252,6 +252,7 @@ export function deploymentForContract<ContractInstance extends Truffle.ContractI
   const Contract = artifacts.require(name)
   const ContractProxy = artifacts.require(name + 'Proxy')
   return (deployer: any, networkName: string, _accounts: string[]) => {
+    console.log('Deploying', name)
     deployer.deploy(ContractProxy)
     deployer.deploy(Contract)
     deployer.then(async () => {
@@ -297,7 +298,6 @@ export async function transferOwnershipOfProxy(
 ) {
   const Proxy = artifacts.require(contractName + 'Proxy')
   const proxy: ProxyInstance = await Proxy.deployed()
-  // @ts-ignore
   await proxy._transferOwnership(owner)
 }
 
@@ -309,7 +309,6 @@ export async function transferOwnershipOfProxyAndImplementation<
     contractName,
     artifacts
   )
-  // @ts-ignore
   await contract.transferOwnership(owner)
   await transferOwnershipOfProxy(contractName, owner, artifacts)
 }

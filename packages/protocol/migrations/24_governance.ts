@@ -44,7 +44,6 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
   CeloContractName.Governance,
   initializeArgs,
   async (governance: GovernanceInstance) => {
-    console.log('govrnance callback')
     if (!config.governance.skipSetConstitution) {
       console.info('Setting constitution thresholds')
       const constitutionContractNames = Object.keys(constitution).filter(
@@ -97,12 +96,10 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
       'Validators',
     ]
 
-    //if (!config.governance.skipTransferOwnership) {
-    if (true) {
+    if (!config.governance.skipTransferOwnership) {
       for (const contractName of proxyAndImplementationOwnedByGovernance) {
         await transferOwnershipOfProxyAndImplementation(contractName, governance.address, artifacts)
       }
     }
-    console.log('done transferring ownership to goveernance')
   }
 )

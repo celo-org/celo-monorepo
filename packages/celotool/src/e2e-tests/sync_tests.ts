@@ -15,7 +15,7 @@ describe('sync tests', function(this: any) {
     network: 'local',
     runPath: TMP_PATH,
     migrate: true,
-    verbosity: 4,
+    verbosity: 1,
     instances: [
       {
         name: 'validator0',
