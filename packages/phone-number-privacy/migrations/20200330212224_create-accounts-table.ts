@@ -1,5 +1,5 @@
 import * as Knex from 'knex'
-import { ACCOUNTS_COLUMNS, ACCOUNTS_TABLE } from '../src/models/account'
+import { ACCOUNTS_COLUMNS, ACCOUNTS_TABLE } from '../src/database/models/account'
 
 export async function up(knex: Knex): Promise<any> {
   return knex.schema.createTable(ACCOUNTS_TABLE, (t) => {

@@ -9,7 +9,6 @@ import Sandbox from 'src/dev/Sandbox'
 import { H2, H3 } from 'src/fonts/Fonts'
 import OpenGraph from 'src/header/OpenGraph'
 import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
-import ConnectionFooter from 'src/shared/ConnectionFooter'
 import menuItems from 'src/shared/menu-items'
 import { standardStyles } from 'src/styles'
 class Developers extends React.PureComponent<I18nProps> {
@@ -34,7 +33,6 @@ class Developers extends React.PureComponent<I18nProps> {
           <H2 style={standardStyles.elementalMarginBottom}>{t('getInvolved')}</H2>
         </EngageAsDeveloper>
         <Contribute />
-        <ConnectionFooter includeDividerLine={false} />
       </View>
     )
   }
