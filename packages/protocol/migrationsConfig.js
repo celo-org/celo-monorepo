@@ -117,6 +117,7 @@ const DefaultConfig = {
       '0xD6d48412dA0804CF88258bfDf5AaFcBe5FEd7ecC',
       '0xFD74A4b05F12B9aB6020CB202aDE1BBa4Bc99aba',
       '0x114a0f28f20a6cF1AD428C396f78248d0E76724e',
+      '0xC631Eb5dE231000f96F4973ca8516d487108b2BF',
     ],
     numRequiredConfirmations: 2,
     numInternalRequiredConfirmations: 4,
