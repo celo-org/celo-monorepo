@@ -21,29 +21,45 @@ export async function removeHelmRelease(celoEnv: string) {
 }
 
 async function helmParameters(celoEnv: string) {
-  const identity = await createOracleIdentityIfNotExists(celoEnv)
+  // const identity = await createOracleIdentityIfNotExists(celoEnv)
   const tokenName = await createRBACResources(celoEnv)
   const addresses = oracleAddresses()
   return [
     `--set environmentName=${celoEnv}`,
-    `--set replicas=${addresses.length}`,
     `--set image.repository=${fetchEnv(envVar.ORACLE_DOCKER_IMAGE_REPOSITORY)}`,
     `--set image.tag=${fetchEnv(envVar.ORACLE_DOCKER_IMAGE_TAG)}`,
-    `--set oracle.addresses='{${addresses.join(',')}}'`,
-    `--set oracle.web3ProviderUrl=${getFornoUrl(celoEnv)}`,
+    // `--set oracle.addresses='{${addresses.join(',')}}'`,
+    `--set oracle.replicas=${addresses.length}`,
     `--set oracle.token_name=${tokenName}`,
-    `--set azure.identity.id=${identity.id}`,
-    `--set azure.identity.clientId=${identity.clientId}`,
+    `--set oracle.web3ProviderUrl=${getFornoUrl(celoEnv)}`,
+    // `--set azure.identity.id=${identity.id}`,
+    // `--set azure.identity.clientId=${identity.clientId}`,
     `--set azure.keyVault.name=${keyVaultName()}`,
-  ]
+  ].concat(await oracleIdentityHelmParameters(celoEnv))
+}
+
+async function oracleIdentityHelmParameters(celoEnv: string) {
+  const addresses = oracleAddresses()
+  const replicas = addresses.length
+  let params: string[] = []
+  for (let i = 0; i < replicas; i++) {
+    const identity = await createOracleIdentityIfNotExists(celoEnv, i)
+    const prefix = `--set oracle.identities[${i}]`
+    params = params.concat([
+      `${prefix}.address=${addresses[i]}`,
+      `${prefix}.azure.id=${identity.id}`,
+      `${prefix}.azure.clientId=${identity.clientId}`,
+    ])
+  }
+  return params
 }
 
 function releaseName(celoEnv: string) {
   return `${celoEnv}-oracle`
 }
 
-async function createOracleIdentityIfNotExists(celoEnv: string) {
-  const identity = await createIdentityIfNotExists(oracleIdentityName(celoEnv))
+async function createOracleIdentityIfNotExists(celoEnv: string, index: number) {
+  const identity = await createIdentityIfNotExists(oracleIdentityName(celoEnv, index))
 
   // Grant the service principal permission to manage the oracle identity.
   // See: https://github.com/Azure/aad-pod-identity#6-set-permissions-for-mic
@@ -64,8 +80,8 @@ async function createOracleIdentityIfNotExists(celoEnv: string) {
   return identity
 }
 
-function oracleIdentityName(celoEnv: string) {
-  return `${celoEnv}-oracle`
+function oracleIdentityName(celoEnv: string, index: number) {
+  return `${celoEnv}-oracle-${index}`
 }
 
 function keyVaultName() {

@@ -26,12 +26,13 @@ app.kubernetes.io/component: oracle-client
 The name of the azure identity binding for all oracles
 */}}
 {{- define "azure-identity-binding-name" -}}
-{{ template "name" . }}-identity-binding
+{{- with .dot -}}{{ template "name" . }}{{- end -}}-{{ .index }}-identity-binding
 {{- end -}}
 
 {{/*
 The name of the azure identity for all oracles
+{{- with .dot -}}{{ template "name" . }}{{- end -}}-{{ .index }}-identity
 */}}
 {{- define "azure-identity-name" -}}
-{{ template "name" . }}-identity
+{{- with .dot -}}{{ template "name" . }}{{- end -}}-{{ .index }}-identity
 {{- end -}}
