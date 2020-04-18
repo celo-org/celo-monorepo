@@ -1,8 +1,8 @@
-FROM node:10
+FROM circleci/node:10
 WORKDIR /celo-monorepo
 
 # Needed for gsutil
-RUN apt-get update && \
+RUN sudo apt-get update && \
   apt-get install -y lsb-release && \
   export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)" && \
   echo "deb http://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
@@ -23,7 +23,7 @@ COPY packages/protocol/package.json packages/protocol/
 COPY packages/verification-pool-api/package.json packages/verification-pool-api/
 COPY packages/celotool/package.json packages/celotool/
 
-RUN yarn install --network-timeout 100000 --frozen-lockfile && yarn cache clean
+RUN sudo yarn install --network-timeout 100000 --frozen-lockfile && yarn cache clean
 
 COPY packages/utils packages/utils/
 COPY packages/dev-utils packages/dev-utils/
@@ -33,7 +33,7 @@ COPY packages/protocol packages/protocol/
 COPY packages/verification-pool-api packages/verification-pool-api/
 COPY packages/celotool packages/celotool/
 
-RUN yarn build
+RUN sudo yarn build
 
 ENV PATH="/celo-monorepo/packages/celotool/bin:${PATH}"
 
