@@ -1,6 +1,5 @@
 /* tslint:disable no-console */
 import { newKit } from '@celo/contractkit'
-import sleep from 'sleep-promise'
 import { convertToContractDecimals } from 'src/lib/contract-utils'
 import { AccountType, generateAddress } from 'src/lib/generate_utils'
 import yargs from 'yargs'
@@ -90,6 +89,6 @@ export const handler = async (argv: faucetLoadTest) => {
       }
       await stableToken.transfer(address, stableTokenAmount.toFixed()).send()
     }
-    await sleep(100)
+    // await sleep(100)
   }
 }

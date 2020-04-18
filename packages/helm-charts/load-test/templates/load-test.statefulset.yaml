@@ -42,28 +42,27 @@ spec:
       - name: generate-keys
         image: {{ .Values.celotool.image.repository }}:{{ .Values.celotool.image.tag }}
         imagePullPolicy: {{ .Values.imagePullPolicy }}
+      - args:
+        - |
+          [[ $REPLICA_NAME =~ -([0-9]+)$ ]] || exit 1
+          RID=${BASH_REMATCH[1]}
+          echo $RID > /root/.celo/rid
+          celotooljs.sh generate public-key --mnemonic "$MNEMONIC" --accountType bootnode --index 0 > /root/.celo/bootnodeEnodeAddress
+          echo -n "Generating Bootnode enode address for the validator: "
+          cat /root/.celo/bootnodeEnodeAddress
+
+          BOOTNODE_IP_ADDRESS=${{ .Release.Namespace | upper }}_BOOTNODE_SERVICE_HOST
+          echo `cat /root/.celo/bootnodeEnodeAddress`@$BOOTNODE_IP_ADDRESS:30301 > /root/.celo/bootnodeEnode
+          echo -n "Generating Bootnode enode for the validator: "
+          cat /root/.celo/bootnodeEnode
+
+          celotooljs.sh generate prepare-load-test \
+            --mnemonic "$MNEMONIC" \
+            --threads {{ .Values.threads | default "1" } \
+            --index $RID
         command:
-          - bash
-          - "-c"
-          - |
-            [[ $REPLICA_NAME =~ -([0-9]+)$ ]] || exit 1
-            RID=${BASH_REMATCH[1]}
-            echo $RID > /root/.celo/rid
-
-            for thread in $(seq 0 {{ sub .Values.threads 1 | default "0" }}); do
-              echo "Generating private key for rid=$RID thread=$thread"
-              celotooljs.sh generate bip32 \
-                --mnemonic "$MNEMONIC" \
-                --accountType load_testing \
-                --index $RID$thread \
-                > /root/.celo/pkey$thread
-
-              echo "Generating account address for rid=$RID thread=$thread"
-              address=$(celotooljs.sh generate account-address \
-                --private-key $(cat /root/.celo/pkey$thread))
-              echo "$address" >> /root/.celo/address
-              echo "Public Address $address"
-            done
+        - bash
+        - -c
         env:
         - name: REPLICA_NAME
           valueFrom:
@@ -95,59 +94,6 @@ spec:
           mountPath: "/root/.celo/account"
           readOnly: true
       containers:
-      # - name: geth
-      #   image: {{ .Values.geth.image.repository }}:{{ .Values.geth.image.tag }}
-      #   imagePullPolicy: {{ .Values.imagePullPolicy }}
-      #   command: ["/bin/sh"]
-      #   args:
-      #   - "-c"
-      #   - |-
-      #     set -euo pipefail
-      #     cp /var/geth/static-nodes.json /root/.celo/static-nodes.json
-
-      #     #ACCOUNT_ADDRESS=`cat /root/.celo/address`
-      #     ACCOUNT_ADDRESS=$(awk '{print $1}' /root/.celo/address | paste -s -d, -)
-      #     PASSWORD=$(cat /root/.celo/account/accountSecret)
-      #     for thread in $(seq 0 {{ sub .Values.threads 1 | default "0" }}); do
-      #       echo $PASSWORD >> /passwords.txt
-      #     done
-
-      #     geth \
-      #     --rpc \
-      #     --rpcapi=eth,web3,debug,admin,personal,net \
-      #     --allow-insecure-unlock \
-      #     --rpcvhosts=* \
-      #     --networkid={{ .Values.geth.networkID }} \
-      #     --nodekey=/root/.celo/pkey1 \
-      #     --syncmode=lightest \
-      #     --consoleformat=json \
-      #     --consoleoutput=stdout \
-      #     --verbosity={{ .Values.geth.verbosity }} \
-      #     --unlock=$ACCOUNT_ADDRESS \
-      #     --allow-insecure-unlock \
-      #     --password=/passwords.txt
-      #   ports:
-      #   - name: discovery-udp
-      #     containerPort: 30303
-      #     protocol: UDP
-      #   - name: discovery-tcp
-      #     containerPort: 30303
-      #   - name: rpc
-      #     containerPort: 8545
-      #   - name: ws
-      #     containerPort: 8546
-      #   resources:
-      #     requests:
-      #       memory: 250Mi
-      #       cpu: 40m
-      #   volumeMounts:
-      #   - name: data
-      #     mountPath: /root/.celo
-      #   - name: config
-      #     mountPath: /var/geth
-      #   - name: account
-      #     mountPath: "/root/.celo/account"
-      #     readOnly: true
 {{ range $index, $e := until (.Values.threads | int) }}
       - name: geth-{{ $index }}
         image: {{ $.Values.geth.image.repository }}:{{ $.Values.geth.image.tag }}
@@ -167,6 +113,7 @@ spec:
           --rpc \
           --rpcapi=eth,web3,debug,admin,personal,net \
           --allow-insecure-unlock \
+          --bootnode=enode://$(cat /root/.celo/bootnodeEnode) \
           --rpcvhosts=* \
           --networkid={{ $.Values.geth.networkID }} \
           --nodekey=/root/.celo/pkey{{ $index }} \
@@ -175,7 +122,6 @@ spec:
           --consoleoutput=stdout \
           --verbosity={{ $.Values.geth.verbosity }} \
           --unlock=$ACCOUNT_ADDRESS \
-          --allow-insecure-unlock \
           --password=/root/.celo/account/accountSecret \
           --port {{ add 30303 $index }} \
           --rpcport {{ add 8545 $index }}
