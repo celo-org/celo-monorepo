@@ -10,9 +10,6 @@ module.exports = withImages(
       localIdentName: '[local]___[hash:base64:5]',
     },
     cssModules: true,
-    experimental: {
-      granularChunks: true,
-    },
     publicRuntimeConfig: envConfig,
     serverRuntimeConfig: serverEnvConfig,
 
