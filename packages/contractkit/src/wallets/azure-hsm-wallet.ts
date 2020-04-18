@@ -28,8 +28,7 @@ export class AzureHSMWallet extends RemoteWallet implements Wallet {
         addressToSigner.set(address, new AzureHSMSigner(this.keyVaultClient, key))
       } catch (e) {
         // Safely ignore non-secp256k1 keys
-        const message = e.message
-        if (!message.includes('Invalid secp256k1')) {
+        if (!e.message.includes('Invalid secp256k1')) {
           throw e
         }
       }

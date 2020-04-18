@@ -67,7 +67,7 @@ export abstract class RemoteWallet extends WalletBase implements Wallet {
    * Returns true if account is in the remote wallet
    * @param address Account to check
    */
-  hasAccount(address?: Address) {
+  hasAccount(address?: Address): boolean {
     this.initializationRequired()
     return super.hasAccount(address)
   }
