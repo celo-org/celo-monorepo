@@ -1,5 +1,4 @@
 import { _setInitialProxyImplementation } from '@celo/protocol/lib/web3-utils'
-import { DefaultConfig } from '@celo/protocol/migrationsConfig'
 import BigNumber from 'bignumber.js'
 import chalk from 'chalk'
 import fs = require('fs')
@@ -108,7 +107,7 @@ async function handleGrant(releaseGoldConfig: any, currGrant: number) {
     releaseGoldConfig.initialDistributionRatio,
     releaseGoldConfig.canValidate,
     releaseGoldConfig.canVote,
-    DefaultConfig.registry.predeployedProxyAddress
+    '0x000000000000000000000000000000000000ce10'
   )
   const proxiedReleaseGold = await ReleaseGold.at(releaseGoldProxy.address)
   await proxiedReleaseGold.transferOwnership(releaseGoldMultiSigProxy.address, { from: argv.from })
@@ -133,7 +132,9 @@ async function handleGrant(releaseGoldConfig: any, currGrant: number) {
   deployedGrants.push(releaseGoldConfig.identifier)
   releases.push(record)
   // Must write to file after every grant to avoid losing info on crash.
-  fs.writeFileSync(deployedGrantsFile, JSON.stringify(deployedGrants, null, 1))
+  if (!argv.yesreally) {
+    fs.writeFileSync(deployedGrantsFile, JSON.stringify(deployedGrants, null, 1))
+  }
   if (argv.output_file) {
     fs.writeFileSync(argv.output_file, JSON.stringify(releases, null, 2))
   } else {
@@ -154,55 +155,33 @@ async function handleJSONFile(err, data) {
     return
   }
 
-  console.info('Filtering out grants that have already been deployed.')
-  const filteredGrants = grants.filter((grant: any) => {
-    if (deployedGrants.includes(grant.identifier)) {
-      console.info(
-        chalk.yellow(
-          '\tIgnoring ',
-          grant.identifier,
-          ' because identifier has already been deployed'
+  console.info('Verifying grants have not already been deployed.')
+  if (!argv.yesreally) {
+    for (const grant of grants) {
+      if (deployedGrants.includes(grant.identifier)) {
+        console.info(
+          chalk.red(
+            'Grant with identifier ' + grant.identifier + ' has already been deployed.\nExiting.'
+          )
         )
-      )
+        process.exit(0)
+      }
     }
-    return !deployedGrants.includes(grant.identifier)
-  })
+  }
 
-  if (filteredGrants.length === 0) {
-    console.info(
-      chalk.yellow(
-        "All grants in provided json '" +
-          argv.grants +
-          "' have already been deployed according to '" +
-          deployedGrantsFile +
-          "'."
-      )
-    )
-    console.info(chalk.red('Exiting.'))
-    process.exit(0)
-  }
-  console.info(
-    'Filtering complete.\n' +
-      chalk.yellow(
-        'Please review this list of identifiers and verify it matches your expectation of grants to deploy:'
-      )
-  )
-  for (const grant of filteredGrants) {
-    console.info('\t' + grant.identifier)
-  }
   // Each grant type has a defined template - either they can validate and can't be revoked,
   // or vice versa. Their distribution ratios and liquidity provisions should be the same.
   // We check the first grant here and use that as a template for all grants
   // to verify the grant file is uniformly typed to hopefully avoid user errors.
   const template = {
-    revocable: filteredGrants[0].revocable,
-    canVote: filteredGrants[0].canVote,
-    canValidate: filteredGrants[0].canValidate,
-    subjectToLiquidityProvision: filteredGrants[0].subjectToLiquidityProvision,
-    initialDistributionRatio: filteredGrants[0].initialDistributionRatio,
+    revocable: grants[0].revocable,
+    canVote: grants[0].canVote,
+    canValidate: grants[0].canValidate,
+    subjectToLiquidityProvision: grants[0].subjectToLiquidityProvision,
+    initialDistributionRatio: grants[0].initialDistributionRatio,
   }
   if (!argv.yesreally) {
-    filteredGrants.map((grant) => {
+    grants.map((grant) => {
       if (
         grant.revocable !== template.revocable ||
         grant.canVote !== template.canVote ||
@@ -220,10 +199,10 @@ async function handleJSONFile(err, data) {
     })
   }
 
-  const totalGoldGrant = filteredGrants.reduce((sum: number, curr: any) => {
+  const totalGoldGrant = grants.reduce((sum: number, curr: any) => {
     return sum + Number(curr.amountReleasedPerPeriod) * Number(curr.numReleasePeriods)
   }, 0)
-  const totalTransferFees = Number(argv.start_gold) * Number(filteredGrants.length)
+  const totalTransferFees = Number(argv.start_gold) * Number(grants.length)
   const totalValue = new BigNumber(totalTransferFees + totalGoldGrant)
   const fromBalance = new BigNumber(await web3.eth.getBalance(argv.from))
   if (fromBalance.lt(await web3.utils.toWei(totalValue.toFixed()))) {
@@ -260,7 +239,7 @@ async function handleJSONFile(err, data) {
     }
   }
   let currGrant = 1
-  for (const releaseGoldConfig of filteredGrants) {
+  for (const releaseGoldConfig of grants) {
     await handleGrant(releaseGoldConfig, currGrant)
     currGrant++
   }
