@@ -1,14 +1,14 @@
 # Validator Explorer
 You can interact with the Validator Explorer that allows you to have a complete view of how the different validators are performing. This is one resource voters may use to find validator groups to vote for. The Validator Explorer tool is available in the following address:
-https://dev.celo.org/validators/explore/
+https://celo.org/validators/explore/
 
-All of the existing validators and groups in the Celo network are included in this view. The main view of the tool is organized showing the groups, if you click on any of the group names the affiliates of that group will be displayed. You have the option to sort the contents of the table clicking in the header of each column. 
+All of the existing validators and groups in the Celo network are included in this view. The default view shows all registered validator groups - if you click on any of the group names it will expand to show the validators affiliated with that group. You can also sort results by each column's value by clicking on the header field.
 
-If you are looking for how your validator is performing, you should be able to find the group to which your validator is affiliated, clicking on the group name will show your validator and the rest of affiliates of the same group.  
+If you are looking to see how your validator is performing, you should first find the group your validator is affiliated with. Then you can click on the group name to see your validator and the rest of the validators affiliated with this group.  
 
-A critical element of this explorer is the Validator Group name, which can help voters recognize organizations or active community members. This name is fetched from the Validator Group’s associated `metadata`, which you can read more about [here](https://github.com/celo-org/celo-monorepo/blob/master/packages/docs/celo-codebase/protocol/identity/metadata.md). In order to prevent name impersonation, a group can register a domain claim within their metadata. This is done by adding a [TXT record](https://en.wikipedia.org/wiki/TXT_record) to their domain which includes a signature of their domain claim signed by their associated account. This claim is then verified by the validator explorer. Individual users may also verify a claim using `celocli account:get-metdata` or by manually checking for this `TXT Record` on a group’s purported identity domain. 
+A critical element of this explorer is the Validator Group name, which can help voters recognize organizations or active community members. This name is fetched from the `account` information registered on-chain for your validator and validator group. In order to combat name impersonation, a group can register a domain claim within their metadata, which you can read more about [here](https://github.com/celo-org/celo-monorepo/blob/master/packages/docs/celo-codebase/protocol/identity/metadata.md). This verification is done by adding a [TXT record](https://en.wikipedia.org/wiki/TXT_record) to their domain which includes a signature of their domain claim signed by their associated account. This claim is then verified by the validator explorer. Individual users may also verify a claim using `celocli account:get-metdata` or by manually checking for this `TXT Record` on a group’s purported identity domain. 
 
-For example, if a group was run by the owners of `example.com`, they may want to register their Validator Group with the name `Example.com`. Additionally, they may want to add a DNS claim so no one can impersonate their valuable brand name. They can do this by adding a DNS claim to their metadata, claiming the URL `example.com`, while simultaneously adding a `TXT Record` to `example.com` that includes this claim signed by their group address. Let’s go through this example in detail, using a `ReleaseGold` contract as our validator group.
+For example, if a group was run by the owners of `example.com`, they may want to register their Validator Group with the name `Example.com`. The name does not need to be the same as the name of your domain, but for simplicity we do so here. To give credence to this name claim, they may want to add a DNS claim. They can do this by adding a DNS claim to their metadata, claiming the URL `example.com`, while simultaneously adding a `TXT Record` to `example.com` that includes this claim signed by their group address. Let’s go through this example in detail, using a `ReleaseGold` contract as our validator group.
 
 Assuming you have already deployed your Validator Group via a `ReleaseGold` contract, you will need these environment variables set to claim your domain.
 
@@ -44,9 +44,20 @@ celocli account:claim-domain ./group_metadata.json --domain example.com --from $
 
 This will output your claim signed under the provided signer address. This output should then be recorded via a `TXT Record` on your desired domain, so in this case we should add a `TXT Record` to `example.com` with this signed output.
 
+You can now view and simultaneously verify the claims on your metadata:
+
+```
+# On your local machine
+celocli account:show-metadata ./group_metadata.json
+```
+
+Take a look at the output and verify these claims look right to you. This tool also automatically verifies the signatures on claims you've added.
+
 Once that record is added, we can then register this metadata under on our `Validator Group` account for external validation.
 
-Before we do this, you may also want to associate some validators with this domain. In order to do so, you will need to claim each validator address on your group's metadata. You will also need to claim your group account on each of your validator's metadata to complete the association. We will run through an example of a single validator now:
+Before we do this, you may also want to associate some validators with this domain. The benefit of doing this is to extend your DNS claim to your validators as well, meaning your validators can also verifiably be associated with your domain. You could also do this by adding individual DNS claims for each validator, but this would require separate `TXT Record`s for each, which is inconvenient. Instead, you can simply associate the group and validators together under a single claim.
+
+In order to do so, you will need to claim each validator address on your group's metadata. You will also need to claim your group account on each of your validator's metadata to complete the association. We will run through an example of a single validator now:
 
 First lets claim the `validator` address from the `group` account:
 
