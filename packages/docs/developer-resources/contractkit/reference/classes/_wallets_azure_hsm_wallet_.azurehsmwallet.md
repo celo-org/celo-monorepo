@@ -66,7 +66,7 @@ ___
 
 ▸ **getAddressFromKeyName**(`keyName`: string): *Promise‹[Address](../modules/_base_.md#address)›*
 
-*Defined in [contractkit/src/wallets/azure-hsm-wallet.ts:50](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/azure-hsm-wallet.ts#L50)*
+*Defined in [contractkit/src/wallets/azure-hsm-wallet.ts:49](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/azure-hsm-wallet.ts#L49)*
 
 Returns the EVM address for the given key
 Useful for initially getting the 'from' field given a keyName
