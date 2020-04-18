@@ -17,7 +17,7 @@ Because the Validator signer key is constantly in use to sign consensus messages
   ```bash
   # With $SIGNER_TO_AUTHORIZE as the new validator signer:
 
-  # On the new validator node which contains the Locked Gold Account key
+  # On the new validator node which contains the new $SIGNER_TO_AUTHORIZE key
   docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE --nousb account proof-of-possession $SIGNER_TO_AUTHORIZE $LOCKED_GOLD_ACCOUNT
   docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE --nousb account proof-of-possession $SIGNER_TO_AUTHORIZE $LOCKED_GOLD_ACCOUNT --bls
 
