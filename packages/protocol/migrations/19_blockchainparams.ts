@@ -5,13 +5,12 @@ import { BlockchainParametersInstance } from 'types'
 
 const initializeArgs = async (_: string): Promise<any[]> => {
   const version = config.blockchainParameters.minimumClientVersion
-  console.log('setting block gas limit to', config.blockchainParameters.blockGasLimit)
   return [
     version.major,
     version.minor,
     version.patch,
     config.blockchainParameters.gasForNonGoldCurrencies,
-    config.blockchainParameters.blockGasLimit,
+    config.blockchainParameters.deploymentBlockGasLimit,
   ]
 }
 

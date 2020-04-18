@@ -42,7 +42,8 @@ const DefaultConfig = {
       minor: 9,
       patch: 0,
     },
-    blockGasLimit: 20000000,
+    deploymentBlockGasLimit: 20000000,
+    blockGasLimit: 10000000,
   },
   doubleSigningSlasher: {
     reward: '1000000000000000000000', // 1000 cGLD
@@ -111,8 +112,6 @@ const DefaultConfig = {
     participationBaselineFloor: 5 / 100,
     participationBaselineUpdateFactor: 1 / 5,
     participationBaselineQuorumFactor: 1,
-    // TODO(asa): HACK!!!
-    skipTransferOwnership: true,
   },
   governanceApproverMultiSig: {
     // 2/4 multsig
