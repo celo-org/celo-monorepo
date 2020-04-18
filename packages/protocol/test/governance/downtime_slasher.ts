@@ -203,7 +203,7 @@ contract('DowntimeSlasher', (accounts: string[]) => {
         event: 'DowntimeSlashPerformed',
         args: {
           validator,
-          startBlock,
+          startBlock: new BigNumber(startBlock),
         },
       })
     })

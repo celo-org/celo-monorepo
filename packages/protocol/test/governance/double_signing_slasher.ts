@@ -161,7 +161,7 @@ contract('DoubleSigningSlasher', (accounts: string[]) => {
         event: 'DoubleSigningSlashPerformed',
         args: {
           validator,
-          blockNumber,
+          blockNumber: new BigNumber(blockNumber),
         },
       })
     })

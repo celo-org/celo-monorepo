@@ -1,5 +1,6 @@
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { assertContainSubset, assertRevert } from '@celo/protocol/lib/test-utils'
+import BigNumber from 'bignumber.js'
 import {
   AccountsContract,
   AccountsInstance,
@@ -99,7 +100,7 @@ contract('GovernanceSlasher', (accounts: string[]) => {
         event: 'GovernanceSlashPerformed',
         args: {
           account: validator,
-          amount,
+          amount: new BigNumber(amount),
         },
       })
     })
