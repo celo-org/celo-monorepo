@@ -59,8 +59,10 @@ export const handler = async (argv: Bip32Argv) => {
   const goldAmount = await convertToContractDecimals(1, goldToken)
   const stableTokenAmount = await convertToContractDecimals(1, stableToken)
 
-  for (let i = argv.count - 1; i >= 0; i--) {
-    for (let t = argv.threads - 1; t >= 0; t--) {
+  // for (let i = argv.count - 1; i >= 0; i--) {
+  //   for (let t = argv.threads - 1; t >= 0; t--) {
+  for (let i = 0; i < argv.count; i++) {
+    for (let t = 0; t < argv.threads; t++) {
       const index = parseInt(i.toString() + t.toString(), 10)
       const address = generateAddress(argv.mnemonic, accountType, index)
       console.log(
