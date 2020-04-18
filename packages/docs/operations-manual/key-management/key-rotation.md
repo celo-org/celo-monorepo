@@ -22,7 +22,7 @@ Because the Validator signer key is constantly in use to sign consensus messages
   docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE --nousb account proof-of-possession $SIGNER_TO_AUTHORIZE $LOCKED_GOLD_ACCOUNT --bls
 
   # On a node containing your Locked Gold Account key.
-  celocli account:authorize --from $LOCKED_GOLD_ACCOUNT --role validator --signer $SIGNER_TO_AUTHORIZE --signature $SIGNER_PROOF_OF_POSSESSION --blsKey $BLS_PUBLIC_KEY --blsPop $BLS_PROOF_OF_POSSESSION
+  celocli account:authorize --from $LOCKED_GOLD_ACCOUNT --role validator --signer $SIGNER_TO_AUTHORIZE --signature 0x$SIGNER_PROOF_OF_POSSESSION --blsKey $BLS_PUBLIC_KEY --blsPop $BLS_PROOF_OF_POSSESSION
   ```
 
 3. **Leave all validator and proxy nodes running** until the next epoch change. At the start the next epoch, the new Validator signer should take over participation in consensus.
