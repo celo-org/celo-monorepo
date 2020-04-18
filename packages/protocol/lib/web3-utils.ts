@@ -298,7 +298,7 @@ export async function transferOwnershipOfProxy(
   const Proxy = artifacts.require(contractName + 'Proxy')
   const proxy: ProxyInstance = await Proxy.deployed()
   // @ts-ignore
-  await proxy._transferOwnership(owner, { gas: '10000000' })
+  await proxy._transferOwnership(owner)
 }
 
 export async function transferOwnershipOfProxyAndImplementation<
@@ -310,7 +310,7 @@ export async function transferOwnershipOfProxyAndImplementation<
     artifacts
   )
   // @ts-ignore
-  await contract.transferOwnership(owner, { gas: '10000000' })
+  await contract.transferOwnership(owner)
   await transferOwnershipOfProxy(contractName, owner, artifacts)
 }
 

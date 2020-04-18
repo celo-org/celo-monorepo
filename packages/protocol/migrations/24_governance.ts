@@ -10,11 +10,7 @@ import {
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
 import { toFixed } from '@celo/utils/lib/fixidity'
-import {
-  BlockchainParametersInstance,
-  GovernanceApproverMultiSigInstance,
-  GovernanceInstance,
-} from 'types'
+import { GovernanceApproverMultiSigInstance, GovernanceInstance } from 'types'
 
 const initializeArgs = async (networkName: string): Promise<any[]> => {
   const governanceApproverMultiSig: GovernanceApproverMultiSigInstance = await getDeployedProxiedContract<
@@ -48,6 +44,7 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
   CeloContractName.Governance,
   initializeArgs,
   async (governance: GovernanceInstance) => {
+    console.log('govrnance callback')
     if (!config.governance.skipSetConstitution) {
       console.info('Setting constitution thresholds')
       const constitutionContractNames = Object.keys(constitution).filter(
@@ -74,18 +71,11 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
       }
     }
 
-    if (false) {
-      const bcp = await getDeployedProxiedContract<BlockchainParametersInstance>(
-        'BlockchainParameters',
-        artifacts
-      )
-      await bcp.setBlockGasLimit('10000000')
-    }
-
     const proxyAndImplementationOwnedByGovernance = [
       'Accounts',
       'Attestations',
-      'BlockchainParameters',
+      // BlockchainParameters ownership transitioned to governance in a follow-up script.
+      // 'BlockchainParameters',
       'DoubleSigningSlasher',
       'DowntimeSlasher',
       'Election',
@@ -107,10 +97,12 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
       'Validators',
     ]
 
-    if (!config.governance.skipTransferOwnership) {
+    //if (!config.governance.skipTransferOwnership) {
+    if (true) {
       for (const contractName of proxyAndImplementationOwnedByGovernance) {
         await transferOwnershipOfProxyAndImplementation(contractName, governance.address, artifacts)
       }
     }
+    console.log('done transferring ownership to goveernance')
   }
 )
