@@ -136,7 +136,7 @@ The setup of RC1 is similar to the new Baklava network and the deployment timeli
 * 4/22 16:00 UTC: Block production begins
 * 4/22: Celo Core Contracts and `ReleaseGold` contracts are deployed
 * 4/27: Governance proposals submitted to unfreeze validator elections and validator epoch rewards
-* 5/1: Validators have been registered and affiliated with a Validator Group for first election
+* 5/1: Elections and validator rewards enabled if governance proposals pass; validators have been registered and affiliated with a Validator Group for first election
 * 5/9: Governance proposals submitted to enable voter rewards and enable Celo Gold (cGLD) transfers
 * 5/13: RC1 is declared Mainnet and cGLD transfers are enabled, if governance proposals pass
 * 5/22: Governance proposal submitted to unfreeze stability protocol
@@ -497,7 +497,7 @@ celocli validatorgroup:show $CELO_VALIDATOR_GROUP_RG_ADDRESS
 
 In order to get elected as a Validator, you will need to use the balance of your `ReleaseGold` contracts to vote for your group.
 
-#### Authorize vote signing keys
+#### Authorize vote signer
 
 In order to vote on behalf of the `ReleaseGold` Locked Gold Accounts you will need to authorize vote signers.
 
