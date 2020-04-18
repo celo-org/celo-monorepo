@@ -28,8 +28,23 @@ USAGE
 
 OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Spender's address
+
+  --ledgerAddresses=ledgerAddresses                  [default: 1] If --userLedger is set, this will get the first N
+                                                     addresses for local signing
+
+  --ledgerConfirmAddress                             Set it to ask confirmation for the address of the transaction from
+                                                     the ledger
+
+  --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --userLedger is set, this will get the array of
+                                                     index addresses for local signing. Example --ledgerCustomAddresses
+                                                     "[4,99]"
+
   --to=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d    (required) Receiving address
+
+  --useLedger                                        Set it to use a ledger wallet
+
   --useMultiSig                                      True means the request will be sent through multisig.
+
   --value=value                                      (required) The unit amount of Celo Gold (cGLD)
 
 EXAMPLES
