@@ -1,10 +1,10 @@
 import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
+import { stopProvider } from '@celo/contractkit/lib/utils/provider-utils'
 import {
   AddressValidation,
   newLedgerWalletWithSetup,
 } from '@celo/contractkit/lib/wallets/ledger-wallet'
 import { Wallet } from '@celo/contractkit/lib/wallets/wallet'
-import { stopProvider } from '@celo/contractkit/src/utils/provider-utils'
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid'
 import { Command, flags } from '@oclif/command'
 import { ParserOutput } from '@oclif/parser/lib/parse'
