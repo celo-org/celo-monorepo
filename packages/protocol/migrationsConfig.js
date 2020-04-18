@@ -110,7 +110,7 @@ const DefaultConfig = {
     participationBaselineQuorumFactor: 1,
   },
   governanceApproverMultiSig: {
-    // 2/7 multsig, with 4/7 to make multisig changes.
+    // 3/8 multsig, with 5/8 to make multisig changes.
     // TODO(asa): Needs updating before RC1 deployment
     signatories: [
       '0xBE0c3B35Ec3f759D9A67c4B7c539b0D5b52A4642',
@@ -120,9 +120,10 @@ const DefaultConfig = {
       '0xC631Eb5dE231000f96F4973ca8516d487108b2BF',
       '0xc85639289d4bbb5f90e380a0f4db6b77a2f777bf',
       '0x92AD020Cde6A4e566770C603ae8315a9d7252740',
+      '0xba4862643d476acbc13276bd73daca7b27bf567c',
     ],
-    numRequiredConfirmations: 2,
-    numInternalRequiredConfirmations: 4,
+    numRequiredConfirmations: 3,
+    numInternalRequiredConfirmations: 5,
     useMultiSig: true,
   },
   lockedGold: {
