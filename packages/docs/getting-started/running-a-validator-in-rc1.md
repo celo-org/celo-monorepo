@@ -277,9 +277,9 @@ At this point your proxy should be peering with other nodes as they come online.
 
 ## After Block Production Begins
 
-Once block production starts, core contracts and  `ReleaseGold` contracts will be deployed, and the community will vote on a series of Governance Proposals in a process which will be a preview of the deployment process for the Celo Mainnet.
+In the days following block production, core contracts and  `ReleaseGold` contracts will be deployed, and the community will vote on a series of governance proposals to establish full network functionality, at which point RC1 will be declared Mainnet.
 
-As opposed to receiving testnet units of Celo Gold directly, `ReleaseGold` contracts will be used to provide the required balance to register a Validator and vote. `ReleaseGold` is the same mechanism that will be used to distribute Celo Gold to Stake Off participants, so it will be used in Baklava to give you a chance to get familiar with the process. At a high level, `ReleaseGold` holds a balance for scheduled release, while allowing the held balance to be used for certain actions such as validating and voting, depending on the configuration of the contract.
+If you were a Celo Stake Off winner, you should have received an award for cGLD. `ReleaseGold` contracts will have been deployed at this point, with each beneficiary address you provided in the RC1 Gist corresponding to a single `ReleaseGold` contract. `ReleaseGold` is the same mechanism that will be used to distribute Celo Gold to Stake Off participants, so it will be used in Baklava to give you a chance to get familiar with the process. At a high level, `ReleaseGold` holds a balance for scheduled release, while allowing the held balance to be used for certain actions such as validating and voting, depending on the configuration of the contract. [Read more about `ReleaseGold`.](../celo-codebase/protocol/release-gold.md)
 
 ### Core Contract Deployment
 
