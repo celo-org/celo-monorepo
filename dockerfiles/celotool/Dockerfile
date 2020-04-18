@@ -3,13 +3,13 @@ WORKDIR /celo-monorepo
 
 # Needed for gsutil
 RUN sudo apt-get update && \
-  apt-get install -y lsb-release && \
+  sudo apt-get install -y lsb-release && \
   export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)" && \
-  echo "deb http://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
-  curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - && \
-  apt-get update -y && \
-  apt-get install -y google-cloud-sdk && \
-  rm -rf /var/lib/apt/lists/*
+  echo "deb http://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
+  curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add - && \
+  sudo apt-get update -y && \
+  sudo apt-get install -y google-cloud-sdk && \
+  sudo rm -rf /var/lib/apt/lists/*
 
 
 # ensure yarn.lock is evaluated by kaniko cache diff
