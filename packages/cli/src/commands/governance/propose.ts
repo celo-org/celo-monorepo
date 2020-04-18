@@ -27,11 +27,6 @@ export default class Propose extends BaseCommand {
       description:
         'Form proposal using an interactive prompt for Celo registry contracts and functions',
     }),
-    number: flags.integer({
-      default: 1,
-      dependsOn: ['interactive'],
-      description: 'Number of transactions to prompt for in interactive mode',
-    }),
     deposit: flags.string({ required: true, description: 'Amount of Gold to attach to proposal' }),
     from: Flags.address({ required: true, description: "Proposer's address" }),
     descriptionURL: flags.string({
@@ -59,10 +54,10 @@ export default class Propose extends BaseCommand {
 
     // TODO: optimize builder redundancies
     let jsonTransactions: ProposalTransactionJSON[]
-    if (res.flags.interactive && res.flags.number) {
+    if (res.flags.interactive) {
       // BUILD FROM INTERACTIVE PROMPT
       const promptBuilder = new InteractiveProposalBuilder(builder)
-      jsonTransactions = await promptBuilder.promptTransactions(res.flags.number)
+      jsonTransactions = await promptBuilder.promptTransactions()
     } else if (res.flags.jsonTransactions) {
       // BUILD FROM JSON
       const jsonString = readFileSync(res.flags.jsonTransactions).toString()

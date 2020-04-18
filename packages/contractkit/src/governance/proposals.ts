@@ -1,5 +1,6 @@
 import { concurrentMap } from '@celo/base/lib/async'
-import { keccak256 } from 'ethereumjs-util'
+import { isHexString } from '@celo/utils/src/address'
+import { isValidAddress, keccak256 } from 'ethereumjs-util'
 import * as inquirer from 'inquirer'
 import { Transaction, TransactionObject } from 'web3-eth'
 import { ABIDefinition } from 'web3-eth-abi'
@@ -152,6 +153,8 @@ export class ProposalBuilder {
   addJsonTx = (tx: ProposalTransactionJSON) => this.builders.push(async () => this.fromJsonTx(tx))
 }
 
+const DONE_CHOICE = '✔ done'
+
 export class InteractiveProposalBuilder {
   constructor(private readonly builder: ProposalBuilder) {}
 
@@ -160,9 +163,9 @@ export class InteractiveProposalBuilder {
     console.log(JSON.stringify(transactionList, null, 2))
   }
 
-  async promptTransactions(num: number) {
+  async promptTransactions() {
     const transactions: ProposalTransactionJSON[] = []
-    while (transactions.length < num) {
+    while (true) {
       console.log(`Transaction #${transactions.length + 1}:`)
 
       // prompt for contract
@@ -170,9 +173,15 @@ export class InteractiveProposalBuilder {
       const contractAnswer = await inquirer.prompt({
         name: contractPromptName,
         type: 'list',
-        choices: Object.keys(CeloContract),
+        choices: [DONE_CHOICE, ...Object.keys(CeloContract)],
       })
-      const contractName = contractAnswer[contractPromptName] as CeloContract
+
+      const choice = contractAnswer[contractPromptName]
+      if (choice === DONE_CHOICE) {
+        break
+      }
+
+      const contractName = choice as CeloContract
       const contractABI = require('@celo/contractkit/lib/generated/' + contractName)
         .ABI as ABIDefinition[]
 
@@ -198,9 +207,20 @@ export class InteractiveProposalBuilder {
         const inputAnswer = await inquirer.prompt({
           name: functionInput.name,
           type: 'input',
-          validate: () => {
-            // TODO(yorke): switch on user input and functionInput.type
-            return true
+          validate: async (input: string) => {
+            switch (functionInput.type) {
+              case 'uint256':
+                const parsed = parseInt(input, 10)
+                return !isNaN(parsed)
+              case 'boolean':
+                return input === 'true' || input === 'false'
+              case 'address':
+                return isValidAddress(input)
+              case 'bytes':
+                return isHexString(input)
+              default:
+                return true
+            }
           },
         })
         args.push(inputAnswer[functionInput.name])
