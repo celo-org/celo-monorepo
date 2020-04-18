@@ -1,6 +1,9 @@
 FROM circleci/node:10
 WORKDIR /celo-monorepo
 
+RUN sudo apt-get update -y
+RUN sudo apt-get install lsb-release libudev-dev libusb-dev libusb-1.0-0 -y
+
 # Needed for gsutil
 RUN sudo apt-get update && \
   sudo apt-get install -y lsb-release && \
