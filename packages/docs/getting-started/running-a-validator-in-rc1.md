@@ -283,17 +283,17 @@ If you were a Celo Stake Off winner, you should have received an award for cGLD.
 
 ### Core Contract Deployment
 
-Much of functionality of the Celo protocol is implemented in smart contracts, as opposed to entirely within the blockchain client itself. So at the start of block production, core features such as Validator elections, will not be operational. In order to bring the network into its fully operational state, a deployer encoded in genesis block will create the core contracts and finally transfer ownership of the contracts to the Governance contract. In the Baklava network, cLabs will play the role of deployer.
+Much of the functionality of the Celo protocol is implemented in smart contracts. At the start of block production, core features such as Validator elections, will not be operational. In order to bring the network into its fully operational state, a deployer encoded in the genesis block will create the core contracts and finally transfer ownership of the contracts to the Governance contract. In the RC1 network, cLabs will play the role of deployer.
 
-Contract deployment will begin shortly after block production, and may take several hours to complete. On the Baklava network, the deployer address is `0x469be98FE71AFf8F6e7f64F9b732e28A03596B5C` and one way to track progress of the deployment is to watch the transactions submitted by that address on [Blockscout](https://baklava-blockscout.celo-testnet.org/address/0x469be98FE71AFf8F6e7f64F9b732e28A03596B5C/transactions).
+Contract deployment will begin shortly after block production, and may take several hours to complete. On the Baklava network, the deployer address is `0xE23a4c6615669526Ab58E9c37088bee4eD2b2dEE` and one way to track progress of the deployment is to watch the transactions submitted by that address on [Blockscout](https://baklava-blockscout.celo-testnet.org/address/0x469be98FE71AFf8F6e7f64F9b732e28A03596B5C/transactions).
 
 ### Actions Required After Core Contract Deployment
 
-Once core contracts have been deployed, you will be able to register your Validator and stand for election.
-Election will run on each epoch boundary after a minimum number of validators are registered and have votes.
-Once elections are running, the genesis validators will be replaced by the elected validators, so it is important to register and vote even if you are in the genesis set.
+Once core contracts have been deployed, you will be able to register your Validator and stand for election. Elections will run on each epoch boundary (e.g. every 24 hours in RC1) after a minimum number of validators are registered and have votes and after elections have been unfrozen by on-chain governance.
 
-The following sections outline the actions you will need to take. On a high level, we will:
+**Once elections are running, the genesis validators will be replaced by the elected validators, so it is important to register and vote even if you are in the genesis set.**
+
+The following sections outline the actions you will need to take. On a high level, you will:
 
 - Create Accounts and lock up the balance of each `ReleaseGold` contract
 - Register a Validator
@@ -301,11 +301,11 @@ The following sections outline the actions you will need to take. On a high leve
 - Add the registered Validator to the Validator Group
 - Vote for the group with funds from each `ReleaseGold` contract
 
-We will need to use 7 keys, so let's have a refresher on key management.
+We will need to use 7 keys, so let's have [a refresher on key management](../operations-manual/summary.md).
 
 ### Create Accounts from the `ReleaseGold` contracts
 
-In order to participate on the network (lock gold, vote, validate) from a `ReleaseGold` contract, we need to create an Account at the address of the `ReleaseGold` contract. In the Baklava network, you can look up your Beneficiary address in [the published mapping](https://gist.githubusercontent.com/nategraf/a87f9c2e488ab2d38a0a3c09f5d4ca2b/raw) to find your `ReleaseGold` contract addresses. If you are a genesis validator, your two Beneficary addresses will be the provided `CELO_VALIDATOR_ADDRESS` and `CELO_VALIDATOR_GROUP_ADDRESS`.
+In order to participate on the network (lock gold, vote, validate) from a `ReleaseGold` contract, we need to create a Locked Gold Account with the address of the `ReleaseGold` contract. In the RC1 network, you can look up your Beneficiary address(es) in [the published mapping](https://gist.githubusercontent.com/nategraf/a87f9c2e488ab2d38a0a3c09f5d4ca2b/raw) to find your corresponding `ReleaseGold` contract addresses. If you submitted a Gist for RC1 with your beneficiary addresses, you should find a `ReleaseGold` contract for each beneficiary address, one for each split of your total award.
 
 ```bash
 # On your local machine
@@ -325,7 +325,7 @@ celocli releasegold:show --contract $CELO_VALIDATOR_RG_ADDRESS
 When running the following commands, the Beneficiary keys should be [unlocked](#unlocking).
 {% endhint %}
 
-Create an Account for each of the Validator and Validator Group's `ReleaseGold` contracts:
+Create a Locked Gold Account for each of the Validator and Validator Group's `ReleaseGold` contracts:
 
 ```bash
 # On your local machine
@@ -333,7 +333,7 @@ celocli releasegold:create-account --contract $CELO_VALIDATOR_GROUP_RG_ADDRESS
 celocli releasegold:create-account --contract $CELO_VALIDATOR_RG_ADDRESS
 ```
 
-By running the following commands, you can see that the `ReleaseGold` contract addresses are now also associated with a registered Account.
+By running the following commands, you can see that the `ReleaseGold` contract addresses are now also associated with a registered Locked Gold Account.
 
 ```bash
 # On your local machine
@@ -341,14 +341,14 @@ celocli account:show $CELO_VALIDATOR_GROUP_RG_ADDRESS
 celocli account:show $CELO_VALIDATOR_RG_ADDRESS
 ```
 
-Lock up Celo Gold balance from your `ReleaseGold` contracts to fulfill the staking requirements to register a Validator and Validator Group. The current requirement is 10,000 Celo Gold to register a Validator, and 10,000 Celo Gold _per member validator_ to register a Validator Group.
+Lock cGLD from your `ReleaseGold` contracts to fulfill the lock-up requirements to register a Validator and Validator Group. The current requirement is 10,000 cGLD to register a Validator, and 10,000 cGLD _per member validator_ to register a Validator Group.
 
 ```bash
 celocli releasegold:locked-gold --contract $CELO_VALIDATOR_GROUP_RG_ADDRESS --action lock --value 10000000000000000000000
 celocli releasegold:locked-gold --contract $CELO_VALIDATOR_RG_ADDRESS --action lock --value 10000000000000000000000
 ```
 
-Check that your Celo Gold was successfully locked with the following commands:
+Check that your cGLD was successfully locked with the following commands:
 
 ```bash
 # On your local machine
@@ -358,9 +358,9 @@ celocli lockedgold:show $CELO_VALIDATOR_RG_ADDRESS
 
 ### Register as a Validator
 
-In order to perform Validator actions with the Account created in the previous step, you will need to authorize a Validator signer key for the `ReleaseGold` contract account.
+In order to perform Validator actions with the Account created in the previous step, you will need to authorize a [Validator signer](../operations-manual/summary/detailed#authorized-validator-signers.md) for the `ReleaseGold` contract account.
 
-If you were part of the genesis validator set, you will have already generated this key and submitted it via gist. Note that if you are planning running more than one validator, each validator will need a distinct validator signer key.`
+If you were part of the genesis validator set, you will have already generated this key and submitted it via Gist. Note that if you are planning to run more than one validator, each validator will need a distinct validator signer.
 
 ```bash
 # On the Validator machine
@@ -378,7 +378,9 @@ export CELO_VALIDATOR_SIGNER_SIGNATURE=<YOUR-VALIDATOR-SIGNER-SIGNATURE>
 export CELO_VALIDATOR_SIGNER_PUBLIC_KEY=<YOUR-VALIDATOR-SIGNER-PUBLIC-KEY>
 ```
 
-Validators on the Celo network use BLS aggregated signatures to create blocks in addition to the Validator signer (ECDSA) key. While an independent BLS key can be specified, the simplest thing to do is to derive the BLS key from the Validator signer key. When we register our Validator, we'll need to prove possession of the BLS key as well, which can be done by running the following command:
+Validators on the Celo network use BLS aggregated signatures to create blocks in addition to the Validator signer (ECDSA) key. While an independent BLS key can be specified, the simplest thing to do is to derive the BLS key from the Validator signer. When we register our Validator, we'll need to prove possession of the BLS key as well, which can be done by running the following command.
+
+If you were part of the genesis validator set, you will have already generated this key and submitted it via Gist. Note that if you are planning to run more than one validator, each validator will need a distinct BLS key.
 
 ```bash
 # On the Validator machine
@@ -393,18 +395,16 @@ export CELO_VALIDATOR_SIGNER_BLS_SIGNATURE=<YOUR-VALIDATOR-SIGNER-SIGNATURE>
 export CELO_VALIDATOR_SIGNER_BLS_PUBLIC_KEY=<YOUR-VALIDATOR-SIGNER-BLS-PUBLIC-KEY>
 ```
 
-In order to validate we need to authorize the Validator signing key:
+In order to validate we need to authorize the Validator signer:
 
 ```bash
 # On your local machine
 celocli releasegold:authorize --contract $CELO_VALIDATOR_RG_ADDRESS --role validator --signature 0x$CELO_VALIDATOR_SIGNER_SIGNATURE --signer $CELO_VALIDATOR_SIGNER_ADDRESS
 ```
 
-Using the newly authorized Validator key, register the Account as a Validator:
+Using the newly authorized Validator signer, register a validator on behalf of the Locked Gold Account:
 
-{% hint style="info" %}
-Running the following command requires the keys for the validator signer address. This command can be run on the validator machine, or if the keys are also available on your local machine, it can be run there.
-{% endhint %}
+{% hint style="info" %} Running the following command requires the validator signer key. This command can be run on the validator machine, or if the key is available on your local machine, it can be run there. {% endhint %}
 
 ```bash
 # On a machine with CELO_VALIDATOR_SIGNER_ADDRESS unlocked.
@@ -420,8 +420,7 @@ celocli validator:show $CELO_VALIDATOR_RG_ADDRESS
 
 ### Register as a Validator Group
 
-In order to register a Validator Group, you will need to authorize a signer key for Validator actions on the group `ReleaseGold` contract.
-In these steps you will create a new key on your local machine for this purpose.
+In order to register a Validator Group, you will need to authorize a validator (group) signer on behalf of the `ReleaseGold` Locked Gold Account. In these steps you will create a new key on your local machine for this purpose.
 
 ```bash
 # On your local machine
@@ -434,8 +433,7 @@ And save this new address:
 export CELO_VALIDATOR_GROUP_SIGNER_ADDRESS=<YOUR-VALIDATOR-GROUP-SIGNER-ADDRESS>
 ```
 
-In order to authorize our Validator Group signer, we need to create a proof that we have possession of the Validator Group signer private key.
-We do so by signing a message that consists of the Validator Group Account address, in this case, the `ReleaseGold` contract address.
+In order to authorize our Validator Group signer, we need to create a proof that we have possession of the Validator Group signer private key. We do so by signing a message that consists of the authorizing Locked Gold Account address, in this case, the `ReleaseGold` contract address.
 
 To generate the proof-of-possession, run the following command:
 
@@ -450,14 +448,14 @@ Save the signer address, public key, and proof-of-possession signature to your l
 export CELO_VALIDATOR_GROUP_SIGNER_SIGNATURE=<YOUR-VALIDATOR-GROUP-SIGNER-SIGNATURE>
 ```
 
-Authorize your Validator Group signing key:
+Authorize your Validator Group signer:
 
 ```bash
 # On your local machine
 celocli releasegold:authorize --contract $CELO_VALIDATOR_GROUP_RG_ADDRESS --role validator --signature 0x$CELO_VALIDATOR_GROUP_SIGNER_SIGNATURE --signer $CELO_VALIDATOR_GROUP_SIGNER_ADDRESS
 ```
 
-With this newly authorized key, you can register the Account as a Validator Group:
+With this newly authorized signer, you can register a Validator Group on behalf of the Locked Gold Account:
 
 ```bash
 # On your local machine
@@ -499,9 +497,9 @@ celocli validatorgroup:show $CELO_VALIDATOR_GROUP_RG_ADDRESS
 
 In order to get elected as a Validator, you will need to use the balance of your `ReleaseGold` contracts to vote for your group.
 
-#### Authorize voter signing keys
+#### Authorize vote signing keys
 
-In order to vote with the balance of a `ReleaseGold` contract you will need to authorize a voting key.
+In order to vote on behalf of the `ReleaseGold` Locked Gold Accounts you will need to authorize vote signers.
 
 Create the vote signer keys:
 
@@ -514,7 +512,7 @@ docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE account new
 export CELO_VALIDATOR_GROUP_VOTE_SIGNER_ADDRESS=<YOUR-VALIDATOR-GROUP-VOTE-SIGNER-ADDRESS>
 ```
 
-Produce the proof-of-possession needed to authorize the keys:
+Produce the proof-of-possessions needed to authorize the vote signers:
 
 ```bash
 # On your local machine
@@ -535,7 +533,7 @@ celocli releasegold:authorize --contract $CELO_VALIDATOR_GROUP_RG_ADDRESS --role
 
 #### Submit your votes
 
-Now the newly authorized voter signing keys can be used to submit votes in the election:
+Now the newly authorized vote signers can be used to vote for your validator group:
 
 ```bash
 # On your local machine
@@ -552,10 +550,10 @@ celocli election:show $CELO_VALIDATOR_GROUP_RG_ADDRESS --voter
 celocli election:show $CELO_VALIDATOR_RG_ADDRESS --voter
 ```
 
-Users in the Celo protocol receive epoch rewards for voting in Validator Elections only after submitting a special transaction to enable them. This must be done every time new votes are cast, and can only be made after the most recent epoch has ended. For convenience, we can use the following command, which will wait until the epoch has ended before sending a transaction:
+Users in the Celo protocol receive epoch rewards for voting in Validator Elections only after submitting a special transaction to enable rewards. This must be done every time new votes are cast, and can only be made after the most recent epoch has ended. For convenience, we can use the following command, which will wait until the epoch has ended before sending a transaction:
 
 {% hint style="info" %}
-Epoch lengths in the Baklava network are set to be the number of blocks produced in a day. As a result, votes may need to be activated up to 24 hours after they are cast.
+Epoch lengths in the RC1 network are set to be the number of blocks produced in a day. As a result, votes may need to be activated up to 24 hours after they are cast.
 {% endhint %}
 
 ```bash
@@ -572,7 +570,7 @@ celocli election:show $CELO_VALIDATOR_GROUP_RG_ADDRESS --voter
 celocli election:show $CELO_VALIDATOR_RG_ADDRESS --voter
 ```
 
-If your Validator Group elects validators, you will receive epoch rewards in the form of additional Locked Gold voting for your Validator Group from your Account addresses. You can see these rewards accumulate with the commands in the previous set, as well as:
+If your Validator Group elects validators, you will receive epoch rewards in the form of additional Locked Gold voting for your Validator Group. You can see these rewards accumulate with the commands in the previous set, as well as:
 
 ```bash
 # On your local machine
@@ -580,7 +578,7 @@ celocli lockedgold:show $CELO_VALIDATOR_GROUP_RG_ADDRESS
 celocli lockedgold:show $CELO_VALIDATOR_RG_ADDRESS
 ```
 
-You're all set! Elections are finalized at the end of each epoch, roughly once a day in the Baklava testnet. If you get elected, your node will start participating in BFT consensus and validating blocks. After the first epoch in which your Validator participates in BFT, you should receive your first set of epoch rewards.
+You're all set! Elections are finalized at the end of each epoch, roughly once a day in the RC1 network. If you get elected, your node will start participating in BFT consensus and validating blocks. After the first epoch in which your Validator participates in BFT, you should receive your first set of epoch rewards.
 
 You can inspect the current state of the Validator elections by running:
 
@@ -634,7 +632,7 @@ export CELO_ATTESTATION_SIGNER_ADDRESS=<YOUR-ATTESTATION-SIGNER-ADDRESS>
 celocli releasegold:authorize --contract $CELO_VALIDATOR_RG_ADDRESS --role attestation --signature 0x$CELO_ATTESTATION_SIGNER_SIGNATURE --signer $CELO_ATTESTATION_SIGNER_ADDRESS
 ```
 
-You can now run the node for the attestation service in the background. In the below command remember to specify the password you used during the creation of the `CELO_ATTESTATION_SIGNER_ADDRESS` account:
+You can now run the node for the attestation service in the background. In the below command remember to specify the password you used during the creation of the `CELO_ATTESTATION_SIGNER_ADDRESS`:
 
 ```bash
 # On the Attestation machine
@@ -653,7 +651,7 @@ export CELO_PROVIDER=http://localhost:8545
 
 ### SMS Providers
 
-Currently the SMS providers supported are [Twilio](https://www.twilio.com/try-twilio) and [Nexmo Sign Up form](https://dashboard.nexmo.com/sign-up). We recommend using [Twilio](https://www.twilio.com/try-twilio).
+Currently the SMS providers supported are [Twilio](https://www.twilio.com/try-twilio) and [Nexmo Sign Up form](https://dashboard.nexmo.com/sign-up).
 
 **Twilio**
 
@@ -664,9 +662,9 @@ Twilio is the most common and popular provider. For that you will need to provis
 | TWILIO_ACCOUNT_SID           | The Twilio account ID                                           |
 | TWILIO_MESSAGING_SERVICE_SID | The Twilio Message Service ID. Starts by `MG`                   |
 | TWILIO_AUTH_TOKEN            | The API authentication token                                    |
-| TWILIO_BLACKLIST             | A comma-sperated list of country codes you do not want to serve |
+| TWILIO_BLACKLIST             | A comma-separated list of country codes you do not want to serve |
 
-After you signed up for Twilio at [https://www.twilio.com/try-twilio](https://www.twilio.com/try-twilio), you should see your `ACCOUNT SID` and your `AUTH_TOKEN` in the top right of the console. You'll also want to enter in a credit card to fund the account. For most text messages, the costs will be very low (and on mainnet easily exceeded by the attestation fee paid by the user). Find a more comprehensive price list at [https://www.twilio.com/sms/pricing](https://www.twilio.com/sms/pricing). If there are countries that you do not want to serve, you can specify them with the `TWILIO_BLACKLIST`. In any case, you'll want to adjust your Geo settings to serve phone numbers globally under [https://www.twilio.com/console/sms/settings/geo-permissions](https://www.twilio.com/console/sms/settings/geo-permissions).
+After you signed up for Twilio at [https://www.twilio.com/try-twilio](https://www.twilio.com/try-twilio), you should see your `ACCOUNT SID` and your `AUTH_TOKEN` in the top right of the console. You'll also want to enter in a credit card to fund the account. For most text messages, the costs are typically very low (and significantly lower than the attestation fee paid by the user). Find a more comprehensive price list at [https://www.twilio.com/sms/pricing](https://www.twilio.com/sms/pricing). If there are countries that you do not want to serve, you can specify them with the `TWILIO_BLACKLIST`. In any case, you'll want to adjust your Geo settings to serve phone numbers globally under [https://www.twilio.com/console/sms/settings/geo-permissions](https://www.twilio.com/console/sms/settings/geo-permissions).
 
 {% hint style="info" %}
 Make sure you can serve requests for numbers in US, Europe, Australia, Mexico, Argentina, the Philippines, and Kenya.
@@ -682,7 +680,7 @@ Here is the list of the environment variables needed to use the Nexmo SMS broker
 | --------------- | --------------------------------------------------------------- |
 | NEXMO_KEY       | The API key to the Nexmo API                                    |
 | NEXMO_SECRET    | The API secret to the Nexmo API                                 |
-| NEXMO_BLACKLIST | A comma-sperated list of country codes you do not want to serve |
+| NEXMO_BLACKLIST | A comma-separated list of country codes you do not want to serve |
 
 ### Database Configuration
 
@@ -719,8 +717,7 @@ docker run --name celo-attestation-service -it --restart always --entrypoint /bi
 
 ## Registering Metadata
 
-We are using [Metadata](../celo-codebase/protocol/identity/metadata) to allow accounts to make certain claims without having to do so on-chain. Since the validator in question here is run under a `ReleaseGold` contract, users can use any `signer` address to make claims on behalf of the `ReleaseGold` contract. This guide will use the `CELO_ATTESTATION_SIGNER_ADDRESS` since it is likely the most recently used, but any can be used.
-For us to complete the metadata process, we have to claim which URL users can request attestations from:
+Celo uses [Metadata](../celo-codebase/protocol/identity/metadata) to allow accounts to make certain claims without having to do so on-chain. Users can use any authorized signer address to make claims on behalf of the Locked Gold Account. For convenience this guide uses the `CELO_ATTESTATION_SIGNER_ADDRESS`, but any authorized signer will work. To complete the metadata process, we have to claim which URL users can request attestations from.
 
 Run the following commands on your local machine:
 
@@ -736,9 +733,9 @@ The `CELO_ATTESTATION_SERVICE_URL` variable stores the URL to access the Attesta
 celocli account:claim-attestation-service-url ./metadata.json --url $CELO_ATTESTATION_SERVICE_URL --from $CELO_ATTESTATION_SIGNER_ADDRESS
 ```
 
-You should now host your metadata somewhere reachable via HTTP. You can use a service like [gist.github.com](https://gist.github.com). Create a gist with the contents of the file and then click on the `Raw` buttton to receive the permalink to the machine-readable file.
+You should now host your metadata somewhere reachable via HTTP. You can use a service like [gist.github.com](https://gist.github.com). Create a gist with the contents of the file and then click on the `Raw` button to receive the permalink to the machine-readable file.
 
-Now we can register this url under the `ReleaseGold` validator account for others to see. To do this, we must have the `beneficiary` address of the `ReleaseGold` contract (`CELO_VALIDATOR_ADDRESS`) unlocked:
+Now we can register this url for others to see. To do this, we must have the `beneficiary` address of the `ReleaseGold` contract (`CELO_VALIDATOR_ADDRESS`) unlocked:
 
 ```bash
 # On your local machine
@@ -765,7 +762,7 @@ If this works then your attestation service should be successfully deployed!
 
 ### Running the Docker containers in the background
 
-There are different options for executing Docker containers in the background. The most typical one is to use in your docker run commands the `-d` option. Also for long running processes, especially when you run in a remote computer, you can use a tool like [screen](https://ss64.com/osx/screen.html). It allows to connect and disconnect from running processes providing an easy way to manage long running processes.
+There are different options for executing Docker containers in the background. The most typical one is to use in your docker run commands the `-d` option. Also for long running processes, especially when you run in on a remote machine, you can use a tool like [screen](https://ss64.com/osx/screen.html). It allows you to connect and disconnect from running processes providing an easy way to manage long running processes.
 
 It's out of the scope of this documentation to go through the `screen` options, but you can use the following command format with your `docker` commands:
 
