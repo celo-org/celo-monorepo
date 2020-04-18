@@ -72,7 +72,13 @@ export async function getContractAddresses() {
         ' Escrow: ' +
         escrowAddress
     )
-    return { tokenAddressMapping, attestationsAddress, escrowAddress }
+    return {
+      tokenAddressMapping,
+      attestationsAddress,
+      escrowAddress,
+      goldTokenAddress,
+      stableTokenAddress,
+    }
   } catch (e) {
     console.error('@getContractAddresses() error', e)
     throw new Error('Unable to fetch contract addresses')

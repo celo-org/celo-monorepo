@@ -1,5 +1,7 @@
 // @ts-ignore
 import { blsPrivateKeyToProcessedPrivateKey } from '@celo/utils/lib/bls'
+import * as bip32 from 'bip32'
+import * as bip39 from 'bip39'
 import * as bls12377js from 'bls12377js'
 import { ec as EC } from 'elliptic'
 import fs from 'fs'
@@ -17,9 +19,6 @@ import {
 } from './genesis_constants'
 import { GenesisConfig } from './interfaces/genesis-config'
 import { ensure0x, strip0x } from './utils'
-
-import bip32 = require('bip32')
-import bip39 = require('bip39')
 
 const ec = new EC('secp256k1')
 
@@ -78,11 +77,11 @@ export const coerceMnemonicAccountType = (raw: string): AccountType => {
 }
 
 export const generatePrivateKey = (mnemonic: string, accountType: AccountType, index: number) => {
-  const seed = bip39.mnemonicToSeed(mnemonic)
+  const seed = bip39.mnemonicToSeedSync(mnemonic)
   const node = bip32.fromSeed(seed)
   const newNode = node.derive(accountType).derive(index)
 
-  return newNode.privateKey.toString('hex')
+  return newNode.privateKey!.toString('hex')
 }
 
 export const generatePublicKey = (mnemonic: string, accountType: AccountType, index: number) => {

@@ -42,6 +42,7 @@ const DefaultConfig = {
       minor: 9,
       patch: 0,
     },
+    deploymentBlockGasLimit: 20000000,
     blockGasLimit: 10000000,
   },
   doubleSigningSlasher: {
@@ -81,12 +82,12 @@ const DefaultConfig = {
     communityRewardFraction: 1 / 4,
     // TODO(asa): Must be set before RC1
     carbonOffsettingPartner: '0x0000000000000000000000000000000000000000',
-    carbonOffsettingFraction: 1 / 200,
+    carbonOffsettingFraction: 1 / 1000,
     frozen: false,
   },
   exchange: {
     spread: 5 / 1000,
-    reserveFraction: 1 / 20,
+    reserveFraction: 1 / 100,
     updateFrequency: 5 * MINUTE,
     minimumReports: 5,
     frozen: false,
@@ -111,6 +112,8 @@ const DefaultConfig = {
     participationBaselineFloor: 5 / 100,
     participationBaselineUpdateFactor: 1 / 5,
     participationBaselineQuorumFactor: 1,
+    skipSetConstitution: true,
+    skipTransferOwnership: true,
   },
   governanceApproverMultiSig: {
     // 2/4 multsig
@@ -138,11 +141,13 @@ const DefaultConfig = {
   },
   reserve: {
     tobinTaxStalenessThreshold: HOUR, // 1 hour
+    tobinTax: toFixed(0.005).toFixed(), // 0.5%
+    tobinTaxReserveRatio: toFixed(2).toFixed(), // 2
     dailySpendingRatio: toFixed(0.05).toFixed(), // 5%
     spenders: [],
     otherAddresses: ['0xd0a57D8acFe9979d33933d8A52971E6DC9E2DbF0'],
     assetAllocationSymbols: ['cGLD', 'BTC', 'ETH', 'DAI'],
-    assetAllocationWeights: [0.5, 0.2, 0.1, 0.2],
+    assetAllocationWeights: [0.5, 0.3, 0.15, 0.05],
   },
   reserveSpenderMultiSig: {
     // 2/2 multsig
@@ -373,9 +378,34 @@ const NetworkConfigs = {
       membershipHistoryLength: 15, // Number of epochs in the group lockup period.
     },
   },
+  alfajores: {
+    election: {
+      minElectableValidators: '1',
+    },
+    epochRewards: {
+      frozen: false,
+    },
+    exchange: {
+      frozen: false,
+      minimumReports: 1,
+    },
+    goldToken: {
+      frozen: false,
+    },
+    stableToken: {
+      frozen: false,
+    },
+    reserve: {
+      initialBalance: 100000000,
+    },
+    oracles: {
+      reportExpiry: 1000 * DAY,
+    },
+  },
 }
 
 NetworkConfigs.baklavastaging = NetworkConfigs.baklava
+NetworkConfigs.alfajoresstaging = NetworkConfigs.alfajores
 
 const linkedLibraries = {
   FixidityLib: [
