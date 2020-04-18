@@ -6,19 +6,19 @@ Validators help secure the Celo network by participating in Celo’s Proof of St
 
 Just as anyone in a democracy can create their own political party, or seek to get selected to represent a party in an election, any Celo user can create a Validator group and add themselves to it, or set up a potential Validator and work to get an existing Validator group to include them.
 
-While other Validator Groups will exist on the Celo Networks, the fastest way to get up and running with a Validator will be to register a Validator Group, register a Validator, and add that Validator to your Validator Group. The addresses used to register Validator Groups and Validators must be unique, which will require that you create two accounts in the step-by-step guide below.
+While other Validator Groups will exist on the Celo Network, the fastest way to get up and running with a Validator will be to register a Validator Group, register a Validator, and affliate that Validator with your Validator Group. The addresses used to register Validator Groups and Validators must be unique, which will require that you create two accounts in the step-by-step guide below.
 
-Because of the importance of Validator security and availability, Validators are expected to run one or more additional "proxy" nodes. In this setup, the proxy node connects with the rest of the network, and the machine running the Validator communicates only with the proxy, ideally via a private network.
+Because of the importance of Validator security and availability, Validators are expected to run a "proxy" node in front of each Validator node. In this setup, the Proxy node connects with the rest of the network, and the Validator node communicates only with the Proxy, ideally via a private network.
 
 Additionally, Validators are expected to run an [Attestation Service](https://github.com/celo-org/celo-monorepo/tree/master/packages/attestation-service) as part of the [lightweight identity protocol](../celo-codebase/protocol/identity), to provide attestations that allow users to map their phone number to a Celo address.
 
-You can find more details about Celo mission and why to become a Validator [in our Medium article](https://medium.com/celohq/calling-all-chefs-become-a-celo-validator-c75d1c2909aa).
+[Read more about Celo's mission and why you may want to become a Validator.](https://medium.com/celoorg/calling-all-chefs-become-a-celo-validator-c75d1c2909aa)
 
 ## Prerequisites
 
 ### Hardware requirements
 
-The recommended Celo Validator setup involves continually running three nodes on separate hardware:
+The recommended Celo Validator setup involves continually running three instances:
 
 - 1 **Validator node**: should be deployed to single-tenant hardware in a secure, high availability data center
 - 1 **Validator Proxy node**: can be a VM or container in a multi-tenant environment (e.g. a public cloud), but requires high availability
@@ -33,13 +33,13 @@ Celo is a Proof of Stake network, which has different hardware requirements than
 
 Attestation Service nodes consume less resources and can run on machines with less memory and compute.
 
-In addition, to get things started, it will be useful to temporarily run a node on your local machine.
+In addition, to get things started, it will be useful to run a node on your local machine that you can issue CLI commands against.
 
 ### Networking requirements
 
 In order for your Validator to participate in consensus and complete attestations, it is **critically** important to configure your network correctly.
 
-Your Proxy and Attestations nodes must have static, external IP addresses, and your Validator node must be able to communicate with your proxy, either via an internal network or via the Proxy's external IP address.
+Your Proxy and Attestations nodes must have static, external IP addresses, and your Validator node must be able to communicate with the Proxy, either via an internal network or via the Proxy's external IP address.
 
 On the Proxy and Attestations machines, port 30303 should accept TCP and UDP connections from all IP addresses. This port is used to communicate with other nodes in the network.
 
@@ -68,7 +68,7 @@ On the Attestations machine, port 80 should accept TCP connections from all IP a
 
 {% hint style="info" %}
 A note about conventions:
-The code you'll see on this page is bash commands and their output.
+The code snippets you'll see on this page are bash commands and their output.
 
 When you see text in angle brackets &lt;&gt;, replace them and the text inside with your own value of what it refers to. Don't include the &lt;&gt; in the command.
 {% endhint %}
@@ -79,31 +79,7 @@ When you see text in angle brackets &lt;&gt;, replace them and the text inside w
 
 Private keys are the central primitive of any cryptographic system and need to be handled with extreme care. Loss of your private key can lead to irreversible loss of value.
 
-#### Philosophy
-
-The Celo protocol was designed with the understanding that there is often an inherent tradeoff between the convenience of accessing a private key and the security with which that private key can be custodied. In general Celo is unopinionated about how keys are custodied, but also allows users to authorize private keys with specific, limited privileges. This allows users to custody each private key according to its sensitivity (i.e. what is the impact of this key being lost or stolen?) and usage patterns (i.e. how often and under which circumstances will this key need to be accessed).
-
-#### Celo Keys Overview
-
-The table below outlines a summary of the various account roles in the Celo protocol. Note that these roles are often  *mutually exclusive*. An account that has been designated as one role can often not be used for a different purpose. Also note that under the hood, all of these accounts) are based on secp256k1 ECDSA private keys with the exception of the BLS signer. The different account roles are simply a concept encoded into the Celo proof-of-stake smart contracts, specifically [Accounts.sol](https://github.com/celo-org/celo-monorepo/blob/master/packages/protocol/contracts/common/Accounts.sol).
-
-For more details on a specific key type, please see the more detailed sections below.
-
-
-| Role                                | Description                                                                                      | Ledger compatible |
-| ----------------------------------- |--------------------------------------------------------------------------------------------------|-----|
-| Celo Account                        | An account used to send transactions in the Celo protocol                                        | Yes |
-| Locked Gold Account                 | Used to lock and unlock cGLD and authorize signers                                               | Yes |
-| Authorized vote signer              | Can vote on behalf of a Locked Gold Account                                                      | Yes |
-| Authorized validator (group) signer | Can register and manage a validator group on behalf of a Locked Gold Account                     | Yes |
-| Authorized validator signer         | Can register, manage a validator, and sign consensus messages on behalf of a Locked Gold Account | No  |
-| Authorized validator BLS signer     | Used to sign blocks as a validator                                                               | No  |
-| Authorized attestation signer       | Can sign attestation messages on behalf of a Locked Gold account                                 | No  |
-
-
-{% hint style="warning" %}
-A Locked Gold Account may have at most one authorized signer of each type at any time. Once a signer is authorized, the only way to deauthorize that signer is to authorize a new signer that has never previously been used as an authorized signer or Locked Gold Account. It follows then that a newly deauthorized signer cannot be reauthorized.
-{% endhint %}
+This guide contains a large number of keys, so it is important to understand the purpose of each key. [Read more about key management.](../operations-manual/summary.md)
 
 #### Unlocking
 
@@ -116,14 +92,14 @@ It is important to note that when a key is unlocked you need to be particularly 
 
 ### Environment variables
 
-There are number of new environment variables, and you may use this table as a reference.
+There are number of environment variables in this guide, and you may use this table as a reference.
 
 | Variable                             | Explanation                                                                                                                          |
 | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------ |
 | CELO_IMAGE                           | The Docker image used for the Validator and proxy containers                                                                         |
 | NETWORK_ID                           | The Celo Baklava network chain ID                                                                                                    |
 | CELO_VALIDATOR_GROUP_ADDRESS         | The account address for the Validator Group; the `ReleaseGold` beneficiary address for the Validator Group                                                                                          |
-| CELO_VALIDATOR_ADDRESS         | The account adddress for the Validator; the `ReleaseGold` beneficiary address for the Validator                                                                                          |
+| CELO_VALIDATOR_ADDRESS         | The account address for the Validator; the `ReleaseGold` beneficiary address for the Validator                                                                                          |
 | CELO_VALIDATOR_GROUP_RG_ADDRESS         | The `ReleaseGold` contract address for the Validator Group                                                                                          |
 | CELO_VALIDATOR_RG_ADDRESS         | The `ReleaseGold` contract address for the Validator                                                                                          |
 | CELO_VALIDATOR_GROUP_SIGNER_ADDRESS        | The validator (group) signer address authorized by the Validator Group account.
