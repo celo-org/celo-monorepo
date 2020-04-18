@@ -1,4 +1,4 @@
-FROM node:10
+FROM circleci/node:10
 WORKDIR /celo-monorepo
 
 RUN sudo apt-get update -y
