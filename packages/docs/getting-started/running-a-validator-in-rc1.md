@@ -47,6 +47,14 @@ On the Proxy machine, port 30503 should accept TCP connections from the IP addre
 
 On the Attestations machine, port 80 should accept TCP connections from all IP addresses. This port is used by users to request attestations from you.
 
+To illustrate this, you may refer to the following table:
+
+| Machine     | Port 80  | Port 30303     | Port 30503     |
+|-------------|----------|----------------|----------------|
+| Validator   | closed   | closed         | TCP: Proxy     |
+| Proxy       | closed   | TCP & UDP: all | TCP: Validator |
+| Attestation | TCP: all | closed         | closed         |
+
 ### Software requirements
 
 #### On each machine
