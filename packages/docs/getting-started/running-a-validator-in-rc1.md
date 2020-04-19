@@ -180,7 +180,7 @@ In all the commands we are going to see the `CELO_IMAGE` variable to refer to th
 docker pull $CELO_IMAGE
 ```
 
-The `us.gcr.io/celo-testnet/celo-node:rc1` image is built from commit [`c38f2fd30d2d7c4716a5181c9645121709b9004e`](https://github.com/celo-org/celo-blockchain/commit/c38f2fd30d2d7c4716a5181c9645121709b9004e) and contains the [genesis block](https://github.com/celo-org/celo-monorepo/blob/asaj/rc1/packages/celotool/genesis_rc1.json) and [bootnode information](https://storage.cloud.google.com/env_bootnodes/baklava) in addition to the Celo Blockchain binary.
+The `us.gcr.io/celo-testnet/celo-node:rc1` image contains the [genesis block](https://github.com/celo-org/celo-monorepo/blob/asaj/rc1/packages/celotool/genesis_rc1.json) in addition to the Celo Blockchain binary.
 
 ### Networking requirements
 
@@ -652,7 +652,7 @@ Next we will set up the Attestation Service itself. First, specify the following
 
 ```bash
 # On the Attestation machine
-export CELO_IMAGE_ATTESTATION=us.gcr.io/celo-testnet/celo-monorepo:attestation-service-baklava
+export CELO_IMAGE_ATTESTATION=us.gcr.io/celo-testnet/celo-monorepo:attestation-service-rc1
 # if you followed the instruction of setting up the attestation signer
 export CELO_PROVIDER=http://localhost:8545
 ```
