@@ -1,5 +1,37 @@
 [
   {
+    "identifier": "0x57a5fddadb1d26d0558a55bd11e17f16ebcfbbcb",
+    "releaseStartTime": "MAINNET",
+    "releaseCliffTime": 31536000,
+    "numReleasePeriods": 1,
+    "releasePeriod": 31536000,
+    "amountReleasedPerPeriod": 10002,
+    "revocable": false,
+    "beneficiary": "0x57a5fddadb1d26d0558a55bd11e17f16ebcfbbcb",
+    "releaseOwner": "TBD",
+    "refundAddress": "0x0000000000000000000000000000000000000000",
+    "subjectToLiquidityProvision": false,
+    "initialDistributionRatio": 1000,
+    "canVote": true,
+    "canValidate": true
+  },
+  {
+    "identifier": "0x6bd60aa42b900f7a5608d4dff5b406e503924c24",
+    "releaseStartTime": "MAINNET",
+    "releaseCliffTime": 31536000,
+    "numReleasePeriods": 1,
+    "releasePeriod": 31536000,
+    "amountReleasedPerPeriod": 10002,
+    "revocable": false,
+    "beneficiary": "0x6bd60aa42b900f7a5608d4dff5b406e503924c24",
+    "releaseOwner": "TBD",
+    "refundAddress": "0x0000000000000000000000000000000000000000",
+    "subjectToLiquidityProvision": false,
+    "initialDistributionRatio": 1000,
+    "canVote": true,
+    "canValidate": true
+  },
+  {
     "identifier": "0x2E5b1E0ebbAbBf74b2D13876e027a42939892610",
     "releaseStartTime": "MAINNET",
     "releaseCliffTime": 31536000,
