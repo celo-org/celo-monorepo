@@ -8,7 +8,7 @@ export default class ValidatorGroupShow extends BaseCommand {
   static description = 'Show information about an existing Validator Group'
 
   static flags = {
-    ...BaseCommand.flags,
+    ...BaseCommand.flagsWithoutLocalAddresses(),
   }
 
   static args: IArg[] = [Args.address('groupAddress', { description: "ValidatorGroup's address" })]
