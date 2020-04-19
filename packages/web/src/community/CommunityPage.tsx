@@ -1,30 +1,28 @@
 import * as React from 'react'
 import { View } from 'react-native'
 import Fade from 'react-reveal/Fade'
+import ArticleData from 'src/community/connect/ArticleData'
 import CodeOfConduct from 'src/community/connect/CodeOfConduct'
 import Contribute from 'src/community/connect/Contribute'
 import CoverArea from 'src/community/connect/CoverArea'
+import EventData from 'src/community/connect/EventsData'
 import FellowSection from 'src/community/connect/FellowSection'
+import preview from 'src/community/connect/preview.jpg'
 import Tenets from 'src/community/connect/Tenets'
 import EcoFund from 'src/community/EcoFund'
 import { H2 } from 'src/fonts/Fonts'
 import OpenGraph from 'src/header/OpenGraph'
 import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
-import ConnectionFooter from 'src/shared/ConnectionFooter'
 import { hashNav } from 'src/shared/menu-items'
 import { standardStyles } from 'src/styles'
-import ArticleData from './ArticleData'
-import EventData from './EventsData'
-
-const preview = require('src/community/connect/preview.jpg')
 
 type Props = I18nProps
 
 // only send used translations to the client
 const NAME_SPACES = ['common', 'community']
 
-export class ConnectPage extends React.Component<Props> {
+export class CommunityPage extends React.Component<Props> {
   // This is Next.js method that runs serverside. it is only available on page components
   static getInitialProps = () => {
     return {
@@ -65,13 +63,11 @@ export class ConnectPage extends React.Component<Props> {
           <Contribute />
           <EcoFund />
           <FellowSection />
-          <View nativeID={hashNav.connect.newsletter}>
-            <ConnectionFooter includeDividerLine={true} />
-          </View>
+          <View nativeID={hashNav.connect.newsletter} />
         </View>
       </>
     )
   }
 }
 
-export default withNamespaces(NameSpaces.community)(ConnectPage)
+export default withNamespaces(NameSpaces.community)(CommunityPage)

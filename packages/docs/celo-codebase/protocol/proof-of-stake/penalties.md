@@ -18,13 +18,8 @@ The protocol has three means of recourse for validator misbehavior. Each slashin
 
 There are three categories of slashing conditions:
 
-- Automatic \(initiated and verified on-chain\)
 - Provable \(initiated off-chain, verifiable on-chain\)
 - Governed \(verified only by off-chain knowledge\)
-
-### Automatic
-
-Automatic slashing conditions are enforced entirely through the protocol, and require no external information. Any Celo Gold slashed from stakes is transferred to the [Community Fund](community-fund.md).
 
 ### Provable
 
@@ -32,9 +27,9 @@ Provable slashing conditions cannot be initiated automatically on chain but info
 
 In exchange for sending a transaction which initiates a successful provable slashing condition on-chain, the initiator receives a portion of the slashed amount (which will always be greater than the gas costs of the proof). The remainder of the slashed amount is sent to the [Community Fund](community-fund.md).
 
-**Persistent downtime -** A validator which can be shown to be absent from 480 consecutive BLS signatures will be slashed 20 Celo Gold, have future rewards suppressed, and (most importantly in this case) will be ejected from its current group.
+**Persistent downtime -** A validator which can be shown to be absent from 8640 consecutive BLS signatures will be slashed 100 Celo Gold, have future rewards suppressed, and (most importantly in this case) will be ejected from its current group.
 
-**Double Signing -** A validator which can be shown to have produced BLS signatures for 2 distinct blocks at the same height but with different hashes will be slashed 100 Celo Gold, have future rewards suppressed, and will be ejected from its current group.
+**Double Signing -** A validator which can be shown to have produced BLS signatures for 2 distinct blocks at the same height but with different hashes will be slashed 9000 Celo Gold, have future rewards suppressed, and will be ejected from its current group.
 
 ### **Governed**
 
