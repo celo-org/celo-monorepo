@@ -1,29 +1,154 @@
 # Mobile (Celo Wallet)
-      - [Java](#java)
+
+- [Mobile (Celo Wallet)](#mobile-(celo-wallet))
+  - [Overview](#overview)
+  - [Architecture](#architecture)
+  - [Setup](#setup)
+    - [iOS](#ios)
+      - [Enroll in the Apple Developer Program](#enroll-in-the-apple-developer-program)
+      - [Install XCode](#install-xcode)
+      - [Install Cocopods](#install-cocopods)
+    - [Android](#android)
+      - [Install Java](#install-java)
       - [Install Android Dev Tools](#install-android-dev-tools)
-      - [Install iOS Dev Tools](#install-ios-dev-tools)
-
-
-
-            - [Installing OpenJDK 8](#installing-openjdk-8)
-      - [Install Android Dev Tools](#install-android-dev-tools-1)
-
-
-
-
-
-
       - [Optional: Install an Android Emulator](#optional-install-an-android-emulator)
-      - [Optional: Genymotion](#optional-genymotion)
-        - [MacOS](#macos-1)
-        - [Linux](#linux-1)
-    - [Building celo-monorepo](#building-celo-monorepo)
-  - [Using an Android test device locally](#using-an-android-test-device-locally)
+  - [Running the mobile wallet](#running-the-mobile-wallet)
+    - [iOS](#ios-1)
+    - [Android](#android-1)
+  - [Debugging](#debugging)
+  - [Testing](#testing)
+  - [Troubleshooting](#troubleshooting)
 
-  // MacOS
+## Overview
 
+This is a wallet application for the [Celo platform].
+It's a self-soverign wallet that enables anyone to onboard onto the Celo network, manage their currencies, and send payments.
+
+![](https://storage.googleapis.com/celo-website/docs/wallet-preview.png)
+
+
+## Architecture
+
+The app uses [React Native][react native] and a geth [light node][light node].
+
+
+## Setup
+
+__You must have the [celo-monorepo] successfully set up and built before setting up and running the mobile wallet.__
+
+To do this, follow the [setup instructions][setup].
+
+### iOS
+
+#### Enroll in the Apple Developer Program
+
+In order to successfully set up your iOS development environment you will need to enroll in the [Apple Developer Program]. It is recommended that you enroll from an iOS device by downloading the Apple Developer App in the App Store. Using the app will result in the fastest processing of your enrollment.
+
+_If you are a cLabs employee, please ask to be added to the cLabs iOS development team._
+
+#### Install XCode
+
+XCode is needed to build and deploy the mobile wallet to your iOS device. If you do not have an iOS device, Xcode can be used to emulate one.
+
+Install [Xcode 11.4](https://developer.apple.com/download/more/?q=xcode) (an Apple Developer Account is needed to access this link).
+
+We do not recommend installing Xcode through the App Store as it can auto update and become incompatible with our projects.
+
+Note that using the method above, you can have multiple versions of Xcode installed in parallel if you'd like. Simply use different names for the different version of XCode in your computer's `Applications` folder (e.g., `Xcode10.3.app` and `Xcode11.app`).
+
+#### Install Cocopods
+
+Install cocopods:
+
+```bash
+gem install cocoapods
+```
+
+If your machine does not recognize the `gem` command, you may need to [download Ruby](https://rubyinstaller.org/) first.
+
+
+### Android
+
+#### Install Java
+
+We need Java to be able to build and deploy the mobile app to Android devices. Android currently only builds correctly with Java 8. (Using OpenJDK because of [Oracle being Oracle][oracle being oracle]).
+
+##### MacOS
+
+Install by running the following:
+
+```bash
+brew install cask
+brew tap homebrew/cask-versions
+brew cask install homebrew/cask-versions/adoptopenjdk8
+```
+
+Alternatively, install Jenv to manage multiple Java versions:
+
+```bash
+brew install jenv
+eval "$(jenv init -)"
+jenv add /Library/Java/JavaVirtualMachines/<java8 version here>/Contents/Home
+```
+
+##### Linux
+
+Install by running the following:
+
+```
+sudo apt install openjdk-8-jdk
+```
+
+#### Install Android Dev Tools
+
+##### MacOS
+
+Install the Android SDK and platform tools:
+
+```bash
+brew cask install android-sdk
+brew cask install android-platform-tools
+```
+
+Next install [Android Studio][android studio] and add the [Android NDK][android ndk]
+
+Execute the following (and make sure the lines are in your `~/.bash_profile`):
+
+```bash
+export ANDROID_HOME=/usr/local/share/android-sdk
+export ANDROID_NDK=/usr/local/share/android-ndk
+export ANDROID_SDK_ROOT=/usr/local/share/android-sdk
+# this is an optional gradle configuration that should make builds faster
+export GRADLE_OPTS='-Dorg.gradle.daemon=true -Dorg.gradle.parallel=true -Dorg.gradle.jvmargs="-Xmx4096m -XX:+HeapDumpOnOutOfMemoryError"'
+```
+
+Then install the Android 28 platform:
+
+```bash
+sdkmanager 'platforms;android-28'
+```
+
+##### Linux
+
+You can download the complete Android Studio and SDK from the [Android Developer download site](https://developer.android.com/studio/#downloads).
+
+The steps are:
+
+1.  Unpack the .zip file you downloaded to an appropriate location for your applications, such as within `/usr/local/` for your user profile, or `/opt/` for shared users.
+
+    If you're using a 64-bit version of Linux, make sure you first install the [required libraries for 64-bit machines](https://developer.android.com/studio/install#64bit-libs).
+
+2.  To launch Android Studio, open a terminal, navigate to the `android-studio/bin/` directory, and execute `studio.sh`.
+
+3.  Select whether you want to import previous Android Studio settings or not, then click OK.
+
+4.  The Android Studio Setup Wizard guides you through the rest of the setup, which includes downloading Android SDK components that are required for development.
+
+You can find the complete instructions about how to install the tools in Linux environments in the [Documentation page](https://developer.android.com/studio/install#linux).
 
 #### Optional: Install an Android Emulator
+
+##### Configure an emulator using the Android SDK Manager
 
 Install the Android 28 system image and create an Android Virtual Device:
 
@@ -44,11 +169,11 @@ Run the emulator with:
 emulator -avd Nexus_5X_API_28_x86
 ```
 
-#### Optional: Install Genymotion Emulator Manager
+##### Install Genymotion Emulator Manager
 
-Optionally, as alternative to other emulators you can install Genymotion
+Another Android emulator option is Genymotion
 
-##### MacOS
+###### MacOS
 
 ```bash
 brew cask install genymotion
@@ -63,7 +188,7 @@ Then make sure the ADB path is set correctly in Genymotion — set
 `Preferences > ADB > Use custom Android SDK tools` to
 `/usr/local/share/android-sdk` (same as `$ANDROID_HOME`)
 
-##### Linux
+###### Linux
 
 You can download the Linux version of Genymotion from the [fun zone!](https://www.genymotion.com/fun-zone/) (you need to sign in first).
 
@@ -73,96 +198,24 @@ After having the binary you only need to run the installer:
 sudo ./genymotion-3.0.2-linux_x64.bin
 ```
 
-  #### Java
 
-We need Java to be able to build and run Android to deploy the mobile app to
-test devices. Android currently only builds correctly with Java 8. (Using
-OpenJDK because of [Oracle being Oracle][oracle being oracle])
+## Running the mobile wallet
 
-```bash
-brew install cask
-brew tap homebrew/cask-versions
-brew cask install homebrew/cask-versions/adoptopenjdk8
-```
+1. If you haven't already, run `yarn` from the monorepo root to install dependencies.
 
-Optionally, install Jenv to manage multiple Java versions
+2. Attach your device or start an emulated one.
 
-```bash
-brew install jenv
-eval "$(jenv init -)"
-jenv add /Library/Java/JavaVirtualMachines/<java8 version here>/Contents/Home
-```
-
-#### Install Android Dev Tools
-
-Install the Android SDK and platform tools:
-
-```bash
-brew cask install android-sdk
-brew cask install android-platform-tools
-```
-
-Next install [Android Studio][android studio] and add the [Android NDK][android ndk]
-
-Execute the following (and make sure the lines are in your `~/.bash_profile`):
-
-```bash
-export ANDROID_HOME=/usr/local/share/android-sdk
-export ANDROID_NDK=/usr/local/share/android-ndk
-export ANDROID_SDK_ROOT=/usr/local/share/android-sdk
-export GRADLE_OPTS='-Dorg.gradle.daemon=true -Dorg.gradle.parallel=true -Dorg.gradle.jvmargs="-Xmx4096m -XX:+HeapDumpOnOutOfMemoryError"'
-```
-
-Then install the Android 28 platform:
-
-```bash
-sdkmanager 'platforms;android-28'
-```
-
-#### Install iOS Dev Tools
-
-Install [Xcode 10.3](https://download.developer.apple.com/Developer_Tools/Xcode_10.3/Xcode_10.3.xip) (an Apple Developer Account is needed to access this link).
-(If after signing in the the direct link does not work try finding on https://developer.apple.com/download/more/)
-
-We do not recommend installing Xcode through the App Store as it can auto update and become incompatible with our projects (until we decide to upgrade).
-
-Note that using the method above, you can have multiple versions of Xcode installed in parallel by using different app names. For instance `Xcode10.3.app` and `Xcode11.app` inside the `/Applications` folder.
-
-Install Cocopods `gem install cocoapods`
+### iOS
 
 From ios folder in mobile package run `bundle exec pod install`
 
-//
+Opne the workspace file with xcode
 
-// linux
+Run the build
 
-#### Installing OpenJDK 8
+yarn dev:ios
 
-```
-sudo apt install openjdk-8-jdk
-```
-
-#### Install Android Dev Tools
-
-You can download the complete Android Studio and SDK from the [Android Developer download site](https://developer.android.com/studio/#downloads).
-
-The steps are:
-
-1.  Unpack the .zip file you downloaded to an appropriate location for your applications, such as within `/usr/local/` for your user profile, or `/opt/` for shared users.
-
-    If you're using a 64-bit version of Linux, make sure you first install the [required libraries for 64-bit machines](https://developer.android.com/studio/install#64bit-libs).
-
-1.  To launch Android Studio, open a terminal, navigate to the `android-studio/bin/` directory, and execute `studio.sh`.
-
-1.  Select whether you want to import previous Android Studio settings or not, then click OK.
-
-1.  The Android Studio Setup Wizard guides you through the rest of the setup, which includes downloading Android SDK components that are required for development.
-
-You can find the complete instructions about how to install the tools in Linux environments in the [Documentation page](https://developer.android.com/studio/install#linux).
-
-//
-
-## Using an Android test device locally
+### Android
 
 First, follow [these instructions to enable Developer Options][android dev options]
 on your Android.
@@ -186,32 +239,7 @@ List of devices attached
 If it lists a device as "unauthorized", make sure you've accepted the prompt or
 [troubleshoot here][device unauthorized].
 
-## Overview
 
-This is a wallet application for the [Celo platform].
-It's a self-soverign wallet that enables anyone to onboard onto the Celo network, manage their currencies, and send payments.
-
-![](https://storage.googleapis.com/celo-website/docs/wallet-preview.png)
-
-## Architecture
-
-The app uses [React Native][react native] and a geth [light node][light node].
-
-## Setup
-
-You need to install Java 8, the Android SDK, Yarn, and Node 8 to run the app.
-
-To do this, follow the [setup instructions][setup]
-
-### (_Optional_) Gradle improvement
-
-This makes Gradle faster:
-
-```bash
-export GRADLE_OPTS='-Dorg.gradle.daemon=true -Dorg.gradle.parallel=true -Dorg.gradle.jvmargs="-Xmx4096m -XX:+HeapDumpOnOutOfMemoryError"'
-```
-
-## Running the App
 
 1.  If you haven't already, run `yarn` from the monorepo root to install dependencies.
 
@@ -234,7 +262,8 @@ export GRADLE_OPTS='-Dorg.gradle.daemon=true -Dorg.gradle.parallel=true -Dorg.gr
 
     **Note:** We've seen some issues running the metro bundler from iTerm
 
-### Debugging
+
+## Debugging
 
 In order to debug, you should run:
 
@@ -416,7 +445,11 @@ $ adb kill-server && adb start-server
 * daemon started successfully
 ```
 
-[celo platform]: https://celo.org
+[Celo platform]: https://celo.org
+[celo-monorepo]: https://github.com/celo-org/celo-monorepo
+[celo-blockchain]: https://github.com/celo-org/celo-blockchain
+[Apple Developer Program]: https://developer.apple.com/programs/
+
 [`src/components/bottombutton.test.tsx`]: ./src/components/BottomButton.test.tsx
 [detox]: https://github.com/wix/Detox
 [e2e readme]: ./e2e/README.md

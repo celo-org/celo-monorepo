@@ -120,9 +120,9 @@ export PATH=$PATH:$GOPATH/bin
 
 #### Install gcloud CLI
 
-_Required for cLabs employees only_
+_Required for cLabs employees only._
 
-[Install the gcloud SDK](https://cloud.google.com/sdk/docs#install_the_latest_cloud_tools_version_cloudsdk_current_version), which includes the CLI. Once installed, initialize `gcloud` and log in.
+[Install the gcloud SDK](https://cloud.google.com/sdk/docs#install_the_latest_cloud_tools_version_cloudsdk_current_version), which includes the command line tools. Once installed, initialize `gcloud` and log in.
 
 #### Optional: Install Rust
 
@@ -166,7 +166,7 @@ cd celo
 git clone https://github.com/celo-org/celo-monorepo.git
 ```
 
-Then install packages:
+Then install the packages:
 
 ```bash
 cd celo-monorepo
