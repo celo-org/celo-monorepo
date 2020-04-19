@@ -49,11 +49,12 @@ On the Attestations machine, port 80 should accept TCP connections from all IP a
 
 To illustrate this, you may refer to the following table:
 
-| Machine     | Port 80  | Port 30303     | Port 30503     |
-|-------------|----------|----------------|----------------|
-| Validator   | closed   | closed         | TCP: Proxy     |
-| Proxy       | closed   | TCP & UDP: all | TCP: Validator |
-| Attestation | TCP: all | closed         | closed         |
+| Machine \\ IPs open to | 0\.0\.0\.0/0 \(all\) | <your\-validator\-ip> | <your\-proxy\-ip> |
+|------------------------|----------------------|-----------------------|-------------------|
+| Validator              |                      |                       | TCP: Proxy        |
+| Proxy                  | tcp:30303, udp:30303 | tcp:30503             |                   |
+| Attestation            | tcp:80               |                       |                   |
+|                        |                      |                       |                   |
 
 ### Software requirements
 
