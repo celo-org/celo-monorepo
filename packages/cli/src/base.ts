@@ -51,14 +51,14 @@ export abstract class BaseCommand extends LocalCommand {
       default: 1,
       hidden: false,
       exclusive: ['ledgerCustomAddresses'],
-      description: 'If --userLedger is set, this will get the first N addresses for local signing',
+      description: 'If --useLedger is set, this will get the first N addresses for local signing',
     }),
     ledgerCustomAddresses: flags.string({
       default: '[0]',
       hidden: false,
       exclusive: ['ledgerAddresses'],
       description:
-        'If --userLedger is set, this will get the array of index addresses for local signing. Example --ledgerCustomAddresses "[4,99]"',
+        'If --useLedger is set, this will get the array of index addresses for local signing. Example --ledgerCustomAddresses "[4,99]"',
     }),
     ledgerConfirmAddress: flags.boolean({
       default: false,
