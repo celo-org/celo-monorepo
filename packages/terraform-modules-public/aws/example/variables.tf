@@ -32,31 +32,41 @@ variable key_pair_name {
 variable celo_image {
   type        = string
   description = "Docker image for Celo nodes"
-  default     = "us.gcr.io/celo-testnet/celo-node:1.8"
+  default     = "us.gcr.io/celo-testnet/celo-node:baklava"
 }
 
 variable celo_network_id {
   type        = string
   description = "ID of the Celo network to join"
-  default     = "200110"
+  default     = "40120"
 }
 
 variable ethstats_host {
   type        = string
   description = "Hostname for ethstats"
-  default     = "baklava-ethstats.celo-testnet.org"
+  default     = "baklava-celostats-server.celo-testnet.org"
 }
 
 variable proxies {
   description = "Configuration for zero or more proxies in each availability zone."
   type = object({
     az1 = map(object({
-      validator_name           = string
-      validator_signer_address = string
+      validator_name                  = string
+      validator_signer_address        = string
+      proxy_address                   = string
+      proxy_private_key_filename      = string
+      proxy_private_key_file_contents = string
+      proxy_private_key_password      = string
+      proxy_node_private_key          = string
     }))
     az2 = map(object({
-      validator_name           = string
-      validator_signer_address = string
+      validator_name                  = string
+      validator_signer_address        = string
+      proxy_address                   = string
+      proxy_private_key_filename      = string
+      proxy_private_key_file_contents = string
+      proxy_private_key_password      = string
+      proxy_node_private_key          = string
     }))
   })
   default = {

@@ -43,6 +43,11 @@ variable proxies {
   type = map(object({
     validator_name           = string
     validator_signer_address = string
+    proxy_address            = string
+    proxy_private_key_filename      = string
+    proxy_private_key_file_contents = string
+    proxy_private_key_password      = string
+    proxy_node_private_key          = string
   }))
   description = "Map of proxy configurations."
 }

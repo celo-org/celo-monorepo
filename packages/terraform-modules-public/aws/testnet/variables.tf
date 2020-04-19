@@ -80,12 +80,22 @@ variable proxies {
   description = "Configuration for zero or more proxies in each availability zone."
   type = object({
     az1 = map(object({
-      validator_name           = string
-      validator_signer_address = string
+      validator_name                  = string
+      validator_signer_address        = string
+      proxy_address                   = string
+      proxy_private_key_filename      = string
+      proxy_private_key_file_contents = string
+      proxy_private_key_password      = string
+      proxy_node_private_key          = string
     }))
     az2 = map(object({
-      validator_name           = string
-      validator_signer_address = string
+      validator_name                  = string
+      validator_signer_address        = string
+      proxy_address                   = string
+      proxy_private_key_filename      = string
+      proxy_private_key_file_contents = string
+      proxy_private_key_password      = string
+      proxy_node_private_key          = string
     }))
   })
 }

@@ -26,6 +26,11 @@ resource "aws_instance" "celo_proxy" {
       ethstats_host            = var.ethstats_host
       validator_name           = each.value.validator_name
       validator_signer_address = each.value.validator_signer_address
+      proxy_address            = each.value.proxy_address
+      proxy_private_key_filename      = each.value.proxy_private_key_filename
+      proxy_private_key_file_contents = each.value.proxy_private_key_file_contents
+      proxy_private_key_password      = each.value.proxy_private_key_password
+      proxy_node_private_key          = each.value.proxy_node_private_key
     }),
     file("${path.module}/../startup-scripts/final-hardening.sh")
   ])
