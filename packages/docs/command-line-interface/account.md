@@ -23,10 +23,22 @@ OPTIONS
 
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d    (required) Account Address
 
+  --ledgerAddresses=ledgerAddresses                    [default: 1] If --useLedger is set, this will get the first N
+                                                       addresses for local signing
+
+  --ledgerConfirmAddress                               Set it to ask confirmation for the address of the transaction
+                                                       from the ledger
+
+  --ledgerCustomAddresses=ledgerCustomAddresses        [default: [0]] If --useLedger is set, this will get the array of
+                                                       index addresses for local signing. Example
+                                                       --ledgerCustomAddresses "[4,99]"
+
   --signature=signature                                (required) Signature (a.k.a proof-of-possession) of the signer
                                                        key
 
   --signer=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Account Address
+
+  --useLedger                                          Set it to use a ledger wallet
 
 EXAMPLES
   authorize --from 0x5409ED021D9299bf6814279A6A1411A7e866A631 --role vote --signer
@@ -73,8 +85,20 @@ OPTIONS
   --address=address                                  (required) The address of the account you want to claim
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Addess of the account to set metadata for
 
+  --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
+                                                     addresses for local signing
+
+  --ledgerConfirmAddress                             Set it to ask confirmation for the address of the transaction from
+                                                     the ledger
+
+  --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
+                                                     index addresses for local signing. Example --ledgerCustomAddresses
+                                                     "[4,99]"
+
   --publicKey=publicKey                              The public key of the account that others may use to send you
                                                      encrypted messages
+
+  --useLedger                                        Set it to use a ledger wallet
 
 EXAMPLE
   claim-account ~/metadata.json --address 0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d --from
@@ -96,7 +120,20 @@ ARGUMENTS
 
 OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Addess of the account to set metadata for
+
+  --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
+                                                     addresses for local signing
+
+  --ledgerConfirmAddress                             Set it to ask confirmation for the address of the transaction from
+                                                     the ledger
+
+  --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
+                                                     index addresses for local signing. Example --ledgerCustomAddresses
+                                                     "[4,99]"
+
   --url=https://www.celo.org                         (required) The url you want to claim
+
+  --useLedger                                        Set it to use a ledger wallet
 
 EXAMPLE
   claim-attestation-service-url ~/metadata.json --url http://test.com/myurl --from
@@ -120,6 +157,18 @@ OPTIONS
   --domain=domain                                    (required) The domain you want to claim
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Addess of the account to set metadata for
 
+  --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
+                                                     addresses for local signing
+
+  --ledgerConfirmAddress                             Set it to ask confirmation for the address of the transaction from
+                                                     the ledger
+
+  --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
+                                                     index addresses for local signing. Example --ledgerCustomAddresses
+                                                     "[4,99]"
+
+  --useLedger                                        Set it to use a ledger wallet
+
 EXAMPLE
   claim-domain ~/metadata.json --domain test.com --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95
 ```
@@ -139,6 +188,19 @@ ARGUMENTS
 
 OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Addess of the account to set metadata for
+
+  --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
+                                                     addresses for local signing
+
+  --ledgerConfirmAddress                             Set it to ask confirmation for the address of the transaction from
+                                                     the ledger
+
+  --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
+                                                     index addresses for local signing. Example --ledgerCustomAddresses
+                                                     "[4,99]"
+
+  --useLedger                                        Set it to use a ledger wallet
+
   --username=username                                (required) The keybase username you want to claim
 
 EXAMPLE
@@ -160,7 +222,20 @@ ARGUMENTS
 
 OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Addess of the account to set metadata for
+
+  --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
+                                                     addresses for local signing
+
+  --ledgerConfirmAddress                             Set it to ask confirmation for the address of the transaction from
+                                                     the ledger
+
+  --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
+                                                     index addresses for local signing. Example --ledgerCustomAddresses
+                                                     "[4,99]"
+
   --name=name                                        (required) The name you want to claim
+
+  --useLedger                                        Set it to use a ledger wallet
 
 EXAMPLE
   claim-name ~/metadata.json --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95 --name myname
@@ -182,6 +257,18 @@ ARGUMENTS
 OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Addess of the account to set metadata for
 
+  --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
+                                                     addresses for local signing
+
+  --ledgerConfirmAddress                             Set it to ask confirmation for the address of the transaction from
+                                                     the ledger
+
+  --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
+                                                     index addresses for local signing. Example --ledgerCustomAddresses
+                                                     "[4,99]"
+
+  --useLedger                                        Set it to use a ledger wallet
+
 EXAMPLE
   create-metadata ~/metadata.json --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95
 ```
@@ -199,6 +286,18 @@ USAGE
 ARGUMENTS
   ADDRESS  Address to get metadata for
 
+OPTIONS
+  --ledgerAddresses=ledgerAddresses              [default: 1] If --useLedger is set, this will get the first N addresses
+                                                 for local signing
+
+  --ledgerConfirmAddress                         Set it to ask confirmation for the address of the transaction from the
+                                                 ledger
+
+  --ledgerCustomAddresses=ledgerCustomAddresses  [default: [0]] If --useLedger is set, this will get the array of index
+                                                 addresses for local signing. Example --ledgerCustomAddresses "[4,99]"
+
+  --useLedger                                    Set it to use a ledger wallet
+
 EXAMPLE
   get-metadata 0x97f7333c51897469E8D98E7af8653aAb468050a3
 ```
@@ -212,6 +311,18 @@ List the addresses from the node and the local instance
 ```
 USAGE
   $ celocli account:list
+
+OPTIONS
+  --ledgerAddresses=ledgerAddresses              [default: 1] If --useLedger is set, this will get the first N addresses
+                                                 for local signing
+
+  --ledgerConfirmAddress                         Set it to ask confirmation for the address of the transaction from the
+                                                 ledger
+
+  --ledgerCustomAddresses=ledgerCustomAddresses  [default: [0]] If --useLedger is set, this will get the array of index
+                                                 addresses for local signing. Example --ledgerCustomAddresses "[4,99]"
+
+  --useLedger                                    Set it to use a ledger wallet
 ```
 
 _See code: [packages/cli/src/commands/account/list.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/list.ts)_
@@ -255,7 +366,19 @@ OPTIONS
   --account=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the account that needs to prove possession
                                                         of the signer key.
 
+  --ledgerAddresses=ledgerAddresses                     [default: 1] If --useLedger is set, this will get the first N
+                                                        addresses for local signing
+
+  --ledgerConfirmAddress                                Set it to ask confirmation for the address of the transaction
+                                                        from the ledger
+
+  --ledgerCustomAddresses=ledgerCustomAddresses         [default: [0]] If --useLedger is set, this will get the array of
+                                                        index addresses for local signing. Example
+                                                        --ledgerCustomAddresses "[4,99]"
+
   --signer=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d   (required) Address of the signer key to prove possession of.
+
+  --useLedger                                           Set it to use a ledger wallet
 
 EXAMPLE
   proof-of-possession --account 0x5409ed021d9299bf6814279a6a1411a7e866a631 --signer
@@ -274,7 +397,20 @@ USAGE
 
 OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Account Address
+
+  --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
+                                                     addresses for local signing
+
+  --ledgerConfirmAddress                             Set it to ask confirmation for the address of the transaction from
+                                                     the ledger
+
+  --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
+                                                     index addresses for local signing. Example --ledgerCustomAddresses
+                                                     "[4,99]"
+
   --name=name
+
+  --useLedger                                        Set it to use a ledger wallet
 
 EXAMPLES
   register --from 0x5409ed021d9299bf6814279a6a1411a7e866a631
@@ -294,7 +430,20 @@ USAGE
 OPTIONS
   --force                                            Ignore metadata validity checks
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Addess of the account to set metadata for
+
+  --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
+                                                     addresses for local signing
+
+  --ledgerConfirmAddress                             Set it to ask confirmation for the address of the transaction from
+                                                     the ledger
+
+  --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
+                                                     index addresses for local signing. Example --ledgerCustomAddresses
+                                                     "[4,99]"
+
   --url=https://www.celo.org                         (required) The url to the metadata you want to register
+
+  --useLedger                                        Set it to use a ledger wallet
 
 EXAMPLE
   register-metadata --url https://www.mywebsite.com/celo-metadata --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95
@@ -312,7 +461,20 @@ USAGE
 
 OPTIONS
   --account=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Account Address
+
+  --ledgerAddresses=ledgerAddresses                     [default: 1] If --useLedger is set, this will get the first N
+                                                        addresses for local signing
+
+  --ledgerConfirmAddress                                Set it to ask confirmation for the address of the transaction
+                                                        from the ledger
+
+  --ledgerCustomAddresses=ledgerCustomAddresses         [default: [0]] If --useLedger is set, this will get the array of
+                                                        index addresses for local signing. Example
+                                                        --ledgerCustomAddresses "[4,99]"
+
   --name=name                                           (required)
+
+  --useLedger                                           Set it to use a ledger wallet
 
 EXAMPLE
   set-name --account 0x5409ed021d9299bf6814279a6a1411a7e866a631 --name test-account
@@ -328,6 +490,18 @@ Show information for an account, including name, authorized vote, validator, and
 USAGE
   $ celocli account:show ADDRESS
 
+OPTIONS
+  --ledgerAddresses=ledgerAddresses              [default: 1] If --useLedger is set, this will get the first N addresses
+                                                 for local signing
+
+  --ledgerConfirmAddress                         Set it to ask confirmation for the address of the transaction from the
+                                                 ledger
+
+  --ledgerCustomAddresses=ledgerCustomAddresses  [default: [0]] If --useLedger is set, this will get the array of index
+                                                 addresses for local signing. Example --ledgerCustomAddresses "[4,99]"
+
+  --useLedger                                    Set it to use a ledger wallet
+
 EXAMPLE
   show 0x5409ed021d9299bf6814279a6a1411a7e866a631
 ```
@@ -341,6 +515,18 @@ Show information about claimed accounts
 ```
 USAGE
   $ celocli account:show-claimed-accounts ADDRESS
+
+OPTIONS
+  --ledgerAddresses=ledgerAddresses              [default: 1] If --useLedger is set, this will get the first N addresses
+                                                 for local signing
+
+  --ledgerConfirmAddress                         Set it to ask confirmation for the address of the transaction from the
+                                                 ledger
+
+  --ledgerCustomAddresses=ledgerCustomAddresses  [default: [0]] If --useLedger is set, this will get the array of index
+                                                 addresses for local signing. Example --ledgerCustomAddresses "[4,99]"
+
+  --useLedger                                    Set it to use a ledger wallet
 
 EXAMPLE
   show-claimed-accounts 0x5409ed021d9299bf6814279a6a1411a7e866a631
@@ -358,6 +544,18 @@ USAGE
 
 ARGUMENTS
   FILE  Path of the metadata file
+
+OPTIONS
+  --ledgerAddresses=ledgerAddresses              [default: 1] If --useLedger is set, this will get the first N addresses
+                                                 for local signing
+
+  --ledgerConfirmAddress                         Set it to ask confirmation for the address of the transaction from the
+                                                 ledger
+
+  --ledgerCustomAddresses=ledgerCustomAddresses  [default: [0]] If --useLedger is set, this will get the array of index
+                                                 addresses for local signing. Example --ledgerCustomAddresses "[4,99]"
+
+  --useLedger                                    Set it to use a ledger wallet
 
 EXAMPLE
   show-metadata ~/metadata.json
@@ -377,7 +575,18 @@ ARGUMENTS
   ACCOUNT  Account address
 
 OPTIONS
+  --ledgerAddresses=ledgerAddresses              [default: 1] If --useLedger is set, this will get the first N addresses
+                                                 for local signing
+
+  --ledgerConfirmAddress                         Set it to ask confirmation for the address of the transaction from the
+                                                 ledger
+
+  --ledgerCustomAddresses=ledgerCustomAddresses  [default: [0]] If --useLedger is set, this will get the array of index
+                                                 addresses for local signing. Example --ledgerCustomAddresses "[4,99]"
+
   --password=password
+
+  --useLedger                                    Set it to use a ledger wallet
 
 EXAMPLE
   unlock 0x5409ed021d9299bf6814279a6a1411a7e866a631
