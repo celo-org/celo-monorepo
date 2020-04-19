@@ -5,12 +5,15 @@
 
 ## Getting Started
 
+- [Choosing a Network](getting-started/choosing-a-network.md)
 - [Alfajores Testnet](getting-started/alfajores-testnet.md)
   - [Using the Mobile Wallet](getting-started/using-the-mobile-wallet.md)
   - [Getting an Account and Funds](getting-started/faucet.md)
 - [Baklava Testnet](getting-started/baklava-testnet.md)
   - [Running a Validator](getting-started/running-a-validator-in-baklava.md)
   - [Running a Full Node](getting-started/running-a-full-node.md)
+- [Release Candidate](getting-started/release-candidate.md)
+  - [Running a Validator](getting-started/running-a-validator.md)
 - [Glossary](GLOSSARY.md)
 
 ## Operations Manual
@@ -409,6 +412,7 @@
 
 - [Code of Conduct](community/code-of-conduct.md)
 - [Contributing](community/contributing.md)
+- [Grant Playbook](community/grant-playbook.md)
 
 ## Important Information
 
