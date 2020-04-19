@@ -21,13 +21,13 @@ OPTIONS
 
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
 
-  --ledgerAddresses=ledgerAddresses                      [default: 1] If --userLedger is set, this will get the first N
+  --ledgerAddresses=ledgerAddresses                      [default: 1] If --useLedger is set, this will get the first N
                                                          addresses for local signing
 
   --ledgerConfirmAddress                                 Set it to ask confirmation for the address of the transaction
                                                          from the ledger
 
-  --ledgerCustomAddresses=ledgerCustomAddresses          [default: [0]] If --userLedger is set, this will get the array
+  --ledgerCustomAddresses=ledgerCustomAddresses          [default: [0]] If --useLedger is set, this will get the array
                                                          of index addresses for local signing. Example
                                                          --ledgerCustomAddresses "[4,99]"
 
@@ -69,13 +69,13 @@ USAGE
 OPTIONS
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
 
-  --ledgerAddresses=ledgerAddresses                      [default: 1] If --userLedger is set, this will get the first N
+  --ledgerAddresses=ledgerAddresses                      [default: 1] If --useLedger is set, this will get the first N
                                                          addresses for local signing
 
   --ledgerConfirmAddress                                 Set it to ask confirmation for the address of the transaction
                                                          from the ledger
 
-  --ledgerCustomAddresses=ledgerCustomAddresses          [default: [0]] If --userLedger is set, this will get the array
+  --ledgerCustomAddresses=ledgerCustomAddresses          [default: [0]] If --useLedger is set, this will get the array
                                                          of index addresses for local signing. Example
                                                          --ledgerCustomAddresses "[4,99]"
 
@@ -99,13 +99,13 @@ OPTIONS
   -a, --action=lock|unlock|withdraw                      (required) Action to perform on contract's gold
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
 
-  --ledgerAddresses=ledgerAddresses                      [default: 1] If --userLedger is set, this will get the first N
+  --ledgerAddresses=ledgerAddresses                      [default: 1] If --useLedger is set, this will get the first N
                                                          addresses for local signing
 
   --ledgerConfirmAddress                                 Set it to ask confirmation for the address of the transaction
                                                          from the ledger
 
-  --ledgerCustomAddresses=ledgerCustomAddresses          [default: [0]] If --userLedger is set, this will get the array
+  --ledgerCustomAddresses=ledgerCustomAddresses          [default: [0]] If --useLedger is set, this will get the array
                                                          of index addresses for local signing. Example
                                                          --ledgerCustomAddresses "[4,99]"
 
@@ -132,13 +132,13 @@ USAGE
 OPTIONS
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
 
-  --ledgerAddresses=ledgerAddresses                      [default: 1] If --userLedger is set, this will get the first N
+  --ledgerAddresses=ledgerAddresses                      [default: 1] If --useLedger is set, this will get the first N
                                                          addresses for local signing
 
   --ledgerConfirmAddress                                 Set it to ask confirmation for the address of the transaction
                                                          from the ledger
 
-  --ledgerCustomAddresses=ledgerCustomAddresses          [default: [0]] If --userLedger is set, this will get the array
+  --ledgerCustomAddresses=ledgerCustomAddresses          [default: [0]] If --useLedger is set, this will get the array
                                                          of index addresses for local signing. Example
                                                          --ledgerCustomAddresses "[4,99]"
 
@@ -159,13 +159,13 @@ USAGE
 OPTIONS
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
 
-  --ledgerAddresses=ledgerAddresses                      [default: 1] If --userLedger is set, this will get the first N
+  --ledgerAddresses=ledgerAddresses                      [default: 1] If --useLedger is set, this will get the first N
                                                          addresses for local signing
 
   --ledgerConfirmAddress                                 Set it to ask confirmation for the address of the transaction
                                                          from the ledger
 
-  --ledgerCustomAddresses=ledgerCustomAddresses          [default: [0]] If --userLedger is set, this will get the array
+  --ledgerCustomAddresses=ledgerCustomAddresses          [default: [0]] If --useLedger is set, this will get the array
                                                          of index addresses for local signing. Example
                                                          --ledgerCustomAddresses "[4,99]"
 
@@ -185,13 +185,13 @@ USAGE
 OPTIONS
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
 
-  --ledgerAddresses=ledgerAddresses                      [default: 1] If --userLedger is set, this will get the first N
+  --ledgerAddresses=ledgerAddresses                      [default: 1] If --useLedger is set, this will get the first N
                                                          addresses for local signing
 
   --ledgerConfirmAddress                                 Set it to ask confirmation for the address of the transaction
                                                          from the ledger
 
-  --ledgerCustomAddresses=ledgerCustomAddresses          [default: [0]] If --userLedger is set, this will get the array
+  --ledgerCustomAddresses=ledgerCustomAddresses          [default: [0]] If --useLedger is set, this will get the array
                                                          of index addresses for local signing. Example
                                                          --ledgerCustomAddresses "[4,99]"
 
@@ -217,13 +217,13 @@ OPTIONS
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
   --group=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d     (required) Address of the group to revoke votes from
 
-  --ledgerAddresses=ledgerAddresses                      [default: 1] If --userLedger is set, this will get the first N
+  --ledgerAddresses=ledgerAddresses                      [default: 1] If --useLedger is set, this will get the first N
                                                          addresses for local signing
 
   --ledgerConfirmAddress                                 Set it to ask confirmation for the address of the transaction
                                                          from the ledger
 
-  --ledgerCustomAddresses=ledgerCustomAddresses          [default: [0]] If --userLedger is set, this will get the array
+  --ledgerCustomAddresses=ledgerCustomAddresses          [default: [0]] If --useLedger is set, this will get the array
                                                          of index addresses for local signing. Example
                                                          --ledgerCustomAddresses "[4,99]"
 
@@ -251,13 +251,13 @@ OPTIONS
   -v, --value=value                                      (required) Property value to set
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
 
-  --ledgerAddresses=ledgerAddresses                      [default: 1] If --userLedger is set, this will get the first N
+  --ledgerAddresses=ledgerAddresses                      [default: 1] If --useLedger is set, this will get the first N
                                                          addresses for local signing
 
   --ledgerConfirmAddress                                 Set it to ask confirmation for the address of the transaction
                                                          from the ledger
 
-  --ledgerCustomAddresses=ledgerCustomAddresses          [default: [0]] If --userLedger is set, this will get the array
+  --ledgerCustomAddresses=ledgerCustomAddresses          [default: [0]] If --useLedger is set, this will get the array
                                                          of index addresses for local signing. Example
                                                          --ledgerCustomAddresses "[4,99]"
 
@@ -284,13 +284,13 @@ USAGE
 OPTIONS
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d       (required) Address of the ReleaseGold Contract
 
-  --ledgerAddresses=ledgerAddresses                           [default: 1] If --userLedger is set, this will get the
+  --ledgerAddresses=ledgerAddresses                           [default: 1] If --useLedger is set, this will get the
                                                               first N addresses for local signing
 
   --ledgerConfirmAddress                                      Set it to ask confirmation for the address of the
                                                               transaction from the ledger
 
-  --ledgerCustomAddresses=ledgerCustomAddresses               [default: [0]] If --userLedger is set, this will get the
+  --ledgerCustomAddresses=ledgerCustomAddresses               [default: [0]] If --useLedger is set, this will get the
                                                               array of index addresses for local signing. Example
                                                               --ledgerCustomAddresses "[4,99]"
 
@@ -326,13 +326,13 @@ OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d         (required) Address to submit multisig transaction from (one
                                                             of the owners)
 
-  --ledgerAddresses=ledgerAddresses                         [default: 1] If --userLedger is set, this will get the first
+  --ledgerAddresses=ledgerAddresses                         [default: 1] If --useLedger is set, this will get the first
                                                             N addresses for local signing
 
   --ledgerConfirmAddress                                    Set it to ask confirmation for the address of the
                                                             transaction from the ledger
 
-  --ledgerCustomAddresses=ledgerCustomAddresses             [default: [0]] If --userLedger is set, this will get the
+  --ledgerCustomAddresses=ledgerCustomAddresses             [default: [0]] If --useLedger is set, this will get the
                                                             array of index addresses for local signing. Example
                                                             --ledgerCustomAddresses "[4,99]"
 
@@ -358,13 +358,13 @@ USAGE
 OPTIONS
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
 
-  --ledgerAddresses=ledgerAddresses                      [default: 1] If --userLedger is set, this will get the first N
+  --ledgerAddresses=ledgerAddresses                      [default: 1] If --useLedger is set, this will get the first N
                                                          addresses for local signing
 
   --ledgerConfirmAddress                                 Set it to ask confirmation for the address of the transaction
                                                          from the ledger
 
-  --ledgerCustomAddresses=ledgerCustomAddresses          [default: [0]] If --userLedger is set, this will get the array
+  --ledgerCustomAddresses=ledgerCustomAddresses          [default: [0]] If --useLedger is set, this will get the array
                                                          of index addresses for local signing. Example
                                                          --ledgerCustomAddresses "[4,99]"
 
@@ -391,13 +391,13 @@ USAGE
 OPTIONS
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
 
-  --ledgerAddresses=ledgerAddresses                      [default: 1] If --userLedger is set, this will get the first N
+  --ledgerAddresses=ledgerAddresses                      [default: 1] If --useLedger is set, this will get the first N
                                                          addresses for local signing
 
   --ledgerConfirmAddress                                 Set it to ask confirmation for the address of the transaction
                                                          from the ledger
 
-  --ledgerCustomAddresses=ledgerCustomAddresses          [default: [0]] If --userLedger is set, this will get the array
+  --ledgerCustomAddresses=ledgerCustomAddresses          [default: [0]] If --useLedger is set, this will get the array
                                                          of index addresses for local signing. Example
                                                          --ledgerCustomAddresses "[4,99]"
 
@@ -425,13 +425,13 @@ OPTIONS
   --distributionRatio=distributionRatio                  (required) Amount in range [0, 1000] (3 significant figures)
                                                          indicating % of total balance available for distribution.
 
-  --ledgerAddresses=ledgerAddresses                      [default: 1] If --userLedger is set, this will get the first N
+  --ledgerAddresses=ledgerAddresses                      [default: 1] If --useLedger is set, this will get the first N
                                                          addresses for local signing
 
   --ledgerConfirmAddress                                 Set it to ask confirmation for the address of the transaction
                                                          from the ledger
 
-  --ledgerCustomAddresses=ledgerCustomAddresses          [default: [0]] If --userLedger is set, this will get the array
+  --ledgerCustomAddresses=ledgerCustomAddresses          [default: [0]] If --useLedger is set, this will get the array
                                                          of index addresses for local signing. Example
                                                          --ledgerCustomAddresses "[4,99]"
 
@@ -456,13 +456,13 @@ USAGE
 OPTIONS
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
 
-  --ledgerAddresses=ledgerAddresses                      [default: 1] If --userLedger is set, this will get the first N
+  --ledgerAddresses=ledgerAddresses                      [default: 1] If --useLedger is set, this will get the first N
                                                          addresses for local signing
 
   --ledgerConfirmAddress                                 Set it to ask confirmation for the address of the transaction
                                                          from the ledger
 
-  --ledgerCustomAddresses=ledgerCustomAddresses          [default: [0]] If --userLedger is set, this will get the array
+  --ledgerCustomAddresses=ledgerCustomAddresses          [default: [0]] If --useLedger is set, this will get the array
                                                          of index addresses for local signing. Example
                                                          --ledgerCustomAddresses "[4,99]"
 
@@ -485,13 +485,13 @@ USAGE
 OPTIONS
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
 
-  --ledgerAddresses=ledgerAddresses                      [default: 1] If --userLedger is set, this will get the first N
+  --ledgerAddresses=ledgerAddresses                      [default: 1] If --useLedger is set, this will get the first N
                                                          addresses for local signing
 
   --ledgerConfirmAddress                                 Set it to ask confirmation for the address of the transaction
                                                          from the ledger
 
-  --ledgerCustomAddresses=ledgerCustomAddresses          [default: [0]] If --userLedger is set, this will get the array
+  --ledgerCustomAddresses=ledgerCustomAddresses          [default: [0]] If --useLedger is set, this will get the array
                                                          of index addresses for local signing. Example
                                                          --ledgerCustomAddresses "[4,99]"
 
@@ -519,13 +519,13 @@ USAGE
 OPTIONS
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
 
-  --ledgerAddresses=ledgerAddresses                      [default: 1] If --userLedger is set, this will get the first N
+  --ledgerAddresses=ledgerAddresses                      [default: 1] If --useLedger is set, this will get the first N
                                                          addresses for local signing
 
   --ledgerConfirmAddress                                 Set it to ask confirmation for the address of the transaction
                                                          from the ledger
 
-  --ledgerCustomAddresses=ledgerCustomAddresses          [default: [0]] If --userLedger is set, this will get the array
+  --ledgerCustomAddresses=ledgerCustomAddresses          [default: [0]] If --useLedger is set, this will get the array
                                                          of index addresses for local signing. Example
                                                          --ledgerCustomAddresses "[4,99]"
 
