@@ -54,7 +54,6 @@ To illustrate this, you may refer to the following table:
 | Validator              |                      |                       | TCP: Proxy        |
 | Proxy                  | tcp:30303, udp:30303 | tcp:30503             |                   |
 | Attestation            | tcp:80               |                       |                   |
-|                        |                      |                       |                   |
 
 ### Software requirements
 
