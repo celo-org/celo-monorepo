@@ -72,8 +72,8 @@ export abstract class BaseCommand extends LocalCommand {
       ...BaseCommand.flags,
       privateKey: flags.string({ hidden: true }),
       useLedger: flags.boolean({ hidden: true }),
-      ledgerAddresses: flags.integer({ hidden: true }),
-      ledgerCustomAddresses: flags.string({ hidden: true }),
+      ledgerAddresses: flags.integer({ hidden: true, default: 1 }),
+      ledgerCustomAddresses: flags.string({ hidden: true, default: '[0]' }),
       ledgerConfirmAddress: flags.boolean({ hidden: true }),
     }
   }
