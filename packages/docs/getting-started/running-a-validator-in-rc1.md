@@ -105,7 +105,7 @@ There are number of environment variables in this guide, and you may use this ta
 | Variable                             | Explanation                                                                                                                          |
 | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------ |
 | CELO_IMAGE                           | The Docker image used for the Validator and proxy containers                                                                         |
-| NETWORK_ID                           | The Celo Baklava network chain ID                                                                                                    |
+| NETWORK_ID                           | The Celo RC1 network chain ID                                                                                                    |
 | CELO_VALIDATOR_GROUP_ADDRESS         | The account address for the Validator Group; the `ReleaseGold` beneficiary address for the Validator Group                                                                                          |
 | CELO_VALIDATOR_ADDRESS         | The account address for the Validator; the `ReleaseGold` beneficiary address for the Validator                                                                                          |
 | CELO_VALIDATOR_GROUP_RG_ADDRESS         | The `ReleaseGold` contract address for the Validator Group                                                                                          |
@@ -165,12 +165,12 @@ This section outlines the steps needed to configure your Proxy and Validator nod
 First we are going to set up the main environment variables related to the RC1 network. Run these on both your **Validator** and **Proxy** machines:
 
 ```bash
-export CELO_IMAGE=us.gcr.io/celo-testnet/celo-node:baklava
-export NETWORK_ID=40120
+export CELO_IMAGE=us.gcr.io/celo-testnet/celo-node:rc1
+export NETWORK_ID=42220
 export CELO_VALIDATOR_SIGNER_ADDRESS=<YOUR-VALIDATOR-SIGNER-ADDRESS>
 ```
 
-Please use the Validator signer address that you submitted through your Gist file. It is included in the genesis Validator set. If you plan to run additional validators once the network is up and running you will need to create additional validator signer addresses.
+Please use the Validator signer address that you submitted through your Gist file. It is included in the [genesis Validator set](https://github.com/celo-org/celo-monorepo/blob/asaj/rc1/packages/celotool/genesis_rc1.json). If you plan to run additional validators once the network is up and running you will need to create additional validator signer addresses.
 
 ### Pull the Celo Docker image
 
@@ -180,7 +180,7 @@ In all the commands we are going to see the `CELO_IMAGE` variable to refer to th
 docker pull $CELO_IMAGE
 ```
 
-The `us.gcr.io/celo-testnet/celo-node:baklava` image is built from commit [`c38f2fd30d2d7c4716a5181c9645121709b9004e`](https://github.com/celo-org/celo-blockchain/commit/c38f2fd30d2d7c4716a5181c9645121709b9004e) and contains the [genesis block](https://storage.cloud.google.com/genesis_blocks/baklava) and [bootnode information](https://storage.cloud.google.com/env_bootnodes/baklava) in addition to the Celo Blockchain binary.
+The `us.gcr.io/celo-testnet/celo-node:rc1` image is built from commit [`c38f2fd30d2d7c4716a5181c9645121709b9004e`](https://github.com/celo-org/celo-blockchain/commit/c38f2fd30d2d7c4716a5181c9645121709b9004e) and contains the [genesis block](https://github.com/celo-org/celo-monorepo/blob/asaj/rc1/packages/celotool/genesis_rc1.json) and [bootnode information](https://storage.cloud.google.com/env_bootnodes/baklava) in addition to the Celo Blockchain binary.
 
 ### Networking requirements
 
@@ -200,7 +200,7 @@ docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE init /celo/genesis.json
 export BOOTNODE_ENODES="$(docker run --rm --entrypoint cat $CELO_IMAGE /celo/bootnodes)"
 ```
 
-You can then run the proxy with the following command. Be sure to replace `<YOUR-VALIDATOR-NAME>` with the name you'd like to appear on Celostats. The validator name shown in [Celostats](https://baklava-celostats.celo-testnet.org/) will be the name configured in the proxy.
+You can then run the proxy with the following command. Be sure to replace `<YOUR-VALIDATOR-NAME>` with the name you'd like to appear on Celostats. The validator name shown in [Celostats](https://stats.celo.org/) will be the name configured in the proxy.
 
 Additionally, you need to unlock the account configured in the `etherbase` option. It is recommended to create a new account and independent account only for this purpose. Be sure to write a new password to `./.password` for this account (different to the Validator Signer password)
 
@@ -216,7 +216,7 @@ Notice the public address returned by this command, that can be exported and use
 # On the proxy machine
 export PROXY_ADDRESS=<PROXY-PUBLIC-ADDRESS>
 
-docker run --name celo-proxy -it --restart unless-stopped -p 30303:30303 -p 30303:30303/udp -p 30503:30503 -p 30503:30503/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --nousb --syncmode full --proxy.proxy --proxy.proxiedvalidatoraddress $CELO_VALIDATOR_SIGNER_ADDRESS --proxy.internalendpoint :30503 --etherbase $PROXY_ADDRESS --unlock $PROXY_ADDRESS --password /root/.celo/.password --allow-insecure-unlock --bootnodes $BOOTNODE_ENODES --ethstats=<YOUR-VALIDATOR-NAME>@baklava-celostats-server.celo-testnet.org
+docker run --name celo-proxy -it --restart unless-stopped -p 30303:30303 -p 30303:30303/udp -p 30503:30503 -p 30503:30503/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --nousb --syncmode full --proxy.proxy --proxy.proxiedvalidatoraddress $CELO_VALIDATOR_SIGNER_ADDRESS --proxy.internalendpoint :30503 --etherbase $PROXY_ADDRESS --unlock $PROXY_ADDRESS --password /root/.celo/.password --allow-insecure-unlock --bootnodes $BOOTNODE_ENODES --ethstats=<YOUR-VALIDATOR-NAME>@stats-server.celo.org
 ```
 
 {% hint style="info" %}
@@ -276,10 +276,10 @@ Once that is completed, go ahead and run the Validator. Be sure to write your Va
 ```bash
 # On the Validator machine
 docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE init /celo/genesis.json
-docker run --name celo-validator -it --restart unless-stopped -p 30303:30303 -p 30303:30303/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --mine --istanbul.blockperiod=5 --istanbul.requesttimeout=3000 --etherbase $CELO_VALIDATOR_SIGNER_ADDRESS --nodiscover --nousb --proxy.proxied --proxy.proxyenodeurlpair=enode://$PROXY_ENODE@$PROXY_INTERNAL_IP:30503\;enode://$PROXY_ENODE@$PROXY_EXTERNAL_IP:30303 --unlock=$CELO_VALIDATOR_SIGNER_ADDRESS --password /root/.celo/.password --ethstats=<YOUR-VALIDATOR-NAME>@baklava-celostats-server.celo-testnet.org
+docker run --name celo-validator -it --restart unless-stopped -p 30303:30303 -p 30303:30303/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --mine --istanbul.blockperiod=5 --istanbul.requesttimeout=3000 --etherbase $CELO_VALIDATOR_SIGNER_ADDRESS --nodiscover --nousb --proxy.proxied --proxy.proxyenodeurlpair=enode://$PROXY_ENODE@$PROXY_INTERNAL_IP:30503\;enode://$PROXY_ENODE@$PROXY_EXTERNAL_IP:30303 --unlock=$CELO_VALIDATOR_SIGNER_ADDRESS --password /root/.celo/.password --ethstats=<YOUR-VALIDATOR-NAME>@stats-server.celo.org
 ```
 
-The `networkid` parameter value of `40120` indicates we are connecting to the Mainnet Release Candidate 1 network.
+The `networkid` parameter value of `42220` indicates we are connecting to the Mainnet Release Candidate 1 network.
 
 At this point your proxy should be peering with other nodes as they come online. Your Validator will not automatically peer with the proxy until block production starts after the genesis timestamp, so it will not have any peers at this moment. You should see a `Mining too far in the future` log message from the Validator, which indicates it is waiting for the genesis timestamp to pass. On April 22nd at 16:00 UTC, the Validator consensus engine will start, and after a few minutes to establish the Validator overlay network, block production will begin.
 
@@ -287,13 +287,13 @@ At this point your proxy should be peering with other nodes as they come online.
 
 In the days following block production, core contracts and  `ReleaseGold` contracts will be deployed, and the community will vote on a series of governance proposals to establish full network functionality, at which point RC1 will be declared Mainnet.
 
-If you were a Celo Stake Off winner, you should have received an award for cGLD. `ReleaseGold` contracts will have been deployed at this point, with each beneficiary address you provided in the RC1 Gist corresponding to a single `ReleaseGold` contract. `ReleaseGold` is the same mechanism that will be used to distribute Celo Gold to Stake Off participants, so it will be used in Baklava to give you a chance to get familiar with the process. At a high level, `ReleaseGold` holds a balance for scheduled release, while allowing the held balance to be used for certain actions such as validating and voting, depending on the configuration of the contract. [Read more about `ReleaseGold`.](../celo-codebase/protocol/release-gold.md)
+If you were a Celo Stake Off winner, you should have received an award for cGLD. `ReleaseGold` contracts will have been deployed at this point, with each beneficiary address you provided in the RC1 Gist corresponding to a single `ReleaseGold` contract. At a high level, `ReleaseGold` holds a balance for scheduled release, while allowing the held balance to be used for certain actions such as validating and voting, depending on the configuration of the contract. [Read more about `ReleaseGold`.](../celo-codebase/protocol/release-gold.md)
 
 ### Core Contract Deployment
 
 Much of the functionality of the Celo protocol is implemented in smart contracts. At the start of block production, core features such as Validator elections, will not be operational. In order to bring the network into its fully operational state, a deployer encoded in the genesis block will create the core contracts and finally transfer ownership of the contracts to the Governance contract. In the RC1 network, cLabs will play the role of deployer.
 
-Contract deployment will begin shortly after block production, and may take several hours to complete. On the Baklava network, the deployer address is `0xE23a4c6615669526Ab58E9c37088bee4eD2b2dEE` and one way to track progress of the deployment is to watch the transactions submitted by that address on [Blockscout](https://baklava-blockscout.celo-testnet.org/address/0x469be98FE71AFf8F6e7f64F9b732e28A03596B5C/transactions).
+Contract deployment will begin shortly after block production, and may take several hours to complete. On the RC1 network, the deployer address is `0xE23a4c6615669526Ab58E9c37088bee4eD2b2dEE` and one way to track progress of the deployment is to watch the transactions submitted by that address on [Blockscout](https://explorer.celo.org/).
 
 ### Actions Required After Core Contract Deployment
 
@@ -595,7 +595,7 @@ You can inspect the current state of the Validator elections by running:
 celocli election:list
 ```
 
-You can check the status of your Validator, including whether it is elected and signing blocks, at [baklava-celostats.celo-testnet.org](https://baklava-celostats.celo-testnet.org) or by running:
+You can check the status of your Validator, including whether it is elected and signing blocks, at [stats.celo.org/](https://stats.celo.org/) or by running:
 
 ```bash
 # On your local machine
