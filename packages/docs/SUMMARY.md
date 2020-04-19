@@ -5,21 +5,26 @@
 
 ## Getting Started
 
-- [Alfajores Testnet](getting-started/alfajores-testnet.md)
-  - [Using the Mobile Wallet](getting-started/using-the-mobile-wallet.md)
-  - [Getting an Account and Funds](getting-started/faucet.md)
+- [Mainnet Release Candidate 1](getting-started/rc1.md)
+  - [Running a Validator](getting-started/running-a-validator-in-rc1.md)
 - [Baklava Testnet](getting-started/baklava-testnet.md)
   - [Running a Validator](getting-started/running-a-validator-in-baklava.md)
   - [Running a Full Node](getting-started/running-a-full-node.md)
+- [Alfajores Testnet](getting-started/alfajores-testnet.md)
+  - [Using the Mobile Wallet](getting-started/using-the-mobile-wallet.md)
+  - [Getting an Account and Funds](getting-started/faucet.md)
 - [Glossary](GLOSSARY.md)
 
 ## Operations Manual
 
-- [Governance](operations-manual/governance.md)
-- [Key Management](operations-manual/key-management.md)
-  - [Using a Ledger Wallet](operations-manual/using-a-ledger-wallet.md)
+- [Key Management](operations-manual/key-management/summary.md)
+  - [Detailed Role Descriptions](operations-manual/key-management/detailed.md)
+  - [Validator Signer Key Rotation](operations-manual/key-management/key-rotation.md)
+  - [Using a Ledger Wallet](operations-manual/key-management/ledger.md)
+- [Celo Foundation Voting Policy](operations-manual/celo-foundation-voting-policy.md)
 - [Securing Celo Nodes and Services](operations-manual/securing-nodes-and-services.md)
 - [Upgrading a Node](operations-manual/node-upgrades.md)
+- [Governance](operations-manual/governance.md)
 
 ## Celo Codebase
 
