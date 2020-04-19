@@ -111,6 +111,7 @@ resource "aws_db_instance" "attestation" {
   multi_az               = true
   db_subnet_group_name   = aws_db_subnet_group.attestation.name
   vpc_security_group_ids = [module.celo_vpc.security_group_ids.attestation_db]
+  skip_final_snapshot    = true
 }
 
 locals {
