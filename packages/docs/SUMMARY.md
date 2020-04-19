@@ -5,12 +5,14 @@
 
 ## Getting Started
 
-- [Alfajores Testnet](getting-started/alfajores-testnet.md)
-  - [Using the Mobile Wallet](getting-started/using-the-mobile-wallet.md)
-  - [Getting an Account and Funds](getting-started/faucet.md)
+- [Mainnet Release Candidate 1](getting-started/rc1.md)
+  - [Running a Validator](getting-started/running-a-validator-in-rc1.md)
 - [Baklava Testnet](getting-started/baklava-testnet.md)
   - [Running a Validator](getting-started/running-a-validator-in-baklava.md)
   - [Running a Full Node](getting-started/running-a-full-node.md)
+- [Alfajores Testnet](getting-started/alfajores-testnet.md)
+  - [Using the Mobile Wallet](getting-started/using-the-mobile-wallet.md)
+  - [Getting an Account and Funds](getting-started/faucet.md)
 - [Glossary](GLOSSARY.md)
 
 ## Operations Manual
