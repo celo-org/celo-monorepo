@@ -1,5 +1,4 @@
 import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
-import { CeloProvider } from '@celo/contractkit/lib/providers/celo-provider'
 import { AzureHSMWallet } from '@celo/contractkit/lib/wallets/azure-hsm-wallet'
 import { stopProvider } from '@celo/contractkit/lib/utils/provider-utils'
 import {
