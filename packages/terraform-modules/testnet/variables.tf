@@ -118,6 +118,12 @@ variable network_name {
   description = "The name of the network to use"
 }
 
+variable private_tx_node_count {
+  type        = number
+  description = "Number of private tx-nodes that are created with RPC ports only internally exposed"
+  default     = 0
+}
+
 variable proxied_validator_count {
   type        = number
   description = "Number of validator_count validators that are hidden behind proxies"
@@ -125,7 +131,7 @@ variable proxied_validator_count {
 
 variable tx_node_count {
   type        = number
-  description = "Number of tx-nodes to create"
+  description = "Number of public tx-nodes to create"
 }
 
 variable validator_count {

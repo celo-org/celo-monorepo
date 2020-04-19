@@ -1,10 +1,14 @@
 import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
-import { CeloProvider } from '@celo/contractkit/lib/providers/celo-provider'
-import { newLedgerWalletWithSetup } from '@celo/contractkit/lib/wallets/ledger-wallet'
+import { stopProvider } from '@celo/contractkit/lib/utils/provider-utils'
+import {
+  AddressValidation,
+  newLedgerWalletWithSetup,
+} from '@celo/contractkit/lib/wallets/ledger-wallet'
 import { Wallet } from '@celo/contractkit/lib/wallets/wallet'
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid'
 import { Command, flags } from '@oclif/command'
 import { ParserOutput } from '@oclif/parser/lib/parse'
+import net from 'net'
 import Web3 from 'web3'
 import { getNodeUrl } from './utils/config'
 import { requireNodeIsSynced } from './utils/helpers'
@@ -40,11 +44,39 @@ export abstract class BaseCommand extends LocalCommand {
     node: flags.string({ char: 'n', hidden: true }),
     useLedger: flags.boolean({
       default: false,
-      hidden: true,
+      hidden: false,
       description: 'Set it to use a ledger wallet',
+    }),
+    ledgerAddresses: flags.integer({
+      default: 1,
+      hidden: false,
+      exclusive: ['ledgerCustomAddresses'],
+      description: 'If --useLedger is set, this will get the first N addresses for local signing',
+    }),
+    ledgerCustomAddresses: flags.string({
+      default: '[0]',
+      hidden: false,
+      exclusive: ['ledgerAddresses'],
+      description:
+        'If --useLedger is set, this will get the array of index addresses for local signing. Example --ledgerCustomAddresses "[4,99]"',
+    }),
+    ledgerConfirmAddress: flags.boolean({
+      default: false,
+      hidden: false,
+      description: 'Set it to ask confirmation for the address of the transaction from the ledger',
     }),
   }
 
+  static flagsWithoutLocalAddresses() {
+    return {
+      ...BaseCommand.flags,
+      privateKey: flags.string({ hidden: true }),
+      useLedger: flags.boolean({ hidden: true }),
+      ledgerAddresses: flags.integer({ hidden: true, default: 1 }),
+      ledgerCustomAddresses: flags.string({ hidden: true, default: '[0]' }),
+      ledgerConfirmAddress: flags.boolean({ hidden: true }),
+    }
+  }
   // This specifies whether the node needs to be synced before the command
   // can be run. In most cases, this should be `true`, so that's the default.
   // For commands that don't require the node is synced, add the following line
@@ -56,17 +88,14 @@ export abstract class BaseCommand extends LocalCommand {
   private _kit: ContractKit | null = null
   private _wallet?: Wallet
 
-  // This is required since we wrap the provider with a debug provider and
-  // there is no way to unwrap the provider afterwards.
-  // We need access to the original provider, so that, we can close it.
-  private _originalProvider: any | null = null
-
   get web3() {
     if (!this._web3) {
       const res: ParserOutput<any, any> = this.parse()
       const nodeUrl = (res.flags && res.flags.node) || getNodeUrl(this.config.configDir)
-      this._web3 = new Web3(nodeUrl)
-      this._originalProvider = this._web3.currentProvider
+      this._web3 =
+        nodeUrl && nodeUrl.endsWith('.ipc')
+          ? new Web3(new Web3.providers.IpcProvider(nodeUrl, net))
+          : new Web3(nodeUrl)
     }
     return this._web3
   }
@@ -92,7 +121,23 @@ export abstract class BaseCommand extends LocalCommand {
       let transport: Transport
       try {
         transport = await TransportNodeHid.open('')
-        this._wallet = await newLedgerWalletWithSetup(transport)
+        const derivationPathIndexes = res.raw.some(
+          (value) => (value as any).flag === 'ledgerCustomAddresses'
+        )
+          ? JSON.parse(res.flags.ledgerCustomAddresses)
+          : Array.from(Array(res.flags.ledgerAddresses).keys())
+
+        console.log('Retrieving derivation Paths', derivationPathIndexes)
+        let ledgerConfirmation = AddressValidation.never
+        if (res.flags.ledgerConfirmAddress) {
+          ledgerConfirmation = AddressValidation.everyTransaction
+        }
+        this._wallet = await newLedgerWalletWithSetup(
+          transport,
+          derivationPathIndexes,
+          undefined,
+          ledgerConfirmation
+        )
       } catch (err) {
         console.log('Check if the ledger is connected and logged.')
         throw err
@@ -102,21 +147,7 @@ export abstract class BaseCommand extends LocalCommand {
 
   finally(arg: Error | undefined): Promise<any> {
     try {
-      // If local-signing accounts are added, the debug wrapper is itself wrapped
-      // with a CeloProvider. This class has a stop() function that handles closing
-      // the connection for underlying providers
-      if (this.web3.currentProvider instanceof CeloProvider) {
-        const celoProvider = this.web3.currentProvider as CeloProvider
-        celoProvider.stop()
-      }
-
-      if (this._originalProvider && this._originalProvider.hasOwnProperty('connection')) {
-        // Close the web3 connection or the CLI hangs forever.
-        const connection = this._originalProvider.connection
-        if (connection.hasOwnProperty('_connection')) {
-          connection._connection.close()
-        }
-      }
+      stopProvider(this.web3.currentProvider)
     } catch (error) {
       this.log(`Failed to close the connection: ${error}`)
     }

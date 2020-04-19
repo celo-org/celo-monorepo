@@ -2,6 +2,7 @@ import { Address } from '@celo/contractkit'
 import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
 import { GovernanceWrapper, ProposalStage } from '@celo/contractkit/lib/wrappers/Governance'
 import { LockedGoldWrapper } from '@celo/contractkit/lib/wrappers/LockedGold'
+import { MultiSigWrapper } from '@celo/contractkit/lib/wrappers/MultiSig'
 import { ValidatorsWrapper } from '@celo/contractkit/lib/wrappers/Validators'
 import { eqAddress, NULL_ADDRESS } from '@celo/utils/lib/address'
 import { verifySignature } from '@celo/utils/lib/signatureUtils'
@@ -262,7 +263,7 @@ class CheckBuilder {
       `${this.signer!} is vote signer or registered account`,
       this.withAccounts(async (accs) => {
         return accs.voteSignerToAccount(this.signer!).then(
-          () => true,
+          (addr) => !eqAddress(addr, NULL_ADDRESS),
           () => false
         )
       })
@@ -352,7 +353,18 @@ class CheckBuilder {
           account
         )
         const { duration } = await v.getValidatorLockedGoldRequirements()
-        return duration.toNumber() + lastRemovedFromGroupTimestamp < Date.now()
+        return duration.toNumber() + lastRemovedFromGroupTimestamp < Date.now() / 1000
+      })
+    )
+  }
+
+  resetSlashingmultiplierPeriodPassed = () => {
+    return this.addCheck(
+      `Enough time has passed since the last halving of the slashing multiplier`,
+      this.withValidators(async (v, _signer, account) => {
+        const { lastSlashed } = await v.getValidatorGroup(account)
+        const duration = await v.getSlashingMultiplierResetPeriod()
+        return duration.toNumber() + lastSlashed.toNumber() < Date.now() / 1000
       })
     )
   }
@@ -375,6 +387,13 @@ class CheckBuilder {
         return vg.nextCommissionBlock.lte(blockNumber)
       })
     )
+
+  isMultiSigOwner = (from: string, multisig: MultiSigWrapper) => {
+    return this.addCheck('The provided address is an owner of the multisig', async () => {
+      const owners = await multisig.getOwners()
+      return owners.indexOf(from) > -1
+    })
+  }
 
   async runChecks() {
     console.log(`Running Checks:`)

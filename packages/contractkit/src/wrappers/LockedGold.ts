@@ -44,6 +44,7 @@ export interface PendingWithdrawal {
 
 export interface LockedGoldConfig {
   unlockingPeriod: BigNumber
+  totalLockedGold: BigNumber
 }
 
 /**
@@ -145,6 +146,17 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
   )
 
   /**
+   * Returns the total amount of locked gold in the system. Note that this does not include
+   *   gold that has been unlocked but not yet withdrawn.
+   * @returns The total amount of locked gold in the system.
+   */
+  getTotalLockedGold = proxyCall(
+    this.contract.methods.getTotalLockedGold,
+    undefined,
+    valueToBigNumber
+  )
+
+  /**
    * Returns the total amount of non-voting locked gold for an account.
    * @param account The account.
    * @return The total amount of non-voting locked gold for an account.
@@ -161,6 +173,7 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
   async getConfig(): Promise<LockedGoldConfig> {
     return {
       unlockingPeriod: valueToBigNumber(await this.contract.methods.unlockingPeriod().call()),
+      totalLockedGold: await this.getTotalLockedGold(),
     }
   }
 

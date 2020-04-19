@@ -17,6 +17,7 @@ import { getLocalCurrencyExchangeRate } from 'src/localCurrency/selectors'
 import useSelector from 'src/redux/useSelector'
 import { goldToDollarAmount } from 'src/utils/currencyExchange'
 import { getLocalCurrencyDisplayValue } from 'src/utils/formatting'
+import { formatFeedDate } from 'src/utils/time'
 // @ts-ignore
 import { VictoryGroup, VictoryLine, VictoryScatter } from 'victory-native'
 
@@ -141,7 +142,7 @@ function Loader() {
   )
 }
 
-function CeloGoldHistoryChart({ t, testID }: Props) {
+function CeloGoldHistoryChart({ t, testID, i18n }: Props) {
   const calculateGroup = useCallback((er) => {
     return Math.floor(er.timestamp / (range / CHART_POINTS_NUMBER))
   }, [])
@@ -169,9 +170,9 @@ function CeloGoldHistoryChart({ t, testID }: Props) {
   }
 
   const groupedExchangeHistory = _.groupBy(exchangeHistory.celoGoldExchangeRates, calculateGroup)
-  const latestGroup = calculateGroup(
+  const latestExchangeRate =
     exchangeHistory.celoGoldExchangeRates[exchangeHistory.celoGoldExchangeRates.length - 1]
-  )
+  const latestGroup = calculateGroup(latestExchangeRate)
   const chartData = _.range(
     Math.min(CHART_POINTS_NUMBER - 1, Object.keys(groupedExchangeHistory).length),
     0,
@@ -212,6 +213,7 @@ function CeloGoldHistoryChart({ t, testID }: Props) {
     const offset = CHART_MIN_VERTICAL_RANGE - (max - min) / 2
     domain = { y: [min - offset, max + offset] }
   }
+  const rateWentUp = rateChange.gt(0)
 
   return (
     <View style={styles.container} testID={testID}>
@@ -223,9 +225,9 @@ function CeloGoldHistoryChart({ t, testID }: Props) {
           <Text style={styles.goldPriceCurrentValue}>
             {displayLocalCurrency(currentGoldRateInLocalCurrency)}
           </Text>
-          <Text style={styles.goldPriceChange}>
-            {rateChange.gt(0) ? '▴' : '▾'} {rateChange.toFixed(2)} (
-            {rateChangeInPercentage.toFixed(2)}%)
+          <Text style={rateWentUp ? styles.goldPriceWentUp : styles.goldPriceWentDown}>
+            {rateWentUp ? '▴' : '▾'} {rateChange.toFormat(2)} ({rateChangeInPercentage.toFormat(2)}
+            %)
           </Text>
         </View>
       </View>
@@ -243,7 +245,12 @@ function CeloGoldHistoryChart({ t, testID }: Props) {
         // @ts-ignore */}
         <VictoryScatter dataComponent={<RenderPoint />} />
       </VictoryGroup>
-      <Text style={styles.timeframe}>{t('global:timeframes.30d')}</Text>
+      <View style={styles.range}>
+        <Text style={styles.timeframe}>
+          {formatFeedDate(latestExchangeRate.timestamp - range, i18n)}
+        </Text>
+        <Text style={styles.timeframe}>{formatFeedDate(latestExchangeRate.timestamp, i18n)}</Text>
+      </View>
     </View>
   )
 }
@@ -257,6 +264,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingTop: variables.contentPadding,
+    paddingBottom: variables.contentPadding,
   },
   goldPriceTitle: {
     ...fontStyles.body,
@@ -267,11 +275,17 @@ const styles = StyleSheet.create({
   goldPriceCurrentValue: {
     fontSize: 24,
   },
-  goldPriceChange: {
+  goldPriceWentUp: {
     ...fontStyles.body,
     ...fontStyles.semiBold,
     color: colors.celoGreen,
   },
+  goldPriceWentDown: {
+    ...fontStyles.body,
+    ...fontStyles.semiBold,
+    color: colors.errorRed,
+  },
+
   loader: {
     width: CHART_WIDTH + 32,
     height: CHART_HEIGHT + 130,
@@ -279,16 +293,19 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   timeframe: {
-    textAlign: 'center',
-    fontSize: 16,
-    paddingBottom: 4,
     color: colors.gray,
+    fontSize: 16,
   },
   chartStyle: {
     paddingRight: 0,
     paddingTop: 32,
     marginTop: -32,
     paddingBottom: 16,
+  },
+  range: {
+    justifyContent: 'space-between',
+    flexDirection: 'row',
+    paddingBottom: 4,
   },
 })
 

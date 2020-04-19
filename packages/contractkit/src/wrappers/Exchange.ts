@@ -17,6 +17,7 @@ export interface ExchangeConfig {
   reserveFraction: BigNumber
   updateFrequency: BigNumber
   minimumReports: BigNumber
+  lastBucketUpdate: BigNumber
 }
 
 /**
@@ -47,6 +48,11 @@ export class ExchangeWrapper extends BaseWrapper<Exchange> {
    * commit to the gold bucket
    */
   minimumReports = proxyCall(this.contract.methods.minimumReports, undefined, valueToBigNumber)
+  /**
+   * Query last bucket update
+   * @returns The timestamp of the last time exchange buckets were updated.
+   */
+  lastBucketUpdate = proxyCall(this.contract.methods.lastBucketUpdate, undefined, valueToBigNumber)
 
   /**
    * @dev Returns the amount of buyToken a user would get for sellAmount of sellToken
@@ -171,12 +177,14 @@ export class ExchangeWrapper extends BaseWrapper<Exchange> {
       this.reserveFraction(),
       this.updateFrequency(),
       this.minimumReports(),
+      this.lastBucketUpdate(),
     ])
     return {
       spread: res[0],
       reserveFraction: res[1],
       updateFrequency: res[2],
       minimumReports: res[3],
+      lastBucketUpdate: res[4],
     }
   }
   /**

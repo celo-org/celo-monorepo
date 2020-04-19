@@ -9,6 +9,7 @@ import { getAppLocked } from 'src/app/selectors'
 import { DEV_RESTORE_NAV_STATE_ON_RELOAD } from 'src/config'
 import { handleNavigationStateChange, setTopLevelNavigator } from 'src/navigator/NavigationService'
 import Navigator from 'src/navigator/Navigator'
+import PincodeLock from 'src/pincode/PincodeLock'
 import { RootState } from 'src/redux/reducers'
 import BackupPrompt from 'src/shared/BackupPrompt'
 import Logger from 'src/utils/Logger'
@@ -71,7 +72,11 @@ export class NavigatorWrapper extends React.Component<Props> {
           onNavigationStateChange={handleNavigationStateChange}
           {...getPersistenceFunctions()}
         />
-
+        {appLocked && (
+          <View style={styles.locked}>
+            <PincodeLock />
+          </View>
+        )}
         <View style={styles.floating}>
           {!appLocked && <BackupPrompt />}
           <AlertBanner />
@@ -93,6 +98,13 @@ const styles = StyleSheet.create({
     left: 0,
     top: 0,
     right: 0,
+  },
+  locked: {
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    right: 0,
+    bottom: 0,
   },
 })
 

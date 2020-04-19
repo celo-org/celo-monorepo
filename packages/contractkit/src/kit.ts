@@ -8,6 +8,7 @@ import { Address, CeloContract, CeloToken } from './base'
 import { WrapperCache } from './contract-cache'
 import { CeloProvider } from './providers/celo-provider'
 import { toTxResult, TransactionResult } from './utils/tx-result'
+import { estimateGas } from './utils/web3-utils'
 import { Wallet } from './wallets/wallet'
 import { Web3ContractCache } from './web3-contract-cache'
 import { AttestationsConfig } from './wrappers/Attestations'
@@ -67,6 +68,7 @@ export interface NetworkConfig {
 
 export interface KitOptions {
   gasInflationFactor: number
+  gasPrice: string
   feeCurrency?: Address
   from?: Address
 }
@@ -91,6 +93,8 @@ export class ContractKit {
   constructor(readonly web3: Web3, wallet?: Wallet) {
     this.config = {
       gasInflationFactor: 1.3,
+      // gasPrice:0 means the node will compute gasPrice on its own
+      gasPrice: '0',
     }
     if (!(web3.currentProvider instanceof CeloProvider)) {
       const celoProviderInstance = new CeloProvider(web3.currentProvider, wallet)
@@ -208,6 +212,14 @@ export class ContractKit {
     return this.config.gasInflationFactor
   }
 
+  set gasPrice(price: number) {
+    this.config.gasPrice = price.toString(10)
+  }
+
+  get gasPrice() {
+    return parseInt(this.config.gasPrice, 10)
+  }
+
   /**
    * Set the ERC20 address for the token to use to pay for transaction fees.
    * The ERC20 must be whitelisted for gas.
@@ -257,10 +269,15 @@ export class ContractKit {
 
     let gas = tx.gas
     if (gas == null) {
-      gas = Math.round(
-        (await this.web3.eth.estimateGas({ ...tx })) * this.config.gasInflationFactor
-      )
-      debug('estimatedGas: %s', gas)
+      try {
+        gas = Math.round(
+          (await estimateGas(tx, this.web3.eth.estimateGas, this.web3.eth.call)) *
+            this.config.gasInflationFactor
+        )
+        debug('estimatedGas: %s', gas)
+      } catch (e) {
+        throw new Error(e)
+      }
     }
 
     return toTxResult(
@@ -279,8 +296,20 @@ export class ContractKit {
 
     let gas = tx.gas
     if (gas == null) {
-      gas = Math.round((await txObj.estimateGas({ ...tx })) * this.config.gasInflationFactor)
-      debug('estimatedGas: %s', gas)
+      const gasEstimator = (_tx: Tx) => txObj.estimateGas({ ..._tx })
+      const getCallTx = (_tx: Tx) => {
+        // @ts-ignore missing _parent property from TransactionObject type.
+        return { ..._tx, data: txObj.encodeABI(), to: txObj._parent._address }
+      }
+      const caller = (_tx: Tx) => this.web3.eth.call(getCallTx(_tx))
+      try {
+        gas = Math.round(
+          (await estimateGas(tx, gasEstimator, caller)) * this.config.gasInflationFactor
+        )
+        debug('estimatedGas: %s', gas)
+      } catch (e) {
+        throw new Error(e)
+      }
     }
 
     return toTxResult(
@@ -295,8 +324,7 @@ export class ContractKit {
     const defaultTx: Tx = {
       from: this.config.from,
       feeCurrency: this.config.feeCurrency,
-      // gasPrice:0 means the node will compute gasPrice on it's own
-      gasPrice: '0',
+      gasPrice: this.config.gasPrice,
     }
 
     if (this.config.feeCurrency) {

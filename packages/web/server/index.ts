@@ -93,6 +93,20 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
     })
   })
 
+  server.get('/papers/stability', (_, res) => {
+    res.redirect('/papers/Celo_Stability_Analysis.pdf')
+  })
+
+  server.get('/papers/cbdc-velocity', (_, res) => {
+    res.redirect('/papers/cLabs_CBDC_Velocity_v2_04-2020.pdf')
+  })
+
+  server.get('/papers/whitepaper', (_, res) => {
+    res.redirect(
+      '/papers/Celo_A_Multi_Asset_Cryptographic_Protocol_for_Decentralized_Social_Payments.pdf'
+    )
+  })
+
   server.get('/brand', (_, res) => {
     res.redirect('/experience/brand')
   })
@@ -180,14 +194,19 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
 
   server.post('/partnerships-email', async (req, res) => {
     const { email } = req.body
-    await mailer({
-      toName: 'Team Celo',
-      toEmail: 'partnerships@celo.org',
-      fromEmail: 'partnerships@celo.org',
-      subject: `New Partnership Email: ${email}`,
-      text: email,
-    })
-    res.status(NO_CONTENT).send('ok')
+    try {
+      await mailer({
+        toName: 'Team Celo',
+        toEmail: 'partnerships@celo.org',
+        fromEmail: 'partnerships@celo.org',
+        subject: `New Partnership Email: ${email}`,
+        text: email,
+      })
+
+      res.status(NO_CONTENT).send('ok')
+    } catch (e) {
+      respondError(res, e)
+    }
   })
 
   server.get('/proxy/events/', async (_, res) => {

@@ -1,3 +1,4 @@
+import { Platform } from 'react-native'
 import { Actions, ActionTypes, AppState } from 'src/app/actions'
 import { getRehydratePayload, REHYDRATE, RehydrateAction } from 'src/redux/persist-helper'
 import { RootState } from 'src/redux/reducers'
@@ -7,11 +8,11 @@ export interface State {
   numberVerified: boolean
   language: string | null
   doingBackupFlow: boolean
-  doingPinVerification: boolean
   analyticsEnabled: boolean
   lockWithPinEnabled: boolean
   appState: AppState
   locked: boolean
+  lastTimeBackgrounded: number
 }
 
 const initialState = {
@@ -20,11 +21,11 @@ const initialState = {
   numberVerified: false,
   language: null,
   doingBackupFlow: false,
-  doingPinVerification: false,
   analyticsEnabled: true,
   lockWithPinEnabled: false,
   appState: AppState.Active,
   locked: false,
+  lastTimeBackgrounded: 0,
 }
 
 export const currentLanguageSelector = (state: RootState) => state.app.language
@@ -36,21 +37,25 @@ export const appReducer = (
   switch (action.type) {
     case REHYDRATE: {
       // Ignore some persisted properties
+      const rehydratePayload = getRehydratePayload(action, 'app')
       return {
         ...state,
-        ...getRehydratePayload(action, 'app'),
-        doingPinVerification: initialState.doingPinVerification,
+        ...rehydratePayload,
         appState: initialState.appState,
-        locked: initialState.locked,
+        locked: rehydratePayload.lockWithPinEnabled ?? initialState.locked,
       }
     }
     case Actions.SET_APP_STATE:
-      let appState = state.appState
+      let { appState, lastTimeBackgrounded } = state
       switch (action.state) {
         case 'background':
+          if (Platform.OS === 'android') {
+            lastTimeBackgrounded = Date.now()
+          }
           appState = AppState.Background
           break
-        case 'inactive':
+        case 'inactive': // occurs only on iOS
+          lastTimeBackgrounded = Date.now()
           appState = AppState.Inactive
           break
         case 'active':
@@ -60,6 +65,7 @@ export const appReducer = (
       return {
         ...state,
         appState,
+        lastTimeBackgrounded,
       }
     case Actions.SET_LOGGED_IN:
       return {
