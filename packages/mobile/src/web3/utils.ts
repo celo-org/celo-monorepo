@@ -35,11 +35,11 @@ export async function isAccountLocked(address: string) {
   return false
 }
 
-export async function* getLatestNonce(address: string) {
+export function* getLatestNonce(address: string) {
   Logger.debug(TAG, 'Fetching latest nonce (incl. pending)')
   const contractKit = yield call(getContractKit)
   // Note tx count is 1-indexed but nonces are 0-indexed
-  const nonce = contractKit.web3.eth.getTransactionCount(address, 'pending') - 1
+  const nonce = (yield call(contractKit.web3.eth.getTransactionCount, address, 'pending')) - 1
   Logger.debug(TAG, `Latest nonce found: ${nonce}`)
   return nonce
 }

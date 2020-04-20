@@ -68,9 +68,7 @@ export function* checkWeb3SyncProgress() {
       let syncProgress: boolean | Web3SyncProgress
 
       // isSyncing returns a syncProgress object when it's still syncing, false otherwise
-      Logger.debug(TAG, 'checkWeb3SyncProgress', 'About to get getContractKit')
       const contractKit = yield call(getContractKit)
-      Logger.debug(TAG, 'checkWeb3SyncProgress', 'Got ContractKit')
       syncProgress = contractKit.web3.eth.isSyncing
       Logger.debug(TAG, 'checkWeb3SyncProgress', `Sync progress: ${syncProgress}`)
 
