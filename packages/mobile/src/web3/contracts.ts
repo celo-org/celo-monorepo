@@ -11,6 +11,7 @@ import Logger from 'src/utils/Logger'
 import { contractKitReadySelector } from 'src/web3/selectors'
 import Web3 from 'web3'
 import { provider } from 'web3-core'
+import { Platform } from 'react-native'
 
 // Logging tag
 const tag = 'web3/contracts'
@@ -35,6 +36,21 @@ export async function getContractKitOutsideGenerator() {
     return contractKit
   } else {
     throw new Error('Contract Kit not yet ready')
+  }
+}
+
+function getWeb3(): Web3 {
+  Logger.info(
+    `${tag}@getWeb3`,
+    `Initializing web3, platform: ${Platform.OS}, forno mode: ${isInitiallyFornoMode()}`
+  )
+
+  if (isInitiallyFornoMode()) {
+    const url = DEFAULT_FORNO_URL
+    Logger.debug(`${tag}@getWeb3`, `Connecting to url ${url}`)
+    return new Web3(getHttpProvider(url))
+  } else {
+    return new Web3(getIpcProvider())
   }
 }
 

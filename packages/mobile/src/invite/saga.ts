@@ -50,6 +50,7 @@ import {
 } from 'src/web3/contracts'
 import { getConnectedUnlockedAccount, getOrCreateAccount, waitWeb3LastBlock } from 'src/web3/saga'
 import { fornoSelector } from 'src/web3/selectors'
+import Web3 from 'web3'
 
 const TAG = 'invite/saga'
 export const TEMP_PW = 'ce10'
@@ -86,7 +87,7 @@ export function getInvitationVerificationFeeInDollars() {
 }
 
 export function getInvitationVerificationFeeInWei() {
-  return new BigNumber(web3.utils.toWei(INVITE_FEE))
+  return new BigNumber(new Web3().utils.toWei(INVITE_FEE))
 }
 
 export async function generateInviteLink(inviteCode: string) {

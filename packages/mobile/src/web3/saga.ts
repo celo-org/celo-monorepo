@@ -12,6 +12,7 @@ import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { currentLanguageSelector } from 'src/app/reducers'
+import { waitForRehydrate } from 'src/app/saga'
 import { getWordlist } from 'src/backup/utils'
 import { features } from 'src/flags'
 import { cancelGethSaga } from 'src/geth/actions'
@@ -45,6 +46,7 @@ import {
 } from 'src/web3/selectors'
 import { getLatestBlock, isAccountLocked } from 'src/web3/utils'
 import { Block } from 'web3-eth'
+import { setContractKitReady } from 'src/web3/actions'
 
 const TAG = 'web3/saga'
 
@@ -455,6 +457,17 @@ export function* toggleFornoMode(action: SetIsFornoAction) {
 
 export function* watchFornoMode() {
   yield takeLatest(Actions.TOGGLE_IS_FORNO, toggleFornoMode)
+}
+
+export function* watchReadyToInitializeWeb3() {
+  yield call(waitForRehydrate)
+  const forno = yield select(fornoSelector)
+  if (forno) {
+    // create web3 with https
+  } else {
+    // create web3 with not https
+  }
+  yield put(setContractKitReady())
 }
 
 export function* web3Saga() {

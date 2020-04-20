@@ -11,9 +11,10 @@ import { CeloDefaultRecipient } from 'src/send/Send'
 import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
 import { BasicTokenTransfer } from 'src/tokens/saga'
 import Logger from 'src/utils/Logger'
-import { web3 } from 'src/web3/contracts'
 import { getGasPrice } from 'src/web3/gas'
 import { getConnectedAccount } from 'src/web3/saga'
+
+import Web3 from 'web3'
 
 const TAG = 'fees/saga'
 // Cache of the gas estimates for common tx types
@@ -23,7 +24,7 @@ const feeGasCache = new Map<FeeType, BigNumber>()
 
 const placeholderSendTx: BasicTokenTransfer = {
   recipientAddress: CeloDefaultRecipient.address,
-  amount: web3.utils.fromWei('1'),
+  amount: new Web3().utils.fromWei('1'),
   comment: 'Coffee or Tea?',
 }
 
