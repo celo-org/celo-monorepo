@@ -8,7 +8,7 @@ export default class Contracts extends BaseCommand {
   static description = 'Prints Celo contract addesses.'
 
   static flags = {
-    ...BaseCommand.flags,
+    ...BaseCommand.flagsWithoutLocalAddresses(),
   }
 
   async run() {

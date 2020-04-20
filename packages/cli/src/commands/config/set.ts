@@ -16,7 +16,7 @@ export default class Set extends LocalCommand {
     }),
   }
 
-  static examples = ['set  --node ws://localhost:2500']
+  static examples = ['set  --node ws://localhost:2500', 'set  --node <geth-location>/geth.ipc']
 
   async run() {
     const res = this.parse(Set)
