@@ -16,9 +16,10 @@
     - [iOS](#ios-1)
     - [Android](#android-1)
     - [Running in forno (data saver) mode](#running-in-forno-(data-saver)-mode)
-  - [Debugging](#debugging)
-    - [Optional: Install React Native Debugger](#optional:-install-react-native-debugger)
-  - [App Profiling](#app-profiling)
+  - [Debugging & App Profiling](#debugging-&-app-profiling)
+    - [Debugging](#debugging)
+      - [Optional: Install React Native Debugger](#optional:-install-react-native-debugger)
+    - [App Profiling](#app-profiling)
   - [Testing](#testing)
     - [Snapshot testing](#snapshot-testing)
     - [React component unit testing](#react-component-unit-testing)
@@ -74,7 +75,7 @@ Note that using the method above, you can have multiple versions of Xcode instal
 
 #### Install Cocopods, Bundler, and download project dependencies
 
-Make sure you are in the ios directory of the mobile package before running the following:
+Make sure you are in the `ios` directory of the `mobile` package before running the following:
 
 ```bash
 # install cocopods and bundler if you don't already have it
@@ -131,7 +132,7 @@ brew cask install android-sdk
 brew cask install android-platform-tools
 ```
 
-Next install [Android Studio][android studio] and add the [Android NDK][android ndk]
+Next install [Android Studio][android studio] and add the [Android NDK][android ndk].
 
 Execute the following (and make sure the lines are in your `~/.bash_profile`):
 
@@ -192,7 +193,7 @@ emulator -avd Nexus_5X_API_28_x86
 
 ##### Install Genymotion Emulator Manager
 
-Another Android emulator option is Genymotion
+Another Android emulator option is Genymotion.
 
 ###### MacOS
 
@@ -244,7 +245,7 @@ The below steps should help you successfully run the mobile wallet on either a U
 
 4. Unplug and replug your device. You'll be prompted to accept the connection and shown a public key (corresponding to the `abd_key.pub` file in `~/.android`)
 
-5. To confirm your device is properly connectted, running `adb devices` from the terminal should reflect your connected device. If it lists a device as "unauthorized", make sure you've accepted the prompt or [troubleshoot here][device unauthorized].
+5. To confirm your device is properly connected, running `adb devices` from the terminal should reflect your connected device. If it lists a device as "unauthorized", make sure you've accepted the prompt or [troubleshoot here][device unauthorized].
 
 6. From the `mobile` directory run `yarn run dev:android`.
 
@@ -257,7 +258,9 @@ To run the wallet in forno (Data Saver) mode, using a trusted node rather than t
 To debug network requests in forno mode, we use Charles, a proxy for monitoring network traffic to see Celo JSON RPC calls and responses. Follow instructions [here](https://community.tealiumiq.com/t5/Tealium-for-Android/Setting-up-Charles-to-Proxy-your-Android-Device/ta-p/5121) to configure Charles to proxy a test device.
 
 
-## Debugging
+## Debugging & App Profiling
+
+### Debugging
 
 _To avoid debugging errors, ensure your device and laptop are connected to the same WiFi network even if they are connected via USB._
 
@@ -268,12 +271,12 @@ _To avoid debugging errors, ensure your device and laptop are connected to the s
 
 3. For the fastest development experience, you likely want to open the developer menu again and ensure `Fast Reloading` (iOS) or `Live Reloading` and `Hot Reloading` (Android) is enabled.
 
-### Optional: Install React Native Debugger
+#### Optional: Install React Native Debugger
 
 The [React Native Debugger][rn debugger] bundles together the Redux and Chrome dev tools nicely and provides a clean debugging environment.
 
 
-## App Profiling
+### App Profiling
 
 Run `yarn run react-devtools`. It should automatically connect to the running app, and includes a profiler (second tab). Start recording with the profiler, use the app, and then stop recording.
 
@@ -436,7 +439,7 @@ $ adb kill-server && adb start-server
 [redux-saga-test-plan]: https://github.com/jfairbank/redux-saga-test-plan
 [sms retriever]: https://developers.google.com/identity/sms-retriever/verify#1_construct_a_verification_message
 [android dev options]: https://developer.android.com/studio/debug/dev-options
-[android ndk]: https://developer.android.com/ndk/guides
+[android ndk]: https://developer.android.com/studio/projects/install-ndk
 [android studio]: https://developer.android.com/studio
 [approve kernel extension]: https://developer.apple.com/library/content/technotes/tn2459/_index.html
 [oracle being oracle]: https://github.com/Homebrew/homebrew-cask-versions/issues/7253
