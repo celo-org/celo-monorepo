@@ -63,8 +63,8 @@ locals {
       keys(var.proxies.az1),
       [for k, v in var.proxies.az1 : {
         proxy_enode      = var.proxies.az1[k].proxy_enode
-        proxy_private_ip = module.celo_proxy_az1.instances[k].private_ip
-        proxy_public_ip  = module.celo_proxy_az1.instances[k].public_ip
+        proxy_private_ip = lookup(module.celo_proxy_az1.instances, k, { private_ip = "" }).private_ip
+        proxy_public_ip  = lookup(module.celo_proxy_az1.instances, k, { public_ip = "" }).public_ip
         }
       ]
     )
@@ -72,8 +72,8 @@ locals {
       keys(var.proxies.az2),
       [for k, v in var.proxies.az2 : {
         proxy_enode      = var.proxies.az2[k].proxy_enode
-        proxy_private_ip = module.celo_proxy_az2.instances[k].private_ip
-        proxy_public_ip  = module.celo_proxy_az2.instances[k].public_ip
+        proxy_private_ip = lookup(module.celo_proxy_az2.instances, k, { private_ip = "" }).private_ip
+        proxy_public_ip  = lookup(module.celo_proxy_az2.instances, k, { public_ip = "" }).public_ip
         }
       ]
     )
