@@ -86,17 +86,10 @@ function keyVaultName(oracleIndex: number) {
   return oracleAddressesAndVaults()[oracleIndex].keyVaultName
 }
 
-// function keyVaultNames() {
-//   const keyVaultNamesStr = fetchEnv(envVar.ORACLE_AZURE_KEY_VAULT_NAMES)
-//   return keyVaultNamesStr.split(',')
-// }
-//
-// // oracleAddresses returns an array of the comma separated addresses found in ORACLE_ADDRESSES
-// function oracleAddresses() {
-//   const oracleAddressesStr = fetchEnv(envVar.ORACLE_ADDRESSES)
-//   return oracleAddressesStr.split(',')
-// }
-
+// Decodes the env variable ORACLE_AZURE_KEY_VAULT_ADDRESSES of the form:
+//   <address>:<keyVaultName>,<address>:<keyVaultName>
+//   eg: 0x0000000000000000000000000000000000000000:keyVault0,0x0000000000000000000000000000000000000001:keyVault1
+// into an array in the same order
 function oracleAddressesAndVaults(): {
   address: string
   keyVaultName: string
@@ -117,8 +110,7 @@ async function createRBACResources(celoEnv: string) {
   await createOracleServiceAccount(celoEnv)
   await createOracleRole(celoEnv)
   await createOracleRoleBinding(celoEnv)
-  const tokenName = await getSecretTokenName(celoEnv)
-  return tokenName
+  return getSecretTokenName(celoEnv)
 }
 
 async function createOracleServiceAccount(celoEnv: string) {
