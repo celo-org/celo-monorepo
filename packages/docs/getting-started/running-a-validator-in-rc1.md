@@ -134,8 +134,7 @@ There are number of environment variables in this guide, and you may use this ta
 | APP_SIGNATURE                        | The hash with which clients can auto-read SMS messages on android                                                                    |
 | SMS_PROVIDERS                        | A comma-separated list of providers you want to configure, Celo currently supports `nexmo` & `twilio`                                   |
 
-
-## Network Deployment
+## Network Deployment Timeline
 
 The setup of RC1 is similar to the new Baklava network and the deployment timeline is as follows (all dates are subject to change):
 
