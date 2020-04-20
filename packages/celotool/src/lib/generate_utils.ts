@@ -12,6 +12,7 @@ import Web3 from 'web3'
 import { envVar, fetchEnv, fetchEnvOrFallback, monorepoRoot } from './env-utils'
 import {
   CONTRACT_OWNER_STORAGE_LOCATION,
+  GENESIS_MSG_HASH,
   GETH_CONFIG_OLD,
   ISTANBUL_MIX_HASH,
   REGISTRY_ADDRESS,
@@ -249,12 +250,16 @@ export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
 }
 
 export const generateIstanbulExtraData = (validators: Validator[]) => {
-  const istanbulVanity = 32
+  const istanbulVanity = GENESIS_MSG_HASH
+  // Vanity prefix is 32 bytes (1 hex char/.5 bytes * 32 bytes = 64 hex chars)
+  if (istanbulVanity.length !== 32 * 2) {
+    throw new Error('Istanbul vanity must be 32 bytes')
+  }
   const blsSignatureVanity = 96
   const ecdsaSignatureVanity = 65
   return (
     '0x' +
-    repeat('0', istanbulVanity * 2) +
+    istanbulVanity +
     rlp
       // @ts-ignore
       .encode([
