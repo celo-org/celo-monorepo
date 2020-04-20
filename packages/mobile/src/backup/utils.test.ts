@@ -1,4 +1,5 @@
 import { MnemonicLanguages, validateMnemonic } from '@celo/utils/lib/account'
+import * as bip39 from 'react-native-bip39'
 import {
   createQuizWordList,
   formatBackupPhraseOnEdit,
@@ -33,7 +34,7 @@ jest.mock('@celo/utils/lib/account', () => {
 
 describe('createQuizWordList', () => {
   it('creates list correctly without dupes', async () => {
-    const wordList = createQuizWordList(mockMnemonic, 'en')
+    const wordList = await createQuizWordList(mockMnemonic, 'en')
     expect(wordList.length).toEqual(24)
     const wordSet = new Set(wordList)
     const intersection = mockMnemonic.split(' ').filter((w) => wordSet.has(w))
@@ -44,7 +45,7 @@ describe('selectQuizWordOptions', () => {
   it('selects words correctly', async () => {
     global.Math.random = () => 0.5
 
-    const wordList = createQuizWordList(mockMnemonic, 'en')
+    const wordList = await createQuizWordList(mockMnemonic, 'en')
     const [correctWord, wordOptions] = selectQuizWordOptions(mockMnemonic, wordList, 4)
     expect(wordOptions).not.toBeUndefined()
     expect(wordOptions!.length).toBe(4)
@@ -134,25 +135,39 @@ inner surprise invest`
 
   it('validates spanish successfully', () => {
     expect(
-      validateMnemonic(formatBackupPhraseOnSubmit(SPANISH_MNEMONIC), MnemonicLanguages.spanish)
+      validateMnemonic(
+        formatBackupPhraseOnSubmit(SPANISH_MNEMONIC),
+        MnemonicLanguages.spanish,
+        bip39
+      )
     ).toBeTruthy()
   })
 
   it('validates english successfully', () => {
-    expect(validateMnemonic(formatBackupPhraseOnSubmit(ENGLISH_MNEMONIC))).toBeTruthy()
+    expect(
+      validateMnemonic(formatBackupPhraseOnSubmit(ENGLISH_MNEMONIC), undefined, bip39)
+    ).toBeTruthy()
   })
 
   it('validates english multiline successfully', () => {
-    expect(validateMnemonic(formatBackupPhraseOnSubmit(MULTILINE_ENGLISH_MNEMONIC))).toBeTruthy()
+    expect(
+      validateMnemonic(formatBackupPhraseOnSubmit(MULTILINE_ENGLISH_MNEMONIC), undefined, bip39)
+    ).toBeTruthy()
   })
 
   it('does not validate bad english', () => {
-    expect(validateMnemonic(formatBackupPhraseOnSubmit(BAD_ENGLISH_MNEMONIC))).toBeFalsy()
+    expect(
+      validateMnemonic(formatBackupPhraseOnSubmit(BAD_ENGLISH_MNEMONIC), undefined, bip39)
+    ).toBeFalsy()
   })
 
   it('does not validate bad spanish', () => {
     expect(
-      validateMnemonic(formatBackupPhraseOnSubmit(BAD_SPANISH_MNEMONIC), MnemonicLanguages.spanish)
+      validateMnemonic(
+        formatBackupPhraseOnSubmit(BAD_SPANISH_MNEMONIC),
+        MnemonicLanguages.spanish,
+        bip39
+      )
     ).toBeFalsy()
   })
 })

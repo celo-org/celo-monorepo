@@ -52,8 +52,11 @@ export default class NewAccount extends LocalCommand {
 
   async run() {
     const res = this.parse(NewAccount)
-    const mnemonic = generateMnemonic(undefined, NewAccount.languageOptions(res.flags.language!))
-    const keys = generateKeys(mnemonic, res.flags.password, res.flags.indexAddress)
+    const mnemonic = await generateMnemonic(
+      undefined,
+      NewAccount.languageOptions(res.flags.language!)
+    )
+    const keys = await generateKeys(mnemonic, res.flags.password, res.flags.indexAddress)
     const accountAddress = privateKeyToAddress(keys.privateKey)
     this.log(
       'This is not being stored anywhere. Save the mnemonic somewhere to use this account at a later point.\n'

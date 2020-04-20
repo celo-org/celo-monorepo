@@ -1,13 +1,13 @@
 import { generateKeys, generateMnemonic, MnemonicStrength, validateMnemonic } from './account'
 
 describe('Mnemonic validation', () => {
-  it('should generate 24 word mnemonic', () => {
-    const mnemonic: string = generateMnemonic()
+  it('should generate 24 word mnemonic', async () => {
+    const mnemonic: string = await generateMnemonic()
     expect(mnemonic.split(' ').length).toEqual(24)
   })
 
-  it('should generate 12 word mnemonic', () => {
-    const mnemonic: string = generateMnemonic(MnemonicStrength.s128_12words)
+  it('should generate 12 word mnemonic', async () => {
+    const mnemonic: string = await generateMnemonic(MnemonicStrength.s128_12words)
     expect(mnemonic.split(' ').length).toEqual(12)
   })
 
