@@ -166,6 +166,20 @@ async function handleJSONFile(err, data) {
         )
         process.exit(0)
       }
+      // Sum occurences of each identifier in the grant file, if more than 1 then there is a duplicate.
+      const identifierCounts = grants.map((x) => (x.identifier === grant.identifier ? 1 : 0))
+      if (identifierCounts.reduce((a, b) => a + b, 0) > 1) {
+        console.info(
+          chalk.red(
+            'Provided grant file ' +
+              argv.grants +
+              ' contains a duplicate identifier: ' +
+              grant.identifier +
+              '.\nExiting.'
+          )
+        )
+        process.exit(0)
+      }
     }
   }
 
