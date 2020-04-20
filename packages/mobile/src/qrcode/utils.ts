@@ -6,7 +6,7 @@ import { put } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { AddressToE164NumberType } from 'src/identity/reducer'
-import { navigate } from 'src/navigator/NavigationService'
+import { replace } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import {
   getRecipientFromAddress,
@@ -90,5 +90,5 @@ export function* handleBarcode(
       }
   yield put(storeLatestInRecents(recipient))
 
-  navigate(Screens.SendAmount, { recipient })
+  replace(Screens.SendAmount, { recipient })
 }
