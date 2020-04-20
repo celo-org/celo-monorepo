@@ -5,8 +5,14 @@ import { installGenericHelmChart, removeGenericHelmChart } from 'src/lib/helm_de
 import { execCmdWithExitOnFailure } from 'src/lib/utils'
 
 const helmChartPath = '../helm-charts/oracle'
+const rbacHelmChartPath = '../helm-charts/oracle-rbac'
 
 export async function installHelmChart(celoEnv: string) {
+  // First install the oracle-rbac helm chart.
+  // This must be deployed before so we can use a resulting auth token so that
+  // oracle pods can reach the K8s API server to change their aad labels
+  await installOracleRBACHelmChart(celoEnv)
+  // Then install the oracle helm chart
   return installGenericHelmChart(
     celoEnv,
     releaseName(celoEnv),
@@ -17,12 +23,11 @@ export async function installHelmChart(celoEnv: string) {
 
 export async function removeHelmRelease(celoEnv: string) {
   await removeGenericHelmChart(releaseName(celoEnv))
-  await deleteRBACResources(celoEnv)
+  await removeOracleRBACHelmRelease(celoEnv)
 }
 
 async function helmParameters(celoEnv: string) {
-  // const identity = await createOracleIdentityIfNotExists(celoEnv)
-  const kubeAuthTokenName = await createRBACResources(celoEnv)
+  const kubeAuthTokenName = await rbacAuthTokenName(celoEnv)
   const replicas = oracleAddressesAndVaults().length
   return [
     `--set environment.name=${celoEnv}`,
@@ -106,77 +111,37 @@ function oracleAddressesAndVaults(): {
   return addressesAndVaults
 }
 
-async function createRBACResources(celoEnv: string) {
-  await createOracleServiceAccount(celoEnv)
-  await createOracleRole(celoEnv)
-  await createOracleRoleBinding(celoEnv)
-  return getSecretTokenName(celoEnv)
+// Oracle RBAC------
+// We need the oracle pods to be able to change their label to accommodate
+// limitations in aad-pod-identity & statefulsets (see https://github.com/Azure/aad-pod-identity/issues/237#issuecomment-611672987)
+// To do this, we use an auth token that we get using the resources in the `oracle-rbac` chart
+
+async function installOracleRBACHelmChart(celoEnv: string) {
+  return installGenericHelmChart(
+    celoEnv,
+    rbacReleaseName(celoEnv),
+    rbacHelmChartPath,
+    rbacHelmParameters(celoEnv)
+  )
 }
 
-async function createOracleServiceAccount(celoEnv: string) {
-  const serviceAccountYaml = `
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: ${releaseName(celoEnv)}
-  namespace: ${celoEnv}
-EOF
-`
-
-  await execCmdWithExitOnFailure(`cat <<EOF | kubectl apply --filename - ${serviceAccountYaml}`)
+function removeOracleRBACHelmRelease(celoEnv: string) {
+  return removeGenericHelmChart(rbacReleaseName(celoEnv))
 }
 
-async function createOracleRole(celoEnv: string) {
-  const roleYaml = `
-apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
-metadata:
-  namespace: ${celoEnv}
-  name: ${releaseName(celoEnv)}
-rules:
-- apiGroups: [""]
-  resources: ["pods"]
-  verbs: ["get", "update", "patch"]
-EOF
-`
-
-  await execCmdWithExitOnFailure(`cat <<EOF | kubectl apply --filename - ${roleYaml}`)
+function rbacHelmParameters(celoEnv: string) {
+  return [`--set environment.name=${celoEnv}`]
 }
 
-async function createOracleRoleBinding(celoEnv: string) {
-  const roleBindingYaml = `
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  namespace: ${celoEnv}
-  name: ${releaseName(celoEnv)}
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: ${releaseName(celoEnv)}
-subjects:
-- kind: ServiceAccount
-  name: ${releaseName(celoEnv)}
-  namespace: ${celoEnv}
-EOF
-`
-
-  await execCmdWithExitOnFailure(`cat <<EOF | kubectl apply --filename - ${roleBindingYaml}`)
+function rbacReleaseName(celoEnv: string) {
+  return `${celoEnv}-oracle-rbac`
 }
 
-async function getSecretTokenName(celoEnv: string) {
+async function rbacAuthTokenName(celoEnv: string) {
   const [tokenName] = await execCmdWithExitOnFailure(
-    `kubectl get serviceaccount --namespace=${celoEnv} ${releaseName(
+    `kubectl get serviceaccount --namespace=${celoEnv} ${rbacReleaseName(
       celoEnv
     )} -o=jsonpath="{.secrets[0]['name']}"`
   )
   return tokenName.trim()
-}
-
-async function deleteRBACResources(celoEnv: string) {
-  await execCmdWithExitOnFailure(`kubectl delete rolebinding -n ${celoEnv} ${releaseName(celoEnv)}`)
-  await execCmdWithExitOnFailure(`kubectl delete role -n ${celoEnv} ${releaseName(celoEnv)}`)
-  await execCmdWithExitOnFailure(
-    `kubectl delete serviceaccount -n ${celoEnv} ${releaseName(celoEnv)}`
-  )
 }

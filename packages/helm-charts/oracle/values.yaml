@@ -2,6 +2,7 @@
 
 environment:
   name: test
+
 image:
   repository: oracletest.azurecr.io/test/oracle
   tag: hsmtest
