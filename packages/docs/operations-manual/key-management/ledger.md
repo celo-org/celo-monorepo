@@ -97,18 +97,18 @@ The Celo app is now ready for use and you should see `Application is ready` on t
 Accounts are automatically generated on your device. In the terminal on your computer, you can view the first account addresses with the following command:
 
 ```bash
-celocli node:accounts --useLedger --ledgerAddresses 1
+celocli account:list --useLedger --ledgerAddresses 1
 ```
 
 {% hint style="tip" %}
 If you wish to generate more than one address from your seed phrase, you can display the first `N` (e.g. 10) addresses use the `--ledgerAddresses` flag.
 ```bash
-celocli node:accounts --useLedger --ledgerAddresses N
+celocli account:list --useLedger --ledgerAddresses N
 ```
 
 To display addresses at specific indexes `M`and `N`(e. 2 and 654) use the `--ledgerCustomAddresses "[M, N]"`flag
 ```bash
-celocli node:accounts --useLedger --ledgerCustomAddresses "[M, N]"
+celocli account:list --useLedger --ledgerCustomAddresses "[M, N]"
 ```
  {% endhint %}
 
@@ -147,22 +147,33 @@ https://alfajores-blockscout.celo-testnet.org/
 
 ## Using celocli
 
-You can now use `celocli` to securely sign transactions or key proof-of-possessions with your Ledger.
+You can now use `celocli` to securely sign transactions or proof-of-possessions with your Ledger.
 
 To use `celocli` with your Ledger, ensure the device is connected to your computer, unlocked, and the `Celo` app is open and displaying `Application is ready`.
 
-Then, simply append the `--useLedger` flag to any `celocli` commands with which you'd like to use a Ledger.
+Then, simply append the `--useLedger` flag to any `celocli` commands with which you'd like to use a Ledger. You may also append the `--ledgerConfirmAddress` flag, which will require that you manually verify on the Ledger the address from which the transaction is being sent.
 
-The following commands are an example of how you might authorize a vote signing key stored on a Ledger, for your account key, which is also stored on a Ledger, or for your ReleaseGold account, for which the beneficiary key is stored on a Ledger.
+The following commands are an example of how you might authorize a vote signer whose private key is stored on a Ledger, on behalf of your Locked Gold account, whose private key is also stored on a Ledger, or for your ReleaseGold Locked Gold Account, for which the beneficiary key is stored on a Ledger.
 
 
 ```bash
-# Plug in the Ledger containing the vote signing key to authorize and run the following command to securely generate the proof-of-possession.
-celocli accounts:proof-of-possession --account $ACCOUNT_ADDRESS --signer $VOTE_SIGNER_ADDRESS --useLedger
+# Plug in the Ledger containing the vote signer key and run the following command to securely generate the proof-of-possession.
+celocli account:proof-of-possession --account $LOCKED_GOLD_ACCOUNT --signer $SIGNER_TO_AUTHORIZE --useLedger
 
-# If you wish to authorize a vote signing key for your account, plug in the Ledger containing the account key and run the following command to authorize the vote signing key.
-celocli account:authorize --from $ACCOUNT_ADDRESS --role vote --signer $VOTE_SIGNER_ADDRESS --signature $PROOF_OF_POSSESSION --useLedger
+# If you wish to authorize a vote signer for your Locked Gold Account, plug in the Ledger containing
+# the Locked Gold Account key and run the following command.
+celocli account:authorize --from $LOCKED_GOLD_ACCOUNT --role vote --signer $SIGNER_TO_AUTHORIZE --signature $SIGNER_PROOF_OF_POSSESSION --useLedger
 
-# If instead you wish to authorize a vote signing key for your ReleaseGold account, plug in the Ledger containing the beneficiary key for the ReleaseGold contract and run the following command.
-celocli release-gold:authorize --contract $RELEASE_GOLD_CONTRACT_ADDRESS --role vote --signer $VOTE_SIGNER_ADDRESS --signature $PROOF_OF_POSSESSION --useLedger
+# If instead you wish to authorize a vote signer for a Locked Gold Account that was created via a ReleaseGold contract,
+# plug in the Ledger containing the beneficiary key and run the following command.
+celocli release-gold:authorize --contract $RELEASE_GOLD_CONTRACT_ADDRESS --role vote --signer $SIGNER_TO_AUTHORIZE --signature $SIGNER_PROOF_OF_POSSESSION --useLedger
 ```
+
+## Troubleshooting
+
+If you have issues connecting to the Ledger, try the following:
+
+* Check that the Ledger device is connected, powered on, and that you've unlocked it using the PIN.
+* Check that no other applications are using the device (close Ledger Live, or a local Celo Blockchain node)
+* Try unplugging and replugging the device. Some devices appear to trigger a warning on Macs saying: “USB Devices Disabled. Unplug the device using too much power to re-enable USB devices” which is usually resolved by reconnecting.
+* Ensure that your Ledger has the [latest firmware](https://support.ledger.com/hc/en-us/articles/360002731113-Update-device-firmware). For Ledger Nano S, a firmware version of 1.6 or later is required.
