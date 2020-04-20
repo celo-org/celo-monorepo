@@ -35,6 +35,7 @@ describe('JoinCeloScreen', () => {
     const wrapper = render(
       <Provider store={store}>
         <JoinCeloClass
+          acceptedTerms={false}
           showError={showErrorMock}
           hideAlert={jest.fn()}
           setPromptForno={jest.fn()}
@@ -58,6 +59,7 @@ describe('JoinCeloScreen', () => {
     const wrapper = render(
       <Provider store={createMockStore()}>
         <JoinCeloClass
+          acceptedTerms={false}
           showError={jest.fn()}
           hideAlert={jest.fn()}
           setPromptForno={jest.fn()}
@@ -81,6 +83,7 @@ describe('JoinCeloScreen', () => {
     const wrapper = render(
       <Provider store={createMockStore()}>
         <JoinCeloClass
+          acceptedTerms={false}
           showError={error}
           hideAlert={jest.fn()}
           setPhoneNumber={jest.fn()}
