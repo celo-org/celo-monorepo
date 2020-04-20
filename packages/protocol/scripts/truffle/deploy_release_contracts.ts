@@ -35,6 +35,10 @@ async function handleGrant(releaseGoldConfig: any, currGrant: number) {
     releaseGoldConfig.releaseStartTime +
     '\n\tGrant Cliff time (in seconds): ' +
     releaseGoldConfig.releaseCliffTime +
+    '\n\tGrant num periods: ' +
+    releaseGoldConfig.numReleasePeriods +
+    '\n\tRelease Period length: ' +
+    releaseGoldConfig.releasePeriod +
     '\n\tDeploy this grant? (y/n)'
   if (!argv.yesreally) {
     const response = await prompts({

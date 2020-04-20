@@ -9,10 +9,10 @@ set -euo pipefail
 # -g: File containing grant information
 # -s: (Optional) Amount of gold for beneficiary to start with for transactions
 # -o: (Optional) File to output results to
-# -really: (Optional) Reply "yes" to prompts about deploying grants (Be careful!)
+# -r: (Optional) Reply "yes" to prompts about deploying grants (Be careful!)
 #
 # Example:
-# `./scripts/bash/deploy_release_contracts.sh -n development -f 0x5409ED021D9299bf6814279A6A1411A7e866A631 -g scripts/truffle/releaseGoldExampleConfigs.json -r yes`
+# `./scripts/bash/deploy_release_contracts.sh -n development -f 0x5409ED021D9299bf6814279A6A1411A7e866A631 -g scripts/truffle/releaseGoldExampleConfigs.json`
 
 NETWORK=""
 GRANTS_FILE=""
