@@ -89,7 +89,7 @@ Additionally, you need to unlock the account configured in `etherbase` option. I
 
 ```bash
 # On the proxy machine
-# Firts, we create a new account for the proxy
+# First, we create a new account for the proxy
 docker run --name celo-proxy-password -it --rm  -v $PWD:/root/.celo $CELO_IMAGE account new --password /root/.celo/.password
 ```
 
