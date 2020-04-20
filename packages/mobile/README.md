@@ -7,17 +7,32 @@
     - [iOS](#ios)
       - [Enroll in the Apple Developer Program](#enroll-in-the-apple-developer-program)
       - [Install XCode](#install-xcode)
-      - [Install Cocopods](#install-cocopods)
+      - [Install Cocopods, Bundler, and download project dependencies](#install-cocopods,-bundler,-and-download-project-dependencies)
     - [Android](#android)
       - [Install Java](#install-java)
       - [Install Android Dev Tools](#install-android-dev-tools)
-      - [Optional: Install an Android Emulator](#optional-install-an-android-emulator)
+      - [Optional: Install an Android emulator](#optional-install-an-android-emulator)
   - [Running the mobile wallet](#running-the-mobile-wallet)
     - [iOS](#ios-1)
     - [Android](#android-1)
+    - [Running in forno (data saver) mode](#running-in-forno-(data-saver)-mode)
   - [Debugging](#debugging)
+    - [Optional: Install React Native Debugger](#optional:-install-react-native-debugger)
+  - [App Profiling](#app-profiling)
   - [Testing](#testing)
-  - [Troubleshooting](#troubleshooting)
+    - [Snapshot testing](#snapshot-testing)
+    - [React component unit testing](#react-component-unit-testing)
+    - [Saga testing](#saga-testing)
+    - [End-to-End testing](#end-to-end-testing)
+  - [Building APKs / Bundles](#building-apks-/-bundles)
+    - [Creating a fake keystore](#creating-a-fake-keystore)
+    - [Building an APK or Bundle](#building-an-apk-or-bundle)
+  - [Other](#other)
+    - [Configuring the SMS Retriever](#configuring-the-sms-retriever)
+    - [Generating GraphQL Types](#generating-graphql-types)
+    - [How we handle Geth crashes in wallet app on Android](#how-we-handle-geth-crashes-in-wallet-app-on-android)
+    - [Why do we use http(s) provider?](#why-do-we-use-http(s)-provider?)
+    - [Troubleshooting](#troubleshooting)
 
 ## Overview
 
@@ -56,12 +71,17 @@ We do not recommend installing Xcode through the App Store as it can auto update
 
 Note that using the method above, you can have multiple versions of Xcode installed in parallel if you'd like. Simply use different names for the different version of XCode in your computer's `Applications` folder (e.g., `Xcode10.3.app` and `Xcode11.app`).
 
-#### Install Cocopods
+#### Install Cocopods, Bundler, and download project dependencies
 
-Install cocopods:
+Make sure you are in the ios directory of the mobile package before running the following:
 
 ```bash
+# install cocopods and bundler if you don't already have it
 gem install cocoapods
+gem install bundler
+# download the project dependencies
+bundle install
+bundle exec pod install
 ```
 
 If your machine does not recognize the `gem` command, you may need to [download Ruby](https://rubyinstaller.org/) first.
@@ -146,7 +166,7 @@ The steps are:
 
 You can find the complete instructions about how to install the tools in Linux environments in the [Documentation page](https://developer.android.com/studio/install#linux).
 
-#### Optional: Install an Android Emulator
+#### Optional: Install an Android emulator
 
 ##### Configure an emulator using the Android SDK Manager
 
@@ -211,66 +231,23 @@ The below steps should help you successfully run the mobile wallet on either a U
 
 ### iOS
 
-3. From the `ios` directory in the `mobile` package, run `bundle exec pod install` to download and install the necessary iOS dependencies.
+3. Launch Xcode and use it to open the directory `celo.xcworkspace`. Confirm your iOS device has been detected by XCode.
 
-4. Launch Xcode and use it to open the directory `celo.xcodeproj`. Confirm your iOS device has been detected by XCode.
+4. Build the project by pressing the play button in the top left corner or selecting `Product > Build` from the XCode menu bar.
 
-5. Build the project by pressing the play button in the top left corner or selecting `Product > Build` from the XCode menu bar.
-
-6. From the `mobile` directory run `yarn run dev:ios`.
+5. From the `mobile` directory run `yarn run dev:ios`.
 
 ### Android
 
 3. Follow [these instructions to enable Developer Options][android dev options] on your Android device.
 
-4. Unplug your device and replug it in. You'll be prompted to accept the connection and shown a public key (corresponding to the `abd_key.pub` file in `~/.android`)
+4. Unplug and replug your device. You'll be prompted to accept the connection and shown a public key (corresponding to the `abd_key.pub` file in `~/.android`)
 
-5. To confirm your device is properly connectted, running `adb devices` from the terminal should show a connected device. If it lists a device as "unauthorized", make sure you've accepted the prompt or [troubleshoot here][device unauthorized].
+5. To confirm your device is properly connectted, running `adb devices` from the terminal should reflect your connected device. If it lists a device as "unauthorized", make sure you've accepted the prompt or [troubleshoot here][device unauthorized].
 
 6. From the `mobile` directory run `yarn run dev:android`.
 
-
-## Debugging
-
-In order to debug, you should run:
-
-```bash
-yarn run dev:show-menu
-```
-
-A menu will pop-up in the app and you should hit `Start Remote JS Debugging`.
-This will open a new tab in your browser with React Native logger in the
-console. In order to get a full picture, the console's filter should be set to
-`All levels`.
-
-You will probably want to open the dev menu again and enable `Live Reloading`
-and `Hot Reloading` to make development faster.
-
-#### (_Optional_) React Native debugger app
-
-The [RN debugger app][rn debugger] bundles together the Redux and Chrome dev
-tools nicely.
-
-### App Profiling
-
-Start the emulator and load up the app. Then run the following to start react
-devtools.
-
-```bash
-yarn run react-devtools
-```
-
-It should automatically connect to the running app, and includes a profiler
-(second tab). Start recorder with the profiler, using the app, and the stop
-recording. The flame graph provides a view of each component and sub-component.
-The width is proportional to how long it took to load. If it is grey, it was not
-re-rendered at that 'commit' or DOM change. Details on the react native profiler
-are [here][rn profiler]. The biggest thing to look for are large number of
-renders when no state has changed. Reducing renders can be done via pure
-components in react or overloading the should component update method
-[example here][rn optimize example].
-
-### Running Wallet app in forno (Data Saver) mode
+### Running in forno (data saver) mode
 
 By default, the mobile wallet app runs geth in ultralight sync mode where all the epoch headers are fetched. The default sync mode is defined in [packages/mobile/.env](https://github.com/celo-org/celo-monorepo/blob/master/packages/mobile/.env#L4) file.
 
@@ -278,9 +255,33 @@ To run the wallet in forno (Data Saver) mode, using a trusted node rather than t
 
 To debug network requests in forno mode, we use Charles, a proxy for monitoring network traffic to see Celo JSON RPC calls and responses. Follow instructions [here](https://community.tealiumiq.com/t5/Tealium-for-Android/Setting-up-Charles-to-Proxy-your-Android-Device/ta-p/5121) to configure Charles to proxy a test device.
 
+
+## Debugging
+
+_To avoid debugging errors, ensure your device and laptop are connected to the same WiFi network even if they are connected via USB._
+
+1. Either shake the device or run `yarn run dev:show-menu` (only for Android) to open up the developer menu.
+
+2. Select `Debug` (iOS) or `Start Remote JS Debugging` (Android). This should open a new tab in your browser with React Native logger in the console. In order to get a full picture, the console's filter should be set to
+`All levels`.
+
+3. For the fastest development experience, you likely want to open the developer menu again and ensure `Fast Reloading` (iOS) or `Live Reloading` and `Hot Reloading` (Android) is enabled.
+
+### Optional: Install React Native Debugger
+
+The [React Native Debugger][rn debugger] bundles together the Redux and Chrome dev tools nicely and provides a clean debugging environment.
+
+
+## App Profiling
+
+Run `yarn run react-devtools`. It should automatically connect to the running app, and includes a profiler (second tab). Start recording with the profiler, use the app, and then stop recording.
+
+The flame graph provides a view of each component and sub-component. The width is proportional to how long it took to load. If it is grey, it was not re-rendered at that 'commit' or DOM change. Details on the react native profiler are [here][rn profiler]. The biggest thing to look for are large number of renders when no state has changed. Reducing renders can be done via pure components in React or overloading the should component update method [example here][rn optimize example].
+
+
 ## Testing
 
-To execute the suite of tests, run `yarn test`
+To execute the suite of tests, run `yarn test`.
 
 ### Snapshot testing
 
@@ -290,7 +291,7 @@ example at [`src/send/SendAmount.test.tsx`]. If your snapshot is expected
 to deviate, you can update the snapshot with the `-u` or `--updateSnapshot`
 flag when running the test.
 
-### React Component Unit Testing
+### React component unit testing
 
 We use [react-native-testing-library][react-native-testing-library] to unit test
 react components. It allows for deep rendering and interaction with the rendered
@@ -302,18 +303,17 @@ tree to assert proper reactions to user interaction and input. See an example at
 We use [redux-saga-test-plan][redux-saga-test-plan] to test complex sagas.
 See [`src/identity/verification.test.ts`] for an example.
 
-### E2E testing
+### End-to-End testing
 
 We use [Detox][detox] for E2E testing. In order to run the tests locally, you
 must have the proper emulator set up. Follow the instrutions in [e2e/README.md][e2e readme].
 
 Once setup is done, you can run the tests with `yarn test:e2e:android`
 
+
 ## Building APKs / Bundles
 
-The app can be build via the command line or in Android Studio.
-For an exact set of commands, refer to the lanes in `fastlane/FastFile`.
-For convinience, the basic are described below:
+You can create your own custom build of the app via the command line or in Android Studio. For an exact set of commands, refer to the lanes in `fastlane/FastFile`. For convinience, the basic are described below:
 
 ### Creating a fake keystore
 
@@ -345,29 +345,29 @@ cd android/
 
 Where `YOUR_BUILD_VARIANT` can be any of the app's build variants, such as debug or release.
 
-## Configuring the SMS Retriever
 
-On android, the wallet app uses the SMS Retriever API to automatically input codes during phone number verification.
+## Other
 
-The service that route SMS messages to the app needs to be configured to [append this app signature to the message][sms retriever].
-The hash depends on both the bundle id and the signing certificate. Since we use Google Play signing, we need to download the certificate.
+### Configuring the SMS Retriever
+
+On Android, the wallet app uses the SMS Retriever API to automatically input codes during phone number verification. When creating a new app build type this needs to be properly configured.
+
+The service that route SMS messages to the app needs to be configured to [append this app signature to the message][sms retriever]. The hash depends on both the bundle id and the signing certificate. Since we use Google Play signing, we need to download the certificate.
 
 1.  Go to the play console for the relevant app, Release management > App signing, and download the App signing certificate.
 2.  Use this script to generate the hash code: https://github.com/michalbrz/sms-retriever-hash-generator
 
-## Generating GraphQL Types
+### Generating GraphQL Types
 
-We're using [GraphQL Code Generator][graphql code generator] to properly type
-GraphQL queries. If you make a change to a query, run `yarn build:gen-graphql-types` to update the typings in the `typings` directory.
+We're using [GraphQL Code Generator][graphql code generator] to properly type GraphQL queries. If you make a change to a query, run `yarn build:gen-graphql-types` to update the typings in the `typings` directory.
 
-## How we handle Geth crashes in wallet app on Android
+### How we handle Geth crashes in wallet app on Android
 
 Our Celo app has three types of codes.
 
-1.  Javascript code - generated from Typescript, this runs in Javascript interpreter.
-2.  Java bytecode - This runs on Dalvik/Art Virtual Machine.
-3.  Native code - Geth code is written in Golang which compiles to native code - this runs directly on the
-    CPU, no virtual machines involved.
+1. Javascript code - generated from Typescript, this runs in Javascript interpreter.
+2. Java bytecode - this runs on Dalvik/Art Virtual Machine.
+3. Native code - Geth code is written in Golang which compiles to native code, this runs directly on the CPU, no virtual machines involved.
 
 One should note that, on iOS, there is no byte code and therefore, there are only two layers, one is the Javascript code, and the other is the Native code. Till now, we have been blind towards native crashes except Google Playstore logs.
 
@@ -377,21 +377,21 @@ We cannot use libraries like [Bugsnag](https://www.bugsnag.com) since they do no
 
 Relevant code references:
 
-1.  [NDKCrashService](https://github.com/celo-org/celo-monorepo/blob/master/packages/mobile/android/app/src/main/java/org/celo/mobile/NdkCrashService.java)
-2.  [Initialization](https://github.com/celo-org/celo-monorepo/blob/8689634a1d10d74ba6d4f3b36b2484db60a95bdb/packages/mobile/android/app/src/main/java/org/celo/mobile/MainApplication.java#L156) of the NDKCrashService
-3.  [Sentry code](https://github.com/celo-org/celo-monorepo/blob/799d74675dc09327543c210e88cbf5cc796721a0/packages/mobile/src/sentry/Sentry.ts#L53) to read NDK crash logs on restart
+1. [NDKCrashService](https://github.com/celo-org/celo-monorepo/blob/master/packages/mobile/android/app/src/main/java/org/celo/mobile/NdkCrashService.java)
+2. [Initialization](https://github.com/celo-org/celo-monorepo/blob/8689634a1d10d74ba6d4f3b36b2484db60a95bdb/packages/mobile/android/app/src/main/java/org/celo/mobile/MainApplication.java#L156) of the NDKCrashService
+3. [Sentry code](https://github.com/celo-org/celo-monorepo/blob/799d74675dc09327543c210e88cbf5cc796721a0/packages/mobile/src/sentry/Sentry.ts#L53) to read NDK crash logs on restart
 
 There are two major differences in Forno mode:
 
 1.  Geth won't run at all. Instead, web3 connects to <testnet>-forno.celo-testnet.org using an https provider, for example, [https://integration-forno.celo-testnet.org](https://integration-forno.celo-testnet.org).
 
-#### Why http(s) provider?
+### Why do we use http(s) provider?
 
-Websockets (`ws`) would have been a better choicee but we cannot use unencrypted `ws` provider since it would be bad to send plain-text data from a privacy perspective. Geth does not support `wss` by [default](https://github.com/ethereum/go-ethereum/issues/16423). And Kubernetes does not support it either. This forced us to use https provider.
+Websockets (`ws`) would have been a better choice but we cannot use unencrypted `ws` provider since it would be bad to send plain-text data from a privacy perspective. Geth does not support `wss` by [default](https://github.com/ethereum/go-ethereum/issues/16423). And Kubernetes does not support it either. This forced us to use https provider.
 
-## Troubleshooting
+### Troubleshooting
 
-### `Activity class {org.celo.mobile.staging/org.celo.mobile.MainActivity} does not exist.`
+#### `Activity class {org.celo.mobile.staging/org.celo.mobile.MainActivity} does not exist.`
 
 From time to time the app refuses to start showing this error:
 
@@ -416,8 +416,6 @@ $ adb kill-server && adb start-server
 [celo-monorepo]: https://github.com/celo-org/celo-monorepo
 [celo-blockchain]: https://github.com/celo-org/celo-blockchain
 [Apple Developer Program]: https://developer.apple.com/programs/
-
-[`src/components/bottombutton.test.tsx`]: ./src/components/BottomButton.test.tsx
 [detox]: https://github.com/wix/Detox
 [e2e readme]: ./e2e/README.md
 [enzyme]: https://airbnb.io/enzyme/docs/guides/react-native.html
