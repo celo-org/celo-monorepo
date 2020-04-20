@@ -13,6 +13,7 @@ contract DowntimeSlasher is SlasherUtil {
   uint256 public slashableDowntime;
 
   event SlashableDowntimeSet(uint256 interval);
+  event DowntimeSlashPerformed(address indexed validator, uint256 indexed startBlock);
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
@@ -150,6 +151,6 @@ contract DowntimeSlasher is SlasherUtil {
       groupElectionGreaters,
       groupElectionIndices
     );
+    emit DowntimeSlashPerformed(validator, startBlock);
   }
-
 }
