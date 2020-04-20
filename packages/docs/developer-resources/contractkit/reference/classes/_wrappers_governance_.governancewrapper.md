@@ -898,7 +898,7 @@ ___
 
 ###  getConstitution
 
-▸ **getConstitution**(`proposal`: [Proposal](../modules/_wrappers_governance_.md#proposal)): *Promise‹BigNumber.Value›*
+▸ **getConstitution**(`proposal`: [Proposal](../modules/_wrappers_governance_.md#proposal)): *Promise‹BigNumber›*
 
 *Defined in [contractkit/src/wrappers/Governance.ts:178](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L178)*
 
@@ -910,7 +910,7 @@ Name | Type | Description |
 ------ | ------ | ------ |
 `proposal` | [Proposal](../modules/_wrappers_governance_.md#proposal) | Proposal to determine the constitution for running.  |
 
-**Returns:** *Promise‹BigNumber.Value›*
+**Returns:** *Promise‹BigNumber›*
 
 ___
 
@@ -1002,7 +1002,7 @@ ___
 
 ###  getTransactionConstitution
 
-▸ **getTransactionConstitution**(`tx`: [ProposalTransaction](../modules/_wrappers_governance_.md#proposaltransaction)): *Promise‹BigNumber.Value›*
+▸ **getTransactionConstitution**(`tx`: [ProposalTransaction](../modules/_wrappers_governance_.md#proposaltransaction)): *Promise‹BigNumber›*
 
 *Defined in [contractkit/src/wrappers/Governance.ts:165](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L165)*
 
@@ -1014,7 +1014,7 @@ Name | Type | Description |
 ------ | ------ | ------ |
 `tx` | [ProposalTransaction](../modules/_wrappers_governance_.md#proposaltransaction) | Transaction to determine the constitution for running.  |
 
-**Returns:** *Promise‹BigNumber.Value›*
+**Returns:** *Promise‹BigNumber›*
 
 ___
 
