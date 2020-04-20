@@ -47,6 +47,17 @@ USAGE
 
 _See code: [packages/cli/src/commands/election/current.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/election/current.ts)_
 
+### Current-signers
+
+Outputs the set of validators currently participating in BFT to create blocks. An election is run to select the validator set at the end of every epoch.
+
+```
+USAGE
+  $ celocli election:current-signers
+```
+
+_See code: [packages/cli/src/commands/election/current-signers.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/election/current-signers.ts)_
+
 ### List
 
 Prints the list of validator groups, the number of votes they have received, the number of additional votes they are able to receive, and whether or not they are eligible to elect validators.
