@@ -3,16 +3,26 @@ import { InMemoryCache } from 'apollo-cache-inmemory'
 import fetch from 'cross-fetch'
 import gql from 'graphql-tag'
 import getConfig from 'next/config'
+import { Router, withRouter } from 'next/router'
 import * as React from 'react'
 import { ApolloProvider, Query } from 'react-apollo'
 import { StyleSheet, View } from 'react-native'
 import ShowApolloError from 'src/dev/ShowApolloError'
 import ValidatorsList from 'src/dev/ValidatorsList'
+import { styles } from 'src/dev/ValidatorsListStyles'
+import { H1 } from 'src/fonts/Fonts'
 import OpenGraph from 'src/header/OpenGraph'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import menuItems from 'src/shared/menu-items'
+import Navigation, { NavigationTheme } from 'src/shared/navigation'
 import Spinner from 'src/shared/Spinner'
-import { colors, standardStyles } from 'src/styles'
+import { colors, standardStyles, textStyles } from 'src/styles'
+
+const networkMenu = [
+  ['Mainnet', menuItems.VALIDATORS_LIST.link],
+  ['Baklava', menuItems.VALIDATORS_LIST__BAKLAVA.link],
+  // ['Baklavastaging', menuItems.VALIDATORS_LIST_BAKLAVASTAGING.link],
+]
 
 function createApolloClient(network: string) {
   return new ApolloClient({
@@ -87,12 +97,19 @@ const query = gql`
   }
 `
 
-class ValidatorsListApp extends React.PureComponent<I18nProps & { network?: string }> {
+type Props = I18nProps & { network?: string; router: Router }
+
+class ValidatorsListApp extends React.PureComponent<Props> {
   render() {
     const { network } = this.props
     if (!getConfig().publicRuntimeConfig.FLAGS.VALIDATORS) {
       return null
     }
+    const networkMenuList = networkMenu.map(([name, link]) => [
+      name,
+      link,
+      () => this.props.router.push(link),
+    ])
     return (
       <>
         <OpenGraph
@@ -100,51 +117,74 @@ class ValidatorsListApp extends React.PureComponent<I18nProps & { network?: stri
           path={menuItems.VALIDATORS_LIST.link}
           description="View status of Validators on the Celo Network"
         />
-        <ApolloProvider client={createApolloClient(network)}>
-          <Query query={query}>
-            {({ loading, error, data }: any) => {
-              if (error) {
-                return (
-                  <View
-                    style={[
-                      standardStyles.darkBackground,
-                      standardStyles.centered,
-                      styles.fullHeight,
-                    ]}
-                  >
-                    <ShowApolloError error={error} />
-                  </View>
-                )
-              }
-              if (!data) {
-                return (
-                  <View
-                    style={[
-                      standardStyles.darkBackground,
-                      standardStyles.centered,
-                      styles.fullHeight,
-                    ]}
-                  >
-                    <Spinner size="medium" color={colors.white} />
-                  </View>
-                )
-              }
-              return <ValidatorsList data={data} isLoading={loading} />
-            }}
-          </Query>
-        </ApolloProvider>
+        <View style={[styles.cover, styles.pStatic, compStyles.fullHeight]}>
+          <H1 style={[textStyles.center, standardStyles.sectionMarginTablet, textStyles.invert]}>
+            Validator Explorer
+          </H1>
+          <View>
+            <View style={[styles.links]}>
+              {networkMenuList.map(([name, link, navigate]: any) => (
+                <View key={name} style={[styles.linkWrapper]}>
+                  <Navigation
+                    onPress={navigate}
+                    text={name}
+                    theme={NavigationTheme.DARK}
+                    selected={this.props.router.pathname === link}
+                  />
+                </View>
+              ))}
+            </View>
+          </View>
+          <ApolloProvider client={createApolloClient(network)}>
+            <Query query={query}>
+              {({ loading, error, data }: any) => {
+                if (error) {
+                  return (
+                    <View
+                      style={[
+                        standardStyles.darkBackground,
+                        standardStyles.centered,
+                        compStyles.useSpace,
+                      ]}
+                    >
+                      <ShowApolloError error={error} />
+                    </View>
+                  )
+                }
+                if (!data) {
+                  return (
+                    <View
+                      style={[
+                        standardStyles.darkBackground,
+                        standardStyles.centered,
+                        compStyles.useSpace,
+                      ]}
+                    >
+                      <Spinner size="medium" color={colors.white} />
+                    </View>
+                  )
+                }
+                return <ValidatorsList data={data} isLoading={loading} />
+              }}
+            </Query>
+          </ApolloProvider>
+        </View>
       </>
     )
   }
 }
 
-const styles = StyleSheet.create({
-  fullHeight: { minHeight: '100vh' },
+const compStyles = StyleSheet.create({
+  fullHeight: { minHeight: 'calc(100vh - 75px)' },
+  useSpace: {
+    flex: 1,
+    paddingBottom: '20vh',
+  },
 })
 
-export default withNamespaces('dev')(ValidatorsListApp)
+export default withNamespaces('dev')(withRouter<Props>(ValidatorsListApp))
 
 export const ValidatorsListAppWithNetwork = (networkName: string) => {
-  const Comp = withNamespaces('dev')(ValidatorsListApp)
+  const Comp = withNamespaces('dev')(withRouter<Props>(ValidatorsListApp))
   return () => <Comp network={networkName} />
 }

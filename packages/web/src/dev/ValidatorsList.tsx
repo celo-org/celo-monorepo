@@ -1,22 +1,13 @@
 import { BigNumber } from 'bignumber.js'
-import { SingletonRouter as Router, withRouter } from 'next/router'
+import { SingletonRouter as Router } from 'next/router'
 import * as React from 'react'
 import { Text as RNText, View } from 'react-native'
 import ValidatorsListRow, { CeloGroup } from 'src/dev/ValidatorsListRow'
 import { styles } from 'src/dev/ValidatorsListStyles'
-import { H1 } from 'src/fonts/Fonts'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import Chevron, { Direction } from 'src/icons/chevron'
-import menu from 'src/shared/menu-items'
-import { colors, standardStyles, textStyles } from 'src/styles'
+import { colors } from 'src/styles'
 import { weiToDecimal } from 'src/utils/utils'
-import Navigation, { NavigationTheme } from 'src/shared/navigation'
-
-const networkMenu = [
-  ['Mainnet', menu.VALIDATORS_LIST.link],
-  ['Baklava', menu.VALIDATORS_LIST__BAKLAVA.link],
-  // ['Baklavastaging', menu.VALIDATORS_LIST_BAKLAVASTAGING.link],
-]
 
 class Text extends RNText {
   render() {
@@ -282,92 +273,68 @@ class ValidatorsList extends React.PureComponent<Props, State> {
     const { expanded, orderBy, orderAsc } = this.state
     const { data } = this.props
     const validatorGroups = !data ? ([] as CeloGroup[]) : this.sortData(this.cleanData(data))
-    const networkMenuList = networkMenu.map(([name, link]) => [
-      name,
-      link,
-      () => this.props.router.push(link),
-    ])
     return (
-      <View style={[styles.cover, styles.pStatic]}>
-        <View style={[styles.pStatic]}>
-          <H1 style={[textStyles.center, standardStyles.sectionMarginTablet, textStyles.invert]}>
-            Validator Explorer
-          </H1>
-          <View>
-            <View style={[styles.links]}>
-              {networkMenuList.map(([name, link, navigate]: any) => (
-                <View key={name} style={[styles.linkWrapper]}>
-                  <Navigation
-                    onPress={navigate}
-                    text={name}
-                    theme={NavigationTheme.DARK}
-                    selected={this.props.router.pathname === link}
-                  />
-                </View>
-              ))}
-            </View>
+      <View style={[styles.pStatic]}>
+        <View style={[styles.table, styles.pStatic]}>
+          <View style={[styles.tableRow, styles.tableHeaderRow]}>
+            <HeaderCell
+              onClick={this.orderByFn.name}
+              style={[styles.tableHeaderCellPadding]}
+              name="Name"
+              order={orderBy === 'name' ? orderAsc : null}
+            />
+            <HeaderCell
+              onClick={this.orderByFn.total}
+              style={[styles.sizeM]}
+              name="Elected/ Total"
+              order={orderBy === 'total' ? orderAsc : null}
+            />
+            <HeaderCell
+              onClick={this.orderByFn.votes}
+              style={[styles.sizeXL]}
+              name="Votes Available"
+              order={orderBy === 'votes' ? orderAsc : null}
+            />
+            <HeaderCell
+              onClick={this.orderByFn.gold}
+              style={[styles.sizeM]}
+              name="Locked CGLD"
+              order={orderBy === 'gold' ? orderAsc : null}
+            />
+            <HeaderCell
+              onClick={this.orderByFn.commision}
+              style={[styles.sizeM]}
+              name="Group Share"
+              order={orderBy === 'commision' ? orderAsc : null}
+            />
+            <HeaderCell
+              onClick={this.orderByFn.rewards}
+              style={[styles.sizeM]}
+              name="Voter Rewards"
+              order={orderBy === 'rewards' ? orderAsc : null}
+            />
+            <HeaderCell
+              onClick={this.orderByFn.uptime}
+              style={[styles.sizeS]}
+              name="Uptime"
+              order={orderBy === 'uptime' ? orderAsc : null}
+            />
+            <HeaderCell
+              onClick={this.orderByFn.attestation}
+              style={[styles.sizeS]}
+              name="Attestation"
+              order={orderBy === 'attestation' ? orderAsc : null}
+            />
           </View>
-          <View style={[styles.table, styles.pStatic]}>
-            <View style={[styles.tableRow, styles.tableHeaderRow]}>
-              <HeaderCell
-                onClick={this.orderByFn.name}
-                style={[styles.tableHeaderCellPadding]}
-                name="Name"
-                order={orderBy === 'name' ? orderAsc : null}
-              />
-              <HeaderCell
-                onClick={this.orderByFn.total}
-                style={[styles.sizeM]}
-                name="Elected/ Total"
-                order={orderBy === 'total' ? orderAsc : null}
-              />
-              <HeaderCell
-                onClick={this.orderByFn.votes}
-                style={[styles.sizeXL]}
-                name="Votes Available"
-                order={orderBy === 'votes' ? orderAsc : null}
-              />
-              <HeaderCell
-                onClick={this.orderByFn.gold}
-                style={[styles.sizeM]}
-                name="Locked CGLD"
-                order={orderBy === 'gold' ? orderAsc : null}
-              />
-              <HeaderCell
-                onClick={this.orderByFn.commision}
-                style={[styles.sizeM]}
-                name="Group Share"
-                order={orderBy === 'commision' ? orderAsc : null}
-              />
-              <HeaderCell
-                onClick={this.orderByFn.rewards}
-                style={[styles.sizeM]}
-                name="Voter Rewards"
-                order={orderBy === 'rewards' ? orderAsc : null}
-              />
-              <HeaderCell
-                onClick={this.orderByFn.uptime}
-                style={[styles.sizeS]}
-                name="Uptime"
-                order={orderBy === 'uptime' ? orderAsc : null}
-              />
-              <HeaderCell
-                onClick={this.orderByFn.attestation}
-                style={[styles.sizeS]}
-                name="Attestation"
-                order={orderBy === 'attestation' ? orderAsc : null}
-              />
-            </View>
-            {validatorGroups.map((group, i) => (
-              <div key={group.id} onClick={this.expand.bind(this, i)}>
-                <ValidatorsListRow group={group} expanded={expanded === i} />
-              </div>
-            ))}
-          </View>
+          {validatorGroups.map((group, i) => (
+            <div key={group.id} onClick={this.expand.bind(this, i)}>
+              <ValidatorsListRow group={group} expanded={expanded === i} />
+            </div>
+          ))}
         </View>
       </View>
     )
   }
 }
 
-export default withNamespaces('dev')(withRouter<Props>(ValidatorsList))
+export default withNamespaces('dev')(ValidatorsList)
