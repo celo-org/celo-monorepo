@@ -37,8 +37,8 @@ export abstract class ReleaseGoldCommand extends BaseCommand {
       // Call arbitrary release gold fn to verify `contractAddress` is a releasegold contract.
       try {
         await this._releaseGoldWrapper.getBeneficiary()
-      } catch (_) {
-        this.error('Provided address does not point to release gold contract.')
+      } catch (err) {
+        this.error(`Does the provided address point to release gold contract? ${err}`)
       }
     }
   }
