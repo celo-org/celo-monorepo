@@ -57,6 +57,39 @@ module "celo_proxy_az2" {
   proxies = var.proxies.az2
 }
 
+locals {
+  validator_proxy_settings = {
+    az1 = zipmap(
+      keys(var.proxies.az1),
+      [for k, v in var.proxies.az1 : {
+        proxy_enode      = var.proxies.az1[k].proxy_enode
+        proxy_private_ip = module.celo_proxy_az1.instances[k].private_ip
+        proxy_public_ip  = module.celo_proxy_az1.instances[k].public_ip
+        }
+      ]
+    )
+    az2 = zipmap(
+      keys(var.proxies.az2),
+      [for k, v in var.proxies.az2 : {
+        proxy_enode      = var.proxies.az2[k].proxy_enode
+        proxy_private_ip = module.celo_proxy_az2.instances[k].private_ip
+        proxy_public_ip  = module.celo_proxy_az2.instances[k].public_ip
+        }
+      ]
+    )
+  }
+  validator_params = {
+    az1 = zipmap(
+      keys(var.validators.az1),
+      [for k, v in var.validators.az1 : merge(var.validators.az1[k], lookup(local.validator_proxy_settings.az1, k, {}))]
+    )
+    az2 = zipmap(
+      keys(var.validators.az2),
+      [for k, v in var.validators.az2 : merge(var.validators.az2[k], lookup(local.validator_proxy_settings.az2, k, {}))]
+    )
+  }
+}
+
 module "celo_validator_az1" {
   source = "./modules/validator"
 
@@ -68,7 +101,7 @@ module "celo_validator_az1" {
   celo_network_id   = var.celo_network_id
   ethstats_host     = var.ethstats_host
 
-  validators = var.validators.az1
+  validators = local.validator_params.az1
 }
 
 module "celo_validator_az2" {
@@ -82,7 +115,7 @@ module "celo_validator_az2" {
   celo_network_id   = var.celo_network_id
   ethstats_host     = var.ethstats_host
 
-  validators = var.validators.az2
+  validators = local.validator_params.az2
 }
 
 resource "random_password" "password" {

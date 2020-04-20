@@ -58,6 +58,7 @@ variable proxies {
       proxy_private_key_file_contents = string
       proxy_private_key_password      = string
       proxy_node_private_key          = string
+      proxy_enode                     = string
     }))
     az2 = map(object({
       validator_name                  = string
@@ -67,6 +68,7 @@ variable proxies {
       proxy_private_key_file_contents = string
       proxy_private_key_password      = string
       proxy_node_private_key          = string
+      proxy_enode                     = string
     }))
   })
   default = {
@@ -79,20 +81,29 @@ variable proxies {
   #     myvalidator_az1_01 = {
   #       validator_name            = "myvalidator_az1_01"
   #       validator_signer_address  = "0000000011111111222222223333333344444444"
+  #       proxy_address             = "1234567812345678123456781234567812345678"
+  #       proxy_private_key_filename                 = "UTC--2020-04-12T06-49-54.736290200Z--1234567812345678123456781234567812345678" # Use the name of the private key file generated when you created your signer address key. This will be in the keystore folder on the node where you created the signer account.
+  #       proxy_private_key_file_contents            = "<The contents of the file described in the attestation_signer_private_key_filename comment>"
+  #       proxy_private_key_password                 = "<The password used then you created the proxy key>"
+  #       proxy_node_private_key                     = "<A private key that will become the nodekey for this proxy node. This allows enode to be predictable>"
+  #       proxy_enode                                = "<The enode value for this node. This is the hex public key for the node private key without the first two numbers >"
   #     }
   #     myvalidator_az1_02 = {
   #       validator_name            = "myvalidator_az1_02"
   #       validator_signer_address  = "5555555566666666777777778888888899999999"
+  #       ...
   #     }
   #   }
   #   az2 = {
   #     myvalidator_az2_01 = {
   #       validator_name            = "myvalidator_az2_01"
   #       validator_signer_address  = "4444444433333333222222221111111100000000"
+  #       ...
   #     }
   #     myvalidator_az2_02 = {
   #       validator_name            = "myvalidator_az2_02"
   #       validator_signer_address  = "9999999988888888777777776666666655555555"
+  #       ...
   #     }
   #   }
   #
@@ -108,9 +119,6 @@ variable validators {
       signer_private_key_filename      = string
       signer_private_key_file_contents = string
       signer_private_key_password      = string
-      proxy_enode                      = string
-      proxy_private_ip                 = string
-      proxy_public_ip                  = string
     }))
     az2 = map(object({
       name                             = string
@@ -118,9 +126,6 @@ variable validators {
       signer_private_key_filename      = string
       signer_private_key_file_contents = string
       signer_private_key_password      = string
-      proxy_enode                      = string
-      proxy_private_ip                 = string
-      proxy_public_ip                  = string
     }))
   })
   default = {
@@ -136,9 +141,6 @@ variable validators {
   #       signer_private_key_filename                 = "UTC--2020-02-06T06-49-54.736290200Z--0000000011111111222222223333333344444444" # Use the name of the private key file generated when you created your signer address key. This will be in the keystore folder on the node where you created the signer account.
   #       signer_private_key_file_contents            = "<The contents of the file described in the attestation_signer_private_key_filename comment>"
   #       signer_private_key_password                 = "<The password used then you created the signer key>"
-  #       proxy_enode                                 = "00000000000000001111111111111111222222222222222233333333333333334444444444444444555555555555555566666666666666667777777777777777"
-  #       proxy_private_ip                            = "10.10.0.120"
-  #       proxy_public_ip                             = "1.1.1.1"
   #     }
   #     myvalidator_az1_02 = {
   #       ...

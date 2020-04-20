@@ -87,6 +87,7 @@ variable proxies {
       proxy_private_key_file_contents = string
       proxy_private_key_password      = string
       proxy_node_private_key          = string
+      proxy_enode                     = string
     }))
     az2 = map(object({
       validator_name                  = string
@@ -96,6 +97,7 @@ variable proxies {
       proxy_private_key_file_contents = string
       proxy_private_key_password      = string
       proxy_node_private_key          = string
+      proxy_enode                     = string
     }))
   })
 }
@@ -109,9 +111,6 @@ variable validators {
       signer_private_key_filename      = string
       signer_private_key_file_contents = string
       signer_private_key_password      = string
-      proxy_enode                      = string
-      proxy_private_ip                 = string
-      proxy_public_ip                  = string
     }))
     az2 = map(object({
       name                             = string
@@ -119,9 +118,6 @@ variable validators {
       signer_private_key_filename      = string
       signer_private_key_file_contents = string
       signer_private_key_password      = string
-      proxy_enode                      = string
-      proxy_private_ip                 = string
-      proxy_public_ip                  = string
     }))
   })
 }
