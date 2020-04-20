@@ -201,66 +201,33 @@ sudo ./genymotion-3.0.2-linux_x64.bin
 
 ## Running the mobile wallet
 
+The below steps should help you successfully run the mobile wallet on either a USB connected or emulated device. For additional information and troublshooting see the [React Native docs][rn running on device].
+
+ **Note:** We've seen some issues running the metro bundler from iTerm
+
 1. If you haven't already, run `yarn` from the monorepo root to install dependencies.
 
 2. Attach your device or start an emulated one.
 
 ### iOS
 
-From ios folder in mobile package run `bundle exec pod install`
+3. From the `ios` directory in the `mobile` package, run `bundle exec pod install` to download and install the necessary iOS dependencies.
 
-Opne the workspace file with xcode
+4. Launch Xcode and use it to open the directory `celo.xcodeproj`. Confirm your iOS device has been detected by XCode.
 
-Run the build
+5. Build the project by pressing the play button in the top left corner or selecting `Product > Build` from the XCode menu bar.
 
-yarn dev:ios
+6. From the `mobile` directory run `yarn run dev:ios`.
 
 ### Android
 
-First, follow [these instructions to enable Developer Options][android dev options]
-on your Android.
+3. Follow [these instructions to enable Developer Options][android dev options] on your Android device.
 
-Plug in a USB cable and you'll be prompted to accept the connection and shown a
-public key (corresponding to the `abd_key.pub` file in `~/.android`)
+4. Unplug your device and replug it in. You'll be prompted to accept the connection and shown a public key (corresponding to the `abd_key.pub` file in `~/.android`)
 
-Then, running:
+5. To confirm your device is properly connectted, running `adb devices` from the terminal should show a connected device. If it lists a device as "unauthorized", make sure you've accepted the prompt or [troubleshoot here][device unauthorized].
 
-```bash
-adb devices
-```
-
-should show something like:
-
-```text
-List of devices attached
-8XEBB18414424157    device
-```
-
-If it lists a device as "unauthorized", make sure you've accepted the prompt or
-[troubleshoot here][device unauthorized].
-
-
-
-1.  If you haven't already, run `yarn` from the monorepo root to install dependencies.
-
-2.  Attach your device or start an emulated one.
-
-    You can verify if your device is properly connecting to ADB with `adb devices`.
-    More information about running the app on Android devices can be found on the
-    [React Native docs][rn running on device].
-
-3.  Compile the project and start the bundler with
-
-    ```bash
-    yarn run dev:android
-    OR
-    yarn run dev:ios
-    ```
-
-    This will build the app in a device (physical or emulated) and open a
-    terminal with a js server.
-
-    **Note:** We've seen some issues running the metro bundler from iTerm
+6. From the `mobile` directory run `yarn run dev:android`.
 
 
 ## Debugging
