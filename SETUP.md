@@ -11,7 +11,6 @@
       - [Install Node, Yarn and friends](#install-node-yarn-and-friends-1)
     - [Common stuff](#common-stuff)
       - [Install Go](#install-go)
-      - [Install gcloud CLI](#install-gcloud-CLI)
       - [Optional: Install Rust](#optional-install-rust)
   - [Building celo-monorepo](#building-celo-monorepo)
   - [Deploying the mobile wallet](#deploying-the-mobile-wallet)
@@ -117,12 +116,6 @@ Execute the following (and make sure the lines are in your `~/.bash_profile`):
 export GOPATH=$HOME/go
 export PATH=$PATH:$GOPATH/bin
 ```
-
-#### Install gcloud CLI
-
-_Required for cLabs employees only._
-
-[Install the gcloud SDK](https://cloud.google.com/sdk/docs#install_the_latest_cloud_tools_version_cloudsdk_current_version), which includes the command line tools. Once installed, initialize `gcloud` and log in.
 
 #### Optional: Install Rust
 

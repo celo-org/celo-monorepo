@@ -34,6 +34,7 @@
     - [Why do we use http(s) provider?](#why-do-we-use-http(s)-provider?)
     - [Troubleshooting](#troubleshooting)
 
+
 ## Overview
 
 This is a wallet application for the [Celo platform].
