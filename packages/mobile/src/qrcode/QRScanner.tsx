@@ -24,11 +24,9 @@ interface DispatchProps {
   handleBarcodeDetected: typeof handleBarcodeDetected
 }
 
-interface State {}
-
 type Props = DispatchProps & WithTranslation & NavigationFocusInjectedProps
 
-class QRScanner extends React.Component<Props, State> {
+class QRScanner extends React.Component<Props> {
   static navigationOptions = () => ({
     ...headerWithBackButton,
     headerTitle: i18n.t('sendFlow7:scanCode'),
