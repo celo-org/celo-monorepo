@@ -41,15 +41,17 @@ In order for your Validator to participate in consensus and complete attestation
 
 Your Proxy and Attestations nodes must have static, external IP addresses, and your Validator node must be able to communicate with the Proxy, either via an internal network or via the Proxy's external IP address.
 
-On the Proxy and Attestations machines, port 30303 should accept TCP and UDP connections from all IP addresses. This port is used to communicate with other nodes in the network.
+On the Validator machine, port 30503 should accept TCP connects from the IP address of your Proxy machine. This port is used by the Validator to communicate with the Proxy.
 
 On the Proxy machine, port 30503 should accept TCP connections from the IP address of your Validator machine. This port is used by the Proxy to communicate with the Validator.
+
+On the Proxy and Attestations machines, port 30303 should accept TCP and UDP connections from all IP addresses. This port is used to communicate with other nodes in the network.
 
 On the Attestations machine, port 80 should accept TCP connections from all IP addresses. This port is used by users to request attestations from you.
 
 To illustrate this, you may refer to the following table:
 
-| Machine \\ IPs open to | 0\.0\.0\.0/0 \(all\) | your\-validator\-ip> | your\-proxy\-ip |
+| Machine \\ IPs open to | 0\.0\.0\.0/0 \(all\) | your\-validator\-ip | your\-proxy\-ip |
 |------------------------|----------------------|-----------------------|-------------------|
 | Validator              |                      |                       | tcp:30503        |
 | Proxy                  | tcp:30303, udp:30303 | tcp:30503             |                   |
@@ -186,6 +188,8 @@ The `us.gcr.io/celo-testnet/celo-node:rc1` image contains the [genesis block](ht
 
 ```bash
 # On the proxy machine
+mkdir celo-proxy-node
+cd celo-proxy-node
 docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE init /celo/genesis.json
 export BOOTNODE_ENODES="$(docker run --rm --entrypoint cat $CELO_IMAGE /celo/bootnodes)"
 ```
@@ -242,6 +246,13 @@ export PROXY_EXTERNAL_IP=<PROXY-MACHINE-EXTERNAL-IP-ADDRESS>
 export PROXY_INTERNAL_IP=<PROXY-MACHINE-INTERNAL-IP-ADDRESS>
 ```
 
+You will also need to export `PROXY_EXTERNAL_IP` on your local machine.
+
+```bash
+# On your local machine
+export PROXY_EXTERNAL_IP=<PROXY-MACHINE-EXTERNAL-IP-ADDRESS>
+```
+
 ### Connect the Validator to the proxy
 
 When your Validator starts up it will attempt to create a network connection with the proxy machine. You will need to make sure that your proxy machine has the appropriate firewall settings to allow the Validator to connect to it.
@@ -265,6 +276,8 @@ Once that is completed, go ahead and run the Validator. Be sure to write your Va
 
 ```bash
 # On the Validator machine
+mkdir celo-validator-node
+cd celo-validator-node
 docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE init /celo/genesis.json
 docker run --name celo-validator -it --restart unless-stopped -p 30303:30303 -p 30303:30303/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --mine --istanbul.blockperiod=5 --istanbul.requesttimeout=3000 --etherbase $CELO_VALIDATOR_SIGNER_ADDRESS --nodiscover --nousb --proxy.proxied --proxy.proxyenodeurlpair=enode://$PROXY_ENODE@$PROXY_INTERNAL_IP:30503\;enode://$PROXY_ENODE@$PROXY_EXTERNAL_IP:30303 --unlock=$CELO_VALIDATOR_SIGNER_ADDRESS --password /root/.celo/.password --ethstats=<YOUR-VALIDATOR-NAME>@stats-server.celo.org
 ```
