@@ -12,17 +12,20 @@ import { contractKitReadySelector } from 'src/web3/selectors'
 import Web3 from 'web3'
 import { provider } from 'web3-core'
 import { Platform } from 'react-native'
+import { fornoSelector } from 'src/web3/selectors'
+import sleep from 'sleep-promise'
 
 // Logging tag
 const tag = 'web3/contracts'
 
 export const web3: Web3 = getWeb3ForUtils()
-let contractKit = newKitFromWeb3(web3)
+const contractKitForno = newKitFromWeb3(getWeb3(true))
+const contractKitGeth = newKitFromWeb3(getWeb3(false))
 
 // TODO util functions can just be web3
 
 function getWeb3ForUtils(): Web3 {
-  Logger.debug('getting web3')
+  Logger.debug('getting web3 for utils')
   return new Web3()
 }
 
@@ -31,21 +34,33 @@ export async function getContractKitOutsideGenerator() {
   // 250 ms
   // make sure not blocking US
   // don't get store until it's defined
+  while (!store) {
+    Logger.debug(`getContractKitOutsideGenerator`, `still waiting for store...`)
+    await sleep(250)
+  }
+
   const contractKitReady = contractKitReadySelector(store.getState())
   if (contractKitReady) {
-    return contractKit
+    if (fornoSelector(store.getState())) {
+      Logger.debug('getting forno contractkit')
+      return contractKitForno
+    } else {
+      Logger.debug('getting geth contractkit')
+      return contractKitGeth
+    }
   } else {
     throw new Error('Contract Kit not yet ready')
   }
 }
 
-function getWeb3(): Web3 {
+function getWeb3(fornoMode: boolean): Web3 {
   Logger.info(
     `${tag}@getWeb3`,
     `Initializing web3, platform: ${Platform.OS}, forno mode: ${isInitiallyFornoMode()}`
   )
 
-  if (isInitiallyFornoMode()) {
+  Logger.debug(`@getWeb3`, `forno mode: ${fornoMode}`)
+  if (fornoMode) {
     const url = DEFAULT_FORNO_URL
     Logger.debug(`${tag}@getWeb3`, `Connecting to url ${url}`)
     return new Web3(getHttpProvider(url))
@@ -55,14 +70,23 @@ function getWeb3(): Web3 {
 }
 
 export function* getContractKit() {
-  // TODO(anna) Keep polling until store is defined
-  // 250 ms
-  // make sure not blocking US
-  // don't get store until it's defined
-  yield call(waitForRehydrate)
+  if (!store) {
+    // Wait for rehydrate if store undefined
+    yield call(waitForRehydrate)
+    Logger.debug(`@getContractKit`, `Waited for rehydrate`)
+    // Note this is not necessary on first start
+  }
   const contractKitReady = contractKitReadySelector(store.getState())
+  Logger.debug(`@getContractKit`, `contractKitReady: ${contractKitReady}`)
+
   if (contractKitReady) {
-    return contractKit
+    if (fornoSelector(store.getState())) {
+      Logger.debug('getting forno contractkit')
+      return contractKitForno
+    } else {
+      Logger.debug('getting geth contractkit')
+      return contractKitGeth
+    }
   } else {
     throw new Error('Contract Kit not yet ready')
   }
@@ -138,8 +162,8 @@ export function addLocalAccount(privateKey: string, isDefault: boolean = false) 
   if (!privateKey) {
     throw new Error(`privateKey is ${privateKey}`)
   }
-  contractKit.addAccount(privateKey)
+  contractKitForno.addAccount(privateKey)
   if (isDefault) {
-    contractKit.defaultAccount = privateKeyToAddress(privateKey)
+    contractKitForno.defaultAccount = privateKeyToAddress(privateKey)
   }
 }

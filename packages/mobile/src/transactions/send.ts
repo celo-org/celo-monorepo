@@ -132,7 +132,7 @@ export function* sendTransaction(
       nonce,
       staticGas
     )
-    const result = yield confirmation
+    const result = yield confirmation // TODO(anna) is this yield ok
     return result
   }
   yield call(wrapSendTransactionWithRetry, txId, account, sendTxMethod, cancelAction)

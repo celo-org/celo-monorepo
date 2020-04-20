@@ -68,8 +68,11 @@ export function* checkWeb3SyncProgress() {
       let syncProgress: boolean | Web3SyncProgress
 
       // isSyncing returns a syncProgress object when it's still syncing, false otherwise
+      Logger.debug(TAG, 'checkWeb3SyncProgress', 'About to get getContractKit')
       const contractKit = yield call(getContractKit)
+      Logger.debug(TAG, 'checkWeb3SyncProgress', 'Got ContractKit')
       syncProgress = contractKit.web3.eth.isSyncing
+      Logger.debug(TAG, 'checkWeb3SyncProgress', `Sync progress: ${syncProgress}`)
 
       if (typeof syncProgress === 'boolean' && !syncProgress) {
         Logger.debug(TAG, 'checkWeb3SyncProgress', 'Sync maybe complete, checking')
@@ -457,17 +460,6 @@ export function* toggleFornoMode(action: SetIsFornoAction) {
 
 export function* watchFornoMode() {
   yield takeLatest(Actions.TOGGLE_IS_FORNO, toggleFornoMode)
-}
-
-export function* watchReadyToInitializeWeb3() {
-  yield call(waitForRehydrate)
-  const forno = yield select(fornoSelector)
-  if (forno) {
-    // create web3 with https
-  } else {
-    // create web3 with not https
-  }
-  yield put(setContractKitReady())
 }
 
 export function* web3Saga() {
