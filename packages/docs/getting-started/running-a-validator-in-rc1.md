@@ -313,7 +313,7 @@ We will need to use 7 keys, so let's have [a refresher on key management](../ope
 
 ### Create Accounts from the `ReleaseGold` contracts
 
-In order to participate on the network (lock gold, vote, validate) from a `ReleaseGold` contract, we need to create a Locked Gold Account with the address of the `ReleaseGold` contract. In the RC1 network, you can look up your Beneficiary address(es) in [the published mapping](https://raw.githubusercontent.com/celo-org/celo-monorepo/asaj/rc1/packages/celotool/stakeoff_grants.json) to find your corresponding `ReleaseGold` contract addresses. If you submitted a Gist for RC1 with your beneficiary addresses, you should find a `ReleaseGold` contract for each beneficiary address, one for each split of your total award.
+In order to participate on the network (lock gold, vote, validate) from a `ReleaseGold` contract, we need to create a Locked Gold Account with the address of the `ReleaseGold` contract. In the RC1 network, you can look up your Beneficiary address(es) in a mapping that will be published soon to find your corresponding `ReleaseGold` contract addresses. If you submitted a Gist for RC1 with your beneficiary addresses, you should find a `ReleaseGold` contract for each beneficiary address, one for each split of your total award.
 
 ```bash
 # On your local machine
