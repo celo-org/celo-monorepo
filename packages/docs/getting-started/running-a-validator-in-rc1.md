@@ -41,17 +41,19 @@ In order for your Validator to participate in consensus and complete attestation
 
 Your Proxy and Attestations nodes must have static, external IP addresses, and your Validator node must be able to communicate with the Proxy, either via an internal network or via the Proxy's external IP address.
 
-On the Proxy and Attestations machines, port 30303 should accept TCP and UDP connections from all IP addresses. This port is used to communicate with other nodes in the network.
+On the Validator machine, port 30503 should accept TCP connections from the IP address of your Proxy machine. This port is used by the Validator to communicate with the Proxy.
 
 On the Proxy machine, port 30503 should accept TCP connections from the IP address of your Validator machine. This port is used by the Proxy to communicate with the Validator.
+
+On the Proxy and Attestations machines, port 30303 should accept TCP and UDP connections from all IP addresses. This port is used to communicate with other nodes in the network.
 
 On the Attestations machine, port 80 should accept TCP connections from all IP addresses. This port is used by users to request attestations from you.
 
 To illustrate this, you may refer to the following table:
 
-| Machine \\ IPs open to | 0\.0\.0\.0/0 \(all\) | <your\-validator\-ip> | <your\-proxy\-ip> |
+| Machine \\ IPs open to | 0\.0\.0\.0/0 \(all\) | your\-validator\-ip | your\-proxy\-ip |
 |------------------------|----------------------|-----------------------|-------------------|
-| Validator              |                      |                       | TCP: Proxy        |
+| Validator              |                      |                       | tcp:30503        |
 | Proxy                  | tcp:30303, udp:30303 | tcp:30503             |                   |
 | Attestation            | tcp:80               |                       |                   |
 
@@ -80,8 +82,6 @@ The code snippets you'll see on this page are bash commands and their output.
 
 When you see text in angle brackets &lt;&gt;, replace them and the text inside with your own value of what it refers to. Don't include the &lt;&gt; in the command.
 {% endhint %}
-
-## Instructions
 
 ### Key Management
 
@@ -134,8 +134,7 @@ There are number of environment variables in this guide, and you may use this ta
 | APP_SIGNATURE                        | The hash with which clients can auto-read SMS messages on android                                                                    |
 | SMS_PROVIDERS                        | A comma-separated list of providers you want to configure, Celo currently supports `nexmo` & `twilio`                                   |
 
-
-## Network Deployment
+## Network Deployment Timeline
 
 The setup of RC1 is similar to the new Baklava network and the deployment timeline is as follows (all dates are subject to change):
 
@@ -182,20 +181,12 @@ docker pull $CELO_IMAGE
 
 The `us.gcr.io/celo-testnet/celo-node:rc1` image contains the [genesis block](https://github.com/celo-org/celo-monorepo/blob/asaj/rc1/packages/celotool/genesis_rc1.json) in addition to the Celo Blockchain binary.
 
-### Networking requirements
-
-To avoid exposing the Validator to the public internet, we first deploy a Proxy node which is responsible for communicating with the network. On our Proxy machine, we'll set up the node and get the bootnode enode URLs to discover other nodes.
-
-In order for your Validator to participate in consensus and complete attestations, it is critically important to configure your network correctly. Your proxy nodes must have static, external IP addresses, and your Validator node must be able to communicate with your proxy, preferably via an internal network, or otherwise via the proxy's external IP address.
-
-On the proxy machine, port 30303 should accept TCP and UDP connections from all IP addresses. This port is used to communicate with other nodes in the network.
-
-On the proxy machine, port 30503 should accept TCP connections from the IP address of your Validator machine. This port is used by the proxy to communicate with the Validator.
-
 ### Deploy a proxy
 
 ```bash
 # On the proxy machine
+mkdir celo-proxy-node
+cd celo-proxy-node
 docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE init /celo/genesis.json
 export BOOTNODE_ENODES="$(docker run --rm --entrypoint cat $CELO_IMAGE /celo/bootnodes)"
 ```
@@ -252,6 +243,13 @@ export PROXY_EXTERNAL_IP=<PROXY-MACHINE-EXTERNAL-IP-ADDRESS>
 export PROXY_INTERNAL_IP=<PROXY-MACHINE-INTERNAL-IP-ADDRESS>
 ```
 
+You will also need to export `PROXY_EXTERNAL_IP` on your local machine.
+
+```bash
+# On your local machine
+export PROXY_EXTERNAL_IP=<PROXY-MACHINE-EXTERNAL-IP-ADDRESS>
+```
+
 ### Connect the Validator to the proxy
 
 When your Validator starts up it will attempt to create a network connection with the proxy machine. You will need to make sure that your proxy machine has the appropriate firewall settings to allow the Validator to connect to it.
@@ -275,6 +273,8 @@ Once that is completed, go ahead and run the Validator. Be sure to write your Va
 
 ```bash
 # On the Validator machine
+mkdir celo-validator-node
+cd celo-validator-node
 docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE init /celo/genesis.json
 docker run --name celo-validator -it --restart unless-stopped -p 30303:30303 -p 30303:30303/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --mine --istanbul.blockperiod=5 --istanbul.requesttimeout=3000 --etherbase $CELO_VALIDATOR_SIGNER_ADDRESS --nodiscover --nousb --proxy.proxied --proxy.proxyenodeurlpair=enode://$PROXY_ENODE@$PROXY_INTERNAL_IP:30503\;enode://$PROXY_ENODE@$PROXY_EXTERNAL_IP:30303 --unlock=$CELO_VALIDATOR_SIGNER_ADDRESS --password /root/.celo/.password --ethstats=<YOUR-VALIDATOR-NAME>@stats-server.celo.org
 ```
@@ -313,7 +313,7 @@ We will need to use 7 keys, so let's have [a refresher on key management](../ope
 
 ### Create Accounts from the `ReleaseGold` contracts
 
-In order to participate on the network (lock gold, vote, validate) from a `ReleaseGold` contract, we need to create a Locked Gold Account with the address of the `ReleaseGold` contract. In the RC1 network, you can look up your Beneficiary address(es) in [the published mapping](https://gist.githubusercontent.com/nategraf/a87f9c2e488ab2d38a0a3c09f5d4ca2b/raw) to find your corresponding `ReleaseGold` contract addresses. If you submitted a Gist for RC1 with your beneficiary addresses, you should find a `ReleaseGold` contract for each beneficiary address, one for each split of your total award.
+In order to participate on the network (lock gold, vote, validate) from a `ReleaseGold` contract, we need to create a Locked Gold Account with the address of the `ReleaseGold` contract. In the RC1 network, you can look up your Beneficiary address(es) in [the published mapping](https://raw.githubusercontent.com/celo-org/celo-monorepo/asaj/rc1/packages/celotool/stakeoff_grants.json) to find your corresponding `ReleaseGold` contract addresses. If you submitted a Gist for RC1 with your beneficiary addresses, you should find a `ReleaseGold` contract for each beneficiary address, one for each split of your total award.
 
 ```bash
 # On your local machine
