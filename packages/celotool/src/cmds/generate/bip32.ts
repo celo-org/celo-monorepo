@@ -1,7 +1,6 @@
 /* tslint:disable no-console */
 import {
   coerceMnemonicAccountType,
-  generateAddress,
   generatePrivateKey,
   MNEMONIC_ACCOUNT_TYPE_CHOICES,
 } from 'src/lib/generate_utils'
@@ -47,7 +46,6 @@ export const builder = (argv: yargs.Argv) => {
  */
 export const handler = async (argv: Bip32Argv) => {
   console.log(
-    `${generatePrivateKey(argv.mnemonic, coerceMnemonicAccountType(argv.accountType), argv.index)}\n
-    ${generateAddress(argv.mnemonic, coerceMnemonicAccountType(argv.accountType), argv.index)}`
+    generatePrivateKey(argv.mnemonic, coerceMnemonicAccountType(argv.accountType), argv.index)
   )
 }

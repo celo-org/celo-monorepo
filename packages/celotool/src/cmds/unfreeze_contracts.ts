@@ -55,14 +55,13 @@ export const handler = async (argv: UnfreezeContractsArgv) => {
     console.log(`Using account: ${account}`)
     kit.defaultAccount = account
 
-    const [exchange, epochRewards, stableToken] = await Promise.all([
+    const [exchange, epochRewards] = await Promise.all([
       argv.exchange ? kit._web3Contracts.getExchange() : null,
       argv.rewards ? kit._web3Contracts.getEpochRewards() : null,
-      kit._web3Contracts.getStableToken(),
     ])
     const freezerContract = await kit._web3Contracts.getFreezer()
 
-    for (const [name, contract] of Object.entries({ exchange, epochRewards, stableToken })) {
+    for (const [name, contract] of Object.entries({ exchange, epochRewards })) {
       if (contract === null) {
         continue
       }
