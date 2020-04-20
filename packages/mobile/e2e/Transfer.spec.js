@@ -62,7 +62,7 @@ describe('Transfer Works', () => {
     await element(by.id('SystemAuthContinue')).tap()
   })
 
-  it.skip('NUX->Invite', async () => {
+  it('NUX->Invite', async () => {
     await waitFor(element(by.id('InviteCodeTitle')))
       .toBeVisible()
       .withTimeout(2000)
@@ -94,7 +94,7 @@ describe('Transfer Works', () => {
     await sleep(10000)
   })
 
-  it.skip('NUX->VerifyEducation', async () => {
+  it('NUX->VerifyEducation', async () => {
     await waitFor(element(by.id('VerifyEducationHeader')))
       .toBeVisible()
       .withTimeout(10000000)
@@ -111,13 +111,13 @@ describe('Transfer Works', () => {
     // await element(by.id('VerifyContinueButton')).tap()
   })
 
-  it.skip('NUX->Verify', async () => {
+  it('NUX->Verify', async () => {
     // skipping for now
     skipTo('WalletHome')
     await sleep(10000)
   })
 
-  it.skip('Wallet Home', async () => {
+  it('Wallet Home', async () => {
     await waitFor(element(by.id('AccountOverviewInHome/dollarBalance')))
       .toBeVisible()
       .withTimeout(10000)
@@ -127,7 +127,7 @@ describe('Transfer Works', () => {
       .withTimeout(10000)
   })
 
-  it.skip('Wallet Home->Send', async () => {
+  it('Wallet Home->Send', async () => {
     await element(by.id('SendNavigator')).tap()
 
     await waitFor(element(by.id('RecipientPicker')))
