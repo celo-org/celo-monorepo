@@ -7,11 +7,10 @@ import { styles } from 'src/dev/ValidatorsListStyles'
 import { H1 } from 'src/fonts/Fonts'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import Chevron, { Direction } from 'src/icons/chevron'
-import Button, { BTN } from 'src/shared/Button.3'
 import menu from 'src/shared/menu-items'
-import OvalCoin from 'src/shared/OvalCoin'
 import { colors, standardStyles, textStyles } from 'src/styles'
 import { weiToDecimal } from 'src/utils/utils'
+import Navigation, { NavigationTheme } from 'src/shared/navigation'
 
 const networkMenu = [
   ['Mainnet', menu.VALIDATORS_LIST.link],
@@ -283,6 +282,11 @@ class ValidatorsList extends React.PureComponent<Props, State> {
     const { expanded, orderBy, orderAsc } = this.state
     const { data } = this.props
     const validatorGroups = !data ? ([] as CeloGroup[]) : this.sortData(this.cleanData(data))
+    const networkMenuList = networkMenu.map(([name, link]) => [
+      name,
+      link,
+      () => this.props.router.push(link),
+    ])
     return (
       <View style={[styles.cover, styles.pStatic]}>
         <View style={[styles.pStatic]}>
@@ -291,20 +295,14 @@ class ValidatorsList extends React.PureComponent<Props, State> {
           </H1>
           <View>
             <View style={[styles.links]}>
-              {networkMenu.map(([name, link]) => (
-                <View
-                  key={name}
-                  style={[
-                    styles.linkWrapper,
-                    this.props.router.pathname !== link ? styles.linkWrapperInactive : {},
-                  ]}
-                >
-                  <Button kind={BTN.DARKNAV} href={link} text={name} />
-                  {this.props.router.pathname === link && (
-                    <View style={styles.activeTab}>
-                      <OvalCoin color={colors.gold} size={10} />
-                    </View>
-                  )}
+              {networkMenuList.map(([name, link, navigate]: any) => (
+                <View key={name} style={[styles.linkWrapper]}>
+                  <Navigation
+                    onPress={navigate}
+                    text={name}
+                    theme={NavigationTheme.DARK}
+                    selected={this.props.router.pathname === link}
+                  />
                 </View>
               ))}
             </View>

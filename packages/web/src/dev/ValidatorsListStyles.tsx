@@ -39,7 +39,7 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'column',
-    marginHorizontal: 20,
+    marginHorizontal: 0,
     marginBottom: 40,
   },
   linkWrapperInactive: {
