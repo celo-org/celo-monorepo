@@ -4,75 +4,6 @@ description: Interact with on-chain governance proposals and hotfixes
 
 ## Commands
 
-# <<<<<<< HEAD
-
-### Approve
-
-Approve a dequeued governance proposal
-
-```
-USAGE
-  $ celocli governance:approve
-
-OPTIONS
-  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Approver's address
-
-  --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
-                                                     addresses for local signing
-
-  --ledgerConfirmAddress                             Set it to ask confirmation for the address of the transaction from
-                                                     the ledger
-
-  --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
-                                                     index addresses for local signing. Example --ledgerCustomAddresses
-                                                     "[4,99]"
-
-  --proposalID=proposalID                            (required) UUID of proposal to approve
-
-  --useLedger                                        Set it to use a ledger wallet
-
-  --useMultiSig                                      True means the request will be sent through multisig.
-
-EXAMPLES
-  approve --proposalID 99 --from 0x5409ed021d9299bf6814279a6a1411a7e866a631
-  approve --proposalID 99 --from 0x5409ed021d9299bf6814279a6a1411a7e866a631 --useMultiSig
-```
-
-_See code: [packages/cli/src/commands/governance/approve.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/governance/approve.ts)_
-
-### Approvehotfix
-
-Approve a governance hotfix
-
-```
-USAGE
-  $ celocli governance:approvehotfix
-
-OPTIONS
-  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Approver's address
-  --hash=hash                                        (required) Hash of hotfix transactions
-
-  --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
-                                                     addresses for local signing
-
-  --ledgerConfirmAddress                             Set it to ask confirmation for the address of the transaction from
-                                                     the ledger
-
-  --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
-                                                     index addresses for local signing. Example --ledgerCustomAddresses
-                                                     "[4,99]"
-
-  --useLedger                                        Set it to use a ledger wallet
-
-EXAMPLE
-  approvehotfix --hash 0x614dccb5ac13cba47c2430bdee7829bb8c8f3603a8ace22e7680d317b39e3658 --from
-  0x5409ed021d9299bf6814279a6a1411a7e866a631
-```
-
-_See code: [packages/cli/src/commands/governance/approvehotfix.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/governance/approvehotfix.ts)_
-
-> > > > > > > 267ca911aad089b4d571ee3199cc38c0401f2df6
-
 ### Dequeue
 
 Try to dequeue governance proposal
@@ -175,8 +106,20 @@ USAGE
   $ celocli governance:hashhotfix
 
 OPTIONS
-  --jsonTransactions=jsonTransactions  (required) Path to json transactions of the hotfix
-  --salt=salt                          (required) Secret salt associated with hotfix
+  --jsonTransactions=jsonTransactions            (required) Path to json transactions of the hotfix
+
+  --ledgerAddresses=ledgerAddresses              [default: 1] If --useLedger is set, this will get the first N addresses
+                                                 for local signing
+
+  --ledgerConfirmAddress                         Set it to ask confirmation for the address of the transaction from the
+                                                 ledger
+
+  --ledgerCustomAddresses=ledgerCustomAddresses  [default: [0]] If --useLedger is set, this will get the array of index
+                                                 addresses for local signing. Example --ledgerCustomAddresses "[4,99]"
+
+  --salt=salt                                    (required) Secret salt associated with hotfix
+
+  --useLedger                                    Set it to use a ledger wallet
 
 EXAMPLE
   hashhotfix --jsonTransactions ./transactions.json --salt
@@ -277,6 +220,18 @@ USAGE
 
 OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Upvoter's address
+
+  --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
+                                                     addresses for local signing
+
+  --ledgerConfirmAddress                             Set it to ask confirmation for the address of the transaction from
+                                                     the ledger
+
+  --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
+                                                     index addresses for local signing. Example --ledgerCustomAddresses
+                                                     "[4,99]"
+
+  --useLedger                                        Set it to use a ledger wallet
 
 EXAMPLE
   revokeupvote --from 0x5409ed021d9299bf6814279a6a1411a7e866a631
