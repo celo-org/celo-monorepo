@@ -385,6 +385,7 @@ Relevant code references:
 There are two major differences in Forno mode:
 
 1.  Geth won't run at all. Instead, web3 connects to <testnet>-forno.celo-testnet.org using an https provider, for example, [https://integration-forno.celo-testnet.org](https://integration-forno.celo-testnet.org).
+2. Transactions will be signed locally by contractkit.
 
 ### Why do we use http(s) provider?
 
