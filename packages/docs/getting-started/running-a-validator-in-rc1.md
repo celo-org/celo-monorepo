@@ -87,7 +87,7 @@ When you see text in angle brackets &lt;&gt;, replace them and the text inside w
 
 Private keys are the central primitive of any cryptographic system and need to be handled with extreme care. Loss of your private key can lead to irreversible loss of value.
 
-This guide contains a large number of keys, so it is important to understand the purpose of each key. [Read more about key management.](../operations-manual/summary.md)
+This guide contains a large number of keys, so it is important to understand the purpose of each key. [Read more about key management.](../operations-manual/key-management/summary.md)
 
 #### Unlocking
 
@@ -309,7 +309,7 @@ The following sections outline the actions you will need to take. On a high leve
 - Add the registered Validator to the Validator Group
 - Vote for the group with funds from each `ReleaseGold` contract
 
-We will need to use 7 keys, so let's have [a refresher on key management](../operations-manual/summary.md).
+We will need to use 7 keys, so let's have [a refresher on key management](../operations-manual/key-management/summary.md).
 
 ### Create Accounts from the `ReleaseGold` contracts
 
@@ -366,7 +366,7 @@ celocli lockedgold:show $CELO_VALIDATOR_RG_ADDRESS
 
 ### Register as a Validator
 
-In order to perform Validator actions with the Account created in the previous step, you will need to authorize a [Validator signer](../operations-manual/summary/detailed#authorized-validator-signers.md) for the `ReleaseGold` contract account.
+In order to perform Validator actions with the Account created in the previous step, you will need to authorize a [Validator signer](../operations-manual/key-management/detailed#authorized-validator-signers.md) for the `ReleaseGold` contract account.
 
 If you were part of the genesis validator set, you will have already generated this key and submitted it via Gist. Note that if you are planning to run more than one validator, each validator will need a distinct validator signer.
 
