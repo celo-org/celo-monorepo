@@ -1,10 +1,10 @@
-# Class: LedgerWallet
+# Class: AzureHSMWallet
 
 ## Hierarchy
 
   ↳ [RemoteWallet](_wallets_remote_wallet_.remotewallet.md)
 
-  ↳ **LedgerWallet**
+  ↳ **AzureHSMWallet**
 
 ## Implements
 
@@ -16,83 +16,33 @@
 
 ### Constructors
 
-* [constructor](_wallets_ledger_wallet_.ledgerwallet.md#constructor)
-
-### Properties
-
-* [baseDerivationPath](_wallets_ledger_wallet_.ledgerwallet.md#basederivationpath)
-* [derivationPathIndexes](_wallets_ledger_wallet_.ledgerwallet.md#derivationpathindexes)
-* [ledgerAddressValidation](_wallets_ledger_wallet_.ledgerwallet.md#ledgeraddressvalidation)
-* [transport](_wallets_ledger_wallet_.ledgerwallet.md#transport)
+* [constructor](_wallets_azure_hsm_wallet_.azurehsmwallet.md#constructor)
 
 ### Methods
 
-* [getAccounts](_wallets_ledger_wallet_.ledgerwallet.md#getaccounts)
-* [hasAccount](_wallets_ledger_wallet_.ledgerwallet.md#hasaccount)
-* [init](_wallets_ledger_wallet_.ledgerwallet.md#init)
-* [signPersonalMessage](_wallets_ledger_wallet_.ledgerwallet.md#signpersonalmessage)
-* [signTransaction](_wallets_ledger_wallet_.ledgerwallet.md#signtransaction)
-* [signTypedData](_wallets_ledger_wallet_.ledgerwallet.md#signtypeddata)
+* [getAccounts](_wallets_azure_hsm_wallet_.azurehsmwallet.md#getaccounts)
+* [getAddressFromKeyName](_wallets_azure_hsm_wallet_.azurehsmwallet.md#getaddressfromkeyname)
+* [hasAccount](_wallets_azure_hsm_wallet_.azurehsmwallet.md#hasaccount)
+* [init](_wallets_azure_hsm_wallet_.azurehsmwallet.md#init)
+* [signPersonalMessage](_wallets_azure_hsm_wallet_.azurehsmwallet.md#signpersonalmessage)
+* [signTransaction](_wallets_azure_hsm_wallet_.azurehsmwallet.md#signtransaction)
+* [signTypedData](_wallets_azure_hsm_wallet_.azurehsmwallet.md#signtypeddata)
 
 ## Constructors
 
 ###  constructor
 
-\+ **new LedgerWallet**(`derivationPathIndexes`: number[], `baseDerivationPath`: string, `transport`: any, `ledgerAddressValidation`: [AddressValidation](../enums/_wallets_ledger_wallet_.addressvalidation.md)): *[LedgerWallet](_wallets_ledger_wallet_.ledgerwallet.md)*
+\+ **new AzureHSMWallet**(`vaultName`: string): *[AzureHSMWallet](_wallets_azure_hsm_wallet_.azurehsmwallet.md)*
 
-*Defined in [contractkit/src/wallets/ledger-wallet.ts:46](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/ledger-wallet.ts#L46)*
+*Defined in [contractkit/src/wallets/azure-hsm-wallet.ts:12](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/azure-hsm-wallet.ts#L12)*
 
 **Parameters:**
 
-Name | Type | Default | Description |
------- | ------ | ------ | ------ |
-`derivationPathIndexes` | number[] | Array.from(Array(ADDRESS_QTY).keys()) | number array of "address_index" for the base derivation path. Default: Array[0..9]. Example: [3, 99, 53] will retrieve the derivation paths of [`${baseDerivationPath}/3`, `${baseDerivationPath}/99`, `${baseDerivationPath}/53`] |
-`baseDerivationPath` | string | CELO_BASE_DERIVATION_PATH | base derivation path. Default: "44'/52752'/0'/0" |
-`transport` | any | {} | Transport to connect the ledger device  |
-`ledgerAddressValidation` | [AddressValidation](../enums/_wallets_ledger_wallet_.addressvalidation.md) | AddressValidation.firstTransactionPerAddress | - |
+Name | Type |
+------ | ------ |
+`vaultName` | string |
 
-**Returns:** *[LedgerWallet](_wallets_ledger_wallet_.ledgerwallet.md)*
-
-## Properties
-
-###  baseDerivationPath
-
-• **baseDerivationPath**: *string*
-
-*Defined in [contractkit/src/wallets/ledger-wallet.ts:58](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/ledger-wallet.ts#L58)*
-
-base derivation path. Default: "44'/52752'/0'/0"
-
-___
-
-###  derivationPathIndexes
-
-• **derivationPathIndexes**: *number[]*
-
-*Defined in [contractkit/src/wallets/ledger-wallet.ts:57](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/ledger-wallet.ts#L57)*
-
-number array of "address_index" for the base derivation path.
-Default: Array[0..9].
-Example: [3, 99, 53] will retrieve the derivation paths of
-[`${baseDerivationPath}/3`, `${baseDerivationPath}/99`, `${baseDerivationPath}/53`]
-
-___
-
-###  ledgerAddressValidation
-
-• **ledgerAddressValidation**: *[AddressValidation](../enums/_wallets_ledger_wallet_.addressvalidation.md)*
-
-*Defined in [contractkit/src/wallets/ledger-wallet.ts:60](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/ledger-wallet.ts#L60)*
-
-___
-
-###  transport
-
-• **transport**: *any*
-
-*Defined in [contractkit/src/wallets/ledger-wallet.ts:59](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/ledger-wallet.ts#L59)*
-
-Transport to connect the ledger device
+**Returns:** *[AzureHSMWallet](_wallets_azure_hsm_wallet_.azurehsmwallet.md)*
 
 ## Methods
 
@@ -109,6 +59,25 @@ Transport to connect the ledger device
 Get a list of accounts in the remote wallet
 
 **Returns:** *[Address](../modules/_base_.md#address)[]*
+
+___
+
+###  getAddressFromKeyName
+
+▸ **getAddressFromKeyName**(`keyName`: string): *Promise‹[Address](../modules/_base_.md#address)›*
+
+*Defined in [contractkit/src/wallets/azure-hsm-wallet.ts:49](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/azure-hsm-wallet.ts#L49)*
+
+Returns the EVM address for the given key
+Useful for initially getting the 'from' field given a keyName
+
+**Parameters:**
+
+Name | Type | Description |
+------ | ------ | ------ |
+`keyName` | string | Azure KeyVault key name  |
+
+**Returns:** *Promise‹[Address](../modules/_base_.md#address)›*
 
 ___
 
