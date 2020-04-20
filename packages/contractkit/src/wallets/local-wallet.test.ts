@@ -1,20 +1,60 @@
 import { normalizeAddressWith0x, privateKeyToAddress } from '@celo/utils/lib/address'
+import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import Web3 from 'web3'
 import { EncodedTransaction, Tx } from 'web3-core'
-import { EIP712TypedData } from '../utils/sign-typed-data-utils'
-import { recoverTransaction } from '../utils/signing-utils'
-import { DefaultWallet } from './default-wallet'
+import { recoverTransaction, verifyEIP712TypedDataSigner } from '../utils/signing-utils'
+import { LocalWallet } from './local-wallet'
+
+// Sample data from the official EIP-712 example:
+// https://github.com/ethereum/EIPs/blob/master/assets/eip-712/Example.js
+const TYPED_DATA = {
+  types: {
+    EIP712Domain: [
+      { name: 'name', type: 'string' },
+      { name: 'version', type: 'string' },
+      { name: 'chainId', type: 'uint256' },
+      { name: 'verifyingContract', type: 'address' },
+    ],
+    Person: [
+      { name: 'name', type: 'string' },
+      { name: 'wallet', type: 'address' },
+    ],
+    Mail: [
+      { name: 'from', type: 'Person' },
+      { name: 'to', type: 'Person' },
+      { name: 'contents', type: 'string' },
+    ],
+  },
+  primaryType: 'Mail',
+  domain: {
+    name: 'Ether Mail',
+    version: '1',
+    chainId: 1,
+    verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC',
+  },
+  message: {
+    from: {
+      name: 'Cow',
+      wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+    },
+    to: {
+      name: 'Bob',
+      wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+    },
+    contents: 'Hello, Bob!',
+  },
+}
 
 const PRIVATE_KEY1 = '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
 const ACCOUNT_ADDRESS1 = normalizeAddressWith0x(privateKeyToAddress(PRIVATE_KEY1))
 const PRIVATE_KEY2 = '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890fdeccc'
 const ACCOUNT_ADDRESS2 = normalizeAddressWith0x(privateKeyToAddress(PRIVATE_KEY2))
 
-describe('Wallet class', () => {
-  let wallet: DefaultWallet
+describe('Local wallet class', () => {
+  let wallet: LocalWallet
 
   beforeEach(() => {
-    wallet = new DefaultWallet()
+    wallet = new LocalWallet()
   })
 
   test('starts with no accounts', () => {
@@ -24,17 +64,18 @@ describe('Wallet class', () => {
   test('fails if you add an invalid private key', () => {
     try {
       wallet.addAccount('this is not a valid private key')
+      throw new Error('Expected exception to be thrown')
     } catch (e) {
       expect(e.message).toBe('private key length is invalid')
     }
   })
 
-  test('succeds if you add an private key without 0x', () => {
+  test('succeeds if you add an private key without 0x', () => {
     wallet.addAccount(PRIVATE_KEY1)
     expect(wallet.hasAccount(ACCOUNT_ADDRESS1)).toBeTruthy()
   })
 
-  test('succeds if you add an private key with 0x', () => {
+  test('succeeds if you add an private key with 0x', () => {
     wallet.addAccount(PRIVATE_KEY2)
     expect(wallet.hasAccount(ACCOUNT_ADDRESS2)).toBeTruthy()
   })
@@ -53,16 +94,27 @@ describe('Wallet class', () => {
 
     describe('signing', () => {
       describe('using an unknown address', () => {
+        let celoTransaction: Tx
         const unknownAddress: string = ACCOUNT_ADDRESS2
-        test('fails calling signTransaction', async () => {
-          const tsParams: Tx = {
-            nonce: 1,
-            gas: 'test',
-            to: 'test',
+
+        beforeEach(() => {
+          celoTransaction = {
             from: unknownAddress,
-            chainId: 1,
+            to: unknownAddress,
+            chainId: 2,
+            value: Web3.utils.toWei('1', 'ether'),
+            nonce: 0,
+            gas: '10',
+            gasPrice: '99',
+            feeCurrency: '0x124356',
+            gatewayFeeRecipient: '0x1234',
+            gatewayFee: '0x5678',
+            data: '0xabcdef',
           }
-          await expect(wallet.signTransaction(tsParams)).rejects.toThrowError()
+        })
+
+        test('fails calling signTransaction', async () => {
+          await expect(wallet.signTransaction(celoTransaction)).rejects.toThrowError()
         })
 
         test('fails calling signPersonalMessage', async () => {
@@ -71,13 +123,7 @@ describe('Wallet class', () => {
         })
 
         test('fails calling signTypedData', async () => {
-          const typedData: EIP712TypedData = {
-            types: { test: [{ name: 'test', type: 'string' }] },
-            domain: { test: 'test' },
-            message: { test: 'test' },
-            primaryType: 'test',
-          }
-          await expect(wallet.signTypedData(unknownAddress, typedData)).rejects.toThrowError()
+          await expect(wallet.signTypedData(unknownAddress, TYPED_DATA)).rejects.toThrowError()
         })
       })
 
@@ -101,7 +147,7 @@ describe('Wallet class', () => {
             }
           })
 
-          test('succeds', async () => {
+          test('succeeds', async () => {
             await expect(wallet.signTransaction(celoTransaction)).resolves.not.toBeUndefined()
           })
 
@@ -115,19 +161,22 @@ describe('Wallet class', () => {
         })
 
         describe('when calling signPersonalMessage', () => {
-          test('succeds', async () => {
-            const hexStr: string = '0xa1'
-            await expect(
-              wallet.signPersonalMessage(knownAddress, hexStr)
-            ).resolves.not.toBeUndefined()
+          test('succeeds', async () => {
+            const hexStr: string = ACCOUNT_ADDRESS1
+            const signedMessage = await wallet.signPersonalMessage(knownAddress, hexStr)
+            expect(signedMessage).not.toBeUndefined()
+            const valid = verifySignature(hexStr, signedMessage, knownAddress)
+            expect(valid).toBeTruthy()
           })
-
-          test.todo('returns a valid sign')
         })
 
         describe('when calling signTypedData', () => {
-          test.todo('succeds, needs a valid typedData to be tested')
-          test.todo('returns a valid sign')
+          test('succeeds', async () => {
+            const signedMessage = await wallet.signTypedData(knownAddress, TYPED_DATA)
+            expect(signedMessage).not.toBeUndefined()
+            const valid = verifyEIP712TypedDataSigner(TYPED_DATA, signedMessage, knownAddress)
+            expect(valid).toBeTruthy()
+          })
         })
       })
     })

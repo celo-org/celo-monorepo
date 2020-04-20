@@ -18,13 +18,13 @@ ARGUMENTS
 OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Signer or Validator's address
 
-  --ledgerAddresses=ledgerAddresses                  [default: 1] If --userLedger is set, this will get the first N
+  --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
 
   --ledgerConfirmAddress                             Set it to ask confirmation for the address of the transaction from
                                                      the ledger
 
-  --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --userLedger is set, this will get the array of
+  --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
 
@@ -47,13 +47,13 @@ USAGE
 OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Signer or Validator's address
 
-  --ledgerAddresses=ledgerAddresses                  [default: 1] If --userLedger is set, this will get the first N
+  --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
 
   --ledgerConfirmAddress                             Set it to ask confirmation for the address of the transaction from
                                                      the ledger
 
-  --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --userLedger is set, this will get the array of
+  --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
 
@@ -76,13 +76,13 @@ USAGE
 OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Signer or Validator's address
 
-  --ledgerAddresses=ledgerAddresses                  [default: 1] If --userLedger is set, this will get the first N
+  --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
 
   --ledgerConfirmAddress                             Set it to ask confirmation for the address of the transaction from
                                                      the ledger
 
-  --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --userLedger is set, this will get the array of
+  --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
 
@@ -105,13 +105,13 @@ USAGE
 OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d       (required) Initiator
 
-  --ledgerAddresses=ledgerAddresses                       [default: 1] If --userLedger is set, this will get the first N
+  --ledgerAddresses=ledgerAddresses                       [default: 1] If --useLedger is set, this will get the first N
                                                           addresses for local signing
 
   --ledgerConfirmAddress                                  Set it to ask confirmation for the address of the transaction
                                                           from the ledger
 
-  --ledgerCustomAddresses=ledgerCustomAddresses           [default: [0]] If --userLedger is set, this will get the array
+  --ledgerCustomAddresses=ledgerCustomAddresses           [default: [0]] If --useLedger is set, this will get the array
                                                           of index addresses for local signing. Example
                                                           --ledgerCustomAddresses "[4,99]"
 
@@ -154,13 +154,13 @@ OPTIONS
   --ecdsaKey=0x                                      (required) ECDSA Public Key
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address for the Validator
 
-  --ledgerAddresses=ledgerAddresses                  [default: 1] If --userLedger is set, this will get the first N
+  --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
 
   --ledgerConfirmAddress                             Set it to ask confirmation for the address of the transaction from
                                                      the ledger
 
-  --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --userLedger is set, this will get the array of
+  --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
 
@@ -271,13 +271,13 @@ OPTIONS
   --blsPop=0x                                        (required) BLS Proof-of-Possession
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Validator's address
 
-  --ledgerAddresses=ledgerAddresses                  [default: 1] If --userLedger is set, this will get the first N
+  --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
 
   --ledgerConfirmAddress                             Set it to ask confirmation for the address of the transaction from
                                                      the ledger
 
-  --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --userLedger is set, this will get the array of
+  --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
 
