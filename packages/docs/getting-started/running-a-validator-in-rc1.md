@@ -366,7 +366,7 @@ celocli lockedgold:show $CELO_VALIDATOR_RG_ADDRESS
 
 ### Register as a Validator
 
-In order to perform Validator actions with the Account created in the previous step, you will need to authorize a [Validator signer](../operations-manual/key-management/detailed#authorized-validator-signers.md) for the `ReleaseGold` contract account.
+In order to perform Validator actions with the Account created in the previous step, you will need to authorize a [Validator signer](../operations-manual/key-management/detailed.md#authorized-validator-signers) for the `ReleaseGold` contract account.
 
 If you were part of the genesis validator set, you will have already generated this key and submitted it via Gist. Note that if you are planning to run more than one validator, each validator will need a distinct validator signer.
 
