@@ -1,6 +1,6 @@
-import { getContactMatches, getSalt } from '../src/index'
-import { computeBLSSalt } from '../src/salt-generation/bls-salt'
 import { getNumberPairContacts, setNumberPairContacts } from '../src/database/wrappers/number-pairs'
+import { getContactMatches, getSalt } from '../src/index'
+import { BLSCryptographyClient } from '../src/salt-generation/bls-cryptography-client'
 
 const BLS_SALT = '6546544323114343'
 
@@ -15,8 +15,8 @@ jest.mock('../src/salt-generation/query-quota', () => {
   })
 })
 
-jest.mock('../src/salt-generation/bls-salt')
-const mockBlsSalt = computeBLSSalt as jest.Mock
+jest.mock('../src/salt-generation/bls-cryptography-client')
+const mockBlsSalt = BLSCryptographyClient.computeBLSSalt as jest.Mock
 mockBlsSalt.mockReturnValue(BLS_SALT)
 
 jest.mock('../src/database/wrappers/account', () => ({

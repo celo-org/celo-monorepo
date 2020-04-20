@@ -3,7 +3,7 @@ import * as functions from 'firebase-functions'
 import { authenticateUser } from './common/identity'
 import { incrementQueryCount } from './database/wrappers/account'
 import { getNumberPairContacts, setNumberPairContacts } from './database/wrappers/number-pairs'
-import { computeBLSSalt } from './salt-generation/bls-salt'
+import { BLSCryptographyClient } from './salt-generation/bls-cryptography-client'
 import QueryQuota from './salt-generation/query-quota'
 
 export const getSalt = functions.https.onRequest(async (request, response) => {
@@ -24,7 +24,7 @@ export const getSalt = functions.https.onRequest(async (request, response) => {
       response.status(400).send('Requester exceeded salt service query quota')
       return
     }
-    const salt = computeBLSSalt(request.body.queryPhoneNumber)
+    const salt = await BLSCryptographyClient.computeBLSSalt(request.body.queryPhoneNumber)
     await incrementQueryCount(request.body.account).catch((error) => {
       // TODO [amyslawson] think of failure case here
       console.error(error)
@@ -66,9 +66,14 @@ export const getContactMatches = functions.https.onRequest(async (request, respo
       return
     }
     authenticateUser()
-    const matchedContacts: ContactMatch[] = (
-      await getNumberPairContacts(request.body.userPhoneNumber, request.body.contactPhoneNumbers)
-    ).map((numberPair) => ({ phoneNumber: numberPair, salt: computeBLSSalt(numberPair) }))
+    const matchedContacts: ContactMatch[] = await Promise.all(
+      (
+        await getNumberPairContacts(request.body.userPhoneNumber, request.body.contactPhoneNumbers)
+      ).map(async (numberPair) => ({
+        phoneNumber: numberPair,
+        salt: await BLSCryptographyClient.computeBLSSalt(numberPair),
+      }))
+    )
     await setNumberPairContacts(request.body.userPhoneNumber, request.body.contactPhoneNumbers)
     // TODO (amyslawson) return salts with contact
     response.json({ success: true, matchedContacts })
