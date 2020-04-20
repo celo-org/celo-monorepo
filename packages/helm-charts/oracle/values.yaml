@@ -7,6 +7,11 @@ image:
   repository: oracletest.azurecr.io/test/oracle
   tag: hsmtest
 
+kubectl:
+  image:
+    repository: bitnami/kubectl
+    tag: 1.17.4
+
 oracle:
   replicas: 2
   web3ProviderUrl: https://alfajoresstaging-forno.celo-testnet.org

@@ -31,7 +31,6 @@ The name of the azure identity binding for all oracles
 
 {{/*
 The name of the azure identity for all oracles
-{{- with .dot -}}{{ template "name" . }}{{- end -}}-{{ .index }}-identity
 */}}
 {{- define "azure-identity-name" -}}
 {{- with .dot -}}{{ template "name" . }}{{- end -}}-{{ .index }}-identity

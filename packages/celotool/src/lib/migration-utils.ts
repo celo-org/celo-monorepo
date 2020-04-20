@@ -48,6 +48,7 @@ export function migrationOverrides() {
         addresses: initialAddresses,
         values: initialAddresses.map(() => initialBalance),
       },
+      oracles: [...getAddressesFor(AccountType.PRICE_ORACLE, mnemonic, 1), minerForEnv()],
     },
     validators: {
       validatorKeys: validatorKeys(),

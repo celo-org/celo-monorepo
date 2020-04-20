@@ -35,7 +35,7 @@ spec:
     spec:
       initContainers:
       - name: set-label
-        image: bitnami/kubectl:1.17.4
+        image: {{ .Values.kubectl.image.repository }}:{{ .Values.kubectl.image.tag }}
         command:
         - sh
         - -c

@@ -74,7 +74,6 @@ async function createOracleIdentityIfNotExists(celoEnv: string, index: number) {
     `az role assignment create --role "Managed Identity Operator" --assignee ${servicePrincipalClientId} --scope ${identity.id}`
   )
   // Allow the oracle identity to access the correct key vault
-  // const keyVaultName
   await execCmdWithExitOnFailure(
     `az keyvault set-policy --name ${keyVaultName(
       index
@@ -91,7 +90,7 @@ function keyVaultName(oracleIndex: number) {
   return oracleAddressesAndVaults()[oracleIndex].keyVaultName
 }
 
-// Decodes the env variable ORACLE_AZURE_KEY_VAULT_ADDRESSES of the form:
+// Decodes the env variable ORACLE_ADDRESS_KEY_VAULTS of the form:
 //   <address>:<keyVaultName>,<address>:<keyVaultName>
 //   eg: 0x0000000000000000000000000000000000000000:keyVault0,0x0000000000000000000000000000000000000001:keyVault1
 // into an array in the same order
@@ -99,7 +98,7 @@ function oracleAddressesAndVaults(): {
   address: string
   keyVaultName: string
 }[] {
-  const vaultNamesAndAddresses = fetchEnv(envVar.ORACLE_AZURE_KEY_VAULT_ADDRESSES).split(',')
+  const vaultNamesAndAddresses = fetchEnv(envVar.ORACLE_ADDRESS_KEY_VAULTS).split(',')
   const addressesAndVaults = []
   for (const nameAndAddress of vaultNamesAndAddresses) {
     const [address, keyVaultName] = nameAndAddress.split(':')
