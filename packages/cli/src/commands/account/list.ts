@@ -1,5 +1,6 @@
 import { CeloProvider } from '@celo/contractkit/src'
 import { ParserOutput } from '@oclif/parser/lib/parse'
+import { toChecksumAddress } from 'ethereumjs-util'
 import { BaseCommand } from '../../base'
 
 export default class AccountList extends BaseCommand {
@@ -15,8 +16,10 @@ export default class AccountList extends BaseCommand {
     this.parse(AccountList)
 
     const celoProvider: CeloProvider = this.kit.web3.currentProvider as any
-    const addresses = await celoProvider.getAccounts()
-    const localAddresses = celoProvider.wallet.getAccounts()
+    const addresses = await this.kit.web3.eth.getAccounts()
+    const localAddresses = celoProvider.wallet
+      .getAccounts()
+      .map((value) => toChecksumAddress(value))
     let localName = 'Local'
     const res: ParserOutput<any, any> = this.parse()
 
