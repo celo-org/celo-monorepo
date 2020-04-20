@@ -40,7 +40,7 @@ class QRScanner extends React.Component<Props> {
 
   // This method would be called multiple times with the same
   // QR code, so we need to catch only the first one
-  onBardCodeDetected = (rawData: any) => {
+  onBarCodeDetected = (rawData: any) => {
     Logger.debug('QRScanner', 'Bar code detected')
     this.props.handleBarcodeDetected(rawData)
   }
@@ -61,7 +61,7 @@ class QRScanner extends React.Component<Props> {
               }}
               style={styles.preview}
               type={RNCamera.Constants.Type.back}
-              onBarCodeRead={memoize(this.onBardCodeDetected, (qr) => qr.data)}
+              onBarCodeRead={memoize(this.onBarCodeDetected, (qr) => qr.data)}
               barCodeTypes={[RNCamera.Constants.BarCodeType.qr]}
               flashMode={RNCamera.Constants.FlashMode.auto}
               captureAudio={false}
