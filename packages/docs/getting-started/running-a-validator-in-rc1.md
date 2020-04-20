@@ -83,7 +83,7 @@ The code snippets you'll see on this page are bash commands and their output.
 When you see text in angle brackets &lt;&gt;, replace them and the text inside with your own value of what it refers to. Don't include the &lt;&gt; in the command.
 {% endhint %}
 
-## Instructions
+## Background Information
 
 ### Key Management
 
