@@ -35,10 +35,9 @@ const DefaultConfig = {
   },
   blockchainParameters: {
     gasForNonGoldCurrencies: 50000,
-    // TODO(asa): Needs updating before RC1 deployment
     minimumClientVersion: {
-      major: 0,
-      minor: 9,
+      major: 1,
+      minor: 0,
       patch: 0,
     },
     blockGasLimit: 20000000,
@@ -110,8 +109,7 @@ const DefaultConfig = {
     participationBaselineQuorumFactor: 1,
   },
   governanceApproverMultiSig: {
-    // 3/8 multsig, with 5/8 to make multisig changes.
-    // TODO(asa): Needs updating before RC1 deployment
+    // 3/9 multsig, with 5/9 to make multisig changes.
     signatories: [
       '0xBE0c3B35Ec3f759D9A67c4B7c539b0D5b52A4642',
       '0xD6d48412dA0804CF88258bfDf5AaFcBe5FEd7ecC',
@@ -121,6 +119,7 @@ const DefaultConfig = {
       '0xc85639289d4bbb5f90e380a0f4db6b77a2f777bf',
       '0x92AD020Cde6A4e566770C603ae8315a9d7252740',
       '0xba4862643d476acbc13276bd73daca7b27bf567c',
+      '0xe5bD469Ad2d2A160604e38ad123828B7754aa23b',
     ],
     numRequiredConfirmations: 3,
     numInternalRequiredConfirmations: 5,
