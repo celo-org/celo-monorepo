@@ -1,7 +1,6 @@
 import { clusterName, createIdentityIfNotExists, resourceGroup } from 'src/lib/azure'
 import { getFornoUrl } from 'src/lib/endpoints'
 import { envVar, fetchEnv } from 'src/lib/env-utils'
-import { AccountType, getPrivateKeysFor } from 'src/lib/generate_utils'
 import { installGenericHelmChart, removeGenericHelmChart } from 'src/lib/helm_deploy'
 import { execCmdWithExitOnFailure } from 'src/lib/utils'
 
@@ -23,33 +22,31 @@ export async function removeHelmRelease(celoEnv: string) {
 
 async function helmParameters(celoEnv: string) {
   // const identity = await createOracleIdentityIfNotExists(celoEnv)
-  const tokenName = await createRBACResources(celoEnv)
-  const addresses = oracleAddresses()
+  const kubeAuthTokenName = await createRBACResources(celoEnv)
+  const replicas = oracleAddressesAndVaults().length
   return [
-    `--set environmentName=${celoEnv}`,
+    `--set environment.name=${celoEnv}`,
     `--set image.repository=${fetchEnv(envVar.ORACLE_DOCKER_IMAGE_REPOSITORY)}`,
     `--set image.tag=${fetchEnv(envVar.ORACLE_DOCKER_IMAGE_TAG)}`,
-    // `--set oracle.addresses='{${addresses.join(',')}}'`,
-    `--set oracle.replicas=${addresses.length}`,
-    `--set oracle.token_name=${tokenName}`,
+    `--set kube.authTokenName=${kubeAuthTokenName}`,
+    `--set oracle.replicas=${replicas}`,
     `--set oracle.web3ProviderUrl=${getFornoUrl(celoEnv)}`,
-    // `--set azure.identity.id=${identity.id}`,
-    // `--set azure.identity.clientId=${identity.clientId}`,
-    `--set azure.keyVault.name=${keyVaultName()}`,
   ].concat(await oracleIdentityHelmParameters(celoEnv))
 }
 
 async function oracleIdentityHelmParameters(celoEnv: string) {
-  const addresses = oracleAddresses()
-  const replicas = addresses.length
+  const addressesAndVaults = oracleAddressesAndVaults()
+  const replicas = addressesAndVaults.length
   let params: string[] = []
   for (let i = 0; i < replicas; i++) {
     const identity = await createOracleIdentityIfNotExists(celoEnv, i)
+    const { address, keyVaultName } = addressesAndVaults[i]
     const prefix = `--set oracle.identities[${i}]`
     params = params.concat([
-      `${prefix}.address=${addresses[i]}`,
+      `${prefix}.address=${address}`,
       `${prefix}.azure.id=${identity.id}`,
       `${prefix}.azure.clientId=${identity.clientId}`,
+      `${prefix}.azure.keyVaultName=${keyVaultName}`,
     ])
   }
   return params
@@ -71,12 +68,12 @@ async function createOracleIdentityIfNotExists(celoEnv: string, index: number) {
   await execCmdWithExitOnFailure(
     `az role assignment create --role "Managed Identity Operator" --assignee ${servicePrincipalClientId} --scope ${identity.id}`
   )
-
   // Allow the oracle identity to access the correct key vault
+  // const keyVaultName
   await execCmdWithExitOnFailure(
-    `az keyvault set-policy --name ${keyVaultName()} --key-permissions {get,list,sign} --object-id ${
-      identity.principalId
-    } -g ${resourceGroup()}`
+    `az keyvault set-policy --name ${keyVaultName(
+      index
+    )} --key-permissions {get,list,sign} --object-id ${identity.principalId} -g ${resourceGroup()}`
   )
   return identity
 }
@@ -85,14 +82,35 @@ function oracleIdentityName(celoEnv: string, index: number) {
   return `${celoEnv}-oracle-${index}`
 }
 
-function keyVaultName() {
-  return fetchEnv(envVar.AZURE_ORACLE_KEY_VAULT_NAME)
+function keyVaultName(oracleIndex: number) {
+  return oracleAddressesAndVaults()[oracleIndex].keyVaultName
 }
 
-// oracleAddresses returns an array of the comma separated addresses found in ORACLE_ADDRESSES
-function oracleAddresses() {
-  const oracleAddressesStr = fetchEnv(envVar.ORACLE_ADDRESSES)
-  return oracleAddressesStr.split(',')
+// function keyVaultNames() {
+//   const keyVaultNamesStr = fetchEnv(envVar.ORACLE_AZURE_KEY_VAULT_NAMES)
+//   return keyVaultNamesStr.split(',')
+// }
+//
+// // oracleAddresses returns an array of the comma separated addresses found in ORACLE_ADDRESSES
+// function oracleAddresses() {
+//   const oracleAddressesStr = fetchEnv(envVar.ORACLE_ADDRESSES)
+//   return oracleAddressesStr.split(',')
+// }
+
+function oracleAddressesAndVaults(): {
+  address: string
+  keyVaultName: string
+}[] {
+  const vaultNamesAndAddresses = fetchEnv(envVar.ORACLE_AZURE_KEY_VAULT_ADDRESSES).split(',')
+  const addressesAndVaults = []
+  for (const nameAndAddress of vaultNamesAndAddresses) {
+    const [address, keyVaultName] = nameAndAddress.split(':')
+    addressesAndVaults.push({
+      address,
+      keyVaultName,
+    })
+  }
+  return addressesAndVaults
 }
 
 async function createRBACResources(celoEnv: string) {

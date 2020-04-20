@@ -2,7 +2,7 @@
 The name of the deployment
 */}}
 {{- define "name" -}}
-{{- .Values.environmentName -}}-oracle
+{{- .Values.environment.name -}}-oracle
 {{- end -}}
 
 {{/*

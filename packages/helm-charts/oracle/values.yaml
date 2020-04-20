@@ -1,15 +1,22 @@
-environmentName: test
-replicas: 2
+# This file is intended to show the expected value structure with placeholder values
+
+environment:
+  name: test
 image:
   repository: oracletest.azurecr.io/test/oracle
   tag: hsmtest
 
 oracle:
-  addresses: 0x0000000000000000000000000000000000000000,0x0000000000000000000000000000000000000001
+  replicas: 2
   web3ProviderUrl: https://alfajoresstaging-forno.celo-testnet.org
-azure:
-  identity:
-    id: defaultId
-    clientId: defaultClientId
-  keyVault:
-    name: defaultKeyVaultName
+  identities:
+  - address: 0x0000000000000000000000000000000000000000
+    azure:
+      id: defaultId
+      clientId: defaultClientId
+      keyVaultName: defaultKeyVaultName
+  - address: 0x0000000000000000000000000000000000000001
+    azure:
+      id: defaultId1
+      clientId: defaultClientId1
+      keyVaultName: defaultKeyVaultName1
