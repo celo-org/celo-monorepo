@@ -14,9 +14,9 @@ import { colors, standardStyles, textStyles } from 'src/styles'
 import { weiToDecimal } from 'src/utils/utils'
 
 const networkMenu = [
-  // ['Mainnet', menu.VALIDATORS_LIST.link],
+  ['Mainnet', menu.VALIDATORS_LIST.link],
   ['Baklava', menu.VALIDATORS_LIST__BAKLAVA.link],
-  ['Baklavastaging', menu.VALIDATORS_LIST_BAKLAVASTAGING.link],
+  // ['Baklavastaging', menu.VALIDATORS_LIST_BAKLAVASTAGING.link],
 ]
 
 class Text extends RNText {
