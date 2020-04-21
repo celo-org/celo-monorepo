@@ -1,13 +1,9 @@
-import {
-  _setInitialProxyImplementation,
-  getDeployedProxiedContract,
-} from '@celo/protocol/lib/web3-utils'
+import { _setInitialProxyImplementation } from '@celo/protocol/lib/web3-utils'
 import BigNumber from 'bignumber.js'
 import chalk from 'chalk'
 import fs = require('fs')
 import * as prompts from 'prompts'
 import {
-  RegistryInstance,
   ReleaseGoldContract,
   ReleaseGoldMultiSigContract,
   ReleaseGoldMultiSigProxyContract,
@@ -15,9 +11,10 @@ import {
 } from 'types'
 
 let argv: any
-let registry: any
 let releases: any
 let startGold: any
+let deployedGrants: any
+let deployedGrantsFile: string
 let ReleaseGoldMultiSig: ReleaseGoldMultiSigContract
 let ReleaseGoldMultiSigProxy: ReleaseGoldMultiSigProxyContract
 let ReleaseGold: ReleaseGoldContract
@@ -27,10 +24,22 @@ async function handleGrant(releaseGoldConfig: any, currGrant: number) {
   console.info('Processing grant number ' + currGrant)
 
   const message =
-    'Are you sure you want to deploy this contract?\n Total Grant Value: ' +
+    'Please review this grant before you deploy:\n\tTotal Grant Value: ' +
     Number(releaseGoldConfig.numReleasePeriods) *
       Number(releaseGoldConfig.amountReleasedPerPeriod) +
-    '? (y/n)'
+    '\n\tGrant Recipient ID: ' +
+    releaseGoldConfig.identifier +
+    '\n\tGrant Beneficiary address: ' +
+    releaseGoldConfig.beneficiary +
+    '\n\tGrant Start Date: ' +
+    releaseGoldConfig.releaseStartTime +
+    '\n\tGrant Cliff time (in seconds): ' +
+    releaseGoldConfig.releaseCliffTime +
+    '\n\tGrant num periods: ' +
+    releaseGoldConfig.numReleasePeriods +
+    '\n\tRelease Period length: ' +
+    releaseGoldConfig.releasePeriod +
+    '\n\tDeploy this grant? (y/n)'
   if (!argv.yesreally) {
     const response = await prompts({
       type: 'confirm',
@@ -102,7 +111,7 @@ async function handleGrant(releaseGoldConfig: any, currGrant: number) {
     releaseGoldConfig.initialDistributionRatio,
     releaseGoldConfig.canValidate,
     releaseGoldConfig.canVote,
-    registry.address
+    '0x000000000000000000000000000000000000ce10'
   )
   const proxiedReleaseGold = await ReleaseGold.at(releaseGoldProxy.address)
   await proxiedReleaseGold.transferOwnership(releaseGoldMultiSigProxy.address, { from: argv.from })
@@ -116,14 +125,23 @@ async function handleGrant(releaseGoldConfig: any, currGrant: number) {
 
   const record = {
     GrantNumber: currGrant,
+    Identifier: releaseGoldConfig.identifier,
     Beneficiary: releaseGoldConfig.beneficiary,
-    ProxyAddress: releaseGoldProxy.address,
+    ContractAddress: releaseGoldProxy.address,
     MultiSigProxyAddress: releaseGoldMultiSigProxy.address,
     MultiSigTxHash: multiSigTxHash,
     ReleaseGoldTxHash: releaseGoldTxHash,
   }
-  console.info(record)
+
+  deployedGrants.push(releaseGoldConfig.identifier)
   releases.push(record)
+  // Must write to file after every grant to avoid losing info on crash.
+  fs.writeFileSync(deployedGrantsFile, JSON.stringify(deployedGrants, null, 1))
+  if (argv.output_file) {
+    fs.writeFileSync(argv.output_file, JSON.stringify(releases, null, 2))
+  } else {
+    console.info('Deployed grant ', record)
+  }
 }
 
 async function handleJSONFile(err, data) {
@@ -137,6 +155,32 @@ async function handleJSONFile(err, data) {
       chalk.red('Provided grants file ' + argv.grants + ' does not contain any grants.\nExiting.')
     )
     return
+  }
+
+  console.info('Verifying grants have not already been deployed.')
+  for (const grant of grants) {
+    if (deployedGrants.includes(grant.identifier)) {
+      console.info(
+        chalk.red(
+          'Grant with identifier ' + grant.identifier + ' has already been deployed.\nExiting.'
+        )
+      )
+      process.exit(0)
+    }
+    // Sum occurences of each identifier in the grant file, if more than 1 then there is a duplicate.
+    const identifierCounts = grants.map((x) => (x.identifier === grant.identifier ? 1 : 0))
+    if (identifierCounts.reduce((a, b) => a + b, 0) > 1) {
+      console.info(
+        chalk.red(
+          'Provided grant file ' +
+            argv.grants +
+            ' contains a duplicate identifier: ' +
+            grant.identifier +
+            '.\nExiting.'
+        )
+      )
+      process.exit(0)
+    }
   }
 
   // Each grant type has a defined template - either they can validate and can't be revoked,
@@ -213,34 +257,40 @@ async function handleJSONFile(err, data) {
     await handleGrant(releaseGoldConfig, currGrant)
     currGrant++
   }
-  // tslint:disable-next-line: no-console
-  console.log(chalk.green('Grants deployed successfully.'))
-  if (argv.output_file) {
-    fs.writeFile(argv.output_file, JSON.stringify(releases, null, 4), (writeError) => {
-      if (writeError) {
-        console.error(writeError)
-        return
-      }
-      console.info('Wrote release results to file ' + argv.output_file + '.')
-    })
-  } else {
-    // tslint:disable-next-line: no-console
-    console.log(releases)
-  }
+  console.info(chalk.green('Grants deployed successfully.'))
 }
 
 module.exports = async (callback: (error?: any) => number) => {
   try {
     argv = require('minimist')(process.argv.slice(5), {
-      string: ['network', 'from', 'grants', 'start_gold', 'output_file', 'really'],
+      string: [
+        'network',
+        'from',
+        'grants',
+        'start_gold',
+        'deployed_grants',
+        'output_file',
+        'really',
+      ],
     })
-    registry = await getDeployedProxiedContract<RegistryInstance>('Registry', artifacts)
     ReleaseGoldMultiSig = artifacts.require('ReleaseGoldMultiSig')
     ReleaseGoldMultiSigProxy = artifacts.require('ReleaseGoldMultiSigProxy')
     ReleaseGold = artifacts.require('ReleaseGold')
     ReleaseGoldProxy = artifacts.require('ReleaseGoldProxy')
     releases = []
     startGold = web3.utils.toWei(argv.start_gold)
+    deployedGrantsFile = argv.deployed_grants
+    try {
+      deployedGrants = JSON.parse(fs.readFileSync(deployedGrantsFile, 'utf-8'))
+    } catch (e) {
+      // If this fails, file must be created
+      fs.writeFile(deployedGrantsFile, '', (err) => {
+        if (err) {
+          throw err
+        }
+      })
+      deployedGrants = []
+    }
     fs.readFile(argv.grants, handleJSONFile)
   } catch (error) {
     callback(error)

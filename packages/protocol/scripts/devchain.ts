@@ -197,7 +197,7 @@ function createDirIfMissing(dir: string) {
 }
 
 function runMigrations(opts: { upto?: number; migrationOverride?: string } = {}) {
-  const cmdArgs = ['truffle', 'migrate']
+  const cmdArgs = ['truffle', 'migrate', '--reset']
 
   if (opts.upto) {
     cmdArgs.push('--to')
@@ -222,6 +222,9 @@ function deployReleaseGold(releaseGoldContracts: string) {
   cmdArgs.push(releaseGoldContracts)
   cmdArgs.push('--start_gold')
   cmdArgs.push('10')
+  cmdArgs.push('--deployed_grants')
+  // Random file name to prevent rewriting to it
+  cmdArgs.push('/tmp/deployedGrants' + Math.floor(1000 * Math.random()) + '.json')
   // --yesreally command to bypass prompts
   cmdArgs.push('--yesreally')
   cmdArgs.push('--build_directory')
