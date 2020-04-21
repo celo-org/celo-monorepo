@@ -23,6 +23,35 @@ export const styles = StyleSheet.create({
     color: colors.grayHeavy,
   },
 
+  tooltipOn: {
+    zIndex: 2,
+  },
+
+  links: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  linkWrapper: {
+    display: 'inline-flex',
+    margin: 'auto',
+    position: 'relative',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'column',
+    marginHorizontal: 0,
+    marginBottom: 40,
+  },
+  linkWrapperInactive: {
+    opacity: 0.6,
+  },
+  activeTab: {
+    position: 'absolute',
+    height: 8,
+    width: 7,
+    bottom: -16,
+  },
+
   // Table
   table: {
     width: 1020,
@@ -87,14 +116,17 @@ export const styles = StyleSheet.create({
     cursor: 'pointer',
     display: 'flex',
     flexDirection: 'row',
-    overflow: 'hidden',
     flexGrow: 1,
     width: 226,
   },
   tableCellTitleRows: {
     display: 'flex',
     flexDirection: 'column',
-    overflow: 'hidden',
+  },
+  tableCellTitleFirstRowWrapper: {
+    display: 'flex',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
   },
   tableCellTitleFirstRow: {
     textDecorationLine: 'underline',
@@ -102,6 +134,7 @@ export const styles = StyleSheet.create({
     overflow: 'hidden',
     whiteSpace: 'nowrap',
     textOverflow: 'ellipsis',
+    maxWidth: 140,
   },
   tableCellTitleSecRow: {
     display: 'flex',
@@ -199,7 +232,7 @@ export const styles = StyleSheet.create({
 
   // Bar
   barContainer: {
-    width: 40,
+    width: 35,
     height: 20,
     display: 'inline-flex',
     marginLeft: 8,
@@ -219,5 +252,47 @@ export const styles = StyleSheet.create({
   },
   barKo: {
     backgroundColor: colors.red,
+  },
+
+  // Checkmark
+  checkmark: {
+    display: 'inline-block',
+    width: 14,
+    height: 14,
+    lineHeight: 14,
+    backgroundColor: colors.white,
+    borderRadius: '50%',
+    textAlign: 'center',
+    marginLeft: 6,
+    position: 'relative',
+  } as any,
+
+  // Tooltip
+  tooltip: {
+    fontWeight: '300',
+    fontSize: 14,
+    backgroundColor: '#585c60',
+    paddingVertical: 4,
+    paddingHorizontal: 14,
+    position: 'absolute',
+    top: '100%',
+    marginTop: 10,
+    left: '50%',
+    transform: [{ translateX: '-50%' as any }],
+    textAlign: 'left',
+    whiteSpace: 'nowrap',
+    borderRadius: 3,
+    zIndex: 5,
+  },
+  tooltipRow: {
+    lineHeight: 34,
+    display: 'flex' as any,
+    alignItems: 'center',
+  },
+  tooltipText: {
+    textDecorationStyle: 'solid',
+    textDecorationLine: 'underline',
+    marginRight: 6,
+    marginLeft: 4,
   },
 })

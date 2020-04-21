@@ -190,7 +190,7 @@ const mockTokenTxs = {
       gas: '6700000',
       from: '0x0000000000000000000000000000000000007E57',
       cumulativeGasUsed: '67154',
-      contractAddress: TEST_GOLD_ADDRESS,
+      contractAddress: TEST_DOLLAR_ADDRESS,
       confirmations: '242836',
       blockNumber: '117451',
       blockHash: '0xcfffc293e190c74490b6c5a3ea831e7020c4380d7a5330716b9eb6e0db1df95d',

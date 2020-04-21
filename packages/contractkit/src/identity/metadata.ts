@@ -6,8 +6,10 @@ import { isLeft } from 'fp-ts/lib/Either'
 import { readFileSync } from 'fs'
 import * as t from 'io-ts'
 import { PathReporter } from 'io-ts/lib/PathReporter'
+import { ContractKit } from '../kit'
 import { Claim, ClaimPayload, ClaimType, hashOfClaims, isOfType } from './claims/claim'
 import { ClaimTypes, SINGULAR_CLAIM_TYPES } from './claims/types'
+
 export { ClaimTypes } from './claims/types'
 
 const MetaType = t.type({
@@ -34,19 +36,37 @@ export class IdentityMetadataWrapper {
     })
   }
 
-  static async fetchFromURL(url: string) {
+  static async fetchFromURL(kit: ContractKit, url: string) {
     const resp = await fetch(url)
     if (!resp.ok) {
       throw new Error(`Request failed with status ${resp.status}`)
     }
-    return this.fromRawString(await resp.text())
+    return this.fromRawString(kit, await resp.text())
   }
 
-  static fromFile(path: string) {
-    return this.fromRawString(readFileSync(path, 'utf-8'))
+  static fromFile(kit: ContractKit, path: string) {
+    return this.fromRawString(kit, readFileSync(path, 'utf-8'))
   }
 
-  static fromRawString(rawData: string) {
+  static async verifySigner(kit: ContractKit, hash: any, signature: any, metadata: any) {
+    // First try to verify on account's address
+    if (!verifySignature(hash, signature, metadata.address)) {
+      // If this fails, signature may still be one of `address`' signers
+      const accounts = await kit.contracts.getAccounts()
+      if (await accounts.isAccount(metadata.address)) {
+        const signers = await Promise.all([
+          accounts.getVoteSigner(metadata.address),
+          accounts.getValidatorSigner(metadata.address),
+          accounts.getAttestationSigner(metadata.address),
+        ])
+        return signers.some((signer) => verifySignature(hash, signature, signer))
+      }
+      return false
+    }
+    return true
+  }
+
+  static async fromRawString(kit: ContractKit, rawData: string) {
     const data = JSON.parse(rawData)
 
     const validatedData = IdentityMetadataType.decode(data)
@@ -61,7 +81,12 @@ export class IdentityMetadataWrapper {
     const hash = hashOfClaims(claims)
     if (
       claims.length > 0 &&
-      !verifySignature(hash, validatedData.right.meta.signature, validatedData.right.meta.address)
+      !(await this.verifySigner(
+        kit,
+        hash,
+        validatedData.right.meta.signature,
+        validatedData.right.meta
+      ))
     ) {
       throw new Error('Signature could not be validated')
     }
@@ -105,7 +130,11 @@ export class IdentityMetadataWrapper {
           throw new Error("Can't claim self")
         }
         break
-
+      case ClaimTypes.DOMAIN:
+        const existingClaims = this.data.claims.filter((el: any) => el.domain === claim.domain)
+        if (existingClaims.length > 0) {
+          return existingClaims[0]
+        }
       default:
         break
     }
@@ -119,6 +148,7 @@ export class IdentityMetadataWrapper {
 
     this.data.claims.push(claim)
     this.data.meta.signature = await signer.sign(this.hashOfClaims())
+    return claim
   }
 
   findClaim<K extends ClaimTypes>(type: K): ClaimPayload<K> | undefined {

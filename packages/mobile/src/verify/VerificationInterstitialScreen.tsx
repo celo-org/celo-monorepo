@@ -39,9 +39,9 @@ class VerificationInterstitialScreen extends React.Component<WithTranslation> {
       <SafeAreaView style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           <View style={styles.iconRowContainer}>
-            {AnimatedCircle()}
-            {AnimatedCircle()}
-            {AnimatedCircle()}
+            <AnimatedCircle />
+            <AnimatedCircle />
+            <AnimatedCircle />
           </View>
           <Text style={fontStyles.h1}>{t('interstitial.header')}</Text>
           <Text style={styles.bodyText}>{t('interstitial.body1')}</Text>
