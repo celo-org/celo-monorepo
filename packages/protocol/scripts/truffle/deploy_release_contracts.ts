@@ -354,6 +354,7 @@ async function handleJSONFile(err, data) {
   }
   let currGrant = 1
   for (const releaseGoldConfig of grants) {
+    // Trim whitespace in case of bad copy/paste in provided json.
     releaseGoldConfig.beneficiary = releaseGoldConfig.beneficiary.trim()
     releaseGoldConfig.identifier = releaseGoldConfig.identifier.trim()
     await checkBalance(releaseGoldConfig)
