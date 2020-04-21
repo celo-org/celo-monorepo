@@ -139,9 +139,9 @@ const DefaultConfig = {
     predeployedProxyAddress: '0x000000000000000000000000000000000000ce10',
   },
   reserve: {
-    tobinTaxStalenessThreshold: HOUR, // 1 hour
-    tobinTax: toFixed(0.005).toFixed(), // 0.5%
-    tobinTaxReserveRatio: toFixed(2).toFixed(), // 2
+    tobinTaxStalenessThreshold: 100 * YEAR, // Tobin tax turned off to start
+    tobinTax: toFixed(0).toFixed(), // Tobin tax turned off to start
+    tobinTaxReserveRatio: toFixed(0).toFixed(), // Tobin tax turned off to start
     dailySpendingRatio: toFixed(0.05).toFixed(), // 5%
     spenders: [],
     otherAddresses: ['0x246f4599eFD3fA67AC44335Ed5e749E518Ffd8bB'],
@@ -165,8 +165,8 @@ const DefaultConfig = {
     inflationRate: 1,
     inflationPeriod: 1.5 * YEAR,
     initialBalances: {
-      addresses: [],
-      values: [],
+      addresses: ['0x11901cf7eEae1E2644995FB2E47Ce46bC7F33246'],
+      values: ['5000000000000000000000000'],
     },
     // TODO(asa): Needs updating before RC1 deployment
     oracles: [],
