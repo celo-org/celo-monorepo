@@ -1,5 +1,6 @@
-import { getSalt } from '../src/index'
+import { getContactMatches, getSalt } from '../src/index'
 import { computeBLSSalt } from '../src/salt-generation/bls-salt'
+import { getNumberPairContacts, setNumberPairContacts } from '../src/database/wrappers/number-pairs'
 
 const BLS_SALT = '6546544323114343'
 
@@ -22,6 +23,11 @@ jest.mock('../src/database/wrappers/account', () => ({
   incrementQueryCount: jest.fn().mockReturnValue(new Promise((resolve) => resolve())),
 }))
 
+jest.mock('../src/database/wrappers/number-pairs')
+const mockSetNumberPairContacts = setNumberPairContacts as jest.Mock
+mockSetNumberPairContacts.mockImplementation()
+const mockGetNumberPairContacts = getNumberPairContacts as jest.Mock
+
 // TODO the failures are nested in the res structure as a deep equality which does not fail
 // the full test
 describe(`POST /getSalt endpoint`, () => {
@@ -39,7 +45,7 @@ describe(`POST /getSalt endpoint`, () => {
 
     it('provides salt', () => {
       const res = {
-        json: (body: any) => {
+        json(body: any) {
           expect(body.success).toEqual(true)
           expect(body.salt).toEqual(BLS_SALT)
         },
@@ -50,7 +56,9 @@ describe(`POST /getSalt endpoint`, () => {
     it('returns 400 on query count 0', () => {
       mockGetRemainingQueryCount = jest.fn(() => 0)
       const res = {
-        json: () => {},
+        json() {
+          return {}
+        },
         status: (status: any) => {
           expect(status).toEqual(400)
           // tslint:disable-next-line: no-empty
@@ -76,7 +84,6 @@ describe(`POST /getSalt endpoint`, () => {
       getSalt(req, res)
     })
   })
-  mockBlsSalt.mockReturnValue(BLS_SALT)
   describe('with invalid input', () => {
     it('invalid phone number returns 400', () => {
       const queryPhoneNumber = '+5555555555'
@@ -121,6 +128,88 @@ describe(`POST /getSalt endpoint`, () => {
       }
       // @ts-ignore TODO fix req type to make it a mock express req
       getSalt(req, res)
+    })
+  })
+})
+
+describe(`POST /getContactMatches endpoint`, () => {
+  describe('with valid input', () => {
+    const userPhoneNumber = '5555555555'
+    const contactPhoneNumber1 = '1234567890'
+    const contactPhoneNumbers = [contactPhoneNumber1]
+
+    const mockRequestData = {
+      userPhoneNumber,
+      contactPhoneNumbers,
+    }
+    const req = { body: mockRequestData }
+    it('provides matches', () => {
+      mockGetNumberPairContacts.mockReturnValue(contactPhoneNumbers)
+      mockBlsSalt.mockReturnValue(BLS_SALT)
+      const expected = [{ phoneNumber: contactPhoneNumber1, salt: BLS_SALT }]
+      const res = {
+        json(body: any) {
+          expect(body.success).toEqual(true)
+          expect(body.matchedContacts).toEqual(expected)
+        },
+      }
+      // @ts-ignore TODO fix req type to make it a mock express req
+      getContactMatches(req, res)
+    })
+    it('provides matches empty array', () => {
+      mockGetNumberPairContacts.mockReturnValue([])
+      const res = {
+        json(body: any) {
+          expect(body.success).toEqual(true)
+          expect(body.matchedContacts).toEqual([])
+        },
+      }
+      // @ts-ignore TODO fix req type to make it a mock express req
+      getContactMatches(req, res)
+    })
+  })
+  describe('with invalid input', () => {
+    it('missing user number returns 400', () => {
+      const contactPhoneNumbers = ['1234567890']
+
+      const mockRequestData = {
+        contactPhoneNumbers,
+      }
+      const req = { body: mockRequestData }
+
+      const res = {
+        status(status: any) {
+          expect(status).toEqual(400)
+          return {
+            send() {
+              return {}
+            },
+          }
+        },
+      }
+      // @ts-ignore TODO fix req type to make it a mock express req
+      getContactMatches(req, res)
+    })
+    it('missing contact phone numbers returns 400', () => {
+      const userPhoneNumber = '5555555555'
+
+      const mockRequestData = {
+        userPhoneNumber,
+      }
+      const req = { body: mockRequestData }
+
+      const res = {
+        status(status: any) {
+          expect(status).toEqual(400)
+          return {
+            send() {
+              return {}
+            },
+          }
+        },
+      }
+      // @ts-ignore TODO fix req type to make it a mock express req
+      getContactMatches(req, res)
     })
   })
 })
