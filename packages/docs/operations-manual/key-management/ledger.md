@@ -158,7 +158,7 @@ The following commands are an example of how you might authorize a vote signer w
 
 ```bash
 # Plug in the Ledger containing the vote signer key and run the following command to securely generate the proof-of-possession.
-celocli accounts:proof-of-possession --account $LOCKED_GOLD_ACCOUNT --signer $SIGNER_TO_AUTHORIZE --useLedger
+celocli account:proof-of-possession --account $LOCKED_GOLD_ACCOUNT --signer $SIGNER_TO_AUTHORIZE --useLedger
 
 # If you wish to authorize a vote signer for your Locked Gold Account, plug in the Ledger containing
 # the Locked Gold Account key and run the following command.

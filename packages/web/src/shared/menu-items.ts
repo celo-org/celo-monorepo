@@ -16,7 +16,7 @@ export const pagePaths = {
     link: '/applications',
   },
   BRAND: {
-    name: 'Experience - Brand Kit',
+    name: 'BrandKit',
     link: '/experience/brand',
   },
   BUILD: {
@@ -50,6 +50,10 @@ export const pagePaths = {
   PRIVACY: {
     name: 'Privacy Policy',
     link: '/privacy',
+  },
+  PAPERS: {
+    name: 'White Papers',
+    link: '/papers',
   },
   TECH: {
     name: 'Technology',
