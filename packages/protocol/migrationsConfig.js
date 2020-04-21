@@ -40,7 +40,8 @@ const DefaultConfig = {
       minor: 0,
       patch: 0,
     },
-    blockGasLimit: 20000000,
+    deploymentBlockGasLimit: 20000000,
+    blockGasLimit: 10000000,
   },
   doubleSigningSlasher: {
     reward: '1000000000000000000000', // 1000 cGLD
