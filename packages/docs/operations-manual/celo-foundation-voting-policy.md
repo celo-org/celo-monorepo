@@ -38,18 +38,19 @@ To support effective and responsible validators, the Foundation considers the fo
 
 * **Zero Slashing Incidents.**  The validator members of any applying group must not have been slashed within the last 6 months of application. (Note, there are a variety of reasons for slashing, including downtime, security issues, etc. At the outset, and because groups can re-apply at 6 months and 1 day of the slashing, all slashing will be considered equal at this stage)
 
-* **Audit Checklist and self reporting.** As part of the application process, the Foundation will publish a list of recommended validator settings. The members of every group applying will self attest to complying with the recommended checklist. 
+* **Audit Checklist and Self Reporting.** As part of the application process, the Foundation will publish a list of recommended validator settings. The members of every group applying will self attest to complying with the recommended checklist. 
 
 * **Education.** An effective validator must be secure. Applicants’ members will take an education course. The course must be completed annually. 
 
 * **Basic Diligence.** Because the Foundation holds a substantial number of votes, and its voting may determine whether a validator is elected, the Foundation will conduct a basic diligence process for voted groups. The diligence would include name, location, entity information. This diligence would occur on an annual basis for any group receiving votes. 
+
+* **Attestation Service.** Ability and commitment to running attestation services.
 
 
 ### Additional Criteria
 
 In addition to meeting the standard criteria, outlined above, the Foundation anticipates prioritizing validator groups who are mission aligned and/or will provide greater network resilience. These criteria may include:
 * The geographical location of the validator group
-* Ability and commitment to running attestation services
 * Non-profit organizations
 * Organizations who commit to donating a percentage of rewards to non-profit organizations
 * The likelihood of the validator group having substantial network support from other voters
