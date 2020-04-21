@@ -39,7 +39,7 @@ A form of consensus algorithm in which up to a third of participants can be faul
 
 ## cLabs, Celo Labs
 
-The team currently leading the development of the Celo protocol and Celo Wallet application.
+The team that, before mainnet release, has worked closely to develop and shape the Celo protocol and Celo Wallet application with the input of the larger Celo Community.
 
 ## Carbon Offsetting Fund
 
@@ -127,7 +127,7 @@ The very first block in the blockchain, provided as configuration to Celo Blockc
 
 ## Governable
 
-A smart contract that is owned by the Celo [Governance](../celo-codebase/protocol/governance.md) mechanism and so can be manipulated or updated by an on-chain governance proposal.
+A smart contract that is owned by the Celo [Governance](../celo-codebase/protocol/governance.md) mechanism and so can be changed or updated by an on-chain governance proposal.
 
 ## Group Share
 
@@ -219,7 +219,7 @@ Programs that are deployed to a blockchain and execute on its nodes. They operat
 
 ## Stablecoin
 
-A stablecoin is a type of cryptocurrency whose price aims to be 'pegged' to an external currency or commodity and where volatility of the asset is reduced by managing a reserve that may consist of fiat assets or other cryptocurrencies.
+A stablecoin is a type of cryptocurrency whose price tracks an external currency or commodity.
 
 ## Stake
 
