@@ -11397,6 +11397,18 @@ bls12377js@celo-org/bls12377js#566137fd6b9568ef105a3aeaf8e36ff03da91d49:
     ts-node "^8.4.1"
     typescript "^3.6.4"
 
+"bls12377js@https://github.com/celo-org/bls12377js#cb38a4cfb643c778619d79b20ca3e5283a2122a6":
+  version "0.1.0"
+  resolved "https://github.com/celo-org/bls12377js#cb38a4cfb643c778619d79b20ca3e5283a2122a6"
+  dependencies:
+    "@stablelib/blake2xs" "0.10.4"
+    "@types/node" "^12.11.7"
+    big-integer "^1.6.44"
+    chai "^4.2.0"
+    mocha "^6.2.2"
+    ts-node "^8.4.1"
+    typescript "^3.6.4"
+
 "bls12377js@https://github.com/celo-org/bls12377js#ea09eba5c54fe63617af494a0c198fcc47582e0c":
   version "0.1.0"
   resolved "https://github.com/celo-org/bls12377js#ea09eba5c54fe63617af494a0c198fcc47582e0c"
