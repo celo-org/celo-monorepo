@@ -228,7 +228,6 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
       wei for ${convertedMakerAmount} wei of ${makerToken}`
     )
 
-    Logger.debug(TAG, `getting approve tx...`)
     let approveTx
     if (makerToken === CURRENCY_ENUM.GOLD) {
       approveTx = goldTokenContract.approve(
@@ -244,7 +243,6 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
       Logger.error(TAG, `Unexpected maker token ${makerToken}`)
       return
     }
-    Logger.debug(TAG, `About to send transaction`)
     yield call(sendTransaction, approveTx.txo, account, TAG, 'approval')
     Logger.debug(TAG, `Transaction approved: ${util.inspect(approveTx.txo.arguments)}`)
 

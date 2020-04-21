@@ -132,7 +132,7 @@ export function* sendTransaction(
       nonce,
       staticGas
     )
-    const result = yield confirmation // TODO(anna) is this yield ok
+    const result = yield confirmation
     return result
   }
   yield call(wrapSendTransactionWithRetry, txId, account, sendTxMethod, cancelAction)
@@ -141,7 +141,7 @@ export function* sendTransaction(
 export function* wrapSendTransactionWithRetry(
   txId: string,
   account: string,
-  sendTxMethod: (nonce: number) => Generator<any, any, anya>,
+  sendTxMethod: (nonce: number) => Generator<any, any, any>,
   cancelAction?: string
 ) {
   const latestNonce = yield call(getLatestNonce, account)

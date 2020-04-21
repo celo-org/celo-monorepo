@@ -70,7 +70,6 @@ export function* checkWeb3SyncProgress() {
       // isSyncing returns a syncProgress object when it's still syncing, false otherwise
       const contractKit = yield call(getContractKit)
       syncProgress = yield call(contractKit.web3.eth.isSyncing)
-      Logger.debug(TAG, 'checkWeb3SyncProgress', `Sync progress: ${syncProgress}`)
 
       if (typeof syncProgress === 'boolean' && !syncProgress) {
         Logger.debug(TAG, 'checkWeb3SyncProgress', 'Sync maybe complete, checking')
@@ -284,7 +283,7 @@ export function* unlockAccount(account: string) {
       return true
     } else {
       const contractKit = yield call(getContractKit)
-      yield contractKit.web3.eth.personal.unlockAccount(account, pincode, UNLOCK_DURATION)
+      yield call(contractKit.web3.eth.personal.unlockAccount, account, pincode, UNLOCK_DURATION)
       Logger.debug(TAG + '@unlockAccount', `Account unlocked: ${account}`)
       return true
     }
@@ -386,7 +385,7 @@ export function* switchToGethFromForno() {
       // This is a temporary workaround as this restart will be
       // removed when the geth issue is resolved
       const contractKit = yield call(getContractKit)
-      yield contractKit.web3.eth.isSyncing()
+      yield call(contractKit.web3.eth.isSyncing)
       // If geth is started twice within the same session,
       // there is an issue where it cannot find deployed contracts.
       // Restarting the app fixes this issue.

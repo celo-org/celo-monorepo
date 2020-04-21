@@ -72,15 +72,12 @@ export function* initGethSaga() {
   Logger.debug(TAG, 'Initializing Geth')
   yield put(setInitState(InitializationState.INITIALIZING))
 
-  Logger.debug(TAG, 'About to start race')
   const { result } = yield race({
     result: call(waitForGethInstance),
     timeout: delay(INIT_GETH_TIMEOUT),
   })
-  Logger.debug(TAG, 'Done racing')
 
   let restartAppAutomatically: boolean = false
-  Logger.debug(TAG, 'About to switch based on results')
   switch (result) {
     case GethInitOutcomes.SUCCESS: {
       Logger.debug(TAG, 'Geth initialized')
@@ -182,10 +179,8 @@ function* monitorGeth() {
 
 export function* gethSaga() {
   yield call(initGethSaga)
-  Logger.debug('gethSaga', `Called initGethSaga`)
   const gethRelatedSagas = yield fork(monitorGeth)
   yield take(Actions.CANCEL_GETH_SAGA)
-  Logger.debug('gethSaga', `Cancelling geth saga`)
   yield cancel(gethRelatedSagas)
   yield put(setGethConnected(true))
 }

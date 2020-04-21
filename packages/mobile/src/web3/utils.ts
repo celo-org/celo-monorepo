@@ -22,11 +22,11 @@ export async function getLatestBlock() {
   return contractKit.web3.eth.getBlock('latest')
 }
 
-export async function isAccountLocked(address: string) {
+export function* isAccountLocked(address: string) {
   try {
     // Test account to see if it is unlocked
-    const contractKit = await getContractKitOutsideGenerator()
-    await contractKit.web3.eth.sign('', address)
+    const contractKit = yield call(getContractKit)
+    yield call(contractKit.eth.sign, '', address)
   } catch (e) {
     return true
   }
