@@ -49,8 +49,6 @@ import { Block } from 'web3-eth'
 
 const TAG = 'web3/saga'
 
-// const ETH_PRIVATE_KEY_LENGTH = 64
-// const MNEMONIC_BIT_LENGTH = (ETH_PRIVATE_KEY_LENGTH * 8) / 2
 const MNEMONIC_BIT_LENGTH = MnemonicStrength.s256_24words
 // The timeout for web3 to complete syncing and the latestBlock to be > 0
 export const SYNC_TIMEOUT = 2 * 60 * 1000 // 2 minutes

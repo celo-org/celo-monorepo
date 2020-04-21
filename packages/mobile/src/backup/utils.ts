@@ -1,5 +1,6 @@
 import { generateMnemonic, MnemonicLanguages, MnemonicStrength } from '@celo/utils/lib/account'
 import * as _ from 'lodash'
+import * as bip39 from 'react-native-bip39'
 import { getKey } from 'src/utils/keyStore'
 import Logger from 'src/utils/Logger'
 
@@ -14,7 +15,8 @@ export async function createQuizWordList(mnemonic: string, language: string | nu
   const languageWordList = getWordlist(language)
   const wordOptions: string = await generateMnemonic(
     MnemonicStrength.s256_24words,
-    languageWordList
+    languageWordList,
+    bip39
   )
   return wordOptions.split(' ').filter((word: string) => !disallowedWordSet.has(word))
 }
