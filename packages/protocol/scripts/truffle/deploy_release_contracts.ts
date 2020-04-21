@@ -402,18 +402,20 @@ module.exports = async (callback: (error?: any) => number) => {
       deployedGrants = []
     }
 
-    const response = await prompts({
-      type: 'confirm',
-      name: 'confirmation',
-      message:
-        'Provided `deployedGrants` file includes ' +
-        deployedGrants.length +
-        ' deployed grant identifiers.\nPlease verify this matches your expectations. (y/n)',
-    })
+    if (!argv.yesreally) {
+      const response = await prompts({
+        type: 'confirm',
+        name: 'confirmation',
+        message:
+          'Provided `deployedGrants` file includes ' +
+          deployedGrants.length +
+          ' deployed grant identifiers.\nPlease verify this matches your expectations. (y/n)',
+      })
 
-    if (!response.confirmation) {
-      console.info(chalk.red('Abandoning grant deployment due to user response.'))
-      process.exit(0)
+      if (!response.confirmation) {
+        console.info(chalk.red('Abandoning grant deployment due to user response.'))
+        process.exit(0)
+      }
     }
     fs.readFile(argv.grants, handleJSONFile)
   } catch (error) {
