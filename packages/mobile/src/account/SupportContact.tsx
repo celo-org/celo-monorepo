@@ -11,8 +11,7 @@ import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-nat
 import DeviceInfo from 'react-native-device-info'
 import Mailer from 'react-native-mail'
 import SafeAreaView from 'react-native-safe-area-view'
-import { connect } from 'react-redux'
-import { useSelector } from 'react-redux'
+import { connect, useSelector } from 'react-redux'
 import { e164NumberSelector } from 'src/account/selectors'
 import { showMessage } from 'src/alert/actions'
 import { CELO_SUPPORT_EMAIL_ADDRESS, DEFAULT_TESTNET } from 'src/config'
@@ -46,7 +45,7 @@ const mapDispatchToProps = {
   showMessage,
 }
 
-const SupportContact = ({ showMessage }: Props) => {
+const SupportContact = (props: Props) => {
   const { t } = useTranslation(Namespaces.accountScreen10)
   const [message, setMessage] = useState('')
   const [attachLogs, setAttachLogs] = useState(true)
@@ -87,7 +86,7 @@ const SupportContact = ({ showMessage }: Props) => {
     Mailer.mail(email, (error: any, event: string) => {
       if (event === 'sent') {
         navigate(Screens.Account)
-        showMessage(t('contactSuccess'))
+        props.showMessage(t('contactSuccess'))
       }
       if (error) {
         Logger.showError(error + ' ' + event)
