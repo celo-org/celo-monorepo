@@ -2,6 +2,7 @@ import * as React from 'react'
 import { StyleSheet, View } from 'react-native'
 import { NewMember } from 'src/alliance/AllianceMember'
 import { CheckboxWithLabel } from 'src/forms/CheckboxWithLabel'
+import { ErrorDisplay } from 'src/forms/ErrorDisplay'
 import FormContainer, { emailIsValid, hasField } from 'src/forms/Form'
 import { Form } from 'src/forms/FormComponents'
 import { LabeledInput } from 'src/forms/LabeledInput'
@@ -96,6 +97,9 @@ export default function SignupForm() {
             isShowing={formState.isComplete}
             message={t('common:applicationSubmitted')}
           />
+          <View style={standardStyles.centered}>
+            <ErrorDisplay isShowing={!!formState.apiError} field={formState.apiError} />
+          </View>
         </Form>
       )}
     </FormContainer>
@@ -108,7 +112,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 5,
   },
   buttonContainer: {
-    paddingTop: 15,
+    paddingVertical: 15,
     paddingHorizontal: 20,
   },
   stretch: {

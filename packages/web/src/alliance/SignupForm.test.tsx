@@ -11,6 +11,10 @@ describe('When Submitting', () => {
       expect(getByText('common:validationErrors.email')).toBeVisible()
       expect(getByText('common:validationErrors.generic')).toBeVisible()
     })
+    it('does not show any unknown Errors', () => {
+      const { queryByText } = render(<SignupForm />)
+      expect(queryByText('common:validationErrors.unknownError')).not.toBeInTheDocument()
+    })
   })
   describe('when filled out', () => {
     it('displays success message', async () => {

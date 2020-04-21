@@ -82,7 +82,7 @@ const DefaultConfig = {
   },
   exchange: {
     spread: 5 / 1000,
-    reserveFraction: 1 / 20,
+    reserveFraction: 1 / 100,
     updateFrequency: 5 * MINUTE,
     minimumReports: 5,
     frozen: true,
@@ -139,11 +139,13 @@ const DefaultConfig = {
   },
   reserve: {
     tobinTaxStalenessThreshold: HOUR, // 1 hour
+    tobinTax: toFixed(0.005).toFixed(), // 0.5%
+    tobinTaxReserveRatio: toFixed(2).toFixed(), // 2
     dailySpendingRatio: toFixed(0.05).toFixed(), // 5%
     spenders: [],
     otherAddresses: ['0x246f4599eFD3fA67AC44335Ed5e749E518Ffd8bB'],
     assetAllocationSymbols: ['cGLD', 'BTC', 'ETH', 'DAI'],
-    assetAllocationWeights: [0.5, 0.2, 0.1, 0.2],
+    assetAllocationWeights: [0.5, 0.3, 0.15, 0.05],
   },
   reserveSpenderMultiSig: {
     // 2/2 multsig
@@ -357,9 +359,34 @@ const NetworkConfigs = {
       membershipHistoryLength: 15, // Number of epochs in the group lockup period.
     },
   },
+  alfajores: {
+    election: {
+      minElectableValidators: '1',
+    },
+    epochRewards: {
+      frozen: false,
+    },
+    exchange: {
+      frozen: false,
+      minimumReports: 1,
+    },
+    goldToken: {
+      frozen: false,
+    },
+    stableToken: {
+      frozen: false,
+    },
+    reserve: {
+      initialBalance: 100000000,
+    },
+    oracles: {
+      reportExpiry: 1000 * DAY,
+    },
+  },
 }
 
 NetworkConfigs.baklavastaging = NetworkConfigs.baklava
+NetworkConfigs.alfajoresstaging = NetworkConfigs.alfajores
 
 const linkedLibraries = {
   FixidityLib: [

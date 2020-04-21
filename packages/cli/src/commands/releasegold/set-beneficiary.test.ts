@@ -11,6 +11,7 @@ testWithGanache('releasegold:set-beneficiary cmd', (web3: Web3) => {
   let contractAddress: any
   let kit: any
   let releaseGoldWrapper: ReleaseGoldWrapper
+  let releaseGoldMultiSig: any
   let releaseOwner: string
   let beneficiary: string
   let newBeneficiary: string
@@ -30,6 +31,8 @@ testWithGanache('releasegold:set-beneficiary cmd', (web3: Web3) => {
     releaseGoldWrapper = new ReleaseGoldWrapper(kit, newReleaseGold(web3, contractAddress))
     beneficiary = await releaseGoldWrapper.getBeneficiary()
     kit = newKitFromWeb3(web3)
+    const owner = await releaseGoldWrapper.getOwner()
+    releaseGoldMultiSig = await kit.contracts.getMultiSig(owner)
   })
 
   test('can change beneficiary', async () => {
@@ -55,6 +58,8 @@ testWithGanache('releasegold:set-beneficiary cmd', (web3: Web3) => {
       '--yesreally',
     ])
     expect(await releaseGoldWrapper.getBeneficiary()).toEqual(newBeneficiary)
+    // It should also update the multisig owners
+    expect(await releaseGoldMultiSig.getOwners()).toEqual([releaseOwner, newBeneficiary])
   })
 
   test('if called by a different account, it should fail', async () => {
@@ -93,5 +98,6 @@ testWithGanache('releasegold:set-beneficiary cmd', (web3: Web3) => {
       '--yesreally',
     ])
     expect(await releaseGoldWrapper.getBeneficiary()).toEqual(beneficiary)
+    expect(await releaseGoldMultiSig.getOwners()).toEqual([releaseOwner, beneficiary])
   })
 })

@@ -9,10 +9,32 @@
 
 ### Functions
 
+* [compareLedgerAppVersions](_wallets_ledger_utils_tokens_.md#compareledgerappversions)
 * [list](_wallets_ledger_utils_tokens_.md#const-list)
 * [tokenInfoByAddressAndChainId](_wallets_ledger_utils_tokens_.md#const-tokeninfobyaddressandchainid)
 
 ## Functions
+
+###  compareLedgerAppVersions
+
+▸ **compareLedgerAppVersions**(`version1`: string, `version2`: string): *number*
+
+*Defined in [contractkit/src/wallets/ledger-utils/tokens.ts:33](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/ledger-utils/tokens.ts#L33)*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`version1` | string |
+`version2` | string |
+
+**Returns:** *number*
+
+-1: version1 < version2,
+ 0: version1 == version2,
+ 1: version1 > version2
+
+___
 
 ### `Const` list
 

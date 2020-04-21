@@ -1,12 +1,12 @@
 import { BigNumber } from 'bignumber.js'
+import { SingletonRouter as Router } from 'next/router'
 import * as React from 'react'
 import { Text as RNText, View } from 'react-native'
 import ValidatorsListRow, { CeloGroup } from 'src/dev/ValidatorsListRow'
 import { styles } from 'src/dev/ValidatorsListStyles'
-import { H1 } from 'src/fonts/Fonts'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import Chevron, { Direction } from 'src/icons/chevron'
-import { colors, standardStyles, textStyles } from 'src/styles'
+import { colors } from 'src/styles'
 import { weiToDecimal } from 'src/utils/utils'
 
 class Text extends RNText {
@@ -43,30 +43,42 @@ const HeaderCell = React.memo(function HeaderCellFn({
   )
 })
 
+interface Edges<T> {
+  edges: Array<{
+    node: T
+  }>
+}
+
 interface CeloValidatorGroup {
   account: {
     address: string
     lockedGold: string
     name: string
     usd: string
+    claims: Edges<{
+      verified: boolean
+      element: string
+    }>
   }
   accumulatedActive: string
   accumulatedRewards: string
-  affiliates: {
-    edges: Array<{
-      node: {
-        address: string
-        attestationsFulfilled: number
-        attestationsRequested: number
-        lastElected: number
-        lastOnline: number
-        lockedGold: string
-        name: string
-        score: string
-        usd: string
-      }
-    }>
-  }
+  affiliates: Edges<{
+    account: {
+      claims: Edges<{
+        verified: boolean
+        element: string
+      }>
+    }
+    address: string
+    attestationsFulfilled: number
+    attestationsRequested: number
+    lastElected: number
+    lastOnline: number
+    lockedGold: string
+    name: string
+    score: string
+    usd: string
+  }>
   commission: string
   numMembers: number
   receivableVotes: string
@@ -75,12 +87,15 @@ interface CeloValidatorGroup {
 }
 
 interface ValidatorsListProps {
+  router: Router
   data: {
     celoValidatorGroups: CeloValidatorGroup[]
     latestBlock: number
   }
   isLoading: boolean
 }
+
+type Props = ValidatorsListProps & I18nProps
 
 type orderByTypes =
   | 'name'
@@ -98,14 +113,14 @@ export interface State {
   orderAsc: boolean
 }
 
-class ValidatorsList extends React.PureComponent<ValidatorsListProps & I18nProps, State> {
+class ValidatorsList extends React.PureComponent<Props, State> {
   state = {
     expanded: undefined,
     orderBy: 'name' as orderByTypes,
     orderAsc: true,
   }
   private orderAccessors = {
-    name: (_) => (_.name || '').toLowerCase(),
+    name: (_) => (_.name || '').toLowerCase() || null,
     total: (_) => _.numMembers * 1000 + _.elected,
     votes: (_) => +_.votesAbsolute || 0,
     gold: (_) => _.gold || 0,
@@ -150,6 +165,12 @@ class ValidatorsList extends React.PureComponent<ValidatorsListProps & I18nProps
       .map(({ receivableVotes }) => new BigNumber(receivableVotes))
       .reduce((acc: BigNumber, _) => acc.plus(_), new BigNumber(0))
 
+    const getClaims = (claims: CeloValidatorGroup['account']['claims'] = {} as any): string[] =>
+      (claims.edges || [])
+        .map(({ node }) => node)
+        .filter(({ verified }) => verified)
+        .map(({ element }) => element)
+
     const cleanData = celoValidatorGroups
       .map(
         ({ account, affiliates, votes, receivableVotes, commission, numMembers, rewardsRatio }) => {
@@ -174,6 +195,7 @@ class ValidatorsList extends React.PureComponent<ValidatorsListProps & I18nProps
             rewards,
             rewardsStyle,
             numMembers,
+            claims: getClaims(group.claims),
             validators: affiliates.edges.map(({ node: validator }) => {
               const {
                 address,
@@ -196,12 +218,13 @@ class ValidatorsList extends React.PureComponent<ValidatorsListProps & I18nProps
                 uptime: (+score * 100) / 10 ** 24,
                 attestation:
                   Math.max(0, attestationsFulfilled / (attestationsRequested || -1)) * 100,
+                claims: getClaims(validator.account.claims),
               }
             }),
           }
         }
       )
-      .map((group) => {
+      .map((group, id) => {
         const data = group.validators.reduce(
           ({ elected, online, total, uptime, attestation }, validator) => ({
             elected: elected + +validator.elected,
@@ -215,6 +238,7 @@ class ValidatorsList extends React.PureComponent<ValidatorsListProps & I18nProps
         data.uptime = data.uptime / group.validators.length
         data.attestation = data.attestation / group.validators.length
         return {
+          id,
           ...group,
           ...data,
         }
@@ -223,15 +247,26 @@ class ValidatorsList extends React.PureComponent<ValidatorsListProps & I18nProps
     return cleanData
   }
 
-  sortData<T>(data: T[]): T[] {
+  sortData<T extends any & { id: number }>(data: T[]): T[] {
     const { orderBy, orderAsc } = this.state
     const accessor = this.orderAccessors[orderBy]
     const dAccessor = this.orderAccessors[this.defaultOrderAccessor]
     const dir = orderAsc ? 1 : -1
 
+    const compare = (a, b): number => {
+      if (a === null) {
+        return 1
+      }
+      if (b === null) {
+        return -1
+      }
+      return a > b ? 1 : -1
+    }
+
     return (data || [])
-      .sort((a, b) => (dAccessor(a) > dAccessor(b) ? -1 : 1))
-      .sort((a, b) => dir * (accessor(a) > accessor(b) ? 1 : -1))
+      .sort((a, b) => b.id - a.id)
+      .sort((a, b) => compare(dAccessor(a), dAccessor(b)))
+      .sort((a, b) => dir * compare(accessor(a), accessor(b)))
   }
 
   render() {
@@ -239,68 +274,63 @@ class ValidatorsList extends React.PureComponent<ValidatorsListProps & I18nProps
     const { data } = this.props
     const validatorGroups = !data ? ([] as CeloGroup[]) : this.sortData(this.cleanData(data))
     return (
-      <View style={[styles.cover, styles.pStatic]}>
-        <View style={[styles.pStatic]}>
-          <H1 style={[textStyles.center, standardStyles.sectionMarginTablet, textStyles.invert]}>
-            Validator Explorer
-          </H1>
-          <View style={[styles.table, styles.pStatic]}>
-            <View style={[styles.tableRow, styles.tableHeaderRow]}>
-              <HeaderCell
-                onClick={this.orderByFn.name}
-                style={[styles.tableHeaderCellPadding]}
-                name="Name"
-                order={orderBy === 'name' ? orderAsc : null}
-              />
-              <HeaderCell
-                onClick={this.orderByFn.total}
-                style={[styles.sizeM]}
-                name="Elected/ Total"
-                order={orderBy === 'total' ? orderAsc : null}
-              />
-              <HeaderCell
-                onClick={this.orderByFn.votes}
-                style={[styles.sizeXL]}
-                name="Votes Available"
-                order={orderBy === 'votes' ? orderAsc : null}
-              />
-              <HeaderCell
-                onClick={this.orderByFn.gold}
-                style={[styles.sizeM]}
-                name="Locked CGLD"
-                order={orderBy === 'gold' ? orderAsc : null}
-              />
-              <HeaderCell
-                onClick={this.orderByFn.commision}
-                style={[styles.sizeM]}
-                name="Group Share"
-                order={orderBy === 'commision' ? orderAsc : null}
-              />
-              <HeaderCell
-                onClick={this.orderByFn.rewards}
-                style={[styles.sizeM]}
-                name="Voter Rewards"
-                order={orderBy === 'rewards' ? orderAsc : null}
-              />
-              <HeaderCell
-                onClick={this.orderByFn.uptime}
-                style={[styles.sizeS]}
-                name="Uptime"
-                order={orderBy === 'uptime' ? orderAsc : null}
-              />
-              <HeaderCell
-                onClick={this.orderByFn.attestation}
-                style={[styles.sizeS]}
-                name="Attestation"
-                order={orderBy === 'attestation' ? orderAsc : null}
-              />
-            </View>
-            {validatorGroups.map((group, i) => (
-              <View key={group.address} onClick={this.expand.bind(this, i)}>
-                <ValidatorsListRow group={group} expanded={expanded === i} />
-              </View>
-            ))}
+      <View style={[styles.pStatic]}>
+        <View style={[styles.table, styles.pStatic]}>
+          <View style={[styles.tableRow, styles.tableHeaderRow]}>
+            <HeaderCell
+              onClick={this.orderByFn.name}
+              style={[styles.tableHeaderCellPadding]}
+              name="Name"
+              order={orderBy === 'name' ? orderAsc : null}
+            />
+            <HeaderCell
+              onClick={this.orderByFn.total}
+              style={[styles.sizeM]}
+              name="Elected/ Total"
+              order={orderBy === 'total' ? orderAsc : null}
+            />
+            <HeaderCell
+              onClick={this.orderByFn.votes}
+              style={[styles.sizeXL]}
+              name="Votes Available"
+              order={orderBy === 'votes' ? orderAsc : null}
+            />
+            <HeaderCell
+              onClick={this.orderByFn.gold}
+              style={[styles.sizeM]}
+              name="Locked CGLD"
+              order={orderBy === 'gold' ? orderAsc : null}
+            />
+            <HeaderCell
+              onClick={this.orderByFn.commision}
+              style={[styles.sizeM]}
+              name="Group Share"
+              order={orderBy === 'commision' ? orderAsc : null}
+            />
+            <HeaderCell
+              onClick={this.orderByFn.rewards}
+              style={[styles.sizeM]}
+              name="Voter Rewards"
+              order={orderBy === 'rewards' ? orderAsc : null}
+            />
+            <HeaderCell
+              onClick={this.orderByFn.uptime}
+              style={[styles.sizeS]}
+              name="Uptime"
+              order={orderBy === 'uptime' ? orderAsc : null}
+            />
+            <HeaderCell
+              onClick={this.orderByFn.attestation}
+              style={[styles.sizeS]}
+              name="Attestation"
+              order={orderBy === 'attestation' ? orderAsc : null}
+            />
           </View>
+          {validatorGroups.map((group, i) => (
+            <div key={group.id} onClick={this.expand.bind(this, i)}>
+              <ValidatorsListRow group={group} expanded={expanded === i} />
+            </div>
+          ))}
         </View>
       </View>
     )
