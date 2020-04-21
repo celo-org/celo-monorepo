@@ -34,32 +34,48 @@ USAGE
   $ celocli rewards:slasher
 
 OPTIONS
-  --automatic                                                        Automatically monitor and slash for downtime
-  --dryRun                                                           Dry run
-  --endBlock=endBlock                                                Stop monitoring after block
+  --automatic                                                          Automatically monitor and slash for downtime
+  --dryRun                                                             Dry run
+  --endBlock=endBlock                                                  Stop monitoring after block
+  --excludeValidator=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d        Don't slash this validator
+  --excludeValidatorSigner=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  Don't slash this validator
 
-  --forDowntimeBeginningAtBlock=forDowntimeBeginningAtBlock          Manually slash validator for downtime beginning at
-                                                                     block
+  --forDowntimeBeginningAtBlock=forDowntimeBeginningAtBlock            Manually slash validator for downtime beginning
+                                                                       at block
 
-  --forDowntimeEndingAtBlock=forDowntimeEndingAtBlock                Manually slash validator for downtime ending at
-                                                                     block
+  --forDowntimeEndingAtBlock=forDowntimeEndingAtBlock                  Manually slash validator for downtime ending at
+                                                                       block
 
-  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d                  (required) Slasher's address
+  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d                    (required) Slasher's address
 
-  --gas=gas                                                          Gas to supply for slashing transactions
+  --gas=gas                                                            Gas to supply for slashing transactions
 
-  --maxSlashAttempts=maxSlashAttempts                                Attempt slashing a max of N times
+  --ledgerAddresses=ledgerAddresses                                    [default: 1] If --useLedger is set, this will get
+                                                                       the first N addresses for local signing
 
-  --slashAgainAfter=slashAgainAfter                                  Slash same validator again after N blocks
+  --ledgerConfirmAddress                                               Set it to ask confirmation for the address of the
+                                                                       transaction from the ledger
 
-  --slashValidator=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d        Manually slash this validator address
+  --ledgerCustomAddresses=ledgerCustomAddresses                        [default: [0]] If --useLedger is set, this will
+                                                                       get the array of index addresses for local
+                                                                       signing. Example --ledgerCustomAddresses "[4,99]"
 
-  --slashValidatorSigner=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  Manually slash this validator address
+  --maxSlashAttempts=maxSlashAttempts                                  Attempt slashing a max of N times
 
-  --slashableDowntime=slashableDowntime                              Overrides downtime threshold for automatically
-                                                                     slashing
+  --slashAgainAfter=slashAgainAfter                                    Slash same validator again after N blocks
 
-  --startBlock=startBlock                                            Start monitoring on block instead of tip
+  --slashLog=slashLog                                                  Filename for slash log
+
+  --slashValidator=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d          Manually slash this validator
+
+  --slashValidatorSigner=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d    Manually slash this validator
+
+  --slashableDowntime=slashableDowntime                                Overrides downtime threshold for automatically
+                                                                       slashing
+
+  --startBlock=startBlock                                              Start monitoring on block instead of tip
+
+  --useLedger                                                          Set it to use a ledger wallet
 
 EXAMPLE
   slasher --from 0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d --automatic

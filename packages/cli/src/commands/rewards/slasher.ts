@@ -4,9 +4,11 @@ import { concurrentMap, sleep } from '@celo/utils/lib/async'
 import { bitIsSet, parseBlockExtraData } from '@celo/utils/lib/istanbul'
 import { flags } from '@oclif/command'
 import { cli } from 'cli-ux'
+import { appendFileSync } from 'fs'
+import * as readline from 'readline'
 import { BaseCommand } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'
-import { displaySendTx } from '../../utils/cli'
+import { displaySendTx, printValueMapRecursive } from '../../utils/cli'
 import { Flags } from '../../utils/command'
 
 export default class Slasher extends BaseCommand {
@@ -17,6 +19,8 @@ export default class Slasher extends BaseCommand {
     automatic: flags.boolean({ description: 'Automatically monitor and slash for downtime' }),
     dryRun: flags.boolean({ description: 'Dry run' }),
     endBlock: flags.integer({ description: 'Stop monitoring after block' }),
+    excludeValidator: Flags.address({ description: "Don't slash this validator" }),
+    excludeValidatorSigner: Flags.address({ description: "Don't slash this validator" }),
     forDowntimeBeginningAtBlock: flags.integer({
       description: 'Manually slash validator for downtime beginning at block',
     }),
@@ -30,8 +34,9 @@ export default class Slasher extends BaseCommand {
       description: 'Overrides downtime threshold for automatically slashing',
     }),
     slashAgainAfter: flags.integer({ description: 'Slash same validator again after N blocks' }),
-    slashValidator: Flags.address({ description: 'Manually slash this validator address' }),
-    slashValidatorSigner: Flags.address({ description: 'Manually slash this validator address' }),
+    slashLog: flags.string({ description: 'Filename for slash log' }),
+    slashValidator: Flags.address({ description: 'Manually slash this validator' }),
+    slashValidatorSigner: Flags.address({ description: 'Manually slash this validator' }),
     startBlock: flags.integer({ description: 'Start monitoring on block instead of tip' }),
   }
 
@@ -47,15 +52,23 @@ export default class Slasher extends BaseCommand {
     if (res.flags.slashValidatorSigner && res.flags.slashValidator) {
       throw new Error('Provided both slashValidatorSigner and slashValidator')
     }
-    this.kit.defaultAccount = res.flags.from
+    const accounts = await this.kit.contracts.getAccounts()
+    const validators = await this.kit.contracts.getValidators()
 
+    this.kit.defaultAccount = res.flags.from
     const checkBuilder = newCheckBuilder(this, res.flags.from)
     checkBuilder.isSignerOrAccount()
     if (res.flags.slashValidator) {
       checkBuilder.isValidator(res.flags.slashValidator)
     } else if (res.flags.slashValidatorSigner) {
-      const accounts = await this.kit.contracts.getAccounts()
       const account = await accounts.signerToAccount(res.flags.slashValidatorSigner)
+      checkBuilder.isValidator(account)
+    }
+    if (res.flags.excludeValidator) {
+      checkBuilder.isValidator(res.flags.excludeValidator)
+    }
+    if (res.flags.excludeValidatorSigner) {
+      const account = await accounts.signerToAccount(res.flags.excludeValidatorSigner)
       checkBuilder.isValidator(account)
     }
     await checkBuilder.runChecks()
@@ -71,13 +84,13 @@ export default class Slasher extends BaseCommand {
         res.flags.forDowntimeBeginningAtBlock,
         res.flags.forDowntimeEndingAtBlock,
         res.flags.dryRun,
-        res.flags.gas
+        res.flags.gas,
+        res.flags.slashLog
       )
     } else if (
       res.flags.slashValidator &&
       (res.flags.forDowntimeEndingAtBlock || res.flags.forDowntimeBeginningAtBlock)
     ) {
-      const validators = await this.kit.contracts.getValidators()
       const validator = await validators.getValidator(res.flags.slashValidator)
       // Prefer slashing by signer, because to find the signer for a validator at arbitrary height,
       // we would need to consult ValidatorSignerAuthorized events (or an archival node).
@@ -86,9 +99,19 @@ export default class Slasher extends BaseCommand {
         res.flags.forDowntimeBeginningAtBlock,
         res.flags.forDowntimeEndingAtBlock,
         res.flags.dryRun,
-        res.flags.gas
+        res.flags.gas,
+        res.flags.slashLog
       )
     } else if (res.flags.automatic) {
+      const excludeValidator: Record<Address, boolean> = {}
+      if (res.flags.excludeValidator) {
+        excludeValidator[normalizeAddress(res.flags.excludeValidator)] = true
+      }
+      if (res.flags.excludeValidatorSigner) {
+        excludeValidator[
+          normalizeAddress(await accounts.signerToAccount(res.flags.excludeValidatorSigner))
+        ] = true
+      }
       const slashableDowntime =
         res.flags.slashableDowntime || (await downtimeSlasher.slashableDowntime())
       await this.slasher(
@@ -98,7 +121,9 @@ export default class Slasher extends BaseCommand {
         res.flags.gas,
         res.flags.startBlock,
         res.flags.endBlock,
-        res.flags.slashAgainAfter
+        res.flags.slashAgainAfter,
+        res.flags.slashLog,
+        excludeValidator
       )
     } else {
       throw new Error('Either --automatic or --slashValidator* and --forDowntime* is required')
@@ -112,7 +137,10 @@ export default class Slasher extends BaseCommand {
     slashGas?: number,
     startBlock?: number,
     endBlock?: number,
-    slashAgainAfter?: number
+    slashAgainAfter?: number,
+    slashLogFilename?: string,
+    excludeValidator: Record<Address, boolean> = {},
+    readStdinCommands: boolean = true
   ) {
     const election = await this.kit.contracts.getElection()
     const validators = await this.kit.contracts.getValidators()
@@ -127,9 +155,43 @@ export default class Slasher extends BaseCommand {
     let blockNumber = startBlock || (await this.kit.web3.eth.getBlockNumber()) - 1
     let epochNumber = -1
     let slashAttempts = 0
+    let quit = false
     console.info(`Slashing for downtime >= ${slashableDowntime} with extraWait = ${extraWait} ...`)
 
+    const rl = readStdinCommands
+      ? readline.createInterface({
+          input: process.stdin,
+          output: process.stdout,
+        })
+      : null
+    if (rl) {
+      rl.on('line', (command: string) => {
+        switch (command) {
+          case 'q':
+            quit = true
+            break
+          case 'd':
+            console.log('Down validators:')
+            for (let i = 0; i < validatorSet.length; i++) {
+              if (validatorDownSince[i] < 0) {
+                continue
+              }
+              printValueMapRecursive({
+                validator: validatorSet[i].name,
+                downSince: validatorDownSince[i],
+                downBlocks: blockNumber - validatorDownSince[i],
+              })
+            }
+            break
+          default:
+            console.log(`Unknown command "${command}"`)
+            break
+        }
+      })
+    }
+
     const done = () =>
+      quit ||
       (endBlock && blockNumber >= endBlock) ||
       (maxSlashAttempts && slashAttempts >= maxSlashAttempts)
     while (!done()) {
@@ -192,6 +254,13 @@ export default class Slasher extends BaseCommand {
               const downtimeEndBlock = sealBlockNumber - extraWait
               const validator = validatorSet[i]
               const signer = validatorSigners[i]
+
+              if (excludeValidator[normalizeAddress(validator.address)]) {
+                console.info(`Excluded Validator:${i}: "${validator.name}" skipping`)
+                continue
+              }
+
+              // Unnecessary if tip
               const alreadySlashedSigner = alreadySlashed[normalizeAddress(signer)]
               if (
                 alreadySlashedSigner &&
@@ -202,14 +271,15 @@ export default class Slasher extends BaseCommand {
               } else {
                 alreadySlashed[normalizeAddress(signer)] = downtimeEndBlock
               }
-              console.info(`Validator:${i}: "${validator.name}" downtime=${downtime} slashable`)
 
+              console.info(`Validator:${i}: "${validator.name}" downtime=${downtime} slashable`)
               await this.slashValidatorSignerForDowntime(
                 signer,
                 undefined,
                 downtimeEndBlock,
                 dryRun,
-                slashGas
+                slashGas,
+                slashLogFilename
               ).catch(console.log)
               validatorDownSince[i] = -1
               slashAttempts++
@@ -222,6 +292,10 @@ export default class Slasher extends BaseCommand {
       }
       await sleep(1)
     }
+
+    if (rl) {
+      rl.close()
+    }
   }
 
   async slashValidatorSignerForDowntime(
@@ -229,18 +303,19 @@ export default class Slasher extends BaseCommand {
     startBlock?: number,
     endBlock?: number,
     dryRun?: boolean,
-    gas?: number
+    gas?: number,
+    logFile?: string
   ) {
     const validators = await this.kit.contracts.getValidators()
     const validator = await validators.getValidatorFromSigner(signerAddress)
     const downtimeSlasher = await this.kit.contracts.getDowntimeSlasher()
     if (endBlock) {
       console.info(
-        `Slashing ${validator.address} "${validator.name}" for downtime ending at ${endBlock}`
+        `Slashing ${signerAddress}: Validator ${validator.address} "${validator.name}" for downtime ending at ${endBlock}`
       )
     } else if (startBlock) {
       console.info(
-        `Slashing ${validator.address} "${validator.name}" for downtime beginning at ${startBlock}`
+        `Slashing ${signerAddress}: Validator ${validator.address} "${validator.name}" for downtime beginning at ${startBlock}`
       )
     } else {
       throw new Error('No block number provided')
@@ -260,6 +335,9 @@ export default class Slasher extends BaseCommand {
     } else {
       try {
         await displaySendTx('slashing', slashTx, { gas })
+        if (logFile) {
+          appendFileSync(logFile, `${signerAddress} ${startBlock} ${endBlock}`)
+        }
       } catch (error) {
         cli.action.stop()
         console.info(`Slashing failed: ${error}`)
