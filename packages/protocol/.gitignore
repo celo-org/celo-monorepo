@@ -28,3 +28,5 @@ types/contracts/*
 
 .0x-artifacts/*
 coverage/*
+
+deployedGrants.json
