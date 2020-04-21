@@ -314,11 +314,36 @@ contract('Reserve', (accounts: string[]) => {
       await assertRevert(reserve.transferGold(otherReserveAddress, aValue, { from: spender }))
     })
 
-    for (let i = 0; i < 3; i++) {
+    const freezeGold = 5000
+    const freezeDays = 5
+    const unfrozenDaily = freezeGold / freezeDays
+    for (let i = 0; i < 5; i++) {
       it('unfrozen gold should increase every 24 hours', async () => {
-        const expectedFrozenGold = 3 - i
-        await reserve.setFrozenGold(3, 3)
+        const expectedFrozenGold = freezeGold - i * unfrozenDaily
+        const unfrozenBalanceStart = await reserve.getUnfrozenBalance()
+        const unfrozenReserveGoldBalanceStart = await reserve.getUnfrozenReserveGoldBalance()
+        await reserve.setFrozenGold(freezeGold, freezeDays)
+        assert.equal((await reserve.getFrozenReserveGoldBalance()).toNumber(), freezeGold)
+        assert.equal(
+          (await reserve.getUnfrozenBalance()).toNumber(),
+          unfrozenBalanceStart.toNumber() - freezeGold
+        )
+        assert.equal(
+          (await reserve.getUnfrozenReserveGoldBalance()).toNumber(),
+          unfrozenReserveGoldBalanceStart.toNumber() - freezeGold
+        )
+
         await timeTravel(3600 * 24 * i, web3)
+        assert.equal((await reserve.getFrozenReserveGoldBalance()).toNumber(), expectedFrozenGold)
+        assert.equal(
+          (await reserve.getUnfrozenBalance()).toNumber(),
+          unfrozenBalanceStart.toNumber() - expectedFrozenGold
+        )
+        assert.equal(
+          (await reserve.getUnfrozenReserveGoldBalance()).toNumber(),
+          unfrozenReserveGoldBalanceStart.toNumber() - expectedFrozenGold
+        )
+
         await assertRevert(
           reserve.transferGold(otherReserveAddress, aValue - expectedFrozenGold + 1, {
             from: spender,
@@ -700,14 +725,46 @@ contract('Reserve', (accounts: string[]) => {
         value: reserveGoldBalance,
       })
     })
-    it('should return the correct ratio', async () => {
-      const stableTokenSupply = new BigNumber(10).pow(21)
-      await mockStableToken.setTotalSupply(stableTokenSupply)
-      const ratio = new BigNumber(await reserve.getReserveRatio())
-      assert(
-        fromFixed(ratio).isEqualTo(reserveGoldBalance.div(stableTokenSupply.div(exchangeRate))),
-        'reserve ratio should be correct'
-      )
+
+    describe('should return the correct ratio when', () => {
+      it('undercollateralized', async () => {
+        const stableTokenSupply = new BigNumber(10).pow(21)
+        await mockStableToken.setTotalSupply(stableTokenSupply)
+        const stableTokenValueInGold = stableTokenSupply.div(exchangeRate)
+        const ratio = new BigNumber(await reserve.getReserveRatio())
+        assert(fromFixed(ratio).isEqualTo(0.1))
+        assert(fromFixed(ratio).isEqualTo(reserveGoldBalance.div(stableTokenValueInGold)))
+      })
+
+      it('overcollateralized', async () => {
+        await reserve.setFrozenGold(reserveGoldBalance.minus(reserveGoldBalance.dividedBy(10)), 10)
+        reserveGoldBalance = reserveGoldBalance.dividedBy(10)
+
+        const stableTokenSupply = new BigNumber(10).pow(18)
+        await mockStableToken.setTotalSupply(stableTokenSupply)
+        const stableTokenValueInGold = stableTokenSupply.div(exchangeRate)
+        const ratio = new BigNumber(await reserve.getReserveRatio())
+        assert(fromFixed(ratio).isEqualTo(10))
+        assert(fromFixed(ratio).isEqualTo(reserveGoldBalance.div(stableTokenValueInGold)))
+      })
+
+      it('balanced', async () => {
+        const otherReserveAddress = web3.utils.randomHex(20)
+        await web3.eth.sendTransaction({
+          to: otherReserveAddress,
+          value: reserveGoldBalance.times(9),
+          from: accounts[0],
+        })
+        await reserve.addOtherReserveAddress(otherReserveAddress)
+        reserveGoldBalance = reserveGoldBalance.times(10)
+
+        const stableTokenSupply = new BigNumber(10).pow(21)
+        await mockStableToken.setTotalSupply(stableTokenSupply)
+        const stableTokenValueInGold = stableTokenSupply.div(exchangeRate)
+        const ratio = new BigNumber(await reserve.getReserveRatio())
+        assert(fromFixed(ratio).isEqualTo(1))
+        assert(fromFixed(ratio).isEqualTo(reserveGoldBalance.div(stableTokenValueInGold)))
+      })
     })
   })
 })
