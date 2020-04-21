@@ -505,20 +505,13 @@ DEPENDENCIES:
   - Yoga (from `../../../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
-  trunk:
-    - Analytics
-    - boost-for-react-native
+  https://cdn.cocoapods.org/:
     - Crashlytics
-    - Fabric
     - Firebase
-    - FirebaseAnalytics
-    - FirebaseAnalyticsInterop
     - FirebaseAuth
     - FirebaseAuthInterop
-    - FirebaseCore
     - FirebaseDatabase
     - FirebaseDynamicLinks
-    - FirebaseInstanceID
     - FirebaseMessaging
     - FirebaseStorage
     - GoogleAppMeasurement
@@ -529,6 +522,16 @@ SPEC REPOS:
     - Protobuf
     - Sentry
     - Toast
+  https://github.com/CocoaPods/Specs.git:
+    - Analytics
+    - boost-for-react-native
+    - Fabric
+    - Firebase
+    - FirebaseAnalytics
+    - FirebaseAnalyticsInterop
+    - FirebaseCore
+    - FirebaseInstanceID
+    - GoogleUtilities
 
 EXTERNAL SOURCES:
   CeloBlockchain:
