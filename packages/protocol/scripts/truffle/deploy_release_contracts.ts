@@ -136,9 +136,7 @@ async function handleGrant(releaseGoldConfig: any, currGrant: number) {
   deployedGrants.push(releaseGoldConfig.identifier)
   releases.push(record)
   // Must write to file after every grant to avoid losing info on crash.
-  if (!argv.yesreally) {
-    fs.writeFileSync(deployedGrantsFile, JSON.stringify(deployedGrants, null, 1))
-  }
+  fs.writeFileSync(deployedGrantsFile, JSON.stringify(deployedGrants, null, 1))
   if (argv.output_file) {
     fs.writeFileSync(argv.output_file, JSON.stringify(releases, null, 2))
   } else {
@@ -160,30 +158,28 @@ async function handleJSONFile(err, data) {
   }
 
   console.info('Verifying grants have not already been deployed.')
-  if (!argv.yesreally) {
-    for (const grant of grants) {
-      if (deployedGrants.includes(grant.identifier)) {
-        console.info(
-          chalk.red(
-            'Grant with identifier ' + grant.identifier + ' has already been deployed.\nExiting.'
-          )
+  for (const grant of grants) {
+    if (deployedGrants.includes(grant.identifier)) {
+      console.info(
+        chalk.red(
+          'Grant with identifier ' + grant.identifier + ' has already been deployed.\nExiting.'
         )
-        process.exit(0)
-      }
-      // Sum occurences of each identifier in the grant file, if more than 1 then there is a duplicate.
-      const identifierCounts = grants.map((x) => (x.identifier === grant.identifier ? 1 : 0))
-      if (identifierCounts.reduce((a, b) => a + b, 0) > 1) {
-        console.info(
-          chalk.red(
-            'Provided grant file ' +
-              argv.grants +
-              ' contains a duplicate identifier: ' +
-              grant.identifier +
-              '.\nExiting.'
-          )
+      )
+      process.exit(0)
+    }
+    // Sum occurences of each identifier in the grant file, if more than 1 then there is a duplicate.
+    const identifierCounts = grants.map((x) => (x.identifier === grant.identifier ? 1 : 0))
+    if (identifierCounts.reduce((a, b) => a + b, 0) > 1) {
+      console.info(
+        chalk.red(
+          'Provided grant file ' +
+            argv.grants +
+            ' contains a duplicate identifier: ' +
+            grant.identifier +
+            '.\nExiting.'
         )
-        process.exit(0)
-      }
+      )
+      process.exit(0)
     }
   }
 
@@ -267,7 +263,15 @@ async function handleJSONFile(err, data) {
 module.exports = async (callback: (error?: any) => number) => {
   try {
     argv = require('minimist')(process.argv.slice(5), {
-      string: ['network', 'from', 'grants', 'start_gold', 'output_file', 'really'],
+      string: [
+        'network',
+        'from',
+        'grants',
+        'start_gold',
+        'deployed_grants',
+        'output_file',
+        'really',
+      ],
     })
     ReleaseGoldMultiSig = artifacts.require('ReleaseGoldMultiSig')
     ReleaseGoldMultiSigProxy = artifacts.require('ReleaseGoldMultiSigProxy')
@@ -275,8 +279,18 @@ module.exports = async (callback: (error?: any) => number) => {
     ReleaseGoldProxy = artifacts.require('ReleaseGoldProxy')
     releases = []
     startGold = web3.utils.toWei(argv.start_gold)
-    deployedGrantsFile = 'scripts/truffle/deployedGrants.json'
-    deployedGrants = JSON.parse(fs.readFileSync(deployedGrantsFile, 'utf-8'))
+    deployedGrantsFile = argv.deployed_grants
+    try {
+      deployedGrants = JSON.parse(fs.readFileSync(deployedGrantsFile, 'utf-8'))
+    } catch (e) {
+      // If this fails, file must be created
+      fs.writeFile(deployedGrantsFile, '', (err) => {
+        if (err) {
+          throw err
+        }
+      })
+      deployedGrants = []
+    }
     fs.readFile(argv.grants, handleJSONFile)
   } catch (error) {
     callback(error)
