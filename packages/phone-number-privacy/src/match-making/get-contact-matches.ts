@@ -1,6 +1,6 @@
 import { Request, Response } from 'firebase-functions'
-import { authenticateUser } from '../common/identity'
 import { ErrorMessages, respondWithError } from '../common/error-utils'
+import { authenticateUser } from '../common/identity'
 import { getNumberPairContacts, setNumberPairContacts } from '../database/wrappers/number-pairs'
 import { computeBLSSalt } from '../salt-generation/bls-salt'
 
