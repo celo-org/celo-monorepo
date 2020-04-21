@@ -119,6 +119,9 @@ const INTRINSIC_TX_GAS_COST = 21000
 // Additional intrinsic gas for a transaction with fee currency specified
 const ADDITIONAL_INTRINSIC_TX_GAS_COST = 50000
 
+// Gas refund for resetting to the original non-zero value
+const sstoreCleanRefundEIP2200 = 4200
+// Transfer cost of a stable token transfer, accounting for the refund above.
 const stableTokenTransferGasCost = 23631
 
 /** Helper to watch balance changes over accounts */
@@ -746,7 +749,8 @@ describe('Transfer tests', function(this: any) {
 
           describe('feeCurrency = CeloGold >', () => {
             testTransferToken({
-              expectedGas: stableTokenTransferGasCost + INTRINSIC_TX_GAS_COST,
+              expectedGas:
+                stableTokenTransferGasCost + INTRINSIC_TX_GAS_COST + sstoreCleanRefundEIP2200,
               transferToken: CeloContract.StableToken,
               feeToken: CeloContract.GoldToken,
             })
