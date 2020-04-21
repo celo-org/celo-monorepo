@@ -119,7 +119,7 @@ const INTRINSIC_TX_GAS_COST = 21000
 // Additional intrinsic gas for a transaction with fee currency specified
 const ADDITIONAL_INTRINSIC_TX_GAS_COST = 50000
 
-const stableTokenTransferGasCost = 29391
+const stableTokenTransferGasCost = 23631
 
 /** Helper to watch balance changes over accounts */
 interface BalanceWatcher {
