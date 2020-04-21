@@ -161,11 +161,8 @@ function* withdrawFromEscrow() {
 
     Logger.debug(TAG + '@withdrawFromEscrow', `Signing message hash ${msgHash}`)
     // using the temporary wallet account to sign a message. The message is the current account.
-    let signature: string = (yield call(
-      contractKit.web3.eth.accounts.sign,
-      msgHash,
-      tmpWalletPrivateKey
-    )).signature
+    let signature: string = (yield contractKit.web3.eth.accounts.sign(msgHash, tmpWalletPrivateKey))
+      .signature
     Logger.debug(TAG + '@withdrawFromEscrow', `Signed message hash signature is ${signature}`)
     signature = signature.slice(2)
     const r = `0x${signature.slice(0, 64)}`

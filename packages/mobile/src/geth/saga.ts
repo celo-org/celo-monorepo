@@ -186,18 +186,10 @@ export function* gethSaga() {
 }
 
 export function* gethSagaIfNecessary() {
-  // TODO make sure state is rehydrated
-  Logger.debug('gethSagaIfNecessary', `Waiting for rehydate...`)
   yield call(waitForRehydrate)
-  Logger.debug('gethSagaIfNecessary', `Rehydrated.`)
-
-  const forno = yield select(fornoSelector)
-  Logger.debug('gethSagaIfNecessary', `Forno mode: ${forno}`)
-  yield put(setContractKitReady())
-  Logger.debug('Rehydrated', `forno mode known: ${forno}`)
-
+  yield put(setContractKitReady(true))
   if (!(yield select(fornoSelector))) {
-    Logger.debug('gethSagaIfNecessary', `Starting geth saga...`)
+    Logger.debug(`${TAG}@gethSagaIfNecessary`, `Starting geth saga...`)
     yield call(gethSaga)
   }
 }

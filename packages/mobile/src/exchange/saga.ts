@@ -305,7 +305,6 @@ export function* watchFetchExchangeRate() {
 }
 
 export function* watchExchangeTokens() {
-  // @ts-ignore saga doesn't seem to understand the action with multiple params?
   yield takeEvery(Actions.EXCHANGE_TOKENS, exchangeGoldAndStableTokens)
 }
 

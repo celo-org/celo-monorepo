@@ -1,7 +1,7 @@
 import { newKitFromWeb3 } from '@celo/contractkit'
 import { privateKeyToAddress } from '@celo/utils/src/address'
 import * as net from 'react-native-tcp'
-import { call } from 'redux-saga/effects'
+import { call, select, take } from 'redux-saga/effects'
 import { waitForRehydrate } from 'src/app/saga'
 import { DEFAULT_FORNO_URL } from 'src/config'
 import { IPC_PATH } from 'src/geth/geth'
@@ -12,6 +12,7 @@ import { contractKitReadySelector } from 'src/web3/selectors'
 import Web3 from 'web3'
 import { provider } from 'web3-core'
 import { Platform } from 'react-native'
+import { Actions } from 'src/web3/actions'
 import { fornoSelector } from 'src/web3/selectors'
 import sleep from 'sleep-promise'
 
@@ -37,14 +38,35 @@ export async function getContractKitOutsideGenerator() {
     Logger.debug(`getContractKitOutsideGenerator`, `Still waiting for store...`)
     await sleep(250) // Every 0.25 seconds
   }
+  // Once have store, make sure contractKit is ready
+  /*
+  while (contractKitReadySelector(store.getState())) {
+    // Must wait for contractKit to be Ready
+  }
+  */
+  Logger.debug(`${tag}@getContractKitOutsideGenerator`, 'getContractKitOutsideGenerator')
   return getContractKitBasedOnFornoInStore()
 }
 
 export function* getContractKit() {
-  // Wait for rehydrate if store undefined
-  if (!store) {
-    yield call(waitForRehydrate)
+  Logger.debug(
+    `${tag}@getContractKit`,
+    `contractKitReady1: ${yield select(contractKitReadySelector)}`
+  )
+  // No need to waitForRehydrate as contractKitReady set to false for every app reopen
+  while (!(yield select(contractKitReadySelector))) {
+    // If contractKit locked, wait until unlocked
+    // TODO(anna) see if this is necessary or if we can just wait for rehydrate
+    yield take(Actions.SET_CONTRACT_KIT_READY)
+    Logger.debug(
+      `${tag}@getContractKit`,
+      `got new action, contractKitReadyn: ${yield select(contractKitReadySelector)}`
+    )
   }
+  Logger.debug(
+    `${tag}@getContractKit`,
+    `contractKitReady2: ${yield select(contractKitReadySelector)}`
+  )
   return getContractKitBasedOnFornoInStore()
 }
 

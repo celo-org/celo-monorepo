@@ -42,7 +42,7 @@ export const reducer = (
           highestBlock: 0,
         },
         latestBlockNumber: 0,
-        contractKitReady: false, // Always default to false until ready TODO(anna)
+        contractKitReady: false, // Starts as false upon every app reopen
       }
     }
     case Actions.SET_ACCOUNT:
@@ -83,7 +83,7 @@ export const reducer = (
     case Actions.SET_CONTRACT_KIT_READY:
       return {
         ...state,
-        contractKitReady: true, // TODO(anna) decide whether need option to turn this off
+        contractKitReady: action.ready,
       }
     default:
       return state

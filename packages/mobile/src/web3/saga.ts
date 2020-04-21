@@ -116,6 +116,7 @@ export function* waitForWeb3Sync() {
     const { syncComplete, timeout } = yield race({
       syncComplete: call(checkWeb3SyncProgress),
       timeout: delay(SYNC_TIMEOUT),
+      fornoSwitch: take(Actions.SET_IS_FORNO),
     })
     if (timeout || !syncComplete) {
       Logger.error(TAG, 'Could not complete sync')
@@ -276,7 +277,7 @@ export function* unlockAccount(account: string) {
         Logger.info(TAG + 'unlockAccount', `Account ${account} already added to web3 for signing`)
       } else {
         Logger.info(TAG + '@unlockAccount', `unlockDuration is ignored in forno mode`)
-        const privateKey: string = yield readPrivateKeyFromLocalDisk(account, pincode)
+        const privateKey: string = yield call(readPrivateKeyFromLocalDisk, account, pincode)
         addLocalAccount(privateKey, true)
         accountAlreadyAddedInFornoMode = true
       }
@@ -378,6 +379,7 @@ export function* switchToGethFromForno() {
   Logger.debug(TAG, 'Switching to geth from forno..')
   try {
     const gethAlreadyStartedThisSession = yield select(gethStartedThisSessionSelector)
+    yield put(setContractKitReady(false)) // Lock contractKit during provider switch
     yield put(setFornoMode(false))
 
     if (gethAlreadyStartedThisSession) {
@@ -403,15 +405,18 @@ export function* switchToGethFromForno() {
     // Note that this must happen after the sync mode is switched
     // as the web3.personal where the key is stored is not available in forno mode
     yield call(ensureAccountInWeb3Keystore)
+    yield put(setContractKitReady(true))
   } catch (e) {
     Logger.error(TAG + '@switchToGethFromForno', 'Error switching to geth from forno')
     yield put(showError(ErrorMessages.FAILED_TO_SWITCH_SYNC_MODES))
+    yield put(setContractKitReady(true))
   }
 }
 
 export function* switchToFornoFromGeth() {
   Logger.debug(TAG, 'Switching to forno from geth..')
   try {
+    yield put(setContractKitReady(false)) // Lock contractKit during provider switch
     yield put(setFornoMode(true))
     switchWeb3ProviderForSyncMode(true)
     yield put(cancelGethSaga())
@@ -421,9 +426,11 @@ export function* switchToFornoFromGeth() {
     // This prevents a false positive "geth disconnected"
     // when blocks stop syncing.
     yield call(waitForWeb3Sync)
+    yield put(setContractKitReady(true))
   } catch (e) {
     Logger.error(TAG + '@switchToFornoFromGeth', 'Error switching to forno from geth')
     yield put(showError(ErrorMessages.FAILED_TO_SWITCH_SYNC_MODES))
+    yield put(setContractKitReady(true))
   }
 }
 

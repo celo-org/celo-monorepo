@@ -56,6 +56,7 @@ export interface UpdateWeb3SyncProgressAction {
 
 export interface SetContractKitReadyAction {
   type: Actions.SET_CONTRACT_KIT_READY
+  ready: boolean
 }
 
 export type ActionTypes =
@@ -97,9 +98,10 @@ export const setFornoMode = (fornoMode: boolean): SetIsFornoAction => {
   }
 }
 
-export const setContractKitReady = (): SetContractKitReadyAction => {
+export const setContractKitReady = (ready: boolean): SetContractKitReadyAction => {
   return {
     type: Actions.SET_CONTRACT_KIT_READY,
+    ready,
   }
 }
 
