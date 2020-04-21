@@ -1,23 +1,8 @@
 FROM node:10
 WORKDIR /celo-monorepo
 
-RUN sudo apt-get update -y
-RUN sudo apt-get install lsb-release libudev-dev libusb-dev libusb-1.0-0 -y
-
-RUN apt-get update -y && \
-    apt-get install -y libudev-dev  && \
-    rm -rf /var/lib/apt/lists/*
-
-
-# Needed for gsutil
-# RUN apt-get update && \
-#     apt-get install -y lsb-release && \
-#     export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)" && \
-#     echo "deb http://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
-#     curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - && \
-#     apt-get update -y && \
-#     apt-get install -y google-cloud-sdk && \
-#     rm -rf /var/lib/apt/lists/*
+RUN apt-get update -y
+RUN apt-get install lsb-release libudev-dev libusb-dev libusb-1.0-0 -y
 
 # ensure yarn.lock is evaluated by kaniko cache diff
 COPY lerna.json package.json yarn.lock ./
