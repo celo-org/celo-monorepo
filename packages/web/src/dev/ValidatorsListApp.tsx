@@ -19,7 +19,7 @@ import Spinner from 'src/shared/Spinner'
 import { colors, standardStyles, textStyles } from 'src/styles'
 
 const networkMenu = [
-  ['Mainnet', menuItems.VALIDATORS_LIST.link],
+  ['Release Candidate', menuItems.VALIDATORS_LIST.link],
   ['Baklava', menuItems.VALIDATORS_LIST__BAKLAVA.link],
   // ['Baklavastaging', menuItems.VALIDATORS_LIST_BAKLAVASTAGING.link],
 ]
@@ -113,13 +113,13 @@ class ValidatorsListApp extends React.PureComponent<Props> {
     return (
       <>
         <OpenGraph
-          title="Celo Validator Explorer"
+          title="Celo Validators"
           path={menuItems.VALIDATORS_LIST.link}
           description="View status of Validators on the Celo Network"
         />
         <View style={[styles.cover, styles.pStatic, compStyles.fullHeight]}>
           <H1 style={[textStyles.center, standardStyles.sectionMarginTablet, textStyles.invert]}>
-            Validator Explorer
+            Validators
           </H1>
           <View>
             <View style={[styles.links]}>
