@@ -562,7 +562,7 @@ contract Accounts is IAccounts, Ownable, ReentrancyGuard, Initializable, UsingRe
     require(isAccount(msg.sender), "Unknown account");
     require(
       isNotAccount(authorized) && isNotAuthorizedSigner(authorized),
-      "delegate or account exists"
+      "Cannot re-authorize address or locked gold account."
     );
 
     address signer = Signatures.getSignerOfAddress(msg.sender, v, r, s);

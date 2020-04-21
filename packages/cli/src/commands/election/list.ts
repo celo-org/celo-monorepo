@@ -6,7 +6,7 @@ export default class List extends BaseCommand {
     'Prints the list of validator groups, the number of votes they have received, the number of additional votes they are able to receive, and whether or not they are eligible to elect validators.'
 
   static flags = {
-    ...BaseCommand.flags,
+    ...BaseCommand.flagsWithoutLocalAddresses(),
   }
 
   static examples = ['list']
