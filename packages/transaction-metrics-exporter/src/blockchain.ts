@@ -46,6 +46,8 @@ interface EndReason {
 }
 
 export async function runMetricExporter(kit: ContractKit): Promise<EndReason> {
+  ;(kit.web3.currentProvider as any).enableSubscriptions()
+
   // Start exporting metrics
   const fromBLock = Number.parseInt(process.env.FROM_BLOCK || '', 10)
   const toBlock = Number.parseInt(process.env.TO_BLOCK || '', 10)

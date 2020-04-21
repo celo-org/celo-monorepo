@@ -25,16 +25,12 @@ export class CeloProvider {
   private readonly paramsPopulator: TxParamsNormalizer
   private alreadyStopped: boolean = false
   wallet: Wallet
+  on?: (...args: any[]) => any
 
   constructor(readonly existingProvider: provider, wallet: Wallet = new LocalWallet()) {
     this.rpcCaller = new DefaultRpcCaller(existingProvider)
     this.paramsPopulator = new TxParamsNormalizer(this.rpcCaller)
     this.wallet = wallet
-
-    // Deleting on method if the provider doesn't allow subscriptions
-    if (!(existingProvider as any)?.on) {
-      delete this.on
-    }
   }
 
   addAccount(privateKey: string) {
@@ -53,13 +49,6 @@ export class CeloProvider {
 
   isLocalAccount(address?: string): boolean {
     return this.wallet.hasAccount(address)
-  }
-
-  /**
-   * Proxy of `on` method
-   */
-  on?(...args: any[]) {
-    ;(this.existingProvider as any)?.on?.(...args)
   }
 
   /**
@@ -153,6 +142,10 @@ export class CeloProvider {
     } catch (error) {
       debug(`Failed to close the connection: ${error}`)
     }
+  }
+
+  enableSubscriptions() {
+    this.on = (...args: any[]) => (this.existingProvider as any)?.on?.(...args)
   }
 
   private async handleAccounts(_payload: JsonRpcPayload): Promise<any> {
