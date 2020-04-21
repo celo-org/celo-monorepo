@@ -1,4 +1,4 @@
-import { ErrorMessages } from '../../common/utils'
+import { ErrorMessages } from '../../common/error-utils'
 import { getDatabase } from '../database'
 import { ACCOUNTS_COLUMNS, ACCOUNTS_TABLE } from '../models/account'
 

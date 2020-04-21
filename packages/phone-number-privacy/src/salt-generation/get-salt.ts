@@ -1,7 +1,7 @@
 import { PhoneNumberUtils } from '@celo/utils'
 import { Request, Response } from 'firebase-functions'
+import { ErrorMessages, respondWithError } from '../common/error-utils'
 import { authenticateUser } from '../common/identity'
-import { ErrorMessages, respondWithError } from '../common/utils'
 import { incrementQueryCount } from '../database/wrappers/account'
 import { computeBLSSalt } from './bls-salt'
 import QueryQuota from './query-quota'
@@ -23,9 +23,7 @@ export async function handleGetSalt(request: Request, response: Response) {
       return
     }
     const salt = computeBLSSalt(request.body.queryPhoneNumber)
-    await incrementQueryCount(request.body.account).catch((error) => {
-      console.error(ErrorMessages.DATABASE_UPDATE_FAILURE, error)
-    })
+    await incrementQueryCount(request.body.account)
     response.json({ success: true, salt })
   } catch (error) {
     console.error('Failed to getSalt', error)

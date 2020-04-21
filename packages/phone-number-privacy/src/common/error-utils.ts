@@ -13,31 +13,3 @@ export enum ErrorMessages {
 export function respondWithError(res: Response, statusCode: number, error: string) {
   res.status(statusCode).json({ success: false, error })
 }
-
-export class HashSet<T> {
-  public set: any = {}
-
-  add(key: T) {
-    this.set[key] = true
-  }
-
-  remove(key: T) {
-    delete this.set[key]
-  }
-
-  clear() {
-    this.set = {}
-  }
-
-  contains(key: T) {
-    return this.set.hasOwnProperty(key)
-  }
-}
-
-export function hashSetBuilder<T>(list: T[]): HashSet<T> {
-  const hs = new HashSet()
-  for (const item of list) {
-    hs.add(item)
-  }
-  return hs
-}

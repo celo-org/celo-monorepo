@@ -1,5 +1,5 @@
 import { BLINDBLS } from 'bls12377js-blind'
-import { ErrorMessages } from '../common/utils'
+import { ErrorMessages } from '../common/error-utils'
 import config from '../config'
 
 /*

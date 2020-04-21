@@ -1,4 +1,4 @@
-import { ErrorMessages, hashSetBuilder } from '../../common/utils'
+import { ErrorMessages } from '../../common/error-utils'
 import { getDatabase } from '../database'
 import { NUMBER_PAIRS_COLUMN, NUMBER_PAIRS_TABLE } from '../models/numberPair'
 
@@ -14,10 +14,10 @@ export async function getNumberPairContacts(
       .select(NUMBER_PAIRS_COLUMN.userPhoneHash)
       .where(NUMBER_PAIRS_COLUMN.contactPhoneHash, userPhone)
 
-    const contactPhonesHashSet = hashSetBuilder(contactPhones)
+    const contactPhonesSet = new Set(contactPhones)
     return contentPairs
-      .map((contractPair) => contractPair[NUMBER_PAIRS_COLUMN.userPhoneHash])
-      .filter((number) => contactPhonesHashSet.contains(number))
+      .map((contactPair) => contactPair[NUMBER_PAIRS_COLUMN.userPhoneHash])
+      .filter((number) => contactPhonesSet.has(number))
   } catch (e) {
     console.error(ErrorMessages.DATABASE_GET_FAILURE, e)
     return []
@@ -42,8 +42,8 @@ export async function setNumberPairContacts(
   try {
     await getDatabase().batchInsert(NUMBER_PAIRS_TABLE, rows)
   } catch (e) {
+    // ignore duplicate insertion error (23505)
     if (e.code !== '23505') {
-      // ignore duplicate insertion error (23505)
       console.error(ErrorMessages.DATABASE_INSERT_FAILURE, e)
     }
   }
