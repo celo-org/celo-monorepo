@@ -17254,6 +17254,11 @@ express-rate-limit@5.0.0:
   resolved "https://registry.yarnpkg.com/express-rate-limit/-/express-rate-limit-5.0.0.tgz#9a6f4cacc388c1a1da7ba2f65db69f7395e9b04e"
   integrity sha512-dhT57wqxfqmkOi4HM7NuT4Gd7gbUgSK2ocG27Y6lwm8lbOAw9XQfeANawGq8wLDtlGPO1ZgDj0HmKsykTxfFAg==
 
+express-rate-limit@^5.1.1:
+  version "5.1.1"
+  resolved "https://registry.yarnpkg.com/express-rate-limit/-/express-rate-limit-5.1.1.tgz#572e75c47ef890a6c9a3347f27bf3557d571f9ed"
+  integrity sha512-puA1zcCx/quwWUOU6pT6daCt6t7SweD9wKChKhb+KSgFMKRwS81C224hiSAUANw/gnSHiwEhgozM/2ezEBZPeA==
+
 express-request-id@1.4.1:
   version "1.4.1"
   resolved "https://registry.yarnpkg.com/express-request-id/-/express-request-id-1.4.1.tgz#66feaf1f0be3deca13f3abfe1c098e49b12f2c28"
@@ -31568,9 +31573,9 @@ react-native-tab-view@^2.9.0:
   resolved "https://registry.yarnpkg.com/react-native-tab-view/-/react-native-tab-view-2.10.0.tgz#5e249e5650502010013449ffd4e5edc18a95364b"
   integrity sha512-qgexVz5eO4yaFjdkmn/sURXgVvaBo6pZD/q1eoca96SbPVbaH3WzVhF3bRUfeTHwZkXwznFTpS3JURqIFU8vQA==
 
-"react-native-tcp@https://github.com/celo-org/react-native-tcp#96cdfeb":
+"react-native-tcp@https://github.com/celo-org/react-native-tcp#68567d7":
   version "3.3.0"
-  resolved "https://github.com/celo-org/react-native-tcp#96cdfeb967fd7dd7401f27ac2cebee770f044a94"
+  resolved "https://github.com/celo-org/react-native-tcp#68567d7b7afe52af31f04518700f865b4d66a19f"
   dependencies:
     base64-js "0.0.8"
     buffer "^5.0.0"
