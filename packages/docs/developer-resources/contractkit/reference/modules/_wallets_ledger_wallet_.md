@@ -22,7 +22,7 @@
 
 ### `Const` CELO_BASE_DERIVATION_PATH
 
-• **CELO_BASE_DERIVATION_PATH**: *any* = CELO_DERIVATION_PATH_BASE.slice(2)
+• **CELO_BASE_DERIVATION_PATH**: *string* = CELO_DERIVATION_PATH_BASE.slice(2)
 
 *Defined in [contractkit/src/wallets/ledger-wallet.ts:12](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/ledger-wallet.ts#L12)*
 
