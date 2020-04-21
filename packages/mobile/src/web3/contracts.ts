@@ -21,67 +21,44 @@ export const web3ForUtils: Web3 = new Web3() // Web3 with no provider
 const contractKitForno = newKitFromWeb3(getWeb3(true))
 const contractKitGeth = newKitFromWeb3(getWeb3(false))
 
-export async function getContractKitOutsideGenerator() {
-  // TODO(anna) Keep polling until store is defined
-  // 250 ms
-  // make sure not blocking US
-  // don't get store until it's defined
-  while (!store) {
-    Logger.debug(`getContractKitOutsideGenerator`, `still waiting for store...`)
-    await sleep(250)
-  }
-
-  const contractKitReady = contractKitReadySelector(store.getState())
-  if (contractKitReady) {
-    if (fornoSelector(store.getState())) {
-      Logger.debug('getting forno contractkit')
-      return contractKitForno
-    } else {
-      Logger.debug('getting geth contractkit')
-      return contractKitGeth
-    }
-  } else {
-    throw new Error('Contract Kit not yet ready')
-  }
-}
-
 function getWeb3(fornoMode: boolean): Web3 {
   Logger.info(
     `${tag}@getWeb3`,
-    `Initializing web3, platform: ${Platform.OS}, forno mode: ${isInitiallyFornoMode()}`
+    `Initializing web3, platform: ${Platform.OS}, forno mode: ${fornoMode}, provider: ${
+      fornoMode ? DEFAULT_FORNO_URL : 'geth'
+    }`
   )
+  return fornoMode ? new Web3(getHttpProvider(DEFAULT_FORNO_URL)) : new Web3(getIpcProvider())
+}
 
-  Logger.debug(`@getWeb3`, `forno mode: ${fornoMode}`)
-  if (fornoMode) {
-    const url = DEFAULT_FORNO_URL
-    Logger.debug(`${tag}@getWeb3`, `Connecting to url ${url}`)
-    return new Web3(getHttpProvider(url))
-  } else {
-    return new Web3(getIpcProvider())
+export async function getContractKitOutsideGenerator() {
+  // Poll store until rehydrated
+  while (!store) {
+    Logger.debug(`getContractKitOutsideGenerator`, `Still waiting for store...`)
+    await sleep(250) // Every 0.25 seconds
   }
+  return getContractKitBasedOnFornoInStore()
 }
 
 export function* getContractKit() {
+  // Wait for rehydrate if store undefined
   if (!store) {
-    // Wait for rehydrate if store undefined
     yield call(waitForRehydrate)
-    Logger.debug(`@getContractKit`, `Waited for rehydrate`)
-    // Note this is not necessary on first start
   }
-  const contractKitReady = contractKitReadySelector(store.getState())
-  Logger.debug(`@getContractKit`, `contractKitReady: ${contractKitReady}`)
+  return getContractKitBasedOnFornoInStore()
+}
 
+export function getContractKitBasedOnFornoInStore() {
+  return fornoSelector(store.getState()) ? contractKitForno : contractKitGeth
+  // TODO(anna) make sure contractKitReady can be ignored
+  /*
+  const contractKitReady = contractKitReadySelector(store.getState())
   if (contractKitReady) {
-    if (fornoSelector(store.getState())) {
-      Logger.debug('getting forno contractkit')
-      return contractKitForno
-    } else {
-      Logger.debug('getting geth contractkit')
-      return contractKitGeth
-    }
+    return fornoSelector(store.getState()) ? contractKitForno : contractKitGeth
   } else {
     throw new Error('Contract Kit not yet ready')
   }
+  */
 }
 
 export function isInitiallyFornoMode() {
