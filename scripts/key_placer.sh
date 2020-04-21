@@ -35,6 +35,7 @@ files=(
   ".env.mnemonic.pilot"
   ".env.mnemonic.pilotstaging"
   ".env.mnemonic.rc0"
+  ".env.mnemonic.rc1"
 )
 
 if [[ -z "$1" ]]; then
