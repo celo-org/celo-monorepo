@@ -36,7 +36,7 @@ export default class AttestationServicesCurrent extends BaseCommand {
       const metadata = await IdentityMetadataWrapper.fetchFromURL(this.kit, metadataURL)
       const attestationServiceURLClaim = metadata.findClaim(ClaimTypes.ATTESTATION_SERVICE_URL)
 
-      if (attestationServiceURLClaim === undefined) {
+      if (!attestationServiceURLClaim) {
         return ret
       }
 
