@@ -153,6 +153,7 @@ async function checkBalance(releaseGoldConfig: any) {
   )
   const grantTotal = weiAmountReleasedPerPeriod
     .multipliedBy(releaseGoldConfig.numReleasePeriods)
+    .plus(startGold)
     .toFixed()
   while (true) {
     const fromBalance = new BigNumber(await web3.eth.getBalance(fromAddress))
@@ -353,6 +354,8 @@ async function handleJSONFile(err, data) {
   }
   let currGrant = 1
   for (const releaseGoldConfig of grants) {
+    releaseGoldConfig.beneficiary = releaseGoldConfig.beneficiary.trim()
+    releaseGoldConfig.identifier = releaseGoldConfig.identifier.trim()
     await checkBalance(releaseGoldConfig)
     await handleGrant(releaseGoldConfig, currGrant)
     currGrant++
