@@ -1,11 +1,9 @@
 import { ensureLeading0x } from '@celo/utils/src/address'
-// TODO(anna) these may need to become generator
 import BigNumber from 'bignumber.js'
 import { call } from 'redux-saga/effects'
 import { GAS_INFLATION_FACTOR } from 'src/config'
 import Logger from 'src/utils/Logger'
-import { getContractKit, getContractKitOutsideGenerator } from 'src/web3/contracts'
-import Web3 from 'web3'
+import { getContractKit, getContractKitOutsideGenerator, web3ForUtils } from 'src/web3/contracts'
 import { Tx } from 'web3-core'
 import { TransactionObject } from 'web3-eth'
 
@@ -45,5 +43,5 @@ export function* getLatestNonce(address: string) {
 }
 
 export function getAccountAddressFromPrivateKey(privateKey: string): string {
-  return new Web3().eth.accounts.privateKeyToAccount(ensureLeading0x(privateKey)).address
+  return web3ForUtils.eth.accounts.privateKeyToAccount(ensureLeading0x(privateKey)).address
 }

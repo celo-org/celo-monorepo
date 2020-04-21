@@ -36,11 +36,15 @@ import { TransactionStatus } from 'src/transactions/reducer'
 import { sendAndMonitorTransaction } from 'src/transactions/saga'
 import { sendTransaction } from 'src/transactions/send'
 import Logger from 'src/utils/Logger'
-import { addLocalAccount, getContractKit, getContractKitOutsideGenerator } from 'src/web3/contracts'
+import {
+  addLocalAccount,
+  getContractKit,
+  getContractKitOutsideGenerator,
+  web3ForUtils,
+} from 'src/web3/contracts'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
 import { fornoSelector } from 'src/web3/selectors'
 import { estimateGas } from 'src/web3/utils'
-import Web3 from 'web3'
 
 const TAG = 'escrow/saga'
 
@@ -62,7 +66,7 @@ function* transferStableTokenToEscrow(action: EscrowTransferPaymentAction) {
     ])
 
     Logger.debug(TAG + '@transferToEscrow', 'Approving escrow transfer')
-    const convertedAmount = new Web3().utils.toWei(amount.toString())
+    const convertedAmount = web3ForUtils.utils.toWei(amount.toString())
     const approvalTx = stableToken.approve(escrow.address, convertedAmount)
 
     yield call(sendTransaction, approvalTx.txo, account, TAG, 'approval')

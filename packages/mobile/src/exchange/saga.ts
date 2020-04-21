@@ -244,6 +244,7 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
       Logger.error(TAG, `Unexpected maker token ${makerToken}`)
       return
     }
+    Logger.debug(TAG, `About to send transaction`)
     yield call(sendTransaction, approveTx.txo, account, TAG, 'approval')
     Logger.debug(TAG, `Transaction approved: ${util.inspect(approveTx.txo.arguments)}`)
 

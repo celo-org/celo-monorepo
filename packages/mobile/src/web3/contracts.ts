@@ -15,19 +15,11 @@ import { Platform } from 'react-native'
 import { fornoSelector } from 'src/web3/selectors'
 import sleep from 'sleep-promise'
 
-// Logging tag
 const tag = 'web3/contracts'
 
-export const web3: Web3 = getWeb3ForUtils()
+export const web3ForUtils: Web3 = new Web3() // Web3 with no provider
 const contractKitForno = newKitFromWeb3(getWeb3(true))
 const contractKitGeth = newKitFromWeb3(getWeb3(false))
-
-// TODO util functions can just be web3
-
-function getWeb3ForUtils(): Web3 {
-  Logger.debug('getting web3 for utils')
-  return new Web3()
-}
 
 export async function getContractKitOutsideGenerator() {
   // TODO(anna) Keep polling until store is defined

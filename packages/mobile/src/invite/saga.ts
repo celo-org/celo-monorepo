@@ -47,6 +47,7 @@ import {
   getContractKit,
   getContractKitOutsideGenerator,
   web3,
+  web3ForUtils,
 } from 'src/web3/contracts'
 import { getConnectedUnlockedAccount, getOrCreateAccount, waitWeb3LastBlock } from 'src/web3/saga'
 import { fornoSelector } from 'src/web3/selectors'
@@ -87,7 +88,7 @@ export function getInvitationVerificationFeeInDollars() {
 }
 
 export function getInvitationVerificationFeeInWei() {
-  return new BigNumber(new Web3().utils.toWei(INVITE_FEE))
+  return new BigNumber(web3ForUtils.utils.toWei(INVITE_FEE))
 }
 
 export async function generateInviteLink(inviteCode: string) {

@@ -141,7 +141,7 @@ export function* sendTransaction(
 export function* wrapSendTransactionWithRetry(
   txId: string,
   account: string,
-  sendTxMethod: (nonce: number) => Generator<any, any, any>,
+  sendTxMethod: (nonce: number) => Generator<any, any, anya>,
   cancelAction?: string
 ) {
   const latestNonce = yield call(getLatestNonce, account)
