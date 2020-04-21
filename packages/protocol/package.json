@@ -41,7 +41,7 @@
     "@0x/sol-trace": "^2.0.16",
     "@0x/subproviders": "^5.0.0",
     "@celo/ganache-cli": "git+https://github.com/celo-org/ganache-cli.git#d5ff1f1",
-    "@celo/utils": "0.1.11-dev",
+    "@celo/utils": "0.1.12-dev",
     "apollo-client": "^2.4.13",
     "bip39": "^3.0.2",
     "bls12377js": "https://github.com/celo-org/bls12377js#400bcaeec9e7620b040bfad833268f5289699cac",
