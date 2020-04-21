@@ -1,4 +1,4 @@
-import { ErrorMessages } from '../../common/utils'
+import { ErrorMessages, hashSetBuilder } from '../../common/utils'
 import { getDatabase } from '../database'
 import { NUMBER_PAIRS_COLUMN, NUMBER_PAIRS_TABLE } from '../models/numberPair'
 
@@ -14,9 +14,10 @@ export async function getNumberPairContacts(
       .select(NUMBER_PAIRS_COLUMN.userPhoneHash)
       .where(NUMBER_PAIRS_COLUMN.contactPhoneHash, userPhone)
 
+    const contactPhonesHashSet = hashSetBuilder(contactPhones)
     return contentPairs
       .map((contractPair) => contractPair[NUMBER_PAIRS_COLUMN.userPhoneHash])
-      .filter((number) => contactPhones.includes(number))
+      .filter((number) => contactPhonesHashSet.contains(number))
   } catch (e) {
     console.error(ErrorMessages.DATABASE_GET_FAILURE, e)
     return []
