@@ -416,7 +416,7 @@ PODS:
     - Sentry (~> 4.4.0)
   - RNShare (2.0.0):
     - React
-  - RNSVG (9.11.1):
+  - RNSVG (9.13.6):
     - React
   - Segment-Firebase (2.5.0):
     - Analytics (~> 3.2)
@@ -505,20 +505,13 @@ DEPENDENCIES:
   - Yoga (from `../../../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
-  trunk:
-    - Analytics
-    - boost-for-react-native
+  https://cdn.cocoapods.org/:
     - Crashlytics
-    - Fabric
     - Firebase
-    - FirebaseAnalytics
-    - FirebaseAnalyticsInterop
     - FirebaseAuth
     - FirebaseAuthInterop
-    - FirebaseCore
     - FirebaseDatabase
     - FirebaseDynamicLinks
-    - FirebaseInstanceID
     - FirebaseMessaging
     - FirebaseStorage
     - GoogleAppMeasurement
@@ -529,6 +522,16 @@ SPEC REPOS:
     - Protobuf
     - Sentry
     - Toast
+  https://github.com/CocoaPods/Specs.git:
+    - Analytics
+    - boost-for-react-native
+    - Fabric
+    - Firebase
+    - FirebaseAnalytics
+    - FirebaseAnalyticsInterop
+    - FirebaseCore
+    - FirebaseInstanceID
+    - GoogleUtilities
 
 EXTERNAL SOURCES:
   CeloBlockchain:
@@ -740,7 +743,7 @@ SPEC CHECKSUMS:
   RNSecureKeyStore: f1ad870e53806453039f650720d2845c678d89c8
   RNSentry: 86baf0c87120cd5eb491d073989f8cbc1a2174c6
   RNShare: 8b171d4b43c1d886917fdd303bf7a4b87167b05c
-  RNSVG: be27aa7c58819f97399388ae53d7fa0572f32c7f
+  RNSVG: 8ba35cbeb385a52fd960fd28db9d7d18b4c2974f
   Segment-Firebase: 5ab5aa1e962148c60e5582734ad68b320c647cef
   Sentry: 14bdd673870e8cf64932b149fad5bbbf39a9b390
   Toast: 91b396c56ee72a5790816f40d3a94dd357abc196
