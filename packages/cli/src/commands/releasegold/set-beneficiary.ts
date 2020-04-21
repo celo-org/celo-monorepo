@@ -56,11 +56,23 @@ export default class SetBeneficiary extends ReleaseGoldCommand {
       }
     }
 
-    const tx = this.releaseGoldWrapper.setBeneficiary(newBeneficiary)
-    const multiSigTx = await releaseGoldMultiSig.submitOrConfirmTransaction(
+    const currentBeneficiary = await this.releaseGoldWrapper.getBeneficiary()
+    const setBeneficiaryTx = this.releaseGoldWrapper.setBeneficiary(newBeneficiary)
+    const setBeneficiaryMultiSigTx = await releaseGoldMultiSig.submitOrConfirmTransaction(
       this.contractAddress,
-      tx.txo
+      setBeneficiaryTx.txo
     )
-    await displaySendTx<any>('setBeneficiary', multiSigTx, { from: flags.from }, 'BeneficiarySet')
+    await displaySendTx<any>(
+      'setBeneficiary',
+      setBeneficiaryMultiSigTx,
+      { from: flags.from },
+      'BeneficiarySet'
+    )
+    const replaceOwnerTx = releaseGoldMultiSig.replaceOwner(currentBeneficiary, newBeneficiary)
+    const replaceOwnerMultiSigTx = await releaseGoldMultiSig.submitOrConfirmTransaction(
+      releaseGoldMultiSig.address,
+      replaceOwnerTx.txo
+    )
+    await displaySendTx<any>('replaceMultiSigOwner', replaceOwnerMultiSigTx, { from: flags.from })
   }
 }

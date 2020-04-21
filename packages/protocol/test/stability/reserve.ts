@@ -36,6 +36,8 @@ contract('Reserve', (accounts: string[]) => {
   const spender: string = accounts[2]
   const exchangeAddress: string = accounts[3]
   const aTobinTaxStalenessThreshold: number = 600
+  const aTobinTax = toFixed(0.005)
+  const aTobinTaxReserveRatio = toFixed(2)
   const aDailySpendingRatio: string = '1000000000000000000000000'
   const sortedOraclesDenominator = new BigNumber('0x10000000000000000')
   const initialAssetAllocationSymbols = [web3.utils.padRight(web3.utils.utf8ToHex('cGLD'), 64)]
@@ -53,7 +55,9 @@ contract('Reserve', (accounts: string[]) => {
       0,
       0,
       initialAssetAllocationSymbols,
-      initialAssetAllocationWeights
+      initialAssetAllocationWeights,
+      aTobinTax,
+      aTobinTaxReserveRatio
     )
   })
 
@@ -82,9 +86,50 @@ contract('Reserve', (accounts: string[]) => {
           0,
           0,
           initialAssetAllocationSymbols,
-          initialAssetAllocationWeights
+          initialAssetAllocationWeights,
+          aTobinTax,
+          aTobinTaxReserveRatio
         )
       )
+    })
+  })
+
+  describe('#setTobinTax()', async () => {
+    const value = 123
+    it('should allow owner to set the tax', async () => {
+      await reserve.setTobinTax(value)
+      assert.equal(value, (await reserve.tobinTax()).toNumber())
+    })
+    it('should emit corresponding event', async () => {
+      const response = await reserve.setTobinTax(value)
+      const events = response.logs
+      assert.equal(events.length, 1)
+      assert.equal(events[0].event, 'TobinTaxSet')
+      assert.equal(events[0].args.value.toNumber(), value)
+    })
+    it('should not allow other users to set the tobin tax', async () => {
+      await assertRevert(reserve.setTobinTax(value, { from: nonOwner }))
+    })
+    it('should not be allowed to set it larger than 100%', async () => {
+      await assertRevert(reserve.setTobinTax(toFixed(1).plus(1)))
+    })
+  })
+
+  describe('#setTobinTaxReserveRatio()', async () => {
+    const value = 123
+    it('should allow owner to set the reserve ratio', async () => {
+      await reserve.setTobinTaxReserveRatio(value)
+      assert.equal(value, (await reserve.tobinTaxReserveRatio()).toNumber())
+    })
+    it('should emit corresponding event', async () => {
+      const response = await reserve.setTobinTaxReserveRatio(value)
+      const events = response.logs
+      assert.equal(events.length, 1)
+      assert.equal(events[0].event, 'TobinTaxReserveRatioSet')
+      assert.equal(events[0].args.value.toNumber(), value)
+    })
+    it('should not allow other users to set the ratio', async () => {
+      await assertRevert(reserve.setTobinTaxReserveRatio(value, { from: nonOwner }))
     })
   })
 
