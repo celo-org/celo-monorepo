@@ -5,7 +5,10 @@ const WebsocketSubprovider = require('web3-provider-engine/subproviders/websocke
 const { TruffleArtifactAdapter } = require('@0x/sol-trace')
 const { CoverageSubprovider } = require('@0x/sol-coverage')
 
-const argv = require('minimist')(process.argv.slice(2), { string: ['truffle_override', 'network'] })
+const argv = require('minimist')(process.argv.slice(2), {
+  string: ['truffle_override', 'network'],
+  boolean: ['reset'],
+})
 
 const SOLC_VERSION = '0.5.8'
 const ALFAJORES_NETWORKID = 44786
@@ -22,7 +25,8 @@ const PILOT_FROM = '0x387bCb16Bfcd37AccEcF5c9eB2938E30d3aB8BF2'
 const PILOTSTAGING_FROM = '0x545DEBe3030B570731EDab192640804AC8Cf65CA'
 const RC0_FROM = '0x469be98FE71AFf8F6e7f64F9b732e28A03596B5C'
 
-const gasLimit = 20000000
+// Gas limit is doubled for initial contract deployment.
+const gasLimit = argv.reset ? 20000000 : 10000000
 
 const defaultConfig = {
   host: '127.0.0.1',

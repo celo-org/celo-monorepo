@@ -1,5 +1,6 @@
 [
   {
+    "identifier": "0x111111111",
     "releaseStartTime": "MAINNET",
     "releaseCliffTime": 0,
     "numReleasePeriods": 1,
@@ -15,6 +16,7 @@
     "canValidate": true
   },
   {
+    "identifier": "0x222222222",
     "releaseStartTime": "MAINNET",
     "releaseCliffTime": 0,
     "numReleasePeriods": 1,
