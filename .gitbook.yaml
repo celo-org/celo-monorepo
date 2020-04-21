@@ -1,4 +1,7 @@
 root: ./packages/docs/
 
 redirect:
-  operations-manual/key-management/using-a-ledger-wallet: operations-manual/key-management/using-a-ledger-wallet.md
+  operations-manual/key-management/using-a-ledger-wallet: ./operations-manual/key-management/ledger.md
+  operations-manual/key-management/ledger: ./operations-manual/key-management/ledger.md
+  operations-manual/summary/ledger: ./operations-manual/key-management/ledger.md
+  operations-manual/using-a-ledger-wallet: ./operations-manual/key-management/ledger.md
