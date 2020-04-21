@@ -34,8 +34,10 @@ Contract for handling reserve for stable currencies
 
 ### Methods
 
+* [exists](_wrappers_reserve_.reservewrapper.md#exists)
 * [getConfig](_wrappers_reserve_.reservewrapper.md#getconfig)
 * [getSpenders](_wrappers_reserve_.reservewrapper.md#getspenders)
+* [setDefaultBlock](_wrappers_reserve_.reservewrapper.md#setdefaultblock)
 
 ## Constructors
 
@@ -156,7 +158,7 @@ ___
 
 • **getOtherReserveAddresses**: *function* = proxyCall(this.contract.methods.getOtherReserveAddresses)
 
-*Defined in [contractkit/src/wrappers/Reserve.ts:51](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Reserve.ts#L51)*
+*Defined in [contractkit/src/wrappers/Reserve.ts:46](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Reserve.ts#L46)*
 
 #### Type declaration:
 
@@ -178,7 +180,11 @@ ___
     valueToBigNumber
   )
 
-*Defined in [contractkit/src/wrappers/Reserve.ts:46](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Reserve.ts#L46)*
+*Defined in [contractkit/src/wrappers/Reserve.ts:52](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Reserve.ts#L52)*
+
+Returns the reserve cGLD balance.
+
+**`returns`** cGLD balance.
 
 #### Type declaration:
 
@@ -196,7 +202,7 @@ ___
 
 • **isOtherReserveAddress**: *function* = proxyCall(this.contract.methods.isOtherReserveAddress)
 
-*Defined in [contractkit/src/wrappers/Reserve.ts:66](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Reserve.ts#L66)*
+*Defined in [contractkit/src/wrappers/Reserve.ts:71](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Reserve.ts#L71)*
 
 #### Type declaration:
 
@@ -286,11 +292,29 @@ Contract address
 
 ## Methods
 
+###  exists
+
+▸ **exists**(`block?`: undefined | number): *Promise‹boolean›*
+
+*Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[exists](_wrappers_basewrapper_.basewrapper.md#exists)*
+
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:35](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L35)*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`block?` | undefined &#124; number |
+
+**Returns:** *Promise‹boolean›*
+
+___
+
 ###  getConfig
 
 ▸ **getConfig**(): *Promise‹[ReserveConfig](../interfaces/_wrappers_reserve_.reserveconfig.md)›*
 
-*Defined in [contractkit/src/wrappers/Reserve.ts:56](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Reserve.ts#L56)*
+*Defined in [contractkit/src/wrappers/Reserve.ts:61](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Reserve.ts#L61)*
 
 Returns current configuration parameters.
 
@@ -302,6 +326,24 @@ ___
 
 ▸ **getSpenders**(): *Promise‹[Address](../modules/_base_.md#address)[]›*
 
-*Defined in [contractkit/src/wrappers/Reserve.ts:68](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Reserve.ts#L68)*
+*Defined in [contractkit/src/wrappers/Reserve.ts:73](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Reserve.ts#L73)*
 
 **Returns:** *Promise‹[Address](../modules/_base_.md#address)[]›*
+
+___
+
+###  setDefaultBlock
+
+▸ **setDefaultBlock**(`block`: number | "latest"): *void*
+
+*Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[setDefaultBlock](_wrappers_basewrapper_.basewrapper.md#setdefaultblock)*
+
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:40](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L40)*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`block` | number &#124; "latest" |
+
+**Returns:** *void*

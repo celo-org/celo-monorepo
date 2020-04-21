@@ -35,6 +35,7 @@ Contract for voting for validators and managing validator groups.
 * [activate](_wrappers_election_.electionwrapper.md#activate)
 * [electValidatorSigners](_wrappers_election_.electionwrapper.md#electvalidatorsigners)
 * [electableValidators](_wrappers_election_.electionwrapper.md#electablevalidators)
+* [exists](_wrappers_election_.electionwrapper.md#exists)
 * [findLesserAndGreaterAfterVote](_wrappers_election_.electionwrapper.md#findlesserandgreateraftervote)
 * [getActiveVotesForGroup](_wrappers_election_.electionwrapper.md#getactivevotesforgroup)
 * [getConfig](_wrappers_election_.electionwrapper.md#getconfig)
@@ -54,6 +55,7 @@ Contract for voting for validators and managing validator groups.
 * [revoke](_wrappers_election_.electionwrapper.md#revoke)
 * [revokeActive](_wrappers_election_.electionwrapper.md#revokeactive)
 * [revokePending](_wrappers_election_.electionwrapper.md#revokepending)
+* [setDefaultBlock](_wrappers_election_.electionwrapper.md#setdefaultblock)
 * [vote](_wrappers_election_.electionwrapper.md#vote)
 
 ## Constructors
@@ -361,6 +363,24 @@ Returns the minimum and maximum number of validators that can be elected.
 **Returns:** *Promise‹[ElectableValidators](../interfaces/_wrappers_election_.electablevalidators.md)›*
 
 The minimum and maximum number of validators that can be elected.
+
+___
+
+###  exists
+
+▸ **exists**(`block?`: undefined | number): *Promise‹boolean›*
+
+*Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[exists](_wrappers_basewrapper_.basewrapper.md#exists)*
+
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:35](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L35)*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`block?` | undefined &#124; number |
+
+**Returns:** *Promise‹boolean›*
 
 ___
 
@@ -692,6 +712,24 @@ Name | Type |
 `value` | BigNumber |
 
 **Returns:** *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹boolean››*
+
+___
+
+###  setDefaultBlock
+
+▸ **setDefaultBlock**(`block`: number | "latest"): *void*
+
+*Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[setDefaultBlock](_wrappers_basewrapper_.basewrapper.md#setdefaultblock)*
+
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:40](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L40)*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`block` | number &#124; "latest" |
+
+**Returns:** *void*
 
 ___
 

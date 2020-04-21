@@ -15,8 +15,8 @@ if (host === undefined) {
 }
 
 let blockInterval = 1
-if (!(process.env.BLOCK_INTERVAL === undefined) && (Number(process.env.BLOCK_INTERVAL) > 1)) {
-  blockInterval =  Number(process.env.BLOCK_INTERVAL)
+if (!(process.env.BLOCK_INTERVAL === undefined) && Number(process.env.BLOCK_INTERVAL) > 1) {
+  blockInterval = Number(process.env.BLOCK_INTERVAL)
 }
 
 metricExporterWithRestart(host, blockInterval).catch((err) => {

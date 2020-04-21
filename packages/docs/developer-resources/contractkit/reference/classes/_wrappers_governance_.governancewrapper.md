@@ -55,6 +55,7 @@ Contract managing voting for governance proposals.
 
 * [approve](_wrappers_governance_.governancewrapper.md#approve)
 * [execute](_wrappers_governance_.governancewrapper.md#execute)
+* [exists](_wrappers_governance_.governancewrapper.md#exists)
 * [getConfig](_wrappers_governance_.governancewrapper.md#getconfig)
 * [getDequeue](_wrappers_governance_.governancewrapper.md#getdequeue)
 * [getHotfixRecord](_wrappers_governance_.governancewrapper.md#gethotfixrecord)
@@ -64,6 +65,7 @@ Contract managing voting for governance proposals.
 * [getVoteValue](_wrappers_governance_.governancewrapper.md#getvotevalue)
 * [getVoteWeight](_wrappers_governance_.governancewrapper.md#getvoteweight)
 * [revokeUpvote](_wrappers_governance_.governancewrapper.md#revokeupvote)
+* [setDefaultBlock](_wrappers_governance_.governancewrapper.md#setdefaultblock)
 * [sortedQueue](_wrappers_governance_.governancewrapper.md#sortedqueue)
 * [stageDurations](_wrappers_governance_.governancewrapper.md#stagedurations)
 * [timeUntilStages](_wrappers_governance_.governancewrapper.md#timeuntilstages)
@@ -882,6 +884,24 @@ Name | Type | Description |
 
 ___
 
+###  exists
+
+▸ **exists**(`block?`: undefined | number): *Promise‹boolean›*
+
+*Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[exists](_wrappers_basewrapper_.basewrapper.md#exists)*
+
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:35](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L35)*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`block?` | undefined &#124; number |
+
+**Returns:** *Promise‹boolean›*
+
+___
+
 ###  getConfig
 
 ▸ **getConfig**(): *Promise‹[GovernanceConfig](../interfaces/_wrappers_governance_.governanceconfig.md)›*
@@ -1032,6 +1052,24 @@ Name | Type | Description |
 `upvoter` | [Address](../modules/_base_.md#address) | Address of upvoter  |
 
 **Returns:** *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹boolean››*
+
+___
+
+###  setDefaultBlock
+
+▸ **setDefaultBlock**(`block`: number | "latest"): *void*
+
+*Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[setDefaultBlock](_wrappers_basewrapper_.basewrapper.md#setdefaultblock)*
+
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:40](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L40)*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`block` | number &#124; "latest" |
+
+**Returns:** *void*
 
 ___
 

@@ -9,7 +9,7 @@ import { LedgerSigner } from './signers/ledger-signer'
 import { Signer } from './signers/signer'
 import { Wallet } from './wallet'
 
-export const CELO_BASE_DERIVATION_PATH = CELO_DERIVATION_PATH_BASE.slice(2)
+export const CELO_BASE_DERIVATION_PATH: string = CELO_DERIVATION_PATH_BASE.slice(2)
 const ADDRESS_QTY = 5
 
 // Validates an address using the Ledger

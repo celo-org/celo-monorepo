@@ -36,6 +36,8 @@ ERC-20 contract for Celo native currency.
 ### Methods
 
 * [balanceOf](_wrappers_goldtokenwrapper_.goldtokenwrapper.md#balanceof)
+* [exists](_wrappers_goldtokenwrapper_.goldtokenwrapper.md#exists)
+* [setDefaultBlock](_wrappers_goldtokenwrapper_.goldtokenwrapper.md#setdefaultblock)
 
 ## Constructors
 
@@ -362,7 +364,7 @@ Contract address
 
 ###  balanceOf
 
-▸ **balanceOf**(`account`: [Address](../modules/_base_.md#address)): *Promise‹BigNumber‹››*
+▸ **balanceOf**(`account`: [Address](../modules/_base_.md#address), `blockNumber?`: undefined | number): *Promise‹BigNumber‹››*
 
 *Defined in [contractkit/src/wrappers/GoldTokenWrapper.ts:110](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/GoldTokenWrapper.ts#L110)*
 
@@ -373,7 +375,44 @@ Gets the balance of the specified address.
 Name | Type |
 ------ | ------ |
 `account` | [Address](../modules/_base_.md#address) |
+`blockNumber?` | undefined &#124; number |
 
 **Returns:** *Promise‹BigNumber‹››*
 
 The balance of the specified address.
+
+___
+
+###  exists
+
+▸ **exists**(`block?`: undefined | number): *Promise‹boolean›*
+
+*Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[exists](_wrappers_basewrapper_.basewrapper.md#exists)*
+
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:35](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L35)*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`block?` | undefined &#124; number |
+
+**Returns:** *Promise‹boolean›*
+
+___
+
+###  setDefaultBlock
+
+▸ **setDefaultBlock**(`block`: number | "latest"): *void*
+
+*Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[setDefaultBlock](_wrappers_basewrapper_.basewrapper.md#setdefaultblock)*
+
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:40](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L40)*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`block` | number &#124; "latest" |
+
+**Returns:** *void*

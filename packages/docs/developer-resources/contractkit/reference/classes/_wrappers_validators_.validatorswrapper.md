@@ -48,6 +48,7 @@ Contract for voting for validators and managing validator groups.
 * [currentValidatorAccountsSet](_wrappers_validators_.validatorswrapper.md#currentvalidatoraccountsset)
 * [deregisterValidator](_wrappers_validators_.validatorswrapper.md#deregistervalidator)
 * [deregisterValidatorGroup](_wrappers_validators_.validatorswrapper.md#deregistervalidatorgroup)
+* [exists](_wrappers_validators_.validatorswrapper.md#exists)
 * [findValidatorMembershipHistoryIndex](_wrappers_validators_.validatorswrapper.md#findvalidatormembershiphistoryindex)
 * [getConfig](_wrappers_validators_.validatorswrapper.md#getconfig)
 * [getGroupLockedGoldRequirements](_wrappers_validators_.validatorswrapper.md#getgrouplockedgoldrequirements)
@@ -64,6 +65,7 @@ Contract for voting for validators and managing validator groups.
 * [meetsValidatorGroupBalanceRequirements](_wrappers_validators_.validatorswrapper.md#meetsvalidatorgroupbalancerequirements)
 * [registerValidatorGroup](_wrappers_validators_.validatorswrapper.md#registervalidatorgroup)
 * [reorderMember](_wrappers_validators_.validatorswrapper.md#reordermember)
+* [setDefaultBlock](_wrappers_validators_.validatorswrapper.md#setdefaultblock)
 * [signerToAccount](_wrappers_validators_.validatorswrapper.md#signertoaccount)
 * [validatorSignerToAccount](_wrappers_validators_.validatorswrapper.md#validatorsignertoaccount)
 
@@ -655,6 +657,24 @@ Name | Type | Description |
 
 ___
 
+###  exists
+
+▸ **exists**(`block?`: undefined | number): *Promise‹boolean›*
+
+*Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[exists](_wrappers_basewrapper_.basewrapper.md#exists)*
+
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:35](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L35)*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`block?` | undefined &#124; number |
+
+**Returns:** *Promise‹boolean›*
+
+___
+
 ###  findValidatorMembershipHistoryIndex
 
 ▸ **findValidatorMembershipHistoryIndex**(`epoch`: number, `history`: [GroupMembership](../interfaces/_wrappers_validators_.groupmembership.md)[]): *number*
@@ -937,6 +957,24 @@ Name | Type | Description |
 `newIndex` | number | New position for the validator  |
 
 **Returns:** *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹boolean››*
+
+___
+
+###  setDefaultBlock
+
+▸ **setDefaultBlock**(`block`: number | "latest"): *void*
+
+*Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[setDefaultBlock](_wrappers_basewrapper_.basewrapper.md#setdefaultblock)*
+
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:40](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L40)*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`block` | number &#124; "latest" |
+
+**Returns:** *void*
 
 ___
 

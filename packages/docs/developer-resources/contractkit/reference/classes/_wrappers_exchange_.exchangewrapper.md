@@ -34,6 +34,7 @@ using a Constant Product Market Maker Model
 
 ### Methods
 
+* [exists](_wrappers_exchange_.exchangewrapper.md#exists)
 * [getConfig](_wrappers_exchange_.exchangewrapper.md#getconfig)
 * [getExchangeRate](_wrappers_exchange_.exchangewrapper.md#getexchangerate)
 * [getGoldExchangeRate](_wrappers_exchange_.exchangewrapper.md#getgoldexchangerate)
@@ -44,6 +45,7 @@ using a Constant Product Market Maker Model
 * [quoteUsdSell](_wrappers_exchange_.exchangewrapper.md#quoteusdsell)
 * [sellDollar](_wrappers_exchange_.exchangewrapper.md#selldollar)
 * [sellGold](_wrappers_exchange_.exchangewrapper.md#sellgold)
+* [setDefaultBlock](_wrappers_exchange_.exchangewrapper.md#setdefaultblock)
 
 ## Constructors
 
@@ -332,6 +334,24 @@ Contract address
 
 ## Methods
 
+###  exists
+
+▸ **exists**(`block?`: undefined | number): *Promise‹boolean›*
+
+*Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[exists](_wrappers_basewrapper_.basewrapper.md#exists)*
+
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:35](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L35)*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`block?` | undefined &#124; number |
+
+**Returns:** *Promise‹boolean›*
+
+___
+
 ###  getConfig
 
 ▸ **getConfig**(): *Promise‹[ExchangeConfig](../interfaces/_wrappers_exchange_.exchangeconfig.md)›*
@@ -526,3 +546,21 @@ Name | Type | Description |
 `minUSDAmount` | BigNumber.Value | - |
 
 **Returns:** *[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹string›*
+
+___
+
+###  setDefaultBlock
+
+▸ **setDefaultBlock**(`block`: number | "latest"): *void*
+
+*Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[setDefaultBlock](_wrappers_basewrapper_.basewrapper.md#setdefaultblock)*
+
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:40](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L40)*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`block` | number &#124; "latest" |
+
+**Returns:** *void*

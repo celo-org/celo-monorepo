@@ -42,12 +42,14 @@ Contract for handling deposits needed for voting.
 * [authorizeValidatorSigner](_wrappers_accounts_.accountswrapper.md#authorizevalidatorsigner)
 * [authorizeValidatorSignerAndBls](_wrappers_accounts_.accountswrapper.md#authorizevalidatorsignerandbls)
 * [authorizeVoteSigner](_wrappers_accounts_.accountswrapper.md#authorizevotesigner)
+* [exists](_wrappers_accounts_.accountswrapper.md#exists)
 * [generateProofOfKeyPossession](_wrappers_accounts_.accountswrapper.md#generateproofofkeypossession)
 * [generateProofOfKeyPossessionLocally](_wrappers_accounts_.accountswrapper.md#generateproofofkeypossessionlocally)
 * [getAccountSummary](_wrappers_accounts_.accountswrapper.md#getaccountsummary)
 * [getName](_wrappers_accounts_.accountswrapper.md#getname)
 * [parseSignatureOfAddress](_wrappers_accounts_.accountswrapper.md#parsesignatureofaddress)
 * [setAccount](_wrappers_accounts_.accountswrapper.md#setaccount)
+* [setDefaultBlock](_wrappers_accounts_.accountswrapper.md#setdefaultblock)
 * [setWalletAddress](_wrappers_accounts_.accountswrapper.md#setwalletaddress)
 * [signerToAccount](_wrappers_accounts_.accountswrapper.md#signertoaccount)
 
@@ -517,6 +519,24 @@ A CeloTransactionObject
 
 ___
 
+###  exists
+
+▸ **exists**(`block?`: undefined | number): *Promise‹boolean›*
+
+*Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[exists](_wrappers_basewrapper_.basewrapper.md#exists)*
+
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:35](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L35)*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`block?` | undefined &#124; number |
+
+**Returns:** *Promise‹boolean›*
+
+___
+
 ###  generateProofOfKeyPossession
 
 ▸ **generateProofOfKeyPossession**(`account`: [Address](../modules/_base_.md#address), `signer`: [Address](../modules/_base_.md#address)): *Promise‹object›*
@@ -629,6 +649,24 @@ Name | Type | Default | Description |
 `proofOfPossession` | Signature &#124; null | null | Signature from the wallet address key over the sender's address  |
 
 **Returns:** *[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹void›*
+
+___
+
+###  setDefaultBlock
+
+▸ **setDefaultBlock**(`block`: number | "latest"): *void*
+
+*Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[setDefaultBlock](_wrappers_basewrapper_.basewrapper.md#setdefaultblock)*
+
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:40](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L40)*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`block` | number &#124; "latest" |
+
+**Returns:** *void*
 
 ___
 

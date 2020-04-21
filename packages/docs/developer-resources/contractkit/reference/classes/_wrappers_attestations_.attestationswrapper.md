@@ -32,6 +32,7 @@
 * [approveAttestationFee](_wrappers_attestations_.attestationswrapper.md#approveattestationfee)
 * [attestationFeeRequired](_wrappers_attestations_.attestationswrapper.md#attestationfeerequired)
 * [complete](_wrappers_attestations_.attestationswrapper.md#complete)
+* [exists](_wrappers_attestations_.attestationswrapper.md#exists)
 * [findMatchingIssuer](_wrappers_attestations_.attestationswrapper.md#findmatchingissuer)
 * [getActionableAttestations](_wrappers_attestations_.attestationswrapper.md#getactionableattestations)
 * [getConfig](_wrappers_attestations_.attestationswrapper.md#getconfig)
@@ -40,6 +41,7 @@
 * [request](_wrappers_attestations_.attestationswrapper.md#request)
 * [revealPhoneNumberToIssuer](_wrappers_attestations_.attestationswrapper.md#revealphonenumbertoissuer)
 * [selectIssuers](_wrappers_attestations_.attestationswrapper.md#selectissuers)
+* [setDefaultBlock](_wrappers_attestations_.attestationswrapper.md#setdefaultblock)
 * [validateAttestationCode](_wrappers_attestations_.attestationswrapper.md#validateattestationcode)
 * [waitForSelectingIssuers](_wrappers_attestations_.attestationswrapper.md#waitforselectingissuers)
 
@@ -337,6 +339,24 @@ Name | Type | Description |
 
 ___
 
+###  exists
+
+▸ **exists**(`block?`: undefined | number): *Promise‹boolean›*
+
+*Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[exists](_wrappers_basewrapper_.basewrapper.md#exists)*
+
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:35](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L35)*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`block?` | undefined &#124; number |
+
+**Returns:** *Promise‹boolean›*
+
+___
+
 ###  findMatchingIssuer
 
 ▸ **findMatchingIssuer**(`phoneNumber`: string, `account`: [Address](../modules/_base_.md#address), `code`: string, `issuers`: string[]): *Promise‹string | null›*
@@ -486,6 +506,24 @@ Name | Type | Description |
 `phoneNumber` | string | The phone number for which to request attestations for  |
 
 **Returns:** *[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹void›*
+
+___
+
+###  setDefaultBlock
+
+▸ **setDefaultBlock**(`block`: number | "latest"): *void*
+
+*Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[setDefaultBlock](_wrappers_basewrapper_.basewrapper.md#setdefaultblock)*
+
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:40](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L40)*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`block` | number &#124; "latest" |
+
+**Returns:** *void*
 
 ___
 

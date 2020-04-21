@@ -25,6 +25,7 @@ Currency price oracle contract.
 
 ### Methods
 
+* [exists](_wrappers_sortedoracles_.sortedoracleswrapper.md#exists)
 * [getConfig](_wrappers_sortedoracles_.sortedoracleswrapper.md#getconfig)
 * [getOracles](_wrappers_sortedoracles_.sortedoracleswrapper.md#getoracles)
 * [getRates](_wrappers_sortedoracles_.sortedoracleswrapper.md#getrates)
@@ -38,6 +39,7 @@ Currency price oracle contract.
 * [removeExpiredReports](_wrappers_sortedoracles_.sortedoracleswrapper.md#removeexpiredreports)
 * [report](_wrappers_sortedoracles_.sortedoracleswrapper.md#report)
 * [reportStableToken](_wrappers_sortedoracles_.sortedoracleswrapper.md#reportstabletoken)
+* [setDefaultBlock](_wrappers_sortedoracles_.sortedoracleswrapper.md#setdefaultblock)
 
 ## Constructors
 
@@ -109,6 +111,24 @@ Contract address
 **Returns:** *string*
 
 ## Methods
+
+###  exists
+
+▸ **exists**(`block?`: undefined | number): *Promise‹boolean›*
+
+*Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[exists](_wrappers_basewrapper_.basewrapper.md#exists)*
+
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:35](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L35)*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`block?` | undefined &#124; number |
+
+**Returns:** *Promise‹boolean›*
+
+___
 
 ###  getConfig
 
@@ -346,3 +366,21 @@ Name | Type | Description |
 `oracleAddress` | [Address](../modules/_base_.md#address) | - |
 
 **Returns:** *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹void››*
+
+___
+
+###  setDefaultBlock
+
+▸ **setDefaultBlock**(`block`: number | "latest"): *void*
+
+*Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[setDefaultBlock](_wrappers_basewrapper_.basewrapper.md#setdefaultblock)*
+
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:40](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L40)*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`block` | number &#124; "latest" |
+
+**Returns:** *void*

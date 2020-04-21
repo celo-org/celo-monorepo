@@ -27,6 +27,7 @@ Provides access to all contract wrappers for celo core contracts
 * [getDoubleSigningSlasher](_contract_cache_.wrappercache.md#getdoublesigningslasher)
 * [getDowntimeSlasher](_contract_cache_.wrappercache.md#getdowntimeslasher)
 * [getElection](_contract_cache_.wrappercache.md#getelection)
+* [getEpochRewards](_contract_cache_.wrappercache.md#getepochrewards)
 * [getEscrow](_contract_cache_.wrappercache.md#getescrow)
 * [getExchange](_contract_cache_.wrappercache.md#getexchange)
 * [getGasPriceMinimum](_contract_cache_.wrappercache.md#getgaspriceminimum)
@@ -145,6 +146,16 @@ ___
 *Defined in [contractkit/src/contract-cache.ts:99](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/contract-cache.ts#L99)*
 
 **Returns:** *Promise‹[ElectionWrapper](_wrappers_election_.electionwrapper.md)‹››*
+
+___
+
+###  getEpochRewards
+
+▸ **getEpochRewards**(): *Promise‹[EpochRewardsWrapper](_wrappers_epochrewardswrapper_.epochrewardswrapper.md)‹››*
+
+*Defined in [contractkit/src/contract-cache.ts:102](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/contract-cache.ts#L102)*
+
+**Returns:** *Promise‹[EpochRewardsWrapper](_wrappers_epochrewardswrapper_.epochrewardswrapper.md)‹››*
 
 ___
 

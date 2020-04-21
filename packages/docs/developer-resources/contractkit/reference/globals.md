@@ -55,6 +55,7 @@
 * ["wrappers/DoubleSigningSlasher"](modules/_wrappers_doublesigningslasher_.md)
 * ["wrappers/DowntimeSlasher"](modules/_wrappers_downtimeslasher_.md)
 * ["wrappers/Election"](modules/_wrappers_election_.md)
+* ["wrappers/EpochRewardsWrapper"](modules/_wrappers_epochrewardswrapper_.md)
 * ["wrappers/Escrow"](modules/_wrappers_escrow_.md)
 * ["wrappers/Exchange"](modules/_wrappers_exchange_.md)
 * ["wrappers/GasPriceMinimum"](modules/_wrappers_gaspriceminimum_.md)

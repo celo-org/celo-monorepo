@@ -153,7 +153,6 @@ export class BlockProcessor {
       this.logEvent(LoggingCategory.Transaction, tx)
       const receipt = await this.kit.web3.eth.getTransactionReceipt(tx.hash)
       this.logEvent(LoggingCategory.TransactionReceipt, receipt)
-
       ;(this.kit.web3.currentProvider as any).existingProvider.send(
         {
           method: 'debug_traceTransaction',

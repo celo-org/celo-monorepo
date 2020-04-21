@@ -57,7 +57,7 @@ ___
 
 ▸ **allAddresses**(): *Promise‹Record‹[CeloContract](../enums/_base_.celocontract.md), [Address](../modules/_base_.md#address)››*
 
-*Defined in [contractkit/src/address-registry.ts:48](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/address-registry.ts#L48)*
+*Defined in [contractkit/src/address-registry.ts:49](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/address-registry.ts#L49)*
 
 Get the address for all possible `CeloContract`
 
