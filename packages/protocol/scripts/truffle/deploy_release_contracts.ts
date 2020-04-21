@@ -1,7 +1,6 @@
 import { _setInitialProxyImplementation } from '@celo/protocol/lib/web3-utils'
 import BigNumber from 'bignumber.js'
 import chalk from 'chalk'
-import fs = require('fs')
 import * as prompts from 'prompts'
 import {
   ReleaseGoldContract,
@@ -9,10 +8,12 @@ import {
   ReleaseGoldMultiSigProxyContract,
   ReleaseGoldProxyContract,
 } from 'types'
+import fs = require('fs')
 
 let argv: any
 let releases: any
 let startGold: any
+let fromAddress: any
 let deployedGrants: any
 let deployedGrantsFile: string
 let ReleaseGoldMultiSig: ReleaseGoldMultiSigContract
@@ -52,15 +53,15 @@ async function handleGrant(releaseGoldConfig: any, currGrant: number) {
       return
     }
   }
-  const releaseGoldMultiSigProxy = await ReleaseGoldMultiSigProxy.new({ from: argv.from })
-  const releaseGoldMultiSigInstance = await ReleaseGoldMultiSig.new({ from: argv.from })
+  const releaseGoldMultiSigProxy = await ReleaseGoldMultiSigProxy.new({ from: fromAddress })
+  const releaseGoldMultiSigInstance = await ReleaseGoldMultiSig.new({ from: fromAddress })
   const multiSigTxHash = await _setInitialProxyImplementation(
     web3,
     releaseGoldMultiSigInstance,
     releaseGoldMultiSigProxy,
     'ReleaseGoldMultiSig',
     {
-      from: argv.from,
+      from: fromAddress,
       value: null,
     },
     [releaseGoldConfig.releaseOwner, releaseGoldConfig.beneficiary],
@@ -68,10 +69,10 @@ async function handleGrant(releaseGoldConfig: any, currGrant: number) {
     2
   )
   await releaseGoldMultiSigProxy._transferOwnership(releaseGoldMultiSigProxy.address, {
-    from: argv.from,
+    from: fromAddress,
   })
-  const releaseGoldProxy = await ReleaseGoldProxy.new({ from: argv.from })
-  const releaseGoldInstance = await ReleaseGold.new({ from: argv.from })
+  const releaseGoldProxy = await ReleaseGoldProxy.new({ from: fromAddress })
+  const releaseGoldInstance = await ReleaseGold.new({ from: fromAddress })
   const weiAmountReleasedPerPeriod = new BigNumber(
     web3.utils.toWei(releaseGoldConfig.amountReleasedPerPeriod.toString())
   )
@@ -95,7 +96,7 @@ async function handleGrant(releaseGoldConfig: any, currGrant: number) {
     releaseGoldProxy,
     'ReleaseGold',
     {
-      from: argv.from,
+      from: fromAddress,
       value: weiAmountReleasedPerPeriod.multipliedBy(releaseGoldConfig.numReleasePeriods).toFixed(),
     },
     Math.round(releaseStartTime),
@@ -114,11 +115,13 @@ async function handleGrant(releaseGoldConfig: any, currGrant: number) {
     '0x000000000000000000000000000000000000ce10'
   )
   const proxiedReleaseGold = await ReleaseGold.at(releaseGoldProxy.address)
-  await proxiedReleaseGold.transferOwnership(releaseGoldMultiSigProxy.address, { from: argv.from })
-  await releaseGoldProxy._transferOwnership(releaseGoldMultiSigProxy.address, { from: argv.from })
+  await proxiedReleaseGold.transferOwnership(releaseGoldMultiSigProxy.address, {
+    from: fromAddress,
+  })
+  await releaseGoldProxy._transferOwnership(releaseGoldMultiSigProxy.address, { from: fromAddress })
   // Send starting gold amount to the beneficiary so they can perform transactions.
   await web3.eth.sendTransaction({
-    from: argv.from,
+    from: fromAddress,
     to: releaseGoldConfig.beneficiary,
     value: startGold,
   })
@@ -141,6 +144,91 @@ async function handleGrant(releaseGoldConfig: any, currGrant: number) {
     fs.writeFileSync(argv.output_file, JSON.stringify(releases, null, 2))
   } else {
     console.info('Deployed grant ', record)
+  }
+}
+
+async function checkBalance(releaseGoldConfig: any) {
+  const weiAmountReleasedPerPeriod = new BigNumber(
+    web3.utils.toWei(releaseGoldConfig.amountReleasedPerPeriod.toString())
+  )
+  const grantTotal = weiAmountReleasedPerPeriod
+    .multipliedBy(releaseGoldConfig.numReleasePeriods)
+    .toFixed()
+  while (true) {
+    const fromBalance = new BigNumber(await web3.eth.getBalance(fromAddress))
+    if (fromBalance.gte(grantTotal)) {
+      break
+    }
+    console.info(
+      chalk.yellow(
+        fromAddress +
+          "'s balance will not cover the next grant with identifier " +
+          releaseGoldConfig.identifier +
+          '.'
+      )
+    )
+    const addressResponse = await prompts({
+      type: 'text',
+      name: 'newFromAddress',
+      message:
+        'If you would like to continue deployment from a new address please provide it now. If you would like to cancel deployment just press enter. Grants already deployed will persist.',
+    })
+
+    if (addressResponse.newFromAddress === '') {
+      console.info('Exiting because of user input.')
+      process.exit(0)
+    }
+
+    if (!web3.utils.isAddress(addressResponse.newFromAddress)) {
+      console.info(
+        chalk.red('Provided address is invalid, please insert a valid Celo Address.\nRetrying.')
+      )
+      continue
+    }
+    console.info(
+      '\nSending 1 cGLD as a test from ' +
+        fromAddress +
+        ' to ' +
+        addressResponse.newFromAddress +
+        ' to verify ownership.\n'
+    )
+    await web3.eth.sendTransaction({
+      from: fromAddress,
+      to: addressResponse.newFromAddress,
+      value: web3.utils.toWei('1', 'ether'),
+    })
+    const confirmResponse = await prompts({
+      type: 'confirm',
+      name: 'confirmation',
+      message:
+        'Please check the balance of your provided address. You should see the 1cGLD transfer and an initial genesis balance if this is a shard from the genesis block.\nCan you confirm this (y/n)?',
+    })
+    if (!confirmResponse.confirmation) {
+      console.info(chalk.red('Setting new address failed.\nRetrying.'))
+      continue
+    }
+    console.info(chalk.green('\nTransfer confirmed, sending the remaining balance.\n'))
+    const fromBalancePostTransfer = new BigNumber(await web3.eth.getBalance(fromAddress))
+    await web3.eth.sendTransaction({
+      from: fromAddress,
+      to: addressResponse.newFromAddress,
+      value: fromBalancePostTransfer,
+    })
+    const switchResponse = await prompts({
+      type: 'confirm',
+      name: 'confirmation',
+      message:
+        'Please now switch your local wallet from ' +
+        fromAddress +
+        ' to ' +
+        addressResponse.newFromAddress +
+        '.\nIf you respond no here the script will exit because balance has already been sent.\nPlease confirm when you are able to switch (y/n)?',
+    })
+    if (!switchResponse.confirmation) {
+      console.info(chalk.red('Switching wallets abandoned, exiting.'))
+      process.exit(0)
+    }
+    fromAddress = addressResponse.newFromAddress
   }
 }
 
@@ -218,21 +306,7 @@ async function handleJSONFile(err, data) {
   }, 0)
   const totalTransferFees = Number(argv.start_gold) * Number(grants.length)
   const totalValue = new BigNumber(totalTransferFees + totalGoldGrant)
-  const fromBalance = new BigNumber(await web3.eth.getBalance(argv.from))
-  if (fromBalance.lt(await web3.utils.toWei(totalValue.toFixed()))) {
-    console.error(
-      chalk.red(
-        '\nError: The `from` address ' +
-          argv.from +
-          "'s balance is not sufficient to cover all of the grants specified in " +
-          argv.grants +
-          '.\
-      \nIf you would only like to deploy a subset of grants, please modify the json file and try again.\
-      \nExiting.'
-      )
-    )
-    process.exit(0)
-  }
+  const fromBalance = new BigNumber(await web3.eth.getBalance(fromAddress))
   if (!argv.yesreally) {
     const response = await prompts({
       type: 'confirm',
@@ -252,8 +326,34 @@ async function handleJSONFile(err, data) {
       process.exit(0)
     }
   }
+
+  // Check first provided address' balance
+  if (fromBalance.lt(await web3.utils.toWei(totalValue.toFixed()))) {
+    console.info(
+      chalk.yellow(
+        '\nError: The provided `from` address ' +
+          fromAddress +
+          "'s balance of " +
+          fromBalance +
+          ' is not sufficient to cover all of the grants specified in ' +
+          argv.grants +
+          '.\nYou will need to provide supplementary addresses (additional shards) to fund these grants.'
+      )
+    )
+    const response = await prompts({
+      type: 'confirm',
+      name: 'confirmation',
+      message: 'If you know what you are doing, continue: (y/n)',
+    })
+
+    if (!response.confirmation) {
+      console.info(chalk.red('Abandoning grant deployment due to user response.'))
+      process.exit(0)
+    }
+  }
   let currGrant = 1
   for (const releaseGoldConfig of grants) {
+    await checkBalance(releaseGoldConfig)
     await handleGrant(releaseGoldConfig, currGrant)
     currGrant++
   }
@@ -278,6 +378,7 @@ module.exports = async (callback: (error?: any) => number) => {
     ReleaseGold = artifacts.require('ReleaseGold')
     ReleaseGoldProxy = artifacts.require('ReleaseGoldProxy')
     releases = []
+    fromAddress = argv.from
     startGold = web3.utils.toWei(argv.start_gold)
     deployedGrantsFile = argv.deployed_grants
     try {
