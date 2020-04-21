@@ -59,7 +59,7 @@ export class CeloProvider {
    * Proxy of `on` method
    */
   on?(...args: any[]) {
-    ;(this.existingProvider as any)?.on(...args)
+    ;(this.existingProvider as any)?.on?.(...args)
   }
 
   /**
