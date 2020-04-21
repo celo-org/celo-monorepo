@@ -1,6 +1,14 @@
 FROM node:10
 WORKDIR /celo-monorepo
 
+RUN sudo apt-get update -y
+RUN sudo apt-get install lsb-release libudev-dev libusb-dev libusb-1.0-0 -y
+
+RUN apt-get update -y && \
+    apt-get install -y libudev-dev  && \
+    rm -rf /var/lib/apt/lists/*
+
+
 # Needed for gsutil
 # RUN apt-get update && \
 #     apt-get install -y lsb-release && \
