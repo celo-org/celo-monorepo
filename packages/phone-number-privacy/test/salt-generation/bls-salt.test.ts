@@ -1,66 +1,28 @@
-import { BLINDBLS } from 'bls12377js-blind'
+import threshold from 'blind-threshold-bls'
+import crypto from 'crypto'
 import { computeBLSSalt } from '../../src/salt-generation/bls-salt'
 
 describe(`BLS service computes salt`, () => {
   it('provides blinded salt', () => {
     const queryPhoneNumber = '5555555555'
     // Expected value derived by making request unblinded
-    const expected = new Buffer([
-      20,
-      170,
-      113,
-      251,
-      54,
-      95,
-      165,
-      23,
-      231,
-      21,
-      33,
-      0,
-      228,
-      65,
-      208,
-      196,
-      248,
-      162,
-      127,
-      147,
-      232,
-      47,
-      224,
-      247,
-      111,
-      57,
-      199,
-      92,
-      130,
-      152,
-      238,
-      236,
-      114,
-      237,
-      189,
-      96,
-      0,
-      3,
-      97,
-      225,
-      158,
-      38,
-      74,
-      16,
-      97,
-      162,
-      143,
-      0,
-    ])
-    const blindingFactor = BLINDBLS.generateBlindingFactor()
-    const blindedPhoneNumber = BLINDBLS.blindMessage(new Buffer(queryPhoneNumber), blindingFactor)
+    const expected =
+      '5Xz5pxxni8SCj124ncnGrKkzj5YkTsVpUqp0LhhVnV3BHQOWKEO0r2qVcvjbqYQAL33W2GYojFfzWAJa0gs8MiaoHojTzH1sWuWnz3JhW5V0LeMSpPncy62TvPyqGpYAvm1WwEH1PBWL1tf8lvcHgH0/YlzVR7eOhSnhCYSVUzLptT+2+7HWKFJCidx8HmQBqXpk/ICuRXfntBiinY+gaNPTWryO4EBpXfK3UE+kiNwCqqrym6RcSFNaN6FA2CAAAA=='
+    const blindingFactor = crypto.randomBytes(32)
+    const blindedPhoneNumber = threshold.blind(
+      new Buffer(queryPhoneNumber, 'base64'),
+      blindingFactor
+    )
+    const blindPhoneNumberString = Buffer.from(blindedPhoneNumber.message).toString('base64')
 
     expect(
       JSON.stringify(
-        BLINDBLS.unblindMessage(computeBLSSalt(blindedPhoneNumber as any), blindingFactor)
+        Buffer.from(
+          threshold.unblind(
+            new Buffer(computeBLSSalt(blindPhoneNumberString), 'base64'),
+            blindedPhoneNumber.blindingFactor
+          )
+        ).toString('base64')
       )
     ).toEqual(JSON.stringify(expected))
   })

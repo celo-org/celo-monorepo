@@ -2,7 +2,7 @@ import * as functions from 'firebase-functions'
 import { handleGetContactMatches } from './match-making/get-contact-matches'
 import { handleGetSalt } from './salt-generation/get-salt'
 
-export const getSalt = functions.https.onRequest(async (request, response) => {
+export const getBlindedMessageSignature = functions.https.onRequest(async (request, response) => {
   return handleGetSalt(request, response)
 })
 

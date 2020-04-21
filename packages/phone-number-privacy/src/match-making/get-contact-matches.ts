@@ -1,8 +1,7 @@
 import { Request, Response } from 'firebase-functions'
-import { authenticateUser } from '../common/identity'
 import { ErrorMessages, respondWithError } from '../common/error-utils'
+import { authenticateUser } from '../common/identity'
 import { getNumberPairContacts, setNumberPairContacts } from '../database/wrappers/number-pairs'
-import { computeBLSSalt } from '../salt-generation/bls-salt'
 
 // TODO (amyslawson) consider pagination or streaming of contacts?
 export async function handleGetContactMatches(request: Request, response: Response) {
@@ -14,9 +13,9 @@ export async function handleGetContactMatches(request: Request, response: Respon
       return
     }
     authenticateUser()
-    const matchedContacts: ContactMatch[] = (
+    const matchedContacts: any = (
       await getNumberPairContacts(request.body.userPhoneNumber, request.body.contactPhoneNumbers)
-    ).map((numberPair) => ({ phoneNumber: numberPair, salt: computeBLSSalt(numberPair) }))
+    ).map((numberPair) => ({ phoneNumber: numberPair }))
     await setNumberPairContacts(request.body.userPhoneNumber, request.body.contactPhoneNumbers)
     // TODO (amyslawson) return salts with contact
     response.json({ success: true, matchedContacts })
@@ -24,11 +23,6 @@ export async function handleGetContactMatches(request: Request, response: Respon
     console.error('Failed to getContactMatches', e)
     respondWithError(response, 500, ErrorMessages.UNKNOWN_ERROR)
   }
-}
-
-interface ContactMatch {
-  phoneNumber: string
-  salt: Buffer
 }
 
 function isValidGetContactMatchesInput(requestBody: any): boolean {
