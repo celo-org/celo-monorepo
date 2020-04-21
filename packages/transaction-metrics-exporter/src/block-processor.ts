@@ -38,7 +38,7 @@ export class BlockProcessor {
     private kit: ContractKit,
     private blockInterval = 1,
     private fromBlock: number = 0,
-    private toBlock: number = fromBlock
+    private toBlock?: number
   ) {}
 
   async init() {
@@ -49,8 +49,11 @@ export class BlockProcessor {
 
     await this.loadContracts()
 
-    if (this.fromBlock?.toFixed?.() && this.toBlock) {
-      this.initBatch()
+    if (this.fromBlock?.toFixed?.()) {
+      await this.initBatch()
+      if (!this.toBlock) {
+        await this.initSubscription()
+      }
     } else {
       await this.initSubscription()
     }
@@ -82,9 +85,16 @@ export class BlockProcessor {
 
   async initBatch() {
     let block = this.fromBlock - 1
-    while (++block <= this.toBlock) {
+    while (++block <= (await this.getToBlock())) {
       await this.onNewBlock(block, block - this.fromBlock)
     }
+  }
+
+  async getToBlock() {
+    if (this.toBlock) {
+      return this.toBlock
+    }
+    return (await this.kit.web3.eth.getBlock('latest')).number
   }
 
   async onNewBlock(blockNumber: number, blockIntervalNumber?: number) {
