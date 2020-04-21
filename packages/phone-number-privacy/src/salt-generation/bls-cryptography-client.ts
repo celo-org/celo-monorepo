@@ -27,6 +27,11 @@ export class BLSCryptographyClient {
       return BLSCryptographyClient.privateKey
     }
 
+    // Set environment variables for service principal auth
+    process.env.AZURE_CLIENT_ID = config.keyVault.azureClientID
+    process.env.AZURE_CLIENT_SECRET = config.keyVault.azureClientSecret
+    process.env.AZURE_TENANT_ID = config.keyVault.azureTenant
+
     const vaultName = config.keyVault.azureVaultName
     const keyVaultClient = new AzureKeyVaultClient(vaultName)
     const secretName = config.keyVault.azureSecretName

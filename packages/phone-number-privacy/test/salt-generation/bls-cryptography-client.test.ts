@@ -6,22 +6,18 @@ import { BLSCryptographyClient } from '../../src/salt-generation/bls-cryptograph
 // https://www.npmjs.com/package/@azure/keyvault-keys
 require('dotenv').config()
 
-const USING_MOCK =
-  typeof process.env.AZURE_SECRET_NAME === 'undefined' ||
-  process.env.AZURE_SECRET_NAME === '<AZURE_SECRET_NAME>'
+const USING_MOCK = config.keyVault.azureClientSecret === 'useMock'
 
 describe(`BLS service computes salt`, () => {
   beforeEach(() => {
     // Use mock client if env vars not specified
     if (!USING_MOCK) {
       // Ensure all env vars are specified
-      expect(process.env.AZURE_CLIENT_ID).toBeDefined()
-      expect(process.env.AZURE_CLIENT_SECRET).toBeDefined()
-      expect(process.env.AZURE_TENANT_ID).toBeDefined()
-      expect(process.env.AZURE_VAULT_NAME).toBeDefined()
-      expect(process.env.AZURE_SECRET_NAME).toBeDefined()
-      config.keyVault.azureVaultName = process.env.AZURE_VAULT_NAME!
-      config.keyVault.azureSecretName = process.env.AZURE_SECRET_NAME!
+      expect(config.keyVault.azureClientID).not.toBe('useMock')
+      expect(config.keyVault.azureClientSecret).not.toBe('useMock')
+      expect(config.keyVault.azureTenant).not.toBe('useMock')
+      expect(config.keyVault.azureVaultName).not.toBe('useMock')
+      expect(config.keyVault.azureSecretName).not.toBe('useMock')
     }
     if (USING_MOCK) {
       jest.spyOn<any, any>(BLSCryptographyClient, 'getPrivateKey').mockImplementation(() => {
