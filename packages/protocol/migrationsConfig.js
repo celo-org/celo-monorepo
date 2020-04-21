@@ -61,9 +61,9 @@ const DefaultConfig = {
   },
   epochRewards: {
     targetVotingYieldParameters: {
-      initial: 0.00016, // (x + 1) ^ 365 = 1.06
+      initial: 0, // Change to (x + 1) ^ 365 = 1.06 once mainnet activated.
       max: 0.0005, // (x + 1) ^ 365 = 1.20
-      adjustmentFactor: 0, // Change to 1 / 3650 once mainnet activated
+      adjustmentFactor: 0, // Change to 1 / 3650 once mainnet activated.
     },
     rewardsMultiplierParameters: {
       max: 2,
