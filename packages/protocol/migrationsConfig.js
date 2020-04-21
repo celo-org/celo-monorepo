@@ -165,7 +165,7 @@ const DefaultConfig = {
     inflationRate: 1,
     inflationPeriod: 1.5 * YEAR,
     initialBalances: {
-      addresses: ['0x989e1a3B344A43911e02cCC609D469fbc15AB1F1'],
+      addresses: ['0xc471776eA02705004C451959129bF09423B56526'],
       values: ['5000000000000000000000000'],
     },
     // TODO(asa): Needs updating before RC1 deployment
