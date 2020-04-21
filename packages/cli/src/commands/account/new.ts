@@ -1,4 +1,9 @@
-import { generateKeys, generateMnemonic, MnemonicLanguages } from '@celo/utils/lib/account'
+import {
+  generateKeys,
+  generateMnemonic,
+  MnemonicLanguages,
+  MnemonicStrength,
+} from '@celo/utils/lib/account'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
 import { flags } from '@oclif/command'
 import { toChecksumAddress } from 'ethereumjs-util'
@@ -54,7 +59,7 @@ export default class NewAccount extends LocalCommand {
   async run() {
     const res = this.parse(NewAccount)
     const mnemonic = await generateMnemonic(
-      undefined,
+      MnemonicStrength.s256_24words,
       NewAccount.languageOptions(res.flags.language!)
     )
     const keys = await generateKeys(mnemonic, res.flags.password, res.flags.indexAddress)
