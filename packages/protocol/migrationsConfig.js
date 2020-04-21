@@ -55,7 +55,7 @@ const DefaultConfig = {
   election: {
     minElectableValidators: '22',
     maxElectableValidators: '100',
-    maxVotesPerAccount: 100,
+    maxVotesPerAccount: 10,
     electabilityThreshold: 1 / 1000,
     frozen: true,
   },
