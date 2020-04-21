@@ -10,7 +10,7 @@ export default class ValidatorSignedBlocks extends BaseCommand {
     "Display a graph of blocks and whether the given signer's signature is included in each. A green '.' indicates the signature is present in that block, a red '✘' indicates the signature is not present. A yellow '~' indicates the signer is not elected for that block."
 
   static flags = {
-    ...BaseCommand.flags,
+    ...BaseCommand.flagsWithoutLocalAddresses(),
     signer: Flags.address({
       description: 'address of the signer to check for signatures',
       required: true,
