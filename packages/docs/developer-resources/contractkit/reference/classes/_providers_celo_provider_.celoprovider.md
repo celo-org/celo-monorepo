@@ -36,7 +36,7 @@
 Name | Type | Default |
 ------ | ------ | ------ |
 `existingProvider` | provider | - |
-`wallet` | [Wallet](../interfaces/_wallets_wallet_.wallet.md) | new DefaultWallet() |
+`wallet` | [Wallet](../interfaces/_wallets_wallet_.wallet.md) | new LocalWallet() |
 
 **Returns:** *[CeloProvider](_providers_celo_provider_.celoprovider.md)*
 

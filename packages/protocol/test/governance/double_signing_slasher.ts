@@ -142,6 +142,29 @@ contract('DoubleSigningSlasher', (accounts: string[]) => {
         slasher.slash(validator, validatorIndex, headerA, headerC, 0, [], [], [], [], [], [])
       )
     })
+    it('should emit the corresponding event', async () => {
+      const resp = await slasher.slash(
+        validator,
+        validatorIndex,
+        headerA,
+        headerC,
+        0,
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      )
+      const log = resp.logs[0]
+      assertContainSubset(log, {
+        event: 'DoubleSigningSlashPerformed',
+        args: {
+          validator,
+          blockNumber: new BigNumber(blockNumber),
+        },
+      })
+    })
     it('decrements gold when success', async () => {
       await slasher.slash(validator, validatorIndex, headerA, headerC, 0, [], [], [], [], [], [])
       const balance = await mockLockedGold.accountTotalLockedGold(validator)

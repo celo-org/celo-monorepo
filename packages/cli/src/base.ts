@@ -1,5 +1,6 @@
 import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { stopProvider } from '@celo/contractkit/lib/utils/provider-utils'
+import { AzureHSMWallet } from '@celo/contractkit/lib/wallets/azure-hsm-wallet'
 import {
   AddressValidation,
   newLedgerWalletWithSetup,
@@ -60,6 +61,15 @@ export abstract class BaseCommand extends LocalCommand {
       description:
         'If --useLedger is set, this will get the array of index addresses for local signing. Example --ledgerCustomAddresses "[4,99]"',
     }),
+    useAKV: flags.boolean({
+      default: false,
+      hidden: true,
+      description: 'Set it to use an Azure KeyVault HSM',
+    }),
+    azureVaultName: flags.string({
+      hidden: true,
+      description: 'If --useAKV is set, this is used to connect to the Azure KeyVault',
+    }),
     ledgerConfirmAddress: flags.boolean({
       default: false,
       hidden: false,
@@ -106,7 +116,7 @@ export abstract class BaseCommand extends LocalCommand {
     }
 
     const res: ParserOutput<any, any> = this.parse()
-    if (res.flags && res.flags.privateKey && !res.flags.useLedger) {
+    if (res.flags && res.flags.privateKey && !res.flags.useLedger && !res.flags.useAKV) {
       this._kit.addAccount(res.flags.privateKey)
     }
     return this._kit
@@ -140,6 +150,16 @@ export abstract class BaseCommand extends LocalCommand {
         )
       } catch (err) {
         console.log('Check if the ledger is connected and logged.')
+        throw err
+      }
+    } else if (res.flags.useAKV) {
+      try {
+        const akvWallet = await new AzureHSMWallet(res.flags.azureVaultName)
+        await akvWallet.init()
+        console.log(`Found addresses: ${await akvWallet.getAccounts()}`)
+        this._wallet = akvWallet
+      } catch (err) {
+        console.log(`Failed to connect to AKV ${err}`)
         throw err
       }
     }
