@@ -24,6 +24,20 @@ let ReleaseGoldProxy: ReleaseGoldProxyContract
 async function handleGrant(releaseGoldConfig: any, currGrant: number) {
   console.info('Processing grant number ' + currGrant)
 
+  // Special mainnet string is intended as MAINNET+X where X is months after mainnet launch.
+  // This is to account for the dynamic start date for mainnet,
+  // and some grants rely on x months post mainnet launch.
+  let releaseStartTime: any
+  if (releaseGoldConfig.releaseStartTime.startsWith('MAINNET')) {
+    const addedMonths = Number(releaseGoldConfig.releaseStartTime.split('+')[1])
+    const date = new Date()
+    if (addedMonths > 0) {
+      date.setDate(date.getDate() + addedMonths * 30)
+    }
+    releaseStartTime = date.getTime() / 1000
+  } else {
+    releaseStartTime = new Date(releaseGoldConfig.releaseStartTime).getTime() / 1000
+  }
   const message =
     'Please review this grant before you deploy:\n\tTotal Grant Value: ' +
     Number(releaseGoldConfig.numReleasePeriods) *
@@ -32,8 +46,8 @@ async function handleGrant(releaseGoldConfig: any, currGrant: number) {
     releaseGoldConfig.identifier +
     '\n\tGrant Beneficiary address: ' +
     releaseGoldConfig.beneficiary +
-    '\n\tGrant Start Date: ' +
-    releaseGoldConfig.releaseStartTime +
+    '\n\tGrant Start Date (Unix timestamp): ' +
+    Math.floor(releaseStartTime) +
     '\n\tGrant Cliff time (in seconds): ' +
     releaseGoldConfig.releaseCliffTime +
     '\n\tGrant num periods: ' +
@@ -76,20 +90,7 @@ async function handleGrant(releaseGoldConfig: any, currGrant: number) {
   const weiAmountReleasedPerPeriod = new BigNumber(
     web3.utils.toWei(releaseGoldConfig.amountReleasedPerPeriod.toString())
   )
-  // Special mainnet string is intended as MAINNET+X where X is months after mainnet launch.
-  // This is to account for the dynamic start date for mainnet,
-  // and some grants rely on x months post mainnet launch.
-  let releaseStartTime: any
-  if (releaseGoldConfig.releaseStartTime.startsWith('MAINNET')) {
-    const addedMonths = Number(releaseGoldConfig.releaseStartTime.split('+')[1])
-    const date = new Date()
-    if (addedMonths > 0) {
-      date.setDate(date.getDate() + addedMonths * 30)
-    }
-    releaseStartTime = date.getTime() / 1000
-  } else {
-    releaseStartTime = new Date(releaseGoldConfig.releaseStartTime).getTime() / 1000
-  }
+
   const releaseGoldTxHash = await _setInitialProxyImplementation(
     web3,
     releaseGoldInstance,
@@ -151,13 +152,14 @@ async function checkBalance(releaseGoldConfig: any) {
   const weiAmountReleasedPerPeriod = new BigNumber(
     web3.utils.toWei(releaseGoldConfig.amountReleasedPerPeriod.toString())
   )
-  const grantTotal = weiAmountReleasedPerPeriod
+  const grantDeploymentCost = weiAmountReleasedPerPeriod
     .multipliedBy(releaseGoldConfig.numReleasePeriods)
     .plus(startGold)
+    .plus(web3.utils.toWei('1', 'ether')) // Tx Fees
     .toFixed()
   while (true) {
     const fromBalance = new BigNumber(await web3.eth.getBalance(fromAddress))
-    if (fromBalance.gte(grantTotal)) {
+    if (fromBalance.gte(grantDeploymentCost)) {
       break
     }
     console.info(
@@ -172,10 +174,11 @@ async function checkBalance(releaseGoldConfig: any) {
       type: 'text',
       name: 'newFromAddress',
       message:
-        'If you would like to continue deployment from a new address please provide it now. If you would like to cancel deployment just press enter. Grants already deployed will persist.',
+        "If you would like to continue deployment from a new address please provide it now. If you would like to cancel deployment please enter 'exit'. Grants already deployed will persist. \
+        \nNote that the key for the current `from` address needs to remain accessible in order to roll funds over to the new `from` address.",
     })
 
-    if (addressResponse.newFromAddress === '') {
+    if (addressResponse.newFromAddress === 'exit') {
       console.info('Exiting because of user input.')
       process.exit(0)
     }
@@ -186,35 +189,37 @@ async function checkBalance(releaseGoldConfig: any) {
       )
       continue
     }
-    console.info(
-      '\nSending 1 cGLD as a test from ' +
-        fromAddress +
-        ' to ' +
-        addressResponse.newFromAddress +
-        ' to verify ownership.\n'
-    )
-    await web3.eth.sendTransaction({
-      from: fromAddress,
-      to: addressResponse.newFromAddress,
-      value: web3.utils.toWei('1', 'ether'),
-    })
-    const confirmResponse = await prompts({
-      type: 'confirm',
-      name: 'confirmation',
-      message:
-        'Please check the balance of your provided address. You should see the 1cGLD transfer and an initial genesis balance if this is a shard from the genesis block.\nCan you confirm this (y/n)?',
-    })
-    if (!confirmResponse.confirmation) {
-      console.info(chalk.red('Setting new address failed.\nRetrying.'))
-      continue
+    if (fromBalance.gt(web3.utils.toWei('1', 'ether'))) {
+      console.info(
+        '\nSending 1 cGLD as a test from ' +
+          fromAddress +
+          ' to ' +
+          addressResponse.newFromAddress +
+          ' to verify ownership.\n'
+      )
+      await web3.eth.sendTransaction({
+        from: fromAddress,
+        to: addressResponse.newFromAddress,
+        value: web3.utils.toWei('1', 'ether'),
+      })
+      const confirmResponse = await prompts({
+        type: 'confirm',
+        name: 'confirmation',
+        message:
+          'Please check the balance of your provided address. You should see the 1cGLD transfer and an initial genesis balance if this is a shard from the genesis block.\nCan you confirm this (y/n)?',
+      })
+      if (!confirmResponse.confirmation) {
+        console.info(chalk.red('Setting new address failed.\nRetrying.'))
+        continue
+      }
+      console.info(chalk.green('\nTransfer confirmed, sending the remaining balance.\n'))
+      const fromBalancePostTransfer = new BigNumber(await web3.eth.getBalance(fromAddress))
+      await web3.eth.sendTransaction({
+        from: fromAddress,
+        to: addressResponse.newFromAddress,
+        value: fromBalancePostTransfer.minus(web3.utils.toWei('1', 'ether')), // minus Tx Fees
+      })
     }
-    console.info(chalk.green('\nTransfer confirmed, sending the remaining balance.\n'))
-    const fromBalancePostTransfer = new BigNumber(await web3.eth.getBalance(fromAddress))
-    await web3.eth.sendTransaction({
-      from: fromAddress,
-      to: addressResponse.newFromAddress,
-      value: fromBalancePostTransfer,
-    })
     const switchResponse = await prompts({
       type: 'confirm',
       name: 'confirmation',
@@ -223,7 +228,7 @@ async function checkBalance(releaseGoldConfig: any) {
         fromAddress +
         ' to ' +
         addressResponse.newFromAddress +
-        '.\nIf you respond no here the script will exit because balance has already been sent.\nPlease confirm when you are able to switch (y/n)?',
+        '.\nIf you respond `n` here the script will exit because balance has already been sent.\nPlease confirm when you are able to switch (y/n)?',
     })
     if (!switchResponse.confirmation) {
       console.info(chalk.red('Switching wallets abandoned, exiting.'))
@@ -395,6 +400,20 @@ module.exports = async (callback: (error?: any) => number) => {
         }
       })
       deployedGrants = []
+    }
+
+    const response = await prompts({
+      type: 'confirm',
+      name: 'confirmation',
+      message:
+        'Provided `deployedGrants` file includes ' +
+        deployedGrants.length +
+        ' deployed grant identifiers.\nPlease verify this matches your expectations. (y/n)',
+    })
+
+    if (!response.confirmation) {
+      console.info(chalk.red('Abandoning grant deployment due to user response.'))
+      process.exit(0)
     }
     fs.readFile(argv.grants, handleJSONFile)
   } catch (error) {
