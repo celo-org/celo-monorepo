@@ -1,7 +1,7 @@
 import { ContractKit } from '@celo/contractkit'
 import { newBlockExplorer, ParsedTx } from '@celo/contractkit/lib/explorer/block-explorer'
 import { newLogExplorer } from '@celo/contractkit/lib/explorer/log-explorer'
-import { labelValues, Histogram, linearBuckets } from 'prom-client'
+import { Histogram, labelValues, linearBuckets } from 'prom-client'
 import { Transaction } from 'web3-core'
 import { Block } from 'web3-eth'
 
@@ -154,41 +154,39 @@ export class BlockProcessor {
       const receipt = await this.kit.web3.eth.getTransactionReceipt(tx.hash)
       this.logEvent(LoggingCategory.TransactionReceipt, receipt)
 
-      new Promise((resolve) =>
-        (this.kit.web3.currentProvider as any).existingProvider.send(
-          {
-            method: 'debug_traceTransaction',
-            params: [
-              tx.hash,
-              {
-                tracer: tracerAsText,
-                disableStack: true,
-                disableMemory: true,
-                disableStorage: true,
-              },
-            ],
-            jsonrpc: '2.0',
-            id: '2',
-          },
-          (err: any, result: any) => {
-            if (!err) {
-              result?.result
-                ?.filter?.(
-                  ({ type, callType }: any) => type === 'create' || callType === 'delegatecall'
-                )
-                ?.forEach?.((data: any) =>
-                  this.logEvent(LoggingCategory.InternalTransaction, {
-                    ...data,
-                    blockNumber,
-                    createdContractCode: undefined,
-                    init: undefined,
-                  })
-                )
-            }
-            resolve()
+      ;(this.kit.web3.currentProvider as any).existingProvider.send(
+        {
+          method: 'debug_traceTransaction',
+          params: [
+            tx.hash,
+            {
+              tracer: tracerAsText,
+              disableStack: true,
+              disableMemory: true,
+              disableStorage: true,
+            },
+          ],
+          jsonrpc: '2.0',
+          id: '2',
+        },
+        (err: any, result: any) => {
+          if (!err) {
+            result?.result
+              ?.filter?.(
+                ({ type, callType }: any) => type === 'create' || callType === 'delegatecall'
+              )
+              ?.forEach?.((data: any) =>
+                this.logEvent(LoggingCategory.InternalTransaction, {
+                  ...data,
+                  blockNumber,
+                  createdContractCode: undefined,
+                  init: undefined,
+                })
+              )
           }
-        )
+        }
       )
+
       // tslint:disable-next-line
       const labels = {
         to: parsedTx ? tx.to : NOT_WHITELISTED_ADDRESS,

@@ -1,5 +1,5 @@
-import fetch from 'node-fetch'
 import { ParsedBlock, ParsedTx } from '@celo/contractkit/lib/explorer/block-explorer'
+import fetch from 'node-fetch'
 
 const EMPTY_INPUT = 'empty_input'
 const NO_METHOD_ID = 'no_method_id'

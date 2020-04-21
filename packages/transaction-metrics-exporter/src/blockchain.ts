@@ -50,6 +50,7 @@ export async function runMetricExporter(kit: ContractKit): Promise<EndReason> {
   const fromBLock = Number.parseInt(process.env.FROM_BLOCK || '', 10)
   const toBlock = Number.parseInt(process.env.TO_BLOCK || '', 10)
 
+  // tslint:disable-next-line
   new BlockProcessor(kit, BLOCK_INTERVAL, fromBLock, toBlock).init()
 
   const provider = kit.web3.currentProvider as WebsocketProvider
