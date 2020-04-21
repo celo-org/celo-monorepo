@@ -275,7 +275,6 @@ _To avoid debugging errors, ensure your device and laptop are connected to the s
 
 The [React Native Debugger][rn debugger] bundles together the Redux and Chrome dev tools nicely and provides a clean debugging environment.
 
-
 ### App Profiling
 
 Run `yarn run react-devtools`. It should automatically connect to the running app, and includes a profiler (second tab). Start recording with the profiler, use the app, and then stop recording.

@@ -3,17 +3,19 @@
 - [Celo Engineering Setup](#celo-engineering-setup)
   - [Reading](#reading)
   - [Getting everything installed](#getting-everything-installed)
+    - [Common stuff](#common-stuff)
+      - [Install Go](#install-go)
+      - [Install Node](#install-node)
     - [MacOS](#macos)
       - [Xcode CLI](#xcode-CLI)
       - [Homebrew](#homebrew)
-      - [Install Node, Yarn and friends](#install-node-yarn-and-friends)
+      - [Install Yarn](#install-yarn)
     - [Linux](#linux)
-      - [Install Node, Yarn and friends](#install-node-yarn-and-friends-1)
-    - [Common stuff](#common-stuff)
-      - [Install Go](#install-go)
-      - [Optional: Install Rust](#optional-install-rust)
+      - [Install Yarn](#install-yarn-1)
+    - [Optional](#optional)
+      - [Install Rust](#install-rust)
   - [Building celo-monorepo](#building-celo-monorepo)
-  - [Deploying the mobile wallet](#deploying-the-mobile-wallet)
+  - [Running the mobile wallet](#running-the-mobile-wallet)
 
 This is a living document! Please edit and update it as part of your onboarding process :-)
 
@@ -26,77 +28,6 @@ Review the README from each directory in [packages](packages/). The [protocol](p
 ## Getting everything installed
 
 Follow these steps to get everything that you need installed to build the celo-monorepo codebase on your computer.
-
-### MacOS
-
-#### Xcode CLI
-
-Install the Xcode command line tools:
-
-```bash
-xcode-select --install
-```
-
-#### Homebrew
-
-Install [Homebrew], the best way of managing packages on OSX:
-
-```bash
-/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-```
-
-#### Install Node, Yarn and friends
-
-Install `nvm` (allows you to manage multiple versions of Node) by following the instructions here: [https://github.com/nvm-sh/nvm].
-
-Once `nvm` is successfully installed, restart the terminal and run the following commands to install the `npm` versions and typescript package that [celo-monorepo] will need:
-
-```bash
-# restart the terminal after installing nvm
-nvm install 8
-nvm install 10
-nvm alias default 10
-npm install -g typescript
-```
-
-We use Yarn to build all of the [celo-monorepo] repo. Install it using [Homebrew](#homebrew):
-
-```bash
-brew install yarn
-```
-
-### Linux
-
-#### Install Node, Yarn and friends
-
-Install NodeJS:
-
-```bash
-# Installing NodeJS
-sudo apt-get update
-sudo apt-get install nodejs
-```
-
-Install `nvm` (allows you to manage multiple versions of Node) by following the instructions here: [https://github.com/nvm-sh/nvm].
-
-Once `nvm` is successfully installed, restart the terminal and run the following commands to install the `npm` versions and typescript package that [celo-monorepo] will need:
-
-```bash
-# restart the terminal after installing nvm
-nvm install 8
-nvm install 10
-nvm alias default 10
-npm install -g typescript
-```
-
-We use Yarn to build all of the [celo-monorepo] repo. Install it by running the following:
-
-```bash
-# for documentation on yarn visit https://yarnpkg.com/en/docs/install#debian-stable
-curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
-echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
-sudo apt-get update && sudo apt-get install yarn
-```
 
 ### Common stuff
 
@@ -117,7 +48,61 @@ export GOPATH=$HOME/go
 export PATH=$PATH:$GOPATH/bin
 ```
 
-#### Optional: Install Rust
+#### Install Node
+
+Install `nvm` (allows you to manage multiple versions of Node) by following the instructions here: [https://github.com/nvm-sh/nvm].
+
+Once `nvm` is successfully installed, restart the terminal and run the following commands to install the `npm` versions that [celo-monorepo] will need:
+
+```bash
+# restart the terminal after installing nvm
+nvm install 8
+nvm install 10
+nvm alias default 10
+```
+
+### MacOS
+
+#### Xcode CLI
+
+Install the Xcode command line tools:
+
+```bash
+xcode-select --install
+```
+
+#### Homebrew
+
+Install [Homebrew], the best way of managing packages on OSX:
+
+```bash
+/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+```
+
+#### Install Yarn
+
+We use Yarn to build all of the [celo-monorepo] repo. Install it using [Homebrew](#homebrew):
+
+```bash
+brew install yarn
+```
+
+### Linux
+
+#### Install Yarn
+
+We use Yarn to build all of the [celo-monorepo] repo. Install it by running the following:
+
+```bash
+# for documentation on yarn visit https://yarnpkg.com/en/docs/install#debian-stable
+curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+sudo apt-get update && sudo apt-get install yarn
+```
+
+### Optional
+
+#### Install Rust
 
 We use Rust to build the [celo-blockchain] and [bls-zexe] repos. You will need to install Rust if you'd like to run the Celo blockchain locally. This is not required if you only want use the monorepo and mobile wallet.
 
@@ -180,9 +165,9 @@ yarn build
 > and the `postinstall` step which uses it is not automatically run after using `yarn remove`.
 
 
-## Deploying the mobile wallet
+## Running the mobile wallet
 
-To deploy the mobile wallet to your iOS or Android devices see the guide in the [mobile](packages/mobile) directory.
+To build and run the mobile wallet on your iOS or Android devices see the guide in the [mobile](packages/mobile) directory.
 
 
 [celo-monorepo]: https://github.com/celo-org/celo-monorepo
