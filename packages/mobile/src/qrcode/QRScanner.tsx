@@ -3,6 +3,7 @@ import QRCode from '@celo/react-components/icons/QRCode'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
+import { memoize } from 'lodash'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { Platform, StyleSheet, Text, View } from 'react-native'
@@ -23,13 +24,9 @@ interface DispatchProps {
   handleBarcodeDetected: typeof handleBarcodeDetected
 }
 
-interface State {
-  isScanningEnabled: boolean
-}
-
 type Props = DispatchProps & WithTranslation & NavigationFocusInjectedProps
 
-class QRScanner extends React.Component<Props, State> {
+class QRScanner extends React.Component<Props> {
   static navigationOptions = () => ({
     ...headerWithBackButton,
     headerTitle: i18n.t('sendFlow7:scanCode'),
@@ -37,34 +34,19 @@ class QRScanner extends React.Component<Props, State> {
 
   timeout: undefined | number = undefined
 
-  state = {
-    isScanningEnabled: true,
-  }
+  state = {}
 
   camera: RNCamera | null = null
 
   // This method would be called multiple times with the same
   // QR code, so we need to catch only the first one
-  onBardCodeDetected = (rawData: any) => {
-    if (this.state.isScanningEnabled) {
-      this.setState({ isScanningEnabled: false }, () => {
-        Logger.debug('QRScanner', 'Bar code detected')
-        this.props.handleBarcodeDetected(rawData)
-      })
-      this.timeout = window.setTimeout(() => {
-        this.setState({ isScanningEnabled: true })
-      }, 1000)
-    }
+  onBarCodeDetected = (rawData: any) => {
+    Logger.debug('QRScanner', 'Bar code detected')
+    this.props.handleBarcodeDetected(rawData)
   }
 
   onPressShowYourCode = () => {
     navigate(Screens.QRCode)
-  }
-
-  componentWillUnmount() {
-    if (this.timeout) {
-      clearTimeout(this.timeout)
-    }
   }
 
   render() {
@@ -79,7 +61,7 @@ class QRScanner extends React.Component<Props, State> {
               }}
               style={styles.preview}
               type={RNCamera.Constants.Type.back}
-              onBarCodeRead={this.onBardCodeDetected}
+              onBarCodeRead={memoize(this.onBarCodeDetected, (qr) => qr.data)}
               barCodeTypes={[RNCamera.Constants.BarCodeType.qr]}
               flashMode={RNCamera.Constants.FlashMode.auto}
               captureAudio={false}
