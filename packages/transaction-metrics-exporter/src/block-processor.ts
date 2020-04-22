@@ -6,7 +6,7 @@ import { Transaction } from 'web3-core'
 import { Block } from 'web3-eth'
 
 import { Counters } from './metrics'
-import { Contracts, stateGetters } from './states'
+import { Contracts, stateGetters, watchAddress } from './states'
 import { toMethodId, toTxMap } from './utils'
 
 import { tracerAsText } from './tracer'
@@ -33,6 +33,7 @@ export class BlockProcessor {
   private contracts: Contracts = {} as any
   private initialized = false
   private histograms: { [key: string]: Histogram } = {}
+  private watchingReserveAddress = false
 
   constructor(
     private kit: ContractKit,
@@ -104,6 +105,10 @@ export class BlockProcessor {
   }
 
   async fetchBlockState(blockNumber: number) {
+    if (!this.watchingReserveAddress && this.contracts.Reserve?.address) {
+      watchAddress(this.contracts.Reserve.address)
+      this.watchingReserveAddress = true
+    }
     const promises = stateGetters.map(
       async ({ contract, method, args, transformValues, maxBucketSize }) => {
         if (!(await this.contracts[contract].exists(blockNumber))) {

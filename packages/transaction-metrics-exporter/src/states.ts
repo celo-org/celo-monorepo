@@ -82,28 +82,31 @@ export const stateGetters: StateGetter[] = [
   ]
 
   // Include getters for accounts
+
+export function watchAddress(address: string) {
+  stateGetters.push(
+    getter(
+      'GoldToken',
+      'balanceOf',
+      (balance: any) => ({
+        balance: +balance,
+      }),
+      (blockNumber) => [address, blockNumber] as any
+    )
+  )
+  stateGetters.push(
+    getter(
+      'StableToken',
+      'balanceOf',
+      (balance) => ({
+        balance: +balance,
+      }),
+      [address]
+    )
+  )
+}
+
 ;(process.env.WATCH_ADDRESS || '')
   .split(/,\s?/)
   .filter((address) => address.match(/^0x[a-f0-9]{40}$/i))
-  .forEach((address) => {
-    stateGetters.push(
-      getter(
-        'GoldToken',
-        'balanceOf',
-        (balance: any) => ({
-          balance: +balance,
-        }),
-        (blockNumber) => [address, blockNumber] as any
-      )
-    )
-    stateGetters.push(
-      getter(
-        'StableToken',
-        'balanceOf',
-        (balance) => ({
-          balance: +balance,
-        }),
-        [address]
-      )
-    )
-  })
+  .forEach(watchAddress)
