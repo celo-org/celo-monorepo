@@ -47,7 +47,7 @@ async function helmParameters(celoEnv: string) {
     `--set toBlock=${fetchEnvOrFallback(envVar.TRANSACTION_METRICS_EXPORTER_FROM_BLOCK, '')}`,
     `--set blockInterval=${fetchEnvOrFallback(
       envVar.TRANSACTION_METRICS_EXPORTER_BLOCK_INTERVAL,
-      ''
+      '1'
     )}`,
     `--set watchAddress=${fetchEnvOrFallback(
       envVar.TRANSACTION_METRICS_EXPORTER_WATCH_ADDRESS,
