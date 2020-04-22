@@ -24,6 +24,23 @@ export interface TokenInfo {
   data: Buffer
 }
 
+/**
+ * @return
+ * -1: version1 < version2,
+ *  0: version1 == version2,
+ *  1: version1 > version2
+ */
+export function compareLedgerAppVersions(version1: string, version2: string): number {
+  const numberV1 = stringVersionToNumber(version1)
+  const numberV2 = stringVersionToNumber(version2)
+  return numberV1 < numberV2 ? -1 : numberV1 === numberV2 ? 0 : 1
+}
+
+function stringVersionToNumber(version: string): number {
+  const parts = version.split('.')
+  return parts.reduce((accum, part) => (accum + Number(part)) * 1000, 0)
+}
+
 export interface API {
   byContractKey: (arg0: string) => TokenInfo | null | undefined
   list: () => TokenInfo[]
