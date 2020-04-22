@@ -889,8 +889,8 @@ workflows:
             - lint-checks
             - contractkit-test
       - phone-number-privacy-test:
-        requires:
-          - lint-checks
+          requires:
+            - lint-checks
   npm-install-testing-cron-workflow:
     triggers:
       - schedule:
@@ -924,3 +924,4 @@ workflows:
       - protocol-test-with-code-coverage:
           requires:
             - lint-checks
+            
