@@ -27,9 +27,30 @@ export default class View extends BaseCommand {
     const governance = await this.kit.contracts.getGovernance()
     const record = await governance.getProposalRecord(id)
     if (!raw) {
-      const jsonproposal = await proposalToJSON(this.kit, record.proposal)
-      record.proposal = jsonproposal as any
+      try {
+        const jsonproposal = await proposalToJSON(this.kit, record.proposal)
+        record.proposal = jsonproposal as any
+      } catch (error) {
+        console.warn(`Could not decode proposal, displaying raw data: ${error}`)
+      }
     }
-    printValueMapRecursive(record)
+
+    // Identify the transaction with the highest constitutional requirement.
+    const proposal = await governance.getProposal(id)
+
+    // Get the minimum participation and agreement required to pass a proposal.
+    const participationParams = await governance.getParticipationParameters()
+    const constitution = await governance.getConstitution(proposal)
+
+    printValueMapRecursive({
+      ...record,
+      requirements: {
+        participation: participationParams.baseline,
+        agreement: constitution.times(100).toString() + '%',
+      },
+      isApproved: await governance.isApproved(id),
+      isProposalPassing: await governance.isProposalPassing(id),
+      secondsUntilStages: await governance.timeUntilStages(id),
+    })
   }
 }
