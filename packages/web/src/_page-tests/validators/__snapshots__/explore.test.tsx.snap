@@ -14,6 +14,7 @@ exports[`ValidatorsList renders 1`] = `
     className="css-view-1dbjc4n"
     style={
       Object {
+        "backgroundColor": "rgba(46,51,56,1.00)",
         "marginBottom": "100px",
         "marginLeft": "auto",
         "marginRight": "auto",
