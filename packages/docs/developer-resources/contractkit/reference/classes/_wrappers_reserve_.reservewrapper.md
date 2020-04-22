@@ -23,6 +23,7 @@ Contract for handling reserve for stable currencies
 * [getOrComputeTobinTax](_wrappers_reserve_.reservewrapper.md#getorcomputetobintax)
 * [getOtherReserveAddresses](_wrappers_reserve_.reservewrapper.md#getotherreserveaddresses)
 * [getReserveGoldBalance](_wrappers_reserve_.reservewrapper.md#getreservegoldbalance)
+* [getReserveRatio](_wrappers_reserve_.reservewrapper.md#getreserveratio)
 * [isOtherReserveAddress](_wrappers_reserve_.reservewrapper.md#isotherreserveaddress)
 * [isSpender](_wrappers_reserve_.reservewrapper.md#isspender)
 * [tobinTaxStalenessThreshold](_wrappers_reserve_.reservewrapper.md#tobintaxstalenessthreshold)
@@ -198,11 +199,33 @@ Name | Type |
 
 ___
 
+###  getReserveRatio
+
+• **getReserveRatio**: *function* = proxyCall(this.contract.methods.getReserveRatio, undefined, valueToBigNumber)
+
+*Defined in [contractkit/src/wrappers/Reserve.ts:62](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Reserve.ts#L62)*
+
+Returns the reserve cGLD balance.
+
+**`returns`** cGLD balance.
+
+#### Type declaration:
+
+▸ (...`args`: InputArgs): *Promise‹Output›*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`...args` | InputArgs |
+
+___
+
 ###  isOtherReserveAddress
 
 • **isOtherReserveAddress**: *function* = proxyCall(this.contract.methods.isOtherReserveAddress)
 
-*Defined in [contractkit/src/wrappers/Reserve.ts:71](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Reserve.ts#L71)*
+*Defined in [contractkit/src/wrappers/Reserve.ts:77](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Reserve.ts#L77)*
 
 #### Type declaration:
 
@@ -314,7 +337,7 @@ ___
 
 ▸ **getConfig**(): *Promise‹[ReserveConfig](../interfaces/_wrappers_reserve_.reserveconfig.md)›*
 
-*Defined in [contractkit/src/wrappers/Reserve.ts:61](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Reserve.ts#L61)*
+*Defined in [contractkit/src/wrappers/Reserve.ts:67](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Reserve.ts#L67)*
 
 Returns current configuration parameters.
 
@@ -326,7 +349,7 @@ ___
 
 ▸ **getSpenders**(): *Promise‹[Address](../modules/_base_.md#address)[]›*
 
-*Defined in [contractkit/src/wrappers/Reserve.ts:73](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Reserve.ts#L73)*
+*Defined in [contractkit/src/wrappers/Reserve.ts:79](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Reserve.ts#L79)*
 
 **Returns:** *Promise‹[Address](../modules/_base_.md#address)[]›*
 
