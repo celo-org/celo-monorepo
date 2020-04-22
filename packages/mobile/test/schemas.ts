@@ -28,6 +28,7 @@ export const vNeg1Schema = {
     recentPhoneNumbers: undefined,
     recipientCache: undefined,
     recentRecipients: [],
+    recentPayments: [],
   },
   recipients: {
     recipientCache: {},

@@ -22,7 +22,6 @@ export enum Actions {
 export interface StoreLatestInRecentsAction {
   type: Actions.STORE_LATEST_IN_RECENTS
   recipient: Recipient
-  amount: BigNumber
 }
 
 export interface SendPaymentOrInviteAction {
@@ -49,13 +48,9 @@ export type ActionTypes =
   | SendPaymentOrInviteSuccessAction
   | SendPaymentOrInviteFailureAction
 
-export const storeLatestInRecents = (
-  recipient: Recipient,
-  amount: BigNumber
-): StoreLatestInRecentsAction => ({
+export const storeLatestInRecents = (recipient: Recipient): StoreLatestInRecentsAction => ({
   type: Actions.STORE_LATEST_IN_RECENTS,
   recipient,
-  amount,
 })
 
 export const handleBarcodeDetected = (data: QrCode) => ({

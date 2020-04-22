@@ -41,10 +41,7 @@ export const sendReducer = (
       }
     }
     case Actions.SEND_PAYMENT_OR_INVITE:
-      return {
-        ...state,
-        isSending: true,
-      }
+      return sendPaymentOrInvite(state, action.amount)
     case Actions.SEND_PAYMENT_OR_INVITE_SUCCESS:
     case Actions.SEND_PAYMENT_OR_INVITE_FAILURE:
       return {
@@ -52,14 +49,25 @@ export const sendReducer = (
         isSending: false,
       }
     case Actions.STORE_LATEST_IN_RECENTS:
-      return storeLatestRecentReducer(state, action.recipient, action.amount)
+      return storeLatestRecentReducer(state, action.recipient)
 
     default:
       return state
   }
 }
 
-const storeLatestRecentReducer = (state: State, newRecipient: Recipient, amount: BigNumber) => {
+const sendPaymentOrInvite = (state: State, amount: BigNumber) => {
+  const latestPayment = { timestamp: Date.now(), amount }
+  const recentPayments = [...state.recentPayments, latestPayment]
+
+  return {
+    ...state,
+    isSending: true,
+    recentPayments,
+  }
+}
+
+const storeLatestRecentReducer = (state: State, newRecipient: Recipient) => {
   const recentRecipients = [
     newRecipient,
     ...state.recentRecipients.filter(
@@ -67,13 +75,8 @@ const storeLatestRecentReducer = (state: State, newRecipient: Recipient, amount:
     ),
   ].slice(0, RECENT_RECIPIENTS_TO_STORE)
 
-  // TODO(erdal) should we separate this?
-  const latestPayment = { timestamp: Date.now(), amount }
-  const recentPayments = [...state.recentPayments, latestPayment]
-
   return {
     ...state,
     recentRecipients,
-    recentPayments,
   }
 }
