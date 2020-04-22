@@ -31,6 +31,7 @@ spec:
         - -c
         args:
         - |
+           sleep 5
            mix cmd --app indexer iex -S mix | sed 's/^iex(1)> //'
         ports:
         - name: http
