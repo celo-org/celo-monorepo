@@ -144,7 +144,10 @@ const DefaultConfig = {
     tobinTaxReserveRatio: toFixed(0).toFixed(), // Tobin tax turned off to start
     dailySpendingRatio: toFixed(0.05).toFixed(), // 5%
     spenders: [],
-    otherAddresses: ['0x246f4599eFD3fA67AC44335Ed5e749E518Ffd8bB'],
+    otherAddresses: [
+      '0x246f4599eFD3fA67AC44335Ed5e749E518Ffd8bB',
+      '0x298FbD6dad2Fc2cB56d7E37d8aCad8Bf07324f67',
+    ],
     assetAllocationSymbols: ['cGLD', 'BTC', 'ETH', 'DAI'],
     assetAllocationWeights: [0.5, 0.3, 0.15, 0.05],
   },
