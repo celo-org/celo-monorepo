@@ -1,3 +1,4 @@
+import BigNumber from 'bignumber.js'
 import { areRecipientsEquivalent, Recipient } from 'src/recipients/recipient'
 import { getRehydratePayload, REHYDRATE, RehydrateAction } from 'src/redux/persist-helper'
 import { Actions, ActionTypes } from 'src/send/actions'
@@ -5,14 +6,24 @@ import { Actions, ActionTypes } from 'src/send/actions'
 // Sets the limit of recent recipients we want to store
 const RECENT_RECIPIENTS_TO_STORE = 8
 
+// We need to know the last 24 hours of payments (for compliance reasons)
+export interface PaymentInfo {
+  timestamp: number
+  amount: BigNumber
+}
+
 export interface State {
   isSending: boolean
   recentRecipients: Recipient[]
+  // keep a list of recent (last 24 hours) payments
+  // TODO(erdal) when do we clean this up?
+  recentPayments: PaymentInfo[]
 }
 
 const initialState = {
   isSending: false,
   recentRecipients: [],
+  recentPayments: [],
 }
 
 export const sendReducer = (
@@ -41,22 +52,28 @@ export const sendReducer = (
         isSending: false,
       }
     case Actions.STORE_LATEST_IN_RECENTS:
-      return storeLatestRecentReducer(state, action.recipient)
+      return storeLatestRecentReducer(state, action.recipient, action.amount)
 
     default:
       return state
   }
 }
 
-const storeLatestRecentReducer = (state: State, newRecipient: Recipient) => {
+const storeLatestRecentReducer = (state: State, newRecipient: Recipient, amount: BigNumber) => {
   const recentRecipients = [
     newRecipient,
     ...state.recentRecipients.filter(
       (existingRecipient) => !areRecipientsEquivalent(newRecipient, existingRecipient)
     ),
   ].slice(0, RECENT_RECIPIENTS_TO_STORE)
+
+  // TODO(erdal) should we separate this?
+  const latestPayment = { timestamp: Date.now(), amount }
+  const recentPayments = [...state.recentPayments, latestPayment]
+
   return {
     ...state,
     recentRecipients,
+    recentPayments,
   }
 }

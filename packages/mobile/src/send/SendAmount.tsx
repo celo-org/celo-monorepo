@@ -58,15 +58,20 @@ import {
   RecipientKind,
 } from 'src/recipients/recipient'
 import { RootState } from 'src/redux/reducers'
+import { PaymentInfo } from 'src/send/reducers'
+import { getRecentPayments } from 'src/send/selectors'
 import { ConfirmationInput } from 'src/send/SendConfirmation'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { fetchDollarBalance } from 'src/stableToken/actions'
+import { timeDeltaInHours } from 'src/utils/time'
 import { withDecimalSeparator } from 'src/utils/withDecimalSeparator'
 
 const AmountInput = withDecimalSeparator(
   withTextInputLabeling<ValidatedTextInputProps<DecimalValidatorProps>>(ValidatedTextInput)
 )
 const CommentInput = withTextInputLabeling<TextInputProps>(TextInput)
+
+const DAILY_PAYMENT_LIMIT_USD: BigNumber = new BigNumber(500)
 
 interface State {
   amount: string
@@ -90,6 +95,7 @@ interface StateProps {
   feeType: FeeType | null
   localCurrencyCode: LocalCurrencyCode
   localCurrencyExchangeRate: string | null | undefined
+  recentPayments: PaymentInfo[]
 }
 
 interface DispatchProps {
@@ -135,6 +141,8 @@ const mapStateToProps = (state: RootState, ownProps: NavigationInjectedProps): S
   const { navigation } = ownProps
   const { e164NumberToAddress } = state.identity
   const feeType = getFeeType(navigation, e164NumberToAddress)
+  const recentPayments = getRecentPayments(state)
+
   return {
     dollarBalance: state.stableToken.balance || '0',
     estimateFeeDollars: getFeeEstimateDollars(state, feeType),
@@ -143,6 +151,7 @@ const mapStateToProps = (state: RootState, ownProps: NavigationInjectedProps): S
     feeType,
     localCurrencyCode: getLocalCurrencyCode(state),
     localCurrencyExchangeRate: getLocalCurrencyExchangeRate(state),
+    recentPayments,
   }
 }
 
@@ -206,6 +215,21 @@ export class SendAmount extends React.Component<Props, State> {
     }
   }
 
+  isPaymentLimitReached = (now: number) => {
+    // we are only interested in the last 24 hours
+    const paymentsLast24Hours = this.props.recentPayments.filter(
+      (p: PaymentInfo) => timeDeltaInHours(now, p.timestamp) < 24
+    )
+
+    const initial = new BigNumber(this.state.amount)
+    const amount: BigNumber = paymentsLast24Hours.reduce(
+      (sum, p: PaymentInfo) => sum.plus(p.amount),
+      initial
+    )
+
+    return amount <= DAILY_PAYMENT_LIMIT_USD
+  }
+
   getRecipient = (): Recipient => {
     return getRecipient(this.props.navigation)
   }
@@ -250,6 +274,13 @@ export class SendAmount extends React.Component<Props, State> {
     const { isDollarBalanceSufficient } = this.isAmountValid()
     if (!isDollarBalanceSufficient) {
       this.props.showError(ErrorMessages.NSF_TO_SEND)
+      return
+    }
+
+    const now = Date.now()
+    const isPaymentLimitReached = this.isPaymentLimitReached(now)
+    if (isPaymentLimitReached) {
+      this.props.showError(ErrorMessages.PAYMENT_LIMIT_REACHED)
       return
     }
 
