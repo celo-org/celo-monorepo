@@ -10,7 +10,7 @@ Occasionally, they may be required when the upgrade is necessary to continue ope
 
 ## Upgrading a non-validating node
 
-Use these instructions to update non-validating nodes, such as your account node or your attestaion node on the Baklava testnet. Also use these instructions to upgrade your proxy node, but remember not to stop the proxy of a running validator.
+Use these instructions to update non-validating nodes, such as your account node or your attestation node on the Baklava testnet. Also use these instructions to upgrade your proxy node, but remember not to stop the proxy of a running validator.
 
 ### Pull the latest Docker image
 
