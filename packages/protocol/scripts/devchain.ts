@@ -221,7 +221,7 @@ function deployReleaseGold(releaseGoldContracts: string) {
   cmdArgs.push('--grants')
   cmdArgs.push(releaseGoldContracts)
   cmdArgs.push('--start_gold')
-  cmdArgs.push('10')
+  cmdArgs.push('1')
   cmdArgs.push('--deployed_grants')
   // Random file name to prevent rewriting to it
   cmdArgs.push('/tmp/deployedGrants' + Math.floor(1000 * Math.random()) + '.json')
