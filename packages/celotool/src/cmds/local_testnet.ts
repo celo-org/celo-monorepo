@@ -295,7 +295,7 @@ export const handler = async (argv: LocalTestnetArgs) => {
       `  * ${instance.name} (pid:${instance.pid}) is listening on ${getRpcUrl(instance)}`
     )
   }
-  console.info('\nPress CTRL+C to quit')
+  console.info('\nPress CTRL+D to quit')
 
   await repl(gethConfig)
   await hooks.after()
