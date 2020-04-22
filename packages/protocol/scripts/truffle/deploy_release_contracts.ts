@@ -91,6 +91,8 @@ async function handleGrant(releaseGoldConfig: any, currGrant: number) {
   const weiAmountReleasedPerPeriod = new BigNumber(
     web3.utils.toWei(releaseGoldConfig.amountReleasedPerPeriod.toString())
   )
+  const totalValue = weiAmountReleasedPerPeriod.multipliedBy(releaseGoldConfig.numReleasePeriods)
+  const adjustedAmountPerPeriod = totalValue.sub(startGold).div(releaseGoldConfig.numReleasePeriods)
 
   const releaseGoldTxHash = await _setInitialProxyImplementation(
     web3,
@@ -99,16 +101,13 @@ async function handleGrant(releaseGoldConfig: any, currGrant: number) {
     'ReleaseGold',
     {
       from: fromAddress,
-      value: weiAmountReleasedPerPeriod
-        .multipliedBy(releaseGoldConfig.numReleasePeriods)
-        .sub(startGold)
-        .toFixed(),
+      value: totalValue.sub(startGold).toFixed(),
     },
     Math.round(releaseStartTime),
     releaseGoldConfig.releaseCliffTime,
     releaseGoldConfig.numReleasePeriods,
     releaseGoldConfig.releasePeriod,
-    web3.utils.toHex(weiAmountReleasedPerPeriod),
+    adjustedAmountPerPeriod.toFixed(),
     releaseGoldConfig.revocable,
     releaseGoldConfig.beneficiary,
     releaseGoldConfig.releaseOwner,
@@ -158,7 +157,6 @@ async function checkBalance(releaseGoldConfig: any) {
   )
   const grantDeploymentCost = weiAmountReleasedPerPeriod
     .multipliedBy(releaseGoldConfig.numReleasePeriods)
-    .plus(startGold)
     .plus(ONE_CGLD) // Tx Fees
     .toFixed()
   while (true) {
@@ -311,24 +309,16 @@ async function handleJSONFile(err, data) {
     })
   }
 
-  const totalGoldGrant = grants.reduce((sum: number, curr: any) => {
+  const totalValue = grants.reduce((sum: number, curr: any) => {
     return sum + Number(curr.amountReleasedPerPeriod) * Number(curr.numReleasePeriods)
   }, 0)
-  const totalTransferFees = Number(argv.start_gold) * Number(grants.length)
-  const totalValue = new BigNumber(totalTransferFees + totalGoldGrant)
   const fromBalance = new BigNumber(await web3.eth.getBalance(fromAddress))
   if (!argv.yesreally) {
     const response = await prompts({
       type: 'confirm',
       name: 'confirmation',
       message:
-        'Grants in provided json would send ' +
-        totalGoldGrant +
-        'cGld and ' +
-        totalTransferFees +
-        'cGld in transfer fees, totalling ' +
-        totalValue +
-        'cGld.\nIs this OK (y/n)?',
+        'Grants in provided json would send ' + totalValue.toString() + 'cGld.\nIs this OK (y/n)?',
     })
 
     if (!response.confirmation) {
