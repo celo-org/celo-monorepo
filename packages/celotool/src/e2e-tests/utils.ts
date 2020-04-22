@@ -25,7 +25,7 @@ import {
   resetDataDir,
   restoreDatadir,
   snapshotDatadir,
-  spawnWithLog,
+  startBootnode,
   startGeth,
   writeGenesis,
 } from '../lib/geth'
@@ -154,24 +154,6 @@ export function sleep(seconds: number, verbose = false) {
   return new Promise<void>((resolve) => setTimeout(resolve, seconds * 1000))
 }
 
-export async function startBootnode(
-  bootnodeBinaryPath: string,
-  mnemonic: string,
-  gethConfig: GethRunConfig,
-  verbose: boolean
-) {
-  const bootnodePrivateKey = getPrivateKeysFor(AccountType.BOOTNODE, mnemonic, 1)[0]
-  const bootnodeLog = joinPath(gethConfig.runPath, 'bootnode.log')
-  const bootnodeArgs = [
-    '--verbosity=4',
-    `--nodekeyhex=${bootnodePrivateKey}`,
-    `--networkid=${gethConfig.networkId}`,
-  ]
-
-  spawnWithLog(bootnodeBinaryPath, bootnodeArgs, bootnodeLog, verbose)
-  return getEnodeAddress(privateKeyToPublicKey(bootnodePrivateKey), '127.0.0.1', 30301)
-}
-
 export async function assertRevert(promise: any, errorMessage: string = ''): Promise<void> {
   try {
     await promise
@@ -216,7 +198,7 @@ export function getContext(gethConfig: GethRunConfig, verbose: boolean = verbose
 
   gethConfig.gethRepoPath = argv.localgeth || '/tmp/geth'
   const gethBinaryPath = `${gethConfig.gethRepoPath}/build/bin/geth`
-  const bootnodeBinaryPath = `${gethConfig.gethRepoPath}/build/bin/bootnode`
+  const bootnodePrivateKey = getPrivateKeysFor(AccountType.BOOTNODE, mnemonic, 1)[0]
 
   const before = async () => {
     if (!argv.localgeth) {
@@ -239,7 +221,7 @@ export function getContext(gethConfig: GethRunConfig, verbose: boolean = verbose
     let bootnodeEnode: string = ''
 
     if (gethConfig.useBootnode) {
-      bootnodeEnode = await startBootnode(bootnodeBinaryPath, mnemonic, gethConfig, verbose)
+      bootnodeEnode = await startBootnode(bootnodePrivateKey, gethConfig, undefined, verbose)
     }
 
     let validatorIndex = 0
@@ -324,7 +306,7 @@ export function getContext(gethConfig: GethRunConfig, verbose: boolean = verbose
 
     if (gethConfig.useBootnode) {
       await killBootnode()
-      await startBootnode(bootnodeBinaryPath, mnemonic, gethConfig, verbose)
+      await startBootnode(bootnodePrivateKey, gethConfig, undefined, verbose)
     }
 
     // just in case

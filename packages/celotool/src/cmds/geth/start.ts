@@ -1,13 +1,21 @@
 /* tslint:disable: no-console */
-import { addCeloGethMiddleware } from 'src/lib/utils'
+import { addCeloGethMiddleware, strip0x } from 'src/lib/utils'
 import yargs from 'yargs'
 import {
   AccountType,
+  ConsensusType,
   getPrivateKeysFor,
   getValidatorsInformation,
+  privateKeyToAddress,
   privateKeyToPublicKey,
 } from '../../lib/generate_utils'
-import { getEnodeAddress, migrateContracts, runGethNodes } from '../../lib/geth'
+import {
+  connectPeers,
+  getEnodeAddress,
+  migrateContracts,
+  runGethNodes,
+  startBootnode,
+} from '../../lib/geth'
 import { GethInstanceConfig } from '../../lib/interfaces/geth-instance-config'
 import { GethRunConfig } from '../../lib/interfaces/geth-run-config'
 import { GethArgv } from '../geth'
@@ -156,12 +164,17 @@ export const handler = async (argv: StartArgv) => {
     gethRepoPath: gethDir,
     verbosity,
     networkId,
+    useBootnode: withProxy,
     migrate,
     migrateTo,
     network,
     instances: [],
     genesisConfig: {
       blockTime,
+      epoch: 10,
+      requestTimeout: 3000,
+      chainId: networkId,
+      consensusType: ConsensusType.ISTANBUL,
     },
   }
 
@@ -171,13 +184,29 @@ export const handler = async (argv: StartArgv) => {
 
   const proxyPrivateKeys = getPrivateKeysFor(AccountType.PROXY, mnemonic, instances)
 
+  const bootnodePrivateKey = getPrivateKeysFor(AccountType.BOOTNODE, mnemonic, 1)[0]
+
+  let bootnodeEnode = null
+
+  const bootnodePort = 30300
+
+  if (withProxy) {
+    bootnodeEnode = getEnodeAddress(
+      privateKeyToPublicKey(bootnodePrivateKey),
+      '127.0.0.1',
+      bootnodePort
+    )
+  }
+
   for (let x = 0; x < instances; x++) {
     const node: GethInstanceConfig = {
       name: `${x}-node`,
       validating: mining,
+      isProxy: !mining,
       syncmode: syncMode,
-      ethstats: withProxy ? undefined : ethstats,
+      ethstats: withProxy ? 'proxy_override' : ethstats,
       privateKey: validatorPrivateKeys[x],
+      etherbase: strip0x(privateKeyToAddress(validatorPrivateKeys[x])),
       port: port + x,
       rpcport: rpcport + x * 2,
       wsport: wsport + x * 2,
@@ -190,28 +219,30 @@ export const handler = async (argv: StartArgv) => {
         name: `${x}-proxy`,
         validating: false,
         isProxy: true,
+        isProxied: false,
         syncmode: syncMode,
         ethstats,
-        port: port + x + 1000,
-        proxyport: port + x + 333,
+        privateKey: proxyPrivateKeys[x],
+        proxiedValidatorAddress: node.etherbase,
+        bootnodeEnode: bootnodeEnode ? bootnodeEnode : '',
+        port: port + x * 3 + 1000,
+        rpcport: port + x * 3 + 250,
+        proxyport: port + x * 3 + 333,
       }
-
-      proxy.proxiedValidatorAddress = validators[x].address
-      proxy.proxy = validators[x].address
-      proxy.isProxy = true
 
       node.isProxied = true
       node.proxyAllowPrivateIp = true
       node.proxies = [
         getEnodeAddress(privateKeyToPublicKey(proxyPrivateKeys[x]), '127.0.0.1', proxy.proxyport!),
-        getEnodeAddress(privateKeyToPublicKey(validatorPrivateKeys[x]), '127.0.0.1', node.port),
+        getEnodeAddress(privateKeyToPublicKey(proxyPrivateKeys[x]), '127.0.0.1', proxy.port),
       ]
     }
 
-    gethConfig.instances.push(node)
     if (proxy) {
       gethConfig.instances.push(proxy)
     }
+
+    gethConfig.instances.push(node)
   }
 
   await runGethNodes({
@@ -219,6 +250,12 @@ export const handler = async (argv: StartArgv) => {
     validators,
     verbose,
   })
+
+  if (withProxy) {
+    await startBootnode(bootnodePrivateKey, gethConfig, bootnodePort, verbose)
+
+    await connectPeers(gethConfig.instances.filter((i) => i.isProxy))
+  }
 
   if (gethConfig.migrate || gethConfig.migrateTo) {
     const attestationKeys = getPrivateKeysFor(AccountType.ATTESTATION, mnemonic, instances)

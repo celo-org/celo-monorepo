@@ -22,13 +22,14 @@ import {
   AccountType,
   generateGenesis,
   generatePrivateKey,
+  privateKeyToAddress,
   privateKeyToPublicKey,
   Validator,
 } from './generate_utils'
 import { retrieveClusterIPAddress, retrieveIPAddress } from './helm_deploy'
 import { GethInstanceConfig } from './interfaces/geth-instance-config'
 import { GethRunConfig } from './interfaces/geth-run-config'
-import { ensure0x, spawnCmd, spawnCmdWithExitOnFailure } from './utils'
+import { ensure0x, spawnCmd, spawnCmdWithExitOnFailure, strip0x } from './utils'
 import { getTestnetOutputs } from './vm-testnet-utils'
 
 export async function unlockAccount(
@@ -717,7 +718,7 @@ export function getLogFilename(runPath: string, instance: GethInstanceConfig) {
 }
 
 function getDatadir(runPath: string, instance: GethInstanceConfig) {
-  const dir = path.join(getInstanceDir(runPath, instance), 'datadir')
+  const dir = getInstanceDir(runPath, instance)
   // @ts-ignore
   fs.mkdirSync(dir, { recursive: true })
   return dir
@@ -741,7 +742,9 @@ export async function initAndStartGeth(
   const genesisPath = path.join(gethConfig.runPath, 'genesis.json')
   await init(gethBinaryPath, datadir, genesisPath, verbose)
 
-  if (instance.privateKey) {
+  // import the key this way only on validators
+  // proxies need another way of importing the key
+  if (instance.privateKey && instance.validating) {
     await importPrivateKey(gethConfig, gethBinaryPath, instance, verbose)
   }
 
@@ -781,10 +784,8 @@ export async function importPrivateKey(
   const args = [
     'account',
     'import',
-    '--datadir',
-    getDatadir(getConfig.runPath, instance),
-    '--password',
-    '/dev/null',
+    `--datadir=${getDatadir(getConfig.runPath, instance)}`,
+    '--password=/dev/null',
     keyFile,
   ]
 
@@ -818,6 +819,48 @@ export async function getEnode(peer: string, ws: boolean = false) {
   }
 
   return nodeInfo.enode
+}
+
+export async function startBootnode(
+  bootnodePrivateKey: string,
+  gethConfig: GethRunConfig,
+  bootnodePort: number = 30301,
+  verbose: boolean = false
+) {
+  const bootnodeBinaryPath = path.join(gethConfig.gethRepoPath!, 'build/bin/bootnode')
+  const bootnodeLog = path.join(gethConfig.runPath, 'bootnode.log')
+
+  if (verbose) {
+    console.log('Starting bootnode...')
+  }
+  const bootnodeArgs = [
+    `--verbosity=${gethConfig.verbosity}`,
+    `--nodekeyhex=${bootnodePrivateKey}`,
+    `--networkid=${gethConfig.networkId}`,
+    `--addr=:${bootnodePort}`,
+  ]
+
+  const bootnodeProcess = spawnWithLog(bootnodeBinaryPath, bootnodeArgs, bootnodeLog, verbose)
+
+  bootnodeProcess.on('error', (err) => {
+    throw new Error(`Bootnode crashed! Error: ${err}`)
+  })
+
+  const secondsToWait = 5
+
+  const isOpen = await waitForPortOpen('localhost', bootnodePort, secondsToWait)
+  if (!isOpen) {
+    console.error(`bootnode: port ${bootnodePort} didn't open after ${secondsToWait} seconds`)
+    process.exit(1)
+  } else if (verbose) {
+    console.info(`bootnode: port open ${bootnodePort}`)
+  }
+
+  if (verbose) {
+    console.log(`Started bootnode on port ${bootnodePort}`)
+  }
+
+  return getEnodeAddress(privateKeyToPublicKey(bootnodePrivateKey), '127.0.0.1', 30301)
 }
 
 export async function addStaticPeers(datadir: string, peers: string[], verbose: boolean) {
@@ -881,20 +924,15 @@ export async function startGeth(
   }
 
   const gethArgs = [
-    '--datadir',
-    datadir,
-    '--syncmode',
-    syncmode,
+    `--datadir=${datadir}`,
+    `--syncmode=${syncmode}`,
     '--debug',
-    '--port',
-    port.toString(),
-    '--networkid',
-    gethConfig.networkId.toString(),
+    `--port=${port.toString()}`,
+    `--networkid=${gethConfig.networkId.toString()}`,
     `--verbosity=${verbosity}`,
     '--consoleoutput=stdout', // Send all logs to stdout
     '--consoleformat=term',
-    '--nat',
-    'extip:127.0.0.1',
+    `--nat=extip:127.0.0.1`,
     '--allow-insecure-unlock', // geth1.9 to use http w/unlocking
     '--gcmode=archive', // Needed to retrieve historical state
   ]
@@ -902,8 +940,7 @@ export async function startGeth(
   if (rpcport) {
     gethArgs.push(
       '--rpc',
-      '--rpcport',
-      rpcport.toString(),
+      `--rpcport=${rpcport.toString()}`,
       '--rpccorsdomain=*',
       '--rpcvhosts=*',
       '--rpcapi=eth,net,web3,debug,admin,personal,txpool,istanbul'
@@ -914,19 +951,17 @@ export async function startGeth(
     gethArgs.push(
       '--wsorigins=*',
       '--ws',
-      '--wsport',
-      wsport.toString(),
+      `--wsport=${wsport.toString()}`,
       '--wsapi=eth,net,web3,debug,admin,personal,txpool,istanbul'
     )
   }
 
   if (etherbase) {
-    gethArgs.push('--etherbase', etherbase)
+    gethArgs.push(`--etherbase=${etherbase}`)
   }
 
   if (lightserv) {
-    gethArgs.push('--light.serve=90')
-    gethArgs.push('--light.maxpeers=10')
+    gethArgs.push('--light.serve=90', '--light.maxpeers=10')
   } else if (syncmode === 'full' || syncmode === 'fast') {
     gethArgs.push('--light.serve=0')
   }
@@ -936,49 +971,41 @@ export async function startGeth(
   }
 
   if (validating) {
-    gethArgs.push('--mine', '--minerthreads=10', `--nodekeyhex=${privateKey}`)
+    gethArgs.push('--mine', '--miner.threads=10')
 
     if (validatingGasPrice) {
       gethArgs.push(`--miner.gasprice=${validatingGasPrice}`)
     }
 
-    gethArgs.push(`--istanbul.blockperiod`, blocktime.toString())
+    gethArgs.push(`--istanbul.blockperiod=${blocktime.toString()}`)
+    gethArgs.push(`--istanbul.requesttimeout=3000`)
 
-    if (isProxied) {
-      gethArgs.push('--proxy.proxied')
-    }
+    gethArgs.push('--password=/dev/null', `--unlock=${strip0x(privateKeyToAddress(privateKey))}`)
   } else if (isProxy) {
     gethArgs.push('--proxy.proxy')
+    gethArgs.push(`--proxy.proxiedvalidatoraddress=${instance.proxiedValidatorAddress}`)
     if (proxyport) {
       gethArgs.push(`--proxy.internalendpoint=:${proxyport.toString()}`)
     }
-    gethArgs.push(`--proxy.proxiedvalidatoraddress=${instance.proxiedValidatorAddress}`)
-    // gethArgs.push(`--nodekeyhex=${privateKey}`)
+    gethArgs.push(`--nodekeyhex=${privateKey}`)
   }
 
   if (bootnodeEnode) {
     gethArgs.push(`--bootnodes=${bootnodeEnode}`)
-  } else {
-    gethArgs.push('--nodiscover')
   }
 
   if (isProxied && instance.proxies) {
+    gethArgs.push('--nodiscover')
+    gethArgs.push('--proxy.proxied')
+
     if (proxyAllowPrivateIp) {
-      gethArgs.push('--proxy.allowprivateip=true')
+      gethArgs.push('--proxy.allowprivateip')
     }
     gethArgs.push(`--proxy.proxyenodeurlpair=${instance.proxies[0]!};${instance.proxies[1]!}`)
   }
 
-  if (privateKey) {
-    gethArgs.push('--password=/dev/null', `--unlock=0`)
-  }
-
   if (ethstats) {
     gethArgs.push(`--ethstats=${instance.name}@${ethstats}`)
-
-    if (isProxied && !isProxy) {
-      gethArgs.push('--etherbase=0')
-    }
   }
 
   const gethProcess = spawnWithLog(gethBinaryPath, gethArgs, `${datadir}/logs.txt`, verbose)
@@ -989,6 +1016,18 @@ export async function startGeth(
   })
 
   const secondsToWait = 30
+
+  if (port) {
+    const isOpen = await waitForPortOpen('localhost', port, secondsToWait)
+    if (!isOpen) {
+      console.error(
+        `geth:${instance.name}: port ${port} didn't open after ${secondsToWait} seconds`
+      )
+      process.exit(1)
+    } else if (verbose) {
+      console.info(`geth:${instance.name}: port open ${port}`)
+    }
+  }
 
   // Give some time for geth to come up
   if (rpcport) {
@@ -1015,8 +1054,21 @@ export async function startGeth(
     }
   }
 
+  if (proxyport) {
+    const isOpen = await waitForPortOpen('localhost', proxyport, secondsToWait)
+    if (!isOpen) {
+      console.error(
+        `geth:${instance.name}: proxy port ${proxyport} didn't open after ${secondsToWait} seconds`
+      )
+      process.exit(1)
+    } else if (verbose) {
+      console.info(`geth:${instance.name}: proxy port open ${proxyport}`)
+    }
+  }
+
   console.log(
     `${instance.name}: running.`,
+    port ? `Port: ${port}` : '',
     rpcport ? `RPC: ${rpcport}` : '',
     wsport ? `WS: ${wsport}` : '',
     proxyport ? `PROXY: ${proxyport}` : ''
@@ -1126,9 +1178,13 @@ export function spawnWithLog(cmd: string, args: string[], logsFilepath: string, 
 }
 
 export async function connectPeers(instances: GethInstanceConfig[], verbose: boolean = false) {
-  const admins = instances.map(({ wsport, rpcport }) => {
-    return new Admin(`${rpcport ? 'http' : 'ws'}://localhost:${rpcport || wsport}`)
-  })
+  const admins = instances
+    // do not connect proxied peers because they only connect to the proxies
+    .filter((i) => !i.isProxied)
+    // map out admin interfaces of the instances
+    .map(({ wsport, rpcport }) => {
+      return new Admin(`${rpcport ? 'http' : 'ws'}://127.0.0.1:${rpcport || wsport}`)
+    })
 
   await Promise.all(
     admins.map(async (admin, i) => {
