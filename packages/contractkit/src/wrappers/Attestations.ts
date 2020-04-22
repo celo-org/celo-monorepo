@@ -250,11 +250,11 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     return withAttestationServiceURLs.map((_) => (_.isValid ? null : _.issuer)).filter(notEmpty)
   }
 
-  private async isIssuerRunningAttestationService(arg: {
+  private isIssuerRunningAttestationService = async (arg: {
     blockNumber: number
     issuer: string
     metadataURL: string
-  }): Promise<AttestationServiceRunningCheckResult> {
+  }): Promise<AttestationServiceRunningCheckResult> => {
     try {
       const metadata = await IdentityMetadataWrapper.fetchFromURL(this.kit, arg.metadataURL)
       const attestationServiceURLClaim = metadata.findClaim(ClaimTypes.ATTESTATION_SERVICE_URL)

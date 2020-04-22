@@ -37,6 +37,13 @@ export default class TestAttestationService extends BaseCommand {
 
     const accounts = await this.kit.contracts.getAccounts()
     const account = await accounts.signerToAccount(address)
+
+    const hasAuthorizedAttestationSigner = await accounts.hasAuthorizedAttestationSigner(account)
+    if (!hasAuthorizedAttestationSigner) {
+      console.info('Account has not authorized an attestation signer')
+      return
+    }
+
     const metadataURL = await accounts.getMetadataURL(account)
 
     if (!metadataURL) {

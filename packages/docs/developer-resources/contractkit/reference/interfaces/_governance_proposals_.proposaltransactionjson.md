@@ -1,5 +1,17 @@
 # Interface: ProposalTransactionJSON
 
+JSON encoding of a proposal transaction.
+
+Example:
+```json
+{
+  "contract": "Election",
+  "function": "setElectableValidators",
+  "args": [ "1", "120" ],
+  "value": "0"
+}
+```
+
 ## Hierarchy
 
 * **ProposalTransactionJSON**
@@ -20,7 +32,7 @@
 
 • **args**: *any[]*
 
-*Defined in [contractkit/src/governance/proposals.ts:26](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proposals.ts#L26)*
+*Defined in [contractkit/src/governance/proposals.ts:39](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proposals.ts#L39)*
 
 ___
 
@@ -28,7 +40,7 @@ ___
 
 • **contract**: *[CeloContract](../enums/_base_.celocontract.md)*
 
-*Defined in [contractkit/src/governance/proposals.ts:24](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proposals.ts#L24)*
+*Defined in [contractkit/src/governance/proposals.ts:37](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proposals.ts#L37)*
 
 ___
 
@@ -36,7 +48,7 @@ ___
 
 • **function**: *string*
 
-*Defined in [contractkit/src/governance/proposals.ts:25](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proposals.ts#L25)*
+*Defined in [contractkit/src/governance/proposals.ts:38](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proposals.ts#L38)*
 
 ___
 
@@ -44,7 +56,7 @@ ___
 
 • **params**? : *Record‹string, any›*
 
-*Defined in [contractkit/src/governance/proposals.ts:27](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proposals.ts#L27)*
+*Defined in [contractkit/src/governance/proposals.ts:40](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proposals.ts#L40)*
 
 ___
 
@@ -52,4 +64,4 @@ ___
 
 • **value**: *string*
 
-*Defined in [contractkit/src/governance/proposals.ts:28](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proposals.ts#L28)*
+*Defined in [contractkit/src/governance/proposals.ts:41](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/governance/proposals.ts#L41)*
