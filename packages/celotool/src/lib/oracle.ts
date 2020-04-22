@@ -35,7 +35,7 @@ async function helmParameters(celoEnv: string) {
     `--set image.tag=${fetchEnv(envVar.ORACLE_DOCKER_IMAGE_TAG)}`,
     `--set kube.authTokenName=${kubeAuthTokenName}`,
     `--set oracle.replicas=${replicas}`,
-    `--set oracle.web3ProviderUrl=${getFornoUrl(celoEnv)}`,
+    `--set oracle.rpcProviderUrl=${getFornoUrl(celoEnv)}`,
   ].concat(await oracleIdentityHelmParameters(celoEnv))
 }
 
