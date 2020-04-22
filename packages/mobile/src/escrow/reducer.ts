@@ -43,7 +43,8 @@ export const getReclaimableEscrowPayments = createSelector(
     const currUnixTime = Date.now() / 1000
     return sentPayments.filter((payment) => {
       const paymentExpiryTime = +payment.timestamp + +payment.expirySeconds
-      return currUnixTime >= paymentExpiryTime
+      return true
+      // return currUnixTime >= paymentExpiryTime
     })
   }
 )
