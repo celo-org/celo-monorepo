@@ -14,7 +14,7 @@ export function computeBlindedSignature(base64BlindedMessage: string) {
       )
     ).toString('base64')
   } catch (e) {
-    console.error(ErrorMessages.SALT_COMPUTATION_FAILURE, e)
+    console.error(ErrorMessages.SIGNATURE_COMPUTATION_FAILURE, e)
     throw e
   }
 }

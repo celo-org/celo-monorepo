@@ -1,8 +1,19 @@
 ---
-description: Tests whether the account has setup the attestation service properly by calling the test endpoint on it
+description: Outputs the set of validators currently participating in BFT and which ones are participating in Celo's lightweight identity protocol
 ---
 
 ## Commands
+
+### Current-attestation-services
+
+Outputs the set of validators currently participating in BFT and which ones are participating in Celo's lightweight identity protocol
+
+```
+USAGE
+  $ celocli identity:current-attestation-services
+```
+
+_See code: [packages/cli/src/commands/identity/current-attestation-services.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/identity/current-attestation-services.ts)_
 
 ### Test-attestation-service
 
