@@ -20,24 +20,17 @@ let ReleaseGoldMultiSig: ReleaseGoldMultiSigContract
 let ReleaseGoldMultiSigProxy: ReleaseGoldMultiSigProxyContract
 let ReleaseGold: ReleaseGoldContract
 let ReleaseGoldProxy: ReleaseGoldProxyContract
+const ONE_CGLD = web3.utils.toWei('1', 'ether')
+const MAINNET_START_TIME = new Date('22 April 2020 16:00:00 UTC').getTime() / 1000
 
 async function handleGrant(releaseGoldConfig: any, currGrant: number) {
   console.info('Processing grant number ' + currGrant)
 
-  // Special mainnet string is intended as MAINNET+X where X is months after mainnet launch.
-  // This is to account for the dynamic start date for mainnet,
-  // and some grants rely on x months post mainnet launch.
-  let releaseStartTime: any
-  if (releaseGoldConfig.releaseStartTime.startsWith('MAINNET')) {
-    const addedMonths = Number(releaseGoldConfig.releaseStartTime.split('+')[1])
-    const date = new Date()
-    if (addedMonths > 0) {
-      date.setDate(date.getDate() + addedMonths * 30)
-    }
-    releaseStartTime = date.getTime() / 1000
-  } else {
-    releaseStartTime = new Date(releaseGoldConfig.releaseStartTime).getTime() / 1000
-  }
+  // Sentinel MAINNET dictates a start time of mainnet launch, April 22 2020 16:00 UTC in this case
+  const releaseStartTime = releaseGoldConfig.releaseStartTime.startsWith('MAINNET')
+    ? MAINNET_START_TIME
+    : new Date(releaseGoldConfig.releaseStartTime).getTime() / 1000
+
   const message =
     'Please review this grant before you deploy:\n\tTotal Grant Value: ' +
     Number(releaseGoldConfig.numReleasePeriods) *
@@ -87,9 +80,23 @@ async function handleGrant(releaseGoldConfig: any, currGrant: number) {
   })
   const releaseGoldProxy = await ReleaseGoldProxy.new({ from: fromAddress })
   const releaseGoldInstance = await ReleaseGold.new({ from: fromAddress })
+
   const weiAmountReleasedPerPeriod = new BigNumber(
     web3.utils.toWei(releaseGoldConfig.amountReleasedPerPeriod.toString())
   )
+
+  let totalValue = weiAmountReleasedPerPeriod.multipliedBy(releaseGoldConfig.numReleasePeriods)
+  if (totalValue.lt(startGold)) {
+    console.info('Total value of grant less than cGLD for beneficiary addreess')
+    process.exit(0)
+  }
+  const adjustedAmountPerPeriod = totalValue
+    .minus(startGold)
+    .div(releaseGoldConfig.numReleasePeriods)
+    .dp(0)
+
+  // Reflect any rounding changes from the division above
+  totalValue = adjustedAmountPerPeriod.multipliedBy(releaseGoldConfig.numReleasePeriods)
 
   const releaseGoldTxHash = await _setInitialProxyImplementation(
     web3,
@@ -98,13 +105,13 @@ async function handleGrant(releaseGoldConfig: any, currGrant: number) {
     'ReleaseGold',
     {
       from: fromAddress,
-      value: weiAmountReleasedPerPeriod.multipliedBy(releaseGoldConfig.numReleasePeriods).toFixed(),
+      value: totalValue.toFixed(),
     },
     Math.round(releaseStartTime),
     releaseGoldConfig.releaseCliffTime,
     releaseGoldConfig.numReleasePeriods,
     releaseGoldConfig.releasePeriod,
-    web3.utils.toHex(weiAmountReleasedPerPeriod),
+    adjustedAmountPerPeriod.toFixed(),
     releaseGoldConfig.revocable,
     releaseGoldConfig.beneficiary,
     releaseGoldConfig.releaseOwner,
@@ -139,13 +146,10 @@ async function handleGrant(releaseGoldConfig: any, currGrant: number) {
 
   deployedGrants.push(releaseGoldConfig.identifier)
   releases.push(record)
+  console.info('Deployed grant', record)
   // Must write to file after every grant to avoid losing info on crash.
   fs.writeFileSync(deployedGrantsFile, JSON.stringify(deployedGrants, null, 1))
-  if (argv.output_file) {
-    fs.writeFileSync(argv.output_file, JSON.stringify(releases, null, 2))
-  } else {
-    console.info('Deployed grant ', record)
-  }
+  fs.writeFileSync(argv.output_file, JSON.stringify(releases, null, 2))
 }
 
 async function checkBalance(releaseGoldConfig: any) {
@@ -154,8 +158,7 @@ async function checkBalance(releaseGoldConfig: any) {
   )
   const grantDeploymentCost = weiAmountReleasedPerPeriod
     .multipliedBy(releaseGoldConfig.numReleasePeriods)
-    .plus(startGold)
-    .plus(web3.utils.toWei('1', 'ether')) // Tx Fees
+    .plus(ONE_CGLD) // Tx Fees
     .toFixed()
   while (true) {
     const fromBalance = new BigNumber(await web3.eth.getBalance(fromAddress))
@@ -189,7 +192,7 @@ async function checkBalance(releaseGoldConfig: any) {
       )
       continue
     }
-    if (fromBalance.gt(web3.utils.toWei('1', 'ether'))) {
+    if (fromBalance.gt(ONE_CGLD)) {
       console.info(
         '\nSending 1 cGLD as a test from ' +
           fromAddress +
@@ -200,7 +203,7 @@ async function checkBalance(releaseGoldConfig: any) {
       await web3.eth.sendTransaction({
         from: fromAddress,
         to: addressResponse.newFromAddress,
-        value: web3.utils.toWei('1', 'ether'),
+        value: ONE_CGLD,
       })
       const confirmResponse = await prompts({
         type: 'confirm',
@@ -217,7 +220,7 @@ async function checkBalance(releaseGoldConfig: any) {
       await web3.eth.sendTransaction({
         from: fromAddress,
         to: addressResponse.newFromAddress,
-        value: fromBalancePostTransfer.minus(web3.utils.toWei('1', 'ether')), // minus Tx Fees
+        value: fromBalancePostTransfer.minus(ONE_CGLD).toFixed(), // minus Tx Fees
       })
     }
     const switchResponse = await prompts({
@@ -307,24 +310,16 @@ async function handleJSONFile(err, data) {
     })
   }
 
-  const totalGoldGrant = grants.reduce((sum: number, curr: any) => {
+  const totalValue = grants.reduce((sum: number, curr: any) => {
     return sum + Number(curr.amountReleasedPerPeriod) * Number(curr.numReleasePeriods)
   }, 0)
-  const totalTransferFees = Number(argv.start_gold) * Number(grants.length)
-  const totalValue = new BigNumber(totalTransferFees + totalGoldGrant)
   const fromBalance = new BigNumber(await web3.eth.getBalance(fromAddress))
   if (!argv.yesreally) {
     const response = await prompts({
       type: 'confirm',
       name: 'confirmation',
       message:
-        'Grants in provided json would send ' +
-        totalGoldGrant +
-        'cGld and ' +
-        totalTransferFees +
-        'cGld in transfer fees, totalling ' +
-        totalValue +
-        'cGld.\nIs this OK (y/n)?',
+        'Grants in provided json would send ' + totalValue.toString() + 'cGld.\nIs this OK (y/n)?',
     })
 
     if (!response.confirmation) {
@@ -416,6 +411,17 @@ module.exports = async (callback: (error?: any) => number) => {
         console.info(chalk.red('Abandoning grant deployment due to user response.'))
         process.exit(0)
       }
+    }
+    try {
+      releases = JSON.parse(fs.readFileSync(argv.output_file, 'utf-8'))
+    } catch (e) {
+      // If this fails, file must be created
+      fs.writeFile(argv.output_file, '', (err) => {
+        if (err) {
+          throw err
+        }
+      })
+      releases = []
     }
     fs.readFile(argv.grants, handleJSONFile)
   } catch (error) {
