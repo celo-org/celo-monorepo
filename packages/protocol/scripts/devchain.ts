@@ -225,6 +225,8 @@ function deployReleaseGold(releaseGoldContracts: string) {
   cmdArgs.push('--deployed_grants')
   // Random file name to prevent rewriting to it
   cmdArgs.push('/tmp/deployedGrants' + Math.floor(1000 * Math.random()) + '.json')
+  cmdArgs.push('--output_file')
+  cmdArgs.push('/tmp/releaseGoldOutput.txt')
   // --yesreally command to bypass prompts
   cmdArgs.push('--yesreally')
   cmdArgs.push('--build_directory')
