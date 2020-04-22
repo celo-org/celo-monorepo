@@ -1,4 +1,4 @@
-import { generateKeys, validateMnemonic } from '@celo/utils/lib/account'
+import { generateKeys, validateMnemonic } from '@celo/utils/src/account'
 import { ensureLeading0x } from '@celo/utils/src/address'
 import BigNumber from 'bignumber.js'
 import * as bip39 from 'react-native-bip39'

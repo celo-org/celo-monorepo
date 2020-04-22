@@ -31239,9 +31239,9 @@ react-native-autocomplete-input@^4.1.0:
   resolved "https://registry.yarnpkg.com/react-native-autocomplete-input/-/react-native-autocomplete-input-4.1.0.tgz#979ece28d891b245ecb967b6d31f1f924445b8ab"
   integrity sha512-Yn4GulZ9F6tde74UUGZHdVFeYWVuL7+EbUZy6kt+QHrzMc5B4OuRop1FT4RyWLpvbySW/vvqYgj9LAmlzkuEqA==
 
-"react-native-bip39@git://github.com/celo-org/react-native-bip39#07bc8a7":
+"react-native-bip39@git://github.com/celo-org/react-native-bip39#0439f00":
   version "2.2.0"
-  resolved "git://github.com/celo-org/react-native-bip39#07bc8a75a0591d32c9cf72f9cac1e8008ec31e37"
+  resolved "git://github.com/celo-org/react-native-bip39#0439f002bea13ff77b1a05a5ebce38645f646016"
   dependencies:
     create-hash "^1.1.0"
     react-native-crypto "^2.0.1"

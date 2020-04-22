@@ -1,4 +1,4 @@
-import { generateMnemonic, MnemonicLanguages, MnemonicStrength } from '@celo/utils/lib/account'
+import { generateMnemonic, MnemonicLanguages, MnemonicStrength } from '@celo/utils/src/account'
 import * as _ from 'lodash'
 import * as bip39 from 'react-native-bip39'
 import { getKey } from 'src/utils/keyStore'

@@ -1,4 +1,4 @@
-import { generateKeys, generateMnemonic, MnemonicStrength } from '@celo/utils/lib/account'
+import { generateKeys, generateMnemonic, MnemonicStrength } from '@celo/utils/src/account'
 import { privateKeyToAddress } from '@celo/utils/src/address'
 import { deriveCEK } from '@celo/utils/src/commentEncryption'
 import * as Sentry from '@sentry/react-native'
@@ -165,7 +165,7 @@ export function* getOrCreateAccount() {
       throw new Error('Failed to generate mnemonic')
     }
 
-    const keys = yield call(generateKeys, mnemonic, bip39)
+    const keys = yield call(generateKeys, mnemonic, undefined, undefined, bip39)
     const privateKey = keys.privateKey
     if (!privateKey) {
       throw new Error('Failed to convert mnemonic to hex')
