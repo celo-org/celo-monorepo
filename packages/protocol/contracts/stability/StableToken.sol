@@ -218,7 +218,11 @@ contract StableToken is
    */
   function _mint(address to, uint256 value) private returns (bool) {
     require(to != address(0), "0 is a reserved address");
-    require(value > 0, "mint value must be > 0");
+    require(value >= 0, "mint value must be >= 0");
+    if (value == 0) {
+      return true;
+    }
+
     uint256 units = _valueToUnits(inflationState.factor, value);
     totalSupply_ = totalSupply_.add(units);
     balances[to] = balances[to].add(units);
