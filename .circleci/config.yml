@@ -810,6 +810,24 @@ jobs:
           name: Minor test of celocli
           command: ./node_modules/.bin/celocli account:new # Small test
 
+    phone-number-privacy-test:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/app
+      - run:
+          name: Run Tests
+          command: yarn --cwd=packages/phone-number-privacy test
+      - run:
+          name: Fail if someone forgot to commit phone-number-privacy docs
+          command: |
+            yarn --cwd=packages/phone-number-privacy docs
+            if [[ $(git status packages/docs/developer-resources/phone-number-privacy --porcelain) ]]; then
+              git --no-pager diff packages/docs/developer-resources/phone-number-privacy
+              echo "There are git differences after generating phone-number-privacy docs"
+              exit 1
+            fi
+
 workflows:
   version: 2
   celo-monorepo-build:
@@ -870,6 +888,10 @@ workflows:
           requires:
             - lint-checks
             - contractkit-test
+      - phone-number-privacy-test:
+          requires:
+            - lint-checks
+
   npm-install-testing-cron-workflow:
     triggers:
       - schedule:
