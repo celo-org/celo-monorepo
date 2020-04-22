@@ -56,7 +56,7 @@ The Celo Wallet application is a fully unmanaged wallet that allows users to sel
 - **Celo Wallet Notification Service:** sends device push notifications when a user receives a payment or requests for payment
 - **Celo Wallet Blockchain API:** provides a GraphQL API to query transactions on the blockchain on a per-account basis, used to implement a users' activity feed.
 
-When an end user downloads the Celo Wallet from the Google Play Store, users are trusting both Celo and Google to deliver a correct binary, and most users would feel that relying on these centralized services to provide this additional functionality is worthwhile.
+When an end user downloads the Celo Wallet from, for example, the Google Play Store, users are trusting both cLabs (or the entity that has made the application available in the Play Store) and Google to deliver a correct binary, and most users would feel that relying on these centralized services to provide this additional functionality is worthwhile.
 
 ## The Celo Protocol
 
@@ -94,7 +94,7 @@ In Ethereum, verifying whether data received from an untrusted full node really 
 
 In Ethereum, there are few incentives to run a full node that is not mining. Few nodes serve light clients, and this results in a poor experience for mobile wallets.
 
-Celo introduces a scheme that incentivizes users to operate regular nodes. Light clients pay transaction fees to full nodes. Clients include in every transaction the address of a node which, when the transaction is processed, receives the fee. While a full node provides other services for which they receive no specific fee, we expect that failing to service these requests will cause clients to seek other full nodes that do, who will then receive fees when they next make a transaction.
+Celo introduces a scheme that incentivizes users to operate regular nodes. Light clients pay transaction fees to full nodes. Clients include in every transaction the address of a node which, when the transaction is processed, receives the fee. While a full node provides other services for which they receive no specific fee, it is expected that failing to service these requests will cause clients to seek other full nodes that do, who will then receive fees when they next make a transaction.
 
 Since light clients need not trust full nodes, as they can verify their work, this also provides the 'permissionless on-ramp' for users to receive Celo Gold or Celo Dollars without already holding it that is missing in other Proof of Stake networks.
 
@@ -113,6 +113,10 @@ In addition, a back-up reserve of cryptocurrencies is held off-chain. This off-c
 This scheme relies on a series of Oracles, external to the network, reporting the value of the Celo Gold to US Dollar market rate. To minimize depletion of the reserve when these reported values are inaccurate or out-of-date, Celo uses a constant-product-market-maker model, inspired by the [Uniswap](https://uniswap.io/) system. As arbitrage occurs, the on-chain price dynamically adjusts until the offered rate meets the external rate.
 
 Celo maintains the size of its reserve through several sources, including a stability fee levied on Celo Dollar balances and a transfer from epoch rewards.
+
+{% hint style="success" %}
+**Roadmap**: Celo envisages a number of stable currencies pegged to different fiat currencies as well as natural resources such as forests.  In addition, once bridges between other chains and the Celo blockchain are fully developed, and liquid trading on decentralized exchanges occurs, the rebalancing can be handled transparently on-chain.
+{% endhint %}
 
 ### Lightweight Identity
 
