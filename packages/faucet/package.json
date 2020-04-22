@@ -1,5 +1,5 @@
 {
-  "name": "celo-faucet-app",
+  "name": "@celo/faucet-app",
   "version": "1.0.0",
   "description": "Faucet Web application for Celo",
   "author": "Celo",

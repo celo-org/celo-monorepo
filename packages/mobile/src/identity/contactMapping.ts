@@ -168,8 +168,9 @@ function* lookupNewRecipients(
 
 async function getAddresses(e164Numbers: string[], attestationsWrapper: AttestationsWrapper) {
   Logger.debug(TAG, `Get addresses for ${e164Numbers.length} phone numbers`)
+  //TODO fix
   const phoneHashes = e164Numbers.map((phoneNumber) => getPhoneHash(phoneNumber))
-  const results = await attestationsWrapper.lookupPhoneNumbers(phoneHashes)
+  const results = await attestationsWrapper.lookupIdentifiers(phoneHashes)
   if (!results) {
     return null
   }

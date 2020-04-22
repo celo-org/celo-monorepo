@@ -45,6 +45,7 @@ export async function requestAttestationsFromIssuers(
     try {
       const response = await attestations.revealPhoneNumberToIssuer(
         phoneNumber,
+        '',
         account,
         attestation.issuer,
         attestation.attestationServiceURL
@@ -168,8 +169,8 @@ async function findSuitableNumber(
   numbers: string[],
   maximumNumberOfAttestations: number
 ) {
-  const attestedAccountsLookup = await attestations.lookupPhoneNumbers(
-    numbers.map(PhoneNumberUtils.getPhoneHash)
+  const attestedAccountsLookup = await attestations.lookupIdentifiers(
+    numbers.map((n) => PhoneNumberUtils.getPhoneHash(n))
   )
   return numbers.find((number) => {
     const phoneHash = PhoneNumberUtils.getPhoneHash(number)

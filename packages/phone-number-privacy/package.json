@@ -1,5 +1,5 @@
 {
-  "name": "celo-phone-number-privacy",
+  "name": "@celo/phone-number-privacy",
   "version": "1.0.0",
   "description": "Generates unique salt for phone numbers.",
   "author": "Celo",

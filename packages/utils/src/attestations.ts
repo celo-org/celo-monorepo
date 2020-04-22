@@ -27,8 +27,8 @@ export function getAttestationMessageToSignFromIdentifier(identifier: string, ac
 
 export function getAttestationMessageToSignFromPhoneNumber(
   phoneNumber: string,
-  phoneSalt: string,
-  account: string
+  account: string,
+  phoneSalt?: string
 ) {
   return getAttestationMessageToSignFromIdentifier(
     hashIdentifier(phoneNumber, IdentifierType.PHONE_NUMBER, phoneSalt),

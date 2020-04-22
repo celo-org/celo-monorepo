@@ -22,7 +22,7 @@ describe(getPhoneHashPrivate, () => {
 
   it('handles failure from quota', async () => {
     try {
-      mockFetch.mockResponseOnce(JSON.stringify({ success: false }), { status: 401 })
+      mockFetch.mockResponseOnce(JSON.stringify({ success: false }), { status: 402 })
       await getPhoneHashPrivate(mockE164Number)
       fail('expected error')
     } catch (error) {

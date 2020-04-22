@@ -11,7 +11,6 @@ import Logger from 'src/utils/Logger'
 
 const TAG = 'identity/privacy'
 const SIGN_MESSAGE_ENDPOINT = '/getSalt' // TODO rename that endpoint
-const MATCHMAKING_ENDPOINT = '/TODO'
 
 export interface PhoneNumberHashDetails {
   e164Number: string
@@ -51,8 +50,9 @@ export function* fetchPrivatePhoneHash(e164Number: string) {
 
 // Unlike the getPhoneHash in utils, this leverage the phone number
 // privacy service to compute a secure, unique salt for the phone number
-// and then appends it before hashing
-async function getPhoneHashPrivate(e164Number: string): Promise<PhoneNumberHashDetails> {
+// and then appends it before hashing.
+// Exported for tests, don't use directly. Use fetchPrivatePhoneHash instead.
+export async function getPhoneHashPrivate(e164Number: string): Promise<PhoneNumberHashDetails> {
   const salt = await getPhoneNumberSalt(e164Number)
   const phoneHash = getPhoneHash(e164Number, salt)
   return {
@@ -116,7 +116,7 @@ async function postToSignMessage(base64BlindedMessage: string) {
 function handleSignMessageFailure(res: Response) {
   Logger.error(`${TAG}@handleSignMessageFailure`, `Response not okay. Status ${res.status}`)
   switch (res.status) {
-    case 401:
+    case 402:
       throw new Error(ErrorMessages.SALT_QUOTA_EXCEEDED)
     default:
       throw new Error('Failure getting blinded sig')
