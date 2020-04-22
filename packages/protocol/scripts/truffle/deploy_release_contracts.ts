@@ -92,7 +92,9 @@ async function handleGrant(releaseGoldConfig: any, currGrant: number) {
     web3.utils.toWei(releaseGoldConfig.amountReleasedPerPeriod.toString())
   )
   const totalValue = weiAmountReleasedPerPeriod.multipliedBy(releaseGoldConfig.numReleasePeriods)
-  const adjustedAmountPerPeriod = totalValue.sub(startGold).div(releaseGoldConfig.numReleasePeriods)
+  const adjustedAmountPerPeriod = totalValue
+    .minus(startGold)
+    .div(releaseGoldConfig.numReleasePeriods)
 
   const releaseGoldTxHash = await _setInitialProxyImplementation(
     web3,
@@ -101,7 +103,7 @@ async function handleGrant(releaseGoldConfig: any, currGrant: number) {
     'ReleaseGold',
     {
       from: fromAddress,
-      value: totalValue.sub(startGold).toFixed(),
+      value: totalValue.minus(startGold).toFixed(),
     },
     Math.round(releaseStartTime),
     releaseGoldConfig.releaseCliffTime,
