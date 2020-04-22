@@ -84,9 +84,9 @@ export class BlockProcessor {
   }
 
   async initBatch() {
-    let block = this.fromBlock - 1
+    let block = +this.fromBlock - 1
     while (++block <= (await this.getToBlock())) {
-      await this.onNewBlock(block, block - this.fromBlock)
+      await this.onNewBlock(block, block - +this.fromBlock)
     }
   }
 
@@ -124,7 +124,7 @@ export class BlockProcessor {
             this.logEvent(LoggingCategory.State, data)
             this.logHistogram({ ...data, args }, maxBucketSize)
           })
-          .catch(() => '') as Promise<any>
+          .catch(console.error) as Promise<any>
       }
     )
     await Promise.all(promises)
@@ -222,8 +222,9 @@ export class BlockProcessor {
 
             this.logEvent(LoggingCategory.ParsedLog, event)
           }
-          // tslint:disable-next-line
-        } catch {}
+        } catch (e) {
+          console.error(e)
+        }
       }
     }
   }
