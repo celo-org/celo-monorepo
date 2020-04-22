@@ -38,10 +38,10 @@ done
 
 [ -z "$NETWORK" ] && echo "Need to set the NETWORK via the -n flag" && exit 1;
 [ -z "$FROM" ] && echo "Need to set the FROM address vai the -f flag" && exit 1;
-[ -z "$GRANTS_FILE" ] && echo "Need to set the GRANTS_FILE via the -g flag" && exit;
+[ -z "$GRANTS_FILE" ] && echo "Need to set the GRANTS_FILE via the -g flag" && exit 1;
 [ -z "$START_GOLD" ] && echo "No starting gold provided via -s flag: defaulting to 1cGld" && START_GOLD=1;
-[ -z "$DEPLOYED_GRANTS"] && echo "No deployed grants file provided via -d flag: defaulting to `scripts/truffle/deployedGrants.json`" && DEPLOYED_GRANTS="scripts/truffle/deployedGrants.json"
-[ -z "$OUTPUT_FILE" ] && echo "No output file provided, will print output to console."
+[ -z "$DEPLOYED_GRANTS" ] && echo "No deployed grants file provided via -d flag: defaulting to `scripts/truffle/deployedGrants.json`" && DEPLOYED_GRANTS="scripts/truffle/deployedGrants.json"
+[ -z "$OUTPUT_FILE" ] && echo "Need to set output file via the -o flag" && exit 1;
 
 if ! nc -z 127.0.0.1 8545 ; then
   echo "Port 8545 not open"
