@@ -31,7 +31,7 @@ export class EscrowedPaymentListItem extends React.PureComponent<Props> {
     const { payment, t } = this.props
     const recipientPhoneNumber = payment.recipientPhone
     CeloAnalytics.track(CustomEventNames.clicked_escrowed_payment_send_message)
-    // TODO: open up whatsapp/text message slider with pre populated message
+    // TODO: add a UI that allows user to choose between SMS and Whatsapp (currently only SMS) for reminder message
     try {
       await sendSms(recipientPhoneNumber, t('walletFlow5:escrowedPaymentReminderSms'))
     } catch (error) {
