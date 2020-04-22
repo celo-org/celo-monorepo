@@ -257,7 +257,7 @@ export function deploymentForContract<ContractInstance extends Truffle.ContractI
     deployer.deploy(Contract)
     deployer.then(async () => {
       const proxy: ProxyInstance = await ContractProxy.deployed()
-      await proxy._transferOwnership(_accounts[0])
+      await proxy._transferOwnership(ContractProxy.defaults().from)
       const proxiedContract: ContractInstance = await setInitialProxyImplementation<
         ContractInstance
       >(web3, artifacts, name, ...(await args(networkName)))
