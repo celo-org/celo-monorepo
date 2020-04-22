@@ -1,5 +1,6 @@
 import { trimLeading0x } from '@celo/utils/lib/address'
 import { range } from 'lodash'
+import qrcode from 'qrcode'
 import querystring from 'querystring'
 import { Tx } from 'web3-core'
 import abi from 'web3-eth-abi'
@@ -44,6 +45,7 @@ export function parseUri(uri: string): Tx {
 
       if (namedGroups.inputTypes !== undefined) {
         const abiTypes = namedGroups.inputTypes.split(',')
+        // TODO(yorke): fix delete hacks
         let args: string[] = []
         range(0, abiTypes.length).forEach((idx) => {
           args = args.concat(queryParams[idx])
@@ -105,4 +107,15 @@ export function buildUri(tx: Tx, functionName?: string, abiTypes?: string[]): st
   uri += `${querystring.stringify(txQueryParams)}`
 
   return uri
+}
+
+export async function QrSvgFromUri(uri: string, terminal = false) {
+  if (!uriRegexp.test(uri)) {
+    throw new Error(`Invalid uri ${uri}`)
+  }
+
+  const qr = await qrcode.toString(uri, {
+    type: terminal ? 'terminal' : 'svg',
+  })
+  return qr
 }
