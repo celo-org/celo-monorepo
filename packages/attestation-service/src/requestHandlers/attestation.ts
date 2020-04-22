@@ -119,6 +119,7 @@ class AttestationRequestHandler {
   }
 
   signAttestation() {
+    //TODO use getAttestationMessageToSignFromPhoneNumber here
     const message = AttestationUtils.getAttestationMessageToSignFromIdentifier(
       this.attestationRequest.phoneNumber,
       this.attestationRequest.account

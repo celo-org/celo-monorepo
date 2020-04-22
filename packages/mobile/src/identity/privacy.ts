@@ -1,62 +1,139 @@
-import { isE164Number } from '@celo/utils/src/phoneNumbers'
+import { getPhoneHash, isE164Number } from '@celo/utils/src/phoneNumbers'
+import crypto from 'crypto'
+import { Platform } from 'react-native'
 import BlindThresholdBls from 'react-native-blind-threshold-bls'
+import { call, put, select } from 'redux-saga/effects'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { PHONE_NUM_PRIVACY_SERVICE } from 'src/config'
+import { updateE164PhoneNumberSalts } from 'src/identity/actions'
+import { e164NumberToSaltSelector, E164NumberToSaltType } from 'src/identity/reducer'
 import Logger from 'src/utils/Logger'
 
 const TAG = 'identity/privacy'
+const SIGN_MESSAGE_ENDPOINT = '/getSalt' // TODO rename that endpoint
+const MATCHMAKING_ENDPOINT = '/TODO'
 
-export async function getPhoneHashPrivate(e164Number: string) {
-  BlindThresholdBls.sampleMethod('===' + e164Number, 1, console.log)
-  // const salt = await getPhoneNumberSalt(e164Number)
-  // return getPhoneHash(e164Number, salt)
+export interface PhoneNumberHashDetails {
+  e164Number: string
+  phoneHash: string
+  salt: string
 }
 
-// TODO don't export
-export async function getPhoneNumberSalt(e164Number: string) {
+// Fetch and cache a phone number's salt and hash
+export function* fetchPrivatePhoneHash(e164Number: string) {
+  try {
+    Logger.debug(`${TAG}@fetchPrivatePhoneHash`, 'Fetching phone hash details')
+    const saltCache: E164NumberToSaltType = yield select(e164NumberToSaltSelector)
+    const cachedSalt = saltCache[e164Number]
+
+    if (cachedSalt) {
+      Logger.debug(`${TAG}@fetchPrivatePhoneHash`, 'Salt was cached')
+      const phoneHash = getPhoneHash(e164Number, cachedSalt)
+      return { e164Number, phoneHash, salt: cachedSalt }
+    }
+
+    Logger.debug(`${TAG}@fetchPrivatePhoneHash`, 'Salt was not cached, fetching')
+    const details: PhoneNumberHashDetails = yield call(getPhoneHashPrivate, e164Number)
+    yield put(updateE164PhoneNumberSalts({ e164Number: details.salt }))
+    return details
+  } catch (error) {
+    if (error.message === ErrorMessages.SALT_QUOTA_EXCEEDED) {
+      Logger.error(
+        `${TAG}@fetchPrivatePhoneHash`,
+        'Salt quota exceeded, navigating to quota purchase screen'
+      )
+      // TODO nav to quota purchase screen
+    } else {
+      throw error
+    }
+  }
+}
+
+// Unlike the getPhoneHash in utils, this leverage the phone number
+// privacy service to compute a secure, unique salt for the phone number
+// and then appends it before hashing
+async function getPhoneHashPrivate(e164Number: string): Promise<PhoneNumberHashDetails> {
+  const salt = await getPhoneNumberSalt(e164Number)
+  const phoneHash = getPhoneHash(e164Number, salt)
+  return {
+    e164Number,
+    phoneHash,
+    salt,
+  }
+}
+
+async function getPhoneNumberSalt(e164Number: string) {
   Logger.debug(`${TAG}@getPhoneNumberSalt`, 'Getting phone number salt')
 
   if (!isE164Number(e164Number)) {
     throw new Error(ErrorMessages.INVALID_PHONE_NUMBER)
   }
 
-  // TODO blind the number
-  const blindPhoneNumber = e164Number
+  // TODO remove when iOS works
+  if (Platform.OS === 'ios') {
+    return 'fakeSalt'
+  }
 
-  const res = await fetch(PHONE_NUM_PRIVACY_SERVICE, {
+  Logger.debug(`${TAG}@getPhoneNumberSalt`, 'Retrieving blinded message')
+  const base64BlindedMessage = await BlindThresholdBls.blindMessage(e164Number)
+  const base64BlindSig = await postToSignMessage(base64BlindedMessage)
+  Logger.debug(`${TAG}@getPhoneNumberSalt`, 'Retrieving unblinded signature')
+  const base64UnblindedSig = await BlindThresholdBls.unblindMessage(base64BlindSig)
+  Logger.debug(`${TAG}@getPhoneNumberSalt`, 'Converting sig to salt')
+  return getSaltFromThresholdSignature(base64UnblindedSig)
+}
+
+interface SignMessageResponse {
+  success: boolean
+  // TODO change this in service
+  salt: string
+}
+
+// Send the blinded message off to the phone number privacy service and
+// get back the theshold signed blinded message
+async function postToSignMessage(base64BlindedMessage: string) {
+  Logger.debug(`${TAG}@postToSignMessage`, 'Retrieving blinded message')
+  const res = await fetch(PHONE_NUM_PRIVACY_SERVICE + SIGN_MESSAGE_ENDPOINT, {
     method: 'POST',
     headers: {
       Accept: 'application/json',
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      blindPhoneNumber,
+      blindPhoneNumber: base64BlindedMessage,
     }),
   })
 
   if (!res.ok) {
-    handleGetSaltFailure(res)
-    return false
+    handleSignMessageFailure(res)
   }
 
-  Logger.debug(`${TAG}@getPhoneNumberSalt`, 'Response ok. Parsing.')
-  const parsedRes = await res.json()
-
-  // TODO extract out the val
-  return parsedRes
-
-  // } catch (error) {
-  //   Logger.error(TAG, 'Error getting phone salt', error)
-  //   throw new Error(ErrorMessages.SALT_FETCH_FAILURE)
-  // }
+  Logger.debug(`${TAG}@postToSignMessage`, 'Response ok. Parsing.')
+  const signResponse = (await res.json()) as SignMessageResponse
+  return signResponse.salt
 }
 
-function handleGetSaltFailure(res: Response) {
-  Logger.error(`${TAG}@getPhoneNumberSalt`, `Response not okay. Status ${res.status}`)
+function handleSignMessageFailure(res: Response) {
+  Logger.error(`${TAG}@handleSignMessageFailure`, `Response not okay. Status ${res.status}`)
   switch (res.status) {
     case 401:
       throw new Error(ErrorMessages.SALT_QUOTA_EXCEEDED)
     default:
-      throw new Error(ErrorMessages.SALT_FETCH_FAILURE)
+      throw new Error('Failure getting blinded sig')
   }
+}
+
+// This is the algorithm that creates a salt from the unblinded message signatures
+// It simply hashes it with sha256 and encodes it to hex
+// If we ever need to compute salts anywhere other than here then we should move this to the utils package
+export function getSaltFromThresholdSignature(base64Sig: string) {
+  if (!base64Sig) {
+    throw new Error('Invalid base64Sig')
+  }
+
+  const sigBuf = Buffer.from(base64Sig, 'base64')
+  return crypto
+    .createHash('sha256')
+    .update(sigBuf)
+    .digest('hex')
 }

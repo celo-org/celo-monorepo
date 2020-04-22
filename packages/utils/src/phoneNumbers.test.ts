@@ -54,7 +54,7 @@ describe('Phone number formatting and utilities', () => {
     })
     it('Hashes an valid number with a salt', () => {
       expect(getPhoneHash(TEST_PHONE_NUMBERS.VALID_E164, 'abcdefg')).toBe(
-        '0xabbb2344c2a48a1fdba0b43cc372c6688d0052980d4d97b2af37235832b3092a'
+        '0xfe2835a235ffb2f98dcf259a710dc23751af20bf1a0284829a0cde0c720c3595'
       )
     })
     it('Throws for an invalid number', () => {

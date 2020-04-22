@@ -16,6 +16,7 @@ export interface ParsedPhoneNumber {
 
 const phoneUtil = PhoneNumberUtil.getInstance()
 const MIN_PHONE_LENGTH = 4
+const PHONE_SALT_SEPARATOR = '__'
 
 export function getCountryEmoji(
   e164PhoneNumber: string,
@@ -42,7 +43,7 @@ export const getPhoneHash = (phoneNumber: string, salt?: string): string => {
   if (!phoneNumber || !isE164Number(phoneNumber)) {
     throw Error('Attempting to hash a non-e164 number: ' + phoneNumber)
   }
-  const value = salt ? phoneNumber + salt : phoneNumber
+  const value = salt ? phoneNumber + PHONE_SALT_SEPARATOR + salt : phoneNumber
   return Web3Utils.soliditySha3({ type: 'string', value })
 }
 

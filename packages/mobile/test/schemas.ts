@@ -76,6 +76,7 @@ export const vNeg1Schema = {
     verificationFailed: false,
     addressToE164Number: {},
     e164NumberToAddress: {},
+    e164NumberToSalt: {},
     startedVerification: false,
     askedContactsPermission: false,
     isLoadingImportContacts: false,
