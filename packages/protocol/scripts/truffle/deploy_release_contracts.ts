@@ -20,6 +20,7 @@ let ReleaseGoldMultiSig: ReleaseGoldMultiSigContract
 let ReleaseGoldMultiSigProxy: ReleaseGoldMultiSigProxyContract
 let ReleaseGold: ReleaseGoldContract
 let ReleaseGoldProxy: ReleaseGoldProxyContract
+const ONE_CGLD = web3.utils.toWei('1', 'ether')
 
 async function handleGrant(releaseGoldConfig: any, currGrant: number) {
   console.info('Processing grant number ' + currGrant)
@@ -90,6 +91,14 @@ async function handleGrant(releaseGoldConfig: any, currGrant: number) {
   const weiAmountReleasedPerPeriod = new BigNumber(
     web3.utils.toWei(releaseGoldConfig.amountReleasedPerPeriod.toString())
   )
+  const totalValue = weiAmountReleasedPerPeriod.multipliedBy(releaseGoldConfig.numReleasePeriods)
+  if (totalValue.lt(startGold)) {
+    console.info('Total value of grant less than cGLD for beneficiary addreess')
+    process.exit(0)
+  }
+  const adjustedAmountPerPeriod = totalValue
+    .minus(startGold)
+    .div(releaseGoldConfig.numReleasePeriods)
 
   const releaseGoldTxHash = await _setInitialProxyImplementation(
     web3,
@@ -98,13 +107,13 @@ async function handleGrant(releaseGoldConfig: any, currGrant: number) {
     'ReleaseGold',
     {
       from: fromAddress,
-      value: weiAmountReleasedPerPeriod.multipliedBy(releaseGoldConfig.numReleasePeriods).toFixed(),
+      value: totalValue.minus(startGold).toFixed(),
     },
     Math.round(releaseStartTime),
     releaseGoldConfig.releaseCliffTime,
     releaseGoldConfig.numReleasePeriods,
     releaseGoldConfig.releasePeriod,
-    web3.utils.toHex(weiAmountReleasedPerPeriod),
+    adjustedAmountPerPeriod.toFixed(),
     releaseGoldConfig.revocable,
     releaseGoldConfig.beneficiary,
     releaseGoldConfig.releaseOwner,
@@ -154,8 +163,7 @@ async function checkBalance(releaseGoldConfig: any) {
   )
   const grantDeploymentCost = weiAmountReleasedPerPeriod
     .multipliedBy(releaseGoldConfig.numReleasePeriods)
-    .plus(startGold)
-    .plus(web3.utils.toWei('1', 'ether')) // Tx Fees
+    .plus(ONE_CGLD) // Tx Fees
     .toFixed()
   while (true) {
     const fromBalance = new BigNumber(await web3.eth.getBalance(fromAddress))
@@ -189,7 +197,7 @@ async function checkBalance(releaseGoldConfig: any) {
       )
       continue
     }
-    if (fromBalance.gt(web3.utils.toWei('1', 'ether'))) {
+    if (fromBalance.gt(ONE_CGLD)) {
       console.info(
         '\nSending 1 cGLD as a test from ' +
           fromAddress +
@@ -200,7 +208,7 @@ async function checkBalance(releaseGoldConfig: any) {
       await web3.eth.sendTransaction({
         from: fromAddress,
         to: addressResponse.newFromAddress,
-        value: web3.utils.toWei('1', 'ether'),
+        value: ONE_CGLD,
       })
       const confirmResponse = await prompts({
         type: 'confirm',
@@ -217,7 +225,7 @@ async function checkBalance(releaseGoldConfig: any) {
       await web3.eth.sendTransaction({
         from: fromAddress,
         to: addressResponse.newFromAddress,
-        value: fromBalancePostTransfer.minus(web3.utils.toWei('1', 'ether')), // minus Tx Fees
+        value: fromBalancePostTransfer.minus(ONE_CGLD).toFixed(), // minus Tx Fees
       })
     }
     const switchResponse = await prompts({
@@ -307,24 +315,16 @@ async function handleJSONFile(err, data) {
     })
   }
 
-  const totalGoldGrant = grants.reduce((sum: number, curr: any) => {
+  const totalValue = grants.reduce((sum: number, curr: any) => {
     return sum + Number(curr.amountReleasedPerPeriod) * Number(curr.numReleasePeriods)
   }, 0)
-  const totalTransferFees = Number(argv.start_gold) * Number(grants.length)
-  const totalValue = new BigNumber(totalTransferFees + totalGoldGrant)
   const fromBalance = new BigNumber(await web3.eth.getBalance(fromAddress))
   if (!argv.yesreally) {
     const response = await prompts({
       type: 'confirm',
       name: 'confirmation',
       message:
-        'Grants in provided json would send ' +
-        totalGoldGrant +
-        'cGld and ' +
-        totalTransferFees +
-        'cGld in transfer fees, totalling ' +
-        totalValue +
-        'cGld.\nIs this OK (y/n)?',
+        'Grants in provided json would send ' + totalValue.toString() + 'cGld.\nIs this OK (y/n)?',
     })
 
     if (!response.confirmation) {
