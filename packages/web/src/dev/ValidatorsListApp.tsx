@@ -10,7 +10,7 @@ import { StyleSheet, View } from 'react-native'
 import ShowApolloError from 'src/dev/ShowApolloError'
 import ValidatorsList from 'src/dev/ValidatorsList'
 import { styles } from 'src/dev/ValidatorsListStyles'
-import { H1 } from 'src/fonts/Fonts'
+import { H2 } from 'src/fonts/Fonts'
 import OpenGraph from 'src/header/OpenGraph'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import menuItems from 'src/shared/menu-items'
@@ -19,7 +19,7 @@ import Spinner from 'src/shared/Spinner'
 import { colors, standardStyles, textStyles } from 'src/styles'
 
 const networkMenu = [
-  ['Mainnet', menuItems.VALIDATORS_LIST.link],
+  ['Release Candidate', menuItems.VALIDATORS_LIST.link],
   ['Baklava', menuItems.VALIDATORS_LIST__BAKLAVA.link],
   // ['Baklavastaging', menuItems.VALIDATORS_LIST_BAKLAVASTAGING.link],
 ]
@@ -113,16 +113,23 @@ class ValidatorsListApp extends React.PureComponent<Props> {
     return (
       <>
         <OpenGraph
-          title="Celo Validator Explorer"
+          title="Celo Validators"
           path={menuItems.VALIDATORS_LIST.link}
           description="View status of Validators on the Celo Network"
         />
         <View style={[styles.cover, styles.pStatic, compStyles.fullHeight]}>
-          <H1 style={[textStyles.center, standardStyles.sectionMarginTablet, textStyles.invert]}>
-            Validator Explorer
-          </H1>
+          <H2
+            style={[
+              textStyles.center,
+              standardStyles.blockMarginTopTablet,
+              standardStyles.elementalMarginBottom,
+              textStyles.invert,
+            ]}
+          >
+            Validators
+          </H2>
           <View>
-            <View style={[styles.links]}>
+            <View style={styles.links}>
               {networkMenuList.map(([name, link, navigate]: any) => (
                 <View key={name} style={[styles.linkWrapper]}>
                   <Navigation
