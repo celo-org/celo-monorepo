@@ -168,8 +168,18 @@ const DefaultConfig = {
       addresses: ['0xc471776eA02705004C451959129bF09423B56526'],
       values: ['5000000000000000000000000'],
     },
-    // TODO(asa): Needs updating before RC1 deployment
-    oracles: [],
+    oracles: [
+      '0x0aee051be85ba9c7c1bc635fb76b52039341ab26',
+      '0xd3405621f6cdcd95519a79d37f91c78e7c79cefa',
+      '0xe037f31121f3a96c0cc49d0cf55b2f5d6deff19e',
+      '0x12bad172b47287a754048f0d294221a499d1690f',
+      '0xacad5b2913e21ccc073b80e431fec651cd8231c6',
+      '0xfe9925e6ae9c4cd50ae471b90766aaef37ad307e',
+      '0x641c6466dae2c0b1f1f4f9c547bc3f54f4744a1d',
+      '0x75becd8e400552bac29cbe0534d8c7d6cba49979',
+      '0x223ab67272891dd352194be61597042ecf9c272a',
+      '0xca9ae47493f763a7166ab8310686b197984964b4',
+    ],
     frozen: true,
   },
   transferWhitelist: {
