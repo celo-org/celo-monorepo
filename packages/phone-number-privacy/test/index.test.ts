@@ -62,7 +62,7 @@ describe(`POST /getSalt endpoint`, () => {
         status: (status: any) => {
           expect(status).toEqual(400)
           // tslint:disable-next-line: no-empty
-          return { send: () => {} }
+          return { json: () => {} }
         },
       }
       // @ts-ignore TODO fix req type to make it a mock express req
@@ -77,7 +77,7 @@ describe(`POST /getSalt endpoint`, () => {
         status: (status: any) => {
           expect(status).toEqual(500)
           // tslint:disable-next-line: no-empty
-          return { send: () => {} }
+          return { json: () => {} }
         },
       }
       // @ts-ignore TODO fix req type to make it a mock express req
@@ -101,7 +101,7 @@ describe(`POST /getSalt endpoint`, () => {
         status: (status: any) => {
           expect(status).toEqual(400)
           // tslint:disable-next-line: no-empty
-          return { send: () => {} }
+          return { json: () => {} }
         },
       }
       // @ts-ignore TODO fix req type to make it a mock express req
@@ -123,7 +123,7 @@ describe(`POST /getSalt endpoint`, () => {
         status: (status: any) => {
           expect(status).toEqual(400)
           // tslint:disable-next-line: no-empty
-          return { send: () => {} }
+          return { json: () => {} }
         },
       }
       // @ts-ignore TODO fix req type to make it a mock express req
@@ -181,7 +181,7 @@ describe(`POST /getContactMatches endpoint`, () => {
         status(status: any) {
           expect(status).toEqual(400)
           return {
-            send() {
+            json() {
               return {}
             },
           }
@@ -202,7 +202,7 @@ describe(`POST /getContactMatches endpoint`, () => {
         status(status: any) {
           expect(status).toEqual(400)
           return {
-            send() {
+            json() {
               return {}
             },
           }

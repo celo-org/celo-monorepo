@@ -50,20 +50,20 @@ const DefaultConfig = {
   downtimeSlasher: {
     reward: '10000000000000000000', // 10 cGLD
     penalty: '100000000000000000000', // 100 cGLD
-    slashableDowntime: (12 * HOUR) / 5, // ~12 hours
+    slashableDowntime: (8 * HOUR) / 5, // ~8 hours
   },
   election: {
     minElectableValidators: '22',
     maxElectableValidators: '100',
-    maxVotesPerAccount: 100,
+    maxVotesPerAccount: 10,
     electabilityThreshold: 1 / 1000,
     frozen: true,
   },
   epochRewards: {
     targetVotingYieldParameters: {
-      initial: 0.00016, // (x + 1) ^ 365 = 1.06
+      initial: 0, // Change to (x + 1) ^ 365 = 1.06 once mainnet activated.
       max: 0.0005, // (x + 1) ^ 365 = 1.20
-      adjustmentFactor: 0, // Change to 1 / 3650 once mainnet activated
+      adjustmentFactor: 0, // Change to 1 / 3650 once mainnet activated.
     },
     rewardsMultiplierParameters: {
       max: 2,
@@ -139,12 +139,15 @@ const DefaultConfig = {
     predeployedProxyAddress: '0x000000000000000000000000000000000000ce10',
   },
   reserve: {
-    tobinTaxStalenessThreshold: HOUR, // 1 hour
-    tobinTax: toFixed(0.005).toFixed(), // 0.5%
-    tobinTaxReserveRatio: toFixed(2).toFixed(), // 2
+    tobinTaxStalenessThreshold: 100 * YEAR, // Tobin tax turned off to start
+    tobinTax: toFixed(0).toFixed(), // Tobin tax turned off to start
+    tobinTaxReserveRatio: toFixed(0).toFixed(), // Tobin tax turned off to start
     dailySpendingRatio: toFixed(0.05).toFixed(), // 5%
     spenders: [],
-    otherAddresses: ['0x246f4599eFD3fA67AC44335Ed5e749E518Ffd8bB'],
+    otherAddresses: [
+      '0x246f4599eFD3fA67AC44335Ed5e749E518Ffd8bB',
+      '0x298FbD6dad2Fc2cB56d7E37d8aCad8Bf07324f67',
+    ],
     assetAllocationSymbols: ['cGLD', 'BTC', 'ETH', 'DAI'],
     assetAllocationWeights: [0.5, 0.3, 0.15, 0.05],
   },
@@ -165,11 +168,26 @@ const DefaultConfig = {
     inflationRate: 1,
     inflationPeriod: 1.5 * YEAR,
     initialBalances: {
-      addresses: [],
-      values: [],
+      addresses: ['0xc471776eA02705004C451959129bF09423B56526'],
+      values: ['5000000000000000000000000'],
     },
-    // TODO(asa): Needs updating before RC1 deployment
-    oracles: [],
+    oracles: [
+      '0x0aee051be85ba9c7c1bc635fb76b52039341ab26',
+      '0xd3405621f6cdcd95519a79d37f91c78e7c79cefa',
+      '0xe037f31121f3a96c0cc49d0cf55b2f5d6deff19e',
+      '0x12bad172b47287a754048f0d294221a499d1690f',
+      '0xacad5b2913e21ccc073b80e431fec651cd8231c6',
+      '0xfe9925e6ae9c4cd50ae471b90766aaef37ad307e',
+      '0x641c6466dae2c0b1f1f4f9c547bc3f54f4744a1d',
+      '0x75becd8e400552bac29cbe0534d8c7d6cba49979',
+      '0x223ab67272891dd352194be61597042ecf9c272a',
+      '0xca9ae47493f763a7166ab8310686b197984964b4',
+      '0xB93Fe7906ea4221b3fbe23412D18Ab1B07FE2F71',
+      '0x8d25D74E43789079Ef3C6B965c3D22b63A1233aC',
+      '0xCD88Cc79342a7cFE78E91FAa173eC87704bDcA9a',
+      '0x5091110175318A2A8aF88309D1648c1D84d31B29',
+      '0xBBd6e54Af7A5722f42461C6313F37Bd50729F195',
+    ],
     frozen: true,
   },
   transferWhitelist: {
