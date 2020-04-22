@@ -818,15 +818,6 @@ jobs:
       - run:
           name: Run Tests
           command: yarn --cwd=packages/phone-number-privacy test
-      - run:
-          name: Fail if someone forgot to commit phone-number-privacy docs
-          command: |
-            yarn --cwd=packages/phone-number-privacy docs
-            if [[ $(git status packages/docs/developer-resources/phone-number-privacy --porcelain) ]]; then
-              git --no-pager diff packages/docs/developer-resources/phone-number-privacy
-              echo "There are git differences after generating phone-number-privacy docs"
-              exit 1
-            fi
 
 workflows:
   version: 2
