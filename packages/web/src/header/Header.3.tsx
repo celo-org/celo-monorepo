@@ -32,6 +32,8 @@ const DARK_PAGES = new Set([
   menu.ALLIANCE_COLLECTIVE.link,
   menu.DEVELOPERS.link,
   menu.VALIDATORS_LIST.link,
+  menu.VALIDATORS_LIST__BAKLAVA.link,
+  menu.VALIDATORS_LIST_BAKLAVASTAGING.link,
   CeloLinks.walletApp,
 ])
 
