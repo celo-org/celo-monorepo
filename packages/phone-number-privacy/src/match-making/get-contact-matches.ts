@@ -13,7 +13,7 @@ export async function handleGetContactMatches(request: Request, response: Respon
       return
     }
     authenticateUser()
-    const matchedContacts: any = (
+    const matchedContacts: ContactMatch[] = (
       await getNumberPairContacts(request.body.userPhoneNumber, request.body.contactPhoneNumbers)
     ).map((numberPair) => ({ phoneNumber: numberPair }))
     await setNumberPairContacts(request.body.userPhoneNumber, request.body.contactPhoneNumbers)
@@ -23,6 +23,10 @@ export async function handleGetContactMatches(request: Request, response: Respon
     console.error('Failed to getContactMatches', e)
     respondWithError(response, 500, ErrorMessages.UNKNOWN_ERROR)
   }
+}
+
+interface ContactMatch {
+  phoneNumber: string
 }
 
 function isValidGetContactMatchesInput(requestBody: any): boolean {
