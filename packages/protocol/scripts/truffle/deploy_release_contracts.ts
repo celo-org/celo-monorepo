@@ -192,7 +192,8 @@ async function checkBalance(releaseGoldConfig: any) {
       )
       continue
     }
-    if (fromBalance.gt(ONE_CGLD)) {
+    // Must be enough to handle 1cGLD test transfer and 1cGLD for transaction fees
+    if (fromBalance.gt(ONE_CGLD.multipliedBy(2))) {
       console.info(
         '\nSending 1 cGLD as a test from ' +
           fromAddress +
