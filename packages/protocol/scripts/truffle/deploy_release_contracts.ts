@@ -21,6 +21,7 @@ let ReleaseGoldMultiSigProxy: ReleaseGoldMultiSigProxyContract
 let ReleaseGold: ReleaseGoldContract
 let ReleaseGoldProxy: ReleaseGoldProxyContract
 const ONE_CGLD = web3.utils.toWei('1', 'ether')
+const TWO_CGLD = web3.utils.toWei('2', 'ether')
 const MAINNET_START_TIME = new Date('22 April 2020 16:00:00 UTC').getTime() / 1000
 
 async function handleGrant(releaseGoldConfig: any, currGrant: number) {
@@ -193,7 +194,7 @@ async function checkBalance(releaseGoldConfig: any) {
       continue
     }
     // Must be enough to handle 1cGLD test transfer and 1cGLD for transaction fees
-    if (fromBalance.gt(ONE_CGLD.multipliedBy(2))) {
+    if (fromBalance.gt(TWO_CGLD)) {
       console.info(
         '\nSending 1 cGLD as a test from ' +
           fromAddress +
