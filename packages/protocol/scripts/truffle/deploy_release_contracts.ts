@@ -21,21 +21,15 @@ let ReleaseGoldMultiSigProxy: ReleaseGoldMultiSigProxyContract
 let ReleaseGold: ReleaseGoldContract
 let ReleaseGoldProxy: ReleaseGoldProxyContract
 const ONE_CGLD = web3.utils.toWei('1', 'ether')
+const MAINNET_START_TIME = new Date('22 April 2020 16:00:00 UTC').getTime() / 1000
 
 async function handleGrant(releaseGoldConfig: any, currGrant: number) {
   console.info('Processing grant number ' + currGrant)
 
-  // Special mainnet string is intended as MAINNET+X where X is months after mainnet launch.
-  // This is to account for the dynamic start date for mainnet,
-  // and some grants rely on x months post mainnet launch.
+  // Sentinel MAINNET dictates a start time of mainnet launch, April 22 2020 16:00 UTC in this case
   let releaseStartTime: any
   if (releaseGoldConfig.releaseStartTime.startsWith('MAINNET')) {
-    const addedMonths = Number(releaseGoldConfig.releaseStartTime.split('+')[1])
-    const date = new Date()
-    if (addedMonths > 0) {
-      date.setDate(date.getDate() + addedMonths * 30)
-    }
-    releaseStartTime = date.getTime() / 1000
+    releaseStartTime = MAINNET_START_TIME
   } else {
     releaseStartTime = new Date(releaseGoldConfig.releaseStartTime).getTime() / 1000
   }
@@ -148,13 +142,10 @@ async function handleGrant(releaseGoldConfig: any, currGrant: number) {
 
   deployedGrants.push(releaseGoldConfig.identifier)
   releases.push(record)
+  console.info('Deployed grant', record)
   // Must write to file after every grant to avoid losing info on crash.
   fs.writeFileSync(deployedGrantsFile, JSON.stringify(deployedGrants, null, 1))
-  if (argv.output_file) {
-    fs.writeFileSync(argv.output_file, JSON.stringify(releases, null, 2))
-  } else {
-    console.info('Deployed grant ', record)
-  }
+  fs.writeFileSync(argv.output_file, JSON.stringify(releases, null, 2))
 }
 
 async function checkBalance(releaseGoldConfig: any) {
@@ -357,31 +348,6 @@ async function handleJSONFile(err, data) {
       process.exit(0)
     }
   }
-
-  // Check first provided address' balance
-  if (fromBalance.lt(await web3.utils.toWei(totalValue.toFixed()))) {
-    console.info(
-      chalk.yellow(
-        '\nError: The provided `from` address ' +
-          fromAddress +
-          "'s balance of " +
-          fromBalance +
-          ' is not sufficient to cover all of the grants specified in ' +
-          argv.grants +
-          '.\nYou will need to provide supplementary addresses (additional shards) to fund these grants.'
-      )
-    )
-    const response = await prompts({
-      type: 'confirm',
-      name: 'confirmation',
-      message: 'If you know what you are doing, continue: (y/n)',
-    })
-
-    if (!response.confirmation) {
-      console.info(chalk.red('Abandoning grant deployment due to user response.'))
-      process.exit(0)
-    }
-  }
   let currGrant = 1
   for (const releaseGoldConfig of grants) {
     // Trim whitespace in case of bad copy/paste in provided json.
@@ -441,6 +407,17 @@ module.exports = async (callback: (error?: any) => number) => {
         console.info(chalk.red('Abandoning grant deployment due to user response.'))
         process.exit(0)
       }
+    }
+    try {
+      releases = JSON.parse(fs.readFileSync(argv.output_file, 'utf-8'))
+    } catch (e) {
+      // If this fails, file must be created
+      fs.writeFile(argv.output_file, '', (err) => {
+        if (err) {
+          throw err
+        }
+      })
+      releases = []
     }
     fs.readFile(argv.grants, handleJSONFile)
   } catch (error) {
