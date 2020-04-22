@@ -50,20 +50,20 @@ const DefaultConfig = {
   downtimeSlasher: {
     reward: '10000000000000000000', // 10 cGLD
     penalty: '100000000000000000000', // 100 cGLD
-    slashableDowntime: (12 * HOUR) / 5, // ~12 hours
+    slashableDowntime: (8 * HOUR) / 5, // ~8 hours
   },
   election: {
     minElectableValidators: '22',
     maxElectableValidators: '100',
-    maxVotesPerAccount: 100,
+    maxVotesPerAccount: 10,
     electabilityThreshold: 1 / 1000,
     frozen: true,
   },
   epochRewards: {
     targetVotingYieldParameters: {
-      initial: 0.00016, // (x + 1) ^ 365 = 1.06
+      initial: 0, // Change to (x + 1) ^ 365 = 1.06 once mainnet activated.
       max: 0.0005, // (x + 1) ^ 365 = 1.20
-      adjustmentFactor: 0, // Change to 1 / 3650 once mainnet activated
+      adjustmentFactor: 0, // Change to 1 / 3650 once mainnet activated.
     },
     rewardsMultiplierParameters: {
       max: 2,
@@ -139,12 +139,15 @@ const DefaultConfig = {
     predeployedProxyAddress: '0x000000000000000000000000000000000000ce10',
   },
   reserve: {
-    tobinTaxStalenessThreshold: HOUR, // 1 hour
-    tobinTax: toFixed(0.005).toFixed(), // 0.5%
-    tobinTaxReserveRatio: toFixed(2).toFixed(), // 2
+    tobinTaxStalenessThreshold: 100 * YEAR, // Tobin tax turned off to start
+    tobinTax: toFixed(0).toFixed(), // Tobin tax turned off to start
+    tobinTaxReserveRatio: toFixed(0).toFixed(), // Tobin tax turned off to start
     dailySpendingRatio: toFixed(0.05).toFixed(), // 5%
     spenders: [],
-    otherAddresses: ['0x246f4599eFD3fA67AC44335Ed5e749E518Ffd8bB'],
+    otherAddresses: [
+      '0x246f4599eFD3fA67AC44335Ed5e749E518Ffd8bB',
+      '0x298FbD6dad2Fc2cB56d7E37d8aCad8Bf07324f67',
+    ],
     assetAllocationSymbols: ['cGLD', 'BTC', 'ETH', 'DAI'],
     assetAllocationWeights: [0.5, 0.3, 0.15, 0.05],
   },
@@ -165,8 +168,8 @@ const DefaultConfig = {
     inflationRate: 1,
     inflationPeriod: 1.5 * YEAR,
     initialBalances: {
-      addresses: [],
-      values: [],
+      addresses: ['0xc471776eA02705004C451959129bF09423B56526'],
+      values: ['5000000000000000000000000'],
     },
     oracles: [
       '0x0aee051be85ba9c7c1bc635fb76b52039341ab26',
