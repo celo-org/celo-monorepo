@@ -92,6 +92,10 @@ async function handleGrant(releaseGoldConfig: any, currGrant: number) {
     web3.utils.toWei(releaseGoldConfig.amountReleasedPerPeriod.toString())
   )
   const totalValue = weiAmountReleasedPerPeriod.multipliedBy(releaseGoldConfig.numReleasePeriods)
+  if (totalValue.lt(startGold)) {
+    console.info('Total value of grant less than cGLD for beneficiary addreess')
+    process.exit(0)
+  }
   const adjustedAmountPerPeriod = totalValue
     .minus(startGold)
     .div(releaseGoldConfig.numReleasePeriods)
