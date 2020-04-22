@@ -6,7 +6,7 @@ Celo uses a Byzantine Fault Tolerant [consensus protocol](../consensus/README.md
 
 Celo's Proof of Stake mechanism is the set of processes that determine which nodes become active validators and how incentives are arranged to secure the network.
 
-The first set of active validators are determined in the genesis block. Thereafter at the end of every epoch, a fixed number of blocks fixed at network creation time,an election is run that may lead to validators being added or removed.
+The first set of active validators are determined in the genesis block. Thereafter at the end of every epoch, a fixed number of blocks fixed at network creation time, an election is run that may lead to validators being added or removed.
 
 ![](https://storage.googleapis.com/celo-website/docs/concepts.jpg)
 
