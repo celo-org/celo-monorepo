@@ -34,6 +34,7 @@ export class BlockProcessor {
   private initialized = false
   private histograms: { [key: string]: Histogram } = {}
   private watchingReserveAddress = false
+  private loadedAllContracts = false
 
   constructor(
     private kit: ContractKit,
@@ -61,12 +62,32 @@ export class BlockProcessor {
   }
 
   async loadContracts() {
-    this.contracts.Exchange = await this.kit.contracts.getExchange()
-    this.contracts.SortedOracles = await this.kit.contracts.getSortedOracles()
-    this.contracts.Reserve = await this.kit.contracts.getReserve()
-    this.contracts.GoldToken = await this.kit.contracts.getGoldToken()
-    this.contracts.EpochRewards = await this.kit.contracts.getEpochRewards()
-    this.contracts.StableToken = await this.kit.contracts.getStableToken()
+    if (this.loadedAllContracts) {
+      return
+    }
+    const loaded = await Promise.all([
+      this.tryLoadContract('Exchange', 'getExchange'),
+      this.tryLoadContract('SortedOracles', 'getSortedOracles'),
+      this.tryLoadContract('Reserve', 'getReserve'),
+      this.tryLoadContract('GoldToken', 'getGoldToken'),
+      this.tryLoadContract('EpochRewards', 'getEpochRewards'),
+      this.tryLoadContract('StableToken', 'getStableToken'),
+    ])
+    if (!loaded.filter((_) => !_).length) {
+      this.loadedAllContracts = true
+    }
+  }
+
+  async tryLoadContract(name: keyof Contracts, method: keyof ContractKit['contracts']) {
+    if (this.contracts[name]) {
+      return true
+    }
+    try {
+      this.contracts[name] = await (this.kit.contracts as any)[method]()
+    } catch {
+      return false
+    }
+    return true
   }
 
   async initSubscription() {
@@ -101,6 +122,7 @@ export class BlockProcessor {
   async onNewBlock(blockNumber: number, blockIntervalNumber?: number) {
     if ((blockIntervalNumber ?? blockNumber) % this.blockInterval === 0) {
       await Promise.all([this.fetchBlockState(blockNumber), this.processBlockHeader(blockNumber)])
+      await this.loadContracts() // Check if there are contracts not loaded
     }
   }
 
@@ -111,7 +133,7 @@ export class BlockProcessor {
     }
     const promises = stateGetters.map(
       async ({ contract, method, args, transformValues, maxBucketSize }) => {
-        if (!(await this.contracts[contract].exists(blockNumber))) {
+        if (!this.contracts[contract] || !(await this.contracts[contract].exists(blockNumber))) {
           return
         }
         args = typeof args === 'function' ? args(blockNumber) : args
@@ -137,9 +159,17 @@ export class BlockProcessor {
 
   async processBlockHeader(blockNumber: number) {
     const NOT_WHITELISTED_ADDRESS = 'not_whitelisted_address'
-
-    const blockExplorer = await newBlockExplorer(this.kit)
-    const logExplorer = await newLogExplorer(this.kit)
+    let blockExplorer
+    let logExplorer
+    try {
+      blockExplorer = await newBlockExplorer(this.kit)
+      logExplorer = await newLogExplorer(this.kit)
+    } catch (e) {
+      if (this.loadedAllContracts) {
+        console.error(e)
+      }
+      return
+    }
 
     const block = await blockExplorer.fetchBlock(blockNumber)
     const previousBlock: Block = await blockExplorer.fetchBlock(blockNumber - 1)
