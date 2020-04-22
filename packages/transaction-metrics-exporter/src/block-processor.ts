@@ -37,8 +37,8 @@ export class BlockProcessor {
   constructor(
     private kit: ContractKit,
     private blockInterval = 1,
-    private fromBlock: number = 0,
-    private toBlock?: number
+    private fromBlock: number | false = 0,
+    private toBlock?: number | false
   ) {}
 
   async init() {
@@ -49,7 +49,7 @@ export class BlockProcessor {
 
     await this.loadContracts()
 
-    if (this.fromBlock?.toFixed?.()) {
+    if (this.fromBlock !== false) {
       await this.initBatch()
       if (!this.toBlock) {
         await this.initSubscription()

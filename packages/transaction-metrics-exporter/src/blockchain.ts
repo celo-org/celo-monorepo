@@ -49,11 +49,11 @@ export async function runMetricExporter(kit: ContractKit): Promise<EndReason> {
   ;(kit.web3.currentProvider as any).enableSubscriptions()
 
   // Start exporting metrics
-  const fromBLock = Number.parseInt(process.env.FROM_BLOCK || '', 10)
-  const toBlock = Number.parseInt(process.env.TO_BLOCK || '', 10)
+  const fromBlock = Number.parseInt(process.env.FROM_BLOCK || '', 10) || false
+  const toBlock = Number.parseInt(process.env.TO_BLOCK || '', 10) || false
 
   // tslint:disable-next-line
-  new BlockProcessor(kit, BLOCK_INTERVAL, fromBLock, toBlock).init()
+  new BlockProcessor(kit, BLOCK_INTERVAL, fromBlock, toBlock).init()
 
   const provider = kit.web3.currentProvider as WebsocketProvider
   const subscription = await kit.web3.eth.subscribe('newBlockHeaders')
