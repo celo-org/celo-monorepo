@@ -82,7 +82,6 @@ spec:
             ORACLE_ACCOUNT_ADDRESSES={{- range $index, $identity := .Values.oracle.identities -}}{{ $identity.address }},{{- end }}
             export ORACLE_ACCOUNT_ADDRESS=`echo -n $ORACLE_ACCOUNT_ADDRESSES | cut -d ',' -f $((RID + 1))`
 
-            sleep 120
             node /celo-oracle/lib/run_app.js
         env:
         - name: REPLICA_NAME

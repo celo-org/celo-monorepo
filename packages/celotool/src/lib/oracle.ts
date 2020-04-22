@@ -102,6 +102,11 @@ function oracleAddressesAndVaults(): {
   const addressesAndVaults = []
   for (const nameAndAddress of vaultNamesAndAddresses) {
     const [address, keyVaultName] = nameAndAddress.split(':')
+    if (!address || !keyVaultName) {
+      throw Error(
+        `Address or key vault name is invalid. Address: ${address} Key Vault Name: ${keyVaultName}`
+      )
+    }
     addressesAndVaults.push({
       address,
       keyVaultName,
