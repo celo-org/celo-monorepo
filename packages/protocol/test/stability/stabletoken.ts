@@ -146,7 +146,7 @@ contract('StableToken', (accounts: string[]) => {
       assert.equal(supply, amountToMint)
     })
 
-    it('should allow the minting 0 value', async () => {
+    it('should allow minting 0 value', async () => {
       await stableToken.mint(validators, 0, { from: validators })
       const balance = (await stableToken.balanceOf(validators)).toNumber()
       assert.equal(balance, 0)
