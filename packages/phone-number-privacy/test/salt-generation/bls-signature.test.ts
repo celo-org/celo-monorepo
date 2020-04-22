@@ -1,7 +1,7 @@
 import { computeBlindedSignature } from '../../src/salt-generation/bls-signature'
 
-describe(`BLS service computes salt`, () => {
-  it('provides blinded salt', () => {
+describe(`BLS service computes signature`, () => {
+  it('provides blinded signature', () => {
     const expected =
       'lwB9ct0qGQqAYeRO2l6G3BRGmhxJcNn+Fc7/eCq0MtrVfOSKBT32R2p7Za4E31AA6xLw+5Uzg9dCmj8lXlq4oeC5t4Zn2Bx7Ce9py2ZPlzNST2PAx/sebKkG90P6WTcB82t977G0/09vFhof3lKSht5tClbbxsXTsOrOn6RDh/0/DT1ibAlURR4O8oxaFCcBrhVfMyFcWWa+HNeILPYMDk+okRGD0CnLMDsQHPG2kjetEaKPYPPhcf82rv0IFUIAAA=='
     const blindPhoneNumberString =

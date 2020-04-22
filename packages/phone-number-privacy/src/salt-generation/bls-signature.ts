@@ -3,7 +3,7 @@ import { ErrorMessages } from '../common/error-utils'
 import config from '../config'
 
 /*
- * Computes the BLS Salt for the blinded phone number.
+ * Computes the BLS signature for the blinded phone number.
  */
 export function computeBlindedSignature(base64BlindedMessage: string) {
   try {

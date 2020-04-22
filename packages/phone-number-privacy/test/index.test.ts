@@ -1,8 +1,8 @@
 import { getNumberPairContacts, setNumberPairContacts } from '../src/database/wrappers/number-pairs'
 import { getBlindedMessageSignature, getContactMatches } from '../src/index'
-import { computeBLSSalt } from '../src/salt-generation/bls-salt'
+import { computeBlindedSignature } from '../src/salt-generation/bls-signature'
 
-const BLS_SALT = '6546544323114343'
+const BLS_SIGNATURE = '6546544323114343'
 
 jest.mock('../src/common/identity', () => ({
   authenticateUser: jest.fn().mockReturnValue(true),
@@ -15,9 +15,9 @@ jest.mock('../src/salt-generation/query-quota', () => {
   })
 })
 
-jest.mock('../src/salt-generation/bls-salt')
-const mockBlsSalt = computeBLSSalt as jest.Mock
-mockBlsSalt.mockReturnValue(BLS_SALT)
+jest.mock('../src/salt-generation/bls-signature')
+const mockComputeBlindedSignature = computeBlindedSignature as jest.Mock
+mockComputeBlindedSignature.mockReturnValue(BLS_SIGNATURE)
 
 jest.mock('../src/database/wrappers/account', () => ({
   incrementQueryCount: jest.fn().mockReturnValue(new Promise((resolve) => resolve())),
@@ -43,11 +43,11 @@ describe(`POST /getBlindedMessageSignature endpoint`, () => {
     }
     const req = { body: mockRequestData }
 
-    it('provides salt', () => {
+    it('provides signature', () => {
       const res = {
         json(body: any) {
           expect(body.success).toEqual(true)
-          expect(body.salt).toEqual(BLS_SALT)
+          expect(body.signature).toEqual(BLS_SIGNATURE)
         },
       }
       // @ts-ignore TODO fix req type to make it a mock express req
@@ -70,7 +70,7 @@ describe(`POST /getBlindedMessageSignature endpoint`, () => {
     })
     it('returns 500 on bls error', () => {
       mockGetRemainingQueryCount = jest.fn()
-      mockBlsSalt.mockImplementation(() => {
+      mockComputeBlindedSignature.mockImplementation(() => {
         throw Error()
       })
       const res = {
