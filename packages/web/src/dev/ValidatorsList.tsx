@@ -274,7 +274,7 @@ class ValidatorsList extends React.PureComponent<Props, State> {
     const { data } = this.props
     const validatorGroups = !data ? ([] as CeloGroup[]) : this.sortData(this.cleanData(data))
     return (
-      <View style={[styles.pStatic]}>
+      <View style={styles.pStatic}>
         <View style={[styles.table, styles.pStatic]}>
           <View style={[styles.tableRow, styles.tableHeaderRow]}>
             <HeaderCell
