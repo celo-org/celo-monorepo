@@ -105,7 +105,7 @@ export async function generateInviteLink(inviteCode: string) {
   return shortUrl
 }
 
-async function sendSms(toPhone: string, msg: string) {
+export async function sendSms(toPhone: string, msg: string) {
   return new Promise((resolve, reject) => {
     try {
       if (Platform.OS === 'android') {
@@ -113,6 +113,7 @@ async function sendSms(toPhone: string, msg: string) {
         resolve()
       } else {
         // react-native-sms types are incorrect
+        // react-native-sms doesn't seem to work on Xcode emulator but works on device
         // tslint:disable-next-line: no-floating-promises
         SendSMS.send(
           {

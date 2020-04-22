@@ -2,8 +2,7 @@ import BaseNotification from '@celo/react-components/components/BaseNotification
 import fontStyles from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { Trans, WithTranslation } from 'react-i18next'
-import { Image, Platform, StyleSheet, Text, View } from 'react-native'
-import SendIntentAndroid from 'react-native-send-intent'
+import { Image, StyleSheet, Text, View } from 'react-native'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
@@ -13,10 +12,10 @@ import { EscrowedPayment } from 'src/escrow/actions'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { inviteFriendsIcon } from 'src/images/Images'
+import { sendSms } from 'src/invite/saga'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { divideByWei } from 'src/utils/formatting'
-import { navigateToURI } from 'src/utils/linking'
 import Logger from 'src/utils/Logger'
 
 interface OwnProps {
@@ -28,18 +27,13 @@ type Props = OwnProps & WithTranslation
 const TAG = 'EscrowedPaymentListItem'
 
 export class EscrowedPaymentListItem extends React.PureComponent<Props> {
-  onRemind = () => {
+  onRemind = async () => {
     const { payment, t } = this.props
     const recipientPhoneNumber = payment.recipientPhone
     CeloAnalytics.track(CustomEventNames.clicked_escrowed_payment_send_message)
     // TODO: open up whatsapp/text message slider with pre populated message
     try {
-      if (Platform.OS === 'android') {
-        SendIntentAndroid.sendSms(recipientPhoneNumber, t('walletFlow5:escrowedPaymentReminderSms'))
-      } else {
-        // TODO look into using MFMessageComposeViewController to prefill the body for iOS
-        navigateToURI(`sms:${recipientPhoneNumber}`)
-      }
+      await sendSms(recipientPhoneNumber, t('walletFlow5:escrowedPaymentReminderSms'))
     } catch (error) {
       // TODO: use the showError saga instead of the Logger.showError, which is a hacky temp thing we used for a while that doesn't actually work on iOS
       Logger.showError(ErrorMessages.SMS_ERROR)
