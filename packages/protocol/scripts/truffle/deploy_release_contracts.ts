@@ -20,6 +20,7 @@ let ReleaseGoldMultiSig: ReleaseGoldMultiSigContract
 let ReleaseGoldMultiSigProxy: ReleaseGoldMultiSigProxyContract
 let ReleaseGold: ReleaseGoldContract
 let ReleaseGoldProxy: ReleaseGoldProxyContract
+const ONE_CGLD = web3.utils.toWei('1', 'ether')
 
 async function handleGrant(releaseGoldConfig: any, currGrant: number) {
   console.info('Processing grant number ' + currGrant)
@@ -98,7 +99,10 @@ async function handleGrant(releaseGoldConfig: any, currGrant: number) {
     'ReleaseGold',
     {
       from: fromAddress,
-      value: weiAmountReleasedPerPeriod.multipliedBy(releaseGoldConfig.numReleasePeriods).toFixed(),
+      value: weiAmountReleasedPerPeriod
+        .multipliedBy(releaseGoldConfig.numReleasePeriods)
+        .sub(startGold)
+        .toFixed(),
     },
     Math.round(releaseStartTime),
     releaseGoldConfig.releaseCliffTime,
@@ -155,7 +159,7 @@ async function checkBalance(releaseGoldConfig: any) {
   const grantDeploymentCost = weiAmountReleasedPerPeriod
     .multipliedBy(releaseGoldConfig.numReleasePeriods)
     .plus(startGold)
-    .plus(web3.utils.toWei('1', 'ether')) // Tx Fees
+    .plus(ONE_CGLD) // Tx Fees
     .toFixed()
   while (true) {
     const fromBalance = new BigNumber(await web3.eth.getBalance(fromAddress))
@@ -189,7 +193,7 @@ async function checkBalance(releaseGoldConfig: any) {
       )
       continue
     }
-    if (fromBalance.gt(web3.utils.toWei('1', 'ether'))) {
+    if (fromBalance.gt(ONE_CGLD)) {
       console.info(
         '\nSending 1 cGLD as a test from ' +
           fromAddress +
@@ -200,7 +204,7 @@ async function checkBalance(releaseGoldConfig: any) {
       await web3.eth.sendTransaction({
         from: fromAddress,
         to: addressResponse.newFromAddress,
-        value: web3.utils.toWei('1', 'ether'),
+        value: ONE_CGLD,
       })
       const confirmResponse = await prompts({
         type: 'confirm',
@@ -217,7 +221,7 @@ async function checkBalance(releaseGoldConfig: any) {
       await web3.eth.sendTransaction({
         from: fromAddress,
         to: addressResponse.newFromAddress,
-        value: fromBalancePostTransfer.minus(web3.utils.toWei('1', 'ether')), // minus Tx Fees
+        value: fromBalancePostTransfer.minus(ONE_CGLD).toFixed(), // minus Tx Fees
       })
     }
     const switchResponse = await prompts({
