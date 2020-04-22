@@ -154,10 +154,6 @@ contract('StableToken', (accounts: string[]) => {
       assert.equal(supply, 0)
     })
 
-    it('should not allow the minting negative value', async () => {
-      await assertRevert(stableToken.mint(validators, -amountToMint, { from: validators }))
-    })
-
     it('should not allow anyone else to mint', async () => {
       await assertRevert(stableToken.mint(validators, amountToMint, { from: accounts[2] }))
     })
