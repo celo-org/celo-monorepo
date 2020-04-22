@@ -13,7 +13,8 @@ export const styles = StyleSheet.create({
   cover: {
     marginTop: HEADER_HEIGHT,
     backgroundColor: colors.dark,
-    maxWidth: '100vw',
+    minWidth: '100vw',
+    width: '100%',
   },
   defaultText: {
     fontFamily: typeFaces.futura,
@@ -57,6 +58,7 @@ export const styles = StyleSheet.create({
     width: 1020,
     margin: 'auto',
     marginBottom: 100,
+    backgroundColor: colors.dark,
   },
   tableRow: {
     display: 'flex',
