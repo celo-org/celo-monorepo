@@ -45,13 +45,13 @@ async function oracleIdentityHelmParameters(celoEnv: string) {
   let params: string[] = []
   for (let i = 0; i < replicas; i++) {
     const identity = await createOracleIdentityIfNotExists(celoEnv, i)
-    const { address, keyVaultName } = addressesAndVaults[i]
+    const { address, keyVaultName: vaultName } = addressesAndVaults[i]
     const prefix = `--set oracle.identities[${i}]`
     params = params.concat([
       `${prefix}.address=${address}`,
       `${prefix}.azure.id=${identity.id}`,
       `${prefix}.azure.clientId=${identity.clientId}`,
-      `${prefix}.azure.keyVaultName=${keyVaultName}`,
+      `${prefix}.azure.keyVaultName=${vaultName}`,
     ])
   }
   return params
@@ -94,22 +94,22 @@ function keyVaultName(oracleIndex: number) {
 //   <address>:<keyVaultName>,<address>:<keyVaultName>
 //   eg: 0x0000000000000000000000000000000000000000:keyVault0,0x0000000000000000000000000000000000000001:keyVault1
 // into an array in the same order
-function oracleAddressesAndVaults(): {
+function oracleAddressesAndVaults(): Array<{
   address: string
   keyVaultName: string
-}[] {
+}> {
   const vaultNamesAndAddresses = fetchEnv(envVar.ORACLE_ADDRESS_KEY_VAULTS).split(',')
   const addressesAndVaults = []
   for (const nameAndAddress of vaultNamesAndAddresses) {
-    const [address, keyVaultName] = nameAndAddress.split(':')
-    if (!address || !keyVaultName) {
+    const [address, vaultName] = nameAndAddress.split(':')
+    if (!address || !vaultName) {
       throw Error(
-        `Address or key vault name is invalid. Address: ${address} Key Vault Name: ${keyVaultName}`
+        `Address or key vault name is invalid. Address: ${address} Key Vault Name: ${vaultName}`
       )
     }
     addressesAndVaults.push({
       address,
-      keyVaultName,
+      keyVaultName: vaultName,
     })
   }
   return addressesAndVaults
