@@ -57,6 +57,7 @@ export const stateGetters: StateGetter[] = [
       CeloContract.StableToken,
     ]),
     getter('Reserve', 'getReserveGoldBalance', (goldBalance) => ({ goldBalance: +goldBalance })),
+    getter('Reserve', 'getReserveRatio', (reserveRatio) => ({ reserveRatio: +reserveRatio })),
     getter('Exchange', 'reserveFraction', (reserveFraction) => ({
       reserveFraction: +reserveFraction,
     })),

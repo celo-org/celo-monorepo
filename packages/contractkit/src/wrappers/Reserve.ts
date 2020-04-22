@@ -56,6 +56,12 @@ export class ReserveWrapper extends BaseWrapper<Reserve> {
   )
 
   /**
+   * Returns the reserve cGLD balance.
+   * @returns cGLD balance.
+   */
+  getReserveRatio = proxyCall(this.contract.methods.getReserveRatio, undefined, valueToBigNumber)
+
+  /**
    * Returns current configuration parameters.
    */
   async getConfig(): Promise<ReserveConfig> {
