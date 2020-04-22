@@ -322,7 +322,7 @@ contract MultiSig is Initializable {
       if (confirmations[transactionId][owners[i]]) count = count.add(1);
   }
 
-  /// @dev Returns total number of transactions after filers are applied.
+  /// @dev Returns total number of transactions after filters are applied.
   /// @param pending Include pending transactions.
   /// @param executed Include executed transactions.
   /// @return Total number of transactions after filters are applied.

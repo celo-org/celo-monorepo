@@ -13,6 +13,7 @@ contract DowntimeSlasher is SlasherUtil {
   uint256 public slashableDowntime;
 
   event SlashableDowntimeSet(uint256 interval);
+  event DowntimeSlashPerformed(address indexed validator, uint256 indexed startBlock);
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
@@ -46,9 +47,11 @@ contract DowntimeSlasher is SlasherUtil {
 
   /**
    * @notice Test if a validator has been down.
-   * @param startBlock First block of the downtime.
-   * @param startSignerIndex Validator index at the first block.
-   * @param endSignerIndex Validator index at the last block.
+   * @param startBlock First block of the downtime. Last block will be computed from this.
+   * @param startSignerIndex Index of the signer within the validator set as of the start block.
+   * @param endSignerIndex Index of the signer within the validator set as of the end block.
+   * @return True if the validator signature does not appear in any block within the window.
+   * @dev Due to getParentSealBitmap, startBlock must be within 4 epochs of the current head.
    */
   function isDown(uint256 startBlock, uint256 startSignerIndex, uint256 endSignerIndex)
     public
@@ -150,6 +153,6 @@ contract DowntimeSlasher is SlasherUtil {
       groupElectionGreaters,
       groupElectionIndices
     );
+    emit DowntimeSlashPerformed(validator, startBlock);
   }
-
 }
