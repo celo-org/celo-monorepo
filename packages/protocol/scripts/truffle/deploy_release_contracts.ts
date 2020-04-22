@@ -27,16 +27,32 @@ async function handleGrant(releaseGoldConfig: any, currGrant: number) {
   console.info('Processing grant number ' + currGrant)
 
   // Sentinel MAINNET dictates a start time of mainnet launch, April 22 2020 16:00 UTC in this case
-  let releaseStartTime: any
-  if (releaseGoldConfig.releaseStartTime.startsWith('MAINNET')) {
-    releaseStartTime = MAINNET_START_TIME
-  } else {
-    releaseStartTime = new Date(releaseGoldConfig.releaseStartTime).getTime() / 1000
+  const releaseStartTime = releaseGoldConfig.releaseStartTime.startsWith('MAINNET')
+    ? MAINNET_START_TIME
+    : new Date(releaseGoldConfig.releaseStartTime).getTime() / 1000
+
+  const weiAmountReleasedPerPeriod = new BigNumber(
+    web3.utils.toWei(releaseGoldConfig.amountReleasedPerPeriod.toString())
+  )
+
+  let totalValue = weiAmountReleasedPerPeriod.multipliedBy(releaseGoldConfig.numReleasePeriods)
+  if (totalValue.lt(startGold)) {
+    console.info('Total value of grant less than cGLD for beneficiary addreess')
+    process.exit(0)
   }
+  const adjustedAmountPerPeriod = totalValue
+    .minus(startGold)
+    .div(releaseGoldConfig.numReleasePeriods)
+    .dp(0)
+
+  // Reflect any rounding changes from the division above
+  totalValue = adjustedAmountPerPeriod.multipliedBy(releaseGoldConfig.numReleasePeriods)
+
   const message =
     'Please review this grant before you deploy:\n\tTotal Grant Value: ' +
-    Number(releaseGoldConfig.numReleasePeriods) *
-      Number(releaseGoldConfig.amountReleasedPerPeriod) +
+    totalValue +
+    '\n\tStarting gold to send to beneficiary (this plus grant value should reflect config value): ' +
+    startGold +
     '\n\tGrant Recipient ID: ' +
     releaseGoldConfig.identifier +
     '\n\tGrant Beneficiary address: ' +
@@ -82,17 +98,6 @@ async function handleGrant(releaseGoldConfig: any, currGrant: number) {
   })
   const releaseGoldProxy = await ReleaseGoldProxy.new({ from: fromAddress })
   const releaseGoldInstance = await ReleaseGold.new({ from: fromAddress })
-  const weiAmountReleasedPerPeriod = new BigNumber(
-    web3.utils.toWei(releaseGoldConfig.amountReleasedPerPeriod.toString())
-  )
-  const totalValue = weiAmountReleasedPerPeriod.multipliedBy(releaseGoldConfig.numReleasePeriods)
-  if (totalValue.lt(startGold)) {
-    console.info('Total value of grant less than cGLD for beneficiary addreess')
-    process.exit(0)
-  }
-  const adjustedAmountPerPeriod = totalValue
-    .minus(startGold)
-    .div(releaseGoldConfig.numReleasePeriods)
 
   const releaseGoldTxHash = await _setInitialProxyImplementation(
     web3,
@@ -101,7 +106,7 @@ async function handleGrant(releaseGoldConfig: any, currGrant: number) {
     'ReleaseGold',
     {
       from: fromAddress,
-      value: totalValue.minus(startGold).toFixed(),
+      value: totalValue.toFixed(),
     },
     Math.round(releaseStartTime),
     releaseGoldConfig.releaseCliffTime,
