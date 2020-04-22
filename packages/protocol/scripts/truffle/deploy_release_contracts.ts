@@ -21,24 +21,16 @@ let ReleaseGoldMultiSigProxy: ReleaseGoldMultiSigProxyContract
 let ReleaseGold: ReleaseGoldContract
 let ReleaseGoldProxy: ReleaseGoldProxyContract
 const ONE_CGLD = web3.utils.toWei('1', 'ether')
+const MAINNET_START_TIME = new Date('22 April 2020 16:00:00 UTC').getTime() / 1000
 
 async function handleGrant(releaseGoldConfig: any, currGrant: number) {
   console.info('Processing grant number ' + currGrant)
 
-  // Special mainnet string is intended as MAINNET+X where X is months after mainnet launch.
-  // This is to account for the dynamic start date for mainnet,
-  // and some grants rely on x months post mainnet launch.
-  let releaseStartTime: any
-  if (releaseGoldConfig.releaseStartTime.startsWith('MAINNET')) {
-    const addedMonths = Number(releaseGoldConfig.releaseStartTime.split('+')[1])
-    const date = new Date()
-    if (addedMonths > 0) {
-      date.setDate(date.getDate() + addedMonths * 30)
-    }
-    releaseStartTime = date.getTime() / 1000
-  } else {
-    releaseStartTime = new Date(releaseGoldConfig.releaseStartTime).getTime() / 1000
-  }
+  // Sentinel MAINNET dictates a start time of mainnet launch, April 22 2020 16:00 UTC in this case
+  const releaseStartTime = releaseGoldConfig.releaseStartTime.startsWith('MAINNET')
+    ? MAINNET_START_TIME
+    : new Date(releaseGoldConfig.releaseStartTime).getTime() / 1000
+
   const message =
     'Please review this grant before you deploy:\n\tTotal Grant Value: ' +
     Number(releaseGoldConfig.numReleasePeriods) *
@@ -88,10 +80,12 @@ async function handleGrant(releaseGoldConfig: any, currGrant: number) {
   })
   const releaseGoldProxy = await ReleaseGoldProxy.new({ from: fromAddress })
   const releaseGoldInstance = await ReleaseGold.new({ from: fromAddress })
+
   const weiAmountReleasedPerPeriod = new BigNumber(
     web3.utils.toWei(releaseGoldConfig.amountReleasedPerPeriod.toString())
   )
-  const totalValue = weiAmountReleasedPerPeriod.multipliedBy(releaseGoldConfig.numReleasePeriods)
+
+  let totalValue = weiAmountReleasedPerPeriod.multipliedBy(releaseGoldConfig.numReleasePeriods)
   if (totalValue.lt(startGold)) {
     console.info('Total value of grant less than cGLD for beneficiary addreess')
     process.exit(0)
@@ -99,6 +93,10 @@ async function handleGrant(releaseGoldConfig: any, currGrant: number) {
   const adjustedAmountPerPeriod = totalValue
     .minus(startGold)
     .div(releaseGoldConfig.numReleasePeriods)
+    .dp(0)
+
+  // Reflect any rounding changes from the division above
+  totalValue = adjustedAmountPerPeriod.multipliedBy(releaseGoldConfig.numReleasePeriods)
 
   const releaseGoldTxHash = await _setInitialProxyImplementation(
     web3,
@@ -107,7 +105,7 @@ async function handleGrant(releaseGoldConfig: any, currGrant: number) {
     'ReleaseGold',
     {
       from: fromAddress,
-      value: totalValue.minus(startGold).toFixed(),
+      value: totalValue.toFixed(),
     },
     Math.round(releaseStartTime),
     releaseGoldConfig.releaseCliffTime,
@@ -148,13 +146,10 @@ async function handleGrant(releaseGoldConfig: any, currGrant: number) {
 
   deployedGrants.push(releaseGoldConfig.identifier)
   releases.push(record)
+  console.info('Deployed grant', record)
   // Must write to file after every grant to avoid losing info on crash.
   fs.writeFileSync(deployedGrantsFile, JSON.stringify(deployedGrants, null, 1))
-  if (argv.output_file) {
-    fs.writeFileSync(argv.output_file, JSON.stringify(releases, null, 2))
-  } else {
-    console.info('Deployed grant ', record)
-  }
+  fs.writeFileSync(argv.output_file, JSON.stringify(releases, null, 2))
 }
 
 async function checkBalance(releaseGoldConfig: any) {
@@ -416,6 +411,17 @@ module.exports = async (callback: (error?: any) => number) => {
         console.info(chalk.red('Abandoning grant deployment due to user response.'))
         process.exit(0)
       }
+    }
+    try {
+      releases = JSON.parse(fs.readFileSync(argv.output_file, 'utf-8'))
+    } catch (e) {
+      // If this fails, file must be created
+      fs.writeFile(argv.output_file, '', (err) => {
+        if (err) {
+          throw err
+        }
+      })
+      releases = []
     }
     fs.readFile(argv.grants, handleJSONFile)
   } catch (error) {
