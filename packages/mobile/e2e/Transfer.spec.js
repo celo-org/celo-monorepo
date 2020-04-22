@@ -53,12 +53,12 @@ describe('Transfer Works', () => {
     await element(by.id('JoinCeloContinueButton')).tap()
   })
 
-  it('NUX-Terms', async () => {
+  it.skip('NUX-Terms', async () => {
     await expect(element(by.id('AcceptTermsButton'))).toBeVisible()
     await element(by.id('AcceptTermsButton')).tap()
   })
 
-  it('NUX->Pin', async () => {
+  it.skip('NUX->Pin', async () => {
     await expect(element(by.id('SystemAuthTitle'))).toBeVisible()
     await expect(element(by.id('SystemAuthContinue'))).toBeVisible()
 
