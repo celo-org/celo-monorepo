@@ -52,6 +52,7 @@
     "humanize-duration": "^3.21.0",
     "path": "^0.12.7",
     "prompts": "^2.0.1",
+    "randombytes": "^2.0.1",
     "tslib": "^1",
     "web3": "1.2.4"
   },
