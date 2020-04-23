@@ -293,6 +293,8 @@ const AppStack = createStackNavigator(
     [Screens.ReclaimPaymentConfirmationScreen]: {
       screen: ReclaimPaymentConfirmationScreen,
     },
+    // Adding this stack, so it possbile to go back to Home screen from it
+    [Stacks.BackupStack]: { screen: BackupStack },
     [Stacks.QRSendStack]: { screen: QRSendStack },
     [Stacks.ExchangeStack]: { screen: ExchangeStack },
     [Stacks.IncomingRequestStack]: { screen: IncomingRequestStack },
