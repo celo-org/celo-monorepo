@@ -1,8 +1,8 @@
 # Celo Protocol
 
-Celo's blockchain reference implementation is based on go-ethereum, the Go implementation of the Ethereum protocol. We're indebted to the Geth community for providing these shoulders to stand on and, while recognizing that Ethereum is an independent project with its own trajectory, we hope to contribute back where we can.
+Celo's blockchain reference implementation is based on go-ethereum, the Go implementation of the Ethereum protocol. The project team is indebted to the Geth community for providing these shoulders to stand on and, while recognizing that Ethereum is an independent project with its own trajectory, hopes to contribute changes where it makes sense to do so.
 
-We have made a number of substantial changes in service of Celo's product goals, including the following:
+A number of substantial changes have been made in service of Celo's product goals, including the following:
 
 {% page-ref page="consensus/" %}
 

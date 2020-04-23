@@ -1,8 +1,8 @@
-import { getContactMatches, getSalt } from '../src/index'
-import { computeBLSSalt } from '../src/salt-generation/bls-salt'
 import { getNumberPairContacts, setNumberPairContacts } from '../src/database/wrappers/number-pairs'
+import { getBlindedMessageSignature, getContactMatches } from '../src/index'
+import { computeBlindedSignature } from '../src/salt-generation/bls-signature'
 
-const BLS_SALT = '6546544323114343'
+const BLS_SIGNATURE = '6546544323114343'
 
 jest.mock('../src/common/identity', () => ({
   authenticateUser: jest.fn().mockReturnValue(true),
@@ -15,9 +15,9 @@ jest.mock('../src/salt-generation/query-quota', () => {
   })
 })
 
-jest.mock('../src/salt-generation/bls-salt')
-const mockBlsSalt = computeBLSSalt as jest.Mock
-mockBlsSalt.mockReturnValue(BLS_SALT)
+jest.mock('../src/salt-generation/bls-signature')
+const mockComputeBlindedSignature = computeBlindedSignature as jest.Mock
+mockComputeBlindedSignature.mockReturnValue(BLS_SIGNATURE)
 
 jest.mock('../src/database/wrappers/account', () => ({
   incrementQueryCount: jest.fn().mockReturnValue(new Promise((resolve) => resolve())),
@@ -30,7 +30,7 @@ const mockGetNumberPairContacts = getNumberPairContacts as jest.Mock
 
 // TODO the failures are nested in the res structure as a deep equality which does not fail
 // the full test
-describe(`POST /getSalt endpoint`, () => {
+describe(`POST /getBlindedMessageSignature endpoint`, () => {
   describe('with valid input', () => {
     const queryPhoneNumber = '+5555555555'
     const phoneNumber = '+1234567890'
@@ -43,15 +43,15 @@ describe(`POST /getSalt endpoint`, () => {
     }
     const req = { body: mockRequestData }
 
-    it('provides salt', () => {
+    it('provides signature', () => {
       const res = {
         json(body: any) {
           expect(body.success).toEqual(true)
-          expect(body.salt).toEqual(BLS_SALT)
+          expect(body.signature).toEqual(BLS_SIGNATURE)
         },
       }
       // @ts-ignore TODO fix req type to make it a mock express req
-      getSalt(req, res)
+      getBlindedMessageSignature(req, res)
     })
     it('returns 400 on query count 0', () => {
       mockGetRemainingQueryCount = jest.fn(() => 0)
@@ -62,26 +62,26 @@ describe(`POST /getSalt endpoint`, () => {
         status: (status: any) => {
           expect(status).toEqual(400)
           // tslint:disable-next-line: no-empty
-          return { send: () => {} }
+          return { json: () => {} }
         },
       }
       // @ts-ignore TODO fix req type to make it a mock express req
-      getSalt(req, res)
+      getBlindedMessageSignature(req, res)
     })
     it('returns 500 on bls error', () => {
       mockGetRemainingQueryCount = jest.fn()
-      mockBlsSalt.mockImplementation(() => {
+      mockComputeBlindedSignature.mockImplementation(() => {
         throw Error()
       })
       const res = {
         status: (status: any) => {
           expect(status).toEqual(500)
           // tslint:disable-next-line: no-empty
-          return { send: () => {} }
+          return { json: () => {} }
         },
       }
       // @ts-ignore TODO fix req type to make it a mock express req
-      getSalt(req, res)
+      getBlindedMessageSignature(req, res)
     })
   })
   describe('with invalid input', () => {
@@ -101,11 +101,11 @@ describe(`POST /getSalt endpoint`, () => {
         status: (status: any) => {
           expect(status).toEqual(400)
           // tslint:disable-next-line: no-empty
-          return { send: () => {} }
+          return { json: () => {} }
         },
       }
       // @ts-ignore TODO fix req type to make it a mock express req
-      getSalt(req, res)
+      getBlindedMessageSignature(req, res)
     })
     it('invalid address returns 400', () => {
       const queryPhoneNumber = '+5555555555'
@@ -123,11 +123,11 @@ describe(`POST /getSalt endpoint`, () => {
         status: (status: any) => {
           expect(status).toEqual(400)
           // tslint:disable-next-line: no-empty
-          return { send: () => {} }
+          return { json: () => {} }
         },
       }
       // @ts-ignore TODO fix req type to make it a mock express req
-      getSalt(req, res)
+      getBlindedMessageSignature(req, res)
     })
   })
 })
@@ -145,8 +145,7 @@ describe(`POST /getContactMatches endpoint`, () => {
     const req = { body: mockRequestData }
     it('provides matches', () => {
       mockGetNumberPairContacts.mockReturnValue(contactPhoneNumbers)
-      mockBlsSalt.mockReturnValue(BLS_SALT)
-      const expected = [{ phoneNumber: contactPhoneNumber1, salt: BLS_SALT }]
+      const expected = [{ phoneNumber: contactPhoneNumber1 }]
       const res = {
         json(body: any) {
           expect(body.success).toEqual(true)
@@ -181,7 +180,7 @@ describe(`POST /getContactMatches endpoint`, () => {
         status(status: any) {
           expect(status).toEqual(400)
           return {
-            send() {
+            json() {
               return {}
             },
           }
@@ -202,7 +201,7 @@ describe(`POST /getContactMatches endpoint`, () => {
         status(status: any) {
           expect(status).toEqual(400)
           return {
-            send() {
+            json() {
               return {}
             },
           }
