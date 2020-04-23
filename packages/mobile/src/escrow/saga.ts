@@ -268,7 +268,7 @@ function* doFetchSentPayments() {
     const sentPaymentsRaw = yield all(
       sentPaymentIDs.map((paymentID) => call(getEscrowedPayment, escrow, paymentID))
     )
-    // const tempAddresstoRecipientPhoneNumber: InviteDetails = yield select(inviteesSelector)
+
     const invitees: InviteDetails[] = yield select(inviteesSelector)
     const sentPayments: EscrowedPayment[] = []
     for (let i = 0; i < sentPaymentsRaw.length; i++) {
@@ -287,6 +287,8 @@ function* doFetchSentPayments() {
         continue
       }
 
+      // OPEN QUESTION - we may possibly want to update invite.invitees with this data rather than
+      // create a largely duplicative datas structure
       const escrowPaymentWithRecipient: EscrowedPayment = {
         paymentID: id,
         senderAddress: payment[1],

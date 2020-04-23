@@ -195,16 +195,16 @@ export function* sendInvite(
     // OPEN QUESTION - does storing invitee data only in the event of a successful transaction have
     // unintended consequences? Seems right to me but previous position was before the generateStandbyTransactionId call
     const inviteDetails: InviteDetails = {
-      timestamp: 100, // placeholder
+      timestamp: new BigNumber(Date.now()), // we probably want to read from the actual tx data for this
       e164Number,
       tempWalletAddress: temporaryAddress,
-      tempWalletPrivateKey: temporaryWalletAccount.privateKey,
-      tempWalletRedeemed: false,
+      tempWalletPrivateKey: temporaryWalletAccount.privateKey, // what do we need this for?
+      tempWalletRedeemed: false, // no logic in place to toggle this yet
       inviteCode,
-      escrowAmount: amount,
+      escrowAmount: amount, // formatting is inconsistent with sentEscrowedPayments.amount
       escrowCurrency: currency,
-      escrowTxId,
-      escrowRedeemed: false,
+      escrowTxId, // the tx id we are saving is wrong (paymentId in sentEscrowedPayments is wrong too)
+      escrowRedeemed: false, // no logic in place to toggle this yet
     }
 
     // Store the Temp Address locally so we know which transactions were invites

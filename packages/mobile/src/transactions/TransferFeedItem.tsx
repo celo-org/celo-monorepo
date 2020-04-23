@@ -83,7 +83,6 @@ export function TransferFeedItem(props: Props) {
     commentKey,
     status,
     invitees,
-    addressToE164Number,
     recipientCache,
   } = props
 
@@ -98,7 +97,6 @@ export function TransferFeedItem(props: Props) {
     invitees,
     recipientCache,
     address,
-    addressToE164Number,
     comment,
     commentKey
   )

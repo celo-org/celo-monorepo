@@ -31,9 +31,12 @@ export class EscrowedPaymentListItem extends React.PureComponent<Props> {
     const { payment, t } = this.props
     const recipientPhoneNumber = payment.recipientPhone
     CeloAnalytics.track(CustomEventNames.clicked_escrowed_payment_send_message)
-    // TODO: add a UI that allows user to choose between SMS and Whatsapp (currently only SMS) for reminder message
+    // TODO(Tarik): add a UI that allows user to choose between SMS and Whatsapp (currently only SMS) for reminder message
     try {
-      await sendSms(recipientPhoneNumber, t('walletFlow5:escrowedPaymentReminderSms'))
+      await sendSms(recipientPhoneNumber, t('walletFlow5:escrowedPaymentReminderSms'), {
+        code: inviteCode,
+        link,
+      })
     } catch (error) {
       // TODO: use the showError saga instead of the Logger.showError, which is a hacky temp thing we used for a while that doesn't actually work on iOS
       Logger.showError(ErrorMessages.SMS_ERROR)

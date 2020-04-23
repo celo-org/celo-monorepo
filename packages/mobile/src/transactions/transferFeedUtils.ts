@@ -4,7 +4,6 @@ import * as _ from 'lodash'
 import { TokenTransactionType } from 'src/apollo/types'
 import { DEFAULT_TESTNET } from 'src/config'
 import { features } from 'src/flags'
-import { AddressToE164NumberType } from 'src/identity/reducer'
 import { InviteDetails } from 'src/invite/actions'
 import { getRecipientFromAddress, NumberToRecipient } from 'src/recipients/recipient'
 
@@ -28,7 +27,6 @@ export function getTransferFeedParams(
   invitees: InviteDetails[],
   recipientCache: NumberToRecipient,
   address: string,
-  addressToE164Number: AddressToE164NumberType,
   comment: string | null,
   commentKey: Buffer | null
 ) {
@@ -65,8 +63,6 @@ export function getTransferFeedParams(
       )
       const inviteeE164Number = inviteDetails ? inviteDetails.e164Number : undefined
       const inviteeRecipient = inviteeE164Number ? recipientCache[inviteeE164Number] : undefined
-      // const inviteeE164Number = invitees[address]
-      // const inviteeRecipient = recipientCache[inviteeE164Number]
       title = t('feedItemInviteSentTitle')
       info = t('feedItemInviteSentInfo', {
         context: !inviteeE164Number ? 'missingInviteeDetails' : null,
