@@ -1,6 +1,6 @@
 # Running a Full Node
 
-This section explains how to get a full node running on the [Baklava Network](baklava-testnet.md), using a Docker image that was built for this purpose.
+This section explains how to get a full node running on the [Release Candidate 1 Network](rc1.md), using a Docker image that was built for this purpose.
 
 Full nodes play a special purpose in the Celo ecosystem, acting as a bridge between the mobile wallets \(running as light clients\) and the validator nodes. To make sure that full nodes are rewarded for this service, the Celo protocol includes [full node incentives](../celo-codebase/protocol/transactions/full-node-incentives.md).
 
@@ -23,8 +23,8 @@ When you see text in angle brackets &lt;&gt;, replace them and the text inside w
 First we are going to setup the environment variables required for `Baklava` network. Run:
 
 ```bash
-export CELO_IMAGE=us.gcr.io/celo-testnet/celo-node:baklava
-export NETWORK_ID=40120
+export CELO_IMAGE=us.gcr.io/celo-testnet/celo-node:rc1
+export NETWORK_ID=42220
 ```
 
 ## Pull the Celo Docker image
