@@ -112,5 +112,8 @@
   "timeframes": {
     "30d": "30 days"
   },
-  "message": "Message"
+  "message": "Message",
+  "addressLookupFailure": "Failed to look up phone number address",
+  "saltFetchFailure": "Failed to retrieve phone number secret",
+  "saltQuotaExceededError": "Your phone number lookup quota is used up"
 }

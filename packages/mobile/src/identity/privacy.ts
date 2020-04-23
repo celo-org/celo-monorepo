@@ -33,7 +33,7 @@ export function* fetchPhoneHashPrivate(e164Number: string) {
 
     Logger.debug(`${TAG}@fetchPrivatePhoneHash`, 'Salt was not cached, fetching')
     const details: PhoneNumberHashDetails = yield call(getPhoneHashPrivate, e164Number)
-    yield put(updateE164PhoneNumberSalts({ e164Number: details.salt }))
+    yield put(updateE164PhoneNumberSalts({ [e164Number]: details.salt }))
     return details
   } catch (error) {
     if (error.message === ErrorMessages.SALT_QUOTA_EXCEEDED) {
@@ -43,7 +43,7 @@ export function* fetchPhoneHashPrivate(e164Number: string) {
       )
       // TODO nav to quota purchase screen
     } else {
-      throw error
+      throw new Error(ErrorMessages.SALT_FETCH_FAILURE)
     }
   }
 }
@@ -51,8 +51,7 @@ export function* fetchPhoneHashPrivate(e164Number: string) {
 // Unlike the getPhoneHash in utils, this leverage the phone number
 // privacy service to compute a secure, unique salt for the phone number
 // and then appends it before hashing.
-// Exported for tests, don't use directly. Use fetchPrivatePhoneHash instead.
-export async function getPhoneHashPrivate(e164Number: string): Promise<PhoneNumberHashDetails> {
+async function getPhoneHashPrivate(e164Number: string): Promise<PhoneNumberHashDetails> {
   const salt = await getPhoneNumberSalt(e164Number)
   const phoneHash = getPhoneHash(e164Number, salt)
   return {

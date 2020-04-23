@@ -58,7 +58,6 @@ export class IncomingPaymentRequestSummaryNotification extends React.Component<P
       <PaymentRequestNotificationInner
         key={item.uid}
         amount={item.amount}
-        requesterE164Number={item.requesterE164Number}
         requesterRecipient={getSenderFromPaymentRequest(
           item,
           this.props.addressToE164Number,

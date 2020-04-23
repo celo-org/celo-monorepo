@@ -15,11 +15,7 @@ import {
   updateE164PhoneNumberAddresses,
 } from 'src/identity/actions'
 import { fetchPhoneHashPrivate, PhoneNumberHashDetails } from 'src/identity/privacy'
-import {
-  AddressToE164NumberType,
-  e164NumberToAddressSelector,
-  E164NumberToAddressType,
-} from 'src/identity/reducer'
+import { AddressToE164NumberType, E164NumberToAddressType } from 'src/identity/reducer'
 import { setRecipientCache } from 'src/recipients/actions'
 import { contactsToRecipients, NumberToRecipient } from 'src/recipients/recipient'
 import { getAllContacts } from 'src/utils/contacts'
@@ -59,8 +55,7 @@ function* doImportContacts() {
   }
 
   const defaultCountryCode: string = yield select(defaultCountryCodeSelector)
-  const e164NumberToAddress: E164NumberToAddressType = yield select(e164NumberToAddressSelector)
-  const recipients = contactsToRecipients(contacts, defaultCountryCode, e164NumberToAddress)
+  const recipients = contactsToRecipients(contacts, defaultCountryCode)
   if (!recipients) {
     return Logger.warn(TAG, 'No recipients found')
   }
@@ -103,7 +98,7 @@ export function* fetchPhoneAddresses({ e164Number }: FetchPhoneAddressesAction) 
     Logger.debug(TAG + '@fetchPhoneAddresses', `Fetching addresses for number`)
     // Clear existing entries for those numbers so our mapping consumers
     // know new status is pending.
-    yield put(updateE164PhoneNumberAddresses({ e164Number: undefined }, {}))
+    yield put(updateE164PhoneNumberAddresses({ [e164Number]: undefined }, {}))
 
     const contractKit = getContractKit()
     const attestationsWrapper: AttestationsWrapper = yield call([
@@ -131,8 +126,7 @@ export function* fetchPhoneAddresses({ e164Number }: FetchPhoneAddressesAction) 
     )
   } catch (error) {
     Logger.error(TAG + '@fetchPhoneAddresses', `Error fetching addresses`, error)
-    //TODO create new error message
-    yield put(showError(ErrorMessages.SALT_FETCH_FAILURE))
+    yield put(showError(ErrorMessages.ADDRESS_LOOKUP_FAILURE))
   }
 }
 

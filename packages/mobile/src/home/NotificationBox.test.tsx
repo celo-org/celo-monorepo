@@ -19,7 +19,7 @@ const storeDataNotificationsEnabled = {
     dismissedInviteFriends: false,
     dismissedGetVerified: false,
     accountCreationTime: EXPIRED_BACKUP_TIME,
-    incomingPaymentRequests: mockPaymentRequests,
+    incomingPaymentRequests: mockPaymentRequests.slice(0, 2),
   },
 }
 
@@ -97,8 +97,8 @@ describe('NotificationBox', () => {
       </Provider>
     )
 
-    const element = getByTestId('IncomingPaymentRequestNotification/fas12fas4fa141241/Title')
-    expect(getElementText(element)).toBe('+14155550000 requested $16.41')
+    const element = getByTestId('IncomingPaymentRequestNotification/FAKE_ID_1/Title')
+    expect(getElementText(element)).toBe('+14155550000 requested $266,000.00')
   })
 
   it('renders incoming payment requests when they exist', () => {
@@ -146,8 +146,8 @@ describe('NotificationBox', () => {
         <NotificationBox />
       </Provider>
     )
-    const element = getByTestId('OutgoingPaymentRequestNotification/fas12fas4fa141241/Title')
-    expect(getElementText(element)).toBe('Requested $16.41 from +14155550000')
+    const element = getByTestId('OutgoingPaymentRequestNotification/FAKE_ID_1/Title')
+    expect(getElementText(element)).toBe('Requested $266,000.00 from +14155550000')
   })
 
   it('renders verification reminder when not verified', () => {
