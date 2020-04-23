@@ -226,7 +226,7 @@ docker run --name celo-accounts -it --restart always -p 127.0.0.1:8545:8545 -v $
 
 ### Deploy a Validator
 
-To actually register as a validator, we'll need to generate a validating signer key. On your Validator machine (which should not be accessible from the public internet), follow very similar steps:
+To actually register as a validator, we'll need to generate a validator signer key. On your Validator machine (which should not be accessible from the public internet), follow very similar steps:
 
 ```bash
 # On the validator machine
