@@ -3,7 +3,7 @@ import BigNumber from 'bignumber.js'
 import { MinimalContact } from 'react-native-contacts'
 import { NotificationTypes, PaymentRequest, PaymentRequestStatus } from 'src/account/types'
 import { EscrowedPayment } from 'src/escrow/actions'
-import { SHORT_CURRENCIES } from 'src/geth/consts'
+import { CURRENCY_ENUM, SHORT_CURRENCIES } from 'src/geth/consts'
 import { AddressToE164NumberType, E164NumberToAddressType } from 'src/identity/reducer'
 import { AttestationCode } from 'src/identity/verification'
 import {
@@ -14,7 +14,18 @@ import {
 
 export const mockName = 'John Doe'
 export const mockAccount = '0x0000000000000000000000000000000000007E57'
-export const mockAccount2 = '0x1Ff482D42D8727258A1686102Fa4ba925C46Bc42'
+export const mockkAccount2 = '0x1Ff482D42D8727258A1686102Fa4ba925C46Bc42'
+
+export const mockAccount3 = '0x9335BaFcE54cAa0D6690d1D4DA6406568b52488F'
+export const mockAccount3PrivateKey =
+  '0xe59c12feb5ea13dabcc068a28d1d521a26e39464faa7bbcc01f43b8340e92fa6'
+export const mockAccount4 = '0x8e1Df47B7064D005Ef071a89D0D7dc8634BC8A9C'
+export const mockAccount4PrivateKey =
+  '0xb33eac631fd3a415f3738649db8cad57da78b99ec92cd8f77b76b5dae2ebdf27'
+export const mockInviteCode = '5ZwS/rXqE9q8wGiijR1SGibjlGT6p7vMAfQ7g0DpL6Y='
+export const mockInviteCode2 = 'sz6sYx/TpBXzc4ZJ24ytV9p4uZ7JLNj3e3a12uLr3yc='
+export const mockTxId = '0xc722727f84b17146f524eccf6a7369039cf9de31f03baa8782c864bad4a9fe8e'
+export const mockTxId2 = '0xb027f61431cd296cd09f3e13e985259d5a18264b5457cde7752b8422a4683945'
 
 export const mockMnemonic =
   'prosper winner find donate tape history measure umbrella agent patrol want rhythm old unable wash wrong need fluid hammer coach reveal plastic trust lake'
@@ -42,6 +53,9 @@ export const mockE164Number2 = '+12095559790'
 export const mockDisplayNumber2 = '(209) 555-9790'
 export const mockComment = 'Rent request for June, it is already late!!!'
 export const mockCountryCode = '+1'
+
+export const mockTimestamp = new BigNumber(1585526400)
+export const mockTimestamp2 = new BigNumber(1587622489078)
 
 export const mockQrCodeData = `{"address":"${mockAccount}","e164PhoneNumber":"${mockE164Number}","displayName":"${mockName}"}`
 
@@ -176,3 +190,29 @@ export const mockPaymentRequests: PaymentRequest[] = [
     type: NotificationTypes.PAYMENT_REQUESTED,
   },
 ]
+
+export const mockInviteDetails = {
+  timestamp: mockTimestamp,
+  e164Number: mockE164Number,
+  tempWalletAddress: mockAccount3,
+  tempWalletPrivateKey: mockAccount3PrivateKey,
+  tempWalletRedeemed: false,
+  inviteCode: mockInviteCode,
+  escrowAmount: new BigNumber(1.75),
+  escrowCurrency: CURRENCY_ENUM.DOLLAR, // Only dollars can be escrowed
+  escrowTxId: mockTxId,
+  escrowRedeemed: false,
+}
+
+export const mockInviteDetails2 = {
+  timestamp: mockTimestamp2,
+  e164Number: mockE164Number2,
+  tempWalletAddress: mockAccount4,
+  tempWalletPrivateKey: mockAccount4PrivateKey,
+  tempWalletRedeemed: false,
+  inviteCode: mockInviteCode2,
+  escrowAmount: new BigNumber(100.12),
+  escrowCurrency: CURRENCY_ENUM.DOLLAR, // Only dollars can be escrowed
+  escrowTxId: mockTxId2,
+  escrowRedeemed: false,
+}
