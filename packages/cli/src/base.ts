@@ -127,7 +127,6 @@ export abstract class BaseCommand extends LocalCommand {
       await requireNodeIsSynced(this.web3)
     }
     const res: ParserOutput<any, any> = this.parse()
-    console.log(res)
     if (res.flags.useLedger) {
       let transport: Transport
       try {
