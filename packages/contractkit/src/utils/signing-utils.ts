@@ -32,6 +32,32 @@ export function getHashFromEncoded(rlpEncode: string): string {
   return Hash.keccak256(rlpEncode)
 }
 
+function trimLeadingZero(hex: string) {
+  while (hex && hex.startsWith('0x0')) {
+    hex = '0x' + hex.slice(3)
+  }
+  return hex
+}
+
+function makeEven(hex: string) {
+  if (hex.length % 2 === 1) {
+    hex = hex.replace('0x', '0x0')
+  }
+  return hex
+}
+
+function signatureFormatter(signature: {
+  v: number
+  r: Buffer
+  s: Buffer
+}): { v: string; r: string; s: string } {
+  return {
+    v: stringNumberToHex(signature.v),
+    r: makeEven(trimLeadingZero(ensureLeading0x(signature.r.toString('hex')))),
+    s: makeEven(trimLeadingZero(ensureLeading0x(signature.s.toString('hex')))),
+  }
+}
+
 function stringNumberToHex(num?: number | string): string {
   const auxNumber = Number(num)
   if (num === '0x' || num === undefined || auxNumber === 0) {
@@ -97,9 +123,10 @@ export async function encodeTransaction(
 ): Promise<EncodedTransaction> {
   const hash = getHashFromEncoded(rlpEncoded.rlpEncode)
 
-  const v = stringNumberToHex(signature.v)
-  const r = ensureLeading0x(signature.r.toString('hex'))
-  const s = ensureLeading0x(signature.s.toString('hex'))
+  const sanitizedSignature = signatureFormatter(signature)
+  const v = sanitizedSignature.v
+  const r = sanitizedSignature.r
+  const s = sanitizedSignature.s
   const rawTx = RLP.decode(rlpEncoded.rlpEncode)
     .slice(0, 9)
     .concat([v, r, s])
