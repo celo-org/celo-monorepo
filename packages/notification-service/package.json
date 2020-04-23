@@ -34,7 +34,7 @@
     "@google-cloud/nodejs-repo-tools": "^2.3.3",
     "@types/async-polling": "^0.0.3",
     "@types/dotenv": "^4.0.3",
-    "@types/express": "^4.17.4",
+    "@types/express": "^4.17.6",
     "@types/node-fetch": "^2.1.2",
     "@types/utf8": "^2.1.6",
     "typescript": "^3.7.3"

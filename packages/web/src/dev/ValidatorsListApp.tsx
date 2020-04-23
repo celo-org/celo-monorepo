@@ -32,6 +32,7 @@ function createApolloClient(network: string) {
     cache: new InMemoryCache(),
     // TODO: Remove this workaround when the backend service fixes not needed errors
     fetch: async (...args) => {
+      // @ts-ignore
       const response = await fetch(...args)
       const { data } = await response.json()
       return new (Response as any)(JSON.stringify({ data }))

@@ -33,7 +33,7 @@
   "devDependencies": {
     "@google-cloud/nodejs-repo-tools": "^3.3.0",
     "@types/dotenv": "^8.2.0",
-    "@types/express": "^4.17.5",
+    "@types/express": "^4.17.6",
     "@types/utf8": "^2.1.6",
     "jest-fetch-mock": "^2.1.2",
     "tsc-watch": "^4.2.3",
