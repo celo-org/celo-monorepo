@@ -14,7 +14,7 @@ export async function retryTx(fn: any, ...args: any[]) {
       const response = await prompts({
         type: 'confirm',
         name: 'confirmation',
-        'Error while sending tx, press enter when resolved to try again',
+        message: 'Error while sending tx, press enter when resolved to try again',
       })
     }
   }
