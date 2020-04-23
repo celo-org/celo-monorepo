@@ -4,7 +4,7 @@ import Web3 from 'web3'
 import * as prompts from 'prompts'
 
 
-export async function retryTx(fn: any, ...args: any[]) {
+export async function retryTx(fn: any, args: any[]) {
   while (true) {
     try {
       const rvalue = await fn(...args)
