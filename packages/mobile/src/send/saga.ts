@@ -10,8 +10,8 @@ import { completePaymentRequest } from 'src/firebase/actions'
 import { features } from 'src/flags'
 import { transferGoldToken } from 'src/goldToken/actions'
 import { encryptComment } from 'src/identity/commentKey'
-import { addressToE164NumberSelector } from 'src/identity/reducer'
 import { InviteBy } from 'src/invite/actions'
+import { inviteesSelector } from 'src/invite/reducer'
 import { sendInvite } from 'src/invite/saga'
 import { navigateHome } from 'src/navigator/NavigationService'
 import { handleBarcode, shareSVGImage } from 'src/qrcode/utils'
@@ -60,11 +60,11 @@ export async function getSendFee(
 export function* watchQrCodeDetections() {
   while (true) {
     const action = yield take(Actions.BARCODE_DETECTED)
-    Logger.debug(TAG, 'Bar bar detected in watcher')
-    const addressToE164Number = yield select(addressToE164NumberSelector)
+    Logger.debug(TAG, 'Barcode detected in watcher')
+    const invitees = yield select(inviteesSelector)
     const recipientCache = yield select(recipientCacheSelector)
     try {
-      yield call(handleBarcode, action.data, addressToE164Number, recipientCache)
+      yield call(handleBarcode, action.data, invitees, recipientCache)
     } catch (error) {
       Logger.error(TAG, 'Error handling the barcode', error)
     }

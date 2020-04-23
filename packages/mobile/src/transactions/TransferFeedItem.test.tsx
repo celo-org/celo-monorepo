@@ -3,23 +3,38 @@ import 'react-native'
 import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
 import { TokenTransactionType } from 'src/apollo/types'
+import { SHORT_CURRENCIES } from 'src/geth/consts'
 import { TransactionStatus } from 'src/transactions/reducer'
 import { TransferFeedItem } from 'src/transactions/TransferFeedItem'
 import { createMockStore, getMockI18nProps } from 'test/utils'
-import {
-  mockAccount,
-  mockAccount2,
-  mockAddressToE164Number,
-  mockComment,
-  mockE164Number,
-  mockPrivateDEK,
-  mockPrivateDEK2,
-  mockRecipientCache,
-} from 'test/values'
+import { mockAccount, mockAccount2, mockAddressToE164Number, mockComment, mockE164Number, mockE164Number2, mockPrivateDEK, mockPrivateDEK2, mockRecipientCache, mockTimestamp, mockTimestamp2 } from 'test/values'
 
-const invitee = {
-  [mockAccount]: mockE164Number,
-}
+const invitees = [
+  {
+    timestamp: mockTimestamp,
+    e164Number: mockE164Number,
+    tempWalletAddress: mockAccount,
+    tempWalletPrivateKey: string,
+    tempWalletRedeemed: false,
+    inviteCode: string,
+    escrowAmount: BigNumber,
+    escrowCurrency: SHORT_CURRENCIES.DOLLAR, // Only dollars can be escrowed
+    escrowTxId: string,
+    escrowRedeemed: boolean,
+  },
+  {
+    timestamp: mockTimestamp2,
+    e164Number: mockE164Number2,
+    tempWalletAddress: mockAccount,
+    tempWalletPrivateKey: string,
+    tempWalletRedeemed: false,
+    inviteCode: string,
+    escrowAmount: BigNumber,
+    escrowCurrency: SHORT_CURRENCIES.DOLLAR, // Only dollars can be escrowed
+    escrowTxId: string,
+    escrowRedeemed: boolean,
+  },
+]
 // Mock encrypted comment from account 1 to account 2.
 // Generated with `encryptComment(mockComment, Buffer.from(mockPublicDEK2, 'hex'), Buffer.from(mockPublicDEK, 'hex')).comment` from '@celo/utils'
 const encryptedMockComment =
@@ -37,7 +52,7 @@ describe('transfer feed item renders correctly', () => {
           hash={'0x'}
           amount={{ value: '-1', currencyCode: 'cUSD', localAmount: null }}
           address={mockAccount}
-          invitees={{}}
+          invitees=[{}]
           timestamp={1}
           commentKey={null}
           addressToE164Number={{}}
@@ -59,7 +74,7 @@ describe('transfer feed item renders correctly', () => {
           hash={'0x'}
           amount={{ value: '-1', currencyCode: 'cUSD', localAmount: null }}
           address={mockAccount2}
-          invitees={{}}
+          invitees=[{}]
           timestamp={1}
           commentKey={mockPrivateDEK}
           addressToE164Number={{}}
@@ -81,7 +96,7 @@ describe('transfer feed item renders correctly', () => {
           hash={'0x'}
           amount={{ value: '100', currencyCode: 'cUSD', localAmount: null }}
           address={mockAccount}
-          invitees={{}}
+          invitees=[{}]
           timestamp={1}
           commentKey={mockPrivateDEK2}
           addressToE164Number={{}}
@@ -103,7 +118,7 @@ describe('transfer feed item renders correctly', () => {
           hash={'0x'}
           amount={{ value: '-0.33', currencyCode: 'cUSD', localAmount: null }}
           address={mockAccount}
-          invitees={{}}
+          invitees=[{}]
           timestamp={1}
           commentKey={null}
           addressToE164Number={{}}
@@ -125,7 +140,7 @@ describe('transfer feed item renders correctly', () => {
           hash={'0x'}
           amount={{ value: '-0.002', currencyCode: 'cUSD', localAmount: null }}
           address={mockAccount}
-          invitees={{}}
+          invitees=[{}]
           timestamp={1}
           commentKey={null}
           addressToE164Number={{}}
@@ -147,7 +162,7 @@ describe('transfer feed item renders correctly', () => {
           hash={'0x'}
           amount={{ value: '-0.0000002', currencyCode: 'cUSD', localAmount: null }}
           address={mockAccount}
-          invitees={{}}
+          invitees=[{}]
           timestamp={1}
           commentKey={null}
           addressToE164Number={{}}
@@ -169,7 +184,7 @@ describe('transfer feed item renders correctly', () => {
           hash={'0x'}
           amount={{ value: '1', currencyCode: 'cUSD', localAmount: null }}
           address={mockAccount}
-          invitees={{}}
+          invitees=[{}]
           timestamp={1}
           commentKey={null}
           addressToE164Number={{}}
@@ -191,7 +206,7 @@ describe('transfer feed item renders correctly', () => {
           hash={'0x'}
           amount={{ value: '100', currencyCode: 'cUSD', localAmount: null }}
           address={mockAccount}
-          invitees={{}}
+          invitees=[{}]
           timestamp={1}
           commentKey={null}
           addressToE164Number={{}}
@@ -257,7 +272,7 @@ describe('transfer feed item renders correctly', () => {
           hash={'0x'}
           amount={{ value: '100', currencyCode: 'cUSD', localAmount: null }}
           address={mockAccount}
-          invitees={{}}
+          invitees=[{}]
           timestamp={1}
           commentKey={null}
           addressToE164Number={{}}
@@ -279,7 +294,7 @@ describe('transfer feed item renders correctly', () => {
           hash={'0x'}
           amount={{ value: '100', currencyCode: 'cUSD', localAmount: null }}
           address={mockAccount}
-          invitees={{}}
+          invitees=[{}]
           timestamp={1}
           commentKey={null}
           addressToE164Number={mockAddressToE164Number}
@@ -301,7 +316,7 @@ describe('transfer feed item renders correctly', () => {
           hash={'0x'}
           amount={{ value: '-100', currencyCode: 'cUSD', localAmount: null }}
           address={mockAccount}
-          invitees={{}}
+          invitees=[{}]
           timestamp={1}
           commentKey={null}
           addressToE164Number={{}}
@@ -323,7 +338,7 @@ describe('transfer feed item renders correctly', () => {
           hash={'0x'}
           amount={{ value: '-100', currencyCode: 'cUSD', localAmount: null }}
           address={mockAccount}
-          invitees={{}}
+          invitees=[{}]
           timestamp={1}
           commentKey={null}
           addressToE164Number={mockAddressToE164Number}

@@ -22,6 +22,7 @@ import { denyImportContacts, setHasSeenVerificationNux } from 'src/identity/acti
 import {
   Actions,
   InviteBy,
+  InviteDetails,
   RedeemInviteAction,
   redeemInviteFailure,
   redeemInviteSuccess,
@@ -160,9 +161,6 @@ export function* sendInvite(
       }
     )
 
-    // Store the Temp Address locally so we know which transactions were invites
-    yield put(storeInviteeData(temporaryAddress.toLowerCase(), inviteCode, e164Number))
-
     const txId = generateStandbyTransactionId(temporaryAddress)
 
     yield put(
@@ -192,6 +190,24 @@ export function* sendInvite(
     } else {
       Logger.error(TAG, 'Currently only dollar escrow payments are allowed')
     }
+
+    // OPEN QUESTION - does storing invitee data only in the event of a successful transaction have
+    // unintended consequences? Previous position was before the generateStandyTransactionId call
+    const inviteDetails: InviteDetails = {
+      timestamp: 100, // placeholder
+      e164Number,
+      tempWalletAddress: temporaryAddress,
+      tempWalletPrivateKey: temporaryWalletAccount.privateKey,
+      tempWalletRedeemed: false,
+      inviteCode,
+      escrowAmount: amount,
+      escrowCurrency: currency,
+      escrowTxId: string,
+      escrowRedeemed: false,
+    }
+
+    // Store the Temp Address locally so we know which transactions were invites
+    yield put(storeInviteeData(inviteDetails))
 
     yield call(navigateToInviteMessageApp, e164Number, inviteMode, message)
   } catch (e) {

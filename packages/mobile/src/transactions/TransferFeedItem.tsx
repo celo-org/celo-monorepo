@@ -11,7 +11,7 @@ import { TokenTransactionType, TransferItemFragment } from 'src/apollo/types'
 import CurrencyDisplay, { FormatType } from 'src/components/CurrencyDisplay'
 import { Namespaces } from 'src/i18n'
 import { AddressToE164NumberType } from 'src/identity/reducer'
-import { Invitees } from 'src/invite/actions'
+import { InviteDetails } from 'src/invite/actions'
 import { getRecipientFromAddress, NumberToRecipient } from 'src/recipients/recipient'
 import { navigateToPaymentTransferReview } from 'src/transactions/actions'
 import { TransactionStatus } from 'src/transactions/reducer'
@@ -22,7 +22,7 @@ import { formatFeedTime, getDatetimeDisplayString } from 'src/utils/time'
 type Props = TransferItemFragment & {
   type: TokenTransactionType
   status: TransactionStatus
-  invitees: Invitees
+  invitees: InviteDetails[]
   addressToE164Number: AddressToE164NumberType
   recipientCache: NumberToRecipient
   commentKey: Buffer | null
@@ -44,10 +44,15 @@ function navigateToTransactionReview({
     return
   }
 
+  const inviteNotSent = type !== TokenTransactionType.InviteSent
   const recipient = getRecipientFromAddress(
     address,
-    type === TokenTransactionType.InviteSent ? invitees : addressToE164Number,
-    recipientCache
+    invitees,
+    recipientCache,
+    // dont like adding these two optional params but it's either this or refactor addressToE164Number
+    // to have a similar structure to invitees which I dont understand the tradeoffs for at the moment
+    inviteNotSent,
+    addressToE164Number
   )
 
   navigateToPaymentTransferReview(type, timestamp, {

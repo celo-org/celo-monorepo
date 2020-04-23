@@ -23,15 +23,11 @@ export interface InviteDetails {
   tempWalletPrivateKey: string
   tempWalletRedeemed: boolean
   inviteCode: string
-  escrowAmount?: BigNumber
-  escrowCurrency?: CURRENCY_ENUM
-  escrowTxId: string
+  escrowAmount: BigNumber | undefined
+  escrowCurrency: CURRENCY_ENUM | undefined
+  escrowTxId: string | undefined
   escrowRedeemed: boolean
 }
-
-// export interface Invitees {
-//   [tempAddress: string]: string // tempAddress -> e164Number
-// }
 
 export enum InviteBy {
   WhatsApp = 'WhatsApp',

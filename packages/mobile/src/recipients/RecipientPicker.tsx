@@ -17,7 +17,7 @@ import {
 import { SafeAreaConsumer } from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import { Namespaces, withTranslation } from 'src/i18n'
-import { AddressToE164NumberType } from 'src/identity/reducer'
+import { InviteDetails } from 'src/invite/actions'
 import {
   getRecipientFromAddress,
   NumberToRecipient,
@@ -49,14 +49,14 @@ interface Props {
 }
 
 interface StateProps {
-  addressToE164Number: AddressToE164NumberType
+  invitees: InviteDetails[]
   recipientCache: NumberToRecipient
 }
 
 type RecipientProps = Props & WithTranslation & StateProps
 
 const mapStateToProps = (state: RootState): StateProps => ({
-  addressToE164Number: state.identity.addressToE164Number,
+  invitees: state.invite.invitees,
   recipientCache: recipientCacheSelector(state),
 })
 
@@ -145,12 +145,8 @@ export class RecipientPicker extends React.Component<RecipientProps> {
   }
 
   renderSendToAddress = () => {
-    const { t, searchQuery, addressToE164Number, recipientCache, onSelectRecipient } = this.props
-    const existingContact = getRecipientFromAddress(
-      searchQuery,
-      addressToE164Number,
-      recipientCache
-    )
+    const { t, searchQuery, invitees, recipientCache, onSelectRecipient } = this.props
+    const existingContact = getRecipientFromAddress(searchQuery, invitees, recipientCache)
     if (existingContact) {
       return (
         <>

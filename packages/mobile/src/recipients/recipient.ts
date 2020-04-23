@@ -6,7 +6,7 @@ import {
   getVerificationStatusFromPhoneNumber,
   RecipientVerificationStatus,
 } from 'src/identity/contactMapping'
-import { E164NumberToAddressType } from 'src/identity/reducer'
+import { AddressToE164NumberType, E164NumberToAddressType } from 'src/identity/reducer'
 import { InviteDetails } from 'src/invite/actions'
 import Logger from 'src/utils/Logger'
 
@@ -166,10 +166,21 @@ export function getAddressFromRecipient(
 export function getRecipientFromAddress(
   address: string,
   invitees: InviteDetails[],
-  recipientCache: NumberToRecipient
+  recipientCache: NumberToRecipient,
+  // dont like adding these two optional params but it's either this or refactor addressToE164Number
+  // to have a similar structure to invitees which I dont understand the tradeoffs for at the moment
+  inviteNotSent?: boolean,
+  addressToE164Number?: AddressToE164NumberType
 ) {
-  const inviteDetails = invitees.find((inviteeObj) => address === inviteeObj.tempWalletAddress)
-  return inviteDetails ? inviteDetails.e164Number : undefined
+  let e164PhoneNumber
+  if (inviteNotSent && addressToE164Number) {
+    e164PhoneNumber = addressToE164Number[address]
+  } else {
+    const inviteDetails = invitees.find((inviteeObj) => address === inviteeObj.tempWalletAddress)
+    e164PhoneNumber = inviteDetails ? inviteDetails.e164Number : undefined
+  }
+
+  return e164PhoneNumber ? recipientCache[e164PhoneNumber] : undefined
 }
 
 export function getRecipientVerificationStatus(
