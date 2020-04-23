@@ -100,7 +100,7 @@ It is important to note that when a key is unlocked you need to be particularly 
 
 ### Environment variables
 
-There are number of environment variables in this guide, and you may use this table as a reference.
+There are a number of environment variables in this guide, and you may use this table as a reference.
 
 | Variable                             | Explanation                                                                                                                          |
 | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------ |

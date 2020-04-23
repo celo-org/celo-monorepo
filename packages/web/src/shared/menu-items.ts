@@ -67,6 +67,14 @@ export const pagePaths = {
     name: 'Validators List',
     link: '/validators/explore',
   },
+  VALIDATORS_LIST__BAKLAVA: {
+    name: 'Validators List - Baklava',
+    link: '/validators/explore/baklava',
+  },
+  VALIDATORS_LIST_BAKLAVASTAGING: {
+    name: 'Validators List - Baklavastaging',
+    link: '/validators/explore/baklavastaging',
+  },
 }
 
 export const MAIN_MENU = [

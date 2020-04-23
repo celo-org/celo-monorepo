@@ -56,7 +56,8 @@ async function test() {
       await waitForPortOpen('localhost', 8545, 60)
     }
 
-    let testArgs = ['run', 'truffle', 'test']
+    // --reset is a hack to trick truffle into using 20M gas.
+    let testArgs = ['run', 'truffle', 'test', '--reset']
     if (argv['verbose-rpc']) {
       testArgs.push('--verbose-rpc')
     }

@@ -25,6 +25,7 @@
 - [Celo Foundation Voting Policy](operations-manual/celo-foundation-voting-policy.md)
 - [Securing Celo Nodes and Services](operations-manual/securing-nodes-and-services.md)
 - [Upgrading a Node](operations-manual/node-upgrades.md)
+- [Validator Explorer](operations-manual/validator-explorer.md)
 - [Governance](operations-manual/governance.md)
 
 ## Developer Guide
