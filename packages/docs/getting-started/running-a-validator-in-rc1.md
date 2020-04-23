@@ -236,7 +236,7 @@ docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE account new
 export CELO_VALIDATOR_SIGNER_ADDRESS=<YOUR-VALIDATOR-SIGNER-ADDRESS>
 ```
 
-In order to authorize our Validator signer, we need to create a proof that we have possession of the Validator signer private key. We do so by signing a message that consists of the Validator account address. To generate the proof-of-possession, run the following command:
+In order to authorize our validator signer key, we need to create a proof-of-possession. We do so by signing a message that consists of the Validator account address with the validator signer private key. To generate the proof-of-possession, run the following command:
 
 ```bash
 # On the validator machine
