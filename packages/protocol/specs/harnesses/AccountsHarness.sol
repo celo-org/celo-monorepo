@@ -31,7 +31,7 @@ contract AccountsHarness is Accounts {
 
 
 
-  // overriding authorize function to simulate that for each set of parameters there is a unique signer.
+  // override authorize function to simulate that for each set of parameters there is a unique signer.
   mapping(address => mapping (uint8 => mapping (bytes32 => mapping (bytes32 => address)))) signerMap;
   function authorize(address authorized, uint8 v, bytes32 r, bytes32 s) internal {
     require(isAccount(msg.sender), "Unknown account");
