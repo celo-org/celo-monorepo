@@ -6,7 +6,7 @@ export enum ErrorMessages {
   DATABASE_GET_FAILURE = 'CELO_PNP_ERR_03 Failed to get databse entry',
   INVALID_INPUT = 'CELO_PNP_ERR_04 Invalid input paramaters',
   EXCEEDED_QUOTA = 'CELO_PNP_ERR_05 Requester exceeded salt service query quota',
-  SALT_COMPUTATION_FAILURE = 'CELO_PNP_ERR_06 Failed to compute BLS salt',
+  SIGNATURE_COMPUTATION_FAILURE = 'CELO_PNP_ERR_06 Failed to compute BLS signature',
   UNKNOWN_ERROR = 'CELO_PNP_ERR_07 Something went wrong',
 }
 

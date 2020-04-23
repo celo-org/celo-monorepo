@@ -813,6 +813,15 @@ jobs:
       - run:
           name: Minor test of celocli
           command: ./node_modules/.bin/celocli account:new # Small test
+          
+  phone-number-privacy-test:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/app
+      - run:
+          name: Run Tests
+          command: yarn --cwd=packages/phone-number-privacy test
 
 workflows:
   version: 2
@@ -874,6 +883,9 @@ workflows:
           requires:
             - lint-checks
             - contractkit-test
+      - phone-number-privacy-test:
+          requires:
+            - lint-checks
   npm-install-testing-cron-workflow:
     triggers:
       - schedule:
@@ -907,3 +919,4 @@ workflows:
       - protocol-test-with-code-coverage:
           requires:
             - lint-checks
+            
