@@ -44,7 +44,6 @@ export class EscrowedPaymentListItem extends React.PureComponent<Props> {
     CeloAnalytics.track(CustomEventNames.clicked_escrowed_payment_send_message)
     // TODO(Tarik): add a UI that allows user to choose between SMS and Whatsapp (currently only SMS) for reminder message
     try {
-      console.log(recipientPhoneNumber)
       const inviteDetails = invitees.find(
         (inviteeObj) => recipientPhoneNumber === inviteeObj.e164Number
       )
@@ -151,6 +150,8 @@ const styles = StyleSheet.create({
   },
 })
 
-export default connect<StateProps, {}, {}, RootState>(mapStateToProps)(
-  componentWithAnalytics(withTranslation(Namespaces.inviteFlow11)(EscrowedPaymentListItem))
+export default componentWithAnalytics(
+  connect<StateProps, {}, {}, RootState>(mapStateToProps)(
+    withTranslation(Namespaces.inviteFlow11)(EscrowedPaymentListItem)
+  )
 )
