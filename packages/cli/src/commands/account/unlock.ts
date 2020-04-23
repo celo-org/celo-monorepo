@@ -20,6 +20,10 @@ export default class Unlock extends BaseCommand {
 
   async run() {
     const res = this.parse(Unlock)
+    if (res.flags.useLedger) {
+      console.error('account:unlock not implemented for Ledger')
+      process.exit(1)
+    }
     // Unlock until geth exits
     // Source: https://github.com/ethereum/go-ethereum/wiki/Management-APIs#personal_unlockaccount
     const unlockDurationInMs = 0
