@@ -1,6 +1,6 @@
 import { ErrorMessages } from '../../common/error-utils'
 import { getDatabase } from '../database'
-import { NUMBER_PAIRS_COLUMN, NUMBER_PAIRS_TABLE } from '../models/numberPair'
+import { NUMBER_PAIRS_COLUMN, NUMBER_PAIRS_TABLE, NumberPair } from '../models/numberPair'
 
 /*
  * Returns contacts who have already matched with the user (a contact-->user mapping exists).
@@ -33,10 +33,7 @@ export async function setNumberPairContacts(
 ): Promise<void> {
   const rows: any = []
   for (const contactPhone of contactPhones) {
-    const data = {
-      [NUMBER_PAIRS_COLUMN.userPhoneHash]: userPhone,
-      [NUMBER_PAIRS_COLUMN.contactPhoneHash]: contactPhone,
-    }
+    const data = new NumberPair(userPhone, contactPhone)
     rows.push(data)
   }
   try {

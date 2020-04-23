@@ -35,7 +35,7 @@ if (DEV_MODE) {
       blockscout: 'https://alfajores-blockscout.celo-testnet.org',
     },
     salt: {
-      key: 'GaYc5lTZI9wQUwKvjLIFNHEcbzxt/MMoUnmY1JHLHBI=',
+      key: 'pknJzIYf4LPbOPao5lk1tVwljmXAddyebYsQ3wI5ywk=',
       unverifiedQueryMax: 2,
       additionalVerifiedQueryMax: 30,
       queryPerTransaction: 2,
