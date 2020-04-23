@@ -34,7 +34,7 @@ export function getHashFromEncoded(rlpEncode: string): string {
 
 function trimLeadingZero(hex: string) {
   while (hex && hex.startsWith('0x0')) {
-    hex = '0x' + hex.slice(3)
+    hex = ensureLeading0x(hex.slice(3))
   }
   return hex
 }
