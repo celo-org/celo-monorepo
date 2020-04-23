@@ -6,7 +6,7 @@ Full nodes play a special purpose in the Celo ecosystem, acting as a bridge betw
 
 When a light client sends transactions, they will include specify a gateway fee to be paid to the node that gossips transactions to the other full nodes and validators.
 
-For this reason, despite the fact that Celo uses a proof-of-stake protocol, users can earn cryptocurrency without first having to own any, simply by running a full node.
+For this reason, despite the fact that Celo uses a proof-of-stake consensus protocol, users can earn cryptocurrency without first having to own any, simply by running a full node.
 
 ## Prerequisites
 
