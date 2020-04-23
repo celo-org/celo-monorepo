@@ -1837,7 +1837,9 @@ exports[`Experience/Brandkit renders 1`] = `
           className="css-view-1dbjc4n"
           style={
             Object {
-              "marginBottom": "50px",
+              "WebkitTransform": "translateY(-10px)",
+              "marginBottom": "20px",
+              "transform": "translateY(-10px)",
             }
           }
         >
@@ -3235,7 +3237,7 @@ exports[`Experience/Brandkit renders 1`] = `
                   className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
                   data-focusable={true}
                   dir="auto"
-                  href="https://discord.gg/6yWMkgM"
+                  href="https://youtube.com/channel/UCCZgos_YAJSXm5QX5D5Wkcw"
                   onClick={[Function]}
                   onMouseEnter={[Function]}
                   rel=" noopener noreferrer"
@@ -3315,7 +3317,7 @@ exports[`Experience/Brandkit renders 1`] = `
                   className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
                   data-focusable={true}
                   dir="auto"
-                  href="https://discord.gg/6yWMkgM"
+                  href="https://www.instagram.com/celoorg/"
                   onClick={[Function]}
                   onMouseEnter={[Function]}
                   rel=" noopener noreferrer"
