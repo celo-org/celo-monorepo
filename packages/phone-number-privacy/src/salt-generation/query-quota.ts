@@ -10,11 +10,7 @@ export default class QueryQuota {
    */
   async getRemainingQueryCount(account: string, phoneNumber: string) {
     const queryQuota = await this.getQueryQuota(account, phoneNumber)
-    const performedQueryCount = await getPerformedQueryCount(account).catch((reason) => {
-      // TODO [amyslawson] think of failure case here
-      console.error(reason)
-      return 0
-    })
+    const performedQueryCount = await getPerformedQueryCount(account)
     return queryQuota - performedQueryCount
   }
 
