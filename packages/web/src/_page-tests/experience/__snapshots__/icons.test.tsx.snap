@@ -1377,6 +1377,7 @@ exports[`Experience/Icons renders 1`] = `
               >
                 <div
                   className="css-view-1dbjc4n"
+                  data-testid="1"
                 >
                   <div
                     className="css-view-1dbjc4n"
@@ -1658,6 +1659,7 @@ exports[`Experience/Icons renders 1`] = `
                 </div>
                 <div
                   className="css-view-1dbjc4n"
+                  data-testid="2"
                 >
                   <div
                     className="css-view-1dbjc4n"
