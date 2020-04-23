@@ -6,7 +6,7 @@ import {
   getVerificationStatusFromPhoneNumber,
   RecipientVerificationStatus,
 } from 'src/identity/contactMapping'
-import { AddressToE164NumberType, E164NumberToAddressType } from 'src/identity/reducer'
+import { E164NumberToAddressType } from 'src/identity/reducer'
 import Logger from 'src/utils/Logger'
 
 const TAG = 'recipients/recipient'
@@ -163,11 +163,9 @@ export function getAddressFromRecipient(
 }
 
 export function getRecipientFromAddress(
-  address: string,
-  addressToE164Number: AddressToE164NumberType,
+  e164PhoneNumber: string,
   recipientCache: NumberToRecipient
 ) {
-  const e164PhoneNumber = addressToE164Number[address]
   return e164PhoneNumber ? recipientCache[e164PhoneNumber] : undefined
 }
 

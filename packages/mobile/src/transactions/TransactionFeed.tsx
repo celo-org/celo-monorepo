@@ -6,7 +6,7 @@ import { FlatList } from 'react-native'
 import { connect } from 'react-redux'
 import { TransactionFeedFragment } from 'src/apollo/types'
 import { AddressToE164NumberType } from 'src/identity/reducer'
-import { Invitees } from 'src/invite/actions'
+import { InviteDetails } from 'src/invite/actions'
 import { NumberToRecipient } from 'src/recipients/recipient'
 import { recipientCacheSelector } from 'src/recipients/reducer'
 import { RootState } from 'src/redux/reducers'
@@ -25,7 +25,7 @@ export enum FeedType {
 }
 
 interface StateProps {
-  invitees: Invitees
+  invitees: InviteDetails[]
   commentKey: string | null | undefined
   addressToE164Number: AddressToE164NumberType
   recipientCache: NumberToRecipient

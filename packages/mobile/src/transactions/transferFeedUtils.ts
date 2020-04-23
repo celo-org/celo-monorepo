@@ -5,7 +5,7 @@ import { TokenTransactionType } from 'src/apollo/types'
 import { DEFAULT_TESTNET } from 'src/config'
 import { features } from 'src/flags'
 import { AddressToE164NumberType } from 'src/identity/reducer'
-import { Invitees } from 'src/invite/actions'
+import { InviteDetails } from 'src/invite/actions'
 import { getRecipientFromAddress, NumberToRecipient } from 'src/recipients/recipient'
 
 export function decryptComment(
@@ -25,7 +25,7 @@ export function decryptComment(
 export function getTransferFeedParams(
   type: TokenTransactionType,
   t: TFunction,
-  invitees: Invitees,
+  invitees: InviteDetails[],
   recipientCache: NumberToRecipient,
   address: string,
   addressToE164Number: AddressToE164NumberType,
@@ -60,8 +60,11 @@ export function getTransferFeedParams(
       break
     }
     case TokenTransactionType.InviteSent: {
-      const inviteeE164Number = invitees[address]
+      const inviteeData = invitees.find((inviteeObj) => address === inviteeObj.tempWalletAddress)
+      const inviteeE164Number = inviteeData.e164Number
       const inviteeRecipient = recipientCache[inviteeE164Number]
+      // const inviteeE164Number = invitees[address]
+      // const inviteeRecipient = recipientCache[inviteeE164Number]
       title = t('feedItemInviteSentTitle')
       info = t('feedItemInviteSentInfo', {
         context: !inviteeE164Number ? 'missingInviteeDetails' : null,
