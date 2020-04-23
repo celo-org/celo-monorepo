@@ -8,6 +8,7 @@
 - [Choosing a Network](getting-started/choosing-a-network.md)
 - [Mainnet Release Candidate 1](getting-started/rc1.md)
   - [Running a Validator](getting-started/running-a-validator-in-rc1.md)
+  - [Running a Full Node](getting-started/running-a-full-node-in-rc1.md)
 - [Baklava Testnet](getting-started/baklava-testnet.md)
   - [Running a Validator](getting-started/running-a-validator-in-baklava.md)
   - [Running a Full Node](getting-started/running-a-full-node.md)

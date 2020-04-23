@@ -153,27 +153,22 @@ The setup of RC1 is similar to the new Baklava network and the deployment timeli
 A [timeline](https://forum.celo.org/t/release-candidate-1-rc1-timeline-and-details/428) of the Release Candidate 1 is available to provide further context.
 {% endhint %}
 
-## Setup for Genesis Validators (Before 4/22)
+## Instructions Before Producing Blocks
 
-**If you provided your Validator signer address and BLS public key for genesis, the community is relying on your Validator to get the network started!**
-
-This section outlines the steps needed to configure your Proxy and Validator nodes before block production begins.
+This section outlines the steps needed to configure your Proxy and Validator nodes before you can start producing blocks.
 
 ### Environment Variables
 
-First we are going to set up the main environment variables related to the RC1 network. Run these on both your **Validator** and **Proxy** machines:
+First we are going to set up the main environment variables related to the RC1 network. Run these on all machines:
 
 ```bash
 export CELO_IMAGE=us.gcr.io/celo-testnet/celo-node:rc1
 export NETWORK_ID=42220
-export CELO_VALIDATOR_SIGNER_ADDRESS=<YOUR-VALIDATOR-SIGNER-ADDRESS>
 ```
-
-Please use the Validator signer address that you submitted through your Gist file. It is included in the [genesis Validator set](https://github.com/celo-org/celo-monorepo/blob/asaj/rc1/packages/celotool/genesis_rc1.json). If you plan to run additional validators once the network is up and running you will need to create additional validator signer addresses.
 
 ### Pull the Celo Docker image
 
-In all the commands we are going to see the `CELO_IMAGE` variable to refer to the Docker image to use. Now we can get the Docker image on your Validator and Proxy machines:
+In all the commands we are going to see the `CELO_IMAGE` variable to refer to the Docker image to use. Now we can get the Docker image on all machines:
 
 ```bash
 docker pull $CELO_IMAGE
@@ -181,12 +176,108 @@ docker pull $CELO_IMAGE
 
 The `us.gcr.io/celo-testnet/celo-node:rc1` image contains the [genesis block](https://github.com/celo-org/celo-monorepo/blob/asaj/rc1/packages/celotool/genesis_rc1.json) in addition to the Celo Blockchain binary.
 
+### Create the Validator and Validator Group accounts
+
+First, you'll need to generate account keys for your Validator and Validator Group.
+
+{% hint style="danger" %}
+These keys will become the beneficiary addresses of your `ReleaseGold` contracts, and thus should be handled with care.
+
+Store and back these keys up in a secure manner, as there will be no way to recover if them if lost or stolen.
+{% endhint %}
+
+```bash
+# On your local machine
+mkdir celo-accounts-node
+cd celo-accounts-node
+docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE account new
+docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE account new
+```
+
+This will create a new keystore in the current directory with two new accounts.
+Copy the addresses from the terminal and set the following environment variables:
+
+```bash
+# On your local machine
+export CELO_VALIDATOR_GROUP_ADDRESS=<YOUR-VALIDATOR-GROUP-ADDRESS>
+export CELO_VALIDATOR_ADDRESS=<YOUR-VALIDATOR-ADDRESS>
+```
+
+### Start your Accounts node
+
+Next, we'll run a node on your local machine so that we can use these accounts to lock Celo Gold and authorize the keys needed to run your validator. To do this, we need to run the following commands, which fetch the genesis block and a list of other nodes in the network to connect to.
+
+```bash
+# On your local machine
+docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE init /celo/genesis.json
+export BOOTNODE_ENODES=`docker run --rm --entrypoint cat $CELO_IMAGE /celo/bootnodes`
+```
+
+To run the node:
+
+```bash
+# On your local machine
+docker run --name celo-accounts -it --restart always -p 127.0.0.1:8545:8545 -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin,personal --bootnodes $BOOTNODE_ENODES --gcmode=archive
+```
+
+{% hint style="danger" %}
+**Security**: The command line above includes the parameter `--rpcaddr 0.0.0.0` which makes the Celo Blockchain software listen for incoming RPC requests on all network adaptors. Exercise extreme caution in doing this when running outside Docker, as it means that any unlocked accounts and their funds may be accessed from other machines on the Internet. In the context of running a Docker container on your local machine, this together with the `docker -p 127.0.0.1:localport:containerport` flags allows you to make RPC calls from outside the container, i.e from your local host, but not from outside your machine. Read more about [Docker Networking](https://docs.docker.com/network/network-tutorial-standalone/#use-user-defined-bridge-networks) here.
+{% endhint %}
+
+### Deploy a Validator
+
+To actually register as a validator, we'll need to generate a validating signer key. On your Validator machine (which should not be accessible from the public internet), follow very similar steps:
+
+```bash
+# On the validator machine
+mkdir celo-validator-node
+cd celo-validator-node
+docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE account new
+export CELO_VALIDATOR_SIGNER_ADDRESS=<YOUR-VALIDATOR-SIGNER-ADDRESS>
+```
+
+In order to authorize our Validator signer, we need to create a proof that we have possession of the Validator signer private key. We do so by signing a message that consists of the Validator account address. To generate the proof-of-possession, run the following command:
+
+```bash
+# On the validator machine
+# Note that you have to export CELO_VALIDATOR_ADDRESS on this machine
+export CELO_VALIDATOR_ADDRESS=<CELO-VALIDATOR-ADDRESS>
+docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE account proof-of-possession $CELO_VALIDATOR_SIGNER_ADDRESS $CELO_VALIDATOR_ADDRESS
+```
+
+Save the signer address, public key, and proof-of-possession signature to your local machine:
+
+```bash
+# On your local machine
+export CELO_VALIDATOR_SIGNER_ADDRESS=<YOUR-VALIDATOR-SIGNER-ADDRESS>
+export CELO_VALIDATOR_SIGNER_SIGNATURE=<YOUR-VALIDATOR-SIGNER-SIGNATURE>
+export CELO_VALIDATOR_SIGNER_PUBLIC_KEY=<YOUR-VALIDATOR-SIGNER-PUBLIC-KEY>
+```
+
+Validators on the Celo network use BLS aggregated signatures to create blocks in addition to the Validator signer (ECDSA) key. While an independent BLS key can be specified, the simplest thing to do is to derive the BLS key from the Validator signer key. When we register our Validator, we'll need to prove possession of the BLS key as well, which can be done by running the following command:
+
+```bash
+# On the validator machine
+docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE account proof-of-possession $CELO_VALIDATOR_SIGNER_ADDRESS $CELO_VALIDATOR_ADDRESS --bls
+```
+
+Save the resulting signature and public key to your local machine:
+
+```bash
+# On your local machine
+export CELO_VALIDATOR_SIGNER_BLS_SIGNATURE=<YOUR-VALIDATOR-SIGNER-SIGNATURE>
+export CELO_VALIDATOR_SIGNER_BLS_PUBLIC_KEY=<YOUR-VALIDATOR-SIGNER-BLS-PUBLIC-KEY>
+```
+
+We'll get back to this machine later, but for now, let's give it a proxy.
+
 ### Deploy a proxy
 
 ```bash
 # On the proxy machine
 mkdir celo-proxy-node
 cd celo-proxy-node
+export CELO_VALIDATOR_SIGNER_ADDRESS=<YOUR-VALIDATOR-SIGNER-ADDRESS>
 docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE init /celo/genesis.json
 export BOOTNODE_ENODES="$(docker run --rm --entrypoint cat $CELO_IMAGE /celo/bootnodes)"
 ```
