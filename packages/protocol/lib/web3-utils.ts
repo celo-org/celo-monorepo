@@ -1,6 +1,7 @@
 /* tslint:disable:no-console */
 // TODO(asa): Refactor and rename to 'deployment-utils.ts'
-import { setAndInitializeImplementation } from '@celo/protocol/lib/proxy-utils'
+import * as prompts from 'prompts'
+import { retryTx, setAndInitializeImplementation } from '@celo/protocol/lib/proxy-utils'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { signTransaction } from '@celo/protocol/lib/signing-utils'
 import { Address, privateKeyToAddress } from '@celo/utils/lib/address'
@@ -176,16 +177,16 @@ export async function _setInitialProxyImplementation<
     receipt = await setAndInitializeImplementation(web3, proxy, implementation.address, initializerAbi, txOptions, ...args)
   } else {
     if (txOptions.from != null) {
-      receipt = await proxy._setImplementation(implementation.address, { from: txOptions.from })
+      receipt = await retryTx(proxy._setImplementation, [implementation.address, { from: txOptions.from }])
       if (txOptions.value != null) {
-        await web3.eth.sendTransaction({
+        await retryTx(web3.eth.sendTransaction, [{
           from: txOptions.from,
           to: proxy.address,
           value: txOptions.value,
-        })
+        }])
       }
     } else {
-      receipt = await proxy._setImplementation(implementation.address)
+      receipt = await retryTx(proxy._setImplementation, [implementation.address])
     }
   }
   return receipt.tx
