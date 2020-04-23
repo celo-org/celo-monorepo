@@ -51,11 +51,8 @@ export interface BlockscoutCeloTransfer {
 }
 
 export class BlockscoutAPI extends RESTDataSource {
-  tokenAddressMapping: { [key: string]: string } | undefined
   attestationsAddress: string | undefined
   escrowAddress: string | undefined
-  goldTokenAddress: string | undefined
-  stableTokenAddress: string | undefined
 
   constructor() {
     super()
@@ -177,40 +174,13 @@ export class BlockscoutAPI extends RESTDataSource {
   }
 
   async ensureTokenAddresses() {
-    if (
-      this.tokenAddressMapping &&
-      this.attestationsAddress &&
-      this.escrowAddress &&
-      this.goldTokenAddress &&
-      this.stableTokenAddress
-    ) {
+    if (this.attestationsAddress && this.escrowAddress) {
       // Already got addresses
       return
     } else {
       const addresses = await getContractAddresses()
       this.attestationsAddress = addresses.attestationsAddress
-      this.tokenAddressMapping = addresses.tokenAddressMapping
       this.escrowAddress = addresses.escrowAddress
-      this.goldTokenAddress = addresses.goldTokenAddress
-      this.stableTokenAddress = addresses.stableTokenAddress
-    }
-  }
-
-  getTokenAtAddress(tokenAddress: string) {
-    if (this.tokenAddressMapping) {
-      const lowerCaseTokenAddress = tokenAddress.toLowerCase()
-      if (lowerCaseTokenAddress in this.tokenAddressMapping) {
-        return this.tokenAddressMapping[lowerCaseTokenAddress]
-      } else {
-        console.info('Token addresses mapping: ' + JSON.stringify(this.tokenAddressMapping))
-        throw new Error(
-          'No token corresponding to ' +
-            lowerCaseTokenAddress +
-            '. Check web3 provider is for correct network.'
-        )
-      }
-    } else {
-      throw new Error('Cannot find tokenAddressMapping')
     }
   }
 
