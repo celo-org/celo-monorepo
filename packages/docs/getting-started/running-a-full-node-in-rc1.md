@@ -20,7 +20,7 @@ When you see text in angle brackets &lt;&gt;, replace them and the text inside w
 
 ## Celo Networks
 
-First we are going to setup the environment variables required for `Baklava` network. Run:
+First we are going to setup the environment variables required for the `RC1` network. Run:
 
 ```bash
 export CELO_IMAGE=us.gcr.io/celo-testnet/celo-node:rc1
