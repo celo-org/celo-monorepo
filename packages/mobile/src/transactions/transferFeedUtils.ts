@@ -60,9 +60,9 @@ export function getTransferFeedParams(
       break
     }
     case TokenTransactionType.InviteSent: {
-      const inviteeData = invitees.find((inviteeObj) => address === inviteeObj.tempWalletAddress)
-      const inviteeE164Number = inviteeData.e164Number
-      const inviteeRecipient = recipientCache[inviteeE164Number]
+      const inviteDetails = invitees.find((inviteeObj) => address === inviteeObj.tempWalletAddress)
+      const inviteeE164Number = inviteDetails ? inviteDetails.e164Number : undefined
+      const inviteeRecipient = inviteeE164Number ? recipientCache[inviteeE164Number] : undefined
       // const inviteeE164Number = invitees[address]
       // const inviteeRecipient = recipientCache[inviteeE164Number]
       title = t('feedItemInviteSentTitle')
@@ -79,7 +79,7 @@ export function getTransferFeedParams(
       break
     }
     default: {
-      recipient = getRecipientFromAddress(address, addressToE164Number, recipientCache)
+      recipient = getRecipientFromAddress(address, invitees, recipientCache)
       const shortAddr = address.substring(0, 8)
 
       if (recipient) {

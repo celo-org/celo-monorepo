@@ -7,6 +7,7 @@ import {
   RecipientVerificationStatus,
 } from 'src/identity/contactMapping'
 import { E164NumberToAddressType } from 'src/identity/reducer'
+import { InviteDetails } from 'src/invite/actions'
 import Logger from 'src/utils/Logger'
 
 const TAG = 'recipients/recipient'
@@ -163,10 +164,12 @@ export function getAddressFromRecipient(
 }
 
 export function getRecipientFromAddress(
-  e164PhoneNumber: string,
+  address: string,
+  invitees: InviteDetails[],
   recipientCache: NumberToRecipient
 ) {
-  return e164PhoneNumber ? recipientCache[e164PhoneNumber] : undefined
+  const inviteDetails = invitees.find((inviteeObj) => address === inviteeObj.tempWalletAddress)
+  return inviteDetails ? inviteDetails.e164Number : undefined
 }
 
 export function getRecipientVerificationStatus(

@@ -22,7 +22,7 @@ import { CURRENCY_ENUM, SHORT_CURRENCIES } from 'src/geth/consts'
 import i18n from 'src/i18n'
 import { Actions as IdentityActions, SetVerificationStatusAction } from 'src/identity/actions'
 import { NUM_ATTESTATIONS_REQUIRED, VerificationStatus } from 'src/identity/verification'
-import { Invitees } from 'src/invite/actions'
+import { InviteDetails } from 'src/invite/actions'
 import { inviteesSelector } from 'src/invite/reducer'
 import { TEMP_PW } from 'src/invite/saga'
 import { isValidPrivateKey } from 'src/invite/utils'
@@ -268,11 +268,18 @@ function* doFetchSentPayments() {
     const sentPaymentsRaw = yield all(
       sentPaymentIDs.map((paymentID) => call(getEscrowedPayment, escrow, paymentID))
     )
-    const tempAddresstoRecipientPhoneNumber: Invitees = yield select(inviteesSelector)
+    // const tempAddresstoRecipientPhoneNumber: InviteDetails = yield select(inviteesSelector)
+    const invitees: InviteDetails[] = yield select(inviteesSelector)
     const sentPayments: EscrowedPayment[] = []
     for (let i = 0; i < sentPaymentsRaw.length; i++) {
       const id = sentPaymentIDs[i].toLowerCase()
-      const recipientPhoneNumber = tempAddresstoRecipientPhoneNumber[id]
+      const inviteDetails = invitees.find((inviteeObj) => id === inviteeObj.tempWalletAddress)
+      const recipientPhoneNumber = inviteDetails ? inviteDetails.e164Number : undefined
+
+      if (!recipientPhoneNumber) {
+        throw Error('Could not match sentPaymentId with an invitee')
+      }
+
       const payment = sentPaymentsRaw[i]
       if (!payment) {
         continue

@@ -23,7 +23,8 @@ export interface InviteDetails {
   tempWalletPrivateKey: string
   tempWalletRedeemed: boolean
   inviteCode: string
-  escrowAmount: number
+  escrowAmount?: BigNumber
+  escrowCurrency?: CURRENCY_ENUM
   escrowTxId: string
   escrowRedeemed: boolean
 }
