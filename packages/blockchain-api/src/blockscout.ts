@@ -7,30 +7,6 @@ import { formatCommentString, getContractAddresses } from './utils'
 // to get rid of 18 extra 0s in the values
 const WEI_PER_GOLD = Math.pow(10, 18)
 
-export interface BlockscoutTransaction {
-  value: string
-  txreceipt_status: string
-  transactionIndex: string
-  tokenSymbol: string
-  tokenName: string
-  tokenDecimal: string
-  to: string
-  timeStamp: string
-  nonce: string
-  isError: string
-  input: string
-  hash: string
-  gasUsed: string
-  gasPrice: string
-  gas: string
-  from: string
-  cumulativeGasUsed: string
-  contractAddress: string
-  confirmations: string
-  blockNumber: string
-  blockHash: string
-}
-
 export interface BlockscoutTransferTx {
   blockNumber: number
   transactionHash: string
