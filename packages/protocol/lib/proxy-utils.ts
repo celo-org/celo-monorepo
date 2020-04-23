@@ -1,7 +1,7 @@
 import { Address } from '@celo/utils/lib/address'
+import * as prompts from 'prompts'
 import { ProxyInstance } from 'types'
 import Web3 from 'web3'
-import * as prompts from 'prompts'
 
 
 export async function retryTx(fn: any, args: any[]) {
@@ -11,7 +11,7 @@ export async function retryTx(fn: any, args: any[]) {
       return rvalue
     } catch (e) {
       console.error(e)
-      const response = await prompts({
+      await prompts({
         type: 'confirm',
         name: 'confirmation',
         message: 'Error while sending tx, press enter when resolved to try again',

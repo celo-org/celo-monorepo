@@ -62,8 +62,9 @@ async function handleGrant(releaseGoldConfig: any, currGrant: number) {
       return
     }
   }
-  let txSuccess = false
-  const releaseGoldMultiSigProxy = retryTx(ReleaseGoldMultiSigProxy.new, [{ from: fromAddress }])
+  const releaseGoldMultiSigProxy = await retryTx(ReleaseGoldMultiSigProxy.new, [
+    { from: fromAddress },
+  ])
   const releaseGoldMultiSigInstance = await retryTx(ReleaseGoldMultiSig.new, [
     { from: fromAddress },
   ])
