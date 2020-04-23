@@ -128,7 +128,7 @@ export class AzureKeyVaultClient {
 
   public async getSecret(secretName: string): Promise<string> {
     const secret = await this.secretClient.getSecret(secretName)
-    if (typeof secret.value === 'undefined') {
+    if (!secret.value) {
       throw new Error(`Could not locate secret ${secretName} in vault ${this.vaultName}`)
     }
     return secret.value
