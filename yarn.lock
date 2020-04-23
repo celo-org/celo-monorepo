@@ -11381,30 +11381,16 @@ bl@~1.1.2:
   dependencies:
     readable-stream "~2.0.5"
 
+"blind-threshold-bls@https://github.com/celo-org/blind-threshold-bls-wasm#791b4ccc0d6aa8fa42e0153ee2ff7a50738fb3b1":
+  version "0.1.0"
+  resolved "https://github.com/celo-org/blind-threshold-bls-wasm#791b4ccc0d6aa8fa42e0153ee2ff7a50738fb3b1"
+
 block-stream@0.0.9:
   version "0.0.9"
   resolved "https://registry.yarnpkg.com/block-stream/-/block-stream-0.0.9.tgz#13ebfe778a03205cfe03751481ebb4b3300c126a"
   integrity sha1-E+v+d4oDIFz+A3UUgeu0szAMEmo=
   dependencies:
     inherits "~2.0.0"
-
-"bls12377js-blind@https://github.com/celo-org/bls12377js-blind#3a5ac033fbe282d40002639e01db56313124e721":
-  version "0.1.0"
-  resolved "https://github.com/celo-org/bls12377js-blind#3a5ac033fbe282d40002639e01db56313124e721"
-  dependencies:
-    bls12377js celo-org/bls12377js#566137fd6b9568ef105a3aeaf8e36ff03da91d49
-
-bls12377js@celo-org/bls12377js#566137fd6b9568ef105a3aeaf8e36ff03da91d49:
-  version "0.1.0"
-  resolved "https://codeload.github.com/celo-org/bls12377js/tar.gz/566137fd6b9568ef105a3aeaf8e36ff03da91d49"
-  dependencies:
-    "@stablelib/blake2xs" "0.10.4"
-    "@types/node" "^12.11.7"
-    big-integer "^1.6.44"
-    chai "^4.2.0"
-    mocha "^6.2.2"
-    ts-node "^8.4.1"
-    typescript "^3.6.4"
 
 "bls12377js@https://github.com/celo-org/bls12377js#400bcaeec9e7620b040bfad833268f5289699cac":
   version "0.1.0"
