@@ -203,6 +203,10 @@ export CELO_VALIDATOR_GROUP_ADDRESS=<YOUR-VALIDATOR-GROUP-ADDRESS>
 export CELO_VALIDATOR_ADDRESS=<YOUR-VALIDATOR-ADDRESS>
 ```
 
+{% hint style="danger" %}
+You are recommended to use Ledger to generate addresses securely. [Read more here.](../validator-guide/summary/ledger.md)
+{% endhint %}
+
 ### Start your Accounts node
 
 Next, we'll run a node on your local machine so that we can use these accounts to lock Celo Gold and authorize the keys needed to run your validator. To do this, we need to run the following commands, which fetch the genesis block and a list of other nodes in the network to connect to.

@@ -56,7 +56,7 @@ Run the command to create a new account:
 docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE account new
 ```
 
-It will prompt you for a passphrase, ask you to confirm it, and then will output your account address: `Address: {<YOUR-ACCOUNT-ADDRESS>}`
+It will prompt you for a passphrase, ask you to confirm it, and then will output your account address: `Public address of the key: <YOUR-ACCOUNT-ADDRESS>`
 
 Save this address to an environment variables, so that you can reference it below (don't include the braces):
 
