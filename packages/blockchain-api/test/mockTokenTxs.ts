@@ -127,7 +127,7 @@ const mockTokenTxs = {
                     fromAddressHash: '0x0000000000000000000000000000000000007E57',
                     toAddressHash: '0x6a61e1e693c765cbab7e02a500665f2e13ee46df',
                     token: 'cGLD',
-                    value: '10000000000000000000',
+                    value: '1000000000000000000',
                   },
                 },
                 {

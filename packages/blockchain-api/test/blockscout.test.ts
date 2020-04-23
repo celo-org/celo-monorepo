@@ -71,7 +71,7 @@ describe('Blockscout', () => {
           "makerAmount": Object {
             "currencyCode": "cGLD",
             "timestamp": 1566345866000,
-            "value": "10",
+            "value": "1",
           },
           "takerAmount": Object {
             "currencyCode": "cUSD",
@@ -140,14 +140,14 @@ describe('Blockscout', () => {
           "amount": Object {
             "currencyCode": "cGLD",
             "timestamp": 1566345866000,
-            "value": "-10",
+            "value": "-1",
           },
           "block": "90637",
           "hash": "0x961403536006f9c120c23900f94da59dbf43edf10eb3569b448665483bab77b2",
           "makerAmount": Object {
             "currencyCode": "cGLD",
             "timestamp": 1566345866000,
-            "value": "10",
+            "value": "1",
           },
           "takerAmount": Object {
             "currencyCode": "cUSD",
