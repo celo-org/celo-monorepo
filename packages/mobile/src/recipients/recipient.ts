@@ -176,7 +176,10 @@ export function getRecipientFromAddress(
   if (inviteNotSent && addressToE164Number) {
     e164PhoneNumber = addressToE164Number[address]
   } else {
-    const inviteDetails = invitees.find((inviteeObj) => address === inviteeObj.tempWalletAddress)
+    console.log(invitees)
+    const inviteDetails = invitees.find(
+      (inviteeObj) => address.toLowerCase() === inviteeObj.tempWalletAddress.toLowerCase()
+    )
     e164PhoneNumber = inviteDetails ? inviteDetails.e164Number : undefined
   }
 

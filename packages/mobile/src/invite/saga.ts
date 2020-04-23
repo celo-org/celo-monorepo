@@ -176,8 +176,9 @@ export function* sendInvite(
     Logger.debug(TAG + '@sendInviteSaga', 'Sent money to new wallet')
 
     // If this invitation has a payment attached to it, send the payment to the escrow.
+    let escrowTxId
     if (currency === CURRENCY_ENUM.DOLLAR && amount) {
-      const escrowTxId = generateStandbyTransactionId(temporaryAddress + '-escrow')
+      escrowTxId = generateStandbyTransactionId(temporaryAddress + '-escrow')
       try {
         const phoneHash = getPhoneHash(e164Number)
         yield put(transferEscrowedPayment(phoneHash, amount, temporaryAddress, escrowTxId))
@@ -192,7 +193,7 @@ export function* sendInvite(
     }
 
     // OPEN QUESTION - does storing invitee data only in the event of a successful transaction have
-    // unintended consequences? Previous position was before the generateStandyTransactionId call
+    // unintended consequences? Seems right to me but previous position was before the generateStandbyTransactionId call
     const inviteDetails: InviteDetails = {
       timestamp: 100, // placeholder
       e164Number,
@@ -202,7 +203,7 @@ export function* sendInvite(
       inviteCode,
       escrowAmount: amount,
       escrowCurrency: currency,
-      escrowTxId: string,
+      escrowTxId,
       escrowRedeemed: false,
     }
 

@@ -46,7 +46,7 @@ export const inviteReducer = (
         isSendingInvite: false,
       }
     case Actions.STORE_INVITEE_DATA:
-      // TODO(Rossy / Tarik) decide on UI for showing users those invite codes, see #2639
+      // TODO(Rossy / Tarik) decide on UI for showing users the invite codes they've sent, see #2639
       return {
         ...state,
         invitees: [...state.invitees, action.inviteDetails],

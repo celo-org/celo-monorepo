@@ -273,11 +273,13 @@ function* doFetchSentPayments() {
     const sentPayments: EscrowedPayment[] = []
     for (let i = 0; i < sentPaymentsRaw.length; i++) {
       const id = sentPaymentIDs[i].toLowerCase()
-      const inviteDetails = invitees.find((inviteeObj) => id === inviteeObj.tempWalletAddress)
+      const inviteDetails = invitees.find(
+        (inviteeObj) => id === inviteeObj.tempWalletAddress.toLowerCase()
+      )
       const recipientPhoneNumber = inviteDetails ? inviteDetails.e164Number : undefined
 
       if (!recipientPhoneNumber) {
-        throw Error('Could not match sentPaymentId with an invitee')
+        throw Error(`Could not match sentPaymentId with an invitee. sentPaymentId: ${id}`)
       }
 
       const payment = sentPaymentsRaw[i]

@@ -60,7 +60,9 @@ export function getTransferFeedParams(
       break
     }
     case TokenTransactionType.InviteSent: {
-      const inviteDetails = invitees.find((inviteeObj) => address === inviteeObj.tempWalletAddress)
+      const inviteDetails = invitees.find(
+        (inviteeObj) => address.toLowerCase() === inviteeObj.tempWalletAddress.toLowerCase()
+      )
       const inviteeE164Number = inviteDetails ? inviteDetails.e164Number : undefined
       const inviteeRecipient = inviteeE164Number ? recipientCache[inviteeE164Number] : undefined
       // const inviteeE164Number = invitees[address]
