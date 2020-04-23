@@ -165,7 +165,7 @@ celocli account:authorize --from $LOCKED_GOLD_ACCOUNT --role vote --signer $SIGN
 
 # If instead you wish to authorize a vote signer for a Locked Gold Account that was created via a ReleaseGold contract,
 # plug in the Ledger containing the beneficiary key and run the following command.
-celocli release-gold:authorize --contract $RELEASE_GOLD_CONTRACT_ADDRESS --role vote --signer $SIGNER_TO_AUTHORIZE --signature $SIGNER_PROOF_OF_POSSESSION --useLedger
+celocli releasegold:authorize --contract $RELEASE_GOLD_CONTRACT_ADDRESS --role vote --signer $SIGNER_TO_AUTHORIZE --signature $SIGNER_PROOF_OF_POSSESSION --useLedger
 ```
 
 ## Troubleshooting
