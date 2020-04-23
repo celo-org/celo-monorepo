@@ -706,7 +706,7 @@ function getInstanceDir(runPath: string, instance: GethInstanceConfig) {
 }
 
 function getSnapshotdir(runPath: string, instance: GethInstanceConfig) {
-  return path.join(getInstanceDir(runPath, instance), 'snapshot')
+  return path.join(runPath, instance.name + '_snapshot')
 }
 
 export function importGenesis(genesisPath: string) {
