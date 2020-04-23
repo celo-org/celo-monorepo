@@ -1,5 +1,5 @@
 import * as utf8 from 'utf8'
-import { AbiCoder } from 'web3-eth-abi'
+import Web3 from 'web3'
 import { hexToUtf8 } from 'web3-utils'
 import { Log, Transfer } from './blockscout'
 
@@ -8,7 +8,7 @@ import { Log, Transfer } from './blockscout'
 const transferTopic0 = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef'
 const commentTopic0 = '0xe5d4e30fb8364e57bc4d662a07d0cf36f4c34552004c4c3624620a2c1d1c03dc'
 
-const abiCoder = new AbiCoder()
+const web3 = new Web3()
 
 export function decodeLogs(logs: Log[]) {
   const transfers = new Map<string, Transfer>()
@@ -58,7 +58,7 @@ function decodeTransferLog(log: Log): Transfer | null {
    * Including this unknown param in the input list or decoding won't work
    */
   try {
-    const decodedLog = abiCoder.decodeLog(
+    const decodedLog = web3.eth.abi.decodeLog(
       [
         {
           indexed: true,
