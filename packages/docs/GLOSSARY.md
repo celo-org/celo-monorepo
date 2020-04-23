@@ -27,7 +27,7 @@ subject to the [Baklava Testnet Disclaimer](../important-information/baklava-tes
 
 ## Block<a name="block"></a>
 
-The unit of update to the blockchain. A block consist of a header identifying its position in the chain and other metadata, and a body that contains a list of transactions, and data structures that describe the new state after executing those transactions.
+The unit of update to the blockchain. A block consists of a header identifying its position in the chain and other metadata, and a body that contains a list of transactions, and data structures that describe the new state after executing those transactions.
 
 ## Blockchain
 
