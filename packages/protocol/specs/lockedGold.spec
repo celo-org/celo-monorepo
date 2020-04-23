@@ -14,6 +14,7 @@ methods {
 	unlock(uint256) 
 	pendingWithdrawalsNotFull(address) returns bool envfree
 	getGoldTokenExt() returns address envfree
+	isAccount(address) returns bool envfree
 }
 
 
@@ -29,7 +30,7 @@ rule totalNonVotingGEAccountNonVoting(address a,method f)  {
 }
 
 
-/* One can tranfer erc token to non voting
+/* One can transfer erc token to non voting
 then move non voting to pending 
 then withdraw.
 That is, the total amount of: ERC tokens (balance) AND totalPending AND nonVoting is fixed
@@ -159,3 +160,5 @@ rule check_initializer {
 	assert successInit => isInitialized_, "When initialize() succeeds, must set initialization field to true";
 }
 
+invariant nonAccountDoesNotHavePending(address a)
+	!invoke isAccount(a) => invoke getTotalPendingWithdrawals(a) == 0
