@@ -19,7 +19,7 @@ export interface PhoneNumberHashDetails {
 }
 
 // Fetch and cache a phone number's salt and hash
-export function* fetchPrivatePhoneHash(e164Number: string) {
+export function* fetchPhoneHashPrivate(e164Number: string) {
   try {
     Logger.debug(`${TAG}@fetchPrivatePhoneHash`, 'Fetching phone hash details')
     const saltCache: E164NumberToSaltType = yield select(e164NumberToSaltSelector)

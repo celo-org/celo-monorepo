@@ -106,7 +106,7 @@ export const mockNavigation = {
 export const mockAddressToE164Number: AddressToE164NumberType = {
   [mockAccount]: mockE164Number,
 }
-export const mockE164NumberToAddress: E164NumberToAddressType = { [mockE164Number]: mockAccount }
+export const mockE164NumberToAddress: E164NumberToAddressType = { [mockE164Number]: [mockAccount] }
 
 export const mockAttestationMessage: AttestationCode = {
   code:

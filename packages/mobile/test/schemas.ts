@@ -25,8 +25,6 @@ export const vNeg1Schema = {
   },
   send: {
     isSending: false,
-    recentPhoneNumbers: undefined,
-    recipientCache: undefined,
     recentRecipients: [],
   },
   recipients: {

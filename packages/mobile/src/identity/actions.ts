@@ -80,7 +80,7 @@ export interface UpdateE164PhoneNumberSaltAction {
 
 export interface FetchPhoneAddressesAction {
   type: Actions.FETCH_PHONE_ADDRESSES
-  numbers: string[]
+  e164Number: string
 }
 
 export interface ImportContactsAction {
@@ -171,9 +171,9 @@ export const completeAttestationCode = (
   numComplete,
 })
 
-export const fetchPhoneAddresses = (numbers: string[]): FetchPhoneAddressesAction => ({
+export const fetchPhoneAddresses = (e164Number: string): FetchPhoneAddressesAction => ({
   type: Actions.FETCH_PHONE_ADDRESSES,
-  numbers,
+  e164Number,
 })
 
 export const updateE164PhoneNumberAddresses = (

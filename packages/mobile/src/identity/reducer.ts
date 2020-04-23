@@ -7,12 +7,15 @@ import { RootState } from 'src/redux/reducers'
 export const ATTESTATION_CODE_PLACEHOLDER = 'ATTESTATION_CODE_PLACEHOLDER'
 export const ATTESTATION_ISSUER_PLACEHOLDER = 'ATTESTATION_ISSUER_PLACEHOLDER'
 
+// TODO currently treating addresses to e164Number as 1:1 but
+// there are rare cases where an address could have two numbers mapped to it.
+// E.g. user imported backup phrase onto second phone and then verified again with a new number
 export interface AddressToE164NumberType {
   [address: string]: string | null
 }
 
 export interface E164NumberToAddressType {
-  [e164PhoneNumber: string]: string | null // null means unverified
+  [e164PhoneNumber: string]: string[] | null | undefined // null means unverified
 }
 
 export interface E164NumberToSaltType {

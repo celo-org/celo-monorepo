@@ -29,7 +29,7 @@ import {
   setHasSeenVerificationNux,
   setVerificationStatus,
 } from 'src/identity/actions'
-import { fetchPrivatePhoneHash, PhoneNumberHashDetails } from 'src/identity/privacy'
+import { fetchPhoneHashPrivate, PhoneNumberHashDetails } from 'src/identity/privacy'
 import { acceptedAttestationCodesSelector, attestationCodesSelector } from 'src/identity/reducer'
 import { startAutoSmsRetrieval } from 'src/identity/smsRetrieval'
 import { sendTransaction } from 'src/transactions/send'
@@ -128,7 +128,7 @@ export function* doVerificationFlow() {
     yield put(setVerificationStatus(VerificationStatus.Prepping))
     const account: string = yield call(getConnectedUnlockedAccount)
     const e164Number: string = yield select(e164NumberSelector)
-    const phoneHashDetails: PhoneNumberHashDetails = yield call(fetchPrivatePhoneHash, e164Number)
+    const phoneHashDetails: PhoneNumberHashDetails = yield call(fetchPhoneHashPrivate, e164Number)
     const phoneHash = phoneHashDetails.phoneHash
     const privDataKey = yield select(privateCommentKeySelector)
     const dataKey = compressedPubKey(Buffer.from(privDataKey, 'hex'))

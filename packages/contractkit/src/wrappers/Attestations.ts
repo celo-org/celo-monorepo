@@ -15,8 +15,6 @@ import {
   valueToInt,
 } from './BaseWrapper'
 
-const parseSignature = SignatureUtils.parseSignature
-
 export interface AttestationStat {
   completed: number
   total: number
@@ -61,6 +59,9 @@ export interface UnselectedRequest {
   attestationsRequested: number
   attestationRequestFeeToken: string
 }
+
+// Map of identifier -> (Map of address -> AttestationStat)
+export type IdentifierLookupResult = Record<string, Record<string, AttestationStat>>
 
 interface GetCompletableAttestationsResponse {
   0: string[]
@@ -290,7 +291,11 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
       identifier,
       account
     )
-    const { r, s, v } = parseSignature(expectedSourceMessage, code, attestationSigner)
+    const { r, s, v } = SignatureUtils.parseSignature(
+      expectedSourceMessage,
+      code,
+      attestationSigner
+    )
     return toTransactionObject(this.kit, this.contract.methods.complete(identifier, v, r, s))
   }
 
@@ -316,7 +321,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
       const attestationSigner = await accounts.getAttestationSigner(issuer)
 
       try {
-        parseSignature(expectedSourceMessage, code, attestationSigner)
+        SignatureUtils.parseSignature(expectedSourceMessage, code, attestationSigner)
         return issuer
       } catch (error) {
         continue
@@ -346,9 +351,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
    * Lookup mapped wallet addresses for a given list of identifiers
    * @param identifiers Attestation identifiers (e.g. phone hashes)
    */
-  async lookupIdentifiers(
-    identifiers: string[]
-  ): Promise<Record<string, Record<string, AttestationStat>>> {
+  async lookupIdentifiers(identifiers: string[]): Promise<IdentifierLookupResult> {
     // Unfortunately can't be destructured
     const stats = await this.contract.methods.batchGetAttestationStats(identifiers).call()
 
@@ -357,7 +360,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     const completed = stats[2].map(valueToInt)
     const total = stats[3].map(valueToInt)
     // Map of identifier -> (Map of address -> AttestationStat)
-    const result: Record<string, Record<string, AttestationStat>> = {}
+    const result: IdentifierLookupResult = {}
 
     let rIndex = 0
 
@@ -445,7 +448,11 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
       identifier,
       account
     )
-    const { r, s, v } = parseSignature(expectedSourceMessage, code, attestationSigner)
+    const { r, s, v } = SignatureUtils.parseSignature(
+      expectedSourceMessage,
+      code,
+      attestationSigner
+    )
     const result = await this.contract.methods
       .validateAttestationCode(identifier, account, v, r, s)
       .call()

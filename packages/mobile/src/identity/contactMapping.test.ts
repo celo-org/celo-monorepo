@@ -62,8 +62,8 @@ describe('Import Contacts Saga', () => {
       .put(
         updateE164PhoneNumberAddresses(
           {
-            [mockE164Number]: mockAccount.toLowerCase(),
-            [mockE164Number2]: mockAccount2.toLowerCase(),
+            [mockE164Number]: [mockAccount.toLowerCase()],
+            [mockE164Number2]: [mockAccount2.toLowerCase()],
           },
           {
             [mockAccount.toLowerCase()]: mockE164Number,
