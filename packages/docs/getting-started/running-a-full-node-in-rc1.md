@@ -70,7 +70,7 @@ This environment variable will only persist while you have this terminal window 
 
 ## Configure the node
 
-The genesis block is the first block in the chain, and is specific to each network. This command gets the `genesis.json` file for baklava and uses it to initialize your nodes' data directory.
+The genesis block is the first block in the chain, and is specific to each network. This command gets the `genesis.json` file for RC1 and uses it to initialize your nodes' data directory.
 
 ```bash
 docker run -v $PWD:/root/.celo --rm $CELO_IMAGE init /celo/genesis.json
