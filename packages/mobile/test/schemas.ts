@@ -116,7 +116,7 @@ export const vNeg1Schema = {
     isSendingInvite: false,
     isRedeemingInvite: false,
     isSkippingInvite: false,
-    invitees: {},
+    invitees: [],
     redeemedInviteCode: '',
     redeemComplete: false,
   },
