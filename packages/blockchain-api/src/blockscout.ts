@@ -278,7 +278,7 @@ export class BlockscoutAPI extends RESTDataSource {
     rawTransferTxs.forEach((transferTx) => {
       const transfers = transferTx.celoTransfers
 
-      const block = transferTx.blockNumber
+      const block = new BigNumber(transferTx.blockNumber).toFixed()
       const hash = transferTx.transactionHash
       const timestamp = new Date(transferTx.timestamp).getTime()
 
