@@ -115,7 +115,7 @@ async function postToSignMessage(base64BlindedMessage: string) {
 function handleSignMessageFailure(res: Response) {
   Logger.error(`${TAG}@handleSignMessageFailure`, `Response not okay. Status ${res.status}`)
   switch (res.status) {
-    case 402:
+    case 403:
       throw new Error(ErrorMessages.SALT_QUOTA_EXCEEDED)
     default:
       throw new Error('Failure getting blinded sig')

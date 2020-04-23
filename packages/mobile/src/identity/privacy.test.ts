@@ -38,7 +38,7 @@ describe('Fetch phone hash details', () => {
   })
 
   it.skip('handles failure from quota', async () => {
-    mockFetch.mockResponseOnce(JSON.stringify({ success: false }), { status: 402 })
+    mockFetch.mockResponseOnce(JSON.stringify({ success: false }), { status: 403 })
     // TODO confirm it navs to quota purchase screen
   })
 })
