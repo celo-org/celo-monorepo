@@ -91,15 +91,18 @@ exports[`Experience/KeyImagery renders 1`] = `
               Object {
                 "MozTransitionProperty": "opacity",
                 "MozUserSelect": "none",
+                "WebkitAlignContent": "center",
                 "WebkitBoxDirection": "normal",
                 "WebkitBoxOrient": "horizontal",
                 "WebkitFlexDirection": "row",
                 "WebkitTransitionDuration": "0.15s",
                 "WebkitTransitionProperty": "opacity",
                 "WebkitUserSelect": "none",
+                "alignContent": "center",
                 "cursor": "pointer",
                 "flexDirection": "row",
                 "msFlexDirection": "row",
+                "msFlexLinePack": "center",
                 "msTouchAction": "manipulation",
                 "msUserSelect": "none",
                 "touchAction": "manipulation",
@@ -147,13 +150,13 @@ exports[`Experience/KeyImagery renders 1`] = `
                   "fontFamily": "Jost, futura-pt, futura, sans-serif",
                   "fontSize": "24px",
                   "fontWeight": "400",
-                  "lineHeight": "28px",
-                  "marginLeft": "20px",
+                  "lineHeight": "initial",
+                  "marginLeft": "15px",
                   "textRendering": "geometricPrecision",
                 }
               }
             >
-              Brand Kit
+              BrandKit
             </div>
           </div>
         </a>

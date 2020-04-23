@@ -21,7 +21,14 @@ export default withNamespaces(NameSpaces.common)(function TopBar({
         <a href={menuItems.BRAND.link}>
           <TouchableOpacity style={styles.logo}>
             <LogoLightBg height={30} />
-            {!isMobile && <Text style={[fonts.h3, styles.title]}>BrandKit</Text>}
+            {!isMobile && (
+              <Text
+                // @ts-ignore -- added initial to the aug but it still isnt liking it
+                style={[fonts.h3, styles.title]}
+              >
+                BrandKit
+              </Text>
+            )}
           </TouchableOpacity>
         </a>
         <Button
@@ -39,7 +46,7 @@ export default withNamespaces(NameSpaces.common)(function TopBar({
 const styles = StyleSheet.create({
   title: {
     marginLeft: 15,
-    lineHeight: 'initial',
+    lineHeight: 'initial', // fixes the vertical alignment
   },
   container: {
     maxWidth: 1600,

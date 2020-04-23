@@ -8,7 +8,6 @@ declare module 'react-native' {
     transitionProperty?: string
     transitionDuration?: string
     gridArea?: string
-    marginLeft?: number
     lineHeight?: 'initial' | number
   }
 
