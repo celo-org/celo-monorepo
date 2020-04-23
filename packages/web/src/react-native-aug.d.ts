@@ -8,6 +8,7 @@ declare module 'react-native' {
     transitionProperty?: string
     transitionDuration?: string
     gridArea?: string
+    lineHeight?: 'initial' | number
   }
 
   interface KeyFrame {
