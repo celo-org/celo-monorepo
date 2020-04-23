@@ -43,8 +43,8 @@ export async function setAndInitializeImplementation(
         value: txOptions.value,
       }])
     }
-    return await retryTx(proxy._setAndInitializeImplementation, [implementationAddress, callData as any, { from: txOptions.from }])
+    return retryTx(proxy._setAndInitializeImplementation, [implementationAddress, callData as any, { from: txOptions.from }])
   } else {
-    return await retryTx(proxy._setAndInitializeImplementation, [implementationAddress, callData as any])
+    return retryTx(proxy._setAndInitializeImplementation, [implementationAddress, callData as any])
   }
 }
