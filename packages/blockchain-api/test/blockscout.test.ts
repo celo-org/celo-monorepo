@@ -63,6 +63,27 @@ describe('Blockscout', () => {
         Object {
           "amount": Object {
             "currencyCode": "cUSD",
+            "timestamp": 1566345797000,
+            "value": "-10",
+          },
+          "block": "90608",
+          "hash": "0xba620de2d812f299d987155eb5dca7abcfeaf154f5cfd99cb1773452a7df3d7a",
+          "makerAmount": Object {
+            "currencyCode": "cUSD",
+            "timestamp": 1566345797000,
+            "value": "10",
+          },
+          "takerAmount": Object {
+            "currencyCode": "cGLD",
+            "timestamp": 1566345797000,
+            "value": "1",
+          },
+          "timestamp": 1566345797000,
+          "type": "EXCHANGE",
+        },
+        Object {
+          "amount": Object {
+            "currencyCode": "cUSD",
             "timestamp": 1566345866000,
             "value": "10",
           },
@@ -136,6 +157,27 @@ describe('Blockscout', () => {
 
     expect(transactions).toMatchInlineSnapshot(`
       Array [
+        Object {
+          "amount": Object {
+            "currencyCode": "cGLD",
+            "timestamp": 1566345797000,
+            "value": "1",
+          },
+          "block": "90608",
+          "hash": "0xba620de2d812f299d987155eb5dca7abcfeaf154f5cfd99cb1773452a7df3d7a",
+          "makerAmount": Object {
+            "currencyCode": "cUSD",
+            "timestamp": 1566345797000,
+            "value": "10",
+          },
+          "takerAmount": Object {
+            "currencyCode": "cGLD",
+            "timestamp": 1566345797000,
+            "value": "1",
+          },
+          "timestamp": 1566345797000,
+          "type": "EXCHANGE",
+        },
         Object {
           "amount": Object {
             "currencyCode": "cGLD",
