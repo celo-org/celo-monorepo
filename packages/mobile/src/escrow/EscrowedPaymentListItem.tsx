@@ -3,6 +3,7 @@ import fontStyles from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { Trans, WithTranslation } from 'react-i18next'
 import { Image, StyleSheet, Text, View } from 'react-native'
+import { connect } from 'react-redux'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
@@ -12,9 +13,11 @@ import { EscrowedPayment } from 'src/escrow/actions'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { inviteFriendsIcon } from 'src/images/Images'
-import { sendSms } from 'src/invite/saga'
+import { InviteDetails } from 'src/invite/actions'
+import { generateInviteLink, sendSms } from 'src/invite/saga'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { RootState } from 'src/redux/reducers'
 import { divideByWei } from 'src/utils/formatting'
 import Logger from 'src/utils/Logger'
 
@@ -22,21 +25,48 @@ interface OwnProps {
   payment: EscrowedPayment
 }
 
-type Props = OwnProps & WithTranslation
+interface StateProps {
+  invitees: InviteDetails[]
+}
+
+const mapStateToProps = (state: RootState): StateProps => ({
+  invitees: state.invite.invitees,
+})
+
+type Props = OwnProps & WithTranslation & StateProps
 
 const TAG = 'EscrowedPaymentListItem'
 
 export class EscrowedPaymentListItem extends React.PureComponent<Props> {
   onRemind = async () => {
-    const { payment, t } = this.props
+    const { payment, t, invitees } = this.props
     const recipientPhoneNumber = payment.recipientPhone
     CeloAnalytics.track(CustomEventNames.clicked_escrowed_payment_send_message)
     // TODO(Tarik): add a UI that allows user to choose between SMS and Whatsapp (currently only SMS) for reminder message
     try {
-      await sendSms(recipientPhoneNumber, t('walletFlow5:escrowedPaymentReminderSms'), {
-        code: inviteCode,
-        link,
-      })
+      console.log(recipientPhoneNumber)
+      const inviteDetails = invitees.find(
+        (inviteeObj) => recipientPhoneNumber === inviteeObj.e164Number
+      )
+
+      // * This ties into my commnets on EscrowedPayment and InviteDetails being separate sources of truth *
+      // OPEN QUESTION: when could this error be thrown? appears to me invitee data is stored on send and
+      // escrow data is fetched from the smart contract, which means we could see an issue where app data is wiped
+      // and these two sources of data are no longer in sync
+      if (!inviteDetails) {
+        throw Error('Could not find the invite details that match this phone number')
+      }
+      const { inviteCode } = inviteDetails
+      // OPEN QUESTION: this function creates a unique link every time a reminder is sent. is this desirable?
+      const link = await generateInviteLink(inviteCode)
+      await sendSms(
+        // we do we have to send inviteCode and link if link is derived from inviteCode?
+        recipientPhoneNumber,
+        t('walletFlow5:escrowedPaymentReminderSms', {
+          code: inviteCode,
+          link,
+        })
+      )
     } catch (error) {
       // TODO: use the showError saga instead of the Logger.showError, which is a hacky temp thing we used for a while that doesn't actually work on iOS
       Logger.showError(ErrorMessages.SMS_ERROR)
@@ -121,6 +151,6 @@ const styles = StyleSheet.create({
   },
 })
 
-export default componentWithAnalytics(
-  withTranslation(Namespaces.inviteFlow11)(EscrowedPaymentListItem)
+export default connect<StateProps, {}, {}, RootState>(mapStateToProps)(
+  componentWithAnalytics(withTranslation(Namespaces.inviteFlow11)(EscrowedPaymentListItem))
 )
