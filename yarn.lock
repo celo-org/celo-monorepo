@@ -547,6 +547,20 @@
     "@opentelemetry/types" "^0.2.0"
     tslib "^1.9.3"
 
+"@azure/keyvault-secrets@^4.0.2":
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/@azure/keyvault-secrets/-/keyvault-secrets-4.0.2.tgz#b76375c31e54f903b07367d30ff9574a6bc87e34"
+  integrity sha512-WDOZ4uMRN3SqItHeW24MJYVbkptLojzbblFEVAR3q1dnpBEL6Ah4g/GVJcM9xJgEsPJR8fqt3WF/A0V25LbJZg==
+  dependencies:
+    "@azure/abort-controller" "^1.0.0"
+    "@azure/core-http" "^1.0.0"
+    "@azure/core-lro" "^1.0.0"
+    "@azure/core-paging" "^1.0.0"
+    "@azure/core-tracing" "1.0.0-preview.7"
+    "@azure/logger" "^1.0.0"
+    "@opentelemetry/types" "^0.2.0"
+    tslib "^1.9.3"
+
 "@azure/logger@^1.0.0":
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/@azure/logger/-/logger-1.0.0.tgz#48b371dfb34288c8797e5c104f6c4fb45bf1772c"
@@ -7660,6 +7674,13 @@
   version "6.5.3"
   resolved "https://registry.yarnpkg.com/@types/qs/-/qs-6.5.3.tgz#1c3b71b091eaeaf5924538006b7f70603ce63d38"
   integrity sha512-Jugo5V/1bS0fRhy2z8+cUAHEyWOATaz4rbyLVvcFs7+dXp5HfwpEwzF1Q11bB10ApUqHf+yTauxI0UXQDwGrbA==
+
+"@types/randombytes@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@types/randombytes/-/randombytes-2.0.0.tgz#0087ff5e60ae68023b9bc4398b406fea7ad18304"
+  integrity sha512-bz8PhAVlwN72vqefzxa14DKNT8jK/mV66CSjwdVQM/k3Th3EPKfUtdMniwZgMedQTFuywAsfjnZsg+pEnltaMA==
+  dependencies:
+    "@types/node" "*"
 
 "@types/react-autosuggest@^9.3.13":
   version "9.3.13"
@@ -31232,9 +31253,9 @@ react-native-autocomplete-input@^4.1.0:
   resolved "https://registry.yarnpkg.com/react-native-autocomplete-input/-/react-native-autocomplete-input-4.1.0.tgz#979ece28d891b245ecb967b6d31f1f924445b8ab"
   integrity sha512-Yn4GulZ9F6tde74UUGZHdVFeYWVuL7+EbUZy6kt+QHrzMc5B4OuRop1FT4RyWLpvbySW/vvqYgj9LAmlzkuEqA==
 
-"react-native-bip39@git://github.com/celo-org/react-native-bip39#b31a8ff":
+"react-native-bip39@git://github.com/celo-org/react-native-bip39#0439f00":
   version "2.2.0"
-  resolved "git://github.com/celo-org/react-native-bip39#b31a8ffc6a6c4393178e5a173ecbc966fbfcf92c"
+  resolved "git://github.com/celo-org/react-native-bip39#0439f002bea13ff77b1a05a5ebce38645f646016"
   dependencies:
     create-hash "^1.1.0"
     react-native-crypto "^2.0.1"

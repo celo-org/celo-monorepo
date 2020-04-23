@@ -26,7 +26,7 @@ Signs the EVM transaction using an HSM key in Azure Key Vault
 
 ###  constructor
 
-\+ **new AzureHSMSigner**(`keyVaultClient`: [AzureKeyVaultClient](_wallets_signers_azure_key_vault_client_.azurekeyvaultclient.md), `keyName`: string): *[AzureHSMSigner](_wallets_signers_azure_hsm_signer_.azurehsmsigner.md)*
+\+ **new AzureHSMSigner**(`keyVaultClient`: [AzureKeyVaultClient](_utils_azure_key_vault_client_.azurekeyvaultclient.md), `keyName`: string): *[AzureHSMSigner](_wallets_signers_azure_hsm_signer_.azurehsmsigner.md)*
 
 *Defined in [contractkit/src/wallets/signers/azure-hsm-signer.ts:12](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/azure-hsm-signer.ts#L12)*
 
@@ -34,7 +34,7 @@ Signs the EVM transaction using an HSM key in Azure Key Vault
 
 Name | Type |
 ------ | ------ |
-`keyVaultClient` | [AzureKeyVaultClient](_wallets_signers_azure_key_vault_client_.azurekeyvaultclient.md) |
+`keyVaultClient` | [AzureKeyVaultClient](_utils_azure_key_vault_client_.azurekeyvaultclient.md) |
 `keyName` | string |
 
 **Returns:** *[AzureHSMSigner](_wallets_signers_azure_hsm_signer_.azurehsmsigner.md)*

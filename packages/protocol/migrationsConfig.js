@@ -144,7 +144,10 @@ const DefaultConfig = {
     tobinTaxReserveRatio: toFixed(0).toFixed(), // Tobin tax turned off to start
     dailySpendingRatio: toFixed(0.05).toFixed(), // 5%
     spenders: [],
-    otherAddresses: ['0x246f4599eFD3fA67AC44335Ed5e749E518Ffd8bB'],
+    otherAddresses: [
+      '0x246f4599eFD3fA67AC44335Ed5e749E518Ffd8bB',
+      '0x298FbD6dad2Fc2cB56d7E37d8aCad8Bf07324f67',
+    ],
     assetAllocationSymbols: ['cGLD', 'BTC', 'ETH', 'DAI'],
     assetAllocationWeights: [0.5, 0.3, 0.15, 0.05],
   },
@@ -179,6 +182,11 @@ const DefaultConfig = {
       '0x75becd8e400552bac29cbe0534d8c7d6cba49979',
       '0x223ab67272891dd352194be61597042ecf9c272a',
       '0xca9ae47493f763a7166ab8310686b197984964b4',
+      '0xB93Fe7906ea4221b3fbe23412D18Ab1B07FE2F71',
+      '0x8d25D74E43789079Ef3C6B965c3D22b63A1233aC',
+      '0xCD88Cc79342a7cFE78E91FAa173eC87704bDcA9a',
+      '0x5091110175318A2A8aF88309D1648c1D84d31B29',
+      '0xBBd6e54Af7A5722f42461C6313F37Bd50729F195',
     ],
     frozen: true,
   },
