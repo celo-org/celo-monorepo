@@ -14,6 +14,7 @@ export const describe = 'Command to run a local testnet of geth instances.'
 
 interface LocalTestnetArgs {
   localgeth?: string
+  keepdata?: boolean
   branch?: string
   bootnode: boolean
   validators: number
@@ -23,14 +24,21 @@ interface LocalTestnetArgs {
   lightestclients: number
   migrateto: number
   instances: string
-  keepdata?: boolean
+  genesisOverride: string
+  migrationOverride: string
 }
 
 export const builder = (argv: yargs.Argv) => {
   return argv
-    .option('localgeth', {
+    .option('local-geth', {
       type: 'string',
       description: 'local path to celo-blockchain repository',
+      alias: ['localGeth', 'localgeth'],
+    })
+    .option('keep-data', {
+      type: 'boolean',
+      decription: 'keep the data directory from any previous runs',
+      alias: ['keepData', 'keepdata'],
     })
     .option('branch', {
       type: 'string',
@@ -50,34 +58,46 @@ export const builder = (argv: yargs.Argv) => {
       description: 'number of proxy nodes to create, assigned to the first n validators',
       default: 0,
     })
-    .option('txnodes', {
+    .option('tx-nodes', {
       type: 'number',
       description: 'number of transaction nodes to create',
       default: 0,
+      alias: ['txnodes', 'txNodes'],
     })
-    .option('lightclients', {
+    .option('light-clients', {
       type: 'number',
       description: 'number of light client nodes to create',
       default: 0,
+      alias: ['lightClients', 'lightclients'],
     })
-    .option('lightestclients', {
+    .option('lightest-clients', {
       type: 'number',
       description: 'number of transaction nodes to create',
       default: 0,
+      alias: ['lightestClients', 'lightestclients'],
     })
-    .option('migrateto', {
+    .option('migrate-to', {
       type: 'number',
       description: 'maximum migration number to run',
       default: 1000,
+      alias: ['migrateTo', 'migrateto'],
     })
     .option('instances', {
       type: 'string',
       description: 'manually enter a GethInstanceConfig[] json blob to add to the config',
       default: '[]',
     })
-    .option('keepdata', {
-      type: 'boolean',
-      decription: 'keep the data directory from any previous runs',
+    .option('genesis-override', {
+      type: 'string',
+      description: 'genesis configuration overrides as a GenesisConfig JSON blob',
+      default: '{}',
+      alias: ['genesisOverride', 'genesisoverride'],
+    })
+    .option('migration-override', {
+      type: 'string',
+      description: 'migration configuration overrides as a JSON blob',
+      default: '{}',
+      alias: ['migrationOverride', 'migrationoverride'],
     })
 }
 
@@ -281,6 +301,8 @@ export const handler = async (argv: LocalTestnetArgs) => {
       branch: argv.branch,
       remote: !argv.localgeth,
     },
+    genesisConfig: JSON.parse(argv.genesisOverride),
+    migrationOverrides: JSON.parse(argv.migrationOverride),
   }
   const hooks = getHooks(gethConfig)
   await hooks.initialize()
