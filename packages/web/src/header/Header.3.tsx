@@ -20,6 +20,7 @@ import MobileMenu from 'src/shared/MobileMenu'
 import OvalCoin from 'src/shared/OvalCoin'
 import { HEADER_HEIGHT } from 'src/shared/Styles'
 import { colors } from 'src/styles'
+import Hamburger from 'src/header/Hamburger'
 const BlueBanner = dynamic(import('src/header/BlueBanner'), { loading: () => null, ssr: false })
 const CookieConsent = dynamic(
   (import('src/header/CookieConsent') as unknown) as Promise<React.ComponentType>
@@ -305,6 +306,11 @@ export class Header extends React.PureComponent<Props, State> {
                 },
             ]}
           >
+            <Hamburger
+              isOpen={this.state.mobileMenuActive}
+              onPress={this.clickHamburger}
+              color={this.getForegroundColor()}
+            />
             <div
               className={`${cssStyles.hamburger} ${cssStyles['hamburger--squeeze']} ${
                 this.state.mobileMenuActive ? cssStyles['is-active'] : ''
