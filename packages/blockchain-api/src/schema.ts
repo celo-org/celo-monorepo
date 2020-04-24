@@ -199,15 +199,6 @@ export const typeDefs = gql`
   }
 
   type Query {
-    events(
-      address: String!
-      sort: String
-      startblock: Int
-      endblock: Int
-      page: Int
-      offset: Int
-    ): [Event] @deprecated(reason: "Use tokenTransactions query instead")
-
     rewards(
       address: String!
       sort: String
@@ -243,10 +234,6 @@ interface Context {
 
 export const resolvers = {
   Query: {
-    events: async (_source: any, args: EventArgs, context: Context) => {
-      const { dataSources } = context
-      return dataSources.blockscoutAPI.getFeedEvents(args)
-    },
     rewards: async (_source: any, args: EventArgs, { dataSources }: Context) => {
       return dataSources.blockscoutAPI.getFeedRewards(args)
     },
