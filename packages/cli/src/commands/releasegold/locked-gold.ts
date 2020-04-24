@@ -62,7 +62,7 @@ export default class LockedGold extends ReleaseGoldCommand {
           !flags.yes &&
           remaining.lt(new BigNumber(2e18)) &&
           (eqAddress(await accounts.getVoteSigner(flags.contract), flags.contract) ||
-            eqAddress(await accounts.getVoteSigner(flags.contract), flags.contract))
+            eqAddress(await accounts.getValidatorSigner(flags.contract), flags.contract))
         ) {
           const check = await binaryPrompt(
             `Only ${remaining.shiftedBy(
