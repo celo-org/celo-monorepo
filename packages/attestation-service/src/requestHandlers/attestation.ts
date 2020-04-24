@@ -1,5 +1,6 @@
 import { AttestationState } from '@celo/contractkit/lib/wrappers/Attestations'
 import { AttestationUtils, PhoneNumberUtils } from '@celo/utils'
+import { eqAddress } from '@celo/utils/lib/address'
 import { AddressType, E164PhoneNumberType, SaltType } from '@celo/utils/lib/io'
 import Logger from 'bunyan'
 import express from 'express'
@@ -106,7 +107,7 @@ class AttestationRequestHandler {
     const address = getAccountAddress()
 
     // TODO: Check with the new Accounts.sol
-    if (address.toLowerCase() !== issuer.toLowerCase()) {
+    if (eqAddress(address, issuer)) {
       Counters.attestationRequestsWrongIssuer.inc()
       throw new Error(`Mismatching issuer, I am ${address}`)
     }
