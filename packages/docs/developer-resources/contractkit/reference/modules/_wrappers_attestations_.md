@@ -27,6 +27,6 @@
 
 ###  IdentifierLookupResult
 
-Ƭ **IdentifierLookupResult**: *Record‹string, Record‹string, [AttestationStat](../interfaces/_wrappers_attestations_.attestationstat.md)››*
+Ƭ **IdentifierLookupResult**: *Record‹string, Record‹[Address](_base_.md#address), [AttestationStat](../interfaces/_wrappers_attestations_.attestationstat.md)››*
 
-*Defined in [contractkit/src/wrappers/Attestations.ts:64](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L64)*
+*Defined in [contractkit/src/wrappers/Attestations.ts:71](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L71)*

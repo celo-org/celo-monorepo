@@ -45,7 +45,6 @@ export async function requestAttestationsFromIssuers(
     try {
       const response = await attestations.revealPhoneNumberToIssuer(
         phoneNumber,
-        '',
         account,
         attestation.issuer,
         attestation.attestationServiceURL

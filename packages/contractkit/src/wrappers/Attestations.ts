@@ -54,6 +54,13 @@ type AttestationServiceRunningCheckResult =
   | { isValid: true; result: ActionableAttestation }
   | { isValid: false; issuer: Address }
 
+interface AttesationServiceRevealRequest {
+  account: string
+  phoneNumber: string
+  issuer: string
+  salt?: string
+}
+
 export interface UnselectedRequest {
   blockNumber: number
   attestationsRequested: number
@@ -61,7 +68,7 @@ export interface UnselectedRequest {
 }
 
 // Map of identifier -> (Map of address -> AttestationStat)
-export type IdentifierLookupResult = Record<string, Record<string, AttestationStat>>
+export type IdentifierLookupResult = Record<string, Record<Address, AttestationStat>>
 
 interface GetCompletableAttestationsResponse {
   0: string[]
@@ -410,22 +417,25 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
 
   revealPhoneNumberToIssuer(
     phoneNumber: string,
-    salt: string,
     account: Address,
     issuer: Address,
-    serviceURL: string
+    serviceURL: string,
+    salt?: string
   ) {
+    const body: AttesationServiceRevealRequest = {
+      account,
+      phoneNumber,
+      issuer,
+    }
+    if (salt) {
+      body.salt = salt
+    }
     return fetch(serviceURL + '/attestations', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        account,
-        phoneNumber,
-        salt,
-        issuer,
-      }),
+      body: JSON.stringify(body),
     })
   }
 

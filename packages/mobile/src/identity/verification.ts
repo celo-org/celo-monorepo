@@ -478,10 +478,10 @@ function* tryRevealPhoneNumber(
     const response = yield call(
       [attestationsWrapper, attestationsWrapper.revealPhoneNumberToIssuer],
       phoneHashDetails.e164Number,
-      phoneHashDetails.salt,
       account,
       attestation.issuer,
-      attestation.attestationServiceURL
+      attestation.attestationServiceURL,
+      phoneHashDetails.salt
     )
     if (!response.ok) {
       throw new Error(

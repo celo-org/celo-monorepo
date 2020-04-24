@@ -170,7 +170,7 @@ export function getAddressFromPhoneNumber(
     throw new Error('Phone addresses array should never be empty')
   }
 
-  if (addresses.length === 1) {
+  if (addresses.length > 1) {
     Logger.warn(TAG, 'Number mapped to multiple addresses, need to disambiguate')
     // TODO handle with Secure Send flow, return latest for now
     return addresses[addresses.length - 1]

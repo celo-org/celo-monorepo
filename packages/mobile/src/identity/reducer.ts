@@ -36,6 +36,7 @@ export interface State {
   verificationStatus: VerificationStatus
   hasSeenVerificationNux: boolean
   addressToE164Number: AddressToE164NumberType
+  // Note: Do not access values in this directly, use the `getAddressFromPhoneNumber` helper in contactMapping
   e164NumberToAddress: E164NumberToAddressType
   e164NumberToSalt: E164NumberToSaltType
   askedContactsPermission: boolean
