@@ -326,6 +326,11 @@ const NetworkConfigs = {
       skipSetConstitution: true,
       skipTransferOwnership: true,
     },
+    governanceApproverMultiSig: {
+      signatories: [network.from],
+      numRequiredConfirmations: 1,
+      numInternalRequiredConfirmations: 1,
+    },
     stableToken: {
       frozen: false,
     },
@@ -404,6 +409,7 @@ const NetworkConfigs = {
   },
 }
 
+NetworkConfigs.local = NetworkConfigs.testing
 NetworkConfigs.baklavastaging = NetworkConfigs.baklava
 NetworkConfigs.alfajoresstaging = NetworkConfigs.alfajores
 
