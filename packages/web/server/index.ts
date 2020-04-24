@@ -18,6 +18,7 @@ import { faucetOrInviteController } from './controllers'
 import getFormattedEvents from './EventHelpers'
 import { submitFellowApp } from './FellowshipApp'
 import mailer from './mailer'
+import rateLimit from './rateLimit'
 import respondError from './respondError'
 
 const CREATED = 201
@@ -98,7 +99,7 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
   })
 
   server.get('/papers/cbdc-velocity', (_, res) => {
-    res.redirect('/papers/CBDC_Velocity_Copic-Franke.pdf')
+    res.redirect('/papers/cLabs_CBDC_Velocity_v2_04-2020.pdf')
   })
 
   server.get('/papers/whitepaper', (_, res) => {
@@ -126,7 +127,7 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
   server.use(bodyParser.json())
   server.use(nextI18NextMiddleware(nextI18next))
 
-  server.post('/fellowship', async (req, res) => {
+  server.post('/fellowship', rateLimit, async (req, res) => {
     const { ideas, email, name, bio, deliverables, resume } = req.body
 
     try {
@@ -142,20 +143,20 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
     } catch (e) {
       Sentry.withScope((scope) => {
         scope.setTag('Service', 'Airtable')
-        Sentry.captureException(e)
+        Sentry.captureEvent({ message: e.message, extra: e })
       })
       respondError(res, e)
     }
   })
 
-  server.post('/ecosystem/:table', async (req, res) => {
+  server.post('/ecosystem/:table', rateLimit, async (req, res) => {
     try {
       const record = await ecoFundSubmission(req.body, req.params.table as Tables)
       res.status(CREATED).json({ id: record.id })
     } catch (e) {
       Sentry.withScope((scope) => {
         scope.setTag('Service', 'Airtable')
-        Sentry.captureEvent(e)
+        Sentry.captureEvent({ message: e.message, extra: e })
       })
       respondError(res, e)
     }
@@ -169,9 +170,13 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
     await faucetOrInviteController(req, res, RequestType.Invite)
   })
 
-  server.post('/contacts', async (req, res) => {
-    await addToCRM(req.body)
-    res.status(NO_CONTENT).send('ok')
+  server.post('/contacts', rateLimit, async (req, res) => {
+    try {
+      await addToCRM(req.body)
+      res.status(NO_CONTENT).send('ok')
+    } catch (e) {
+      respondError(res, e)
+    }
   })
 
   server.get('/announcement', async (req, res) => {
@@ -183,7 +188,7 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
     }
   })
 
-  server.post('/api/alliance', async (req, res) => {
+  server.post('/api/alliance', rateLimit, async (req, res) => {
     try {
       await create(req.body)
       res.sendStatus(CREATED)
@@ -192,7 +197,7 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
     }
   })
 
-  server.post('/partnerships-email', async (req, res) => {
+  server.post('/partnerships-email', rateLimit, async (req, res) => {
     const { email } = req.body
     try {
       await mailer({

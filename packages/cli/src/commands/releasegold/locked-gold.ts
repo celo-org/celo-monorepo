@@ -37,14 +37,15 @@ export default class LockedGold extends ReleaseGoldCommand {
     const lockedGold = await this.kit.contracts.getLockedGold()
 
     if (flags.action === 'lock') {
+      // Must verify contract is account before checking pending withdrawals
+      await checkBuilder.addCheck('Is not revoked', () => !isRevoked).runChecks()
       const pendingWithdrawalsValue = await lockedGold.getPendingWithdrawalsTotalValue(
         this.contractAddress
       )
       const relockValue = BigNumber.minimum(pendingWithdrawalsValue, value)
       const lockValue = value.minus(relockValue)
       this.kit.defaultAccount = beneficiary
-      await checkBuilder
-        .addCheck('Is not revoked', () => !isRevoked)
+      await newCheckBuilder(this, this.contractAddress)
         .hasEnoughGold(this.contractAddress, lockValue)
         .runChecks()
       const txos = await this.releaseGoldWrapper.relockGold(relockValue)

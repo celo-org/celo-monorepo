@@ -265,13 +265,18 @@ export async function grantRoles(serviceAccountName: string, role: string) {
   return
 }
 
-export async function retrieveCloudSQLConnectionInfo(celoEnv: string, instanceName: string) {
+export async function retrieveCloudSQLConnectionInfo(
+  celoEnv: string,
+  instanceName: string,
+  dbSuffix: string
+) {
   await validateExistingCloudSQLInstance(instanceName)
+  const secretName = `${celoEnv}-blockscout${dbSuffix}`
   const [blockscoutDBUsername] = await execCmdWithExitOnFailure(
-    `kubectl get secret ${celoEnv}-blockscout -o jsonpath='{.data.DATABASE_USER}' -n ${celoEnv} | base64 --decode`
+    `kubectl get secret ${secretName} -o jsonpath='{.data.DATABASE_USER}' -n ${celoEnv} | base64 --decode`
   )
   const [blockscoutDBPassword] = await execCmdWithExitOnFailure(
-    `kubectl get secret ${celoEnv}-blockscout -o jsonpath='{.data.DATABASE_PASSWORD}' -n ${celoEnv} | base64 --decode`
+    `kubectl get secret ${secretName} -o jsonpath='{.data.DATABASE_PASSWORD}' -n ${celoEnv} | base64 --decode`
   )
   const [blockscoutDBConnectionName] = await execCmdWithExitOnFailure(
     `gcloud sql instances describe ${instanceName} --format="value(connectionName)"`

@@ -1,12 +1,10 @@
-import BigNumber from 'bignumber.js'
-
 import { ContractKit } from '@celo/contractkit'
 import { ClaimTypes, IdentityMetadataWrapper } from '@celo/contractkit/lib/identity'
 import { AccountClaim } from '@celo/contractkit/lib/identity/claims/account'
 import { verifyAccountClaim } from '@celo/contractkit/lib/identity/claims/verify'
 import { ensureLeading0x } from '@celo/utils/lib/address'
 import { notEmpty } from '@celo/utils/lib/collections'
-
+import BigNumber from 'bignumber.js'
 import { BaseCommand } from '../../base'
 import { printValueMap } from '../../utils/cli'
 import { Args } from '../../utils/command'
@@ -16,7 +14,7 @@ async function getMetadata(kit: ContractKit, address: string) {
   const url = await accounts.getMetadataURL(address)
   console.log(address, 'has url', url)
   if (url === '') return IdentityMetadataWrapper.fromEmpty(address)
-  else return IdentityMetadataWrapper.fetchFromURL(url)
+  else return IdentityMetadataWrapper.fetchFromURL(kit, url)
 }
 
 function dedup(lst: string[]): string[] {
@@ -28,9 +26,8 @@ async function getClaims(
   address: string,
   data: IdentityMetadataWrapper
 ): Promise<string[]> {
-  const accounts = await kit.contracts.getAccounts()
   const getClaim = async (claim: AccountClaim) => {
-    const error = await verifyAccountClaim(claim, ensureLeading0x(address), accounts.getMetadataURL)
+    const error = await verifyAccountClaim(kit, claim, ensureLeading0x(address))
     return error ? null : claim.address.toLowerCase()
   }
   const res = (await Promise.all(data.filterClaims(ClaimTypes.ACCOUNT).map(getClaim))).filter(

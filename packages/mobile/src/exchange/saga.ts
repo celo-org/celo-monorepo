@@ -1,3 +1,4 @@
+import { CeloTransactionObject } from '@celo/contractkit'
 import { ExchangeWrapper } from '@celo/contractkit/lib/wrappers/Exchange'
 import { GoldTokenWrapper } from '@celo/contractkit/lib/wrappers/GoldTokenWrapper'
 import { ReserveWrapper } from '@celo/contractkit/lib/wrappers/Reserve'
@@ -51,7 +52,7 @@ export function* doFetchTobinTax({ makerAmount, makerToken }: FetchTobinTaxActio
         contractKit.contracts.getReserve,
       ])
 
-      const tobinTaxFraction = yield call(reserve.getOrComputeTobinTax)
+      const tobinTaxFraction = yield call(reserve.getOrComputeTobinTax().txo.call)
 
       if (!tobinTaxFraction) {
         Logger.error(TAG, 'Unable to fetch tobin tax')
@@ -245,7 +246,9 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
     yield call(sendTransaction, approveTx.txo, account, TAG, 'approval')
     Logger.debug(TAG, `Transaction approved: ${util.inspect(approveTx.txo.arguments)}`)
 
-    const tx = exchangeContract.exchange(
+    contractKit.defaultAccount = account
+
+    const tx: CeloTransactionObject<string> = yield exchangeContract.exchange(
       convertedMakerAmount.toString(),
       convertedTakerAmount.toString(),
       sellGold
@@ -255,8 +258,7 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
       Logger.error(TAG, 'No txId. Did not exchange.')
       return
     }
-    // TODO check types
-    yield call(sendAndMonitorTransaction as any, txId, tx, account)
+    yield call(sendAndMonitorTransaction, txId, tx, account)
   } catch (error) {
     Logger.error(TAG, 'Error doing exchange', error)
     if (txId) {

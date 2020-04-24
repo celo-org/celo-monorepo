@@ -7,7 +7,7 @@ export default class ElectionCurrent extends BaseCommand {
     'Outputs the set of validators currently participating in BFT to create blocks. An election is run to select the validator set at the end of every epoch.'
 
   static flags = {
-    ...BaseCommand.flags,
+    ...BaseCommand.flagsWithoutLocalAddresses(),
   }
 
   async run() {

@@ -1,14 +1,17 @@
 import * as React from 'react'
 import { StyleSheet, View } from 'react-native'
 import { NewMember } from 'src/alliance/AllianceMember'
+import { CheckboxWithLabel } from 'src/forms/CheckboxWithLabel'
+import { ErrorDisplay } from 'src/forms/ErrorDisplay'
 import FormContainer, { emailIsValid, hasField } from 'src/forms/Form'
-import { CheckboxWithLabel, Form } from 'src/forms/FormComponents'
+import { Form } from 'src/forms/FormComponents'
 import { LabeledInput } from 'src/forms/LabeledInput'
+import SubmitButton from 'src/forms/SubmitButton'
+import SuccessDisplay from 'src/forms/SuccessDisplay'
 import { NameSpaces, useTranslation } from 'src/i18n'
-import Checkmark from 'src/icons/Checkmark'
 import { useScreenSize } from 'src/layout/ScreenSize'
-import Button, { BTN, SIZE } from 'src/shared/Button.3'
-import { colors, standardStyles } from 'src/styles'
+import { SIZE } from 'src/shared/Button.3'
+import { standardStyles } from 'src/styles'
 
 const BLANK_FORM: NewMember = {
   name: '',
@@ -34,7 +37,7 @@ export default function SignupForm() {
   const { isMobile, isDesktop } = useScreenSize()
   return (
     <FormContainer route="/api/alliance" blankForm={BLANK_FORM} validateWith={validateWith}>
-      {({ formState, onInput, onCheck, onAltSubmit }) => (
+      {({ formState, onInput, onCheck, onSubmit }) => (
         <Form>
           <View style={styles.container}>
             <View style={isDesktop && standardStyles.row}>
@@ -80,15 +83,22 @@ export default function SignupForm() {
           <View
             style={[standardStyles.centered, styles.buttonContainer, isMobile && styles.stretch]}
           >
-            <Button
+            <SubmitButton
+              isLoading={formState.isLoading}
               text={t('form.btn')}
               onDarkBackground={true}
-              onPress={onAltSubmit}
-              kind={BTN.PRIMARY}
+              onPress={onSubmit}
               style={styles.buttonText}
-              iconRight={formState.isComplete && <Checkmark color={colors.white} size={18} />}
               size={isMobile ? SIZE.fullWidth : SIZE.big}
             />
+          </View>
+          <SuccessDisplay
+            style={styles.success}
+            isShowing={formState.isComplete}
+            message={t('common:applicationSubmitted')}
+          />
+          <View style={standardStyles.centered}>
+            <ErrorDisplay isShowing={!!formState.apiError} field={formState.apiError} />
           </View>
         </Form>
       )}
@@ -102,7 +112,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 5,
   },
   buttonContainer: {
-    paddingTop: 15,
+    paddingVertical: 15,
     paddingHorizontal: 20,
   },
   stretch: {
@@ -110,6 +120,10 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontSize: 20,
+  },
+  success: {
+    textAlign: 'center',
+    marginTop: 15,
   },
   container: { margin: 20 },
 })
