@@ -121,9 +121,9 @@ release: {{ .Release.Name }}
   
     geth \
       --bootnodes=$(cat /root/.celo/bootnodeEnode) \
-      --light.serve 90 \
-      --light.maxpeers 1000 \
-      --maxpeers 1100 \
+      --light.serve {{ .light_serve | default 90 }} \
+      --light.maxpeers {{ .light_maxpeers | default 1000 }} \
+      --maxpeers {{ .maxpeers | default 1100 }} \
       --networkid=${NETWORK_ID} \
       --syncmode={{ .Values.geth.syncmode }} \
       --gcmode={{ .Values.geth.gcmode }} \
