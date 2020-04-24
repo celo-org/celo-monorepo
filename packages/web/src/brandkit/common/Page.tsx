@@ -248,7 +248,7 @@ class Page extends React.Component<Props & ScreenProps, State> {
     return (
       <>
         <OpenGraph
-          title={`Celo Experience / Brand Kit / ${title}`}
+          title={`Celo Experience / BrandKit / ${title}`}
           path={path}
           description={metaDescription}
           image={require('src/brandkit/images/ogimage-brandkit.png')}

@@ -1,5 +1,6 @@
 import { DefaultAzureCredential } from '@azure/identity'
 import { CryptographyClient, KeyClient, KeyVaultKey } from '@azure/keyvault-keys'
+import { SecretClient } from '@azure/keyvault-secrets'
 import { ensureLeading0x } from '@celo/utils/lib/address'
 import { BigNumber } from 'bignumber.js'
 import debugFactory from 'debug'
@@ -28,6 +29,7 @@ export class AzureKeyVaultClient {
     string,
     CryptographyClient
   >()
+  private readonly secretClient: SecretClient
 
   constructor(vaultName: string) {
     this.vaultName = vaultName
@@ -36,6 +38,7 @@ export class AzureKeyVaultClient {
     // If using a service principal, you must set the appropriate environment vars
     this.credential = new DefaultAzureCredential()
     this.keyClient = new KeyClient(this.vaultUri, this.credential)
+    this.secretClient = new SecretClient(this.vaultUri, this.credential)
   }
 
   public async getKeys(): Promise<string[]> {
@@ -121,6 +124,14 @@ export class AzureKeyVaultClient {
       throw e
     }
     return true
+  }
+
+  public async getSecret(secretName: string): Promise<string> {
+    const secret = await this.secretClient.getSecret(secretName)
+    if (!secret.value) {
+      throw new Error(`Could not locate secret ${secretName} in vault ${this.vaultName}`)
+    }
+    return secret.value
   }
 
   /**
