@@ -1,3 +1,4 @@
+import { retryTx } from '@celo/protocol/lib/proxy-utils'
 import { _setInitialProxyImplementation } from '@celo/protocol/lib/web3-utils'
 import BigNumber from 'bignumber.js'
 import chalk from 'chalk'
@@ -21,6 +22,7 @@ let ReleaseGoldMultiSigProxy: ReleaseGoldMultiSigProxyContract
 let ReleaseGold: ReleaseGoldContract
 let ReleaseGoldProxy: ReleaseGoldProxyContract
 const ONE_CGLD = web3.utils.toWei('1', 'ether')
+const TWO_CGLD = web3.utils.toWei('2', 'ether')
 const MAINNET_START_TIME = new Date('22 April 2020 16:00:00 UTC').getTime() / 1000
 
 async function handleGrant(releaseGoldConfig: any, currGrant: number) {
@@ -60,8 +62,12 @@ async function handleGrant(releaseGoldConfig: any, currGrant: number) {
       return
     }
   }
-  const releaseGoldMultiSigProxy = await ReleaseGoldMultiSigProxy.new({ from: fromAddress })
-  const releaseGoldMultiSigInstance = await ReleaseGoldMultiSig.new({ from: fromAddress })
+  const releaseGoldMultiSigProxy = await retryTx(ReleaseGoldMultiSigProxy.new, [
+    { from: fromAddress },
+  ])
+  const releaseGoldMultiSigInstance = await retryTx(ReleaseGoldMultiSig.new, [
+    { from: fromAddress },
+  ])
   const multiSigTxHash = await _setInitialProxyImplementation(
     web3,
     releaseGoldMultiSigInstance,
@@ -75,11 +81,14 @@ async function handleGrant(releaseGoldConfig: any, currGrant: number) {
     2,
     2
   )
-  await releaseGoldMultiSigProxy._transferOwnership(releaseGoldMultiSigProxy.address, {
-    from: fromAddress,
-  })
-  const releaseGoldProxy = await ReleaseGoldProxy.new({ from: fromAddress })
-  const releaseGoldInstance = await ReleaseGold.new({ from: fromAddress })
+  await retryTx(releaseGoldMultiSigProxy._transferOwnership, [
+    releaseGoldMultiSigProxy.address,
+    {
+      from: fromAddress,
+    },
+  ])
+  const releaseGoldProxy = await retryTx(ReleaseGoldProxy.new, [{ from: fromAddress }])
+  const releaseGoldInstance = await retryTx(ReleaseGold.new, [{ from: fromAddress }])
 
   const weiAmountReleasedPerPeriod = new BigNumber(
     web3.utils.toWei(releaseGoldConfig.amountReleasedPerPeriod.toString())
@@ -123,16 +132,24 @@ async function handleGrant(releaseGoldConfig: any, currGrant: number) {
     '0x000000000000000000000000000000000000ce10'
   )
   const proxiedReleaseGold = await ReleaseGold.at(releaseGoldProxy.address)
-  await proxiedReleaseGold.transferOwnership(releaseGoldMultiSigProxy.address, {
-    from: fromAddress,
-  })
-  await releaseGoldProxy._transferOwnership(releaseGoldMultiSigProxy.address, { from: fromAddress })
+  await retryTx(proxiedReleaseGold.transferOwnership, [
+    releaseGoldMultiSigProxy.address,
+    {
+      from: fromAddress,
+    },
+  ])
+  await retryTx(releaseGoldProxy._transferOwnership, [
+    releaseGoldMultiSigProxy.address,
+    { from: fromAddress },
+  ])
   // Send starting gold amount to the beneficiary so they can perform transactions.
-  await web3.eth.sendTransaction({
-    from: fromAddress,
-    to: releaseGoldConfig.beneficiary,
-    value: startGold,
-  })
+  await retryTx(web3.eth.sendTransaction, [
+    {
+      from: fromAddress,
+      to: releaseGoldConfig.beneficiary,
+      value: startGold,
+    },
+  ])
 
   const record = {
     GrantNumber: currGrant,
@@ -192,7 +209,8 @@ async function checkBalance(releaseGoldConfig: any) {
       )
       continue
     }
-    if (fromBalance.gt(ONE_CGLD)) {
+    // Must be enough to handle 1cGLD test transfer and 1cGLD for transaction fees
+    if (fromBalance.gt(TWO_CGLD)) {
       console.info(
         '\nSending 1 cGLD as a test from ' +
           fromAddress +
@@ -200,11 +218,13 @@ async function checkBalance(releaseGoldConfig: any) {
           addressResponse.newFromAddress +
           ' to verify ownership.\n'
       )
-      await web3.eth.sendTransaction({
-        from: fromAddress,
-        to: addressResponse.newFromAddress,
-        value: ONE_CGLD,
-      })
+      await retryTx(web3.eth.sendTransaction, [
+        {
+          from: fromAddress,
+          to: addressResponse.newFromAddress,
+          value: ONE_CGLD,
+        },
+      ])
       const confirmResponse = await prompts({
         type: 'confirm',
         name: 'confirmation',
@@ -217,11 +237,13 @@ async function checkBalance(releaseGoldConfig: any) {
       }
       console.info(chalk.green('\nTransfer confirmed, sending the remaining balance.\n'))
       const fromBalancePostTransfer = new BigNumber(await web3.eth.getBalance(fromAddress))
-      await web3.eth.sendTransaction({
-        from: fromAddress,
-        to: addressResponse.newFromAddress,
-        value: fromBalancePostTransfer.minus(ONE_CGLD).toFixed(), // minus Tx Fees
-      })
+      await retryTx(web3.eth.sendTransaction, [
+        {
+          from: fromAddress,
+          to: addressResponse.newFromAddress,
+          value: fromBalancePostTransfer.minus(ONE_CGLD).toFixed(), // minus Tx Fees
+        },
+      ])
     }
     const switchResponse = await prompts({
       type: 'confirm',

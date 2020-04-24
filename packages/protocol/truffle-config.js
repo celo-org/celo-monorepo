@@ -64,7 +64,7 @@ const networks = {
     from: '0xE23a4c6615669526Ab58E9c37088bee4eD2b2dEE',
     network_id: 42220,
     gas: gasLimit,
-    gasPrice: 100000000000,
+    gasPrice: 10000000000,
   },
   coverage: {
     host: 'localhost',

@@ -4,7 +4,7 @@ env_variables:
   NODE_ENV: "development"
   DEPLOY_ENV: "baklavastaging"
   EXCHANGE_RATES_API: "https://apilayer.net/api"
-  BLOCKSCOUT_API: "https://baklavastaging-blockscout.celo-testnet.org/api"
+  BLOCKSCOUT_API: "https://baklavastaging-blockscout.celo-testnet.org/graphql"
   # TODO Pull addresses from the build artifacts of the network in protocol/build
   FAUCET_ADDRESS: "0x4588ABb84e1BBEFc2BcF4b2296F785fB7AD9F285"
   VERIFICATION_REWARDS_ADDRESS: "0xb4fdaf5f3cd313654aa357299ada901b1d2dd3b5"

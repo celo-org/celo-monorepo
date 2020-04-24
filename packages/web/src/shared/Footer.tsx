@@ -60,10 +60,10 @@ const SOCIAL_MENU = [
   },
   {
     name: 'YouTube',
-    link: CeloLinks.discord,
+    link: CeloLinks.youtube,
     icon: <YouTube size={ICON_SIZE} color={colors.dark} />,
   },
-  { name: 'Instagram', link: CeloLinks.discord, icon: <Instagram size={ICON_SIZE} /> },
+  { name: 'Instagram', link: CeloLinks.instagram, icon: <Instagram size={ICON_SIZE} /> },
 ]
 
 export default function Footer() {
@@ -204,7 +204,7 @@ const styles = StyleSheet.create({
     maxWidth: 350,
   },
   ringsMobile: { marginBottom: 30 },
-  rings: { marginBottom: 50 },
+  rings: { marginBottom: 20, transform: [{ translateY: -10 }] },
   form: {
     maxWidth: 550,
   },
