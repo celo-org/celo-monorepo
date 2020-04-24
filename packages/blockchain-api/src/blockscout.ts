@@ -15,6 +15,7 @@ export interface BlockscoutTransferTx {
   gasUsed: string
   feeToken: string
   gatewayFee: string
+  gatewayFeeRecipient: string
   input: string
   celoTransfers: BlockscoutCeloTransfer[]
 }
@@ -44,33 +45,31 @@ export class BlockscoutAPI extends RESTDataSource {
     const { celoTransfers } = transferTx
 
     const transfersCount = celoTransfers.length
-    if (transfersCount < 3) {
+    // 3 fee transfers when gatewayFeeRecipient is set, otherwise 2
+    const expectedFeeTransfersCount = transferTx.gatewayFeeRecipient ? 3 : 2
+
+    if (transfersCount < expectedFeeTransfersCount) {
       throw new Error(`Cannot determine fee transfers for tx ${transferTx.transactionHash}`)
     }
 
-    const feeTransfer1 = celoTransfers[transfersCount - 1]
-    const feeTransfer2 = celoTransfers[transfersCount - 2]
-    const feeTransfer3 = celoTransfers[transfersCount - 3]
-    const fee1Value = new BigNumber(feeTransfer1.value)
-    const fee2Value = new BigNumber(feeTransfer2.value)
-    const fee3Value = new BigNumber(feeTransfer3.value)
-    const gasValue = new BigNumber(transferTx.gasUsed).multipliedBy(transferTx.gasPrice)
-    const gatewayFeeValue = new BigNumber(transferTx.gatewayFee)
-    const expectedTotalFeeValue = gasValue.plus(gatewayFeeValue)
+    let totalFee = new BigNumber(0)
+    for (let i = 1; i <= expectedFeeTransfersCount; i++) {
+      const feeTransfer = celoTransfers[transfersCount - i]
+      totalFee = totalFee.plus(feeTransfer.value)
+    }
+
+    const gasFee = new BigNumber(transferTx.gasUsed).multipliedBy(transferTx.gasPrice)
+    const gatewayFee = new BigNumber(transferTx.gatewayFee || 0)
+    const expectedTotalFee = gasFee.plus(gatewayFee)
 
     // Make sure our assertion is correct
-    if (
-      !fee1Value
-        .plus(fee2Value)
-        .plus(fee3Value)
-        .isEqualTo(expectedTotalFeeValue)
-    ) {
+    if (!totalFee.isEqualTo(expectedTotalFee)) {
       // If this is raised, something is wrong with our assertion
       throw new Error(`Fee transfers don't add up for tx ${transferTx.transactionHash}`)
     }
 
     // Filter out fee transfers
-    return celoTransfers.slice(0, transfersCount - 3)
+    return celoTransfers.slice(0, transfersCount - expectedFeeTransfersCount)
   }
 
   getRelevantTransfers(
@@ -113,6 +112,7 @@ export class BlockscoutAPI extends RESTDataSource {
                 gasUsed
                 feeToken
                 gatewayFee
+                gatewayFeeRecipient
                 input
                 # Transfers associated with the TX
                 celoTransfer(first: 10) {
