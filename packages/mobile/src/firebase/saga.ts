@@ -1,5 +1,5 @@
-import firebase from 'react-native-firebase'
-import { DataSnapshot } from 'react-native-firebase/database'
+import firebase from '@react-native-firebase/app'
+import { FirebaseDatabaseTypes } from '@react-native-firebase/database'
 import { eventChannel } from 'redux-saga'
 import {
   all,
@@ -97,7 +97,7 @@ function createPaymentRequestChannel(address: string, addressKeyField: ADDRESS_K
   }
 
   return eventChannel((emit: any) => {
-    const emitter = (data: DataSnapshot) => {
+    const emitter = (data: FirebaseDatabaseTypes.DataSnapshot) => {
       if (data.toJSON()) {
         emit(data.toJSON())
       }
@@ -246,9 +246,9 @@ function celoGoldExchangeRateHistoryChannel(latestExchangeRate: ExchangeRate) {
   const now = Date.now()
 
   return eventChannel((emit: any) => {
-    const emitter = (snapshot: DataSnapshot) => {
+    const emitter = (snapshot: FirebaseDatabaseTypes.DataSnapshot) => {
       const result: ExchangeRate[] = []
-      snapshot.forEach((childSnapshot) => {
+      snapshot.forEach((childSnapshot: FirebaseDatabaseTypes.DataSnapshot) => {
         result.push(childSnapshot.val())
         return false
       })
