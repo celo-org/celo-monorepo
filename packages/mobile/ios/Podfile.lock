@@ -433,7 +433,7 @@ PODS:
     - Sentry (~> 4.4.0)
   - RNShare (2.0.0):
     - React
-  - RNSVG (9.11.1):
+  - RNSVG (9.13.6):
     - React
   - Segment-Firebase (2.6.0):
     - Analytics (~> 3.2)
@@ -769,7 +769,7 @@ SPEC CHECKSUMS:
   RNSecureKeyStore: f1ad870e53806453039f650720d2845c678d89c8
   RNSentry: 86baf0c87120cd5eb491d073989f8cbc1a2174c6
   RNShare: 8b171d4b43c1d886917fdd303bf7a4b87167b05c
-  RNSVG: be27aa7c58819f97399388ae53d7fa0572f32c7f
+  RNSVG: 8ba35cbeb385a52fd960fd28db9d7d18b4c2974f
   Segment-Firebase: 0eed2062280020a418957d991c8c12588fea5c14
   Sentry: 14bdd673870e8cf64932b149fad5bbbf39a9b390
   Toast: 91b396c56ee72a5790816f40d3a94dd357abc196
