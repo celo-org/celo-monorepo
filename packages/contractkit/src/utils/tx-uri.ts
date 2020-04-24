@@ -91,9 +91,10 @@ export function buildUri(tx: Tx, functionName?: string, abiTypes?: string[]): st
     if (tx.data.length > 8) {
       const argsEncoded = trimLeading0x(tx.data).slice(8)
       const decoded = abi.decodeParameters(abiTypes, argsEncoded)
-      const args = range(0, decoded.__length__).map((idx) => `${idx}=${decoded[idx].toLowerCase()}`)
 
-      uri += `?${args.join('&')}`
+      delete decoded.__length__
+
+      uri += `?${querystring.stringify({ ...decoded }).toLowerCase()}`
       paramsAppended = true
     }
   }
@@ -102,14 +103,14 @@ export function buildUri(tx: Tx, functionName?: string, abiTypes?: string[]): st
     uri += '?'
   }
 
-  const { data, to, chainId, ...txQueryParams } = tx
+  const { data, to, chainId, nonce, hardfork, common, chain, ...txQueryParams } = tx
 
-  uri += `${querystring.stringify(txQueryParams)}`
+  uri += querystring.stringify({ ...txQueryParams })
 
   return uri
 }
 
-export async function QrFromUri(uri: string, type: 'svg' | 'terminal' | 'utf8') {
+export function QrFromUri(uri: string, type: 'svg' | 'terminal' | 'utf8') {
   if (!uriRegexp.test(uri)) {
     throw new Error(`Invalid uri ${uri}`)
   }
