@@ -44,14 +44,12 @@ function navigateToTransactionReview({
     return
   }
 
-  const inviteNotSent = type !== TokenTransactionType.InviteSent
+  const txIsNotAnInvite = type !== TokenTransactionType.InviteSent
   const recipient = getRecipientFromAddress(
     address,
     invitees,
     recipientCache,
-    // dont like adding these two optional params but it's either this or refactor addressToE164Number
-    // to have a similar structure to invitees which I dont understand the tradeoffs for at the moment
-    inviteNotSent,
+    txIsNotAnInvite,
     addressToE164Number
   )
 

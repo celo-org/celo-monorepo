@@ -410,7 +410,7 @@ exports[`transfer feed item renders correctly for known received 1`] = `
             }
           }
         >
-          John Doe
+          feedItemReceivedTitle
         </Text>
         <Text
           numberOfLines={1}
@@ -577,7 +577,7 @@ exports[`transfer feed item renders correctly for known sent 1`] = `
             }
           }
         >
-          John Doe
+          feedItemSentTitle
         </Text>
         <Text
           numberOfLines={1}

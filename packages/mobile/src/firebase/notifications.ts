@@ -10,7 +10,7 @@ import {
 import { showMessage } from 'src/alert/actions'
 import { TokenTransactionType } from 'src/apollo/types'
 import { CURRENCIES, resolveCurrency } from 'src/geth/consts'
-import { addressToE164NumberSelector } from 'src/identity/reducer'
+import { inviteesSelector } from 'src/invite/reducer'
 import { getRecipientFromPaymentRequest } from 'src/paymentRequest/utils'
 import { getRecipientFromAddress } from 'src/recipients/recipient'
 import { recipientCacheSelector } from 'src/recipients/reducer'
@@ -55,7 +55,7 @@ function* handlePaymentReceived(
 ) {
   if (notificationState !== NotificationReceiveState.APP_ALREADY_OPEN) {
     const recipientCache = yield select(recipientCacheSelector)
-    const addressToE164Number = yield select(addressToE164NumberSelector)
+    const invitees = yield select(inviteesSelector)
     const address = transferNotification.sender.toLowerCase()
     const currency = resolveCurrency(transferNotification.currency)
 
@@ -69,7 +69,7 @@ function* handlePaymentReceived(
         },
         address: transferNotification.sender.toLowerCase(),
         comment: transferNotification.comment,
-        recipient: getRecipientFromAddress(address, addressToE164Number, recipientCache),
+        recipient: getRecipientFromAddress(address, invitees, recipientCache),
         type: TokenTransactionType.Received,
       }
     )

@@ -2,7 +2,7 @@ import { expectSaga } from 'redux-saga-test-plan'
 import { select } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { addressToE164NumberSelector } from 'src/identity/reducer'
+import { inviteesSelector } from 'src/invite/reducer'
 import { replace } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { BarcodeTypes } from 'src/qrcode/utils'
@@ -16,9 +16,9 @@ jest.mock('src/utils/time', () => ({
   clockInSync: () => true,
 }))
 
-jest.mock('src/identity/reducer', () => ({
-  ...jest.requireActual('src/identity/reducer'),
-  addressToE164NumberSelector: () => ({}),
+jest.mock('src/invite/reducer', () => ({
+  ...jest.requireActual('src/invite/reducer'),
+  inviteesSelector: () => ({}),
 }))
 
 describe(watchQrCodeDetections, () => {
@@ -35,7 +35,7 @@ describe(watchQrCodeDetections, () => {
 
     await expectSaga(watchQrCodeDetections)
       .provide([
-        [select(addressToE164NumberSelector), {}],
+        [select(inviteesSelector), {}],
         [select(recipientCacheSelector), {}],
       ])
       .dispatch({ type: Actions.BARCODE_DETECTED, data })
@@ -56,7 +56,7 @@ describe(watchQrCodeDetections, () => {
 
     await expectSaga(watchQrCodeDetections)
       .provide([
-        [select(addressToE164NumberSelector), {}],
+        [select(inviteesSelector), {}],
         [select(recipientCacheSelector), {}],
       ])
       .dispatch({ type: Actions.BARCODE_DETECTED, data })
@@ -80,7 +80,7 @@ describe(watchQrCodeDetections, () => {
 
     await expectSaga(watchQrCodeDetections)
       .provide([
-        [select(addressToE164NumberSelector), {}],
+        [select(inviteesSelector), {}],
         [select(recipientCacheSelector), {}],
       ])
       .dispatch({ type: Actions.BARCODE_DETECTED, data })
@@ -102,7 +102,7 @@ describe(watchQrCodeDetections, () => {
 
     await expectSaga(watchQrCodeDetections)
       .provide([
-        [select(addressToE164NumberSelector), {}],
+        [select(inviteesSelector), {}],
         [select(recipientCacheSelector), {}],
       ])
       .dispatch({ type: Actions.BARCODE_DETECTED, data })
@@ -117,7 +117,7 @@ describe(watchQrCodeDetections, () => {
 
     await expectSaga(watchQrCodeDetections)
       .provide([
-        [select(addressToE164NumberSelector), {}],
+        [select(inviteesSelector), {}],
         [select(recipientCacheSelector), {}],
       ])
       .dispatch({ type: Actions.BARCODE_DETECTED, data })
@@ -133,7 +133,7 @@ describe(watchQrCodeDetections, () => {
 
     await expectSaga(watchQrCodeDetections)
       .provide([
-        [select(addressToE164NumberSelector), {}],
+        [select(inviteesSelector), {}],
         [select(recipientCacheSelector), {}],
       ])
       .dispatch({ type: Actions.BARCODE_DETECTED, data })
