@@ -109,13 +109,10 @@ export function buildUri(tx: Tx, functionName?: string, abiTypes?: string[]): st
   return uri
 }
 
-export async function QrSvgFromUri(uri: string, terminal = false) {
+export async function QrFromUri(uri: string, type: 'svg' | 'terminal' | 'utf8') {
   if (!uriRegexp.test(uri)) {
     throw new Error(`Invalid uri ${uri}`)
   }
 
-  const qr = await qrcode.toString(uri, {
-    type: terminal ? 'terminal' : 'svg',
-  })
-  return qr
+  return qrcode.toString(uri, { type })
 }
