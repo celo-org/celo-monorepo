@@ -1002,13 +1002,20 @@ export async function startGeth(
   const gethProcess = spawnWithLog(gethBinaryPath, instance.args, `${datadir}/logs.txt`, verbose)
   instance.pid = gethProcess.pid
 
-  gethProcess.on('error', (err) => {
-    throw new Error(`Geth crashed! Error: ${err}`)
+  gethProcess.on('error', (err: Error) => {
+    throw new Error(`geth:${instance.name} failed to start! ${err}`)
   })
 
-  const secondsToWait = 30
+  gethProcess.on('exit', (code: number, signal: string) => {
+    if (code === 0) {
+      console.info(`geth:${instance.name} exited`)
+    } else {
+      console.error(`geth:${instance.name} exited with code ${code}`)
+    }
+  })
 
   // Give some time for geth to come up
+  const secondsToWait = 30
   if (rpcport) {
     const isOpen = await waitForPortOpen('localhost', rpcport, secondsToWait)
     if (!isOpen) {

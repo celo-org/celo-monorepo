@@ -116,9 +116,22 @@ export function assertAlmostEqual(
   }
 }
 
-export async function killBootnode() {
-  console.info(`Killing the bootnode`)
-  await shutdownOrKill('bootnode')
+type Signal = 'TERM' | 'KILL' | 'INT' | 'STOP' | 'CONT'
+
+export async function signalProcess(identifier: string | number, signal: Signal) {
+  if (typeof p === 'number') {
+    await spawnCmd('kill', ['-s', signal, identifier], { silent: true })
+  } else {
+    await spawnCmd('pkill', ['-signal', signal, identifier], { silent: true })
+  }
+}
+
+export async function processIsRunning(identifier: string | number): boolean {
+  if (typeof p === 'number') {
+    return (await spawnCmd('kill', ['-0', identifier], { silent: true })) === 0
+  } else {
+    return (await spawnCmd('pgrep', [identifier], { silent: true })) === 0
+  }
 }
 
 export async function killGeth() {
@@ -126,25 +139,25 @@ export async function killGeth() {
   await shutdownOrKill('geth')
 }
 
-export async function shutdownOrKill(processName: string) {
-  await spawnCmd('pkill', ['-SIGINT', processName], { silent: true })
-
-  let processRemaining = true
-  for (let i = 0; i < 15 && processRemaining; i++) {
-    await sleep(2)
-    const pgrepResult = await spawnCmd('pgrep', [processName], { silent: true })
-    processRemaining = pgrepResult === 0
-  }
-
-  if (processRemaining) {
-    console.info('shutdownOrKill: clean shutdown failed')
-    await spawnCmd('pkill', ['-SIGKILL', processName], { silent: true })
+export async function killInstance(instance: GethInstanceConfig) {
+  if (instance.pid) {
+    await shutdownOrKill(instance.pid)
   }
 }
 
-export async function killInstance(instance: GethInstanceConfig) {
-  if (instance.pid) {
-    await spawnCmd('kill', ['-9', instance.pid.toString()])
+export async function shutdownOrKill(identifier: string | number) {
+  await signalProcess(identifier, 'INT')
+
+  // Poll for remaining processes for up to ~30s with exponetial backoff.
+  let processRemaining = true
+  for (let i = 0; i < 10 && processRemaining; i++) {
+    await sleep(0.03 * Math.pow(2, i))
+    processRemaining = await processIsRunning(identifier)
+  }
+
+  if (processRemaining) {
+    console.warn('shutdownOrKill: clean shutdown failed')
+    await signalProcess(identifier, 'KILL')
   }
 }
 
@@ -309,7 +322,6 @@ export function getContext(gethConfig: GethRunConfig, verbose: boolean = verbose
 
   const before = async () => {
     await initialize()
-    await killGeth()
 
     // Snapshot the datadir after the contract migrations so we can start from a "clean slate"
     // for every test.
