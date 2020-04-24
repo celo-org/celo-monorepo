@@ -24,7 +24,7 @@ export default class Show extends BaseCommand {
 
   static flags = {
     ...BaseCommand.flagsWithoutLocalAddresses(),
-    archive: flags.boolean({ description: 'Use archival state', default: true }),
+    archive: flags.boolean({ description: 'Use archival state' }),
     voter: Flags.address({ description: 'Voter to show rewards for' }),
     validator: Flags.address({ description: 'Validator to show rewards for' }),
     group: Flags.address({ description: 'Validator Group to show rewards for' }),
