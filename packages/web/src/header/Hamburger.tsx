@@ -8,6 +8,8 @@ interface Props {
   color: colors
 }
 
+const DISTANCE = 5
+
 export default React.memo(function Hamburger(props: Props) {
   const backgroundColor = props.color
   return (
@@ -15,14 +17,18 @@ export default React.memo(function Hamburger(props: Props) {
       <View
         style={[
           styles.bar,
-          props.isOpen ? styles.slopeUp : { backgroundColor, transform: [{ translateY: -5 }] },
+          props.isOpen
+            ? styles.slopeUp
+            : { backgroundColor, transform: [{ translateY: -DISTANCE }] },
         ]}
       />
       <View style={[styles.bar, props.isOpen ? styles.invisible : { backgroundColor }]} />
       <View
         style={[
           styles.bar,
-          props.isOpen ? styles.slopeDown : { backgroundColor, transform: [{ translateY: 5 }] },
+          props.isOpen
+            ? styles.slopeDown
+            : { backgroundColor, transform: [{ translateY: DISTANCE }] },
         ]}
       />
     </TouchableOpacity>
@@ -33,12 +39,12 @@ const styles = StyleSheet.create({
   root: {
     width: 18,
     height: 12,
-    marginHorizontal: 18,
-    marginVertical: 15,
+    marginHorizontal: 20,
+    marginVertical: 20,
   },
   bar: {
-    transitionProperty: 'transform',
-    transitionDuration: '150ms',
+    transitionProperty: 'transform color',
+    transitionDuration: '120ms',
     position: 'absolute',
     marginVertical: 2,
     height: 2,
