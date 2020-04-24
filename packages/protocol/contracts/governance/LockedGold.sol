@@ -361,7 +361,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     }
     address communityFund = registry.getAddressForOrDie(GOVERNANCE_REGISTRY_ID);
     address payable communityFundPayable = address(uint160(communityFund));
-    require(value <= address(this).balance, "Inconsistent balance");
+    require(maxSlash.sub(reward) <= address(this).balance, "Inconsistent balance");
     communityFundPayable.transfer(maxSlash.sub(reward));
     emit AccountSlashed(account, maxSlash, reporter, reward);
   }
