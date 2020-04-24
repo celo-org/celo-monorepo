@@ -4,7 +4,9 @@ import * as RNFS from 'react-native-fs'
 import Share from 'react-native-share'
 import { put } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
+import { TokenTransactionType } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
+import { AddressToE164NumberType } from 'src/identity/reducer'
 import { InviteDetails } from 'src/invite/actions'
 import { replace } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -48,7 +50,9 @@ export async function shareSVGImage(svg: SVG) {
 export function* handleBarcode(
   barcode: QrCode,
   invitees: InviteDetails[],
-  recipientCache: NumberToRecipient
+  recipientCache: NumberToRecipient,
+  type: TokenTransactionType,
+  addressToE164Number: AddressToE164NumberType
 ) {
   let data: { address: string; e164PhoneNumber: string; displayName: string } | undefined
   try {
@@ -72,7 +76,13 @@ export function* handleBarcode(
     // Default for invalid displayName
     data.displayName = ''
   }
-  const cachedRecipient = getRecipientFromAddress(data.address, invitees, recipientCache)
+  const cachedRecipient = getRecipientFromAddress(
+    data.address,
+    invitees,
+    recipientCache,
+    type,
+    addressToE164Number
+  )
 
   const recipient: Recipient = cachedRecipient
     ? {

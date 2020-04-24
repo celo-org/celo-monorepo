@@ -253,7 +253,7 @@ exports[`transfer feed item renders correctly for faucet 1`] = `
             ]
           }
         >
-
+          
           $
           133.00
         </Text>
@@ -434,7 +434,7 @@ exports[`transfer feed item renders correctly for known received 1`] = `
             ]
           }
         >
-
+          
           $
           133.00
         </Text>
@@ -919,7 +919,7 @@ exports[`transfer feed item renders correctly for received 1`] = `
             ]
           }
         >
-
+          
           $
           133.00
         </Text>
@@ -1056,7 +1056,7 @@ exports[`transfer feed item renders correctly for received invite 1`] = `
             ]
           }
         >
-
+          
           $
           1.33
         </Text>
@@ -1237,7 +1237,7 @@ exports[`transfer feed item renders correctly for received with encrypted commen
             ]
           }
         >
-
+          
           $
           133.00
         </Text>
@@ -2238,7 +2238,7 @@ exports[`transfer feed item renders correctly for verification reward 1`] = `
             ]
           }
         >
-
+          
           $
           1.33
         </Text>

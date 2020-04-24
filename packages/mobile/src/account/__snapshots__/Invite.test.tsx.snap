@@ -420,6 +420,22 @@ exports[`Invite renders correctly with recipients 1`] = `
                 "kind": "Contact",
                 "phoneNumberLabel": "phoneNumLabel",
               },
+              Object {
+                "contactId": "contactId",
+                "displayId": "13105550000",
+                "displayName": "Marcus Zuckerberg",
+                "e164PhoneNumber": "+13105550000",
+                "kind": "Contact",
+                "phoneNumberLabel": "phoneNumLabel",
+              },
+              Object {
+                "contactId": "contactId",
+                "displayId": "21255550000",
+                "displayName": "William Gates",
+                "e164PhoneNumber": "+21255550000",
+                "kind": "Contact",
+                "phoneNumberLabel": "phoneNumLabel",
+              },
             ],
             "key": "contacts",
           },
@@ -452,6 +468,22 @@ exports[`Invite renders correctly with recipients 1`] = `
                 "displayId": "14155550000",
                 "displayName": "John Doe",
                 "e164PhoneNumber": "+14155550000",
+                "kind": "Contact",
+                "phoneNumberLabel": "phoneNumLabel",
+              },
+              Object {
+                "contactId": "contactId",
+                "displayId": "13105550000",
+                "displayName": "Marcus Zuckerberg",
+                "e164PhoneNumber": "+13105550000",
+                "kind": "Contact",
+                "phoneNumberLabel": "phoneNumLabel",
+              },
+              Object {
+                "contactId": "contactId",
+                "displayId": "21255550000",
+                "displayName": "William Gates",
+                "e164PhoneNumber": "+21255550000",
                 "kind": "Contact",
                 "phoneNumberLabel": "phoneNumLabel",
               },
@@ -497,6 +529,286 @@ exports[`Invite renders correctly with recipients 1`] = `
             >
               contacts
             </Text>
+          </View>
+        </View>
+        <View
+          onLayout={[Function]}
+          style={null}
+        >
+          <View>
+            <View
+              accessible={true}
+              focusable={true}
+              isTVSelectable={true}
+              onClick={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={null}
+            >
+              <View
+                style={
+                  Object {
+                    "alignItems": "center",
+                    "flex": 1,
+                    "flexDirection": "row",
+                    "height": 50,
+                    "justifyContent": "space-between",
+                    "paddingHorizontal": 10,
+                  }
+                }
+              >
+                <View
+                  style={
+                    Array [
+                      Object {
+                        "alignItems": "center",
+                        "flexDirection": "row",
+                        "justifyContent": "center",
+                      },
+                      Object {
+                        "marginRight": 10,
+                      },
+                    ]
+                  }
+                >
+                  <View
+                    style={
+                      Array [
+                        Object {
+                          "alignItems": "center",
+                          "justifyContent": "center",
+                        },
+                        Object {
+                          "backgroundColor": "#7AD6FE",
+                          "borderRadius": 20,
+                          "height": 40,
+                          "width": 40,
+                        },
+                      ]
+                    }
+                  >
+                    <Image
+                      source={
+                        Object {
+                          "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
+                        }
+                      }
+                      style={
+                        Object {
+                          "alignItems": "center",
+                          "height": 40,
+                          "justifyContent": "center",
+                          "width": 40,
+                        }
+                      }
+                    />
+                  </View>
+                </View>
+                <View
+                  style={
+                    Object {
+                      "flex": 1,
+                      "flexDirection": "row",
+                      "paddingRight": 5,
+                    }
+                  }
+                >
+                  <Text
+                    ellipsizeMode="tail"
+                    numberOfLines={1}
+                    style={
+                      Array [
+                        Object {
+                          "color": "#2E3338",
+                          "fontFamily": "Hind-SemiBold",
+                          "fontSize": 14,
+                          "lineHeight": 18,
+                        },
+                        Object {
+                          "lineHeight": 41,
+                        },
+                      ]
+                    }
+                  >
+                    John Doe
+                  </Text>
+                </View>
+                <Text
+                  style={
+                    Array [
+                      Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Hind-SemiBold",
+                        "fontSize": 14,
+                        "lineHeight": 18,
+                      },
+                      Object {
+                        "fontFamily": "Hind-Light",
+                      },
+                      Object {
+                        "lineHeight": 41,
+                        "textAlign": "right",
+                      },
+                    ]
+                  }
+                >
+                  14155550000
+                </Text>
+              </View>
+            </View>
+            <View
+              style={
+                Object {
+                  "backgroundColor": "#EEEEEE",
+                  "height": 1,
+                  "marginLeft": 60,
+                }
+              }
+            />
+          </View>
+        </View>
+        <View
+          onLayout={[Function]}
+          style={null}
+        >
+          <View>
+            <View
+              accessible={true}
+              focusable={true}
+              isTVSelectable={true}
+              onClick={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={null}
+            >
+              <View
+                style={
+                  Object {
+                    "alignItems": "center",
+                    "flex": 1,
+                    "flexDirection": "row",
+                    "height": 50,
+                    "justifyContent": "space-between",
+                    "paddingHorizontal": 10,
+                  }
+                }
+              >
+                <View
+                  style={
+                    Array [
+                      Object {
+                        "alignItems": "center",
+                        "flexDirection": "row",
+                        "justifyContent": "center",
+                      },
+                      Object {
+                        "marginRight": 10,
+                      },
+                    ]
+                  }
+                >
+                  <View
+                    style={
+                      Array [
+                        Object {
+                          "alignItems": "center",
+                          "justifyContent": "center",
+                        },
+                        Object {
+                          "backgroundColor": "#7AD6FE",
+                          "borderRadius": 20,
+                          "height": 40,
+                          "width": 40,
+                        },
+                      ]
+                    }
+                  >
+                    <Image
+                      source={
+                        Object {
+                          "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
+                        }
+                      }
+                      style={
+                        Object {
+                          "alignItems": "center",
+                          "height": 40,
+                          "justifyContent": "center",
+                          "width": 40,
+                        }
+                      }
+                    />
+                  </View>
+                </View>
+                <View
+                  style={
+                    Object {
+                      "flex": 1,
+                      "flexDirection": "row",
+                      "paddingRight": 5,
+                    }
+                  }
+                >
+                  <Text
+                    ellipsizeMode="tail"
+                    numberOfLines={1}
+                    style={
+                      Array [
+                        Object {
+                          "color": "#2E3338",
+                          "fontFamily": "Hind-SemiBold",
+                          "fontSize": 14,
+                          "lineHeight": 18,
+                        },
+                        Object {
+                          "lineHeight": 41,
+                        },
+                      ]
+                    }
+                  >
+                    Marcus Zuckerberg
+                  </Text>
+                </View>
+                <Text
+                  style={
+                    Array [
+                      Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Hind-SemiBold",
+                        "fontSize": 14,
+                        "lineHeight": 18,
+                      },
+                      Object {
+                        "fontFamily": "Hind-Light",
+                      },
+                      Object {
+                        "lineHeight": 41,
+                        "textAlign": "right",
+                      },
+                    ]
+                  }
+                >
+                  13105550000
+                </Text>
+              </View>
+            </View>
+            <View
+              style={
+                Object {
+                  "backgroundColor": "#EEEEEE",
+                  "height": 1,
+                  "marginLeft": 60,
+                }
+              }
+            />
           </View>
         </View>
         <View
@@ -601,7 +913,7 @@ exports[`Invite renders correctly with recipients 1`] = `
                     ]
                   }
                 >
-                  John Doe
+                  William Gates
                 </Text>
               </View>
               <Text
@@ -623,7 +935,7 @@ exports[`Invite renders correctly with recipients 1`] = `
                   ]
                 }
               >
-                14155550000
+                21255550000
               </Text>
             </View>
           </View>

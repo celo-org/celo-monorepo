@@ -1,6 +1,7 @@
 import { parsePhoneNumber } from '@celo/utils/src/phoneNumbers'
 import * as fuzzysort from 'fuzzysort'
 import { MinimalContact } from 'react-native-contacts'
+import { TokenTransactionType } from 'src/apollo/types'
 import {
   getAddressFromPhoneNumber,
   getVerificationStatusFromPhoneNumber,
@@ -169,11 +170,11 @@ export function getRecipientFromAddress(
   recipientCache: NumberToRecipient,
   // dont like adding these two optional params but it's either this or refactor addressToE164Number
   // to have a similar structure to invitees which I dont understand the tradeoffs for at the moment
-  txIsNotAnInvite?: boolean,
-  addressToE164Number?: AddressToE164NumberType
+  type: TokenTransactionType,
+  addressToE164Number: AddressToE164NumberType
 ) {
   let e164PhoneNumber
-  if (txIsNotAnInvite && addressToE164Number) {
+  if (type !== TokenTransactionType.InviteSent && addressToE164Number) {
     e164PhoneNumber = addressToE164Number[address]
   } else {
     const inviteDetails = invitees.find(

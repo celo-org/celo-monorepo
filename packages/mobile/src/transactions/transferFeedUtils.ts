@@ -4,6 +4,7 @@ import * as _ from 'lodash'
 import { TokenTransactionType } from 'src/apollo/types'
 import { DEFAULT_TESTNET } from 'src/config'
 import { features } from 'src/flags'
+import { AddressToE164NumberType } from 'src/identity/reducer'
 import { InviteDetails } from 'src/invite/actions'
 import { getRecipientFromAddress, NumberToRecipient } from 'src/recipients/recipient'
 
@@ -27,6 +28,7 @@ export function getTransferFeedParams(
   invitees: InviteDetails[],
   recipientCache: NumberToRecipient,
   address: string,
+  addressToE164Number: AddressToE164NumberType,
   comment: string | null,
   commentKey: Buffer | null
 ) {
@@ -77,7 +79,13 @@ export function getTransferFeedParams(
       break
     }
     default: {
-      recipient = getRecipientFromAddress(address, invitees, recipientCache)
+      recipient = getRecipientFromAddress(
+        address,
+        invitees,
+        recipientCache,
+        type,
+        addressToE164Number
+      )
       const shortAddr = address.substring(0, 8)
 
       if (recipient) {

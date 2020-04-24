@@ -28,7 +28,7 @@ import { transactionConfirmed } from 'src/transactions/actions'
 import { getContractKit } from 'src/web3/contracts'
 import { getConnectedUnlockedAccount, getOrCreateAccount, waitWeb3LastBlock } from 'src/web3/saga'
 import { createMockStore, mockContractKitBalance } from 'test/utils'
-import { mockAccount, mockE164Number } from 'test/values'
+import { mockAccount, mockInviteDetails } from 'test/values'
 
 const mockKey = '0x1129eb2fbccdc663f4923a6495c35b096249812b589f7c4cd1dba01e1edaf724'
 const mockKeyEncoded = 'ESnrL7zNxmP0kjpklcNbCWJJgStYn3xM0dugHh7a9yQ='
@@ -69,9 +69,9 @@ describe(watchSendInvite, () => {
         [call(getConnectedUnlockedAccount), mockAccount],
       ])
       .withState(state)
-      .dispatch(sendInvite(mockE164Number, InviteBy.SMS))
+      .dispatch(sendInvite(mockInviteDetails.e164Number, InviteBy.SMS))
       .dispatch(transactionConfirmed('a sha3 hash'))
-      .put(storeInviteeData(mockAccount.toLowerCase(), mockKeyEncoded, mockE164Number))
+      .put(storeInviteeData(mockInviteDetails))
       .run()
 
     expect(SendIntentAndroid.sendSms).toHaveBeenCalled()
@@ -84,9 +84,9 @@ describe(watchSendInvite, () => {
         [call(getConnectedUnlockedAccount), mockAccount],
       ])
       .withState(state)
-      .dispatch(sendInvite(mockE164Number, InviteBy.WhatsApp))
+      .dispatch(sendInvite(mockInviteDetails.e164Number, InviteBy.WhatsApp))
       .dispatch(transactionConfirmed('a sha3 hash'))
-      .put(storeInviteeData(mockAccount.toLowerCase(), mockKeyEncoded, mockE164Number))
+      .put(storeInviteeData(mockInviteDetails))
       .run()
 
     expect(Linking.openURL).toHaveBeenCalled()

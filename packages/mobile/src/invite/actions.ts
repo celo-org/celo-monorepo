@@ -17,7 +17,7 @@ export enum Actions {
 }
 
 export interface InviteDetails {
-  timestamp: string
+  timestamp: BigNumber
   e164Number: string
   tempWalletAddress: string
   tempWalletPrivateKey: string

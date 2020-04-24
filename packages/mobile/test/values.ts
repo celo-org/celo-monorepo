@@ -16,17 +16,6 @@ export const mockName = 'John Doe'
 export const mockAccount = '0x0000000000000000000000000000000000007E57'
 export const mockAccount2 = '0x1Ff482D42D8727258A1686102Fa4ba925C46Bc42'
 
-export const mockAccount3 = '0x9335BaFcE54cAa0D6690d1D4DA6406568b52488F'
-export const mockAccount3PrivateKey =
-  '0xe59c12feb5ea13dabcc068a28d1d521a26e39464faa7bbcc01f43b8340e92fa6'
-export const mockAccount4 = '0x8e1Df47B7064D005Ef071a89D0D7dc8634BC8A9C'
-export const mockAccount4PrivateKey =
-  '0xb33eac631fd3a415f3738649db8cad57da78b99ec92cd8f77b76b5dae2ebdf27'
-export const mockInviteCode = '5ZwS/rXqE9q8wGiijR1SGibjlGT6p7vMAfQ7g0DpL6Y='
-export const mockInviteCode2 = 'sz6sYx/TpBXzc4ZJ24ytV9p4uZ7JLNj3e3a12uLr3yc='
-export const mockTxId = '0xc722727f84b17146f524eccf6a7369039cf9de31f03baa8782c864bad4a9fe8e'
-export const mockTxId2 = '0xb027f61431cd296cd09f3e13e985259d5a18264b5457cde7752b8422a4683945'
-
 export const mockMnemonic =
   'prosper winner find donate tape history measure umbrella agent patrol want rhythm old unable wash wrong need fluid hammer coach reveal plastic trust lake'
 
@@ -54,16 +43,70 @@ export const mockDisplayNumber2 = '(209) 555-9790'
 export const mockComment = 'Rent request for June, it is already late!!!'
 export const mockCountryCode = '+1'
 
-export const mockTimestamp = new BigNumber(1585526400)
-export const mockTimestamp2 = new BigNumber(1587622489078)
-
 export const mockQrCodeData = `{"address":"${mockAccount}","e164PhoneNumber":"${mockE164Number}","displayName":"${mockName}"}`
 
-export const mockInvitableRecipient: RecipientWithContact = {
+const mockNameInvite = 'Marcus Zuckerberg'
+const mockName2Invite = 'William Gates'
+const mockE164NumberInvite = '+13105550000'
+const mockDisplayNumberInvite = '13105550000'
+const mockE164Number2Invite = '+21255550000'
+const mockDisplayNumber2Invite = '21255550000'
+const mockAccountInvite = '0x9335BaFcE54cAa0D6690d1D4DA6406568b52488F'
+const mockAccountInvitePrivKey =
+  '0xe59c12feb5ea13dabcc068a28d1d521a26e39464faa7bbcc01f43b8340e92fa6'
+const mockAccount2Invite = '0x8e1Df47B7064D005Ef071a89D0D7dc8634BC8A9C'
+const mockAccountInvite2PrivKey =
+  '0xb33eac631fd3a415f3738649db8cad57da78b99ec92cd8f77b76b5dae2ebdf27'
+
+export const mockInviteDetails = {
+  timestamp: new BigNumber(1585526400),
+  e164Number: mockE164NumberInvite,
+  tempWalletAddress: mockAccountInvite,
+  tempWalletPrivateKey: mockAccountInvitePrivKey,
+  tempWalletRedeemed: false,
+  inviteCode: '5ZwS/rXqE9q8wGiijR1SGibjlGT6p7vMAfQ7g0DpL6Y=',
+  escrowAmount: new BigNumber(1.75),
+  escrowCurrency: CURRENCY_ENUM.DOLLAR, // Only dollars can be escrowed
+  escrowTxId: '0xc722727f84b17146f524eccf6a7369039cf9de31f03baa8782c864bad4a9fe8e',
+  escrowRedeemed: false,
+}
+
+export const mockInviteDetails2 = {
+  timestamp: new BigNumber(1587622489078),
+  e164Number: mockE164Number2Invite,
+  tempWalletAddress: mockAccount2Invite,
+  tempWalletPrivateKey: mockAccountInvite2PrivKey,
+  tempWalletRedeemed: false,
+  inviteCode: 'sz6sYx/TpBXzc4ZJ24ytV9p4uZ7JLNj3e3a12uLr3yc=',
+  escrowAmount: new BigNumber(100.12),
+  escrowCurrency: CURRENCY_ENUM.DOLLAR, // Only dollars can be escrowed
+  escrowTxId: '0xb027f61431cd296cd09f3e13e985259d5a18264b5457cde7752b8422a4683945',
+  escrowRedeemed: false,
+}
+
+const mockInvitableRecipient: RecipientWithContact = {
   kind: RecipientKind.Contact,
   displayName: mockName,
   displayId: '14155550000',
   e164PhoneNumber: mockE164Number,
+  contactId: 'contactId',
+  phoneNumberLabel: 'phoneNumLabel',
+}
+
+const mockInvitableRecipient2: RecipientWithContact = {
+  kind: RecipientKind.Contact,
+  displayName: mockNameInvite,
+  displayId: mockDisplayNumberInvite,
+  e164PhoneNumber: mockE164NumberInvite,
+  contactId: 'contactId',
+  phoneNumberLabel: 'phoneNumLabel',
+}
+
+const mockInvitableRecipient3: RecipientWithContact = {
+  kind: RecipientKind.Contact,
+  displayName: mockName2Invite,
+  displayId: mockDisplayNumber2Invite,
+  e164PhoneNumber: mockE164Number2Invite,
   contactId: 'contactId',
   phoneNumberLabel: 'phoneNumLabel',
 }
@@ -73,12 +116,26 @@ export const mockRecipient: RecipientWithContact = {
   address: mockAccount,
 }
 
+export const mockRecipient2: RecipientWithContact = {
+  ...mockInvitableRecipient2,
+  address: mockAccountInvite,
+}
+
+export const mockRecipient3: RecipientWithContact = {
+  ...mockInvitableRecipient3,
+  address: mockAccount2Invite,
+}
+
 export const mockE164NumberToInvitableRecipient = {
   [mockE164Number]: mockInvitableRecipient,
+  [mockE164NumberInvite]: mockInvitableRecipient2,
+  [mockE164Number2Invite]: mockInvitableRecipient3,
 }
 
 export const mockRecipientCache = {
   [mockE164Number]: mockRecipient,
+  [mockE164NumberInvite]: mockInvitableRecipient2,
+  [mockE164Number2Invite]: mockInvitableRecipient3,
 }
 
 export const mockRecipientWithPhoneNumber: RecipientWithMobileNumber = {
@@ -117,10 +174,17 @@ export const mockNavigation = {
   emit: jest.fn(),
   isFirstRouteInParent: jest.fn(),
 }
+
 export const mockAddressToE164Number: AddressToE164NumberType = {
   [mockAccount]: mockE164Number,
+  [mockAccountInvite]: mockE164NumberInvite,
+  [mockAccount2Invite]: mockE164Number2Invite,
 }
-export const mockE164NumberToAddress: E164NumberToAddressType = { [mockE164Number]: mockAccount }
+export const mockE164NumberToAddress: E164NumberToAddressType = {
+  [mockE164Number]: mockAccount,
+  [mockE164NumberInvite]: mockAccountInvite,
+  [mockE164Number2Invite]: mockAccount2Invite,
+}
 
 export const mockAttestationMessage: AttestationCode = {
   code:
@@ -190,29 +254,3 @@ export const mockPaymentRequests: PaymentRequest[] = [
     type: NotificationTypes.PAYMENT_REQUESTED,
   },
 ]
-
-export const mockInviteDetails = {
-  timestamp: mockTimestamp,
-  e164Number: mockE164Number,
-  tempWalletAddress: mockAccount3,
-  tempWalletPrivateKey: mockAccount3PrivateKey,
-  tempWalletRedeemed: false,
-  inviteCode: mockInviteCode,
-  escrowAmount: new BigNumber(1.75),
-  escrowCurrency: CURRENCY_ENUM.DOLLAR, // Only dollars can be escrowed
-  escrowTxId: mockTxId,
-  escrowRedeemed: false,
-}
-
-export const mockInviteDetails2 = {
-  timestamp: mockTimestamp2,
-  e164Number: mockE164Number2,
-  tempWalletAddress: mockAccount4,
-  tempWalletPrivateKey: mockAccount4PrivateKey,
-  tempWalletRedeemed: false,
-  inviteCode: mockInviteCode2,
-  escrowAmount: new BigNumber(100.12),
-  escrowCurrency: CURRENCY_ENUM.DOLLAR, // Only dollars can be escrowed
-  escrowTxId: mockTxId2,
-  escrowRedeemed: false,
-}

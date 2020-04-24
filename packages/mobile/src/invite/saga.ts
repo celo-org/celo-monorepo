@@ -110,6 +110,7 @@ export async function sendSms(toPhone: string, msg: string) {
   return new Promise((resolve, reject) => {
     try {
       if (Platform.OS === 'android') {
+        // react-native-sms supports Android + iOS so we may not need this Android specific package
         SendIntentAndroid.sendSms(toPhone, msg)
         resolve()
       } else {

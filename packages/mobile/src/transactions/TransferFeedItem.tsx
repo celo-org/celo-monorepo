@@ -44,12 +44,11 @@ function navigateToTransactionReview({
     return
   }
 
-  const txIsNotAnInvite = type !== TokenTransactionType.InviteSent
   const recipient = getRecipientFromAddress(
     address,
     invitees,
     recipientCache,
-    txIsNotAnInvite,
+    type,
     addressToE164Number
   )
 
@@ -75,6 +74,7 @@ export function TransferFeedItem(props: Props) {
   const {
     amount,
     address,
+    addressToE164Number,
     timestamp,
     type,
     comment,
@@ -95,6 +95,7 @@ export function TransferFeedItem(props: Props) {
     invitees,
     recipientCache,
     address,
+    addressToE164Number,
     comment,
     commentKey
   )
