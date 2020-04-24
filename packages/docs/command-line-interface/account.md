@@ -33,7 +33,7 @@ OPTIONS
                                                        index addresses for local signing. Example
                                                        --ledgerCustomAddresses "[4,99]"
 
-  --signature=signature                                (required) Signature (a.k.a proof-of-possession) of the signer
+  --signature=0x                                       (required) Signature (a.k.a proof-of-possession) of the signer
                                                        key
 
   --signer=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Account Address
@@ -605,8 +605,8 @@ OPTIONS
                                                         index addresses for local signing. Example
                                                         --ledgerCustomAddresses "[4,99]"
 
-  --signature=0x                                        (required) A hex-encoded 0x-prefixed 65-byte signature from
-                                                        "account:proof-of-possession" command
+  --signature=0x                                        (required) Signature (a.k.a. proof-of-possession) of the signer
+                                                        key
 
   --signer=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d   (required) Address of the signer key to verify proof of
                                                         possession.

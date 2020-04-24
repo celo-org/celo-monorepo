@@ -18,8 +18,7 @@ export default class VerifyProofOfPossession extends BaseCommand {
     }),
     signature: Flags.proofOfPossession({
       required: true,
-      description:
-        'A hex-encoded 0x-prefixed 65-byte signature from "account:proof-of-possession" command',
+      description: 'Signature (a.k.a. proof-of-possession) of the signer key',
     }),
   }
 
