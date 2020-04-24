@@ -2,7 +2,7 @@ import { eqAddress } from '@celo/utils/lib/address'
 import { flags } from '@oclif/command'
 import BigNumber from 'bignumber.js'
 import { newCheckBuilder } from '../../utils/checks'
-import { displaySendTx, binaryPrompt } from '../../utils/cli'
+import { binaryPrompt, displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
 import { ReleaseGoldCommand } from './release-gold'
 
@@ -58,6 +58,7 @@ export default class LockedGold extends ReleaseGoldCommand {
         const accounts = await this.kit.contracts.getAccounts()
         const totalValue = await this.releaseGoldWrapper.getRemainingUnlockedBalance()
         const remaining = totalValue.minus(lockValue)
+        console.log('remaining', remaining.toFixed())
         if (
           !flags.yes &&
           remaining.lt(new BigNumber(2e18)) &&
