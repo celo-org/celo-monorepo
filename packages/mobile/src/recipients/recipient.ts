@@ -169,11 +169,11 @@ export function getRecipientFromAddress(
   recipientCache: NumberToRecipient,
   // dont like adding these two optional params but it's either this or refactor addressToE164Number
   // to have a similar structure to invitees which I dont understand the tradeoffs for at the moment
-  inviteNotSent?: boolean,
+  txIsNotAnInvite?: boolean,
   addressToE164Number?: AddressToE164NumberType
 ) {
   let e164PhoneNumber
-  if (inviteNotSent && addressToE164Number) {
+  if (txIsNotAnInvite && addressToE164Number) {
     e164PhoneNumber = addressToE164Number[address]
   } else {
     const inviteDetails = invitees.find(
