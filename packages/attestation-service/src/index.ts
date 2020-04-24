@@ -1,6 +1,6 @@
 import { AttestationServiceTestRequestType } from '@celo/utils/lib/io'
 import express from 'express'
-import RateLimiter from 'express-rate-limit'
+import rateLimit from 'express-rate-limit'
 import requestIdMiddleware from 'express-request-id'
 import * as PromClient from 'prom-client'
 import { initializeDB, initializeKit } from './db'
@@ -25,11 +25,9 @@ async function init() {
   const port = process.env.PORT || 3000
   app.listen(port, () => rootLogger.info({ port }, 'Attestation Service started'))
 
-  const rateLimiter = new RateLimiter({
+  const rateLimiter = rateLimit({
     windowMs: 5 * 60 * 100, // 5 minutes
     max: 50,
-    // @ts-ignore
-    message: { status: false, error: 'Too many requests, please try again later' },
   })
   app.get('/metrics', (_req, res) => {
     res.send(PromClient.register.metrics())

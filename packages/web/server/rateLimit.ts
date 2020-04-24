@@ -1,9 +1,9 @@
-import Limit from 'express-rate-limit'
+import rateLimit from 'express-rate-limit'
 import Sentry from './sentry'
 const MS = 1000
 const SECONDS = 60
 const MINUTES = 20
-export default new Limit({
+export default rateLimit({
   windowMs: MINUTES * SECONDS * MS,
   max: 30, // max request within the time window per ip,
   message: 'breathe',
