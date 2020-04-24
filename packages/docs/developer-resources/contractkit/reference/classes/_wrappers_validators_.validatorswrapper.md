@@ -843,7 +843,7 @@ ___
 
 ###  getValidatorRewards
 
-▸ **getValidatorRewards**(`epochNumber`: number): *Promise‹[ValidatorReward](../interfaces/_wrappers_validators_.validatorreward.md)[]›*
+▸ **getValidatorRewards**(`epochNumber`: number, `archive?`: undefined | false | true): *Promise‹[ValidatorReward](../interfaces/_wrappers_validators_.validatorreward.md)[]›*
 
 *Defined in [contractkit/src/wrappers/Validators.ts:537](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L537)*
 
@@ -854,6 +854,7 @@ Retrieves ValidatorRewards for epochNumber.
 Name | Type | Description |
 ------ | ------ | ------ |
 `epochNumber` | number | The epoch to retrieve ValidatorRewards at.  |
+`archive?` | undefined &#124; false &#124; true | - |
 
 **Returns:** *Promise‹[ValidatorReward](../interfaces/_wrappers_validators_.validatorreward.md)[]›*
 
@@ -942,7 +943,7 @@ ___
 
 ###  signerToAccount
 
-▸ **signerToAccount**(`signerAddress`: [Address](../modules/_base_.md#address), `blockNumber?`: undefined | number): *Promise‹string›*
+▸ **signerToAccount**(`signerAddress`: [Address](../modules/_base_.md#address)): *Promise‹string›*
 
 *Defined in [contractkit/src/wrappers/Validators.ts:181](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L181)*
 
@@ -955,7 +956,6 @@ Returns the account associated with `signer`.
 Name | Type |
 ------ | ------ |
 `signerAddress` | [Address](../modules/_base_.md#address) |
-`blockNumber?` | undefined &#124; number |
 
 **Returns:** *Promise‹string›*
 
