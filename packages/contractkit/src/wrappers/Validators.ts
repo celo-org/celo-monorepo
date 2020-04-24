@@ -178,9 +178,9 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
    * @dev Fails if the `signer` is not an account or previously authorized signer.
    * @return The associated account.
    */
-  async signerToAccount(signerAddress: Address, blockNumber?: number) {
+  async signerToAccount(signerAddress: Address) {
     const accounts = await this.kit.contracts.getAccounts()
-    return accounts.signerToAccount(signerAddress, blockNumber)
+    return accounts.signerToAccount(signerAddress)
   }
 
   /**
@@ -258,7 +258,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   }
 
   async getValidatorFromSigner(address: Address, blockNumber?: number): Promise<Validator> {
-    const account = await this.signerToAccount(address, blockNumber)
+    const account = await this.signerToAccount(address)
     if (eqAddress(account, NULL_ADDRESS) || !(await this.isValidator(account))) {
       return {
         name: 'Unregistered validator',
@@ -534,17 +534,17 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
    * Retrieves ValidatorRewards for epochNumber.
    * @param epochNumber The epoch to retrieve ValidatorRewards at.
    */
-  async getValidatorRewards(epochNumber: number): Promise<ValidatorReward[]> {
+  async getValidatorRewards(epochNumber: number, archive?: boolean): Promise<ValidatorReward[]> {
     const blockNumber = await this.kit.getLastBlockNumberForEpoch(epochNumber)
     const events = await this.getPastEvents('ValidatorEpochPaymentDistributed', {
       fromBlock: blockNumber,
       toBlock: blockNumber,
     })
     const validator: Validator[] = await concurrentMap(10, events, (e: EventLog) =>
-      this.getValidator(e.returnValues.validator, blockNumber)
+      this.getValidator(e.returnValues.validator, archive ? blockNumber : undefined)
     )
     const validatorGroup: ValidatorGroup[] = await concurrentMap(10, events, (e: EventLog) =>
-      this.getValidatorGroup(e.returnValues.group, false, blockNumber)
+      this.getValidatorGroup(e.returnValues.group, false, archive ? blockNumber : undefined)
     )
     return events.map(
       (e: EventLog, index: number): ValidatorReward => ({
