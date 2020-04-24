@@ -54,9 +54,7 @@ export class BlockscoutAPI extends RESTDataSource {
     const fee1Value = new BigNumber(feeTransfer1.value)
     const fee2Value = new BigNumber(feeTransfer2.value)
     const fee3Value = new BigNumber(feeTransfer3.value)
-    const gasValue = new BigNumber(transferTx.gasUsed).multipliedBy(
-      new BigNumber(transferTx.gasPrice)
-    )
+    const gasValue = new BigNumber(transferTx.gasUsed).multipliedBy(transferTx.gasPrice)
     const gatewayFeeValue = new BigNumber(transferTx.gatewayFee)
     const expectedTotalFeeValue = gasValue.plus(gatewayFeeValue)
 
@@ -198,7 +196,7 @@ export class BlockscoutAPI extends RESTDataSource {
       }
       rewards.push({
         type: EventTypes.VERIFICATION_REWARD,
-        timestamp: new Date(transferTx.timestamp).getTime(),
+        timestamp: this.getTransactionTimestamp(transferTx),
         block: new BigNumber(transferTx.blockNumber).toNumber(),
         value: new BigNumber(rewardTransfer.value).dividedBy(WEI_PER_GOLD).toNumber(),
         address: VERIFICATION_REWARDS_ADDRESS,
@@ -213,10 +211,107 @@ export class BlockscoutAPI extends RESTDataSource {
     return rewards.sort((a, b) => b.timestamp - a.timestamp)
   }
 
+  getTransactionBlock(transferTx: BlockscoutTransferTx) {
+    return new BigNumber(transferTx.blockNumber).toFixed()
+  }
+
+  getTransactionTimestamp(transferTx: BlockscoutTransferTx) {
+    return new Date(transferTx.timestamp).getTime()
+  }
+
+  getRegularTokenTransaction(
+    userAddress: string,
+    transferTx: BlockscoutTransferTx,
+    transfer: BlockscoutCeloTransfer
+  ) {
+    const hash = transferTx.transactionHash
+    const block = this.getTransactionBlock(transferTx)
+    const timestamp = this.getTransactionTimestamp(transferTx)
+    const comment = transferTx.input ? formatCommentString(transferTx.input) : ''
+    const eventToAddress = transfer.toAddressHash.toLowerCase()
+    const eventFromAddress = transfer.fromAddressHash.toLowerCase()
+    const [type, address] = resolveTransferEventType(
+      userAddress,
+      eventToAddress,
+      eventFromAddress,
+      this.getAttestationAddress(),
+      this.getEscrowAddress()
+    )
+
+    return {
+      type,
+      timestamp,
+      block,
+      amount: {
+        // Signed amount relative to the account currency
+        value: new BigNumber(transfer.value)
+          .multipliedBy(eventFromAddress === userAddress ? -1 : 1)
+          .dividedBy(WEI_PER_GOLD)
+          .toString(),
+        currencyCode: transfer.token,
+        timestamp,
+      },
+      address,
+      comment,
+      hash,
+    }
+  }
+
+  getExchangeTransaction(
+    userAddress: string,
+    token: string,
+    transferTx: BlockscoutTransferTx,
+    transfers: BlockscoutCeloTransfer[]
+  ) {
+    const hash = transferTx.transactionHash
+    const block = this.getTransactionBlock(transferTx)
+    const timestamp = this.getTransactionTimestamp(transferTx)
+    let inTransfer: BlockscoutCeloTransfer, outTransfer: BlockscoutCeloTransfer
+    if (transfers[0].fromAddressHash.toLowerCase() === userAddress) {
+      inTransfer = transfers[0]
+      outTransfer = transfers[1]
+    } else {
+      inTransfer = transfers[1]
+      outTransfer = transfers[0]
+    }
+    // Find the transfer related to the queried token
+    const tokenTransfer = [inTransfer, outTransfer].find((event) => event.token === token)
+    if (!tokenTransfer) {
+      return undefined
+    }
+
+    return {
+      type: EventTypes.EXCHANGE,
+      timestamp,
+      block,
+      amount: {
+        // Signed amount relative to the account currency
+        value: new BigNumber(tokenTransfer.value)
+          .multipliedBy(tokenTransfer === inTransfer ? -1 : 1)
+          .dividedBy(WEI_PER_GOLD)
+          .toString(),
+        currencyCode: tokenTransfer.token,
+        timestamp,
+      },
+      makerAmount: {
+        value: new BigNumber(inTransfer.value).dividedBy(WEI_PER_GOLD).toString(),
+        currencyCode: inTransfer.token,
+        timestamp,
+      },
+      takerAmount: {
+        value: new BigNumber(outTransfer.value).dividedBy(WEI_PER_GOLD).toString(),
+        currencyCode: outTransfer.token,
+        timestamp,
+      },
+      hash,
+    }
+  }
+
   async getTokenTransactions(args: TokenTransactionArgs) {
     const rawTransferTxs = await this.getRawTokenTransactions(args)
     const events: any[] = []
     const userAddress = args.address.toLowerCase()
+    const token = args.token
 
     await this.ensureTokenAddresses()
 
@@ -224,104 +319,38 @@ export class BlockscoutAPI extends RESTDataSource {
     rawTransferTxs.forEach((transferTx) => {
       const transfers = transferTx.celoTransfers
 
-      const block = new BigNumber(transferTx.blockNumber).toFixed()
-      const hash = transferTx.transactionHash
-      const timestamp = new Date(transferTx.timestamp).getTime()
-
       switch (transfers.length) {
         case 0: // Just a contract call
           break
 
         case 1: // It's a regular token transfer
-          {
-            const transfer = transfers[0]
-
-            const comment = transferTx.input ? formatCommentString(transferTx.input) : ''
-            const eventToAddress = transfer.toAddressHash.toLowerCase()
-            const eventFromAddress = transfer.fromAddressHash.toLowerCase()
-            const [type, address] = resolveTransferEventType(
-              userAddress,
-              eventToAddress,
-              eventFromAddress,
-              this.getAttestationAddress(),
-              this.getEscrowAddress()
-            )
-            events.push({
-              type,
-              timestamp,
-              block,
-              amount: {
-                // Signed amount relative to the account currency
-                value: new BigNumber(transfer.value)
-                  .multipliedBy(eventFromAddress === userAddress ? -1 : 1)
-                  .dividedBy(WEI_PER_GOLD)
-                  .toString(),
-                currencyCode: transfer.token,
-                timestamp,
-              },
-              address,
-              comment,
-              hash,
-            })
-          }
+          events.push(this.getRegularTokenTransaction(userAddress, transferTx, transfers[0]))
           break
 
         case 2: // Exchange events have two corresponding transfers (in and out)
-          {
-            let inTransfer: BlockscoutCeloTransfer, outTransfer: BlockscoutCeloTransfer
-            if (transfers[0].fromAddressHash.toLowerCase() === userAddress) {
-              inTransfer = transfers[0]
-              outTransfer = transfers[1]
-            } else {
-              inTransfer = transfers[1]
-              outTransfer = transfers[0]
-            }
-            // Find the transfer related to the queried token
-            const tokenTransfer = [inTransfer, outTransfer].find(
-              (event) => event.token === args.token
-            )
-            if (tokenTransfer) {
-              events.push({
-                type: EventTypes.EXCHANGE,
-                timestamp,
-                block,
-                amount: {
-                  // Signed amount relative to the account currency
-                  value: new BigNumber(tokenTransfer.value)
-                    .multipliedBy(tokenTransfer === inTransfer ? -1 : 1)
-                    .dividedBy(WEI_PER_GOLD)
-                    .toString(),
-                  currencyCode: tokenTransfer.token,
-                  timestamp,
-                },
-                makerAmount: {
-                  value: new BigNumber(inTransfer.value).dividedBy(WEI_PER_GOLD).toString(),
-                  currencyCode: inTransfer.token,
-                  timestamp,
-                },
-                takerAmount: {
-                  value: new BigNumber(outTransfer.value).dividedBy(WEI_PER_GOLD).toString(),
-                  currencyCode: outTransfer.token,
-                  timestamp,
-                },
-                hash,
-              })
-            }
+          const exchangeTransaction = this.getExchangeTransaction(
+            userAddress,
+            token,
+            transferTx,
+            transfers
+          )
+          if (exchangeTransaction) {
+            events.push(exchangeTransaction)
           }
           break
 
         default:
-          // Warn if anything else happens
-          console.warn(`Unhandled transfers for tx ${transferTx.transactionHash}`)
+          // Error if anything else happens
+          console.error(`Unhandled transfers for tx ${transferTx.transactionHash}`)
           break
       }
     })
 
     console.info(
-      `[Celo] getTokenTransactions address=${args.address} token=${args.token} localCurrencyCode=${args.localCurrencyCode}} rawTransactionCount=${rawTransferTxs.length} eventCount=${events.length}`
+      `[Celo] getTokenTransactions address=${args.address} token=${token} localCurrencyCode=${args.localCurrencyCode}} rawTransactionCount=${rawTransferTxs.length} eventCount=${events.length}`
     )
     return events
-      .filter((event) => event.amount.currencyCode === args.token)
+      .filter((event) => event.amount.currencyCode === token)
       .sort((a, b) => b.timestamp - a.timestamp)
   }
 }
