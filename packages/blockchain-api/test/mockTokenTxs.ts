@@ -307,7 +307,7 @@ const mockTokenTxs = {
             transactionHash: '0xf6856169eb7bf78211babc312028cddf3dad2761799428ab6e4fcf297a27fe09',
           },
         },
-        // Verification fee sent
+        // Verification fee sent (no gateway fee recipient)
         {
           node: {
             blockNumber: 117451,
@@ -337,14 +337,6 @@ const mockTokenTxs = {
                     value: '6362040000000000',
                   },
                 },
-                {
-                  node: {
-                    fromAddressHash: '0x0000000000000000000000000000000000007E57',
-                    toAddressHash: '0x6a0edf42f5e618bee697e7718fa05efb1ea5d11c',
-                    token: 'cUSD',
-                    value: '0',
-                  },
-                },
               ],
             },
             feeCurrency: '0xa561131a1c8ac25925fb848bca45a74af61e5a38',
@@ -352,7 +344,7 @@ const mockTokenTxs = {
             gasPrice: '50000000000',
             gasUsed: '159051',
             gatewayFee: '0',
-            gatewayFeeRecipient: '0x6a0edf42f5e618bee697e7718fa05efb1ea5d11c',
+            gatewayFeeRecipient: null,
             timestamp: '2019-08-22T14:26:40.000000Z',
             transactionHash: '0xcc2120e5d050fd68284dc01f6464b2ed8f7358ca80fccb20967af28eb7d79160',
           },
