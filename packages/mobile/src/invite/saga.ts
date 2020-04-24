@@ -2,10 +2,9 @@ import { CeloTransactionObject } from '@celo/contractkit'
 import { trimLeading0x } from '@celo/utils/src/address'
 import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
 import BigNumber from 'bignumber.js'
-import { Clipboard, Linking, Platform } from 'react-native'
+import { Clipboard, Linking } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 import { asyncRandomBytes } from 'react-native-secure-randombytes'
-import SendIntentAndroid from 'react-native-send-intent'
 import SendSMS from 'react-native-sms'
 import { call, delay, put, race, select, spawn, take, takeLeading } from 'redux-saga/effects'
 import { showError, showMessage } from 'src/alert/actions'
@@ -109,28 +108,22 @@ export async function generateInviteLink(inviteCode: string) {
 export async function sendSms(toPhone: string, msg: string) {
   return new Promise((resolve, reject) => {
     try {
-      if (Platform.OS === 'android') {
-        // react-native-sms supports Android + iOS so we may not need this Android specific package
-        SendIntentAndroid.sendSms(toPhone, msg)
-        resolve()
-      } else {
-        // react-native-sms types are incorrect
-        // react-native-sms doesn't seem to work on Xcode emulator but works on device
-        // tslint:disable-next-line: no-floating-promises
-        SendSMS.send(
-          {
-            body: msg,
-            recipients: [toPhone],
-          },
-          (completed, cancelled, error) => {
-            if (!completed) {
-              reject(new Error(`Couldn't send sms: isCancelled: ${cancelled} isError: ${error}`))
-            } else {
-              resolve()
-            }
+      // react-native-sms types are incorrect
+      // react-native-sms doesn't seem to work on Xcode emulator but works on device
+      // tslint:disable-next-line: no-floating-promises
+      SendSMS.send(
+        {
+          body: msg,
+          recipients: [toPhone],
+        },
+        (completed, cancelled, error) => {
+          if (!completed) {
+            reject(new Error(`Couldn't send sms: isCancelled: ${cancelled} isError: ${error}`))
+          } else {
+            resolve()
           }
-        )
-      }
+        }
+      )
     } catch (e) {
       reject(e)
     }

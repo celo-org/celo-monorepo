@@ -48,10 +48,8 @@ export class EscrowedPaymentListItem extends React.PureComponent<Props> {
         (inviteeObj) => recipientPhoneNumber === inviteeObj.e164Number
       )
 
-      // * This ties into my commnets on EscrowedPayment and InviteDetails being separate sources of truth *
-      // OPEN QUESTION: when could this error be thrown? appears to me invitee data is stored on send and
-      // escrow data is fetched from the smart contract, which means we could see an issue where app data is wiped
-      // and these two sources of data are no longer in sync
+      // OPEN QUESTION: EscrowedPayment and InviteDetails appear to store redundant info but have different sources of truth. Should we consolidate
+      // them to avoid throwing the below error? Appears to me invitee data is stored on send and escrow data is fetched from the smart contract, which means we'll throw the below error when local data is wiped
       if (!inviteDetails) {
         throw Error('Could not find the invite details that match this phone number')
       }
@@ -59,7 +57,7 @@ export class EscrowedPaymentListItem extends React.PureComponent<Props> {
       // OPEN QUESTION: this function creates a unique link every time a reminder is sent. is this desirable?
       const link = await generateInviteLink(inviteCode)
       await sendSms(
-        // we do we have to send inviteCode and link if link is derived from inviteCode?
+        // OPEN QUESTION: why do we have to send inviteCode and link if link is derived from inviteCode?
         recipientPhoneNumber,
         t('walletFlow5:escrowedPaymentReminderSms', {
           code: inviteCode,

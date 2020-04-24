@@ -1,6 +1,6 @@
 import BigNumber from 'bignumber.js'
 import { Linking } from 'react-native'
-import SendIntentAndroid from 'react-native-send-intent'
+import SendSMS from 'react-native-sms'
 import { expectSaga } from 'redux-saga-test-plan'
 import * as matchers from 'redux-saga-test-plan/matchers'
 import { throwError } from 'redux-saga-test-plan/providers'
@@ -53,7 +53,7 @@ jest.mock('src/transactions/send', () => ({
 
 jest.mock('@celo/contractkit')
 
-SendIntentAndroid.sendSms = jest.fn()
+SendSMS.send = jest.fn()
 
 const state = createMockStore({ web3: { account: mockAccount } }).getState()
 
@@ -70,11 +70,11 @@ describe(watchSendInvite, () => {
       ])
       .withState(state)
       .dispatch(sendInvite(mockInviteDetails.e164Number, InviteBy.SMS))
-      .dispatch(transactionConfirmed('a sha3 hash'))
+      .dispatch(transactionConfirmed(mockInviteDetails.escrowTxId))
       .put(storeInviteeData(mockInviteDetails))
       .run()
 
-    expect(SendIntentAndroid.sendSms).toHaveBeenCalled()
+    expect(SendSMS.send).toHaveBeenCalled()
   })
 
   it('sends a WhatsApp invite as expected', async () => {
