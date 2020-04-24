@@ -89,7 +89,7 @@ Additionally, you need to unlock the account configured in `etherbase` option. I
 
 ```bash
 # On the proxy machine
-# Firts, we create a new account for the proxy
+# First, we create a new account for the proxy
 docker run --name celo-proxy-password -it --rm  -v $PWD:/root/.celo $CELO_IMAGE account new --password /root/.celo/.password
 ```
 
@@ -154,7 +154,7 @@ nc -vz $PROXY_EXTERNAL_IP 30303
 nc -vz $PROXY_INTERNAL_IP 30503
 ```
 
-Once that is completed, go ahead and run the Validator. Be sure write your Validator signer password to `./.password` for the following command to work, or provide your password another way.
+Once that is completed, go ahead and run the Validator. Be sure to write your Validator signer password to `./.password` for the following command to work, or provide your password another way.
 
 ```bash
 # On the Validator machine
@@ -164,7 +164,7 @@ docker run --name celo-validator -it --restart unless-stopped -p 30303:30303 -p 
 
 The `networkid` parameter value of `40120` indicates we are connecting to the new Baklava network.
 
-At this point your proxy should be peering with other nodes as the come online. Your Validator will not automatically peer with the proxy until the mining routine starts after the genesis timestamp on, so it will not have any peers. You should see a `Mining too far in the future` log message from the Validator, which indicates it is waiting for the genesis timestamp to pass. On April 7th at 1600 UTC, the Validator engine will start up, and after a couple of minutes to establish the Validator overlay network, block production will begin.
+At this point your proxy should be peering with other nodes as they come online. Your Validator will not automatically peer with the proxy until the mining routine starts after the genesis timestamp on, so it will not have any peers. You should see a `Mining too far in the future` log message from the Validator, which indicates it is waiting for the genesis timestamp to pass. On April 7th at 1600 UTC, the Validator engine will start up, and after a couple of minutes to establish the Validator overlay network, block production will begin.
 
 ## After Block Production Begins
 
@@ -238,11 +238,11 @@ We will use 7 keys in the following setup, namely:
   - Validator signer key (new)
   - Voter key (new)
 
-In this guide, it is assumed that the Validator signer key is stored on the Validator node, and the attestation key on the attestation node, but all other the other keys are accessible on your local machine.
+In this guide, it is assumed that the Validator signer key is stored on the Validator node, and the attestation key on the attestation node, but all other keys are accessible on your local machine.
 
 ### Environment variables
 
-There are number of new environment variables, and you may use this table as a reference.
+There are a number of new environment variables, and you may use this table as a reference.
 
 | Variable                             | Explanation                                                                                                                          |
 | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------ |
@@ -276,7 +276,7 @@ There are number of new environment variables, and you may use this table as a r
 
 ### Create Accounts from the `ReleaseGold` contracts
 
-In order to participate on the network (lock gold, vote, validate) from a `ReleaseGold` contract, we need to create an Account at the address of the `ReleaseGold` contract. In the Baklava network, you can look up your Beneficiary address in [the published mapping](https://gist.githubusercontent.com/nategraf/a87f9c2e488ab2d38a0a3c09f5d4ca2b/raw) to find your `ReleaseGold` contract addresses. If you are a genesis validator, your two Beneficary addresses will be the provided `CELO_VALIDATOR_ADDRESS` and `CELO_VALIDATOR_GROUP_ADDRESS`.
+In order to participate on the network (lock gold, vote, validate) from a `ReleaseGold` contract, we need to create an Account at the address of the `ReleaseGold` contract. In the Baklava network, you can look up your Beneficiary address in [the published mapping](https://gist.githubusercontent.com/nategraf/a87f9c2e488ab2d38a0a3c09f5d4ca2b/raw) to find your `ReleaseGold` contract addresses. If you are a genesis validator, your two Beneficiary addresses will be the provided `CELO_VALIDATOR_ADDRESS` and `CELO_VALIDATOR_GROUP_ADDRESS`.
 
 ```bash
 # On your local machine

@@ -1,6 +1,8 @@
 # Stability Mechanism
 
-The Celo protocol includes a stability mechanism which includes the following:
+{% youtube src="https://www.youtube.com/watch?v=3UIudzzCb8o" %}{% endyoutube %}
+
+The Celo protocol's stability mechanism comprises the following:
 
 {% page-ref page="doto.md" %}
 

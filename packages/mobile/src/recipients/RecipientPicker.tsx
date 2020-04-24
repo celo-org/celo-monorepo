@@ -73,7 +73,7 @@ export class RecipientPicker extends React.Component<RecipientProps> {
     <RecipientItem recipient={item} onSelectRecipient={this.props.onSelectRecipient} />
   )
 
-  renderSectionHeader = (info: { section: SectionListData<Section> }) => (
+  renderSectionHeader = (info: { section: SectionListData<Recipient> }) => (
     <SectionHead text={info.section.key as string} />
   )
 

@@ -6,7 +6,7 @@ description: Manage your account, keys, and metadata
 
 ### Authorize
 
-Keep your locked Gold more secure by authorizing alternative keys to be used for signing attestations, voting, or validating. By doing so, you can continue to participate in the protocol why keeping the key with access to your locked Gold in cold storage. You must include a "proof-of-possession" of the key being authorized, which can be generated with the "account:proof-of-possession" command.
+Keep your locked Gold more secure by authorizing alternative keys to be used for signing attestations, voting, or validating. By doing so, you can continue to participate in the protocol while keeping the key with access to your locked Gold in cold storage. You must include a "proof-of-possession" of the key being authorized, which can be generated with the "account:proof-of-possession" command.
 
 ```
 USAGE
@@ -575,18 +575,7 @@ ARGUMENTS
   ACCOUNT  Account address
 
 OPTIONS
-  --ledgerAddresses=ledgerAddresses              [default: 1] If --useLedger is set, this will get the first N addresses
-                                                 for local signing
-
-  --ledgerConfirmAddress                         Set it to ask confirmation for the address of the transaction from the
-                                                 ledger
-
-  --ledgerCustomAddresses=ledgerCustomAddresses  [default: [0]] If --useLedger is set, this will get the array of index
-                                                 addresses for local signing. Example --ledgerCustomAddresses "[4,99]"
-
   --password=password
-
-  --useLedger                                    Set it to use a ledger wallet
 
 EXAMPLE
   unlock 0x5409ed021d9299bf6814279a6a1411a7e866a631

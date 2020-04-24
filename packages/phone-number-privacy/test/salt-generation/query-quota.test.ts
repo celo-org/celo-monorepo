@@ -30,13 +30,6 @@ describe('get remaining query count', () => {
     jest.spyOn(queryQuota, 'getQueryQuota').mockResolvedValue(32)
     expect(await queryQuota.getRemainingQueryCount(ACCOUNT, PHONE_NUMBER)).toEqual(30)
   })
-  it('defaults to 0 on failed attempt to get performed query count', async () => {
-    mockPerformedQueryCount.mockImplementation(
-      () => new Promise((_resolve, reject) => reject('error'))
-    )
-    jest.spyOn(queryQuota, 'getQueryQuota').mockResolvedValue(32)
-    expect(await queryQuota.getRemainingQueryCount(ACCOUNT, PHONE_NUMBER)).toEqual(32)
-  })
 })
 
 describe(`Retrieve Transaction Count`, () => {
