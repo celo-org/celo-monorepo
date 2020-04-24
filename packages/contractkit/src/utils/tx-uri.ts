@@ -63,7 +63,7 @@ export function parseUri(uri: string): Tx {
   return tx
 }
 
-export function buildUri(tx: Tx, functionName?: string, abiTypes?: string[]): string {
+export function buildUri(tx: Tx, functionName?: string, abiTypes: string[] = []): string {
   if (!tx.to) {
     throw new Error("'to' address must be defined for celo URIs")
   }
@@ -75,21 +75,23 @@ export function buildUri(tx: Tx, functionName?: string, abiTypes?: string[]): st
 
   let paramsAppended = false
   if (tx.data !== undefined) {
-    if (!functionName || !abiTypes) {
-      throw new Error("Cannot decode tx 'data' without 'functionName' and 'abiTypes'")
+    if (!functionName) {
+      throw new Error("Cannot decode tx 'data' without 'functionName'")
     }
+
     const functionSelector = `${functionName}(${abiTypes.join(',')})`
     const functionSig = trimLeading0x(abi.encodeFunctionSignature(functionSelector))
-    const funcEncoded = trimLeading0x(tx.data).slice(0, 8)
+    const txData = trimLeading0x(tx.data)
+    const funcEncoded = txData.slice(0, 8)
 
     if (functionSig !== funcEncoded) {
-      throw new Error("'functionName' does not match first 4 encoded bytes of 'tx.data'")
+      throw new Error("'functionName' and 'abiTypes' do not match first 4 bytes of 'tx.data'")
     }
 
     uri += `/${functionSelector}`
 
-    if (tx.data.length > 8) {
-      const argsEncoded = trimLeading0x(tx.data).slice(8)
+    if (txData.length > 8) {
+      const argsEncoded = txData.slice(8)
       const decoded = abi.decodeParameters(abiTypes, argsEncoded)
 
       delete decoded.__length__
