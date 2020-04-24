@@ -1,4 +1,4 @@
-import { ensureLeading0x } from '@celo/utils/lib/address'
+import { ensureLeading0x, trimLeading0x } from '@celo/utils/lib/address'
 import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import debugFactory from 'debug'
 // @ts-ignore-next-line
@@ -171,7 +171,13 @@ export function recoverTransaction(rawTx: string): [Tx, string] {
     data: rawValues[8],
     chainId,
   }
-  const signature = Account.encodeSignature(rawValues.slice(9, 12))
+  let r = rawValues[10]
+  let s = rawValues[11]
+  // Account.recover cannot handle canonicalized signatures
+  // A canonicalized signature may have the first byte removed if its value is 0
+  r = ensureLeading0x(trimLeading0x(r).padStart(64, '0'))
+  s = ensureLeading0x(trimLeading0x(s).padStart(64, '0'))
+  const signature = Account.encodeSignature([rawValues[9], r, s])
   const extraData = recovery < 35 ? [] : [chainId, '0x', '0x']
   const signingData = rawValues.slice(0, 9).concat(extraData)
   const signingDataHex = RLP.encode(signingData)
