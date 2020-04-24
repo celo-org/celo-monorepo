@@ -28,3 +28,4 @@ pull_request_rules:
       merge:
         method: squash 
         strict: true
+        commit_message: title+body
