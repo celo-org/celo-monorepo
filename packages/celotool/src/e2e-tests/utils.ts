@@ -168,24 +168,6 @@ export function sleep(seconds: number, verbose = false) {
   return new Promise<void>((resolve) => setTimeout(resolve, seconds * 1000))
 }
 
-export async function startBootnode(
-  bootnodeBinaryPath: string,
-  mnemonic: string,
-  gethConfig: GethRunConfig,
-  verbose: boolean
-) {
-  const bootnodePrivateKey = getPrivateKeysFor(AccountType.BOOTNODE, mnemonic, 1)[0]
-  const bootnodeLog = joinPath(gethConfig.runPath, 'bootnode.log')
-  const bootnodeArgs = [
-    '--verbosity=4',
-    `--nodekeyhex=${bootnodePrivateKey}`,
-    `--networkid=${gethConfig.networkId}`,
-  ]
-
-  spawnWithLog(bootnodeBinaryPath, bootnodeArgs, bootnodeLog, verbose)
-  return getEnodeAddress(privateKeyToPublicKey(bootnodePrivateKey), '127.0.0.1', 30301)
-}
-
 export async function assertRevert(promise: any, errorMessage: string = ''): Promise<void> {
   try {
     await promise
@@ -258,7 +240,6 @@ export function getContext(gethConfig: GethRunConfig, verbose: boolean = verbose
     let proxyIndex = 0
 
     for (const instance of gethConfig.instances) {
-      // Non proxied validators and proxies should connect to the bootnode
       if (instance.isProxied) {
         // Proxied validators should connect to only the proxy
         // Find this proxied validator's proxy
