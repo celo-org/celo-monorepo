@@ -56,7 +56,6 @@ export async function incrementQueryCount(account: string) {
  * Returns whether account has already performed matchmaking
  */
 export async function getDidMatchmaking(account: string): Promise<boolean> {
-  logger.debug('Getting did matchmaking')
   try {
     const didMatchmaking = await accounts()
       .where(ACCOUNTS_COLUMNS.address, account)
@@ -68,8 +67,8 @@ export async function getDidMatchmaking(account: string): Promise<boolean> {
     }
     return !!didMatchmaking[ACCOUNTS_COLUMNS.didMatchmaking]
   } catch (e) {
-    logger.error(ErrorMessages.DATABASE_GET_FAILURE, e)
-    return true
+    console.error(ErrorMessages.DATABASE_GET_FAILURE, e)
+    return false
   }
 }
 
