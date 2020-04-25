@@ -2,18 +2,18 @@ import { Request, Response } from 'firebase-functions'
 import { computeBlindedSignature } from '../bls/bls-signature'
 import { ErrorMessages, respondWithError } from '../common/error-utils'
 import { authenticateUser } from '../common/identity'
+import logger from '../common/logger'
 import { incrementQueryCount } from '../database/wrappers/account'
-import QueryQuota from './query-quota'
+import { getRemainingQueryCount } from './query-quota'
 
 export async function handleGetBlindedMessageForSalt(request: Request, response: Response) {
   try {
-    const queryQuota: QueryQuota = new QueryQuota()
     if (!isValidGetSignatureInput(request.body)) {
       respondWithError(response, 400, ErrorMessages.INVALID_INPUT)
       return
     }
     authenticateUser()
-    const remainingQueryCount = await queryQuota.getRemainingQueryCount(
+    const remainingQueryCount = await getRemainingQueryCount(
       request.body.account,
       request.body.hashedPhoneNumber
     )
@@ -25,7 +25,7 @@ export async function handleGetBlindedMessageForSalt(request: Request, response:
     await incrementQueryCount(request.body.account)
     response.json({ success: true, signature })
   } catch (error) {
-    console.error(ErrorMessages.UNKNOWN_ERROR + ' Failed to getSalt', error)
+    logger.error('Failed to getSalt', error)
     respondWithError(response, 500, ErrorMessages.UNKNOWN_ERROR)
   }
 }

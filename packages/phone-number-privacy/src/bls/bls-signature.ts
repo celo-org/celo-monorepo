@@ -1,11 +1,13 @@
 import threshold from 'blind-threshold-bls'
 import { ErrorMessages } from '../common/error-utils'
+import logger from '../common/logger'
 import config from '../config'
 
 /*
  * Computes the BLS signature for the blinded phone number.
  */
 export function computeBlindedSignature(base64BlindedMessage: string) {
+  logger.debug('Computing blinded signature')
   try {
     return Buffer.from(
       threshold.sign(
@@ -14,7 +16,7 @@ export function computeBlindedSignature(base64BlindedMessage: string) {
       )
     ).toString('base64')
   } catch (e) {
-    console.error(ErrorMessages.SIGNATURE_COMPUTATION_FAILURE, e)
+    logger.error(ErrorMessages.SIGNATURE_COMPUTATION_FAILURE, e)
     throw e
   }
 }
