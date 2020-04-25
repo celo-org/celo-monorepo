@@ -1,3 +1,4 @@
+import { isValidAddress } from '@celo/utils/lib/address'
 import { Request, Response } from 'firebase-functions'
 import { ErrorMessages, respondWithError } from '../common/error-utils'
 import { authenticateUser } from '../common/identity'
@@ -43,7 +44,7 @@ function isValidGetContactMatchesInput(requestBody: any): boolean {
 }
 
 function hasValidAccountParam(requestBody: any): boolean {
-  return requestBody.account && (requestBody.account as string).startsWith('0x')
+  return requestBody.account && isValidAddress(requestBody.account)
 }
 
 function hasValidUserPhoneNumberParam(requestBody: any): boolean {
