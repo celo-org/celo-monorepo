@@ -11,7 +11,7 @@
     "heading2": "Acerca de los Activos de Celo",
     "privacy":
       "Al unirte a esta red, nos das permiso para recopilar información anónima sobre cómo utilizas la aplicación. Además, si verificas tu número de teléfono, se almacenará una copia ofuscada en la Red de Celo. Más información en <0>celo.org/terms</0>",
-    "goldDisclaimer": "Please be aware that cGld is a digital asset whose value is not related to the value of physical gold.  Both cUSD and cGld are part of a new asset class and present a risk of financial loss.  Carefully consider your financial circumstances and tolerance for financial risk before purchasing either cGld or cUSD."
+    "goldDisclaimer": "Por favor ten en cuenta que cGld es un activo digital cuyo valor no está relacionado con el valor del oro físico. Tanto cUSD como cGld son parte de una nueva clase de activos y presentan riesgos de pérdidas finacieras. Considera cuidadosamente tu situación financiera y tu tolerancia a riesgos antes de comprar cGld o cUSD."
     },
   "phoneNumber": "000 000 0000",
   "inviteCodeText": {
@@ -26,7 +26,6 @@
     "faucetLink": "celo.org/app",
     "skip": "continuar sin."
   },
-  "accept": "Aceptar",
   "fullName": "Nombre completo",
   "importIt": "Restaurar tu monedero existente",
   "cancel": "Cancelar",

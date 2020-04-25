@@ -49,7 +49,8 @@ exports[`RegulatoryTermsScreen renders correctly 1`] = `
         style={
           Object {
             "flex": 1,
-            "padding": 20,
+            "paddingBottom": 15,
+            "paddingHorizontal": 20,
           }
         }
       >
@@ -214,7 +215,7 @@ exports[`RegulatoryTermsScreen renders correctly 1`] = `
                 ]
               }
             >
-              accept
+              global:accept
             </Text>
           </View>
         </View>

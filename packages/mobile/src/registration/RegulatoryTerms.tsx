@@ -80,7 +80,7 @@ export class RegulatoryTerms extends React.Component<Props> {
           <Button
             standard={false}
             type={BtnTypes.PRIMARY}
-            text={t('accept')}
+            text={t('global:accept')}
             onPress={this.onPressAccept}
             testID={'AcceptTermsButton'}
           />
@@ -107,7 +107,8 @@ const styles = StyleSheet.create({
   },
   terms: {
     flex: 1,
-    padding: 20,
+    paddingHorizontal: 20,
+    paddingBottom: 15,
   },
   header: {
     ...fontStyles.body,

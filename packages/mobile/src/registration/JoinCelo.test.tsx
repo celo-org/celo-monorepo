@@ -5,7 +5,7 @@ import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
 import { PincodeType } from 'src/account/reducer'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import JoinCelo, { JoinCelo as JoinCeloClass } from 'src/invite/JoinCelo'
+import JoinCelo, { JoinCelo as JoinCeloClass } from 'src/registration/JoinCelo'
 import { createMockStore, getMockI18nProps } from 'test/utils'
 
 describe('JoinCeloScreen', () => {
