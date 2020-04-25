@@ -8,9 +8,10 @@ import { PHONE_NUM_PRIVACY_SERVICE } from 'src/config'
 import { updateE164PhoneNumberSalts } from 'src/identity/actions'
 import { e164NumberToSaltSelector, E164NumberToSaltType } from 'src/identity/reducer'
 import Logger from 'src/utils/Logger'
+import { currentAccountSelector } from 'src/web3/selectors'
 
 const TAG = 'identity/privacy'
-const SIGN_MESSAGE_ENDPOINT = '/getSalt' // TODO rename that endpoint
+const SIGN_MESSAGE_ENDPOINT = '/getBlindedMessageSignature'
 
 export interface PhoneNumberHashDetails {
   e164Number: string
@@ -32,7 +33,8 @@ export function* fetchPhoneHashPrivate(e164Number: string) {
     }
 
     Logger.debug(`${TAG}@fetchPrivatePhoneHash`, 'Salt was not cached, fetching')
-    const details: PhoneNumberHashDetails = yield call(getPhoneHashPrivate, e164Number)
+    const account: string = yield select(currentAccountSelector)
+    const details: PhoneNumberHashDetails = yield call(getPhoneHashPrivate, e164Number, account)
     yield put(updateE164PhoneNumberSalts({ [e164Number]: details.salt }))
     return details
   } catch (error) {
@@ -51,8 +53,11 @@ export function* fetchPhoneHashPrivate(e164Number: string) {
 // Unlike the getPhoneHash in utils, this leverage the phone number
 // privacy service to compute a secure, unique salt for the phone number
 // and then appends it before hashing.
-async function getPhoneHashPrivate(e164Number: string): Promise<PhoneNumberHashDetails> {
-  const salt = await getPhoneNumberSalt(e164Number)
+async function getPhoneHashPrivate(
+  e164Number: string,
+  account: string
+): Promise<PhoneNumberHashDetails> {
+  const salt = await getPhoneNumberSalt(e164Number, account)
   const phoneHash = getPhoneHash(e164Number, salt)
   return {
     e164Number,
@@ -61,7 +66,7 @@ async function getPhoneHashPrivate(e164Number: string): Promise<PhoneNumberHashD
   }
 }
 
-async function getPhoneNumberSalt(e164Number: string) {
+async function getPhoneNumberSalt(e164Number: string, account: string) {
   Logger.debug(`${TAG}@getPhoneNumberSalt`, 'Getting phone number salt')
 
   if (!isE164Number(e164Number)) {
@@ -75,7 +80,7 @@ async function getPhoneNumberSalt(e164Number: string) {
 
   Logger.debug(`${TAG}@getPhoneNumberSalt`, 'Retrieving blinded message')
   const base64BlindedMessage = await BlindThresholdBls.blindMessage(e164Number)
-  const base64BlindSig = await postToSignMessage(base64BlindedMessage)
+  const base64BlindSig = await postToSignMessage(base64BlindedMessage, account)
   Logger.debug(`${TAG}@getPhoneNumberSalt`, 'Retrieving unblinded signature')
   const base64UnblindedSig = await BlindThresholdBls.unblindMessage(base64BlindSig)
   Logger.debug(`${TAG}@getPhoneNumberSalt`, 'Converting sig to salt')
@@ -90,7 +95,7 @@ interface SignMessageResponse {
 
 // Send the blinded message off to the phone number privacy service and
 // get back the theshold signed blinded message
-async function postToSignMessage(base64BlindedMessage: string) {
+async function postToSignMessage(base64BlindedMessage: string, account: string) {
   Logger.debug(`${TAG}@postToSignMessage`, 'Retrieving blinded message')
   const res = await fetch(PHONE_NUM_PRIVACY_SERVICE + SIGN_MESSAGE_ENDPOINT, {
     method: 'POST',
@@ -99,7 +104,10 @@ async function postToSignMessage(base64BlindedMessage: string) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      blindPhoneNumber: base64BlindedMessage,
+      // TODO use hashed number when service is updated
+      phoneNumber: '+1455556600',
+      queryPhoneNumber: base64BlindedMessage,
+      account,
     }),
   })
 
