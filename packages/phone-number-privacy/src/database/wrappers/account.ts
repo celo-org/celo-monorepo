@@ -67,7 +67,7 @@ export async function getDidMatchmaking(account: string): Promise<boolean> {
     }
     return !!didMatchmaking[ACCOUNTS_COLUMNS.didMatchmaking]
   } catch (e) {
-    console.error(ErrorMessages.DATABASE_GET_FAILURE, e)
+    logger.error(ErrorMessages.DATABASE_GET_FAILURE, e)
     return false
   }
 }

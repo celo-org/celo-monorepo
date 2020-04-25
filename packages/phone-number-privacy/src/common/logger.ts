@@ -1,3 +1,4 @@
+// tslint:disable: no-console
 import { v4 as uuidv4 } from 'uuid'
 
 // This allows us to differentiate parallel instantiations of this function

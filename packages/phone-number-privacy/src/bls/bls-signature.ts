@@ -4,17 +4,23 @@ import logger from '../common/logger'
 import config from '../config'
 
 /*
- * Computes the BLS signature for the blinded phone number.
+ * Computes the BLS signature for a blinded message (e.g. phone number).
  */
 export function computeBlindedSignature(base64BlindedMessage: string) {
-  logger.debug('Computing blinded signature')
   try {
-    return Buffer.from(
-      threshold.sign(
-        new Uint8Array(new Buffer(config.salt.key, 'base64')),
-        new Uint8Array(new Buffer(base64BlindedMessage, 'base64'))
-      )
-    ).toString('base64')
+    logger.debug('b64 blinded msg', base64BlindedMessage)
+    const keyBuffer = Buffer.from(config.salt.key, 'base64')
+    const msgBuffer = Buffer.from(base64BlindedMessage, 'base64')
+
+    logger.debug('Calling theshold sign')
+    const signedMsg = threshold.sign(keyBuffer, msgBuffer)
+    logger.debug('Back from threshold sign, parsing results')
+
+    if (!signedMsg) {
+      throw new Error('Empty threshold sign result')
+    }
+
+    return Buffer.from(signedMsg).toString('base64')
   } catch (e) {
     logger.error(ErrorMessages.SIGNATURE_COMPUTATION_FAILURE, e)
     throw e

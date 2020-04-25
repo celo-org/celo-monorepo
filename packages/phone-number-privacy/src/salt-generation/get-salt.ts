@@ -1,3 +1,4 @@
+import { isValidAddress } from '@celo/utils/lib/address'
 import { Request, Response } from 'firebase-functions'
 import { computeBlindedSignature } from '../bls/bls-signature'
 import { ErrorMessages, respondWithError } from '../common/error-utils'
@@ -39,7 +40,7 @@ function isValidGetSignatureInput(requestBody: any): boolean {
 }
 
 function hasValidAccountParam(requestBody: any): boolean {
-  return requestBody.account && (requestBody.account as string).startsWith('0x')
+  return requestBody.account && isValidAddress(requestBody.account)
 }
 
 // TODO (amyslawson) make this param optional for user's first request prior to attestation
