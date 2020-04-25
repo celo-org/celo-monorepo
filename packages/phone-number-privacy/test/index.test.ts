@@ -41,13 +41,13 @@ const mockGetNumberPairContacts = getNumberPairContacts as jest.Mock
 // the full test
 describe(`POST /getBlindedMessageSignature endpoint`, () => {
   describe('with valid input', () => {
-    const queryPhoneNumber = '+5555555555'
-    const phoneNumber = '+1234567890'
+    const blindedQueryPhoneNumber = '+5555555555'
+    const hashedPhoneNumber = '+1234567890'
     const account = '0x78dc5D2D739606d31509C31d654056A45185ECb6'
 
     const mockRequestData = {
-      queryPhoneNumber,
-      phoneNumber,
+      blindedQueryPhoneNumber,
+      hashedPhoneNumber,
       account,
     }
     const req = { body: mockRequestData }
@@ -94,36 +94,14 @@ describe(`POST /getBlindedMessageSignature endpoint`, () => {
     })
   })
   describe('with invalid input', () => {
-    it('invalid phone number returns 400', () => {
-      const queryPhoneNumber = '+5555555555'
-      const phoneNumber = 'a567890'
-      const account = '0x78dc5D2D739606d31509C31d654056A45185ECb6'
-
-      const mockRequestData = {
-        queryPhoneNumber,
-        phoneNumber,
-        account,
-      }
-      const req = { body: mockRequestData }
-
-      const res = {
-        status: (status: any) => {
-          expect(status).toEqual(400)
-          // tslint:disable-next-line: no-empty
-          return { json: () => {} }
-        },
-      }
-      // @ts-ignore TODO fix req type to make it a mock express req
-      getBlindedSalt(req, res)
-    })
     it('invalid address returns 400', () => {
-      const queryPhoneNumber = '+5555555555'
-      const phoneNumber = '+1234567890'
+      const blindedQueryPhoneNumber = '+5555555555'
+      const hashedPhoneNumber = '+1234567890'
       const account = 'd31509C31d654056A45185ECb6'
 
       const mockRequestData = {
-        queryPhoneNumber,
-        phoneNumber,
+        blindedQueryPhoneNumber,
+        hashedPhoneNumber,
         account,
       }
       const req = { body: mockRequestData }

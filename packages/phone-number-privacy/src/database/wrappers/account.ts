@@ -27,7 +27,7 @@ export async function getDidMatchmaking(account: string): Promise<boolean> {
       .where(ACCOUNTS_COLUMNS.address, account)
       .select(ACCOUNTS_COLUMNS.didMatchmaking)
       .first()
-    return didMatchmaking !== undefined && didMatchmaking[ACCOUNTS_COLUMNS.didMatchmaking] !== null
+    return didMatchmaking && didMatchmaking[ACCOUNTS_COLUMNS.didMatchmaking]
   } catch (e) {
     console.error(ErrorMessages.DATABASE_GET_FAILURE, e)
     return false

@@ -12,6 +12,7 @@ export async function handleGetContactMatches(request: Request, response: Respon
       return
     }
     authenticateUser()
+    // TODO (amyslawson) reject unverified user
     if (await getDidMatchmaking(request.body.account)) {
       console.warn(ErrorMessages.DUPLICATE_REQUEST_TO_MATCHMAKE)
       respondWithError(response, 403, ErrorMessages.DUPLICATE_REQUEST_TO_MATCHMAKE)
@@ -24,7 +25,7 @@ export async function handleGetContactMatches(request: Request, response: Respon
     await setDidMatchmaking(request.body.account)
     response.json({ success: true, matchedContacts })
   } catch (e) {
-    console.error(ErrorMessages.UNKNOWN_ERROR + ' Failed to getContactMatches', e)
+    console.error(ErrorMessages.UNKNOWN_ERROR, ' Failed to getContactMatches', e)
     respondWithError(response, 500, ErrorMessages.UNKNOWN_ERROR)
   }
 }

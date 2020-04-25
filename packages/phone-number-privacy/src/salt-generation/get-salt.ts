@@ -1,4 +1,3 @@
-import { PhoneNumberUtils } from '@celo/utils'
 import { Request, Response } from 'firebase-functions'
 import { computeBlindedSignature } from '../bls/bls-signature'
 import { ErrorMessages, respondWithError } from '../common/error-utils'
@@ -16,13 +15,13 @@ export async function handleGetBlindedMessageForSalt(request: Request, response:
     authenticateUser()
     const remainingQueryCount = await queryQuota.getRemainingQueryCount(
       request.body.account,
-      request.body.phoneNumber
+      request.body.hashedPhoneNumber
     )
     if (remainingQueryCount <= 0) {
       respondWithError(response, 403, ErrorMessages.EXCEEDED_QUOTA)
       return
     }
-    const signature = computeBlindedSignature(request.body.queryPhoneNumber)
+    const signature = computeBlindedSignature(request.body.blindedQueryPhoneNumber)
     await incrementQueryCount(request.body.account)
     response.json({ success: true, signature })
   } catch (error) {
@@ -43,10 +42,11 @@ function hasValidAccountParam(requestBody: any): boolean {
   return requestBody.account && (requestBody.account as string).startsWith('0x')
 }
 
+// TODO (amyslawson) make this param optional for user's first request prior to attestation
 function hasValidPhoneNumberParam(requestBody: any): boolean {
-  return requestBody.phoneNumber && PhoneNumberUtils.isE164Number(requestBody.phoneNumber)
+  return requestBody.hashedPhoneNumber
 }
 
 function hasValidQueryPhoneNumberParam(requestBody: any): boolean {
-  return requestBody.queryPhoneNumber
+  return requestBody.blindedQueryPhoneNumber
 }
