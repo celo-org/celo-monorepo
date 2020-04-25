@@ -51,7 +51,6 @@ export const inviteReducer = (
         ...state,
         invitees: [...state.invitees, action.inviteDetails],
       }
-    // return dotProp.merge(state, 'invitees', { [action.address]: action.e164Number })
     case Actions.REDEEM_INVITE:
       return {
         ...state,

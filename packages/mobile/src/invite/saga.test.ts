@@ -7,6 +7,7 @@ import { throwError } from 'redux-saga-test-plan/providers'
 import { call } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
+import { transferEscrowedPayment } from 'src/escrow/actions'
 import { generateShortInviteLink } from 'src/firebase/dynamicLinks'
 import {
   InviteBy,
@@ -14,6 +15,7 @@ import {
   redeemInviteFailure,
   redeemInviteSuccess,
   sendInvite,
+  SENTINEL_INVITE_COMMENT,
   storeInviteeData,
 } from 'src/invite/actions'
 import {
@@ -23,15 +25,15 @@ import {
   withdrawFundsFromTempAccount,
 } from 'src/invite/saga'
 import { getSendFee } from 'src/send/saga'
-import { fetchDollarBalance } from 'src/stableToken/actions'
+import { fetchDollarBalance, transferStableToken } from 'src/stableToken/actions'
 import { transactionConfirmed } from 'src/transactions/actions'
+import { waitForTransactionWithId } from 'src/transactions/saga'
 import { getContractKit } from 'src/web3/contracts'
 import { getConnectedUnlockedAccount, getOrCreateAccount, waitWeb3LastBlock } from 'src/web3/saga'
 import { createMockStore, mockContractKitBalance } from 'test/utils'
-import { mockAccount, mockInviteDetails } from 'test/values'
+import { mockAccount, mockInviteDetails3 } from 'test/values'
 
 const mockKey = '0x1129eb2fbccdc663f4923a6495c35b096249812b589f7c4cd1dba01e1edaf724'
-const mockKeyEncoded = 'ESnrL7zNxmP0kjpklcNbCWJJgStYn3xM0dugHh7a9yQ='
 
 jest.mock('src/firebase/dynamicLinks', () => ({
   ...jest.requireActual('src/firebase/dynamicLinks'),
@@ -67,11 +69,35 @@ describe(watchSendInvite, () => {
       .provide([
         [call(waitWeb3LastBlock), true],
         [call(getConnectedUnlockedAccount), mockAccount],
+        [matchers.call.fn(waitForTransactionWithId), mockInviteDetails3.escrowTxId],
       ])
       .withState(state)
-      .dispatch(sendInvite(mockInviteDetails.e164Number, InviteBy.SMS))
-      .dispatch(transactionConfirmed(mockInviteDetails.escrowTxId))
-      .put(storeInviteeData(mockInviteDetails))
+      .dispatch(
+        sendInvite(
+          mockInviteDetails3.e164Number,
+          InviteBy.SMS,
+          mockInviteDetails3.escrowAmount,
+          mockInviteDetails3.escrowCurrency
+        )
+      )
+      .dispatch(transactionConfirmed('a sha3 hash'))
+      .put(
+        transferStableToken({
+          recipientAddress: mockAccount,
+          amount: '0.25',
+          comment: SENTINEL_INVITE_COMMENT,
+          txId: 'a sha3 hash',
+        })
+      )
+      .put(
+        transferEscrowedPayment(
+          '0x4f1ab32ca80add38c067f020202592cd0a2a9fb7a01cd538e731871ed6547e1a',
+          new BigNumber(mockInviteDetails3.escrowAmount),
+          mockAccount,
+          'a sha3 hash'
+        )
+      )
+      .put(storeInviteeData(mockInviteDetails3))
       .run()
 
     expect(SendSMS.send).toHaveBeenCalled()
@@ -82,11 +108,35 @@ describe(watchSendInvite, () => {
       .provide([
         [call(waitWeb3LastBlock), true],
         [call(getConnectedUnlockedAccount), mockAccount],
+        [matchers.call.fn(waitForTransactionWithId), mockInviteDetails3.escrowTxId],
       ])
       .withState(state)
-      .dispatch(sendInvite(mockInviteDetails.e164Number, InviteBy.WhatsApp))
+      .dispatch(
+        sendInvite(
+          mockInviteDetails3.e164Number,
+          InviteBy.WhatsApp,
+          mockInviteDetails3.escrowAmount,
+          mockInviteDetails3.escrowCurrency
+        )
+      )
       .dispatch(transactionConfirmed('a sha3 hash'))
-      .put(storeInviteeData(mockInviteDetails))
+      .put(
+        transferStableToken({
+          recipientAddress: mockAccount,
+          amount: '0.25',
+          comment: SENTINEL_INVITE_COMMENT,
+          txId: 'a sha3 hash',
+        })
+      )
+      .put(
+        transferEscrowedPayment(
+          '0x4f1ab32ca80add38c067f020202592cd0a2a9fb7a01cd538e731871ed6547e1a',
+          new BigNumber(mockInviteDetails3.escrowAmount),
+          mockAccount,
+          'a sha3 hash'
+        )
+      )
+      .put(storeInviteeData(mockInviteDetails3))
       .run()
 
     expect(Linking.openURL).toHaveBeenCalled()

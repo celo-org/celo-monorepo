@@ -133,7 +133,7 @@ export async function sendSms(toPhone: string, msg: string) {
 export function* sendInvite(
   e164Number: string,
   inviteMode: InviteBy,
-  amount?: BigNumber,
+  amount?: BigNumber | string,
   currency?: CURRENCY_ENUM
 ) {
   yield call(getConnectedUnlockedAccount)
@@ -175,7 +175,9 @@ export function* sendInvite(
       escrowTxId = generateStandbyTransactionId(temporaryAddress + '-escrow')
       try {
         const phoneHash = getPhoneHash(e164Number)
-        yield put(transferEscrowedPayment(phoneHash, amount, temporaryAddress, escrowTxId))
+        yield put(
+          transferEscrowedPayment(phoneHash, new BigNumber(amount), temporaryAddress, escrowTxId)
+        )
         yield call(waitForTransactionWithId, escrowTxId)
         Logger.debug(TAG + '@sendInviteSaga', 'Escrowed money to new wallet')
       } catch (e) {
@@ -189,13 +191,13 @@ export function* sendInvite(
     // OPEN QUESTION - does storing invitee data only in the event of a successful transaction have
     // unintended consequences? Seems right to me but previous position was before the generateStandbyTransactionId call
     const inviteDetails: InviteDetails = {
-      timestamp: new BigNumber(Date.now()), // we probably want to read from the actual tx data for this
+      timestamp: '1587621489078', // we probably want to read from the actual tx data for this
       e164Number,
       tempWalletAddress: temporaryAddress,
       tempWalletPrivateKey: temporaryWalletAccount.privateKey, // what do we need this for?
       tempWalletRedeemed: false, // no logic in place to toggle this yet
       inviteCode,
-      escrowAmount: amount, // formatting is inconsistent with sentEscrowedPayments.amount
+      escrowAmount: amount ? amount.toString() : undefined, // formatting is inconsistent with sentEscrowedPayments.amount
       escrowCurrency: currency,
       escrowTxId, // the tx id we are saving is wrong (paymentId in sentEscrowedPayments is wrong too)
       escrowRedeemed: false, // no logic in place to toggle this yet

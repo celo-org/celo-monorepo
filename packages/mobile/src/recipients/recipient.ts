@@ -168,8 +168,6 @@ export function getRecipientFromAddress(
   address: string,
   invitees: InviteDetails[],
   recipientCache: NumberToRecipient,
-  // dont like adding these two optional params but it's either this or refactor addressToE164Number
-  // to have a similar structure to invitees which I dont understand the tradeoffs for at the moment
   type: TokenTransactionType,
   addressToE164Number: AddressToE164NumberType
 ) {

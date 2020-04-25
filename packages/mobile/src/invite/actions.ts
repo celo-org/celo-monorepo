@@ -17,13 +17,13 @@ export enum Actions {
 }
 
 export interface InviteDetails {
-  timestamp: BigNumber
+  timestamp: string
   e164Number: string
   tempWalletAddress: string
   tempWalletPrivateKey: string
   tempWalletRedeemed: boolean
   inviteCode: string
-  escrowAmount: BigNumber | undefined
+  escrowAmount: string | BigNumber | undefined
   escrowCurrency: CURRENCY_ENUM | undefined
   escrowTxId: string | undefined
   escrowRedeemed: boolean
@@ -48,14 +48,14 @@ export interface SendInviteAction {
   type: Actions.SEND_INVITE
   e164Number: string
   inviteMode: InviteBy
-  amount?: BigNumber
+  amount?: string | BigNumber
   currency?: CURRENCY_ENUM
 }
 
 export const sendInvite = (
   e164Number: string,
   inviteMode: InviteBy,
-  amount?: BigNumber,
+  amount?: string | BigNumber,
   currency?: CURRENCY_ENUM
 ): SendInviteAction => ({
   type: Actions.SEND_INVITE,
