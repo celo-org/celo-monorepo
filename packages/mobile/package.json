@@ -103,6 +103,7 @@
     "react-native-screens": "^1.0.0-alpha.23",
     "react-native-secure-key-store": "^2.0.5",
     "react-native-secure-randombytes": "^3.0.0",
+    "react-native-send-intent": "git+https://github.com/celo-org/react-native-send-intent#a0f4b00",
     "react-native-shadow": "^1.2.2",
     "react-native-share": "^2.0.0",
     "react-native-simple-toast": "^1.0.0",
