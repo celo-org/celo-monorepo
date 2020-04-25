@@ -23,7 +23,7 @@ describe('URI utils', () => {
 
   beforeAll(async () => {
     const stableTokenAddr = await kit.registry.addressFor(CeloContract.StableToken)
-    stableTokenTransferUri = `celo:${stableTokenAddr}/transfer(address,uint256)?0=${recipient}&1=${value}`
+    stableTokenTransferUri = `celo:${stableTokenAddr}/transfer(address,uint256)?args=[${recipient},${value}]`
     const stableToken = await kit.contracts.getStableToken()
     const transferData = stableToken.transfer(recipient, value).txo.encodeABI()
     stableTokenTransferTx = {

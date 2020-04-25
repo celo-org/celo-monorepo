@@ -5,19 +5,18 @@ import querystring from 'querystring'
 import { Tx } from 'web3-core'
 import abi from 'web3-eth-abi'
 
-// URI scheme mostly borrowed from https://github.com/ethereum/EIPs/blob/master/EIPS/eip-681.md
-
 // see https://solidity.readthedocs.io/en/v0.5.3/abi-spec.html#function-selector-and-argument-encoding
-const ABI_TYPE_REGEX = ',?(u?int(8|16|32|64|128|256)|address|bool|bytes(4|32)?|string)(\\[\\])?'
-const FUNCTION_REGEX = `(?<function>\\w+\\((?<inputTypes>(${ABI_TYPE_REGEX})*)\\))`
-
+const ABI_TYPE_REGEX = '(u?int(8|16|32|64|128|256)|address|bool|bytes(4|32)?|string)(\\[\\])?'
+const FUNCTION_REGEX = `(?<function>\\w+\\((?<inputTypes>(,?${ABI_TYPE_REGEX})*)\\))`
 const ADDRESS_REGEX_STR = '(?<address>0x[a-fA-F0-9]{40})'
 const CHAIN_ID_REGEX = '(?<chainId>\\d+)'
+const TX_PARAMS = ['feeCurrency', 'gas', 'gasPrice', 'value', 'gatewayFee', 'gatewayFeeRecipient']
+const PARAM_REGEX = `(${TX_PARAMS.join('|')})=\\w+`
+const ARGS_REGEX = 'args=\\[(,?\\w+)*\\]'
+const QUERY_REGEX = `(?<query>(&?(${PARAM_REGEX}|${ARGS_REGEX}))+)`
 
-const PARAM_REGEX = '&?(\\w+)=(\\w+)'
-const PARAMS_REGEX = `(?<params>(${PARAM_REGEX})+)`
-
-const URI_REGEX_STR = `^celo:${ADDRESS_REGEX_STR}(@${CHAIN_ID_REGEX})?(/${FUNCTION_REGEX})?(\\?${PARAMS_REGEX})?$`
+// URI scheme mostly borrowed from https://github.com/ethereum/EIPs/blob/master/EIPS/eip-681.md
+const URI_REGEX_STR = `^celo:${ADDRESS_REGEX_STR}(@${CHAIN_ID_REGEX})?(/${FUNCTION_REGEX})?(\\?${QUERY_REGEX})?$`
 
 const uriRegexp = new RegExp(URI_REGEX_STR)
 
@@ -36,8 +35,8 @@ export function parseUri(uri: string): Tx {
     tx.chainId = namedGroups.chainId
   }
 
-  if (namedGroups.params !== undefined) {
-    const queryParams = querystring.parse(namedGroups.params)
+  if (namedGroups.query !== undefined) {
+    const parsedQuery = querystring.parse(namedGroups.query)
 
     if (namedGroups.function !== undefined) {
       const functionSig = abi.encodeFunctionSignature(namedGroups.function)
@@ -45,19 +44,16 @@ export function parseUri(uri: string): Tx {
 
       if (namedGroups.inputTypes !== undefined) {
         const abiTypes = namedGroups.inputTypes.split(',')
-        // TODO(yorke): fix delete hacks
-        let args: string[] = []
-        range(0, abiTypes.length).forEach((idx) => {
-          args = args.concat(queryParams[idx])
-          delete queryParams[idx]
-        })
-        const callSig = abi.encodeParameters(abiTypes, args)
+        const rawArgs = (parsedQuery.args || '[]') as string
+        const builtArgs = rawArgs.slice(1, rawArgs.length - 1).split(',')
+        const callSig = abi.encodeParameters(abiTypes, builtArgs)
 
         tx.data += trimLeading0x(callSig)
       }
     }
 
-    tx = { ...tx, ...queryParams }
+    const { args, ...txParams } = parsedQuery
+    tx = { ...tx, ...txParams }
   }
 
   return tx
@@ -73,7 +69,7 @@ export function buildUri(tx: Tx, functionName?: string, abiTypes: string[] = [])
     uri += `@${tx.chainId}`
   }
 
-  let paramsAppended = false
+  let functionArgs: string[] | undefined
   if (tx.data !== undefined) {
     if (!functionName) {
       throw new Error("Cannot decode tx 'data' without 'functionName'")
@@ -93,20 +89,16 @@ export function buildUri(tx: Tx, functionName?: string, abiTypes: string[] = [])
     if (txData.length > 8) {
       const argsEncoded = txData.slice(8)
       const decoded = abi.decodeParameters(abiTypes, argsEncoded)
-
-      delete decoded.__length__
-
-      uri += `?${querystring.stringify({ ...decoded }).toLowerCase()}`
-      paramsAppended = true
+      functionArgs = range(0, decoded.__length__).map((idx) => decoded[idx].toLowerCase())
     }
-  }
-
-  if (!paramsAppended) {
-    uri += '?'
   }
 
   const { data, to, chainId, nonce, hardfork, common, chain, ...txQueryParams } = tx
 
+  uri += '?'
+  if (functionArgs) {
+    uri += `args=[${functionArgs.join(',')}]`
+  }
   uri += querystring.stringify({ ...txQueryParams })
 
   return uri
