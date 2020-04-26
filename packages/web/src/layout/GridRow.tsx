@@ -16,6 +16,7 @@ const gap = 20.0
 export enum Spans {
   fourth = 'fourth',
   third = 'third',
+  twoThird = 'twoThird',
   half = 'half',
   three4th = 'three4th',
   full = 'full',
@@ -82,6 +83,7 @@ export const cellStyle = StyleSheet.create({
   base: { padding: gap / 2, flexGrow: 0, flexShrink: 0 },
   fourth: { width: '25%' },
   third: { width: '33.333%' },
+  twoThird: { width: '66.666%' },
   half: { width: '50%' },
   three4th: { width: '75%' },
   full: { flexBasis: '100%', width: '100%' },

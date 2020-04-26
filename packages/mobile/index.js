@@ -32,4 +32,3 @@ const customErrorHandler = (e, isFatal) => {
 ErrorUtils.setGlobalHandler(customErrorHandler)
 
 AppRegistry.registerComponent('celo', () => App)
-AppRegistry.registerHeadlessTask('RNFirebaseBackgroundMessage', () => onBackgroundNotification)

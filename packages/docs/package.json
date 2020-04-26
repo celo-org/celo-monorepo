@@ -20,5 +20,5 @@
     "preview": "gitbook install && gitbook serve"
   },
   "author": "",
-  "license": "ISC"
+  "license": "Apache-2.0"
 }

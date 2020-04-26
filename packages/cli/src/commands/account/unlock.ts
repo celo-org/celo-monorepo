@@ -8,7 +8,7 @@ export default class Unlock extends BaseCommand {
   static description = 'Unlock an account address to send transactions or validate blocks'
 
   static flags = {
-    ...BaseCommand.flags,
+    ...BaseCommand.flagsWithoutLocalAddresses(),
     password: flags.string({ required: false }),
   }
 
@@ -20,6 +20,9 @@ export default class Unlock extends BaseCommand {
 
   async run() {
     const res = this.parse(Unlock)
+    if (res.flags.useLedger) {
+      console.log('Warning: account:unlock not implemented for Ledger')
+    }
     // Unlock until geth exits
     // Source: https://github.com/ethereum/go-ethereum/wiki/Management-APIs#personal_unlockaccount
     const unlockDurationInMs = 0
