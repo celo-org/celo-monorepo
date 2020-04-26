@@ -81,7 +81,7 @@ module "celo_cluster" {
   validator_signer_account_passwords = var.validator_signer_accounts["account_passwords"]
 
   proxy_private_keys = var.proxy_accounts["private_keys"]
-  proxy_address      = var.proxy_accounts["account_addresses"]
+  proxy_addresses    = var.proxy_accounts["account_addresses"]
   proxy_enodes       = var.proxy_accounts["enodes"]
   proxy_account_passwords = var.proxy_accounts["account_passwords"]
 

@@ -105,7 +105,7 @@ variable proxy_name {
   description = "The proxy Name for ethstats"
 }
 
-variable proxy_address {
+variable proxy_addresses {
   type        = list(string)
   description = "The proxy address for ethstats"
 }
