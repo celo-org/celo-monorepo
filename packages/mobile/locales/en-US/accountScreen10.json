@@ -48,5 +48,6 @@
   "contactUs": "Contact Us",
   "tellUsMore": "Tell us more",
   "attachLogs": "Attach logs",
-  "supportLegalCheckbox": "By submitting, I agree to share the above information and any attached application log data with Celo Support."
+  "supportLegalCheckbox": "By submitting, I agree to share the above information and any attached application log data with Celo Support.",
+  "contactSuccess": "Your issue has been successfully reported! Expect an email response soon!"
 }

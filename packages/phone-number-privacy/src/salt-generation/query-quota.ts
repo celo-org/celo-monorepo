@@ -8,13 +8,9 @@ export default class QueryQuota {
    * Returns how many queries the account can make based on the
    * calculated query quota and the number of queries already performed.
    */
-  async getRemainingQueryCount(account: string, phoneNumber: string) {
-    const queryQuota = await this.getQueryQuota(account, phoneNumber)
-    const performedQueryCount = await getPerformedQueryCount(account).catch((reason) => {
-      // TODO [amyslawson] think of failure case here
-      console.error(reason)
-      return 0
-    })
+  async getRemainingQueryCount(account: string, hashedPhoneNumber: string) {
+    const queryQuota = await this.getQueryQuota(account, hashedPhoneNumber)
+    const performedQueryCount = await getPerformedQueryCount(account)
     return queryQuota - performedQueryCount
   }
 
@@ -22,9 +18,10 @@ export default class QueryQuota {
    * Calculates how many queries the caller has unlocked based on the algorithm
    * unverifiedQueryCount + verifiedQueryCount + (queryPerTransaction * transactionCount)
    */
-  async getQueryQuota(account: string, phoneNumber: string) {
+  async getQueryQuota(account: string, hashedPhoneNumber: string) {
+    // TODO (amyslawson) check balance meets a minimum before granting any quota
     let queryQuota = config.salt.unverifiedQueryMax
-    if (await this.isVerified(account, phoneNumber)) {
+    if (await this.isVerified(account, hashedPhoneNumber)) {
       queryQuota += config.salt.additionalVerifiedQueryMax
       const transactionCount = await this.getTransactionCountFromAccount(account)
       queryQuota += config.salt.queryPerTransaction * transactionCount
@@ -32,9 +29,14 @@ export default class QueryQuota {
     return queryQuota
   }
 
-  async isVerified(account: string, phoneNumber: string): Promise<boolean> {
-    const attestationsWrapper: AttestationsWrapper = await ((await getContractKit()) as any).contracts.getAttestations()
-    const attestationStats = await attestationsWrapper.getAttestationStat(phoneNumber, account)
+  async isVerified(account: string, hashedPhoneNumber: string): Promise<boolean> {
+    // TODO (amyslawson) wrap forno request in retry
+    // TODO (aslawson) update to work with hashed phoneNumber
+    const attestationsWrapper: AttestationsWrapper = await getContractKit().contracts.getAttestations()
+    const attestationStats = await attestationsWrapper.getAttestationStat(
+      hashedPhoneNumber,
+      account
+    )
     const numAttestationsCompleted = attestationStats.completed
     const numAttestationsRemaining =
       config.attestations.numberAttestationsRequired - numAttestationsCompleted
@@ -42,6 +44,7 @@ export default class QueryQuota {
   }
 
   async getTransactionCountFromAccount(account: string): Promise<number> {
+    // TODO (amyslawson) wrap forno request in retry
     return getContractKit().web3.eth.getTransactionCount(account)
   }
 }

@@ -16,7 +16,6 @@ import { NameSpaces, useTranslation } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import { useScreenSize } from 'src/layout/ScreenSize'
 import BeautifulQuote from 'src/shared/BeautifulQuote'
-import ConnectionFooter from 'src/shared/ConnectionFooter'
 import menuItems from 'src/shared/menu-items'
 import { colors, standardStyles, textStyles } from 'src/styles'
 
@@ -88,7 +87,6 @@ export default function Main() {
       <ArticleData title={t('mediumArticlesTitle')} tagged={'alliance'} />
       <Benefits />
       <WheelWithForm />
-      <ConnectionFooter includeDividerLine={false} />
     </View>
   )
 }

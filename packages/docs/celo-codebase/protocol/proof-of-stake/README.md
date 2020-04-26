@@ -1,10 +1,12 @@
 # Proof of Stake
 
+{% youtube src="https://www.youtube.com/watch?v=3UIudzzCb8o" %}{% endyoutube %}
+
 Celo uses a Byzantine Fault Tolerant [consensus protocol](../consensus/README.md) to agree on new blocks to append to the blockchain. The instances of the Celo software that participate in this consensus protocol are known as **validators**. More accurately, they are **active validators** or **elected validators**, to distinguish them from **registered validators** which are configured to participate but are not actively selected.
 
 Celo's Proof of Stake mechanism is the set of processes that determine which nodes become active validators and how incentives are arranged to secure the network.
 
-The first set of active validators are determined in the genesis block. Thereafter at the end of every epoch, a fixed number of blocks fixed at network creation time,an election is run that may lead to validators being added or removed.
+The first set of active validators are determined in the genesis block. Thereafter at the end of every epoch, a fixed number of blocks fixed at network creation time, an election is run that may lead to validators being added or removed.
 
 ![](https://storage.googleapis.com/celo-website/docs/concepts.jpg)
 
