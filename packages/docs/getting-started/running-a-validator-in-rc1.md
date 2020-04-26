@@ -477,6 +477,12 @@ You can view information about your Validator Group by running the following com
 celocli validatorgroup:show $CELO_VALIDATOR_GROUP_RG_ADDRESS
 ```
 
+You will want to associate a human-friendly name with your Validator Group, by running the following command:
+```
+# On your local machine
+celocli releasegold:set-account --contract $CELO_VALIDATOR_GROUP_RG_ADDRESS --property name --value <GROUP_NAME>
+```
+
 ### Affiliate the Validator with the group
 
 Now that the Validator and the group are registered, you can affiliate the Validator with the group, indicating that Validator's desire to join the group.
