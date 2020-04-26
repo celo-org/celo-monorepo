@@ -105,8 +105,17 @@ variable proxy_name {
   description = "The proxy Name for ethstats"
 }
 
+variable proxy_address {
+  type        = list(string)
+  description = "The proxy address for ethstats"
+}
 variable proxy_max_peers {
   type        = number
   description = "Max number of peers to connect with"
   default     = 120
+}
+
+variable proxy_account_passwords {
+  type        = list(string)
+  description = "Array with the proxy account passwords"
 }

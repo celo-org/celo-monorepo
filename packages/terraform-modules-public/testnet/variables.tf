@@ -121,6 +121,11 @@ variable proxy_private_keys {
   description = "Array with the Proxy private keys"
 }
 
+variable proxy_account_passwords {
+  type        = list(string)
+  description = "Array with the proxy etherbase account passwords"
+}
+
 variable reset_geth_data {
   type        = bool
   description = "Specifies if the existing chain data should be removed while creating the instance"
@@ -231,4 +236,9 @@ variable validator_name {
 variable proxy_name {
   type        = string
   description = "The proxy Name for ethstats"
+}
+
+variable proxy_address {
+  type        = list(string)
+  description = "The proxy address for ethstats"
 }

@@ -101,6 +101,9 @@ variable proxy_accounts {
     enodes = [
       "f8...",
     ]
+    account_passwords = [
+      "secret2",
+    ]
   }
 }
 

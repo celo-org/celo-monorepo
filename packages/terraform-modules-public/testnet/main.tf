@@ -182,7 +182,9 @@ module "proxy" {
   reset_geth_data                       = var.reset_geth_data
 
   proxy_name                         = var.proxy_name
+  proxy_address                      = var.proxy_address
   proxy_private_keys                 = var.proxy_private_keys
+  proxy_account_passwords            = var.proxy_account_passwords
   validator_signer_account_addresses = var.validator_signer_account_addresses
   bootnodes_base64                   = base64encode(data.http.bootnodes.body)
 }

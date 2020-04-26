@@ -120,6 +120,8 @@ ExecStart=/usr/bin/docker run \\
     geth \\
       --password=$DATA_DIR/account/accountSecret \\
       --unlock=$ACCOUNT_ADDRESS \\
+      --allow-insecure-unlock \\
+      --nousb \\
       --mine \\
       --rpc \\
       --rpcaddr 0.0.0.0 \\
