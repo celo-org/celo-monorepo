@@ -19,7 +19,7 @@ export async function getRemainingQueryCount(account: string, hashedPhoneNumber:
  * Calculates how many queries the caller has unlocked based on the algorithm
  * unverifiedQueryCount + verifiedQueryCount + (queryPerTransaction * transactionCount)
  */
-export async function getQueryQuota(account: string, hashedPhoneNumber: string) {
+async function getQueryQuota(account: string, hashedPhoneNumber: string) {
   // TODO (amyslawson) check balance meets a minimum before granting any quota
   let queryQuota = config.salt.unverifiedQueryMax
   if (await isVerified(account, hashedPhoneNumber)) {
