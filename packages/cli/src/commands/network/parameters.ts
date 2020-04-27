@@ -6,7 +6,7 @@ export default class Parameters extends BaseCommand {
     'View parameters of the network, including but not limited to configuration for the various Celo core smart contracts.'
 
   static flags = {
-    ...BaseCommand.flags,
+    ...BaseCommand.flagsWithoutLocalAddresses(),
   }
 
   async run() {

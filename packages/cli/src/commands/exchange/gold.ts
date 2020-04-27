@@ -35,9 +35,12 @@ export default class ExchangeGold extends BaseCommand {
     const goldToken = await this.kit.contracts.getGoldToken()
     const exchange = await this.kit.contracts.getExchange()
 
-    await displaySendTx('approve', goldToken.approve(exchange.address, sellAmount.toFixed()))
+    await displaySendTx(
+      'increaseAllowance',
+      goldToken.increaseAllowance(exchange.address, sellAmount.toFixed())
+    )
 
-    const exchangeTx = await exchange.exchange(sellAmount.toFixed(), minBuyAmount!.toFixed(), true)
+    const exchangeTx = exchange.exchange(sellAmount.toFixed(), minBuyAmount!.toFixed(), true)
     // Set explicit gas based on github.com/celo-org/celo-monorepo/issues/2541
     await displaySendTx('exchange', exchangeTx, { gas: 300000 })
   }

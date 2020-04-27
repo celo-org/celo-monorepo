@@ -207,7 +207,6 @@ module "tx_node_lb" {
   dns_gcloud_project              = var.dns_gcloud_project
   dns_zone_name                   = var.dns_zone_name
   forno_host                      = var.forno_host
-  gcloud_credentials_path         = var.gcloud_credentials_path
   gcloud_project                  = var.gcloud_project
   gcloud_vm_service_account_email = var.gcloud_vm_service_account_email
   letsencrypt_email               = var.letsencrypt_email
