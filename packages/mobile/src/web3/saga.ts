@@ -113,11 +113,23 @@ export function* checkWeb3SyncProgress() {
 
 export function* waitForWeb3Sync() {
   try {
-    const { syncComplete, timeout } = yield race({
+    const { syncComplete, timeout, fornoSwitch } = yield race({
       syncComplete: call(checkWeb3SyncProgress),
       timeout: delay(SYNC_TIMEOUT),
-      fornoSwitch: take(Actions.SET_IS_FORNO),
+      fornoSwitch: take(Actions.TOGGLE_IS_FORNO),
     })
+    // TODO(anna) hitting timeout upon switch, want to catch using fornoSwitch instead
+    Logger.debug(
+      `${TAG}@waitForWeb3Sync`,
+      `syncComplete: ${syncComplete}, timeout: ${timeout}, fornoSwitch: ${fornoSwitch}`
+    )
+    if (fornoSwitch) {
+      Logger.debug(
+        `${TAG}@waitForWeb3Sync`,
+        'Switching providers, expected web3 sync failure occured'
+      )
+      return true
+    }
     if (timeout || !syncComplete) {
       Logger.error(TAG, 'Could not complete sync')
       navigateToError('web3FailedToSync')

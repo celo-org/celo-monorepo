@@ -44,7 +44,7 @@ export async function getContractKitOutsideGenerator() {
     // Must wait for contractKit to be Ready
   }
   */
-  Logger.debug(`${tag}@getContractKitOutsideGenerator`, 'getContractKitOutsideGenerator')
+  Logger.debug(`${tag}@getContractKitOutsideGenerator`, 'Store rehydrated, returning kit')
   return getContractKitBasedOnFornoInStore()
 }
 
@@ -71,7 +71,13 @@ export function* getContractKit() {
 }
 
 export function getContractKitBasedOnFornoInStore() {
-  return fornoSelector(store.getState()) ? contractKitForno : contractKitGeth
+  // Make sure contractKitReady
+  const forno = fornoSelector(store.getState())
+  Logger.debug(
+    `getContractKitBasedOnFornoInStore`,
+    `Returning kit for ${forno ? 'forno' : 'geth'} mode`
+  )
+  return forno ? contractKitForno : contractKitGeth
   // TODO(anna) make sure contractKitReady can be ignored
   /*
   const contractKitReady = contractKitReadySelector(store.getState())
