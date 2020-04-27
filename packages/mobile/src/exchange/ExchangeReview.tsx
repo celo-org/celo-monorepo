@@ -28,7 +28,6 @@ import { RootState } from 'src/redux/reducers'
 import { isAppConnected } from 'src/redux/selectors'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { getRateForMakerToken, getTakerAmount } from 'src/utils/currencyExchange'
-import Logger from 'src/utils/Logger'
 
 interface StateProps {
   exchangeRatePair: ExchangeRatePair | null
@@ -92,7 +91,6 @@ export class ExchangeReview extends React.Component<Props, State> {
       makerToken,
       makerAmount,
     })
-    Logger.debug('ExchangeReview@onPressConfirm', `navigating to homeScreen`)
     navigate(Screens.ExchangeHomeScreen)
   }
 
