@@ -189,7 +189,7 @@ Store and back these keys up in a secure manner, as there will be no way to reco
 {% hint style="danger" %}
 You are recommended to use Ledger to generate addresses securely. [Read more here.](../validator-guide/summary/ledger.md)
 
-Only use the following commands when a Ledger is not available.
+Only use the `account new` command to generate an address when a Ledger is not available.
 {% endhint %}
 
 ```bash
@@ -223,7 +223,7 @@ To run the node:
 
 ```bash
 # On your local machine
-docker run --name celo-accounts -it --restart always -p 127.0.0.1:8545:8545 -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin,personal --bootnodes $BOOTNODE_ENODES --gcmode=archive
+docker run --name celo-accounts -it --restart always -p 127.0.0.1:8545:8545 -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin,personal --bootnodes $BOOTNODE_ENODES
 ```
 
 {% hint style="danger" %}
