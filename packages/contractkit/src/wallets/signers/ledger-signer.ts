@@ -170,7 +170,7 @@ export class LedgerSigner implements Signer {
       if (tokenInfo) {
         await this.ledger!.provideERC20TokenInformation(tokenInfo)
       }
-      if (rlpEncoded.transaction.feeCurrency) {
+      if (rlpEncoded.transaction.feeCurrency && rlpEncoded.transaction.feeCurrency !== '0x') {
         const tokenInfo = tokenInfoByAddressAndChainId(
           rlpEncoded.transaction.feeCurrency!,
           rlpEncoded.transaction.chainId!
