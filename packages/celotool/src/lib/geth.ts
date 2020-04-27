@@ -1006,12 +1006,13 @@ export async function startGeth(
     throw new Error(`geth:${instance.name} failed to start! ${err}`)
   })
 
-  gethProcess.on('exit', (code: number, signal: string) => {
+  gethProcess.on('exit', (code: number) => {
     if (code === 0) {
       console.info(`geth:${instance.name} exited`)
     } else {
       console.error(`geth:${instance.name} exited with code ${code}`)
     }
+    instance.pid = undefined
   })
 
   // Give some time for geth to come up

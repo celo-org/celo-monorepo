@@ -25,7 +25,6 @@ import {
   resetDataDir,
   restoreDatadir,
   snapshotDatadir,
-  spawnWithLog,
   startGeth,
   writeGenesis,
 } from '../lib/geth'
@@ -118,17 +117,17 @@ export function assertAlmostEqual(
 
 type Signal = 'TERM' | 'KILL' | 'INT' | 'STOP' | 'CONT'
 
-export async function signalProcess(identifier: string | number, signal: Signal) {
-  if (typeof p === 'number') {
-    await spawnCmd('kill', ['-s', signal, identifier], { silent: true })
+export async function signalProcess(identifier: string | number, signal: Signal): Promise<void> {
+  if (typeof identifier === 'number') {
+    await spawnCmd('kill', ['-s', signal, identifier.toString()], { silent: true })
   } else {
     await spawnCmd('pkill', ['-signal', signal, identifier], { silent: true })
   }
 }
 
-export async function processIsRunning(identifier: string | number): boolean {
-  if (typeof p === 'number') {
-    return (await spawnCmd('kill', ['-0', identifier], { silent: true })) === 0
+export async function processIsRunning(identifier: string | number): Promise<boolean> {
+  if (typeof identifier === 'number') {
+    return (await spawnCmd('kill', ['-0', identifier.toString()], { silent: true })) === 0
   } else {
     return (await spawnCmd('pgrep', [identifier], { silent: true })) === 0
   }
