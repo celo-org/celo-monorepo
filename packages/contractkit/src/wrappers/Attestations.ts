@@ -68,7 +68,10 @@ export interface UnselectedRequest {
 }
 
 // Map of identifier -> (Map of address -> AttestationStat)
-export type IdentifierLookupResult = Record<string, Record<Address, AttestationStat>>
+export type IdentifierLookupResult = Record<
+  string,
+  Record<Address, AttestationStat | undefined> | undefined
+>
 
 interface GetCompletableAttestationsResponse {
   0: string[]

@@ -2,6 +2,7 @@ import {
   AttestationsWrapper,
   IdentifierLookupResult,
 } from '@celo/contractkit/lib/wrappers/Attestations'
+import { isValidAddress } from '@celo/utils/src/address'
 import BigNumber from 'bignumber.js'
 import { MinimalContact } from 'react-native-contacts'
 import { call, put, select } from 'redux-saga/effects'
@@ -143,14 +144,14 @@ function* getAddresses(e164Number: string, attestationsWrapper: AttestationsWrap
     return null
   }
 
-  const addresses = Object.keys(results[phoneHash])
-    .filter(isValidAddress)
+  const addresses = Object.keys(results[phoneHash]!)
+    .filter(isValidNon0Address)
     .map((a) => a.toLowerCase())
   return addresses.length ? addresses : null
 }
 
-const isValidAddress = (address: string) =>
-  typeof address === 'string' && address.length && !new BigNumber(address).isZero()
+const isValidNon0Address = (address: string) =>
+  typeof address === 'string' && isValidAddress(address) && !new BigNumber(address).isZero()
 
 export function getAddressFromPhoneNumber(
   e164Number: string,
