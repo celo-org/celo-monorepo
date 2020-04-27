@@ -327,6 +327,23 @@ OPTIONS
 
 _See code: [packages/cli/src/commands/account/list.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/list.ts)_
 
+### Lock
+
+Lock an account which was previously unlocked
+
+```
+USAGE
+  $ celocli account:lock ACCOUNT
+
+ARGUMENTS
+  ACCOUNT  Account address
+
+EXAMPLE
+  lock 0x5409ed021d9299bf6814279a6a1411a7e866a631
+```
+
+_See code: [packages/cli/src/commands/account/lock.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/lock.ts)_
+
 ### New
 
 Creates a new account locally using the Celo Derivation Path (m/44'/52752'/0/0/indexAddress) and print out the key information. Save this information for local transaction signing or import into a Celo node. Ledger: this command has been tested swapping mnemonics with the Ledger successfully (only supports english)
@@ -575,10 +592,12 @@ ARGUMENTS
   ACCOUNT  Account address
 
 OPTIONS
-  --password=password
+  --duration=duration  Duration in seconds to leave the account unlocked. Unlocks until the node exits by default.
+  --password=password  Password used to unlock the account. If not specified, you will be prompted for a password.
 
-EXAMPLE
+EXAMPLES
   unlock 0x5409ed021d9299bf6814279a6a1411a7e866a631
+  unlock 0x5409ed021d9299bf6814279a6a1411a7e866a631 --duration 600
 ```
 
 _See code: [packages/cli/src/commands/account/unlock.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/unlock.ts)_
