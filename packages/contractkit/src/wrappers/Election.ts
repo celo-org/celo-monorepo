@@ -9,6 +9,7 @@ import { Election } from '../generated/Election'
 import {
   BaseWrapper,
   CeloTransactionObject,
+  fixidityValueToBigNumber,
   identity,
   proxyCall,
   proxySend,
@@ -84,7 +85,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
   electabilityThreshold = proxyCall(
     this.contract.methods.getElectabilityThreshold,
     undefined,
-    valueToBigNumber
+    fixidityValueToBigNumber
   )
 
   /**
@@ -291,7 +292,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
       electabilityThreshold: res[1],
       maxNumGroupsVotedFor: valueToBigNumber(res[2]),
       totalVotes: res[3],
-      currentThreshold: res[3].dividedBy(res[1]),
+      currentThreshold: res[3].multipliedBy(res[1]),
     }
   }
 

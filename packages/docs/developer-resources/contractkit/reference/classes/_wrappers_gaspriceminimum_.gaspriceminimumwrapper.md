@@ -53,7 +53,7 @@ Name | Type |
 
 ###  adjustmentSpeed
 
-• **adjustmentSpeed**: *function* = proxyCall(this.contract.methods.adjustmentSpeed, undefined, valueToBigNumber)
+• **adjustmentSpeed**: *function* = proxyCall(this.contract.methods.adjustmentSpeed, undefined, fixidityValueToBigNumber)
 
 *Defined in [contractkit/src/wrappers/GasPriceMinimum.ts:40](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/GasPriceMinimum.ts#L40)*
 
@@ -133,7 +133,7 @@ ___
 
 ###  targetDensity
 
-• **targetDensity**: *function* = proxyCall(this.contract.methods.targetDensity, undefined, valueToBigNumber)
+• **targetDensity**: *function* = proxyCall(this.contract.methods.targetDensity, undefined, fixidityValueToBigNumber)
 
 *Defined in [contractkit/src/wrappers/GasPriceMinimum.ts:35](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/GasPriceMinimum.ts#L35)*
 
