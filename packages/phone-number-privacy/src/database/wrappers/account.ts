@@ -44,7 +44,7 @@ export async function incrementQueryCount(account: string) {
     } else {
       const newAccount = new Account(account)
       newAccount[ACCOUNTS_COLUMNS.numLookups] = 1
-      return updateRecord(newAccount)
+      return insertRecord(newAccount)
     }
   } catch (e) {
     logger.error(ErrorMessages.DATABASE_UPDATE_FAILURE, e)
@@ -85,7 +85,7 @@ export async function setDidMatchmaking(account: string) {
     } else {
       const newAccount = new Account(account)
       newAccount[ACCOUNTS_COLUMNS.didMatchmaking] = new Date()
-      return updateRecord(newAccount)
+      return insertRecord(newAccount)
     }
   } catch (e) {
     logger.error(ErrorMessages.DATABASE_UPDATE_FAILURE, e)
@@ -93,7 +93,7 @@ export async function setDidMatchmaking(account: string) {
   }
 }
 
-async function updateRecord(data: Account) {
+async function insertRecord(data: Account) {
   try {
     await accounts()
       .insert(data)
