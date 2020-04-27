@@ -46,9 +46,10 @@ export class LedgerSigner implements Signer {
     encodedTx: RLPEncodedTx
   ): Promise<{ v: number; r: Buffer; s: Buffer }> {
     try {
+      const validatedDerivationPath = await this.getValidatedDerivationPath()
       await this.checkForKnownToken(encodedTx)
       const signature = await this.ledger!.signTransaction(
-        await this.getValidatedDerivationPath(),
+        validatedDerivationPath,
         trimLeading0x(encodedTx.rlpEncode) // the ledger requires the rlpEncode without the leading 0x
       )
       // EIP155 support. check/recalc signature v value.
@@ -168,6 +169,15 @@ export class LedgerSigner implements Signer {
       )
       if (tokenInfo) {
         await this.ledger!.provideERC20TokenInformation(tokenInfo)
+      }
+      if (rlpEncoded.transaction.feeCurrency) {
+        const tokenInfo = tokenInfoByAddressAndChainId(
+          rlpEncoded.transaction.feeCurrency!,
+          rlpEncoded.transaction.chainId!
+        )
+        if (tokenInfo) {
+          await this.ledger!.provideERC20TokenInformation(tokenInfo)
+        }
       }
     }
   }
