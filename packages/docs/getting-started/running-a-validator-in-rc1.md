@@ -16,6 +16,16 @@ Additionally, Validators are expected to run an [Attestation Service](https://gi
 
 ## Prerequisites
 
+### Staking Requirements
+
+Celo uses a [proof-of-stake](../celo-codebase/protocol/proof-of-stake) consensus mechanism, which requires Validators to have locked Celo Gold to participate in block production. The current requirement is 10,000 cGLD to register a Validator, and 10,000 cGLD _per member validator_ to register a Validator Group.
+
+If you do not have the required Celo Gold to lock up, you can try out of the process of creating a validator on the Baklava network by following the [Running a Validator in Baklava guide](running-a-validator-in-baklava.md)
+
+We will not discuss obtaining Celo Gold here, but it is a prerequisite that you obtain the required Celo Gold, and it is assumed in this guide that your gold is held in two `ReleaseGold` contracts, one for the Validator and one for the Validator Group. If that is not the case, the provided commands will need to be adjusted, but the guide will still provide the required steps.
+
+At a high level, `ReleaseGold` holds a balance for scheduled release, while allowing the held balance to be used for certain actions such as validating and voting, depending on the configuration of the contract. [Read more about `ReleaseGold`.](../celo-codebase/protocol/release-gold.md)
+
 ### Hardware requirements
 
 The recommended Celo Validator setup involves continually running three instances:
@@ -153,13 +163,13 @@ The setup of RC1 is similar to the new Baklava network and the deployment timeli
 A [timeline](https://forum.celo.org/t/release-candidate-1-rc1-timeline-and-details/428) of the Release Candidate 1 is available to provide further context.
 {% endhint %}
 
-## Instructions Before Producing Blocks
+## Validator Node Setup
 
-This section outlines the steps needed to configure your Proxy and Validator nodes before you can start producing blocks.
+This section outlines the steps needed to configure your Proxy and Validator nodes so that they are ready to sign blocks once elected.
 
 ### Environment Variables
 
-First we are going to set up the main environment variables related to the RC1 network. Run these on all machines:
+First we are going to set up the main environment variables related to the RC1 network. Run these on both your **Validator** and **Proxy** machines:
 
 ```bash
 export CELO_IMAGE=us.gcr.io/celo-testnet/celo-node:rc1
@@ -168,46 +178,13 @@ export NETWORK_ID=42220
 
 ### Pull the Celo Docker image
 
-In all the commands we are going to see the `CELO_IMAGE` variable to refer to the Docker image to use. Now we can get the Docker image on all machines:
+In all the commands we are going to see the `CELO_IMAGE` variable to refer to the Docker image to use. Now we can get the Docker image on your Validator and Proxy machines:
 
 ```bash
 docker pull $CELO_IMAGE
 ```
 
 The `us.gcr.io/celo-testnet/celo-node:rc1` image contains the [genesis block](https://github.com/celo-org/celo-monorepo/blob/asaj/rc1/packages/celotool/genesis_rc1.json) in addition to the Celo Blockchain binary.
-
-### Create the Validator and Validator Group accounts
-
-First, you'll need to generate account keys for your Validator and Validator Group.
-
-{% hint style="danger" %}
-These keys will become the beneficiary addresses of your `ReleaseGold` contracts, and thus should be handled with care.
-
-Store and back these keys up in a secure manner, as there will be no way to recover if them if lost or stolen.
-{% endhint %}
-
-{% hint style="danger" %}
-You are recommended to use Ledger to generate addresses securely. [Read more here.](../validator-guide/summary/ledger.md)
-
-Only use the `account new` command to generate an address when a Ledger is not available.
-{% endhint %}
-
-```bash
-# On your local machine
-mkdir celo-accounts-node
-cd celo-accounts-node
-docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE account new
-docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE account new
-```
-
-This will create a new keystore in the current directory with two new accounts.
-Copy the addresses from the terminal and set the following environment variables:
-
-```bash
-# On your local machine
-export CELO_VALIDATOR_GROUP_ADDRESS=<YOUR-VALIDATOR-GROUP-ADDRESS>
-export CELO_VALIDATOR_ADDRESS=<YOUR-VALIDATOR-ADDRESS>
-```
 
 ### Start your Accounts node
 
@@ -223,6 +200,8 @@ To run the node:
 
 ```bash
 # On your local machine
+mkdir celo-accounts-node
+cd celo-accounts-node
 docker run --name celo-accounts -it --restart always -p 127.0.0.1:8545:8545 -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin,personal --bootnodes $BOOTNODE_ENODES
 ```
 
@@ -230,52 +209,6 @@ docker run --name celo-accounts -it --restart always -p 127.0.0.1:8545:8545 -v $
 **Security**: The command line above includes the parameter `--rpcaddr 0.0.0.0` which makes the Celo Blockchain software listen for incoming RPC requests on all network adaptors. Exercise extreme caution in doing this when running outside Docker, as it means that any unlocked accounts and their funds may be accessed from other machines on the Internet. In the context of running a Docker container on your local machine, this together with the `docker -p 127.0.0.1:localport:containerport` flags allows you to make RPC calls from outside the container, i.e from your local host, but not from outside your machine. Read more about [Docker Networking](https://docs.docker.com/network/network-tutorial-standalone/#use-user-defined-bridge-networks) here.
 {% endhint %}
 
-### Deploy a Validator
-
-To actually register as a validator, we'll need to generate a validator signer key. On your Validator machine (which should not be accessible from the public internet), follow very similar steps:
-
-```bash
-# On the validator machine
-mkdir celo-validator-node
-cd celo-validator-node
-docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE account new
-export CELO_VALIDATOR_SIGNER_ADDRESS=<YOUR-VALIDATOR-SIGNER-ADDRESS>
-```
-
-In order to authorize our validator signer key, we need to create a proof-of-possession. We do so by signing a message that consists of the Validator account address with the validator signer private key. To generate the proof-of-possession, run the following command:
-
-```bash
-# On the validator machine
-# Note that you have to export CELO_VALIDATOR_ADDRESS on this machine
-export CELO_VALIDATOR_ADDRESS=<CELO-VALIDATOR-ADDRESS>
-docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE account proof-of-possession $CELO_VALIDATOR_SIGNER_ADDRESS $CELO_VALIDATOR_ADDRESS
-```
-
-Save the signer address, public key, and proof-of-possession signature to your local machine:
-
-```bash
-# On your local machine
-export CELO_VALIDATOR_SIGNER_ADDRESS=<YOUR-VALIDATOR-SIGNER-ADDRESS>
-export CELO_VALIDATOR_SIGNER_SIGNATURE=<YOUR-VALIDATOR-SIGNER-SIGNATURE>
-export CELO_VALIDATOR_SIGNER_PUBLIC_KEY=<YOUR-VALIDATOR-SIGNER-PUBLIC-KEY>
-```
-
-Validators on the Celo network use BLS aggregated signatures to create blocks in addition to the Validator signer (ECDSA) key. While an independent BLS key can be specified, the simplest thing to do is to derive the BLS key from the Validator signer key. When we register our Validator, we'll need to prove possession of the BLS key as well, which can be done by running the following command:
-
-```bash
-# On the validator machine
-docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE account proof-of-possession $CELO_VALIDATOR_SIGNER_ADDRESS $CELO_VALIDATOR_ADDRESS --bls
-```
-
-Save the resulting signature and public key to your local machine:
-
-```bash
-# On your local machine
-export CELO_VALIDATOR_SIGNER_BLS_SIGNATURE=<YOUR-VALIDATOR-SIGNER-SIGNATURE>
-export CELO_VALIDATOR_SIGNER_BLS_PUBLIC_KEY=<YOUR-VALIDATOR-SIGNER-BLS-PUBLIC-KEY>
-```
-
-We'll get back to this machine later, but for now, let's give it a proxy.
 
 ### Deploy a proxy
 
@@ -346,7 +279,17 @@ You will also need to export `PROXY_EXTERNAL_IP` on your local machine.
 export PROXY_EXTERNAL_IP=<PROXY-MACHINE-EXTERNAL-IP-ADDRESS>
 ```
 
-### Connect the Validator to the proxy
+### Deploy a Validator Machine
+
+To operate as a validator, you'll need to generate a validator signer key. On your Validator machine (which should not be accessible from the public internet), follow very similar steps:
+
+```bash
+# On the validator machine
+mkdir celo-validator-node
+cd celo-validator-node
+docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE account new
+export CELO_VALIDATOR_SIGNER_ADDRESS=<YOUR-VALIDATOR-SIGNER-ADDRESS>
+```
 
 When your Validator starts up it will attempt to create a network connection with the proxy machine. You will need to make sure that your proxy machine has the appropriate firewall settings to allow the Validator to connect to it.
 
@@ -378,21 +321,11 @@ The `networkid` parameter value of `42220` indicates we are connecting to the Ma
 
 At this point your proxy should be peering with other nodes as they come online. Your Validator will not automatically peer with the proxy until block production starts after the genesis timestamp, so it will not have any peers at this moment. You should see a `Mining too far in the future` log message from the Validator, which indicates it is waiting for the genesis timestamp to pass. On April 22nd at 16:00 UTC, the Validator consensus engine will start, and after a few minutes to establish the Validator overlay network, block production will begin.
 
-## After Block Production Begins
+## Registering as a Validator
 
-In the days following block production, core contracts and  `ReleaseGold` contracts will be deployed, and the community will vote on a series of governance proposals to establish full network functionality, at which point RC1 will be declared Mainnet.
+In order to operate as a Validator, you must register on-chain and be elected. Elections will run on each epoch boundary, approximatly every 24 hours, after elections have been unfrozen by on-chain governance. Eligible validator groups will be considered in an Election mechanism that will select Validator based on the [D'Hondt method](https://en.wikipedia.org/wiki/D%27Hondt_method).
 
-If you were a Celo Stake Off winner, you should have received an award for cGLD. `ReleaseGold` contracts will have been deployed at this point, with each beneficiary address you provided in the RC1 Gist corresponding to a single `ReleaseGold` contract. At a high level, `ReleaseGold` holds a balance for scheduled release, while allowing the held balance to be used for certain actions such as validating and voting, depending on the configuration of the contract. [Read more about `ReleaseGold`.](../celo-codebase/protocol/release-gold.md)
-
-### Core Contract Deployment
-
-Much of the functionality of the Celo protocol is implemented in smart contracts. At the start of block production, core features such as Validator elections, will not be operational. In order to bring the network into its fully operational state, a deployer encoded in the genesis block will create the core contracts and finally transfer ownership of the contracts to the Governance contract. In the RC1 network, cLabs will play the role of deployer.
-
-Contract deployment will begin shortly after block production, and may take several hours to complete. On the RC1 network, the deployer address is `0xE23a4c6615669526Ab58E9c37088bee4eD2b2dEE` and one way to track progress of the deployment is to watch the transactions submitted by that address on [Blockscout](https://explorer.celo.org/).
-
-### Actions Required After Core Contract Deployment
-
-Once core contracts have been deployed, you will be able to register your Validator and stand for election. Elections will run on each epoch boundary (e.g. every 24 hours in RC1) after a minimum number of validators are registered and have votes and after elections have been unfrozen by on-chain governance.
+In the following steps, this guide will assume your Celo Gold is held in a `ReleaseGold` contract, if this is not the case, the commands will need to be adjusted. At a high level, `ReleaseGold` holds a balance for scheduled release, while allowing the held balance to be used for certain actions such as validating and voting, depending on the configuration of the contract. [Read more about `ReleaseGold`.](../celo-codebase/protocol/release-gold.md)
 
 **Once elections are running, the genesis validators will be replaced by the elected validators, so it is important to register and vote even if you are in the genesis set.**
 
@@ -404,11 +337,11 @@ The following sections outline the actions you will need to take. On a high leve
 - Add the registered Validator to the Validator Group
 - Vote for the group with funds from each `ReleaseGold` contract
 
-We will need to use 7 keys, so let's have [a refresher on key management](../operations-manual/key-management/summary.md).
+We will need to use 7 keys, so it would be wise to review our recomendations on [key management](../operations-manual/key-management/summary.md).
 
 ### Create Accounts from the `ReleaseGold` contracts
 
-In order to participate on the network (lock gold, vote, validate) from a `ReleaseGold` contract, we need to create a Locked Gold Account with the address of the `ReleaseGold` contract. In the RC1 network, you can look up your Beneficiary address(es) in a mapping that will be published soon to find your corresponding `ReleaseGold` contract addresses. If you submitted a Gist for RC1 with your beneficiary addresses, you should find a `ReleaseGold` contract for each beneficiary address, one for each split of your total award.
+In order to participate on the network (lock gold, vote, validate) from a `ReleaseGold` contract, we need to create a Locked Gold Account with the address of the `ReleaseGold` contract.
 
 ```bash
 # On your local machine
@@ -462,8 +395,6 @@ celocli lockedgold:show $CELO_VALIDATOR_RG_ADDRESS
 ### Register as a Validator
 
 In order to perform Validator actions with the Account created in the previous step, you will need to authorize a [Validator signer](../operations-manual/key-management/detailed.md#authorized-validator-signers) for the `ReleaseGold` contract account.
-
-If you were part of the genesis validator set, you will have already generated this key and submitted it via Gist. Note that if you are planning to run more than one validator, each validator will need a distinct validator signer.
 
 ```bash
 # On the Validator machine
@@ -809,7 +740,7 @@ sudo -u postgres psql -c "ALTER USER postgres PASSWORD '<DATABASE_PASSWORD>';"
 export DATABASE_URL="postgres://postgres:<DATABASE_PASSWORD>@localhost:5432/attestation-service"
 ```
 
-## Executing the Attestation Service
+## Running the Attestation Service
 
 The following command for running the Attestation Service is using Twilio and uses `--network host` to access a local database (only works on Linux):
 
@@ -818,7 +749,7 @@ The following command for running the Attestation Service is using Twilio and us
 docker run --name celo-attestation-service -it --restart always --entrypoint /bin/bash --network host -e ATTESTATION_SIGNER_ADDRESS=0x$CELO_ATTESTATION_SIGNER_ADDRESS -e CELO_VALIDATOR_ADDRESS=0x$CELO_VALIDATOR_RG_ADDRESS -e CELO_PROVIDER=$CELO_PROVIDER -e DATABASE_URL=$DATABASE_URL -e SMS_PROVIDERS=twilio -e TWILIO_MESSAGING_SERVICE_SID=$TWILIO_MESSAGING_SERVICE_SID -e TWILIO_ACCOUNT_SID=$TWILIO_ACCOUNT_SID -e TWILIO_BLACKLIST=$TWILIO_BLACKLIST -e TWILIO_AUTH_TOKEN=$TWILIO_AUTH_TOKEN -e PORT=80 -p 80:80 $CELO_IMAGE_ATTESTATION -c " cd /celo-monorepo/packages/attestation-service && yarn run db:migrate && yarn start "
 ```
 
-## Registering Metadata
+### Registering Metadata
 
 Celo uses [Metadata](../celo-codebase/protocol/identity/metadata) to allow accounts to make certain claims without having to do so on-chain. Users can use any authorized signer address to make claims on behalf of the Locked Gold Account. For convenience this guide uses the `CELO_ATTESTATION_SIGNER_ADDRESS`, but any authorized signer will work. To complete the metadata process, we have to claim which URL users can request attestations from.
 
