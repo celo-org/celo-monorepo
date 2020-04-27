@@ -534,17 +534,17 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
    * Retrieves ValidatorRewards for epochNumber.
    * @param epochNumber The epoch to retrieve ValidatorRewards at.
    */
-  async getValidatorRewards(epochNumber: number, archive?: boolean): Promise<ValidatorReward[]> {
+  async getValidatorRewards(epochNumber: number): Promise<ValidatorReward[]> {
     const blockNumber = await this.kit.getLastBlockNumberForEpoch(epochNumber)
     const events = await this.getPastEvents('ValidatorEpochPaymentDistributed', {
       fromBlock: blockNumber,
       toBlock: blockNumber,
     })
     const validator: Validator[] = await concurrentMap(10, events, (e: EventLog) =>
-      this.getValidator(e.returnValues.validator, archive ? blockNumber : undefined)
+      this.getValidator(e.returnValues.validator)
     )
     const validatorGroup: ValidatorGroup[] = await concurrentMap(10, events, (e: EventLog) =>
-      this.getValidatorGroup(e.returnValues.group, false, archive ? blockNumber : undefined)
+      this.getValidatorGroup(e.returnValues.group, false)
     )
     return events.map(
       (e: EventLog, index: number): ValidatorReward => ({

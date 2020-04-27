@@ -13,8 +13,8 @@ USAGE
   $ celocli rewards:show
 
 OPTIONS
-  --archive                                               Use archival state
   --epochs=epochs                                         [default: 1] Show results for the last N epochs
+  --estimate                                              Estimate voter rewards from current state
   --group=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d      Validator Group to show rewards for
   --slashing                                              Show rewards for slashing
   --validator=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  Validator to show rewards for

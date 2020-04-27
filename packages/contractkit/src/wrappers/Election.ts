@@ -448,7 +448,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
    * Retrieves GroupVoterRewards at epochNumber.
    * @param epochNumber The epoch to retrieve GroupVoterRewards at.
    */
-  async getGroupVoterRewards(epochNumber: number, archive?: boolean): Promise<GroupVoterReward[]> {
+  async getGroupVoterRewards(epochNumber: number): Promise<GroupVoterReward[]> {
     const blockNumber = await this.kit.getLastBlockNumberForEpoch(epochNumber)
     const events = await this.getPastEvents('EpochRewardsDistributedToVoters', {
       fromBlock: blockNumber,
@@ -456,7 +456,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     })
     const validators = await this.kit.contracts.getValidators()
     const validatorGroup: ValidatorGroup[] = await concurrentMap(10, events, (e: EventLog) =>
-      validators.getValidatorGroup(e.returnValues.group, false, archive ? blockNumber : undefined)
+      validators.getValidatorGroup(e.returnValues.group, false)
     )
     return events.map(
       (e: EventLog, index: number): GroupVoterReward => ({
@@ -475,10 +475,10 @@ export class ElectionWrapper extends BaseWrapper<Election> {
   async getVoterRewards(
     address: Address,
     epochNumber: number,
-    archive?: boolean
+    estimate?: boolean
   ): Promise<VoterReward[]> {
     const blockNumber = await this.kit.getLastBlockNumberForEpoch(epochNumber)
-    const voter = await this.getVoter(address, archive ? blockNumber : undefined)
+    const voter = await this.getVoter(address, estimate ? undefined : blockNumber)
     const activeVoterVotes: Record<string, BigNumber> = {}
     for (const vote of voter.votes) {
       const group: string = normalizeAddress(vote.group)
@@ -487,7 +487,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     const activeGroupVotes: Record<string, BigNumber> = await concurrentValuesMap(
       10,
       activeVoterVotes,
-      (_, group: string) => this.getTotalVotesForGroup(group, archive ? blockNumber : undefined)
+      (_, group: string) => this.getTotalVotesForGroup(group, estimate ? undefined : blockNumber)
     )
 
     const groupVoterRewards = await this.getGroupVoterRewards(epochNumber)

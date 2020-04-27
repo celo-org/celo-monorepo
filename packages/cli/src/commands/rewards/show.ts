@@ -24,7 +24,7 @@ export default class Show extends BaseCommand {
 
   static flags = {
     ...BaseCommand.flagsWithoutLocalAddresses(),
-    archive: flags.boolean({ description: 'Use archival state' }),
+    estimate: flags.boolean({ description: 'Estimate voter rewards from current state' }),
     voter: Flags.address({ description: 'Voter to show rewards for' }),
     validator: Flags.address({ description: 'Validator to show rewards for' }),
     group: Flags.address({ description: 'Validator Group to show rewards for' }),
@@ -80,10 +80,7 @@ export default class Show extends BaseCommand {
       if (!filter || res.flags.voter) {
         const electedValidators = await election.getElectedValidators(epochNumber)
         if (!filter) {
-          const epochGroupVoterRewards = await election.getGroupVoterRewards(
-            epochNumber,
-            res.flags.archive
-          )
+          const epochGroupVoterRewards = await election.getGroupVoterRewards(epochNumber)
           groupVoterRewards = groupVoterRewards.concat(
             epochGroupVoterRewards.map(
               (e: GroupVoterReward): ExplainedGroupVoterReward => ({
@@ -97,7 +94,7 @@ export default class Show extends BaseCommand {
           const epochVoterRewards = await election.getVoterRewards(
             address,
             epochNumber,
-            res.flags.archive
+            res.flags.estimate
           )
           voterRewards = voterRewards.concat(
             epochVoterRewards.map(
@@ -112,8 +109,7 @@ export default class Show extends BaseCommand {
 
       if (!filter || res.flags.validator || res.flags.group) {
         const epochValidatorRewards: ValidatorReward[] = await validators.getValidatorRewards(
-          epochNumber,
-          res.flags.archive
+          epochNumber
         )
 
         if (!filter || res.flags.validator) {

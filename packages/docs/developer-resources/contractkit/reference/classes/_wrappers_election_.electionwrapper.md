@@ -464,7 +464,7 @@ ___
 
 ###  getGroupVoterRewards
 
-▸ **getGroupVoterRewards**(`epochNumber`: number, `archive?`: undefined | false | true): *Promise‹[GroupVoterReward](../interfaces/_wrappers_election_.groupvoterreward.md)[]›*
+▸ **getGroupVoterRewards**(`epochNumber`: number): *Promise‹[GroupVoterReward](../interfaces/_wrappers_election_.groupvoterreward.md)[]›*
 
 *Defined in [contractkit/src/wrappers/Election.ts:451](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L451)*
 
@@ -475,7 +475,6 @@ Retrieves GroupVoterRewards at epochNumber.
 Name | Type | Description |
 ------ | ------ | ------ |
 `epochNumber` | number | The epoch to retrieve GroupVoterRewards at.  |
-`archive?` | undefined &#124; false &#124; true | - |
 
 **Returns:** *Promise‹[GroupVoterReward](../interfaces/_wrappers_election_.groupvoterreward.md)[]›*
 
@@ -569,7 +568,7 @@ ___
 
 ###  getVoterRewards
 
-▸ **getVoterRewards**(`address`: [Address](../modules/_base_.md#address), `epochNumber`: number, `archive?`: undefined | false | true): *Promise‹[VoterReward](../interfaces/_wrappers_election_.voterreward.md)[]›*
+▸ **getVoterRewards**(`address`: [Address](../modules/_base_.md#address), `epochNumber`: number, `estimate?`: undefined | false | true): *Promise‹[VoterReward](../interfaces/_wrappers_election_.voterreward.md)[]›*
 
 *Defined in [contractkit/src/wrappers/Election.ts:475](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L475)*
 
@@ -581,7 +580,7 @@ Name | Type | Description |
 ------ | ------ | ------ |
 `address` | [Address](../modules/_base_.md#address) | The address to retrieve VoterRewards for. |
 `epochNumber` | number | The epoch to retrieve VoterRewards at.  |
-`archive?` | undefined &#124; false &#124; true | - |
+`estimate?` | undefined &#124; false &#124; true | - |
 
 **Returns:** *Promise‹[VoterReward](../interfaces/_wrappers_election_.voterreward.md)[]›*
 
