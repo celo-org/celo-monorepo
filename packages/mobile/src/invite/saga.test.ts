@@ -1,6 +1,6 @@
 import BigNumber from 'bignumber.js'
 import { Linking } from 'react-native'
-import SendSMS from 'react-native-sms'
+import SendIntentAndroid from 'react-native-send-intent'
 import { expectSaga } from 'redux-saga-test-plan'
 import * as matchers from 'redux-saga-test-plan/matchers'
 import { throwError } from 'redux-saga-test-plan/providers'
@@ -9,6 +9,7 @@ import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { transferEscrowedPayment } from 'src/escrow/actions'
 import { generateShortInviteLink } from 'src/firebase/dynamicLinks'
+import { updateE164PhoneNumberAddresses } from 'src/identity/actions'
 import {
   InviteBy,
   redeemInvite,
@@ -55,7 +56,7 @@ jest.mock('src/transactions/send', () => ({
 
 jest.mock('@celo/contractkit')
 
-SendSMS.send = jest.fn()
+SendIntentAndroid.sendSms = jest.fn()
 
 const state = createMockStore({ web3: { account: mockAccount } }).getState()
 
@@ -98,9 +99,15 @@ describe(watchSendInvite, () => {
         )
       )
       .put(storeInviteeData(mockInviteDetails3))
+      .put(
+        updateE164PhoneNumberAddresses(
+          { [mockInviteDetails3.e164Number]: mockAccount },
+          { [mockAccount]: mockInviteDetails3.e164Number }
+        )
+      )
       .run()
 
-    expect(SendSMS.send).toHaveBeenCalled()
+    expect(SendIntentAndroid.sendSms).toHaveBeenCalled()
   })
 
   it('sends a WhatsApp invite as expected', async () => {

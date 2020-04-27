@@ -1,14 +1,12 @@
 import { parsePhoneNumber } from '@celo/utils/src/phoneNumbers'
 import * as fuzzysort from 'fuzzysort'
 import { MinimalContact } from 'react-native-contacts'
-import { TokenTransactionType } from 'src/apollo/types'
 import {
   getAddressFromPhoneNumber,
   getVerificationStatusFromPhoneNumber,
   RecipientVerificationStatus,
 } from 'src/identity/contactMapping'
 import { AddressToE164NumberType, E164NumberToAddressType } from 'src/identity/reducer'
-import { InviteDetails } from 'src/invite/actions'
 import Logger from 'src/utils/Logger'
 
 const TAG = 'recipients/recipient'
@@ -166,21 +164,10 @@ export function getAddressFromRecipient(
 
 export function getRecipientFromAddress(
   address: string,
-  invitees: InviteDetails[],
-  recipientCache: NumberToRecipient,
-  type: TokenTransactionType,
-  addressToE164Number: AddressToE164NumberType
+  addressToE164Number: AddressToE164NumberType,
+  recipientCache: NumberToRecipient
 ) {
-  let e164PhoneNumber
-  if (type !== TokenTransactionType.InviteSent && addressToE164Number) {
-    e164PhoneNumber = addressToE164Number[address]
-  } else {
-    const inviteDetails = invitees.find(
-      (inviteeObj) => address.toLowerCase() === inviteeObj.tempWalletAddress.toLowerCase()
-    )
-    e164PhoneNumber = inviteDetails ? inviteDetails.e164Number : undefined
-  }
-
+  const e164PhoneNumber = addressToE164Number[address]
   return e164PhoneNumber ? recipientCache[e164PhoneNumber] : undefined
 }
 

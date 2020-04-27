@@ -18,7 +18,11 @@ import { calculateFee } from 'src/fees/saga'
 import { generateShortInviteLink } from 'src/firebase/dynamicLinks'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import i18n from 'src/i18n'
-import { denyImportContacts, setHasSeenVerificationNux } from 'src/identity/actions'
+import {
+  denyImportContacts,
+  setHasSeenVerificationNux,
+  updateE164PhoneNumberAddresses,
+} from 'src/identity/actions'
 import {
   Actions,
   InviteBy,
@@ -200,7 +204,7 @@ export function* sendInvite(
     const inviteDetails: InviteDetails = {
       timestamp: '1587621489078', // we probably want to read from the actual tx data for this
       e164Number,
-      tempWalletAddress: temporaryAddress,
+      tempWalletAddress: temporaryAddress, // unclear to me if this should be stored unchange or as lowercase
       tempWalletPrivateKey: temporaryWalletAccount.privateKey, // what do we need this for?
       tempWalletRedeemed: false, // no logic in place to toggle this yet
       inviteCode,
@@ -213,6 +217,9 @@ export function* sendInvite(
     // Store the Temp Address locally so we know which transactions were invites
     yield put(storeInviteeData(inviteDetails))
 
+    const e164NumberToAddress = { [e164Number]: temporaryAddress }
+    const addressToE164Number = { [temporaryAddress]: e164Number }
+    yield put(updateE164PhoneNumberAddresses(e164NumberToAddress, addressToE164Number))
     yield call(navigateToInviteMessageApp, e164Number, inviteMode, message)
   } catch (e) {
     Logger.error(TAG, 'Send invite error: ', e)

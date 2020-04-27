@@ -4,7 +4,6 @@ import { call, put, select, spawn, take, takeLeading } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
-import { TokenTransactionType } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { calculateFee } from 'src/fees/saga'
 import { completePaymentRequest } from 'src/firebase/actions'
@@ -13,7 +12,6 @@ import { transferGoldToken } from 'src/goldToken/actions'
 import { encryptComment } from 'src/identity/commentKey'
 import { addressToE164NumberSelector } from 'src/identity/reducer'
 import { InviteBy } from 'src/invite/actions'
-import { inviteesSelector } from 'src/invite/reducer'
 import { sendInvite } from 'src/invite/saga'
 import { navigateHome } from 'src/navigator/NavigationService'
 import { handleBarcode, shareSVGImage } from 'src/qrcode/utils'
@@ -63,18 +61,10 @@ export function* watchQrCodeDetections() {
   while (true) {
     const action = yield take(Actions.BARCODE_DETECTED)
     Logger.debug(TAG, 'Barcode detected in watcher')
-    const invitees = yield select(inviteesSelector)
     const addressToE164Number = yield select(addressToE164NumberSelector)
     const recipientCache = yield select(recipientCacheSelector)
     try {
-      yield call(
-        handleBarcode,
-        action.data,
-        invitees,
-        recipientCache,
-        TokenTransactionType.Received,
-        addressToE164Number
-      )
+      yield call(handleBarcode, action.data, addressToE164Number, recipientCache)
     } catch (error) {
       Logger.error(TAG, 'Error handling the barcode', error)
     }
