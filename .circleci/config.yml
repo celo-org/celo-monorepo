@@ -98,6 +98,10 @@ commands:
               echo "There are git differences after running yarn install"
               exit 1
             fi
+      - run:
+          name: Fail if there are vulnerabilities in packages
+          command: |
+            /bin/bash -c 'yarn audit --groups dependencies --level high; [[ $? -ge 8 ]] && exit 1 || exit 0'
 
       # Workaround save_cache not supporting globbing for the paths key
       # see note in https://circleci.com/docs/2.0/caching/#basic-example-of-dependency-caching and https://ideas.circleci.com/ideas/CCI-I-239
@@ -809,6 +813,15 @@ jobs:
       - run:
           name: Minor test of celocli
           command: ./node_modules/.bin/celocli account:new # Small test
+          
+  phone-number-privacy-test:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/app
+      - run:
+          name: Run Tests
+          command: yarn --cwd=packages/phone-number-privacy test
 
 workflows:
   version: 2
@@ -870,6 +883,9 @@ workflows:
           requires:
             - lint-checks
             - contractkit-test
+      - phone-number-privacy-test:
+          requires:
+            - lint-checks
   npm-install-testing-cron-workflow:
     triggers:
       - schedule:
@@ -903,3 +919,4 @@ workflows:
       - protocol-test-with-code-coverage:
           requires:
             - lint-checks
+            

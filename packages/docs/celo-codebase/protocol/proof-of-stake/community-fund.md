@@ -12,4 +12,4 @@ The Community Fund receives assets from three sources:
 
 ## <a name="bolster-reserve"></a>Bolstering the Reserve
 
-The rewards to the Community Fund are automatically redirected to the reserve during times in which the reserve ratio \(the ratio of reserve value over stablecoin market capitalization\) is below a cutoff value. This cutoff reduces from two to one over the first of 25 years in a linear fashion and remains at one afterwards.
+The rewards to the Community Fund are automatically redirected to the on-chain reserve during times in which the reserve ratio (the ratio of aggregate reserve value of on-chain Celo Gold and the off-chain reserve of crypto-assets over stablecoin market capitalization) is below a cutoff value. This cutoff reduces from two to one over the first of 25 years in a linear fashion and remains at one afterwards.

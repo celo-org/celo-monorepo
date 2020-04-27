@@ -1,12 +1,12 @@
 import { BigNumber } from 'bignumber.js'
+import { SingletonRouter as Router } from 'next/router'
 import * as React from 'react'
 import { Text as RNText, View } from 'react-native'
 import ValidatorsListRow, { CeloGroup } from 'src/dev/ValidatorsListRow'
 import { styles } from 'src/dev/ValidatorsListStyles'
-import { H1 } from 'src/fonts/Fonts'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import Chevron, { Direction } from 'src/icons/chevron'
-import { colors, standardStyles, textStyles } from 'src/styles'
+import { colors } from 'src/styles'
 import { weiToDecimal } from 'src/utils/utils'
 
 class Text extends RNText {
@@ -87,12 +87,15 @@ interface CeloValidatorGroup {
 }
 
 interface ValidatorsListProps {
+  router: Router
   data: {
     celoValidatorGroups: CeloValidatorGroup[]
     latestBlock: number
   }
   isLoading: boolean
 }
+
+type Props = ValidatorsListProps & I18nProps
 
 type orderByTypes =
   | 'name'
@@ -110,14 +113,14 @@ export interface State {
   orderAsc: boolean
 }
 
-class ValidatorsList extends React.PureComponent<ValidatorsListProps & I18nProps, State> {
+class ValidatorsList extends React.PureComponent<Props, State> {
   state = {
     expanded: undefined,
     orderBy: 'name' as orderByTypes,
     orderAsc: true,
   }
   private orderAccessors = {
-    name: (_) => (_.name || '').toLowerCase(),
+    name: (_) => (_.name || '').toLowerCase() || null,
     total: (_) => _.numMembers * 1000 + _.elected,
     votes: (_) => +_.votesAbsolute || 0,
     gold: (_) => _.gold || 0,
@@ -250,10 +253,20 @@ class ValidatorsList extends React.PureComponent<ValidatorsListProps & I18nProps
     const dAccessor = this.orderAccessors[this.defaultOrderAccessor]
     const dir = orderAsc ? 1 : -1
 
+    const compare = (a, b): number => {
+      if (a === null) {
+        return 1
+      }
+      if (b === null) {
+        return -1
+      }
+      return a > b ? 1 : -1
+    }
+
     return (data || [])
       .sort((a, b) => b.id - a.id)
-      .sort((a, b) => (dAccessor(a) > dAccessor(b) ? -1 : 1))
-      .sort((a, b) => dir * (accessor(a) > accessor(b) ? 1 : -1))
+      .sort((a, b) => compare(dAccessor(a), dAccessor(b)))
+      .sort((a, b) => dir * compare(accessor(a), accessor(b)))
   }
 
   render() {
@@ -261,68 +274,63 @@ class ValidatorsList extends React.PureComponent<ValidatorsListProps & I18nProps
     const { data } = this.props
     const validatorGroups = !data ? ([] as CeloGroup[]) : this.sortData(this.cleanData(data))
     return (
-      <View style={[styles.cover, styles.pStatic]}>
-        <View style={[styles.pStatic]}>
-          <H1 style={[textStyles.center, standardStyles.sectionMarginTablet, textStyles.invert]}>
-            Validator Explorer
-          </H1>
-          <View style={[styles.table, styles.pStatic]}>
-            <View style={[styles.tableRow, styles.tableHeaderRow]}>
-              <HeaderCell
-                onClick={this.orderByFn.name}
-                style={[styles.tableHeaderCellPadding]}
-                name="Name"
-                order={orderBy === 'name' ? orderAsc : null}
-              />
-              <HeaderCell
-                onClick={this.orderByFn.total}
-                style={[styles.sizeM]}
-                name="Elected/ Total"
-                order={orderBy === 'total' ? orderAsc : null}
-              />
-              <HeaderCell
-                onClick={this.orderByFn.votes}
-                style={[styles.sizeXL]}
-                name="Votes Available"
-                order={orderBy === 'votes' ? orderAsc : null}
-              />
-              <HeaderCell
-                onClick={this.orderByFn.gold}
-                style={[styles.sizeM]}
-                name="Locked CGLD"
-                order={orderBy === 'gold' ? orderAsc : null}
-              />
-              <HeaderCell
-                onClick={this.orderByFn.commision}
-                style={[styles.sizeM]}
-                name="Group Share"
-                order={orderBy === 'commision' ? orderAsc : null}
-              />
-              <HeaderCell
-                onClick={this.orderByFn.rewards}
-                style={[styles.sizeM]}
-                name="Voter Rewards"
-                order={orderBy === 'rewards' ? orderAsc : null}
-              />
-              <HeaderCell
-                onClick={this.orderByFn.uptime}
-                style={[styles.sizeS]}
-                name="Uptime"
-                order={orderBy === 'uptime' ? orderAsc : null}
-              />
-              <HeaderCell
-                onClick={this.orderByFn.attestation}
-                style={[styles.sizeS]}
-                name="Attestation"
-                order={orderBy === 'attestation' ? orderAsc : null}
-              />
-            </View>
-            {validatorGroups.map((group, i) => (
-              <div key={group.id} onClick={this.expand.bind(this, i)}>
-                <ValidatorsListRow group={group} expanded={expanded === i} />
-              </div>
-            ))}
+      <View style={styles.pStatic}>
+        <View style={[styles.table, styles.pStatic]}>
+          <View style={[styles.tableRow, styles.tableHeaderRow]}>
+            <HeaderCell
+              onClick={this.orderByFn.name}
+              style={[styles.tableHeaderCellPadding]}
+              name="Name"
+              order={orderBy === 'name' ? orderAsc : null}
+            />
+            <HeaderCell
+              onClick={this.orderByFn.total}
+              style={[styles.sizeM]}
+              name="Elected/ Total"
+              order={orderBy === 'total' ? orderAsc : null}
+            />
+            <HeaderCell
+              onClick={this.orderByFn.votes}
+              style={[styles.sizeXL]}
+              name="Votes Available"
+              order={orderBy === 'votes' ? orderAsc : null}
+            />
+            <HeaderCell
+              onClick={this.orderByFn.gold}
+              style={[styles.sizeM]}
+              name="Locked CGLD"
+              order={orderBy === 'gold' ? orderAsc : null}
+            />
+            <HeaderCell
+              onClick={this.orderByFn.commision}
+              style={[styles.sizeM]}
+              name="Group Share"
+              order={orderBy === 'commision' ? orderAsc : null}
+            />
+            <HeaderCell
+              onClick={this.orderByFn.rewards}
+              style={[styles.sizeM]}
+              name="Voter Rewards"
+              order={orderBy === 'rewards' ? orderAsc : null}
+            />
+            <HeaderCell
+              onClick={this.orderByFn.uptime}
+              style={[styles.sizeS]}
+              name="Uptime"
+              order={orderBy === 'uptime' ? orderAsc : null}
+            />
+            <HeaderCell
+              onClick={this.orderByFn.attestation}
+              style={[styles.sizeS]}
+              name="Attestation"
+              order={orderBy === 'attestation' ? orderAsc : null}
+            />
           </View>
+          {validatorGroups.map((group, i) => (
+            <div key={group.id} onClick={this.expand.bind(this, i)}>
+              <ValidatorsListRow group={group} expanded={expanded === i} />
+            </div>
+          ))}
         </View>
       </View>
     )
