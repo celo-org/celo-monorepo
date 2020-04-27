@@ -320,6 +320,7 @@ docker run --name celo-validator -it --restart unless-stopped -p 30303:30303 -p 
 ```
 
 The `networkid` parameter value of `42220` indicates we are connecting to the Mainnet Release Candidate 1 network.
+
 At this point your Validator and Proxy machines should be configured, and both should be syncing to the network. You should see `Imported new chain segment` in your node logs, about once every 5 seconds once the node is synced to the latest block which you can find on the [Network Stats](https://stats.celo.org) page.
 
 ## Registering as a Validator

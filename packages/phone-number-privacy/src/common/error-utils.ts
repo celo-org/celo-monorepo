@@ -1,4 +1,5 @@
 import { Response } from 'firebase-functions'
+import logger from './logger'
 
 export enum ErrorMessages {
   UNKNOWN_ERROR = 'CELO_PNP_ERR_00 Something went wrong',
@@ -11,6 +12,7 @@ export enum ErrorMessages {
   DUPLICATE_REQUEST_TO_MATCHMAKE = 'CELO_PNP_ERR_08 Attempt to request >1 matchmaking',
 }
 
-export function respondWithError(res: Response, statusCode: number, error: string) {
+export function respondWithError(res: Response, statusCode: number, error: ErrorMessages) {
+  logger.error('Responding with error', error)
   res.status(statusCode).json({ success: false, error })
 }
