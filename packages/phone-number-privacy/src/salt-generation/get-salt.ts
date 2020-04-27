@@ -1,13 +1,11 @@
-import { PhoneNumberUtils } from '@celo/utils'
 import { Request, Response } from 'firebase-functions'
+import { computeBlindedSignature } from '../bls/bls-signature'
 import { ErrorMessages, respondWithError } from '../common/error-utils'
 import { authenticateUser } from '../common/identity'
 import { incrementQueryCount } from '../database/wrappers/account'
-import { computeBlindedSignature } from './bls-signature'
 import QueryQuota from './query-quota'
 
-// EG. curl -v "http://localhost:5000/celo-phone-number-privacy/us-central1/getBlindedMessageSignature" -d '{"queryPhoneNumber": "xfVo/qxqTXWE8AXzev8KcqJ2CG8sMqNQfn/0X2ch7dKGJyBGG8YjhFyNSmX1e1cB9n4ARdq6kYr0vZTAebx1Nudl3zR9ij0aIJY5wzhsR89uLPj/31H0Ks4FMf42oD4A/5ny0+AA1As0oUFvTpVr99Uk4+GxbRjX/iHgTa2qkM15ih/3Qot/tw/vt9LmDZAByogwM3EAHZFC+BLyYfgt8Tws/2jwiie61wET0Ms/JLOVZjiTZafwJJ74Wqlk/IgAAA==", "account":"0x117ea45d497ab022b85494ba3ab6f52969bf6813", "phoneNumber":"+15555555555"}' -H 'Content-Type: application/json'
-export async function handleGetSignature(request: Request, response: Response) {
+export async function handleGetBlindedMessageForSalt(request: Request, response: Response) {
   try {
     const queryQuota: QueryQuota = new QueryQuota()
     if (!isValidGetSignatureInput(request.body)) {
@@ -17,17 +15,17 @@ export async function handleGetSignature(request: Request, response: Response) {
     authenticateUser()
     const remainingQueryCount = await queryQuota.getRemainingQueryCount(
       request.body.account,
-      request.body.phoneNumber
+      request.body.hashedPhoneNumber
     )
     if (remainingQueryCount <= 0) {
-      respondWithError(response, 400, ErrorMessages.EXCEEDED_QUOTA)
+      respondWithError(response, 403, ErrorMessages.EXCEEDED_QUOTA)
       return
     }
-    const signature = computeBlindedSignature(request.body.queryPhoneNumber)
+    const signature = computeBlindedSignature(request.body.blindedQueryPhoneNumber)
     await incrementQueryCount(request.body.account)
     response.json({ success: true, signature })
   } catch (error) {
-    console.error('Failed to getSignature', error)
+    console.error(ErrorMessages.UNKNOWN_ERROR + ' Failed to getSalt', error)
     respondWithError(response, 500, ErrorMessages.UNKNOWN_ERROR)
   }
 }
@@ -44,10 +42,11 @@ function hasValidAccountParam(requestBody: any): boolean {
   return requestBody.account && (requestBody.account as string).startsWith('0x')
 }
 
+// TODO (amyslawson) make this param optional for user's first request prior to attestation
 function hasValidPhoneNumberParam(requestBody: any): boolean {
-  return requestBody.phoneNumber && PhoneNumberUtils.isE164Number(requestBody.phoneNumber)
+  return requestBody.hashedPhoneNumber
 }
 
 function hasValidQueryPhoneNumberParam(requestBody: any): boolean {
-  return requestBody.queryPhoneNumber
+  return requestBody.blindedQueryPhoneNumber
 }
