@@ -9,7 +9,7 @@ export default class List extends BaseCommand {
   static description = 'List live governance proposals (queued and ongoing)'
 
   static flags = {
-    ...BaseCommand.flags,
+    ...BaseCommand.flagsWithoutLocalAddresses(),
   }
 
   static examples = ['list']

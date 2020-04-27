@@ -3,28 +3,34 @@ import MessageDisplay from 'src/forms/MessageDisplay'
 import { NameSpaces, useTranslation } from 'src/i18n'
 import { textStyles } from 'src/styles'
 
-type Field = string
+export enum ErrorKeys {
+  'email' = 'email',
+  'pleaseWait' = 'pleaseWait',
+  'unknownError' = 'unknownError',
+  'generic' = 'generic',
+}
 
-function getErrorTransKey(field: string) {
-  let key = 'generic'
-
-  if (field === 'email' || key === 'unknownError') {
-    key = field
+export function getErrorTransKey(field: string) {
+  switch (field) {
+    case ErrorKeys.email:
+    case ErrorKeys.unknownError:
+    case ErrorKeys.pleaseWait:
+      return field
+    default:
+      return ErrorKeys.generic
   }
-  return key
 }
 
 interface ErrorProps {
-  field: Field
+  field: ErrorKeys
   isShowing: boolean
 }
 
 export const ErrorDisplay = React.memo(({ field, isShowing }: ErrorProps) => {
   const { t } = useTranslation(NameSpaces.common)
-  const key = getErrorTransKey(field)
   return (
     <MessageDisplay isShowing={isShowing} style={textStyles.error}>
-      {t(`common:validationErrors.${key}`)}
+      {field && t(`common:validationErrors.${field}`)}
     </MessageDisplay>
   )
 })

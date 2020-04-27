@@ -10,7 +10,7 @@ Five factors affect validator and group rewards:
 - The current value of the slashing penalty for the group of which it was a member at the last election
 - The group share for the group of which it was a member at the last election
 
-Epoch rewards to validators and validator groups are denominated in Celo Dollars, since it is anticipated that most of their expenses will be incurred in fiat currencies, allowing organizations to understand their likely return regardless of volatility in the price of Celo Gold. To enable this, the protocol mints new Celo Dollars that correspond to the epoch reward equivalent of Celo Gold and transfers those to the Reserve to maintain its collateralization ratio. Of course, the effect on the target schedule depends on the prevailing exchange rate.
+Epoch rewards to validators and validator groups are denominated in Celo Dollars, since it is anticipated that most of their expenses will be incurred in fiat currencies, allowing organizations to understand their likely return regardless of volatility in the price of Celo Gold. To enable this, the protocol mints new Celo Dollars that correspond to the epoch reward equivalent of Celo Gold which are maintained on chain to preserve the collateralization ratio. Of course, the effect on the target schedule depends on the prevailing exchange rate.
 
 ![](https://storage.googleapis.com/celo-website/docs/validator-rewards.jpg)
 
@@ -26,9 +26,9 @@ The Celo protocol tracks an ‘uptime score’ for each validator. When a valida
 
 ![](https://storage.googleapis.com/celo-website/docs/uptime-score.jpg)
 
-For a validator to be ‘up’ at a given block, it must have its signature included in at least one in the previous ten blocks. This cannot be done during the first 9 blocks of the epoch. At each epoch, this counter is reset to 0. Because the proposer order is shuffled at each election, it is very hard for a malicious actor withholding an honest validator’s signatures to affect this measure.
+For a validator to be ‘up’ at a given block, it must have its signature included in at least one in the previous twelve blocks. This cannot be done during the first 11 blocks of the epoch. At each epoch, this counter is reset to 0. Because the proposer order is shuffled at each election, it is very hard for a malicious actor withholding an honest validator’s signatures to affect this measure.
 
-Then, a validator’s uptime for the epoch is the proportion of blocks in the epoch for which it is ‘up’: `U = counter/ (epoch_size - 9)`. Its epoch uptime score `S_ve = u ^ k`, where `k` is a governable constant. This means that downtime of less than around a minute does not count against the validator, but that longer periods begin to reduce the score rapidly.
+Then, a validator’s uptime for the epoch is the proportion of blocks in the epoch for which it is ‘up’: `U = counter/ (epoch_size - 11)`. Its epoch uptime score `S_ve = u ^ k`, where `k` is a governable constant. This means that downtime of less than around a minute does not count against the validator, but that longer periods begin to reduce the score rapidly.
 
 The validator’s overall uptime score is an exponential moving average of the uptime score from this and previous epochs. `S_{v} = min(S_ve, S_ve * x + S_{v-1} * (1 -x))` where `0 < x < 1` and is governable. Since `S_v` starts out at zero, validators have a disincentive to change identities and an incentive to prioritize activities that improve long-term availability.
 
