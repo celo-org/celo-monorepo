@@ -144,7 +144,7 @@ export async function sendSms(toPhone: string, msg: string) {
 export function* sendInvite(
   e164Number: string,
   inviteMode: InviteBy,
-  amount?: BigNumber | string,
+  amount?: BigNumber,
   currency?: CURRENCY_ENUM
 ) {
   yield call(getConnectedUnlockedAccount)
@@ -186,9 +186,7 @@ export function* sendInvite(
       escrowTxId = generateStandbyTransactionId(temporaryAddress + '-escrow')
       try {
         const phoneHash = getPhoneHash(e164Number)
-        yield put(
-          transferEscrowedPayment(phoneHash, new BigNumber(amount), temporaryAddress, escrowTxId)
-        )
+        yield put(transferEscrowedPayment(phoneHash, amount, temporaryAddress, escrowTxId))
         yield call(waitForTransactionWithId, escrowTxId)
         Logger.debug(TAG + '@sendInviteSaga', 'Escrowed money to new wallet')
       } catch (e) {
@@ -211,7 +209,7 @@ export function* sendInvite(
       tempWalletPrivateKey: temporaryWalletAccount.privateKey, // what could we need this for?
       tempWalletRedeemed: false, // no logic in place to toggle this yet
       inviteCode,
-      escrowAmount: amount, // this is not being read anywhere yet
+      escrowAmount: amount ? amount.toString() : undefined, // this is not being read anywhere yet
       escrowCurrency: currency, // this is not being read anywhere yet
       escrowTxId, // the tx id we are saving is wrong (paymentId in sentEscrowedPayments is wrong too)
       escrowRedeemed: false, // no logic in place to toggle this yet

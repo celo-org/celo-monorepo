@@ -92,7 +92,7 @@ export const mockInviteDetails3 = {
   tempWalletPrivateKey: '0x1129eb2fbccdc663f4923a6495c35b096249812b589f7c4cd1dba01e1edaf724',
   tempWalletRedeemed: false,
   inviteCode: 'ESnrL7zNxmP0kjpklcNbCWJJgStYn3xM0dugHh7a9yQ=',
-  escrowAmount: '1.75',
+  escrowAmount: '2.75',
   escrowCurrency: CURRENCY_ENUM.DOLLAR,
   escrowTxId: 'a sha3 hash',
   escrowRedeemed: false,

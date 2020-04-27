@@ -23,7 +23,7 @@ export interface InviteDetails {
   tempWalletPrivateKey: string
   tempWalletRedeemed: boolean
   inviteCode: string
-  escrowAmount: string | BigNumber | undefined
+  escrowAmount: string | undefined
   escrowCurrency: CURRENCY_ENUM | undefined
   escrowTxId: string | undefined
   escrowRedeemed: boolean
@@ -48,14 +48,14 @@ export interface SendInviteAction {
   type: Actions.SEND_INVITE
   e164Number: string
   inviteMode: InviteBy
-  amount?: string | BigNumber
+  amount?: BigNumber
   currency?: CURRENCY_ENUM
 }
 
 export const sendInvite = (
   e164Number: string,
   inviteMode: InviteBy,
-  amount?: string | BigNumber,
+  amount?: BigNumber,
   currency?: CURRENCY_ENUM
 ): SendInviteAction => ({
   type: Actions.SEND_INVITE,

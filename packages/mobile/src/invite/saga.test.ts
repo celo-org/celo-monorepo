@@ -77,7 +77,7 @@ describe(watchSendInvite, () => {
         sendInvite(
           mockInviteDetails3.e164Number,
           InviteBy.SMS,
-          mockInviteDetails3.escrowAmount,
+          new BigNumber(mockInviteDetails3.escrowAmount),
           mockInviteDetails3.escrowCurrency
         )
       )
@@ -122,7 +122,7 @@ describe(watchSendInvite, () => {
         sendInvite(
           mockInviteDetails3.e164Number,
           InviteBy.WhatsApp,
-          mockInviteDetails3.escrowAmount,
+          new BigNumber(mockInviteDetails3.escrowAmount),
           mockInviteDetails3.escrowCurrency
         )
       )
