@@ -186,6 +186,12 @@ These keys will become the beneficiary addresses of your `ReleaseGold` contracts
 Store and back these keys up in a secure manner, as there will be no way to recover if them if lost or stolen.
 {% endhint %}
 
+{% hint style="danger" %}
+You are recommended to use Ledger to generate addresses securely. [Read more here.](../validator-guide/summary/ledger.md)
+
+Only use the following commands when a Ledger is not available.
+{% endhint %}
+
 ```bash
 # On your local machine
 mkdir celo-accounts-node
@@ -202,10 +208,6 @@ Copy the addresses from the terminal and set the following environment variables
 export CELO_VALIDATOR_GROUP_ADDRESS=<YOUR-VALIDATOR-GROUP-ADDRESS>
 export CELO_VALIDATOR_ADDRESS=<YOUR-VALIDATOR-ADDRESS>
 ```
-
-{% hint style="danger" %}
-You are recommended to use Ledger to generate addresses securely. [Read more here.](../validator-guide/summary/ledger.md)
-{% endhint %}
 
 ### Start your Accounts node
 
