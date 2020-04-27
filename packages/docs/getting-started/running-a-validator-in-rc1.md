@@ -751,7 +751,7 @@ docker run --name celo-attestation-service -it --restart always --entrypoint /bi
 
 ### Registering Metadata
 
-Celo uses [Metadata](../celo-codebase/protocol/identity/metadata) to allow accounts to make certain claims without having to do so on-chain. Users can use any authorized signer address to make claims on behalf of the Locked Gold Account. For convenience this guide uses the `CELO_ATTESTATION_SIGNER_ADDRESS`, but any authorized signer will work. To complete the metadata process, we have to claim which URL users can request attestations from.
+Celo uses [Metadata](../celo-codebase/protocol/identity/metadata.md) to allow accounts to make certain claims without having to do so on-chain. Users can use any authorized signer address to make claims on behalf of the Locked Gold Account. For convenience this guide uses the `CELO_ATTESTATION_SIGNER_ADDRESS`, but any authorized signer will work. To complete the metadata process, we have to claim which URL users can request attestations from.
 
 Run the following commands on your local machine:
 
