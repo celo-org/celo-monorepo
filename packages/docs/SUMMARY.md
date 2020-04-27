@@ -11,7 +11,7 @@
   - [Running a Full Node](getting-started/running-a-full-node-in-rc1.md)
 - [Baklava Testnet](getting-started/baklava-testnet.md)
   - [Running a Validator](getting-started/running-a-validator-in-baklava.md)
-  - [Running a Full Node](getting-started/running-a-full-node.md)
+  - [Running a Full Node](getting-started/running-a-full-node-in-baklava.md)
 - [Alfajores Testnet](getting-started/alfajores-testnet.md)
   - [Using the Mobile Wallet](getting-started/using-the-mobile-wallet.md)
   - [Getting an Account and Funds](getting-started/faucet.md)
