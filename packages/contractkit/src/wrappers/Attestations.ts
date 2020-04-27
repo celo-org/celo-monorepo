@@ -119,6 +119,11 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     valueToInt
   )
 
+  /**
+   * @notice Returns the unselected attestation request for an identifier/account pair, if any.
+   * @param identifier Attestation identifier (e.g. phone hash)
+   * @param account Address of the account
+   */
   getUnselectedRequest = proxyCall(
     this.contract.methods.getUnselectedRequest,
     undefined,
@@ -429,9 +434,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
       account,
       phoneNumber,
       issuer,
-    }
-    if (salt) {
-      body.salt = salt
+      salt,
     }
     return fetch(serviceURL + '/attestations', {
       method: 'POST',

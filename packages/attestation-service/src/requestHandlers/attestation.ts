@@ -20,20 +20,13 @@ const NO_INCOMPLETE_ATTESTATION_FOUND_ERROR = 'No incomplete attestation found'
 const ATTESTATION_ALREADY_SENT_ERROR = 'Attestation already sent'
 const COUNTRY_CODE_NOT_SERVED_ERROR = 'Your country code is not being served by this service'
 
-const AttestationRequestMandatory = t.type({
+export const AttestationRequestType = t.type({
   phoneNumber: E164PhoneNumberType,
   account: AddressType,
   issuer: AddressType,
+  // io-ts way of defining optional key-value pair
+  salt: t.union([t.undefined, SaltType]),
 })
-
-const AttestationRequestOptional = t.partial({
-  salt: SaltType,
-})
-
-export const AttestationRequestType = t.intersection([
-  AttestationRequestMandatory,
-  AttestationRequestOptional,
-])
 
 export type AttestationRequest = t.TypeOf<typeof AttestationRequestType>
 
