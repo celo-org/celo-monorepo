@@ -29,6 +29,7 @@ export abstract class ReleaseGoldCommand extends BaseCommand {
   }
 
   async init() {
+    await super.init()
     if (!this._releaseGoldWrapper) {
       this._releaseGoldWrapper = new ReleaseGoldWrapper(
         this.kit,

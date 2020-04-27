@@ -15,9 +15,6 @@
 #import <React/RCTLinkingManager.h>
 
 @import Firebase;
-#import "RNFirebaseNotifications.h"
-#import "RNFirebaseMessaging.h"
-#import "RNFirebaseLinks.h"
 
 #import "RNSplashScreen.h"
 #import "ReactNativeConfig.h"
@@ -45,7 +42,6 @@ static NSString * const kHasRunBeforeKey = @"RnSksIsAppInstalled";
     [FIROptions defaultOptions].deepLinkURLScheme = @"celo";
     [FIRApp configure];
   }
-  [RNFirebaseNotifications configure];
   RCTBridge *bridge = [[RCTBridge alloc] initWithDelegate:self launchOptions:launchOptions];
   RCTRootView *rootView = [[RCTRootView alloc] initWithBridge:bridge
                                                    moduleName:@"celo"
@@ -69,19 +65,6 @@ static NSString * const kHasRunBeforeKey = @"RnSksIsAppInstalled";
 #else
   return [[NSBundle mainBundle] URLForResource:@"main" withExtension:@"jsbundle"];
 #endif
-}
-
-- (void)application:(UIApplication *)application didReceiveLocalNotification:(UILocalNotification *)notification {
-  [[RNFirebaseNotifications instance] didReceiveLocalNotification:notification];
-}
-
-- (void)application:(UIApplication *)application didReceiveRemoteNotification:(nonnull NSDictionary *)userInfo
-fetchCompletionHandler:(nonnull void (^)(UIBackgroundFetchResult))completionHandler{
-  [[RNFirebaseNotifications instance] didReceiveRemoteNotification:userInfo fetchCompletionHandler:completionHandler];
-}
-
-- (void)application:(UIApplication *)application didRegisterUserNotificationSettings:(UIUserNotificationSettings *)notificationSettings {
-  [[RNFirebaseMessaging instance] didRegisterUserNotificationSettings:notificationSettings];
 }
 
 // Reset keychain on first app run, this is so we don't run with leftover items
@@ -113,17 +96,7 @@ fetchCompletionHandler:(nonnull void (^)(UIBackgroundFetchResult))completionHand
             options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options {
   BOOL handled = [RCTLinkingManager application:application openURL:url options:options];
   
-  if (!handled) {
-    handled = [[RNFirebaseLinks instance] application:application openURL:url options:options];
-  }
-  
   return handled;
-}
-
-- (BOOL)application:(UIApplication *)application
-continueUserActivity:(NSUserActivity *)userActivity
- restorationHandler:(void (^)(NSArray *))restorationHandler {
-  return [[RNFirebaseLinks instance] application:application continueUserActivity:userActivity restorationHandler:restorationHandler];
 }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application
