@@ -201,15 +201,18 @@ export function* sendInvite(
 
     // OPEN QUESTION - does storing invitee data only in the event of a successful transaction have
     // unintended consequences? Seems right to me but previous position was before the generateStandbyTransactionId call
+
+    // OPEN QUESTION: EscrowedPayment and InviteDetails appear to store redundant data but invitee data is stored on send and escrow data is fetched from the smart contract.
+    // Should we consolidate into one data structure that we update when appropriate?
     const inviteDetails: InviteDetails = {
-      timestamp: '1587621489078', // we probably want to read from the actual tx data for this
+      timestamp: '1587621489078', // PLACEHOLDER - we probably want to read from the actual tx data for this
       e164Number,
-      tempWalletAddress: temporaryAddress, // unclear to me if this should be stored unchange or as lowercase
-      tempWalletPrivateKey: temporaryWalletAccount.privateKey, // what do we need this for?
+      tempWalletAddress: temporaryAddress,
+      tempWalletPrivateKey: temporaryWalletAccount.privateKey, // what could we need this for?
       tempWalletRedeemed: false, // no logic in place to toggle this yet
       inviteCode,
-      escrowAmount: amount ? amount.toString() : undefined, // formatting is inconsistent with sentEscrowedPayments.amount
-      escrowCurrency: currency,
+      escrowAmount: amount, // this is not being read anywhere yet
+      escrowCurrency: currency, // this is not being read anywhere yet
       escrowTxId, // the tx id we are saving is wrong (paymentId in sentEscrowedPayments is wrong too)
       escrowRedeemed: false, // no logic in place to toggle this yet
     }
@@ -217,7 +220,7 @@ export function* sendInvite(
     // Store the Temp Address locally so we know which transactions were invites
     yield put(storeInviteeData(inviteDetails))
 
-    const e164NumberToAddress = { [e164Number]: temporaryAddress }
+    const e164NumberToAddress = { [e164Number]: null } // null means the number is unverified
     const addressToE164Number = { [temporaryAddress]: e164Number }
     yield put(updateE164PhoneNumberAddresses(e164NumberToAddress, addressToE164Number))
     yield call(navigateToInviteMessageApp, e164Number, inviteMode, message)

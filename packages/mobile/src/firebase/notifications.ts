@@ -58,7 +58,6 @@ function* handlePaymentReceived(
     const addressToE164Number = yield select(addressToE164NumberSelector)
     const address = transferNotification.sender.toLowerCase()
     const currency = resolveCurrency(transferNotification.currency)
-    const type = TokenTransactionType.Received
 
     navigateToPaymentTransferReview(
       TokenTransactionType.Received,
@@ -71,7 +70,7 @@ function* handlePaymentReceived(
         address: transferNotification.sender.toLowerCase(),
         comment: transferNotification.comment,
         recipient: getRecipientFromAddress(address, addressToE164Number, recipientCache),
-        type,
+        type: TokenTransactionType.Received,
       }
     )
   }

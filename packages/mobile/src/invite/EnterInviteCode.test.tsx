@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Clipboard } from 'react-native'
 import firebase from 'react-native-firebase'
-import SendSMS from 'react-native-sms'
+import SendIntentAndroid from 'react-native-send-intent'
 import { fireEvent, flushMicrotasksQueue, render } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
@@ -30,7 +30,7 @@ const VALID_REFERRER_INVITE_KEY =
   '0xa7d7f55c207b91102021b2ef1e1886bf1d8fb3d1e558c932105f72c248fdc53f'
 const INVALID_REFERRER_INVITE_URL = 'http://example.com?invite-code=abc'
 
-SendSMS.send = jest.fn()
+SendIntentAndroid.openSMSApp = jest.fn()
 
 const clipboardGetStringMock = (Clipboard.getString = jest.fn())
 

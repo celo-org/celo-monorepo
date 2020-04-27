@@ -48,22 +48,29 @@ export class EscrowedPaymentListItem extends React.PureComponent<Props> {
         (inviteeObj) => recipientPhoneNumber === inviteeObj.e164Number
       )
 
-      // OPEN QUESTION: EscrowedPayment and InviteDetails appear to store redundant info but have different sources of truth. Should we consolidate
-      // them to avoid throwing the below error? Appears to me invitee data is stored on send and escrow data is fetched from the smart contract, which means we'll throw the below error when local data is wiped
+      // OPEN QUESTION: EscrowedPayment and InviteDetails appear to store redundant data but have different sources of truth. Should we consolidate
+      // them to avoid throwing the below error? Appears to me invitee data is stored on send and escrow data is fetched from the smart contract
+
+      // OPEN QUESTION: Appears to me we won't have inivtee data when local data is wiped. is this an appropriate compromise in that case?
       if (!inviteDetails) {
-        throw Error('Could not find the invite details that match this phone number')
+        await sendSms(
+          // OPEN QUESTION: why do we have to send inviteCode and link if link is derived from inviteCode?
+          recipientPhoneNumber,
+          t('walletFlow5:escrowedPaymentReminderSmsNoData')
+        )
+      } else {
+        const { inviteCode } = inviteDetails
+        // OPEN QUESTION: this function creates a unique link every time a reminder is sent. is this desirable?
+        const link = await generateInviteLink(inviteCode)
+        await sendSms(
+          // OPEN QUESTION: why do we have to send inviteCode and link if link is derived from inviteCode?
+          recipientPhoneNumber,
+          t('walletFlow5:escrowedPaymentReminderSms', {
+            code: inviteCode,
+            link,
+          })
+        )
       }
-      const { inviteCode } = inviteDetails
-      // OPEN QUESTION: this function creates a unique link every time a reminder is sent. is this desirable?
-      const link = await generateInviteLink(inviteCode)
-      await sendSms(
-        // OPEN QUESTION: why do we have to send inviteCode and link if link is derived from inviteCode?
-        recipientPhoneNumber,
-        t('walletFlow5:escrowedPaymentReminderSms', {
-          code: inviteCode,
-          link,
-        })
-      )
     } catch (error) {
       // TODO: use the showError saga instead of the Logger.showError, which is a hacky temp thing we used for a while that doesn't actually work on iOS
       Logger.showError(ErrorMessages.SMS_ERROR)

@@ -21,9 +21,8 @@ import { calculateFee } from 'src/fees/saga'
 import { CURRENCY_ENUM, SHORT_CURRENCIES } from 'src/geth/consts'
 import i18n from 'src/i18n'
 import { Actions as IdentityActions, SetVerificationStatusAction } from 'src/identity/actions'
+import { addressToE164NumberSelector } from 'src/identity/reducer'
 import { NUM_ATTESTATIONS_REQUIRED, VerificationStatus } from 'src/identity/verification'
-import { InviteDetails } from 'src/invite/actions'
-import { inviteesSelector } from 'src/invite/reducer'
 import { TEMP_PW } from 'src/invite/saga'
 import { isValidPrivateKey } from 'src/invite/utils'
 import { navigate } from 'src/navigator/NavigationService'
@@ -269,26 +268,19 @@ function* doFetchSentPayments() {
       sentPaymentIDs.map((paymentID) => call(getEscrowedPayment, escrow, paymentID))
     )
 
-    const invitees: InviteDetails[] = yield select(inviteesSelector)
+    const addressToE164Number = yield select(addressToE164NumberSelector)
     const sentPayments: EscrowedPayment[] = []
     for (let i = 0; i < sentPaymentsRaw.length; i++) {
-      const id = sentPaymentIDs[i].toLowerCase()
-      const inviteDetails = invitees.find(
-        (inviteeObj) => id === inviteeObj.tempWalletAddress.toLowerCase()
-      )
-      const recipientPhoneNumber = inviteDetails ? inviteDetails.e164Number : undefined
-
-      if (!recipientPhoneNumber) {
-        throw Error(`Could not match sentPaymentId with an invitee. sentPaymentId: ${id}`)
-      }
-
+      const address = sentPaymentIDs[i]
+      const recipientPhoneNumber = addressToE164Number[address]
+      const id = sentPaymentIDs[i].toLowerCase() // OPEN QUESTION: why are we making this lowercase? seems inconsistent
       const payment = sentPaymentsRaw[i]
       if (!payment) {
         continue
       }
 
-      // OPEN QUESTION - we may possibly want to update invite.invitees with this data rather than
-      // create a largely duplicative datas structure
+      // OPEN QUESTION: EscrowedPayment and InviteDetails appear to store redundant data but invitee data is stored on send and escrow data is fetched from the smart contract.
+      // Should we consolidate into one data structure that we update when appropriate?
       const escrowPaymentWithRecipient: EscrowedPayment = {
         paymentID: id,
         senderAddress: payment[1],

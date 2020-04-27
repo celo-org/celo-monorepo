@@ -65,12 +65,12 @@ export function TransferFeedItem(props: Props) {
   const {
     amount,
     address,
-    addressToE164Number,
     timestamp,
     type,
     comment,
     commentKey,
     status,
+    addressToE164Number,
     recipientCache,
   } = props
 

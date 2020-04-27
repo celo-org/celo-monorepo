@@ -101,7 +101,7 @@ describe(watchSendInvite, () => {
       .put(storeInviteeData(mockInviteDetails3))
       .put(
         updateE164PhoneNumberAddresses(
-          { [mockInviteDetails3.e164Number]: mockAccount },
+          { [mockInviteDetails3.e164Number]: null }, // address is null when unverified
           { [mockAccount]: mockInviteDetails3.e164Number }
         )
       )
