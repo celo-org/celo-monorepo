@@ -3,6 +3,7 @@ import { Exchange } from '../generated/Exchange'
 import {
   BaseWrapper,
   CeloTransactionObject,
+  fixidityValueToBigNumber,
   identity,
   proxyCall,
   proxySend,
@@ -29,12 +30,16 @@ export class ExchangeWrapper extends BaseWrapper<Exchange> {
    * Query spread parameter
    * @returns Current spread charged on exchanges
    */
-  spread = proxyCall(this.contract.methods.spread, undefined, valueToBigNumber)
+  spread = proxyCall(this.contract.methods.spread, undefined, fixidityValueToBigNumber)
   /**
    * Query reserve fraction parameter
    * @returns Current fraction to commit to the gold bucket
    */
-  reserveFraction = proxyCall(this.contract.methods.reserveFraction, undefined, valueToBigNumber)
+  reserveFraction = proxyCall(
+    this.contract.methods.reserveFraction,
+    undefined,
+    fixidityValueToBigNumber
+  )
   /**
    * Query update frequency parameter
    * @returns The time period that needs to elapse between bucket
