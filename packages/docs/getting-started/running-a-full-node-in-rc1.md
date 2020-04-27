@@ -8,6 +8,10 @@ When a light client sends transactions, they will include specify a gateway fee 
 
 For this reason, despite the fact that Celo uses a proof-of-stake consensus protocol, users can earn cryptocurrency without first having to own any, simply by running a full node.
 
+{% hint style="danger" %}
+Full node incentives have not been enabled yet because the mechanism for negotiating a gateway fee is still under development. Currently, light clients are configured to send a gateway fee of 0 and full nodes are set to accept a minimum gateway fee of 0.
+{% endhint %}
+
 ## Prerequisites
 
 - **You have Docker installed.** If you don’t have it already, follow the instructions here: [Get Started with Docker](https://www.docker.com/get-started). It will involve creating or signing in with a Docker account, downloading a desktop app, and then launching the app to be able to use the Docker CLI. If you are running on a Linux server, follow the instructions for your distro [here](https://docs.docker.com/install/#server). You may be required to run Docker with `sudo` depending on your installation environment.
