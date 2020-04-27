@@ -3,17 +3,28 @@ import { privateKeyToAddress } from './address'
 import { PhoneNumberUtils } from './phoneNumbers'
 import { Signature, SignatureUtils } from './signatureUtils'
 
-enum IdentifierType {
-  PHONE_NUMBER,
+// Supported identifer types for attestations
+export enum IdentifierType {
+  PHONE_NUMBER = 0,
   // In the future, other types like usernames or emails could go here
 }
 
-function hashIdentifier(identifier: string, type: IdentifierType, salt?: string) {
+// Each identifer type has a unique prefix to prevent unlikely but possible collisions
+export function getIdentifierPrefix(type: IdentifierType) {
+  switch (type) {
+    case IdentifierType.PHONE_NUMBER:
+      return 'tel://'
+    default:
+      throw new Error('Unsupported Identifier Type')
+  }
+}
+
+export function hashIdentifier(identifier: string, type: IdentifierType, salt?: string) {
   switch (type) {
     case IdentifierType.PHONE_NUMBER:
       return PhoneNumberUtils.getPhoneHash(identifier, salt)
     default:
-      return ''
+      throw new Error('Unsupported Identifier Type')
   }
 }
 
@@ -82,6 +93,9 @@ export function extractAttestationCodeFromMessage(message: string) {
 }
 
 export const AttestationUtils = {
+  IdentifierType,
+  getIdentifierPrefix,
+  hashIdentifier,
   getAttestationMessageToSignFromIdentifier,
   getAttestationMessageToSignFromPhoneNumber,
   base64ToHex,
