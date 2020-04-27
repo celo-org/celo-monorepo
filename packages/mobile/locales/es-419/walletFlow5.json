@@ -56,6 +56,8 @@
   "escrowedPaymentReminder": "Reacuerda al receptor aceptar el pago",
   "escrowedPaymentReminderSms":
     "¡Un recordatorio amistoso de que aún no ha canjeado sus dólares de celo!",
+  "escrowedPaymentReminderSmsNoData":
+    "¡Un recordatorio amistoso de que aún no ha canjeado sus dólares de celo! ¡Descargue la aplicación móvil para comenzar!",
   "testnetAlert": {
     "0": "{{testnet}}",
     "1":
