@@ -173,9 +173,9 @@ A running instance of the Celo Blockchain software. This could be configured to 
 
 An interaction that takes place solely through a transaction being executed on the blockchain and updating the state of the ledger.
 
-## Proof of Stake
+## Proof-of-Stake
 
-The system that determines the participants in a Byzantine Fault Tolerant consensus mechanism. [Celo's Proof of Stake mechanism](../celo-codebase/protocol/proof-of-stake/README.md) permits accounts to convert units of Celo Gold into Locked Gold then vote for Validator Groups, such that an election held at the end of every epoch selects a new set of validators for the following epoch.
+The system that determines the participants in a Byzantine Fault Tolerant consensus mechanism. [Celo's proof-of-stake mechanism](../celo-codebase/protocol/proof-of-stake/README.md) permits accounts to convert units of Celo Gold into Locked Gold then vote for Validator Groups, such that an election held at the end of every epoch selects a new set of validators for the following epoch.
 
 ## RC1
 
@@ -207,7 +207,7 @@ The reduction in the stake of a validator, a validator group, or both, for a par
 
 ## Slashing Penalty
 
-A variable that is tracked for each validator group by the Proof of Stake mechanism that causes rewards to the group, its validators and its voters to be temporarily reduced because of a recent slashing.
+A variable that is tracked for each validator group by the proof-of-stake mechanism that causes rewards to the group, its validators and its voters to be temporarily reduced because of a recent slashing.
 
 ## [Solidity](https://solidity.readthedocs.io/en/v0.5.10/)
 
@@ -239,15 +239,15 @@ The elapsed time between an account requesting an amount of Locked Gold be unloc
 
 ## Uptime Score
 
-A variable that is tracked for each validator by the Proof of Stake mechanism that approximates how regularly that validator participates in consensus.
+A variable that is tracked for each validator by the proof-of-stake mechanism that approximates how regularly that validator participates in consensus.
 
 ## Validator
 
-Both: the entity in the Proof of Stake mechanism that can be associated with a validator group and subsequently elected; and a running instance of the Celo Blockchain software that is configured and ready (if elected) to participate in the Byzantine Fault Tolerant consensus algorithm to agree new blocks to append to the blockchain ledger.
+Both: the entity in the proof-of-stake mechanism that can be associated with a validator group and subsequently elected; and a running instance of the Celo Blockchain software that is configured and ready (if elected) to participate in the Byzantine Fault Tolerant consensus algorithm to agree new blocks to append to the blockchain ledger.
 
 ## Validator Group
 
-The entity in the Proof of Stake mechanism that can associate validators, receive votes from holders of Locked Gold and cause those validators to be elected.
+The entity in the proof-of-stake mechanism that can associate validators, receive votes from holders of Locked Gold and cause those validators to be elected.
 
 ## Validator Set
 
