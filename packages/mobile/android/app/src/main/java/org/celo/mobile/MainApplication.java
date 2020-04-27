@@ -11,12 +11,6 @@ import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
 import com.reactnativegeth.RNGethPackage;
-import io.invertase.firebase.auth.RNFirebaseAuthPackage;
-import io.invertase.firebase.database.RNFirebaseDatabasePackage;
-import io.invertase.firebase.links.RNFirebaseLinksPackage;
-import io.invertase.firebase.messaging.RNFirebaseMessagingPackage;
-import io.invertase.firebase.notifications.RNFirebaseNotificationsPackage;
-import io.invertase.firebase.storage.RNFirebaseStoragePackage;
 import io.sentry.RNSentryPackage;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -48,12 +42,6 @@ public class MainApplication
         packages.add(new RNConfirmDeviceCredentialsPackage());
       }
       packages.add(new RNGethPackage());
-      packages.add(new RNFirebaseAuthPackage());
-      packages.add(new RNFirebaseDatabasePackage());
-      packages.add(new RNFirebaseStoragePackage());
-      packages.add(new RNFirebaseMessagingPackage());
-      packages.add(new RNFirebaseNotificationsPackage());
-      packages.add(new RNFirebaseLinksPackage());
       return packages;
     }
 

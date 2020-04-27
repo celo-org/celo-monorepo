@@ -1,37 +1,36 @@
-import { PhoneNumberUtils } from '@celo/utils'
 import { Request, Response } from 'firebase-functions'
+import { computeBlindedSignature } from '../bls/bls-signature'
 import { ErrorMessages, respondWithError } from '../common/error-utils'
 import { authenticateUser } from '../common/identity'
 import { incrementQueryCount } from '../database/wrappers/account'
-import { computeBLSSalt } from './bls-salt'
 import QueryQuota from './query-quota'
 
-export async function handleGetSalt(request: Request, response: Response) {
+export async function handleGetBlindedMessageForSalt(request: Request, response: Response) {
   try {
     const queryQuota: QueryQuota = new QueryQuota()
-    if (!isValidGetSaltInput(request.body)) {
+    if (!isValidGetSignatureInput(request.body)) {
       respondWithError(response, 400, ErrorMessages.INVALID_INPUT)
       return
     }
     authenticateUser()
     const remainingQueryCount = await queryQuota.getRemainingQueryCount(
       request.body.account,
-      request.body.phoneNumber
+      request.body.hashedPhoneNumber
     )
     if (remainingQueryCount <= 0) {
-      respondWithError(response, 400, ErrorMessages.EXCEEDED_QUOTA)
+      respondWithError(response, 403, ErrorMessages.EXCEEDED_QUOTA)
       return
     }
-    const salt = computeBLSSalt(request.body.queryPhoneNumber)
+    const signature = computeBlindedSignature(request.body.blindedQueryPhoneNumber)
     await incrementQueryCount(request.body.account)
-    response.json({ success: true, salt })
+    response.json({ success: true, signature })
   } catch (error) {
-    console.error('Failed to getSalt', error)
+    console.error(ErrorMessages.UNKNOWN_ERROR + ' Failed to getSalt', error)
     respondWithError(response, 500, ErrorMessages.UNKNOWN_ERROR)
   }
 }
 
-function isValidGetSaltInput(requestBody: any): boolean {
+function isValidGetSignatureInput(requestBody: any): boolean {
   return (
     hasValidAccountParam(requestBody) &&
     hasValidPhoneNumberParam(requestBody) &&
@@ -43,10 +42,11 @@ function hasValidAccountParam(requestBody: any): boolean {
   return requestBody.account && (requestBody.account as string).startsWith('0x')
 }
 
+// TODO (amyslawson) make this param optional for user's first request prior to attestation
 function hasValidPhoneNumberParam(requestBody: any): boolean {
-  return requestBody.phoneNumber && PhoneNumberUtils.isE164Number(requestBody.phoneNumber)
+  return requestBody.hashedPhoneNumber
 }
 
 function hasValidQueryPhoneNumberParam(requestBody: any): boolean {
-  return requestBody.queryPhoneNumber
+  return requestBody.blindedQueryPhoneNumber
 }
