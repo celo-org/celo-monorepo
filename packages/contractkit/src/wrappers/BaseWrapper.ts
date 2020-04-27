@@ -1,6 +1,6 @@
 import { ensureLeading0x, hexToBuffer } from '@celo/utils/lib/address'
 import { zip } from '@celo/utils/lib/collections'
-import { toFixed } from '@celo/utils/lib/fixidity'
+import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import { EventLog, TransactionReceipt, Tx } from 'web3-core'
 import { TransactionObject } from 'web3-eth'
@@ -34,6 +34,8 @@ export abstract class BaseWrapper<T extends Contract> {
 }
 
 export const valueToBigNumber = (input: BigNumber.Value) => new BigNumber(input)
+
+export const fixidityValueToBigNumber = (input: BigNumber.Value) => fromFixed(new BigNumber(input))
 
 export const valueToString = (input: BigNumber.Value) => valueToBigNumber(input).toFixed()
 
