@@ -1,4 +1,4 @@
-import { eqAddress, normalizeAddress } from '@celo/utils/lib/address'
+import { eqAddress, findAddressIndex, normalizeAddress } from '@celo/utils/lib/address'
 import { concurrentMap, concurrentValuesMap } from '@celo/utils/lib/async'
 import { zip } from '@celo/utils/lib/collections'
 import BigNumber from 'bignumber.js'
@@ -339,7 +339,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     value: BigNumber
   ): Promise<CeloTransactionObject<boolean>> {
     const groups = await this.contract.methods.getGroupsVotedForByAccount(account).call()
-    const index = groups.indexOf(group)
+    const index = findAddressIndex(group, groups)
     const { lesser, greater } = await this.findLesserAndGreaterAfterVote(group, value.times(-1))
 
     return toTransactionObject(
@@ -354,7 +354,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     value: BigNumber
   ): Promise<CeloTransactionObject<boolean>> {
     const groups = await this.contract.methods.getGroupsVotedForByAccount(account).call()
-    const index = groups.indexOf(group)
+    const index = findAddressIndex(group, groups)
     const { lesser, greater } = await this.findLesserAndGreaterAfterVote(group, value.times(-1))
 
     return toTransactionObject(
