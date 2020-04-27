@@ -9,7 +9,8 @@ import Chevron, { Direction } from 'src/icons/chevron'
 import { colors } from 'src/styles'
 import { cutAddress, formatNumber } from 'src/utils/utils'
 
-const unknonValidatorName = 'Unnamed validator'
+const unknownGroupName = 'Unnamed Group'
+const unknownValidatorName = 'Unnamed Validator'
 
 class Text extends RNText {
   render() {
@@ -62,7 +63,7 @@ class ValidatorsListRow extends React.PureComponent<Props & I18nProps, State> {
     tooltip: false,
   }
   tooltipRef = React.createRef<any>()
-  removeDocumentListener: any
+  removeDocumentListener: () => void
 
   constructor(...args) {
     super(...(args as [any]))
@@ -116,7 +117,7 @@ class ValidatorsListRow extends React.PureComponent<Props & I18nProps, State> {
                   numberOfLines={1}
                   ellipsizeMode="tail"
                 >
-                  {group.name || unknonValidatorName}
+                  {group.name || unknownGroupName}
                 </Text>
 
                 {!!group.claims.length && (
@@ -130,7 +131,7 @@ class ValidatorsListRow extends React.PureComponent<Props & I18nProps, State> {
                         <Text style={[styles.tooltip]}>
                           {group.claims.map((domain, i) => (
                             <Text key={domain} style={[styles.tooltipRow]}>
-                              {i}. <Text style={[styles.tooltipText]}>{domain}</Text>
+                              {i + 1}. <Text style={[styles.tooltipText]}>{domain}</Text>
                               <Text style={[styles.checkmark]}>
                                 <Checkmark color={colors.black} size={8} />
                               </Text>
@@ -221,7 +222,7 @@ class ValidatorsListRow extends React.PureComponent<Props & I18nProps, State> {
                   <Text style={[styles.tableCell, styles.tableCellTitleNumber]}>{j + 1}</Text>
                   <Text style={[styles.tableCellTitleRows]}>
                     <Text style={[styles.tableCellTitleFirstRow, styles.tableSecondaryCell]}>
-                      {validator.name || unknonValidatorName}
+                      {validator.name || unknownValidatorName}
                     </Text>
                     <Text
                       style={[styles.tableCellTitleSecRow, styles.tableCellTitleSecondarySecRow]}

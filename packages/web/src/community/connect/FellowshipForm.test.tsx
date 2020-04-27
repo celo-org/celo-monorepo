@@ -33,6 +33,10 @@ describe('FellowshipForm', () => {
         expect(element).not.toBeVisible()
       )
     })
+    it('does not show any unknown Errors', () => {
+      const { queryByText } = render(<FellowshipForm />)
+      expect(queryByText('common:validationErrors.unknownError')).not.toBeInTheDocument()
+    })
   })
 
   describe('when visitor presses submit after filling out the form', () => {

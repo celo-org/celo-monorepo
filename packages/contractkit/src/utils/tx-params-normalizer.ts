@@ -1,5 +1,6 @@
 import { Tx } from 'web3-core'
 import { RpcCaller } from './rpc-caller'
+import { estimateGas } from './web3-utils'
 
 function isEmpty(value: string | undefined) {
   return (
@@ -58,9 +59,15 @@ export class TxParamsNormalizer {
 
   private async getEstimateGas(txParams: Tx): Promise<string> {
     // Reference: https://github.com/ethereum/wiki/wiki/JSON-RPC#eth_estimategas
-    const gasResult = await this.rpcCaller.call('eth_estimateGas', [txParams])
-    const gas = gasResult.result.toString()
-    return gas
+    const gasEstimator = async (tx: Tx) => {
+      const gasResult = await this.rpcCaller.call('eth_estimateGas', [tx])
+      return gasResult.result as number
+    }
+    const caller = async (tx: Tx) => {
+      const callResult = await this.rpcCaller.call('eth_call', [tx])
+      return callResult.result as string
+    }
+    return (await estimateGas(txParams, gasEstimator, caller)).toString()
   }
 
   // @ts-ignore - see comment above

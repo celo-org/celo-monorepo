@@ -6,8 +6,17 @@
 
 ## Implemented by
 
-* [DefaultWallet](../classes/_wallets_default_wallet_.defaultwallet.md)
+* [AzureHSMWallet](../classes/_wallets_azure_hsm_wallet_.azurehsmwallet.md)
+* [AzureHSMWallet](../classes/_wallets_azure_hsm_wallet_.azurehsmwallet.md)
+* [AzureHSMWallet](../classes/_wallets_azure_hsm_wallet_.azurehsmwallet.md)
 * [LedgerWallet](../classes/_wallets_ledger_wallet_.ledgerwallet.md)
+* [LedgerWallet](../classes/_wallets_ledger_wallet_.ledgerwallet.md)
+* [LedgerWallet](../classes/_wallets_ledger_wallet_.ledgerwallet.md)
+* [LocalWallet](../classes/_wallets_local_wallet_.localwallet.md)
+* [LocalWallet](../classes/_wallets_local_wallet_.localwallet.md)
+* [RemoteWallet](../classes/_wallets_remote_wallet_.remotewallet.md)
+* [RemoteWallet](../classes/_wallets_remote_wallet_.remotewallet.md)
+* [WalletBase](../classes/_wallets_wallet_.walletbase.md)
 
 ## Index
 
@@ -25,7 +34,7 @@
 
 • **getAccounts**: *function*
 
-*Defined in [contractkit/src/wallets/wallet.ts:6](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L6)*
+*Defined in [contractkit/src/wallets/wallet.ts:14](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L14)*
 
 #### Type declaration:
 
@@ -37,7 +46,7 @@ ___
 
 • **hasAccount**: *function*
 
-*Defined in [contractkit/src/wallets/wallet.ts:7](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L7)*
+*Defined in [contractkit/src/wallets/wallet.ts:15](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L15)*
 
 #### Type declaration:
 
@@ -55,7 +64,7 @@ ___
 
 • **signPersonalMessage**: *function*
 
-*Defined in [contractkit/src/wallets/wallet.ts:10](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L10)*
+*Defined in [contractkit/src/wallets/wallet.ts:18](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L18)*
 
 #### Type declaration:
 
@@ -74,7 +83,7 @@ ___
 
 • **signTransaction**: *function*
 
-*Defined in [contractkit/src/wallets/wallet.ts:8](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L8)*
+*Defined in [contractkit/src/wallets/wallet.ts:16](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L16)*
 
 #### Type declaration:
 
@@ -92,15 +101,15 @@ ___
 
 • **signTypedData**: *function*
 
-*Defined in [contractkit/src/wallets/wallet.ts:9](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L9)*
+*Defined in [contractkit/src/wallets/wallet.ts:17](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L17)*
 
 #### Type declaration:
 
-▸ (`address`: string, `typedData`: [EIP712TypedData](_utils_sign_typed_data_utils_.eip712typeddata.md)): *Promise‹string›*
+▸ (`address`: [Address](../modules/_base_.md#address), `typedData`: [EIP712TypedData](_utils_sign_typed_data_utils_.eip712typeddata.md)): *Promise‹string›*
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
-`address` | string |
+`address` | [Address](../modules/_base_.md#address) |
 `typedData` | [EIP712TypedData](_utils_sign_typed_data_utils_.eip712typeddata.md) |
