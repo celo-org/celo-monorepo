@@ -7,12 +7,12 @@ export enum NUMBER_PAIRS_COLUMN {
 }
 
 export class NumberPair extends Model {
-  userPhoneHash: string
-  contactPhoneHash: string
+  [NUMBER_PAIRS_COLUMN.userPhoneHash]: string;
+  [NUMBER_PAIRS_COLUMN.contactPhoneHash]: string
 
   constructor(userPhoneHash: string, contactPhoneHash: string) {
     super()
-    this.userPhoneHash = userPhoneHash
-    this.contactPhoneHash = contactPhoneHash
+    this.user_phone_hash = userPhoneHash
+    this.contact_phone_hash = contactPhoneHash
   }
 }
