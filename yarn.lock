@@ -13470,7 +13470,7 @@ ethereumjs-util@~6.0.0:
 
 ethereumjs-vm@3.0.0:
   version "3.0.0"
-  resolved "https://github.com/celo-org/ethereumjs-vm.git#0fd539c09175e116e06e94ac5289584607c406a5"
+  resolved "git+https://github.com/celo-org/ethereumjs-vm.git#0fd539c09175e116e06e94ac5289584607c406a5"
   dependencies:
     async "^2.1.2"
     async-eventemitter "^0.2.2"
