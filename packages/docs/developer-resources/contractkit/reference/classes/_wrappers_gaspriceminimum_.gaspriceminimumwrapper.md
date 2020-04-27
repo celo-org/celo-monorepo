@@ -53,9 +53,13 @@ Name | Type |
 
 ###  adjustmentSpeed
 
-• **adjustmentSpeed**: *function* = proxyCall(this.contract.methods.adjustmentSpeed, undefined, valueToBigNumber)
+• **adjustmentSpeed**: *function* = proxyCall(
+    this.contract.methods.adjustmentSpeed,
+    undefined,
+    fixidityValueToBigNumber
+  )
 
-*Defined in [contractkit/src/wrappers/GasPriceMinimum.ts:40](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/GasPriceMinimum.ts#L40)*
+*Defined in [contractkit/src/wrappers/GasPriceMinimum.ts:44](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/GasPriceMinimum.ts#L44)*
 
 Query adjustment speed parameter
 
@@ -133,7 +137,11 @@ ___
 
 ###  targetDensity
 
-• **targetDensity**: *function* = proxyCall(this.contract.methods.targetDensity, undefined, valueToBigNumber)
+• **targetDensity**: *function* = proxyCall(
+    this.contract.methods.targetDensity,
+    undefined,
+    fixidityValueToBigNumber
+  )
 
 *Defined in [contractkit/src/wrappers/GasPriceMinimum.ts:35](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/GasPriceMinimum.ts#L35)*
 
@@ -171,7 +179,7 @@ Contract address
 
 ▸ **getConfig**(): *Promise‹[GasPriceMinimumConfig](../interfaces/_wrappers_gaspriceminimum_.gaspriceminimumconfig.md)›*
 
-*Defined in [contractkit/src/wrappers/GasPriceMinimum.ts:44](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/GasPriceMinimum.ts#L44)*
+*Defined in [contractkit/src/wrappers/GasPriceMinimum.ts:52](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/GasPriceMinimum.ts#L52)*
 
 Returns current configuration parameters.
 
