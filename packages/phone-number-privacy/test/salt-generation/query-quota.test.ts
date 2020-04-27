@@ -17,7 +17,7 @@ jest.mock('@celo/contractkit', () => {
 
   return {
     ...jest.requireActual('@celo/contractkit'),
-    newKit: async () => kit,
+    newKit: () => kit,
   }
 })
 
