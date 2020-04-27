@@ -60,6 +60,8 @@ export interface ElectionConfig {
   electableValidators: ElectableValidators
   electabilityThreshold: BigNumber
   maxNumGroupsVotedFor: BigNumber
+  totalVotes: BigNumber
+  currentThreshold: BigNumber
 }
 
 /**
@@ -126,6 +128,12 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     undefined,
     valueToInt
   )
+
+  /**
+   * Returns the total votes received across all groups.
+   * @return The total votes received across all groups.
+   */
+  getTotalVotes = proxyCall(this.contract.methods.getTotalVotes, undefined, valueToBigNumber)
 
   /**
    * Returns the current validator signers using the precompiles.
@@ -276,11 +284,14 @@ export class ElectionWrapper extends BaseWrapper<Election> {
       this.electableValidators(),
       this.electabilityThreshold(),
       this.contract.methods.maxNumGroupsVotedFor().call(),
+      this.getTotalVotes(),
     ])
     return {
       electableValidators: res[0],
       electabilityThreshold: res[1],
       maxNumGroupsVotedFor: valueToBigNumber(res[2]),
+      totalVotes: res[3],
+      currentThreshold: res[3].dividedBy(res[1]),
     }
   }
 
