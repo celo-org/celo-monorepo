@@ -100,14 +100,14 @@ class AttestationRequestHandler {
     const address = getAccountAddress()
 
     // TODO: Check with the new Accounts.sol
-    if (eqAddress(address, issuer)) {
+    if (!eqAddress(address, issuer)) {
       Counters.attestationRequestsWrongIssuer.inc()
       throw new Error(`Mismatching issuer, I am ${address}`)
     }
 
     const attestations = await kit.contracts.getAttestations()
-    const identifer = PhoneNumberUtils.getPhoneHash(phoneNumber, salt)
-    const state = await attestations.getAttestationState(identifer, account, issuer)
+    const identifier = PhoneNumberUtils.getPhoneHash(phoneNumber, salt)
+    const state = await attestations.getAttestationState(identifier, account, issuer)
 
     if (state.attestationState !== AttestationState.Incomplete) {
       Counters.attestationRequestsWOIncompleteAttestation.inc()

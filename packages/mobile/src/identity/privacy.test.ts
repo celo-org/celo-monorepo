@@ -21,7 +21,7 @@ describe('Fetch phone hash details', () => {
   it('retrieves salts correctly', async () => {
     mockFetch.mockResponseOnce(JSON.stringify({ salt: 'foobar' }))
     const expectedSalt = '6ca13d52ca70c883e0f0bb101e425a89e8624de51db2d2392593af6a84118090'
-    const expectedHash = '0x73585dd92c08c7fa648132310efd8f30a370e657b223fae92d7cc51f71b2dea8'
+    const expectedHash = '0x67d164da8c468eabf13481d3644d448e2d41c5e3508aca66242975cfac8e4e95'
 
     await expectSaga(fetchPhoneHashPrivate, mockE164Number)
       .provide([
