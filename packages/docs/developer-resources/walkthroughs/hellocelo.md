@@ -95,7 +95,7 @@ Reading all account balances is a powerful feature of blockchains. Next, let's s
 
 In order to do transfers (aka [transactions](https://docs.celo.org/getting-started/glossary#transaction)), we need to:
 
-1. Create an [account](https://docs.celo.org/getting-started/glossary#account) \(create a private key\)
+1. Create an [account](https://docs.celo.org/getting-started/glossary#account) \(by creating a private key\)
 2. Fund it with test cGLD and cUSDs
 3. Sign and send transactions to the network
 
@@ -118,8 +118,6 @@ This is not the standard way of managing Celo accounts. In a production environm
 We can now use this `account` to get account information \(ie the private key and account address\) and to send transactions from `account.address`. Add the following code to read the account balance. Continue adding to `helloCelo.js`.
 
 ```javascript
-...
-
 //
 // Create an Account
 //
@@ -165,6 +163,8 @@ After we read the receipt, we check the balance of our account again, using the 
 
 You may notice that the account balance is a bit smaller than the amount of tokens that we sent. This is because you have to pay for every update to the network.
 
+Add the following code to the `send()` function in `helloCelo.js` to send a transaction.
+
 ```javascript
 async function send(){
     // 10. Get your account
@@ -176,27 +176,30 @@ async function send(){
     // 12. Specify recipient Address
     let anAddress = '0xD86518b29BB52a5DAC5991eACf09481CE4B0710d'
 
-    // 13. Get the Gold Token contract wrapper    
+    // 13. Specify an amount to send
+    let amount = 100000
+
+    // 14. Get the Gold Token contract wrapper    
     let goldtoken = await kit.contracts.getGoldToken()
     
-    // 14. Transfer gold from your account to anAddress
-    let tx = await goldtoken.transfer(anAddress, 100000).send({from: account.address})
+    // 15. Transfer gold from your account to anAddress
+    let tx = await goldtoken.transfer(anAddress, amount).send({from: account.address})
     
-    // 15. Wait for the transaction to be processed
+    // 16. Wait for the transaction to be processed
     let receipt = await tx.waitReceipt()
     
-    // 16. Print receipt
+    // 17. Print receipt
     console.log('Transaction receipt: %o', receipt)
     
-    // 17. Get your new balance
+    // 18. Get your new balance
     let balance = await goldtoken.balanceOf(account.address)
     
-    // 18. Print new balance
+    // 19. Print new balance
     console.log(`Your new account balance: ${balance.toString()}`)
 }
 ```
 
-Run `$ node helloCelo.js` again to send the transaction.
+Run `$ node helloCelo.js` again to send the transaction and see the printed output in the console.
 
 ## Wrapping Up
 
