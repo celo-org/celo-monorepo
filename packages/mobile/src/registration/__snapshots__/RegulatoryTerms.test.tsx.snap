@@ -43,6 +43,7 @@ exports[`RegulatoryTermsScreen renders correctly 1`] = `
         "minHeight": "100%",
       }
     }
+    testID="scrollView"
   >
     <View>
       <View
