@@ -1,0 +1,633 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Main MobileMenu renders 1`] = `
+<div
+  className="css-view-1dbjc4n"
+  style={
+    Object {
+      "WebkitAlignItems": "center",
+      "WebkitBoxAlign": "center",
+      "WebkitBoxDirection": "normal",
+      "WebkitBoxFlex": 1,
+      "WebkitBoxOrient": "vertical",
+      "WebkitBoxPack": "start",
+      "WebkitFlexBasis": "0%",
+      "WebkitFlexDirection": "column",
+      "WebkitFlexGrow": 1,
+      "WebkitFlexShrink": 1,
+      "WebkitJustifyContent": "flex-start",
+      "alignItems": "center",
+      "flexBasis": "0%",
+      "flexDirection": "column",
+      "flexGrow": 1,
+      "flexShrink": 1,
+      "justifyContent": "flex-start",
+      "msFlexAlign": "center",
+      "msFlexDirection": "column",
+      "msFlexNegative": 1,
+      "msFlexPack": "start",
+      "msFlexPositive": 1,
+      "msFlexPreferredSize": "0%",
+      "paddingBottom": "30px",
+      "paddingLeft": "20px",
+      "paddingRight": "20px",
+      "paddingTop": "30px",
+    }
+  }
+>
+  <div
+    className="css-view-1dbjc4n"
+    style={
+      Object {
+        "WebkitAlignItems": "center",
+        "WebkitBoxAlign": "center",
+        "WebkitBoxDirection": "normal",
+        "WebkitBoxOrient": "vertical",
+        "WebkitBoxPack": "justify",
+        "WebkitFlexDirection": "column",
+        "WebkitJustifyContent": "space-around",
+        "alignItems": "center",
+        "flexDirection": "column",
+        "justifyContent": "space-around",
+        "msFlexAlign": "center",
+        "msFlexDirection": "column",
+        "msFlexPack": "distribute",
+        "paddingLeft": "20px",
+        "paddingRight": "20px",
+      }
+    }
+  >
+    <div
+      className="css-view-1dbjc4n"
+      style={
+        Object {
+          "marginBottom": "25px",
+          "marginLeft": "10px",
+          "marginRight": "10px",
+          "marginTop": "25px",
+        }
+      }
+    >
+      <div
+        className="css-view-1dbjc4n"
+        onClick={[Function]}
+        onMouseDown={[Function]}
+        onMouseEnter={[Function]}
+        onMouseLeave={[Function]}
+        onMouseUp={[Function]}
+        onResponderGrant={[Function]}
+        onResponderRelease={[Function]}
+        style={
+          Object {
+            "WebkitAlignItems": "center",
+            "WebkitBoxAlign": "center",
+            "alignItems": "center",
+            "msFlexAlign": "center",
+          }
+        }
+      >
+        <a
+          className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+          data-focusable={true}
+          dir="auto"
+          href="/"
+          onClick={[Function]}
+          onMouseEnter={[Function]}
+          role="link"
+          style={
+            Object {
+              "WebkitAlignItems": "center",
+              "WebkitBoxAlign": "center",
+              "WebkitBoxFlex": 0,
+              "WebkitBoxPack": "center",
+              "WebkitFlexGrow": 0,
+              "WebkitJustifyContent": "center",
+              "alignItems": "center",
+              "backgroundColor": "rgba(0,0,0,0.00)",
+              "borderBottomColor": "rgba(0,0,0,0.00)",
+              "borderLeftColor": "rgba(0,0,0,0.00)",
+              "borderRightColor": "rgba(0,0,0,0.00)",
+              "borderTopColor": "rgba(0,0,0,0.00)",
+              "color": "rgba(53,208,127,1.00)",
+              "cursor": "pointer",
+              "display": "inline-flex",
+              "flexGrow": 0,
+              "fontFamily": "Jost, futura-pt, futura, sans-serif",
+              "fontSize": "20px",
+              "fontWeight": "500",
+              "justifyContent": "center",
+              "lineHeight": "16px",
+              "minWidth": "150px",
+              "msFlexAlign": "center",
+              "msFlexPack": "center",
+              "msFlexPositive": 0,
+              "opacity": 1,
+              "outlineColor": "transparent",
+              "paddingBottom": "10px",
+              "paddingLeft": "20px",
+              "paddingRight": "20px",
+              "paddingTop": "10px",
+              "textAlign": "center",
+              "textRendering": "geometricPrecision",
+              "width": "fit-content",
+            }
+          }
+        >
+          Home
+        </a>
+      </div>
+    </div>
+    <div
+      className="css-view-1dbjc4n"
+      style={
+        Object {
+          "marginBottom": "25px",
+          "marginLeft": "10px",
+          "marginRight": "10px",
+          "marginTop": "25px",
+        }
+      }
+    >
+      <div
+        className="css-view-1dbjc4n"
+        onClick={[Function]}
+        onMouseDown={[Function]}
+        onMouseEnter={[Function]}
+        onMouseLeave={[Function]}
+        onMouseUp={[Function]}
+        onResponderGrant={[Function]}
+        onResponderRelease={[Function]}
+        style={
+          Object {
+            "WebkitAlignItems": "center",
+            "WebkitBoxAlign": "center",
+            "alignItems": "center",
+            "msFlexAlign": "center",
+          }
+        }
+      >
+        <a
+          className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+          data-focusable={true}
+          dir="auto"
+          href="/about"
+          onClick={[Function]}
+          onMouseEnter={[Function]}
+          role="link"
+          style={
+            Object {
+              "WebkitAlignItems": "center",
+              "WebkitBoxAlign": "center",
+              "WebkitBoxFlex": 0,
+              "WebkitBoxPack": "center",
+              "WebkitFlexGrow": 0,
+              "WebkitJustifyContent": "center",
+              "alignItems": "center",
+              "backgroundColor": "rgba(0,0,0,0.00)",
+              "borderBottomColor": "rgba(0,0,0,0.00)",
+              "borderLeftColor": "rgba(0,0,0,0.00)",
+              "borderRightColor": "rgba(0,0,0,0.00)",
+              "borderTopColor": "rgba(0,0,0,0.00)",
+              "color": "rgba(46,51,56,1.00)",
+              "cursor": "pointer",
+              "display": "inline-flex",
+              "flexGrow": 0,
+              "fontFamily": "Jost, futura-pt, futura, sans-serif",
+              "fontSize": "20px",
+              "fontWeight": "500",
+              "justifyContent": "center",
+              "lineHeight": "16px",
+              "msFlexAlign": "center",
+              "msFlexPack": "center",
+              "msFlexPositive": 0,
+              "opacity": 1,
+              "outlineColor": "transparent",
+              "textAlign": "center",
+              "textRendering": "geometricPrecision",
+              "width": "fit-content",
+            }
+          }
+        >
+          About
+        </a>
+      </div>
+    </div>
+    <div
+      className="css-view-1dbjc4n"
+      style={
+        Object {
+          "marginBottom": "25px",
+          "marginLeft": "10px",
+          "marginRight": "10px",
+          "marginTop": "25px",
+        }
+      }
+    >
+      <div
+        className="css-view-1dbjc4n"
+        onClick={[Function]}
+        onMouseDown={[Function]}
+        onMouseEnter={[Function]}
+        onMouseLeave={[Function]}
+        onMouseUp={[Function]}
+        onResponderGrant={[Function]}
+        onResponderRelease={[Function]}
+        style={
+          Object {
+            "WebkitAlignItems": "center",
+            "WebkitBoxAlign": "center",
+            "alignItems": "center",
+            "msFlexAlign": "center",
+          }
+        }
+      >
+        <a
+          className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+          data-focusable={true}
+          dir="auto"
+          href="/jobs"
+          onClick={[Function]}
+          onMouseEnter={[Function]}
+          role="link"
+          style={
+            Object {
+              "WebkitAlignItems": "center",
+              "WebkitBoxAlign": "center",
+              "WebkitBoxFlex": 0,
+              "WebkitBoxPack": "center",
+              "WebkitFlexGrow": 0,
+              "WebkitJustifyContent": "center",
+              "alignItems": "center",
+              "backgroundColor": "rgba(0,0,0,0.00)",
+              "borderBottomColor": "rgba(0,0,0,0.00)",
+              "borderLeftColor": "rgba(0,0,0,0.00)",
+              "borderRightColor": "rgba(0,0,0,0.00)",
+              "borderTopColor": "rgba(0,0,0,0.00)",
+              "color": "rgba(46,51,56,1.00)",
+              "cursor": "pointer",
+              "display": "inline-flex",
+              "flexGrow": 0,
+              "fontFamily": "Jost, futura-pt, futura, sans-serif",
+              "fontSize": "20px",
+              "fontWeight": "500",
+              "justifyContent": "center",
+              "lineHeight": "16px",
+              "msFlexAlign": "center",
+              "msFlexPack": "center",
+              "msFlexPositive": 0,
+              "opacity": 1,
+              "outlineColor": "transparent",
+              "textAlign": "center",
+              "textRendering": "geometricPrecision",
+              "width": "fit-content",
+            }
+          }
+        >
+          Join
+        </a>
+      </div>
+    </div>
+    <div
+      className="css-view-1dbjc4n"
+      style={
+        Object {
+          "marginBottom": "25px",
+          "marginLeft": "10px",
+          "marginRight": "10px",
+          "marginTop": "25px",
+        }
+      }
+    >
+      <div
+        className="css-view-1dbjc4n"
+        onClick={[Function]}
+        onMouseDown={[Function]}
+        onMouseEnter={[Function]}
+        onMouseLeave={[Function]}
+        onMouseUp={[Function]}
+        onResponderGrant={[Function]}
+        onResponderRelease={[Function]}
+        style={
+          Object {
+            "WebkitAlignItems": "center",
+            "WebkitBoxAlign": "center",
+            "alignItems": "center",
+            "msFlexAlign": "center",
+          }
+        }
+      >
+        <a
+          className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+          data-focusable={true}
+          dir="auto"
+          href="/validators"
+          onClick={[Function]}
+          onMouseEnter={[Function]}
+          role="link"
+          style={
+            Object {
+              "WebkitAlignItems": "center",
+              "WebkitBoxAlign": "center",
+              "WebkitBoxFlex": 0,
+              "WebkitBoxPack": "center",
+              "WebkitFlexGrow": 0,
+              "WebkitJustifyContent": "center",
+              "alignItems": "center",
+              "backgroundColor": "rgba(0,0,0,0.00)",
+              "borderBottomColor": "rgba(0,0,0,0.00)",
+              "borderLeftColor": "rgba(0,0,0,0.00)",
+              "borderRightColor": "rgba(0,0,0,0.00)",
+              "borderTopColor": "rgba(0,0,0,0.00)",
+              "color": "rgba(46,51,56,1.00)",
+              "cursor": "pointer",
+              "display": "inline-flex",
+              "flexGrow": 0,
+              "fontFamily": "Jost, futura-pt, futura, sans-serif",
+              "fontSize": "20px",
+              "fontWeight": "500",
+              "justifyContent": "center",
+              "lineHeight": "16px",
+              "msFlexAlign": "center",
+              "msFlexPack": "center",
+              "msFlexPositive": 0,
+              "opacity": 1,
+              "outlineColor": "transparent",
+              "textAlign": "center",
+              "textRendering": "geometricPrecision",
+              "width": "fit-content",
+            }
+          }
+        >
+          Validators
+        </a>
+      </div>
+    </div>
+    <div
+      className="css-view-1dbjc4n"
+      style={
+        Object {
+          "marginBottom": "25px",
+          "marginLeft": "10px",
+          "marginRight": "10px",
+          "marginTop": "25px",
+        }
+      }
+    >
+      <div
+        className="css-view-1dbjc4n"
+        onClick={[Function]}
+        onMouseDown={[Function]}
+        onMouseEnter={[Function]}
+        onMouseLeave={[Function]}
+        onMouseUp={[Function]}
+        onResponderGrant={[Function]}
+        onResponderRelease={[Function]}
+        style={
+          Object {
+            "WebkitAlignItems": "center",
+            "WebkitBoxAlign": "center",
+            "alignItems": "center",
+            "msFlexAlign": "center",
+          }
+        }
+      >
+        <a
+          className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+          data-focusable={true}
+          dir="auto"
+          href="/developers"
+          onClick={[Function]}
+          onMouseEnter={[Function]}
+          role="link"
+          style={
+            Object {
+              "WebkitAlignItems": "center",
+              "WebkitBoxAlign": "center",
+              "WebkitBoxFlex": 0,
+              "WebkitBoxPack": "center",
+              "WebkitFlexGrow": 0,
+              "WebkitJustifyContent": "center",
+              "alignItems": "center",
+              "backgroundColor": "rgba(0,0,0,0.00)",
+              "borderBottomColor": "rgba(0,0,0,0.00)",
+              "borderLeftColor": "rgba(0,0,0,0.00)",
+              "borderRightColor": "rgba(0,0,0,0.00)",
+              "borderTopColor": "rgba(0,0,0,0.00)",
+              "color": "rgba(46,51,56,1.00)",
+              "cursor": "pointer",
+              "display": "inline-flex",
+              "flexGrow": 0,
+              "fontFamily": "Jost, futura-pt, futura, sans-serif",
+              "fontSize": "20px",
+              "fontWeight": "500",
+              "justifyContent": "center",
+              "lineHeight": "16px",
+              "msFlexAlign": "center",
+              "msFlexPack": "center",
+              "msFlexPositive": 0,
+              "opacity": 1,
+              "outlineColor": "transparent",
+              "textAlign": "center",
+              "textRendering": "geometricPrecision",
+              "width": "fit-content",
+            }
+          }
+        >
+          Developers
+        </a>
+      </div>
+    </div>
+    <div
+      className="css-view-1dbjc4n"
+      style={
+        Object {
+          "marginBottom": "25px",
+          "marginLeft": "10px",
+          "marginRight": "10px",
+          "marginTop": "25px",
+        }
+      }
+    >
+      <div
+        className="css-view-1dbjc4n"
+        onClick={[Function]}
+        onMouseDown={[Function]}
+        onMouseEnter={[Function]}
+        onMouseLeave={[Function]}
+        onMouseUp={[Function]}
+        onResponderGrant={[Function]}
+        onResponderRelease={[Function]}
+        style={
+          Object {
+            "WebkitAlignItems": "center",
+            "WebkitBoxAlign": "center",
+            "alignItems": "center",
+            "msFlexAlign": "center",
+          }
+        }
+      >
+        <a
+          className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+          data-focusable={true}
+          dir="auto"
+          href="/alliance"
+          onClick={[Function]}
+          onMouseEnter={[Function]}
+          role="link"
+          style={
+            Object {
+              "WebkitAlignItems": "center",
+              "WebkitBoxAlign": "center",
+              "WebkitBoxFlex": 0,
+              "WebkitBoxPack": "center",
+              "WebkitFlexGrow": 0,
+              "WebkitJustifyContent": "center",
+              "alignItems": "center",
+              "backgroundColor": "rgba(0,0,0,0.00)",
+              "borderBottomColor": "rgba(0,0,0,0.00)",
+              "borderLeftColor": "rgba(0,0,0,0.00)",
+              "borderRightColor": "rgba(0,0,0,0.00)",
+              "borderTopColor": "rgba(0,0,0,0.00)",
+              "color": "rgba(46,51,56,1.00)",
+              "cursor": "pointer",
+              "display": "inline-flex",
+              "flexGrow": 0,
+              "fontFamily": "Jost, futura-pt, futura, sans-serif",
+              "fontSize": "20px",
+              "fontWeight": "500",
+              "justifyContent": "center",
+              "lineHeight": "16px",
+              "msFlexAlign": "center",
+              "msFlexPack": "center",
+              "msFlexPositive": 0,
+              "opacity": 1,
+              "outlineColor": "transparent",
+              "textAlign": "center",
+              "textRendering": "geometricPrecision",
+              "width": "fit-content",
+            }
+          }
+        >
+          Alliance
+        </a>
+      </div>
+    </div>
+    <div
+      className="css-view-1dbjc4n"
+      style={
+        Object {
+          "marginBottom": "25px",
+          "marginLeft": "10px",
+          "marginRight": "10px",
+          "marginTop": "25px",
+        }
+      }
+    >
+      <div
+        className="css-view-1dbjc4n"
+        onClick={[Function]}
+        onMouseDown={[Function]}
+        onMouseEnter={[Function]}
+        onMouseLeave={[Function]}
+        onMouseUp={[Function]}
+        onResponderGrant={[Function]}
+        onResponderRelease={[Function]}
+        style={
+          Object {
+            "WebkitAlignItems": "center",
+            "WebkitBoxAlign": "center",
+            "alignItems": "center",
+            "msFlexAlign": "center",
+          }
+        }
+      >
+        <a
+          className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+          data-focusable={true}
+          dir="auto"
+          href="/community"
+          onClick={[Function]}
+          onMouseEnter={[Function]}
+          role="link"
+          style={
+            Object {
+              "WebkitAlignItems": "center",
+              "WebkitBoxAlign": "center",
+              "WebkitBoxFlex": 0,
+              "WebkitBoxPack": "center",
+              "WebkitFlexGrow": 0,
+              "WebkitJustifyContent": "center",
+              "alignItems": "center",
+              "backgroundColor": "rgba(0,0,0,0.00)",
+              "borderBottomColor": "rgba(0,0,0,0.00)",
+              "borderLeftColor": "rgba(0,0,0,0.00)",
+              "borderRightColor": "rgba(0,0,0,0.00)",
+              "borderTopColor": "rgba(0,0,0,0.00)",
+              "color": "rgba(46,51,56,1.00)",
+              "cursor": "pointer",
+              "display": "inline-flex",
+              "flexGrow": 0,
+              "fontFamily": "Jost, futura-pt, futura, sans-serif",
+              "fontSize": "20px",
+              "fontWeight": "500",
+              "justifyContent": "center",
+              "lineHeight": "16px",
+              "msFlexAlign": "center",
+              "msFlexPack": "center",
+              "msFlexPositive": 0,
+              "opacity": 1,
+              "outlineColor": "transparent",
+              "textAlign": "center",
+              "textRendering": "geometricPrecision",
+              "width": "fit-content",
+            }
+          }
+        >
+          Community
+        </a>
+      </div>
+    </div>
+  </div>
+  <div
+    className="css-view-1dbjc4n"
+    style={
+      Object {
+        "WebkitAlignItems": "center",
+        "WebkitBoxAlign": "center",
+        "WebkitBoxPack": "center",
+        "WebkitJustifyContent": "center",
+        "alignItems": "center",
+        "justifyContent": "center",
+        "msFlexAlign": "center",
+        "msFlexPack": "center",
+        "paddingBottom": "30px",
+        "paddingTop": "30px",
+      }
+    }
+  >
+    <svg
+      fill="none"
+      height={30}
+      style={Object {}}
+      viewBox="0 0 25 25"
+      width={30}
+    >
+      <path
+        d="M9.86842 22.3684C13.8653 22.3684 17.1053 19.1284 17.1053 15.1316C17.1053 11.1348 13.8653 7.89476 9.86842 7.89476C5.87158 7.89476 2.63158 11.1348 2.63158 15.1316C2.63158 19.1284 5.87158 22.3684 9.86842 22.3684ZM9.86842 25C4.41842 25 0 20.5816 0 15.1316C0 9.6816 4.41842 5.26318 9.86842 5.26318C15.3184 5.26318 19.7368 9.6816 19.7368 15.1316C19.7368 20.5816 15.3184 25 9.86842 25Z"
+        fill="#FBCC5C"
+        style={Object {}}
+      />
+      <path
+        d="M15.1316 17.1053C19.1284 17.1053 22.3684 13.8653 22.3684 9.86842C22.3684 5.87158 19.1284 2.63158 15.1316 2.63158C11.1348 2.63158 7.89476 5.87158 7.89476 9.86842C7.89476 13.8653 11.1348 17.1053 15.1316 17.1053ZM15.1316 19.7368C9.6816 19.7368 5.26318 15.3184 5.26318 9.86842C5.26318 4.41842 9.6816 0 15.1316 0C20.5816 0 25 4.41842 25 9.86842C25 15.3184 20.5816 19.7368 15.1316 19.7368Z"
+        fill="#35D07F"
+        style={Object {}}
+      />
+      <path
+        d="M15.4577 19.7369C16.1419 18.9077 16.6324 17.9361 16.8932 16.8932C17.9361 16.6324 18.9077 16.1421 19.7369 15.4579C19.699 16.6658 19.439 17.8563 18.9695 18.9698C17.8561 19.439 16.6656 19.6992 15.4577 19.7369ZM8.10687 8.10687C7.06397 8.36766 6.09239 8.85792 5.26318 9.54213C5.30108 8.33424 5.56108 7.14371 6.03055 6.03029C7.14397 5.56108 8.3345 5.30082 9.54239 5.26318C8.85818 6.09239 8.36766 7.06397 8.10687 8.10687Z"
+        fill="#5EA33B"
+        style={Object {}}
+      />
+    </svg>
+  </div>
+</div>
+`;
