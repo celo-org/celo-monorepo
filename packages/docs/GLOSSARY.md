@@ -8,9 +8,9 @@ Identifies an account on Celo. There are two types of account. **Externally owne
 
 A unique identifier for an account on the Celo blockchain.
 
-## [Alfajores](alfajores-testnet.md)
+## [Alfajores](getting-started/alfajores-testnet.md)
 
-The first public Celo test network, available for developers to use freely subject to the [Alfajores Testnet Disclaimer](../important-information/alfajores-testnet-disclaimer.md).
+The first public Celo test network, available for developers to use freely subject to the [Alfajores Testnet Disclaimer](important-information/alfajores-testnet-disclaimer.md).
 
 ## Attestation
 
@@ -20,12 +20,11 @@ Generally, support for an entity having an associated identity. In Celo, each at
 
 A service operated by validators that sends signed SMS messages in order to allow accounts to prove they have access to a phone number.
 
-## [Baklava](baklava-testnet.md)
+## [Baklava](getting-started/baklava-testnet.md)
 
-The second public Celo test network, used for [The Great Celo Stake Off](https://www.celo.org/stake-off)
-subject to the [Baklava Testnet Disclaimer](../important-information/baklava-testnet-disclaimer.md).
+The second public Celo test network, intended for use as a testing ground for protocol changes and validator configurations. It is subject to the [Baklava Testnet Disclaimer](important-information/baklava-testnet-disclaimer.md).
 
-## Block<a name="block"></a>
+## Block
 
 The unit of update to the blockchain. A block consists of a header identifying its position in the chain and other metadata, and a body that contains a list of transactions, and data structures that describe the new state after executing those transactions.
 
@@ -127,7 +126,7 @@ The very first block in the blockchain, provided as configuration to Celo Blockc
 
 ## Governable
 
-A smart contract that is owned by the Celo [Governance](../celo-codebase/protocol/governance.md) mechanism and so can be changed or updated by an on-chain governance proposal.
+A smart contract that is owned by the Celo [Governance](celo-codebase/protocol/governance.md) mechanism and so can be changed or updated by an on-chain governance proposal.
 
 ## Group Share
 
@@ -145,7 +144,7 @@ Hardware Security Module. A hardware device that hosts one or more private keys 
 
 The creation of a new cryptographic key to replace an existing key in active use.
 
-## [Community Fund](../celo-codebase/protocol/proof-of-stake/community-fund.md)
+## [Community Fund](celo-codebase/protocol/proof-of-stake/community-fund.md)
 
 An account that supports the development and operational costs of the Celo protocol. The Community Fund is maintained by a transfer made as part of Epoch Rewards, and is intended to cover costs beyond the other specific incentives provided to validators and validator groups. Awards can be made through an on-chain governance proposal.
 
@@ -157,7 +156,7 @@ Istanbul, or IBFT, is the original name of the implementation of the Byzantine F
 
 A device or computer running the Celo Blockchain software that keeps typically only the most recent blockchain state, such that it can send transactions and identify what other data to request as necessary. Every Celo Wallet installation includes a Celo Blockchain light client.
 
-## [Locked Gold](../celo-codebase/protocol/proof-of-stake/locked-gold.md)
+## [Locked Gold](celo-codebase/protocol/proof-of-stake/locked-gold.md)
 
 Celo Gold balances held in escrow at the Locked Gold contract for the account that deposited it there. This permits that balance to be used for voting in validator elections, governance proposals, and to meet staking requirements for registering a validator or validator group.
 
@@ -175,7 +174,7 @@ An interaction that takes place solely through a transaction being executed on t
 
 ## Proof-of-Stake
 
-The system that determines the participants in a Byzantine Fault Tolerant consensus mechanism. [Celo's proof-of-stake mechanism](../celo-codebase/protocol/proof-of-stake/README.md) permits accounts to convert units of Celo Gold into Locked Gold then vote for Validator Groups, such that an election held at the end of every epoch selects a new set of validators for the following epoch.
+The system that determines the participants in a Byzantine Fault Tolerant consensus mechanism. [Celo's Proof-of-Stake mechanism](celo-codebase/protocol/proof-of-stake/README.md) permits accounts to convert units of Celo Gold into Locked Gold then vote for Validator Groups, such that an election held at the end of every epoch selects a new set of validators for the following epoch.
 
 ## RC1
 
@@ -199,7 +198,7 @@ The process, when a node joins the network, of requesting and receiving block he
 
 ## SDK
 
-Software Development Kit. Generally, a suite of developer tools that enable applications to be built on a platform. Celo's SDK currently comprises two components, [DAppKit](../developer-resources/dappkit/README.md) and [ContractKit](../developer-resources/contractkit/README.md).
+Software Development Kit. Generally, a suite of developer tools that enable applications to be built on a platform. Celo's SDK currently comprises two components, [DAppKit](developer-resources/dappkit/README.md) and [ContractKit](developer-resources/contractkit/README.md).
 
 ## Slashing
 

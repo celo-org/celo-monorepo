@@ -4,7 +4,7 @@ Custody in this section refers to the holding of Celo assets such as Celo Dollar
 
 ## Balance model
 
-As a fork of Ethereum, Celo retains the account model to keep track of users' balances. Celo Dollar and Celo Gold are [ERC20](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20.md) contracts. It is common for smart contracts to hold balances on behalf of other addresses. One example is the [`LockedGold`](celo-codebase/protocol/proof-of-stake/locked-gold) smart contract that holds the "locked portion of a user's `cGLD` balance". Another one is the [`ReleaseGold`](https://github.com/celo-org/celo-monorepo/blob/master/packages/protocol/contracts/governance/ReleaseGoldInstance.sol) smart contract that holds `cGLD` that is being released to a beneficiary address over time according to some schedule.
+As a fork of Ethereum, Celo retains the account model to keep track of users' balances. Celo Dollar and Celo Gold are [ERC20](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20.md) contracts. It is common for smart contracts to hold balances on behalf of other addresses. One example is the [`LockedGold`](../../celo-codebase/protocol/proof-of-stake/locked-gold.md) smart contract that holds the "locked portion of a user's `cGLD` balance". Another one is the [`ReleaseGold`](https://github.com/celo-org/celo-monorepo/blob/master/packages/protocol/contracts/governance/ReleaseGold.sol) smart contract that holds `cGLD` that is being released to a beneficiary address over time according to some schedule.
 
 Applications that display balances may need to be written to be aware of this possibility.
 
