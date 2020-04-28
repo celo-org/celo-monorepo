@@ -517,8 +517,8 @@ async function helmIPParameters(celoEnv: string) {
 
   ipAddressParameters.push(...singleAddressParameters)
 
-  const listOfTxNodeAddresses = txAddresses.join('/')
-  ipAddressParameters.push(`--set geth.tx_node_ip_addresses=${listOfTxNodeAddresses}`)
+  const listOfTxNodeAddresses = txAddresses.join(',')
+  ipAddressParameters.push(`--set geth.tx_node_ip_addresses='{${listOfTxNodeAddresses}}'`)
 
   if (useStaticIPsForGethNodes()) {
     ipAddressParameters.push(
@@ -536,8 +536,8 @@ async function helmIPParameters(celoEnv: string) {
     )
 
     ipAddressParameters.push(...singleValidatorAddressParameters)
-    const listOfValidatorAddresses = validatorsAddresses.join('/')
-    ipAddressParameters.push(`--set geth.validator_ip_addresses=${listOfValidatorAddresses}`)
+    const listOfValidatorAddresses = validatorsAddresses.join(',')
+    ipAddressParameters.push(`--set geth.validator_ip_addresses='{${listOfValidatorAddresses}}'`)
 
     const numPrivateTxNodes = parseInt(fetchEnv(envVar.PRIVATE_TX_NODES), 10)
     const privateTxAddresses = await Promise.all(
@@ -547,9 +547,9 @@ async function helmIPParameters(celoEnv: string) {
       (address, i) => `--set geth.private_tx_nodes_${i}IpAddress=${address}`
     )
     ipAddressParameters.push(...privateTxAddressParameters)
-    const listOfPrivateTxNodeAddresses = privateTxAddresses.join('/')
+    const listOfPrivateTxNodeAddresses = privateTxAddresses.join(',')
     ipAddressParameters.push(
-      `--set geth.private_tx_node_ip_addresses=${listOfPrivateTxNodeAddresses}`
+      `--set geth.private_tx_node_ip_addresses='{${listOfPrivateTxNodeAddresses}}'`
     )
   }
 
@@ -571,14 +571,13 @@ async function helmParameters(celoEnv: string, useExistingGenesis: boolean) {
 
   return [
     `--set domain.name=${fetchEnv('CLUSTER_DOMAIN_NAME')}`,
+    `--set genesis.genesisFileBase64=${Buffer.from(genesisContent).toString('base64')}`,
+    `--set genesis.networkId=${fetchEnv(envVar.NETWORK_ID)}`,
     `--set geth.verbosity=${fetchEnvOrFallback('GETH_VERBOSITY', '4')}`,
-    `--set geth.node.cpu_request=${fetchEnv('GETH_NODE_CPU_REQUEST')}`,
-    `--set geth.node.memory_request=${fetchEnv('GETH_NODE_MEMORY_REQUEST')}`,
-    `--set geth.genesisFile=${Buffer.from(genesisContent).toString('base64')}`,
-    `--set geth.genesis.networkId=${fetchEnv(envVar.NETWORK_ID)}`,
+    `--set geth.resources.requests.cpu=${fetchEnv('GETH_NODE_CPU_REQUEST')}`,
+    `--set geth.resources.requests.memory=${fetchEnv('GETH_NODE_MEMORY_REQUEST')}`,
     `--set geth.image.repository=${fetchEnv('GETH_NODE_DOCKER_IMAGE_REPOSITORY')}`,
     `--set geth.image.tag=${fetchEnv('GETH_NODE_DOCKER_IMAGE_TAG')}`,
-    `--set geth.backup.enabled=${fetchEnv(envVar.GETH_NODES_BACKUP_CRONJOB_ENABLED)}`,
     `--set bootnode.image.repository=${fetchEnv('GETH_BOOTNODE_DOCKER_IMAGE_REPOSITORY')}`,
     `--set bootnode.image.tag=${fetchEnv('GETH_BOOTNODE_DOCKER_IMAGE_TAG')}`,
     `--set cluster.zone=${fetchEnv('KUBERNETES_CLUSTER_ZONE')}`,
@@ -602,7 +601,6 @@ async function helmParameters(celoEnv: string, useExistingGenesis: boolean) {
     `--set geth.private_tx_nodes="${fetchEnv(envVar.PRIVATE_TX_NODES)}"`,
     `--set geth.ssd_disks="${fetchEnvOrFallback(envVar.GETH_NODES_SSD_DISKS, 'true')}"`,
     `--set mnemonic="${fetchEnv('MNEMONIC')}"`,
-    `--set contracts.cron_jobs.enabled=${fetchEnv('CONTRACT_CRONJOBS_ENABLED')}`,
     `--set geth.account.secret="${fetchEnv('GETH_ACCOUNT_SECRET')}"`,
     `--set geth.ping_ip_from_packet=${fetchEnvOrFallback('PING_IP_FROM_PACKET', 'false')}`,
     `--set geth.in_memory_discovery_table=${fetchEnvOrFallback(

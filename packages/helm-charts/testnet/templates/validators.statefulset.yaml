@@ -15,9 +15,9 @@ spec:
 apiVersion: apps/v1beta2
 kind: StatefulSet
 metadata:
-  name: {{ template "ethereum.fullname" . }}-validators
+  name: {{ template "common.fullname" . }}-validators
   labels:
-{{ include "standard.labels" .  | indent 4 }}
+{{ include "common.standard.labels" .  | indent 4 }}
     component: validators
 spec:
   volumeClaimTemplates:
@@ -36,12 +36,12 @@ spec:
   serviceName: validators
   selector:
     matchLabels:
-{{ include "standard.labels" .  | indent 6 }}
+{{ include "common.standard.labels" .  | indent 6 }}
       component: validators
   template:
     metadata:
       labels:
-{{ include "standard.labels" .  | indent 8 }}
+{{ include "common.standard.labels" .  | indent 8 }}
         component: validators
     spec:
       initContainers:
@@ -123,7 +123,7 @@ spec:
         - name: MNEMONIC
           valueFrom:
             secretKeyRef:
-              name: {{ template "ethereum.fullname" . }}-geth-account
+              name: {{ template "common.fullname" . }}-geth-account
               key: mnemonic
         - name: IP_ADDRESSES
           value: {{ .Values.geth.validator_ip_addresses }}
@@ -196,11 +196,11 @@ spec:
               apiVersion: v1
               fieldPath: status.podIP
         - name: ETHSTATS_SVC
-          value: {{ template "ethereum.fullname" . }}-ethstats.{{ .Release.Namespace }}
+          value: {{ template "common.fullname" . }}-ethstats.{{ .Release.Namespace }}
         - name: NETWORK_ID
           valueFrom:
             configMapKeyRef:
-              name: {{ template "ethereum.fullname" . }}-geth-config
+              name: {{ template "common.fullname" . }}-geth-config
               key: networkid
         - name: FAULTY_NODES
           value: {{ .Values.geth.faultyValidators | quote }}
@@ -223,9 +223,7 @@ spec:
         - name: ws
           containerPort: 8546
         resources:
-          requests:
-            memory: {{ .Values.geth.node.memory_request }}
-            cpu: {{ .Values.geth.node.cpu_request }}
+{{ toYaml .Values.geth.resources | indent 8 }}
         volumeMounts:
         - name: data
           mountPath: /root/.celo
@@ -239,7 +237,7 @@ spec:
         emptyDir: {}
       - name: config
         configMap:
-          name: {{ template "ethereum.fullname" . }}-geth-config
+          name: {{ template "common.fullname" . }}-geth-config
       - name: account
         secret:
-          secretName: {{ template "ethereum.fullname" . }}-geth-account
+          secretName: {{ template "common.fullname" . }}-geth-account

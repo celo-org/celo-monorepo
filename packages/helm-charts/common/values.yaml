@@ -30,5 +30,11 @@ geth:
 genesis:
   networkId: 31418
   network: baklavastaging
-  useGenesisFileBase64: false
+  useGenesisFileBase64: true
   genesisFileBase64: ""
+
+celotool:
+  image:
+    repository: gcr.io/celo-testnet/celo-monorepo
+    tag: celotool-dc5e5dfa07231a4ff4664816a95eae606293eae9
+    imagePullPolicy: IfNotPresent
