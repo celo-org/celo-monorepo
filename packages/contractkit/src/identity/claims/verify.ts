@@ -99,7 +99,7 @@ export const verifyDomainRecord = async (
       }
     }
     console.debug(`Domain not validated correctly`)
-    return `Failure validating domain with address ${address}`
+    return `Unable to verify domain claim with address ${address}`
   } catch (error) {
     console.debug(`Unable to fetch domain TXT records: ${error.toString()}`)
     return `Unable to fetch domain TXT records: ${error.toString()}`
