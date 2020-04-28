@@ -384,7 +384,7 @@
     - [Validator Set Differences](celo-codebase/protocol/consensus/validator-set-differences.md)
     - [Locating Nodes](celo-codebase/protocol/consensus/locating-nodes.md)
     - [Ultralight Sync](celo-codebase/protocol/consensus/ultralight-sync.md)
-  - [Proof of Stake](celo-codebase/protocol/proof-of-stake/README.md)
+  - [Proof-of-Stake](celo-codebase/protocol/proof-of-stake/README.md)
     - [Validator Groups](celo-codebase/protocol/proof-of-stake/validator-groups.md)
     - [Locked Gold and Voting](celo-codebase/protocol/proof-of-stake/locked-gold.md)
     - [Validator Elections](celo-codebase/protocol/proof-of-stake/validator-elections.md)
