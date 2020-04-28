@@ -2563,7 +2563,7 @@ exports[`DevelopersPage renders 1`] = `
                 }
                 target="blank"
               >
-                Install Wallet
+                Get Test Wallet
               </a>
             </div>
             <div
