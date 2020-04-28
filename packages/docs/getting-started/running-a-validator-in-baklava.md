@@ -690,7 +690,7 @@ docker run --name celo-attestation-service -it --restart always --entrypoint /bi
 
 ## Registering Metadata
 
-We are using [Metadata](../celo-codebase/protocol/identity/metadata) to allow accounts to make certain claims without having to do so on-chain. Since the validator in question here is run under a `ReleaseGold` contract, users can use any `signer` address to make claims on behalf of the `ReleaseGold` contract. This guide will use the `CELO_ATTESTATION_SIGNER_ADDRESS` since it is likely the most recently used, but any can be used.
+We are using [Metadata](../celo-codebase/protocol/identity/metadata.md) to allow accounts to make certain claims without having to do so on-chain. Since the validator in question here is run under a `ReleaseGold` contract, users can use any `signer` address to make claims on behalf of the `ReleaseGold` contract. This guide will use the `CELO_ATTESTATION_SIGNER_ADDRESS` since it is likely the most recently used, but any can be used.
 For us to complete the metadata process, we have to claim which URL users can request attestations from:
 
 Run the following commands on your local machine:
