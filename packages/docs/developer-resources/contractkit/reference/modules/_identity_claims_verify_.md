@@ -14,7 +14,7 @@
 
 ▸ **verifyAccountClaim**(`kit`: [ContractKit](../classes/_kit_.contractkit.md), `claim`: [AccountClaim](_identity_claims_account_.md#accountclaim), `address`: string): *Promise‹undefined | string›*
 
-*Defined in [contractkit/src/identity/claims/verify.ts:33](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/verify.ts#L33)*
+*Defined in [contractkit/src/identity/claims/verify.ts:32](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/verify.ts#L32)*
 
 **Parameters:**
 
@@ -32,7 +32,7 @@ ___
 
 ▸ **verifyClaim**(`kit`: [ContractKit](../classes/_kit_.contractkit.md), `claim`: [Claim](_identity_claims_claim_.md#claim), `address`: string): *Promise‹undefined | string›*
 
-*Defined in [contractkit/src/identity/claims/verify.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/verify.ts#L19)*
+*Defined in [contractkit/src/identity/claims/verify.ts:18](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/verify.ts#L18)*
 
 Verifies a claim made by an account, i.e. whether a claim can be verified to be correct
 
@@ -52,9 +52,9 @@ ___
 
 ### `Const` verifyDomainRecord
 
-▸ **verifyDomainRecord**(`claim`: [DomainClaim](_identity_claims_claim_.md#domainclaim), `address`: string, `dnsResolver`: dnsResolverFunction): *Promise‹undefined | string›*
+▸ **verifyDomainRecord**(`kit`: [ContractKit](../classes/_kit_.contractkit.md), `claim`: [DomainClaim](_identity_claims_claim_.md#domainclaim), `address`: string, `dnsResolver`: dnsResolverFunction): *Promise‹undefined | string›*
 
-*Defined in [contractkit/src/identity/claims/verify.ts:72](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/verify.ts#L72)*
+*Defined in [contractkit/src/identity/claims/verify.ts:71](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/verify.ts#L71)*
 
 It verifies if a DNS domain includes in the TXT records an entry with name
 `celo-site-verification` and a valid signature in base64
@@ -63,6 +63,7 @@ It verifies if a DNS domain includes in the TXT records an entry with name
 
 Name | Type | Default |
 ------ | ------ | ------ |
+`kit` | [ContractKit](../classes/_kit_.contractkit.md) | - |
 `claim` | [DomainClaim](_identity_claims_claim_.md#domainclaim) | - |
 `address` | string | - |
 `dnsResolver` | dnsResolverFunction | resolveTxt as any |
