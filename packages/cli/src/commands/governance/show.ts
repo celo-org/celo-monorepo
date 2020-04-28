@@ -107,9 +107,9 @@ export default class Show extends BaseCommand {
           5,
           accounts,
           async (validator) =>
-            (await governance.isHotfixWhitelistedBy(hash, validator.signer)) ||
+            (await governance.isHotfixWhitelistedBy(hotfixBuf, validator.signer)) ||
             /* tslint:disable-next-line no-return-await */
-            (await governance.isHotfixWhitelistedBy(hash, validator.account))
+            (await governance.isHotfixWhitelistedBy(hotfixBuf, validator.account))
         )
         printValueMapRecursive({
           Validators: accounts.filter((_, idx) => !!res.flags.whitelisters === whitelist[idx]),
