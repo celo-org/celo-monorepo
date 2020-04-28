@@ -2,6 +2,6 @@
   "extends": ["@celo/typescript/tslint.json"],
   "rules": {
     "no-global-arrow-functions": false,
-    "no-console": false
+    "no-console": true 
   }
 }
