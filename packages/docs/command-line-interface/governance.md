@@ -239,6 +239,34 @@ EXAMPLE
 
 _See code: [packages/cli/src/commands/governance/revokeupvote.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/governance/revokeupvote.ts)_
 
+### Show
+
+Show information about a governance proposal, hotfix, or account.
+
+```
+USAGE
+  $ celocli governance:show
+
+OPTIONS
+  --account=account        Address of account or voter
+  --hotfix=hotfix          Hash of hotfix proposal
+  --nonwhitelisters        If set, displays validators that have not whitelisted the hotfix.
+  --notwhitelisted         List validators who have not whitelisted the speicified hotfix
+  --proposalID=proposalID  UUID of proposal to view
+  --raw                    Display proposal in raw bytes format
+  --whitelisters           If set, displays validators that have whitelisted the hotfix.
+
+EXAMPLES
+  show --proposalID 99
+  show --proposalID 99 --raw
+  show --hotfix 0x614dccb5ac13cba47c2430bdee7829bb8c8f3603a8ace22e7680d317b39e3658
+  show --hotfix 0x614dccb5ac13cba47c2430bdee7829bb8c8f3603a8ace22e7680d317b39e3658 --whitelisters
+  show --hotfix 0x614dccb5ac13cba47c2430bdee7829bb8c8f3603a8ace22e7680d317b39e3658 --nonwhitelisters
+  show --account 0x47e172f6cfb6c7d01c1574fa3e2be7cc73269d95
+```
+
+_See code: [packages/cli/src/commands/governance/show.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/governance/show.ts)_
+
 ### Upvote
 
 Upvote a queued governance proposal
@@ -373,3 +401,32 @@ EXAMPLE
 ```
 
 _See code: [packages/cli/src/commands/governance/whitelisthotfix.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/governance/whitelisthotfix.ts)_
+
+### Withdraw
+
+Withdraw refunded governance proposal deposits.
+
+```
+USAGE
+  $ celocli governance:withdraw
+
+OPTIONS
+  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Proposer's address
+
+  --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
+                                                     addresses for local signing
+
+  --ledgerConfirmAddress                             Set it to ask confirmation for the address of the transaction from
+                                                     the ledger
+
+  --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
+                                                     index addresses for local signing. Example --ledgerCustomAddresses
+                                                     "[4,99]"
+
+  --useLedger                                        Set it to use a ledger wallet
+
+EXAMPLE
+  withdraw --from 0x5409ed021d9299bf6814279a6a1411a7e866a631
+```
+
+_See code: [packages/cli/src/commands/governance/withdraw.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/governance/withdraw.ts)_
