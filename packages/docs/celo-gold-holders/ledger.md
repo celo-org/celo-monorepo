@@ -11,7 +11,7 @@ The steps below require technical knowledge. You should be comfortable with the 
 Start by installing the Celo application and setting a PIN on your Ledger device by following steps 1 and 2 [on this page](https://www.ledger.com/start/).
 
 {% hint style="danger" %}
-Make sure to back up both the PIN and the recovery phrase, if you lose them you lose access to your Celo assets with no recovery possible.
+Make sure to securely back up both the PIN and the recovery phrase, or mnemonic. If you lose them, or they are stolen, you lose access to your Celo assets with no recovery possible. The recovery phrase will be shown only once.
 {% endhint %}
 
 Open the Ledger Live App on your computer and follow the instructions on the screen.
@@ -72,7 +72,7 @@ celocli node:synced
 
 The output should display `true`. If it displays `false` you may need to wait a bit and try again.
 
-## Get Celo Addresses
+## Setting up the Celo app
 
 On your Ledger Nano device enter the PIN if prompted and press both buttons at the same time to open into the `Celo app`.
 
@@ -94,6 +94,8 @@ Exit by toggling all the way to the right to the `Back` option and select by pre
 
 The Celo app is now ready for use and you should see `Application is ready` on the screen.
 
+## Get Celo Addresses
+
 Accounts are automatically generated on your device. In the terminal on your computer, you can view the first account addresses with the following command:
 
 ```bash
@@ -112,7 +114,11 @@ celocli account:list --useLedger --ledgerCustomAddresses "[M, N]"
 ```
  {% endhint %}
 
-## Performing a Test Transaction
+{% hint style="tip" %}
+**Advanced:** Celo uses a [BIP-32](https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki) derivation path of `m/44'/52752'/0/0/index`, where `index >= 0`.  
+{% endhint %}
+
+## Performing a Test transaction
 
 Before using your address on the Celo Mainnet, you may want to test it on the Celo Alfajores Testnet with the following instructions.
 
@@ -173,6 +179,7 @@ celocli release-gold:authorize --contract $RELEASE_GOLD_CONTRACT_ADDRESS --role 
 If you have issues connecting to the Ledger, try the following:
 
 * Check that the Ledger device is connected, powered on, and that you've unlocked it using the PIN.
-* Check that no other applications are using the device (close Ledger Live, or a local Celo Blockchain node)
+* Check that no other applications are using the device. Close Ledger Live. Stop any local Celo Blockchain node, or ensure it is run with the `--nousb` option.
 * Try unplugging and replugging the device. Some devices appear to trigger a warning on Macs saying: “USB Devices Disabled. Unplug the device using too much power to re-enable USB devices” which is usually resolved by reconnecting.
+* Ensure that you are using the original cable supplied with your Ledger.
 * Ensure that your Ledger has the [latest firmware](https://support.ledger.com/hc/en-us/articles/360002731113-Update-device-firmware). For Ledger Nano S, a firmware version of 1.6 or later is required.
