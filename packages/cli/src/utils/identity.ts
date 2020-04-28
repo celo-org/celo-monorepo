@@ -36,6 +36,7 @@ export abstract class ClaimCommand extends BaseCommand {
       cli.action.start(`Read Metadata from ${filePath}`)
       const data = IdentityMetadataWrapper.fromFile(this.kit, filePath)
       // Perhaps should check here that `--from` and data.data.meta.address match
+      // (so that it is the address or an associated signer)
       cli.action.stop()
       return data
     } catch (error) {
