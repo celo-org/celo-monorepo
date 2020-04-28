@@ -52,7 +52,7 @@ ___
 
 ### `Const` verifyDomainRecord
 
-▸ **verifyDomainRecord**(`claim`: [DomainClaim](_identity_claims_claim_.md#domainclaim), `address`: string, `dnsResolver`: dnsResolverFunction): *Promise‹undefined | "Unable to verify domain claim"›*
+▸ **verifyDomainRecord**(`claim`: [DomainClaim](_identity_claims_claim_.md#domainclaim), `address`: string, `dnsResolver`: dnsResolverFunction): *Promise‹undefined | string›*
 
 *Defined in [contractkit/src/identity/claims/verify.ts:72](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/verify.ts#L72)*
 
@@ -67,4 +67,4 @@ Name | Type | Default |
 `address` | string | - |
 `dnsResolver` | dnsResolverFunction | resolveTxt as any |
 
-**Returns:** *Promise‹undefined | "Unable to verify domain claim"›*
+**Returns:** *Promise‹undefined | string›*
