@@ -61,7 +61,7 @@ export class RegulatoryTerms extends React.Component<Props> {
     return (
       <SafeAreaView style={styles.container}>
         <DevSkipButton nextScreen={Screens.PincodeEducation} />
-        <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <ScrollView contentContainerStyle={styles.scrollContainer} testID="scrollView">
           <View style={styles.terms}>
             <Text style={fontStyles.h1} testID="Terms">
               {t('terms.title')}
