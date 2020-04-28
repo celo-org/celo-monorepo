@@ -1,6 +1,12 @@
-import { generateKeys, generateMnemonic, MnemonicLanguages } from '@celo/utils/lib/account'
+import {
+  generateKeys,
+  generateMnemonic,
+  MnemonicLanguages,
+  MnemonicStrength,
+} from '@celo/utils/lib/account'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
 import { flags } from '@oclif/command'
+import { toChecksumAddress } from 'ethereumjs-util'
 import { LocalCommand } from '../../base'
 import { printValueMap } from '../../utils/cli'
 
@@ -52,9 +58,12 @@ export default class NewAccount extends LocalCommand {
 
   async run() {
     const res = this.parse(NewAccount)
-    const mnemonic = generateMnemonic(undefined, NewAccount.languageOptions(res.flags.language!))
-    const keys = generateKeys(mnemonic, res.flags.password, res.flags.indexAddress)
-    const accountAddress = privateKeyToAddress(keys.privateKey)
+    const mnemonic = await generateMnemonic(
+      MnemonicStrength.s256_24words,
+      NewAccount.languageOptions(res.flags.language!)
+    )
+    const keys = await generateKeys(mnemonic, res.flags.password, res.flags.indexAddress)
+    const accountAddress = toChecksumAddress(privateKeyToAddress(keys.privateKey))
     this.log(
       'This is not being stored anywhere. Save the mnemonic somewhere to use this account at a later point.\n'
     )

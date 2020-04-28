@@ -35,26 +35,26 @@ Click **Install** for the Celo app, this will install the Celo App Version 1.0.1
 ![](https://storage.googleapis.com/celo-website/docs/ledger-celo-app-install.png)
 
 {% hint style="info" %}
- If you’ve previously installed the Celo app on your device, you’ll see an **Upgrade** option instead of **Install.**
- {% endhint %}
+If you’ve previously installed the Celo app on your device, you’ll see an **Upgrade** option instead of **Install.**
+{% endhint %}
 
- The installation is completed once you see the green tick and **Installed** label.
+The installation is completed once you see the green tick and **Installed** label.
 
 ![](https://storage.googleapis.com/celo-website/docs/ledger-celo-app-installed.png)
 
- You should now see on your device’s screen `Celo app`. You may need to toggle left or right using the buttons on the device to find the app.
+You should now see on your device’s screen `Celo app`. You may need to toggle left or right using the buttons on the device to find the app.
 
- Quit the Ledger Live app on your compute but keep the Ledger wallet connected to your computer.
+Quit the Ledger Live app on your compute but keep the Ledger wallet connected to your computer.
 
  ## Install the Celo CLI
 
- Open the terminal application on your computer and install the Celo CLI (see [documentation](https://docs.celo.org/command-line-interface/introduction) for more information).
+Open the terminal application on your computer and install the Celo CLI (see [documentation](https://docs.celo.org/command-line-interface/introduction) for more information).
 
 ```bash
  npm install -g @celo/celocli
 ```
 
- You will now need to point the Celo CLI to a node that is synchronized with one of Celo’s networks. We’ll be using the [Alfajores Network](https://docs.celo.org/getting-started/alfajores-testnet).
+You will now need to point the Celo CLI to a node that is synchronized with one of Celo’s networks. We’ll be using the [Alfajores Network](https://docs.celo.org/getting-started/alfajores-testnet).
 
 Configure the Celo CLI so that it uses a cLabs node on the Alfajores network.
 
@@ -88,7 +88,7 @@ Since most of the Celo CLI commands use smart contracts you will need to enable 
 
 When you see `Contract data NOT Allowed` press both buttons at the same time to enable.
 
-You should now see `Contact data Allowed` on screen.
+You should now see `Contract data Allowed` on screen.
 
 Exit by toggling all the way to the right to the `Back` option and select by pressing both buttons at the same time.
 
@@ -114,13 +114,14 @@ celocli account:list --useLedger --ledgerCustomAddresses "[M, N]"
 
 ## Performing a Test Transaction
 
-Before using your address on the Celo Mainnet, you may want to test it on the Celo Alfajores Testnet with the following instruction.
+Before using your address on the Celo Mainnet, you may want to test it on the Celo Alfajores Testnet with the following instructions.
 
 Configure the Celo CLI so that it points to the Alfajores network.
 
 ```bash
 celocli config:set --node https://alfajores-forno.celo-testnet.org/
 ```
+
 Visit the Alfajores Faucet and send yourself some testnet Celo Gold at the following URL:
 
 https://celo.org/developers/faucet
@@ -139,15 +140,13 @@ Perform a test transaction by running the following command:
 celocli transfer:gold --from=<your-address> --to=0x0000000000000000000000000000000000000001 --value=10000 --useLedger
 ```
 
-You'll need to then approve the transaction on the ledger device.
+You'll need to then approve the transaction on the Ledger device.
 
-Finally, you can see if your transaction was mined on the network by copying the transaction hash (txHash) outputted by the command, and searching for it on the Alfajores Block Explorer, available at the following URL:
+Finally, you can see if your transaction was mined on the network by copying the transaction hash (txHash) outputted by the command, and searching for it on the [Alfajores Block Explorer](https://alfajores-blockscout.celo-testnet.org/).
 
-https://alfajores-blockscout.celo-testnet.org/
+## Using `celocli`
 
-## Using celocli
-
-You can now use `celocli` to securely sign transactions or proof-of-possessions with your Ledger.
+You can use `celocli` to securely sign transactions or proof-of-possessions with your Ledger.
 
 To use `celocli` with your Ledger, ensure the device is connected to your computer, unlocked, and the `Celo` app is open and displaying `Application is ready`.
 
@@ -158,7 +157,7 @@ The following commands are an example of how you might authorize a vote signer w
 
 ```bash
 # Plug in the Ledger containing the vote signer key and run the following command to securely generate the proof-of-possession.
-celocli accounts:proof-of-possession --account $LOCKED_GOLD_ACCOUNT --signer $SIGNER_TO_AUTHORIZE --useLedger
+celocli account:proof-of-possession --account $LOCKED_GOLD_ACCOUNT --signer $SIGNER_TO_AUTHORIZE --useLedger
 
 # If you wish to authorize a vote signer for your Locked Gold Account, plug in the Ledger containing
 # the Locked Gold Account key and run the following command.

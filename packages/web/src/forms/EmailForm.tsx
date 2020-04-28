@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { StyleSheet, View } from 'react-native'
-import { ErrorDisplay } from 'src/forms/ErrorDisplay'
+import { ErrorDisplay, ErrorKeys } from 'src/forms/ErrorDisplay'
 import Form, { emailIsValid } from 'src/forms/Form'
 import SubmitButton from 'src/forms/SubmitButton'
 import SuccessDisplay from 'src/forms/SuccessDisplay'
@@ -56,7 +56,8 @@ export default React.memo(function EmailForm({
     <Form route={route} blankForm={{ ...blankForm, list: listID }} validateWith={validateFields}>
       {({ formState, onInput, onSubmit }) => {
         const borderStyle = emailErrorStyle(formState.errors)
-
+        const hasError = !!formState.apiError || !!formState.errors.length
+        const errorKey = formState.apiError || ErrorKeys.email
         return (
           <Responsive large={styles.container}>
             <View style={styles.mobileContainer}>
@@ -81,7 +82,7 @@ export default React.memo(function EmailForm({
               </Responsive>
               {!isDesktop && (
                 <View style={!!formState.errors.length && styles.feedbackMobile}>
-                  <ErrorDisplay field={'email'} isShowing={!!formState.errors.length} />
+                  <ErrorDisplay isShowing={hasError} field={errorKey} />
                 </View>
               )}
               <Responsive large={[styles.submitBtn, styles.submitBtnDesktop]}>
@@ -93,9 +94,7 @@ export default React.memo(function EmailForm({
                 />
               </Responsive>
               <View style={styles.feedback}>
-                {isDesktop && (
-                  <ErrorDisplay field={'email'} isShowing={!!formState.errors.length} />
-                )}
+                {isDesktop && <ErrorDisplay isShowing={hasError} field={errorKey} />}
               </View>
             </View>
             <View style={styles.success}>

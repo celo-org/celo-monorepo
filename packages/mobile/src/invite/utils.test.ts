@@ -1,4 +1,4 @@
-import firebase from 'react-native-firebase'
+import dynamicLinks from '@react-native-firebase/dynamic-links'
 import {
   createInviteCode,
   extractValidInviteCode,
@@ -83,39 +83,39 @@ describe(isValidPrivateKey, () => {
 
 describe(getValidInviteCodeFromReferrerData, () => {
   const host = 'http://example.com'
-  const getInitialLink = firebase.links().getInitialLink as jest.Mock
+  const getInitialLink = dynamicLinks().getInitialLink as jest.Mock
   it('returns null with invalid data', async () => {
-    getInitialLink.mockResolvedValueOnce(host)
+    getInitialLink.mockResolvedValueOnce({ url: host })
     expect(await getValidInviteCodeFromReferrerData()).toBeNull()
-    getInitialLink.mockResolvedValueOnce(`${host}?x=a`)
+    getInitialLink.mockResolvedValueOnce({ url: `${host}?x=a` })
     expect(await getValidInviteCodeFromReferrerData()).toBeNull()
   })
 
   it('gets a valid code from referrer data', async () => {
-    getInitialLink.mockResolvedValueOnce(
-      `${host}?invite-code=0xa450abe4d0007ffbd4716ca92624059c5e831c8fbabc21b13218528648b4ee8c`
-    )
+    getInitialLink.mockResolvedValueOnce({
+      url: `${host}?invite-code=0xa450abe4d0007ffbd4716ca92624059c5e831c8fbabc21b13218528648b4ee8c`,
+    })
     expect(await getValidInviteCodeFromReferrerData()).toBe(
       '0xa450abe4d0007ffbd4716ca92624059c5e831c8fbabc21b13218528648b4ee8c'
     )
 
-    getInitialLink.mockResolvedValueOnce(
-      `${host}?invite-code%3D0xa450abe4d0007ffbd4716ca92624059c5e831c8fbabc21b13218528648b4ee8c`
-    )
+    getInitialLink.mockResolvedValueOnce({
+      url: `${host}?invite-code%3D0xa450abe4d0007ffbd4716ca92624059c5e831c8fbabc21b13218528648b4ee8c`,
+    })
     expect(await getValidInviteCodeFromReferrerData()).toBe(
       '0xa450abe4d0007ffbd4716ca92624059c5e831c8fbabc21b13218528648b4ee8c'
     )
 
-    getInitialLink.mockResolvedValueOnce(
-      `${host}?invite-code%3D0ZdSckCiUkiUy5cQMuEv7DucMR%2BEewMx7fmyDd3rm4U%3D`
-    )
+    getInitialLink.mockResolvedValueOnce({
+      url: `${host}?invite-code%3D0ZdSckCiUkiUy5cQMuEv7DucMR%2BEewMx7fmyDd3rm4U%3D`,
+    })
     expect(await getValidInviteCodeFromReferrerData()).toBe(
       '0xd197527240a2524894cb971032e12fec3b9c311f847b0331edf9b20dddeb9b85'
     )
 
-    getInitialLink.mockResolvedValueOnce(
-      `${host}?invite-code=p9f1XCB7kRAgIbLvHhiGvx2Ps9HlWMkyEF9ywkj9xT8=`
-    )
+    getInitialLink.mockResolvedValueOnce({
+      url: `${host}?invite-code=p9f1XCB7kRAgIbLvHhiGvx2Ps9HlWMkyEF9ywkj9xT8=`,
+    })
     expect(await getValidInviteCodeFromReferrerData()).toBe(
       '0xa7d7f55c207b91102021b2ef1e1886bf1d8fb3d1e558c932105f72c248fdc53f'
     )

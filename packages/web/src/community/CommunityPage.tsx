@@ -14,7 +14,6 @@ import { H2 } from 'src/fonts/Fonts'
 import OpenGraph from 'src/header/OpenGraph'
 import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
-import ConnectionFooter from 'src/shared/ConnectionFooter'
 import { hashNav } from 'src/shared/menu-items'
 import { standardStyles } from 'src/styles'
 
@@ -64,9 +63,7 @@ export class CommunityPage extends React.Component<Props> {
           <Contribute />
           <EcoFund />
           <FellowSection />
-          <View nativeID={hashNav.connect.newsletter}>
-            <ConnectionFooter includeDividerLine={true} />
-          </View>
+          <View nativeID={hashNav.connect.newsletter} />
         </View>
       </>
     )

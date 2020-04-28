@@ -1,5 +1,6 @@
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
-import { assertRevert } from '@celo/protocol/lib/test-utils'
+import { assertContainSubset, assertRevert } from '@celo/protocol/lib/test-utils'
+import BigNumber from 'bignumber.js'
 import {
   AccountsContract,
   AccountsInstance,
@@ -89,6 +90,19 @@ contract('GovernanceSlasher', (accounts: string[]) => {
       await slasher.slash(validator, [], [], [])
       const amount = await slasher.getApprovedSlashing(validator)
       assert.equal(amount.toNumber(), 0)
+    })
+    it('should emit the corresponding event', async () => {
+      const amount = 1000
+      await slasher.approveSlashing(validator, amount)
+      const resp = await slasher.slash(validator, [], [], [])
+      const log = resp.logs[0]
+      assertContainSubset(log, {
+        event: 'GovernanceSlashPerformed',
+        args: {
+          account: validator,
+          amount: new BigNumber(amount),
+        },
+      })
     })
   })
 })

@@ -17,7 +17,7 @@
 
 • **max**: *BigNumber*
 
-*Defined in [contractkit/src/wrappers/Election.ts:56](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L56)*
+*Defined in [contractkit/src/wrappers/Election.ts:57](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L57)*
 
 ___
 
@@ -25,4 +25,4 @@ ___
 
 • **min**: *BigNumber*
 
-*Defined in [contractkit/src/wrappers/Election.ts:55](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L55)*
+*Defined in [contractkit/src/wrappers/Election.ts:56](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L56)*
