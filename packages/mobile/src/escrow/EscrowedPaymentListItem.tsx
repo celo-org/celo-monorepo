@@ -47,7 +47,7 @@ export class EscrowedPaymentListItem extends React.PureComponent<Props> {
       const inviteDetails = invitees.find(
         (inviteeObj) => recipientPhoneNumber === inviteeObj.e164Number
       )
-      // OPEN QUESTION: Appears to me we won't have inivtee data when local data is wiped. is this an appropriate compromise in that case?
+
       let message
       if (!inviteDetails) {
         message = t('walletFlow5:escrowedPaymentReminderSmsNoData')
@@ -56,7 +56,6 @@ export class EscrowedPaymentListItem extends React.PureComponent<Props> {
         // OPEN QUESTION: this function creates a unique link every time a reminder is sent. is this desirable?
         const link = await generateInviteLink(inviteCode)
         message = t('walletFlow5:escrowedPaymentReminderSms', {
-          // OPEN QUESTION: why do we have to send inviteCode and link if link is derived from inviteCode?
           code: inviteCode,
           link,
         })
