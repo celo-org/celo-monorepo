@@ -25,6 +25,7 @@ export interface State {
   dismissedInviteFriends: boolean
   dismissedGetVerified: boolean
   promptFornoIfNeeded: boolean
+  acceptedTerms: boolean
 }
 
 export enum PincodeType {
@@ -61,6 +62,7 @@ export const initialState = {
   dismissedInviteFriends: false,
   dismissedGetVerified: false,
   promptFornoIfNeeded: false,
+  acceptedTerms: false,
 }
 
 export const reducer = (
@@ -184,6 +186,9 @@ export const reducer = (
         ...state,
         promptFornoIfNeeded: action.promptIfNeeded,
       }
+    case Actions.ACCEPT_TERMS: {
+      return { ...state, acceptedTerms: true }
+    }
     default:
       return state
   }
