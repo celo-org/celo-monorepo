@@ -1,4 +1,5 @@
 import * as functions from 'firebase-functions'
+import logger from './common/logger'
 
 export const DEV_MODE =
   process.env.NODE_ENV !== 'production' || process.env.FUNCTIONS_EMULATOR === 'true'
@@ -6,7 +7,6 @@ export const DEV_MODE =
 interface Config {
   blockchain: {
     provider: string
-    blockscout: string
   }
   salt: {
     key: string
@@ -28,14 +28,13 @@ interface Config {
 let config: Config
 
 if (DEV_MODE) {
-  console.debug('Running in dev mode')
+  logger.debug('Running in dev mode')
   config = {
     blockchain: {
       provider: 'https://alfajores-forno.celo-testnet.org',
-      blockscout: 'https://alfajores-blockscout.celo-testnet.org',
     },
     salt: {
-      key: 'fakeSecretKey',
+      key: 'pknJzIYf4LPbOPao5lk1tVwljmXAddyebYsQ3wI5ywk=',
       unverifiedQueryMax: 2,
       additionalVerifiedQueryMax: 30,
       queryPerTransaction: 2,
@@ -55,13 +54,12 @@ if (DEV_MODE) {
   config = {
     blockchain: {
       provider: functionConfig.blockchain.provider,
-      blockscout: functionConfig.blockchain.blockscout,
     },
     salt: {
       key: functionConfig.salt.key,
-      unverifiedQueryMax: functionConfig.salt.unverifiedQueryMax,
-      additionalVerifiedQueryMax: functionConfig.salt.additionalVerifiedQueryMax,
-      queryPerTransaction: functionConfig.salt.queryPerTransaction,
+      unverifiedQueryMax: functionConfig.salt.unverified_query_max,
+      additionalVerifiedQueryMax: functionConfig.salt.additional_verified_query_max,
+      queryPerTransaction: functionConfig.salt.query_per_transaction,
     },
     db: {
       user: functionConfig.db.username,
@@ -70,8 +68,9 @@ if (DEV_MODE) {
       host: `/cloudsql/${functionConfig.db.host}`,
     },
     attestations: {
-      numberAttestationsRequired: functionConfig.attestations.numberAttestationsRequired,
+      numberAttestationsRequired: functionConfig.attestations.number_attestations_required,
     },
   }
+  logger.debug('Using function config: ', { ...config, salt: { ...config.salt, key: 'mockKey' } })
 }
 export default config

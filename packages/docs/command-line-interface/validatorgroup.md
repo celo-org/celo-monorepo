@@ -107,7 +107,7 @@ OPTIONS
 
   --remove                                           Remove a validator from the members list
 
-  --reorder=reorder                                  Reorder a validator within the members list
+  --reorder=reorder                                  Reorder a validator within the members list. Indices are 0 based
 
   --useLedger                                        Set it to use a ledger wallet
 

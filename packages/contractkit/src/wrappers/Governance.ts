@@ -1,5 +1,7 @@
+import { ensureLeading0x, NULL_ADDRESS, trimLeading0x } from '@celo/utils/lib/address'
 import { concurrentMap } from '@celo/utils/lib/async'
 import { zip } from '@celo/utils/lib/collections'
+import { fromFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import { Transaction } from 'web3-eth'
 import { Address } from '../base'
@@ -157,16 +159,41 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   }
 
   /**
+   * Returns the required ratio of yes:no votes needed to exceed in order to pass the proposal transaction.
+   * @param tx Transaction to determine the constitution for running.
+   */
+  async getTransactionConstitution(tx: ProposalTransaction): Promise<BigNumber> {
+    // Extract the leading four bytes of the call data, which specifies the function.
+    const callSignature = ensureLeading0x(trimLeading0x(tx.input).slice(0, 8))
+    const value = await this.contract.methods
+      .getConstitution(tx.to ?? NULL_ADDRESS, callSignature)
+      .call()
+    return fromFixed(new BigNumber(value))
+  }
+
+  /**
+   * Returns the required ratio of yes:no votes needed to exceed in order to pass the proposal.
+   * @param proposal Proposal to determine the constitution for running.
+   */
+  async getConstitution(proposal: Proposal): Promise<BigNumber> {
+    let constitution = new BigNumber(0)
+    for (const tx of proposal) {
+      constitution = BigNumber.max(await this.getTransactionConstitution(tx), constitution)
+    }
+    return constitution
+  }
+
+  /**
    * Returns the participation parameters.
    * @returns The participation parameters.
    */
   async getParticipationParameters(): Promise<ParticipationParameters> {
     const res = await this.contract.methods.getParticipationParameters().call()
     return {
-      baseline: new BigNumber(res[0]),
-      baselineFloor: new BigNumber(res[1]),
-      baselineUpdateFactor: new BigNumber(res[2]),
-      baselineQuorumFactor: new BigNumber(res[3]),
+      baseline: fromFixed(new BigNumber(res[0])),
+      baselineFloor: fromFixed(new BigNumber(res[1])),
+      baselineUpdateFactor: fromFixed(new BigNumber(res[2])),
+      baselineQuorumFactor: fromFixed(new BigNumber(res[3])),
     }
   }
 
@@ -273,10 +300,11 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
 
   async timeUntilStages(proposalID: BigNumber.Value) {
     const meta = await this.getProposalMetadata(proposalID)
+    const now = Math.round(new Date().getTime() / 1000)
     const durations = await this.stageDurations()
-    const referendum = meta.timestamp.plus(durations.Approval)
+    const referendum = meta.timestamp.plus(durations.Approval).minus(now)
     const execution = referendum.plus(durations.Referendum)
-    const expiration = referendum.plus(durations.Execution)
+    const expiration = execution.plus(durations.Execution)
     return { referendum, execution, expiration }
   }
 

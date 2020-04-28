@@ -5,11 +5,11 @@ Welcome to the technical documentation site for the Celo project!
 In this documentation you’ll find information on:
 
 - An [overview](overview.md) of the high-level architecture of Celo
-- [Tutorials](getting-started/running-a-full-node.md) to get you started with the Celo codebase and the Alfajores Testnet
+- Tutorials to get you started with the Celo codebase and the [Celo networks](getting-started/choosing-a-network.md)
 - Reference documentation about the [Celo protocol](celo-codebase/protocol/) and [wallet](celo-codebase/wallet/)
 - How to make technical [contributions](community/contributing.md) to the project and community
 
-### About Celo <a id="about-celo"></a>
+### About Celo
 
 Celo’s purpose is to empower anyone with a smartphone anywhere in the world to have access to financial services, send money to phone numbers, and pay merchants.
 

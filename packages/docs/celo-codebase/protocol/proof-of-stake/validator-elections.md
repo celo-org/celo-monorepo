@@ -2,9 +2,9 @@
 
 The active validator set is updated by running an election in the final block of each epoch, after processing transactions and [Epoch Rewards](epoch-rewards.md).
 
-## <a name="voting-cap"></a>Group Voting Caps
+## Group Voting Caps
 
-One way to consider the security of a Proof of Stake system is the marginal cost of getting a malicious validator elected. In a steady state, assuming the Celo community set the incentives appropriately, we can assume that a full complement of validators is elected, which means the attack cost is the cost of acquiring sufficient Celo Gold to receive more votes than the currently elected validator with fewest votes, and thereby supplant it.
+One way to consider the security of a Proof of Stake system is the marginal cost of getting a malicious validator elected. In a steady state, assuming the Celo community set the incentives appropriately, a full complement of validators is likely to be elected, which means the attack cost is the cost of acquiring sufficient Celo Gold to receive more votes than the currently elected validator with fewest votes, and thereby supplant it.
 
 As such, the objective of Celo’s validator elections differs from real-world elections: they aim to translate voter preferences into representation while promoting decentralization and creating a moat around existing, well-performing elected validators. Two design choices influence this: a limit on the maximum number of member validator that a group can list, and a **voting cap** on the number of votes that any one group can receive.
 
