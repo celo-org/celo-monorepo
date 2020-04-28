@@ -14,7 +14,7 @@ You will need node version `10.0.0` or higher.
 
 ## Initializing the Kit
 
-To start working with ContractKit you need a `kit` instance and a valid net to connect with. In this example will use `alfajores` (you can read more about it [here](getting-started/alfajores-testnet.md))
+To start working with ContractKit you need a `kit` instance and a valid net to connect with. In this example will use `alfajores` (you can read more about it [here](../../getting-started/alfajores-testnet.md))
 
 ```ts
 import { newKit } from '@celo/contractkit'
@@ -24,7 +24,7 @@ const kit = newKit('https://alfajores-forno.celo-testnet.org')
 
 ## Initialize the Kit with your own node
 
-If you are hosting your own node (you can follow [this guide](getting-started/running-a-full-node.md) to run one) you can connect our ContractKit to it.
+If you are hosting your own node (you can follow [this guide](../../getting-started/running-a-full-node-in-rc1.md) to run one) you can connect our ContractKit to it.
 
 ```ts
 import { newKit } from '@celo/contractkit'
