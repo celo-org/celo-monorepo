@@ -1,6 +1,5 @@
 import { eqAddress } from '@celo/utils/lib/address'
 import { isValidUrl } from '@celo/utils/lib/io'
-import { parseSignature } from '@celo/utils/lib/signatureUtils'
 import { resolveTxt } from 'dns'
 import { ContractKit } from '../..'
 import { IdentityMetadataWrapper } from '../metadata'
@@ -23,7 +22,7 @@ export async function verifyClaim(kit: ContractKit, claim: Claim, address: strin
     case ClaimTypes.ACCOUNT:
       return verifyAccountClaim(kit, claim, address)
     case ClaimTypes.DOMAIN:
-      return verifyDomainRecord(claim, address)
+      return verifyDomainRecord(kit, claim, address)
     default:
       break
   }
@@ -70,32 +69,37 @@ type dnsResolverFunction = (
  * `celo-site-verification` and a valid signature in base64
  */
 export const verifyDomainRecord = async (
+  kit: ContractKit,
   claim: DomainClaim,
   address: string,
   dnsResolver: dnsResolverFunction = resolveTxt as any
 ) => {
   const found = await new Promise((resolve) => {
-    dnsResolver(claim.domain, (error, domainRecords) => {
+    dnsResolver(claim.domain, async (error, domainRecords) => {
       if (error) {
         console.debug(`Unable to fetch domain TXT records: ${error.toString()}`)
         resolve(`Unable to fetch domain TXT records: ${error.toString()}`)
       } else {
-        domainRecords.forEach((record) => {
-          record.forEach((entry) => {
+        for (const record of domainRecords) {
+          for (const entry of record) {
             if (entry.startsWith(DOMAIN_TXT_HEADER)) {
               console.debug(`TXT Record celo-site-verification found`)
               const signatureBase64 = entry.substring(DOMAIN_TXT_HEADER.length + 1)
               const signature = Buffer.from(signatureBase64, 'base64').toString('binary')
-              try {
-                parseSignature(serializeClaim(claim), signature, address)
+              if (
+                await IdentityMetadataWrapper.verifySignerForAddress(
+                  kit,
+                  serializeClaim(claim),
+                  signature,
+                  address
+                )
+              ) {
                 console.debug(`Signature verified successfully`)
                 resolve(true)
-              } catch (error) {
-                resolve(error.toString())
               }
             }
-          })
-        })
+          }
+        }
       }
       resolve('Unknown failure')
     })
