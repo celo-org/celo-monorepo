@@ -97,7 +97,7 @@ export const verifyDomainRecord = async (
           })
         })
       }
-      resolve(false)
+      resolve('Unknown failure')
     })
   })
 
