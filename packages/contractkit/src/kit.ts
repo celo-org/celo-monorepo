@@ -1,5 +1,6 @@
 import { BigNumber } from 'bignumber.js'
 import debugFactory from 'debug'
+import net from 'net'
 import Web3 from 'web3'
 import { Tx } from 'web3-core'
 import { TransactionObject } from 'web3-eth'
@@ -30,7 +31,10 @@ const debug = debugFactory('kit:kit')
  * @optional wallet to reuse or add a wallet different that the default (example ledger-wallet)
  */
 export function newKit(url: string, wallet?: Wallet) {
-  return newKitFromWeb3(new Web3(url), wallet)
+  const web3 = url.endsWith('.ipc')
+    ? new Web3(new Web3.providers.IpcProvider(url, net))
+    : new Web3(url)
+  return newKitFromWeb3(web3, wallet)
 }
 
 /**

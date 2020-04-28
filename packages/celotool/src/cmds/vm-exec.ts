@@ -26,7 +26,7 @@ export const builder = (argv: yargs.Argv) => {
   return addCeloEnvMiddleware(argv)
     .option('nodeType', {
       describe: 'Type of node',
-      choices: ['validator', 'tx-node', 'bootnode', 'proxy'],
+      choices: ['validator', 'tx-node', 'tx-node-private', 'bootnode', 'proxy'],
       type: 'string',
     })
     .option('docker', {
@@ -125,6 +125,8 @@ function getNodeCount(nodeType: string) {
       return parseInt(fetchEnv(envVar.VALIDATORS), 10)
     case 'tx-node':
       return parseInt(fetchEnv(envVar.TX_NODES), 10)
+    case 'tx-node-private':
+      return parseInt(fetchEnv(envVar.PRIVATE_TX_NODES), 10)
     case 'bootnode':
       return 1
     case 'proxy':

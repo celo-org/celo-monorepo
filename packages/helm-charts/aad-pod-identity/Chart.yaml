@@ -1,0 +1,6 @@
+name: aad-pod-identity
+version: 0.1.0
+description: Helm v2 compatible helm chart for deploying aad-pod-identity
+keywords:
+- aad-pod-identity
+appVersion: ""
