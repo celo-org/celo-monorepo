@@ -1,6 +1,7 @@
 import { eqAddress } from '@celo/utils/lib/address'
 import { isValidUrl } from '@celo/utils/lib/io'
 import { resolveTxt } from 'dns'
+import { promisify } from 'util'
 import { ContractKit } from '../..'
 import { IdentityMetadataWrapper } from '../metadata'
 import { AccountClaim } from './account'
@@ -74,40 +75,33 @@ export const verifyDomainRecord = async (
   address: string,
   dnsResolver: dnsResolverFunction = resolveTxt as any
 ) => {
-  const found = await new Promise((resolve) => {
-    dnsResolver(claim.domain, async (error, domainRecords) => {
-      if (error) {
-        console.debug(`Unable to fetch domain TXT records: ${error.toString()}`)
-        resolve(`Unable to fetch domain TXT records: ${error.toString()}`)
-      } else {
-        for (const record of domainRecords) {
-          for (const entry of record) {
-            if (entry.startsWith(DOMAIN_TXT_HEADER)) {
-              console.debug(`TXT Record celo-site-verification found`)
-              const signatureBase64 = entry.substring(DOMAIN_TXT_HEADER.length + 1)
-              const signature = Buffer.from(signatureBase64, 'base64').toString('binary')
-              if (
-                await IdentityMetadataWrapper.verifySignerForAddress(
-                  kit,
-                  serializeClaim(claim),
-                  signature,
-                  address
-                )
-              ) {
-                console.debug(`Signature verified successfully`)
-                resolve(true)
-              }
-            }
+  try {
+    const getRecords = promisify(dnsResolver)
+    const domainRecords = await getRecords(claim.domain)
+    for (const record of domainRecords) {
+      for (const entry of record) {
+        if (entry.startsWith(DOMAIN_TXT_HEADER)) {
+          console.debug(`TXT Record celo-site-verification found`)
+          const signatureBase64 = entry.substring(DOMAIN_TXT_HEADER.length + 1)
+          const signature = Buffer.from(signatureBase64, 'base64').toString('binary')
+          if (
+            await IdentityMetadataWrapper.verifySignerForAddress(
+              kit,
+              serializeClaim(claim),
+              signature,
+              address
+            )
+          ) {
+            console.debug(`Signature verified successfully`)
+            return
           }
         }
       }
-      resolve(`Unknown failure with address ${address}`)
-    })
-  })
-
-  if (typeof found !== 'string') {
-    return
+    }
+    console.debug(`Domain not validated correctly`)
+    return `Failure validating domain with address ${address}`
+  } catch (error) {
+    console.debug(`Unable to fetch domain TXT records: ${error.toString()}`)
+    return `Unable to fetch domain TXT records: ${error.toString()}`
   }
-  console.debug(`Domain not validated correctly`)
-  return `Unable to verify domain claim: ${found}`
 }
