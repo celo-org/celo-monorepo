@@ -10,6 +10,14 @@ output tx_node_ip_addresses {
   value = module.tx_node.ip_addresses
 }
 
+output tx_node_private_internal_ip_addresses {
+  value = module.tx_node_private.internal_ip_addresses
+}
+
+output tx_node_private_ip_addresses {
+  value = module.tx_node_private.ip_addresses
+}
+
 output tx_node_lb_internal_ip_address {
   value = module.tx_node_lb.internal_ip_address
 }

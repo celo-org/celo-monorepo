@@ -4,6 +4,7 @@ import { installGenericHelmChart, removeGenericHelmChart } from 'src/lib/helm_de
 import { scaleResource } from 'src/lib/kubernetes'
 import { execCmdWithExitOnFailure } from 'src/lib/utils'
 import {
+  getInternalPrivateTxNodeIPs,
   getInternalProxyIPs,
   getInternalTxNodeIPs,
   getInternalValidatorIPs,
@@ -77,10 +78,22 @@ async function helmParameters(celoEnv: string) {
     txNodePodIds.push(`${celoEnv}-tx-node-${i}`)
   }
 
-  const allIps = [...validatorIpAddresses, ...proxyIpAddresses, ...txNodeIpAddresses]
+  const privateTxNodeIpAddresses = await getInternalPrivateTxNodeIPs(celoEnv)
+  const privateTxNodeCount = parseInt(fetchEnv(envVar.PRIVATE_TX_NODES), 10)
+  const privateTxNodePodIds = []
+  for (let i = 0; i < privateTxNodeCount; i++) {
+    privateTxNodePodIds.push(`${celoEnv}-tx-node-private-${i}`)
+  }
+
+  const allIps = [
+    ...validatorIpAddresses,
+    ...proxyIpAddresses,
+    ...txNodeIpAddresses,
+    ...privateTxNodeIpAddresses,
+  ]
   const sources = allIps.map((ip: string) => `http://${ip}:9200/metrics`)
 
-  const allPodIds = [...validatorPodIds, ...proxyPodIds, ...txNodePodIds]
+  const allPodIds = [...validatorPodIds, ...proxyPodIds, ...txNodePodIds, ...privateTxNodePodIds]
 
   return [
     `--set metricsSources.geth="${sources.join('\\,')}"`,
@@ -94,10 +107,11 @@ async function helmParameters(celoEnv: string) {
 
 function getReplicaCount() {
   const txNodeCount = parseInt(fetchEnv(envVar.TX_NODES), 10)
+  const privateTxNodeCount = parseInt(fetchEnv(envVar.PRIVATE_TX_NODES), 10)
   const validatorCount = parseInt(fetchEnv(envVar.VALIDATORS), 10)
   const proxyCount = parseInt(fetchEnv(envVar.PROXIED_VALIDATORS), 10)
 
-  return txNodeCount + validatorCount + proxyCount
+  return txNodeCount + validatorCount + proxyCount + privateTxNodeCount
 }
 
 function releaseName(celoEnv: string) {

@@ -272,6 +272,11 @@ export async function getInternalTxNodeIPs(celoEnv: string) {
   return outputs.tx_node_internal_ip_addresses.value
 }
 
+export async function getInternalPrivateTxNodeIPs(celoEnv: string) {
+  const outputs = await getTestnetOutputs(celoEnv)
+  return outputs.tx_node_private_internal_ip_addresses.value
+}
+
 function getTerraformBackendConfigVars(celoEnv: string, terraformModule: string) {
   return {
     bucket: stateBucketName(),
