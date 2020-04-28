@@ -1,4 +1,4 @@
-import { eqAddress, normalizeAddress } from '@celo/utils/lib/address'
+import { eqAddress, findAddressIndex } from '@celo/utils/lib/address'
 import { concurrentMap } from '@celo/utils/lib/async'
 import { zip } from '@celo/utils/lib/collections'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
@@ -397,7 +397,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
    */
   async deregisterValidator(validatorAddress: Address) {
     const allValidators = await this.getRegisteredValidatorsAddresses()
-    const idx = allValidators.findIndex((addr) => eqAddress(validatorAddress, addr))
+    const idx = findAddressIndex(validatorAddress, allValidators)
 
     if (idx < 0) {
       throw new Error(`${validatorAddress} is not a registered validator`)
@@ -425,7 +425,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
    */
   async deregisterValidatorGroup(validatorGroupAddress: Address) {
     const allGroups = await this.getRegisteredValidatorGroupsAddresses()
-    const idx = allGroups.findIndex((addr) => eqAddress(validatorGroupAddress, addr))
+    const idx = findAddressIndex(validatorGroupAddress, allGroups)
 
     if (idx < 0) {
       throw new Error(`${validatorGroupAddress} is not a registered validator`)
@@ -508,7 +508,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
       throw new Error(`Invalid index ${newIndex}; max index is ${group.members.length - 1}`)
     }
 
-    const currentIdx = group.members.map(normalizeAddress).indexOf(normalizeAddress(validator))
+    const currentIdx = findAddressIndex(validator, group.members)
     if (currentIdx < 0) {
       throw new Error(`ValidatorGroup ${groupAddr} does not include ${validator}`)
     } else if (currentIdx === newIndex) {
@@ -572,7 +572,9 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
    */
   async currentValidatorAccountsSet() {
     const signerAddresses = await this.currentSignerSet()
-    const accountAddresses = await concurrentMap(5, signerAddresses, this.validatorSignerToAccount)
+    const accountAddresses = await concurrentMap(5, signerAddresses, (signer) =>
+      this.validatorSignerToAccount(signer)
+    )
     return zip((signer, account) => ({ signer, account }), signerAddresses, accountAddresses)
   }
 

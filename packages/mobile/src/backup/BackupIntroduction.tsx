@@ -65,7 +65,7 @@ class BackupIntroduction extends React.Component<Props> {
 
   onPressBackup = () => {
     CeloAnalytics.track(CustomEventNames.set_backup_phrase)
-    navigate(Screens.BackupPhrase)
+    navigateProtected(Screens.BackupPhrase)
   }
 
   onPressSetupSocialBackup = () => {

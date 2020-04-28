@@ -36,7 +36,7 @@ export default class ClaimKeybase extends ClaimCommand {
     const res = this.parse(ClaimKeybase)
     const address = toChecksumAddress(res.flags.from)
     const username = res.flags.username
-    const metadata = this.readMetadata()
+    const metadata = await this.readMetadata()
     const claim = createKeybaseClaim(username)
     const signature = await this.signer.sign(hashOfClaim(claim))
     await this.addClaim(metadata, claim)
@@ -73,7 +73,7 @@ export default class ClaimKeybase extends ClaimCommand {
       cli.action.start(`Claim successfully copied to the keybase file system, verifying proof`)
       // Wait for changes to propagate
       await sleep(3000)
-      const verificationError = await verifyKeybaseClaim(claim, address)
+      const verificationError = await verifyKeybaseClaim(this.kit, claim, address)
       if (verificationError) {
         throw new Error(`Claim is not verifiable: ${verificationError}`)
       }

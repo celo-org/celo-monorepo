@@ -11,12 +11,17 @@ import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-nat
 import DeviceInfo from 'react-native-device-info'
 import Mailer from 'react-native-mail'
 import SafeAreaView from 'react-native-safe-area-view'
-import { useSelector } from 'react-redux'
+import { connect, useSelector } from 'react-redux'
 import { e164NumberSelector } from 'src/account/selectors'
-import { CELO_SUPPORT_EMAIL_ADDRESS } from 'src/config'
+import { showMessage } from 'src/alert/actions'
+import { CELO_SUPPORT_EMAIL_ADDRESS, DEFAULT_TESTNET } from 'src/config'
 import i18n, { Namespaces } from 'src/i18n'
 import { headerWithBackButton } from 'src/navigator/Headers'
+import { navigate } from 'src/navigator/NavigationService'
+import { Screens } from 'src/navigator/Screens'
+import { RootState } from 'src/redux/reducers'
 import Logger from 'src/utils/Logger'
+import { currentAccountSelector } from 'src/web3/selectors'
 
 interface Email {
   subject: string
@@ -30,12 +35,23 @@ interface Email {
   }
 }
 
-const Support = () => {
+interface DispatchProps {
+  showMessage: typeof showMessage
+}
+
+type Props = DispatchProps
+
+const mapDispatchToProps = {
+  showMessage,
+}
+
+const SupportContact = (props: Props) => {
   const { t } = useTranslation(Namespaces.accountScreen10)
   const [message, setMessage] = useState('')
   const [attachLogs, setAttachLogs] = useState(true)
   const [inProgress, setInProgress] = useState(false)
   const e164PhoneNumber = useSelector(e164NumberSelector)
+  const currentAccount = useSelector(currentAccountSelector)
 
   const sendEmail = useCallback(async () => {
     setInProgress(true)
@@ -44,6 +60,8 @@ const Support = () => {
       buildNumber: DeviceInfo.getBuildNumber(),
       apiLevel: DeviceInfo.getApiLevelSync(),
       deviceId: DeviceInfo.getDeviceId(),
+      address: currentAccount,
+      network: DEFAULT_TESTNET,
     }
     const userId = anonymizedPhone(e164PhoneNumber)
     const emailSubject = 'Celo support for ' + (userId || 'unknownUser')
@@ -65,8 +83,14 @@ const Support = () => {
       }
     }
     setInProgress(false)
-    Mailer.mail(email, (error: any, event: any) => {
-      Logger.showError(error + ' ' + event)
+    Mailer.mail(email, (error: any, event: string) => {
+      if (event === 'sent') {
+        navigate(Screens.Account)
+        props.showMessage(t('contactSuccess'))
+      }
+      if (error) {
+        Logger.showError(error + ' ' + event)
+      }
     })
   }, [message, attachLogs, e164PhoneNumber])
 
@@ -120,7 +144,7 @@ const Support = () => {
   )
 }
 
-Support.navigationOptions = () => ({
+SupportContact.navigationOptions = () => ({
   ...headerWithBackButton,
   headerTitle: i18n.t('accountScreen10:contact'),
 })
@@ -185,4 +209,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default Support
+export default connect<{}, DispatchProps, {}, RootState>(null, mapDispatchToProps)(SupportContact)

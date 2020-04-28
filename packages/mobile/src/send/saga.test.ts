@@ -3,7 +3,7 @@ import { select } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { addressToE164NumberSelector } from 'src/identity/reducer'
-import { navigate } from 'src/navigator/NavigationService'
+import { replace } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { BarcodeTypes } from 'src/qrcode/utils'
 import { RecipientKind } from 'src/recipients/recipient'
@@ -40,7 +40,7 @@ describe(watchQrCodeDetections, () => {
       ])
       .dispatch({ type: Actions.BARCODE_DETECTED, data })
       .silentRun()
-    expect(navigate).toHaveBeenCalledWith(Screens.SendAmount, {
+    expect(replace).toHaveBeenCalledWith(Screens.SendAmount, {
       recipient: {
         address: mockAccount,
         displayName: mockName,
@@ -61,7 +61,7 @@ describe(watchQrCodeDetections, () => {
       ])
       .dispatch({ type: Actions.BARCODE_DETECTED, data })
       .silentRun()
-    expect(navigate).toHaveBeenCalledWith(Screens.SendAmount, {
+    expect(replace).toHaveBeenCalledWith(Screens.SendAmount, {
       recipient: {
         address: mockAccount,
         displayName: '',
@@ -85,7 +85,7 @@ describe(watchQrCodeDetections, () => {
       ])
       .dispatch({ type: Actions.BARCODE_DETECTED, data })
       .silentRun()
-    expect(navigate).toHaveBeenCalledWith(Screens.SendAmount, {
+    expect(replace).toHaveBeenCalledWith(Screens.SendAmount, {
       recipient: {
         address: mockAccount,
         displayName: mockName,
@@ -108,7 +108,7 @@ describe(watchQrCodeDetections, () => {
       .dispatch({ type: Actions.BARCODE_DETECTED, data })
       .put(showError(ErrorMessages.QR_FAILED_NO_ADDRESS))
       .silentRun()
-    expect(navigate).not.toHaveBeenCalled()
+    expect(replace).not.toHaveBeenCalled()
   })
 
   it('displays an error when scanning a qr code with no address', async () => {
@@ -123,7 +123,7 @@ describe(watchQrCodeDetections, () => {
       .dispatch({ type: Actions.BARCODE_DETECTED, data })
       .put(showError(ErrorMessages.QR_FAILED_NO_ADDRESS))
       .silentRun()
-    expect(navigate).not.toHaveBeenCalled()
+    expect(replace).not.toHaveBeenCalled()
   })
 
   it('displays an error when scanning a qr code with an invalid address', async () => {
@@ -139,6 +139,6 @@ describe(watchQrCodeDetections, () => {
       .dispatch({ type: Actions.BARCODE_DETECTED, data })
       .put(showError(ErrorMessages.QR_FAILED_INVALID_ADDRESS))
       .silentRun()
-    expect(navigate).not.toHaveBeenCalled()
+    expect(replace).not.toHaveBeenCalled()
   })
 })

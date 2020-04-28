@@ -10,7 +10,7 @@ export default class Show extends BaseCommand {
   static description = 'Show information about a governance proposal, hotfix, or account.'
 
   static flags = {
-    ...BaseCommand.flags,
+    ...BaseCommand.flagsWithoutLocalAddresses(),
     raw: flags.boolean({ required: false, description: 'Display proposal in raw bytes format' }),
     proposalID: flags.string({
       exclusive: ['account', 'hotfix'],
@@ -27,13 +27,22 @@ export default class Show extends BaseCommand {
     notwhitelisted: flags.boolean({
       description: 'List validators who have not whitelisted the speicified hotfix',
     }),
+    whitelisters: flags.boolean({
+      description: 'If set, displays validators that have whitelisted the hotfix.',
+      exclusive: ['nonwhitelisters', 'account', 'proposalID'],
+    }),
+    nonwhitelisters: flags.boolean({
+      description: 'If set, displays validators that have not whitelisted the hotfix.',
+      exclusive: ['whitelisters', 'account', 'proposalID'],
+    }),
   }
 
   static examples = [
     'show --proposalID 99',
     'show --proposalID 99 --raw',
     'show --hotfix 0x614dccb5ac13cba47c2430bdee7829bb8c8f3603a8ace22e7680d317b39e3658',
-    'show --hotfix 0x614dccb5ac13cba47c2430bdee7829bb8c8f3603a8ace22e7680d317b39e3658 --notwhitelisted',
+    'show --hotfix 0x614dccb5ac13cba47c2430bdee7829bb8c8f3603a8ace22e7680d317b39e3658 --whitelisters',
+    'show --hotfix 0x614dccb5ac13cba47c2430bdee7829bb8c8f3603a8ace22e7680d317b39e3658 --nonwhitelisters',
     'show --account 0x47e172f6cfb6c7d01c1574fa3e2be7cc73269d95',
   ]
 
@@ -52,10 +61,31 @@ export default class Show extends BaseCommand {
 
       const record = await governance.getProposalRecord(id)
       if (!raw) {
-        const jsonproposal = await proposalToJSON(this.kit, record.proposal)
-        record.proposal = jsonproposal as any
+        try {
+          const jsonproposal = await proposalToJSON(this.kit, record.proposal)
+          record.proposal = jsonproposal as any
+        } catch (error) {
+          console.warn(`Could not decode proposal, displaying raw data: ${error}`)
+        }
       }
-      printValueMapRecursive(record)
+
+      // Identify the transaction with the highest constitutional requirement.
+      const proposal = await governance.getProposal(id)
+
+      // Get the minimum participation and agreement required to pass a proposal.
+      const participationParams = await governance.getParticipationParameters()
+      const constitution = await governance.getConstitution(proposal)
+
+      printValueMapRecursive({
+        ...record,
+        requirements: {
+          participation: participationParams.baseline,
+          agreement: constitution.times(100).toString() + '%',
+        },
+        isApproved: await governance.isApproved(id),
+        isProposalPassing: await governance.isProposalPassing(id),
+        secondsUntilStages: await governance.timeUntilStages(id),
+      })
     } else if (hotfix) {
       const hotfixBuf = toBuffer(hotfix) as Buffer
       const record = await governance.getHotfixRecord(hotfixBuf)
@@ -63,24 +93,26 @@ export default class Show extends BaseCommand {
 
       const passing = await governance.isHotfixPassing(hotfixBuf)
       printValueMap({ passing })
-      if (!passing) {
-        const tally = await governance.hotfixWhitelistValidatorTally(hotfixBuf)
-        const quorum = await governance.minQuorumSize()
-        printValueMap({
-          tally,
-          quorum,
-        })
+      const tally = await governance.hotfixWhitelistValidatorTally(hotfixBuf)
+      const quorum = await governance.minQuorumSize()
+      printValueMap({
+        tally,
+        quorum,
+      })
 
+      if (res.flags.whitelisters || res.flags.nonwhitelisters) {
         const validators = await this.kit.contracts.getValidators()
         const accounts = await validators.currentValidatorAccountsSet()
-        const whitelist = await concurrentMap(5, accounts, async (validator: any) => {
-          const whitelisted = await governance.isHotfixWhitelistedBy(hotfixBuf, validator.signer)
-          return (
-            (await governance.isHotfixWhitelistedBy(hotfixBuf, validator.account)) || whitelisted
-          )
-        })
+        const whitelist = await concurrentMap(
+          5,
+          accounts,
+          async (validator) =>
+            (await governance.isHotfixWhitelistedBy(hash, validator.signer)) ||
+            /* tslint:disable-next-line no-return-await */
+            (await governance.isHotfixWhitelistedBy(hash, validator.account))
+        )
         printValueMapRecursive({
-          Validators: accounts.filter((_, idx) => res.flags.notwhitelisted !== whitelist[idx]),
+          Validators: accounts.filter((_, idx) => !!res.flags.whitelisters === whitelist[idx]),
         })
       }
     } else if (account) {

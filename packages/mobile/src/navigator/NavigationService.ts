@@ -6,6 +6,7 @@ import {
   NavigationContainerComponent,
   NavigationParams,
   NavigationState,
+  StackActions,
 } from 'react-navigation'
 import sleep from 'sleep-promise'
 import { PincodeType } from 'src/account/reducer'
@@ -32,14 +33,36 @@ export const setTopLevelNavigator = (navigatorRef: any) => {
   }
 }
 
-export function navigate(routeName: string, params?: NavigationParams) {
-  waitForNavigator()
-    .then(() => {
-      if (!navigator) {
-        Logger.error(`${TAG}@navigate`, 'Cannot navigate yet, navigator is not initialized')
-        return
-      }
+async function ensureNavigator() {
+  let retries = 0
+  while (!navigator && retries < 3) {
+    await sleep(200)
+    retries++
+  }
+  if (!navigator) {
+    throw new Error('navigator is not initialized')
+  }
+}
 
+export function replace(routeName: string, params?: NavigationParams) {
+  ensureNavigator()
+    .then(() => {
+      Logger.debug(`${TAG}@replace`, `Dispatch ${routeName}`)
+      navigator.dispatch(
+        StackActions.replace({
+          routeName,
+          params,
+        })
+      )
+    })
+    .catch((reason) => {
+      Logger.error(`${TAG}@replace`, `Navigation failure: ${reason}`)
+    })
+}
+
+export function navigate(routeName: string, params?: NavigationParams) {
+  ensureNavigator()
+    .then(() => {
       Logger.debug(`${TAG}@navigate`, `Dispatch ${routeName}`)
       navigator.dispatch(
         NavigationActions.navigate({
@@ -134,8 +157,14 @@ export function handleNavigationStateChange(
 }
 
 export function navigateBack(params?: NavigationBackActionPayload) {
-  Logger.debug(`${TAG}@navigate`, `Dispatch navigate back`)
-  navigator.dispatch(NavigationActions.back(params))
+  ensureNavigator()
+    .then(() => {
+      Logger.debug(`${TAG}@navigateBack`, `Dispatch navigate back`)
+      navigator.dispatch(NavigationActions.back(params))
+    })
+    .catch((reason) => {
+      Logger.error(`${TAG}@navigateBack`, `Navigation failure: ${reason}`)
+    })
 }
 
 export function navigateHome(params?: NavigationParams) {
@@ -146,12 +175,4 @@ export function navigateToError(errorMessage: string, error?: Error) {
   Logger.error(`${TAG}@navigateToError`, `Navigating to error screen: ${errorMessage}`, error)
   CeloAnalytics.track(DefaultEventNames.errorDisplayed, { error }, true)
   navigate(Screens.ErrorScreen, { errorMessage, error })
-}
-
-async function waitForNavigator() {
-  let retries = 0
-  while (!navigator && retries < 3) {
-    await sleep(200)
-    retries++
-  }
 }

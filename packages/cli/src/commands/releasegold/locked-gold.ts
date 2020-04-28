@@ -35,6 +35,7 @@ export default class LockedGold extends ReleaseGoldCommand {
     const beneficiary = await this.releaseGoldWrapper.getBeneficiary()
     const releaseOwner = await this.releaseGoldWrapper.getReleaseOwner()
     const lockedGold = await this.kit.contracts.getLockedGold()
+    this.kit.defaultAccount = isRevoked ? releaseOwner : beneficiary
 
     if (flags.action === 'lock') {
       // Must verify contract is account before checking pending withdrawals
@@ -44,7 +45,6 @@ export default class LockedGold extends ReleaseGoldCommand {
       )
       const relockValue = BigNumber.minimum(pendingWithdrawalsValue, value)
       const lockValue = value.minus(relockValue)
-      this.kit.defaultAccount = beneficiary
       await newCheckBuilder(this, this.contractAddress)
         .hasEnoughGold(this.contractAddress, lockValue)
         .runChecks()
@@ -60,7 +60,6 @@ export default class LockedGold extends ReleaseGoldCommand {
         .isNotVoting(this.contractAddress)
         .hasEnoughLockedGoldToUnlock(value)
         .runChecks()
-      this.kit.defaultAccount = isRevoked ? releaseOwner : beneficiary
       await displaySendTx('lockedGoldUnlock', this.releaseGoldWrapper.unlockGold(flags.value))
     } else if (flags.action === 'withdraw') {
       await checkBuilder.runChecks()

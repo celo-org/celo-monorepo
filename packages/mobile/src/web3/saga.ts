@@ -1,7 +1,8 @@
+import { generateKeys, generateMnemonic, MnemonicStrength } from '@celo/utils/src/account'
 import { privateKeyToAddress } from '@celo/utils/src/address'
 import { deriveCEK } from '@celo/utils/src/commentEncryption'
 import * as Sentry from '@sentry/react-native'
-import { generateMnemonic, mnemonicToSeedHex } from 'react-native-bip39'
+import * as bip39 from 'react-native-bip39'
 import { REHYDRATE } from 'redux-persist/es/constants'
 import { call, delay, put, race, select, spawn, take, takeLatest } from 'redux-saga/effects'
 import { setAccountCreationTime, setPromptForno } from 'src/account/actions'
@@ -13,6 +14,7 @@ import { CustomEventNames } from 'src/analytics/constants'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { currentLanguageSelector } from 'src/app/reducers'
 import { getWordlist } from 'src/backup/utils'
+import { features } from 'src/flags'
 import { cancelGethSaga } from 'src/geth/actions'
 import { UNLOCK_DURATION } from 'src/geth/consts'
 import { deleteChainData, stopGethIfInitialized } from 'src/geth/geth'
@@ -47,8 +49,7 @@ import { Block } from 'web3-eth'
 
 const TAG = 'web3/saga'
 
-const ETH_PRIVATE_KEY_LENGTH = 64
-const MNEMONIC_BIT_LENGTH = (ETH_PRIVATE_KEY_LENGTH * 8) / 2
+const MNEMONIC_BIT_LENGTH = MnemonicStrength.s256_24words
 // The timeout for web3 to complete syncing and the latestBlock to be > 0
 export const SYNC_TIMEOUT = 2 * 60 * 1000 // 2 minutes
 const BLOCK_CHAIN_CORRUPTION_ERROR = "Error: CONNECTION ERROR: Couldn't connect to node on IPC."
@@ -86,7 +87,7 @@ export function* checkWeb3SyncProgress() {
       yield delay(WEB3_MONITOR_DELAY) // wait 100ms while web3 syncs then check again
       syncLoops += 1
       if (syncLoops * WEB3_MONITOR_DELAY > SWITCH_TO_FORNO_TIMEOUT) {
-        if (yield select(promptFornoIfNeededSelector)) {
+        if (yield select(promptFornoIfNeededSelector) && features.DATA_SAVER) {
           yield put(setPromptForno(false))
           navigate(Screens.DataSaver, { promptModalVisible: true })
           return true
@@ -147,7 +148,7 @@ export function* getOrCreateAccount() {
     Logger.debug(TAG + '@getOrCreateAccount', 'Creating a new account')
 
     const wordlist = getWordlist(yield select(currentLanguageSelector))
-    let mnemonic: string = yield call(generateMnemonic, MNEMONIC_BIT_LENGTH, null, wordlist)
+    let mnemonic: string = yield call(generateMnemonic, MNEMONIC_BIT_LENGTH, wordlist, bip39)
 
     // Ensure no duplicates in mnemonic
     const checkDuplicate = (someString: string) => {
@@ -156,7 +157,7 @@ export function* getOrCreateAccount() {
     let duplicateInMnemonic = checkDuplicate(mnemonic)
     while (duplicateInMnemonic) {
       Logger.debug(TAG + '@getOrCreateAccount', 'Regenerating mnemonic to avoid duplicates')
-      mnemonic = yield call(generateMnemonic, MNEMONIC_BIT_LENGTH, null, wordlist)
+      mnemonic = yield call(generateMnemonic, MNEMONIC_BIT_LENGTH, wordlist, bip39)
       duplicateInMnemonic = checkDuplicate(mnemonic)
     }
 
@@ -164,7 +165,8 @@ export function* getOrCreateAccount() {
       throw new Error('Failed to generate mnemonic')
     }
 
-    const privateKey = yield call(mnemonicToSeedHex, mnemonic)
+    const keys = yield call(generateKeys, mnemonic, undefined, undefined, bip39)
+    const privateKey = keys.privateKey
     if (!privateKey) {
       throw new Error('Failed to convert mnemonic to hex')
     }

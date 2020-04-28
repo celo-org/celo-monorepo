@@ -222,13 +222,6 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
     );
     require(registryAddress != address(0), "The registry address cannot be the zero address");
     require(
-      releaseSchedule.releaseStartTime.add(
-        releaseSchedule.numReleasePeriods.mul(releaseSchedule.releasePeriod)
-      ) >
-        block.timestamp,
-      "Release schedule end time must be in the future"
-    );
-    require(
       address(this).balance ==
         releaseSchedule.amountReleasedPerPeriod.mul(releaseSchedule.numReleasePeriods),
       "Contract balance must equal the entire grant amount"

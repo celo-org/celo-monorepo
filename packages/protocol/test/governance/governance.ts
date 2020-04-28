@@ -1538,7 +1538,6 @@ contract('Governance', (accounts: string[]) => {
         account,
         index
       )
-      console.log(proposalId, value, weight)
       assertEqualBN(recordProposalId, proposalId)
       assertEqualBN(recordValue, value)
       assertEqualBN(recordWeight, weight)
