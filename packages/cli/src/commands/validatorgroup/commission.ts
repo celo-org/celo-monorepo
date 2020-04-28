@@ -11,7 +11,10 @@ export default class ValidatorGroupCommission extends BaseCommand {
 
   static flags = {
     ...BaseCommand.flags,
-    from: Flags.address({ required: true, description: 'Address for the Validator Group or Validator Group validator signer' }),
+    from: Flags.address({
+      required: true,
+      description: 'Address for the Validator Group or Validator Group validator signer',
+    }),
     apply: flags.boolean({
       exclusive: ['queue-update'],
       description: 'Applies a previously queued update. Should be called after the update delay.',
