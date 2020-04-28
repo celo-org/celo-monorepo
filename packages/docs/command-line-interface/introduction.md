@@ -10,7 +10,7 @@ description: >-
 
 ### **Prerequisites**
 
-- **You have a Celo node running.** Commands will connect to a Celo node to execute most functionality. See the [Running a Full Node](../getting-started/running-a-full-node.md) instructions for more details on running a full node.
+- **You have a Celo node running.** Commands will connect to a Celo node to execute most functionality. See the [Running a Full Node](../getting-started/running-a-full-node-in-rc1.md) instructions for more details on running a full node.
 
 ### NPM Package
 

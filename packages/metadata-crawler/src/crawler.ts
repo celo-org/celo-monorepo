@@ -76,6 +76,7 @@ async function handleItem(item: { url: string; address: string }) {
         logger.debug('Verifying %s for address %s', claim.domain, addressWith0x)
 
         const verificationStatus = await verifyDomainRecord(
+          kit,
           claim,
           addressWith0x
         ).catch((error: any) => logger.error('Error in verifyDomainClaim %s', error))

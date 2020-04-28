@@ -1,26 +1,34 @@
 import { AzureKeyVaultClient } from '@celo/contractkit/src/utils/azure-key-vault-client'
 import threshold from 'blind-threshold-bls'
 import { ErrorMessages } from '../common/error-utils'
+import logger from '../common/logger'
 import config from '../config'
 
 let privateKey: string
 
 /*
- * Computes the BLS signature for the blinded phone number.
+ * Computes the BLS signature for a blinded message (e.g. phone number).
  */
 export async function computeBlindedSignature(base64BlindedMessage: string) {
   try {
+    logger.debug('b64 blinded msg', base64BlindedMessage)
     if (!privateKey) {
       privateKey = await getPrivateKey()
     }
-    return Buffer.from(
-      threshold.sign(
-        new Uint8Array(new Buffer(privateKey, 'base64')),
-        new Uint8Array(new Buffer(base64BlindedMessage, 'base64'))
-      )
-    ).toString('base64')
+    const keyBuffer = Buffer.from(privateKey, 'base64')
+    const msgBuffer = Buffer.from(base64BlindedMessage, 'base64')
+
+    logger.debug('Calling theshold sign')
+    const signedMsg = threshold.sign(keyBuffer, msgBuffer)
+    logger.debug('Back from threshold sign, parsing results')
+
+    if (!signedMsg) {
+      throw new Error('Empty threshold sign result')
+    }
+
+    return Buffer.from(signedMsg).toString('base64')
   } catch (e) {
-    console.error(ErrorMessages.SIGNATURE_COMPUTATION_FAILURE, e)
+    logger.error(ErrorMessages.SIGNATURE_COMPUTATION_FAILURE, e)
     throw e
   }
 }
