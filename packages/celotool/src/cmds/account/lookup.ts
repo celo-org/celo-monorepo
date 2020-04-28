@@ -47,13 +47,17 @@ export const handler = async (argv: LookupArgv) => {
 
     const matchingAddresses = lookupResult[phoneHash]
 
-    if (matchingAddresses === undefined) {
+    if (!matchingAddresses) {
       console.info(`No addresses attested to ${argv.phone}`)
       return
     }
 
     Object.keys(matchingAddresses).map((address) => {
       const attestationsStats = matchingAddresses[address]
+      if (!attestationsStats) {
+        console.warn('No attesatation stat for address: ', address)
+        return
+      }
       console.info(
         `${address} is attested to ${argv.phone} with ${attestationsStats.completed} completed attestations out of ${attestationsStats.total} total`
       )

@@ -175,11 +175,12 @@ async function findSuitableNumber(
     const phoneHash = PhoneNumberUtils.getPhoneHash(number)
     const allAccounts = attestedAccountsLookup[phoneHash]
 
-    if (allAccounts === undefined) {
+    if (!allAccounts) {
       return true
     }
     const totalAttestations = Object.values(allAccounts)
-      .map((x) => x.total)
+      .filter((x) => !!x)
+      .map((x) => x!.total)
       .reduce((el, sum) => sum + el)
 
     return totalAttestations < maximumNumberOfAttestations
