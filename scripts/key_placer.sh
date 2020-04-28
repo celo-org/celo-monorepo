@@ -4,7 +4,6 @@ echo "Processing encrypted files"
 
 # Set list of secret files to encrypt and decrypt.
 files=(
-  "packages/blockchain-api/serviceAccountKey.json"
   "packages/blockchain-api/src/secrets.json"
   "packages/mobile/android/app/google-services.json"
   "packages/mobile/android/app/src/staging/google-services.json"
