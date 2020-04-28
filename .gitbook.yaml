@@ -5,6 +5,7 @@ redirects:
   operations-manual/key-management/ledger: celo-gold-holders/ledger.md
   operations-manual/summary/ledger: celo-gold-holders/ledger.md
   operations-manual/using-a-ledger-wallet: celo-gold-holders/ledger.md
-  getting-started/running-a-full-node.md: getting-started/running-a-full-node-in-baklava.md
-  getting-started/running-a-validator.md: getting-started/running-a-validator-in-baklava.md
-  getting-started/using-the-wallet.md: getting-started/using-the-mobile-wallet.md
+  getting-started/running-a-full-node: getting-started/running-a-full-node-in-baklava.md
+  getting-started/running-a-validator: getting-started/running-a-validator-in-baklava.md
+  getting-started/using-the-wallet: getting-started/using-the-mobile-wallet.md
+  celo-codebase/protocol/release-gold: celo-gold-holders/release-gold.md

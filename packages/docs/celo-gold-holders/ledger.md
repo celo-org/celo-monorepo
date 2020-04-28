@@ -1,8 +1,10 @@
 # Using a Ledger Wallet
 
-This section shows how to set up a [Ledger](https://www.ledger.com/) Nano S or X hardware wallet and get Celo addresses.
+This section shows how to set up a [Ledger](https://www.ledger.com/) Nano S or X hardware wallet.
 
-{% hint style="danger" %}
+A hardware wallet or Hardware Security Module (HSM) holds a single random seed (expressed as a mnemonic) which can be used to generate any number of public-private keypairs, that is, any number of accounts ("wallets"), each with an associated address.
+
+{% hint style="info" %}
 The steps below require technical knowledge. You should be comfortable with the Command Line Interface (CLI) and understand the basics of how cryptographic network accounts work.
 {% endhint %}
 
@@ -46,7 +48,31 @@ You should now see on your device’s screen `Celo app`. You may need to toggle 
 
 Quit the Ledger Live app on your compute but keep the Ledger wallet connected to your computer.
 
- ## Install the Celo CLI
+## Setting up the Celo app
+
+On your Ledger Nano device enter the PIN if prompted and press both buttons at the same time to open into the `Celo app`.
+
+You will see `Pending Ledger review` on the device’s screen.
+
+{% hint style="info" %}
+`Pending Ledger review` means that the Celo app is approved to be in the developer store but undergoing additional reviews by the Leger team to be approved in the public store.
+ {% endhint %}
+
+Press both buttons on the device at the same time to continue.
+
+Since most of the Celo CLI commands use smart contracts you will need to enable the Contract data option. In the Celo app navigate to `Settings` by toggling the buttons. Enter the menu by pressing both buttons at the same time.
+
+When you see `Contract data NOT Allowed` press both buttons at the same time to enable.
+
+You should now see `Contract data Allowed` on screen.
+
+Exit by toggling all the way to the right to the `Back` option and select by pressing both buttons at the same time.
+
+The Celo app is now ready for use and you should see `Application is ready` on the screen.
+
+## Install the Celo CLI
+
+Now that you have installed the Celo app on to your ledger, you can begin to use it with the Celo CLI.
 
 Open the terminal application on your computer and install the Celo CLI (see [documentation](https://docs.celo.org/command-line-interface/introduction) for more information).
 
@@ -72,31 +98,9 @@ celocli node:synced
 
 The output should display `true`. If it displays `false` you may need to wait a bit and try again.
 
-## Setting up the Celo app
+## Confirm Addresses
 
-On your Ledger Nano device enter the PIN if prompted and press both buttons at the same time to open into the `Celo app`.
-
-You will see `Pending Ledger review` on the device’s screen.
-
-{% hint style="info" %}
-`Pending Ledger review` means that the Celo app is approved to be in the developer store but undergoing additional reviews by the Leger team to be approved in the public store.
- {% endhint %}
-
-Press both buttons on the device at the same time to continue.
-
-Since most of the Celo CLI commands use smart contracts you will need to enable the Contract data option. In the Celo app navigate to `Settings` by toggling the buttons. Enter the menu by pressing both buttons at the same time.
-
-When you see `Contract data NOT Allowed` press both buttons at the same time to enable.
-
-You should now see `Contract data Allowed` on screen.
-
-Exit by toggling all the way to the right to the `Back` option and select by pressing both buttons at the same time.
-
-The Celo app is now ready for use and you should see `Application is ready` on the screen.
-
-## Get Celo Addresses
-
-Accounts are automatically generated on your device. In the terminal on your computer, you can view the first account addresses with the following command:
+The Ledger's current seed phrase determines the device's accounts. In the terminal on your computer, you can view the first account's address with the following command:
 
 ```bash
 celocli account:list --useLedger --ledgerAddresses 1
@@ -146,7 +150,7 @@ Perform a test transaction by running the following command:
 celocli transfer:gold --from=<your-address> --to=0x0000000000000000000000000000000000000001 --value=10000 --useLedger
 ```
 
-You'll need to then approve the transaction on the Ledger device.
+You'll need to then approve the transaction on the Ledger device. Toggle right on the device until you see `Approve` on screen. Press both buttons at the same time to confirm.  
 
 Finally, you can see if your transaction was mined on the network by copying the transaction hash (txHash) outputted by the command, and searching for it on the [Alfajores Block Explorer](https://alfajores-blockscout.celo-testnet.org/).
 
@@ -159,7 +163,6 @@ To use `celocli` with your Ledger, ensure the device is connected to your comput
 Then, simply append the `--useLedger` flag to any `celocli` commands with which you'd like to use a Ledger. You may also append the `--ledgerConfirmAddress` flag, which will require that you manually verify on the Ledger the address from which the transaction is being sent.
 
 The following commands are an example of how you might authorize a vote signer whose private key is stored on a Ledger, on behalf of your Locked Gold account, whose private key is also stored on a Ledger, or for your ReleaseGold Locked Gold Account, for which the beneficiary key is stored on a Ledger.
-
 
 ```bash
 # Plug in the Ledger containing the vote signer key and run the following command to securely generate the proof-of-possession.

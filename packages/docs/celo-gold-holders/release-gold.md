@@ -2,11 +2,11 @@
 
 ## Introduction
 
-[ReleaseGold](https://github.com/celo-org/celo-monorepo/blob/master/packages/protocol/contracts/governance/ReleaseGold.sol) is a smart contract that enables Celo Gold (Celo Gold) to be released programmatically to a beneficiary over a period of time. In a deployed ReleaseGold smart contract, only the Celo Gold balance that has been released according to the release schedule can be withdrawn by the contract’s beneficiary. The unreleased Celo Gold cannot be withdrawn, but can be used for specific functions in Celo’s proof-of-stake protocol, namely voting and validating.
+[ReleaseGold](https://github.com/celo-org/celo-monorepo/blob/master/packages/protocol/contracts/governance/ReleaseGold.sol) is a smart contract that enables Celo Gold to be released programmatically to a beneficiary over a period of time. In a deployed ReleaseGold smart contract, only the Celo Gold balance that has been released according to the release schedule can be withdrawn by the contract’s beneficiary. The unreleased Celo Gold cannot be withdrawn, but can be used for specific functions in Celo’s Proof of Stake protocol, namely voting and validating.
 
-The intent of the ReleaseGold contract is to allow beneficiaries to participate in Celo’s proof-of-stake protocol with Celo Gold that has not yet been fully released to them. Beneficiaries are able to lock Celo Gold for voting and validating with the full ReleaseGold balance, including both released and unreleased Celo Gold.
+The intent of the ReleaseGold contract is to allow beneficiaries to participate in Celo’s Proof of Stake protocol with Celo Gold that has not yet been fully released to them. Beneficiaries are able to lock Celo Gold for voting and validating with the full ReleaseGold balance, including both released and unreleased Celo Gold.
 
-Increasing the volume of Celo Gold that can be used in Celo’s proof-of-stake consensus promotes network security and even greater decentralization. See below for details on specific features of the ReleaseGold contract, as well as how they are implemented. The [source code](https://github.com/celo-org/celo-monorepo/blob/master/packages/protocol/contracts/governance/ReleaseGold.sol) includes documentation, and technical readers are encouraged to find further details there.
+Increasing the volume of Celo Gold that can be used in Celo’s Proof of Stake consensus promotes network security and even greater decentralization. See below for details on specific features of the ReleaseGold contract, as well as how they are implemented. The [source code](https://github.com/celo-org/celo-monorepo/blob/master/packages/protocol/contracts/governance/ReleaseGold.sol) includes documentation, and technical readers are encouraged to find further details there.
 
 ### Example
 
@@ -22,7 +22,7 @@ The beneficiary does not yet have full rights to the remaining 70 unreleased Cel
 
 *Beneficiary*
 
-The `beneficiary` address is the recipient of the Celo Gold in the ReleaseGold contract. As the Celo Gold is released over time, it is incrementally made withdrawable solely to the beneficiary. The beneficiary is also able to use both unreleased and released Celo Gold to participate in Celo’s proof-of-stake consensus protocol, via locking gold and voting or validating.
+The `beneficiary` address is the recipient of the Celo Gold in the ReleaseGold contract. As the Celo Gold is released over time, it is incrementally made withdrawable solely to the beneficiary. The beneficiary is also able to use both unreleased and released Celo Gold to participate in Celo’s Proof of Stake consensus protocol, via locking gold and voting or validating.
 
 *Release Owner*
 
@@ -34,11 +34,11 @@ The `refundAddress` is the address where funds that have not been released will 
 
 ## Use Cases for ReleaseGold
 
-Two anticipated use cases for ReleaseGold contracts are for “holders” and “earners”. Note that these are not specified in ReleaseGold explicitly, rather they represent sample personas of beneficiaries for which ReleaseGold was designed.
+Two anticipated use cases for ReleaseGold contracts are for “holders” and “earners”. Note that these are not specified in ReleaseGold explicitly, rather they represent sample configurations that the ReleaseGold contract supports.
 
-In the “holder” case, a recipient has purchased or been awarded an amount of Celo Gold, but is subject to a distribution schedule limiting the amount of Celo Gold that can be liquidated at any given time. These recipients will likely be able to validate and vote with the full ReleaseGold balance, and also are not subject to the contract’s revocation by another party (eg. an employer).
+In the “holder” case, a recipient may have purchased or been awarded an amount of Celo Gold, but is subject to a distribution schedule limiting the amount of Celo Gold that can be liquidated at any given time. These recipients may be able to validate and vote with the full ReleaseGold balance, and also are not subject to the contract’s revocation by another party (eg. an employer).
 
-In the “earner” case, a grant recipient has entered a legal contract wherein an exchange of services earns them an amount of Celo Gold over a releasing, or vesting, schedule. These grants are characterized by extra restrictions because the total grant amount is still being *earned*. The ReleaseGold balance cannot be used for running a validator, but it can be used to vote for validators and governance proposals on the Celo network. Additionally, these contracts are revocable and subject to the `liquidityProvision` flag, which prevents Celo Gold distribution when markets are incapable of absorbing additional Celo Gold without significant slippage.
+In the “earner” case, a grant recipient may have entered a legal contract wherein an exchange of services earns them an amount of Celo Gold over a releasing, or vesting, schedule. These grants are characterized by extra restrictions because the total grant amount is still being *earned*. The ReleaseGold balance cannot be used for running a validator, but it can be used to vote for validators and governance proposals on the Celo network. Additionally, these contracts may be revocable and may be subject to the `liquidityProvision` flag, which prevents Celo Gold distribution when markets are incapable of absorbing additional Celo Gold without significant slippage.
 
 ## Release Schedule
 

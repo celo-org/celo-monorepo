@@ -1,0 +1,205 @@
+# Quick Start for Celo Gold Holders
+
+If you are an early holder of Celo Gold on the Celo [Release Candidate](../getting-started/rc1.md) network, this guide will help you access your account and do the setup necessary to earn rewards on those funds.
+
+## Prerequisites
+
+This guide assumes:
+
+* You are self-custodying (you hold the private key to your address), and that you have provided that address directly to cLabs. If you are using a custody provider, please contact them for directions.
+
+* Your address is the beneficiary of a [ReleaseGold](release-gold.md) contract, which releases Celo Gold programmatically to a beneficiary over a period of time.
+
+* You have been informed by cLabs that the ReleaseGold instance corresponding to your address has been deployed.
+
+* You have your private key held on a [Ledger Nano S or Ledger Nano X](ledger.md) device, and you have a second such device available for managing a voting key.
+
+{% hint style="warning" %}
+Self-custodying keys has associated security and financial risks. Loss or theft of keys can result in irrecovable loss of funds. This guide also requires technical knowledge. You should be comfortable with the Command Line Interface (CLI) and understand the basics of how cryptographic network accounts work.
+{% endhint %}
+
+{% hint style="info" %}
+**Release Candidate** Use of Celo Mainnet Release Candidate network is subject to [these terms](../important-information/rc-network-disclaimer.md). Please note that this network may not graduate to Celo Mainnet, in which case a new network will be stood up, and new ReleaseGold contracts deployed with different addresses. You will then need to follow this guide again.
+{% endhint %}
+
+## Support
+
+If you have any questions or need assistance with these instructions, please contact cLabs or ask in the `#celo-gold-holders` channel on [Celo's Discord server](https://chat.celo.org). Remember this is a public channel: never disclose mnemonics, private keys, unsantized log output, or personal information.
+
+## Outline
+
+In this guide, you will:
+
+* Install the Celo CLI
+* Access the ReleaseGold account associated with your address using your existing Ledger
+* Authorize a voting key, which you will hold on a new, second Ledger
+* Lock some of the Gold in your ReleaseGold account
+* Use that Locked Gold to vote for validator groups to operate Celo's [Proof of Stake](celo-codebase/protocol/proof-of-stake/README.md) network (and in doing so be ready to receive epoch rewards of 6% when the community enables them in a forthcoming governance proposal)
+
+## Preparing Ledgers
+
+You will need:
+
+* Your **Beneficiary Ledger**: One Ledger Nano S or X configured with your beneficiary key (used to produce the address you supplied cLabs). Once you have completed this guide, this will become a "cold wallet" that you can keep offline most of the time.
+
+* Your **Vote Signer Ledger:** One Ledger Nano S or X configured with a new, unused key. This will become a "warm wallet" you can use whenever you want to participate in validator elections or governance proposals.
+
+As a first step, follow [these instructions](ledger.md) for both Ledgers to install the Ledger Celo app, obtain and verify the associated addresses, and (recommended) run a test transaction on the Alfajores test network.
+
+The remainder of this guide assumes you are using the first address available on each Ledger. You can add the flags described in the above instructions to use different addresses.
+
+## Deployment
+
+If you haven't already, open a terminal window and install the Celo CLI:
+
+```bash
+ npm install -g @celo/celocli
+```
+
+You will now need to point the Celo CLI to a node that is synchronized with the [Release Candidate](../getting-started/rc1.md) network. There are two options:
+
+* **Local Celo Blockchain node**: You can run a full node on your local machine which will communicate
+  with other nodes and cryptographically verify all data it receives. Since this approach does not require you to trust the network, it is most secure. To do this, follow the tutorial for [running a full node](../getting-started/running-a-full-node-in-rc1.md) and make sure to pass `--nousb`. Then run:
+
+  ```bash
+  celocli config:set --node http://localhost:8545
+  ```
+
+* **cLabs-operated node**: cLabs operates a transaction node service called Forno. While this approach  
+  does not require you to deploy a node locally, it requires you to trust cLabs and the remote Forno nodes (in the same way you would trust a centralized web service). An attacker may be able to manipulate data returned to you from the service, which the CLI may rely on to complete operations.
+  To use Forno, run this command:
+
+  ```bash
+  celocli config:set --node https://rc1-forno.celo-testnet.org:443
+  ```
+
+## Locate and verify your ReleaseGold contract address
+
+Next, you will find the address of the `ReleaseGold` contract deployed for your beneficiary address. The `ReleaseGold` contract has its own address and is separate from the beneficiary address, but there are certain aspects of it that can be controlled only by the beneficiary.
+
+Use the mapping from this list:
+
+* [RC1 ReleaseGold deployments on 4/23/20](https://gist.githubusercontent.com/timmoreton/704404484cf8f641b5464a237592a341/raw/6ad2615f219c71fe370bac84e5ac7aa1653fffac/CeloRC1ReleaseGoldWave1.json)
+
+If you have more than one beneficiary address, you'll want to step through this guide for each one.
+
+If you cannot locate your address in these mappings, please contact cLabs.
+
+Record the value for your records, and also store it in an environment variable:
+
+```bash
+export CELO_RG_ADDRESS=<YOUR-CELO-RG-ADDRESS>
+```
+
+Next check the configuration, balance, and beneficiary of your `ReleaseGold` contract:
+
+```bash
+celocli releasegold:show --contract $CELO_RG_ADDRESS
+```
+
+You can find an explanation of these parameters on the [ReleaseGold](release-gold.md) page.
+
+If the configuration shows `voting: true`, it makes sense to proceed with this guide.
+
+If any of these details appear to be incorrect, please contact cLabs, and do not proceed with the remainder of this guide.
+
+<!-- ## Withdrawing from ReleaseGold accounts  -->
+
+## Authorize Vote Signer Keys
+
+To allow you to keep your Beneficiary Ledger offline on a day-to-day basis, it’s recommended to use a seperate [Authorized Vote Signer Account](https://docs.celo.org/validator-guide/summary/detailed#authorized-vote-signers) that will vote on behalf of the beneficiary.
+
+This is a two step process. First, you create a "proof of possession" that shows that the holder of the beneficiary key also holds the vote signer key. Then, you will use that when the benficiary signs a transaction authorizing the vote signer key. This proves to the Celo network that a single entity holds both keys.
+
+{% hint style="info" %}
+* Connect your **Vote Signer Ledger** now, unlock it, and open the Celo application.
+{% endhint %}
+
+First obtain your vote signer address:
+
+```bash
+# Using the Vote Signer Ledger
+celocli account:list --useLedger
+```
+
+Create an environment variable for your vote signer address.
+
+```bash
+export CELO_VOTE_SIGNER_ADDRESS=<YOUR-VOTE-SIGNER-ADDRESS>
+```
+
+Then create the proof of possession:
+
+```bash
+# Using the Vote Signer Ledger
+celocli account proof-of-possession --signer $CELO_VOTE_SIGNER_ADDRESS --account $CELO_RG_ADDRESS --useLedger
+```
+
+The Ledger `Celo app` will ask you to confirm the transaction. Toggle right on the device until you see `Approve` on screen. Press both buttons at the same time to confirm.
+
+Take note of the signature produced by the `proof-of-possession` command and create an environment variable for it.
+
+```bash
+export CELO_VOTE_SIGNER_SIGNATURE=<YOUR-VOTE-SIGNER-SIGNATURE>
+```
+
+Now switch ledgers.
+
+{% hint style="info" %}
+* Connect your **Beneficiary Ledger** now, unlock it, and open the Celo application.
+{% endhint %}
+
+Next, designate the `ReleaseGold` contract as a “Locked Gold” account:
+
+```bash
+# Using the Beneficiary Ledger
+celocli releasegold:create-account --contract $CELO_RG_ADDRESS --useLedger
+```
+
+Check that the `ReleaseGold` contract address is associated with a registered Locked Gold Account:
+
+```bash
+celocli account:show $CELO_RG_ADDRESS
+```
+
+Now, using the proof-of-possession you generated above, as the Locked Gold Account account, you will authorize the vote signing key to vote on the Locked Gold Account's behalf:
+
+```bash
+# Using the Beneficiary Ledger
+celocli releasegold:authorize --contract $CELO_RG_ADDRESS --role=vote --signer $CELO_VOTE_SIGNER_ADDRESS --signature $CELO_VOTE_SIGNER_SIGNATURE --useLedger
+```
+
+Finally, verify that your signer was correctly authorized.
+
+```bash
+celocli account:show $CELO_RG_ADDRESS
+```
+
+The `vote` address under `authorizedSigners` should match `$CELO_VOTE_SIGNER_ADDRESS`.
+
+## Lock Celo Gold
+
+To vote for validator groups and on governance proposals you will need to lock Celo Gold. This is to keep the network secure by making sure each unit of Celo Gold can only be used to vote once. `ReleaseGold` contracts that permit voting
+
+Specify the amount of Celo Gold you wish to lock (don’t include the  `< >`  braces).  All amounts are given as wei, i.e units of 10^-18 Celo Gold. For example, 1 cGLD = 1000000000000000000.
+
+{% hint style="warning" %}
+Make sure to leave at least 1 Celo Gold unlocked to pay for transaction fees.
+{% endhint %}
+
+```bash
+# Using the Beneficiary Ledger
+celocli releasegold:locked-gold --contract $CELO_RG_ADDRESS --action lock --value <CELO-GOLD-AMOUNT> --useLedger
+```
+
+Check that your Celo Gold was successfully locked.
+
+```bash
+celocli lockedgold:show $CELO_RG_ADDRESS
+```
+
+# Next Steps
+
+You are now set up to participate in the Celo network! You can:
+* vote for [validator groups](voting.md)
+* vote in on-chain [governance proposals](governance.md).
