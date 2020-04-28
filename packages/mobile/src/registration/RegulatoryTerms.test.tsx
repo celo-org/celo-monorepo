@@ -4,11 +4,11 @@ import { fireEvent, render } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
 import { PincodeType } from 'src/account/reducer'
+import { navigate } from 'src/navigator/NavigationService'
+import { Screens } from 'src/navigator/Screens'
 import RegulatoryTerms, {
   RegulatoryTerms as RegulatoryTermsClass,
 } from 'src/registration/RegulatoryTerms'
-import { navigate } from 'src/navigator/NavigationService'
-import { Screens } from 'src/navigator/Screens'
 import { createMockStore, getMockI18nProps } from 'test/utils'
 
 jest.mock('src/navigator/NavigationService', () => {
