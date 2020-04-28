@@ -9,7 +9,7 @@ const RECENT_RECIPIENTS_TO_STORE = 8
 // We need to know the last 24 hours of payments (for compliance reasons)
 export interface PaymentInfo {
   timestamp: number
-  amount: BigNumber
+  amount: number
 }
 
 export interface State {

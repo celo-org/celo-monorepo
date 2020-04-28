@@ -112,5 +112,6 @@
   "timeframes": {
     "30d": "30 days"
   },
-  "message": "Message"
+  "message": "Message",
+  "paymentLimitReached": "The daily limit is {{dailyLimit}} {{dailyRemaining}} remaining"
 }
