@@ -163,9 +163,24 @@ describe('Local wallet class', () => {
 
           // https://github.com/ethereum/go-ethereum/blob/38aab0aa831594f31d02c9f02bfacc0bef48405d/rlp/decode.go#L664
           test('signature with 0x00 prefix is canonicalized', async () => {
-            // nonce 65 with the mock private keys will produce an S value with the first byte as 0x00
-            celoTransaction.nonce = 65
-            const signedTx: EncodedTransaction = await wallet.signTransaction(celoTransaction)
+            // This tx is carefully constructed to produce an S value with the first byte as 0x00
+            const celoTransactionZeroPrefix = {
+              from: ACCOUNT_ADDRESS1,
+              to: ACCOUNT_ADDRESS2,
+              chainId: CHAIN_ID,
+              value: Web3.utils.toWei('1', 'ether'),
+              nonce: 65,
+              gas: '10',
+              gasPrice: '99',
+              feeCurrency: '0x',
+              gatewayFeeRecipient: '0x1234',
+              gatewayFee: '0x5678',
+              data: '0xabcdef',
+            }
+
+            const signedTx: EncodedTransaction = await wallet.signTransaction(
+              celoTransactionZeroPrefix
+            )
             expect(signedTx.tx.s.startsWith('0x00')).toBeFalsy()
             const [, recoveredSigner] = recoverTransaction(signedTx.raw)
             expect(normalizeAddressWith0x(recoveredSigner)).toBe(

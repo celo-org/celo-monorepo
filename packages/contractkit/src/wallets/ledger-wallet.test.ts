@@ -340,9 +340,24 @@ describe('LedgerWallet class', () => {
             test(
               'signature with 0x00 prefix is canonicalized',
               async () => {
-                // nonce 65 with the mock private keys will produce an S value with the first byte as 0x00
-                celoTransaction.nonce = 65
-                const signedTx: EncodedTransaction = await wallet.signTransaction(celoTransaction)
+                // This tx is carefully constructed to produce an S value with the first byte as 0x00
+                const celoTransactionZeroPrefix = {
+                  from: knownAddress,
+                  to: otherAddress,
+                  chainId: CHAIN_ID,
+                  value: Web3.utils.toWei('1', 'ether'),
+                  nonce: 65,
+                  gas: '10',
+                  gasPrice: '99',
+                  feeCurrency: '0x',
+                  gatewayFeeRecipient: '0x1234',
+                  gatewayFee: '0x5678',
+                  data: '0xabcdef',
+                }
+
+                const signedTx: EncodedTransaction = await wallet.signTransaction(
+                  celoTransactionZeroPrefix
+                )
                 expect(signedTx.tx.s.startsWith('0x00')).toBeFalsy()
                 const [, recoveredSigner] = recoverTransaction(signedTx.raw)
                 expect(normalizeAddressWith0x(recoveredSigner)).toBe(
