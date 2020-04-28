@@ -8,7 +8,7 @@ As with most public blockchains \(e.g. Bitcoin, Ethereum\), transactions and sma
 
 To address this issue, the cLabs team, [Matterlabs](https://matterlabs.dev) and other esteemed zk-SNARK cryptographers and Celo community members are working to create a framework that makes it easy to create gas-efficient tokens that offer Zcash-like privacy, using a shared anonymity pool. Such an implementation could allow wallets to use the [default identity mode](identity/) easily without the risk that someone with your phone number could see your balance and transaction history.
 
-Prior to this, it is recommended that wallet providers use the [privacy identity mode](identity/#privacy-mode) so that only users that you have explicitly approved can map your phone number to your wallet address and see your balances/transactions.
+Prior to this, it is recommended that wallet providers use the [privacy identity mode](identity/README.md#privacy-mode) so that only users that you have explicitly approved can map your phone number to your wallet address and see your balances/transactions.
 
 ### Keeping your Phone Number Private
 
