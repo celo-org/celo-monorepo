@@ -20,7 +20,8 @@ export abstract class ClaimCommand extends BaseCommand {
     ...BaseCommand.flags,
     from: Flags.address({
       required: true,
-      description: 'Addess of the account to set metadata for',
+      description:
+        'Address of the account to set metadata for or an authorized signer for the address in the metadata',
     }),
   }
   static args = [Args.file('file', { description: 'Path of the metadata file' })]
@@ -34,6 +35,7 @@ export abstract class ClaimCommand extends BaseCommand {
     try {
       cli.action.start(`Read Metadata from ${filePath}`)
       const data = IdentityMetadataWrapper.fromFile(this.kit, filePath)
+      // Perhaps should check here that `--from` and data.data.meta.address match
       cli.action.stop()
       return data
     } catch (error) {
