@@ -190,10 +190,10 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   async getParticipationParameters(): Promise<ParticipationParameters> {
     const res = await this.contract.methods.getParticipationParameters().call()
     return {
-      baseline: new BigNumber(res[0]),
-      baselineFloor: new BigNumber(res[1]),
-      baselineUpdateFactor: new BigNumber(res[2]),
-      baselineQuorumFactor: new BigNumber(res[3]),
+      baseline: fromFixed(new BigNumber(res[0])),
+      baselineFloor: fromFixed(new BigNumber(res[1])),
+      baselineUpdateFactor: fromFixed(new BigNumber(res[2])),
+      baselineQuorumFactor: fromFixed(new BigNumber(res[3])),
     }
   }
 
