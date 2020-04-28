@@ -2,6 +2,7 @@ import { isValidAddress } from '@celo/utils/lib/address'
 import { Request, Response } from 'firebase-functions'
 import { ErrorMessages, respondWithError } from '../common/error-utils'
 import { authenticateUser } from '../common/identity'
+import logger from '../common/logger'
 import { getDidMatchmaking, setDidMatchmaking } from '../database/wrappers/account'
 import { getNumberPairContacts, setNumberPairContacts } from '../database/wrappers/number-pairs'
 
@@ -15,7 +16,7 @@ export async function handleGetContactMatches(request: Request, response: Respon
     authenticateUser()
     // TODO (amyslawson) reject unverified user
     if (await getDidMatchmaking(request.body.account)) {
-      console.warn(ErrorMessages.DUPLICATE_REQUEST_TO_MATCHMAKE)
+      logger.warn(ErrorMessages.DUPLICATE_REQUEST_TO_MATCHMAKE)
       respondWithError(response, 403, ErrorMessages.DUPLICATE_REQUEST_TO_MATCHMAKE)
       return
     }
@@ -26,7 +27,7 @@ export async function handleGetContactMatches(request: Request, response: Respon
     await setDidMatchmaking(request.body.account)
     response.json({ success: true, matchedContacts })
   } catch (e) {
-    console.error(ErrorMessages.UNKNOWN_ERROR, ' Failed to getContactMatches', e)
+    logger.error('Failed to getContactMatches', e)
     respondWithError(response, 500, ErrorMessages.UNKNOWN_ERROR)
   }
 }
