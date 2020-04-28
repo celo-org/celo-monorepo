@@ -1,6 +1,6 @@
 import { eqAddress } from '@celo/utils/lib/address'
 import { isValidUrl } from '@celo/utils/lib/io'
-import { verifySignature } from '@celo/utils/lib/signatureUtils'
+import { parseSignature } from '@celo/utils/lib/signatureUtils'
 import { resolveTxt } from 'dns'
 import { ContractKit } from '../..'
 import { IdentityMetadataWrapper } from '../metadata'
@@ -78,7 +78,7 @@ export const verifyDomainRecord = async (
     dnsResolver(claim.domain, (error, domainRecords) => {
       if (error) {
         console.debug(`Unable to fetch domain TXT records: ${error.toString()}`)
-        resolve(false)
+        resolve(`Unable to fetch domain TXT records: ${error.toString()}`)
       } else {
         domainRecords.forEach((record) => {
           record.forEach((entry) => {
@@ -86,9 +86,12 @@ export const verifyDomainRecord = async (
               console.debug(`TXT Record celo-site-verification found`)
               const signatureBase64 = entry.substring(DOMAIN_TXT_HEADER.length + 1)
               const signature = Buffer.from(signatureBase64, 'base64').toString('binary')
-              if (verifySignature(serializeClaim(claim), signature, address)) {
+              try {
+                parseSignature(serializeClaim(claim), signature, address)
                 console.debug(`Signature verified successfully`)
                 resolve(true)
+              } catch (error) {
+                resolve(error.toString())
               }
             }
           })
@@ -98,9 +101,9 @@ export const verifyDomainRecord = async (
     })
   })
 
-  if (found) {
+  if (typeof found !== 'string') {
     return
   }
   console.debug(`Domain not validated correctly`)
-  return `Unable to verify domain claim`
+  return `Unable to verify domain claim: ${found}`
 }
