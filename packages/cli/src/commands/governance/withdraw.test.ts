@@ -48,8 +48,6 @@ testWithGanache('governance:withdraw', (web3: Web3) => {
     console.log(await Withdraw.run(['--from', accounts[0]]))
     const balanceAfter = await kit.web3.eth.getBalance(accounts[0])
     const difference = new BigNumber(balanceAfter).minus(balanceBefore)
-    if (false) {
-      expect(difference.toFixed()).toEqual(minDeposit)
-    }
+    expect(difference.toFixed()).toEqual(minDeposit)
   })
 })

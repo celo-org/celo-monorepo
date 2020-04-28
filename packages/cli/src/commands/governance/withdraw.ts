@@ -22,11 +22,7 @@ export default class Withdraw extends BaseCommand {
       .hasRefundedDeposits(res.flags.from)
       .runChecks()
 
-    if (false) {
-      // Failing here, what is this.kit?
-      const governance = await this.kit.contracts.getGovernance()
-
-      await displaySendTx('withdraw', governance.withdraw(), {}, 'DepositWithdrawn')
-    }
+    const governance = await this.kit.contracts.getGovernance()
+    await displaySendTx('withdraw', governance.withdraw(), {}, 'DepositWithdrawn')
   }
 }

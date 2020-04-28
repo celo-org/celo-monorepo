@@ -1,5 +1,5 @@
-import { concurrentMap } from '@celo/utils/lib/async'
 import { proposalToJSON } from '@celo/contractkit/lib/governance/proposals'
+import { concurrentMap } from '@celo/utils/lib/async'
 import { flags } from '@oclif/command'
 import { toBuffer } from 'ethereumjs-util'
 import { BaseCommand } from '../../base'
