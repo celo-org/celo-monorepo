@@ -1,4 +1,5 @@
 import * as functions from 'firebase-functions'
+import logger from './common/logger'
 
 export const DEV_MODE =
   process.env.NODE_ENV !== 'production' || process.env.FUNCTIONS_EMULATOR === 'true'
@@ -27,7 +28,7 @@ interface Config {
 let config: Config
 
 if (DEV_MODE) {
-  console.debug('Running in dev mode')
+  logger.debug('Running in dev mode')
   config = {
     blockchain: {
       provider: 'https://alfajores-forno.celo-testnet.org',
@@ -70,6 +71,6 @@ if (DEV_MODE) {
       numberAttestationsRequired: functionConfig.attestations.number_attestations_required,
     },
   }
-  console.debug('Using function config: ', { ...config, salt: { ...config.salt, key: 'mockKey' } })
+  logger.debug('Using function config: ', { ...config, salt: { ...config.salt, key: 'mockKey' } })
 }
 export default config
