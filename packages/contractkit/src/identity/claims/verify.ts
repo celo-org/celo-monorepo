@@ -19,7 +19,7 @@ import { ClaimTypes } from './types'
 export async function verifyClaim(kit: ContractKit, claim: Claim, address: string) {
   switch (claim.type) {
     case ClaimTypes.KEYBASE:
-      return verifyKeybaseClaim(claim, address)
+      return verifyKeybaseClaim(kit, claim, address)
     case ClaimTypes.ACCOUNT:
       return verifyAccountClaim(kit, claim, address)
     case ClaimTypes.DOMAIN:
