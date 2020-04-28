@@ -18,7 +18,7 @@ describe('CookieConsent', () => {
     it('initializes Sentry', async () => {
       const { getByText } = render(
         <TestProvider>
-          <CookieConsent />{' '}
+          <CookieConsent />
         </TestProvider>
       )
       await waitForDomChange()
@@ -33,7 +33,7 @@ describe('CookieConsent', () => {
     it('does calls disagree', async () => {
       const { getByText } = render(
         <TestProvider>
-          <CookieConsent />{' '}
+          <CookieConsent />
         </TestProvider>
       )
       await waitForDomChange()
