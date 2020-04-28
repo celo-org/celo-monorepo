@@ -24,7 +24,11 @@ export function Explorer({ icons }: Props) {
       </Text>
       <View style={brandStyles.tiling}>
         {icons.map((icon) => (
-          <View key={icon.id} style={!visibleIcons.has(icon.id) && styles.offScreen}>
+          <View
+            key={icon.id}
+            testID={icon.id}
+            style={!visibleIcons.has(icon.id) && styles.offScreen}
+          >
             <IconShowcase
               key={icon.name}
               ratio={1}

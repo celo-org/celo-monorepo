@@ -1,4 +1,4 @@
-import { eqAddress, normalizeAddress } from '@celo/utils/lib/address'
+import { eqAddress, findAddressIndex, normalizeAddress } from '@celo/utils/lib/address'
 import { concurrentMap, concurrentValuesMap } from '@celo/utils/lib/async'
 import { zip } from '@celo/utils/lib/collections'
 import BigNumber from 'bignumber.js'
@@ -9,6 +9,7 @@ import { Election } from '../generated/Election'
 import {
   BaseWrapper,
   CeloTransactionObject,
+  fixidityValueToBigNumber,
   identity,
   proxyCall,
   proxySend,
@@ -60,6 +61,8 @@ export interface ElectionConfig {
   electableValidators: ElectableValidators
   electabilityThreshold: BigNumber
   maxNumGroupsVotedFor: BigNumber
+  totalVotes: BigNumber
+  currentThreshold: BigNumber
 }
 
 /**
@@ -82,7 +85,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
   electabilityThreshold = proxyCall(
     this.contract.methods.getElectabilityThreshold,
     undefined,
-    valueToBigNumber
+    fixidityValueToBigNumber
   )
 
   /**
@@ -126,6 +129,12 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     undefined,
     valueToInt
   )
+
+  /**
+   * Returns the total votes received across all groups.
+   * @return The total votes received across all groups.
+   */
+  getTotalVotes = proxyCall(this.contract.methods.getTotalVotes, undefined, valueToBigNumber)
 
   /**
    * Returns the current validator signers using the precompiles.
@@ -276,11 +285,14 @@ export class ElectionWrapper extends BaseWrapper<Election> {
       this.electableValidators(),
       this.electabilityThreshold(),
       this.contract.methods.maxNumGroupsVotedFor().call(),
+      this.getTotalVotes(),
     ])
     return {
       electableValidators: res[0],
       electabilityThreshold: res[1],
       maxNumGroupsVotedFor: valueToBigNumber(res[2]),
+      totalVotes: res[3],
+      currentThreshold: res[3].multipliedBy(res[1]),
     }
   }
 
@@ -328,7 +340,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     value: BigNumber
   ): Promise<CeloTransactionObject<boolean>> {
     const groups = await this.contract.methods.getGroupsVotedForByAccount(account).call()
-    const index = groups.indexOf(group)
+    const index = findAddressIndex(group, groups)
     const { lesser, greater } = await this.findLesserAndGreaterAfterVote(group, value.times(-1))
 
     return toTransactionObject(
@@ -343,7 +355,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     value: BigNumber
   ): Promise<CeloTransactionObject<boolean>> {
     const groups = await this.contract.methods.getGroupsVotedForByAccount(account).call()
-    const index = groups.indexOf(group)
+    const index = findAddressIndex(group, groups)
     const { lesser, greater } = await this.findLesserAndGreaterAfterVote(group, value.times(-1))
 
     return toTransactionObject(
