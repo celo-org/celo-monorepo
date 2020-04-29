@@ -8708,9 +8708,9 @@ bl@~1.1.2:
   dependencies:
     readable-stream "~2.0.5"
 
-"blind-threshold-bls@https://github.com/celo-org/blind-threshold-bls-wasm#791b4ccc0d6aa8fa42e0153ee2ff7a50738fb3b1":
+"blind-threshold-bls@https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a":
   version "0.1.0"
-  resolved "https://github.com/celo-org/blind-threshold-bls-wasm#791b4ccc0d6aa8fa42e0153ee2ff7a50738fb3b1"
+  resolved "https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a1ab5154c2f0b1c55cb0d61fbb1d907208"
 
 block-stream@0.0.9:
   version "0.0.9"
@@ -26400,9 +26400,9 @@ react-native-autocomplete-input@^4.1.0:
     react-native-secure-randombytes "^2.2.3"
     unorm "^1.3.3"
 
-"react-native-blind-threshold-bls@https://github.com/celo-org/react-native-blind-threshold-bls#8c53019":
+"react-native-blind-threshold-bls@https://github.com/celo-org/react-native-blind-threshold-bls#cc36392":
   version "1.0.0"
-  resolved "https://github.com/celo-org/react-native-blind-threshold-bls#8c530199d6b9dbf695c8baef60eabe0773b40d19"
+  resolved "https://github.com/celo-org/react-native-blind-threshold-bls#cc3639286a29a1fc2ac85a8554061a01680725a0"
 
 react-native-camera@^3.7.1:
   version "3.7.1"

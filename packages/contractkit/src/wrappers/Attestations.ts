@@ -55,7 +55,7 @@ type AttestationServiceRunningCheckResult =
   | { isValid: false; issuer: Address }
 
 interface AttesationServiceRevealRequest {
-  account: string
+  account: Address
   phoneNumber: string
   issuer: string
   salt?: string

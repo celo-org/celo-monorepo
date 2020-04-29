@@ -8,12 +8,11 @@ import config from '../config'
  */
 export function computeBlindedSignature(base64BlindedMessage: string) {
   try {
-    logger.debug('b64 blinded msg', base64BlindedMessage)
     const keyBuffer = Buffer.from(config.salt.key, 'base64')
     const msgBuffer = Buffer.from(base64BlindedMessage, 'base64')
 
     logger.debug('Calling theshold sign')
-    const signedMsg = threshold.sign(keyBuffer, msgBuffer)
+    const signedMsg = threshold.signBlindedMessage(keyBuffer, msgBuffer)
     logger.debug('Back from threshold sign, parsing results')
 
     if (!signedMsg) {

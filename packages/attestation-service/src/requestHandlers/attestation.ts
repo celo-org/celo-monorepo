@@ -132,10 +132,10 @@ class AttestationRequestHandler {
   async validateAttestation(attestationCode: string) {
     const { phoneNumber, account, salt } = this.attestationRequest
     const address = getAccountAddress()
-    const identifer = PhoneNumberUtils.getPhoneHash(phoneNumber, salt)
+    const identifier = PhoneNumberUtils.getPhoneHash(phoneNumber, salt)
     const attestations = await kit.contracts.getAttestations()
     const isValid = await attestations.validateAttestationCode(
-      identifer,
+      identifier,
       account,
       address,
       attestationCode

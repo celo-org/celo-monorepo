@@ -4,14 +4,14 @@ import { Platform } from 'react-native'
 import BlindThresholdBls from 'react-native-blind-threshold-bls'
 import { call, put, select } from 'redux-saga/effects'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { PHONE_NUM_PRIVACY_SERVICE } from 'src/config'
+import { PHONE_NUM_PRIVACY_PUBLIC_KEY, PHONE_NUM_PRIVACY_SERVICE } from 'src/config'
 import { updateE164PhoneNumberSalts } from 'src/identity/actions'
 import { e164NumberToSaltSelector, E164NumberToSaltType } from 'src/identity/reducer'
 import Logger from 'src/utils/Logger'
 import { currentAccountSelector } from 'src/web3/selectors'
 
 const TAG = 'identity/privacy'
-const SIGN_MESSAGE_ENDPOINT = '/getBlindedMessageSignature'
+const SIGN_MESSAGE_ENDPOINT = '/getBlindedSalt'
 
 export interface PhoneNumberHashDetails {
   e164Number: string
@@ -82,21 +82,23 @@ async function getPhoneNumberSalt(e164Number: string, account: string) {
   const base64BlindedMessage = await BlindThresholdBls.blindMessage(e164Number)
   const base64BlindSig = await postToSignMessage(base64BlindedMessage, account)
   Logger.debug(`${TAG}@getPhoneNumberSalt`, 'Retrieving unblinded signature')
-  const base64UnblindedSig = await BlindThresholdBls.unblindMessage(base64BlindSig)
+  const base64UnblindedSig = await BlindThresholdBls.unblindMessage(
+    base64BlindSig,
+    PHONE_NUM_PRIVACY_PUBLIC_KEY
+  )
   Logger.debug(`${TAG}@getPhoneNumberSalt`, 'Converting sig to salt')
   return getSaltFromThresholdSignature(base64UnblindedSig)
 }
 
 interface SignMessageResponse {
   success: boolean
-  // TODO change this in service
-  salt: string
+  signature: string
 }
 
 // Send the blinded message off to the phone number privacy service and
 // get back the theshold signed blinded message
 async function postToSignMessage(base64BlindedMessage: string, account: string) {
-  Logger.debug(`${TAG}@postToSignMessage`, 'Retrieving blinded message')
+  Logger.debug(`${TAG}@postToSignMessage`, `Posting to ${SIGN_MESSAGE_ENDPOINT}`)
   const res = await fetch(PHONE_NUM_PRIVACY_SERVICE + SIGN_MESSAGE_ENDPOINT, {
     method: 'POST',
     headers: {
@@ -104,9 +106,8 @@ async function postToSignMessage(base64BlindedMessage: string, account: string) 
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      // TODO use hashed number when service is updated
-      phoneNumber: '+1455556600',
-      queryPhoneNumber: base64BlindedMessage,
+      hashedPhoneNumber: '+1455556600',
+      blindedQueryPhoneNumber: base64BlindedMessage.trim(),
       account,
     }),
   })
@@ -117,7 +118,7 @@ async function postToSignMessage(base64BlindedMessage: string, account: string) 
 
   Logger.debug(`${TAG}@postToSignMessage`, 'Response ok. Parsing.')
   const signResponse = (await res.json()) as SignMessageResponse
-  return signResponse.salt
+  return signResponse.signature
 }
 
 function handleSignMessageFailure(res: Response) {

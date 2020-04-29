@@ -9,7 +9,7 @@ interface Config {
     provider: string
   }
   salt: {
-    key: string
+    key: string // base 64 encoded key
     unverifiedQueryMax: number
     additionalVerifiedQueryMax: number
     queryPerTransaction: number
@@ -34,7 +34,8 @@ if (DEV_MODE) {
       provider: 'https://alfajores-forno.celo-testnet.org',
     },
     salt: {
-      key: 'pknJzIYf4LPbOPao5lk1tVwljmXAddyebYsQ3wI5ywk=',
+      key: '1DNeOAuBYhR9BIKKChUOatB1Ha6cK/sG9p7XT2tjYQ8=',
+      // Public Key is B+gJTCmTrf9t3X7YQ2F4xekSzd5xg5bdzcJ8NPefby3mScelg5172zl1GgIO9boADEwE67j6M55GwouQwaG5jDZ5tHa2eNtfC7oLIsevuUmzrXVDry9cmsalB0BHX0EA
       unverifiedQueryMax: 2,
       additionalVerifiedQueryMax: 30,
       queryPerTransaction: 2,
