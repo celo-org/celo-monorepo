@@ -14,6 +14,13 @@ Github: https://github.com/celo-org/savings-circle-demo
 
 Github: https://github.com/abundance-stack 
 
+## Bienvenir
+
+Decentralized application to help coordinate and improve the impact metric of non-profit organizations that work with migrants in Latin America.
+
+Github: https://github.com/nestorbonilla/bienvenir
+
+
 ## Add your app to this list!
 
 _Are you building on Celo? To add your project, please submit a pull request updating this page!_

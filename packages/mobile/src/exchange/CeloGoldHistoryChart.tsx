@@ -12,7 +12,6 @@ import { exchangeHistorySelector } from 'src/exchange/reducer'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { LocalCurrencyCode } from 'src/localCurrency/consts'
 import { convertDollarsToLocalAmount } from 'src/localCurrency/convert'
-import { useLocalCurrencyCode } from 'src/localCurrency/hooks'
 import { getLocalCurrencyExchangeRate } from 'src/localCurrency/selectors'
 import useSelector from 'src/redux/useSelector'
 import { goldToDollarAmount } from 'src/utils/currencyExchange'
@@ -147,7 +146,9 @@ function CeloGoldHistoryChart({ t, testID, i18n }: Props) {
     return Math.floor(er.timestamp / (range / CHART_POINTS_NUMBER))
   }, [])
 
-  const localCurrencyCode = useLocalCurrencyCode()
+  // We hardcode localCurrencyCode to null, hence the chart will always show cGLD to cUSD no matter what.
+  // TODO: revert this back to `useLocalCurrencyCode()` when we have history data for cGDL to Local Currency.
+  const localCurrencyCode = null
   const displayLocalCurrency = useCallback(
     (amount: BigNumber.Value) =>
       getLocalCurrencyDisplayValue(amount, localCurrencyCode || LocalCurrencyCode.USD, true),

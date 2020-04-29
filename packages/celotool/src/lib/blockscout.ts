@@ -85,6 +85,15 @@ async function helmParameters(
       envVar.BLOCKSCOUT_SUBNETWORK_NAME,
       celoEnv
     )}"`,
+    `--set blockscout.metadata_crawler.image.repository=${fetchEnv(
+      envVar.BLOCKSCOUT_METADATA_CRAWLER_IMAGE_REPOSITORY
+    )}`,
+    `--set blockscout.metadata_crawler.repository.tag=${fetchEnv(
+      envVar.BLOCKSCOUT_METADATA_CRAWLER_IMAGE_TAG
+    )}`,
+    `--set blockscout.metadata_crawler.schedule=${fetchEnv(
+      envVar.BLOCKSCOUT_METADATA_CRAWLER_SCHEDULE
+    )}`,
     `--set promtosd.scrape_interval=${fetchEnv(envVar.PROMTOSD_SCRAPE_INTERVAL)}`,
     `--set promtosd.export_interval=${fetchEnv(envVar.PROMTOSD_EXPORT_INTERVAL)}`,
   ]
