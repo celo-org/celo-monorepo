@@ -1,11 +1,11 @@
 import BigNumber from 'bignumber.js'
 import * as functions from 'firebase-functions'
+import Web3 from 'web3'
 import logger from './common/logger'
 
 export const DEV_MODE =
   process.env.NODE_ENV !== 'production' || process.env.FUNCTIONS_EMULATOR === 'true'
 
-const CUSD_VALUE = 1000000000000000000
 interface Config {
   blockchain: {
     provider: string
@@ -41,7 +41,7 @@ if (DEV_MODE) {
       unverifiedQueryMax: 2,
       additionalVerifiedQueryMax: 30,
       queryPerTransaction: 2,
-      minDollarBalance: new BigNumber(0.1 * CUSD_VALUE),
+      minDollarBalance: new BigNumber(Web3.utils.toWei('0.1')),
     },
     db: {
       user: 'postgres',
