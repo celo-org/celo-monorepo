@@ -15,16 +15,16 @@ This guide assumes:
 * You have your private key held on a [Ledger Nano S or Ledger Nano X](ledger.md) device, and you have a second such device available for managing a voting key.
 
 {% hint style="warning" %}
-Self-custodying keys has associated security and financial risks. Loss or theft of keys can result in irrecovable loss of funds. This guide also requires technical knowledge. You should be comfortable with the Command Line Interface (CLI) and understand the basics of how cryptographic network accounts work.
+**Warning**: Self-custodying keys has associated security and financial risks. Loss or theft of keys can result in irrecovable loss of funds. This guide also requires technical knowledge. You should be comfortable with using a Command Line Interface (CLI) and understand the basics of how cryptographic network accounts work.
 {% endhint %}
 
 {% hint style="info" %}
-**Release Candidate** Use of Celo Mainnet Release Candidate network is subject to [these terms](../important-information/rc-network-disclaimer.md). Please note that this network may not graduate to Celo Mainnet, in which case a new network will be stood up, and new ReleaseGold contracts deployed with different addresses. You will then need to follow this guide again.
+**Release Candidate**: Use of Celo Mainnet Release Candidate network is subject to [these terms](../important-information/rc-network-disclaimer.md). Please note that this network may not graduate to Celo Mainnet, in which case a new network will be stood up, and new ReleaseGold contracts deployed with different addresses. You will then need to follow this guide again.
 {% endhint %}
 
 ## Support
 
-If you have any questions or need assistance with these instructions, please contact cLabs or ask in the `#celo-gold-holders` channel on [Celo's Discord server](https://chat.celo.org). Remember this is a public channel: never disclose mnemonics, private keys, unsantized log output, or personal information.
+If you have any questions or need assistance with these instructions, please contact cLabs or ask in the `#celo-gold-holders` channel on [Celo's Discord server](https://chat.celo.org). Remember that Discord is a public channel: never disclose mnemonics, private keys, unsantized log output, or personal information.
 
 ## Outline
 
@@ -77,7 +77,7 @@ You will now need to point the Celo CLI to a node that is synchronized with the 
 
 Next, you will find the address of the `ReleaseGold` contract deployed for your beneficiary address. The `ReleaseGold` contract has its own address and is separate from the beneficiary address, but there are certain aspects of it that can be controlled only by the beneficiary.
 
-Use the mapping from this list:
+Use the mapping from this list (you can use Edit>Find in your browser):
 
 * [RC1 ReleaseGold deployments on 4/23/20](https://gist.githubusercontent.com/timmoreton/704404484cf8f641b5464a237592a341/raw/6ad2615f219c71fe370bac84e5ac7aa1653fffac/CeloRC1ReleaseGoldWave1.json)
 
@@ -103,7 +103,7 @@ If the configuration shows `voting: true`, it makes sense to proceed with this g
 
 If any of these details appear to be incorrect, please contact cLabs, and do not proceed with the remainder of this guide.
 
-<!-- ## Withdrawing from ReleaseGold accounts  -->
+If you wish to access your `ReleaseGold` account and use it to participate in electing validator groups for Celo's Proof of Stake protocol, and potentially earn epoch rewards for doing so, please continue this guide. Otherwise, you're all set. You don't need to take any further action right now. You can come back and continue at any time.
 
 ## Authorize Vote Signer Keys
 
@@ -198,8 +198,80 @@ Check that your Celo Gold was successfully locked.
 celocli lockedgold:show $CELO_RG_ADDRESS
 ```
 
+## Vote for a Validator Group
+
+Celo Gold (cGLD) holders can vote for Validator groups and not validators directly. This is similar to delegating on other cryptographic networks. cGLD holders who vote for an elected validator group may earn [epoch rewards](https://docs.celo.org/getting-started/glossary#epoch-rewards). Refer to [Voting](voting.md) for more detailed information.
+
+A number of community sites are providing information to help choose a validator group. Start with [the cLabs Validator explorer](https://celo.org/validators/explore), or [Bi23 Labs' `thecelo` dashboard](https://thecelo.com).
+
+You can also see registered validator groups through the Celo CLI. This will display a list of validator groups, the number of votes they have received, the number of additional votes they are able to receive, and whether or not they are eligible to elect validators:
+
+```bash
+celocli election:list
+```
+
+Once you have found one or more validator groups you’d like to vote for, create an environment variable for its group address (don’t include the  `< >`  braces):
+
+```bash
+export CELO_VALIDATOR_GROUP_ADDRESS=<VALIDATOR-GROUP-ADDRESS-TO-VOTE-FOR>
+```
+
+To vote, you will use your vote signer key, which is voting *on behalf of* your Locked Gold account.
+
+For each vote you will need to specify the amount of locked Celo Gold you wish to vote with (don’t include the  `< >`  braces). All Celo Gold amounts should be expressed in wei: that means 1 cGLD = 1000000000000000000.
+
+{% hint style="info" %}
+* Connect your **Vote Signer Ledger** now, unlock it, and open the Celo application.
+{% endhint %}
+
+```bash
+# Using the Vote Signer Ledger
+celocli election:vote --from $CELO_VOTE_SIGNER_ADDRESS --for $CELO_VALIDATOR_GROUP_ADDRESS --value <CELO-GOLD-AMOUNT> --useLedger
+```
+
+Verify that your votes were cast successfully. Since your Vote Signer account votes on behalf of the Celo Locked Gold account, you want to check the election status for that account:
+
+```bash
+celocli election:show $CELO_RG_ADDRESS --voter
+```
+
+Your locked cGLD votes should be displayed next to `pending` under `votes`.
+
+## Activate your Vote
+
+Users in the Celo protocol receive epoch rewards for voting in Validator Elections only after submitting a special transaction to enable rewards. This must be done every time new votes are cast, and can only be made after the most recent epoch has ended.
+
+{% hint style="info" %}
+Epoch lengths in the RC1 network are set to be the number of blocks produced in a day. As a result, votes may need to be activated up to 24 hours after they are cast.
+{% endhint %}
+
+Check that your votes were cast in a past epoch.
+
+```bash
+celocli election:show $CELO_RG_ADDRESS --voter
+```
+
+Your locked cGLD votes should be displayed next to `active` under `votes`.
+
+{% hint style="info" %}
+* For the following commands, make sure that your Ledger device with the voter signer keys is unlocked. * *  The Ledger `Celo app` will ask you to confirm the transaction. Follow instructions on the device's screen to do this.
+{% endhint %}
+
+Now activate your votes.
+
+```bash
+# Using the Ledger device where your vote signer keys are stored
+# You must do this in an epoch after the one you voted in, this may take up to 24h
+celocli election:activate --from $CELO_VOTE_SIGNER_ADDRESS --useLedger --ledgerConfirmAddress
+```
+
+
 # Next Steps
 
 You are now set up to participate in the Celo network! You can:
 * vote for [validator groups](voting.md)
 * vote in on-chain [governance proposals](governance.md).
+
+## Withdrawing from ReleaseGold accounts
+
+At some point, the terms of your ReleaseGold contract will allow you to withdraw funds and transfer them to your beneficiary address. Check back here for instructions on how to do this.  
