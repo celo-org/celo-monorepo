@@ -37,13 +37,13 @@ Highlights include:
 
   Extremely fast, secure synchronization between mobile devices and the Celo network means that even wallet users with high latency, low bandwidth, or high cost data tariffs can use Celo. Celo removes the need to check every header before a received header can be trusted. Performance will be further improved with BLS signature aggregation and succinct zero-knowledge proofs, via zk-SNARKs.
 
-- **Proof of Stake**
+- **Proof-of-Stake**
 
-  Celo uses a Proof of Stake consensus algorithm. In comparison to Proof of Work systems like Bitcoin and Ethereum, this eliminates the negative environmental impact and means that users can make transactions that are cheaper, faster, and where the outcome cannot be changed once complete.
+  Celo uses a proof-of-stake consensus algorithm. In comparison to Proof of Work systems like Bitcoin and Ethereum, this eliminates the negative environmental impact and means that users can make transactions that are cheaper, faster, and where the outcome cannot be changed once complete.
 
 - **Full Node Incentives**
 
-  The Celo protocol offers incentives for running full nodes to service the light clients that run on each mobile device. Unlike other Proof of Stake systems, users can still earn cryptocurrency in exchange for providing compute resources without having to stake funds.
+  The Celo protocol offers incentives for running full nodes to service the light clients that run on each mobile device. Unlike other proof-of-stake systems, users can still earn cryptocurrency in exchange for providing compute resources without having to stake funds.
 
 - **On-chain Governance**
 
