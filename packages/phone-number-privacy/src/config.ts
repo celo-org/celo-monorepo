@@ -11,7 +11,6 @@ interface Config {
     provider: string
   }
   salt: {
-    key: string
     unverifiedQueryMax: number
     additionalVerifiedQueryMax: number
     queryPerTransaction: number
@@ -22,6 +21,13 @@ interface Config {
     password: string
     database: string
     host: string
+  }
+  keyVault: {
+    azureClientID: string
+    azureClientSecret: string
+    azureTenant: string
+    azureVaultName: string
+    azureSecretName: string
   }
   attestations: {
     numberAttestationsRequired: number
@@ -37,7 +43,6 @@ if (DEV_MODE) {
       provider: 'https://alfajores-forno.celo-testnet.org',
     },
     salt: {
-      key: 'pknJzIYf4LPbOPao5lk1tVwljmXAddyebYsQ3wI5ywk=',
       unverifiedQueryMax: 2,
       additionalVerifiedQueryMax: 30,
       queryPerTransaction: 2,
@@ -48,6 +53,13 @@ if (DEV_MODE) {
       password: 'fakePass',
       database: 'phoneNumberPrivacy',
       host: 'fakeHost',
+    },
+    keyVault: {
+      azureClientID: 'useMock',
+      azureClientSecret: 'useMock',
+      azureTenant: 'useMock',
+      azureVaultName: 'useMock',
+      azureSecretName: 'useMock',
     },
     attestations: {
       numberAttestationsRequired: 3,
@@ -60,7 +72,6 @@ if (DEV_MODE) {
       provider: functionConfig.blockchain.provider,
     },
     salt: {
-      key: functionConfig.salt.key,
       unverifiedQueryMax: functionConfig.salt.unverified_query_max,
       additionalVerifiedQueryMax: functionConfig.salt.additional_verified_query_max,
       queryPerTransaction: functionConfig.salt.query_per_transaction,
@@ -71,6 +82,13 @@ if (DEV_MODE) {
       password: functionConfig.db.pass,
       database: functionConfig.db.name,
       host: `/cloudsql/${functionConfig.db.host}`,
+    },
+    keyVault: {
+      azureClientID: functionConfig.keyVault.azureClientID,
+      azureClientSecret: functionConfig.keyVault.azureClientSecret,
+      azureTenant: functionConfig.keyVault.azureTenant,
+      azureVaultName: functionConfig.keyVault.azureVaultName,
+      azureSecretName: functionConfig.keyVault.azureSecretName,
     },
     attestations: {
       numberAttestationsRequired: functionConfig.attestations.number_attestations_required,

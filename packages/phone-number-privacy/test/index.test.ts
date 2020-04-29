@@ -1,5 +1,5 @@
-import { computeBlindedSignature } from '../src/bls/bls-signature'
 import { authenticateUser, isVerified } from '../src/common/identity'
+import { BLSCryptographyClient } from '../src/bls/bls-cryptography-client'
 import {
   getDidMatchmaking,
   incrementQueryCount,
@@ -19,9 +19,9 @@ const mockIsVerified = isVerified as jest.Mock
 jest.mock('../src/salt-generation/query-quota')
 const mockGetRemainingQueryCount = getRemainingQueryCount as jest.Mock
 
-jest.mock('../src/bls/bls-signature')
-const mockComputeBlindedSignature = computeBlindedSignature as jest.Mock
-mockComputeBlindedSignature.mockReturnValue(BLS_SIGNATURE)
+jest.mock('../src/bls/bls-cryptography-client')
+const mockComputeBlindedSignature = BLSCryptographyClient.computeBlindedSignature as jest.Mock
+mockComputeBlindedSignature.mockResolvedValue(BLS_SIGNATURE)
 
 jest.mock('../src/database/wrappers/account')
 const mockIncrementQueryCount = incrementQueryCount as jest.Mock
