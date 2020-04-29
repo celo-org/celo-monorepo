@@ -62,11 +62,10 @@ export default class ClaimKeybase extends ClaimCommand {
       const fileName = proofFileName(address)
       const tmpPath = `${tmpdir()}/${fileName}`
       writeFileSync(tmpPath, JSON.stringify(signedClaim))
-      console.log('here')
       await execCmdWithError(
         'keybase',
         ['fs', 'cp', tmpPath, publicFolderPrefix + keybaseFilePathToProof + '/' + fileName],
-        { silent: false }
+        { silent: true }
       )
       cli.action.stop()
 
@@ -86,7 +85,6 @@ export default class ClaimKeybase extends ClaimCommand {
   }
   async uploadProof(claim: KeybaseClaim, signature: string, username: string, address: string) {
     try {
-      console.log('here')
       if (
         (await commandExists('keybase')) &&
         (await binaryPrompt(
