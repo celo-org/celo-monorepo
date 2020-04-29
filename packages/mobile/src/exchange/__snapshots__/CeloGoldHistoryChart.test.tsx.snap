@@ -48,7 +48,7 @@ exports[`renders properly 1`] = `
           }
         }
       >
-        $13.30
+        $10.00
       </Text>
       <Text
         style={
@@ -62,7 +62,7 @@ exports[`renders properly 1`] = `
       >
         ▴
          
-        13.30
+        10.00
          (
         Infinity
         %)
@@ -271,7 +271,7 @@ exports[`renders while update is in progress 1`] = `
           }
         }
       >
-        $13.30
+        $10.00
       </Text>
       <Text
         style={
@@ -285,7 +285,7 @@ exports[`renders while update is in progress 1`] = `
       >
         ▴
          
-        13.14
+        9.88
          (
         8,030.08
         %)
@@ -368,7 +368,7 @@ exports[`renders while update is in progress 1`] = `
           x={4.99904361864102}
           y={177.3076923076923}
         >
-          $0.16
+          $0.12
         </text>
         <g>
           <circle
