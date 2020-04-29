@@ -6,16 +6,19 @@ description: View and manage Validator Groups
 
 ### Commission
 
-Manage the commission for a registered Validator Group. This represents the share of the epoch rewards given to elected Validators that goes to the group they are a member of.
+Manage the commission for a registered Validator Group. This represents the share of the epoch rewards given to elected Validators that goes to the group they are a member of. Updates must be made in a two step process where the group owner first calls uses the queue-update option, then after the required update delay, the apply option. The commission update delay, in blocks, can be viewed with the network:parameters command. A groups next commission update block can be checked with validatorgroup:show
 
 ```
 USAGE
   $ celocli validatorgroup:commission
 
 OPTIONS
-  --apply                                            Applies a previously queued update
   --azureVaultName=azureVaultName                    If --useAKV is set, this is used to connect to the Azure KeyVault
-  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address for the Validator Group
+  --apply                                            Applies a previously queued update. Should be called after the
+                                                     update delay.
+
+  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address for the Validator Group or Validator Group
+                                                     validator signer
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
@@ -27,7 +30,8 @@ OPTIONS
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
 
-  --queue-update=queue-update                        Queues an update to the commission
+  --queue-update=queue-update                        Queues an update to the commission, which can be applied after the
+                                                     update delay.
 
   --useAKV                                           Set it to use an Azure KeyVault HSM
 
