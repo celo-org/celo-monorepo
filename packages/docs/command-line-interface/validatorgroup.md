@@ -13,9 +13,10 @@ USAGE
   $ celocli validatorgroup:commission
 
 OPTIONS
-  --azureVaultName=azureVaultName                    If --useAKV is set, this is used to connect to the Azure KeyVault
   --apply                                            Applies a previously queued update. Should be called after the
                                                      update delay.
+
+  --azureVaultName=azureVaultName                    If --useAKV is set, this is used to connect to the Azure KeyVault
 
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address for the Validator Group or Validator Group
                                                      validator signer
