@@ -101,7 +101,7 @@ celocli releasegold:show --contract $CELO_RG_ADDRESS
 
 You can find an explanation of these parameters on the [ReleaseGold](release-gold.md) page.
 
-If the configuration shows `voting: true`, it makes sense to proceed with this guide.
+If the configuration shows `canVote: true`, it makes sense to proceed with this guide.
 
 If any of these details appear to be incorrect, please contact cLabs, and do not proceed with the remainder of this guide.
 
