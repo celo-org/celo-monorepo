@@ -77,14 +77,14 @@ export class RegulatoryTerms extends React.Component<Props> {
             <Text style={styles.header}>{t('terms.heading2')}</Text>
             <Text style={styles.disclaimer}>{t('terms.goldDisclaimer')}</Text>
           </View>
-          <Button
-            standard={false}
-            type={BtnTypes.PRIMARY}
-            text={t('global:accept')}
-            onPress={this.onPressAccept}
-            testID={'AcceptTermsButton'}
-          />
         </ScrollView>
+        <Button
+          standard={false}
+          type={BtnTypes.PRIMARY}
+          text={t('global:accept')}
+          onPress={this.onPressAccept}
+          testID={'AcceptTermsButton'}
+        />
       </SafeAreaView>
     )
   }

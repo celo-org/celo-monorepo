@@ -4,12 +4,14 @@ import logger from './common/logger'
 export const DEV_MODE =
   process.env.NODE_ENV !== 'production' || process.env.FUNCTIONS_EMULATOR === 'true'
 
+// Public Key is B+gJTCmTrf9t3X7YQ2F4xekSzd5xg5bdzcJ8NPefby3mScelg5172zl1GgIO9boADEwE67j6M55GwouQwaG5jDZ5tHa2eNtfC7oLIsevuUmzrXVDry9cmsalB0BHX0EA
+export const DEV_PRIVATE_KEY = '1DNeOAuBYhR9BIKKChUOatB1Ha6cK/sG9p7XT2tjYQ8='
+
 interface Config {
   blockchain: {
     provider: string
   }
   salt: {
-    key: string // base 64 encoded key
     unverifiedQueryMax: number
     additionalVerifiedQueryMax: number
     queryPerTransaction: number
@@ -19,6 +21,13 @@ interface Config {
     password: string
     database: string
     host: string
+  }
+  keyVault: {
+    azureClientID: string
+    azureClientSecret: string
+    azureTenant: string
+    azureVaultName: string
+    azureSecretName: string
   }
   attestations: {
     numberAttestationsRequired: number
@@ -34,8 +43,6 @@ if (DEV_MODE) {
       provider: 'https://alfajores-forno.celo-testnet.org',
     },
     salt: {
-      key: '1DNeOAuBYhR9BIKKChUOatB1Ha6cK/sG9p7XT2tjYQ8=',
-      // Public Key is B+gJTCmTrf9t3X7YQ2F4xekSzd5xg5bdzcJ8NPefby3mScelg5172zl1GgIO9boADEwE67j6M55GwouQwaG5jDZ5tHa2eNtfC7oLIsevuUmzrXVDry9cmsalB0BHX0EA
       unverifiedQueryMax: 2,
       additionalVerifiedQueryMax: 30,
       queryPerTransaction: 2,
@@ -45,6 +52,13 @@ if (DEV_MODE) {
       password: 'fakePass',
       database: 'phoneNumberPrivacy',
       host: 'fakeHost',
+    },
+    keyVault: {
+      azureClientID: 'useMock',
+      azureClientSecret: 'useMock',
+      azureTenant: 'useMock',
+      azureVaultName: 'useMock',
+      azureSecretName: 'useMock',
     },
     attestations: {
       numberAttestationsRequired: 3,
@@ -57,7 +71,6 @@ if (DEV_MODE) {
       provider: functionConfig.blockchain.provider,
     },
     salt: {
-      key: functionConfig.salt.key,
       unverifiedQueryMax: functionConfig.salt.unverified_query_max,
       additionalVerifiedQueryMax: functionConfig.salt.additional_verified_query_max,
       queryPerTransaction: functionConfig.salt.query_per_transaction,
@@ -67,6 +80,13 @@ if (DEV_MODE) {
       password: functionConfig.db.pass,
       database: functionConfig.db.name,
       host: `/cloudsql/${functionConfig.db.host}`,
+    },
+    keyVault: {
+      azureClientID: functionConfig.keyVault.azureClientID,
+      azureClientSecret: functionConfig.keyVault.azureClientSecret,
+      azureTenant: functionConfig.keyVault.azureTenant,
+      azureVaultName: functionConfig.keyVault.azureVaultName,
+      azureSecretName: functionConfig.keyVault.azureSecretName,
     },
     attestations: {
       numberAttestationsRequired: functionConfig.attestations.number_attestations_required,

@@ -18,7 +18,7 @@
     "db:migrate": "NODE_ENV=development ts-node scripts/runMigrations.ts"
   },
   "dependencies": {
-    "@celo/contractkit": "0.3.6",
+    "@celo/contractkit": "0.4.1",
     "@celo/utils": "0.1.9",
     "blind-threshold-bls": "https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a",
     "firebase-admin": "^8.10.0",

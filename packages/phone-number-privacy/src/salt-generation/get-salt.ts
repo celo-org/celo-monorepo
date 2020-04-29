@@ -1,6 +1,6 @@
 import { isValidAddress } from '@celo/utils/lib/address'
 import { Request, Response } from 'firebase-functions'
-import { computeBlindedSignature } from '../bls/bls-signature'
+import { BLSCryptographyClient } from '../../src/bls/bls-cryptography-client'
 import { ErrorMessages, respondWithError } from '../common/error-utils'
 import { authenticateUser } from '../common/identity'
 import logger from '../common/logger'
@@ -22,7 +22,9 @@ export async function handleGetBlindedMessageForSalt(request: Request, response:
       respondWithError(response, 403, ErrorMessages.EXCEEDED_QUOTA)
       return
     }
-    const signature = computeBlindedSignature(request.body.blindedQueryPhoneNumber)
+    const signature = await BLSCryptographyClient.computeBlindedSignature(
+      request.body.blindedQueryPhoneNumber
+    )
     await incrementQueryCount(request.body.account)
     response.json({ success: true, signature })
   } catch (error) {
