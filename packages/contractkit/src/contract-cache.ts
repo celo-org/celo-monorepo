@@ -9,6 +9,7 @@ import { ElectionWrapper } from './wrappers/Election'
 // import { EpochRewardsWrapper } from './wrappers/EpochRewards'
 import { EscrowWrapper } from './wrappers/Escrow'
 import { ExchangeWrapper } from './wrappers/Exchange'
+import { FreezerWrapper } from './wrappers/Freezer'
 import { GasPriceMinimumWrapper } from './wrappers/GasPriceMinimum'
 import { GoldTokenWrapper } from './wrappers/GoldTokenWrapper'
 import { GovernanceWrapper } from './wrappers/Governance'
@@ -30,6 +31,7 @@ const WrapperFactories = {
   [CeloContract.Escrow]: EscrowWrapper,
   [CeloContract.Exchange]: ExchangeWrapper,
   // [CeloContract.FeeCurrencyWhitelist]: FeeCurrencyWhitelistWrapper,
+  [CeloContract.Freezer]: FreezerWrapper,
   [CeloContract.GasPriceMinimum]: GasPriceMinimumWrapper,
   [CeloContract.GoldToken]: GoldTokenWrapper,
   [CeloContract.Governance]: GovernanceWrapper,
@@ -57,6 +59,7 @@ interface WrapperCacheMap {
   [CeloContract.Escrow]?: EscrowWrapper
   [CeloContract.Exchange]?: ExchangeWrapper
   // [CeloContract.FeeCurrencyWhitelist]?: FeeCurrencyWhitelistWrapper,
+  [CeloContract.Freezer]?: FreezerWrapper
   [CeloContract.GasPriceMinimum]?: GasPriceMinimumWrapper
   [CeloContract.GoldToken]?: GoldTokenWrapper
   [CeloContract.Governance]?: GovernanceWrapper
@@ -107,6 +110,9 @@ export class WrapperCache {
   }
   getExchange() {
     return this.getContract(CeloContract.Exchange)
+  }
+  getFreezer() {
+    return this.getContract(CeloContract.Freezer)
   }
   // getFeeCurrencyWhitelist() {
   //   return this.getWrapper(CeloContract.FeeCurrencyWhitelist, newFeeCurrencyWhitelist)
