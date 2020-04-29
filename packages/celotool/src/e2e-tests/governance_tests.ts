@@ -164,7 +164,7 @@ describe('governance tests', () => {
   const gethConfig: GethRunConfig = {
     migrate: true,
     runPath: TMP_PATH,
-    verbosity: 0,
+    verbosity: 4,
     migrateTo: 25,
     networkId: 1101,
     network: 'local',
@@ -958,37 +958,20 @@ describe('governance tests', () => {
       epoch = new BigNumber(await validators.methods.getEpochSize().call()).toNumber()
       assert.equal(epoch, 10)
 
-      // Wait for an epoch transition so we can activate our vote.
-      await waitForEpochTransition(web3, epoch)
-      await sleep(5.5)
-      // Wait for an extra epoch transition to ensure everyone is connected to one another.
+      // Wait for an epoch transition to ensure everyone is connected to one another.
       await waitForEpochTransition(web3, epoch)
 
       const groupWeb3Url = 'ws://localhost:8555'
-
       const groupWeb3 = new Web3(groupWeb3Url)
       const provider = groupWeb3.currentProvider
-
-      const groupKit = newKitFromWeb3(groupWeb3)
       groupWeb3.setProvider(provider)
 
-      const group: string = (await groupWeb3.eth.getAccounts())[0]
-
-      const txos = await (await groupKit.contracts.getElection()).activate(group)
-      for (const txo of txos) {
-        await txo.sendAndWaitForReceipt({ from: group })
-      }
-
-      const validatorRpc = 'http://localhost:8549'
-
       // Prepare for key rotation.
+      const validatorRpc = 'http://localhost:8549'
       const validatorWeb3 = new Web3(validatorRpc)
-
       const authWeb31 = 'ws://localhost:8559'
       const authWeb32 = 'ws://localhost:8561'
-
       const authorizedWeb3s = [new Web3(authWeb31), new Web3(authWeb32)]
-
       const authorizedPrivateKeys = [rotation0PrivateKey, rotation1PrivateKey]
       const keyRotator = await newKeyRotator(
         newKitFromWeb3(validatorWeb3),
@@ -1042,8 +1025,13 @@ describe('governance tests', () => {
     })
 
     it('key rotation should have worked', async () => {
-      assert(miners.some((a) => eqAddress(a, rotation0Address)))
-      assert(miners.some((a) => eqAddress(a, rotation1Address)))
+      const rotation0MinedBlock = miners.some((a) => eqAddress(a, rotation0Address))
+      const rotation1MinedBlock = miners.some((a) => eqAddress(a, rotation1Address))
+      if (!rotation0MinedBlock || !rotation1MinedBlock) {
+        console.log(rotation0Address, rotation1Address, miners)
+      }
+      assert.isTrue(rotation0MinedBlock)
+      assert.isTrue(rotation1MinedBlock)
     })
   })
 

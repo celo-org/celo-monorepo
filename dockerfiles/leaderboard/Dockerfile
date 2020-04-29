@@ -1,5 +1,8 @@
-FROM node:10
+FROM circleci/node:10
 WORKDIR /celo-monorepo
+
+RUN sudo apt-get update -y
+RUN sudo apt-get install lsb-release libudev-dev libusb-dev libusb-1.0-0 -y
 
 # ensure yarn.lock is evaluated by kaniko cache diff
 COPY lerna.json package.json yarn.lock ./
@@ -13,7 +16,7 @@ COPY packages/protocol/package.json packages/protocol/
 COPY packages/contractkit/package.json packages/contractkit/
 COPY packages/leaderboard/package.json packages/leaderboard/
 
-RUN yarn install --frozen-lockfile --network-timeout 100000 && yarn cache clean
+RUN sudo yarn install --frozen-lockfile --network-timeout 100000 && yarn cache clean
 
 # Copy the rest
 COPY packages/typescript packages/typescript/
@@ -24,7 +27,7 @@ COPY packages/contractkit packages/contractkit/
 COPY packages/leaderboard packages/leaderboard/
 
 # build all
-RUN yarn build
+RUN sudo yarn build
 
 WORKDIR /celo-monorepo/packages/leaderboard
 

@@ -1,5 +1,7 @@
 import * as bip32 from 'bip32'
 import * as bip39 from 'bip39'
+import randomBytes from 'randombytes'
+
 export const CELO_DERIVATION_PATH_BASE = "m/44'/52752'/0'/0"
 
 export enum MnemonicStrength {
@@ -18,23 +20,90 @@ export enum MnemonicLanguages {
   spanish,
 }
 
-export function generateMnemonic(
+type RandomNumberGenerator = (
+  size: number,
+  callback: (err: Error | null, buf: Buffer) => void
+) => void
+
+interface Bip39 {
+  mnemonicToSeedSync: (mnemonic: string, password?: string) => Buffer
+  mnemonicToSeed: (mnemonic: string, password?: string) => Promise<Buffer>
+  generateMnemonic: (
+    strength?: number,
+    rng?: RandomNumberGenerator,
+    wordlist?: string[]
+  ) => Promise<string>
+  validateMnemonic: (mnemonic: string, wordlist?: string[]) => boolean
+}
+
+function defaultGenerateMnemonic(
+  strength?: number,
+  rng?: RandomNumberGenerator,
+  wordlist?: string[]
+): Promise<string> {
+  return new Promise((resolve, reject) => {
+    strength = strength || 128
+    rng = rng || randomBytes
+
+    rng(strength / 8, (error, randomBytesBuffer) => {
+      if (error) {
+        reject(error)
+      } else {
+        resolve(bip39.entropyToMnemonic(randomBytesBuffer.toString('hex'), wordlist))
+      }
+    })
+  })
+}
+
+const bip39Wrapper: Bip39 = {
+  mnemonicToSeedSync: bip39.mnemonicToSeedSync,
+  mnemonicToSeed: bip39.mnemonicToSeed,
+  generateMnemonic: defaultGenerateMnemonic,
+  validateMnemonic: bip39.validateMnemonic,
+}
+
+export async function generateMnemonic(
   strength: MnemonicStrength = MnemonicStrength.s256_24words,
-  language?: MnemonicLanguages
-): string {
-  return bip39.generateMnemonic(strength, undefined, getWordList(language))
+  language?: MnemonicLanguages,
+  bip39ToUse: Bip39 = bip39Wrapper
+): Promise<string> {
+  return bip39ToUse.generateMnemonic(strength, undefined, getWordList(language))
 }
 
-export function validateMnemonic(mnemonic: string, language?: MnemonicLanguages) {
-  return bip39.validateMnemonic(mnemonic, getWordList(language))
+export function validateMnemonic(
+  mnemonic: string,
+  language?: MnemonicLanguages,
+  bip39ToUse: Bip39 = bip39Wrapper
+) {
+  return bip39ToUse.validateMnemonic(mnemonic, getWordList(language))
 }
 
-export function generateKeys(
+export async function generateKeys(
   mnemonic: string,
   password?: string,
-  addressIndex: number = 0
+  addressIndex: number = 0,
+  bip39ToUse: Bip39 = bip39Wrapper
+): Promise<{ privateKey: string; publicKey: string }> {
+  const seed = await bip39ToUse.mnemonicToSeed(mnemonic, password)
+  const node = bip32.fromSeed(seed)
+  const newNode = node.derivePath(`${CELO_DERIVATION_PATH_BASE}/${addressIndex}`)
+  if (!newNode.privateKey) {
+    // As we are generating the node from a seed, the node will always have a private key and this would never happened
+    throw new Error('utils-accounts@generateKeys: invalid node to derivate')
+  }
+  return {
+    privateKey: newNode.privateKey.toString('hex'),
+    publicKey: newNode.publicKey.toString('hex'),
+  }
+}
+
+export function generateKeysSync(
+  mnemonic: string,
+  password?: string,
+  addressIndex: number = 0,
+  bip39ToUse: Bip39 = bip39Wrapper
 ): { privateKey: string; publicKey: string } {
-  const seed = bip39.mnemonicToSeedSync(mnemonic, password)
+  const seed = bip39ToUse.mnemonicToSeedSync(mnemonic, password)
   const node = bip32.fromSeed(seed)
   const newNode = node.derivePath(`${CELO_DERIVATION_PATH_BASE}/${addressIndex}`)
   return {
@@ -43,6 +112,7 @@ export function generateKeys(
   }
 }
 
+// Unify the bip39.wordlists (otherwise depends on the instance of the bip39)
 function getWordList(language?: MnemonicLanguages) {
   switch (language) {
     case MnemonicLanguages.chinese_simplified:
@@ -70,4 +140,5 @@ export const AccountUtils = {
   generateMnemonic,
   validateMnemonic,
   generateKeys,
+  generateKeysSync,
 }

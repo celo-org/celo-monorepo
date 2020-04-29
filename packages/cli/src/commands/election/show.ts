@@ -9,7 +9,7 @@ export default class ElectionShow extends BaseCommand {
   static description = 'Show election information about a voter or registered Validator Group'
 
   static flags = {
-    ...BaseCommand.flags,
+    ...BaseCommand.flagsWithoutLocalAddresses(),
     voter: flags.boolean({
       exclusive: ['group'],
       description: 'Show information about an account voting in Validator elections',
