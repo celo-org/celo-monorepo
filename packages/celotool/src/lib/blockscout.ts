@@ -85,7 +85,7 @@ async function helmParameters(
       envVar.BLOCKSCOUT_SUBNETWORK_NAME,
       celoEnv
     )}"`,
-    `--set blockscout.metadata_crawlr.image.repository=${fetchEnv(
+    `--set blockscout.metadata_crawler.image.repository=${fetchEnv(
       envVar.BLOCKSCOUT_METADATA_CRAWLER_IMAGE_REPOSITORY
     )}`,
     `--set blockscout.metadata_crawler.repository.tag=${fetchEnv(

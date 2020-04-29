@@ -135,17 +135,39 @@ function addDatabaseVerificationClaims(address, domain, verified) {
 }
 function handleItem(item) {
     return __awaiter(this, void 0, void 0, function () {
-        var metadata, claims, accounts_1, err_2;
+        var metadata, claims, unverifiedAccounts, accountVerification, accounts_1, err_2;
         var _this = this;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    _a.trys.push([0, 3, , 4]);
+                    _a.trys.push([0, 4, , 5]);
                     return [4 /*yield*/, identity_1.IdentityMetadataWrapper.fetchFromURL(kit, item.url)];
                 case 1:
                     metadata = _a.sent();
                     claims = metadata.filterClaims(identity_1.ClaimTypes.DOMAIN);
-                    accounts_1 = metadata.filterClaims(identity_1.ClaimTypes.ACCOUNT);
+                    unverifiedAccounts = metadata.filterClaims(identity_1.ClaimTypes.ACCOUNT);
+                    return [4 /*yield*/, Promise.all(unverifiedAccounts.map(function (claim) { return __awaiter(_this, void 0, void 0, function () {
+                            var _a;
+                            return __generator(this, function (_b) {
+                                switch (_b.label) {
+                                    case 0:
+                                        _a = {
+                                            claim: claim
+                                        };
+                                        return [4 /*yield*/, verify_1.verifyAccountClaim(kit, claim, item.address)];
+                                    case 1: return [2 /*return*/, (_a.verified = _b.sent(),
+                                            _a)];
+                                }
+                            });
+                        }); }))];
+                case 2:
+                    accountVerification = _a.sent();
+                    accounts_1 = accountVerification
+                        .filter(function (_a) {
+                        var verified = _a.verified;
+                        return verified === undefined;
+                    })
+                        .map(function (a) { return a.claim; });
                     return [4 /*yield*/, Promise.all(claims.map(function (claim) { return __awaiter(_this, void 0, void 0, function () {
                             var addressWith0x, verificationStatus;
                             return __generator(this, function (_a) {
@@ -155,7 +177,7 @@ function handleItem(item) {
                                         logger_1.logger.debug('Claim: %s', claim_1.serializeClaim(claim));
                                         logger_1.logger.debug('Accounts: %s', JSON.stringify(accounts_1));
                                         logger_1.logger.debug('Verifying %s for address %s', claim.domain, addressWith0x);
-                                        return [4 /*yield*/, verify_1.verifyDomainRecord(claim, addressWith0x).catch(function (error) { return logger_1.logger.error('Error in verifyDomainClaim %s', error); })];
+                                        return [4 /*yield*/, verify_1.verifyDomainRecord(kit, claim, addressWith0x).catch(function (error) { return logger_1.logger.error('Error in verifyDomainClaim %s', error); })];
                                     case 1:
                                         verificationStatus = _a.sent();
                                         if (!(verificationStatus === undefined)) return [3 /*break*/, 3];
@@ -172,14 +194,14 @@ function handleItem(item) {
                                 }
                             });
                         }); }))];
-                case 2:
-                    _a.sent();
-                    return [3 /*break*/, 4];
                 case 3:
+                    _a.sent();
+                    return [3 /*break*/, 5];
+                case 4:
                     err_2 = _a.sent();
                     logger_1.logger.error('Cannot read metadata %s', err_2);
-                    return [3 /*break*/, 4];
-                case 4: return [2 /*return*/];
+                    return [3 /*break*/, 5];
+                case 5: return [2 /*return*/];
             }
         });
     });
