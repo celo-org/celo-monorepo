@@ -177,7 +177,7 @@ celocli account:authorize --from $LOCKED_GOLD_ACCOUNT --role vote --signer $SIGN
 celocli release-gold:authorize --contract $RELEASE_GOLD_CONTRACT_ADDRESS --role vote --signer $SIGNER_TO_AUTHORIZE --signature $SIGNER_PROOF_OF_POSSESSION --useLedger
 ```
 
-## Troubleshooting
+## Troubleshooting <a id="troubleshooting"></a>
 
 If you have issues connecting to the Ledger, try the following:
 

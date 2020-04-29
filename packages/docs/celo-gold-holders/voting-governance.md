@@ -1,4 +1,4 @@
-# Governance
+# Voting on Governance Proposals
 
 Celo uses a formal on-chain governance mechanism to manage and upgrade the protocol. More information about the Governance system can be found in the [Governance section of the protocol documentation](../celo-codebase/protocol/governance.md).
 Here, we will discuss using the [Celo CLI](../command-line-interface/introduction.md) to participate in Governance as a voter as well as how to create a proposal.
@@ -83,6 +83,8 @@ secondsUntilStages:
   execution: 200545
   expiration: 459745
 ```
+
+<!-- TODO Details of proposal -->
 
 ## Voting on Proposals
 
