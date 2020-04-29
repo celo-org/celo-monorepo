@@ -3,7 +3,7 @@ WORKDIR /celo-monorepo
 
 RUN apt-get update && \
   apt-get update -y && \
-  apt-get install -y libusb-dev && \
+  apt-get install -y libusb-dev lsb-release libudev-dev libusb-1.0-0 && \
   rm -rf /var/lib/apt/lists/*
 
 # ensure yarn.lock is evaluated by kaniko cache diff
