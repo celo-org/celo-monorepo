@@ -85,7 +85,7 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
   server.get('/build/*', (req, res) => {
     res.redirect(`/developers/${req.params[0]}`)
   })
-  ;['/test-wallet', '/mobile-app', 'build/download'].forEach((path) => {
+  ;['/app', '/test-wallet', '/mobile-app', 'build/download'].forEach((path) => {
     server.get(path, (_, res) => {
       res.redirect('/developers/wallet')
     })
