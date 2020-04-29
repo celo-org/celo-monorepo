@@ -1,6 +1,6 @@
 import { eqAddress } from '@celo/utils/lib/address'
 import { AddressType, SignatureType } from '@celo/utils/lib/io'
-import { Signer, verifySignature } from '@celo/utils/lib/signatureUtils'
+import { guessSigner, Signer, verifySignature } from '@celo/utils/lib/signatureUtils'
 import fetch from 'cross-fetch'
 import { isLeft } from 'fp-ts/lib/Either'
 import { readFileSync } from 'fs'
@@ -97,7 +97,12 @@ export class IdentityMetadataWrapper {
         validatedData.right.meta
       ))
     ) {
-      throw new Error('Signature could not be validated')
+      throw new Error(
+        `Signature could not be validated. Guessing signer: ${guessSigner(
+          hash,
+          validatedData.right.meta.signature
+        )}`
+      )
     }
 
     const res = new IdentityMetadataWrapper(validatedData.right)

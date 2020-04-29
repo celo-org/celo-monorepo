@@ -49,9 +49,7 @@ export abstract class ClaimCommand extends BaseCommand {
     try {
       cli.action.start(`Read Metadata from ${filePath}`)
       const data = await IdentityMetadataWrapper.fromFile(this.kit, filePath)
-      if (flags.from) {
-        await this.checkMetadataAddress(data.data.meta.address, flags.from)
-      }
+      await this.checkMetadataAddress(data.data.meta.address, flags.from)
       cli.action.stop()
       return data
     } catch (error) {
