@@ -66,7 +66,7 @@ export const FORNO_ENABLED_INITIALLY = Config.FORNO_ENABLED_INITIALLY
   : false
 export const DEFAULT_SYNC_MODE: GethSyncMode = Config.DEFAULT_SYNC_MODE
   ? new BigNumber(Config.DEFAULT_SYNC_MODE).toNumber()
-  : GethSyncMode.Ultralight
+  : GethSyncMode.Lightest
 
 // SECRETS
 export const SEGMENT_API_KEY = keyOrUndefined(secretsFile, Config.SECRETS_KEY, 'SEGMENT_API_KEY')
