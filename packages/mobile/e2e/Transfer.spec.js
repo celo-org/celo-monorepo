@@ -71,12 +71,15 @@ describe('Transfer Works', () => {
     await enterPinUi()
   })
 
+  // TODO(erdal) 2 new paths: using invite code, continue without
+
+  // Restore existing wallet
   it('NUX->Invite', async () => {
     await waitFor(element(by.id('InviteCodeTitle')))
       .toBeVisible()
       .withTimeout(8000)
 
-    await element(by.id('ImportExistingUsingBackupKey')).tap()
+    await element(by.id('RestoreExistingWallet')).tap()
 
     await waitFor(element(by.id('ImportWalletBackupKeyInputField')))
       .toBeVisible()
@@ -94,6 +97,7 @@ describe('Transfer Works', () => {
 
     await element(by.id('ImportWalletBackupKeyInputField')).replaceText(SAMPLE_BACKUP_KEY)
 
+    // TODO(erdal): try to implement these without sleeps
     // waits for button to be enabled
     await sleep(10000)
 
@@ -101,12 +105,15 @@ describe('Transfer Works', () => {
 
     // waits for import to finish
     await sleep(10000)
+
+    // TODO(erdal) make sure it succeeds (or does not fail)
+    // TODO(erdal) new path restore using safeguards
   })
 
   it('NUX->VerifyEducation', async () => {
     await waitFor(element(by.id('VerifyEducationHeader')))
       .toBeVisible()
-      .withTimeout(10000000)
+      .withTimeout(10000)
 
     await waitFor(element(by.id('VerifyContinueButton')))
       .toBeVisible()
@@ -119,6 +126,8 @@ describe('Transfer Works', () => {
     // will skip in next test
     // await element(by.id('VerifyContinueButton')).tap()
   })
+
+  // TODO(erdal): new path verify phone
 
   it('NUX->Verify', async () => {
     // skipping for now
@@ -143,4 +152,6 @@ describe('Transfer Works', () => {
       .toBeVisible()
       .withTimeout(10000)
   })
+
+  // TODO(erdal) implement send and verify success
 })
