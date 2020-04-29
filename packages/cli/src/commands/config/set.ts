@@ -53,13 +53,12 @@ export default class Set extends LocalCommand {
   }
 }
 
-function validateConfig(celoConfig: CeloConfig): string {
+function validateConfig(celoConfig: CeloConfig): string | undefined {
   let counter = celoConfig.useLedger ? 1 : 0
   counter = celoConfig.useAKV ? counter + 1 : counter
   counter = celoConfig.privateKey ? counter + 1 : counter
-  let returnVal = ''
   if (counter > 1) {
-    returnVal = `${returnVal} Can't have two or more of these flags: '--useLedger', '--useAKV' or '--privateKey'.`
+    return "Can't have two or more of these flags stored: '--useLedger', '--useAKV' or '--privateKey'."
   }
   if (
     (celoConfig.ledgerAddresses ||
@@ -67,10 +66,14 @@ function validateConfig(celoConfig: CeloConfig): string {
       celoConfig.ledgerConfirmAddress) &&
     !celoConfig.useLedger
   ) {
-    returnVal = `${returnVal} Can't set any ledger flag without setting '--useLedger'.`
+    console.log(
+      "You will need to use the '--useLedger' flag in your transactions, to use the Ledger flags that you set. You could also store the '--useLedger' flag to your configuration"
+    )
   }
   if (celoConfig.azureVaultName && !celoConfig.useAKV) {
-    returnVal = `${returnVal} Can't set 'azureVaultName' without setting '--useAKV'.`
+    console.log(
+      "You will need to use the '--useAKV' flag in your transactions, to use the Azure flags that you set. You could also store the '--useAKV' flag to your configuration"
+    )
   }
-  return returnVal
+  return
 }
