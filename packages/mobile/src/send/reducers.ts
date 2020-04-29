@@ -2,6 +2,7 @@ import BigNumber from 'bignumber.js'
 import { areRecipientsEquivalent, Recipient } from 'src/recipients/recipient'
 import { getRehydratePayload, REHYDRATE, RehydrateAction } from 'src/redux/persist-helper'
 import { Actions, ActionTypes } from 'src/send/actions'
+import { timeDeltaInHours } from 'src/utils/time'
 
 // Sets the limit of recent recipients we want to store
 const RECENT_RECIPIENTS_TO_STORE = 8
@@ -57,8 +58,15 @@ export const sendReducer = (
 }
 
 const sendPaymentOrInvite = (state: State, amount: BigNumber) => {
-  const latestPayment = { timestamp: Date.now(), amount }
-  const recentPayments = [...state.recentPayments, latestPayment]
+  const timestamp = Date.now()
+  const latestPayment = { timestamp, amount }
+
+  // keep only the last 24 hours
+  const paymentsLast24Hours = state.recentPayments.filter(
+    (p: PaymentInfo) => timeDeltaInHours(timestamp, p.timestamp) < 24
+  )
+
+  const recentPayments = [...paymentsLast24Hours, latestPayment]
 
   return {
     ...state,
