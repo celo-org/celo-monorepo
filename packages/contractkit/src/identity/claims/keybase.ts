@@ -1,7 +1,8 @@
 import { Address } from '@celo/utils/lib/address'
-import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import { isLeft } from 'fp-ts/lib/Either'
 import * as t from 'io-ts'
+import { ContractKit } from '../../kit'
+import { IdentityMetadataWrapper } from '../metadata'
 import { hashOfClaim, SignedClaimType } from './claim'
 import { ClaimTypes, now, TimestampType } from './types'
 
@@ -21,6 +22,7 @@ export const targetURL = (username: string, address: Address) =>
 // If verification encounters an error, returns the error message as a string
 // otherwise returns undefined when successful
 export async function verifyKeybaseClaim(
+  kit: ContractKit,
   claim: KeybaseClaim,
   signer: Address
 ): Promise<string | undefined> {
@@ -39,13 +41,14 @@ export async function verifyKeybaseClaim(
       return 'Claim is incorrectly formatted'
     }
 
-    const hasValidSiganture = verifySignature(
+    const hasValidSignature = await IdentityMetadataWrapper.verifySignerForAddress(
+      kit,
       hashOfClaim(parsedClaim.right.claim),
       parsedClaim.right.signature,
       signer
     )
 
-    if (!hasValidSiganture) {
+    if (!hasValidSignature) {
       return 'Claim does not contain a valid signature'
     }
 

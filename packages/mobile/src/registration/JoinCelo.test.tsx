@@ -5,7 +5,7 @@ import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
 import { PincodeType } from 'src/account/reducer'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import JoinCelo, { JoinCelo as JoinCeloClass } from 'src/invite/JoinCelo'
+import JoinCelo, { JoinCelo as JoinCeloClass } from 'src/registration/JoinCelo'
 import { createMockStore, getMockI18nProps } from 'test/utils'
 
 describe('JoinCeloScreen', () => {
@@ -35,6 +35,7 @@ describe('JoinCeloScreen', () => {
     const wrapper = render(
       <Provider store={store}>
         <JoinCeloClass
+          acceptedTerms={false}
           showError={showErrorMock}
           hideAlert={jest.fn()}
           setPromptForno={jest.fn()}
@@ -58,6 +59,7 @@ describe('JoinCeloScreen', () => {
     const wrapper = render(
       <Provider store={createMockStore()}>
         <JoinCeloClass
+          acceptedTerms={false}
           showError={jest.fn()}
           hideAlert={jest.fn()}
           setPromptForno={jest.fn()}
@@ -81,6 +83,7 @@ describe('JoinCeloScreen', () => {
     const wrapper = render(
       <Provider store={createMockStore()}>
         <JoinCeloClass
+          acceptedTerms={false}
           showError={error}
           hideAlert={jest.fn()}
           setPhoneNumber={jest.fn()}

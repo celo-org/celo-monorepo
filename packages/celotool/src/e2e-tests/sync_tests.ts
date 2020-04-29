@@ -1,3 +1,4 @@
+// tslint:disable: no-console
 import { assert } from 'chai'
 import Web3 from 'web3'
 import { GethInstanceConfig } from '../lib/interfaces/geth-instance-config'
@@ -110,10 +111,12 @@ describe('sync tests', function(this: any) {
       it('should sync the latest block', async () => {
         const validatingWeb3 = new Web3(`http://localhost:8545`)
         const validatingFirstBlock = await validatingWeb3.eth.getBlockNumber()
+        console.log(`At block ${validatingFirstBlock}, waiting for next block`)
         await waitForBlock(validatingWeb3, validatingFirstBlock + 1)
         const validatingLatestBlock = await validatingWeb3.eth.getBlockNumber()
 
         const syncWeb3 = new Web3(`http://localhost:8555`)
+        console.log(`Waiting to sync to block ${validatingFirstBlock}`)
         await waitForBlock(syncWeb3, validatingLatestBlock)
         const syncLatestBlock = await syncWeb3.eth.getBlockNumber()
 

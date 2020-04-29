@@ -4,12 +4,15 @@
   "welcomeCelo": "Te damos la bienvenida a Celo",
   "chooseCountryCode": "Código de país",
   "chooseCountry": "País",
-  "joinText": {
-    "0": "El Monedero Celo te ayuda a enviar, recibir y guardar valor en la red de Celo.",
-    "1":
-      "Al unirte a esta red, nos das permiso para recopilar información anónima sobre cómo utilizas la aplicación. Además, si verificas tu número de teléfono, se almacenará una copia ofuscada en la Red de Celo. Más información en ",
-    "2": "celo.org/terms"
-  },
+  "joinText": "El Monedero Celo te ayuda a enviar, recibir y guardar valor en la red de Celo.",
+  "terms": {
+    "title": "Términos",
+    "heading1": "Datos y Privacidad",
+    "heading2": "Acerca de los Activos de Celo",
+    "privacy":
+      "Al unirte a esta red, nos das permiso para recopilar información anónima sobre cómo utilizas la aplicación. Además, si verificas tu número de teléfono, se almacenará una copia ofuscada en la Red de Celo. Más información en <0>celo.org/terms</0>",
+    "goldDisclaimer": "Por favor ten en cuenta que cGld es un activo digital cuyo valor no está relacionado con el valor del oro físico. Tanto cUSD como cGld son parte de una nueva clase de activos y presentan riesgos de pérdidas finacieras. Considera cuidadosamente tu situación financiera y tu tolerancia a riesgos antes de comprar cGld o cUSD."
+    },
   "phoneNumber": "000 000 0000",
   "inviteCodeText": {
     "title": "Ingresa el Código de Invitación",
