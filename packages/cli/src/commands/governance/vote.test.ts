@@ -5,11 +5,11 @@ import { NetworkConfig, testWithGanache, timeTravel } from '@celo/dev-utils/lib/
 import { Address } from '@celo/utils/lib/address'
 import BigNumber from 'bignumber.js'
 import Web3 from 'web3'
+import Register from '../account/register'
+import Lock from '../lockedgold/lock'
 import Approve from './approve'
 import Dequeue from './dequeue'
 import Vote from './vote'
-import Register from '../account/register'
-import Lock from '../lockedgold/lock'
 
 process.env.NO_SYNCCHECK = 'true'
 
