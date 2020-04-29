@@ -17,7 +17,6 @@ export default class Withdraw extends BaseCommand {
     const res = this.parse(Withdraw)
     console.log(res.flags.from)
     this.kit.defaultAccount = res.flags.from
-    // console.log(res.flags.from)
     await newCheckBuilder(this, res.flags.from)
       .hasRefundedDeposits(res.flags.from)
       .runChecks()

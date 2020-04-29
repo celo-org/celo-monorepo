@@ -96,21 +96,9 @@ class CheckBuilder {
   ): () => Promise<Resolve<A>> {
     return async () => {
       const governance = await this.kit.contracts.getGovernance()
-      console.log(
-        await governance.getRefundedDeposits('0x5409ED021D9299bf6814279A6A1411A7e866A631')
-      )
       return f(governance, '', '', this) as Resolve<A>
     }
   }
-
-  /*
-  withGovernance<A>(f: (governance: GovernanceWrapper) => A): () => Promise<Resolve<A>> {
-    return async () => {
-      const governance = await this.kit.contracts.getGovernance()
-      return f(governance) as Resolve<A>
-    }
-  }
-  */
 
   addCheck(name: string, predicate: () => Promise<boolean> | boolean, errorMessage?: string) {
     this.checks.push(check(name, predicate, errorMessage))
@@ -318,21 +306,6 @@ class CheckBuilder {
       `${account} has refunded governance deposits`,
       this.withGovernance(async (g) => !(await g.getRefundedDeposits(account)).isZero())
     )
-
-  /*
-  hasRefundedDeposits = (account: Address) =>
-    this.addCheck(
-      `Account has refunded governance deposits`,
-      this.withGovernance(async (g) => {
-        console.log(`oogabooga`)
-        // Doesn't get here
-        console.log(`test`, account, `test ${await g.getRefundedDeposits(account)} test`)
-        console.log(`oogabooga1 `)
-        // console.log(account, d.toFixed())
-        return true
-      })
-    )
-    */
 
   hasEnoughLockedGold = (value: BigNumber) => {
     const valueInEth = this.kit.web3.utils.fromWei(value.toFixed(), 'ether')

@@ -5,9 +5,7 @@ import { NetworkConfig, testWithGanache, timeTravel } from '@celo/dev-utils/lib/
 import { Address } from '@celo/utils/lib/address'
 import BigNumber from 'bignumber.js'
 import Web3 from 'web3'
-// import Dequeue from './dequeue'
 import Withdraw from './withdraw'
-// import { sleep } from '@celo/utils/lib/async'
 
 process.env.NO_SYNCCHECK = 'true'
 
@@ -32,12 +30,7 @@ testWithGanache('governance:withdraw', (web3: Web3) => {
       .sendAndWaitForReceipt({ from: accounts[0], value: minDeposit })
     console.log(await governance.getProposalMetadata(1))
     await timeTravel(expConfig.dequeueFrequency + 1, web3)
-    console.log((await governance.lastDequeue()).toNumber())
-    // await governance.dequeueProposalsIfReady().sendAndWaitForReceipt()
-    await governance
-      .propose(proposal, 'URL')
-      .sendAndWaitForReceipt({ from: accounts[0], value: minDeposit })
-    console.log((await governance.lastDequeue()).toNumber())
+    await governance.dequeueProposalsIfReady().sendAndWaitForReceipt()
   })
 
   test('can withdraw', async () => {
