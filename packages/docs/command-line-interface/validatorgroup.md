@@ -14,6 +14,7 @@ USAGE
 
 OPTIONS
   --apply                                            Applies a previously queued update
+  --azureVaultName=azureVaultName                    If --useAKV is set, this is used to connect to the Azure KeyVault
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address for the Validator Group
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
@@ -27,6 +28,8 @@ OPTIONS
                                                      "[4,99]"
 
   --queue-update=queue-update                        Queues an update to the commission
+
+  --useAKV                                           Set it to use an Azure KeyVault HSM
 
   --useLedger                                        Set it to use a ledger wallet
 
@@ -46,6 +49,7 @@ USAGE
   $ celocli validatorgroup:deregister
 
 OPTIONS
+  --azureVaultName=azureVaultName                    If --useAKV is set, this is used to connect to the Azure KeyVault
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Signer or ValidatorGroup's address
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
@@ -57,6 +61,8 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
+
+  --useAKV                                           Set it to use an Azure KeyVault HSM
 
   --useLedger                                        Set it to use a ledger wallet
 
@@ -93,6 +99,7 @@ ARGUMENTS
 
 OPTIONS
   --accept                                           Accept a validator whose affiliation is already set to the group
+  --azureVaultName=azureVaultName                    If --useAKV is set, this is used to connect to the Azure KeyVault
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) ValidatorGroup's address
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
@@ -108,6 +115,8 @@ OPTIONS
   --remove                                           Remove a validator from the members list
 
   --reorder=reorder                                  Reorder a validator within the members list. Indices are 0 based
+
+  --useAKV                                           Set it to use an Azure KeyVault HSM
 
   --useLedger                                        Set it to use a ledger wallet
 
@@ -128,6 +137,8 @@ USAGE
   $ celocli validatorgroup:register
 
 OPTIONS
+  --azureVaultName=azureVaultName                    If --useAKV is set, this is used to connect to the Azure KeyVault
+
   --commission=commission                            (required) The share of the epoch rewards given to elected
                                                      Validators that goes to the group.
 
@@ -142,6 +153,8 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
+
+  --useAKV                                           Set it to use an Azure KeyVault HSM
 
   --useLedger                                        Set it to use a ledger wallet
 
@@ -165,6 +178,8 @@ ARGUMENTS
   GROUPADDRESS  ValidatorGroup's address
 
 OPTIONS
+  --azureVaultName=azureVaultName                If --useAKV is set, this is used to connect to the Azure KeyVault
+
   --ledgerAddresses=ledgerAddresses              [default: 1] If --useLedger is set, this will get the first N addresses
                                                  for local signing
 
@@ -173,6 +188,8 @@ OPTIONS
 
   --ledgerCustomAddresses=ledgerCustomAddresses  [default: [0]] If --useLedger is set, this will get the array of index
                                                  addresses for local signing. Example --ledgerCustomAddresses "[4,99]"
+
+  --useAKV                                       Set it to use an Azure KeyVault HSM
 
   --useLedger                                    Set it to use a ledger wallet
 

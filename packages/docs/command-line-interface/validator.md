@@ -16,6 +16,7 @@ ARGUMENTS
   GROUPADDRESS  ValidatorGroup's address
 
 OPTIONS
+  --azureVaultName=azureVaultName                    If --useAKV is set, this is used to connect to the Azure KeyVault
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Signer or Validator's address
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
@@ -27,6 +28,8 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
+
+  --useAKV                                           Set it to use an Azure KeyVault HSM
 
   --useLedger                                        Set it to use a ledger wallet
 
@@ -45,6 +48,7 @@ USAGE
   $ celocli validator:deaffiliate
 
 OPTIONS
+  --azureVaultName=azureVaultName                    If --useAKV is set, this is used to connect to the Azure KeyVault
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Signer or Validator's address
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
@@ -56,6 +60,8 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
+
+  --useAKV                                           Set it to use an Azure KeyVault HSM
 
   --useLedger                                        Set it to use a ledger wallet
 
@@ -74,6 +80,7 @@ USAGE
   $ celocli validator:deregister
 
 OPTIONS
+  --azureVaultName=azureVaultName                    If --useAKV is set, this is used to connect to the Azure KeyVault
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Signer or Validator's address
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
@@ -85,6 +92,8 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
+
+  --useAKV                                           Set it to use an Azure KeyVault HSM
 
   --useLedger                                        Set it to use a ledger wallet
 
@@ -103,6 +112,9 @@ USAGE
   $ celocli validator:force-deaffiliate
 
 OPTIONS
+  --azureVaultName=azureVaultName                         If --useAKV is set, this is used to connect to the Azure
+                                                          KeyVault
+
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d       (required) Initiator
 
   --ledgerAddresses=ledgerAddresses                       [default: 1] If --useLedger is set, this will get the first N
@@ -114,6 +126,8 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses           [default: [0]] If --useLedger is set, this will get the array
                                                           of index addresses for local signing. Example
                                                           --ledgerCustomAddresses "[4,99]"
+
+  --useAKV                                                Set it to use an Azure KeyVault HSM
 
   --useLedger                                             Set it to use a ledger wallet
 
@@ -149,6 +163,7 @@ USAGE
   $ celocli validator:register
 
 OPTIONS
+  --azureVaultName=azureVaultName                    If --useAKV is set, this is used to connect to the Azure KeyVault
   --blsKey=0x                                        (required) BLS Public Key
   --blsSignature=0x                                  (required) BLS Proof-of-Possession
   --ecdsaKey=0x                                      (required) ECDSA Public Key
@@ -163,6 +178,8 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
+
+  --useAKV                                           Set it to use an Azure KeyVault HSM
 
   --useLedger                                        Set it to use a ledger wallet
 
@@ -267,6 +284,7 @@ USAGE
   $ celocli validator:update-bls-public-key
 
 OPTIONS
+  --azureVaultName=azureVaultName                    If --useAKV is set, this is used to connect to the Azure KeyVault
   --blsKey=0x                                        (required) BLS Public Key
   --blsPop=0x                                        (required) BLS Proof-of-Possession
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Validator's address
@@ -280,6 +298,8 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
+
+  --useAKV                                           Set it to use an Azure KeyVault HSM
 
   --useLedger                                        Set it to use a ledger wallet
 

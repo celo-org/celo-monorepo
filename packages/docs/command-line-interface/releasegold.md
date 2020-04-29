@@ -13,6 +13,9 @@ USAGE
   $ celocli releasegold:authorize
 
 OPTIONS
+  --azureVaultName=azureVaultName                        If --useAKV is set, this is used to connect to the Azure
+                                                         KeyVault
+
   --blsKey=0x                                            The BLS public key that the validator is using for consensus,
                                                          should pass proof of possession. 96 bytes.
 
@@ -38,6 +41,8 @@ OPTIONS
 
   --signer=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d    (required) The signer key that is to be used for voting through
                                                          the ReleaseGold instance
+
+  --useAKV                                               Set it to use an Azure KeyVault HSM
 
   --useLedger                                            Set it to use a ledger wallet
 
@@ -67,6 +72,9 @@ USAGE
   $ celocli releasegold:create-account
 
 OPTIONS
+  --azureVaultName=azureVaultName                        If --useAKV is set, this is used to connect to the Azure
+                                                         KeyVault
+
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
 
   --ledgerAddresses=ledgerAddresses                      [default: 1] If --useLedger is set, this will get the first N
@@ -78,6 +86,8 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses          [default: [0]] If --useLedger is set, this will get the array
                                                          of index addresses for local signing. Example
                                                          --ledgerCustomAddresses "[4,99]"
+
+  --useAKV                                               Set it to use an Azure KeyVault HSM
 
   --useLedger                                            Set it to use a ledger wallet
 
@@ -97,6 +107,10 @@ USAGE
 
 OPTIONS
   -a, --action=lock|unlock|withdraw                      (required) Action to perform on contract's gold
+
+  --azureVaultName=azureVaultName                        If --useAKV is set, this is used to connect to the Azure
+                                                         KeyVault
+
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
 
   --ledgerAddresses=ledgerAddresses                      [default: 1] If --useLedger is set, this will get the first N
@@ -108,6 +122,8 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses          [default: [0]] If --useLedger is set, this will get the array
                                                          of index addresses for local signing. Example
                                                          --ledgerCustomAddresses "[4,99]"
+
+  --useAKV                                               Set it to use an Azure KeyVault HSM
 
   --useLedger                                            Set it to use a ledger wallet
 
@@ -130,6 +146,9 @@ USAGE
   $ celocli releasegold:refund-and-finalize
 
 OPTIONS
+  --azureVaultName=azureVaultName                        If --useAKV is set, this is used to connect to the Azure
+                                                         KeyVault
+
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
 
   --ledgerAddresses=ledgerAddresses                      [default: 1] If --useLedger is set, this will get the first N
@@ -141,6 +160,8 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses          [default: [0]] If --useLedger is set, this will get the array
                                                          of index addresses for local signing. Example
                                                          --ledgerCustomAddresses "[4,99]"
+
+  --useAKV                                               Set it to use an Azure KeyVault HSM
 
   --useLedger                                            Set it to use a ledger wallet
 
@@ -157,6 +178,9 @@ USAGE
   $ celocli releasegold:release-gold
 
 OPTIONS
+  --azureVaultName=azureVaultName                        If --useAKV is set, this is used to connect to the Azure
+                                                         KeyVault
+
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
 
   --ledgerAddresses=ledgerAddresses                      [default: 1] If --useLedger is set, this will get the first N
@@ -168,6 +192,8 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses          [default: [0]] If --useLedger is set, this will get the array
                                                          of index addresses for local signing. Example
                                                          --ledgerCustomAddresses "[4,99]"
+
+  --useAKV                                               Set it to use an Azure KeyVault HSM
 
   --useLedger                                            Set it to use a ledger wallet
 ```
@@ -183,6 +209,9 @@ USAGE
   $ celocli releasegold:revoke
 
 OPTIONS
+  --azureVaultName=azureVaultName                        If --useAKV is set, this is used to connect to the Azure
+                                                         KeyVault
+
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
 
   --ledgerAddresses=ledgerAddresses                      [default: 1] If --useLedger is set, this will get the first N
@@ -194,6 +223,8 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses          [default: [0]] If --useLedger is set, this will get the array
                                                          of index addresses for local signing. Example
                                                          --ledgerCustomAddresses "[4,99]"
+
+  --useAKV                                               Set it to use an Azure KeyVault HSM
 
   --useLedger                                            Set it to use a ledger wallet
 
@@ -214,7 +245,11 @@ USAGE
   $ celocli releasegold:revoke-votes
 
 OPTIONS
+  --azureVaultName=azureVaultName                        If --useAKV is set, this is used to connect to the Azure
+                                                         KeyVault
+
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
+
   --group=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d     (required) Address of the group to revoke votes from
 
   --ledgerAddresses=ledgerAddresses                      [default: 1] If --useLedger is set, this will get the first N
@@ -226,6 +261,8 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses          [default: [0]] If --useLedger is set, this will get the array
                                                          of index addresses for local signing. Example
                                                          --ledgerCustomAddresses "[4,99]"
+
+  --useAKV                                               Set it to use an Azure KeyVault HSM
 
   --useLedger                                            Set it to use a ledger wallet
 
@@ -249,6 +286,10 @@ USAGE
 OPTIONS
   -p, --property=name|dataEncryptionKey|metaURL          (required) Property type to set
   -v, --value=value                                      (required) Property value to set
+
+  --azureVaultName=azureVaultName                        If --useAKV is set, this is used to connect to the Azure
+                                                         KeyVault
+
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
 
   --ledgerAddresses=ledgerAddresses                      [default: 1] If --useLedger is set, this will get the first N
@@ -260,6 +301,8 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses          [default: [0]] If --useLedger is set, this will get the array
                                                          of index addresses for local signing. Example
                                                          --ledgerCustomAddresses "[4,99]"
+
+  --useAKV                                               Set it to use an Azure KeyVault HSM
 
   --useLedger                                            Set it to use a ledger wallet
 
@@ -282,6 +325,9 @@ USAGE
   $ celocli releasegold:set-account-wallet-address
 
 OPTIONS
+  --azureVaultName=azureVaultName                             If --useAKV is set, this is used to connect to the Azure
+                                                              KeyVault
+
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d       (required) Address of the ReleaseGold Contract
 
   --ledgerAddresses=ledgerAddresses                           [default: 1] If --useLedger is set, this will get the
@@ -295,6 +341,8 @@ OPTIONS
                                                               --ledgerCustomAddresses "[4,99]"
 
   --pop=pop                                                   ECDSA PoP for signer over contract's account
+
+  --useAKV                                                    Set it to use an Azure KeyVault HSM
 
   --useLedger                                                 Set it to use a ledger wallet
 
@@ -320,7 +368,11 @@ USAGE
   $ celocli releasegold:set-beneficiary
 
 OPTIONS
+  --azureVaultName=azureVaultName                           If --useAKV is set, this is used to connect to the Azure
+                                                            KeyVault
+
   --beneficiary=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the new beneficiary
+
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d     (required) Address of the ReleaseGold Contract
 
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d         (required) Address to submit multisig transaction from (one
@@ -335,6 +387,8 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses             [default: [0]] If --useLedger is set, this will get the
                                                             array of index addresses for local signing. Example
                                                             --ledgerCustomAddresses "[4,99]"
+
+  --useAKV                                                  Set it to use an Azure KeyVault HSM
 
   --useLedger                                               Set it to use a ledger wallet
 
@@ -356,6 +410,9 @@ USAGE
   $ celocli releasegold:set-can-expire
 
 OPTIONS
+  --azureVaultName=azureVaultName                        If --useAKV is set, this is used to connect to the Azure
+                                                         KeyVault
+
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
 
   --ledgerAddresses=ledgerAddresses                      [default: 1] If --useLedger is set, this will get the first N
@@ -367,6 +424,8 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses          [default: [0]] If --useLedger is set, this will get the array
                                                          of index addresses for local signing. Example
                                                          --ledgerCustomAddresses "[4,99]"
+
+  --useAKV                                               Set it to use an Azure KeyVault HSM
 
   --useLedger                                            Set it to use a ledger wallet
 
@@ -389,6 +448,9 @@ USAGE
   $ celocli releasegold:set-liquidity-provision
 
 OPTIONS
+  --azureVaultName=azureVaultName                        If --useAKV is set, this is used to connect to the Azure
+                                                         KeyVault
+
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
 
   --ledgerAddresses=ledgerAddresses                      [default: 1] If --useLedger is set, this will get the first N
@@ -400,6 +462,8 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses          [default: [0]] If --useLedger is set, this will get the array
                                                          of index addresses for local signing. Example
                                                          --ledgerCustomAddresses "[4,99]"
+
+  --useAKV                                               Set it to use an Azure KeyVault HSM
 
   --useLedger                                            Set it to use a ledger wallet
 
@@ -420,6 +484,9 @@ USAGE
   $ celocli releasegold:set-max-distribution
 
 OPTIONS
+  --azureVaultName=azureVaultName                        If --useAKV is set, this is used to connect to the Azure
+                                                         KeyVault
+
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
 
   --distributionRatio=distributionRatio                  (required) Amount in range [0, 1000] (3 significant figures)
@@ -434,6 +501,8 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses          [default: [0]] If --useLedger is set, this will get the array
                                                          of index addresses for local signing. Example
                                                          --ledgerCustomAddresses "[4,99]"
+
+  --useAKV                                               Set it to use an Azure KeyVault HSM
 
   --useLedger                                            Set it to use a ledger wallet
 
@@ -454,6 +523,9 @@ USAGE
   $ celocli releasegold:show
 
 OPTIONS
+  --azureVaultName=azureVaultName                        If --useAKV is set, this is used to connect to the Azure
+                                                         KeyVault
+
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
 
   --ledgerAddresses=ledgerAddresses                      [default: 1] If --useLedger is set, this will get the first N
@@ -465,6 +537,8 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses          [default: [0]] If --useLedger is set, this will get the array
                                                          of index addresses for local signing. Example
                                                          --ledgerCustomAddresses "[4,99]"
+
+  --useAKV                                               Set it to use an Azure KeyVault HSM
 
   --useLedger                                            Set it to use a ledger wallet
 
@@ -483,6 +557,9 @@ USAGE
   $ celocli releasegold:transfer-dollars
 
 OPTIONS
+  --azureVaultName=azureVaultName                        If --useAKV is set, this is used to connect to the Azure
+                                                         KeyVault
+
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
 
   --ledgerAddresses=ledgerAddresses                      [default: 1] If --useLedger is set, this will get the first N
@@ -496,6 +573,8 @@ OPTIONS
                                                          --ledgerCustomAddresses "[4,99]"
 
   --to=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d        (required) Address of the recipient of Celo Dollars transfer
+
+  --useAKV                                               Set it to use an Azure KeyVault HSM
 
   --useLedger                                            Set it to use a ledger wallet
 
@@ -517,6 +596,9 @@ USAGE
   $ celocli releasegold:withdraw
 
 OPTIONS
+  --azureVaultName=azureVaultName                        If --useAKV is set, this is used to connect to the Azure
+                                                         KeyVault
+
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the ReleaseGold Contract
 
   --ledgerAddresses=ledgerAddresses                      [default: 1] If --useLedger is set, this will get the first N
@@ -528,6 +610,8 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses          [default: [0]] If --useLedger is set, this will get the array
                                                          of index addresses for local signing. Example
                                                          --ledgerCustomAddresses "[4,99]"
+
+  --useAKV                                               Set it to use an Azure KeyVault HSM
 
   --useLedger                                            Set it to use a ledger wallet
 

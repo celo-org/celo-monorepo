@@ -14,6 +14,7 @@ USAGE
 
 OPTIONS
   -r, --role=vote|validator|attestation                (required) Role to delegate
+  --azureVaultName=azureVaultName                      If --useAKV is set, this is used to connect to the Azure KeyVault
 
   --blsKey=0x                                          The BLS public key that the validator is using for consensus,
                                                        should pass proof of possession. 96 bytes.
@@ -37,6 +38,8 @@ OPTIONS
                                                        key
 
   --signer=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Account Address
+
+  --useAKV                                             Set it to use an Azure KeyVault HSM
 
   --useLedger                                          Set it to use a ledger wallet
 
@@ -83,6 +86,7 @@ ARGUMENTS
 
 OPTIONS
   --address=address                                  (required) The address of the account you want to claim
+  --azureVaultName=azureVaultName                    If --useAKV is set, this is used to connect to the Azure KeyVault
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Addess of the account to set metadata for
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
@@ -97,6 +101,8 @@ OPTIONS
 
   --publicKey=publicKey                              The public key of the account that others may use to send you
                                                      encrypted messages
+
+  --useAKV                                           Set it to use an Azure KeyVault HSM
 
   --useLedger                                        Set it to use a ledger wallet
 
@@ -119,6 +125,7 @@ ARGUMENTS
   FILE  Path of the metadata file
 
 OPTIONS
+  --azureVaultName=azureVaultName                    If --useAKV is set, this is used to connect to the Azure KeyVault
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Addess of the account to set metadata for
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
@@ -132,6 +139,8 @@ OPTIONS
                                                      "[4,99]"
 
   --url=https://www.celo.org                         (required) The url you want to claim
+
+  --useAKV                                           Set it to use an Azure KeyVault HSM
 
   --useLedger                                        Set it to use a ledger wallet
 
@@ -154,6 +163,7 @@ ARGUMENTS
   FILE  Path of the metadata file
 
 OPTIONS
+  --azureVaultName=azureVaultName                    If --useAKV is set, this is used to connect to the Azure KeyVault
   --domain=domain                                    (required) The domain you want to claim
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Addess of the account to set metadata for
 
@@ -166,6 +176,8 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
+
+  --useAKV                                           Set it to use an Azure KeyVault HSM
 
   --useLedger                                        Set it to use a ledger wallet
 
@@ -187,6 +199,7 @@ ARGUMENTS
   FILE  Path of the metadata file
 
 OPTIONS
+  --azureVaultName=azureVaultName                    If --useAKV is set, this is used to connect to the Azure KeyVault
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Addess of the account to set metadata for
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
@@ -198,6 +211,8 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
+
+  --useAKV                                           Set it to use an Azure KeyVault HSM
 
   --useLedger                                        Set it to use a ledger wallet
 
@@ -221,6 +236,7 @@ ARGUMENTS
   FILE  Path of the metadata file
 
 OPTIONS
+  --azureVaultName=azureVaultName                    If --useAKV is set, this is used to connect to the Azure KeyVault
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Addess of the account to set metadata for
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
@@ -234,6 +250,8 @@ OPTIONS
                                                      "[4,99]"
 
   --name=name                                        (required) The name you want to claim
+
+  --useAKV                                           Set it to use an Azure KeyVault HSM
 
   --useLedger                                        Set it to use a ledger wallet
 
@@ -255,6 +273,7 @@ ARGUMENTS
   FILE  Path where the metadata should be saved
 
 OPTIONS
+  --azureVaultName=azureVaultName                    If --useAKV is set, this is used to connect to the Azure KeyVault
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Addess of the account to set metadata for
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
@@ -266,6 +285,8 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
+
+  --useAKV                                           Set it to use an Azure KeyVault HSM
 
   --useLedger                                        Set it to use a ledger wallet
 
@@ -287,6 +308,8 @@ ARGUMENTS
   ADDRESS  Address to get metadata for
 
 OPTIONS
+  --azureVaultName=azureVaultName                If --useAKV is set, this is used to connect to the Azure KeyVault
+
   --ledgerAddresses=ledgerAddresses              [default: 1] If --useLedger is set, this will get the first N addresses
                                                  for local signing
 
@@ -295,6 +318,8 @@ OPTIONS
 
   --ledgerCustomAddresses=ledgerCustomAddresses  [default: [0]] If --useLedger is set, this will get the array of index
                                                  addresses for local signing. Example --ledgerCustomAddresses "[4,99]"
+
+  --useAKV                                       Set it to use an Azure KeyVault HSM
 
   --useLedger                                    Set it to use a ledger wallet
 
@@ -313,6 +338,8 @@ USAGE
   $ celocli account:list
 
 OPTIONS
+  --azureVaultName=azureVaultName                If --useAKV is set, this is used to connect to the Azure KeyVault
+
   --ledgerAddresses=ledgerAddresses              [default: 1] If --useLedger is set, this will get the first N addresses
                                                  for local signing
 
@@ -321,6 +348,8 @@ OPTIONS
 
   --ledgerCustomAddresses=ledgerCustomAddresses  [default: [0]] If --useLedger is set, this will get the array of index
                                                  addresses for local signing. Example --ledgerCustomAddresses "[4,99]"
+
+  --useAKV                                       Set it to use an Azure KeyVault HSM
 
   --useLedger                                    Set it to use a ledger wallet
 ```
@@ -383,6 +412,9 @@ OPTIONS
   --account=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the account that needs to prove possession
                                                         of the signer key.
 
+  --azureVaultName=azureVaultName                       If --useAKV is set, this is used to connect to the Azure
+                                                        KeyVault
+
   --ledgerAddresses=ledgerAddresses                     [default: 1] If --useLedger is set, this will get the first N
                                                         addresses for local signing
 
@@ -394,6 +426,8 @@ OPTIONS
                                                         --ledgerCustomAddresses "[4,99]"
 
   --signer=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d   (required) Address of the signer key to prove possession of.
+
+  --useAKV                                              Set it to use an Azure KeyVault HSM
 
   --useLedger                                           Set it to use a ledger wallet
 
@@ -413,6 +447,7 @@ USAGE
   $ celocli account:register
 
 OPTIONS
+  --azureVaultName=azureVaultName                    If --useAKV is set, this is used to connect to the Azure KeyVault
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Account Address
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
@@ -426,6 +461,8 @@ OPTIONS
                                                      "[4,99]"
 
   --name=name
+
+  --useAKV                                           Set it to use an Azure KeyVault HSM
 
   --useLedger                                        Set it to use a ledger wallet
 
@@ -445,6 +482,7 @@ USAGE
   $ celocli account:register-metadata
 
 OPTIONS
+  --azureVaultName=azureVaultName                    If --useAKV is set, this is used to connect to the Azure KeyVault
   --force                                            Ignore metadata validity checks
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Addess of the account to set metadata for
 
@@ -459,6 +497,8 @@ OPTIONS
                                                      "[4,99]"
 
   --url=https://www.celo.org                         (required) The url to the metadata you want to register
+
+  --useAKV                                           Set it to use an Azure KeyVault HSM
 
   --useLedger                                        Set it to use a ledger wallet
 
@@ -479,6 +519,9 @@ USAGE
 OPTIONS
   --account=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Account Address
 
+  --azureVaultName=azureVaultName                       If --useAKV is set, this is used to connect to the Azure
+                                                        KeyVault
+
   --ledgerAddresses=ledgerAddresses                     [default: 1] If --useLedger is set, this will get the first N
                                                         addresses for local signing
 
@@ -490,6 +533,8 @@ OPTIONS
                                                         --ledgerCustomAddresses "[4,99]"
 
   --name=name                                           (required)
+
+  --useAKV                                              Set it to use an Azure KeyVault HSM
 
   --useLedger                                           Set it to use a ledger wallet
 
@@ -508,6 +553,8 @@ USAGE
   $ celocli account:show ADDRESS
 
 OPTIONS
+  --azureVaultName=azureVaultName                If --useAKV is set, this is used to connect to the Azure KeyVault
+
   --ledgerAddresses=ledgerAddresses              [default: 1] If --useLedger is set, this will get the first N addresses
                                                  for local signing
 
@@ -516,6 +563,8 @@ OPTIONS
 
   --ledgerCustomAddresses=ledgerCustomAddresses  [default: [0]] If --useLedger is set, this will get the array of index
                                                  addresses for local signing. Example --ledgerCustomAddresses "[4,99]"
+
+  --useAKV                                       Set it to use an Azure KeyVault HSM
 
   --useLedger                                    Set it to use a ledger wallet
 
@@ -534,6 +583,8 @@ USAGE
   $ celocli account:show-claimed-accounts ADDRESS
 
 OPTIONS
+  --azureVaultName=azureVaultName                If --useAKV is set, this is used to connect to the Azure KeyVault
+
   --ledgerAddresses=ledgerAddresses              [default: 1] If --useLedger is set, this will get the first N addresses
                                                  for local signing
 
@@ -542,6 +593,8 @@ OPTIONS
 
   --ledgerCustomAddresses=ledgerCustomAddresses  [default: [0]] If --useLedger is set, this will get the array of index
                                                  addresses for local signing. Example --ledgerCustomAddresses "[4,99]"
+
+  --useAKV                                       Set it to use an Azure KeyVault HSM
 
   --useLedger                                    Set it to use a ledger wallet
 
@@ -563,6 +616,8 @@ ARGUMENTS
   FILE  Path of the metadata file
 
 OPTIONS
+  --azureVaultName=azureVaultName                If --useAKV is set, this is used to connect to the Azure KeyVault
+
   --ledgerAddresses=ledgerAddresses              [default: 1] If --useLedger is set, this will get the first N addresses
                                                  for local signing
 
@@ -571,6 +626,8 @@ OPTIONS
 
   --ledgerCustomAddresses=ledgerCustomAddresses  [default: [0]] If --useLedger is set, this will get the array of index
                                                  addresses for local signing. Example --ledgerCustomAddresses "[4,99]"
+
+  --useAKV                                       Set it to use an Azure KeyVault HSM
 
   --useLedger                                    Set it to use a ledger wallet
 
@@ -614,6 +671,9 @@ OPTIONS
   --account=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the account that needs to prove possession
                                                         of the signer key.
 
+  --azureVaultName=azureVaultName                       If --useAKV is set, this is used to connect to the Azure
+                                                        KeyVault
+
   --ledgerAddresses=ledgerAddresses                     [default: 1] If --useLedger is set, this will get the first N
                                                         addresses for local signing
 
@@ -629,6 +689,8 @@ OPTIONS
 
   --signer=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d   (required) Address of the signer key to verify proof of
                                                         possession.
+
+  --useAKV                                              Set it to use an Azure KeyVault HSM
 
   --useLedger                                           Set it to use a ledger wallet
 
