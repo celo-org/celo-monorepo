@@ -44,6 +44,7 @@ export enum Screens {
   Invite = 'Invite',
   InviteReview = 'InviteReview',
   JoinCelo = 'JoinCelo',
+  RegulatoryTerms = 'RegulatoryTerms',
   Language = 'Language',
   Licenses = 'Licenses',
   Support = 'Support',
