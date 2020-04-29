@@ -1,7 +1,7 @@
 import { trimLeading0x } from '@celo/utils/src/address'
 import { sanitizeMessageBase64 } from '@celo/utils/src/attestations'
+import dynamicLinks from '@react-native-firebase/dynamic-links'
 import URLSearchParamsReal from '@ungap/url-search-params'
-import firebase from 'react-native-firebase'
 import url from 'url'
 
 export const createInviteCode = (privateKey: string) => {
@@ -43,10 +43,10 @@ export function extractValidInviteCode(inviteFieldInput: string) {
 }
 
 export const getValidInviteCodeFromReferrerData = async () => {
-  const deepLinkWithInviteCode = await firebase.links().getInitialLink()
+  const deepLinkWithInviteCode = await dynamicLinks().getInitialLink()
 
   if (deepLinkWithInviteCode) {
-    const parsedUrl = url.parse(deepLinkWithInviteCode)
+    const parsedUrl = url.parse(deepLinkWithInviteCode.url)
     if (parsedUrl.query) {
       const params = new URLSearchParamsReal(decodeURIComponent(parsedUrl.query))
       const code: string = params.get('invite-code')

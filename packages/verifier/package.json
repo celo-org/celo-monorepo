@@ -28,7 +28,7 @@
   "dependencies": {
     "@celo/react-components": "1.0.0",
     "@celo/react-native-sms-retriever": "git+https://github.com/celo-org/react-native-sms-retriever#b88e502",
-    "@celo/utils": "0.1.12-dev",
+    "@celo/utils": "0.1.14-dev",
     "@react-native-community/async-storage": "^1.6.2",
     "@react-native-community/netinfo": "^4.4.0",
     "@segment/analytics-react-native": "^1.1.0-beta.2",

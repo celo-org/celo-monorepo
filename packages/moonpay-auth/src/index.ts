@@ -1,4 +1,4 @@
-import * as crypto from 'crypto'
+import crypto from 'crypto'
 import * as functions from 'firebase-functions'
 import { MOONPAY_PUBLIC_KEY, MOONPAY_SECRET_KEY, MOONPAY_URL } from './config'
 const URL = require('url').URL
@@ -15,6 +15,7 @@ export const signMoonpay = functions.https.onRequest((request, response) => {
     '&baseCurrencyCode=' +
     request.body.fiatCurrency
   console.log(`Requested signature for: ${url}`)
+
   const signature = crypto
     .createHmac('sha256', MOONPAY_SECRET_KEY)
     .update(new URL(url).search)
