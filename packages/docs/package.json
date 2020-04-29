@@ -19,7 +19,7 @@
   },
   "scripts": {
     "build": "gitbook install && gitbook build",
-    "lint": "remark -qf -u validate-links --ignore-pattern developer-resources/contractkit/reference .",
+    "lint": "remark -qf -u validate-links --ignore-pattern developer-resources/contractkit/reference --ignore-pattern _book .",
     "preview": "gitbook install && gitbook serve"
   },
   "author": "",
