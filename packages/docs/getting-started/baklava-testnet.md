@@ -2,7 +2,7 @@
 
 The **Baklava Testnet** is the second Celo test network after [Alfajores](alfajores-testnet.md). You can use it to participate in the [The Great Celo Stake Off](https://forum.celo.org/t/the-great-celo-stake-off-the-details/136). Subject to these [Terms and Conditions](https://docs.google.com/document/d/1b5SzeRbq60nx50NeezAEMpwLkaBDQ9hjZc0QAh4Mbdk/), eligible participants will have the opportunity to receive Celo Gold at the Mainnet launch of the Celo Protocol. The Stake Off will operate in phases, with each phase focusing on a different part of the protocol or infrastructure to test.
 
-Once you have [registered for The Great Celo Stake Off](https://docs.google.com/forms/d/e/1FAIpQLSfbn5hTJ4UIWpN92-o2qMTUB0UnrFsL0fm97XqGe4VhhN_r5A/viewform), follow these instructions to set up a [full node](running-a-full-node-in-baklava.md) or a [validator](running-a-validator.md) on your machine \(or on a cloud or hosting provider\).
+Once you have [registered for The Great Celo Stake Off](https://docs.google.com/forms/d/e/1FAIpQLSfbn5hTJ4UIWpN92-o2qMTUB0UnrFsL0fm97XqGe4VhhN_r5A/viewform), follow these instructions to set up a [full node](running-a-full-node-in-baklava.md) or a [validator](running-a-validator-in-baklava.md) on your machine \(or on a cloud or hosting provider\).
 
 Please refer to [Key Concepts](../overview.md#background-and-key-concepts) for background on blockchains and an explanation of terms used in the section.
 

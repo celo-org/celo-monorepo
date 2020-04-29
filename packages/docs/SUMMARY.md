@@ -18,18 +18,17 @@
 - [Glossary](GLOSSARY.md)
 
 ## Celo Gold Holder Guide
-- [Quick Start](celo-gold-holders/quick-start.md)
-- [Using a Ledger Wallet](celo-gold-holders/ledger.md)
-- [Understanding ReleaseGold](celo-gold-holders/release-gold.md)
-- [Voting on Governance](celo-gold-holders/voting-governance.md)
-<!-- - [Voting on Validator Groups](celo-gold-holders/voting-validators.md) -->
+- [Quick Start](celo-gold-holder-guide/quick-start.md)
+- [Using a Ledger Wallet](celo-gold-holder-guide/ledger.md)
+- [Understanding ReleaseGold](celo-gold-holder-guide/release-gold.md)
+- [Voting on Governance](celo-gold-holder-guide/voting-governance.md)
+<!-- - [Voting on Validator Groups](celo-gold-holder-guide/voting-validators.md) -->
 
 ## Validator Guide
 
 - [Key Management](operations-manual/key-management/summary.md)
   - [Detailed Role Descriptions](operations-manual/key-management/detailed.md)
   - [Validator Signer Key Rotation](operations-manual/key-management/key-rotation.md)
-  - [Using a Ledger Wallet](operations-manual/key-management/ledger.md)
 - [Celo Foundation Voting Policy](operations-manual/celo-foundation-voting-policy.md)
 - [Securing Celo Nodes and Services](operations-manual/securing-nodes-and-services.md)
 - [Upgrading a Node](operations-manual/node-upgrades.md)

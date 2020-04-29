@@ -36,7 +36,7 @@ In this guide, you will:
 * Access the `ReleaseGold` account associated with your address using your existing Ledger
 * Authorize a voting key, which you will hold on a new, second Ledger
 * Lock some of the Gold in your `ReleaseGold` account
-* Use that Locked Gold to vote for validator groups to operate Celo's [Proof of Stake](celo-codebase/protocol/proof-of-stake/README.md) network (and in doing so be ready to receive epoch rewards of 6% when the community enables them in a forthcoming governance proposal)
+* Use that Locked Gold to vote for validator groups to operate Celo's [Proof of Stake](../celo-codebase/protocol/proof-of-stake/README.md) network (and in doing so be ready to receive epoch rewards of 6% when the community enables them in a forthcoming governance proposal)
 
 ## Preparing Ledgers
 
@@ -202,7 +202,7 @@ celocli lockedgold:show $CELO_RG_ADDRESS
 
 ## Vote for a Validator Group
 
-Celo Gold (cGLD) holders can vote for Validator groups and not validators directly. This is similar to delegating on other cryptographic networks. cGLD holders who vote for an elected validator group may earn [epoch rewards](https://docs.celo.org/getting-started/glossary#epoch-rewards). Refer to [Voting](voting.md) for more detailed information.
+Celo Gold (cGLD) holders can vote for Validator groups and not validators directly. This is similar to delegating on other cryptographic networks. cGLD holders who vote for an elected validator group may earn [epoch rewards](https://docs.celo.org/getting-started/glossary#epoch-rewards).
 
 A number of community sites are providing information to help choose a validator group. Start with [the cLabs Validator explorer](https://celo.org/validators/explore), or [Bi23 Labs' `thecelo` dashboard](https://thecelo.com).
 
