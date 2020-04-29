@@ -61,6 +61,7 @@ export interface ValidatorsConfig {
   maxGroupSize: BigNumber
   membershipHistoryLength: BigNumber
   slashingMultiplierResetPeriod: BigNumber
+  commissionUpdateDelay: BigNumber
 }
 
 export interface GroupMembership {
@@ -92,7 +93,6 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   /**
    * Updates a validator group's commission based on the previously queued update
    */
-
   updateCommission: () => CeloTransactionObject<void> = proxySend(
     this.kit,
     this.contract.methods.updateCommission
@@ -133,10 +133,19 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   )
 
   /**
-   * Returns the reset period for slashing multiplier.
+   * Returns the reset period, in seconds, for slashing multiplier.
    */
   getSlashingMultiplierResetPeriod = proxyCall(
     this.contract.methods.slashingMultiplierResetPeriod,
+    undefined,
+    valueToBigNumber
+  )
+
+  /**
+   * Returns the update delay, in blocks, for the group commission.
+   */
+  getCommissionUpdateDelay = proxyCall(
+    this.contract.methods.commissionUpdateDelay,
     undefined,
     valueToBigNumber
   )
@@ -151,6 +160,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
       this.contract.methods.maxGroupSize().call(),
       this.contract.methods.membershipHistoryLength().call(),
       this.getSlashingMultiplierResetPeriod(),
+      this.getCommissionUpdateDelay(),
     ])
     return {
       validatorLockedGoldRequirements: res[0],
@@ -158,6 +168,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
       maxGroupSize: valueToBigNumber(res[2]),
       membershipHistoryLength: valueToBigNumber(res[3]),
       slashingMultiplierResetPeriod: res[4],
+      commissionUpdateDelay: res[5],
     }
   }
 
