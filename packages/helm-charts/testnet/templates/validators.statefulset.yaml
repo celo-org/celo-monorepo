@@ -60,7 +60,7 @@ spec:
             celotooljs.sh generate bip32 --mnemonic "$MNEMONIC" --accountType validator --index $RID > /root/.celo/pkey
             echo 'Generating address'
             celotooljs.sh generate account-address --private-key `cat /root/.celo/pkey` > /root/.celo/address
-            echo -n $IP_ADDRESSES | cut -d '/' -f $((RID + 1)) > /root/.celo/externalIpAddress
+            echo -n $IP_ADDRESSES | cut -d ',' -f $((RID + 1)) > /root/.celo/externalIpAddress
 
             if [[ -z $IP_ADDRESSES || "$RID" -lt "{{ .Values.geth.proxiedValidators }}" ]]; then
               echo $POD_IP > /root/.celo/ipAddress
@@ -126,7 +126,7 @@ spec:
               name: {{ template "common.fullname" . }}-geth-account
               key: mnemonic
         - name: IP_ADDRESSES
-          value: {{ .Values.geth.validator_ip_addresses }}
+          value: {{ join "," .Values.geth.validator_ip_addresses }}
         - name: BOOTNODE_IP_ADDRESS
           value: "{{ default "none" .Values.geth.bootnodeIpAddress  }}"
         volumeMounts:
