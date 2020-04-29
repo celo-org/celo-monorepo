@@ -10,6 +10,7 @@ const SAMPLE_BACKUP_KEY =
 const VERIFICATION_COUNTRY = 'Germany'
 const VERIFICATION_PHONE_NUMBER = '030 111111'
 const EXAMPLE_NAME = 'Test Name'
+const PIN = '888888'
 
 // clicks an element if it sees it
 async function bannerDismiss(inElement, tapElement) {
@@ -59,13 +60,27 @@ describe('Transfer Works', () => {
     await element(by.id('AcceptTermsButton')).tap()
   })
 
+  it('NUX->PincodeEducation', async () => {
+    await expect(element(by.id('CustomPinContinue'))).toBeVisible()
+    await element(by.id('CustomPinContinue')).tap()
+  })
+
   it('NUX->Pin', async () => {
-    await expect(element(by.id('SystemAuthTitle'))).toBeVisible()
-    await expect(element(by.id('SystemAuthContinue'))).toBeVisible()
+    // Set pin
+    for (const digit of PIN) {
+      await expect(element(by.text(digit))).toBeVisible()
+      await element(by.text(digit)).tap()
+    }
 
-    // TODO: enter pin using custom keypad
+    await element(by.id('PincodeSetContinue')).tap()
 
-    await element(by.id('SystemAuthContinue')).tap()
+    // Verify pin
+    for (const digit of PIN) {
+      await expect(element(by.text(digit))).toBeVisible()
+      await element(by.text(digit)).tap()
+    }
+
+    await element(by.id('PincodeVerifyContinue')).tap()
   })
 
   it('NUX->Invite', async () => {
