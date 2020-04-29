@@ -1,4 +1,4 @@
-import { skipTo, sleep } from './utils'
+import { skipTo, sleep, enterPinUi } from './utils'
 
 const ENABLE_CONTACT_IMPORT = false
 
@@ -10,7 +10,6 @@ const SAMPLE_BACKUP_KEY =
 const VERIFICATION_COUNTRY = 'Germany'
 const VERIFICATION_PHONE_NUMBER = '030 111111'
 const EXAMPLE_NAME = 'Test Name'
-const PIN = '888888'
 
 // clicks an element if it sees it
 async function bannerDismiss(inElement, tapElement) {
@@ -61,32 +60,21 @@ describe('Transfer Works', () => {
   })
 
   it('NUX->PincodeEducation', async () => {
-    await expect(element(by.id('CustomPinContinue'))).toBeVisible()
-    await element(by.id('CustomPinContinue')).tap()
+    await expect(element(by.id('SystemAuthContinue'))).toBeVisible()
+    await element(by.id('SystemAuthContinue')).tap()
   })
 
   it('NUX->Pin', async () => {
     // Set pin
-    for (const digit of PIN) {
-      await expect(element(by.text(digit))).toBeVisible()
-      await element(by.text(digit)).tap()
-    }
-
-    await element(by.id('PincodeSetContinue')).tap()
-
+    await enterPinUi()
     // Verify pin
-    for (const digit of PIN) {
-      await expect(element(by.text(digit))).toBeVisible()
-      await element(by.text(digit)).tap()
-    }
-
-    await element(by.id('PincodeVerifyContinue')).tap()
+    await enterPinUi()
   })
 
   it('NUX->Invite', async () => {
     await waitFor(element(by.id('InviteCodeTitle')))
       .toBeVisible()
-      .withTimeout(2000)
+      .withTimeout(8000)
 
     await element(by.id('ImportExistingUsingBackupKey')).tap()
 

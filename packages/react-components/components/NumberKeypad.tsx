@@ -5,6 +5,7 @@ import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 
 interface Props {
+  testID?: string
   showDecimal: boolean
   onDigitPress: (digit: number) => void
   onBackspacePress: () => void
@@ -20,7 +21,7 @@ function DigitButton({
 }) {
   const onPress = () => onDigitPress(digit)
   return (
-    <Touchable borderless={true} onPress={onPress}>
+    <Touchable testID={`${digit}`} borderless={true} onPress={onPress}>
       <Text style={style.digit}>{digit}</Text>
     </Touchable>
   )

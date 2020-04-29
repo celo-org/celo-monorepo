@@ -101,7 +101,6 @@ export class PincodeSet extends React.Component<Props, State> {
             pin={pin2}
             onChangePin={this.onChangePin2}
             maxLength={PIN_LENGTH}
-            testID="PincodeVerifyContinue"
           />
         ) : (
           // Create
@@ -114,7 +113,6 @@ export class PincodeSet extends React.Component<Props, State> {
             pin={pin1}
             onChangePin={this.onChangePin1}
             maxLength={PIN_LENGTH}
-            testID="PincodeSetContinue"
           />
         )}
       </SafeAreaView>
