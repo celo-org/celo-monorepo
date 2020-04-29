@@ -139,11 +139,19 @@ export class IdentityMetadataWrapper {
           throw new Error("Can't claim self")
         }
         break
-      case ClaimTypes.DOMAIN:
+      case ClaimTypes.DOMAIN: {
         const existingClaims = this.data.claims.filter((el: any) => el.domain === claim.domain)
         if (existingClaims.length > 0) {
           return existingClaims[0]
         }
+        break
+      }
+      case ClaimTypes.KEYBASE: {
+        const existingClaims = this.data.claims.filter((el: any) => el.username === claim.username)
+        if (existingClaims.length > 0) {
+          return existingClaims[0]
+        }
+      }
       default:
         break
     }

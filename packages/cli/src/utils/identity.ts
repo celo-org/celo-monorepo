@@ -6,6 +6,7 @@ import {
   VERIFIABLE_CLAIM_TYPES,
 } from '@celo/contractkit/lib/identity/claims/types'
 import { verifyClaim } from '@celo/contractkit/lib/identity/claims/verify'
+import { eqAddress } from '@celo/utils/lib/address'
 import { concurrentMap } from '@celo/utils/lib/async'
 import { NativeSigner } from '@celo/utils/lib/signatureUtils'
 import { cli } from 'cli-ux'
@@ -29,14 +30,28 @@ export abstract class ClaimCommand extends BaseCommand {
   // We need this to properly parse flags for subclasses
   protected self = ClaimCommand
 
-  protected readMetadata = () => {
-    const { args } = this.parse(this.self)
+  protected async checkMetadataAddress(address: string, from: string) {
+    if (eqAddress(address, from)) {
+      return
+    }
+    const accounts = await this.kit.contracts.getAccounts()
+    const signers = await accounts.getCurrentSigners(address)
+    if (!signers.some((a) => eqAddress(a, from))) {
+      throw new Error(
+        'Signing metadata with an address that is not the account or one of its signers'
+      )
+    }
+  }
+
+  protected readMetadata = async () => {
+    const { args, flags } = this.parse(this.self)
     const filePath = args.file
     try {
       cli.action.start(`Read Metadata from ${filePath}`)
-      const data = IdentityMetadataWrapper.fromFile(this.kit, filePath)
-      // Perhaps should check here that `--from` and data.data.meta.address match
-      // (so that it is the address or an associated signer)
+      const data = await IdentityMetadataWrapper.fromFile(this.kit, filePath)
+      if (flags.from) {
+        await this.checkMetadataAddress(data.data.meta.address, flags.from)
+      }
       cli.action.stop()
       return data
     } catch (error) {
