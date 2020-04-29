@@ -110,6 +110,7 @@ export const vNeg1Schema = {
     dismissedEarnRewards: false,
     dismissedInviteFriends: false,
     promptFornoIfNeeded: false,
+    acceptedTerms: false,
   },
   invite: {
     isSendingInvite: false,

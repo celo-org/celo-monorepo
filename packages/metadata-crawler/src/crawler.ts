@@ -1,6 +1,9 @@
 import { Client } from 'pg'
 import { ClaimTypes, IdentityMetadataWrapper } from '@celo/contractkit/lib/identity'
-import { verifyDomainRecord } from '@celo/contractkit/lib/identity/claims/verify'
+import {
+  verifyDomainRecord,
+  verifyAccountClaim,
+} from '@celo/contractkit/lib/identity/claims/verify'
 import { normalizeAddress } from '@celo/utils/lib/address'
 import { ClaimPayload, serializeClaim } from '@celo/contractkit/lib/identity/claims/claim'
 import { newKit } from '@celo/contractkit'
@@ -66,7 +69,16 @@ async function handleItem(item: { url: string; address: string }) {
   try {
     let metadata = await IdentityMetadataWrapper.fetchFromURL(kit, item.url)
     let claims = metadata.filterClaims(ClaimTypes.DOMAIN)
-    const accounts = metadata.filterClaims(ClaimTypes.ACCOUNT)
+    const unverifiedAccounts = metadata.filterClaims(ClaimTypes.ACCOUNT)
+    const accountVerification = await Promise.all(
+      unverifiedAccounts.map(async (claim) => ({
+        claim,
+        verified: await verifyAccountClaim(kit, claim, item.address),
+      }))
+    )
+    const accounts = accountVerification
+      .filter(({ verified }) => verified === undefined)
+      .map((a) => a.claim)
 
     await Promise.all(
       claims.map(async (claim: ClaimPayload<ClaimTypes.DOMAIN>) => {
@@ -76,6 +88,7 @@ async function handleItem(item: { url: string; address: string }) {
         logger.debug('Verifying %s for address %s', claim.domain, addressWith0x)
 
         const verificationStatus = await verifyDomainRecord(
+          kit,
           claim,
           addressWith0x
         ).catch((error: any) => logger.error('Error in verifyDomainClaim %s', error))

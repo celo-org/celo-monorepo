@@ -24,7 +24,7 @@
 
 Ƭ **KeybaseClaim**: *t.TypeOf‹typeof KeybaseClaimType›*
 
-*Defined in [contractkit/src/identity/claims/keybase.ts:14](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/keybase.ts#L14)*
+*Defined in [contractkit/src/identity/claims/keybase.ts:15](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/keybase.ts#L15)*
 
 ## Variables
 
@@ -37,7 +37,7 @@
   username: t.string,
 })
 
-*Defined in [contractkit/src/identity/claims/keybase.ts:8](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/keybase.ts#L8)*
+*Defined in [contractkit/src/identity/claims/keybase.ts:9](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/keybase.ts#L9)*
 
 ___
 
@@ -45,7 +45,7 @@ ___
 
 • **keybaseFilePathToProof**: *".well-known/celo/"* = `.well-known/celo/`
 
-*Defined in [contractkit/src/identity/claims/keybase.ts:16](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/keybase.ts#L16)*
+*Defined in [contractkit/src/identity/claims/keybase.ts:17](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/keybase.ts#L17)*
 
 ## Functions
 
@@ -53,7 +53,7 @@ ___
 
 ▸ **createKeybaseClaim**(`username`: string): *[KeybaseClaim](_identity_claims_keybase_.md#keybaseclaim)*
 
-*Defined in [contractkit/src/identity/claims/keybase.ts:67](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/keybase.ts#L67)*
+*Defined in [contractkit/src/identity/claims/keybase.ts:70](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/keybase.ts#L70)*
 
 **Parameters:**
 
@@ -69,7 +69,7 @@ ___
 
 ▸ **proofFileName**(`address`: [Address](_base_.md#address)): *string*
 
-*Defined in [contractkit/src/identity/claims/keybase.ts:17](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/keybase.ts#L17)*
+*Defined in [contractkit/src/identity/claims/keybase.ts:18](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/keybase.ts#L18)*
 
 **Parameters:**
 
@@ -85,7 +85,7 @@ ___
 
 ▸ **targetURL**(`username`: string, `address`: [Address](_base_.md#address)): *string*
 
-*Defined in [contractkit/src/identity/claims/keybase.ts:18](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/keybase.ts#L18)*
+*Defined in [contractkit/src/identity/claims/keybase.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/keybase.ts#L19)*
 
 **Parameters:**
 
@@ -100,14 +100,15 @@ ___
 
 ###  verifyKeybaseClaim
 
-▸ **verifyKeybaseClaim**(`claim`: [KeybaseClaim](_identity_claims_keybase_.md#keybaseclaim), `signer`: [Address](_base_.md#address)): *Promise‹string | undefined›*
+▸ **verifyKeybaseClaim**(`kit`: [ContractKit](../classes/_kit_.contractkit.md), `claim`: [KeybaseClaim](_identity_claims_keybase_.md#keybaseclaim), `signer`: [Address](_base_.md#address)): *Promise‹string | undefined›*
 
-*Defined in [contractkit/src/identity/claims/keybase.ts:23](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/keybase.ts#L23)*
+*Defined in [contractkit/src/identity/claims/keybase.ts:24](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/keybase.ts#L24)*
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
+`kit` | [ContractKit](../classes/_kit_.contractkit.md) |
 `claim` | [KeybaseClaim](_identity_claims_keybase_.md#keybaseclaim) |
 `signer` | [Address](_base_.md#address) |
 
