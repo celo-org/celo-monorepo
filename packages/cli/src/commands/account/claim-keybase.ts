@@ -73,7 +73,7 @@ export default class ClaimKeybase extends ClaimCommand {
       cli.action.start(`Claim successfully copied to the keybase file system, verifying proof`)
       // Wait for changes to propagate
       await sleep(3000)
-      const verificationError = await verifyKeybaseClaim(claim, address)
+      const verificationError = await verifyKeybaseClaim(this.kit, claim, address)
       if (verificationError) {
         throw new Error(`Claim is not verifiable: ${verificationError}`)
       }

@@ -1,6 +1,8 @@
 import * as Web3Utils from 'web3-utils'
 import { eqAddress, privateKeyToAddress } from './address'
 
+export const POP_SIZE = 65
+
 const ethjsutil = require('ethereumjs-util')
 
 // If messages is a hex, the length of it should be the number of bytes
@@ -144,7 +146,7 @@ export function parseSignatureWithoutPrefix(
     return { v, r, s }
   }
 
-  throw new Error('Unable to parse signature')
+  throw new Error(`Unable to parse signature (expected signer ${signer})`)
 }
 
 function parseSignatureAsVrs(signature: string) {

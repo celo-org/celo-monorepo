@@ -1,3 +1,4 @@
+import { ApolloProvider, Query } from '@apollo/react-components'
 import ApolloClient from 'apollo-boost'
 import { InMemoryCache } from 'apollo-cache-inmemory'
 import fetch from 'cross-fetch'
@@ -5,7 +6,6 @@ import gql from 'graphql-tag'
 import getConfig from 'next/config'
 import { Router, withRouter } from 'next/router'
 import * as React from 'react'
-import { ApolloProvider, Query } from 'react-apollo'
 import { StyleSheet, View } from 'react-native'
 import ShowApolloError from 'src/dev/ShowApolloError'
 import ValidatorsList from 'src/dev/ValidatorsList'
@@ -32,6 +32,7 @@ function createApolloClient(network: string) {
     cache: new InMemoryCache(),
     // TODO: Remove this workaround when the backend service fixes not needed errors
     fetch: async (...args) => {
+      // @ts-ignore
       const response = await fetch(...args)
       const { data } = await response.json()
       return new (Response as any)(JSON.stringify({ data }))

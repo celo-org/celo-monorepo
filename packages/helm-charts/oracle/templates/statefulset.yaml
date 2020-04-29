@@ -21,7 +21,7 @@ spec:
   podManagementPolicy: Parallel
   updateStrategy:
     type: RollingUpdate
-  replicas: {{ .Values.replicas }}
+  replicas: {{ .Values.oracle.replicas }}
   serviceName: oracle
   selector:
     matchLabels:
@@ -33,6 +33,36 @@ spec:
 {{ include "labels" . | indent 8 }}
 {{ include "oracle-client-component-label" . | indent 8 }}
     spec:
+      initContainers:
+      - name: set-label
+        image: {{ .Values.kubectl.image.repository }}:{{ .Values.kubectl.image.tag }}
+        command:
+        - sh
+        - -c
+        args:
+        - |
+           kubectl \
+            --namespace "$POD_NAMESPACE" \
+            --server="https://kubernetes.default.svc" \
+            --token="$TOKEN" \
+            --certificate-authority="/var/run/secrets/kubernetes.io/serviceaccount/ca.crt" \
+            label pod "$POD_NAME" \
+            --overwrite \
+            "aadpodidbinding=$POD_NAME-identity-binding"
+        env:
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: TOKEN
+          valueFrom:
+            secretKeyRef:
+              key: token
+              name: {{ .Values.kube.authTokenName }}
       containers:
       - name: oracle-client
         image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
@@ -43,20 +73,20 @@ spec:
           - |
             [[ $REPLICA_NAME =~ -([0-9]+)$ ]] || exit 1
             RID=${BASH_REMATCH[1]}
-            export ORACLE_KEY_PATH="/private-keys/private-key-$RID"
+
+            # Get the correct key vault name
+            AZURE_KEY_VAULT_NAMES={{- range $index, $identity := .Values.oracle.identities -}}{{ $identity.azure.keyVaultName }},{{- end }}
+            export AZURE_KEY_VAULT_NAME=`echo -n $AZURE_KEY_VAULT_NAMES | cut -d ',' -f $((RID + 1))`
+
+            # Get the correct oracle account address
+            ADDRESSES={{- range $index, $identity := .Values.oracle.identities -}}{{ $identity.address }},{{- end }}
+            export ADDRESS=`echo -n $ADDRESSES | cut -d ',' -f $((RID + 1))`
+
             node /celo-oracle/lib/run_app.js
         env:
         - name: REPLICA_NAME
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        - name: CELO_NODE
-          value: {{ .Values.oracle.web3ProviderUrl }}
-        volumeMounts:
-        - name: private-key-volume
-          readOnly: true
-          mountPath: "/private-keys"
-      volumes:
-        - name: private-key-volume
-          secret:
-            secretName: pkey-secret
+        - name: RPC_PROVIDER_URL
+          value: {{ .Values.oracle.rpcProviderUrl }}

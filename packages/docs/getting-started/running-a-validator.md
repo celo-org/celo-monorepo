@@ -2,7 +2,7 @@
 
 This section explains how to get a Validator node running on the network, using the same docker image used for running a full node.
 
-Validators help secure the Celo network by participating in Celo’s Proof of Stake protocol. Validators are organized into Validator Groups, analogous to parties in representative democracies. A Validator Group is essentially an ordered list of Validators.
+Validators help secure the Celo network by participating in Celo’s proof-of-stake protocol. Validators are organized into Validator Groups, analogous to parties in representative democracies. A Validator Group is essentially an ordered list of Validators.
 
 Just as anyone in a democracy can create their own political party, or seek to get selected to represent a party in an election, any Celo user can create a Validator group and add themselves to it, or set up a potential Validator and work to get an existing Validator group to include them.
 
@@ -28,7 +28,7 @@ The recommended Celo Validator setup involves continually running three nodes on
 - 1 **Validator Proxy node**: can be a VM or container in a multi-tenant environment (e.g. a public cloud), but requires high availability
 - 1 **Attestation node**: can be a VM or container in a multi-tenant environment (e.g. a public cloud), and has moderate availability requirements
 
-Celo is a Proof of Stake network, which has different hardware requirements than a Proof of Work network. Proof of Stake consensus is less CPU intensive, but is more sensitive to network connectivity and latency. Below is a list of standard requirements for running Validator and Proxy nodes on the Celo Network:
+Celo is a proof-of-stake network, which has different hardware requirements than a Proof of Work network. proof-of-stake consensus is less CPU intensive, but is more sensitive to network connectivity and latency. Below is a list of standard requirements for running Validator and Proxy nodes on the Celo Network:
 
 - Memory: 8 GB RAM
 - CPU: Quad core 3GHz (64-bit)
@@ -641,7 +641,7 @@ docker run --name celo-attestation-service -it --restart always --entrypoint /bi
 
 ## Registering Metadata
 
-We are using [Metadata](../celo-codebase/protocol/identity/metadata) to allow accounts to make certain claims without having to do so on-chain. For us to complete the process, we have to make two claims:
+We are using [Metadata](../celo-codebase/protocol/identity/metadata.md) to allow accounts to make certain claims without having to do so on-chain. For us to complete the process, we have to make two claims:
 
 1.  Under which URL users can request attestations from
 2.  Which accounts belong together for the purpose of the leaderboard
