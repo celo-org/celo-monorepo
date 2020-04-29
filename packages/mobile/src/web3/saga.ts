@@ -95,6 +95,12 @@ export function* checkWeb3SyncProgress() {
       }
     } catch (error) {
       if (error.toString().toLowerCase() === BLOCK_CHAIN_CORRUPTION_ERROR.toLowerCase()) {
+        if (syncLoops < 2) {
+          syncLoops += 1
+          yield delay(WEB3_MONITOR_DELAY)
+          continue
+        }
+
         CeloAnalytics.track(CustomEventNames.blockChainCorruption, {}, true)
         const deleted = yield call(deleteChainData)
         if (deleted) {
