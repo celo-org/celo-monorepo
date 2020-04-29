@@ -197,9 +197,8 @@ export function* sendInvite(
       Logger.error(TAG, 'Currently only dollar escrow payments are allowed')
     }
 
-    // OPEN QUESTION - does storing invitee data only in the event of a successful transaction have
-    // unintended consequences? Seems right to me but previous position was before the generateStandbyTransactionId call
     const inviteDetails: InviteDetails = {
+      timestamp: Date.now(),
       e164Number,
       tempWalletAddress: temporaryAddress,
       tempWalletPrivateKey: temporaryWalletAccount.privateKey,

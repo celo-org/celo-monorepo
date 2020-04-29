@@ -31,7 +31,7 @@ import { waitForTransactionWithId } from 'src/transactions/saga'
 import { getContractKit } from 'src/web3/contracts'
 import { getConnectedUnlockedAccount, getOrCreateAccount, waitWeb3LastBlock } from 'src/web3/saga'
 import { createMockStore, mockContractKitBalance } from 'test/utils'
-import { mockAccount, mockInviteDetails3 } from 'test/values'
+import { mockAccount, mockInviteDetails } from 'test/values'
 
 const mockKey = '0x1129eb2fbccdc663f4923a6495c35b096249812b589f7c4cd1dba01e1edaf724'
 
@@ -64,6 +64,9 @@ describe(watchSendInvite, () => {
     jest.useRealTimers()
   })
 
+  const dateNowStub = jest.fn(() => 1588200517518)
+  global.Date.now = dateNowStub
+
   it('sends an SMS invite as expected', async () => {
     await expectSaga(watchSendInvite)
       .provide([
@@ -72,7 +75,7 @@ describe(watchSendInvite, () => {
         [matchers.call.fn(waitForTransactionWithId), 'a sha3 hash'],
       ])
       .withState(state)
-      .dispatch(sendInvite(mockInviteDetails3.e164Number, InviteBy.SMS))
+      .dispatch(sendInvite(mockInviteDetails.e164Number, InviteBy.SMS))
       .dispatch(transactionConfirmed('a sha3 hash'))
       .put(
         transferStableToken({
@@ -82,11 +85,11 @@ describe(watchSendInvite, () => {
           txId: 'a sha3 hash',
         })
       )
-      .put(storeInviteeData(mockInviteDetails3))
+      .put(storeInviteeData(mockInviteDetails))
       .put(
         updateE164PhoneNumberAddresses(
-          { [mockInviteDetails3.e164Number]: null }, // address is null when unverified
-          { [mockAccount]: mockInviteDetails3.e164Number }
+          { [mockInviteDetails.e164Number]: null }, // address is null when unverified
+          { [mockAccount]: mockInviteDetails.e164Number }
         )
       )
       .run()
@@ -102,7 +105,7 @@ describe(watchSendInvite, () => {
         [matchers.call.fn(waitForTransactionWithId), 'a sha3 hash'],
       ])
       .withState(state)
-      .dispatch(sendInvite(mockInviteDetails3.e164Number, InviteBy.WhatsApp))
+      .dispatch(sendInvite(mockInviteDetails.e164Number, InviteBy.WhatsApp))
       .dispatch(transactionConfirmed('a sha3 hash'))
       .put(
         transferStableToken({
@@ -112,7 +115,7 @@ describe(watchSendInvite, () => {
           txId: 'a sha3 hash',
         })
       )
-      .put(storeInviteeData(mockInviteDetails3))
+      .put(storeInviteeData(mockInviteDetails))
       .run()
 
     expect(Linking.openURL).toHaveBeenCalled()

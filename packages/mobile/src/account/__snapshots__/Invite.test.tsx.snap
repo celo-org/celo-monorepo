@@ -414,25 +414,25 @@ exports[`Invite renders correctly with recipients 1`] = `
             "data": Array [
               Object {
                 "contactId": "contactId",
-                "displayId": "14155550000",
-                "displayName": "John Doe",
-                "e164PhoneNumber": "+14155550000",
+                "displayId": "21255550000",
+                "displayName": "George Bogart",
+                "e164PhoneNumber": "+21255550000",
                 "kind": "Contact",
                 "phoneNumberLabel": "phoneNumLabel",
               },
               Object {
                 "contactId": "contactId",
                 "displayId": "13105550000",
-                "displayName": "Marcus Zuckerberg",
+                "displayName": "Jane Doe",
                 "e164PhoneNumber": "+13105550000",
                 "kind": "Contact",
                 "phoneNumberLabel": "phoneNumLabel",
               },
               Object {
                 "contactId": "contactId",
-                "displayId": "21255550000",
-                "displayName": "William Gates",
-                "e164PhoneNumber": "+21255550000",
+                "displayId": "14155550000",
+                "displayName": "John Doe",
+                "e164PhoneNumber": "+14155550000",
                 "kind": "Contact",
                 "phoneNumberLabel": "phoneNumLabel",
               },
@@ -465,25 +465,25 @@ exports[`Invite renders correctly with recipients 1`] = `
             "data": Array [
               Object {
                 "contactId": "contactId",
-                "displayId": "14155550000",
-                "displayName": "John Doe",
-                "e164PhoneNumber": "+14155550000",
+                "displayId": "21255550000",
+                "displayName": "George Bogart",
+                "e164PhoneNumber": "+21255550000",
                 "kind": "Contact",
                 "phoneNumberLabel": "phoneNumLabel",
               },
               Object {
                 "contactId": "contactId",
                 "displayId": "13105550000",
-                "displayName": "Marcus Zuckerberg",
+                "displayName": "Jane Doe",
                 "e164PhoneNumber": "+13105550000",
                 "kind": "Contact",
                 "phoneNumberLabel": "phoneNumLabel",
               },
               Object {
                 "contactId": "contactId",
-                "displayId": "21255550000",
-                "displayName": "William Gates",
-                "e164PhoneNumber": "+21255550000",
+                "displayId": "14155550000",
+                "displayName": "John Doe",
+                "e164PhoneNumber": "+14155550000",
                 "kind": "Contact",
                 "phoneNumberLabel": "phoneNumLabel",
               },
@@ -634,7 +634,7 @@ exports[`Invite renders correctly with recipients 1`] = `
                       ]
                     }
                   >
-                    John Doe
+                    George Bogart
                   </Text>
                 </View>
                 <Text
@@ -656,7 +656,7 @@ exports[`Invite renders correctly with recipients 1`] = `
                     ]
                   }
                 >
-                  14155550000
+                  21255550000
                 </Text>
               </View>
             </View>
@@ -774,7 +774,7 @@ exports[`Invite renders correctly with recipients 1`] = `
                       ]
                     }
                   >
-                    Marcus Zuckerberg
+                    Jane Doe
                   </Text>
                 </View>
                 <Text
@@ -913,7 +913,7 @@ exports[`Invite renders correctly with recipients 1`] = `
                     ]
                   }
                 >
-                  William Gates
+                  John Doe
                 </Text>
               </View>
               <Text
@@ -935,7 +935,7 @@ exports[`Invite renders correctly with recipients 1`] = `
                   ]
                 }
               >
-                21255550000
+                14155550000
               </Text>
             </View>
           </View>

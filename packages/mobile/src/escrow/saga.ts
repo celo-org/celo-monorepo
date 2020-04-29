@@ -271,7 +271,6 @@ function* doFetchSentPayments() {
     const addressToE164Number = yield select(addressToE164NumberSelector)
     const sentPayments: EscrowedPayment[] = []
     for (let i = 0; i < sentPaymentsRaw.length; i++) {
-      const id = sentPaymentIDs[i].toLowerCase() // OPEN QUESTION: why are we making this lowercase? seems inconsistent
       const address = sentPaymentIDs[i]
       const recipientPhoneNumber = addressToE164Number[address]
       const payment = sentPaymentsRaw[i]
@@ -280,7 +279,7 @@ function* doFetchSentPayments() {
       }
 
       const escrowPaymentWithRecipient: EscrowedPayment = {
-        paymentID: id,
+        paymentID: address.toLowerCase(),
         senderAddress: payment[1],
         recipientPhone: recipientPhoneNumber,
         currency: SHORT_CURRENCIES.DOLLAR, // Only dollars can be escrowed

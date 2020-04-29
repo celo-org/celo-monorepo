@@ -6,7 +6,11 @@ import { EscrowedPayment } from 'src/escrow/actions'
 import { SHORT_CURRENCIES } from 'src/geth/consts'
 import { AddressToE164NumberType, E164NumberToAddressType } from 'src/identity/reducer'
 import { AttestationCode } from 'src/identity/verification'
-import { RecipientKind, RecipientWithContact, RecipientWithMobileNumber } from 'src/recipients/recipient'
+import {
+  RecipientKind,
+  RecipientWithContact,
+  RecipientWithMobileNumber,
+} from 'src/recipients/recipient'
 
 export const mockName = 'John Doe'
 export const mockAccount = '0x0000000000000000000000000000000000007E57'
@@ -41,8 +45,8 @@ export const mockCountryCode = '+1'
 
 export const mockQrCodeData = `{"address":"${mockAccount}","e164PhoneNumber":"${mockE164Number}","displayName":"${mockName}"}`
 
-const mockNameInvite = 'Marcus Zuckerberg'
-const mockName2Invite = 'William Gates'
+const mockNameInvite = 'Jane Doe'
+const mockName2Invite = 'George Bogart'
 const mockE164NumberInvite = '+13105550000'
 const mockDisplayNumberInvite = '13105550000'
 const mockE164Number2Invite = '+21255550000'
@@ -55,18 +59,20 @@ const mockAccountInvite2PrivKey =
   '0xb33eac631fd3a415f3738649db8cad57da78b99ec92cd8f77b76b5dae2ebdf27'
 
 export const mockInviteDetails = {
+  timestamp: 1588200517518,
   e164Number: mockE164NumberInvite,
-  tempWalletAddress: mockAccountInvite,
-  tempWalletPrivateKey: mockAccountInvitePrivKey,
+  tempWalletAddress: mockAccount,
+  tempWalletPrivateKey: '0x1129eb2fbccdc663f4923a6495c35b096249812b589f7c4cd1dba01e1edaf724',
   tempWalletRedeemed: false,
-  inviteCode: '5ZwS/rXqE9q8wGiijR1SGibjlGT6p7vMAfQ7g0DpL6Y=',
-  inviteLink: 'http://celo.page.link/PARAMS,
+  inviteCode: 'ESnrL7zNxmP0kjpklcNbCWJJgStYn3xM0dugHh7a9yQ=',
+  inviteLink: 'http://celo.page.link/PARAMS',
 }
 
 export const mockInviteDetails2 = {
+  timestamp: 1588200517518,
   e164Number: mockE164Number2Invite,
-  tempWalletAddress: mockAccount2Invite,
-  tempWalletPrivateKey: mockAccountInvite2PrivKey,
+  tempWalletAddress: mockAccountInvite,
+  tempWalletPrivateKey: mockAccountInvitePrivKey,
   tempWalletRedeemed: false,
   inviteCode: 'sz6sYx/TpBXzc4ZJ24ytV9p4uZ7JLNj3e3a12uLr3yc=',
   inviteLink: 'http://celo.page.link/PARAMS',
@@ -74,11 +80,12 @@ export const mockInviteDetails2 = {
 
 // using the default mock values
 export const mockInviteDetails3 = {
+  timestamp: 1588200517518,
   e164Number: mockE164NumberInvite,
-  tempWalletAddress: mockAccount,
-  tempWalletPrivateKey: '0x1129eb2fbccdc663f4923a6495c35b096249812b589f7c4cd1dba01e1edaf724',
+  tempWalletAddress: mockAccount2Invite,
+  tempWalletPrivateKey: mockAccountInvite2PrivKey,
   tempWalletRedeemed: false,
-  inviteCode: 'ESnrL7zNxmP0kjpklcNbCWJJgStYn3xM0dugHh7a9yQ=',
+  inviteCode: '5ZwS/rXqE9q8wGiijR1SGibjlGT6p7vMAfQ7g0DpL6Y=',
   inviteLink: 'http://celo.page.link/PARAMS',
 }
 
