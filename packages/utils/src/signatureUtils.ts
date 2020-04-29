@@ -146,7 +146,7 @@ export function parseSignatureWithoutPrefix(
     return { v, r, s }
   }
 
-  throw new Error('Unable to parse signature')
+  throw new Error(`Unable to parse signature (expected signer ${signer})`)
 }
 
 function parseSignatureAsVrs(signature: string) {
