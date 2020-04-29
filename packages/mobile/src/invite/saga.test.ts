@@ -7,7 +7,6 @@ import { throwError } from 'redux-saga-test-plan/providers'
 import { call } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { transferEscrowedPayment } from 'src/escrow/actions'
 import { generateShortInviteLink } from 'src/firebase/dynamicLinks'
 import { updateE164PhoneNumberAddresses } from 'src/identity/actions'
 import {
@@ -70,17 +69,10 @@ describe(watchSendInvite, () => {
       .provide([
         [call(waitWeb3LastBlock), true],
         [call(getConnectedUnlockedAccount), mockAccount],
-        [matchers.call.fn(waitForTransactionWithId), mockInviteDetails3.escrowTxId],
+        [matchers.call.fn(waitForTransactionWithId), 'a sha3 hash'],
       ])
       .withState(state)
-      .dispatch(
-        sendInvite(
-          mockInviteDetails3.e164Number,
-          InviteBy.SMS,
-          new BigNumber(mockInviteDetails3.escrowAmount),
-          mockInviteDetails3.escrowCurrency
-        )
-      )
+      .dispatch(sendInvite(mockInviteDetails3.e164Number, InviteBy.SMS))
       .dispatch(transactionConfirmed('a sha3 hash'))
       .put(
         transferStableToken({
@@ -89,14 +81,6 @@ describe(watchSendInvite, () => {
           comment: SENTINEL_INVITE_COMMENT,
           txId: 'a sha3 hash',
         })
-      )
-      .put(
-        transferEscrowedPayment(
-          '0x4f1ab32ca80add38c067f020202592cd0a2a9fb7a01cd538e731871ed6547e1a',
-          new BigNumber(mockInviteDetails3.escrowAmount),
-          mockAccount,
-          'a sha3 hash'
-        )
       )
       .put(storeInviteeData(mockInviteDetails3))
       .put(
@@ -115,17 +99,10 @@ describe(watchSendInvite, () => {
       .provide([
         [call(waitWeb3LastBlock), true],
         [call(getConnectedUnlockedAccount), mockAccount],
-        [matchers.call.fn(waitForTransactionWithId), mockInviteDetails3.escrowTxId],
+        [matchers.call.fn(waitForTransactionWithId), 'a sha3 hash'],
       ])
       .withState(state)
-      .dispatch(
-        sendInvite(
-          mockInviteDetails3.e164Number,
-          InviteBy.WhatsApp,
-          new BigNumber(mockInviteDetails3.escrowAmount),
-          mockInviteDetails3.escrowCurrency
-        )
-      )
+      .dispatch(sendInvite(mockInviteDetails3.e164Number, InviteBy.WhatsApp))
       .dispatch(transactionConfirmed('a sha3 hash'))
       .put(
         transferStableToken({
@@ -134,14 +111,6 @@ describe(watchSendInvite, () => {
           comment: SENTINEL_INVITE_COMMENT,
           txId: 'a sha3 hash',
         })
-      )
-      .put(
-        transferEscrowedPayment(
-          '0x4f1ab32ca80add38c067f020202592cd0a2a9fb7a01cd538e731871ed6547e1a',
-          new BigNumber(mockInviteDetails3.escrowAmount),
-          mockAccount,
-          'a sha3 hash'
-        )
       )
       .put(storeInviteeData(mockInviteDetails3))
       .run()

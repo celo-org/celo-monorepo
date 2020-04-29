@@ -271,16 +271,14 @@ function* doFetchSentPayments() {
     const addressToE164Number = yield select(addressToE164NumberSelector)
     const sentPayments: EscrowedPayment[] = []
     for (let i = 0; i < sentPaymentsRaw.length; i++) {
+      const id = sentPaymentIDs[i].toLowerCase() // OPEN QUESTION: why are we making this lowercase? seems inconsistent
       const address = sentPaymentIDs[i]
       const recipientPhoneNumber = addressToE164Number[address]
-      const id = sentPaymentIDs[i].toLowerCase() // OPEN QUESTION: why are we making this lowercase? seems inconsistent
       const payment = sentPaymentsRaw[i]
       if (!payment) {
         continue
       }
 
-      // OPEN QUESTION: EscrowedPayment and InviteDetails appear to store redundant data but invitee data is stored on send and escrow data is fetched from the smart contract.
-      // Should we consolidate into one data structure that we update when appropriate?
       const escrowPaymentWithRecipient: EscrowedPayment = {
         paymentID: id,
         senderAddress: payment[1],

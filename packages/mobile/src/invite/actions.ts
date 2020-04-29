@@ -17,16 +17,12 @@ export enum Actions {
 }
 
 export interface InviteDetails {
-  timestamp: string
   e164Number: string
   tempWalletAddress: string
   tempWalletPrivateKey: string
   tempWalletRedeemed: boolean
   inviteCode: string
-  escrowAmount: string | undefined
-  escrowCurrency: CURRENCY_ENUM | undefined
-  escrowTxId: string | undefined
-  escrowRedeemed: boolean
+  inviteLink: string
 }
 
 export enum InviteBy {

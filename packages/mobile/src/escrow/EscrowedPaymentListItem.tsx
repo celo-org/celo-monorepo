@@ -14,7 +14,7 @@ import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { inviteFriendsIcon } from 'src/images/Images'
 import { InviteDetails } from 'src/invite/actions'
-import { generateInviteLink, sendSms } from 'src/invite/saga'
+import { sendSms } from 'src/invite/saga'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
@@ -42,7 +42,7 @@ export class EscrowedPaymentListItem extends React.PureComponent<Props> {
     const { payment, t, invitees } = this.props
     const recipientPhoneNumber = payment.recipientPhone
     CeloAnalytics.track(CustomEventNames.clicked_escrowed_payment_send_message)
-    // TODO(Tarik): add a UI that allows user to choose between SMS and Whatsapp (currently only SMS) for reminder message
+
     try {
       const inviteDetails = invitees.find(
         (inviteeObj) => recipientPhoneNumber === inviteeObj.e164Number
@@ -52,12 +52,10 @@ export class EscrowedPaymentListItem extends React.PureComponent<Props> {
       if (!inviteDetails) {
         message = t('walletFlow5:escrowedPaymentReminderSmsNoData')
       } else {
-        const { inviteCode } = inviteDetails
-        // OPEN QUESTION: this function creates a unique link every time a reminder is sent. is this desirable?
-        const link = await generateInviteLink(inviteCode)
+        const { inviteCode, inviteLink } = inviteDetails
         message = t('walletFlow5:escrowedPaymentReminderSms', {
           code: inviteCode,
-          link,
+          link: inviteLink,
         })
       }
 

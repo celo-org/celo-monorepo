@@ -199,20 +199,13 @@ export function* sendInvite(
 
     // OPEN QUESTION - does storing invitee data only in the event of a successful transaction have
     // unintended consequences? Seems right to me but previous position was before the generateStandbyTransactionId call
-
-    // OPEN QUESTION: EscrowedPayment and InviteDetails appear to store redundant data but invitee data is stored on send and escrow data is fetched from the smart contract.
-    // Should we consolidate into one data structure that we update when appropriate?
     const inviteDetails: InviteDetails = {
-      timestamp: '1587621489078', // PLACEHOLDER - we probably want to read from the actual tx data for this
       e164Number,
       tempWalletAddress: temporaryAddress,
-      tempWalletPrivateKey: temporaryWalletAccount.privateKey, // what could we need this for?
+      tempWalletPrivateKey: temporaryWalletAccount.privateKey,
       tempWalletRedeemed: false, // no logic in place to toggle this yet
       inviteCode,
-      escrowAmount: amount ? amount.toString() : undefined, // this is not being read anywhere yet
-      escrowCurrency: currency, // this is not being read anywhere yet
-      escrowTxId, // the tx id we are saving is wrong (paymentId in sentEscrowedPayments is wrong too)
-      escrowRedeemed: false, // no logic in place to toggle this yet
+      inviteLink: link,
     }
 
     // Store the Temp Address locally so we know which transactions were invites

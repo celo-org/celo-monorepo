@@ -3,14 +3,10 @@ import BigNumber from 'bignumber.js'
 import { MinimalContact } from 'react-native-contacts'
 import { NotificationTypes, PaymentRequest, PaymentRequestStatus } from 'src/account/types'
 import { EscrowedPayment } from 'src/escrow/actions'
-import { CURRENCY_ENUM, SHORT_CURRENCIES } from 'src/geth/consts'
+import { SHORT_CURRENCIES } from 'src/geth/consts'
 import { AddressToE164NumberType, E164NumberToAddressType } from 'src/identity/reducer'
 import { AttestationCode } from 'src/identity/verification'
-import {
-  RecipientKind,
-  RecipientWithContact,
-  RecipientWithMobileNumber,
-} from 'src/recipients/recipient'
+import { RecipientKind, RecipientWithContact, RecipientWithMobileNumber } from 'src/recipients/recipient'
 
 export const mockName = 'John Doe'
 export const mockAccount = '0x0000000000000000000000000000000000007E57'
@@ -59,43 +55,31 @@ const mockAccountInvite2PrivKey =
   '0xb33eac631fd3a415f3738649db8cad57da78b99ec92cd8f77b76b5dae2ebdf27'
 
 export const mockInviteDetails = {
-  timestamp: '1587621489078',
   e164Number: mockE164NumberInvite,
   tempWalletAddress: mockAccountInvite,
   tempWalletPrivateKey: mockAccountInvitePrivKey,
   tempWalletRedeemed: false,
   inviteCode: '5ZwS/rXqE9q8wGiijR1SGibjlGT6p7vMAfQ7g0DpL6Y=',
-  escrowAmount: '1.75',
-  escrowCurrency: CURRENCY_ENUM.DOLLAR, // Only dollars can be escrowed
-  escrowTxId: '0xc722727f84b17146f524eccf6a7369039cf9de31f03baa8782c864bad4a9fe8e',
-  escrowRedeemed: false,
+  inviteLink: 'http://celo.page.link/PARAMS,
 }
 
 export const mockInviteDetails2 = {
-  timestamp: '1587773274055',
   e164Number: mockE164Number2Invite,
   tempWalletAddress: mockAccount2Invite,
   tempWalletPrivateKey: mockAccountInvite2PrivKey,
   tempWalletRedeemed: false,
   inviteCode: 'sz6sYx/TpBXzc4ZJ24ytV9p4uZ7JLNj3e3a12uLr3yc=',
-  escrowAmount: '100.12',
-  escrowCurrency: CURRENCY_ENUM.DOLLAR, // Only dollars can be escrowed
-  escrowTxId: '0xb027f61431cd296cd09f3e13e985259d5a18264b5457cde7752b8422a4683945',
-  escrowRedeemed: false,
+  inviteLink: 'http://celo.page.link/PARAMS',
 }
 
 // using the default mock values
 export const mockInviteDetails3 = {
-  timestamp: '1587621489078',
   e164Number: mockE164NumberInvite,
   tempWalletAddress: mockAccount,
   tempWalletPrivateKey: '0x1129eb2fbccdc663f4923a6495c35b096249812b589f7c4cd1dba01e1edaf724',
   tempWalletRedeemed: false,
   inviteCode: 'ESnrL7zNxmP0kjpklcNbCWJJgStYn3xM0dugHh7a9yQ=',
-  escrowAmount: '2.75',
-  escrowCurrency: CURRENCY_ENUM.DOLLAR,
-  escrowTxId: 'a sha3 hash',
-  escrowRedeemed: false,
+  inviteLink: 'http://celo.page.link/PARAMS',
 }
 
 const mockInvitableRecipient: RecipientWithContact = {
