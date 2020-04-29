@@ -83,6 +83,7 @@ gem install cocoapods
 gem install bundler
 # download the project dependencies
 bundle install
+# run inside mobile/ios
 bundle exec pod install
 ```
 
