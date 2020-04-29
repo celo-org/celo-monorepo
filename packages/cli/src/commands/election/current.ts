@@ -17,7 +17,7 @@ export default class ElectionCurrent extends BaseCommand {
 
   static flags = {
     ...BaseCommand.flagsWithoutLocalAddresses(),
-    current: flags.boolean({
+    valset: flags.boolean({
       description:
         'Show currently used signers from valset (by default the authorized validator signers are shown). Useful for checking if keys have been rotated.',
     }),
@@ -29,7 +29,7 @@ export default class ElectionCurrent extends BaseCommand {
     const election = await this.kit.contracts.getElection()
     const validators = await this.kit.contracts.getValidators()
     const signers = await election.getCurrentValidatorSigners()
-    if (res.flags.current) {
+    if (res.flags.valset) {
       const validatorList = await Promise.all(
         signers.map(async (addr) => {
           const v = await validators.getValidatorFromSigner(addr)
@@ -37,7 +37,7 @@ export default class ElectionCurrent extends BaseCommand {
         })
       )
       cli.action.stop()
-      cli.table(validatorList, validatorTable, { 'no-truncate': !res.flags.truncate })
+      cli.table(validatorList, otherValidatorTable, { 'no-truncate': !res.flags.truncate })
     } else {
       const validatorList = await Promise.all(
         signers.map((addr) => validators.getValidatorFromSigner(addr))
