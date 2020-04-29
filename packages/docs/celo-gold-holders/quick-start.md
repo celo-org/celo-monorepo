@@ -32,7 +32,7 @@ Please refer to the [Ledger Troubleshooting](ledger.md#troubleshooting) for issu
 
 In this guide, you will:
 
-* Install the Celo CLI
+* Install the Celo CLI (and optionally, a local node to connect to the network)
 * Access the `ReleaseGold` account associated with your address using your existing Ledger
 * Authorize a voting key, which you will hold on a new, second Ledger
 * Lock some of the Gold in your `ReleaseGold` account
@@ -48,7 +48,7 @@ You will need:
 
 As a first step, follow [these instructions](ledger.md) for both Ledgers to install the Ledger Celo app, obtain and verify the associated addresses, and (recommended) run a test transaction on the Alfajores test network.
 
-The remainder of this guide assumes you are using the first address available on each Ledger. You can add the flags described in the above instructions to use different addresses.
+The remainder of this guide assumes you are using the first address available on each Ledger. You can add the flags described in the above instructions to commands below to use different addresses.
 
 ## Deployment
 
@@ -61,18 +61,18 @@ If you haven't already, open a terminal window and install the Celo CLI:
 You will now need to point the Celo CLI to a node that is synchronized with the [Release Candidate](../getting-started/rc1.md) network. There are two options:
 
 * **Local Celo Blockchain node**: You can run a full node on your local machine which will communicate
-  with other nodes and cryptographically verify all data it receives. Since this approach does not require you to trust the network, it is most secure. To do this, follow the tutorial for [running a full node](../getting-started/running-a-full-node-in-rc1.md) and make sure to pass `--nousb`. Then run:
+  with other nodes and cryptographically verify all data it receives. Since this approach does not require you to trust the network, it is most secure. To do this, follow the tutorial for [running a full node](../getting-started/running-a-full-node-in-rc1.md) (and make sure to pass `--nousb`). Then run:
 
   ```bash
   celocli config:set --node http://localhost:8545
   ```
 
-* **cLabs-operated node**: cLabs operates a transaction node service called Forno. While this approach  
-  does not require you to deploy a node locally, it requires you to trust cLabs and the remote Forno nodes (in the same way you would trust a centralized web service). An attacker may be able to manipulate data returned to you from the service, which the CLI may rely on to complete operations.
+* **cLabs-operated node**: cLabs operates a transaction node service called Forno.
+While this approach does not require you to deploy a node locally, it requires you to trust cLabs and the remote Forno nodes (in the same way you would trust a centralized web service). An attacker may be able to manipulate data returned to you from the service, which the CLI may rely on to complete operations.
   To use Forno, run this command:
 
   ```bash
-  celocli config:set --node https://rc1-forno.celo-testnet.org:443
+  celocli config:set --node https://rc1-forno.celo-testnet.org
   ```
 
 ## Locate and verify your `ReleaseGold` contract address
@@ -101,11 +101,11 @@ celocli releasegold:show --contract $CELO_RG_ADDRESS
 
 You can find an explanation of these parameters on the [ReleaseGold](release-gold.md) page.
 
-If the configuration shows `canVote: true`, it makes sense to proceed with this guide.
-
 If any of these details appear to be incorrect, please contact cLabs, and do not proceed with the remainder of this guide.
 
-If you wish to access your `ReleaseGold` account and use it to participate in electing validator groups for Celo's Proof of Stake protocol, and potentially earn epoch rewards for doing so, please continue this guide. Otherwise, you're all set. You don't need to take any further action right now. You can come back and continue at any time.
+If the configuration shows `canVote: true`, your contract allows you to participate in electing validator groups for Celo's Proof of Stake protocol, and potentially earn epoch rewards for doing so. Please continue to follow the remainder of this guide (or you can come back and continue at any time).
+
+Otherwise, you're all set. You don't need to take any further action right now.
 
 ## Authorize Vote Signer Keys
 
