@@ -87,19 +87,26 @@ If you have more than one beneficiary address, you'll want to step through this 
 
 If you cannot locate your address in these mappings, please contact cLabs.
 
-Record the value for your records, and also store it in an environment variable:
+Record the `Beneficiary` and ContractAddress` values in environment variable:
 
 ```bash
-export CELO_RG_ADDRESS=<YOUR-CELO-RG-ADDRESS>
+export CELO_BENEFICIARY_ADDRESS=<YOUR-CELO-BENEFICIARY-ADDRESS>
+export CELO_RG_ADDRESS=<YOUR-CELO-RELEASEGOLD-ADDRESS>
 ```
 
-Next check the configuration, balance, and beneficiary of your `ReleaseGold` contract:
+You should find your beneficiary account has already got a very small Celo Gold balance to pay for transaction fees (values are shown in wei, so For example, 1 cGLD = 1000000000000000000):
+
+```bash
+celocli account:balance $CELO_BENEFICIARY_ADDRESS
+```
+
+Next, check the details of your `ReleaseGold` contract:
 
 ```bash
 celocli releasegold:show --contract $CELO_RG_ADDRESS
 ```
 
-You can find an explanation of these parameters on the [ReleaseGold](release-gold.md) page.
+Verify the configuration, balance, and beneficiary details. You can find an explanation of these parameters on the [ReleaseGold](release-gold.md) page.
 
 If any of these details appear to be incorrect, please contact cLabs, and do not proceed with the remainder of this guide.
 
@@ -124,7 +131,7 @@ First obtain your vote signer address:
 celocli account:list --useLedger
 ```
 
-Create an environment variable for your vote signer address.
+Your address is listed under `Ledger Addresses`. Create an environment variable for your vote signer address.
 
 ```bash
 export CELO_VOTE_SIGNER_ADDRESS=<YOUR-VOTE-SIGNER-ADDRESS>
@@ -134,10 +141,10 @@ Then create the proof of possession:
 
 ```bash
 # Using the Vote Signer Ledger
-celocli account proof-of-possession --signer $CELO_VOTE_SIGNER_ADDRESS --account $CELO_RG_ADDRESS --useLedger
+celocli account:proof-of-possession --signer $CELO_VOTE_SIGNER_ADDRESS --account $CELO_RG_ADDRESS --useLedger
 ```
 
-The Ledger `Celo app` will ask you to confirm the transaction. Toggle right on the device until you see `Approve` on screen. Press both buttons at the same time to confirm.
+The Ledger `Celo app` will ask you to confirm the transaction. Toggle right on the device until you see `Sign Message` on screen. Press both buttons at the same time to confirm.
 
 Take note of the signature produced by the `proof-of-possession` command and create an environment variable for it.
 
@@ -157,6 +164,8 @@ Next, designate the `ReleaseGold` contract as a “Locked Gold” account:
 # Using the Beneficiary Ledger
 celocli releasegold:create-account --contract $CELO_RG_ADDRESS --useLedger
 ```
+
+You'll need to press right on the Ledger several times to review details of the transactions, then when the device says "Accept and send" press both buttons together. 
 
 Check that the `ReleaseGold` contract address is associated with a registered Locked Gold Account:
 
@@ -191,7 +200,7 @@ Make sure to leave at least 1 Celo Gold unlocked to pay for transaction fees.
 
 ```bash
 # Using the Beneficiary Ledger
-celocli releasegold:locked-gold --contract $CELO_RG_ADDRESS --action lock --value <CELO-GOLD-AMOUNT> --useLedger
+celocli releasegold:locked-gold --contract $CELO_RG_ADDRESS --action lock  --useLedger --value <CELO-GOLD-AMOUNT>
 ```
 
 Check that your Celo Gold was successfully locked.
@@ -228,7 +237,7 @@ For each vote you will need to specify the amount of locked Celo Gold you wish t
 
 ```bash
 # Using the Vote Signer Ledger
-celocli election:vote --from $CELO_VOTE_SIGNER_ADDRESS --for $CELO_VALIDATOR_GROUP_ADDRESS --value <CELO-GOLD-AMOUNT> --useLedger
+celocli election:vote --from $CELO_VOTE_SIGNER_ADDRESS --for $CELO_VALIDATOR_GROUP_ADDRESS --useLedger --value <CELO-GOLD-AMOUNT>
 ```
 
 Verify that your votes were cast successfully. Since your Vote Signer account votes on behalf of the Celo Locked Gold account, you want to check the election status for that account:
