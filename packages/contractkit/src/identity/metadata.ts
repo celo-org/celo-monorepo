@@ -49,15 +49,24 @@ export class IdentityMetadataWrapper {
   }
 
   static async verifySigner(kit: ContractKit, hash: any, signature: any, metadata: any) {
+    return this.verifySignerForAddress(kit, hash, signature, metadata.address)
+  }
+
+  static async verifySignerForAddress(
+    kit: ContractKit,
+    hash: any,
+    signature: any,
+    address: string
+  ) {
     // First try to verify on account's address
-    if (!verifySignature(hash, signature, metadata.address)) {
+    if (!verifySignature(hash, signature, address)) {
       // If this fails, signature may still be one of `address`' signers
       const accounts = await kit.contracts.getAccounts()
-      if (await accounts.isAccount(metadata.address)) {
+      if (await accounts.isAccount(address)) {
         const signers = await Promise.all([
-          accounts.getVoteSigner(metadata.address),
-          accounts.getValidatorSigner(metadata.address),
-          accounts.getAttestationSigner(metadata.address),
+          accounts.getVoteSigner(address),
+          accounts.getValidatorSigner(address),
+          accounts.getAttestationSigner(address),
         ])
         return signers.some((signer) => verifySignature(hash, signature, signer))
       }
