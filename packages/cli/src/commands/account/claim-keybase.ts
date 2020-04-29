@@ -1,7 +1,6 @@
-import { hashOfClaim } from '@celo/contractkit/lib/identity/claims/claim'
+import { hashOfClaim, KeybaseClaim } from '@celo/contractkit/lib/identity/claims/claim'
 import {
   createKeybaseClaim,
-  KeybaseClaim,
   keybaseFilePathToProof,
   proofFileName,
   targetURL,
