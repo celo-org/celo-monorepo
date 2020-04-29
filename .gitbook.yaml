@@ -5,3 +5,4 @@ redirects:
   operations-manual/key-management/ledger: operations-manual/key-management/ledger.md
   operations-manual/summary/ledger: operations-manual/key-management/ledger.md
   operations-manual/using-a-ledger-wallet: operations-manual/key-management/ledger.md
+  getting-started/running-a-full-node.md: getting-started/running-a-full-node-in-baklava.md

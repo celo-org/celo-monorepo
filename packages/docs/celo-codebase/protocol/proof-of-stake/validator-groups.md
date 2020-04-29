@@ -1,6 +1,6 @@
 # Validator Groups
 
-Celo's Proof of Stake mechanism introduces the concept of **Validator Groups** as intermediaries between voters and validators.
+Celo's proof-of-stake mechanism introduces the concept of **Validator Groups** as intermediaries between voters and validators.
 
 ## Overview
 
@@ -36,7 +36,7 @@ This means that while a group can unilaterally remove a validator, and a validat
 
 ## Votes and Voting Cap
 
-Validator Groups can receive votes from Locked Gold up to a [voting cap](validator-elections.md#voting-cap). This value is set to be the number of votes that would be needed to elect all of its validators, plus one more validator. The cap is enforced at the point of voting: a user can only cast a vote for a group if it currently has fewer votes than this cap.
+Validator Groups can receive votes from Locked Gold up to a [voting cap](validator-elections.md#group-voting-caps). This value is set to be the number of votes that would be needed to elect all of its validators, plus one more validator. The cap is enforced at the point of voting: a user can only cast a vote for a group if it currently has fewer votes than this cap.
 
 ## Slashing Penalty
 

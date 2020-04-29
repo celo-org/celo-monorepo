@@ -266,7 +266,7 @@ describe('AzureHSMWallet class', () => {
           let celoTransaction: Tx
           const knownKey: string = AZURE_KEY_NAME!
           let knownAddress: Address
-          const otherAddress: string = ACCOUNT_ADDRESS1
+          const otherAddress: string = ACCOUNT_ADDRESS2
 
           beforeEach(async () => {
             knownAddress = await wallet.getAddressFromKeyName(knownKey)
@@ -278,7 +278,7 @@ describe('AzureHSMWallet class', () => {
               nonce: 0,
               gas: '10',
               gasPrice: '99',
-              feeCurrency: '0x124356',
+              feeCurrency: '0x',
               gatewayFeeRecipient: '0x1234',
               gatewayFee: '0x5678',
               data: '0xabcdef',
@@ -293,6 +293,33 @@ describe('AzureHSMWallet class', () => {
 
             test('with same signer', async () => {
               const signedTx: EncodedTransaction = await wallet.signTransaction(celoTransaction)
+              const [, recoveredSigner] = recoverTransaction(signedTx.raw)
+              expect(normalizeAddressWith0x(recoveredSigner)).toBe(
+                normalizeAddressWith0x(knownAddress)
+              )
+            })
+
+            // https://github.com/ethereum/go-ethereum/blob/38aab0aa831594f31d02c9f02bfacc0bef48405d/rlp/decode.go#L664
+            test('signature with 0x00 prefix is canonicalized', async () => {
+              // This tx is carefully constructed to produce an S value with the first byte as 0x00
+              const celoTransactionZeroPrefix = {
+                from: await wallet.getAddressFromKeyName(knownKey),
+                to: ACCOUNT_ADDRESS2,
+                chainId: CHAIN_ID,
+                value: Web3.utils.toWei('1', 'ether'),
+                nonce: 65,
+                gas: '10',
+                gasPrice: '99',
+                feeCurrency: '0x',
+                gatewayFeeRecipient: '0x1234',
+                gatewayFee: '0x5678',
+                data: '0xabcdef',
+              }
+
+              const signedTx: EncodedTransaction = await wallet.signTransaction(
+                celoTransactionZeroPrefix
+              )
+              expect(signedTx.tx.s.startsWith('0x00')).toBeFalsy()
               const [, recoveredSigner] = recoverTransaction(signedTx.raw)
               expect(normalizeAddressWith0x(recoveredSigner)).toBe(
                 normalizeAddressWith0x(knownAddress)
