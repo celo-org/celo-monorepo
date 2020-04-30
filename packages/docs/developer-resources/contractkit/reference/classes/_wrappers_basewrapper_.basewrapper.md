@@ -28,6 +28,8 @@ Base ContractWrapper
 
   ↳ [ExchangeWrapper](_wrappers_exchange_.exchangewrapper.md)
 
+  ↳ [FreezerWrapper](_wrappers_freezer_.freezerwrapper.md)
+
   ↳ [GasPriceMinimumWrapper](_wrappers_gaspriceminimum_.gaspriceminimumwrapper.md)
 
   ↳ [GoldTokenWrapper](_wrappers_goldtokenwrapper_.goldtokenwrapper.md)

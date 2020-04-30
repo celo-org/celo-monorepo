@@ -1,4 +1,5 @@
-import { computeBlindedSignature } from '../src/bls/bls-signature'
+import { authenticateUser, isVerified } from '../src/common/identity'
+import { BLSCryptographyClient } from '../src/bls/bls-cryptography-client'
 import {
   getDidMatchmaking,
   incrementQueryCount,
@@ -6,23 +7,21 @@ import {
 } from '../src/database/wrappers/account'
 import { getNumberPairContacts, setNumberPairContacts } from '../src/database/wrappers/number-pairs'
 import { getBlindedSalt, getContactMatches } from '../src/index'
+import { getRemainingQueryCount } from '../src/salt-generation/query-quota'
 
 const BLS_SIGNATURE = '6546544323114343'
 
-jest.mock('../src/common/identity', () => ({
-  authenticateUser: jest.fn().mockReturnValue(true),
-}))
+jest.mock('../src/common/identity')
+const mockAuthenticateUser = authenticateUser as jest.Mock
+mockAuthenticateUser.mockReturnValue(true)
+const mockIsVerified = isVerified as jest.Mock
 
-let mockGetRemainingQueryCount = jest.fn()
-jest.mock('../src/salt-generation/query-quota', () => {
-  return jest.fn().mockImplementation(() => {
-    return { getRemainingQueryCount: mockGetRemainingQueryCount }
-  })
-})
+jest.mock('../src/salt-generation/query-quota')
+const mockGetRemainingQueryCount = getRemainingQueryCount as jest.Mock
 
-jest.mock('../src/bls/bls-signature')
-const mockComputeBlindedSignature = computeBlindedSignature as jest.Mock
-mockComputeBlindedSignature.mockReturnValue(BLS_SIGNATURE)
+jest.mock('../src/bls/bls-cryptography-client')
+const mockComputeBlindedSignature = BLSCryptographyClient.computeBlindedSignature as jest.Mock
+mockComputeBlindedSignature.mockResolvedValue(BLS_SIGNATURE)
 
 jest.mock('../src/database/wrappers/account')
 const mockIncrementQueryCount = incrementQueryCount as jest.Mock
@@ -53,6 +52,7 @@ describe(`POST /getBlindedMessageSignature endpoint`, () => {
     const req = { body: mockRequestData }
 
     it('provides signature', () => {
+      mockGetRemainingQueryCount.mockReturnValue(10)
       const res = {
         json(body: any) {
           expect(body.success).toEqual(true)
@@ -63,7 +63,7 @@ describe(`POST /getBlindedMessageSignature endpoint`, () => {
       getBlindedSalt(req, res)
     })
     it('returns 403 on query count 0', () => {
-      mockGetRemainingQueryCount = jest.fn(() => 0)
+      mockGetRemainingQueryCount.mockReturnValue(0)
       const res = {
         json() {
           return {}
@@ -78,7 +78,7 @@ describe(`POST /getBlindedMessageSignature endpoint`, () => {
       getBlindedSalt(req, res)
     })
     it('returns 500 on bls error', () => {
-      mockGetRemainingQueryCount = jest.fn()
+      mockGetRemainingQueryCount.mockReturnValue(10)
       mockComputeBlindedSignature.mockImplementation(() => {
         throw Error()
       })
@@ -134,6 +134,7 @@ describe(`POST /getContactMatches endpoint`, () => {
     const req = { body: mockRequestData }
     it('provides matches', () => {
       mockGetNumberPairContacts.mockReturnValue(contactPhoneNumbers)
+      mockIsVerified.mockReturnValue(true)
       const expected = [{ phoneNumber: contactPhoneNumber1 }]
       const res = {
         json(body: any) {
@@ -146,6 +147,7 @@ describe(`POST /getContactMatches endpoint`, () => {
     })
     it('provides matches empty array', () => {
       mockGetNumberPairContacts.mockReturnValue([])
+      mockIsVerified.mockReturnValue(true)
       const res = {
         json(body: any) {
           expect(body.success).toEqual(true)
@@ -157,6 +159,7 @@ describe(`POST /getContactMatches endpoint`, () => {
     })
     it('rejects more than one attempt to matchmake with 403', () => {
       mockGetDidMatchmaking.mockReturnValue(true)
+      mockIsVerified.mockReturnValue(true)
       const res = {
         status(status: any) {
           expect(status).toEqual(403)

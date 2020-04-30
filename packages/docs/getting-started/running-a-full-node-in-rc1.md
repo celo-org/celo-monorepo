@@ -1,11 +1,16 @@
 # Running a Full Node
 
-This section explains how to get a full node running on the [Baklava Network](baklava-testnet.md) and Baklava Network, using a Docker image that was built for this purpose.
+This section explains how to get a full node running on the [Release Candidate 1 Network](rc1.md), using a Docker image that was built for this purpose.
 
-Full nodes play a special purpose in the Celo ecosystem, acting as a bridge between the mobile wallets \(running as light clients\) and the validator nodes. To make sure that full nodes are rewarded for this service, the Celo protocol includes [full node incentives](../protocol/transactions/full-node-incentives.md).
-When a light client sends transactions, they will include specify a gateway fee to be paid to the node that gossips transactions to the other full nodes and validators.
+Full nodes play a special purpose in the Celo ecosystem, acting as a bridge between the mobile wallets \(running as light clients\) and the validator nodes. To make sure that full nodes are rewarded for this service, the Celo protocol includes [full node incentives](../celo-codebase/protocol/transactions/full-node-incentives.md).
+
+When a light client sends transactions, they may include a gateway fee to be paid to the node that gossips transactions to the other full nodes and validators.
 
 For this reason, despite the fact that Celo uses a proof-of-stake protocol, users can earn cryptocurrency without first having to own any, simply by running a full node.
+
+{% hint style="warning" %}
+Full node incentives have not been enabled yet because the mechanism for negotiating a gateway fee is still under development. Currently, light clients are configured to send a gateway fee of 0 and full nodes are set to accept a minimum gateway fee of 0.
+{% endhint %}
 
 ## Prerequisites
 
@@ -19,11 +24,11 @@ When you see text in angle brackets &lt;&gt;, replace them and the text inside w
 
 ## Celo Networks
 
-First we are going to setup the environment variables required for `Baklava` network. Run:
+First we are going to setup the environment variables required for the `RC1` network. Run:
 
 ```bash
-export CELO_IMAGE=us.gcr.io/celo-testnet/celo-node:baklava
-export NETWORK_ID=40120
+export CELO_IMAGE=us.gcr.io/celo-testnet/celo-node:rc1
+export NETWORK_ID=42220
 ```
 
 ## Pull the Celo Docker image
@@ -55,7 +60,7 @@ Run the command to create a new account:
 docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE account new
 ```
 
-It will prompt you for a passphrase, ask you to confirm it, and then will output your account address: `Address: {<YOUR-ACCOUNT-ADDRESS>}`
+It will prompt you for a passphrase, ask you to confirm it, and then will output your account address: `Public address of the key: <YOUR-ACCOUNT-ADDRESS>`
 
 Save this address to an environment variables, so that you can reference it below (don't include the braces):
 
@@ -69,10 +74,10 @@ This environment variable will only persist while you have this terminal window 
 
 ## Configure the node
 
-The genesis block is the first block in the chain, and is specific to each network. This command gets the `genesis.json` file for baklava and uses it to initialize your nodes' data directory.
+The genesis block is the first block in the chain, and is specific to each network. This command gets the `genesis.json` file for RC1 and uses it to initialize your nodes' data directory.
 
 ```bash
-docker run -v $PWD:/root/.celo --rm $CELO_IMAGE init /celo/genesis.json
+docker run --rm -it -v $PWD:/root/.celo $CELO_IMAGE init /celo/genesis.json
 ```
 
 In order to allow the node to sync with the network, get the enode URLs of the bootnodes:
@@ -89,7 +94,7 @@ This command specifies the settings needed to run the node, and gets it started.
 docker run --name celo-fullnode -d --restart unless-stopped -p 127.0.0.1:8545:8545 -p 127.0.0.1:8546:8546 -p 30303:30303 -p 30303:30303/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --rpc --rpcaddr 0.0.0.0 --rpcapi eth,net,web3,debug,admin,personal --light.serve 90 --light.maxpeers 1000 --maxpeers 1100 --etherbase $CELO_ACCOUNT_ADDRESS --bootnodes $BOOTNODE_ENODES --nousb
 ```
 
-You'll start seeing some output. After a few minutes, you should see lines that look like this. This means your node has synced with the network and is receiving blocks.
+You'll start seeing some output. After a few minutes, you should see lines that look like this. This means your node has started syncing with the network and is receiving blocks.
 
 ```text
 INFO [07-16|14:04:24.924] Imported new chain segment               blocks=139  txs=319 mgas=61.987 elapsed=8.085s mgasps=7.666 number=406  hash=9acf16…4fddc8 age=6h58m44s cache=1.51mB
@@ -99,11 +104,23 @@ INFO [07-16|14:04:48.941] Imported new chain segment               blocks=335  t
 INFO [07-16|14:04:56.944] Imported new chain segment               blocks=472  txs=0   mgas=0.000  elapsed=8.003s mgasps=0.000 number=1927 hash=4f1010…1414c1 age=4h52m31s cache=2.34mB
 ```
 
-You will have fully synced with the network once you have pulled the latest block number, which you can lookup by visiting at the [Baklava Testnet Stats](https://baklava-celostats.celo-testnet.org/) or [Baklava Network Explorer]](https://baklava-blockscout.celo-testnet.org/) pages.
+You will have fully synced with the network once you have pulled the latest block number, which you can lookup by visiting the [Network Stats](https://stats.celo.org) or [Block Explorer]](https://explorer.celo.org/) pages.
 
 {% hint style="danger" %}
 **Security**: The command line above includes the parameter `--rpcaddr 0.0.0.0` which makes the Celo Blockchain software listen for incoming RPC requests on all network adaptors. Exercise extreme caution in doing this when running outside Docker, as it means that any unlocked accounts and their funds may be accessed from other machines on the Internet. In the context of running a Docker container on your local machine, this together with the `docker -p` flags allows you to make RPC calls from outside the container, i.e from your local host, but not from outside your machine. Read more about [Docker Networking](https://docs.docker.com/network/network-tutorial-standalone/#use-user-defined-bridge-networks) here.
 {% endhint %}
+
+## Command Line Interface
+
+Once the full node is running, it can serve the [Command Line Interface](../command-line-interface/introduction.md) tool `celocli`. For example:
+```bash
+$ npm install -g @celo/celocli
+...
+$ celocli node:synced
+true
+$ celocli account:new
+...
+```
 
 ## Light Client Serving
 
