@@ -98,6 +98,5 @@ if (DEV_MODE) {
       numberAttestationsRequired: functionConfig.attestations.number_attestations_required,
     },
   }
-  logger.debug('Using function config: ', { ...config, salt: { ...config.salt, key: 'mockKey' } })
 }
 export default config
