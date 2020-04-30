@@ -28,6 +28,8 @@ type Props = OwnProps & WithTranslation
 
 const TAG = 'EscrowedPaymentListItem'
 
+const testID = 'EscrowedPaymentListItem'
+
 export class EscrowedPaymentListItem extends React.PureComponent<Props> {
   onRemind = async () => {
     const { payment, t, invitees } = this.props
@@ -110,6 +112,7 @@ export class EscrowedPaymentListItem extends React.PureComponent<Props> {
           }
           icon={<Image source={inviteFriendsIcon} style={styles.image} resizeMode="contain" />}
           ctas={this.getCTA()}
+          testID={testID}
         >
           <Text style={fontStyles.bodySmall}>{payment.message || t('defaultComment')}</Text>
         </BaseNotification>

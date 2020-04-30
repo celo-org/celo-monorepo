@@ -400,6 +400,7 @@ exports[`NotificationBox renders correctly for with all notifications 1`] = `
                       onResponderTerminate={[Function]}
                       onResponderTerminationRequest={[Function]}
                       onStartShouldSetResponder={[Function]}
+                      testID="undefined/backupKeyFlow6:getBackupKey/Button"
                     >
                       <Text
                         style={
@@ -566,6 +567,7 @@ exports[`NotificationBox renders correctly for with all notifications 1`] = `
                       onResponderTerminate={[Function]}
                       onResponderTerminationRequest={[Function]}
                       onStartShouldSetResponder={[Function]}
+                      testID="undefined/nuxVerification2:notification.cta/Button"
                     >
                       <Text
                         style={
@@ -602,6 +604,7 @@ exports[`NotificationBox renders correctly for with all notifications 1`] = `
                       onResponderTerminate={[Function]}
                       onResponderTerminationRequest={[Function]}
                       onStartShouldSetResponder={[Function]}
+                      testID="undefined/maybeLater/Button"
                     >
                       <Text
                         style={
@@ -768,6 +771,7 @@ exports[`NotificationBox renders correctly for with all notifications 1`] = `
                       onResponderTerminate={[Function]}
                       onResponderTerminationRequest={[Function]}
                       onStartShouldSetResponder={[Function]}
+                      testID="undefined/exchange/Button"
                     >
                       <Text
                         style={
@@ -804,6 +808,7 @@ exports[`NotificationBox renders correctly for with all notifications 1`] = `
                       onResponderTerminate={[Function]}
                       onResponderTerminationRequest={[Function]}
                       onStartShouldSetResponder={[Function]}
+                      testID="undefined/maybeLater/Button"
                     >
                       <Text
                         style={
@@ -970,6 +975,7 @@ exports[`NotificationBox renders correctly for with all notifications 1`] = `
                       onResponderTerminate={[Function]}
                       onResponderTerminationRequest={[Function]}
                       onStartShouldSetResponder={[Function]}
+                      testID="undefined/global:inviteFriends/Button"
                     >
                       <Text
                         style={
@@ -1006,6 +1012,7 @@ exports[`NotificationBox renders correctly for with all notifications 1`] = `
                       onResponderTerminate={[Function]}
                       onResponderTerminationRequest={[Function]}
                       onStartShouldSetResponder={[Function]}
+                      testID="undefined/maybeLater/Button"
                     >
                       <Text
                         style={

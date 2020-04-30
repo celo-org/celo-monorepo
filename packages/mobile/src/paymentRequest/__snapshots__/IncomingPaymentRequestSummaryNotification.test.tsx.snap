@@ -400,6 +400,7 @@ exports[`IncomingPaymentRequestSummaryNotification when more 1 requests renders 
                   onResponderTerminate={[Function]}
                   onResponderTerminationRequest={[Function]}
                   onStartShouldSetResponder={[Function]}
+                  testID="IncomingPaymentRequestNotification/FAKE_ID_1/global:pay/Button"
                 >
                   <Text
                     style={
@@ -436,6 +437,7 @@ exports[`IncomingPaymentRequestSummaryNotification when more 1 requests renders 
                   onResponderTerminate={[Function]}
                   onResponderTerminationRequest={[Function]}
                   onStartShouldSetResponder={[Function]}
+                  testID="IncomingPaymentRequestNotification/FAKE_ID_1/global:decline/Button"
                 >
                   <Text
                     style={

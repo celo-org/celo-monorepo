@@ -386,6 +386,7 @@ exports[`OutgoingPaymentRequestSummaryNotification when more 1 requests renders 
                   onResponderTerminate={[Function]}
                   onResponderTerminationRequest={[Function]}
                   onStartShouldSetResponder={[Function]}
+                  testID="OutgoingPaymentRequestNotification/FAKE_ID_1/global:remind/Button"
                 >
                   <Text
                     style={
@@ -422,6 +423,7 @@ exports[`OutgoingPaymentRequestSummaryNotification when more 1 requests renders 
                   onResponderTerminate={[Function]}
                   onResponderTerminationRequest={[Function]}
                   onStartShouldSetResponder={[Function]}
+                  testID="OutgoingPaymentRequestNotification/FAKE_ID_1/global:cancel/Button"
                 >
                   <Text
                     style={

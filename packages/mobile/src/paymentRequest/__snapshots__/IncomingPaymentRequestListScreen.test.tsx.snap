@@ -245,6 +245,7 @@ exports[`IncomingPaymentRequestListScreen renders correctly with requests 1`] = 
                           onResponderTerminate={[Function]}
                           onResponderTerminationRequest={[Function]}
                           onStartShouldSetResponder={[Function]}
+                          testID="IncomingPaymentRequestNotification/7363bvby2ba8270273/global:pay/Button"
                         >
                           <Text
                             style={
@@ -281,6 +282,7 @@ exports[`IncomingPaymentRequestListScreen renders correctly with requests 1`] = 
                           onResponderTerminate={[Function]}
                           onResponderTerminationRequest={[Function]}
                           onStartShouldSetResponder={[Function]}
+                          testID="IncomingPaymentRequestNotification/7363bvby2ba8270273/global:decline/Button"
                         >
                           <Text
                             style={
@@ -505,6 +507,7 @@ exports[`IncomingPaymentRequestListScreen renders correctly with requests 1`] = 
                           onResponderTerminate={[Function]}
                           onResponderTerminationRequest={[Function]}
                           onStartShouldSetResponder={[Function]}
+                          testID="IncomingPaymentRequestNotification/7363bvby2ba8270273/global:pay/Button"
                         >
                           <Text
                             style={
@@ -541,6 +544,7 @@ exports[`IncomingPaymentRequestListScreen renders correctly with requests 1`] = 
                           onResponderTerminate={[Function]}
                           onResponderTerminationRequest={[Function]}
                           onStartShouldSetResponder={[Function]}
+                          testID="IncomingPaymentRequestNotification/7363bvby2ba8270273/global:decline/Button"
                         >
                           <Text
                             style={
@@ -765,6 +769,7 @@ exports[`IncomingPaymentRequestListScreen renders correctly with requests 1`] = 
                           onResponderTerminate={[Function]}
                           onResponderTerminationRequest={[Function]}
                           onStartShouldSetResponder={[Function]}
+                          testID="IncomingPaymentRequestNotification/7363bvby2ba8270273/global:pay/Button"
                         >
                           <Text
                             style={
@@ -801,6 +806,7 @@ exports[`IncomingPaymentRequestListScreen renders correctly with requests 1`] = 
                           onResponderTerminate={[Function]}
                           onResponderTerminationRequest={[Function]}
                           onStartShouldSetResponder={[Function]}
+                          testID="IncomingPaymentRequestNotification/7363bvby2ba8270273/global:decline/Button"
                         >
                           <Text
                             style={

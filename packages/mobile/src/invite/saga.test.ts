@@ -1,6 +1,7 @@
 import BigNumber from 'bignumber.js'
-import { Linking } from 'react-native'
+import { Linking, Platform } from 'react-native'
 import SendIntentAndroid from 'react-native-send-intent'
+import SendSMS from 'react-native-sms'
 import { expectSaga } from 'redux-saga-test-plan'
 import * as matchers from 'redux-saga-test-plan/matchers'
 import { throwError } from 'redux-saga-test-plan/providers'
@@ -56,6 +57,7 @@ jest.mock('src/transactions/send', () => ({
 jest.mock('@celo/contractkit')
 
 SendIntentAndroid.sendSms = jest.fn()
+SendSMS.send = jest.fn()
 
 const state = createMockStore({ web3: { account: mockAccount } }).getState()
 
@@ -67,7 +69,8 @@ describe(watchSendInvite, () => {
   const dateNowStub = jest.fn(() => 1588200517518)
   global.Date.now = dateNowStub
 
-  it('sends an SMS invite as expected', async () => {
+  it('sends an SMS invite on Android as expected', async () => {
+    Platform.OS = 'android'
     await expectSaga(watchSendInvite)
       .provide([
         [call(waitWeb3LastBlock), true],
@@ -97,7 +100,64 @@ describe(watchSendInvite, () => {
     expect(SendIntentAndroid.sendSms).toHaveBeenCalled()
   })
 
-  it('sends a WhatsApp invite as expected', async () => {
+  it('sends an SMS invite on iOS as expected', async () => {
+    Platform.OS = 'ios'
+    await expectSaga(watchSendInvite)
+      .provide([
+        [call(waitWeb3LastBlock), true],
+        [call(getConnectedUnlockedAccount), mockAccount],
+        [matchers.call.fn(waitForTransactionWithId), 'a sha3 hash'],
+      ])
+      .withState(state)
+      .dispatch(sendInvite(mockInviteDetails.e164Number, InviteBy.SMS))
+      .dispatch(transactionConfirmed('a sha3 hash'))
+      .put(
+        transferStableToken({
+          recipientAddress: mockAccount,
+          amount: '0.25',
+          comment: SENTINEL_INVITE_COMMENT,
+          txId: 'a sha3 hash',
+        })
+      )
+      .put(storeInviteeData(mockInviteDetails))
+      .put(
+        updateE164PhoneNumberAddresses(
+          { [mockInviteDetails.e164Number]: null }, // address is null when unverified
+          { [mockAccount]: mockInviteDetails.e164Number }
+        )
+      )
+      .run()
+
+    expect(SendSMS.send).toHaveBeenCalled()
+  })
+
+  it('sends a WhatsApp invite on Android as expected', async () => {
+    Platform.OS = 'android'
+    await expectSaga(watchSendInvite)
+      .provide([
+        [call(waitWeb3LastBlock), true],
+        [call(getConnectedUnlockedAccount), mockAccount],
+        [matchers.call.fn(waitForTransactionWithId), 'a sha3 hash'],
+      ])
+      .withState(state)
+      .dispatch(sendInvite(mockInviteDetails.e164Number, InviteBy.WhatsApp))
+      .dispatch(transactionConfirmed('a sha3 hash'))
+      .put(
+        transferStableToken({
+          recipientAddress: mockAccount,
+          amount: '0.25',
+          comment: SENTINEL_INVITE_COMMENT,
+          txId: 'a sha3 hash',
+        })
+      )
+      .put(storeInviteeData(mockInviteDetails))
+      .run()
+
+    expect(Linking.openURL).toHaveBeenCalled()
+  })
+
+  it('sends a WhatsApp invite on iOS as expected', async () => {
+    Platform.OS = 'ios'
     await expectSaga(watchSendInvite)
       .provide([
         [call(waitWeb3LastBlock), true],

@@ -199,6 +199,7 @@ Array [
                   onResponderTerminate={[Function]}
                   onResponderTerminationRequest={[Function]}
                   onStartShouldSetResponder={[Function]}
+                  testID="IncomingPaymentRequestNotification/1/global:pay/Button"
                 >
                   <Text
                     style={
@@ -235,6 +236,7 @@ Array [
                   onResponderTerminate={[Function]}
                   onResponderTerminationRequest={[Function]}
                   onStartShouldSetResponder={[Function]}
+                  testID="IncomingPaymentRequestNotification/1/global:decline/Button"
                 >
                   <Text
                     style={
