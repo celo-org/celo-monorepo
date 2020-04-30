@@ -1,4 +1,4 @@
-import { enterPin, skipTo, sleep } from './utils'
+import { skipTo, sleep } from './utils'
 
 const ENABLE_CONTACT_IMPORT = false
 
@@ -29,8 +29,8 @@ async function bannerDismiss(inElement, tapElement) {
 
 describe('Transfer Works', () => {
   beforeEach(async () => {
-    bannerDismiss(by.id('errorBanner'))
-    bannerDismiss(by.id('SmartTopAlertButton'))
+    await bannerDismiss(by.id('errorBanner'))
+    await bannerDismiss(by.id('SmartTopAlertButton'))
   })
 
   it('NUX->Language', async () => {
@@ -53,10 +53,17 @@ describe('Transfer Works', () => {
     await element(by.id('JoinCeloContinueButton')).tap()
   })
 
+  it('NUX-Terms', async () => {
+    await element(by.id('scrollView')).scrollTo('bottom')
+    expect(element(by.id('AcceptTermsButton'))).toBeVisible()
+    await element(by.id('AcceptTermsButton')).tap()
+  })
+
   it('NUX->Pin', async () => {
     await expect(element(by.id('SystemAuthTitle'))).toBeVisible()
     await expect(element(by.id('SystemAuthContinue'))).toBeVisible()
-    enterPin()
+
+    // TODO: enter pin using custom keypad
 
     await element(by.id('SystemAuthContinue')).tap()
   })
@@ -91,28 +98,6 @@ describe('Transfer Works', () => {
 
     // waits for import to finish
     await sleep(10000)
-  })
-
-  it.skip('NUX->ImportContacts', async () => {
-    await device.launchApp({ permissions: { contacts: 'YES' } })
-
-    await waitFor(element(by.id('ImportContactsPermissionTitle')))
-      .toBeVisible()
-      .withTimeout(1000)
-
-    await waitFor(element(by.id('importContactsEnable')))
-      .toBeVisible()
-      .withTimeout(1000)
-
-    await waitFor(element(by.id('importContactsSkip')))
-      .toBeVisible()
-      .withTimeout(1000)
-
-    if (ENABLE_CONTACT_IMPORT) {
-      await element(by.id('importContactsEnable')).tap()
-    } else {
-      await element(by.id('importContactsSkip')).tap()
-    }
   })
 
   it.skip('NUX->VerifyEducation', async () => {

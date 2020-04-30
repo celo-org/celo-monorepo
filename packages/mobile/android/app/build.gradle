@@ -74,7 +74,7 @@ import com.android.build.OutputFile
 
 project.ext.react = [
         entryFile        : "index.js",
-        enableHermes: true,  // clean and rebuild if changing
+        enableHermes: false,  // clean and rebuild if changing
         extraPackagerArgs: ["--max-workers=2"],
         bundleInIntegration: true,
         devDisabledInIntegration: true,
@@ -102,12 +102,21 @@ apply from: project(':react-native-config').projectDir.getPath() + "/dotenv.grad
 apply from: "./react.gradle"
 apply from: "../../../../node_modules/@sentry/react-native/sentry.gradle"
 
-
- /**
- * Build for Detox has to have a universal apk and should be minSdkVersion >= 18
+/**
+ * Build for Detox should be minSdkVersion >= 18
  * Use the taskname to recognize the build is for detox
  */
-def isDetoxTestBuild = !gradle.startParameter.taskNames.contains("assembleAndroidTest")
+def isDetoxTestBuild = gradle.startParameter.taskNames.contains("assembleAndroidTest")
+
+/**
+ * Set this to true to create two separate APKs instead of one:
+ *   - An APK that only works on ARM devices
+ *   - An APK that only works on x86 devices
+ * The advantage is the size of the APK is reduced by about 4MB.
+ * Upload all the APKs to the Play Store and people will download
+ * the correct one based on the CPU architecture of their device.
+ */
+def enableSeparateBuildPerCPUArchitecture = true
 
 /**
  * Run Proguard to shrink the Java bytecode in release builds.
@@ -148,10 +157,10 @@ android {
 
     defaultConfig {
         applicationId "org.celo.mobile"
-        minSdkVersion isDetoxTestBuild ? rootProject.ext.minSdkVersion : 18
+        minSdkVersion isDetoxTestBuild ? 18 : rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode appVersionCode
-        versionName "1.5.1"
+        versionName "1.7.1"
         testBuildType System.getProperty('testBuildType', 'debug')
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         resValue "string", "build_config_package", "org.celo.mobile"
@@ -177,15 +186,7 @@ android {
     splits {
         abi {
             reset()
-            /**
-             * Set this to true to create two separate APKs instead of one:
-             *   - An APK that only works on ARM devices
-             *   - An APK that only works on x86 devices
-             * The advantage is the size of the APK is reduced by about 4MB.
-             * Upload all the APKs to the Play Store and people will download
-             * the correct one based on the CPU architecture of their device.
-             */
-            enable isDetoxTestBuild
+            enable enableSeparateBuildPerCPUArchitecture
             universalApk false  // If true, also generate a universal APK
             include "armeabi-v7a", "x86", "arm64-v8a", "x86_64"
         }
@@ -252,6 +253,8 @@ android {
     packagingOptions {
         exclude 'META-INF/-no-jdk.kotlin_module'
         exclude 'META-INF/androidx.exifinterface_exifinterface.version'
+        pickFirst '**/libjsc.so'
+        pickFirst '**/libc++_shared.so'
     }
 
     
@@ -264,14 +267,8 @@ dependencies {
     androidTestImplementation('com.wix:detox:+') { transitive = true }
     androidTestImplementation 'junit:junit:4.12'
 
-    implementation platform("com.google.firebase:firebase-bom:22.2.0")
-    implementation 'com.google.android.gms:play-services-base'
-    implementation 'com.google.firebase:firebase-core'
-    implementation 'com.google.firebase:firebase-messaging'
-    implementation 'com.google.firebase:firebase-database'
-    implementation 'com.google.firebase:firebase-auth'
-    implementation 'com.google.firebase:firebase-invites'
-    implementation 'com.google.firebase:firebase-storage'
+    def multidex_version = "2.0.1"
+    implementation 'androidx.multidex:multidex:$multidex_version'
     implementation 'ru.ivanarh.ndcrash:jndcrash-libunwind:0.7'
     implementation 'androidx.appcompat:appcompat:1.1.0-rc01'
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0-alpha02'
@@ -312,7 +309,7 @@ if (enableFirebase.toBoolean()){
 // https://github.com/facebook/react-native/issues/26400#issuecomment-539395814
 configurations.all {
      resolutionStrategy {
-       force "com.facebook.soloader:soloader:0.8.0"
+       force "com.facebook.soloader:soloader:0.8.1"
      }
 }
 

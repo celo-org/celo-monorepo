@@ -1,10 +1,10 @@
 pragma solidity ^0.5.8;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "openzeppelin-solidity/contracts/utils/Address.sol";
 import "solidity-bytes-utils/contracts/BytesLib.sol";
 
 import "../common/FixidityLib.sol";
-import "../common/libraries/AddressesHelper.sol";
 
 /**
  * @title A library operating on Celo Governance proposals.
@@ -45,6 +45,7 @@ library Proposals {
     Transaction[] transactions;
     bool approved;
     uint256 networkWeight;
+    string descriptionUrl;
   }
 
   /**
@@ -66,7 +67,10 @@ library Proposals {
     address proposer,
     uint256 deposit
   ) public {
-    require(values.length == destinations.length && destinations.length == dataLengths.length);
+    require(
+      values.length == destinations.length && destinations.length == dataLengths.length,
+      "Array length mismatch"
+    );
     uint256 transactionCount = values.length;
 
     proposal.proposer = proposer;
@@ -82,6 +86,11 @@ library Proposals {
       );
       dataPosition = dataPosition.add(dataLengths[i]);
     }
+  }
+
+  function setDescriptionUrl(Proposal storage proposal, string memory descriptionUrl) internal {
+    require(bytes(descriptionUrl).length != 0, "Description url must have non-zero length");
+    proposal.descriptionUrl = descriptionUrl;
   }
 
   /**
@@ -101,7 +110,10 @@ library Proposals {
     address proposer,
     uint256 deposit
   ) internal view returns (Proposal memory) {
-    require(values.length == destinations.length && destinations.length == dataLengths.length);
+    require(
+      values.length == destinations.length && destinations.length == dataLengths.length,
+      "Array length mismatch"
+    );
     uint256 transactionCount = values.length;
 
     Proposal memory proposal;
@@ -183,7 +195,8 @@ library Proposals {
           transactions[i].value,
           transactions[i].data.length,
           transactions[i].data
-        )
+        ),
+        "Proposal execution failed"
       );
     }
   }
@@ -276,7 +289,7 @@ library Proposals {
     view
     returns (uint256, address, bytes memory)
   {
-    require(index < proposal.transactions.length);
+    require(index < proposal.transactions.length, "getTransaction: bad index");
     Transaction storage transaction = proposal.transactions[index];
     return (transaction.value, transaction.destination, transaction.data);
   }
@@ -289,9 +302,15 @@ library Proposals {
   function unpack(Proposal storage proposal)
     internal
     view
-    returns (address, uint256, uint256, uint256)
+    returns (address, uint256, uint256, uint256, string storage)
   {
-    return (proposal.proposer, proposal.deposit, proposal.timestamp, proposal.transactions.length);
+    return (
+      proposal.proposer,
+      proposal.deposit,
+      proposal.timestamp,
+      proposal.transactions.length,
+      proposal.descriptionUrl
+    );
   }
 
   /**
@@ -340,8 +359,7 @@ library Proposals {
   {
     bool result;
 
-    if (dataLength > 0)
-      require(AddressesHelper.isContract(destination), "Invalid contract address");
+    if (dataLength > 0) require(Address.isContract(destination), "Invalid contract address");
 
     /* solhint-disable no-inline-assembly */
     assembly {

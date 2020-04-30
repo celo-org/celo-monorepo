@@ -5,4 +5,6 @@ module.exports = {
   setupFilesAfterEnv: ['@celo/dev-utils/lib/matchers'],
   globalSetup: '<rootDir>/src/test-utils/ganache.setup.ts',
   globalTeardown: '<rootDir>/src/test-utils/ganache.teardown.ts',
+  testSequencer: '<rootDir>/src/test-utils/AlphabeticSequencer.js',
+  verbose: true,
 }

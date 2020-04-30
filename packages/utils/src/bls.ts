@@ -8,8 +8,8 @@ import { isValidAddress } from './address'
 const n = BigInteger.fromHex('12ab655e9a2ca55660b44d1e5c37b00159aa76fed00000010a11800000000001', 16)
 
 const MODULUSMASK = 31
-export const BLS_PUBLIC_KEY_SIZE = 48
-export const BLS_POP_SIZE = 96
+export const BLS_PUBLIC_KEY_SIZE = 96
+export const BLS_POP_SIZE = 48
 
 export const blsPrivateKeyToProcessedPrivateKey = (privateKeyHex: string) => {
   for (let i = 0; i < 256; i++) {

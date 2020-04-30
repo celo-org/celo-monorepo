@@ -1,18 +1,21 @@
 import BaseNotification from '@celo/react-components/components/BaseNotification'
+import fontStyles from '@celo/react-components/styles/fonts'
 import * as React from 'react'
-import { WithNamespaces, withNamespaces } from 'react-i18next'
-import { Image, Platform, StyleSheet, View } from 'react-native'
+import { Trans, WithTranslation } from 'react-i18next'
+import { Image, Platform, StyleSheet, Text, View } from 'react-native'
 import SendIntentAndroid from 'react-native-send-intent'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
+import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import { EscrowedPayment } from 'src/escrow/actions'
-import { Namespaces } from 'src/i18n'
+import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
+import { Namespaces, withTranslation } from 'src/i18n'
 import { inviteFriendsIcon } from 'src/images/Images'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import NotificationAmount from 'src/paymentRequest/NotificationAmount'
+import { divideByWei } from 'src/utils/formatting'
 import { navigateToURI } from 'src/utils/linking'
 import Logger from 'src/utils/Logger'
 
@@ -20,19 +23,19 @@ interface OwnProps {
   payment: EscrowedPayment
 }
 
-type Props = OwnProps & WithNamespaces
+type Props = OwnProps & WithTranslation
 
 const TAG = 'EscrowedPaymentListItem'
 
 export class EscrowedPaymentListItem extends React.PureComponent<Props> {
-  onSendMessage = () => {
+  onRemind = () => {
     const { payment, t } = this.props
     const recipientPhoneNumber = payment.recipientPhone
     CeloAnalytics.track(CustomEventNames.clicked_escrowed_payment_send_message)
     // TODO: open up whatsapp/text message slider with pre populated message
     try {
       if (Platform.OS === 'android') {
-        SendIntentAndroid.sendSms(recipientPhoneNumber, t('escrowedPaymentReminderSms'))
+        SendIntentAndroid.sendSms(recipientPhoneNumber, t('walletFlow5:escrowedPaymentReminderSms'))
       } else {
         // TODO look into using MFMessageComposeViewController to prefill the body for iOS
         navigateToURI(`sms:${recipientPhoneNumber}`)
@@ -51,44 +54,63 @@ export class EscrowedPaymentListItem extends React.PureComponent<Props> {
   }
   getCTA = () => {
     const { t } = this.props
-    return [
-      {
-        text: t('sendMessage'),
-        onPress: this.onSendMessage,
-      },
-      {
-        text: t('reclaimPayment'),
-        onPress: this.onReclaimPayment,
-      },
-    ]
+    const ctas = []
+    if (this.getDisplayName()) {
+      ctas.push({
+        text: t('global:remind'),
+        onPress: this.onRemind,
+      })
+    }
+    ctas.push({
+      text: t('global:reclaim'),
+      onPress: this.onReclaimPayment,
+    })
+    return ctas
   }
 
-  getTitle() {
-    const { t, payment } = this.props
-    const displayName = payment.recipientContact
-      ? payment.recipientContact.displayName
-      : payment.recipientPhone
-    return t('escrowedPaymentReminderListItemTitle', { mobile: displayName })
+  getDisplayName() {
+    const { payment } = this.props
+    // TODO(Rossy) Get contact number from recipient cache here
+    return payment.recipientPhone
   }
 
   render() {
-    const { payment } = this.props
+    const { t, payment } = this.props
+    const mobile = this.getDisplayName() || t('global:unknown').toLowerCase()
 
     return (
-      <BaseNotification
-        title={this.getTitle()}
-        icon={<Image source={inviteFriendsIcon} style={styles.image} resizeMode="contain" />}
-        ctas={this.getCTA()}
-        roundedBorders={false}
-        callout={<NotificationAmount amount={payment.amount} />}
-      >
-        <View style={styles.body} />
-      </BaseNotification>
+      <View style={styles.container}>
+        <BaseNotification
+          title={
+            <Trans
+              i18nKey="escrowPaymentNotificationTitl"
+              ns={Namespaces.inviteFlow11}
+              values={{ mobile }}
+            >
+              Invited and paid {{ mobile }} (
+              <CurrencyDisplay
+                amount={{
+                  value: divideByWei(payment.amount),
+                  currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
+                }}
+              />
+              )
+            </Trans>
+          }
+          icon={<Image source={inviteFriendsIcon} style={styles.image} resizeMode="contain" />}
+          ctas={this.getCTA()}
+        >
+          <Text style={fontStyles.bodySmall}>{payment.message || t('defaultComment')}</Text>
+        </BaseNotification>
+      </View>
     )
   }
 }
 
 const styles = StyleSheet.create({
+  container: {
+    marginBottom: 16,
+  },
   body: {
     marginTop: 5,
     flexDirection: 'row',
@@ -103,5 +125,5 @@ const styles = StyleSheet.create({
 })
 
 export default componentWithAnalytics(
-  withNamespaces(Namespaces.walletFlow5)(EscrowedPaymentListItem)
+  withTranslation(Namespaces.inviteFlow11)(EscrowedPaymentListItem)
 )

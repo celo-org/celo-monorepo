@@ -1,5 +1,6 @@
 pragma solidity ^0.5.3;
 
+import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 import "./interfaces/IRegistry.sol";
@@ -9,10 +10,15 @@ import "./Initializable.sol";
  * @title Routes identifiers to addresses.
  */
 contract Registry is IRegistry, Ownable, Initializable {
+  using SafeMath for uint256;
+
   mapping(bytes32 => address) public registry;
 
-  event RegistryUpdated(string identifier, bytes32 indexed identifierHash, address addr);
+  event RegistryUpdated(string identifier, bytes32 indexed identifierHash, address indexed addr);
 
+  /**
+   * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
+   */
   function initialize() external initializer {
     _transferOwnership(msg.sender);
   }
@@ -64,5 +70,26 @@ contract Registry is IRegistry, Ownable, Initializable {
   function getAddressForString(string calldata identifier) external view returns (address) {
     bytes32 identifierHash = keccak256(abi.encodePacked(identifier));
     return registry[identifierHash];
+  }
+
+  /**
+   * @notice Iterates over provided array of identifiers, getting the address for each.
+   *         Returns true if `sender` matches the address of one of the provided identifiers.
+   * @param identifierHashes Array of hashes of approved identifiers.
+   * @param sender Address in question to verify membership.
+   * @return True if `sender` corresponds to the address of any of `identifiers`
+   *         registry entries.
+   */
+  function isOneOf(bytes32[] calldata identifierHashes, address sender)
+    external
+    view
+    returns (bool)
+  {
+    for (uint256 i = 0; i < identifierHashes.length; i = i.add(1)) {
+      if (registry[identifierHashes[i]] == sender) {
+        return true;
+      }
+    }
+    return false;
   }
 }

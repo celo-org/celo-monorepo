@@ -1,0 +1,251 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`OutgoingPaymentRequestListItem renders correctly 1`] = `
+Array [
+  "// @ts-ignore -- kind is not assignable?",
+  <View
+    style={
+      Object {
+        "marginBottom": 16,
+      }
+    }
+  >
+    <View
+      style={
+        Array [
+          Object {
+            "backgroundColor": "#FFFFFF",
+            "width": "100%",
+          },
+          Object {
+            "elevation": 2,
+            "shadowColor": "black",
+            "shadowOffset": Object {
+              "height": 1,
+              "width": 0,
+            },
+            "shadowOpacity": 0.3,
+            "shadowRadius": 1.6,
+          },
+        ]
+      }
+    >
+      <View
+        style={
+          Object {
+            "padding": 16,
+          }
+        }
+      >
+        <View
+          style={
+            Object {
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+            }
+          }
+        >
+          <View
+            style={
+              Object {
+                "alignItems": "center",
+                "paddingRight": 16,
+              }
+            }
+          >
+            <View
+              style={
+                Array [
+                  Object {
+                    "alignItems": "center",
+                    "flexDirection": "row",
+                    "justifyContent": "center",
+                  },
+                  undefined,
+                ]
+              }
+            >
+              <View
+                style={
+                  Array [
+                    Object {
+                      "alignItems": "center",
+                      "justifyContent": "center",
+                    },
+                    Object {
+                      "backgroundColor": "#7AD6FE",
+                      "borderRadius": 20,
+                      "height": 40,
+                      "width": 40,
+                    },
+                  ]
+                }
+              >
+                <Image
+                  source={
+                    Object {
+                      "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
+                    }
+                  }
+                  style={
+                    Object {
+                      "alignItems": "center",
+                      "height": 40,
+                      "justifyContent": "center",
+                      "width": 40,
+                    }
+                  }
+                />
+              </View>
+            </View>
+          </View>
+          <View
+            style={
+              Object {
+                "flex": 1,
+                "justifyContent": "space-between",
+              }
+            }
+          >
+            <Text
+              style={
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Hind-SemiBold",
+                  "fontSize": 14,
+                  "lineHeight": 18,
+                }
+              }
+              testID="OutgoingPaymentRequestNotification/1/Title"
+            >
+              Requested
+               
+              <Text
+                numberOfLines={1}
+                style={
+                  Array [
+                    undefined,
+                    Object {
+                      "color": undefined,
+                    },
+                  ]
+                }
+              >
+                
+                $
+                31.92
+              </Text>
+               
+              from 
+              5126608970
+            </Text>
+            <View
+              style={
+                Object {
+                  "justifyContent": "space-between",
+                  "minHeight": 60,
+                  "paddingTop": 2,
+                }
+              }
+            >
+              <Text
+                style={
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Hind-Regular",
+                    "fontSize": 14,
+                    "lineHeight": 18,
+                  }
+                }
+              >
+                Hey thanks for the loan, Ill pay you back ASAP. LOVE YOU
+              </Text>
+              <View
+                style={
+                  Object {
+                    "flexDirection": "row",
+                    "marginTop": 12,
+                  }
+                }
+              >
+                <View
+                  accessible={true}
+                  focusable={true}
+                  isTVSelectable={true}
+                  nativeBackgroundAndroid={
+                    Object {
+                      "attribute": "selectableItemBackgroundBorderless",
+                      "type": "ThemeAttrAndroid",
+                    }
+                  }
+                  onClick={[Function]}
+                  onResponderGrant={[Function]}
+                  onResponderMove={[Function]}
+                  onResponderRelease={[Function]}
+                  onResponderTerminate={[Function]}
+                  onResponderTerminationRequest={[Function]}
+                  onStartShouldSetResponder={[Function]}
+                >
+                  <Text
+                    style={
+                      Array [
+                        Object {
+                          "color": "#42D689",
+                          "fontFamily": "Hind-SemiBold",
+                          "fontSize": 14,
+                          "lineHeight": 18,
+                        },
+                        Object {
+                          "paddingEnd": 15,
+                        },
+                      ]
+                    }
+                  >
+                    global:remind
+                  </Text>
+                </View>
+                <View
+                  accessible={true}
+                  focusable={true}
+                  isTVSelectable={true}
+                  nativeBackgroundAndroid={
+                    Object {
+                      "attribute": "selectableItemBackgroundBorderless",
+                      "type": "ThemeAttrAndroid",
+                    }
+                  }
+                  onClick={[Function]}
+                  onResponderGrant={[Function]}
+                  onResponderMove={[Function]}
+                  onResponderRelease={[Function]}
+                  onResponderTerminate={[Function]}
+                  onResponderTerminationRequest={[Function]}
+                  onStartShouldSetResponder={[Function]}
+                >
+                  <Text
+                    style={
+                      Array [
+                        Object {
+                          "color": "#42D689",
+                          "fontFamily": "Hind-SemiBold",
+                          "fontSize": 14,
+                          "lineHeight": 18,
+                        },
+                        Object {
+                          "paddingEnd": 15,
+                        },
+                      ]
+                    }
+                  >
+                    global:cancel
+                  </Text>
+                </View>
+              </View>
+            </View>
+          </View>
+        </View>
+      </View>
+    </View>
+  </View>,
+]
+`;

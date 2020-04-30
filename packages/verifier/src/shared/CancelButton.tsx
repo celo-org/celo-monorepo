@@ -4,7 +4,7 @@ import { fontStyles } from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
 import { Namespaces } from 'locales'
 import * as React from 'react'
-import { withNamespaces, WithNamespaces } from 'react-i18next'
+import { WithTranslation, withTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
@@ -14,7 +14,7 @@ type Props = {
   onPress?: () => void
   backScreen?: Screens
   eventName?: CustomEventNames
-} & WithNamespaces
+} & WithTranslation
 
 class CancelButton extends React.PureComponent<Props> {
   handleOnPress = () => {
@@ -50,4 +50,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default withNamespaces(Namespaces.common)(CancelButton)
+export default withTranslation(Namespaces.common)(CancelButton)

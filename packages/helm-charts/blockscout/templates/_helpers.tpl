@@ -21,12 +21,12 @@ volumes:
 - name: DATABASE_USER
   valueFrom:
     secretKeyRef:
-      name: {{ .Release.Namespace }}-blockscout
+      name:  {{ .Release.Name }}
       key: DATABASE_USER
 - name: DATABASE_PASSWORD
   valueFrom:
     secretKeyRef:
-      name: {{ .Release.Namespace }}-blockscout
+      name:  {{ .Release.Name }}
       key: DATABASE_PASSWORD
 - name: NETWORK
   value: Celo

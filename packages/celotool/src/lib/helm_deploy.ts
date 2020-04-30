@@ -1,19 +1,12 @@
-import { entries, flatMap, range } from 'lodash'
+import { entries, range } from 'lodash'
 import sleep from 'sleep-promise'
 import { getKubernetesClusterRegion, switchToClusterFromEnv } from './cluster'
 import { EnvTypes, envVar, fetchEnv, fetchEnvOrFallback, isProduction } from './env-utils'
 import { ensureAuthenticatedGcloudAccount } from './gcloud_utils'
 import { generateGenesisFromEnv } from './generate_utils'
-import { OG_ACCOUNTS } from './genesis_constants'
 import { getStatefulSetReplicas, scaleResource } from './kubernetes'
-import {
-  execCmd,
-  execCmdWithExitOnFailure,
-  getVerificationPoolRewardsURL,
-  getVerificationPoolSMSURL,
-  outputIncludes,
-  switchToProjectFromEnv,
-} from './utils'
+import { getGenesisBlockFromGoogleStorage } from './testnet-utils'
+import { execCmd, execCmdWithExitOnFailure, outputIncludes } from './utils'
 
 const CLOUDSQL_SECRET_NAME = 'blockscout-cloudsql-credentials'
 const BACKUP_GCS_SECRET_NAME = 'backup-blockchain-credentials'
@@ -45,8 +38,9 @@ async function failIfSecretMissing(secretName: string, namespace: string) {
 
 async function copySecret(secretName: string, srcNamespace: string, destNamespace: string) {
   console.info(`Copying secret ${secretName} from namespace ${srcNamespace} to ${destNamespace}`)
-  await execCmdWithExitOnFailure(`kubectl get secret ${secretName} --namespace ${srcNamespace} --export -o yaml |\
-  kubectl apply --namespace=${destNamespace} -f -`)
+  await execCmdWithExitOnFailure(`kubectl get secret ${secretName} --namespace ${srcNamespace} -o yaml |\
+  grep -v creationTimestamp | grep -v resourceVersion | grep -v selfLink | grep -v uid |\
+  sed 's/default/${destNamespace}/' | kubectl apply --namespace=${destNamespace} -f -`)
 }
 
 export async function createCloudSQLInstance(celoEnv: string, instanceName: string) {
@@ -75,7 +69,7 @@ export async function createCloudSQLInstance(celoEnv: string, instanceName: stri
 
   try {
     await execCmd(
-      `gcloud sql instances create ${instanceName} --gce-zone ${fetchEnv(
+      `gcloud sql instances create ${instanceName} --zone ${fetchEnv(
         envVar.KUBERNETES_CLUSTER_ZONE
       )} --database-version POSTGRES_9_6 --cpu 1 --memory 4G`
     )
@@ -87,7 +81,7 @@ export async function createCloudSQLInstance(celoEnv: string, instanceName: stri
   if (envType !== EnvTypes.DEVELOPMENT) {
     try {
       await execCmdWithExitOnFailure(
-        `gcloud sql instances create ${instanceName}-replica --master-instance-name=${instanceName} --gce-zone ${fetchEnv(
+        `gcloud sql instances create ${instanceName}-replica --master-instance-name=${instanceName} --zone ${fetchEnv(
           envVar.KUBERNETES_CLUSTER_ZONE
         )}`
       )
@@ -157,21 +151,6 @@ export async function createAndUploadBackupSecretIfNotExists(serviceAccountName:
   return createAndUploadKubernetesSecretIfNotExists(BACKUP_GCS_SECRET_NAME, serviceAccountName)
 }
 
-export async function createServiceAccountIfNotExists(name: string) {
-  await switchToProjectFromEnv()
-  // TODO: add permissions for cloudsql editor to service account
-  const serviceAccountExists = await outputIncludes(
-    `gcloud iam service-accounts list`,
-    name,
-    `Service account ${name} exists, skipping creation`
-  )
-  if (!serviceAccountExists) {
-    await execCmdWithExitOnFailure(
-      `gcloud iam service-accounts create ${name} --display-name="${name}"`
-    )
-  }
-}
-
 export function getServiceAccountName(prefix: string) {
   // NOTE: trim to meet the max size requirements of service account names
   return `${prefix}-${fetchEnv(envVar.KUBERNETES_CLUSTER_NAME)}`.slice(0, 30)
@@ -196,16 +175,15 @@ export async function redeployTiller() {
   }
 }
 
-export async function installLegoAndNginx() {
-  const legoReleaseExists = await outputIncludes(
+export async function installCertManagerAndNginx() {
+  // Cert Manager is the newer version of lego
+  const certManagerExists = await outputIncludes(
     `helm list`,
-    `kube-lego-release`,
-    `kube-lego-release exists, skipping install`
+    `cert-manager-cluster-issuers`,
+    `cert-manager-cluster-issuers exists, skipping install`
   )
-  if (!legoReleaseExists) {
-    await execCmdWithExitOnFailure(
-      `helm install --name kube-lego-release stable/kube-lego --set config.LEGO_EMAIL=n@celo.org --set rbac.create=true --set rbac.serviceAccountName=kube-lego --set config.LEGO_URL=https://acme-v01.api.letsencrypt.org/directory`
-    )
+  if (!certManagerExists) {
+    await installCertManager()
   }
   const nginxIngressReleaseExists = await outputIncludes(
     `helm list`,
@@ -217,7 +195,22 @@ export async function installLegoAndNginx() {
   }
 }
 
-export async function installAndEnableMetricsDeps() {
+export async function installCertManager() {
+  const clusterIssuersHelmChartPath = `../helm-charts/cert-manager-cluster-issuers`
+
+  console.info('Installing cert-manager CustomResourceDefinitions')
+  await execCmdWithExitOnFailure(
+    `kubectl apply --validate=false -f https://raw.githubusercontent.com/jetstack/cert-manager/release-0.11/deploy/manifests/00-crds.yaml`
+  )
+  console.info('Updating cert-manager-cluster-issuers dependencies')
+  await execCmdWithExitOnFailure(`helm dependency update ${clusterIssuersHelmChartPath}`)
+  console.info('Installing cert-manager-cluster-issuers')
+  await execCmdWithExitOnFailure(
+    `helm install --name cert-manager-cluster-issuers ${clusterIssuersHelmChartPath}`
+  )
+}
+
+export async function installAndEnableMetricsDeps(installPromToSd: boolean) {
   const kubeStateMetricsReleaseExists = await outputIncludes(
     `helm list`,
     `kube-state-metrics`,
@@ -228,46 +221,62 @@ export async function installAndEnableMetricsDeps() {
       `helm install --name kube-state-metrics stable/kube-state-metrics --set rbac.create=true`
     )
   }
-  const kubeStateMetricsPrometheusReleaseExists = await outputIncludes(
-    `helm list`,
-    `kube-state-metrics-prometheus-to-sd`,
-    `kube-state-metrics-prometheus-to-sd exists, skipping install`
-  )
-  if (!kubeStateMetricsPrometheusReleaseExists) {
-    const promToSdParams = [
-      `--set "metricsSources.kube-state-metrics=http://kube-state-metrics.default.svc.cluster.local:8080"`,
-      `--set promtosd.scrape_interval=${fetchEnv('PROMTOSD_SCRAPE_INTERVAL')}`,
-      `--set promtosd.export_interval=${fetchEnv('PROMTOSD_EXPORT_INTERVAL')}`,
-    ]
-    await execCmdWithExitOnFailure(
-      `helm install --name kube-state-metrics-prometheus-to-sd ../helm-charts/prometheus-to-sd ${promToSdParams.join(
-        ' '
-      )}`
+  if (installPromToSd) {
+    const kubeStateMetricsPrometheusReleaseExists = await outputIncludes(
+      `helm list`,
+      `kube-state-metrics-prometheus-to-sd`,
+      `kube-state-metrics-prometheus-to-sd exists, skipping install`
     )
+    if (!kubeStateMetricsPrometheusReleaseExists) {
+      const promToSdParams = [
+        `--set "metricsSources.kube-state-metrics=http://kube-state-metrics.default.svc.cluster.local:8080"`,
+        `--set promtosd.scrape_interval=${fetchEnv('PROMTOSD_SCRAPE_INTERVAL')}`,
+        `--set promtosd.export_interval=${fetchEnv('PROMTOSD_EXPORT_INTERVAL')}`,
+      ]
+      await execCmdWithExitOnFailure(
+        `helm install --name kube-state-metrics-prometheus-to-sd ../helm-charts/prometheus-to-sd ${promToSdParams.join(
+          ' '
+        )}`
+      )
+    }
   }
 }
 
-export async function grantRoles(
-  serviceAccountName: string,
-  role: string
-): Promise<[string, string]> {
+export async function grantRoles(serviceAccountName: string, role: string) {
   const projectName = fetchEnv(envVar.TESTNET_PROJECT_NAME)
 
   const serviceAccountFullName = `${serviceAccountName}@${projectName}.iam.gserviceaccount.com`
-  const cmd =
-    `gcloud projects add-iam-policy-binding ${projectName} ` +
-    `--role=${role} ` +
-    `--member=serviceAccount:${serviceAccountFullName}`
-  return execCmd(cmd)
+  const commandRolesAlreadyGranted = `gcloud projects get-iam-policy ${projectName}  \
+  --flatten="bindings[].members" \
+  --format='table(bindings.role)' \
+  --filter="bindings.members:serviceAccount:${serviceAccountFullName}"`
+  const rolesAlreadyGranted = await outputIncludes(
+    commandRolesAlreadyGranted,
+    role,
+    `Role ${role} already granted for account ${serviceAccountFullName}, skipping binding`
+  )
+  if (!rolesAlreadyGranted) {
+    const cmd =
+      `gcloud projects add-iam-policy-binding ${projectName} ` +
+      `--role=${role} ` +
+      `--member=serviceAccount:${serviceAccountFullName}`
+    await execCmd(cmd)
+  }
+  return
 }
 
-export async function retrieveCloudSQLConnectionInfo(celoEnv: string, instanceName: string) {
+export async function retrieveCloudSQLConnectionInfo(
+  celoEnv: string,
+  instanceName: string,
+  dbSuffix: string
+) {
   await validateExistingCloudSQLInstance(instanceName)
+  const secretName = `${celoEnv}-blockscout${dbSuffix}`
   const [blockscoutDBUsername] = await execCmdWithExitOnFailure(
-    `kubectl get secret ${celoEnv}-blockscout --export -o jsonpath='{.data.DATABASE_USER}' -n ${celoEnv} | base64 --decode`
+    `kubectl get secret ${secretName} -o jsonpath='{.data.DATABASE_USER}' -n ${celoEnv} | base64 --decode`
   )
   const [blockscoutDBPassword] = await execCmdWithExitOnFailure(
-    `kubectl get secret ${celoEnv}-blockscout --export -o jsonpath='{.data.DATABASE_PASSWORD}' -n ${celoEnv} | base64 --decode`
+    `kubectl get secret ${secretName} -o jsonpath='{.data.DATABASE_PASSWORD}' -n ${celoEnv} | base64 --decode`
   )
   const [blockscoutDBConnectionName] = await execCmdWithExitOnFailure(
     `gcloud sql instances describe ${instanceName} --format="value(connectionName)"`
@@ -335,6 +344,18 @@ export async function retrieveIPAddress(name: string) {
   return address.replace(/\n*$/, '')
 }
 
+// returns the IP address of a resource internal to the cluster (ie 10.X.X.X)
+export async function retrieveClusterIPAddress(
+  resourceType: string,
+  resourceName: string,
+  namespace: string
+) {
+  const [address] = await execCmdWithExitOnFailure(
+    `kubectl get ${resourceType} ${resourceName} -n ${namespace} -o jsonpath={.spec.clusterIP}`
+  )
+  return address
+}
+
 export async function createStaticIPs(celoEnv: string) {
   console.info(`Creating static IPs for ${celoEnv}`)
 
@@ -347,6 +368,10 @@ export async function createStaticIPs(celoEnv: string) {
     const numValdiators = parseInt(fetchEnv(envVar.VALIDATORS), 10)
     await Promise.all(
       range(numValdiators).map((i) => registerIPAddress(`${celoEnv}-validators-${i}`))
+    )
+    const numPrivateTxNodes = parseInt(fetchEnv(envVar.PRIVATE_TX_NODES), 10)
+    await Promise.all(
+      range(numPrivateTxNodes).map((i) => registerIPAddress(`${celoEnv}-tx-nodes-private-${i}`))
     )
   }
 
@@ -366,6 +391,17 @@ export async function upgradeStaticIPs(celoEnv: string) {
       'validators',
       prevValidatorNodeCount,
       newValidatorNodeCount
+    )
+    const prevPrivateTxNodeCount = await getStatefulSetReplicas(
+      celoEnv,
+      `${celoEnv}-tx-nodes-private`
+    )
+    const newPrivateTxNodeCount = parseInt(fetchEnv(envVar.PRIVATE_TX_NODES), 10)
+    await upgradeNodeTypeStaticIPs(
+      celoEnv,
+      'tx-nodes-private',
+      prevPrivateTxNodeCount,
+      newPrivateTxNodeCount
     )
   }
 }
@@ -421,7 +457,8 @@ export async function pollForBootnodeLoadBalancer(celoEnv: string) {
     await sleep(LOAD_BALANCER_POLL_INTERVAL)
   }
 
-  await sleep(1000 * 60 * 5)
+  console.info('Sleeping 1 minute...')
+  await sleep(1000 * 60) // 1 minute
 
   console.info(`\nReset all pods now that the bootnode load balancer has provisioned`)
   await execCmdWithExitOnFailure(`kubectl delete pod -n ${celoEnv} --selector=component=validators`)
@@ -437,23 +474,25 @@ export async function deleteStaticIPs(celoEnv: string) {
 
   await deleteIPAddress(`${celoEnv}-bootnode`)
 
-  const numValdiators = parseInt(fetchEnv(envVar.VALIDATORS), 10)
-  await Promise.all(range(numValdiators).map((i) => deleteIPAddress(`${celoEnv}-validators-${i}`)))
-  return
+  const numValidators = parseInt(fetchEnv(envVar.VALIDATORS), 10)
+  await Promise.all(range(numValidators).map((i) => deleteIPAddress(`${celoEnv}-validators-${i}`)))
+
+  const numPrivateTxNodes = parseInt(fetchEnv(envVar.PRIVATE_TX_NODES), 10)
+  await Promise.all(
+    range(numPrivateTxNodes).map((i) => deleteIPAddress(`${celoEnv}-tx-nodes-private-${i}`))
+  )
 }
 
 export async function deletePersistentVolumeClaims(celoEnv: string) {
   console.info(`Deleting persistent volume claims for ${celoEnv}`)
   try {
-    const [output] = await execCmd(
-      `kubectl delete pvc --selector='component=validators' --namespace ${celoEnv}`
-    )
-    console.info(output)
-
-    const [outputTx] = await execCmd(
-      `kubectl delete pvc --selector='component=tx_nodes' --namespace ${celoEnv}`
-    )
-    console.info(outputTx)
+    const componentLabels = ['validators', 'tx_nodes', 'proxy', 'tx_nodes_private']
+    for (const component of componentLabels) {
+      const [output] = await execCmd(
+        `kubectl delete pvc --selector='component=${component}' --namespace ${celoEnv}`
+      )
+      console.info(output)
+    }
   } catch (error) {
     console.error(error)
     if (!error.toString().includes('not found')) {
@@ -479,8 +518,8 @@ async function helmIPParameters(celoEnv: string) {
 
   ipAddressParameters.push(...singleAddressParameters)
 
-  const listOfAddresses = txAddresses.join('/')
-  ipAddressParameters.push(`--set geth.tx_node_ip_addresses=${listOfAddresses}`)
+  const listOfTxNodeAddresses = txAddresses.join('/')
+  ipAddressParameters.push(`--set geth.tx_node_ip_addresses=${listOfTxNodeAddresses}`)
 
   if (useStaticIPsForGethNodes()) {
     ipAddressParameters.push(
@@ -500,37 +539,44 @@ async function helmIPParameters(celoEnv: string) {
     ipAddressParameters.push(...singleValidatorAddressParameters)
     const listOfValidatorAddresses = validatorsAddresses.join('/')
     ipAddressParameters.push(`--set geth.validator_ip_addresses=${listOfValidatorAddresses}`)
+
+    const numPrivateTxNodes = parseInt(fetchEnv(envVar.PRIVATE_TX_NODES), 10)
+    const privateTxAddresses = await Promise.all(
+      range(numPrivateTxNodes).map((i) => retrieveIPAddress(`${celoEnv}-tx-nodes-private-${i}`))
+    )
+    const privateTxAddressParameters = privateTxAddresses.map(
+      (address, i) => `--set geth.private_tx_nodes_${i}IpAddress=${address}`
+    )
+    ipAddressParameters.push(...privateTxAddressParameters)
+    const listOfPrivateTxNodeAddresses = privateTxAddresses.join('/')
+    ipAddressParameters.push(
+      `--set geth.private_tx_node_ip_addresses=${listOfPrivateTxNodeAddresses}`
+    )
   }
 
   return ipAddressParameters
 }
 
-async function helmParameters(celoEnv: string) {
-  const bucketName = isProduction(celoEnv) ? 'contract_artifacts_production' : 'contract_artifacts'
-  const productionTagOverrides = isProduction(celoEnv)
+async function helmParameters(celoEnv: string, useExistingGenesis: boolean) {
+  const bucketName = isProduction() ? 'contract_artifacts_production' : 'contract_artifacts'
+  const productionTagOverrides = isProduction()
     ? [
         `--set gethexporter.image.repository=${fetchEnv('GETH_EXPORTER_DOCKER_IMAGE_REPOSITORY')}`,
         `--set gethexporter.image.tag=${fetchEnv('GETH_EXPORTER_DOCKER_IMAGE_TAG')}`,
       ]
     : []
 
-  const gethAccountParameters = flatMap(OG_ACCOUNTS, (account) => [
-    `--set geth.account.${account.name}.name=${account.name}`,
-    `--set geth.account.${account.name}.privateKey=${account.privateKey}`,
-    `--set geth.account.${account.name}.address=${account.address}`,
-  ])
+  const genesisContent = useExistingGenesis
+    ? await getGenesisBlockFromGoogleStorage(celoEnv)
+    : generateGenesisFromEnv()
 
   return [
     `--set domain.name=${fetchEnv('CLUSTER_DOMAIN_NAME')}`,
-    `--set geth.miner.verificationpool=${fetchEnvOrFallback(
-      'VERIFICATION_POOL_URL',
-      getVerificationPoolSMSURL(celoEnv)
-    )}`,
     `--set geth.verbosity=${fetchEnvOrFallback('GETH_VERBOSITY', '4')}`,
     `--set geth.node.cpu_request=${fetchEnv('GETH_NODE_CPU_REQUEST')}`,
     `--set geth.node.memory_request=${fetchEnv('GETH_NODE_MEMORY_REQUEST')}`,
-    `--set geth.genesisFile=${Buffer.from(generateGenesisFromEnv()).toString('base64')}`,
-    `--set geth.genesis.networkId=${fetchEnv('NETWORK_ID')}`,
+    `--set geth.genesisFile=${Buffer.from(genesisContent).toString('base64')}`,
+    `--set geth.genesis.networkId=${fetchEnv(envVar.NETWORK_ID)}`,
     `--set geth.image.repository=${fetchEnv('GETH_NODE_DOCKER_IMAGE_REPOSITORY')}`,
     `--set geth.image.tag=${fetchEnv('GETH_NODE_DOCKER_IMAGE_TAG')}`,
     `--set geth.backup.enabled=${fetchEnv(envVar.GETH_NODES_BACKUP_CRONJOB_ENABLED)}`,
@@ -540,10 +586,6 @@ async function helmParameters(celoEnv: string) {
     `--set cluster.name=${fetchEnv('KUBERNETES_CLUSTER_NAME')}`,
     `--set bucket=${bucketName}`,
     `--set project.name=${fetchEnv('TESTNET_PROJECT_NAME')}`,
-    `--set verification.rewardsUrl=${fetchEnvOrFallback(
-      'VERIFICATION_REWARDS_URL',
-      getVerificationPoolRewardsURL(celoEnv)
-    )}`,
     `--set celotool.image.repository=${fetchEnv('CELOTOOL_DOCKER_IMAGE_REPOSITORY')}`,
     `--set celotool.image.tag=${fetchEnv('CELOTOOL_DOCKER_IMAGE_TAG')}`,
     `--set promtosd.scrape_interval=${fetchEnv('PROMTOSD_SCRAPE_INTERVAL')}`,
@@ -558,28 +600,35 @@ async function helmParameters(celoEnv: string) {
     `--set geth.faultyValidators="${fetchEnvOrFallback('FAULTY_VALIDATORS', '0')}"`,
     `--set geth.faultyValidatorType="${fetchEnvOrFallback('FAULTY_VALIDATOR_TYPE', '0')}"`,
     `--set geth.tx_nodes="${fetchEnv('TX_NODES')}"`,
+    `--set geth.private_tx_nodes="${fetchEnv(envVar.PRIVATE_TX_NODES)}"`,
     `--set geth.ssd_disks="${fetchEnvOrFallback(envVar.GETH_NODES_SSD_DISKS, 'true')}"`,
     `--set mnemonic="${fetchEnv('MNEMONIC')}"`,
     `--set contracts.cron_jobs.enabled=${fetchEnv('CONTRACT_CRONJOBS_ENABLED')}`,
     `--set geth.account.secret="${fetchEnv('GETH_ACCOUNT_SECRET')}"`,
-    `--set ethstats.webSocketSecret="${fetchEnv('ETHSTATS_WEBSOCKETSECRET')}"`,
     `--set geth.ping_ip_from_packet=${fetchEnvOrFallback('PING_IP_FROM_PACKET', 'false')}`,
     `--set geth.in_memory_discovery_table=${fetchEnvOrFallback(
       'IN_MEMORY_DISCOVERY_TABLE',
       'false'
     )}`,
+    `--set geth.proxiedValidators=${fetchEnvOrFallback(envVar.PROXIED_VALIDATORS, '0')}`,
     ...productionTagOverrides,
     ...(await helmIPParameters(celoEnv)),
-    ...gethAccountParameters,
   ]
 }
 
 async function helmCommand(command: string) {
-  if (isCelotoolVerbose()) {
+  if (isCelotoolVerbose() && !command.includes(' dep build ')) {
     await execCmdWithExitOnFailure(command + ' --dry-run --debug')
+  } else if (isCelotoolVerbose()) {
+    await execCmdWithExitOnFailure(command + ' --debug')
   }
 
   await execCmdWithExitOnFailure(command)
+}
+
+function buildHelmChartDependencies(chartDir: string) {
+  console.info(`Building any chart dependencies...`)
+  return helmCommand(`helm dep build ${chartDir}`)
 }
 
 export async function installGenericHelmChart(
@@ -588,6 +637,8 @@ export async function installGenericHelmChart(
   chartDir: string,
   parameters: string[]
 ) {
+  await buildHelmChartDependencies(chartDir)
+
   console.info(`Installing helm release ${releaseName}`)
   await helmCommand(
     `helm install ${chartDir} --name ${releaseName} --namespace ${celoEnv} ${parameters.join(' ')}`
@@ -600,8 +651,9 @@ export async function upgradeGenericHelmChart(
   chartDir: string,
   parameters: string[]
 ) {
-  console.info(`Upgrading helm release ${releaseName}`)
+  await buildHelmChartDependencies(chartDir)
 
+  console.info(`Upgrading helm release ${releaseName}`)
   await helmCommand(
     `helm upgrade ${releaseName} ${chartDir} --namespace ${celoEnv} ${parameters.join(' ')}`
   )
@@ -621,55 +673,58 @@ export async function removeGenericHelmChart(releaseName: string) {
   }
 }
 
-export async function installHelmChart(celoEnv: string) {
+export async function installHelmChart(celoEnv: string, useExistingGenesis: boolean) {
   await failIfSecretMissing(BACKUP_GCS_SECRET_NAME, 'default')
   await copySecret(BACKUP_GCS_SECRET_NAME, 'default', celoEnv)
   return installGenericHelmChart(
     celoEnv,
     celoEnv,
     '../helm-charts/testnet',
-    await helmParameters(celoEnv)
+    await helmParameters(celoEnv, useExistingGenesis)
   )
 }
 
-export async function upgradeHelmChart(celoEnv: string) {
+export async function upgradeHelmChart(celoEnv: string, useExistingGenesis: boolean) {
   console.info(`Upgrading helm release ${celoEnv}`)
-  const parameters = (await helmParameters(celoEnv)).join(' ')
-  if (process.env.CELOTOOL_VERBOSE === 'true') {
-    await execCmdWithExitOnFailure(
-      `helm upgrade --debug --dry-run ${celoEnv} ../helm-charts/testnet --namespace ${celoEnv} ${parameters}`
-    )
-  }
-  await execCmdWithExitOnFailure(
-    `helm upgrade ${celoEnv} ../helm-charts/testnet --namespace ${celoEnv} ${parameters}`
-  )
+  const parameters = await helmParameters(celoEnv, useExistingGenesis)
+  await upgradeGenericHelmChart(celoEnv, celoEnv, '../helm-charts/testnet', parameters)
   console.info(`Helm release ${celoEnv} upgrade successful`)
 }
 
-export async function resetAndUpgradeHelmChart(celoEnv: string) {
+export async function resetAndUpgradeHelmChart(celoEnv: string, useExistingGenesis: boolean) {
   const txNodesSetName = `${celoEnv}-tx-nodes`
   const validatorsSetName = `${celoEnv}-validators`
   const bootnodeName = `${celoEnv}-bootnode`
+  const proxySetName = `${celoEnv}-proxy`
+  const privateTxNodesSetname = `${celoEnv}-tx-nodes-private`
 
   // scale down nodes
   await scaleResource(celoEnv, 'StatefulSet', txNodesSetName, 0)
   await scaleResource(celoEnv, 'StatefulSet', validatorsSetName, 0)
+  // allow to fail for the cases where a testnet does not include the proxy statefulset yet
+  await scaleResource(celoEnv, 'StatefulSet', proxySetName, 0, true)
+  await scaleResource(celoEnv, 'StatefulSet', privateTxNodesSetname, 0, true)
   await scaleResource(celoEnv, 'Deployment', bootnodeName, 0)
 
   await deletePersistentVolumeClaims(celoEnv)
   await sleep(10000)
 
-  await upgradeHelmChart(celoEnv)
+  await upgradeHelmChart(celoEnv, useExistingGenesis)
   await sleep(10000)
 
   const numValdiators = parseInt(fetchEnv(envVar.VALIDATORS), 10)
   const numTxNodes = parseInt(fetchEnv(envVar.TX_NODES), 10)
+  // assumes 1 proxy per proxied validator
+  const numProxies = parseInt(fetchEnvOrFallback(envVar.PROXIED_VALIDATORS, '0'), 10)
+  const numPrivateTxNodes = parseInt(fetchEnv(envVar.PRIVATE_TX_NODES), 10)
 
   // Note(trevor): helm upgrade only compares the current chart to the
   // previously deployed chart when deciding what needs changing, so we need
   // to manually scale up to account for when a node count is the same
   await scaleResource(celoEnv, 'StatefulSet', txNodesSetName, numTxNodes)
   await scaleResource(celoEnv, 'StatefulSet', validatorsSetName, numValdiators)
+  await scaleResource(celoEnv, 'StatefulSet', proxySetName, numProxies)
+  await scaleResource(celoEnv, 'StatefulSet', privateTxNodesSetname, numPrivateTxNodes)
   await scaleResource(celoEnv, 'Deployment', bootnodeName, 1)
 }
 

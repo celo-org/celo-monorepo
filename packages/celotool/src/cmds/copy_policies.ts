@@ -7,7 +7,7 @@ import {
   validateAndSwitchToEnv,
 } from 'src/lib/env-utils'
 import { deleteOtherPolicies, downloadPolicies, uploadPolicies } from 'src/lib/policies'
-import * as yargs from 'yargs'
+import yargs from 'yargs'
 
 export const command = 'copy-policies'
 

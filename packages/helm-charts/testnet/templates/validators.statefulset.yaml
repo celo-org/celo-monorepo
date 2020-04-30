@@ -1,4 +1,3 @@
-{{ if not (eq (.Values.geth.validators | toString) "og") }}
 apiVersion: v1
 kind: Service
 metadata:
@@ -29,7 +28,7 @@ spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:
         requests:
-          storage: 10Gi
+          storage: 2Gi
   podManagementPolicy: Parallel
   updateStrategy:
     type: RollingUpdate
@@ -46,10 +45,10 @@ spec:
         component: validators
     spec:
       initContainers:
-{{ include "celo.init-genesis-container" .  | indent 6 }}
+{{ include "common.init-genesis-container" .  | indent 6 }}
       - name: get-account
         image: {{ .Values.celotool.image.repository }}:{{ .Values.celotool.image.tag }}
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         command:
           - bash
           - "-c"
@@ -61,20 +60,56 @@ spec:
             celotooljs.sh generate bip32 --mnemonic "$MNEMONIC" --accountType validator --index $RID > /root/.celo/pkey
             echo 'Generating address'
             celotooljs.sh generate account-address --private-key `cat /root/.celo/pkey` > /root/.celo/address
-            if [ -z $IP_ADDRESSES ]; then
+            echo -n $IP_ADDRESSES | cut -d '/' -f $((RID + 1)) > /root/.celo/externalIpAddress
+
+            if [[ -z $IP_ADDRESSES || "$RID" -lt "{{ .Values.geth.proxiedValidators }}" ]]; then
               echo $POD_IP > /root/.celo/ipAddress
             else
-              echo $IP_ADDRESSES | cut -d '/' -f $((RID + 1)) > /root/.celo/ipAddress
+              cat /root/.celo/externalIpAddress > /root/.celo/ipAddress
             fi
             echo -n "Generating IP address for validator: "
             cat /root/.celo/ipAddress
-            celotooljs.sh generate public-key --mnemonic "$MNEMONIC" --accountType load_testing --index 0 > /root/.celo/bootnodeEnodeAddress
+
+            celotooljs.sh generate public-key --mnemonic "$MNEMONIC" --accountType bootnode --index 0 > /root/.celo/bootnodeEnodeAddress
             echo -n "Generating Bootnode enode address for the validator: "
             cat /root/.celo/bootnodeEnodeAddress
+
             [[ "$BOOTNODE_IP_ADDRESS" == 'none' ]] && BOOTNODE_IP_ADDRESS=${{ .Release.Namespace | upper }}_BOOTNODE_SERVICE_HOST
             echo `cat /root/.celo/bootnodeEnodeAddress`@$BOOTNODE_IP_ADDRESS:30301 > /root/.celo/bootnodeEnode
             echo -n "Generating Bootnode enode for the validator: "
             cat /root/.celo/bootnodeEnode
+
+            if [ "$RID" -lt "{{ .Values.geth.proxiedValidators }}" ]; then
+              PROXY_INTERNAL_IP_ENV_VAR={{ .Release.Namespace | upper }}_PROXY_INTERNAL_${RID}_SERVICE_HOST
+              echo "PROXY_INTERNAL_IP_ENV_VAR=$PROXY_INTERNAL_IP_ENV_VAR"
+              PROXY_INTERNAL_IP=`eval "echo \\${${PROXY_INTERNAL_IP_ENV_VAR}}"`
+
+              # we can't get the external IP of a service from an environment variable,
+              # so we use the IP address that was allocated for this validator that is
+              # being used by the proxy found in /root/.celo/externalIpAddress
+              if [ -s /root/.celo/externalIpAddress ]; then
+                echo "Proxy external IP from /root/.celo/externalIpAddress: "
+                PROXY_EXTERNAL_IP=`cat /root/.celo/externalIpAddress`
+              else
+                # otherwise use the internal proxy service IP address
+                PROXY_EXTERNAL_IP_ENV_VAR={{ .Release.Namespace | upper }}_PROXY_INTERNAL_${RID}_SERVICE_HOST
+                echo "Proxy external IP from PROXY_EXTERNAL_IP_ENV_VAR=$PROXY_EXTERNAL_IP_ENV_VAR"
+                PROXY_EXTERNAL_IP=`eval "echo \\${${PROXY_EXTERNAL_IP_ENV_VAR}}"`
+              fi
+
+              echo "Proxy internal IP: $PROXY_INTERNAL_IP_ENV_VAR=$PROXY_INTERNAL_IP"
+              echo "Proxy external IP: $PROXY_EXTERNAL_IP_ENV_VAR=$PROXY_EXTERNAL_IP"
+
+              PROXY_ENODE_ADDRESS=`celotooljs.sh generate public-key --mnemonic "$MNEMONIC" --accountType proxy --index $RID`
+              PROXY_INTERNAL_ENODE=enode://${PROXY_ENODE_ADDRESS}@${PROXY_INTERNAL_IP}:30503
+              PROXY_EXTERNAL_ENODE=enode://${PROXY_ENODE_ADDRESS}@${PROXY_EXTERNAL_IP}:30303
+
+              echo "Proxy internal enode: $PROXY_INTERNAL_ENODE"
+              echo "Proxy external enode: $PROXY_EXTERNAL_ENODE"
+
+              echo $PROXY_INTERNAL_ENODE > /root/.celo/proxyInternalEnode
+              echo $PROXY_EXTERNAL_ENODE > /root/.celo/proxyExternalEnode
+            fi
         env:
         - name: POD_IP
           valueFrom:
@@ -97,36 +132,32 @@ spec:
         volumeMounts:
         - name: data
           mountPath: /root/.celo
-      - name: import-geth-account
-        image: {{ .Values.geth.image.repository }}:{{ .Values.geth.image.tag }}
-        imagePullPolicy: {{ .Values.imagePullPolicy }}
-        command: ["/bin/sh"]
-        args:
-        - "-c"
-        - |
-          geth account import --password /root/.celo/account/accountSecret /root/.celo/pkey || true
-        volumeMounts:
-        - name: data
-          mountPath: /root/.celo
-        - name: account
-          mountPath: "/root/.celo/account"
-          readOnly: true
+{{ include "common.import-geth-account-container" .  | indent 6 }}
       containers:
       - name: geth
         image: {{ .Values.geth.image.repository }}:{{ .Values.geth.image.tag }}
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         command: ["/bin/sh"]
         args:
         - "-c"
         - |-
           set -euo pipefail
+          rm /root/.celo/pkey || true
+
           ACCOUNT_ADDRESS=`cat /root/.celo/address`
           RID=`cat /root/.celo/replica_id`
+
           FAULTY_NODE_FLAGS=`if [ "$RID" -lt "$FAULTY_NODES" ]; then echo -n "--istanbul.faultymode $FAULTY_NODE_TYPE"; fi`
+
+          PROXIED_FLAGS=""
+          [ "$RID" -lt "{{ .Values.geth.proxiedValidators }}" ] && PROXIED_FLAGS="--proxy.proxied --proxy.proxyenodeurlpair=`cat /root/.celo/proxyInternalEnode`;`cat /root/.celo/proxyExternalEnode` --nodiscover --proxy.allowprivateip"
+
           PING_IP_FROM_PACKET_FLAG=""
           [[ "$PING_IP_FROM_PACKET" == "true" ]] && PING_IP_FROM_PACKET_FLAG="--ping-ip-from-packet"
+
           IN_MEMORY_DISCOVERY_TABLE_FLAG=""
           [[ "$IN_MEMORY_DISCOVERY_TABLE" == "true" ]] && IN_MEMORY_DISCOVERY_TABLE_FLAG="--use-in-memory-discovery-table"
+
           geth \
             --bootnodes=enode://`cat /root/.celo/bootnodeEnode` \
             --password=/root/.celo/account/accountSecret \
@@ -141,24 +172,23 @@ spec:
             --wsaddr 0.0.0.0 \
             --wsorigins=* \
             --wsapi=eth,net,web3,debug \
-            --nodekey=/root/.celo/pkey \
             --etherbase=${ACCOUNT_ADDRESS} \
             --networkid=${NETWORK_ID} \
             --syncmode=full \
-            --ethstats=${HOSTNAME}:${ETHSTATS_SECRET}@${ETHSTATS_SVC} \
-            --miner.verificationpool=${VERIFICATION_POOL_URL} \
+            --ethstats=${HOSTNAME}@${ETHSTATS_SVC} \
             --consoleformat=json \
             --consoleoutput=stdout \
             --verbosity={{ .Values.geth.verbosity }} \
-            --ethstats=${HOSTNAME}:${ETHSTATS_SECRET}@${ETHSTATS_SVC} \
             ${FAULTY_NODE_FLAGS} \
             --istanbul.blockperiod={{ .Values.geth.blocktime }} \
             --istanbul.requesttimeout={{ .Values.geth.istanbulrequesttimeout }} \
-            --maxpeers={{ mul 2 (add .Values.geth.validators .Values.geth.tx_nodes) }} \
+            --maxpeers=125 \
             --nat=extip:`cat /root/.celo/ipAddress` \
             --metrics \
+            --allow-insecure-unlock \
             ${PING_IP_FROM_PACKET_FLAG} \
-            ${IN_MEMORY_DISCOVERY_TABLE_FLAG}
+            ${IN_MEMORY_DISCOVERY_TABLE_FLAG} \
+            ${PROXIED_FLAGS}
         env:
         - name: POD_IP
           valueFrom:
@@ -167,18 +197,11 @@ spec:
               fieldPath: status.podIP
         - name: ETHSTATS_SVC
           value: {{ template "ethereum.fullname" . }}-ethstats.{{ .Release.Namespace }}
-        - name: ETHSTATS_SECRET
-          valueFrom:
-            secretKeyRef:
-              name: {{ template "ethereum.fullname" . }}-ethstats
-              key: WS_SECRET
         - name: NETWORK_ID
           valueFrom:
             configMapKeyRef:
               name: {{ template "ethereum.fullname" . }}-geth-config
               key: networkid
-        - name: VERIFICATION_POOL_URL
-          value: {{ .Values.geth.miner.verificationpool }}
         - name: FAULTY_NODES
           value: {{ .Values.geth.faultyValidators | quote }}
         - name: FAULTY_NODE_TYPE
@@ -220,4 +243,3 @@ spec:
       - name: account
         secret:
           secretName: {{ template "ethereum.fullname" . }}-geth-account
-{{ end }}

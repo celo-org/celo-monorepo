@@ -68,7 +68,7 @@ Run this command:
 ### How to Faucet an Account
 
 Run this command:
-`celotooljs account faucet --celo-env <integration-or-your-testnet> --account <account-address>`
+`celotooljs account faucet --celo-env <integration-or-your-testnet> --account <account-address> --gold 10 --dollar 10`
 
 ### How to Setup a Local Celo Blockchain Node
 
@@ -79,3 +79,20 @@ a few useful commands to make running a node really easy.
 - Build `celotooljs geth build --geth-dir <directory-where-you-cloned-geth-repo> -c`
 - Init `celotooljs geth init --geth-dir <directory-where-you-cloned-geth-repo> --data-dir <geth-data-dir> -e <env-name>`
 - Run `celotooljs geth run --geth-dir <directory-where-you-cloned-geth-repo> --data-dir <geth-data-dir> --sync-mode <full | fast | light | ultralight>`
+
+### How to Deploy a Test Network to the Cloud
+
+- Setup the environment variables: MNEMONIC, and GETH_ACCOUNT_SECRET.
+
+- Deploy: `celotooljs deploy initial testnet -e yourname`
+
+- Get pods: `kubectl get pods -n yourname`
+
+- Start shell: `kubectl exec -n podname -it podname /bin/sh`
+
+- Tear down: `celotooljs deploy destroy testnet -e yourname`
+
+#### MacOS Setup
+
+- Install Helm 2.14.0 from https://get.helm.sh/ (Homebrew lacks this version.)
+  To get past the Unidentified Developer error: open the directory containing helm, then ctrl-click helm and select Open then Open again. Repeat for tiller.

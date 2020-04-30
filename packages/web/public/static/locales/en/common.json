@@ -1,0 +1,74 @@
+{
+  "disclaimer": "Nothing herein constitutes an offer to sell, or the solicitation of an offer to buy, any securities or tokens.",
+  "About Us": "About Us",
+  "Join Us": "Join Us",
+  "Home": "Home",
+  "Join": "Join",
+  "Technology": "Technology",
+  "Applications": "Applications",
+  "Community": "Community",
+  "Connect": "Connect",
+  "Medium": "Medium",
+  "blog": "Blog",
+  "Twitter": "Twitter",
+  "github": "GitHub",
+  "Privacy Policy": "Privacy Policy",
+  "email": "Email",
+  "weUseCookies": "We use cookies on our website",
+  "weUseCookiesReasons": "to better understand how visitors use our site so that we can improve the experience.",
+  "cookiesPrivacyInfo": "By selecting Agree, you consent to our use of cookies in accordance with our",
+  "cookiesPrivacyPolicy": "Privacy Policy.",
+  "cookiesAgree": "Agree",
+  "cookiesDisagree": "Disagree",
+  "footerReadMoreTerms": "Read more in Celo <0>Terms of Service</0>",
+  "footer": {
+    "technology": "Technology",
+    "resources": "Resources",
+    "social": "Social",
+    "copyright": "Designed & Built by cLabs, © Celo {{year}}"
+  },
+  "channels": {
+    "brand": {
+      "name": "Brand Toolkit",
+      "text": "Design with Celo"
+    },
+    "discord": {
+      "name": "Discord",
+      "text": "Collaborate and get\ndeveloper support"
+    },
+    "events": {
+      "name": "Events",
+      "text": "Connect in Person"
+    },
+    "forum": {
+      "name": "Forum",
+      "text": "Ask technical questions"
+    },
+    "github": {
+      "name": "GitHub",
+      "text": "Contribute to the codebase"
+    },
+    "linkedin": {
+      "name": "LinkedIn",
+      "text": "Find Professional Opportunities"
+    }
+  },
+  "stayConnected": "Stay connected",
+  "stayConnectedThanks": "Thanks for joining the Celo community, expect our newsletter soon.",
+  "readMoreFromOurBlog": "Read more on our blog",
+  "receiveUpdates": "Receive the latest updates to your inbox",
+  "signUp": "Sign Up",
+  "conductBtn": "Read Document",
+  "experienceLabel": "Experience",
+  "conductLabel": "Code of Conduct",
+  "conductText": "Shared norms and behaviors are the foundation of a beautiful community. Please read and respect our code of conduct.",
+  "socialLabel": "Engage",
+  "validationErrors": {
+    "email": "Please enter a valid email",
+    "generic": "Oops I’m blank!",
+    "unknownError": "Something went wrong",
+    "pleaseWait": "Please wait"
+  },
+  "shortSuccess": "Submitted",
+  "applicationSubmitted": "Application Submitted"
+}

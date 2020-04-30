@@ -1,4 +1,4 @@
-import { TransactionObject } from 'web3/eth/types'
+import { TransactionObject } from 'web3-eth'
 import { failWith } from './cli'
 
 export enum Op {

@@ -19,7 +19,7 @@ export default class CommunityDemo extends React.PureComponent {
           image={preview}
         />
         <View style={styles.fullScreen}>
-          <FullCircle />
+          <FullCircle lightBackground={false} />
           <View style={styles.logo}>
             <a href={'/'}>
               <LogoCombinedColor height={40} />

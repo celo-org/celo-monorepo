@@ -1,4 +1,4 @@
-import { memo } from 'react'
+import * as React from 'react'
 import { StyleSheet, View } from 'react-native'
 import LottieBase from 'src/animate/LottieBase'
 import { colors } from 'src/styles'
@@ -7,16 +7,16 @@ interface Props {
   size: 'small' | 'medium'
 }
 
-const PATHS = {
-  [colors.primary]: 'greenSpinner.json',
-  [colors.white]: 'whiteSpinner.json',
-  [colors.dark]: 'darkSpinner.json',
+const DATA = {
+  [colors.primary]: require('src/shared/greenSpinner.json'),
+  [colors.white]: require('src/shared/whiteSpinner.json'),
+  [colors.dark]: require('src/shared/darkSpinner.json'),
 }
 
-export default memo(function Spinner(props: Props) {
+export default React.memo(function Spinner(props: Props) {
   return (
-    <View style={styles[props.size]}>
-      <LottieBase path={PATHS[props.color]} />
+    <View accessibilityLabel="loading" style={styles[props.size]}>
+      <LottieBase loop={true} data={DATA[props.color]} />
     </View>
   )
 })

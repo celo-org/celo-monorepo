@@ -3,88 +3,29 @@ import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
 import BigNumber from 'bignumber.js'
+import gql from 'graphql-tag'
 import * as React from 'react'
-import { withNamespaces, WithNamespaces } from 'react-i18next'
+import { useTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
-import { HomeTransferFragment } from 'src/apollo/types'
-import { CURRENCIES, CURRENCY_ENUM, resolveCurrency } from 'src/geth/consts'
+import { TokenTransactionType, TransferItemFragment } from 'src/apollo/types'
+import CurrencyDisplay, { FormatType } from 'src/components/CurrencyDisplay'
 import { Namespaces } from 'src/i18n'
 import { AddressToE164NumberType } from 'src/identity/reducer'
 import { Invitees } from 'src/invite/actions'
-import {
-  useDollarsToLocalAmount,
-  useLocalCurrencyCode,
-  useLocalCurrencySymbol,
-} from 'src/localCurrency/hooks'
 import { getRecipientFromAddress, NumberToRecipient } from 'src/recipients/recipient'
 import { navigateToPaymentTransferReview } from 'src/transactions/actions'
-import { TransactionStatus, TransactionTypes, TransferStandby } from 'src/transactions/reducer'
+import { TransactionStatus } from 'src/transactions/reducer'
 import TransferFeedIcon from 'src/transactions/TransferFeedIcon'
 import { decryptComment, getTransferFeedParams } from 'src/transactions/transferFeedUtils'
-import { getMoneyDisplayValue, getNetworkFeeDisplayValue } from 'src/utils/formatting'
-import Logger from 'src/utils/Logger'
 import { formatFeedTime, getDatetimeDisplayString } from 'src/utils/time'
 
-const TAG = 'transactions/TransferFeedItem.tsx'
-
-type Props = (HomeTransferFragment | TransferStandby) &
-  WithNamespaces & {
-    type: TransactionTypes
-    status?: TransactionStatus
-    invitees: Invitees
-    addressToE164Number: AddressToE164NumberType
-    recipientCache: NumberToRecipient
-    commentKey: Buffer | null
-    showLocalCurrency: boolean
-  }
-
-interface CurrencySymbolProps {
-  color: string
-  symbol: string
-  direction: string
-}
-
-function getCurrencyStyles(currency: CURRENCY_ENUM, type: string): CurrencySymbolProps {
-  if (
-    type === TransactionTypes.SENT ||
-    type === TransactionTypes.VERIFICATION_FEE ||
-    type === TransactionTypes.INVITE_SENT
-  ) {
-    return {
-      color: colors.darkSecondary,
-      symbol: CURRENCIES[currency].symbol,
-      direction: '-',
-    }
-  }
-  if (
-    type === TransactionTypes.RECEIVED ||
-    type === TransactionTypes.FAUCET ||
-    type === TransactionTypes.VERIFICATION_REWARD ||
-    type === TransactionTypes.INVITE_RECEIVED ||
-    type === TransactionTypes.PAY_REQUEST
-  ) {
-    if (currency === CURRENCY_ENUM.DOLLAR) {
-      return {
-        color: colors.dark,
-        symbol: CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol,
-        direction: '',
-      }
-    }
-    if (currency === CURRENCY_ENUM.GOLD) {
-      return {
-        color: colors.celoGold,
-        symbol: CURRENCIES[CURRENCY_ENUM.GOLD].symbol,
-        direction: '',
-      }
-    }
-  }
-
-  Logger.warn(TAG, `Unsupported transaction type: ${type}`)
-  return {
-    color: colors.darkSecondary,
-    symbol: '',
-    direction: '',
-  }
+type Props = TransferItemFragment & {
+  type: TokenTransactionType
+  status: TransactionStatus
+  invitees: Invitees
+  addressToE164Number: AddressToE164NumberType
+  recipientCache: NumberToRecipient
+  commentKey: Buffer | null
 }
 
 function navigateToTransactionReview({
@@ -93,70 +34,58 @@ function navigateToTransactionReview({
   comment,
   commentKey,
   timestamp,
-  value,
-  symbol,
+  amount,
   invitees,
   addressToE164Number,
   recipientCache,
 }: Props) {
   // TODO: remove this when verification reward drilldown is supported
-  if (type === TransactionTypes.VERIFICATION_REWARD) {
+  if (type === TokenTransactionType.VerificationReward) {
     return
   }
 
   const recipient = getRecipientFromAddress(
     address,
-    type === TransactionTypes.INVITE_SENT ? invitees : addressToE164Number,
+    type === TokenTransactionType.InviteSent ? invitees : addressToE164Number,
     recipientCache
   )
 
   navigateToPaymentTransferReview(type, timestamp, {
     address,
     comment: decryptComment(comment, commentKey, type),
-    currency: resolveCurrency(symbol),
-    value: new BigNumber(value),
+    amount,
     recipient,
     type,
     // fee TODO: add fee here.
   })
 }
 
+// TODO(jeanregisser): ExchangeFeedItem and TransferFeedItem renders are very similar, we should use the same building blocks
+// so the parts that need to be identical stay the same as we change the code (main layout)
 export function TransferFeedItem(props: Props) {
+  const { t, i18n } = useTranslation(Namespaces.walletFlow5)
+
   const onItemPress = () => {
     navigateToTransactionReview(props)
   }
 
   const {
-    t,
-    value,
+    amount,
     address,
     timestamp,
-    i18n,
     type,
     comment,
     commentKey,
-    symbol,
     status,
     invitees,
     addressToE164Number,
     recipientCache,
-    showLocalCurrency,
   } = props
 
-  const localCurrencyCode = useLocalCurrencyCode()
-  const localCurrencySymbol = useLocalCurrencySymbol()
-  const localValue = useDollarsToLocalAmount(value)
+  const isSent = new BigNumber(amount.value).isNegative()
   const timeFormatted = formatFeedTime(timestamp, i18n)
   const dateTimeFormatted = getDatetimeDisplayString(timestamp, t, i18n)
-  const currency = resolveCurrency(symbol)
-  const currencyStyle = getCurrencyStyles(currency, type)
   const isPending = status === TransactionStatus.Pending
-  const transactionValue =
-    type === TransactionTypes.NETWORK_FEE
-      ? getNetworkFeeDisplayValue(props.value)
-      : showLocalCurrency && localCurrencyCode
-        ? getMoneyDisplayValue(localValue || 0)
-        : getMoneyDisplayValue(props.value)
 
   const { title, info, recipient } = getTransferFeedParams(
     type,
@@ -178,21 +107,16 @@ export function TransferFeedItem(props: Props) {
         <View style={styles.contentContainer}>
           <View style={styles.titleContainer}>
             <Text style={styles.title}>{title}</Text>
-            <Text
+            <CurrencyDisplay
+              amount={amount}
+              formatType={
+                type === TokenTransactionType.NetworkFee ? FormatType.NetworkFee : undefined
+              }
               style={[
-                currencyStyle.direction === '-'
-                  ? fontStyles.activityCurrencySent
-                  : {
-                      ...fontStyles.activityCurrencyReceived,
-                      color: currency === CURRENCY_ENUM.GOLD ? colors.celoGold : colors.celoGreen,
-                    },
                 styles.amount,
+                isSent ? fontStyles.activityCurrencySent : fontStyles.activityCurrencyReceived,
               ]}
-            >
-              {currencyStyle.direction}
-              {showLocalCurrency && localCurrencySymbol}
-              {transactionValue}
-            </Text>
+            />
           </View>
           {!!info && <Text style={styles.info}>{info}</Text>}
           <View style={[styles.statusContainer, !!info && styles.statusContainerUnderComment]}>
@@ -216,6 +140,28 @@ export function TransferFeedItem(props: Props) {
       </View>
     </Touchable>
   )
+}
+
+TransferFeedItem.fragments = {
+  transfer: gql`
+    fragment TransferItem on TokenTransfer {
+      __typename
+      type
+      hash
+      amount {
+        value
+        currencyCode
+        localAmount {
+          value
+          currencyCode
+          exchangeRate
+        }
+      }
+      timestamp
+      address
+      comment
+    }
+  `,
 }
 
 const styles = StyleSheet.create({
@@ -274,13 +220,6 @@ const styles = StyleSheet.create({
     lineHeight: 17,
     color: colors.darkSecondary,
   },
-  localAmount: {
-    marginLeft: 'auto',
-    paddingLeft: 10,
-    fontSize: 14,
-    lineHeight: 18,
-    color: colors.lightGray,
-  },
 })
 
-export default withNamespaces(Namespaces.walletFlow5)(React.memo(TransferFeedItem))
+export default TransferFeedItem

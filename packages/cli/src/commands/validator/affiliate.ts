@@ -1,11 +1,13 @@
 import { IArg } from '@oclif/parser/lib/args'
+import prompts from 'prompts'
 import { BaseCommand } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx } from '../../utils/cli'
 import { Args, Flags } from '../../utils/command'
 
 export default class ValidatorAffiliate extends BaseCommand {
-  static description = 'Affiliate to a ValidatorGroup'
+  static description =
+    "Affiliate a Validator with a Validator Group. This allows the Validator Group to add that Validator as a member. If the Validator is already a member of a Validator Group, affiliating with a different Group will remove the Validator from the first group's members."
 
   static flags = {
     ...BaseCommand.flags,
@@ -32,6 +34,17 @@ export default class ValidatorAffiliate extends BaseCommand {
       .isValidatorGroup(res.args.groupAddress)
       .runChecks()
 
+    const response = await prompts({
+      type: 'confirm',
+      name: 'confirmation',
+      message:
+        'Are you sure you want to affiliate with this group?\nAffiliating with a Validator Group could result in Locked Gold requirements of up to 10,000 cGLD for 60 days. (y/n)',
+    })
+
+    if (!response.confirmation) {
+      console.info('Aborting due to user response')
+      process.exit(0)
+    }
     await displaySendTx('affiliate', validators.affiliate(res.args.groupAddress))
   }
 }

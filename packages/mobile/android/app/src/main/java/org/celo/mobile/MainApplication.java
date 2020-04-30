@@ -1,39 +1,31 @@
 package org.celo.mobile;
 
 import android.content.Context;
-import android.app.Application;
-
+import android.util.Log;
+import androidx.multidex.MultiDexApplication;
+import cl.json.ShareApplication;
 import com.facebook.react.PackageList;
 import com.facebook.react.ReactApplication;
-import io.sentry.RNSentryPackage;
-import com.reactnativegeth.RNGethPackage;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
-import org.celo.devicecredentials.RNConfirmDeviceCredentialsPackage;
-import cl.json.ShareApplication;
-
-import android.util.Log;
-
+import com.reactnativegeth.RNGethPackage;
+import io.sentry.RNSentryPackage;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import ru.ivanarh.jndcrash.NDCrashError;
+import org.celo.devicecredentials.RNConfirmDeviceCredentialsPackage;
 import ru.ivanarh.jndcrash.NDCrash;
+import ru.ivanarh.jndcrash.NDCrashError;
 import ru.ivanarh.jndcrash.NDCrashUnwinder;
 
-import io.invertase.firebase.auth.RNFirebaseAuthPackage;
-import io.invertase.firebase.database.RNFirebaseDatabasePackage;
-import io.invertase.firebase.storage.RNFirebaseStoragePackage;
-import io.invertase.firebase.messaging.RNFirebaseMessagingPackage;
-import io.invertase.firebase.notifications.RNFirebaseNotificationsPackage;
-
-public class MainApplication extends Application implements ShareApplication, ReactApplication {
-
+public class MainApplication
+  extends MultiDexApplication
+  implements ShareApplication, ReactApplication {
   private final ReactNativeHost mReactNativeHost = new ReactNativeHost(this) {
+
     @Override
     public boolean getUseDeveloperSupport() {
       return BuildConfig.DEBUG;
@@ -50,11 +42,6 @@ public class MainApplication extends Application implements ShareApplication, Re
         packages.add(new RNConfirmDeviceCredentialsPackage());
       }
       packages.add(new RNGethPackage());
-      packages.add(new RNFirebaseAuthPackage());
-      packages.add(new RNFirebaseDatabasePackage());
-      packages.add(new RNFirebaseStoragePackage());
-      packages.add(new RNFirebaseMessagingPackage());
-      packages.add(new RNFirebaseNotificationsPackage());
       return packages;
     }
 
@@ -72,7 +59,7 @@ public class MainApplication extends Application implements ShareApplication, Re
   @Override
   public void onCreate() {
     super.onCreate();
-    SoLoader.init(this, /* native exopackage */ false);
+    SoLoader.init(this, /* native exopackage */false);
     initializeFlipper(this); // Remove this line if you don't want Flipper enabled
     initNdkCrashHandler();
   }
@@ -85,8 +72,12 @@ public class MainApplication extends Application implements ShareApplication, Re
   // Set up the NDK crash handler - this is useful for catching Geth crashes
   private void initNdkCrashHandler() {
     final String reportPath = NdkCrashService.getNdkCrashLogReportPath(this);
-    final NDCrashError error = NDCrash.initializeOutOfProcess(this, reportPath, NDCrashUnwinder.libunwind,
-        NdkCrashService.class);
+    final NDCrashError error = NDCrash.initializeOutOfProcess(
+      this,
+      reportPath,
+      NDCrashUnwinder.libunwind,
+      NdkCrashService.class
+    );
     if (error == NDCrashError.ok) {
       Log.i("MainApplication@initJndcrash", "NDK crash handler init successful");
     } else {

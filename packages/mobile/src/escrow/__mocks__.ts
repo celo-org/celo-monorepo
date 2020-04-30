@@ -2,7 +2,6 @@ import BigNumber from 'bignumber.js'
 import { EscrowedPayment } from 'src/escrow/actions'
 import { SHORT_CURRENCIES } from 'src/geth/consts'
 import { multiplyByWei } from 'src/utils/formatting'
-import { mockInvitableRecipient } from 'test/values'
 
 const recipientPhone = '+491522345678'
 const senderAddress = '0x000000000000000000000ce10'
@@ -16,7 +15,6 @@ export function escrowPaymentDouble(partial: object): EscrowedPayment {
   return {
     senderAddress,
     recipientPhone,
-    recipientContact: mockInvitableRecipient,
     paymentID: 'FAKE_ID_1',
     currency,
     amount: multiplyByWei(new BigNumber(7)),

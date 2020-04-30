@@ -10,7 +10,7 @@ import {
 } from 'src/lib/generate_utils'
 import { portForwardAnd } from 'src/lib/port_forward'
 import { execCmd } from 'src/lib/utils'
-import * as yargs from 'yargs'
+import yargs from 'yargs'
 import { UpgradeArgv } from '../../deploy/upgrade'
 
 export const command = 'faucet'
@@ -70,9 +70,7 @@ export const handler = async (argv: UpgradeFaucetArgs) => {
 
     console.info(`Updating contract addresses for ${argv.celoEnv} on ${argv.firebaseProject}`)
     await execCmd(
-      `yarn --cwd ../faucet cli config:set --net ${argv.celoEnv} --escrowAddress ${
-        addressMap.escrow
-      } --goldTokenAddress ${addressMap.goldToken} --stableTokenAddress ${addressMap.stableToken}`
+      `yarn --cwd ../faucet cli config:set --net ${argv.celoEnv} --escrowAddress ${addressMap.escrow} --goldTokenAddress ${addressMap.goldToken} --stableTokenAddress ${addressMap.stableToken}`
     )
     console.info(`Redepolying functions (neeeded for config changes to take place)`)
     await execCmd('yarn --cwd ../faucet cli deploy:functions')
@@ -92,9 +90,7 @@ export const handler = async (argv: UpgradeFaucetArgs) => {
     await portForwardAnd(argv.celoEnv, fundFaucetAccounts)
 
     console.info(
-      `Done updating contract addresses and funding the faucet account for network ${
-        argv.celoEnv
-      } in ${argv.firebaseProject}`
+      `Done updating contract addresses and funding the faucet account for network ${argv.celoEnv} in ${argv.firebaseProject}`
     )
     console.info('Please double check the TX node IP address to ensure it did not change.')
     process.exit(0)

@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`PaymentRequestListScreen renders correctly with no payments 1`] = `
+exports[`EscrowedPaymentListScreen renders correctly with no payments 1`] = `
 <SafeAreaView
   style={
     Object {
@@ -9,91 +9,6 @@ exports[`PaymentRequestListScreen renders correctly with no payments 1`] = `
     }
   }
 >
-  <View
-    style={
-      Object {
-        "alignItems": "center",
-        "flex": 0,
-        "flexDirection": "row",
-        "padding": 16,
-      }
-    }
-  >
-    <Image
-      resizeMode="contain"
-      source={
-        Object {
-          "testUri": "../../../packages/mobile/src/images/celo-account.png",
-        }
-      }
-      style={
-        Object {
-          "height": 40,
-          "width": 40,
-        }
-      }
-    />
-    <View
-      style={
-        Object {
-          "flex": 1,
-          "flexDirection": "row",
-          "justifyContent": "space-between",
-          "paddingStart": 16,
-        }
-      }
-    >
-      <Text
-        style={
-          Object {
-            "color": "#2E3338",
-            "fontFamily": "Hind-SemiBold",
-            "fontSize": 14,
-            "lineHeight": 18,
-          }
-        }
-      >
-        celoDollarBalance
-      </Text>
-      <Text
-        style={
-          Object {
-            "color": "#42D689",
-            "fontFamily": "Hind-SemiBold",
-            "fontSize": 14,
-            "lineHeight": 18,
-          }
-        }
-      >
-        $120
-      </Text>
-    </View>
-  </View>
-  <View
-    style={
-      Object {
-        "alignItems": "center",
-        "backgroundColor": "#F8F8F8",
-        "display": "flex",
-        "flexDirection": "row",
-        "height": 36,
-        "justifyContent": "space-between",
-        "paddingHorizontal": 10,
-      }
-    }
-  >
-    <Text
-      style={
-        Object {
-          "color": "#81868B",
-          "fontFamily": "Hind-Medium",
-          "fontSize": 12,
-        }
-      }
-    >
-      payments
-    </Text>
-  </View>
   <Text
     style={
       Array [
@@ -110,12 +25,12 @@ exports[`PaymentRequestListScreen renders correctly with no payments 1`] = `
       ]
     }
   >
-    empty
+    global:emptyList
   </Text>
 </SafeAreaView>
 `;
 
-exports[`PaymentRequestListScreen renders correctly with payments 1`] = `
+exports[`EscrowedPaymentListScreen renders correctly with payments 1`] = `
 <SafeAreaView
   style={
     Object {
@@ -124,91 +39,6 @@ exports[`PaymentRequestListScreen renders correctly with payments 1`] = `
     }
   }
 >
-  <View
-    style={
-      Object {
-        "alignItems": "center",
-        "flex": 0,
-        "flexDirection": "row",
-        "padding": 16,
-      }
-    }
-  >
-    <Image
-      resizeMode="contain"
-      source={
-        Object {
-          "testUri": "../../../packages/mobile/src/images/celo-account.png",
-        }
-      }
-      style={
-        Object {
-          "height": 40,
-          "width": 40,
-        }
-      }
-    />
-    <View
-      style={
-        Object {
-          "flex": 1,
-          "flexDirection": "row",
-          "justifyContent": "space-between",
-          "paddingStart": 16,
-        }
-      }
-    >
-      <Text
-        style={
-          Object {
-            "color": "#2E3338",
-            "fontFamily": "Hind-SemiBold",
-            "fontSize": 14,
-            "lineHeight": 18,
-          }
-        }
-      >
-        celoDollarBalance
-      </Text>
-      <Text
-        style={
-          Object {
-            "color": "#42D689",
-            "fontFamily": "Hind-SemiBold",
-            "fontSize": 14,
-            "lineHeight": 18,
-          }
-        }
-      >
-        $120
-      </Text>
-    </View>
-  </View>
-  <View
-    style={
-      Object {
-        "alignItems": "center",
-        "backgroundColor": "#F8F8F8",
-        "display": "flex",
-        "flexDirection": "row",
-        "height": 36,
-        "justifyContent": "space-between",
-        "paddingHorizontal": 10,
-      }
-    }
-  >
-    <Text
-      style={
-        Object {
-          "color": "#81868B",
-          "fontFamily": "Hind-Medium",
-          "fontSize": 12,
-        }
-      }
-    >
-      payments
-    </Text>
-  </View>
   <Text
     style={
       Array [
@@ -225,7 +55,7 @@ exports[`PaymentRequestListScreen renders correctly with payments 1`] = `
       ]
     }
   >
-    empty
+    global:emptyList
   </Text>
 </SafeAreaView>
 `;

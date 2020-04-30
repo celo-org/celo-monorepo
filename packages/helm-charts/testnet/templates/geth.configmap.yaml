@@ -9,8 +9,4 @@ metadata:
     heritage: {{ .Release.Service }}
 data:
   networkid: "{{ .Values.geth.genesis.networkId }}"
-  gethtx1NodeId: {{ .Values.geth.account.gethtx1.nodeId }}
-  gethtx2NodeId: {{ .Values.geth.account.gethtx2.nodeId }}
-  gethtx3NodeId: {{ .Values.geth.account.gethtx3.nodeId }}
-  gethtx4NodeId: {{ .Values.geth.account.gethtx4.nodeId }}
   genesis.json: {{ .Values.geth.genesisFile | b64dec | quote }}

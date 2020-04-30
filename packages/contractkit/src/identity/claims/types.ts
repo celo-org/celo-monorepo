@@ -15,4 +15,9 @@ export enum ClaimTypes {
   TWITTER = 'TWITTER',
 }
 
-export const VERIFIABLE_CLAIM_TYPES = [ClaimTypes.KEYBASE, ClaimTypes.ACCOUNT]
+export const VERIFIABLE_CLAIM_TYPES = [ClaimTypes.KEYBASE, ClaimTypes.ACCOUNT, ClaimTypes.DOMAIN]
+
+// Claims whose status can be validated
+export const VALIDATABLE_CLAIM_TYPES = [ClaimTypes.ATTESTATION_SERVICE_URL]
+
+export const SINGULAR_CLAIM_TYPES = [ClaimTypes.NAME, ClaimTypes.ATTESTATION_SERVICE_URL]

@@ -1,15 +1,17 @@
 import Link from '@celo/react-components/components/Link'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
-import { anonymizedPhone, isE164Number } from '@celo/utils/src/phoneNumbers'
+import { isE164Number } from '@celo/utils/src/phoneNumbers'
 import * as Sentry from '@sentry/react-native'
 import * as React from 'react'
-import { WithNamespaces, withNamespaces } from 'react-i18next'
+import { WithTranslation } from 'react-i18next'
 import { Clipboard, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import { devModeTriggerClicked, resetBackupState } from 'src/account/actions'
+import { PincodeType } from 'src/account/reducer'
+import { pincodeTypeSelector } from 'src/account/selectors'
 import SettingsItem from 'src/account/SettingsItem'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
@@ -17,10 +19,10 @@ import { resetAppOpenedState, setAnalyticsEnabled, setNumberVerified } from 'src
 import { AvatarSelf } from 'src/components/AvatarSelf'
 import { FAQ_LINK, TOS_LINK } from 'src/config'
 import { features } from 'src/flags'
-import { Namespaces } from 'src/i18n'
+import { Namespaces, withTranslation } from 'src/i18n'
 import { revokeVerification } from 'src/identity/actions'
 import { headerWithBackButton } from 'src/navigator/Headers'
-import { navigate } from 'src/navigator/NavigationService'
+import { navigate, navigateProtected } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
 import { navigateToURI, navigateToVerifierApp } from 'src/utils/linking'
@@ -41,9 +43,10 @@ interface StateProps {
   devModeActive: boolean
   analyticsEnabled: boolean
   numberVerified: boolean
+  pincodeType: PincodeType
 }
 
-type Props = StateProps & DispatchProps & WithNamespaces
+type Props = StateProps & DispatchProps & WithTranslation
 
 interface State {
   version: string
@@ -56,6 +59,7 @@ const mapStateToProps = (state: RootState): StateProps => {
     e164PhoneNumber: state.account.e164PhoneNumber,
     analyticsEnabled: state.app.analyticsEnabled,
     numberVerified: state.app.numberVerified,
+    pincodeType: pincodeTypeSelector(state),
   }
 }
 
@@ -108,12 +112,20 @@ export class Account extends React.Component<Props, State> {
     navigate(Screens.Licenses)
   }
 
+  goToSupport() {
+    navigate(Screens.Support)
+  }
+
+  goToSecurity = () => {
+    navigateProtected(Screens.Security, { nextScreen: Screens.Account })
+  }
+
   goToAnalytics() {
     navigate(Screens.Analytics, { nextScreen: Screens.Account })
   }
 
-  goToCeloLite() {
-    navigate(Screens.CeloLite, { nextScreen: Screens.Account })
+  goToDataSaver() {
+    navigate(Screens.DataSaver, { nextScreen: Screens.Account })
   }
 
   goToFAQ() {
@@ -124,9 +136,17 @@ export class Account extends React.Component<Props, State> {
     navigateToURI(TOS_LINK)
   }
 
+  goToFiatExchange() {
+    navigate(Screens.FiatExchange)
+  }
+
   resetAppOpenedState = () => {
     this.props.resetAppOpenedState()
     Logger.showMessage('App onboarding state reset.')
+  }
+
+  toggleNumberVerified = () => {
+    this.props.setNumberVerified(!this.props.numberVerified)
   }
 
   revokeNumberVerification = async () => {
@@ -144,12 +164,6 @@ export class Account extends React.Component<Props, State> {
 
   showDebugScreen = async () => {
     navigate(Screens.Debug)
-  }
-
-  sendLogsToSupport = async () => {
-    if (this.props.e164PhoneNumber) {
-      await Logger.emailLogsToSupport(anonymizedPhone(this.props.e164PhoneNumber))
-    }
   }
 
   onPressAddress = () => {
@@ -173,9 +187,14 @@ export class Account extends React.Component<Props, State> {
     } else {
       return (
         <View style={style.devSettings}>
-          <View style={style.devSettingsItem}>
+          {/* <View style={style.devSettingsItem}>
             <TouchableOpacity onPress={this.revokeNumberVerification}>
               <Text>Revoke Number Verification</Text>
+            </TouchableOpacity>
+          </View> */}
+          <View style={style.devSettingsItem}>
+            <TouchableOpacity onPress={this.toggleNumberVerified}>
+              <Text>Toggle verification done</Text>
             </TouchableOpacity>
           </View>
           <View style={style.devSettingsItem}>
@@ -183,6 +202,7 @@ export class Account extends React.Component<Props, State> {
               <Text>Reset app opened state</Text>
             </TouchableOpacity>
           </View>
+
           <View style={style.devSettingsItem}>
             <TouchableOpacity onPress={this.resetBackupState}>
               <Text>Reset backup state</Text>
@@ -204,12 +224,14 @@ export class Account extends React.Component<Props, State> {
   }
 
   render() {
-    const { t, account, numberVerified } = this.props
+    const { t, account, numberVerified, pincodeType } = this.props
+    const showSecurity = pincodeType === PincodeType.CustomPin
 
     return (
       <ScrollView style={style.scrollView}>
         <SafeAreaView>
           <View style={style.accountProfile}>
+            {/* TouchableNoFeedback doesn't work here for some reason */}
             <TouchableOpacity onPress={this.onPressAvatar}>
               <AvatarSelf />
             </TouchableOpacity>
@@ -222,6 +244,9 @@ export class Account extends React.Component<Props, State> {
             </View>
           </View>
           <View style={style.containerList}>
+            {features.SHOW_ADD_FUNDS && (
+              <SettingsItem title={t('addFunds')} onPress={this.goToFiatExchange} />
+            )}
             <SettingsItem
               title={t('backupKeyFlow6:backupAndRecovery')}
               onPress={this.goToBackupScreen}
@@ -237,15 +262,18 @@ export class Account extends React.Component<Props, State> {
             {features.SHOW_SHOW_REWARDS_APP_LINK && (
               <SettingsItem title={t('celoRewards')} onPress={navigateToVerifierApp} />
             )}
+            {showSecurity && <SettingsItem title={t('security')} onPress={this.goToSecurity} />}
             <SettingsItem title={t('analytics')} onPress={this.goToAnalytics} />
-            <SettingsItem title={t('celoLite')} onPress={this.goToCeloLite} />
+            {features.DATA_SAVER && (
+              <SettingsItem title={t('dataSaver')} onPress={this.goToDataSaver} />
+            )}
             <SettingsItem title={t('languageSettings')} onPress={this.goToLanguageSetting} />
             <SettingsItem
               title={t('localCurrencySetting')}
               onPress={this.goToLocalCurrencySetting}
             />
             <SettingsItem title={t('licenses')} onPress={this.goToLicenses} />
-            <SettingsItem title={t('sendIssueReport')} onPress={this.sendLogsToSupport} />
+            <SettingsItem title={t('support')} onPress={this.goToSupport} />
           </View>
           {this.getDevSettingsComp()}
 
@@ -315,4 +343,4 @@ const style = StyleSheet.create({
 export default connect<StateProps, DispatchProps, {}, RootState>(
   mapStateToProps,
   mapDispatchToProps
-)(withNamespaces(Namespaces.accountScreen10)(Account))
+)(withTranslation(Namespaces.accountScreen10)(Account))

@@ -1,13 +1,26 @@
 {
   "learnMore": "Learn More",
+  "equalToAmount": "Equal to <1></1>",
   "whatIsGold": "Gold is where you can choose to store {{CeloDollars}} you have",
   "manageCelo": "Manage {{CeloDollars}}",
   "activity": "Activity",
   "goldActivity": "Gold Activity",
-  "exchangeRate": "Estimated Exchange Rate",
+  "exchangeRate": "Exchange Rate",
+  "exchangeRateValue": "<0></0> : 1 {{takerTokenCode}}",
   "history": "History",
   "exchange": "Exchange",
+  "buy": "Buy",
+  "sell": "Sell",
+  "buyGold": "Buy Gold",
+  "sellGold": "Sell Gold",
+  "exchangeAmount": "Amount ({{tokenName}})",
+  "switchTo": "Switch to {{tokenName}}",
+  "subtotalAmount": "Subtotal @ <1></1>",
+  "inputSubtotal": "Subtotal (@ <2></2>)",
+  "inputSubtotal_gold": "$t(global:celoGold) (@ <2></2>)",
   "cancel": "Cancel",
+  "buyGoldAmount": "Buy <1></1> $t(global:gold)",
+  "sellGoldAmount": "Sell <1></1> $t(global:gold)",
   "includeExchangeFee": "*includes exchange fee",
   "available": "Available",
   "newBalance": "New Balance",
@@ -23,6 +36,6 @@
   "loadingExchangeRate": "Loading Exchange Rate...",
   "errorRefreshingRate": "Could not refresh exchange rate",
   "exchangeRateChange": "Exchange rate has changed, please retry",
-  "feeExchangeEducation":
-    "When making echanges, a small additional fee goes towards maintaining the stable value of Celo Dollar. To learn more about Celo fees, visit the FAQ."
+  "feeExchangeEducation": "When making exchanges, a small additional fee goes towards maintaining the stable value of Celo Dollar. To learn more about Celo fees, visit the FAQ.",
+  "goldPrice": "Gold Price"
 }

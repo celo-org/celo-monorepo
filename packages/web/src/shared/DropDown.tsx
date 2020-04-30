@@ -89,17 +89,19 @@ export default class DropDown extends React.Component<Props, State> {
             >
               {name}
             </Text>
-            {list.sort((a, b) => (a.id > b.id ? 1 : -1)).map(({ id, label, selected }) => {
-              return (
-                <DropDownElement
-                  key={id}
-                  id={id}
-                  label={label}
-                  selected={selected}
-                  onSelect={this.onSelectItem}
-                />
-              )
-            })}
+            {list
+              .sort((a, b) => (a.id > b.id ? 1 : -1))
+              .map(({ id, label, selected }) => {
+                return (
+                  <DropDownElement
+                    key={id}
+                    id={id}
+                    label={label}
+                    selected={selected}
+                    onSelect={this.onSelectItem}
+                  />
+                )
+              })}
           </View>
         </Responsive>
       </View>
@@ -113,7 +115,6 @@ const styles = StyleSheet.create({
     zIndex: 2,
   },
   containerClosed: {
-    // @ts-ignore
     position: 'static',
     zIndex: -1,
   },

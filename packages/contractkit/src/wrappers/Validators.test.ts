@@ -1,4 +1,4 @@
-import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
+import { mineBlocks, testWithGanache } from '@celo/dev-utils/lib/ganache-test'
 import { addressToPublicKey } from '@celo/utils/lib/signatureUtils'
 import BigNumber from 'bignumber.js'
 import Web3 from 'web3'
@@ -12,12 +12,12 @@ TEST NOTES:
 - In migrations: The only account that has cUSD is accounts[0]
 */
 
-const minLockedGoldValue = Web3.utils.toWei('10', 'ether') // 10 gold
+const minLockedGoldValue = Web3.utils.toWei('10000', 'ether') // 10k gold
 
 const blsPublicKey =
-  '0x4d23d8cd06f30b1fa7cf368e2f5399ab04bb6846c682f493a98a607d3dfb7e53a712bb79b475c57b0ac2785460f91301'
+  '0x4fa3f67fc913878b068d1fa1cdddc54913d3bf988dbe5a36a20fa888f20d4894c408a6773f3d7bde11154f2a3076b700d345a42fd25a0e5e83f4db5586ac7979ac2053cd95d8f2efd3e959571ceccaa743e02cf4be3f5d7aaddb0b06fc9aff00'
 const blsPoP =
-  '0x9d3e1d8f49f6b0d8e9a03d80ca07b1d24cf1cc0557bdcc04f5e17a46e35d02d0d411d956dbd5d2d2464eebd7b74ae30005d223780d785d2abc5644fac7ac29fb0e302bdc80c81a5d45018b68b1045068a4b3a4861c93037685fd0d252d740501'
+  '0xcdb77255037eb68897cd487fdd85388cbda448f617f874449d4b11588b0b7ad8ddc20d9bb450b513bb35664ea3923900'
 
 testWithGanache('Validators Wrapper', (web3) => {
   const kit = newKitFromWeb3(web3)
@@ -26,11 +26,14 @@ testWithGanache('Validators Wrapper', (web3) => {
   let validators: ValidatorsWrapper
   let lockedGold: LockedGoldWrapper
 
-  const registerAccountWithLockedGold = async (account: string) => {
+  const registerAccountWithLockedGold = async (
+    account: string,
+    value: string = minLockedGoldValue
+  ) => {
     if (!(await accountsInstance.isAccount(account))) {
       await accountsInstance.createAccount().sendAndWaitForReceipt({ from: account })
     }
-    await lockedGold.lock().sendAndWaitForReceipt({ from: account, value: minLockedGoldValue })
+    await lockedGold.lock().sendAndWaitForReceipt({ from: account, value })
   }
 
   beforeAll(async () => {
@@ -40,21 +43,25 @@ testWithGanache('Validators Wrapper', (web3) => {
     accountsInstance = await kit.contracts.getAccounts()
   })
 
-  const setupGroup = async (groupAccount: string) => {
-    await registerAccountWithLockedGold(groupAccount)
+  const setupGroup = async (groupAccount: string, members: number = 1) => {
+    await registerAccountWithLockedGold(
+      groupAccount,
+      new BigNumber(minLockedGoldValue).times(members).toFixed()
+    )
     await (await validators.registerValidatorGroup(new BigNumber(0.1))).sendAndWaitForReceipt({
       from: groupAccount,
     })
   }
 
   const setupValidator = async (validatorAccount: string) => {
-    const publicKey = await addressToPublicKey(validatorAccount, web3.eth.sign)
     await registerAccountWithLockedGold(validatorAccount)
-    // set account1 as the validator
+    const ecdsaPublicKey = await addressToPublicKey(validatorAccount, kit.web3.eth.sign)
     await validators
       // @ts-ignore
-      .registerValidator(publicKey, blsPublicKey, blsPoP)
-      .sendAndWaitForReceipt({ from: validatorAccount })
+      .registerValidator(ecdsaPublicKey, blsPublicKey, blsPoP)
+      .sendAndWaitForReceipt({
+        from: validatorAccount,
+      })
   }
 
   test('SBAT registerValidatorGroup', async () => {
@@ -83,15 +90,25 @@ testWithGanache('Validators Wrapper', (web3) => {
     expect(members).toContain(validatorAccount)
   })
 
+  test('SBAT setNextCommissionUpdate', async () => {
+    const groupAccount = accounts[0]
+    await setupGroup(groupAccount)
+    await validators.setNextCommissionUpdate('0.2').sendAndWaitForReceipt({
+      from: groupAccount,
+    })
+    const commission = (await validators.getValidatorGroup(groupAccount)).nextCommission
+    expect(commission).toEqBigNumber('0.2')
+  })
+
   test('SBAT updateCommission', async () => {
     const groupAccount = accounts[0]
     await setupGroup(groupAccount)
-    let commission = (await validators.getValidatorGroup(groupAccount)).commission
-    expect(commission).toEqBigNumber('0.1')
-    await (await validators.updateCommission(new BigNumber(0.2))).sendAndWaitForReceipt({
-      from: groupAccount,
-    })
-    commission = (await validators.getValidatorGroup(groupAccount)).commission
+    const txOpts = { from: groupAccount }
+    await validators.setNextCommissionUpdate('0.2').sendAndWaitForReceipt(txOpts)
+    await mineBlocks(3, web3)
+    await validators.updateCommission().sendAndWaitForReceipt(txOpts)
+
+    const commission = (await validators.getValidatorGroup(groupAccount)).commission
     expect(commission).toEqBigNumber('0.2')
   })
 
@@ -110,7 +127,7 @@ testWithGanache('Validators Wrapper', (web3) => {
 
     beforeEach(async () => {
       groupAccount = accounts[0]
-      await setupGroup(groupAccount)
+      await setupGroup(groupAccount, 2)
 
       validator1 = accounts[1]
       validator2 = accounts[2]
@@ -130,6 +147,8 @@ testWithGanache('Validators Wrapper', (web3) => {
     })
 
     test('move last to first', async () => {
+      jest.setTimeout(30 * 1000)
+
       await validators
         .reorderMember(groupAccount, validator2, 0)
         .then((x) => x.sendAndWaitForReceipt({ from: groupAccount }))
@@ -137,10 +156,13 @@ testWithGanache('Validators Wrapper', (web3) => {
       const membersAfter = await validators
         .getValidatorGroup(groupAccount)
         .then((group) => group.members)
+
       expect(membersAfter).toEqual([validator2, validator1])
     })
 
     test('move first to last', async () => {
+      jest.setTimeout(30 * 1000)
+
       await validators
         .reorderMember(groupAccount, validator1, 1)
         .then((x) => x.sendAndWaitForReceipt({ from: groupAccount }))
@@ -148,6 +170,21 @@ testWithGanache('Validators Wrapper', (web3) => {
       const membersAfter = await validators
         .getValidatorGroup(groupAccount)
         .then((group) => group.members)
+
+      expect(membersAfter).toEqual([validator2, validator1])
+    })
+
+    test('test address normalization', async () => {
+      jest.setTimeout(30 * 1000)
+
+      await validators
+        .reorderMember(groupAccount, validator2.toLowerCase(), 0)
+        .then((x) => x.sendAndWaitForReceipt({ from: groupAccount }))
+
+      const membersAfter = await validators
+        .getValidatorGroup(groupAccount)
+        .then((group) => group.members)
+
       expect(membersAfter).toEqual([validator2, validator1])
     })
   })

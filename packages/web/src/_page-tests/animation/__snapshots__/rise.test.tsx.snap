@@ -1,0 +1,3802 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Animations/Rise renders 1`] = `
+<div
+  className="css-view-1dbjc4n"
+  style={
+    Object {
+      "maxHeight": "100vh",
+      "maxWidth": "100vw",
+      "overflowX": "hidden",
+      "overflowY": "hidden",
+      "width": "100%",
+    }
+  }
+>
+  <div
+    className="css-view-1dbjc4n"
+    style={
+      Object {
+        "backgroundColor": "rgba(255,255,255,1.00)",
+        "height": "100vh",
+        "maxHeight": "768px",
+        "maxWidth": "1024px",
+        "overflowX": "hidden",
+        "overflowY": "hidden",
+        "position": "relative",
+        "width": "100vw",
+        "zIndex": -1,
+      }
+    }
+  >
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "NaNms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "NaNms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "16.5ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "16.5ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "33ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "33ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "60.5ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "60.5ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "88ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "88ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "115.5ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "115.5ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "143ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "143ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "170.5ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "170.5ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "209ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "209ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "247.5ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "247.5ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "275ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "275ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "313.5ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "313.5ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "352ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "352ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "390.5ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "390.5ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "429ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "429ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "467.5ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "467.5ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "506ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "506ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "544.5ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "544.5ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "583ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "583ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "621.5ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "621.5ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "660ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "660ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "709.5ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "709.5ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "748ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "748ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "786.5ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "786.5ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "836ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "836ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "874.5ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "874.5ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "924ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "924ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "962.5ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "962.5ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "1001ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "1001ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "1050.5ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "1050.5ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "1100ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "1100ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "1138.5ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "1138.5ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "1188ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "1188ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "1226.5ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "1226.5ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "1276ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "1276ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "1325.5ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "1325.5ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "1364ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "1364ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "1413.5ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "1413.5ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "1463ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "1463ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "1501.5ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "1501.5ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "1551ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "1551ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "1600.5ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "1600.5ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "1650ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "1650ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "1699.5ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "1699.5ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "1738ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "1738ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "1787.5ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "1787.5ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "1837ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "1837ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "1886.5ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "1886.5ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "1936ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "1936ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "1985.5ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "1985.5ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "2035ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "2035ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "2084.5ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "2084.5ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "2134ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "2134ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "2183.5ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "2183.5ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "2233ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "2233ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "2282.5ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "2282.5ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "2332ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "2332ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "2381.5ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "2381.5ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "2431ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "2431ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "2480.5ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "2480.5ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "2530ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "2530ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "2579.5ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "2579.5ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "2629ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "2629ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "2678.5ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "2678.5ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "2728ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "2728ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "2777.5ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "2777.5ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "2827ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "2827ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "2887.5ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "2887.5ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "2937ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "2937ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "2986.5ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "2986.5ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "3036ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "3036ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "3085.5ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "3085.5ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "3135ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "3135ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "3195.5ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "3195.5ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "3245ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "3245ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "3294.5ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "3294.5ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "3344ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "3344ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "3404.5ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "3404.5ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "3454ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "3454ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "3503.5ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "3503.5ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "3553ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "3553ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "3613.5ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "3613.5ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "3663ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "3663ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "3712.5ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "3712.5ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "3773ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "3773ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "3822.5ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "3822.5ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "3872ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "3872ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "3932.5ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "3932.5ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "3982ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "3982ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "4031.5ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "4031.5ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "4092ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "4092ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "4141.5ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "4141.5ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+    <div
+      className="css-view-1dbjc4n r-animationKeyframes-yyl175"
+      style={
+        Object {
+          "WebkitAnimationDelay": "4202ms",
+          "WebkitAnimationDuration": "33s",
+          "WebkitAnimationFillMode": "both",
+          "WebkitAnimationIterationCount": "infinite",
+          "WebkitAnimationTimingFunction": "ease-in",
+          "animationDelay": "4202ms",
+          "animationDuration": "33s",
+          "animationFillMode": "both",
+          "animationIterationCount": "infinite",
+          "animationTimingFunction": "ease-in",
+          "opacity": 0,
+          "position": "absolute",
+        }
+      }
+    >
+      <svg
+        fill="none"
+        height={24}
+        style={Object {}}
+        viewBox="-10 -10 90 115"
+        width={24}
+      >
+        <g
+          style={
+            Object {
+              "mixBlendMode": "screen",
+            }
+          }
+        >
+          <path
+            d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+            fill="#BF97FF"
+          />
+        </g>
+      </svg>
+    </div>
+  </div>
+  <div
+    className="css-view-1dbjc4n"
+    style={
+      Object {
+        "WebkitAlignItems": "center",
+        "WebkitBoxAlign": "center",
+        "alignItems": "center",
+        "backgroundColor": "rgba(255,255,255,1.00)",
+        "bottom": "60px",
+        "msFlexAlign": "center",
+        "position": "absolute",
+        "width": "100%",
+      }
+    }
+  >
+    <a
+      href="/"
+    >
+      <svg
+        fill="none"
+        height={40}
+        style={Object {}}
+        viewBox="0 0 85 25"
+        width={136}
+      >
+        <path
+          d="M64.2368 22.079L66.5 21.3684V2.63159L64.2368 3.34212V22.079ZM38.1316 10.7105C39.5526 10.7105 40.8684 11.3421 41.7105 12.3947L42.6316 10.2632C41.421 9.10528 39.8158 8.55264 38.1316 8.55264C34.2368 8.55264 31.5526 11.6316 31.5789 15.0263C31.6052 18.7105 34.5 21.7105 38.1316 21.7105C39.9737 21.7105 41.3684 21.1579 42.421 20.3947V17.7895C41.3158 18.8947 39.7105 19.5526 38.3158 19.5526C36.2105 19.5526 33.8421 17.8421 33.8421 15.0263C33.8421 12.4211 35.8947 10.7105 38.1316 10.7105ZM53.1842 8.55264C49.2895 8.55264 47.0263 11.6316 47.0263 15.0263C47.0263 18.7105 49.9473 21.7105 53.5789 21.7105C55.421 21.7105 56.8158 21.1579 57.8684 20.3947V17.7895C56.7631 18.8947 55.1579 19.5526 53.7631 19.5526C51.8947 19.5526 49.8421 18.3947 49.421 15.9474H59.3421V15.079C59.3421 11.4474 56.9473 8.55264 53.1842 8.55264ZM77.6316 8.55264C74 8.55264 71.0526 11.5 71.0526 15.1316C71.0526 18.7632 74 21.7105 77.6316 21.7105C81.2631 21.7105 84.2105 18.7632 84.2105 15.1316C84.2105 11.5 81.2631 8.55264 77.6316 8.55264ZM53.2105 10.7105C54.9737 10.7105 56.8421 11.8158 57 13.9474H49.421C49.5789 11.8158 51.4473 10.7105 53.2105 10.7105ZM77.6316 19.5526C75.1842 19.5526 73.2105 17.579 73.2105 15.1316C73.2105 12.6842 75.1842 10.7105 77.6316 10.7105C80.0789 10.7105 82.0526 12.6842 82.0526 15.1316C82.0526 17.579 80.0789 19.5526 77.6316 19.5526Z"
+          fill="#2E3338"
+          style={Object {}}
+        />
+        <path
+          d="M15.1316 17.1053C19.1284 17.1053 22.3684 13.8653 22.3684 9.86842C22.3684 5.87158 19.1284 2.63158 15.1316 2.63158C11.1348 2.63158 7.89476 5.87158 7.89476 9.86842C7.89476 13.8653 11.1348 17.1053 15.1316 17.1053ZM15.1316 19.7368C9.6816 19.7368 5.26318 15.3184 5.26318 9.86842C5.26318 4.41842 9.6816 0 15.1316 0C20.5816 0 25 4.41842 25 9.86842C25 15.3184 20.5816 19.7368 15.1316 19.7368Z"
+          fill="#35D07F"
+          style={Object {}}
+        />
+        <path
+          d="M9.86842 22.3684C13.8653 22.3684 17.1053 19.1284 17.1053 15.1316C17.1053 11.1348 13.8653 7.89476 9.86842 7.89476C5.87158 7.89476 2.63158 11.1348 2.63158 15.1316C2.63158 19.1284 5.87158 22.3684 9.86842 22.3684ZM9.86842 25C4.41842 25 0 20.5816 0 15.1316C0 9.6816 4.41842 5.26318 9.86842 5.26318C15.3184 5.26318 19.7368 9.6816 19.7368 15.1316C19.7368 20.5816 15.3184 25 9.86842 25Z"
+          fill="#FBCC5C"
+          style={Object {}}
+        />
+        <path
+          d="M15.4553 19.7315C16.1392 18.903 16.6292 17.932 16.89 16.8899C17.9321 16.6294 18.9029 16.1391 19.7316 15.4554C19.6937 16.6623 19.4339 17.852 18.9647 18.9646C17.8521 19.4338 16.6624 19.6936 15.4553 19.7315ZM8.11026 8.10989C7.06815 8.37042 6.09736 8.86068 5.26868 9.54436C5.30657 8.33752 5.56631 7.14778 6.03552 6.03515C7.14815 5.56594 8.33789 5.30621 9.54473 5.26831C8.86105 6.09699 8.37078 7.06778 8.11026 8.10989Z"
+          fill="#5EA33B"
+          style={Object {}}
+        />
+      </svg>
+    </a>
+  </div>
+</div>
+`;

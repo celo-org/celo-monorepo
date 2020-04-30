@@ -1,6 +1,6 @@
 import BigNumber from 'bignumber.js'
 import { checkGethStarted, getWeb3AndTokensContracts, transferERC20Token } from 'src/lib/geth'
-import * as yargs from 'yargs'
+import yargs from 'yargs'
 import { GethArgv } from '../geth'
 
 export const command = 'transfer <senderAddress> <receiverAddress> <token> <amount>'
@@ -54,12 +54,12 @@ export const handler = async (argv: TransferArgv) => {
 
   checkGethStarted(dataDir)
 
-  const { web3, goldToken, stableToken } = await getWeb3AndTokensContracts()
+  const { kit, goldToken, stableToken } = await getWeb3AndTokensContracts()
 
   const transferrableToken = tokenType === CELO_GOLD ? goldToken : stableToken
 
   await transferERC20Token(
-    web3,
+    kit,
     transferrableToken,
     senderAddress,
     receiverAddress,

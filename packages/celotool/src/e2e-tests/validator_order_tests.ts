@@ -1,16 +1,22 @@
 import { assert } from 'chai'
 import _ from 'lodash'
 import Web3 from 'web3'
-import { getContext, GethTestConfig, sleep } from './utils'
+import { GethRunConfig } from '../lib/interfaces/geth-run-config'
+import { getContext, sleep } from './utils'
 
 const VALIDATORS = 10
 const EPOCH = 20
 const EPOCHS_TO_WAIT = 3
 const BLOCK_COUNT = EPOCH * EPOCHS_TO_WAIT
 
+const TMP_PATH = '/tmp/e2e'
+
 describe('governance tests', () => {
-  const gethConfig: GethTestConfig = {
-    migrateTo: 15,
+  const gethConfig: GethRunConfig = {
+    networkId: 1101,
+    network: 'local',
+    runPath: TMP_PATH,
+    migrateTo: 19,
     instances: _.range(VALIDATORS).map((i) => ({
       name: `validator${i}`,
       validating: true,
@@ -31,7 +37,10 @@ describe('governance tests', () => {
     await context.hooks.before()
   })
 
-  after(context.hooks.after)
+  after(async function(this: any) {
+    this.timeout(0)
+    await context.hooks.after()
+  })
 
   describe('Validator ordering', () => {
     before(async function() {
@@ -42,6 +51,9 @@ describe('governance tests', () => {
 
     it('properly orders validators randomly', async function(this: any) {
       this.timeout(160000 /* 160 seconds */)
+      // If a consensus round fails during this test, the results are inconclusive.
+      // Retry up to two times to mitigate this issue. Restarting the nodes is not needed.
+      this.retries(2)
 
       const latestBlockNumber = (await web3.eth.getBlock('latest')).number
       const indexInEpoch = ((latestBlockNumber % EPOCH) + EPOCH - 1) % EPOCH

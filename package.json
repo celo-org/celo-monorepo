@@ -7,8 +7,8 @@
   "scripts": {
     "install-pkg": "yarn install --link-duplicates",
     "lint": "yarn lerna run lint",
-    "prettify": "yarn run prettier --config .prettierrc.js --write '**/*.+(ts|tsx|js|jsx|sol)'",
-    "prettify:diff": "yarn run prettier --config .prettierrc.js --list-different '**/*.+(ts|tsx|js|jsx|sol)'",
+    "prettify": "yarn run prettier --config .prettierrc.js --write '**/*.+(ts|tsx|js|jsx|sol|java)'",
+    "prettify:diff": "yarn run prettier --config .prettierrc.js --list-different '**/*.+(ts|tsx|js|jsx|sol|java)'",
     "reset": "yarn reset-modules && yarn reset-cache",
     "reset-cache": "yarn reset-yarn && yarn reset-rn",
     "reset-modules": "rm -rf node_modules/ packages/*/node_modules",
@@ -22,11 +22,13 @@
     "postinstall": "yarn run lerna run postinstall && patch-package && yarn keys:decrypt",
     "keys:decrypt": "bash scripts/key_placer.sh decrypt",
     "keys:encrypt": "bash scripts/key_placer.sh encrypt",
-    "check:packages": "node ./scripts/check-packages.js"
+    "check:packages": "node ./scripts/check-packages.js",
+    "celotool": "yarn --cwd packages/celotool run --silent cli",
+    "celocli": "yarn --cwd packages/cli run --silent celocli"
   },
   "husky": {
     "hooks": {
-      "pre-commit": "pretty-quick --staged",
+      "pre-commit": "pretty-quick --staged --pattern '**/*.+(ts|tsx|js|jsx|sol|java)'",
       "pre-push": "node ./scripts/hooks/pre-push.js"
     }
   },
@@ -35,46 +37,53 @@
       "packages/*"
     ],
     "nohoist": [
-      "@celo/web/@timkendrick/monaco-editor",
-      "@celo/web/@types/react-i18next",
-      "@celo/web/next-i18next",
-      "**/openzeppelin-solidity"
+      "**/openzeppelin-solidity",
+      "**/solidity-bytes-utils"
     ]
   },
   "devDependencies": {
     "@babel/core": "^7.6.2",
     "@babel/runtime": "^7.6.2",
-    "@types/jest": "^24.0.18",
-    "babel-jest": "^24.9.0",
+    "@types/jest": "^25.1.4",
+    "babel-jest": "^25.1.0",
+    "codecov": "^3.6.5",
     "husky": "^3.0.0",
-    "jest": "^24.9.0",
-    "jest-junit": "^8.0.0",
-    "jest-snapshot": "^24.9.0",
+    "jest": "^25.1.0",
+    "jest-junit": "^10.0.0",
+    "jest-snapshot": "^25.1.0",
     "lerna": "^3.16.0",
     "patch-package": "^5.1.1",
-    "prettier": "1.13.5",
-    "prettier-plugin-solidity": "1.0.0-alpha.34",
-    "pretty-quick": "^1.11.1",
+    "prettier": "1.19.1",
+    "prettier-plugin-java": "^0.6.0",
+    "prettier-plugin-solidity": "1.0.0-alpha.35",
+    "pretty-quick": "^2.0.1",
     "solc": "0.5.8",
-    "ts-jest": "^24.1.0",
+    "ts-jest": "^25.2.1",
     "ts-node": "^8.3.0",
     "tsconfig-paths": "^3.8.0",
     "tslint": "^5.20.0",
-    "typescript": "^3.5.3",
+    "typescript": "^3.7.3",
     "typescript-tslint-plugin": "^0.5.4"
   },
-  "dependencies": {
-    "codecov": "^3.1.0"
-  },
+  "dependencies": {},
   "resolutions": {
     "node-gyp": "5.0.1",
     "tar": "4.4.10",
     "lodash": "4.17.15",
     "react-native-ntp-client": "^1.0.0",
-    "**/codecov/**/js-yaml": "^3.13.1",
     "**/deep-extend": "^0.5.1",
     "**/extend": "^3.0.2",
     "**/cross-fetch": "^3.0.2",
-    "sha3": "1.2.3"
+    "sha3": "1.2.3",
+    "bignumber.js": "9.0.0",
+    "prettier": "^1.19.1",
+    "@types/prettier": "^1.19.0",
+    "eslint-utils": "^1.4.1",
+    "set-value": "^3.0.2",
+    "decompress": "^4.2.1",
+    "https-proxy-agent": "^5.0.0",
+    "mixin-deep": "^2.0.1",
+    "js-yaml": "^3.13.1",
+    "ganache-core": "https://github.com/celo-org/ganache-core.git#3dbc32b"
   }
 }

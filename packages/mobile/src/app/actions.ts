@@ -1,23 +1,36 @@
-import { NavigationParams } from 'react-navigation'
 import i18n from 'src/i18n'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import Logger from 'src/utils/Logger'
 
-const numeral = require('numeral')
-require('numeral/locales/es')
+const TAG = 'app/actions'
+
+// https://facebook.github.io/react-native/docs/appstate
+export enum AppState {
+  Background = 'Background',
+  Active = 'Active',
+  Inactive = 'Inactive',
+}
 
 export enum Actions {
+  SET_APP_STATE = 'APP/SET_APP_STATE',
   SET_LOGGED_IN = 'APP/SET_LOGGED_IN',
   SET_NUMBER_VERIFIED = 'APP/SET_NUMBER_VERIFIED',
   SET_LANGUAGE = 'APP/SET_LANGUAGE',
+  OPEN_DEEP_LINK = 'APP/OPEN_DEEP_LINK',
   RESET_APP_OPENED_STATE = 'APP/RESET_APP_OPENED_STATE',
   ENTER_BACKUP_FLOW = 'APP/ENTER_BACKUP_FLOW',
   EXIT_BACKUP_FLOW = 'APP/EXIT_BACKUP_FLOW',
   SET_FEED_CACHE = 'APP/SET_FEED_CACHE',
   SET_ANALYTICS_ENABLED = 'APP/SET_ANALYTICS_ENABLED',
-  NAVIGATE_PIN_PROTECTED = 'APP/NAVIGATE_PIN_PROTECTED',
-  START_PIN_VERIFICATION = 'APP/START_PIN_VERIFICATION',
-  FINISH_PIN_VERIFICATION = 'APP/FINISH_PIN_VERIFICATION',
+  SET_LOCK_WITH_PIN_ENABLED = 'APP/SET_LOCK_WITH_PIN_ENABLED',
+  LOCK = 'APP/LOCK',
+  UNLOCK = 'APP/UNLOCK',
+}
+
+export interface SetAppState {
+  type: Actions.SET_APP_STATE
+  state: string
 }
 
 interface SetLoggedIn {
@@ -33,6 +46,11 @@ interface SetNumberVerifiedAction {
 export interface SetLanguage {
   type: Actions.SET_LANGUAGE
   language: string
+}
+
+export interface OpenDeepLink {
+  type: Actions.OPEN_DEEP_LINK
+  deepLink: string
 }
 
 interface ResetAppOpenedState {
@@ -52,31 +70,37 @@ interface SetAnalyticsEnabled {
   enabled: boolean
 }
 
-export interface NavigatePinProtected {
-  type: Actions.NAVIGATE_PIN_PROTECTED
-  routeName: string
-  params?: NavigationParams
+interface SetLockWithPinEnabled {
+  type: Actions.SET_LOCK_WITH_PIN_ENABLED
+  enabled: boolean
 }
 
-interface StartPinVerification {
-  type: Actions.START_PIN_VERIFICATION
+export interface Lock {
+  type: Actions.LOCK
 }
 
-interface FinishPinVerification {
-  type: Actions.FINISH_PIN_VERIFICATION
+export interface Unlock {
+  type: Actions.UNLOCK
 }
 
 export type ActionTypes =
+  | SetAppState
   | SetLoggedIn
   | SetNumberVerifiedAction
   | ResetAppOpenedState
   | SetLanguage
+  | OpenDeepLink
   | EnterBackupFlow
   | ExitBackupFlow
   | SetAnalyticsEnabled
-  | NavigatePinProtected
-  | StartPinVerification
-  | FinishPinVerification
+  | SetLockWithPinEnabled
+  | Lock
+  | Unlock
+
+export const setAppState = (state: string) => ({
+  type: Actions.SET_APP_STATE,
+  state,
+})
 
 export const setLoggedIn = (loggedIn: boolean) => ({
   type: Actions.SET_LOGGED_IN,
@@ -89,8 +113,9 @@ export const setNumberVerified = (numberVerified: boolean) => ({
 })
 
 export const setLanguage = (language: string, nextScreen?: Screens) => {
-  numeral.locale(language.substring(0, 2))
-  i18n.changeLanguage(language)
+  i18n
+    .changeLanguage(language)
+    .catch((reason: any) => Logger.error(TAG, 'Failed to change i18n language', reason))
 
   if (nextScreen) {
     navigate(nextScreen)
@@ -98,6 +123,13 @@ export const setLanguage = (language: string, nextScreen?: Screens) => {
   return {
     type: Actions.SET_LANGUAGE,
     language,
+  }
+}
+
+export const openDeepLink = (deepLink: string) => {
+  return {
+    type: Actions.OPEN_DEEP_LINK,
+    deepLink,
   }
 }
 
@@ -118,19 +150,15 @@ export const setAnalyticsEnabled = (enabled: boolean): SetAnalyticsEnabled => ({
   enabled,
 })
 
-export const navigatePinProtected = (
-  routeName: string,
-  params?: NavigationParams
-): NavigatePinProtected => ({
-  type: Actions.NAVIGATE_PIN_PROTECTED,
-  routeName,
-  params,
+export const setLockWithPinEnabled = (enabled: boolean): SetLockWithPinEnabled => ({
+  type: Actions.SET_LOCK_WITH_PIN_ENABLED,
+  enabled,
 })
 
-export const startPinVerification = (): StartPinVerification => ({
-  type: Actions.START_PIN_VERIFICATION,
+export const appLock = (): Lock => ({
+  type: Actions.LOCK,
 })
 
-export const finishPinVerification = (): FinishPinVerification => ({
-  type: Actions.FINISH_PIN_VERIFICATION,
+export const appUnlock = (): Unlock => ({
+  type: Actions.UNLOCK,
 })

@@ -1,14 +1,14 @@
 import { AnyAction } from 'redux'
 import { call, select, spawn, takeEvery } from 'redux-saga/effects'
-import { devModeSelector } from 'src/account/reducer'
 import { accountSaga } from 'src/account/saga'
+import { devModeSelector } from 'src/account/selectors'
 import { appSaga, waitForRehydrate } from 'src/app/saga'
 import { dappKitSaga } from 'src/dappkit/dappkit'
 import { escrowSaga } from 'src/escrow/saga'
 import { exchangeSaga } from 'src/exchange/saga'
 import { feesSaga } from 'src/fees/saga'
 import { firebaseSaga } from 'src/firebase/saga'
-import { gethSaga } from 'src/geth/saga'
+import { gethSagaIfNecessary } from 'src/geth/saga'
 import { goldTokenSaga } from 'src/goldToken/saga'
 import { homeSaga } from 'src/home/saga'
 import { identitySaga } from 'src/identity/saga'
@@ -34,6 +34,8 @@ const loggerBlacklist = [
   'IDENTITY/UPDATE_E164_PHONE_NUMBER_ADDRESSES',
   'IDENTITY/FETCH_PHONE_ADDRESSES',
   'INVITE/REDEEM_INVITE',
+  'INVITE/STORE_INVITEE_DATA',
+  'EXCHANGE/UPDATE_CELO_GOLD_EXCHANGE_RATE_HISTORY', // Not private, just noisy
 ]
 
 function* loggerSaga() {
@@ -62,7 +64,7 @@ export function* rootSaga() {
   yield spawn(loggerSaga)
   yield spawn(appSaga)
   yield spawn(networkInfoSaga)
-  yield spawn(gethSaga)
+  yield spawn(gethSagaIfNecessary)
   yield spawn(accountSaga)
   yield spawn(identitySaga)
   yield spawn(goldTokenSaga)
@@ -77,6 +79,6 @@ export function* rootSaga() {
   yield spawn(dappKitSaga)
   yield spawn(feesSaga)
   yield spawn(localCurrencySaga)
-  yield spawn(web3Saga)
   yield spawn(sentrySaga)
+  yield spawn(web3Saga)
 }

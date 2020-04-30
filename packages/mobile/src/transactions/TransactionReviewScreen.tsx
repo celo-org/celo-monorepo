@@ -1,15 +1,16 @@
 import ReviewFrame from '@celo/react-components/components/ReviewFrame'
 import ReviewHeader from '@celo/react-components/components/ReviewHeader'
 import * as React from 'react'
-import { withNamespaces, WithNamespaces } from 'react-i18next'
+import { WithTranslation } from 'react-i18next'
 import { StyleSheet } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { NavigationInjectedProps } from 'react-navigation'
+import { TokenTransactionType } from 'src/apollo/types'
 import ExchangeConfirmationCard from 'src/exchange/ExchangeConfirmationCard'
+import { Namespaces, withTranslation } from 'src/i18n'
 import { navigate, navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import TransferConfirmationCard from 'src/send/TransferConfirmationCard'
-import { TransactionTypes } from 'src/transactions/reducer'
 import { getDatetimeDisplayString } from 'src/utils/time'
 
 export interface NavigationPropsWrapper {
@@ -18,12 +19,12 @@ export interface NavigationPropsWrapper {
 }
 
 export interface ReviewProps {
-  type: TransactionTypes
+  type: TokenTransactionType
   timestamp: number
   header: string
 }
 
-type Props = NavigationInjectedProps<NavigationPropsWrapper> & WithNamespaces
+type Props = NavigationInjectedProps<NavigationPropsWrapper> & WithTranslation
 
 class TransactionReviewScreen extends React.PureComponent<Props> {
   static navigationOptions = { header: null }
@@ -63,9 +64,9 @@ class TransactionReviewScreen extends React.PureComponent<Props> {
     return <ReviewHeader title={header} subtitle={dateTimeStatus} />
   }
 
-  renderCard = (type: TransactionTypes, confirmationProps: any) => {
+  renderCard = (type: TokenTransactionType, confirmationProps: any) => {
     switch (type) {
-      case TransactionTypes.EXCHANGE:
+      case TokenTransactionType.Exchange:
         return <ExchangeConfirmationCard {...confirmationProps} />
       default:
         return <TransferConfirmationCard {...confirmationProps} />
@@ -92,4 +93,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default withNamespaces()(TransactionReviewScreen)
+export default withTranslation(Namespaces.global)(TransactionReviewScreen)

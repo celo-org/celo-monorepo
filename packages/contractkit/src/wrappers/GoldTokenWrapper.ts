@@ -1,10 +1,19 @@
 // NOTE: removing this import results in `yarn build` failures in Dockerfiles
 // after the move to node 10. This allows types to be inferred without
 // referencing '@celo/utils/node_modules/bignumber.js'
-import _ from 'bignumber.js'
+import 'bignumber.js'
 import { Address } from '../base'
-import { GoldToken } from '../generated/types/GoldToken'
-import { BaseWrapper, proxyCall, proxySend, toBigNumber, toNumber } from './BaseWrapper'
+import { GoldToken } from '../generated/GoldToken'
+import {
+  BaseWrapper,
+  proxyCall,
+  proxySend,
+  stringIdentity,
+  tupleParser,
+  valueToBigNumber,
+  valueToInt,
+  valueToString,
+} from './BaseWrapper'
 
 /**
  * ERC-20 contract for Celo native currency.
@@ -16,7 +25,7 @@ export class GoldTokenWrapper extends BaseWrapper<GoldToken> {
    * @param to Address of account to whom the allowance was given.
    * @returns Amount of allowance.
    */
-  allowance = proxyCall(this.contract.methods.allowance, undefined, toBigNumber)
+  allowance = proxyCall(this.contract.methods.allowance, undefined, valueToBigNumber)
 
   /**
    * Returns the name of the token.
@@ -33,13 +42,13 @@ export class GoldTokenWrapper extends BaseWrapper<GoldToken> {
    * Returns the number of decimals used in the token.
    * @returns Number of decimals.
    */
-  decimals = proxyCall(this.contract.methods.decimals, undefined, toNumber)
+  decimals = proxyCall(this.contract.methods.decimals, undefined, valueToInt)
 
   /**
    * Returns the total supply of the token, that is, the amount of tokens currently minted.
    * @returns Total supply.
    */
-  totalSupply = proxyCall(this.contract.methods.totalSupply, undefined, toBigNumber)
+  totalSupply = proxyCall(this.contract.methods.totalSupply, undefined, valueToBigNumber)
 
   /**
    * Approve a user to transfer Celo Gold on behalf of another user.
@@ -54,7 +63,11 @@ export class GoldTokenWrapper extends BaseWrapper<GoldToken> {
    * @param value The increment of the amount of Celo Gold approved to the spender.
    * @returns true if success.
    */
-  increaseAllowance = proxySend(this.kit, this.contract.methods.increaseAllowance)
+  increaseAllowance = proxySend(
+    this.kit,
+    this.contract.methods.increaseAllowance,
+    tupleParser(stringIdentity, valueToString)
+  )
   /**
    * Decreases the allowance of another user.
    * @param spender The address which is being approved to spend Celo Gold.
@@ -94,5 +107,5 @@ export class GoldTokenWrapper extends BaseWrapper<GoldToken> {
    * @param owner The address to query the balance of.
    * @return The balance of the specified address.
    */
-  balanceOf = (account: Address) => this.kit.web3.eth.getBalance(account).then(toBigNumber)
+  balanceOf = (account: Address) => this.kit.web3.eth.getBalance(account).then(valueToBigNumber)
 }

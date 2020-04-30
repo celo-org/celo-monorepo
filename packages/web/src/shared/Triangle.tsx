@@ -16,6 +16,7 @@ export default class Triangle extends React.PureComponent<Props> {
   render() {
     return (
       <Svg
+        title="triangle"
         width="14"
         height="14"
         viewBox="0 0 14 8"

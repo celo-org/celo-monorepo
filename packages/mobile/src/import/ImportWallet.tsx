@@ -5,9 +5,10 @@ import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
 import * as React from 'react'
-import { WithNamespaces, withNamespaces } from 'react-i18next'
-import { ActivityIndicator, Image, Keyboard, StyleSheet, Text, View } from 'react-native'
+import { WithTranslation } from 'react-i18next'
+import { ActivityIndicator, Keyboard, StyleSheet, Text, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
+import { NavigationEvents, NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
 import { hideAlert } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
@@ -22,8 +23,8 @@ import {
   isValidBackupPhrase,
 } from 'src/backup/utils'
 import GethAwareButton from 'src/geth/GethAwareButton'
-import { Namespaces } from 'src/i18n'
-import { backupIcon } from 'src/images/Images'
+import { Namespaces, withTranslation } from 'src/i18n'
+import BackupKeyIcon from 'src/icons/BackupKeyIcon'
 import { importBackupPhrase } from 'src/import/actions'
 import { nuxNavigationOptions } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
@@ -43,7 +44,7 @@ interface StateProps {
   isImportingWallet: boolean
 }
 
-type Props = StateProps & DispatchProps & WithNamespaces
+type Props = StateProps & DispatchProps & WithTranslation & NavigationInjectedProps
 
 const mapStateToProps = (state: RootState): StateProps => {
   return {
@@ -56,6 +57,16 @@ export class ImportWallet extends React.Component<Props, State> {
 
   state = {
     backupPhrase: '',
+  }
+
+  checkCleanBackupPhrase = () => {
+    const { navigation } = this.props
+    if (navigation && navigation.getParam('clean')) {
+      this.setState({
+        backupPhrase: '',
+      })
+      navigation.setParams({ clean: false })
+    }
   }
 
   setBackupPhrase = (input: string) => {
@@ -88,11 +99,12 @@ export class ImportWallet extends React.Component<Props, State> {
 
     return (
       <SafeAreaView style={styles.container}>
+        <NavigationEvents onDidFocus={this.checkCleanBackupPhrase} />
         <KeyboardAwareScrollView
           contentContainerStyle={styles.scrollContainer}
           keyboardShouldPersistTaps="always"
         >
-          <Image source={backupIcon} style={styles.logo} />
+          <BackupKeyIcon style={styles.logo} width={140} height={102} />
           <Text style={fontStyles.h1}>{t('title')}</Text>
           <Text style={fontStyles.body}>{t('userYourBackupKey')}</Text>
           <BackupPhraseContainer
@@ -150,8 +162,7 @@ const styles = StyleSheet.create({
   },
   logo: {
     alignSelf: 'center',
-    height: 75,
-    width: 75,
+    marginBottom: 20,
   },
   tip: {
     ...fontStyles.bodySmall,
@@ -164,10 +175,7 @@ const styles = StyleSheet.create({
   },
 })
 
-export default connect<StateProps, DispatchProps, {}, RootState>(
-  mapStateToProps,
-  {
-    importBackupPhrase,
-    hideAlert,
-  }
-)(withNamespaces(Namespaces.nuxRestoreWallet3)(ImportWallet))
+export default connect<StateProps, DispatchProps, any, RootState>(mapStateToProps, {
+  importBackupPhrase,
+  hideAlert,
+})(withTranslation(Namespaces.nuxRestoreWallet3)(ImportWallet))

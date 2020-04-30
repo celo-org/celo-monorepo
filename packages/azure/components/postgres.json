@@ -1,0 +1,33 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "resources": [
+    {
+      "name": "[variables('attesterDBName')]",
+      "type": "Microsoft.DBforPostgreSQL/servers",
+      "apiVersion": "2017-12-01",
+      "location": "[parameters('location')]",
+      "sku": "[variables('attesterPostgreSQLSku')]",
+      "properties": {
+        "version": "[variables('attesterPostgreSQLVersion')]",
+        "sslEnforcement": "Disabled",
+        "administratorLogin": "[parameters('attesterPostgreSQLUsername')]",
+        "administratorLoginPassword": "[parameters('attesterPostgreSQLPassword')]",
+        "storageProfile": "[variables('attesterPostgreSQLStorageProfile')]"
+      },
+      "resources": [
+        {
+          "name": "[concat(variables('attesterDBName'), '/config')]",
+          "dependsOn": [
+            "[variables('attesterDBName')]"
+          ],
+          "type": "Microsoft.DBforPostgreSQL/servers/virtualNetworkRules",
+          "apiVersion": "2017-12-01",
+          "properties": {
+            "virtualNetworkSubnetId": "[variables('subnetId')]"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -8,8 +8,8 @@ function getAirtable() {
   return airtableInit(serverRuntimeConfig.AIRTABLE_FELLOW_ID)(TABLE_NAME)
 }
 
-export async function submitFellowApp(fields: FellowApp): Promise<AirRecord<FellowApp>> {
-  return getAirtable().create(migrate(fields))
+export async function submitFellowApp(fields: FellowApp) {
+  return (getAirtable().create(migrate(fields)) as unknown) as Promise<AirRecord<FellowApp>>
 }
 
 function migrate(fields: FellowApp) {

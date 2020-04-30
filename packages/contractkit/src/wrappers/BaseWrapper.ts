@@ -1,15 +1,19 @@
+import { ensureLeading0x, hexToBuffer } from '@celo/utils/lib/address'
 import { zip } from '@celo/utils/lib/collections'
+import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
-import Contract from 'web3/eth/contract'
-import { TransactionObject, Tx } from 'web3/eth/types'
-import { TransactionReceipt } from 'web3/types'
+import { EventLog, TransactionReceipt, Tx } from 'web3-core'
+import { TransactionObject } from 'web3-eth'
+import { Contract, PastEventOptions } from 'web3-eth-contract'
 import { ContractKit } from '../kit'
 import { TransactionResult } from '../utils/tx-result'
 
 /** Represents web3 native contract Method */
 type Method<I extends any[], O> = (...args: I) => TransactionObject<O>
 
-export type NumberLike = string | number | BigNumber
+export interface Filter {
+  [key: string]: number | string | string[] | number[]
+}
 
 /** Base ContractWrapper */
 export abstract class BaseWrapper<T extends Contract> {
@@ -20,32 +24,51 @@ export abstract class BaseWrapper<T extends Contract> {
     // TODO fix typings
     return (this.contract as any)._address
   }
+
+  /** Contract getPastEvents */
+  protected getPastEvents(event: string, options: PastEventOptions): Promise<EventLog[]> {
+    return this.contract.getPastEvents(event, options)
+  }
+
+  events = this.contract.events
 }
 
-/** Parse string -> BigNumber */
-export function toBigNumber(input: string) {
-  return new BigNumber(input)
-}
+export const valueToBigNumber = (input: BigNumber.Value) => new BigNumber(input)
 
-/** Parse string -> int */
-export function toNumber(input: string) {
-  return parseInt(input, 10)
-}
+export const fixidityValueToBigNumber = (input: BigNumber.Value) => fromFixed(new BigNumber(input))
 
-export function parseNumber(input: NumberLike) {
-  return new BigNumber(input).toString(10)
-}
+export const valueToString = (input: BigNumber.Value) => valueToBigNumber(input).toFixed()
 
-export function parseBytes(input: string): Array<string | number[]> {
-  return input as any
-}
+export const valueToFixidityString = (input: BigNumber.Value) =>
+  toFixed(valueToBigNumber(input)).toFixed()
+
+export const valueToInt = (input: BigNumber.Value) =>
+  valueToBigNumber(input)
+    .integerValue()
+    .toNumber()
+
+export const valueToFrac = (numerator: BigNumber.Value, denominator: BigNumber.Value) =>
+  valueToBigNumber(numerator).div(valueToBigNumber(denominator))
+
+export const stringToBuffer = hexToBuffer
+
+export const bufferToString = (buf: Buffer) => ensureLeading0x(buf.toString('hex'))
+
+type SolBytes = string | number[]
+const toBytes = (input: any): SolBytes => input
+const fromBytes = (input: SolBytes): any => input as any
+
+export const stringToBytes = (input: string) => toBytes(ensureLeading0x(input))
+
+export const bufferToBytes = (input: Buffer) => stringToBytes(bufferToString(input))
+
+export const bytesToString = (input: SolBytes): string => fromBytes(input)
 
 type Parser<A, B> = (input: A) => B
 
 /** Identity Parser */
-export function identity<A>(a: A) {
-  return a
-}
+export const identity = <A>(a: A) => a
+export const stringIdentity = (x: string) => x
 
 /**
  * Tuple parser
@@ -215,19 +238,20 @@ export function toTransactionObject<O>(
   return new CeloTransactionObject(kit, txo, defaultParams)
 }
 
+export type CeloTransactionParams = Omit<Tx, 'data'>
 export class CeloTransactionObject<O> {
   constructor(
     private kit: ContractKit,
     readonly txo: TransactionObject<O>,
-    readonly defaultParams?: Omit<Tx, 'data'>
+    readonly defaultParams?: CeloTransactionParams
   ) {}
 
   /** send the transaction to the chain */
-  send = (params?: Omit<Tx, 'data'>): Promise<TransactionResult> => {
+  send = (params?: CeloTransactionParams): Promise<TransactionResult> => {
     return this.kit.sendTransactionObject(this.txo, { ...this.defaultParams, ...params })
   }
 
   /** send the transaction and waits for the receipt */
-  sendAndWaitForReceipt = (params?: Omit<Tx, 'data'>): Promise<TransactionReceipt> =>
+  sendAndWaitForReceipt = (params?: CeloTransactionParams): Promise<TransactionReceipt> =>
     this.send(params).then((result) => result.waitReceipt())
 }

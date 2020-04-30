@@ -5,7 +5,7 @@ import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import { Namespaces } from 'locales'
 import * as React from 'react'
-import { Trans, WithNamespaces, withNamespaces } from 'react-i18next'
+import { Trans, WithTranslation, withTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 import { connect } from 'react-redux'
@@ -37,7 +37,7 @@ const mapStateToProps = (state: RootState) => ({
   accountAddress: state.app.accountAddress,
 })
 
-type Props = StateProps & WithNamespaces
+type Props = StateProps & WithTranslation
 
 class SettingsScreen extends React.Component<Props, {}> {
   render() {
@@ -99,4 +99,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default withNamespaces(Namespaces.setupAccount)(connect(mapStateToProps)(SettingsScreen))
+export default withTranslation(Namespaces.setupAccount)(connect(mapStateToProps)(SettingsScreen))

@@ -10,8 +10,8 @@ interface Props {
 
 export default class PaymentsIcon extends React.PureComponent<Props> {
   static defaultProps = {
-    width: 28,
-    height: 28,
+    width: 34,
+    height: 34,
     color: colors.dark,
   }
 

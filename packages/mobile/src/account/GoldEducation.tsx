@@ -62,8 +62,5 @@ export class GoldEducation extends React.Component<Props> {
 }
 
 export default componentWithAnalytics(
-  connect<{}, DispatchProps>(
-    null,
-    { setEducationCompleted }
-  )(GoldEducation)
+  connect<{}, DispatchProps>(null, { setEducationCompleted })(GoldEducation)
 )

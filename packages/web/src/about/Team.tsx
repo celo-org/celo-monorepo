@@ -1,123 +1,180 @@
 import * as React from 'react'
-import LazyLoad from 'react-lazyload'
-import { Image, StyleSheet, Text, View } from 'react-native'
-import shuffleSeed from 'shuffle-seed'
-import teamList from 'src/about/team/team-list'
-import { H1, H4 } from 'src/fonts/Fonts'
+import LazyLoadFadin from 'react-lazyload-fadein'
+import { Image, ImageURISource, StyleSheet, Text, View } from 'react-native'
+import { Contributor } from 'src/about/Contributor'
 import { I18nProps, withNamespaces } from 'src/i18n'
+import BookLayout from 'src/layout/BookLayout'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
+import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
 import AspectRatio from 'src/shared/AspectRatio'
+import Outbound from 'src/shared/Outbound'
 import Responsive from 'src/shared/Responsive'
-import { MENU_MAX_WIDTH } from 'src/shared/Styles'
 import { fonts, standardStyles, textStyles } from 'src/styles'
-
 interface Props {
-  randomSeed: number
+  contributors: Contributor[]
 }
 
-export class Team extends React.Component<Props & I18nProps> {
+export class Team extends React.Component<Props & I18nProps & ScreenProps> {
   render() {
-    const { t, randomSeed } = this.props
-    const shuffledTeamList = shuffleSeed.shuffle(teamList, randomSeed)
+    const { t, screen, contributors } = this.props
+    const isTablet = screen === ScreenSizes.TABLET
+    const isMobile = screen === ScreenSizes.MOBILE
 
     return (
-      <View style={styles.container}>
-        <GridRow allStyle={standardStyles.centered}>
-          <Cell span={Spans.half}>
-            <H1 ariaLevel="2" style={[textStyles.center, standardStyles.elementalMarginBottom]}>
-              {t('coreContributors')}
-            </H1>
-            <H4 style={textStyles.center}>{t('InNoOrder')}</H4>
+      <View nativeID="contributors">
+        <BookLayout label={t('teamTitle')} startBlock={true}>
+          <Text style={[fonts.p, standardStyles.sectionMarginBottomMobile]}>{t('teamCopy')} </Text>
+        </BookLayout>
+        <GridRow>
+          <Cell span={Spans.full} tabletSpan={Spans.full} style={standardStyles.centered}>
+            <View
+              style={[
+                styles.photoList,
+                isMobile ? styles.photoListAuxMobile : isTablet && styles.photoListAuxTablet,
+              ]}
+            >
+              {contributors.map((person: Contributor) => (
+                <React.Fragment key={person.name}>
+                  <Portrait
+                    name={person.name}
+                    url={person.url}
+                    team={person.team}
+                    company={person.company}
+                    purpose={person.purpose}
+                    preview={{ uri: person.preview }}
+                    source={{ uri: person.photo }}
+                  />
+                </React.Fragment>
+              ))}
+            </View>
           </Cell>
         </GridRow>
-        <View style={styles.maxWidth}>
-          <View style={styles.photoList}>
-            {shuffledTeamList.map((person) => (
-              <Responsive key={person.name} medium={styles.mediumPerson} large={styles.largePerson}>
-                <View style={styles.person}>
-                  <LazyLoad height={200}>
-                    <AspectRatio style={styles.photoContainer} ratio={275 / 400}>
-                      <Image source={{ uri: person.photo }} style={styles.photo} />
-                    </AspectRatio>
-                  </LazyLoad>
-                  <H4>{person.name}</H4>
-                  <Text style={fonts.h5}>{(t(person.role) as string).toUpperCase()}</Text>
-                </View>
-              </Responsive>
-            ))}
-            <Responsive medium={styles.mediumFiller} large={styles.largeFiller}>
-              <View style={styles.filler} />
-            </Responsive>
-            <Responsive medium={styles.mediumFiller} large={styles.largeFiller}>
-              <View style={styles.filler} />
-            </Responsive>
-          </View>
-        </View>
       </View>
     )
   }
 }
 
+interface PortraitProps {
+  source: ImageURISource
+  preview: ImageURISource
+  name: string
+  purpose: string
+  team?: string
+  company: string
+  url?: string
+}
+
+const Portrait = React.memo(function _Portrait({
+  source,
+  name,
+  team,
+  company,
+  preview,
+  purpose,
+  url,
+}: PortraitProps) {
+  return (
+    <>
+      <Responsive medium={styles.mediumPerson} large={styles.largePerson}>
+        <View style={styles.person}>
+          <ContributorPlaceHolder uri={preview.uri} />
+          <View style={styles.realImageContainer}>
+            <LazyLoadFadin>
+              {(onLoad) => (
+                <AspectRatio ratio={1}>
+                  <Image
+                    accessibilityLabel={`Photo of ${name}`}
+                    source={source}
+                    onLoad={onLoad}
+                    style={styles.photo}
+                  />
+                </AspectRatio>
+              )}
+            </LazyLoadFadin>
+          </View>
+
+          <View style={standardStyles.row}>
+            <Text style={[fonts.p, textStyles.heavy, styles.name]}>{name}</Text>
+            {url && (
+              <View style={styles.outLink}>
+                <Outbound url={url} />
+              </View>
+            )}
+          </View>
+
+          <Text style={fonts.legal}>
+            {company.trim()}
+            {team && `, ${team.trim()}`}
+          </Text>
+          <Text style={[fonts.p, textStyles.italic, styles.purposeText]}>{purpose}</Text>
+        </View>
+      </Responsive>
+    </>
+  )
+})
+
+function ContributorPlaceHolder({ uri }) {
+  return (
+    <AspectRatio ratio={1}>
+      <Image source={{ uri }} style={styles.imagePreview} />
+    </AspectRatio>
+  )
+}
+
 // @ts-ignore
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    flexDirection: 'column',
-    justifyContent: 'flex-start',
-    alignItems: 'center',
+  name: {
+    marginTop: 8,
+    marginRight: 5,
   },
-  photoContainer: { marginBottom: 20 },
+  outLink: {
+    paddingBottom: 1,
+    justifyContent: 'flex-end',
+  },
+  purposeText: { fontSize: 26, lineHeight: 28, marginTop: 8 },
+  photoListAuxMobile: {
+    display: 'flex',
+    justifyContent: 'center',
+    minHeight: '80vh',
+  },
+  photoListAuxTablet: {
+    display: 'grid',
+    gridTemplateColumns: `repeat(2, 1fr)`,
+  },
   photo: {
     height: '100%',
     width: '100%',
   },
+  realImageContainer: { position: 'absolute', height: '100%', width: '100%' },
+  imagePreview: {
+    opacity: 0.5,
+    filter: `blur(20px)`,
+    height: '100%',
+    width: '100%',
+  },
   photoList: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 10,
-    maxWidth: 1025,
-  },
-  header: {
-    alignSelf: 'stretch',
-    paddingBottom: 10,
-    paddingLeft: 34,
-  },
-  maxWidth: {
-    maxWidth: MENU_MAX_WIDTH,
-    justifyContent: 'center',
-    alignItems: 'center',
+    display: 'grid',
+    gridRowGap: 55,
+    gridColumnGap: 40,
+    gridTemplateColumns: `repeat(3, 1fr)`,
+    minHeight: '50vh',
   },
   person: {
     flexDirection: 'column',
     margin: 5,
-    width: 176,
-    minHeight: 400,
+    marginBottom: 50,
+    width: '90vw',
+    minWidth: 250,
+    maxWidth: 300,
   },
   mediumPerson: {
     flexDirection: 'column',
-    margin: 20,
-    width: 210,
-    minHeight: 420,
+    minWidth: 250,
+    maxWidth: 300,
   },
   largePerson: {
     flexDirection: 'column',
-    margin: 30,
-    width: 275,
-  },
-  filler: {
-    width: 176 + 10,
-    height: 0,
-  },
-  mediumFiller: {
-    width: 210 + 40,
-    height: 0,
-  },
-  largeFiller: {
-    width: 275 + 60,
-    height: 0,
   },
 })
 
-export default withNamespaces('about')(Team)
+export default withScreenSize(withNamespaces('about')(Team))

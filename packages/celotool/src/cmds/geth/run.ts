@@ -2,7 +2,7 @@ import { spawnSync } from 'child_process'
 import fs from 'fs'
 import path from 'path'
 import { addCeloGethMiddleware, ensure0x, validateAccountAddress } from 'src/lib/utils'
-import * as yargs from 'yargs'
+import yargs from 'yargs'
 import { GethArgv } from '../geth'
 
 const STATIC_NODES_FILE_NAME = 'static-nodes.json'
@@ -32,7 +32,7 @@ export const builder = (argv: yargs.Argv) => {
       default: '1101',
     })
     .option('sync-mode', {
-      choices: ['full', 'fast', 'light', 'ultralight'],
+      choices: ['full', 'fast', 'light', 'lightest'],
       demandOption: true,
     })
     .option('mining', {
@@ -75,9 +75,8 @@ export const builder = (argv: yargs.Argv) => {
       description: 'Verbosity level',
       default: 5,
     })
-    .coerce(
-      'miner-address',
-      (minerAddress: string) => (minerAddress === null ? null : ensure0x(minerAddress))
+    .coerce('miner-address', (minerAddress: string) =>
+      minerAddress === null ? null : ensure0x(minerAddress)
     )
 }
 
@@ -124,6 +123,7 @@ export const handler = async (argv: RunArgv) => {
     verbosity.toString(),
     '--consoleoutput=stdout', // Send all logs to stdout
     '--consoleformat=term',
+    '--istanbul.lookbackwindow=2',
   ]
 
   if (nodekeyhex !== null && nodekeyhex.length > 0) {
@@ -147,7 +147,8 @@ export const handler = async (argv: RunArgv) => {
       `--miner.gasprice=${minerGasPrice}`,
       '--password=/dev/null',
       `--unlock=${minerAddress}`,
-      '--lightserv=90'
+      '--light.serve=90',
+      '--allow-insecure-unlock' // geth1.9 to use http w/unlocking
     )
   }
 

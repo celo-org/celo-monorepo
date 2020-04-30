@@ -1,0 +1,34 @@
+# Example configuration. Fill in your details here.
+
+#DEFAULT_PASSWORD="1234"
+
+#VALIDATOR_GROUP_NAME="validator-group"
+#VALIDATOR_NAME="validator-0"
+
+#TWILIO_MESSAGING_SERVICE_SID=
+#TWILIO_ACCOUNT_SID=
+#TWILIO_BLACKLIST=""
+#TWILIO_AUTH_TOKEN=""
+
+#CELO_VALIDATOR_ADDRESS=
+#CELO_VALIDATOR_GROUP_ADDRESS=
+#CELO_VALIDATOR_SIGNER_ADDRESS=
+#CELO_VALIDATOR_SIGNER_PUBLIC_KEY=
+#CELO_VALIDATOR_SIGNER_SIGNATURE=
+#CELO_VALIDATOR_SIGNER_BLS_PUBLIC_KEY=
+#CELO_VALIDATOR_SIGNER_BLS_SIGNATURE=
+#CELO_ATTESTATION_SIGNER_ADDRESS=
+#CELO_ACCOUNT_ADDRESS=
+
+# Attestation Service metadata
+#ATTESTATION_SERVICE_URL=
+#METADATA_URL=
+#GROUP_METADATA_URL=
+
+#CELO_IMAGE="us.gcr.io/celo-testnet/celo-node:baklava"
+#NETWORK_ID=200110
+#NETWORK_NAME=baklava
+#CELO_IMAGE_ATTESTATION="us.gcr.io/celo-testnet/celo-monorepo:attestation-service-8f87dda20f1854c9532a5cbcf8ff556f48dff413"
+#CELO_PROVIDER="http://localhost:8545"
+#DATABASE_URL="sqlite://db/attestation.db"
+#CELOCLI=celocli  # ~/Projects/Celo/celo-monorepo/packages/cli/bin/run

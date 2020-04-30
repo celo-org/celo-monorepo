@@ -1,6 +1,5 @@
-import { TransactionObject, Tx } from 'web3/eth/types'
-import PromiEvent from 'web3/promiEvent'
-import { TransactionReceipt } from 'web3/types'
+import { PromiEvent, TransactionReceipt, Tx } from 'web3-core'
+import { TransactionObject } from 'web3-eth'
 import { newKit } from './kit'
 import { promiEventSpy } from './test-utils/PromiEventStub'
 
@@ -73,11 +72,11 @@ describe('kit.sendTransactionObject()', () => {
 
   test('should forward txoptions to txo.send()', async () => {
     const txo = txoStub()
-    await kit.sendTransactionObject(txo, { gas: 555, gasCurrency: 'XXX', from: '0xAAFFF' })
+    await kit.sendTransactionObject(txo, { gas: 555, feeCurrency: 'XXX', from: '0xAAFFF' })
     expect(txo.send).toBeCalledWith({
       gasPrice: '0',
       gas: 555,
-      gasCurrency: 'XXX',
+      feeCurrency: 'XXX',
       from: '0xAAFFF',
     })
   })

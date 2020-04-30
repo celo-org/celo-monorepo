@@ -12,21 +12,19 @@ exports[`renders correctly 1`] = `
 >
   <Text
     style={
-      Array [
-        Object {
-          "color": "#81868B",
-          "fontFamily": "Hind-Regular",
-          "fontSize": 14,
-          "lineHeight": 20,
-        },
-      ]
+      Object {
+        "color": "#81868B",
+        "fontFamily": "Hind-Regular",
+        "fontSize": 14,
+        "lineHeight": 20,
+      }
     }
   >
     +14155552671
-     - 
-    Hey thanks for the loan, Ill pay you back ASAP. LOVE YOU
+     for 
   </Text>
   <Text
+    numberOfLines={1}
     style={
       Array [
         Object {
@@ -36,12 +34,14 @@ exports[`renders correctly 1`] = `
           "lineHeight": 20,
         },
         Object {
-          "fontFamily": "Hind-SemiBold",
+          "color": "#81868B",
         },
       ]
     }
   >
-    $24
+    
+    $
+    31.92
   </Text>
 </Text>
 `;

@@ -204,7 +204,7 @@ contract('Proxy', (accounts: string[]) => {
       await proxiedMsgSenderCheck.checkMsgSender(owner)
     })
 
-    describe('after changing the implementation', async () => {
+    describe('after changing the implementation', () => {
       let getSet1: GetSetV1Instance
       let proxiedGetSet1: GetSetV1Instance
 

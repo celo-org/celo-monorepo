@@ -4,19 +4,26 @@ import Button, { BtnTypes } from '@celo/react-components/components/Button'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import * as React from 'react'
-import { withNamespaces, WithNamespaces } from 'react-i18next'
-import { Image, StyleSheet, Text, View } from 'react-native'
+import { WithTranslation } from 'react-i18next'
+import { Image, Platform, StyleSheet, Text, View } from 'react-native'
 import * as AndroidOpenSettings from 'react-native-android-open-settings'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
-import { Namespaces } from 'src/i18n'
+import { Namespaces, withTranslation } from 'src/i18n'
 import clockIcon from 'src/images/clock-icon.png'
+import { navigate } from 'src/navigator/NavigationService'
+import { Screens } from 'src/navigator/Screens'
 import { getLocalTimezone, getRemoteTime } from 'src/utils/time'
 
-export class SetClock extends React.Component<WithNamespaces> {
+export class SetClock extends React.Component<WithTranslation> {
   static navigationOptions = { header: null }
 
   goToSettings = () => {
-    return AndroidOpenSettings.dateSettings()
+    if (Platform.OS === 'android') {
+      return AndroidOpenSettings.dateSettings()
+    } else {
+      // TODO: Implement Date Setting on iOS
+      navigate(Screens.WalletHome)
+    }
   }
 
   render() {
@@ -81,4 +88,4 @@ const style = StyleSheet.create({
   },
 })
 
-export default componentWithAnalytics(withNamespaces(Namespaces.global)(SetClock))
+export default componentWithAnalytics(withTranslation(Namespaces.global)(SetClock))

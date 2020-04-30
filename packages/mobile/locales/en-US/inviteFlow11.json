@@ -25,5 +25,8 @@
   "inviteAnyone": "Invite Anyone in your address book to send and receive value",
   "inviteComplete": "Invite Complete",
   "inviteReceived": "Invite Received",
-  "pedningInvitations": "Pending Invitations"
+  "escrowPaymentNotificationTitle": "Invited and paid {{mobile}} (<3></3>)",
+  "escrowPaymentNotificationLine": "<0>{{recipientPhone}} for</0> <1></1>",
+  "escrowPaymentNotificationLine_missingRecipientPhone": "<0>Unknown for</0> <1></1>",
+  "defaultComment": "Invited and sent payment"
 }

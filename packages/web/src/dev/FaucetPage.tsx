@@ -8,6 +8,7 @@ import OpenGraph from 'src/header/OpenGraph'
 import { I18nProps, NameSpaces, Trans, withNamespaces } from 'src/i18n'
 import SideTitledSection from 'src/layout/SideTitledSection'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
+import InlineAnchor from 'src/shared/InlineAnchor'
 import { CeloLinks } from 'src/shared/menu-items'
 import { HEADER_HEIGHT } from 'src/shared/Styles'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
@@ -29,7 +30,12 @@ class FaucetPage extends React.Component<I18nProps, State> {
 
     return (
       <>
-        <OpenGraph title={t('pageTitle')} path={CeloLinks.faucet} description={t('description')} />
+        <OpenGraph
+          title={t('pageTitle')}
+          path={CeloLinks.faucet}
+          description={t('description')}
+          image={require('src/fauceting/ogimage-faucet.png')}
+        />
         <View style={styles.container}>
           <H1 style={[textStyles.center, standardStyles.sectionMarginTablet]}>{t('title')}</H1>
           <SideTitledSection title={t('addFunds')} text={t('addFundsText')}>
@@ -38,16 +44,16 @@ class FaucetPage extends React.Component<I18nProps, State> {
           <SideTitledSection
             title={t('getTestnetAddress')}
             text={
-              <Trans i18nKey={'getTestnetText'}>
-                <Link href={CeloLinks.walletApp}>INVITE</Link>{' '}
-                <Link href={CeloLinks.tutorial}>CLI</Link>
+              <Trans ns={NameSpaces.faucet} i18nKey={'getTestnetText'}>
+                <InlineAnchor href={CeloLinks.walletApp}>INVITE</InlineAnchor>{' '}
+                <InlineAnchor href={CeloLinks.tutorial}>CLI</InlineAnchor>
               </Trans>
             }
           />
           <SideTitledSection
             title={t('haveAnAccount')}
             text={
-              <Trans i18nKey={'haveAccountText'}>
+              <Trans ns={NameSpaces.faucet} i18nKey={'haveAccountText'}>
                 You can access an existing account from the Celo Wallet by pressing `Import It` on
                 the first screen and entering your seed phrase.
               </Trans>
@@ -85,10 +91,6 @@ class FaucetPage extends React.Component<I18nProps, State> {
       </>
     )
   }
-}
-
-function Link({ children, href }) {
-  return <Button kind={BTN.INLINE} text={children} href={href} />
 }
 
 function ContentWithCTA({ emphasis, text, btnText, href }) {

@@ -1,4 +1,4 @@
-import { PaymentRequest, PaymentRequestStatus } from 'src/account'
+import { PaymentRequest, PaymentRequestStatus } from 'src/account/types'
 import { SHORT_CURRENCIES } from 'src/geth/consts'
 
 export function paymentRequestDouble(partial: object): PaymentRequest {

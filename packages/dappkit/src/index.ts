@@ -16,7 +16,7 @@ import { Linking } from 'expo'
 import { Contact, Fields, getContactsAsync, PhoneNumber } from 'expo-contacts'
 import { E164Number, parsePhoneNumberFromString } from 'libphonenumber-js'
 import { chunk, find, flatMap, flatten, fromPairs, zipObject } from 'lodash'
-import { TransactionObject } from 'web3/eth/types'
+import { ContractSendMethod } from 'web3-eth-contract'
 export {
   AccountAuthRequest,
   DappKitRequestMeta,
@@ -98,49 +98,49 @@ export function requestAccountAddress(meta: DappKitRequestMeta) {
   Linking.openURL(serializeDappKitRequestDeeplink(AccountAuthRequest(meta)))
 }
 
-export enum GasCurrency {
+export enum FeeCurrency {
   cUSD = 'cUSD',
   cGLD = 'cGLD',
 }
 
-async function getGasCurrencyContractAddress(
+async function getFeeCurrencyContractAddress(
   kit: ContractKit,
-  gasCurrency: GasCurrency
+  feeCurrency: FeeCurrency
 ): Promise<string> {
-  switch (gasCurrency) {
-    case GasCurrency.cUSD:
+  switch (feeCurrency) {
+    case FeeCurrency.cUSD:
       return kit.registry.addressFor(CeloContract.StableToken)
-    case GasCurrency.cGLD:
+    case FeeCurrency.cGLD:
       return kit.registry.addressFor(CeloContract.GoldToken)
     default:
       return kit.registry.addressFor(CeloContract.StableToken)
   }
 }
 
-export interface TxParams<T> {
-  tx: TransactionObject<T>
+export interface TxParams {
+  tx: ContractSendMethod
   from: string
   to?: string
-  gasCurrency?: GasCurrency
+  feeCurrency?: FeeCurrency
   estimatedGas?: number
   value?: string
 }
 
-export async function requestTxSig<T>(
+export async function requestTxSig(
   kit: ContractKit,
-  txParams: TxParams<T>[],
+  txParams: TxParams[],
   meta: DappKitRequestMeta
 ) {
   // TODO: For multi-tx payloads, we for now just assume the same from address for all txs. We should apply a better heuristic
   const baseNonce = await kit.web3.eth.getTransactionCount(txParams[0].from)
   const txs: TxToSignParam[] = await Promise.all(
     txParams.map(async (txParam, index) => {
-      const gasCurrency = txParam.gasCurrency ? txParam.gasCurrency : GasCurrency.cGLD
-      const gasCurrencyContractAddress = await getGasCurrencyContractAddress(kit, gasCurrency)
+      const feeCurrency = txParam.feeCurrency ? txParam.feeCurrency : FeeCurrency.cGLD
+      const feeCurrencyContractAddress = await getFeeCurrencyContractAddress(kit, feeCurrency)
       const value = txParam.value === undefined ? '0' : txParam.value
 
       const estimatedTxParams = {
-        gasCurrency: gasCurrencyContractAddress,
+        feeCurrency: feeCurrencyContractAddress,
         from: txParam.from,
         value,
       } as any
@@ -153,7 +153,7 @@ export async function requestTxSig<T>(
         txData: txParam.tx.encodeABI(),
         estimatedGas,
         nonce: baseNonce + index,
-        gasCurrencyAddress: gasCurrencyContractAddress,
+        feeCurrencyAddress: feeCurrencyContractAddress,
         value,
         ...txParam,
       }

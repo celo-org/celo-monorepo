@@ -24,12 +24,6 @@ interface ShowAlertAction {
   underlyingError?: ErrorMessages | null
 }
 
-interface HideAlertAction {
-  type: Actions.HIDE
-}
-
-export type ActionTypes = ShowAlertAction | HideAlertAction
-
 export const showMessage = (
   message: string,
   dismissAfter?: number | null,
@@ -70,6 +64,12 @@ const showAlert = (
   }
 }
 
-export const hideAlert = () => ({
+interface HideAlertAction {
+  type: Actions.HIDE
+}
+
+export const hideAlert = (): HideAlertAction => ({
   type: Actions.HIDE,
 })
+
+export type ActionTypes = ShowAlertAction | HideAlertAction

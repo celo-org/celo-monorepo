@@ -1,17 +1,16 @@
 pragma solidity ^0.5.3;
 
-import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "./interfaces/IExchange.sol";
 import "./interfaces/ISortedOracles.sol";
 import "./interfaces/IReserve.sol";
 import "./interfaces/IStableToken.sol";
-import "../common/FractionUtil.sol";
 import "../common/Initializable.sol";
 import "../common/FixidityLib.sol";
-import "../baklava/Freezable.sol";
+import "../common/Freezable.sol";
 import "../common/UsingRegistry.sol";
+import "../common/libraries/ReentrancyGuard.sol";
 
 /**
  * @title Contract that allows to exchange StableToken for GoldToken and vice versa
@@ -19,20 +18,15 @@ import "../common/UsingRegistry.sol";
  */
 contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, ReentrancyGuard, Freezable {
   using SafeMath for uint256;
-  using FractionUtil for FractionUtil.Fraction;
   using FixidityLib for FixidityLib.Fraction;
 
   event Exchanged(address indexed exchanger, uint256 sellAmount, uint256 buyAmount, bool soldGold);
-
   event UpdateFrequencySet(uint256 updateFrequency);
-
   event MinimumReportsSet(uint256 minimumReports);
-
-  event StableTokenSet(address stable);
-
+  event StableTokenSet(address indexed stable);
   event SpreadSet(uint256 spread);
-
   event ReserveFractionSet(uint256 reserveFraction);
+  event BucketsUpdated(uint256 goldBucket, uint256 stableBucket);
 
   FixidityLib.Fraction public spread;
 
@@ -56,13 +50,9 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
     _;
   }
 
-  // TODO: Remove this one with https://github.com/celo-org/celo-monorepo/issues/2000
-  // solhint-disable-next-line
-  function() external payable {}
-
   /**
-   * @dev Initializes the exchange, setting initial bucket sizes
-   * @param registryAddress Address of the Registry contract
+   * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
+   * @param registryAddress The address of the registry core smart contract.
    * @param stableToken Address of the stable token
    * @param _spread Spread charged on exchanges
    * @param _reserveFraction Fraction to commit to the gold bucket
@@ -74,7 +64,6 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
    */
   function initialize(
     address registryAddress,
-    address _freezer,
     address stableToken,
     uint256 _spread,
     uint256 _reserveFraction,
@@ -82,7 +71,6 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
     uint256 _minimumReports
   ) external initializer {
     _transferOwnership(msg.sender);
-    setFreezer(_freezer);
     setRegistry(registryAddress);
     setStableToken(stableToken);
     setSpread(_spread);
@@ -127,12 +115,12 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
       stableBucket = stableBucket.add(sellAmount);
       goldBucket = goldBucket.sub(buyAmount);
       require(
-        IERC20Token(stable).transferFrom(msg.sender, address(this), sellAmount),
+        IERC20(stable).transferFrom(msg.sender, address(this), sellAmount),
         "Transfer of sell token failed"
       );
       IStableToken(stable).burn(sellAmount);
 
-      require(reserve.transferGold(msg.sender, buyAmount), "Transfer of buyToken failed");
+      require(reserve.transferExchangeGold(msg.sender, buyAmount), "Transfer of buyToken failed");
     }
 
     emit Exchanged(msg.sender, sellAmount, buyAmount, sellGold);
@@ -162,7 +150,7 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
     // than maxFixedDivisor.
     // Fortunately, we expect an integer result, so integer division gives us as
     // much precision as we could hope for.
-    return numerator.unwrap() / denominator.unwrap();
+    return numerator.unwrap().div(denominator.unwrap());
   }
 
   /**
@@ -183,7 +171,7 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
       .multiply(FixidityLib.fixed1().subtract(spread));
 
     // See comment in getBuyTokenAmount
-    return numerator.unwrap() / denominator.unwrap();
+    return numerator.unwrap().div(denominator.unwrap());
   }
 
   /**
@@ -225,10 +213,6 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
     emit MinimumReportsSet(newMininumReports);
   }
 
-  function setFreezer(address freezer) public onlyOwner {
-    _setFreezer(freezer);
-  }
-
   /**
     * @notice Allows owner to set the Stable Token address
     * @param newStableToken The new address for Stable Token
@@ -253,6 +237,7 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
     */
   function setReserveFraction(uint256 newReserveFraction) public onlyOwner {
     reserveFraction = FixidityLib.wrap(newReserveFraction);
+    require(reserveFraction.lt(FixidityLib.fixed1()), "reserve fraction must be smaller than 1");
     emit ReserveFractionSet(newReserveFraction);
   }
 
@@ -290,20 +275,22 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
     );
 
     // See comment in getBuyTokenAmount
-    return numerator.unwrap() / denominator.unwrap();
+    return numerator.unwrap().div(denominator.unwrap());
   }
 
   function getUpdatedBuckets() private view returns (uint256, uint256) {
     uint256 updatedGoldBucket = getUpdatedGoldBucket();
-    uint256 updatedStableBucket = getOracleExchangeRate().mul(updatedGoldBucket);
-
+    uint256 exchangeRateNumerator;
+    uint256 exchangeRateDenominator;
+    (exchangeRateNumerator, exchangeRateDenominator) = getOracleExchangeRate();
+    uint256 updatedStableBucket = exchangeRateNumerator.mul(updatedGoldBucket).div(
+      exchangeRateDenominator
+    );
     return (updatedGoldBucket, updatedStableBucket);
   }
 
   function getUpdatedGoldBucket() private view returns (uint256) {
-    uint256 reserveGoldBalance = getGoldToken().balanceOf(
-      registry.getAddressForOrDie(RESERVE_REGISTRY_ID)
-    );
+    uint256 reserveGoldBalance = getReserve().getUnfrozenReserveGoldBalance();
     return reserveFraction.multiply(FixidityLib.newFixed(reserveGoldBalance)).fromFixed();
   }
 
@@ -317,6 +304,7 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
       lastBucketUpdate = now;
 
       (goldBucket, stableBucket) = getUpdatedBuckets();
+      emit BucketsUpdated(goldBucket, stableBucket);
     }
   }
 
@@ -336,27 +324,28 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
   /*
    * Checks conditions required for bucket updates.
    * @return Whether or not buckets should be updated.
-   * TODO: check the oldest report isn't expired
    */
   function shouldUpdateBuckets() private view returns (bool) {
     ISortedOracles sortedOracles = ISortedOracles(
       registry.getAddressForOrDie(SORTED_ORACLES_REGISTRY_ID)
     );
+    (bool isReportExpired, ) = sortedOracles.isOldestReportExpired(stable);
     // solhint-disable-next-line not-rely-on-time
     bool timePassed = now >= lastBucketUpdate.add(updateFrequency);
     bool enoughReports = sortedOracles.numRates(stable) >= minimumReports;
     // solhint-disable-next-line not-rely-on-time
     bool medianReportRecent = sortedOracles.medianTimestamp(stable) > now.sub(updateFrequency);
-    return timePassed && enoughReports && medianReportRecent;
+    return timePassed && enoughReports && medianReportRecent && !isReportExpired;
   }
 
-  function getOracleExchangeRate() private view returns (FractionUtil.Fraction memory) {
+  function getOracleExchangeRate() private view returns (uint256, uint256) {
     uint256 rateNumerator;
     uint256 rateDenominator;
     (rateNumerator, rateDenominator) = ISortedOracles(
       registry.getAddressForOrDie(SORTED_ORACLES_REGISTRY_ID)
     )
       .medianRate(stable);
-    return FractionUtil.Fraction(rateNumerator, rateDenominator);
+    require(rateDenominator > 0, "exchange rate denominator must be greater than 0");
+    return (rateNumerator, rateDenominator);
   }
 }

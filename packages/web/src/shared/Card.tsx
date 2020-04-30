@@ -25,7 +25,7 @@ export function Card({ imgSource, href, title, text, t, onLoad }: CompleteProps)
       />
       <View style={styles.inside}>
         <View style={styles.stayTop}>
-          <Text style={[fonts.h5, standardStyles.elementalMarginBottom, styles.title]}>
+          <Text style={[fonts.h6, standardStyles.elementalMarginBottom, styles.title]}>
             {title}
           </Text>
           <Text style={fonts.p}>{text}</Text>

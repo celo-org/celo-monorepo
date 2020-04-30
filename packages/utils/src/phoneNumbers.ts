@@ -231,6 +231,34 @@ export function anonymizedPhone(phoneNumber: string) {
   return phoneNumber.slice(0, -4) + 'XXXX'
 }
 
+export function getExampleNumber(
+  regionCode: string,
+  useOnlyZeroes: boolean = true,
+  isInternational: boolean = false
+) {
+  const examplePhone = phoneUtil.getExampleNumber(
+    getRegionCodeFromCountryCode(regionCode) as string
+  )
+
+  if (!examplePhone) {
+    return
+  }
+
+  const formatedExample = phoneUtil.format(
+    examplePhone,
+    isInternational ? PhoneNumberFormat.INTERNATIONAL : PhoneNumberFormat.NATIONAL
+  )
+
+  if (useOnlyZeroes) {
+    if (isInternational) {
+      return formatedExample.replace(/(^\+[0-9]{1,3} |[0-9])/g, (value, _, i) => (i ? '0' : value))
+    }
+    return formatedExample.replace(/[0-9]/g, '0')
+  }
+
+  return formatedExample
+}
+
 export const PhoneNumberUtils = {
   getPhoneHash,
   getCountryCode,

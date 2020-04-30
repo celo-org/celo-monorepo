@@ -1,7 +1,9 @@
 import { addressToPublicKey } from '@celo/utils/lib/signatureUtils'
+import { flags } from '@oclif/command'
+import humanizeDuration from 'humanize-duration'
 import { BaseCommand } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'
-import { displaySendTx } from '../../utils/cli'
+import { binaryPrompt, displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
 
 export default class ValidatorRegister extends BaseCommand {
@@ -12,11 +14,12 @@ export default class ValidatorRegister extends BaseCommand {
     from: Flags.address({ required: true, description: 'Address for the Validator' }),
     ecdsaKey: Flags.ecdsaPublicKey({ required: true }),
     blsKey: Flags.blsPublicKey({ required: true }),
-    blsPop: Flags.blsProofOfPossession({ required: true }),
+    blsSignature: Flags.blsProofOfPossession({ required: true }),
+    yes: flags.boolean({ description: 'Answer yes to prompt' }),
   }
 
   static examples = [
-    'register --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95 --ecdsaKey 0xc52f3fab06e22a54915a8765c4f6826090cfac5e40282b43844bf1c0df83aaa632e55b67869758f2291d1aabe0ebecc7cbf4236aaa45e3e0cfbf997eda082ae1 --blsKey 0x9d3e1d8f49f6b0d8e9a03d80ca07b1d24cf1cc0557bdcc04f5e17a46e35d02d0d411d956dbd5d2d2464eebd7b74ae300 --blsPop 0x05d223780d785d2abc5644fac7ac29fb0e302bdc80c81a5d45018b68b1045068a4b3a4861c93037685fd0d252d7405011220a66a6257562d0c26dabf64485a1d96bad27bb1c0fd6080a75b0ec9f75b50298a2a8e04b02b2688c8104fca61fb00',
+    'register --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95 --ecdsaKey 0x049b7291ab8813a095d6b7913a7930ede5ea17466abd5e1a26c6c44f6df9a400a6f474080098b2c752c6c4871978ca977b90dcd3aed92bc9d564137c8dfa14ee72 --blsKey 0x4fa3f67fc913878b068d1fa1cdddc54913d3bf988dbe5a36a20fa888f20d4894c408a6773f3d7bde11154f2a3076b700d345a42fd25a0e5e83f4db5586ac7979ac2053cd95d8f2efd3e959571ceccaa743e02cf4be3f5d7aaddb0b06fc9aff00 --blsSignature 0xcdb77255037eb68897cd487fdd85388cbda448f617f874449d4b11588b0b7ad8ddc20d9bb450b513bb35664ea3923900',
   ]
 
   async run() {
@@ -26,18 +29,36 @@ export default class ValidatorRegister extends BaseCommand {
     const validators = await this.kit.contracts.getValidators()
     const accounts = await this.kit.contracts.getAccounts()
 
+    if (!res.flags.yes) {
+      const requirements = await validators.getValidatorLockedGoldRequirements()
+      const duration = requirements.duration.toNumber() * 1000
+      const check = await binaryPrompt(
+        `This will lock ${requirements.value.shiftedBy(-18)} cGLD for ${humanizeDuration(
+          duration
+        )}. Are you sure you want to continue?`,
+        true
+      )
+      if (!check) {
+        console.log('Cancelled')
+        return
+      }
+    }
+
     await newCheckBuilder(this, res.flags.from)
       .isSignerOrAccount()
       .canSignValidatorTxs()
+      .isNotValidator()
+      .isNotValidatorGroup()
       .signerMeetsValidatorBalanceRequirements()
       .runChecks()
 
     await displaySendTx(
       'registerValidator',
       validators.registerValidator(
-        res.flags.ecdsaKey as any,
-        res.flags.blsKey as any,
-        res.flags.blsPop as any
+        // @ts-ignore incorrect typing for bytes type
+        res.flags.ecdsaKey,
+        res.flags.blsKey,
+        res.flags.blsSignature
       )
     )
 

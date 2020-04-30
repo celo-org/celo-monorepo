@@ -17,7 +17,7 @@ const BAD_STATES = new Set([RequestState.Failed, RequestState.Invalid])
 
 export function ContextualInfo({ requestState, t, isFaucet }: InfoProps) {
   const contextStyle = [
-    fonts.small,
+    fonts.micro,
     !isFaucet && textStyles.readingOnDark,
     BAD_STATES.has(requestState) && textStyles.error,
   ]
@@ -57,7 +57,7 @@ export function HashingStatus({
         .map((message) => (
           <Fade key={message} when={!done} appear={true}>
             <View style={isFaucet ? styles.ticker : styles.log}>
-              <Text style={[fonts.h5, !isFaucet && textStyles.invert]}>
+              <Text style={[fonts.h6, !isFaucet && textStyles.invert]}>
                 <Checkmark size={12} color={colors.primary} /> {message}
               </Text>
             </View>

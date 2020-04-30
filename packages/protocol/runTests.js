@@ -2,9 +2,10 @@ const ganache = require('@celo/ganache-cli')
 const glob = require('glob-fs')({
   gitignore: false,
 })
-const { exec } = require('./lib/test-utils')
+const { exec, waitForPortOpen } = require('./lib/test-utils')
 const minimist = require('minimist')
-const network = require('./truffle-config.js').networks.development
+const networkName = 'development'
+const network = require('./truffle-config.js').networks[networkName]
 
 const sleep = (seconds) => new Promise((resolve) => setTimeout(resolve, 1000 * seconds))
 
@@ -17,7 +18,7 @@ async function startGanache() {
     network_id: network.network_id,
     mnemonic: network.mnemonic,
     gasPrice: network.gasPrice,
-    gasLimit: 10000000,
+    gasLimit: 20000000,
     allowUnlimitedContractSize: true,
   })
 
@@ -51,31 +52,36 @@ async function test() {
   try {
     const closeGanache = await startGanache()
     if (isCI) {
-      // if we are running on circle ci we need to wait for ganache to be up
-      // TODO(mcortesi): improvement: check for open port instead of a fixed wait time.
-      await sleep(60)
+      // If we are running on circle ci we need to wait for ganache to be up.
+      await waitForPortOpen('localhost', 8545, 60)
     }
 
-    let testArgs = ['run', 'truffle', 'test']
+    // --reset is a hack to trick truffle into using 20M gas.
+    let testArgs = ['run', 'truffle', 'test', '--reset']
     if (argv['verbose-rpc']) {
       testArgs.push('--verbose-rpc')
     }
     if (argv.coverage) {
       testArgs = testArgs.concat(['--network', 'coverage'])
+    } else {
+      testArgs = testArgs.concat(['--network', networkName])
     }
     if (argv.gas) {
       testArgs = testArgs.concat(['--color', '--gas'])
     }
-    if (argv._.length > 0) {
-      const testGlob = argv._.map((testName) => `test/\*\*/${testName}.ts`).join(' ')
-      const testFiles = glob.readdirSync(testGlob)
-      if (testFiles.length === 0) {
-        // tslint:disable-next-line: no-console
-        console.error(`No tests matched with ${argv._}`)
-        process.exit(1)
-      }
-      testArgs = testArgs.concat(testFiles)
+
+    const testGlob =
+      argv._.length > 0
+        ? argv._.map((testName) => `test/\*\*/${testName}.ts`).join(' ')
+        : `test/\*\*/*.ts`
+    const testFiles = glob.readdirSync(testGlob)
+    if (testFiles.length === 0) {
+      // tslint:disable-next-line: no-console
+      console.error(`No test files matched with ${testGlob}`)
+      process.exit(1)
     }
+    testArgs = testArgs.concat(testFiles)
+
     await exec('yarn', testArgs)
     await closeGanache()
   } catch (e) {

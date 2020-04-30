@@ -1,5 +1,5 @@
 import { newKitFromWeb3 } from '@celo/contractkit'
-import { addLocalAccount as web3utilsAddLocalAccount } from '@celo/walletkit'
+import { privateKeyToAddress } from '@celo/utils/src/address'
 import { Platform } from 'react-native'
 import * as net from 'react-native-tcp'
 import { DEFAULT_FORNO_URL } from 'src/config'
@@ -7,16 +7,20 @@ import { IPC_PATH } from 'src/geth/geth'
 import networkConfig from 'src/geth/networkConfig'
 import Logger from 'src/utils/Logger'
 import Web3 from 'web3'
-import { Provider } from 'web3/providers'
+import { provider } from 'web3-core'
 
 // Logging tag
 const tag = 'web3/contracts'
 
-export const web3: Web3 = getWeb3()
-export const contractKit = newKitFromWeb3(web3)
+const web3: Web3 = getWeb3()
+let contractKit = newKitFromWeb3(web3)
 
-export function isInitiallyZeroSyncMode() {
-  return networkConfig.initiallyZeroSync
+export function getContractKit() {
+  return contractKit
+}
+
+export function isInitiallyFornoMode() {
+  return networkConfig.initiallyForno
 }
 
 function getIpcProvider() {
@@ -56,50 +60,52 @@ function getIpcProvider() {
   return ipcProvider
 }
 
-function getWebSocketProvider(url: string): Provider {
+function getHttpProvider(url: string): provider {
   Logger.debug(tag, 'creating HttpProvider...')
-  const provider = new Web3.providers.HttpProvider(url)
+  const httpProvider = new Web3.providers.HttpProvider(url)
   Logger.debug(tag, 'created HttpProvider')
   // In the future, we might decide to over-ride the error handler via the following code.
   // provider.on('error', () => {
   //   Logger.showError('Error occurred')
   // })
-  return provider
+  return httpProvider
 }
 
 function getWeb3(): Web3 {
   Logger.info(
     `${tag}@getWeb3`,
-    `Initializing web3, platform: ${Platform.OS}, geth free mode: ${isInitiallyZeroSyncMode()}`
+    `Initializing web3, platform: ${Platform.OS}, forno mode: ${isInitiallyFornoMode()}`
   )
 
-  if (isInitiallyZeroSyncMode()) {
-    // Geth free mode
+  if (isInitiallyFornoMode()) {
     const url = DEFAULT_FORNO_URL
     Logger.debug(`${tag}@getWeb3`, `Connecting to url ${url}`)
-    return new Web3(getWebSocketProvider(url))
+    return new Web3(getHttpProvider(url))
   } else {
     return new Web3(getIpcProvider())
   }
 }
 
 // Mutates web3 with new provider
-export function switchWeb3ProviderForSyncMode(zeroSync: boolean) {
-  if (zeroSync) {
-    web3.setProvider(getWebSocketProvider(DEFAULT_FORNO_URL))
-    Logger.info(`${tag}@switchWeb3ProviderForSyncMode`, `Set provider to ${DEFAULT_FORNO_URL}`)
+export function switchWeb3ProviderForSyncMode(forno: boolean) {
+  if (forno) {
+    contractKit = newKitFromWeb3(new Web3(getHttpProvider(DEFAULT_FORNO_URL)))
+    Logger.info(
+      `${tag}@switchWeb3ProviderForSyncMode`,
+      `Switch contractKit provider to ${DEFAULT_FORNO_URL}`
+    )
   } else {
-    web3.setProvider(getIpcProvider())
-    Logger.info(`${tag}@switchWeb3ProviderForSyncMode`, `Set provider to IPC provider`)
+    contractKit = newKitFromWeb3(new Web3(getIpcProvider()))
+    Logger.info(`${tag}@switchWeb3ProviderForSyncMode`, `Set contractKit provider to IPC provider`)
   }
 }
 
-export function addLocalAccount(web3Instance: Web3, privateKey: string) {
-  if (!web3Instance) {
-    throw new Error(`web3 instance is ${web3Instance}`)
-  }
+export function addLocalAccount(privateKey: string, isDefault: boolean = false) {
   if (!privateKey) {
     throw new Error(`privateKey is ${privateKey}`)
   }
-  web3utilsAddLocalAccount(web3Instance, privateKey)
+  contractKit.addAccount(privateKey)
+  if (isDefault) {
+    contractKit.defaultAccount = privateKeyToAddress(privateKey)
+  }
 }

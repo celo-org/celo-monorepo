@@ -1,7 +1,8 @@
 {
+  "accept": "Accept",
+  "at": "at",
   "yourClockIsBroke": "Your phone date and time is inaccurate",
-  "adjustYourClock":
-    "Adjust your clock to read time automatically and try again. If the issue persists, you may need to restart the application",
+  "adjustYourClock": "Adjust your clock to read time automatically and try again. If the issue persists, you may need to restart the application",
   "adjustDate": "Adjust Date",
   "submit": "Submit",
   "continue": "Continue",
@@ -30,15 +31,15 @@
   "refreshFailedUnexpectedly": "Failed to refresh, please check your connectivity",
   "edit": "Edit",
   "receivedPayment": "Received Payment",
-  "readOnlyState":
-    "Read Only Mode Set Backup Key to continue sending and receiving {{CeloDollars}}",
+  "readOnlyState": "Read Only Mode Set Backup Key to continue sending and receiving {{CeloDollars}}",
   "getStarted": "Get Started",
   "manageCeloDollars": "Manage {{CeloDollars}}",
   "sendCeloDollars": "Send {{CeloDollars}}",
   "startEarning": "Start Earning",
   "backToWallet": "Back to Wallet",
   "exchangeForGold": "Exchange for Gold",
-  "invalidPhone": "Invalid Phone Number",
+  "missingFullName": "Name cannot be empty",
+  "invalidPhone": "Invalid phone number",
   "cantSelectInvalidPhone": "Cannot select contact: invalid phone number",
   "needMoreFundsToSend": "Need more funds to send payment",
   "invalidAmount": "Invalid amount",
@@ -56,10 +57,18 @@
   "invalidAccount": "Invalid Account",
   "delete": "Delete",
   "cancel": "Cancel",
+  "remind": "Remind",
+  "pay": "Pay",
+  "decline": "Decline",
   "to": "To",
   "for": "For",
+  "reclaim": "Reclaim",
   "celoGold": "Celo Gold",
   "celoDollars": "{{CeloDollars}}",
+  "balanceAvailable": "<0></0> available",
+  "subtotal": "Subtotal",
+  "total": "Total",
+  "totalInDollars": "{{CeloDollars}} (@ <2></2>)",
   "oops": "Oops!",
   "somethingWrong": "Something went wrong.",
   "verifyFailed": "Failed to verify",
@@ -68,6 +77,7 @@
   "quitApp": "Quit",
   "loading": "Loading…",
   "inviteFailed": "Failure sending invite",
+  "inviteOpenAppFailed": "Could not open messaging app, invite code copied to clipboard",
   "importContactsFailed": "Failed to import contacts",
   "sendPaymentFailed": "Failure sending payment",
   "paymentRequestFailed": "Payment Request did not send",
@@ -79,9 +89,8 @@
     "0": "Bad Connection",
     "1": "some features disabled"
   },
-  "networkConnectionFailed":
-    "Could not connect with the network, please check your data connection",
-  "firebaseFailed": "Couldn't connect to notification service",
+  "networkConnectionFailed": "Could not connect with the network, please check your data connection",
+  "firebaseFailed": "Could not connect to Firebase",
   "gasPriceUpdateFailed": "Could not update fee",
   "appHasToBeUpdated": "App has to be updated",
   "thisVersionIsInsecure": "This version is insecure",
@@ -97,5 +106,12 @@
   "localCurrencyTitle": "Select Currency",
   "or": "or",
   "accepted": "Accepted",
-  "processing": "Processing"
+  "processing": "Processing",
+  "moreWithCount": "+{{count }} more",
+  "unknown": "Unknown",
+  "emptyList": "Empty list",
+  "timeframes": {
+    "30d": "30 days"
+  },
+  "message": "Message"
 }

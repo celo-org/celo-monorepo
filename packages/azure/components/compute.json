@@ -1,0 +1,328 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "resources": [
+    {
+      "name": "[variables('validatorDataDiskName')]",
+      "type": "Microsoft.Compute/disks",
+      "apiVersion": "2019-07-01",
+      "location": "[parameters('location')]",
+      "properties": {
+        "diskSizeGB": "[parameters('validatorDiskSize')]",
+        "creationData": {
+          "createOption": "empty"
+        }
+      },
+      "sku": {
+        "name": "Premium_LRS"
+      }
+    },
+    {
+      "name": "[variables('proxyDataDiskName')]",
+      "type": "Microsoft.Compute/disks",
+      "apiVersion": "2019-07-01",
+      "location": "[parameters('location')]",
+      "properties": {
+        "diskSizeGB": "[parameters('proxyDiskSize')]",
+        "creationData": {
+          "createOption": "empty"
+        }
+      },
+      "sku": {
+        "name": "Premium_LRS"
+      }
+    },
+    {
+      "name": "[variables('attesterDataDiskName')]",
+      "type": "Microsoft.Compute/disks",
+      "apiVersion": "2019-07-01",
+      "location": "[parameters('location')]",
+      "properties": {
+        "diskSizeGB": "[parameters('attesterDiskSize')]",
+        "creationData": {
+          "createOption": "empty"
+        }
+      },
+      "sku": {
+        "name": "Premium_LRS"
+      }
+    },
+    {
+      "name": "[variables('validatorVirtualMachineName')]",
+      "type": "Microsoft.Compute/virtualMachines",
+      "apiVersion": "2019-07-01",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[variables('validatorDataDiskName')]",
+        "[variables('validatorNetworkInterfaceName')]",
+        "[variables('validatorUserAssignedIdentityName')]",
+        "[variables('validatorKeyVaultName')]"
+      ],
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "[parameters('validatorVirtualMachineSize')]"
+        },
+        "storageProfile": {
+          "osDisk": {
+            "createOption": "fromImage",
+            "managedDisk": {
+              "storageAccountType": "[parameters('osDiskType')]"
+            }
+          },
+          "imageReference": "[variables('imageReference')]",
+          "dataDisks": [
+            {
+              "lun": 0,
+              "createOption": "attach",
+              "managedDisk": {
+                "id": "[resourceId('Microsoft.Compute/disks', variables('validatorDataDiskName'))]"
+              }
+            }
+          ]
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id":
+                "[resourceId('Microsoft.Network/networkInterfaces', variables('validatorNetworkInterfaceName'))]"
+            }
+          ]
+        },
+        "osProfile": {
+          "computerName": "[variables('validatorVirtualMachineName')]",
+          "adminUsername": "[parameters('adminUsername')]",
+          "linuxConfiguration": {
+            "disablePasswordAuthentication": true,
+            "ssh": {
+              "publicKeys": [
+                {
+                  "path":
+                    "[concat('/home/', parameters('adminUsername'), '/.ssh/authorized_keys')]",
+                  "keyData": "[parameters('adminPublicKey')]"
+                }
+              ]
+            }
+          }
+        },
+        "diagnosticsProfile": {
+          "bootDiagnostics": {
+            "enabled": false
+          }
+        }
+      },
+      "identity": {
+        "type": "UserAssigned",
+        "userAssignedIdentities": {
+          "[resourceId(resourceGroup().name, 'Microsoft.ManagedIdentity/userAssignedIdentities', variables('validatorUserAssignedIdentityName'))]": {}
+        }
+      },
+      "resources": [
+        {
+          "name": "validatorCustomScript",
+          "type": "extensions",
+          "location": "[resourceGroup().location]",
+          "apiVersion": "2019-03-01",
+          "dependsOn": [
+            "[variables('validatorVirtualMachineName')]",
+            "[variables('validatorNetworkInterfaceName')]",
+            "[variables('proxyNetworkInterfaceName')]"
+          ],
+          "properties": {
+            "publisher": "Microsoft.Azure.Extensions",
+            "type": "CustomScript",
+            "typeHandlerVersion": "2.0",
+            "autoUpgradeMinorVersion": true,
+            "protectedSettings": {
+              "script": "[base64(concat('echo \"', {{{proxyIps}}}, {{{validatorIps}}}, {{{variables}}}, {{{parameters}}}, '\" > startup-env.sh;', base64ToString('{{{validatorScript}}}')))]"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "[variables('proxyVirtualMachineName')]",
+      "type": "Microsoft.Compute/virtualMachines",
+      "apiVersion": "2019-07-01",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[variables('proxyDataDiskName')]",
+        "[variables('proxyNetworkInterfaceName')]",
+        "[variables('proxyUserAssignedIdentityName')]",
+        "[variables('proxyKeyVaultName')]"
+      ],
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "[parameters('proxyVirtualMachineSize')]"
+        },
+        "storageProfile": {
+          "osDisk": {
+            "createOption": "fromImage",
+            "managedDisk": {
+              "storageAccountType": "[parameters('osDiskType')]"
+            }
+          },
+          "imageReference": "[variables('imageReference')]",
+          "dataDisks": [
+            {
+              "lun": 0,
+              "createOption": "attach",
+              "managedDisk": {
+                "id": "[resourceId('Microsoft.Compute/disks', variables('proxyDataDiskName'))]"
+              }
+            }
+          ]
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id":
+                "[resourceId('Microsoft.Network/networkInterfaces', variables('proxyNetworkInterfaceName'))]"
+            }
+          ]
+        },
+        "osProfile": {
+          "computerName": "[variables('proxyVirtualMachineName')]",
+          "adminUsername": "[parameters('adminUsername')]",
+          "linuxConfiguration": {
+            "disablePasswordAuthentication": true,
+            "ssh": {
+              "publicKeys": [
+                {
+                  "path":
+                    "[concat('/home/', parameters('adminUsername'), '/.ssh/authorized_keys')]",
+                  "keyData": "[parameters('adminPublicKey')]"
+                }
+              ]
+            }
+          }
+        },
+        "diagnosticsProfile": {
+          "bootDiagnostics": {
+            "enabled": false
+          }
+        }
+      },
+      "identity": {
+        "type": "UserAssigned",
+        "userAssignedIdentities": {
+          "[resourceId(resourceGroup().name, 'Microsoft.ManagedIdentity/userAssignedIdentities', variables('proxyUserAssignedIdentityName'))]": {}
+        }
+      },
+      "resources": [
+        {
+          "name": "proxyCustomScript",
+          "type": "extensions",
+          "location": "[resourceGroup().location]",
+          "apiVersion": "2019-03-01",
+          "dependsOn": [
+            "[variables('proxyVirtualMachineName')]",
+            "[variables('proxyNetworkInterfaceName')]",
+            "[variables('validatorNetworkInterfaceName')]"
+          ],
+          "properties": {
+            "publisher": "Microsoft.Azure.Extensions",
+            "type": "CustomScript",
+            "typeHandlerVersion": "2.0",
+            "autoUpgradeMinorVersion": true,
+            "protectedSettings": {
+              "script": "[base64(concat('echo \"', {{{proxyIps}}}, {{{validatorIps}}}, {{{variables}}}, {{{parameters}}}, '\" > startup-env.sh;', base64ToString('{{{proxyScript}}}')))]"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "[variables('attesterVirtualMachineName')]",
+      "type": "Microsoft.Compute/virtualMachines",
+      "apiVersion": "2019-07-01",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[variables('attesterDataDiskName')]",
+        "[variables('attesterNetworkInterfaceName')]",
+        "[variables('attesterUserAssignedIdentityName')]",
+        "[variables('attesterKeyVaultName')]",
+        "[variables('attesterDBName')]"
+      ],
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "[parameters('attesterVirtualMachineSize')]"
+        },
+        "storageProfile": {
+          "osDisk": {
+            "createOption": "fromImage",
+            "managedDisk": {
+              "storageAccountType": "[parameters('osDiskType')]"
+            }
+          },
+          "imageReference": "[variables('imageReference')]",
+          "dataDisks": [
+            {
+              "lun": 0,
+              "createOption": "attach",
+              "managedDisk": {
+                "id": "[resourceId('Microsoft.Compute/disks', variables('attesterDataDiskName'))]"
+              }
+            }
+          ]
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id":
+                "[resourceId('Microsoft.Network/networkInterfaces', variables('attesterNetworkInterfaceName'))]"
+            }
+          ]
+        },
+        "osProfile": {
+          "computerName": "[variables('attesterVirtualMachineName')]",
+          "adminUsername": "[parameters('adminUsername')]",
+          "linuxConfiguration": {
+            "disablePasswordAuthentication": true,
+            "ssh": {
+              "publicKeys": [
+                {
+                  "path":
+                    "[concat('/home/', parameters('adminUsername'), '/.ssh/authorized_keys')]",
+                  "keyData": "[parameters('adminPublicKey')]"
+                }
+              ]
+            }
+          }
+        },
+        "diagnosticsProfile": {
+          "bootDiagnostics": {
+            "enabled": false
+          }
+        }
+      },
+      "identity": {
+        "type": "UserAssigned",
+        "userAssignedIdentities": {
+          "[resourceId(resourceGroup().name, 'Microsoft.ManagedIdentity/userAssignedIdentities', variables('attesterUserAssignedIdentityName'))]": {}
+        }
+      },
+      "resources": [
+        {
+          "name": "attesterCustomScript",
+          "type": "extensions",
+          "location": "[resourceGroup().location]",
+          "apiVersion": "2019-03-01",
+          "dependsOn": [
+            "[variables('attesterVirtualMachineName')]",
+            "[variables('proxyNetworkInterfaceName')]"
+          ],
+          "properties": {
+            "publisher": "Microsoft.Azure.Extensions",
+            "type": "CustomScript",
+            "typeHandlerVersion": "2.0",
+            "autoUpgradeMinorVersion": true,
+            "protectedSettings": {
+              "script":
+              "[base64(concat('echo \"', {{{proxyIps}}}, {{{validatorIps}}}, {{{variables}}}, {{{parameters}}}, '\" > startup-env.sh;', base64ToString('{{{attesterScript}}}')))]"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

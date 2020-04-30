@@ -1,8 +1,20 @@
 pragma solidity ^0.5.3;
 
-// TODO(asa): Limit assembly usage by using X.staticcall instead.
+import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+
 contract UsingPrecompiles {
+  using SafeMath for uint256;
+
+  address constant TRANSFER = address(0xff - 2);
+  address constant FRACTION_MUL = address(0xff - 3);
   address constant PROOF_OF_POSSESSION = address(0xff - 4);
+  address constant GET_VALIDATOR = address(0xff - 5);
+  address constant NUMBER_VALIDATORS = address(0xff - 6);
+  address constant EPOCH_SIZE = address(0xff - 7);
+  address constant BLOCK_NUMBER_FROM_HEADER = address(0xff - 8);
+  address constant HASH_HEADER = address(0xff - 9);
+  address constant GET_PARENT_SEAL_BITMAP = address(0xff - 10);
+  address constant GET_VERIFIED_SEAL_BITMAP = address(0xff - 11);
 
   /**
    * @notice calculate a * b^x for fractions a, b to `decimals` precision
@@ -22,42 +34,17 @@ contract UsingPrecompiles {
     uint256 exponent,
     uint256 _decimals
   ) public view returns (uint256, uint256) {
-    require(aDenominator != 0 && bDenominator != 0);
+    require(aDenominator != 0 && bDenominator != 0, "a denominator is zero");
     uint256 returnNumerator;
     uint256 returnDenominator;
-    // solhint-disable-next-line no-inline-assembly
-    assembly {
-      let newCallDataPosition := mload(0x40)
-      mstore(0x40, add(newCallDataPosition, calldatasize))
-      mstore(newCallDataPosition, aNumerator)
-      mstore(add(newCallDataPosition, 32), aDenominator)
-      mstore(add(newCallDataPosition, 64), bNumerator)
-      mstore(add(newCallDataPosition, 96), bDenominator)
-      mstore(add(newCallDataPosition, 128), exponent)
-      mstore(add(newCallDataPosition, 160), _decimals)
-      let success := staticcall(
-        1050, // estimated gas cost for this function
-        0xfc,
-        newCallDataPosition,
-        0xc4, // input size, 6 * 32 = 192 bytes
-        0,
-        0
-      )
-
-      let returnDataSize := returndatasize
-      let returnDataPosition := mload(0x40)
-      mstore(0x40, add(returnDataPosition, returnDataSize))
-      returndatacopy(returnDataPosition, 0, returnDataSize)
-
-      switch success
-        case 0 {
-          revert(returnDataPosition, returnDataSize)
-        }
-        default {
-          returnNumerator := mload(returnDataPosition)
-          returnDenominator := mload(add(returnDataPosition, 32))
-        }
-    }
+    bool success;
+    bytes memory out;
+    (success, out) = FRACTION_MUL.staticcall(
+      abi.encodePacked(aNumerator, aDenominator, bNumerator, bDenominator, exponent, _decimals)
+    );
+    require(success, "error calling fractionMulExp precompile");
+    returnNumerator = getUint256FromBytes(out, 0);
+    returnDenominator = getUint256FromBytes(out, 32);
     return (returnNumerator, returnDenominator);
   }
 
@@ -66,43 +53,79 @@ contract UsingPrecompiles {
    * @return The current epoch size in blocks.
    */
   function getEpochSize() public view returns (uint256) {
-    uint256 ret;
-    // solhint-disable-next-line no-inline-assembly
-    assembly {
-      let newCallDataPosition := mload(0x40)
-      let success := staticcall(1000, 0xf8, newCallDataPosition, 0, 0, 0)
-
-      returndatacopy(add(newCallDataPosition, 32), 0, 32)
-      ret := mload(add(newCallDataPosition, 32))
-    }
-    return ret;
+    bytes memory out;
+    bool success;
+    (success, out) = EPOCH_SIZE.staticcall(abi.encodePacked());
+    require(success, "error calling getEpochSize precompile");
+    return getUint256FromBytes(out, 0);
   }
 
+  /**
+   * @notice Returns the epoch number at a block.
+   * @param blockNumber Block number where epoch number is calculated.
+   * @return Epoch number.
+   */
+  function getEpochNumberOfBlock(uint256 blockNumber) public view returns (uint256) {
+    return epochNumberOfBlock(blockNumber, getEpochSize());
+  }
+
+  /**
+   * @notice Returns the epoch number at a block.
+   * @return Current epoch number.
+   */
   function getEpochNumber() public view returns (uint256) {
-    uint256 epochSize = getEpochSize();
-    uint256 epochNumber = block.number / epochSize;
-    if (block.number % epochSize == 0) {
-      epochNumber = epochNumber - 1;
+    return getEpochNumberOfBlock(block.number);
+  }
+
+  /**
+   * @notice Returns the epoch number at a block.
+   * @param blockNumber Block number where epoch number is calculated.
+   * @param epochSize The epoch size in blocks.
+   * @return Epoch number.
+   */
+  function epochNumberOfBlock(uint256 blockNumber, uint256 epochSize)
+    internal
+    pure
+    returns (uint256)
+  {
+    // Follows GetEpochNumber from celo-blockchain/blob/master/consensus/istanbul/utils.go
+    uint256 epochNumber = blockNumber / epochSize;
+    if (blockNumber % epochSize == 0) {
+      return epochNumber;
+    } else {
+      return epochNumber + 1;
     }
-    return epochNumber;
   }
 
   /**
    * @notice Gets a validator address from the current validator set.
-   * @param index Index of requested validator in the validator set as sorted by the election.
+   * @param index Index of requested validator in the validator set.
    * @return Address of validator at the requested index.
    */
-  function validatorAddressFromCurrentSet(uint256 index) public view returns (address) {
-    address validatorAddress;
-    assembly {
-      let newCallDataPosition := mload(0x40)
-      mstore(newCallDataPosition, index)
-      let success := staticcall(5000, 0xfa, newCallDataPosition, 32, 0, 0)
-      returndatacopy(add(newCallDataPosition, 64), 0, 32)
-      validatorAddress := mload(add(newCallDataPosition, 64))
-    }
+  function validatorSignerAddressFromCurrentSet(uint256 index) public view returns (address) {
+    bytes memory out;
+    bool success;
+    (success, out) = GET_VALIDATOR.staticcall(abi.encodePacked(index, uint256(block.number)));
+    require(success, "error calling validatorSignerAddressFromCurrentSet precompile");
+    return address(getUint256FromBytes(out, 0));
+  }
 
-    return validatorAddress;
+  /**
+   * @notice Gets a validator address from the validator set at the given block number.
+   * @param index Index of requested validator in the validator set.
+   * @param blockNumber Block number to retrieve the validator set from.
+   * @return Address of validator at the requested index.
+   */
+  function validatorSignerAddressFromSet(uint256 index, uint256 blockNumber)
+    public
+    view
+    returns (address)
+  {
+    bytes memory out;
+    bool success;
+    (success, out) = GET_VALIDATOR.staticcall(abi.encodePacked(index, blockNumber));
+    require(success, "error calling validatorSignerAddressFromSet precompile");
+    return address(getUint256FromBytes(out, 0));
   }
 
   /**
@@ -110,15 +133,24 @@ contract UsingPrecompiles {
    * @return Size of the current elected validator set.
    */
   function numberValidatorsInCurrentSet() public view returns (uint256) {
-    uint256 numberValidators;
-    assembly {
-      let success := staticcall(5000, 0xf9, 0, 0, 0, 0)
-      let returnData := mload(0x40)
-      returndatacopy(returnData, 0, 32)
-      numberValidators := mload(returnData)
-    }
+    bytes memory out;
+    bool success;
+    (success, out) = NUMBER_VALIDATORS.staticcall(abi.encodePacked(uint256(block.number)));
+    require(success, "error calling numberValidatorsInCurrentSet precompile");
+    return getUint256FromBytes(out, 0);
+  }
 
-    return numberValidators;
+  /**
+   * @notice Gets the size of the validator set that must sign the given block number.
+   * @param blockNumber Block number to retrieve the validator set from.
+   * @return Size of the validator set.
+   */
+  function numberValidatorsInSet(uint256 blockNumber) public view returns (uint256) {
+    bytes memory out;
+    bool success;
+    (success, out) = NUMBER_VALIDATORS.staticcall(abi.encodePacked(blockNumber));
+    require(success, "error calling numberValidatorsInSet precompile");
+    return getUint256FromBytes(out, 0);
   }
 
   /**
@@ -132,12 +164,107 @@ contract UsingPrecompiles {
    */
   function checkProofOfPossession(address sender, bytes memory blsKey, bytes memory blsPop)
     public
+    view
     returns (bool)
   {
     bool success;
-    (success, ) = PROOF_OF_POSSESSION.call.value(0).gas(gasleft())(
-      abi.encodePacked(sender, blsKey, blsPop)
-    );
+    (success, ) = PROOF_OF_POSSESSION.staticcall(abi.encodePacked(sender, blsKey, blsPop));
     return success;
   }
+
+  /**
+   * @notice Parses block number out of header.
+   * @param header RLP encoded header
+   * @return Block number.
+   */
+  function getBlockNumberFromHeader(bytes memory header) public view returns (uint256) {
+    bytes memory out;
+    bool success;
+    (success, out) = BLOCK_NUMBER_FROM_HEADER.staticcall(abi.encodePacked(header));
+    require(success, "error calling getBlockNumberFromHeader precompile");
+    return getUint256FromBytes(out, 0);
+  }
+
+  /**
+   * @notice Computes hash of header.
+   * @param header RLP encoded header
+   * @return Header hash.
+   */
+  function hashHeader(bytes memory header) public view returns (bytes32) {
+    bytes memory out;
+    bool success;
+    (success, out) = HASH_HEADER.staticcall(abi.encodePacked(header));
+    require(success, "error calling hashHeader precompile");
+    return getBytes32FromBytes(out, 0);
+  }
+
+  /**
+   * @notice Gets the parent seal bitmap from the header at the given block number.
+   * @param blockNumber Block number to retrieve. Must be within 4 epochs of the current number.
+   * @return Bitmap parent seal with set bits at indices corresponding to signing validators.
+   */
+  function getParentSealBitmap(uint256 blockNumber) public view returns (bytes32) {
+    bytes memory out;
+    bool success;
+    (success, out) = GET_PARENT_SEAL_BITMAP.staticcall(abi.encodePacked(blockNumber));
+    require(success, "error calling getParentSealBitmap precompile");
+    return getBytes32FromBytes(out, 0);
+  }
+
+  /**
+   * @notice Verifies the BLS signature on the header and returns the seal bitmap.
+   * The validator set used for verification is retrieved based on the parent hash field of the
+   * header.  If the parent hash is not in the blockchain, verification fails.
+   * @param header RLP encoded header
+   * @return Bitmap parent seal with set bits at indices correspoinding to signing validators.
+   */
+  function getVerifiedSealBitmapFromHeader(bytes memory header) public view returns (bytes32) {
+    bytes memory out;
+    bool success;
+    (success, out) = GET_VERIFIED_SEAL_BITMAP.staticcall(abi.encodePacked(header));
+    require(success, "error calling getVerifiedSealBitmapFromHeader precompile");
+    return getBytes32FromBytes(out, 0);
+  }
+
+  /**
+   * @notice Converts bytes to uint256.
+   * @param bs byte[] data
+   * @param start offset into byte data to convert
+   * @return uint256 data
+   */
+  function getUint256FromBytes(bytes memory bs, uint256 start) internal pure returns (uint256) {
+    return uint256(getBytes32FromBytes(bs, start));
+  }
+
+  /**
+   * @notice Converts bytes to bytes32.
+   * @param bs byte[] data
+   * @param start offset into byte data to convert
+   * @return bytes32 data
+   */
+  function getBytes32FromBytes(bytes memory bs, uint256 start) internal pure returns (bytes32) {
+    require(bs.length >= start + 32, "slicing out of range");
+    bytes32 x;
+    assembly {
+      x := mload(add(bs, add(start, 32)))
+    }
+    return x;
+  }
+
+  /**
+   * @notice Returns the minimum number of required signers for a given block number.
+   * @dev Computed in celo-blockchain as int(math.Ceil(float64(2*valSet.Size()) / 3))
+   */
+  function minQuorumSize(uint256 blockNumber) public view returns (uint256) {
+    return numberValidatorsInSet(blockNumber).mul(2).add(2).div(3);
+  }
+
+  /**
+   * @notice Computes byzantine quorum from current validator set size
+   * @return Byzantine quorum of validators.
+   */
+  function minQuorumSizeInCurrentSet() public view returns (uint256) {
+    return minQuorumSize(block.number);
+  }
+
 }

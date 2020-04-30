@@ -1,7 +1,8 @@
 {
+  "accept": "Aceptar",
+  "at": "a",
   "yourClockIsBroke": "La fecha y hora de tu teléfono son incorrectos",
-  "adjustYourClock":
-    "Ajusta tu reloj para leer la hora automáticamente y vuelva a intentarlo. Si el problema persiste, puede que sea necesario reiniciar la aplicación",
+  "adjustYourClock": "Ajusta tu reloj para leer la hora automáticamente y vuelva a intentarlo. Si el problema persiste, puede que sea necesario reiniciar la aplicación",
   "adjustDate": "Arreglar hora",
   "submit": "Enviar",
   "continue": "Continuar",
@@ -30,14 +31,14 @@
   "refreshFailedUnexpectedly": "Error al actualizar, por favor revise tu conectividad",
   "edit": "Editar",
   "receivedPayment": "Pago recibido",
-  "readOnlyState":
-    "Modo de solo lectura: cree la clave de respaldo para seguir enviando y recibiendo {{CeloDollars}}",
+  "readOnlyState": "Modo de solo lectura: cree la clave de respaldo para seguir enviando y recibiendo {{CeloDollars}}",
   "getStarted": "Primeros pasos",
   "manageCeloDollars": "Administrar {{CeloDollars}}",
   "sendCeloDollars": "Enviar {{CeloDollars}}",
   "startEarning": "Comenzar a ganar",
   "backToWallet": "Volver a el Monedero",
   "exchangeForGold": "Cambiar a Oro",
+  "missingFullName": "El nombre no puede estar vacío",
   "invalidPhone": "Número de teléfono inválido",
   "cantSelectInvalidPhone": "No se puede seleccionar el contacto: número de teléfono no válido",
   "needMoreFundsToSend": "Necesita más fondos para enviar el pago",
@@ -56,10 +57,18 @@
   "invalidAccount": "Cuenta inválida",
   "delete": "Eliminar",
   "cancel": "Cancelar",
+  "remind": "Recordar",
+  "pay": "Paga",
+  "decline": "Disminución",
   "to": "Para",
   "for": "Por",
+  "reclaim": "Reclaim",
   "celoGold": "Celo Oro",
   "celoDollars": "{{CeloDollars}}",
+  "balanceAvailable": "<0></0> disponibles",
+  "subtotal": "Total parcial",
+  "total": "Total",
+  "totalInDollars": "{{CeloDollars}} (@ <2></2>)",
   "oops": "¡Uy!",
   "somethingWrong": "Había un problema",
   "verifyFailed": "Falla durante la verificación",
@@ -68,6 +77,7 @@
   "quitApp": "Dejar",
   "loading": "Cargando…",
   "inviteFailed": "Falló el envío de la invitación",
+  "inviteOpenAppFailed": "No se pudo abrir la aplicación de mensajería, el código de invitación se copió al portapapeles",
   "importContactsFailed": "Error al importar contactos",
   "sendPaymentFailed": "Falla en el envío de pago",
   "paymentRequestFailed": "No se pudo enviar la solicitud de pago",
@@ -80,15 +90,13 @@
     "1": "algunas funciones no disponible"
   },
   "networkConnectionFailed": "No se pudo conectar a la red, por favor verifica tu conexión",
-  "firebaseFailed": "No se pudo conectar al servicio de notificaciones",
+  "firebaseFailed": "No se pudo conectar al Firebase",
   "gasPriceUpdateFailed": "No se pudo actualizar la comisión",
   "appHasToBeUpdated": "La aplicación tiene que ser actualizada",
   "thisVersionIsInsecure": "Esta versión es insegura.",
   "update": "Actualizar",
-  "qrFailedNoAddress":
-    "Código QR no se pudo leer. Motivo: no se encontró la dirección de el monedero.",
-  "qrFailedInvalidAddress":
-    "Código QR no se pudo leer. Razón: la dirección de la cartera no es válida.",
+  "qrFailedNoAddress": "Código QR no se pudo leer. Motivo: no se encontró la dirección de el monedero.",
+  "qrFailedInvalidAddress": "Código QR no se pudo leer. Razón: la dirección de la cartera no es válida.",
   "corruptedChainDeleted": "Se ha borrado información corrupta, por favor reinicie la applicación",
   "web3FailedToSync": "Fallo la sincronización, por favor verifica tu conexión",
   "errorDuringSync": "Ocurrió un error duranet la sincronización, por favor intente más tarde",
@@ -98,5 +106,12 @@
   "localCurrencyTitle": "Seleccione el tipo de moneda",
   "or": "o",
   "accepted": "Aceptado",
-  "processing": "Procesando"
+  "processing": "Procesando",
+  "moreWithCount": "+{{count }} más",
+  "unknown": "Desconocido",
+  "emptyList": "Lista vacía",
+  "timeframes": {
+    "30d": "30 dias"
+  },
+  "message": "Mensaje"
 }

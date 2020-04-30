@@ -5,8 +5,10 @@ interface State {
   showHover: boolean
 }
 
+type KidsOrKidsAsFunc = ((currentlyHovering: boolean) => React.ReactNode) | React.ReactNode
+
 interface Props {
-  children: React.ReactNode
+  children: KidsOrKidsAsFunc
   onHoverIn?: () => void
   onHoverOut?: () => void
   onPressDown?: () => void
@@ -95,12 +97,13 @@ export default class Hoverable extends React.Component<Props, State> {
   }
 
   render() {
-    const { children } = this.props
-    const child =
-      typeof children === 'function'
-        ? children(this.state.showHover && this.state.isHovered)
-        : children
+    const isHovering = this.state.showHover && this.state.isHovered
 
+    const { children } = this.props
+
+    const child = getChild(children, isHovering)
+
+    // @ts-ignore
     return React.cloneElement(React.Children.only(child), {
       onMouseEnter: this.onMouseEnter,
       onMouseLeave: this.onMouseLeave,
@@ -114,5 +117,18 @@ export default class Hoverable extends React.Component<Props, State> {
       onMouseUp: this.onPressOut,
       onClick: this.props.onPress,
     })
+  }
+}
+
+function isFunction(thing: unknown): boolean {
+  return typeof thing === 'function'
+}
+
+function getChild(children: KidsOrKidsAsFunc, isHovering: boolean) {
+  if (isFunction(children)) {
+    const kids = children as (isHovering: boolean) => React.ReactNode
+    return kids(isHovering)
+  } else {
+    return children as React.ReactChild
   }
 }

@@ -1,17 +1,21 @@
-import {
-  ContractUtils,
-  getExchangeContract,
-  getGoldTokenContract,
-  getStableTokenContract,
-} from '@celo/walletkit'
-import { Exchange as ExchangeType } from '@celo/walletkit/types/Exchange'
-import { GoldToken as GoldTokenType } from '@celo/walletkit/types/GoldToken'
-import { StableToken as StableTokenType } from '@celo/walletkit/types/StableToken'
+import { CeloTransactionObject } from '@celo/contractkit'
+import { ExchangeWrapper } from '@celo/contractkit/lib/wrappers/Exchange'
+import { GoldTokenWrapper } from '@celo/contractkit/lib/wrappers/GoldTokenWrapper'
+import { ReserveWrapper } from '@celo/contractkit/lib/wrappers/Reserve'
+import { StableTokenWrapper } from '@celo/contractkit/lib/wrappers/StableTokenWrapper'
 import BigNumber from 'bignumber.js'
 import { all, call, put, select, spawn, takeEvery, takeLatest } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
+import { TokenTransactionType } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { Actions, ExchangeTokensAction, setExchangeRate } from 'src/exchange/actions'
+import {
+  Actions,
+  ExchangeTokensAction,
+  FetchExchangeRateAction,
+  FetchTobinTaxAction,
+  setExchangeRate,
+  setTobinTax,
+} from 'src/exchange/actions'
 import { ExchangeRatePair, exchangeRatePairSelector } from 'src/exchange/reducer'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { convertToContractDecimals } from 'src/tokens/saga'
@@ -20,13 +24,13 @@ import {
   generateStandbyTransactionId,
   removeStandbyTransaction,
 } from 'src/transactions/actions'
-import { TransactionStatus, TransactionTypes } from 'src/transactions/reducer'
+import { TransactionStatus } from 'src/transactions/reducer'
 import { sendAndMonitorTransaction } from 'src/transactions/saga'
 import { sendTransaction } from 'src/transactions/send'
 import { getRateForMakerToken, getTakerAmount } from 'src/utils/currencyExchange'
 import { roundDown } from 'src/utils/formatting'
 import Logger from 'src/utils/Logger'
-import { contractKit, web3 } from 'src/web3/contracts'
+import { getContractKit } from 'src/web3/contracts'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
 import * as util from 'util'
 
@@ -36,21 +40,76 @@ const LARGE_DOLLARS_SELL_AMOUNT_IN_WEI = new BigNumber(1000 * 100000000000000000
 const LARGE_GOLD_SELL_AMOUNT_IN_WEI = new BigNumber(100 * 1000000000000000000)
 const EXCHANGE_DIFFERENCE_TOLERATED = 0.01 // Maximum difference between actual and displayed takerAmount
 
-export function* doFetchExchangeRate(makerAmount?: BigNumber, makerToken?: CURRENCY_ENUM) {
+export function* doFetchTobinTax({ makerAmount, makerToken }: FetchTobinTaxAction) {
+  try {
+    let tobinTax
+    if (makerToken === CURRENCY_ENUM.GOLD) {
+      yield call(getConnectedAccount)
+
+      const contractKit = getContractKit()
+      const reserve: ReserveWrapper = yield call([
+        contractKit.contracts,
+        contractKit.contracts.getReserve,
+      ])
+
+      const tobinTaxFraction = yield call(reserve.getOrComputeTobinTax().txo.call)
+
+      if (!tobinTaxFraction) {
+        Logger.error(TAG, 'Unable to fetch tobin tax')
+        throw new Error('Unable to fetch tobin tax')
+      }
+
+      // Tobin tax represents % tax on gold transfer, stored as fraction tuple
+      tobinTax = tobinTaxFraction['0'] / tobinTaxFraction['1']
+      if (tobinTax > 0) {
+        tobinTax = makerAmount.times(tobinTax).toString()
+      }
+    } else {
+      // Tobin tax only charged for gold transfers
+      tobinTax = 0
+    }
+
+    Logger.debug(TAG, `Retrieved Tobin tax rate: ${tobinTax}`)
+    yield put(setTobinTax(tobinTax.toString()))
+  } catch (error) {
+    Logger.error(TAG, 'Error fetching Tobin tax', error)
+    yield put(showError(ErrorMessages.CALCULATE_FEE_FAILED))
+  }
+}
+
+export function* doFetchExchangeRate(action: FetchExchangeRateAction) {
   Logger.debug(TAG, 'Calling @doFetchExchangeRate')
 
-  // If makerAmount and makerToken are given, use them to estimate the exchange rate,
-  // as exchange rate depends on amount sold. Else default to preset large sell amount.
-  const goldMakerAmount =
-    makerAmount && makerToken === CURRENCY_ENUM.GOLD ? makerAmount : LARGE_GOLD_SELL_AMOUNT_IN_WEI
-  const dollarMakerAmount =
-    makerAmount && makerToken === CURRENCY_ENUM.DOLLAR
-      ? makerAmount
-      : LARGE_DOLLARS_SELL_AMOUNT_IN_WEI
-
+  const { makerToken, makerAmount } = action
   try {
     yield call(getConnectedAccount)
-    const exchange = yield call([contractKit.contracts, contractKit.contracts.getExchange])
+
+    let makerAmountInWei
+    if (makerAmount && makerToken) {
+      makerAmountInWei = (yield call(
+        convertToContractDecimals,
+        makerAmount,
+        makerToken
+      )).integerValue()
+    }
+
+    // If makerAmount and makerToken are given, use them to estimate the exchange rate,
+    // as exchange rate depends on amount sold. Else default to preset large sell amount.
+    const goldMakerAmount =
+      makerAmountInWei && makerToken === CURRENCY_ENUM.GOLD
+        ? makerAmountInWei
+        : LARGE_GOLD_SELL_AMOUNT_IN_WEI
+    const dollarMakerAmount =
+      makerAmountInWei && makerToken === CURRENCY_ENUM.DOLLAR
+        ? makerAmountInWei
+        : LARGE_DOLLARS_SELL_AMOUNT_IN_WEI
+
+    const contractKit = getContractKit()
+
+    const exchange: ExchangeWrapper = yield call([
+      contractKit.contracts,
+      contractKit.contracts.getExchange,
+    ])
 
     const [dollarMakerExchangeRate, goldMakerExchangeRate]: [BigNumber, BigNumber] = yield all([
       call([exchange, exchange.getUsdExchangeRate], dollarMakerAmount),
@@ -101,23 +160,32 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
 
     txId = yield createStandbyTx(makerToken, makerAmount, exchangeRate, account)
 
-    const goldTokenContract: GoldTokenType = yield call(getGoldTokenContract, web3)
-    const stableTokenContract: StableTokenType = yield call(getStableTokenContract, web3)
-    const exchangeContract: ExchangeType = yield call(getExchangeContract, web3)
+    const contractKit = getContractKit()
 
-    const convertedMakerAmount: BigNumber = yield call(
-      convertToContractDecimals,
-      makerAmount,
-      makerToken
-    )
+    const goldTokenContract: GoldTokenWrapper = yield call([
+      contractKit.contracts,
+      contractKit.contracts.getGoldToken,
+    ])
+    const stableTokenContract: StableTokenWrapper = yield call([
+      contractKit.contracts,
+      contractKit.contracts.getStableToken,
+    ])
+    const exchangeContract: ExchangeWrapper = yield call([
+      contractKit.contracts,
+      contractKit.contracts.getExchange,
+    ])
+
+    const convertedMakerAmount: BigNumber = roundDown(
+      yield call(convertToContractDecimals, makerAmount, makerToken),
+      0
+    ) // Nearest integer in wei
     const sellGold = makerToken === CURRENCY_ENUM.GOLD
 
     const updatedExchangeRate: BigNumber = yield call(
       // Updating with actual makerAmount, rather than conservative estimate displayed
-      ContractUtils.getExchangeRate,
-      web3,
-      makerToken,
-      convertedMakerAmount
+      [exchangeContract, exchangeContract.getExchangeRate],
+      convertedMakerAmount,
+      sellGold
     )
 
     const exceedsExpectedSize =
@@ -134,8 +202,9 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
     }
 
     // Ensure the user gets makerAmount at least as good as displayed (rounded to EXCHANGE_DIFFERENCE_TOLERATED)
-    const minimumTakerAmount = getTakerAmount(makerAmount, exchangeRate).minus(
-      EXCHANGE_DIFFERENCE_TOLERATED
+    const minimumTakerAmount = BigNumber.maximum(
+      getTakerAmount(makerAmount, exchangeRate).minus(EXCHANGE_DIFFERENCE_TOLERATED),
+      0
     )
     const updatedTakerAmount = getTakerAmount(makerAmount, updatedExchangeRate)
     if (minimumTakerAmount.isGreaterThan(updatedTakerAmount)) {
@@ -161,23 +230,25 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
 
     let approveTx
     if (makerToken === CURRENCY_ENUM.GOLD) {
-      approveTx = goldTokenContract.methods.approve(
-        exchangeContract._address,
+      approveTx = goldTokenContract.approve(
+        exchangeContract.address,
         convertedMakerAmount.toString()
       )
     } else if (makerToken === CURRENCY_ENUM.DOLLAR) {
-      approveTx = stableTokenContract.methods.approve(
-        exchangeContract._address,
+      approveTx = stableTokenContract.approve(
+        exchangeContract.address,
         convertedMakerAmount.toString()
       )
     } else {
       Logger.error(TAG, `Unexpected maker token ${makerToken}`)
       return
     }
-    yield call(sendTransaction, approveTx, account, TAG, 'approval')
-    Logger.debug(TAG, `Transaction approved: ${util.inspect(approveTx.arguments)}`)
+    yield call(sendTransaction, approveTx.txo, account, TAG, 'approval')
+    Logger.debug(TAG, `Transaction approved: ${util.inspect(approveTx.txo.arguments)}`)
 
-    const tx = exchangeContract.methods.exchange(
+    contractKit.defaultAccount = account
+
+    const tx: CeloTransactionObject<string> = yield exchangeContract.exchange(
       convertedMakerAmount.toString(),
       convertedTakerAmount.toString(),
       sellGold
@@ -208,12 +279,12 @@ function* createStandbyTx(
   exchangeRate: BigNumber,
   account: string
 ) {
-  const takerAmount = getTakerAmount(makerAmount, exchangeRate, 2)
+  const takerAmount = getTakerAmount(makerAmount, exchangeRate)
   const txId = generateStandbyTransactionId(account)
   yield put(
     addStandbyTransaction({
       id: txId,
-      type: TransactionTypes.EXCHANGE,
+      type: TokenTransactionType.Exchange,
       status: TransactionStatus.Pending,
       inSymbol: makerToken,
       inValue: makerAmount.toString(),
@@ -223,6 +294,10 @@ function* createStandbyTx(
     })
   )
   return txId
+}
+
+export function* watchFetchTobinTax() {
+  yield takeLatest(Actions.FETCH_TOBIN_TAX, doFetchTobinTax)
 }
 
 export function* watchFetchExchangeRate() {
@@ -236,5 +311,6 @@ export function* watchExchangeTokens() {
 
 export function* exchangeSaga() {
   yield spawn(watchFetchExchangeRate)
+  yield spawn(watchFetchTobinTax)
   yield spawn(watchExchangeTokens)
 }

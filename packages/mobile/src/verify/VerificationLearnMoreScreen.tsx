@@ -1,14 +1,14 @@
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import * as React from 'react'
-import { withNamespaces, WithNamespaces } from 'react-i18next'
+import { WithTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import componentWithAnalytics from 'src/analytics/wrapper'
-import { Namespaces } from 'src/i18n'
+import { Namespaces, withTranslation } from 'src/i18n'
 import { nuxNavigationOptions } from 'src/navigator/Headers'
 
-class VerificationLearnMoreScreen extends React.Component<WithNamespaces> {
+class VerificationLearnMoreScreen extends React.Component<WithTranslation> {
   static navigationOptions = nuxNavigationOptions
 
   render() {
@@ -55,5 +55,5 @@ const styles = StyleSheet.create({
 })
 
 export default componentWithAnalytics(
-  withNamespaces(Namespaces.nuxVerification2)(VerificationLearnMoreScreen)
+  withTranslation(Namespaces.nuxVerification2)(VerificationLearnMoreScreen)
 )

@@ -5,11 +5,11 @@ Welcome to the technical documentation site for the Celo project!
 In this documentation you’ll find information on:
 
 - An [overview](overview.md) of the high-level architecture of Celo
-- [Tutorials](getting-started/running-a-full-node.md) to get you started with the Celo codebase and the Alfajores Testnet
+- Tutorials to get you started with the Celo codebase and the [Celo networks](getting-started/choosing-a-network.md)
 - Reference documentation about the [Celo protocol](celo-codebase/protocol/) and [wallet](celo-codebase/wallet/)
 - How to make technical [contributions](community/contributing.md) to the project and community
 
-### About Celo <a id="about-celo"></a>
+### About Celo
 
 Celo’s purpose is to empower anyone with a smartphone anywhere in the world to have access to financial services, send money to phone numbers, and pay merchants.
 
@@ -37,13 +37,13 @@ Highlights include:
 
   Extremely fast, secure synchronization between mobile devices and the Celo network means that even wallet users with high latency, low bandwidth, or high cost data tariffs can use Celo. Celo removes the need to check every header before a received header can be trusted. Performance will be further improved with BLS signature aggregation and succinct zero-knowledge proofs, via zk-SNARKs.
 
-- **Proof of Stake**
+- **Proof-of-Stake**
 
-  Celo uses a Proof of Stake consensus algorithm. In comparison to Proof of Work systems like Bitcoin and Ethereum, this eliminates the negative environmental impact and means that users can make transactions that are cheaper, faster, and where the outcome cannot be changed once complete.
+  Celo uses a proof-of-stake consensus algorithm. In comparison to Proof of Work systems like Bitcoin and Ethereum, this eliminates the negative environmental impact and means that users can make transactions that are cheaper, faster, and where the outcome cannot be changed once complete.
 
 - **Full Node Incentives**
 
-  The Celo protocol offers incentives for running full nodes to service the light clients that run on each mobile device. Unlike other Proof of Stake systems, users can still earn cryptocurrency in exchange for providing compute resources without having to stake funds.
+  The Celo protocol offers incentives for running full nodes to service the light clients that run on each mobile device. Unlike other proof-of-stake systems, users can still earn cryptocurrency in exchange for providing compute resources without having to stake funds.
 
 - **On-chain Governance**
 
@@ -69,9 +69,11 @@ The [Alfajores Testnet](getting-started/alfajores-testnet.md) is the first of se
 The Alfajores Testnet’s tokens hold no real world economic value. The entirety of the testnet’s data will be reset on a regular basis. This will erase your accounts, their balance and your transaction history. Your use of the Alfajores Tesnet is subject to the [Alfajores Testnet Disclaimer](important-information/alfajores-testnet-disclaimer.md).
 {% endhint %}
 
-Our work is focused on the path to a production Celo network that holds economic value. This means testing, running security audits, and building community involvement around a longer-term roadmap. We also continue to remain focused on user experience.
+The [Baklava Testnet](getting-started/baklava-testnet.md) is the second Celo test network after Alfajores. You can use it to participate in the The Great Celo Stake Off. Subject to these Terms and Conditions, eligible participants will have the opportunity to receive Celo Gold at the Mainnet launch of the Celo Protocol. The Stake Off will operate in phases, with each phase focusing on a different part of the protocol or infrastructure to test.
 
-We anticipate working to improve and expand the range of APIs available for developers to use in creating extensions to Celo, whether as smart contracts or applications. We welcome your input in the form of use cases, suggestions, and bug reports.
+The Celo community's work is focused on the path to a production Celo network that holds economic value. This means testing, running security audits, and building broader involvement around a longer-term roadmap. The project also continues to remain focused on user experience.
+
+The team working on Celo anticipates working to improve and expand the range of APIs available for developers to use in creating extensions to Celo, whether as smart contracts or applications. Your input is very welcome in the form of use cases, suggestions, and bug reports.
 
 {% hint style="warning" %}
 While development proceeds, Celo’s protocol and its APIs will evolve and any smart contracts or applications built to operate on Alfajores or with respect to the current codebase may become incompatible.
@@ -96,7 +98,7 @@ Browse the code, raise an issue, or contribute a PR:
 Try Celo out:
 
 - [Using the Mobile Wallet](getting-started/using-the-mobile-wallet.md) on the Alfajores Testnet
-- [Using the CLI ](getting-started/using-the-cli.md)on the Alfajores Testnet
+- [Introduction to the CLI ](command-line-interface/introduction.md)on the Alfajores Testnet
 
 Read the Whitepapers:
 
@@ -108,18 +110,15 @@ Alfajores Testnet links:
 
 - [Alfajores Testnet Faucet](https://celo.org/build/faucet) - get testnet tokens to experiment with
 - [Celo Wallet for Alfajores](https://celo.org/build/wallet) - download the Android wallet app for the testnet from the Play Store
-- [Alfajores Testnet Network Status](https://alfajores-ethstats.celo-testnet.org) - to check the current availability of the testnet
+- [Alfajores Testnet Network Status](https://alfajores-celostats.celo-testnet.org) - to check the current availability of the testnet
 - [Alfajores Testnet Block Explorer](https://alfajores-blockscout.celo-testnet.org) - explore the history of the blockchain and view transaction details
 
 Ask questions, find answers, and get in touch:
 
 - [Celo Forum](https://forum.celo.org)
 - [Celo Developer Chat on Discord](https://discord.gg/JvJ66Wc)
-  - There are office hours twice weekly when core developers on Celo are always available:
-    - Mondays 8am PDT, 11am EDT, 3pm GMT, 4pm BST, 5pm CEST
-    - Wednesdays 2pm EDT, 5pm PDT = Thursday 8am CST, 9am JST
 - [Celo Subreddit](https://www.reddit.com/r/CeloHQ/)
-- [Celo Community Page](https://celo.org/community)
+- [Celo Website](https://celo.org/build)
 - [Host a Meetup](https://airtable.com/shrTCM7LddTxOm3r6)
 
 ### Notes <a id="notes"></a>

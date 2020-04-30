@@ -45,8 +45,9 @@ contract('LinkedListTest', () => {
     describe('when inserting to a list with more items', () => {
       beforeEach(async () => {
         await linkedListTest.insert(firstKey, NULL_KEY, NULL_KEY)
-        for (let i = 1; i < keys.length; i++)
+        for (let i = 1; i < keys.length; i++) {
           await linkedListTest.insert(keys[i], NULL_KEY, keys[i - 1])
+        }
       })
 
       it('should revert if next is equal to key (beginning)', async () => {

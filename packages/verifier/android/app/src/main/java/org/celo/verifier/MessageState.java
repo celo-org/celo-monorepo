@@ -5,5 +5,5 @@ public enum MessageState {
   ASSIGNED,
   SENT,
   EXPIRED,
-  REWARDED,
+  REWARDED
 }

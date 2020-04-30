@@ -1,8 +1,7 @@
-import { StyleSheet } from 'react-native'
+import { StyleSheet, TextStyle } from 'react-native'
 
 export enum colors {
   white = '#FFFFFF',
-  offWhite = 'rgba(221,221,221,1.00)',
   light = '#E5E5E5',
   gray = '#DDDDDD',
   screenGray = '#545C64',
@@ -10,7 +9,9 @@ export enum colors {
   placeholderDarkMode = '#838486',
   secondary = '#81868B',
   dark = '#2E3338',
+  darkTransparent = 'rgba(46, 51, 56, 0.5)',
   gold = '#FBCC5C',
+  goldDark = '#D8A11F',
   goldSelect = 'rgba(251, 204, 92, 0.4)',
   goldSubtle = 'rgba(251, 204, 92, 0.2)',
   primary = '#35D07F',
@@ -24,127 +25,142 @@ export enum colors {
   purple = '#BF97FF',
   deepBlue = '#3488EC',
   lightBlue = '#73DDFF',
+  cyan = '#3DBFFF',
   turquoise = '#29EDFF',
 
   greenScreen = '#0CDA6E',
   purpleScreen = '#924EFF',
   redScreen = '#FF6553',
   blueScreen = '#52B6FF',
+
+  // added
+  faintGray = '#F8F9F9',
+  faintPurple = '#EFE5FF',
+  faintGold = '#FEF2D6',
+  faintRed = '#FEDEDA',
+  faintCyan = '#DCF6FF',
+  lightGray = '#EDEEEF',
+
+  grayHeavy = '#ABADAF',
+  black = '#000',
 }
 
 export enum typeFaces {
-  futura = 'futura-pt, sans-serif',
-  garamond = 'eb-garamond, serif',
+  futura = 'Jost, futura-pt, futura, sans-serif',
+  garamond = 'EB Garamond, eb-garamond, Garamond, serif',
 }
 
-export const fonts = StyleSheet.create({
+const fontDefaults = {
+  textRendering: 'geometricPrecision',
+  color: colors.dark,
+}
+
+export const fontInfo: Record<string, TextStyle> = {
   h1: {
     fontFamily: typeFaces.garamond,
-    textRendering: 'geometricPrecision',
     fontSize: 48,
-    lineHeight: 52,
-    color: colors.dark,
+    lineHeight: 56,
+    ...fontDefaults,
   },
   h1Mobile: {
     fontFamily: typeFaces.garamond,
-    textRendering: 'geometricPrecision',
     fontSize: 36,
     lineHeight: 40,
-    color: colors.dark,
+    ...fontDefaults,
   },
   h2: {
     fontFamily: typeFaces.garamond,
-    textRendering: 'geometricPrecision',
-    fontSize: 44,
+    fontSize: 40,
     lineHeight: 48,
-    color: colors.dark,
+    ...fontDefaults,
   },
   h2Mobile: {
     fontFamily: typeFaces.garamond,
-    textRendering: 'geometricPrecision',
     fontSize: 28,
     lineHeight: 32,
-    color: colors.dark,
+    ...fontDefaults,
   },
   h3: {
     fontFamily: typeFaces.futura,
-    fontSize: 28,
-    lineHeight: 32,
-    color: colors.dark,
-    textRendering: 'geometricPrecision',
+    fontSize: 24,
+    lineHeight: 28,
+    fontWeight: '400',
+    ...fontDefaults,
   },
   h3Mobile: {
     fontFamily: typeFaces.futura,
-    fontSize: 20,
-    lineHeight: 24,
-    color: colors.dark,
-    textRendering: 'geometricPrecision',
+    fontSize: 24,
+    lineHeight: 32,
+    ...fontDefaults,
   },
   h4: {
     fontFamily: typeFaces.garamond,
-    textRendering: 'geometricPrecision',
     fontSize: 28,
     lineHeight: 36,
-    color: colors.dark,
+    ...fontDefaults,
   },
   h4Mobile: {
     fontFamily: typeFaces.garamond,
-    textRendering: 'geometricPrecision',
-    fontSize: 20,
-    lineHeight: 24,
-    color: colors.dark,
+    fontSize: 24,
+    lineHeight: 32,
+    ...fontDefaults,
   },
   h5: {
+    fontFamily: typeFaces.futura,
+    fontSize: 20,
+    lineHeight: 24,
+    fontWeight: '500',
+    ...fontDefaults,
+  },
+  h6: {
     fontFamily: typeFaces.futura,
     fontSize: 16,
     lineHeight: 18,
     fontWeight: '500',
-    color: colors.dark,
-    textRendering: 'geometricPrecision',
+    ...fontDefaults,
   },
   navigation: {
     fontFamily: typeFaces.futura,
     fontSize: 16,
     lineHeight: 16,
     textAlign: 'center',
-    color: colors.dark,
+    ...fontDefaults,
     cursor: 'pointer',
     fontWeight: '500',
-    textRendering: 'geometricPrecision',
   },
   p: {
     fontFamily: typeFaces.garamond,
-    textRendering: 'geometricPrecision',
     fontSize: 20,
     lineHeight: 28,
-    color: colors.dark,
+    ...fontDefaults,
   },
   legal: {
     fontFamily: typeFaces.garamond,
-    textRendering: 'geometricPrecision',
     fontSize: 16,
     lineHeight: 20,
-    color: colors.dark,
+    ...fontDefaults,
   },
   a: {
     fontFamily: typeFaces.futura,
-    textRendering: 'geometricPrecision',
     fontSize: 16,
     lineHeight: 16,
-    color: colors.dark,
+    ...fontDefaults,
   },
   mini: {
     fontFamily: typeFaces.garamond,
-    textRendering: 'geometricPrecision',
     fontSize: 14,
     lineHeight: 16,
-    color: colors.dark,
+    ...fontDefaults,
   },
-  small: {
+  micro: {
     fontFamily: typeFaces.futura,
     fontSize: 14,
-    color: colors.dark,
-    textRendering: 'geometricPrecision',
+    ...fontDefaults,
+  },
+  uiSmall: {
+    fontFamily: typeFaces.futura,
+    fontSize: 12,
+    ...fontDefaults,
   },
   superLarge: {
     fontSize: 72,
@@ -152,14 +168,9 @@ export const fonts = StyleSheet.create({
     fontFamily: typeFaces.futura,
     textRendering: 'geometricPrecision',
   },
-  // @ts-ignore
-  specialOneOff: {
-    fontFamily: typeFaces.garamond,
-    textRendering: 'geometricPrecision',
-    fontSize: 'calc(33px + 0.25vw)',
-    lineHeight: `calc(33px + 0.25vw)`,
-  },
-})
+}
+
+export const fonts = StyleSheet.create(fontInfo)
 
 export const textStyles = StyleSheet.create({
   center: {
@@ -168,6 +179,7 @@ export const textStyles = StyleSheet.create({
   left: {
     textAlign: 'left',
   },
+  lean: { fontWeight: '300' },
   medium: {
     fontWeight: '500',
   },
@@ -188,7 +200,7 @@ export const textStyles = StyleSheet.create({
     color: colors.white,
   },
   readingOnDark: {
-    color: colors.offWhite,
+    color: colors.gray,
   },
   caption: {
     paddingTop: 5,
@@ -283,6 +295,9 @@ export const standardStyles = StyleSheet.create({
   blockMarginBottomTablet: {
     marginBottom: tabletMargins.medium,
   },
+  halfElement: {
+    marginVertical: margins.small / 2,
+  },
   elementalMargin: {
     marginVertical: margins.small,
   },
@@ -330,4 +345,9 @@ export const standardStyles = StyleSheet.create({
 export const baseCoinStyle = {
   stroke: colors.screenGray,
   mixBlendMode: 'screen',
+}
+
+export const baseCoinStyleLight = {
+  stroke: colors.gray,
+  mixBlendMode: 'multiply',
 }

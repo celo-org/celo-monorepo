@@ -1,13 +1,16 @@
 import { eqAddress } from '@celo/utils/lib/address'
+import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import { Address, CeloContract, CeloToken, NULL_ADDRESS } from '../base'
-import { SortedOracles } from '../generated/types/SortedOracles'
+import { SortedOracles } from '../generated/SortedOracles'
 import {
   BaseWrapper,
   CeloTransactionObject,
   proxyCall,
-  toBigNumber,
   toTransactionObject,
+  valueToBigNumber,
+  valueToFrac,
+  valueToInt,
 } from './BaseWrapper'
 
 export enum MedianRelation {
@@ -27,6 +30,18 @@ export interface OracleRate {
   medianRelation: MedianRelation
 }
 
+export interface OracleTimestamp {
+  address: Address
+  timestamp: BigNumber
+  medianRelation: MedianRelation
+}
+
+export interface OracleReport {
+  address: Address
+  rate: BigNumber
+  timestamp: BigNumber
+}
+
 export interface MedianRate {
   rate: BigNumber
 }
@@ -43,7 +58,7 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
   async numRates(token: CeloToken): Promise<number> {
     const tokenAddress = await this.kit.registry.addressFor(token)
     const response = await this.contract.methods.numRates(tokenAddress).call()
-    return toBigNumber(response).toNumber()
+    return valueToInt(response)
   }
 
   /**
@@ -56,7 +71,7 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
     const tokenAddress = await this.kit.registry.addressFor(token)
     const response = await this.contract.methods.medianRate(tokenAddress).call()
     return {
-      rate: toBigNumber(response[0]).div(toBigNumber(response[1])),
+      rate: valueToFrac(response[0], response[1]),
     }
   }
 
@@ -72,51 +87,90 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
   }
 
   /**
+   * Returns the list of whitelisted oracles for a given token.
+   * @returns The list of whitelisted oracles for a given token.
+   */
+  async getOracles(token: CeloToken): Promise<Address[]> {
+    const tokenAddress = await this.kit.registry.addressFor(token)
+    return this.contract.methods.getOracles(tokenAddress).call()
+  }
+
+  /**
    * Returns the report expiry parameter.
    * @returns Current report expiry.
    */
-  reportExpirySeconds = proxyCall(this.contract.methods.reportExpirySeconds, undefined, toBigNumber)
+  reportExpirySeconds = proxyCall(
+    this.contract.methods.reportExpirySeconds,
+    undefined,
+    valueToBigNumber
+  )
+
+  /**
+   * Checks if the oldest report for a given token is expired
+   * @param token The token for which to check reports
+   */
+  async isOldestReportExpired(token: CeloToken): Promise<[boolean, Address]> {
+    const tokenAddress = await this.kit.registry.addressFor(token)
+    const response = await this.contract.methods.isOldestReportExpired(tokenAddress).call()
+    return response as [boolean, Address]
+  }
+
+  /**
+   * Removes expired reports, if any exist
+   * @param token The token to remove reports for
+   * @param numReports The upper-limit of reports to remove. For example, if there
+   * are 2 expired reports, and this param is 5, it will only remove the 2 that
+   * are expired.
+   */
+  async removeExpiredReports(
+    token: CeloToken,
+    numReports?: number
+  ): Promise<CeloTransactionObject<void>> {
+    const tokenAddress = await this.kit.registry.addressFor(token)
+    if (!numReports) {
+      numReports = (await this.getReports(token)).length - 1
+    }
+    return toTransactionObject(
+      this.kit,
+      this.contract.methods.removeExpiredReports(tokenAddress, numReports)
+    )
+  }
 
   /**
    * Updates an oracle value and the median.
-   * @param token The address of the token for which the Celo Gold exchange rate is being reported.
-   * @param numerator The amount of tokens equal to `denominator` Celo Gold.
-   * @param denominator The amount of Celo Gold that the `numerator` tokens are equal to.
+   * @param token The token for which the Celo Gold exchange rate is being reported.
+   * @param value The amount of `token` equal to one Celo Gold.
    */
   async report(
     token: CeloToken,
-    numerator: number,
-    denominator: number,
+    value: BigNumber.Value,
     oracleAddress: Address
   ): Promise<CeloTransactionObject<void>> {
     const tokenAddress = await this.kit.registry.addressFor(token)
+    const fixedValue = toFixed(valueToBigNumber(value))
 
     const { lesserKey, greaterKey } = await this.findLesserAndGreaterKeys(
       token,
-      numerator,
-      denominator,
+      valueToBigNumber(value),
       oracleAddress
     )
 
     return toTransactionObject(
       this.kit,
-      this.contract.methods.report(tokenAddress, numerator, denominator, lesserKey, greaterKey),
+      this.contract.methods.report(tokenAddress, fixedValue.toFixed(), lesserKey, greaterKey),
       { from: oracleAddress }
     )
   }
 
   /**
    * Updates an oracle value and the median.
-   * @param token The address of the token for which the Celo Gold exchange rate is being reported.
-   * @param numerator The amount of tokens equal to `denominator` Celo Gold.
-   * @param denominator The amount of Celo Gold that the `numerator` tokens are equal to.
+   * @param value The amount of US Dollars equal to one Celo Gold.
    */
   async reportStableToken(
-    numerator: number,
-    denominator: number,
+    value: BigNumber.Value,
     oracleAddress: Address
   ): Promise<CeloTransactionObject<void>> {
-    return this.report(CeloContract.StableToken, numerator, denominator, oracleAddress)
+    return this.report(CeloContract.StableToken, value, oracleAddress)
   }
 
   /**
@@ -144,36 +198,54 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
     const tokenAddress = await this.kit.registry.addressFor(token)
     const response = await this.contract.methods.getRates(tokenAddress).call()
     const rates: OracleRate[] = []
-    const denominator = await this.getInternalDenominator()
-
     for (let i = 0; i < response[0].length; i++) {
       const medRelIndex = parseInt(response[2][i], 10)
       rates.push({
         address: response[0][i],
-        rate: toBigNumber(response[1][i]).div(denominator),
+        rate: fromFixed(valueToBigNumber(response[1][i])),
         medianRelation: medRelIndex,
       })
     }
     return rates
   }
 
-  private async getInternalDenominator(): Promise<BigNumber> {
-    return toBigNumber(await this.contract.methods.DENOMINATOR().call())
+  /**
+   * Gets all elements from the doubly linked list.
+   * @param token The CeloToken representing the token for which the Celo
+   *   Gold exchange rate is being reported. Example: CeloContract.StableToken
+   * @return An unpacked list of elements from largest to smallest.
+   */
+  async getTimestamps(token: CeloToken): Promise<OracleTimestamp[]> {
+    const tokenAddress = await this.kit.registry.addressFor(token)
+    const response = await this.contract.methods.getTimestamps(tokenAddress).call()
+    const timestamps: OracleTimestamp[] = []
+    for (let i = 0; i < response[0].length; i++) {
+      const medRelIndex = parseInt(response[2][i], 10)
+      timestamps.push({
+        address: response[0][i],
+        timestamp: valueToBigNumber(response[1][i]),
+        medianRelation: medRelIndex,
+      })
+    }
+    return timestamps
+  }
+
+  async getReports(token: CeloToken): Promise<OracleReport[]> {
+    const [rates, timestamps] = await Promise.all([this.getRates(token), this.getTimestamps(token)])
+    const reports: OracleReport[] = []
+    for (const rate of rates) {
+      const match = timestamps.filter((t: OracleTimestamp) => eqAddress(t.address, rate.address))
+      reports.push({ address: rate.address, rate: rate.rate, timestamp: match[0].timestamp })
+    }
+    return reports
   }
 
   private async findLesserAndGreaterKeys(
     token: CeloToken,
-    numerator: number,
-    denominator: number,
+    value: BigNumber.Value,
     oracleAddress: Address
   ): Promise<{ lesserKey: Address; greaterKey: Address }> {
     const currentRates: OracleRate[] = await this.getRates(token)
-
-    // This is how the contract calculates the rate from the numerator and denominator.
-    // To figure out where this new report goes in the list, we need to compare this
-    // value with the other rates
-    const value = toBigNumber(numerator.toString()).div(toBigNumber(denominator.toString()))
-
     let greaterKey = NULL_ADDRESS
     let lesserKey = NULL_ADDRESS
 

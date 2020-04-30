@@ -2,7 +2,7 @@
   "compileOnSave": false,
   "compilerOptions": {
     "allowJs": true,
-    "allowSyntheticDefaultImports": false,
+    "allowSyntheticDefaultImports": true,
     "baseUrl": ".",
     "jsx": "preserve",
     "lib": ["dom", "es2015", "es2016"],
@@ -11,14 +11,25 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "preserveConstEnums": true,
-    "removeComments": false,
+    "removeComments": true,
     "sourceMap": true,
     "skipLibCheck": true,
     "target": "esnext",
     "paths": {
       "next-i18next": ["src/next-i18next-aug.d.ts"]
-    }
+    },
+    "strict": false,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": false,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true
   },
   "exclude": ["dist"],
-  "references": [{ "path": "../utils" }]
+  "references": [
+    {
+      "path": "../utils"
+    }
+  ],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"]
 }

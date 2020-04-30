@@ -25,7 +25,7 @@ interface Props {
   onEndEditingPhoneNumber?: () => void
   onEndEditingCountryCode?: () => void
   inputCountryPlaceholder?: string
-  inputPhonePlaceholder?: string
+  initialInputPhonePlaceholder?: string
   lng?: string
   callingCode?: boolean
   defaultCountryCode?: string
@@ -38,6 +38,7 @@ interface State {
   regionCode: string
   phoneNumber: string
   countries: Countries
+  inputPhonePlaceholder?: string
   country?: string
 }
 
@@ -49,6 +50,7 @@ export default class PhoneNumberInput extends React.Component<Props, State> {
     phoneNumber: '',
     // country data should be fetched before mounting to prevent a second render
     countries: new Countries(this.props.lng),
+    inputPhonePlaceholder: this.props.initialInputPhonePlaceholder,
   }
 
   componentDidMount() {
@@ -138,6 +140,8 @@ export default class PhoneNumberInput extends React.Component<Props, State> {
           countryQuery,
           countryCallingCode,
           regionCode,
+          // @ts-ignore
+          inputPhonePlaceholder: country.countryPhonePlaceholder.national,
         },
         // Reparse phone number in case user entered that first
         () => this.onChangePhoneNumber(this.state.phoneNumber)
@@ -266,7 +270,7 @@ export default class PhoneNumberInput extends React.Component<Props, State> {
             onEndEditing={this.props.onEndEditingPhoneNumber}
             value={this.state.phoneNumber}
             underlineColorAndroid="transparent"
-            placeholder={this.props.inputPhonePlaceholder}
+            placeholder={this.state.inputPhonePlaceholder}
             keyboardType="phone-pad"
             testID="PhoneNumberField"
             validator={ValidatorKind.Phone}

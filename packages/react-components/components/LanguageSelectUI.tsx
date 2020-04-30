@@ -3,7 +3,7 @@ import SelectionOption from '@celo/react-components/components/SelectionOption'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
-import { TranslationFunction } from 'i18next'
+import { TFunction } from 'i18next'
 import * as React from 'react'
 import { Image, ImageSourcePropType, ScrollView, StyleSheet, Text, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
@@ -19,7 +19,7 @@ export interface Props {
   onSubmit: () => void
   isSubmitDisabled: boolean
   currentSelected: string
-  t: TranslationFunction
+  t: TFunction
   languages: LanguageType[]
 }
 

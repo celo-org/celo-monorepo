@@ -3,12 +3,16 @@ import { Image, StyleSheet, Text, View } from 'react-native'
 import ah from 'src/community/ah-logo.png'
 import polychain from 'src/community/polychain-logo.png'
 import { H2 } from 'src/fonts/Fonts'
+import { ErrorDisplay, ErrorKeys } from 'src/forms/ErrorDisplay'
 import FormContainer, { emailIsValid, hasField } from 'src/forms/Form'
-import { ErrorMessage, Form, LabeledInput } from 'src/forms/FormComponents'
+import { Form } from 'src/forms/FormComponents'
+import { LabeledInput } from 'src/forms/LabeledInput'
+import SubmitButton from 'src/forms/SubmitButton'
+import SuccessDisplay from 'src/forms/SuccessDisplay'
 import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
-import Rings from 'src/logos/RingsLight'
+import Rings from 'src/logos/RingsGlyph'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import menuItems, { hashNav } from 'src/shared/menu-items'
 import Navigation from 'src/shared/navigation'
@@ -54,7 +58,7 @@ class EcoFund extends React.PureComponent<I18nProps & ScreenProps, State> {
           <Text style={[fonts.p, standardStyles.elementalMargin]}>{t('ecoFund.description')}</Text>
           <View style={[standardStyles.row, standardStyles.elementalMargin, standardStyles.wrap]}>
             <View style={styles.partners}>
-              <Text style={[fonts.h5, styles.partnerText]}>{t('ecoFund.generalPartner')}</Text>
+              <Text style={[fonts.h6, styles.partnerText]}>{t('ecoFund.generalPartner')}</Text>
               <Image
                 resizeMode="contain"
                 accessibilityLabel="Polychain"
@@ -63,7 +67,7 @@ class EcoFund extends React.PureComponent<I18nProps & ScreenProps, State> {
               />
             </View>
             <View style={styles.partners}>
-              <Text style={[fonts.h5, styles.partnerText]}>{t('ecoFund.limitedPartners')}</Text>
+              <Text style={[fonts.h6, styles.partnerText]}>{t('ecoFund.limitedPartners')}</Text>
               <View style={[standardStyles.row, styles.limitedPartners]}>
                 <Rings color={colors.dark} height={40} />
                 <Image
@@ -114,34 +118,41 @@ class EcoFund extends React.PureComponent<I18nProps & ScreenProps, State> {
               <FormContainer
                 key={Tables.Applicants}
                 route={`/ecosystem/${Tables.Applicants}`}
+                // @ts-ignore
                 blankForm={blankApplicationForm}
                 validateWith={invalidApplicationFields}
               >
-                {({ onAltSubmit, onInput, formState }) => (
+                {({ onSubmit, onInput, formState }) => (
                   <Form>
                     {ApplicationKeys.map((key) => (
                       <LabeledInput
                         key={key}
+                        displayErrorAs={
+                          key === 'founderEmail' || key === 'coFounderEmail'
+                            ? ErrorKeys.email
+                            : undefined
+                        }
                         label={ApplicationFields[key]}
                         value={formState.form[key]}
                         name={key}
                         multiline={key === 'product'}
                         onInput={onInput}
-                        hasError={formState.errors.includes(key)}
+                        allErrors={formState.errors}
                       />
                     ))}
-                    <Button
+                    <SubmitButton
+                      isLoading={formState.isLoading}
                       text={t('apply')}
-                      kind={BTN.PRIMARY}
-                      onPress={onAltSubmit}
+                      onPress={onSubmit}
                       size={SIZE.big}
+                      style={standardStyles.elementalMarginBottom}
                       align={'flex-start'}
                     />
-                    <AfterMessage
-                      errors={formState.errors}
-                      isComplete={formState.isComplete}
-                      t={t}
+                    <SuccessDisplay
+                      isShowing={formState.isComplete}
+                      message={t('common:applicationSubmitted')}
                     />
+                    <ErrorDisplay isShowing={!!formState.apiError} field={formState.apiError} />
                   </Form>
                 )}
               </FormContainer>
@@ -156,34 +167,37 @@ class EcoFund extends React.PureComponent<I18nProps & ScreenProps, State> {
               <FormContainer
                 key={Tables.Recommendations}
                 route={`/ecosystem/${Tables.Recommendations}`}
+                // @ts-ignore
                 blankForm={blankRecForm}
                 validateWith={invalidRecFields}
               >
-                {({ onAltSubmit, onInput, formState }) => (
+                {({ onSubmit: onSubmit, onInput, formState }) => (
                   <Form>
                     {RecommendationKeys.map((key) => (
                       <LabeledInput
                         key={key}
+                        displayErrorAs={key === 'founderEmail' ? ErrorKeys.email : undefined}
                         label={RecommendationFields[key]}
                         value={formState.form[key]}
                         name={key}
                         multiline={key === 'why'}
                         onInput={onInput}
-                        hasError={formState.errors.includes(key)}
+                        allErrors={formState.errors}
                       />
                     ))}
-                    <Button
+                    <SubmitButton
+                      isLoading={formState.isLoading}
                       text={t('recommend')}
-                      kind={BTN.PRIMARY}
-                      onPress={onAltSubmit}
+                      onPress={onSubmit}
+                      style={standardStyles.elementalMarginBottom}
                       size={SIZE.big}
                       align={'flex-start'}
                     />
-                    <AfterMessage
-                      errors={formState.errors}
-                      isComplete={formState.isComplete}
-                      t={t}
+                    <SuccessDisplay
+                      isShowing={formState.isComplete}
+                      message={t('recommendationSubmitted')}
                     />
+                    <ErrorDisplay isShowing={!!formState.apiError} field={formState.apiError} />
                   </Form>
                 )}
               </FormContainer>
@@ -276,24 +290,3 @@ const styles = StyleSheet.create({
     width: '100%',
   },
 })
-
-function AfterMessage({
-  isComplete,
-  t,
-  errors,
-}: {
-  isComplete: boolean
-  errors: string[]
-  t: I18nProps['t']
-}) {
-  return (
-    <View style={standardStyles.elementalMarginTop}>
-      {isComplete && (
-        <Text style={[textStyles.center, fonts.p, standardStyles.elementalMarginTop]}>
-          {t('form.fellowshipSubmitted')}
-        </Text>
-      )}
-      <ErrorMessage allErrors={errors} field={'unknownError'} t={t} />
-    </View>
-  )
-}

@@ -1,0 +1,21 @@
+{
+  "name": "@celo/leaderboard",
+  "version": "1.0.0",
+  "description": "Baklava leaderboard script",
+  "main": "index.js",
+  "author": "Celo",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@celo/contractkit": "0.4.3-dev",
+    "@types/pg": "^7.11.2",
+    "google-spreadsheet": "^2.0.8",
+    "pg": "^7.12.1",
+    "googleapis": "^39.2.0",
+    "ts-node": "^8.5.4"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "build": "tsc -b ."
+  },
+  "private": true
+}

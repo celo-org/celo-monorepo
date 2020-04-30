@@ -17,7 +17,7 @@ export const CONTRACTS_TO_COPY = [
 export async function downloadArtifacts(celoEnv: string) {
   let baseCmd = `yarn --cwd ../protocol run download-artifacts -n ${celoEnv}`
   console.log(`Downloading artifacts for ${celoEnv}`)
-  if (isProduction(celoEnv)) {
+  if (isProduction()) {
     baseCmd += ` -b contract_artifacts_production`
   }
   try {
@@ -35,7 +35,7 @@ export async function uploadArtifacts(celoEnv: string, checkOrPromptIfStagingOrP
   }
 
   let baseCmd = `yarn --cwd ../protocol run upload-artifacts -n ${celoEnv}`
-  if (isProduction(celoEnv)) {
+  if (isProduction()) {
     baseCmd += ` -b contract_artifacts_production`
   }
   console.log(`Uploading artifacts for ${celoEnv}`)

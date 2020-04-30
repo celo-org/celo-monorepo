@@ -1,0 +1,154 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders correctly when not ready 1`] = `
+<View
+  style={
+    Object {
+      "paddingBottom": 20,
+      "paddingHorizontal": 16,
+    }
+  }
+  testID="SnapshotCeloGoldOverview"
+>
+  <Text
+    style={
+      Object {
+        "fontFamily": "Hind-SemiBold",
+        "fontSize": 18,
+      }
+    }
+  >
+    global:celoGold
+  </Text>
+  <Text
+    style={
+      Object {
+        "color": "#2E3338",
+        "fontSize": 44,
+        "height": 48,
+        "lineHeight": 62,
+      }
+    }
+  >
+    <Text
+      numberOfLines={1}
+      style={
+        Array [
+          Object {
+            "fontFamily": "Hind-SemiBold",
+          },
+          Object {
+            "color": undefined,
+          },
+        ]
+      }
+    >
+      
+      
+      55.000
+    </Text>
+  </Text>
+  <Text
+    style={
+      Object {
+        "color": "#B0B5B9",
+        "fontFamily": "Hind-Light",
+        "fontSize": 18,
+      }
+    }
+  >
+    Equal to 
+    <Text
+      numberOfLines={1}
+      style={
+        Array [
+          undefined,
+          Object {
+            "color": undefined,
+          },
+        ]
+      }
+    >
+      
+      -
+    </Text>
+  </Text>
+</View>
+`;
+
+exports[`renders correctly when ready 1`] = `
+<View
+  style={
+    Object {
+      "paddingBottom": 20,
+      "paddingHorizontal": 16,
+    }
+  }
+  testID="SnapshotCeloGoldOverview"
+>
+  <Text
+    style={
+      Object {
+        "fontFamily": "Hind-SemiBold",
+        "fontSize": 18,
+      }
+    }
+  >
+    global:celoGold
+  </Text>
+  <Text
+    style={
+      Object {
+        "color": "#2E3338",
+        "fontSize": 44,
+        "height": 48,
+        "lineHeight": 62,
+      }
+    }
+  >
+    <Text
+      numberOfLines={1}
+      style={
+        Array [
+          Object {
+            "fontFamily": "Hind-SemiBold",
+          },
+          Object {
+            "color": undefined,
+          },
+        ]
+      }
+    >
+      
+      
+      55.000
+    </Text>
+  </Text>
+  <Text
+    style={
+      Object {
+        "color": "#B0B5B9",
+        "fontFamily": "Hind-Light",
+        "fontSize": 18,
+      }
+    }
+  >
+    Equal to 
+    <Text
+      numberOfLines={1}
+      style={
+        Array [
+          undefined,
+          Object {
+            "color": undefined,
+          },
+        ]
+      }
+    >
+      
+      $
+      731.50
+    </Text>
+  </Text>
+</View>
+`;

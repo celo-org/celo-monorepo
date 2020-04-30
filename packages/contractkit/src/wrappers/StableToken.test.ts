@@ -2,10 +2,7 @@ import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
 import { newKitFromWeb3 } from '../kit'
 import { StableTokenWrapper } from './StableTokenWrapper'
 
-/*
-TEST NOTES:
-- In migrations: The only account that has cUSD is accounts[0]
-*/
+// TEST NOTES: balances defined in test-utils/migration-override
 
 testWithGanache('StableToken Wrapper', (web3) => {
   const ONE_USD = web3.utils.toWei('1', 'ether')

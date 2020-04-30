@@ -4,7 +4,7 @@ import { H1 } from 'src/fonts/Fonts'
 import OpenGraph from 'src/header/OpenGraph'
 import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
-import Button, { BTN } from 'src/shared/Button.3'
+import Link from 'src/shared/InlineAnchor'
 import menuItems, { CeloLinks } from 'src/shared/menu-items'
 import { HEADER_HEIGHT } from 'src/shared/Styles'
 import { fonts, standardStyles, textStyles } from 'src/styles'
@@ -36,12 +36,12 @@ class Agreement extends React.PureComponent<I18nProps> {
           </GridRow>
           <GridRow>
             <Cell span={Spans.fourth}>
-              <Text style={fonts.h5}>Valid as of July 17, 2019</Text>
+              <Text style={fonts.h6}>Valid as of July 17, 2019</Text>
             </Cell>
             <Cell span={Spans.three4th}>
               <Text style={fonts.p}>
                 {`This User Agreement and Test Terms (“Agreement”) constitute a contract between you and A Protocol Inc. (“Company” or “Celo” and including all affiliates) and applies to your use of the Celo Products, including the Celo Wallet, and other features, technologies and functionalities offered by the Company to you through a website, app, or through other means (the “Celo Services.”) as part of a limited test. The Celo Services are provided to you subject to this Agreement as well as the Celo Privacy Policy available at `}{' '}
-                <Link href={menuItems.PRIVACY}>celo.org/privacy</Link>,
+                <Link href={menuItems.PRIVACY.link}>celo.org/privacy</Link>,
                 {`incorporated by this Agreement by this reference.
 
 This Agreement covers use of the Celo ‘Alfajores’ Network, a test network (‘Celo Test’) running a version of the Celo Protocol. Any balance amounts on this network are not redeemable for real value.
@@ -85,10 +85,6 @@ You understand that your wireless service provider(s) may charge you for each te
       </>
     )
   }
-}
-
-function Link({ children, href }) {
-  return <Button text={children} href={href} kind={BTN.INLINE} />
 }
 
 export default withNamespaces(NameSpaces.terms)(Agreement)

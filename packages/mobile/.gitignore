@@ -70,7 +70,7 @@ android/app/celo-release-key.keystore
 .vscode/
 
 # End to end tests
-e2e/tmp/
+e2e/artifacts/
 e2e_run.log
 e2e_pidcat_run.log
 

@@ -1,16 +1,16 @@
 import { fromFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
-import { StableToken } from '../generated/types/StableToken'
+import { StableToken } from '../generated/StableToken'
 import {
   BaseWrapper,
   CeloTransactionObject,
-  NumberLike,
-  parseNumber,
   proxyCall,
   proxySend,
-  toBigNumber,
-  toNumber,
+  stringIdentity,
   tupleParser,
+  valueToBigNumber,
+  valueToInt,
+  valueToString,
 } from './BaseWrapper'
 
 export interface InflationParameters {
@@ -37,7 +37,7 @@ export class StableTokenWrapper extends BaseWrapper<StableToken> {
    * @param spender The spender of the StableToken.
    * @return The amount of StableToken owner is allowing spender to spend.
    */
-  allowance = proxyCall(this.contract.methods.allowance, undefined, toBigNumber)
+  allowance = proxyCall(this.contract.methods.allowance, undefined, valueToBigNumber)
 
   /**
    * @return The name of the stable token.
@@ -52,13 +52,13 @@ export class StableTokenWrapper extends BaseWrapper<StableToken> {
   /**
    * @return The number of decimal places to which StableToken is divisible.
    */
-  decimals = proxyCall(this.contract.methods.decimals, undefined, toNumber)
+  decimals = proxyCall(this.contract.methods.decimals, undefined, valueToInt)
 
   /**
    * Returns the total supply of the token, that is, the amount of tokens currently minted.
    * @returns Total supply.
    */
-  totalSupply = proxyCall(this.contract.methods.totalSupply, undefined, toBigNumber)
+  totalSupply = proxyCall(this.contract.methods.totalSupply, undefined, valueToBigNumber)
 
   /**
    * Gets the balance of the specified address using the presently stored inflation factor.
@@ -68,7 +68,7 @@ export class StableTokenWrapper extends BaseWrapper<StableToken> {
   balanceOf: (owner: string) => Promise<BigNumber> = proxyCall(
     this.contract.methods.balanceOf,
     undefined,
-    toBigNumber
+    valueToBigNumber
   )
 
   owner = proxyCall(this.contract.methods.owner)
@@ -80,10 +80,10 @@ export class StableTokenWrapper extends BaseWrapper<StableToken> {
    * @dev We don't compute the updated inflationFactor here because
    * we assume any function calling this will have updated the inflation factor.
    */
-  valueToUnits: (value: NumberLike) => Promise<BigNumber> = proxyCall(
+  valueToUnits: (value: BigNumber.Value) => Promise<BigNumber> = proxyCall(
     this.contract.methods.valueToUnits,
-    tupleParser(parseNumber),
-    toBigNumber
+    tupleParser(valueToString),
+    valueToBigNumber
   )
 
   /**
@@ -91,10 +91,10 @@ export class StableTokenWrapper extends BaseWrapper<StableToken> {
    * @param units The units to convert to value.
    * @return The value corresponding to `units` given the current inflation factor.
    */
-  unitsToValue: (units: NumberLike) => Promise<BigNumber> = proxyCall(
+  unitsToValue: (units: BigNumber.Value) => Promise<BigNumber> = proxyCall(
     this.contract.methods.unitsToValue,
-    tupleParser(parseNumber),
-    toBigNumber
+    tupleParser(valueToString),
+    valueToBigNumber
   )
 
   /**
@@ -103,7 +103,11 @@ export class StableTokenWrapper extends BaseWrapper<StableToken> {
    * @param value The increment of the amount of StableToken approved to the spender.
    * @returns true if success.
    */
-  increaseAllowance = proxySend(this.kit, this.contract.methods.increaseAllowance)
+  increaseAllowance = proxySend(
+    this.kit,
+    this.contract.methods.increaseAllowance,
+    tupleParser(stringIdentity, valueToString)
+  )
   /**
    * Decreases the allowance of another user.
    * @param spender The address which is being approved to spend StableToken.
@@ -123,10 +127,10 @@ export class StableTokenWrapper extends BaseWrapper<StableToken> {
   async getInflationParameters(): Promise<InflationParameters> {
     const res = await this.contract.methods.getInflationParameters().call()
     return {
-      rate: fromFixed(toBigNumber(res[0])),
-      factor: fromFixed(toBigNumber(res[1])),
-      updatePeriod: toBigNumber(res[2]),
-      factorLastUpdated: toBigNumber(res[3]),
+      rate: fromFixed(valueToBigNumber(res[0])),
+      factor: fromFixed(valueToBigNumber(res[1])),
+      updatePeriod: valueToBigNumber(res[2]),
+      factorLastUpdated: valueToBigNumber(res[3]),
     }
   }
 

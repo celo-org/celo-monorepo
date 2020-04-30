@@ -1,42 +1,53 @@
-import App, { Container } from 'next/app'
+import App from 'next/app'
 import getConfig from 'next/config'
 import * as React from 'react'
 import { View } from 'react-native'
 import config from 'react-reveal/globals'
-import { canTrack } from 'src/analytics/analytics'
+import scrollIntoView from 'scroll-into-view'
+import analytics, { canTrack, initializeAnalytics } from 'src/analytics/analytics'
 import Header from 'src/header/Header.3'
 import { ScreenSizeProvider } from 'src/layout/ScreenSize'
-import Footer from 'src/shared/Footer.3'
-import { scrollTo } from 'src/utils/utils'
-import Sentry, { initSentry } from '../fullstack/sentry'
+import Footer from 'src/shared/Footer'
+import Progress from 'src/shared/Progress'
+import { HEADER_HEIGHT } from 'src/shared/Styles'
+import { getSentry, initSentry } from 'src/utils/sentry'
 import { appWithTranslation } from '../src/i18n'
 
 config({ ssrReveal: true })
+
 class MyApp extends App {
-  componentDidMount() {
-    if (canTrack()) {
-      initSentry()
+  async componentDidMount() {
+    if (window.location.hash) {
+      hashScroller(window.location.hash)
     }
 
-    if (window.location.hash) {
-      setTimeout(() => {
-        scrollTo(window.location.hash.slice(1), 'start')
-      }, 200)
-    }
+    window.addEventListener('hashchange', () => hashScroller(window.location.hash))
 
     if (getConfig().publicRuntimeConfig.FLAGS.ENV === 'development') {
       checkH1Count()
     }
+    await initializeAnalytics()
+    if (await canTrack()) {
+      await initSentry()
+    }
+    this.props.router.events.on('routeChangeComplete', async () => {
+      await analytics.page()
+    })
   }
 
-  // there are a few pages we dont want the header on for artist reasons
-  // currently this is just the animation demo pages
+  // there are a few pages we dont want the header on
+  // currently this is just the animation demo pages and BrandKit
   skipHeader() {
-    return this.props.router.asPath.startsWith('/animation')
+    return this.props.router.asPath.startsWith('/animation') || this.isBrand()
   }
 
-  componentDidCatch = (error: Error, info: object) => {
-    Sentry.withScope((scope: Sentry.Scope) => {
+  isBrand = () => {
+    return this.props.router.asPath.startsWith('/experience')
+  }
+
+  componentDidCatch = async (error: Error, info: object) => {
+    const Sentry = await getSentry()
+    Sentry.withScope((scope) => {
       scope.setExtras(info)
       Sentry.captureException(error)
     })
@@ -45,17 +56,16 @@ class MyApp extends App {
   render() {
     const { Component, pageProps } = this.props
     return (
-      <Container>
-        <ScreenSizeProvider>
-          {this.skipHeader() || <Header />}
-          <Component {...pageProps} />
-          {this.skipHeader() || (
-            <View>
-              <Footer />
-            </View>
-          )}
-        </ScreenSizeProvider>
-      </Container>
+      <ScreenSizeProvider>
+        <Progress />
+        {this.skipHeader() || <Header />}
+        <Component {...pageProps} />
+        {this.skipHeader() || (
+          <View>
+            <Footer />
+          </View>
+        )}
+      </ScreenSizeProvider>
     )
   }
 }
@@ -71,4 +81,10 @@ function checkH1Count() {
       )
     }
   }, 500)
+}
+
+function hashScroller(id: string) {
+  const element = document.getElementById(id.replace('#', ''))
+
+  scrollIntoView(element, { time: 100, align: { top: 0, topOffset: HEADER_HEIGHT + 100 } })
 }

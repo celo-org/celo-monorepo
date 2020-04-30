@@ -91,7 +91,7 @@ export const mockNavigation = {
   openDrawer: jest.fn(),
   closeDrawer: jest.fn(),
   toggleDrawer: jest.fn(),
-  getParam: jest.fn((key) => mockRecipient),
+  getParam: jest.fn(() => mockRecipient),
   setParams: jest.fn(),
   addListener: jest.fn(),
   push: jest.fn(),
@@ -129,7 +129,10 @@ export const mockContactWithPhone: MinimalContact = {
 export const mockContactWithPhone2: MinimalContact = {
   recordID: '2',
   displayName: 'Bob Bobson',
-  phoneNumbers: [{ label: 'home', number: mockE164Number }, { label: 'mobile', number: '100200' }],
+  phoneNumbers: [
+    { label: 'home', number: mockE164Number },
+    { label: 'mobile', number: '100200' },
+  ],
   thumbnailPath: '',
 }
 
@@ -138,7 +141,6 @@ export const mockContactList = [mockContactWithPhone2, mockContactWithPhone]
 export const mockEscrowedPayment: EscrowedPayment = {
   senderAddress: mockAccount2,
   recipientPhone: mockE164Number,
-  recipientContact: mockRecipient,
   paymentID: mockAccount,
   currency: SHORT_CURRENCIES.DOLLAR,
   amount: new BigNumber(10),
@@ -149,6 +151,19 @@ export const mockEscrowedPayment: EscrowedPayment = {
 export const mockPaymentRequests: PaymentRequest[] = [
   {
     uid: 'fas12fas4fa141241',
+    amount: '12.34',
+    timestamp: new Date('2019-06-04T16:17:55.239Z'),
+    requesterAddress: mockAccount2,
+    requesterE164Number: mockE164Number,
+    requesteeAddress: mockAccount,
+    currency: SHORT_CURRENCIES.DOLLAR,
+    comment: mockComment,
+    status: PaymentRequestStatus.REQUESTED,
+    notified: true,
+    type: NotificationTypes.PAYMENT_REQUESTED,
+  },
+  {
+    uid: 'fas12fbs4fa141241',
     amount: '12.34',
     timestamp: new Date('2019-06-04T16:17:55.239Z'),
     requesterAddress: mockAccount2,

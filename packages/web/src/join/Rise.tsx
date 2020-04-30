@@ -171,16 +171,19 @@ class RisingCoin extends React.PureComponent<RisingCoinProps, StateVectors> {
     this.state = spawn(props)
   }
   getTransformStart = ({ x, y }: Coord) => {
-    return [{ translateX: x }, { translateY: y }, { translateZ: 0 }]
+    return [{ translateX: x }, { translateY: y }]
   }
   getTransformEnd = ({ x, y }: Coord) => {
-    return [{ translateX: x + this.state.vx }, { translateY: y - this.state.vy }, { translateZ: 0 }]
+    return [{ translateX: x + this.state.vx }, { translateY: y - this.state.vy }]
   }
-  getTransformMidpoint = ({ x, y }, percent: number) => {
+  getTransformMidpoint = ({ x, y }: Coord, percent: number) => {
     return [
-      { translateX: x + this.state.vx * percent },
-      { translateY: y - this.state.vy * percent },
-      { translateZ: 0 },
+      {
+        translateX: x + this.state.vx * percent,
+      },
+      {
+        translateY: y - this.state.vy * percent,
+      },
     ]
   }
 
@@ -369,7 +372,7 @@ const styles = StyleSheet.create({
     animationTimingFunction: 'ease-in',
   },
   coinFall: {
-    animationIterationCount: '1',
+    animationIterationCount: 1,
     animationTimingFunction: 'ease-out',
   },
 })

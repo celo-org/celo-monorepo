@@ -4,11 +4,11 @@ import Link from '@celo/react-components/components/Link'
 import TextButton from '@celo/react-components/components/TextButton'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
-import { extractAttestationCodeFromMessage } from '@celo/walletkit'
+import { extractAttestationCodeFromMessage } from '@celo/utils/src/attestations'
 import dotProp from 'dot-prop-immutable'
 import { padStart } from 'lodash'
 import * as React from 'react'
-import { withNamespaces, WithNamespaces } from 'react-i18next'
+import { WithTranslation } from 'react-i18next'
 import { EmitterSubscription, StyleSheet, Text, View } from 'react-native'
 import Modal from 'react-native-modal'
 import SafeAreaView from 'react-native-safe-area-view'
@@ -19,7 +19,7 @@ import componentWithAnalytics from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import CancelButton from 'src/components/CancelButton'
 import DevSkipButton from 'src/components/DevSkipButton'
-import { Namespaces } from 'src/i18n'
+import { Namespaces, withTranslation } from 'src/i18n'
 import LoadingSpinner from 'src/icons/LoadingSpinner'
 import { cancelVerification, receiveAttestationMessage } from 'src/identity/actions'
 import {
@@ -50,7 +50,7 @@ interface DispatchProps {
   hideAlert: typeof hideAlert
 }
 
-type Props = StateProps & DispatchProps & WithNamespaces
+type Props = StateProps & DispatchProps & WithTranslation
 
 interface State {
   timer: number
@@ -58,6 +58,7 @@ interface State {
   codeSubmittingStatuses: boolean[]
   isModalVisible: boolean
   isTipVisible: boolean
+  didFinish: boolean
 }
 
 const mapDispatchToProps = {
@@ -89,6 +90,7 @@ class VerificationInputScreen extends React.Component<Props, State> {
     codeSubmittingStatuses: [],
     isModalVisible: false,
     isTipVisible: false,
+    didFinish: false,
   }
 
   componentDidMount() {
@@ -115,7 +117,7 @@ class VerificationInputScreen extends React.Component<Props, State> {
   }
 
   isVerificationComplete = () => {
-    return this.props.numCompleteAttestations >= NUM_ATTESTATIONS_REQUIRED
+    return this.props.numCompleteAttestations >= NUM_ATTESTATIONS_REQUIRED && !this.state.didFinish
   }
 
   isCodeRejected = () => {
@@ -131,6 +133,7 @@ class VerificationInputScreen extends React.Component<Props, State> {
 
   finishVerification = () => {
     Logger.debug(TAG + '@finishVerification', 'Verification finished, navigating to next screen.')
+    this.setState({ didFinish: true })
     this.props.hideAlert()
     navigate(Screens.VerificationSuccessScreen)
   }
@@ -266,14 +269,10 @@ const styles = StyleSheet.create({
     paddingTop: 0,
   },
   buttonCancelContainer: {
-    position: 'absolute',
-    top: 20,
     left: 5,
-    zIndex: 10,
   },
   timerContainer: {
     alignItems: 'center',
-    marginTop: 30,
     marginBottom: 10,
   },
   timerText: {
@@ -335,5 +334,5 @@ export default componentWithAnalytics(
   connect<StateProps, DispatchProps, {}, RootState>(
     mapStateToProps,
     mapDispatchToProps
-  )(withNamespaces(Namespaces.nuxVerification2)(VerificationInputScreen))
+  )(withTranslation(Namespaces.nuxVerification2)(VerificationInputScreen))
 )

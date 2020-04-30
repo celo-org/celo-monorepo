@@ -17,10 +17,14 @@ export enum Actions {
   SET_BACKUP_DELAYED_ACTION = 'ACCOUNT/SET_BACKUP_DELAYED_ACTION',
   SET_SOCIAL_BACKUP_COMPLETED_ACTION = 'ACCOUNT/SET_SOCIAL_BACKUP_COMPLETED_ACTION',
   RESET_BACKUP_STATE = 'ACCOUNT/RESET_BACKUP_STATE',
-  UPDATE_PAYMENT_REQUESTS = 'ACCOUNT/UPDATE_PAYMENT_REQUESTS',
+  UPDATE_INCOMING_PAYMENT_REQUESTS = 'ACCOUNT/UPDATE_INCOMING_PAYMENT_REQUESTS',
+  UPDATE_OUTGOING_PAYMENT_REQUESTS = 'ACCOUNT/UPDATE_OUTGOING_PAYMENT_REQUESTS',
   DISMISS_EARN_REWARDS = 'ACCOUNT/DISMISS_EARN_REWARDS',
   DISMISS_INVITE_FRIENDS = 'ACCOUNT/DISMISS_INVITE_FRIENDS',
+  DISMISS_GET_VERIFIED = 'ACCOUNT/DISMISS_GET_VERIFIED',
   SET_USER_CONTACT_DETAILS = 'ACCOUNT/SET_USER_CONTACT_DETAILS',
+  SET_PROMPT_FORNO = 'GETH/SET_PROMPT_FORNO',
+  ACCEPT_TERMS = 'ACCOUNT/ACCEPT_TERMS',
 }
 
 export interface SetNameAction {
@@ -36,6 +40,10 @@ export interface SetPhoneNumberAction {
 
 export interface DevModeTriggerClickedAction {
   type: Actions.DEV_MODE_TRIGGER_CLICKED
+}
+
+export interface AcceptTermsAction {
+  type: Actions.ACCEPT_TERMS
 }
 
 export interface PhotosNUXClickedAction {
@@ -77,23 +85,37 @@ export interface ResetBackupState {
   type: Actions.RESET_BACKUP_STATE
 }
 
-export interface UpdatePaymentRequestsAction {
-  type: Actions.UPDATE_PAYMENT_REQUESTS
+export interface UpdateIncomingPaymentRequestsAction {
+  type: Actions.UPDATE_INCOMING_PAYMENT_REQUESTS
   paymentRequests: PaymentRequest[]
 }
 
-export interface DismissEarnRewards {
+export interface UpdateOutgoingPaymentRequestsAction {
+  type: Actions.UPDATE_OUTGOING_PAYMENT_REQUESTS
+  paymentRequests: PaymentRequest[]
+}
+
+export interface DismissEarnRewardsAction {
   type: Actions.DISMISS_EARN_REWARDS
 }
 
-export interface DismissInviteFriends {
+export interface DismissInviteFriendsAction {
   type: Actions.DISMISS_INVITE_FRIENDS
+}
+
+export interface DismissGetVerifiedAction {
+  type: Actions.DISMISS_GET_VERIFIED
 }
 
 export interface SetContactDetailsAction {
   type: Actions.SET_USER_CONTACT_DETAILS
   contactId: string
   thumbnailPath: string | null
+}
+
+interface SetPromptFornoAction {
+  type: Actions.SET_PROMPT_FORNO
+  promptIfNeeded: boolean
 }
 
 export type ActionTypes =
@@ -109,15 +131,24 @@ export type ActionTypes =
   | SetBackupDelayedAction
   | SetSocialBackupCompletedAction
   | ResetBackupState
-  | UpdatePaymentRequestsAction
-  | DismissEarnRewards
-  | DismissInviteFriends
+  | DismissEarnRewardsAction
+  | DismissInviteFriendsAction
+  | DismissGetVerifiedAction
+  | UpdateIncomingPaymentRequestsAction
+  | UpdateOutgoingPaymentRequestsAction
   | SetContactDetailsAction
+  | SetPromptFornoAction
+  | AcceptTermsAction
 
 export function setName(name: string): SetNameAction {
   return {
     type: Actions.SET_NAME,
     name,
+  }
+}
+export function acceptTerms(): AcceptTermsAction {
+  return {
+    type: Actions.ACCEPT_TERMS,
   }
 }
 
@@ -173,19 +204,35 @@ export const resetBackupState = (): ResetBackupState => ({
   type: Actions.RESET_BACKUP_STATE,
 })
 
-export const updatePaymentRequests = (
+export const updateIncomingPaymentRequests = (
   paymentRequests: PaymentRequest[]
-): UpdatePaymentRequestsAction => ({
-  type: Actions.UPDATE_PAYMENT_REQUESTS,
+): UpdateIncomingPaymentRequestsAction => ({
+  type: Actions.UPDATE_INCOMING_PAYMENT_REQUESTS,
   paymentRequests,
 })
 
-export const dismissEarnRewards = (): DismissEarnRewards => ({
+export const updateOutgoingPaymentRequests = (
+  paymentRequests: PaymentRequest[]
+): UpdateOutgoingPaymentRequestsAction => ({
+  type: Actions.UPDATE_OUTGOING_PAYMENT_REQUESTS,
+  paymentRequests,
+})
+
+export const dismissEarnRewards = (): DismissEarnRewardsAction => ({
   type: Actions.DISMISS_EARN_REWARDS,
 })
 
-export const dismissInviteFriends = (): DismissInviteFriends => ({
+export const dismissInviteFriends = (): DismissInviteFriendsAction => ({
   type: Actions.DISMISS_INVITE_FRIENDS,
+})
+
+export const dismissGetVerified = (): DismissGetVerifiedAction => ({
+  type: Actions.DISMISS_GET_VERIFIED,
+})
+
+export const setPromptForno = (promptIfNeeded: boolean): SetPromptFornoAction => ({
+  type: Actions.SET_PROMPT_FORNO,
+  promptIfNeeded,
 })
 
 export const setUserContactDetails = (

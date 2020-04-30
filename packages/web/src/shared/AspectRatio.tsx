@@ -26,15 +26,12 @@ export default class AspectRatio extends React.Component<Props> {
   }
 }
 
-// @ts-ignore
 const styles = StyleSheet.create({
   root: {
-    // @ts-ignore
     display: 'block',
     overflow: 'hidden',
   },
   ratio: {
-    // @ts-ignore
     display: 'block',
     width: '100%',
   },

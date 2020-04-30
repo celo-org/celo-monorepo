@@ -1,14 +1,13 @@
+import { EventProps } from 'fullstack/EventProps'
 import * as React from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { I18nProps, withNamespaces } from 'src/i18n'
+import Chevron from 'src/icons/chevron'
 import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
-import Button, { BTN } from 'src/shared/Button.3'
+import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import OvalCoin from 'src/shared/OvalCoin'
 import { parseDate, printDuration } from 'src/shared/PlaceDate'
 import { colors, fonts, standardStyles } from 'src/styles'
-
-import { EventProps } from 'fullstack/EventProps'
-import Chevron from 'src/icons/chevron'
 
 interface Section {
   section: string
@@ -52,7 +51,7 @@ class EventRow extends React.PureComponent<Props> {
         <View style={styles.start}>
           <a href={link} target="_external">
             <TouchableOpacity style={styles.title}>
-              <Text numberOfLines={1} style={[fonts.h5, styles.name]}>
+              <Text numberOfLines={1} style={[fonts.h6, styles.name]}>
                 {name}
               </Text>
               {filteredCoins.map(({ color }, index) => {
@@ -63,17 +62,17 @@ class EventRow extends React.PureComponent<Props> {
                       <OvalCoin size={COIN_SIZE} color={color} mixBlendMode={'multiply'} />
                     </View>
 
-                    {isMobile &&
-                      index === filteredCoins.length - 1 && (
-                        <View style={[styles.chevron, { transform }]}>
-                          <Chevron color={colors.dark} opacity={1} size={9} />
-                        </View>
-                      )}
+                    {isMobile && index === filteredCoins.length - 1 && (
+                      <View style={[styles.chevron, { transform }]}>
+                        <Chevron color={colors.dark} opacity={1} size={9} />
+                      </View>
+                    )}
                   </React.Fragment>
                 )
               })}
-              {isMobile &&
-                filteredCoins.length === 0 && <Chevron color={colors.dark} opacity={1} size={9} />}
+              {isMobile && filteredCoins.length === 0 && (
+                <Chevron color={colors.dark} opacity={1} size={9} />
+              )}
             </TouchableOpacity>
           </a>
           {isHighlightEvent && (
@@ -108,10 +107,26 @@ class EventLink extends React.PureComponent<EventLinkProps> {
   render() {
     const { link, recap, isPastEvent, t, isMobile } = this.props
     if (link && !isPastEvent && !isMobile) {
-      return <Button text={t('events.eventPage')} kind={BTN.NAKED} href={link} target="_external" />
+      return (
+        <Button
+          size={SIZE.normal}
+          text={t('events.eventPage')}
+          kind={BTN.NAKED}
+          href={link}
+          target="_external"
+        />
+      )
     }
     if (recap && recap.length) {
-      return <Button text={t('events.recap')} kind={BTN.NAKED} href={recap} target="_external" />
+      return (
+        <Button
+          size={SIZE.normal}
+          text={t('events.recap')}
+          kind={BTN.NAKED}
+          href={recap}
+          target="_external"
+        />
+      )
     }
     return null
   }

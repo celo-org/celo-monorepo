@@ -1,0 +1,5013 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ValidatorsList renders 1`] = `
+<div
+  className="css-view-1dbjc4n"
+  style={
+    Object {
+      "position": "static",
+      "zIndex": "initial",
+    }
+  }
+>
+  <div
+    className="css-view-1dbjc4n"
+    style={
+      Object {
+        "backgroundColor": "rgba(46,51,56,1.00)",
+        "marginBottom": "100px",
+        "marginLeft": "auto",
+        "marginRight": "auto",
+        "marginTop": "auto",
+        "position": "static",
+        "width": "1020px",
+        "zIndex": "initial",
+      }
+    }
+  >
+    <div
+      className="css-view-1dbjc4n"
+      style={
+        Object {
+          "WebkitAlignItems": "center",
+          "WebkitBoxAlign": "center",
+          "WebkitBoxDirection": "normal",
+          "WebkitBoxOrient": "horizontal",
+          "WebkitBoxPack": "justify",
+          "WebkitFlexDirection": "row",
+          "WebkitJustifyContent": "space-between",
+          "alignItems": "center",
+          "backgroundColor": "rgba(46,51,56,1.00)",
+          "borderBottomColor": "rgba(255,255,255,0.20)",
+          "borderBottomStyle": "solid",
+          "borderBottomWidth": "1px",
+          "borderLeftColor": "rgba(255,255,255,0.20)",
+          "borderLeftStyle": "solid",
+          "borderRightColor": "rgba(255,255,255,0.20)",
+          "borderRightStyle": "solid",
+          "borderTopColor": "rgba(255,255,255,0.20)",
+          "borderTopStyle": "solid",
+          "boxShadow": "960px 0 #2E3338, -960px 0 #2E3338",
+          "display": "flex",
+          "flexDirection": "row",
+          "justifyContent": "space-between",
+          "msFlexAlign": "center",
+          "msFlexDirection": "row",
+          "msFlexPack": "justify",
+          "position": "sticky",
+          "top": "0px",
+          "width": "100%",
+          "zIndex": 2,
+        }
+      }
+    >
+      <div
+        className="css-view-1dbjc4n"
+        onClick={[Function]}
+        style={
+          Object {
+            "WebkitAlignItems": "center",
+            "WebkitBoxAlign": "center",
+            "WebkitBoxDirection": "normal",
+            "WebkitBoxFlex": 1,
+            "WebkitBoxOrient": "horizontal",
+            "WebkitFlexDirection": "row",
+            "WebkitFlexGrow": 1,
+            "alignItems": "center",
+            "cursor": "pointer",
+            "flexDirection": "row",
+            "flexGrow": 1,
+            "fontSize": "16px",
+            "lineHeight": "20px",
+            "msFlexAlign": "center",
+            "msFlexDirection": "row",
+            "msFlexPositive": 1,
+            "paddingBottom": "24px",
+            "paddingLeft": "44px",
+            "paddingRight": "10px",
+            "paddingTop": "24px",
+            "textAlign": "left",
+          }
+        }
+      >
+        <span
+          className="css-text-901oao css-textHasAncestor-16my406"
+          dir="auto"
+          style={
+            Object {
+              "color": "rgba(255,255,255,1.00)",
+              "fontFamily": "Jost, futura-pt, futura, sans-serif",
+            }
+          }
+        >
+          Name
+        </span>
+        <span
+          className="css-text-901oao css-textHasAncestor-16my406"
+          dir="auto"
+          style={
+            Object {
+              "color": "rgba(255,255,255,1.00)",
+              "fontFamily": "Jost, futura-pt, futura, sans-serif",
+              "opacity": 0.6,
+              "paddingLeft": "6px",
+            }
+          }
+        >
+          <svg
+            fill="none"
+            height={10}
+            style={Object {}}
+            transform="rotate(270)"
+            viewBox="0 0 8 12"
+            width={10}
+          >
+            <path
+              clipRule="evenodd"
+              d="M1.19997 0L1.13249e-05 1.19996L4.80011 6.00006L0 10.8002L1.19996 12.0001L7.19977 6.00032L7.19953 6.00007L7.19979 5.99981L1.19997 0Z"
+              fill="#FFFFFF"
+              fillRule="evenodd"
+              opacity={1}
+              style={Object {}}
+            />
+          </svg>
+        </span>
+      </div>
+      <div
+        className="css-view-1dbjc4n"
+        onClick={[Function]}
+        style={
+          Object {
+            "WebkitAlignItems": "center",
+            "WebkitBoxAlign": "center",
+            "WebkitBoxDirection": "normal",
+            "WebkitBoxFlex": 0,
+            "WebkitBoxOrient": "horizontal",
+            "WebkitFlexDirection": "row",
+            "WebkitFlexGrow": 0,
+            "alignItems": "center",
+            "cursor": "pointer",
+            "flexDirection": "row",
+            "flexGrow": 0,
+            "fontSize": "16px",
+            "lineHeight": "20px",
+            "maxWidth": "116px",
+            "minWidth": "116px",
+            "msFlexAlign": "center",
+            "msFlexDirection": "row",
+            "msFlexPositive": 0,
+            "paddingBottom": "24px",
+            "paddingLeft": "10px",
+            "paddingRight": "10px",
+            "paddingTop": "24px",
+            "textAlign": "center",
+          }
+        }
+      >
+        <span
+          className="css-text-901oao css-textHasAncestor-16my406"
+          dir="auto"
+          style={
+            Object {
+              "color": "rgba(255,255,255,1.00)",
+              "fontFamily": "Jost, futura-pt, futura, sans-serif",
+            }
+          }
+        >
+          Elected/ Total
+        </span>
+        <span
+          className="css-text-901oao css-textHasAncestor-16my406"
+          dir="auto"
+          style={
+            Object {
+              "color": "rgba(255,255,255,1.00)",
+              "fontFamily": "Jost, futura-pt, futura, sans-serif",
+              "opacity": 0,
+              "paddingLeft": "6px",
+            }
+          }
+        >
+          <svg
+            fill="none"
+            height={10}
+            style={Object {}}
+            transform="rotate(90)"
+            viewBox="0 0 8 12"
+            width={10}
+          >
+            <path
+              clipRule="evenodd"
+              d="M1.19997 0L1.13249e-05 1.19996L4.80011 6.00006L0 10.8002L1.19996 12.0001L7.19977 6.00032L7.19953 6.00007L7.19979 5.99981L1.19997 0Z"
+              fill="#FFFFFF"
+              fillRule="evenodd"
+              opacity={1}
+              style={Object {}}
+            />
+          </svg>
+        </span>
+      </div>
+      <div
+        className="css-view-1dbjc4n"
+        onClick={[Function]}
+        style={
+          Object {
+            "WebkitAlignItems": "center",
+            "WebkitBoxAlign": "center",
+            "WebkitBoxDirection": "normal",
+            "WebkitBoxFlex": 0,
+            "WebkitBoxOrient": "horizontal",
+            "WebkitFlexDirection": "row",
+            "WebkitFlexGrow": 0,
+            "alignItems": "center",
+            "cursor": "pointer",
+            "flexDirection": "row",
+            "flexGrow": 0,
+            "fontSize": "16px",
+            "lineHeight": "20px",
+            "maxWidth": "170px",
+            "minWidth": "170px",
+            "msFlexAlign": "center",
+            "msFlexDirection": "row",
+            "msFlexPositive": 0,
+            "paddingBottom": "24px",
+            "paddingLeft": "10px",
+            "paddingRight": "10px",
+            "paddingTop": "24px",
+            "textAlign": "center",
+          }
+        }
+      >
+        <span
+          className="css-text-901oao css-textHasAncestor-16my406"
+          dir="auto"
+          style={
+            Object {
+              "color": "rgba(255,255,255,1.00)",
+              "fontFamily": "Jost, futura-pt, futura, sans-serif",
+            }
+          }
+        >
+          Votes Available
+        </span>
+        <span
+          className="css-text-901oao css-textHasAncestor-16my406"
+          dir="auto"
+          style={
+            Object {
+              "color": "rgba(255,255,255,1.00)",
+              "fontFamily": "Jost, futura-pt, futura, sans-serif",
+              "opacity": 0,
+              "paddingLeft": "6px",
+            }
+          }
+        >
+          <svg
+            fill="none"
+            height={10}
+            style={Object {}}
+            transform="rotate(90)"
+            viewBox="0 0 8 12"
+            width={10}
+          >
+            <path
+              clipRule="evenodd"
+              d="M1.19997 0L1.13249e-05 1.19996L4.80011 6.00006L0 10.8002L1.19996 12.0001L7.19977 6.00032L7.19953 6.00007L7.19979 5.99981L1.19997 0Z"
+              fill="#FFFFFF"
+              fillRule="evenodd"
+              opacity={1}
+              style={Object {}}
+            />
+          </svg>
+        </span>
+      </div>
+      <div
+        className="css-view-1dbjc4n"
+        onClick={[Function]}
+        style={
+          Object {
+            "WebkitAlignItems": "center",
+            "WebkitBoxAlign": "center",
+            "WebkitBoxDirection": "normal",
+            "WebkitBoxFlex": 0,
+            "WebkitBoxOrient": "horizontal",
+            "WebkitFlexDirection": "row",
+            "WebkitFlexGrow": 0,
+            "alignItems": "center",
+            "cursor": "pointer",
+            "flexDirection": "row",
+            "flexGrow": 0,
+            "fontSize": "16px",
+            "lineHeight": "20px",
+            "maxWidth": "116px",
+            "minWidth": "116px",
+            "msFlexAlign": "center",
+            "msFlexDirection": "row",
+            "msFlexPositive": 0,
+            "paddingBottom": "24px",
+            "paddingLeft": "10px",
+            "paddingRight": "10px",
+            "paddingTop": "24px",
+            "textAlign": "center",
+          }
+        }
+      >
+        <span
+          className="css-text-901oao css-textHasAncestor-16my406"
+          dir="auto"
+          style={
+            Object {
+              "color": "rgba(255,255,255,1.00)",
+              "fontFamily": "Jost, futura-pt, futura, sans-serif",
+            }
+          }
+        >
+          Locked CGLD
+        </span>
+        <span
+          className="css-text-901oao css-textHasAncestor-16my406"
+          dir="auto"
+          style={
+            Object {
+              "color": "rgba(255,255,255,1.00)",
+              "fontFamily": "Jost, futura-pt, futura, sans-serif",
+              "opacity": 0,
+              "paddingLeft": "6px",
+            }
+          }
+        >
+          <svg
+            fill="none"
+            height={10}
+            style={Object {}}
+            transform="rotate(90)"
+            viewBox="0 0 8 12"
+            width={10}
+          >
+            <path
+              clipRule="evenodd"
+              d="M1.19997 0L1.13249e-05 1.19996L4.80011 6.00006L0 10.8002L1.19996 12.0001L7.19977 6.00032L7.19953 6.00007L7.19979 5.99981L1.19997 0Z"
+              fill="#FFFFFF"
+              fillRule="evenodd"
+              opacity={1}
+              style={Object {}}
+            />
+          </svg>
+        </span>
+      </div>
+      <div
+        className="css-view-1dbjc4n"
+        onClick={[Function]}
+        style={
+          Object {
+            "WebkitAlignItems": "center",
+            "WebkitBoxAlign": "center",
+            "WebkitBoxDirection": "normal",
+            "WebkitBoxFlex": 0,
+            "WebkitBoxOrient": "horizontal",
+            "WebkitFlexDirection": "row",
+            "WebkitFlexGrow": 0,
+            "alignItems": "center",
+            "cursor": "pointer",
+            "flexDirection": "row",
+            "flexGrow": 0,
+            "fontSize": "16px",
+            "lineHeight": "20px",
+            "maxWidth": "116px",
+            "minWidth": "116px",
+            "msFlexAlign": "center",
+            "msFlexDirection": "row",
+            "msFlexPositive": 0,
+            "paddingBottom": "24px",
+            "paddingLeft": "10px",
+            "paddingRight": "10px",
+            "paddingTop": "24px",
+            "textAlign": "center",
+          }
+        }
+      >
+        <span
+          className="css-text-901oao css-textHasAncestor-16my406"
+          dir="auto"
+          style={
+            Object {
+              "color": "rgba(255,255,255,1.00)",
+              "fontFamily": "Jost, futura-pt, futura, sans-serif",
+            }
+          }
+        >
+          Group Share
+        </span>
+        <span
+          className="css-text-901oao css-textHasAncestor-16my406"
+          dir="auto"
+          style={
+            Object {
+              "color": "rgba(255,255,255,1.00)",
+              "fontFamily": "Jost, futura-pt, futura, sans-serif",
+              "opacity": 0,
+              "paddingLeft": "6px",
+            }
+          }
+        >
+          <svg
+            fill="none"
+            height={10}
+            style={Object {}}
+            transform="rotate(90)"
+            viewBox="0 0 8 12"
+            width={10}
+          >
+            <path
+              clipRule="evenodd"
+              d="M1.19997 0L1.13249e-05 1.19996L4.80011 6.00006L0 10.8002L1.19996 12.0001L7.19977 6.00032L7.19953 6.00007L7.19979 5.99981L1.19997 0Z"
+              fill="#FFFFFF"
+              fillRule="evenodd"
+              opacity={1}
+              style={Object {}}
+            />
+          </svg>
+        </span>
+      </div>
+      <div
+        className="css-view-1dbjc4n"
+        onClick={[Function]}
+        style={
+          Object {
+            "WebkitAlignItems": "center",
+            "WebkitBoxAlign": "center",
+            "WebkitBoxDirection": "normal",
+            "WebkitBoxFlex": 0,
+            "WebkitBoxOrient": "horizontal",
+            "WebkitFlexDirection": "row",
+            "WebkitFlexGrow": 0,
+            "alignItems": "center",
+            "cursor": "pointer",
+            "flexDirection": "row",
+            "flexGrow": 0,
+            "fontSize": "16px",
+            "lineHeight": "20px",
+            "maxWidth": "116px",
+            "minWidth": "116px",
+            "msFlexAlign": "center",
+            "msFlexDirection": "row",
+            "msFlexPositive": 0,
+            "paddingBottom": "24px",
+            "paddingLeft": "10px",
+            "paddingRight": "10px",
+            "paddingTop": "24px",
+            "textAlign": "center",
+          }
+        }
+      >
+        <span
+          className="css-text-901oao css-textHasAncestor-16my406"
+          dir="auto"
+          style={
+            Object {
+              "color": "rgba(255,255,255,1.00)",
+              "fontFamily": "Jost, futura-pt, futura, sans-serif",
+            }
+          }
+        >
+          Voter Rewards
+        </span>
+        <span
+          className="css-text-901oao css-textHasAncestor-16my406"
+          dir="auto"
+          style={
+            Object {
+              "color": "rgba(255,255,255,1.00)",
+              "fontFamily": "Jost, futura-pt, futura, sans-serif",
+              "opacity": 0,
+              "paddingLeft": "6px",
+            }
+          }
+        >
+          <svg
+            fill="none"
+            height={10}
+            style={Object {}}
+            transform="rotate(90)"
+            viewBox="0 0 8 12"
+            width={10}
+          >
+            <path
+              clipRule="evenodd"
+              d="M1.19997 0L1.13249e-05 1.19996L4.80011 6.00006L0 10.8002L1.19996 12.0001L7.19977 6.00032L7.19953 6.00007L7.19979 5.99981L1.19997 0Z"
+              fill="#FFFFFF"
+              fillRule="evenodd"
+              opacity={1}
+              style={Object {}}
+            />
+          </svg>
+        </span>
+      </div>
+      <div
+        className="css-view-1dbjc4n"
+        onClick={[Function]}
+        style={
+          Object {
+            "WebkitAlignItems": "center",
+            "WebkitBoxAlign": "center",
+            "WebkitBoxDirection": "normal",
+            "WebkitBoxFlex": 0,
+            "WebkitBoxOrient": "horizontal",
+            "WebkitFlexDirection": "row",
+            "WebkitFlexGrow": 0,
+            "alignItems": "center",
+            "cursor": "pointer",
+            "flexDirection": "row",
+            "flexGrow": 0,
+            "fontSize": "16px",
+            "lineHeight": "20px",
+            "maxWidth": "80px",
+            "minWidth": "80px",
+            "msFlexAlign": "center",
+            "msFlexDirection": "row",
+            "msFlexPositive": 0,
+            "paddingBottom": "24px",
+            "paddingLeft": "10px",
+            "paddingRight": "10px",
+            "paddingTop": "24px",
+            "textAlign": "center",
+          }
+        }
+      >
+        <span
+          className="css-text-901oao css-textHasAncestor-16my406"
+          dir="auto"
+          style={
+            Object {
+              "color": "rgba(255,255,255,1.00)",
+              "fontFamily": "Jost, futura-pt, futura, sans-serif",
+            }
+          }
+        >
+          Uptime
+        </span>
+        <span
+          className="css-text-901oao css-textHasAncestor-16my406"
+          dir="auto"
+          style={
+            Object {
+              "color": "rgba(255,255,255,1.00)",
+              "fontFamily": "Jost, futura-pt, futura, sans-serif",
+              "opacity": 0,
+              "paddingLeft": "6px",
+            }
+          }
+        >
+          <svg
+            fill="none"
+            height={10}
+            style={Object {}}
+            transform="rotate(90)"
+            viewBox="0 0 8 12"
+            width={10}
+          >
+            <path
+              clipRule="evenodd"
+              d="M1.19997 0L1.13249e-05 1.19996L4.80011 6.00006L0 10.8002L1.19996 12.0001L7.19977 6.00032L7.19953 6.00007L7.19979 5.99981L1.19997 0Z"
+              fill="#FFFFFF"
+              fillRule="evenodd"
+              opacity={1}
+              style={Object {}}
+            />
+          </svg>
+        </span>
+      </div>
+      <div
+        className="css-view-1dbjc4n"
+        onClick={[Function]}
+        style={
+          Object {
+            "WebkitAlignItems": "center",
+            "WebkitBoxAlign": "center",
+            "WebkitBoxDirection": "normal",
+            "WebkitBoxFlex": 0,
+            "WebkitBoxOrient": "horizontal",
+            "WebkitFlexDirection": "row",
+            "WebkitFlexGrow": 0,
+            "alignItems": "center",
+            "cursor": "pointer",
+            "flexDirection": "row",
+            "flexGrow": 0,
+            "fontSize": "16px",
+            "lineHeight": "20px",
+            "maxWidth": "80px",
+            "minWidth": "80px",
+            "msFlexAlign": "center",
+            "msFlexDirection": "row",
+            "msFlexPositive": 0,
+            "paddingBottom": "24px",
+            "paddingLeft": "10px",
+            "paddingRight": "10px",
+            "paddingTop": "24px",
+            "textAlign": "center",
+          }
+        }
+      >
+        <span
+          className="css-text-901oao css-textHasAncestor-16my406"
+          dir="auto"
+          style={
+            Object {
+              "color": "rgba(255,255,255,1.00)",
+              "fontFamily": "Jost, futura-pt, futura, sans-serif",
+            }
+          }
+        >
+          Attestation
+        </span>
+        <span
+          className="css-text-901oao css-textHasAncestor-16my406"
+          dir="auto"
+          style={
+            Object {
+              "color": "rgba(255,255,255,1.00)",
+              "fontFamily": "Jost, futura-pt, futura, sans-serif",
+              "opacity": 0,
+              "paddingLeft": "6px",
+            }
+          }
+        >
+          <svg
+            fill="none"
+            height={10}
+            style={Object {}}
+            transform="rotate(90)"
+            viewBox="0 0 8 12"
+            width={10}
+          >
+            <path
+              clipRule="evenodd"
+              d="M1.19997 0L1.13249e-05 1.19996L4.80011 6.00006L0 10.8002L1.19996 12.0001L7.19977 6.00032L7.19953 6.00007L7.19979 5.99981L1.19997 0Z"
+              fill="#FFFFFF"
+              fillRule="evenodd"
+              opacity={1}
+              style={Object {}}
+            />
+          </svg>
+        </span>
+      </div>
+    </div>
+    <div
+      onClick={[Function]}
+    >
+      <div
+        style={Object {}}
+      >
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitAlignItems": "center",
+              "WebkitBoxAlign": "center",
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxOrient": "horizontal",
+              "WebkitBoxPack": "justify",
+              "WebkitFlexDirection": "row",
+              "WebkitJustifyContent": "space-between",
+              "alignItems": "center",
+              "display": "flex",
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+              "msFlexAlign": "center",
+              "msFlexDirection": "row",
+              "msFlexPack": "justify",
+              "paddingTop": "10px",
+              "width": "100%",
+            }
+          }
+        >
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "WebkitBoxDirection": "normal",
+                "WebkitBoxFlex": 1,
+                "WebkitBoxOrient": "horizontal",
+                "WebkitFlexDirection": "row",
+                "WebkitFlexGrow": 1,
+                "cursor": "pointer",
+                "display": "flex",
+                "flexDirection": "row",
+                "flexGrow": 1,
+                "fontSize": "16px",
+                "msFlexDirection": "row",
+                "msFlexPositive": 1,
+                "paddingBottom": "12px",
+                "paddingLeft": "10px",
+                "paddingRight": "10px",
+                "paddingTop": "12px",
+                "width": "226px",
+              }
+            }
+          >
+            <span
+              className="css-text-901oao css-textHasAncestor-16my406"
+              dir="auto"
+              style={
+                Object {
+                  "WebkitBoxFlex": 0,
+                  "WebkitFlexGrow": 0,
+                  "color": "rgba(255,255,255,1.00)",
+                  "flexGrow": 0,
+                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                  "fontSize": "16px",
+                  "marginLeft": "15px",
+                  "marginRight": "20px",
+                  "msFlexPositive": 0,
+                  "paddingBottom": "12px",
+                  "paddingLeft": "10px",
+                  "paddingRight": "10px",
+                  "paddingTop": "12px",
+                  "textAlign": "center",
+                  "width": "20px",
+                }
+              }
+            >
+              <svg
+                fill="none"
+                height={10}
+                style={Object {}}
+                transform="rotate(0)"
+                viewBox="0 0 8 12"
+                width={10}
+              >
+                <path
+                  clipRule="evenodd"
+                  d="M1.19997 0L1.13249e-05 1.19996L4.80011 6.00006L0 10.8002L1.19996 12.0001L7.19977 6.00032L7.19953 6.00007L7.19979 5.99981L1.19997 0Z"
+                  fill="#FFFFFF"
+                  fillRule="evenodd"
+                  opacity={0.4}
+                  style={Object {}}
+                />
+              </svg>
+            </span>
+            <span
+              className="css-text-901oao css-textHasAncestor-16my406"
+              dir="auto"
+              style={
+                Object {
+                  "WebkitBoxDirection": "normal",
+                  "WebkitBoxOrient": "vertical",
+                  "WebkitFlexDirection": "column",
+                  "color": "rgba(255,255,255,1.00)",
+                  "display": "flex",
+                  "flexDirection": "column",
+                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                  "msFlexDirection": "column",
+                }
+              }
+            >
+              <span
+                className="css-text-901oao css-textHasAncestor-16my406"
+                dir="auto"
+                style={
+                  Object {
+                    "WebkitAlignItems": "center",
+                    "WebkitBoxAlign": "center",
+                    "WebkitBoxPack": "start",
+                    "WebkitJustifyContent": "flex-start",
+                    "alignItems": "center",
+                    "color": "rgba(255,255,255,1.00)",
+                    "display": "flex",
+                    "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                    "justifyContent": "flex-start",
+                    "msFlexAlign": "center",
+                    "msFlexPack": "start",
+                  }
+                }
+              >
+                <span
+                  className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+                  dir="auto"
+                  style={
+                    Object {
+                      "color": "rgba(255,255,255,1.00)",
+                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                      "fontWeight": "500",
+                      "maxWidth": "140px",
+                      "overflowX": "hidden",
+                      "overflowY": "hidden",
+                      "textDecoration": "underline",
+                      "textOverflow": "ellipsis",
+                      "whiteSpace": "nowrap",
+                    }
+                  }
+                >
+                  Test 1
+                </span>
+              </span>
+              <span
+                className="css-text-901oao css-textHasAncestor-16my406"
+                dir="auto"
+                style={
+                  Object {
+                    "WebkitBoxDirection": "normal",
+                    "WebkitBoxOrient": "horizontal",
+                    "WebkitFlexDirection": "row",
+                    "color": "rgba(171,173,175,1.00)",
+                    "display": "flex",
+                    "flexDirection": "row",
+                    "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                    "fontSize": "14px",
+                    "fontWeight": "normal",
+                    "msFlexDirection": "row",
+                    "paddingTop": "10px",
+                  }
+                }
+              >
+                <span
+                  className="css-text-901oao css-textHasAncestor-16my406"
+                  dir="auto"
+                  style={
+                    Object {
+                      "color": "rgba(171,173,175,1.00)",
+                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                    }
+                  }
+                >
+                  0xBCFF...B591
+                </span>
+                <div
+                  className="css-view-1dbjc4n"
+                  onClick={[Function]}
+                  style={
+                    Object {
+                      "display": "inline-flex",
+                      "height": "14px",
+                      "paddingLeft": "8px",
+                      "paddingRight": "8px",
+                    }
+                  }
+                >
+                  <span
+                    className="css-text-901oao css-textHasAncestor-16my406"
+                    dir="auto"
+                    style={
+                      Object {
+                        "color": "rgba(171,173,175,1.00)",
+                        "cursor": "pointer",
+                        "display": "inline-flex",
+                        "fontSize": "16px",
+                        "height": "14px",
+                        "lineHeight": "14px",
+                      }
+                    }
+                  >
+                    <svg
+                      fill="none"
+                      height={16}
+                      style={Object {}}
+                      viewBox="0 0 16 16"
+                      width={16}
+                    >
+                      <path
+                        d="M10.6666 0.666687H2.66659C1.93325 0.666687 1.33325 1.26669 1.33325 2.00002V11.3334H2.66659V2.00002H10.6666V0.666687ZM9.99992 3.33335H5.33325C4.59992 3.33335 4.00659 3.93335 4.00659 4.66669L3.99992 14C3.99992 14.7334 4.59325 15.3334 5.32659 15.3334H12.6666C13.3999 15.3334 13.9999 14.7334 13.9999 14V7.33335L9.99992 3.33335ZM5.33325 14V4.66669H9.33325V8.00002H12.6666V14H5.33325Z"
+                        fill="#ABADAF"
+                        style={Object {}}
+                      />
+                    </svg>
+                  </span>
+                </div>
+              </span>
+            </span>
+          </div>
+          <span
+            className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+            dir="auto"
+            style={
+              Object {
+                "WebkitBoxFlex": 0,
+                "WebkitFlexGrow": 0,
+                "color": "rgba(255,255,255,1.00)",
+                "flexGrow": 0,
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "maxWidth": "116px",
+                "minWidth": "116px",
+                "msFlexPositive": 0,
+                "paddingBottom": "12px",
+                "paddingLeft": "10px",
+                "paddingRight": "10px",
+                "paddingTop": "12px",
+                "textAlign": "center",
+              }
+            }
+          >
+            <span
+              className="css-text-901oao css-textHasAncestor-16my406"
+              dir="auto"
+              style={
+                Object {
+                  "borderBottomWidth": "0px",
+                  "borderLeftColor": "rgba(171,173,175,1.00)",
+                  "borderLeftWidth": "0px",
+                  "borderRightWidth": "0px",
+                  "borderTopWidth": "0px",
+                  "color": "rgba(255,255,255,1.00)",
+                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                  "paddingLeft": "10px",
+                  "paddingRight": "10px",
+                }
+              }
+            >
+              0
+            </span>
+            <span
+              className="css-text-901oao css-textHasAncestor-16my406"
+              dir="auto"
+              style={
+                Object {
+                  "borderBottomWidth": "0px",
+                  "borderLeftColor": "rgba(171,173,175,1.00)",
+                  "borderLeftWidth": "1px",
+                  "borderRightWidth": "0px",
+                  "borderTopWidth": "0px",
+                  "color": "rgba(255,255,255,1.00)",
+                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                  "paddingLeft": "10px",
+                  "paddingRight": "10px",
+                }
+              }
+            >
+              5
+            </span>
+          </span>
+          <span
+            className="css-text-901oao css-textHasAncestor-16my406"
+            dir="auto"
+            style={
+              Object {
+                "WebkitBoxDirection": "normal",
+                "WebkitBoxFlex": 0,
+                "WebkitBoxOrient": "horizontal",
+                "WebkitFlexDirection": "row",
+                "WebkitFlexGrow": 0,
+                "color": "rgba(255,255,255,1.00)",
+                "display": "flex",
+                "flexDirection": "row",
+                "flexGrow": 0,
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "maxWidth": "170px",
+                "minWidth": "170px",
+                "msFlexDirection": "row",
+                "msFlexPositive": 0,
+                "paddingBottom": "12px",
+                "paddingLeft": "10px",
+                "paddingRight": "10px",
+                "paddingTop": "12px",
+              }
+            }
+          >
+            <span
+              className="css-text-901oao css-textHasAncestor-16my406"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(255,255,255,1.00)",
+                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                  "fontSize": "14px",
+                  "fontWeight": "500",
+                  "paddingRight": "8px",
+                }
+              }
+            >
+              0.0
+              %
+            </span>
+            <span
+              className="css-text-901oao css-textHasAncestor-16my406"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(255,255,255,1.00)",
+                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                }
+              }
+            >
+              <span
+                className="css-text-901oao css-textHasAncestor-16my406"
+                dir="auto"
+                style={
+                  Object {
+                    "color": "rgba(171,173,175,1.00)",
+                    "display": "flex",
+                    "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                    "fontSize": "14px",
+                    "fontWeight": "500",
+                    "paddingBottom": "2px",
+                  }
+                }
+              >
+                0.0
+                % of 
+                50.0
+                %
+              </span>
+              <div
+                className="css-view-1dbjc4n"
+                style={
+                  Object {
+                    "WebkitBoxDirection": "normal",
+                    "WebkitBoxOrient": "horizontal",
+                    "WebkitFlexDirection": "row",
+                    "display": "flex",
+                    "flexDirection": "row",
+                    "height": "16px",
+                    "msFlexDirection": "row",
+                  }
+                }
+              >
+                <div
+                  className="css-view-1dbjc4n"
+                  style={
+                    Object {
+                      "backgroundColor": "rgba(255,255,255,0.20)",
+                      "borderBottomLeftRadius": "2px",
+                      "borderBottomRightRadius": "2px",
+                      "borderTopLeftRadius": "2px",
+                      "borderTopRightRadius": "2px",
+                      "display": "inline-flex",
+                      "height": "16px",
+                      "marginRight": "4px",
+                      "overflowX": "hidden",
+                      "overflowY": "hidden",
+                      "width": "8px",
+                    }
+                  }
+                >
+                  <div
+                    className="css-view-1dbjc4n"
+                    style={
+                      Object {
+                        "backgroundColor": "rgba(251,204,92,1.00)",
+                        "display": "inline-flex",
+                        "height": "16px",
+                        "width": "0%",
+                      }
+                    }
+                  />
+                </div>
+                <div
+                  className="css-view-1dbjc4n"
+                  style={
+                    Object {
+                      "backgroundColor": "rgba(255,255,255,0.20)",
+                      "borderBottomLeftRadius": "2px",
+                      "borderBottomRightRadius": "2px",
+                      "borderTopLeftRadius": "2px",
+                      "borderTopRightRadius": "2px",
+                      "display": "inline-flex",
+                      "height": "16px",
+                      "marginRight": "4px",
+                      "overflowX": "hidden",
+                      "overflowY": "hidden",
+                      "width": "8px",
+                    }
+                  }
+                >
+                  <div
+                    className="css-view-1dbjc4n"
+                    style={
+                      Object {
+                        "backgroundColor": "rgba(251,204,92,1.00)",
+                        "display": "inline-flex",
+                        "height": "16px",
+                        "width": "0%",
+                      }
+                    }
+                  />
+                </div>
+                <div
+                  className="css-view-1dbjc4n"
+                  style={
+                    Object {
+                      "backgroundColor": "rgba(255,255,255,0.20)",
+                      "borderBottomLeftRadius": "2px",
+                      "borderBottomRightRadius": "2px",
+                      "borderTopLeftRadius": "2px",
+                      "borderTopRightRadius": "2px",
+                      "display": "inline-flex",
+                      "height": "16px",
+                      "marginRight": "4px",
+                      "overflowX": "hidden",
+                      "overflowY": "hidden",
+                      "width": "8px",
+                    }
+                  }
+                >
+                  <div
+                    className="css-view-1dbjc4n"
+                    style={
+                      Object {
+                        "backgroundColor": "rgba(251,204,92,1.00)",
+                        "display": "inline-flex",
+                        "height": "16px",
+                        "width": "0%",
+                      }
+                    }
+                  />
+                </div>
+                <div
+                  className="css-view-1dbjc4n"
+                  style={
+                    Object {
+                      "backgroundColor": "rgba(255,255,255,0.20)",
+                      "borderBottomLeftRadius": "2px",
+                      "borderBottomRightRadius": "2px",
+                      "borderTopLeftRadius": "2px",
+                      "borderTopRightRadius": "2px",
+                      "display": "inline-flex",
+                      "height": "16px",
+                      "marginRight": "4px",
+                      "overflowX": "hidden",
+                      "overflowY": "hidden",
+                      "width": "8px",
+                    }
+                  }
+                >
+                  <div
+                    className="css-view-1dbjc4n"
+                    style={
+                      Object {
+                        "backgroundColor": "rgba(251,204,92,1.00)",
+                        "display": "inline-flex",
+                        "height": "16px",
+                        "width": "0%",
+                      }
+                    }
+                  />
+                </div>
+                <div
+                  className="css-view-1dbjc4n"
+                  style={
+                    Object {
+                      "backgroundColor": "rgba(255,255,255,0.20)",
+                      "borderBottomLeftRadius": "2px",
+                      "borderBottomRightRadius": "2px",
+                      "borderTopLeftRadius": "2px",
+                      "borderTopRightRadius": "2px",
+                      "display": "inline-flex",
+                      "height": "16px",
+                      "marginRight": "4px",
+                      "overflowX": "hidden",
+                      "overflowY": "hidden",
+                      "width": "8px",
+                    }
+                  }
+                >
+                  <div
+                    className="css-view-1dbjc4n"
+                    style={
+                      Object {
+                        "backgroundColor": "rgba(251,204,92,1.00)",
+                        "display": "inline-flex",
+                        "height": "16px",
+                        "width": "0%",
+                      }
+                    }
+                  />
+                </div>
+                <div
+                  className="css-view-1dbjc4n"
+                  style={
+                    Object {
+                      "backgroundColor": "rgba(255,255,255,0.20)",
+                      "borderBottomLeftRadius": "2px",
+                      "borderBottomRightRadius": "2px",
+                      "borderTopLeftRadius": "2px",
+                      "borderTopRightRadius": "2px",
+                      "display": "inline-flex",
+                      "height": "16px",
+                      "marginRight": "4px",
+                      "overflowX": "hidden",
+                      "overflowY": "hidden",
+                      "width": "8px",
+                    }
+                  }
+                >
+                  <div
+                    className="css-view-1dbjc4n"
+                    style={
+                      Object {
+                        "backgroundColor": "rgba(251,204,92,1.00)",
+                        "display": "inline-flex",
+                        "height": "16px",
+                        "width": "0%",
+                      }
+                    }
+                  />
+                </div>
+              </div>
+            </span>
+          </span>
+          <span
+            className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+            dir="auto"
+            style={
+              Object {
+                "WebkitBoxFlex": 0,
+                "WebkitFlexGrow": 0,
+                "color": "rgba(255,255,255,1.00)",
+                "flexGrow": 0,
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "maxWidth": "116px",
+                "minWidth": "116px",
+                "msFlexPositive": 0,
+                "paddingBottom": "12px",
+                "paddingLeft": "10px",
+                "paddingRight": "10px",
+                "paddingTop": "12px",
+                "textAlign": "center",
+              }
+            }
+          >
+            92,308
+          </span>
+          <span
+            className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+            dir="auto"
+            style={
+              Object {
+                "WebkitBoxFlex": 0,
+                "WebkitFlexGrow": 0,
+                "color": "rgba(255,255,255,1.00)",
+                "flexGrow": 0,
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "maxWidth": "116px",
+                "minWidth": "116px",
+                "msFlexPositive": 0,
+                "paddingBottom": "12px",
+                "paddingLeft": "10px",
+                "paddingRight": "10px",
+                "paddingTop": "12px",
+                "textAlign": "center",
+              }
+            }
+          >
+            10
+            %
+          </span>
+          <span
+            className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+            dir="auto"
+            style={
+              Object {
+                "WebkitBoxFlex": 0,
+                "WebkitFlexGrow": 0,
+                "color": "rgba(255,255,255,1.00)",
+                "flexGrow": 0,
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "maxWidth": "116px",
+                "minWidth": "116px",
+                "msFlexPositive": 0,
+                "paddingBottom": "12px",
+                "paddingLeft": "10px",
+                "paddingRight": "10px",
+                "paddingTop": "12px",
+                "textAlign": "center",
+              }
+            }
+          >
+            <span
+              className="css-text-901oao css-textHasAncestor-16my406"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(255,255,255,1.00)",
+                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                }
+              }
+            >
+              0.0%
+            </span>
+            <span
+              className="css-text-901oao css-textHasAncestor-16my406"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(255,255,255,1.00)",
+                  "display": "inline-flex",
+                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                  "height": "20px",
+                  "marginLeft": "8px",
+                  "position": "relative",
+                  "top": "4px",
+                  "width": "35px",
+                }
+              }
+            >
+              <span
+                className="css-text-901oao css-textHasAncestor-16my406"
+                dir="auto"
+                style={
+                  Object {
+                    "backgroundColor": "rgba(251,124,109,1.00)",
+                    "borderBottomLeftRadius": "2px",
+                    "borderBottomRightRadius": "2px",
+                    "borderTopLeftRadius": "2px",
+                    "borderTopRightRadius": "2px",
+                    "color": "rgba(255,255,255,1.00)",
+                    "display": "inline-flex",
+                    "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                    "height": "20px",
+                    "width": "0%",
+                  }
+                }
+              />
+            </span>
+          </span>
+          <span
+            className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+            dir="auto"
+            style={
+              Object {
+                "WebkitBoxFlex": 0,
+                "WebkitFlexGrow": 0,
+                "color": "rgba(255,255,255,1.00)",
+                "flexGrow": 0,
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "maxWidth": "80px",
+                "minWidth": "80px",
+                "msFlexPositive": 0,
+                "paddingBottom": "12px",
+                "paddingLeft": "10px",
+                "paddingRight": "10px",
+                "paddingTop": "12px",
+                "textAlign": "center",
+              }
+            }
+          >
+            0.0
+            %
+          </span>
+          <span
+            className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+            dir="auto"
+            style={
+              Object {
+                "WebkitBoxFlex": 0,
+                "WebkitFlexGrow": 0,
+                "color": "rgba(255,255,255,1.00)",
+                "flexGrow": 0,
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "maxWidth": "80px",
+                "minWidth": "80px",
+                "msFlexPositive": 0,
+                "paddingBottom": "12px",
+                "paddingLeft": "10px",
+                "paddingRight": "10px",
+                "paddingTop": "12px",
+                "textAlign": "center",
+              }
+            }
+          >
+            0.0
+            %
+          </span>
+        </div>
+      </div>
+    </div>
+    <div
+      onClick={[Function]}
+    >
+      <div
+        style={Object {}}
+      >
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitAlignItems": "center",
+              "WebkitBoxAlign": "center",
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxOrient": "horizontal",
+              "WebkitBoxPack": "justify",
+              "WebkitFlexDirection": "row",
+              "WebkitJustifyContent": "space-between",
+              "alignItems": "center",
+              "display": "flex",
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+              "msFlexAlign": "center",
+              "msFlexDirection": "row",
+              "msFlexPack": "justify",
+              "paddingTop": "10px",
+              "width": "100%",
+            }
+          }
+        >
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "WebkitBoxDirection": "normal",
+                "WebkitBoxFlex": 1,
+                "WebkitBoxOrient": "horizontal",
+                "WebkitFlexDirection": "row",
+                "WebkitFlexGrow": 1,
+                "cursor": "pointer",
+                "display": "flex",
+                "flexDirection": "row",
+                "flexGrow": 1,
+                "fontSize": "16px",
+                "msFlexDirection": "row",
+                "msFlexPositive": 1,
+                "paddingBottom": "12px",
+                "paddingLeft": "10px",
+                "paddingRight": "10px",
+                "paddingTop": "12px",
+                "width": "226px",
+              }
+            }
+          >
+            <span
+              className="css-text-901oao css-textHasAncestor-16my406"
+              dir="auto"
+              style={
+                Object {
+                  "WebkitBoxFlex": 0,
+                  "WebkitFlexGrow": 0,
+                  "color": "rgba(255,255,255,1.00)",
+                  "flexGrow": 0,
+                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                  "fontSize": "16px",
+                  "marginLeft": "15px",
+                  "marginRight": "20px",
+                  "msFlexPositive": 0,
+                  "paddingBottom": "12px",
+                  "paddingLeft": "10px",
+                  "paddingRight": "10px",
+                  "paddingTop": "12px",
+                  "textAlign": "center",
+                  "width": "20px",
+                }
+              }
+            >
+              <svg
+                fill="none"
+                height={10}
+                style={Object {}}
+                transform="rotate(0)"
+                viewBox="0 0 8 12"
+                width={10}
+              >
+                <path
+                  clipRule="evenodd"
+                  d="M1.19997 0L1.13249e-05 1.19996L4.80011 6.00006L0 10.8002L1.19996 12.0001L7.19977 6.00032L7.19953 6.00007L7.19979 5.99981L1.19997 0Z"
+                  fill="#FFFFFF"
+                  fillRule="evenodd"
+                  opacity={0.4}
+                  style={Object {}}
+                />
+              </svg>
+            </span>
+            <span
+              className="css-text-901oao css-textHasAncestor-16my406"
+              dir="auto"
+              style={
+                Object {
+                  "WebkitBoxDirection": "normal",
+                  "WebkitBoxOrient": "vertical",
+                  "WebkitFlexDirection": "column",
+                  "color": "rgba(255,255,255,1.00)",
+                  "display": "flex",
+                  "flexDirection": "column",
+                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                  "msFlexDirection": "column",
+                }
+              }
+            >
+              <span
+                className="css-text-901oao css-textHasAncestor-16my406"
+                dir="auto"
+                style={
+                  Object {
+                    "WebkitAlignItems": "center",
+                    "WebkitBoxAlign": "center",
+                    "WebkitBoxPack": "start",
+                    "WebkitJustifyContent": "flex-start",
+                    "alignItems": "center",
+                    "color": "rgba(255,255,255,1.00)",
+                    "display": "flex",
+                    "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                    "justifyContent": "flex-start",
+                    "msFlexAlign": "center",
+                    "msFlexPack": "start",
+                  }
+                }
+              >
+                <span
+                  className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+                  dir="auto"
+                  style={
+                    Object {
+                      "color": "rgba(255,255,255,1.00)",
+                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                      "fontWeight": "500",
+                      "maxWidth": "140px",
+                      "overflowX": "hidden",
+                      "overflowY": "hidden",
+                      "textDecoration": "underline",
+                      "textOverflow": "ellipsis",
+                      "whiteSpace": "nowrap",
+                    }
+                  }
+                >
+                  Test 2
+                </span>
+              </span>
+              <span
+                className="css-text-901oao css-textHasAncestor-16my406"
+                dir="auto"
+                style={
+                  Object {
+                    "WebkitBoxDirection": "normal",
+                    "WebkitBoxOrient": "horizontal",
+                    "WebkitFlexDirection": "row",
+                    "color": "rgba(171,173,175,1.00)",
+                    "display": "flex",
+                    "flexDirection": "row",
+                    "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                    "fontSize": "14px",
+                    "fontWeight": "normal",
+                    "msFlexDirection": "row",
+                    "paddingTop": "10px",
+                  }
+                }
+              >
+                <span
+                  className="css-text-901oao css-textHasAncestor-16my406"
+                  dir="auto"
+                  style={
+                    Object {
+                      "color": "rgba(171,173,175,1.00)",
+                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                    }
+                  }
+                >
+                  0x4F58...6B9F
+                </span>
+                <div
+                  className="css-view-1dbjc4n"
+                  onClick={[Function]}
+                  style={
+                    Object {
+                      "display": "inline-flex",
+                      "height": "14px",
+                      "paddingLeft": "8px",
+                      "paddingRight": "8px",
+                    }
+                  }
+                >
+                  <span
+                    className="css-text-901oao css-textHasAncestor-16my406"
+                    dir="auto"
+                    style={
+                      Object {
+                        "color": "rgba(171,173,175,1.00)",
+                        "cursor": "pointer",
+                        "display": "inline-flex",
+                        "fontSize": "16px",
+                        "height": "14px",
+                        "lineHeight": "14px",
+                      }
+                    }
+                  >
+                    <svg
+                      fill="none"
+                      height={16}
+                      style={Object {}}
+                      viewBox="0 0 16 16"
+                      width={16}
+                    >
+                      <path
+                        d="M10.6666 0.666687H2.66659C1.93325 0.666687 1.33325 1.26669 1.33325 2.00002V11.3334H2.66659V2.00002H10.6666V0.666687ZM9.99992 3.33335H5.33325C4.59992 3.33335 4.00659 3.93335 4.00659 4.66669L3.99992 14C3.99992 14.7334 4.59325 15.3334 5.32659 15.3334H12.6666C13.3999 15.3334 13.9999 14.7334 13.9999 14V7.33335L9.99992 3.33335ZM5.33325 14V4.66669H9.33325V8.00002H12.6666V14H5.33325Z"
+                        fill="#ABADAF"
+                        style={Object {}}
+                      />
+                    </svg>
+                  </span>
+                </div>
+              </span>
+            </span>
+          </div>
+          <span
+            className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+            dir="auto"
+            style={
+              Object {
+                "WebkitBoxFlex": 0,
+                "WebkitFlexGrow": 0,
+                "color": "rgba(255,255,255,1.00)",
+                "flexGrow": 0,
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "maxWidth": "116px",
+                "minWidth": "116px",
+                "msFlexPositive": 0,
+                "paddingBottom": "12px",
+                "paddingLeft": "10px",
+                "paddingRight": "10px",
+                "paddingTop": "12px",
+                "textAlign": "center",
+              }
+            }
+          >
+            <span
+              className="css-text-901oao css-textHasAncestor-16my406"
+              dir="auto"
+              style={
+                Object {
+                  "borderBottomWidth": "0px",
+                  "borderLeftColor": "rgba(171,173,175,1.00)",
+                  "borderLeftWidth": "0px",
+                  "borderRightWidth": "0px",
+                  "borderTopWidth": "0px",
+                  "color": "rgba(255,255,255,1.00)",
+                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                  "paddingLeft": "10px",
+                  "paddingRight": "10px",
+                }
+              }
+            >
+              0
+            </span>
+            <span
+              className="css-text-901oao css-textHasAncestor-16my406"
+              dir="auto"
+              style={
+                Object {
+                  "borderBottomWidth": "0px",
+                  "borderLeftColor": "rgba(171,173,175,1.00)",
+                  "borderLeftWidth": "1px",
+                  "borderRightWidth": "0px",
+                  "borderTopWidth": "0px",
+                  "color": "rgba(255,255,255,1.00)",
+                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                  "paddingLeft": "10px",
+                  "paddingRight": "10px",
+                }
+              }
+            >
+              0
+            </span>
+          </span>
+          <span
+            className="css-text-901oao css-textHasAncestor-16my406"
+            dir="auto"
+            style={
+              Object {
+                "WebkitBoxDirection": "normal",
+                "WebkitBoxFlex": 0,
+                "WebkitBoxOrient": "horizontal",
+                "WebkitFlexDirection": "row",
+                "WebkitFlexGrow": 0,
+                "color": "rgba(255,255,255,1.00)",
+                "display": "flex",
+                "flexDirection": "row",
+                "flexGrow": 0,
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "maxWidth": "170px",
+                "minWidth": "170px",
+                "msFlexDirection": "row",
+                "msFlexPositive": 0,
+                "paddingBottom": "12px",
+                "paddingLeft": "10px",
+                "paddingRight": "10px",
+                "paddingTop": "12px",
+              }
+            }
+          >
+            <span
+              className="css-text-901oao css-textHasAncestor-16my406"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(255,255,255,1.00)",
+                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                  "fontSize": "14px",
+                  "fontWeight": "500",
+                  "paddingRight": "8px",
+                }
+              }
+            >
+              0.4
+              %
+            </span>
+            <span
+              className="css-text-901oao css-textHasAncestor-16my406"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(255,255,255,1.00)",
+                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                }
+              }
+            >
+              <span
+                className="css-text-901oao css-textHasAncestor-16my406"
+                dir="auto"
+                style={
+                  Object {
+                    "color": "rgba(171,173,175,1.00)",
+                    "display": "flex",
+                    "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                    "fontSize": "14px",
+                    "fontWeight": "500",
+                    "paddingBottom": "2px",
+                  }
+                }
+              >
+                5.0
+                % of 
+                8.3
+                %
+              </span>
+              <div
+                className="css-view-1dbjc4n"
+                style={
+                  Object {
+                    "WebkitBoxDirection": "normal",
+                    "WebkitBoxOrient": "horizontal",
+                    "WebkitFlexDirection": "row",
+                    "display": "flex",
+                    "flexDirection": "row",
+                    "height": "16px",
+                    "msFlexDirection": "row",
+                  }
+                }
+              >
+                <div
+                  className="css-view-1dbjc4n"
+                  style={
+                    Object {
+                      "backgroundColor": "rgba(255,255,255,0.20)",
+                      "borderBottomLeftRadius": "2px",
+                      "borderBottomRightRadius": "2px",
+                      "borderTopLeftRadius": "2px",
+                      "borderTopRightRadius": "2px",
+                      "display": "inline-flex",
+                      "height": "16px",
+                      "marginRight": "4px",
+                      "overflowX": "hidden",
+                      "overflowY": "hidden",
+                      "width": "8px",
+                    }
+                  }
+                >
+                  <div
+                    className="css-view-1dbjc4n"
+                    style={
+                      Object {
+                        "backgroundColor": "rgba(251,204,92,1.00)",
+                        "display": "inline-flex",
+                        "height": "16px",
+                        "width": "24%",
+                      }
+                    }
+                  />
+                </div>
+                <div
+                  className="css-view-1dbjc4n"
+                  style={
+                    Object {
+                      "backgroundColor": "rgba(255,255,255,0.20)",
+                      "borderBottomLeftRadius": "2px",
+                      "borderBottomRightRadius": "2px",
+                      "borderTopLeftRadius": "2px",
+                      "borderTopRightRadius": "2px",
+                      "display": "inline-flex",
+                      "height": "16px",
+                      "marginRight": "4px",
+                      "overflowX": "hidden",
+                      "overflowY": "hidden",
+                      "width": "8px",
+                    }
+                  }
+                >
+                  <div
+                    className="css-view-1dbjc4n"
+                    style={
+                      Object {
+                        "backgroundColor": "rgba(251,204,92,1.00)",
+                        "display": "inline-flex",
+                        "height": "16px",
+                        "width": "0%",
+                      }
+                    }
+                  />
+                </div>
+                <div
+                  className="css-view-1dbjc4n"
+                  style={
+                    Object {
+                      "backgroundColor": "rgba(255,255,255,0.20)",
+                      "borderBottomLeftRadius": "2px",
+                      "borderBottomRightRadius": "2px",
+                      "borderTopLeftRadius": "2px",
+                      "borderTopRightRadius": "2px",
+                      "display": "inline-flex",
+                      "height": "16px",
+                      "marginRight": "4px",
+                      "overflowX": "hidden",
+                      "overflowY": "hidden",
+                      "width": "8px",
+                    }
+                  }
+                >
+                  <div
+                    className="css-view-1dbjc4n"
+                    style={
+                      Object {
+                        "backgroundColor": "rgba(251,204,92,1.00)",
+                        "display": "inline-flex",
+                        "height": "16px",
+                        "width": "0%",
+                      }
+                    }
+                  />
+                </div>
+                <div
+                  className="css-view-1dbjc4n"
+                  style={
+                    Object {
+                      "backgroundColor": "rgba(255,255,255,0.20)",
+                      "borderBottomLeftRadius": "2px",
+                      "borderBottomRightRadius": "2px",
+                      "borderTopLeftRadius": "2px",
+                      "borderTopRightRadius": "2px",
+                      "display": "inline-flex",
+                      "height": "16px",
+                      "marginRight": "4px",
+                      "overflowX": "hidden",
+                      "overflowY": "hidden",
+                      "width": "8px",
+                    }
+                  }
+                >
+                  <div
+                    className="css-view-1dbjc4n"
+                    style={
+                      Object {
+                        "backgroundColor": "rgba(251,204,92,1.00)",
+                        "display": "inline-flex",
+                        "height": "16px",
+                        "width": "0%",
+                      }
+                    }
+                  />
+                </div>
+                <div
+                  className="css-view-1dbjc4n"
+                  style={
+                    Object {
+                      "backgroundColor": "rgba(255,255,255,0.20)",
+                      "borderBottomLeftRadius": "2px",
+                      "borderBottomRightRadius": "2px",
+                      "borderTopLeftRadius": "2px",
+                      "borderTopRightRadius": "2px",
+                      "display": "inline-flex",
+                      "height": "16px",
+                      "marginRight": "4px",
+                      "overflowX": "hidden",
+                      "overflowY": "hidden",
+                      "width": "8px",
+                    }
+                  }
+                >
+                  <div
+                    className="css-view-1dbjc4n"
+                    style={
+                      Object {
+                        "backgroundColor": "rgba(251,204,92,1.00)",
+                        "display": "inline-flex",
+                        "height": "16px",
+                        "width": "0%",
+                      }
+                    }
+                  />
+                </div>
+                <div
+                  className="css-view-1dbjc4n"
+                  style={
+                    Object {
+                      "backgroundColor": "rgba(255,255,255,0.20)",
+                      "borderBottomLeftRadius": "2px",
+                      "borderBottomRightRadius": "2px",
+                      "borderTopLeftRadius": "2px",
+                      "borderTopRightRadius": "2px",
+                      "display": "inline-flex",
+                      "height": "16px",
+                      "marginRight": "4px",
+                      "overflowX": "hidden",
+                      "overflowY": "hidden",
+                      "width": "8px",
+                    }
+                  }
+                >
+                  <div
+                    className="css-view-1dbjc4n"
+                    style={
+                      Object {
+                        "backgroundColor": "rgba(251,204,92,1.00)",
+                        "display": "inline-flex",
+                        "height": "16px",
+                        "width": "0%",
+                      }
+                    }
+                  />
+                </div>
+              </div>
+            </span>
+          </span>
+          <span
+            className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+            dir="auto"
+            style={
+              Object {
+                "WebkitBoxFlex": 0,
+                "WebkitFlexGrow": 0,
+                "color": "rgba(255,255,255,1.00)",
+                "flexGrow": 0,
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "maxWidth": "116px",
+                "minWidth": "116px",
+                "msFlexPositive": 0,
+                "paddingBottom": "12px",
+                "paddingLeft": "10px",
+                "paddingRight": "10px",
+                "paddingTop": "12px",
+                "textAlign": "center",
+              }
+            }
+          >
+            10,000
+          </span>
+          <span
+            className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+            dir="auto"
+            style={
+              Object {
+                "WebkitBoxFlex": 0,
+                "WebkitFlexGrow": 0,
+                "color": "rgba(255,255,255,1.00)",
+                "flexGrow": 0,
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "maxWidth": "116px",
+                "minWidth": "116px",
+                "msFlexPositive": 0,
+                "paddingBottom": "12px",
+                "paddingLeft": "10px",
+                "paddingRight": "10px",
+                "paddingTop": "12px",
+                "textAlign": "center",
+              }
+            }
+          >
+            10
+            %
+          </span>
+          <span
+            className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+            dir="auto"
+            style={
+              Object {
+                "WebkitBoxFlex": 0,
+                "WebkitFlexGrow": 0,
+                "color": "rgba(255,255,255,1.00)",
+                "flexGrow": 0,
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "maxWidth": "116px",
+                "minWidth": "116px",
+                "msFlexPositive": 0,
+                "paddingBottom": "12px",
+                "paddingLeft": "10px",
+                "paddingRight": "10px",
+                "paddingTop": "12px",
+                "textAlign": "center",
+              }
+            }
+          >
+            <span
+              className="css-text-901oao css-textHasAncestor-16my406"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(255,255,255,1.00)",
+                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                }
+              }
+            >
+              0.0%
+            </span>
+            <span
+              className="css-text-901oao css-textHasAncestor-16my406"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(255,255,255,1.00)",
+                  "display": "inline-flex",
+                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                  "height": "20px",
+                  "marginLeft": "8px",
+                  "position": "relative",
+                  "top": "4px",
+                  "width": "35px",
+                }
+              }
+            >
+              <span
+                className="css-text-901oao css-textHasAncestor-16my406"
+                dir="auto"
+                style={
+                  Object {
+                    "backgroundColor": "rgba(251,124,109,1.00)",
+                    "borderBottomLeftRadius": "2px",
+                    "borderBottomRightRadius": "2px",
+                    "borderTopLeftRadius": "2px",
+                    "borderTopRightRadius": "2px",
+                    "color": "rgba(255,255,255,1.00)",
+                    "display": "inline-flex",
+                    "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                    "height": "20px",
+                    "width": "0%",
+                  }
+                }
+              />
+            </span>
+          </span>
+          <span
+            className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+            dir="auto"
+            style={
+              Object {
+                "WebkitBoxFlex": 0,
+                "WebkitFlexGrow": 0,
+                "color": "rgba(255,255,255,1.00)",
+                "flexGrow": 0,
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "maxWidth": "80px",
+                "minWidth": "80px",
+                "msFlexPositive": 0,
+                "paddingBottom": "12px",
+                "paddingLeft": "10px",
+                "paddingRight": "10px",
+                "paddingTop": "12px",
+                "textAlign": "center",
+              }
+            }
+          >
+            0.0
+            %
+          </span>
+          <span
+            className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+            dir="auto"
+            style={
+              Object {
+                "WebkitBoxFlex": 0,
+                "WebkitFlexGrow": 0,
+                "color": "rgba(255,255,255,1.00)",
+                "flexGrow": 0,
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "maxWidth": "80px",
+                "minWidth": "80px",
+                "msFlexPositive": 0,
+                "paddingBottom": "12px",
+                "paddingLeft": "10px",
+                "paddingRight": "10px",
+                "paddingTop": "12px",
+                "textAlign": "center",
+              }
+            }
+          >
+            0.0
+            %
+          </span>
+        </div>
+      </div>
+    </div>
+    <div
+      onClick={[Function]}
+    >
+      <div
+        style={Object {}}
+      >
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitAlignItems": "center",
+              "WebkitBoxAlign": "center",
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxOrient": "horizontal",
+              "WebkitBoxPack": "justify",
+              "WebkitFlexDirection": "row",
+              "WebkitJustifyContent": "space-between",
+              "alignItems": "center",
+              "display": "flex",
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+              "msFlexAlign": "center",
+              "msFlexDirection": "row",
+              "msFlexPack": "justify",
+              "paddingTop": "10px",
+              "width": "100%",
+            }
+          }
+        >
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "WebkitBoxDirection": "normal",
+                "WebkitBoxFlex": 1,
+                "WebkitBoxOrient": "horizontal",
+                "WebkitFlexDirection": "row",
+                "WebkitFlexGrow": 1,
+                "cursor": "pointer",
+                "display": "flex",
+                "flexDirection": "row",
+                "flexGrow": 1,
+                "fontSize": "16px",
+                "msFlexDirection": "row",
+                "msFlexPositive": 1,
+                "paddingBottom": "12px",
+                "paddingLeft": "10px",
+                "paddingRight": "10px",
+                "paddingTop": "12px",
+                "width": "226px",
+              }
+            }
+          >
+            <span
+              className="css-text-901oao css-textHasAncestor-16my406"
+              dir="auto"
+              style={
+                Object {
+                  "WebkitBoxFlex": 0,
+                  "WebkitFlexGrow": 0,
+                  "color": "rgba(255,255,255,1.00)",
+                  "flexGrow": 0,
+                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                  "fontSize": "16px",
+                  "marginLeft": "15px",
+                  "marginRight": "20px",
+                  "msFlexPositive": 0,
+                  "paddingBottom": "12px",
+                  "paddingLeft": "10px",
+                  "paddingRight": "10px",
+                  "paddingTop": "12px",
+                  "textAlign": "center",
+                  "width": "20px",
+                }
+              }
+            >
+              <svg
+                fill="none"
+                height={10}
+                style={Object {}}
+                transform="rotate(0)"
+                viewBox="0 0 8 12"
+                width={10}
+              >
+                <path
+                  clipRule="evenodd"
+                  d="M1.19997 0L1.13249e-05 1.19996L4.80011 6.00006L0 10.8002L1.19996 12.0001L7.19977 6.00032L7.19953 6.00007L7.19979 5.99981L1.19997 0Z"
+                  fill="#FFFFFF"
+                  fillRule="evenodd"
+                  opacity={0.4}
+                  style={Object {}}
+                />
+              </svg>
+            </span>
+            <span
+              className="css-text-901oao css-textHasAncestor-16my406"
+              dir="auto"
+              style={
+                Object {
+                  "WebkitBoxDirection": "normal",
+                  "WebkitBoxOrient": "vertical",
+                  "WebkitFlexDirection": "column",
+                  "color": "rgba(255,255,255,1.00)",
+                  "display": "flex",
+                  "flexDirection": "column",
+                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                  "msFlexDirection": "column",
+                }
+              }
+            >
+              <span
+                className="css-text-901oao css-textHasAncestor-16my406"
+                dir="auto"
+                style={
+                  Object {
+                    "WebkitAlignItems": "center",
+                    "WebkitBoxAlign": "center",
+                    "WebkitBoxPack": "start",
+                    "WebkitJustifyContent": "flex-start",
+                    "alignItems": "center",
+                    "color": "rgba(255,255,255,1.00)",
+                    "display": "flex",
+                    "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                    "justifyContent": "flex-start",
+                    "msFlexAlign": "center",
+                    "msFlexPack": "start",
+                  }
+                }
+              >
+                <span
+                  className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+                  dir="auto"
+                  style={
+                    Object {
+                      "color": "rgba(255,255,255,1.00)",
+                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                      "fontWeight": "500",
+                      "maxWidth": "140px",
+                      "overflowX": "hidden",
+                      "overflowY": "hidden",
+                      "textDecoration": "underline",
+                      "textOverflow": "ellipsis",
+                      "whiteSpace": "nowrap",
+                    }
+                  }
+                >
+                  Test 3
+                </span>
+              </span>
+              <span
+                className="css-text-901oao css-textHasAncestor-16my406"
+                dir="auto"
+                style={
+                  Object {
+                    "WebkitBoxDirection": "normal",
+                    "WebkitBoxOrient": "horizontal",
+                    "WebkitFlexDirection": "row",
+                    "color": "rgba(171,173,175,1.00)",
+                    "display": "flex",
+                    "flexDirection": "row",
+                    "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                    "fontSize": "14px",
+                    "fontWeight": "normal",
+                    "msFlexDirection": "row",
+                    "paddingTop": "10px",
+                  }
+                }
+              >
+                <span
+                  className="css-text-901oao css-textHasAncestor-16my406"
+                  dir="auto"
+                  style={
+                    Object {
+                      "color": "rgba(171,173,175,1.00)",
+                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                    }
+                  }
+                >
+                  0x57B1...B737
+                </span>
+                <div
+                  className="css-view-1dbjc4n"
+                  onClick={[Function]}
+                  style={
+                    Object {
+                      "display": "inline-flex",
+                      "height": "14px",
+                      "paddingLeft": "8px",
+                      "paddingRight": "8px",
+                    }
+                  }
+                >
+                  <span
+                    className="css-text-901oao css-textHasAncestor-16my406"
+                    dir="auto"
+                    style={
+                      Object {
+                        "color": "rgba(171,173,175,1.00)",
+                        "cursor": "pointer",
+                        "display": "inline-flex",
+                        "fontSize": "16px",
+                        "height": "14px",
+                        "lineHeight": "14px",
+                      }
+                    }
+                  >
+                    <svg
+                      fill="none"
+                      height={16}
+                      style={Object {}}
+                      viewBox="0 0 16 16"
+                      width={16}
+                    >
+                      <path
+                        d="M10.6666 0.666687H2.66659C1.93325 0.666687 1.33325 1.26669 1.33325 2.00002V11.3334H2.66659V2.00002H10.6666V0.666687ZM9.99992 3.33335H5.33325C4.59992 3.33335 4.00659 3.93335 4.00659 4.66669L3.99992 14C3.99992 14.7334 4.59325 15.3334 5.32659 15.3334H12.6666C13.3999 15.3334 13.9999 14.7334 13.9999 14V7.33335L9.99992 3.33335ZM5.33325 14V4.66669H9.33325V8.00002H12.6666V14H5.33325Z"
+                        fill="#ABADAF"
+                        style={Object {}}
+                      />
+                    </svg>
+                  </span>
+                </div>
+              </span>
+            </span>
+          </div>
+          <span
+            className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+            dir="auto"
+            style={
+              Object {
+                "WebkitBoxFlex": 0,
+                "WebkitFlexGrow": 0,
+                "color": "rgba(255,255,255,1.00)",
+                "flexGrow": 0,
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "maxWidth": "116px",
+                "minWidth": "116px",
+                "msFlexPositive": 0,
+                "paddingBottom": "12px",
+                "paddingLeft": "10px",
+                "paddingRight": "10px",
+                "paddingTop": "12px",
+                "textAlign": "center",
+              }
+            }
+          >
+            <span
+              className="css-text-901oao css-textHasAncestor-16my406"
+              dir="auto"
+              style={
+                Object {
+                  "borderBottomWidth": "0px",
+                  "borderLeftColor": "rgba(171,173,175,1.00)",
+                  "borderLeftWidth": "0px",
+                  "borderRightWidth": "0px",
+                  "borderTopWidth": "0px",
+                  "color": "rgba(255,255,255,1.00)",
+                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                  "paddingLeft": "10px",
+                  "paddingRight": "10px",
+                }
+              }
+            >
+              1
+            </span>
+            <span
+              className="css-text-901oao css-textHasAncestor-16my406"
+              dir="auto"
+              style={
+                Object {
+                  "borderBottomWidth": "0px",
+                  "borderLeftColor": "rgba(171,173,175,1.00)",
+                  "borderLeftWidth": "1px",
+                  "borderRightWidth": "0px",
+                  "borderTopWidth": "0px",
+                  "color": "rgba(255,255,255,1.00)",
+                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                  "paddingLeft": "10px",
+                  "paddingRight": "10px",
+                }
+              }
+            >
+              0
+            </span>
+          </span>
+          <span
+            className="css-text-901oao css-textHasAncestor-16my406"
+            dir="auto"
+            style={
+              Object {
+                "WebkitBoxDirection": "normal",
+                "WebkitBoxFlex": 0,
+                "WebkitBoxOrient": "horizontal",
+                "WebkitFlexDirection": "row",
+                "WebkitFlexGrow": 0,
+                "color": "rgba(255,255,255,1.00)",
+                "display": "flex",
+                "flexDirection": "row",
+                "flexGrow": 0,
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "maxWidth": "170px",
+                "minWidth": "170px",
+                "msFlexDirection": "row",
+                "msFlexPositive": 0,
+                "paddingBottom": "12px",
+                "paddingLeft": "10px",
+                "paddingRight": "10px",
+                "paddingTop": "12px",
+              }
+            }
+          >
+            <span
+              className="css-text-901oao css-textHasAncestor-16my406"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(255,255,255,1.00)",
+                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                  "fontSize": "14px",
+                  "fontWeight": "500",
+                  "paddingRight": "8px",
+                }
+              }
+            >
+              0.5
+              %
+            </span>
+            <span
+              className="css-text-901oao css-textHasAncestor-16my406"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(255,255,255,1.00)",
+                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                }
+              }
+            >
+              <span
+                className="css-text-901oao css-textHasAncestor-16my406"
+                dir="auto"
+                style={
+                  Object {
+                    "color": "rgba(171,173,175,1.00)",
+                    "display": "flex",
+                    "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                    "fontSize": "14px",
+                    "fontWeight": "500",
+                    "paddingBottom": "2px",
+                  }
+                }
+              >
+                6.0
+                % of 
+                8.3
+                %
+              </span>
+              <div
+                className="css-view-1dbjc4n"
+                style={
+                  Object {
+                    "WebkitBoxDirection": "normal",
+                    "WebkitBoxOrient": "horizontal",
+                    "WebkitFlexDirection": "row",
+                    "display": "flex",
+                    "flexDirection": "row",
+                    "height": "16px",
+                    "msFlexDirection": "row",
+                  }
+                }
+              >
+                <div
+                  className="css-view-1dbjc4n"
+                  style={
+                    Object {
+                      "backgroundColor": "rgba(255,255,255,0.20)",
+                      "borderBottomLeftRadius": "2px",
+                      "borderBottomRightRadius": "2px",
+                      "borderTopLeftRadius": "2px",
+                      "borderTopRightRadius": "2px",
+                      "display": "inline-flex",
+                      "height": "16px",
+                      "marginRight": "4px",
+                      "overflowX": "hidden",
+                      "overflowY": "hidden",
+                      "width": "8px",
+                    }
+                  }
+                >
+                  <div
+                    className="css-view-1dbjc4n"
+                    style={
+                      Object {
+                        "backgroundColor": "rgba(251,204,92,1.00)",
+                        "display": "inline-flex",
+                        "height": "16px",
+                        "width": "36%",
+                      }
+                    }
+                  />
+                </div>
+                <div
+                  className="css-view-1dbjc4n"
+                  style={
+                    Object {
+                      "backgroundColor": "rgba(255,255,255,0.20)",
+                      "borderBottomLeftRadius": "2px",
+                      "borderBottomRightRadius": "2px",
+                      "borderTopLeftRadius": "2px",
+                      "borderTopRightRadius": "2px",
+                      "display": "inline-flex",
+                      "height": "16px",
+                      "marginRight": "4px",
+                      "overflowX": "hidden",
+                      "overflowY": "hidden",
+                      "width": "8px",
+                    }
+                  }
+                >
+                  <div
+                    className="css-view-1dbjc4n"
+                    style={
+                      Object {
+                        "backgroundColor": "rgba(251,204,92,1.00)",
+                        "display": "inline-flex",
+                        "height": "16px",
+                        "width": "0%",
+                      }
+                    }
+                  />
+                </div>
+                <div
+                  className="css-view-1dbjc4n"
+                  style={
+                    Object {
+                      "backgroundColor": "rgba(255,255,255,0.20)",
+                      "borderBottomLeftRadius": "2px",
+                      "borderBottomRightRadius": "2px",
+                      "borderTopLeftRadius": "2px",
+                      "borderTopRightRadius": "2px",
+                      "display": "inline-flex",
+                      "height": "16px",
+                      "marginRight": "4px",
+                      "overflowX": "hidden",
+                      "overflowY": "hidden",
+                      "width": "8px",
+                    }
+                  }
+                >
+                  <div
+                    className="css-view-1dbjc4n"
+                    style={
+                      Object {
+                        "backgroundColor": "rgba(251,204,92,1.00)",
+                        "display": "inline-flex",
+                        "height": "16px",
+                        "width": "0%",
+                      }
+                    }
+                  />
+                </div>
+                <div
+                  className="css-view-1dbjc4n"
+                  style={
+                    Object {
+                      "backgroundColor": "rgba(255,255,255,0.20)",
+                      "borderBottomLeftRadius": "2px",
+                      "borderBottomRightRadius": "2px",
+                      "borderTopLeftRadius": "2px",
+                      "borderTopRightRadius": "2px",
+                      "display": "inline-flex",
+                      "height": "16px",
+                      "marginRight": "4px",
+                      "overflowX": "hidden",
+                      "overflowY": "hidden",
+                      "width": "8px",
+                    }
+                  }
+                >
+                  <div
+                    className="css-view-1dbjc4n"
+                    style={
+                      Object {
+                        "backgroundColor": "rgba(251,204,92,1.00)",
+                        "display": "inline-flex",
+                        "height": "16px",
+                        "width": "0%",
+                      }
+                    }
+                  />
+                </div>
+                <div
+                  className="css-view-1dbjc4n"
+                  style={
+                    Object {
+                      "backgroundColor": "rgba(255,255,255,0.20)",
+                      "borderBottomLeftRadius": "2px",
+                      "borderBottomRightRadius": "2px",
+                      "borderTopLeftRadius": "2px",
+                      "borderTopRightRadius": "2px",
+                      "display": "inline-flex",
+                      "height": "16px",
+                      "marginRight": "4px",
+                      "overflowX": "hidden",
+                      "overflowY": "hidden",
+                      "width": "8px",
+                    }
+                  }
+                >
+                  <div
+                    className="css-view-1dbjc4n"
+                    style={
+                      Object {
+                        "backgroundColor": "rgba(251,204,92,1.00)",
+                        "display": "inline-flex",
+                        "height": "16px",
+                        "width": "0%",
+                      }
+                    }
+                  />
+                </div>
+                <div
+                  className="css-view-1dbjc4n"
+                  style={
+                    Object {
+                      "backgroundColor": "rgba(255,255,255,0.20)",
+                      "borderBottomLeftRadius": "2px",
+                      "borderBottomRightRadius": "2px",
+                      "borderTopLeftRadius": "2px",
+                      "borderTopRightRadius": "2px",
+                      "display": "inline-flex",
+                      "height": "16px",
+                      "marginRight": "4px",
+                      "overflowX": "hidden",
+                      "overflowY": "hidden",
+                      "width": "8px",
+                    }
+                  }
+                >
+                  <div
+                    className="css-view-1dbjc4n"
+                    style={
+                      Object {
+                        "backgroundColor": "rgba(251,204,92,1.00)",
+                        "display": "inline-flex",
+                        "height": "16px",
+                        "width": "0%",
+                      }
+                    }
+                  />
+                </div>
+              </div>
+            </span>
+          </span>
+          <span
+            className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+            dir="auto"
+            style={
+              Object {
+                "WebkitBoxFlex": 0,
+                "WebkitFlexGrow": 0,
+                "color": "rgba(255,255,255,1.00)",
+                "flexGrow": 0,
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "maxWidth": "116px",
+                "minWidth": "116px",
+                "msFlexPositive": 0,
+                "paddingBottom": "12px",
+                "paddingLeft": "10px",
+                "paddingRight": "10px",
+                "paddingTop": "12px",
+                "textAlign": "center",
+              }
+            }
+          >
+            12,038
+          </span>
+          <span
+            className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+            dir="auto"
+            style={
+              Object {
+                "WebkitBoxFlex": 0,
+                "WebkitFlexGrow": 0,
+                "color": "rgba(255,255,255,1.00)",
+                "flexGrow": 0,
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "maxWidth": "116px",
+                "minWidth": "116px",
+                "msFlexPositive": 0,
+                "paddingBottom": "12px",
+                "paddingLeft": "10px",
+                "paddingRight": "10px",
+                "paddingTop": "12px",
+                "textAlign": "center",
+              }
+            }
+          >
+            10
+            %
+          </span>
+          <span
+            className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+            dir="auto"
+            style={
+              Object {
+                "WebkitBoxFlex": 0,
+                "WebkitFlexGrow": 0,
+                "color": "rgba(255,255,255,1.00)",
+                "flexGrow": 0,
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "maxWidth": "116px",
+                "minWidth": "116px",
+                "msFlexPositive": 0,
+                "paddingBottom": "12px",
+                "paddingLeft": "10px",
+                "paddingRight": "10px",
+                "paddingTop": "12px",
+                "textAlign": "center",
+              }
+            }
+          >
+            <span
+              className="css-text-901oao css-textHasAncestor-16my406"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(255,255,255,1.00)",
+                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                }
+              }
+            >
+              0.0%
+            </span>
+            <span
+              className="css-text-901oao css-textHasAncestor-16my406"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(255,255,255,1.00)",
+                  "display": "inline-flex",
+                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                  "height": "20px",
+                  "marginLeft": "8px",
+                  "position": "relative",
+                  "top": "4px",
+                  "width": "35px",
+                }
+              }
+            >
+              <span
+                className="css-text-901oao css-textHasAncestor-16my406"
+                dir="auto"
+                style={
+                  Object {
+                    "backgroundColor": "rgba(251,124,109,1.00)",
+                    "borderBottomLeftRadius": "2px",
+                    "borderBottomRightRadius": "2px",
+                    "borderTopLeftRadius": "2px",
+                    "borderTopRightRadius": "2px",
+                    "color": "rgba(255,255,255,1.00)",
+                    "display": "inline-flex",
+                    "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                    "height": "20px",
+                    "width": "0%",
+                  }
+                }
+              />
+            </span>
+          </span>
+          <span
+            className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+            dir="auto"
+            style={
+              Object {
+                "WebkitBoxFlex": 0,
+                "WebkitFlexGrow": 0,
+                "color": "rgba(255,255,255,1.00)",
+                "flexGrow": 0,
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "maxWidth": "80px",
+                "minWidth": "80px",
+                "msFlexPositive": 0,
+                "paddingBottom": "12px",
+                "paddingLeft": "10px",
+                "paddingRight": "10px",
+                "paddingTop": "12px",
+                "textAlign": "center",
+              }
+            }
+          >
+            34.4
+            %
+          </span>
+          <span
+            className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+            dir="auto"
+            style={
+              Object {
+                "WebkitBoxFlex": 0,
+                "WebkitFlexGrow": 0,
+                "color": "rgba(255,255,255,1.00)",
+                "flexGrow": 0,
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "maxWidth": "80px",
+                "minWidth": "80px",
+                "msFlexPositive": 0,
+                "paddingBottom": "12px",
+                "paddingLeft": "10px",
+                "paddingRight": "10px",
+                "paddingTop": "12px",
+                "textAlign": "center",
+              }
+            }
+          >
+            0.0
+            %
+          </span>
+        </div>
+      </div>
+    </div>
+    <div
+      onClick={[Function]}
+    >
+      <div
+        style={Object {}}
+      >
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitAlignItems": "center",
+              "WebkitBoxAlign": "center",
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxOrient": "horizontal",
+              "WebkitBoxPack": "justify",
+              "WebkitFlexDirection": "row",
+              "WebkitJustifyContent": "space-between",
+              "alignItems": "center",
+              "display": "flex",
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+              "msFlexAlign": "center",
+              "msFlexDirection": "row",
+              "msFlexPack": "justify",
+              "paddingTop": "10px",
+              "width": "100%",
+            }
+          }
+        >
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "WebkitBoxDirection": "normal",
+                "WebkitBoxFlex": 1,
+                "WebkitBoxOrient": "horizontal",
+                "WebkitFlexDirection": "row",
+                "WebkitFlexGrow": 1,
+                "cursor": "pointer",
+                "display": "flex",
+                "flexDirection": "row",
+                "flexGrow": 1,
+                "fontSize": "16px",
+                "msFlexDirection": "row",
+                "msFlexPositive": 1,
+                "paddingBottom": "12px",
+                "paddingLeft": "10px",
+                "paddingRight": "10px",
+                "paddingTop": "12px",
+                "width": "226px",
+              }
+            }
+          >
+            <span
+              className="css-text-901oao css-textHasAncestor-16my406"
+              dir="auto"
+              style={
+                Object {
+                  "WebkitBoxFlex": 0,
+                  "WebkitFlexGrow": 0,
+                  "color": "rgba(255,255,255,1.00)",
+                  "flexGrow": 0,
+                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                  "fontSize": "16px",
+                  "marginLeft": "15px",
+                  "marginRight": "20px",
+                  "msFlexPositive": 0,
+                  "paddingBottom": "12px",
+                  "paddingLeft": "10px",
+                  "paddingRight": "10px",
+                  "paddingTop": "12px",
+                  "textAlign": "center",
+                  "width": "20px",
+                }
+              }
+            >
+              <svg
+                fill="none"
+                height={10}
+                style={Object {}}
+                transform="rotate(0)"
+                viewBox="0 0 8 12"
+                width={10}
+              >
+                <path
+                  clipRule="evenodd"
+                  d="M1.19997 0L1.13249e-05 1.19996L4.80011 6.00006L0 10.8002L1.19996 12.0001L7.19977 6.00032L7.19953 6.00007L7.19979 5.99981L1.19997 0Z"
+                  fill="#FFFFFF"
+                  fillRule="evenodd"
+                  opacity={0.4}
+                  style={Object {}}
+                />
+              </svg>
+            </span>
+            <span
+              className="css-text-901oao css-textHasAncestor-16my406"
+              dir="auto"
+              style={
+                Object {
+                  "WebkitBoxDirection": "normal",
+                  "WebkitBoxOrient": "vertical",
+                  "WebkitFlexDirection": "column",
+                  "color": "rgba(255,255,255,1.00)",
+                  "display": "flex",
+                  "flexDirection": "column",
+                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                  "msFlexDirection": "column",
+                }
+              }
+            >
+              <span
+                className="css-text-901oao css-textHasAncestor-16my406"
+                dir="auto"
+                style={
+                  Object {
+                    "WebkitAlignItems": "center",
+                    "WebkitBoxAlign": "center",
+                    "WebkitBoxPack": "start",
+                    "WebkitJustifyContent": "flex-start",
+                    "alignItems": "center",
+                    "color": "rgba(255,255,255,1.00)",
+                    "display": "flex",
+                    "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                    "justifyContent": "flex-start",
+                    "msFlexAlign": "center",
+                    "msFlexPack": "start",
+                  }
+                }
+              >
+                <span
+                  className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+                  dir="auto"
+                  style={
+                    Object {
+                      "color": "rgba(255,255,255,1.00)",
+                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                      "fontWeight": "500",
+                      "maxWidth": "140px",
+                      "overflowX": "hidden",
+                      "overflowY": "hidden",
+                      "textDecoration": "underline",
+                      "textOverflow": "ellipsis",
+                      "whiteSpace": "nowrap",
+                    }
+                  }
+                >
+                  Test 4
+                </span>
+              </span>
+              <span
+                className="css-text-901oao css-textHasAncestor-16my406"
+                dir="auto"
+                style={
+                  Object {
+                    "WebkitBoxDirection": "normal",
+                    "WebkitBoxOrient": "horizontal",
+                    "WebkitFlexDirection": "row",
+                    "color": "rgba(171,173,175,1.00)",
+                    "display": "flex",
+                    "flexDirection": "row",
+                    "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                    "fontSize": "14px",
+                    "fontWeight": "normal",
+                    "msFlexDirection": "row",
+                    "paddingTop": "10px",
+                  }
+                }
+              >
+                <span
+                  className="css-text-901oao css-textHasAncestor-16my406"
+                  dir="auto"
+                  style={
+                    Object {
+                      "color": "rgba(171,173,175,1.00)",
+                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                    }
+                  }
+                >
+                  0x7A91...1EA2
+                </span>
+                <div
+                  className="css-view-1dbjc4n"
+                  onClick={[Function]}
+                  style={
+                    Object {
+                      "display": "inline-flex",
+                      "height": "14px",
+                      "paddingLeft": "8px",
+                      "paddingRight": "8px",
+                    }
+                  }
+                >
+                  <span
+                    className="css-text-901oao css-textHasAncestor-16my406"
+                    dir="auto"
+                    style={
+                      Object {
+                        "color": "rgba(171,173,175,1.00)",
+                        "cursor": "pointer",
+                        "display": "inline-flex",
+                        "fontSize": "16px",
+                        "height": "14px",
+                        "lineHeight": "14px",
+                      }
+                    }
+                  >
+                    <svg
+                      fill="none"
+                      height={16}
+                      style={Object {}}
+                      viewBox="0 0 16 16"
+                      width={16}
+                    >
+                      <path
+                        d="M10.6666 0.666687H2.66659C1.93325 0.666687 1.33325 1.26669 1.33325 2.00002V11.3334H2.66659V2.00002H10.6666V0.666687ZM9.99992 3.33335H5.33325C4.59992 3.33335 4.00659 3.93335 4.00659 4.66669L3.99992 14C3.99992 14.7334 4.59325 15.3334 5.32659 15.3334H12.6666C13.3999 15.3334 13.9999 14.7334 13.9999 14V7.33335L9.99992 3.33335ZM5.33325 14V4.66669H9.33325V8.00002H12.6666V14H5.33325Z"
+                        fill="#ABADAF"
+                        style={Object {}}
+                      />
+                    </svg>
+                  </span>
+                </div>
+              </span>
+            </span>
+          </div>
+          <span
+            className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+            dir="auto"
+            style={
+              Object {
+                "WebkitBoxFlex": 0,
+                "WebkitFlexGrow": 0,
+                "color": "rgba(255,255,255,1.00)",
+                "flexGrow": 0,
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "maxWidth": "116px",
+                "minWidth": "116px",
+                "msFlexPositive": 0,
+                "paddingBottom": "12px",
+                "paddingLeft": "10px",
+                "paddingRight": "10px",
+                "paddingTop": "12px",
+                "textAlign": "center",
+              }
+            }
+          >
+            <span
+              className="css-text-901oao css-textHasAncestor-16my406"
+              dir="auto"
+              style={
+                Object {
+                  "borderBottomWidth": "0px",
+                  "borderLeftColor": "rgba(171,173,175,1.00)",
+                  "borderLeftWidth": "0px",
+                  "borderRightWidth": "0px",
+                  "borderTopWidth": "0px",
+                  "color": "rgba(255,255,255,1.00)",
+                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                  "paddingLeft": "10px",
+                  "paddingRight": "10px",
+                }
+              }
+            >
+              0
+            </span>
+            <span
+              className="css-text-901oao css-textHasAncestor-16my406"
+              dir="auto"
+              style={
+                Object {
+                  "borderBottomWidth": "0px",
+                  "borderLeftColor": "rgba(171,173,175,1.00)",
+                  "borderLeftWidth": "1px",
+                  "borderRightWidth": "0px",
+                  "borderTopWidth": "0px",
+                  "color": "rgba(255,255,255,1.00)",
+                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                  "paddingLeft": "10px",
+                  "paddingRight": "10px",
+                }
+              }
+            >
+              0
+            </span>
+          </span>
+          <span
+            className="css-text-901oao css-textHasAncestor-16my406"
+            dir="auto"
+            style={
+              Object {
+                "WebkitBoxDirection": "normal",
+                "WebkitBoxFlex": 0,
+                "WebkitBoxOrient": "horizontal",
+                "WebkitFlexDirection": "row",
+                "WebkitFlexGrow": 0,
+                "color": "rgba(255,255,255,1.00)",
+                "display": "flex",
+                "flexDirection": "row",
+                "flexGrow": 0,
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "maxWidth": "170px",
+                "minWidth": "170px",
+                "msFlexDirection": "row",
+                "msFlexPositive": 0,
+                "paddingBottom": "12px",
+                "paddingLeft": "10px",
+                "paddingRight": "10px",
+                "paddingTop": "12px",
+              }
+            }
+          >
+            <span
+              className="css-text-901oao css-textHasAncestor-16my406"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(255,255,255,1.00)",
+                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                  "fontSize": "14px",
+                  "fontWeight": "500",
+                  "paddingRight": "8px",
+                }
+              }
+            >
+              7.9
+              %
+            </span>
+            <span
+              className="css-text-901oao css-textHasAncestor-16my406"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(255,255,255,1.00)",
+                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                }
+              }
+            >
+              <span
+                className="css-text-901oao css-textHasAncestor-16my406"
+                dir="auto"
+                style={
+                  Object {
+                    "color": "rgba(171,173,175,1.00)",
+                    "display": "flex",
+                    "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                    "fontSize": "14px",
+                    "fontWeight": "500",
+                    "paddingBottom": "2px",
+                  }
+                }
+              >
+                94.9
+                % of 
+                8.3
+                %
+              </span>
+              <div
+                className="css-view-1dbjc4n"
+                style={
+                  Object {
+                    "WebkitBoxDirection": "normal",
+                    "WebkitBoxOrient": "horizontal",
+                    "WebkitFlexDirection": "row",
+                    "display": "flex",
+                    "flexDirection": "row",
+                    "height": "16px",
+                    "msFlexDirection": "row",
+                  }
+                }
+              >
+                <div
+                  className="css-view-1dbjc4n"
+                  style={
+                    Object {
+                      "backgroundColor": "rgba(255,255,255,0.20)",
+                      "borderBottomLeftRadius": "2px",
+                      "borderBottomRightRadius": "2px",
+                      "borderTopLeftRadius": "2px",
+                      "borderTopRightRadius": "2px",
+                      "display": "inline-flex",
+                      "height": "16px",
+                      "marginRight": "4px",
+                      "overflowX": "hidden",
+                      "overflowY": "hidden",
+                      "width": "8px",
+                    }
+                  }
+                >
+                  <div
+                    className="css-view-1dbjc4n"
+                    style={
+                      Object {
+                        "backgroundColor": "rgba(251,204,92,1.00)",
+                        "display": "inline-flex",
+                        "height": "16px",
+                        "width": "100%",
+                      }
+                    }
+                  />
+                </div>
+                <div
+                  className="css-view-1dbjc4n"
+                  style={
+                    Object {
+                      "backgroundColor": "rgba(255,255,255,0.20)",
+                      "borderBottomLeftRadius": "2px",
+                      "borderBottomRightRadius": "2px",
+                      "borderTopLeftRadius": "2px",
+                      "borderTopRightRadius": "2px",
+                      "display": "inline-flex",
+                      "height": "16px",
+                      "marginRight": "4px",
+                      "overflowX": "hidden",
+                      "overflowY": "hidden",
+                      "width": "8px",
+                    }
+                  }
+                >
+                  <div
+                    className="css-view-1dbjc4n"
+                    style={
+                      Object {
+                        "backgroundColor": "rgba(251,204,92,1.00)",
+                        "display": "inline-flex",
+                        "height": "16px",
+                        "width": "100%",
+                      }
+                    }
+                  />
+                </div>
+                <div
+                  className="css-view-1dbjc4n"
+                  style={
+                    Object {
+                      "backgroundColor": "rgba(255,255,255,0.20)",
+                      "borderBottomLeftRadius": "2px",
+                      "borderBottomRightRadius": "2px",
+                      "borderTopLeftRadius": "2px",
+                      "borderTopRightRadius": "2px",
+                      "display": "inline-flex",
+                      "height": "16px",
+                      "marginRight": "4px",
+                      "overflowX": "hidden",
+                      "overflowY": "hidden",
+                      "width": "8px",
+                    }
+                  }
+                >
+                  <div
+                    className="css-view-1dbjc4n"
+                    style={
+                      Object {
+                        "backgroundColor": "rgba(251,204,92,1.00)",
+                        "display": "inline-flex",
+                        "height": "16px",
+                        "width": "100%",
+                      }
+                    }
+                  />
+                </div>
+                <div
+                  className="css-view-1dbjc4n"
+                  style={
+                    Object {
+                      "backgroundColor": "rgba(255,255,255,0.20)",
+                      "borderBottomLeftRadius": "2px",
+                      "borderBottomRightRadius": "2px",
+                      "borderTopLeftRadius": "2px",
+                      "borderTopRightRadius": "2px",
+                      "display": "inline-flex",
+                      "height": "16px",
+                      "marginRight": "4px",
+                      "overflowX": "hidden",
+                      "overflowY": "hidden",
+                      "width": "8px",
+                    }
+                  }
+                >
+                  <div
+                    className="css-view-1dbjc4n"
+                    style={
+                      Object {
+                        "backgroundColor": "rgba(251,204,92,1.00)",
+                        "display": "inline-flex",
+                        "height": "16px",
+                        "width": "100%",
+                      }
+                    }
+                  />
+                </div>
+                <div
+                  className="css-view-1dbjc4n"
+                  style={
+                    Object {
+                      "backgroundColor": "rgba(255,255,255,0.20)",
+                      "borderBottomLeftRadius": "2px",
+                      "borderBottomRightRadius": "2px",
+                      "borderTopLeftRadius": "2px",
+                      "borderTopRightRadius": "2px",
+                      "display": "inline-flex",
+                      "height": "16px",
+                      "marginRight": "4px",
+                      "overflowX": "hidden",
+                      "overflowY": "hidden",
+                      "width": "8px",
+                    }
+                  }
+                >
+                  <div
+                    className="css-view-1dbjc4n"
+                    style={
+                      Object {
+                        "backgroundColor": "rgba(251,204,92,1.00)",
+                        "display": "inline-flex",
+                        "height": "16px",
+                        "width": "100%",
+                      }
+                    }
+                  />
+                </div>
+                <div
+                  className="css-view-1dbjc4n"
+                  style={
+                    Object {
+                      "backgroundColor": "rgba(255,255,255,0.20)",
+                      "borderBottomLeftRadius": "2px",
+                      "borderBottomRightRadius": "2px",
+                      "borderTopLeftRadius": "2px",
+                      "borderTopRightRadius": "2px",
+                      "display": "inline-flex",
+                      "height": "16px",
+                      "marginRight": "4px",
+                      "overflowX": "hidden",
+                      "overflowY": "hidden",
+                      "width": "8px",
+                    }
+                  }
+                >
+                  <div
+                    className="css-view-1dbjc4n"
+                    style={
+                      Object {
+                        "backgroundColor": "rgba(251,204,92,1.00)",
+                        "display": "inline-flex",
+                        "height": "16px",
+                        "width": "63.99999999999994%",
+                      }
+                    }
+                  />
+                </div>
+              </div>
+            </span>
+          </span>
+          <span
+            className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+            dir="auto"
+            style={
+              Object {
+                "WebkitBoxFlex": 0,
+                "WebkitFlexGrow": 0,
+                "color": "rgba(255,255,255,1.00)",
+                "flexGrow": 0,
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "maxWidth": "116px",
+                "minWidth": "116px",
+                "msFlexPositive": 0,
+                "paddingBottom": "12px",
+                "paddingLeft": "10px",
+                "paddingRight": "10px",
+                "paddingTop": "12px",
+                "textAlign": "center",
+              }
+            }
+          >
+            380,210
+          </span>
+          <span
+            className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+            dir="auto"
+            style={
+              Object {
+                "WebkitBoxFlex": 0,
+                "WebkitFlexGrow": 0,
+                "color": "rgba(255,255,255,1.00)",
+                "flexGrow": 0,
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "maxWidth": "116px",
+                "minWidth": "116px",
+                "msFlexPositive": 0,
+                "paddingBottom": "12px",
+                "paddingLeft": "10px",
+                "paddingRight": "10px",
+                "paddingTop": "12px",
+                "textAlign": "center",
+              }
+            }
+          >
+            50
+            %
+          </span>
+          <span
+            className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+            dir="auto"
+            style={
+              Object {
+                "WebkitBoxFlex": 0,
+                "WebkitFlexGrow": 0,
+                "color": "rgba(255,255,255,1.00)",
+                "flexGrow": 0,
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "maxWidth": "116px",
+                "minWidth": "116px",
+                "msFlexPositive": 0,
+                "paddingBottom": "12px",
+                "paddingLeft": "10px",
+                "paddingRight": "10px",
+                "paddingTop": "12px",
+                "textAlign": "center",
+              }
+            }
+          >
+            <span
+              className="css-text-901oao css-textHasAncestor-16my406"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(255,255,255,1.00)",
+                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                }
+              }
+            >
+              2.2%
+            </span>
+            <span
+              className="css-text-901oao css-textHasAncestor-16my406"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(255,255,255,1.00)",
+                  "display": "inline-flex",
+                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                  "height": "20px",
+                  "marginLeft": "8px",
+                  "position": "relative",
+                  "top": "4px",
+                  "width": "35px",
+                }
+              }
+            >
+              <span
+                className="css-text-901oao css-textHasAncestor-16my406"
+                dir="auto"
+                style={
+                  Object {
+                    "backgroundColor": "rgba(251,124,109,1.00)",
+                    "borderBottomLeftRadius": "2px",
+                    "borderBottomRightRadius": "2px",
+                    "borderTopLeftRadius": "2px",
+                    "borderTopRightRadius": "2px",
+                    "color": "rgba(255,255,255,1.00)",
+                    "display": "inline-flex",
+                    "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                    "height": "20px",
+                    "width": "2.2%",
+                  }
+                }
+              />
+            </span>
+          </span>
+          <span
+            className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+            dir="auto"
+            style={
+              Object {
+                "WebkitBoxFlex": 0,
+                "WebkitFlexGrow": 0,
+                "color": "rgba(255,255,255,1.00)",
+                "flexGrow": 0,
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "maxWidth": "80px",
+                "minWidth": "80px",
+                "msFlexPositive": 0,
+                "paddingBottom": "12px",
+                "paddingLeft": "10px",
+                "paddingRight": "10px",
+                "paddingTop": "12px",
+                "textAlign": "center",
+              }
+            }
+          >
+            0.0
+            %
+          </span>
+          <span
+            className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+            dir="auto"
+            style={
+              Object {
+                "WebkitBoxFlex": 0,
+                "WebkitFlexGrow": 0,
+                "color": "rgba(255,255,255,1.00)",
+                "flexGrow": 0,
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "maxWidth": "80px",
+                "minWidth": "80px",
+                "msFlexPositive": 0,
+                "paddingBottom": "12px",
+                "paddingLeft": "10px",
+                "paddingRight": "10px",
+                "paddingTop": "12px",
+                "textAlign": "center",
+              }
+            }
+          >
+            0.0
+            %
+          </span>
+        </div>
+      </div>
+    </div>
+    <div
+      onClick={[Function]}
+    >
+      <div
+        style={Object {}}
+      >
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitAlignItems": "center",
+              "WebkitBoxAlign": "center",
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxOrient": "horizontal",
+              "WebkitBoxPack": "justify",
+              "WebkitFlexDirection": "row",
+              "WebkitJustifyContent": "space-between",
+              "alignItems": "center",
+              "display": "flex",
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+              "msFlexAlign": "center",
+              "msFlexDirection": "row",
+              "msFlexPack": "justify",
+              "paddingTop": "10px",
+              "width": "100%",
+            }
+          }
+        >
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "WebkitBoxDirection": "normal",
+                "WebkitBoxFlex": 1,
+                "WebkitBoxOrient": "horizontal",
+                "WebkitFlexDirection": "row",
+                "WebkitFlexGrow": 1,
+                "cursor": "pointer",
+                "display": "flex",
+                "flexDirection": "row",
+                "flexGrow": 1,
+                "fontSize": "16px",
+                "msFlexDirection": "row",
+                "msFlexPositive": 1,
+                "paddingBottom": "12px",
+                "paddingLeft": "10px",
+                "paddingRight": "10px",
+                "paddingTop": "12px",
+                "width": "226px",
+              }
+            }
+          >
+            <span
+              className="css-text-901oao css-textHasAncestor-16my406"
+              dir="auto"
+              style={
+                Object {
+                  "WebkitBoxFlex": 0,
+                  "WebkitFlexGrow": 0,
+                  "color": "rgba(255,255,255,1.00)",
+                  "flexGrow": 0,
+                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                  "fontSize": "16px",
+                  "marginLeft": "15px",
+                  "marginRight": "20px",
+                  "msFlexPositive": 0,
+                  "paddingBottom": "12px",
+                  "paddingLeft": "10px",
+                  "paddingRight": "10px",
+                  "paddingTop": "12px",
+                  "textAlign": "center",
+                  "width": "20px",
+                }
+              }
+            >
+              <svg
+                fill="none"
+                height={10}
+                style={Object {}}
+                transform="rotate(0)"
+                viewBox="0 0 8 12"
+                width={10}
+              >
+                <path
+                  clipRule="evenodd"
+                  d="M1.19997 0L1.13249e-05 1.19996L4.80011 6.00006L0 10.8002L1.19996 12.0001L7.19977 6.00032L7.19953 6.00007L7.19979 5.99981L1.19997 0Z"
+                  fill="#FFFFFF"
+                  fillRule="evenodd"
+                  opacity={0.4}
+                  style={Object {}}
+                />
+              </svg>
+            </span>
+            <span
+              className="css-text-901oao css-textHasAncestor-16my406"
+              dir="auto"
+              style={
+                Object {
+                  "WebkitBoxDirection": "normal",
+                  "WebkitBoxOrient": "vertical",
+                  "WebkitFlexDirection": "column",
+                  "color": "rgba(255,255,255,1.00)",
+                  "display": "flex",
+                  "flexDirection": "column",
+                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                  "msFlexDirection": "column",
+                }
+              }
+            >
+              <span
+                className="css-text-901oao css-textHasAncestor-16my406"
+                dir="auto"
+                style={
+                  Object {
+                    "WebkitAlignItems": "center",
+                    "WebkitBoxAlign": "center",
+                    "WebkitBoxPack": "start",
+                    "WebkitJustifyContent": "flex-start",
+                    "alignItems": "center",
+                    "color": "rgba(255,255,255,1.00)",
+                    "display": "flex",
+                    "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                    "justifyContent": "flex-start",
+                    "msFlexAlign": "center",
+                    "msFlexPack": "start",
+                  }
+                }
+              >
+                <span
+                  className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+                  dir="auto"
+                  style={
+                    Object {
+                      "color": "rgba(255,255,255,1.00)",
+                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                      "fontWeight": "500",
+                      "maxWidth": "140px",
+                      "overflowX": "hidden",
+                      "overflowY": "hidden",
+                      "textDecoration": "underline",
+                      "textOverflow": "ellipsis",
+                      "whiteSpace": "nowrap",
+                    }
+                  }
+                >
+                  Test 5
+                </span>
+              </span>
+              <span
+                className="css-text-901oao css-textHasAncestor-16my406"
+                dir="auto"
+                style={
+                  Object {
+                    "WebkitBoxDirection": "normal",
+                    "WebkitBoxOrient": "horizontal",
+                    "WebkitFlexDirection": "row",
+                    "color": "rgba(171,173,175,1.00)",
+                    "display": "flex",
+                    "flexDirection": "row",
+                    "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                    "fontSize": "14px",
+                    "fontWeight": "normal",
+                    "msFlexDirection": "row",
+                    "paddingTop": "10px",
+                  }
+                }
+              >
+                <span
+                  className="css-text-901oao css-textHasAncestor-16my406"
+                  dir="auto"
+                  style={
+                    Object {
+                      "color": "rgba(171,173,175,1.00)",
+                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                    }
+                  }
+                >
+                  0x44E1...9A62
+                </span>
+                <div
+                  className="css-view-1dbjc4n"
+                  onClick={[Function]}
+                  style={
+                    Object {
+                      "display": "inline-flex",
+                      "height": "14px",
+                      "paddingLeft": "8px",
+                      "paddingRight": "8px",
+                    }
+                  }
+                >
+                  <span
+                    className="css-text-901oao css-textHasAncestor-16my406"
+                    dir="auto"
+                    style={
+                      Object {
+                        "color": "rgba(171,173,175,1.00)",
+                        "cursor": "pointer",
+                        "display": "inline-flex",
+                        "fontSize": "16px",
+                        "height": "14px",
+                        "lineHeight": "14px",
+                      }
+                    }
+                  >
+                    <svg
+                      fill="none"
+                      height={16}
+                      style={Object {}}
+                      viewBox="0 0 16 16"
+                      width={16}
+                    >
+                      <path
+                        d="M10.6666 0.666687H2.66659C1.93325 0.666687 1.33325 1.26669 1.33325 2.00002V11.3334H2.66659V2.00002H10.6666V0.666687ZM9.99992 3.33335H5.33325C4.59992 3.33335 4.00659 3.93335 4.00659 4.66669L3.99992 14C3.99992 14.7334 4.59325 15.3334 5.32659 15.3334H12.6666C13.3999 15.3334 13.9999 14.7334 13.9999 14V7.33335L9.99992 3.33335ZM5.33325 14V4.66669H9.33325V8.00002H12.6666V14H5.33325Z"
+                        fill="#ABADAF"
+                        style={Object {}}
+                      />
+                    </svg>
+                  </span>
+                </div>
+              </span>
+            </span>
+          </div>
+          <span
+            className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+            dir="auto"
+            style={
+              Object {
+                "WebkitBoxFlex": 0,
+                "WebkitFlexGrow": 0,
+                "color": "rgba(255,255,255,1.00)",
+                "flexGrow": 0,
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "maxWidth": "116px",
+                "minWidth": "116px",
+                "msFlexPositive": 0,
+                "paddingBottom": "12px",
+                "paddingLeft": "10px",
+                "paddingRight": "10px",
+                "paddingTop": "12px",
+                "textAlign": "center",
+              }
+            }
+          >
+            <span
+              className="css-text-901oao css-textHasAncestor-16my406"
+              dir="auto"
+              style={
+                Object {
+                  "borderBottomWidth": "0px",
+                  "borderLeftColor": "rgba(171,173,175,1.00)",
+                  "borderLeftWidth": "0px",
+                  "borderRightWidth": "0px",
+                  "borderTopWidth": "0px",
+                  "color": "rgba(255,255,255,1.00)",
+                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                  "paddingLeft": "10px",
+                  "paddingRight": "10px",
+                }
+              }
+            >
+              0
+            </span>
+            <span
+              className="css-text-901oao css-textHasAncestor-16my406"
+              dir="auto"
+              style={
+                Object {
+                  "borderBottomWidth": "0px",
+                  "borderLeftColor": "rgba(171,173,175,1.00)",
+                  "borderLeftWidth": "1px",
+                  "borderRightWidth": "0px",
+                  "borderTopWidth": "0px",
+                  "color": "rgba(255,255,255,1.00)",
+                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                  "paddingLeft": "10px",
+                  "paddingRight": "10px",
+                }
+              }
+            >
+              0
+            </span>
+          </span>
+          <span
+            className="css-text-901oao css-textHasAncestor-16my406"
+            dir="auto"
+            style={
+              Object {
+                "WebkitBoxDirection": "normal",
+                "WebkitBoxFlex": 0,
+                "WebkitBoxOrient": "horizontal",
+                "WebkitFlexDirection": "row",
+                "WebkitFlexGrow": 0,
+                "color": "rgba(255,255,255,1.00)",
+                "display": "flex",
+                "flexDirection": "row",
+                "flexGrow": 0,
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "maxWidth": "170px",
+                "minWidth": "170px",
+                "msFlexDirection": "row",
+                "msFlexPositive": 0,
+                "paddingBottom": "12px",
+                "paddingLeft": "10px",
+                "paddingRight": "10px",
+                "paddingTop": "12px",
+              }
+            }
+          >
+            <span
+              className="css-text-901oao css-textHasAncestor-16my406"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(255,255,255,1.00)",
+                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                  "fontSize": "14px",
+                  "fontWeight": "500",
+                  "paddingRight": "8px",
+                }
+              }
+            >
+              0.4
+              %
+            </span>
+            <span
+              className="css-text-901oao css-textHasAncestor-16my406"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(255,255,255,1.00)",
+                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                }
+              }
+            >
+              <span
+                className="css-text-901oao css-textHasAncestor-16my406"
+                dir="auto"
+                style={
+                  Object {
+                    "color": "rgba(171,173,175,1.00)",
+                    "display": "flex",
+                    "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                    "fontSize": "14px",
+                    "fontWeight": "500",
+                    "paddingBottom": "2px",
+                  }
+                }
+              >
+                5.0
+                % of 
+                8.3
+                %
+              </span>
+              <div
+                className="css-view-1dbjc4n"
+                style={
+                  Object {
+                    "WebkitBoxDirection": "normal",
+                    "WebkitBoxOrient": "horizontal",
+                    "WebkitFlexDirection": "row",
+                    "display": "flex",
+                    "flexDirection": "row",
+                    "height": "16px",
+                    "msFlexDirection": "row",
+                  }
+                }
+              >
+                <div
+                  className="css-view-1dbjc4n"
+                  style={
+                    Object {
+                      "backgroundColor": "rgba(255,255,255,0.20)",
+                      "borderBottomLeftRadius": "2px",
+                      "borderBottomRightRadius": "2px",
+                      "borderTopLeftRadius": "2px",
+                      "borderTopRightRadius": "2px",
+                      "display": "inline-flex",
+                      "height": "16px",
+                      "marginRight": "4px",
+                      "overflowX": "hidden",
+                      "overflowY": "hidden",
+                      "width": "8px",
+                    }
+                  }
+                >
+                  <div
+                    className="css-view-1dbjc4n"
+                    style={
+                      Object {
+                        "backgroundColor": "rgba(251,204,92,1.00)",
+                        "display": "inline-flex",
+                        "height": "16px",
+                        "width": "24%",
+                      }
+                    }
+                  />
+                </div>
+                <div
+                  className="css-view-1dbjc4n"
+                  style={
+                    Object {
+                      "backgroundColor": "rgba(255,255,255,0.20)",
+                      "borderBottomLeftRadius": "2px",
+                      "borderBottomRightRadius": "2px",
+                      "borderTopLeftRadius": "2px",
+                      "borderTopRightRadius": "2px",
+                      "display": "inline-flex",
+                      "height": "16px",
+                      "marginRight": "4px",
+                      "overflowX": "hidden",
+                      "overflowY": "hidden",
+                      "width": "8px",
+                    }
+                  }
+                >
+                  <div
+                    className="css-view-1dbjc4n"
+                    style={
+                      Object {
+                        "backgroundColor": "rgba(251,204,92,1.00)",
+                        "display": "inline-flex",
+                        "height": "16px",
+                        "width": "0%",
+                      }
+                    }
+                  />
+                </div>
+                <div
+                  className="css-view-1dbjc4n"
+                  style={
+                    Object {
+                      "backgroundColor": "rgba(255,255,255,0.20)",
+                      "borderBottomLeftRadius": "2px",
+                      "borderBottomRightRadius": "2px",
+                      "borderTopLeftRadius": "2px",
+                      "borderTopRightRadius": "2px",
+                      "display": "inline-flex",
+                      "height": "16px",
+                      "marginRight": "4px",
+                      "overflowX": "hidden",
+                      "overflowY": "hidden",
+                      "width": "8px",
+                    }
+                  }
+                >
+                  <div
+                    className="css-view-1dbjc4n"
+                    style={
+                      Object {
+                        "backgroundColor": "rgba(251,204,92,1.00)",
+                        "display": "inline-flex",
+                        "height": "16px",
+                        "width": "0%",
+                      }
+                    }
+                  />
+                </div>
+                <div
+                  className="css-view-1dbjc4n"
+                  style={
+                    Object {
+                      "backgroundColor": "rgba(255,255,255,0.20)",
+                      "borderBottomLeftRadius": "2px",
+                      "borderBottomRightRadius": "2px",
+                      "borderTopLeftRadius": "2px",
+                      "borderTopRightRadius": "2px",
+                      "display": "inline-flex",
+                      "height": "16px",
+                      "marginRight": "4px",
+                      "overflowX": "hidden",
+                      "overflowY": "hidden",
+                      "width": "8px",
+                    }
+                  }
+                >
+                  <div
+                    className="css-view-1dbjc4n"
+                    style={
+                      Object {
+                        "backgroundColor": "rgba(251,204,92,1.00)",
+                        "display": "inline-flex",
+                        "height": "16px",
+                        "width": "0%",
+                      }
+                    }
+                  />
+                </div>
+                <div
+                  className="css-view-1dbjc4n"
+                  style={
+                    Object {
+                      "backgroundColor": "rgba(255,255,255,0.20)",
+                      "borderBottomLeftRadius": "2px",
+                      "borderBottomRightRadius": "2px",
+                      "borderTopLeftRadius": "2px",
+                      "borderTopRightRadius": "2px",
+                      "display": "inline-flex",
+                      "height": "16px",
+                      "marginRight": "4px",
+                      "overflowX": "hidden",
+                      "overflowY": "hidden",
+                      "width": "8px",
+                    }
+                  }
+                >
+                  <div
+                    className="css-view-1dbjc4n"
+                    style={
+                      Object {
+                        "backgroundColor": "rgba(251,204,92,1.00)",
+                        "display": "inline-flex",
+                        "height": "16px",
+                        "width": "0%",
+                      }
+                    }
+                  />
+                </div>
+                <div
+                  className="css-view-1dbjc4n"
+                  style={
+                    Object {
+                      "backgroundColor": "rgba(255,255,255,0.20)",
+                      "borderBottomLeftRadius": "2px",
+                      "borderBottomRightRadius": "2px",
+                      "borderTopLeftRadius": "2px",
+                      "borderTopRightRadius": "2px",
+                      "display": "inline-flex",
+                      "height": "16px",
+                      "marginRight": "4px",
+                      "overflowX": "hidden",
+                      "overflowY": "hidden",
+                      "width": "8px",
+                    }
+                  }
+                >
+                  <div
+                    className="css-view-1dbjc4n"
+                    style={
+                      Object {
+                        "backgroundColor": "rgba(251,204,92,1.00)",
+                        "display": "inline-flex",
+                        "height": "16px",
+                        "width": "0%",
+                      }
+                    }
+                  />
+                </div>
+              </div>
+            </span>
+          </span>
+          <span
+            className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+            dir="auto"
+            style={
+              Object {
+                "WebkitBoxFlex": 0,
+                "WebkitFlexGrow": 0,
+                "color": "rgba(255,255,255,1.00)",
+                "flexGrow": 0,
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "maxWidth": "116px",
+                "minWidth": "116px",
+                "msFlexPositive": 0,
+                "paddingBottom": "12px",
+                "paddingLeft": "10px",
+                "paddingRight": "10px",
+                "paddingTop": "12px",
+                "textAlign": "center",
+              }
+            }
+          >
+            9,988
+          </span>
+          <span
+            className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+            dir="auto"
+            style={
+              Object {
+                "WebkitBoxFlex": 0,
+                "WebkitFlexGrow": 0,
+                "color": "rgba(255,255,255,1.00)",
+                "flexGrow": 0,
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "maxWidth": "116px",
+                "minWidth": "116px",
+                "msFlexPositive": 0,
+                "paddingBottom": "12px",
+                "paddingLeft": "10px",
+                "paddingRight": "10px",
+                "paddingTop": "12px",
+                "textAlign": "center",
+              }
+            }
+          >
+            10
+            %
+          </span>
+          <span
+            className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+            dir="auto"
+            style={
+              Object {
+                "WebkitBoxFlex": 0,
+                "WebkitFlexGrow": 0,
+                "color": "rgba(255,255,255,1.00)",
+                "flexGrow": 0,
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "maxWidth": "116px",
+                "minWidth": "116px",
+                "msFlexPositive": 0,
+                "paddingBottom": "12px",
+                "paddingLeft": "10px",
+                "paddingRight": "10px",
+                "paddingTop": "12px",
+                "textAlign": "center",
+              }
+            }
+          >
+            <span
+              className="css-text-901oao css-textHasAncestor-16my406"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(255,255,255,1.00)",
+                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                }
+              }
+            >
+              0.6%
+            </span>
+            <span
+              className="css-text-901oao css-textHasAncestor-16my406"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(255,255,255,1.00)",
+                  "display": "inline-flex",
+                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                  "height": "20px",
+                  "marginLeft": "8px",
+                  "position": "relative",
+                  "top": "4px",
+                  "width": "35px",
+                }
+              }
+            >
+              <span
+                className="css-text-901oao css-textHasAncestor-16my406"
+                dir="auto"
+                style={
+                  Object {
+                    "backgroundColor": "rgba(251,124,109,1.00)",
+                    "borderBottomLeftRadius": "2px",
+                    "borderBottomRightRadius": "2px",
+                    "borderTopLeftRadius": "2px",
+                    "borderTopRightRadius": "2px",
+                    "color": "rgba(255,255,255,1.00)",
+                    "display": "inline-flex",
+                    "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                    "height": "20px",
+                    "width": "0.6%",
+                  }
+                }
+              />
+            </span>
+          </span>
+          <span
+            className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+            dir="auto"
+            style={
+              Object {
+                "WebkitBoxFlex": 0,
+                "WebkitFlexGrow": 0,
+                "color": "rgba(255,255,255,1.00)",
+                "flexGrow": 0,
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "maxWidth": "80px",
+                "minWidth": "80px",
+                "msFlexPositive": 0,
+                "paddingBottom": "12px",
+                "paddingLeft": "10px",
+                "paddingRight": "10px",
+                "paddingTop": "12px",
+                "textAlign": "center",
+              }
+            }
+          >
+            0.0
+            %
+          </span>
+          <span
+            className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+            dir="auto"
+            style={
+              Object {
+                "WebkitBoxFlex": 0,
+                "WebkitFlexGrow": 0,
+                "color": "rgba(255,255,255,1.00)",
+                "flexGrow": 0,
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "maxWidth": "80px",
+                "minWidth": "80px",
+                "msFlexPositive": 0,
+                "paddingBottom": "12px",
+                "paddingLeft": "10px",
+                "paddingRight": "10px",
+                "paddingTop": "12px",
+                "textAlign": "center",
+              }
+            }
+          >
+            0.0
+            %
+          </span>
+        </div>
+      </div>
+    </div>
+    <div
+      onClick={[Function]}
+    >
+      <div
+        style={Object {}}
+      >
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitAlignItems": "center",
+              "WebkitBoxAlign": "center",
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxOrient": "horizontal",
+              "WebkitBoxPack": "justify",
+              "WebkitFlexDirection": "row",
+              "WebkitJustifyContent": "space-between",
+              "alignItems": "center",
+              "display": "flex",
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+              "msFlexAlign": "center",
+              "msFlexDirection": "row",
+              "msFlexPack": "justify",
+              "paddingTop": "10px",
+              "width": "100%",
+            }
+          }
+        >
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "WebkitBoxDirection": "normal",
+                "WebkitBoxFlex": 1,
+                "WebkitBoxOrient": "horizontal",
+                "WebkitFlexDirection": "row",
+                "WebkitFlexGrow": 1,
+                "cursor": "pointer",
+                "display": "flex",
+                "flexDirection": "row",
+                "flexGrow": 1,
+                "fontSize": "16px",
+                "msFlexDirection": "row",
+                "msFlexPositive": 1,
+                "paddingBottom": "12px",
+                "paddingLeft": "10px",
+                "paddingRight": "10px",
+                "paddingTop": "12px",
+                "width": "226px",
+              }
+            }
+          >
+            <span
+              className="css-text-901oao css-textHasAncestor-16my406"
+              dir="auto"
+              style={
+                Object {
+                  "WebkitBoxFlex": 0,
+                  "WebkitFlexGrow": 0,
+                  "color": "rgba(255,255,255,1.00)",
+                  "flexGrow": 0,
+                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                  "fontSize": "16px",
+                  "marginLeft": "15px",
+                  "marginRight": "20px",
+                  "msFlexPositive": 0,
+                  "paddingBottom": "12px",
+                  "paddingLeft": "10px",
+                  "paddingRight": "10px",
+                  "paddingTop": "12px",
+                  "textAlign": "center",
+                  "width": "20px",
+                }
+              }
+            >
+              <svg
+                fill="none"
+                height={10}
+                style={Object {}}
+                transform="rotate(0)"
+                viewBox="0 0 8 12"
+                width={10}
+              >
+                <path
+                  clipRule="evenodd"
+                  d="M1.19997 0L1.13249e-05 1.19996L4.80011 6.00006L0 10.8002L1.19996 12.0001L7.19977 6.00032L7.19953 6.00007L7.19979 5.99981L1.19997 0Z"
+                  fill="#FFFFFF"
+                  fillRule="evenodd"
+                  opacity={0.4}
+                  style={Object {}}
+                />
+              </svg>
+            </span>
+            <span
+              className="css-text-901oao css-textHasAncestor-16my406"
+              dir="auto"
+              style={
+                Object {
+                  "WebkitBoxDirection": "normal",
+                  "WebkitBoxOrient": "vertical",
+                  "WebkitFlexDirection": "column",
+                  "color": "rgba(255,255,255,1.00)",
+                  "display": "flex",
+                  "flexDirection": "column",
+                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                  "msFlexDirection": "column",
+                }
+              }
+            >
+              <span
+                className="css-text-901oao css-textHasAncestor-16my406"
+                dir="auto"
+                style={
+                  Object {
+                    "WebkitAlignItems": "center",
+                    "WebkitBoxAlign": "center",
+                    "WebkitBoxPack": "start",
+                    "WebkitJustifyContent": "flex-start",
+                    "alignItems": "center",
+                    "color": "rgba(255,255,255,1.00)",
+                    "display": "flex",
+                    "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                    "justifyContent": "flex-start",
+                    "msFlexAlign": "center",
+                    "msFlexPack": "start",
+                  }
+                }
+              >
+                <span
+                  className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+                  dir="auto"
+                  style={
+                    Object {
+                      "color": "rgba(255,255,255,1.00)",
+                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                      "fontWeight": "500",
+                      "maxWidth": "140px",
+                      "overflowX": "hidden",
+                      "overflowY": "hidden",
+                      "textDecoration": "underline",
+                      "textOverflow": "ellipsis",
+                      "whiteSpace": "nowrap",
+                    }
+                  }
+                >
+                  Test 6
+                </span>
+              </span>
+              <span
+                className="css-text-901oao css-textHasAncestor-16my406"
+                dir="auto"
+                style={
+                  Object {
+                    "WebkitBoxDirection": "normal",
+                    "WebkitBoxOrient": "horizontal",
+                    "WebkitFlexDirection": "row",
+                    "color": "rgba(171,173,175,1.00)",
+                    "display": "flex",
+                    "flexDirection": "row",
+                    "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                    "fontSize": "14px",
+                    "fontWeight": "normal",
+                    "msFlexDirection": "row",
+                    "paddingTop": "10px",
+                  }
+                }
+              >
+                <span
+                  className="css-text-901oao css-textHasAncestor-16my406"
+                  dir="auto"
+                  style={
+                    Object {
+                      "color": "rgba(171,173,175,1.00)",
+                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                    }
+                  }
+                >
+                  0x439D...9F50
+                </span>
+                <div
+                  className="css-view-1dbjc4n"
+                  onClick={[Function]}
+                  style={
+                    Object {
+                      "display": "inline-flex",
+                      "height": "14px",
+                      "paddingLeft": "8px",
+                      "paddingRight": "8px",
+                    }
+                  }
+                >
+                  <span
+                    className="css-text-901oao css-textHasAncestor-16my406"
+                    dir="auto"
+                    style={
+                      Object {
+                        "color": "rgba(171,173,175,1.00)",
+                        "cursor": "pointer",
+                        "display": "inline-flex",
+                        "fontSize": "16px",
+                        "height": "14px",
+                        "lineHeight": "14px",
+                      }
+                    }
+                  >
+                    <svg
+                      fill="none"
+                      height={16}
+                      style={Object {}}
+                      viewBox="0 0 16 16"
+                      width={16}
+                    >
+                      <path
+                        d="M10.6666 0.666687H2.66659C1.93325 0.666687 1.33325 1.26669 1.33325 2.00002V11.3334H2.66659V2.00002H10.6666V0.666687ZM9.99992 3.33335H5.33325C4.59992 3.33335 4.00659 3.93335 4.00659 4.66669L3.99992 14C3.99992 14.7334 4.59325 15.3334 5.32659 15.3334H12.6666C13.3999 15.3334 13.9999 14.7334 13.9999 14V7.33335L9.99992 3.33335ZM5.33325 14V4.66669H9.33325V8.00002H12.6666V14H5.33325Z"
+                        fill="#ABADAF"
+                        style={Object {}}
+                      />
+                    </svg>
+                  </span>
+                </div>
+              </span>
+            </span>
+          </div>
+          <span
+            className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+            dir="auto"
+            style={
+              Object {
+                "WebkitBoxFlex": 0,
+                "WebkitFlexGrow": 0,
+                "color": "rgba(255,255,255,1.00)",
+                "flexGrow": 0,
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "maxWidth": "116px",
+                "minWidth": "116px",
+                "msFlexPositive": 0,
+                "paddingBottom": "12px",
+                "paddingLeft": "10px",
+                "paddingRight": "10px",
+                "paddingTop": "12px",
+                "textAlign": "center",
+              }
+            }
+          >
+            <span
+              className="css-text-901oao css-textHasAncestor-16my406"
+              dir="auto"
+              style={
+                Object {
+                  "borderBottomWidth": "0px",
+                  "borderLeftColor": "rgba(171,173,175,1.00)",
+                  "borderLeftWidth": "0px",
+                  "borderRightWidth": "0px",
+                  "borderTopWidth": "0px",
+                  "color": "rgba(255,255,255,1.00)",
+                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                  "paddingLeft": "10px",
+                  "paddingRight": "10px",
+                }
+              }
+            >
+              0
+            </span>
+            <span
+              className="css-text-901oao css-textHasAncestor-16my406"
+              dir="auto"
+              style={
+                Object {
+                  "borderBottomWidth": "0px",
+                  "borderLeftColor": "rgba(171,173,175,1.00)",
+                  "borderLeftWidth": "1px",
+                  "borderRightWidth": "0px",
+                  "borderTopWidth": "0px",
+                  "color": "rgba(255,255,255,1.00)",
+                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                  "paddingLeft": "10px",
+                  "paddingRight": "10px",
+                }
+              }
+            >
+              1
+            </span>
+          </span>
+          <span
+            className="css-text-901oao css-textHasAncestor-16my406"
+            dir="auto"
+            style={
+              Object {
+                "WebkitBoxDirection": "normal",
+                "WebkitBoxFlex": 0,
+                "WebkitBoxOrient": "horizontal",
+                "WebkitFlexDirection": "row",
+                "WebkitFlexGrow": 0,
+                "color": "rgba(255,255,255,1.00)",
+                "display": "flex",
+                "flexDirection": "row",
+                "flexGrow": 0,
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "maxWidth": "170px",
+                "minWidth": "170px",
+                "msFlexDirection": "row",
+                "msFlexPositive": 0,
+                "paddingBottom": "12px",
+                "paddingLeft": "10px",
+                "paddingRight": "10px",
+                "paddingTop": "12px",
+              }
+            }
+          >
+            <span
+              className="css-text-901oao css-textHasAncestor-16my406"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(255,255,255,1.00)",
+                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                  "fontSize": "14px",
+                  "fontWeight": "500",
+                  "paddingRight": "8px",
+                }
+              }
+            >
+              0.9
+              %
+            </span>
+            <span
+              className="css-text-901oao css-textHasAncestor-16my406"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(255,255,255,1.00)",
+                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                }
+              }
+            >
+              <span
+                className="css-text-901oao css-textHasAncestor-16my406"
+                dir="auto"
+                style={
+                  Object {
+                    "color": "rgba(171,173,175,1.00)",
+                    "display": "flex",
+                    "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                    "fontSize": "14px",
+                    "fontWeight": "500",
+                    "paddingBottom": "2px",
+                  }
+                }
+              >
+                5.5
+                % of 
+                16.7
+                %
+              </span>
+              <div
+                className="css-view-1dbjc4n"
+                style={
+                  Object {
+                    "WebkitBoxDirection": "normal",
+                    "WebkitBoxOrient": "horizontal",
+                    "WebkitFlexDirection": "row",
+                    "display": "flex",
+                    "flexDirection": "row",
+                    "height": "16px",
+                    "msFlexDirection": "row",
+                  }
+                }
+              >
+                <div
+                  className="css-view-1dbjc4n"
+                  style={
+                    Object {
+                      "backgroundColor": "rgba(255,255,255,0.20)",
+                      "borderBottomLeftRadius": "2px",
+                      "borderBottomRightRadius": "2px",
+                      "borderTopLeftRadius": "2px",
+                      "borderTopRightRadius": "2px",
+                      "display": "inline-flex",
+                      "height": "16px",
+                      "marginRight": "4px",
+                      "overflowX": "hidden",
+                      "overflowY": "hidden",
+                      "width": "8px",
+                    }
+                  }
+                >
+                  <div
+                    className="css-view-1dbjc4n"
+                    style={
+                      Object {
+                        "backgroundColor": "rgba(251,204,92,1.00)",
+                        "display": "inline-flex",
+                        "height": "16px",
+                        "width": "30%",
+                      }
+                    }
+                  />
+                </div>
+                <div
+                  className="css-view-1dbjc4n"
+                  style={
+                    Object {
+                      "backgroundColor": "rgba(255,255,255,0.20)",
+                      "borderBottomLeftRadius": "2px",
+                      "borderBottomRightRadius": "2px",
+                      "borderTopLeftRadius": "2px",
+                      "borderTopRightRadius": "2px",
+                      "display": "inline-flex",
+                      "height": "16px",
+                      "marginRight": "4px",
+                      "overflowX": "hidden",
+                      "overflowY": "hidden",
+                      "width": "8px",
+                    }
+                  }
+                >
+                  <div
+                    className="css-view-1dbjc4n"
+                    style={
+                      Object {
+                        "backgroundColor": "rgba(251,204,92,1.00)",
+                        "display": "inline-flex",
+                        "height": "16px",
+                        "width": "0%",
+                      }
+                    }
+                  />
+                </div>
+                <div
+                  className="css-view-1dbjc4n"
+                  style={
+                    Object {
+                      "backgroundColor": "rgba(255,255,255,0.20)",
+                      "borderBottomLeftRadius": "2px",
+                      "borderBottomRightRadius": "2px",
+                      "borderTopLeftRadius": "2px",
+                      "borderTopRightRadius": "2px",
+                      "display": "inline-flex",
+                      "height": "16px",
+                      "marginRight": "4px",
+                      "overflowX": "hidden",
+                      "overflowY": "hidden",
+                      "width": "8px",
+                    }
+                  }
+                >
+                  <div
+                    className="css-view-1dbjc4n"
+                    style={
+                      Object {
+                        "backgroundColor": "rgba(251,204,92,1.00)",
+                        "display": "inline-flex",
+                        "height": "16px",
+                        "width": "0%",
+                      }
+                    }
+                  />
+                </div>
+                <div
+                  className="css-view-1dbjc4n"
+                  style={
+                    Object {
+                      "backgroundColor": "rgba(255,255,255,0.20)",
+                      "borderBottomLeftRadius": "2px",
+                      "borderBottomRightRadius": "2px",
+                      "borderTopLeftRadius": "2px",
+                      "borderTopRightRadius": "2px",
+                      "display": "inline-flex",
+                      "height": "16px",
+                      "marginRight": "4px",
+                      "overflowX": "hidden",
+                      "overflowY": "hidden",
+                      "width": "8px",
+                    }
+                  }
+                >
+                  <div
+                    className="css-view-1dbjc4n"
+                    style={
+                      Object {
+                        "backgroundColor": "rgba(251,204,92,1.00)",
+                        "display": "inline-flex",
+                        "height": "16px",
+                        "width": "0%",
+                      }
+                    }
+                  />
+                </div>
+                <div
+                  className="css-view-1dbjc4n"
+                  style={
+                    Object {
+                      "backgroundColor": "rgba(255,255,255,0.20)",
+                      "borderBottomLeftRadius": "2px",
+                      "borderBottomRightRadius": "2px",
+                      "borderTopLeftRadius": "2px",
+                      "borderTopRightRadius": "2px",
+                      "display": "inline-flex",
+                      "height": "16px",
+                      "marginRight": "4px",
+                      "overflowX": "hidden",
+                      "overflowY": "hidden",
+                      "width": "8px",
+                    }
+                  }
+                >
+                  <div
+                    className="css-view-1dbjc4n"
+                    style={
+                      Object {
+                        "backgroundColor": "rgba(251,204,92,1.00)",
+                        "display": "inline-flex",
+                        "height": "16px",
+                        "width": "0%",
+                      }
+                    }
+                  />
+                </div>
+                <div
+                  className="css-view-1dbjc4n"
+                  style={
+                    Object {
+                      "backgroundColor": "rgba(255,255,255,0.20)",
+                      "borderBottomLeftRadius": "2px",
+                      "borderBottomRightRadius": "2px",
+                      "borderTopLeftRadius": "2px",
+                      "borderTopRightRadius": "2px",
+                      "display": "inline-flex",
+                      "height": "16px",
+                      "marginRight": "4px",
+                      "overflowX": "hidden",
+                      "overflowY": "hidden",
+                      "width": "8px",
+                    }
+                  }
+                >
+                  <div
+                    className="css-view-1dbjc4n"
+                    style={
+                      Object {
+                        "backgroundColor": "rgba(251,204,92,1.00)",
+                        "display": "inline-flex",
+                        "height": "16px",
+                        "width": "0%",
+                      }
+                    }
+                  />
+                </div>
+              </div>
+            </span>
+          </span>
+          <span
+            className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+            dir="auto"
+            style={
+              Object {
+                "WebkitBoxFlex": 0,
+                "WebkitFlexGrow": 0,
+                "color": "rgba(255,255,255,1.00)",
+                "flexGrow": 0,
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "maxWidth": "116px",
+                "minWidth": "116px",
+                "msFlexPositive": 0,
+                "paddingBottom": "12px",
+                "paddingLeft": "10px",
+                "paddingRight": "10px",
+                "paddingTop": "12px",
+                "textAlign": "center",
+              }
+            }
+          >
+            10,000
+          </span>
+          <span
+            className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+            dir="auto"
+            style={
+              Object {
+                "WebkitBoxFlex": 0,
+                "WebkitFlexGrow": 0,
+                "color": "rgba(255,255,255,1.00)",
+                "flexGrow": 0,
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "maxWidth": "116px",
+                "minWidth": "116px",
+                "msFlexPositive": 0,
+                "paddingBottom": "12px",
+                "paddingLeft": "10px",
+                "paddingRight": "10px",
+                "paddingTop": "12px",
+                "textAlign": "center",
+              }
+            }
+          >
+            10
+            %
+          </span>
+          <span
+            className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+            dir="auto"
+            style={
+              Object {
+                "WebkitBoxFlex": 0,
+                "WebkitFlexGrow": 0,
+                "color": "rgba(255,255,255,1.00)",
+                "flexGrow": 0,
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "maxWidth": "116px",
+                "minWidth": "116px",
+                "msFlexPositive": 0,
+                "paddingBottom": "12px",
+                "paddingLeft": "10px",
+                "paddingRight": "10px",
+                "paddingTop": "12px",
+                "textAlign": "center",
+              }
+            }
+          >
+            <span
+              className="css-text-901oao css-textHasAncestor-16my406"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(255,255,255,1.00)",
+                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                }
+              }
+            >
+              0.0%
+            </span>
+            <span
+              className="css-text-901oao css-textHasAncestor-16my406"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(255,255,255,1.00)",
+                  "display": "inline-flex",
+                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                  "height": "20px",
+                  "marginLeft": "8px",
+                  "position": "relative",
+                  "top": "4px",
+                  "width": "35px",
+                }
+              }
+            >
+              <span
+                className="css-text-901oao css-textHasAncestor-16my406"
+                dir="auto"
+                style={
+                  Object {
+                    "backgroundColor": "rgba(251,124,109,1.00)",
+                    "borderBottomLeftRadius": "2px",
+                    "borderBottomRightRadius": "2px",
+                    "borderTopLeftRadius": "2px",
+                    "borderTopRightRadius": "2px",
+                    "color": "rgba(255,255,255,1.00)",
+                    "display": "inline-flex",
+                    "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                    "height": "20px",
+                    "width": "0%",
+                  }
+                }
+              />
+            </span>
+          </span>
+          <span
+            className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+            dir="auto"
+            style={
+              Object {
+                "WebkitBoxFlex": 0,
+                "WebkitFlexGrow": 0,
+                "color": "rgba(255,255,255,1.00)",
+                "flexGrow": 0,
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "maxWidth": "80px",
+                "minWidth": "80px",
+                "msFlexPositive": 0,
+                "paddingBottom": "12px",
+                "paddingLeft": "10px",
+                "paddingRight": "10px",
+                "paddingTop": "12px",
+                "textAlign": "center",
+              }
+            }
+          >
+            0.0
+            %
+          </span>
+          <span
+            className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+            dir="auto"
+            style={
+              Object {
+                "WebkitBoxFlex": 0,
+                "WebkitFlexGrow": 0,
+                "color": "rgba(255,255,255,1.00)",
+                "flexGrow": 0,
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "maxWidth": "80px",
+                "minWidth": "80px",
+                "msFlexPositive": 0,
+                "paddingBottom": "12px",
+                "paddingLeft": "10px",
+                "paddingRight": "10px",
+                "paddingTop": "12px",
+                "textAlign": "center",
+              }
+            }
+          >
+            0.0
+            %
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;

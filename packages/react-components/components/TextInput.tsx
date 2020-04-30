@@ -11,7 +11,7 @@ import {
   StyleSheet,
   TextInput as RNTextInput,
   TextInputFocusEventData,
-  TextInputProps,
+  TextInputProps as RNTextInputProps,
   View,
 } from 'react-native'
 
@@ -22,7 +22,7 @@ interface OwnProps {
   forwardedRef?: React.RefObject<RNTextInput>
 }
 
-type Props = OwnProps & TextInputProps
+type Props = OwnProps & RNTextInputProps
 
 interface State {
   isFocused: boolean
@@ -69,24 +69,25 @@ export class CTextInput extends React.Component<Props, State> {
       <View style={[style.container, propsStyle]}>
         <RNTextInput
           ref={forwardedRef}
-          style={style.borderedText}
+          style={{
+            ...style.borderedText,
+            ...(passThroughProps.multiline && { textAlignVertical: 'top' }),
+          }}
           value={value}
           {...passThroughProps}
           onFocus={this.handleInputFocus}
           onBlur={this.handleInputBlur}
         />
-        {isFocused &&
-          !!value &&
-          showClearButton && (
-            <CircleButton
-              style={style.iconStyle}
-              onPress={this.onClear}
-              solid={true}
-              size={20}
-              activeColor={colors.gray}
-              inactiveColor={colors.darkLightest}
-            />
-          )}
+        {isFocused && !!value && showClearButton && (
+          <CircleButton
+            style={style.iconStyle}
+            onPress={this.onClear}
+            solid={true}
+            size={20}
+            activeColor={colors.gray}
+            inactiveColor={colors.darkLightest}
+          />
+        )}
       </View>
     )
   }

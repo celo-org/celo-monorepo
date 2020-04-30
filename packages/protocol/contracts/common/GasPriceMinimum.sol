@@ -2,23 +2,27 @@ pragma solidity ^0.5.3;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+
+import "./CalledByVm.sol";
 import "./Initializable.sol";
-import "./UsingRegistry.sol";
 import "./FixidityLib.sol";
+import "./UsingRegistry.sol";
 import "../stability/interfaces/ISortedOracles.sol";
 
 /**
  * @title Stores and provides gas price minimum for various currencies.
  */
-contract GasPriceMinimum is Ownable, Initializable, UsingRegistry {
+contract GasPriceMinimum is Ownable, Initializable, UsingRegistry, CalledByVm {
   using FixidityLib for FixidityLib.Fraction;
   using SafeMath for uint256;
 
   event TargetDensitySet(uint256 targetDensity);
-
+  event GasPriceMinimumFloorSet(uint256 gasPriceMinimumFloor);
   event AdjustmentSpeedSet(uint256 adjustmentSpeed);
+  event GasPriceMinimumUpdated(uint256 gasPriceMinimum);
 
   uint256 public gasPriceMinimum;
+  uint256 public gasPriceMinimumFloor;
 
   // Block congestion level targeted by the gas price minimum calculation.
   FixidityLib.Fraction public targetDensity;
@@ -26,42 +30,58 @@ contract GasPriceMinimum is Ownable, Initializable, UsingRegistry {
   // Speed of gas price minimum adjustment due to congestion.
   FixidityLib.Fraction public adjustmentSpeed;
 
-  modifier onlyVm() {
-    assert(msg.sender == address(0x0));
-    _;
-  }
-
+  /**
+   * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
+   * @param _registryAddress The address of the registry core smart contract.
+   * @param _gasPriceMinimumFloor The lowest value the gas price minimum can be.
+   * @param _targetDensity The target gas fullness of blocks, expressed as a fixidity fraction.
+   * @param _adjustmentSpeed How quickly the minimum changes, expressed as a fixidity fraction.
+   */
   function initialize(
     address _registryAddress,
-    uint256 initialGas,
+    uint256 _gasPriceMinimumFloor,
     uint256 _targetDensity,
     uint256 _adjustmentSpeed
   ) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(_registryAddress);
-    gasPriceMinimum = initialGas;
+    gasPriceMinimum = _gasPriceMinimumFloor;
+    setGasPriceMinimumFloor(_gasPriceMinimumFloor);
     setTargetDensity(_targetDensity);
     setAdjustmentSpeed(_adjustmentSpeed);
   }
 
   /**
    * @notice Set a multiplier that impacts how quickly gas price minimum is adjusted.
+   * @param _adjustmentSpeed How quickly the minimum changes, expressed as a fixidity fraction.
    * @dev Value is expected to be < 1.
    */
   function setAdjustmentSpeed(uint256 _adjustmentSpeed) public onlyOwner {
     adjustmentSpeed = FixidityLib.wrap(_adjustmentSpeed);
-    require(adjustmentSpeed.lt(FixidityLib.fixed1()));
+    require(adjustmentSpeed.lt(FixidityLib.fixed1()), "adjustment speed must be smaller than 1");
     emit AdjustmentSpeedSet(_adjustmentSpeed);
   }
 
   /**
    * @notice Set the block density targeted by the gas price minimum algorithm.
+   * @param _targetDensity The target gas fullness of blocks, expressed as a fixidity fraction.
    * @dev Value is expected to be < 1.
    */
   function setTargetDensity(uint256 _targetDensity) public onlyOwner {
     targetDensity = FixidityLib.wrap(_targetDensity);
-    require(targetDensity.lt(FixidityLib.fixed1()));
+    require(targetDensity.lt(FixidityLib.fixed1()), "target density must be smaller than 1");
     emit TargetDensitySet(_targetDensity);
+  }
+
+  /**
+   * @notice Set the minimum gas price treshold.
+   * @param _gasPriceMinimumFloor The lowest value the gas price minimum can be.
+   * @dev Value is expected to be > 0.
+   */
+  function setGasPriceMinimumFloor(uint256 _gasPriceMinimumFloor) public onlyOwner {
+    require(_gasPriceMinimumFloor > 0, "gas price minimum floor must be greater than zero");
+    gasPriceMinimumFloor = _gasPriceMinimumFloor;
+    emit GasPriceMinimumFloorSet(_gasPriceMinimumFloor);
   }
 
   /**
@@ -99,6 +119,7 @@ contract GasPriceMinimum is Ownable, Initializable, UsingRegistry {
     returns (uint256)
   {
     gasPriceMinimum = getUpdatedGasPriceMinimum(blockGasTotal, blockGasLimit);
+    emit GasPriceMinimumUpdated(gasPriceMinimum);
     return gasPriceMinimum;
   }
 
@@ -128,10 +149,11 @@ contract GasPriceMinimum is Ownable, Initializable, UsingRegistry {
       ? FixidityLib.fixed1().add(adjustmentSpeed.multiply(densityDelta))
       : FixidityLib.fixed1().subtract(adjustmentSpeed.multiply(densityDelta));
 
-    return
-      adjustment
-        .multiply(FixidityLib.newFixed(gasPriceMinimum))
-        .add(FixidityLib.fixed1())
-        .fromFixed();
+    uint256 newGasPriceMinimum = adjustment
+      .multiply(FixidityLib.newFixed(gasPriceMinimum))
+      .add(FixidityLib.fixed1())
+      .fromFixed();
+
+    return newGasPriceMinimum >= gasPriceMinimumFloor ? newGasPriceMinimum : gasPriceMinimumFloor;
   }
 }

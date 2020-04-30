@@ -1,0 +1,167 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: load-test
+  labels:
+    component: load-test
+spec:
+  ports:
+  - port: 80
+    name: web
+  clusterIP: None
+  selector:
+    component: load-test
+---
+apiVersion: apps/v1beta2
+kind: StatefulSet
+metadata:
+  name: {{ .Values.environment }}-load-test
+  labels:
+    app: load-test
+    chart: load-test
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    component: load-test
+spec:
+  podManagementPolicy: Parallel
+  serviceName: load-test
+  replicas: {{ .Values.replicas }}
+  selector:
+    matchLabels:
+      app: load-test
+      release: {{ .Release.Name }}
+      component: load-test
+  template:
+    metadata:
+      labels:
+        app: load-test
+        release: {{ .Release.Name }}
+        component: load-test
+    spec:
+      initContainers:
+      - name: generate-keys
+        image: {{ .Values.celotool.image.repository }}:{{ .Values.celotool.image.tag }}
+        imagePullPolicy: {{ .Values.imagePullPolicy }}
+        command:
+          - bash
+          - "-c"
+          - |
+            [[ $REPLICA_NAME =~ -([0-9]+)$ ]] || exit 1
+            RID=${BASH_REMATCH[1]}
+            echo $RID > /root/.celo/rid
+
+            echo "Generating private key for rid=$RID"
+            celotooljs.sh generate bip32 \
+              --mnemonic "$MNEMONIC" \
+              --accountType load_testing \
+              --index $RID \
+              > /root/.celo/pkey
+
+            echo "Generating account address for rid=$RID"
+            celotooljs.sh generate account-address \
+              --private-key `cat /root/.celo/pkey` \
+              > /root/.celo/address
+        env:
+        - name: REPLICA_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: MNEMONIC
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.environment }}-load-test
+              key: mnemonic
+        volumeMounts:
+        - name: data
+          mountPath: /root/.celo
+{{ include "common.init-genesis-container" .  | indent 6 }}
+{{ include "common.import-geth-account-container" .  | indent 6 }}
+      containers:
+      - name: geth
+        image: {{ .Values.geth.image.repository }}:{{ .Values.geth.image.tag }}
+        imagePullPolicy: {{ .Values.imagePullPolicy }}
+        command: ["/bin/sh"]
+        args:
+        - "-c"
+        - |-
+          set -euo pipefail
+          cp /var/geth/static-nodes.json /root/.celo/static-nodes.json
+
+          ACCOUNT_ADDRESS=`cat /root/.celo/address`
+
+          geth \
+          --rpc \
+          --rpcapi=eth,web3,debug,admin,personal,net \
+          --rpcvhosts=* \
+          --networkid={{ .Values.geth.networkID }} \
+          --nodekey=/root/.celo/pkey \
+          --syncmode=ultralight \
+          --consoleformat=json \
+          --consoleoutput=stdout \
+          --verbosity={{ .Values.geth.verbosity }} \
+          --unlock=${ACCOUNT_ADDRESS} \
+          --etherbase=${ACCOUNT_ADDRESS} \
+          --password=/root/.celo/account/accountSecret
+        ports:
+        - name: discovery-udp
+          containerPort: 30303
+          protocol: UDP
+        - name: discovery-tcp
+          containerPort: 30303
+        - name: rpc
+          containerPort: 8545
+        - name: ws
+          containerPort: 8546
+        resources:
+          requests:
+            memory: 250Mi
+            cpu: 40m
+        volumeMounts:
+        - name: data
+          mountPath: /root/.celo
+        - name: config
+          mountPath: /var/geth
+        - name: account
+          mountPath: "/root/.celo/account"
+          readOnly: true
+      - name: simulate-client
+        image: {{ .Values.celotool.image.repository }}:{{ .Values.celotool.image.tag }}
+        imagePullPolicy: {{ .Values.imagePullPolicy }}
+        command:
+          - bash
+          - "-c"
+          - |
+            RID=`cat /root/.celo/rid`
+
+            # Send the txs to the next load test client
+            RECIPIENT_INDEX=$(( ($RID + 1) % {{ .Values.replicas }} ))
+
+            celotooljs.sh geth simulate-client \
+              --index $RID \
+              --recipient-index $RECIPIENT_INDEX \
+              --delay {{ .Values.delay }} \
+              --mnemonic "$MNEMONIC" \
+              --blockscout-url {{ .Values.blockscout.url }} \
+              --blockscoutMeasurePercent {{ .Values.blockscout.measurePercent }}
+        resources:
+          requests:
+            memory: 256Mi
+            cpu: 5m
+        env:
+        - name: MNEMONIC
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.environment }}-load-test
+              key: mnemonic
+        volumeMounts:
+        - name: data
+          mountPath: /root/.celo
+      volumes:
+      - name: data
+        emptyDir: {}
+      - name: config
+        configMap:
+          name: {{ .Values.environment }}-load-test-config
+      - name: account
+        secret:
+          secretName: {{ .Values.environment }}-load-test

@@ -8,7 +8,7 @@ import { GasPriceMinimumInstance } from 'types'
 const initializeArgs = async (): Promise<any[]> => {
   return [
     config.registry.predeployedProxyAddress,
-    config.gasPriceMinimum.initialMinimum,
+    config.gasPriceMinimum.minimumFloor,
     toFixed(config.gasPriceMinimum.targetDensity).toString(),
     toFixed(config.gasPriceMinimum.adjustmentSpeed).toString(),
   ]

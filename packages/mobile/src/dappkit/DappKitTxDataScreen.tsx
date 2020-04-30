@@ -1,14 +1,14 @@
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import * as React from 'react'
-import { WithNamespaces, withNamespaces } from 'react-i18next'
+import { WithTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { NavigationInjectedProps } from 'react-navigation'
-import { Namespaces } from 'src/i18n'
+import { Namespaces, withTranslation } from 'src/i18n'
 import { headerWithBackButton } from 'src/navigator/Headers'
 
-type Props = NavigationInjectedProps & WithNamespaces
+type Props = NavigationInjectedProps & WithTranslation
 
 class DappKitTxDataScreen extends React.Component<Props> {
   static navigationOptions = headerWithBackButton
@@ -51,4 +51,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default withNamespaces(Namespaces.dappkit)(DappKitTxDataScreen)
+export default withTranslation(Namespaces.dappkit)(DappKitTxDataScreen)

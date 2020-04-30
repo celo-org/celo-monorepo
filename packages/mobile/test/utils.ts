@@ -1,6 +1,7 @@
 /* Utilities to facilitate testing */
 import BigNumber from 'bignumber.js'
 import { NavigationScreenProp } from 'react-navigation'
+import { ReactTestInstance } from 'react-test-renderer'
 import configureMockStore from 'redux-mock-store'
 import { InitializationState } from 'src/geth/reducer'
 import i18n from 'src/i18n'
@@ -22,6 +23,7 @@ export const mockContractKitBalance = jest.fn(() => new BigNumber(10))
 export const mockContractKitContract = {
   balanceOf: mockContractKitBalance,
   decimals: jest.fn(async () => '10'),
+  transferWithComment: jest.fn(async () => '10'),
 }
 
 interface MockContract {
@@ -92,7 +94,7 @@ export function createMockStore(overrides: RecursivePartial<RootState> = {}) {
 export function getMockStoreData(overrides: RecursivePartial<RootState> = {}): RootState {
   const defaultSchema = getLatestSchema()
   const appConnectedData = {
-    geth: { initialized: InitializationState.INITIALIZED, connected: true },
+    geth: { ...defaultSchema.geth, initialized: InitializationState.INITIALIZED, connected: true },
   }
   const contactMappingData = {
     identity: {
@@ -128,4 +130,15 @@ export function getMockI18nProps() {
     t: i18n.t,
     tReady: true,
   }
+}
+
+export function getElementText(instance: ReactTestInstance | string): string {
+  if (typeof instance === 'string') {
+    return instance
+  }
+  return instance.children
+    .map((child) => {
+      return getElementText(child)
+    })
+    .join('')
 }

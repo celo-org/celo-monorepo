@@ -1,20 +1,20 @@
 import BigNumber from 'bignumber.js'
-const numeral = require('numeral')
 
 export const stringToBoolean = (inputString: string): boolean => {
-  const lowercasedInput = inputString.toLowerCase()
+  const lowercasedInput = inputString.toLowerCase().trim()
   if (lowercasedInput === 'true') {
     return true
   } else if (lowercasedInput === 'false') {
     return false
   }
-  throw new Error('Parsing error')
+  throw new Error(`Unable to parse '${inputString}' as boolean`)
 }
 
-export const parseInputAmount = (inputString: string): BigNumber => {
-  // Potential precision loss from using numeric values
-  // https://github.com/MikeMcl/bignumber.js/#use
-  return new BigNumber(numeral(inputString).value() || '0')
+export const parseInputAmount = (inputString: string, decimalSeparator = '.'): BigNumber => {
+  if (decimalSeparator !== '.') {
+    inputString = inputString.replace(decimalSeparator, '.')
+  }
+  return new BigNumber(inputString || '0')
 }
 
 /**

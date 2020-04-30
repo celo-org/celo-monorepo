@@ -6,9 +6,12 @@ import AspectRatio from 'src/shared/AspectRatio'
 interface Props {
   ratio: number
   sources: { large?: ImageURISource; medium?: ImageURISource; small?: ImageURISource }
+  source?: ImageURISource
 }
 
-class ResponsiveImage extends React.PureComponent<Props & ImageProps & ScreenProps> {
+class ResponsiveImage extends React.PureComponent<
+  Props & Omit<ImageProps, 'source'> & ScreenProps
+> {
   getSource = () => {
     switch (this.props.screen) {
       case ScreenSizes.DESKTOP:

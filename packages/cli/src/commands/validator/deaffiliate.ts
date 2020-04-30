@@ -4,7 +4,8 @@ import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
 
 export default class ValidatorDeAffiliate extends BaseCommand {
-  static description = 'DeAffiliate to a ValidatorGroup'
+  static description =
+    'Deaffiliate a Validator from a Validator Group, and remove it from the Group if it is also a member.'
 
   static flags = {
     ...BaseCommand.flags,

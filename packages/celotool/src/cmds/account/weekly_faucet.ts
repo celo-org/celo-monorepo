@@ -4,7 +4,7 @@ import { switchToClusterFromEnv } from 'src/lib/cluster'
 import { getBlockchainApiUrl } from 'src/lib/endpoints'
 import { portForwardAnd } from 'src/lib/port_forward'
 import { execCmd } from 'src/lib/utils'
-import * as yargs from 'yargs'
+import yargs from 'yargs'
 import { AccountArgv } from '../account'
 
 export const command = 'weekly-faucet'
@@ -32,7 +32,7 @@ export const handler = async (argv: WeeklyFaucetArgv) => {
     const [output] = await execCmd(
       `yarn --cwd ../protocol run weekly-faucet -n ${argv.celoEnv} -f ${
         argv.file
-      } -b ${getBlockchainApiUrl(argv)}`
+      } -b ${getBlockchainApiUrl(argv.celoEnv)}`
     )
     console.log(output)
   }

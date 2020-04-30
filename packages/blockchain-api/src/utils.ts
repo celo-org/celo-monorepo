@@ -44,31 +44,28 @@ export function formatDateString(date: Date) {
   return date.toISOString().split('T')[0]
 }
 
-let goldTokenAddress: string
-let stableTokenAddress: string
 let attestationsAddress: string
-let tokenAddressMapping: { [key: string]: string }
+let escrowAddress: string
+
 export async function getContractAddresses() {
-  if (goldTokenAddress && stableTokenAddress && attestationsAddress) {
+  if (attestationsAddress && escrowAddress) {
     console.info('Already got token addresses')
-    return { tokenAddressMapping, attestationsAddress }
+    return {
+      attestationsAddress,
+      escrowAddress,
+    }
   }
   try {
     const kit = await getContractKit()
-    goldTokenAddress = (await kit.registry.addressFor(CeloContract.GoldToken)).toLowerCase()
-    stableTokenAddress = (await kit.registry.addressFor(CeloContract.StableToken)).toLowerCase()
     attestationsAddress = (await kit.registry.addressFor(CeloContract.Attestations)).toLowerCase()
-    tokenAddressMapping = {
-      [goldTokenAddress]: 'Celo Gold',
-      [stableTokenAddress]: 'Celo Dollar',
-    }
+    escrowAddress = (await kit.registry.addressFor(CeloContract.Escrow)).toLowerCase()
     console.info(
-      'Got token addresses. Attestations: ' +
-        attestationsAddress +
-        ' Token mapping: ' +
-        JSON.stringify(tokenAddressMapping)
+      'Got token addresses. Attestations: ' + attestationsAddress + ' Escrow: ' + escrowAddress
     )
-    return { tokenAddressMapping, attestationsAddress }
+    return {
+      attestationsAddress,
+      escrowAddress,
+    }
   } catch (e) {
     console.error('@getContractAddresses() error', e)
     throw new Error('Unable to fetch contract addresses')

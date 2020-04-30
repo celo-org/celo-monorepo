@@ -1,10 +1,11 @@
 import { createSelector } from 'reselect'
-import { getPaymentRequests } from 'src/account/selectors'
+import { getIncomingPaymentRequests } from 'src/account/selectors'
 import { DAYS_TO_BACKUP, DAYS_TO_DELAY } from 'src/backup/utils'
 import { BALANCE_OUT_OF_SYNC_THRESHOLD } from 'src/config'
-import { isGethConnectedSelector } from 'src/geth/reducer'
+import { isGethConnectedSelector } from 'src/geth/selectors'
 import { RootState } from 'src/redux/reducers'
 import { timeDeltaInDays, timeDeltaInSeconds } from 'src/utils/time'
+import { fornoSelector } from 'src/web3/selectors'
 
 export const disabledDueToNoBackup = (
   accountCreationTime: number,
@@ -27,14 +28,24 @@ export const isBackupTooLate = (state: RootState) => {
 export const getNetworkConnected = (state: RootState) => state.networkInfo.connected
 
 export const isAppConnected = createSelector(
+  fornoSelector,
   isGethConnectedSelector,
   getNetworkConnected,
-  (gethConnected, networkConnected) => gethConnected && networkConnected
+  (fornoEnabled, gethConnected, networkConnected) =>
+    (fornoEnabled || gethConnected) && networkConnected
 )
+
+export const isAppSynced = (state: RootState) => {
+  return (
+    state.web3.syncProgress.currentBlock > 0 &&
+    state.web3.syncProgress.highestBlock > 0 &&
+    state.web3.syncProgress.currentBlock === state.web3.syncProgress.highestBlock
+  )
+}
 
 export const getTabBarActiveNotification = createSelector(
   isBackupTooLate,
-  getPaymentRequests,
+  getIncomingPaymentRequests,
   (tooLate, paymentRequests) => tooLate || Boolean(paymentRequests.length)
 )
 

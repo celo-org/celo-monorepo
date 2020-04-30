@@ -1,9 +1,10 @@
 {
-  "getVerified": "~~Verify Phone Number",
+  "getVerified": "Verificar el Teléfono",
   "notReadyForCode": "Aún no está listo para ingresar el código",
   "emptyVerificationCode": "Sin Código en el Portapapeles",
   "invalidVerificationCode": "Código de Verification Inválido",
   "repeatVerificationCode": "Código de Verificación Repetido",
+  "revealAttestationFailure": "Error al solicitar mensaje SMS",
   "verificationFailure": "Fallo en la Verificación",
   "verificationTimeout": "Verificación no pudo ser verificada a tiempo",
   "errorRequestCode": "Error al solicitar los códigos.",
@@ -25,7 +26,7 @@
       "La verificación del número telefónico de Celo consiste en asociar su billetera de Celo con su teléfono.",
     "section1Header": "¿Tengo que completar este paso?",
     "section1Body":
-      "La verificación no es obligatoria. Cuando la completa, las personas de la red de Celo le podrán enviar valores usando su número telefónico. De lo contrario, deberán usar códigos QR o direcciones.",
+      "La verificación no es obligatoria.  Sin verificar, solo es posible enviar y recibir valor utilizando códigos QR o direcciones.",
     "section2Header": "Seguridad y privacidad",
     "section2Body":
       "Para proteger su privacidad, solo se guarda una versión oculta de su teléfono en la cadena de bloques de Celo."
@@ -33,11 +34,9 @@
   "loading": {
     "verifyingNumber": "Verificando {{number}}",
     "keepOpen": "Deje abierta la aplicación",
-    "card1":
-      "Verificar su número telefónico permite que sus amigos lo encuentren en la red de Celo.",
+    "card1": "Verificar tu cuenta te permite ver cuál de tus amigos usa Celo Wallet.",
     "card2": "Con Celo, puede enviar dinero a cualquier persona con tan solo el número telefónico.",
-    "card3":
-      "Celo ahora envía tres mensajes de texto para confirmar que es dueño de su propia línea telefónica."
+    "card3": "Celo ahora envía tres mensajes de texto para confirmar que es dueño de su propia línea telefónica."
   },
   "skipModal": {
     "header": "¿Omitir la verificación?",
@@ -70,9 +69,16 @@
     "skip": "Omitir por ahora"
   },
   "failModal": {
-    "header": "No se pudo verificar",
+    "header": "Error de verificación",
     "body1": "Se produjo un problema al verificar su número de teléfono.",
-    "body2": "Puede saltar la verificación y volver a intentarlo más tarde."
+    "body2": "Puede saltar la verificación y volver a intentarlo más tarde.",
+    "enterCodesBody": " Si ya recibió tres códigos por SMS, aún puede ingresarlos.",
+    "enterCodesButton": "Ingresar códigos"
   },
-  "congratsVerified": "¡Felicitaciones se ha verificado tu suario!"
+  "congratsVerified": "¡Felicitaciones se ha verificado tu usuario!",
+  "notification": {
+    "title": "Verificar el Teléfono",
+    "body": "La verificación le permite enviar y recibir con sus contactos telefónicos.",
+    "cta": "Verifícate"
+  }
 }

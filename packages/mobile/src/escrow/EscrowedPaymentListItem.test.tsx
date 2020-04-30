@@ -3,6 +3,7 @@ import 'react-native'
 import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
 import EscrowedPaymentListItem from 'src/escrow/EscrowedPaymentListItem'
+
 import { createMockStore } from 'test/utils'
 import { mockEscrowedPayment } from 'test/values'
 

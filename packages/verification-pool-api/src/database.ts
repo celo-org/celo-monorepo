@@ -15,18 +15,22 @@ export async function getVerifier(id: string): Promise<MobileVerifier | null> {
     return null
   }
 
-  return (await database()
-    .ref(`/${CELO_ENV}/mobileVerifiers/${id}`)
-    .once('value')).val()
+  return (
+    await database()
+      .ref(`/${CELO_ENV}/mobileVerifiers/${id}`)
+      .once('value')
+  ).val()
 }
 
 export async function getActiveVerifiers(): Promise<MobileVerifiersMap> {
   console.info('Getting all active verifiers from db')
-  return (await database()
-    .ref(`/${CELO_ENV}/mobileVerifiers`)
-    .orderByChild('isVerifying')
-    .equalTo(true)
-    .once('value')).val()
+  return (
+    await database()
+      .ref(`/${CELO_ENV}/mobileVerifiers`)
+      .orderByChild('isVerifying')
+      .equalTo(true)
+      .once('value')
+  ).val()
 }
 
 export function incrementVerifierAttemptCount(id?: string) {
@@ -126,20 +130,24 @@ export async function getMessagesForPhoneNumber(
     return null
   }
 
-  return (await database()
-    .ref(`/${CELO_ENV}/messages`)
-    .orderByChild('phoneNum')
-    .equalTo(phoneNumber)
-    .once('value')).val()
+  return (
+    await database()
+      .ref(`/${CELO_ENV}/messages`)
+      .orderByChild('phoneNum')
+      .equalTo(phoneNumber)
+      .once('value')
+  ).val()
 }
 
 export async function getMessagesForState(messageState: MessageState): Promise<SMSMessagesMap> {
   console.info('Getting messages from db of state:', messageState)
-  return (await database()
-    .ref(`/${CELO_ENV}/messages`)
-    .orderByChild('messageState')
-    .equalTo(messageState)
-    .once('value')).val()
+  return (
+    await database()
+      .ref(`/${CELO_ENV}/messages`)
+      .orderByChild('messageState')
+      .equalTo(messageState)
+      .once('value')
+  ).val()
 }
 
 export function setMessageState(id: string, messageState: MessageState) {

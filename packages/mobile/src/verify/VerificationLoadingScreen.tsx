@@ -4,7 +4,7 @@ import VerificationTexts from '@celo/react-components/icons/VerificationTexts'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import * as React from 'react'
-import { withNamespaces, WithNamespaces } from 'react-i18next'
+import { WithTranslation } from 'react-i18next'
 import { BackHandler, ScrollView, StyleSheet, Text, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
@@ -12,7 +12,7 @@ import componentWithAnalytics from 'src/analytics/wrapper'
 import CancelButton from 'src/components/CancelButton'
 import Carousel, { CarouselItem } from 'src/components/Carousel'
 import DevSkipButton from 'src/components/DevSkipButton'
-import { Namespaces } from 'src/i18n'
+import { Namespaces, withTranslation } from 'src/i18n'
 import LoadingSpinner from 'src/icons/LoadingSpinner'
 import { cancelVerification, startVerification } from 'src/identity/actions'
 import { VerificationStatus } from 'src/identity/verification'
@@ -20,7 +20,7 @@ import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
 import Logger from 'src/utils/Logger'
-import VerificationFailedModal from 'src/verify/VerificationFailedModal'
+import { VerificationFailedModal } from 'src/verify/VerificationFailedModal'
 
 const TAG = 'VerificationLoadingScreen'
 
@@ -34,7 +34,7 @@ interface DispatchProps {
   cancelVerification: typeof cancelVerification
 }
 
-type Props = StateProps & DispatchProps & WithNamespaces
+type Props = StateProps & DispatchProps & WithTranslation
 
 const mapDispatchToProps = {
   startVerification,
@@ -99,21 +99,26 @@ class VerificationLoadingScreen extends React.Component<Props> {
     ]
     return (
       <SafeAreaView style={styles.container}>
-        <View style={styles.buttonCancelContainer}>
-          <CancelButton onCancel={this.onCancel} />
-        </View>
-        <ScrollView contentContainerStyle={styles.scrollContainer}>
-          <DevSkipButton nextScreen={Screens.VerificationInterstitialScreen} />
-          <View style={styles.statusContainer}>
-            <LoadingSpinner />
-            <Text style={styles.textPhoneNumber}>
-              {t('loading.verifyingNumber', { number: e164Number })}
-            </Text>
-            <Text style={styles.textOpenTip}>{t('loading.keepOpen')}</Text>
+        <View style={styles.innerContainer}>
+          <View style={styles.buttonCancelContainer}>
+            <CancelButton onCancel={this.onCancel} />
           </View>
-          <Carousel containerStyle={styles.carouselContainer} items={items} />
-        </ScrollView>
-        <VerificationFailedModal isVisible={verificationStatus === VerificationStatus.Failed} />
+          <ScrollView contentContainerStyle={styles.scrollContainer}>
+            <DevSkipButton nextScreen={Screens.VerificationInterstitialScreen} />
+            <View style={styles.statusContainer}>
+              <LoadingSpinner />
+              <Text style={styles.textPhoneNumber}>
+                {t('loading.verifyingNumber', { number: e164Number })}
+              </Text>
+              <Text style={styles.textOpenTip}>{t('loading.keepOpen')}</Text>
+            </View>
+            <Carousel containerStyle={styles.carouselContainer} items={items} />
+          </ScrollView>
+        </View>
+        <VerificationFailedModal
+          verificationStatus={verificationStatus}
+          cancelVerification={this.props.cancelVerification}
+        />
       </SafeAreaView>
     )
   }
@@ -122,24 +127,24 @@ class VerificationLoadingScreen extends React.Component<Props> {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'space-between',
     backgroundColor: colors.backgroundDarker,
   },
-  scrollContainer: {
+  innerContainer: {
     flex: 1,
-    paddingTop: 60,
+  },
+  scrollContainer: {
+    flexGrow: 1,
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
   },
   buttonCancelContainer: {
     position: 'absolute',
-    top: 20,
     left: 5,
-    zIndex: 10,
   },
   statusContainer: {
     alignItems: 'center',
     justifyContent: 'center',
+    marginTop: 46,
   },
   textPhoneNumber: {
     ...fontStyles.body,
@@ -151,7 +156,7 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   carouselContainer: {
-    marginVertical: 20,
+    paddingVertical: 20,
   },
 })
 
@@ -159,5 +164,5 @@ export default componentWithAnalytics(
   connect<StateProps, DispatchProps, {}, RootState>(
     mapStateToProps,
     mapDispatchToProps
-  )(withNamespaces(Namespaces.nuxVerification2)(VerificationLoadingScreen))
+  )(withTranslation(Namespaces.nuxVerification2)(VerificationLoadingScreen))
 )

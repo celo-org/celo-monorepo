@@ -1,0 +1,52 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders correctly 1`] = `
+<View
+  accessible={true}
+  focusable={true}
+  hitSlop={
+    Object {
+      "bottom": 10,
+      "left": 10,
+      "right": 10,
+      "top": 10,
+    }
+  }
+  isTVSelectable={true}
+  nativeBackgroundAndroid={
+    Object {
+      "attribute": "selectableItemBackgroundBorderless",
+      "type": "ThemeAttrAndroid",
+    }
+  }
+  onClick={[Function]}
+  onResponderGrant={[Function]}
+  onResponderMove={[Function]}
+  onResponderRelease={[Function]}
+  onResponderTerminate={[Function]}
+  onResponderTerminationRequest={[Function]}
+  onStartShouldSetResponder={[Function]}
+  style={
+    Object {
+      "alignItems": "center",
+      "justifyContent": "flex-end",
+      "paddingHorizontal": 5,
+    }
+  }
+>
+  <Image
+    source={
+      Object {
+        "testUri": "../../../packages/mobile/src/images/info.png",
+      }
+    }
+    style={
+      Object {
+        "height": 12,
+        "tintColor": "#BDBDBD",
+        "width": 12,
+      }
+    }
+  />
+</View>
+`;

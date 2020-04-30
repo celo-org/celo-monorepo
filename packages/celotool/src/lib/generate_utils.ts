@@ -1,4 +1,7 @@
+// @ts-ignore
 import { blsPrivateKeyToProcessedPrivateKey } from '@celo/utils/lib/bls'
+import * as bip32 from 'bip32'
+import * as bip39 from 'bip39'
 import * as bls12377js from 'bls12377js'
 import { ec as EC } from 'elliptic'
 import fs from 'fs'
@@ -9,16 +12,15 @@ import Web3 from 'web3'
 import { envVar, fetchEnv, fetchEnvOrFallback, monorepoRoot } from './env-utils'
 import {
   CONTRACT_OWNER_STORAGE_LOCATION,
+  GENESIS_MSG_HASH,
   GETH_CONFIG_OLD,
   ISTANBUL_MIX_HASH,
-  OG_ACCOUNTS,
   REGISTRY_ADDRESS,
   TEMPLATE,
 } from './genesis_constants'
+import { GenesisConfig } from './interfaces/genesis-config'
 import { ensure0x, strip0x } from './utils'
 
-import bip32 = require('bip32')
-import bip39 = require('bip39')
 const ec = new EC('secp256k1')
 
 export enum AccountType {
@@ -29,6 +31,9 @@ export enum AccountType {
   FAUCET = 4,
   ATTESTATION = 5,
   PRICE_ORACLE = 6,
+  PROXY = 7,
+  ATTESTATION_BOT = 8,
+  VOTING_BOT = 9,
 }
 
 export enum ConsensusType {
@@ -39,6 +44,12 @@ export enum ConsensusType {
 export interface Validator {
   address: string
   blsPublicKey: string
+  balance?: string
+}
+
+export interface AccountAndBalance {
+  address: string
+  balance: string
 }
 
 export const MNEMONIC_ACCOUNT_TYPE_CHOICES = [
@@ -49,6 +60,9 @@ export const MNEMONIC_ACCOUNT_TYPE_CHOICES = [
   'faucet',
   'attestation',
   'price_oracle',
+  'proxy',
+  'attestation_bot',
+  'voting_bot',
 ]
 
 export const add0x = (str: string) => {
@@ -64,14 +78,21 @@ export const coerceMnemonicAccountType = (raw: string): AccountType => {
 }
 
 export const generatePrivateKey = (mnemonic: string, accountType: AccountType, index: number) => {
-  const seed = bip39.mnemonicToSeed(mnemonic)
+  const seed = bip39.mnemonicToSeedSync(mnemonic)
   const node = bip32.fromSeed(seed)
   const newNode = node.derive(accountType).derive(index)
 
-  return newNode.privateKey.toString('hex')
+  return newNode.privateKey!.toString('hex')
 }
 
-export const privateKeyToPublicKey = (privateKey: string) => {
+export const generatePublicKey = (mnemonic: string, accountType: AccountType, index: number) => {
+  return privateKeyToPublicKey(generatePrivateKey(mnemonic, accountType, index))
+}
+
+export const generateAddress = (mnemonic: string, accountType: AccountType, index: number) =>
+  privateKeyToAddress(generatePrivateKey(mnemonic, accountType, index))
+
+export const privateKeyToPublicKey = (privateKey: string): string => {
   const ecPrivateKey = ec.keyFromPrivate(Buffer.from(privateKey, 'hex'))
   const ecPublicKey: string = ecPrivateKey.getPublic('hex')
   return ecPublicKey.slice(2)
@@ -85,8 +106,16 @@ export const privateKeyToAddress = (privateKey: string) => {
 export const privateKeyToStrippedAddress = (privateKey: string) =>
   strip0x(privateKeyToAddress(privateKey))
 
-const DEFAULT_BALANCE = '1000000000000000000000000'
-const VALIDATOR_OG_SOURCE = 'og'
+const validatorZeroBalance = () =>
+  fetchEnvOrFallback(envVar.VALIDATOR_ZERO_GENESIS_BALANCE, '103010030000000000000000000') // 103,010,030 CG
+const validatorBalance = () =>
+  fetchEnvOrFallback(envVar.VALIDATOR_GENESIS_BALANCE, '10011000000000000000000') // 10,011 CG
+const faucetBalance = () =>
+  fetchEnvOrFallback(envVar.FAUCET_GENESIS_BALANCE, '10011000000000000000000') // 10,011 CG
+const oracleBalance = () =>
+  fetchEnvOrFallback(envVar.MOCK_ORACLE_GENESIS_BALANCE, '100000000000000000000') // 100 CG
+const votingBotBalance = () =>
+  fetchEnvOrFallback(envVar.VOTING_BOT_BALANCE, '10000000000000000000000') // 10,000 CG
 
 export const getPrivateKeysFor = (accountType: AccountType, mnemonic: string, n: number) =>
   range(0, n).map((i) => generatePrivateKey(mnemonic, accountType, i))
@@ -97,12 +126,13 @@ export const getAddressesFor = (accountType: AccountType, mnemonic: string, n: n
 export const getStrippedAddressesFor = (accountType: AccountType, mnemonic: string, n: number) =>
   getAddressesFor(accountType, mnemonic, n).map(strip0x)
 
-export const getValidators = (mnemonic: string, n: number) => {
-  return getPrivateKeysFor(AccountType.VALIDATOR, mnemonic, n).map((key) => {
+export const getValidatorsInformation = (mnemonic: string, n: number): Validator[] => {
+  return getPrivateKeysFor(AccountType.VALIDATOR, mnemonic, n).map((key, i) => {
     const blsKeyBytes = blsPrivateKeyToProcessedPrivateKey(key)
     return {
       address: strip0x(privateKeyToAddress(key)),
       blsPublicKey: bls12377js.BLS.privateToPublicBytes(blsKeyBytes).toString('hex'),
+      balance: i === 0 ? validatorZeroBalance() : validatorBalance(),
     }
   })
 }
@@ -113,19 +143,58 @@ export const getAddressFromEnv = (accountType: AccountType, n: number) => {
   return privateKeyToAddress(privateKey)
 }
 
+const getFaucetedAccountsFor = (
+  accountType: AccountType,
+  mnemonic: string,
+  n: number,
+  balance: string
+) => {
+  return getStrippedAddressesFor(accountType, mnemonic, n).map((address) => ({
+    address,
+    balance,
+  }))
+}
+
+export const getFaucetedAccounts = (mnemonic: string) => {
+  const numFaucetAccounts = parseInt(fetchEnvOrFallback(envVar.FAUCET_GENESIS_ACCOUNTS, '0'), 10)
+  const faucetAccounts = getFaucetedAccountsFor(
+    AccountType.FAUCET,
+    mnemonic,
+    numFaucetAccounts,
+    faucetBalance()
+  )
+
+  const numLoadTestAccounts = parseInt(fetchEnvOrFallback(envVar.LOAD_TEST_CLIENTS, '0'), 10)
+  const loadTestAccounts = getFaucetedAccountsFor(
+    AccountType.LOAD_TESTING_ACCOUNT,
+    mnemonic,
+    numLoadTestAccounts,
+    faucetBalance()
+  )
+
+  const oracleAccounts = getFaucetedAccountsFor(
+    AccountType.PRICE_ORACLE,
+    mnemonic,
+    1,
+    oracleBalance()
+  )
+
+  const numVotingBotAccounts = parseInt(fetchEnvOrFallback(envVar.VOTING_BOTS, '0'), 10)
+  const votingBotAccounts = getFaucetedAccountsFor(
+    AccountType.VOTING_BOT,
+    mnemonic,
+    numVotingBotAccounts,
+    votingBotBalance()
+  )
+
+  return [...faucetAccounts, ...loadTestAccounts, ...oracleAccounts, ...votingBotAccounts]
+}
+
 export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
   const mnemonic = fetchEnv(envVar.MNEMONIC)
   const validatorEnv = fetchEnv(envVar.VALIDATORS)
-  const validators =
-    validatorEnv === VALIDATOR_OG_SOURCE
-      ? OG_ACCOUNTS.map((account) => {
-          const blsKeyBytes = blsPrivateKeyToProcessedPrivateKey(account.privateKey)
-          return {
-            address: account.address,
-            blsPublicKey: bls12377js.BLS.privateToPublicBytes(blsKeyBytes).toString('hex'),
-          }
-        })
-      : getValidators(mnemonic, parseInt(validatorEnv, 10))
+  const genesisAccountsEnv = fetchEnvOrFallback(envVar.GENESIS_ACCOUNTS, '')
+  const validators = getValidatorsInformation(mnemonic, parseInt(validatorEnv, 10))
 
   const consensusType = fetchEnv(envVar.CONSENSUS_TYPE) as ConsensusType
 
@@ -140,32 +209,59 @@ export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
     10
   )
   const epoch = parseInt(fetchEnvOrFallback(envVar.EPOCH, '30000'), 10)
+  // allow 12 blocks in prod for the uptime metric
+  const lookbackwindow = parseInt(fetchEnvOrFallback(envVar.LOOKBACK, '12'), 10)
   const chainId = parseInt(fetchEnv(envVar.NETWORK_ID), 10)
 
-  // Assing DEFAULT ammount of gold to 2 faucet accounts
-  const faucetAddresses = getStrippedAddressesFor(AccountType.FAUCET, mnemonic, 2)
+  const initialAccounts = getFaucetedAccounts(mnemonic)
+  if (genesisAccountsEnv !== '') {
+    const genesisAccountsPath = path.resolve(monorepoRoot, genesisAccountsEnv)
+    const genesisAccounts = JSON.parse(fs.readFileSync(genesisAccountsPath).toString())
+    for (const addr of genesisAccounts.addresses) {
+      initialAccounts.push({
+        address: addr,
+        balance: genesisAccounts.value,
+      })
+    }
+  }
 
-  const oracleAddress = getStrippedAddressesFor(AccountType.PRICE_ORACLE, mnemonic, 1)
+  // Allocate voting bot account(s)
+  const numVotingBotAccounts = parseInt(fetchEnvOrFallback(envVar.VOTING_BOTS, '0'), 10)
+  initialAccounts.concat(
+    getStrippedAddressesFor(AccountType.VOTING_BOT, mnemonic, numVotingBotAccounts).map((addr) => {
+      return {
+        address: addr,
+        balance: fetchEnvOrFallback(envVar.VOTING_BOT_BALANCE, '100000000000000000000'),
+      }
+    })
+  )
 
   return generateGenesis({
     validators,
     consensusType,
     blockTime,
-    initialAccounts: faucetAddresses.concat(oracleAddress),
+    initialAccounts,
     epoch,
+    lookbackwindow,
     chainId,
     requestTimeout,
     enablePetersburg,
   })
 }
 
-const generateIstanbulExtraData = (validators: Validator[]) => {
-  const istanbulVanity = 32
-  const blsSignatureVanity = 192
+export const generateIstanbulExtraData = (validators: Validator[]) => {
+  const istanbulVanity = GENESIS_MSG_HASH
+  // Vanity prefix is 32 bytes (1 hex char/.5 bytes * 32 bytes = 64 hex chars)
+  if (istanbulVanity.length !== 32 * 2) {
+    throw new Error('Istanbul vanity must be 32 bytes')
+  }
+  const blsSignatureVanity = 96
+  const ecdsaSignatureVanity = 65
   return (
     '0x' +
-    repeat('0', istanbulVanity * 2) +
+    istanbulVanity +
     rlp
+      // @ts-ignore
       .encode([
         // Added validators
         validators.map((validator) => Buffer.from(validator.address, 'hex')),
@@ -173,7 +269,7 @@ const generateIstanbulExtraData = (validators: Validator[]) => {
         // Removed validators
         new Buffer(0),
         // Seal
-        Buffer.from(repeat('0', blsSignatureVanity * 2), 'hex'),
+        Buffer.from(repeat('0', ecdsaSignatureVanity * 2), 'hex'),
         [
           // AggregatedSeal.Bitmap
           new Buffer(0),
@@ -190,8 +286,6 @@ const generateIstanbulExtraData = (validators: Validator[]) => {
           // ParentAggregatedSeal.Round
           new Buffer(0),
         ],
-        // EpochData
-        new Buffer(0),
       ])
       .toString('hex')
   )
@@ -203,19 +297,11 @@ export const generateGenesis = ({
   initialAccounts: otherAccounts = [],
   blockTime,
   epoch,
+  lookbackwindow,
   chainId,
   requestTimeout,
   enablePetersburg = true,
-}: {
-  validators: Validator[]
-  consensusType?: ConsensusType
-  initialAccounts?: string[]
-  blockTime: number
-  epoch: number
-  chainId: number
-  requestTimeout: number
-  enablePetersburg?: boolean
-}) => {
+}: GenesisConfig): string => {
   const genesis: any = { ...TEMPLATE }
 
   if (!enablePetersburg) {
@@ -232,26 +318,31 @@ export const generateGenesis = ({
   } else if (consensusType === ConsensusType.ISTANBUL) {
     genesis.mixHash = ISTANBUL_MIX_HASH
     genesis.difficulty = '0x1'
-    genesis.extraData = generateIstanbulExtraData(validators)
+    if (validators) {
+      genesis.extraData = generateIstanbulExtraData(validators)
+    }
     genesis.config.istanbul = {
       // see github.com/celo-org/celo-blockchain/blob/master/consensus/istanbul/config.go#L21-L25
       // 0 = RoundRobin, 1 = Sticky, 2 = ShuffledRoundRobin
       policy: 2,
-      period: blockTime,
+      blockperiod: blockTime,
       requesttimeout: requestTimeout,
       epoch,
+      lookbackwindow,
     }
   }
 
-  for (const validator of validators) {
-    genesis.alloc[validator.address] = {
-      balance: DEFAULT_BALANCE,
+  if (validators) {
+    for (const validator of validators) {
+      genesis.alloc[validator.address] = {
+        balance: validator.balance,
+      }
     }
   }
 
-  for (const address of otherAccounts) {
-    genesis.alloc[address] = {
-      balance: DEFAULT_BALANCE,
+  for (const account of otherAccounts) {
+    genesis.alloc[account.address] = {
+      balance: account.balance,
     }
   }
 
@@ -260,15 +351,18 @@ export const generateGenesis = ({
     monorepoRoot,
     'packages/protocol/build/contracts/Proxy.json'
   )
-  for (const contract of contracts) {
-    genesis.alloc[contract] = {
-      code: JSON.parse(fs.readFileSync(contractBuildPath).toString()).deployedBytecode,
-      storage: {
-        [CONTRACT_OWNER_STORAGE_LOCATION]: validators[0].address,
-      },
-      balance: '0',
+
+  if (validators && validators.length > 0) {
+    for (const contract of contracts) {
+      genesis.alloc[contract] = {
+        code: JSON.parse(fs.readFileSync(contractBuildPath).toString()).deployedBytecode,
+        storage: {
+          [CONTRACT_OWNER_STORAGE_LOCATION]: validators[0].address,
+        },
+        balance: '0',
+      }
     }
   }
 
-  return JSON.stringify(genesis)
+  return JSON.stringify(genesis, null, 2)
 }

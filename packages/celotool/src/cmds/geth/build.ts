@@ -1,5 +1,5 @@
 import { execCmdWithExitOnFailure } from 'src/lib/utils'
-import * as yargs from 'yargs'
+import yargs from 'yargs'
 import { GethArgv } from '../geth'
 
 export const command = 'build'

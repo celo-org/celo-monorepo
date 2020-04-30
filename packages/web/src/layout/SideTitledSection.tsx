@@ -9,11 +9,12 @@ interface SectionProps {
   text?: string | React.ReactNode
   children?: React.ReactNode
   span?: Spans
+  nativeID?: string
 }
 
-function SideTitledSection({ title, text, children, span }: SectionProps) {
+function SideTitledSection({ title, text, children, span, nativeID }: SectionProps) {
   return (
-    <GridRow allStyle={standardStyles.elementalMargin}>
+    <GridRow allStyle={standardStyles.elementalMargin} nativeID={nativeID}>
       <Cell span={Spans.fourth}>
         <H3>{title}</H3>
       </Cell>

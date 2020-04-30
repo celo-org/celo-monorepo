@@ -2,46 +2,21 @@
 
 [![e2e test status](https://storage.googleapis.com/celo-e2e-data/e2e-banner.svg)](https://console.cloud.google.com/storage/browser/celo-e2e-data?project=celo-testnet)
 
-These are the End-to-End (e2e) tests for the mobile (payments) application. They run an emulator and simulate a user clicking through the mobile app.
+These are the End-to-End (e2e) tests for the wallet mobile app. They run an emulator and simulate a user clicking through the app.
 
-## The e2e banner
+## Setting up the VM
 
-In the readme files (in the root, mobile, and this one), there are banners for the e2e tests. The test status is saved in a [google cloud storage bucket](https://console.cloud.google.com/storage/browser/celo-e2e-data?project=celo-testnet).
-There is also a log file for the last test run.
+First install the emulator as described in the [SETUP readme](../../../SETUP.md#optional-install-an-android-emulator).
 
-Too see all the versions of the log file:
+By default, the e2e scripts will assume the VM name of `Nexus_5X_API_28_x86` recommended in the instructions but you can rename the VM as you like.
 
-```bash
-gsutil ls -al  gs://celo-e2e-data/last_run_log
-```
+Next, to improve reliability of the tests, configure the VM as described in the [Detox best practices doc](https://github.com/wix/Detox/blob/master/docs/Introduction.AndroidEmulatorsBestPractices.md).
 
-Too display a specific version of the log file:
+## Running the tests
 
-```bash
-gsutil cat  gs://celo-e2e-data/last_run_log#<version_number>
-gsutil cat  gs://celo-e2e-data/last_run_log   #specify no version number to get the latest
-```
+Simply run `yarn test:e2e:android` or `yarn test:e2e:ios`
 
-If you need to have a more detailed look, there is a collection of log files and even screenshots for the failing tests saved in `detailed_logs.tar.gz`. Download with:
-
-```bash
-  gsutil cp gs://celo-e2e-data/detailed_logs.tar.gz .
-  tar -xvf detailed_logs.tar.gz
-```
-
-These files are uploaded by by the [a script](../scripts/ci-e2e.sh), that is executed regularly. Don't use this script to run the tests locally.
-
-## Running the tests locally
-
-First install the emulator as described in the [mobile readme](../README.md).
-
-```bash
-yarn test:build-e2e #To build the java parts
-yarn test:run-e2e #packages the react native parts of the app, launches the emulator and runs the tests
-```
-
-After making small changes to the app or adding new tests you can rerun the tests without rebuilding first.
-When the tests are running, they will automatically try to enter `123456` as the pin code when needed. You will have to set this pin code in the settings of the emulator.
+The run_e2e.sh script will take care of configuring and building the app for you.
 
 ## Adding a test
 
@@ -106,6 +81,33 @@ It is recommended to follow the scheme parentID/ChildDescription.
 The e2e tests should use as few mocks as possible, since they are supposed to be as close to the real app as possible. They also don't change in between tests. all e2e test use the same build of the app. But sometimes it is necessary to mock a module.
 
 The mocks are only used, when the environment variable `CELO_TEST_CONFIG` is set too 'e2e'. This variable will be read in `mobile/rn-cli.config.js` and will modify what the metro bundler will include in the bundle. If you're mocking a module from node_nodules, put the mock in `e2e/mocks/`. Use the file extension `.e2e.ts` or `.e2e.js`.
+
+## The e2e banner
+
+In the readme files (in the root, mobile, and this one), there are banners for the e2e tests. The test status is saved in a [google cloud storage bucket](https://console.cloud.google.com/storage/browser/celo-e2e-data?project=celo-testnet).
+There is also a log file for the last test run.
+
+Too see all the versions of the log file:
+
+```bash
+gsutil ls -al  gs://celo-e2e-data/last_run_log
+```
+
+Too display a specific version of the log file:
+
+```bash
+gsutil cat  gs://celo-e2e-data/last_run_log#<version_number>
+gsutil cat  gs://celo-e2e-data/last_run_log   #specify no version number to get the latest
+```
+
+If you need to have a more detailed look, there is a collection of log files and even screenshots for the failing tests saved in `detailed_logs.tar.gz`. Download with:
+
+```bash
+  gsutil cp gs://celo-e2e-data/detailed_logs.tar.gz .
+  tar -xvf detailed_logs.tar.gz
+```
+
+These files are uploaded by by the [a script](../scripts/ci-e2e.sh), that is executed regularly. Don't use this script to run the tests locally.
 
 ## Troubleshooting
 

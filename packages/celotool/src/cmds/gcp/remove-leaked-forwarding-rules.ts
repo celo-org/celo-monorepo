@@ -1,6 +1,6 @@
 import { zip } from 'lodash'
 import { execCmd, execCmdWithExitOnFailure } from 'src/lib/utils'
-import * as yargs from 'yargs'
+import yargs from 'yargs'
 
 export const command = 'remove-leaked-forwarding-rules'
 
@@ -33,7 +33,7 @@ export const handler = async (argv: Argv) => {
     `gcloud compute forwarding-rules list --format=json --project=${argv.project}`
   ).then(([body]) => JSON.parse(body))
 
-  const candidates = rules.filter((rule) => rule.target.includes('targetPools'))
+  const candidates = rules.filter((rule) => rule.target && rule.target.includes('targetPools'))
 
   console.info('Determining health of rules')
   const shouldDelete = await Promise.all(
@@ -44,9 +44,7 @@ export const handler = async (argv: Argv) => {
 
       try {
         await execCmd(
-          `gcloud compute target-pools get-health ${target} --region=${zone} --format=json --project=${
-            argv.project
-          }`,
+          `gcloud compute target-pools get-health ${target} --region=${zone} --format=json --project=${argv.project}`,
           {},
           true
         )

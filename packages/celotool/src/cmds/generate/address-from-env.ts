@@ -5,14 +5,14 @@ import {
   getAddressFromEnv,
   MNEMONIC_ACCOUNT_TYPE_CHOICES,
 } from 'src/lib/generate_utils'
-import * as yargs from 'yargs'
+import yargs from 'yargs'
 
 export const command = 'address-from-env'
 
 export const describe =
   'command for fetching addresses (validator, load_testing, tx_node, bootnode and faucet) as specified by the current environment'
 
-interface AccountAddressArgv {
+interface AccountAddressArgv extends CeloEnvArgv {
   index: number
   accountType: string
 }

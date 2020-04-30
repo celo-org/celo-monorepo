@@ -1,7 +1,7 @@
 {
   "getStarted": "Primeros pasos",
-  "paymentRequest": "Solicitud de pago",
-  "paymentRequestWithCount_plural": "{{count}} solicitudes de pago",
+  "incomingPaymentRequests": "Solicitudes de otros",
+  "outgoingPaymentRequests": "Pagos que ha solicitado",
   "SMSError": "Error al enviar SMS",
   "notifications": "Notificaciones",
   "getBackupKey": "Obtener clave de respaldo",
@@ -53,11 +53,7 @@
   "maybeLater": "quizas mas tarde",
   "balanceNeedUpdating": "Saldo necesita actualizarse",
   "refreshBalances": "Actualizar saldos",
-  "reclaimPayment": "Reclamar el Pago",
-  "sendMessage": "Enviar Mensaje",
-  "escrowedPaymentReminderListItemTitle": "Recuérdele a {{mobile #}} que acepte el pago",
   "escrowedPaymentReminder": "Reacuerda al receptor aceptar el pago",
-  "escrowedPaymentReminderWithCount_plural": "Recordar {{count}} receptores to aceptar el pago",
   "escrowedPaymentReminderSms":
     "¡Un recordatorio amistoso de que aún no ha canjeado sus dólares de celo!",
   "testnetAlert": {
@@ -66,8 +62,7 @@
       "Un recordatorio amistoso de que está utilizando la compilación de red {{testnet}} - los saldos aquí no son reales."
   },
   "dismiss": "Ocultar",
-  "localCurrencyEqual": "Igual a <2>{{localValue}} {{localCurrencyCode}}</2>",
-  "localCurrencyValue": "{{localValue}} {{localCurrencyCode}}",
+  "dollarBalance": "<0></0> $t(global:celoDollars)",
   "feedItemVerificationFeeTitle": "Celo",
   "feedItemVerificationFeeInfo": "$t(verificationFee)",
   "feedItemNetworkFeeTitle": "Celo",
@@ -83,5 +78,7 @@
   "feedItemInviteReceivedTitle": "Celo",
   "feedItemInviteReceivedInfo": "$t(inviteFlow11:inviteReceived)",
   "feedItemReceivedTitle_missingSenderDetails": "Pago Recibido",
-  "feedItemSentTitle_missingReceiverDetails": "Pago Enviado"
+  "feedItemReceivedTitle_escrowRecieved": "Escrow Pago Recibido",
+  "feedItemSentTitle_missingReceiverDetails": "Pago Enviado",
+  "feedItemSentTitle_escrowSent": "Escrow Pago Enviado"
 }

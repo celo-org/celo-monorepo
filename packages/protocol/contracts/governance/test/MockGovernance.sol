@@ -8,6 +8,8 @@ import "../interfaces/IGovernance.sol";
 contract MockGovernance is IGovernance {
   mapping(address => bool) public isVoting;
 
+  function() external payable {} // solhint-disable no-empty-blocks
+
   function setVoting(address voter) external {
     isVoting[voter] = true;
   }

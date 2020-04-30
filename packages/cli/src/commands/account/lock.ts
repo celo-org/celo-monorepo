@@ -1,42 +1,24 @@
-import { Address } from '@celo/utils/lib/address'
-import { flags } from '@oclif/command'
-import BigNumber from 'bignumber.js'
+import { IArg } from '@oclif/parser/lib/args'
 import { BaseCommand } from '../../base'
-import { newCheckBuilder } from '../../utils/checks'
-import { displaySendTx } from '../../utils/cli'
-import { Flags } from '../../utils/command'
-import { LockedGoldArgs } from '../../utils/lockedgold'
+import { Args } from '../../utils/command'
 
 export default class Lock extends BaseCommand {
-  static description = 'Locks Celo Gold to be used in governance and validator elections.'
+  static description = 'Lock an account which was previously unlocked'
 
-  static flags = {
-    ...BaseCommand.flags,
-    from: flags.string({ ...Flags.address, required: true }),
-    value: flags.string({ ...LockedGoldArgs.valueArg, required: true }),
-  }
+  static flags = BaseCommand.flagsWithoutLocalAddresses()
 
-  static args = []
+  static args: IArg[] = [Args.address('account', { description: 'Account address' })]
 
-  static examples = [
-    'lock --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95 --value 1000000000000000000',
-  ]
+  static examples = ['lock 0x5409ed021d9299bf6814279a6a1411a7e866a631']
+
+  requireSynced = false
 
   async run() {
     const res = this.parse(Lock)
-    const address: Address = res.flags.from
+    if (res.flags.useLedger) {
+      console.warn('Warning: account:lock not implemented for Ledger')
+    }
 
-    this.kit.defaultAccount = address
-    const value = new BigNumber(res.flags.value)
-
-    await newCheckBuilder(this)
-      .addCheck(`Value [${value.toString()}] is >= 0`, () => value.gt(0))
-      .isAccount(address)
-      .hasEnoughGold(address, value)
-      .runChecks()
-
-    const lockedGold = await this.kit.contracts.getLockedGold()
-    const tx = lockedGold.lock()
-    await displaySendTx('lock', tx, { value: value.toString() })
+    await this.web3.eth.personal.lockAccount(res.args.account)
   }
 }

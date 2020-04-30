@@ -42,9 +42,7 @@ export const handler = async (argv: LookupArgv) => {
     Object.keys(matchingAddresses).map((address) => {
       const attestationsStats = matchingAddresses[address]
       console.info(
-        `${address} is attested to ${argv.phone} with ${
-          attestationsStats.completed
-        } completed attestations out of ${attestationsStats.total} total`
+        `${address} is attested to ${argv.phone} with ${attestationsStats.completed} completed attestations out of ${attestationsStats.total} total`
       )
     })
   }

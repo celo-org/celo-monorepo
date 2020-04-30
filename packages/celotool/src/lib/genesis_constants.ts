@@ -18,6 +18,7 @@ export const TEMPLATE = {
     byzantiumBlock: 0,
     constantinopleBlock: 0,
     petersburgBlock: 0,
+    istanbulBlock: 0,
   },
   nonce: '0x0',
   timestamp: '0x5b843511',
@@ -36,29 +37,9 @@ export const TEMPLATE = {
 export const REGISTRY_ADDRESS = '000000000000000000000000000000000000ce10'
 
 export const CONTRACT_OWNER_STORAGE_LOCATION =
-  '0x34dc5a2556b2030988481969696f29fed38d45813d8003f6c70e5c16ac92ae0f'
+  '0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103'
 export const ISTANBUL_MIX_HASH =
   '0x63746963616c2062797a616e74696e65206661756c7420746f6c6572616e6365'
 
-export const OG_ACCOUNTS = [
-  {
-    name: 'gethminer1',
-    privateKey: 'a2d2c843bb2c6b6aed146343b8aec7d23a7cc050f41c6217760d46095bfc49cd',
-    address: 'feE1a22F43BeeCB912B5a4912ba87527682ef0fC',
-  },
-  {
-    name: 'gethminer2',
-    privateKey: '898a61ff4d42360802c9897bc2df1298d2df9153cb761ca55b5dc1bb940f44dc',
-    address: '889F21CE69dcc25a4594f73230A55896d6703806',
-  },
-  {
-    name: 'gethminer3',
-    privateKey: '6005018fe530da09942a016921a185cabef0fbcc10e63fe2b45805b2957f6ec9',
-    address: '5372d2bbBaBaAf1495182E31cF13dB0d18463B0E',
-  },
-  {
-    name: 'gethminer4',
-    privateKey: '1310f2a9c32d52dbbabc28dbaa9ca4c5c826d59664320b597effa66155c72c61',
-    address: 'F71690ea7E0c67827d8968882FAC0c4cBBD65BCE',
-  },
-]
+// Keccak256 of "The Times 09/Apr/2020 With $2.3 Trillion Injection, Fed’s Plan Far Exceeds Its 2008 Rescue"
+export const GENESIS_MSG_HASH = 'ecc833a7747eaa8327335e8e0c6b6d8aa3a38d0063591e43ce116ccf5c89753e'

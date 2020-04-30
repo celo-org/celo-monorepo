@@ -1,14 +1,14 @@
 import * as React from 'react'
-import { WithNamespaces, withNamespaces } from 'react-i18next'
 import { StyleSheet, View } from 'react-native'
 import Fade from 'react-reveal/Fade'
 import { H1 } from 'src/fonts/Fonts'
+import { I18nProps, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import menuItems from 'src/shared/menu-items'
 import { standardStyles, textStyles } from 'src/styles'
 
-type Props = WithNamespaces
+type Props = I18nProps
 
 class HomeWork extends React.PureComponent<Props> {
   render() {

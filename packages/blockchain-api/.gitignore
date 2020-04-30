@@ -6,5 +6,6 @@ dist/
 # Exclude dependencies
 node_modules/
 
-# keys
+# Exclude secrets
+serviceAccountKey.json
 src/secrets.json

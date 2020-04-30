@@ -64,8 +64,5 @@ export class DollarEducation extends React.Component<Props> {
 }
 
 export default componentWithAnalytics(
-  connect<{}, DispatchProps>(
-    null,
-    { setEducationCompleted }
-  )(DollarEducation)
+  connect<{}, DispatchProps>(null, { setEducationCompleted })(DollarEducation)
 )

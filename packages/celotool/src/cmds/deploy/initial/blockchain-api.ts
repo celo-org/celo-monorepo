@@ -17,9 +17,7 @@ export const handler = async (argv: BlockchainApiArgv) => {
   const newFaucetAddress = getAddressFromEnv(AccountType.VALIDATOR, 0) // We use the 0th validator as the faucet
   console.info(`updating blockchain-api yaml file for env ${argv.celoEnv}`)
   await execCmd(
-    `sed -i.bak 's/FAUCET_ADDRESS: .*$/FAUCET_ADDRESS: \"${newFaucetAddress}\"/g' ../blockchain-api/app.${
-      argv.celoEnv
-    }.yaml`
+    `sed -i.bak 's/FAUCET_ADDRESS: .*$/FAUCET_ADDRESS: \"${newFaucetAddress}\"/g' ../blockchain-api/app.${argv.celoEnv}.yaml`
   )
   await execCmd(`rm ../blockchain-api/app.${argv.celoEnv}.yaml.bak`) // Removing temporary bak file
   console.info(`deploying blockchain-api for env ${argv.config} to ${testnetProjectName}`)

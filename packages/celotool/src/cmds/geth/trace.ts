@@ -1,7 +1,7 @@
 import { getBlockscoutUrl } from 'src/lib/endpoints'
 import { addCeloEnvMiddleware, CeloEnvArgv } from 'src/lib/env-utils'
 import { checkGethStarted, getWeb3AndTokensContracts, traceTransactions } from 'src/lib/geth'
-import * as yargs from 'yargs'
+import yargs from 'yargs'
 import { GethArgv } from '../geth'
 
 export const command = 'trace <address1> <address2>'
@@ -44,9 +44,8 @@ export const handler = async (argv: TraceArgv) => {
   outerwhile: while (iterations-- > 0) {
     try {
       web3AndContracts = await getWeb3AndTokensContracts()
-      // tslint:disable-next-line: no-shadowed-variable
-      const { web3 } = web3AndContracts!
-      const latestBlock = await web3.eth.getBlock('latest')
+      const { kit: kit1 } = web3AndContracts
+      const latestBlock = await kit1.web3.eth.getBlock('latest')
       if (latestBlock.number === 0) {
         throw new Error('Latest block is zero')
       } else {
@@ -67,7 +66,7 @@ export const handler = async (argv: TraceArgv) => {
     process.exit(1)
   }
 
-  const { web3, goldToken, stableToken } = web3AndContracts!
+  const { kit, goldToken, stableToken } = web3AndContracts!
 
   // This is needed to turn off debug logging which is made in `sendTransaction`
   // and needed only for mobile client.
@@ -76,10 +75,11 @@ export const handler = async (argv: TraceArgv) => {
   }
 
   await traceTransactions(
-    web3,
+    kit,
     goldToken,
+    // @ts-ignore - TODO: remove when web3 upgrade completed everywhere
     stableToken,
     [address1, address2],
-    getBlockscoutUrl(argv)
+    getBlockscoutUrl(argv.celoEnv)
   )
 }

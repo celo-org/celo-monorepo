@@ -21,7 +21,7 @@ interface Props {
   color?: colors
 }
 
-export function PlayCircle2(props) {
+export function PlayCircle2(props: Props) {
   return (
     <Svg width={props.height} height={props.height} viewBox="0 0 40 40" fill="none">
       <Path

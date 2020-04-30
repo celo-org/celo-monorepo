@@ -1,20 +1,19 @@
-import { getAttestationsContract } from '@celo/walletkit'
+import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
 import { expectSaga } from 'redux-saga-test-plan'
 import { throwError } from 'redux-saga-test-plan/providers'
 import { call, select } from 'redux-saga/effects'
-import { setUserContactDetails } from 'src/account'
-import { defaultCountryCodeSelector, e164NumberSelector } from 'src/account/reducer'
+import { setUserContactDetails } from 'src/account/actions'
+import { defaultCountryCodeSelector, e164NumberSelector } from 'src/account/selectors'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { updateE164PhoneNumberAddresses } from 'src/identity/actions'
-import { doImportContacts } from 'src/identity/contactMapping'
+import { doImportContactsWrapper } from 'src/identity/contactMapping'
 import { e164NumberToAddressSelector } from 'src/identity/reducer'
 import { setRecipientCache } from 'src/recipients/actions'
 import { contactsToRecipients } from 'src/recipients/recipient'
 import { getAllContacts } from 'src/utils/contacts'
-import { web3 } from 'src/web3/contracts'
+import { getContractKit } from 'src/web3/contracts'
 import { getConnectedAccount } from 'src/web3/saga'
-import { createMockContract } from 'test/utils'
 import {
   mockAccount,
   mockAccount2,
@@ -24,9 +23,15 @@ import {
   mockE164Number2,
 } from 'test/values'
 
-const attestationsStub = {
-  batchGetAttestationStats: [[1, 1], [mockAccount, mockAccount2], [3, 3], [3, 4]],
+const mockPhoneNumberLookup = {
+  [getPhoneHash(mockE164Number)]: { [mockAccount]: { complete: 3, total: 3 } },
+  [getPhoneHash(mockE164Number2)]: { [mockAccount2]: { complete: 3, total: 4 } },
 }
+
+const mockAttestationsWrapper = {
+  lookupPhoneNumbers: jest.fn(() => mockPhoneNumberLookup),
+}
+
 const recipients = contactsToRecipients(mockContactList, '+1', {})
 const e164NumberRecipients = recipients!.e164NumberToRecipients
 const otherRecipients = recipients!.otherRecipients
@@ -34,15 +39,18 @@ const allRecipients = { ...e164NumberRecipients, ...otherRecipients }
 
 describe('Import Contacts Saga', () => {
   it('imports contacts and creates contact mappings correctly', async () => {
-    const attestationsContract = createMockContract(attestationsStub)
-    await expectSaga(doImportContacts)
+    const contractKit = getContractKit()
+    await expectSaga(doImportContactsWrapper)
       .provide([
         [call(getConnectedAccount), null],
         [call(getAllContacts), mockContactList],
         [select(defaultCountryCodeSelector), '+1'],
         [select(e164NumberToAddressSelector), {}],
         [select(e164NumberSelector), mockE164Number],
-        [call(getAttestationsContract, web3), attestationsContract],
+        [
+          call([contractKit.contracts, contractKit.contracts.getAttestations]),
+          mockAttestationsWrapper,
+        ],
       ])
       .put(
         setUserContactDetails(
@@ -69,14 +77,18 @@ describe('Import Contacts Saga', () => {
   })
 
   it('shows errors correctly', async () => {
-    await expectSaga(doImportContacts)
+    const contractKit = getContractKit()
+    await expectSaga(doImportContactsWrapper)
       .provide([
         [call(getConnectedAccount), null],
         [call(getAllContacts), mockContactList],
         [select(defaultCountryCodeSelector), '+1'],
         [select(e164NumberToAddressSelector), {}],
         [select(e164NumberSelector), mockE164Number],
-        [call(getAttestationsContract, web3), throwError(new Error('fake error'))],
+        [
+          call([contractKit.contracts, contractKit.contracts.getAttestations]),
+          throwError(new Error('fake error')),
+        ],
       ])
       .put(
         setUserContactDetails(

@@ -1,4 +1,4 @@
-import { memo } from 'react'
+import * as React from 'react'
 import FadeIn from 'react-lazyload-fadein'
 import { Image, StyleSheet, TouchableOpacity, View } from 'react-native'
 import Fade from 'react-reveal/Fade'
@@ -15,7 +15,7 @@ const playLogo = require('src/download/play-store.png')
 const appStoreLogo = require('src/download/app-store.png')
 
 export default withNamespaces(NameSpaces.download)(
-  memo(function AppStores({ t }: I18nProps) {
+  React.memo(function AppStores({ t }: I18nProps) {
     return (
       <View>
         <Title ariaLevel="2" title={t('downloadDirect')} />

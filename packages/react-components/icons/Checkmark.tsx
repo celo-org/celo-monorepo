@@ -10,6 +10,7 @@ interface Props {
 export default class Checkmark extends React.PureComponent<Props> {
   static defaultProps = {
     height: 47,
+    width: 47,
     color: '#45CD86',
   }
 

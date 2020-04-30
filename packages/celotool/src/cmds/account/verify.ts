@@ -5,11 +5,15 @@ import {
   ActionableAttestation,
   AttestationsWrapper,
 } from '@celo/contractkit/lib/wrappers/Attestations'
-import { concurrentMap } from '@celo/utils/lib/async'
 import { base64ToHex } from '@celo/utils/lib/attestations'
 import prompts from 'prompts'
+import {
+  printAndIgnoreRequestErrors,
+  requestAttestationsFromIssuers,
+  requestMoreAttestations,
+} from 'src/lib/attestation'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
-import * as yargs from 'yargs'
+import yargs from 'yargs'
 
 export const command = 'verify'
 export const describe = 'command for requesting attestations for a phone number'
@@ -25,7 +29,7 @@ export const builder = (argv: yargs.Argv) => {
   return argv
     .option('phone', {
       type: 'string',
-      description: 'Phone number to attest to,',
+      description: `Phone number to attest to. Should be an E.164 number matching formatted like +451234567890.`,
       demand: 'Please specify phone number to attest to',
     })
     .option('num', {
@@ -74,7 +78,7 @@ async function verifyCmd(argv: VerifyArgv) {
   const currentWalletAddress = await accounts.getWalletAddress(account)
 
   if (currentWalletAddress !== account) {
-    const setWalletAddressTx = await accounts.setWalletAddress(account)
+    const setWalletAddressTx = accounts.setWalletAddress(account)
     const result = await setWalletAddressTx.send()
     await result.waitReceipt()
   }
@@ -82,8 +86,13 @@ async function verifyCmd(argv: VerifyArgv) {
   attestationsToComplete = await attestations.getActionableAttestations(argv.phone, account)
   // Find attestations we can verify
   console.info(`Requesting ${attestationsToComplete.length} attestations from issuers`)
-  await requestAttestationsFromIssuers(attestationsToComplete, attestations, argv.phone, account)
-
+  const possibleErrors = await requestAttestationsFromIssuers(
+    attestationsToComplete,
+    attestations,
+    argv.phone,
+    account
+  )
+  printAndIgnoreRequestErrors(possibleErrors)
   await promptForCodeAndVerify(attestations, argv.phone, account)
 }
 
@@ -95,50 +104,8 @@ export async function printCurrentCompletedAttestations(
   const attestationStat = await attestations.getAttestationStat(phoneNumber, account)
 
   console.info(
-    `Phone Number: ${phoneNumber} has completed ${
-      attestationStat.completed
-    } attestations out of a total of ${attestationStat.total}`
+    `Phone Number: ${phoneNumber} has completed ${attestationStat.completed} attestations out of a total of ${attestationStat.total}`
   )
-}
-
-async function requestMoreAttestations(
-  attestations: AttestationsWrapper,
-  phoneNumber: string,
-  attestationsRequested: number,
-  account: string
-) {
-  await attestations
-    .approveAttestationFee(attestationsRequested)
-    .then((txo) => txo.sendAndWaitForReceipt())
-  await attestations
-    .request(phoneNumber, attestationsRequested)
-    .then((txo) => txo.sendAndWaitForReceipt())
-  await attestations.waitForSelectingIssuers(phoneNumber, account)
-  await attestations.selectIssuers(phoneNumber).then((txo) => txo.sendAndWaitForReceipt())
-}
-
-async function requestAttestationsFromIssuers(
-  attestationsToReveal: ActionableAttestation[],
-  attestations: AttestationsWrapper,
-  phoneNumber: string,
-  account: string
-) {
-  return concurrentMap(5, attestationsToReveal, async (attestation) => {
-    try {
-      const response = await attestations.revealPhoneNumberToIssuer(
-        phoneNumber,
-        account,
-        attestation.issuer,
-        attestation.attestationServiceURL
-      )
-      if (!response.ok) {
-        throw new Error(`Request failed with status ${response.status}: ${await response.text()}`)
-      }
-    } catch (error) {
-      console.error(`Error requesting attestations from issuer ${attestation.issuer}`)
-      console.error(error)
-    }
-  })
 }
 
 async function verifyCode(
@@ -149,7 +116,7 @@ async function verifyCode(
   attestationsToComplete: ActionableAttestation[]
 ) {
   const code = base64ToHex(base64Code)
-  const matchingIssuer = attestations.findMatchingIssuer(
+  const matchingIssuer = await attestations.findMatchingIssuer(
     phoneNumber,
     account,
     code,
@@ -172,7 +139,9 @@ async function verifyCode(
     return
   }
 
-  const tx = await attestations.complete(phoneNumber, account, matchingIssuer, code).send()
+  const tx = await attestations
+    .complete(phoneNumber, account, matchingIssuer, code)
+    .then((x) => x.send())
   return tx.waitReceipt()
 }
 
@@ -195,9 +164,7 @@ async function promptForCodeAndVerify(
     const userResponse = await prompts({
       type: 'text',
       name: 'code',
-      message: `${
-        attestationsToComplete.length
-      } attestations completable. Enter the code here or type exit`,
+      message: `${attestationsToComplete.length} attestations completable. Enter the code here or type exit`,
     })
 
     if (userResponse.code === 'exit') {

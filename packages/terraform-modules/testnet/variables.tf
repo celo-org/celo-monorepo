@@ -8,9 +8,24 @@ variable celo_env {
   description = "Name of the testnet Celo environment"
 }
 
+variable dns_gcloud_project {
+  type        = string
+  description = "Name of the Google Cloud project where Cloud DNS is"
+}
+
+variable dns_zone_name {
+  type        = string
+  description = "Name of the DNS zone for the domain used for the forno setup"
+}
+
 variable ethstats_host {
-  type        = "string"
+  type        = string
   description = "Ethstats url or IP address"
+}
+
+variable forno_host {
+  type        = string
+  description = "The host name to use for the tx node forno setup"
 }
 
 variable gcloud_credentials_path {
@@ -88,6 +103,11 @@ variable istanbul_request_timeout_ms {
   description = "The number of ms for the istanbul request timeout"
 }
 
+variable letsencrypt_email {
+  type        = string
+  description = "The email to create letsencrypt certificates with"
+}
+
 variable network_id {
   type        = number
   description = "The network ID number"
@@ -98,17 +118,23 @@ variable network_name {
   description = "The name of the network to use"
 }
 
+variable private_tx_node_count {
+  type        = number
+  description = "Number of private tx-nodes that are created with RPC ports only internally exposed"
+  default     = 0
+}
+
+variable proxied_validator_count {
+  type        = number
+  description = "Number of validator_count validators that are hidden behind proxies"
+}
+
 variable tx_node_count {
   type        = number
-  description = "Number of tx-nodes to create"
+  description = "Number of public tx-nodes to create"
 }
 
 variable validator_count {
   type        = number
   description = "Number of validators to create"
-}
-
-variable verification_pool_url {
-  type        = string
-  description = "URL of the verification pool"
 }

@@ -1,20 +1,22 @@
 import { flags } from '@oclif/command'
-import { BaseCommand } from '../../base'
+import { LocalCommand } from '../../base'
 import { CeloConfig, writeConfig } from '../../utils/config'
 
-export default class Set extends BaseCommand {
+export default class Set extends LocalCommand {
   static description = 'Configure running node information for propogating transactions to network'
 
   static flags = {
-    ...BaseCommand.flags,
+    ...LocalCommand.flags,
+    // Overrides base command node flag.
     node: flags.string({
+      char: 'n',
       required: true,
-      description: 'Node URL',
-      default: 'ws://localhost:8546',
+      description: 'URL of the node to run commands against',
+      default: 'http://localhost:8545',
     }),
   }
 
-  requireSynced = false
+  static examples = ['set  --node ws://localhost:2500', 'set  --node <geth-location>/geth.ipc']
 
   async run() {
     const res = this.parse(Set)

@@ -27,6 +27,17 @@ spec:
         component: attestation-service
     spec:
       initContainers:
+      - name: init-genesis
+        image: {{ .Values.geth.image.repository }}:{{ .Values.geth.image.tag }}
+        imagePullPolicy: {{ .Values.imagePullPolicy }}
+        args:
+        - "init"
+        - "/var/geth/genesis.json"
+        volumeMounts:
+        - name: data
+          mountPath: /root/.celo
+        - name: config
+          mountPath: /var/geth
       - name: get-account
         image: {{ .Values.celotool.image.repository }}:{{ .Values.celotool.image.tag }}
         imagePullPolicy: IfNotPresent
@@ -38,8 +49,13 @@ spec:
             [[ $REPLICA_NAME =~ -([0-9]+)$ ]] || exit 1
             RID=${BASH_REMATCH[1]}
             echo -n $RID >/root/.celo/replica_id
-            echo "Generating private key for rid=$RID"
+            echo "Generating keys for rid=$RID"
             celotooljs.sh generate bip32 --mnemonic "$MNEMONIC" --accountType validator --index $RID > /root/.celo/pkey
+            celotooljs.sh generate bip32 --mnemonic "$MNEMONIC" --accountType attestation --index $RID > /root/.celo/attestationSignerKey
+            celotooljs.sh generate account-address --private-key `cat /root/.celo/pkey` > /root/.celo/address
+            celotooljs.sh generate account-address --private-key `cat /root/.celo/attestationSignerKey` > /root/.celo/attestationSignerAddress
+            echo password > /root/.celo/password
+            cp /var/geth/static-nodes.json /root/.celo/static-nodes.json
         env:
         - name: MNEMONIC
           valueFrom:
@@ -53,7 +69,60 @@ spec:
         volumeMounts:
         - name: data
           mountPath: /root/.celo
+        - name: config
+          mountPath: /var/geth
+      - name: import-geth-account
+        image: {{ .Values.geth.image.repository }}:{{ .Values.geth.image.tag }}
+        imagePullPolicy: {{ .Values.imagePullPolicy }}
+        command: ["/bin/sh"]
+        args:
+        - "-c"
+        - |
+          geth account import --password /root/.celo/password /root/.celo/attestationSignerKey || true
+        volumeMounts:
+        - name: data
+          mountPath: /root/.celo
       containers:
+      - name: light-client
+        image: {{ .Values.geth.image.repository }}:{{ .Values.geth.image.tag }}
+        imagePullPolicy: IfNotPresent
+        command: ["/bin/sh"]
+        args:
+        - "-c"
+        - |-
+          set -euo pipefail
+          ATTESTATION_SIGNER_ADDRESS=`cat /root/.celo/attestationSignerAddress`
+          geth \
+            --password=/root/.celo/password \
+            --unlock=${ATTESTATION_SIGNER_ADDRESS} \
+            --ws \
+            --wsaddr 0.0.0.0 \
+            --wsorigins=* \
+            --wsapi=eth,net,web3,debug \
+            --networkid=${NETWORK_ID} \
+            --syncmode=lightest \
+            --consoleformat=json \
+            --consoleoutput=stdout \
+            --verbosity={{ .Values.geth.verbosity }} \
+            --metrics \
+            --allow-insecure-unlock
+        env:
+        - name: NETWORK_ID
+          valueFrom:
+            configMapKeyRef:
+              name: attestation-service-geth-config
+              key: networkid
+        ports:
+        - name: discovery-udp
+          containerPort: 30303
+          protocol: UDP
+        - name: discovery-tcp
+          containerPort: 30303
+        - name: ws
+          containerPort: 8546
+        volumeMounts:
+        - name: data
+          mountPath: /root/.celo
       - name: attestation-service
         image: {{ .Values.attestation_service.image.repository }}:{{ .Values.attestation_service.image.tag }}
         imagePullPolicy: {{ .Values.imagePullPolicy }}
@@ -62,7 +131,8 @@ spec:
         - "-c"
         - |
           yarn db:migrate
-          ATTESTATION_KEY=0x`cat /root/.celo/pkey` yarn start
+          sleep 5
+          ATTESTATION_SIGNER_ADDRESS=`cat /root/.celo/attestationSignerAddress` CELO_VALIDATOR_ADDRESS=`cat /root/.celo/address` yarn start
         ports:
         - name: http
           containerPort: 3000
@@ -76,9 +146,13 @@ spec:
         - name: NODE_ENV
           value: production
         - name: CELO_PROVIDER
-          value: https://{{ .Release.Namespace }}-forno.{{ .Values.domain.name }}.org
+          value: ws://localhost:8546
         - name: APP_SIGNATURE
-          value: {{ .Values.attestation_service.sms_retriever_hash_code }}}
+          value: {{ .Values.attestation_service.sms_retriever_hash_code }}
+        - name: SMS_PROVIDERS
+          value: nexmo
+        - name: LOG_FORMAT
+          value: stackdriver
         - name: NEXMO_KEY
           valueFrom:
             secretKeyRef:
@@ -96,6 +170,9 @@ spec:
       volumes:
         - name: data
           emptyDir: {}
+        - name: config
+          configMap:
+            name: attestation-service-geth-config
           {{- with .Values.nodeSelector }}
       nodeSelector:
 {{ toYaml . | indent 8 }}

@@ -9,6 +9,9 @@
 
 # Add any project specific keep options here:
 
+# Detox
+-keep class com.facebook.react.ReactInstanceManager { *; }
+
 # RN Firebase
 -keep class io.invertase.firebase.** { *; }
 -dontwarn io.invertase.firebase.**

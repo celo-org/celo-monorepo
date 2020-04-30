@@ -57,7 +57,7 @@ const fellows = [
     color: colors.purpleScreen,
     quote: '"I’ve spent my career running field operations under extreme financial circumstances.”',
     text:
-      'James applied his skills as a Fixer to organize comprehensive field research for the entire C Labs team, interviewing 20 Venezuelan migrants in Colombia. The ethnographic interviews focused in particular on individual perspectives on the prolific informal remittance market and the process of becoming unbanked in the transition from Venezuela to Colombia. This immersive learning experience was instrumental in increasing empathy and understanding with our end users.',
+      'James applied his skills as a Fixer to organize comprehensive field research for the entire cLabs team, interviewing 20 Venezuelan migrants in Colombia. The ethnographic interviews focused in particular on individual perspectives on the prolific informal remittance market and the process of becoming unbanked in the transition from Venezuela to Colombia. This immersive learning experience was instrumental in increasing empathy and understanding with our end users.',
   },
 ]
 
@@ -86,7 +86,9 @@ class FellowViewer extends React.PureComponent<ScreenProps> {
             renderCenterRightControls={null}
             renderBottomCenterControls={PagingDots}
           >
-            {fellows.map((fellow) => <Fellow key={fellow.name} {...fellow} />)}
+            {fellows.map((fellow) => (
+              <Fellow key={fellow.name} {...fellow} />
+            ))}
           </Carousel>
         </Fade>
       </View>

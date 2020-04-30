@@ -28,7 +28,7 @@ export default class Fellow extends React.PureComponent<FellowProps> {
           </Cell>
           <Cell span={Spans.half}>
             <H4>{name}</H4>
-            <Text style={fonts.h5}>
+            <Text style={fonts.h6}>
               {location} | {role}
             </Text>
             <H4

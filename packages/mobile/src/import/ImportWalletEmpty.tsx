@@ -1,20 +1,22 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
+import { CURRENCIES, CURRENCY_ENUM } from '@celo/utils/src'
 import * as React from 'react'
-import { WithNamespaces, withNamespaces } from 'react-i18next'
-import { ActivityIndicator, Image, StyleSheet, Text, View } from 'react-native'
+import { WithTranslation } from 'react-i18next'
+import { ActivityIndicator, StyleSheet, Text, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
+import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import GethAwareButton from 'src/geth/GethAwareButton'
-import { Namespaces } from 'src/i18n'
-import { backupIcon } from 'src/images/Images'
+import { Namespaces, withTranslation } from 'src/i18n'
+import BackupKeyIcon from 'src/icons/BackupKeyIcon'
 import { importBackupPhrase } from 'src/import/actions'
 import { nuxNavigationOptions } from 'src/navigator/Headers'
-import { navigateBack } from 'src/navigator/NavigationService'
+import { navigate } from 'src/navigator/NavigationService'
+import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
-import { getMoneyDisplayValue } from 'src/utils/formatting'
 
 interface DispatchProps {
   importBackupPhrase: typeof importBackupPhrase
@@ -24,7 +26,7 @@ interface StateProps {
   isImportingWallet: boolean
 }
 
-type Props = StateProps & DispatchProps & NavigationInjectedProps & WithNamespaces
+type Props = StateProps & DispatchProps & NavigationInjectedProps & WithTranslation
 
 const mapStateToProps = (state: RootState): StateProps => {
   return {
@@ -48,7 +50,7 @@ export class ImportWalletEmpty extends React.Component<Props> {
   }
 
   onPressTryAnotherKey = () => {
-    navigateBack()
+    navigate(Screens.ImportWallet, { clean: true })
   }
 
   render() {
@@ -57,8 +59,11 @@ export class ImportWalletEmpty extends React.Component<Props> {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.emptyWarningContainer}>
-          <Image source={backupIcon} style={styles.logo} />
-          <Text style={fontStyles.h1}>{getMoneyDisplayValue(0)}</Text>
+          <BackupKeyIcon style={styles.logo} />
+          <CurrencyDisplay
+            style={fontStyles.h1}
+            amount={{ value: '0', currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code }}
+          />
           <Text style={fontStyles.bodyLarge}>{t('emptyWalletWarning')}</Text>
           <Text style={fontStyles.bodyLarge}>{t('useEmptyAnyway')}</Text>
         </View>
@@ -98,8 +103,6 @@ const styles = StyleSheet.create({
   logo: {
     marginBottom: 20,
     alignSelf: 'center',
-    height: 75,
-    width: 75,
   },
   emptyWarningContainer: {
     flex: 1,
@@ -114,9 +117,6 @@ const styles = StyleSheet.create({
   },
 })
 
-export default connect<StateProps, DispatchProps, {}, RootState>(
-  mapStateToProps,
-  {
-    importBackupPhrase,
-  }
-)(withNamespaces(Namespaces.nuxRestoreWallet3)(ImportWalletEmpty))
+export default connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
+  importBackupPhrase,
+})(withTranslation(Namespaces.nuxRestoreWallet3)(ImportWalletEmpty))

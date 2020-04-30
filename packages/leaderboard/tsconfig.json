@@ -1,0 +1,19 @@
+{
+  "extends": "../typescript/tsconfig.library.json",
+  "compilerOptions": {
+    "outDir": "lib",
+    "rootDir": "src",
+    "baseUrl": ".",
+    "lib": ["es7", "es2017"],
+    "target": "es6",
+    "resolveJsonModule": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "paths": {
+      "@google-cloud/monitoring": ["types/monitoring"]
+    }
+  },
+  "include": ["src", "../contractkit/types"],
+  "exclude": ["node_modules/"],
+  "references": [{ "path": "../utils" }, { "path": "../contractkit" }]
+}

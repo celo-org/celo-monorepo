@@ -1,7 +1,7 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import * as React from 'react'
-import { WithNamespaces, withNamespaces } from 'react-i18next'
+import { WithTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
@@ -9,12 +9,11 @@ import { setPincode } from 'src/account/actions'
 import { PincodeType } from 'src/account/reducer'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
 import DevSkipButton from 'src/components/DevSkipButton'
-import { Namespaces } from 'src/i18n'
-import BackupIcon from 'src/icons/BackupIcon'
+import { Namespaces, withTranslation } from 'src/i18n'
+import LockedPhoneIcon from 'src/icons/LockedPhoneIcon'
 import { nuxNavigationOptions } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import { isPhoneAuthSupported } from 'src/pincode/PincodeUtils.android'
 import { RootState } from 'src/redux/reducers'
 
 interface StateProps {
@@ -26,7 +25,7 @@ interface DispatchProps {
   setPincode: typeof setPincode
 }
 
-type Props = StateProps & DispatchProps & WithNamespaces
+type Props = StateProps & DispatchProps & WithTranslation
 
 const mapStateToProps = (state: RootState): StateProps => {
   return {
@@ -67,14 +66,15 @@ class PincodeEducation extends React.Component<Props> {
 
   render() {
     const { t, isSettingPin } = this.props
-    const phoneAuth = isPhoneAuthSupported()
+    // we want to disable PhoneAuth during onboarding only for now
+    const phoneAuth = false
 
     return (
       <SafeAreaView style={style.container}>
         <DevSkipButton nextScreen={Screens.EnterInviteCode} />
         <ScrollView contentContainerStyle={style.scrollContainer}>
           <View>
-            <BackupIcon style={style.pincodeLogo} />
+            <LockedPhoneIcon style={style.logo} height={150} width={150} />
             <Text style={style.h1} testID="SystemAuthTitle">
               {t('pincodeEducation.title')}
             </Text>
@@ -132,7 +132,7 @@ const style = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  pincodeLogo: {
+  logo: {
     alignSelf: 'center',
   },
   body: {
@@ -151,5 +151,5 @@ export default componentWithAnalytics(
   connect<StateProps, DispatchProps, {}, RootState>(
     mapStateToProps,
     mapDispatchToProps
-  )(withNamespaces(Namespaces.nuxNamePin1)(PincodeEducation))
+  )(withTranslation(Namespaces.nuxNamePin1)(PincodeEducation))
 )

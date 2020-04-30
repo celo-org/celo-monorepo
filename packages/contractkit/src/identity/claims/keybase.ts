@@ -1,16 +1,9 @@
 import { Address } from '@celo/utils/lib/address'
 import { isLeft } from 'fp-ts/lib/Either'
-import * as t from 'io-ts'
-import { serializeClaim, SignedClaimType, verifySignature } from './claim'
-import { ClaimTypes, now, TimestampType } from './types'
-
-export const KeybaseClaimType = t.type({
-  type: t.literal(ClaimTypes.KEYBASE),
-  timestamp: TimestampType,
-  // TODO: Validate compliant username before just interpolating
-  username: t.string,
-})
-export type KeybaseClaim = t.TypeOf<typeof KeybaseClaimType>
+import { ContractKit } from '../../kit'
+import { IdentityMetadataWrapper } from '../metadata'
+import { hashOfClaim, KeybaseClaim, KeybaseClaimType, SignedClaimType } from './claim'
+import { ClaimTypes, now } from './types'
 
 export const keybaseFilePathToProof = `.well-known/celo/`
 export const proofFileName = (address: Address) => `verify-${address}.json`
@@ -20,6 +13,7 @@ export const targetURL = (username: string, address: Address) =>
 // If verification encounters an error, returns the error message as a string
 // otherwise returns undefined when successful
 export async function verifyKeybaseClaim(
+  kit: ContractKit,
   claim: KeybaseClaim,
   signer: Address
 ): Promise<string | undefined> {
@@ -38,17 +32,18 @@ export async function verifyKeybaseClaim(
       return 'Claim is incorrectly formatted'
     }
 
-    const hasValidSiganture = verifySignature(
-      serializeClaim(parsedClaim.right.payload),
+    const hasValidSignature = await IdentityMetadataWrapper.verifySignerForAddress(
+      kit,
+      hashOfClaim(parsedClaim.right.claim),
       parsedClaim.right.signature,
       signer
     )
 
-    if (!hasValidSiganture) {
+    if (!hasValidSignature) {
       return 'Claim does not contain a valid signature'
     }
 
-    const parsedKeybaseClaim = KeybaseClaimType.decode(parsedClaim.right.payload)
+    const parsedKeybaseClaim = KeybaseClaimType.decode(parsedClaim.right.claim)
     if (isLeft(parsedKeybaseClaim)) {
       return 'Hosted claim is not a Keybase claim'
     }

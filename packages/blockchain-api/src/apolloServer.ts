@@ -1,6 +1,6 @@
 import { ApolloServer } from 'apollo-server-express'
 import { BlockscoutAPI } from './blockscout'
-import { CurrencyConversionAPI } from './currencyConversion'
+import CurrencyConversionAPI from './currencyConversion/CurrencyConversionAPI'
 import { resolvers, typeDefs } from './schema'
 
 export interface DataSources {

@@ -2,6 +2,7 @@ import {
   getCountryCode,
   getDisplayPhoneNumber,
   getE164Number,
+  getExampleNumber,
   getRegionCode,
   getRegionCodeFromCountryCode,
   isE164Number,
@@ -257,6 +258,26 @@ describe('Phone number formatting and utilities', () => {
       expect(isE164Number(TEST_PHONE_NUMBERS.VALID_US_2)).toBe(false)
       expect(isE164Number(TEST_PHONE_NUMBERS.VALID_US_3)).toBe(true)
       expect(isE164Number(TEST_PHONE_NUMBERS.VALID_US_4)).toBe(false)
+    })
+  })
+
+  describe('Example phones', () => {
+    it('gets example by country showing zeros', () => {
+      expect(getExampleNumber(COUNTRY_CODES.AR)).toBe('000 0000-0000')
+      expect(getExampleNumber(COUNTRY_CODES.DE)).toBe('000 000000')
+      expect(getExampleNumber(COUNTRY_CODES.US)).toBe('(000) 000-0000')
+    })
+
+    it('gets example by country', () => {
+      expect(getExampleNumber(COUNTRY_CODES.AR, false)).toBe('011 2345-6789')
+      expect(getExampleNumber(COUNTRY_CODES.DE, false)).toBe('030 123456')
+      expect(getExampleNumber(COUNTRY_CODES.US, false)).toBe('(201) 555-0123')
+    })
+
+    it('gets example by country showing zeros in international way', () => {
+      expect(getExampleNumber(COUNTRY_CODES.AR, true, true)).toBe('+54 00 0000-0000')
+      expect(getExampleNumber(COUNTRY_CODES.DE, true, true)).toBe('+49 00 000000')
+      expect(getExampleNumber(COUNTRY_CODES.US, true, true)).toBe('+1 000-000-0000')
     })
   })
 })

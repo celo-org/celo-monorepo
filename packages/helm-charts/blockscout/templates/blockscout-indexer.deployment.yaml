@@ -31,16 +31,19 @@ spec:
         - -c
         args:
         - |
-           mix cmd --app indexer iex -S mix
+           sleep 5
+           mix cmd --app indexer iex -S mix | sed 's/^iex(1)> //'
         ports:
         - name: http
           containerPort: 4000
         resources:
           requests:
-            memory: 1G
-            cpu: 250m
+            memory: 500Mi
+            cpu: 500m
         env:
-{{ include "celo.blockscout-env-vars" .  | indent 10 }}
+        - name: DISABLE_WEBAPP
+          value: "true"
+{{ include "celo.blockscout-env-vars" .  | indent 8 }}
 {{ include "celo.blockscout-db-sidecar" .  | indent 6 }}
     {{- with .Values.nodeSelector }}
       nodeSelector:

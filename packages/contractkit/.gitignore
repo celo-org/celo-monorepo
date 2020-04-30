@@ -1,3 +1,7 @@
 src/generated
 lib/
-.devchain
+.devchain/
+.devchain.tar.gz
+tmp/
+.tmp/
+.env

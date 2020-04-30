@@ -4,6 +4,7 @@ echo "Processing encrypted files"
 
 # Set list of secret files to encrypt and decrypt.
 files=(
+  "packages/blockchain-api/serviceAccountKey.json"
   "packages/blockchain-api/src/secrets.json"
   "packages/mobile/android/app/google-services.json"
   "packages/mobile/android/app/src/staging/google-services.json"
@@ -12,7 +13,10 @@ files=(
   "packages/mobile/android/app/src/debug/google-services.json"
   "packages/mobile/android/app/src/pilot/google-services.json"
   "packages/mobile/android/sentry.properties"
-  "packages/mobile/ios/GoogleService-Info.plist"
+  "packages/mobile/ios/GoogleService-Info.dev.plist"
+  "packages/mobile/ios/GoogleService-Info.integration.plist"
+  "packages/mobile/ios/GoogleService-Info.alfajores.plist"
+  "packages/mobile/ios/GoogleService-Info.pilot.plist"
   "packages/mobile/ios/sentry.properties"
   "packages/verifier/android/app/google-services.json"
   "packages/verifier/android/app/src/staging/google-services.json"
@@ -21,13 +25,17 @@ files=(
   "packages/mobile/secrets.json"
   "packages/web/env-config.js"
   "packages/web/server-env-config.js"
+  "packages/moonpay-auth/.env"
   ".env.mnemonic"
   ".env.mnemonic.alfajores"
   ".env.mnemonic.alfajoresstaging"
+  ".env.mnemonic.baklava"
+  ".env.mnemonic.baklavastaging"
   ".env.mnemonic.integration"
-  ".env.mnemonic.integrationtesting"
   ".env.mnemonic.pilot"
   ".env.mnemonic.pilotstaging"
+  ".env.mnemonic.rc0"
+  ".env.mnemonic.rc1"
 )
 
 if [[ -z "$1" ]]; then
@@ -83,7 +91,7 @@ for file_path in "${files[@]}"; do
   # Encrypt or decrypt this file.
   gcloud kms $1 --ciphertext-file=$encrypted_file_path --plaintext-file=$file_path --key=github-key --keyring=celo-keyring --location=global --project celo-testnet
   if [[ $? -eq 1 ]]; then
-    echo "Only C Labs employees can $1 keys - skipping ${1}ion"
+    echo "Only cLabs employees can $1 keys - skipping ${1}ion"
     exit 0
   fi
 done

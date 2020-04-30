@@ -30,3 +30,10 @@ export function navigateToURI(uri: string, backupUri?: string) {
     })
     .catch(onError)
 }
+
+export function navigateToPhoneSettings() {
+  Logger.debug(TAG, 'Navigating phone settings')
+  Linking.openSettings().catch((reason: string) =>
+    Logger.error(TAG, `Error navigating to phone settings: ${reason}`)
+  )
+}

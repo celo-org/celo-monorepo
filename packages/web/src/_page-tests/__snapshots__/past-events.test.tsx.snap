@@ -1,0 +1,493 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`PastEventsPage renders 1`] = `
+<div
+  className="css-view-1dbjc4n"
+  style={
+    Object {
+      "marginBottom": "100px",
+      "marginTop": "100px",
+    }
+  }
+>
+  <div
+    className="css-view-1dbjc4n"
+    style={
+      Object {
+        "WebkitAlignSelf": "center",
+        "WebkitBoxDirection": "normal",
+        "WebkitBoxOrient": "vertical",
+        "WebkitFlexDirection": "column",
+        "alignSelf": "center",
+        "flexDirection": "column",
+        "marginBottom": "30px",
+        "marginTop": "30px",
+        "maxWidth": "100vw",
+        "msFlexDirection": "column",
+        "msFlexItemAlign": "center",
+        "paddingLeft": "10px",
+        "paddingRight": "10px",
+        "width": "100%",
+      }
+    }
+  >
+    <div
+      className="css-view-1dbjc4n"
+      style={
+        Object {
+          "WebkitBoxFlex": 0,
+          "WebkitFlexGrow": 0,
+          "WebkitFlexShrink": 0,
+          "flexGrow": 0,
+          "flexShrink": 0,
+          "msFlexNegative": 0,
+          "msFlexPositive": 0,
+          "paddingBottom": "10px",
+          "paddingLeft": "10px",
+          "paddingRight": "10px",
+          "paddingTop": "10px",
+          "width": "100%",
+        }
+      }
+    >
+      <div
+        className="css-view-1dbjc4n"
+        style={
+          Object {
+            "marginBottom": "30px",
+            "marginTop": "30px",
+          }
+        }
+      >
+        <div
+          className="css-text-901oao"
+          dir="auto"
+          style={
+            Object {
+              "color": "rgba(46,51,56,1.00)",
+              "fontFamily": "Jost, futura-pt, futura, sans-serif",
+              "fontSize": "16px",
+              "fontWeight": "500",
+              "lineHeight": "18px",
+              "textRendering": "geometricPrecision",
+            }
+          }
+        >
+          Refine By
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          data-focusable={true}
+          onKeyDown={[Function]}
+          onKeyUp={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+          style={
+            Object {
+              "MozTransitionProperty": "opacity",
+              "MozUserSelect": "none",
+              "WebkitTransitionDuration": "0.15s",
+              "WebkitTransitionProperty": "opacity",
+              "WebkitUserSelect": "none",
+              "cursor": "pointer",
+              "msTouchAction": "manipulation",
+              "msUserSelect": "none",
+              "touchAction": "manipulation",
+              "transitionDuration": "0.15s",
+              "transitionProperty": "opacity",
+              "userSelect": "none",
+            }
+          }
+          tabIndex="0"
+        >
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "WebkitAlignContent": "center",
+                "WebkitAlignItems": "center",
+                "WebkitBoxAlign": "center",
+                "WebkitBoxDirection": "normal",
+                "WebkitBoxOrient": "horizontal",
+                "WebkitFlexDirection": "row",
+                "alignContent": "center",
+                "alignItems": "center",
+                "flexDirection": "row",
+                "marginBottom": "10px",
+                "marginTop": "10px",
+                "msFlexAlign": "center",
+                "msFlexDirection": "row",
+                "msFlexLinePack": "center",
+              }
+            }
+          >
+            <svg
+              fill="none"
+              height="24"
+              style={Object {}}
+              viewBox="0 0 24 24"
+              width="24"
+            >
+              <circle
+                cx="12"
+                cy="12"
+                r="11.5"
+                stroke="#DDDDDD"
+                style={Object {}}
+              />
+            </svg>
+            <div
+              className="css-view-1dbjc4n"
+              style={
+                Object {
+                  "WebkitBoxPack": "center",
+                  "WebkitJustifyContent": "center",
+                  "justifyContent": "center",
+                  "msFlexPack": "center",
+                  "paddingLeft": "10px",
+                  "paddingRight": "10px",
+                }
+              }
+            >
+              <svg
+                fill="none"
+                height={14}
+                style={Object {}}
+                viewBox="0 0 83 98"
+                width={14}
+              >
+                <g
+                  style={
+                    Object {
+                      "mixBlendMode": "normal",
+                    }
+                  }
+                >
+                  <path
+                    d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+                    fill="#35D07F"
+                  />
+                </g>
+              </svg>
+            </div>
+            <label
+              className="css-text-901oao"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(46,51,56,1.00)",
+                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                  "fontSize": "20px",
+                  "lineHeight": "28px",
+                  "textRendering": "geometricPrecision",
+                }
+              }
+            >
+              Hosting
+            </label>
+          </div>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          data-focusable={true}
+          onKeyDown={[Function]}
+          onKeyUp={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+          style={
+            Object {
+              "MozTransitionProperty": "opacity",
+              "MozUserSelect": "none",
+              "WebkitTransitionDuration": "0.15s",
+              "WebkitTransitionProperty": "opacity",
+              "WebkitUserSelect": "none",
+              "cursor": "pointer",
+              "msTouchAction": "manipulation",
+              "msUserSelect": "none",
+              "touchAction": "manipulation",
+              "transitionDuration": "0.15s",
+              "transitionProperty": "opacity",
+              "userSelect": "none",
+            }
+          }
+          tabIndex="0"
+        >
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "WebkitAlignContent": "center",
+                "WebkitAlignItems": "center",
+                "WebkitBoxAlign": "center",
+                "WebkitBoxDirection": "normal",
+                "WebkitBoxOrient": "horizontal",
+                "WebkitFlexDirection": "row",
+                "alignContent": "center",
+                "alignItems": "center",
+                "flexDirection": "row",
+                "marginBottom": "10px",
+                "marginTop": "10px",
+                "msFlexAlign": "center",
+                "msFlexDirection": "row",
+                "msFlexLinePack": "center",
+              }
+            }
+          >
+            <svg
+              fill="none"
+              height="24"
+              style={Object {}}
+              viewBox="0 0 24 24"
+              width="24"
+            >
+              <circle
+                cx="12"
+                cy="12"
+                r="11.5"
+                stroke="#DDDDDD"
+                style={Object {}}
+              />
+            </svg>
+            <div
+              className="css-view-1dbjc4n"
+              style={
+                Object {
+                  "WebkitBoxPack": "center",
+                  "WebkitJustifyContent": "center",
+                  "justifyContent": "center",
+                  "msFlexPack": "center",
+                  "paddingLeft": "10px",
+                  "paddingRight": "10px",
+                }
+              }
+            >
+              <svg
+                fill="none"
+                height={14}
+                style={Object {}}
+                viewBox="0 0 83 98"
+                width={14}
+              >
+                <g
+                  style={
+                    Object {
+                      "mixBlendMode": "normal",
+                    }
+                  }
+                >
+                  <path
+                    d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+                    fill="#BF97FF"
+                  />
+                </g>
+              </svg>
+            </div>
+            <label
+              className="css-text-901oao"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(46,51,56,1.00)",
+                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                  "fontSize": "20px",
+                  "lineHeight": "28px",
+                  "textRendering": "geometricPrecision",
+                }
+              }
+            >
+              Speaking
+            </label>
+          </div>
+        </div>
+      </div>
+      <div
+        className="css-text-901oao"
+        dir="auto"
+        style={
+          Object {
+            "color": "rgba(46,51,56,1.00)",
+            "fontFamily": "Jost, futura-pt, futura, sans-serif",
+            "fontSize": "16px",
+            "fontWeight": "500",
+            "lineHeight": "18px",
+            "marginBottom": "20px",
+            "textRendering": "geometricPrecision",
+          }
+        }
+      >
+        Want to host a Celo Meet-up?
+      </div>
+      <div
+        className="css-text-901oao"
+        dir="auto"
+        style={
+          Object {
+            "color": "rgba(46,51,56,1.00)",
+            "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+            "fontSize": "20px",
+            "lineHeight": "28px",
+            "textRendering": "geometricPrecision",
+          }
+        }
+      >
+        Send a note to
+         
+        <div
+          className="css-view-1dbjc4n"
+          onClick={[Function]}
+          onMouseDown={[Function]}
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          onMouseUp={[Function]}
+          onResponderGrant={[Function]}
+          onResponderRelease={[Function]}
+          style={
+            Object {
+              "display": "inline",
+            }
+          }
+        >
+          <a
+            className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao css-textHasAncestor-16my406"
+            data-focusable={true}
+            dir="auto"
+            href="mailto:community@celo.org"
+            onClick={[Function]}
+            onMouseEnter={[Function]}
+            role="link"
+            style={
+              Object {
+                "WebkitTextDecorationStyle": "solid",
+                "cursor": "pointer",
+                "display": "inline",
+                "opacity": 1,
+                "textDecoration": "underline",
+                "textDecorationStyle": "solid",
+              }
+            }
+          >
+            community@celo.org
+          </a>
+        </div>
+         
+        before the event to learn more
+      </div>
+    </div>
+    <div
+      className="css-view-1dbjc4n"
+      style={
+        Object {
+          "WebkitBoxFlex": 0,
+          "WebkitFlexGrow": 0,
+          "WebkitFlexShrink": 0,
+          "flexGrow": 0,
+          "flexShrink": 0,
+          "msFlexNegative": 0,
+          "msFlexPositive": 0,
+          "paddingBottom": "10px",
+          "paddingLeft": "10px",
+          "paddingRight": "10px",
+          "paddingTop": "10px",
+          "width": "100%",
+        }
+      }
+    >
+      <div
+        className="css-view-1dbjc4n"
+        onResponderGrant={[Function]}
+        onResponderReject={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onScroll={[Function]}
+        onScrollShouldSetResponder={[Function]}
+        onStartShouldSetResponder={[Function]}
+        onStartShouldSetResponderCapture={[Function]}
+        onTouchEnd={[Function]}
+        onTouchMove={[Function]}
+        onTouchStart={[Function]}
+        onWheel={[Function]}
+        style={
+          Object {
+            "WebkitBoxDirection": "normal",
+            "WebkitBoxFlex": 1,
+            "WebkitBoxOrient": "vertical",
+            "WebkitFlexDirection": "column",
+            "WebkitFlexGrow": 1,
+            "WebkitFlexShrink": 1,
+            "WebkitOverflowScrolling": "touch",
+            "WebkitTransform": "translateZ(0px)",
+            "flexDirection": "column",
+            "flexGrow": 1,
+            "flexShrink": 1,
+            "msFlexDirection": "column",
+            "msFlexNegative": 1,
+            "msFlexPositive": 1,
+            "overflowX": "hidden",
+            "overflowY": "auto",
+            "transform": "translateZ(0px)",
+          }
+        }
+      >
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "overflowX": "hidden",
+              "overflowY": "hidden",
+            }
+          }
+        >
+          <div
+            className="css-view-1dbjc4n"
+          >
+            <div
+              className="css-view-1dbjc4n"
+              style={
+                Object {
+                  "WebkitAlignItems": "center",
+                  "WebkitBoxAlign": "center",
+                  "WebkitBoxPack": "center",
+                  "WebkitJustifyContent": "center",
+                  "alignItems": "center",
+                  "height": "90vh",
+                  "justifyContent": "center",
+                  "msFlexAlign": "center",
+                  "msFlexPack": "center",
+                }
+              }
+            >
+              <div
+                aria-label="loading"
+                className="css-view-1dbjc4n"
+                style={
+                  Object {
+                    "height": "50px",
+                    "width": "50px",
+                  }
+                }
+              >
+                <span
+                  style={
+                    Object {
+                      "height": "100%",
+                      "width": "100%",
+                    }
+                  }
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;

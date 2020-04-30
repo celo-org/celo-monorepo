@@ -5,21 +5,23 @@ import Svg, { Circle, Path } from 'svgs'
 
 interface Props {
   color?: string
+  width?: number
   style?: ViewStyle
 }
 
 export default class Error extends React.PureComponent<Props> {
   static defaultProps = {
     color: colors.white,
+    width: 16,
     style: {},
   }
 
   render() {
     return (
-      <View style={this.props.style}>
+      <View style={this.props.style} testID={'ErrorIcon'}>
         <Svg
-          width={'16'}
-          height="16"
+          width={this.props.width}
+          height={this.props.width}
           viewBox="0 0 16 16"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"

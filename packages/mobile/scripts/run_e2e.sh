@@ -1,78 +1,176 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-#####
-# This file launches the emulator and fires the tests
-#####
+# Default ENVFILE if not set
+export ENVFILE="${ENVFILE:-.env.test}"
 
-export CELO_TEST_CONFIG=e2e
+# ========================================
+# Build and run the end-to-end tests
+# ========================================
 
-adb kill-server && adb start-server
+# Flags:
+# -p: Platform (android or ios)
+# -v (Optional): Name of virual machine to run
+# -f (Optional): Fast (skip build step)
+# -r (Optional): Use release build (by default uses debug) 
+# TODO ^ release doesn't work currently b.c. the run_app.sh script assumes we want a debug build
 
-DEFAULT_AVD="Nexus_5X_API_28_x86"
+PLATFORM=""
+VD_NAME="Nexus_5X_API_28_x86"
+FAST=false
+RELEASE=false
+while getopts 'p:fr' flag; do
+  case "${flag}" in
+    p) PLATFORM="$OPTARG" ;;
+    v) VD_NAME="$OPTARG" ;;
+    f) FAST=true ;;
+    r) RELEASE=true ;;
+    *) error "Unexpected option ${flag}" ;;
+  esac
+done
 
-if [[ ! $($ANDROID_SDK_ROOT/emulator/emulator -list-avds | grep ^$DEFAULT_AVD$) ]]; then
-  echo "AVD $DEFAULT_AVD not installed. Pleas install it or change detox' configuration in package.json"
-  echo "You can see the list of available installed devices with $ANDROID_SDK_ROOT/emulator/emulator -list-avds"
-  exit 1
-fi
+[ -z "$PLATFORM" ] && echo "Need to set the PLATFORM via the -p flag" && exit 1;
 
+# Start the packager and wait until ready
+startPackager() {
+    echo "Starting metro packager"
+    yarn react-native start &
 
-bash ./scripts/unlock.sh
-adb reconnect
-if [ $? -ne 0 ]
-then
-  exit 1
-fi
+    waitForPackager
+    preloadBundle
+}
 
-echo "Waiting for emulator to unlock..."
-# TODO: improve this to actually poll if the screen is unlocked
-# https://stackoverflow.com/questions/35275828/is-there-a-way-to-check-if-android-device-screen-is-locked-via-adb
-sleep 3
-echo "Emulator unlocked!"
+# Wait for the package to start
+waitForPackager() {
+  local -i max_attempts=60
+  local -i attempt_num=1
 
-# sometimes the emulator locks itself after boot
-# this prevents that
-bash ./scripts/unlock.sh
+  until curl -s http://localhost:8081/status | grep "packager-status:running" -q; do
+    if (( attempt_num == max_attempts )); then
+      echo "Packager did not respond in time. No more attempts left."
+      exit 1
+    else
+      (( attempt_num++ ))
+      echo "Packager did not respond. Retrying for attempt number $attempt_num..."
+      sleep 1
+    fi
+  done
+
+  echo "Packager is ready!"
+}
+
+# Preload bundle, this is to prevent random red screen "Could not connect to development server" on the CI
+preloadBundle() {
+  echo "Preloading bundle..."
+  local response_code=$(curl --write-out %{http_code} --silent --output /dev/null "http://localhost:8081/index.bundle?platform=$PLATFORM&dev=true")
+  if [ "$response_code" != "200" ]; then
+    echo "Failed to preload bundle, http response code: $response_code"
+    exit 1
+  fi
+  echo "Preload bundle finished with http code: $response_code"
+}
+
+runTest() {
+  yarn detox test \
+    --configuration $CONFIG_NAME \
+    --artifacts-location e2e/artifacts \
+    --take-screenshots=all \
+    --record-logs=failing \
+    --detectOpenHandles \
+    --loglevel verbose
+  TEST_STATUS=$?
+}
+
+# Needed by metro packager to use .e2e.ts overrides
+# See metro.config.js
+export CELO_TEST_CONFIG=e2e 
+
+# Ensure jest is accessible to detox
+cp ../../node_modules/.bin/jest node_modules/.bin/
 
 # Just to be safe kill any process that listens on the port 'yarn start' is going to use
 echo "Killing previous metro server (if any)"
-react-native-kill-packager || echo 'Failed to kill for some reason'
-echo "Start metro server"
-yarn start:bg
+yarn react-native-kill-packager || echo "Failed to kill package manager, proceeding anyway"
 
+# Build the app and run it
+if [ $PLATFORM = "android" ]; then
+  echo "Using platform android"
 
-echo "Waiting for device to connect to Wifi, this is a good proxy the device is ready"
-until adb shell dumpsys wifi | grep "mNetworkInfo" |grep "state: CONNECTED"
-do
-  sleep 10
-done
+  if [ -z $ANDROID_HOME ]; then
+    echo "No Android SDK root set"
+    exit 1
+  fi
 
-cp ../../node_modules/.bin/jest node_modules/.bin/
+  if [[ ! $($ANDROID_HOME/emulator/emulator -list-avds | grep ^$VD_NAME$) ]]; then
+    echo "AVD $VD_NAME not installed. Please install it or change the detox configuration in package.json"
+    echo "You can see the list of available installed devices with $ANDROID_HOME/emulator/emulator -list-avds"
+    exit 1
+  fi
 
-yarn test:detox
-STATUS=$?
+  if [ "$RELEASE" = false ]; then
+    CONFIG_NAME="android.emu.debug"
+  else
+    CONFIG_NAME="android.emu.release"
+  fi
 
- # Retry on fail logic
-if [ $STATUS -ne 0 ]; then
-   echo "It failed once, let's try again"
-   yarn test:detox
-   STATUS=$?
-fi
+  if [ "$FAST" = false ]; then
+    echo "Configuring the app"
+    ./scripts/run_app.sh -p $PLATFORM -b
+  fi
 
-if [ $STATUS -ne 0 ]; then
-   # TODO: upload e2e_run.log and attach the link
-   echo "Test failed"
+  echo "Building detox"
+  yarn detox build -c $CONFIG_NAME
+
+  startPackager
+
+  NUM_DEVICES=`adb devices -l | wc -l`
+  if [ $NUM_DEVICES -gt 2 ]; then 
+    echo "Emulator already running or device attached. Please shutdown / remove first"
+    exit 1
+  fi
+
+  echo "Starting the emulator"
+  $ANDROID_HOME/emulator/emulator -avd $VD_NAME -no-boot-anim &
+
+  echo "Waiting for device to connect to Wifi, this is a good proxy the device is ready"
+  until [ `adb shell dumpsys wifi | grep "mNetworkInfo" | grep "state: CONNECTED" | wc -l` -gt 0 ]
+  do
+    sleep 3 
+  done
+
+  runTest
+
+  echo "Closing emulator (if active)"
+  adb devices | grep emulator | cut -f1 | while read line; do adb -s $line emu kill; done
+
+elif [ $PLATFORM = "ios" ]; then
+  echo "Using platform ios"
+  
+  if [ "$RELEASE" = false ]; then
+    CONFIG_NAME="ios.sim.debug"
+  else
+    CONFIG_NAME="ios.sim.release"
+  fi
+
+  if [ "$FAST" = false ]; then
+    echo "Configuring the app"
+    ./scripts/run_app.sh -p $PLATFORM -b
+  fi
+
+  echo "Building detox"
+  yarn detox build -c $CONFIG_NAME
+
+  startPackager
+
+  runTest
+
 else
-   echo "Test passed"
+  echo "Invalid value for platform, must be 'android' or 'ios'"
+  exit 1
 fi
 
-react-native-kill-packager
+echo "Done test, cleaning up"
+yarn react-native-kill-packager
 
-echo "Closing emulator"
-kill -s 9 `ps -a | grep "Nexus_5X_API_28_x86" | grep -v "grep"  | awk '{print $1}'`
-
-echo "Closing pidcat"
-kill -s 9 `ps -a | grep "pidcat" | grep -v "grep"  | awk '{print $1}'`
-
-exit $STATUS
+echo "Exiting with test result status $TEST_STATUS"
+exit $TEST_STATUS

@@ -9,10 +9,10 @@ type numberT = number | string | BigNumber | null
 
 export function getRateForMakerToken(
   exchangeRatePair: ExchangeRatePair | null,
-  makerToken: CURRENCY_ENUM
+  makerToken: CURRENCY_ENUM,
+  inputToken?: CURRENCY_ENUM // Token to convert from, defaults to makerToken
 ) {
   if (!exchangeRatePair) {
-    Logger.warn(TAG, `Rate for token ${makerToken} is NaN`)
     return new BigNumber(0)
   }
 
@@ -31,6 +31,10 @@ export function getRateForMakerToken(
     return new BigNumber(0)
   }
 
+  if (inputToken && inputToken !== makerToken) {
+    rateBN = rateBN.pow(-1) // Invert for takerToken -> makerToken rate
+  }
+
   return rateBN
 }
 
@@ -44,11 +48,6 @@ export function getTakerAmount(makerAmount: numberT, exchangeRate: numberT, deci
   }
 
   let converted = amountBN.dividedBy(rateBN)
-  Logger.debug(
-    TAG + '@getTakerAmount',
-    `Exchanging ${amountBN} at rate ${rateBN} gives ${converted}`
-  )
-
   if (decimals !== undefined) {
     converted = converted.decimalPlaces(decimals, BigNumber.ROUND_DOWN)
   }
@@ -84,4 +83,18 @@ export function getNewGoldBalance(
   return makerToken === CURRENCY_ENUM.GOLD
     ? getNewMakerBalance(goldBalance, makerAmount)
     : getNewTakerBalance(goldBalance, takerAmount)
+}
+
+export function goldToDollarAmount(amount: BigNumber.Value, exchangeRate: BigNumber | null) {
+  const isRateValid = exchangeRate && !exchangeRate.isZero() && exchangeRate.isFinite()
+  if (!isRateValid) {
+    return null
+  }
+
+  const convertedAmount = getTakerAmount(new BigNumber(amount), exchangeRate)
+  if (!convertedAmount) {
+    return null
+  }
+
+  return convertedAmount
 }

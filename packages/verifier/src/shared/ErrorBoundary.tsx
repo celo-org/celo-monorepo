@@ -1,6 +1,6 @@
 import { getErrorMessage } from '@celo/utils/src/displayFormatting'
 import * as React from 'react'
-import { withNamespaces, WithNamespaces } from 'react-i18next'
+import { WithTranslation, withTranslation } from 'react-i18next'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { DefaultEventNames } from 'src/analytics/constants'
 import ErrorScreen from 'src/shared/ErrorScreen'
@@ -13,7 +13,7 @@ interface OwnProps {
   children: any
 }
 
-type Props = OwnProps & WithNamespaces
+type Props = OwnProps & WithTranslation
 
 class ErrorBoundary extends React.Component<Props, State> {
   state: State = {
@@ -35,4 +35,4 @@ class ErrorBoundary extends React.Component<Props, State> {
   }
 }
 
-export default withNamespaces()(ErrorBoundary)
+export default withTranslation()(ErrorBoundary)

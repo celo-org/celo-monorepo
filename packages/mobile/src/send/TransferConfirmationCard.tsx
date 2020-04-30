@@ -1,57 +1,83 @@
 import HorizontalLine from '@celo/react-components/components/HorizontalLine'
 import Link from '@celo/react-components/components/Link'
-import { MoneyAmount } from '@celo/react-components/components/MoneyAmount'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
-import variables from '@celo/react-components/styles/variables'
-import { CURRENCIES } from '@celo/utils'
+import { CURRENCIES, CURRENCY_ENUM } from '@celo/utils/src'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
-import { withNamespaces, WithNamespaces } from 'react-i18next'
+import { Trans, WithTranslation } from 'react-i18next'
 import { Image, StyleSheet, Text, View } from 'react-native'
+import { MoneyAmount, TokenTransactionType } from 'src/apollo/types'
 import Avatar from 'src/components/Avatar'
+import CurrencyDisplay, { DisplayType, FormatType } from 'src/components/CurrencyDisplay'
 import { FAQ_LINK } from 'src/config'
-import { CURRENCY_ENUM } from 'src/geth/consts'
-import { Namespaces } from 'src/i18n'
+import { Namespaces, withTranslation } from 'src/i18n'
 import { faucetIcon } from 'src/images/Images'
-import {
-  useDollarsToLocalAmount,
-  useLocalCurrencyCode,
-  useLocalCurrencySymbol,
-} from 'src/localCurrency/hooks'
+import { LocalCurrencyCode } from 'src/localCurrency/consts'
+import { useLocalCurrencyCode } from 'src/localCurrency/hooks'
 import { Recipient } from 'src/recipients/recipient'
-import { TransactionTypes } from 'src/transactions/reducer'
-import { getMoneyDisplayValue, getNetworkFeeDisplayValue } from 'src/utils/formatting'
 import { navigateToURI } from 'src/utils/linking'
+import { ExtractProps } from 'src/utils/typescript'
 
 const iconSize = 40
 
 export interface TransferConfirmationCardProps {
   address?: string
-  comment?: string
-  value: BigNumber
-  currency: CURRENCY_ENUM
-  type: TransactionTypes
+  comment?: string | null
+  amount: MoneyAmount
+  type: TokenTransactionType
   e164PhoneNumber?: string
   dollarBalance?: BigNumber
   recipient?: Recipient
 }
 
-type Props = TransferConfirmationCardProps & WithNamespaces
+type Props = TransferConfirmationCardProps & WithTranslation
 
-// Bordered content placed in a ReviewFrame
+// Content placed in a ReviewFrame
 // Differs from TransferReviewCard which is used during Send flow, this is for completed txs
 const onPressGoToFaq = () => {
   navigateToURI(FAQ_LINK)
 }
 
+function Amount(props: ExtractProps<typeof CurrencyDisplay>) {
+  const localCurrencyCode = useLocalCurrencyCode()
+
+  const { amount } = props
+  const showDollarAmount =
+    amount.currencyCode === CURRENCIES[CURRENCY_ENUM.DOLLAR].code &&
+    localCurrencyCode !== LocalCurrencyCode.USD
+
+  return (
+    <View>
+      <CurrencyDisplay type={DisplayType.Big} hideSign={true} {...props} />
+      {showDollarAmount && (
+        <Text style={style.dollarAmount}>
+          <Trans
+            i18nKey="celoDollarAmount"
+            ns={Namespaces.sendFlow7}
+            count={new BigNumber(amount.value).absoluteValue().toNumber()}
+          >
+            <CurrencyDisplay
+              amount={amount}
+              showLocalAmount={false}
+              hideSign={true}
+              hideSymbol={true}
+            />{' '}
+            Celo Dollars
+          </Trans>
+        </Text>
+      )}
+    </View>
+  )
+}
+
 const renderTopSection = (props: Props) => {
   const { address, recipient, type, e164PhoneNumber } = props
   if (
-    type === TransactionTypes.VERIFICATION_FEE ||
-    type === TransactionTypes.NETWORK_FEE ||
-    type === TransactionTypes.FAUCET
+    type === TokenTransactionType.VerificationFee ||
+    type === TokenTransactionType.NetworkFee ||
+    type === TokenTransactionType.Faucet
   ) {
     return <Image source={faucetIcon} style={style.icon} />
   } else {
@@ -67,56 +93,33 @@ const renderTopSection = (props: Props) => {
 }
 
 const renderAmountSection = (props: Props) => {
-  const { currency, type, value } = props
-
-  // tslint:disable react-hooks-nesting
-  const localCurrencyCode = useLocalCurrencyCode()
-  const localCurrencySymbol = useLocalCurrencySymbol()
-  const localValue = useDollarsToLocalAmount(value) || 0
-  // tslint:enable react-hooks-nesting
-  const transactionValue = getMoneyDisplayValue(
-    currency === CURRENCY_ENUM.DOLLAR && localCurrencyCode ? localValue : value
-  )
+  const { amount, type } = props
 
   switch (type) {
-    case TransactionTypes.INVITE_SENT: // fallthrough
-    case TransactionTypes.INVITE_RECEIVED:
+    case TokenTransactionType.InviteSent: // fallthrough
+    case TokenTransactionType.InviteReceived:
       return null
-    case TransactionTypes.NETWORK_FEE:
-      return (
-        <MoneyAmount
-          symbol={CURRENCIES[currency].symbol}
-          amount={getNetworkFeeDisplayValue(value, true)}
-        />
-      )
+    case TokenTransactionType.NetworkFee:
+      return <Amount amount={amount} formatType={FormatType.NetworkFeePrecise} />
     default:
-      return (
-        <MoneyAmount
-          symbol={
-            (currency === CURRENCY_ENUM.DOLLAR && localCurrencySymbol) ||
-            CURRENCIES[currency].symbol
-          }
-          amount={transactionValue}
-        />
-      )
+      return <Amount amount={amount} />
   }
 }
 
 const renderBottomSection = (props: Props) => {
-  const { t, currency, comment, type, value } = props
+  const { t, amount, comment, type } = props
 
-  if (type === TransactionTypes.VERIFICATION_FEE) {
+  if (type === TokenTransactionType.VerificationFee) {
     return <Text style={style.pSmall}>{t('receiveFlow8:verificationMessage')}</Text>
-  } else if (type === TransactionTypes.FAUCET) {
+  } else if (type === TokenTransactionType.Faucet) {
     return (
       <Text style={style.pSmall}>
-        {t('receiveFlow8:receivedAmountFromCelo.0')}
-        {CURRENCIES[currency].symbol}
-        {getMoneyDisplayValue(props.value)}
-        {t('receiveFlow8:receivedAmountFromCelo.1')}
+        <Trans i18nKey="receiveFlow8:receivedAmountFromCelo">
+          You received <CurrencyDisplay amount={amount} /> from Celo!
+        </Trans>
       </Text>
     )
-  } else if (type === TransactionTypes.NETWORK_FEE) {
+  } else if (type === TokenTransactionType.NetworkFee) {
     return (
       <View>
         <Text style={style.pSmall}>
@@ -125,20 +128,23 @@ const renderBottomSection = (props: Props) => {
         </Text>
       </View>
     )
-  } else if (type === TransactionTypes.INVITE_SENT || type === TransactionTypes.INVITE_RECEIVED) {
+  } else if (
+    type === TokenTransactionType.InviteSent ||
+    type === TokenTransactionType.InviteReceived
+  ) {
     return (
       <View style={style.bottomContainer}>
         <View style={style.inviteLine}>
           <HorizontalLine />
         </View>
         <Text style={style.inviteTitle}>{t('inviteFlow11:inviteFee')}</Text>
-        {type === TransactionTypes.INVITE_SENT ? (
+        {type === TokenTransactionType.InviteSent ? (
           <Text style={style.pSmall}>{t('inviteFlow11:whySendFees')}</Text>
         ) : (
           <Text style={style.pSmall}>{t('inviteFlow11:whyReceiveFees')}</Text>
         )}
 
-        <MoneyAmount symbol={CURRENCIES[currency].symbol} amount={getMoneyDisplayValue(value)} />
+        <Amount amount={amount} />
       </View>
     )
   } else if (comment) {
@@ -149,7 +155,7 @@ const renderBottomSection = (props: Props) => {
 
 export function TransferConfirmationCard(props: Props) {
   return (
-    <View style={[componentStyles.roundedBorder, style.container]}>
+    <View style={style.container}>
       {renderTopSection(props)}
       {renderAmountSection(props)}
       {renderBottomSection(props)}
@@ -159,10 +165,7 @@ export function TransferConfirmationCard(props: Props) {
 
 const style = StyleSheet.create({
   container: {
-    paddingVertical: 40,
-    paddingHorizontal: 20,
     marginVertical: 20,
-    minWidth: variables.width * 0.75,
   },
   bottomContainer: {
     marginTop: 5,
@@ -188,6 +191,14 @@ const style = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 5,
   },
+  dollarAmount: {
+    ...fontStyles.light,
+    fontSize: 14,
+    color: '#B0B5B9',
+    alignSelf: 'center',
+    marginBottom: 20,
+    marginTop: -10,
+  },
 })
 
-export default withNamespaces(Namespaces.sendFlow7)(TransferConfirmationCard)
+export default withTranslation(Namespaces.sendFlow7)(TransferConfirmationCard)

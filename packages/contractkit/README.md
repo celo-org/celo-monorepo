@@ -6,8 +6,8 @@ ContractKit supports the following functionality:
 
 - Connect to a node
 - Access web3 object to interact with node's Json RPC API
-- Send Transaction with celo's extra fields: (gasCurrency)
-- Simple interface to interact with cGold and cDollar
+- Send Transaction with celo's extra fields: (feeCurrency)
+- Simple interface to interact with cGLD and cUSD
 - Simple interface to interact with Celo Core contracts
 - Utilities
 
@@ -18,9 +18,9 @@ ContractKit supports the following functionality:
 To install:
 
 ```bash
-npm install @celo/contractkit
+npm install @celo/contractkit@baklava
 // or
-yarn add @celo/contractkit
+yarn add @celo/contractkit@baklava
 ```
 
 You will need node version `8.13.0` or higher.
@@ -52,14 +52,14 @@ async function getKit(myAddress: string) {
   // default from
   kit.defaultAccount = myAddress
   // paid gas in celo dollars
-  await kit.setGasCurrency(CeloContract.StableToken)
+  await kit.setFeeCurrency(CeloContract.StableToken)
   return kit
 }
 ```
 
-### Interacting with cGold & cDollar
+### Interacting with cGLD & cUSD
 
-celo-blockchain has two initial coins: cGold and cDollar (stableToken).
+celo-blockchain has two initial coins: cGLD and cUSD (stableToken).
 Both implement the ERC20 standard, and to interact with them is as simple as:
 
 ```ts
@@ -80,7 +80,7 @@ const hash = await tx.getHash()
 const receipt = await tx.waitReceipt()
 ```
 
-To interact with cDollar, is the same but with a different contract:
+To interact with cUSD, is the same but with a different contract:
 
 ```ts
 const stabletoken = await kit.contracts.getStableToken()
@@ -121,7 +121,7 @@ The complete list of Celo Core contracts is:
 - LockedGold
 - Escrow
 - Exchange
-- GasCurrencyWhitelist
+- FeeCurrencyWhitelist
 - GasPriceMinimum
 - GoldToken
 - Governance
@@ -146,10 +146,11 @@ const goldTokenAddress = await kit.registry.addressFor(CeloContract.GoldToken)
 
 ### Sending Custom Transactions
 
-Celo transaction object is not the same as Ethereum's. There are two new fields present:
+Celo transaction object is not the same as Ethereum's. There are three new fields present:
 
-- gasCurrency (address of the ERC20 contract to use to pay for gas)
-- gasFeeRecipient (address of the beneficiary for the gas, the full node)
+- feeCurrency (address of the ERC20 contract to use to pay for gas and the gateway fee)
+- gatewayFeeRecipient (coinbase address of the full serving the light client's trasactions)
+- gatewayFee (value paid to the gateway fee recipient, denominated in the fee currency)
 
 This means that using `web3.eth.sendTransaction` or `myContract.methods.transfer().send()` should be avoided.
 

@@ -4,6 +4,7 @@
   "emptyVerificationCode": "No Verification Code in Clipboard",
   "invalidVerificationCode": "Invalid Verification Code",
   "repeatVerificationCode": "Repeated Verification Code",
+  "revealAttestationFailure": "Error requesting SMS message",
   "verificationFailure": "Verification Failed",
   "verificationTimeout": "Verification Timed Out",
   "errorRequestCode": "Failed to request codes.",
@@ -25,7 +26,7 @@
       "Celo Phone number verification works by associating your Celo Wallet with your phone number.",
     "section1Header": "Do I need to complete this?",
     "section1Body":
-      "Verification is not required. However, if you do not verify, others on the Celo network cannot send value to you using your phone number. They must use QR codes or addresses.",
+      "Verification is not required. However, without verifying, it is only possible to send and receive value using QR codes or addresses.",
     "section2Header": "Security and Privacy",
     "section2Body":
       "To protect your privacy, only an obfuscated version of your phone number is stored on the Celo blockchain."
@@ -33,15 +34,15 @@
   "loading": {
     "verifyingNumber": "Verifying {{number}}",
     "keepOpen": "Please keep the app open",
-    "card1": "Verifying your phone number helps your friends find you on the Celo Network.",
-    "card2": "On Celo, you can send money to your anyone using just their phone number.",
+    "card1": "Verifying your account allows you to see which of your friends uses Celo Wallet.",
+    "card2": "On Celo, you can send money to anyone using just their phone number.",
     "card3": "Celo is now requesting three text messages to confirm you own your phone number."
   },
   "skipModal": {
     "header": "Skip Verification?",
     "body1": "Verifying allows others to send value to your phone number.",
     "body2":
-      "Without verification, you can still receive payments but only using Celo addresses or QR codes."
+      "Without verification, you can still send payments, but only using Celo addresses or QR codes."
   },
   "interstitial": {
     "header": "Almost Done",
@@ -68,9 +69,16 @@
     "skip": "Skip for now"
   },
   "failModal": {
-    "header": "Verification failed",
-    "body1": "An issue has occured while verifying your phone number.",
-    "body2": "You can skip verification for now and try again later."
+    "header": "Verification Error",
+    "body1": "An issue has occurred while verifying your phone number.",
+    "body2": "You can skip verification for now and try again later.",
+    "enterCodesBody": " If you already received three codes via SMS, you can still enter them.",
+    "enterCodesButton": "Enter Codes"
   },
-  "congratsVerified": "Congratulations you are now verified!"
+  "congratsVerified": "Congratulations you are now verified!",
+  "notification": {
+    "title": "Verify Your Phone",
+    "body": "Verifying allows you to send and receive with your phone contacts.",
+    "cta": "Get Verified"
+  }
 }

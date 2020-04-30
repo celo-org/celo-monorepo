@@ -142,12 +142,17 @@ export enum CustomEventNames {
 
   // Request Money events
   // request_select_cancel is captured in send_select_cancel
-  request_payment_continue = 'request_payment_continue',
-  request_payment_request = 'request_payment_request',
-  request_payment_decline = 'request_payment_decline',
-  request_payment_pay = 'request_payment_pay',
-  request_payment_edit = 'request_payment_edit',
-  request_payment_review = 'request_payment_review',
+  request_payment_continue = 'incoming_request_payment_continue',
+  request_payment_request = 'incoming_request_payment_request',
+  request_payment_edit = 'incoming_request_payment_edit',
+
+  incoming_request_payment_decline = 'incoming_request_payment_decline',
+  incoming_request_payment_pay = 'incoming_request_payment_pay',
+  incoming_request_payment_review = 'incoming_request_payment_review',
+
+  outgoing_request_payment_review = 'outgoing_request_payment_review',
+  outgoing_request_payment_remind = 'outgoing_request_payment_remind',
+  outgoing_request_payment_cancel = 'outgoing_request_payment_cancel',
 
   // Escrowed payments
   escrowed_payment_review = 'escrowed_payment_review',

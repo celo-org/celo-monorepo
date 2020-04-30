@@ -4,7 +4,7 @@ import colors from '@celo/react-components/styles/colors'
 import { CURRENCY_ENUM } from '@celo/utils/src/currencies'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
-import { withNamespaces, WithNamespaces } from 'react-i18next'
+import { WithTranslation } from 'react-i18next'
 import { ActivityIndicator, StyleSheet, View } from 'react-native'
 import Modal from 'react-native-modal'
 import SafeAreaView from 'react-native-safe-area-view'
@@ -13,6 +13,7 @@ import { connect } from 'react-redux'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
+import { TokenTransactionType } from 'src/apollo/types'
 import InviteOptionsModal from 'src/components/InviteOptionsModal'
 import { FeeType } from 'src/fees/actions'
 import CalculateFee, {
@@ -20,7 +21,8 @@ import CalculateFee, {
   PropsWithoutChildren as CalculateFeeProps,
 } from 'src/fees/CalculateFee'
 import { getFeeDollars } from 'src/fees/selectors'
-import i18n, { Namespaces } from 'src/i18n'
+import { completePaymentRequest, declinePaymentRequest } from 'src/firebase/actions'
+import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import { InviteBy } from 'src/invite/actions'
 import { navigateBack } from 'src/navigator/NavigationService'
 import { Recipient } from 'src/recipients/recipient'
@@ -30,7 +32,7 @@ import { sendPaymentOrInvite } from 'src/send/actions'
 import TransferReviewCard from 'src/send/TransferReviewCard'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { fetchDollarBalance } from 'src/stableToken/actions'
-import { TransactionTypes } from 'src/transactions/reducer'
+import Logger from 'src/utils/Logger'
 import { currentAccountSelector } from 'src/web3/selectors'
 
 export interface ConfirmationInput {
@@ -38,7 +40,8 @@ export interface ConfirmationInput {
   amount: BigNumber
   reason: string
   recipientAddress?: string | null
-  type: TransactionTypes
+  type: TokenTransactionType
+  firebasePendingRequestUid?: string | null
 }
 
 interface StateProps {
@@ -52,11 +55,15 @@ interface StateProps {
 interface DispatchProps {
   sendPaymentOrInvite: typeof sendPaymentOrInvite
   fetchDollarBalance: typeof fetchDollarBalance
+  declinePaymentRequest: typeof declinePaymentRequest
+  completePaymentRequest: typeof completePaymentRequest
 }
 
 const mapDispatchToProps = {
   sendPaymentOrInvite,
   fetchDollarBalance,
+  declinePaymentRequest,
+  completePaymentRequest,
 }
 
 const mapStateToProps = (state: RootState): StateProps => {
@@ -74,7 +81,7 @@ interface State {
   buttonReset: boolean
 }
 
-type Props = NavigationInjectedProps & DispatchProps & StateProps & WithNamespaces
+type Props = NavigationInjectedProps & DispatchProps & StateProps & WithTranslation
 
 class SendConfirmation extends React.Component<Props, State> {
   static navigationOptions = { header: null }
@@ -97,6 +104,7 @@ class SendConfirmation extends React.Component<Props, State> {
     if (confirmationInput === '') {
       throw new Error('Confirmation input missing')
     }
+    confirmationInput.amount = new BigNumber(confirmationInput.amount)
     return confirmationInput
   }
 
@@ -110,8 +118,13 @@ class SendConfirmation extends React.Component<Props, State> {
   }
 
   sendOrInvite = (inviteMethod?: InviteBy) => {
-    const { amount, reason, recipient, recipientAddress } = this.getConfirmationInput()
-    const { onConfirm } = this.getNavParams()
+    const {
+      amount,
+      reason,
+      recipient,
+      recipientAddress,
+      firebasePendingRequestUid,
+    } = this.getConfirmationInput()
 
     this.props.sendPaymentOrInvite(
       amount,
@@ -119,18 +132,22 @@ class SendConfirmation extends React.Component<Props, State> {
       recipient,
       recipientAddress,
       inviteMethod,
-      onConfirm
+      firebasePendingRequestUid
     )
   }
 
   onEditClick = () => {
     CeloAnalytics.track(CustomEventNames.edit_dollar_confirm)
-    const { onCancel } = this.getNavParams()
-    if (onCancel) {
-      onCancel()
-    } else {
-      navigateBack()
+    navigateBack()
+  }
+
+  onCancelClick = () => {
+    const { firebasePendingRequestUid } = this.getConfirmationInput()
+    if (firebasePendingRequestUid) {
+      this.props.declinePaymentRequest(firebasePendingRequestUid)
     }
+    Logger.showMessage(this.props.t('paymentRequestFlow:requestDeclined'))
+    navigateBack()
   }
 
   renderHeader = () => {
@@ -138,9 +155,9 @@ class SendConfirmation extends React.Component<Props, State> {
     const { type } = this.getConfirmationInput()
     let title
 
-    if (type === TransactionTypes.PAY_REQUEST) {
+    if (type === TokenTransactionType.PayRequest) {
       title = t('payRequest')
-    } else if (type === TransactionTypes.INVITE_SENT) {
+    } else if (type === TokenTransactionType.InviteSent) {
       title = t('inviteVerifyPayment')
     } else {
       title = t('reviewPayment')
@@ -188,15 +205,15 @@ class SendConfirmation extends React.Component<Props, State> {
 
     let primaryBtnInfo
     let secondaryBtnInfo
-    if (type === TransactionTypes.PAY_REQUEST) {
+    if (type === TokenTransactionType.PayRequest) {
       primaryBtnInfo = {
         action: this.sendOrInvite,
-        text: i18n.t('paymentRequestFlow:pay'),
+        text: i18n.t('global:pay'),
         disabled: isPrimaryButtonDisabled,
       }
       secondaryBtnInfo = {
-        action: this.onEditClick,
-        text: i18n.t('paymentRequestFlow:decline'),
+        action: this.onCancelClick,
+        text: i18n.t('global:decline'),
         disabled: isSending,
       }
     } else {
@@ -295,5 +312,5 @@ export default componentWithAnalytics(
   connect<StateProps, DispatchProps, {}, RootState>(
     mapStateToProps,
     mapDispatchToProps
-  )(withNamespaces(Namespaces.sendFlow7)(SendConfirmation))
+  )(withTranslation(Namespaces.sendFlow7)(SendConfirmation))
 )

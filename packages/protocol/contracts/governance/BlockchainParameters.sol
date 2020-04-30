@@ -15,20 +15,17 @@ contract BlockchainParameters is Ownable, Initializable {
 
   ClientVersion private minimumClientVersion;
   uint256 public blockGasLimit;
-  uint256 public intrinsicGasForAlternativeGasCurrency;
+  uint256 public intrinsicGasForAlternativeFeeCurrency;
 
   event MinimumClientVersionSet(uint256 major, uint256 minor, uint256 patch);
-  event IntrinsicGasForAlternativeGasCurrencySet(uint256 gas);
+  event IntrinsicGasForAlternativeFeeCurrencySet(uint256 gas);
   event BlockGasLimitSet(uint256 limit);
 
   /**
-   * @notice Initializes critical variables.
-   * @param major Minimum client version that can be used in the chain,
-   * major version.
-   * @param minor Minimum client version that can be used in the chain,
-   * minor version.
-   * @param patch Minimum client version that can be used in the chain,
-   * patch level.
+   * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
+   * @param major Minimum client version that can be used in the chain, major version.
+   * @param minor Minimum client version that can be used in the chain, minor version.
+   * @param patch Minimum client version that can be used in the chain, patch level.
    * @param _gasForNonGoldCurrencies Intrinsic gas for non-gold gas currencies.
    * @param gasLimit Block gas limit.
    */
@@ -42,7 +39,7 @@ contract BlockchainParameters is Ownable, Initializable {
     _transferOwnership(msg.sender);
     setMinimumClientVersion(major, minor, patch);
     setBlockGasLimit(gasLimit);
-    setIntrinsicGasForAlternativeGasCurrency(_gasForNonGoldCurrencies);
+    setIntrinsicGasForAlternativeFeeCurrency(_gasForNonGoldCurrencies);
   }
 
   /**
@@ -73,9 +70,9 @@ contract BlockchainParameters is Ownable, Initializable {
    * @notice Sets the intrinsic gas for non-gold gas currencies.
    * @param gas Intrinsic gas for non-gold gas currencies.
    */
-  function setIntrinsicGasForAlternativeGasCurrency(uint256 gas) public onlyOwner {
-    intrinsicGasForAlternativeGasCurrency = gas;
-    emit IntrinsicGasForAlternativeGasCurrencySet(gas);
+  function setIntrinsicGasForAlternativeFeeCurrency(uint256 gas) public onlyOwner {
+    intrinsicGasForAlternativeFeeCurrency = gas;
+    emit IntrinsicGasForAlternativeFeeCurrencySet(gas);
   }
 
   /**

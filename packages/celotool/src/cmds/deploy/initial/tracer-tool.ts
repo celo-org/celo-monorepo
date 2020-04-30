@@ -1,7 +1,7 @@
 import { switchToClusterFromEnv } from 'src/lib/cluster'
 import { installHelmChart } from 'src/lib/tracer-tool'
 import { execCmdWithExitOnFailure } from 'src/lib/utils'
-import * as yargs from 'yargs'
+import yargs from 'yargs'
 import { InitialArgv } from '../../deploy/initial'
 
 export const command = 'tracer-tool'

@@ -1,11 +1,15 @@
-import { StaticNodeUtils } from '@celo/walletkit'
-import { GenesisBlocksGoogleStorageBucketName } from '@celo/walletkit/lib/src/genesis-block-utils'
+import { StaticNodeUtils } from '@celo/contractkit'
+import { GenesisBlocksGoogleStorageBucketName } from '@celo/contractkit/lib/network-utils/genesis-block-utils'
 import { Storage } from '@google-cloud/storage'
 import * as fs from 'fs'
+import fetch from 'node-fetch'
+import * as path from 'path'
+import sleep from 'sleep-promise'
+import { getGenesisGoogleStorageUrl } from './endpoints'
 import { getEnvFile } from './env-utils'
 import { ensureAuthenticatedGcloudAccount } from './gcloud_utils'
 import { generateGenesisFromEnv } from './generate_utils'
-import { getEnodesWithExternalIPAddresses, sleep } from './geth'
+import { getBootnodeEnode, getEnodesWithExternalIPAddresses } from './geth'
 import { execCmdWithExitOnFailure } from './utils'
 
 const genesisBlocksBucketName = GenesisBlocksGoogleStorageBucketName
@@ -13,15 +17,27 @@ const staticNodesBucketName = StaticNodeUtils.getStaticNodesGoogleStorageBucketN
 // Someone has taken env_files and I don't even has permission to modify it :/
 // See files in this bucket using `$ gsutil ls gs://env_config_files`
 const envBucketName = 'env_config_files'
+const bootnodesBucketName = 'env_bootnodes'
+
+// uploads genesis block, static nodes, env file, and bootnode to GCS
+export async function uploadTestnetInfoToGoogleStorage(
+  networkName: string,
+  uploadGenesis: boolean
+) {
+  if (uploadGenesis) {
+    await uploadGenesisBlockToGoogleStorage(networkName)
+  }
+  await uploadStaticNodesToGoogleStorage(networkName)
+  await uploadBootnodeToGoogleStorage(networkName)
+  await uploadEnvFileToGoogleStorage(networkName)
+}
 
 export async function uploadGenesisBlockToGoogleStorage(networkName: string) {
   console.info(`\nUploading genesis block for ${networkName} to Google cloud storage`)
   const genesisBlockJsonData = generateGenesisFromEnv()
   console.debug(`Genesis block is ${genesisBlockJsonData} \n`)
-  const localTmpFilePath = `/tmp/${networkName}_genesis-block`
-  fs.writeFileSync(localTmpFilePath, genesisBlockJsonData)
-  await uploadFileToGoogleStorage(
-    localTmpFilePath,
+  await uploadDataToGoogleStorage(
+    genesisBlockJsonData,
     genesisBlocksBucketName,
     networkName,
     true,
@@ -29,39 +45,46 @@ export async function uploadGenesisBlockToGoogleStorage(networkName: string) {
   )
 }
 
+export async function getGenesisBlockFromGoogleStorage(networkName: string) {
+  const resp = await fetch(getGenesisGoogleStorageUrl(networkName))
+  return JSON.stringify(await resp.json())
+}
+
 // This will throw an error if it fails to upload
 export async function uploadStaticNodesToGoogleStorage(networkName: string) {
   console.info(`\nUploading static nodes for ${networkName} to Google cloud storage...`)
   // Get node json file
-  let nodesJsonData: string | null = null
-  const numAttempts = 100
-  for (let i = 1; i <= numAttempts; i++) {
-    try {
-      nodesJsonData = JSON.stringify(await getEnodesWithExternalIPAddresses(networkName))
-      break
-    } catch (error) {
-      const sleepTimeBasisInMs = 1000
-      const sleepTimeInMs = sleepTimeBasisInMs * Math.pow(2, i)
-      console.warn(
-        `${new Date().toLocaleTimeString()} Failed to get static nodes information, attempt: ${i}/${numAttempts}, ` +
-          `retry after sleeping for ${sleepTimeInMs} milli-seconds`,
-        error
-      )
-      await sleep(sleepTimeInMs)
-    }
-  }
-  if (nodesJsonData === null) {
+  const nodesData: string[] | null = await retryCmd(() =>
+    getEnodesWithExternalIPAddresses(networkName)
+  )
+  if (nodesData === null) {
     throw new Error('Fail to get static nodes information')
   }
-  console.debug('Static nodes are ' + nodesJsonData + '\n')
-  const localTmpFilePath = `/tmp/${networkName}_static-nodes`
-  fs.writeFileSync(localTmpFilePath, nodesJsonData)
-  await uploadFileToGoogleStorage(
-    localTmpFilePath,
+  const nodesJson = JSON.stringify(nodesData)
+  console.debug('Static nodes are ' + nodesJson + '\n')
+  await uploadDataToGoogleStorage(
+    nodesJson,
     staticNodesBucketName,
     networkName,
     true,
     'application/json'
+  )
+}
+
+export async function uploadBootnodeToGoogleStorage(networkName: string) {
+  console.info(`\nUploading bootnode for ${networkName} to Google Cloud Storage...`)
+  const [bootnodeEnode] = await retryCmd(() => getBootnodeEnode(networkName))
+  if (!bootnodeEnode) {
+    throw new Error('Failed to get bootnode enode')
+  }
+  // for now there is always only one bootnodde
+  console.info('Bootnode enode:', bootnodeEnode)
+  await uploadDataToGoogleStorage(
+    bootnodeEnode,
+    bootnodesBucketName,
+    networkName,
+    true, // make it public
+    'text/plain'
   )
 }
 
@@ -82,15 +105,36 @@ export async function uploadEnvFileToGoogleStorage(networkName: string) {
     `# Last modified on on ${Date()}\n` +
     `# Base commit: "https://github.com/${repo}/commit/${commitHash}"\n`
   const fullData = metaData + '\n' + envFileData
-  const localTmpFilePath = `/tmp/${networkName}_env-file`
-  fs.writeFileSync(localTmpFilePath, fullData)
-  await uploadFileToGoogleStorage(
-    localTmpFilePath,
+  await uploadDataToGoogleStorage(
+    fullData,
     envBucketName,
     networkName,
     false /* keep file private */,
     'text/plain'
   )
+}
+
+async function retryCmd(
+  cmd: () => Promise<any>,
+  numAttempts: number = 100,
+  maxTimeoutMs: number = 15000
+) {
+  for (let i = 1; i <= numAttempts; i++) {
+    try {
+      const result = await cmd()
+      return result
+    } catch (error) {
+      const sleepTimeBasisInMs = 1000
+      const sleepTimeInMs = Math.min(sleepTimeBasisInMs * Math.pow(2, i), maxTimeoutMs)
+      console.warn(
+        `${new Date().toLocaleTimeString()} Retry attempt: ${i}/${numAttempts}, ` +
+          `retry after sleeping for ${sleepTimeInMs} milli-seconds`,
+        error
+      )
+      await sleep(sleepTimeInMs)
+    }
+  }
+  return null
 }
 
 async function getGoogleCloudUserInfo(): Promise<string> {
@@ -113,6 +157,29 @@ async function getCommitHash(): Promise<string> {
   const cmd = 'git show | head -n 1'
   const stdout = (await execCmdWithExitOnFailure(cmd))[0]
   return stdout.split(' ')[1].trim()
+}
+
+// Writes data to a temporary file & uploads it to GCS
+export function uploadDataToGoogleStorage(
+  data: any,
+  googleStorageBucketName: string,
+  googleStorageFileName: string,
+  makeFileWorldReadable: boolean,
+  contentType: string
+) {
+  const localTmpFilePath = `/tmp/${googleStorageBucketName}-${googleStorageFileName}`
+  // @ts-ignore The expected type of this is not accurate
+  fs.mkdirSync(path.dirname(localTmpFilePath), {
+    recursive: true,
+  })
+  fs.writeFileSync(localTmpFilePath, data)
+  return uploadFileToGoogleStorage(
+    localTmpFilePath,
+    googleStorageBucketName,
+    googleStorageFileName,
+    makeFileWorldReadable,
+    contentType
+  )
 }
 
 // TODO(yerdua): make this communicate or handle auth issues reasonably. Ideally,

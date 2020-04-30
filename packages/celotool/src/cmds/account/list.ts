@@ -24,7 +24,7 @@ export const builder = (yargs: Argv) => {
 }
 
 export const handler = async (argv: ListArgv) => {
-  const domain = getBlockscoutUrl(argv)
+  const domain = getBlockscoutUrl(argv.celoEnv)
   const listUsersUrl = `${domain}/api?module=account&action=tokentx&address=0x0000000000000000000000000000000000000abe`
 
   await switchToClusterFromEnv(false)

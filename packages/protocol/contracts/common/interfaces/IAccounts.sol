@@ -6,14 +6,18 @@ interface IAccounts {
   function validatorSignerToAccount(address) external view returns (address);
   function attestationSignerToAccount(address) external view returns (address);
   function signerToAccount(address) external view returns (address);
-  function getValidatorSigner(address) external view returns (address);
   function getAttestationSigner(address) external view returns (address);
+  function getValidatorSigner(address) external view returns (address);
+  function getVoteSigner(address) external view returns (address);
+  function hasAuthorizedVoteSigner(address) external view returns (bool);
+  function hasAuthorizedValidatorSigner(address) external view returns (bool);
+  function hasAuthorizedAttestationSigner(address) external view returns (bool);
 
   function setAccountDataEncryptionKey(bytes calldata) external;
   function setMetadataURL(string calldata) external;
   function setName(string calldata) external;
-  function setWalletAddress(address) external;
-  function setAccount(string calldata, bytes calldata, address) external;
+  function setWalletAddress(address, uint8, bytes32, bytes32) external;
+  function setAccount(string calldata, bytes calldata, address, uint8, bytes32, bytes32) external;
 
   function getDataEncryptionKey(address) external view returns (bytes memory);
   function getWalletAddress(address) external view returns (address);
@@ -23,4 +27,20 @@ interface IAccounts {
     view
     returns (uint256[] memory, bytes memory);
   function getName(address) external view returns (string memory);
+
+  function authorizeVoteSigner(address, uint8, bytes32, bytes32) external;
+  function authorizeValidatorSigner(address, uint8, bytes32, bytes32) external;
+  function authorizeValidatorSignerWithPublicKey(address, uint8, bytes32, bytes32, bytes calldata)
+    external;
+  function authorizeValidatorSignerWithKeys(
+    address,
+    uint8,
+    bytes32,
+    bytes32,
+    bytes calldata,
+    bytes calldata,
+    bytes calldata
+  ) external;
+  function authorizeAttestationSigner(address, uint8, bytes32, bytes32) external;
+  function createAccount() external returns (bool);
 }

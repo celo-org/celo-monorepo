@@ -1,5 +1,5 @@
-import { Platform, ToastAndroid } from 'react-native'
 import * as RNFS from 'react-native-fs'
+import Toast from 'react-native-simple-toast'
 
 export default class ReactNativeLogger {
   /**
@@ -32,9 +32,7 @@ export default class ReactNativeLogger {
 
   // TODO: see what to do with this on iOS since there's not native toast
   showMessage = (message: string) => {
-    if (Platform.OS === 'android') {
-      ToastAndroid.showWithGravity(message, ToastAndroid.SHORT, ToastAndroid.BOTTOM)
-    }
+    Toast.showWithGravity(message, Toast.SHORT, Toast.BOTTOM)
     this.debug('Toast', message)
   }
 
@@ -42,9 +40,7 @@ export default class ReactNativeLogger {
   // Do not add new code that uses this.
   showError = (error: string | Error) => {
     const errorMsg = this.getErrorMessage(error)
-    if (Platform.OS === 'android') {
-      ToastAndroid.showWithGravity(errorMsg, ToastAndroid.SHORT, ToastAndroid.BOTTOM)
-    }
+    Toast.showWithGravity(errorMsg, Toast.SHORT, Toast.BOTTOM)
     this.error('Toast', errorMsg)
   }
 

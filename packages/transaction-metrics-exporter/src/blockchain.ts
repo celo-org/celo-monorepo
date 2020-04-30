@@ -1,11 +1,15 @@
 import { ContractKit, newKit } from '@celo/contractkit'
-import { newBlockExplorer, ParsedTx } from '@celo/contractkit/lib/explorer/block-explorer'
-import { newLogExplorer, ParsedBlock } from '@celo/contractkit/lib/explorer/log-explorer'
+import {
+  newBlockExplorer,
+  ParsedBlock,
+  ParsedTx,
+} from '@celo/contractkit/lib/explorer/block-explorer'
+import { newLogExplorer } from '@celo/contractkit/lib/explorer/log-explorer'
 import { Future } from '@celo/utils/lib/future'
 import { consoleLogger } from '@celo/utils/lib/logger'
 import { conditionWatcher, tryObtainValueWithRetries } from '@celo/utils/lib/task'
-import { Block, BlockHeader } from 'web3/eth/types'
-import { WebsocketProvider } from 'web3/providers'
+import { Transaction, WebsocketProvider } from 'web3-core'
+import { BlockHeader } from 'web3-eth'
 import { Counters } from './metrics'
 
 const EMPTY_INPUT = 'empty_input'
@@ -58,7 +62,14 @@ export async function runMetricExporter(kit: ContractKit): Promise<EndReason> {
     logger: consoleLogger,
     timeInBetweenMS: 5000,
     initialDelayMS: 5000,
-    pollCondition: async () => !(await kit.isListening()),
+    pollCondition: async () => {
+      try {
+        return !(await kit.isListening())
+      } catch (error) {
+        console.error(error)
+        return true
+      }
+    },
     onSuccess: () => endExporter({ reason: 'not-listening' }),
   })
 
@@ -126,15 +137,15 @@ async function newBlockHeaderProcessor(kit: ContractKit): Promise<(block: BlockH
     Counters.blockheader.inc({ miner: header.miner })
 
     const block = await blockExplorer.fetchBlock(header.number)
-    const previousBlock: Block = await blockExplorer.fetchBlock(header.number - 1)
+    const previousBlock = await blockExplorer.fetchBlock(header.number - 1)
 
-    const blockTime = block.timestamp - previousBlock.timestamp
+    const blockTime = Number(block.timestamp) - Number(previousBlock.timestamp)
     logEvent('RECEIVED_BLOCK', { ...block, blockTime })
 
     const parsedBlock = blockExplorer.parseBlock(block)
     const parsedTxMap = toTxMap(parsedBlock)
 
-    for (const tx of parsedBlock.block.transactions) {
+    for (const tx of parsedBlock.block.transactions as Transaction[]) {
       const parsedTx: ParsedTx | undefined = parsedTxMap.get(tx.hash)
 
       logEvent('RECEIVED_TRANSACTION', tx)
@@ -142,7 +153,7 @@ async function newBlockHeaderProcessor(kit: ContractKit): Promise<(block: BlockH
       logEvent('RECEIVED_TRANSACTION_RECEIPT', receipt)
 
       const labels = {
-        to: parsedTx ? tx.to : NOT_WHITELISTED_ADDRESS,
+        to: parsedTx ? (tx.to as string) : NOT_WHITELISTED_ADDRESS,
         methodId: toMethodId(tx.input, parsedTx != null),
         status: receipt.status.toString(),
       }
@@ -165,6 +176,10 @@ async function newBlockHeaderProcessor(kit: ContractKit): Promise<(block: BlockH
             function: parsedTx.callDetails.function,
             log: event.event,
           })
+
+          // @ts-ignore We want to rename event => eventName to avoid overwriting
+          event.eventName = event.event
+          delete event.event
 
           logEvent('RECEIVED_PARSED_LOG', event)
         }

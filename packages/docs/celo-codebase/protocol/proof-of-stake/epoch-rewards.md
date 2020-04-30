@@ -1,59 +1,26 @@
----
-description: 'Working proposal, subject to change.'
----
-
 # Epoch Rewards
 
-## **Overview**
+## Overview
 
-This section describes the current working proposal for how epoch rewards are distributed in Celo. Epoch rewards are similar to the familiar notion of block rewards in other blockchains; inflation of the currency as blocks are produced. They are minted and distributed on the last block of every epoch to different recipients, namely: Stakers, validators, the community fund and the reserve.
+**Epoch Rewards** are similar to the familiar notion of block rewards in other blockchains, minting and distributing new units of Celo Gold as blocks are produced, to create several kinds of incentives. Epoch rewards are paid in the final block of the epoch and are used to:
+* Distributed [rewards for validators and validator groups](validator-rewards.md)
+* Distribute [rewards to holders of Locked Celo Gold](locked-gold-rewards.md) voting for groups that elected validators
+* Make payments into a [Community Fund](community-fund.md) for protocol infrastructure grants
+* [Bolster the stablecoin reserve](community-fund.md#bolstering-the-reserve) if it is under-collateralized
+* Make payments into a [Carbon Offsetting Fund](carbon-offsetting-fund.md).
 
-A total of 400 million Celo Gold will be released for epoch rewards over time. Celo Gold is one of Celo’s reserve currencies and can be used as utility token in Celo. It has a fixed total supply and in the long term will exhibit deflationary characteristics like Bitcoin.
+A total of 400 million Celo Gold will be released for epoch rewards over time. Celo Gold is a utility and governance asset on Celo, and also the reserve collateral for Celo Dollar (and possibly in the future other whitelisted tokens). It has a fixed total supply and in the long term will exhibit deflationary characteristics like Bitcoin.
 
-The size of the disbursements is determined at the end of every epoch via a two-step-process: In step one, economically desired payments are derived. In step two, these desired payments are adjusted to generate a drift towards a predefined target epoch rewards schedule. This two-step-process aims at solving the tradeoff between paying reasonable rewards in terms of purchasing power and avoiding excessive over- or underspending with respect to a predefined epoch rewards schedule. More detail about the two steps is provided below.
+The total amount of disbursements is determined at the end of every epoch via a two step process. In step one, economically desired **on-target rewards** are derived. These are explained in the following pages. Several factors can increase or decrease the value of the payments that would ideally be made in a given epoch (including the Celo Gold to Dollar exchange rate, the collateralization of the reserve, and whether payments to validators or groups are held back due to poor uptime or prior slashing).
 
-## **Step 1: Determine desired payments**
+In step two, these on-target rewards are adjusted to generate a drift towards a predefined target epoch rewards schedule. This process aims to solve the trade-off between paying reasonable rewards in terms of purchasing power and avoiding excessive over- or underspending with respect to a predefined epoch rewards schedule. More detail about the two steps is provided below.
 
-### **Validators**
+## Adjusting Rewards for Target Schedule
 
-The proposed scheme to determine the desired epoch rewards for validators aims at incentivizing validator uptime performance while ensuring that payments are economically reasonable in size independent of fluctuations of the price of Celo Gold .
-
-Validators are eligible for epoch payments if they proposed at least one block during the epoch. The desired epoch rewards to validators are determined by a flat fee in Celo Dollar times a validator specific performance factor. The flat fee can be varied by governance but it is supposed to cover reasonable cost plus a margin for validators. Celo starts with a flat fee of 75,000 Celo Dollar \(subject to change\) per year per validator which is derived from the following assumptions:
-
-- The annual cost of running and securing a validator node, including overhead: 60,000 Celo Dollar
-- Profit margin: $$20\%$$
-- Flat fee to validators : $$annual\_val\_fee = \frac{60,000}{1 - 0.2} = 75,\!000$$ Celo Dollar
-
-The flat fee is multiplied by a $$performance\_factor$$ that accounts for the validators’ uptime performance during the epoch. Desired validator epoch rewards thus results as:
-
-$$
-des\_val\_rewards =
-
-performance\_factor \frac{annual\_val\_fee}{epochs\_per\_annum}
-$$
-
-Validator epoch rewards are distributed in Celo Dollars and the reserve receives the equivalent amount of Celo Gold as compensation for minting the required Celo Dollars disbursements.
-
-### **Stakers**
-
-The proposed scheme to determine desired rewards for staking aims at achieving a target Celo Gold bonding percentage while incentivizing stakers to vote for performant groups.
-
-Stakers are eligible for epoch payments if they voted for a validator group that had a validator elected during the epoch. The total desired epoch payments to stakers are calculated with respect to the difference between the target percentage of Celo Gold locked and the current percentage of Celo Gold locked \(relative to outstanding Celo Gold\). The target percentage of locked Celo Gold is governable and set to 50% initially. The protocol dynamically increases \(decreases\) the rewards for staking if the current percentage of locked Celo Gold is below \(above\) the target. Additionally, the total rewards, defined as a percentage of total locked Celo Gold, are constrained to remain in a governable interval $$[y_{min}, y_{max}]$$.
-
-The total rewards for staking are distributed according to the proportion to the weight of locked Celo Gold in each account and adjusted by a $$group\_performance\_factor$$ that accounts for the uptime performance of the elected validator group.
-
-### Community Fund & Reserve
-
-The Community Fund obtains a desired epoch payment defined as a fraction of the total desired epoch rewards \(governable, initially planned to be $$25\%$$\). The community decides how to allocate these funds further through governance proposals. Funds might be used to pay bounties for bugs or vulnerabilities, security audits, or grants for development.
-
-The reserve automatically receives a fraction of the desired epoch payments to the Community Fund during times in which the reserve ratio \(the ratio of reserve value over stablecoin market capitalization\) is below a predefined target schedule. The size of the epoch payment to the reserve is calculated based on a half-life calculation to bring the reserve back to its target level. The reserve ratio target schedule as well as the half-life period \(initially planned to be 10 years\) are governable.
-
-### **Step 2: Adjust desired payments to track target schedule**
-
-There is a target schedule for the release of Celo Gold epoch rewards. The proposed target curve \(subject to change\) of remaining epoch rewards declines linearly over 15 years to 50% of the initial 400 million Celo Gold and experiences an exponential decay with half life of $$h = ln(2)\times15 =10.3$$ afterwards. The choice of $$h$$ guarantees a smooth transition from the linear to the exponential regime.
+There is a target schedule for the release of Celo Gold epoch rewards. The proposed target curve \(subject to change\) of remaining epoch rewards declines linearly over 15 years to 50% of the initial 400 million Celo Gold, then decays exponentially with half life of $$h = ln(2)\times15 =10.3$$ afterwards. The choice of $$h$$ guarantees a smooth transition from the linear to the exponential regime.
 
 ![](https://storage.googleapis.com/celo-website/docs/epoch-rewards-schedule.png)
 
-The total rewards paid out at the end of a given epoch result from multiplying the total desired epoch rewards \(derived in step 1\) with an adjustment factor. This adjustment factor is a function of the percentage deviation of the remaining epoch rewards from the target epoch rewards remaining. It evaluates to 1 if the remaining epoch rewards are at the target and to smaller \(larger\) than 1 if the remaining rewards are below \(above\) the target. This creates a drag towards the target schedule. The sensitivity of the adjustment factor to the percentage deviation from the target is governable.
+The total **actual rewards** paid out at the end of a given epoch result from multiplying the total on-target rewards with a `Rewards Multiplier`. This adjustment factor is a function of the percentage deviation of the remaining epoch rewards from the target epoch rewards remaining. It evaluates to `1` if the remaining epoch rewards are at the target and to smaller \(or larger\) than `1` if the remaining rewards are below \(or above, respectively\) the target. This creates a drag towards the target schedule.
 
-The proposed scheme for calculating desired staking rewards aims achieving a target Celo Gold bonding percentage while also incentivizing to vote for performant validator groups.
+The sensitivity of the adjustment factor to the percentage deviation from the target are governable parameters: one for an underspend, one for an overspend.

@@ -1,12 +1,10 @@
 import BigNumber from 'bignumber.js'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { SHORT_CURRENCIES } from 'src/geth/consts'
-import { RecipientWithContact } from 'src/recipients/recipient'
 
 export interface EscrowedPayment {
   senderAddress: string
   recipientPhone: string
-  recipientContact?: RecipientWithContact
   paymentID: string
   currency: SHORT_CURRENCIES
   amount: BigNumber
@@ -30,6 +28,7 @@ export interface EscrowTransferPaymentAction {
   phoneHash: string
   amount: BigNumber
   tempWalletAddress: string
+  txId: string
 }
 export interface EscrowReclaimPaymentAction {
   type: Actions.RECLAIM_PAYMENT
@@ -71,12 +70,14 @@ export type ActionTypes =
 export const transferEscrowedPayment = (
   phoneHash: string,
   amount: BigNumber,
-  tempWalletAddress: string
+  tempWalletAddress: string,
+  txId: string
 ): EscrowTransferPaymentAction => ({
   type: Actions.TRANSFER_PAYMENT,
   phoneHash,
   amount,
   tempWalletAddress,
+  txId,
 })
 
 export const reclaimEscrowPayment = (paymentID: string): EscrowReclaimPaymentAction => ({

@@ -1,50 +1,99 @@
+/* tslint:disable: no-console */
 import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
-import { spawn, SpawnOptions } from 'child_process'
 import fs from 'fs'
+import _ from 'lodash'
 import { join as joinPath, resolve as resolvePath } from 'path'
-import { Admin } from 'web3-eth-admin'
+import readLastLines from 'read-last-lines'
+import Web3 from 'web3'
 import {
   AccountType,
-  generateGenesis,
   getPrivateKeysFor,
-  getValidators,
+  getValidatorsInformation,
+  privateKeyToAddress,
   privateKeyToPublicKey,
-  Validator,
 } from '../lib/generate_utils'
-import { getEnodeAddress } from '../lib/geth'
-import { ensure0x } from '../lib/utils'
+import {
+  buildGeth,
+  checkoutGethRepo,
+  connectPeers,
+  connectValidatorPeers,
+  getEnodeAddress,
+  getLogFilename,
+  initAndStartGeth,
+  migrateContracts,
+  resetDataDir,
+  restoreDatadir,
+  snapshotDatadir,
+  spawnWithLog,
+  startGeth,
+  writeGenesis,
+} from '../lib/geth'
+import { GethInstanceConfig } from '../lib/interfaces/geth-instance-config'
+import { GethRunConfig } from '../lib/interfaces/geth-run-config'
+import { spawnCmd } from '../lib/utils'
 
-export interface GethInstanceConfig {
-  name: string
-  validating: boolean
-  syncmode: string
-  port: number
-  rpcport?: number
-  wsport?: number
-  lightserv?: boolean
-  privateKey?: string
-  etherbase?: string
-  peers?: string[]
-  pid?: number
-}
-
-export interface GethTestConfig {
-  migrate?: boolean
-  migrateTo?: number
-  instances: GethInstanceConfig[]
-  genesisConfig?: any
-}
-
-const TEST_DIR = '/tmp/e2e'
-const GENESIS_PATH = `${TEST_DIR}/genesis.json`
-const NetworkId = 1101
 const MonorepoRoot = resolvePath(joinPath(__dirname, '../..', '../..'))
+const verboseOutput = false
+
+export async function initAndSyncGethWithRetry(
+  gethConfig: GethRunConfig,
+  gethBinaryPath: string,
+  instance: GethInstanceConfig,
+  connectInstances: GethInstanceConfig[],
+  verbose: boolean,
+  retries: number
+) {
+  for (let i = 1; i <= retries; i++) {
+    try {
+      await initAndStartGeth(gethConfig, gethBinaryPath, instance, verbose)
+      await connectPeers(connectInstances, verbose)
+      await waitToFinishInstanceSyncing(instance)
+      break
+    } catch (error) {
+      console.info(`initAndSyncGethWithRetry error: ${error}`)
+      const logFilename = getLogFilename(gethConfig.runPath, instance)
+      console.info(`tail -50 ${logFilename}`)
+      console.info(await readLastLines.read(logFilename, 50))
+      if (i === retries) {
+        throw error
+      } else {
+        console.info(`Retrying ${i}/${retries} ...`)
+        await killInstance(instance)
+        continue
+      }
+    }
+  }
+  return instance
+}
+
+export async function waitToFinishInstanceSyncing(instance: GethInstanceConfig) {
+  const { wsport, rpcport } = instance
+  await waitToFinishSyncing(new Web3(`${rpcport ? 'http' : 'ws'}://localhost:${rpcport || wsport}`))
+}
 
 export async function waitToFinishSyncing(web3: any) {
   while ((await web3.eth.isSyncing()) || (await web3.eth.getBlockNumber()) === 0) {
     await sleep(0.1)
   }
+}
+
+export async function waitForBlock(web3: Web3, blockNumber: number) {
+  // const epoch = new BigNumber(await validators.methods.getEpochSize().call()).toNumber()
+  let currentBlock: number
+  do {
+    currentBlock = await web3.eth.getBlockNumber()
+    await sleep(0.1)
+  } while (currentBlock < blockNumber)
+}
+
+export async function waitForEpochTransition(web3: Web3, epoch: number) {
+  // const epoch = new BigNumber(await validators.methods.getEpochSize().call()).toNumber()
+  let blockNumber: number
+  do {
+    blockNumber = await web3.eth.getBlockNumber()
+    await sleep(0.1)
+  } while (blockNumber % epoch !== 1)
 }
 
 export function assertAlmostEqual(
@@ -55,7 +104,10 @@ export function assertAlmostEqual(
   if (expected.isZero()) {
     assert.equal(actual.toFixed(), expected.toFixed())
   } else {
-    const isCloseTo = actual.plus(delta).gte(expected) || actual.minus(delta).lte(expected)
+    const isCloseTo = actual
+      .minus(expected)
+      .abs()
+      .lte(delta)
     assert(
       isCloseTo,
       `expected ${actual.toString()} to almost equal ${expected.toString()} +/- ${delta.toString()}`
@@ -63,449 +115,64 @@ export function assertAlmostEqual(
   }
 }
 
-export function spawnWithLog(cmd: string, args: string[], logsFilepath: string) {
-  try {
-    fs.unlinkSync(logsFilepath)
-  } catch (error) {
-    // nothing to do
-  }
-  const logStream = fs.createWriteStream(logsFilepath, { flags: 'a' })
-  const process = spawn(cmd, args)
-  process.stdout.pipe(logStream)
-  process.stderr.pipe(logStream)
-  return process
-}
-
-export function execCmd(
-  cmd: string,
-  args: string[],
-  options?: SpawnOptions & { silent?: boolean }
-) {
-  return new Promise<number>(async (resolve, reject) => {
-    const { silent, ...spawnOptions } = options || { silent: false }
-    if (!silent) {
-      console.debug('$ ' + [cmd].concat(args).join(' '))
-    }
-    const process = spawn(cmd, args, { ...spawnOptions, stdio: silent ? 'ignore' : 'inherit' })
-    process.on('close', (code) => {
-      try {
-        resolve(code)
-      } catch (error) {
-        reject(error)
-      }
-    })
-  })
-}
-
-// Returns a Promise which resolves to [stdout, stderr] array
-export async function execCmdWithExitOnFailure(
-  cmd: string,
-  args: string[],
-  options?: SpawnOptions & { silent?: boolean }
-) {
-  const code = await execCmd(cmd, args, options)
-  if (code !== 0) {
-    process.exit(1)
-  }
-}
-
-// TODO(asa): Use the contract kit here instead
-export const erc20Abi = [
-  // balanceOf
-  {
-    constant: true,
-    inputs: [{ name: '_owner', type: 'address' }],
-    name: 'balanceOf',
-    outputs: [{ name: 'balance', type: 'uint256' }],
-    type: 'function',
-  },
-  {
-    constant: false,
-    inputs: [
-      {
-        name: 'to',
-        type: 'address',
-      },
-      {
-        name: 'value',
-        type: 'uint256',
-      },
-    ],
-    name: 'transfer',
-    outputs: [
-      {
-        name: '',
-        type: 'bool',
-      },
-    ],
-    payable: false,
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    constant: false,
-    inputs: [],
-    name: 'totalSupply',
-    outputs: [
-      {
-        name: '',
-        type: 'uint256',
-      },
-    ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    constant: true,
-    inputs: [],
-    name: 'firstBlockWithReward',
-    outputs: [
-      {
-        name: '',
-        type: 'uint256',
-      },
-    ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
-  },
-]
-
-async function checkoutGethRepo(branch: string, path: string) {
-  await execCmdWithExitOnFailure('rm', ['-rf', path])
-  await execCmdWithExitOnFailure('git', [
-    'clone',
-    '--depth',
-    '1',
-    'https://github.com/celo-org/celo-blockchain.git',
-    path,
-    '-b',
-    branch,
-  ])
-  await execCmdWithExitOnFailure('git', ['checkout', branch], { cwd: path })
-}
-
-async function buildGeth(path: string) {
-  await execCmdWithExitOnFailure('make', ['geth'], { cwd: path })
-}
-
-async function setupTestDir(testDir: string) {
-  await execCmd('rm', ['-rf', testDir])
-  await execCmd('mkdir', [testDir])
-}
-
-function writeGenesis(validators: Validator[], path: string, configOverrides: any = {}) {
-  const genesis = generateGenesis({
-    validators,
-    blockTime: 0,
-    epoch: 10,
-    requestTimeout: 3000,
-    chainId: NetworkId,
-    ...configOverrides,
-  })
-  fs.writeFileSync(path, genesis)
-}
-
-export function importGenesis() {
-  return JSON.parse(fs.readFileSync(GENESIS_PATH).toString())
-}
-
-export async function init(gethBinaryPath: string, datadir: string, genesisPath: string) {
-  await execCmdWithExitOnFailure('rm', ['-rf', datadir], { silent: true })
-  await execCmdWithExitOnFailure(gethBinaryPath, ['--datadir', datadir, 'init', genesisPath], {
-    silent: true,
-  })
-}
-
-export async function importPrivateKey(gethBinaryPath: string, instance: GethInstanceConfig) {
-  const keyFile = `/${getDatadir(instance)}/key.txt`
-  fs.writeFileSync(keyFile, instance.privateKey)
-  console.info(`geth:${instance.name}: import account`)
-  await execCmdWithExitOnFailure(
-    gethBinaryPath,
-    ['account', 'import', '--datadir', getDatadir(instance), '--password', '/dev/null', keyFile],
-    { silent: true }
-  )
+export async function killBootnode() {
+  console.info(`Killing the bootnode`)
+  await shutdownOrKill('bootnode')
 }
 
 export async function killGeth() {
   console.info(`Killing ALL geth instances`)
-  await execCmd('pkill', ['-SIGINT', 'geth'], { silent: true })
+  await shutdownOrKill('geth')
+}
+
+export async function shutdownOrKill(processName: string) {
+  await spawnCmd('pkill', ['-SIGINT', processName], { silent: true })
+
+  let processRemaining = true
+  for (let i = 0; i < 15 && processRemaining; i++) {
+    await sleep(2)
+    const pgrepResult = await spawnCmd('pgrep', [processName], { silent: true })
+    processRemaining = pgrepResult === 0
+  }
+
+  if (processRemaining) {
+    console.info('shutdownOrKill: clean shutdown failed')
+    await spawnCmd('pkill', ['-SIGKILL', processName], { silent: true })
+  }
 }
 
 export async function killInstance(instance: GethInstanceConfig) {
   if (instance.pid) {
-    await execCmd('kill', ['-9', instance.pid.toString()])
+    await spawnCmd('kill', ['-9', instance.pid.toString()])
   }
 }
 
-export async function addStaticPeers(datadir: string, enodes: string[]) {
-  fs.writeFileSync(`${datadir}/static-nodes.json`, JSON.stringify(enodes))
-}
-
-async function isPortOpen(host: string, port: number) {
-  return (await execCmd('nc', ['-z', host, port.toString()], { silent: true })) === 0
-}
-
-async function waitForPortOpen(host: string, port: number, seconds: number) {
-  const deadline = Date.now() + seconds * 1000
-  do {
-    if (await isPortOpen(host, port)) {
-      return true
-    }
-  } while (Date.now() < deadline)
-  return false
-}
-
-export function sleep(seconds: number) {
+export function sleep(seconds: number, verbose = false) {
+  if (verbose) {
+    console.log(`Sleeping for ${seconds} seconds. Stay tuned!`)
+  }
   return new Promise<void>((resolve) => setTimeout(resolve, seconds * 1000))
 }
 
-export async function getEnode(port: number, ws: boolean = false) {
-  const p = ws ? 'ws' : 'http'
-  const admin = new Admin(`${p}://localhost:${port}`)
-  return (await admin.getNodeInfo()).enode
-}
-
-export async function startGeth(gethBinaryPath: string, instance: GethInstanceConfig) {
-  const datadir = getDatadir(instance)
-  const { syncmode, port, rpcport, wsport, validating } = instance
-  const privateKey = instance.privateKey || ''
-  const lightserv = instance.lightserv || false
-  const etherbase = instance.etherbase || ''
-  const gethArgs = [
-    '--datadir',
-    datadir,
-    '--syncmode',
-    syncmode,
-    '--debug',
-    '--port',
-    port.toString(),
-    '--nodiscover',
-    '--rpcvhosts=*',
-    '--networkid',
-    NetworkId.toString(),
-    '--verbosity',
-    '4',
-    '--consoleoutput=stdout', // Send all logs to stdout
-    '--consoleformat=term',
-    '--nat',
-    'extip:127.0.0.1',
-  ]
-
-  if (rpcport) {
-    gethArgs.push(
-      '--rpc',
-      '--rpcport',
-      rpcport.toString(),
-      '--rpcapi=eth,net,web3,debug,admin,personal'
-    )
-  }
-
-  if (wsport) {
-    gethArgs.push(
-      '--wsorigins=*',
-      '--ws',
-      '--wsport',
-      wsport.toString(),
-      '--wsapi=eth,net,web3,debug,admin,personal'
-    )
-  }
-
-  if (etherbase) {
-    gethArgs.push('--etherbase', etherbase)
-  }
-
-  if (lightserv) {
-    gethArgs.push('--lightserv=90')
-  }
-
-  if (validating) {
-    gethArgs.push('--mine', '--minerthreads=10', `--nodekeyhex=${privateKey}`)
-  }
-
-  if (privateKey) {
-    gethArgs.push('--password=/dev/null', `--unlock=0`)
-  }
-
-  const gethProcess = spawnWithLog(gethBinaryPath, gethArgs, `${datadir}/logs.txt`)
-  instance.pid = gethProcess.pid
-
-  // Give some time for geth to come up
-  const waitForPort = wsport ? wsport : rpcport
-  if (waitForPort) {
-    const isOpen = await waitForPortOpen('localhost', waitForPort, 5)
-    if (!isOpen) {
-      console.error(`geth:${instance.name}: jsonRPC didn't open after 5 seconds`)
-      process.exit(1)
-    } else {
-      console.info(`geth:${instance.name}: jsonRPC port open ${waitForPort}`)
-    }
-  }
-  return instance
-}
-
-export async function migrateContracts(
-  validatorPrivateKeys: string[],
-  validators: string[],
-  to: number = 1000
+export async function startBootnode(
+  bootnodeBinaryPath: string,
+  mnemonic: string,
+  gethConfig: GethRunConfig,
+  verbose: boolean
 ) {
-  const migrationOverrides = {
-    validators: {
-      validatorKeys: validatorPrivateKeys.map(ensure0x),
-    },
-    election: {
-      minElectableValidators: '1',
-    },
-    stableToken: {
-      initialBalances: {
-        addresses: validators.map(ensure0x),
-        values: validators.map(() => '10000000000000000000000'),
-      },
-    },
-  }
-  const args = [
-    '--cwd',
-    `${MonorepoRoot}/packages/protocol`,
-    'init-network',
-    '-n',
-    'testing',
-    '-m',
-    JSON.stringify(migrationOverrides),
-    '-t',
-    to.toString(),
+  const bootnodePrivateKey = getPrivateKeysFor(AccountType.BOOTNODE, mnemonic, 1)[0]
+  const bootnodeLog = joinPath(gethConfig.runPath, 'bootnode.log')
+  const bootnodeArgs = [
+    '--verbosity=4',
+    `--nodekeyhex=${bootnodePrivateKey}`,
+    `--networkid=${gethConfig.networkId}`,
   ]
-  await execCmdWithExitOnFailure('yarn', args)
+
+  spawnWithLog(bootnodeBinaryPath, bootnodeArgs, bootnodeLog, verbose)
+  return getEnodeAddress(privateKeyToPublicKey(bootnodePrivateKey), '127.0.0.1', 30301)
 }
 
-export function getContractAddress(contractName: string) {
-  const filePath = `${MonorepoRoot}/packages/protocol/build/testing/contracts/${contractName}.json`
-  const contractData = JSON.parse(fs.readFileSync(filePath, 'utf8'))
-  return contractData.networks[NetworkId].address
-}
-
-export async function snapshotDatadir(instance: GethInstanceConfig) {
-  // Sometimes the socket is still present, preventing us from snapshotting.
-  await execCmd('rm', [`${getDatadir(instance)}/geth.ipc`], { silent: true })
-  await execCmdWithExitOnFailure('cp', ['-r', getDatadir(instance), getSnapshotdir(instance)])
-}
-
-export async function restoreDatadir(instance: GethInstanceConfig) {
-  const datadir = getDatadir(instance)
-  const snapshotdir = getSnapshotdir(instance)
-  console.info(`geth:${instance.name}: restore datadir: ${datadir}`)
-  await execCmdWithExitOnFailure('rm', ['-rf', datadir], { silent: true })
-  await execCmdWithExitOnFailure('cp', ['-r', snapshotdir, datadir], { silent: true })
-}
-
-function getInstanceDir(instance: GethInstanceConfig) {
-  return joinPath(TEST_DIR, instance.name)
-}
-
-function getDatadir(instance: GethInstanceConfig) {
-  return joinPath(getInstanceDir(instance), 'datadir')
-}
-
-function getSnapshotdir(instance: GethInstanceConfig) {
-  return joinPath(getInstanceDir(instance), 'snapshot')
-}
-
-/**
- * @returns Promise<number> the geth pid number
- */
-export async function initAndStartGeth(gethBinaryPath: string, instance: GethInstanceConfig) {
-  const datadir = getDatadir(instance)
-  console.info(`geth:${instance.name}: init datadir ${datadir}`)
-  await init(gethBinaryPath, datadir, GENESIS_PATH)
-  if (instance.privateKey) {
-    await importPrivateKey(gethBinaryPath, instance)
-  }
-  if (instance.peers) {
-    await addStaticPeers(datadir, instance.peers)
-  }
-  return startGeth(gethBinaryPath, instance)
-}
-
-export function getContext(gethConfig: GethTestConfig) {
-  const mnemonic =
-    'jazz ripple brown cloth door bridge pen danger deer thumb cable prepare negative library vast'
-  const validatorInstances = gethConfig.instances.filter((x: any) => x.validating)
-  const numValidators = validatorInstances.length
-  const validatorPrivateKeys = getPrivateKeysFor(AccountType.VALIDATOR, mnemonic, numValidators)
-  const validators = getValidators(mnemonic, numValidators)
-  const validatorEnodes = validatorPrivateKeys.map((x: any, i: number) =>
-    getEnodeAddress(privateKeyToPublicKey(x), '127.0.0.1', validatorInstances[i].port)
-  )
-  const argv = require('minimist')(process.argv.slice(2))
-  const branch = argv.branch || 'master'
-  const gethRepoPath = argv.localgeth || '/tmp/geth'
-  const gethBinaryPath = `${gethRepoPath}/build/bin/geth`
-
-  const before = async () => {
-    if (!argv.localgeth) {
-      await checkoutGethRepo(branch, gethRepoPath)
-    }
-    await buildGeth(gethRepoPath)
-    await setupTestDir(TEST_DIR)
-    await writeGenesis(validators, GENESIS_PATH, gethConfig.genesisConfig)
-    let validatorIndex = 0
-    for (const instance of gethConfig.instances) {
-      if (instance.validating) {
-        // Automatically connect validator nodes to eachother.
-        const otherValidators = validatorEnodes.filter(
-          (_: string, i: number) => i !== validatorIndex
-        )
-        instance.peers = (instance.peers || []).concat(otherValidators)
-        instance.privateKey = instance.privateKey || validatorPrivateKeys[validatorIndex]
-        validatorIndex++
-      }
-      await initAndStartGeth(gethBinaryPath, instance)
-    }
-    if (gethConfig.migrate || gethConfig.migrateTo) {
-      await migrateContracts(
-        validatorPrivateKeys,
-        validators.map((x) => x.address),
-        gethConfig.migrateTo
-      )
-    }
-    await killGeth()
-    await sleep(2)
-    // Snapshot the datadir after the contract migrations so we can start from a "clean slate"
-    // for every test.
-    for (const instance of gethConfig.instances) {
-      await snapshotDatadir(instance)
-    }
-  }
-
-  const restart = async () => {
-    await killGeth()
-    let validatorIndex = 0
-    for (const instance of gethConfig.instances) {
-      await restoreDatadir(instance)
-      if (!instance.privateKey && instance.validating) {
-        instance.privateKey = validatorPrivateKeys[validatorIndex]
-      }
-      await startGeth(gethBinaryPath, instance)
-      if (instance.validating) {
-        validatorIndex++
-      }
-    }
-  }
-
-  const after = () => killGeth()
-
-  return {
-    validators,
-    hooks: { before, after, restart, gethBinaryPath },
-  }
-}
-
-export function getHooks(gethConfig: GethTestConfig) {
-  return getContext(gethConfig).hooks
-}
-
-export async function assertRevert(promise: any, errorMessage: string = '') {
+export async function assertRevert(promise: any, errorMessage: string = ''): Promise<void> {
   try {
     await promise
     assert.fail('Expected revert not received')
@@ -516,5 +183,179 @@ export async function assertRevert(promise: any, errorMessage: string = '') {
     } else {
       assert(revertFound, errorMessage)
     }
+  }
+}
+
+export function getHooks(gethConfig: GethRunConfig) {
+  return getContext(gethConfig).hooks
+}
+
+export function getContext(gethConfig: GethRunConfig, verbose: boolean = verboseOutput) {
+  const mnemonic =
+    'jazz ripple brown cloth door bridge pen danger deer thumb cable prepare negative library vast'
+  const validatorInstances = gethConfig.instances.filter((x: any) => x.validating)
+
+  const numValidators = validatorInstances.length
+
+  const validatorPrivateKeys = getPrivateKeysFor(AccountType.VALIDATOR, mnemonic, numValidators)
+  const attestationKeys = getPrivateKeysFor(AccountType.ATTESTATION, mnemonic, numValidators)
+  const validators = getValidatorsInformation(mnemonic, numValidators)
+
+  const proxyInstances = gethConfig.instances.filter((x: any) => x.isProxy)
+  const numProxies = proxyInstances.length
+
+  const proxyPrivateKeys = getPrivateKeysFor(AccountType.PROXY, mnemonic, numProxies)
+  const proxyEnodes = proxyPrivateKeys.map((x: string, i: number) => [
+    proxyInstances[i].name,
+    getEnodeAddress(privateKeyToPublicKey(x), '127.0.0.1', proxyInstances[i].proxyport!),
+    getEnodeAddress(privateKeyToPublicKey(x), '127.0.0.1', proxyInstances[i].port),
+  ])
+
+  const argv = require('minimist')(process.argv.slice(2))
+  const branch = argv.branch || 'master'
+
+  gethConfig.gethRepoPath = argv.localgeth || '/tmp/geth'
+  const gethBinaryPath = `${gethConfig.gethRepoPath}/build/bin/geth`
+  const bootnodeBinaryPath = `${gethConfig.gethRepoPath}/build/bin/bootnode`
+
+  const before = async () => {
+    if (!argv.localgeth) {
+      await checkoutGethRepo(branch, gethConfig.gethRepoPath!)
+    }
+
+    await buildGeth(gethConfig.gethRepoPath!)
+
+    if (!gethConfig.keepData && fs.existsSync(gethConfig.runPath)) {
+      await resetDataDir(gethConfig.runPath, verbose)
+    }
+
+    if (!fs.existsSync(gethConfig.runPath)) {
+      // @ts-ignore
+      fs.mkdirSync(gethConfig.runPath, { recursive: true })
+    }
+
+    await writeGenesis(gethConfig, validators, verbose)
+
+    let bootnodeEnode: string = ''
+
+    if (gethConfig.useBootnode) {
+      bootnodeEnode = await startBootnode(bootnodeBinaryPath, mnemonic, gethConfig, verbose)
+    }
+
+    let validatorIndex = 0
+    let proxyIndex = 0
+
+    for (const instance of gethConfig.instances) {
+      // Non proxied validators and proxies should connect to the bootnode
+      if (!instance.isProxied) {
+        if (gethConfig.useBootnode) {
+          instance.bootnodeEnode = bootnodeEnode
+        }
+      } else {
+        // Proxied validators should connect to only the proxy
+        // Find this proxied validator's proxy
+        const proxyEnode = proxyEnodes.filter((x: any) => x[0] === instance.proxy)
+
+        if (proxyEnode.length !== 1) {
+          throw new Error('proxied validator must have exactly one proxy')
+        }
+
+        instance.proxies = [proxyEnode[0][1]!, proxyEnode[0][2]!]
+      }
+
+      // Set the private key for the validator or proxy instance
+      if (instance.validating) {
+        instance.privateKey = instance.privateKey || validatorPrivateKeys[validatorIndex]
+        validatorIndex++
+      } else if (instance.isProxy) {
+        instance.privateKey = instance.privateKey || proxyPrivateKeys[proxyIndex]
+        proxyIndex++
+      }
+    }
+
+    // The proxies will need to know their proxied validator's address
+    for (const instance of gethConfig.instances) {
+      if (instance.isProxy) {
+        const proxiedValidator = gethConfig.instances.filter(
+          (x: GethInstanceConfig) => x.proxy === instance.name
+        )
+
+        if (proxiedValidator.length !== 1) {
+          throw new Error('proxied validator must have exactly one proxy')
+        }
+
+        instance.proxiedValidatorAddress = privateKeyToAddress(proxiedValidator[0].privateKey!)
+      }
+    }
+
+    // Start all the instances
+    for (const instance of gethConfig.instances) {
+      await initAndStartGeth(gethConfig, gethBinaryPath, instance, verbose)
+    }
+
+    await connectValidatorPeers(gethConfig.instances)
+
+    await Promise.all(
+      gethConfig.instances.filter((i) => i.validating).map((i) => waitToFinishInstanceSyncing(i))
+    )
+
+    if (gethConfig.migrate || gethConfig.migrateTo) {
+      await migrateContracts(
+        MonorepoRoot,
+        validatorPrivateKeys,
+        attestationKeys,
+        validators.map((x) => x.address),
+        gethConfig.migrateTo,
+        gethConfig.migrationOverrides
+      )
+    }
+
+    await killGeth()
+
+    // Snapshot the datadir after the contract migrations so we can start from a "clean slate"
+    // for every test.
+    for (const instance of gethConfig.instances) {
+      await snapshotDatadir(gethConfig.runPath, instance, verbose)
+    }
+  }
+
+  const restart = async () => {
+    await killGeth()
+
+    if (gethConfig.useBootnode) {
+      await killBootnode()
+      await startBootnode(bootnodeBinaryPath, mnemonic, gethConfig, verbose)
+    }
+
+    // just in case
+    gethConfig.keepData = true
+
+    let validatorIndex = 0
+    const validatorIndices: number[] = []
+
+    for (const instance of gethConfig.instances) {
+      validatorIndices.push(validatorIndex)
+      if (instance.validating) {
+        validatorIndex++
+      }
+    }
+
+    await Promise.all(
+      gethConfig.instances.map(async (instance, i) => {
+        await restoreDatadir(gethConfig.runPath, instance)
+        if (!instance.privateKey && instance.validating) {
+          instance.privateKey = validatorPrivateKeys[validatorIndices[i]]
+        }
+        return startGeth(gethConfig, gethBinaryPath, instance, verbose)
+      })
+    )
+    await connectValidatorPeers(gethConfig.instances)
+  }
+
+  const after = () => killGeth()
+
+  return {
+    validators,
+    hooks: { before, after, restart, gethBinaryPath },
   }
 }

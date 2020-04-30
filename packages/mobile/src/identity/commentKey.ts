@@ -1,17 +1,15 @@
-import { stripHexLeader } from '@celo/utils/src/address'
+import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
+import { hexToBuffer } from '@celo/utils/src/address'
 import { encryptComment as encryptCommentRaw } from '@celo/utils/src/commentEncryption'
-import { getAttestationsContract, getDataEncryptionKey } from '@celo/walletkit'
-import { web3 } from 'src/web3/contracts'
+import { getContractKit } from 'src/web3/contracts'
 
 export async function getCommentKey(address: string): Promise<Buffer | null> {
-  const attestations = await getAttestationsContract(web3)
-  const hexString = await getDataEncryptionKey(attestations, address)
+  const contractKit = getContractKit()
+  const accountsWrapper: AccountsWrapper = await contractKit.contracts.getAccounts()
+  // getDataEncryptionKey actually returns a string instead of an array
+  const hexString = [await accountsWrapper.getDataEncryptionKey(address)].join()
   // No comment key -> empty string returned from getDEK. This is expected for old addresses created before comment encryption change
-  if (!hexString) {
-    return null
-  }
-  // Buffer.from will create an empty buffer if the input string has '0x' prepended
-  return Buffer.from(stripHexLeader(hexString), 'hex')
+  return !hexString ? null : hexToBuffer(hexString)
 }
 
 export async function encryptComment(

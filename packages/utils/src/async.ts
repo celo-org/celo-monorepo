@@ -23,7 +23,7 @@ export const retryAsync = async <T extends any[], U>(
     } catch (error) {
       await sleep(delay)
       saveError = error
-      console.info(`${TAG}/@reTryAsync, Failed to execute function on try #${i}`, error)
+      console.info(`${TAG}/@retryAsync, Failed to execute function on try #${i}`, error)
     }
   }
 
@@ -47,7 +47,7 @@ export const retryAsyncWithBackOff = async <T extends any[], U>(
     } catch (error) {
       await sleep(Math.pow(factor, i) * delay)
       saveError = error
-      console.info(`${TAG}/@reTryAsync, Failed to execute function on try #${i}`, error)
+      console.info(`${TAG}/@retryAsync, Failed to execute function on try #${i}`, error)
     }
   }
 
@@ -74,4 +74,26 @@ export async function concurrentMap<A, B>(
     res = res.concat(await Promise.all(slice.map((elem, index) => mapFn(elem, i + index))))
   }
   return res
+}
+
+/**
+ * Map an async function over the values in Object x with a given concurrency level
+ *
+ * @param concurrency number of `mapFn` concurrent executions
+ * @param x associative array of values
+ * @param mapFn mapping function
+ */
+export async function concurrentValuesMap<IN extends any, OUT extends any>(
+  concurrency: number,
+  x: Record<string, IN>,
+  mapFn: (val: IN, key: string) => Promise<OUT>
+): Promise<Record<string, OUT>> {
+  const xk = Object.keys(x)
+  const xv: IN[] = []
+  xk.forEach((k) => xv.push(x[k]))
+  const res = await concurrentMap(concurrency, xv, (val: IN, idx: number) => mapFn(val, xk[idx]))
+  return res.reduce((output: Record<string, OUT>, value: OUT, index: number) => {
+    output[xk[index]] = value
+    return output
+  }, {})
 }

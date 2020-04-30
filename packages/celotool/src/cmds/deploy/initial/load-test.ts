@@ -1,51 +1,54 @@
 import { switchToClusterFromEnv } from 'src/lib/cluster'
-import { fetchEnv } from 'src/lib/env-utils'
+import { CeloEnvArgv, envVar, fetchEnv } from 'src/lib/env-utils'
 import { installHelmChart } from 'src/lib/load-test'
-import * as yargs from 'yargs'
-import { InitialArgv } from '../../deploy/initial'
+import yargs from 'yargs'
 
 export const command = 'load-test'
 
 export const describe = 'deploy load-test'
 
-const MAX_REPLICAS_COUNT = 10000
-
-interface LoadTestArgv extends InitialArgv {
+export interface LoadTestArgv extends CeloEnvArgv {
+  blockscoutMeasurePercent: number
+  delay: number
   replicas: number
-  loadTestId: string
-  blockscoutProb: number
 }
 
 export const builder = (argv: yargs.Argv) => {
   return argv
-    .option('replicas', {
+    .option('blockscout-measure-percent', {
       type: 'number',
-      description: 'Number of replicas',
-      default: 1,
-    })
-    .option('load-test-id', {
-      type: 'string',
-      description: 'Unique identifier used to distinguish between ran load-tests',
-      demand: 'Please, specify the load test unique identifier',
-    })
-    .option('blockscout-prob', {
-      type: 'number',
-      description: 'Probability of checking the blockscout transaction status',
+      description:
+        'Percent of transactions to measure the time it takes for blockscout to process a transaction. Should be in the range of [0, 100]',
       default: 30,
     })
+    .option('delay', {
+      type: 'number',
+      description:
+        'Number of ms a client waits between each transaction, defaults to LOAD_TEST_TX_DELAY_MS in the .env file',
+      default: -1,
+    })
+    .option('replicas', {
+      type: 'number',
+      description:
+        'Number of load test clients to create, defaults to LOAD_TEST_CLIENTS in the .env file',
+      default: -1,
+    })
+}
+
+export function setArgvDefaults(argv: LoadTestArgv) {
+  // Variables from the .env file are not set as environment variables
+  // by the time the builder is run, so we set the default here
+  if (argv.delay < 0) {
+    argv.delay = parseInt(fetchEnv(envVar.LOAD_TEST_TX_DELAY_MS), 10)
+  }
+  if (argv.replicas < 0) {
+    argv.replicas = parseInt(fetchEnv(envVar.LOAD_TEST_CLIENTS), 10)
+  }
 }
 
 export const handler = async (argv: LoadTestArgv) => {
   await switchToClusterFromEnv()
+  setArgvDefaults(argv)
 
-  const mnemonic = fetchEnv('MNEMONIC')
-
-  const replicas = argv.replicas
-  if (replicas < 0 || replicas > MAX_REPLICAS_COUNT) {
-    console.error(
-      `Invalid replicas count: it should be more than zero and not greater than ${MAX_REPLICAS_COUNT}`
-    )
-  }
-
-  await installHelmChart(argv.celoEnv, argv.loadTestId, argv.blockscoutProb, replicas, mnemonic)
+  await installHelmChart(argv.celoEnv, argv.blockscoutMeasurePercent, argv.delay, argv.replicas)
 }

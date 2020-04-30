@@ -3,8 +3,8 @@ import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
+import { TokenTransactionType } from 'src/apollo/types'
 import TransferReviewCard from 'src/send/TransferReviewCard'
-import { TransactionTypes } from 'src/transactions/reducer'
 import { createMockStore } from 'test/utils'
 import { mockAccount, mockContactWithPhone, mockCountryCode, mockE164Number } from 'test/values'
 
@@ -20,7 +20,7 @@ const store = createMockStore({
 describe('TransferReviewCard', () => {
   it('renders correctly for send review', () => {
     const props = {
-      type: TransactionTypes.SENT,
+      type: TokenTransactionType.Sent,
       address: mockAccount,
       comment: '',
       value: new BigNumber(0.3),
@@ -37,7 +37,7 @@ describe('TransferReviewCard', () => {
 
   it('renders correctly for invite review', () => {
     const props = {
-      type: TransactionTypes.INVITE_SENT,
+      type: TokenTransactionType.InviteSent,
       address: mockAccount,
       comment: '',
       value: new BigNumber(100),
@@ -54,7 +54,7 @@ describe('TransferReviewCard', () => {
 
   it('renders correctly for pay request review', () => {
     const props = {
-      type: TransactionTypes.PAY_REQUEST,
+      type: TokenTransactionType.PayRequest,
       address: mockAccount,
       comment: '',
       value: new BigNumber(100),

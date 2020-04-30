@@ -1,6 +1,7 @@
 /* tslint:disable no-console */
 import { newKit } from '@celo/contractkit'
 import { BigNumber } from 'bignumber.js'
+import { switchToClusterFromEnv } from 'src/lib/cluster'
 import { convertToContractDecimals } from 'src/lib/contract-utils'
 import { portForwardAnd } from 'src/lib/port_forward'
 import { execCmd } from 'src/lib/utils'
@@ -25,6 +26,7 @@ export const builder = (yargs: Argv) => {
 }
 
 export const handler = async (argv: InviteArgv) => {
+  await switchToClusterFromEnv()
   const phone = argv.phone
 
   console.log(`Sending invitation code to ${phone}`)

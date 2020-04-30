@@ -1,7 +1,7 @@
 import { getRegionCode } from '@celo/utils/src/phoneNumbers'
 import CountryData from 'country-data'
 import { createSelector } from 'reselect'
-import { e164NumberSelector } from 'src/account/reducer'
+import { e164NumberSelector } from 'src/account/selectors'
 import {
   LOCAL_CURRENCY_CODES,
   LocalCurrencyCode,
@@ -21,7 +21,7 @@ function getCountryCurrencies(e164PhoneNumber: string) {
 
 const getDefaultLocalCurrencyCode = createSelector(
   e164NumberSelector,
-  (e164PhoneNumber): LocalCurrencyCode | null => {
+  (e164PhoneNumber): LocalCurrencyCode => {
     // Note: we initially tried using the device locale for getting the currencies (`RNLocalize.getCurrencies()`)
     // but the problem is some Android versions don't make it possible to select the appropriate language/country
     // from the device settings.
@@ -39,22 +39,12 @@ const getDefaultLocalCurrencyCode = createSelector(
   }
 )
 
-export function getLocalCurrencyCode(state: RootState): LocalCurrencyCode | null {
-  const currencyCode =
-    state.localCurrency.preferredCurrencyCode || getDefaultLocalCurrencyCode(state)
-  if (!currencyCode || currencyCode === LocalCurrencyCode.USD) {
-    // This disables local currency display
-    return null
-  }
-
-  return currencyCode
+export function getLocalCurrencyCode(state: RootState): LocalCurrencyCode {
+  return state.localCurrency.preferredCurrencyCode || getDefaultLocalCurrencyCode(state)
 }
 
 export function getLocalCurrencySymbol(state: RootState): LocalCurrencySymbol | null {
-  const currencyCode =
-    state.localCurrency.preferredCurrencyCode || getDefaultLocalCurrencyCode(state)
-
-  return currencyCode ? LocalCurrencySymbol[currencyCode] : null
+  return LocalCurrencySymbol[getLocalCurrencyCode(state)]
 }
 
 export function getLocalCurrencyExchangeRate(state: RootState) {
@@ -73,10 +63,6 @@ export function shouldFetchCurrentRate(state: RootState): boolean {
   const { isLoading, lastSuccessfulUpdate } = state.localCurrency
 
   if (isLoading) {
-    return false
-  }
-
-  if (!getLocalCurrencyCode(state)) {
     return false
   }
 

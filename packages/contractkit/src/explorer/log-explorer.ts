@@ -1,25 +1,8 @@
 import { Address } from '@celo/utils/lib/address'
+import { EventLog, Log, TransactionReceipt } from 'web3-core'
 import abi, { ABIDefinition } from 'web3-eth-abi'
-import { Block, Transaction } from 'web3/eth/types'
-import { EventLog, Log, TransactionReceipt } from 'web3/types'
 import { ContractKit } from '../kit'
 import { ContractDetails, mapFromPairs, obtainKitContractDetails } from './base'
-
-export interface CallDetails {
-  contract: string
-  function: string
-  parameters: Record<string, any>
-}
-
-export interface ParsedTx {
-  callDetails: CallDetails
-  tx: Transaction
-}
-
-export interface ParsedBlock {
-  block: Block
-  parsedTx: ParsedTx[]
-}
 
 interface ContractMapping {
   details: ContractDetails
@@ -95,6 +78,11 @@ export class LogExplorer {
 
     const returnValues = abi.decodeLog(matchedAbi.inputs || [], log.data || '', log.topics.slice(1))
     delete (returnValues as any).__length__
+    Object.keys(returnValues).forEach((key) => {
+      if (Number.parseInt(key, 10) >= 0) {
+        delete (returnValues as any)[key]
+      }
+    })
 
     const logEvent: EventLog & { signature: string } = {
       address: log.address,

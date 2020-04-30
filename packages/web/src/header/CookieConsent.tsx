@@ -1,12 +1,12 @@
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
+import { agree, disagree, showVisitorCookieConsent } from 'src/analytics/analytics'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import Link from 'src/shared/Link'
 import Responsive from 'src/shared/Responsive'
 import { CONSENT_HEIGHT } from 'src/shared/Styles'
 import { colors, fonts } from 'src/styles'
-import { initSentry } from '../../fullstack/sentry'
-import { agree, disagree, showVisitorCookieConsent } from '../analytics/analytics'
+import { initSentry } from 'src/utils/sentry'
 
 interface State {
   showConsent: boolean
@@ -17,18 +17,18 @@ export class CookieConsent extends React.PureComponent<I18nProps, State> {
     showConsent: false,
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     this.setState({
-      showConsent: showVisitorCookieConsent(),
+      showConsent: await showVisitorCookieConsent(),
     })
   }
 
-  onAgree = () => {
-    agree()
+  onAgree = async () => {
+    await agree()
     this.setState({
       showConsent: false,
     })
-    initSentry()
+    await initSentry()
   }
 
   onDisagree = () => {
@@ -47,7 +47,7 @@ export class CookieConsent extends React.PureComponent<I18nProps, State> {
 
     return (
       <View style={styles.container}>
-        <Text style={[fonts.p, styles.infoMessageText, styles.infoMessageTextFirstBlock]}>
+        <Text style={[fonts.p, styles.infoMessageText]}>
           <Text style={styles.infoMessageTextPrefix}>{t('weUseCookies')} </Text>
           {t('weUseCookiesReasons')}
         </Text>
@@ -65,11 +65,7 @@ export class CookieConsent extends React.PureComponent<I18nProps, State> {
               large={[styles.button, styles.disagreeButton]}
             >
               <View style={[styles.buttonMedium, styles.disagreeButton]} onClick={this.onDisagree}>
-                <Text style={[fonts.navigation, styles.buttonText]}>
-                  {t('cookiesDisagree')
-                    .toString()
-                    .toUpperCase()}
-                </Text>
+                <Text style={[fonts.navigation, styles.buttonText]}>{t('cookiesDisagree')}</Text>
               </View>
             </Responsive>
             <Responsive
@@ -77,11 +73,7 @@ export class CookieConsent extends React.PureComponent<I18nProps, State> {
               large={[styles.button, styles.agreeButton]}
             >
               <View style={[styles.buttonMedium, styles.agreeButton]} onClick={this.onAgree}>
-                <Text style={[fonts.navigation, styles.buttonText]}>
-                  {t('cookiesAgree')
-                    .toString()
-                    .toUpperCase()}
-                </Text>
+                <Text style={[fonts.navigation, styles.buttonText]}>{t('cookiesAgree')}</Text>
               </View>
             </Responsive>
           </View>
@@ -94,9 +86,8 @@ export class CookieConsent extends React.PureComponent<I18nProps, State> {
 const styles = StyleSheet.create({
   container: {
     bottom: 0,
-    // @ts-ignore-next-line
     position: 'fixed',
-    backgroundColor: '#3C9BF4',
+    backgroundColor: colors.deepBlue,
     width: '100%',
     minHeight: CONSENT_HEIGHT,
     display: 'flex',

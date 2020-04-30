@@ -1,0 +1,1809 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`CodeOfConduct renders 1`] = `
+<div
+  className="css-view-1dbjc4n"
+  style={
+    Object {
+      "marginTop": "75px",
+      "paddingTop": "75px",
+    }
+  }
+>
+  <div
+    className="css-view-1dbjc4n"
+    style={
+      Object {
+        "WebkitAlignItems": "center",
+        "WebkitAlignSelf": "center",
+        "WebkitBoxAlign": "center",
+        "WebkitBoxDirection": "normal",
+        "WebkitBoxOrient": "vertical",
+        "WebkitBoxPack": "center",
+        "WebkitFlexDirection": "column",
+        "WebkitJustifyContent": "center",
+        "alignItems": "center",
+        "alignSelf": "center",
+        "flexDirection": "column",
+        "justifyContent": "center",
+        "marginBottom": "30px",
+        "maxWidth": "100vw",
+        "msFlexAlign": "center",
+        "msFlexDirection": "column",
+        "msFlexItemAlign": "center",
+        "msFlexPack": "center",
+        "paddingLeft": "10px",
+        "paddingRight": "10px",
+        "width": "100%",
+      }
+    }
+  >
+    <div
+      className="css-view-1dbjc4n"
+      style={
+        Object {
+          "WebkitAlignItems": "center",
+          "WebkitBoxAlign": "center",
+          "WebkitBoxFlex": 0,
+          "WebkitBoxPack": "center",
+          "WebkitFlexGrow": 0,
+          "WebkitFlexShrink": 0,
+          "WebkitJustifyContent": "center",
+          "alignItems": "center",
+          "flexGrow": 0,
+          "flexShrink": 0,
+          "justifyContent": "center",
+          "msFlexAlign": "center",
+          "msFlexNegative": 0,
+          "msFlexPack": "center",
+          "msFlexPositive": 0,
+          "paddingBottom": "10px",
+          "paddingLeft": "10px",
+          "paddingRight": "10px",
+          "paddingTop": "10px",
+          "width": "100%",
+        }
+      }
+    >
+      <div
+        className="css-view-1dbjc4n"
+        style={
+          Object {
+            "height": "90px",
+            "marginBottom": "100px",
+            "width": "241px",
+          }
+        }
+      >
+        <svg
+          fill="none"
+          height="100%"
+          style={
+            Object {
+              "overflow": "visible",
+            }
+          }
+          viewBox="0 0 353 132"
+          width="100%"
+        >
+          <g
+            className="r-animationKeyframes-caxldr"
+            style={
+              Object {
+                "WebkitAnimationDelay": "1450ms",
+                "WebkitAnimationDuration": "2050ms",
+                "WebkitAnimationFillMode": "both",
+                "WebkitAnimationIterationCount": 1,
+                "WebkitAnimationTimingFunction": "ease-in-out",
+                "animationDelay": "1450ms",
+                "animationDuration": "2050ms",
+                "animationFillMode": "both",
+                "animationIterationCount": 1,
+                "animationTimingFunction": "ease-in-out",
+                "mixBlendMode": "multiply",
+              }
+            }
+          >
+            <path
+              d="M73.8575 0C46.0188 0 16.1671 26.4774 4.42227 61.5833C-2.38131 81.9649 -1.29403 101.48 7.40422 115.119C13.4219 124.647 22.8737 130.468 34.0157 131.51C35.0922 131.62 36.2225 131.674 37.6005 131.674C50.3249 131.674 64.3196 125.436 77.0117 114.122C89.7361 102.818 100.243 87.2056 106.594 70.146C114.324 49.282 113.409 29.4267 104.086 15.6781C97.2394 5.56958 86.5066 0 73.8575 0Z"
+              fill="#73DDFF"
+              opacity={0.95}
+            />
+          </g>
+          <g
+            className="r-animationKeyframes-1mlig3r"
+            style={
+              Object {
+                "WebkitAnimationDelay": "1000ms",
+                "WebkitAnimationDuration": "2500ms",
+                "WebkitAnimationFillMode": "both",
+                "WebkitAnimationIterationCount": 1,
+                "WebkitAnimationTimingFunction": "ease-in-out",
+                "animationDelay": "1000ms",
+                "animationDuration": "2500ms",
+                "animationFillMode": "both",
+                "animationIterationCount": 1,
+                "animationTimingFunction": "ease-in-out",
+                "mixBlendMode": "multiply",
+              }
+            }
+          >
+            <path
+              d="M153.858 0C126.019 0 96.1671 26.4774 84.4223 61.5833C77.6187 81.9649 78.706 101.48 87.4042 115.119C93.4219 124.647 102.874 130.468 114.016 131.51C115.092 131.62 116.223 131.674 117.6 131.674C130.325 131.674 144.32 125.436 157.012 114.122C169.736 102.818 180.243 87.2056 186.594 70.146C194.324 49.282 193.409 29.4267 184.086 15.6781C177.239 5.56958 166.507 0 153.858 0Z"
+              fill="#FB7C6D"
+              opacity={0.95}
+            />
+          </g>
+          <g
+            className="r-animationKeyframes-19fb98x"
+            style={
+              Object {
+                "WebkitAnimationDelay": "500ms",
+                "WebkitAnimationDuration": "3000ms",
+                "WebkitAnimationFillMode": "both",
+                "WebkitAnimationIterationCount": 1,
+                "WebkitAnimationTimingFunction": "ease-in-out",
+                "animationDelay": "500ms",
+                "animationDuration": "3000ms",
+                "animationFillMode": "both",
+                "animationIterationCount": 1,
+                "animationTimingFunction": "ease-in-out",
+                "mixBlendMode": "multiply",
+              }
+            }
+          >
+            <path
+              d="M234.858 0C207.019 0 177.167 26.4774 165.422 61.5833C158.619 81.9649 159.706 101.48 168.404 115.119C174.422 124.647 183.874 130.468 195.016 131.51C196.092 131.62 197.223 131.674 198.6 131.674C211.325 131.674 225.32 125.436 238.012 114.122C250.736 102.818 261.243 87.2056 267.594 70.146C275.324 49.282 274.409 29.4267 265.086 15.6781C258.239 5.56958 247.507 0 234.858 0Z"
+              fill="#BF97FF"
+              opacity={0.95}
+            />
+          </g>
+          <g
+            className="r-animationKeyframes-sxe0sf"
+            style={
+              Object {
+                "WebkitAnimationDelay": "1500ms",
+                "WebkitAnimationDuration": "2000ms",
+                "WebkitAnimationFillMode": "both",
+                "WebkitAnimationIterationCount": 1,
+                "WebkitAnimationTimingFunction": "ease-in-out",
+                "animationDelay": "1500ms",
+                "animationDuration": "2000ms",
+                "animationFillMode": "both",
+                "animationIterationCount": 1,
+                "animationTimingFunction": "ease-in-out",
+                "mixBlendMode": "multiply",
+              }
+            }
+          >
+            <path
+              d="M314.858 0C287.019 0 257.167 26.4774 245.422 61.5833C238.619 81.9649 239.706 101.48 248.404 115.119C254.422 124.647 263.874 130.468 275.016 131.51C276.092 131.62 277.223 131.674 278.6 131.674C291.325 131.674 305.32 125.436 318.012 114.122C330.736 102.818 341.243 87.2056 347.594 70.146C355.324 49.282 354.409 29.4267 345.086 15.6781C338.239 5.56958 327.507 0 314.858 0Z"
+              fill="#35D07F"
+              opacity={0.95}
+            />
+          </g>
+        </svg>
+      </div>
+      <h1
+        aria-level="1"
+        className="css-reset-4rbku5 css-text-901oao"
+        dir="auto"
+        role="heading"
+        style={
+          Object {
+            "color": "rgba(46,51,56,1.00)",
+            "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+            "fontSize": "36px",
+            "lineHeight": "40px",
+            "textAlign": "center",
+            "textRendering": "geometricPrecision",
+            "textTransform": "none",
+          }
+        }
+      >
+        Celo Community Code of Conduct
+      </h1>
+    </div>
+  </div>
+  <div
+    className="css-view-1dbjc4n"
+    style={
+      Object {
+        "WebkitAlignSelf": "center",
+        "WebkitBoxDirection": "normal",
+        "WebkitBoxOrient": "vertical",
+        "WebkitFlexDirection": "column",
+        "alignSelf": "center",
+        "flexDirection": "column",
+        "marginBottom": "20px",
+        "marginTop": "20px",
+        "maxWidth": "100vw",
+        "msFlexDirection": "column",
+        "msFlexItemAlign": "center",
+        "paddingLeft": "10px",
+        "paddingRight": "10px",
+        "width": "100%",
+      }
+    }
+  >
+    <div
+      className="css-view-1dbjc4n"
+      style={
+        Object {
+          "WebkitBoxFlex": 0,
+          "WebkitFlexGrow": 0,
+          "WebkitFlexShrink": 0,
+          "flexGrow": 0,
+          "flexShrink": 0,
+          "msFlexNegative": 0,
+          "msFlexPositive": 0,
+          "paddingBottom": "10px",
+          "paddingLeft": "10px",
+          "paddingRight": "10px",
+          "paddingTop": "10px",
+          "width": "100%",
+        }
+      }
+    >
+      <h3
+        aria-level="3"
+        className="css-reset-4rbku5 css-text-901oao"
+        dir="auto"
+        role="heading"
+        style={
+          Object {
+            "color": "rgba(46,51,56,1.00)",
+            "fontFamily": "Jost, futura-pt, futura, sans-serif",
+            "fontSize": "24px",
+            "lineHeight": "32px",
+            "textRendering": "geometricPrecision",
+            "textTransform": "none",
+          }
+        }
+      >
+        1. Purpose
+      </h3>
+    </div>
+    <div
+      className="css-view-1dbjc4n"
+      style={
+        Object {
+          "WebkitBoxFlex": 0,
+          "WebkitFlexGrow": 0,
+          "WebkitFlexShrink": 0,
+          "flexGrow": 0,
+          "flexShrink": 0,
+          "msFlexNegative": 0,
+          "msFlexPositive": 0,
+          "paddingBottom": "10px",
+          "paddingLeft": "10px",
+          "paddingRight": "10px",
+          "paddingTop": "10px",
+          "width": "100%",
+        }
+      }
+    >
+      <div
+        className="css-text-901oao"
+        dir="auto"
+        style={
+          Object {
+            "color": "rgba(46,51,56,1.00)",
+            "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+            "fontSize": "20px",
+            "lineHeight": "28px",
+            "textRendering": "geometricPrecision",
+          }
+        }
+      >
+        The Celo Code of Conduct is one of the ways we bring our value of connectedness into practice. A primary goal of the Celo community is to be inclusive to the largest number of contributors, with the most varied and diverse backgrounds possible. As such, we are committed to providing a friendly, safe and welcoming environment for all, regardless of age, body size, disability, ethnicity, gender identity and expression, level of experience, education, socio-economic status, nationality, personal appearance, race, religion, or sexual identity and orientation.
+
+We invite all those who participate in the Celo community to help us create safe and positive experiences for everyone.
+      </div>
+    </div>
+  </div>
+  <div
+    className="css-view-1dbjc4n"
+    style={
+      Object {
+        "WebkitAlignSelf": "center",
+        "WebkitBoxDirection": "normal",
+        "WebkitBoxOrient": "vertical",
+        "WebkitFlexDirection": "column",
+        "alignSelf": "center",
+        "flexDirection": "column",
+        "marginBottom": "20px",
+        "marginTop": "20px",
+        "maxWidth": "100vw",
+        "msFlexDirection": "column",
+        "msFlexItemAlign": "center",
+        "paddingLeft": "10px",
+        "paddingRight": "10px",
+        "width": "100%",
+      }
+    }
+  >
+    <div
+      className="css-view-1dbjc4n"
+      style={
+        Object {
+          "WebkitBoxFlex": 0,
+          "WebkitFlexGrow": 0,
+          "WebkitFlexShrink": 0,
+          "flexGrow": 0,
+          "flexShrink": 0,
+          "msFlexNegative": 0,
+          "msFlexPositive": 0,
+          "paddingBottom": "10px",
+          "paddingLeft": "10px",
+          "paddingRight": "10px",
+          "paddingTop": "10px",
+          "width": "100%",
+        }
+      }
+    >
+      <h3
+        aria-level="3"
+        className="css-reset-4rbku5 css-text-901oao"
+        dir="auto"
+        role="heading"
+        style={
+          Object {
+            "color": "rgba(46,51,56,1.00)",
+            "fontFamily": "Jost, futura-pt, futura, sans-serif",
+            "fontSize": "24px",
+            "lineHeight": "32px",
+            "textRendering": "geometricPrecision",
+            "textTransform": "none",
+          }
+        }
+      >
+        2. Open Source Citizenship
+      </h3>
+    </div>
+    <div
+      className="css-view-1dbjc4n"
+      style={
+        Object {
+          "WebkitBoxFlex": 0,
+          "WebkitFlexGrow": 0,
+          "WebkitFlexShrink": 0,
+          "flexGrow": 0,
+          "flexShrink": 0,
+          "msFlexNegative": 0,
+          "msFlexPositive": 0,
+          "paddingBottom": "10px",
+          "paddingLeft": "10px",
+          "paddingRight": "10px",
+          "paddingTop": "10px",
+          "width": "100%",
+        }
+      }
+    >
+      <div
+        className="css-text-901oao"
+        dir="auto"
+        style={
+          Object {
+            "color": "rgba(46,51,56,1.00)",
+            "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+            "fontSize": "20px",
+            "lineHeight": "28px",
+            "textRendering": "geometricPrecision",
+          }
+        }
+      >
+        A supplemental goal of this Code of Conduct is to increase open source citizenship by encouraging participants to recognize and strengthen the relationships between our actions and their effects on our community.
+
+Communities mirror the societies in which they exist and positive action is essential to counteract the many forms of inequality and abuses of power that exist in society.
+
+ If you see someone who is making an extra effort to ensure our community is welcoming, friendly, and encourages all participants to contribute to the fullest extent, let us know by emailing 
+        <div
+          className="css-view-1dbjc4n"
+          onClick={[Function]}
+          onMouseDown={[Function]}
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          onMouseUp={[Function]}
+          onResponderGrant={[Function]}
+          onResponderRelease={[Function]}
+          style={
+            Object {
+              "display": "inline",
+            }
+          }
+        >
+          <a
+            className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao css-textHasAncestor-16my406"
+            data-focusable={true}
+            dir="auto"
+            href="mailto:community@celo.org"
+            onClick={[Function]}
+            onMouseEnter={[Function]}
+            role="link"
+            style={
+              Object {
+                "WebkitTextDecorationStyle": "solid",
+                "cursor": "pointer",
+                "display": "inline",
+                "opacity": 1,
+                "textDecoration": "underline",
+                "textDecorationStyle": "solid",
+              }
+            }
+            target="_new"
+          >
+            community@celo.org
+          </a>
+        </div>
+        .
+      </div>
+    </div>
+  </div>
+  <div
+    className="css-view-1dbjc4n"
+    style={
+      Object {
+        "WebkitAlignSelf": "center",
+        "WebkitBoxDirection": "normal",
+        "WebkitBoxOrient": "vertical",
+        "WebkitFlexDirection": "column",
+        "alignSelf": "center",
+        "flexDirection": "column",
+        "marginBottom": "20px",
+        "marginTop": "20px",
+        "maxWidth": "100vw",
+        "msFlexDirection": "column",
+        "msFlexItemAlign": "center",
+        "paddingLeft": "10px",
+        "paddingRight": "10px",
+        "width": "100%",
+      }
+    }
+  >
+    <div
+      className="css-view-1dbjc4n"
+      style={
+        Object {
+          "WebkitBoxFlex": 0,
+          "WebkitFlexGrow": 0,
+          "WebkitFlexShrink": 0,
+          "flexGrow": 0,
+          "flexShrink": 0,
+          "msFlexNegative": 0,
+          "msFlexPositive": 0,
+          "paddingBottom": "10px",
+          "paddingLeft": "10px",
+          "paddingRight": "10px",
+          "paddingTop": "10px",
+          "width": "100%",
+        }
+      }
+    >
+      <h3
+        aria-level="3"
+        className="css-reset-4rbku5 css-text-901oao"
+        dir="auto"
+        role="heading"
+        style={
+          Object {
+            "color": "rgba(46,51,56,1.00)",
+            "fontFamily": "Jost, futura-pt, futura, sans-serif",
+            "fontSize": "24px",
+            "lineHeight": "32px",
+            "textRendering": "geometricPrecision",
+            "textTransform": "none",
+          }
+        }
+      >
+        3. Scope
+      </h3>
+    </div>
+    <div
+      className="css-view-1dbjc4n"
+      style={
+        Object {
+          "WebkitBoxFlex": 0,
+          "WebkitFlexGrow": 0,
+          "WebkitFlexShrink": 0,
+          "flexGrow": 0,
+          "flexShrink": 0,
+          "msFlexNegative": 0,
+          "msFlexPositive": 0,
+          "paddingBottom": "10px",
+          "paddingLeft": "10px",
+          "paddingRight": "10px",
+          "paddingTop": "10px",
+          "width": "100%",
+        }
+      }
+    >
+      <div
+        className="css-text-901oao"
+        dir="auto"
+        style={
+          Object {
+            "color": "rgba(46,51,56,1.00)",
+            "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+            "fontSize": "20px",
+            "lineHeight": "28px",
+            "textRendering": "geometricPrecision",
+          }
+        }
+      >
+        We expect all community participants (contributors, paid or otherwise; sponsors; cLabs employees; and other guests) to abide by this Code of Conduct in all community venues–online and in-person–as well as in all one-on-one communications pertaining to community business.
+
+This Code of Conduct and its related procedures also applies to unacceptable behavior occurring outside the scope of community activities when such behavior has the potential to adversely affect the safety and well-being of community members.
+      </div>
+    </div>
+  </div>
+  <div
+    className="css-view-1dbjc4n"
+    style={
+      Object {
+        "WebkitAlignSelf": "center",
+        "WebkitBoxDirection": "normal",
+        "WebkitBoxOrient": "vertical",
+        "WebkitFlexDirection": "column",
+        "alignSelf": "center",
+        "flexDirection": "column",
+        "marginBottom": "20px",
+        "marginTop": "20px",
+        "maxWidth": "100vw",
+        "msFlexDirection": "column",
+        "msFlexItemAlign": "center",
+        "paddingLeft": "10px",
+        "paddingRight": "10px",
+        "width": "100%",
+      }
+    }
+  >
+    <div
+      className="css-view-1dbjc4n"
+      style={
+        Object {
+          "WebkitBoxFlex": 0,
+          "WebkitFlexGrow": 0,
+          "WebkitFlexShrink": 0,
+          "flexGrow": 0,
+          "flexShrink": 0,
+          "msFlexNegative": 0,
+          "msFlexPositive": 0,
+          "paddingBottom": "10px",
+          "paddingLeft": "10px",
+          "paddingRight": "10px",
+          "paddingTop": "10px",
+          "width": "100%",
+        }
+      }
+    >
+      <h3
+        aria-level="3"
+        className="css-reset-4rbku5 css-text-901oao"
+        dir="auto"
+        role="heading"
+        style={
+          Object {
+            "color": "rgba(46,51,56,1.00)",
+            "fontFamily": "Jost, futura-pt, futura, sans-serif",
+            "fontSize": "24px",
+            "lineHeight": "32px",
+            "textRendering": "geometricPrecision",
+            "textTransform": "none",
+          }
+        }
+      >
+        4. Expected Behavior
+      </h3>
+    </div>
+    <div
+      className="css-view-1dbjc4n"
+      style={
+        Object {
+          "WebkitBoxFlex": 0,
+          "WebkitFlexGrow": 0,
+          "WebkitFlexShrink": 0,
+          "flexGrow": 0,
+          "flexShrink": 0,
+          "msFlexNegative": 0,
+          "msFlexPositive": 0,
+          "paddingBottom": "10px",
+          "paddingLeft": "10px",
+          "paddingRight": "10px",
+          "paddingTop": "10px",
+          "width": "100%",
+        }
+      }
+    >
+      <div
+        className="css-text-901oao"
+        dir="auto"
+        style={
+          Object {
+            "color": "rgba(46,51,56,1.00)",
+            "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+            "fontSize": "20px",
+            "lineHeight": "28px",
+            "textRendering": "geometricPrecision",
+          }
+        }
+      >
+        The following behaviors are expected and requested of all community members:
+      </div>
+      <ul
+        className="css-reset-4rbku5 css-view-1dbjc4n"
+        role="list"
+        style={
+          Object {
+            "marginTop": "20px",
+            "paddingLeft": "20px",
+          }
+        }
+      >
+        <li
+          className="css-reset-4rbku5 css-text-901oao"
+          dir="auto"
+          role="listitem"
+          style={
+            Object {
+              "color": "rgba(46,51,56,1.00)",
+              "display": "list-item",
+              "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+              "fontSize": "20px",
+              "lineHeight": "28px",
+              "listStyle": "disc",
+              "marginBottom": "20px",
+              "textRendering": "geometricPrecision",
+            }
+          }
+        >
+          Exercise consideration and respect in your speech and actions. Use welcoming and inclusive language.
+        </li>
+        <li
+          className="css-reset-4rbku5 css-text-901oao"
+          dir="auto"
+          role="listitem"
+          style={
+            Object {
+              "color": "rgba(46,51,56,1.00)",
+              "display": "list-item",
+              "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+              "fontSize": "20px",
+              "lineHeight": "28px",
+              "listStyle": "disc",
+              "marginBottom": "20px",
+              "textRendering": "geometricPrecision",
+            }
+          }
+        >
+          Attempt collaboration before conflict.
+        </li>
+        <li
+          className="css-reset-4rbku5 css-text-901oao"
+          dir="auto"
+          role="listitem"
+          style={
+            Object {
+              "color": "rgba(46,51,56,1.00)",
+              "display": "list-item",
+              "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+              "fontSize": "20px",
+              "lineHeight": "28px",
+              "listStyle": "disc",
+              "marginBottom": "20px",
+              "textRendering": "geometricPrecision",
+            }
+          }
+        >
+          Refrain from demeaning, discriminatory, or harassing behavior and speech.
+        </li>
+        <li
+          className="css-reset-4rbku5 css-text-901oao"
+          dir="auto"
+          role="listitem"
+          style={
+            Object {
+              "color": "rgba(46,51,56,1.00)",
+              "display": "list-item",
+              "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+              "fontSize": "20px",
+              "lineHeight": "28px",
+              "listStyle": "disc",
+              "marginBottom": "20px",
+              "textRendering": "geometricPrecision",
+            }
+          }
+        >
+          Be mindful of your surroundings and of your fellow participants. Alert community leaders if you notice  a dangerous situation, someone in distress, or violations of this Code of Conduct, even if they seem inconsequential.
+        </li>
+        <li
+          className="css-reset-4rbku5 css-text-901oao"
+          dir="auto"
+          role="listitem"
+          style={
+            Object {
+              "color": "rgba(46,51,56,1.00)",
+              "display": "list-item",
+              "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+              "fontSize": "20px",
+              "lineHeight": "28px",
+              "listStyle": "disc",
+              "marginBottom": "20px",
+              "textRendering": "geometricPrecision",
+            }
+          }
+        >
+          Remember that community event venues may be shared with members of the public; please be respectful to all patrons of these locations.
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div
+    className="css-view-1dbjc4n"
+    style={
+      Object {
+        "WebkitAlignSelf": "center",
+        "WebkitBoxDirection": "normal",
+        "WebkitBoxOrient": "vertical",
+        "WebkitFlexDirection": "column",
+        "alignSelf": "center",
+        "flexDirection": "column",
+        "marginBottom": "20px",
+        "marginTop": "20px",
+        "maxWidth": "100vw",
+        "msFlexDirection": "column",
+        "msFlexItemAlign": "center",
+        "paddingLeft": "10px",
+        "paddingRight": "10px",
+        "width": "100%",
+      }
+    }
+  >
+    <div
+      className="css-view-1dbjc4n"
+      style={
+        Object {
+          "WebkitBoxFlex": 0,
+          "WebkitFlexGrow": 0,
+          "WebkitFlexShrink": 0,
+          "flexGrow": 0,
+          "flexShrink": 0,
+          "msFlexNegative": 0,
+          "msFlexPositive": 0,
+          "paddingBottom": "10px",
+          "paddingLeft": "10px",
+          "paddingRight": "10px",
+          "paddingTop": "10px",
+          "width": "100%",
+        }
+      }
+    >
+      <h3
+        aria-level="3"
+        className="css-reset-4rbku5 css-text-901oao"
+        dir="auto"
+        role="heading"
+        style={
+          Object {
+            "color": "rgba(46,51,56,1.00)",
+            "fontFamily": "Jost, futura-pt, futura, sans-serif",
+            "fontSize": "24px",
+            "lineHeight": "32px",
+            "textRendering": "geometricPrecision",
+            "textTransform": "none",
+          }
+        }
+      >
+        5. Unacceptable Behavior
+      </h3>
+    </div>
+    <div
+      className="css-view-1dbjc4n"
+      style={
+        Object {
+          "WebkitBoxFlex": 0,
+          "WebkitFlexGrow": 0,
+          "WebkitFlexShrink": 0,
+          "flexGrow": 0,
+          "flexShrink": 0,
+          "msFlexNegative": 0,
+          "msFlexPositive": 0,
+          "paddingBottom": "10px",
+          "paddingLeft": "10px",
+          "paddingRight": "10px",
+          "paddingTop": "10px",
+          "width": "100%",
+        }
+      }
+    >
+      <div
+        className="css-text-901oao"
+        dir="auto"
+        style={
+          Object {
+            "color": "rgba(46,51,56,1.00)",
+            "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+            "fontSize": "20px",
+            "lineHeight": "28px",
+            "textRendering": "geometricPrecision",
+          }
+        }
+      >
+        The following behaviors are considered harassment and are unacceptable within our community. Please note that this is not a comprehensive list, and in general, anything which could reasonably be considered inappropriate in a professional setting is unacceptable.
+      </div>
+      <ul
+        className="css-reset-4rbku5 css-view-1dbjc4n"
+        role="list"
+        style={
+          Object {
+            "marginTop": "20px",
+            "paddingLeft": "20px",
+          }
+        }
+      >
+        <li
+          className="css-reset-4rbku5 css-text-901oao"
+          dir="auto"
+          role="listitem"
+          style={
+            Object {
+              "color": "rgba(46,51,56,1.00)",
+              "display": "list-item",
+              "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+              "fontSize": "20px",
+              "lineHeight": "28px",
+              "listStyle": "disc",
+              "marginBottom": "20px",
+              "textRendering": "geometricPrecision",
+            }
+          }
+        >
+          Violence, threats of violence or violent language directed against another person.
+        </li>
+        <li
+          className="css-reset-4rbku5 css-text-901oao"
+          dir="auto"
+          role="listitem"
+          style={
+            Object {
+              "color": "rgba(46,51,56,1.00)",
+              "display": "list-item",
+              "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+              "fontSize": "20px",
+              "lineHeight": "28px",
+              "listStyle": "disc",
+              "marginBottom": "20px",
+              "textRendering": "geometricPrecision",
+            }
+          }
+        >
+          Sexist, racist, homophobic, transphobic, ableist or otherwise discriminatory jokes and language.
+        </li>
+        <li
+          className="css-reset-4rbku5 css-text-901oao"
+          dir="auto"
+          role="listitem"
+          style={
+            Object {
+              "color": "rgba(46,51,56,1.00)",
+              "display": "list-item",
+              "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+              "fontSize": "20px",
+              "lineHeight": "28px",
+              "listStyle": "disc",
+              "marginBottom": "20px",
+              "textRendering": "geometricPrecision",
+            }
+          }
+        >
+          Posting or displaying sexually explicit or violent material.
+        </li>
+        <li
+          className="css-reset-4rbku5 css-text-901oao"
+          dir="auto"
+          role="listitem"
+          style={
+            Object {
+              "color": "rgba(46,51,56,1.00)",
+              "display": "list-item",
+              "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+              "fontSize": "20px",
+              "lineHeight": "28px",
+              "listStyle": "disc",
+              "marginBottom": "20px",
+              "textRendering": "geometricPrecision",
+            }
+          }
+        >
+          Posting or threatening to post other people’s personally identifying information ("doxing").
+        </li>
+        <li
+          className="css-reset-4rbku5 css-text-901oao"
+          dir="auto"
+          role="listitem"
+          style={
+            Object {
+              "color": "rgba(46,51,56,1.00)",
+              "display": "list-item",
+              "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+              "fontSize": "20px",
+              "lineHeight": "28px",
+              "listStyle": "disc",
+              "marginBottom": "20px",
+              "textRendering": "geometricPrecision",
+            }
+          }
+        >
+          Personal insults, including those related to gender, sexual orientation, race, religion, or disability.
+        </li>
+        <li
+          className="css-reset-4rbku5 css-text-901oao"
+          dir="auto"
+          role="listitem"
+          style={
+            Object {
+              "color": "rgba(46,51,56,1.00)",
+              "display": "list-item",
+              "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+              "fontSize": "20px",
+              "lineHeight": "28px",
+              "listStyle": "disc",
+              "marginBottom": "20px",
+              "textRendering": "geometricPrecision",
+            }
+          }
+        >
+          Inappropriate photography or recording.
+        </li>
+        <li
+          className="css-reset-4rbku5 css-text-901oao"
+          dir="auto"
+          role="listitem"
+          style={
+            Object {
+              "color": "rgba(46,51,56,1.00)",
+              "display": "list-item",
+              "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+              "fontSize": "20px",
+              "lineHeight": "28px",
+              "listStyle": "disc",
+              "marginBottom": "20px",
+              "textRendering": "geometricPrecision",
+            }
+          }
+        >
+          Inappropriate physical contact. You should have someone’s consent before touching them.
+        </li>
+        <li
+          className="css-reset-4rbku5 css-text-901oao"
+          dir="auto"
+          role="listitem"
+          style={
+            Object {
+              "color": "rgba(46,51,56,1.00)",
+              "display": "list-item",
+              "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+              "fontSize": "20px",
+              "lineHeight": "28px",
+              "listStyle": "disc",
+              "marginBottom": "20px",
+              "textRendering": "geometricPrecision",
+            }
+          }
+        >
+          Sexual attention, including sexualized comments or jokes; inappropriate touching, groping, and unwelcome sexual advances.
+        </li>
+        <li
+          className="css-reset-4rbku5 css-text-901oao"
+          dir="auto"
+          role="listitem"
+          style={
+            Object {
+              "color": "rgba(46,51,56,1.00)",
+              "display": "list-item",
+              "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+              "fontSize": "20px",
+              "lineHeight": "28px",
+              "listStyle": "disc",
+              "marginBottom": "20px",
+              "textRendering": "geometricPrecision",
+            }
+          }
+        >
+          Deliberate intimidation, stalking or following (online or in person).
+        </li>
+        <li
+          className="css-reset-4rbku5 css-text-901oao"
+          dir="auto"
+          role="listitem"
+          style={
+            Object {
+              "color": "rgba(46,51,56,1.00)",
+              "display": "list-item",
+              "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+              "fontSize": "20px",
+              "lineHeight": "28px",
+              "listStyle": "disc",
+              "marginBottom": "20px",
+              "textRendering": "geometricPrecision",
+            }
+          }
+        >
+          Advocating for, or encouraging, any of the above behavior.
+        </li>
+        <li
+          className="css-reset-4rbku5 css-text-901oao"
+          dir="auto"
+          role="listitem"
+          style={
+            Object {
+              "color": "rgba(46,51,56,1.00)",
+              "display": "list-item",
+              "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+              "fontSize": "20px",
+              "lineHeight": "28px",
+              "listStyle": "disc",
+              "marginBottom": "20px",
+              "textRendering": "geometricPrecision",
+            }
+          }
+        >
+          Sustained disruption of community events, including talks and presentations.
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div
+    className="css-view-1dbjc4n"
+    style={
+      Object {
+        "WebkitAlignSelf": "center",
+        "WebkitBoxDirection": "normal",
+        "WebkitBoxOrient": "vertical",
+        "WebkitFlexDirection": "column",
+        "alignSelf": "center",
+        "flexDirection": "column",
+        "marginBottom": "20px",
+        "marginTop": "20px",
+        "maxWidth": "100vw",
+        "msFlexDirection": "column",
+        "msFlexItemAlign": "center",
+        "paddingLeft": "10px",
+        "paddingRight": "10px",
+        "width": "100%",
+      }
+    }
+  >
+    <div
+      className="css-view-1dbjc4n"
+      style={
+        Object {
+          "WebkitBoxFlex": 0,
+          "WebkitFlexGrow": 0,
+          "WebkitFlexShrink": 0,
+          "flexGrow": 0,
+          "flexShrink": 0,
+          "msFlexNegative": 0,
+          "msFlexPositive": 0,
+          "paddingBottom": "10px",
+          "paddingLeft": "10px",
+          "paddingRight": "10px",
+          "paddingTop": "10px",
+          "width": "100%",
+        }
+      }
+    >
+      <h3
+        aria-level="3"
+        className="css-reset-4rbku5 css-text-901oao"
+        dir="auto"
+        role="heading"
+        style={
+          Object {
+            "color": "rgba(46,51,56,1.00)",
+            "fontFamily": "Jost, futura-pt, futura, sans-serif",
+            "fontSize": "24px",
+            "lineHeight": "32px",
+            "textRendering": "geometricPrecision",
+            "textTransform": "none",
+          }
+        }
+      >
+        6. Consequences of Unacceptable Behavior
+      </h3>
+    </div>
+    <div
+      className="css-view-1dbjc4n"
+      style={
+        Object {
+          "WebkitBoxFlex": 0,
+          "WebkitFlexGrow": 0,
+          "WebkitFlexShrink": 0,
+          "flexGrow": 0,
+          "flexShrink": 0,
+          "msFlexNegative": 0,
+          "msFlexPositive": 0,
+          "paddingBottom": "10px",
+          "paddingLeft": "10px",
+          "paddingRight": "10px",
+          "paddingTop": "10px",
+          "width": "100%",
+        }
+      }
+    >
+      <div
+        className="css-text-901oao"
+        dir="auto"
+        style={
+          Object {
+            "color": "rgba(46,51,56,1.00)",
+            "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+            "fontSize": "20px",
+            "lineHeight": "28px",
+            "textRendering": "geometricPrecision",
+          }
+        }
+      >
+        Unacceptable behavior from any community member, including sponsors and those with decision-making authority, will not be tolerated.
+
+Anyone asked to stop unacceptable behavior is expected to comply immediately.
+
+If a community member engages in unacceptable behavior, the community organizers may take any action they deem appropriate, up to and including a temporary ban or permanent expulsion from the community without warning (and without refund in the case of a paid event).
+      </div>
+    </div>
+  </div>
+  <div
+    className="css-view-1dbjc4n"
+    style={
+      Object {
+        "WebkitAlignSelf": "center",
+        "WebkitBoxDirection": "normal",
+        "WebkitBoxOrient": "vertical",
+        "WebkitFlexDirection": "column",
+        "alignSelf": "center",
+        "flexDirection": "column",
+        "marginBottom": "20px",
+        "marginTop": "20px",
+        "maxWidth": "100vw",
+        "msFlexDirection": "column",
+        "msFlexItemAlign": "center",
+        "paddingLeft": "10px",
+        "paddingRight": "10px",
+        "width": "100%",
+      }
+    }
+  >
+    <div
+      className="css-view-1dbjc4n"
+      style={
+        Object {
+          "WebkitBoxFlex": 0,
+          "WebkitFlexGrow": 0,
+          "WebkitFlexShrink": 0,
+          "flexGrow": 0,
+          "flexShrink": 0,
+          "msFlexNegative": 0,
+          "msFlexPositive": 0,
+          "paddingBottom": "10px",
+          "paddingLeft": "10px",
+          "paddingRight": "10px",
+          "paddingTop": "10px",
+          "width": "100%",
+        }
+      }
+    >
+      <h3
+        aria-level="3"
+        className="css-reset-4rbku5 css-text-901oao"
+        dir="auto"
+        role="heading"
+        style={
+          Object {
+            "color": "rgba(46,51,56,1.00)",
+            "fontFamily": "Jost, futura-pt, futura, sans-serif",
+            "fontSize": "24px",
+            "lineHeight": "32px",
+            "textRendering": "geometricPrecision",
+            "textTransform": "none",
+          }
+        }
+      >
+        7. Reporting Guidelines
+      </h3>
+    </div>
+    <div
+      className="css-view-1dbjc4n"
+      style={
+        Object {
+          "WebkitBoxFlex": 0,
+          "WebkitFlexGrow": 0,
+          "WebkitFlexShrink": 0,
+          "flexGrow": 0,
+          "flexShrink": 0,
+          "msFlexNegative": 0,
+          "msFlexPositive": 0,
+          "paddingBottom": "10px",
+          "paddingLeft": "10px",
+          "paddingRight": "10px",
+          "paddingTop": "10px",
+          "width": "100%",
+        }
+      }
+    >
+      <div
+        className="css-text-901oao"
+        dir="auto"
+        style={
+          Object {
+            "color": "rgba(46,51,56,1.00)",
+            "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+            "fontSize": "20px",
+            "lineHeight": "28px",
+            "textRendering": "geometricPrecision",
+          }
+        }
+      >
+        If you are subject to or witness unacceptable behavior, or have any other concerns, please notify 
+        <div
+          className="css-view-1dbjc4n"
+          onClick={[Function]}
+          onMouseDown={[Function]}
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          onMouseUp={[Function]}
+          onResponderGrant={[Function]}
+          onResponderRelease={[Function]}
+          style={
+            Object {
+              "display": "inline",
+            }
+          }
+        >
+          <a
+            className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao css-textHasAncestor-16my406"
+            data-focusable={true}
+            dir="auto"
+            href="mailto:community@celo.org"
+            onClick={[Function]}
+            onMouseEnter={[Function]}
+            role="link"
+            style={
+              Object {
+                "WebkitTextDecorationStyle": "solid",
+                "cursor": "pointer",
+                "display": "inline",
+                "opacity": 1,
+                "textDecoration": "underline",
+                "textDecorationStyle": "solid",
+              }
+            }
+            target="_new"
+          >
+            community@celo.org
+          </a>
+        </div>
+         as soon as possible.
+      </div>
+    </div>
+  </div>
+  <div
+    className="css-view-1dbjc4n"
+    style={
+      Object {
+        "WebkitAlignSelf": "center",
+        "WebkitBoxDirection": "normal",
+        "WebkitBoxOrient": "vertical",
+        "WebkitFlexDirection": "column",
+        "alignSelf": "center",
+        "flexDirection": "column",
+        "marginBottom": "20px",
+        "marginTop": "20px",
+        "maxWidth": "100vw",
+        "msFlexDirection": "column",
+        "msFlexItemAlign": "center",
+        "paddingLeft": "10px",
+        "paddingRight": "10px",
+        "width": "100%",
+      }
+    }
+  >
+    <div
+      className="css-view-1dbjc4n"
+      style={
+        Object {
+          "WebkitBoxFlex": 0,
+          "WebkitFlexGrow": 0,
+          "WebkitFlexShrink": 0,
+          "flexGrow": 0,
+          "flexShrink": 0,
+          "msFlexNegative": 0,
+          "msFlexPositive": 0,
+          "paddingBottom": "10px",
+          "paddingLeft": "10px",
+          "paddingRight": "10px",
+          "paddingTop": "10px",
+          "width": "100%",
+        }
+      }
+    >
+      <h3
+        aria-level="3"
+        className="css-reset-4rbku5 css-text-901oao"
+        dir="auto"
+        role="heading"
+        style={
+          Object {
+            "color": "rgba(46,51,56,1.00)",
+            "fontFamily": "Jost, futura-pt, futura, sans-serif",
+            "fontSize": "24px",
+            "lineHeight": "32px",
+            "textRendering": "geometricPrecision",
+            "textTransform": "none",
+          }
+        }
+      >
+        8. Addressing Grievances
+      </h3>
+    </div>
+    <div
+      className="css-view-1dbjc4n"
+      style={
+        Object {
+          "WebkitBoxFlex": 0,
+          "WebkitFlexGrow": 0,
+          "WebkitFlexShrink": 0,
+          "flexGrow": 0,
+          "flexShrink": 0,
+          "msFlexNegative": 0,
+          "msFlexPositive": 0,
+          "paddingBottom": "10px",
+          "paddingLeft": "10px",
+          "paddingRight": "10px",
+          "paddingTop": "10px",
+          "width": "100%",
+        }
+      }
+    >
+      <div
+        className="css-text-901oao"
+        dir="auto"
+        style={
+          Object {
+            "color": "rgba(46,51,56,1.00)",
+            "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+            "fontSize": "20px",
+            "lineHeight": "28px",
+            "textRendering": "geometricPrecision",
+          }
+        }
+      >
+        If you feel you have been falsely or unfairly accused of violating this Code of Conduct, you should notify 
+        <div
+          className="css-view-1dbjc4n"
+          onClick={[Function]}
+          onMouseDown={[Function]}
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          onMouseUp={[Function]}
+          onResponderGrant={[Function]}
+          onResponderRelease={[Function]}
+          style={
+            Object {
+              "display": "inline",
+            }
+          }
+        >
+          <a
+            className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao css-textHasAncestor-16my406"
+            data-focusable={true}
+            dir="auto"
+            href="mailto:community@celo.org"
+            onClick={[Function]}
+            onMouseEnter={[Function]}
+            role="link"
+            style={
+              Object {
+                "WebkitTextDecorationStyle": "solid",
+                "cursor": "pointer",
+                "display": "inline",
+                "opacity": 1,
+                "textDecoration": "underline",
+                "textDecorationStyle": "solid",
+              }
+            }
+            target="_new"
+          >
+            community@celo.org
+          </a>
+        </div>
+         with a concise description of your grievance.
+      </div>
+    </div>
+  </div>
+  <div
+    className="css-view-1dbjc4n"
+    style={
+      Object {
+        "WebkitAlignSelf": "center",
+        "WebkitBoxDirection": "normal",
+        "WebkitBoxOrient": "vertical",
+        "WebkitFlexDirection": "column",
+        "alignSelf": "center",
+        "flexDirection": "column",
+        "marginBottom": "20px",
+        "marginTop": "20px",
+        "maxWidth": "100vw",
+        "msFlexDirection": "column",
+        "msFlexItemAlign": "center",
+        "paddingLeft": "10px",
+        "paddingRight": "10px",
+        "width": "100%",
+      }
+    }
+  >
+    <div
+      className="css-view-1dbjc4n"
+      style={
+        Object {
+          "WebkitBoxFlex": 0,
+          "WebkitFlexGrow": 0,
+          "WebkitFlexShrink": 0,
+          "flexGrow": 0,
+          "flexShrink": 0,
+          "msFlexNegative": 0,
+          "msFlexPositive": 0,
+          "paddingBottom": "10px",
+          "paddingLeft": "10px",
+          "paddingRight": "10px",
+          "paddingTop": "10px",
+          "width": "100%",
+        }
+      }
+    >
+      <h3
+        aria-level="3"
+        className="css-reset-4rbku5 css-text-901oao"
+        dir="auto"
+        role="heading"
+        style={
+          Object {
+            "color": "rgba(46,51,56,1.00)",
+            "fontFamily": "Jost, futura-pt, futura, sans-serif",
+            "fontSize": "24px",
+            "lineHeight": "32px",
+            "textRendering": "geometricPrecision",
+            "textTransform": "none",
+          }
+        }
+      >
+        9. License and attribution
+      </h3>
+    </div>
+    <div
+      className="css-view-1dbjc4n"
+      style={
+        Object {
+          "WebkitBoxFlex": 0,
+          "WebkitFlexGrow": 0,
+          "WebkitFlexShrink": 0,
+          "flexGrow": 0,
+          "flexShrink": 0,
+          "msFlexNegative": 0,
+          "msFlexPositive": 0,
+          "paddingBottom": "10px",
+          "paddingLeft": "10px",
+          "paddingRight": "10px",
+          "paddingTop": "10px",
+          "width": "100%",
+        }
+      }
+    >
+      <div
+        className="css-text-901oao"
+        dir="auto"
+        style={
+          Object {
+            "color": "rgba(46,51,56,1.00)",
+            "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+            "fontSize": "20px",
+            "lineHeight": "28px",
+            "textRendering": "geometricPrecision",
+          }
+        }
+      >
+        This Code of Conduct is distributed under a 
+        <div
+          className="css-view-1dbjc4n"
+          onClick={[Function]}
+          onMouseDown={[Function]}
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          onMouseUp={[Function]}
+          onResponderGrant={[Function]}
+          onResponderRelease={[Function]}
+          style={
+            Object {
+              "display": "inline",
+            }
+          }
+        >
+          <a
+            className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao css-textHasAncestor-16my406"
+            data-focusable={true}
+            dir="auto"
+            href="https://creativecommons.org/licenses/by-sa/3.0/"
+            onClick={[Function]}
+            onMouseEnter={[Function]}
+            role="link"
+            style={
+              Object {
+                "WebkitTextDecorationStyle": "solid",
+                "cursor": "pointer",
+                "display": "inline",
+                "opacity": 1,
+                "textDecoration": "underline",
+                "textDecorationStyle": "solid",
+              }
+            }
+            target="_new"
+          >
+            Creative Commons Attribution-ShareAlike
+          </a>
+        </div>
+         license. Portions of text derived from the 
+        <div
+          className="css-view-1dbjc4n"
+          onClick={[Function]}
+          onMouseDown={[Function]}
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          onMouseUp={[Function]}
+          onResponderGrant={[Function]}
+          onResponderRelease={[Function]}
+          style={
+            Object {
+              "display": "inline",
+            }
+          }
+        >
+          <a
+            className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao css-textHasAncestor-16my406"
+            data-focusable={true}
+            dir="auto"
+            href="http://citizencodeofconduct.org/"
+            onClick={[Function]}
+            onMouseEnter={[Function]}
+            role="link"
+            style={
+              Object {
+                "WebkitTextDecorationStyle": "solid",
+                "cursor": "pointer",
+                "display": "inline",
+                "opacity": 1,
+                "textDecoration": "underline",
+                "textDecorationStyle": "solid",
+              }
+            }
+            target="_new"
+          >
+            Citizen Code of Conduct
+          </a>
+        </div>
+         , the 
+        <div
+          className="css-view-1dbjc4n"
+          onClick={[Function]}
+          onMouseDown={[Function]}
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          onMouseUp={[Function]}
+          onResponderGrant={[Function]}
+          onResponderRelease={[Function]}
+          style={
+            Object {
+              "display": "inline",
+            }
+          }
+        >
+          <a
+            className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao css-textHasAncestor-16my406"
+            data-focusable={true}
+            dir="auto"
+            href="https://www.djangoproject.com/conduct/"
+            onClick={[Function]}
+            onMouseEnter={[Function]}
+            role="link"
+            style={
+              Object {
+                "WebkitTextDecorationStyle": "solid",
+                "cursor": "pointer",
+                "display": "inline",
+                "opacity": 1,
+                "textDecoration": "underline",
+                "textDecorationStyle": "solid",
+              }
+            }
+            target="_new"
+          >
+            Django Code of Conduct
+          </a>
+        </div>
+        , the 
+        <div
+          className="css-view-1dbjc4n"
+          onClick={[Function]}
+          onMouseDown={[Function]}
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          onMouseUp={[Function]}
+          onResponderGrant={[Function]}
+          onResponderRelease={[Function]}
+          style={
+            Object {
+              "display": "inline",
+            }
+          }
+        >
+          <a
+            className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao css-textHasAncestor-16my406"
+            data-focusable={true}
+            dir="auto"
+            href="http://geekfeminism.wikia.com/wiki/Community_anti-harassment"
+            onClick={[Function]}
+            onMouseEnter={[Function]}
+            role="link"
+            style={
+              Object {
+                "WebkitTextDecorationStyle": "solid",
+                "cursor": "pointer",
+                "display": "inline",
+                "opacity": 1,
+                "textDecoration": "underline",
+                "textDecorationStyle": "solid",
+              }
+            }
+            target="_new"
+          >
+            Geek Feminism Anti-Harassment Policy
+          </a>
+        </div>
+        , and the 
+        <div
+          className="css-view-1dbjc4n"
+          onClick={[Function]}
+          onMouseDown={[Function]}
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          onMouseUp={[Function]}
+          onResponderGrant={[Function]}
+          onResponderRelease={[Function]}
+          style={
+            Object {
+              "display": "inline",
+            }
+          }
+        >
+          <a
+            className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao css-textHasAncestor-16my406"
+            data-focusable={true}
+            dir="auto"
+            href="https://www.contributor-covenant.org/version/1/4/code-of-conduct.html"
+            onClick={[Function]}
+            onMouseEnter={[Function]}
+            role="link"
+            style={
+              Object {
+                "WebkitTextDecorationStyle": "solid",
+                "cursor": "pointer",
+                "display": "inline",
+                "opacity": 1,
+                "textDecoration": "underline",
+                "textDecorationStyle": "solid",
+              }
+            }
+            target="_new"
+          >
+            Contributor Covenant
+          </a>
+        </div>
+        .
+      </div>
+    </div>
+  </div>
+  <div
+    className="css-view-1dbjc4n"
+    style={
+      Object {
+        "WebkitAlignSelf": "center",
+        "WebkitBoxDirection": "normal",
+        "WebkitBoxOrient": "vertical",
+        "WebkitFlexDirection": "column",
+        "alignSelf": "center",
+        "flexDirection": "column",
+        "marginBottom": "20px",
+        "marginTop": "20px",
+        "maxWidth": "100vw",
+        "msFlexDirection": "column",
+        "msFlexItemAlign": "center",
+        "paddingLeft": "10px",
+        "paddingRight": "10px",
+        "width": "100%",
+      }
+    }
+  >
+    <div
+      className="css-view-1dbjc4n"
+      style={
+        Object {
+          "WebkitBoxFlex": 0,
+          "WebkitFlexGrow": 0,
+          "WebkitFlexShrink": 0,
+          "flexGrow": 0,
+          "flexShrink": 0,
+          "msFlexNegative": 0,
+          "msFlexPositive": 0,
+          "paddingBottom": "10px",
+          "paddingLeft": "10px",
+          "paddingRight": "10px",
+          "paddingTop": "10px",
+          "width": "100%",
+        }
+      }
+    >
+      <h3
+        aria-level="3"
+        className="css-reset-4rbku5 css-text-901oao"
+        dir="auto"
+        role="heading"
+        style={
+          Object {
+            "color": "rgba(46,51,56,1.00)",
+            "fontFamily": "Jost, futura-pt, futura, sans-serif",
+            "fontSize": "24px",
+            "lineHeight": "32px",
+            "textRendering": "geometricPrecision",
+            "textTransform": "none",
+          }
+        }
+      >
+        
+      </h3>
+    </div>
+    <div
+      className="css-view-1dbjc4n"
+      style={
+        Object {
+          "WebkitBoxFlex": 0,
+          "WebkitFlexGrow": 0,
+          "WebkitFlexShrink": 0,
+          "flexGrow": 0,
+          "flexShrink": 0,
+          "msFlexNegative": 0,
+          "msFlexPositive": 0,
+          "paddingBottom": "10px",
+          "paddingLeft": "10px",
+          "paddingRight": "10px",
+          "paddingTop": "10px",
+          "width": "100%",
+        }
+      }
+    >
+      <div
+        className="css-text-901oao"
+        dir="auto"
+        style={
+          Object {
+            "color": "rgba(46,51,56,1.00)",
+            "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+            "fontSize": "20px",
+            "lineHeight": "28px",
+            "textRendering": "geometricPrecision",
+          }
+        }
+      >
+        Last updated June 12, 2018
+      </div>
+    </div>
+  </div>
+</div>
+`;

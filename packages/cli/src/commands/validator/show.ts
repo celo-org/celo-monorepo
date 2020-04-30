@@ -5,10 +5,10 @@ import { printValueMap } from '../../utils/cli'
 import { Args } from '../../utils/command'
 
 export default class ValidatorShow extends BaseCommand {
-  static description = 'Show information about an existing Validator'
+  static description = 'Show information about a registered Validator.'
 
   static flags = {
-    ...BaseCommand.flags,
+    ...BaseCommand.flagsWithoutLocalAddresses(),
   }
 
   static args: IArg[] = [Args.address('validatorAddress', { description: "Validator's address" })]

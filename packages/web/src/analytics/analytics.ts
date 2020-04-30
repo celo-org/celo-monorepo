@@ -1,41 +1,48 @@
 import Cookies from 'js-cookie'
 import getConfig from 'next/config'
-const isInEU = require('@segment/in-eu')
+import { isBrowser } from 'src/utils/utils'
 
 let analytics: {
-  track: (key: string, properties: object, options: object) => void
-}
-const ALLOW_ANALYTICS_COOKIE_NAME = '__allow__analytics__cookie__'
-const RESPONDED_TO_CONSENT = '__responded_to_consent__'
-
-declare var process: any
-
-export function canTrack(): boolean {
-  return !!Cookies.get(ALLOW_ANALYTICS_COOKIE_NAME) || !isInEU()
+  track: (key: string, properties?: object, options?: object) => void
+  page: () => void
 }
 
-export function showVisitorCookieConsent(): boolean {
-  return isInEU() && !Cookies.get(RESPONDED_TO_CONSENT)
+let segmentPromise
+
+export const ALLOW_ANALYTICS_COOKIE_NAME = '__allow__analytics__cookie__'
+export const RESPONDED_TO_CONSENT = '__responded_to_consent__'
+
+export async function canTrack() {
+  return !!Cookies.get(ALLOW_ANALYTICS_COOKIE_NAME)
 }
 
-const initializeAnalytics = () => {
-  if (process.browser && canTrack()) {
-    const Segment = require('load-segment')
-    const { publicRuntimeConfig } = getConfig()
-    analytics = Segment({ key: publicRuntimeConfig.__SEGMENT_KEY__ })
-  } else {
-    analytics = {
-      track: () => null,
+export async function showVisitorCookieConsent() {
+  return !Cookies.get(RESPONDED_TO_CONSENT)
+}
+
+export async function initializeAnalytics() {
+  if (!isBrowser() || !(await canTrack())) {
+    return {
+      track: noTrack,
+      page: noTrack,
     }
   }
+
+  if (!segmentPromise) {
+    segmentPromise = import('load-segment').then((mod) => mod.default)
+  }
+  if (!analytics) {
+    const Segment = await segmentPromise
+    const { publicRuntimeConfig } = getConfig()
+    analytics = Segment({ key: publicRuntimeConfig.__SEGMENT_KEY__ })
+  }
+  return analytics
 }
 
-initializeAnalytics()
-
-export const agree = () => {
+export async function agree() {
   Cookies.set(ALLOW_ANALYTICS_COOKIE_NAME, true, { expires: OPTIN_EXPIRE_DAYS })
   Cookies.set(RESPONDED_TO_CONSENT, true, { expires: OPTIN_EXPIRE_DAYS })
-  initializeAnalytics()
+  await initializeAnalytics()
 }
 
 export const disagree = () => {
@@ -45,4 +52,17 @@ export const disagree = () => {
 const OPTIN_EXPIRE_DAYS = 365
 const OPTOUT_EXPIRE_DAYS = 1
 
-export default analytics
+export default {
+  track: async function track(key: string, properties?: object, options?: object) {
+    const segment = await initializeAnalytics()
+    return segment.track(key, properties, options)
+  },
+  page: async function page() {
+    const segment = await initializeAnalytics()
+    return segment.page()
+  },
+}
+
+function noTrack() {
+  return getConfig().publicRuntimeConfig.ENV === 'development' ? console.info(arguments) : null
+}

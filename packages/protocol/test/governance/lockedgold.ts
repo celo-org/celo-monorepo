@@ -4,12 +4,16 @@ import {
   assertLogMatches,
   assertLogMatches2,
   assertRevert,
+  NULL_ADDRESS,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
+import { toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import {
   AccountsContract,
   AccountsInstance,
+  ElectionTestContract,
+  ElectionTestInstance,
   LockedGoldContract,
   LockedGoldInstance,
   MockElectionContract,
@@ -26,6 +30,7 @@ import {
 
 const Accounts: AccountsContract = artifacts.require('Accounts')
 const LockedGold: LockedGoldContract = artifacts.require('LockedGold')
+const ElectionTest: ElectionTestContract = artifacts.require('Election')
 const MockElection: MockElectionContract = artifacts.require('MockElection')
 const MockGoldToken: MockGoldTokenContract = artifacts.require('MockGoldToken')
 const MockGovernance: MockGovernanceContract = artifacts.require('MockGovernance')
@@ -35,23 +40,28 @@ const Registry: RegistryContract = artifacts.require('Registry')
 // @ts-ignore
 // TODO(mcortesi): Use BN
 LockedGold.numberFormat = 'BigNumber'
+// @ts-ignore
+// TODO(mcortesi): Use BN
+ElectionTest.numberFormat = 'BigNumber'
 
 const HOUR = 60 * 60
 const DAY = 24 * HOUR
 
 contract('LockedGold', (accounts: string[]) => {
-  let account = accounts[0]
+  const account = accounts[0]
   const nonOwner = accounts[1]
   const unlockingPeriod = 3 * DAY
   let accountsInstance: AccountsInstance
   let lockedGold: LockedGoldInstance
+  let election: ElectionTestInstance
   let mockElection: MockElectionInstance
   let mockGovernance: MockGovernanceInstance
   let mockValidators: MockValidatorsInstance
   let registry: RegistryInstance
+  let mockGoldToken: MockGoldTokenInstance
 
   beforeEach(async () => {
-    const mockGoldToken: MockGoldTokenInstance = await MockGoldToken.new()
+    mockGoldToken = await MockGoldToken.new()
     accountsInstance = await Accounts.new()
     lockedGold = await LockedGold.new()
     mockElection = await MockElection.new()
@@ -63,6 +73,7 @@ contract('LockedGold', (accounts: string[]) => {
     await registry.setAddressFor(CeloContractName.GoldToken, mockGoldToken.address)
     await registry.setAddressFor(CeloContractName.Governance, mockGovernance.address)
     await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
+    await registry.setAddressFor(CeloContractName.LockedGold, lockedGold.address)
     await lockedGold.initialize(registry.address, unlockingPeriod)
     await accountsInstance.createAccount()
   })
@@ -265,52 +276,103 @@ contract('LockedGold', (accounts: string[]) => {
   })
 
   describe('#relock()', () => {
-    const value = 1000
+    const pendingWithdrawalValue = 1000
     const index = 0
     let resp: any
     describe('when a pending withdrawal exists', () => {
       beforeEach(async () => {
         // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
-        await lockedGold.lock({ value })
-        await lockedGold.unlock(value)
-        resp = await lockedGold.relock(index)
+        await lockedGold.lock({ value: pendingWithdrawalValue })
+        await lockedGold.unlock(pendingWithdrawalValue)
       })
 
-      it("should increase the account's nonvoting locked gold balance", async () => {
-        assertEqualBN(await lockedGold.getAccountNonvotingLockedGold(account), value)
-      })
+      describe('when relocking value equal to the value of the pending withdrawal', () => {
+        const value = pendingWithdrawalValue
+        beforeEach(async () => {
+          resp = await lockedGold.relock(index, value)
+        })
 
-      it("should increase the account's total locked gold balance", async () => {
-        assertEqualBN(await lockedGold.getAccountTotalLockedGold(account), value)
-      })
+        it("should increase the account's nonvoting locked gold balance", async () => {
+          assertEqualBN(await lockedGold.getAccountNonvotingLockedGold(account), value)
+        })
 
-      it('should increase the nonvoting locked gold balance', async () => {
-        assertEqualBN(await lockedGold.getNonvotingLockedGold(), value)
-      })
+        it("should increase the account's total locked gold balance", async () => {
+          assertEqualBN(await lockedGold.getAccountTotalLockedGold(account), value)
+        })
 
-      it('should increase the total locked gold balance', async () => {
-        assertEqualBN(await lockedGold.getTotalLockedGold(), value)
-      })
+        it('should increase the nonvoting locked gold balance', async () => {
+          assertEqualBN(await lockedGold.getNonvotingLockedGold(), value)
+        })
 
-      it('should emit a GoldLocked event', async () => {
-        assert.equal(resp.logs.length, 1)
-        const log = resp.logs[0]
-        assertLogMatches(log, 'GoldLocked', {
-          account,
-          value: new BigNumber(value),
+        it('should increase the total locked gold balance', async () => {
+          assertEqualBN(await lockedGold.getTotalLockedGold(), value)
+        })
+
+        it('should emit a GoldRelocked event', async () => {
+          assert.equal(resp.logs.length, 1)
+          const log = resp.logs[0]
+          assertLogMatches(log, 'GoldRelocked', {
+            account,
+            value: new BigNumber(value),
+          })
+        })
+
+        it('should remove the pending withdrawal', async () => {
+          const [values, timestamps] = await lockedGold.getPendingWithdrawals(account)
+          assert.equal(values.length, 0)
+          assert.equal(timestamps.length, 0)
         })
       })
 
-      it('should remove the pending withdrawal', async () => {
-        const [values, timestamps] = await lockedGold.getPendingWithdrawals(account)
-        assert.equal(values.length, 0)
-        assert.equal(timestamps.length, 0)
+      describe('when relocking value less than the value of the pending withdrawal', () => {
+        const value = pendingWithdrawalValue - 1
+        beforeEach(async () => {
+          resp = await lockedGold.relock(index, value)
+        })
+
+        it("should increase the account's nonvoting locked gold balance", async () => {
+          assertEqualBN(await lockedGold.getAccountNonvotingLockedGold(account), value)
+        })
+
+        it("should increase the account's total locked gold balance", async () => {
+          assertEqualBN(await lockedGold.getAccountTotalLockedGold(account), value)
+        })
+
+        it('should increase the nonvoting locked gold balance', async () => {
+          assertEqualBN(await lockedGold.getNonvotingLockedGold(), value)
+        })
+
+        it('should increase the total locked gold balance', async () => {
+          assertEqualBN(await lockedGold.getTotalLockedGold(), value)
+        })
+
+        it('should emit a GoldRelocked event', async () => {
+          assert.equal(resp.logs.length, 1)
+          const log = resp.logs[0]
+          assertLogMatches(log, 'GoldRelocked', {
+            account,
+            value: new BigNumber(value),
+          })
+        })
+
+        it('should decrement the value of the pending withdrawal', async () => {
+          const [values, timestamps] = await lockedGold.getPendingWithdrawals(account)
+          assert.equal(values.length, 1)
+          assert.equal(timestamps.length, 1)
+          assertEqualBN(values[0], 1)
+        })
+      })
+      describe('when relocking value greater than the value of the pending withdrawal', () => {
+        const value = pendingWithdrawalValue + 1
+        it('should revert', async () => {
+          await assertRevert(lockedGold.relock(index, value))
+        })
       })
     })
 
     describe('when a pending withdrawal does not exist', () => {
       it('should revert', async () => {
-        await assertRevert(lockedGold.relock(index))
+        await assertRevert(lockedGold.relock(index, pendingWithdrawalValue))
       })
     })
   })
@@ -358,6 +420,254 @@ contract('LockedGold', (accounts: string[]) => {
     describe('when a pending withdrawal does not exist', () => {
       it('should revert', async () => {
         await assertRevert(lockedGold.withdraw(index))
+      })
+    })
+  })
+
+  describe('#addSlasher', () => {
+    beforeEach(async () => {
+      await registry.setAddressFor(CeloContractName.DowntimeSlasher, accounts[2])
+    })
+    it('can add slasher to whitelist', async () => {
+      await lockedGold.addSlasher(CeloContractName.DowntimeSlasher)
+      const bytes = web3.utils.soliditySha3({
+        type: 'string',
+        value: CeloContractName.DowntimeSlasher,
+      })
+      assert.equal(bytes, (await lockedGold.getSlashingWhitelist())[0])
+    })
+    it('can only be called by owner', async () => {
+      await assertRevert(
+        lockedGold.addSlasher(CeloContractName.DowntimeSlasher, { from: accounts[1] })
+      )
+    })
+    it('cannot add a slasher twice', async () => {
+      await lockedGold.addSlasher(CeloContractName.DowntimeSlasher)
+      await assertRevert(lockedGold.addSlasher(CeloContractName.DowntimeSlasher))
+    })
+  })
+
+  describe('#removeSlasher', () => {
+    beforeEach(async () => {
+      await registry.setAddressFor(CeloContractName.DowntimeSlasher, accounts[2])
+      await registry.setAddressFor(CeloContractName.GovernanceSlasher, accounts[3])
+      await lockedGold.addSlasher(CeloContractName.DowntimeSlasher)
+    })
+    it('removes item for whitelist', async () => {
+      await lockedGold.removeSlasher(CeloContractName.DowntimeSlasher, 0)
+      assert.equal(0, (await lockedGold.getSlashingWhitelist()).length)
+    })
+    it('can only be called by owner', async () => {
+      await assertRevert(
+        lockedGold.removeSlasher(CeloContractName.DowntimeSlasher, 0, { from: accounts[1] })
+      )
+    })
+    it('reverts when index too large', async () => {
+      await assertRevert(lockedGold.removeSlasher(CeloContractName.DowntimeSlasher, 100))
+    })
+    it('reverts when key does not exists', async () => {
+      await assertRevert(lockedGold.removeSlasher(CeloContractName.GovernanceSlasher, 100))
+    })
+    it('reverts when index and key have mismatch', async () => {
+      await lockedGold.addSlasher(CeloContractName.GovernanceSlasher)
+      await assertRevert(lockedGold.removeSlasher(CeloContractName.DowntimeSlasher, 1))
+    })
+  })
+
+  describe('#slash', () => {
+    const value = 1000
+    const group = accounts[1]
+    const reporter = accounts[3]
+
+    beforeEach(async () => {
+      election = await ElectionTest.new()
+      await registry.setAddressFor(CeloContractName.LockedGold, lockedGold.address)
+      await election.initialize(
+        registry.address,
+        new BigNumber(4),
+        new BigNumber(6),
+        new BigNumber(3),
+        toFixed(1 / 100)
+      )
+      await mockValidators.setMembers(group, [accounts[9]])
+      await registry.setAddressFor(CeloContractName.Validators, accounts[0])
+      await registry.setAddressFor(CeloContractName.Election, election.address)
+      await election.markGroupEligible(group, NULL_ADDRESS, NULL_ADDRESS)
+      await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
+      await mockValidators.setNumRegisteredValidators(1)
+      // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
+      await lockedGold.lock({ value })
+      await registry.setAddressFor(CeloContractName.DowntimeSlasher, accounts[2])
+      await lockedGold.addSlasher(CeloContractName.DowntimeSlasher)
+    })
+
+    describe('when the account is slashed for all of its locked gold', () => {
+      const penalty = value
+      const reward = value / 2
+
+      beforeEach(async () => {
+        await lockedGold.slash(
+          account,
+          penalty,
+          reporter,
+          reward,
+          [NULL_ADDRESS],
+          [NULL_ADDRESS],
+          [0],
+          { from: accounts[2] }
+        )
+      })
+
+      it("should reduce account's locked gold balance", async () => {
+        assertEqualBN(await lockedGold.getAccountNonvotingLockedGold(account), value - penalty)
+        assertEqualBN(await lockedGold.getAccountTotalLockedGold(account), value - penalty)
+      })
+
+      it("should increase the reporter's locked gold", async () => {
+        assertEqualBN(await lockedGold.getAccountNonvotingLockedGold(reporter), reward)
+        assertEqualBN(await lockedGold.getAccountTotalLockedGold(reporter), reward)
+      })
+
+      it("should increase the community fund's gold", async () => {
+        assert.equal(await web3.eth.getBalance(mockGovernance.address), penalty - reward)
+      })
+    })
+
+    describe('when the account is removed from `isSlasher`', () => {
+      const penalty = value
+      const reward = value / 2
+      beforeEach(async () => {
+        await lockedGold.removeSlasher(CeloContractName.DowntimeSlasher, 0)
+      })
+
+      it('should revert', async () => {
+        await assertRevert(
+          lockedGold.slash(
+            account,
+            penalty,
+            reporter,
+            reward,
+            [NULL_ADDRESS],
+            [NULL_ADDRESS],
+            [0],
+            { from: accounts[2] }
+          )
+        )
+      })
+    })
+
+    describe('when the account has half voting and half nonvoting gold', () => {
+      const voting = value / 2
+      const nonVoting = value - voting
+      beforeEach(async () => {
+        await election.vote(group, voting, NULL_ADDRESS, NULL_ADDRESS)
+      })
+
+      describe('when the account is slashed for only its nonvoting balance', () => {
+        const penalty = nonVoting
+        const reward = penalty / 2
+        beforeEach(async () => {
+          await lockedGold.slash(
+            account,
+            penalty,
+            reporter,
+            reward,
+            [NULL_ADDRESS],
+            [NULL_ADDRESS],
+            [0],
+            { from: accounts[2] }
+          )
+        })
+
+        it("should reduce account's nonvoting locked gold balance", async () => {
+          assertEqualBN(
+            await lockedGold.getAccountNonvotingLockedGold(account),
+            nonVoting - penalty
+          )
+        })
+
+        it('should leave the voting locked gold', async () => {
+          assertEqualBN(await lockedGold.getAccountTotalLockedGold(account), value - penalty)
+          assertEqualBN(await election.getTotalVotesByAccount(account), voting)
+        })
+
+        it("should increase the reporter's locked gold", async () => {
+          assertEqualBN(await lockedGold.getAccountNonvotingLockedGold(reporter), reward)
+          assertEqualBN(await lockedGold.getAccountTotalLockedGold(reporter), reward)
+        })
+
+        it("should increase the community fund's gold", async () => {
+          assert.equal(await web3.eth.getBalance(mockGovernance.address), penalty - reward)
+        })
+      })
+
+      describe('when the account is slashed for its whole balance', () => {
+        const penalty = value
+        const reward = penalty / 2
+
+        beforeEach(async () => {
+          await lockedGold.slash(
+            account,
+            penalty,
+            reporter,
+            reward,
+            [NULL_ADDRESS],
+            [NULL_ADDRESS],
+            [0],
+            { from: accounts[2] }
+          )
+        })
+
+        it("should reduce account's nonvoting locked gold balance", async () => {
+          assertEqualBN(await lockedGold.getAccountNonvotingLockedGold(account), value - penalty)
+        })
+
+        it("should reduce account's locked gold and voting gold", async () => {
+          assertEqualBN(await lockedGold.getAccountTotalLockedGold(account), value - penalty)
+          assertEqualBN(await election.getTotalVotesByAccount(account), value - penalty)
+        })
+
+        it("should increase the reporter's locked gold", async () => {
+          assertEqualBN(await lockedGold.getAccountNonvotingLockedGold(reporter), reward)
+          assertEqualBN(await lockedGold.getAccountTotalLockedGold(reporter), reward)
+        })
+
+        it("should increase the community fund's gold", async () => {
+          assert.equal(await web3.eth.getBalance(mockGovernance.address), penalty - reward)
+        })
+      })
+
+      describe('when the account is slashed for more than its whole balance', () => {
+        const penalty = value * 2
+        const reward = value / 2
+
+        beforeEach(async () => {
+          await lockedGold.slash(
+            account,
+            penalty,
+            reporter,
+            reward,
+            [NULL_ADDRESS],
+            [NULL_ADDRESS],
+            [0],
+            { from: accounts[2] }
+          )
+        })
+
+        it('should slash the whole accounts balance', async () => {
+          assertEqualBN(await lockedGold.getAccountNonvotingLockedGold(account), 0)
+          assertEqualBN(await lockedGold.getAccountTotalLockedGold(account), 0)
+          assertEqualBN(await election.getTotalVotesByAccount(account), 0)
+        })
+
+        it('should still send the `reporter` `reward` gold', async () => {
+          assertEqualBN(await lockedGold.getAccountNonvotingLockedGold(reporter), reward)
+          assertEqualBN(await lockedGold.getAccountTotalLockedGold(reporter), reward)
+        })
+
+        it("should only send the community fund value based on `account`'s total balance", async () => {
+          assert.equal(await web3.eth.getBalance(mockGovernance.address), value - reward)
+        })
       })
     })
   })

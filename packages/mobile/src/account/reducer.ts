@@ -2,7 +2,7 @@ import { isE164Number } from '@celo/utils/src/phoneNumbers'
 import { Actions, ActionTypes } from 'src/account/actions'
 import { PaymentRequest } from 'src/account/types'
 import { DEV_SETTINGS_ACTIVE_INITIALLY } from 'src/config'
-import { RootState } from 'src/redux/reducers'
+import { getRehydratePayload, REHYDRATE, RehydrateAction } from 'src/redux/persist-helper'
 import { getRemoteTime } from 'src/utils/time'
 
 export interface State {
@@ -19,9 +19,13 @@ export interface State {
   backupCompleted: boolean
   backupDelayedTime: number
   socialBackupCompleted: boolean
-  paymentRequests: PaymentRequest[]
+  incomingPaymentRequests: PaymentRequest[]
+  outgoingPaymentRequests: PaymentRequest[]
   dismissedEarnRewards: boolean
   dismissedInviteFriends: boolean
+  dismissedGetVerified: boolean
+  promptFornoIfNeeded: boolean
+  acceptedTerms: boolean
 }
 
 export enum PincodeType {
@@ -49,16 +53,31 @@ export const initialState = {
   pincodeType: PincodeType.Unset,
   isSettingPin: false,
   accountCreationTime: 99999999999999,
-  paymentRequests: [],
+  incomingPaymentRequests: [],
+  outgoingPaymentRequests: [],
   backupCompleted: false,
   backupDelayedTime: 0,
   socialBackupCompleted: false,
   dismissedEarnRewards: false,
   dismissedInviteFriends: false,
+  dismissedGetVerified: false,
+  promptFornoIfNeeded: false,
+  acceptedTerms: false,
 }
 
-export const reducer = (state: State | undefined = initialState, action: ActionTypes): State => {
+export const reducer = (
+  state: State | undefined = initialState,
+  action: ActionTypes | RehydrateAction
+): State => {
   switch (action.type) {
+    case REHYDRATE: {
+      // Ignore some persisted properties
+      return {
+        ...state,
+        ...getRehydratePayload(action, 'account'),
+        dismissedGetVerified: false,
+      }
+    }
     case Actions.SET_NAME:
       return {
         ...state,
@@ -129,10 +148,15 @@ export const reducer = (state: State | undefined = initialState, action: ActionT
         socialBackupCompleted: false,
         backupDelayedTime: 0,
       }
-    case Actions.UPDATE_PAYMENT_REQUESTS:
+    case Actions.UPDATE_INCOMING_PAYMENT_REQUESTS:
       return {
         ...state,
-        paymentRequests: action.paymentRequests,
+        incomingPaymentRequests: action.paymentRequests,
+      }
+    case Actions.UPDATE_OUTGOING_PAYMENT_REQUESTS:
+      return {
+        ...state,
+        outgoingPaymentRequests: action.paymentRequests,
       }
     case Actions.DISMISS_EARN_REWARDS:
       return {
@@ -144,6 +168,11 @@ export const reducer = (state: State | undefined = initialState, action: ActionT
         ...state,
         dismissedInviteFriends: true,
       }
+    case Actions.DISMISS_GET_VERIFIED:
+      return {
+        ...state,
+        dismissedGetVerified: true,
+      }
     case Actions.SET_USER_CONTACT_DETAILS:
       return {
         ...state,
@@ -152,14 +181,15 @@ export const reducer = (state: State | undefined = initialState, action: ActionT
           thumbnailPath: action.thumbnailPath,
         },
       }
+    case Actions.SET_PROMPT_FORNO:
+      return {
+        ...state,
+        promptFornoIfNeeded: action.promptIfNeeded,
+      }
+    case Actions.ACCEPT_TERMS: {
+      return { ...state, acceptedTerms: true }
+    }
     default:
       return state
   }
 }
-
-export const devModeSelector = (state: RootState) => state.account.devModeActive
-export const nameSelector = (state: RootState) => state.account.name
-export const e164NumberSelector = (state: RootState) => state.account.e164PhoneNumber
-export const defaultCountryCodeSelector = (state: RootState) => state.account.defaultCountryCode
-export const userContactDetailsSelector = (state: RootState) => state.account.contactDetails
-export const pincodeTypeSelector = (state: RootState) => state.account.pincodeType

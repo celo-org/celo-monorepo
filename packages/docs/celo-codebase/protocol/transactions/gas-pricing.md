@@ -1,25 +1,25 @@
 # Gas Pricing
 
-The Celo protocol uses a minimum gas price which moves as a function of block congestion. The required transaction fee, `minimum gas price * gas amount,` is split between the infrastructure fund and the `gas_recipient` . The rest of the transaction fee is given to the `gas_recipient.` As you might expect, transactions that offer a gas price above the current minimum gas price are accepted while transactions that fail to meet this minimum will be held in the mempool until the minimum gas price falls below the transaction gas price.
+## Gas Price Minimum
 
-The primary reason for the departure from ethereum's transaction fee protocol comes from a requirement for incentive realignment due to the new incentive structure in the Celo protocol design. Without this minimum gas price, full nodes which propagate light client transactions to validators would receive 100% of the transaction fees. This means that transaction construction would be free for full nodes as would a denial-of-service attack on network validators. Therefore, some amount of the transaction fees must not be returned to the full node. Additionally, a simple percentage would not work because it incentivizes side-channels between light clients and full nodes.
+Celo uses a gas market based on [EIP-1559](https://eips.ethereum.org/EIPS/eip-1559). The protocol establishes a **gas price minimum** that applies to all transactions regardless of which validator processes them.
 
-Another constraint that fueled this change was the desire for low transaction fees in order to best serve the target population while maintaining high enough transaction costs to make denial-of-service attacks expensive.
+The gas price minimum will respond to demand, increasing during periods of sustained demand, but allowing temporary spikes in gas demand without price shocks. The Celo protocol aims to have blocks filled at the `target_density`, a certain proportion of the total block gas limit. When blocks are being filled more than the target, the gas price minimum will be raised until demand subsides. If blocks are being filled at less than the target rate, the gas price minimum will decrease until demand rises. The rate of change is determined by a governable parameter, `adjustment_speed`.
 
-This approach, which is based on [EIP-1559](https://eips.ethereum.org/EIPS/eip-1559), provides all of these features. We expect the minimum gas price to be low \(especially in the early days of the protocol\) but, thanks to congestion based pricing, will quickly increase in response to congestion spikes. Additionally, basing pricing on congestion rather than historic gas pricing allows adjustments following gas price spikes to occur more quickly and makes client-side price suggestion much simpler.
+In the Celo protocol, the gas price minimum for the next block is calculated based on the current block:
 
-The minimum gas price is calculated as follows:
+```
+gas_price_minimum' = gas_price_minimum * (1 + ((total_gas_used / block_gas_limit) − target_density) * adjustment_speed) + 1
+```
 
-$$MinGasPrice_1 = MinGasPrice_0 \times ( 1 + ( BlockDensity_0 − TargetDensity ) \times AdjustementSpeed )$$
+Every transaction is required to pay for gas at or above the gas price minimum in order to be processed. Full nodes will reject transactions whose gas price is below the current gas price minimum, and will discard outstanding transactions if the gas price minimum subsequently falls below the gas price that the transactions specify.
 
-With:
+## Selecting a Transaction Gas Price
 
-- $$MinGasPrice_1$$: New minimum gas price
+This approach provides a simple mechanism for clients to determine what gas price they should pay. A `GasPriceMinimum` smart contract provides access to the current gas price minimum. For example, with the parameters specified for the Celo testnets, a gas price of 3x the current gas price minimum will be valid in all scenarios for the following 30 seconds.
 
-- $$MinGasPrice_0$$: Old minimum gas price
+When the client wants to ensure that their transaction is processed quickly, they may wish to further increase the gas price to encourage validators proposing new blocks to include it in preference to other transactions.
 
-- $$BlockDensity_0$$: Block density \(total gas / blockGasLimit\)
+## Transaction Fee Recipients
 
-- $$TargetDensity$$: Governable block target density
-
-- $$AdjustementSpeed$$: Governable adjustment speed
+The required portion of gas fee, known as the **base**, is set as `base = gas_price_minimum * gas_used` and is sent to the [Community Fund](../proof-of-stake/community-fund.md). The rest of the gas fee, known as the **tip**, is rewarded to the validator that proposes the block. Block producers only receive the tip and not the base of the gas fee, which means that they do not have an incentive to artificially inflate the gas price minimum by flooding the network with transactions.

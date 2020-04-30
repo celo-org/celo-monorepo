@@ -1,10 +1,14 @@
 pragma solidity ^0.5.3;
 // solhint-disable no-unused-vars
 
+import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+
 /**
  * @title A mock StableToken for testing.
  */
 contract MockStableToken {
+  using SafeMath for uint256;
+
   uint8 public constant decimals = 18;
   bool public _needsRebase;
   uint256 public _totalSupply;
@@ -24,7 +28,7 @@ contract MockStableToken {
   }
 
   function mint(address to, uint256 value) external returns (bool) {
-    balanceOf[to] = balanceOf[to] + value;
+    balanceOf[to] = balanceOf[to].add(value);
     return true;
   }
 
@@ -47,7 +51,12 @@ contract MockStableToken {
     return _targetTotalSupply;
   }
 
-  function transfer(address, uint256) external pure returns (bool) {
+  function transfer(address to, uint256 value) external returns (bool) {
+    if (balanceOf[msg.sender] < value) {
+      return false;
+    }
+    balanceOf[msg.sender] = balanceOf[msg.sender].sub(value);
+    balanceOf[to] = balanceOf[to].add(value);
     return true;
   }
 

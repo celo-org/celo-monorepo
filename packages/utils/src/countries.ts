@@ -1,3 +1,4 @@
+import { getExampleNumber } from './phoneNumbers'
 const esData = require('@umpirsky/country-list/data/es/country.json')
 import countryData from 'country-data'
 import { notEmpty } from './collections'
@@ -9,6 +10,10 @@ interface CountryNames {
 export interface LocalizedCountry extends countryData.Country {
   displayName: string
   names: CountryNames
+  countryPhonePlaceholder: {
+    national?: string | undefined
+    international?: string | undefined
+  }
 }
 
 const EMPTY_COUNTRY: LocalizedCountry = {
@@ -23,6 +28,7 @@ const EMPTY_COUNTRY: LocalizedCountry = {
   name: '',
   names: {},
   status: '',
+  countryPhonePlaceholder: { national: '', international: '' },
 }
 
 const removeDiacritics = (word: string) =>
@@ -140,6 +146,11 @@ export class Countries {
         const localizedCountry = {
           names,
           displayName: names[this.language],
+          countryPhonePlaceholder: {
+            national: getExampleNumber(country.countryCallingCodes[0]),
+            // Not needed right now
+            // international: getExampleNumber(country.countryCallingCodes[0], true, true),
+          },
           ...country,
         }
 

@@ -1,141 +1,80 @@
-import fs from 'fs'
-import { getBlockscoutClusterInternalUrl } from 'src/lib/endpoints'
-import { addCeloEnvMiddleware, CeloEnvArgv } from 'src/lib/env-utils'
-import { privateKeyToAddress } from 'src/lib/generate_utils'
-import { checkGethStarted, getWeb3AndTokensContracts, simulateClient, sleep } from 'src/lib/geth'
+import sleep from 'sleep-promise'
+import { AccountType, generateAddress } from 'src/lib/generate_utils'
+import { simulateClient } from 'src/lib/geth'
 import * as yargs from 'yargs'
-import { GethArgv } from '../geth'
 
 export const command = 'simulate-client'
 
 export const describe = 'command for simulating client behavior'
 
-const TRANSACTION_RECIPIENT = '0x4da58d267cd465b9313fdb19b120ec591d957ad2'
-
-interface SimulateClientArgv extends CeloEnvArgv, GethArgv {
+interface SimulateClientArgv extends yargs.Argv {
+  blockscoutMeasurePercent: number
+  blockscoutUrl: string
   delay: number
-  privateKey: string
-  blockscout: number
-  loadTestId: string
+  index: number
+  mnemonic: string
+  recipientIndex: number
 }
 
-export const builder = (argv: yargs.Argv) => {
-  return addCeloEnvMiddleware(argv)
-    .option('data-dir', {
-      type: 'string',
-      description: 'path to datadir',
-      demand: 'Please, specify geth datadir',
-    })
-    .option('private-key', {
-      type: 'string',
-      description: 'path to file with private key',
-      demand: 'Please, provide a path to file with account private key',
-      coerce: (path: string) => {
-        if (!fs.existsSync(path)) {
-          throw new Error(`File not found at: ${path}`)
-        }
-        return fs
-          .readFileSync(path)
-          .toString()
-          .trim()
-      },
-    })
-    .option('blockscout', {
+export const builder = () => {
+  return yargs
+    .option('blockscout-measure-percent', {
       type: 'number',
-      description: 'how often to measure blockscout time from on scale from 0 to 100',
+      description:
+        'Percent of transactions to measure the time it takes for blockscout to process a transaction. Should be in the range of [0, 100]',
       default: 100,
+    })
+    .option('blockscout-url', {
+      type: 'string',
+      description:
+        'URL of blockscout used for measuring the time for transactions to be indexed by blockscout',
     })
     .option('delay', {
       type: 'number',
-      description: 'Deplay between sending transactions in seconds',
-      default: 10,
+      description: 'Delay between sending transactions in milliseconds',
+      default: 10000,
     })
-    .option('load-test-id', {
+    .option('index', {
+      type: 'number',
+      description:
+        'Index of the load test account to send transactions from. Used to generate account address',
+      default: 0,
+    })
+    .option('recipient-index', {
+      type: 'number',
+      description:
+        'Index of the load test account to send transactions to. Used to generate account address',
+      default: 0,
+    })
+    .options('mnemonic', {
       type: 'string',
-      description: 'Unique identifier used to distinguish between ran load-tests',
-      demand: 'Please, specify the load test unique identifier',
+      description: 'Mnemonic used to generate account addresses',
+      demand: 'A mnemonic must be provided',
     })
 }
 
 export const handler = async (argv: SimulateClientArgv) => {
-  const dataDir = argv.dataDir
-  const delay = argv.delay
-  const privateKey = argv.privateKey
-  const blockscoutProbability = argv.blockscout
-  const loadTestID = argv.loadTestId
+  // So we can transactions to another load testing account
+  const senderAddress = generateAddress(argv.mnemonic, AccountType.LOAD_TESTING_ACCOUNT, argv.index)
+  const recipientAddress = generateAddress(
+    argv.mnemonic,
+    AccountType.LOAD_TESTING_ACCOUNT,
+    argv.recipientIndex
+  )
 
-  const address = privateKeyToAddress(privateKey).toLowerCase()
-
-  checkGethStarted(dataDir)
-
-  let iterations = 70
-  let web3AndContracts = null
-  outerwhile: while (iterations-- > 0) {
-    try {
-      web3AndContracts = await getWeb3AndTokensContracts()
-      // tslint:disable-next-line: no-shadowed-variable
-      const { web3 } = web3AndContracts!
-      const latestBlock = await web3.eth.getBlock('latest')
-      if (latestBlock.number === 0) {
-        throw new Error('Latest block is zero')
-      } else {
-        break outerwhile
-      }
-    } catch (ignored) {
-      console.warn(ignored.toString())
-      if (iterations === 0) {
-        console.info(
-          JSON.stringify({
-            loadTestID,
-            sender: address.toLowerCase(),
-            receipient: TRANSACTION_RECIPIENT.toLowerCase(),
-            tag: 'geth_start_error',
-            error: ignored.toString(),
-          })
-        )
-      }
-      await sleep(1000)
-    }
-  }
-
-  if (iterations <= 0) {
-    console.warn('Can not wait for geth to sync')
-    console.info(
-      JSON.stringify({
-        loadTestID,
-        sender: address.toLowerCase(),
-        receipient: TRANSACTION_RECIPIENT.toLowerCase(),
-        tag: 'geth_start_unsuccessful',
-      })
-    )
-    process.exit(1)
-  }
-
-  const { web3, goldToken, stableToken } = web3AndContracts!
-
-  // Needs to be called only once per private key
-  // to create a file in keystore containing all the needed to geth info
-  try {
-    await web3.eth.personal.importRawKey(privateKey, '')
-  } catch (ignored) {
-    // ignore
-  }
-
-  // This is needed to turn off debug logging which is made in `sendTransaction`
-  // and needed only for mobile client.
-  console.debug = () => {
-    // empty
-  }
+  // sleep a random amount of time in the range [0, argv.delay] before starting so
+  // that if multiple simulations are started at the same time, they don't all
+  // submit transactions at the same time
+  const sleepMs = Math.random() * argv.delay
+  console.info(`Sleeping for ${sleepMs} ms`)
+  await sleep(sleepMs)
 
   await simulateClient(
-    web3,
-    goldToken,
-    stableToken,
-    address.toLowerCase(),
-    TRANSACTION_RECIPIENT.toLowerCase(),
-    getBlockscoutClusterInternalUrl(argv),
-    delay,
-    blockscoutProbability,
-    loadTestID
+    senderAddress,
+    recipientAddress,
+    argv.delay,
+    argv.blockscoutUrl,
+    argv.blockscoutMeasurePercent,
+    argv.index
   )
 }

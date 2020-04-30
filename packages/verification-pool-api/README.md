@@ -28,9 +28,7 @@ You have two options for deploying to Firebase Functions:
 
 ### 1. Celotool with custom testnet
 
-First, setup a custom testnet that points to your custom pool function.
-To do this, edit the `.env` file in monorepo root directory. Edit the `VERIFICATION_POOL_URL` and `VERIFICATION_REWARDS_URL` fields by replacing in `YOUR_ENV_NAME`.
-Next, deploy your custom testnet. See the [Bootnode](https://github.com/celo-org/bootnode/tree/master/bootnode-coin) project for details.
+Now, deploy your custom testnet. See the [Bootnode](https://github.com/celo-org/bootnode/tree/master/bootnode-coin) project for details.
 
 Finally, deploy your verification pool function.
 For the first deployment:
