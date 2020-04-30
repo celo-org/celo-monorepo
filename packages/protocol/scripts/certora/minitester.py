@@ -29,7 +29,7 @@ def addError(errors, testName, rule, ruleResult, expectedResult="", funcName="")
 def compareResultsWithExpected(testName, rulesResults, expectedRulesResults, assertMessages, expectedAssertionMessages, test):
     global errors
     global warnings
-    
+
     if rulesResults != expectedRulesResults:
         for rule in rulesResults.keys():
             if rule in expectedRulesResults.keys():
@@ -37,28 +37,28 @@ def compareResultsWithExpected(testName, rulesResults, expectedRulesResults, ass
                     if rulesResults[rule] != expectedRulesResults[rule]:
                         test = False
                         errors = addError(errors, testName, rule, rulesResults[rule], expectedRulesResults[rule])
-                        
+
                 else: # nested rule ( ruleName: {result1: [funcionts list], result2: [funcionts list] ... } )
                     expectedFuncSet = getFunctionsSet(expectedRulesResults[rule])
                     gotFuncSet = getFunctionsSet(rulesResults[rule])
-                                        
+
                     #warnings = checkMissingFunctions(warnings, testName, rule, expectedFuncSet, gotFuncSet)
-                    
+
                     for result, funcList in rulesResults[rule].items():
                         funcList.sort()
                         expectedRulesResults[rule][result].sort()
                         if funcList != expectedRulesResults[rule][result]: # compare functions sets (current results with expected)
                             for funcName in funcList:
                                 # if funcion appears in current results but does not appear in the expected ones
-                                if funcName not in expectedRulesResults[rule][result]: 
+                                if funcName not in expectedRulesResults[rule][result]:
                                     test = False
                                     errors = addError(errors, testName, rule, result, "", funcName)
             else:
                 test = False
                 errors+= testName+", "+rule +" is not listed in 'rules'. Expected rules: " + ','.join(expectedRulesResults.keys()) + "\n"
-    
+
     # if assertMessages field is defined (in tester)
-    if expectedAssertionMessages:        
+    if expectedAssertionMessages:
         for rule in expectedAssertionMessages.keys():
             if rule not in assertMessages: # current rule is missing from 'assertMessages' section in current results
                 test = False
@@ -67,7 +67,6 @@ def compareResultsWithExpected(testName, rulesResults, expectedRulesResults, ass
                 test = False
                 errors+= testName+", rule \""+rule +"\": wrong assertion message. Got: \""+assertMessages[rule]+"\". Expected: \"" + expectedAssertionMessages[rule] + "\".\n"
     return test
-    
+
 def get_errors():
     return errors
-    
