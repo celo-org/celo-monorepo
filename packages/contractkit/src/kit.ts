@@ -20,6 +20,7 @@ import { ReserveConfig } from './wrappers/Reserve'
 import { SortedOraclesConfig } from './wrappers/SortedOracles'
 import { StableTokenConfig } from './wrappers/StableTokenWrapper'
 import { ValidatorsConfig } from './wrappers/Validators'
+import { DowntimeSlasherConfig } from './wrappers/DowntimeSlasher'
 
 const debug = debugFactory('kit:kit')
 
@@ -63,6 +64,7 @@ export interface NetworkConfig {
   reserve: ReserveConfig
   stableToken: StableTokenConfig
   validators: ValidatorsConfig
+  downtimeSlasher: DowntimeSlasherConfig
 }
 
 export interface KitOptions {
@@ -135,7 +137,10 @@ export class ContractKit {
   async getNetworkConfig(): Promise<NetworkConfig> {
     const token1 = await this.registry.addressFor(CeloContract.GoldToken)
     const token2 = await this.registry.addressFor(CeloContract.StableToken)
-    const contracts = await Promise.all([
+    // There can only be `10` unique parametrized types in Promise.all call, that is how
+    // its typescript typing is setup. Thus, since we crossed threshold of 10
+    // have to explicitly cast it to just any type and discard type information.
+    const promises: Array<Promise<any>> = [
       this.contracts.getExchange(),
       this.contracts.getElection(),
       this.contracts.getAttestations(),
@@ -146,7 +151,9 @@ export class ContractKit {
       this.contracts.getReserve(),
       this.contracts.getStableToken(),
       this.contracts.getValidators(),
-    ])
+      this.contracts.getDowntimeSlasher(),
+    ]
+    const contracts = await Promise.all(promises)
     const res = await Promise.all([
       contracts[0].getConfig(),
       contracts[1].getConfig(),
@@ -158,6 +165,7 @@ export class ContractKit {
       contracts[7].getConfig(),
       contracts[8].getConfig(),
       contracts[9].getConfig(),
+      contracts[10].getConfig(),
     ])
     return {
       exchange: res[0],
@@ -170,6 +178,7 @@ export class ContractKit {
       reserve: res[7],
       stableToken: res[8],
       validators: res[9],
+      downtimeSlasher: res[10],
     }
   }
 
