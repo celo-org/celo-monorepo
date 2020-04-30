@@ -1,20 +1,17 @@
 import { newKitFromWeb3 } from '@celo/contractkit'
 import { privateKeyToAddress } from '@celo/utils/src/address'
+import { Platform } from 'react-native'
 import * as net from 'react-native-tcp'
-import { call, select, take } from 'redux-saga/effects'
-import { waitForRehydrate } from 'src/app/saga'
+import { select, take } from 'redux-saga/effects'
+import sleep from 'sleep-promise'
 import { DEFAULT_FORNO_URL } from 'src/config'
 import { IPC_PATH } from 'src/geth/geth'
-import networkConfig from 'src/geth/networkConfig'
 import { store } from 'src/redux/store'
 import Logger from 'src/utils/Logger'
-import { contractKitReadySelector } from 'src/web3/selectors'
+import { Actions } from 'src/web3/actions'
+import { contractKitReadySelector, fornoSelector } from 'src/web3/selectors'
 import Web3 from 'web3'
 import { provider } from 'web3-core'
-import { Platform } from 'react-native'
-import { Actions } from 'src/web3/actions'
-import { fornoSelector } from 'src/web3/selectors'
-import sleep from 'sleep-promise'
 
 const tag = 'web3/contracts'
 
@@ -78,19 +75,6 @@ export function getContractKitBasedOnFornoInStore() {
     `Returning kit for ${forno ? 'forno' : 'geth'} mode`
   )
   return forno ? contractKitForno : contractKitGeth
-  // TODO(anna) make sure contractKitReady can be ignored
-  /*
-  const contractKitReady = contractKitReadySelector(store.getState())
-  if (contractKitReady) {
-    return fornoSelector(store.getState()) ? contractKitForno : contractKitGeth
-  } else {
-    throw new Error('Contract Kit not yet ready')
-  }
-  */
-}
-
-export function isInitiallyFornoMode() {
-  return networkConfig.initiallyForno
 }
 
 function getIpcProvider() {
@@ -140,22 +124,6 @@ function getHttpProvider(url: string): provider {
   // })
   return httpProvider
 }
-
-// Mutates web3 with new provider
-/*
-export function switchWeb3ProviderForSyncMode(forno: boolean) {
-  if (forno) {
-    contractKit = newKitFromWeb3(new Web3(getHttpProvider(DEFAULT_FORNO_URL)))
-    Logger.info(
-      `${tag}@switchWeb3ProviderForSyncMode`,
-      `Switch contractKit provider to ${DEFAULT_FORNO_URL}`
-    )
-  } else {
-    contractKit = newKitFromWeb3(new Web3(getIpcProvider()))
-    Logger.info(`${tag}@switchWeb3ProviderForSyncMode`, `Set contractKit provider to IPC provider`)
-  }
-}
-*/
 
 export function addLocalAccount(privateKey: string, isDefault: boolean = false) {
   if (!privateKey) {

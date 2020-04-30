@@ -36,21 +36,11 @@ enum GethInitOutcomes {
 export function* waitForGethConnectivity() {
   const connected = yield select(isGethConnectedSelector)
   if (connected) {
-    Logger.debug(TAG, 'waitForGethConnectivity Geth connected, returning')
     return
   }
-  Logger.debug(TAG, 'waitForGethConnectivity Geth not yet connected')
   while (true) {
-    Logger.debug(TAG, 'waitForGethConnectivity Checking if geth now connected... ')
-    const nowConnected = yield select(isGethConnectedSelector)
-    Logger.debug(TAG, `waitForGethConnectivity geth now connected? ${nowConnected}`)
-
     const action = yield take(Actions.SET_GETH_CONNECTED)
-    // TODO(anna) missing SET GETH CONNECTED action between
-    Logger.debug(TAG, `waitForGethConnectivity got new action: ${action}`)
-
     if (action.connected) {
-      Logger.debug(TAG, `waitForGethConnectivity geth now connected?, returning`)
       return
     }
   }
@@ -160,7 +150,6 @@ function* monitorGeth() {
       if (newBlock) {
         Logger.debug(`${TAG}@monitorGeth`, 'Received new blocks')
         yield put(setGethConnected(true))
-        Logger.debug(`${TAG}@monitorGeth`, 'setGethConnected to true')
         yield delay(GETH_MONITOR_DELAY)
       } else {
         Logger.error(
@@ -168,7 +157,6 @@ function* monitorGeth() {
           `Did not receive a block in ${NEW_BLOCK_TIMEOUT} milliseconds`
         )
         yield put(setGethConnected(false))
-        Logger.debug(`${TAG}@monitorGeth`, 'setGethConnected to false')
       }
     } catch (error) {
       Logger.error(`${TAG}@monitorGeth`, error)
@@ -194,11 +182,10 @@ export function* gethSaga() {
   yield take(Actions.CANCEL_GETH_SAGA)
   yield cancel(gethRelatedSagas)
   yield put(setGethConnected(true))
-  Logger.debug(`${TAG}@monitorGeth`, 'setGethConnected to true')
 }
 
 export function* gethSagaIfNecessary() {
-  yield call(waitForRehydrate)
+  yield call(waitForRehydrate) // Wait for rehydrate to know if geth or forno
   yield put(setContractKitReady(true))
   if (!(yield select(fornoSelector))) {
     Logger.debug(`${TAG}@gethSagaIfNecessary`, `Starting geth saga...`)

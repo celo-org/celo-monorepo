@@ -13,7 +13,6 @@ import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { currentLanguageSelector } from 'src/app/reducers'
-import { waitForRehydrate } from 'src/app/saga'
 import { getWordlist } from 'src/backup/utils'
 import { features } from 'src/flags'
 import { cancelGethSaga } from 'src/geth/actions'
@@ -32,6 +31,7 @@ import {
   completeWeb3Sync,
   setAccount,
   setAccountInWeb3Keystore,
+  setContractKitReady,
   setFornoMode,
   SetIsFornoAction,
   setPrivateCommentKey,
@@ -47,7 +47,6 @@ import {
 } from 'src/web3/selectors'
 import { getLatestBlock, isAccountLocked } from 'src/web3/utils'
 import { Block } from 'web3-eth'
-import { setContractKitReady } from 'src/web3/actions'
 
 const TAG = 'web3/saga'
 
@@ -118,11 +117,6 @@ export function* waitForWeb3Sync() {
       timeout: delay(SYNC_TIMEOUT),
       fornoSwitch: take(Actions.TOGGLE_IS_FORNO),
     })
-    // TODO(anna) hitting timeout upon switch, want to catch using fornoSwitch instead
-    Logger.debug(
-      `${TAG}@waitForWeb3Sync`,
-      `syncComplete: ${syncComplete}, timeout: ${timeout}, fornoSwitch: ${fornoSwitch}`
-    )
     if (fornoSwitch) {
       Logger.debug(
         `${TAG}@waitForWeb3Sync`,
