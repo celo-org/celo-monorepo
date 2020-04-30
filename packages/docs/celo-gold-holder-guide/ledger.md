@@ -56,7 +56,7 @@ You will see `Pending Ledger review` on the device’s screen.
 
 {% hint style="info" %}
 `Pending Ledger review` means that the Celo app is approved to be in the developer store but undergoing additional reviews by the Leger team to be approved in the public store.
- {% endhint %}
+{% endhint %}
 
 Press both buttons on the device at the same time to continue.
 
@@ -108,15 +108,18 @@ celocli account:list --useLedger --ledgerAddresses 1
 
 {% hint style="tip" %}
 If you wish to generate more than one address from your seed phrase, you can display the first `N` (e.g. 10) addresses use the `--ledgerAddresses` flag.
+
 ```bash
 celocli account:list --useLedger --ledgerAddresses N
 ```
 
 To display addresses at specific indexes `M`and `N`(e. 2 and 654) use the `--ledgerCustomAddresses "[M, N]"`flag
+
 ```bash
 celocli account:list --useLedger --ledgerCustomAddresses "[M, N]"
 ```
- {% endhint %}
+
+{% endhint %}
 
 {% hint style="tip" %}
 **Advanced:** Celo uses a [BIP-32](https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki) derivation path of `m/44'/52752'/0/0/index`, where `index >= 0`.  
@@ -150,7 +153,7 @@ Perform a test transaction by running the following command:
 celocli transfer:gold --from=<your-address> --to=0x0000000000000000000000000000000000000001 --value=10000 --useLedger
 ```
 
-You'll need to then approve the transaction on the Ledger device. Toggle right on the device until you see `Approve` on screen. Press both buttons at the same time to confirm.  
+You'll need to then approve the transaction on the Ledger device. Toggle right on the device until you see `Approve` on screen. Press both buttons at the same time to confirm.
 
 Finally, you can see if your transaction was mined on the network by copying the transaction hash (txHash) outputted by the command, and searching for it on the [Alfajores Block Explorer](https://alfajores-blockscout.celo-testnet.org/).
 
@@ -177,12 +180,12 @@ celocli account:authorize --from $LOCKED_GOLD_ACCOUNT --role vote --signer $SIGN
 celocli release-gold:authorize --contract $RELEASE_GOLD_CONTRACT_ADDRESS --role vote --signer $SIGNER_TO_AUTHORIZE --signature $SIGNER_PROOF_OF_POSSESSION --useLedger
 ```
 
-## Troubleshooting <a id="troubleshooting"></a>
+## Troubleshooting
 
 If you have issues connecting to the Ledger, try the following:
 
-* Check that the Ledger device is connected, powered on, and that you've unlocked it using the PIN.
-* Check that no other applications are using the device. Close Ledger Live. Stop any local Celo Blockchain node, or ensure it is run with the `--nousb` option.
-* Try unplugging and replugging the device. Some devices appear to trigger a warning on Macs saying: “USB Devices Disabled. Unplug the device using too much power to re-enable USB devices” which is usually resolved by reconnecting.
-* Ensure that you are using the original cable supplied with your Ledger.
-* Ensure that your Ledger has the [latest firmware](https://support.ledger.com/hc/en-us/articles/360002731113-Update-device-firmware). For Ledger Nano S, a firmware version of 1.6 or later is required.
+- Check that the Ledger device is connected, powered on, and that you've unlocked it using the PIN.
+- Check that no other applications are using the device. Close Ledger Live. Stop any local Celo Blockchain node, or ensure it is run with the `--nousb` option.
+- Try unplugging and replugging the device. Some devices appear to trigger a warning on Macs saying: “USB Devices Disabled. Unplug the device using too much power to re-enable USB devices” which is usually resolved by reconnecting.
+- Ensure that you are using the original cable supplied with your Ledger.
+- Ensure that your Ledger has the [latest firmware](https://support.ledger.com/hc/en-us/articles/360002731113-Update-device-firmware). For Ledger Nano S, a firmware version of 1.6 or later is required.
