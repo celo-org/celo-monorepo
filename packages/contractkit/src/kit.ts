@@ -11,6 +11,7 @@ import { toTxResult, TransactionResult } from './utils/tx-result'
 import { Wallet } from './wallets/wallet'
 import { Web3ContractCache } from './web3-contract-cache'
 import { AttestationsConfig } from './wrappers/Attestations'
+import { DowntimeSlasherConfig } from './wrappers/DowntimeSlasher'
 import { ElectionConfig } from './wrappers/Election'
 import { ExchangeConfig } from './wrappers/Exchange'
 import { GasPriceMinimumConfig } from './wrappers/GasPriceMinimum'
@@ -20,7 +21,6 @@ import { ReserveConfig } from './wrappers/Reserve'
 import { SortedOraclesConfig } from './wrappers/SortedOracles'
 import { StableTokenConfig } from './wrappers/StableTokenWrapper'
 import { ValidatorsConfig } from './wrappers/Validators'
-import { DowntimeSlasherConfig } from './wrappers/DowntimeSlasher'
 
 const debug = debugFactory('kit:kit')
 
