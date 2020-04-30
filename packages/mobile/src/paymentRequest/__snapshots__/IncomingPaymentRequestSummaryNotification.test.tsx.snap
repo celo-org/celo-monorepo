@@ -162,7 +162,6 @@ exports[`IncomingPaymentRequestSummaryNotification renders correctly 1`] = `
           <View
             accessible={true}
             focusable={true}
-            isTVSelectable={true}
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackgroundBorderless",
@@ -234,7 +233,6 @@ exports[`IncomingPaymentRequestSummaryNotification when more 1 requests renders 
       <View
         accessible={true}
         focusable={true}
-        isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackground",
@@ -386,7 +384,6 @@ exports[`IncomingPaymentRequestSummaryNotification when more 1 requests renders 
                 <View
                   accessible={true}
                   focusable={true}
-                  isTVSelectable={true}
                   nativeBackgroundAndroid={
                     Object {
                       "attribute": "selectableItemBackgroundBorderless",
@@ -422,7 +419,6 @@ exports[`IncomingPaymentRequestSummaryNotification when more 1 requests renders 
                 <View
                   accessible={true}
                   focusable={true}
-                  isTVSelectable={true}
                   nativeBackgroundAndroid={
                     Object {
                       "attribute": "selectableItemBackgroundBorderless",
@@ -627,7 +623,6 @@ exports[`IncomingPaymentRequestSummaryNotification when more than 2 requests ren
           <View
             accessible={true}
             focusable={true}
-            isTVSelectable={true}
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackgroundBorderless",
