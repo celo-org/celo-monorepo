@@ -67,7 +67,7 @@
     "@types/humanize-duration": "^3.18.0",
     "globby": "^8",
     "prettier": "1.19.1",
-    "typescript": "^3.7.3"
+    "typescript": "^3.8.3"
   },
   "files": [
     "README.md",
