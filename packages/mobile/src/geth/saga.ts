@@ -47,7 +47,10 @@ export function* waitForGethConnectivity() {
 
     const action = yield take(Actions.SET_GETH_CONNECTED)
     // TODO(anna) missing SET GETH CONNECTED action between
+    Logger.debug(TAG, `waitForGethConnectivity got new action: ${action}`)
+
     if (action.connected) {
+      Logger.debug(TAG, `waitForGethConnectivity geth now connected?, returning`)
       return
     }
   }
