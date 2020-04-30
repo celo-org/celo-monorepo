@@ -1,4 +1,5 @@
 import { Response } from 'firebase-functions'
+import logger from './logger'
 
 export enum ErrorMessages {
   UNKNOWN_ERROR = 'CELO_PNP_ERR_00 Something went wrong',
@@ -9,8 +10,10 @@ export enum ErrorMessages {
   EXCEEDED_QUOTA = 'CELO_PNP_ERR_05 Requester exceeded salt service query quota',
   SIGNATURE_COMPUTATION_FAILURE = 'CELO_PNP_ERR_06 Failed to compute BLS signature',
   DUPLICATE_REQUEST_TO_MATCHMAKE = 'CELO_PNP_ERR_08 Attempt to request >1 matchmaking',
+  UNVERIFIED_USER_ATTEMPT_TO_MATCHMAKE = 'CELO_PNP_ERR_09 Unverified user attempting to matchmake',
 }
 
-export function respondWithError(res: Response, statusCode: number, error: string) {
+export function respondWithError(res: Response, statusCode: number, error: ErrorMessages) {
+  logger.error('Responding with error', error)
   res.status(statusCode).json({ success: false, error })
 }

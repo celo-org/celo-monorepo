@@ -48,6 +48,7 @@ interface PersistedStateProps {
   redeemComplete: boolean
   account: string | null
   hasSeenVerificationNux: boolean
+  acceptedTerms: boolean
 }
 
 const mapStateToProps = (state: PersistedRootState): PersistedStateProps | null => {
@@ -61,6 +62,7 @@ const mapStateToProps = (state: PersistedRootState): PersistedStateProps | null 
     redeemComplete: state.invite.redeemComplete,
     account: state.web3.account,
     hasSeenVerificationNux: state.identity.hasSeenVerificationNux,
+    acceptedTerms: state.account.acceptedTerms,
   }
 }
 
@@ -91,6 +93,7 @@ export function* navigateToProperScreen() {
     redeemComplete,
     account,
     hasSeenVerificationNux,
+    acceptedTerms,
   } = mappedState
 
   const deepLink = yield call(Linking.getInitialURL)
@@ -111,6 +114,8 @@ export function* navigateToProperScreen() {
     navigate(Screens.SetClock)
   } else if (!e164Number) {
     navigate(Screens.JoinCelo)
+  } else if (!acceptedTerms) {
+    navigate(Screens.RegulatoryTerms)
   } else if (pincodeType === PincodeType.Unset) {
     navigate(Screens.PincodeEducation)
   } else if (!redeemComplete && !account) {

@@ -5,6 +5,8 @@ import { EncodedTransaction, Tx } from 'web3-core'
 import { recoverTransaction, verifyEIP712TypedDataSigner } from '../utils/signing-utils'
 import { LocalWallet } from './local-wallet'
 
+const CHAIN_ID = 44378
+
 // Sample data from the official EIP-712 example:
 // https://github.com/ethereum/EIPs/blob/master/assets/eip-712/Example.js
 const TYPED_DATA = {
@@ -135,12 +137,12 @@ describe('Local wallet class', () => {
             celoTransaction = {
               from: knownAddress,
               to: otherAddress,
-              chainId: 2,
+              chainId: CHAIN_ID,
               value: Web3.utils.toWei('1', 'ether'),
               nonce: 0,
               gas: '10',
               gasPrice: '99',
-              feeCurrency: '0x124356',
+              feeCurrency: '0x',
               gatewayFeeRecipient: '0x1234',
               gatewayFee: '0x5678',
               data: '0xabcdef',
@@ -153,6 +155,33 @@ describe('Local wallet class', () => {
 
           test('with same signer', async () => {
             const signedTx: EncodedTransaction = await wallet.signTransaction(celoTransaction)
+            const [, recoveredSigner] = recoverTransaction(signedTx.raw)
+            expect(normalizeAddressWith0x(recoveredSigner)).toBe(
+              normalizeAddressWith0x(knownAddress)
+            )
+          })
+
+          // https://github.com/ethereum/go-ethereum/blob/38aab0aa831594f31d02c9f02bfacc0bef48405d/rlp/decode.go#L664
+          test('signature with 0x00 prefix is canonicalized', async () => {
+            // This tx is carefully constructed to produce an S value with the first byte as 0x00
+            const celoTransactionZeroPrefix = {
+              from: ACCOUNT_ADDRESS1,
+              to: ACCOUNT_ADDRESS2,
+              chainId: CHAIN_ID,
+              value: Web3.utils.toWei('1', 'ether'),
+              nonce: 65,
+              gas: '10',
+              gasPrice: '99',
+              feeCurrency: '0x',
+              gatewayFeeRecipient: '0x1234',
+              gatewayFee: '0x5678',
+              data: '0xabcdef',
+            }
+
+            const signedTx: EncodedTransaction = await wallet.signTransaction(
+              celoTransactionZeroPrefix
+            )
+            expect(signedTx.tx.s.startsWith('0x00')).toBeFalsy()
             const [, recoveredSigner] = recoverTransaction(signedTx.raw)
             expect(normalizeAddressWith0x(recoveredSigner)).toBe(
               normalizeAddressWith0x(knownAddress)
