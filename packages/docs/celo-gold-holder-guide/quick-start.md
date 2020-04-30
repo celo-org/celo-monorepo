@@ -92,14 +92,14 @@ If you have more than one beneficiary address, you'll want to step through this 
 
 If you cannot locate your address in these mappings, please contact cLabs.
 
-Record the `Beneficiary` and `ContractAddress` values in environment variables:
+Record the `Beneficiary` and ContractAddress` values in environment variable:
 
 ```bash
 export CELO_BENEFICIARY_ADDRESS=<YOUR-CELO-BENEFICIARY-ADDRESS>
 export CELO_RG_ADDRESS=<YOUR-CELO-RELEASEGOLD-ADDRESS>
 ```
 
-You should find your beneficiary account already has a small Celo Gold balance to pay for transaction fees (values are shown in wei, so For example, 1 cGLD = 1000000000000000000):
+You should find your beneficiary account has already got a very small Celo Gold balance to pay for transaction fees (values are shown in wei, so For example, 1 cGLD = 1000000000000000000):
 
 ```bash
 celocli account:balance $CELO_BENEFICIARY_ADDRESS
@@ -185,7 +185,7 @@ Now, using the proof-of-possession you generated above, as the Locked Gold Accou
 celocli releasegold:authorize --contract $CELO_RG_ADDRESS --role=vote --signer $CELO_VOTE_SIGNER_ADDRESS --signature $CELO_VOTE_SIGNER_SIGNATURE --useLedger
 ```
 
-Verify that your signer was correctly authorized:
+Finally, verify that your signer was correctly authorized.
 
 ```bash
 celocli account:show $CELO_RG_ADDRESS
@@ -193,13 +193,15 @@ celocli account:show $CELO_RG_ADDRESS
 
 The `vote` address under `authorizedSigners` should match `$CELO_VOTE_SIGNER_ADDRESS`.
 
-This operation also transfers 1 cGLD to the vote signer address, for you to use for transaction fees.
-
 ## Lock Celo Gold
 
-To vote for validator groups and on governance proposals you will need to lock Celo Gold. This is to keep the network secure by making sure each unit of Celo Gold can only be used to vote once. 
+To vote for validator groups and on governance proposals you will need to lock Celo Gold. This is to keep the network secure by making sure each unit of Celo Gold can only be used to vote once. `ReleaseGold` contracts that permit voting
 
 Specify the amount of Celo Gold you wish to lock (don’t include the  `< >`  braces).  All amounts are given as wei, i.e units of 10^-18 Celo Gold. For example, 1 cGLD = 1000000000000000000.
+
+{% hint style="warning" %}
+Make sure to leave at least 1 Celo Gold unlocked to pay for transaction fees.
+{% endhint %}
 
 ```bash
 # Using the Beneficiary Ledger
@@ -211,10 +213,6 @@ Check that your Celo Gold was successfully locked.
 ```bash
 celocli lockedgold:show $CELO_RG_ADDRESS
 ```
-
-{% hint style="warning" %}
-Don't lock the small amounts of Celo Gold in your beneficiary account or vote signer account. You may need this to pay for transaction fees.
-{% endhint %}
 
 ## Vote for a Validator Group
 
