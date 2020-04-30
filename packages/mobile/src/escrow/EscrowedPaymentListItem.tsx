@@ -3,7 +3,6 @@ import fontStyles from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { Trans, WithTranslation } from 'react-i18next'
 import { Image, StyleSheet, Text, View } from 'react-native'
-import { connect } from 'react-redux'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
@@ -17,23 +16,15 @@ import { InviteDetails } from 'src/invite/actions'
 import { sendSms } from 'src/invite/saga'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import { RootState } from 'src/redux/reducers'
 import { divideByWei } from 'src/utils/formatting'
 import Logger from 'src/utils/Logger'
 
 interface OwnProps {
   payment: EscrowedPayment
-}
-
-interface StateProps {
   invitees: InviteDetails[]
 }
 
-const mapStateToProps = (state: RootState): StateProps => ({
-  invitees: state.invite.invitees,
-})
-
-type Props = OwnProps & WithTranslation & StateProps
+type Props = OwnProps & WithTranslation
 
 const TAG = 'EscrowedPaymentListItem'
 
@@ -145,7 +136,5 @@ const styles = StyleSheet.create({
 })
 
 export default componentWithAnalytics(
-  connect<StateProps, {}, {}, RootState>(mapStateToProps)(
-    withTranslation(Namespaces.inviteFlow11)(EscrowedPaymentListItem)
-  )
+  withTranslation(Namespaces.inviteFlow11)(EscrowedPaymentListItem)
 )
