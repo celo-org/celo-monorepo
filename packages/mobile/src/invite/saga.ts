@@ -166,6 +166,19 @@ export function* sendInvite(
       }
     )
 
+    const inviteDetails: InviteDetails = {
+      timestamp: Date.now(),
+      e164Number,
+      tempWalletAddress: temporaryAddress,
+      tempWalletPrivateKey: temporaryWalletAccount.privateKey,
+      tempWalletRedeemed: false, // no logic in place to toggle this yet
+      inviteCode,
+      inviteLink: link,
+    }
+
+    // Store the Temp Address locally so we know which transactions were invites
+    yield put(storeInviteeData(inviteDetails))
+
     const txId = generateStandbyTransactionId(temporaryAddress)
 
     yield put(
@@ -196,19 +209,6 @@ export function* sendInvite(
     } else {
       Logger.error(TAG, 'Currently only dollar escrow payments are allowed')
     }
-
-    const inviteDetails: InviteDetails = {
-      timestamp: Date.now(),
-      e164Number,
-      tempWalletAddress: temporaryAddress,
-      tempWalletPrivateKey: temporaryWalletAccount.privateKey,
-      tempWalletRedeemed: false, // no logic in place to toggle this yet
-      inviteCode,
-      inviteLink: link,
-    }
-
-    // Store the Temp Address locally so we know which transactions were invites
-    yield put(storeInviteeData(inviteDetails))
 
     const e164NumberToAddress = { [e164Number]: null } // null means the number is unverified
     const addressToE164Number = { [temporaryAddress]: e164Number }

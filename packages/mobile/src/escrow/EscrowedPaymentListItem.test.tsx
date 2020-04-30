@@ -25,7 +25,7 @@ describe('EscrowedPaymentReminderNotification', () => {
     expect(tree).toMatchSnapshot()
   })
 
-  it('sends an SMS reminder on Andorid as expected', async () => {
+  it('sends an SMS reminder on Android as expected', async () => {
     Platform.OS = 'android'
     const contact = render(
       <Provider store={store}>
