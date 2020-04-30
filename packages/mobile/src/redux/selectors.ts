@@ -33,7 +33,7 @@ export const isAppConnected = createSelector(
   contractKitReadySelector,
   isGethConnectedSelector,
   getNetworkConnected,
-  (fornoEnabled, gethConnected, contractKitReady, networkConnected) =>
+  (fornoEnabled, contractKitReady, gethConnected, networkConnected) =>
     (fornoEnabled || gethConnected) && contractKitReady && networkConnected
 )
 
