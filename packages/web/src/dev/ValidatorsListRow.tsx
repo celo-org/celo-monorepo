@@ -14,7 +14,11 @@ const unknownValidatorName = 'Unnamed Validator'
 
 class Text extends RNText {
   render() {
-    return <RNText style={[styles.defaultText, this.props.style]}>{this.props.children}</RNText>
+    return (
+      <RNText {...this.props} style={[styles.defaultText, this.props.style]}>
+        {this.props.children}
+      </RNText>
+    )
   }
 }
 
@@ -91,7 +95,6 @@ class ValidatorsListRow extends React.PureComponent<Props & I18nProps, State> {
     const { group, expanded } = this.props
     const { tooltip } = this.state
     const stopPropagation = (event: any) => {
-      event.preventDefault()
       event.stopPropagation()
     }
     const toggleTooltip = (event: any) => {
@@ -131,7 +134,15 @@ class ValidatorsListRow extends React.PureComponent<Props & I18nProps, State> {
                         <Text style={[styles.tooltip]}>
                           {group.claims.map((domain, i) => (
                             <Text key={domain} style={[styles.tooltipRow]}>
-                              {i + 1}. <Text style={[styles.tooltipText]}>{domain}</Text>
+                              {i + 1}.
+                              <Text
+                                accessibilityRole="link"
+                                target="_blank"
+                                href={`https://${domain}`}
+                                style={[styles.tooltipText]}
+                              >
+                                {domain}
+                              </Text>
                               <Text style={[styles.checkmark]}>
                                 <Checkmark color={colors.black} size={8} />
                               </Text>

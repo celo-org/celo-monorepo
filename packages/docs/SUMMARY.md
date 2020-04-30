@@ -17,17 +17,22 @@
   - [Getting an Account and Funds](getting-started/faucet.md)
 - [Glossary](GLOSSARY.md)
 
+## Celo Gold Holder Guide
+- [Quick Start](celo-gold-holder-guide/quick-start.md)
+- [Using a Ledger Wallet](celo-gold-holder-guide/ledger.md)
+- [Understanding ReleaseGold](celo-gold-holder-guide/release-gold.md)
+- [Voting on Governance](celo-gold-holder-guide/voting-governance.md)
+<!-- - [Voting on Validator Groups](celo-gold-holder-guide/voting-validators.md) -->
+
 ## Validator Guide
 
 - [Key Management](operations-manual/key-management/summary.md)
   - [Detailed Role Descriptions](operations-manual/key-management/detailed.md)
   - [Validator Signer Key Rotation](operations-manual/key-management/key-rotation.md)
-  - [Using a Ledger Wallet](operations-manual/key-management/ledger.md)
 - [Celo Foundation Voting Policy](operations-manual/celo-foundation-voting-policy.md)
 - [Securing Celo Nodes and Services](operations-manual/securing-nodes-and-services.md)
 - [Upgrading a Node](operations-manual/node-upgrades.md)
 - [Validator Explorer](operations-manual/validator-explorer.md)
-- [Governance](operations-manual/governance.md)
 
 ## Developer Guide
 - [Quick Start](developer-resources/start.md)
@@ -414,7 +419,6 @@
     - [Stability Fees](celo-codebase/protocol/stability/stability-fees.md)
     - [Tobin Tax](celo-codebase/protocol/stability/tobin-tax.md)
   - [Privacy](celo-codebase/protocol/privacy.md)
-  - [ReleaseGold](celo-codebase/protocol/release-gold/README.md)
 - [Celo Wallet](celo-codebase/wallet/README.md)
   - [Running the Wallet Locally](celo-codebase/wallet/intro.md)
   - [Wallet Functionality](celo-codebase/wallet/how-the-wallet-works/README.md)
