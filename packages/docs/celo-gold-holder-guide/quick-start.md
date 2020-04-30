@@ -61,14 +61,19 @@ If you haven't already, open a terminal window and install the Celo CLI:
 You will now need to point the Celo CLI to a node that is synchronized with the [Release Candidate](../getting-started/rc1.md) network. There are two options:
 
 * **Local Celo Blockchain node**: You can run a full node on your local machine which will communicate
-  with other nodes and cryptographically verify all data it receives. Since this approach does not require you to trust the network, it is most secure. To do this, follow the tutorial for [running a full node](../getting-started/running-a-full-node-in-rc1.md) (and make sure to pass `--nousb`). Then run:
+  with other nodes and cryptographically verify all data it receives. Since this approach does not require you to trust the network, it is most secure. 
+  
+  To do this, follow the tutorial for [running a full node](../getting-started/running-a-full-node-in-rc1.md) (and make sure to pass `--nousb`). 
+  
+  Then run:
 
   ```bash
   celocli config:set --node http://localhost:8545
   ```
 
-* **cLabs-operated node**: cLabs operates a transaction node service called Forno.
-While this approach does not require you to deploy a node locally, it requires you to trust cLabs and the remote Forno nodes (in the same way you would trust a centralized web service). An attacker may be able to manipulate data returned to you from the service, which the CLI may rely on to complete operations.
+* **cLabs-operated node**: As an alternative to using your own node, you can use existing an transaction
+  nodes service. Forno, operated by cLabs, is one example. While this approach does not require you to deploy a node locally, it requires you to trust cLabs and the remote Forno nodes (in the same way you would trust a centralized web service). An attacker may be able to manipulate data returned to you from the service, which the CLI may rely on to complete operations.
+  
   To use Forno, run this command:
 
   ```bash
