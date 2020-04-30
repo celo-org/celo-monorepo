@@ -30,10 +30,10 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import Avatar from 'src/components/Avatar'
 import CurrencyDisplay, { FormatType } from 'src/components/CurrencyDisplay'
 import {
+  DAILY_PAYMENT_LIMIT_CUSD,
   DOLLAR_TRANSACTION_MIN_AMOUNT,
   MAX_COMMENT_LENGTH,
   NUMBER_INPUT_MAX_DECIMALS,
-  DAILY_PAYMENT_LIMIT_CUSD,
 } from 'src/config'
 import { FeeType } from 'src/fees/actions'
 import EstimateFee from 'src/fees/EstimateFee'
@@ -45,8 +45,8 @@ import { RecipientVerificationStatus } from 'src/identity/contactMapping'
 import { E164NumberToAddressType } from 'src/identity/reducer'
 import { LocalCurrencyCode, LocalCurrencySymbol } from 'src/localCurrency/consts'
 import {
-  convertDollarsToMaxSupportedPrecision,
   convertDollarsToLocalAmount,
+  convertDollarsToMaxSupportedPrecision,
   convertLocalAmountToDollars,
 } from 'src/localCurrency/convert'
 import { getLocalCurrencyCode, getLocalCurrencyExchangeRate } from 'src/localCurrency/selectors'
@@ -63,7 +63,7 @@ import { RootState } from 'src/redux/reducers'
 import { PaymentInfo } from 'src/send/reducers'
 import { getRecentPayments } from 'src/send/selectors'
 import { ConfirmationInput } from 'src/send/SendConfirmation'
-import { isPaymentLimitReached, dailyAmountRemaining } from 'src/send/utils'
+import { dailyAmountRemaining, isPaymentLimitReached } from 'src/send/utils'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { fetchDollarBalance } from 'src/stableToken/actions'
 import { withDecimalSeparator } from 'src/utils/withDecimalSeparator'
