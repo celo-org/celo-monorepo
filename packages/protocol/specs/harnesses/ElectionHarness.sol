@@ -7,51 +7,50 @@ contract ElectionHarness is Election {
   LockedGoldHarness lockedGold;
   Accounts accounts;
 
-
   /*** override the getters for the other contracts so we can link to the contract ****/
   function getLockedGold() internal view returns (ILockedGold) {
     return lockedGold;
   }
-  
+
   /*** override the getters for the other contracts so we can link to the contract ****/
   function getLockedGoldFromSepc() public view returns (ILockedGold) {
     return lockedGold;
   }
 
   function getAccounts() internal view returns (IAccounts) {
-	return accounts;
+    return accounts;
   }
-  
-  
-    //Account wrappers
-  function getVoteSignerToAccount() public view returns (address) { 
+
+  //Account wrappers
+  function getVoteSignerToAccount() public view returns (address) {
     return accounts.voteSignerToAccount(msg.sender);
   }
-  
-    //lockedGold wrappers
+
+  //lockedGold wrappers
   function getTotalLockedGold(address account) public view returns (uint256) {
-    return lockedGold.getAccountNonvotingLockedGold(account).add(lockedGold.getTotalPendingWithdrawals(account));
+    return
+      lockedGold.getAccountNonvotingLockedGold(account).add(
+        lockedGold.getTotalPendingWithdrawals(account)
+      );
   }
 
   function getPendingWithdrawalsLength(address account) external view returns (uint256) {
     return lockedGold.getPendingWithdrawalsLength(account);
   }
-  
+
   function getTotalPendingWithdrawals(address account) public view returns (uint256) {
     return lockedGold.getTotalPendingWithdrawals(account);
   }
-  
+
   function getAccountNonvotingLockedGold(address account) public view returns (uint256) {
     return lockedGold.getAccountNonvotingLockedGold(account);
   }
-  
- 
+
   function ercBalance(address a) public view returns (uint256) {
     return a.balance;
   }
 
-
-function getActiveVoteUnitsForGroupByAccount(address group, address account)
+  function getActiveVoteUnitsForGroupByAccount(address group, address account)
     public
     view
     returns (uint256)
@@ -59,20 +58,17 @@ function getActiveVoteUnitsForGroupByAccount(address group, address account)
     return votes.active.forGroup[group].unitsByAccount[account];
   }
 
-
-
-/*** override functions with non linear operations */
-/*
+  /*** override functions with non linear operations */
+  /*
 toVotes(uint units, uint totalVotes,uint totalUnits) → uint
 */
-mapping(uint256 => mapping( uint256 => mapping (uint256 => uint256))) toVotesGhost;
+  mapping(uint256 => mapping(uint256 => mapping(uint256 => uint256))) toVotesGhost;
 
   function votesToUnits(address group, uint256 value) internal view returns (uint256) {
     //return toVotes(value,votes.active.forGroup[group].total,);
-    if (value==votes.active.forGroup[group].total)
-      return votes.active.forGroup[group].totalUnits;
+    if (value == votes.active.forGroup[group].total) return votes.active.forGroup[group].totalUnits;
     else {
-      require(value < votes.active.forGroup[group].totalUnits );
+      require(value < votes.active.forGroup[group].totalUnits);
       return value;
     }
     /*FixidityLib.Fraction memory fixedValue = FixidityLib.newFixed(value);
@@ -86,7 +82,11 @@ mapping(uint256 => mapping( uint256 => mapping (uint256 => uint256))) toVotesGho
     }*/
   }
 
-  function toVotes(uint256 value, uint256 totalVotes, uint256 totalunits) public view returns (uint256) {
+  function toVotes(uint256 value, uint256 totalVotes, uint256 totalunits)
+    public
+    view
+    returns (uint256)
+  {
     return toVotesGhost[value][totalVotes][totalunits];
   }
 
@@ -100,14 +100,12 @@ mapping(uint256 => mapping( uint256 => mapping (uint256 => uint256))) toVotesGho
     //FixidityLib.Fraction memory fixedValue = FixidityLib.wrap(value);
     if (votes.active.forGroup[group].totalUnits == 0) {
       return 0;
-    } 
-    else {
-      if (votes.active.forGroup[group].totalUnits==value) {
+    } else {
+      if (votes.active.forGroup[group].totalUnits == value) {
         return votes.active.forGroup[group].total;
-      }
-      else {
+      } else {
         return value;
-      /*  return
+        /*  return
           fixedValue.multiply(FixidityLib.newFixed(votes.active.forGroup[group].total)).unwrap().div(
             votes.active.forGroup[group].totalUnits
           );
@@ -117,41 +115,41 @@ mapping(uint256 => mapping( uint256 => mapping (uint256 => uint256))) toVotesGho
   }
 
   // overriding to havoc more
-  mapping (uint256 => mapping (uint256 => bytes32)) input_validatorSignerAddressFromCurrentSet;
-  mapping (uint256 => mapping (uint256 => bytes32)) input_validatorSignerAddressFromSet;
-   function validatorSignerAddressFromCurrentSet(uint256 index) public view returns (address) {
+  mapping(uint256 => mapping(uint256 => bytes32)) input_validatorSignerAddressFromCurrentSet;
+  mapping(uint256 => mapping(uint256 => bytes32)) input_validatorSignerAddressFromSet;
+  function validatorSignerAddressFromCurrentSet(uint256 index) public view returns (address) {
     bytes memory out;
     bool success;
     // let's not pack stuff and this will be easier on the solver
     bytes32 _input = input_validatorSignerAddressFromCurrentSet[index][block.number];
     bytes memory input = new bytes(32);
     assembly {
-      mstore(add(input,32),_input)
+      mstore(add(input, 32), _input)
     }
     (success, out) = GET_VALIDATOR.staticcall(input);
     require(success);
     return address(getUint256FromBytes(out, 0));
   }
   // TODO: Suggested Lucas to merge the two
-    function validatorSignerAddressFromSet(uint256 index, uint256 blockNumber)
+  function validatorSignerAddressFromSet(uint256 index, uint256 blockNumber)
     public
     view
     returns (address)
   {
     bytes memory out;
     bool success;
-     // let's not pack stuff and this will be easier on the solver
+    // let's not pack stuff and this will be easier on the solver
     bytes32 _input = input_validatorSignerAddressFromSet[index][blockNumber];
     bytes memory input = new bytes(32);
     assembly {
-      mstore(add(input,32),_input)
+      mstore(add(input, 32), _input)
     }
     (success, out) = GET_VALIDATOR.staticcall(input);
     require(success);
     return address(getUint256FromBytes(out, 0));
   }
- mapping (uint256 => mapping (uint256 => mapping (uint256 => mapping (uint256 => mapping (uint256 => mapping (uint256 => bytes32)))))) input_fractionMulExp;
- function fractionMulExp(
+  mapping(uint256 => mapping(uint256 => mapping(uint256 => mapping(uint256 => mapping(uint256 => mapping(uint256 => bytes32)))))) input_fractionMulExp;
+  function fractionMulExp(
     uint256 aNumerator,
     uint256 aDenominator,
     uint256 bNumerator,
@@ -167,11 +165,9 @@ mapping(uint256 => mapping( uint256 => mapping (uint256 => uint256))) toVotesGho
     bytes32 _input = input_fractionMulExp[aNumerator][aDenominator][bNumerator][bDenominator][exponent][_decimals];
     bytes memory input = new bytes(32);
     assembly {
-      mstore(add(input,32),_input)
+      mstore(add(input, 32), _input)
     }
-    (success, out) = FRACTION_MUL.staticcall(
-      input
-    );
+    (success, out) = FRACTION_MUL.staticcall(input);
     require(
       success,
       "UsingPrecompiles :: fractionMulExp Unsuccessful invocation of fraction exponent"
@@ -180,7 +176,7 @@ mapping(uint256 => mapping( uint256 => mapping (uint256 => uint256))) toVotesGho
     returnDenominator = getUint256FromBytes(out, 32);
     return (returnNumerator, returnDenominator);
   }
-  
+
   // havoc getEpochSize
   uint256 epochSize;
   function getEpochSize() public view returns (uint256) {
@@ -198,5 +194,5 @@ mapping(uint256 => mapping( uint256 => mapping (uint256 => uint256))) toVotesGho
     }
     return total;
   }
-  
+
 }
