@@ -19,11 +19,7 @@
 
 • **feeCurrency**? : *[Address](../modules/_base_.md#address)*
 
-<<<<<<< HEAD
-*Defined in [contractkit/src/kit.ts:73](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L73)*
-=======
-*Defined in [contractkit/src/kit.ts:76](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L76)*
->>>>>>> master
+*Defined in [contractkit/src/kit.ts:78](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L78)*
 
 ___
 
@@ -31,11 +27,7 @@ ___
 
 • **from**? : *[Address](../modules/_base_.md#address)*
 
-<<<<<<< HEAD
-*Defined in [contractkit/src/kit.ts:74](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L74)*
-=======
-*Defined in [contractkit/src/kit.ts:77](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L77)*
->>>>>>> master
+*Defined in [contractkit/src/kit.ts:79](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L79)*
 
 ___
 
@@ -43,11 +35,7 @@ ___
 
 • **gasInflationFactor**: *number*
 
-<<<<<<< HEAD
-*Defined in [contractkit/src/kit.ts:71](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L71)*
-=======
-*Defined in [contractkit/src/kit.ts:74](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L74)*
->>>>>>> master
+*Defined in [contractkit/src/kit.ts:76](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L76)*
 
 ___
 
@@ -55,8 +43,4 @@ ___
 
 • **gasPrice**: *string*
 
-<<<<<<< HEAD
-*Defined in [contractkit/src/kit.ts:72](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L72)*
-=======
-*Defined in [contractkit/src/kit.ts:75](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L75)*
->>>>>>> master
+*Defined in [contractkit/src/kit.ts:77](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L77)*
