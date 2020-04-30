@@ -8,25 +8,31 @@
 - [Choosing a Network](getting-started/choosing-a-network.md)
 - [Mainnet Release Candidate 1](getting-started/rc1.md)
   - [Running a Validator](getting-started/running-a-validator-in-rc1.md)
+  - [Running a Full Node](getting-started/running-a-full-node-in-rc1.md)
 - [Baklava Testnet](getting-started/baklava-testnet.md)
   - [Running a Validator](getting-started/running-a-validator-in-baklava.md)
-  - [Running a Full Node](getting-started/running-a-full-node.md)
+  - [Running a Full Node](getting-started/running-a-full-node-in-baklava.md)
 - [Alfajores Testnet](getting-started/alfajores-testnet.md)
   - [Using the Mobile Wallet](getting-started/using-the-mobile-wallet.md)
   - [Getting an Account and Funds](getting-started/faucet.md)
 - [Glossary](GLOSSARY.md)
+
+## Celo Gold Holder Guide
+- [Quick Start](celo-gold-holder-guide/quick-start.md)
+- [Using a Ledger Wallet](celo-gold-holder-guide/ledger.md)
+- [Understanding ReleaseGold](celo-gold-holder-guide/release-gold.md)
+- [Voting on Governance](celo-gold-holder-guide/voting-governance.md)
+<!-- - [Voting on Validator Groups](celo-gold-holder-guide/voting-validators.md) -->
 
 ## Validator Guide
 
 - [Key Management](operations-manual/key-management/summary.md)
   - [Detailed Role Descriptions](operations-manual/key-management/detailed.md)
   - [Validator Signer Key Rotation](operations-manual/key-management/key-rotation.md)
-  - [Using a Ledger Wallet](operations-manual/key-management/ledger.md)
 - [Celo Foundation Voting Policy](operations-manual/celo-foundation-voting-policy.md)
 - [Securing Celo Nodes and Services](operations-manual/securing-nodes-and-services.md)
 - [Upgrading a Node](operations-manual/node-upgrades.md)
 - [Validator Explorer](operations-manual/validator-explorer.md)
-- [Governance](operations-manual/governance.md)
 
 ## Developer Guide
 - [Quick Start](developer-resources/start.md)
@@ -202,6 +208,8 @@
       - [wrappers/Exchange](developer-resources/contractkit/reference/modules/_wrappers_exchange_.md)
       - [ExchangeWrapper](developer-resources/contractkit/reference/classes/_wrappers_exchange_.exchangewrapper.md)
       - [ExchangeConfig](developer-resources/contractkit/reference/interfaces/_wrappers_exchange_.exchangeconfig.md)
+      - [wrappers/Freezer](developer-resources/contractkit/reference/modules/_wrappers_freezer_.md)
+      - [FreezerWrapper](developer-resources/contractkit/reference/classes/_wrappers_freezer_.freezerwrapper.md)
       - [wrappers/GasPriceMinimum](developer-resources/contractkit/reference/modules/_wrappers_gaspriceminimum_.md)
       - [GasPriceMinimumWrapper](developer-resources/contractkit/reference/classes/_wrappers_gaspriceminimum_.gaspriceminimumwrapper.md)
       - [GasPriceMinimumConfig](developer-resources/contractkit/reference/interfaces/_wrappers_gaspriceminimum_.gaspriceminimumconfig.md)
@@ -292,6 +300,7 @@
       - [ElectionWrapper](developer-resources/contractkit/reference/classes/_wrappers_election_.electionwrapper.md)
       - [EscrowWrapper](developer-resources/contractkit/reference/classes/_wrappers_escrow_.escrowwrapper.md)
       - [ExchangeWrapper](developer-resources/contractkit/reference/classes/_wrappers_exchange_.exchangewrapper.md)
+      - [FreezerWrapper](developer-resources/contractkit/reference/classes/_wrappers_freezer_.freezerwrapper.md)
       - [GasPriceMinimumWrapper](developer-resources/contractkit/reference/classes/_wrappers_gaspriceminimum_.gaspriceminimumwrapper.md)
       - [GoldTokenWrapper](developer-resources/contractkit/reference/classes/_wrappers_goldtokenwrapper_.goldtokenwrapper.md)
       - [GovernanceWrapper](developer-resources/contractkit/reference/classes/_wrappers_governance_.governancewrapper.md)
@@ -383,7 +392,7 @@
     - [Validator Set Differences](celo-codebase/protocol/consensus/validator-set-differences.md)
     - [Locating Nodes](celo-codebase/protocol/consensus/locating-nodes.md)
     - [Ultralight Sync](celo-codebase/protocol/consensus/ultralight-sync.md)
-  - [Proof of Stake](celo-codebase/protocol/proof-of-stake/README.md)
+  - [Proof-of-Stake](celo-codebase/protocol/proof-of-stake/README.md)
     - [Validator Groups](celo-codebase/protocol/proof-of-stake/validator-groups.md)
     - [Locked Gold and Voting](celo-codebase/protocol/proof-of-stake/locked-gold.md)
     - [Validator Elections](celo-codebase/protocol/proof-of-stake/validator-elections.md)
@@ -410,7 +419,6 @@
     - [Stability Fees](celo-codebase/protocol/stability/stability-fees.md)
     - [Tobin Tax](celo-codebase/protocol/stability/tobin-tax.md)
   - [Privacy](celo-codebase/protocol/privacy.md)
-  - [ReleaseGold](celo-codebase/protocol/release-gold/README.md)
 - [Celo Wallet](celo-codebase/wallet/README.md)
   - [Running the Wallet Locally](celo-codebase/wallet/intro.md)
   - [Wallet Functionality](celo-codebase/wallet/how-the-wallet-works/README.md)

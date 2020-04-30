@@ -6,7 +6,7 @@ This page provides a detailed description of the various account roles found in 
 
 Any private key generated for use in the Celo protocol has a corresponding address. The account address is the last 20 bytes of the hash of the corresponding public key, just as in Ethereum. Celo account keys can be used to sign and send transactions on the Celo network.
 
-Celo Accounts can be designated as Locked Gold Accounts or authorized as signer keys on behalf of a Locked Gold Account by sending special transactions using [celocli](../../command-line-interface/introduction). Note that Celo accounts that have not been designated as Locked Gold Accounts or authorized signers may not be able to send certain transactions related to proof-of-stake.
+Celo Accounts can be designated as Locked Gold Accounts or authorized as signer keys on behalf of a Locked Gold Account by sending special transactions using [celocli](../../command-line-interface/introduction.md). Note that Celo accounts that have not been designated as Locked Gold Accounts or authorized signers may not be able to send certain transactions related to proof-of-stake.
 
 ## Locked Gold Accounts
 
@@ -27,7 +27,7 @@ celocli account:create --from $ADDRESS_TO_DESIGNATE --useLedger
 celocli account:show $ADDRESS_TO_DESIGNATE
 ```
 
-Note that [ReleaseGold](../../celo-codebase/protocol/release-gold) beneficiary keys are considered vanilla Celo accounts with respect to proof-of-stake, and that the `ReleaseGold` contract address is what ultimately gets designated as a Locked Gold Account.
+Note that [ReleaseGold](../../celo-gold-holder-guide/release-gold.md) beneficiary keys are considered vanilla Celo accounts with respect to proof-of-stake, and that the `ReleaseGold` contract address is what ultimately gets designated as a Locked Gold Account.
 
 ## Authorized Vote Signers
 
@@ -120,7 +120,7 @@ celocli validator:show $AUTHORIZED_VALIDATOR_SIGNER
 
 ## Authorized Attestation Signers
 
-Any Locked Gold Account may optionally authorize a Celo account as an attestation signer. Authorized attestation signers can sign attestation messages on behalf of the Locked Gold Account in Celo's [lightweight identity protocol](celo-codebase/protocol/identity/).
+Any Locked Gold Account may optionally authorize a Celo account as an attestation signer. Authorized attestation signers can sign attestation messages on behalf of the Locked Gold Account in Celo's [lightweight identity protocol](../../celo-codebase/protocol/identity/).
 
 Note that the Celo Ledger App does yet not support signing attestation messages and as such attestation signer keys **cannot be stored on a Ledger hardware wallet**.
 

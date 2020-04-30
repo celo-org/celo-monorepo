@@ -1,4 +1,7 @@
+import BigNumber from 'bignumber.js'
 import * as functions from 'firebase-functions'
+import Web3 from 'web3'
+import logger from './common/logger'
 
 export const DEV_MODE =
   process.env.NODE_ENV !== 'production' || process.env.FUNCTIONS_EMULATOR === 'true'
@@ -6,19 +9,25 @@ export const DEV_MODE =
 interface Config {
   blockchain: {
     provider: string
-    blockscout: string
   }
   salt: {
-    key: string
     unverifiedQueryMax: number
     additionalVerifiedQueryMax: number
     queryPerTransaction: number
+    minDollarBalance: BigNumber
   }
   db: {
     user: string
     password: string
     database: string
     host: string
+  }
+  keyVault: {
+    azureClientID: string
+    azureClientSecret: string
+    azureTenant: string
+    azureVaultName: string
+    azureSecretName: string
   }
   attestations: {
     numberAttestationsRequired: number
@@ -28,23 +37,29 @@ interface Config {
 let config: Config
 
 if (DEV_MODE) {
-  console.debug('Running in dev mode')
+  logger.debug('Running in dev mode')
   config = {
     blockchain: {
       provider: 'https://alfajores-forno.celo-testnet.org',
-      blockscout: 'https://alfajores-blockscout.celo-testnet.org',
     },
     salt: {
-      key: 'GaYc5lTZI9wQUwKvjLIFNHEcbzxt/MMoUnmY1JHLHBI=',
       unverifiedQueryMax: 2,
       additionalVerifiedQueryMax: 30,
       queryPerTransaction: 2,
+      minDollarBalance: new BigNumber(Web3.utils.toWei('0.1')),
     },
     db: {
       user: 'postgres',
       password: 'fakePass',
       database: 'phoneNumberPrivacy',
       host: 'fakeHost',
+    },
+    keyVault: {
+      azureClientID: 'useMock',
+      azureClientSecret: 'useMock',
+      azureTenant: 'useMock',
+      azureVaultName: 'useMock',
+      azureSecretName: 'useMock',
     },
     attestations: {
       numberAttestationsRequired: 3,
@@ -55,13 +70,12 @@ if (DEV_MODE) {
   config = {
     blockchain: {
       provider: functionConfig.blockchain.provider,
-      blockscout: functionConfig.blockchain.blockscout,
     },
     salt: {
-      key: functionConfig.salt.key,
-      unverifiedQueryMax: functionConfig.salt.unverifiedQueryMax,
-      additionalVerifiedQueryMax: functionConfig.salt.additionalVerifiedQueryMax,
-      queryPerTransaction: functionConfig.salt.queryPerTransaction,
+      unverifiedQueryMax: functionConfig.salt.unverified_query_max,
+      additionalVerifiedQueryMax: functionConfig.salt.additional_verified_query_max,
+      queryPerTransaction: functionConfig.salt.query_per_transaction,
+      minDollarBalance: new BigNumber(functionConfig.salt.min_dollar_balance),
     },
     db: {
       user: functionConfig.db.username,
@@ -69,9 +83,17 @@ if (DEV_MODE) {
       database: functionConfig.db.name,
       host: `/cloudsql/${functionConfig.db.host}`,
     },
+    keyVault: {
+      azureClientID: functionConfig.keyVault.azureClientID,
+      azureClientSecret: functionConfig.keyVault.azureClientSecret,
+      azureTenant: functionConfig.keyVault.azureTenant,
+      azureVaultName: functionConfig.keyVault.azureVaultName,
+      azureSecretName: functionConfig.keyVault.azureSecretName,
+    },
     attestations: {
-      numberAttestationsRequired: functionConfig.attestations.numberAttestationsRequired,
+      numberAttestationsRequired: functionConfig.attestations.number_attestations_required,
     },
   }
+  logger.debug('Using function config: ', { ...config, salt: { ...config.salt, key: 'mockKey' } })
 }
 export default config
