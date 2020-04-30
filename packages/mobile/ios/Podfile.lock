@@ -384,30 +384,30 @@ PODS:
     - React
   - RNExitApp (1.1.0):
     - React
-  - RNFBApp (6.4.0):
+  - RNFBApp (6.7.1):
     - Firebase/Core (~> 6.13.0)
     - React
-  - RNFBAuth (6.4.0):
+  - RNFBAuth (6.7.1):
     - Firebase/Auth (~> 6.13.0)
     - Firebase/Core (~> 6.13.0)
     - React
     - RNFBApp
-  - RNFBDatabase (6.4.0):
+  - RNFBDatabase (6.7.1):
     - Firebase/Core (~> 6.13.0)
     - Firebase/Database (~> 6.13.0)
     - React
     - RNFBApp
-  - RNFBDynamicLinks (6.4.0):
+  - RNFBDynamicLinks (6.7.1):
     - Firebase/Core (~> 6.13.0)
     - Firebase/DynamicLinks (~> 6.13.0)
     - React
     - RNFBApp
-  - RNFBMessaging (6.4.0):
+  - RNFBMessaging (6.7.1):
     - Firebase/Core (~> 6.13.0)
     - Firebase/Messaging (~> 6.13.0)
     - React
     - RNFBApp
-  - RNFBStorage (6.4.0):
+  - RNFBStorage (6.7.1):
     - Firebase/Core (~> 6.13.0)
     - Firebase/Storage (~> 6.13.0)
     - React
@@ -753,12 +753,12 @@ SPEC CHECKSUMS:
   RNCAsyncStorage: 60a80e72d95bf02a01cace55d3697d9724f0d77f
   RNDeviceInfo: 687c1b2ab6d86ff1ca1208783320cd144138c7f2
   RNExitApp: c4e052df2568b43bec8a37c7cd61194d4cfee2c3
-  RNFBApp: ae8fe642e3e457a9a417f1cf825a22de6bc5e94d
-  RNFBAuth: 8309add6fb9d1aca22be498fd94184c03e81cd4e
-  RNFBDatabase: e2b8aa9343cb2f664ef723092f08ebf08d324060
-  RNFBDynamicLinks: fae51a8bad224af8b3686c1dff54c6ca0ed9099e
-  RNFBMessaging: 82a9c9bacbf5fff18bdc42e731b5fe7eef2bd3f2
-  RNFBStorage: 89bc6053f77b4272a8fad45d9558a8853d649246
+  RNFBApp: a8a70521201eb3e75761e5495ebf3be319a3a9bc
+  RNFBAuth: 3d3491cf27037c65a7f68bd77a990c15fd97ccec
+  RNFBDatabase: 5cfc5a090c66c46dd325e0842378be69a1780d6f
+  RNFBDynamicLinks: 87346f14c8f12a16eb3ad56ae279c8ce0fdc9c03
+  RNFBMessaging: 67f7f6c799e1ea2a8f19b4717a5e5d9515902533
+  RNFBStorage: 08c6831d19190f68f0985ff7bd773262f11a1c4a
   RNFS: a8fbe7060fa49157d819466404794ad9c58e58cf
   RNGestureHandler: 946a7691e41df61e2c4b1884deab41a4cdc3afff
   RNLocalize: cebb57c3c1e5479806204ce135b26bdd79d17e8a

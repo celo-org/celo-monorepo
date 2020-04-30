@@ -17,3 +17,8 @@ blockscout:
     drop: "false"
   jsonrpc_http_url: http://tx-nodes-private:8545
   jsonrpc_ws_url: ws://tx-nodes-private:8546
+  metadata_crawler:
+    schedule: "*/30 * * * *"
+    image:
+      repository: gcr.io/celo-testnet/celo-monorepo
+      tag: metadata-crawler-33bb740ffb4ee7804046f48299f8686416afbe47
