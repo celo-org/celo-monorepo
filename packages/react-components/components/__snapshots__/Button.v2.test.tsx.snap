@@ -1,0 +1,159 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Button when type is SECONDARY renders 1`] = `
+<View
+  style={
+    Object {
+      "flexDirection": "row",
+    }
+  }
+>
+  <View
+    accessible={true}
+    focusable={true}
+    isTVSelectable={true}
+    nativeBackgroundAndroid={
+      Object {
+        "attribute": "selectableItemBackground",
+        "type": "ThemeAttrAndroid",
+      }
+    }
+    onClick={[Function]}
+    onResponderGrant={[Function]}
+    onResponderMove={[Function]}
+    onResponderRelease={[Function]}
+    onResponderTerminate={[Function]}
+    onResponderTerminationRequest={[Function]}
+    onStartShouldSetResponder={[Function]}
+    style={
+      Array [
+        Object {
+          "alignItems": "center",
+          "borderRadius": 100,
+          "justifyContent": "center",
+          "margin": 10,
+          "paddingHorizontal": 16,
+          "paddingVertical": 5,
+        },
+        Object {
+          "height": 48,
+          "minWidth": 98,
+        },
+        Object {
+          "backgroundColor": "#F5F4F0",
+        },
+      ]
+    }
+  >
+    <View
+      style={
+        Object {
+          "alignItems": "center",
+          "flexDirection": "row",
+          "justifyContent": "space-evenly",
+        }
+      }
+    >
+      <Text>
+        child text
+      </Text>
+      <Text
+        style={
+          Array [
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Inter-SemiBold",
+              "fontSize": 15,
+              "lineHeight": 20,
+            },
+            Object {
+              "color": "#2E3338",
+            },
+          ]
+        }
+      >
+        Button
+      </Text>
+    </View>
+  </View>
+</View>
+`;
+
+exports[`Button when type is TERTIARY renders 1`] = `
+<View
+  style={
+    Object {
+      "flexDirection": "row",
+    }
+  }
+>
+  <View
+    accessible={true}
+    focusable={true}
+    isTVSelectable={true}
+    nativeBackgroundAndroid={
+      Object {
+        "attribute": "selectableItemBackground",
+        "type": "ThemeAttrAndroid",
+      }
+    }
+    onClick={[Function]}
+    onResponderGrant={[Function]}
+    onResponderMove={[Function]}
+    onResponderRelease={[Function]}
+    onResponderTerminate={[Function]}
+    onResponderTerminationRequest={[Function]}
+    onStartShouldSetResponder={[Function]}
+    style={
+      Array [
+        Object {
+          "alignItems": "center",
+          "borderRadius": 100,
+          "justifyContent": "center",
+          "margin": 10,
+          "paddingHorizontal": 16,
+          "paddingVertical": 5,
+        },
+        Object {
+          "height": 48,
+          "minWidth": 98,
+        },
+        Object {
+          "backgroundColor": "#EEB93C",
+        },
+      ]
+    }
+  >
+    <View
+      style={
+        Object {
+          "alignItems": "center",
+          "flexDirection": "row",
+          "justifyContent": "space-evenly",
+        }
+      }
+    >
+      <Text>
+        child text
+      </Text>
+      <Text
+        style={
+          Array [
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Inter-SemiBold",
+              "fontSize": 15,
+              "lineHeight": 20,
+            },
+            Object {
+              "color": "#FFFFFF",
+            },
+          ]
+        }
+      >
+        Button
+      </Text>
+    </View>
+  </View>
+</View>
+`;

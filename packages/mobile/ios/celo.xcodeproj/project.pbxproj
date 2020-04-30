@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		00E356F31AD99517003FC87E /* celoTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* celoTests.m */; };
+		0317E786245B696200AAAC2E /* Inter-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0317E783245B696200AAAC2E /* Inter-Regular.ttf */; };
+		0317E788245B696200AAAC2E /* Inter-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0317E784245B696200AAAC2E /* Inter-Medium.ttf */; };
+		0317E78A245B696200AAAC2E /* Inter-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0317E785245B696200AAAC2E /* Inter-SemiBold.ttf */; };
 		0350D7F2EBD64D0585FEF0AF /* Hind-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 95E01263B685485BA7D5CEB0 /* Hind-Light.ttf */; };
 		0445977E03C74B20A93158B5 /* Hind-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B59F6FDB7D084157A12E7A52 /* Hind-Bold.ttf */; };
 		0581BC2D3AEB42D086D403E3 /* Hind-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = AAE92820119F4CC5B23C6636 /* Hind-Medium.ttf */; };
@@ -50,6 +53,9 @@
 		00E356EE1AD99517003FC87E /* celoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = celoTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		00E356F21AD99517003FC87E /* celoTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = celoTests.m; sourceTree = "<group>"; };
+		0317E783245B696200AAAC2E /* Inter-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter-Regular.ttf"; sourceTree = "<group>"; };
+		0317E784245B696200AAAC2E /* Inter-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter-Medium.ttf"; sourceTree = "<group>"; };
+		0317E785245B696200AAAC2E /* Inter-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter-SemiBold.ttf"; sourceTree = "<group>"; };
 		0F1E1EB32346439C00274556 /* rings@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "rings@2x.png"; sourceTree = "<group>"; };
 		0F1E1EB42346439C00274556 /* rings@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "rings@3x.png"; sourceTree = "<group>"; };
 		0FE3DE8E2347740700EA87A0 /* celo.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = celo.entitlements; path = celo/celo.entitlements; sourceTree = "<group>"; };
@@ -205,6 +211,9 @@
 		E3041EF3155B4320B4CF8300 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				0317E784245B696200AAAC2E /* Inter-Medium.ttf */,
+				0317E783245B696200AAAC2E /* Inter-Regular.ttf */,
+				0317E785245B696200AAAC2E /* Inter-SemiBold.ttf */,
 				B59F6FDB7D084157A12E7A52 /* Hind-Bold.ttf */,
 				95E01263B685485BA7D5CEB0 /* Hind-Light.ttf */,
 				AAE92820119F4CC5B23C6636 /* Hind-Medium.ttf */,
@@ -366,14 +375,17 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0317E78A245B696200AAAC2E /* Inter-SemiBold.ttf in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */,
 				0445977E03C74B20A93158B5 /* Hind-Bold.ttf in Resources */,
 				0350D7F2EBD64D0585FEF0AF /* Hind-Light.ttf in Resources */,
 				0F1E1EB62346439C00274556 /* rings@3x.png in Resources */,
 				0F1E1EB52346439C00274556 /* rings@2x.png in Resources */,
+				0317E786245B696200AAAC2E /* Inter-Regular.ttf in Resources */,
 				0581BC2D3AEB42D086D403E3 /* Hind-Medium.ttf in Resources */,
 				2CE54C7D16D44C5380C53609 /* Hind-Regular.ttf in Resources */,
+				0317E788245B696200AAAC2E /* Inter-Medium.ttf in Resources */,
 				5575263ED1EA4F568D328DE9 /* Hind-SemiBold.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
