@@ -20,6 +20,12 @@ Decentralized application to help coordinate and improve the impact metric of no
 
 Github: https://github.com/nestorbonilla/bienvenir
 
+## Pesabase
+
+An integration of a Celo Dollar (Stablecoin) and Mpesa, showing flows of payment between an Mpesa User and a Celo Blockchain wallet from anywhere in the world.
+
+Github: https://github.com/Kesholabs/celoBackend
+
 
 ## Add your app to this list!
 
