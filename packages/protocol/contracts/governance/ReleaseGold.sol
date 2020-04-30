@@ -222,13 +222,6 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
     );
     require(registryAddress != address(0), "The registry address cannot be the zero address");
     require(
-      releaseSchedule.releaseStartTime.add(
-        releaseSchedule.numReleasePeriods.mul(releaseSchedule.releasePeriod)
-      ) >
-        block.timestamp,
-      "Release schedule end time must be in the future"
-    );
-    require(
       address(this).balance ==
         releaseSchedule.amountReleasedPerPeriod.mul(releaseSchedule.numReleasePeriods),
       "Contract balance must equal the entire grant amount"
@@ -375,6 +368,7 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
   function refundAndFinalize() external nonReentrant onlyReleaseOwnerAndRevoked {
     require(getRemainingLockedBalance() == 0, "Total gold balance must be unlocked");
     uint256 beneficiaryAmount = revocationInfo.releasedBalanceAtRevoke.sub(totalWithdrawn);
+    require(address(this).balance >= beneficiaryAmount, "Inconsistent balance");
     beneficiary.transfer(beneficiaryAmount);
     uint256 revokerAmount = getRemainingUnlockedBalance();
     refundAddress.transfer(revokerAmount);
@@ -514,6 +508,7 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
   function fundSigner(address payable signer) private {
     // Fund signer account with 1 cGLD.
     uint256 value = 1 ether;
+    require(address(this).balance >= value, "no available cGLD to fund signer");
     signer.transfer(value);
     require(getRemainingTotalBalance() > 0, "no remaining balance");
   }

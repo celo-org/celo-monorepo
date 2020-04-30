@@ -1,29 +1,16 @@
 import { CELO_DERIVATION_PATH_BASE } from '@celo/utils/lib/account'
-import {
-  ensureLeading0x,
-  isHexString,
-  normalizeAddressWith0x,
-  trimLeading0x,
-} from '@celo/utils/lib/address'
 import { TransportError, TransportStatusError } from '@ledgerhq/errors'
 import Ledger from '@ledgerhq/hw-app-eth'
 import debugFactory from 'debug'
-import * as ethUtil from 'ethereumjs-util'
-import { EncodedTransaction, Tx } from 'web3-core'
 import { Address } from '../base'
-import { EIP712TypedData, generateTypedDataHash } from '../utils/sign-typed-data-utils'
-import {
-  chainIdTransformationForSigning,
-  encodeTransaction,
-  rlpEncodedTx,
-  signatureFormatter,
-} from '../utils/signing-utils'
-import { tokenInfoByAddressAndChainId } from './ledger-utils/tokens'
+import { transportErrorFriendlyMessage } from '../utils/ledger-utils'
+import { RemoteWallet } from './remote-wallet'
+import { LedgerSigner } from './signers/ledger-signer'
+import { Signer } from './signers/signer'
 import { Wallet } from './wallet'
 
 export const CELO_BASE_DERIVATION_PATH = CELO_DERIVATION_PATH_BASE.slice(2)
 const ADDRESS_QTY = 5
-const CELO_APP_ACCEPTS_CONTRACT_DATA_FROM_VERSION = '1.0.2'
 
 // Validates an address using the Ledger
 export enum AddressValidation {
@@ -46,27 +33,16 @@ export async function newLedgerWalletWithSetup(
   const wallet = new LedgerWallet(
     derivationPathIndexes,
     baseDerivationPath,
+    transport,
     ledgerAddressValidation
   )
-  await wallet.init(transport)
+  await wallet.init()
   return wallet
 }
 
 const debug = debugFactory('kit:wallet:ledger')
 
-export class LedgerWallet implements Wallet {
-  // Account addresses are hex-encoded, lower case alphabets
-  private readonly addressDerivationPath = new Map<
-    Address,
-    { derivationPath: string; validated: boolean }
-  >()
-  private addressesRetrieved = false
-  private setupFinished = false
-  private setupLocked = false
-  private appConfiguration: { arbitraryDataEnabled: number; version: string } = {
-    arbitraryDataEnabled: 0,
-    version: '0.0.0',
-  }
+export class LedgerWallet extends RemoteWallet implements Wallet {
   private ledger: any
 
   /**
@@ -75,12 +51,15 @@ export class LedgerWallet implements Wallet {
    * Example: [3, 99, 53] will retrieve the derivation paths of
    * [`${baseDerivationPath}/3`, `${baseDerivationPath}/99`, `${baseDerivationPath}/53`]
    * @param baseDerivationPath base derivation path. Default: "44'/52752'/0'/0"
+   * @param transport Transport to connect the ledger device
    */
   constructor(
     readonly derivationPathIndexes: number[] = Array.from(Array(ADDRESS_QTY).keys()),
     readonly baseDerivationPath: string = CELO_BASE_DERIVATION_PATH,
+    readonly transport: any = {},
     readonly ledgerAddressValidation: AddressValidation = AddressValidation.firstTransactionPerAddress
   ) {
+    super()
     const invalidDPs = derivationPathIndexes.some(
       (value) => !(Number.isInteger(value) && value >= 0)
     )
@@ -89,45 +68,21 @@ export class LedgerWallet implements Wallet {
     }
   }
 
-  /**
-   * @param transport Transport to connect the ledger device
-   */
-  async init(transport: any) {
-    if (this.setupLocked) {
-      throw new Error('ledger-wallet: initialization already running')
+  protected async loadAccountSigners(): Promise<Map<Address, Signer>> {
+    if (!this.ledger) {
+      this.ledger = this.generateNewLedger(this.transport)
     }
+    debug('Fetching addresses from the ledger')
+    let addressToSigner = new Map<Address, Signer>()
     try {
-      if (this.setupFinished) {
-        return
-      }
-      this.setupLocked = true
-      if (!this.ledger) {
-        this.ledger = this.generateNewLedger(transport)
-      }
-      await this.retrieveAppConfiguration()
-      if (!this.addressesRetrieved) {
-        debug('Fetching addresses from the ledger')
-        await this.retrieveAccounts()
-        this.addressesRetrieved = true
-      }
-      this.setupFinished = true
+      addressToSigner = await this.retrieveAccounts()
     } catch (error) {
       if (error instanceof TransportStatusError || error instanceof TransportError) {
-        this.transportErrorFriendlyMessage(error)
+        transportErrorFriendlyMessage(error)
       }
       throw error
-    } finally {
-      this.setupLocked = false
     }
-  }
-
-  private async retrieveAppConfiguration() {
-    this.appConfiguration = await this.ledger!.getAppConfiguration()
-    if (!this.appConfiguration.arbitraryDataEnabled) {
-      console.warn(
-        'Beware, your ledger does not allow the use of contract data. Some features may not work correctly'
-      )
-    }
+    return addressToSigner
   }
 
   // Extracted for testing purpose
@@ -135,218 +90,38 @@ export class LedgerWallet implements Wallet {
     return new Ledger(transport)
   }
 
-  private async retrieveAccounts() {
-    const pairAddresses = await this.retrieveAccountsFromLedger()
-    pairAddresses.forEach((pair) =>
-      this.addressDerivationPath.set(normalizeAddressWith0x(pair.address), {
-        derivationPath: pair.derivationPath,
-        validated: pair.validated,
-      })
-    )
-  }
+  private async retrieveAccounts(): Promise<Map<Address, Signer>> {
+    const addressToSigner = new Map<Address, Signer>()
+    const appConfiguration = await this.retrieveAppConfiguration()
+    const validationRequired = this.ledgerAddressValidation === AddressValidation.initializationOnly
 
-  private async retrieveAccountsFromLedger() {
-    const addresses = []
-    const validationRequired = this.validationRequired(false)
     // Each address must be retrieved synchronously, (ledger lock)
     for (const value of this.derivationPathIndexes) {
       const derivationPath = `${this.baseDerivationPath}/${value}`
       const addressInfo = await this.ledger!.getAddress(derivationPath, validationRequired)
-      addresses.push({
-        address: addressInfo.address,
-        derivationPath,
-        validated: validationRequired,
-      })
-    }
-    return addresses
-  }
-
-  private validationRequired(initialized: boolean, validated?: boolean): boolean {
-    if (!initialized) {
-      return this.ledgerAddressValidation === AddressValidation.initializationOnly
-    }
-    switch (this.ledgerAddressValidation) {
-      case AddressValidation.never: {
-        return false
-      }
-      case AddressValidation.everyTransaction: {
-        return true
-      }
-      case AddressValidation.firstTransactionPerAddress: {
-        return !validated
-      }
-      case AddressValidation.initializationOnly: {
-        // Already initialized, so no need to validate in this state
-        return false
-      }
-    }
-    throw new Error('ledger-wallet@validationRequired: invalid ledgerValidation value')
-  }
-
-  getAccounts(): Address[] {
-    this.initializationRequired()
-    return Array.from(this.addressDerivationPath.keys())
-  }
-
-  hasAccount(address?: string) {
-    this.initializationRequired()
-    if (address) {
-      return this.addressDerivationPath.has(normalizeAddressWith0x(address))
-    } else {
-      return false
-    }
-  }
-
-  async signTransaction(txParams: Tx): Promise<EncodedTransaction> {
-    this.initializationRequired()
-    try {
-      const rlpEncoded = rlpEncodedTx(txParams)
-      const path = await this.getDerivationPathFor(txParams.from!.toString())
-      if (
-        LedgerWallet.compareLedgerAppVersions(
-          this.appConfiguration.version,
-          CELO_APP_ACCEPTS_CONTRACT_DATA_FROM_VERSION
-        ) >= 0
-      ) {
-        const tokenInfo = tokenInfoByAddressAndChainId(
-          rlpEncoded.transaction.to!,
-          rlpEncoded.transaction.chainId!
+      addressToSigner.set(
+        addressInfo.address,
+        new LedgerSigner(
+          this.ledger,
+          derivationPath,
+          this.ledgerAddressValidation,
+          appConfiguration
         )
-        if (tokenInfo) {
-          await this.ledger!.provideERC20TokenInformation(tokenInfo)
-        }
-      }
-      const signature = await this.ledger!.signTransaction(
-        path,
-        trimLeading0x(rlpEncoded.rlpEncode) // the ledger requires the rlpEncode without the leading 0x
-      )
-      // EIP155 support. check/recalc signature v value.
-      const rv = parseInt(signature.v, 16)
-      let cv = chainIdTransformationForSigning(rlpEncoded.transaction.chainId!)
-      // tslint:disable-next-line: no-bitwise
-      if (rv !== cv && (rv & cv) !== rv) {
-        cv += 1 // add signature v bit.
-      }
-      signature.v = cv.toString(16)
-      return encodeTransaction(rlpEncoded, signatureFormatter(signature))
-    } catch (error) {
-      if (error instanceof TransportStatusError) {
-        // The Ledger fails if it doesn't know the feeCurrency
-        if (error.statusCode === 27264 && error.statusText === 'INCORRECT_DATA') {
-          debug('Possible invalid feeCurrency field')
-          throw new Error(
-            'ledger-wallet@singTransaction: Incorrect Data. Verify that the feeCurrency is a valid one'
-          )
-        } else {
-          this.transportErrorFriendlyMessage(error)
-        }
-      }
-      throw error
-    }
-  }
-
-  /**
-   * @param address Address of the account to sign with
-   * @param data Hex string message to sign
-   * @return Signature hex string (order: rsv)
-   */
-  async signPersonalMessage(address: string, data: string): Promise<string> {
-    this.initializationRequired()
-    try {
-      if (!isHexString(data)) {
-        throw Error('ledger-wallet@signPersonalMessage: Expected data has to be an Hex String ')
-      }
-      const path = await this.getDerivationPathFor(address)
-      const sig = await this.ledger!.signPersonalMessage(path, trimLeading0x(data))
-      const rpcSig = ethUtil.toRpcSig(
-        sig.v,
-        ethUtil.toBuffer(ensureLeading0x(sig.r)),
-        ethUtil.toBuffer(ensureLeading0x(sig.s))
-      )
-      return rpcSig
-    } catch (error) {
-      if (error instanceof TransportStatusError) {
-        this.transportErrorFriendlyMessage(error)
-      }
-      throw error
-    }
-  }
-
-  /**
-   * @param address Address of the account to sign with
-   * @param data the typed data object
-   * @return Signature hex string (order: rsv)
-   */
-  async signTypedData(address: Address, typedData: EIP712TypedData): Promise<string> {
-    this.initializationRequired()
-    try {
-      if (typedData === undefined) {
-        throw Error('ledger-wallet@signTypedData: TypedData Missing')
-      }
-      const dataBuff = generateTypedDataHash(typedData)
-
-      const path = await this.getDerivationPathFor(address)
-      const sig = await this.ledger!.signPersonalMessage(path, trimLeading0x(dataBuff.toString()))
-
-      const rpcSig = ethUtil.toRpcSig(
-        sig.v,
-        ethUtil.toBuffer(ensureLeading0x(sig.r)),
-        ethUtil.toBuffer(ensureLeading0x(sig.s))
-      )
-      return rpcSig
-    } catch (error) {
-      if (error instanceof TransportStatusError) {
-        this.transportErrorFriendlyMessage(error)
-      }
-      throw error
-    }
-  }
-
-  private async getDerivationPathFor(account: Address): Promise<string> {
-    if (account) {
-      const maybeDP = this.addressDerivationPath.get(normalizeAddressWith0x(account))
-      if (maybeDP != null) {
-        if (this.validationRequired(true, maybeDP.validated)) {
-          await this.ledger!.getAddress(maybeDP.derivationPath, true)
-          maybeDP.validated = true
-        }
-        return maybeDP.derivationPath
-      }
-    }
-    throw Error(`ledger-wallet@getDerivationPathFor: Derivation Path not found for ${account}`)
-  }
-
-  private initializationRequired() {
-    if (!this.setupFinished) {
-      throw new Error('ledger-wallet needs to be initialized first')
-    }
-  }
-
-  private transportErrorFriendlyMessage(error: any) {
-    debug('Possible connection lost with the ledger')
-    debug(`Error message: ${error.message}`)
-    if (error.statusCode === 26368 || error.statusCode === 26628 || error.message === 'NoDevice') {
-      throw new Error(
-        `Possible connection lost with the ledger. Check if still on and connected. ${error.message}`
       )
     }
-    throw error
+    return addressToSigner
   }
 
-  /**
-   * @return
-   * -1: version1 < version2,
-   *  0: version1 == version2,
-   *  1: version1 > version2
-   */
-  static compareLedgerAppVersions(version1: string, version2: string): number {
-    const numberV1 = this.stringVersionToNumber(version1)
-    const numberV2 = this.stringVersionToNumber(version2)
-    return numberV1 < numberV2 ? -1 : numberV1 === numberV2 ? 0 : 1
-  }
-
-  private static stringVersionToNumber(version: string): number {
-    const parts = version.split('.')
-    return parts.reduce((accum, part) => (accum + Number(part)) * 1000, 0)
+  private async retrieveAppConfiguration(): Promise<{
+    arbitraryDataEnabled: number
+    version: string
+  }> {
+    const appConfiguration = await this.ledger!.getAppConfiguration()
+    if (!appConfiguration.arbitraryDataEnabled) {
+      console.warn(
+        'Beware, your ledger does not allow the use of contract data. Some features may not work correctly, including token transfers. You can enable it from the ledger app settings.'
+      )
+    }
+    return appConfiguration
   }
 }

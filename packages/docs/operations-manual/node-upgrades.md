@@ -10,7 +10,7 @@ Occasionally, they may be required when the upgrade is necessary to continue ope
 
 ## Upgrading a non-validating node
 
-Use these instructions to update non-validating nodes, such as your account node or your attestaion node on the Baklava testnet. Also use these instructions to upgrade your proxy node, but remember not to stop the proxy of a running validator.
+Use these instructions to update non-validating nodes, such as your account node or your attestation node on the Baklava testnet. Also use these instructions to upgrade your proxy node, but remember not to stop the proxy of a running validator.
 
 ### Pull the latest Docker image
 
@@ -33,13 +33,13 @@ docker rm celo-fullnode
 
 Start the new node using `docker run` as detailed in the appropriate section of the getting started guide. Remember to recover any environment variables, if using a new terminal, before running the documented commands.
 
-* [Full node](../getting-started/running-a-full-node.html#start-the-node)
-* [Accounts node](../getting-started/running-a-validator.md#start-your-accounts-node)
-* [Attestion node](../getting-started/running-a-validator.md#running-the-attestation-service)
-* [Proxy node](../getting-started/running-a-validator.md#deploy-a-proxy)
+- [Full node](../getting-started/running-a-full-node-in-rc1.md#start-the-node)
+- [Accounts node](../getting-started/running-a-validator-in-rc1.md#start-your-accounts-node)
+- [Attestion node](../getting-started/running-a-validator-in-rc1.md#running-the-attestation-service)
+- [Proxy node](../getting-started/running-a-validator-in-rc1.md#deploy-a-proxy)
 
 ## Upgrading a Validating Node
 
 Upgrading a validating node is much the same, but requires extra care to be taken to prevent validator downtime.
 
-To complete a validating node upgrade, pull the latest Docker image, as mentioned above, then execute a Validator signing key rotation, using the latest image as the new Validator signing node. A recommended procedure for key rotation is documented in the [Key Management](key-management.md#validator-signer-key-rotation) guide.
+To complete a validating node upgrade, pull the latest Docker image, as mentioned above, then execute a Validator signing key rotation, using the latest image as the new Validator signing node. A recommended procedure for key rotation is documented in the [Key Management](key-management/key-rotation.md) guide.

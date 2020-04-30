@@ -1,8 +1,19 @@
 ---
-description: Tests whether the account has setup the attestation service properly by calling the test endpoint on it
+description: Outputs the set of validators currently participating in BFT and which ones are participating in Celo's lightweight identity protocol
 ---
 
 ## Commands
+
+### Current-attestation-services
+
+Outputs the set of validators currently participating in BFT and which ones are participating in Celo's lightweight identity protocol
+
+```
+USAGE
+  $ celocli identity:current-attestation-services
+```
+
+_See code: [packages/cli/src/commands/identity/current-attestation-services.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/identity/current-attestation-services.ts)_
 
 ### Test-attestation-service
 
@@ -15,13 +26,13 @@ USAGE
 OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Your validator's signer or account address
 
-  --ledgerAddresses=ledgerAddresses                  [default: 1] If --userLedger is set, this will get the first N
+  --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
 
   --ledgerConfirmAddress                             Set it to ask confirmation for the address of the transaction from
                                                      the ledger
 
-  --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --userLedger is set, this will get the array of
+  --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
 

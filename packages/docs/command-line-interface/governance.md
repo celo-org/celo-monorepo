@@ -4,71 +4,6 @@ description: Interact with on-chain governance proposals and hotfixes
 
 ## Commands
 
-### Approve
-
-Approve a dequeued governance proposal
-
-```
-USAGE
-  $ celocli governance:approve
-
-OPTIONS
-  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Approver's address
-
-  --ledgerAddresses=ledgerAddresses                  [default: 1] If --userLedger is set, this will get the first N
-                                                     addresses for local signing
-
-  --ledgerConfirmAddress                             Set it to ask confirmation for the address of the transaction from
-                                                     the ledger
-
-  --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --userLedger is set, this will get the array of
-                                                     index addresses for local signing. Example --ledgerCustomAddresses
-                                                     "[4,99]"
-
-  --proposalID=proposalID                            (required) UUID of proposal to approve
-
-  --useLedger                                        Set it to use a ledger wallet
-
-  --useMultiSig                                      True means the request will be sent through multisig.
-
-EXAMPLES
-  approve --proposalID 99 --from 0x5409ed021d9299bf6814279a6a1411a7e866a631
-  approve --proposalID 99 --from 0x5409ed021d9299bf6814279a6a1411a7e866a631 --useMultiSig
-```
-
-_See code: [packages/cli/src/commands/governance/approve.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/governance/approve.ts)_
-
-### Approvehotfix
-
-Approve a governance hotfix
-
-```
-USAGE
-  $ celocli governance:approvehotfix
-
-OPTIONS
-  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Approver's address
-  --hash=hash                                        (required) Hash of hotfix transactions
-
-  --ledgerAddresses=ledgerAddresses                  [default: 1] If --userLedger is set, this will get the first N
-                                                     addresses for local signing
-
-  --ledgerConfirmAddress                             Set it to ask confirmation for the address of the transaction from
-                                                     the ledger
-
-  --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --userLedger is set, this will get the array of
-                                                     index addresses for local signing. Example --ledgerCustomAddresses
-                                                     "[4,99]"
-
-  --useLedger                                        Set it to use a ledger wallet
-
-EXAMPLE
-  approvehotfix --hash 0x614dccb5ac13cba47c2430bdee7829bb8c8f3603a8ace22e7680d317b39e3658 --from
-  0x5409ed021d9299bf6814279a6a1411a7e866a631
-```
-
-_See code: [packages/cli/src/commands/governance/approvehotfix.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/governance/approvehotfix.ts)_
-
 ### Dequeue
 
 Try to dequeue governance proposal
@@ -80,13 +15,13 @@ USAGE
 OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) From address
 
-  --ledgerAddresses=ledgerAddresses                  [default: 1] If --userLedger is set, this will get the first N
+  --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
 
   --ledgerConfirmAddress                             Set it to ask confirmation for the address of the transaction from
                                                      the ledger
 
-  --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --userLedger is set, this will get the array of
+  --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
 
@@ -109,13 +44,13 @@ USAGE
 OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Executor's address
 
-  --ledgerAddresses=ledgerAddresses                  [default: 1] If --userLedger is set, this will get the first N
+  --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
 
   --ledgerConfirmAddress                             Set it to ask confirmation for the address of the transaction from
                                                      the ledger
 
-  --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --userLedger is set, this will get the array of
+  --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
 
@@ -141,13 +76,13 @@ OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Executors's address
   --jsonTransactions=jsonTransactions                (required) Path to json transactions
 
-  --ledgerAddresses=ledgerAddresses                  [default: 1] If --userLedger is set, this will get the first N
+  --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
 
   --ledgerConfirmAddress                             Set it to ask confirmation for the address of the transaction from
                                                      the ledger
 
-  --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --userLedger is set, this will get the array of
+  --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
 
@@ -161,6 +96,37 @@ EXAMPLE
 ```
 
 _See code: [packages/cli/src/commands/governance/executehotfix.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/governance/executehotfix.ts)_
+
+### Hashhotfix
+
+Hash a governance hotfix specified by JSON and a salt
+
+```
+USAGE
+  $ celocli governance:hashhotfix
+
+OPTIONS
+  --jsonTransactions=jsonTransactions            (required) Path to json transactions of the hotfix
+
+  --ledgerAddresses=ledgerAddresses              [default: 1] If --useLedger is set, this will get the first N addresses
+                                                 for local signing
+
+  --ledgerConfirmAddress                         Set it to ask confirmation for the address of the transaction from the
+                                                 ledger
+
+  --ledgerCustomAddresses=ledgerCustomAddresses  [default: [0]] If --useLedger is set, this will get the array of index
+                                                 addresses for local signing. Example --ledgerCustomAddresses "[4,99]"
+
+  --salt=salt                                    (required) Secret salt associated with hotfix
+
+  --useLedger                                    Set it to use a ledger wallet
+
+EXAMPLE
+  hashhotfix --jsonTransactions ./transactions.json --salt
+  0x614dccb5ac13cba47c2430bdee7829bb8c8f3603a8ace22e7680d317b39e3658
+```
+
+_See code: [packages/cli/src/commands/governance/hashhotfix.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/governance/hashhotfix.ts)_
 
 ### List
 
@@ -188,13 +154,13 @@ OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Preparer's address
   --hash=hash                                        (required) Hash of hotfix transactions
 
-  --ledgerAddresses=ledgerAddresses                  [default: 1] If --userLedger is set, this will get the first N
+  --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
 
   --ledgerConfirmAddress                             Set it to ask confirmation for the address of the transaction from
                                                      the ledger
 
-  --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --userLedger is set, this will get the array of
+  --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
 
@@ -225,13 +191,13 @@ OPTIONS
 
   --jsonTransactions=jsonTransactions                (required) Path to json transactions
 
-  --ledgerAddresses=ledgerAddresses                  [default: 1] If --userLedger is set, this will get the first N
+  --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
 
   --ledgerConfirmAddress                             Set it to ask confirmation for the address of the transaction from
                                                      the ledger
 
-  --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --userLedger is set, this will get the array of
+  --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
 
@@ -244,6 +210,35 @@ EXAMPLE
 
 _See code: [packages/cli/src/commands/governance/propose.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/governance/propose.ts)_
 
+### Revokeupvote
+
+Revoke upvotes for queued governance proposals
+
+```
+USAGE
+  $ celocli governance:revokeupvote
+
+OPTIONS
+  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Upvoter's address
+
+  --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
+                                                     addresses for local signing
+
+  --ledgerConfirmAddress                             Set it to ask confirmation for the address of the transaction from
+                                                     the ledger
+
+  --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
+                                                     index addresses for local signing. Example --ledgerCustomAddresses
+                                                     "[4,99]"
+
+  --useLedger                                        Set it to use a ledger wallet
+
+EXAMPLE
+  revokeupvote --from 0x5409ed021d9299bf6814279a6a1411a7e866a631
+```
+
+_See code: [packages/cli/src/commands/governance/revokeupvote.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/governance/revokeupvote.ts)_
+
 ### Upvote
 
 Upvote a queued governance proposal
@@ -255,13 +250,13 @@ USAGE
 OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Upvoter's address
 
-  --ledgerAddresses=ledgerAddresses                  [default: 1] If --userLedger is set, this will get the first N
+  --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
 
   --ledgerConfirmAddress                             Set it to ask confirmation for the address of the transaction from
                                                      the ledger
 
-  --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --userLedger is set, this will get the array of
+  --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
 
@@ -303,12 +298,14 @@ USAGE
   $ celocli governance:viewhotfix
 
 OPTIONS
-  --hash=hash  (required) Hash of hotfix transactions
-  --notyet     Whether to list validators who have or have not yet whitelisted
+  --hash=hash        (required) Hash of hotfix transactions
+  --nonwhitelisters  If set, displays validators that have not whitelisted the hotfix.
+  --whitelisters     If set, displays validators that have whitelisted the hotfix.
 
 EXAMPLES
   viewhotfix --hash 0x614dccb5ac13cba47c2430bdee7829bb8c8f3603a8ace22e7680d317b39e3658
-  viewhotfix --hash 0x614dccb5ac13cba47c2430bdee7829bb8c8f3603a8ace22e7680d317b39e3658 --notyet
+  viewhotfix --hash 0x614dccb5ac13cba47c2430bdee7829bb8c8f3603a8ace22e7680d317b39e3658 --whitelisters
+  viewhotfix --hash 0x614dccb5ac13cba47c2430bdee7829bb8c8f3603a8ace22e7680d317b39e3658 --nonwhitelisters
 ```
 
 _See code: [packages/cli/src/commands/governance/viewhotfix.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/governance/viewhotfix.ts)_
@@ -324,13 +321,13 @@ USAGE
 OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Voter's address
 
-  --ledgerAddresses=ledgerAddresses                  [default: 1] If --userLedger is set, this will get the first N
+  --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
 
   --ledgerConfirmAddress                             Set it to ask confirmation for the address of the transaction from
                                                      the ledger
 
-  --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --userLedger is set, this will get the array of
+  --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
 
@@ -358,13 +355,13 @@ OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Whitelister's address
   --hash=hash                                        (required) Hash of hotfix transactions
 
-  --ledgerAddresses=ledgerAddresses                  [default: 1] If --userLedger is set, this will get the first N
+  --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
 
   --ledgerConfirmAddress                             Set it to ask confirmation for the address of the transaction from
                                                      the ledger
 
-  --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --userLedger is set, this will get the array of
+  --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
 

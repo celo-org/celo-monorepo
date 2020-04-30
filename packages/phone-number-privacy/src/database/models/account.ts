@@ -7,12 +7,11 @@ export enum ACCOUNTS_COLUMNS {
   numLookups = 'num_lookups',
   didMatchmaking = 'did_matchmaking',
 }
-
 export class Account extends Model {
-  address: string
-  createdAt: number = Date.now()
-  numLookups: number = 0
-  didMatchmaking: number | null = null
+  [ACCOUNTS_COLUMNS.address]: string;
+  [ACCOUNTS_COLUMNS.createdAt]: Date = new Date();
+  [ACCOUNTS_COLUMNS.numLookups]: number = 0;
+  [ACCOUNTS_COLUMNS.didMatchmaking]: Date | null = null
 
   constructor(address: string) {
     super()
