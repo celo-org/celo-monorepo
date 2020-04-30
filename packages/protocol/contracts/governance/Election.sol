@@ -97,7 +97,7 @@ contract Election is
     uint256 max;
   }
 
-  Votes private votes;
+  Votes internal votes;
   // Governs the minimum and maximum number of validators that can be elected.
   ElectableValidators public electableValidators;
   // Governs how many validator groups a single account can vote for.
