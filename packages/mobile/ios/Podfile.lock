@@ -503,7 +503,7 @@ DEPENDENCIES:
   - react-native-geth (from `../../../node_modules/react-native-geth`)
   - react-native-keep-awake (from `../../../node_modules/react-native-keep-awake`)
   - react-native-mail (from `../../../node_modules/react-native-mail`)
-  - "react-native-netinfo (from `../node_modules/@react-native-community/netinfo`)"
+  - "react-native-netinfo (from `../../../node_modules/@react-native-community/netinfo`)"
   - react-native-safe-area-context (from `../../../node_modules/react-native-safe-area-context`)
   - react-native-secure-randombytes (from `../../../node_modules/react-native-secure-randombytes`)
   - react-native-simple-toast (from `../../../node_modules/react-native-simple-toast`)
@@ -523,11 +523,11 @@ DEPENDENCIES:
   - React-RCTVibration (from `../../../node_modules/react-native/Libraries/Vibration`)
   - ReactCommon/callinvoker (from `../../../node_modules/react-native/ReactCommon`)
   - ReactCommon/turbomodule/core (from `../../../node_modules/react-native/ReactCommon`)
-  - "RNAnalytics (from `../node_modules/@segment/analytics-react-native`)"
-  - "RNAnalyticsIntegration-Firebase (from `../node_modules/@segment/analytics-react-native-firebase`)"
+  - "RNAnalytics (from `../../../node_modules/@segment/analytics-react-native`)"
+  - "RNAnalyticsIntegration-Firebase (from `../../../node_modules/@segment/analytics-react-native-firebase`)"
   - "RNCAsyncStorage (from `../../../node_modules/@react-native-community/async-storage`)"
   - "RNCMaskedView (from `../../../node_modules/@react-native-community/masked-view`)"
-  - RNDeviceInfo (from `../node_modules/react-native-device-info`)
+  - RNDeviceInfo (from `../../../node_modules/react-native-device-info`)
   - RNExitApp (from `../../../node_modules/react-native-exit-app`)
   - "RNFBApp (from `../../../node_modules/@react-native-firebase/app`)"
   - "RNFBAuth (from `../../../node_modules/@react-native-firebase/auth`)"
@@ -627,7 +627,7 @@ EXTERNAL SOURCES:
   react-native-mail:
     :path: "../../../node_modules/react-native-mail"
   react-native-netinfo:
-    :path: "../node_modules/@react-native-community/netinfo"
+    :path: "../../../node_modules/@react-native-community/netinfo"
   react-native-safe-area-context:
     :path: "../../../node_modules/react-native-safe-area-context"
   react-native-secure-randombytes:
@@ -665,15 +665,15 @@ EXTERNAL SOURCES:
   ReactCommon:
     :path: "../../../node_modules/react-native/ReactCommon"
   RNAnalytics:
-    :path: "../node_modules/@segment/analytics-react-native"
+    :path: "../../../node_modules/@segment/analytics-react-native"
   RNAnalyticsIntegration-Firebase:
-    :path: "../node_modules/@segment/analytics-react-native-firebase"
+    :path: "../../../node_modules/@segment/analytics-react-native-firebase"
   RNCAsyncStorage:
     :path: "../../../node_modules/@react-native-community/async-storage"
   RNCMaskedView:
     :path: "../../../node_modules/@react-native-community/masked-view"
   RNDeviceInfo:
-    :path: "../node_modules/react-native-device-info"
+    :path: "../../../node_modules/react-native-device-info"
   RNExitApp:
     :path: "../../../node_modules/react-native-exit-app"
   RNFBApp:

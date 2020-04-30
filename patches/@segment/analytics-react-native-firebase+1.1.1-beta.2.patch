@@ -1,12 +1,4 @@
 patch-package
---- a/node_modules/@segment/analytics-react-native-firebase/RNAnalyticsIntegration-Firebase.podspec
-+++ b/node_modules/@segment/analytics-react-native-firebase/RNAnalyticsIntegration-Firebase.podspec
-@@ -25,4 +25,5 @@ Pod::Spec.new do |s|
-   s.dependency          'Segment-Firebase'
-   s.dependency          'Analytics'
-   s.dependency          'React'
-+  s.dependency          'RNAnalytics'
- end
 --- a/node_modules/@segment/analytics-react-native-firebase/android/build.gradle
 +++ b/node_modules/@segment/analytics-react-native-firebase/android/build.gradle
 @@ -26,6 +26,10 @@ android {
@@ -33,7 +25,7 @@ patch-package
  @end
 --- a/node_modules/@segment/analytics-react-native-firebase/android/build.gradle
 +++ b/node_modules/@segment/analytics-react-native-firebase/android/build.gradle
-@@ -43,7 +43,7 @@ repositories {
+@@ -42,7 +42,7 @@ repositories {
 
 
  dependencies {
