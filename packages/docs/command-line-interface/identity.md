@@ -24,6 +24,7 @@ USAGE
   $ celocli identity:test-attestation-service
 
 OPTIONS
+  --azureVaultName=azureVaultName                    If --useAKV is set, this is used to connect to the Azure KeyVault
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Your validator's signer or account address
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
@@ -39,6 +40,8 @@ OPTIONS
   --message=message                                  (required) The message of the SMS
 
   --phoneNumber=+14152223333                         (required) The phone number to send the test message to
+
+  --useAKV                                           Set it to use an Azure KeyVault HSM
 
   --useLedger                                        Set it to use a ledger wallet
 

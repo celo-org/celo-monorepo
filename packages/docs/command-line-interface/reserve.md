@@ -27,6 +27,7 @@ USAGE
   $ celocli reserve:transfergold
 
 OPTIONS
+  --azureVaultName=azureVaultName                    If --useAKV is set, this is used to connect to the Azure KeyVault
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Spender's address
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
@@ -40,6 +41,8 @@ OPTIONS
                                                      "[4,99]"
 
   --to=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d    (required) Receiving address
+
+  --useAKV                                           Set it to use an Azure KeyVault HSM
 
   --useLedger                                        Set it to use a ledger wallet
 

@@ -13,6 +13,7 @@ USAGE
   $ celocli election:activate
 
 OPTIONS
+  --azureVaultName=azureVaultName                    If --useAKV is set, this is used to connect to the Azure KeyVault
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Voter's address
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
@@ -24,6 +25,8 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
+
+  --useAKV                                           Set it to use an Azure KeyVault HSM
 
   --useLedger                                        Set it to use a ledger wallet
 
@@ -70,6 +73,7 @@ USAGE
   $ celocli election:revoke
 
 OPTIONS
+  --azureVaultName=azureVaultName                    If --useAKV is set, this is used to connect to the Azure KeyVault
   --for=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d   (required) ValidatorGroup's address
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Voter's address
 
@@ -82,6 +86,8 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
+
+  --useAKV                                           Set it to use an Azure KeyVault HSM
 
   --useLedger                                        Set it to use a ledger wallet
 
@@ -136,6 +142,7 @@ USAGE
   $ celocli election:vote
 
 OPTIONS
+  --azureVaultName=azureVaultName                    If --useAKV is set, this is used to connect to the Azure KeyVault
   --for=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d   (required) ValidatorGroup's address
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Voter's address
 
@@ -148,6 +155,8 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
+
+  --useAKV                                           Set it to use an Azure KeyVault HSM
 
   --useLedger                                        Set it to use a ledger wallet
 

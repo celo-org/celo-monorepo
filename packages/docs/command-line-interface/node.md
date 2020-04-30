@@ -13,6 +13,8 @@ USAGE
   $ celocli node:accounts
 
 OPTIONS
+  --azureVaultName=azureVaultName                If --useAKV is set, this is used to connect to the Azure KeyVault
+
   --ledgerAddresses=ledgerAddresses              [default: 1] If --useLedger is set, this will get the first N addresses
                                                  for local signing
 
@@ -21,6 +23,8 @@ OPTIONS
 
   --ledgerCustomAddresses=ledgerCustomAddresses  [default: [0]] If --useLedger is set, this will get the array of index
                                                  addresses for local signing. Example --ledgerCustomAddresses "[4,99]"
+
+  --useAKV                                       Set it to use an Azure KeyVault HSM
 
   --useLedger                                    Set it to use a ledger wallet
 ```

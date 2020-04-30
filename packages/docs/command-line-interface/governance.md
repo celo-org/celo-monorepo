@@ -13,6 +13,7 @@ USAGE
   $ celocli governance:dequeue
 
 OPTIONS
+  --azureVaultName=azureVaultName                    If --useAKV is set, this is used to connect to the Azure KeyVault
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) From address
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
@@ -24,6 +25,8 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
+
+  --useAKV                                           Set it to use an Azure KeyVault HSM
 
   --useLedger                                        Set it to use a ledger wallet
 
@@ -42,6 +45,7 @@ USAGE
   $ celocli governance:execute
 
 OPTIONS
+  --azureVaultName=azureVaultName                    If --useAKV is set, this is used to connect to the Azure KeyVault
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Executor's address
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
@@ -55,6 +59,8 @@ OPTIONS
                                                      "[4,99]"
 
   --proposalID=proposalID                            (required) UUID of proposal to execute
+
+  --useAKV                                           Set it to use an Azure KeyVault HSM
 
   --useLedger                                        Set it to use a ledger wallet
 
@@ -73,6 +79,7 @@ USAGE
   $ celocli governance:executehotfix
 
 OPTIONS
+  --azureVaultName=azureVaultName                    If --useAKV is set, this is used to connect to the Azure KeyVault
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Executors's address
   --jsonTransactions=jsonTransactions                (required) Path to json transactions
 
@@ -87,6 +94,8 @@ OPTIONS
                                                      "[4,99]"
 
   --salt=salt                                        (required) Secret salt associated with hotfix
+
+  --useAKV                                           Set it to use an Azure KeyVault HSM
 
   --useLedger                                        Set it to use a ledger wallet
 
@@ -106,6 +115,7 @@ USAGE
   $ celocli governance:hashhotfix
 
 OPTIONS
+  --azureVaultName=azureVaultName                If --useAKV is set, this is used to connect to the Azure KeyVault
   --jsonTransactions=jsonTransactions            (required) Path to json transactions of the hotfix
 
   --ledgerAddresses=ledgerAddresses              [default: 1] If --useLedger is set, this will get the first N addresses
@@ -118,6 +128,8 @@ OPTIONS
                                                  addresses for local signing. Example --ledgerCustomAddresses "[4,99]"
 
   --salt=salt                                    (required) Secret salt associated with hotfix
+
+  --useAKV                                       Set it to use an Azure KeyVault HSM
 
   --useLedger                                    Set it to use a ledger wallet
 
@@ -151,6 +163,7 @@ USAGE
   $ celocli governance:preparehotfix
 
 OPTIONS
+  --azureVaultName=azureVaultName                    If --useAKV is set, this is used to connect to the Azure KeyVault
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Preparer's address
   --hash=hash                                        (required) Hash of hotfix transactions
 
@@ -163,6 +176,8 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
+
+  --useAKV                                           Set it to use an Azure KeyVault HSM
 
   --useLedger                                        Set it to use a ledger wallet
 
@@ -182,6 +197,7 @@ USAGE
   $ celocli governance:propose
 
 OPTIONS
+  --azureVaultName=azureVaultName                    If --useAKV is set, this is used to connect to the Azure KeyVault
   --deposit=deposit                                  (required) Amount of Gold to attach to proposal
 
   --descriptionURL=descriptionURL                    (required) A URL where further information about the proposal can
@@ -201,6 +217,8 @@ OPTIONS
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
 
+  --useAKV                                           Set it to use an Azure KeyVault HSM
+
   --useLedger                                        Set it to use a ledger wallet
 
 EXAMPLE
@@ -219,6 +237,7 @@ USAGE
   $ celocli governance:revokeupvote
 
 OPTIONS
+  --azureVaultName=azureVaultName                    If --useAKV is set, this is used to connect to the Azure KeyVault
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Upvoter's address
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
@@ -230,6 +249,8 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
+
+  --useAKV                                           Set it to use an Azure KeyVault HSM
 
   --useLedger                                        Set it to use a ledger wallet
 
@@ -248,6 +269,7 @@ USAGE
   $ celocli governance:upvote
 
 OPTIONS
+  --azureVaultName=azureVaultName                    If --useAKV is set, this is used to connect to the Azure KeyVault
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Upvoter's address
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
@@ -261,6 +283,8 @@ OPTIONS
                                                      "[4,99]"
 
   --proposalID=proposalID                            (required) UUID of proposal to upvote
+
+  --useAKV                                           Set it to use an Azure KeyVault HSM
 
   --useLedger                                        Set it to use a ledger wallet
 
@@ -319,6 +343,7 @@ USAGE
   $ celocli governance:vote
 
 OPTIONS
+  --azureVaultName=azureVaultName                    If --useAKV is set, this is used to connect to the Azure KeyVault
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Voter's address
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
@@ -332,6 +357,8 @@ OPTIONS
                                                      "[4,99]"
 
   --proposalID=proposalID                            (required) UUID of proposal to vote on
+
+  --useAKV                                           Set it to use an Azure KeyVault HSM
 
   --useLedger                                        Set it to use a ledger wallet
 
@@ -352,6 +379,7 @@ USAGE
   $ celocli governance:whitelisthotfix
 
 OPTIONS
+  --azureVaultName=azureVaultName                    If --useAKV is set, this is used to connect to the Azure KeyVault
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Whitelister's address
   --hash=hash                                        (required) Hash of hotfix transactions
 
@@ -364,6 +392,8 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
+
+  --useAKV                                           Set it to use an Azure KeyVault HSM
 
   --useLedger                                        Set it to use a ledger wallet
 

@@ -11,7 +11,7 @@ import { Command, flags } from '@oclif/command'
 import { ParserOutput } from '@oclif/parser/lib/parse'
 import net from 'net'
 import Web3 from 'web3'
-import { getNodeUrl } from './utils/config'
+import { CeloConfig, ConfigRetriever } from './utils/config'
 import { requireNodeIsSynced } from './utils/helpers'
 
 // Base for commands that do not need web3.
@@ -45,35 +45,29 @@ export abstract class BaseCommand extends LocalCommand {
     node: flags.string({ char: 'n', hidden: true }),
     useLedger: flags.boolean({
       default: false,
-      hidden: false,
       description: 'Set it to use a ledger wallet',
     }),
     ledgerAddresses: flags.integer({
       default: 1,
-      hidden: false,
       exclusive: ['ledgerCustomAddresses'],
       description: 'If --useLedger is set, this will get the first N addresses for local signing',
     }),
     ledgerCustomAddresses: flags.string({
       default: '[0]',
-      hidden: false,
       exclusive: ['ledgerAddresses'],
       description:
         'If --useLedger is set, this will get the array of index addresses for local signing. Example --ledgerCustomAddresses "[4,99]"',
     }),
+    ledgerConfirmAddress: flags.boolean({
+      default: false,
+      description: 'Set it to ask confirmation for the address of the transaction from the ledger',
+    }),
     useAKV: flags.boolean({
       default: false,
-      hidden: true,
       description: 'Set it to use an Azure KeyVault HSM',
     }),
     azureVaultName: flags.string({
-      hidden: true,
       description: 'If --useAKV is set, this is used to connect to the Azure KeyVault',
-    }),
-    ledgerConfirmAddress: flags.boolean({
-      default: false,
-      hidden: false,
-      description: 'Set it to ask confirmation for the address of the transaction from the ledger',
     }),
   }
 
@@ -85,6 +79,8 @@ export abstract class BaseCommand extends LocalCommand {
       ledgerAddresses: flags.integer({ hidden: true, default: 1 }),
       ledgerCustomAddresses: flags.string({ hidden: true, default: '[0]' }),
       ledgerConfirmAddress: flags.boolean({ hidden: true }),
+      useAKV: flags.boolean({ hidden: true }),
+      azureVaultName: flags.string({ hidden: true }),
     }
   }
   // This specifies whether the node needs to be synced before the command
@@ -97,11 +93,12 @@ export abstract class BaseCommand extends LocalCommand {
   private _web3: Web3 | null = null
   private _kit: ContractKit | null = null
   private _wallet?: Wallet
+  private _configRetriever?: ConfigRetriever
 
   get web3() {
     if (!this._web3) {
       const res: ParserOutput<any, any> = this.parse()
-      const nodeUrl = (res.flags && res.flags.node) || getNodeUrl(this.config.configDir)
+      const nodeUrl = this.flagOrConfig(res, 'node')
       this._web3 =
         nodeUrl && nodeUrl.endsWith('.ipc')
           ? new Web3(new Web3.providers.IpcProvider(nodeUrl, net))
@@ -116,10 +113,22 @@ export abstract class BaseCommand extends LocalCommand {
     }
 
     const res: ParserOutput<any, any> = this.parse()
-    if (res.flags && res.flags.privateKey && !res.flags.useLedger && !res.flags.useAKV) {
+    if (
+      res.flags &&
+      this.flagOrConfig(res, 'privateKey') &&
+      !this.flagOrConfig(res, 'useLedger') &&
+      !this.flagOrConfig(res, 'useAKV')
+    ) {
       this._kit.addAccount(res.flags.privateKey)
     }
     return this._kit
+  }
+
+  get configRetriever() {
+    if (!this._configRetriever) {
+      this._configRetriever = new ConfigRetriever(this.config.configDir)
+    }
+    return this._configRetriever
   }
 
   async init() {
@@ -127,19 +136,19 @@ export abstract class BaseCommand extends LocalCommand {
       await requireNodeIsSynced(this.web3)
     }
     const res: ParserOutput<any, any> = this.parse()
-    if (res.flags.useLedger) {
+    if (res.flags.useLedger || this.configRetriever.getKey('useLedger')) {
       let transport: Transport
       try {
         transport = await TransportNodeHid.open('')
-        const derivationPathIndexes = res.raw.some(
-          (value) => (value as any).flag === 'ledgerCustomAddresses'
-        )
-          ? JSON.parse(res.flags.ledgerCustomAddresses)
-          : Array.from(Array(res.flags.ledgerAddresses).keys())
+        const derivationPathIndexes =
+          res.raw.some((value) => (value as any).flag === 'ledgerCustomAddresses') ||
+          this.configRetriever.getKey('ledgerCustomAddresses')
+            ? JSON.parse(this.flagOrConfig(res, 'ledgerCustomAddresses'))
+            : Array.from(Array(this.flagOrConfig(res, 'ledgerAddresses')).keys())
 
         console.log('Retrieving derivation Paths', derivationPathIndexes)
         let ledgerConfirmation = AddressValidation.never
-        if (res.flags.ledgerConfirmAddress) {
+        if (this.flagOrConfig(res, 'ledgerConfirmAddress')) {
           ledgerConfirmation = AddressValidation.everyTransaction
         }
         this._wallet = await newLedgerWalletWithSetup(
@@ -152,11 +161,11 @@ export abstract class BaseCommand extends LocalCommand {
         console.log('Check if the ledger is connected and logged.')
         throw err
       }
-    } else if (res.flags.useAKV) {
+    } else if (this.flagOrConfig(res, 'useAKV')) {
       try {
-        const akvWallet = await new AzureHSMWallet(res.flags.azureVaultName)
+        const akvWallet = new AzureHSMWallet(this.flagOrConfig(res, 'azureVaultName'))
         await akvWallet.init()
-        console.log(`Found addresses: ${await akvWallet.getAccounts()}`)
+        console.log(`Found addresses: ${akvWallet.getAccounts()}`)
         this._wallet = akvWallet
       } catch (err) {
         console.log(`Failed to connect to AKV ${err}`)
@@ -173,5 +182,14 @@ export abstract class BaseCommand extends LocalCommand {
     }
 
     return super.finally(arg)
+  }
+
+  private flagOrConfig(res: ParserOutput<any, any>, configStr: keyof CeloConfig) {
+    // Ask if especifically the flag was called (otherwise could have a default)
+    if (res.raw.some((v) => (v as any).flag === configStr)) {
+      return res.flags[configStr]
+    }
+    // returns the cached parameter or the default (if it has any)
+    return this.configRetriever.getKey(configStr) || res.flags[configStr]
   }
 }

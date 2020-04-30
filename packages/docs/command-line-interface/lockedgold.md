@@ -13,6 +13,7 @@ USAGE
   $ celocli lockedgold:lock
 
 OPTIONS
+  --azureVaultName=azureVaultName                If --useAKV is set, this is used to connect to the Azure KeyVault
   --from=from                                    (required)
 
   --ledgerAddresses=ledgerAddresses              [default: 1] If --useLedger is set, this will get the first N addresses
@@ -23,6 +24,8 @@ OPTIONS
 
   --ledgerCustomAddresses=ledgerCustomAddresses  [default: [0]] If --useLedger is set, this will get the array of index
                                                  addresses for local signing. Example --ledgerCustomAddresses "[4,99]"
+
+  --useAKV                                       Set it to use an Azure KeyVault HSM
 
   --useLedger                                    Set it to use a ledger wallet
 
@@ -57,6 +60,7 @@ USAGE
   $ celocli lockedgold:unlock
 
 OPTIONS
+  --azureVaultName=azureVaultName                    If --useAKV is set, this is used to connect to the Azure KeyVault
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Account Address
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
@@ -68,6 +72,8 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
+
+  --useAKV                                           Set it to use an Azure KeyVault HSM
 
   --useLedger                                        Set it to use a ledger wallet
 
@@ -88,6 +94,7 @@ USAGE
   $ celocli lockedgold:withdraw
 
 OPTIONS
+  --azureVaultName=azureVaultName                    If --useAKV is set, this is used to connect to the Azure KeyVault
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Account Address
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
@@ -99,6 +106,8 @@ OPTIONS
   --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
+
+  --useAKV                                           Set it to use an Azure KeyVault HSM
 
   --useLedger                                        Set it to use a ledger wallet
 
