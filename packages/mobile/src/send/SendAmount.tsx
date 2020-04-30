@@ -33,6 +33,7 @@ import {
   DOLLAR_TRANSACTION_MIN_AMOUNT,
   MAX_COMMENT_LENGTH,
   NUMBER_INPUT_MAX_DECIMALS,
+  DAILY_PAYMENT_LIMIT_CUSD,
 } from 'src/config'
 import { FeeType } from 'src/fees/actions'
 import EstimateFee from 'src/fees/EstimateFee'
@@ -45,6 +46,7 @@ import { E164NumberToAddressType } from 'src/identity/reducer'
 import { LocalCurrencyCode, LocalCurrencySymbol } from 'src/localCurrency/consts'
 import {
   convertDollarsToMaxSupportedPrecision,
+  convertDollarsToLocalAmount,
   convertLocalAmountToDollars,
 } from 'src/localCurrency/convert'
 import { getLocalCurrencyCode, getLocalCurrencyExchangeRate } from 'src/localCurrency/selectors'
@@ -61,7 +63,7 @@ import { RootState } from 'src/redux/reducers'
 import { PaymentInfo } from 'src/send/reducers'
 import { getRecentPayments } from 'src/send/selectors'
 import { ConfirmationInput } from 'src/send/SendConfirmation'
-import { isPaymentLimitReached } from 'src/send/utils'
+import { isPaymentLimitReached, dailyAmountRemaining } from 'src/send/utils'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { fetchDollarBalance } from 'src/stableToken/actions'
 import { withDecimalSeparator } from 'src/utils/withDecimalSeparator'
@@ -253,6 +255,28 @@ export class SendAmount extends React.Component<Props, State> {
     this.setState({ reason, characterLimitExceeded })
   }
 
+  showLimitReachedError = (now: number) => {
+    const dailyRemainingcUSD = dailyAmountRemaining(now, this.props.recentPayments)
+    const dailyRemaining = convertDollarsToLocalAmount(
+      dailyRemainingcUSD,
+      this.props.localCurrencyExchangeRate
+    )
+    const dailyLimit = convertDollarsToLocalAmount(
+      DAILY_PAYMENT_LIMIT_CUSD,
+      this.props.localCurrencyExchangeRate
+    )
+    const currencySymbol = LocalCurrencySymbol[this.props.localCurrencyCode]
+
+    const translationParams = {
+      currencySymbol,
+      dailyRemaining,
+      dailyLimit,
+      dailyRemainingcUSD,
+      dailyLimitcUSD: DAILY_PAYMENT_LIMIT_CUSD,
+    }
+    this.props.showError(ErrorMessages.PAYMENT_LIMIT_REACHED, null, translationParams)
+  }
+
   onSend = () => {
     const { isDollarBalanceSufficient } = this.isAmountValid()
     if (!isDollarBalanceSufficient) {
@@ -261,9 +285,10 @@ export class SendAmount extends React.Component<Props, State> {
     }
 
     const amount = this.getDollarsAmount().toNumber()
-    const isLimitReached = isPaymentLimitReached(Date.now(), this.props.recentPayments, amount)
+    const now = Date.now()
+    const isLimitReached = isPaymentLimitReached(now, this.props.recentPayments, amount)
     if (isLimitReached) {
-      this.props.showError(ErrorMessages.PAYMENT_LIMIT_REACHED)
+      this.showLimitReachedError(now)
       return
     }
 

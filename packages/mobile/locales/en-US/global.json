@@ -114,5 +114,5 @@
     "30d": "30 days"
   },
   "message": "Message",
-  "paymentLimitReached": "The daily limit is {{dailyLimit}} {{dailyRemaining}} remaining"
+  "paymentLimitReached": "The daily limit is {{dailyLimitcUSD}} CUSD ({{currencySymbol}}{{dailyLimit}})\n{{dailyRemainingcUSD}} ({{currencySymbol}}{{dailyRemaining}}) remaining"
 }

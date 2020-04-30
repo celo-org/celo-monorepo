@@ -1,10 +1,9 @@
 import { PaymentInfo } from 'src/send/reducers'
-import { isPaymentLimitReached } from 'src/send/utils'
+import { dailyAmountRemaining, isPaymentLimitReached } from 'src/send/utils'
 
 describe('send/utils', () => {
+  const HOURS = 3600 * 1000
   describe('isPaymentLimitReached', () => {
-    const HOURS = 3600 * 1000
-
     it('no recent payments, fine', () => {
       const now = Date.now()
       const newPayment = 10
@@ -68,6 +67,38 @@ describe('send/utils', () => {
         { timestamp: now - 6 * HOURS, amount: 250 },
       ]
       expect(isPaymentLimitReached(now, recentPayments, newPayment)).toBeTruthy()
+    })
+  })
+  describe('dailyAmountRemaining', () => {
+    it('returns difference between amount sent in last 24 hours and the Limit', () => {
+      const now = Date.now()
+      const recentPayments: PaymentInfo[] = [{ timestamp: now, amount: 10 }]
+      expect(dailyAmountRemaining(now, recentPayments)).toEqual(490)
+    })
+
+    it('returns 0 when limit has been reached', () => {
+      const now = Date.now()
+      const recentPayments: PaymentInfo[] = [
+        { timestamp: now, amount: 100 },
+        { timestamp: now, amount: 200 },
+        { timestamp: now, amount: 200 },
+      ]
+      expect(dailyAmountRemaining(now, recentPayments)).toEqual(0)
+    })
+
+    it('works fine when no payments have been sent', () => {
+      const now = Date.now()
+      const recentPayments: PaymentInfo[] = []
+      expect(dailyAmountRemaining(now, recentPayments)).toEqual(500)
+    })
+
+    it('works fine when payments were sent but some more than 24 hours ago', () => {
+      const now = Date.now()
+      const recentPayments: PaymentInfo[] = [
+        { timestamp: now - 48 * HOURS, amount: 300 },
+        { timestamp: now - 16 * HOURS, amount: 300 },
+      ]
+      expect(dailyAmountRemaining(now, recentPayments)).toEqual(200)
     })
   })
 })
