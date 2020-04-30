@@ -21,7 +21,6 @@ export async function estimateGas(txObj: TransactionObject<any>, txParams: Tx) {
   const gas = new BigNumber(await ckEstimateGas(txParams, gasEstimator, caller))
     .times(GAS_INFLATION_FACTOR)
     .integerValue()
-  Logger.debug('Estimated gas: ', gas.toString())
   return gas
 }
 
