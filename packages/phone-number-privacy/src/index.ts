@@ -9,7 +9,7 @@ export const getBlindedSalt = functions.https.onRequest(async (request, response
   return handleGetBlindedMessageForSalt(request, response)
 })
 
-// EG. curl -v "http://localhost:5000/celo-phone-number-privacy/us-central1/getContactMatches" -d '{"userPhoneNumber": "99999999999", "contactPhoneNumbers": ["5555555555", "3333333333"], "account": "0x117ea45d497ab022b85494ba3ab6f52969bf6812"}' -H 'Content-Type: application/json'
+// EG. curl -v "http://localhost:5000/celo-phone-number-privacy/us-central1/getContactMatches" -d '{"userPhoneNumber": "+99999999999", "contactPhoneNumbers": ["+5555555555", "+3333333333"], "account": "0x117ea45d497ab022b85494ba3ab6f52969bf6812"}' -H 'Content-Type: application/json'
 export const getContactMatches = functions.https.onRequest(async (request, response) => {
   logger.info('Begin getContactMatches request')
   return handleGetContactMatches(request, response)

@@ -21,6 +21,8 @@
     "ts-node": "^8.5.4"
   },
   "devDependencies": {
+    "@types/bunyan": "1.8.4",
+    "@types/dotenv": "4.0.3",
     "bunyan-debug-stream": "^2.0.0"
   },
   "scripts": {

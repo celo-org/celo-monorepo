@@ -20,7 +20,7 @@ Celo uses a [proof-of-stake](../celo-codebase/protocol/proof-of-stake) consensus
 
 Participating in the Baklava testnet requires testnet units of Celo Gold, which can only be used in the Baklava testnet. You can request a distribution of testnet Celo Gold by filling out [the faucet request form](https://forms.gle/JTYkMAJWTAUQp1sv9). If you need any help getting started, please join the discussion on [Discord](https://discord.gg/6yWMkgM) or email community@celo.org.
 
-Fauceted funds will come as two `ReleaseGold` contracts. At a high level, `ReleaseGold` holds a balance for scheduled release, while allowing the held balance to be used for certain actions such as validating and voting, depending on the configuration of the contract. [Read more about `ReleaseGold`.](../celo-codebase/protocol/release-gold)
+Fauceted funds will come as two `ReleaseGold` contracts. At a high level, `ReleaseGold` holds a balance for scheduled release, while allowing the held balance to be used for certain actions such as validating and voting, depending on the configuration of the contract. [Read more about `ReleaseGold`.](../celo-gold-holder-guide/release-gold.md)
 
 ### Hardware requirements
 
@@ -304,7 +304,7 @@ At this point your Validator and Proxy machines should be configured, and both s
 
 In order to operate as a Validator, you must register on-chain and be elected. Elections will run on each epoch boundary, approximatly every 24 hours, after elections have been unfrozen by on-chain governance. Eligible validator groups will be considered in an Election mechanism that will select Validator based on the [D'Hondt method](https://en.wikipedia.org/wiki/D%27Hondt_method).
 
-In the following steps, this guide will assume your Celo Gold is held in a `ReleaseGold` contract, if this is not the case, the commands will need to be adjusted. At a high level, `ReleaseGold` holds a balance for scheduled release, while allowing the held balance to be used for certain actions such as validating and voting, depending on the configuration of the contract. [Read more about `ReleaseGold`.](../celo-codebase/protocol/release-gold)
+In the following steps, this guide will assume your Celo Gold is held in a `ReleaseGold` contract, if this is not the case, the commands will need to be adjusted. At a high level, `ReleaseGold` holds a balance for scheduled release, while allowing the held balance to be used for certain actions such as validating and voting, depending on the configuration of the contract. [Read more about `ReleaseGold`.](../celo-gold-holder-guide/release-gold.md)
 
 The following sections outline the actions you will need to take. On a high level, we will:
 
