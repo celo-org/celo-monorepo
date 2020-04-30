@@ -10,7 +10,10 @@ export const stringToBoolean = (inputString: string): boolean => {
   throw new Error(`Unable to parse '${inputString}' as boolean`)
 }
 
-export const parseInputAmount = (inputString: string): BigNumber => {
+export const parseInputAmount = (inputString: string, decimalSeparator = '.'): BigNumber => {
+  if (decimalSeparator !== '.') {
+    inputString = inputString.replace(decimalSeparator, '.')
+  }
   return new BigNumber(inputString || '0')
 }
 

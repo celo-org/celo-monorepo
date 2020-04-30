@@ -56,6 +56,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
   event UnlockingPeriodSet(uint256 period);
   event GoldLocked(address indexed account, uint256 value);
   event GoldUnlocked(address indexed account, uint256 value, uint256 available);
+  event GoldRelocked(address indexed account, uint256 value);
   event GoldWithdrawn(address indexed account, uint256 value);
   event SlasherWhitelistAdded(string indexed slasherIdentifier);
   event SlasherWhitelistRemoved(string indexed slasherIdentifier);
@@ -182,7 +183,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
       pendingWithdrawal.value = pendingWithdrawal.value.sub(value);
     }
     _incrementNonvotingAccountBalance(msg.sender, value);
-    emit GoldLocked(msg.sender, value);
+    emit GoldRelocked(msg.sender, value);
   }
 
   /**
@@ -197,6 +198,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     require(now >= pendingWithdrawal.timestamp, "Pending withdrawal not available");
     uint256 value = pendingWithdrawal.value;
     deletePendingWithdrawal(account.pendingWithdrawals, index);
+    require(value <= address(this).balance, "Inconsistent balance");
     msg.sender.transfer(value);
     emit GoldWithdrawn(msg.sender, value);
   }
@@ -359,6 +361,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     }
     address communityFund = registry.getAddressForOrDie(GOVERNANCE_REGISTRY_ID);
     address payable communityFundPayable = address(uint160(communityFund));
+    require(maxSlash.sub(reward) <= address(this).balance, "Inconsistent balance");
     communityFundPayable.transfer(maxSlash.sub(reward));
     emit AccountSlashed(account, maxSlash, reporter, reward);
   }

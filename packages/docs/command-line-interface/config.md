@@ -26,8 +26,9 @@ USAGE
 OPTIONS
   -n, --node=node  (required) [default: http://localhost:8545] URL of the node to run commands against
 
-EXAMPLE
+EXAMPLES
   set  --node ws://localhost:2500
+  set  --node <geth-location>/geth.ipc
 ```
 
 _See code: [packages/cli/src/commands/config/set.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/config/set.ts)_

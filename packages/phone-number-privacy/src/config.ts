@@ -1,11 +1,20 @@
+import BigNumber from 'bignumber.js'
 import * as functions from 'firebase-functions'
-import knex from 'knex'
+import Web3 from 'web3'
+import logger from './common/logger'
 
-const DEV_MODE = process.env.NODE_ENV !== 'production' || process.env.FUNCTIONS_EMULATOR === 'true'
+export const DEV_MODE =
+  process.env.NODE_ENV !== 'production' || process.env.FUNCTIONS_EMULATOR === 'true'
 
 interface Config {
+  blockchain: {
+    provider: string
+  }
   salt: {
-    key: string
+    unverifiedQueryMax: number
+    additionalVerifiedQueryMax: number
+    queryPerTransaction: number
+    minDollarBalance: BigNumber
   }
   db: {
     user: string
@@ -13,15 +22,31 @@ interface Config {
     database: string
     host: string
   }
+  keyVault: {
+    azureClientID: string
+    azureClientSecret: string
+    azureTenant: string
+    azureVaultName: string
+    azureSecretName: string
+  }
+  attestations: {
+    numberAttestationsRequired: number
+  }
 }
 
 let config: Config
 
 if (DEV_MODE) {
-  console.debug('Running in dev mode')
+  logger.debug('Running in dev mode')
   config = {
+    blockchain: {
+      provider: 'https://alfajores-forno.celo-testnet.org',
+    },
     salt: {
-      key: 'fakeSecretKey',
+      unverifiedQueryMax: 2,
+      additionalVerifiedQueryMax: 30,
+      queryPerTransaction: 2,
+      minDollarBalance: new BigNumber(Web3.utils.toWei('0.1')),
     },
     db: {
       user: 'postgres',
@@ -29,12 +54,28 @@ if (DEV_MODE) {
       database: 'phoneNumberPrivacy',
       host: 'fakeHost',
     },
+    keyVault: {
+      azureClientID: 'useMock',
+      azureClientSecret: 'useMock',
+      azureTenant: 'useMock',
+      azureVaultName: 'useMock',
+      azureSecretName: 'useMock',
+    },
+    attestations: {
+      numberAttestationsRequired: 3,
+    },
   }
 } else {
   const functionConfig = functions.config()
   config = {
+    blockchain: {
+      provider: functionConfig.blockchain.provider,
+    },
     salt: {
-      key: functionConfig.salt.key,
+      unverifiedQueryMax: functionConfig.salt.unverified_query_max,
+      additionalVerifiedQueryMax: functionConfig.salt.additional_verified_query_max,
+      queryPerTransaction: functionConfig.salt.query_per_transaction,
+      minDollarBalance: new BigNumber(functionConfig.salt.min_dollar_balance),
     },
     db: {
       user: functionConfig.db.username,
@@ -42,16 +83,17 @@ if (DEV_MODE) {
       database: functionConfig.db.name,
       host: `/cloudsql/${functionConfig.db.host}`,
     },
+    keyVault: {
+      azureClientID: functionConfig.keyVault.azureClientID,
+      azureClientSecret: functionConfig.keyVault.azureClientSecret,
+      azureTenant: functionConfig.keyVault.azureTenant,
+      azureVaultName: functionConfig.keyVault.azureVaultName,
+      azureSecretName: functionConfig.keyVault.azureSecretName,
+    },
+    attestations: {
+      numberAttestationsRequired: functionConfig.attestations.number_attestations_required,
+    },
   }
+  logger.debug('Using function config: ', { ...config, salt: { ...config.salt, key: 'mockKey' } })
 }
-
-export const connectToDatabase = () => {
-  console.debug('Creating knex instance')
-  return knex({
-    client: 'pg',
-    connection: config.db,
-    debug: DEV_MODE,
-  })
-}
-
 export default config

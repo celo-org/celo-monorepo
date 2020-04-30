@@ -8,7 +8,7 @@ const getChildren = (node) =>
   node && node.children ? node.children : node.props && node.props.children
 
 const renderNodes = (reactNodes) => {
-  if (typeof reactNodes === 'string') {
+  if (typeof reactNodes === 'string' || React.isValidElement(reactNodes)) {
     return reactNodes
   }
 
