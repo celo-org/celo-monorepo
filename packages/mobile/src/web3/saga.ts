@@ -38,7 +38,7 @@ import {
   updateWeb3SyncProgress,
   Web3SyncProgress,
 } from 'src/web3/actions'
-import { addLocalAccount, getContractKit, switchWeb3ProviderForSyncMode } from 'src/web3/contracts'
+import { addLocalAccount, getContractKit } from 'src/web3/contracts'
 import { readPrivateKeyFromLocalDisk, savePrivateKeyToLocalDisk } from 'src/web3/privateKey'
 import {
   currentAccountInWeb3KeystoreSelector,
@@ -393,9 +393,13 @@ export function* switchToGethFromForno() {
   try {
     const gethAlreadyStartedThisSession = yield select(gethStartedThisSessionSelector)
     yield put(setContractKitReady(false)) // Lock contractKit during provider switch
+    Logger.error(TAG + '@switchToGethFromForno', 'Set contractKit not ready')
+
     yield put(setFornoMode(false))
 
     if (gethAlreadyStartedThisSession) {
+      Logger.error(TAG + '@switchToGethFromForno', 'Geth restart')
+
       // Call any method on web3 to avoid a persist state issue
       // This is a temporary workaround as this restart will be
       // removed when the geth issue is resolved
@@ -409,16 +413,24 @@ export function* switchToGethFromForno() {
     }
 
     yield spawn(gethSaga)
-    switchWeb3ProviderForSyncMode(false)
+    Logger.error(TAG + '@switchToGethFromForno', 'Started geth saga')
+
+    // switchWeb3ProviderForSyncMode(false)
     yield call(waitForGethConnectivity)
+    Logger.error(TAG + '@switchToGethFromForno', 'Waited for geth connectivity')
+
     // Once geth connnected, ensure web3 is fully synced using new provider
     yield call(waitForWeb3Sync)
+    Logger.error(TAG + '@switchToGethFromForno', 'Waited for web3 sync')
 
     // After switching off forno mode, ensure key is stored in web3.personal
     // Note that this must happen after the sync mode is switched
     // as the web3.personal where the key is stored is not available in forno mode
     yield call(ensureAccountInWeb3Keystore)
+    Logger.error(TAG + '@switchToGethFromForno', 'Ensured in keystore')
+
     yield put(setContractKitReady(true))
+    Logger.error(TAG + '@switchToGethFromForno', 'Set contractKitReady')
   } catch (e) {
     Logger.error(TAG + '@switchToGethFromForno', 'Error switching to geth from forno')
     yield put(showError(ErrorMessages.FAILED_TO_SWITCH_SYNC_MODES))
@@ -430,15 +442,24 @@ export function* switchToFornoFromGeth() {
   Logger.debug(TAG, 'Switching to forno from geth..')
   try {
     yield put(setContractKitReady(false)) // Lock contractKit during provider switch
+    Logger.error(TAG + '@switchToFornoFromGeth', 'Set contractKit not ready')
+
     yield put(setFornoMode(true))
-    switchWeb3ProviderForSyncMode(true)
+    Logger.error(TAG + '@switchToFornoFromGeth', 'Set forno mode')
+
+    // switchWeb3ProviderForSyncMode(true)
     yield put(cancelGethSaga())
+    Logger.error(TAG + '@switchToFornoFromGeth', 'Cancelled geth saga')
+
     yield call(stopGethIfInitialized)
+    Logger.error(TAG + '@switchToFornoFromGeth', 'Stopped geth')
 
     // Ensure web3 sync state is updated with new forno state.
     // This prevents a false positive "geth disconnected"
     // when blocks stop syncing.
-    yield call(waitForWeb3Sync)
+    // NOTE: this is commented out as now we just cancel the waitForWeb3Sync saga upon a switch
+    // yield call(waitForWeb3Sync)
+    // Logger.error(TAG + '@switchToFornoFromGeth', 'Finished web3 sync')
     yield put(setContractKitReady(true))
   } catch (e) {
     Logger.error(TAG + '@switchToFornoFromGeth', 'Error switching to forno from geth')

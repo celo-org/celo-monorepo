@@ -65,7 +65,7 @@ export function* getContractKit() {
   }
   Logger.debug(
     `${tag}@getContractKit`,
-    `contractKitReady2: ${yield select(contractKitReadySelector)}`
+    `should be ready. Ready in store: ${yield select(contractKitReadySelector)}`
   )
   return getContractKitBasedOnFornoInStore()
 }
@@ -142,6 +142,7 @@ function getHttpProvider(url: string): provider {
 }
 
 // Mutates web3 with new provider
+/*
 export function switchWeb3ProviderForSyncMode(forno: boolean) {
   if (forno) {
     contractKit = newKitFromWeb3(new Web3(getHttpProvider(DEFAULT_FORNO_URL)))
@@ -154,6 +155,7 @@ export function switchWeb3ProviderForSyncMode(forno: boolean) {
     Logger.info(`${tag}@switchWeb3ProviderForSyncMode`, `Set contractKit provider to IPC provider`)
   }
 }
+*/
 
 export function addLocalAccount(privateKey: string, isDefault: boolean = false) {
   if (!privateKey) {
