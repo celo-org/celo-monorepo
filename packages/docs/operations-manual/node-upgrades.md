@@ -33,10 +33,10 @@ docker rm celo-fullnode
 
 Start the new node using `docker run` as detailed in the appropriate section of the getting started guide. Remember to recover any environment variables, if using a new terminal, before running the documented commands.
 
-* [Full node](../getting-started/running-a-full-node-in-rc1.md#start-the-node)
-* [Accounts node](../getting-started/running-a-validator.md#start-your-accounts-node)
-* [Attestion node](../getting-started/running-a-validator.md#running-the-attestation-service)
-* [Proxy node](../getting-started/running-a-validator.md#deploy-a-proxy)
+- [Full node](../getting-started/running-a-full-node-in-rc1.md#start-the-node)
+- [Accounts node](../getting-started/running-a-validator-in-rc1.md#start-your-accounts-node)
+- [Attestion node](../getting-started/running-a-validator-in-rc1.md#running-the-attestation-service)
+- [Proxy node](../getting-started/running-a-validator-in-rc1.md#deploy-a-proxy)
 
 ## Upgrading a Validating Node
 

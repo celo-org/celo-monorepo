@@ -1,4 +1,6 @@
+import BigNumber from 'bignumber.js'
 import * as functions from 'firebase-functions'
+import Web3 from 'web3'
 import logger from './common/logger'
 
 export const DEV_MODE =
@@ -16,6 +18,7 @@ interface Config {
     unverifiedQueryMax: number
     additionalVerifiedQueryMax: number
     queryPerTransaction: number
+    minDollarBalance: BigNumber
   }
   db: {
     user: string
@@ -47,6 +50,7 @@ if (DEV_MODE) {
       unverifiedQueryMax: 2,
       additionalVerifiedQueryMax: 30,
       queryPerTransaction: 2,
+      minDollarBalance: new BigNumber(Web3.utils.toWei('0.1')),
     },
     db: {
       user: 'postgres',
@@ -75,6 +79,7 @@ if (DEV_MODE) {
       unverifiedQueryMax: functionConfig.salt.unverified_query_max,
       additionalVerifiedQueryMax: functionConfig.salt.additional_verified_query_max,
       queryPerTransaction: functionConfig.salt.query_per_transaction,
+      minDollarBalance: new BigNumber(functionConfig.salt.min_dollar_balance),
     },
     db: {
       user: functionConfig.db.username,
