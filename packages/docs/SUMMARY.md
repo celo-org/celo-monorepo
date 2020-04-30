@@ -21,8 +21,8 @@
 - [Quick Start](celo-gold-holder-guide/quick-start.md)
 - [Using a Ledger Wallet](celo-gold-holder-guide/ledger.md)
 - [Understanding ReleaseGold](celo-gold-holder-guide/release-gold.md)
+- [Voting on Validator Groups](celo-gold-holder-guide/voting-validators.md)
 - [Voting on Governance](celo-gold-holder-guide/voting-governance.md)
-<!-- - [Voting on Validator Groups](celo-gold-holder-guide/voting-validators.md) -->
 
 ## Validator Guide
 
