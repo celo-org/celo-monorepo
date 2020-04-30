@@ -484,6 +484,8 @@ function* tryRevealPhoneNumber(
       phoneHashDetails.salt
     )
     if (!response.ok) {
+      const body = yield response.json()
+      Logger.error(TAG + '@tryRevealPhoneNumber', `Reveal response not okay: ${body.error}`)
       throw new Error(
         `Error revealing to issuer ${attestation.attestationServiceURL}. Status code: ${response.status}`
       )
