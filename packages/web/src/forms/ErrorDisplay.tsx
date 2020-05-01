@@ -1,72 +1,36 @@
 import * as React from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import MessageDisplay from 'src/forms/MessageDisplay'
 import { NameSpaces, useTranslation } from 'src/i18n'
-import { fonts, textStyles } from 'src/styles'
+import { textStyles } from 'src/styles'
 
-type Field = string
+export enum ErrorKeys {
+  'email' = 'email',
+  'pleaseWait' = 'pleaseWait',
+  'unknownError' = 'unknownError',
+  'generic' = 'generic',
+}
 
-function getErrorTransKey(field: string) {
-  let key = 'generic'
-
-  if (field === 'email' || key === 'unknownError') {
-    key = field
+export function getErrorTransKey(field: string) {
+  switch (field) {
+    case ErrorKeys.email:
+    case ErrorKeys.unknownError:
+    case ErrorKeys.pleaseWait:
+      return field
+    default:
+      return ErrorKeys.generic
   }
-  return key
 }
 
 interface ErrorProps {
-  field: Field
+  field: ErrorKeys
   isShowing: boolean
 }
 
 export const ErrorDisplay = React.memo(({ field, isShowing }: ErrorProps) => {
   const { t } = useTranslation(NameSpaces.common)
-  const key = getErrorTransKey(field)
   return (
-    <View style={[styles.container, !isShowing && styles.containerCollapsed]}>
-      <Text
-        style={[
-          fonts.h6,
-          textStyles.error,
-          styles.text,
-          isShowing ? styles.showingError : styles.hidingError,
-        ]}
-      >
-        {t(`common:validationErrors.${key}`)}
-      </Text>
-    </View>
+    <MessageDisplay isShowing={isShowing} style={textStyles.error}>
+      {field && t(`common:validationErrors.${field}`)}
+    </MessageDisplay>
   )
-})
-
-interface Props {
-  allErrors: Field[]
-  field: Field
-}
-
-export const ErrorMessage = React.memo(function _ErrorMessage({ allErrors, field }: Props) {
-  const isShowing = allErrors.includes(field)
-  return <ErrorDisplay field={field} isShowing={isShowing} />
-})
-
-const styles = StyleSheet.create({
-  text: {
-    transitionProperty: 'opacity',
-    transitionDuration: '700ms',
-  },
-  showingError: {
-    opacity: 100,
-  },
-  hidingError: {
-    opacity: 0,
-  },
-  container: {
-    marginVertical: 5,
-    height: 'auto',
-    maxHeight: 80,
-    transitionProperty: 'max-height',
-    transitionDuration: '600ms',
-  },
-  containerCollapsed: {
-    maxHeight: 0,
-  },
 })

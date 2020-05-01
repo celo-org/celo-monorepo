@@ -587,7 +587,9 @@ contract('EpochRewards', (accounts: string[]) => {
         0,
         0,
         initialAssetAllocationSymbols,
-        initialAssetAllocationWeights
+        initialAssetAllocationWeights,
+        toFixed(0.005),
+        toFixed(2)
       )
       await mockGoldToken.setTotalSupply(totalSupply)
       await web3.eth.sendTransaction({
@@ -763,7 +765,9 @@ contract('EpochRewards', (accounts: string[]) => {
         0,
         0,
         initialAssetAllocationSymbols,
-        initialAssetAllocationWeights
+        initialAssetAllocationWeights,
+        toFixed(0.005),
+        toFixed(2)
       )
       await reserve.addToken(mockStableToken.address)
       await mockGoldToken.setTotalSupply(totalSupply)

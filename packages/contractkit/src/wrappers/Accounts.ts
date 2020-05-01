@@ -50,6 +50,16 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
   getAttestationSigner: (account: string) => Promise<Address> = proxyCall(
     this.contract.methods.getAttestationSigner
   )
+
+  /**
+   * Returns if the account has authorized an attestation signer
+   * @param account The address of the account.
+   * @return If the account has authorized an attestation signer
+   */
+  hasAuthorizedAttestationSigner: (account: string) => Promise<boolean> = proxyCall(
+    this.contract.methods.hasAuthorizedAttestationSigner
+  )
+
   /**
    * Returns the vote signer for the specified account.
    * @param account The address of the account.
@@ -112,6 +122,14 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
   isSigner: (address: string) => Promise<boolean> = proxyCall(
     this.contract.methods.isAuthorizedSigner
   )
+
+  getCurrentSigners(address: string): Promise<string[]> {
+    return Promise.all([
+      this.getVoteSigner(address),
+      this.getValidatorSigner(address),
+      this.getAttestationSigner(address),
+    ])
+  }
 
   async getAccountSummary(account: string): Promise<AccountSummary> {
     const ret = await Promise.all([

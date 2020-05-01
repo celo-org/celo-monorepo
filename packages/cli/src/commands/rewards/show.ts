@@ -23,7 +23,7 @@ export default class Show extends BaseCommand {
     'Show rewards information about a voter, registered Validator, or Validator Group'
 
   static flags = {
-    ...BaseCommand.flags,
+    ...BaseCommand.flagsWithoutLocalAddresses(),
     voter: Flags.address({ description: 'Voter to show rewards for' }),
     validator: Flags.address({ description: 'Validator to show rewards for' }),
     group: Flags.address({ description: 'Validator Group to show rewards for' }),
@@ -167,7 +167,7 @@ export default class Show extends BaseCommand {
         voterRewards,
         {
           address: {},
-          addressPayment: {},
+          addressPayment: { get: (e) => e.addressPayment.toFixed() },
           group: { get: (e) => e.group.address },
           averageValidatorScore: { get: (e) => averageValidatorScore(e.validators).toFixed() },
           epochNumber: {},
@@ -182,7 +182,7 @@ export default class Show extends BaseCommand {
         {
           groupName: { get: (e) => e.group.name },
           group: { get: (e) => e.group.address },
-          groupVoterPayment: {},
+          groupVoterPayment: { get: (e) => e.groupVoterPayment.toFixed() },
           averageValidatorScore: { get: (e) => averageValidatorScore(e.validators).toFixed() },
           epochNumber: {},
         },
@@ -213,7 +213,7 @@ export default class Show extends BaseCommand {
         {
           validatorName: { get: (e) => e.validator.name },
           validator: { get: (e) => e.validator.address },
-          validatorPayment: {},
+          validatorPayment: { get: (e) => e.validatorPayment.toFixed() },
           validatorScore: { get: (e) => e.validator.score.toFixed() },
           group: { get: (e) => e.group.address },
           epochNumber: {},
@@ -236,7 +236,7 @@ export default class Show extends BaseCommand {
         {
           groupName: { get: (e) => e.group.name },
           group: { get: (e) => e.group.address },
-          groupPayment: {},
+          groupPayment: { get: (e) => e.groupPayment.toFixed() },
           validator: { get: (e) => e.validator.address },
           validatorScore: { get: (e) => e.validator.score.toFixed() },
           epochNumber: {},
@@ -252,9 +252,9 @@ export default class Show extends BaseCommand {
         accountsSlashed,
         {
           slashed: {},
-          penalty: {},
+          penalty: { get: (e) => e.penalty.toFixed() },
           reporter: {},
-          reward: {},
+          reward: { get: (e) => e.reward.toFixed() },
           epochNumber: {},
         },
         { 'no-truncate': !res.flags.truncate }

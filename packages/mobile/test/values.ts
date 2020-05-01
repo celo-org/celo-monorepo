@@ -37,6 +37,8 @@ export const mockPublicDEK2 = '024c158e98449d9ca4dddeaa12c2432a5e7d38a48a53299fd
 
 export const mockContractAddress = '0x000000000000000000000000000000000000CE10'
 export const mockE164Number = '+14155550000'
+export const mockE164NumberHash =
+  '0xefbc804cdddcb76544e1dd2c25e9624edae290d175ccd20538e5cae06c7dbe9e'
 export const mockDisplayNumber = '(415) 555-0000'
 export const mockE164Number2 = '+12095559790'
 export const mockDisplayNumber2 = '(209) 555-9790'
@@ -106,7 +108,7 @@ export const mockNavigation = {
 export const mockAddressToE164Number: AddressToE164NumberType = {
   [mockAccount]: mockE164Number,
 }
-export const mockE164NumberToAddress: E164NumberToAddressType = { [mockE164Number]: mockAccount }
+export const mockE164NumberToAddress: E164NumberToAddressType = { [mockE164Number]: [mockAccount] }
 
 export const mockAttestationMessage: AttestationCode = {
   code:
@@ -148,30 +150,45 @@ export const mockEscrowedPayment: EscrowedPayment = {
   expirySeconds: new BigNumber(50000),
 }
 
+const date = new Date('Tue Mar 05 2019 13:44:06 GMT-0800 (Pacific Standard Time)')
+const currency = SHORT_CURRENCIES.DOLLAR
 export const mockPaymentRequests: PaymentRequest[] = [
   {
-    uid: 'fas12fas4fa141241',
-    amount: '12.34',
-    timestamp: new Date('2019-06-04T16:17:55.239Z'),
-    requesterAddress: mockAccount2,
+    amount: '200000.00',
+    uid: 'FAKE_ID_1',
+    timestamp: date,
+    comment: 'Dinner for me and the gals, PIZZAA!',
     requesterE164Number: mockE164Number,
     requesteeAddress: mockAccount,
-    currency: SHORT_CURRENCIES.DOLLAR,
-    comment: mockComment,
+    requesterAddress: mockAccount2,
     status: PaymentRequestStatus.REQUESTED,
+    currency,
     notified: true,
     type: NotificationTypes.PAYMENT_REQUESTED,
   },
   {
-    uid: 'fas12fbs4fa141241',
-    amount: '12.34',
-    timestamp: new Date('2019-06-04T16:17:55.239Z'),
-    requesterAddress: mockAccount2,
+    timestamp: date,
+    amount: '180.89',
+    uid: 'FAKE_ID_2',
+    comment: 'My Birthday Present. :) Am I not the best? Celebration. Bam!',
     requesterE164Number: mockE164Number,
     requesteeAddress: mockAccount,
-    currency: SHORT_CURRENCIES.DOLLAR,
-    comment: mockComment,
+    requesterAddress: mockAccount2,
     status: PaymentRequestStatus.REQUESTED,
+    currency,
+    notified: true,
+    type: NotificationTypes.PAYMENT_REQUESTED,
+  },
+  {
+    timestamp: date,
+    amount: '180.89',
+    uid: 'FAKE_ID_3',
+    comment: 'My Birthday Present. :) Am I not the best? Celebration. Bam!',
+    requesterE164Number: mockE164Number,
+    requesteeAddress: mockAccount,
+    requesterAddress: mockAccount2,
+    status: PaymentRequestStatus.REQUESTED,
+    currency,
     notified: true,
     type: NotificationTypes.PAYMENT_REQUESTED,
   },

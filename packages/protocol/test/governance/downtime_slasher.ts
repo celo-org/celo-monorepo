@@ -185,6 +185,29 @@ contract('DowntimeSlasher', (accounts: string[]) => {
       const balance = await mockLockedGold.accountTotalLockedGold(validator)
       assert.equal(balance.toNumber(), 40000)
     })
+    it('should emit the corresponding event', async () => {
+      const resp = await slasher.slash(
+        startBlock,
+        validatorIndex,
+        validatorIndex,
+        0,
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      )
+      const log = resp.logs[0]
+      assertContainSubset(log, {
+        event: 'DowntimeSlashPerformed',
+        args: {
+          validator,
+          startBlock: new BigNumber(startBlock),
+        },
+      })
+    })
+
     it('decrements gold when success', async () => {
       await slasher.slash(startBlock, validatorIndex, validatorIndex, 0, [], [], [], [], [], [])
       const balance = await mockLockedGold.accountTotalLockedGold(validator)
