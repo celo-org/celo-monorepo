@@ -14,7 +14,7 @@
 
 ▸ **QrFromUri**(`uri`: string, `type`: "svg" | "terminal" | "utf8"): *Promise‹string›*
 
-*Defined in [contractkit/src/utils/tx-uri.ts:113](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/tx-uri.ts#L113)*
+*Defined in [contractkit/src/utils/tx-uri.ts:107](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/tx-uri.ts#L107)*
 
 **Parameters:**
 
@@ -29,17 +29,17 @@ ___
 
 ###  buildUri
 
-▸ **buildUri**(`tx`: Tx, `functionName?`: undefined | string, `abiTypes?`: string[]): *string*
+▸ **buildUri**(`tx`: Tx, `functionName?`: undefined | string, `abiTypes`: string[]): *string*
 
-*Defined in [contractkit/src/utils/tx-uri.ts:66](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/tx-uri.ts#L66)*
+*Defined in [contractkit/src/utils/tx-uri.ts:62](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/tx-uri.ts#L62)*
 
 **Parameters:**
 
-Name | Type |
------- | ------ |
-`tx` | Tx |
-`functionName?` | undefined &#124; string |
-`abiTypes?` | string[] |
+Name | Type | Default |
+------ | ------ | ------ |
+`tx` | Tx | - |
+`functionName?` | undefined &#124; string | - |
+`abiTypes` | string[] | [] |
 
 **Returns:** *string*
 
@@ -49,7 +49,7 @@ ___
 
 ▸ **parseUri**(`uri`: string): *Tx*
 
-*Defined in [contractkit/src/utils/tx-uri.ts:24](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/tx-uri.ts#L24)*
+*Defined in [contractkit/src/utils/tx-uri.ts:23](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/tx-uri.ts#L23)*
 
 **Parameters:**
 
