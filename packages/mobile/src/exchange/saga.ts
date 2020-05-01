@@ -18,6 +18,8 @@ import {
 } from 'src/exchange/actions'
 import { ExchangeRatePair, exchangeRatePairSelector } from 'src/exchange/reducer'
 import { CURRENCY_ENUM } from 'src/geth/consts'
+import { navigate } from 'src/navigator/NavigationService'
+import { Screens } from 'src/navigator/Screens'
 import { convertToContractDecimals } from 'src/tokens/saga'
 import {
   addStandbyTransaction,
@@ -146,6 +148,7 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
   Logger.debug(TAG, `Exchanging ${makerAmount.toString()} of token ${makerToken}`)
   let txId: string | null = null
   try {
+    navigate(Screens.ExchangeHomeScreen)
     const account: string = yield call(getConnectedUnlockedAccount)
     const exchangeRatePair: ExchangeRatePair = yield select(exchangeRatePairSelector)
     const exchangeRate = getRateForMakerToken(exchangeRatePair, makerToken)
