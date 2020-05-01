@@ -297,6 +297,8 @@ PODS:
     - React-cxxreact (= 0.61.2)
     - React-jsi (= 0.61.2)
   - React-jsinspector (0.61.2)
+  - react-native-blind-threshold-bls (1.0.0):
+    - React
   - react-native-camera (3.7.1):
     - React
     - react-native-camera/RCT (= 3.7.1)
@@ -470,6 +472,7 @@ DEPENDENCIES:
   - React-jsi (from `../../../node_modules/react-native/ReactCommon/jsi`)
   - React-jsiexecutor (from `../../../node_modules/react-native/ReactCommon/jsiexecutor`)
   - React-jsinspector (from `../../../node_modules/react-native/ReactCommon/jsinspector`)
+  - react-native-blind-threshold-bls (from `../../../node_modules/react-native-blind-threshold-bls`)
   - react-native-camera (from `../../../node_modules/react-native-camera`)
   - react-native-config (from `../../../node_modules/react-native-config`)
   - react-native-contacts (from `../../../node_modules/react-native-contacts`)
@@ -585,6 +588,8 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/react-native/ReactCommon/jsiexecutor"
   React-jsinspector:
     :path: "../../../node_modules/react-native/ReactCommon/jsinspector"
+  react-native-blind-threshold-bls:
+    :path: "../../../node_modules/react-native-blind-threshold-bls"
   react-native-camera:
     :path: "../../../node_modules/react-native-camera"
   react-native-config:
@@ -723,6 +728,7 @@ SPEC CHECKSUMS:
   React-jsi: 32285a21b1b24c36060493ed3057a34677d58d09
   React-jsiexecutor: 8909917ff7d8f21a57e443a866fd8d4560e50c65
   React-jsinspector: 111d7d342b07a904c400592e02a2b958f1098b60
+  react-native-blind-threshold-bls: ff203478b661b165924ba56f81f87bd14f6a779a
   react-native-camera: ccbcbe683c621b9a4270e86e3a46bb9609121186
   react-native-config: 8f6b2b9e017f6a5e92a97353c768e19e67294bb1
   react-native-contacts: d1a60e38dadb67dbbe481480338988e00966a30d
