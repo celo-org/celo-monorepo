@@ -7,7 +7,6 @@ import { getOutgoingPaymentRequests } from 'src/account/selectors'
 import { PaymentRequest } from 'src/account/types'
 import { cancelPaymentRequest, updatePaymentRequestNotified } from 'src/firebase/actions'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
-import { fetchPhoneAddresses } from 'src/identity/actions'
 import {
   AddressToE164NumberType,
   e164NumberToAddressSelector,
@@ -32,7 +31,6 @@ interface StateProps {
 }
 
 interface DispatchProps {
-  fetchPhoneAddresses: typeof fetchPhoneAddresses
   cancelPaymentRequest: typeof cancelPaymentRequest
   updatePaymentRequestNotified: typeof updatePaymentRequestNotified
 }
@@ -87,7 +85,6 @@ OutgoingPaymentRequestListScreen.navigationOptions = titleWithBalanceNavigationO
 )
 
 export default connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
-  fetchPhoneAddresses,
   cancelPaymentRequest,
   updatePaymentRequestNotified,
 })(withTranslation(Namespaces.paymentRequestFlow)(OutgoingPaymentRequestListScreen))

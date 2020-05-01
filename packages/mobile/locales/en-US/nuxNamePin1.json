@@ -4,13 +4,16 @@
   "welcomeCelo": "Welcome to Celo Wallet",
   "chooseCountryCode": "Country Code",
   "chooseCountry": "Country",
-  "joinText": {
-    "0": "The Celo Wallet helps you to send, receive, and save value on the Celo Network.",
-    "1":
-      "By joining this network, you give us permission to collect anonymous information about how you use the app. Additionally, if you verify your phone number, an obfuscated copy of it will be stored on the Celo Network. Learn more at ",
-    "2": "celo.org/terms"
-  },
+  "joinText": "The Celo Wallet helps you to send, receive, and save value on the Celo Network.",
   "phoneNumber": "000 000 0000",
+  "terms": {
+    "title": "Terms",
+    "heading1": "Data and Privacy",
+    "heading2": "About Celo Assets",
+    "privacy":
+      "By joining this network, you give us permission to collect anonymous information about how you use the app. Additionally, if you verify your phone number, an obfuscated copy of it will be stored on the Celo Network. Learn more at <0>celo.org/terms</0> ",
+    "goldDisclaimer": "Please be aware that cGld is a digital asset whose value is not related to the value of physical gold.  Both cUSD and cGld are part of a new asset class and present a risk of financial loss.  Carefully consider your financial circumstances and tolerance for financial risk before purchasing either cGld or cUSD."
+  },
   "inviteCodeText": {
     "title": "Enter Invite Code",
     "body":

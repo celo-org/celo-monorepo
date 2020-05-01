@@ -55,6 +55,12 @@ __You must have the [celo-monorepo] successfully set up and built before setting
 
 To do this, follow the [setup instructions][setup].
 
+Next, install [watchman][watchman].
+```bash
+# On a mac
+brew install watchman
+```
+
 ### iOS
 
 #### Enroll in the Apple Developer Program
@@ -83,6 +89,7 @@ gem install cocoapods
 gem install bundler
 # download the project dependencies
 bundle install
+# run inside mobile/ios
 bundle exec pod install
 ```
 
@@ -251,7 +258,7 @@ The below steps should help you successfully run the mobile wallet on either a U
 
 ### Running in forno (data saver) mode
 
-By default, the mobile wallet app runs geth in ultralight sync mode where all the epoch headers are fetched. The default sync mode is defined in [packages/mobile/.env](https://github.com/celo-org/celo-monorepo/blob/master/packages/mobile/.env#L4) file.
+By default, the mobile wallet app runs geth in lightest sync mode where all the epoch headers are fetched. The default sync mode is defined in [packages/mobile/.env](https://github.com/celo-org/celo-monorepo/blob/master/packages/mobile/.env#L4) file.
 
 To run the wallet in forno (Data Saver) mode, using a trusted node rather than the local geth node as a provider, turn it on from the Data Saver page in settings or update the `FORNO_ENABLED_INITIALLY` parameter in the .env file linked above. When forno mode is turned back off, the wallet will switch to the default sync mode as specified in the .env file. By default, the trusted node is `https://{TESTNET}-forno.celo-testnet.org`, however any trusted node can be used by updating `DEFAULT_FORNO_URL`. In forno mode, the wallet signs transactions locally in web3 then sends them to the trusted node.
 
@@ -443,3 +450,4 @@ $ adb kill-server && adb start-server
 [approve kernel extension]: https://developer.apple.com/library/content/technotes/tn2459/_index.html
 [oracle being oracle]: https://github.com/Homebrew/homebrew-cask-versions/issues/7253
 [device unauthorized]: https://stackoverflow.com/questions/23081263/adb-android-device-unauthorized
+[watchman]: https://facebook.github.io/watchman/docs/install/

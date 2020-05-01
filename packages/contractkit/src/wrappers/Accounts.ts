@@ -121,6 +121,14 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
     this.contract.methods.isAuthorizedSigner
   )
 
+  getCurrentSigners(address: string): Promise<string[]> {
+    return Promise.all([
+      this.getVoteSigner(address),
+      this.getValidatorSigner(address),
+      this.getAttestationSigner(address),
+    ])
+  }
+
   async getAccountSummary(account: string): Promise<AccountSummary> {
     const ret = await Promise.all([
       this.getName(account),
