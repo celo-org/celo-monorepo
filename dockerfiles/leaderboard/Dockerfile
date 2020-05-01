@@ -13,7 +13,7 @@ COPY packages/protocol/package.json packages/protocol/
 COPY packages/contractkit/package.json packages/contractkit/
 COPY packages/leaderboard/package.json packages/leaderboard/
 
-RUN yarn install --frozen-lockfile --network-timeout 100000 && yarn cache clean
+RUN yarn install --ignore-optional --prod --frozen-lockfile --network-timeout 100000 && yarn cache clean
 
 # Copy the rest
 COPY packages/typescript packages/typescript/
