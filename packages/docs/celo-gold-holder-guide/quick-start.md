@@ -170,7 +170,7 @@ Next, designate the `ReleaseGold` contract as a “Locked Gold” account:
 celocli releasegold:create-account --contract $CELO_RG_ADDRESS --useLedger
 ```
 
-You'll need to press right on the Ledger several times to review details of the transactions, then when the device says "Accept and send" press both buttons together. 
+You'll need to press right on the Ledger several times to review details of the transactions, then when the device says "Accept and send" press both buttons together.
 
 Check that the `ReleaseGold` contract address is associated with a registered Locked Gold Account:
 
@@ -192,6 +192,16 @@ celocli account:show $CELO_RG_ADDRESS
 ```
 
 The `vote` address under `authorizedSigners` should match `$CELO_VOTE_SIGNER_ADDRESS`.
+
+The `ReleaseGold` contract was funded with an additional 1 cGLD that it sends to the first vote signer account to be authorized. This allows the vote signer account to cover transaction fees. You can confirm this:
+
+```bash
+celocli account:balance $CELO_VOTE_SIGNER_SIGNATURE
+```
+
+{% hint style="warning" %}
+**Warning**: Celo Gold transfers are frozen in the Release Candidate network until the network graduates to Mainnet. Until this time, only authorize a vote signer key for a `ReleaseGold` contract once. If you replace that vote signer key by authorizing a new key, the contract cannot transfer it funds to cover transaction fees. This means you will not be able to complete the steps below until Celo Gold transfers are unfrozen.
+{% endhint %}
 
 ## Lock Celo Gold
 
