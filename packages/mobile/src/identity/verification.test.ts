@@ -23,7 +23,7 @@ import {
   VERIFICATION_TIMEOUT,
   VerificationStatus,
 } from 'src/identity/verification'
-import { getContractKit } from 'src/web3/contracts'
+import { getContractKitOutsideGenerator } from 'src/web3/contracts'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
 import { privateCommentKeySelector } from 'src/web3/selectors'
 import { sleep } from 'test/utils'
@@ -175,7 +175,7 @@ describe('Start Verification Saga', () => {
 
 describe('Do Verification Saga', () => {
   it('succeeds for unverified users', async () => {
-    const contractKit = getContractKit()
+    const contractKit = await getContractKitOutsideGenerator()
     await expectSaga(doVerificationFlow)
       .provide([
         [call(getConnectedUnlockedAccount), mockAccount],
@@ -222,7 +222,7 @@ describe('Do Verification Saga', () => {
   })
 
   it('succeeds for verified users', async () => {
-    const contractKit = getContractKit()
+    const contractKit = await getContractKitOutsideGenerator()
     await expectSaga(doVerificationFlow)
       .provide([
         [call(getConnectedUnlockedAccount), mockAccount],
@@ -240,7 +240,7 @@ describe('Do Verification Saga', () => {
   })
 
   it('shows error on unexpected failure', async () => {
-    const contractKit = getContractKit()
+    const contractKit = await getContractKitOutsideGenerator()
     await expectSaga(doVerificationFlow)
       .provide([
         [call(getConnectedUnlockedAccount), mockAccount],
@@ -265,7 +265,7 @@ describe('Do Verification Saga', () => {
         throw new Error('Reveal error')
       }),
     }
-    const contractKit = getContractKit()
+    const contractKit = await getContractKitOutsideGenerator()
 
     await expectSaga(doVerificationFlow)
       .provide([

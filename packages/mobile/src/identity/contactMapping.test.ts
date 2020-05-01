@@ -12,7 +12,7 @@ import { e164NumberToAddressSelector } from 'src/identity/reducer'
 import { setRecipientCache } from 'src/recipients/actions'
 import { contactsToRecipients } from 'src/recipients/recipient'
 import { getAllContacts } from 'src/utils/contacts'
-import { getContractKit } from 'src/web3/contracts'
+import { getContractKitOutsideGenerator } from 'src/web3/contracts'
 import { getConnectedAccount } from 'src/web3/saga'
 import {
   mockAccount,
@@ -39,7 +39,7 @@ const allRecipients = { ...e164NumberRecipients, ...otherRecipients }
 
 describe('Import Contacts Saga', () => {
   it('imports contacts and creates contact mappings correctly', async () => {
-    const contractKit = getContractKit()
+    const contractKit = await getContractKitOutsideGenerator()
     await expectSaga(doImportContactsWrapper)
       .provide([
         [call(getConnectedAccount), null],
@@ -77,7 +77,7 @@ describe('Import Contacts Saga', () => {
   })
 
   it('shows errors correctly', async () => {
-    const contractKit = getContractKit()
+    const contractKit = await getContractKitOutsideGenerator()
     await expectSaga(doImportContactsWrapper)
       .provide([
         [call(getConnectedAccount), null],

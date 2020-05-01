@@ -186,10 +186,10 @@ function* withdrawFromEscrow() {
   }
 }
 
-function* createReclaimTransaction(paymentID: string) {
-  const contractKit = yield call(getContractKit)
+async function createReclaimTransaction(paymentID: string) {
+  const contractKit = await getContractKitOutsideGenerator()
 
-  const escrow = yield call([contractKit.contracts, contractKit.contracts.getEscrow])
+  const escrow = await contractKit.contracts.getEscrow()
   return escrow.revoke(paymentID).txo
 }
 

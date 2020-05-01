@@ -64,6 +64,7 @@ export const vNeg1Schema = {
     commentKey: '0x0000000000000000000000000000000000008F68',
     gasPriceLastUpdated: 0,
     fornoMode: false,
+    contractKitReady: true,
   },
   geth: {
     initialized: 'INITIALIZED',

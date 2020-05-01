@@ -16,8 +16,8 @@ import { nuxNavigationOptions } from 'src/navigator/Headers'
 import Pincode from 'src/pincode/Pincode'
 import { isPinCorrect, isPinValid, PIN_LENGTH } from 'src/pincode/utils'
 import { RootState } from 'src/redux/reducers'
-import { currentAccountSelector, fornoSelector } from 'src/web3/selectors'
 import Logger from 'src/utils/Logger'
+import { currentAccountSelector, fornoSelector } from 'src/web3/selectors'
 
 interface State {
   pin: string
