@@ -35,45 +35,27 @@ export async function getContractKitOutsideGenerator() {
     Logger.debug(`getContractKitOutsideGenerator`, `Still waiting for store...`)
     await sleep(250) // Every 0.25 seconds
   }
-  // Once have store, make sure contractKit is ready
-  /*
-  while (contractKitReadySelector(store.getState())) {
-    // Must wait for contractKit to be Ready
+  // Use store to ensure ContractKit is ready
+  while (!contractKitReadySelector(store.getState())) {
+    Logger.debug(`getContractKitOutsideGenerator`, `ContractKit is still locked...`)
+    await sleep(250) // Every 0.25 seconds
   }
-  */
-  Logger.debug(`${tag}@getContractKitOutsideGenerator`, 'Store rehydrated, returning kit')
+
+  Logger.debug(`${tag}@getContractKitOutsideGenerator`, 'ContractKit ready, returning')
   return getContractKitBasedOnFornoInStore()
 }
 
 export function* getContractKit() {
-  Logger.debug(
-    `${tag}@getContractKit`,
-    `contractKitReady1: ${yield select(contractKitReadySelector)}`
-  )
   // No need to waitForRehydrate as contractKitReady set to false for every app reopen
   while (!(yield select(contractKitReadySelector))) {
     // If contractKit locked, wait until unlocked
-    // TODO(anna) see if this is necessary or if we can just wait for rehydrate
     yield take(Actions.SET_CONTRACT_KIT_READY)
-    Logger.debug(
-      `${tag}@getContractKit`,
-      `got new action, contractKitReadyn: ${yield select(contractKitReadySelector)}`
-    )
   }
-  Logger.debug(
-    `${tag}@getContractKit`,
-    `should be ready. Ready in store: ${yield select(contractKitReadySelector)}`
-  )
   return getContractKitBasedOnFornoInStore()
 }
 
 export function getContractKitBasedOnFornoInStore() {
-  // Make sure contractKitReady
   const forno = fornoSelector(store.getState())
-  Logger.debug(
-    `getContractKitBasedOnFornoInStore`,
-    `Returning kit for ${forno ? 'forno' : 'geth'} mode`
-  )
   return forno ? contractKitForno : contractKitGeth
 }
 

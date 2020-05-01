@@ -185,8 +185,8 @@ export function* gethSaga() {
 }
 
 export function* gethSagaIfNecessary() {
-  yield call(waitForRehydrate) // Wait for rehydrate to know if geth or forno
-  yield put(setContractKitReady(true))
+  yield call(waitForRehydrate) // Wait for rehydrate to know if geth or forno mode
+  yield put(setContractKitReady(true)) // ContractKit is blocked (not ready) before rehydrate
   if (!(yield select(fornoSelector))) {
     Logger.debug(`${TAG}@gethSagaIfNecessary`, `Starting geth saga...`)
     yield call(gethSaga)

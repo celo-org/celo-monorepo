@@ -390,7 +390,7 @@ export function* switchToGethFromForno() {
     yield put(setFornoMode(false))
 
     if (gethAlreadyStartedThisSession) {
-      // TODO(anna) make restart work with contractKit lock
+      // TODO(anna) test restart on physical device
       // Call any method on web3 to avoid a persist state issue
       // This is a temporary workaround as this restart will be
       // removed when the geth issue is resolved

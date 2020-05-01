@@ -27,10 +27,9 @@ export const isBackupTooLate = (state: RootState) => {
 
 export const getNetworkConnected = (state: RootState) => state.networkInfo.connected
 
-// TODO(anna) Label app as disconnected when we don't yet know if in forno or geth
 export const isAppConnected = createSelector(
   fornoSelector,
-  contractKitReadySelector,
+  contractKitReadySelector, // App acts as if disconnected when contractKit is locked
   isGethConnectedSelector,
   getNetworkConnected,
   (fornoEnabled, contractKitReady, gethConnected, networkConnected) =>

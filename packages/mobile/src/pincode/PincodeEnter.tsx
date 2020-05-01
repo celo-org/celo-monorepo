@@ -16,7 +16,6 @@ import { nuxNavigationOptions } from 'src/navigator/Headers'
 import Pincode from 'src/pincode/Pincode'
 import { isPinCorrect, isPinValid, PIN_LENGTH } from 'src/pincode/utils'
 import { RootState } from 'src/redux/reducers'
-import Logger from 'src/utils/Logger'
 import { currentAccountSelector, fornoSelector } from 'src/web3/selectors'
 
 interface State {
@@ -46,7 +45,6 @@ class PincodeEnter extends React.Component<Props, State> {
   }
 
   onCorrectPin = (pin: string) => {
-    Logger.debug('PincodeEnter', 'onCorrectPin')
     const onSuccess = this.props.navigation.getParam('onSuccess')
     if (onSuccess) {
       onSuccess(pin)
@@ -54,14 +52,11 @@ class PincodeEnter extends React.Component<Props, State> {
   }
 
   onWrongPin = () => {
-    Logger.debug('PincodeEnter', 'onWrongPin')
     this.props.showError(ErrorMessages.INCORRECT_PIN)
     this.setState({ pin: '' })
   }
 
   onPressConfirm = () => {
-    Logger.debug('PincodeEnter', 'onPressConfirm')
-
     const { fornoMode, navigation, currentAccount } = this.props
     const { pin } = this.state
     const withVerification = navigation.getParam('withVerification')
@@ -77,7 +72,6 @@ class PincodeEnter extends React.Component<Props, State> {
   render() {
     const { t } = this.props
     const { pin } = this.state
-    Logger.debug('PincodeEnter', `pin: ${pin}`)
     return (
       <SafeAreaView style={style.container}>
         <Pincode
