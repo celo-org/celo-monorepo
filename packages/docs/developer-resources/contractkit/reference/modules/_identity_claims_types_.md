@@ -54,7 +54,7 @@ ___
 
 ### `Const` VERIFIABLE_CLAIM_TYPES
 
-• **VERIFIABLE_CLAIM_TYPES**: *[ClaimTypes](../enums/_identity_claims_types_.claimtypes.md)[]* = [ClaimTypes.KEYBASE, ClaimTypes.ACCOUNT]
+• **VERIFIABLE_CLAIM_TYPES**: *[ClaimTypes](../enums/_identity_claims_types_.claimtypes.md)[]* = [ClaimTypes.KEYBASE, ClaimTypes.ACCOUNT, ClaimTypes.DOMAIN]
 
 *Defined in [contractkit/src/identity/claims/types.ts:18](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/types.ts#L18)*
 

@@ -1,5 +1,5 @@
 {
-  "name": "celo-moonpay-auth",
+  "name": "@celo/moonpay-auth",
   "version": "1.0.0",
   "description": "Signs Moonpay requests with private api key",
   "author": "Celo",
@@ -15,11 +15,11 @@
     "lint": "tslint --project ."
   },
   "dependencies": {
-    "firebase-admin": "^8.9.2",
-    "firebase-functions": "^3.3.0"
+    "firebase-admin": "^8.10.0",
+    "firebase-functions": "^3.6.0"
   },
   "devDependencies": {
-    "firebase-functions-test": "^0.1.6"
+    "firebase-functions-test": "^0.2.0"
   },
   "engines": {
     "node": "10"

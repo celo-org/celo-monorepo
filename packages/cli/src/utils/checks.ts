@@ -2,13 +2,14 @@ import { Address } from '@celo/contractkit'
 import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
 import { GovernanceWrapper, ProposalStage } from '@celo/contractkit/lib/wrappers/Governance'
 import { LockedGoldWrapper } from '@celo/contractkit/lib/wrappers/LockedGold'
+import { MultiSigWrapper } from '@celo/contractkit/lib/wrappers/MultiSig'
 import { ValidatorsWrapper } from '@celo/contractkit/lib/wrappers/Validators'
 import { eqAddress, NULL_ADDRESS } from '@celo/utils/lib/address'
 import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import BigNumber from 'bignumber.js'
 import chalk from 'chalk'
 import { BaseCommand } from '../base'
-import { printValueMap } from './cli'
+import { printValueMapRecursive } from './cli'
 
 export interface CommandCheck {
   name: string
@@ -132,8 +133,8 @@ class CheckBuilder {
       this.withGovernance(async (g) => {
         const match = (await g.getProposalStage(proposalID)) === stage
         if (!match) {
-          const waitTimes = await g.timeUntilStages(proposalID)
-          printValueMap({ waitTimes })
+          const timeUntilStages = await g.timeUntilStages(proposalID)
+          printValueMapRecursive({ timeUntilStages })
         }
         return match
       })
@@ -147,13 +148,13 @@ class CheckBuilder {
 
   hotfixIsPassing = (hash: Buffer) =>
     this.addCheck(
-      `Hotfix ${hash} is whitelisted by quorum of validators`,
+      `Hotfix 0x${hash.toString('hex')} is whitelisted by quorum of validators`,
       this.withGovernance((g) => g.isHotfixPassing(hash))
     )
 
   hotfixNotExecuted = (hash: Buffer) =>
     this.addCheck(
-      `Hotfix ${hash} is not already executed`,
+      `Hotfix 0x${hash.toString('hex')} is not already executed`,
       this.withGovernance(async (g) => !(await g.getHotfixRecord(hash)).executed)
     )
 
@@ -386,6 +387,13 @@ class CheckBuilder {
         return vg.nextCommissionBlock.lte(blockNumber)
       })
     )
+
+  isMultiSigOwner = (from: string, multisig: MultiSigWrapper) => {
+    return this.addCheck('The provided address is an owner of the multisig', async () => {
+      const owners = await multisig.getOwners()
+      return owners.indexOf(from) > -1
+    })
+  }
 
   async runChecks() {
     console.log(`Running Checks:`)

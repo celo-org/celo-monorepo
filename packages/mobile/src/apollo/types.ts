@@ -297,7 +297,7 @@ export interface IntrospectionResultData {
     }>
   }
 }
-const result: IntrospectionResultData = {
+export const introspectionQueryResultData: IntrospectionResultData = {
   __schema: {
     types: [
       {
@@ -327,4 +327,3 @@ const result: IntrospectionResultData = {
     ],
   },
 }
-export default result

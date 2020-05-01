@@ -1,8 +1,28 @@
+import { estimateGas as ckEstimateGas } from '@celo/contractkit/lib/utils/web3-utils'
 import { ensureLeading0x } from '@celo/utils/src/address'
+import BigNumber from 'bignumber.js'
+import { GAS_INFLATION_FACTOR } from 'src/config'
 import Logger from 'src/utils/Logger'
 import { getContractKit } from 'src/web3/contracts'
+import { Tx } from 'web3-core'
+import { TransactionObject } from 'web3-eth'
 
 const TAG = 'web3/utils'
+
+// Estimate gas taking into account the configured inflation factor
+export async function estimateGas(txObj: TransactionObject<any>, txParams: Tx) {
+  const web3 = getContractKit().web3
+  const gasEstimator = (_tx: Tx) => txObj.estimateGas({ ..._tx })
+  const getCallTx = (_tx: Tx) => {
+    // @ts-ignore missing _parent property from TransactionObject type.
+    return { ..._tx, data: txObj.encodeABI(), to: txObj._parent._address }
+  }
+  const caller = (_tx: Tx) => web3.eth.call(getCallTx(_tx))
+  const gas = new BigNumber(await ckEstimateGas(txParams, gasEstimator, caller))
+    .times(GAS_INFLATION_FACTOR)
+    .integerValue()
+  return gas
+}
 
 // Note: This returns Promise<Block>
 export function getLatestBlock() {

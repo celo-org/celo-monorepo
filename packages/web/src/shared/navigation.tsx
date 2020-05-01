@@ -4,26 +4,35 @@ import Button, { BTN } from 'src/shared/Button.3'
 import OvalCoin from 'src/shared/OvalCoin'
 import { colors, textStyles } from 'src/styles'
 
+export enum NavigationTheme {
+  LIGHT,
+  DARK,
+}
+
 interface Props {
   link?: string
   onPress?: () => void
   text: string
   selected: boolean
+  theme?: NavigationTheme
 }
 
-export default function Navigation({ link, text, selected, onPress }: Props) {
+export default function Navigation({ link, text, selected, onPress, theme }: Props) {
   return (
     <View style={styles.linkWrapper}>
       <Button
         style={[textStyles.medium, !selected && styles.notSelected]}
-        kind={BTN.NAV}
+        kind={theme !== NavigationTheme.DARK ? BTN.NAV : BTN.DARKNAV}
         href={link}
         text={text}
         onPress={onPress}
       />
       {selected && (
         <View style={styles.activeTab}>
-          <OvalCoin color={colors.primary} size={10} />
+          <OvalCoin
+            color={theme !== NavigationTheme.DARK ? colors.primary : colors.gold}
+            size={10}
+          />
         </View>
       )}
     </View>

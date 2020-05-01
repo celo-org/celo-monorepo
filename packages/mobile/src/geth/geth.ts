@@ -22,7 +22,7 @@ export const FailedToFetchGenesisBlockError = new Error(
 // We are never going to run mobile node in full or fast mode.
 enum SyncMode {
   LIGHT = 'light',
-  ULTRA_LIGHT = 'ultralight',
+  LIGHTEST = 'lightest',
 }
 
 // Log levels correpond to the values defined in
@@ -49,9 +49,9 @@ enum ErrorType {
 // see https://github.com/celo-org/celo-blockchain/blob/d4b48f3e79b01e8cb7dcf8606b0ed1f666a37a2f/mobile/geth.go#L143
 // and https://github.com/celo-org/celo-blockchain/blob/d4b48f3e79b01e8cb7dcf8606b0ed1f666a37a2f/mobile/geth_android.go
 const INSTANCE_FOLDER = Platform.select({
-  ios: 'iGeth',
-  android: 'GethDroid',
-  default: 'GethMobile',
+  ios: 'celoios',
+  android: 'celoandroid',
+  default: 'celomobile',
 })
 
 // Use relative path on iOS to workaround the 104 chars path limit for unix domain socket.
@@ -286,7 +286,7 @@ async function attemptGethCorruptionFix(geth: any) {
 export async function deleteChainData() {
   Logger.debug('Geth@deleteChainData', 'Deleting chain data')
   // Delete data for both the possible modes a mobile node could be running in.
-  const result1 = await deleteSingleChainData(SyncMode.ULTRA_LIGHT)
+  const result1 = await deleteSingleChainData(SyncMode.LIGHTEST)
   const result2 = await deleteSingleChainData(SyncMode.LIGHT)
   return result1 || result2
 }

@@ -1,5 +1,5 @@
 {
-  "name": "celo-faucet-app",
+  "name": "@celo/faucet-app",
   "version": "1.0.0",
   "description": "Faucet Web application for Celo",
   "author": "Celo",
@@ -20,12 +20,12 @@
   "dependencies": {
     "@firebase/app": "^0.5.3",
     "@google-cloud/logging": "^7.1.0",
-    "@celo/contractkit": "0.3.1",
-    "@celo/utils": "0.1.8",
+    "@celo/contractkit": "0.3.6",
+    "@celo/utils": "0.1.9",
     "debug": "^4.1.1",
     "firebase": "^7.8.0",
-    "firebase-admin": "^8.9.2",
-    "firebase-functions": "^3.3.0",
+    "firebase-admin": "^8.10.0",
+    "firebase-functions": "^3.6.0",
     "twilio": "^3.39.3",
     "web3": "1.2.4",
     "web3-core-helpers": "1.2.4"
@@ -36,7 +36,7 @@
     "@types/yargs": "^13.0.2",
     "cross-env": "5.2.0",
     "firebase-bolt": "^0.8.4",
-    "firebase-tools": "^7.12.1",
+    "firebase-tools": "^8.0.0",
     "rimraf": "2.6.3",
     "yargs": "14.0.0"
   },

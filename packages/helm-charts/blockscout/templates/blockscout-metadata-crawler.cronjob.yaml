@@ -1,0 +1,82 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: {{ .Release.Name }}-metadata-crawler
+  labels:
+    app: blockscout
+    chart: blockscout
+    release: {{ .Release.Service }}
+    component: blockscout-metadata-crawler
+spec:
+  schedule: "{{ .Values.blockscout.metadata_crawler.schedule }}"
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      template:
+        spec:
+          containers:
+          - name: cloudsql-proxy
+            image: gcr.io/cloudsql-docker/gce-proxy:1.11
+            command:
+            - /bin/sh
+            args:
+            - -c
+            - |
+              /cloud_sql_proxy \
+              -instances={{ .Values.blockscout.db.connection_name }}=tcp:5432 \
+              -credential_file=/secrets/cloudsql/credentials.json &
+              CHILD_PID=$!
+              (while true; do if [[ -f "/tmp/pod/main-terminated" ]]; then kill $CHILD_PID; fi; sleep 1; done) &
+              wait $CHILD_PID
+              if [[ -f "/tmp/pod/main-terminated" ]]; then exit 0; fi
+            securityContext:
+              runAsUser: 2  # non-root user
+              allowPrivilegeEscalation: false
+            volumeMounts:
+            - name: blockscout-cloudsql-credentials
+              mountPath: /secrets/cloudsql
+              readOnly: true
+            - mountPath: /tmp/pod
+              name: tmp-pod
+              readOnly: true
+          - name: metadata-crawler
+            image: {{ .Values.blockscout.metadata_crawler.image.repository }}:{{ .Values.blockscout.metadata_crawler.image.tag }}
+            imagePullPolicy: IfNotPresent
+            command:
+            - /bin/sh
+            args:
+            - -c
+            - |
+              trap "touch /tmp/pod/main-terminated" EXIT
+              node lib/crawler.js
+            env:
+            - name: PGHOST
+              value: "127.0.0.1"
+            - name: PGPORT
+              value: "5432"
+            - name: PGDATABASE
+              value: "blockscout"
+            - name: PROVIDER_URL
+              value: {{ .Values.blockscout.jsonrpc_http_url }}
+            - name: PGUSER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}
+                  key: DATABASE_USER
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}
+                  key: DATABASE_PASSWORD
+            volumeMounts:
+            - mountPath: /tmp/pod
+              name: tmp-pod
+          restartPolicy: Never
+          volumes:
+          - name: blockscout-cloudsql-credentials
+            secret:
+              defaultMode: 420
+              secretName: blockscout-cloudsql-credentials
+          - name: tmp-pod
+            emptyDir: {}
