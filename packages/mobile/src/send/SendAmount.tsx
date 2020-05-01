@@ -174,7 +174,7 @@ export class SendAmount extends React.Component<Props, State> {
     if (!recipient.e164PhoneNumber) {
       throw new Error('Missing recipient e164Number')
     }
-    this.props.fetchPhoneAddresses([recipient.e164PhoneNumber])
+    this.props.fetchPhoneAddresses(recipient.e164PhoneNumber)
   }
 
   getDollarsAmount = () => {
@@ -217,7 +217,6 @@ export class SendAmount extends React.Component<Props, State> {
   getConfirmationInput = (type: TokenTransactionType) => {
     const amount = this.getDollarsAmount()
     const recipient = this.getRecipient()
-    // TODO (Rossy) Remove address field from some recipient types.
     const recipientAddress = getAddressFromRecipient(recipient, this.props.e164NumberToAddress)
 
     const confirmationInput: ConfirmationInput = {

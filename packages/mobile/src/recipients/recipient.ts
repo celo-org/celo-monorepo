@@ -26,10 +26,10 @@ export type Recipient =
 
 interface IRecipient {
   kind: RecipientKind
-  address?: string
   displayName: string
   displayId?: string
   e164PhoneNumber?: string
+  address?: string
 }
 
 export interface RecipientWithMobileNumber extends IRecipient {
@@ -61,41 +61,11 @@ export interface NumberToRecipient {
   [number: string]: RecipientWithContact
 }
 
-export function phoneNumberToRecipient(
-  e164Number: string,
-  address: string | null,
-  recipientCache: NumberToRecipient
-): Recipient {
-  const recipient = recipientCache[e164Number]
-  return recipient
-    ? {
-        kind: RecipientKind.Contact,
-        e164PhoneNumber: e164Number,
-        displayId: e164Number,
-        address: address || undefined,
-        phoneNumberLabel: recipient.phoneNumberLabel,
-        displayName: recipient.displayName,
-        thumbnailPath: recipient.thumbnailPath,
-        contactId: recipient.contactId,
-      }
-    : {
-        kind: RecipientKind.MobileNumber,
-        e164PhoneNumber: e164Number,
-        displayId: e164Number,
-        address: address || undefined,
-        displayName: e164Number,
-      }
-}
-
 /**
  * Transforms contacts into a map of e164Number to recipients based on phone numbers from contacts.
  * If a contact has no phone numbers it won't result in any recipients.
  */
-export function contactsToRecipients(
-  contacts: MinimalContact[],
-  defaultCountryCode: string,
-  e164NumberToAddress: E164NumberToAddressType
-) {
+export function contactsToRecipients(contacts: MinimalContact[], defaultCountryCode: string) {
   try {
     //  We need a map of e164Number to recipients so we can efficiently
     //    update them later as the latest contact mappings arrive from the contact calls.
@@ -123,7 +93,6 @@ export function contactsToRecipients(
             displayId: parsedNumber.displayNumber,
             e164PhoneNumber: parsedNumber.e164Number,
             phoneNumberLabel: phoneNumber.label,
-            address: e164NumberToAddress[parsedNumber.e164Number] || undefined,
             contactId: contact.recordID,
             thumbnailPath: contact.thumbnailPath,
           }
@@ -143,7 +112,7 @@ export function contactsToRecipients(
     return { e164NumberToRecipients, otherRecipients }
   } catch (error) {
     Logger.error(TAG, 'Failed to build recipients cache', error)
-    return null
+    throw error
   }
 }
 
