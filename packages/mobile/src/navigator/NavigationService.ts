@@ -1,13 +1,5 @@
 // (https://github.com/react-navigation/react-navigation/issues/1439)
-import SplashScreen from 'react-native-splash-screen'
-import {
-  NavigationActions,
-  NavigationBackActionPayload,
-  NavigationContainerComponent,
-  NavigationParams,
-  NavigationState,
-  StackActions,
-} from 'react-navigation'
+
 import sleep from 'sleep-promise'
 import { PincodeType } from 'src/account/reducer'
 import { pincodeTypeSelector } from 'src/account/selectors'
@@ -19,19 +11,7 @@ import Logger from 'src/utils/Logger'
 
 const TAG = 'NavigationService'
 
-export enum NavActions {
-  SET_NAVIGATOR = 'NAVIGATION/SET_NAVIGATOR',
-}
-
-let navigator: NavigationContainerComponent
-
-export const setTopLevelNavigator = (navigatorRef: any) => {
-  Logger.debug(`${TAG}@setTopLevelNavigator`, 'Initialized')
-  navigator = navigatorRef
-  return {
-    type: NavActions.SET_NAVIGATOR,
-  }
-}
+let navigator: any
 
 async function ensureNavigator() {
   let retries = 0
@@ -44,7 +24,7 @@ async function ensureNavigator() {
   }
 }
 
-export function replace(routeName: string, params?: NavigationParams) {
+export function replace(routeName: string, params?: any) {
   ensureNavigator()
     .then(() => {
       Logger.debug(`${TAG}@replace`, `Dispatch ${routeName}`)
@@ -60,7 +40,7 @@ export function replace(routeName: string, params?: NavigationParams) {
     })
 }
 
-export function navigate(routeName: string, params?: NavigationParams) {
+export function navigate(routeName: string, params?: any) {
   ensureNavigator()
     .then(() => {
       Logger.debug(`${TAG}@navigate`, `Dispatch ${routeName}`)
@@ -133,27 +113,6 @@ function getCurrentRouteName(navState: NavigationState): string {
     return getCurrentRouteName(route)
   }
   return route.routeName
-}
-
-let splashHidden = false
-
-export function handleNavigationStateChange(
-  prevState: NavigationState,
-  currentState: NavigationState
-) {
-  const currentScreen = getCurrentRouteName(currentState)
-  const previousScreen = getCurrentRouteName(prevState)
-
-  // Hide native splash if necessary, once we navigate away from AppLoading
-  if (!splashHidden && currentScreen && currentScreen !== Screens.AppLoading) {
-    splashHidden = true
-    // Use requestAnimationFrame to prevent a one frame gap when hiding
-    requestAnimationFrame(() => {
-      SplashScreen.hide()
-    })
-  }
-
-  CeloAnalytics.page(currentScreen, { previousScreen, currentScreen })
 }
 
 export function navigateBack(params?: NavigationBackActionPayload) {

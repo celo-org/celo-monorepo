@@ -2,11 +2,9 @@ import colors from '@celo/react-components/styles/colors'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { ApolloProvider } from 'react-apollo'
-import { withTranslation } from 'react-i18next'
 import { DeviceEventEmitter, Linking, StatusBar, YellowBox } from 'react-native'
 import { getNumberFormatSettings } from 'react-native-localize'
-import { SafeAreaProvider } from 'react-native-safe-area-context'
-import { useScreens } from 'react-native-screens'
+import { enableScreens } from 'react-native-screens'
 import { Provider } from 'react-redux'
 import { PersistGate } from 'redux-persist/integration/react'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
@@ -16,13 +14,11 @@ import { openDeepLink } from 'src/app/actions'
 import AppLoading from 'src/app/AppLoading'
 import ErrorBoundary from 'src/app/ErrorBoundary'
 import i18n from 'src/i18n'
-import Navigator from 'src/navigator/NavigatorWrapper'
+import NavigatorWrapper from 'src/navigator/NavigatorWrapper'
 import { persistor, store } from 'src/redux/store'
 import Logger from 'src/utils/Logger'
 
-// This is not actually a hook
-// tslint:disable-next-line
-useScreens()
+enableScreens()
 
 Logger.debug('App/init', 'Current Language: ' + i18n.language)
 YellowBox.ignoreWarnings([
@@ -40,9 +36,6 @@ BigNumber.config({
     groupSeparator: groupingSeparator,
   },
 })
-
-const WrappedNavigator = withTranslation('common')(Navigator)
-WrappedNavigator.displayName = 'WrappedNavigator'
 
 export class App extends React.Component {
   async componentDidMount() {
@@ -75,14 +68,12 @@ export class App extends React.Component {
       // @ts-ignore */
       <ApolloProvider client={apolloClient}>
         <Provider store={store}>
-          <SafeAreaProvider>
-            <PersistGate loading={<AppLoading />} persistor={persistor}>
-              <StatusBar backgroundColor={colors.white} barStyle="dark-content" />
-              <ErrorBoundary>
-                <WrappedNavigator />
-              </ErrorBoundary>
-            </PersistGate>
-          </SafeAreaProvider>
+          <PersistGate loading={<AppLoading />} persistor={persistor}>
+            <StatusBar backgroundColor={colors.white} barStyle="dark-content" />
+            <ErrorBoundary>
+              <NavigatorWrapper />
+            </ErrorBoundary>
+          </PersistGate>
         </Provider>
       </ApolloProvider>
     )

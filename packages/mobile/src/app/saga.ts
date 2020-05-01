@@ -205,7 +205,7 @@ export function* handleSetAppState(action: SetAppState) {
 }
 
 export function* appSaga() {
-  yield spawn(navigateToProperScreen)
+  // yield spawn(navigateToProperScreen)
   yield spawn(toggleToProperSyncMode)
   yield spawn(watchDeepLinks)
   yield spawn(watchAppState)

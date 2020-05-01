@@ -1,6 +1,6 @@
+import { createStackNavigator } from '@react-navigation/stack'
+import * as React from 'react'
 import { Platform } from 'react-native'
-import { createSwitchNavigator } from 'react-navigation'
-import { createStackNavigator } from 'react-navigation-stack'
 import Account from 'src/account/Account'
 import Analytics from 'src/account/Analytics'
 import DataSaver from 'src/account/DataSaver'
@@ -16,7 +16,6 @@ import Profile from 'src/account/Profile'
 import Security from 'src/account/Security'
 import Support from 'src/account/Support'
 import SupportContact from 'src/account/SupportContact'
-import AppLoading from 'src/app/AppLoading'
 import Debug from 'src/app/Debug'
 import ErrorScreen from 'src/app/ErrorScreen'
 import UpgradeScreen from 'src/app/UpgradeScreen'
@@ -41,7 +40,7 @@ import EnterInviteCode from 'src/invite/EnterInviteCode'
 import Language from 'src/language/Language'
 import SelectLocalCurrency from 'src/localCurrency/SelectLocalCurrency'
 import { Screens, Stacks } from 'src/navigator/Screens'
-import TabNavigator from 'src/navigator/TabNavigator'
+// import TabNavigator from 'src/navigator/TabNavigator'
 import IncomingPaymentRequestListScreen from 'src/paymentRequest/IncomingPaymentRequestListScreen'
 import OutgoingPaymentRequestListScreen from 'src/paymentRequest/OutgoingPaymentRequestListScreen'
 import PaymentRequestConfirmation from 'src/paymentRequest/PaymentRequestConfirmation'
@@ -84,6 +83,10 @@ export const headerArea = {
   },
 }
 
+const createStackNavigatorStub = (...args) => {
+  console.log(args)
+}
+
 export const commonScreens = {
   [Screens.PincodeEnter]: { screen: PincodeEnter },
   [Screens.ErrorScreen]: { screen: ErrorScreen },
@@ -104,7 +107,7 @@ const verificationScreens = {
   [Screens.VerificationSuccessScreen]: { screen: VerificationSuccessScreen },
 }
 
-const NuxStack = createStackNavigator(
+const NuxStack = createStackNavigatorStub(
   {
     [Screens.Language]: { screen: Language },
     [Screens.JoinCelo]: { screen: JoinCelo },
@@ -127,7 +130,7 @@ const NuxStack = createStackNavigator(
   }
 )
 
-const SendStack = createStackNavigator(
+const SendStack = createStackNavigatorStub(
   {
     [Screens.Send]: { screen: Send },
     ...verificationScreens,
@@ -145,7 +148,7 @@ const SendStack = createStackNavigator(
   }
 )
 
-const QRSendStack = createStackNavigator(
+const QRSendStack = createStackNavigatorStub(
   {
     [Screens.QRCode]: { screen: QRCode },
     [Screens.QRScanner]: { screen: QRScanner },
@@ -162,7 +165,7 @@ const QRSendStack = createStackNavigator(
   }
 )
 
-const ExchangeStack = createStackNavigator(
+const ExchangeStack = createStackNavigatorStub(
   {
     // Note, ExchangeHomeScreen isn't in this stack because it's part of the tab navigator
     [Screens.ExchangeTradeScreen]: { screen: ExchangeTradeScreen },
@@ -178,7 +181,7 @@ const ExchangeStack = createStackNavigator(
   }
 )
 
-const IncomingRequestStack = createStackNavigator(
+const IncomingRequestStack = createStackNavigatorStub(
   {
     [Screens.IncomingPaymentRequestListScreen]: { screen: IncomingPaymentRequestListScreen },
     [Screens.SendConfirmation]: { screen: SendConfirmation },
@@ -192,7 +195,7 @@ const IncomingRequestStack = createStackNavigator(
   }
 )
 
-const OutgoingRequestStack = createStackNavigator(
+const OutgoingRequestStack = createStackNavigatorStub(
   {
     [Screens.OutgoingPaymentRequestListScreen]: { screen: OutgoingPaymentRequestListScreen },
   },
@@ -205,7 +208,7 @@ const OutgoingRequestStack = createStackNavigator(
   }
 )
 
-const EscrowStack = createStackNavigator(
+const EscrowStack = createStackNavigatorStub(
   {
     [Screens.EscrowedPaymentListScreen]: { screen: EscrowedPaymentListScreen },
     [Screens.ReclaimPaymentConfirmationScreen]: {
@@ -221,7 +224,7 @@ const EscrowStack = createStackNavigator(
   }
 )
 
-const BackupStack = createStackNavigator(
+const BackupStack = createStackNavigatorStub(
   {
     [Screens.BackupIntroduction]: { screen: BackupIntroduction },
     [Screens.BackupPhrase]: { screen: BackupPhrase },
@@ -239,7 +242,7 @@ const BackupStack = createStackNavigator(
   }
 )
 
-const SettingsStack = createStackNavigator(
+const SettingsStack = createStackNavigatorStub(
   {
     [Screens.Account]: { screen: Account },
     [Stacks.BackupStack]: { screen: BackupStack },
@@ -267,10 +270,10 @@ const SettingsStack = createStackNavigator(
   }
 )
 
-const AppStack = createStackNavigator(
+const AppStack = createStackNavigatorStub(
   {
     // Note, WalletHome isn't in this stack because it's part of the tab navigator
-    [Screens.TabNavigator]: { screen: TabNavigator },
+    // [Screens.TabNavigator]: { screen: TabNavigator },
     [Stacks.SendStack]: { screen: SendStack },
     // Adding this screen, so it possbile to go back to Home screen from it
     [Screens.SendConfirmation]: { screen: SendConfirmation },
@@ -301,15 +304,15 @@ const AppStack = createStackNavigator(
   }
 )
 
-const AppNavigator = createSwitchNavigator(
-  {
-    [Screens.AppLoading]: AppLoading,
-    [Stacks.NuxStack]: NuxStack,
-    [Stacks.AppStack]: AppStack,
-  },
-  {
-    initialRouteName: Screens.AppLoading,
-  }
-)
+const Stack = createStackNavigator()
 
-export default AppNavigator
+export function AppNavigatorNew() {
+  console.log('hhiiiiiiiii')
+  return (
+    <Stack.Navigator initialRouteName={Screens.Language}>
+      <Stack.Screen name={Screens.Language} component={Language} />
+    </Stack.Navigator>
+  )
+}
+
+export default AppNavigatorNew
