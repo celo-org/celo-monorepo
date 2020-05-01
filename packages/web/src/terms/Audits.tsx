@@ -29,26 +29,14 @@ class Audits extends React.PureComponent<I18nProps> {
               <H1 style={textStyles.center}>{t('title')}</H1>
             </Cell>
           </GridRow>
-          <SideTitledSection span={Spans.three4th} title={t('protocol')}>
-            <Text style={[fonts.p, standardStyles.elementalMarginBottom]}>
-              {t('whitepaperTitle')}
-            </Text>
+          <SideTitledSection span={Spans.three4th} title={t('sideTitle')}>
+            <Text style={[fonts.p, standardStyles.elementalMarginBottom]}>{t('openZeppelin')}</Text>
             <View style={styles.links}>
-              <HelpfullLink text={t('download')} href={'/papers/whitepaper'} />
-              <HelpfullLink text={'阅读'} href={'/papers/celo-wp-simplified-chinese.pdf'} />
+              <HelpfullLink
+                text={t('download')}
+                href={'https://blog.openzeppelin.com/celo-contracts-audit'}
+              />
             </View>
-          </SideTitledSection>
-          <SideTitledSection span={Spans.three4th} title={t('economics')}>
-            <Text style={[fonts.p, standardStyles.elementalMarginBottom]}>
-              {t('stabilityTitle')}
-            </Text>
-            <HelpfullLink text={t('download')} href={'/papers/stability'} />
-          </SideTitledSection>
-          <SideTitledSection span={Spans.three4th} title={''}>
-            <Text style={[fonts.p, standardStyles.elementalMarginBottom]}>
-              {t('velocityTitle')}
-            </Text>
-            <HelpfullLink text={t('download')} href={'/papers/cbdc-velocity'} />
           </SideTitledSection>
         </View>
       </>
@@ -75,6 +63,7 @@ const styles = StyleSheet.create({
   container: {
     marginTop: HEADER_HEIGHT,
     paddingTop: HEADER_HEIGHT,
+    minHeight: 450,
   },
   links: {
     flexWrap: 'wrap',

@@ -22,7 +22,7 @@ import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 
 const MENU = [menu.HOME, ...MAIN_MENU]
 const TECH_MENU = [
-  { name: 'Audits', link: CeloLinks.audits },
+  { name: 'Security Audits', link: CeloLinks.audits },
   { name: 'Docs', link: CeloLinks.docs },
   menu.PAPERS,
 ]
