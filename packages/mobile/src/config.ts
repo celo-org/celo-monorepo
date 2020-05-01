@@ -55,6 +55,11 @@ export const FAQ_LINK = 'https://celo.org/faq'
 export const FORUM_LINK = 'https://forum.celo.org/c/support'
 export const CELO_SUPPORT_EMAIL_ADDRESS = 'support@celo.org'
 export const DEFAULT_FORNO_URL = `https://${DEFAULT_TESTNET}-forno.celo-testnet.org`
+// TODO configure per envrionment
+export const PHONE_NUM_PRIVACY_SERVICE =
+  'https://us-central1-celo-phone-number-privacy-stg.cloudfunctions.net'
+export const PHONE_NUM_PRIVACY_PUBLIC_KEY =
+  'B+gJTCmTrf9t3X7YQ2F4xekSzd5xg5bdzcJ8NPefby3mScelg5172zl1GgIO9boADEwE67j6M55GwouQwaG5jDZ5tHa2eNtfC7oLIsevuUmzrXVDry9cmsalB0BHX0EA'
 
 // FEATURE FLAGS
 export const FIREBASE_ENABLED = stringToBoolean(Config.FIREBASE_ENABLED || 'true')

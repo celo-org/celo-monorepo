@@ -279,7 +279,6 @@ class Send extends React.Component<Props, State> {
           searchQuery={searchQuery}
           defaultCountryCode={defaultCountryCode}
           listHeaderComponent={this.renderListHeader}
-          showContactSyncBanner={true}
           onSelectRecipient={this.onSelectRecipient}
         />
       </View>
