@@ -18,41 +18,21 @@ export enum colors {
   light = '#FFFFFF',
 }
 
-export default colors
-// transition table
-// export default {
-//   background: colors.light,
-//   // backgroundDarker: '#FAFAFA',
-//   // loadingBarGrey: '#DBDBDB',
-//   // darkGrey: '#3D3D3D',
-//   // gray: 'rgba(0, 0, 0, .4)',
-//   // lightGray: '#BDBDBD',
-//   // listBorderColor: 'rgba(0, 0, 0, .5)',
-//   // inputLabelColor: 'rgba(0, 0, 0, 0.3)',
-
-//   celoGold: colors.goldBrand,
-//   celoGoldInactive: '#F4E8BE',
-//   celoGreen: colors.greenBrand,
-//   // celoDarkGreenInactive: '#5ee8ae',
-//   // celoGreenInactive: '#A3EBC6',
-//   // celoGreenInactiveExtra: '#D4EEE0',
-//   dark: colors.dark,
-//   darkSecondary: colors.gray5,
-//   darkLightest: colors.gray1,
-//   altDarkBg: '#F8F8F8',
-//   white: colors.light,
-//   // inactive: '#D1D5D8',
-//   // inactiveDark: 'color: rgba(46, 51, 56, 0.4)',
-//   // inactiveLabelBar: '#E3E3E5',
-//   // iconDefault: '#81868B',
-//   // listBorder: 'rgba(134, 138, 141, 0.15)',
-//   // inputBorder: '#D1D5D8',
-//   // sectionBorder: '#C4C4C4',
-//   // errorRed: '#FD785B',
-//   // messageBlue: '#3C9BF4',
-//   // purple: '#D39CFE',
-//   // teal: '#7AD6FE',
-//   // orange: '#FEB45E',
-//   // disconnectBannerGrey: 'rgba(46, 51, 56, 0.4)',
-//   disconnectBannerRed: colors.warning
-// }
+// transition table old names new colors
+export default {
+  background: colors.light,
+  gray: colors.gray5,
+  dark: colors.dark,
+  darkSecondary: colors.gray5,
+  darkLightest: colors.gray1,
+  white: colors.light,
+  inactive: colors.gray4,
+  listBorder: colors.gray2,
+  inputBorder: colors.gray2,
+  celoGold: colors.goldBrand,
+  celoGoldInactive: colors.goldFaint,
+  celoGreen: colors.greenBrand,
+  celoDarkGreenInactive: colors.greenFaint,
+  celoGreenInactive: colors.greenFaint,
+  errorRed: colors.warning,
+}
