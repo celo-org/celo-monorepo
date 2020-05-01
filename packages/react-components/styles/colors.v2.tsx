@@ -1,3 +1,4 @@
+// Designer Created Figma Colors
 export enum colors {
   greenFaint = '#97DFC1', // green disabled
   greenBrand = '#42D689',
@@ -18,7 +19,7 @@ export enum colors {
   light = '#FFFFFF',
 }
 
-// transition table old names new colors
+// deprecated transition map of old names new colors
 export default {
   background: colors.light,
   gray: colors.gray5,

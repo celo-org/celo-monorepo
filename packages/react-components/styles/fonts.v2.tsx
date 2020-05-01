@@ -29,7 +29,7 @@ const standards = {
     color: colors.dark,
   },
 }
-
+// Figma Font Styles
 export const fontStyles = StyleSheet.create({
   h1: {
     fontSize: 24,
@@ -64,7 +64,7 @@ export const fontStyles = StyleSheet.create({
   regular500: { ...standards.regular, fontFamily: Inter.Medium },
 })
 
-// use existing names but new styles
+// map of deprecated font names to knew font styles.
 export default StyleSheet.create({
   body: fontStyles.regular,
   bodySmall: fontStyles.small,
