@@ -1031,7 +1031,7 @@ Array [
                 className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
                 data-focusable={true}
                 dir="auto"
-                href="/audits"
+                href="https://docs.celo.org/"
                 onClick={[Function]}
                 onMouseEnter={[Function]}
                 rel=" noopener noreferrer"
@@ -1053,7 +1053,7 @@ Array [
                 }
                 target="_blank"
               >
-                Security Audits
+                Docs
               </a>
             </div>
           </div>
@@ -1085,7 +1085,7 @@ Array [
                 className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
                 data-focusable={true}
                 dir="auto"
-                href="https://docs.celo.org/"
+                href="/audits"
                 onClick={[Function]}
                 onMouseEnter={[Function]}
                 rel=" noopener noreferrer"
@@ -1107,7 +1107,7 @@ Array [
                 }
                 target="_blank"
               >
-                Docs
+                Security Audits
               </a>
             </div>
           </div>

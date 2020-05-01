@@ -22,8 +22,8 @@ import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 
 const MENU = [menu.HOME, ...MAIN_MENU]
 const TECH_MENU = [
-  { name: 'Security Audits', link: CeloLinks.audits },
   { name: 'Docs', link: CeloLinks.docs },
+  { name: 'Security Audits', link: CeloLinks.audits },
   menu.PAPERS,
 ]
 const eventsLink = `${menu.COMMUNITY.link}#${hashNav.connect.events}`
