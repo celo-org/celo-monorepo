@@ -113,6 +113,8 @@ OPTIONS
 
   --value=10000000000000000000000                        (required) Amount of gold to perform `action` with
 
+  --yes                                                  Answer yes to prompt
+
 EXAMPLES
   locked-gold --contract 0xCcc8a47BE435F1590809337BB14081b256Ae26A8 --action lock --value 10000000000000000000000
   locked-gold --contract 0xCcc8a47BE435F1590809337BB14081b256Ae26A8 --action unlock --value 10000000000000000000000
