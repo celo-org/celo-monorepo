@@ -55,6 +55,12 @@ __You must have the [celo-monorepo] successfully set up and built before setting
 
 To do this, follow the [setup instructions][setup].
 
+Next, install [watchman][watchman].
+```bash
+# On a mac
+brew install watchman
+```
+
 ### iOS
 
 #### Enroll in the Apple Developer Program
@@ -83,6 +89,7 @@ gem install cocoapods
 gem install bundler
 # download the project dependencies
 bundle install
+# run inside mobile/ios
 bundle exec pod install
 ```
 
@@ -443,3 +450,4 @@ $ adb kill-server && adb start-server
 [approve kernel extension]: https://developer.apple.com/library/content/technotes/tn2459/_index.html
 [oracle being oracle]: https://github.com/Homebrew/homebrew-cask-versions/issues/7253
 [device unauthorized]: https://stackoverflow.com/questions/23081263/adb-android-device-unauthorized
+[watchman]: https://facebook.github.io/watchman/docs/install/
