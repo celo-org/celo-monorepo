@@ -2,6 +2,8 @@ PODS:
   - Analytics (3.8.0)
   - boost-for-react-native (1.63.0)
   - CeloBlockchain (0.0.300)
+  - CocoaAsyncSocket (7.6.4)
+  - CocoaLibEvent (1.0.0)
   - DoubleConversion (1.1.6)
   - FBLazyVector (0.62.2)
   - FBReactNativeSpec (0.62.2):
@@ -84,6 +86,52 @@ PODS:
     - FirebaseAuthInterop (~> 1.0)
     - FirebaseCore (~> 6.0)
     - GTMSessionFetcher/Core (~> 1.1)
+  - Flipper (0.39.0):
+    - Flipper-Folly (~> 2.2)
+    - Flipper-RSocket (~> 1.1)
+  - Flipper-DoubleConversion (1.1.7)
+  - Flipper-Folly (2.2.0):
+    - boost-for-react-native
+    - CocoaLibEvent (~> 1.0)
+    - Flipper-DoubleConversion
+    - Flipper-Glog
+    - OpenSSL-Universal (= 1.0.2.19)
+  - Flipper-Glog (0.3.6)
+  - Flipper-PeerTalk (0.0.4)
+  - Flipper-RSocket (1.1.0):
+    - Flipper-Folly (~> 2.2)
+  - FlipperKit (0.39.0):
+    - FlipperKit/Core (= 0.39.0)
+  - FlipperKit/Core (0.39.0):
+    - Flipper (~> 0.39.0)
+    - FlipperKit/CppBridge
+    - FlipperKit/FBCxxFollyDynamicConvert
+    - FlipperKit/FBDefines
+    - FlipperKit/FKPortForwarding
+  - FlipperKit/CppBridge (0.39.0):
+    - Flipper (~> 0.39.0)
+  - FlipperKit/FBCxxFollyDynamicConvert (0.39.0):
+    - Flipper-Folly (~> 2.2)
+  - FlipperKit/FBDefines (0.39.0)
+  - FlipperKit/FKPortForwarding (0.39.0):
+    - CocoaAsyncSocket (~> 7.6)
+    - Flipper-PeerTalk (~> 0.0.4)
+  - FlipperKit/FlipperKitHighlightOverlay (0.39.0)
+  - FlipperKit/FlipperKitLayoutPlugin (0.39.0):
+    - FlipperKit/Core
+    - FlipperKit/FlipperKitHighlightOverlay
+    - FlipperKit/FlipperKitLayoutTextSearchable
+    - YogaKit (~> 1.18)
+  - FlipperKit/FlipperKitLayoutTextSearchable (0.39.0)
+  - FlipperKit/FlipperKitNetworkPlugin (0.39.0):
+    - FlipperKit/Core
+  - FlipperKit/FlipperKitReactPlugin (0.39.0):
+    - FlipperKit/Core
+  - FlipperKit/FlipperKitUserDefaultsPlugin (0.39.0):
+    - FlipperKit/Core
+  - FlipperKit/SKIOSNetworkPlugin (0.39.0):
+    - FlipperKit/Core
+    - FlipperKit/FlipperKitNetworkPlugin
   - Folly (2018.10.22.00):
     - boost-for-react-native
     - DoubleConversion
@@ -134,6 +182,9 @@ PODS:
     - nanopb/encode (= 0.3.9011)
   - nanopb/decode (0.3.9011)
   - nanopb/encode (0.3.9011)
+  - OpenSSL-Universal (1.0.2.19):
+    - OpenSSL-Universal/Static (= 1.0.2.19)
+  - OpenSSL-Universal/Static (1.0.2.19)
   - PromisesObjC (1.2.8)
   - Protobuf (3.11.4)
   - RCTRequired (0.62.2)
@@ -313,8 +364,6 @@ PODS:
     - React
   - react-native-contacts (5.0.0):
     - React
-  - react-native-fast-crypto (1.8.3):
-    - React
   - react-native-geth (0.1.0-development):
     - CeloBlockchain
     - React
@@ -477,12 +526,33 @@ PODS:
   - Sentry/Core (4.4.3)
   - Toast (4.0.0)
   - Yoga (1.14.0)
+  - YogaKit (1.18.1):
+    - Yoga (~> 1.14)
 
 DEPENDENCIES:
   - "CeloBlockchain (from `../../../node_modules/@celo/client/CeloBlockchain.podspec`)"
   - DoubleConversion (from `../../../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec`)
   - FBLazyVector (from `../../../node_modules/react-native/Libraries/FBLazyVector`)
   - FBReactNativeSpec (from `../../../node_modules/react-native/Libraries/FBReactNativeSpec`)
+  - Flipper (~> 0.39)
+  - Flipper-DoubleConversion (= 1.1.7)
+  - Flipper-Folly (~> 2.1)
+  - Flipper-Glog (= 0.3.6)
+  - Flipper-PeerTalk (~> 0.0.4)
+  - Flipper-RSocket (~> 1.0)
+  - FlipperKit (~> 0.39)
+  - FlipperKit/Core (~> 0.39)
+  - FlipperKit/CppBridge (~> 0.39)
+  - FlipperKit/FBCxxFollyDynamicConvert (~> 0.39)
+  - FlipperKit/FBDefines (~> 0.39)
+  - FlipperKit/FKPortForwarding (~> 0.39)
+  - FlipperKit/FlipperKitHighlightOverlay (~> 0.39)
+  - FlipperKit/FlipperKitLayoutPlugin (~> 0.39)
+  - FlipperKit/FlipperKitLayoutTextSearchable (~> 0.39)
+  - FlipperKit/FlipperKitNetworkPlugin (~> 0.39)
+  - FlipperKit/FlipperKitReactPlugin (~> 0.39)
+  - FlipperKit/FlipperKitUserDefaultsPlugin (~> 0.39)
+  - FlipperKit/SKIOSNetworkPlugin (~> 0.39)
   - Folly (from `../../../node_modules/react-native/third-party-podspecs/Folly.podspec`)
   - glog (from `../../../node_modules/react-native/third-party-podspecs/glog.podspec`)
   - lottie-ios (from `../../../node_modules/lottie-ios`)
@@ -502,7 +572,6 @@ DEPENDENCIES:
   - react-native-camera (from `../../../node_modules/react-native-camera`)
   - react-native-config (from `../../../node_modules/react-native-config`)
   - react-native-contacts (from `../../../node_modules/react-native-contacts`)
-  - react-native-fast-crypto (from `../../../node_modules/react-native-fast-crypto`)
   - react-native-geth (from `../../../node_modules/react-native-geth`)
   - react-native-keep-awake (from `../../../node_modules/react-native-keep-awake`)
   - react-native-mail (from `../../../node_modules/react-native-mail`)
@@ -554,6 +623,8 @@ SPEC REPOS:
   trunk:
     - Analytics
     - boost-for-react-native
+    - CocoaAsyncSocket
+    - CocoaLibEvent
     - Firebase
     - FirebaseAnalytics
     - FirebaseAnalyticsInterop
@@ -567,6 +638,13 @@ SPEC REPOS:
     - FirebaseInstanceID
     - FirebaseMessaging
     - FirebaseStorage
+    - Flipper
+    - Flipper-DoubleConversion
+    - Flipper-Folly
+    - Flipper-Glog
+    - Flipper-PeerTalk
+    - Flipper-RSocket
+    - FlipperKit
     - GoogleAppMeasurement
     - GoogleDataTransport
     - GoogleDataTransportCCTSupport
@@ -574,11 +652,13 @@ SPEC REPOS:
     - GTMSessionFetcher
     - leveldb-library
     - nanopb
+    - OpenSSL-Universal
     - PromisesObjC
     - Protobuf
     - Segment-Firebase
     - Sentry
     - Toast
+    - YogaKit
 
 EXTERNAL SOURCES:
   CeloBlockchain:
@@ -623,8 +703,6 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/react-native-config"
   react-native-contacts:
     :path: "../../../node_modules/react-native-contacts"
-  react-native-fast-crypto:
-    :path: "../../../node_modules/react-native-fast-crypto"
   react-native-geth:
     :path: "../../../node_modules/react-native-geth"
   react-native-keep-awake:
@@ -718,6 +796,8 @@ SPEC CHECKSUMS:
   Analytics: fcf79ebc393a7d77befb8d43ce296353ba9ede3d
   boost-for-react-native: 39c7adb57c4e60d6c5479dd8623128eb5b3f0f2c
   CeloBlockchain: f7e79f3526535dacc3d64dd786bf3c1f7b602446
+  CocoaAsyncSocket: 694058e7c0ed05a9e217d1b3c7ded962f4180845
+  CocoaLibEvent: 2fab71b8bd46dd33ddb959f7928ec5909f838e3f
   DoubleConversion: 5805e889d232975c086db112ece9ed034df7a0b2
   FBLazyVector: 4aab18c93cd9546e4bfed752b4084585eca8b245
   FBReactNativeSpec: 5465d51ccfeecb7faa12f9ae0024f2044ce4044e
@@ -734,6 +814,13 @@ SPEC CHECKSUMS:
   FirebaseInstanceID: ebd2ea79ee38db0cb5f5167b17a0d387e1cc7b6e
   FirebaseMessaging: 089b7a4991425783384acc8bcefcd78c0af913bd
   FirebaseStorage: 93fe2f8190a01bfb2b2c4932df7d679744c4ef1d
+  Flipper: bee8d5809012d1b6affa747fb756567ecd8c7c0b
+  Flipper-DoubleConversion: 38631e41ef4f9b12861c67d17cb5518d06badc41
+  Flipper-Folly: c12092ea368353b58e992843a990a3225d4533c3
+  Flipper-Glog: 1dfd6abf1e922806c52ceb8701a3599a79a200a6
+  Flipper-PeerTalk: 116d8f857dc6ef55c7a5a75ea3ceaafe878aadc9
+  Flipper-RSocket: 64e7431a55835eb953b0bf984ef3b90ae9fdddd7
+  FlipperKit: 45e659ff1bfa264bb55ea0b20926c9c11599c628
   Folly: 30e7936e1c45c08d884aa59369ed951a8e68cf51
   glog: 1f3da668190260b06b429bb211bfbee5cd790c28
   GoogleAppMeasurement: dfe55efa543e899d906309eaaac6ca26d249862f
@@ -745,6 +832,7 @@ SPEC CHECKSUMS:
   lottie-ios: 48fac6be217c76937e36e340e2d09cf7b10b7f5f
   lottie-react-native: 2a1a82bb326ae51331a5520de0cf706733c6db69
   nanopb: 18003b5e52dab79db540fe93fe9579f399bd1ccd
+  OpenSSL-Universal: 8b48cc0d10c1b2923617dfe5c178aa9ed2689355
   PromisesObjC: c119f3cd559f50b7ae681fa59dc1acd19173b7e6
   Protobuf: 176220c526ad8bd09ab1fb40a978eac3fef665f7
   RCTRequired: cec6a34b3ac8a9915c37e7e4ad3aa74726ce4035
@@ -760,7 +848,6 @@ SPEC CHECKSUMS:
   react-native-camera: 1b52abea404d04e040edb3e74b7c5523c01a3089
   react-native-config: 8f6b2b9e017f6a5e92a97353c768e19e67294bb1
   react-native-contacts: d1a60e38dadb67dbbe481480338988e00966a30d
-  react-native-fast-crypto: 2ca87a31247365bbef25b2682d4cf88182cbf806
   react-native-geth: b643560e11512a3c0b1d78df929cb9f2409cf4a2
   react-native-keep-awake: afad8a51dfef9fe9655a6344771be32c8596d774
   react-native-mail: a864fb211feaa5845c6c478a3266de725afdce89
@@ -808,7 +895,8 @@ SPEC CHECKSUMS:
   Sentry: 14bdd673870e8cf64932b149fad5bbbf39a9b390
   Toast: 91b396c56ee72a5790816f40d3a94dd357abc196
   Yoga: 3ebccbdd559724312790e7742142d062476b698e
+  YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
 
-PODFILE CHECKSUM: a53eb8d81d4e617f0eadb2910945831841c0ac1d
+PODFILE CHECKSUM: aa4f89d317793f6e29b75ec8289484fbab2bd1a2
 
 COCOAPODS: 1.9.1

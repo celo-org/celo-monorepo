@@ -11,7 +11,7 @@ $RNFirebaseAsStaticFramework = true
 require_relative "../../../node_modules/@react-native-community/cli-platform-ios/native_modules"
 
 def add_flipper_pods!(versions = {})
-  versions['Flipper'] ||= '~> 0.33.1'
+  versions['Flipper'] ||= '~> 0.39'
   versions['DoubleConversion'] ||= '1.1.7'
   versions['Flipper-Folly'] ||= '~> 2.1'
   versions['Flipper-Glog'] ||= '0.3.6'
@@ -102,21 +102,31 @@ target "celo" do
 
   pod 'Segment-Firebase'
 
-  target "celoTests" do
-    inherit! :search_paths
-  end
-
   use_native_modules!
 
+
+  $static_framework = ['FlipperKit', 'Flipper', 'Flipper-Folly',
+    'ComponentKit', 'Flipper-DoubleConversion',
+    'Flipper-Glog', 'Flipper-PeerTalk', 'Flipper-RSocket', 'YogaKit',
+    'CocoaLibEvent', 'OpenSSL-Universal', 'boost-for-react-native']
+ 
+  pre_install do |installer|
+    Pod::Installer::Xcode::TargetValidator.send(:define_method, :verify_no_static_framework_transitive_dependencies) {}
+    installer.pod_targets.each do |pod|
+      if $static_framework.include?(pod.name)
+        def pod.build_type;
+          Pod::BuildType.static_library
+        end
+      end
+    end
+  end
+
   # Enables Flipper.
-  #
-  # Note that if you have use_frameworks! enabled, Flipper will not work and
-  # you should disable these next few lines.
-  # add_flipper_pods!
+  add_flipper_pods!
 end
 
 post_install do |installer|
-  # flipper_post_install(installer)
+  flipper_post_install(installer)
 
   installer.pods_project.targets.each do |target|
     target.build_configurations.each do |config|

@@ -7,4 +7,11 @@ module.exports = {
       },
     },
   },
+  dependencies: {
+    'react-native-fast-crypto': {
+      platforms: {
+        ios: null,
+      },
+    },
+  },
 }
