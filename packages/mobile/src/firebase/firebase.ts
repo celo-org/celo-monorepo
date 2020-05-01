@@ -85,6 +85,9 @@ export function* initializeCloudMessaging(app: ReactNativeFirebase.Module, addre
     }
   }
 
+  // `registerDeviceForRemoteMessages` must be called before calling `getToken`
+  // Note: `registerDeviceForRemoteMessages` is really only required for iOS and is a no-op on Android
+  yield call([app.messaging(), 'registerDeviceForRemoteMessages'])
   const fcmToken = yield call([app.messaging(), 'getToken'])
   if (fcmToken) {
     yield call(registerTokenToDb, app, address, fcmToken)

@@ -2,7 +2,7 @@
 
 This section explains how to get a Validator node running on Mainnet Release Candidate 1 (RC1) Network.
 
-Validators help secure the Celo network by participating in Celo’s Proof of Stake protocol. Validators are organized into Validator Groups, analogous to parties in representative democracies. A Validator Group is essentially an ordered list of Validators.
+Validators help secure the Celo network by participating in Celo’s proof-of-stake protocol. Validators are organized into Validator Groups, analogous to parties in representative democracies. A Validator Group is essentially an ordered list of Validators.
 
 Just as anyone in a democracy can create their own political party, or seek to get selected to represent a party in an election, any Celo user can create a Validator group and add themselves to it, or set up a potential Validator and work to get an existing Validator group to include them.
 
@@ -24,7 +24,7 @@ If you do not have the required Celo Gold to lock up, you can try out of the pro
 
 We will not discuss obtaining Celo Gold here, but it is a prerequisite that you obtain the required Celo Gold, and it is assumed in this guide that your gold is held in two `ReleaseGold` contracts, one for the Validator and one for the Validator Group. If that is not the case, the provided commands will need to be adjusted, but the guide will still provide the required steps.
 
-At a high level, `ReleaseGold` holds a balance for scheduled release, while allowing the held balance to be used for certain actions such as validating and voting, depending on the configuration of the contract. [Read more about `ReleaseGold`.](../celo-codebase/protocol/release-gold)
+At a high level, `ReleaseGold` holds a balance for scheduled release, while allowing the held balance to be used for certain actions such as validating and voting, depending on the configuration of the contract. [Read more about `ReleaseGold`](../celo-gold-holder-guide/release-gold.md).
 
 ### Hardware requirements
 
@@ -34,7 +34,7 @@ The recommended Celo Validator setup involves continually running three instance
 - 1 **Validator Proxy node**: can be a VM or container in a multi-tenant environment (e.g. a public cloud), but requires high availability
 - 1 **Attestation node**: can be a VM or container in a multi-tenant environment (e.g. a public cloud), and has moderate availability requirements
 
-Celo is a Proof of Stake network, which has different hardware requirements than a Proof of Work network. Proof of Stake consensus is less CPU intensive, but is more sensitive to network connectivity and latency. Below is a list of standard requirements for running Validator and Proxy nodes on the Celo Network:
+Celo is a proof-of-stake network, which has different hardware requirements than a Proof of Work network. proof-of-stake consensus is less CPU intensive, but is more sensitive to network connectivity and latency. Below is a list of standard requirements for running Validator and Proxy nodes on the Celo Network:
 
 - Memory: 8 GB RAM
 - CPU: Quad core 3GHz (64-bit)
@@ -281,6 +281,8 @@ export PROXY_EXTERNAL_IP=<PROXY-MACHINE-EXTERNAL-IP-ADDRESS>
 
 ### Deploy a Validator Machine
 
+The Validator machine is node that actually assembles and signs blocks to particpate in consesnsus. We will set it up in this section.
+
 To operate as a validator, you'll need to generate a validator signer key. On your Validator machine (which should not be accessible from the public internet), follow very similar steps:
 
 ```bash
@@ -319,13 +321,13 @@ docker run --name celo-validator -it --restart unless-stopped -p 30303:30303 -p 
 
 The `networkid` parameter value of `42220` indicates we are connecting to the Mainnet Release Candidate 1 network.
 
-At this point your proxy should be peering with other nodes as they come online. Your Validator will not automatically peer with the proxy until block production starts after the genesis timestamp, so it will not have any peers at this moment. You should see a `Mining too far in the future` log message from the Validator, which indicates it is waiting for the genesis timestamp to pass. On April 22nd at 16:00 UTC, the Validator consensus engine will start, and after a few minutes to establish the Validator overlay network, block production will begin.
+At this point your Validator and Proxy machines should be configured, and both should be syncing to the network. You should see `Imported new chain segment` in your node logs, about once every 5 seconds once the node is synced to the latest block which you can find on the [Network Stats](https://stats.celo.org) page.
 
 ## Registering as a Validator
 
 In order to operate as a Validator, you must register on-chain and be elected. Elections will run on each epoch boundary, approximatly every 24 hours, after elections have been unfrozen by on-chain governance. Eligible validator groups will be considered in an Election mechanism that will select Validator based on the [D'Hondt method](https://en.wikipedia.org/wiki/D%27Hondt_method).
 
-In the following steps, this guide will assume your Celo Gold is held in a `ReleaseGold` contract, if this is not the case, the commands will need to be adjusted. At a high level, `ReleaseGold` holds a balance for scheduled release, while allowing the held balance to be used for certain actions such as validating and voting, depending on the configuration of the contract. [Read more about `ReleaseGold`.](../celo-codebase/protocol/release-gold)
+In the following steps, this guide will assume your Celo Gold is held in a `ReleaseGold` contract, if this is not the case, the commands will need to be adjusted. At a high level, `ReleaseGold` holds a balance for scheduled release, while allowing the held balance to be used for certain actions such as validating and voting, depending on the configuration of the contract. [Read more about `ReleaseGold`.](../celo-gold-holder-guide/release-gold.md)
 
 **Once elections are running, the genesis validators will be replaced by the elected validators, so it is important to register and vote even if you are in the genesis set.**
 
@@ -337,11 +339,9 @@ The following sections outline the actions you will need to take. On a high leve
 - Add the registered Validator to the Validator Group
 - Vote for the group with funds from each `ReleaseGold` contract
 
-We will need to use 7 keys, so it would be wise to review our recomendations on [key management](../operations-manual/key-management/summary.md).
-
 ### Create Accounts from the `ReleaseGold` contracts
 
-In order to participate on the network (lock gold, vote, validate) from a `ReleaseGold` contract, we need to create a Locked Gold Account with the address of the `ReleaseGold` contract.
+In order to participate on the network (lock gold, vote, validate) from a `ReleaseGold` contract, we need to create a registered Account with the address of the `ReleaseGold` contract.
 
 ```bash
 # On your local machine
@@ -361,7 +361,7 @@ celocli releasegold:show --contract $CELO_VALIDATOR_RG_ADDRESS
 When running the following commands, the Beneficiary keys should be [unlocked](#unlocking).
 {% endhint %}
 
-Create a Locked Gold Account for each of the Validator and Validator Group's `ReleaseGold` contracts:
+Create a registered Account for each of the Validator and Validator Group's `ReleaseGold` contracts:
 
 ```bash
 # On your local machine
@@ -369,7 +369,7 @@ celocli releasegold:create-account --contract $CELO_VALIDATOR_GROUP_RG_ADDRESS
 celocli releasegold:create-account --contract $CELO_VALIDATOR_RG_ADDRESS
 ```
 
-By running the following commands, you can see that the `ReleaseGold` contract addresses are now also associated with a registered Locked Gold Account.
+By running the following commands, you can see that the `ReleaseGold` contract addresses are now also associated with a registered Account.
 
 ```bash
 # On your local machine
@@ -436,9 +436,11 @@ In order to validate we need to authorize the Validator signer:
 celocli releasegold:authorize --contract $CELO_VALIDATOR_RG_ADDRESS --role validator --signature 0x$CELO_VALIDATOR_SIGNER_SIGNATURE --signer $CELO_VALIDATOR_SIGNER_ADDRESS
 ```
 
-Using the newly authorized Validator signer, register a validator on behalf of the Locked Gold Account:
+Using the newly authorized Validator signer, register a validator on behalf of the registered Account:
 
-{% hint style="info" %} Running the following command requires the validator signer key. This command can be run on the validator machine, or if the key is available on your local machine, it can be run there. {% endhint %}
+{% hint style="info" %}
+Running the following command requires the keys for the validator signer address. This command can be run on the validator machine, or if the keys are also available on your local machine, it can be run there.
+{% endhint %}
 
 ```bash
 # On a machine with CELO_VALIDATOR_SIGNER_ADDRESS unlocked.
@@ -454,7 +456,7 @@ celocli validator:show $CELO_VALIDATOR_RG_ADDRESS
 
 ### Register as a Validator Group
 
-In order to register a Validator Group, you will need to authorize a validator (group) signer on behalf of the `ReleaseGold` Locked Gold Account. In these steps you will create a new key on your local machine for this purpose.
+In order to register a Validator Group, you will need to authorize a validator (group) signer on behalf of the `ReleaseGold` registered Account. In these steps you will create a new key on your local machine for this purpose.
 
 ```bash
 # On your local machine
@@ -467,7 +469,7 @@ And save this new address:
 export CELO_VALIDATOR_GROUP_SIGNER_ADDRESS=<YOUR-VALIDATOR-GROUP-SIGNER-ADDRESS>
 ```
 
-In order to authorize our Validator Group signer, we need to create a proof that we have possession of the Validator Group signer private key. We do so by signing a message that consists of the authorizing Locked Gold Account address, in this case, the `ReleaseGold` contract address.
+In order to authorize our Validator Group signer, we need to create a proof that we have possession of the Validator Group signer private key. We do so by signing a message that consists of the authorizing registered Account address, in this case, the `ReleaseGold` contract address.
 
 To generate the proof-of-possession, run the following command:
 
@@ -489,7 +491,7 @@ Authorize your Validator Group signer:
 celocli releasegold:authorize --contract $CELO_VALIDATOR_GROUP_RG_ADDRESS --role validator --signature 0x$CELO_VALIDATOR_GROUP_SIGNER_SIGNATURE --signer $CELO_VALIDATOR_GROUP_SIGNER_ADDRESS
 ```
 
-With this newly authorized signer, you can register a Validator Group on behalf of the Locked Gold Account:
+With this newly authorized signer, you can register a Validator Group on behalf of the regsitered Account:
 
 ```bash
 # On your local machine
@@ -533,7 +535,7 @@ In order to get elected as a Validator, you will need to use the balance of your
 
 #### Authorize vote signer
 
-In order to vote on behalf of the `ReleaseGold` Locked Gold Accounts you will need to authorize vote signers.
+In order to vote on behalf of the `ReleaseGold` registered Accounts you will need to authorize vote signers.
 
 Create the vote signer keys:
 
@@ -751,7 +753,7 @@ docker run --name celo-attestation-service -it --restart always --entrypoint /bi
 
 ### Registering Metadata
 
-Celo uses [Metadata](../celo-codebase/protocol/identity/metadata.md) to allow accounts to make certain claims without having to do so on-chain. Users can use any authorized signer address to make claims on behalf of the Locked Gold Account. For convenience this guide uses the `CELO_ATTESTATION_SIGNER_ADDRESS`, but any authorized signer will work. To complete the metadata process, we have to claim which URL users can request attestations from.
+Celo uses [Metadata](../celo-codebase/protocol/identity/metadata.md) to allow accounts to make certain claims without having to do so on-chain. Users can use any authorized signer address to make claims on behalf of the registered Account. For convenience this guide uses the `CELO_ATTESTATION_SIGNER_ADDRESS`, but any authorized signer will work. To complete the metadata process, we have to claim which URL users can request attestations from.
 
 Run the following commands on your local machine:
 
