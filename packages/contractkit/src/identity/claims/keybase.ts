@@ -1,18 +1,9 @@
 import { Address } from '@celo/utils/lib/address'
 import { isLeft } from 'fp-ts/lib/Either'
-import * as t from 'io-ts'
 import { ContractKit } from '../../kit'
 import { IdentityMetadataWrapper } from '../metadata'
-import { hashOfClaim, SignedClaimType } from './claim'
-import { ClaimTypes, now, TimestampType } from './types'
-
-export const KeybaseClaimType = t.type({
-  type: t.literal(ClaimTypes.KEYBASE),
-  timestamp: TimestampType,
-  // TODO: Validate compliant username before just interpolating
-  username: t.string,
-})
-export type KeybaseClaim = t.TypeOf<typeof KeybaseClaimType>
+import { hashOfClaim, KeybaseClaim, KeybaseClaimType, SignedClaimType } from './claim'
+import { ClaimTypes, now } from './types'
 
 export const keybaseFilePathToProof = `.well-known/celo/`
 export const proofFileName = (address: Address) => `verify-${address}.json`

@@ -14,7 +14,7 @@ The Celo protocol addresses this by enforcing a per-group vote cap. This cap is 
 
 If a group adds a new validator, or the total amount of voting Locked Gold increases, the group’s cap rises and new votes are permitted. If a group removes a validator or a validator chooses to leave, or the total amount of voting Locked Gold falls, then the group’s cap falls: if it has more votes than this new cap, then new votes are no longer permitted, but all existing votes continue to be counted.
 
-The Celo protocol allows an account to divide its vote between up to three groups, since there may be cases where the vote cap prevents an account allocating its entire vote to its first choice group.
+The Celo protocol allows an account to divide its vote between up to ten groups, since there may be cases where the vote cap prevents an account allocating its entire vote to its first choice group.
 
 ## Running the Election
 
