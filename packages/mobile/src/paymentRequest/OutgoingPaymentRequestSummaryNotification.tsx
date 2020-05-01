@@ -19,7 +19,8 @@ import { Stacks } from 'src/navigator/Screens'
 import SummaryNotification from 'src/notifications/SummaryNotification'
 import { listItemRenderer } from 'src/paymentRequest/OutgoingPaymentRequestListScreen'
 import PaymentRequestNotificationInner from 'src/paymentRequest/PaymentRequestNotificationInner'
-import { NumberToRecipient, phoneNumberToRecipient } from 'src/recipients/recipient'
+import { getSenderFromPaymentRequest } from 'src/paymentRequest/utils'
+import { NumberToRecipient } from 'src/recipients/recipient'
 import { recipientCacheSelector } from 'src/recipients/reducer'
 import { RootState } from 'src/redux/reducers'
 
@@ -53,21 +54,16 @@ export class OutgoingPaymentRequestSummaryNotification extends React.Component<P
     navigate(Stacks.OutgoingRequestStack)
   }
 
-  getRequesterRecipient = (requesterE164Number: string) => {
-    return phoneNumberToRecipient(
-      requesterE164Number,
-      this.props.e164PhoneNumberAddressMapping[requesterE164Number],
-      this.props.recipientCache
-    )
-  }
-
   itemRenderer = (item: PaymentRequest) => {
     return (
       <PaymentRequestNotificationInner
         key={item.uid}
         amount={item.amount}
-        requesterE164Number={item.requesterE164Number}
-        requesterRecipient={this.getRequesterRecipient(item.requesterE164Number)}
+        requesterRecipient={getSenderFromPaymentRequest(
+          item,
+          this.props.addressToE164Number,
+          this.props.recipientCache
+        )}
       />
     )
   }

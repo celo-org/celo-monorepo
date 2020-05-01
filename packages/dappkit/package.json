@@ -5,8 +5,8 @@
     "build": "tsc"
   },
   "dependencies": {
-    "@celo/contractkit": "0.3.9-dev",
-    "@celo/utils": "0.1.12-dev",
+    "@celo/contractkit": "0.4.3-dev",
+    "@celo/utils": "0.1.14-dev",
     "expo": "^36.0.2",
     "expo-contacts": "8.0.0",
     "libphonenumber-js": "^1.7.22",

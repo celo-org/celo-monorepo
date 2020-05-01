@@ -226,6 +226,8 @@ export class WalletHome extends React.Component<Props> {
             </HeaderButton>
           </View>
         </View>
+        {/*
+        // @ts-ignore */}
         <AnimatedSectionList
           onScroll={this.onScroll}
           refreshControl={refresh}

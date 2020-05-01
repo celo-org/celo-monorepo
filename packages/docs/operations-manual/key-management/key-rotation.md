@@ -6,7 +6,7 @@ If an authorized signer key is lost or compromised, the Locked Gold Account can 
 
 Because the Validator signer key is constantly in use to sign consensus messages, special care must be taken when authorizing a new Validator signer. The following steps detail the recommended procedure for rotating the validator signer of an active and elected validator:
 
-1. Create a new Validator instance as detailed in the [Deploy a Validator](../getting-started/running-a-validator-in-baklava.md#deploy-a-validator) section of the getting started documentation. When using a proxy, additionally create a new proxy and peer it with the new validator instance, as described in the same document. Wait for the new instances to sync before proceeding.
+1. Create a new Validator instance as detailed in the [Deploy a Validator](../../getting-started/running-a-validator-in-baklava.md#deploy-a-validator-machine) section of the getting started documentation. When using a proxy, additionally create a new proxy and peer it with the new validator instance, as described in the same document. Wait for the new instances to sync before proceeding.
 
   {% hint style="warning" %}
   Before proceeding to step 2 ensure there is sufficient time until the end of the epoch to complete key rotation.

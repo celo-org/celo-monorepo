@@ -21,14 +21,18 @@ import menu, { CeloLinks, hashNav, MAIN_MENU } from 'src/shared/menu-items'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 
 const MENU = [menu.HOME, ...MAIN_MENU]
-const TECH_MENU = [menu.PAPERS, { name: 'Docs', link: CeloLinks.docs }]
+const TECH_MENU = [
+  { name: 'Docs', link: CeloLinks.docs },
+  { name: 'Security Audits', link: CeloLinks.audits },
+  menu.PAPERS,
+]
 const eventsLink = `${menu.COMMUNITY.link}#${hashNav.connect.events}`
 const ecoFundLink = `${menu.COMMUNITY.link}#${hashNav.connect.fund}`
 const RESOURCE_MENU = [
   menu.CODE_OF_CONDUCT,
   { name: 'Events', link: eventsLink },
   menu.BRAND,
-  { name: 'EcoSystem Fund', link: ecoFundLink },
+  { name: 'Ecosystem Fund', link: ecoFundLink },
 ]
 
 const ICON_SIZE = 13
@@ -60,10 +64,10 @@ const SOCIAL_MENU = [
   },
   {
     name: 'YouTube',
-    link: CeloLinks.discord,
+    link: CeloLinks.youtube,
     icon: <YouTube size={ICON_SIZE} color={colors.dark} />,
   },
-  { name: 'Instagram', link: CeloLinks.discord, icon: <Instagram size={ICON_SIZE} /> },
+  { name: 'Instagram', link: CeloLinks.instagram, icon: <Instagram size={ICON_SIZE} /> },
 ]
 
 export default function Footer() {
@@ -204,7 +208,7 @@ const styles = StyleSheet.create({
     maxWidth: 350,
   },
   ringsMobile: { marginBottom: 30 },
-  rings: { marginBottom: 50 },
+  rings: { marginBottom: 20, transform: [{ translateY: -10 }] },
   form: {
     maxWidth: 550,
   },

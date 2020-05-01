@@ -1,6 +1,7 @@
 import { AttestationState } from '@celo/contractkit/lib/wrappers/Attestations'
-import { AttestationUtils } from '@celo/utils'
-import { AddressType, E164PhoneNumberType } from '@celo/utils/lib/io'
+import { AttestationUtils, PhoneNumberUtils } from '@celo/utils'
+import { eqAddress } from '@celo/utils/lib/address'
+import { AddressType, E164PhoneNumberType, SaltType } from '@celo/utils/lib/io'
 import Logger from 'bunyan'
 import express from 'express'
 import * as t from 'io-ts'
@@ -12,6 +13,7 @@ import { AttestationModel, AttestationStatus } from '../models/attestation'
 import { respondWithError, Response } from '../request'
 import { smsProviderFor } from '../sms'
 import { SmsProviderType } from '../sms/base'
+
 const SMS_SENDING_ERROR = 'Something went wrong while attempting to send SMS, try again later'
 const ATTESTATION_ERROR = 'Valid attestation could not be provided'
 const NO_INCOMPLETE_ATTESTATION_FOUND_ERROR = 'No incomplete attestation found'
@@ -22,6 +24,8 @@ export const AttestationRequestType = t.type({
   phoneNumber: E164PhoneNumberType,
   account: AddressType,
   issuer: AddressType,
+  // io-ts way of defining optional key-value pair
+  salt: t.union([t.undefined, SaltType]),
 })
 
 export type AttestationRequest = t.TypeOf<typeof AttestationRequestType>
@@ -83,12 +87,11 @@ class AttestationRequestHandler {
   }
 
   async validateAttestationRequest() {
-    const attestationRecord = await existingAttestationRequestRecord(
-      this.attestationRequest.phoneNumber,
-      this.attestationRequest.account,
-      this.attestationRequest.issuer,
-      { logging: this.sequelizeLogger }
-    )
+    const { phoneNumber, account, issuer, salt } = this.attestationRequest
+
+    const attestationRecord = await existingAttestationRequestRecord(phoneNumber, account, issuer, {
+      logging: this.sequelizeLogger,
+    })
     // check if it exists in the database
     if (attestationRecord && !attestationRecord.canSendSms()) {
       Counters.attestationRequestsAlreadySent.inc()
@@ -97,17 +100,14 @@ class AttestationRequestHandler {
     const address = getAccountAddress()
 
     // TODO: Check with the new Accounts.sol
-    if (address.toLowerCase() !== this.attestationRequest.issuer.toLowerCase()) {
+    if (!eqAddress(address, issuer)) {
       Counters.attestationRequestsWrongIssuer.inc()
       throw new Error(`Mismatching issuer, I am ${address}`)
     }
 
     const attestations = await kit.contracts.getAttestations()
-    const state = await attestations.getAttestationState(
-      this.attestationRequest.phoneNumber,
-      this.attestationRequest.account,
-      this.attestationRequest.issuer
-    )
+    const identifier = PhoneNumberUtils.getPhoneHash(phoneNumber, salt)
+    const state = await attestations.getAttestationState(identifier, account, issuer)
 
     if (state.attestationState !== AttestationState.Incomplete) {
       Counters.attestationRequestsWOIncompleteAttestation.inc()
@@ -119,20 +119,24 @@ class AttestationRequestHandler {
   }
 
   signAttestation() {
-    const message = AttestationUtils.getAttestationMessageToSignFromIdentifier(
-      this.attestationRequest.phoneNumber,
-      this.attestationRequest.account
+    const { phoneNumber, account, salt } = this.attestationRequest
+    const message = AttestationUtils.getAttestationMessageToSignFromPhoneNumber(
+      phoneNumber,
+      account,
+      salt
     )
 
     return kit.web3.eth.sign(message, getAttestationSignerAddress())
   }
 
   async validateAttestation(attestationCode: string) {
+    const { phoneNumber, account, salt } = this.attestationRequest
     const address = getAccountAddress()
+    const identifier = PhoneNumberUtils.getPhoneHash(phoneNumber, salt)
     const attestations = await kit.contracts.getAttestations()
     const isValid = await attestations.validateAttestationCode(
-      this.attestationRequest.phoneNumber,
-      this.attestationRequest.account,
+      identifier,
+      account,
       address,
       attestationCode
     )
