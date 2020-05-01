@@ -40,6 +40,7 @@
   - [Hello Contracts](developer-resources/walkthroughs/hellocontracts.md)
   - [Hello Contract (Truffle + Remote Node)](developer-resources/walkthroughs/hello-contract-remote-node.md)
   - [Celo Truffle Box](developer-resources/walkthroughs/celo-truffle-box.md)
+  - [Using Windows](developer-resources/develop-on-windows.md)
   <!-- - [Building a dApp with Contracts on Celo]() -->
 - [Overview]()
   <!-- - [The Celo Protocol]()
