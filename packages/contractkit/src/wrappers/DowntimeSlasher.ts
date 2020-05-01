@@ -12,6 +12,10 @@ import {
 } from './BaseWrapper'
 import { Validator } from './Validators'
 
+export interface DowntimeSlasherConfig {
+  slashableDowntime: number
+}
+
 /**
  * Contract handling slashing for Validator downtime
  */
@@ -163,5 +167,15 @@ export class DowntimeSlasherWrapper extends BaseWrapper<DowntimeSlasher> {
         slashGroup.indices
       )
     )
+  }
+
+  /**
+   * Returns current configuration parameters.
+   */
+  async getConfig(): Promise<DowntimeSlasherConfig> {
+    const res = await Promise.all([this.slashableDowntime()])
+    return {
+      slashableDowntime: res[0],
+    }
   }
 }

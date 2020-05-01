@@ -1,4 +1,4 @@
-FROM circleci/node:10
+FROM node:10
 WORKDIR /celo-monorepo
 
 # ensure yarn.lock is evaluated by kaniko cache diff
@@ -13,7 +13,7 @@ COPY packages/protocol/package.json packages/protocol/
 COPY packages/contractkit/package.json packages/contractkit/
 COPY packages/leaderboard/package.json packages/leaderboard/
 
-RUN sudo yarn install --frozen-lockfile --network-timeout 100000 && yarn cache clean
+RUN yarn install --frozen-lockfile --network-timeout 100000 && yarn cache clean
 
 # Copy the rest
 COPY packages/typescript packages/typescript/
@@ -24,7 +24,7 @@ COPY packages/contractkit packages/contractkit/
 COPY packages/leaderboard packages/leaderboard/
 
 # build all
-RUN sudo yarn build
+RUN yarn build
 
 WORKDIR /celo-monorepo/packages/leaderboard
 

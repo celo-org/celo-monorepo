@@ -1,4 +1,4 @@
-FROM circleci/node:10
+FROM node:10
 WORKDIR /celo-monorepo
 
 # ensure yarn.lock is evaluated by kaniko cache diff
@@ -13,7 +13,7 @@ COPY packages/protocol/package.json packages/protocol/
 COPY packages/contractkit/package.json packages/contractkit/
 COPY packages/attestation-service/package.json packages/attestation-service/
 
-RUN sudo yarn install --frozen-lockfile --network-timeout 100000 && yarn cache clean
+RUN yarn install --frozen-lockfile --network-timeout 100000 && yarn cache clean
 
 # Copy the rest
 COPY packages/typescript packages/typescript/
@@ -26,7 +26,7 @@ COPY packages/attestation-service packages/attestation-service/
 ENV NODE_ENV production
 
 # build all
-RUN sudo yarn build
+RUN yarn build
 
 WORKDIR /celo-monorepo/packages/attestation-service
 ENTRYPOINT ["node", "lib/index.js"]
