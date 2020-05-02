@@ -22,6 +22,7 @@ export enum Screens {
   BackupSocialIntro = 'BackupSocialIntro',
   BackupSocial = 'BackupSocial',
   BackupComplete = 'BackupComplete',
+  ConfirmRecipient = 'ConfirmRecipient',
   DataSaver = 'DataSaver',
   DappKitAccountAuth = 'DappKitAccountAuth',
   DappKitSignTxScreen = 'DappKitSignTxScreen',

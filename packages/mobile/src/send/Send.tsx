@@ -205,7 +205,9 @@ class Send extends React.Component<Props, State> {
       this.props.storeLatestInRecents(recipient)
     }
 
-    navigate(Screens.SendAmount, { recipient })
+    // NOTE: Neeed to do a check here to see if they should go to normal flow or secure send
+    navigate(Screens.ConfirmRecipient, { recipient })
+    // navigate(Screens.SendAmount, { recipient })
   }
 
   onPermissionsAccepted = async () => {
