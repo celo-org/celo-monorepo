@@ -9,7 +9,11 @@ import { WithTranslation } from 'react-i18next'
 import { Platform, StyleSheet, Text, View } from 'react-native'
 import { RNCamera } from 'react-native-camera'
 import SafeAreaView from 'react-native-safe-area-view'
-import { NavigationFocusInjectedProps, withNavigationFocus } from 'react-navigation'
+import {
+  NavigationFocusInjectedProps,
+  NavigationInjectedProps,
+  withNavigationFocus,
+} from 'react-navigation'
 import { connect } from 'react-redux'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
@@ -20,11 +24,17 @@ import NotAuthorizedView from 'src/qrcode/NotAuthorizedView'
 import { handleBarcodeDetected } from 'src/send/actions'
 import Logger from 'src/utils/Logger'
 
+type Navigation = NavigationInjectedProps['navigation']
+
+interface OwnProps {
+  navigation: Navigation
+}
+
 interface DispatchProps {
   handleBarcodeDetected: typeof handleBarcodeDetected
 }
 
-type Props = DispatchProps & WithTranslation & NavigationFocusInjectedProps
+type Props = DispatchProps & WithTranslation & NavigationFocusInjectedProps & OwnProps
 
 class QRScanner extends React.Component<Props> {
   static navigationOptions = () => ({
@@ -41,16 +51,43 @@ class QRScanner extends React.Component<Props> {
   // This method would be called multiple times with the same
   // QR code, so we need to catch only the first one
   onBarCodeDetected = (rawData: any) => {
+    const isScanForSecureSend: true | undefined = this.props.navigation.getParam('secureSendFlow')
     Logger.debug('QRScanner', 'Bar code detected')
-    this.props.handleBarcodeDetected(rawData)
+    this.props.handleBarcodeDetected(rawData, isScanForSecureSend)
   }
 
   onPressShowYourCode = () => {
     navigate(Screens.QRCode)
   }
 
+  renderUsersOwnQRCode = () => {
+    const { t } = this.props
+    const isScanForSecureSend: true | undefined = this.props.navigation.getParam('secureSendFlow')
+
+    // Hide option to return to user's own QR code if scan happens as part of Secure Send flow
+    if (isScanForSecureSend) {
+      return null
+    }
+
+    return (
+      <View style={styles.footerContainer}>
+        <Button
+          onPress={this.onPressShowYourCode}
+          text={t('showYourQRCode')}
+          standard={false}
+          type={BtnTypes.SECONDARY}
+        >
+          <View style={styles.footerIcon}>
+            <QRCode />
+          </View>
+        </Button>
+      </View>
+    )
+  }
+
   render() {
     const { t } = this.props
+
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.innerContainer}>
@@ -88,18 +125,7 @@ class QRScanner extends React.Component<Props> {
             </RNCamera>
           )}
         </View>
-        <View style={styles.footerContainer}>
-          <Button
-            onPress={this.onPressShowYourCode}
-            text={t('showYourQRCode')}
-            standard={false}
-            type={BtnTypes.SECONDARY}
-          >
-            <View style={styles.footerIcon}>
-              <QRCode />
-            </View>
-          </Button>
-        </View>
+        {this.renderUsersOwnQRCode()}
       </SafeAreaView>
     )
   }
