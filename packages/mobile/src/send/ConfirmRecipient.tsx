@@ -10,14 +10,12 @@ import SafeAreaView from 'react-native-safe-area-view'
 import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
 import { setBackupDelayed } from 'src/account/actions'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { CustomEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import { enterBackupFlow, exitBackupFlow } from 'src/app/actions'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { unknownUserIcon } from 'src/images/Images'
 import { headerWithBackButton } from 'src/navigator/Headers'
-import { navigate, navigateBack, navigateProtected } from 'src/navigator/NavigationService'
+import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { getRecipientThumbnail, Recipient } from 'src/recipients/recipient'
 import { RootState } from 'src/redux/reducers'
@@ -61,50 +59,16 @@ class ConfirmRecipient extends React.Component<Props> {
     ...headerWithBackButton,
   })
 
+  onPressScanCode = () => {
+    navigate(Screens.QRScanner, { secureSendFlow: true })
+  }
+
   getRecipient = (): Recipient => {
     const recipient = this.props.navigation.getParam('recipient')
     if (!recipient) {
       throw new Error('Recipient expected')
     }
     return recipient
-  }
-
-  componentDidMount() {
-    this.props.enterBackupFlow()
-  }
-
-  componentWillUnmount() {
-    this.props.exitBackupFlow()
-  }
-
-  onPressViewBackupKey = () => {
-    CeloAnalytics.track(CustomEventNames.view_backup_phrase)
-    navigateProtected(Screens.BackupPhrase)
-  }
-
-  onPressBackup = () => {
-    CeloAnalytics.track(CustomEventNames.set_backup_phrase)
-    navigateProtected(Screens.BackupPhrase)
-  }
-
-  onPressSetupSocialBackup = () => {
-    CeloAnalytics.track(CustomEventNames.set_social_backup)
-    navigate(Screens.BackupSocialIntro)
-  }
-
-  onPressViewSocialBackup = () => {
-    CeloAnalytics.track(CustomEventNames.view_social_backup)
-    navigateProtected(Screens.BackupSocial)
-  }
-
-  onPressDelay = () => {
-    this.props.setBackupDelayed()
-    CeloAnalytics.track(CustomEventNames.delay_backup)
-    navigateBack()
-  }
-
-  onPressScanCode = () => {
-    navigate(Screens.QRScanner, { hideUserQROption: true })
   }
 
   formatDisplayName = (displayName: string, isAtStartOfSentence?: boolean) => {
@@ -158,7 +122,7 @@ class ConfirmRecipient extends React.Component<Props> {
             {<QRCodeBorderlessIcon height={QR_ICON_SIZE} color={colors.celoGreen} />}
           </Button>
           <Button
-            onPress={this.onPressViewSocialBackup}
+            onPress={this.onPressScanCode}
             text={t('confirmAccount.button')}
             standard={false}
             type={BtnTypes.SECONDARY}

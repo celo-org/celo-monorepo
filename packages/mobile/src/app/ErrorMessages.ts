@@ -48,6 +48,7 @@ export enum ErrorMessages {
   GAS_PRICE_UPDATE_FAILED = 'gasPriceUpdateFailed',
   QR_FAILED_NO_ADDRESS = 'qrFailedNoAddress',
   QR_FAILED_INVALID_ADDRESS = 'qrFailedInvalidAddress',
+  QR_FAILED_INVALID_RECIPIENT = 'qrFailedInvalidRecipient',
   CORRUPTED_CHAIN_DELETED = 'corruptedChainDeleted',
   CALCULATE_FEE_FAILED = 'calculateFeeFailed',
   FAILED_TO_SWITCH_SYNC_MODES = 'failedToSwitchSyncModes',

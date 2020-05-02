@@ -63,6 +63,8 @@ export function* watchQrCodeDetections() {
     Logger.debug(TAG, 'Barcode detected in watcher')
     const addressToE164Number = yield select(addressToE164NumberSelector)
     const recipientCache = yield select(recipientCacheSelector)
+    // NOTE: if action.isScanForSecureSend is true
+    // need to pull the possible recipient addresses and pass it into handleBarCode
     try {
       yield call(handleBarcode, action.data, addressToE164Number, recipientCache)
     } catch (error) {

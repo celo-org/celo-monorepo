@@ -48,7 +48,8 @@ export async function shareSVGImage(svg: SVG) {
 export function* handleBarcode(
   barcode: QrCode,
   addressToE164Number: AddressToE164NumberType,
-  recipientCache: NumberToRecipient
+  recipientCache: NumberToRecipient,
+  possibleRecipientAddresses?: string[] // NOTE: placeholder until i speak with rossy about what this data will look like
 ) {
   let data: { address: string; e164PhoneNumber: string; displayName: string } | undefined
   try {
@@ -57,13 +58,25 @@ export function* handleBarcode(
     Logger.warn(TAG, 'QR code read failed with ' + e)
   }
   if (typeof data !== 'object' || isEmpty(data.address)) {
-    yield put(showError(ErrorMessages.QR_FAILED_NO_ADDRESS))
+    // yield put(showError(ErrorMessages.QR_FAILED_NO_ADDRESS))
+    yield put(showError(ErrorMessages.QR_FAILED_INVALID_RECIPIENT))
     return
   }
   if (!isValidAddress(data.address)) {
     yield put(showError(ErrorMessages.QR_FAILED_INVALID_ADDRESS))
     return
   }
+  if (possibleRecipientAddresses) {
+    const addressBelongsToTargetRecipient: boolean = possibleRecipientAddresses.includes(
+      data.address
+    )
+    if (!addressBelongsToTargetRecipient) {
+      // NOTE: showing an error message instead of a toast (what the mocks stipulated)
+      yield put(showError(ErrorMessages.QR_FAILED_INVALID_RECIPIENT))
+      return
+    }
+  }
+
   if (typeof data.e164PhoneNumber !== 'string') {
     // Default for invalid e164PhoneNumber
     data.e164PhoneNumber = ''

@@ -53,9 +53,10 @@ export const storeLatestInRecents = (recipient: Recipient): StoreLatestInRecents
   recipient,
 })
 
-export const handleBarcodeDetected = (data: QrCode) => ({
+export const handleBarcodeDetected = (data: QrCode, isScanForSecureSend?: boolean) => ({
   type: Actions.BARCODE_DETECTED,
   data,
+  isScanForSecureSend,
 })
 
 export const shareQRCode = (qrCodeSvg: SVG) => ({
