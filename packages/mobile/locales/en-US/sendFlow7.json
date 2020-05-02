@@ -50,6 +50,7 @@
   "QRCode": "QR Code",
   "shareCodeImage": "Share Code Image",
   "scanCode": "Scan Code",
+  "scanQRCode": "Scan QR Code",
   "writeStorageNeededForQrDownload": "Storage write permission is needed for downloading the QR code",
   "cameraScanInfo": "Scan code by placing it in the box",
   "cameraNotAuthorizedTitle": "Enable Camera",
@@ -80,5 +81,13 @@
     "header": "Syncing Contacts",
     "progress": "{{current}} of {{total}}",
     "importing": "Importing..."
+  },
+  "confirmAccount": {
+    "header": "Please confirm {{displayName}}'s account",
+    "button": "Confirm Account Number"
+  },
+  "secureSendExplanation": {
+    "1": "{{e164Number}} has multiple accounts associated with it. {{displayName}} could have created a new Celo account, or may have lost their phone or had their account compromised.",
+    "2": "Before transacting, you must confirm {{displayName}}'s account. You can do this by scanning their QR code or asking for their account number and confirming it."
   }
 }
