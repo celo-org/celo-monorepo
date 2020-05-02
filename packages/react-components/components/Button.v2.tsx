@@ -3,7 +3,7 @@ import { colors } from '@celo/react-components/styles/colors.v2'
 import { fontStyles } from '@celo/react-components/styles/fonts.v2'
 import { debounce } from 'lodash'
 import React, { useCallback } from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleProp, StyleSheet, Text, View, ViewStyle } from 'react-native'
 
 const BUTTON_TAP_DEBOUNCE_TIME = 300 // milliseconds
 const DEBOUNCE_OPTIONS = {
@@ -25,7 +25,7 @@ export enum BtnSizes {
 
 export interface ButtonProps {
   onPress: () => void
-  style?: any
+  style?: StyleProp<ViewStyle>
   text: string | React.ReactNode
   accessibilityLabel?: string
   type: BtnTypes
@@ -35,8 +35,8 @@ export interface ButtonProps {
   children?: React.ReactNode // remove? previously used for icons not sure if knew design will need but lets keep for now
 }
 
-export default function Button(props: ButtonProps) {
-  const { accessibilityLabel, children, disabled, size, testID, text, type } = props
+export default React.memo(function Button(props: ButtonProps) {
+  const { accessibilityLabel, children, disabled, size, testID, text, type, style } = props
 
   // Debounce onPress event so that it is called once on trigger and
   // consecutive calls in given period are ignored.
@@ -48,7 +48,7 @@ export default function Button(props: ButtonProps) {
   const [textColor, backgroundColor] = getColors(type, disabled)
 
   return (
-    <View style={styles.root}>
+    <View style={style ? [styles.root, style] : styles.root}>
       <Touchable
         onPress={debouncedOnPress}
         disabled={disabled}
@@ -67,17 +67,17 @@ export default function Button(props: ButtonProps) {
       </Touchable>
     </View>
   )
-}
+})
 
 const styles = StyleSheet.create({
   root: {
     flexDirection: 'row',
+    margin: 10,
   },
   button: {
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 100,
-    margin: 10,
     paddingVertical: 5,
     paddingHorizontal: 16,
   },
