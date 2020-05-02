@@ -62,6 +62,7 @@
   * [TxParamsNormalizer](classes/_utils_tx_params_normalizer_.txparamsnormalizer.md)
   * [utils/tx-result](modules/_utils_tx_result_.md)
   * [TransactionResult](classes/_utils_tx_result_.transactionresult.md)
+  * [utils/tx-uri](modules/_utils_tx_uri_.md)
   * [utils/web3-utils](modules/_utils_web3_utils_.md)
   * [wallets/azure-hsm-wallet](modules/_wallets_azure_hsm_wallet_.md)
   * [AzureHSMWallet](classes/_wallets_azure_hsm_wallet_.azurehsmwallet.md)
