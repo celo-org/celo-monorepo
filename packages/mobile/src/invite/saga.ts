@@ -210,9 +210,8 @@ export function* sendInvite(
       Logger.error(TAG, 'Currently only dollar escrow payments are allowed')
     }
 
-    const e164NumberToAddress = { [e164Number]: null } // null means the number is unverified
-    const addressToE164Number = { [temporaryAddress]: e164Number }
-    yield put(updateE164PhoneNumberAddresses(e164NumberToAddress, addressToE164Number))
+    const addressToE164Number = { [temporaryAddress.toLowerCase()]: e164Number }
+    yield put(updateE164PhoneNumberAddresses({}, addressToE164Number))
     yield call(navigateToInviteMessageApp, e164Number, inviteMode, message)
   } catch (e) {
     Logger.error(TAG, 'Send invite error: ', e)

@@ -271,7 +271,7 @@ function* doFetchSentPayments() {
     const addressToE164Number = yield select(addressToE164NumberSelector)
     const sentPayments: EscrowedPayment[] = []
     for (let i = 0; i < sentPaymentsRaw.length; i++) {
-      const address = sentPaymentIDs[i]
+      const address = sentPaymentIDs[i].toLowerCase()
       const recipientPhoneNumber = addressToE164Number[address]
       const payment = sentPaymentsRaw[i]
       if (!payment) {
@@ -279,7 +279,7 @@ function* doFetchSentPayments() {
       }
 
       const escrowPaymentWithRecipient: EscrowedPayment = {
-        paymentID: address.toLowerCase(),
+        paymentID: address,
         senderAddress: payment[1],
         recipientPhone: recipientPhoneNumber,
         currency: SHORT_CURRENCIES.DOLLAR, // Only dollars can be escrowed

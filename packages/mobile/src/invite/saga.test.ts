@@ -91,8 +91,8 @@ describe(watchSendInvite, () => {
       .put(storeInviteeData(mockInviteDetails))
       .put(
         updateE164PhoneNumberAddresses(
-          { [mockInviteDetails.e164Number]: null }, // address is null when unverified
-          { [mockAccount]: mockInviteDetails.e164Number }
+          {},
+          { [mockAccount.toLowerCase()]: mockInviteDetails.e164Number }
         )
       )
       .run()
@@ -122,8 +122,8 @@ describe(watchSendInvite, () => {
       .put(storeInviteeData(mockInviteDetails))
       .put(
         updateE164PhoneNumberAddresses(
-          { [mockInviteDetails.e164Number]: null }, // address is null when unverified
-          { [mockAccount]: mockInviteDetails.e164Number }
+          {},
+          { [mockAccount.toLowerCase()]: mockInviteDetails.e164Number }
         )
       )
       .run()
