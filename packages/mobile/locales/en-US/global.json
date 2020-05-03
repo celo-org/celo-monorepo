@@ -97,6 +97,7 @@
   "update": "Update",
   "qrFailedNoAddress": "QR code read failed. Reason: wallet address not found.",
   "qrFailedInvalidAddress": "QR code read failed. Reason: wallet address invalid.",
+  "qrFailedInvalidRecipient": "QR code does not belong to the selected recipient",
   "corruptedChainDeleted": "Corrupted chain data has been deleted, please restart the app",
   "web3FailedToSync": "Failing to sync, check your network connection",
   "errorDuringSync": "Error occurred during sync, please try again later",
