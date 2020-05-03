@@ -30,6 +30,11 @@ interface OwnProps {
   navigation: Navigation
 }
 
+interface State {
+  displayName: string
+  displayNameStartOfSentence: string
+}
+
 interface StateProps {
   backupCompleted: boolean
   socialBackupCompleted: boolean
@@ -59,8 +64,16 @@ class ConfirmRecipient extends React.Component<Props> {
     ...headerWithBackButton,
   })
 
-  onPressScanCode = () => {
-    navigate(Screens.QRScanner, { secureSendFlow: true })
+  state: State = {
+    displayName: '',
+    displayNameStartOfSentence: '',
+  }
+
+  componentDidMount = () => {
+    const recipient = this.getRecipient()
+    const displayName = this.formatDisplayName(recipient.displayName)
+    const displayNameStartOfSentence = this.formatDisplayName(recipient.displayName, true)
+    this.setState({ displayName, displayNameStartOfSentence })
   }
 
   getRecipient = (): Recipient => {
@@ -84,6 +97,14 @@ class ConfirmRecipient extends React.Component<Props> {
     return 'this person'
   }
 
+  onPressScanCode = () => {
+    navigate(Screens.QRScanner, { secureSendFlow: true })
+  }
+
+  onPressConfirmAccount = () => {
+    navigate(Screens.ConfirmRecipientAccount, { displayName: this.state.displayName })
+  }
+
   render() {
     const { t } = this.props
     const recipient = this.getRecipient()
@@ -97,18 +118,18 @@ class ConfirmRecipient extends React.Component<Props> {
           </View>
           <Text style={[styles.h1, fontStyles.bold]}>
             {t('confirmAccount.header', {
-              displayName: this.formatDisplayName(recipient.displayName),
+              displayName: this.state.displayName,
             })}
           </Text>
           <Text style={styles.body}>
             {t('secureSendExplanation.1', {
               e164Number: recipient.e164PhoneNumber,
-              displayName: this.formatDisplayName(recipient.displayName, true),
+              displayName: this.state.displayNameStartOfSentence,
             })}
           </Text>
           <Text style={styles.body}>
             {t('secureSendExplanation.2', {
-              displayName: this.formatDisplayName(recipient.displayName),
+              displayName: this.state.displayName,
             })}
           </Text>
         </ScrollView>
@@ -122,7 +143,7 @@ class ConfirmRecipient extends React.Component<Props> {
             {<QRCodeBorderlessIcon height={QR_ICON_SIZE} color={colors.celoGreen} />}
           </Button>
           <Button
-            onPress={this.onPressScanCode}
+            onPress={this.onPressConfirmAccount}
             text={t('confirmAccount.button')}
             standard={false}
             type={BtnTypes.SECONDARY}
