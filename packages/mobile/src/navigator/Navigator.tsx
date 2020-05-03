@@ -63,6 +63,7 @@ import QRScanner from 'src/qrcode/QRScanner'
 import JoinCelo from 'src/registration/JoinCelo'
 import RegulatoryTerms from 'src/registration/RegulatoryTerms'
 import ConfirmRecipient from 'src/send/ConfirmRecipient'
+import ConfirmRecipientAccount from 'src/send/ConfirmRecipientAccount'
 import FeeEducation from 'src/send/FeeEducation'
 import Send from 'src/send/Send'
 import SendAmount from 'src/send/SendAmount'
@@ -149,6 +150,7 @@ const SendStack = createStackNavigator(
     ...verificationScreens,
     [Screens.QRScanner]: { screen: QRScanner },
     [Screens.ConfirmRecipient]: { screen: ConfirmRecipient },
+    [Screens.ConfirmRecipientAccount]: { screen: ConfirmRecipientAccount },
     [Screens.SendAmount]: { screen: SendAmount },
     [Screens.SendConfirmation]: { screen: SendConfirmation },
     [Screens.PaymentRequestConfirmation]: { screen: PaymentRequestConfirmation },
