@@ -817,7 +817,7 @@ jobs:
   integration-celotool-install:
     <<: *defaults
     environment:
-      CI_INTEGRATION_ENV: scenario2
+      CI_INTEGRATION_ENV: integration
       DESIRED_VERSION: v2.11.0
       GOOGLE_APPLICATION_CREDENTIALS: /tmp/sa.json
     steps:
