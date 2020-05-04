@@ -1,5 +1,31 @@
 # Voting on Validator Groups
 
+## Proof of Stake Election Essentials
+
+Celo Gold can be used to participate in validator elections. Validators play a critical role in the Celo protocol, determining which transactions get applied and producing new blocks. Selecting organizations that operate well-run infrastructure to perform this role effectively is essential for the long-term success of Celo networks.
+
+Groups are intermediaries between voters and validators:
+
+Every validator group has **members**, an ordered list of candidate validators.
+
+Max number of votes
+
+Voting cap
+
+## Identities
+
+The canonical identifier for validators and validator groups is their address.
+
+The Celo protocol also supports [account metadata](../celo-codebase/protocol/identity/metadata.md) that allows accounts to make verifiable as well as non-verifiable claims about their identity.
+
+Validators and groups can supply non-verifiable human-readable names, and these are what is shown on most validator explorers.
+
+{% hint style="warning" %}
+**Warning**: Malicious participants may attempt to impersonate other validators in order to attract votes. Do not rely on validator-supplied names to determine their real-world identity.
+{% endhint %}
+
+Validators and groups can also supply [verifiable DNS claims](../operations-manual/validator-explorer.md), and the Celo Validator Explorer displays these. You can use these to securely identify that the same entity has access both to the account of a validator or group and the supplied DNS records.
+
 ## Choosing a Validator Group
 
 A single account can place votes for up to 10 validator groups at any one time.
