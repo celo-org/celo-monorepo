@@ -388,14 +388,9 @@ export function* switchToGethFromForno() {
     const gethAlreadyStartedThisSession = yield select(gethStartedThisSessionSelector)
     yield put(setContractKitReady(false)) // Lock contractKit during provider switch
     yield put(setFornoMode(false))
+    yield spawn(gethSaga)
 
     if (gethAlreadyStartedThisSession) {
-      // TODO(anna) test restart on physical device
-      // Call any method on web3 to avoid a persist state issue
-      // This is a temporary workaround as this restart will be
-      // removed when the geth issue is resolved
-      const contractKit = yield call(getContractKit)
-      yield call(contractKit.web3.eth.isSyncing)
       // If geth is started twice within the same session,
       // there is an issue where it cannot find deployed contracts.
       // Restarting the app fixes this issue.
@@ -403,7 +398,6 @@ export function* switchToGethFromForno() {
       return
     }
 
-    yield spawn(gethSaga)
     yield call(waitForGethConnectivity)
 
     yield put(setContractKitReady(true))
