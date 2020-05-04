@@ -128,9 +128,8 @@ To allow you to keep your Beneficiary Ledger offline on a day-to-day basis, it�
 This is a two step process. First, you create a "proof of possession" that shows that the holder of the beneficiary key also holds the vote signer key. Then, you will use that when the benficiary signs a transaction authorizing the vote signer key. This proves to the Celo network that a single entity holds both keys.
 
 {% hint style="info" %}
-
-- Connect your **Vote Signer Ledger** now, unlock it, and open the Celo application.
-  {% endhint %}
+Connect your **Vote Signer Ledger** now, unlock it, and open the Celo application.
+{% endhint %}
 
 First obtain your vote signer address:
 
@@ -163,9 +162,8 @@ export CELO_VOTE_SIGNER_SIGNATURE=<YOUR-VOTE-SIGNER-SIGNATURE>
 Now switch ledgers.
 
 {% hint style="info" %}
-
-- Connect your **Beneficiary Ledger** now, unlock it, and open the Celo application.
-  {% endhint %}
+Connect your **Beneficiary Ledger** now, unlock it, and open the Celo application.
+{% endhint %}
 
 Next, designate the `ReleaseGold` contract as a “Locked Gold” account:
 
@@ -243,9 +241,8 @@ To vote, you will use your vote signer key, which is voting _on behalf of_ your 
 For each vote you will need to specify the amount of locked Celo Gold you wish to vote with (don’t include the `< >` braces). All Celo Gold amounts should be expressed in wei: that means 1 cGLD = 1000000000000000000.
 
 {% hint style="info" %}
-
-- Connect your **Vote Signer Ledger** now, unlock it, and open the Celo application.
-  {% endhint %}
+Connect your **Vote Signer Ledger** now, unlock it, and open the Celo application.
+{% endhint %}
 
 ```bash
 # Using the Vote Signer Ledger
@@ -279,9 +276,8 @@ celocli election:show $CELO_RG_ADDRESS --voter
 Your locked cGLD votes should be displayed next to `active` under `votes`.
 
 {% hint style="info" %}
-
-- Connect your **Vote Signer Ledger** now, unlock it, and open the Celo application.
-  {% endhint %}
+Connect your **Vote Signer Ledger** now, unlock it, and open the Celo application.
+{% endhint %}
 
 Now activate your votes:
 
