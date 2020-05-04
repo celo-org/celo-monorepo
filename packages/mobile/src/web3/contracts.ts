@@ -15,9 +15,10 @@ import { provider } from 'web3-core'
 
 const tag = 'web3/contracts'
 
-export const web3ForUtils: Web3 = new Web3() // Web3 with no provider
 const contractKitForno = newKitFromWeb3(getWeb3(true))
 const contractKitGeth = newKitFromWeb3(getWeb3(false))
+// Web3 for utils does not require a provider, using geth web3 to avoid creating another web3 instance
+export const web3ForUtils = contractKitGeth.web3
 
 function getWeb3(fornoMode: boolean): Web3 {
   Logger.info(
