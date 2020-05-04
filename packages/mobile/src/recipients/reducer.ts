@@ -4,6 +4,10 @@ import { RehydrateAction } from 'src/redux/persist-helper'
 import { RootState } from 'src/redux/reducers'
 
 export interface State {
+  // RecipientCache contains the processed contact data imported from the
+  // phone for a single app session.
+  // Think of contacts as raw data and recipients as filtered data
+  // No relation to recent recipients, which is in /send/reducer.ts
   recipientCache: NumberToRecipient
 }
 
