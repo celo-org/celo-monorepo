@@ -6,6 +6,10 @@ import logger from './common/logger'
 export const DEV_MODE =
   process.env.NODE_ENV !== 'production' || process.env.FUNCTIONS_EMULATOR === 'true'
 
+export const DEV_PUBLIC_KEY =
+  'B+gJTCmTrf9t3X7YQ2F4xekSzd5xg5bdzcJ8NPefby3mScelg5172zl1GgIO9boADEwE67j6M55GwouQwaG5jDZ5tHa2eNtfC7oLIsevuUmzrXVDry9cmsalB0BHX0EA'
+export const DEV_PRIVATE_KEY = '1DNeOAuBYhR9BIKKChUOatB1Ha6cK/sG9p7XT2tjYQ8='
+
 interface Config {
   blockchain: {
     provider: string
@@ -94,6 +98,5 @@ if (DEV_MODE) {
       numberAttestationsRequired: functionConfig.attestations.number_attestations_required,
     },
   }
-  logger.debug('Using function config: ', { ...config, salt: { ...config.salt, key: 'mockKey' } })
 }
 export default config
