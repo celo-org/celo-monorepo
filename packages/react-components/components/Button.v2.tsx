@@ -18,31 +18,30 @@ export enum BtnTypes {
 }
 
 export enum BtnSizes {
-  Small = 'small',
-  Medium = 'medium',
-  Full = 'full',
+  SMALL = 'small',
+  MEDIUM = 'medium',
+  FULL = 'full',
 }
 
 export interface ButtonProps {
   onPress: () => void
   style?: StyleProp<ViewStyle>
-  text: string | React.ReactNode
+  text: string
   accessibilityLabel?: string
-  type: BtnTypes
+  type?: BtnTypes
   disabled?: boolean
   size?: BtnSizes
   testID?: string
-  children?: React.ReactNode // remove? previously used for icons not sure if knew design will need but lets keep for now
 }
 
 export default React.memo(function Button(props: ButtonProps) {
-  const { accessibilityLabel, children, disabled, size, testID, text, type, style } = props
+  const { accessibilityLabel, disabled, size, testID, text, type = BtnTypes.PRIMARY, style } = props
 
   // Debounce onPress event so that it is called once on trigger and
   // consecutive calls in given period are ignored.
   const debouncedOnPress = useCallback(
     debounce(props.onPress, BUTTON_TAP_DEBOUNCE_TIME, DEBOUNCE_OPTIONS),
-    [props.onPress]
+    [props.onPress, disabled]
   )
 
   const [textColor, backgroundColor] = getColors(type, disabled)
@@ -52,18 +51,15 @@ export default React.memo(function Button(props: ButtonProps) {
       <Touchable
         onPress={debouncedOnPress}
         disabled={disabled}
-        style={[styles.button, getSizeStyle(size), { backgroundColor }]}
+        style={getSizeStyle(size, backgroundColor)}
         testID={testID}
       >
-        <View style={styles.containerButton}>
-          {children}
-          <Text
-            accessibilityLabel={accessibilityLabel}
-            style={[fontStyles.regular600, { color: textColor }]}
-          >
-            {text}
-          </Text>
-        </View>
+        <Text
+          accessibilityLabel={accessibilityLabel}
+          style={{ ...fontStyles.regular600, color: textColor }}
+        >
+          {text}
+        </Text>
       </Touchable>
     </View>
   )
@@ -93,11 +89,6 @@ const styles = StyleSheet.create({
     height: 48,
     flex: 1,
   },
-  containerButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-evenly',
-  },
 })
 
 function getColors(type: BtnTypes, disabled: boolean | undefined) {
@@ -121,13 +112,13 @@ function getColors(type: BtnTypes, disabled: boolean | undefined) {
   return [textColor, backgroundColor]
 }
 
-function getSizeStyle(size: BtnSizes | undefined) {
+function getSizeStyle(size: BtnSizes | undefined, backgroundColor: colors) {
   switch (size) {
-    case BtnSizes.Small:
-      return styles.small
-    case BtnSizes.Full:
-      return styles.full
+    case BtnSizes.SMALL:
+      return { ...styles.button, ...styles.small, backgroundColor }
+    case BtnSizes.FULL:
+      return { ...styles.button, ...styles.full, backgroundColor }
     default:
-      return styles.medium
+      return { ...styles.button, ...styles.medium, backgroundColor }
   }
 }
