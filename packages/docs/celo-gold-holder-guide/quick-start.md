@@ -303,7 +303,7 @@ You are now set up to participate in the Celo network!
 
 Epoch rewards are not yet enabled on the Release Candidate network, but as part of the network deployment process the community will approve a governance request that enables them.
 
-In the mean time, you might want to read more about [choosing a Validator Group](voting-validator.md) to vote for.  You can vote for up to ten different groups from a single account.
+In the mean time, you might want to read more about [choosing a Validator Group](voting-validators.md) to vote for.  You can vote for up to ten different groups from a single account.
 
 Locking Celo Gold also enables you to participate in voting for or against [Governance proposals](voting-governance.md).
 
