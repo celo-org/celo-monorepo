@@ -14,6 +14,7 @@ nmi:
       cpu: 100m
       memory: 256Mi
 mic:
+  syncRetryDuration: 1m
   forceNamespaced: true
   prometheusPort: 9090
   image:
