@@ -1,3 +1,5 @@
+import BigNumber from 'bignumber.js'
+
 export interface GethInstanceConfig {
   name: string
   validating?: boolean
@@ -19,4 +21,5 @@ export interface GethInstanceConfig {
   proxiedValidatorAddress?: string
   proxyAllowPrivateIp?: boolean
   ethstats?: string
+  gatewayFee?: BigNumber
 }

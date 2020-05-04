@@ -296,7 +296,11 @@ contract('Exchange', (accounts: string[]) => {
       })
     })
 
-    it('should not allow a non-owner not set the minimum reports', async () => {
+    it('should not allow to set the reserve fraction greater or equal to one', async () => {
+      await assertRevert(exchange.setReserveFraction(toFixed(1)))
+    })
+
+    it('should not allow a non-owner not set the reserve fraction', async () => {
       await assertRevert(exchange.setReserveFraction(newReserveFraction, { from: accounts[1] }))
     })
   })
@@ -843,6 +847,29 @@ contract('Exchange', (accounts: string[]) => {
           // The new value should be the updatedStableBucket (derived from the new
           // Gold Bucket value), minus the amount purchased during the exchange
           assertEqualBN(newStableBucket, updatedStableBucket.plus(stableTokenBalance))
+        })
+
+        it('should emit an BucketsUpdated event', async () => {
+          const exchangeTx = await exchange.exchange(
+            stableTokenBalance,
+            expectedGoldAmount.integerValue(BigNumber.ROUND_FLOOR),
+            false,
+            {
+              from: user,
+            }
+          )
+
+          const exchangeLogs = exchangeTx.logs.filter((x) => x.event === 'BucketsUpdated')
+          assert(exchangeLogs.length === 1, 'Did not receive event')
+
+          const log = exchangeLogs[0]
+          assertLogMatches2(log, {
+            event: 'BucketsUpdated',
+            args: {
+              goldBucket: updatedGoldBucket,
+              stableBucket: updatedStableBucket,
+            },
+          })
         })
       })
     })

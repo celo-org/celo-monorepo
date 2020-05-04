@@ -7,11 +7,18 @@ import { RootState } from 'src/redux/reducers'
 export const ATTESTATION_CODE_PLACEHOLDER = 'ATTESTATION_CODE_PLACEHOLDER'
 export const ATTESTATION_ISSUER_PLACEHOLDER = 'ATTESTATION_ISSUER_PLACEHOLDER'
 
+// TODO currently treating addresses to e164Number as 1:1 but
+// there are rare cases where an address could have two numbers mapped to it.
+// E.g. user imported backup phrase onto second phone and then verified again with a new number
 export interface AddressToE164NumberType {
   [address: string]: string | null
 }
 
 export interface E164NumberToAddressType {
+  [e164PhoneNumber: string]: string[] | null | undefined // null means unverified
+}
+
+export interface E164NumberToSaltType {
   [e164PhoneNumber: string]: string | null // null means unverified
 }
 
@@ -29,7 +36,9 @@ export interface State {
   verificationStatus: VerificationStatus
   hasSeenVerificationNux: boolean
   addressToE164Number: AddressToE164NumberType
+  // Note: Do not access values in this directly, use the `getAddressFromPhoneNumber` helper in contactMapping
   e164NumberToAddress: E164NumberToAddressType
+  e164NumberToSalt: E164NumberToSaltType
   askedContactsPermission: boolean
   isLoadingImportContacts: boolean
   contactMappingProgress: ContactMappingProgress
@@ -43,6 +52,7 @@ const initialState: State = {
   hasSeenVerificationNux: false,
   addressToE164Number: {},
   e164NumberToAddress: {},
+  e164NumberToSalt: {},
   askedContactsPermission: false,
   isLoadingImportContacts: false,
   contactMappingProgress: {
@@ -80,6 +90,10 @@ export const reducer = (
       return {
         ...state,
         verificationStatus: action.status,
+        // Reset accepted codes on fail otherwise there's no way for user
+        // to try again with same codes
+        acceptedAttestationCodes:
+          action.status === VerificationStatus.Failed ? [] : state.acceptedAttestationCodes,
       }
     case Actions.SET_SEEN_VERIFICATION_NUX:
       return {
@@ -105,6 +119,11 @@ export const reducer = (
           ...state.e164NumberToAddress,
           ...action.e164NumberToAddress,
         },
+      }
+    case Actions.UPDATE_E164_PHONE_NUMBER_SALT:
+      return {
+        ...state,
+        e164NumberToSalt: { ...state.e164NumberToSalt, ...action.e164NumberToSalt },
       }
     case Actions.IMPORT_CONTACTS:
       return {
@@ -167,6 +186,7 @@ export const acceptedAttestationCodesSelector = (state: RootState) =>
   state.identity.acceptedAttestationCodes
 export const e164NumberToAddressSelector = (state: RootState) => state.identity.e164NumberToAddress
 export const addressToE164NumberSelector = (state: RootState) => state.identity.addressToE164Number
+export const e164NumberToSaltSelector = (state: RootState) => state.identity.e164NumberToSalt
 export const contactMappingProgressSelector = (state: RootState) =>
   state.identity.contactMappingProgress
 export const isLoadingImportContactsSelector = (state: RootState) =>

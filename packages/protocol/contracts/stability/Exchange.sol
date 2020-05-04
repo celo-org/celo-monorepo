@@ -23,9 +23,10 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
   event Exchanged(address indexed exchanger, uint256 sellAmount, uint256 buyAmount, bool soldGold);
   event UpdateFrequencySet(uint256 updateFrequency);
   event MinimumReportsSet(uint256 minimumReports);
-  event StableTokenSet(address stable);
+  event StableTokenSet(address indexed stable);
   event SpreadSet(uint256 spread);
   event ReserveFractionSet(uint256 reserveFraction);
+  event BucketsUpdated(uint256 goldBucket, uint256 stableBucket);
 
   FixidityLib.Fraction public spread;
 
@@ -236,6 +237,7 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
     */
   function setReserveFraction(uint256 newReserveFraction) public onlyOwner {
     reserveFraction = FixidityLib.wrap(newReserveFraction);
+    require(reserveFraction.lt(FixidityLib.fixed1()), "reserve fraction must be smaller than 1");
     emit ReserveFractionSet(newReserveFraction);
   }
 
@@ -302,6 +304,7 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
       lastBucketUpdate = now;
 
       (goldBucket, stableBucket) = getUpdatedBuckets();
+      emit BucketsUpdated(goldBucket, stableBucket);
     }
   }
 
@@ -342,6 +345,7 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
       registry.getAddressForOrDie(SORTED_ORACLES_REGISTRY_ID)
     )
       .medianRate(stable);
+    require(rateDenominator > 0, "exchange rate denominator must be greater than 0");
     return (rateNumerator, rateDenominator);
   }
 }

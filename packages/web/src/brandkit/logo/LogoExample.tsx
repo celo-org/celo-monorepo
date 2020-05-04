@@ -2,6 +2,7 @@ import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { brandStyles, GAP } from 'src/brandkit/common/constants'
 import DownloadButton from 'src/brandkit/common/DownloadButton'
+import { AssetTypes } from 'src/brandkit/tracking'
 import LogoDarkBg from 'src/logos/LogoDarkBg'
 import LogoLightBg from 'src/logos/LogoLightBg'
 import { colors, fonts, standardStyles } from 'src/styles'
@@ -28,7 +29,7 @@ export default React.memo(function LogoExample({
   logoType,
   hasBorder,
 }: Props) {
-  const useLight = logoType === Logos.light || logoType === Logos.black
+  const isLightbg = logoType === Logos.light || logoType === Logos.black
   return (
     <View style={styles.container}>
       <View
@@ -39,14 +40,17 @@ export default React.memo(function LogoExample({
           { backgroundColor: background },
         ]}
       >
-        {useLight ? (
+        {isLightbg ? (
           <LogoLightBg height={35} allBlack={logoType === Logos.black} />
         ) : (
           <LogoDarkBg height={35} allWhite={logoType === Logos.white} />
         )}
       </View>
       <Text style={fonts.legal}>{caption}</Text>
-      <DownloadButton uri={href} />
+      <DownloadButton
+        uri={href}
+        trackingData={{ name: `${Logos[logoType]} Logo`, type: AssetTypes.logo }}
+      />
     </View>
   )
 })

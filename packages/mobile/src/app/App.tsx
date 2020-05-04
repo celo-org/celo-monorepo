@@ -1,11 +1,12 @@
 import colors from '@celo/react-components/styles/colors'
+import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { ApolloProvider } from 'react-apollo'
 import { withTranslation } from 'react-i18next'
 import { DeviceEventEmitter, Linking, StatusBar, YellowBox } from 'react-native'
+import { getNumberFormatSettings } from 'react-native-localize'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { useScreens } from 'react-native-screens'
-import SplashScreen from 'react-native-splash-screen'
 import { Provider } from 'react-redux'
 import { PersistGate } from 'redux-persist/integration/react'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
@@ -30,6 +31,15 @@ YellowBox.ignoreWarnings([
   'cancelTouches', // rn-screens warning on iOS
   'Setting a timer', // warns about long setTimeouts which are actually saga timeouts
 ])
+
+const { decimalSeparator, groupingSeparator } = getNumberFormatSettings()
+
+BigNumber.config({
+  FORMAT: {
+    decimalSeparator,
+    groupSeparator: groupingSeparator,
+  },
+})
 
 const WrappedNavigator = withTranslation('common')(Navigator)
 WrappedNavigator.displayName = 'WrappedNavigator'
@@ -59,21 +69,14 @@ export class App extends React.Component {
     store.dispatch(openDeepLink(event.url))
   }
 
-  hideSplashScreen() {
-    SplashScreen.hide()
-  }
-
   render() {
     return (
-      // @ts-ignore Apollo doesn't like the typings
+      /*
+      // @ts-ignore */
       <ApolloProvider client={apolloClient}>
         <Provider store={store}>
           <SafeAreaProvider>
-            <PersistGate
-              onBeforeLift={this.hideSplashScreen}
-              loading={<AppLoading />}
-              persistor={persistor}
-            >
+            <PersistGate loading={<AppLoading />} persistor={persistor}>
               <StatusBar backgroundColor={colors.white} barStyle="dark-content" />
               <ErrorBoundary>
                 <WrappedNavigator />

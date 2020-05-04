@@ -104,9 +104,9 @@ contract('DoubleSigningSlasher', (accounts: string[]) => {
   describe('#slash()', () => {
     const blockNumber = 110
     const validatorIndex = 5
-    const headerA = ['0x12', '0x12', '0x12']
-    const headerB = ['0x13', '0x13', '0x13']
-    const headerC = ['0x11', '0x13', '0x14']
+    const headerA = '0x121212'
+    const headerB = '0x131313'
+    const headerC = '0x111314'
     beforeEach(async () => {
       await slasher.setBlockNumber(headerA, blockNumber)
       await slasher.setBlockNumber(headerB, blockNumber + 1)
@@ -141,6 +141,29 @@ contract('DoubleSigningSlasher', (accounts: string[]) => {
       await assertRevert(
         slasher.slash(validator, validatorIndex, headerA, headerC, 0, [], [], [], [], [], [])
       )
+    })
+    it('should emit the corresponding event', async () => {
+      const resp = await slasher.slash(
+        validator,
+        validatorIndex,
+        headerA,
+        headerC,
+        0,
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      )
+      const log = resp.logs[0]
+      assertContainSubset(log, {
+        event: 'DoubleSigningSlashPerformed',
+        args: {
+          validator,
+          blockNumber: new BigNumber(blockNumber),
+        },
+      })
     })
     it('decrements gold when success', async () => {
       await slasher.slash(validator, validatorIndex, headerA, headerC, 0, [], [], [], [], [], [])

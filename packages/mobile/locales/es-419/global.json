@@ -1,4 +1,5 @@
 {
+  "accept": "Aceptar",
   "at": "a",
   "yourClockIsBroke": "La fecha y hora de tu teléfono son incorrectos",
   "adjustYourClock": "Ajusta tu reloj para leer la hora automáticamente y vuelva a intentarlo. Si el problema persiste, puede que sea necesario reiniciar la aplicación",
@@ -64,6 +65,10 @@
   "reclaim": "Reclaim",
   "celoGold": "Celo Oro",
   "celoDollars": "{{CeloDollars}}",
+  "balanceAvailable": "<0></0> disponibles",
+  "subtotal": "Total parcial",
+  "total": "Total",
+  "totalInDollars": "{{CeloDollars}} (@ <2></2>)",
   "oops": "¡Uy!",
   "somethingWrong": "Había un problema",
   "verifyFailed": "Falla durante la verificación",
@@ -108,5 +113,8 @@
   "timeframes": {
     "30d": "30 dias"
   },
-  "message": "Mensaje"
+  "message": "Mensaje",
+  "addressLookupFailure": "Error al buscar la dirección del número de teléfono",
+  "saltFetchFailure": "Error al recuperar el secreto del número de teléfono",
+  "saltQuotaExceededError": "Su cuota de búsqueda de número de teléfono está agotada"
 }

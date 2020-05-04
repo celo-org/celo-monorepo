@@ -15,18 +15,16 @@ export const vNeg1Schema = {
     message: null,
     dismissMessageAfter: null,
     analyticsEnabled: true,
-    doingPinVerification: false,
     lockWithPinEnabled: false,
     appState: AppState.Active,
     locked: false,
+    lastTimeBackgrounded: 0,
   },
   networkInfo: {
     connected: true,
   },
   send: {
     isSending: false,
-    recentPhoneNumbers: undefined,
-    recipientCache: undefined,
     recentRecipients: [],
   },
   recipients: {
@@ -76,6 +74,7 @@ export const vNeg1Schema = {
     verificationFailed: false,
     addressToE164Number: {},
     e164NumberToAddress: {},
+    e164NumberToSalt: {},
     startedVerification: false,
     askedContactsPermission: false,
     isLoadingImportContacts: false,
@@ -111,6 +110,7 @@ export const vNeg1Schema = {
     dismissedEarnRewards: false,
     dismissedInviteFriends: false,
     promptFornoIfNeeded: false,
+    acceptedTerms: false,
   },
   invite: {
     isSendingInvite: false,

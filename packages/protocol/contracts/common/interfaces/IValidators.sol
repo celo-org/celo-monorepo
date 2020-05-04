@@ -1,7 +1,6 @@
 pragma solidity ^0.5.3;
 
 interface IValidators {
-  function initialize() external;
   function addValidator(address) external;
   function removeValidator(address, uint256) external;
   function addPublicKey(address, bytes calldata) external;

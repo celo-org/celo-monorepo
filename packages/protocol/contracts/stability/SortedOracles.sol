@@ -29,7 +29,12 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
 
   event OracleAdded(address indexed token, address indexed oracleAddress);
   event OracleRemoved(address indexed token, address indexed oracleAddress);
-  event OracleReported(address token, address oracle, uint256 timestamp, uint256 value);
+  event OracleReported(
+    address indexed token,
+    address indexed oracle,
+    uint256 timestamp,
+    uint256 value
+  );
   event OracleReportRemoved(address indexed token, address indexed oracle);
   event MedianUpdated(address indexed token, uint256 value);
   event ReportExpirySet(uint256 reportExpiry);
@@ -246,6 +251,15 @@ contract SortedOracles is ISortedOracles, Ownable, Initializable {
    */
   function reportExists(address token, address oracle) internal view returns (bool) {
     return rates[token].contains(oracle) && timestamps[token].contains(oracle);
+  }
+
+  /**
+   * @notice Returns the list of oracles for a particular token.
+   * @param token The address of the token whose oracles should be returned.
+   * @return The list of oracles for a particular token.
+   */
+  function getOracles(address token) external view returns (address[] memory) {
+    return oracles[token];
   }
 
   /**

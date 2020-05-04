@@ -13,9 +13,9 @@ export enum Stacks {
 }
 
 export enum Screens {
+  AppLoading = 'AppLoading',
   Account = 'Account',
   Analytics = 'Analytics',
-  Background = 'Background',
   BackupIntroduction = 'BackupIntroduction',
   BackupPhrase = 'BackupPhrase',
   BackupQuiz = 'BackupQuiz',
@@ -44,6 +44,7 @@ export enum Screens {
   Invite = 'Invite',
   InviteReview = 'InviteReview',
   JoinCelo = 'JoinCelo',
+  RegulatoryTerms = 'RegulatoryTerms',
   Language = 'Language',
   Licenses = 'Licenses',
   Support = 'Support',
@@ -55,7 +56,7 @@ export enum Screens {
   PhotosNUX = 'PhotosNUX',
   PincodeEducation = 'PincodeEducation',
   PincodeSet = 'SetPincode',
-  PincodeConfirmation = 'PincodeConfirmation',
+  PincodeEnter = 'PincodeEnter',
   Profile = 'Profile',
   QRCode = 'QRCode',
   QRScanner = 'QRScanner',

@@ -116,7 +116,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
                 }
               }
             >
-              workWithValue
+              Work with value
             </h1>
             <h4
               aria-level="4"
@@ -136,7 +136,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
                 }
               }
             >
-              joinUsToCreateMoney
+              Join us to create money with meaning
             </h4>
           </div>
         </div>
@@ -235,7 +235,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
                 }
               }
             >
-              exploreRoles
+              Explore Roles
             </a>
           </div>
         </div>
@@ -4077,7 +4077,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
                 }
               }
             >
-              buildAMonetarySys
+              Build a monetary system that creates the conditions of prosperity — for everyone
             </h2>
           </div>
         </div>
@@ -4137,7 +4137,6 @@ exports[`JoinJobsPage with jobs renders 1`] = `
             }
 
             .ReactModal__Overlay {
-              transform: translateY(-100vh);
               transition: transform 1000ms ease-in-out;
             }
             
@@ -4370,7 +4369,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
             }
           }
         >
-          threePillars
+          Three Pillars of Celo's Culture
         </h3>
         <h2
           aria-level="2"
@@ -4390,7 +4389,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
             }
           }
         >
-          selfMgmtWholeness
+          Networked leadership, wholeness, and evolutionary purpose
         </h2>
         <div
           className="css-text-901oao"
@@ -4405,7 +4404,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
             }
           }
         >
-          guidedBy
+          We’re guided by these practices and each new employee expands our culture
         </div>
       </div>
       <div
@@ -5099,7 +5098,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
             }
           }
         >
-          workOnCelo
+          Building a team comprised of diverse perspectives and experiences
         </h1>
       </div>
     </div>
@@ -5170,7 +5169,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
                   }
                 }
               >
-                careerOpportunities
+                Career Opportunities
               </div>
               <div
                 className="css-text-901oao"
@@ -5187,7 +5186,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
                   }
                 }
               >
-                filter
+                Refine By
               </div>
               <div
                 className="css-view-1dbjc4n"
@@ -5299,7 +5298,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
                           }
                         }
                       >
-                        allLocations
+                        All Locations
                       </label>
                       <svg
                         aria-label="[title]"
@@ -5384,7 +5383,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
                       }
                       tabIndex="0"
                     >
-                      allLocations
+                      All Locations
                     </div>
                     <div
                       className="css-text-901oao"
@@ -5418,7 +5417,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
                         }
                       }
                     >
-                      Berlin
+                      Berlin, DE
                     </div>
                     <div
                       className="css-text-901oao"
@@ -5452,7 +5451,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
                         }
                       }
                     >
-                      Buenos Aires
+                      Buenos Aires, AR
                     </div>
                     <div
                       className="css-text-901oao"
@@ -5486,7 +5485,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
                         }
                       }
                     >
-                      San Francisco Bay Area, CA
+                      San Francisco, US
                     </div>
                     <div
                       className="css-text-901oao"
@@ -5520,7 +5519,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
                         }
                       }
                     >
-                      worldWideRemote
+                      Remote
                     </div>
                   </div>
                 </div>
@@ -5631,7 +5630,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
                           }
                         }
                       >
-                        allDepartments
+                        All Departments
                       </label>
                       <svg
                         aria-label="[title]"
@@ -5716,7 +5715,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
                       }
                       tabIndex="0"
                     >
-                      allDepartments
+                      All Departments
                     </div>
                     <div
                       className="css-text-901oao"
@@ -5895,7 +5894,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
                           }
                         }
                       >
-                        allCommitments
+                        All Work Types
                       </label>
                       <svg
                         aria-label="[title]"
@@ -5980,7 +5979,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
                       }
                       tabIndex="0"
                     >
-                      allCommitments
+                      All Work Types
                     </div>
                     <div
                       className="css-text-901oao"
@@ -6409,6 +6408,8 @@ exports[`JoinJobsPage with jobs renders 1`] = `
                           data-focusable={true}
                           dir="auto"
                           href="example.com"
+                          onClick={[Function]}
+                          onMouseEnter={[Function]}
                           role="link"
                           style={
                             Object {
@@ -6753,6 +6754,8 @@ exports[`JoinJobsPage with jobs renders 1`] = `
                           data-focusable={true}
                           dir="auto"
                           href="example.com"
+                          onClick={[Function]}
+                          onMouseEnter={[Function]}
                           role="link"
                           style={
                             Object {
@@ -7214,7 +7217,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
           }
         }
       >
-        weGotYouCovered
+        We've got you covered
       </h2>
       <h4
         aria-level="4"
@@ -7234,7 +7237,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
           }
         }
       >
-        comprehensiveBenefits
+        Comprehensive benefits for you and your loved ones
       </h4>
       <div
         className="css-view-1dbjc4n"
@@ -7259,6 +7262,8 @@ exports[`JoinJobsPage with jobs renders 1`] = `
           data-focusable={true}
           dir="auto"
           href="https://storage.googleapis.com/celo_whitepapers/celo-perks-benefits.pdf"
+          onClick={[Function]}
+          onMouseEnter={[Function]}
           rel=" noopener noreferrer"
           role="link"
           style={
@@ -7308,7 +7313,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
           }
           target="_blank"
         >
-          viewBenefits
+          View Benefits
         </a>
       </div>
     </div>
@@ -7432,7 +7437,7 @@ exports[`JoinJobsPage without jobs renders 1`] = `
                 }
               }
             >
-              workWithValue
+              Work with value
             </h1>
             <h4
               aria-level="4"
@@ -7452,7 +7457,7 @@ exports[`JoinJobsPage without jobs renders 1`] = `
                 }
               }
             >
-              joinUsToCreateMoney
+              Join us to create money with meaning
             </h4>
           </div>
         </div>
@@ -7551,7 +7556,7 @@ exports[`JoinJobsPage without jobs renders 1`] = `
                 }
               }
             >
-              exploreRoles
+              Explore Roles
             </a>
           </div>
         </div>
@@ -11393,7 +11398,7 @@ exports[`JoinJobsPage without jobs renders 1`] = `
                 }
               }
             >
-              buildAMonetarySys
+              Build a monetary system that creates the conditions of prosperity — for everyone
             </h2>
           </div>
         </div>
@@ -11453,7 +11458,6 @@ exports[`JoinJobsPage without jobs renders 1`] = `
             }
 
             .ReactModal__Overlay {
-              transform: translateY(-100vh);
               transition: transform 1000ms ease-in-out;
             }
             
@@ -11686,7 +11690,7 @@ exports[`JoinJobsPage without jobs renders 1`] = `
             }
           }
         >
-          threePillars
+          Three Pillars of Celo's Culture
         </h3>
         <h2
           aria-level="2"
@@ -11706,7 +11710,7 @@ exports[`JoinJobsPage without jobs renders 1`] = `
             }
           }
         >
-          selfMgmtWholeness
+          Networked leadership, wholeness, and evolutionary purpose
         </h2>
         <div
           className="css-text-901oao"
@@ -11721,7 +11725,7 @@ exports[`JoinJobsPage without jobs renders 1`] = `
             }
           }
         >
-          guidedBy
+          We’re guided by these practices and each new employee expands our culture
         </div>
       </div>
       <div
@@ -12415,7 +12419,7 @@ exports[`JoinJobsPage without jobs renders 1`] = `
             }
           }
         >
-          workOnCelo
+          Building a team comprised of diverse perspectives and experiences
         </h1>
       </div>
     </div>
@@ -12486,7 +12490,7 @@ exports[`JoinJobsPage without jobs renders 1`] = `
                   }
                 }
               >
-                careerOpportunities
+                Career Opportunities
               </div>
               <div
                 className="css-text-901oao"
@@ -12503,7 +12507,7 @@ exports[`JoinJobsPage without jobs renders 1`] = `
                   }
                 }
               >
-                filter
+                Refine By
               </div>
               <div
                 className="css-view-1dbjc4n"
@@ -12615,7 +12619,7 @@ exports[`JoinJobsPage without jobs renders 1`] = `
                           }
                         }
                       >
-                        allLocations
+                        All Locations
                       </label>
                       <svg
                         aria-label="[title]"
@@ -12700,7 +12704,7 @@ exports[`JoinJobsPage without jobs renders 1`] = `
                       }
                       tabIndex="0"
                     >
-                      allLocations
+                      All Locations
                     </div>
                     <div
                       className="css-text-901oao"
@@ -12734,7 +12738,7 @@ exports[`JoinJobsPage without jobs renders 1`] = `
                         }
                       }
                     >
-                      Berlin
+                      Berlin, DE
                     </div>
                     <div
                       className="css-text-901oao"
@@ -12768,7 +12772,7 @@ exports[`JoinJobsPage without jobs renders 1`] = `
                         }
                       }
                     >
-                      Buenos Aires
+                      Buenos Aires, AR
                     </div>
                     <div
                       className="css-text-901oao"
@@ -12802,7 +12806,7 @@ exports[`JoinJobsPage without jobs renders 1`] = `
                         }
                       }
                     >
-                      San Francisco Bay Area, CA
+                      San Francisco, US
                     </div>
                     <div
                       className="css-text-901oao"
@@ -12836,7 +12840,7 @@ exports[`JoinJobsPage without jobs renders 1`] = `
                         }
                       }
                     >
-                      worldWideRemote
+                      Remote
                     </div>
                   </div>
                 </div>
@@ -12947,7 +12951,7 @@ exports[`JoinJobsPage without jobs renders 1`] = `
                           }
                         }
                       >
-                        allDepartments
+                        All Departments
                       </label>
                       <svg
                         aria-label="[title]"
@@ -13032,7 +13036,7 @@ exports[`JoinJobsPage without jobs renders 1`] = `
                       }
                       tabIndex="0"
                     >
-                      allDepartments
+                      All Departments
                     </div>
                   </div>
                 </div>
@@ -13143,7 +13147,7 @@ exports[`JoinJobsPage without jobs renders 1`] = `
                           }
                         }
                       >
-                        allCommitments
+                        All Work Types
                       </label>
                       <svg
                         aria-label="[title]"
@@ -13228,7 +13232,7 @@ exports[`JoinJobsPage without jobs renders 1`] = `
                       }
                       tabIndex="0"
                     >
-                      allCommitments
+                      All Work Types
                     </div>
                   </div>
                 </div>
@@ -13829,7 +13833,7 @@ exports[`JoinJobsPage without jobs renders 1`] = `
           }
         }
       >
-        weGotYouCovered
+        We've got you covered
       </h2>
       <h4
         aria-level="4"
@@ -13849,7 +13853,7 @@ exports[`JoinJobsPage without jobs renders 1`] = `
           }
         }
       >
-        comprehensiveBenefits
+        Comprehensive benefits for you and your loved ones
       </h4>
       <div
         className="css-view-1dbjc4n"
@@ -13874,6 +13878,8 @@ exports[`JoinJobsPage without jobs renders 1`] = `
           data-focusable={true}
           dir="auto"
           href="https://storage.googleapis.com/celo_whitepapers/celo-perks-benefits.pdf"
+          onClick={[Function]}
+          onMouseEnter={[Function]}
           rel=" noopener noreferrer"
           role="link"
           style={
@@ -13923,7 +13929,7 @@ exports[`JoinJobsPage without jobs renders 1`] = `
           }
           target="_blank"
         >
-          viewBenefits
+          View Benefits
         </a>
       </div>
     </div>

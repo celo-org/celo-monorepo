@@ -1,9 +1,9 @@
+// tslint:disable: no-console
 import { assert } from 'chai'
 import Web3 from 'web3'
-import { connectPeers, initAndStartGeth } from '../lib/geth'
 import { GethInstanceConfig } from '../lib/interfaces/geth-instance-config'
 import { GethRunConfig } from '../lib/interfaces/geth-run-config'
-import { getHooks, killInstance, sleep, waitToFinishInstanceSyncing } from './utils'
+import { getHooks, initAndSyncGethWithRetry, killInstance, waitForBlock } from './utils'
 
 const TMP_PATH = '/tmp/e2e'
 const verbose = false
@@ -60,18 +60,26 @@ describe('sync tests', function(this: any) {
 
   const hooks = getHooks(gethConfig)
 
-  before(async () => {
+  before(async function(this: any) {
+    this.timeout(0)
     // Start validator nodes and migrate contracts.
     await hooks.before()
     // Restart validator nodes.
     await hooks.restart()
-
-    await initAndStartGeth(gethConfig, hooks.gethBinaryPath, fullNode, verbose)
-    await connectPeers([...gethConfig.instances, fullNode], verbose)
-    await waitToFinishInstanceSyncing(fullNode)
+    await initAndSyncGethWithRetry(
+      gethConfig,
+      hooks.gethBinaryPath,
+      fullNode,
+      [...gethConfig.instances, fullNode],
+      verbose,
+      3
+    )
   })
 
-  after(hooks.after)
+  after(async function(this: any) {
+    this.timeout(0)
+    await hooks.after()
+  })
 
   const syncModes = ['full', 'fast', 'light', 'lightest']
   for (const syncmode of syncModes) {
@@ -88,9 +96,14 @@ describe('sync tests', function(this: any) {
           rpcport: 8555,
           lightserv: syncmode !== 'light' && syncmode !== 'lightest',
         }
-        await initAndStartGeth(gethConfig, hooks.gethBinaryPath, syncNode, verbose)
-        await connectPeers([fullNode, syncNode], verbose)
-        await waitToFinishInstanceSyncing(syncNode)
+        await initAndSyncGethWithRetry(
+          gethConfig,
+          hooks.gethBinaryPath,
+          syncNode,
+          [fullNode, syncNode],
+          verbose,
+          3
+        )
       })
 
       afterEach(() => killInstance(syncNode))
@@ -98,12 +111,15 @@ describe('sync tests', function(this: any) {
       it('should sync the latest block', async () => {
         const validatingWeb3 = new Web3(`http://localhost:8545`)
         const validatingFirstBlock = await validatingWeb3.eth.getBlockNumber()
-        // Give the validators time to create more blocks.
-        await sleep(20, true)
+        console.log(`At block ${validatingFirstBlock}, waiting for next block`)
+        await waitForBlock(validatingWeb3, validatingFirstBlock + 1)
         const validatingLatestBlock = await validatingWeb3.eth.getBlockNumber()
-        await sleep(20, true)
+
         const syncWeb3 = new Web3(`http://localhost:8555`)
+        console.log(`Waiting to sync to block ${validatingFirstBlock}`)
+        await waitForBlock(syncWeb3, validatingLatestBlock)
         const syncLatestBlock = await syncWeb3.eth.getBlockNumber()
+
         assert.isAbove(validatingLatestBlock, 1)
         // Assert that the validator is still producing blocks.
         assert.isAbove(validatingLatestBlock, validatingFirstBlock)
@@ -126,14 +142,20 @@ describe('sync tests', function(this: any) {
       await killInstance(instance)
       // copy instance
       const additionalInstance = { ...instance }
-      await initAndStartGeth(gethConfig, hooks.gethBinaryPath, additionalInstance, verbose)
-      await connectPeers([gethConfig.instances[0], additionalInstance], verbose)
-      await waitToFinishInstanceSyncing(additionalInstance)
-      await sleep(180, true) // wait for round change / resync
+      await initAndSyncGethWithRetry(
+        gethConfig,
+        hooks.gethBinaryPath,
+        additionalInstance,
+        [gethConfig.instances[0], additionalInstance],
+        verbose,
+        3
+      )
+
       const address = (await web3.eth.getAccounts())[0]
       const currentBlock = await web3.eth.getBlock('latest')
-      for (let i = 0; i < gethConfig.instances.length; i++) {
-        if ((await web3.eth.getBlock(currentBlock.number - i)).miner === address) {
+      for (let i = 1; i < 500; i++) {
+        await waitForBlock(web3, currentBlock.number + i)
+        if ((await web3.eth.getBlock(currentBlock.number + i)).miner === address) {
           return // A block proposed by validator who lost randomness was found, hence randomness was recovered
         }
       }

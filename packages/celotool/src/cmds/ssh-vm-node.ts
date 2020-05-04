@@ -8,7 +8,7 @@ export const describe =
   'Generates a command to ssh into a vm-testnet node. To execute the ssh command, run `eval $(<this cmd>)`'
 
 interface SshVmNodeArgv extends CeloEnvArgv {
-  nodeType: 'validator' | 'tx-node' | 'bootnode' | 'proxy'
+  nodeType: 'validator' | 'tx-node' | 'tx-node-private' | 'bootnode' | 'proxy'
   nodeIndex?: number
 }
 
@@ -16,7 +16,7 @@ export const builder = (argv: yargs.Argv) => {
   return addCeloEnvMiddleware(argv)
     .positional('nodeType', {
       describe: 'Type of node',
-      choices: ['validator', 'tx-node', 'bootnode', 'proxy'],
+      choices: ['validator', 'tx-node', 'tx-node-private', 'bootnode', 'proxy'],
       type: 'string',
     })
     .positional('nodeIndex', {
@@ -24,7 +24,7 @@ export const builder = (argv: yargs.Argv) => {
       type: 'number',
     })
     .check((checkArgv: SshVmNodeArgv) => {
-      const requiresIndex = checkArgv.nodeType === 'validator' || checkArgv.nodeType === 'tx-node'
+      const requiresIndex = checkArgv.nodeType !== 'bootnode'
       if (requiresIndex && checkArgv.nodeIndex === undefined) {
         return new Error(`nodeIndex is required for nodeType ${checkArgv.nodeType}`)
       }

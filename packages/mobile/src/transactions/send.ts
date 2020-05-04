@@ -1,28 +1,34 @@
-import {
-  getStableTokenContract,
-  sendTransactionAsync,
-  sendTransactionAsyncWithWeb3Signing,
-  SendTransactionLogEvent,
-  SendTransactionLogEventType,
-} from '@celo/walletkit'
+import { CURRENCY_ENUM } from '@celo/utils/src'
+import { BigNumber } from 'bignumber.js'
 import { call, delay, race, select, take } from 'redux-saga/effects'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { DEFAULT_FORNO_URL } from 'src/config'
+import { getCurrencyAddress } from 'src/tokens/saga'
+import {
+  sendTransactionAsync,
+  SendTransactionLogEvent,
+  SendTransactionLogEventType,
+} from 'src/transactions/contract-utils'
 import Logger from 'src/utils/Logger'
 import { assertNever } from 'src/utils/typescript'
-import { web3 } from 'src/web3/contracts'
+import { getGasPrice } from 'src/web3/gas'
 import { fornoSelector } from 'src/web3/selectors'
 import { getLatestNonce } from 'src/web3/utils'
-import { TransactionObject } from 'web3/eth/types'
+import { TransactionObject } from 'web3-eth'
 
 const TAG = 'transactions/send'
-const TX_NUM_RETRIES = 3 // Try txs up to 3 times
-const TX_RETRY_DELAY = 1000 // 1s
-const TX_TIMEOUT = 20000 // 20s
+
+// TODO(Rossy) We need to avoid retries for now because we don't have a way of forcing serialization
+// in cases where we have multiple parallel txs, like in verification. The nonces can get mixed up
+// causing failures when a tx times out (rare but can happen on slow devices)
+const TX_NUM_TRIES = 1 // Try txs up to this many times
+const TX_RETRY_DELAY = 2000 // 2s
+const TX_TIMEOUT = 40000 // 40s
 const NONCE_TOO_LOW_ERROR = 'nonce too low'
 const OUT_OF_GAS_ERROR = 'out of gas'
+const ALWAYS_FAILING_ERROR = 'always failing transaction'
 const KNOWN_TX_ERROR = 'known transaction'
 
 const getLogger = (tag: string, txId: string) => {
@@ -75,14 +81,14 @@ export function* sendTransactionPromises(
 ) {
   Logger.debug(`${TAG}@sendTransactionPromises`, `Going to send a transaction with id ${txId}`)
   // Use stabletoken to pay for gas by default
-  const stableToken = yield call(getStableTokenContract, web3)
+  const stableTokenAddress: string = yield call(getCurrencyAddress, CURRENCY_ENUM.DOLLAR)
   const fornoMode: boolean = yield select(fornoSelector)
+  let gasPrice: BigNumber | undefined
 
   Logger.debug(
     `${TAG}@sendTransactionPromises`,
     `Sending tx ${txId} in ${fornoMode ? 'forno' : 'geth'} mode`
   )
-  // This if-else case is temporary and will disappear once we move from `walletkit` to `contractkit`.
   if (fornoMode) {
     // In dev mode, verify that we are actually able to connect to the network. This
     // ensures that we get a more meaningful error if the forno server is down, which
@@ -90,29 +96,20 @@ export function* sendTransactionPromises(
     if (__DEV__) {
       yield call(verifyUrlWorksOrThrow, DEFAULT_FORNO_URL)
     }
-    const transactionPromises = yield call(
-      sendTransactionAsyncWithWeb3Signing,
-      web3,
-      tx,
-      account,
-      stableToken,
-      nonce,
-      getLogger(tag, txId),
-      staticGas
-    )
-    return transactionPromises
-  } else {
-    const transactionPromises = yield call(
-      sendTransactionAsync,
-      tx,
-      account,
-      stableToken,
-      nonce,
-      getLogger(tag, txId),
-      staticGas
-    )
-    return transactionPromises
+
+    gasPrice = yield getGasPrice(CURRENCY_ENUM.DOLLAR)
   }
+  const transactionPromises = yield call(
+    sendTransactionAsync,
+    tx,
+    account,
+    stableTokenAddress,
+    nonce,
+    getLogger(tag, txId),
+    staticGas,
+    gasPrice ? gasPrice.toString() : gasPrice
+  )
+  return transactionPromises
 }
 
 // Send a transaction and await for its confirmation
@@ -148,7 +145,7 @@ export function* wrapSendTransactionWithRetry(
   cancelAction?: string
 ) {
   const latestNonce = yield call(getLatestNonce, account)
-  for (let i = 1; i <= TX_NUM_RETRIES; i++) {
+  for (let i = 1; i <= TX_NUM_TRIES; i++) {
     try {
       const { result, timeout, cancel } = yield race({
         result: call(sendTxMethod, latestNonce + 1),
@@ -178,7 +175,7 @@ export function* wrapSendTransactionWithRetry(
         return
       }
 
-      if (i + 1 <= TX_NUM_RETRIES) {
+      if (i + 1 <= TX_NUM_TRIES) {
         yield delay(TX_RETRY_DELAY)
         Logger.debug(`${TAG}@wrapSendTransactionWithRetry`, `Tx ${txId} retrying attempt ${i + 1}`)
       } else {
@@ -200,6 +197,12 @@ function shouldTxFailureRetry(err: any) {
       `${TAG}@shouldTxFailureRetry`,
       'Out of gas or invalid tx error. Will not reattempt.'
     )
+    return false
+  }
+
+  // Similar to case above
+  if (message.includes(ALWAYS_FAILING_ERROR)) {
+    Logger.debug(`${TAG}@shouldTxFailureRetry`, 'Transaction always failing. Will not reattempt')
     return false
   }
 

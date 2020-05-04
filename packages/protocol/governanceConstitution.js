@@ -57,6 +57,11 @@ const DefaultConstitution = {
     default: 0.8,
     addToken: 0.8,
   },
+  Freezer: {
+    default: 0.6,
+    freeze: 0.6,
+    unfreeze: 0.6,
+  },
   GasPriceMinimum: {
     default: 0.7,
     setRegistry: 0.9,

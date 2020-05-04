@@ -1,8 +1,9 @@
 import BigNumber from 'bignumber.js'
-import { Exchange } from '../generated/types/Exchange'
+import { Exchange } from '../generated/Exchange'
 import {
   BaseWrapper,
   CeloTransactionObject,
+  fixidityValueToBigNumber,
   identity,
   proxyCall,
   proxySend,
@@ -17,6 +18,7 @@ export interface ExchangeConfig {
   reserveFraction: BigNumber
   updateFrequency: BigNumber
   minimumReports: BigNumber
+  lastBucketUpdate: BigNumber
 }
 
 /**
@@ -28,12 +30,16 @@ export class ExchangeWrapper extends BaseWrapper<Exchange> {
    * Query spread parameter
    * @returns Current spread charged on exchanges
    */
-  spread = proxyCall(this.contract.methods.spread, undefined, valueToBigNumber)
+  spread = proxyCall(this.contract.methods.spread, undefined, fixidityValueToBigNumber)
   /**
    * Query reserve fraction parameter
    * @returns Current fraction to commit to the gold bucket
    */
-  reserveFraction = proxyCall(this.contract.methods.reserveFraction, undefined, valueToBigNumber)
+  reserveFraction = proxyCall(
+    this.contract.methods.reserveFraction,
+    undefined,
+    fixidityValueToBigNumber
+  )
   /**
    * Query update frequency parameter
    * @returns The time period that needs to elapse between bucket
@@ -47,6 +53,11 @@ export class ExchangeWrapper extends BaseWrapper<Exchange> {
    * commit to the gold bucket
    */
   minimumReports = proxyCall(this.contract.methods.minimumReports, undefined, valueToBigNumber)
+  /**
+   * Query last bucket update
+   * @returns The timestamp of the last time exchange buckets were updated.
+   */
+  lastBucketUpdate = proxyCall(this.contract.methods.lastBucketUpdate, undefined, valueToBigNumber)
 
   /**
    * @dev Returns the amount of buyToken a user would get for sellAmount of sellToken
@@ -171,12 +182,14 @@ export class ExchangeWrapper extends BaseWrapper<Exchange> {
       this.reserveFraction(),
       this.updateFrequency(),
       this.minimumReports(),
+      this.lastBucketUpdate(),
     ])
     return {
       spread: res[0],
       reserveFraction: res[1],
       updateFrequency: res[2],
       minimumReports: res[3],
+      lastBucketUpdate: res[4],
     }
   }
   /**

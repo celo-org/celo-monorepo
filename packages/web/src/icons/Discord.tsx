@@ -7,9 +7,10 @@ interface Props {
   size: number
 }
 
-export default React.memo(function Octocat({ color, size }: Props) {
+export default React.memo(function Discord({ color, size }: Props) {
   return (
     <Svg width={size} height={size} viewBox="0 0 40 46" fill="none">
+      <title>Chat</title>
       <Path
         fillRule="evenodd"
         clipRule="evenodd"

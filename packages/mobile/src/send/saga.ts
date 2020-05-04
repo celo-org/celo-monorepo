@@ -1,5 +1,4 @@
 import { CURRENCY_ENUM } from '@celo/utils/src/currencies'
-import { getGoldTokenContract, getStableTokenContract } from '@celo/walletkit'
 import BigNumber from 'bignumber.js'
 import { call, put, select, spawn, take, takeLeading } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
@@ -24,34 +23,37 @@ import {
   sendPaymentOrInviteSuccess,
 } from 'src/send/actions'
 import { transferStableToken } from 'src/stableToken/actions'
-import { BasicTokenTransfer, createTransaction } from 'src/tokens/saga'
+import {
+  BasicTokenTransfer,
+  createTokenTransferTransaction,
+  getCurrencyAddress,
+} from 'src/tokens/saga'
 import { generateStandbyTransactionId } from 'src/transactions/actions'
 import Logger from 'src/utils/Logger'
-import { web3 } from 'src/web3/contracts'
 import { currentAccountSelector } from 'src/web3/selectors'
+import { estimateGas } from 'src/web3/utils'
 
 const TAG = 'send/saga'
 
 export async function getSendTxGas(
   account: string,
-  contractGetter: typeof getStableTokenContract | typeof getGoldTokenContract,
+  currency: CURRENCY_ENUM,
   params: BasicTokenTransfer
 ) {
   Logger.debug(`${TAG}/getSendTxGas`, 'Getting gas estimate for send tx')
-  const tx = await createTransaction(contractGetter, params)
-  const tokenContract = await contractGetter(web3)
-  const txParams = { from: account, feeCurrency: tokenContract._address }
-  const gas = new BigNumber(await tx.estimateGas(txParams))
+  const tx = await createTokenTransferTransaction(currency, params)
+  const txParams = { from: account, feeCurrency: await getCurrencyAddress(currency) }
+  const gas = await estimateGas(tx.txo, txParams)
   Logger.debug(`${TAG}/getSendTxGas`, `Estimated gas of ${gas.toString()}`)
   return gas
 }
 
 export async function getSendFee(
   account: string,
-  contractGetter: typeof getStableTokenContract | typeof getGoldTokenContract,
+  currency: CURRENCY_ENUM,
   params: BasicTokenTransfer
 ) {
-  const gas = await getSendTxGas(account, contractGetter, params)
+  const gas = await getSendTxGas(account, currency, params)
   return calculateFee(gas)
 }
 

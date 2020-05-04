@@ -1,6 +1,6 @@
 import { installGenericHelmChart, removeGenericHelmChart } from 'src/lib/helm_deploy'
 import { execCmdWithExitOnFailure } from 'src/lib/utils'
-import { getBlockscoutUrl } from './endpoints'
+import { getBlockscoutUrl, getFornoUrl } from './endpoints'
 import { envVar, fetchEnv, fetchEnvOrFallback } from './env-utils'
 import { AccountType, getAddressesFor } from './generate_utils'
 
@@ -56,6 +56,7 @@ function helmParameters(celoEnv: string) {
     ).replace(/,/g, '\\,')}'`,
     `--set celostats.network_name='Celo ${celoEnv}'`,
     `--set celostats.blockscout_url='${getBlockscoutUrl(celoEnv)}'`,
+    `--set celostats.jsonrpc='${getFornoUrl(celoEnv)}'`,
   ]
 }
 

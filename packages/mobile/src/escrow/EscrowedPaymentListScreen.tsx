@@ -7,11 +7,9 @@ import { EscrowedPayment } from 'src/escrow/actions'
 import EscrowedPaymentListItem from 'src/escrow/EscrowedPaymentListItem'
 import { getReclaimableEscrowPayments } from 'src/escrow/reducer'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
-import { fetchPhoneAddresses } from 'src/identity/actions'
 import {
   NotificationList,
   titleWithBalanceNavigationOptions,
-  useBalanceInNavigationParam,
 } from 'src/notifications/NotificationList'
 import { NumberToRecipient } from 'src/recipients/recipient'
 import { recipientCacheSelector } from 'src/recipients/reducer'
@@ -23,17 +21,13 @@ interface StateProps {
   recipientCache: NumberToRecipient
 }
 
-interface DispatchProps {
-  fetchPhoneAddresses: typeof fetchPhoneAddresses
-}
-
 const mapStateToProps = (state: RootState): StateProps => ({
   dollarBalance: state.stableToken.balance,
   sentEscrowedPayments: getReclaimableEscrowPayments(state),
   recipientCache: recipientCacheSelector(state),
 })
 
-type Props = NavigationInjectedProps & WithTranslation & StateProps & DispatchProps
+type Props = NavigationInjectedProps & WithTranslation & StateProps
 
 export const listItemRenderer = (payment: EscrowedPayment, key: number | undefined = undefined) => {
   return (
@@ -44,8 +38,6 @@ export const listItemRenderer = (payment: EscrowedPayment, key: number | undefin
 }
 
 const EscrowedPaymentListScreen = (props: Props) => {
-  const { dollarBalance, navigation } = props
-  useBalanceInNavigationParam(dollarBalance, navigation)
   return (
     <NotificationList
       items={props.sentEscrowedPayments}
@@ -59,6 +51,6 @@ EscrowedPaymentListScreen.navigationOptions = titleWithBalanceNavigationOptions(
   i18n.t('walletFlow5:escrowedPaymentReminder')
 )
 
-export default connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
-  fetchPhoneAddresses,
-})(withTranslation(Namespaces.global)(EscrowedPaymentListScreen))
+export default connect<StateProps, {}, {}, RootState>(mapStateToProps)(
+  withTranslation(Namespaces.global)(EscrowedPaymentListScreen)
+)

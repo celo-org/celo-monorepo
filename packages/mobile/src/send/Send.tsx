@@ -29,7 +29,6 @@ import RecipientPicker from 'src/recipients/RecipientPicker'
 import { recipientCacheSelector } from 'src/recipients/reducer'
 import { RootState } from 'src/redux/reducers'
 import { storeLatestInRecents } from 'src/send/actions'
-import { ContactSyncBanner } from 'src/send/ContactSyncBanner'
 import { QRCodeIcon } from 'src/send/QRCodeIcon'
 import { SendCallToAction } from 'src/send/SendCallToAction'
 import { SendSearchInput } from 'src/send/SendSearchInput'
@@ -260,7 +259,6 @@ class Send extends React.Component<Props, State> {
             onPressCta={this.onPressContactsSettings}
           />
         )}
-        <ContactSyncBanner />
       </>
     )
   }

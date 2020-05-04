@@ -1,10 +1,12 @@
+import { ensureLeading0x, trimLeading0x } from '@celo/utils/lib/address'
+import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import debugFactory from 'debug'
 // @ts-ignore-next-line
-import { account as Account, bytes as Bytes, hash as Hash, nat as Nat, RLP } from 'eth-lib'
-// @ts-ignore-next-line
+import { account as Account, bytes as Bytes, hash as Hash, RLP } from 'eth-lib'
+import * as ethUtil from 'ethereumjs-util'
+import { EncodedTransaction, Tx } from 'web3-core'
 import * as helpers from 'web3-core-helpers'
-import { Tx } from 'web3/eth/types'
-import { EncodedTransaction } from 'web3/types'
+import { EIP712TypedData, generateTypedDataHash } from './sign-typed-data-utils'
 
 const debug = debugFactory('kit:tx:sign')
 
@@ -15,9 +17,24 @@ function isNullOrUndefined(value: any): boolean {
   return value === null || value === undefined
 }
 
+export interface RLPEncodedTx {
+  transaction: Tx
+  rlpEncode: any
+}
+
+// Simple replay attack protection
+// https://github.com/ethereum/EIPs/blob/master/EIPS/eip-155.md
+export function chainIdTransformationForSigning(chainId: number): number {
+  return chainId * 2 + 35
+}
+
+export function getHashFromEncoded(rlpEncode: string): string {
+  return Hash.keccak256(rlpEncode)
+}
+
 function trimLeadingZero(hex: string) {
   while (hex && hex.startsWith('0x0')) {
-    hex = '0x' + hex.slice(3)
+    hex = ensureLeading0x(hex.slice(3))
   }
   return hex
 }
@@ -29,111 +46,109 @@ function makeEven(hex: string) {
   return hex
 }
 
-export async function signTransaction(txn: any, privateKey: string): Promise<EncodedTransaction> {
-  let result: EncodedTransaction
+function signatureFormatter(signature: {
+  v: number
+  r: Buffer
+  s: Buffer
+}): { v: string; r: string; s: string } {
+  return {
+    v: stringNumberToHex(signature.v),
+    r: makeEven(trimLeadingZero(ensureLeading0x(signature.r.toString('hex')))),
+    s: makeEven(trimLeadingZero(ensureLeading0x(signature.s.toString('hex')))),
+  }
+}
 
-  if (!txn) {
-    throw new Error('No transaction object given!')
+function stringNumberToHex(num?: number | string): string {
+  const auxNumber = Number(num)
+  if (num === '0x' || num === undefined || auxNumber === 0) {
+    return '0x'
+  }
+  return Bytes.fromNumber(auxNumber)
+}
+
+export function rlpEncodedTx(tx: Tx): RLPEncodedTx {
+  if (!tx.gas) {
+    throw new Error('"gas" is missing')
   }
 
-  const signed = (tx: any) => {
-    if (!tx.gas && !tx.gasLimit) {
-      throw new Error('"gas" is missing')
-    }
-
-    if (tx.nonce < 0 || tx.gas < 0 || tx.gasPrice < 0 || tx.chainId < 0) {
-      throw new Error('Gas, gasPrice, nonce or chainId is lower than 0')
-    }
-
-    try {
-      tx = helpers.formatters.inputCallFormatter(tx)
-
-      const transaction = tx
-      transaction.to = tx.to || '0x'
-      transaction.data = tx.data || '0x'
-      transaction.value = tx.value || '0x'
-      transaction.chainId = '0x' + Number(tx.chainId).toString(16)
-      transaction.feeCurrency = tx.feeCurrency || '0x'
-      transaction.gatewayFeeRecipient = tx.gatewayFeeRecipient || '0x'
-      transaction.gatewayFee = tx.gatewayFee || '0x'
-
-      // This order should match the order in Geth.
-      // https://github.com/celo-org/celo-blockchain/blob/027dba2e4584936cc5a8e8993e4e27d28d5247b8/core/types/transaction.go#L65
-      const rlpEncoded = RLP.encode([
-        Bytes.fromNat(transaction.nonce),
-        Bytes.fromNat(transaction.gasPrice),
-        Bytes.fromNat(transaction.gas),
-        transaction.feeCurrency.toLowerCase(),
-        transaction.gatewayFeeRecipient.toLowerCase(),
-        Bytes.fromNat(transaction.gatewayFee),
-        transaction.to.toLowerCase(),
-        Bytes.fromNat(transaction.value),
-        transaction.data,
-        Bytes.fromNat(transaction.chainId || '0x1'),
-        '0x',
-        '0x',
-      ])
-
-      const hash = Hash.keccak256(rlpEncoded)
-
-      const signature = Account.makeSigner(Nat.toNumber(transaction.chainId || '0x1') * 2 + 35)(
-        Hash.keccak256(rlpEncoded),
-        privateKey
-      )
-
-      const rawTx = RLP.decode(rlpEncoded)
-        .slice(0, 9)
-        .concat(Account.decodeSignature(signature))
-
-      rawTx[9] = makeEven(trimLeadingZero(rawTx[9]))
-      rawTx[10] = makeEven(trimLeadingZero(rawTx[10]))
-      rawTx[11] = makeEven(trimLeadingZero(rawTx[11]))
-
-      const rawTransaction = RLP.encode(rawTx)
-
-      const values = RLP.decode(rawTransaction)
-
-      result = {
-        tx: {
-          nonce: transaction.nonce,
-          gasPrice: transaction.gasPrice,
-          gas: transaction.gas,
-          to: transaction.to,
-          value: transaction.value,
-          input: transaction.input,
-          v: trimLeadingZero(values[9]),
-          r: trimLeadingZero(values[10]),
-          s: trimLeadingZero(values[11]),
-          hash,
-        },
-        raw: rawTransaction,
-      }
-    } catch (e) {
-      throw e
-    }
-
-    return result
-  }
-
-  // Resolve immediately if nonce, chainId and price are provided
-  if (txn.nonce !== undefined && txn.chainId !== undefined && txn.gasPrice !== undefined) {
-    return signed(txn)
-  }
-
-  const chainId = txn.chainId
-  const gasPrice = txn.gasPrice
-  const nonce = txn.nonce
-
-  if (isNullOrUndefined(chainId) || isNullOrUndefined(gasPrice) || isNullOrUndefined(nonce)) {
+  if (
+    isNullOrUndefined(tx.chainId) ||
+    isNullOrUndefined(tx.gasPrice) ||
+    isNullOrUndefined(tx.nonce)
+  ) {
     throw new Error(
       'One of the values "chainId", "gasPrice", or "nonce" couldn\'t be fetched: ' +
-        JSON.stringify({ chainId, gasPrice, nonce })
+        JSON.stringify({ chainId: tx.chainId, gasPrice: tx.gasPrice, nonce: tx.nonce })
     )
   }
-  txn.chainId = chainId
-  txn.gasPrice = gasPrice
-  txn.nonce = nonce
-  return signed(txn)
+
+  if (tx.nonce! < 0 || tx.gas! < 0 || tx.gasPrice! < 0 || tx.chainId! < 0) {
+    throw new Error('Gas, gasPrice, nonce or chainId is lower than 0')
+  }
+  const transaction: Tx = helpers.formatters.inputCallFormatter(tx)
+  transaction.to = Bytes.fromNat(tx.to || '0x').toLowerCase()
+  transaction.nonce = Number(((tx.nonce as any) !== '0x' ? tx.nonce : 0) || 0)
+  transaction.data = Bytes.fromNat(tx.data || '0x').toLowerCase()
+  transaction.value = stringNumberToHex(tx.value?.toString())
+  transaction.feeCurrency = Bytes.fromNat(tx.feeCurrency || '0x').toLowerCase()
+  transaction.gatewayFeeRecipient = Bytes.fromNat(tx.gatewayFeeRecipient || '0x').toLowerCase()
+  transaction.gatewayFee = stringNumberToHex(tx.gatewayFee)
+  transaction.gasPrice = stringNumberToHex(tx.gasPrice?.toString())
+  transaction.gas = stringNumberToHex(tx.gas)
+  transaction.chainId = tx.chainId || 1
+
+  // This order should match the order in Geth.
+  // https://github.com/celo-org/celo-blockchain/blob/027dba2e4584936cc5a8e8993e4e27d28d5247b8/core/types/transaction.go#L65
+  const rlpEncode = RLP.encode([
+    stringNumberToHex(transaction.nonce),
+    transaction.gasPrice,
+    transaction.gas,
+    transaction.feeCurrency,
+    transaction.gatewayFeeRecipient,
+    transaction.gatewayFee,
+    transaction.to,
+    transaction.value,
+    transaction.data,
+    stringNumberToHex(transaction.chainId),
+    '0x',
+    '0x',
+  ])
+
+  return { transaction, rlpEncode }
+}
+
+export async function encodeTransaction(
+  rlpEncoded: RLPEncodedTx,
+  signature: { v: number; r: Buffer; s: Buffer }
+): Promise<EncodedTransaction> {
+  const hash = getHashFromEncoded(rlpEncoded.rlpEncode)
+
+  const sanitizedSignature = signatureFormatter(signature)
+  const v = sanitizedSignature.v
+  const r = sanitizedSignature.r
+  const s = sanitizedSignature.s
+  const rawTx = RLP.decode(rlpEncoded.rlpEncode)
+    .slice(0, 9)
+    .concat([v, r, s])
+
+  const rawTransaction = RLP.encode(rawTx)
+
+  const result: EncodedTransaction = {
+    tx: {
+      nonce: rlpEncoded.transaction.nonce!.toString(),
+      gasPrice: rlpEncoded.transaction.gasPrice!.toString(),
+      gas: rlpEncoded.transaction.gas!.toString(),
+      to: rlpEncoded.transaction.to!.toString(),
+      value: rlpEncoded.transaction.value!.toString(),
+      input: rlpEncoded.transaction.data!,
+      v,
+      r,
+      s,
+      hash,
+    },
+    raw: rawTransaction,
+  }
+  return result
 }
 
 // Recover transaction and sender address from a raw transaction.
@@ -156,10 +171,37 @@ export function recoverTransaction(rawTx: string): [Tx, string] {
     data: rawValues[8],
     chainId,
   }
-  const signature = Account.encodeSignature(rawValues.slice(9, 12))
+  let r = rawValues[10]
+  let s = rawValues[11]
+  // Account.recover cannot handle canonicalized signatures
+  // A canonicalized signature may have the first byte removed if its value is 0
+  r = ensureLeading0x(trimLeading0x(r).padStart(64, '0'))
+  s = ensureLeading0x(trimLeading0x(s).padStart(64, '0'))
+  const signature = Account.encodeSignature([rawValues[9], r, s])
   const extraData = recovery < 35 ? [] : [chainId, '0x', '0x']
   const signingData = rawValues.slice(0, 9).concat(extraData)
   const signingDataHex = RLP.encode(signingData)
-  const signer = Account.recover(Hash.keccak256(signingDataHex), signature)
+  const signer = Account.recover(getHashFromEncoded(signingDataHex), signature)
   return [celoTx, signer]
+}
+
+export function recoverMessageSigner(signingDataHex: string, signedData: string): string {
+  const dataBuff = ethUtil.toBuffer(signingDataHex)
+  const msgHashBuff = ethUtil.hashPersonalMessage(dataBuff)
+  const signature = ethUtil.fromRpcSig(signedData)
+
+  const publicKey = ethUtil.ecrecover(msgHashBuff, signature.v, signature.r, signature.s)
+  const address = ethUtil.pubToAddress(publicKey, true)
+  return ensureLeading0x(address.toString('hex'))
+}
+
+export function verifyEIP712TypedDataSigner(
+  typedData: EIP712TypedData,
+  signedData: string,
+  expectedAddress: string
+): boolean {
+  const dataBuff = generateTypedDataHash(typedData)
+  const trimmedData = dataBuff.toString('hex')
+  const valid = verifySignature(ensureLeading0x(trimmedData), signedData, expectedAddress)
+  return valid
 }

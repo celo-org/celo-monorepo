@@ -5,6 +5,8 @@
  * `yarn run build:gen-graphql-types`
  */
 
+import BigNumber from 'bignumber.js'
+
 export type Maybe<T> = T | null
 
 /** All built-in and custom scalars, mapped to their actual values */
@@ -16,7 +18,7 @@ export interface Scalars {
   Float: number
   Address: string
   Timestamp: number
-  Decimal: string
+  Decimal: BigNumber.Value
   Upload: any
 }
 
@@ -189,7 +191,7 @@ export interface ExchangeRateQueryVariables {
 
 export interface ExchangeRateQuery {
   __typename?: 'Query'
-  currencyConversion: Maybe<{ __typename?: 'ExchangeRate'; rate: string }>
+  currencyConversion: Maybe<{ __typename?: 'ExchangeRate'; rate: BigNumber.Value }>
 }
 
 export interface ExchangeItemFragment {
@@ -199,35 +201,35 @@ export interface ExchangeItemFragment {
   timestamp: number
   amount: {
     __typename?: 'MoneyAmount'
-    value: string
+    value: BigNumber.Value
     currencyCode: string
     localAmount: Maybe<{
       __typename?: 'LocalMoneyAmount'
-      value: string
+      value: BigNumber.Value
       currencyCode: string
-      exchangeRate: string
+      exchangeRate: BigNumber.Value
     }>
   }
   takerAmount: {
     __typename?: 'MoneyAmount'
-    value: string
+    value: BigNumber.Value
     currencyCode: string
     localAmount: Maybe<{
       __typename?: 'LocalMoneyAmount'
-      value: string
+      value: BigNumber.Value
       currencyCode: string
-      exchangeRate: string
+      exchangeRate: BigNumber.Value
     }>
   }
   makerAmount: {
     __typename?: 'MoneyAmount'
-    value: string
+    value: BigNumber.Value
     currencyCode: string
     localAmount: Maybe<{
       __typename?: 'LocalMoneyAmount'
-      value: string
+      value: BigNumber.Value
       currencyCode: string
-      exchangeRate: string
+      exchangeRate: BigNumber.Value
     }>
   }
 }
@@ -273,13 +275,13 @@ export interface TransferItemFragment {
   comment: Maybe<string>
   amount: {
     __typename?: 'MoneyAmount'
-    value: string
+    value: BigNumber.Value
     currencyCode: string
     localAmount: Maybe<{
       __typename?: 'LocalMoneyAmount'
-      value: string
+      value: BigNumber.Value
       currencyCode: string
-      exchangeRate: string
+      exchangeRate: BigNumber.Value
     }>
   }
 }
@@ -295,7 +297,7 @@ export interface IntrospectionResultData {
     }>
   }
 }
-const result: IntrospectionResultData = {
+export const introspectionQueryResultData: IntrospectionResultData = {
   __schema: {
     types: [
       {
@@ -325,4 +327,3 @@ const result: IntrospectionResultData = {
     ],
   },
 }
-export default result

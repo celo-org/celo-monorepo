@@ -16,7 +16,8 @@ import { parseInputAmount } from '@celo/utils/src/parsing'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
-import { StyleSheet, Text, TextStyle, TouchableWithoutFeedback, View } from 'react-native'
+import { StyleSheet, TextStyle, TouchableWithoutFeedback, View } from 'react-native'
+import { getNumberFormatSettings } from 'react-native-localize'
 import SafeAreaView from 'react-native-safe-area-view'
 import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
@@ -27,6 +28,7 @@ import componentWithAnalytics from 'src/analytics/wrapper'
 import { TokenTransactionType } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import Avatar from 'src/components/Avatar'
+import CurrencyDisplay, { FormatType } from 'src/components/CurrencyDisplay'
 import {
   DOLLAR_TRANSACTION_MIN_AMOUNT,
   MAX_COMMENT_LENGTH,
@@ -40,13 +42,13 @@ import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import { fetchPhoneAddresses } from 'src/identity/actions'
 import { RecipientVerificationStatus } from 'src/identity/contactMapping'
 import { E164NumberToAddressType } from 'src/identity/reducer'
-import { LocalCurrencyCode } from 'src/localCurrency/consts'
+import { LocalCurrencyCode, LocalCurrencySymbol } from 'src/localCurrency/consts'
 import {
   convertDollarsToMaxSupportedPrecision,
   convertLocalAmountToDollars,
 } from 'src/localCurrency/convert'
 import { getLocalCurrencyCode, getLocalCurrencyExchangeRate } from 'src/localCurrency/selectors'
-import { headerWithBackButton } from 'src/navigator/Headers'
+import { HeaderTitleWithBalance, headerWithBackButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import {
@@ -59,10 +61,10 @@ import { RootState } from 'src/redux/reducers'
 import { ConfirmationInput } from 'src/send/SendConfirmation'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { fetchDollarBalance } from 'src/stableToken/actions'
-import { getBalanceColor, getFeeDisplayValue, getMoneyDisplayValue } from 'src/utils/formatting'
+import { withDecimalSeparator } from 'src/utils/withDecimalSeparator'
 
-const AmountInput = withTextInputLabeling<ValidatedTextInputProps<DecimalValidatorProps>>(
-  ValidatedTextInput
+const AmountInput = withDecimalSeparator(
+  withTextInputLabeling<ValidatedTextInputProps<DecimalValidatorProps>>(ValidatedTextInput)
 )
 const CommentInput = withTextInputLabeling<TextInputProps>(TextInput)
 
@@ -144,10 +146,12 @@ const mapStateToProps = (state: RootState, ownProps: NavigationInjectedProps): S
   }
 }
 
+const { decimalSeparator } = getNumberFormatSettings()
+
 export class SendAmount extends React.Component<Props, State> {
   static navigationOptions = () => ({
     ...headerWithBackButton,
-    headerTitle: i18n.t('sendFlow7:sendOrRequest'),
+    headerTitle: <HeaderTitleWithBalance title={i18n.t('sendFlow7:sendOrRequest')} />,
   })
 
   state: State = {
@@ -170,11 +174,12 @@ export class SendAmount extends React.Component<Props, State> {
     if (!recipient.e164PhoneNumber) {
       throw new Error('Missing recipient e164Number')
     }
-    this.props.fetchPhoneAddresses([recipient.e164PhoneNumber])
+    this.props.fetchPhoneAddresses(recipient.e164PhoneNumber)
   }
 
   getDollarsAmount = () => {
-    const parsedInputAmount = parseInputAmount(this.state.amount)
+    const parsedInputAmount = parseInputAmount(this.state.amount, decimalSeparator)
+
     const { localCurrencyExchangeRate } = this.props
 
     const dollarsAmount =
@@ -190,9 +195,10 @@ export class SendAmount extends React.Component<Props, State> {
   }
 
   isAmountValid = () => {
-    const isAmountValid = parseInputAmount(this.state.amount).isGreaterThanOrEqualTo(
-      DOLLAR_TRANSACTION_MIN_AMOUNT
-    )
+    const isAmountValid = parseInputAmount(
+      this.state.amount,
+      decimalSeparator
+    ).isGreaterThanOrEqualTo(DOLLAR_TRANSACTION_MIN_AMOUNT)
     return {
       isAmountValid,
       isDollarBalanceSufficient:
@@ -211,7 +217,6 @@ export class SendAmount extends React.Component<Props, State> {
   getConfirmationInput = (type: TokenTransactionType) => {
     const amount = this.getDollarsAmount()
     const recipient = this.getRecipient()
-    // TODO (Rossy) Remove address field from some recipient types.
     const recipientAddress = getAddressFromRecipient(recipient, this.props.e164NumberToAddress)
 
     const confirmationInput: ConfirmationInput = {
@@ -241,6 +246,12 @@ export class SendAmount extends React.Component<Props, State> {
   }
 
   onSend = () => {
+    const { isDollarBalanceSufficient } = this.isAmountValid()
+    if (!isDollarBalanceSufficient) {
+      this.props.showError(ErrorMessages.NSF_TO_SEND)
+      return
+    }
+
     const verificationStatus = this.getVerificationStatus()
     let confirmationInput: ConfirmationInput
 
@@ -265,7 +276,7 @@ export class SendAmount extends React.Component<Props, State> {
     navigate(Screens.PaymentRequestConfirmation, { confirmationInput })
   }
 
-  renderButtons = (isAmountValid: boolean, isDollarBalanceSufficient: boolean) => {
+  renderButtons = (isAmountValid: boolean) => {
     const { t } = this.props
     const { characterLimitExceeded } = this.state
     const verificationStatus = this.getVerificationStatus()
@@ -276,7 +287,6 @@ export class SendAmount extends React.Component<Props, State> {
       characterLimitExceeded
     const sendDisabled =
       !isAmountValid ||
-      !isDollarBalanceSufficient ||
       characterLimitExceeded ||
       verificationStatus === RecipientVerificationStatus.UNKNOWN
 
@@ -292,6 +302,7 @@ export class SendAmount extends React.Component<Props, State> {
         {verificationStatus !== RecipientVerificationStatus.UNVERIFIED && (
           <View style={style.button}>
             <Button
+              testID="Request"
               onPress={this.onRequest}
               text={t('request')}
               accessibilityLabel={t('request')}
@@ -306,6 +317,7 @@ export class SendAmount extends React.Component<Props, State> {
         </View>
         <View style={style.button}>
           <Button
+            testID="Send"
             onPress={this.onSend}
             text={
               verificationStatus === RecipientVerificationStatus.VERIFIED ? t('send') : t('invite')
@@ -321,16 +333,11 @@ export class SendAmount extends React.Component<Props, State> {
   }
 
   renderBottomContainer = () => {
-    const { isAmountValid, isDollarBalanceSufficient } = this.isAmountValid()
+    const { isAmountValid } = this.isAmountValid()
 
     const onPress = () => {
       if (!isAmountValid) {
         this.props.showError(ErrorMessages.INVALID_AMOUNT)
-        return
-      }
-
-      if (!isDollarBalanceSufficient) {
-        this.props.showError(ErrorMessages.NSF_DOLLARS)
         return
       }
     }
@@ -338,16 +345,15 @@ export class SendAmount extends React.Component<Props, State> {
     if (!isAmountValid) {
       return (
         <TouchableWithoutFeedback onPress={onPress}>
-          {this.renderButtons(false, isDollarBalanceSufficient)}
+          {this.renderButtons(false)}
         </TouchableWithoutFeedback>
       )
     }
-    return this.renderButtons(true, isDollarBalanceSufficient)
+    return this.renderButtons(true)
   }
 
   render() {
     const { t, feeType, estimateFeeDollars, localCurrencyCode } = this.props
-    const newAccountBalance = this.getNewAccountBalance()
     const recipient = this.getRecipient()
     const verificationStatus = this.getVerificationStatus()
 
@@ -359,7 +365,10 @@ export class SendAmount extends React.Component<Props, State> {
         style={style.body}
       >
         {feeType && <EstimateFee feeType={feeType} />}
-        <KeyboardAwareScrollView keyboardShouldPersistTaps="always">
+        <KeyboardAwareScrollView
+          keyboardShouldPersistTaps="always"
+          contentContainerStyle={style.contentContainer}
+        >
           <DisconnectBanner />
           <Avatar
             name={recipient.displayName}
@@ -381,7 +390,11 @@ export class SendAmount extends React.Component<Props, State> {
           </View>
           <AmountInput
             keyboardType="numeric"
-            title={localCurrencyCode ? localCurrencyCode : CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol}
+            title={
+              localCurrencyCode !== LocalCurrencyCode.USD
+                ? LocalCurrencySymbol[localCurrencyCode]
+                : CURRENCIES[CURRENCY_ENUM.DOLLAR].symbol
+            }
             placeholder={t('amount')}
             labelStyle={style.amountLabel as TextStyle}
             placeholderTextColor={colors.celoGreenInactive}
@@ -391,7 +404,6 @@ export class SendAmount extends React.Component<Props, State> {
             autoFocus={true}
             numberOfDecimals={NUMBER_INPUT_MAX_DECIMALS}
             validator={ValidatorKind.Decimal}
-            lng={this.props.i18n.language}
           />
           <CommentInput
             title={t('global:for')}
@@ -405,21 +417,19 @@ export class SendAmount extends React.Component<Props, State> {
               isLoading={!estimateFeeDollars}
               loadingLabelText={t('estimatingFee')}
               labelText={t('estimatedFee')}
-              valueText={getFeeDisplayValue(estimateFeeDollars)}
+              valueText={
+                estimateFeeDollars && (
+                  <CurrencyDisplay
+                    amount={{
+                      value: estimateFeeDollars,
+                      currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
+                    }}
+                    formatType={FormatType.Fee}
+                  />
+                )
+              }
               valueTextStyle={fontStyles.semiBold}
             />
-            <View style={style.balanceContainer}>
-              <Text style={fontStyles.bodySmall}>{t('newAccountBalance')}</Text>
-              <Text
-                style={[
-                  fontStyles.bodySmall,
-                  fontStyles.semiBold,
-                  { color: getBalanceColor(newAccountBalance) },
-                ]}
-              >
-                {getMoneyDisplayValue(newAccountBalance)}
-              </Text>
-            </View>
           </View>
         </KeyboardAwareScrollView>
         {this.renderBottomContainer()}
@@ -430,6 +440,9 @@ export class SendAmount extends React.Component<Props, State> {
 }
 
 const style = StyleSheet.create({
+  contentContainer: {
+    paddingTop: 8,
+  },
   body: {
     flex: 1,
     backgroundColor: 'white',
@@ -484,13 +497,6 @@ const style = StyleSheet.create({
   },
   feeContainer: {
     marginTop: 15,
-  },
-  balanceContainer: {
-    marginTop: 7,
-    marginBottom: 15,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
   },
 })
 

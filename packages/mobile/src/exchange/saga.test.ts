@@ -7,22 +7,6 @@ import { CURRENCY_ENUM } from 'src/geth/consts'
 import { getConnectedAccount } from 'src/web3/saga'
 
 const SELL_AMOUNT = 50 // in dollars/gold (not wei)
-const TOBIN_TAX = { '0': '5000000000000000000000', '1': '1000000000000000000000000' } // Contract returns tuple representing fraction
-
-export const mockGetTobinTax = { call: jest.fn(async () => TOBIN_TAX) }
-export const mockReserveContractWrapper = {
-  methods: {
-    getOrComputeTobinTax: jest.fn(() => mockGetTobinTax),
-  },
-}
-
-jest.mock('src/web3/contracts', () => ({
-  contractKit: {
-    _web3Contracts: {
-      getReserve: () => mockReserveContractWrapper,
-    },
-  },
-}))
 
 describe(doFetchTobinTax, () => {
   beforeAll(() => {

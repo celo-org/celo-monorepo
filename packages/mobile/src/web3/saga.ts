@@ -1,6 +1,8 @@
+import { generateKeys, generateMnemonic, MnemonicStrength } from '@celo/utils/src/account'
+import { privateKeyToAddress } from '@celo/utils/src/address'
 import { deriveCEK } from '@celo/utils/src/commentEncryption'
 import * as Sentry from '@sentry/react-native'
-import { generateMnemonic, mnemonicToSeedHex } from 'react-native-bip39'
+import * as bip39 from 'react-native-bip39'
 import { REHYDRATE } from 'redux-persist/es/constants'
 import { call, delay, put, race, select, spawn, take, takeLatest } from 'redux-saga/effects'
 import { setAccountCreationTime, setPromptForno } from 'src/account/actions'
@@ -12,6 +14,7 @@ import { CustomEventNames } from 'src/analytics/constants'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { currentLanguageSelector } from 'src/app/reducers'
 import { getWordlist } from 'src/backup/utils'
+import { features } from 'src/flags'
 import { cancelGethSaga } from 'src/geth/actions'
 import { UNLOCK_DURATION } from 'src/geth/consts'
 import { deleteChainData, stopGethIfInitialized } from 'src/geth/geth'
@@ -34,20 +37,19 @@ import {
   updateWeb3SyncProgress,
   Web3SyncProgress,
 } from 'src/web3/actions'
-import { addLocalAccount, switchWeb3ProviderForSyncMode, web3 } from 'src/web3/contracts'
+import { addLocalAccount, getContractKit, switchWeb3ProviderForSyncMode } from 'src/web3/contracts'
 import { readPrivateKeyFromLocalDisk, savePrivateKeyToLocalDisk } from 'src/web3/privateKey'
 import {
   currentAccountInWeb3KeystoreSelector,
   currentAccountSelector,
   fornoSelector,
 } from 'src/web3/selectors'
-import { getAccountAddressFromPrivateKey, getLatestBlock, isAccountLocked } from 'src/web3/utils'
-import { Block } from 'web3/eth/types'
+import { getLatestBlock, isAccountLocked } from 'src/web3/utils'
+import { Block } from 'web3-eth'
 
 const TAG = 'web3/saga'
 
-const ETH_PRIVATE_KEY_LENGTH = 64
-const MNEMONIC_BIT_LENGTH = (ETH_PRIVATE_KEY_LENGTH * 8) / 2
+const MNEMONIC_BIT_LENGTH = MnemonicStrength.s256_24words
 // The timeout for web3 to complete syncing and the latestBlock to be > 0
 export const SYNC_TIMEOUT = 2 * 60 * 1000 // 2 minutes
 const BLOCK_CHAIN_CORRUPTION_ERROR = "Error: CONNECTION ERROR: Couldn't connect to node on IPC."
@@ -64,7 +66,7 @@ export function* checkWeb3SyncProgress() {
       let syncProgress: boolean | Web3SyncProgress
 
       // isSyncing returns a syncProgress object when it's still syncing, false otherwise
-      syncProgress = yield call(web3.eth.isSyncing)
+      syncProgress = yield call(getContractKit().web3.eth.isSyncing)
 
       if (typeof syncProgress === 'boolean' && !syncProgress) {
         Logger.debug(TAG, 'checkWeb3SyncProgress', 'Sync maybe complete, checking')
@@ -85,7 +87,7 @@ export function* checkWeb3SyncProgress() {
       yield delay(WEB3_MONITOR_DELAY) // wait 100ms while web3 syncs then check again
       syncLoops += 1
       if (syncLoops * WEB3_MONITOR_DELAY > SWITCH_TO_FORNO_TIMEOUT) {
-        if (yield select(promptFornoIfNeededSelector)) {
+        if (yield select(promptFornoIfNeededSelector) && features.DATA_SAVER) {
           yield put(setPromptForno(false))
           navigate(Screens.DataSaver, { promptModalVisible: true })
           return true
@@ -146,7 +148,7 @@ export function* getOrCreateAccount() {
     Logger.debug(TAG + '@getOrCreateAccount', 'Creating a new account')
 
     const wordlist = getWordlist(yield select(currentLanguageSelector))
-    let mnemonic: string = yield call(generateMnemonic, MNEMONIC_BIT_LENGTH, null, wordlist)
+    let mnemonic: string = yield call(generateMnemonic, MNEMONIC_BIT_LENGTH, wordlist, bip39)
 
     // Ensure no duplicates in mnemonic
     const checkDuplicate = (someString: string) => {
@@ -155,7 +157,7 @@ export function* getOrCreateAccount() {
     let duplicateInMnemonic = checkDuplicate(mnemonic)
     while (duplicateInMnemonic) {
       Logger.debug(TAG + '@getOrCreateAccount', 'Regenerating mnemonic to avoid duplicates')
-      mnemonic = yield call(generateMnemonic, MNEMONIC_BIT_LENGTH, null, wordlist)
+      mnemonic = yield call(generateMnemonic, MNEMONIC_BIT_LENGTH, wordlist, bip39)
       duplicateInMnemonic = checkDuplicate(mnemonic)
     }
 
@@ -163,7 +165,8 @@ export function* getOrCreateAccount() {
       throw new Error('Failed to generate mnemonic')
     }
 
-    const privateKey = yield call(mnemonicToSeedHex, mnemonic)
+    const keys = yield call(generateKeys, mnemonic, undefined, undefined, bip39)
+    const privateKey = keys.privateKey
     if (!privateKey) {
       throw new Error('Failed to convert mnemonic to hex')
     }
@@ -186,7 +189,7 @@ export function* getOrCreateAccount() {
 
 export function* assignAccountFromPrivateKey(privateKey: string) {
   try {
-    const pincode = yield call(getPincode)
+    const pincode = yield call(getPincode, false)
     if (!pincode) {
       Logger.error(TAG + '@assignAccountFromPrivateKey', 'Got falsy pin')
       throw Error('Cannot create account without having the pin set')
@@ -195,17 +198,17 @@ export function* assignAccountFromPrivateKey(privateKey: string) {
     // Save the account to a local file on the disk.
     // This is done for all sync modes, to allow users to switch into forno mode.
     // Note that if geth is running it saves the key using web3.personal.
-    const account = getAccountAddressFromPrivateKey(privateKey)
+    const account = privateKeyToAddress(privateKey)
     yield call(savePrivateKeyToLocalDisk, account, privateKey, pincode)
 
     const fornoMode = yield select(fornoSelector)
+    const contractKit = getContractKit()
     if (fornoMode) {
       Logger.debug(TAG + '@assignAccountFromPrivateKey', 'Init web3 with private key')
-      addLocalAccount(web3, privateKey)
+      addLocalAccount(privateKey, true)
     } else {
       try {
-        // @ts-ignore
-        yield call(web3.eth.personal.importRawKey, privateKey, pincode)
+        yield call(contractKit.web3.eth.personal.importRawKey, privateKey, pincode)
       } catch (e) {
         if (e.toString().includes('account already exists')) {
           Logger.warn(TAG + '@assignAccountFromPrivateKey', 'Attempted to import same account')
@@ -214,8 +217,8 @@ export function* assignAccountFromPrivateKey(privateKey: string) {
           throw e
         }
       }
-      yield call(web3.eth.personal.unlockAccount, account, pincode, UNLOCK_DURATION)
-      web3.eth.defaultAccount = account
+      yield call(contractKit.web3.eth.personal.unlockAccount, account, pincode, UNLOCK_DURATION)
+      contractKit.web3.eth.defaultAccount = account
     }
 
     Logger.debug(TAG + '@assignAccountFromPrivateKey', `Added to wallet: ${account}`)
@@ -264,7 +267,7 @@ export function* unlockAccount(account: string) {
       return true
     }
 
-    const pincode = yield call(getPincode)
+    const pincode = yield call(getPincode, true)
     const fornoMode = yield select(fornoSelector)
     if (fornoMode) {
       if (accountAlreadyAddedInFornoMode) {
@@ -272,12 +275,17 @@ export function* unlockAccount(account: string) {
       } else {
         Logger.info(TAG + '@unlockAccount', `unlockDuration is ignored in forno mode`)
         const privateKey: string = yield readPrivateKeyFromLocalDisk(account, pincode)
-        addLocalAccount(web3, privateKey)
+        addLocalAccount(privateKey, true)
         accountAlreadyAddedInFornoMode = true
       }
       return true
     } else {
-      yield call(web3.eth.personal.unlockAccount, account, pincode, UNLOCK_DURATION)
+      yield call(
+        getContractKit().web3.eth.personal.unlockAccount,
+        account,
+        pincode,
+        UNLOCK_DURATION
+      )
       Logger.debug(TAG + '@unlockAccount', `Account unlocked: ${account}`)
       return true
     }
@@ -311,13 +319,13 @@ export function* addAccountToWeb3Keystore(key: string, currentAccount: string, p
   let account: string
   Logger.debug(TAG + '@addAccountToWeb3Keystore', `using key ${key} for account ${currentAccount}`)
   const fornoMode = yield select(fornoSelector)
+  const contractKit = getContractKit()
   if (fornoMode) {
     // web3.eth.personal is not accessible in forno mode
     throw new Error('Cannot add account to Web3 keystore while in forno mode')
   }
   try {
-    // @ts-ignore
-    account = yield call(web3.eth.personal.importRawKey, key, pincode)
+    account = yield call(contractKit.web3.eth.personal.importRawKey, key, pincode)
     Logger.debug(
       TAG + '@addAccountToWeb3Keystore',
       `Successfully imported raw key for account ${account}`
@@ -333,8 +341,8 @@ export function* addAccountToWeb3Keystore(key: string, currentAccount: string, p
       throw e
     }
   }
-  yield call(web3.eth.personal.unlockAccount, account, pincode, UNLOCK_DURATION)
-  web3.eth.defaultAccount = account
+  yield call(contractKit.web3.eth.personal.unlockAccount, account, pincode, UNLOCK_DURATION)
+  contractKit.web3.eth.defaultAccount = account
   return account
 }
 
@@ -347,7 +355,7 @@ export function* ensureAccountInWeb3Keystore() {
         TAG + '@ensureAccountInWeb3Keystore',
         'Importing account from private key to web3 keystore'
       )
-      const pincode = yield call(getPincode)
+      const pincode = yield call(getPincode, true)
       const privateKey: string = yield call(readPrivateKeyFromLocalDisk, currentAccount, pincode)
       const account: string = yield call(
         addAccountToWeb3Keystore,
@@ -378,7 +386,7 @@ export function* switchToGethFromForno() {
       // Call any method on web3 to avoid a persist state issue
       // This is a temporary workaround as this restart will be
       // removed when the geth issue is resolved
-      yield call(web3.eth.isSyncing)
+      yield call(getContractKit().web3.eth.isSyncing)
       // If geth is started twice within the same session,
       // there is an issue where it cannot find deployed contracts.
       // Restarting the app fixes this issue.
@@ -415,7 +423,7 @@ export function* switchToFornoFromGeth() {
     // when blocks stop syncing.
     yield call(waitForWeb3Sync)
   } catch (e) {
-    Logger.error(TAG + '@switchToGethFromForno', 'Error switching to forno from geth')
+    Logger.error(TAG + '@switchToFornoFromGeth', 'Error switching to forno from geth')
     yield put(showError(ErrorMessages.FAILED_TO_SWITCH_SYNC_MODES))
   }
 }

@@ -1,6 +1,10 @@
+# Celo Faucet
+
+A firebase function that creates invites and/or faucets addresses
+
 ## Faucet Deployment Configuration
 
-Faucet firebase function requires a few configuration variables to work:
+The function requires a few configuration variables to work:
 
 - nodeUrl: The url for the node the faucet server will use to send transactions
 - stableTokenAddress: The StableToken contract's address

@@ -27,7 +27,6 @@ import Security from 'src/account/Security'
 import Support from 'src/account/Support'
 import SupportContact from 'src/account/SupportContact'
 import AppLoading from 'src/app/AppLoading'
-import Background from 'src/app/Background'
 import Debug from 'src/app/Debug'
 import ErrorScreen from 'src/app/ErrorScreen'
 import UpgradeScreen from 'src/app/UpgradeScreen'
@@ -49,7 +48,6 @@ import ImportWallet from 'src/import/ImportWallet'
 import ImportWalletEmpty from 'src/import/ImportWalletEmpty'
 import ImportWalletSocial from 'src/import/ImportWalletSocial'
 import EnterInviteCode from 'src/invite/EnterInviteCode'
-import JoinCelo from 'src/invite/JoinCelo'
 import Language from 'src/language/Language'
 import SelectLocalCurrency from 'src/localCurrency/SelectLocalCurrency'
 import { Screens, Stacks } from 'src/navigator/Screens'
@@ -57,11 +55,13 @@ import TabNavigator from 'src/navigator/TabNavigator'
 import IncomingPaymentRequestListScreen from 'src/paymentRequest/IncomingPaymentRequestListScreen'
 import OutgoingPaymentRequestListScreen from 'src/paymentRequest/OutgoingPaymentRequestListScreen'
 import PaymentRequestConfirmation from 'src/paymentRequest/PaymentRequestConfirmation'
-import PincodeConfirmation from 'src/pincode/PincodeConfirmation'
 import PincodeEducation from 'src/pincode/PincodeEducation'
+import PincodeEnter from 'src/pincode/PincodeEnter'
 import PincodeSet from 'src/pincode/PincodeSet'
 import QRCode from 'src/qrcode/QRCode'
 import QRScanner from 'src/qrcode/QRScanner'
+import JoinCelo from 'src/registration/JoinCelo'
+import RegulatoryTerms from 'src/registration/RegulatoryTerms'
 import FeeEducation from 'src/send/FeeEducation'
 import Send from 'src/send/Send'
 import SendAmount from 'src/send/SendAmount'
@@ -100,7 +100,7 @@ export const headerArea: CreateNavigatorConfig<
 }
 
 export const commonScreens = {
-  [Screens.PincodeConfirmation]: { screen: PincodeConfirmation },
+  [Screens.PincodeEnter]: { screen: PincodeEnter },
   [Screens.ErrorScreen]: { screen: ErrorScreen },
   [Screens.UpgradeScreen]: { screen: UpgradeScreen },
   [Screens.DappKitAccountAuth]: { screen: DappKitAccountScreen },
@@ -108,7 +108,6 @@ export const commonScreens = {
   [Screens.DappKitTxDataScreen]: { screen: DappKitTxDataScreen },
   [Screens.Debug]: { screen: Debug },
   [Screens.DataSaver]: { screen: DataSaver },
-  [Screens.Background]: { screen: Background },
 }
 
 const verificationScreens = {
@@ -124,6 +123,7 @@ const NuxStack = createStackNavigator(
   {
     [Screens.Language]: { screen: Language },
     [Screens.JoinCelo]: { screen: JoinCelo },
+    [Screens.RegulatoryTerms]: { screen: RegulatoryTerms },
     [Screens.PincodeEducation]: { screen: PincodeEducation },
     [Screens.PincodeSet]: { screen: PincodeSet },
     [Screens.EnterInviteCode]: { screen: EnterInviteCode },
@@ -293,6 +293,8 @@ const AppStack = createStackNavigator(
     [Screens.ReclaimPaymentConfirmationScreen]: {
       screen: ReclaimPaymentConfirmationScreen,
     },
+    // Adding this stack, so it possbile to go back to Home screen from it
+    [Stacks.BackupStack]: { screen: BackupStack },
     [Stacks.QRSendStack]: { screen: QRSendStack },
     [Stacks.ExchangeStack]: { screen: ExchangeStack },
     [Stacks.IncomingRequestStack]: { screen: IncomingRequestStack },
@@ -316,12 +318,12 @@ const AppStack = createStackNavigator(
 
 const AppNavigator = createSwitchNavigator(
   {
-    AppLoading,
+    [Screens.AppLoading]: AppLoading,
     [Stacks.NuxStack]: NuxStack,
     [Stacks.AppStack]: AppStack,
   },
   {
-    initialRouteName: 'AppLoading',
+    initialRouteName: Screens.AppLoading,
   }
 )
 

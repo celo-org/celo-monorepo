@@ -18,7 +18,7 @@ reference:
 defaults: &defaults
   working_directory: ~/app
   docker:
-    - image: celohq/node10-gcloud
+    - image: celohq/node10-gcloud:v2
   environment:
     # To avoid ENOMEM problem when running node
     NODE_OPTIONS: '--max-old-space-size=4096'
@@ -34,10 +34,9 @@ android-defaults: &android-defaults
 e2e-defaults: &e2e-defaults
   <<: *defaults
   docker:
-    - image: celohq/circleci:geth1.9
+    - image: celohq/circleci:geth1.9-2
   environment:
-    CELO_BLOCKCHAIN_BRANCH_TO_TEST: mrsmkl/gas-payment-change-m02-alt
-
+    CELO_BLOCKCHAIN_BRANCH_TO_TEST: master
 general:
   artifacts:
     - 'mobile/coverage'
@@ -99,6 +98,10 @@ commands:
               echo "There are git differences after running yarn install"
               exit 1
             fi
+      - run:
+          name: Fail if there are vulnerabilities in packages
+          command: |
+            /bin/bash -c 'yarn audit --groups dependencies --level high; [[ $? -ge 8 ]] && exit 1 || exit 0'
 
       # Workaround save_cache not supporting globbing for the paths key
       # see note in https://circleci.com/docs/2.0/caching/#basic-example-of-dependency-caching and https://ideas.circleci.com/ideas/CCI-I-239
@@ -157,9 +160,8 @@ jobs:
             # separate build to avoid ENOMEM in CI :(
             yarn build --scope @celo/utils
             yarn build --scope @celo/protocol
-            yarn build --scope @celo/walletkit
-            yarn build --ignore @celo/protocol --ignore docs --ignore @celo/walletkit --ignore @celo/web
-
+            yarn build --ignore @celo/protocol --ignore docs
+                
       - run:
           name: Check licenses
           command: |
@@ -410,7 +412,7 @@ jobs:
             set -euo pipefail
             cd packages/mobile
             # Create dummy Google services plist
-            /usr/libexec/PlistBuddy -c "Save" ios/GoogleService-Info.plist
+            /usr/libexec/PlistBuddy -c "Save" ios/GoogleService-Info.dev.plist
             yarn run test:e2e:ios
       - store_artifacts:
           path: packages/mobile/e2e/artifacts
@@ -436,7 +438,7 @@ jobs:
           name: jest tests
           command: |
             mkdir -p test-results/jest
-            yarn run lerna --ignore @celo/contractkit --ignore @celo/mobile --ignore @celo/protocol --ignore @celo/celotool --ignore @celo/walletkit --ignore @celo/celocli run test
+            yarn run lerna --ignore @celo/contractkit --ignore @celo/mobile --ignore @celo/protocol --ignore @celo/celotool --ignore @celo/celocli run test
 
       - store_test_results:
           path: test-results
@@ -579,27 +581,6 @@ jobs:
               echo "There are git differences after generating contractkit docs"
               exit 1
             fi
-
-  walletkit-test:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: ~/app
-      - run:
-          name: test alphanet
-          command: |
-            # Test alphanet
-            set -euo pipefail
-            yarn --cwd=packages/walletkit build alfajores
-            yarn --cwd=packages/walletkit test
-
-      - run:
-          name: test alphanet staging
-          command: |
-            # Test alphanet
-            set -euo pipefail
-            yarn --cwd=packages/walletkit build alfajoresstaging
-            yarn --cwd=packages/walletkit test
 
   cli-test:
     <<: *defaults
@@ -821,18 +802,6 @@ jobs:
             # to deal with scenarios like https://circleci.com/gh/celo-org/celo-monorepo/23329
             yarn add @celo/contractkit || yarn add @celo/contractkit
 
-  test-walletkit-npm-package-install:
-    working_directory: ~/app
-    docker:
-      - image: celohq/node10-gcloud
-    steps:
-      - run:
-          name: Installing npm package - @celo/walletkit
-          command: |
-            # Try one more time in case the first attempt fails
-            # to deal with scenarios like https://circleci.com/gh/celo-org/celo-monorepo/23329
-            yarn add @celo/walletkit || yarn add @celo/walletkit
-
   test-celocli-npm-package-install:
     working_directory: ~/app
     docker:
@@ -891,6 +860,16 @@ jobs:
     #       echo $(pwd)
     #       cd ~/app/
     #       packages/celotool/bin/celotooljs.sh deploy initial celostats -e ${CI_INTEGRATION_ENV} --verbose 2>&1
+          
+  phone-number-privacy-test:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/app
+      - run:
+          name: Run Tests
+          command: yarn --cwd=packages/phone-number-privacy test
+
 workflows:
   version: 2
   celo-monorepo-build:
@@ -900,9 +879,6 @@ workflows:
           requires:
             - install_dependencies
       - general-test:
-          requires:
-            - install_dependencies
-      - walletkit-test:
           requires:
             - install_dependencies
       - cli-test:
@@ -924,7 +900,6 @@ workflows:
       - protocol-test:
           requires:
             - lint-checks
-            - walletkit-test
       - typescript-test:
           requires:
             - install_dependencies
@@ -958,6 +933,9 @@ workflows:
       - integration-celotool-install:
           requires:
             - lint-checks
+      - phone-number-privacy-test:
+          requires:
+            - lint-checks
   npm-install-testing-cron-workflow:
     triggers:
       - schedule:
@@ -971,7 +949,6 @@ workflows:
     jobs:
       - test-typescript-npm-package-install
       - test-utils-npm-package-install
-      - test-walletkit-npm-package-install
       - test-contractkit-npm-package-install
       - test-celocli-npm-package-install
   protocol-testing-with-code-coverage-cron-workflow:
@@ -987,9 +964,6 @@ workflows:
     jobs:
       - install_dependencies
       - lint-checks:
-          requires:
-            - install_dependencies
-      - walletkit-test:
           requires:
             - install_dependencies
       - protocol-test-with-code-coverage:

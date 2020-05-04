@@ -1,4 +1,4 @@
-import AirtableAPI from 'airtable'
+import AirtableAPI, { Attachment } from 'airtable'
 import getConfig from 'next/config'
 
 let airTableSingleton: AirtableAPI
@@ -28,4 +28,23 @@ export interface AirRecord<Fields> {
     createdTime: string
   }
   _table: AirtableAPI.Table<AirtableAPI.FieldSet>
+}
+
+export enum ImageSizes {
+  large = 'large',
+  small = 'small',
+}
+
+export function getImageURI(previewField: Attachment[], size: ImageSizes) {
+  const thumb = getThumbnail(previewField, size)
+  return thumb ? thumb.url : ''
+}
+
+export function getWidthAndHeight(imageField: Attachment[]) {
+  const thumb = getThumbnail(imageField, ImageSizes.large)
+  return thumb ? { width: thumb.width, height: thumb.height } : { width: 1, height: 1 }
+}
+
+function getThumbnail(imageField: Attachment[], size: ImageSizes) {
+  return imageField && imageField[0] && imageField[0].thumbnails && imageField[0].thumbnails[size]
 }

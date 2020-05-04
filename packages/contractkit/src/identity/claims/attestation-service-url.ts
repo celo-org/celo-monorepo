@@ -25,9 +25,9 @@ export const createAttestationServiceURLClaim = (url: string): AttestationServic
 })
 
 export async function validateAttestationServiceUrl(
+  kit: ContractKit,
   claim: AttestationServiceURLClaim,
-  address: Address,
-  kit: ContractKit
+  address: Address
 ): Promise<string | undefined> {
   try {
     const randomMessage = kit.web3.utils.randomHex(32)
@@ -57,10 +57,9 @@ export async function validateAttestationServiceUrl(
 
     const attestationKeyAddress = await accounts.getAttestationSigner(address)
 
-    // Uncomment this once we opt in by specifying an attestation key
-    // if (attestationKeyAddress === '0x0' || eqAddress(address, attestationKeyAddress)) {
-    //   return `The account has not specified a separate attestation key`
-    // }
+    if (attestationKeyAddress === '0x0' || eqAddress(address, attestationKeyAddress)) {
+      return `The account has not specified a separate attestation key`
+    }
 
     if (
       !parsedResponse.right.signature ||

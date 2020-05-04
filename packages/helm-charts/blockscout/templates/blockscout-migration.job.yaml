@@ -12,7 +12,7 @@ spec:
   template:
     spec:
       containers:
-      - name: blockscout-web
+      - name: blockscout-migration
         image: {{ .Values.blockscout.image.repository }}:{{ .Values.blockscout.image.tag }}
         imagePullPolicy: {{ .Values.imagePullPolicy }}
         command:
@@ -20,8 +20,8 @@ spec:
         - -c
         args:
         - |
-           [ ${DROP_DB} = "true" ] && mix do ecto.drop
-           mix do ecto.create, ecto.migrate
+           [ ${DROP_DB} == "true" ] && mix do ecto.drop, ecto.create
+           mix do ecto.migrate
         resources:
           requests:
             memory: 250M

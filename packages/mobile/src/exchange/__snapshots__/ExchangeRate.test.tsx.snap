@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`isnt overly precise, it rounds 1`] = `
+exports[`renders correctly for cGLD->cUSD exchanges with local amounts 1`] = `
 <View
   style={
     Object {
@@ -9,87 +9,51 @@ exports[`isnt overly precise, it rounds 1`] = `
     }
   }
 >
-  <Text
-    style={
-      Array [
-        Object {
-          "textAlign": "center",
-        },
-        Object {
-          "color": "#81868B",
-          "fontFamily": "Hind-Regular",
-          "fontSize": 16,
-          "lineHeight": 24,
-        },
-      ]
-    }
-  >
-    exchangeRate
-  </Text>
-  <Text
-    style={
-      Object {
-        "color": "#2E3338",
-        "textAlign": "center",
-      }
-    }
-  >
-     0.8573 cUSD : 1 cGLD
-  </Text>
-</View>
-`;
-
-exports[`renders correctly with an exchange rate  and show fine print 1`] = `
-<View
-  style={
-    Object {
-      "justifyContent": "center",
-      "paddingVertical": 10,
-    }
-  }
->
-  <Text
-    style={
-      Array [
-        Object {
-          "textAlign": "center",
-        },
-        Object {
-          "color": "#81868B",
-          "fontFamily": "Hind-Regular",
-          "fontSize": 16,
-          "lineHeight": 24,
-        },
-      ]
-    }
-  >
-    exchangeRate
-  </Text>
-  <Text
-    style={
-      Object {
-        "color": "#2E3338",
-        "textAlign": "center",
-      }
-    }
-  >
-     0.1 cGLD : 1 cUSD
-  </Text>
   <Text
     style={
       Object {
         "color": "#81868B",
-        "fontSize": 12,
+        "fontFamily": "Hind-Regular",
+        "fontSize": 16,
+        "lineHeight": 24,
         "textAlign": "center",
       }
     }
   >
-    includeExchangeFee
+    exchangeRate
+  </Text>
+  <Text
+    style={
+      Object {
+        "color": "#2E3338",
+        "textAlign": "center",
+      }
+    }
+    testID="ExchangeRateRatio"
+  >
+    <Text
+      numberOfLines={1}
+      style={
+        Array [
+          undefined,
+          Object {
+            "color": undefined,
+          },
+        ]
+      }
+    >
+      
+      0.1333
+       cGLD
+    </Text>
+     
+    : 1 
+    EUR
   </Text>
 </View>
 `;
 
-exports[`renders correctly with infinity exchange rate 1`] = `
+exports[`renders correctly for cGLD->cUSD exchanges without local amounts 1`] = `
 <View
   style={
     Object {
@@ -100,25 +64,49 @@ exports[`renders correctly with infinity exchange rate 1`] = `
 >
   <Text
     style={
-      Array [
-        Object {
-          "textAlign": "center",
-        },
-        Object {
-          "color": "#81868B",
-          "fontFamily": "Hind-Regular",
-          "fontSize": 16,
-          "lineHeight": 24,
-        },
-      ]
+      Object {
+        "color": "#81868B",
+        "fontFamily": "Hind-Regular",
+        "fontSize": 16,
+        "lineHeight": 24,
+        "textAlign": "center",
+      }
     }
   >
-    loadingExchangeRate
+    exchangeRate
+  </Text>
+  <Text
+    style={
+      Object {
+        "color": "#2E3338",
+        "textAlign": "center",
+      }
+    }
+    testID="ExchangeRateRatio"
+  >
+    <Text
+      numberOfLines={1}
+      style={
+        Array [
+          undefined,
+          Object {
+            "color": undefined,
+          },
+        ]
+      }
+    >
+      
+      0.1
+       cGLD
+    </Text>
+     
+    : 1 
+    cUSD
   </Text>
 </View>
 `;
 
-exports[`renders correctly with no exchange rate 1`] = `
+exports[`renders correctly for cUSD->cGLD exchanges with local amounts 1`] = `
 <View
   style={
     Object {
@@ -129,20 +117,97 @@ exports[`renders correctly with no exchange rate 1`] = `
 >
   <Text
     style={
-      Array [
-        Object {
-          "textAlign": "center",
-        },
-        Object {
-          "color": "#81868B",
-          "fontFamily": "Hind-Regular",
-          "fontSize": 16,
-          "lineHeight": 24,
-        },
-      ]
+      Object {
+        "color": "#81868B",
+        "fontFamily": "Hind-Regular",
+        "fontSize": 16,
+        "lineHeight": 24,
+        "textAlign": "center",
+      }
     }
   >
-    loadingExchangeRate
+    exchangeRate
+  </Text>
+  <Text
+    style={
+      Object {
+        "color": "#2E3338",
+        "textAlign": "center",
+      }
+    }
+    testID="ExchangeRateRatio"
+  >
+    <Text
+      numberOfLines={1}
+      style={
+        Array [
+          undefined,
+          Object {
+            "color": undefined,
+          },
+        ]
+      }
+    >
+      
+      7.5
+       EUR
+    </Text>
+     
+    : 1 
+    cGLD
+  </Text>
+</View>
+`;
+
+exports[`renders correctly for cUSD->cGLD exchanges without local amounts 1`] = `
+<View
+  style={
+    Object {
+      "justifyContent": "center",
+      "paddingVertical": 10,
+    }
+  }
+>
+  <Text
+    style={
+      Object {
+        "color": "#81868B",
+        "fontFamily": "Hind-Regular",
+        "fontSize": 16,
+        "lineHeight": 24,
+        "textAlign": "center",
+      }
+    }
+  >
+    exchangeRate
+  </Text>
+  <Text
+    style={
+      Object {
+        "color": "#2E3338",
+        "textAlign": "center",
+      }
+    }
+    testID="ExchangeRateRatio"
+  >
+    <Text
+      numberOfLines={1}
+      style={
+        Array [
+          undefined,
+          Object {
+            "color": undefined,
+          },
+        ]
+      }
+    >
+      
+      10
+       cUSD
+    </Text>
+     
+    : 1 
+    cGLD
   </Text>
 </View>
 `;

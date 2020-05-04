@@ -32,7 +32,10 @@ const PAGES = [
   {
     title: 'Introduction',
     href: ROOT,
-    sections: [],
+    sections: [
+      { title: 'Overview', href: `${ROOT}#${hashNav.brandIntro.overview}` },
+      { title: 'Brand Voice', href: `${ROOT}#${hashNav.brandIntro.brandVoice}` },
+    ],
   },
   {
     title: 'Logo',
@@ -245,7 +248,7 @@ class Page extends React.Component<Props & ScreenProps, State> {
     return (
       <>
         <OpenGraph
-          title={`Celo Experience / Brand Kit / ${title}`}
+          title={`Celo Experience / BrandKit / ${title}`}
           path={path}
           description={metaDescription}
           image={require('src/brandkit/images/ogimage-brandkit.png')}
