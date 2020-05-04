@@ -14,6 +14,7 @@ export const describe = 'upgrades a typical deploy'
 type TestnetArgv = UpgradeArgv & {
   reset: boolean
   useExistingGenesis: boolean
+  skipPortForward: boolean
 }
 
 export const builder = (argv: yargs.Argv) => {
@@ -26,6 +27,11 @@ export const builder = (argv: yargs.Argv) => {
     .option('useExistingGenesis', {
       type: 'boolean',
       description: 'Instead of generating a new genesis, use an existing genesis in GCS',
+      default: false,
+    })
+    .option('skipPortForward', {
+      type: 'boolean',
+      description: 'Skip port-forward to validator-0 when for the migrations',
       default: false,
     })
 }

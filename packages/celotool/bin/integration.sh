@@ -72,18 +72,15 @@ else
 fi
 
 # Deploy the contracts
-"$DIR/celotooljs.sh" deploy initial contracts -e ${ENV} ${VERBOSE_OPTS} 2>&1 | grep -v "Handling connection for 8545" | tee "${LOGS_DIR}/migration.log" &
-pid=$!
-contracts_timeout=600 #seconds
+kubectl port-forward -n ${NAMESPACE} ${ENV}-validators-0 8545:8545 &
+PID_PORT_FORWARD=$!
+"$DIR/celotooljs.sh" deploy initial contracts -e ${ENV} --skipPortForward ${VERBOSE_OPTS} | tee "${LOGS_DIR}/migration.log" 2>&1
+if [ $? = 1 ]; then
+  CONTRACTS_FAILED=true
+fi
+kill ${PID_PORT_FORWARD}
 CONTRACTS_FAILED=True
-while [[ "${CONTRACTS_FAILED}" == "True" ]] || ! [[ contracts_timeout -gt 0 ]]; do
-  if fgrep --quiet "Contracs deployed successfully to scenario2" "${LOGS_DIR}/migration.log"; then
-    kill $pid
-    CONTRACTS_FAILED=False
-  fi
-  sleep 10
-  contracts_timeout="$((contracts_timeout-10))"
-done
+
 if [[ ${CONTRACTS_FAILED} == "True" ]]; then
   echo "Contract Deployment failed"
   exit 1

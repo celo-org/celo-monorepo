@@ -14,15 +14,24 @@ import { migrationOverrides, truffleOverrides, validatorKeys } from 'src/lib/mig
 import { portForwardAnd } from 'src/lib/port_forward'
 import { uploadFileToGoogleStorage } from 'src/lib/testnet-utils'
 import { execCmd } from 'src/lib/utils'
+import yargs from 'yargs'
 import { InitialArgv } from '../../deploy/initial'
 
 export const command = 'contracts'
 
 export const describe = 'deploy the celo smart contracts'
 
-export const builder = {}
-
 export const CLABS_VALIDATOR_METADATA_BUCKET = 'clabs_validator_metadata'
+
+export const builder = (argv: yargs.Argv) => {
+  return argv.option('skipPortForward', {
+    type: 'boolean',
+    description: 'If you know that you can skip the port-forward command',
+    default: false,
+  })
+}
+
+type ContractsInitialArgv = InitialArgv & { skipPortForward: boolean }
 
 function getAttestationServiceUrl(testnet: string, index: number) {
   return `https://${testnet}-attestation-service.${fetchEnv(
@@ -72,7 +81,7 @@ export async function registerMetadata(testnet: string, privateKey: string, inde
     .sendAndWaitForReceipt()
 }
 
-export const handler = async (argv: InitialArgv) => {
+export const handler = async (argv: ContractsInitialArgv) => {
   await switchToClusterFromEnv()
 
   console.log(`Deploying smart contracts to ${argv.celoEnv}`)
@@ -91,8 +100,12 @@ export const handler = async (argv: InitialArgv) => {
   }
 
   try {
-    await portForwardAnd(argv.celoEnv, cb)
-    // await uploadArtifacts(argv.celoEnv)
+    if (!argv.skipPortForward === true) {
+      await portForwardAnd(argv.celoEnv, cb)
+    } else {
+      await cb()
+    }
+    await uploadArtifacts(argv.celoEnv)
     console.log(`Contracs deployed successfully to ${argv.celoEnv}`)
     return
   } catch (error) {
