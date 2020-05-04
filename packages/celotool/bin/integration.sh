@@ -9,11 +9,11 @@ clean_env() {
   kubectl get namespace "${ENV}" && kubectl delete namespace "${ENV}"
 }
 
-# ENV=${$1:-integration}
+ENV=${$1:-integration}
 VERBOSE_OPTS=" --verbose"
 CLEAN_ENV="true"
 # VERBOSE_OPTS=""
-ENV=scenario2
+# ENV=scenario2
 NAMESPACE=$ENV
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
