@@ -4,35 +4,25 @@
 
 Validators play a critical role in the Celo protocol, determining which transactions get applied and producing new blocks. Selecting organizations that operate well-run infrastructure to perform this role effectively is essential for Celo's long-term success.
 
-The Celo community makes these decisions through elections for [Validator Groups](../celo-codebase/protocol/proof-of-stake/validator-groups.md), intermediaries between voters and validators. Every validator group has an ordered list of up to 5 candidate validators. Some organizations may operate a group with their own validators in it; some may operate a group to which they have added validators run by others. Since validator group rewards and penalties are closely tied to those of the validators themselves, the best groups will carefully audit and support their validators.
+The Celo community makes these decisions through elections for [Validator Groups](../celo-codebase/protocol/proof-of-stake/validator-groups.md), intermediaries between voters and validators. Every validator group has an ordered list of up to 5 candidate validators. Some organizations may operate a group with their own validators in it; some may operate a group to which they have added validators run by others.
 
-If you hold Celo Gold (or are a beneficiary of a [`ReleaseGold` contract](release-gold.md) that allows voting), you can vote for Validator Groups. This page discusses considerations in choosing groups to vote for, and details the steps to do this using the Celo CLI.
+[Validator elections](../celo-codebase/protocol/proof-of-stake/validator-elections.md) are held every epoch (approximately once per day). All 100 slots are available at each election. Validators are selected [in proportion](../celo-codebase/protocol/proof-of-stake/validator-elections.md#Running-the-Election) to votes received for each Validator Group.
+
+If you hold Celo Gold (or are a beneficiary of a [`ReleaseGold` contract](release-gold.md) that allows voting), you can vote for Validator Groups. A single account can split their LockedGold balance to have outstanding votes for up to 10 groups.
 
 Celo Gold that you lock and use to vote for a group that elects one or more validators receives [epoch rewards](../celo-codebase/protocol/proof-of-stake/epoch-rewards.md) every epoch (approximately every day) once the community passes a governance proposal enabling rewards. The initial level of rewards is anticipated to be around 6% per annum equivalent (but is subject to change).
 
 Unlike a number of Proof of Stake protocols, Celo Gold used for voting is never at risk. The actions of the validator groups or validators you vote for can cause you to receive lower or higher rewards, but the Celo Gold you locked will always be available to be unlocked in the future.
 
-Validator Groups can receive votes up to a [voting cap](../celo-codebase/protocol/proof-of-stake/validator-validator-elections.md#group-voting-caps). You can only cast a vote for a group if it currently has fewer votes than this cap.
-
-A single account can have outstanding votes for up to 10 groups.
-
-## Identities
-
-The canonical identifier for validators and validator groups is their address.
-
-The Celo protocol also supports [account metadata](../celo-codebase/protocol/identity/metadata.md) that allows accounts to make verifiable as well as non-verifiable claims about their identity.
-
-Validators and groups can supply non-verifiable human-readable names, and these are what is shown on most validator explorers.
-
-{% hint style="warning" %}
-**Warning**: Malicious participants may attempt to impersonate other validators in order to attract votes. Exercise caution in relying on validator-supplied names to determine their real-world identity.
-{% endhint %}
-
-Validators and groups can also supply [verifiable DNS claims](../operations-manual/validator-explorer.md), and the Celo Validator Explorer displays these. You can use these to securely identify that the same entity has access both to the account of a validator or group and the supplied DNS records.
-
 ## Validator and Validator Group Explorers
 
 The Celo ecosystem includes a number of great services for browsing registered Validator Groups and Validators.
+
+{% hint style="warning" %}
+**Warning**: Exercise caution in relying on validator-supplied names to determine their real-world identity.Malicious participants may attempt to impersonate other validators in order to attract votes.
+
+Validators and groups can also supply [verifiable DNS claims](../operations-manual/validator-explorer.md), and the Celo Validator Explorer displays these. You can use these to securely identify that the same entity has access both to the account of a validator or group and the supplied DNS records.
+{% endhint %}
 
 ### [Celo Validator Explorer](https://validators.celo.org) (cLabs)
 
@@ -66,9 +56,11 @@ You might consider these factors when choosing a validator group for whom to vot
 
 - **Proven identity:** You are sure the validator group (and their associated validators) are who they say they are using DNS claims, described above.
 
+- **Can receive votes**: Validator Groups can receive votes up to a certain [voting cap](../celo-codebase/protocol/proof-of-stake/validator-elections.md#group-voting-caps). You cannot vote for groups with a balance that would put it beyond its cap.
+
 - **Participated in The Great Celo Stake Off**: [The Great Celo Stake Off](https://forum.celo.org/t/the-great-celo-stake-off-the-details/136) was a validator challenge that ran on the [Baklava Testnet](../getting-started/baklava-testnet.md) between November 2019 and March 2020. Its aims were to help organizations interested in operating Celo validators build operational experience. Validators that participated have had an opportunity to build tooling, understand the Celo protocol, and in many cases undergo a security audit. The [final Stake Off leaderboard](https://docs.google.com/spreadsheets/d/e/2PACX-1vQwk10o6YV0uriR8LuYfLqB1irjmOX_-L6Jljn3BtKlmz_R_TsUU8aI-pMqGVlu4HQKIQlQaFkUhsyl/pubhtml?gid=1970613133&single=true) is public, although addresses that validators used for the Stake Off are different to those on the Mainnet Release Candidate network.
 
-- **Will get elected**: Locked Gold only receives voter rewards during an epoch if it is used to vote for a Validator Group that elects at least one validator during that epoch. Put another way, your vote is wasted if you vote for a group that does not elect a validator.
+- **Will get elected**: Locked Gold only receives voter rewards during an epoch if it is used to vote for a Validator Group that elects at least one validator during that epoch. Put another way, your vote does not contribute to securing the network or earning you rewards if your group does not receive enough other votes to elect a validator.
 
 - **Secure**: The operational security of validators is essential for everyone's use of the Celo network. All validators that participated in the Stake Off were eligible for a [security audit](https://medium.com/celoorg/the-celo-validator-community-security-audits-and-lessons-learned-e67b78cd4123). You can see scores under the "master validator challenge" column in the [Stake Off leaderboard](https://docs.google.com/spreadsheets/d/e/2PACX-1vQwk10o6YV0uriR8LuYfLqB1irjmOX_-L6Jljn3BtKlmz_R_TsUU8aI-pMqGVlu4HQKIQlQaFkUhsyl/pubhtml?gid=1970613133&single=true). Scores of 80% or greater were awarded the "Master Validator" badge, indiciating a serious proven commitment to operational security.
 
@@ -87,42 +79,3 @@ You might consider these factors when choosing a validator group for whom to vot
 - **Broadens Diversity**: The Celo community aims to be inclusive to the largest number of contributors, with the most varied and diverse backgrounds possible. Support that diversity by considering what new perspectives and strengths the teams you support offer. As well as the backgrounds and experiences of the team, consider that the network security and availability is improved by validators operating at different network locations, on different platforms, and with different toolchains.
 
 - **Participates in the community:** Support validator groups that strengthen the Celo developer community, for example through building or operating services for the Celo ecosystem, participating actively in on-chain governance, and answering questions and supporting others, on [Discord](https://chat.celo.org) or the [Forum](https://forum.celo.org).
-
-## Voting with the Celo CLI
-
-# Lock Celo Gold
-
-Each unit of Celo Gold corresponds to one vote. First, you must lock a balance at the `LockedGold` smart contract. This ensures that each unit only votes once.
-
-
-![](https://storage.googleapis.com/celo-website/docs/locked-gold-flow-p1.jpg)
-
-Once you have placed a vote for a group, you can [activate](#TODO) it to begin to receive [voter epoch rewards](../celo-codebase/protocol/proof-of-stake/epoch-rewards.md) in the event that a validator in that group is elected.
-
-![](https://storage.googleapis.com/celo-website/docs/locked-gold-flow-p2.jpg)
-
-
-![](https://storage.googleapis.com/celo-website/docs/locked-gold-flow-p3.jpg)
-
-### Revoke Votes
-
-{% hint style="info" %}
-* For the following commands, make sure that your Ledger device with the voter signer keys is unlocked.  * The Ledger `Celo app` will ask you to confirm the transaction. Follow instructions on the device's screen to do this.
-{% endhint %}
-
-At any point you can revoke votes cast for a validator group. For example, if a group is performing poorly and affecting your rewards, or if you’d prefer to vote for another group, or if you’d like to unlock your gold to transfer it to another address.
-
-{% hint style="info" %}
-When you revoke your votes you will stop receiving voter rewards.
-{% endhint %}
-
-Use your vote signer key to revoke your votes to specify the amount of Celo Gold (cGLD) you wish to revoke (don’t include the  `< >`  braces). All cGLD amounts should be expressed in 18 decimal places. For example, 1 cGLD = 1000000000000000000.
-
-```bash
-# Using the Ledger device where your vote signer keys are stored
-celocli election:revoke --from $CELO_VOTE_SIGNER_ADDRESS --for $CELO_VALIDATOR_GROUP_ADDRESS --value <CELO-GOLD-AMOUNT> --useLedger --ledgerConfirmAddress 
-```
-
-### Unlock Locked Celo Gold
-
-![](https://storage.googleapis.com/celo-website/docs/locked-gold-flow-p4.jpg)
