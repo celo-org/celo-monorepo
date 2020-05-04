@@ -121,6 +121,9 @@ export class ContractKit {
     const goldBalance = await goldToken.balanceOf(address)
     const lockedBalance = await lockedGold.getAccountTotalLockedGold(address)
     const dollarBalance = await stableToken.balanceOf(address)
+    const converted = dollarBalance.eq(new BigNumber(0))
+      ? new BigNumber(0)
+      : await exchange.quoteUsdSell(dollarBalance)
     let pending = new BigNumber(0)
     try {
       pending = await lockedGold.getPendingWithdrawalsTotalValue(address)
@@ -133,7 +136,7 @@ export class ContractKit {
       usd: dollarBalance,
       total: goldBalance
         .plus(lockedBalance)
-        .plus(await exchange.quoteUsdSell(dollarBalance))
+        .plus(converted)
         .plus(pending),
       pending,
     }
