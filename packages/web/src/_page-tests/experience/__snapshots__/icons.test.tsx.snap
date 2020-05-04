@@ -2984,7 +2984,7 @@ exports[`Experience/Icons renders 1`] = `
                   className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
                   data-focusable={true}
                   dir="auto"
-                  href="/papers"
+                  href="https://docs.celo.org/"
                   onClick={[Function]}
                   onMouseEnter={[Function]}
                   rel=" noopener noreferrer"
@@ -3006,7 +3006,7 @@ exports[`Experience/Icons renders 1`] = `
                   }
                   target="_blank"
                 >
-                  White Papers
+                  Docs
                 </a>
               </div>
             </div>
@@ -3038,7 +3038,7 @@ exports[`Experience/Icons renders 1`] = `
                   className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
                   data-focusable={true}
                   dir="auto"
-                  href="https://docs.celo.org/"
+                  href="/audits"
                   onClick={[Function]}
                   onMouseEnter={[Function]}
                   rel=" noopener noreferrer"
@@ -3060,7 +3060,61 @@ exports[`Experience/Icons renders 1`] = `
                   }
                   target="_blank"
                 >
-                  Docs
+                  Security Audits
+                </a>
+              </div>
+            </div>
+            <div
+              className="css-view-1dbjc4n"
+              style={
+                Object {
+                  "marginBottom": "8px",
+                  "marginTop": "8px",
+                }
+              }
+            >
+              <div
+                className="css-view-1dbjc4n"
+                onClick={[Function]}
+                onMouseDown={[Function]}
+                onMouseEnter={[Function]}
+                onMouseLeave={[Function]}
+                onMouseUp={[Function]}
+                onResponderGrant={[Function]}
+                onResponderRelease={[Function]}
+                style={
+                  Object {
+                    "display": "inline",
+                  }
+                }
+              >
+                <a
+                  className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+                  data-focusable={true}
+                  dir="auto"
+                  href="/papers"
+                  onClick={[Function]}
+                  onMouseEnter={[Function]}
+                  rel=" noopener noreferrer"
+                  role="link"
+                  style={
+                    Object {
+                      "WebkitTextDecorationStyle": "solid",
+                      "color": "rgba(46,51,56,1.00)",
+                      "cursor": "pointer",
+                      "display": "inline",
+                      "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                      "fontSize": "16px",
+                      "lineHeight": "20px",
+                      "opacity": 1,
+                      "textDecoration": "none",
+                      "textDecorationStyle": "solid",
+                      "textRendering": "geometricPrecision",
+                    }
+                  }
+                  target="_blank"
+                >
+                  White Papers
                 </a>
               </div>
             </div>
@@ -3303,7 +3357,7 @@ exports[`Experience/Icons renders 1`] = `
                   }
                   target="_blank"
                 >
-                  EcoSystem Fund
+                  Ecosystem Fund
                 </a>
               </div>
             </div>
