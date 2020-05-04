@@ -62,11 +62,14 @@ const fontStyles = StyleSheet.create({
   regular600: { ...standards.regular, fontFamily: Inter.SemiBold },
   small600: { ...standards.small, fontFamily: Inter.SemiBold },
   regular500: { ...standards.regular, fontFamily: Inter.Medium },
+  center: {
+    textAlign: 'center',
+  },
 })
 
 export default fontStyles
 
-// map of deprecated font names to knew font styles.
+// map of deprecated font names to new font styles.
 export const oldFontsStyles = StyleSheet.create({
   body: fontStyles.regular,
   bodySmall: fontStyles.small,
@@ -76,7 +79,4 @@ export const oldFontsStyles = StyleSheet.create({
   sectionLabel: fontStyles.sectionHeader,
   sectionLabelNew: fontStyles.sectionHeader,
   headerTitle: fontStyles.regular600,
-  center: {
-    textAlign: 'center',
-  },
 })
