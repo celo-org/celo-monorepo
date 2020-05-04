@@ -168,7 +168,7 @@ export function* sendInvite(
     const inviteDetails: InviteDetails = {
       timestamp: Date.now(),
       e164Number,
-      tempWalletAddress: temporaryAddress,
+      tempWalletAddress: temporaryAddress.toLowerCase(),
       tempWalletPrivateKey: temporaryWalletAccount.privateKey,
       tempWalletRedeemed: false, // no logic in place to toggle this yet
       inviteCode,

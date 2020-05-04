@@ -61,7 +61,7 @@ const mockAccountInvite2PrivKey =
 export const mockInviteDetails = {
   timestamp: 1588200517518,
   e164Number: mockE164NumberInvite,
-  tempWalletAddress: mockAccount,
+  tempWalletAddress: mockAccount.toLowerCase(),
   tempWalletPrivateKey: '0x1129eb2fbccdc663f4923a6495c35b096249812b589f7c4cd1dba01e1edaf724',
   tempWalletRedeemed: false,
   inviteCode: 'ESnrL7zNxmP0kjpklcNbCWJJgStYn3xM0dugHh7a9yQ=',
@@ -71,7 +71,7 @@ export const mockInviteDetails = {
 export const mockInviteDetails2 = {
   timestamp: 1588200517518,
   e164Number: mockE164Number2Invite,
-  tempWalletAddress: mockAccountInvite,
+  tempWalletAddress: mockAccountInvite.toLowerCase(),
   tempWalletPrivateKey: mockAccountInvitePrivKey,
   tempWalletRedeemed: false,
   inviteCode: 'sz6sYx/TpBXzc4ZJ24ytV9p4uZ7JLNj3e3a12uLr3yc=',
@@ -82,7 +82,7 @@ export const mockInviteDetails2 = {
 export const mockInviteDetails3 = {
   timestamp: 1588200517518,
   e164Number: mockE164NumberInvite,
-  tempWalletAddress: mockAccount2Invite,
+  tempWalletAddress: mockAccount2Invite.toLowerCase(),
   tempWalletPrivateKey: mockAccountInvite2PrivKey,
   tempWalletRedeemed: false,
   inviteCode: '5ZwS/rXqE9q8wGiijR1SGibjlGT6p7vMAfQ7g0DpL6Y=',
