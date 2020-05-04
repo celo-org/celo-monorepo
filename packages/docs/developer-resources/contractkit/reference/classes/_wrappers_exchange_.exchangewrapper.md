@@ -275,7 +275,7 @@ Contract address
 
 ###  getBuyTokenAmount
 
-▸ **getBuyTokenAmount**(`buyAmount`: BigNumber.Value, `sellGold`: boolean): *Promise‹BigNumber›*
+▸ **getBuyTokenAmount**(`sellAmount`: BigNumber.Value, `sellGold`: boolean): *Promise‹BigNumber›*
 
 *Defined in [contractkit/src/wrappers/Exchange.ts:68](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Exchange.ts#L68)*
 
@@ -285,7 +285,7 @@ Contract address
 
 Name | Type | Description |
 ------ | ------ | ------ |
-`buyAmount` | BigNumber.Value | - |
+`sellAmount` | BigNumber.Value | The amount of sellToken the user is selling to the exchange |
 `sellGold` | boolean | `true` if gold is the sell token |
 
 **Returns:** *Promise‹BigNumber›*
