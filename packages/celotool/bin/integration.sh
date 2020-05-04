@@ -9,7 +9,7 @@ clean_env() {
   kubectl get namespace "${ENV}" && kubectl delete namespace "${ENV}"
 }
 
-ENV=${$1:-integration}
+ENV=${1:-integration}
 VERBOSE_OPTS=" --verbose"
 CLEAN_ENV="true"
 # VERBOSE_OPTS=""
@@ -36,7 +36,7 @@ fi
 
 # sleep 200
 
-waitTime=800
+waitTime=1200
 iterations=0
 
 echo -n "waiting for pod"
