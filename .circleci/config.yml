@@ -969,7 +969,6 @@ workflows:
       - protocol-test-with-code-coverage:
           requires:
             - lint-checks
-            - walletkit-test
   # nightly-integration:
   #   triggers:
   #     - schedule:
