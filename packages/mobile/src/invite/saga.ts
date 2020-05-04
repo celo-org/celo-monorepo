@@ -114,7 +114,6 @@ export async function sendSms(toPhone: string, msg: string) {
   return new Promise((resolve, reject) => {
     try {
       if (Platform.OS === 'android') {
-        // TODO: look into how to configure react-native-sms for Android so we can cut this package
         SendIntentAndroid.sendSms(toPhone, msg)
         resolve()
       } else {
@@ -194,9 +193,8 @@ export function* sendInvite(
     Logger.debug(TAG + '@sendInviteSaga', 'Sent money to new wallet')
 
     // If this invitation has a payment attached to it, send the payment to the escrow.
-    let escrowTxId
     if (currency === CURRENCY_ENUM.DOLLAR && amount) {
-      escrowTxId = generateStandbyTransactionId(temporaryAddress + '-escrow')
+      const escrowTxId = generateStandbyTransactionId(temporaryAddress + '-escrow')
       try {
         const phoneHash = getPhoneHash(e164Number)
         yield put(transferEscrowedPayment(phoneHash, amount, temporaryAddress, escrowTxId))
