@@ -194,7 +194,7 @@ data:
   genesis.json: {{ .Values.genesis.genesisFileBase64 | b64dec | quote }}
 {{- end -}}
 
-{{- define "common.celotool-container" -}}
+{{- define "common.celotool-validator-container" -}}
 - name: get-account
   image: {{ .Values.celotool.image.repository }}:{{ .Values.celotool.image.tag }}
   imagePullPolicy: {{ .Values.celotool.image.imagePullPolicy }}

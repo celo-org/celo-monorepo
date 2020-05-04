@@ -121,7 +121,7 @@ spec:
     spec:
       initContainers:
 {{ include "common.init-genesis-container" .  | indent 6 }}
-{{ include "common.celotool-container" ( dict  "Values" .Values "Release" .Release "Chart" .Chart "proxy" .proxy "mnemonic_account_type" .mnemonic_account_type "service_ip_env_var_prefix" .service_ip_env_var_prefix)  | indent 6 }}
+{{ include "common.celotool-validator-container" ( dict  "Values" .Values "Release" .Release "Chart" .Chart "proxy" .proxy "mnemonic_account_type" .mnemonic_account_type "service_ip_env_var_prefix" .service_ip_env_var_prefix)  | indent 6 }}
 {{ if .unlock | default false }}
 {{ include "common.import-geth-account-container" .  | indent 6 }}
 {{ end }}
