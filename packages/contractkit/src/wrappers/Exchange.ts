@@ -65,12 +65,12 @@ export class ExchangeWrapper extends BaseWrapper<Exchange> {
    * @param sellGold `true` if gold is the sell token
    * @return The corresponding buyToken amount.
    */
-  async getBuyTokenAmount(buyAmount: BigNumber.Value, sellGold: boolean): Promise<BigNumber> {
-    const buy = valueToString(buyAmount)
-    if (new BigNumber(buy).eq(new BigNumber(0))) {
+  async getBuyTokenAmount(sellAmount: BigNumber.Value, sellGold: boolean): Promise<BigNumber> {
+    const sell = valueToString(sellAmount)
+    if (new BigNumber(sell).eq(0)) {
       return new BigNumber(0)
     }
-    const res = await this.contract.methods.getBuyTokenAmount(buy, sellGold).call()
+    const res = await this.contract.methods.getBuyTokenAmount(sell, sellGold).call()
     return valueToBigNumber(res)
   }
 
@@ -83,7 +83,7 @@ export class ExchangeWrapper extends BaseWrapper<Exchange> {
    */
   async getSellTokenAmount(buyAmount: BigNumber.Value, sellGold: boolean): Promise<BigNumber> {
     const buy = valueToString(buyAmount)
-    if (new BigNumber(buy).eq(new BigNumber(0))) {
+    if (new BigNumber(buy).eq(0)) {
       return new BigNumber(0)
     }
     const res = await this.contract.methods.getSellTokenAmount(buy, sellGold).call()
