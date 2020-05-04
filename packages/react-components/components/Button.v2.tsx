@@ -1,6 +1,6 @@
 import Touchable from '@celo/react-components/components/Touchable'
-import { colors } from '@celo/react-components/styles/colors.v2'
-import { fontStyles } from '@celo/react-components/styles/fonts.v2'
+import colors, { colorsEnum } from '@celo/react-components/styles/colors.v2'
+import fontStyles from '@celo/react-components/styles/fonts.v2'
 import { debounce } from 'lodash'
 import React, { useCallback } from 'react'
 import { StyleProp, StyleSheet, Text, View, ViewStyle } from 'react-native'
@@ -112,7 +112,7 @@ function getColors(type: BtnTypes, disabled: boolean | undefined) {
   return [textColor, backgroundColor]
 }
 
-function getSizeStyle(size: BtnSizes | undefined, backgroundColor: colors) {
+function getSizeStyle(size: BtnSizes | undefined, backgroundColor: colorsEnum) {
   switch (size) {
     case BtnSizes.SMALL:
       return { ...styles.button, ...styles.small, backgroundColor }

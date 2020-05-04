@@ -1,5 +1,5 @@
 // Designer Created Figma Colors
-export enum colors {
+export enum colorsEnum {
   greenFaint = '#97DFC1', // green disabled
   greenBrand = '#42D689',
   greenUI = '#1AB775',
@@ -19,21 +19,70 @@ export enum colors {
   light = '#FFFFFF',
 }
 
-// deprecated transition map of old names new colors
 export default {
-  background: colors.light,
-  gray: colors.gray5,
-  dark: colors.dark,
-  darkSecondary: colors.gray5,
-  darkLightest: colors.gray1,
-  white: colors.light,
-  inactive: colors.gray4,
-  listBorder: colors.gray2,
-  inputBorder: colors.gray2,
-  celoGold: colors.goldBrand,
-  celoGoldInactive: colors.goldFaint,
-  celoGreen: colors.greenBrand,
-  celoDarkGreenInactive: colors.greenFaint,
-  celoGreenInactive: colors.greenFaint,
-  errorRed: colors.warning,
+  greenFaint: colorsEnum.greenFaint,
+  greenBrand: colorsEnum.greenBrand,
+  greenUI: colorsEnum.greenUI,
+  goldFaint: colorsEnum.goldFaint,
+  goldBrand: colorsEnum.goldBrand,
+  goldUI: colorsEnum.goldUI,
+  goldDark: colorsEnum.goldDark,
+  beige: colorsEnum.beige,
+  brownFaint: colorsEnum.brownFaint,
+  warning: colorsEnum.warning,
+  dark: colorsEnum.dark,
+  gray5: colorsEnum.gray5,
+  gray4: colorsEnum.gray4,
+  gray3: colorsEnum.gray3,
+  gray2: colorsEnum.gray2,
+  gray1: colorsEnum.gray1,
+  light: colorsEnum.light,
+  get background() {
+    return deprecationNotice('light')
+  },
+  get gray() {
+    return deprecationNotice('gray5')
+  },
+  get darkSecondary() {
+    return deprecationNotice('gray5')
+  },
+  get darkLightest() {
+    return deprecationNotice('gray1')
+  },
+  get white() {
+    return deprecationNotice('light')
+  },
+  get inactive() {
+    return deprecationNotice('gray4')
+  },
+  get listBorder() {
+    return deprecationNotice('gray2')
+  },
+  get inputBorder() {
+    return deprecationNotice('gray2')
+  },
+  get celoGold() {
+    return deprecationNotice('goldBrand')
+  },
+  get celoGoldInactive() {
+    return deprecationNotice('goldFaint')
+  },
+  get celoGreen() {
+    return deprecationNotice('greenBrand')
+  },
+  get celoDarkGreenInactive() {
+    return deprecationNotice('greenFaint')
+  },
+  get celoGreenInactive() {
+    return deprecationNotice('greenFaint')
+  },
+  get errorRed() {
+    return deprecationNotice('warning')
+  },
+}
+
+function deprecationNotice(color: string) {
+  console.warn(`deprecated: trying colors.${color}`)
+  // @ts-ignore
+  return colorsEnum[color]
 }
