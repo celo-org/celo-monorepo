@@ -384,27 +384,23 @@ export function* ensureAccountInWeb3Keystore() {
 
 export function* switchToGethFromForno() {
   Logger.debug(TAG, 'Switching to geth from forno..')
+  const gethAlreadyStartedThisSession = yield select(gethStartedThisSessionSelector)
+  if (gethAlreadyStartedThisSession) {
+    // Restart app to allow users to start geth a second time
+    Logger.debug(TAG + '@switchToGethFromForno', 'Restarting...')
+    restartApp()
+    return
+  }
   try {
-    const gethAlreadyStartedThisSession = yield select(gethStartedThisSessionSelector)
     yield put(setContractKitReady(false)) // Lock contractKit during provider switch
     yield put(setFornoMode(false))
     yield spawn(gethSaga)
-
-    if (gethAlreadyStartedThisSession) {
-      // If geth is started twice within the same session,
-      // there is an issue where it cannot find deployed contracts.
-      // Restarting the app fixes this issue.
-      restartApp()
-      return
-    }
-
     yield call(waitForGethConnectivity)
-
     yield put(setContractKitReady(true))
     // After switching off forno mode, ensure key is stored in web3.personal
     // Note that this must happen after contractKit unlocked
     yield call(ensureAccountInWeb3Keystore)
-    Logger.error(TAG + '@switchToGethFromForno', 'Ensured in keystore')
+    Logger.debug(TAG + '@switchToGethFromForno', 'Ensured in keystore')
   } catch (e) {
     Logger.error(TAG + '@switchToGethFromForno', 'Error switching to geth from forno')
     yield put(showError(ErrorMessages.FAILED_TO_SWITCH_SYNC_MODES))
@@ -416,7 +412,6 @@ export function* switchToFornoFromGeth() {
   Logger.debug(TAG, 'Switching to forno from geth..')
   try {
     yield put(setContractKitReady(false)) // Lock contractKit during provider switch
-
     yield put(setFornoMode(true))
     yield put(cancelGethSaga())
     yield call(stopGethIfInitialized)

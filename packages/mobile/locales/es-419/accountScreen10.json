@@ -17,11 +17,6 @@
     "body": "Para encender y apagar Ahorro de Datos repetidamente, deberá reiniciar la aplicación.",
     "restart": "Reiniciar para alternar"
   },
-  "restartModalSwitchOn": {
-    "header": "La aplicación se reiniciará",
-    "body": "En caso de ingresar un PIN incorrecto, la aplicación se reiniciará.",
-    "understand": "Entendido"
-  },
   "addFunds": "Añadir Fondos",
   "promptFornoModal": {
     "header": "Cambiar modo de conexión?",

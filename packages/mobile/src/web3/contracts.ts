@@ -29,6 +29,8 @@ function getWeb3(fornoMode: boolean): Web3 {
   return fornoMode ? new Web3(getHttpProvider(DEFAULT_FORNO_URL)) : new Web3(getIpcProvider())
 }
 
+// Workaround as contractKit logic is still used outside generators
+// Moving towards generators to allow us to block contractKit calls
 export async function getContractKitOutsideGenerator() {
   // Poll store until rehydrated
   while (!store) {
