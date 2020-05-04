@@ -18,7 +18,7 @@ import { calculateFee } from 'src/fees/saga'
 import { generateShortInviteLink } from 'src/firebase/dynamicLinks'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import i18n from 'src/i18n'
-import { denyImportContacts, setHasSeenVerificationNux } from 'src/identity/actions'
+import { setHasSeenVerificationNux } from 'src/identity/actions'
 import {
   Actions,
   InviteBy,
@@ -301,13 +301,9 @@ export function* doRedeemInvite(inviteCode: string) {
 
 export function* skipInvite() {
   yield take(Actions.SKIP_INVITE)
-  Logger.debug(TAG + '@skipInvite', 'Skip invite action taken')
+  Logger.debug(TAG + '@skipInvite', 'Skip invite action taken, creating account')
   try {
-    Logger.debug(TAG + '@skipInvite', 'Creating new account')
     yield call(getOrCreateAccount)
-    Logger.debug(TAG + '@skipInvite', 'Marking nux flows as complete')
-    // TODO(Rossy): Remove when import screen is removed
-    yield put(denyImportContacts())
     yield put(setHasSeenVerificationNux(true))
     Logger.debug(TAG + '@skipInvite', 'Done skipping invite')
     navigateHome()

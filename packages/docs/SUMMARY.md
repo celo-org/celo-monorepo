@@ -40,6 +40,7 @@
   - [Hello Contracts](developer-resources/walkthroughs/hellocontracts.md)
   - [Hello Contract (Truffle + Remote Node)](developer-resources/walkthroughs/hello-contract-remote-node.md)
   - [Celo Truffle Box](developer-resources/walkthroughs/celo-truffle-box.md)
+  - [Using Windows](developer-resources/develop-on-windows.md)
   <!-- - [Building a dApp with Contracts on Celo]() -->
 - [Overview]()
   <!-- - [The Celo Protocol]()
@@ -146,6 +147,7 @@
       - [TxParamsNormalizer](developer-resources/contractkit/reference/classes/_utils_tx_params_normalizer_.txparamsnormalizer.md)
       - [utils/tx-result](developer-resources/contractkit/reference/modules/_utils_tx_result_.md)
       - [TransactionResult](developer-resources/contractkit/reference/classes/_utils_tx_result_.transactionresult.md)
+      - [utils/tx-uri](developer-resources/contractkit/reference/modules/_utils_tx_uri_.md)
       - [utils/web3-utils](developer-resources/contractkit/reference/modules/_utils_web3_utils_.md)
       - [wallets/azure-hsm-wallet](developer-resources/contractkit/reference/modules/_wallets_azure_hsm_wallet_.md)
       - [AzureHSMWallet](developer-resources/contractkit/reference/classes/_wallets_azure_hsm_wallet_.azurehsmwallet.md)
