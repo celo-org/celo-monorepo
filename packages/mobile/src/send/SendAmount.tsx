@@ -108,6 +108,7 @@ function getRecipient(navigation: Navigation): Recipient {
   return recipient
 }
 
+// DELETE THIS AND JUST PUT IN THE COMPONENT - VERY REDUNDANT FUNCTIONALITY
 function getVerificationStatus(
   navigation: Navigation,
   e164NumberToAddress: E164NumberToAddressType

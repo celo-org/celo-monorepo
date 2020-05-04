@@ -77,6 +77,8 @@ export class ConfirmRecipientAccount extends React.Component<Props, State> {
 
   displayName = this.props.navigation.getParam('displayName')
 
+  fullAddressValidationRequired = this.props.navigation.getParam('fullAddressValidationRequired')
+
   onPressContinue = () => {
     navigate(Screens.VerificationEducationScreen)
   }
@@ -105,16 +107,16 @@ export class ConfirmRecipientAccount extends React.Component<Props, State> {
 
   renderInitialInstructions = () => {
     const { t } = this.props
-    // NOTE: need a boolean here depending on if the user will enter full account number or just last 4 digits
-    // if () {
-    //   return (
-    //     <Text style={styles.body}>
-    //       {t('confirmAccountNumber.1b', {
-    //         displayName: this.displayName,
-    //       })}
-    //     </Text>
-    //   )
-    // }
+
+    if (this.fullAddressValidationRequired) {
+      return (
+        <Text style={styles.body}>
+          {t('confirmAccountNumber.1b', {
+            displayName: this.displayName,
+          })}
+        </Text>
+      )
+    }
 
     return (
       <Text style={styles.body}>
@@ -135,22 +137,21 @@ export class ConfirmRecipientAccount extends React.Component<Props, State> {
     } else if (redeemComplete) {
       codeStatus = CodeRowStatus.ACCEPTED
     }
-    // NOTE: need a boolean here depending on if the user will enter full account number or just last 4 digits
 
-    // if () {
-    //   return (
-    //     <React.Fragment>
-    //       <Text style={styles.codeHeader}>{t('accountInputHeaderB')}</Text>
-    //       <CodeRow
-    //         status={codeStatus}
-    //         inputValue={inputValue}
-    //         inputPlaceholder={t('inviteCodeText.codePlaceholder')}
-    //         onInputChange={this.onInputChange}
-    //         shouldShowClipboard={this.shouldShowClipboard}
-    //       />
-    //     </React.Fragment>
-    //   )
-    // }
+    if (this.fullAddressValidationRequired) {
+      return (
+        <React.Fragment>
+          <Text style={styles.codeHeader}>{t('accountInputHeaderB')}</Text>
+          <CodeRow
+            status={codeStatus}
+            inputValue={inputValue}
+            inputPlaceholder={t('inviteCodeText.codePlaceholder')}
+            onInputChange={this.onInputChange}
+            shouldShowClipboard={this.shouldShowClipboard}
+          />
+        </React.Fragment>
+      )
+    }
 
     return (
       <React.Fragment>

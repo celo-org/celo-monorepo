@@ -8,11 +8,15 @@ const RECENT_RECIPIENTS_TO_STORE = 8
 export interface State {
   isSending: boolean
   recentRecipients: Recipient[]
+  isValidatingRecipient: boolean
+  isValidRecipient: boolean
 }
 
 const initialState = {
   isSending: false,
   recentRecipients: [],
+  isValidatingRecipient: true,
+  isValidRecipient: false,
 }
 
 export const sendReducer = (
@@ -42,7 +46,24 @@ export const sendReducer = (
       }
     case Actions.STORE_LATEST_IN_RECENTS:
       return storeLatestRecentReducer(state, action.recipient)
-
+    case Actions.VALIDATE_RECIPIENT_ADDRESS:
+      return {
+        ...state,
+        isValidatingRecipient: true,
+        isValidRecipient: false,
+      }
+    case Actions.VALIDATE_RECIPIENT_ADDRESS_SUCCESS:
+      return {
+        ...state,
+        isValidatingRecipient: false,
+        isValidRecipient: true,
+      }
+    case Actions.VALIDATE_RECIPIENT_ADDRESS_FAILURE:
+      return {
+        ...state,
+        isValidatingRecipient: false,
+        isValidRecipient: false,
+      }
     default:
       return state
   }

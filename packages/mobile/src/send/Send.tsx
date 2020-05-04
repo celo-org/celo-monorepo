@@ -205,8 +205,9 @@ class Send extends React.Component<Props, State> {
       this.props.storeLatestInRecents(recipient)
     }
 
-    // NOTE: Neeed to do a check here to see if they should go to normal flow or secure send
-    navigate(Screens.ConfirmRecipient, { recipient })
+    // NOTE: Need to do a check here to see if they should go to normal flow or secure send
+    // if secure send, also needs to return if they need to do a full address validation or just last 4 digits
+    navigate(Screens.ConfirmRecipient, { recipient, fullAddressValidationRequired: true })
     // navigate(Screens.SendAmount, { recipient })
   }
 
