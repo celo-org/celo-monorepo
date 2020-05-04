@@ -17,6 +17,9 @@ export enum Actions {
   SEND_PAYMENT_OR_INVITE = 'SEND/SEND_PAYMENT_OR_INVITE',
   SEND_PAYMENT_OR_INVITE_SUCCESS = 'SEND/SEND_PAYMENT_OR_INVITE_SUCCESS',
   SEND_PAYMENT_OR_INVITE_FAILURE = 'SEND/SEND_PAYMENT_OR_INVITE_FAILURE',
+  VALIDATE_RECIPIENT_ADDRESS = 'SEND/VALIDATE_RECIPIENT_ADDRESS',
+  VALIDATE_RECIPIENT_ADDRESS_SUCCESS = 'SEND/VALIDATE_RECIPIENT_ADDRESS_SUCCESS',
+  VALIDATE_RECIPIENT_ADDRESS_FAILURE = 'SEND/VALIDATE_RECIPIENT_ADDRESS_FAILURE',
 }
 
 export interface StoreLatestInRecentsAction {
@@ -42,11 +45,27 @@ export interface SendPaymentOrInviteFailureAction {
   type: Actions.SEND_PAYMENT_OR_INVITE_FAILURE
 }
 
+export interface ValidateRecipientAddressAction {
+  type: Actions.VALIDATE_RECIPIENT_ADDRESS
+  fullAddressOrLastFourDigits: string
+}
+
+export interface ValidateRecipientAddressSuccessAction {
+  type: Actions.VALIDATE_RECIPIENT_ADDRESS_SUCCESS
+}
+
+export interface ValidateRecipientAddressFailureAction {
+  type: Actions.VALIDATE_RECIPIENT_ADDRESS_FAILURE
+}
+
 export type ActionTypes =
   | StoreLatestInRecentsAction
   | SendPaymentOrInviteAction
   | SendPaymentOrInviteSuccessAction
   | SendPaymentOrInviteFailureAction
+  | ValidateRecipientAddressAction
+  | ValidateRecipientAddressSuccessAction
+  | ValidateRecipientAddressFailureAction
 
 export const storeLatestInRecents = (recipient: Recipient): StoreLatestInRecentsAction => ({
   type: Actions.STORE_LATEST_IN_RECENTS,
@@ -87,4 +106,19 @@ export const sendPaymentOrInviteSuccess = (): SendPaymentOrInviteSuccessAction =
 
 export const sendPaymentOrInviteFailure = (): SendPaymentOrInviteFailureAction => ({
   type: Actions.SEND_PAYMENT_OR_INVITE_FAILURE,
+})
+
+export const validateRecipientAddress = (
+  fullAddressOrLastFourDigits: string
+): ValidateRecipientAddressAction => ({
+  type: Actions.VALIDATE_RECIPIENT_ADDRESS,
+  fullAddressOrLastFourDigits,
+})
+
+export const validateRecipientAddressSuccess = (): ValidateRecipientAddressSuccessAction => ({
+  type: Actions.VALIDATE_RECIPIENT_ADDRESS_SUCCESS,
+})
+
+export const validateRecipientAddressFailure = (): ValidateRecipientAddressFailureAction => ({
+  type: Actions.VALIDATE_RECIPIENT_ADDRESS_FAILURE,
 })

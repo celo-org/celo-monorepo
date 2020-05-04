@@ -171,12 +171,23 @@ function* sendPaymentOrInviteSaga({
   }
 }
 
+export function* validateRecipientAddressSaga({ address }: Actions.VALIDATE_RECIPIENT_ADDRESS) {
+  Logger.debug(TAG, 'Starting Recipient Address Validation')
+}
+
+export function* doAddressValidation(address: string)
+
 export function* watchSendPaymentOrInvite() {
   yield takeLeading(Actions.SEND_PAYMENT_OR_INVITE, sendPaymentOrInviteSaga)
+}
+
+export function* watchValidateRecipientAddress() {
+  yield takeLeading(Actions.VALIDATE_RECIPIENT_ADDRESS, validateRecipientAddressSaga)
 }
 
 export function* sendSaga() {
   yield spawn(watchQrCodeDetections)
   yield spawn(watchQrCodeShare)
   yield spawn(watchSendPaymentOrInvite)
+  yield spawn(watchValidateRecipientAddress)
 }
