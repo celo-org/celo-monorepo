@@ -3,16 +3,15 @@ import * as React from 'react'
 import { StyleSheet, View } from 'react-native'
 import CCLicense from 'src/brandkit/common/CCLicense'
 import { GAP } from 'src/brandkit/common/constants'
+import { brandStyles } from 'src/brandkit/common/constants'
 import Page, { ICONS_PATH } from 'src/brandkit/common/Page'
 import PageHeadline from 'src/brandkit/common/PageHeadline'
+import IconShowcase from 'src/brandkit/common/Showcase'
+import { AssetTypes, EXCHANGE_ICONS_PKG_TRACKING, trackDownload } from 'src/brandkit/tracking'
 import { NameSpaces, useTranslation } from 'src/i18n'
+import Button, { BTN } from 'src/shared/Button.3'
 import { hashNav } from 'src/shared/menu-items'
 import { colors } from 'src/styles'
-import { brandStyles } from 'src/brandkit/common/constants'
-import { AssetTypes } from 'src/brandkit/tracking'
-import IconShowcase from 'src/brandkit/common/Showcase'
-import { EXCHANGE_ICONS_PKG_TRACKING, trackDownload } from 'src/brandkit/tracking'
-import Button, { BTN } from 'src/shared/Button.3'
 
 const icons = [
   {
@@ -120,7 +119,7 @@ function Overview() {
 
 const styles = StyleSheet.create({
   container: { paddingHorizontal: GAP },
-  root: { minHeight: '100vh' },
+  root: { minHeight: '75vh' },
   offScreen: {
     display: 'none',
   },
