@@ -4,9 +4,13 @@
 
 Celo Gold can be used to participate in validator elections. Validators play a critical role in the Celo protocol, determining which transactions get applied and producing new blocks. Selecting organizations that operate well-run infrastructure to perform this role effectively is essential for the long-term success of Celo networks.
 
+ can lock a balance at a `LockedGold` smart contract and then use that to place votes for **Validator Groups**.
+
 Groups are intermediaries between voters and validators:
 
+
 Every validator group has **members**, an ordered list of candidate validators.
+
 
 Max number of votes
 
@@ -21,16 +25,46 @@ The Celo protocol also supports [account metadata](../celo-codebase/protocol/ide
 Validators and groups can supply non-verifiable human-readable names, and these are what is shown on most validator explorers.
 
 {% hint style="warning" %}
-**Warning**: Malicious participants may attempt to impersonate other validators in order to attract votes. Do not rely on validator-supplied names to determine their real-world identity.
+**Warning**: Malicious participants may attempt to impersonate other validators in order to attract votes. Exercise caution in relying on validator-supplied names to determine their real-world identity.
 {% endhint %}
 
 Validators and groups can also supply [verifiable DNS claims](../operations-manual/validator-explorer.md), and the Celo Validator Explorer displays these. You can use these to securely identify that the same entity has access both to the account of a validator or group and the supplied DNS records.
 
+## Validator and Validator Group Explorers
+
+The Celo ecosystem includes a number of great services for browsing registered Validator Groups and Validators.
+
+### [Celo Validator Explorer](https://validators.celo.org) (cLabs)
+
+The Celo Validator Explorer has tabs to show either Release Candidate or Baklava networks.
+
+The list shows Validator Groups and, when you expand each group, the Validators that are affiliated to that group.
+
+A white check mark next to the name of a Validator Group shows that there is one or more DNS metadata claims verified for that group (see below).
+
+The Votes Available column shows:
+
+- On the left: Votes made for the group, as a percentage of the total Locked Gold
+
+- On the right: The voting cap of that group, as a percentage of the total Locked Gold
+
+- In the middle: votes made for the group as a proportion of the voting cap
+
+### [TheCelo](https://thecelo.com) (Bi23 Labs)
+
+TheCelo contains a range of valuable information on the Celo project and active Celo networks. The "Groups" tab shows a detailed view of Validator Groups. Click on a group to drilldown to see group metadata and affiliated validators.
+
+### [Celo Whale](https://celowhale.com) (DSRV)
+
+Celo Whale shows detailed metadata and statistics around validators but does not presently offer a view centered on validator groups.
+
+_Please raise a Pull Request against [this page](https://github.com/celo-org/celo-monorepo/blob/master/packages/docs/celo-gold-holder-guide/voting-validators.md) to add/amend details of any community services!_
+
 ## Choosing a Validator Group
 
-A single account can place votes for up to 10 validator groups at any one time.
-
 You might consider these factors when choosing a validator group for whom to vote:
+
+- **Proven identity:** You are sure the validator group (and their associated validators) are who they say they are using DNS claims, described above.
 
 - **Participated in The Great Celo Stake Off**: [The Great Celo Stake Off](https://forum.celo.org/t/the-great-celo-stake-off-the-details/136) was a validator challenge that ran on the [Baklava Testnet](../getting-started/baklava-testnet.md) between November 2019 and March 2020. Its aims were to help organizations interested in operating Celo validators build operational experience. Validators that participated have had an opportunity to build tooling, understand the Celo protocol, and in many cases undergo a security audit. The [final Stake Off leaderboard](https://docs.google.com/spreadsheets/d/e/2PACX-1vQwk10o6YV0uriR8LuYfLqB1irjmOX_-L6Jljn3BtKlmz_R_TsUU8aI-pMqGVlu4HQKIQlQaFkUhsyl/pubhtml?gid=1970613133&single=true) is public, although addresses that validators used for the Stake Off are different to those on the Mainnet Release Candidate network.
 
@@ -40,7 +74,7 @@ You might consider these factors when choosing a validator group for whom to vot
 
 - **Reliable**: Celo's consensus protocol relies on two-thirds of elected validators being available in order to produce blocks and process transactions. Voter rewards are directly tied to the [uptime score](../celo-codebase/protocol/proof-of-stake/validator-rewards.md#calculating-uptime-score) of all elected validators in the group for which the vote was made. Any period of consecutive downtime greater than a minute reduces a validator's uptime score.
 
-- **No recent slashing penalty:** When validators and groups register, their Locked Gold becomes "staked", in that it is subject to penalties for conduct that could seriously adversely affect the health of the network. Voters' Locked Gold is never slashed, but voter rewards directly factor in a group's [slashing penalty](../celo-codebase/protocol/proof-of-stake/validator-rewards.md#calculating-slashing-penalty), which is halved when a group or one of its validators is slashed. Look for groups with a slashing penalty value of `1.0`.
+- **No recent slashing:** When validators and groups register, their Locked Gold becomes "staked", in that it is subject to penalties for conduct that could seriously adversely affect the health of the network. Voters' Locked Gold is never slashed, but voter rewards are affected by a group's [slashing penalty](../celo-codebase/protocol/proof-of-stake/validator-rewards.md#calculating-slashing-penalty), which is halved when a group or one of its validators is slashed. Look for groups with a last slashing time long in the past, ideally `0` (never), and a slashing penalty value of `1.0`.
 
 - **Runs an Attestation Service**: The [Attestation Service]() is an important service that validators can run that allows users to verify that they have access to a phone number and map it to an address. Supporting validators that run this service makes it easier for new users to begin using Celo.
 
@@ -48,16 +82,13 @@ You might consider these factors when choosing a validator group for whom to vot
 
 - **Receives Celo Foundation votes**: The Celo Foundation has a [validator group voting policy](../operations-manual/celo-foundation-voting-policy.md) that it applies in order to promote the long-term security and decentralization of the network. You may weigh the Celo Foundation's judgement as one factor in selecting a validator group.
 
-- **Promotes the Celo mission**:
+- **Promotes the Celo mission**: Celo's mission is to [build a monetary system that creates the conditions of prosperity for all](https://medium.com/celoorg/an-introductory-guide-to-celo-b185c62d3067). Consider validator groups that further this mission through their own activities or initiatives around financial inclusion, education and sustainability.
 
-- **Broadens Diversity**: Network presence. esp not cloud. Geographic. Mission. 
+- **Broadens Diversity**: The Celo community aims to be inclusive to the largest number of contributors, with the most varied and diverse backgrounds possible. Support that diversity by considering what new perspectives and strengths the teams you support offer. As well as the backgrounds and experiences of the team, consider that the network security and availability is improved by validators operating at different network locations, on different platforms, and with different toolchains.
 
-- **Community participation:**
+- **Participates in the community:** Support validator groups that strengthen the Celo developer community, for example through building or operating services for the Celo ecosystem, participating actively in on-chain governance, and answering questions and supporting others, on [Discord](https://chat.celo.org) or the [Forum](https://forum.celo.org).
 
-
-<!-- - **Runs Full nodes**: -->
-
-<!-- 
+<!--
 ## Voting with the Celo CLI
 
 ![](https://storage.googleapis.com/celo-website/docs/locked-gold-flow-p1.jpg)
