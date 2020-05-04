@@ -40,7 +40,14 @@ export default React.memo(function Button(props: ButtonProps) {
   // Debounce onPress event so that it is called once on trigger and
   // consecutive calls in given period are ignored.
   const debouncedOnPress = useCallback(
-    debounce(props.onPress, BUTTON_TAP_DEBOUNCE_TIME, DEBOUNCE_OPTIONS),
+    debounce(
+      () => {
+        console.warn('DEBOUNCE')
+        props.onPress()
+      },
+      BUTTON_TAP_DEBOUNCE_TIME,
+      DEBOUNCE_OPTIONS
+    ),
     [props.onPress, disabled]
   )
 
@@ -51,7 +58,7 @@ export default React.memo(function Button(props: ButtonProps) {
       <Touchable
         onPress={debouncedOnPress}
         disabled={disabled}
-        style={getSizeStyle(size, backgroundColor)}
+        style={getStyle(size, backgroundColor)}
         testID={testID}
       >
         <Text
@@ -112,7 +119,7 @@ function getColors(type: BtnTypes, disabled: boolean | undefined) {
   return [textColor, backgroundColor]
 }
 
-function getSizeStyle(size: BtnSizes | undefined, backgroundColor: colorsEnum) {
+function getStyle(size: BtnSizes | undefined, backgroundColor: colorsEnum) {
   switch (size) {
     case BtnSizes.SMALL:
       return { ...styles.button, ...styles.small, backgroundColor }
