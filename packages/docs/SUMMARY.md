@@ -439,12 +439,14 @@
 - [Election](command-line-interface/election.md)
 - [Exchange](command-line-interface/exchange.md)
 - [Governance](command-line-interface/governance.md)
-- [Locked Gold](command-line-interface/lockedgold.md)
+- [LockedGold](command-line-interface/lockedgold.md)
 - [Network](command-line-interface/network.md)
+- [Oracle](command-line-interface/oracle.md)
+- [ReleaseGold](command-line-interface/releasegold.md)
 - [Node](command-line-interface/node.md)
 - [Transfer](command-line-interface/transfer.md)
-- [Validator Node](command-line-interface/validator.md)
-- [Validator Groups](command-line-interface/validatorgroup.md)
+- [Validator](command-line-interface/validator.md)
+- [ValidatorGroup](command-line-interface/validatorgroup.md)
 - [Help](command-line-interface/help.md)
 
 ## Community
