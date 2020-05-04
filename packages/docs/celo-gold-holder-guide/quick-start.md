@@ -6,13 +6,13 @@ If you are an early holder of Celo Gold on the Celo [Release Candidate](../getti
 
 This guide assumes:
 
-* You are self-custodying (you hold the private key to your address), and that you have provided that address directly to cLabs. If you are using a custody provider, please contact them for directions.
+- You are self-custodying (you hold the private key to your address), and that you have provided that address directly to cLabs. If you are using a custody provider, please contact them for directions.
 
-* Your address is the beneficiary of a [ReleaseGold](release-gold.md) contract, which releases Celo Gold programmatically to a beneficiary over a period of time.
+- Your address is the beneficiary of a [ReleaseGold](release-gold.md) contract, which releases Celo Gold programmatically to a beneficiary over a period of time.
 
-* You have been informed by cLabs that the `ReleaseGold` instance corresponding to your address has been deployed.
+- You have been informed by cLabs that the `ReleaseGold` instance corresponding to your address has been deployed.
 
-* You have your private key held on a [Ledger Nano S or Ledger Nano X](ledger.md) device, and you have a second such device available for managing a voting key.
+- You have your private key held on a [Ledger Nano S or Ledger Nano X](ledger.md) device, and you have a second such device available for managing a voting key.
 
 {% hint style="warning" %}
 **Warning**: Self-custodying keys has associated security and financial risks. Loss or theft of keys can result in irrecovable loss of funds. This guide also requires technical knowledge. You should be comfortable with using a Command Line Interface (CLI) and understand the basics of how cryptographic network accounts work.
@@ -26,25 +26,25 @@ This guide assumes:
 
 If you have any questions or need assistance with these instructions, please contact cLabs or ask in the `#celo-gold-holders` channel on [Celo's Discord server](https://chat.celo.org). Remember that Discord is a public channel: never disclose mnemonics, private keys, unsantized log output, or personal information.
 
-Please refer to the [Ledger Troubleshooting](ledger.md#troubleshooting) for issues using Ledgers with the Celo CLI.
+Please refer to the [Ledger Troubleshooting](ledger.md#Troubleshooting) for issues using Ledgers with the Celo CLI.
 
 ## Outline
 
 In this guide, you will:
 
-* Install the Celo CLI (and optionally, a local node to connect to the network)
-* Access the `ReleaseGold` account associated with your address using your existing Ledger
-* Authorize a voting key, which you will hold on a new, second Ledger
-* Lock some of the Gold in your `ReleaseGold` account
-* Use that Locked Gold to vote for validator groups to operate Celo's [Proof of Stake](../celo-codebase/protocol/proof-of-stake/README.md) network (and in doing so be ready to receive epoch rewards of 6% when the community enables them in a forthcoming governance proposal)
+- Install the Celo CLI (and optionally, a local node to connect to the network)
+- Access the `ReleaseGold` account associated with your address using your existing Ledger
+- Authorize a voting key, which you will hold on a new, second Ledger
+- Lock some of the Gold in your `ReleaseGold` account
+- Use that Locked Gold to vote for validator groups to operate Celo's [Proof of Stake](../celo-codebase/protocol/proof-of-stake/README.md) network (and in doing so be ready to receive epoch rewards of 6% when the community enables them in a forthcoming governance proposal)
 
 ## Preparing Ledgers
 
 You will need:
 
-* Your **Beneficiary Ledger**: One Ledger Nano S or X configured with your beneficiary key (used to produce the address you supplied cLabs). Once you have completed this guide, this will become a "cold wallet" that you can keep offline most of the time.
+- Your **Beneficiary Ledger**: One Ledger Nano S or X configured with your beneficiary key (used to produce the address you supplied cLabs). Once you have completed this guide, this will become a "cold wallet" that you can keep offline most of the time.
 
-* Your **Vote Signer Ledger:** One Ledger Nano S or X configured with a new, unused key. This will become a "warm wallet" you can use whenever you want to participate in validator elections or governance proposals.
+- Your **Vote Signer Ledger:** One Ledger Nano S or X configured with a new, unused key. This will become a "warm wallet" you can use whenever you want to participate in validator elections or governance proposals.
 
 As a first step, follow [these instructions](ledger.md) for both Ledgers to install the Ledger Celo app, obtain and verify the associated addresses, and (recommended) run a test transaction on the Alfajores test network.
 
@@ -60,20 +60,20 @@ If you haven't already, open a terminal window and install the Celo CLI:
 
 You will now need to point the Celo CLI to a node that is synchronized with the [Release Candidate](../getting-started/rc1.md) network. There are two options:
 
-* **Local Celo Blockchain node**: You can run a full node on your local machine which will communicate
-  with other nodes and cryptographically verify all data it receives. Since this approach does not require you to trust the network, it is most secure. 
-  
-  To do this, follow the tutorial for [running a full node](../getting-started/running-a-full-node-in-rc1.md) (and make sure to pass `--nousb`). 
-  
+- **Local Celo Blockchain node**: You can run a full node on your local machine which will communicate
+  with other nodes and cryptographically verify all data it receives. Since this approach does not require you to trust the network, it is most secure.
+
+  To do this, follow the tutorial for [running a full node](../getting-started/running-a-full-node-in-rc1.md) (and make sure to pass `--nousb`).
+
   Then run:
 
   ```bash
   celocli config:set --node http://localhost:8545
   ```
 
-* **cLabs-operated node**: As an alternative to using your own node, you can use existing an transaction
+- **cLabs-operated node**: As an alternative to using your own node, you can use existing an transaction
   nodes service. Forno, operated by cLabs, is one example. While this approach does not require you to deploy a node locally, it requires you to trust cLabs and the remote Forno nodes (in the same way you would trust a centralized web service). An attacker may be able to manipulate data returned to you from the service, which the CLI may rely on to complete operations.
-  
+
   To use Forno, run this command:
 
   ```bash
@@ -86,22 +86,22 @@ Next, you will find the address of the `ReleaseGold` contract deployed for your 
 
 Use the mapping from this list (you can use Edit>Find in your browser):
 
-* [RC1 ReleaseGold deployments on 4/23/20 ("Wave 1")](https://gist.githubusercontent.com/timmoreton/704404484cf8f641b5464a237592a341/raw/6ad2615f219c71fe370bac84e5ac7aa1653fffac/CeloRC1ReleaseGoldWave1.json)
+- [RC1 ReleaseGold deployments on 4/23/20 ("Wave 1")](https://gist.githubusercontent.com/timmoreton/704404484cf8f641b5464a237592a341/raw/6ad2615f219c71fe370bac84e5ac7aa1653fffac/CeloRC1ReleaseGoldWave1.json)
 
-* [RC1 ReleaseGold deployments on 4/30/20 ("Wave 1b")](https://gist.githubusercontent.com/timmoreton/32d36dcc48e52a4747df8cfa8e4a4d0f/raw/1557209b59fa863cc8ed9b66e72e6111fbfe3475/CeloRC1ReleaseGoldWave1b.json)
+- [RC1 ReleaseGold deployments on 4/30/20 ("Wave 1b")](https://gist.githubusercontent.com/timmoreton/32d36dcc48e52a4747df8cfa8e4a4d0f/raw/1557209b59fa863cc8ed9b66e72e6111fbfe3475/CeloRC1ReleaseGoldWave1b.json)
 
 If you have more than one beneficiary address, you'll want to step through this guide for each one.
 
 If you cannot locate your address in these mappings, please contact cLabs.
 
-Record the `Beneficiary` and ContractAddress` values in environment variable:
+Record the `Beneficiary` and `ContractAddress` values in environment variables:
 
 ```bash
 export CELO_BENEFICIARY_ADDRESS=<YOUR-CELO-BENEFICIARY-ADDRESS>
 export CELO_RG_ADDRESS=<YOUR-CELO-RELEASEGOLD-ADDRESS>
 ```
 
-You should find your beneficiary account has already got a very small Celo Gold balance to pay for transaction fees (values are shown in wei, so For example, 1 cGLD = 1000000000000000000):
+You should find your beneficiary account already has a very small Celo Gold balance to pay for transaction fees (values are shown in wei, so For example, 1 cGLD = 1000000000000000000):
 
 ```bash
 celocli account:balance $CELO_BENEFICIARY_ADDRESS
@@ -187,7 +187,7 @@ Now, using the proof-of-possession you generated above, as the Locked Gold Accou
 celocli releasegold:authorize --contract $CELO_RG_ADDRESS --role=vote --signer $CELO_VOTE_SIGNER_ADDRESS --signature $CELO_VOTE_SIGNER_SIGNATURE --useLedger
 ```
 
-Finally, verify that your signer was correctly authorized.
+Finally, verify that your signer was correctly authorized:
 
 ```bash
 celocli account:show $CELO_RG_ADDRESS
@@ -207,9 +207,9 @@ celocli account:balance $CELO_VOTE_SIGNER_SIGNATURE
 
 ## Lock Celo Gold
 
-To vote for validator groups and on governance proposals you will need to lock Celo Gold. This is to keep the network secure by making sure each unit of Celo Gold can only be used to vote once. `ReleaseGold` contracts that permit voting
+To vote for validator groups and on governance proposals you will need to lock Celo Gold. This is to keep the network secure by making sure each unit of Celo Gold can only be used to vote once.
 
-Specify the amount of Celo Gold you wish to lock (don’t include the  `< >`  braces).  All amounts are given as wei, i.e units of 10^-18 Celo Gold. For example, 1 cGLD = 1000000000000000000.
+Specify the amount of Celo Gold you wish to lock (don’t include the `< >`  braces). All amounts are given as wei, i.e units of 10^-18 Celo Gold. For example, 1 cGLD = 1000000000000000000.
 
 {% hint style="warning" %}
 Make sure to leave at least 1 Celo Gold unlocked to pay for transaction fees.
@@ -238,7 +238,7 @@ You can also see registered validator groups through the Celo CLI. This will dis
 celocli election:list
 ```
 
-Once you have found one or more validator groups you’d like to vote for, create an environment variable for its group address (don’t include the  `< >`  braces):
+Once you have found one or more validator groups you’d like to vote for, create an environment variable for its group address (don’t include the `< >` braces):
 
 ```bash
 export CELO_VALIDATOR_GROUP_ADDRESS=<VALIDATOR-GROUP-ADDRESS-TO-VOTE-FOR>
@@ -246,7 +246,7 @@ export CELO_VALIDATOR_GROUP_ADDRESS=<VALIDATOR-GROUP-ADDRESS-TO-VOTE-FOR>
 
 To vote, you will use your vote signer key, which is voting *on behalf of* your Locked Gold account.
 
-For each vote you will need to specify the amount of locked Celo Gold you wish to vote with (don’t include the  `< >`  braces). All Celo Gold amounts should be expressed in wei: that means 1 cGLD = 1000000000000000000.
+For each vote you will need to specify the amount of locked Celo Gold you wish to vote with (don’t include the `< >` braces). All Celo Gold amounts should be expressed in wei: that means 1 cGLD = 1000000000000000000.
 
 {% hint style="info" %}
 Connect your **Vote Signer Ledger** now, unlock it, and open the Celo application.
