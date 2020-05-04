@@ -11,6 +11,8 @@ import { colors } from 'src/styles'
 import { brandStyles } from 'src/brandkit/common/constants'
 import { AssetTypes } from 'src/brandkit/tracking'
 import IconShowcase from 'src/brandkit/common/Showcase'
+import { EXCHANGE_ICONS_PKG_TRACKING, trackDownload } from 'src/brandkit/tracking'
+import Button, { BTN } from 'src/shared/Button.3'
 
 const icons = [
   {
@@ -70,9 +72,22 @@ export interface IconData {
 
 function Overview() {
   const { t } = useTranslation(NameSpaces.brand)
+
+  const onPressDownload = React.useCallback(async () => {
+    await trackDownload(EXCHANGE_ICONS_PKG_TRACKING)
+  }, [])
+
   return (
     <View style={styles.container}>
       <PageHeadline title={t('exchangeIcons.title')} headline={t('exchangeIcons.headline')} />
+
+      <Button
+        kind={BTN.PRIMARY}
+        text={t('logo.overviewBtn')}
+        onPress={onPressDownload}
+        href="/assets/CeloMarketplaceIcons.zip"
+      />
+
       <CCLicense textI18nKey="exchangeIcons.license" />
 
       <View style={styles.root}>

@@ -23,7 +23,7 @@ export default withNamespaces(NameSpaces.brand)(function DownloadButton({
     <Button
       kind={BTN.TERTIARY}
       text={t('downloadAssetBtn')}
-      target={uri && uri.startsWith('http') && !uri.endsWith('.zip') ? '_blank' : undefined}
+      target={uri && !uri.endsWith('.zip') ? '_blank' : undefined}
       href={uri}
       onPress={onPress}
       style={brandStyles.button}
