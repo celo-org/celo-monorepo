@@ -23,7 +23,6 @@ exports[`Account renders correctly 1`] = `
         <View
           accessible={true}
           focusable={true}
-          isTVSelectable={true}
           onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
@@ -171,7 +170,6 @@ exports[`Account renders correctly 1`] = `
           <View
             accessible={true}
             focusable={true}
-            isTVSelectable={true}
             onClick={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
@@ -216,7 +214,6 @@ exports[`Account renders correctly 1`] = `
         <View
           accessible={true}
           focusable={true}
-          isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
@@ -293,7 +290,6 @@ exports[`Account renders correctly 1`] = `
         <View
           accessible={true}
           focusable={true}
-          isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
@@ -370,7 +366,6 @@ exports[`Account renders correctly 1`] = `
         <View
           accessible={true}
           focusable={true}
-          isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
@@ -447,7 +442,6 @@ exports[`Account renders correctly 1`] = `
         <View
           accessible={true}
           focusable={true}
-          isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
@@ -524,7 +518,6 @@ exports[`Account renders correctly 1`] = `
         <View
           accessible={true}
           focusable={true}
-          isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
@@ -601,7 +594,6 @@ exports[`Account renders correctly 1`] = `
         <View
           accessible={true}
           focusable={true}
-          isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
@@ -755,7 +747,6 @@ exports[`Account renders correctly 1`] = `
         <View
           accessible={true}
           focusable={true}
-          isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
@@ -832,7 +823,6 @@ exports[`Account renders correctly 1`] = `
         <View
           accessible={true}
           focusable={true}
-          isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
@@ -909,7 +899,6 @@ exports[`Account renders correctly 1`] = `
         <View
           accessible={true}
           focusable={true}
-          isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
@@ -1025,7 +1014,6 @@ exports[`Account renders correctly 1`] = `
           <View
             accessible={true}
             focusable={true}
-            isTVSelectable={true}
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackgroundBorderless",
@@ -1069,7 +1057,6 @@ exports[`Account renders correctly 1`] = `
           <View
             accessible={true}
             focusable={true}
-            isTVSelectable={true}
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackgroundBorderless",
@@ -1131,7 +1118,6 @@ exports[`Account renders correctly when dev mode active 1`] = `
         <View
           accessible={true}
           focusable={true}
-          isTVSelectable={true}
           onClick={[Function]}
           onResponderGrant={[Function]}
           onResponderMove={[Function]}
@@ -1279,7 +1265,6 @@ exports[`Account renders correctly when dev mode active 1`] = `
           <View
             accessible={true}
             focusable={true}
-            isTVSelectable={true}
             onClick={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
@@ -1324,7 +1309,6 @@ exports[`Account renders correctly when dev mode active 1`] = `
         <View
           accessible={true}
           focusable={true}
-          isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
@@ -1401,7 +1385,6 @@ exports[`Account renders correctly when dev mode active 1`] = `
         <View
           accessible={true}
           focusable={true}
-          isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
@@ -1478,7 +1461,6 @@ exports[`Account renders correctly when dev mode active 1`] = `
         <View
           accessible={true}
           focusable={true}
-          isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
@@ -1555,7 +1537,6 @@ exports[`Account renders correctly when dev mode active 1`] = `
         <View
           accessible={true}
           focusable={true}
-          isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
@@ -1632,7 +1613,6 @@ exports[`Account renders correctly when dev mode active 1`] = `
         <View
           accessible={true}
           focusable={true}
-          isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
@@ -1709,7 +1689,6 @@ exports[`Account renders correctly when dev mode active 1`] = `
         <View
           accessible={true}
           focusable={true}
-          isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
@@ -1863,7 +1842,6 @@ exports[`Account renders correctly when dev mode active 1`] = `
         <View
           accessible={true}
           focusable={true}
-          isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
@@ -1940,7 +1918,6 @@ exports[`Account renders correctly when dev mode active 1`] = `
         <View
           accessible={true}
           focusable={true}
-          isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
@@ -2017,7 +1994,6 @@ exports[`Account renders correctly when dev mode active 1`] = `
         <View
           accessible={true}
           focusable={true}
-          isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
@@ -2112,7 +2088,6 @@ exports[`Account renders correctly when dev mode active 1`] = `
           <View
             accessible={true}
             focusable={true}
-            isTVSelectable={true}
             onClick={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
@@ -2142,7 +2117,6 @@ exports[`Account renders correctly when dev mode active 1`] = `
           <View
             accessible={true}
             focusable={true}
-            isTVSelectable={true}
             onClick={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
@@ -2172,7 +2146,6 @@ exports[`Account renders correctly when dev mode active 1`] = `
           <View
             accessible={true}
             focusable={true}
-            isTVSelectable={true}
             onClick={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
@@ -2202,7 +2175,6 @@ exports[`Account renders correctly when dev mode active 1`] = `
           <View
             accessible={true}
             focusable={true}
-            isTVSelectable={true}
             onClick={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
@@ -2232,7 +2204,6 @@ exports[`Account renders correctly when dev mode active 1`] = `
           <View
             accessible={true}
             focusable={false}
-            isTVSelectable={true}
             onClick={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
@@ -2293,7 +2264,6 @@ exports[`Account renders correctly when dev mode active 1`] = `
           <View
             accessible={true}
             focusable={true}
-            isTVSelectable={true}
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackgroundBorderless",
@@ -2337,7 +2307,6 @@ exports[`Account renders correctly when dev mode active 1`] = `
           <View
             accessible={true}
             focusable={true}
-            isTVSelectable={true}
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackgroundBorderless",

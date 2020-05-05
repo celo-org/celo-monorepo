@@ -61,7 +61,7 @@ exports[`DataSaver renders correctly 1`] = `
           }
         >
           <AndroidSwitch
-            accessibilityRole="button"
+            accessibilityRole="switch"
             enabled={true}
             on={false}
             onChange={[Function]}
@@ -113,6 +113,7 @@ exports[`DataSaver renders correctly 1`] = `
       <View
         accessible={true}
         focusable={true}
+        forwardedRef={[Function]}
         onClick={[Function]}
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
@@ -135,6 +136,7 @@ exports[`DataSaver renders correctly 1`] = `
         }
       />
       <View
+        forwardedRef={[Function]}
         hideModalContentWhileAnimating={false}
         onModalHide={[Function]}
         onModalWillHide={[Function]}
@@ -212,7 +214,6 @@ exports[`DataSaver renders correctly 1`] = `
             <View
               accessible={true}
               focusable={true}
-              isTVSelectable={true}
               nativeBackgroundAndroid={
                 Object {
                   "attribute": "selectableItemBackgroundBorderless",
@@ -252,7 +253,6 @@ exports[`DataSaver renders correctly 1`] = `
             <View
               accessible={true}
               focusable={true}
-              isTVSelectable={true}
               nativeBackgroundAndroid={
                 Object {
                   "attribute": "selectableItemBackgroundBorderless",
@@ -318,6 +318,7 @@ exports[`DataSaver renders correctly 1`] = `
       <View
         accessible={true}
         focusable={true}
+        forwardedRef={[Function]}
         onClick={[Function]}
         onResponderGrant={[Function]}
         onResponderMove={[Function]}
@@ -340,6 +341,7 @@ exports[`DataSaver renders correctly 1`] = `
         }
       />
       <View
+        forwardedRef={[Function]}
         hideModalContentWhileAnimating={false}
         onModalHide={[Function]}
         onModalWillHide={[Function]}
@@ -417,7 +419,6 @@ exports[`DataSaver renders correctly 1`] = `
             <View
               accessible={true}
               focusable={true}
-              isTVSelectable={true}
               nativeBackgroundAndroid={
                 Object {
                   "attribute": "selectableItemBackgroundBorderless",
@@ -457,7 +458,6 @@ exports[`DataSaver renders correctly 1`] = `
             <View
               accessible={true}
               focusable={true}
-              isTVSelectable={true}
               nativeBackgroundAndroid={
                 Object {
                   "attribute": "selectableItemBackgroundBorderless",

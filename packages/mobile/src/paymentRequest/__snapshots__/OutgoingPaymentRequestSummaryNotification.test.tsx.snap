@@ -170,7 +170,6 @@ exports[`OutgoingPaymentRequestSummaryNotification renders a number when the add
                 <View
                   accessible={true}
                   focusable={true}
-                  isTVSelectable={true}
                   nativeBackgroundAndroid={
                     Object {
                       "attribute": "selectableItemBackgroundBorderless",
@@ -206,7 +205,6 @@ exports[`OutgoingPaymentRequestSummaryNotification renders a number when the add
                 <View
                   accessible={true}
                   focusable={true}
-                  isTVSelectable={true}
                   nativeBackgroundAndroid={
                     Object {
                       "attribute": "selectableItemBackgroundBorderless",
@@ -419,7 +417,6 @@ exports[`OutgoingPaymentRequestSummaryNotification renders correctly for just on
                 <View
                   accessible={true}
                   focusable={true}
-                  isTVSelectable={true}
                   nativeBackgroundAndroid={
                     Object {
                       "attribute": "selectableItemBackgroundBorderless",
@@ -455,7 +452,6 @@ exports[`OutgoingPaymentRequestSummaryNotification renders correctly for just on
                 <View
                   accessible={true}
                   focusable={true}
-                  isTVSelectable={true}
                   nativeBackgroundAndroid={
                     Object {
                       "attribute": "selectableItemBackgroundBorderless",
@@ -660,7 +656,6 @@ exports[`OutgoingPaymentRequestSummaryNotification renders correctly for multipl
           <View
             accessible={true}
             focusable={true}
-            isTVSelectable={true}
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackgroundBorderless",
