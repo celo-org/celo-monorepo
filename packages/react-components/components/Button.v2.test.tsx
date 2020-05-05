@@ -16,9 +16,8 @@ describe('Button', () => {
       expect(handler).toBeCalled()
     })
 
-    // Test is falsely failing see https://github.com/callstack/react-native-testing-library/issues/28
     it('multiple times fires once', () => {
-      const handler = jest.fn(() => console.warn('FIRE'))
+      const handler = jest.fn()
       const { getByTestId } = render(
         <Button onPress={handler} text="Button" type={BtnTypes.PRIMARY} testID={'TEST'} />
       )
@@ -28,7 +27,7 @@ describe('Button', () => {
       fireEvent.press(button)
       expect(handler).toBeCalledTimes(1)
     })
-    // Test is falsely failing see https://github.com/callstack/react-native-testing-library/issues/28
+
     describe('when disabled', () => {
       it('does not fire onPress', () => {
         const handler = jest.fn()

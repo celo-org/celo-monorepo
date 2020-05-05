@@ -39,14 +39,7 @@ export default React.memo(function Button(props: ButtonProps) {
   // Debounce onPress event so that it is called once on trigger and
   // consecutive calls in given period are ignored.
   const debouncedOnPress = useCallback(
-    debounce(
-      () => {
-        console.warn('DEBOUNCE')
-        props.onPress()
-      },
-      BUTTON_TAP_DEBOUNCE_TIME,
-      DEBOUNCE_OPTIONS
-    ),
+    debounce(props.onPress, BUTTON_TAP_DEBOUNCE_TIME, DEBOUNCE_OPTIONS),
     [props.onPress, disabled]
   )
 
