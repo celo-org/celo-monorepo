@@ -387,6 +387,7 @@ export function* switchToGethFromForno() {
   const gethAlreadyStartedThisSession = yield select(gethStartedThisSessionSelector)
   if (gethAlreadyStartedThisSession) {
     // Restart app to allow users to start geth a second time
+    // TODO remove when https://github.com/celo-org/celo-monorepo/issues/2101 fixed
     Logger.debug(TAG + '@switchToGethFromForno', 'Restarting...')
     restartApp()
     return
