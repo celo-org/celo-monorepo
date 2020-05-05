@@ -36,7 +36,7 @@ fi
 
 # sleep 200
 
-waitTimeInitial=1600
+waitTimeInitial=2000
 waitTimePending=${waitTimeInitial}
 sleepTime=10
 iterations=0
@@ -78,7 +78,6 @@ fi
 if [ $? = 1 ]; then
   CONTRACTS_FAILED=True
 fi
-kill ${PID_PORT_FORWARD}
 
 if [[ ${CONTRACTS_FAILED} == "True" ]]; then
   echo "Contract Deployment failed"
