@@ -39,7 +39,9 @@ async function helmParameters(celoEnv: string) {
     `--set deploymentSuffix=${suffix}`,
   ]
   if (isVmBased()) {
-    params.push(`--set web3Provider="ws://${await getInternalTxNodeLoadBalancerIP(celoEnv)}:8546"`)
+    params.push(
+      `--set web3Provider="http://${await getInternalTxNodeLoadBalancerIP(celoEnv)}:8545"`
+    )
   }
   return params
 }

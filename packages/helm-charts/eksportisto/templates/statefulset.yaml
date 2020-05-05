@@ -42,8 +42,8 @@ spec:
             /rosetta/eksportisto --nodeUri $WEB3_PROVIDER
         resources:
           requests:
-            memory: 856Mi
-            cpu: 1200m
+            memory: 256Mi
+            cpu: 2400m
         volumeMounts:
         - name: data
           mountPath: /root/.eksportisto
