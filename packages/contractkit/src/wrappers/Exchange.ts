@@ -65,14 +65,14 @@ export class ExchangeWrapper extends BaseWrapper<Exchange> {
    * @param sellGold `true` if gold is the sell token
    * @return The corresponding buyToken amount.
    */
-  getBuyTokenAmount: (
-    sellAmount: BigNumber.Value,
-    sellGold: boolean
-  ) => Promise<BigNumber> = proxyCall(
-    this.contract.methods.getBuyTokenAmount,
-    tupleParser(valueToString, identity),
-    valueToBigNumber
-  )
+  async getBuyTokenAmount(sellAmount: BigNumber.Value, sellGold: boolean): Promise<BigNumber> {
+    const sell = valueToString(sellAmount)
+    if (new BigNumber(sell).eq(0)) {
+      return new BigNumber(0)
+    }
+    const res = await this.contract.methods.getBuyTokenAmount(sell, sellGold).call()
+    return valueToBigNumber(res)
+  }
 
   /**
    * Returns the amount of sellToken a user would need to exchange to receive buyAmount of
@@ -81,14 +81,14 @@ export class ExchangeWrapper extends BaseWrapper<Exchange> {
    * @param sellGold `true` if gold is the sell token
    * @return The corresponding sellToken amount.
    */
-  getSellTokenAmount: (
-    buyAmount: BigNumber.Value,
-    sellGold: boolean
-  ) => Promise<BigNumber> = proxyCall(
-    this.contract.methods.getSellTokenAmount,
-    tupleParser(valueToString, identity),
-    valueToBigNumber
-  )
+  async getSellTokenAmount(buyAmount: BigNumber.Value, sellGold: boolean): Promise<BigNumber> {
+    const buy = valueToString(buyAmount)
+    if (new BigNumber(buy).eq(0)) {
+      return new BigNumber(0)
+    }
+    const res = await this.contract.methods.getSellTokenAmount(buy, sellGold).call()
+    return valueToBigNumber(res)
+  }
 
   /**
    * Returns the buy token and sell token bucket sizes, in order. The ratio of

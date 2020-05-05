@@ -1,6 +1,8 @@
 import { createStackNavigator } from '@react-navigation/stack'
 import * as React from 'react'
 import { Platform } from 'react-native'
+import { createSwitchNavigator } from 'react-navigation'
+import { createStackNavigator } from 'react-navigation-stack'
 import Account from 'src/account/Account'
 import Analytics from 'src/account/Analytics'
 import DataSaver from 'src/account/DataSaver'

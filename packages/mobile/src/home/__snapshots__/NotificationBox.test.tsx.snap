@@ -155,7 +155,7 @@ exports[`NotificationBox renders correctly for with all notifications 1`] = `
                       >
                         
                         $
-                        16.41
+                        266,000.00
                       </Text>
                     </Text>
                     <Text
@@ -198,7 +198,7 @@ exports[`NotificationBox renders correctly for with all notifications 1`] = `
                       >
                         
                         $
-                        16.41
+                        240.58
                       </Text>
                     </Text>
                   </View>

@@ -1,7 +1,6 @@
-import { hashOfClaim } from '@celo/contractkit/lib/identity/claims/claim'
+import { hashOfClaim, KeybaseClaim } from '@celo/contractkit/lib/identity/claims/claim'
 import {
   createKeybaseClaim,
-  KeybaseClaim,
   keybaseFilePathToProof,
   proofFileName,
   targetURL,
@@ -34,18 +33,18 @@ export default class ClaimKeybase extends ClaimCommand {
 
   async run() {
     const res = this.parse(ClaimKeybase)
-    const address = toChecksumAddress(res.flags.from)
     const username = res.flags.username
     const metadata = await this.readMetadata()
+    const accountAddress = toChecksumAddress(metadata.data.meta.address)
     const claim = createKeybaseClaim(username)
     const signature = await this.signer.sign(hashOfClaim(claim))
     await this.addClaim(metadata, claim)
     this.writeMetadata(metadata)
 
     try {
-      await this.uploadProof(claim, signature, username, address)
+      await this.uploadProof(claim, signature, username, accountAddress)
     } catch (error) {
-      this.printManualInstruction(claim, signature, username, address)
+      this.printManualInstruction(claim, signature, username, accountAddress)
     }
   }
 
