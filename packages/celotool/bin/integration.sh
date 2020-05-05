@@ -42,7 +42,7 @@ sleepTime=10
 iterations=0
 
 echo -n "waiting for pod"
-while [[ $(kubectl get pods -n ${NAMESPACE} -l statefulset.kubernetes.io/pod-name=${ENV}-validators-0 -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}') != "True" ]] || ! [[ waitTime -gt 0 ]]; do
+while [[ $(kubectl get pods -n ${NAMESPACE} -l statefulset.kubernetes.io/pod-name=${ENV}-validators-0 -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}') != "True" ]] || ! [[ waitTimePending -gt 0 ]]; do
   waitTimePending="$((waitTimePending-sleepTime))"
   echo -n "."
   sleep ${sleepTime}
@@ -56,7 +56,7 @@ PID_PORT_FORWARD=$!
 blockNumber=$(curl -X POST -s --data '{"jsonrpc":"2.0","method":"eth_blockNumber","params":[],"id":1}' http://localhost:8545 -H 'Content-Type: application/json' | jq -r .result)
 
 echo -n "waiting network start mining"
-until [[ $blockNumber -gt 0x0 ]] || ! [[ $waitTime -gt 0 ]]; do
+until [[ $blockNumber -gt 0x0 ]] || ! [[ $waitTimePending -gt 0 ]]; do
   sleep ${sleepTime}
   waitTimePending="$((waitTimePending-sleepTime))"
   iterations="$((iterations+1))"
