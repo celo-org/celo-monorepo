@@ -14,36 +14,42 @@ import { hashNav } from 'src/shared/menu-items'
 
 const icons = [
   {
-    description: 'cUSD Exchange Icon, Full Color\n',
+    name: 'cUSD Exchange Icon',
+    description: 'Full Color\n',
     preview: '/images/marketplace-icons/icon-celo-dollar-color-f.svg',
     uri: '/assets/marketplace-icons/icon-celo-dollar-color.zip',
   },
   {
-    description: 'cGLD Exchange Icon, Full Color\n',
+    name: 'cGLD Exchange Icon',
+    description: 'Full Color\n',
     preview: '/images/marketplace-icons/icon-celo-gold-color-f.svg',
     uri: '/assets/marketplace-icons/icon-celo-gold-color.zip',
   },
   null,
   {
-    description: 'cUSD Exchange Icon, Monochrome\n',
+    name: 'cUSD Exchange Icon',
+    description: 'Monochrome\n',
     preview: '/images/marketplace-icons/icon-celo-dollar-black-f.svg',
     uri: '/assets/marketplace-icons/icon-celo-dollar-black.zip',
     variant: 'circle-white',
   },
   {
-    description: 'cGLD Exchange Icon, Monochrome\n',
+    name: 'cGLD Exchange Icon',
+    description: 'Monochrome\n',
     preview: '/images/marketplace-icons/icon-celo-gold-black-f.svg',
     uri: '/assets/marketplace-icons/icon-celo-gold-black.zip',
     variant: 'circle-white',
   },
   {
-    description: 'cUSD Exchange Icon, Reverse Monochrome\n',
+    name: 'cUSD Exchange Icon',
+    description: 'Reverse Monochrome\n',
     preview: '/images/marketplace-icons/icon-celo-dollar-white-f.svg',
     uri: '/assets/marketplace-icons/icon-celo-dollar-white.zip',
     variant: 'circle-black',
   },
   {
-    description: 'cGLD Exchange Icon, Reverse Monochrome\n',
+    name: 'cGLD Exchange Icon',
+    description: 'Reverse Monochrome\n',
     preview: '/images/marketplace-icons/icon-celo-gold-white-f.svg',
     uri: '/assets/marketplace-icons/icon-celo-gold-white.zip',
     variant: 'circle-black',
@@ -105,7 +111,7 @@ function Overview() {
                   ratio={1}
                   variant={(icon.variant || 'circle') as any}
                   description={icon.description}
-                  name={''}
+                  name={icon.name}
                   preview={icon.preview}
                   uri={icon.uri}
                   loading={false}
