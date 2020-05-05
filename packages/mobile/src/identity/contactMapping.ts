@@ -18,9 +18,14 @@ import {
   updateE164PhoneNumberAddresses,
 } from 'src/identity/actions'
 import { fetchPhoneHashPrivate, PhoneNumberHashDetails } from 'src/identity/privacy'
-import { AddressToE164NumberType, E164NumberToAddressType } from 'src/identity/reducer'
+import {
+  AddressToE164NumberType,
+  e164NumberToAddressSelector,
+  E164NumberToAddressType,
+} from 'src/identity/reducer'
 import { setRecipientCache } from 'src/recipients/actions'
 import { contactsToRecipients, NumberToRecipient } from 'src/recipients/recipient'
+import { manualAddressValidationRequired } from 'src/send/actions'
 import { getAllContacts } from 'src/utils/contacts'
 import Logger from 'src/utils/Logger'
 import { checkContactsPermission } from 'src/utils/permissions'
@@ -96,13 +101,47 @@ function* updateRecipientsCache(
   yield put(setRecipientCache({ ...e164NumberToRecipients, ...otherRecipients }))
 }
 
+// Given addresses can be added and deleted (so length can remain equal despite changes), must do a
+// deep equality check. not sure if order is guaranteed to be consistent so not assuming it
+const checkIfItemsOfChildArrAreSubsetOfParentArr = (parentArr: string[], childArr: string[]) => {
+  const parentArrSorted = parentArr.sort()
+  const childArrSorted = childArr.sort()
+
+  for (let i = 0; i < childArrSorted.length; i += 1) {
+    if (parentArrSorted[i] !== childArrSorted[i]) {
+      return false
+    }
+  }
+
+  return true
+}
+
+const checkIfValidationNeeded = (
+  oldAddresses: string[] | null | undefined,
+  newAddresses: string[] | null | undefined
+) => {
+  // if address is unverified or there is only one address available, no verification needed
+  if (!newAddresses || newAddresses.length < 2) {
+    return false
+  }
+
+  // if there are stored addresses and no new addresses have been added, no verification needed
+  if (oldAddresses && checkIfItemsOfChildArrAreSubsetOfParentArr(oldAddresses, newAddresses)) {
+    return false
+  }
+
+  // if there are unaccounted for changes, require validation
+  return true
+}
+
 export function* fetchPhoneAddresses({ e164Number }: FetchPhoneAddressesAction) {
   try {
     Logger.debug(TAG + '@fetchPhoneAddresses', `Fetching addresses for number`)
+    const oldE164NumberToAddress = yield select(e164NumberToAddressSelector)
+    const oldAddresses = oldE164NumberToAddress[e164Number]
+
     // Clear existing entries for those numbers so our mapping consumers
     // know new status is pending.
-
-    // save previous mapping to compare with later
     yield put(updateE164PhoneNumberAddresses({ [e164Number]: undefined }, {}))
 
     const contractKit = yield call(getContractKit)
@@ -112,9 +151,6 @@ export function* fetchPhoneAddresses({ e164Number }: FetchPhoneAddressesAction) 
     ])
 
     const addresses: string[] | null = yield call(getAddresses, e164Number, attestationsWrapper)
-
-    // do a check for if there are more addresses, less addresses, or the same amount of addresses
-    // and route the user to secure send or not accordingly
 
     const e164NumberToAddressUpdates: E164NumberToAddressType = {}
     const addressToE164NumberUpdates: AddressToE164NumberType = {}
@@ -127,6 +163,10 @@ export function* fetchPhoneAddresses({ e164Number }: FetchPhoneAddressesAction) 
     } else {
       e164NumberToAddressUpdates[e164Number] = addresses
       addresses.map((a) => (addressToE164NumberUpdates[a] = e164Number))
+    }
+
+    if (checkIfValidationNeeded(oldAddresses, addresses)) {
+      yield put(manualAddressValidationRequired())
     }
 
     yield put(
@@ -186,7 +226,9 @@ export function getAddressFromPhoneNumber(
 
   if (addresses.length > 1) {
     Logger.warn(TAG, 'Number mapped to multiple addresses, need to disambiguate')
-    // TODO handle with Secure Send flow, return latest for now
+    // TODO: Do a check against manually verified data to get the prefered address
+
+    // if data doesn't exist or isn't in the addresses array, that means the user bypassed fetchPhoneAddresses somehow
     return addresses[addresses.length - 1]
   }
 

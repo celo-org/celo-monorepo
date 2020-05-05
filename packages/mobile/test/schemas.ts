@@ -28,6 +28,7 @@ export const vNeg1Schema = {
     recentRecipients: [],
     isValidatingRecipient: false,
     isValidRecipient: false,
+    manualAddressValidationRequired: false,
   },
   recipients: {
     recipientCache: {},

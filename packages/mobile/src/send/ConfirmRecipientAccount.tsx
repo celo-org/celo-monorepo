@@ -125,7 +125,7 @@ export class ConfirmRecipientAccount extends React.Component<Props, State> {
           <CodeRow
             status={codeStatus}
             inputValue={inputValue}
-            inputPlaceholder={t('inviteCodeText.codePlaceholder')}
+            inputPlaceholder={t('confirmAccountNumber.placeholder')}
             onInputChange={this.onInputChange}
             shouldShowClipboard={this.shouldShowClipboard}
           />
@@ -194,7 +194,7 @@ export class ConfirmRecipientAccount extends React.Component<Props, State> {
             {this.renderAddressInputField()}
           </View>
           <Text onPress={this.onPressHelp} style={styles.askHelpText}>
-            {t('helpFindAccount')}
+            {t('confirmAccountNumber.help', { displayName })}
           </Text>
         </KeyboardAwareScrollView>
         <View>{this.renderConfirmButtonOrLoadingAnimations()}</View>
