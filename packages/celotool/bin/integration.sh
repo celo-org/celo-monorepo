@@ -47,7 +47,7 @@ while [[ $(kubectl get pods -n ${NAMESPACE} -l statefulset.kubernetes.io/pod-nam
 done
 echo 
 
-kubectl port-forward -n ${NAMESPACE} ${ENV}-validators-0 18545:8545 &
+kubectl port-forward -n ${NAMESPACE} ${ENV}-validators-0 8545:8545 >/dev/null 2>&1 &
 PID_PORT_FORWARD=$!
 
 # blockNumber=$(kubectl exec -it -n ${ENV} ${ENV}-validators-1 -- geth --exec "eth.blockNumber" attach 2>/dev/null)
@@ -62,7 +62,7 @@ until [[ $blockNumber -gt 0x0 ]] || ! [[ $waitTime -gt 0 ]]; do
   blockNumber=$(curl -X POST -s --data '{"jsonrpc":"2.0","method":"eth_blockNumber","params":[],"id":1}' http://localhost:18545 -H 'Content-Type: application/json' | jq -r .result)
 done
 echo
-kill ${PID_PORT_FORWARD}
+
 if ! [[ $waitTime -gt 0 ]]; then
   echo "ERROR: Network could not start after ${waitTime} seconds"
   exit 1
@@ -72,8 +72,6 @@ else
 fi
 
 # Deploy the contracts
-kubectl port-forward -n ${NAMESPACE} ${ENV}-validators-0 8545:8545 &
-PID_PORT_FORWARD=$!
 "$DIR/celotooljs.sh" deploy initial contracts -e ${ENV} --skipPortForward ${VERBOSE_OPTS} | tee "${LOGS_DIR}/migration.log" 2>&1
 if [ $? = 1 ]; then
   CONTRACTS_FAILED=true
@@ -132,3 +130,5 @@ fi
 if [ $? = 1 ]; then
   ORACLE_FAILED=true
 fi
+
+kill -9 ${PID_PORT_FORWARD}
