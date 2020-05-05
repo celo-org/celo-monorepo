@@ -78,8 +78,8 @@ describe(waitForWeb3Sync, () => {
 describe(checkWeb3SyncProgress, () => {
   it('reports web3 status correctly', async () => {
     const contractKit = await getContractKitOutsideGenerator()
-    // @ts-ignore
     contractKit.web3.eth.isSyncing
+      // @ts-ignore
       .mockReturnValueOnce({
         startingBlock: 0,
         currentBlock: 10,
