@@ -54,4 +54,9 @@ export enum ErrorMessages {
   FAILED_TO_SWITCH_SYNC_MODES = 'failedToSwitchSyncModes',
   SMS_ERROR = 'walletFlow5:SMSError',
   PAYMENT_REQUEST_UPDATE_FAILED = 'paymentRequestFlow:paymentRequestUpdateFailed',
+  ADDRESS_VALIDATION_NO_MATCH = 'addressValidationNoMatch',
+  ADDRESS_VALIDATION_FULL_POORLY_FORMATTED = 'addressValidationFullPoorlyFormatted',
+  ADDRESS_VALIDATION_PARTIAL_POORLY_FORMATTED = 'addressValidationPartialPoorlyFormatted',
+  ADDRESS_VALIDATION_FULL_OWN_ADDRESS = 'addressValidationFullOwnAddress',
+  ADDRESS_VALIDATION_PARTIAL_OWN_ADDRESS = 'addressValidationPartialOwnAddress',
 }

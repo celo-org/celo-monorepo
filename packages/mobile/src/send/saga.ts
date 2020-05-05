@@ -21,6 +21,9 @@ import {
   SendPaymentOrInviteAction,
   sendPaymentOrInviteFailure,
   sendPaymentOrInviteSuccess,
+  ValidateRecipientAddressAction,
+  validateRecipientAddressFailure,
+  validateRecipientAddressSuccess,
 } from 'src/send/actions'
 import { transferStableToken } from 'src/stableToken/actions'
 import {
@@ -34,6 +37,7 @@ import { currentAccountSelector } from 'src/web3/selectors'
 import { estimateGas } from 'src/web3/utils'
 
 const TAG = 'send/saga'
+const TAG2 = 'secureSend/saga'
 
 export async function getSendTxGas(
   account: string,
@@ -171,11 +175,61 @@ function* sendPaymentOrInviteSaga({
   }
 }
 
-export function* validateRecipientAddressSaga({ address }: Actions.VALIDATE_RECIPIENT_ADDRESS) {
-  Logger.debug(TAG, 'Starting Recipient Address Validation')
+const checkForSpecialChars = (address: string, fullValidation: boolean) => {
+  const regex = new RegExp('[^0-9A-Za-z]', 'g')
+  const cleanedAddress = address.replace(regex, '')
+
+  if (cleanedAddress !== address) {
+    const errorMessage = fullValidation
+      ? ErrorMessages.ADDRESS_VALIDATION_FULL_POORLY_FORMATTED
+      : ErrorMessages.ADDRESS_VALIDATION_PARTIAL_POORLY_FORMATTED
+    throw Error(errorMessage)
+  }
 }
 
-export function* doAddressValidation(address: string)
+export function* validateRecipientAddressSaga({
+  fullAddressOrLastFourDigits,
+  fullAddressValidationRequired,
+}: ValidateRecipientAddressAction) {
+  Logger.debug(TAG, 'Starting Recipient Address Validation')
+
+  try {
+    if (fullAddressValidationRequired) {
+      yield call(doFullAddressValidation, fullAddressOrLastFourDigits)
+    } else {
+      yield call(doPartialAddressValidation, fullAddressOrLastFourDigits)
+    }
+
+    yield put(validateRecipientAddressSuccess())
+  } catch (error) {
+    Logger.error(TAG2, 'Address validation error: ', error.message)
+    console.log('--------------------', error.message, '----------------------')
+    yield put(showError(error.message))
+    yield put(validateRecipientAddressFailure())
+  }
+}
+
+export function* doFullAddressValidation(address: string) {
+  checkForSpecialChars(address, true)
+
+  if (address.length !== 42 || address.slice(0, 2) !== '0x') {
+    throw Error(ErrorMessages.ADDRESS_VALIDATION_FULL_POORLY_FORMATTED)
+  }
+
+  // Check if it's the user's own address
+  // Check if address is one of the potential addresses that map to that specific recipient
+}
+
+export function* doPartialAddressValidation(lastFourDigitsOfAddress: string) {
+  checkForSpecialChars(lastFourDigitsOfAddress, false)
+
+  if (lastFourDigitsOfAddress.length !== 4) {
+    throw Error(ErrorMessages.ADDRESS_VALIDATION_PARTIAL_POORLY_FORMATTED)
+  }
+
+  // Check if it's the user's own address
+  // Check if address is one of the potential addresses that map to that specific recipient
+}
 
 export function* watchSendPaymentOrInvite() {
   yield takeLeading(Actions.SEND_PAYMENT_OR_INVITE, sendPaymentOrInviteSaga)
