@@ -37,7 +37,7 @@ export function* sendAndMonitorTransaction<T>(
   try {
     Logger.debug(TAG + '@sendAndMonitorTransaction', `Sending transaction with id: ${txId}`)
 
-    const sendTxMethod = function*(nonce: number) {
+    const sendTxMethod = function*(nonce?: number) {
       const { transactionHash, confirmation }: TxPromises = yield call(
         sendTransactionPromises,
         tx.txo,
@@ -51,7 +51,7 @@ export function* sendAndMonitorTransaction<T>(
       const result = yield confirmation
       return result
     }
-    yield call(wrapSendTransactionWithRetry, txId, account, sendTxMethod)
+    yield call(wrapSendTransactionWithRetry, txId, sendTxMethod)
     yield put(transactionConfirmed(txId))
 
     if (currency === CURRENCY_ENUM.GOLD) {
