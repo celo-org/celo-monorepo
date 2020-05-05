@@ -35,6 +35,8 @@ In order to maintain this, create and merge a PR to the `master` branch bumping 
 Update all references to that package in the monorepo to the new version (i.e. `x.y.z+1`)
 Prefer appending a `-dev` suffix to the version number to ensure an internal dependency will never be mistaken for a published one.
 
+> Note: Publishing breaking changes requires an increment to the minor version number for `0.` releases. Once `1.0.0` is pusblished breaking changes are generally prohibited outside the rare major version release. Read the [semver specification](https://semver.org/) for more information.
+
 > Note: Services deployed to App Engine must only depend on published NPM packages. These packages are `verification-pool-api`, `blockchain-api` and `notification-service`.
 
 ### Checkout the commit to be published and verify version numbers
