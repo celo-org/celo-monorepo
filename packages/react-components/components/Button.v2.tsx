@@ -1,9 +1,8 @@
-import Touchable from '@celo/react-components/components/Touchable'
 import colors, { colorsEnum } from '@celo/react-components/styles/colors.v2'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import { debounce } from 'lodash'
 import React, { useCallback } from 'react'
-import { StyleProp, StyleSheet, Text, View, ViewStyle } from 'react-native'
+import { StyleProp, StyleSheet, Text, TouchableOpacity, View, ViewStyle } from 'react-native'
 
 const BUTTON_TAP_DEBOUNCE_TIME = 300 // milliseconds
 const DEBOUNCE_OPTIONS = {
@@ -55,7 +54,8 @@ export default React.memo(function Button(props: ButtonProps) {
 
   return (
     <View style={style ? [styles.root, style] : styles.root}>
-      <Touchable
+      <TouchableOpacity
+        activeOpacity={0.75}
         onPress={debouncedOnPress}
         disabled={disabled}
         style={getStyle(size, backgroundColor)}
@@ -67,7 +67,7 @@ export default React.memo(function Button(props: ButtonProps) {
         >
           {text}
         </Text>
-      </Touchable>
+      </TouchableOpacity>
     </View>
   )
 })
