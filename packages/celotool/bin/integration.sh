@@ -53,7 +53,7 @@ kubectl port-forward -n ${NAMESPACE} ${ENV}-validators-0 8545:8545 >/dev/null 2>
 PID_PORT_FORWARD=$!
 
 # blockNumber=$(kubectl exec -it -n ${ENV} ${ENV}-validators-1 -- geth --exec "eth.blockNumber" attach 2>/dev/null)
-blockNumber=$(curl -X POST -s --data '{"jsonrpc":"2.0","method":"eth_blockNumber","params":[],"id":1}' http://localhost:18545 -H 'Content-Type: application/json' | jq -r .result)
+blockNumber=$(curl -X POST -s --data '{"jsonrpc":"2.0","method":"eth_blockNumber","params":[],"id":1}' http://localhost:8545 -H 'Content-Type: application/json' | jq -r .result)
 
 echo -n "waiting network start mining"
 until [[ $blockNumber -gt 0x0 ]] || ! [[ $waitTime -gt 0 ]]; do
@@ -61,7 +61,7 @@ until [[ $blockNumber -gt 0x0 ]] || ! [[ $waitTime -gt 0 ]]; do
   waitTimePending="$((waitTimePending-sleepTime))"
   iterations="$((iterations+1))"
   echo -n "."
-  blockNumber=$(curl -X POST -s --data '{"jsonrpc":"2.0","method":"eth_blockNumber","params":[],"id":1}' http://localhost:18545 -H 'Content-Type: application/json' | jq -r .result)
+  blockNumber=$(curl -X POST -s --data '{"jsonrpc":"2.0","method":"eth_blockNumber","params":[],"id":1}' http://localhost:8545 -H 'Content-Type: application/json' | jq -r .result)
 done
 echo
 
