@@ -15,7 +15,7 @@ export interface State {
 const initialState = {
   isSending: false,
   recentRecipients: [],
-  isValidatingRecipient: true,
+  isValidatingRecipient: false,
   isValidRecipient: false,
 }
 

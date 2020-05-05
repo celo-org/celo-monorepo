@@ -99,6 +99,8 @@ export function* fetchPhoneAddresses({ e164Number }: FetchPhoneAddressesAction) 
     Logger.debug(TAG + '@fetchPhoneAddresses', `Fetching addresses for number`)
     // Clear existing entries for those numbers so our mapping consumers
     // know new status is pending.
+
+    // save previous mapping to compare with later
     yield put(updateE164PhoneNumberAddresses({ [e164Number]: undefined }, {}))
 
     const contractKit = getContractKit()
@@ -109,11 +111,14 @@ export function* fetchPhoneAddresses({ e164Number }: FetchPhoneAddressesAction) 
 
     const addresses: string[] | null = yield call(getAddresses, e164Number, attestationsWrapper)
 
+    // do a check for if there are more addresses, less addresses, or the same amount of addresses
+    // and route the user to secure send or not accordingly
+
     const e164NumberToAddressUpdates: E164NumberToAddressType = {}
     const addressToE164NumberUpdates: AddressToE164NumberType = {}
 
     if (!addresses) {
-      Logger.debug(TAG + '@fetchPhoneAddresses', `No addresses for for number`)
+      Logger.debug(TAG + '@fetchPhoneAddresses', `No addresses for number`)
       // Save invalid/0 addresses to avoid checking again
       // null means a contact is unverified, whereas undefined means we haven't checked yet
       e164NumberToAddressUpdates[e164Number] = null

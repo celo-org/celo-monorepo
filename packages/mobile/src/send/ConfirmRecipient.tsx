@@ -102,7 +102,13 @@ class ConfirmRecipient extends React.Component<Props> {
   }
 
   onPressConfirmAccount = () => {
-    navigate(Screens.ConfirmRecipientAccount, { displayName: this.state.displayName })
+    const fullAddressValidationRequired = this.props.navigation.getParam(
+      'fullAddressValidationRequired'
+    )
+    navigate(Screens.ConfirmRecipientAccount, {
+      displayName: this.state.displayName,
+      fullAddressValidationRequired,
+    })
   }
 
   render() {

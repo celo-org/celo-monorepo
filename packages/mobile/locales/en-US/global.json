@@ -117,5 +117,11 @@
   "message": "Message",
   "addressLookupFailure": "Failed to look up phone number address",
   "saltFetchFailure": "Failed to retrieve phone number secret",
-  "saltQuotaExceededError": "Your phone number lookup quota is used up"
+  "saltQuotaExceededError": "Your phone number lookup quota is used up",
+  "addressValidationNoMatch": "Incorrect account number",
+  "addressValidationFullPoorlyFormatted": "Account numbers begin with \"0x\", contain only numbers and letters, and are 42 characters long. Press the link below for help",
+  "addressValidationPartialPoorlyFormatted": "Account numbers only contain numbers and letters, please provide the last 4 digits. Press the link below for help",
+  "addressValidationFullOwnAddress": "Please enter your contact's account number, not your own. Press the link below for help",
+  "addressValidationPartialOwnAddress": "Please enter the last 4 digits of your contact's account number, not your own. Press the link below for help",
+  "helpFindAccount": "Help your contact find their account number"
 }

@@ -207,6 +207,8 @@ class Send extends React.Component<Props, State> {
 
     // NOTE: Need to do a check here to see if they should go to normal flow or secure send
     // if secure send, also needs to return if they need to do a full address validation or just last 4 digits
+    // NOTE: User can only validate using the last 4 digits if none of the potential addresses OR the user's own address
+    // ends with the same last 4 digits
     navigate(Screens.ConfirmRecipient, { recipient, fullAddressValidationRequired: true })
     // navigate(Screens.SendAmount, { recipient })
   }

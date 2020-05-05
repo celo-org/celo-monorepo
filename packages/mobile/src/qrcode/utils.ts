@@ -67,6 +67,7 @@ export function* handleBarcode(
     return
   }
   if (possibleRecipientAddresses) {
+    // NOTE: can I leverage the VALIDATE_RECIPEINT_ADDRESS actions I've created to do this step?
     const addressBelongsToTargetRecipient: boolean = possibleRecipientAddresses.includes(
       data.address
     )
