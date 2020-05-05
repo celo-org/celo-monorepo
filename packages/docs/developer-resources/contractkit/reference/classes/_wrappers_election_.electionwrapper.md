@@ -593,7 +593,7 @@ ___
 
 ▸ **getVoterRewards**(`address`: [Address](../modules/_base_.md#address), `epochNumber`: number, `estimate?`: undefined | false | true): *Promise‹[VoterReward](../interfaces/_wrappers_election_.voterreward.md)[]›*
 
-*Defined in [contractkit/src/wrappers/Election.ts:487](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L487)*
+*Defined in [contractkit/src/wrappers/Election.ts:488](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L488)*
 
 Retrieves VoterRewards for address at epochNumber.
 
@@ -602,8 +602,8 @@ Retrieves VoterRewards for address at epochNumber.
 Name | Type | Description |
 ------ | ------ | ------ |
 `address` | [Address](../modules/_base_.md#address) | The address to retrieve VoterRewards for. |
-`epochNumber` | number | The epoch to retrieve VoterRewards at.  |
-`estimate?` | undefined &#124; false &#124; true | - |
+`epochNumber` | number | The epoch to retrieve VoterRewards at. |
+`estimate?` | undefined &#124; false &#124; true | Estimate voter rewards at epochNumber based on current votes.  |
 
 **Returns:** *Promise‹[VoterReward](../interfaces/_wrappers_election_.voterreward.md)[]›*
 
