@@ -129,10 +129,10 @@ export async function sendTransactionAsync<T>(
   tx: TransactionObject<T>,
   account: string,
   feeCurrencyAddress: string,
-  nonce: number,
   logger: TxLogger = emptyTxLogger,
-  estimatedGas?: number | undefined,
-  gasPrice?: string | undefined
+  estimatedGas?: number,
+  gasPrice?: string,
+  nonce?: number
 ): Promise<TxPromises> {
   // @ts-ignore
   const resolvers: TxPromiseResolvers = {}
