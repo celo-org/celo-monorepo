@@ -603,7 +603,7 @@ Name | Type | Description |
 ------ | ------ | ------ |
 `address` | [Address](../modules/_base_.md#address) | The address to retrieve VoterRewards for. |
 `epochNumber` | number | The epoch to retrieve VoterRewards at. |
-`estimate?` | undefined &#124; false &#124; true | Estimate voter rewards at epochNumber based on current votes.  |
+`estimate?` | undefined &#124; false &#124; true | Estimate voter's share of rewards from epochNumber based on current share.  |
 
 **Returns:** *Promise‹[VoterReward](../interfaces/_wrappers_election_.voterreward.md)[]›*
 

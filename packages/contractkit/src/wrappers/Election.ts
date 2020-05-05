@@ -483,7 +483,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
    * Retrieves VoterRewards for address at epochNumber.
    * @param address The address to retrieve VoterRewards for.
    * @param epochNumber The epoch to retrieve VoterRewards at.
-   * @param estimate Estimate voter rewards at epochNumber based on current votes.
+   * @param estimate Estimate voter's share of rewards from epochNumber based on current share.
    */
   async getVoterRewards(
     address: Address,
