@@ -12,7 +12,7 @@ const TAG = 'web3/utils'
 
 // Estimate gas taking into account the configured inflation factor
 export async function estimateGas(txObj: TransactionObject<any>, txParams: Tx) {
-  const web3 = getContractKit().web3
+  const web3 = (await getContractKitOutsideGenerator()).web3
   const gasEstimator = (_tx: Tx) => txObj.estimateGas({ ..._tx })
   const getCallTx = (_tx: Tx) => {
     // @ts-ignore missing _parent property from TransactionObject type.
