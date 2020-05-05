@@ -326,7 +326,6 @@ exports[`Testnet banner Renders when connected with backup complete 1`] = `
             "top": 15,
           }
         }
-        isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackgroundBorderless",
@@ -436,7 +435,6 @@ exports[`Testnet banner Renders when connected with backup complete 1`] = `
             "top": 15,
           }
         }
-        isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackgroundBorderless",
@@ -519,25 +517,12 @@ exports[`Testnet banner Renders when connected with backup complete 1`] = `
     }
     refreshing={false}
     renderItem={[Function]}
-    renderSectionHeader={[Function]}
     scrollEventThrottle={50}
-    sections={
-      Array [
-        Object {
-          "data": Array [
-            Object {},
-          ],
-          "renderItem": [Function],
-          "title": "activity",
-        },
-      ]
-    }
     stickyHeaderIndices={
       Array [
         1,
       ]
     }
-    stickySectionHeadersEnabled={true}
     style={
       Object {
         "backgroundColor": "#FFFFFF",
@@ -957,7 +942,6 @@ exports[`Testnet banner Renders when disconnected 1`] = `
             "top": 15,
           }
         }
-        isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackgroundBorderless",
@@ -1067,7 +1051,6 @@ exports[`Testnet banner Renders when disconnected 1`] = `
             "top": 15,
           }
         }
-        isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackgroundBorderless",
@@ -1150,25 +1133,12 @@ exports[`Testnet banner Renders when disconnected 1`] = `
     }
     refreshing={false}
     renderItem={[Function]}
-    renderSectionHeader={[Function]}
     scrollEventThrottle={50}
-    sections={
-      Array [
-        Object {
-          "data": Array [
-            Object {},
-          ],
-          "renderItem": [Function],
-          "title": "activity",
-        },
-      ]
-    }
     stickyHeaderIndices={
       Array [
         1,
       ]
     }
-    stickySectionHeadersEnabled={true}
     style={
       Object {
         "backgroundColor": "#FFFFFF",
@@ -1569,7 +1539,6 @@ exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
             "top": 15,
           }
         }
-        isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackgroundBorderless",
@@ -1679,7 +1648,6 @@ exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
             "top": 15,
           }
         }
-        isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackgroundBorderless",
@@ -1762,25 +1730,12 @@ exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
     }
     refreshing={false}
     renderItem={[Function]}
-    renderSectionHeader={[Function]}
     scrollEventThrottle={50}
-    sections={
-      Array [
-        Object {
-          "data": Array [
-            Object {},
-          ],
-          "renderItem": [Function],
-          "title": "activity",
-        },
-      ]
-    }
     stickyHeaderIndices={
       Array [
         1,
       ]
     }
-    stickySectionHeadersEnabled={true}
     style={
       Object {
         "backgroundColor": "#FFFFFF",
