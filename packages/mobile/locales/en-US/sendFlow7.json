@@ -88,14 +88,15 @@
   },
   "secureSendExplanation": {
     "1": "{{e164Number}} has multiple accounts associated with it. {{displayName}} could have created a new Celo account, or may have lost their phone or had their account compromised.",
-    "2": "Before transacting, you must confirm {{displayName}}'s account. You can do this by scanning their QR code or asking for their account number and confirming it."
+    "2": "Before transacting, you must confirm {{displayName}}'s account. You can do this by scanning their QR code or confirming their account number with them."
   },
   "confirmAccountNumber": {
     "title": "Confirm Account Number",
     "1a": "Please ask {{displayName}} for the last four digits of their account number and enter it below.",
     "1b": "Please ask {{displayName}} for their account number and enter it below.",
     "2": "For security, please do not use text messaging (SMS). We recommend asking in person or over the phone, through WhatsApp or Messenger, or by email.",
-    "help": "Help {{displayName}} find their account number"
+    "help": "Help {{displayName}} find their account number",
+    "placeholder": "0xf1b1d5a6e7728g309c4a025b122d71ad75a61976"
   },
   "accountInputHeaderA": "LAST 4 DIGITS OF ACCOUNT NUMBER",
   "accountInputHeaderB": "ACCOUNT NUMBER"

@@ -1,5 +1,6 @@
 import { areRecipientsEquivalent, Recipient } from 'src/recipients/recipient'
 import { getRehydratePayload, REHYDRATE, RehydrateAction } from 'src/redux/persist-helper'
+import { RootState } from 'src/redux/reducers'
 import { Actions, ActionTypes } from 'src/send/actions'
 
 // Sets the limit of recent recipients we want to store
@@ -10,6 +11,7 @@ export interface State {
   recentRecipients: Recipient[]
   isValidatingRecipient: boolean
   isValidRecipient: boolean
+  manualAddressValidationRequired: boolean
 }
 
 const initialState = {
@@ -17,6 +19,7 @@ const initialState = {
   recentRecipients: [],
   isValidatingRecipient: false,
   isValidRecipient: false,
+  manualAddressValidationRequired: false,
 }
 
 export const sendReducer = (
@@ -57,6 +60,7 @@ export const sendReducer = (
         ...state,
         isValidatingRecipient: false,
         isValidRecipient: true,
+        manualAddressValidationRequired: false,
       }
     case Actions.VALIDATE_RECIPIENT_ADDRESS_FAILURE:
       return {
@@ -64,6 +68,12 @@ export const sendReducer = (
         isValidatingRecipient: false,
         isValidRecipient: false,
       }
+    case Actions.MANUAL_ADDRESS_VALIDATION_REQUIRED:
+      return {
+        ...state,
+        manualAddressValidationRequired: true,
+      }
+
     default:
       return state
   }
@@ -81,3 +91,6 @@ const storeLatestRecentReducer = (state: State, newRecipient: Recipient) => {
     recentRecipients,
   }
 }
+
+export const manualAddressValidationRequiredSelector = (state: RootState) =>
+  state.send.manualAddressValidationRequired

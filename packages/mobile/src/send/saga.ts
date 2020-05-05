@@ -203,7 +203,6 @@ export function* validateRecipientAddressSaga({
     yield put(validateRecipientAddressSuccess())
   } catch (error) {
     Logger.error(TAG2, 'Address validation error: ', error.message)
-    console.log('--------------------', error.message, '----------------------')
     yield put(showError(error.message))
     yield put(validateRecipientAddressFailure())
   }

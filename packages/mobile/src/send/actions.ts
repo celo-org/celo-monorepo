@@ -20,6 +20,7 @@ export enum Actions {
   VALIDATE_RECIPIENT_ADDRESS = 'SEND/VALIDATE_RECIPIENT_ADDRESS',
   VALIDATE_RECIPIENT_ADDRESS_SUCCESS = 'SEND/VALIDATE_RECIPIENT_ADDRESS_SUCCESS',
   VALIDATE_RECIPIENT_ADDRESS_FAILURE = 'SEND/VALIDATE_RECIPIENT_ADDRESS_FAILURE',
+  MANUAL_ADDRESS_VALIDATION_REQUIRED = 'SEND/MANUAL_ADDRESS_VALIDATION_REQUIRED',
 }
 
 export interface StoreLatestInRecentsAction {
@@ -59,6 +60,10 @@ export interface ValidateRecipientAddressFailureAction {
   type: Actions.VALIDATE_RECIPIENT_ADDRESS_FAILURE
 }
 
+export interface ManualAddressValidationRequiredAction {
+  type: Actions.MANUAL_ADDRESS_VALIDATION_REQUIRED
+}
+
 export type ActionTypes =
   | StoreLatestInRecentsAction
   | SendPaymentOrInviteAction
@@ -67,6 +72,7 @@ export type ActionTypes =
   | ValidateRecipientAddressAction
   | ValidateRecipientAddressSuccessAction
   | ValidateRecipientAddressFailureAction
+  | ManualAddressValidationRequiredAction
 
 export const storeLatestInRecents = (recipient: Recipient): StoreLatestInRecentsAction => ({
   type: Actions.STORE_LATEST_IN_RECENTS,
@@ -124,4 +130,8 @@ export const validateRecipientAddressSuccess = (): ValidateRecipientAddressSucce
 
 export const validateRecipientAddressFailure = (): ValidateRecipientAddressFailureAction => ({
   type: Actions.VALIDATE_RECIPIENT_ADDRESS_FAILURE,
+})
+
+export const manualAddressValidationRequired = (): ManualAddressValidationRequiredAction => ({
+  type: Actions.MANUAL_ADDRESS_VALIDATION_REQUIRED,
 })
