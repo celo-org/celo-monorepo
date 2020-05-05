@@ -6,7 +6,7 @@ Validators play a critical role in the Celo protocol, determining which transact
 
 The Celo community makes these decisions through elections for [Validator Groups](../celo-codebase/protocol/proof-of-stake/validator-groups.md), intermediaries between voters and Validators. Every Validator Group has an ordered list of up to 5 candidate Validators. Some organizations may operate a group with their own Validators in it; some may operate a group to which they have added Validators run by others.
 
-[Validator elections](../celo-codebase/protocol/proof-of-stake/validator-elections.md) are held every epoch (approximately once per day). All 100 slots are available at each election. Validators are selected [in proportion](../celo-codebase/protocol/proof-of-stake/validator-elections.md#Running-the-Election) to votes received for each Validator Group.
+[Validator elections](../celo-codebase/protocol/proof-of-stake/validator-elections.md) are held every epoch (approximately once per day). The protocol elects a maximum of 100 Validators. At each epoch, every elected Validator must be re-elected to continue. Validators are selected [in proportion](../celo-codebase/protocol/proof-of-stake/validator-elections.md#Running-the-Election) to votes received for each Validator Group.
 
 If you hold Celo Gold, or are a beneficiary of a [`ReleaseGold` contract](release-gold.md) that allows voting, you can vote for Validator Groups. A single account can split their LockedGold balance to have outstanding votes for up to 10 groups.
 
