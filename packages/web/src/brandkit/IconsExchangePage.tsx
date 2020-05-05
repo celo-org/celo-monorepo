@@ -11,37 +11,41 @@ import { AssetTypes, EXCHANGE_ICONS_PKG_TRACKING, trackDownload } from 'src/bran
 import { NameSpaces, useTranslation } from 'src/i18n'
 import Button, { BTN } from 'src/shared/Button.3'
 import { hashNav } from 'src/shared/menu-items'
-import { colors } from 'src/styles'
 
 const icons = [
   {
     description: 'cUSD Exchange Icon, Full Color\n',
-    uri: '/images/marketplace-icons/icon-celo-dollar-color-f.svg',
+    preview: '/images/marketplace-icons/icon-celo-dollar-color-f.svg',
+    uri: '/assets/marketplace-icons/icon-celo-dollar-color.zip',
   },
   {
     description: 'cGLD Exchange Icon, Full Color\n',
-    uri: '/images/marketplace-icons/icon-celo-gold-color-f.svg',
+    preview: '/images/marketplace-icons/icon-celo-gold-color-f.svg',
+    uri: '/assets/marketplace-icons/icon-celo-gold-color.zip',
   },
-  null,
   null,
   {
     description: 'cUSD Exchange Icon, Monochrome\n',
-    uri: '/images/marketplace-icons/icon-celo-dollar-black-f.svg',
+    preview: '/images/marketplace-icons/icon-celo-dollar-black-f.svg',
+    uri: '/assets/marketplace-icons/icon-celo-dollar-black.zip',
     variant: 'circle-white',
   },
   {
     description: 'cGLD Exchange Icon, Monochrome\n',
-    uri: '/images/marketplace-icons/icon-celo-gold-black-f.svg',
+    preview: '/images/marketplace-icons/icon-celo-gold-black-f.svg',
+    uri: '/assets/marketplace-icons/icon-celo-gold-black.zip',
     variant: 'circle-white',
   },
   {
     description: 'cUSD Exchange Icon, Reverse Monochrome\n',
-    uri: '/images/marketplace-icons/icon-celo-dollar-white-f.svg',
+    preview: '/images/marketplace-icons/icon-celo-dollar-white-f.svg',
+    uri: '/assets/marketplace-icons/icon-celo-dollar-white.zip',
     variant: 'circle-black',
   },
   {
     description: 'cGLD Exchange Icon, Reverse Monochrome\n',
-    uri: '/images/marketplace-icons/icon-celo-gold-white-f.svg',
+    preview: '/images/marketplace-icons/icon-celo-gold-white-f.svg',
+    uri: '/assets/marketplace-icons/icon-celo-gold-white.zip',
     variant: 'circle-black',
   },
 ]
@@ -93,7 +97,7 @@ function Overview() {
         <View style={brandStyles.tiling}>
           {icons.map((icon, i) =>
             icon === null ? (
-              <View key={i} style={styles.empty} />
+              <View key={i} style={styles.break} />
             ) : (
               <View key={i}>
                 <IconShowcase
@@ -102,7 +106,7 @@ function Overview() {
                   variant={(icon.variant || 'circle') as any}
                   description={icon.description}
                   name={''}
-                  preview={icon.uri}
+                  preview={icon.preview}
                   uri={icon.uri}
                   loading={false}
                   assetType={AssetTypes.icon}
@@ -120,20 +124,8 @@ function Overview() {
 const styles = StyleSheet.create({
   container: { paddingHorizontal: GAP },
   root: { minHeight: '75vh' },
-  offScreen: {
-    display: 'none',
-  },
-  empty: {
-    width: 160,
-    marginTop: 20,
-  },
-  matches: {
-    color: colors.primaryPress,
-    opacity: 0,
-    transitionDuration: '200ms',
-    transitionProperty: 'opacity',
-  },
-  visible: {
-    opacity: 1,
+  break: {
+    width: '100%',
+    display: 'block',
   },
 })
