@@ -29,7 +29,12 @@ Every day the top three proposals at the head of the queue are popped off and mo
 
 ## Referendum
 
-Once the Approval phase is over, approved proposals graduate to the referendum phase. Any user may vote yes, no, or abstain on these proposals. Their vote's weight is determined by the weight of their Locked Gold commitment. After the Referendum phase is over, which lasts two days, each proposal is marked as passed or failed as a function of the votes and the corresponding passing function parameters. These parameters specify what is required for specific proposals to pass. In the Alfajores testnet, this is a simple majority, but in future the voting threshold will adapt based on participation levels.
+Once the Approval phase is over, approved proposals graduate to the referendum phase. Any user may vote yes, no, or abstain on these proposals. Their vote's weight is determined by the weight of their Locked Gold commitment. After the Referendum phase is over, which lasts two days, each proposal is marked as passed or failed as a function of the votes and the corresponding passing function parameters.
+
+In order for a proposal to pass, it must meet a minimum threshold for **participation**, and **agreement**:
+
+* Participation is the minimum portion of Locked Gold which must cast a vote for a proposal to pass. It exists to prevent proposals passing with very low participation. The participation requirement is calculated as a governable portion of the participation baseline, which is an exponential moving average of final participation in past governance proposals.
+* Agreement is the portion of votes cast that must be "yes" votes for a proposal to pass. Each contract and function can define a required level of agreement, and the required agreement for a proposal is the maximum requirement among its constituent transactions.
 
 ## Execution
 
@@ -46,3 +51,4 @@ Note that this means the validators may not always know the contents of the prop
 ## Celo Blockchain Software Upgrades
 
 Some changes cannot be made through the on-chain governance process alone. Examples include changes to the underlying consensus protocol and changes which would result in a hard-fork. When Celo Blockchain software upgrades are required to continue operating correctly on the network, a "Minimum Client Version" parameter is set to indicate the minimum version that it required.
+

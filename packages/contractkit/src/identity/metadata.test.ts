@@ -66,7 +66,7 @@ testWithGanache('Metadata', (web3) => {
     try {
       await IdentityMetadataWrapper.fromRawString(kit, serializedMetadata)
     } catch (e) {
-      expect(e).toEqual(new Error('Signature could not be validated'))
+      expect(e.toString()).toContain('Signature could not be validated')
     }
   })
 })
