@@ -76,14 +76,13 @@ fi
 # Deploy the contracts
 "$DIR/celotooljs.sh" deploy initial contracts -e ${ENV} --skipPortForward ${VERBOSE_OPTS} | tee "${LOGS_DIR}/migration.log" 2>&1
 if [ $? = 1 ]; then
-  CONTRACTS_FAILED=true
+  CONTRACTS_FAILED=True
 fi
 kill ${PID_PORT_FORWARD}
-CONTRACTS_FAILED=True
 
 if [[ ${CONTRACTS_FAILED} == "True" ]]; then
   echo "Contract Deployment failed"
-  exit 1
+  # exit 1
 fi
 
 # Verify contracts
