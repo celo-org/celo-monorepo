@@ -95,7 +95,6 @@ exports[`PaymentsSummaryNotification renders correctly 1`] = `
           <View
             accessible={true}
             focusable={true}
-            isTVSelectable={true}
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackgroundBorderless",

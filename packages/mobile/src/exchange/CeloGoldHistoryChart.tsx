@@ -17,7 +17,6 @@ import useSelector from 'src/redux/useSelector'
 import { goldToDollarAmount } from 'src/utils/currencyExchange'
 import { getLocalCurrencyDisplayValue } from 'src/utils/formatting'
 import { formatFeedDate } from 'src/utils/time'
-// @ts-ignore
 import { VictoryGroup, VictoryLine, VictoryScatter } from 'victory-native'
 
 const CHART_POINTS_NUMBER = 60
@@ -73,6 +72,7 @@ function ChartAwareSvgText({
     [x]
   )
   return (
+    // @ts-ignore
     <SvgText onLayout={onLayout} fill="black" fontSize="14" x={adjustedX} y={y} textAnchor="middle">
       {value}
     </SvgText>
@@ -232,6 +232,8 @@ function CeloGoldHistoryChart({ t, testID, i18n }: Props) {
           </Text>
         </View>
       </View>
+      {/* 
+        // @ts-ignore */}
       <VictoryGroup
         domainPadding={CHART_DOMAIN_PADDING}
         singleQuadrantDomainPadding={false}

@@ -27,8 +27,8 @@
 		2DCD954D1E0B4F2C00145EB5 /* celoTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* celoTests.m */; };
 		5575263ED1EA4F568D328DE9 /* Hind-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C5952C9D168E4172BB52364C /* Hind-SemiBold.ttf */; };
 		67911AC6D310414DAAC1498E /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = F3F5FA21E7EC46BBB744FE54 /* libz.tbd */; };
-		8192F4DEC00F35136670FE28 /* Pods_celoTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 68A3495573DF0B753CD4BB83 /* Pods_celoTests.framework */; };
 		85E8054E767BF68843B24D43 /* Pods_celo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 691B91F2E7383B2AF94AAA8B /* Pods_celo.framework */; };
+		F2B1AD5485D68063EC09183F /* Pods_celoTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3250C8E518DC2C848EA62404 /* Pods_celoTests.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -56,6 +56,7 @@
 		0317E783245B696200AAAC2E /* Inter-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "../fonts/Inter-Regular.ttf"; sourceTree = "<group>"; };
 		0317E784245B696200AAAC2E /* Inter-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "../fonts/Inter-Medium.ttf"; sourceTree = "<group>"; };
 		0317E785245B696200AAAC2E /* Inter-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "../fonts/Inter-SemiBold.ttf"; sourceTree = "<group>"; };
+		0602B5AFC2AE93CFF1316467 /* Pods-celo-celoTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-celo-celoTests.debug.xcconfig"; path = "Target Support Files/Pods-celo-celoTests/Pods-celo-celoTests.debug.xcconfig"; sourceTree = "<group>"; };
 		0F1E1EB32346439C00274556 /* rings@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "rings@2x.png"; sourceTree = "<group>"; };
 		0F1E1EB42346439C00274556 /* rings@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "rings@3x.png"; sourceTree = "<group>"; };
 		0FE3DE8E2347740700EA87A0 /* celo.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = celo.entitlements; path = celo/celo.entitlements; sourceTree = "<group>"; };
@@ -69,8 +70,8 @@
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = celo/main.m; sourceTree = "<group>"; };
 		2D02E47B1E0B4A5D006451C7 /* celo-tvOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "celo-tvOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2D02E4901E0B4A5D006451C7 /* celo-tvOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "celo-tvOSTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		3250C8E518DC2C848EA62404 /* Pods_celoTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_celoTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		6844E1A0CA2D7D32349444EC /* Pods-celo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-celo.debug.xcconfig"; path = "Target Support Files/Pods-celo/Pods-celo.debug.xcconfig"; sourceTree = "<group>"; };
-		68A3495573DF0B753CD4BB83 /* Pods_celoTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_celoTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		691B91F2E7383B2AF94AAA8B /* Pods_celo.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_celo.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		95E01263B685485BA7D5CEB0 /* Hind-Light.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Hind-Light.ttf"; path = "../fonts/Hind-Light.ttf"; sourceTree = "<group>"; };
 		A100BC162FF5410CB4627D3C /* Hind-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Hind-Regular.ttf"; path = "../fonts/Hind-Regular.ttf"; sourceTree = "<group>"; };
@@ -80,6 +81,7 @@
 		B59F6FDB7D084157A12E7A52 /* Hind-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Hind-Bold.ttf"; path = "../fonts/Hind-Bold.ttf"; sourceTree = "<group>"; };
 		BF61F27C85F8E9CE335BA142 /* Pods-celoTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-celoTests.release.xcconfig"; path = "Target Support Files/Pods-celoTests/Pods-celoTests.release.xcconfig"; sourceTree = "<group>"; };
 		C5952C9D168E4172BB52364C /* Hind-SemiBold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Hind-SemiBold.ttf"; path = "../fonts/Hind-SemiBold.ttf"; sourceTree = "<group>"; };
+		CCB1F49C3DAE62A0F72F43DF /* Pods-celo-celoTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-celo-celoTests.release.xcconfig"; path = "Target Support Files/Pods-celo-celoTests/Pods-celo-celoTests.release.xcconfig"; sourceTree = "<group>"; };
 		F3F5FA21E7EC46BBB744FE54 /* libz.tbd */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
@@ -88,7 +90,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8192F4DEC00F35136670FE28 /* Pods_celoTests.framework in Frameworks */,
+				F2B1AD5485D68063EC09183F /* Pods_celoTests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -140,7 +142,7 @@
 			children = (
 				F3F5FA21E7EC46BBB744FE54 /* libz.tbd */,
 				691B91F2E7383B2AF94AAA8B /* Pods_celo.framework */,
-				68A3495573DF0B753CD4BB83 /* Pods_celoTests.framework */,
+				3250C8E518DC2C848EA62404 /* Pods_celoTests.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -170,6 +172,8 @@
 				A11A894B3E86661FA132FC18 /* Pods-celo.release.xcconfig */,
 				114969FB1F3AA04FFDC6831F /* Pods-celoTests.debug.xcconfig */,
 				BF61F27C85F8E9CE335BA142 /* Pods-celoTests.release.xcconfig */,
+				0602B5AFC2AE93CFF1316467 /* Pods-celo-celoTests.debug.xcconfig */,
+				CCB1F49C3DAE62A0F72F43DF /* Pods-celo-celoTests.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -500,16 +504,16 @@
 				"${BUILT_PRODUCTS_DIR}/Folly/folly.framework",
 				"${BUILT_PRODUCTS_DIR}/GTMSessionFetcher/GTMSessionFetcher.framework",
 				"${BUILT_PRODUCTS_DIR}/GoogleUtilities/GoogleUtilities.framework",
+				"${BUILT_PRODUCTS_DIR}/PromisesObjC/FBLPromises.framework",
 				"${BUILT_PRODUCTS_DIR}/Protobuf/protobuf.framework",
 				"${BUILT_PRODUCTS_DIR}/RCTTypeSafety/RCTTypeSafety.framework",
 				"${BUILT_PRODUCTS_DIR}/RNCAsyncStorage/RNCAsyncStorage.framework",
+				"${BUILT_PRODUCTS_DIR}/RNCMaskedView/RNCMaskedView.framework",
 				"${BUILT_PRODUCTS_DIR}/RNDeviceInfo/RNDeviceInfo.framework",
 				"${BUILT_PRODUCTS_DIR}/RNExitApp/RNExitApp.framework",
 				"${BUILT_PRODUCTS_DIR}/RNFS/RNFS.framework",
 				"${BUILT_PRODUCTS_DIR}/RNGestureHandler/RNGestureHandler.framework",
 				"${BUILT_PRODUCTS_DIR}/RNLocalize/RNLocalize.framework",
-				"${BUILT_PRODUCTS_DIR}/RNPermissions/RNPermissions.framework",
-				"${BUILT_PRODUCTS_DIR}/RNRandomBytes/RNRandomBytes.framework",
 				"${BUILT_PRODUCTS_DIR}/RNReanimated/RNReanimated.framework",
 				"${BUILT_PRODUCTS_DIR}/RNSVG/RNSVG.framework",
 				"${BUILT_PRODUCTS_DIR}/RNScreens/RNScreens.framework",
@@ -518,7 +522,6 @@
 				"${BUILT_PRODUCTS_DIR}/RNShare/RNShare.framework",
 				"${BUILT_PRODUCTS_DIR}/React-Core/React.framework",
 				"${BUILT_PRODUCTS_DIR}/React-CoreModules/CoreModules.framework",
-				"${BUILT_PRODUCTS_DIR}/React-RCTActionSheet/RCTActionSheet.framework",
 				"${BUILT_PRODUCTS_DIR}/React-RCTAnimation/RCTAnimation.framework",
 				"${BUILT_PRODUCTS_DIR}/React-RCTBlob/RCTBlob.framework",
 				"${BUILT_PRODUCTS_DIR}/React-RCTImage/RCTImage.framework",
@@ -550,6 +553,7 @@
 				"${BUILT_PRODUCTS_DIR}/react-native-mail/react_native_mail.framework",
 				"${BUILT_PRODUCTS_DIR}/react-native-netinfo/react_native_netinfo.framework",
 				"${BUILT_PRODUCTS_DIR}/react-native-safe-area-context/react_native_safe_area_context.framework",
+				"${BUILT_PRODUCTS_DIR}/react-native-secure-randombytes/react_native_secure_randombytes.framework",
 				"${BUILT_PRODUCTS_DIR}/react-native-simple-toast/react_native_simple_toast.framework",
 				"${BUILT_PRODUCTS_DIR}/react-native-sms/react_native_sms.framework",
 				"${BUILT_PRODUCTS_DIR}/react-native-splash-screen/react_native_splash_screen.framework",
@@ -566,16 +570,16 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/folly.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GTMSessionFetcher.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleUtilities.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FBLPromises.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/protobuf.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RCTTypeSafety.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RNCAsyncStorage.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RNCMaskedView.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RNDeviceInfo.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RNExitApp.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RNFS.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RNGestureHandler.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RNLocalize.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RNPermissions.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RNRandomBytes.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RNReanimated.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RNSVG.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RNScreens.framework",
@@ -584,7 +588,6 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RNShare.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/React.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/CoreModules.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RCTActionSheet.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RCTAnimation.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RCTBlob.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RCTImage.framework",
@@ -616,6 +619,7 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/react_native_mail.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/react_native_netinfo.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/react_native_safe_area_context.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/react_native_secure_randombytes.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/react_native_simple_toast.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/react_native_sms.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/react_native_splash_screen.framework",

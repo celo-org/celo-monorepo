@@ -6,7 +6,6 @@ import {
   PhoneNumberUtil,
 } from 'google-libphonenumber'
 import * as Web3Utils from 'web3-utils'
-import { getIdentifierPrefix, IdentifierType } from './attestations'
 
 export interface ParsedPhoneNumber {
   e164Number: string
@@ -44,9 +43,10 @@ export const getPhoneHash = (phoneNumber: string, salt?: string): string => {
   if (!phoneNumber || !isE164Number(phoneNumber)) {
     throw Error('Attempting to hash a non-e164 number: ' + phoneNumber)
   }
-  const prefix = getIdentifierPrefix(IdentifierType.PHONE_NUMBER)
+  // TODO re-enable when we turn on phone-number-privacy everywhere
+  // const prefix = getIdentifierPrefix(IdentifierType.PHONE_NUMBER)
   const value = salt ? phoneNumber + PHONE_SALT_SEPARATOR + salt : phoneNumber
-  return Web3Utils.soliditySha3({ type: 'string', value: prefix + value })
+  return Web3Utils.soliditySha3({ type: 'string', value })
 }
 
 export function getCountryCode(e164PhoneNumber: string) {

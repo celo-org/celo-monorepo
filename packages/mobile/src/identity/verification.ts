@@ -9,6 +9,7 @@ import { eqAddress } from '@celo/utils/src/address'
 import { retryAsync } from '@celo/utils/src/async'
 import { extractAttestationCodeFromMessage } from '@celo/utils/src/attestations'
 import { compressedPubKey } from '@celo/utils/src/commentEncryption'
+import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
 import { Platform } from 'react-native'
 import { Task } from 'redux-saga'
 import { all, call, delay, fork, put, race, select, take, takeEvery } from 'redux-saga/effects'
@@ -18,6 +19,7 @@ import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { setNumberVerified } from 'src/app/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
+import { USE_PHONE_NUMBER_PRIVACY } from 'src/config'
 import { refreshAllBalances } from 'src/home/actions'
 import {
   Actions,
@@ -101,8 +103,21 @@ export function* doVerificationFlow() {
     yield put(setVerificationStatus(VerificationStatus.Prepping))
     const account: string = yield call(getConnectedUnlockedAccount)
     const e164Number: string = yield select(e164NumberSelector)
-    const phoneHashDetails: PhoneNumberHashDetails = yield call(fetchPhoneHashPrivate, e164Number)
-    const phoneHash = phoneHashDetails.phoneHash
+    // TODO cleanup when feature flag is removed
+    let phoneHash: string
+    let phoneHashDetails: PhoneNumberHashDetails
+    if (USE_PHONE_NUMBER_PRIVACY) {
+      phoneHashDetails = yield call(fetchPhoneHashPrivate, e164Number)
+      phoneHash = phoneHashDetails.phoneHash
+    } else {
+      phoneHash = getPhoneHash(e164Number)
+      phoneHashDetails = {
+        e164Number,
+        phoneHash,
+        // @ts-ignore
+        salt: undefined,
+      }
+    }
     const privDataKey = yield select(privateCommentKeySelector)
     const dataKey = compressedPubKey(Buffer.from(privDataKey, 'hex'))
 
