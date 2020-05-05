@@ -36,14 +36,16 @@ fi
 
 # sleep 200
 
-waitTime=1200
+waitTimeInitial=1600
+waitTimePending=${waitTimeInitial}
+sleepTime=10
 iterations=0
 
 echo -n "waiting for pod"
 while [[ $(kubectl get pods -n ${NAMESPACE} -l statefulset.kubernetes.io/pod-name=${ENV}-validators-0 -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}') != "True" ]] || ! [[ waitTime -gt 0 ]]; do
-  waitTime="$((waitTime-10))"
+  waitTimePending="$((waitTimePending-sleepTime))"
   echo -n "."
-  sleep 5
+  sleep ${sleepTime}
 done
 echo 
 
@@ -55,19 +57,19 @@ blockNumber=$(curl -X POST -s --data '{"jsonrpc":"2.0","method":"eth_blockNumber
 
 echo -n "waiting network start mining"
 until [[ $blockNumber -gt 0x0 ]] || ! [[ $waitTime -gt 0 ]]; do
-  sleep 10
-  waitTime="$((waitTime-10))"
+  sleep ${sleepTime}
+  waitTimePending="$((waitTimePending-sleepTime))"
   iterations="$((iterations+1))"
   echo -n "."
   blockNumber=$(curl -X POST -s --data '{"jsonrpc":"2.0","method":"eth_blockNumber","params":[],"id":1}' http://localhost:18545 -H 'Content-Type: application/json' | jq -r .result)
 done
 echo
 
-if ! [[ $waitTime -gt 0 ]]; then
-  echo "ERROR: Network could not start after ${waitTime} seconds"
+if ! [[ $waitTimePending -gt 0 ]]; then
+  echo "ERROR: Network could not start after ${waitTimeInitial} seconds"
   exit 1
 else
-  networkStartTime="$((600-waitTime))"
+  networkStartTime="$((waitTimeInitial-waitTimePending))"
   echo "INFO: Network started in ${networkStartTime} seconds"
 fi
 
