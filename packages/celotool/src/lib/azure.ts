@@ -95,25 +95,23 @@ export function subscriptionId() {
 }
 
 export async function getAKSNodeResourceGroup() {
-  const clusterName = fetchEnv(envVar.AZURE_KUBERNETES_CLUSTER_NAME)
-  const resourceGroup = fetchEnv(envVar.AZURE_KUBERNETES_RESOURCE_GROUP)
   const [nodeResourceGroup] = await execCmdWithExitOnFailure(
-    `az aks show --name ${clusterName} --resource-group ${resourceGroup} --query nodeResourceGroup -o tsv`
+    `az aks show --name ${clusterName()} --resource-group ${resourceGroup()} --query nodeResourceGroup -o tsv`
   )
   return nodeResourceGroup.trim()
 }
 
-export async function registerStaticIP(name: string, resourceGroup: string) {
-  console.info(`Registering IP address ${name} on ${resourceGroup}`)
+export async function registerStaticIP(name: string, resourceGroupIP: string) {
+  console.info(`Registering IP address ${name} on ${resourceGroupIP}`)
   const [address] = await execCmdWithExitOnFailure(
-    `az network public-ip create --resource-group ${resourceGroup} --name ${name} --allocation-method Static --sku Standard --query publicIp.ipAddress -o tsv`
+    `az network public-ip create --resource-group ${resourceGroupIP} --name ${name} --allocation-method Static --sku Standard --query publicIp.ipAddress -o tsv`
   )
   return address.trim()
 }
 
-export async function deallocateStaticIP(name: string, resourceGroup: string) {
-  console.info(`Deallocating IP address ${name} on ${resourceGroup}`)
+export async function deallocateStaticIP(name: string, resourceGroupIP: string) {
+  console.info(`Deallocating IP address ${name} on ${resourceGroupIP}`)
   return execCmdWithExitOnFailure(
-    `az network public-ip delete --resource-group ${resourceGroup} --name ${name}`
+    `az network public-ip delete --resource-group ${resourceGroupIP} --name ${name}`
   )
 }
