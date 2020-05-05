@@ -102,7 +102,6 @@ exports[`renders home 1`] = `
         "top": 7,
       }
     }
-    isTVSelectable={true}
     nativeBackgroundAndroid={
       Object {
         "attribute": "selectableItemBackground",

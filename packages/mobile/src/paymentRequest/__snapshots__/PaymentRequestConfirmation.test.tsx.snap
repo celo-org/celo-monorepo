@@ -503,7 +503,6 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
         <View
           accessible={true}
           focusable={true}
-          isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
@@ -593,7 +592,6 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
         <View
           accessible={true}
           focusable={true}
-          isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",

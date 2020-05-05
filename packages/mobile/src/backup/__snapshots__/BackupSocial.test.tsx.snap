@@ -72,7 +72,6 @@ exports[`BackupSocialIntro renders correctly when social backup is complete 1`] 
             <View
               accessible={true}
               focusable={true}
-              isTVSelectable={true}
               nativeBackgroundAndroid={
                 Object {
                   "attribute": "selectableItemBackgroundBorderless",
@@ -145,7 +144,6 @@ exports[`BackupSocialIntro renders correctly when social backup is complete 1`] 
             <View
               accessible={true}
               focusable={true}
-              isTVSelectable={true}
               nativeBackgroundAndroid={
                 Object {
                   "attribute": "selectableItemBackgroundBorderless",
@@ -265,7 +263,6 @@ exports[`BackupSocialIntro renders correctly when social backup is not complete 
             <View
               accessible={true}
               focusable={true}
-              isTVSelectable={true}
               nativeBackgroundAndroid={
                 Object {
                   "attribute": "selectableItemBackgroundBorderless",
@@ -338,7 +335,6 @@ exports[`BackupSocialIntro renders correctly when social backup is not complete 
             <View
               accessible={true}
               focusable={true}
-              isTVSelectable={true}
               nativeBackgroundAndroid={
                 Object {
                   "attribute": "selectableItemBackgroundBorderless",
@@ -390,7 +386,7 @@ exports[`BackupSocialIntro renders correctly when social backup is not complete 
         }
       >
         <AndroidSwitch
-          accessibilityRole="button"
+          accessibilityRole="switch"
           enabled={true}
           on={false}
           onChange={[Function]}
@@ -439,7 +435,6 @@ exports[`BackupSocialIntro renders correctly when social backup is not complete 
     <View
       accessible={true}
       focusable={false}
-      isTVSelectable={true}
       nativeBackgroundAndroid={
         Object {
           "attribute": "selectableItemBackground",
