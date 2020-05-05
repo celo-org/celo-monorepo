@@ -33,7 +33,6 @@
     "@celo/utils": "0.1.15-dev",
     "@ledgerhq/hw-app-eth": "^5.11.0",
     "@ledgerhq/hw-transport": "^5.11.0",
-    "@ledgerhq/hw-transport-node-hid": "^5.11.0",
     "bignumber.js": "^9.0.0",
     "cross-fetch": "3.0.4",
     "debug": "^4.1.1",
