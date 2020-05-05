@@ -215,12 +215,11 @@ describe('Do Verification Saga', () => {
   })
 
   it('succeeds for partly verified users', async () => {
+    const contractKit = await getContractKitOutsideGenerator()
     // @ts-ignore Jest mock
-    getContractKit().contracts.getAttestations.mockReturnValue(
-      mockAttestationsWrapperPartlyVerified
-    )
+    contractKit.contracts.getAttestations.mockReturnValue(mockAttestationsWrapperPartlyVerified)
     // @ts-ignore Jest mock
-    getContractKit().contracts.getAccounts.mockReturnValue(mockAccountsWrapper)
+    contractKit.contracts.getAccounts.mockReturnValue(mockAccountsWrapper)
 
     await expectSaga(doVerificationFlow)
       .provide([

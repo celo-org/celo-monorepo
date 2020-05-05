@@ -5,6 +5,8 @@ export const getContractKit = () => {
   return newKitFromWeb3(new Web3())
 }
 
-export const getContractKitOutsideGenerator = getContractKit()
+export const getContractKitOutsideGenerator = () => {
+  return newKitFromWeb3(new Web3())
+}
 
 export const web3ForUtils = new Web3()
