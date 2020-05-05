@@ -12,4 +12,6 @@ As Forno is a public node you will have to sign transactions locally because wit
 Alfajores = 'https://alfajores-forno.celo-testnet.org'
 
 Baklava = 'https://baklava-forno.celo-testnet.org'
+
+RC1 = 'https://rc1-forno.celo-testnet.org/'
 ```

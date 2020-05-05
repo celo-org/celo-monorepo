@@ -1,6 +1,6 @@
 import { isValidAddress } from '@celo/utils/lib/address'
 import { Request, Response } from 'firebase-functions'
-import { BLSCryptographyClient } from '../../src/bls/bls-cryptography-client'
+import { BLSCryptographyClient } from '../bls/bls-cryptography-client'
 import { ErrorMessages, respondWithError } from '../common/error-utils'
 import { authenticateUser } from '../common/identity'
 import logger from '../common/logger'
