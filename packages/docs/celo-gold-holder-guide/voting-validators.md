@@ -8,7 +8,7 @@ The Celo community makes these decisions through elections for [Validator Groups
 
 [Validator elections](../celo-codebase/protocol/proof-of-stake/validator-elections.md) are held every epoch (approximately once per day). All 100 slots are available at each election. Validators are selected [in proportion](../celo-codebase/protocol/proof-of-stake/validator-elections.md#Running-the-Election) to votes received for each Validator Group.
 
-If you hold Celo Gold (or are a beneficiary of a [`ReleaseGold` contract](release-gold.md) that allows voting), you can vote for Validator Groups. A single account can split their LockedGold balance to have outstanding votes for up to 10 groups.
+If you hold Celo Gold, or are a beneficiary of a [`ReleaseGold` contract](release-gold.md) that allows voting, you can vote for Validator Groups. A single account can split their LockedGold balance to have outstanding votes for up to 10 groups.
 
 Celo Gold that you lock and use to vote for a group that elects one or more validators receives [epoch rewards](../celo-codebase/protocol/proof-of-stake/epoch-rewards.md) every epoch (approximately every day) once the community passes a governance proposal enabling rewards. The initial level of rewards is anticipated to be around 6% per annum equivalent (but is subject to change).
 
@@ -19,7 +19,7 @@ Unlike a number of Proof of Stake protocols, Celo Gold used for voting is never 
 The Celo ecosystem includes a number of great services for browsing registered Validator Groups and Validators.
 
 {% hint style="warning" %}
-**Warning**: Exercise caution in relying on validator-supplied names to determine their real-world identity.Malicious participants may attempt to impersonate other validators in order to attract votes.
+**Warning**: Exercise caution in relying on validator-supplied names to determine their real-world identity. Malicious participants may attempt to impersonate other validators in order to attract votes.
 
 Validators and groups can also supply [verifiable DNS claims](../operations-manual/validator-explorer.md), and the Celo Validator Explorer displays these. You can use these to securely identify that the same entity has access both to the account of a validator or group and the supplied DNS records.
 {% endhint %}

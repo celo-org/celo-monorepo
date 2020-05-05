@@ -338,10 +338,10 @@ At some point, the terms of your `ReleaseGold` contract will allow you to withdr
 
 There are actually several steps to this process:
 
-- First, revoke all outstanding votes as above (including for governance proposals)
-- Unlock the non-voting Locked Gold, starting a 72 hour unlocking period
-- After the three day unlocking period is complete, withdraw the Celo Gold back to the `ReleaseGold` contract
-- Assuming vesting and distribution requirements are met, withdraw the Celo Gold to the beneficiary address
+1. First, revoke all outstanding votes as above (including for governance proposals)
+2. Unlock the non-voting Locked Gold, starting a 72 hour unlocking period
+3. After the three day unlocking period is complete, withdraw the Celo Gold back to the `ReleaseGold` contract
+4. Assuming vesting and distribution requirements are met, withdraw the Celo Gold to the beneficiary address
 
 Check the current status of outstanding votes:
 
