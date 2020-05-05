@@ -13,12 +13,6 @@ exports[`Button when type is SECONDARY renders 1`] = `
     accessible={true}
     focusable={true}
     isTVSelectable={true}
-    nativeBackgroundAndroid={
-      Object {
-        "attribute": "selectableItemBackground",
-        "type": "ThemeAttrAndroid",
-      }
-    }
     onClick={[Function]}
     onResponderGrant={[Function]}
     onResponderMove={[Function]}
@@ -34,6 +28,7 @@ exports[`Button when type is SECONDARY renders 1`] = `
         "height": 48,
         "justifyContent": "center",
         "minWidth": 98,
+        "opacity": 1,
         "paddingHorizontal": 16,
         "paddingVertical": 5,
       }
@@ -68,12 +63,6 @@ exports[`Button when type is TERTIARY renders 1`] = `
     accessible={true}
     focusable={true}
     isTVSelectable={true}
-    nativeBackgroundAndroid={
-      Object {
-        "attribute": "selectableItemBackground",
-        "type": "ThemeAttrAndroid",
-      }
-    }
     onClick={[Function]}
     onResponderGrant={[Function]}
     onResponderMove={[Function]}
@@ -89,6 +78,7 @@ exports[`Button when type is TERTIARY renders 1`] = `
         "height": 48,
         "justifyContent": "center",
         "minWidth": 98,
+        "opacity": 1,
         "paddingHorizontal": 16,
         "paddingVertical": 5,
       }
@@ -123,12 +113,6 @@ exports[`Button when type not given defaults to primary 1`] = `
     accessible={true}
     focusable={true}
     isTVSelectable={true}
-    nativeBackgroundAndroid={
-      Object {
-        "attribute": "selectableItemBackground",
-        "type": "ThemeAttrAndroid",
-      }
-    }
     onClick={[Function]}
     onResponderGrant={[Function]}
     onResponderMove={[Function]}
@@ -144,6 +128,7 @@ exports[`Button when type not given defaults to primary 1`] = `
         "height": 48,
         "justifyContent": "center",
         "minWidth": 98,
+        "opacity": 1,
         "paddingHorizontal": 16,
         "paddingVertical": 5,
       }
