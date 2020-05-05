@@ -424,7 +424,6 @@ exports[`SendConfirmation renders correctly for payment request confirmation 1`]
                         "top": 10,
                       }
                     }
-                    isTVSelectable={true}
                     nativeBackgroundAndroid={
                       Object {
                         "attribute": "selectableItemBackgroundBorderless",
@@ -686,6 +685,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation 1`]
             <View
               accessible={true}
               focusable={true}
+              forwardedRef={[Function]}
               onClick={[Function]}
               onResponderGrant={[Function]}
               onResponderMove={[Function]}
@@ -708,6 +708,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation 1`]
               }
             />
             <View
+              forwardedRef={[Function]}
               hideModalContentWhileAnimating={true}
               onModalHide={[Function]}
               onModalWillHide={[Function]}
@@ -786,7 +787,6 @@ exports[`SendConfirmation renders correctly for payment request confirmation 1`]
                     <View
                       accessible={true}
                       focusable={true}
-                      isTVSelectable={true}
                       nativeBackgroundAndroid={
                         Object {
                           "attribute": "selectableItemBackground",
@@ -893,7 +893,6 @@ exports[`SendConfirmation renders correctly for payment request confirmation 1`]
                     <View
                       accessible={true}
                       focusable={true}
-                      isTVSelectable={true}
                       nativeBackgroundAndroid={
                         Object {
                           "attribute": "selectableItemBackground",
@@ -1000,7 +999,6 @@ exports[`SendConfirmation renders correctly for payment request confirmation 1`]
                     <View
                       accessible={true}
                       focusable={true}
-                      isTVSelectable={true}
                       nativeBackgroundAndroid={
                         Object {
                           "attribute": "selectableItemBackground",
@@ -1111,7 +1109,6 @@ exports[`SendConfirmation renders correctly for payment request confirmation 1`]
         <View
           accessible={true}
           focusable={false}
-          isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
@@ -1201,7 +1198,6 @@ exports[`SendConfirmation renders correctly for payment request confirmation 1`]
         <View
           accessible={true}
           focusable={true}
-          isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
@@ -1696,7 +1692,6 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
                         "top": 10,
                       }
                     }
-                    isTVSelectable={true}
                     nativeBackgroundAndroid={
                       Object {
                         "attribute": "selectableItemBackgroundBorderless",
@@ -1958,6 +1953,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
             <View
               accessible={true}
               focusable={true}
+              forwardedRef={[Function]}
               onClick={[Function]}
               onResponderGrant={[Function]}
               onResponderMove={[Function]}
@@ -1980,6 +1976,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
               }
             />
             <View
+              forwardedRef={[Function]}
               hideModalContentWhileAnimating={true}
               onModalHide={[Function]}
               onModalWillHide={[Function]}
@@ -2058,7 +2055,6 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
                     <View
                       accessible={true}
                       focusable={true}
-                      isTVSelectable={true}
                       nativeBackgroundAndroid={
                         Object {
                           "attribute": "selectableItemBackground",
@@ -2165,7 +2161,6 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
                     <View
                       accessible={true}
                       focusable={true}
-                      isTVSelectable={true}
                       nativeBackgroundAndroid={
                         Object {
                           "attribute": "selectableItemBackground",
@@ -2272,7 +2267,6 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
                     <View
                       accessible={true}
                       focusable={true}
-                      isTVSelectable={true}
                       nativeBackgroundAndroid={
                         Object {
                           "attribute": "selectableItemBackground",
@@ -2383,7 +2377,6 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
         <View
           accessible={true}
           focusable={false}
-          isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
@@ -2473,7 +2466,6 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
         <View
           accessible={true}
           focusable={true}
-          isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
@@ -2968,7 +2960,6 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
                         "top": 10,
                       }
                     }
-                    isTVSelectable={true}
                     nativeBackgroundAndroid={
                       Object {
                         "attribute": "selectableItemBackgroundBorderless",
@@ -3227,6 +3218,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
             <View
               accessible={true}
               focusable={true}
+              forwardedRef={[Function]}
               onClick={[Function]}
               onResponderGrant={[Function]}
               onResponderMove={[Function]}
@@ -3249,6 +3241,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
               }
             />
             <View
+              forwardedRef={[Function]}
               hideModalContentWhileAnimating={true}
               onModalHide={[Function]}
               onModalWillHide={[Function]}
@@ -3327,7 +3320,6 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
                     <View
                       accessible={true}
                       focusable={true}
-                      isTVSelectable={true}
                       nativeBackgroundAndroid={
                         Object {
                           "attribute": "selectableItemBackground",
@@ -3434,7 +3426,6 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
                     <View
                       accessible={true}
                       focusable={true}
-                      isTVSelectable={true}
                       nativeBackgroundAndroid={
                         Object {
                           "attribute": "selectableItemBackground",
@@ -3541,7 +3532,6 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
                     <View
                       accessible={true}
                       focusable={true}
-                      isTVSelectable={true}
                       nativeBackgroundAndroid={
                         Object {
                           "attribute": "selectableItemBackground",
@@ -3652,7 +3642,6 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
         <View
           accessible={true}
           focusable={false}
-          isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
@@ -3742,7 +3731,6 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
         <View
           accessible={true}
           focusable={true}
-          isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
@@ -4237,7 +4225,6 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
                         "top": 10,
                       }
                     }
-                    isTVSelectable={true}
                     nativeBackgroundAndroid={
                       Object {
                         "attribute": "selectableItemBackgroundBorderless",
@@ -4499,6 +4486,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
             <View
               accessible={true}
               focusable={true}
+              forwardedRef={[Function]}
               onClick={[Function]}
               onResponderGrant={[Function]}
               onResponderMove={[Function]}
@@ -4521,6 +4509,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
               }
             />
             <View
+              forwardedRef={[Function]}
               hideModalContentWhileAnimating={true}
               onModalHide={[Function]}
               onModalWillHide={[Function]}
@@ -4599,7 +4588,6 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
                     <View
                       accessible={true}
                       focusable={true}
-                      isTVSelectable={true}
                       nativeBackgroundAndroid={
                         Object {
                           "attribute": "selectableItemBackground",
@@ -4706,7 +4694,6 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
                     <View
                       accessible={true}
                       focusable={true}
-                      isTVSelectable={true}
                       nativeBackgroundAndroid={
                         Object {
                           "attribute": "selectableItemBackground",
@@ -4813,7 +4800,6 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
                     <View
                       accessible={true}
                       focusable={true}
-                      isTVSelectable={true}
                       nativeBackgroundAndroid={
                         Object {
                           "attribute": "selectableItemBackground",
@@ -4924,7 +4910,6 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
         <View
           accessible={true}
           focusable={false}
-          isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
@@ -5014,7 +4999,6 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
         <View
           accessible={true}
           focusable={true}
-          isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
@@ -5509,7 +5493,6 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                         "top": 10,
                       }
                     }
-                    isTVSelectable={true}
                     nativeBackgroundAndroid={
                       Object {
                         "attribute": "selectableItemBackgroundBorderless",
@@ -5771,6 +5754,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
             <View
               accessible={true}
               focusable={true}
+              forwardedRef={[Function]}
               onClick={[Function]}
               onResponderGrant={[Function]}
               onResponderMove={[Function]}
@@ -5793,6 +5777,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
               }
             />
             <View
+              forwardedRef={[Function]}
               hideModalContentWhileAnimating={true}
               onModalHide={[Function]}
               onModalWillHide={[Function]}
@@ -5871,7 +5856,6 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                     <View
                       accessible={true}
                       focusable={true}
-                      isTVSelectable={true}
                       nativeBackgroundAndroid={
                         Object {
                           "attribute": "selectableItemBackground",
@@ -5978,7 +5962,6 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                     <View
                       accessible={true}
                       focusable={true}
-                      isTVSelectable={true}
                       nativeBackgroundAndroid={
                         Object {
                           "attribute": "selectableItemBackground",
@@ -6085,7 +6068,6 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                     <View
                       accessible={true}
                       focusable={true}
-                      isTVSelectable={true}
                       nativeBackgroundAndroid={
                         Object {
                           "attribute": "selectableItemBackground",
@@ -6196,7 +6178,6 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
         <View
           accessible={true}
           focusable={false}
-          isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
@@ -6286,7 +6267,6 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
         <View
           accessible={true}
           focusable={true}
-          isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
@@ -6781,7 +6761,6 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                         "top": 10,
                       }
                     }
-                    isTVSelectable={true}
                     nativeBackgroundAndroid={
                       Object {
                         "attribute": "selectableItemBackgroundBorderless",
@@ -7040,6 +7019,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
             <View
               accessible={true}
               focusable={true}
+              forwardedRef={[Function]}
               onClick={[Function]}
               onResponderGrant={[Function]}
               onResponderMove={[Function]}
@@ -7062,6 +7042,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
               }
             />
             <View
+              forwardedRef={[Function]}
               hideModalContentWhileAnimating={true}
               onModalHide={[Function]}
               onModalWillHide={[Function]}
@@ -7140,7 +7121,6 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                     <View
                       accessible={true}
                       focusable={true}
-                      isTVSelectable={true}
                       nativeBackgroundAndroid={
                         Object {
                           "attribute": "selectableItemBackground",
@@ -7247,7 +7227,6 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                     <View
                       accessible={true}
                       focusable={true}
-                      isTVSelectable={true}
                       nativeBackgroundAndroid={
                         Object {
                           "attribute": "selectableItemBackground",
@@ -7354,7 +7333,6 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                     <View
                       accessible={true}
                       focusable={true}
-                      isTVSelectable={true}
                       nativeBackgroundAndroid={
                         Object {
                           "attribute": "selectableItemBackground",
@@ -7465,7 +7443,6 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
         <View
           accessible={true}
           focusable={false}
-          isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
@@ -7555,7 +7532,6 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
         <View
           accessible={true}
           focusable={true}
-          isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",

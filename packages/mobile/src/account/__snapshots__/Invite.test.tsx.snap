@@ -187,11 +187,8 @@ exports[`Invite renders correctly with no recipients 1`] = `
       onScrollBeginDrag={[Function]}
       onScrollEndDrag={[Function]}
       renderItem={[Function]}
-      renderSectionHeader={[Function]}
       scrollEventThrottle={50}
-      sections={Array []}
       stickyHeaderIndices={Array []}
-      stickySectionHeadersEnabled={false}
       updateCellsBatchingPeriod={50}
       windowSize={21}
     >
@@ -441,27 +438,8 @@ exports[`Invite renders correctly with recipients 1`] = `
       onScrollBeginDrag={[Function]}
       onScrollEndDrag={[Function]}
       renderItem={[Function]}
-      renderSectionHeader={[Function]}
       scrollEventThrottle={50}
-      sections={
-        Array [
-          Object {
-            "data": Array [
-              Object {
-                "contactId": "contactId",
-                "displayId": "14155550000",
-                "displayName": "John Doe",
-                "e164PhoneNumber": "+14155550000",
-                "kind": "Contact",
-                "phoneNumberLabel": "phoneNumLabel",
-              },
-            ],
-            "key": "contacts",
-          },
-        ]
-      }
       stickyHeaderIndices={Array []}
-      stickySectionHeadersEnabled={false}
       updateCellsBatchingPeriod={50}
       windowSize={21}
     >
@@ -506,7 +484,6 @@ exports[`Invite renders correctly with recipients 1`] = `
           <View
             accessible={true}
             focusable={true}
-            isTVSelectable={true}
             onClick={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
@@ -514,7 +491,6 @@ exports[`Invite renders correctly with recipients 1`] = `
             onResponderTerminate={[Function]}
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
-            style={null}
           >
             <View
               style={

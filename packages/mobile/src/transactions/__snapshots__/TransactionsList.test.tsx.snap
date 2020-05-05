@@ -74,7 +74,6 @@ exports[`ignores failed standby transactions 1`] = `
   initialNumToRender={10}
   keyExtractor={[Function]}
   maxToRenderPerBatch={10}
-  numColumns={1}
   onContentSizeChange={[Function]}
   onEndReachedThreshold={2}
   onLayout={[Function]}
@@ -98,7 +97,6 @@ exports[`ignores failed standby transactions 1`] = `
       <View
         accessible={true}
         focusable={true}
-        isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackground",
@@ -290,7 +288,6 @@ exports[`ignores failed standby transactions 1`] = `
       <View
         accessible={true}
         focusable={true}
-        isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackground",
@@ -576,7 +573,6 @@ exports[`ignores pending standby transactions that are completed in the response
   initialNumToRender={10}
   keyExtractor={[Function]}
   maxToRenderPerBatch={10}
-  numColumns={1}
   onContentSizeChange={[Function]}
   onEndReachedThreshold={2}
   onLayout={[Function]}
@@ -600,7 +596,6 @@ exports[`ignores pending standby transactions that are completed in the response
       <View
         accessible={true}
         focusable={true}
-        isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackground",
@@ -792,7 +787,6 @@ exports[`ignores pending standby transactions that are completed in the response
       <View
         accessible={true}
         focusable={true}
-        isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackground",
@@ -1164,7 +1158,6 @@ exports[`renders the received data along with the standby transactions 1`] = `
   initialNumToRender={10}
   keyExtractor={[Function]}
   maxToRenderPerBatch={10}
-  numColumns={1}
   onContentSizeChange={[Function]}
   onEndReachedThreshold={2}
   onLayout={[Function]}
@@ -1188,7 +1181,6 @@ exports[`renders the received data along with the standby transactions 1`] = `
       <View
         accessible={true}
         focusable={true}
-        isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackground",
@@ -1392,7 +1384,6 @@ exports[`renders the received data along with the standby transactions 1`] = `
       <View
         accessible={true}
         focusable={true}
-        isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackground",
@@ -1632,7 +1623,6 @@ exports[`renders the received data along with the standby transactions 1`] = `
       <View
         accessible={true}
         focusable={true}
-        isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackground",
@@ -1872,7 +1862,6 @@ exports[`renders the received data along with the standby transactions 1`] = `
       <View
         accessible={true}
         focusable={true}
-        isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackground",
@@ -2064,7 +2053,6 @@ exports[`renders the received data along with the standby transactions 1`] = `
       <View
         accessible={true}
         focusable={true}
-        isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackground",

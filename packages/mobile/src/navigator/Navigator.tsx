@@ -1,16 +1,6 @@
 import { Platform } from 'react-native'
-import {
-  CreateNavigatorConfig,
-  createSwitchNavigator,
-  NavigationRoute,
-  NavigationStackRouterConfig,
-} from 'react-navigation'
-import {
-  createStackNavigator,
-  NavigationStackConfig,
-  NavigationStackOptions,
-  NavigationStackProp,
-} from 'react-navigation-stack'
+import { createSwitchNavigator } from 'react-navigation'
+import { createStackNavigator } from 'react-navigation-stack'
 import Account from 'src/account/Account'
 import Analytics from 'src/account/Analytics'
 import DataSaver from 'src/account/DataSaver'
@@ -75,12 +65,7 @@ import VerificationLearnMoreScreen from 'src/verify/VerificationLearnMoreScreen'
 import VerificationLoadingScreen from 'src/verify/VerificationLoadingScreen'
 import VerificationSuccessScreen from 'src/verify/VerificationSuccessScreen'
 
-export const headerArea: CreateNavigatorConfig<
-  NavigationStackConfig,
-  NavigationStackRouterConfig,
-  NavigationStackOptions,
-  NavigationStackProp<NavigationRoute, any>
-> = {
+export const headerArea = {
   // Force this for now on iOS so screen transitions look normal
   // given we intentionally hide the bottom separator from the nav bar
   headerMode: 'screen',
