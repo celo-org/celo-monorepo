@@ -7,6 +7,7 @@ import { google } from 'googleapis'
 import readline from 'readline'
 
 process.on('unhandledRejection', (reason, _promise) => {
+  // @ts-ignore
   console.log('Unhandled Rejection at:', reason.stack || reason)
   process.exit(0)
 })

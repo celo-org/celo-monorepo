@@ -1,0 +1,2092 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Footer renders 1`] = `
+Array [
+  <div
+    className="css-view-1dbjc4n"
+    style={
+      Object {
+        "WebkitAlignItems": "center",
+        "WebkitAlignSelf": "center",
+        "WebkitBoxAlign": "center",
+        "WebkitBoxDirection": "normal",
+        "WebkitBoxOrient": "vertical",
+        "WebkitBoxPack": "center",
+        "WebkitFlexDirection": "column",
+        "WebkitJustifyContent": "center",
+        "alignItems": "center",
+        "alignSelf": "center",
+        "flexDirection": "column",
+        "justifyContent": "center",
+        "marginBottom": "30px",
+        "marginTop": "30px",
+        "maxWidth": "100vw",
+        "msFlexAlign": "center",
+        "msFlexDirection": "column",
+        "msFlexItemAlign": "center",
+        "msFlexPack": "center",
+        "paddingLeft": "10px",
+        "paddingRight": "10px",
+        "width": "100%",
+      }
+    }
+  >
+    <div
+      className="css-view-1dbjc4n"
+      style={
+        Object {
+          "WebkitAlignItems": "center",
+          "WebkitBoxAlign": "center",
+          "WebkitBoxFlex": 0,
+          "WebkitBoxPack": "center",
+          "WebkitFlexGrow": 0,
+          "WebkitFlexShrink": 0,
+          "WebkitJustifyContent": "center",
+          "alignItems": "center",
+          "flexGrow": 0,
+          "flexShrink": 0,
+          "justifyContent": "center",
+          "maxWidth": "550px",
+          "msFlexAlign": "center",
+          "msFlexNegative": 0,
+          "msFlexPack": "center",
+          "msFlexPositive": 0,
+          "paddingBottom": "10px",
+          "paddingLeft": "10px",
+          "paddingRight": "10px",
+          "paddingTop": "10px",
+          "width": "100%",
+        }
+      }
+    >
+      <div
+        className="css-view-1dbjc4n"
+        style={
+          Object {
+            "WebkitFlexBasis": "auto",
+            "flexBasis": "auto",
+            "height": "50px",
+            "marginBottom": "10px",
+            "marginTop": "10px",
+            "msFlexPreferredSize": "auto",
+            "overflowX": "hidden",
+            "overflowY": "hidden",
+            "width": "50px",
+            "zIndex": 0,
+          }
+        }
+      >
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "backgroundColor": "rgba(0,0,0,0.00)",
+              "backgroundImage": "url(\\"image.png\\")",
+              "backgroundPosition": "center",
+              "backgroundRepeat": "no-repeat",
+              "backgroundSize": "contain",
+              "bottom": "0px",
+              "height": "100%",
+              "left": "0px",
+              "position": "absolute",
+              "right": "0px",
+              "top": "0px",
+              "width": "100%",
+              "zIndex": -1,
+            }
+          }
+        />
+        <img
+          alt=""
+          className="css-accessibilityImage-9pa8cd"
+          draggable={false}
+          src="image.png"
+        />
+      </div>
+      <div
+        className="css-text-901oao"
+        dir="auto"
+        style={
+          Object {
+            "color": "rgba(46,51,56,1.00)",
+            "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+            "fontSize": "20px",
+            "lineHeight": "28px",
+            "marginBottom": "10px",
+            "marginTop": "20px",
+            "textAlign": "center",
+            "textRendering": "geometricPrecision",
+          }
+        }
+      >
+        Receive the latest updates to your inbox
+      </div>
+      <div
+        className="css-view-1dbjc4n"
+        style={
+          Object {
+            "marginBottom": "5px",
+            "marginTop": "5px",
+            "paddingBottom": "15px",
+            "width": "100%",
+          }
+        }
+      >
+        <input
+          autoCapitalize="sentences"
+          autoComplete="on"
+          autoCorrect="on"
+          className="css-textinput-1cwyjr8 r-placeholderTextColor-tf24u1"
+          data-focusable={true}
+          dir="auto"
+          name="email"
+          onBlur={[Function]}
+          onChange={[Function]}
+          onFocus={[Function]}
+          onKeyDown={[Function]}
+          onKeyPress={[Function]}
+          onSelect={[Function]}
+          placeholder="Email*"
+          readOnly={false}
+          required={true}
+          spellCheck={true}
+          style={
+            Object {
+              "WebkitBoxFlex": 1,
+              "WebkitFlexBasis": "0%",
+              "WebkitFlexGrow": 1,
+              "WebkitFlexShrink": 1,
+              "borderBottomColor": "rgba(221,221,221,1.00)",
+              "borderBottomLeftRadius": "3px",
+              "borderBottomRightRadius": "3px",
+              "borderBottomWidth": "1px",
+              "borderLeftColor": "rgba(221,221,221,1.00)",
+              "borderLeftWidth": "1px",
+              "borderRightColor": "rgba(221,221,221,1.00)",
+              "borderRightWidth": "1px",
+              "borderTopColor": "rgba(221,221,221,1.00)",
+              "borderTopLeftRadius": "3px",
+              "borderTopRightRadius": "3px",
+              "borderTopWidth": "1px",
+              "color": "rgba(46,51,56,1.00)",
+              "flexBasis": "0%",
+              "flexGrow": 1,
+              "flexShrink": 1,
+              "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+              "fontSize": "20px",
+              "lineHeight": "28px",
+              "marginBottom": "5px",
+              "marginTop": "5px",
+              "msFlexNegative": 1,
+              "msFlexPositive": 1,
+              "msFlexPreferredSize": "0%",
+              "outlineStyle": "none",
+              "paddingBottom": "15px",
+              "paddingLeft": "10px",
+              "paddingRight": "10px",
+              "paddingTop": "13px",
+              "textRendering": "geometricPrecision",
+            }
+          }
+          type="text"
+          value=""
+        />
+        <div
+          className="css-view-1dbjc4n"
+        >
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "MozTransitionProperty": "max-height",
+                "WebkitTransitionDuration": "600ms",
+                "WebkitTransitionProperty": "max-height",
+                "height": "auto",
+                "marginBottom": "5px",
+                "marginTop": "5px",
+                "maxHeight": "0px",
+                "transitionDuration": "600ms",
+                "transitionProperty": "max-height",
+              }
+            }
+          >
+            <div
+              className="css-text-901oao"
+              dir="auto"
+              style={
+                Object {
+                  "MozTransitionProperty": "opacity",
+                  "WebkitTransitionDuration": "700ms",
+                  "WebkitTransitionProperty": "opacity",
+                  "color": "rgba(255,127,109,1.00)",
+                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                  "fontSize": "16px",
+                  "fontWeight": "500",
+                  "lineHeight": "18px",
+                  "opacity": 0,
+                  "textRendering": "geometricPrecision",
+                  "transitionDuration": "700ms",
+                  "transitionProperty": "opacity",
+                }
+              }
+            >
+              Please enter a valid email
+            </div>
+          </div>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          onClick={[Function]}
+          onMouseDown={[Function]}
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          onMouseUp={[Function]}
+          onResponderGrant={[Function]}
+          onResponderRelease={[Function]}
+        >
+          <a
+            className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+            data-focusable={true}
+            dir="auto"
+            role="link"
+            style={
+              Object {
+                "WebkitAlignItems": "center",
+                "WebkitBoxAlign": "center",
+                "WebkitBoxFlex": 1,
+                "WebkitBoxPack": "center",
+                "WebkitFlexGrow": 1,
+                "WebkitJustifyContent": "center",
+                "alignItems": "center",
+                "backgroundColor": "rgba(53,208,127,1.00)",
+                "borderBottomColor": "rgba(53,208,127,1.00)",
+                "borderBottomLeftRadius": "3px",
+                "borderBottomRightRadius": "3px",
+                "borderBottomWidth": "1px",
+                "borderLeftColor": "rgba(53,208,127,1.00)",
+                "borderLeftWidth": "1px",
+                "borderRightColor": "rgba(53,208,127,1.00)",
+                "borderRightWidth": "1px",
+                "borderTopColor": "rgba(53,208,127,1.00)",
+                "borderTopLeftRadius": "3px",
+                "borderTopRightRadius": "3px",
+                "borderTopWidth": "1px",
+                "color": "rgba(255,255,255,1.00)",
+                "cursor": "pointer",
+                "display": "inline-flex",
+                "flexGrow": 1,
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "fontWeight": "500",
+                "justifyContent": "center",
+                "lineHeight": "16px",
+                "msFlexAlign": "center",
+                "msFlexPack": "center",
+                "msFlexPositive": 1,
+                "opacity": 1,
+                "paddingBottom": "15px",
+                "paddingLeft": "20px",
+                "paddingRight": "20px",
+                "paddingTop": "15px",
+                "textAlign": "center",
+                "textRendering": "geometricPrecision",
+                "width": "100%",
+              }
+            }
+          >
+            Sign Up
+          </a>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "position": "absolute",
+              "top": "65px",
+            }
+          }
+        />
+      </div>
+      <div
+        className="css-view-1dbjc4n"
+        style={
+          Object {
+            "marginTop": "10px",
+          }
+        }
+      >
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "MozTransitionProperty": "max-height",
+              "WebkitTransitionDuration": "600ms",
+              "WebkitTransitionProperty": "max-height",
+              "height": "auto",
+              "marginBottom": "5px",
+              "marginTop": "5px",
+              "maxHeight": "0px",
+              "transitionDuration": "600ms",
+              "transitionProperty": "max-height",
+            }
+          }
+        >
+          <div
+            className="css-text-901oao"
+            dir="auto"
+            style={
+              Object {
+                "MozTransitionProperty": "opacity",
+                "WebkitTransitionDuration": "700ms",
+                "WebkitTransitionProperty": "opacity",
+                "color": "rgba(53,208,127,1.00)",
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "fontWeight": "500",
+                "lineHeight": "18px",
+                "opacity": 0,
+                "textRendering": "geometricPrecision",
+                "transitionDuration": "700ms",
+                "transitionProperty": "opacity",
+              }
+            }
+          >
+            <svg
+              fill="none"
+              height={16}
+              style={Object {}}
+              viewBox="0 0 11 9"
+              width={16}
+            >
+              <path
+                clipRule="evenodd"
+                d="M10.7932 1.85263L3.96211 8.64309L0.180176 4.88366L1.85967 3.19411L3.96211 5.28404L9.11373 0.163086L10.7932 1.85263Z"
+                fill="#35D07F"
+                fillRule="evenodd"
+                style={Object {}}
+              />
+            </svg>
+            <span
+              className="css-text-901oao css-textHasAncestor-16my406"
+              dir="auto"
+              style={
+                Object {
+                  "marginLeft": "10px",
+                }
+              }
+            >
+              Submitted
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>,
+  <div
+    className="css-view-1dbjc4n"
+    style={
+      Object {
+        "WebkitAlignSelf": "center",
+        "WebkitBoxDirection": "normal",
+        "WebkitBoxOrient": "vertical",
+        "WebkitFlexDirection": "column",
+        "alignSelf": "center",
+        "flexDirection": "column",
+        "maxWidth": "100vw",
+        "msFlexDirection": "column",
+        "msFlexItemAlign": "center",
+        "paddingLeft": "10px",
+        "paddingRight": "10px",
+        "width": "100%",
+      }
+    }
+  >
+    <div
+      className="css-view-1dbjc4n"
+      style={
+        Object {
+          "WebkitBoxFlex": 0,
+          "WebkitFlexGrow": 0,
+          "WebkitFlexShrink": 0,
+          "flexGrow": 0,
+          "flexShrink": 0,
+          "msFlexNegative": 0,
+          "msFlexPositive": 0,
+          "paddingBottom": "10px",
+          "paddingLeft": "10px",
+          "paddingRight": "10px",
+          "paddingTop": "10px",
+          "width": "100%",
+        }
+      }
+    >
+      <div
+        className="css-view-1dbjc4n"
+        style={
+          Object {
+            "WebkitTransform": "translateY(-10px)",
+            "marginBottom": "20px",
+            "transform": "translateY(-10px)",
+          }
+        }
+      >
+        <svg
+          fill="none"
+          height={25}
+          style={Object {}}
+          viewBox="0 0 25 25"
+          width={25}
+        >
+          <path
+            d="M9.86842 22.3684C13.8653 22.3684 17.1053 19.1284 17.1053 15.1316C17.1053 11.1348 13.8653 7.89476 9.86842 7.89476C5.87158 7.89476 2.63158 11.1348 2.63158 15.1316C2.63158 19.1284 5.87158 22.3684 9.86842 22.3684ZM9.86842 25C4.41842 25 0 20.5816 0 15.1316C0 9.6816 4.41842 5.26318 9.86842 5.26318C15.3184 5.26318 19.7368 9.6816 19.7368 15.1316C19.7368 20.5816 15.3184 25 9.86842 25Z"
+            fill="#FBCC5C"
+            style={Object {}}
+          />
+          <path
+            d="M15.1316 17.1053C19.1284 17.1053 22.3684 13.8653 22.3684 9.86842C22.3684 5.87158 19.1284 2.63158 15.1316 2.63158C11.1348 2.63158 7.89476 5.87158 7.89476 9.86842C7.89476 13.8653 11.1348 17.1053 15.1316 17.1053ZM15.1316 19.7368C9.6816 19.7368 5.26318 15.3184 5.26318 9.86842C5.26318 4.41842 9.6816 0 15.1316 0C20.5816 0 25 4.41842 25 9.86842C25 15.3184 20.5816 19.7368 15.1316 19.7368Z"
+            fill="#35D07F"
+            style={Object {}}
+          />
+          <path
+            d="M15.4577 19.7369C16.1419 18.9077 16.6324 17.9361 16.8932 16.8932C17.9361 16.6324 18.9077 16.1421 19.7369 15.4579C19.699 16.6658 19.439 17.8563 18.9695 18.9698C17.8561 19.439 16.6656 19.6992 15.4577 19.7369ZM8.10687 8.10687C7.06397 8.36766 6.09239 8.85792 5.26318 9.54213C5.30108 8.33424 5.56108 7.14371 6.03055 6.03029C7.14397 5.56108 8.3345 5.30082 9.54239 5.26318C8.85818 6.09239 8.36766 7.06397 8.10687 8.10687Z"
+            fill="#5EA33B"
+            style={Object {}}
+          />
+        </svg>
+      </div>
+      <div
+        className="css-view-1dbjc4n"
+        style={
+          Object {
+            "paddingBottom": "20px",
+          }
+        }
+      >
+        <div
+          className="css-text-901oao"
+          dir="auto"
+          style={
+            Object {
+              "color": "rgba(46,51,56,1.00)",
+              "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+              "fontSize": "16px",
+              "lineHeight": "20px",
+              "marginBottom": "20px",
+              "maxWidth": "350px",
+              "textAlign": "left",
+              "textRendering": "geometricPrecision",
+            }
+          }
+        >
+          Nothing herein constitutes an offer to sell, or the solicitation of an offer to buy, any securities or tokens.
+        </div>
+        <div
+          className="css-text-901oao"
+          dir="auto"
+          style={
+            Object {
+              "color": "rgba(46,51,56,1.00)",
+              "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+              "fontSize": "16px",
+              "lineHeight": "20px",
+              "marginBottom": "20px",
+              "maxWidth": "350px",
+              "textAlign": "left",
+              "textRendering": "geometricPrecision",
+            }
+          }
+        >
+          Read more in Celo 
+          <div
+            className="css-view-1dbjc4n"
+            onClick={[Function]}
+            onMouseDown={[Function]}
+            onMouseEnter={[Function]}
+            onMouseLeave={[Function]}
+            onMouseUp={[Function]}
+            onResponderGrant={[Function]}
+            onResponderRelease={[Function]}
+            style={
+              Object {
+                "display": "inline",
+              }
+            }
+          >
+            <a
+              className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao css-textHasAncestor-16my406"
+              data-focusable={true}
+              dir="auto"
+              href="/terms"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
+              role="link"
+              style={
+                Object {
+                  "WebkitTextDecorationStyle": "solid",
+                  "cursor": "pointer",
+                  "display": "inline",
+                  "opacity": 1,
+                  "textDecoration": "underline",
+                  "textDecorationStyle": "solid",
+                }
+              }
+            >
+              Terms of Service
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      className="css-view-1dbjc4n"
+      style={
+        Object {
+          "WebkitBoxFlex": 0,
+          "WebkitFlexGrow": 0,
+          "WebkitFlexShrink": 0,
+          "flexGrow": 0,
+          "flexShrink": 0,
+          "msFlexNegative": 0,
+          "msFlexPositive": 0,
+          "paddingBottom": "10px",
+          "paddingLeft": "10px",
+          "paddingRight": "10px",
+          "paddingTop": "10px",
+          "width": "100%",
+        }
+      }
+    >
+      <div
+        className="css-view-1dbjc4n"
+        style={
+          Object {
+            "WebkitBoxDirection": "normal",
+            "WebkitBoxOrient": "horizontal",
+            "WebkitBoxPack": "justify",
+            "WebkitFlexDirection": "row",
+            "WebkitJustifyContent": "space-around",
+            "flexDirection": "row",
+            "justifyContent": "space-around",
+            "msFlexDirection": "row",
+            "msFlexPack": "distribute",
+          }
+        }
+      >
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "paddingLeft": "0px",
+              "paddingRight": "25px",
+            }
+          }
+        >
+          <div
+            className="css-text-901oao"
+            dir="auto"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "fontWeight": "500",
+                "lineHeight": "18px",
+                "marginBottom": "20px",
+                "textRendering": "geometricPrecision",
+              }
+            }
+          >
+            Celo
+          </div>
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "marginBottom": "8px",
+                "marginTop": "8px",
+              }
+            }
+          >
+            <div
+              className="css-view-1dbjc4n"
+              onClick={[Function]}
+              onMouseDown={[Function]}
+              onMouseEnter={[Function]}
+              onMouseLeave={[Function]}
+              onMouseUp={[Function]}
+              onResponderGrant={[Function]}
+              onResponderRelease={[Function]}
+              style={
+                Object {
+                  "display": "inline",
+                }
+              }
+            >
+              <a
+                className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+                data-focusable={true}
+                dir="auto"
+                href="/"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
+                rel=" noopener noreferrer"
+                role="link"
+                style={
+                  Object {
+                    "WebkitTextDecorationStyle": "solid",
+                    "color": "rgba(46,51,56,1.00)",
+                    "cursor": "pointer",
+                    "display": "inline",
+                    "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                    "fontSize": "16px",
+                    "lineHeight": "20px",
+                    "opacity": 1,
+                    "textDecoration": "none",
+                    "textDecorationStyle": "solid",
+                    "textRendering": "geometricPrecision",
+                  }
+                }
+                target="_blank"
+              >
+                Home
+              </a>
+            </div>
+          </div>
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "marginBottom": "8px",
+                "marginTop": "8px",
+              }
+            }
+          >
+            <div
+              className="css-view-1dbjc4n"
+              onClick={[Function]}
+              onMouseDown={[Function]}
+              onMouseEnter={[Function]}
+              onMouseLeave={[Function]}
+              onMouseUp={[Function]}
+              onResponderGrant={[Function]}
+              onResponderRelease={[Function]}
+              style={
+                Object {
+                  "display": "inline",
+                }
+              }
+            >
+              <a
+                className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+                data-focusable={true}
+                dir="auto"
+                href="/about"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
+                rel=" noopener noreferrer"
+                role="link"
+                style={
+                  Object {
+                    "WebkitTextDecorationStyle": "solid",
+                    "color": "rgba(46,51,56,1.00)",
+                    "cursor": "pointer",
+                    "display": "inline",
+                    "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                    "fontSize": "16px",
+                    "lineHeight": "20px",
+                    "opacity": 1,
+                    "textDecoration": "none",
+                    "textDecorationStyle": "solid",
+                    "textRendering": "geometricPrecision",
+                  }
+                }
+                target="_blank"
+              >
+                About
+              </a>
+            </div>
+          </div>
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "marginBottom": "8px",
+                "marginTop": "8px",
+              }
+            }
+          >
+            <div
+              className="css-view-1dbjc4n"
+              onClick={[Function]}
+              onMouseDown={[Function]}
+              onMouseEnter={[Function]}
+              onMouseLeave={[Function]}
+              onMouseUp={[Function]}
+              onResponderGrant={[Function]}
+              onResponderRelease={[Function]}
+              style={
+                Object {
+                  "display": "inline",
+                }
+              }
+            >
+              <a
+                className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+                data-focusable={true}
+                dir="auto"
+                href="/jobs"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
+                rel=" noopener noreferrer"
+                role="link"
+                style={
+                  Object {
+                    "WebkitTextDecorationStyle": "solid",
+                    "color": "rgba(46,51,56,1.00)",
+                    "cursor": "pointer",
+                    "display": "inline",
+                    "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                    "fontSize": "16px",
+                    "lineHeight": "20px",
+                    "opacity": 1,
+                    "textDecoration": "none",
+                    "textDecorationStyle": "solid",
+                    "textRendering": "geometricPrecision",
+                  }
+                }
+                target="_blank"
+              >
+                Join
+              </a>
+            </div>
+          </div>
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "marginBottom": "8px",
+                "marginTop": "8px",
+              }
+            }
+          >
+            <div
+              className="css-view-1dbjc4n"
+              onClick={[Function]}
+              onMouseDown={[Function]}
+              onMouseEnter={[Function]}
+              onMouseLeave={[Function]}
+              onMouseUp={[Function]}
+              onResponderGrant={[Function]}
+              onResponderRelease={[Function]}
+              style={
+                Object {
+                  "display": "inline",
+                }
+              }
+            >
+              <a
+                className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+                data-focusable={true}
+                dir="auto"
+                href="/validators"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
+                rel=" noopener noreferrer"
+                role="link"
+                style={
+                  Object {
+                    "WebkitTextDecorationStyle": "solid",
+                    "color": "rgba(46,51,56,1.00)",
+                    "cursor": "pointer",
+                    "display": "inline",
+                    "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                    "fontSize": "16px",
+                    "lineHeight": "20px",
+                    "opacity": 1,
+                    "textDecoration": "none",
+                    "textDecorationStyle": "solid",
+                    "textRendering": "geometricPrecision",
+                  }
+                }
+                target="_blank"
+              >
+                Validators
+              </a>
+            </div>
+          </div>
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "marginBottom": "8px",
+                "marginTop": "8px",
+              }
+            }
+          >
+            <div
+              className="css-view-1dbjc4n"
+              onClick={[Function]}
+              onMouseDown={[Function]}
+              onMouseEnter={[Function]}
+              onMouseLeave={[Function]}
+              onMouseUp={[Function]}
+              onResponderGrant={[Function]}
+              onResponderRelease={[Function]}
+              style={
+                Object {
+                  "display": "inline",
+                }
+              }
+            >
+              <a
+                className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+                data-focusable={true}
+                dir="auto"
+                href="/developers"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
+                rel=" noopener noreferrer"
+                role="link"
+                style={
+                  Object {
+                    "WebkitTextDecorationStyle": "solid",
+                    "color": "rgba(46,51,56,1.00)",
+                    "cursor": "pointer",
+                    "display": "inline",
+                    "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                    "fontSize": "16px",
+                    "lineHeight": "20px",
+                    "opacity": 1,
+                    "textDecoration": "none",
+                    "textDecorationStyle": "solid",
+                    "textRendering": "geometricPrecision",
+                  }
+                }
+                target="_blank"
+              >
+                Developers
+              </a>
+            </div>
+          </div>
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "marginBottom": "8px",
+                "marginTop": "8px",
+              }
+            }
+          >
+            <div
+              className="css-view-1dbjc4n"
+              onClick={[Function]}
+              onMouseDown={[Function]}
+              onMouseEnter={[Function]}
+              onMouseLeave={[Function]}
+              onMouseUp={[Function]}
+              onResponderGrant={[Function]}
+              onResponderRelease={[Function]}
+              style={
+                Object {
+                  "display": "inline",
+                }
+              }
+            >
+              <a
+                className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+                data-focusable={true}
+                dir="auto"
+                href="/alliance"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
+                rel=" noopener noreferrer"
+                role="link"
+                style={
+                  Object {
+                    "WebkitTextDecorationStyle": "solid",
+                    "color": "rgba(46,51,56,1.00)",
+                    "cursor": "pointer",
+                    "display": "inline",
+                    "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                    "fontSize": "16px",
+                    "lineHeight": "20px",
+                    "opacity": 1,
+                    "textDecoration": "none",
+                    "textDecorationStyle": "solid",
+                    "textRendering": "geometricPrecision",
+                  }
+                }
+                target="_blank"
+              >
+                Alliance
+              </a>
+            </div>
+          </div>
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "marginBottom": "8px",
+                "marginTop": "8px",
+              }
+            }
+          >
+            <div
+              className="css-view-1dbjc4n"
+              onClick={[Function]}
+              onMouseDown={[Function]}
+              onMouseEnter={[Function]}
+              onMouseLeave={[Function]}
+              onMouseUp={[Function]}
+              onResponderGrant={[Function]}
+              onResponderRelease={[Function]}
+              style={
+                Object {
+                  "display": "inline",
+                }
+              }
+            >
+              <a
+                className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+                data-focusable={true}
+                dir="auto"
+                href="/community"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
+                rel=" noopener noreferrer"
+                role="link"
+                style={
+                  Object {
+                    "WebkitTextDecorationStyle": "solid",
+                    "color": "rgba(46,51,56,1.00)",
+                    "cursor": "pointer",
+                    "display": "inline",
+                    "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                    "fontSize": "16px",
+                    "lineHeight": "20px",
+                    "opacity": 1,
+                    "textDecoration": "none",
+                    "textDecorationStyle": "solid",
+                    "textRendering": "geometricPrecision",
+                  }
+                }
+                target="_blank"
+              >
+                Community
+              </a>
+            </div>
+          </div>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "paddingLeft": "25px",
+              "paddingRight": "25px",
+            }
+          }
+        >
+          <div
+            className="css-text-901oao"
+            dir="auto"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "fontWeight": "500",
+                "lineHeight": "18px",
+                "marginBottom": "20px",
+                "textRendering": "geometricPrecision",
+              }
+            }
+          >
+            Technology
+          </div>
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "marginBottom": "8px",
+                "marginTop": "8px",
+              }
+            }
+          >
+            <div
+              className="css-view-1dbjc4n"
+              onClick={[Function]}
+              onMouseDown={[Function]}
+              onMouseEnter={[Function]}
+              onMouseLeave={[Function]}
+              onMouseUp={[Function]}
+              onResponderGrant={[Function]}
+              onResponderRelease={[Function]}
+              style={
+                Object {
+                  "display": "inline",
+                }
+              }
+            >
+              <a
+                className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+                data-focusable={true}
+                dir="auto"
+                href="https://docs.celo.org/"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
+                rel=" noopener noreferrer"
+                role="link"
+                style={
+                  Object {
+                    "WebkitTextDecorationStyle": "solid",
+                    "color": "rgba(46,51,56,1.00)",
+                    "cursor": "pointer",
+                    "display": "inline",
+                    "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                    "fontSize": "16px",
+                    "lineHeight": "20px",
+                    "opacity": 1,
+                    "textDecoration": "none",
+                    "textDecorationStyle": "solid",
+                    "textRendering": "geometricPrecision",
+                  }
+                }
+                target="_blank"
+              >
+                Docs
+              </a>
+            </div>
+          </div>
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "marginBottom": "8px",
+                "marginTop": "8px",
+              }
+            }
+          >
+            <div
+              className="css-view-1dbjc4n"
+              onClick={[Function]}
+              onMouseDown={[Function]}
+              onMouseEnter={[Function]}
+              onMouseLeave={[Function]}
+              onMouseUp={[Function]}
+              onResponderGrant={[Function]}
+              onResponderRelease={[Function]}
+              style={
+                Object {
+                  "display": "inline",
+                }
+              }
+            >
+              <a
+                className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+                data-focusable={true}
+                dir="auto"
+                href="/audits"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
+                rel=" noopener noreferrer"
+                role="link"
+                style={
+                  Object {
+                    "WebkitTextDecorationStyle": "solid",
+                    "color": "rgba(46,51,56,1.00)",
+                    "cursor": "pointer",
+                    "display": "inline",
+                    "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                    "fontSize": "16px",
+                    "lineHeight": "20px",
+                    "opacity": 1,
+                    "textDecoration": "none",
+                    "textDecorationStyle": "solid",
+                    "textRendering": "geometricPrecision",
+                  }
+                }
+                target="_blank"
+              >
+                Security Audits
+              </a>
+            </div>
+          </div>
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "marginBottom": "8px",
+                "marginTop": "8px",
+              }
+            }
+          >
+            <div
+              className="css-view-1dbjc4n"
+              onClick={[Function]}
+              onMouseDown={[Function]}
+              onMouseEnter={[Function]}
+              onMouseLeave={[Function]}
+              onMouseUp={[Function]}
+              onResponderGrant={[Function]}
+              onResponderRelease={[Function]}
+              style={
+                Object {
+                  "display": "inline",
+                }
+              }
+            >
+              <a
+                className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+                data-focusable={true}
+                dir="auto"
+                href="/papers"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
+                rel=" noopener noreferrer"
+                role="link"
+                style={
+                  Object {
+                    "WebkitTextDecorationStyle": "solid",
+                    "color": "rgba(46,51,56,1.00)",
+                    "cursor": "pointer",
+                    "display": "inline",
+                    "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                    "fontSize": "16px",
+                    "lineHeight": "20px",
+                    "opacity": 1,
+                    "textDecoration": "none",
+                    "textDecorationStyle": "solid",
+                    "textRendering": "geometricPrecision",
+                  }
+                }
+                target="_blank"
+              >
+                White Papers
+              </a>
+            </div>
+          </div>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "paddingLeft": "25px",
+              "paddingRight": "25px",
+            }
+          }
+        >
+          <div
+            className="css-text-901oao"
+            dir="auto"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "fontWeight": "500",
+                "lineHeight": "18px",
+                "marginBottom": "20px",
+                "textRendering": "geometricPrecision",
+              }
+            }
+          >
+            Resources
+          </div>
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "marginBottom": "8px",
+                "marginTop": "8px",
+              }
+            }
+          >
+            <div
+              className="css-view-1dbjc4n"
+              onClick={[Function]}
+              onMouseDown={[Function]}
+              onMouseEnter={[Function]}
+              onMouseLeave={[Function]}
+              onMouseUp={[Function]}
+              onResponderGrant={[Function]}
+              onResponderRelease={[Function]}
+              style={
+                Object {
+                  "display": "inline",
+                }
+              }
+            >
+              <a
+                className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+                data-focusable={true}
+                dir="auto"
+                href="/code-of-conduct"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
+                rel=" noopener noreferrer"
+                role="link"
+                style={
+                  Object {
+                    "WebkitTextDecorationStyle": "solid",
+                    "color": "rgba(46,51,56,1.00)",
+                    "cursor": "pointer",
+                    "display": "inline",
+                    "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                    "fontSize": "16px",
+                    "lineHeight": "20px",
+                    "opacity": 1,
+                    "textDecoration": "none",
+                    "textDecorationStyle": "solid",
+                    "textRendering": "geometricPrecision",
+                  }
+                }
+                target="_blank"
+              >
+                Code of Conduct
+              </a>
+            </div>
+          </div>
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "marginBottom": "8px",
+                "marginTop": "8px",
+              }
+            }
+          >
+            <div
+              className="css-view-1dbjc4n"
+              onClick={[Function]}
+              onMouseDown={[Function]}
+              onMouseEnter={[Function]}
+              onMouseLeave={[Function]}
+              onMouseUp={[Function]}
+              onResponderGrant={[Function]}
+              onResponderRelease={[Function]}
+              style={
+                Object {
+                  "display": "inline",
+                }
+              }
+            >
+              <a
+                className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+                data-focusable={true}
+                dir="auto"
+                href="/community#events"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
+                rel=" noopener noreferrer"
+                role="link"
+                style={
+                  Object {
+                    "WebkitTextDecorationStyle": "solid",
+                    "color": "rgba(46,51,56,1.00)",
+                    "cursor": "pointer",
+                    "display": "inline",
+                    "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                    "fontSize": "16px",
+                    "lineHeight": "20px",
+                    "opacity": 1,
+                    "textDecoration": "none",
+                    "textDecorationStyle": "solid",
+                    "textRendering": "geometricPrecision",
+                  }
+                }
+                target="_blank"
+              >
+                Events
+              </a>
+            </div>
+          </div>
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "marginBottom": "8px",
+                "marginTop": "8px",
+              }
+            }
+          >
+            <div
+              className="css-view-1dbjc4n"
+              onClick={[Function]}
+              onMouseDown={[Function]}
+              onMouseEnter={[Function]}
+              onMouseLeave={[Function]}
+              onMouseUp={[Function]}
+              onResponderGrant={[Function]}
+              onResponderRelease={[Function]}
+              style={
+                Object {
+                  "display": "inline",
+                }
+              }
+            >
+              <a
+                className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+                data-focusable={true}
+                dir="auto"
+                href="/experience/brand"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
+                rel=" noopener noreferrer"
+                role="link"
+                style={
+                  Object {
+                    "WebkitTextDecorationStyle": "solid",
+                    "color": "rgba(46,51,56,1.00)",
+                    "cursor": "pointer",
+                    "display": "inline",
+                    "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                    "fontSize": "16px",
+                    "lineHeight": "20px",
+                    "opacity": 1,
+                    "textDecoration": "none",
+                    "textDecorationStyle": "solid",
+                    "textRendering": "geometricPrecision",
+                  }
+                }
+                target="_blank"
+              >
+                BrandKit
+              </a>
+            </div>
+          </div>
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "marginBottom": "8px",
+                "marginTop": "8px",
+              }
+            }
+          >
+            <div
+              className="css-view-1dbjc4n"
+              onClick={[Function]}
+              onMouseDown={[Function]}
+              onMouseEnter={[Function]}
+              onMouseLeave={[Function]}
+              onMouseUp={[Function]}
+              onResponderGrant={[Function]}
+              onResponderRelease={[Function]}
+              style={
+                Object {
+                  "display": "inline",
+                }
+              }
+            >
+              <a
+                className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+                data-focusable={true}
+                dir="auto"
+                href="/community#fund"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
+                rel=" noopener noreferrer"
+                role="link"
+                style={
+                  Object {
+                    "WebkitTextDecorationStyle": "solid",
+                    "color": "rgba(46,51,56,1.00)",
+                    "cursor": "pointer",
+                    "display": "inline",
+                    "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                    "fontSize": "16px",
+                    "lineHeight": "20px",
+                    "opacity": 1,
+                    "textDecoration": "none",
+                    "textDecorationStyle": "solid",
+                    "textRendering": "geometricPrecision",
+                  }
+                }
+                target="_blank"
+              >
+                Ecosystem Fund
+              </a>
+            </div>
+          </div>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "paddingLeft": "25px",
+              "paddingRight": "0px",
+            }
+          }
+        >
+          <div
+            className="css-text-901oao"
+            dir="auto"
+            style={
+              Object {
+                "color": "rgba(46,51,56,1.00)",
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "fontWeight": "500",
+                "lineHeight": "18px",
+                "marginBottom": "20px",
+                "textRendering": "geometricPrecision",
+              }
+            }
+          >
+            Social
+          </div>
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "marginBottom": "8px",
+                "marginTop": "8px",
+              }
+            }
+          >
+            <div
+              className="css-view-1dbjc4n"
+              onClick={[Function]}
+              onMouseDown={[Function]}
+              onMouseEnter={[Function]}
+              onMouseLeave={[Function]}
+              onMouseUp={[Function]}
+              onResponderGrant={[Function]}
+              onResponderRelease={[Function]}
+              style={
+                Object {
+                  "display": "inline",
+                }
+              }
+            >
+              <a
+                className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+                data-focusable={true}
+                dir="auto"
+                href="https://medium.com/celoOrg"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
+                rel=" noopener noreferrer"
+                role="link"
+                style={
+                  Object {
+                    "WebkitTextDecorationStyle": "solid",
+                    "color": "rgba(46,51,56,1.00)",
+                    "cursor": "pointer",
+                    "display": "inline",
+                    "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                    "fontSize": "16px",
+                    "lineHeight": "20px",
+                    "opacity": 1,
+                    "textDecoration": "none",
+                    "textDecorationStyle": "solid",
+                    "textRendering": "geometricPrecision",
+                  }
+                }
+                target="_blank"
+              >
+                <div
+                  className="css-view-1dbjc4n"
+                  style={
+                    Object {
+                      "display": "inline-flex",
+                      "paddingRight": "8px",
+                    }
+                  }
+                >
+                  <a
+                    href="https://medium.com/celoOrg"
+                    rel="noopener"
+                    style={
+                      Object {
+                        "height": "13px",
+                        "lineHeight": "13px",
+                      }
+                    }
+                    target="_blank"
+                  >
+                    <svg
+                      fill="none"
+                      height={13}
+                      style={Object {}}
+                      viewBox="0 0 24 24"
+                      width={13}
+                    >
+                      <title>
+                        Medium
+                      </title>
+                      <path
+                        d="M0 0V24H24V0H0ZM19.9385 5.68615L18.6511 6.92062C18.5403 7.00554 18.4849 7.14462 18.5083 7.28246V16.3495C18.4849 16.4874 18.5403 16.6265 18.6511 16.7114L19.9089 17.9446V18.2154H13.5852V17.9446L14.8874 16.6806C15.0154 16.5526 15.0154 16.5157 15.0154 16.32V8.99077L11.3957 18.1858H10.9058L6.69046 8.99077V15.1532C6.656 15.4117 6.74215 15.6726 6.92431 15.8609L8.61785 17.9151V18.1858H3.81538V17.9151L5.50892 15.8609C5.68985 15.6726 5.77108 15.4105 5.72677 15.1532V8.02708C5.74769 7.82892 5.67138 7.63323 5.52369 7.50031L4.01846 5.68615V5.41538H8.69292L12.3065 13.3391L15.4818 5.41538H19.9385V5.68615Z"
+                        fill="#2E3338"
+                        style={Object {}}
+                      />
+                    </svg>
+                  </a>
+                </div>
+                Blog
+              </a>
+            </div>
+          </div>
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "marginBottom": "8px",
+                "marginTop": "8px",
+              }
+            }
+          >
+            <div
+              className="css-view-1dbjc4n"
+              onClick={[Function]}
+              onMouseDown={[Function]}
+              onMouseEnter={[Function]}
+              onMouseLeave={[Function]}
+              onMouseUp={[Function]}
+              onResponderGrant={[Function]}
+              onResponderRelease={[Function]}
+              style={
+                Object {
+                  "display": "inline",
+                }
+              }
+            >
+              <a
+                className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+                data-focusable={true}
+                dir="auto"
+                href="https://github.com/celo-org"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
+                rel=" noopener noreferrer"
+                role="link"
+                style={
+                  Object {
+                    "WebkitTextDecorationStyle": "solid",
+                    "color": "rgba(46,51,56,1.00)",
+                    "cursor": "pointer",
+                    "display": "inline",
+                    "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                    "fontSize": "16px",
+                    "lineHeight": "20px",
+                    "opacity": 1,
+                    "textDecoration": "none",
+                    "textDecorationStyle": "solid",
+                    "textRendering": "geometricPrecision",
+                  }
+                }
+                target="_blank"
+              >
+                <div
+                  className="css-view-1dbjc4n"
+                  style={
+                    Object {
+                      "display": "inline-flex",
+                      "paddingRight": "8px",
+                    }
+                  }
+                >
+                  <svg
+                    fill="none"
+                    height={13}
+                    style={Object {}}
+                    viewBox="0 0 25 24"
+                    width={13}
+                  >
+                    <title>
+                      Github
+                    </title>
+                    <path
+                      clipRule="evenodd"
+                      d="M12.3019 0C5.50526 0 0 5.50526 0 12.3019C0 17.7392 3.52669 22.3458 8.4127 23.977C9.0244 24.0902 9.25095 23.7126 9.25095 23.3804C9.25095 23.0858 9.2434 22.3156 9.23585 21.2885C5.81488 22.0286 5.08991 19.6422 5.08991 19.6422C4.53108 18.2225 3.72304 17.8373 3.72304 17.8373C2.60537 17.0746 3.80611 17.0897 3.80611 17.0897C5.03705 17.1803 5.69405 18.3584 5.69405 18.3584C6.78906 20.2388 8.57129 19.6951 9.27361 19.3779C9.38688 18.585 9.70406 18.0412 10.0514 17.7316C7.32524 17.4295 4.45556 16.3723 4.45556 11.66C4.45556 10.3158 4.93132 9.22074 5.72426 8.35984C5.59588 8.04266 5.17298 6.79662 5.83754 5.10501C5.83754 5.10501 6.87213 4.77274 9.22074 6.36616C10.2025 6.0943 11.2522 5.95837 12.3019 5.95082C13.344 5.95837 14.4013 6.0943 15.383 6.36616C17.7316 4.77274 18.7662 5.10501 18.7662 5.10501C19.4383 6.79662 19.0154 8.05021 18.887 8.35984C19.6724 9.22074 20.1482 10.3158 20.1482 11.66C20.1482 16.3874 17.271 17.422 14.5297 17.7316C14.9677 18.1092 15.3679 18.8644 15.3679 20.0123C15.3679 21.6586 15.3528 22.9801 15.3528 23.3879C15.3528 23.7202 15.5718 24.0978 16.1986 23.977C21.0846 22.3458 24.6038 17.7392 24.6038 12.3094C24.6038 5.50526 19.0985 0 12.3019 0Z"
+                      fill="#2E3338"
+                      fillRule="evenodd"
+                      style={Object {}}
+                    />
+                  </svg>
+                </div>
+                GitHub
+              </a>
+            </div>
+          </div>
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "marginBottom": "8px",
+                "marginTop": "8px",
+              }
+            }
+          >
+            <div
+              className="css-view-1dbjc4n"
+              onClick={[Function]}
+              onMouseDown={[Function]}
+              onMouseEnter={[Function]}
+              onMouseLeave={[Function]}
+              onMouseUp={[Function]}
+              onResponderGrant={[Function]}
+              onResponderRelease={[Function]}
+              style={
+                Object {
+                  "display": "inline",
+                }
+              }
+            >
+              <a
+                className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+                data-focusable={true}
+                dir="auto"
+                href="https://twitter.com/CeloOrg"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
+                rel=" noopener noreferrer"
+                role="link"
+                style={
+                  Object {
+                    "WebkitTextDecorationStyle": "solid",
+                    "color": "rgba(46,51,56,1.00)",
+                    "cursor": "pointer",
+                    "display": "inline",
+                    "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                    "fontSize": "16px",
+                    "lineHeight": "20px",
+                    "opacity": 1,
+                    "textDecoration": "none",
+                    "textDecorationStyle": "solid",
+                    "textRendering": "geometricPrecision",
+                  }
+                }
+                target="_blank"
+              >
+                <div
+                  className="css-view-1dbjc4n"
+                  style={
+                    Object {
+                      "display": "inline-flex",
+                      "paddingRight": "8px",
+                    }
+                  }
+                >
+                  <svg
+                    fill="none"
+                    height={13}
+                    style={Object {}}
+                    viewBox="0 0 28 24"
+                    width={13}
+                  >
+                    <title>
+                      Twitter
+                    </title>
+                    <path
+                      d="M8.80544 24C19.3715 24 25.1507 14.7676 25.1507 6.7613C25.1507 6.49907 25.1451 6.23802 25.1339 5.97815C26.255 5.12295 27.2306 4.0563 28 2.84083C26.9707 3.32277 25.863 3.6476 24.7005 3.79407C25.8866 3.044 26.7971 1.85688 27.2261 0.442957C26.1162 1.13751 24.8864 1.64189 23.5782 1.91357C22.531 0.737081 21.0381 0 19.3861 0C16.2131 0 13.6405 2.71326 13.6405 6.05847C13.6405 6.5345 13.6909 6.99636 13.7894 7.43932C9.016 7.18653 4.78128 4.77567 1.9488 1.10916C1.45488 2.00453 1.1704 3.04518 1.1704 4.15435C1.1704 6.25692 2.18512 8.11143 3.72624 9.19697C2.78432 9.16626 1.8984 8.8934 1.12448 8.43863C1.12336 8.46343 1.12336 8.48942 1.12336 8.5154C1.12336 11.4496 3.10352 13.8994 5.73216 14.4546C5.24944 14.5928 4.74208 14.6672 4.21792 14.6672C3.84832 14.6672 3.48768 14.6282 3.13824 14.5573C3.8696 16.9647 5.98976 18.7164 8.50528 18.7648C6.53856 20.3902 4.06224 21.3588 1.37088 21.3588C0.9072 21.3588 0.45024 21.3304 0 21.2749C2.5424 22.9971 5.5608 24 8.80544 24Z"
+                      fill="#2E3338"
+                      style={Object {}}
+                    />
+                  </svg>
+                </div>
+                Twitter
+              </a>
+            </div>
+          </div>
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "marginBottom": "8px",
+                "marginTop": "8px",
+              }
+            }
+          >
+            <div
+              className="css-view-1dbjc4n"
+              onClick={[Function]}
+              onMouseDown={[Function]}
+              onMouseEnter={[Function]}
+              onMouseLeave={[Function]}
+              onMouseUp={[Function]}
+              onResponderGrant={[Function]}
+              onResponderRelease={[Function]}
+              style={
+                Object {
+                  "display": "inline",
+                }
+              }
+            >
+              <a
+                className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+                data-focusable={true}
+                dir="auto"
+                href="https://forum.celo.org/"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
+                rel=" noopener noreferrer"
+                role="link"
+                style={
+                  Object {
+                    "WebkitTextDecorationStyle": "solid",
+                    "color": "rgba(46,51,56,1.00)",
+                    "cursor": "pointer",
+                    "display": "inline",
+                    "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                    "fontSize": "16px",
+                    "lineHeight": "20px",
+                    "opacity": 1,
+                    "textDecoration": "none",
+                    "textDecorationStyle": "solid",
+                    "textRendering": "geometricPrecision",
+                  }
+                }
+                target="_blank"
+              >
+                <div
+                  className="css-view-1dbjc4n"
+                  style={
+                    Object {
+                      "display": "inline-flex",
+                      "paddingRight": "8px",
+                    }
+                  }
+                >
+                  <svg
+                    fill="none"
+                    height={13}
+                    style={Object {}}
+                    viewBox="0 0 41 40"
+                    width={13}
+                  >
+                    <title>
+                      Forum
+                    </title>
+                    <path
+                      d="M39.7038 16.5524C38.3862 8.49677 31.8162 1.81812 23.7535 0.329378C14.2427 -1.42664 4.5866 3.9899 1.21367 12.9724C0.414984 15.1004 0.00157366 17.3019 0.000792161 19.576C-0.00155232 26.2429 0.00235515 32.9099 0.00391814 39.5768V39.9886C0.294634 39.9886 0.539242 39.9894 0.783849 39.9886C7.35934 39.9824 13.9356 40.0363 20.5103 39.9511C26.3668 39.8745 31.2105 37.4699 35.0672 33.1006C37.7001 30.1168 39.2654 26.6165 39.8296 22.6739C39.8992 22.1862 39.9516 21.6962 40.0117 21.207V18.7844C39.9101 18.0404 39.825 17.2933 39.7038 16.5524ZM20.0031 31.5977C18.2127 31.5977 16.5185 31.189 15.007 30.4599L7.9103 32.1276L9.8359 25.4904C8.97782 23.8789 8.49095 22.0393 8.49095 20.0856C8.49095 13.7273 13.6449 8.57336 20.0031 8.57336C26.3614 8.57336 31.5161 13.7273 31.5161 20.0856C31.5161 26.4438 26.3614 31.5977 20.0031 31.5977Z"
+                      fill="#2E3338"
+                      style={Object {}}
+                    />
+                  </svg>
+                </div>
+                Forum
+              </a>
+            </div>
+          </div>
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "marginBottom": "8px",
+                "marginTop": "8px",
+              }
+            }
+          >
+            <div
+              className="css-view-1dbjc4n"
+              onClick={[Function]}
+              onMouseDown={[Function]}
+              onMouseEnter={[Function]}
+              onMouseLeave={[Function]}
+              onMouseUp={[Function]}
+              onResponderGrant={[Function]}
+              onResponderRelease={[Function]}
+              style={
+                Object {
+                  "display": "inline",
+                }
+              }
+            >
+              <a
+                className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+                data-focusable={true}
+                dir="auto"
+                href="https://discord.gg/6yWMkgM"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
+                rel=" noopener noreferrer"
+                role="link"
+                style={
+                  Object {
+                    "WebkitTextDecorationStyle": "solid",
+                    "color": "rgba(46,51,56,1.00)",
+                    "cursor": "pointer",
+                    "display": "inline",
+                    "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                    "fontSize": "16px",
+                    "lineHeight": "20px",
+                    "opacity": 1,
+                    "textDecoration": "none",
+                    "textDecorationStyle": "solid",
+                    "textRendering": "geometricPrecision",
+                  }
+                }
+                target="_blank"
+              >
+                <div
+                  className="css-view-1dbjc4n"
+                  style={
+                    Object {
+                      "display": "inline-flex",
+                      "paddingRight": "8px",
+                    }
+                  }
+                >
+                  <svg
+                    fill="none"
+                    height={13}
+                    style={Object {}}
+                    viewBox="0 0 40 46"
+                    width={13}
+                  >
+                    <title>
+                      Chat
+                    </title>
+                    <path
+                      clipRule="evenodd"
+                      d="M4.68571 0H35.3143C37.8971 0 40 2.093 40 4.6865V45.5L35.0857 41.1775L32.32 38.6295L29.3943 35.9222L30.6057 40.131H4.68571C2.10286 40.131 0 38.038 0 35.4445V4.6865C0 2.093 2.10286 0 4.68571 0ZM24.9828 27.8687C25.6686 28.7332 26.4914 29.7115 26.4914 29.7115C31.5428 29.5522 33.4857 26.2535 33.4857 26.2535C33.4857 18.928 30.1943 12.9902 30.1943 12.9902C26.9028 10.5332 23.7714 10.6015 23.7714 10.6015L23.4514 10.9655C27.3371 12.1485 29.1428 13.8547 29.1428 13.8547C26.7657 12.558 24.4343 11.921 22.2628 11.6707C20.6171 11.4887 19.04 11.5342 17.6457 11.7162C17.526 11.7162 17.4237 11.7336 17.3084 11.7531C17.2916 11.756 17.2745 11.7589 17.2571 11.7617C16.4571 11.83 14.5143 12.1257 12.0686 13.195C11.2229 13.5817 10.72 13.8547 10.72 13.8547C10.72 13.8547 12.6171 12.0575 16.7314 10.8745L16.5028 10.6015C16.5028 10.6015 13.3714 10.5332 10.08 12.9902C10.08 12.9902 6.78857 18.928 6.78857 26.2535C6.78857 26.2535 8.70856 29.5522 13.76 29.7115C13.76 29.7115 14.6057 28.6877 15.2914 27.8232C12.3886 26.9587 11.2914 25.1387 11.2914 25.1387C11.2914 25.1387 11.52 25.298 11.9314 25.5255C11.9543 25.5482 11.9771 25.571 12.0228 25.5937C12.0571 25.6165 12.0914 25.6336 12.1257 25.6506C12.16 25.6677 12.1943 25.6847 12.2286 25.7075C12.8 26.026 13.3714 26.2762 13.8971 26.481C14.8343 26.845 15.9543 27.209 17.2571 27.4592C18.9714 27.7777 20.9828 27.8915 23.1771 27.482C24.2514 27.3 25.3486 26.9815 26.4914 26.5037C27.2914 26.208 28.1828 25.7757 29.12 25.1615C29.12 25.1615 27.9771 27.027 24.9828 27.8687ZM13.5312 21.6129C13.5312 20.2252 14.5598 19.0877 15.8627 19.0877C17.1655 19.0877 18.217 20.2252 18.1941 21.6129C18.1941 23.0007 17.1655 24.1382 15.8627 24.1382C14.5827 24.1382 13.5312 23.0007 13.5312 21.6129ZM21.8741 21.6129C21.8741 20.2252 22.9027 19.0877 24.2055 19.0877C25.5084 19.0877 26.537 20.2252 26.537 21.6129C26.537 23.0007 25.5084 24.1382 24.2055 24.1382C22.9255 24.1382 21.8741 23.0007 21.8741 21.6129Z"
+                      fill="#2E3338"
+                      fillRule="evenodd"
+                      style={Object {}}
+                    />
+                  </svg>
+                </div>
+                Chat
+              </a>
+            </div>
+          </div>
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "marginBottom": "8px",
+                "marginTop": "8px",
+              }
+            }
+          >
+            <div
+              className="css-view-1dbjc4n"
+              onClick={[Function]}
+              onMouseDown={[Function]}
+              onMouseEnter={[Function]}
+              onMouseLeave={[Function]}
+              onMouseUp={[Function]}
+              onResponderGrant={[Function]}
+              onResponderRelease={[Function]}
+              style={
+                Object {
+                  "display": "inline",
+                }
+              }
+            >
+              <a
+                className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+                data-focusable={true}
+                dir="auto"
+                href="https://youtube.com/channel/UCCZgos_YAJSXm5QX5D5Wkcw"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
+                rel=" noopener noreferrer"
+                role="link"
+                style={
+                  Object {
+                    "WebkitTextDecorationStyle": "solid",
+                    "color": "rgba(46,51,56,1.00)",
+                    "cursor": "pointer",
+                    "display": "inline",
+                    "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                    "fontSize": "16px",
+                    "lineHeight": "20px",
+                    "opacity": 1,
+                    "textDecoration": "none",
+                    "textDecorationStyle": "solid",
+                    "textRendering": "geometricPrecision",
+                  }
+                }
+                target="_blank"
+              >
+                <div
+                  className="css-view-1dbjc4n"
+                  style={
+                    Object {
+                      "display": "inline-flex",
+                      "paddingRight": "8px",
+                    }
+                  }
+                >
+                  <svg
+                    fill="none"
+                    height={13}
+                    style={Object {}}
+                    viewBox="0 0 33 23"
+                    width={13}
+                  >
+                    <title>
+                      YouTube
+                    </title>
+                    <path
+                      d="M31.6935 3.59097C31.322 2.17758 30.224 1.06468 28.8317 0.68629C26.3083 0 16.1852 0 16.1852 0C16.1852 0 6.06209 0 3.53867 0.68629C2.14638 1.06468 1.04836 2.17758 0.676835 3.59097C0 6.15436 0 11.5 0 11.5C0 11.5 0 16.8456 0.676835 19.409C1.04836 20.8224 2.14638 21.9353 3.53867 22.3137C6.06209 23 16.1852 23 16.1852 23C16.1852 23 26.3083 23 28.8317 22.3137C30.224 21.9353 31.322 20.8224 31.6935 19.409C32.3704 16.8456 32.3704 11.5 32.3704 11.5C32.3704 11.5 32.3704 6.15436 31.6935 3.59097ZM12.8746 16.3541V6.64589L21.335 11.5L12.8746 16.3541Z"
+                      fill="#2E3338"
+                      style={Object {}}
+                    />
+                  </svg>
+                </div>
+                YouTube
+              </a>
+            </div>
+          </div>
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "marginBottom": "8px",
+                "marginTop": "8px",
+              }
+            }
+          >
+            <div
+              className="css-view-1dbjc4n"
+              onClick={[Function]}
+              onMouseDown={[Function]}
+              onMouseEnter={[Function]}
+              onMouseLeave={[Function]}
+              onMouseUp={[Function]}
+              onResponderGrant={[Function]}
+              onResponderRelease={[Function]}
+              style={
+                Object {
+                  "display": "inline",
+                }
+              }
+            >
+              <a
+                className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+                data-focusable={true}
+                dir="auto"
+                href="https://www.instagram.com/celoorg/"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
+                rel=" noopener noreferrer"
+                role="link"
+                style={
+                  Object {
+                    "WebkitTextDecorationStyle": "solid",
+                    "color": "rgba(46,51,56,1.00)",
+                    "cursor": "pointer",
+                    "display": "inline",
+                    "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                    "fontSize": "16px",
+                    "lineHeight": "20px",
+                    "opacity": 1,
+                    "textDecoration": "none",
+                    "textDecorationStyle": "solid",
+                    "textRendering": "geometricPrecision",
+                  }
+                }
+                target="_blank"
+              >
+                <div
+                  className="css-view-1dbjc4n"
+                  style={
+                    Object {
+                      "display": "inline-flex",
+                      "paddingRight": "8px",
+                    }
+                  }
+                >
+                  <svg
+                    height={13}
+                    style={Object {}}
+                    viewBox="0 0 24 24"
+                    width={13}
+                  >
+                    <title>
+                      Instagram
+                    </title>
+                    <path
+                      d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"
+                      style={Object {}}
+                    />
+                  </svg>
+                </div>
+                Instagram
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>,
+  <div
+    className="css-view-1dbjc4n"
+    style={
+      Object {
+        "WebkitAlignSelf": "center",
+        "WebkitBoxDirection": "normal",
+        "WebkitBoxOrient": "vertical",
+        "WebkitFlexDirection": "column",
+        "alignSelf": "center",
+        "flexDirection": "column",
+        "marginBottom": "30px",
+        "marginTop": "30px",
+        "maxWidth": "100vw",
+        "msFlexDirection": "column",
+        "msFlexItemAlign": "center",
+        "paddingLeft": "10px",
+        "paddingRight": "10px",
+        "width": "100%",
+      }
+    }
+  >
+    <div
+      className="css-view-1dbjc4n"
+      style={
+        Object {
+          "WebkitBoxDirection": "normal",
+          "WebkitBoxFlex": 0,
+          "WebkitBoxOrient": "horizontal",
+          "WebkitBoxPack": "justify",
+          "WebkitFlexDirection": "row",
+          "WebkitFlexGrow": 0,
+          "WebkitFlexShrink": 0,
+          "WebkitJustifyContent": "space-between",
+          "flexDirection": "row",
+          "flexGrow": 0,
+          "flexShrink": 0,
+          "justifyContent": "space-between",
+          "msFlexDirection": "row",
+          "msFlexNegative": 0,
+          "msFlexPack": "justify",
+          "msFlexPositive": 0,
+          "paddingBottom": "10px",
+          "paddingLeft": "10px",
+          "paddingRight": "10px",
+          "paddingTop": "10px",
+          "width": "100%",
+        }
+      }
+    >
+      <div
+        className="lazyload-placeholder"
+        style={
+          Object {
+            "height": undefined,
+          }
+        }
+      />
+      <div
+        className="css-text-901oao"
+        dir="auto"
+        style={
+          Object {
+            "color": "rgba(46,51,56,1.00)",
+            "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+            "fontSize": "16px",
+            "lineHeight": "20px",
+            "textRendering": "geometricPrecision",
+            "zIndex": 10,
+          }
+        }
+      >
+        Designed & Built by cLabs, © Celo 2020
+      </div>
+    </div>
+  </div>,
+]
+`;

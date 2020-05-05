@@ -27,6 +27,7 @@ Contract handling slashing for Validator downtime
 
 ### Methods
 
+* [getConfig](_wrappers_downtimeslasher_.downtimeslasherwrapper.md#getconfig)
 * [slashEndSignerIndex](_wrappers_downtimeslasher_.downtimeslasherwrapper.md#slashendsignerindex)
 * [slashStartSignerIndex](_wrappers_downtimeslasher_.downtimeslasherwrapper.md#slashstartsignerindex)
 * [slashValidator](_wrappers_downtimeslasher_.downtimeslasherwrapper.md#slashvalidator)
@@ -66,7 +67,7 @@ ___
 
 • **isDown**: *function* = proxyCall(this.contract.methods.isDown)
 
-*Defined in [contractkit/src/wrappers/DowntimeSlasher.ts:44](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DowntimeSlasher.ts#L44)*
+*Defined in [contractkit/src/wrappers/DowntimeSlasher.ts:48](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DowntimeSlasher.ts#L48)*
 
 Tests if a validator has been down.
 
@@ -92,7 +93,7 @@ ___
 
 • **slashableDowntime**: *function* = proxyCall(this.contract.methods.slashableDowntime, undefined, valueToInt)
 
-*Defined in [contractkit/src/wrappers/DowntimeSlasher.ts:36](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DowntimeSlasher.ts#L36)*
+*Defined in [contractkit/src/wrappers/DowntimeSlasher.ts:40](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DowntimeSlasher.ts#L40)*
 
 Returns slashable downtime in blocks.
 
@@ -121,7 +122,7 @@ ___
     penalty: valueToBigNumber(res.penalty),
   }))
 
-*Defined in [contractkit/src/wrappers/DowntimeSlasher.ts:23](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DowntimeSlasher.ts#L23)*
+*Defined in [contractkit/src/wrappers/DowntimeSlasher.ts:27](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DowntimeSlasher.ts#L27)*
 
 Returns slashing incentives.
 
@@ -153,11 +154,23 @@ Contract address
 
 ## Methods
 
+###  getConfig
+
+▸ **getConfig**(): *Promise‹[DowntimeSlasherConfig](../interfaces/_wrappers_downtimeslasher_.downtimeslasherconfig.md)›*
+
+*Defined in [contractkit/src/wrappers/DowntimeSlasher.ts:175](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DowntimeSlasher.ts#L175)*
+
+Returns current configuration parameters.
+
+**Returns:** *Promise‹[DowntimeSlasherConfig](../interfaces/_wrappers_downtimeslasher_.downtimeslasherconfig.md)›*
+
+___
+
 ###  slashEndSignerIndex
 
 ▸ **slashEndSignerIndex**(`endBlock`: number, `endSignerIndex`: number): *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹void››*
 
-*Defined in [contractkit/src/wrappers/DowntimeSlasher.ts:105](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DowntimeSlasher.ts#L105)*
+*Defined in [contractkit/src/wrappers/DowntimeSlasher.ts:109](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DowntimeSlasher.ts#L109)*
 
 Slash a Validator for downtime.
 
@@ -176,7 +189,7 @@ ___
 
 ▸ **slashStartSignerIndex**(`startBlock`: number, `startSignerIndex`: number): *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹void››*
 
-*Defined in [contractkit/src/wrappers/DowntimeSlasher.ts:81](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DowntimeSlasher.ts#L81)*
+*Defined in [contractkit/src/wrappers/DowntimeSlasher.ts:85](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DowntimeSlasher.ts#L85)*
 
 Slash a Validator for downtime.
 
@@ -195,7 +208,7 @@ ___
 
 ▸ **slashValidator**(`validatorAddress`: [Address](../modules/_base_.md#address), `startBlock?`: undefined | number, `endBlock?`: undefined | number): *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹void››*
 
-*Defined in [contractkit/src/wrappers/DowntimeSlasher.ts:52](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DowntimeSlasher.ts#L52)*
+*Defined in [contractkit/src/wrappers/DowntimeSlasher.ts:56](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/DowntimeSlasher.ts#L56)*
 
 Slash a Validator for downtime.
 
