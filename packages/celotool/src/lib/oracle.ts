@@ -42,7 +42,7 @@ const oracleAzureContextClusterConfigEnvVars: {
   },
 }
 
-export async function installHelmChart(celoEnv: string) {
+export async function installHelmChart(celoEnv: string, context: OracleAzureContext) {
   // First install the oracle-rbac helm chart.
   // This must be deployed before so we can use a resulting auth token so that
   // oracle pods can reach the K8s API server to change their aad labels
@@ -52,7 +52,7 @@ export async function installHelmChart(celoEnv: string) {
     celoEnv,
     releaseName(celoEnv),
     helmChartPath,
-    await helmParameters(celoEnv)
+    await helmParameters(celoEnv, context)
   )
 }
 
@@ -61,7 +61,7 @@ export async function removeHelmRelease(celoEnv: string) {
   await removeOracleRBACHelmRelease(celoEnv)
 }
 
-async function helmParameters(celoEnv: string) {
+async function helmParameters(celoEnv: string, context: OracleAzureContext) {
   const kubeAuthTokenName = await rbacAuthTokenName(celoEnv)
   const replicas = oracleAddressesAndVaults().length
   return [
@@ -71,15 +71,15 @@ async function helmParameters(celoEnv: string) {
     `--set kube.authTokenName=${kubeAuthTokenName}`,
     `--set oracle.replicas=${replicas}`,
     `--set oracle.rpcProviderUrl=${getFornoUrl(celoEnv)}`,
-  ].concat(await oracleIdentityHelmParameters(celoEnv))
+  ].concat(await oracleIdentityHelmParameters(celoEnv, context))
 }
 
-async function oracleIdentityHelmParameters(celoEnv: string) {
+async function oracleIdentityHelmParameters(celoEnv: string, context: OracleAzureContext) {
   const addressesAndVaults = oracleAddressesAndVaults()
   const replicas = addressesAndVaults.length
   let params: string[] = []
   for (let i = 0; i < replicas; i++) {
-    const identity = await createOracleIdentityIfNotExists(celoEnv, i)
+    const identity = await createOracleIdentityIfNotExists(celoEnv, context, i)
     const { address, keyVaultName: vaultName } = addressesAndVaults[i]
     const prefix = `--set oracle.identities[${i}]`
     params = params.concat([
@@ -96,13 +96,21 @@ function releaseName(celoEnv: string) {
   return `${celoEnv}-oracle`
 }
 
-async function createOracleIdentityIfNotExists(celoEnv: string, index: number) {
-  const identity = await createIdentityIfNotExists(oracleIdentityName(celoEnv, index))
+async function createOracleIdentityIfNotExists(
+  celoEnv: string,
+  context: OracleAzureContext,
+  index: number
+) {
+  const clusterConfig = getAzureClusterConfig(context)
+  const identity = await createIdentityIfNotExists(
+    clusterConfig,
+    oracleIdentityName(celoEnv, index)
+  )
 
   // Grant the service principal permission to manage the oracle identity.
   // See: https://github.com/Azure/aad-pod-identity#6-set-permissions-for-mic
   const [rawServicePrincipalClientId] = await execCmdWithExitOnFailure(
-    `az aks show -n ${clusterName()} --query servicePrincipalProfile.clientId -g ${resourceGroup()} -o tsv`
+    `az aks show -n ${clusterConfig.clusterName} --query servicePrincipalProfile.clientId -g ${clusterConfig.resourceGroup} -o tsv`
   )
   const servicePrincipalClientId = rawServicePrincipalClientId.trim()
   await execCmdWithExitOnFailure(
@@ -112,7 +120,9 @@ async function createOracleIdentityIfNotExists(celoEnv: string, index: number) {
   await execCmdWithExitOnFailure(
     `az keyvault set-policy --name ${keyVaultName(
       index
-    )} --key-permissions {get,list,sign} --object-id ${identity.principalId} -g ${resourceGroup()}`
+    )} --key-permissions {get,list,sign} --object-id ${identity.principalId} -g ${
+      clusterConfig.resourceGroup
+    }`
   )
   return identity
 }
@@ -208,16 +218,15 @@ function getAzureClusterConfig(context: OracleAzureContext): AzureClusterConfig 
 /**
  * Given if the desired context is primary, gives the appropriate OracleAzureContext
  */
-function getOracleAzureContext(primary: boolean): OracleAzureContext {
+export function getOracleAzureContext(primary: boolean): OracleAzureContext {
   return primary ? OracleAzureContext.PRIMARY : OracleAzureContext.SECONDARY
 }
 
 /**
  * Switches to an Azure cluster given if the desired context is primary
  */
-export function switchToAzureContextCluster(primary: boolean, celoEnv: string) {
-  const oracleAzureContext = getOracleAzureContext(primary)
-  const azureClusterConfig = getAzureClusterConfig(oracleAzureContext)
+export function switchToAzureContextCluster(context: OracleAzureContext, celoEnv: string) {
+  const azureClusterConfig = getAzureClusterConfig(context)
   return switchToCluster(azureClusterConfig, celoEnv)
 }
 

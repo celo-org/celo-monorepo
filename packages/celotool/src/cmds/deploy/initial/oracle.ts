@@ -2,6 +2,7 @@ import { InitialArgv } from 'src/cmds/deploy/initial'
 import {
   OracleArgv,
   addOracleMiddleware,
+  getOracleAzureContext,
   installHelmChart,
   switchToAzureContextCluster,
 } from 'src/lib/oracle'
@@ -18,8 +19,9 @@ export const builder = (argv: yargs.Argv) => {
 }
 
 export const handler = async (argv: OracleInitialArgv) => {
-  await switchToAzureContextCluster(argv.primary, argv.celoEnv)
+  const oracleAzureContext = getOracleAzureContext(argv.primary)
+  await switchToAzureContextCluster(oracleAzureContext, argv.celoEnv)
   if (false) {
-    await installHelmChart(argv.celoEnv)
+    await installHelmChart(argv.celoEnv, oracleAzureContext)
   }
 }
