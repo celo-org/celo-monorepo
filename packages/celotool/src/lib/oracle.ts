@@ -1,11 +1,5 @@
 import yargs from 'yargs'
-import {
-  AzureClusterConfig,
-  clusterName,
-  createIdentityIfNotExists,
-  resourceGroup,
-  switchToCluster,
-} from 'src/lib/azure'
+import { AzureClusterConfig, createIdentityIfNotExists, switchToCluster } from 'src/lib/azure'
 import { getFornoUrl } from 'src/lib/endpoints'
 import { addCeloEnvMiddleware, envVar, fetchEnv } from 'src/lib/env-utils'
 import { installGenericHelmChart, removeGenericHelmChart } from 'src/lib/helm_deploy'

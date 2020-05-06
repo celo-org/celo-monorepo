@@ -1,6 +1,6 @@
 import { UpgradeArgv } from 'src/cmds/deploy/upgrade'
 import { upgradeFullNodeChart } from 'src/lib/aks-fullnode'
-import { switchToClusterFromEnv } from 'src/lib/azure'
+// import { switchToClusterFromEnv } from 'src/lib/azure'
 import yargs from 'yargs'
 
 export const command = 'aks-fullnode'
@@ -18,6 +18,6 @@ export const builder = (argv: yargs.Argv) => {
 type AksFullNodeUpgradeArgv = UpgradeArgv & { reset: boolean }
 
 export const handler = async (argv: AksFullNodeUpgradeArgv) => {
-  await switchToClusterFromEnv(argv.celoEnv)
+  // await switchToClusterFromEnv(argv.celoEnv)
   await upgradeFullNodeChart(argv.celoEnv, argv.reset)
 }
