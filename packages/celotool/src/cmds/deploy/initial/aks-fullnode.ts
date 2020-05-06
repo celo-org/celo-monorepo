@@ -21,7 +21,7 @@ export const builder = (argv: yargs.Argv) => {
 
 export const handler = async (argv: OracleFullNodeInitialArgv) => {
   const oracleAzureContext = getOracleAzureContext(argv.primary)
-  await switchToAzureContextCluster(oracleAzureContext, argv.celoEnv)
+  await switchToAzureContextCluster(argv.celoEnv, oracleAzureContext)
   const clusterConfig = getAzureClusterConfig(oracleAzureContext)
   await installFullNodeChart(argv.celoEnv, clusterConfig)
 }

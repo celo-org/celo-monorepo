@@ -13,8 +13,8 @@ export type AzureClusterConfig = {
 
 // switchToCluster configures kubectl to connect to the AKS cluster
 export async function switchToCluster(
-  clusterConfig: AzureClusterConfig,
   celoEnv: string,
+  clusterConfig: AzureClusterConfig,
   checkOrPromptIfStagingOrProduction = true
 ) {
   if (checkOrPromptIfStagingOrProduction) {
