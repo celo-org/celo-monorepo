@@ -45,6 +45,10 @@ See documentation on the [config](./config.md) module for information about how 
 
 {% embed url="https://www.npmjs.com/package/@celo/celocli" %}
 
+### Using a Ledger Wallet
+
+The Celo CLI supports using a [Ledger hardware wallet](../celo-gold-holder-guide/ledger.md) to sign transactions.
+
 ### Plugins
 
 Additional plugins can be installed which make the CLI experience smoother.
