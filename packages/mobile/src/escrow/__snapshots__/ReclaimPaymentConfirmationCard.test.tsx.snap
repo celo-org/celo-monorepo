@@ -328,7 +328,6 @@ exports[`ReclaimPaymentConfirmationCard renders correctly for send payment confi
             "top": 10,
           }
         }
-        isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackgroundBorderless",
