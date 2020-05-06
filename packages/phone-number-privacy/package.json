@@ -1,5 +1,5 @@
 {
-  "name": "celo-phone-number-privacy",
+  "name": "@celo/phone-number-privacy",
   "version": "1.0.0",
   "description": "Generates unique salt for phone numbers.",
   "author": "Celo",
@@ -18,16 +18,18 @@
     "db:migrate": "NODE_ENV=development ts-node scripts/runMigrations.ts"
   },
   "dependencies": {
-    "@celo/contractkit": "0.3.2",
-    "@celo/utils": "0.1.8",
-    "bls12377js-blind": "https://github.com/celo-org/bls12377js-blind#3a5ac033fbe282d40002639e01db56313124e721",
-    "firebase-admin": "^8.9.2",
-    "firebase-functions": "^3.3.0",
+    "@celo/contractkit": "0.4.2",
+    "@celo/utils": "0.1.13",
+    "blind-threshold-bls": "https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a",
+    "firebase-admin": "^8.10.0",
+    "firebase-functions": "^3.6.0",
     "knex": "^0.20.13",
-    "pg": "^7.18.2"
+    "pg": "^7.18.2",
+    "uuid": "^7.0.3"
   },
   "devDependencies": {
-    "firebase-functions-test": "^0.1.6"
+    "@types/uuid": "^7.0.3",
+    "firebase-functions-test": "^0.2.0"
   },
   "engines": {
     "node": "10"

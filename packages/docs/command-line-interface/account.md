@@ -33,7 +33,7 @@ OPTIONS
                                                        index addresses for local signing. Example
                                                        --ledgerCustomAddresses "[4,99]"
 
-  --signature=signature                                (required) Signature (a.k.a proof-of-possession) of the signer
+  --signature=0x                                       (required) Signature (a.k.a proof-of-possession) of the signer
                                                        key
 
   --signer=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Account Address
@@ -83,7 +83,9 @@ ARGUMENTS
 
 OPTIONS
   --address=address                                  (required) The address of the account you want to claim
-  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Addess of the account to set metadata for
+
+  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the account to set metadata for or an
+                                                     authorized signer for the address in the metadata
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
@@ -119,7 +121,8 @@ ARGUMENTS
   FILE  Path of the metadata file
 
 OPTIONS
-  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Addess of the account to set metadata for
+  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the account to set metadata for or an
+                                                     authorized signer for the address in the metadata
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
@@ -155,7 +158,9 @@ ARGUMENTS
 
 OPTIONS
   --domain=domain                                    (required) The domain you want to claim
-  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Addess of the account to set metadata for
+
+  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the account to set metadata for or an
+                                                     authorized signer for the address in the metadata
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
@@ -187,7 +192,8 @@ ARGUMENTS
   FILE  Path of the metadata file
 
 OPTIONS
-  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Addess of the account to set metadata for
+  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the account to set metadata for or an
+                                                     authorized signer for the address in the metadata
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
@@ -221,7 +227,8 @@ ARGUMENTS
   FILE  Path of the metadata file
 
 OPTIONS
-  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Addess of the account to set metadata for
+  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the account to set metadata for or an
+                                                     authorized signer for the address in the metadata
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
@@ -255,7 +262,8 @@ ARGUMENTS
   FILE  Path where the metadata should be saved
 
 OPTIONS
-  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Addess of the account to set metadata for
+  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the account to set metadata for or an
+                                                     authorized signer for the address in the metadata
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
@@ -326,6 +334,23 @@ OPTIONS
 ```
 
 _See code: [packages/cli/src/commands/account/list.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/list.ts)_
+
+### Lock
+
+Lock an account which was previously unlocked
+
+```
+USAGE
+  $ celocli account:lock ACCOUNT
+
+ARGUMENTS
+  ACCOUNT  Account address
+
+EXAMPLE
+  lock 0x5409ed021d9299bf6814279a6a1411a7e866a631
+```
+
+_See code: [packages/cli/src/commands/account/lock.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/lock.ts)_
 
 ### New
 
@@ -575,21 +600,51 @@ ARGUMENTS
   ACCOUNT  Account address
 
 OPTIONS
-  --ledgerAddresses=ledgerAddresses              [default: 1] If --useLedger is set, this will get the first N addresses
-                                                 for local signing
+  --duration=duration  Duration in seconds to leave the account unlocked. Unlocks until the node exits by default.
+  --password=password  Password used to unlock the account. If not specified, you will be prompted for a password.
 
-  --ledgerConfirmAddress                         Set it to ask confirmation for the address of the transaction from the
-                                                 ledger
-
-  --ledgerCustomAddresses=ledgerCustomAddresses  [default: [0]] If --useLedger is set, this will get the array of index
-                                                 addresses for local signing. Example --ledgerCustomAddresses "[4,99]"
-
-  --password=password
-
-  --useLedger                                    Set it to use a ledger wallet
-
-EXAMPLE
+EXAMPLES
   unlock 0x5409ed021d9299bf6814279a6a1411a7e866a631
+  unlock 0x5409ed021d9299bf6814279a6a1411a7e866a631 --duration 600
 ```
 
 _See code: [packages/cli/src/commands/account/unlock.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/unlock.ts)_
+
+### Verify-proof-of-possession
+
+Verify a proof-of-possession. See the "account:proof-of-possession" command for more details.
+
+```
+USAGE
+  $ celocli account:verify-proof-of-possession
+
+OPTIONS
+  --account=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the account that needs to prove possession
+                                                        of the signer key.
+
+  --ledgerAddresses=ledgerAddresses                     [default: 1] If --useLedger is set, this will get the first N
+                                                        addresses for local signing
+
+  --ledgerConfirmAddress                                Set it to ask confirmation for the address of the transaction
+                                                        from the ledger
+
+  --ledgerCustomAddresses=ledgerCustomAddresses         [default: [0]] If --useLedger is set, this will get the array of
+                                                        index addresses for local signing. Example
+                                                        --ledgerCustomAddresses "[4,99]"
+
+  --signature=0x                                        (required) Signature (a.k.a. proof-of-possession) of the signer
+                                                        key
+
+  --signer=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d   (required) Address of the signer key to verify proof of
+                                                        possession.
+
+  --useLedger                                           Set it to use a ledger wallet
+
+EXAMPLE
+  verify-proof-of-possession --account 0x199eDF79ABCa29A2Fa4014882d3C13dC191A5B58 --signer
+  0x0EdeDF7B1287f07db348997663EeEb283D70aBE7 --signature
+  0x1c5efaa1f7ca6484d49ccce76217e2fba0552c0b23462cff7ba646473bc2717ffc4ce45be89bd5be9b5d23305e87fc2896808467c4081d9524a8
+  4c01b89ec91ca3
+```
+
+_See code: [packages/cli/src/commands/account/verify-proof-of-possession.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/verify-proof-of-possession.ts)_

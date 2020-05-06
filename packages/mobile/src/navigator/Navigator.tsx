@@ -1,16 +1,6 @@
 import { Platform } from 'react-native'
-import {
-  CreateNavigatorConfig,
-  createSwitchNavigator,
-  NavigationRoute,
-  NavigationStackRouterConfig,
-} from 'react-navigation'
-import {
-  createStackNavigator,
-  NavigationStackConfig,
-  NavigationStackOptions,
-  NavigationStackProp,
-} from 'react-navigation-stack'
+import { createSwitchNavigator } from 'react-navigation'
+import { createStackNavigator } from 'react-navigation-stack'
 import Account from 'src/account/Account'
 import Analytics from 'src/account/Analytics'
 import DataSaver from 'src/account/DataSaver'
@@ -48,7 +38,6 @@ import ImportWallet from 'src/import/ImportWallet'
 import ImportWalletEmpty from 'src/import/ImportWalletEmpty'
 import ImportWalletSocial from 'src/import/ImportWalletSocial'
 import EnterInviteCode from 'src/invite/EnterInviteCode'
-import JoinCelo from 'src/invite/JoinCelo'
 import Language from 'src/language/Language'
 import SelectLocalCurrency from 'src/localCurrency/SelectLocalCurrency'
 import { Screens, Stacks } from 'src/navigator/Screens'
@@ -61,6 +50,8 @@ import PincodeEnter from 'src/pincode/PincodeEnter'
 import PincodeSet from 'src/pincode/PincodeSet'
 import QRCode from 'src/qrcode/QRCode'
 import QRScanner from 'src/qrcode/QRScanner'
+import JoinCelo from 'src/registration/JoinCelo'
+import RegulatoryTerms from 'src/registration/RegulatoryTerms'
 import FeeEducation from 'src/send/FeeEducation'
 import Send from 'src/send/Send'
 import SendAmount from 'src/send/SendAmount'
@@ -74,12 +65,7 @@ import VerificationLearnMoreScreen from 'src/verify/VerificationLearnMoreScreen'
 import VerificationLoadingScreen from 'src/verify/VerificationLoadingScreen'
 import VerificationSuccessScreen from 'src/verify/VerificationSuccessScreen'
 
-export const headerArea: CreateNavigatorConfig<
-  NavigationStackConfig,
-  NavigationStackRouterConfig,
-  NavigationStackOptions,
-  NavigationStackProp<NavigationRoute, any>
-> = {
+export const headerArea = {
   // Force this for now on iOS so screen transitions look normal
   // given we intentionally hide the bottom separator from the nav bar
   headerMode: 'screen',
@@ -122,6 +108,7 @@ const NuxStack = createStackNavigator(
   {
     [Screens.Language]: { screen: Language },
     [Screens.JoinCelo]: { screen: JoinCelo },
+    [Screens.RegulatoryTerms]: { screen: RegulatoryTerms },
     [Screens.PincodeEducation]: { screen: PincodeEducation },
     [Screens.PincodeSet]: { screen: PincodeSet },
     [Screens.EnterInviteCode]: { screen: EnterInviteCode },
@@ -291,6 +278,8 @@ const AppStack = createStackNavigator(
     [Screens.ReclaimPaymentConfirmationScreen]: {
       screen: ReclaimPaymentConfirmationScreen,
     },
+    // Adding this stack, so it possbile to go back to Home screen from it
+    [Stacks.BackupStack]: { screen: BackupStack },
     [Stacks.QRSendStack]: { screen: QRSendStack },
     [Stacks.ExchangeStack]: { screen: ExchangeStack },
     [Stacks.IncomingRequestStack]: { screen: IncomingRequestStack },

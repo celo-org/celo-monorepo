@@ -217,7 +217,6 @@ exports[`OutgoingPaymentRequestListScreen renders correctly with requests 1`] = 
                         <View
                           accessible={true}
                           focusable={true}
-                          isTVSelectable={true}
                           nativeBackgroundAndroid={
                             Object {
                               "attribute": "selectableItemBackgroundBorderless",
@@ -254,7 +253,6 @@ exports[`OutgoingPaymentRequestListScreen renders correctly with requests 1`] = 
                         <View
                           accessible={true}
                           focusable={true}
-                          isTVSelectable={true}
                           nativeBackgroundAndroid={
                             Object {
                               "attribute": "selectableItemBackgroundBorderless",
@@ -465,7 +463,6 @@ exports[`OutgoingPaymentRequestListScreen renders correctly with requests 1`] = 
                         <View
                           accessible={true}
                           focusable={true}
-                          isTVSelectable={true}
                           nativeBackgroundAndroid={
                             Object {
                               "attribute": "selectableItemBackgroundBorderless",
@@ -502,7 +499,6 @@ exports[`OutgoingPaymentRequestListScreen renders correctly with requests 1`] = 
                         <View
                           accessible={true}
                           focusable={true}
-                          isTVSelectable={true}
                           nativeBackgroundAndroid={
                             Object {
                               "attribute": "selectableItemBackgroundBorderless",
@@ -713,7 +709,6 @@ exports[`OutgoingPaymentRequestListScreen renders correctly with requests 1`] = 
                         <View
                           accessible={true}
                           focusable={true}
-                          isTVSelectable={true}
                           nativeBackgroundAndroid={
                             Object {
                               "attribute": "selectableItemBackgroundBorderless",
@@ -750,7 +745,6 @@ exports[`OutgoingPaymentRequestListScreen renders correctly with requests 1`] = 
                         <View
                           accessible={true}
                           focusable={true}
-                          isTVSelectable={true}
                           nativeBackgroundAndroid={
                             Object {
                               "attribute": "selectableItemBackgroundBorderless",

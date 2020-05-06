@@ -1,4 +1,4 @@
-import { ensureLeading0x } from '@celo/utils/lib/address'
+import { ensureLeading0x, trimLeading0x } from '@celo/utils/lib/address'
 import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import debugFactory from 'debug'
 // @ts-ignore-next-line
@@ -30,6 +30,32 @@ export function chainIdTransformationForSigning(chainId: number): number {
 
 export function getHashFromEncoded(rlpEncode: string): string {
   return Hash.keccak256(rlpEncode)
+}
+
+function trimLeadingZero(hex: string) {
+  while (hex && hex.startsWith('0x0')) {
+    hex = ensureLeading0x(hex.slice(3))
+  }
+  return hex
+}
+
+function makeEven(hex: string) {
+  if (hex.length % 2 === 1) {
+    hex = hex.replace('0x', '0x0')
+  }
+  return hex
+}
+
+function signatureFormatter(signature: {
+  v: number
+  r: Buffer
+  s: Buffer
+}): { v: string; r: string; s: string } {
+  return {
+    v: stringNumberToHex(signature.v),
+    r: makeEven(trimLeadingZero(ensureLeading0x(signature.r.toString('hex')))),
+    s: makeEven(trimLeadingZero(ensureLeading0x(signature.s.toString('hex')))),
+  }
 }
 
 function stringNumberToHex(num?: number | string): string {
@@ -97,9 +123,10 @@ export async function encodeTransaction(
 ): Promise<EncodedTransaction> {
   const hash = getHashFromEncoded(rlpEncoded.rlpEncode)
 
-  const v = stringNumberToHex(signature.v)
-  const r = ensureLeading0x(signature.r.toString('hex'))
-  const s = ensureLeading0x(signature.s.toString('hex'))
+  const sanitizedSignature = signatureFormatter(signature)
+  const v = sanitizedSignature.v
+  const r = sanitizedSignature.r
+  const s = sanitizedSignature.s
   const rawTx = RLP.decode(rlpEncoded.rlpEncode)
     .slice(0, 9)
     .concat([v, r, s])
@@ -144,7 +171,13 @@ export function recoverTransaction(rawTx: string): [Tx, string] {
     data: rawValues[8],
     chainId,
   }
-  const signature = Account.encodeSignature(rawValues.slice(9, 12))
+  let r = rawValues[10]
+  let s = rawValues[11]
+  // Account.recover cannot handle canonicalized signatures
+  // A canonicalized signature may have the first byte removed if its value is 0
+  r = ensureLeading0x(trimLeading0x(r).padStart(64, '0'))
+  s = ensureLeading0x(trimLeading0x(s).padStart(64, '0'))
+  const signature = Account.encodeSignature([rawValues[9], r, s])
   const extraData = recovery < 35 ? [] : [chainId, '0x', '0x']
   const signingData = rawValues.slice(0, 9).concat(extraData)
   const signingDataHex = RLP.encode(signingData)

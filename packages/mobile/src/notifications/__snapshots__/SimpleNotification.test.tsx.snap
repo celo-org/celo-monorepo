@@ -126,7 +126,6 @@ exports[`SimpleNotification renders correctly with a react node (svg) icon 1`] =
             <View
               accessible={true}
               focusable={true}
-              isTVSelectable={true}
               nativeBackgroundAndroid={
                 Object {
                   "attribute": "selectableItemBackgroundBorderless",
@@ -287,7 +286,6 @@ exports[`SimpleNotification renders correctly with an image icon 1`] = `
             <View
               accessible={true}
               focusable={true}
-              isTVSelectable={true}
               nativeBackgroundAndroid={
                 Object {
                   "attribute": "selectableItemBackgroundBorderless",

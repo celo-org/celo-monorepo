@@ -25,8 +25,6 @@ export const vNeg1Schema = {
   },
   send: {
     isSending: false,
-    recentPhoneNumbers: undefined,
-    recipientCache: undefined,
     recentRecipients: [],
   },
   recipients: {
@@ -64,6 +62,7 @@ export const vNeg1Schema = {
     commentKey: '0x0000000000000000000000000000000000008F68',
     gasPriceLastUpdated: 0,
     fornoMode: false,
+    contractKitReady: true,
   },
   geth: {
     initialized: 'INITIALIZED',
@@ -76,6 +75,7 @@ export const vNeg1Schema = {
     verificationFailed: false,
     addressToE164Number: {},
     e164NumberToAddress: {},
+    e164NumberToSalt: {},
     startedVerification: false,
     askedContactsPermission: false,
     isLoadingImportContacts: false,
@@ -111,6 +111,7 @@ export const vNeg1Schema = {
     dismissedEarnRewards: false,
     dismissedInviteFriends: false,
     promptFornoIfNeeded: false,
+    acceptedTerms: false,
   },
   invite: {
     isSendingInvite: false,

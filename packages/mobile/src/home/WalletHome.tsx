@@ -86,7 +86,7 @@ const mapStateToProps = (state: RootState): StateProps => ({
   appConnected: isAppConnected(state),
 })
 
-const AnimatedSectionList: SectionList<any> = Animated.createAnimatedComponent(SectionList)
+const AnimatedSectionList = Animated.createAnimatedComponent(SectionList)
 
 const HEADER_FADE_HEIGHT = 100
 const SHADOW_SCROLL_HEIGHT = 226
@@ -226,6 +226,8 @@ export class WalletHome extends React.Component<Props> {
             </HeaderButton>
           </View>
         </View>
+        {/*
+        // @ts-ignore */}
         <AnimatedSectionList
           onScroll={this.onScroll}
           refreshControl={refresh}
