@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "@celo/utils": "0.1.9",
+    "@next/bundle-analyzer": "^9.3.5",
     "@sentry/browser": "^5.10.2",
     "@sentry/node": "^5.10.2",
     "airtable": "^0.8.1",
@@ -56,7 +57,7 @@
     "mobile-detect": "^1.4.4",
     "net": "^1.0.2",
     "network-speed": "^2.0.4",
-    "next": "^9.1.5",
+    "next": "9.3.5",
     "next-i18next": "^4.2.1",
     "next-images": "^1.2.0",
     "next-plugin-transpile-modules": "^2.0.0",
