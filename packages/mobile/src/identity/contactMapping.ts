@@ -195,8 +195,10 @@ export function* fetchPhoneAddresses({ e164Number }: FetchPhoneAddressesAction) 
 }
 
 function* getAddresses(e164Number: string, attestationsWrapper: AttestationsWrapper) {
+  Logger.debug(TAG + '@getAddresses', `Looking up phoneHash for ${e164Number}`)
   const phoneHashDetails: PhoneNumberHashDetails = yield call(fetchPhoneHashPrivate, e164Number)
   const phoneHash = phoneHashDetails.phoneHash
+  Logger.debug(TAG + '@getAddresses', `Received phone hash: ${phoneHash}`)
 
   // Map of identifier -> (Map of address -> AttestationStat)
   const results: IdentifierLookupResult = yield call(attestationsWrapper.lookupIdentifiers, [

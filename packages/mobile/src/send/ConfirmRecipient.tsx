@@ -19,7 +19,7 @@ import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { getRecipientThumbnail, Recipient } from 'src/recipients/recipient'
 import { RootState } from 'src/redux/reducers'
-import { isBackupTooLate } from 'src/redux/selectors'
+import { ConfirmationInput } from 'src/send/SendConfirmation'
 
 const AVATAR_SIZE = 120
 const QR_ICON_SIZE = 24
@@ -30,16 +30,11 @@ interface OwnProps {
   navigation: Navigation
 }
 
-interface State {
-  displayName: string
-  displayNameStartOfSentence: string
-}
-
 interface StateProps {
-  backupCompleted: boolean
-  socialBackupCompleted: boolean
-  backupTooLate: boolean
-  backupDelayedTime: number
+  recipient: Recipient
+  fullValidationRequired: boolean
+  displayName: string
+  startOfSentenceDisplayName: string
 }
 
 interface DispatchProps {
@@ -50,12 +45,26 @@ interface DispatchProps {
 
 type Props = WithTranslation & StateProps & DispatchProps & OwnProps
 
-const mapStateToProps = (state: RootState): StateProps => {
+const formatDisplayName = (displayName: string) => {
+  // OPEN QUESTION: Is default displayName also "Mobile #" for Android?
+  if (displayName !== 'Mobile #') {
+    return { displayName, startOfSentenceDisplayName: displayName }
+  }
+
+  return { displayName: 'your contact', startOfSentenceDisplayName: 'Your contract' }
+}
+
+const mapStateToProps = (state: RootState, ownProps: NavigationInjectedProps): StateProps => {
+  const { navigation } = ownProps
+  const confirmationInput: ConfirmationInput = navigation.getParam('confirmationInput')
+  const fullValidationRequired = navigation.getParam('fullValidationRequired')
+  const { recipient } = confirmationInput
+  const { displayName, startOfSentenceDisplayName } = formatDisplayName(recipient.displayName)
   return {
-    backupCompleted: state.account.backupCompleted,
-    socialBackupCompleted: state.account.socialBackupCompleted,
-    backupTooLate: isBackupTooLate(state),
-    backupDelayedTime: state.account.backupDelayedTime,
+    recipient,
+    fullValidationRequired,
+    displayName,
+    startOfSentenceDisplayName,
   }
 }
 
@@ -64,56 +73,22 @@ class ConfirmRecipient extends React.Component<Props> {
     ...headerWithBackButton,
   })
 
-  state: State = {
-    displayName: '',
-    displayNameStartOfSentence: '',
-  }
-
-  componentDidMount = () => {
-    const recipient = this.getRecipient()
-    const displayName = this.formatDisplayName(recipient.displayName)
-    const displayNameStartOfSentence = this.formatDisplayName(recipient.displayName, true)
-    this.setState({ displayName, displayNameStartOfSentence })
-  }
-
-  getRecipient = (): Recipient => {
-    const recipient = this.props.navigation.getParam('recipient')
-    if (!recipient) {
-      throw new Error('Recipient expected')
-    }
-    return recipient
-  }
-
-  formatDisplayName = (displayName: string, isAtStartOfSentence?: boolean) => {
-    // OPEN QUESTION: Is default displayName also "Mobile #" for Android?
-    if (displayName !== 'Mobile #') {
-      return displayName
-    }
-
-    if (isAtStartOfSentence) {
-      return 'This person'
-    }
-
-    return 'this person'
-  }
-
   onPressScanCode = () => {
     navigate(Screens.QRScanner, { secureSendFlow: true })
   }
 
   onPressConfirmAccount = () => {
-    const fullAddressValidationRequired = this.props.navigation.getParam(
-      'fullAddressValidationRequired'
-    )
+    const { fullValidationRequired, displayName } = this.props
+
     navigate(Screens.ConfirmRecipientAccount, {
-      displayName: this.state.displayName,
-      fullAddressValidationRequired,
+      displayName,
+      fullValidationRequired,
     })
   }
 
   render() {
-    const { t } = this.props
-    const recipient = this.getRecipient()
+    const { t, recipient, displayName, startOfSentenceDisplayName } = this.props
+
     return (
       <SafeAreaView style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -124,18 +99,18 @@ class ConfirmRecipient extends React.Component<Props> {
           </View>
           <Text style={[styles.h1, fontStyles.bold]}>
             {t('confirmAccount.header', {
-              displayName: this.state.displayName,
+              displayName,
             })}
           </Text>
           <Text style={styles.body}>
             {t('secureSendExplanation.1', {
               e164Number: recipient.e164PhoneNumber,
-              displayName: this.state.displayNameStartOfSentence,
+              displayName: startOfSentenceDisplayName,
             })}
           </Text>
           <Text style={styles.body}>
             {t('secureSendExplanation.2', {
-              displayName: this.state.displayName,
+              displayName,
             })}
           </Text>
         </ScrollView>
@@ -202,7 +177,7 @@ const styles = StyleSheet.create({
 })
 
 export default componentWithAnalytics(
-  connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
+  connect<StateProps, DispatchProps, OwnProps, RootState>(mapStateToProps, {
     setBackupDelayed,
     enterBackupFlow,
     exitBackupFlow,
