@@ -398,7 +398,6 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                       "top": 10,
                     }
                   }
-                  isTVSelectable={true}
                   nativeBackgroundAndroid={
                     Object {
                       "attribute": "selectableItemBackgroundBorderless",
@@ -668,7 +667,6 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
         <View
           accessible={true}
           focusable={false}
-          isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
@@ -758,7 +756,6 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
         <View
           accessible={true}
           focusable={true}
-          isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
@@ -1227,7 +1224,6 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                       "top": 10,
                     }
                   }
-                  isTVSelectable={true}
                   nativeBackgroundAndroid={
                     Object {
                       "attribute": "selectableItemBackgroundBorderless",
@@ -1497,7 +1493,6 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
         <View
           accessible={true}
           focusable={false}
-          isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
@@ -1587,7 +1582,6 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
         <View
           accessible={true}
           focusable={true}
-          isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
@@ -2056,7 +2050,6 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                       "top": 10,
                     }
                   }
-                  isTVSelectable={true}
                   nativeBackgroundAndroid={
                     Object {
                       "attribute": "selectableItemBackgroundBorderless",
@@ -2323,7 +2316,6 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
         <View
           accessible={true}
           focusable={false}
-          isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
@@ -2413,7 +2405,6 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
         <View
           accessible={true}
           focusable={true}
-          isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
