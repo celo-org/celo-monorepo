@@ -212,6 +212,9 @@ describe('governance tests', () => {
         carbonOffsettingPartner: carbonOffsettingPartnerAddress,
       },
     },
+    genesisConfig: {
+      blockTime: 2,
+    },
   }
 
   const hooks: any = getHooks(gethConfig)
