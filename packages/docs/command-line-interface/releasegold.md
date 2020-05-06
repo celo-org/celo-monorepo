@@ -33,7 +33,7 @@ OPTIONS
 
   --role=vote|validator|attestation                      (required)
 
-  --signature=signature                                  (required) Signature (a.k.a. proof-of-possession) of the signer
+  --signature=0x                                         (required) Signature (a.k.a. proof-of-possession) of the signer
                                                          key
 
   --signer=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d    (required) The signer key that is to be used for voting through
@@ -112,6 +112,8 @@ OPTIONS
   --useLedger                                            Set it to use a ledger wallet
 
   --value=10000000000000000000000                        (required) Amount of gold to perform `action` with
+
+  --yes                                                  Answer yes to prompt
 
 EXAMPLES
   locked-gold --contract 0xCcc8a47BE435F1590809337BB14081b256Ae26A8 --action lock --value 10000000000000000000000

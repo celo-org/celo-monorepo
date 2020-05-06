@@ -1,4 +1,8 @@
-import { AddressToE164NumberType, E164NumberToAddressType } from 'src/identity/reducer'
+import {
+  AddressToE164NumberType,
+  E164NumberToAddressType,
+  E164NumberToSaltType,
+} from 'src/identity/reducer'
 import { AttestationCode, CodeInputType, VerificationStatus } from 'src/identity/verification'
 
 export enum Actions {
@@ -12,6 +16,7 @@ export enum Actions {
   INPUT_ATTESTATION_CODE = 'IDENTITY/INPUT_ATTESTATION_CODE',
   COMPLETE_ATTESTATION_CODE = 'IDENTITY/COMPLETE_ATTESTATION_CODE',
   UPDATE_E164_PHONE_NUMBER_ADDRESSES = 'IDENTITY/UPDATE_E164_PHONE_NUMBER_ADDRESSES',
+  UPDATE_E164_PHONE_NUMBER_SALT = 'IDENTITY/UPDATE_E164_PHONE_NUMBER_SALT',
   FETCH_PHONE_ADDRESSES = 'IDENTITY/FETCH_PHONE_ADDRESSES',
   IMPORT_CONTACTS = 'IDENTITY/IMPORT_CONTACTS',
   UPDATE_IMPORT_SYNC_PROGRESS = 'IDENTITY/UPDATE_IMPORT_SYNC_PROGRESS',
@@ -68,9 +73,14 @@ export interface UpdateE164PhoneNumberAddressesAction {
   addressToE164Number: AddressToE164NumberType
 }
 
+export interface UpdateE164PhoneNumberSaltAction {
+  type: Actions.UPDATE_E164_PHONE_NUMBER_SALT
+  e164NumberToSalt: E164NumberToSaltType
+}
+
 export interface FetchPhoneAddressesAction {
   type: Actions.FETCH_PHONE_ADDRESSES
-  numbers: string[]
+  e164Number: string
 }
 
 export interface ImportContactsAction {
@@ -107,6 +117,7 @@ export type ActionTypes =
   | InputAttestationCodeAction
   | CompleteAttestationCodeAction
   | UpdateE164PhoneNumberAddressesAction
+  | UpdateE164PhoneNumberSaltAction
   | ImportContactsAction
   | UpdateImportSyncProgress
   | IncrementImportSyncProgress
@@ -160,9 +171,9 @@ export const completeAttestationCode = (
   numComplete,
 })
 
-export const fetchPhoneAddresses = (numbers: string[]): FetchPhoneAddressesAction => ({
+export const fetchPhoneAddresses = (e164Number: string): FetchPhoneAddressesAction => ({
   type: Actions.FETCH_PHONE_ADDRESSES,
-  numbers,
+  e164Number,
 })
 
 export const updateE164PhoneNumberAddresses = (
@@ -172,6 +183,13 @@ export const updateE164PhoneNumberAddresses = (
   type: Actions.UPDATE_E164_PHONE_NUMBER_ADDRESSES,
   e164NumberToAddress,
   addressToE164Number,
+})
+
+export const updateE164PhoneNumberSalts = (
+  e164NumberToSalt: E164NumberToSaltType
+): UpdateE164PhoneNumberSaltAction => ({
+  type: Actions.UPDATE_E164_PHONE_NUMBER_SALT,
+  e164NumberToSalt,
 })
 
 export const importContacts = (): ImportContactsAction => ({

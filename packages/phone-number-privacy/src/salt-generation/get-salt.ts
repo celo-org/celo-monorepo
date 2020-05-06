@@ -1,53 +1,46 @@
-import { PhoneNumberUtils } from '@celo/utils'
+import { isValidAddress } from '@celo/utils/lib/address'
 import { Request, Response } from 'firebase-functions'
+import { BLSCryptographyClient } from '../bls/bls-cryptography-client'
 import { ErrorMessages, respondWithError } from '../common/error-utils'
 import { authenticateUser } from '../common/identity'
+import logger from '../common/logger'
 import { incrementQueryCount } from '../database/wrappers/account'
-import { computeBlindedSignature } from './bls-signature'
-import QueryQuota from './query-quota'
+import { getRemainingQueryCount } from './query-quota'
 
-// EG. curl -v "http://localhost:5000/celo-phone-number-privacy/us-central1/getBlindedMessageSignature" -d '{"queryPhoneNumber": "xfVo/qxqTXWE8AXzev8KcqJ2CG8sMqNQfn/0X2ch7dKGJyBGG8YjhFyNSmX1e1cB9n4ARdq6kYr0vZTAebx1Nudl3zR9ij0aIJY5wzhsR89uLPj/31H0Ks4FMf42oD4A/5ny0+AA1As0oUFvTpVr99Uk4+GxbRjX/iHgTa2qkM15ih/3Qot/tw/vt9LmDZAByogwM3EAHZFC+BLyYfgt8Tws/2jwiie61wET0Ms/JLOVZjiTZafwJJ74Wqlk/IgAAA==", "account":"0x117ea45d497ab022b85494ba3ab6f52969bf6813", "phoneNumber":"+15555555555"}' -H 'Content-Type: application/json'
-export async function handleGetSignature(request: Request, response: Response) {
+export async function handleGetBlindedMessageForSalt(request: Request, response: Response) {
   try {
-    const queryQuota: QueryQuota = new QueryQuota()
     if (!isValidGetSignatureInput(request.body)) {
       respondWithError(response, 400, ErrorMessages.INVALID_INPUT)
       return
     }
     authenticateUser()
-    const remainingQueryCount = await queryQuota.getRemainingQueryCount(
+    const remainingQueryCount = await getRemainingQueryCount(
       request.body.account,
-      request.body.phoneNumber
+      request.body.hashedPhoneNumber
     )
     if (remainingQueryCount <= 0) {
-      respondWithError(response, 400, ErrorMessages.EXCEEDED_QUOTA)
+      respondWithError(response, 403, ErrorMessages.EXCEEDED_QUOTA)
       return
     }
-    const signature = computeBlindedSignature(request.body.queryPhoneNumber)
+    const signature = await BLSCryptographyClient.computeBlindedSignature(
+      request.body.blindedQueryPhoneNumber
+    )
     await incrementQueryCount(request.body.account)
     response.json({ success: true, signature })
   } catch (error) {
-    console.error('Failed to getSignature', error)
+    logger.error('Failed to getSalt', error)
     respondWithError(response, 500, ErrorMessages.UNKNOWN_ERROR)
   }
 }
 
 function isValidGetSignatureInput(requestBody: any): boolean {
-  return (
-    hasValidAccountParam(requestBody) &&
-    hasValidPhoneNumberParam(requestBody) &&
-    hasValidQueryPhoneNumberParam(requestBody)
-  )
+  return hasValidAccountParam(requestBody) && hasValidQueryPhoneNumberParam(requestBody)
 }
 
 function hasValidAccountParam(requestBody: any): boolean {
-  return requestBody.account && (requestBody.account as string).startsWith('0x')
-}
-
-function hasValidPhoneNumberParam(requestBody: any): boolean {
-  return requestBody.phoneNumber && PhoneNumberUtils.isE164Number(requestBody.phoneNumber)
+  return requestBody.account && isValidAddress(requestBody.account)
 }
 
 function hasValidQueryPhoneNumberParam(requestBody: any): boolean {
-  return requestBody.queryPhoneNumber
+  return requestBody.blindedQueryPhoneNumber
 }

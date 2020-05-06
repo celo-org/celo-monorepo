@@ -15,8 +15,9 @@ import com.android.build.OutputFile
  *   // the name of the generated asset file containing your JS bundle
  *   bundleAssetName: "index.android.bundle",
  *
- *   // the entry file for bundle generation
- *   entryFile: "index.android.js",
+ *   // the entry file for bundle generation. If none specified and
+ *   // "index.android.js" exists, it will be used. Otherwise "index.js" is
+ *   // default. Can be overridden with ENTRY_FILE environment variable.
  *
  *   // whether to bundle JS and assets in debug mode
  *   bundleInDebug: false,
@@ -73,7 +74,6 @@ import com.android.build.OutputFile
  */
 
 project.ext.react = [
-        entryFile        : "index.js",
         enableHermes: false,  // clean and rebuild if changing
         extraPackagerArgs: ["--max-workers=2"],
         bundleInIntegration: true,
@@ -160,7 +160,7 @@ android {
         minSdkVersion isDetoxTestBuild ? 18 : rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode appVersionCode
-        versionName "1.7.0"
+        versionName "1.7.1"
         testBuildType System.getProperty('testBuildType', 'debug')
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         resValue "string", "build_config_package", "org.celo.mobile"
@@ -264,8 +264,7 @@ android {
 }
 
 dependencies {
-    androidTestImplementation('com.wix:detox:+') { transitive = true }
-    androidTestImplementation 'junit:junit:4.12'
+    androidTestImplementation('com.wix:detox:+')
 
     def multidex_version = "2.0.1"
     implementation 'androidx.multidex:multidex:$multidex_version'
@@ -275,7 +274,20 @@ dependencies {
     implementation project(':react-native-geth')
     implementation project(':react-native-confirm-device-credentials')
     implementation fileTree(dir: "libs", include: ["*.jar"])
+    //noinspection GradleDynamicVersion
     implementation 'com.facebook.react:react-native:+'  // From node_modules
+
+    implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
+
+    debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}") {
+      exclude group:'com.facebook.fbjni'
+    }
+    debugImplementation("com.facebook.flipper:flipper-network-plugin:${FLIPPER_VERSION}") {
+        exclude group:'com.facebook.flipper'
+    }
+    debugImplementation("com.facebook.flipper:flipper-fresco-plugin:${FLIPPER_VERSION}") {
+        exclude group:'com.facebook.flipper'
+    }
 
     if (enableHermes) {
         def hermesPath = "../../../../node_modules/hermes-engine/android/";

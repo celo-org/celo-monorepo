@@ -1942,7 +1942,7 @@ Leaderboard
                 }
                 target="blank"
               >
-                Install Wallet
+                Get Test Wallet
               </a>
             </div>
             <div
@@ -4371,7 +4371,7 @@ Build dApps for the Celo platform.
                   }
                 }
               >
-                Get Wallet
+                Get Test Wallet
               </a>
             </div>
           </div>

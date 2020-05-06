@@ -1,14 +1,45 @@
-import { computeBlindedSignature } from '../../src/salt-generation/bls-signature'
+import threshold from 'blind-threshold-bls'
+import { BLSCryptographyClient } from '../../src/bls/bls-cryptography-client'
+import config, { DEV_PRIVATE_KEY, DEV_PUBLIC_KEY } from '../../src/config'
+
+const USING_MOCK = config.keyVault.azureClientSecret === 'useMock'
 
 describe(`BLS service computes signature`, () => {
-  it('provides blinded signature', () => {
-    const expected =
-      'lwB9ct0qGQqAYeRO2l6G3BRGmhxJcNn+Fc7/eCq0MtrVfOSKBT32R2p7Za4E31AA6xLw+5Uzg9dCmj8lXlq4oeC5t4Zn2Bx7Ce9py2ZPlzNST2PAx/sebKkG90P6WTcB82t977G0/09vFhof3lKSht5tClbbxsXTsOrOn6RDh/0/DT1ibAlURR4O8oxaFCcBrhVfMyFcWWa+HNeILPYMDk+okRGD0CnLMDsQHPG2kjetEaKPYPPhcf82rv0IFUIAAA=='
-    const blindPhoneNumberString =
-      'TX4Cj9xe1Py0sMClZrk2QsoSmdToZueU7T/6YB4o8jKLEAXaSnO/PeeHvz7KVpQAhPB/E/B9AT7C6zVCeDyfIxcHEaNlS9ZQsfTa7ProhLDNMKxcMzytH9a5U8ousbUAf9SRIXQQiWT6W7dZH4vP1pcU7kz4N+UgPENdZWhUhXVq4o1FlEyNbXctN8f2cJMAVg1A77hcQHR3Nv2ZEU0UnlykquNxufF+KNwqMXUFylPPyJDtSKwi2C0DuRYs8U8AAA=='
+  beforeEach(() => {
+    // Use mock client if env vars not specified
+    if (!USING_MOCK) {
+      // Ensure all env vars are specified
+      expect(config.keyVault.azureClientID).not.toBe('useMock')
+      expect(config.keyVault.azureClientSecret).not.toBe('useMock')
+      expect(config.keyVault.azureTenant).not.toBe('useMock')
+      expect(config.keyVault.azureVaultName).not.toBe('useMock')
+      expect(config.keyVault.azureSecretName).not.toBe('useMock')
+    }
+    if (USING_MOCK) {
+      jest.spyOn<any, any>(BLSCryptographyClient, 'getPrivateKey').mockImplementation(() => {
+        return DEV_PRIVATE_KEY
+      })
+    }
+  })
 
-    expect(JSON.stringify(computeBlindedSignature(blindPhoneNumberString))).toEqual(
-      JSON.stringify(expected)
+  it('provides blinded signature', async () => {
+    const message = Buffer.from('hello world')
+    const userSeed = new Uint8Array(32)
+    for (let i = 0; i < 31; i++) {
+      userSeed[i] = i
+    }
+
+    const blindedMsgResult = threshold.blind(message, userSeed)
+    const blindedMsg = Buffer.from(blindedMsgResult.message).toString('base64')
+
+    const actual = await BLSCryptographyClient.computeBlindedSignature(blindedMsg)
+    expect(actual).toEqual('ZeYBwDBxkWe1ZNDqiViz2MNGIT6PIW2c3pemkMcmM5gM1vaaf5RieVp+2SxR83YA')
+
+    const unblindedSignedMessage = threshold.unblind(
+      Buffer.from(actual, 'base64'),
+      blindedMsgResult.blindingFactor
     )
+    const publicKey = Buffer.from(DEV_PUBLIC_KEY, 'base64')
+    expect(threshold.verify(publicKey, message, unblindedSignedMessage))
   })
 })

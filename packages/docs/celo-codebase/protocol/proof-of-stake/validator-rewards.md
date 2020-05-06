@@ -18,7 +18,7 @@ Epoch rewards to validators and validator groups are denominated in Celo Dollars
 
 The on-target validator reward is a constant value (as block rewards typically would be) and is intended to cover costs plus an attractive margin for amortized capital and operating expenses associated with a recommended set up that includes redundant hosts with hardware wallets in a secure co-lo facility, proxy nodes at cloud or edge hosting providers, as well as security audits. As with most parameters of the Celo protocol, it can be changed by governance proposal.
 
-In the usual case where no validator in the group has been slashed recently, and the validator has signed almost every block in the epoch, then the validator receives the full amount of the on-target reward, less the fraction sent to the validator group based on the group share. Unlike in some other Proof of Stake schemes, epoch rewards to validators do not depend on the number of votes the validator’s group has received.
+In the usual case where no validator in the group has been slashed recently, and the validator has signed almost every block in the epoch, then the validator receives the full amount of the on-target reward, less the fraction sent to the validator group based on the group share. Unlike in some other proof-of-stake schemes, epoch rewards to validators do not depend on the number of votes the validator’s group has received.
 
 ## Calculating Uptime Score
 

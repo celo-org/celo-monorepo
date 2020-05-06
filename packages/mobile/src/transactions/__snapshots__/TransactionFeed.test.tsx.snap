@@ -96,7 +96,6 @@ exports[`renders for gold to dollar exchange properly 1`] = `
   initialNumToRender={10}
   keyExtractor={[Function]}
   maxToRenderPerBatch={10}
-  numColumns={1}
   onContentSizeChange={[Function]}
   onEndReachedThreshold={2}
   onLayout={[Function]}
@@ -120,7 +119,6 @@ exports[`renders for gold to dollar exchange properly 1`] = `
       <View
         accessible={true}
         focusable={true}
-        isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackground",
@@ -429,7 +427,6 @@ exports[`renders for no transactions 1`] = `
         "top": 7,
       }
     }
-    isTVSelectable={true}
     nativeBackgroundAndroid={
       Object {
         "attribute": "selectableItemBackground",
