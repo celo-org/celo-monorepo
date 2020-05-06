@@ -7,7 +7,7 @@ metadata:
     aadpodidentity.k8s.io/Behavior: namespaced
 spec:
   type: 0
-  ResourceID: {{ $identity.azure.id }}
-  ClientID: {{ $identity.azure.clientId }}
+  resourceID: {{ $identity.azure.id }}
+  clientID: {{ $identity.azure.clientId }}
 ---
 {{ end }}
