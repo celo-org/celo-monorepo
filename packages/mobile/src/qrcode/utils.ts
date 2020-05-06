@@ -5,7 +5,7 @@ import Share from 'react-native-share'
 import { put } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { AddressToE164NumberType } from 'src/identity/reducer'
+import { AddressToE164NumberType, E164NumberToAddressType } from 'src/identity/reducer'
 import { replace } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import {
@@ -49,9 +49,12 @@ export function* handleBarcode(
   barcode: QrCode,
   addressToE164Number: AddressToE164NumberType,
   recipientCache: NumberToRecipient,
-  possibleRecipientAddresses?: string[] // NOTE: placeholder until i speak with rossy about what this data will look like
+  scanIsForSecureSend: true | undefined,
+  e164NumberToAddress: E164NumberToAddressType,
+  secureSendRecipient: Recipient | undefined
 ) {
   let data: { address: string; e164PhoneNumber: string; displayName: string } | undefined
+
   try {
     data = JSON.parse(barcode.data)
   } catch (e) {
@@ -66,16 +69,28 @@ export function* handleBarcode(
     yield put(showError(ErrorMessages.QR_FAILED_INVALID_ADDRESS))
     return
   }
-  if (possibleRecipientAddresses) {
-    // NOTE: can I leverage the VALIDATE_RECIPEINT_ADDRESS actions I've created to do this step?
-    const addressBelongsToTargetRecipient: boolean = possibleRecipientAddresses.includes(
-      data.address
-    )
-    if (!addressBelongsToTargetRecipient) {
-      // NOTE: showing an error message instead of a toast (what the mocks stipulated)
-      yield put(showError(ErrorMessages.QR_FAILED_INVALID_RECIPIENT))
-      return
+  try {
+    if (scanIsForSecureSend) {
+      if (!secureSendRecipient || !secureSendRecipient.e164PhoneNumber) {
+        throw Error("Error passing through itended recipient or recipient's phone number")
+      }
+      // Typically use 'getAddressFromPhoneNumber' but need all the possible addresses when doing secure send validation
+      const possibleRecievingAddresses = e164NumberToAddress[secureSendRecipient.e164PhoneNumber]
+
+      if (!possibleRecievingAddresses) {
+        yield put(showError(ErrorMessages.QR_FAILED_NO_PHONE_NUMBER))
+        return
+      }
+
+      if (!possibleRecievingAddresses.includes(data.address)) {
+        yield put(showError(ErrorMessages.QR_FAILED_INVALID_RECIPIENT))
+        return
+      }
+
+      // store as sucess
     }
+  } catch (error) {
+    Logger.error(TAG + '@handleBarcode', `Error with secure send validation: `, error)
   }
 
   if (typeof data.e164PhoneNumber !== 'string') {
@@ -104,5 +119,10 @@ export function* handleBarcode(
       }
   yield put(storeLatestInRecents(recipient))
 
-  replace(Screens.SendAmount, { recipient })
+  if (scanIsForSecureSend) {
+    // TODO: pass through confirmationDetails
+    replace(Screens.SendConfirmation, { recipient })
+  } else {
+    replace(Screens.SendAmount, { recipient })
+  }
 }

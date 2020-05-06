@@ -9,11 +9,7 @@ import { WithTranslation } from 'react-i18next'
 import { Platform, StyleSheet, Text, View } from 'react-native'
 import { RNCamera } from 'react-native-camera'
 import SafeAreaView from 'react-native-safe-area-view'
-import {
-  NavigationFocusInjectedProps,
-  NavigationInjectedProps,
-  withNavigationFocus,
-} from 'react-navigation'
+import { NavigationInjectedProps, withNavigationFocus } from 'react-navigation'
 import { connect } from 'react-redux'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
@@ -21,6 +17,8 @@ import { headerWithBackButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import NotAuthorizedView from 'src/qrcode/NotAuthorizedView'
+import { Recipient } from 'src/recipients/recipient'
+import { RootState } from 'src/redux/reducers'
 import { handleBarcodeDetected } from 'src/send/actions'
 import Logger from 'src/utils/Logger'
 
@@ -30,11 +28,26 @@ interface OwnProps {
   navigation: Navigation
 }
 
+interface StateProps {
+  scanIsForSecureSend: true | undefined
+  recipient: Recipient
+  isFocused: boolean
+}
+
 interface DispatchProps {
   handleBarcodeDetected: typeof handleBarcodeDetected
 }
 
-type Props = DispatchProps & WithTranslation & NavigationFocusInjectedProps & OwnProps
+type Props = DispatchProps & WithTranslation & StateProps & OwnProps
+
+const mapStateToProps = (state: RootState, ownProps: NavigationInjectedProps): StateProps => {
+  const { navigation } = ownProps
+  return {
+    scanIsForSecureSend: navigation.getParam('scanIsForSecureSend'),
+    recipient: navigation.getParam('recipient'),
+    isFocused: navigation.getParam('isFocused'),
+  }
+}
 
 class QRScanner extends React.Component<Props> {
   static navigationOptions = () => ({
@@ -42,18 +55,14 @@ class QRScanner extends React.Component<Props> {
     headerTitle: i18n.t('sendFlow7:scanCode'),
   })
 
-  timeout: undefined | number = undefined
-
-  state = {}
-
   camera: RNCamera | null = null
 
   // This method would be called multiple times with the same
   // QR code, so we need to catch only the first one
   onBarCodeDetected = (rawData: any) => {
-    const isScanForSecureSend: true | undefined = this.props.navigation.getParam('secureSendFlow')
+    const { scanIsForSecureSend, recipient } = this.props
     Logger.debug('QRScanner', 'Bar code detected')
-    this.props.handleBarcodeDetected(rawData, isScanForSecureSend)
+    this.props.handleBarcodeDetected(rawData, scanIsForSecureSend, recipient)
   }
 
   onPressShowYourCode = () => {
@@ -61,11 +70,10 @@ class QRScanner extends React.Component<Props> {
   }
 
   renderUsersOwnQRCode = () => {
-    const { t } = this.props
-    const isScanForSecureSend: true | undefined = this.props.navigation.getParam('secureSendFlow')
+    const { t, scanIsForSecureSend } = this.props
 
     // Hide option to return to user's own QR code if scan happens as part of Secure Send flow
-    if (isScanForSecureSend) {
+    if (scanIsForSecureSend) {
       return null
     }
 
@@ -196,7 +204,7 @@ const styles = StyleSheet.create({
 export default componentWithAnalytics(
   withNavigationFocus(
     // @ts-ignore
-    connect(null, {
+    connect<StateProps, DispatchProps, OwnProps, RootState>(mapStateToProps, {
       handleBarcodeDetected,
     })(withTranslation(Namespaces.sendFlow7)(QRScanner))
   )

@@ -50,6 +50,7 @@ export interface ValidateRecipientAddressAction {
   type: Actions.VALIDATE_RECIPIENT_ADDRESS
   fullAddressOrLastFourDigits: string
   fullAddressValidationRequired: boolean
+  recipient: Recipient
 }
 
 export interface ValidateRecipientAddressSuccessAction {
@@ -80,10 +81,15 @@ export const storeLatestInRecents = (recipient: Recipient): StoreLatestInRecents
   recipient,
 })
 
-export const handleBarcodeDetected = (data: QrCode, isScanForSecureSend?: boolean) => ({
+export const handleBarcodeDetected = (
+  data: QrCode,
+  scanIsForSecureSend: true | undefined,
+  recipient: Recipient | undefined
+) => ({
   type: Actions.BARCODE_DETECTED,
   data,
-  isScanForSecureSend,
+  scanIsForSecureSend,
+  recipient,
 })
 
 export const shareQRCode = (qrCodeSvg: SVG) => ({
@@ -118,11 +124,13 @@ export const sendPaymentOrInviteFailure = (): SendPaymentOrInviteFailureAction =
 
 export const validateRecipientAddress = (
   fullAddressOrLastFourDigits: string,
-  fullAddressValidationRequired: boolean
+  fullAddressValidationRequired: boolean,
+  recipient: Recipient
 ): ValidateRecipientAddressAction => ({
   type: Actions.VALIDATE_RECIPIENT_ADDRESS,
   fullAddressOrLastFourDigits,
   fullAddressValidationRequired,
+  recipient,
 })
 
 export const validateRecipientAddressSuccess = (): ValidateRecipientAddressSuccessAction => ({

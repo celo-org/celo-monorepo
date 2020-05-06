@@ -46,7 +46,6 @@ interface DispatchProps {
 type Props = WithTranslation & StateProps & DispatchProps & OwnProps
 
 const formatDisplayName = (displayName: string) => {
-  // OPEN QUESTION: Is default displayName also "Mobile #" for Android?
   if (displayName !== 'Mobile #') {
     return { displayName, startOfSentenceDisplayName: displayName }
   }
@@ -74,14 +73,14 @@ class ConfirmRecipient extends React.Component<Props> {
   })
 
   onPressScanCode = () => {
-    navigate(Screens.QRScanner, { secureSendFlow: true })
+    navigate(Screens.QRScanner, { recipient: this.props.recipient, scanIsForSecureSend: true })
   }
 
   onPressConfirmAccount = () => {
-    const { fullValidationRequired, displayName } = this.props
+    const { fullValidationRequired, recipient } = this.props
 
     navigate(Screens.ConfirmRecipientAccount, {
-      displayName,
+      recipient,
       fullValidationRequired,
     })
   }

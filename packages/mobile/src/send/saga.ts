@@ -10,7 +10,7 @@ import { completePaymentRequest } from 'src/firebase/actions'
 import { features } from 'src/flags'
 import { transferGoldToken } from 'src/goldToken/actions'
 import { encryptComment } from 'src/identity/commentKey'
-import { addressToE164NumberSelector } from 'src/identity/reducer'
+import { addressToE164NumberSelector, e164NumberToAddressSelector } from 'src/identity/reducer'
 import { InviteBy } from 'src/invite/actions'
 import { sendInvite } from 'src/invite/saga'
 import { navigateHome } from 'src/navigator/NavigationService'
@@ -33,6 +33,7 @@ import {
 } from 'src/tokens/saga'
 import { generateStandbyTransactionId } from 'src/transactions/actions'
 import Logger from 'src/utils/Logger'
+import { userAddressSelector } from 'src/web3/reducer'
 import { currentAccountSelector } from 'src/web3/selectors'
 import { estimateGas } from 'src/web3/utils'
 
@@ -67,10 +68,17 @@ export function* watchQrCodeDetections() {
     Logger.debug(TAG, 'Barcode detected in watcher')
     const addressToE164Number = yield select(addressToE164NumberSelector)
     const recipientCache = yield select(recipientCacheSelector)
-    // NOTE: if action.isScanForSecureSend is true
-    // need to pull the possible recipient addresses and pass it into handleBarCode
+    const e164NumberToAddress = yield select(e164NumberToAddressSelector)
     try {
-      yield call(handleBarcode, action.data, addressToE164Number, recipientCache)
+      yield call(
+        handleBarcode,
+        action.data,
+        addressToE164Number,
+        recipientCache,
+        action.scanIsForSecureSend,
+        e164NumberToAddress,
+        action.recipient
+      )
     } catch (error) {
       Logger.error(TAG, 'Error handling the barcode', error)
     }
@@ -190,16 +198,44 @@ const checkForSpecialChars = (address: string, fullValidation: boolean) => {
 export function* validateRecipientAddressSaga({
   fullAddressOrLastFourDigits,
   fullAddressValidationRequired,
+  recipient,
 }: ValidateRecipientAddressAction) {
   Logger.debug(TAG, 'Starting Recipient Address Validation')
-
   try {
-    if (fullAddressValidationRequired) {
-      yield call(doFullAddressValidation, fullAddressOrLastFourDigits)
-    } else {
-      yield call(doPartialAddressValidation, fullAddressOrLastFourDigits)
+    const userAddress = yield select(userAddressSelector)
+    const e164NumberToAddress = yield select(e164NumberToAddressSelector)
+    const { e164PhoneNumber } = recipient
+
+    // should never happen, if it does it means there's an error passing through recipient object
+    if (!e164PhoneNumber) {
+      throw Error('There is no phone number associated with this recipient')
     }
 
+    const possibleRecievingAddresses = e164NumberToAddress[e164PhoneNumber]
+
+    // should never happen since secure send is initiated due to there being several possible addresses
+    if (!possibleRecievingAddresses) {
+      yield put(showError(ErrorMessages.QR_FAILED_NO_PHONE_NUMBER))
+      return
+    }
+
+    if (fullAddressValidationRequired) {
+      yield call(
+        doFullAddressValidation,
+        fullAddressOrLastFourDigits,
+        possibleRecievingAddresses,
+        userAddress
+      )
+    } else {
+      yield call(
+        doPartialAddressValidation,
+        fullAddressOrLastFourDigits,
+        possibleRecievingAddresses,
+        userAddress
+      )
+    }
+
+    // store successfully validated address
     yield put(validateRecipientAddressSuccess())
   } catch (error) {
     Logger.error(TAG2, 'Address validation error: ', error.message)
@@ -208,26 +244,50 @@ export function* validateRecipientAddressSaga({
   }
 }
 
-export function* doFullAddressValidation(address: string) {
-  checkForSpecialChars(address, true)
+export function* doFullAddressValidation(
+  targetAddress: string,
+  possibleRecievingAddresses: string[],
+  userAddress: string
+) {
+  checkForSpecialChars(targetAddress, true)
 
-  if (address.length !== 42 || address.slice(0, 2) !== '0x') {
+  if (targetAddress.length !== 42 || targetAddress.slice(0, 2) !== '0x') {
     throw Error(ErrorMessages.ADDRESS_VALIDATION_FULL_POORLY_FORMATTED)
   }
 
-  // Check if it's the user's own address
-  // Check if address is one of the potential addresses that map to that specific recipient
+  if (targetAddress === userAddress) {
+    throw Error(ErrorMessages.ADDRESS_VALIDATION_FULL_OWN_ADDRESS)
+  }
+
+  if (!possibleRecievingAddresses.includes(targetAddress)) {
+    yield put(showError(ErrorMessages.ADDRESS_VALIDATION_NO_MATCH))
+    return
+  }
 }
 
-export function* doPartialAddressValidation(lastFourDigitsOfAddress: string) {
-  checkForSpecialChars(lastFourDigitsOfAddress, false)
+export function* doPartialAddressValidation(
+  lastFourDigitsOfTargetAddress: string,
+  possibleRecievingAddresses: string[],
+  userAddress: string
+) {
+  checkForSpecialChars(lastFourDigitsOfTargetAddress, false)
 
-  if (lastFourDigitsOfAddress.length !== 4) {
+  if (lastFourDigitsOfTargetAddress.length !== 4) {
     throw Error(ErrorMessages.ADDRESS_VALIDATION_PARTIAL_POORLY_FORMATTED)
   }
 
-  // Check if it's the user's own address
-  // Check if address is one of the potential addresses that map to that specific recipient
+  if (lastFourDigitsOfTargetAddress === userAddress.slice(-4)) {
+    throw Error(ErrorMessages.ADDRESS_VALIDATION_PARTIAL_OWN_ADDRESS)
+  }
+
+  const last4DigitsOfPossibleRecievingAddresses = possibleRecievingAddresses.map((address) =>
+    address.slice(-4)
+  )
+
+  if (!last4DigitsOfPossibleRecievingAddresses.includes(lastFourDigitsOfTargetAddress)) {
+    yield put(showError(ErrorMessages.ADDRESS_VALIDATION_NO_MATCH))
+    return
+  }
 }
 
 export function* watchSendPaymentOrInvite() {
