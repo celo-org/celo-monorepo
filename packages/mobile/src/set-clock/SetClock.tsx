@@ -1,8 +1,7 @@
-const moment = require('moment')
-
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
+import { format } from 'date-fns'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { Image, Platform, StyleSheet, Text, View } from 'react-native'
@@ -34,7 +33,7 @@ export class SetClock extends React.Component<WithTranslation> {
         <View style={style.header}>
           <Image source={clockIcon} style={style.clockImage} resizeMode="contain" />
           <Text style={[fontStyles.h1, style.time]} testID="SetClockTitle">
-            {moment(getRemoteTime()).format('l, LT')}
+            {format(getRemoteTime(), 'Pp')}
           </Text>
           <Text style={fontStyles.body} testID="SetClockTitle">
             ({getLocalTimezone()})

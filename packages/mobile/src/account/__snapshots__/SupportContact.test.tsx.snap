@@ -101,7 +101,7 @@ exports[`Contact renders correctly 1`] = `
           }
         >
           <AndroidSwitch
-            accessibilityRole="button"
+            accessibilityRole="switch"
             enabled={true}
             on={true}
             onChange={[Function]}
@@ -169,7 +169,6 @@ exports[`Contact renders correctly 1`] = `
     <View
       accessible={true}
       focusable={false}
-      isTVSelectable={true}
       nativeBackgroundAndroid={
         Object {
           "attribute": "selectableItemBackground",

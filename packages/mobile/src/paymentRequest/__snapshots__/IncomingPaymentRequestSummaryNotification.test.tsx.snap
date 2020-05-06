@@ -32,7 +32,6 @@ exports[`IncomingPaymentRequestSummaryNotification renders a number when the add
       <View
         accessible={true}
         focusable={true}
-        isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackground",
@@ -184,7 +183,6 @@ exports[`IncomingPaymentRequestSummaryNotification renders a number when the add
                 <View
                   accessible={true}
                   focusable={true}
-                  isTVSelectable={true}
                   nativeBackgroundAndroid={
                     Object {
                       "attribute": "selectableItemBackgroundBorderless",
@@ -220,7 +218,6 @@ exports[`IncomingPaymentRequestSummaryNotification renders a number when the add
                 <View
                   accessible={true}
                   focusable={true}
-                  isTVSelectable={true}
                   nativeBackgroundAndroid={
                     Object {
                       "attribute": "selectableItemBackgroundBorderless",
@@ -295,7 +292,6 @@ exports[`IncomingPaymentRequestSummaryNotification renders correctly for just on
       <View
         accessible={true}
         focusable={true}
-        isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackground",
@@ -447,7 +443,6 @@ exports[`IncomingPaymentRequestSummaryNotification renders correctly for just on
                 <View
                   accessible={true}
                   focusable={true}
-                  isTVSelectable={true}
                   nativeBackgroundAndroid={
                     Object {
                       "attribute": "selectableItemBackgroundBorderless",
@@ -483,7 +478,6 @@ exports[`IncomingPaymentRequestSummaryNotification renders correctly for just on
                 <View
                   accessible={true}
                   focusable={true}
-                  isTVSelectable={true}
                   nativeBackgroundAndroid={
                     Object {
                       "attribute": "selectableItemBackgroundBorderless",
@@ -688,7 +682,6 @@ exports[`IncomingPaymentRequestSummaryNotification renders correctly for more th
           <View
             accessible={true}
             focusable={true}
-            isTVSelectable={true}
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackgroundBorderless",
