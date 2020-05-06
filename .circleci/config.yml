@@ -108,7 +108,7 @@ commands:
       - run:
           name: Create cached node_modules (if necessary)
           command: |
-            if [ ! -e ~/.tmp/node_modules.tgz ]; then 
+            if [ ! -e ~/.tmp/node_modules.tgz ]; then
               tar -c node_modules/ packages/*/node_modules/ | gzip --fast > ~/.tmp/node_modules.tgz
             fi
       - save_cache:
@@ -258,7 +258,7 @@ jobs:
             #   echo "Cache found, just run post-script."
             #   yarn postinstall
             # fi
-            yarn || yarn 
+            yarn || yarn
             yarn build || yarn build
       - save_cache:
           key: yarn-v4-macos-{{ .Branch }}-{{ checksum "yarn.lock" }}
@@ -519,7 +519,7 @@ jobs:
       - run:
           name: test
           # Flaky tests - run them twice
-          command: yarn --cwd packages/protocol test || yarn --cwd packages/protocol test
+          command: yarn --cwd packages/protocol test
 
   # Slow and flaky compared to protocol-test which runs without coverage
   protocol-test-with-code-coverage:
@@ -535,7 +535,7 @@ jobs:
       - run:
           name: test
           # Flaky tests - run them twice
-          command: yarn --cwd packages/protocol test:coverage || yarn --cwd packages/protocol test:coverage
+          command: yarn --cwd packages/protocol test:coverage
       - store_artifacts:
           path: packages/protocol/coverage
           destination: protocol/coverage
