@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid meet">
+	<desc>Symbol for the Celo Gold currency</desc>
+	<path id="symbol-celo-gold" fill="#FFF" d="M453 768c98 0 181-63 212-150h-61c-27 56-85 94-151 94-93 0-169-76-169-169 0-66 38-124 94-151v-61c-87 31-150 114-150 212 0 124 101 225 225 225zm154-210c90 0 153-67 153-160v-25H610l-16 51h109c0 45-42 82-94 82-67 0-115-50-115-118s50-118 118-118c33 0 61 7 94 24v-57c-30-13-63-19-94-19-97 0-173 76-172 170 1 97 72 170 167 170z"/>
+	<use xlink:href="#symbol-celo-gold" fill-opacity=".5"></use>
+</svg>
