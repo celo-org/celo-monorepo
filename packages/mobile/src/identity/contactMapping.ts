@@ -101,7 +101,7 @@ export function* fetchPhoneAddresses({ e164Number }: FetchPhoneAddressesAction) 
     // know new status is pending.
     yield put(updateE164PhoneNumberAddresses({ [e164Number]: undefined }, {}))
 
-    const contractKit = getContractKit()
+    const contractKit = yield call(getContractKit)
     const attestationsWrapper: AttestationsWrapper = yield call([
       contractKit.contracts,
       contractKit.contracts.getAttestations,

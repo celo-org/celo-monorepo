@@ -27,6 +27,7 @@ spec:
         image: {{ .Values.mic.image.repo }}:{{ .Values.mic.image.tag }}
         imagePullPolicy: Always
         args:
+          - "--syncRetryDuration={{ .Values.mic.syncRetryDuration }}"
           - "--cloudconfig=/etc/kubernetes/azure.json"
           - "--logtostderr"
           - "--prometheus-port={{ .Values.mic.prometheusPort }}"

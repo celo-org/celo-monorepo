@@ -25,7 +25,7 @@ import {
 import { getSendFee } from 'src/send/saga'
 import { fetchDollarBalance } from 'src/stableToken/actions'
 import { transactionConfirmed } from 'src/transactions/actions'
-import { getContractKit } from 'src/web3/contracts'
+import { getContractKitOutsideGenerator } from 'src/web3/contracts'
 import { getConnectedUnlockedAccount, getOrCreateAccount, waitWeb3LastBlock } from 'src/web3/saga'
 import { createMockStore, mockContractKitBalance } from 'test/utils'
 import { mockAccount, mockE164Number } from 'test/values'
@@ -131,7 +131,7 @@ describe(watchRedeemInvite, () => {
   })
 
   it('fails with a valid private key but no money on key', async () => {
-    const stableToken = await getContractKit().contracts.getStableToken()
+    const stableToken = await (await getContractKitOutsideGenerator()).contracts.getStableToken()
 
     // @ts-ignore Jest Mock
     stableToken.balanceOf.mockResolvedValue(new BigNumber(0))
