@@ -15,6 +15,7 @@ CLEAN_ENV="true"
 # VERBOSE_OPTS=""
 ENV=integration
 NAMESPACE=$ENV
+CLEAN_ENV="False"
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 LOGS_DIR=$(mktemp -d -t nightly-XXXX)
