@@ -8,6 +8,9 @@ import { Flags } from '../../utils/command'
 export default class ApproveHotfix extends BaseCommand {
   static description = 'Approve a governance hotfix'
 
+  // Only authorized approvers need to know about this command.
+  static hidden = true
+
   static flags = {
     ...BaseCommand.flags,
     from: Flags.address({ required: true, description: "Approver's address" }),

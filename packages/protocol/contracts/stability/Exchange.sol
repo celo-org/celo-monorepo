@@ -26,6 +26,7 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
   event StableTokenSet(address indexed stable);
   event SpreadSet(uint256 spread);
   event ReserveFractionSet(uint256 reserveFraction);
+  event BucketsUpdated(uint256 goldBucket, uint256 stableBucket);
 
   FixidityLib.Fraction public spread;
 
@@ -133,6 +134,7 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
    * @return The corresponding buyToken amount.
    */
   function getBuyTokenAmount(uint256 sellAmount, bool sellGold) external view returns (uint256) {
+    if (sellAmount == 0) return 0;
     uint256 sellTokenBucket;
     uint256 buyTokenBucket;
     (buyTokenBucket, sellTokenBucket) = getBuyAndSellBuckets(sellGold);
@@ -160,6 +162,7 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
    * @return The corresponding sellToken amount.
    */
   function getSellTokenAmount(uint256 buyAmount, bool sellGold) external view returns (uint256) {
+    if (buyAmount == 0) return 0;
     uint256 sellTokenBucket;
     uint256 buyTokenBucket;
     (buyTokenBucket, sellTokenBucket) = getBuyAndSellBuckets(sellGold);
@@ -303,6 +306,7 @@ contract Exchange is IExchange, Initializable, Ownable, UsingRegistry, Reentranc
       lastBucketUpdate = now;
 
       (goldBucket, stableBucket) = getUpdatedBuckets();
+      emit BucketsUpdated(goldBucket, stableBucket);
     }
   }
 

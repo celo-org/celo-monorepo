@@ -21,7 +21,7 @@
 
 • **metadata**: *[ProposalMetadata](_wrappers_governance_.proposalmetadata.md)*
 
-*Defined in [contractkit/src/wrappers/Governance.ts:79](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L79)*
+*Defined in [contractkit/src/wrappers/Governance.ts:81](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L81)*
 
 ___
 
@@ -29,7 +29,7 @@ ___
 
 • **passing**: *boolean*
 
-*Defined in [contractkit/src/wrappers/Governance.ts:83](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L83)*
+*Defined in [contractkit/src/wrappers/Governance.ts:85](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L85)*
 
 ___
 
@@ -37,7 +37,7 @@ ___
 
 • **proposal**: *[Proposal](../modules/_wrappers_governance_.md#proposal)*
 
-*Defined in [contractkit/src/wrappers/Governance.ts:82](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L82)*
+*Defined in [contractkit/src/wrappers/Governance.ts:84](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L84)*
 
 ___
 
@@ -45,7 +45,7 @@ ___
 
 • **stage**: *[ProposalStage](../enums/_wrappers_governance_.proposalstage.md)*
 
-*Defined in [contractkit/src/wrappers/Governance.ts:78](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L78)*
+*Defined in [contractkit/src/wrappers/Governance.ts:80](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L80)*
 
 ___
 
@@ -53,7 +53,7 @@ ___
 
 • **upvotes**: *BigNumber*
 
-*Defined in [contractkit/src/wrappers/Governance.ts:80](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L80)*
+*Defined in [contractkit/src/wrappers/Governance.ts:82](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L82)*
 
 ___
 
@@ -61,4 +61,4 @@ ___
 
 • **votes**: *[Votes](_wrappers_governance_.votes.md)*
 
-*Defined in [contractkit/src/wrappers/Governance.ts:81](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L81)*
+*Defined in [contractkit/src/wrappers/Governance.ts:83](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L83)*

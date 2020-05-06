@@ -16,7 +16,7 @@ export const pagePaths = {
     link: '/applications',
   },
   BRAND: {
-    name: 'Experience - Brand Kit',
+    name: 'BrandKit',
     link: '/experience/brand',
   },
   BUILD: {
@@ -51,6 +51,10 @@ export const pagePaths = {
     name: 'Privacy Policy',
     link: '/privacy',
   },
+  PAPERS: {
+    name: 'White Papers',
+    link: '/papers',
+  },
   TECH: {
     name: 'Technology',
     link: '/technology',
@@ -62,6 +66,14 @@ export const pagePaths = {
   VALIDATORS_LIST: {
     name: 'Validators List',
     link: '/validators/explore',
+  },
+  VALIDATORS_LIST__BAKLAVA: {
+    name: 'Validators List - Baklava',
+    link: '/validators/explore/baklava',
+  },
+  VALIDATORS_LIST_BAKLAVASTAGING: {
+    name: 'Validators List - Baklavastaging',
+    link: '/validators/explore/baklavastaging',
   },
 }
 
@@ -76,6 +88,7 @@ export const MAIN_MENU = [
 
 // TODO: Temporary link to the master branch documentation for 'sdkDocs' and 'sdkTutorial'
 export enum CeloLinks {
+  audits = '/audits',
   agreement = '/user-agreement',
   faucet = '/developers/faucet',
   iconsLicense = 'https://creativecommons.org/licenses/by-nd/4.0/legalcode',

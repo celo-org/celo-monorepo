@@ -2,9 +2,9 @@
 
 The active validator set is updated by running an election in the final block of each epoch, after processing transactions and [Epoch Rewards](epoch-rewards.md).
 
-## <a name="voting-cap"></a>Group Voting Caps
+## Group Voting Caps
 
-One way to consider the security of a Proof of Stake system is the marginal cost of getting a malicious validator elected. In a steady state, assuming the Celo community set the incentives appropriately, we can assume that a full complement of validators is elected, which means the attack cost is the cost of acquiring sufficient Celo Gold to receive more votes than the currently elected validator with fewest votes, and thereby supplant it.
+One way to consider the security of a proof-of-stake system is the marginal cost of getting a malicious validator elected. In a steady state, assuming the Celo community set the incentives appropriately, a full complement of validators is likely to be elected, which means the attack cost is the cost of acquiring sufficient Celo Gold to receive more votes than the currently elected validator with fewest votes, and thereby supplant it.
 
 As such, the objective of Celo’s validator elections differs from real-world elections: they aim to translate voter preferences into representation while promoting decentralization and creating a moat around existing, well-performing elected validators. Two design choices influence this: a limit on the maximum number of member validator that a group can list, and a **voting cap** on the number of votes that any one group can receive.
 
@@ -14,7 +14,7 @@ The Celo protocol addresses this by enforcing a per-group vote cap. This cap is 
 
 If a group adds a new validator, or the total amount of voting Locked Gold increases, the group’s cap rises and new votes are permitted. If a group removes a validator or a validator chooses to leave, or the total amount of voting Locked Gold falls, then the group’s cap falls: if it has more votes than this new cap, then new votes are no longer permitted, but all existing votes continue to be counted.
 
-The Celo protocol allows an account to divide its vote between up to three groups, since there may be cases where the vote cap prevents an account allocating its entire vote to its first choice group.
+The Celo protocol allows an account to divide its vote between up to ten groups, since there may be cases where the vote cap prevents an account allocating its entire vote to its first choice group.
 
 ## Running the Election
 

@@ -4,6 +4,7 @@ import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
 import BigNumber from 'bignumber.js'
 import { Clipboard, Linking, Platform } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
+import { asyncRandomBytes } from 'react-native-secure-randombytes'
 import SendIntentAndroid from 'react-native-send-intent'
 import SendSMS from 'react-native-sms'
 import { call, delay, put, race, select, spawn, take, takeLeading } from 'redux-saga/effects'
@@ -17,7 +18,7 @@ import { calculateFee } from 'src/fees/saga'
 import { generateShortInviteLink } from 'src/firebase/dynamicLinks'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import i18n from 'src/i18n'
-import { denyImportContacts, setHasSeenVerificationNux } from 'src/identity/actions'
+import { setHasSeenVerificationNux } from 'src/identity/actions'
 import {
   Actions,
   InviteBy,
@@ -142,7 +143,10 @@ export function* sendInvite(
   yield call(getConnectedUnlockedAccount)
   try {
     const contractKit = getContractKit()
-    const temporaryWalletAccount = contractKit.web3.eth.accounts.create()
+    const randomness = yield call(asyncRandomBytes, 64)
+    const temporaryWalletAccount = contractKit.web3.eth.accounts.create(
+      randomness.toString('ascii')
+    )
     const temporaryAddress = temporaryWalletAccount.address
     const inviteCode = createInviteCode(temporaryWalletAccount.privateKey)
 
@@ -174,9 +178,12 @@ export function* sendInvite(
 
     // If this invitation has a payment attached to it, send the payment to the escrow.
     if (currency === CURRENCY_ENUM.DOLLAR && amount) {
+      const escrowTxId = generateStandbyTransactionId(temporaryAddress + '-escrow')
       try {
         const phoneHash = getPhoneHash(e164Number)
-        yield put(transferEscrowedPayment(phoneHash, amount, temporaryAddress))
+        yield put(transferEscrowedPayment(phoneHash, amount, temporaryAddress, escrowTxId))
+        yield call(waitForTransactionWithId, escrowTxId)
+        Logger.debug(TAG + '@sendInviteSaga', 'Escrowed money to new wallet')
       } catch (e) {
         Logger.error(TAG, 'Error sending payment to unverified user: ', e)
         yield put(showError(ErrorMessages.ESCROW_TRANSFER_FAILED))
@@ -294,13 +301,9 @@ export function* doRedeemInvite(inviteCode: string) {
 
 export function* skipInvite() {
   yield take(Actions.SKIP_INVITE)
-  Logger.debug(TAG + '@skipInvite', 'Skip invite action taken')
+  Logger.debug(TAG + '@skipInvite', 'Skip invite action taken, creating account')
   try {
-    Logger.debug(TAG + '@skipInvite', 'Creating new account')
     yield call(getOrCreateAccount)
-    Logger.debug(TAG + '@skipInvite', 'Marking nux flows as complete')
-    // TODO(Rossy): Remove when import screen is removed
-    yield put(denyImportContacts())
     yield put(setHasSeenVerificationNux(true))
     Logger.debug(TAG + '@skipInvite', 'Done skipping invite')
     navigateHome()

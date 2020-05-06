@@ -8,14 +8,13 @@ import { Namespaces } from 'src/i18n'
 import { Recipient } from 'src/recipients/recipient'
 
 interface Props {
-  requesterE164Number: string
   amount: string
-  requesterRecipient: Recipient | null
+  requesterRecipient: Recipient
 }
 
 function PaymentRequestNotificationInner(props: Props & WithTranslation) {
-  const { requesterE164Number, amount, requesterRecipient } = props
-  const displayName = (requesterRecipient && requesterRecipient.displayName) || requesterE164Number
+  const { amount, requesterRecipient } = props
+  const displayName = requesterRecipient.displayName
 
   return (
     <Text numberOfLines={1} ellipsizeMode="middle" style={styles.oneLine}>

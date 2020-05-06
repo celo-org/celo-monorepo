@@ -1,6 +1,7 @@
 import { FellowAppShape } from 'fullstack/Fellowship'
 import * as React from 'react'
 import { StyleSheet } from 'react-native'
+import { ErrorDisplay } from 'src/forms/ErrorDisplay'
 import FormContainer, { emailIsValid, hasField } from 'src/forms/Form'
 import { Form } from 'src/forms/FormComponents'
 import { LabeledInput } from 'src/forms/LabeledInput'
@@ -10,6 +11,7 @@ import { I18nProps, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import { SIZE } from 'src/shared/Button.3'
 import { standardStyles } from 'src/styles'
+
 export class FellowshipForm extends React.Component<I18nProps> {
   render() {
     const { t } = this.props
@@ -96,6 +98,7 @@ export class FellowshipForm extends React.Component<I18nProps> {
                   isShowing={formState.isComplete}
                   message={t('common:applicationSubmitted')}
                 />
+                <ErrorDisplay isShowing={!!formState.apiError} field={formState.apiError} />
               </Cell>
             </GridRow>
           </Form>
