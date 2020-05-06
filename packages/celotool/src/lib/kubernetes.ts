@@ -39,3 +39,22 @@ export async function getRandomTxNodeIP(celoEnv: string) {
   )
   return address
 }
+
+export async function deleteResource(
+  celoEnv: string,
+  type: string,
+  resourceName: string,
+  allowFail: boolean = false
+) {
+  const execFn = allowFail ? execCmd : execCmdWithExitOnFailure
+  const run = () => execFn(`kubectl delete ${type} ${resourceName} --namespace ${celoEnv}`)
+  if (allowFail) {
+    try {
+      return run()
+    } catch (e) {
+      console.info('Error deleting resource, not failing', e)
+      return Promise.resolve()
+    }
+  }
+  return run()
+}

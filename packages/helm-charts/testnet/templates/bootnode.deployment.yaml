@@ -1,12 +1,9 @@
 apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
-  name: {{ template "ethereum.fullname" . }}-bootnode
+  name: {{ template "common.fullname" . }}-bootnode
   labels:
-    app: {{ template "ethereum.name" . }}
-    chart: {{ template "ethereum.chart" . }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
+{{ include "common.standard.labels" .  | indent 4 }}
     component: bootnode
 spec:
   strategy:
@@ -14,23 +11,22 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: {{ template "ethereum.name" . }}
-      release: {{ .Release.Name }}
+{{ include "common.standard.labels" .  | indent 6 }}
       component: bootnode
   template:
     metadata:
       labels:
-        app: {{ template "ethereum.name" . }}
-        release: {{ .Release.Name }}
+{{ include "common.standard.labels" .  | indent 8 }}
         component: bootnode
     spec:
       containers:
       - name: bootnode
         image: {{ .Values.bootnode.image.repository }}:{{ .Values.bootnode.image.tag }}
         imagePullPolicy: {{ .Values.imagePullPolicy }}
-        command: ["/bin/sh"]
+        command:
+        - /bin/sh
+        - -c
         args:
-        - "-c"
         - |
           set -euo pipefail
           NAT_FLAG=""
@@ -42,7 +38,7 @@ spec:
         - name: NETWORK_ID
           valueFrom:
             configMapKeyRef:
-              name: {{ template "ethereum.fullname" . }}-geth-config
+              name: {{ template "common.fullname" . }}-geth-config
               key: networkid
         volumeMounts:
         - name: data
@@ -55,15 +51,17 @@ spec:
       - name: generate-node-key
         image: {{ .Values.celotool.image.repository }}:{{ .Values.celotool.image.tag }}
         imagePullPolicy: {{ .Values.imagePullPolicy }}
-        command: ["/bin/sh"]
+        command:
+        - /bin/sh
+        - -c
         args:
-        - "-c"
-        - "celotooljs.sh generate bip32 --mnemonic \"$MNEMONIC\" --accountType bootnode --index 0 > /etc/bootnode/node.key"
+        - |
+          celotooljs.sh generate bip32 --mnemonic \"$MNEMONIC\" --accountType bootnode --index 0 > /etc/bootnode/node.key
         env:
         - name: MNEMONIC
           valueFrom:
             secretKeyRef:
-              name: {{ template "ethereum.fullname" . }}-geth-account
+              name: {{ template "common.fullname" . }}-geth-account
               key: mnemonic
         volumeMounts:
         - name: data
