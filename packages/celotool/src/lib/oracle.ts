@@ -1,11 +1,46 @@
-import { clusterName, createIdentityIfNotExists, resourceGroup } from 'src/lib/azure'
+import yargs from 'yargs'
+import {
+  AzureClusterConfig,
+  clusterName,
+  createIdentityIfNotExists,
+  resourceGroup,
+  switchToCluster,
+} from 'src/lib/azure'
 import { getFornoUrl } from 'src/lib/endpoints'
-import { envVar, fetchEnv } from 'src/lib/env-utils'
+import { addCeloEnvMiddleware, envVar, fetchEnv } from 'src/lib/env-utils'
 import { installGenericHelmChart, removeGenericHelmChart } from 'src/lib/helm_deploy'
 import { execCmdWithExitOnFailure } from 'src/lib/utils'
 
 const helmChartPath = '../helm-charts/oracle'
 const rbacHelmChartPath = '../helm-charts/oracle-rbac'
+
+/**
+ * Each context can be a different azure subscription/cluster/etc
+ */
+export enum OracleAzureContext {
+  PRIMARY = 'PRIMARY',
+  SECONDARY = 'SECONDARY',
+}
+
+/**
+ * Env vars corresponding to each value for the AzureClusterConfig for a particular context
+ */
+const oracleAzureContextClusterConfigEnvVars: {
+  [key in keyof typeof OracleAzureContext]: { [key in keyof AzureClusterConfig]: string }
+} = {
+  [OracleAzureContext.PRIMARY]: {
+    subscriptionId: envVar.ORACLE_PRIMARY_AZURE_SUBSCRIPTION_ID,
+    tenantId: envVar.ORACLE_PRIMARY_AZURE_TENANT_ID,
+    resourceGroup: envVar.ORACLE_PRIMARY_AZURE_KUBERNETES_RESOURCE_GROUP,
+    clusterName: envVar.ORACLE_PRIMARY_AZURE_KUBERNETES_CLUSTER_NAME,
+  },
+  [OracleAzureContext.SECONDARY]: {
+    subscriptionId: envVar.ORACLE_PRIMARY_AZURE_SUBSCRIPTION_ID,
+    tenantId: envVar.ORACLE_PRIMARY_AZURE_TENANT_ID,
+    resourceGroup: envVar.ORACLE_PRIMARY_AZURE_KUBERNETES_RESOURCE_GROUP,
+    clusterName: envVar.ORACLE_PRIMARY_AZURE_KUBERNETES_CLUSTER_NAME,
+  },
+}
 
 export async function installHelmChart(celoEnv: string) {
   // First install the oracle-rbac helm chart.
@@ -148,4 +183,65 @@ async function rbacAuthTokenName(celoEnv: string) {
     )} -o=jsonpath="{.secrets[0]['name']}"`
   )
   return tokenName.trim()
+}
+
+/**
+ * Fetches the env vars for a particular context
+ * @param context the OracleAzureContext to use
+ * @return an AzureClusterConfig for the context
+ */
+function getAzureClusterConfig(context: OracleAzureContext): AzureClusterConfig {
+  const configEnvVars = oracleAzureContextClusterConfigEnvVars[context]
+  const clusterConfig: AzureClusterConfig = {
+    subscriptionId: '',
+    tenantId: '',
+    resourceGroup: '',
+    clusterName: '',
+  }
+  for (const k of Object.keys(configEnvVars)) {
+    const key = k as keyof AzureClusterConfig
+    clusterConfig[key] = fetchEnv(configEnvVars[key])
+  }
+  return clusterConfig
+}
+
+/**
+ * Given if the desired context is primary, gives the appropriate OracleAzureContext
+ */
+function getOracleAzureContext(primary: boolean): OracleAzureContext {
+  return primary ? OracleAzureContext.PRIMARY : OracleAzureContext.SECONDARY
+}
+
+/**
+ * Switches to an Azure cluster given if the desired context is primary
+ */
+export function switchToAzureContextCluster(primary: boolean, celoEnv: string) {
+  const oracleAzureContext = getOracleAzureContext(primary)
+  const azureClusterConfig = getAzureClusterConfig(oracleAzureContext)
+  return switchToCluster(azureClusterConfig, celoEnv)
+}
+
+export type OracleArgv = {
+  primary: boolean
+  secondary: boolean
+}
+
+export function addOracleMiddleware(argv: yargs.Argv) {
+  return addCeloEnvMiddleware(argv)
+    .option('primary', {
+      description: 'Targets the primary oracle k8s cluster',
+      default: false,
+      type: 'boolean',
+    })
+    .option('secondary', {
+      description: 'Targets the secondary oracle k8s cluster',
+      default: false,
+      type: 'boolean',
+    })
+    .check((argv: OracleArgv) => {
+      if (argv.primary === argv.secondary) {
+        throw Error('Exactly one of `primary` and `secondary` must be true')
+      }
+      return true
+    })
 }

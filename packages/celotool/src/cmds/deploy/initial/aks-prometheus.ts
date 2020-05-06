@@ -1,6 +1,6 @@
 import { InitialArgv } from 'src/cmds/deploy/initial'
 import { installPrometheus } from 'src/lib/aks-prometheus'
-import { switchToClusterFromEnv } from 'src/lib/azure'
+// import { switchToClusterFromEnv } from 'src/lib/azure'
 import yargs from 'yargs'
 
 export const command = 'aks-prometheus'
@@ -12,6 +12,7 @@ export const builder = (argv: yargs.Argv) => {
 }
 
 export const handler = async (argv: InitialArgv) => {
-  await switchToClusterFromEnv(argv.celoEnv)
+  console.log('argv', argv)
+  // await switchToClusterFromEnv(argv.celoEnv)
   await installPrometheus()
 }

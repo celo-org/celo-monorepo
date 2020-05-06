@@ -3,8 +3,16 @@ import { doCheckOrPromptIfStagingOrProduction, envVar, fetchEnv } from './env-ut
 import { installAndEnableMetricsDeps, redeployTiller } from './helm_deploy'
 import { execCmd, execCmdWithExitOnFailure, outputIncludes } from './utils'
 
-// switchToClusterFromEnv configures kubectl to connect to the AKS cluster
-export async function switchToClusterFromEnv(
+export type AzureClusterConfig = {
+  tenantId: string
+  resourceGroup: string
+  clusterName: string
+  subscriptionId: string
+}
+
+// switchToCluster configures kubectl to connect to the AKS cluster
+export async function switchToCluster(
+  clusterConfig: AzureClusterConfig,
   celoEnv: string,
   checkOrPromptIfStagingOrProduction = true
 ) {
@@ -13,15 +21,14 @@ export async function switchToClusterFromEnv(
   }
 
   // Azure subscription switch
-  const tenantId = fetchEnv(envVar.AZURE_TENANT_ID)
   let currentTenantId = null
   try {
     ;[currentTenantId] = await execCmd('az account show --query tenantId -o tsv')
   } catch (error) {
     console.info('No azure account subscription currently set')
   }
-  if (currentTenantId === null || currentTenantId.trim() !== tenantId) {
-    await execCmdWithExitOnFailure(`az account set --subscription ${tenantId}`)
+  if (currentTenantId === null || currentTenantId.trim() !== clusterConfig.tenantId) {
+    await execCmdWithExitOnFailure(`az account set --subscription ${clusterConfig.tenantId}`)
   }
 
   let currentCluster = null
@@ -36,7 +43,7 @@ export async function switchToClusterFromEnv(
     // a warning and prompt is shown asking if the existing context should be
     // overwritten. To avoid this, --overwrite-existing force overwrites.
     await execCmdWithExitOnFailure(
-      `az aks get-credentials --resource-group ${resourceGroup()} --name ${clusterName()} --subscription ${subscriptionId()} --overwrite-existing`
+      `az aks get-credentials --resource-group ${clusterConfig.resourceGroup} --name ${clusterConfig.clusterName} --subscription ${clusterConfig.subscriptionId} --overwrite-existing`
     )
   }
   await setupCluster(celoEnv)
