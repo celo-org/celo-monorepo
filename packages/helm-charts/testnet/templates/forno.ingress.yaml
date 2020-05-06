@@ -3,11 +3,8 @@ kind: Ingress
 metadata:
   name: {{ .Release.Namespace }}-forno-ingress
   labels:
-    app: forno
-    chart: testnet
-    release: {{ .Release.Namespace }}
-    heritage: forno
-    component: forno-web-ingress
+{{ include "common.standard.labels" .  | indent 4 }}
+    component: forno
   annotations:
     kubernetes.io/tls-acme: "true"
 spec:

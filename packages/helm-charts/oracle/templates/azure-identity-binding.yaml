@@ -4,7 +4,7 @@ kind: AzureIdentityBinding
 metadata:
   name: {{ template "azure-identity-binding-name" (dict "dot" $ "index" $index) }}
 spec:
-  AzureIdentity: {{ template "azure-identity-name" (dict "dot" $ "index" $index) }}
-  Selector: {{ template "azure-identity-binding-name" (dict "dot" $ "index" $index) }}
+  azureIdentity: {{ template "azure-identity-name" (dict "dot" $ "index" $index) }}
+  selector: {{ template "azure-identity-binding-name" (dict "dot" $ "index" $index) }}
 ---
 {{ end }}
