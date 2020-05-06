@@ -122,7 +122,7 @@ celocli account:list --useLedger --ledgerCustomAddresses "[M, N]"
 {% endhint %}
 
 {% hint style="tip" %}
-**Advanced:** Celo uses a [BIP-32](https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki) derivation path of `m/44'/52752'/0/0/index`, where `index >= 0`.  
+**Advanced:** Celo uses a [BIP-32](https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki) derivation path of `m/44'/52752'/0'/0/index`, where `index >= 0`.  
 {% endhint %}
 
 ## Performing a Test transaction
