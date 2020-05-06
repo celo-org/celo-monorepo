@@ -32,6 +32,12 @@ to execute transactions, check details of past transactions or query account bal
 key safekeeping. For the Celo Camp 2020 we have developed a prototype version of our product that integrates the Celo blockchain. 
 The [demo project](https://github.com/adrianmitter/celo-camp) presents the new features and provides some code snippets to get started. 
 
+### Celo Toolkit by MugglePay
+
+[MugglePay](https://mugglepay.com/) provides a payment SDK for merchants to accept cryptocurrencies. Mugglepay makes crypto payment easy and thousands of merchants are onboarded with MugglePay SDK. For the Celo Camp 2020, we will integrate with cUSD/cGLD for payments on Celo blockchain.
+
+[Celo Toolkit](https://celo.mugglepay.com) is the [open source](https://github.com/MugglePay/celo-toolkit) interface for managing Celo accounts on Web. Celo developer might start with a funded Celo account (Testnet) now in 1 minute. Phone number or app downloads are not necessary.
+
 ## Add your app to this list!
 
 _Are you building on Celo? To add your project, please submit a pull request updating this page!_
