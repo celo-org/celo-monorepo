@@ -2,7 +2,7 @@ import BigNumber from 'bignumber.js'
 import fetch from 'node-fetch'
 import { BLOCKSCOUT_API } from '../config'
 import { getLastBlockNotified, sendPaymentNotification, setLastBlockNotified } from '../firebase'
-import { getTokenAddresses, removeEmptyValuesFromObject } from '../util/utils'
+import { flat, getTokenAddresses, removeEmptyValuesFromObject } from '../util/utils'
 import { Log, Response, Transfer } from './blockscout'
 import { decodeLogs } from './decode'
 
@@ -48,30 +48,34 @@ async function getLatestTokenTransfers(
 
   console.debug('New logs found for token:', tokenAddress, response.result.length)
   const { transfers, latestBlock } = decodeLogs(response.result)
-  for (const transfer of transfers.values()) {
-    transfer.currency = currency
+  for (const txTransfers of transfers.values()) {
+    txTransfers.forEach((t) => (t.currency = currency))
   }
   return { transfers, latestBlock }
 }
 
 export function filterAndJoinTransfers(
-  goldTransfers: Map<string, Transfer> | null,
-  stableTransfers: Map<string, Transfer> | null
+  goldTransfers: Map<string, Transfer[]> | null,
+  stableTransfers: Map<string, Transfer[]> | null
 ): Transfer[] {
   if (!goldTransfers && !stableTransfers) {
     return []
   }
   if (!goldTransfers) {
     // @ts-ignore checked above
-    return [...stableTransfers.values()]
+    return flat([...stableTransfers.values()])
   }
   if (!stableTransfers) {
-    return [...goldTransfers.values()]
+    return flat([...goldTransfers.values()])
   }
 
   // Exclude transaction found in both maps as those are from exchanges
-  const filteredGold = [...goldTransfers.values()].filter((t) => !stableTransfers.has(t.txHash))
-  const filterdStable = [...stableTransfers.values()].filter((t) => !goldTransfers.has(t.txHash))
+  const filteredGold = flat([...goldTransfers.values()]).filter(
+    (t) => !stableTransfers.has(t.txHash)
+  )
+  const filterdStable = flat([...stableTransfers.values()]).filter(
+    (t) => !goldTransfers.has(t.txHash)
+  )
   return filteredGold.concat(filterdStable)
 }
 
