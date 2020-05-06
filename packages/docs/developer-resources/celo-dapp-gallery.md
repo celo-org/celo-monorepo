@@ -34,7 +34,7 @@ The [demo project](https://github.com/adrianmitter/celo-camp) presents the new f
 
 ### impactMarket
 
-impactMarket enables any vulnerable community to create its own unconditional basic income system for their beneficiaries, where each one can claim a fixed amount on a regular basis and make payments for free.
+[impactMarket](https://github.com/impactMarket) enables any vulnerable community to create its own unconditional basic income system for their beneficiaries, where each one can claim a fixed amount on a regular basis and make payments for free.
 
 ## Add your app to this list!
 
