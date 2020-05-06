@@ -44,3 +44,15 @@ See documentation on the [config](./config.md) module for information about how 
 {% endhint %}
 
 {% embed url="https://www.npmjs.com/package/@celo/celocli" %}
+
+### Plugins
+
+Additional plugins can be installed which make the CLI experience smoother.
+
+The autocomplete plugin adds an interactive autocomplete for `bash` and `zsh` shells. To enable the autocomplete plugin, follow the instructions provided at:
+
+```text
+celocli autocomplete
+```
+
+The update warning plugin notifies the user if they are using an oudated version of the CLI. This plugin is enabled by default.
