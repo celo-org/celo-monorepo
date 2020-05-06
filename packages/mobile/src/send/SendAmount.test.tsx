@@ -9,7 +9,7 @@ import { fetchPhoneAddresses } from 'src/identity/actions'
 import { LocalCurrencyCode } from 'src/localCurrency/consts'
 import SendAmount, { SendAmount as SendAmountClass } from 'src/send/SendAmount'
 import { createMockStore, getMockI18nProps } from 'test/utils'
-import { mockAccount2, mockE164Number2, mockNavigation } from 'test/values'
+import { mockE164NumberToAddress, mockNavigation } from 'test/values'
 
 const AMOUNT_ZERO = '0.00'
 const AMOUNT_VALID = '4.93'
@@ -69,7 +69,7 @@ describe('SendAmount', () => {
             fetchPhoneAddresses={fetchPhoneAddresses}
             dollarBalance={'1'}
             estimateFeeDollars={new BigNumber(1)}
-            e164NumberToAddress={{ [mockE164Number2]: mockAccount2 }}
+            e164NumberToAddress={mockE164NumberToAddress}
             defaultCountryCode={'+1'}
             feeType={FeeType.SEND}
             localCurrencyCode={LocalCurrencyCode.MXN}

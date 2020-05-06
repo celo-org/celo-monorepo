@@ -161,7 +161,7 @@ jobs:
             yarn build --scope @celo/utils
             yarn build --scope @celo/protocol
             yarn build --ignore @celo/protocol --ignore docs
-                
+
       - run:
           name: Check licenses
           command: |
@@ -260,7 +260,6 @@ jobs:
             # fi
             yarn || yarn 
             yarn build || yarn build
-            yarn run jetify
       - save_cache:
           key: yarn-v4-macos-{{ .Branch }}-{{ checksum "yarn.lock" }}
           paths:
@@ -455,22 +454,6 @@ jobs:
       - run:
           name: Upload to CodeCov
           command: yarn codecov -F web
-
-  mobile-test-build-app:
-    <<: *android-defaults
-    resource_class: large
-
-    steps:
-      - attach_workspace:
-          at: ~/app
-      - run:
-          name: Build Android app (debug version)
-          command: |
-            set -euo pipefail
-            yarn run jetify
-            cd packages/mobile/android
-            ENVFILE=.env.test ./gradlew assembleDebug
-            cd -
 
   mobile-test:
     <<: *defaults
@@ -813,7 +796,7 @@ jobs:
       - run:
           name: Minor test of celocli
           command: ./node_modules/.bin/celocli account:new # Small test
-          
+
   phone-number-privacy-test:
     <<: *defaults
     steps:
@@ -843,9 +826,6 @@ workflows:
       - mobile-test:
           requires:
             - lint-checks
-      - mobile-test-build-app:
-          requires:
-            - mobile-test
       - end-to-end-mobile-test-ios
       - verification-pool-api:
           requires:
@@ -919,4 +899,3 @@ workflows:
       - protocol-test-with-code-coverage:
           requires:
             - lint-checks
-            

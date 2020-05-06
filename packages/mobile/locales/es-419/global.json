@@ -114,5 +114,8 @@
     "30d": "30 dias"
   },
   "message": "Mensaje",
-  "paymentLimitReached": "El límite diario es {{dailyLimitcUSD}}CUSD ({{currencySymbol}}{{dailyLimit}})\n{{dailyRemainingcUSD}}CUSD ({{currencySymbol}}{{dailyRemaining}}) restante"
+  "addressLookupFailure": "Error al buscar la dirección del número de teléfono",
+  "saltFetchFailure": "Error al recuperar el secreto del número de teléfono",
+  "saltQuotaExceededError": "Su cuota de búsqueda de número de teléfono está agotada",
+  "paymentLimitReached": "El límite diario es {{dailyLimitcUSD}}CUSD ({{currencySymbol}}{{dailyLimit}})\n{{dailyRemainingcUSD}}CUSD ({{currencySymbol}}{{dailyRemaining}}) restante",
 }

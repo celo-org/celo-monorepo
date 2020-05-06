@@ -3,6 +3,7 @@ import {
   getDisplayPhoneNumber,
   getE164Number,
   getExampleNumber,
+  getPhoneHash,
   getRegionCode,
   getRegionCodeFromCountryCode,
   isE164Number,
@@ -41,9 +42,31 @@ const TEST_PHONE_NUMBERS = {
   DISPLAY_LR: '88 155 1952',
   INVALID_EMPTY: '',
   TOO_SHORT: '123',
+  VALID_E164: '+141555544444',
 }
 
 describe('Phone number formatting and utilities', () => {
+  describe('Phone hashing', () => {
+    it('Hashes an valid number without a salt', () => {
+      expect(getPhoneHash(TEST_PHONE_NUMBERS.VALID_E164)).toBe(
+        '0x4465dd287f82f531502bb84201231dac162cbc2077abf455a5a87f9738c0337d'
+      )
+    })
+    it('Hashes an valid number with a salt', () => {
+      expect(getPhoneHash(TEST_PHONE_NUMBERS.VALID_E164, 'abcdefg')).toBe(
+        '0xfe2835a235ffb2f98dcf259a710dc23751af20bf1a0284829a0cde0c720c3595'
+      )
+    })
+    it('Throws for an invalid number', () => {
+      try {
+        getPhoneHash(TEST_PHONE_NUMBERS.VALID_US_1)
+        fail('expected an error')
+      } catch (error) {
+        // Error expected
+      }
+    })
+  })
+
   describe('E164 formatting', () => {
     it('Invalid empty', () => {
       expect(getE164Number(TEST_PHONE_NUMBERS.INVALID_EMPTY, COUNTRY_CODES.US)).toBe(null)

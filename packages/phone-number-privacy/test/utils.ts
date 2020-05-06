@@ -1,8 +1,15 @@
+import BigNumber from 'bignumber.js'
 import Web3 from 'web3'
 
 export function createMockAttestation(completed: number, total: number) {
   return {
     getAttestationStat: jest.fn(() => ({ completed, total })),
+  }
+}
+
+export function createMockStableToken(balance: BigNumber) {
+  return {
+    balanceOf: jest.fn(() => balance),
   }
 }
 
@@ -26,6 +33,7 @@ export function createMockContractKit(
 
 export enum ContractRetrieval {
   getAttestations = 'getAttestations',
+  getStableToken = 'getStableToken',
 }
 
 export function createMockWeb3(txCount: number) {

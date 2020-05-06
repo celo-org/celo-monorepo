@@ -12,6 +12,7 @@ import { mockAccount2 } from 'test/values'
 
 const hasPermissionMock = jest.fn(() => null)
 const requestPermissionMock = jest.fn(() => null)
+const registerDeviceForRemoteMessagesMock = jest.fn(() => null)
 const getTokenMock = jest.fn(() => null)
 const onTokenRefreshMock = jest.fn(() => null)
 const onMessageMock = jest.fn(() => null)
@@ -26,6 +27,7 @@ const app: any = {
   messaging: () => ({
     hasPermission: hasPermissionMock,
     requestPermission: requestPermissionMock,
+    registerDeviceForRemoteMessages: registerDeviceForRemoteMessagesMock,
     getToken: getTokenMock,
     onTokenRefresh: onTokenRefreshMock,
     setBackgroundMessageHandler,

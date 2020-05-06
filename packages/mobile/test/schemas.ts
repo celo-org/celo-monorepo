@@ -25,8 +25,6 @@ export const vNeg1Schema = {
   },
   send: {
     isSending: false,
-    recentPhoneNumbers: undefined,
-    recipientCache: undefined,
     recentRecipients: [],
     recentPayments: [],
   },
@@ -77,6 +75,7 @@ export const vNeg1Schema = {
     verificationFailed: false,
     addressToE164Number: {},
     e164NumberToAddress: {},
+    e164NumberToSalt: {},
     startedVerification: false,
     askedContactsPermission: false,
     isLoadingImportContacts: false,

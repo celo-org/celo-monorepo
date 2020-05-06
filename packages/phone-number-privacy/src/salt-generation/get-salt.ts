@@ -1,6 +1,6 @@
 import { isValidAddress } from '@celo/utils/lib/address'
 import { Request, Response } from 'firebase-functions'
-import { BLSCryptographyClient } from '../../src/bls/bls-cryptography-client'
+import { BLSCryptographyClient } from '../bls/bls-cryptography-client'
 import { ErrorMessages, respondWithError } from '../common/error-utils'
 import { authenticateUser } from '../common/identity'
 import logger from '../common/logger'
@@ -34,20 +34,11 @@ export async function handleGetBlindedMessageForSalt(request: Request, response:
 }
 
 function isValidGetSignatureInput(requestBody: any): boolean {
-  return (
-    hasValidAccountParam(requestBody) &&
-    hasValidPhoneNumberParam(requestBody) &&
-    hasValidQueryPhoneNumberParam(requestBody)
-  )
+  return hasValidAccountParam(requestBody) && hasValidQueryPhoneNumberParam(requestBody)
 }
 
 function hasValidAccountParam(requestBody: any): boolean {
   return requestBody.account && isValidAddress(requestBody.account)
-}
-
-// TODO (amyslawson) make this param optional for user's first request prior to attestation
-function hasValidPhoneNumberParam(requestBody: any): boolean {
-  return requestBody.hashedPhoneNumber
 }
 
 function hasValidQueryPhoneNumberParam(requestBody: any): boolean {

@@ -67,6 +67,10 @@
 		<string>Hind-Medium.ttf</string>
 		<string>Hind-Regular.ttf</string>
 		<string>Hind-SemiBold.ttf</string>
+
+		<string>Inter-Medium.ttf</string>
+		<string>Inter-Regular.ttf</string>
+		<string>Inter-SemiBold.ttf</string>
 	</array>
 	<key>UIBackgroundModes</key>
 	<array>

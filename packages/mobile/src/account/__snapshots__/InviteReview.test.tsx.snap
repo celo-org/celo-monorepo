@@ -408,7 +408,6 @@ exports[`InviteReview renders correctly 1`] = `
                         "top": 10,
                       }
                     }
-                    isTVSelectable={true}
                     nativeBackgroundAndroid={
                       Object {
                         "attribute": "selectableItemBackgroundBorderless",
@@ -669,7 +668,6 @@ exports[`InviteReview renders correctly 1`] = `
         <View
           accessible={true}
           focusable={true}
-          isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
@@ -769,7 +767,6 @@ exports[`InviteReview renders correctly 1`] = `
         <View
           accessible={true}
           focusable={true}
-          isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
@@ -870,7 +867,6 @@ exports[`InviteReview renders correctly 1`] = `
         <View
           accessible={true}
           focusable={true}
-          isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
