@@ -201,9 +201,10 @@ function* getAddresses(e164Number: string, attestationsWrapper: AttestationsWrap
   Logger.debug(TAG + '@getAddresses', `Received phone hash: ${phoneHash}`)
 
   // Map of identifier -> (Map of address -> AttestationStat)
-  const results: IdentifierLookupResult = yield call(attestationsWrapper.lookupIdentifiers, [
-    phoneHash,
-  ])
+  const results: IdentifierLookupResult = yield call(
+    [attestationsWrapper, attestationsWrapper.lookupIdentifiers],
+    [phoneHash]
+  )
 
   if (!results || !results[phoneHash]) {
     return null

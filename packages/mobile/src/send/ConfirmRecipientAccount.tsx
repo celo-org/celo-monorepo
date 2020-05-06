@@ -19,6 +19,7 @@ import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import { headerWithBackButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { Recipient } from 'src/recipients/recipient'
 import { RootState } from 'src/redux/reducers'
 import { validateRecipientAddress } from 'src/send/actions'
 
@@ -29,7 +30,7 @@ interface OwnProps {
 }
 
 interface StateProps {
-  displayName: string
+  recipient: Recipient
   fullValidationRequired: boolean
   isValidRecipient: boolean
   isValidatingRecipient: boolean
@@ -51,7 +52,7 @@ const mapDispatchToProps = {
 const mapStateToProps = (state: RootState, ownProps: NavigationInjectedProps): StateProps => {
   const { navigation } = ownProps
   return {
-    displayName: navigation.getParam('displayName'),
+    recipient: navigation.getParam('recipient'),
     fullValidationRequired: navigation.getParam('fullValidationRequired'),
     isValidRecipient: state.send.isValidRecipient,
     isValidatingRecipient: state.send.isValidatingRecipient,
@@ -79,7 +80,8 @@ export class ConfirmRecipientAccount extends React.Component<Props, State> {
   }
 
   onPressContinue = () => {
-    this.props.validateRecipientAddress(this.state.inputValue, this.props.fullValidationRequired)
+    const { recipient, fullValidationRequired } = this.props
+    this.props.validateRecipientAddress(this.state.inputValue, fullValidationRequired, recipient)
   }
 
   onInputChange = (value: string) => {
@@ -93,8 +95,9 @@ export class ConfirmRecipientAccount extends React.Component<Props, State> {
   shouldShowClipboard = () => false
 
   renderInstructionsAndInputField = () => {
-    const { t, displayName, fullValidationRequired } = this.props
+    const { t, recipient, fullValidationRequired } = this.props
     const { inputValue } = this.state
+    const { displayName } = recipient
     const codeStatus = CodeRowStatus.INPUTTING
 
     if (fullValidationRequired) {
@@ -175,7 +178,8 @@ export class ConfirmRecipientAccount extends React.Component<Props, State> {
   }
 
   render() {
-    const { t, displayName } = this.props
+    const { t, recipient } = this.props
+    const { displayName } = recipient
 
     return (
       <SafeAreaView style={styles.container}>
