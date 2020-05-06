@@ -1,5 +1,6 @@
 import networkConfig from 'src/geth/networkConfig'
 import { getRehydratePayload, REHYDRATE, RehydrateAction } from 'src/redux/persist-helper'
+import { RootState } from 'src/redux/reducers'
 import { Actions, ActionTypes, Web3SyncProgress } from 'src/web3/actions'
 
 export interface State {
@@ -91,3 +92,5 @@ export const reducer = (
       return state
   }
 }
+
+export const userAddressSelector = (state: RootState) => state.web3.account

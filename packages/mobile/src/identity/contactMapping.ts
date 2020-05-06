@@ -30,6 +30,7 @@ import { getAllContacts } from 'src/utils/contacts'
 import Logger from 'src/utils/Logger'
 import { checkContactsPermission } from 'src/utils/permissions'
 import { getContractKit } from 'src/web3/contracts'
+import { userAddressSelector } from 'src/web3/reducer'
 import { getConnectedAccount } from 'src/web3/saga'
 
 const TAG = 'identity/contactMapping'
@@ -101,8 +102,8 @@ function* updateRecipientsCache(
   yield put(setRecipientCache({ ...e164NumberToRecipients, ...otherRecipients }))
 }
 
-// Given addresses can be added and deleted (so length can remain equal despite changes), must do a
-// deep equality check. not sure if order is guaranteed to be consistent so not assuming it
+// Given addresses can be added and deleted we can't rely on changes in length to signal address changes
+// Not sure if order is guaranteed to be consistent so not assuming it
 const checkIfItemsOfChildArrAreSubsetOfParentArr = (parentArr: string[], childArr: string[]) => {
   const parentArrSorted = parentArr.sort()
   const childArrSorted = childArr.sort()
@@ -118,14 +119,14 @@ const checkIfItemsOfChildArrAreSubsetOfParentArr = (parentArr: string[], childAr
 
 const checkIfValidationNeeded = (
   oldAddresses: string[] | null | undefined,
-  newAddresses: string[] | null | undefined
+  newAddresses: string[]
 ) => {
-  // if address is unverified or there is only one address available, no verification needed
-  if (!newAddresses || newAddresses.length < 2) {
+  // if there are no addresses or only one, no verification needed
+  if (newAddresses.length < 2) {
     return false
   }
 
-  // if there are stored addresses and no new addresses have been added, no verification needed
+  // if there are previously stored addresses and no new addresses have been added, no verification needed
   if (oldAddresses && checkIfItemsOfChildArrAreSubsetOfParentArr(oldAddresses, newAddresses)) {
     return false
   }
@@ -134,14 +135,23 @@ const checkIfValidationNeeded = (
   return true
 }
 
+const checkIfLast4DigitsAreUnique = (addressArr: string[]) => {
+  const last4DigitArr = addressArr.map((address) => address.slice(-4))
+  const last4DigitSet = new Set(...last4DigitArr)
+  return last4DigitArr.length === last4DigitSet.size
+}
+
 export function* fetchPhoneAddresses({ e164Number }: FetchPhoneAddressesAction) {
   try {
     Logger.debug(TAG + '@fetchPhoneAddresses', `Fetching addresses for number`)
     const oldE164NumberToAddress = yield select(e164NumberToAddressSelector)
     const oldAddresses = oldE164NumberToAddress[e164Number]
+      ? [...oldE164NumberToAddress[e164Number]]
+      : oldE164NumberToAddress[e164Number]
 
     // Clear existing entries for those numbers so our mapping consumers
     // know new status is pending.
+    Logger.debug(TAG + '@fetchPhoneAddresses', `Wiping current address mappings`)
     yield put(updateE164PhoneNumberAddresses({ [e164Number]: undefined }, {}))
 
     const contractKit = yield call(getContractKit)
@@ -150,6 +160,7 @@ export function* fetchPhoneAddresses({ e164Number }: FetchPhoneAddressesAction) 
       contractKit.contracts.getAttestations,
     ])
 
+    Logger.debug(TAG + '@fetchPhoneAddresses', `Getting new addresses for ${e164Number}`)
     const addresses: string[] | null = yield call(getAddresses, e164Number, attestationsWrapper)
 
     const e164NumberToAddressUpdates: E164NumberToAddressType = {}
@@ -165,8 +176,15 @@ export function* fetchPhoneAddresses({ e164Number }: FetchPhoneAddressesAction) 
       addresses.map((a) => (addressToE164NumberUpdates[a] = e164Number))
     }
 
-    if (checkIfValidationNeeded(oldAddresses, addresses)) {
-      yield put(manualAddressValidationRequired())
+    if (addresses && checkIfValidationNeeded(oldAddresses, addresses)) {
+      Logger.debug(TAG + '@fetchPhoneAddresses', `Address needs to be validated by user`)
+      const userAddress = yield select(userAddressSelector)
+      // Adding user's own address into the mix to make sure they don't mistakenly try to verify with their own
+      const fullValidationRequired: boolean = !checkIfLast4DigitsAreUnique([
+        userAddress,
+        ...addresses,
+      ])
+      yield put(manualAddressValidationRequired(fullValidationRequired))
     }
 
     yield put(

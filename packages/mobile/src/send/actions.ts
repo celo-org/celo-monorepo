@@ -33,8 +33,8 @@ export interface SendPaymentOrInviteAction {
   amount: BigNumber
   reason: string
   recipient: Recipient
-  recipientAddress?: string | null
-  inviteMethod?: InviteBy
+  recipientAddress: string | null | undefined
+  inviteMethod?: InviteBy | undefined
   firebasePendingRequestUid: string | null | undefined
 }
 
@@ -62,6 +62,7 @@ export interface ValidateRecipientAddressFailureAction {
 
 export interface ManualAddressValidationRequiredAction {
   type: Actions.MANUAL_ADDRESS_VALIDATION_REQUIRED
+  fullValidationRequired: boolean
 }
 
 export type ActionTypes =
@@ -132,6 +133,9 @@ export const validateRecipientAddressFailure = (): ValidateRecipientAddressFailu
   type: Actions.VALIDATE_RECIPIENT_ADDRESS_FAILURE,
 })
 
-export const manualAddressValidationRequired = (): ManualAddressValidationRequiredAction => ({
+export const manualAddressValidationRequired = (
+  fullValidationRequired: boolean
+): ManualAddressValidationRequiredAction => ({
   type: Actions.MANUAL_ADDRESS_VALIDATION_REQUIRED,
+  fullValidationRequired,
 })
