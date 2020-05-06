@@ -29,8 +29,7 @@
   },
   "devDependencies": {
     "@types/uuid": "^7.0.3",
-    "firebase-functions-test": "^0.2.0",
-    "query-string": "^6.12.1"
+    "firebase-functions-test": "^0.2.0"
   },
   "engines": {
     "node": "10"
