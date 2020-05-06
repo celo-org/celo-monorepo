@@ -48,7 +48,7 @@ export function CeloGoldOverview({ t, testID }: Props) {
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: variables.contentPadding,
-    paddingBottom: 20,
+    marginVertical: 28,
   },
   title: {
     fontSize: 18,

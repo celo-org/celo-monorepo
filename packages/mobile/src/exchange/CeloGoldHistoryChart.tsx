@@ -1,5 +1,5 @@
-import colors from '@celo/react-components/styles/colors'
-import fontStyles from '@celo/react-components/styles/fonts'
+import colors from '@celo/react-components/styles/colors.v2'
+import fontStyles from '@celo/react-components/styles/fonts.v2'
 import variables from '@celo/react-components/styles/variables'
 import BigNumber from 'bignumber.js'
 import _ from 'lodash'
@@ -20,7 +20,7 @@ import { formatFeedDate } from 'src/utils/time'
 import { VictoryGroup, VictoryLine, VictoryScatter } from 'victory-native'
 
 const CHART_POINTS_NUMBER = 60
-const CHART_WIDTH = variables.width - variables.contentPadding * 2
+const CHART_WIDTH = variables.width
 const CHART_HEIGHT = 180
 const CHART_MIN_VERTICAL_RANGE = 0.1 // one cent
 const CHART_DOMAIN_PADDING = { y: [30, 30] as [number, number], x: [5, 5] as [number, number] }
@@ -54,6 +54,7 @@ function ChartAwareSvgText({
     y = y + 25
   }
   const [adjustedX, setAdjustedX] = useState(x)
+  const horizontalOffset = 16
   const onLayout = useCallback(
     ({
       nativeEvent: {
@@ -61,11 +62,11 @@ function ChartAwareSvgText({
       },
     }: LayoutChangeEvent) => {
       if (Math.abs(width - chartWidth) > 2) {
-        if (x - width / 2 < 0) {
-          setAdjustedX(width / 2)
+        if (x - width / 2 - horizontalOffset < 0) {
+          setAdjustedX(width / 2 + horizontalOffset)
         }
-        if (x + width / 2 > chartWidth) {
-          setAdjustedX(chartWidth - width / 2)
+        if (x + width / 2 + horizontalOffset > chartWidth) {
+          setAdjustedX(chartWidth - width / 2 - horizontalOffset)
         }
       }
     },
@@ -73,14 +74,22 @@ function ChartAwareSvgText({
   )
   return (
     // @ts-ignore
-    <SvgText onLayout={onLayout} fill="black" fontSize="14" x={adjustedX} y={y} textAnchor="middle">
+    <SvgText
+      onLayout={onLayout}
+      fill={colors.gray4}
+      fontSize="14"
+      x={adjustedX}
+      y={y}
+      textAnchor="middle"
+    >
       {value}
     </SvgText>
   )
 }
 
 function renderPointOnChart(
-  chartData: Array<{ amount: number | BigNumber; displayValue: string }>
+  chartData: Array<{ amount: number | BigNumber; displayValue: string }>,
+  chartWidth: number
 ) {
   let lowestRateIdx = 0,
     highestRateIdx = 0
@@ -94,41 +103,60 @@ function renderPointOnChart(
   })
   return ({ datum, x, y }: { x: number; y: number; datum: { _x: number; _y: number } }) => {
     const idx = datum._x
+    const result = []
     switch (idx) {
-      case chartData.length - 1:
-        return (
-          <G key={idx}>
-            <Circle cx={x} cy={y} r="5" fill={'black'} />
-            <Line x1={0} y1={y} x2={x} y2={y} stroke={colors.listBorder} strokeWidth="1" />
+      case 0:
+        result.push(
+          <G key={idx + 'dot'}>
+            <Line x1={0} y1={y} x2={chartWidth} y2={y} stroke={colors.gray2} strokeWidth="1" />
+            <Circle cx={x} cy={y} r="5" fill={colors.goldUI} />
           </G>
         )
+        break
 
+      case chartData.length - 1:
+        result.push(
+          <G key={idx + 'dot'}>
+            <Circle cx={x} cy={y} r="5" fill={colors.goldUI} />
+          </G>
+        )
+        break
+    }
+    switch (idx) {
       case highestRateIdx:
-        return (
+        result.push(
           <ChartAwareSvgText
             x={x}
             y={y}
             key={idx}
             value={chartData[highestRateIdx].displayValue}
             position={'top'}
-            chartWidth={CHART_WIDTH}
+            chartWidth={chartWidth}
           />
         )
+        break
 
       case lowestRateIdx:
-        return (
+        result.push(
           <ChartAwareSvgText
             x={x}
             y={y}
             key={idx}
             value={chartData[lowestRateIdx].displayValue}
             position={'bottom'}
-            chartWidth={CHART_WIDTH}
+            chartWidth={chartWidth}
           />
         )
+        break
+    }
 
-      default:
+    switch (result.length) {
+      case 0:
         return null
+      case 1:
+        return result[0]
+      default:
+        return <>{result}</>
     }
   }
 }
@@ -197,13 +225,17 @@ function CeloGoldHistoryChart({ t, testID, i18n }: Props) {
   // We need displayValue to show min/max on the chart. In case the
   // current value is min/max we do not need to show it once again,
   // therefor displayValue = ''
-  chartData.push({ amount: currentGoldRateInLocalCurrency.toNumber(), displayValue: '' })
+  chartData.push({
+    amount: currentGoldRateInLocalCurrency.toNumber(),
+    displayValue: displayLocalCurrency(currentGoldRateInLocalCurrency),
+  })
+  // chartData[0].amount += 2
   const rateChange = currentGoldRateInLocalCurrency.minus(oldestGoldRateInLocalCurrency)
   const rateChangeInPercentage = currentGoldRateInLocalCurrency
     .div(oldestGoldRateInLocalCurrency)
     .minus(1)
     .multipliedBy(100)
-  const RenderPoint = renderPointOnChart(chartData)
+  const RenderPoint = renderPointOnChart(chartData, CHART_WIDTH)
 
   const values = chartData.map((el) => el.amount)
   const min = Math.min(...values)
@@ -230,21 +262,25 @@ function CeloGoldHistoryChart({ t, testID, i18n }: Props) {
             {displayLocalCurrency(currentGoldRateInLocalCurrency)}
           </Text>
           <Text style={rateWentUp ? styles.goldPriceWentUp : styles.goldPriceWentDown}>
-            {rateWentUp ? '▴' : '▾'} {rateChange.toFormat(2)} ({rateChangeInPercentage.toFormat(2)}
-            %)
+            {rateWentUp ? '▴' : '▾'} {rateChangeInPercentage.toFormat(2)}%
           </Text>
         </View>
       </View>
       <VictoryGroup
         domainPadding={CHART_DOMAIN_PADDING}
         singleQuadrantDomainPadding={false}
-        padding={{ left: 0 }}
+        padding={{ left: variables.contentPadding, right: variables.contentPadding }}
         width={CHART_WIDTH}
         height={CHART_HEIGHT}
         data={chartData.map((el) => el.amount)}
         domain={domain}
       >
-        <VictoryLine interpolation="monotoneX" />
+        <VictoryLine
+          interpolation="monotoneX"
+          style={{
+            data: { stroke: colors.goldUI },
+          }}
+        />
         {/* 
         // @ts-ignore */}
         <VictoryScatter dataComponent={<RenderPoint />} />
@@ -261,35 +297,31 @@ function CeloGoldHistoryChart({ t, testID, i18n }: Props) {
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: variables.contentPadding,
+    marginBottom: 0,
   },
   goldPrice: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingTop: variables.contentPadding,
-    paddingBottom: variables.contentPadding,
+    padding: variables.contentPadding,
   },
   goldPriceTitle: {
-    ...fontStyles.body,
-    fontSize: 20,
-    lineHeight: 28,
+    ...fontStyles.h2,
+    marginBottom: 8,
   },
-  goldPriceValues: { alignItems: 'flex-end' },
+  goldPriceValues: { flexDirection: 'row', alignItems: 'flex-end' },
   goldPriceCurrentValue: {
+    ...fontStyles.regular,
+    lineHeight: 27,
     fontSize: 24,
   },
   goldPriceWentUp: {
-    ...fontStyles.body,
-    ...fontStyles.semiBold,
-    color: colors.celoGreen,
+    ...fontStyles.regular,
+    color: colors.greenUI,
   },
   goldPriceWentDown: {
-    ...fontStyles.body,
-    ...fontStyles.semiBold,
-    color: colors.errorRed,
+    ...fontStyles.regular,
+    marginBottom: 1, // vertically align with the current price
+    marginLeft: 4,
+    color: colors.warning,
   },
-
   loader: {
     width: CHART_WIDTH + 32,
     height: CHART_HEIGHT + 130,
@@ -297,7 +329,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   timeframe: {
-    color: colors.gray,
+    color: colors.gray3,
     fontSize: 16,
   },
   chartStyle: {
@@ -307,9 +339,10 @@ const styles = StyleSheet.create({
     paddingBottom: 16,
   },
   range: {
+    paddingHorizontal: variables.contentPadding,
+    marginTop: variables.contentPadding,
     justifyContent: 'space-between',
     flexDirection: 'row',
-    paddingBottom: 4,
   },
 })
 
