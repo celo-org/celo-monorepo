@@ -1,6 +1,5 @@
 import AsyncStorage from '@react-native-community/async-storage'
 import { NavigationContainer, NavigationState } from '@react-navigation/native'
-import { createStackNavigator } from '@react-navigation/stack'
 import * as React from 'react'
 import { StyleSheet } from 'react-native'
 import SplashScreen from 'react-native-splash-screen'
@@ -8,8 +7,8 @@ import { useSelector } from 'react-redux'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { getAppLocked } from 'src/app/selectors'
 import { DEV_RESTORE_NAV_STATE_ON_RELOAD } from 'src/config'
-import Language from 'src/language/Language'
-import { Screens } from 'src/navigator/Screens'
+import { navigationRef } from 'src/navigator/NavigationService'
+import Navigator from 'src/navigator/Navigator'
 import Logger from 'src/utils/Logger'
 
 // This uses RN Navigation's experimental nav state persistence
@@ -28,8 +27,6 @@ const getActiveRouteName = (state: NavigationState) => {
   return route.name
 }
 
-const Stack = createStackNavigator()
-
 export const NavigatorWrapper = () => {
   const appLocked = useSelector(getAppLocked)
   const [isReady, setIsReady] = React.useState(
@@ -38,7 +35,6 @@ export const NavigatorWrapper = () => {
   const [initialState, setInitialState] = React.useState()
 
   const routeNameRef = React.useRef()
-  const navigationRef = React.useRef()
 
   React.useEffect(() => {
     SplashScreen.hide()
@@ -73,9 +69,9 @@ export const NavigatorWrapper = () => {
     }
   }, [isReady])
 
-  // if (!isReady) {
-  //   return null
-  // }
+  if (!isReady) {
+    return null
+  }
 
   const handleStateChange = (state: NavigationState | undefined) => {
     if (state === undefined) {
@@ -102,13 +98,13 @@ export const NavigatorWrapper = () => {
     routeNameRef.current = currentRouteName
   }
 
-  console.log('howdyyyyyy')
-
   return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName={Screens.Language}>
-        <Stack.Screen name={Screens.Language} component={Language} />
-      </Stack.Navigator>
+    <NavigationContainer
+      ref={navigationRef}
+      onStateChange={handleStateChange}
+      initialState={initialState}
+    >
+      <Navigator />
     </NavigationContainer>
   )
 }

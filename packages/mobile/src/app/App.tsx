@@ -4,6 +4,7 @@ import * as React from 'react'
 import { ApolloProvider } from 'react-apollo'
 import { DeviceEventEmitter, Linking, StatusBar, YellowBox } from 'react-native'
 import { getNumberFormatSettings } from 'react-native-localize'
+import { SafeAreaProvider } from 'react-native-safe-area-view'
 import { enableScreens } from 'react-native-screens'
 import { Provider } from 'react-redux'
 import { PersistGate } from 'redux-persist/integration/react'
@@ -64,18 +65,18 @@ export class App extends React.Component {
 
   render() {
     return (
-      /*
-      // @ts-ignore */
-      <ApolloProvider client={apolloClient}>
-        <Provider store={store}>
-          <PersistGate loading={<AppLoading />} persistor={persistor}>
-            <StatusBar backgroundColor={colors.white} barStyle="dark-content" />
-            <ErrorBoundary>
-              <NavigatorWrapper />
-            </ErrorBoundary>
-          </PersistGate>
-        </Provider>
-      </ApolloProvider>
+      <SafeAreaProvider>
+        <ApolloProvider client={apolloClient}>
+          <Provider store={store}>
+            <PersistGate loading={<AppLoading />} persistor={persistor}>
+              <StatusBar backgroundColor={colors.white} barStyle="dark-content" />
+              <ErrorBoundary>
+                <NavigatorWrapper />
+              </ErrorBoundary>
+            </PersistGate>
+          </Provider>
+        </ApolloProvider>
+      </SafeAreaProvider>
     )
   }
 }

@@ -1,5 +1,8 @@
 // (https://github.com/react-navigation/react-navigation/issues/1439)
 
+import { NavigationActions, StackActions } from '@react-navigation/compat'
+import { NavigationContainerRef } from '@react-navigation/native'
+import { createRef } from 'react'
 import sleep from 'sleep-promise'
 import { PincodeType } from 'src/account/reducer'
 import { pincodeTypeSelector } from 'src/account/selectors'
@@ -11,24 +14,24 @@ import Logger from 'src/utils/Logger'
 
 const TAG = 'NavigationService'
 
-let navigator: any
+export const navigationRef = createRef<NavigationContainerRef>()
 
 async function ensureNavigator() {
   let retries = 0
-  while (!navigator && retries < 3) {
+  while (!navigationRef.current && retries < 3) {
     await sleep(200)
     retries++
   }
-  if (!navigator) {
+  if (!navigationRef.current) {
     throw new Error('navigator is not initialized')
   }
 }
 
-export function replace(routeName: string, params?: any) {
+export function replace(routeName: string, params?: object) {
   ensureNavigator()
     .then(() => {
       Logger.debug(`${TAG}@replace`, `Dispatch ${routeName}`)
-      navigator.dispatch(
+      navigationRef.current?.dispatch(
         StackActions.replace({
           routeName,
           params,
@@ -40,11 +43,12 @@ export function replace(routeName: string, params?: any) {
     })
 }
 
-export function navigate(routeName: string, params?: any) {
+export function navigate(routeName: string, params?: object) {
   ensureNavigator()
     .then(() => {
       Logger.debug(`${TAG}@navigate`, `Dispatch ${routeName}`)
-      navigator.dispatch(
+
+      navigationRef.current?.dispatch(
         NavigationActions.navigate({
           routeName,
           params,
@@ -87,7 +91,7 @@ async function ensurePincode(): Promise<boolean> {
   return true
 }
 
-export function navigateProtected(routeName: string, params?: NavigationParams) {
+export function navigateProtected(routeName: string, params?: object) {
   ensurePincode()
     .then((ensured) => {
       if (ensured) {
@@ -99,34 +103,18 @@ export function navigateProtected(routeName: string, params?: NavigationParams) 
     })
 }
 
-// Source: https://v1.reactnavigation.org/docs/screen-tracking.html
-function getCurrentRouteName(navState: NavigationState): string {
-  if (!navState) {
-    return ''
-  }
-
-  const route = navState.routes[navState.index]
-  // dive into nested navigators
-  // @ts-ignore
-  if (route.routes) {
-    // @ts-ignore
-    return getCurrentRouteName(route)
-  }
-  return route.routeName
-}
-
-export function navigateBack(params?: NavigationBackActionPayload) {
+export function navigateBack(params?: object) {
   ensureNavigator()
     .then(() => {
       Logger.debug(`${TAG}@navigateBack`, `Dispatch navigate back`)
-      navigator.dispatch(NavigationActions.back(params))
+      navigationRef.current?.dispatch(NavigationActions.back(params))
     })
     .catch((reason) => {
       Logger.error(`${TAG}@navigateBack`, `Navigation failure: ${reason}`)
     })
 }
 
-export function navigateHome(params?: NavigationParams) {
+export function navigateHome(params?: object) {
   navigate(Screens.WalletHome, params)
 }
 

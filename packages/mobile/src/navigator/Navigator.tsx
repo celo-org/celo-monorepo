@@ -1,8 +1,6 @@
 import { createStackNavigator } from '@react-navigation/stack'
 import * as React from 'react'
 import { Platform } from 'react-native'
-import { createSwitchNavigator } from 'react-navigation'
-import { createStackNavigator } from 'react-navigation-stack'
 import Account from 'src/account/Account'
 import Analytics from 'src/account/Analytics'
 import DataSaver from 'src/account/DataSaver'
@@ -100,6 +98,16 @@ export const commonScreens = {
   [Screens.DataSaver]: { screen: DataSaver },
 }
 
+const NuxStack = createStackNavigator()
+
+const commonScreensGen = (Navigator: typeof NuxStack) => {
+  return (
+    <>
+      <Navigator.Screen name={Screens.PincodeEnter} component={PincodeEnter} />
+    </>
+  )
+}
+
 const verificationScreens = {
   [Screens.VerificationEducationScreen]: { screen: VerificationEducationScreen },
   [Screens.VerificationLearnMoreScreen]: { screen: VerificationLearnMoreScreen },
@@ -109,27 +117,41 @@ const verificationScreens = {
   [Screens.VerificationSuccessScreen]: { screen: VerificationSuccessScreen },
 }
 
-const NuxStack = createStackNavigatorStub(
-  {
-    [Screens.Language]: { screen: Language },
-    [Screens.JoinCelo]: { screen: JoinCelo },
-    [Screens.RegulatoryTerms]: { screen: RegulatoryTerms },
-    [Screens.PincodeEducation]: { screen: PincodeEducation },
-    [Screens.PincodeSet]: { screen: PincodeSet },
-    [Screens.EnterInviteCode]: { screen: EnterInviteCode },
-    [Screens.ImportWallet]: { screen: ImportWallet },
-    [Screens.ImportWalletSocial]: { screen: ImportWalletSocial },
-    [Screens.ImportWalletEmpty]: { screen: ImportWalletEmpty },
-    ...verificationScreens,
-    ...commonScreens,
-  },
-  {
-    navigationOptions: {
-      header: null,
-    },
-    ...headerArea,
-    initialRouteName: Screens.Language,
-  }
+//   {
+//     [Screens.Language]: { screen: Language },
+//     [Screens.JoinCelo]: { screen: JoinCelo },
+//     [Screens.RegulatoryTerms]: { screen: RegulatoryTerms },
+//     [Screens.PincodeEducation]: { screen: PincodeEducation },
+//     [Screens.PincodeSet]: { screen: PincodeSet },
+//     [Screens.EnterInviteCode]: { screen: EnterInviteCode },
+//     [Screens.ImportWallet]: { screen: ImportWallet },
+//     [Screens.ImportWalletSocial]: { screen: ImportWalletSocial },
+//     [Screens.ImportWalletEmpty]: { screen: ImportWalletEmpty },
+//     ...verificationScreens,
+//     ...commonScreens,
+//   },
+//   {
+//     navigationOptions: {
+//       header: null,
+//     },
+//     ...headerArea,
+//     initialRouteName: Screens.Language,
+//   }
+// )
+
+const NuxStackNavigator = () => (
+  <NuxStack.Navigator headerMode={'none'} initialRouteName={Screens.Language}>
+    <NuxStack.Screen name={Screens.Language} component={Language} />
+    <NuxStack.Screen name={Screens.JoinCelo} component={JoinCelo} />
+    <NuxStack.Screen name={Screens.RegulatoryTerms} component={RegulatoryTerms} />
+    <NuxStack.Screen name={Screens.PincodeEducation} component={PincodeEducation} />
+    <NuxStack.Screen name={Screens.PincodeSet} component={PincodeSet} />
+    <NuxStack.Screen name={Screens.EnterInviteCode} component={EnterInviteCode} />
+    <NuxStack.Screen name={Screens.ImportWallet} component={ImportWallet} />
+    <NuxStack.Screen name={Screens.ImportWalletSocial} component={ImportWalletSocial} />
+    <NuxStack.Screen name={Screens.ImportWalletEmpty} component={ImportWalletEmpty} />
+    <NuxStack.Screen name={Screens.PincodeEnter} component={PincodeEnter} />
+  </NuxStack.Navigator>
 )
 
 const SendStack = createStackNavigatorStub(
@@ -309,12 +331,7 @@ const AppStack = createStackNavigatorStub(
 const Stack = createStackNavigator()
 
 export function AppNavigatorNew() {
-  console.log('hhiiiiiiiii')
-  return (
-    <Stack.Navigator initialRouteName={Screens.Language}>
-      <Stack.Screen name={Screens.Language} component={Language} />
-    </Stack.Navigator>
-  )
+  return <NuxStackNavigator />
 }
 
 export default AppNavigatorNew

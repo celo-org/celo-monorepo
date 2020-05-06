@@ -1,6 +1,4 @@
 import i18n from 'src/i18n'
-import { navigate } from 'src/navigator/NavigationService'
-import { Screens } from 'src/navigator/Screens'
 import Logger from 'src/utils/Logger'
 
 const TAG = 'app/actions'
@@ -112,14 +110,11 @@ export const setNumberVerified = (numberVerified: boolean) => ({
   numberVerified,
 })
 
-export const setLanguage = (language: string, nextScreen?: Screens) => {
+export const setLanguage = (language: string) => {
   i18n
     .changeLanguage(language)
     .catch((reason: any) => Logger.error(TAG, 'Failed to change i18n language', reason))
 
-  if (nextScreen) {
-    navigate(nextScreen)
-  }
   return {
     type: Actions.SET_LANGUAGE,
     language,
