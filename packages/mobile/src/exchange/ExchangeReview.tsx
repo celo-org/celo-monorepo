@@ -22,8 +22,6 @@ import { ExchangeRatePair } from 'src/exchange/reducer'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { exchangeHeader } from 'src/navigator/Headers'
-import { navigate } from 'src/navigator/NavigationService'
-import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
 import { isAppConnected } from 'src/redux/selectors'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
@@ -91,7 +89,6 @@ export class ExchangeReview extends React.Component<Props, State> {
       makerToken,
       makerAmount,
     })
-    navigate(Screens.ExchangeHomeScreen)
   }
 
   getExchangePropertiesFromNavProps() {

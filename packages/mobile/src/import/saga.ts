@@ -45,7 +45,8 @@ export function* importBackupPhraseSaga({ phrase, useEmptyWallet }: ImportBackup
 
     if (!useEmptyWallet) {
       Logger.debug(TAG + '@importBackupPhraseSaga', 'Checking account balance')
-      const backupAccount = getContractKit().web3.eth.accounts.privateKeyToAccount(
+      const contractKit = yield call(getContractKit)
+      const backupAccount = contractKit.web3.eth.accounts.privateKeyToAccount(
         ensureLeading0x(privateKey)
       ).address
 
