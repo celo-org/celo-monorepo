@@ -1,3 +1,4 @@
+import { installPrometheusIfNotExists } from './aks-prometheus'
 import { createNamespaceIfNotExists } from './cluster'
 import { doCheckOrPromptIfStagingOrProduction, envVar, fetchEnv } from './env-utils'
 import { installAndEnableMetricsDeps, redeployTiller } from './helm_deploy'
@@ -38,7 +39,7 @@ export async function switchToCluster(
     console.info('No cluster currently set')
   }
 
-  if (currentCluster === null || currentCluster.trim() !== clusterName()) {
+  if (currentCluster === null || currentCluster.trim() !== clusterConfig.clusterName) {
     // If a context is edited for some reason (eg switching default namespace),
     // a warning and prompt is shown asking if the existing context should be
     // overwritten. To avoid this, --overwrite-existing force overwrites.
@@ -57,6 +58,7 @@ async function setupCluster(celoEnv: string) {
   console.info('Performing any cluster setup that needs to be done...')
 
   await redeployTiller()
+  await installPrometheusIfNotExists()
   await installAndEnableMetricsDeps(false)
   await installAADPodIdentity()
 }

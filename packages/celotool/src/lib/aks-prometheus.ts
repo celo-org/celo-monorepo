@@ -9,6 +9,7 @@ import {
 } from './service-account-utils'
 import {
   execCmdWithExitOnFailure,
+  outputIncludes,
   switchToProjectFromEnv as switchToGCPProjectFromEnv,
 } from './utils'
 
@@ -21,6 +22,18 @@ const kubeNamespace = 'prometheus'
 const sidecarImageTag = '0.7.3'
 // Prometheus container registry with latest tags: https://hub.docker.com/r/prom/prometheus/tags
 const prometheusImageTag = 'v2.17.0'
+
+export async function installPrometheusIfNotExists() {
+  const prometheusExists = await outputIncludes(
+    `helm list`,
+    `prometheus-stackdriver`,
+    `prometheus-stackdriver exists, skipping install`
+  )
+  if (!prometheusExists) {
+    console.info('Installing prometheus-stackdriver')
+    await installPrometheus()
+  }
+}
 
 export async function installPrometheus() {
   await createNamespaceIfNotExists('prometheus')
