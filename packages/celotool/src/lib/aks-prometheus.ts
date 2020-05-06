@@ -1,4 +1,5 @@
 import fs from 'fs'
+import { AzureClusterConfig } from './azure'
 import { createNamespaceIfNotExists } from './cluster'
 import { envVar, fetchEnv } from './env-utils'
 import { installGenericHelmChart, removeGenericHelmChart } from './helm_deploy'
@@ -23,7 +24,7 @@ const sidecarImageTag = '0.7.3'
 // Prometheus container registry with latest tags: https://hub.docker.com/r/prom/prometheus/tags
 const prometheusImageTag = 'v2.17.0'
 
-export async function installPrometheusIfNotExists() {
+export async function installPrometheusIfNotExists(clusterConfig: AzureClusterConfig) {
   const prometheusExists = await outputIncludes(
     `helm list`,
     `prometheus-stackdriver`,
@@ -31,21 +32,26 @@ export async function installPrometheusIfNotExists() {
   )
   if (!prometheusExists) {
     console.info('Installing prometheus-stackdriver')
-    await installPrometheus()
+    await installPrometheus(clusterConfig)
   }
 }
 
-export async function installPrometheus() {
+export async function installPrometheus(clusterConfig: AzureClusterConfig) {
   await createNamespaceIfNotExists('prometheus')
-  return installGenericHelmChart(kubeNamespace, releaseName, helmChartPath, await helmParameters())
+  return installGenericHelmChart(
+    kubeNamespace,
+    releaseName,
+    helmChartPath,
+    await helmParameters(clusterConfig)
+  )
 }
 
 export async function removeHelmRelease() {
   await removeGenericHelmChart(releaseName)
 }
 
-async function helmParameters() {
-  const kubeClusterName = fetchEnv(envVar.AZURE_KUBERNETES_CLUSTER_NAME)
+async function helmParameters(clusterConfig: AzureClusterConfig) {
+  const kubeClusterName = fetchEnv(clusterConfig.clusterName)
   return [
     `--set namespace=${kubeNamespace}`,
     `--set cluster=${kubeClusterName}`,

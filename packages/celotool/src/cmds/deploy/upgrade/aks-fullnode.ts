@@ -1,23 +1,31 @@
 import { UpgradeArgv } from 'src/cmds/deploy/upgrade'
 import { upgradeFullNodeChart } from 'src/lib/aks-fullnode'
-// import { switchToClusterFromEnv } from 'src/lib/azure'
+import {
+  OracleArgv,
+  addOracleMiddleware,
+  getAzureClusterConfig,
+  getOracleAzureContext,
+  switchToAzureContextCluster,
+} from 'src/lib/oracle'
 import yargs from 'yargs'
 
-export const command = 'aks-fullnode'
+export const command = 'oracle-fullnode'
 
-export const describe = 'upgrade full-node(s) to a kubernetes cluster on AKS'
+export const describe = 'upgrade full-node(s) on an AKS cluster'
+
+type OracleFullNodeUpgradeArgv = UpgradeArgv & OracleArgv & { reset: boolean }
 
 export const builder = (argv: yargs.Argv) => {
-  return argv.option('reset', {
+  return addOracleMiddleware(argv).option('reset', {
     type: 'boolean',
     description: 'when enabled, deletes the data volumes and redeploys the helm chart.',
     default: false,
   })
 }
 
-type AksFullNodeUpgradeArgv = UpgradeArgv & { reset: boolean }
-
-export const handler = async (argv: AksFullNodeUpgradeArgv) => {
-  // await switchToClusterFromEnv(argv.celoEnv)
-  await upgradeFullNodeChart(argv.celoEnv, argv.reset)
+export const handler = async (argv: OracleFullNodeUpgradeArgv) => {
+  const oracleAzureContext = getOracleAzureContext(argv.primary)
+  await switchToAzureContextCluster(oracleAzureContext, argv.celoEnv)
+  const clusterConfig = getAzureClusterConfig(oracleAzureContext)
+  await upgradeFullNodeChart(argv.celoEnv, clusterConfig, argv.reset)
 }

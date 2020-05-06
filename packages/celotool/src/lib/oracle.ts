@@ -16,6 +16,15 @@ export enum OracleAzureContext {
   SECONDARY = 'SECONDARY',
 }
 
+type OracleAddressIdentity = {
+  address: string
+  keyVaultName: string
+}
+
+type OracleConfig = {
+  addressIdentities: OracleAddressIdentity[]
+}
+
 /**
  * Env vars corresponding to each value for the AzureClusterConfig for a particular context
  */
@@ -36,7 +45,22 @@ const oracleAzureContextClusterConfigEnvVars: {
   },
 }
 
-export async function installHelmChart(celoEnv: string, context: OracleAzureContext) {
+const oracleAzureContextOracleConfigEnvVars: {
+  [key in keyof typeof OracleAzureContext]: { [key in keyof OracleConfig]: string }
+} = {
+  [OracleAzureContext.PRIMARY]: {
+    addressIdentities: envVar.ORACLE_PRIMARY_ADDRESS_AZURE_KEY_VAULTS,
+  },
+  [OracleAzureContext.SECONDARY]: {
+    addressIdentities: envVar.ORACLE_SECONDARY_ADDRESS_AZURE_KEY_VAULTS,
+  },
+}
+
+export async function installHelmChart(
+  celoEnv: string,
+  context: OracleAzureContext,
+  useFullNodes: boolean
+) {
   // First install the oracle-rbac helm chart.
   // This must be deployed before so we can use a resulting auth token so that
   // oracle pods can reach the K8s API server to change their aad labels
@@ -46,7 +70,7 @@ export async function installHelmChart(celoEnv: string, context: OracleAzureCont
     celoEnv,
     releaseName(celoEnv),
     helmChartPath,
-    await helmParameters(celoEnv, context)
+    await helmParameters(celoEnv, context, useFullNodes)
   )
 }
 
@@ -55,9 +79,12 @@ export async function removeHelmRelease(celoEnv: string) {
   await removeOracleRBACHelmRelease(celoEnv)
 }
 
-async function helmParameters(celoEnv: string, context: OracleAzureContext) {
+async function helmParameters(celoEnv: string, context: OracleAzureContext, useFullNodes: boolean) {
+  const oracleConfig = getOracleConfig(context)
+
   const kubeAuthTokenName = await rbacAuthTokenName(celoEnv)
-  const replicas = oracleAddressesAndVaults().length
+  const replicas = oracleConfig.addressIdentities.length
+  const rpcProviderUrl = useFullNodes ? 'tbd' : getFornoUrl(celoEnv)
   return [
     `--set environment.name=${celoEnv}`,
     `--set image.repository=${fetchEnv(envVar.ORACLE_DOCKER_IMAGE_REPOSITORY)}`,
@@ -66,25 +93,26 @@ async function helmParameters(celoEnv: string, context: OracleAzureContext) {
     `--set oracle.azureHsm.initTryCount=5`,
     `--set oracle.azureHsm.initMaxRetryBackoffMs=30000`,
     `--set oracle.replicas=${replicas}`,
-    `--set oracle.rpcProviderUrl=${getFornoUrl(celoEnv)}`,
+    `--set oracle.rpcProviderUrl=${rpcProviderUrl}`,
     `--set oracle.metrics.enabled=true`,
     `--set oracle.metrics.prometheusPort=9090`,
   ].concat(await oracleIdentityHelmParameters(celoEnv, context))
 }
 
 async function oracleIdentityHelmParameters(celoEnv: string, context: OracleAzureContext) {
-  const addressesAndVaults = oracleAddressesAndVaults()
-  const replicas = addressesAndVaults.length
+  const oracleConfig = getOracleConfig(context)
+  const replicas = oracleConfig.addressIdentities.length
   let params: string[] = []
   for (let i = 0; i < replicas; i++) {
-    const identity = await createOracleIdentityIfNotExists(celoEnv, context, i)
-    const { address, keyVaultName: vaultName } = addressesAndVaults[i]
+    const addressIdentity = oracleConfig.addressIdentities[i]
+    const identity = await createOracleIdentityIfNotExists(celoEnv, context, addressIdentity, i)
+    const { address, keyVaultName } = addressIdentity
     const prefix = `--set oracle.identities[${i}]`
     params = params.concat([
       `${prefix}.address=${address}`,
       `${prefix}.azure.id=${identity.id}`,
       `${prefix}.azure.clientId=${identity.clientId}`,
-      `${prefix}.azure.keyVaultName=${vaultName}`,
+      `${prefix}.azure.keyVaultName=${keyVaultName}`,
     ])
   }
   return params
@@ -97,6 +125,7 @@ function releaseName(celoEnv: string) {
 async function createOracleIdentityIfNotExists(
   celoEnv: string,
   context: OracleAzureContext,
+  oracleAddressIdentity: OracleAddressIdentity,
   index: number
 ) {
   const clusterConfig = getAzureClusterConfig(context)
@@ -116,11 +145,7 @@ async function createOracleIdentityIfNotExists(
   )
   // Allow the oracle identity to access the correct key vault
   await execCmdWithExitOnFailure(
-    `az keyvault set-policy --name ${keyVaultName(
-      index
-    )} --key-permissions {get,list,sign} --object-id ${identity.principalId} -g ${
-      clusterConfig.resourceGroup
-    }`
+    `az keyvault set-policy --name ${oracleAddressIdentity.keyVaultName} --key-permissions {get,list,sign} --object-id ${identity.principalId} -g ${clusterConfig.resourceGroup}`
   )
   return identity
 }
@@ -129,33 +154,34 @@ function oracleIdentityName(celoEnv: string, index: number) {
   return `${celoEnv}-oracle-${index}`
 }
 
-function keyVaultName(oracleIndex: number) {
-  return oracleAddressesAndVaults()[oracleIndex].keyVaultName
+function getOracleConfig(context: OracleAzureContext): OracleConfig {
+  return {
+    addressIdentities: getOracleAddressIdentities(context),
+  }
 }
 
 // Decodes the env variable ORACLE_ADDRESS_KEY_VAULTS of the form:
 //   <address>:<keyVaultName>,<address>:<keyVaultName>
 //   eg: 0x0000000000000000000000000000000000000000:keyVault0,0x0000000000000000000000000000000000000001:keyVault1
 // into an array in the same order
-function oracleAddressesAndVaults(): Array<{
-  address: string
-  keyVaultName: string
-}> {
-  const vaultNamesAndAddresses = fetchEnv(envVar.ORACLE_ADDRESS_KEY_VAULTS).split(',')
-  const addressesAndVaults = []
-  for (const nameAndAddress of vaultNamesAndAddresses) {
-    const [address, vaultName] = nameAndAddress.split(':')
-    if (!address || !vaultName) {
+function getOracleAddressIdentities(context: OracleAzureContext): Array<OracleAddressIdentity> {
+  const addressIdentityStrings = fetchEnv(
+    oracleAzureContextOracleConfigEnvVars[context].addressIdentities
+  ).split(',')
+  const addressIdentities = []
+  for (const addressIdentityStr of addressIdentityStrings) {
+    const [address, keyVaultName] = addressIdentityStr.split(':')
+    if (!address || !keyVaultName) {
       throw Error(
-        `Address or key vault name is invalid. Address: ${address} Key Vault Name: ${vaultName}`
+        `Address or key vault name is invalid. Address: ${address} Key Vault Name: ${keyVaultName}`
       )
     }
-    addressesAndVaults.push({
+    addressIdentities.push({
       address,
-      keyVaultName: vaultName,
+      keyVaultName,
     })
   }
-  return addressesAndVaults
+  return addressIdentities
 }
 
 // Oracle RBAC------
@@ -198,7 +224,7 @@ async function rbacAuthTokenName(celoEnv: string) {
  * @param context the OracleAzureContext to use
  * @return an AzureClusterConfig for the context
  */
-function getAzureClusterConfig(context: OracleAzureContext): AzureClusterConfig {
+export function getAzureClusterConfig(context: OracleAzureContext): AzureClusterConfig {
   const configEnvVars = oracleAzureContextClusterConfigEnvVars[context]
   const clusterConfig: AzureClusterConfig = {
     subscriptionId: '',

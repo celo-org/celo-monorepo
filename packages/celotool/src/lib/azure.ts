@@ -1,6 +1,6 @@
 import { installPrometheusIfNotExists } from './aks-prometheus'
 import { createNamespaceIfNotExists } from './cluster'
-import { doCheckOrPromptIfStagingOrProduction, envVar, fetchEnv } from './env-utils'
+import { doCheckOrPromptIfStagingOrProduction } from './env-utils'
 import { installAndEnableMetricsDeps, redeployTiller } from './helm_deploy'
 import { execCmd, execCmdWithExitOnFailure, outputIncludes } from './utils'
 
@@ -47,18 +47,18 @@ export async function switchToCluster(
       `az aks get-credentials --resource-group ${clusterConfig.resourceGroup} --name ${clusterConfig.clusterName} --subscription ${clusterConfig.subscriptionId} --overwrite-existing`
     )
   }
-  await setupCluster(celoEnv)
+  await setupCluster(celoEnv, clusterConfig)
 }
 
 // setupCluster is idempotent-- it will only make changes that have not been made
 // before. Therefore, it's safe to be called for a cluster that's been fully set up before
-async function setupCluster(celoEnv: string) {
+async function setupCluster(celoEnv: string, clusterConfig: AzureClusterConfig) {
   await createNamespaceIfNotExists(celoEnv)
 
   console.info('Performing any cluster setup that needs to be done...')
 
   await redeployTiller()
-  await installPrometheusIfNotExists()
+  await installPrometheusIfNotExists(clusterConfig)
   await installAndEnableMetricsDeps(false)
   await installAADPodIdentity()
 }
@@ -94,21 +94,9 @@ export async function createIdentityIfNotExists(
   return JSON.parse(results)
 }
 
-export function resourceGroup() {
-  return fetchEnv(envVar.AZURE_KUBERNETES_RESOURCE_GROUP)
-}
-
-export function clusterName() {
-  return fetchEnv(envVar.AZURE_KUBERNETES_CLUSTER_NAME)
-}
-
-export function subscriptionId() {
-  return fetchEnv(envVar.AZURE_SUBSCRIPTION_ID)
-}
-
-export async function getAKSNodeResourceGroup() {
+export async function getAKSNodeResourceGroup(clusterConfig: AzureClusterConfig) {
   const [nodeResourceGroup] = await execCmdWithExitOnFailure(
-    `az aks show --name ${clusterName()} --resource-group ${resourceGroup()} --query nodeResourceGroup -o tsv`
+    `az aks show --name ${clusterConfig.clusterName} --resource-group ${clusterConfig.resourceGroup} --query nodeResourceGroup -o tsv`
   )
   return nodeResourceGroup.trim()
 }

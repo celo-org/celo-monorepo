@@ -1,17 +1,27 @@
 import { InitialArgv } from 'src/cmds/deploy/initial'
 import { installFullNodeChart } from 'src/lib/aks-fullnode'
-// import { switchToCluster } from 'src/lib/azure'
+import {
+  OracleArgv,
+  addOracleMiddleware,
+  getAzureClusterConfig,
+  getOracleAzureContext,
+  switchToAzureContextCluster,
+} from 'src/lib/oracle'
 import yargs from 'yargs'
 
-export const command = 'aks-fullnode'
+export const command = 'oracle-fullnode'
 
-export const describe = 'deploy full-node(s) to a kubernetes cluster on AKS'
+export const describe = 'deploy full-node(s) on an AKS cluster'
+
+type OracleFullNodeInitialArgv = InitialArgv & OracleArgv
 
 export const builder = (argv: yargs.Argv) => {
-  return argv
+  return addOracleMiddleware(argv)
 }
 
-export const handler = async (argv: InitialArgv) => {
-  // await switchToClusterFromEnv(argv.celoEnv)
-  await installFullNodeChart(argv.celoEnv)
+export const handler = async (argv: OracleFullNodeInitialArgv) => {
+  const oracleAzureContext = getOracleAzureContext(argv.primary)
+  await switchToAzureContextCluster(oracleAzureContext, argv.celoEnv)
+  const clusterConfig = getAzureClusterConfig(oracleAzureContext)
+  await installFullNodeChart(argv.celoEnv, clusterConfig)
 }
