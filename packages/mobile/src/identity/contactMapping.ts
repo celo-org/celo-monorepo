@@ -197,6 +197,7 @@ export function* fetchPhoneAddresses({ e164Number }: FetchPhoneAddressesAction) 
 }
 
 function* getAddresses(e164Number: string, attestationsWrapper: AttestationsWrapper) {
+<<<<<<< HEAD
   let phoneHash: string
   if (USE_PHONE_NUMBER_PRIVACY) {
     const phoneHashDetails: PhoneNumberHashDetails = yield call(fetchPhoneHashPrivate, e164Number)
@@ -204,6 +205,12 @@ function* getAddresses(e164Number: string, attestationsWrapper: AttestationsWrap
   } else {
     phoneHash = getPhoneHash(e164Number)
   }
+=======
+  Logger.debug(TAG + '@getAddresses', `Looking up phoneHash for ${e164Number}`)
+  const phoneHashDetails: PhoneNumberHashDetails = yield call(fetchPhoneHashPrivate, e164Number)
+  const phoneHash = phoneHashDetails.phoneHash
+  Logger.debug(TAG + '@getAddresses', `Received phone hash: ${phoneHash}`)
+>>>>>>> did more frontend work. still getting the backend error when attempting to fetch numbers for the address
 
   // Map of identifier -> (Map of address -> AttestationStat)
   const results: IdentifierLookupResult = yield call(

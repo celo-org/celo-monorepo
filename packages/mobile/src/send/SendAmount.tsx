@@ -90,6 +90,10 @@ interface StateProps {
   feeType: FeeType | null
   localCurrencyCode: LocalCurrencyCode
   localCurrencyExchangeRate: string | null | undefined
+  recipient: Recipient
+  verificationStatus: RecipientVerificationStatus
+  manualAddressValidationRequired: boolean
+  fullValidationRequired: boolean
 }
 
 interface DispatchProps {
@@ -100,27 +104,7 @@ interface DispatchProps {
   fetchPhoneAddresses: typeof fetchPhoneAddresses
 }
 
-function getRecipient(navigation: Navigation): Recipient {
-  const recipient = navigation.getParam('recipient')
-  if (!recipient) {
-    throw new Error('Recipient expected')
-  }
-  return recipient
-}
-
-function getVerificationStatus(
-  navigation: Navigation,
-  e164NumberToAddress: E164NumberToAddressType
-) {
-  return getRecipientVerificationStatus(getRecipient(navigation), e164NumberToAddress)
-}
-
-function getFeeType(
-  navigation: Navigation,
-  e164NumberToAddress: E164NumberToAddressType
-): FeeType | null {
-  const verificationStatus = getVerificationStatus(navigation, e164NumberToAddress)
-
+function getFeeType(verificationStatus: RecipientVerificationStatus): FeeType | null {
   switch (verificationStatus) {
     case RecipientVerificationStatus.UNKNOWN:
       return null
@@ -134,7 +118,11 @@ function getFeeType(
 const mapStateToProps = (state: RootState, ownProps: NavigationInjectedProps): StateProps => {
   const { navigation } = ownProps
   const { e164NumberToAddress } = state.identity
-  const feeType = getFeeType(navigation, e164NumberToAddress)
+  const recipient = navigation.getParam('recipient')
+  const verificationStatus = getRecipientVerificationStatus(recipient, e164NumberToAddress)
+  const feeType = getFeeType(verificationStatus)
+  const { manualAddressValidationRequired, fullValidationRequired } = state.send
+
   return {
     dollarBalance: state.stableToken.balance || '0',
     estimateFeeDollars: getFeeEstimateDollars(state, feeType),
@@ -143,6 +131,10 @@ const mapStateToProps = (state: RootState, ownProps: NavigationInjectedProps): S
     feeType,
     localCurrencyCode: getLocalCurrencyCode(state),
     localCurrencyExchangeRate: getLocalCurrencyExchangeRate(state),
+    recipient,
+    verificationStatus,
+    manualAddressValidationRequired,
+    fullValidationRequired,
   }
 }
 
@@ -166,7 +158,7 @@ export class SendAmount extends React.Component<Props, State> {
   }
 
   fetchLatestPhoneAddress = () => {
-    const recipient = this.getRecipient()
+    const { recipient } = this.props
     if (recipient.kind === RecipientKind.QrCode || recipient.kind === RecipientKind.Address) {
       // Skip for QR codes or Addresses
       return
@@ -206,18 +198,10 @@ export class SendAmount extends React.Component<Props, State> {
     }
   }
 
-  getRecipient = (): Recipient => {
-    return getRecipient(this.props.navigation)
-  }
-
-  getVerificationStatus = () => {
-    return getVerificationStatus(this.props.navigation, this.props.e164NumberToAddress)
-  }
-
   getConfirmationInput = (type: TokenTransactionType) => {
     const amount = this.getDollarsAmount()
-    const recipient = this.getRecipient()
-    const recipientAddress = getAddressFromRecipient(recipient, this.props.e164NumberToAddress)
+    const { recipient, e164NumberToAddress } = this.props
+    const recipientAddress = getAddressFromRecipient(recipient, e164NumberToAddress)
 
     const confirmationInput: ConfirmationInput = {
       recipient,
@@ -246,13 +230,17 @@ export class SendAmount extends React.Component<Props, State> {
   }
 
   onSend = () => {
+    const {
+      verificationStatus,
+      manualAddressValidationRequired,
+      fullValidationRequired,
+    } = this.props
     const { isDollarBalanceSufficient } = this.isAmountValid()
     if (!isDollarBalanceSufficient) {
       this.props.showError(ErrorMessages.NSF_TO_SEND)
       return
     }
 
-    const verificationStatus = this.getVerificationStatus()
     let confirmationInput: ConfirmationInput
 
     if (verificationStatus === RecipientVerificationStatus.VERIFIED) {
@@ -266,29 +254,42 @@ export class SendAmount extends React.Component<Props, State> {
     }
 
     this.props.hideAlert()
-    CeloAnalytics.track(CustomEventNames.send_continue)
-    navigate(Screens.SendConfirmation, { confirmationInput })
+
+    if (manualAddressValidationRequired) {
+      navigate(Screens.ConfirmRecipient, { confirmationInput, fullValidationRequired })
+    } else {
+      CeloAnalytics.track(CustomEventNames.send_continue)
+      navigate(Screens.SendConfirmation, { confirmationInput })
+    }
   }
 
   onRequest = () => {
-    CeloAnalytics.track(CustomEventNames.request_payment_continue)
+    const { manualAddressValidationRequired, fullValidationRequired } = this.props
     const confirmationInput = this.getConfirmationInput(TokenTransactionType.PayRequest)
-    navigate(Screens.PaymentRequestConfirmation, { confirmationInput })
+
+    if (manualAddressValidationRequired) {
+      navigate(Screens.ConfirmRecipient, { confirmationInput, fullValidationRequired })
+    } else {
+      CeloAnalytics.track(CustomEventNames.request_payment_continue)
+      navigate(Screens.PaymentRequestConfirmation, { confirmationInput })
+    }
   }
 
   renderButtons = (isAmountValid: boolean) => {
-    const { t } = this.props
-    const { characterLimitExceeded } = this.state
-    const verificationStatus = this.getVerificationStatus()
+    const { t, verificationStatus } = this.props
+    // const { characterLimitExceeded } = this.state
 
-    const requestDisabled =
-      !isAmountValid ||
-      verificationStatus !== RecipientVerificationStatus.VERIFIED ||
-      characterLimitExceeded
-    const sendDisabled =
-      !isAmountValid ||
-      characterLimitExceeded ||
-      verificationStatus === RecipientVerificationStatus.UNKNOWN
+    // const requestDisabled =
+    //   !isAmountValid ||
+    //   verificationStatus !== RecipientVerificationStatus.VERIFIED ||
+    //   characterLimitExceeded
+    // const sendDisabled =
+    //   !isAmountValid ||
+    //   characterLimitExceeded ||
+    //   verificationStatus === RecipientVerificationStatus.UNKNOWN
+
+    const requestDisabled = false
+    const sendDisabled = false
 
     const separatorContainerStyle =
       sendDisabled && requestDisabled
@@ -353,9 +354,14 @@ export class SendAmount extends React.Component<Props, State> {
   }
 
   render() {
-    const { t, feeType, estimateFeeDollars, localCurrencyCode } = this.props
-    const recipient = this.getRecipient()
-    const verificationStatus = this.getVerificationStatus()
+    const {
+      t,
+      feeType,
+      estimateFeeDollars,
+      localCurrencyCode,
+      recipient,
+      verificationStatus,
+    } = this.props
 
     return (
       <SafeAreaView

@@ -12,6 +12,7 @@ export interface State {
   isValidatingRecipient: boolean
   isValidRecipient: boolean
   manualAddressValidationRequired: boolean
+  fullValidationRequired: boolean
 }
 
 const initialState = {

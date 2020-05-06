@@ -1,6 +1,7 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
 import KeyboardAwareScrollView from '@celo/react-components/components/KeyboardAwareScrollView'
 import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
+import TextButton from '@celo/react-components/components/TextButton'
 import Checkmark from '@celo/react-components/icons/Checkmark'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
@@ -8,6 +9,7 @@ import { delay } from 'lodash'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native'
+import Modal from 'react-native-modal'
 import SafeAreaView from 'react-native-safe-area-view'
 import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
@@ -28,13 +30,14 @@ interface OwnProps {
 
 interface StateProps {
   displayName: string
-  fullAddressValidationRequired: boolean
+  fullValidationRequired: boolean
   isValidRecipient: boolean
   isValidatingRecipient: boolean
 }
 
 interface State {
   inputValue: string
+  isModalVisible: boolean
 }
 
 interface DispatchProps {
@@ -49,7 +52,7 @@ const mapStateToProps = (state: RootState, ownProps: NavigationInjectedProps): S
   const { navigation } = ownProps
   return {
     displayName: navigation.getParam('displayName'),
-    fullAddressValidationRequired: navigation.getParam('fullAddressValidationRequired'),
+    fullValidationRequired: navigation.getParam('fullValidationRequired'),
     isValidRecipient: state.send.isValidRecipient,
     isValidatingRecipient: state.send.isValidatingRecipient,
   }
@@ -65,6 +68,7 @@ export class ConfirmRecipientAccount extends React.Component<Props, State> {
 
   state: State = {
     inputValue: '',
+    isModalVisible: false,
   }
 
   componentDidUpdate = async () => {
@@ -75,52 +79,37 @@ export class ConfirmRecipientAccount extends React.Component<Props, State> {
   }
 
   onPressContinue = () => {
-    this.props.validateRecipientAddress(
-      this.state.inputValue,
-      this.props.fullAddressValidationRequired
-    )
+    this.props.validateRecipientAddress(this.state.inputValue, this.props.fullValidationRequired)
   }
 
   onInputChange = (value: string) => {
     this.setState({ inputValue: value })
   }
 
-  onPressHelp = () => {
-    // TODO: Help Modal should pop up
+  toggleModal = () => {
+    this.setState({ isModalVisible: !this.state.isModalVisible })
   }
 
   shouldShowClipboard = () => false
 
-  renderInitialInstructions = () => {
-    const { t, displayName, fullAddressValidationRequired } = this.props
-
-    if (fullAddressValidationRequired) {
-      return (
-        <Text style={styles.body}>
-          {t('confirmAccountNumber.1b', {
-            displayName,
-          })}
-        </Text>
-      )
-    }
-
-    return (
-      <Text style={styles.body}>
-        {t('confirmAccountNumber.1a', {
-          displayName,
-        })}
-      </Text>
-    )
-  }
-
-  renderAddressInputField = () => {
-    const { t, fullAddressValidationRequired } = this.props
+  renderInstructionsAndInputField = () => {
+    const { t, displayName, fullValidationRequired } = this.props
     const { inputValue } = this.state
     const codeStatus = CodeRowStatus.INPUTTING
 
-    if (fullAddressValidationRequired) {
+    if (fullValidationRequired) {
       return (
-        <React.Fragment>
+        <View>
+          <Text style={styles.body}>
+            {t('confirmAccountNumber.1b', {
+              displayName,
+            })}
+          </Text>
+          <Text style={styles.body}>
+            {t('confirmAccountNumber.2b', {
+              displayName,
+            })}
+          </Text>
           <Text style={styles.codeHeader}>{t('accountInputHeaderB')}</Text>
           <CodeRow
             status={codeStatus}
@@ -129,12 +118,22 @@ export class ConfirmRecipientAccount extends React.Component<Props, State> {
             onInputChange={this.onInputChange}
             shouldShowClipboard={this.shouldShowClipboard}
           />
-        </React.Fragment>
+        </View>
       )
     }
 
     return (
-      <React.Fragment>
+      <View>
+        <Text style={styles.body}>
+          {t('confirmAccountNumber.1a', {
+            displayName,
+          })}
+        </Text>
+        <Text style={styles.body}>
+          {t('confirmAccountNumber.2a', {
+            displayName,
+          })}
+        </Text>
         <Text style={styles.codeHeader}>{t('accountInputHeaderA')}</Text>
         <CodeRow
           status={codeStatus}
@@ -143,7 +142,7 @@ export class ConfirmRecipientAccount extends React.Component<Props, State> {
           onInputChange={this.onInputChange}
           shouldShowClipboard={this.shouldShowClipboard}
         />
-      </React.Fragment>
+      </View>
     )
   }
 
@@ -184,21 +183,25 @@ export class ConfirmRecipientAccount extends React.Component<Props, State> {
           contentContainerStyle={styles.scrollContainer}
           keyboardShouldPersistTaps={'always'}
         >
-          <View>
-            {this.renderInitialInstructions()}
-            <Text style={styles.body}>
-              {t('confirmAccountNumber.2', {
-                displayName,
-              })}
-            </Text>
-            {this.renderAddressInputField()}
-          </View>
-          <Text onPress={this.onPressHelp} style={styles.askHelpText}>
+          <View>{this.renderInstructionsAndInputField()}</View>
+          <Text onPress={this.toggleModal} style={styles.askHelpText}>
             {t('confirmAccountNumber.help', { displayName })}
           </Text>
         </KeyboardAwareScrollView>
         <View>{this.renderConfirmButtonOrLoadingAnimations()}</View>
         <KeyboardSpacer />
+        <Modal isVisible={this.state.isModalVisible}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalHeader}>{t('helpModal.header')}</Text>
+            <Text style={fontStyles.body}>{t('helpModal.body1')}</Text>
+            <Text style={fontStyles.body}>{t('helpModal.body2')}</Text>
+            <View style={styles.modalButtonsContainer}>
+              <TextButton onPress={this.toggleModal} style={styles.modalCancelText}>
+                {t('global:close')}
+              </TextButton>
+            </View>
+          </View>
+        </Modal>
       </SafeAreaView>
     )
   }
@@ -252,6 +255,28 @@ const styles = StyleSheet.create({
     ...fontStyles.body,
     textAlign: 'center',
     paddingBottom: 15,
+  },
+  modalContainer: {
+    backgroundColor: colors.background,
+    padding: 20,
+    marginHorizontal: 10,
+    borderRadius: 4,
+  },
+  modalHeader: {
+    ...fontStyles.h2,
+    ...fontStyles.bold,
+    marginVertical: 15,
+  },
+  modalButtonsContainer: {
+    marginTop: 25,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-evenly',
+  },
+  modalCancelText: {
+    ...fontStyles.body,
+    ...fontStyles.semiBold,
+    paddingRight: 20,
   },
 })
 
