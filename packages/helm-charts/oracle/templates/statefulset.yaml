@@ -32,6 +32,10 @@ spec:
       labels:
 {{ include "labels" . | indent 8 }}
 {{ include "oracle-client-component-label" . | indent 8 }}
+      annotations:
+{{ if .Values.oracle.metrics.enabled }}
+{{ include "metric-annotations" . | indent 8 }}
+{{ end }}
     spec:
       initContainers:
       - name: set-label
@@ -67,6 +71,9 @@ spec:
       - name: oracle-client
         image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
         imagePullPolicy: Always
+        ports:
+          - name: prometheus
+            containerPort: {{ .Values.oracle.metrics.prometheusPort }}
         command:
           - bash
           - "-c"
@@ -90,3 +97,11 @@ spec:
               fieldPath: metadata.name
         - name: RPC_PROVIDER_URL
           value: {{ .Values.oracle.rpcProviderUrl }}
+        - name: METRICS
+          value: "{{ .Values.oracle.metrics.enabled }}"
+        - name: PROMETHEUS_PORT
+          value: "{{ .Values.oracle.metrics.prometheusPort }}"
+        - name: AZURE_HSM_INIT_TRY_COUNT
+          value: "{{ .Values.oracle.azureHsm.initTryCount }}"
+        - name: AZURE_HSM_INIT_MAX_RETRY_BACKOFF_MS
+          value: "{{ .Values.oracle.azureHsm.initMaxRetryBackoffMs }}"
