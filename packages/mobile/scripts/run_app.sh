@@ -74,13 +74,6 @@ rm -f $IOS_GSERVICES_PATH.bak
 if [ $PLATFORM = "android" ]; then
   echo "Using platform android"
 
-  # Run jettify to fix non-android-x compatible libs
-  if [ "$FAST" = false ]; then
-    echo "Jetifying react native libraries"
-    cd ../../ && yarn run jetify && cd packages/mobile
-    echo "Jetified"
-  fi
-
   if [ "$BUILD_ONLY" = true ]; then
     echo "Build only enabled, stopping here."
     exit 0
