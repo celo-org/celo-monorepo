@@ -14,6 +14,7 @@ import Logger from 'src/utils/Logger'
 const TAG = 'i18n'
 
 export enum Namespaces {
+  accountKeyFlow = 'accountKeyFlow',
   accountScreen10 = 'accountScreen10',
   backupKeyFlow6 = 'backupKeyFlow6',
   exchangeFlow9 = 'exchangeFlow9',

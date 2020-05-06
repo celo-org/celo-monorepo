@@ -1,3 +1,4 @@
+import accountKeyFlow from '@celo/mobile/locales/en-US/accountKeyFlow.json'
 import accountScreen10 from '@celo/mobile/locales/en-US/accountScreen10.json'
 import backupKeyFlow6 from '@celo/mobile/locales/en-US/backupKeyFlow6.json'
 import dappkit from '@celo/mobile/locales/en-US/dappkit.json'
@@ -15,6 +16,7 @@ import sendFlow7 from '@celo/mobile/locales/en-US/sendFlow7.json'
 import walletFlow5 from '@celo/mobile/locales/en-US/walletFlow5.json'
 
 export default {
+  accountKeyFlow,
   accountScreen10,
   backupKeyFlow6,
   exchangeFlow9,
