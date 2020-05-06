@@ -12,6 +12,18 @@ export async function switchToClusterFromEnv(
     await doCheckOrPromptIfStagingOrProduction()
   }
 
+  // Azure subscription switch
+  const tenantId = fetchEnv(envVar.AZURE_TENANT_ID)
+  let currentTenantId = null
+  try {
+    ;[currentTenantId] = await execCmd('az account show --query tenantId -o tsv')
+  } catch (error) {
+    console.info('No azure account subscription currently set')
+  }
+  if (currentTenantId === null || currentTenantId.trim() !== tenantId) {
+    await execCmdWithExitOnFailure(`az account set --subscription ${tenantId}`)
+  }
+
   let currentCluster = null
   try {
     ;[currentCluster] = await execCmd('kubectl config current-context')
@@ -80,4 +92,26 @@ export function clusterName() {
 
 export function subscriptionId() {
   return fetchEnv(envVar.AZURE_SUBSCRIPTION_ID)
+}
+
+export async function getAKSNodeResourceGroup() {
+  const [nodeResourceGroup] = await execCmdWithExitOnFailure(
+    `az aks show --name ${clusterName()} --resource-group ${resourceGroup()} --query nodeResourceGroup -o tsv`
+  )
+  return nodeResourceGroup.trim()
+}
+
+export async function registerStaticIP(name: string, resourceGroupIP: string) {
+  console.info(`Registering IP address ${name} on ${resourceGroupIP}`)
+  const [address] = await execCmdWithExitOnFailure(
+    `az network public-ip create --resource-group ${resourceGroupIP} --name ${name} --allocation-method Static --sku Standard --query publicIp.ipAddress -o tsv`
+  )
+  return address.trim()
+}
+
+export async function deallocateStaticIP(name: string, resourceGroupIP: string) {
+  console.info(`Deallocating IP address ${name} on ${resourceGroupIP}`)
+  return execCmdWithExitOnFailure(
+    `az network public-ip delete --resource-group ${resourceGroupIP} --name ${name}`
+  )
 }
