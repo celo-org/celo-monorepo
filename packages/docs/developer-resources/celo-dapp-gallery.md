@@ -36,7 +36,7 @@ The [demo project](https://github.com/adrianmitter/celo-camp) presents the new f
 
 [MugglePay](https://mugglepay.com/) provides a payment SDK for merchants to accept cryptocurrencies. Mugglepay makes crypto payment easy and thousands of merchants are onboarded with MugglePay SDK. For the Celo Camp 2020, we will integrate with cUSD/cGLD for payments on Celo blockchain.
 
-[Celo Toolkit](https://celo.mugglepay.com) is the [open source](https://github.com/MugglePay/celo-toolkit) interface for managing Celo accounts on Web. As a user/developer, you might start with a funded Celo account now in 1 minute. Phone number or app downloads are not necessary.
+[Celo Toolkit](https://celo.mugglepay.com) is the [open source](https://github.com/MugglePay/celo-toolkit) interface for managing Celo accounts on Web. Celo developer might start with a funded Celo account (Testnet) now in 1 minute. Phone number or app downloads are not necessary.
 
 ## Add your app to this list!
 
