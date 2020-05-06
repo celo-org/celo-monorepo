@@ -503,7 +503,6 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
         <View
           accessible={true}
           focusable={false}
-          isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
@@ -627,7 +626,6 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
         <View
           accessible={true}
           focusable={false}
-          isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
