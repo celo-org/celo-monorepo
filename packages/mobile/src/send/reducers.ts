@@ -20,6 +20,7 @@ const initialState = {
   isValidatingRecipient: false,
   isValidRecipient: false,
   manualAddressValidationRequired: false,
+  fullValidationRequired: false,
 }
 
 export const sendReducer = (
@@ -72,6 +73,7 @@ export const sendReducer = (
       return {
         ...state,
         manualAddressValidationRequired: true,
+        fullValidationRequired: action.fullValidationRequired,
       }
 
     default:

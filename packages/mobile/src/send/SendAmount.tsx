@@ -135,8 +135,6 @@ const mapStateToProps = (state: RootState, ownProps: NavigationInjectedProps): S
   const { navigation } = ownProps
   const { e164NumberToAddress } = state.identity
   const feeType = getFeeType(navigation, e164NumberToAddress)
-  // NOTE: IF WE ARE GOING THIS PREPROCESSING ROUTE, WHY NOT PUT VERIFICATION STATUS
-  // AND RECIPIENT IN HERE AS WELL INSTEAD OF REPEATEDLY CALLING EMPTY FUNCTIONS?
   return {
     dollarBalance: state.stableToken.balance || '0',
     estimateFeeDollars: getFeeEstimateDollars(state, feeType),
