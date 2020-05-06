@@ -1,4 +1,4 @@
-import Button, { BtnTypes } from '@celo/react-components/components/Button'
+import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button.v2'
 import ItemSeparator from '@celo/react-components/components/ItemSeparator'
 import ScrollContainer from '@celo/react-components/components/ScrollContainer'
 import SectionHeadNew from '@celo/react-components/components/SectionHeadNew'
@@ -75,31 +75,28 @@ export class ExchangeHomeScreen extends React.Component<Props> {
         >
           <DisconnectBanner />
           <View>
-            <CeloGoldOverview testID="ExchangeAccountOverview" />
-            <ItemSeparator />
             <CeloGoldHistoryChart />
-            <ItemSeparator />
             <View style={styles.buttonContainer}>
               <Button
                 text={t('buy')}
+                size={BtnSizes.FULL}
                 onPress={this.goToBuyGold}
                 style={styles.button}
-                standard={true}
-                type={BtnTypes.PRIMARY}
+                type={BtnTypes.TERTIARY}
               />
               {hasGold && (
-                <>
-                  <View style={styles.buttonDivider} />
-                  <Button
-                    text={t('sell')}
-                    onPress={this.goToBuyDollars}
-                    style={styles.button}
-                    standard={true}
-                    type={BtnTypes.PRIMARY}
-                  />
-                </>
+                <Button
+                  size={BtnSizes.FULL}
+                  text={t('sell')}
+                  onPress={this.goToBuyDollars}
+                  style={styles.button}
+                  type={BtnTypes.TERTIARY}
+                />
               )}
             </View>
+            <ItemSeparator />
+            <CeloGoldOverview testID="ExchangeAccountOverview" />
+            <ItemSeparator />
           </View>
           <SectionHeadNew text={t('goldActivity')} />
           <View style={styles.activity}>
@@ -141,15 +138,13 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     flexDirection: 'row',
-    marginHorizontal: 16,
+    flex: 1,
+    marginTop: 24,
+    marginBottom: 28,
+    marginHorizontal: 12,
   },
   button: {
-    alignItems: 'center',
-    justifyContent: 'space-around',
-    paddingHorizontal: 20,
     flex: 1,
-  },
-  buttonDivider: {
-    marginLeft: 16,
+    marginHorizontal: 4,
   },
 })
