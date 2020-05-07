@@ -54,7 +54,7 @@ describe('when defaultCountry is truthy', () => {
       // mock
       Platform.OS = 'android'
 
-      const { getByName, getByTestId, getByText, debug, toJSON } = render(
+      const { getByTestId, getByText } = render(
         <PhoneNumberInput
           setE164Number={jest.fn()}
           setCountryCode={jest.fn()}
@@ -75,7 +75,7 @@ describe('when defaultCountry is truthy', () => {
     // mock
     Platform.OS = 'android'
 
-    const { getByTestId, toJSON, debug } = render(
+    const { getByTestId } = render(
       <PhoneNumberInput
         setE164Number={jest.fn()}
         setCountryCode={jest.fn()}
