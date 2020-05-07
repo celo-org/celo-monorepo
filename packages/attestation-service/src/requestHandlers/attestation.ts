@@ -5,7 +5,8 @@ import { AddressType, E164PhoneNumberType, SaltType } from '@celo/utils/lib/io'
 import Logger from 'bunyan'
 import express from 'express'
 import * as t from 'io-ts'
-import { Transaction } from 'sequelize'
+import moment from 'moment'
+import { Op, Transaction } from 'sequelize'
 import { existingAttestationRequestRecord, getAttestationTable, kit, sequelize } from '../db'
 import { getAccountAddress, getAttestationSignerAddress } from '../env'
 import { Counters } from '../metrics'
@@ -40,12 +41,13 @@ function createAttestationTextMessage(attestationCode: string) {
 
 async function ensureLockedRecord(
   attestationRequest: AttestationRequest,
+  identifier: string,
   transaction: Transaction
 ) {
   const AttestationTable = await getAttestationTable()
   await AttestationTable.findOrCreate({
     where: {
-      phoneNumber: attestationRequest.phoneNumber,
+      identifier,
       account: attestationRequest.account,
       issuer: attestationRequest.issuer,
     },
@@ -58,7 +60,7 @@ async function ensureLockedRecord(
 
   // Query to lock the record
   const attestationRecord = await existingAttestationRequestRecord(
-    attestationRequest.phoneNumber,
+    identifier,
     attestationRequest.account,
     attestationRequest.issuer,
     { transaction, lock: Transaction.LOCK.UPDATE }
@@ -77,17 +79,44 @@ async function ensureLockedRecord(
   return attestationRecord
 }
 
+async function purgeExpiredRecords() {
+  const attestations = await kit.contracts.getAttestations()
+  const expiryTimeInSeconds = (await attestations.attestationExpiryBlocks()) * 5
+  const transaction = await sequelize!.transaction()
+  const AttestationTable = await getAttestationTable()
+  try {
+    await AttestationTable.destroy({
+      where: {
+        createdAt: {
+          [Op.lte]: moment()
+            .subtract(expiryTimeInSeconds, 'seconds')
+            .toDate(),
+        },
+      },
+      transaction,
+    })
+    await transaction.commit()
+  } catch (err) {
+    await transaction.rollback()
+  }
+}
+
 class AttestationRequestHandler {
   logger: Logger
+  identifier: string
   sequelizeLogger: (_msg: string, sequelizeLog: any) => void
   constructor(public readonly attestationRequest: AttestationRequest, logger: Logger) {
     this.logger = logger.child({ attestationRequest })
     this.sequelizeLogger = (msg: string, sequelizeLogArgs: any) =>
       this.logger.debug({ sequelizeLogArgs, component: 'sequelize' }, msg)
+    this.identifier = PhoneNumberUtils.getPhoneHash(
+      this.attestationRequest.phoneNumber,
+      this.attestationRequest.salt
+    )
   }
 
   async validateAttestationRequest() {
-    const { phoneNumber, account, issuer, salt } = this.attestationRequest
+    const { phoneNumber, account, issuer } = this.attestationRequest
 
     const attestationRecord = await existingAttestationRequestRecord(phoneNumber, account, issuer, {
       logging: this.sequelizeLogger,
@@ -106,8 +135,7 @@ class AttestationRequestHandler {
     }
 
     const attestations = await kit.contracts.getAttestations()
-    const identifier = PhoneNumberUtils.getPhoneHash(phoneNumber, salt)
-    const state = await attestations.getAttestationState(identifier, account, issuer)
+    const state = await attestations.getAttestationState(this.identifier, account, issuer)
 
     if (state.attestationState !== AttestationState.Incomplete) {
       Counters.attestationRequestsWOIncompleteAttestation.inc()
@@ -155,7 +183,11 @@ class AttestationRequestHandler {
     const transaction = await sequelize!.transaction({ logging: this.sequelizeLogger })
 
     try {
-      attestationRecord = await ensureLockedRecord(this.attestationRequest, transaction)
+      attestationRecord = await ensureLockedRecord(
+        this.attestationRequest,
+        this.identifier,
+        transaction
+      )
       const provider = smsProviderFor(this.attestationRequest.phoneNumber)
 
       if (!provider) {
@@ -250,4 +282,5 @@ export async function handleAttestationRequest(
     respondWithError(res, 500, SMS_SENDING_ERROR)
     return
   }
+  await purgeExpiredRecords()
 }
