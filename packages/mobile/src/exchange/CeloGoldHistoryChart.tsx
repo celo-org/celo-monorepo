@@ -164,7 +164,7 @@ function renderPointOnChart(
 function Loader() {
   return (
     <View style={styles.loader}>
-      <ActivityIndicator size="large" color={colors.celoGreen} />
+      <ActivityIndicator size="large" color={colors.goldUI} />
     </View>
   )
 }
@@ -229,7 +229,6 @@ function CeloGoldHistoryChart({ t, testID, i18n }: Props) {
     amount: currentGoldRateInLocalCurrency.toNumber(),
     displayValue: displayLocalCurrency(currentGoldRateInLocalCurrency),
   })
-  // chartData[0].amount += 2
   const rateChange = currentGoldRateInLocalCurrency.minus(oldestGoldRateInLocalCurrency)
   const rateChangeInPercentage = currentGoldRateInLocalCurrency
     .div(oldestGoldRateInLocalCurrency)
@@ -308,9 +307,7 @@ const styles = StyleSheet.create({
   },
   goldPriceValues: { flexDirection: 'row', alignItems: 'flex-end' },
   goldPriceCurrentValue: {
-    ...fontStyles.regular,
-    lineHeight: 27,
-    fontSize: 24,
+    ...fontStyles.mediumNumber,
   },
   goldPriceWentUp: {
     ...fontStyles.regular,
@@ -318,12 +315,12 @@ const styles = StyleSheet.create({
   },
   goldPriceWentDown: {
     ...fontStyles.regular,
-    marginBottom: 1, // vertically align with the current price
+    marginBottom: 2, // vertically align with the current price
     marginLeft: 4,
     color: colors.warning,
   },
   loader: {
-    width: CHART_WIDTH + 32,
+    width: CHART_WIDTH,
     height: CHART_HEIGHT + 130,
     alignItems: 'center',
     justifyContent: 'center',

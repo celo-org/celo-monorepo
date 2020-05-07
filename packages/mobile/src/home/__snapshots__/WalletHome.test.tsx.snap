@@ -193,6 +193,15 @@ exports[`Testnet banner Renders when connected with backup complete 1`] = `
             activity
           </Text>
         </View>
+        <View
+          style={
+            Object {
+              "backgroundColor": "#EDEEEF",
+              "height": 1,
+              "marginHorizontal": 16,
+            }
+          }
+        />
       </View>
       <View
         onLayout={[Function]}
@@ -628,6 +637,15 @@ exports[`Testnet banner Renders when disconnected 1`] = `
             activity
           </Text>
         </View>
+        <View
+          style={
+            Object {
+              "backgroundColor": "#EDEEEF",
+              "height": 1,
+              "marginHorizontal": 16,
+            }
+          }
+        />
       </View>
       <View
         onLayout={[Function]}
@@ -1044,6 +1062,15 @@ exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
             activity
           </Text>
         </View>
+        <View
+          style={
+            Object {
+              "backgroundColor": "#EDEEEF",
+              "height": 1,
+              "marginHorizontal": 16,
+            }
+          }
+        />
       </View>
       <View
         onLayout={[Function]}

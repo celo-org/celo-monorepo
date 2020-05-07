@@ -243,6 +243,15 @@ exports[`ignores failed standby transactions 1`] = `
           </View>
         </View>
       </View>
+      <View
+        style={
+          Object {
+            "backgroundColor": "#EDEEEF",
+            "height": 1,
+            "marginHorizontal": 16,
+          }
+        }
+      />
     </View>
     <View
       onLayout={[Function]}
@@ -631,6 +640,15 @@ exports[`ignores pending standby transactions that are completed in the response
           </View>
         </View>
       </View>
+      <View
+        style={
+          Object {
+            "backgroundColor": "#EDEEEF",
+            "height": 1,
+            "marginHorizontal": 16,
+          }
+        }
+      />
     </View>
     <View
       onLayout={[Function]}
@@ -1105,6 +1123,15 @@ exports[`renders the received data along with the standby transactions 1`] = `
           </View>
         </View>
       </View>
+      <View
+        style={
+          Object {
+            "backgroundColor": "#EDEEEF",
+            "height": 1,
+            "marginHorizontal": 16,
+          }
+        }
+      />
     </View>
     <View
       onLayout={[Function]}
@@ -1229,6 +1256,15 @@ exports[`renders the received data along with the standby transactions 1`] = `
           </View>
         </View>
       </View>
+      <View
+        style={
+          Object {
+            "backgroundColor": "#EDEEEF",
+            "height": 1,
+            "marginHorizontal": 16,
+          }
+        }
+      />
     </View>
     <View
       onLayout={[Function]}
@@ -1356,6 +1392,15 @@ exports[`renders the received data along with the standby transactions 1`] = `
           </View>
         </View>
       </View>
+      <View
+        style={
+          Object {
+            "backgroundColor": "#EDEEEF",
+            "height": 1,
+            "marginHorizontal": 16,
+          }
+        }
+      />
     </View>
     <View
       onLayout={[Function]}
@@ -1511,6 +1556,15 @@ exports[`renders the received data along with the standby transactions 1`] = `
           </View>
         </View>
       </View>
+      <View
+        style={
+          Object {
+            "backgroundColor": "#EDEEEF",
+            "height": 1,
+            "marginHorizontal": 16,
+          }
+        }
+      />
     </View>
     <View
       onLayout={[Function]}

@@ -98,5 +98,7 @@
   "feedItemEscrowReceivedInfo": "{{comment}}",
   "feedItemEscrowReceivedInfo_noComment": "Escrow Payment Received",
   "feedItemGenericTitle": "{{nameOrNumber}}",
-  "feedItemGenericTitle_noRecipientDetails": "Unknown"
+  "feedItemGenericTitle_noRecipientDetails": "Unknown",
+  "feedItemGoldSold": "Sold",
+  "feedItemGoldPurchased": "Purchased"
 }
