@@ -20,7 +20,7 @@
     "dev:emulator:list": "$ANDROID_HOME/emulator/emulator -list-avds",
     "dev:emulator:run": "$ANDROID_HOME/emulator/emulator -avd",
     "test": "export TZ=UTC && jest --silent",
-    "test:all": "yarn lint && yarn build && yarn test",
+    "test:all": "yarn lint && yarn build:ts && yarn test",
     "test:ci": "yarn test --coverage --runInBand",
     "test:watch": "yarn test --watch --maxWorkers=4",
     "test:verbose": "export TZ=UTC && jest --verbose",
