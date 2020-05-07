@@ -331,10 +331,7 @@ jobs:
       - checkout
       - run:
           name: Install node 10
-          command: |
-            curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
-            nvm install 10
-            nvm alias default 10
+          command: brew install node@10
       - run:
           name: Check if the test should run
           command: |
