@@ -1,0 +1,37 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`DelayButton renders button with text when backup too late and not delayed 1`] = `
+<View
+  accessible={true}
+  focusable={true}
+  nativeBackgroundAndroid={
+    Object {
+      "attribute": "selectableItemBackgroundBorderless",
+      "type": "ThemeAttrAndroid",
+    }
+  }
+  onClick={[Function]}
+  onResponderGrant={[Function]}
+  onResponderMove={[Function]}
+  onResponderRelease={[Function]}
+  onResponderTerminate={[Function]}
+  onResponderTerminationRequest={[Function]}
+  onStartShouldSetResponder={[Function]}
+>
+  <Text
+    style={
+      Object {
+        "color": "#9CA4A9",
+        "fontFamily": "Inter-Medium",
+        "fontSize": 15,
+        "lineHeight": 20,
+        "paddingHorizontal": 16,
+      }
+    }
+  >
+    delayBackup
+  </Text>
+</View>
+`;
+
+exports[`DelayButton renders empty when backup too late and delayed 1`] = `<View />`;
