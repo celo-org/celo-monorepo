@@ -70,7 +70,8 @@ spec:
 
         - name: prometheus-storage-volume
           emptyDir: {}
-
+{{- if or (.Values.use_service_account) (eq (.Values.use_service_account | toString) "<nil>") }}
         - name: prometheus-service-account-key
           secret:
             secretName: prometheus-service-account-key
+{{ end -}}

@@ -96,8 +96,10 @@ release: {{ .Release.Name }}
     NAT_FLAG=""
     if [[ ! -z $IP_ADDRESSES ]]; then
       NAT_IP=$(echo "$IP_ADDRESSES" | awk -v RID=$(expr "$RID" + "1") '{split($0,a,","); print a[RID]}')
-    else
+    elif [[ -f /root/.celo/ipAddress ]]; then
       NAT_IP=$(cat /root/.celo/ipAddress)
+    else
+      NAT_IP=$(hostname -i)
     fi
     NAT_FLAG="--nat=extip:${NAT_IP}"
     ADDITIONAL_FLAGS='{{ .geth_flags | default "" }}'

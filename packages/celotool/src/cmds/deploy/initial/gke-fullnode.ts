@@ -7,18 +7,25 @@ export const command = 'gke-fullnode'
 export const describe = 'deploy full-node(s) to a kubernetes cluster on GKE using Helm'
 
 export const builder = (argv: yargs.Argv) => {
-  return argv.option('sync-mode', {
-    type: 'string',
-    description: 'Geth sync mode',
-    default: 'full',
-  })
+  return argv
+    .option('syncmode', {
+      type: 'string',
+      description: 'Geth sync mode',
+      default: 'full',
+    })
+    .option('namespace', {
+      type: 'string',
+      description: 'Namespace where deploy',
+      default: '',
+    })
 }
 
 export interface GKEFullNodeArgv extends InitialArgv {
-  syncMode: string
+  syncmode: string
+  namespace: string
 }
 
 export const handler = async (argv: GKEFullNodeArgv) => {
   // await switchToClusterFromEnv(argv.celoEnv)
-  await installFullNodeChart(argv.celoEnv, argv.syncMode)
+  await installFullNodeChart(argv.celoEnv, argv.syncmode, argv.namespace)
 }
