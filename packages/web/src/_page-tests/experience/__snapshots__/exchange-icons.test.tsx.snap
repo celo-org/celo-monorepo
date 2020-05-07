@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Experience/Composition renders 1`] = `
+exports[`Experience/ExchangeIcons renders 1`] = `
 <div
   className="css-view-1dbjc4n"
 >
@@ -1212,59 +1212,125 @@ exports[`Experience/Composition renders 1`] = `
             className="css-view-1dbjc4n"
             style={
               Object {
-                "marginBottom": "60px",
-                "marginLeft": "10px",
-                "marginRight": "10px",
+                "paddingLeft": "10px",
+                "paddingRight": "10px",
               }
             }
           >
-            <h1
-              aria-level="1"
-              className="css-reset-4rbku5 css-text-901oao"
-              dir="auto"
-              role="heading"
+            <div
+              className="css-view-1dbjc4n"
               style={
                 Object {
-                  "color": "rgba(46,51,56,1.00)",
-                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                  "fontSize": "36px",
-                  "lineHeight": "40px",
-                  "marginBottom": "20px",
-                  "textRendering": "geometricPrecision",
-                  "textTransform": "none",
+                  "marginLeft": "10px",
+                  "marginRight": "10px",
                 }
               }
             >
-              composition.title
-            </h1>
-            <h4
-              aria-level="4"
-              className="css-reset-4rbku5 css-text-901oao"
-              dir="auto"
-              role="heading"
-              style={
-                Object {
-                  "color": "rgba(46,51,56,1.00)",
-                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                  "fontSize": "24px",
-                  "lineHeight": "32px",
-                  "textRendering": "geometricPrecision",
-                  "textTransform": "none",
+              <h1
+                aria-level="1"
+                className="css-reset-4rbku5 css-text-901oao"
+                dir="auto"
+                role="heading"
+                style={
+                  Object {
+                    "color": "rgba(46,51,56,1.00)",
+                    "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                    "fontSize": "36px",
+                    "lineHeight": "40px",
+                    "marginBottom": "20px",
+                    "textRendering": "geometricPrecision",
+                    "textTransform": "none",
+                  }
                 }
-              }
+              >
+                exchangeIcons.title
+              </h1>
+              <h4
+                aria-level="4"
+                className="css-reset-4rbku5 css-text-901oao"
+                dir="auto"
+                role="heading"
+                style={
+                  Object {
+                    "color": "rgba(46,51,56,1.00)",
+                    "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                    "fontSize": "24px",
+                    "lineHeight": "32px",
+                    "textRendering": "geometricPrecision",
+                    "textTransform": "none",
+                  }
+                }
+              >
+                exchangeIcons.headline
+              </h4>
+            </div>
+            <div
+              className="css-view-1dbjc4n"
+              onClick={[Function]}
+              onMouseDown={[Function]}
+              onMouseEnter={[Function]}
+              onMouseLeave={[Function]}
+              onMouseUp={[Function]}
+              onResponderGrant={[Function]}
+              onResponderRelease={[Function]}
             >
-              composition.headline
-            </h4>
-          </div>
-          <div
-            className="css-view-1dbjc4n"
-            style={
-              Object {
-                "marginLeft": "10px",
-                "marginRight": "10px",
-              }
-            }
-          >
+              <a
+                className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+                data-focusable={true}
+                dir="auto"
+                href="/assets/CeloMarketplaceIcons.zip"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
+                role="link"
+                style={
+                  Object {
+                    "WebkitAlignItems": "center",
+                    "WebkitBoxAlign": "center",
+                    "WebkitBoxFlex": 0,
+                    "WebkitBoxPack": "center",
+                    "WebkitFlexGrow": 0,
+                    "WebkitJustifyContent": "center",
+                    "alignItems": "center",
+                    "backgroundColor": "rgba(53,208,127,1.00)",
+                    "borderBottomColor": "rgba(53,208,127,1.00)",
+                    "borderBottomLeftRadius": "3px",
+                    "borderBottomRightRadius": "3px",
+                    "borderBottomWidth": "1px",
+                    "borderLeftColor": "rgba(53,208,127,1.00)",
+                    "borderLeftWidth": "1px",
+                    "borderRightColor": "rgba(53,208,127,1.00)",
+                    "borderRightWidth": "1px",
+                    "borderTopColor": "rgba(53,208,127,1.00)",
+                    "borderTopLeftRadius": "3px",
+                    "borderTopRightRadius": "3px",
+                    "borderTopWidth": "1px",
+                    "color": "rgba(255,255,255,1.00)",
+                    "cursor": "pointer",
+                    "display": "inline-flex",
+                    "flexGrow": 0,
+                    "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                    "fontSize": "16px",
+                    "fontWeight": "500",
+                    "justifyContent": "center",
+                    "lineHeight": "16px",
+                    "minWidth": "150px",
+                    "msFlexAlign": "center",
+                    "msFlexPack": "center",
+                    "msFlexPositive": 0,
+                    "opacity": 1,
+                    "paddingBottom": "10px",
+                    "paddingLeft": "20px",
+                    "paddingRight": "20px",
+                    "paddingTop": "10px",
+                    "textAlign": "center",
+                    "textRendering": "geometricPrecision",
+                    "width": "fit-content",
+                  }
+                }
+              >
+                logo.overviewBtn
+              </a>
+            </div>
             <div
               className="css-text-901oao"
               dir="auto"
@@ -1275,12 +1341,14 @@ exports[`Experience/Composition renders 1`] = `
                   "fontSize": "20px",
                   "fontWeight": "500",
                   "lineHeight": "24px",
-                  "marginBottom": "20px",
+                  "marginLeft": "10px",
+                  "marginRight": "10px",
+                  "marginTop": "60px",
                   "textRendering": "geometricPrecision",
                 }
               }
             >
-              composition.alignmentTitle
+              licenseTitle
             </div>
             <div
               className="css-text-901oao"
@@ -1291,613 +1359,57 @@ exports[`Experience/Composition renders 1`] = `
                   "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                   "fontSize": "20px",
                   "lineHeight": "28px",
-                  "textRendering": "geometricPrecision",
-                }
-              }
-            >
-              composition.alignmentText
-            </div>
-            <div
-              className="css-view-1dbjc4n"
-              style={
-                Object {
-                  "WebkitBoxDirection": "normal",
-                  "WebkitBoxLines": "multiple",
-                  "WebkitBoxOrient": "horizontal",
-                  "WebkitFlexDirection": "row",
-                  "WebkitFlexWrap": "wrap",
-                  "display": "grid",
-                  "flexDirection": "row",
-                  "flexWrap": "wrap",
-                  "gridColumnGap": "20px",
-                  "gridRowGap": "15px",
-                  "gridTemplateColumns": "repeat(auto-fit, minmax(280px, 1fr))",
-                  "marginBottom": "75px",
-                  "marginTop": "40px",
-                  "msFlexDirection": "row",
-                  "msFlexWrap": "wrap",
-                  "msGridColumnGap": "20px",
-                  "msGridRowGap": "15px",
-                  "msGridTemplateColumns": "repeat(auto-fit, minmax(280px, 1fr))",
-                }
-              }
-            >
-              <div
-                className="css-view-1dbjc4n"
-                style={
-                  Object {
-                    "borderBottomColor": "rgba(221,221,221,1.00)",
-                    "borderBottomWidth": "1px",
-                    "borderLeftColor": "rgba(221,221,221,1.00)",
-                    "borderLeftWidth": "1px",
-                    "borderRightColor": "rgba(221,221,221,1.00)",
-                    "borderRightWidth": "1px",
-                    "borderTopColor": "rgba(221,221,221,1.00)",
-                    "borderTopWidth": "1px",
-                    "maxWidth": "400px",
-                    "paddingBottom": "30px",
-                    "paddingLeft": "20px",
-                    "paddingRight": "20px",
-                    "paddingTop": "30px",
-                  }
-                }
-              >
-                <h4
-                  aria-level="4"
-                  className="css-reset-4rbku5 css-text-901oao"
-                  dir="auto"
-                  role="heading"
-                  style={
-                    Object {
-                      "color": "rgba(46,51,56,1.00)",
-                      "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                      "fontSize": "24px",
-                      "lineHeight": "32px",
-                      "marginBottom": "20px",
-                      "textRendering": "geometricPrecision",
-                      "textTransform": "none",
-                    }
-                  }
-                >
-                  composition.alignmentExampleTitle
-                </h4>
-                <div
-                  className="css-view-1dbjc4n"
-                  style={
-                    Object {
-                      "WebkitFlexBasis": "auto",
-                      "flexBasis": "auto",
-                      "height": "88px",
-                      "msFlexPreferredSize": "auto",
-                      "overflowX": "hidden",
-                      "overflowY": "hidden",
-                      "width": "139px",
-                      "zIndex": 0,
-                    }
-                  }
-                >
-                  <div
-                    className="css-view-1dbjc4n"
-                    style={
-                      Object {
-                        "backgroundColor": "rgba(0,0,0,0.00)",
-                        "backgroundImage": "url(\\"image.png\\")",
-                        "backgroundPosition": "center",
-                        "backgroundRepeat": "no-repeat",
-                        "backgroundSize": "cover",
-                        "bottom": "0px",
-                        "height": "100%",
-                        "left": "0px",
-                        "position": "absolute",
-                        "right": "0px",
-                        "top": "0px",
-                        "width": "100%",
-                        "zIndex": -1,
-                      }
-                    }
-                  />
-                  <img
-                    alt=""
-                    className="css-accessibilityImage-9pa8cd"
-                    draggable={false}
-                    src="image.png"
-                  />
-                </div>
-                <div
-                  className="css-text-901oao"
-                  dir="auto"
-                  style={
-                    Object {
-                      "color": "rgba(46,51,56,1.00)",
-                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                      "fontSize": "18px",
-                      "marginBottom": "5px",
-                      "marginTop": "20px",
-                      "textRendering": "geometricPrecision",
-                    }
-                  }
-                >
-                  composition.alignmentExampleSubtitle
-                </div>
-                <div
-                  className="css-text-901oao"
-                  dir="auto"
-                  style={
-                    Object {
-                      "color": "rgba(46,51,56,1.00)",
-                      "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                      "fontSize": "16px",
-                      "lineHeight": "20px",
-                      "textRendering": "geometricPrecision",
-                    }
-                  }
-                >
-                  composition.alignmentExampleText
-                </div>
-              </div>
-              <div
-                className="css-view-1dbjc4n"
-                style={
-                  Object {
-                    "WebkitAlignItems": "center",
-                    "WebkitBoxAlign": "center",
-                    "alignItems": "center",
-                    "borderBottomColor": "rgba(221,221,221,1.00)",
-                    "borderBottomWidth": "1px",
-                    "borderLeftColor": "rgba(221,221,221,1.00)",
-                    "borderLeftWidth": "1px",
-                    "borderRightColor": "rgba(221,221,221,1.00)",
-                    "borderRightWidth": "1px",
-                    "borderTopColor": "rgba(221,221,221,1.00)",
-                    "borderTopWidth": "1px",
-                    "maxWidth": "400px",
-                    "msFlexAlign": "center",
-                    "paddingBottom": "30px",
-                    "paddingLeft": "20px",
-                    "paddingRight": "20px",
-                    "paddingTop": "30px",
-                  }
-                }
-              >
-                <h4
-                  aria-level="4"
-                  className="css-reset-4rbku5 css-text-901oao"
-                  dir="auto"
-                  role="heading"
-                  style={
-                    Object {
-                      "color": "rgba(46,51,56,1.00)",
-                      "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                      "fontSize": "24px",
-                      "lineHeight": "32px",
-                      "marginBottom": "20px",
-                      "textAlign": "center",
-                      "textRendering": "geometricPrecision",
-                      "textTransform": "none",
-                    }
-                  }
-                >
-                  composition.alignmentExampleTitle
-                </h4>
-                <div
-                  className="css-view-1dbjc4n"
-                  style={
-                    Object {
-                      "WebkitFlexBasis": "auto",
-                      "flexBasis": "auto",
-                      "height": "88px",
-                      "msFlexPreferredSize": "auto",
-                      "overflowX": "hidden",
-                      "overflowY": "hidden",
-                      "width": "139px",
-                      "zIndex": 0,
-                    }
-                  }
-                >
-                  <div
-                    className="css-view-1dbjc4n"
-                    style={
-                      Object {
-                        "backgroundColor": "rgba(0,0,0,0.00)",
-                        "backgroundImage": "url(\\"image.png\\")",
-                        "backgroundPosition": "center",
-                        "backgroundRepeat": "no-repeat",
-                        "backgroundSize": "cover",
-                        "bottom": "0px",
-                        "height": "100%",
-                        "left": "0px",
-                        "position": "absolute",
-                        "right": "0px",
-                        "top": "0px",
-                        "width": "100%",
-                        "zIndex": -1,
-                      }
-                    }
-                  />
-                  <img
-                    alt=""
-                    className="css-accessibilityImage-9pa8cd"
-                    draggable={false}
-                    src="image.png"
-                  />
-                </div>
-                <div
-                  className="css-text-901oao"
-                  dir="auto"
-                  style={
-                    Object {
-                      "color": "rgba(46,51,56,1.00)",
-                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                      "fontSize": "18px",
-                      "marginBottom": "5px",
-                      "marginTop": "20px",
-                      "textAlign": "center",
-                      "textRendering": "geometricPrecision",
-                    }
-                  }
-                >
-                  composition.alignmentExampleSubtitle
-                </div>
-                <div
-                  className="css-text-901oao"
-                  dir="auto"
-                  style={
-                    Object {
-                      "color": "rgba(46,51,56,1.00)",
-                      "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                      "fontSize": "16px",
-                      "lineHeight": "20px",
-                      "textAlign": "center",
-                      "textRendering": "geometricPrecision",
-                    }
-                  }
-                >
-                  composition.alignmentExampleText
-                </div>
-              </div>
-              <div
-                className="css-view-1dbjc4n"
-                style={
-                  Object {
-                    "borderBottomColor": "rgba(221,221,221,1.00)",
-                    "borderBottomWidth": "1px",
-                    "borderLeftColor": "rgba(221,221,221,1.00)",
-                    "borderLeftWidth": "1px",
-                    "borderRightColor": "rgba(221,221,221,1.00)",
-                    "borderRightWidth": "1px",
-                    "borderTopColor": "rgba(221,221,221,1.00)",
-                    "borderTopWidth": "1px",
-                    "maxWidth": "400px",
-                    "paddingBottom": "30px",
-                    "paddingLeft": "20px",
-                    "paddingRight": "20px",
-                    "paddingTop": "30px",
-                  }
-                }
-              >
-                <h4
-                  aria-level="4"
-                  className="css-reset-4rbku5 css-text-901oao"
-                  dir="auto"
-                  role="heading"
-                  style={
-                    Object {
-                      "color": "rgba(46,51,56,1.00)",
-                      "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                      "fontSize": "24px",
-                      "lineHeight": "32px",
-                      "marginBottom": "20px",
-                      "textAlign": "center",
-                      "textRendering": "geometricPrecision",
-                      "textTransform": "none",
-                    }
-                  }
-                >
-                  composition.alignmentExampleTitle
-                </h4>
-                <div
-                  className="css-view-1dbjc4n"
-                  style={
-                    Object {
-                      "WebkitBoxDirection": "normal",
-                      "WebkitBoxOrient": "horizontal",
-                      "WebkitFlexDirection": "row",
-                      "flexDirection": "row",
-                      "marginTop": "20px",
-                      "msFlexDirection": "row",
-                    }
-                  }
-                >
-                  <div
-                    className="css-view-1dbjc4n"
-                    style={
-                      Object {
-                        "WebkitFlexBasis": "auto",
-                        "flexBasis": "auto",
-                        "height": "52px",
-                        "msFlexPreferredSize": "auto",
-                        "overflowX": "hidden",
-                        "overflowY": "hidden",
-                        "width": "83px",
-                        "zIndex": 0,
-                      }
-                    }
-                  >
-                    <div
-                      className="css-view-1dbjc4n"
-                      style={
-                        Object {
-                          "backgroundColor": "rgba(0,0,0,0.00)",
-                          "backgroundImage": "url(\\"image.png\\")",
-                          "backgroundPosition": "center",
-                          "backgroundRepeat": "no-repeat",
-                          "backgroundSize": "cover",
-                          "bottom": "0px",
-                          "height": "100%",
-                          "left": "0px",
-                          "position": "absolute",
-                          "right": "0px",
-                          "top": "0px",
-                          "width": "100%",
-                          "zIndex": -1,
-                        }
-                      }
-                    />
-                    <img
-                      alt=""
-                      className="css-accessibilityImage-9pa8cd"
-                      draggable={false}
-                      src="image.png"
-                    />
-                  </div>
-                  <div
-                    className="css-view-1dbjc4n"
-                    style={
-                      Object {
-                        "WebkitBoxFlex": 1,
-                        "WebkitFlexBasis": "0%",
-                        "WebkitFlexGrow": 1,
-                        "WebkitFlexShrink": 1,
-                        "flexBasis": "0%",
-                        "flexGrow": 1,
-                        "flexShrink": 1,
-                        "msFlexNegative": 1,
-                        "msFlexPositive": 1,
-                        "msFlexPreferredSize": "0%",
-                        "paddingLeft": "10px",
-                      }
-                    }
-                  >
-                    <div
-                      className="css-text-901oao"
-                      dir="auto"
-                      style={
-                        Object {
-                          "color": "rgba(46,51,56,1.00)",
-                          "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                          "fontSize": "18px",
-                          "marginBottom": "5px",
-                          "textRendering": "geometricPrecision",
-                        }
-                      }
-                    >
-                      composition.alignmentExampleSubtitle
-                    </div>
-                    <div
-                      className="css-text-901oao"
-                      dir="auto"
-                      style={
-                        Object {
-                          "color": "rgba(46,51,56,1.00)",
-                          "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                          "fontSize": "16px",
-                          "lineHeight": "20px",
-                          "textRendering": "geometricPrecision",
-                        }
-                      }
-                    >
-                      composition.alignmentExampleText
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div
-                className="css-view-1dbjc4n"
-                style={
-                  Object {
-                    "borderBottomColor": "rgba(221,221,221,1.00)",
-                    "borderBottomWidth": "1px",
-                    "borderLeftColor": "rgba(221,221,221,1.00)",
-                    "borderLeftWidth": "1px",
-                    "borderRightColor": "rgba(221,221,221,1.00)",
-                    "borderRightWidth": "1px",
-                    "borderTopColor": "rgba(221,221,221,1.00)",
-                    "borderTopWidth": "1px",
-                    "maxWidth": "400px",
-                    "paddingBottom": "30px",
-                    "paddingLeft": "20px",
-                    "paddingRight": "20px",
-                    "paddingTop": "30px",
-                  }
-                }
-              >
-                <h4
-                  aria-level="4"
-                  className="css-reset-4rbku5 css-text-901oao"
-                  dir="auto"
-                  role="heading"
-                  style={
-                    Object {
-                      "color": "rgba(46,51,56,1.00)",
-                      "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                      "fontSize": "24px",
-                      "lineHeight": "32px",
-                      "marginBottom": "20px",
-                      "textAlign": "center",
-                      "textRendering": "geometricPrecision",
-                      "textTransform": "none",
-                    }
-                  }
-                >
-                  composition.alignmentExampleTitle
-                </h4>
-                <div
-                  className="css-view-1dbjc4n"
-                  style={
-                    Object {
-                      "display": "grid",
-                      "gridColumnGap": "10px",
-                      "gridTemplateAreas": "\\". image image\\" \\"subtitle text text\\"",
-                      "gridTemplateColumns": "repeat(3, 1fr)",
-                      "gridTemplateRows": "repeat(2, 1fr)",
-                      "marginTop": "5px",
-                      "msGridColumnGap": "10px",
-                      "msGridTemplateAreas": "\\". image image\\" \\"subtitle text text\\"",
-                      "msGridTemplateColumns": "repeat(3, 1fr)",
-                      "msGridTemplateRows": "repeat(2, 1fr)",
-                    }
-                  }
-                >
-                  <div
-                    className="css-text-901oao"
-                    dir="auto"
-                    style={
-                      Object {
-                        "color": "rgba(46,51,56,1.00)",
-                        "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                        "fontSize": "18px",
-                        "gridArea": "subtitle",
-                        "marginBottom": "5px",
-                        "msGridArea": "subtitle",
-                        "textRendering": "geometricPrecision",
-                      }
-                    }
-                  >
-                    composition.alignmentExampleSubtitle
-                  </div>
-                  <div
-                    className="css-view-1dbjc4n"
-                    style={
-                      Object {
-                        "WebkitFlexBasis": "auto",
-                        "flexBasis": "auto",
-                        "gridArea": "image",
-                        "height": "63px",
-                        "msFlexPreferredSize": "auto",
-                        "msGridArea": "image",
-                        "overflowX": "hidden",
-                        "overflowY": "hidden",
-                        "width": "98px",
-                        "zIndex": 0,
-                      }
-                    }
-                  >
-                    <div
-                      className="css-view-1dbjc4n"
-                      style={
-                        Object {
-                          "backgroundColor": "rgba(0,0,0,0.00)",
-                          "backgroundImage": "url(\\"image.png\\")",
-                          "backgroundPosition": "center",
-                          "backgroundRepeat": "no-repeat",
-                          "backgroundSize": "cover",
-                          "bottom": "0px",
-                          "height": "100%",
-                          "left": "0px",
-                          "position": "absolute",
-                          "right": "0px",
-                          "top": "0px",
-                          "width": "100%",
-                          "zIndex": -1,
-                        }
-                      }
-                    />
-                    <img
-                      alt=""
-                      className="css-accessibilityImage-9pa8cd"
-                      draggable={false}
-                      src="image.png"
-                    />
-                  </div>
-                  <div
-                    className="css-text-901oao"
-                    dir="auto"
-                    style={
-                      Object {
-                        "color": "rgba(46,51,56,1.00)",
-                        "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                        "fontSize": "16px",
-                        "gridArea": "text",
-                        "lineHeight": "20px",
-                        "msGridArea": "text",
-                        "textRendering": "geometricPrecision",
-                      }
-                    }
-                  >
-                    composition.alignmentExampleText
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div
-          className="css-view-1dbjc4n"
-          id="grid"
-        >
-          <div
-            className="css-view-1dbjc4n"
-            style={
-              Object {
-                "marginLeft": "10px",
-                "marginRight": "10px",
-              }
-            }
-          >
-            <h2
-              aria-level="2"
-              className="css-reset-4rbku5 css-text-901oao"
-              dir="auto"
-              role="heading"
-              style={
-                Object {
-                  "color": "rgba(46,51,56,1.00)",
-                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                  "fontSize": "28px",
-                  "lineHeight": "32px",
                   "marginBottom": "20px",
-                  "textRendering": "geometricPrecision",
-                  "textTransform": "none",
-                }
-              }
-            >
-              composition.gridTitle
-            </h2>
-            <div
-              className="css-text-901oao"
-              dir="auto"
-              style={
-                Object {
-                  "color": "rgba(46,51,56,1.00)",
-                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                  "fontSize": "20px",
-                  "lineHeight": "28px",
+                  "marginLeft": "10px",
+                  "marginRight": "10px",
+                  "marginTop": "20px",
                   "textRendering": "geometricPrecision",
                 }
               }
             >
-              composition.gridText
+              <div
+                className="css-view-1dbjc4n"
+                onClick={[Function]}
+                onMouseDown={[Function]}
+                onMouseEnter={[Function]}
+                onMouseLeave={[Function]}
+                onMouseUp={[Function]}
+                onResponderGrant={[Function]}
+                onResponderRelease={[Function]}
+                style={
+                  Object {
+                    "display": "inline",
+                  }
+                }
+              >
+                <a
+                  className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao css-textHasAncestor-16my406"
+                  data-focusable={true}
+                  dir="auto"
+                  href="/code-of-conduct"
+                  onClick={[Function]}
+                  onMouseEnter={[Function]}
+                  role="link"
+                  style={
+                    Object {
+                      "WebkitTextDecorationStyle": "solid",
+                      "cursor": "pointer",
+                      "display": "inline",
+                      "opacity": 1,
+                      "textDecoration": "underline",
+                      "textDecorationStyle": "solid",
+                    }
+                  }
+                >
+                  Code of Conduct
+                </a>
+              </div>
             </div>
             <div
               className="css-view-1dbjc4n"
               style={
                 Object {
-                  "display": "grid",
-                  "gridColumnGap": "15px",
-                  "gridRowGap": "15px",
-                  "marginTop": "40px",
-                  "msGridColumnGap": "15px",
-                  "msGridRowGap": "15px",
+                  "minHeight": "75vh",
                 }
               }
             >
@@ -1905,580 +1417,1746 @@ exports[`Experience/Composition renders 1`] = `
                 className="css-view-1dbjc4n"
                 style={
                   Object {
-                    "WebkitBoxFlex": 1,
-                    "WebkitFlexBasis": "0%",
-                    "WebkitFlexGrow": 1,
-                    "WebkitFlexShrink": 1,
-                    "backgroundColor": "rgba(239,229,255,1.00)",
-                    "flexBasis": "0%",
-                    "flexGrow": 1,
-                    "flexShrink": 1,
-                    "gridArea": "1 / 1 / 1 / 12 ",
-                    "msFlexNegative": 1,
-                    "msFlexPositive": 1,
-                    "msFlexPreferredSize": "0%",
-                    "msGridArea": "1 / 1 / 1 / 12 ",
-                    "paddingBottom": "15px",
-                    "paddingLeft": "15px",
-                    "paddingRight": "15px",
-                    "paddingTop": "15px",
+                    "WebkitBoxDirection": "normal",
+                    "WebkitBoxLines": "multiple",
+                    "WebkitBoxOrient": "horizontal",
+                    "WebkitFlexDirection": "row",
+                    "WebkitFlexWrap": "wrap",
+                    "flexDirection": "row",
+                    "flexWrap": "wrap",
+                    "msFlexDirection": "row",
+                    "msFlexWrap": "wrap",
                   }
                 }
               >
                 <div
-                  className="css-text-901oao"
-                  dir="auto"
-                  style={
-                    Object {
-                      "borderBottomColor": "rgba(191,151,255,1.00)",
-                      "borderBottomStyle": "dashed",
-                      "borderBottomWidth": "1px",
-                      "borderLeftColor": "rgba(191,151,255,1.00)",
-                      "borderLeftStyle": "dashed",
-                      "borderLeftWidth": "1px",
-                      "borderRightColor": "rgba(191,151,255,1.00)",
-                      "borderRightStyle": "dashed",
-                      "borderRightWidth": "1px",
-                      "borderTopColor": "rgba(191,151,255,1.00)",
-                      "borderTopStyle": "dashed",
-                      "borderTopWidth": "1px",
-                      "color": "rgba(146,78,255,1.00)",
-                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                      "fontSize": "22px",
-                      "letterSpacing": "-8px",
-                      "lineHeight": "16px",
-                      "paddingBottom": "12px",
-                      "paddingLeft": "8px",
-                      "paddingRight": "8px",
-                      "paddingTop": "12px",
-                      "textAlign": "center",
-                      "textRendering": "geometricPrecision",
-                    }
-                  }
+                  className="css-view-1dbjc4n"
                 >
-                  ⅟₁
+                  <div
+                    className="css-view-1dbjc4n"
+                    style={
+                      Object {
+                        "WebkitBoxPack": "justify",
+                        "WebkitJustifyContent": "space-between",
+                        "justifyContent": "space-between",
+                        "marginLeft": "10px",
+                        "marginRight": "10px",
+                        "marginTop": "20px",
+                        "msFlexPack": "justify",
+                        "width": "160px",
+                      }
+                    }
+                  >
+                    <div
+                      className="react-reveal"
+                      style={
+                        Object {
+                          "opacity": undefined,
+                        }
+                      }
+                    >
+                      <div
+                        className="css-view-1dbjc4n"
+                        style={
+                          Object {
+                            "marginBottom": "20px",
+                            "marginRight": "40px",
+                            "marginTop": "20px",
+                          }
+                        }
+                      >
+                        <div
+                          className="css-view-1dbjc4n"
+                          style={
+                            Object {
+                              "display": "block",
+                              "overflowX": "hidden",
+                              "overflowY": "hidden",
+                            }
+                          }
+                        >
+                          <div
+                            style={
+                              Object {
+                                "display": "block",
+                                "paddingBottom": "100%",
+                                "width": "100%",
+                              }
+                            }
+                          />
+                          <div
+                            style={
+                              Object {
+                                "bottom": "0px",
+                                "height": "100%",
+                                "left": "0px",
+                                "position": "absolute",
+                                "top": "0px",
+                                "width": "100%",
+                              }
+                            }
+                          >
+                            <div
+                              aria-label="Preview of cUSD Exchange Icon"
+                              className="css-view-1dbjc4n"
+                              style={
+                                Object {
+                                  "WebkitFlexBasis": "auto",
+                                  "borderBottomLeftRadius": "60px",
+                                  "borderBottomRightRadius": "60px",
+                                  "borderTopLeftRadius": "60px",
+                                  "borderTopRightRadius": "60px",
+                                  "flexBasis": "auto",
+                                  "height": "100%",
+                                  "msFlexPreferredSize": "auto",
+                                  "overflowX": "hidden",
+                                  "overflowY": "hidden",
+                                  "width": "100%",
+                                  "zIndex": 0,
+                                }
+                              }
+                            >
+                              <div
+                                className="css-view-1dbjc4n"
+                                style={
+                                  Object {
+                                    "backgroundColor": "rgba(0,0,0,0.00)",
+                                    "backgroundImage": "url(\\"/images/marketplace-icons/icon-celo-dollar-color-f.svg\\")",
+                                    "backgroundPosition": "center",
+                                    "backgroundRepeat": "no-repeat",
+                                    "backgroundSize": "contain",
+                                    "bottom": "0px",
+                                    "height": "100%",
+                                    "left": "0px",
+                                    "position": "absolute",
+                                    "right": "0px",
+                                    "top": "0px",
+                                    "width": "100%",
+                                    "zIndex": -1,
+                                  }
+                                }
+                              />
+                              <img
+                                alt="Preview of cUSD Exchange Icon"
+                                className="css-accessibilityImage-9pa8cd"
+                                draggable={false}
+                                src="/images/marketplace-icons/icon-celo-dollar-color-f.svg"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      className="react-reveal"
+                      style={
+                        Object {
+                          "opacity": undefined,
+                        }
+                      }
+                    >
+                      <div
+                        className="css-view-1dbjc4n"
+                        style={
+                          Object {
+                            "WebkitBoxFlex": 1,
+                            "WebkitFlexBasis": "0%",
+                            "WebkitFlexGrow": 1,
+                            "WebkitFlexShrink": 1,
+                            "flexBasis": "0%",
+                            "flexGrow": 1,
+                            "flexShrink": 1,
+                            "msFlexNegative": 1,
+                            "msFlexPositive": 1,
+                            "msFlexPreferredSize": "0%",
+                          }
+                        }
+                      >
+                        <div
+                          className="css-text-901oao"
+                          dir="auto"
+                          style={
+                            Object {
+                              "color": "rgba(46,51,56,1.00)",
+                              "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                              "fontSize": "16px",
+                              "fontWeight": "500",
+                              "lineHeight": "18px",
+                              "marginBottom": "5px",
+                              "marginTop": "5px",
+                              "textRendering": "geometricPrecision",
+                            }
+                          }
+                        >
+                          cUSD Exchange Icon
+                        </div>
+                        <div
+                          className="css-text-901oao"
+                          dir="auto"
+                          style={
+                            Object {
+                              "color": "rgba(46,51,56,1.00)",
+                              "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                              "fontSize": "16px",
+                              "lineHeight": "20px",
+                              "textRendering": "geometricPrecision",
+                            }
+                          }
+                        >
+                          Full Color
+
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      className="react-reveal"
+                      style={
+                        Object {
+                          "opacity": undefined,
+                        }
+                      }
+                    >
+                      <div
+                        className="css-view-1dbjc4n"
+                        onClick={[Function]}
+                        onMouseDown={[Function]}
+                        onMouseEnter={[Function]}
+                        onMouseLeave={[Function]}
+                        onMouseUp={[Function]}
+                        onResponderGrant={[Function]}
+                        onResponderRelease={[Function]}
+                      >
+                        <a
+                          className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+                          data-focusable={true}
+                          dir="auto"
+                          href="/assets/marketplace-icons/icon-celo-dollar-color.zip"
+                          onClick={[Function]}
+                          onMouseEnter={[Function]}
+                          role="link"
+                          style={
+                            Object {
+                              "WebkitAlignItems": "center",
+                              "WebkitBoxAlign": "center",
+                              "WebkitBoxFlex": 0,
+                              "WebkitBoxPack": "start",
+                              "WebkitFlexGrow": 0,
+                              "WebkitJustifyContent": "flex-start",
+                              "alignItems": "center",
+                              "backgroundColor": "rgba(0,0,0,0.00)",
+                              "borderBottomColor": "rgba(0,0,0,0.00)",
+                              "borderLeftColor": "rgba(0,0,0,0.00)",
+                              "borderRightColor": "rgba(0,0,0,0.00)",
+                              "borderTopColor": "rgba(0,0,0,0.00)",
+                              "color": "rgba(53,208,127,1.00)",
+                              "cursor": "pointer",
+                              "display": "inline-flex",
+                              "flexGrow": 0,
+                              "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                              "fontSize": "16px",
+                              "fontWeight": "500",
+                              "justifyContent": "flex-start",
+                              "lineHeight": "16px",
+                              "minWidth": "150px",
+                              "msFlexAlign": "center",
+                              "msFlexPack": "start",
+                              "msFlexPositive": 0,
+                              "opacity": 1,
+                              "outlineColor": "transparent",
+                              "paddingBottom": "10px",
+                              "paddingLeft": "0px",
+                              "paddingRight": "20px",
+                              "paddingTop": "10px",
+                              "textAlign": "center",
+                              "textRendering": "geometricPrecision",
+                              "width": "fit-content",
+                            }
+                          }
+                        >
+                          downloadAssetBtn
+                          <div
+                            className="css-view-1dbjc4n"
+                            style={
+                              Object {
+                                "display": "inline-flex",
+                                "paddingLeft": "8px",
+                              }
+                            }
+                          >
+                            <svg
+                              fill="none"
+                              height={12}
+                              style={Object {}}
+                              viewBox="0 0 10 13"
+                              width={12}
+                            >
+                              <path
+                                d="M0 12H10"
+                                stroke="#35D07F"
+                                strokeWidth="1.5"
+                                style={Object {}}
+                              />
+                              <path
+                                d="M5 0V9"
+                                stroke="#35D07F"
+                                strokeWidth="1.5"
+                                style={Object {}}
+                              />
+                              <path
+                                d="M1 5L5 9L9 5"
+                                stroke="#35D07F"
+                                strokeWidth="1.5"
+                                style={Object {}}
+                              />
+                            </svg>
+                          </div>
+                        </a>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </div>
-              <div
-                className="css-view-1dbjc4n"
-                style={
-                  Object {
-                    "WebkitBoxFlex": 1,
-                    "WebkitFlexBasis": "0%",
-                    "WebkitFlexGrow": 1,
-                    "WebkitFlexShrink": 1,
-                    "backgroundColor": "rgba(239,229,255,1.00)",
-                    "flexBasis": "0%",
-                    "flexGrow": 1,
-                    "flexShrink": 1,
-                    "gridArea": "2 / 1 / 2 / 6 ",
-                    "msFlexNegative": 1,
-                    "msFlexPositive": 1,
-                    "msFlexPreferredSize": "0%",
-                    "msGridArea": "2 / 1 / 2 / 6 ",
-                    "paddingBottom": "15px",
-                    "paddingLeft": "15px",
-                    "paddingRight": "15px",
-                    "paddingTop": "15px",
-                  }
-                }
-              >
                 <div
-                  className="css-text-901oao"
-                  dir="auto"
-                  style={
-                    Object {
-                      "borderBottomColor": "rgba(191,151,255,1.00)",
-                      "borderBottomStyle": "dashed",
-                      "borderBottomWidth": "1px",
-                      "borderLeftColor": "rgba(191,151,255,1.00)",
-                      "borderLeftStyle": "dashed",
-                      "borderLeftWidth": "1px",
-                      "borderRightColor": "rgba(191,151,255,1.00)",
-                      "borderRightStyle": "dashed",
-                      "borderRightWidth": "1px",
-                      "borderTopColor": "rgba(191,151,255,1.00)",
-                      "borderTopStyle": "dashed",
-                      "borderTopWidth": "1px",
-                      "color": "rgba(146,78,255,1.00)",
-                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                      "fontSize": "22px",
-                      "letterSpacing": "-8px",
-                      "lineHeight": "16px",
-                      "paddingBottom": "12px",
-                      "paddingLeft": "8px",
-                      "paddingRight": "8px",
-                      "paddingTop": "12px",
-                      "textAlign": "center",
-                      "textRendering": "geometricPrecision",
-                    }
-                  }
+                  className="css-view-1dbjc4n"
                 >
-                  ½
+                  <div
+                    className="css-view-1dbjc4n"
+                    style={
+                      Object {
+                        "WebkitBoxPack": "justify",
+                        "WebkitJustifyContent": "space-between",
+                        "justifyContent": "space-between",
+                        "marginLeft": "10px",
+                        "marginRight": "10px",
+                        "marginTop": "20px",
+                        "msFlexPack": "justify",
+                        "width": "160px",
+                      }
+                    }
+                  >
+                    <div
+                      className="react-reveal"
+                      style={
+                        Object {
+                          "opacity": undefined,
+                        }
+                      }
+                    >
+                      <div
+                        className="css-view-1dbjc4n"
+                        style={
+                          Object {
+                            "marginBottom": "20px",
+                            "marginRight": "40px",
+                            "marginTop": "20px",
+                          }
+                        }
+                      >
+                        <div
+                          className="css-view-1dbjc4n"
+                          style={
+                            Object {
+                              "display": "block",
+                              "overflowX": "hidden",
+                              "overflowY": "hidden",
+                            }
+                          }
+                        >
+                          <div
+                            style={
+                              Object {
+                                "display": "block",
+                                "paddingBottom": "100%",
+                                "width": "100%",
+                              }
+                            }
+                          />
+                          <div
+                            style={
+                              Object {
+                                "bottom": "0px",
+                                "height": "100%",
+                                "left": "0px",
+                                "position": "absolute",
+                                "top": "0px",
+                                "width": "100%",
+                              }
+                            }
+                          >
+                            <div
+                              aria-label="Preview of cGLD Exchange Icon"
+                              className="css-view-1dbjc4n"
+                              style={
+                                Object {
+                                  "WebkitFlexBasis": "auto",
+                                  "borderBottomLeftRadius": "60px",
+                                  "borderBottomRightRadius": "60px",
+                                  "borderTopLeftRadius": "60px",
+                                  "borderTopRightRadius": "60px",
+                                  "flexBasis": "auto",
+                                  "height": "100%",
+                                  "msFlexPreferredSize": "auto",
+                                  "overflowX": "hidden",
+                                  "overflowY": "hidden",
+                                  "width": "100%",
+                                  "zIndex": 0,
+                                }
+                              }
+                            >
+                              <div
+                                className="css-view-1dbjc4n"
+                                style={
+                                  Object {
+                                    "backgroundColor": "rgba(0,0,0,0.00)",
+                                    "backgroundImage": "url(\\"/images/marketplace-icons/icon-celo-gold-color-f.svg\\")",
+                                    "backgroundPosition": "center",
+                                    "backgroundRepeat": "no-repeat",
+                                    "backgroundSize": "contain",
+                                    "bottom": "0px",
+                                    "height": "100%",
+                                    "left": "0px",
+                                    "position": "absolute",
+                                    "right": "0px",
+                                    "top": "0px",
+                                    "width": "100%",
+                                    "zIndex": -1,
+                                  }
+                                }
+                              />
+                              <img
+                                alt="Preview of cGLD Exchange Icon"
+                                className="css-accessibilityImage-9pa8cd"
+                                draggable={false}
+                                src="/images/marketplace-icons/icon-celo-gold-color-f.svg"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      className="react-reveal"
+                      style={
+                        Object {
+                          "opacity": undefined,
+                        }
+                      }
+                    >
+                      <div
+                        className="css-view-1dbjc4n"
+                        style={
+                          Object {
+                            "WebkitBoxFlex": 1,
+                            "WebkitFlexBasis": "0%",
+                            "WebkitFlexGrow": 1,
+                            "WebkitFlexShrink": 1,
+                            "flexBasis": "0%",
+                            "flexGrow": 1,
+                            "flexShrink": 1,
+                            "msFlexNegative": 1,
+                            "msFlexPositive": 1,
+                            "msFlexPreferredSize": "0%",
+                          }
+                        }
+                      >
+                        <div
+                          className="css-text-901oao"
+                          dir="auto"
+                          style={
+                            Object {
+                              "color": "rgba(46,51,56,1.00)",
+                              "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                              "fontSize": "16px",
+                              "fontWeight": "500",
+                              "lineHeight": "18px",
+                              "marginBottom": "5px",
+                              "marginTop": "5px",
+                              "textRendering": "geometricPrecision",
+                            }
+                          }
+                        >
+                          cGLD Exchange Icon
+                        </div>
+                        <div
+                          className="css-text-901oao"
+                          dir="auto"
+                          style={
+                            Object {
+                              "color": "rgba(46,51,56,1.00)",
+                              "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                              "fontSize": "16px",
+                              "lineHeight": "20px",
+                              "textRendering": "geometricPrecision",
+                            }
+                          }
+                        >
+                          Full Color
+
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      className="react-reveal"
+                      style={
+                        Object {
+                          "opacity": undefined,
+                        }
+                      }
+                    >
+                      <div
+                        className="css-view-1dbjc4n"
+                        onClick={[Function]}
+                        onMouseDown={[Function]}
+                        onMouseEnter={[Function]}
+                        onMouseLeave={[Function]}
+                        onMouseUp={[Function]}
+                        onResponderGrant={[Function]}
+                        onResponderRelease={[Function]}
+                      >
+                        <a
+                          className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+                          data-focusable={true}
+                          dir="auto"
+                          href="/assets/marketplace-icons/icon-celo-gold-color.zip"
+                          onClick={[Function]}
+                          onMouseEnter={[Function]}
+                          role="link"
+                          style={
+                            Object {
+                              "WebkitAlignItems": "center",
+                              "WebkitBoxAlign": "center",
+                              "WebkitBoxFlex": 0,
+                              "WebkitBoxPack": "start",
+                              "WebkitFlexGrow": 0,
+                              "WebkitJustifyContent": "flex-start",
+                              "alignItems": "center",
+                              "backgroundColor": "rgba(0,0,0,0.00)",
+                              "borderBottomColor": "rgba(0,0,0,0.00)",
+                              "borderLeftColor": "rgba(0,0,0,0.00)",
+                              "borderRightColor": "rgba(0,0,0,0.00)",
+                              "borderTopColor": "rgba(0,0,0,0.00)",
+                              "color": "rgba(53,208,127,1.00)",
+                              "cursor": "pointer",
+                              "display": "inline-flex",
+                              "flexGrow": 0,
+                              "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                              "fontSize": "16px",
+                              "fontWeight": "500",
+                              "justifyContent": "flex-start",
+                              "lineHeight": "16px",
+                              "minWidth": "150px",
+                              "msFlexAlign": "center",
+                              "msFlexPack": "start",
+                              "msFlexPositive": 0,
+                              "opacity": 1,
+                              "outlineColor": "transparent",
+                              "paddingBottom": "10px",
+                              "paddingLeft": "0px",
+                              "paddingRight": "20px",
+                              "paddingTop": "10px",
+                              "textAlign": "center",
+                              "textRendering": "geometricPrecision",
+                              "width": "fit-content",
+                            }
+                          }
+                        >
+                          downloadAssetBtn
+                          <div
+                            className="css-view-1dbjc4n"
+                            style={
+                              Object {
+                                "display": "inline-flex",
+                                "paddingLeft": "8px",
+                              }
+                            }
+                          >
+                            <svg
+                              fill="none"
+                              height={12}
+                              style={Object {}}
+                              viewBox="0 0 10 13"
+                              width={12}
+                            >
+                              <path
+                                d="M0 12H10"
+                                stroke="#35D07F"
+                                strokeWidth="1.5"
+                                style={Object {}}
+                              />
+                              <path
+                                d="M5 0V9"
+                                stroke="#35D07F"
+                                strokeWidth="1.5"
+                                style={Object {}}
+                              />
+                              <path
+                                d="M1 5L5 9L9 5"
+                                stroke="#35D07F"
+                                strokeWidth="1.5"
+                                style={Object {}}
+                              />
+                            </svg>
+                          </div>
+                        </a>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </div>
-              <div
-                className="css-view-1dbjc4n"
-                style={
-                  Object {
-                    "WebkitBoxFlex": 1,
-                    "WebkitFlexBasis": "0%",
-                    "WebkitFlexGrow": 1,
-                    "WebkitFlexShrink": 1,
-                    "backgroundColor": "rgba(239,229,255,1.00)",
-                    "flexBasis": "0%",
-                    "flexGrow": 1,
-                    "flexShrink": 1,
-                    "gridArea": "2 / 6 / 2 / 12 ",
-                    "msFlexNegative": 1,
-                    "msFlexPositive": 1,
-                    "msFlexPreferredSize": "0%",
-                    "msGridArea": "2 / 6 / 2 / 12 ",
-                    "paddingBottom": "15px",
-                    "paddingLeft": "15px",
-                    "paddingRight": "15px",
-                    "paddingTop": "15px",
-                  }
-                }
-              >
                 <div
-                  className="css-text-901oao"
-                  dir="auto"
+                  className="css-view-1dbjc4n"
                   style={
                     Object {
-                      "borderBottomColor": "rgba(191,151,255,1.00)",
-                      "borderBottomStyle": "dashed",
-                      "borderBottomWidth": "1px",
-                      "borderLeftColor": "rgba(191,151,255,1.00)",
-                      "borderLeftStyle": "dashed",
-                      "borderLeftWidth": "1px",
-                      "borderRightColor": "rgba(191,151,255,1.00)",
-                      "borderRightStyle": "dashed",
-                      "borderRightWidth": "1px",
-                      "borderTopColor": "rgba(191,151,255,1.00)",
-                      "borderTopStyle": "dashed",
-                      "borderTopWidth": "1px",
-                      "color": "rgba(146,78,255,1.00)",
-                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                      "fontSize": "22px",
-                      "letterSpacing": "-8px",
-                      "lineHeight": "16px",
-                      "paddingBottom": "12px",
-                      "paddingLeft": "8px",
-                      "paddingRight": "8px",
-                      "paddingTop": "12px",
-                      "textAlign": "center",
-                      "textRendering": "geometricPrecision",
+                      "display": "block",
+                      "width": "100%",
                     }
                   }
+                />
+                <div
+                  className="css-view-1dbjc4n"
                 >
-                  ½
+                  <div
+                    className="css-view-1dbjc4n"
+                    style={
+                      Object {
+                        "WebkitBoxPack": "justify",
+                        "WebkitJustifyContent": "space-between",
+                        "justifyContent": "space-between",
+                        "marginLeft": "10px",
+                        "marginRight": "10px",
+                        "marginTop": "20px",
+                        "msFlexPack": "justify",
+                        "width": "160px",
+                      }
+                    }
+                  >
+                    <div
+                      className="react-reveal"
+                      style={
+                        Object {
+                          "opacity": undefined,
+                        }
+                      }
+                    >
+                      <div
+                        className="css-view-1dbjc4n"
+                        style={
+                          Object {
+                            "marginBottom": "20px",
+                            "marginRight": "40px",
+                            "marginTop": "20px",
+                          }
+                        }
+                      >
+                        <div
+                          className="css-view-1dbjc4n"
+                          style={
+                            Object {
+                              "display": "block",
+                              "overflowX": "hidden",
+                              "overflowY": "hidden",
+                            }
+                          }
+                        >
+                          <div
+                            style={
+                              Object {
+                                "display": "block",
+                                "paddingBottom": "100%",
+                                "width": "100%",
+                              }
+                            }
+                          />
+                          <div
+                            style={
+                              Object {
+                                "bottom": "0px",
+                                "height": "100%",
+                                "left": "0px",
+                                "position": "absolute",
+                                "top": "0px",
+                                "width": "100%",
+                              }
+                            }
+                          >
+                            <div
+                              aria-label="Preview of cUSD Exchange Icon"
+                              className="css-view-1dbjc4n"
+                              style={
+                                Object {
+                                  "WebkitFlexBasis": "auto",
+                                  "borderBottomLeftRadius": "60px",
+                                  "borderBottomRightRadius": "60px",
+                                  "borderTopLeftRadius": "60px",
+                                  "borderTopRightRadius": "60px",
+                                  "boxShadow": "inset 0 0 0 1px #D1D5D8",
+                                  "flexBasis": "auto",
+                                  "height": "100%",
+                                  "msFlexPreferredSize": "auto",
+                                  "overflowX": "hidden",
+                                  "overflowY": "hidden",
+                                  "width": "100%",
+                                  "zIndex": 0,
+                                }
+                              }
+                            >
+                              <div
+                                className="css-view-1dbjc4n"
+                                style={
+                                  Object {
+                                    "backgroundColor": "rgba(0,0,0,0.00)",
+                                    "backgroundImage": "url(\\"/images/marketplace-icons/icon-celo-dollar-black-f.svg\\")",
+                                    "backgroundPosition": "center",
+                                    "backgroundRepeat": "no-repeat",
+                                    "backgroundSize": "contain",
+                                    "bottom": "0px",
+                                    "height": "100%",
+                                    "left": "0px",
+                                    "position": "absolute",
+                                    "right": "0px",
+                                    "top": "0px",
+                                    "width": "100%",
+                                    "zIndex": -1,
+                                  }
+                                }
+                              />
+                              <img
+                                alt="Preview of cUSD Exchange Icon"
+                                className="css-accessibilityImage-9pa8cd"
+                                draggable={false}
+                                src="/images/marketplace-icons/icon-celo-dollar-black-f.svg"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      className="react-reveal"
+                      style={
+                        Object {
+                          "opacity": undefined,
+                        }
+                      }
+                    >
+                      <div
+                        className="css-view-1dbjc4n"
+                        style={
+                          Object {
+                            "WebkitBoxFlex": 1,
+                            "WebkitFlexBasis": "0%",
+                            "WebkitFlexGrow": 1,
+                            "WebkitFlexShrink": 1,
+                            "flexBasis": "0%",
+                            "flexGrow": 1,
+                            "flexShrink": 1,
+                            "msFlexNegative": 1,
+                            "msFlexPositive": 1,
+                            "msFlexPreferredSize": "0%",
+                          }
+                        }
+                      >
+                        <div
+                          className="css-text-901oao"
+                          dir="auto"
+                          style={
+                            Object {
+                              "color": "rgba(46,51,56,1.00)",
+                              "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                              "fontSize": "16px",
+                              "fontWeight": "500",
+                              "lineHeight": "18px",
+                              "marginBottom": "5px",
+                              "marginTop": "5px",
+                              "textRendering": "geometricPrecision",
+                            }
+                          }
+                        >
+                          cUSD Exchange Icon
+                        </div>
+                        <div
+                          className="css-text-901oao"
+                          dir="auto"
+                          style={
+                            Object {
+                              "color": "rgba(46,51,56,1.00)",
+                              "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                              "fontSize": "16px",
+                              "lineHeight": "20px",
+                              "textRendering": "geometricPrecision",
+                            }
+                          }
+                        >
+                          Monochrome
+
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      className="react-reveal"
+                      style={
+                        Object {
+                          "opacity": undefined,
+                        }
+                      }
+                    >
+                      <div
+                        className="css-view-1dbjc4n"
+                        onClick={[Function]}
+                        onMouseDown={[Function]}
+                        onMouseEnter={[Function]}
+                        onMouseLeave={[Function]}
+                        onMouseUp={[Function]}
+                        onResponderGrant={[Function]}
+                        onResponderRelease={[Function]}
+                      >
+                        <a
+                          className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+                          data-focusable={true}
+                          dir="auto"
+                          href="/assets/marketplace-icons/icon-celo-dollar-black.zip"
+                          onClick={[Function]}
+                          onMouseEnter={[Function]}
+                          role="link"
+                          style={
+                            Object {
+                              "WebkitAlignItems": "center",
+                              "WebkitBoxAlign": "center",
+                              "WebkitBoxFlex": 0,
+                              "WebkitBoxPack": "start",
+                              "WebkitFlexGrow": 0,
+                              "WebkitJustifyContent": "flex-start",
+                              "alignItems": "center",
+                              "backgroundColor": "rgba(0,0,0,0.00)",
+                              "borderBottomColor": "rgba(0,0,0,0.00)",
+                              "borderLeftColor": "rgba(0,0,0,0.00)",
+                              "borderRightColor": "rgba(0,0,0,0.00)",
+                              "borderTopColor": "rgba(0,0,0,0.00)",
+                              "color": "rgba(53,208,127,1.00)",
+                              "cursor": "pointer",
+                              "display": "inline-flex",
+                              "flexGrow": 0,
+                              "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                              "fontSize": "16px",
+                              "fontWeight": "500",
+                              "justifyContent": "flex-start",
+                              "lineHeight": "16px",
+                              "minWidth": "150px",
+                              "msFlexAlign": "center",
+                              "msFlexPack": "start",
+                              "msFlexPositive": 0,
+                              "opacity": 1,
+                              "outlineColor": "transparent",
+                              "paddingBottom": "10px",
+                              "paddingLeft": "0px",
+                              "paddingRight": "20px",
+                              "paddingTop": "10px",
+                              "textAlign": "center",
+                              "textRendering": "geometricPrecision",
+                              "width": "fit-content",
+                            }
+                          }
+                        >
+                          downloadAssetBtn
+                          <div
+                            className="css-view-1dbjc4n"
+                            style={
+                              Object {
+                                "display": "inline-flex",
+                                "paddingLeft": "8px",
+                              }
+                            }
+                          >
+                            <svg
+                              fill="none"
+                              height={12}
+                              style={Object {}}
+                              viewBox="0 0 10 13"
+                              width={12}
+                            >
+                              <path
+                                d="M0 12H10"
+                                stroke="#35D07F"
+                                strokeWidth="1.5"
+                                style={Object {}}
+                              />
+                              <path
+                                d="M5 0V9"
+                                stroke="#35D07F"
+                                strokeWidth="1.5"
+                                style={Object {}}
+                              />
+                              <path
+                                d="M1 5L5 9L9 5"
+                                stroke="#35D07F"
+                                strokeWidth="1.5"
+                                style={Object {}}
+                              />
+                            </svg>
+                          </div>
+                        </a>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </div>
-              <div
-                className="css-view-1dbjc4n"
-                style={
-                  Object {
-                    "WebkitBoxFlex": 1,
-                    "WebkitFlexBasis": "0%",
-                    "WebkitFlexGrow": 1,
-                    "WebkitFlexShrink": 1,
-                    "backgroundColor": "rgba(239,229,255,1.00)",
-                    "flexBasis": "0%",
-                    "flexGrow": 1,
-                    "flexShrink": 1,
-                    "gridArea": "3 / 1 / 3 / 4 ",
-                    "msFlexNegative": 1,
-                    "msFlexPositive": 1,
-                    "msFlexPreferredSize": "0%",
-                    "msGridArea": "3 / 1 / 3 / 4 ",
-                    "paddingBottom": "15px",
-                    "paddingLeft": "15px",
-                    "paddingRight": "15px",
-                    "paddingTop": "15px",
-                  }
-                }
-              >
                 <div
-                  className="css-text-901oao"
-                  dir="auto"
-                  style={
-                    Object {
-                      "borderBottomColor": "rgba(191,151,255,1.00)",
-                      "borderBottomStyle": "dashed",
-                      "borderBottomWidth": "1px",
-                      "borderLeftColor": "rgba(191,151,255,1.00)",
-                      "borderLeftStyle": "dashed",
-                      "borderLeftWidth": "1px",
-                      "borderRightColor": "rgba(191,151,255,1.00)",
-                      "borderRightStyle": "dashed",
-                      "borderRightWidth": "1px",
-                      "borderTopColor": "rgba(191,151,255,1.00)",
-                      "borderTopStyle": "dashed",
-                      "borderTopWidth": "1px",
-                      "color": "rgba(146,78,255,1.00)",
-                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                      "fontSize": "22px",
-                      "letterSpacing": "-8px",
-                      "lineHeight": "16px",
-                      "paddingBottom": "12px",
-                      "paddingLeft": "8px",
-                      "paddingRight": "8px",
-                      "paddingTop": "12px",
-                      "textAlign": "center",
-                      "textRendering": "geometricPrecision",
-                    }
-                  }
+                  className="css-view-1dbjc4n"
                 >
-                  ⅓
+                  <div
+                    className="css-view-1dbjc4n"
+                    style={
+                      Object {
+                        "WebkitBoxPack": "justify",
+                        "WebkitJustifyContent": "space-between",
+                        "justifyContent": "space-between",
+                        "marginLeft": "10px",
+                        "marginRight": "10px",
+                        "marginTop": "20px",
+                        "msFlexPack": "justify",
+                        "width": "160px",
+                      }
+                    }
+                  >
+                    <div
+                      className="react-reveal"
+                      style={
+                        Object {
+                          "opacity": undefined,
+                        }
+                      }
+                    >
+                      <div
+                        className="css-view-1dbjc4n"
+                        style={
+                          Object {
+                            "marginBottom": "20px",
+                            "marginRight": "40px",
+                            "marginTop": "20px",
+                          }
+                        }
+                      >
+                        <div
+                          className="css-view-1dbjc4n"
+                          style={
+                            Object {
+                              "display": "block",
+                              "overflowX": "hidden",
+                              "overflowY": "hidden",
+                            }
+                          }
+                        >
+                          <div
+                            style={
+                              Object {
+                                "display": "block",
+                                "paddingBottom": "100%",
+                                "width": "100%",
+                              }
+                            }
+                          />
+                          <div
+                            style={
+                              Object {
+                                "bottom": "0px",
+                                "height": "100%",
+                                "left": "0px",
+                                "position": "absolute",
+                                "top": "0px",
+                                "width": "100%",
+                              }
+                            }
+                          >
+                            <div
+                              aria-label="Preview of cGLD Exchange Icon"
+                              className="css-view-1dbjc4n"
+                              style={
+                                Object {
+                                  "WebkitFlexBasis": "auto",
+                                  "borderBottomLeftRadius": "60px",
+                                  "borderBottomRightRadius": "60px",
+                                  "borderTopLeftRadius": "60px",
+                                  "borderTopRightRadius": "60px",
+                                  "boxShadow": "inset 0 0 0 1px #D1D5D8",
+                                  "flexBasis": "auto",
+                                  "height": "100%",
+                                  "msFlexPreferredSize": "auto",
+                                  "overflowX": "hidden",
+                                  "overflowY": "hidden",
+                                  "width": "100%",
+                                  "zIndex": 0,
+                                }
+                              }
+                            >
+                              <div
+                                className="css-view-1dbjc4n"
+                                style={
+                                  Object {
+                                    "backgroundColor": "rgba(0,0,0,0.00)",
+                                    "backgroundImage": "url(\\"/images/marketplace-icons/icon-celo-gold-black-f.svg\\")",
+                                    "backgroundPosition": "center",
+                                    "backgroundRepeat": "no-repeat",
+                                    "backgroundSize": "contain",
+                                    "bottom": "0px",
+                                    "height": "100%",
+                                    "left": "0px",
+                                    "position": "absolute",
+                                    "right": "0px",
+                                    "top": "0px",
+                                    "width": "100%",
+                                    "zIndex": -1,
+                                  }
+                                }
+                              />
+                              <img
+                                alt="Preview of cGLD Exchange Icon"
+                                className="css-accessibilityImage-9pa8cd"
+                                draggable={false}
+                                src="/images/marketplace-icons/icon-celo-gold-black-f.svg"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      className="react-reveal"
+                      style={
+                        Object {
+                          "opacity": undefined,
+                        }
+                      }
+                    >
+                      <div
+                        className="css-view-1dbjc4n"
+                        style={
+                          Object {
+                            "WebkitBoxFlex": 1,
+                            "WebkitFlexBasis": "0%",
+                            "WebkitFlexGrow": 1,
+                            "WebkitFlexShrink": 1,
+                            "flexBasis": "0%",
+                            "flexGrow": 1,
+                            "flexShrink": 1,
+                            "msFlexNegative": 1,
+                            "msFlexPositive": 1,
+                            "msFlexPreferredSize": "0%",
+                          }
+                        }
+                      >
+                        <div
+                          className="css-text-901oao"
+                          dir="auto"
+                          style={
+                            Object {
+                              "color": "rgba(46,51,56,1.00)",
+                              "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                              "fontSize": "16px",
+                              "fontWeight": "500",
+                              "lineHeight": "18px",
+                              "marginBottom": "5px",
+                              "marginTop": "5px",
+                              "textRendering": "geometricPrecision",
+                            }
+                          }
+                        >
+                          cGLD Exchange Icon
+                        </div>
+                        <div
+                          className="css-text-901oao"
+                          dir="auto"
+                          style={
+                            Object {
+                              "color": "rgba(46,51,56,1.00)",
+                              "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                              "fontSize": "16px",
+                              "lineHeight": "20px",
+                              "textRendering": "geometricPrecision",
+                            }
+                          }
+                        >
+                          Monochrome
+
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      className="react-reveal"
+                      style={
+                        Object {
+                          "opacity": undefined,
+                        }
+                      }
+                    >
+                      <div
+                        className="css-view-1dbjc4n"
+                        onClick={[Function]}
+                        onMouseDown={[Function]}
+                        onMouseEnter={[Function]}
+                        onMouseLeave={[Function]}
+                        onMouseUp={[Function]}
+                        onResponderGrant={[Function]}
+                        onResponderRelease={[Function]}
+                      >
+                        <a
+                          className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+                          data-focusable={true}
+                          dir="auto"
+                          href="/assets/marketplace-icons/icon-celo-gold-black.zip"
+                          onClick={[Function]}
+                          onMouseEnter={[Function]}
+                          role="link"
+                          style={
+                            Object {
+                              "WebkitAlignItems": "center",
+                              "WebkitBoxAlign": "center",
+                              "WebkitBoxFlex": 0,
+                              "WebkitBoxPack": "start",
+                              "WebkitFlexGrow": 0,
+                              "WebkitJustifyContent": "flex-start",
+                              "alignItems": "center",
+                              "backgroundColor": "rgba(0,0,0,0.00)",
+                              "borderBottomColor": "rgba(0,0,0,0.00)",
+                              "borderLeftColor": "rgba(0,0,0,0.00)",
+                              "borderRightColor": "rgba(0,0,0,0.00)",
+                              "borderTopColor": "rgba(0,0,0,0.00)",
+                              "color": "rgba(53,208,127,1.00)",
+                              "cursor": "pointer",
+                              "display": "inline-flex",
+                              "flexGrow": 0,
+                              "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                              "fontSize": "16px",
+                              "fontWeight": "500",
+                              "justifyContent": "flex-start",
+                              "lineHeight": "16px",
+                              "minWidth": "150px",
+                              "msFlexAlign": "center",
+                              "msFlexPack": "start",
+                              "msFlexPositive": 0,
+                              "opacity": 1,
+                              "outlineColor": "transparent",
+                              "paddingBottom": "10px",
+                              "paddingLeft": "0px",
+                              "paddingRight": "20px",
+                              "paddingTop": "10px",
+                              "textAlign": "center",
+                              "textRendering": "geometricPrecision",
+                              "width": "fit-content",
+                            }
+                          }
+                        >
+                          downloadAssetBtn
+                          <div
+                            className="css-view-1dbjc4n"
+                            style={
+                              Object {
+                                "display": "inline-flex",
+                                "paddingLeft": "8px",
+                              }
+                            }
+                          >
+                            <svg
+                              fill="none"
+                              height={12}
+                              style={Object {}}
+                              viewBox="0 0 10 13"
+                              width={12}
+                            >
+                              <path
+                                d="M0 12H10"
+                                stroke="#35D07F"
+                                strokeWidth="1.5"
+                                style={Object {}}
+                              />
+                              <path
+                                d="M5 0V9"
+                                stroke="#35D07F"
+                                strokeWidth="1.5"
+                                style={Object {}}
+                              />
+                              <path
+                                d="M1 5L5 9L9 5"
+                                stroke="#35D07F"
+                                strokeWidth="1.5"
+                                style={Object {}}
+                              />
+                            </svg>
+                          </div>
+                        </a>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </div>
-              <div
-                className="css-view-1dbjc4n"
-                style={
-                  Object {
-                    "WebkitBoxFlex": 1,
-                    "WebkitFlexBasis": "0%",
-                    "WebkitFlexGrow": 1,
-                    "WebkitFlexShrink": 1,
-                    "backgroundColor": "rgba(239,229,255,1.00)",
-                    "flexBasis": "0%",
-                    "flexGrow": 1,
-                    "flexShrink": 1,
-                    "gridArea": "3 / 4 / 3 / 8 ",
-                    "msFlexNegative": 1,
-                    "msFlexPositive": 1,
-                    "msFlexPreferredSize": "0%",
-                    "msGridArea": "3 / 4 / 3 / 8 ",
-                    "paddingBottom": "15px",
-                    "paddingLeft": "15px",
-                    "paddingRight": "15px",
-                    "paddingTop": "15px",
-                  }
-                }
-              >
                 <div
-                  className="css-text-901oao"
-                  dir="auto"
-                  style={
-                    Object {
-                      "borderBottomColor": "rgba(191,151,255,1.00)",
-                      "borderBottomStyle": "dashed",
-                      "borderBottomWidth": "1px",
-                      "borderLeftColor": "rgba(191,151,255,1.00)",
-                      "borderLeftStyle": "dashed",
-                      "borderLeftWidth": "1px",
-                      "borderRightColor": "rgba(191,151,255,1.00)",
-                      "borderRightStyle": "dashed",
-                      "borderRightWidth": "1px",
-                      "borderTopColor": "rgba(191,151,255,1.00)",
-                      "borderTopStyle": "dashed",
-                      "borderTopWidth": "1px",
-                      "color": "rgba(146,78,255,1.00)",
-                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                      "fontSize": "22px",
-                      "letterSpacing": "-8px",
-                      "lineHeight": "16px",
-                      "paddingBottom": "12px",
-                      "paddingLeft": "8px",
-                      "paddingRight": "8px",
-                      "paddingTop": "12px",
-                      "textAlign": "center",
-                      "textRendering": "geometricPrecision",
-                    }
-                  }
+                  className="css-view-1dbjc4n"
                 >
-                  ⅓
+                  <div
+                    className="css-view-1dbjc4n"
+                    style={
+                      Object {
+                        "WebkitBoxPack": "justify",
+                        "WebkitJustifyContent": "space-between",
+                        "justifyContent": "space-between",
+                        "marginLeft": "10px",
+                        "marginRight": "10px",
+                        "marginTop": "20px",
+                        "msFlexPack": "justify",
+                        "width": "160px",
+                      }
+                    }
+                  >
+                    <div
+                      className="react-reveal"
+                      style={
+                        Object {
+                          "opacity": undefined,
+                        }
+                      }
+                    >
+                      <div
+                        className="css-view-1dbjc4n"
+                        style={
+                          Object {
+                            "marginBottom": "20px",
+                            "marginRight": "40px",
+                            "marginTop": "20px",
+                          }
+                        }
+                      >
+                        <div
+                          className="css-view-1dbjc4n"
+                          style={
+                            Object {
+                              "display": "block",
+                              "overflowX": "hidden",
+                              "overflowY": "hidden",
+                            }
+                          }
+                        >
+                          <div
+                            style={
+                              Object {
+                                "display": "block",
+                                "paddingBottom": "100%",
+                                "width": "100%",
+                              }
+                            }
+                          />
+                          <div
+                            style={
+                              Object {
+                                "bottom": "0px",
+                                "height": "100%",
+                                "left": "0px",
+                                "position": "absolute",
+                                "top": "0px",
+                                "width": "100%",
+                              }
+                            }
+                          >
+                            <div
+                              aria-label="Preview of cUSD Exchange Icon"
+                              className="css-view-1dbjc4n"
+                              style={
+                                Object {
+                                  "WebkitFlexBasis": "auto",
+                                  "backgroundColor": "rgba(0,0,0,1.00)",
+                                  "borderBottomLeftRadius": "60px",
+                                  "borderBottomRightRadius": "60px",
+                                  "borderTopLeftRadius": "60px",
+                                  "borderTopRightRadius": "60px",
+                                  "flexBasis": "auto",
+                                  "height": "100%",
+                                  "msFlexPreferredSize": "auto",
+                                  "overflowX": "hidden",
+                                  "overflowY": "hidden",
+                                  "width": "100%",
+                                  "zIndex": 0,
+                                }
+                              }
+                            >
+                              <div
+                                className="css-view-1dbjc4n"
+                                style={
+                                  Object {
+                                    "backgroundColor": "rgba(0,0,0,0.00)",
+                                    "backgroundImage": "url(\\"/images/marketplace-icons/icon-celo-dollar-white-f.svg\\")",
+                                    "backgroundPosition": "center",
+                                    "backgroundRepeat": "no-repeat",
+                                    "backgroundSize": "contain",
+                                    "bottom": "0px",
+                                    "height": "100%",
+                                    "left": "0px",
+                                    "position": "absolute",
+                                    "right": "0px",
+                                    "top": "0px",
+                                    "width": "100%",
+                                    "zIndex": -1,
+                                  }
+                                }
+                              />
+                              <img
+                                alt="Preview of cUSD Exchange Icon"
+                                className="css-accessibilityImage-9pa8cd"
+                                draggable={false}
+                                src="/images/marketplace-icons/icon-celo-dollar-white-f.svg"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      className="react-reveal"
+                      style={
+                        Object {
+                          "opacity": undefined,
+                        }
+                      }
+                    >
+                      <div
+                        className="css-view-1dbjc4n"
+                        style={
+                          Object {
+                            "WebkitBoxFlex": 1,
+                            "WebkitFlexBasis": "0%",
+                            "WebkitFlexGrow": 1,
+                            "WebkitFlexShrink": 1,
+                            "flexBasis": "0%",
+                            "flexGrow": 1,
+                            "flexShrink": 1,
+                            "msFlexNegative": 1,
+                            "msFlexPositive": 1,
+                            "msFlexPreferredSize": "0%",
+                          }
+                        }
+                      >
+                        <div
+                          className="css-text-901oao"
+                          dir="auto"
+                          style={
+                            Object {
+                              "color": "rgba(46,51,56,1.00)",
+                              "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                              "fontSize": "16px",
+                              "fontWeight": "500",
+                              "lineHeight": "18px",
+                              "marginBottom": "5px",
+                              "marginTop": "5px",
+                              "textRendering": "geometricPrecision",
+                            }
+                          }
+                        >
+                          cUSD Exchange Icon
+                        </div>
+                        <div
+                          className="css-text-901oao"
+                          dir="auto"
+                          style={
+                            Object {
+                              "color": "rgba(46,51,56,1.00)",
+                              "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                              "fontSize": "16px",
+                              "lineHeight": "20px",
+                              "textRendering": "geometricPrecision",
+                            }
+                          }
+                        >
+                          Reverse Monochrome
+
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      className="react-reveal"
+                      style={
+                        Object {
+                          "opacity": undefined,
+                        }
+                      }
+                    >
+                      <div
+                        className="css-view-1dbjc4n"
+                        onClick={[Function]}
+                        onMouseDown={[Function]}
+                        onMouseEnter={[Function]}
+                        onMouseLeave={[Function]}
+                        onMouseUp={[Function]}
+                        onResponderGrant={[Function]}
+                        onResponderRelease={[Function]}
+                      >
+                        <a
+                          className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+                          data-focusable={true}
+                          dir="auto"
+                          href="/assets/marketplace-icons/icon-celo-dollar-white.zip"
+                          onClick={[Function]}
+                          onMouseEnter={[Function]}
+                          role="link"
+                          style={
+                            Object {
+                              "WebkitAlignItems": "center",
+                              "WebkitBoxAlign": "center",
+                              "WebkitBoxFlex": 0,
+                              "WebkitBoxPack": "start",
+                              "WebkitFlexGrow": 0,
+                              "WebkitJustifyContent": "flex-start",
+                              "alignItems": "center",
+                              "backgroundColor": "rgba(0,0,0,0.00)",
+                              "borderBottomColor": "rgba(0,0,0,0.00)",
+                              "borderLeftColor": "rgba(0,0,0,0.00)",
+                              "borderRightColor": "rgba(0,0,0,0.00)",
+                              "borderTopColor": "rgba(0,0,0,0.00)",
+                              "color": "rgba(53,208,127,1.00)",
+                              "cursor": "pointer",
+                              "display": "inline-flex",
+                              "flexGrow": 0,
+                              "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                              "fontSize": "16px",
+                              "fontWeight": "500",
+                              "justifyContent": "flex-start",
+                              "lineHeight": "16px",
+                              "minWidth": "150px",
+                              "msFlexAlign": "center",
+                              "msFlexPack": "start",
+                              "msFlexPositive": 0,
+                              "opacity": 1,
+                              "outlineColor": "transparent",
+                              "paddingBottom": "10px",
+                              "paddingLeft": "0px",
+                              "paddingRight": "20px",
+                              "paddingTop": "10px",
+                              "textAlign": "center",
+                              "textRendering": "geometricPrecision",
+                              "width": "fit-content",
+                            }
+                          }
+                        >
+                          downloadAssetBtn
+                          <div
+                            className="css-view-1dbjc4n"
+                            style={
+                              Object {
+                                "display": "inline-flex",
+                                "paddingLeft": "8px",
+                              }
+                            }
+                          >
+                            <svg
+                              fill="none"
+                              height={12}
+                              style={Object {}}
+                              viewBox="0 0 10 13"
+                              width={12}
+                            >
+                              <path
+                                d="M0 12H10"
+                                stroke="#35D07F"
+                                strokeWidth="1.5"
+                                style={Object {}}
+                              />
+                              <path
+                                d="M5 0V9"
+                                stroke="#35D07F"
+                                strokeWidth="1.5"
+                                style={Object {}}
+                              />
+                              <path
+                                d="M1 5L5 9L9 5"
+                                stroke="#35D07F"
+                                strokeWidth="1.5"
+                                style={Object {}}
+                              />
+                            </svg>
+                          </div>
+                        </a>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </div>
-              <div
-                className="css-view-1dbjc4n"
-                style={
-                  Object {
-                    "WebkitBoxFlex": 1,
-                    "WebkitFlexBasis": "0%",
-                    "WebkitFlexGrow": 1,
-                    "WebkitFlexShrink": 1,
-                    "backgroundColor": "rgba(239,229,255,1.00)",
-                    "flexBasis": "0%",
-                    "flexGrow": 1,
-                    "flexShrink": 1,
-                    "gridArea": "3 / 8 / 3 / 12 ",
-                    "msFlexNegative": 1,
-                    "msFlexPositive": 1,
-                    "msFlexPreferredSize": "0%",
-                    "msGridArea": "3 / 8 / 3 / 12 ",
-                    "paddingBottom": "15px",
-                    "paddingLeft": "15px",
-                    "paddingRight": "15px",
-                    "paddingTop": "15px",
-                  }
-                }
-              >
                 <div
-                  className="css-text-901oao"
-                  dir="auto"
-                  style={
-                    Object {
-                      "borderBottomColor": "rgba(191,151,255,1.00)",
-                      "borderBottomStyle": "dashed",
-                      "borderBottomWidth": "1px",
-                      "borderLeftColor": "rgba(191,151,255,1.00)",
-                      "borderLeftStyle": "dashed",
-                      "borderLeftWidth": "1px",
-                      "borderRightColor": "rgba(191,151,255,1.00)",
-                      "borderRightStyle": "dashed",
-                      "borderRightWidth": "1px",
-                      "borderTopColor": "rgba(191,151,255,1.00)",
-                      "borderTopStyle": "dashed",
-                      "borderTopWidth": "1px",
-                      "color": "rgba(146,78,255,1.00)",
-                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                      "fontSize": "22px",
-                      "letterSpacing": "-8px",
-                      "lineHeight": "16px",
-                      "paddingBottom": "12px",
-                      "paddingLeft": "8px",
-                      "paddingRight": "8px",
-                      "paddingTop": "12px",
-                      "textAlign": "center",
-                      "textRendering": "geometricPrecision",
-                    }
-                  }
+                  className="css-view-1dbjc4n"
                 >
-                  ⅓
-                </div>
-              </div>
-              <div
-                className="css-view-1dbjc4n"
-                style={
-                  Object {
-                    "WebkitBoxFlex": 1,
-                    "WebkitFlexBasis": "0%",
-                    "WebkitFlexGrow": 1,
-                    "WebkitFlexShrink": 1,
-                    "backgroundColor": "rgba(239,229,255,1.00)",
-                    "flexBasis": "0%",
-                    "flexGrow": 1,
-                    "flexShrink": 1,
-                    "gridArea": "4 / 1 / 4 / 3 ",
-                    "msFlexNegative": 1,
-                    "msFlexPositive": 1,
-                    "msFlexPreferredSize": "0%",
-                    "msGridArea": "4 / 1 / 4 / 3 ",
-                    "paddingBottom": "15px",
-                    "paddingLeft": "15px",
-                    "paddingRight": "15px",
-                    "paddingTop": "15px",
-                  }
-                }
-              >
-                <div
-                  className="css-text-901oao"
-                  dir="auto"
-                  style={
-                    Object {
-                      "borderBottomColor": "rgba(191,151,255,1.00)",
-                      "borderBottomStyle": "dashed",
-                      "borderBottomWidth": "1px",
-                      "borderLeftColor": "rgba(191,151,255,1.00)",
-                      "borderLeftStyle": "dashed",
-                      "borderLeftWidth": "1px",
-                      "borderRightColor": "rgba(191,151,255,1.00)",
-                      "borderRightStyle": "dashed",
-                      "borderRightWidth": "1px",
-                      "borderTopColor": "rgba(191,151,255,1.00)",
-                      "borderTopStyle": "dashed",
-                      "borderTopWidth": "1px",
-                      "color": "rgba(146,78,255,1.00)",
-                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                      "fontSize": "22px",
-                      "letterSpacing": "-8px",
-                      "lineHeight": "16px",
-                      "paddingBottom": "12px",
-                      "paddingLeft": "8px",
-                      "paddingRight": "8px",
-                      "paddingTop": "12px",
-                      "textAlign": "center",
-                      "textRendering": "geometricPrecision",
+                  <div
+                    className="css-view-1dbjc4n"
+                    style={
+                      Object {
+                        "WebkitBoxPack": "justify",
+                        "WebkitJustifyContent": "space-between",
+                        "justifyContent": "space-between",
+                        "marginLeft": "10px",
+                        "marginRight": "10px",
+                        "marginTop": "20px",
+                        "msFlexPack": "justify",
+                        "width": "160px",
+                      }
                     }
-                  }
-                >
-                  ¼
-                </div>
-              </div>
-              <div
-                className="css-view-1dbjc4n"
-                style={
-                  Object {
-                    "WebkitBoxFlex": 1,
-                    "WebkitFlexBasis": "0%",
-                    "WebkitFlexGrow": 1,
-                    "WebkitFlexShrink": 1,
-                    "backgroundColor": "rgba(239,229,255,1.00)",
-                    "flexBasis": "0%",
-                    "flexGrow": 1,
-                    "flexShrink": 1,
-                    "gridArea": "4 / 3 / 4 / 6 ",
-                    "msFlexNegative": 1,
-                    "msFlexPositive": 1,
-                    "msFlexPreferredSize": "0%",
-                    "msGridArea": "4 / 3 / 4 / 6 ",
-                    "paddingBottom": "15px",
-                    "paddingLeft": "15px",
-                    "paddingRight": "15px",
-                    "paddingTop": "15px",
-                  }
-                }
-              >
-                <div
-                  className="css-text-901oao"
-                  dir="auto"
-                  style={
-                    Object {
-                      "borderBottomColor": "rgba(191,151,255,1.00)",
-                      "borderBottomStyle": "dashed",
-                      "borderBottomWidth": "1px",
-                      "borderLeftColor": "rgba(191,151,255,1.00)",
-                      "borderLeftStyle": "dashed",
-                      "borderLeftWidth": "1px",
-                      "borderRightColor": "rgba(191,151,255,1.00)",
-                      "borderRightStyle": "dashed",
-                      "borderRightWidth": "1px",
-                      "borderTopColor": "rgba(191,151,255,1.00)",
-                      "borderTopStyle": "dashed",
-                      "borderTopWidth": "1px",
-                      "color": "rgba(146,78,255,1.00)",
-                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                      "fontSize": "22px",
-                      "letterSpacing": "-8px",
-                      "lineHeight": "16px",
-                      "paddingBottom": "12px",
-                      "paddingLeft": "8px",
-                      "paddingRight": "8px",
-                      "paddingTop": "12px",
-                      "textAlign": "center",
-                      "textRendering": "geometricPrecision",
-                    }
-                  }
-                >
-                  ¼
-                </div>
-              </div>
-              <div
-                className="css-view-1dbjc4n"
-                style={
-                  Object {
-                    "WebkitBoxFlex": 1,
-                    "WebkitFlexBasis": "0%",
-                    "WebkitFlexGrow": 1,
-                    "WebkitFlexShrink": 1,
-                    "backgroundColor": "rgba(239,229,255,1.00)",
-                    "flexBasis": "0%",
-                    "flexGrow": 1,
-                    "flexShrink": 1,
-                    "gridArea": "4 / 6 / 4 / 9 ",
-                    "msFlexNegative": 1,
-                    "msFlexPositive": 1,
-                    "msFlexPreferredSize": "0%",
-                    "msGridArea": "4 / 6 / 4 / 9 ",
-                    "paddingBottom": "15px",
-                    "paddingLeft": "15px",
-                    "paddingRight": "15px",
-                    "paddingTop": "15px",
-                  }
-                }
-              >
-                <div
-                  className="css-text-901oao"
-                  dir="auto"
-                  style={
-                    Object {
-                      "borderBottomColor": "rgba(191,151,255,1.00)",
-                      "borderBottomStyle": "dashed",
-                      "borderBottomWidth": "1px",
-                      "borderLeftColor": "rgba(191,151,255,1.00)",
-                      "borderLeftStyle": "dashed",
-                      "borderLeftWidth": "1px",
-                      "borderRightColor": "rgba(191,151,255,1.00)",
-                      "borderRightStyle": "dashed",
-                      "borderRightWidth": "1px",
-                      "borderTopColor": "rgba(191,151,255,1.00)",
-                      "borderTopStyle": "dashed",
-                      "borderTopWidth": "1px",
-                      "color": "rgba(146,78,255,1.00)",
-                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                      "fontSize": "22px",
-                      "letterSpacing": "-8px",
-                      "lineHeight": "16px",
-                      "paddingBottom": "12px",
-                      "paddingLeft": "8px",
-                      "paddingRight": "8px",
-                      "paddingTop": "12px",
-                      "textAlign": "center",
-                      "textRendering": "geometricPrecision",
-                    }
-                  }
-                >
-                  ¼
-                </div>
-              </div>
-              <div
-                className="css-view-1dbjc4n"
-                style={
-                  Object {
-                    "WebkitBoxFlex": 1,
-                    "WebkitFlexBasis": "0%",
-                    "WebkitFlexGrow": 1,
-                    "WebkitFlexShrink": 1,
-                    "backgroundColor": "rgba(239,229,255,1.00)",
-                    "flexBasis": "0%",
-                    "flexGrow": 1,
-                    "flexShrink": 1,
-                    "gridArea": "4 / 9 / 4 / 12 ",
-                    "msFlexNegative": 1,
-                    "msFlexPositive": 1,
-                    "msFlexPreferredSize": "0%",
-                    "msGridArea": "4 / 9 / 4 / 12 ",
-                    "paddingBottom": "15px",
-                    "paddingLeft": "15px",
-                    "paddingRight": "15px",
-                    "paddingTop": "15px",
-                  }
-                }
-              >
-                <div
-                  className="css-text-901oao"
-                  dir="auto"
-                  style={
-                    Object {
-                      "borderBottomColor": "rgba(191,151,255,1.00)",
-                      "borderBottomStyle": "dashed",
-                      "borderBottomWidth": "1px",
-                      "borderLeftColor": "rgba(191,151,255,1.00)",
-                      "borderLeftStyle": "dashed",
-                      "borderLeftWidth": "1px",
-                      "borderRightColor": "rgba(191,151,255,1.00)",
-                      "borderRightStyle": "dashed",
-                      "borderRightWidth": "1px",
-                      "borderTopColor": "rgba(191,151,255,1.00)",
-                      "borderTopStyle": "dashed",
-                      "borderTopWidth": "1px",
-                      "color": "rgba(146,78,255,1.00)",
-                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                      "fontSize": "22px",
-                      "letterSpacing": "-8px",
-                      "lineHeight": "16px",
-                      "paddingBottom": "12px",
-                      "paddingLeft": "8px",
-                      "paddingRight": "8px",
-                      "paddingTop": "12px",
-                      "textAlign": "center",
-                      "textRendering": "geometricPrecision",
-                    }
-                  }
-                >
-                  ¼
+                  >
+                    <div
+                      className="react-reveal"
+                      style={
+                        Object {
+                          "opacity": undefined,
+                        }
+                      }
+                    >
+                      <div
+                        className="css-view-1dbjc4n"
+                        style={
+                          Object {
+                            "marginBottom": "20px",
+                            "marginRight": "40px",
+                            "marginTop": "20px",
+                          }
+                        }
+                      >
+                        <div
+                          className="css-view-1dbjc4n"
+                          style={
+                            Object {
+                              "display": "block",
+                              "overflowX": "hidden",
+                              "overflowY": "hidden",
+                            }
+                          }
+                        >
+                          <div
+                            style={
+                              Object {
+                                "display": "block",
+                                "paddingBottom": "100%",
+                                "width": "100%",
+                              }
+                            }
+                          />
+                          <div
+                            style={
+                              Object {
+                                "bottom": "0px",
+                                "height": "100%",
+                                "left": "0px",
+                                "position": "absolute",
+                                "top": "0px",
+                                "width": "100%",
+                              }
+                            }
+                          >
+                            <div
+                              aria-label="Preview of cGLD Exchange Icon"
+                              className="css-view-1dbjc4n"
+                              style={
+                                Object {
+                                  "WebkitFlexBasis": "auto",
+                                  "backgroundColor": "rgba(0,0,0,1.00)",
+                                  "borderBottomLeftRadius": "60px",
+                                  "borderBottomRightRadius": "60px",
+                                  "borderTopLeftRadius": "60px",
+                                  "borderTopRightRadius": "60px",
+                                  "flexBasis": "auto",
+                                  "height": "100%",
+                                  "msFlexPreferredSize": "auto",
+                                  "overflowX": "hidden",
+                                  "overflowY": "hidden",
+                                  "width": "100%",
+                                  "zIndex": 0,
+                                }
+                              }
+                            >
+                              <div
+                                className="css-view-1dbjc4n"
+                                style={
+                                  Object {
+                                    "backgroundColor": "rgba(0,0,0,0.00)",
+                                    "backgroundImage": "url(\\"/images/marketplace-icons/icon-celo-gold-white-f.svg\\")",
+                                    "backgroundPosition": "center",
+                                    "backgroundRepeat": "no-repeat",
+                                    "backgroundSize": "contain",
+                                    "bottom": "0px",
+                                    "height": "100%",
+                                    "left": "0px",
+                                    "position": "absolute",
+                                    "right": "0px",
+                                    "top": "0px",
+                                    "width": "100%",
+                                    "zIndex": -1,
+                                  }
+                                }
+                              />
+                              <img
+                                alt="Preview of cGLD Exchange Icon"
+                                className="css-accessibilityImage-9pa8cd"
+                                draggable={false}
+                                src="/images/marketplace-icons/icon-celo-gold-white-f.svg"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      className="react-reveal"
+                      style={
+                        Object {
+                          "opacity": undefined,
+                        }
+                      }
+                    >
+                      <div
+                        className="css-view-1dbjc4n"
+                        style={
+                          Object {
+                            "WebkitBoxFlex": 1,
+                            "WebkitFlexBasis": "0%",
+                            "WebkitFlexGrow": 1,
+                            "WebkitFlexShrink": 1,
+                            "flexBasis": "0%",
+                            "flexGrow": 1,
+                            "flexShrink": 1,
+                            "msFlexNegative": 1,
+                            "msFlexPositive": 1,
+                            "msFlexPreferredSize": "0%",
+                          }
+                        }
+                      >
+                        <div
+                          className="css-text-901oao"
+                          dir="auto"
+                          style={
+                            Object {
+                              "color": "rgba(46,51,56,1.00)",
+                              "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                              "fontSize": "16px",
+                              "fontWeight": "500",
+                              "lineHeight": "18px",
+                              "marginBottom": "5px",
+                              "marginTop": "5px",
+                              "textRendering": "geometricPrecision",
+                            }
+                          }
+                        >
+                          cGLD Exchange Icon
+                        </div>
+                        <div
+                          className="css-text-901oao"
+                          dir="auto"
+                          style={
+                            Object {
+                              "color": "rgba(46,51,56,1.00)",
+                              "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                              "fontSize": "16px",
+                              "lineHeight": "20px",
+                              "textRendering": "geometricPrecision",
+                            }
+                          }
+                        >
+                          Reverse Monochrome
+
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      className="react-reveal"
+                      style={
+                        Object {
+                          "opacity": undefined,
+                        }
+                      }
+                    >
+                      <div
+                        className="css-view-1dbjc4n"
+                        onClick={[Function]}
+                        onMouseDown={[Function]}
+                        onMouseEnter={[Function]}
+                        onMouseLeave={[Function]}
+                        onMouseUp={[Function]}
+                        onResponderGrant={[Function]}
+                        onResponderRelease={[Function]}
+                      >
+                        <a
+                          className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+                          data-focusable={true}
+                          dir="auto"
+                          href="/assets/marketplace-icons/icon-celo-gold-white.zip"
+                          onClick={[Function]}
+                          onMouseEnter={[Function]}
+                          role="link"
+                          style={
+                            Object {
+                              "WebkitAlignItems": "center",
+                              "WebkitBoxAlign": "center",
+                              "WebkitBoxFlex": 0,
+                              "WebkitBoxPack": "start",
+                              "WebkitFlexGrow": 0,
+                              "WebkitJustifyContent": "flex-start",
+                              "alignItems": "center",
+                              "backgroundColor": "rgba(0,0,0,0.00)",
+                              "borderBottomColor": "rgba(0,0,0,0.00)",
+                              "borderLeftColor": "rgba(0,0,0,0.00)",
+                              "borderRightColor": "rgba(0,0,0,0.00)",
+                              "borderTopColor": "rgba(0,0,0,0.00)",
+                              "color": "rgba(53,208,127,1.00)",
+                              "cursor": "pointer",
+                              "display": "inline-flex",
+                              "flexGrow": 0,
+                              "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                              "fontSize": "16px",
+                              "fontWeight": "500",
+                              "justifyContent": "flex-start",
+                              "lineHeight": "16px",
+                              "minWidth": "150px",
+                              "msFlexAlign": "center",
+                              "msFlexPack": "start",
+                              "msFlexPositive": 0,
+                              "opacity": 1,
+                              "outlineColor": "transparent",
+                              "paddingBottom": "10px",
+                              "paddingLeft": "0px",
+                              "paddingRight": "20px",
+                              "paddingTop": "10px",
+                              "textAlign": "center",
+                              "textRendering": "geometricPrecision",
+                              "width": "fit-content",
+                            }
+                          }
+                        >
+                          downloadAssetBtn
+                          <div
+                            className="css-view-1dbjc4n"
+                            style={
+                              Object {
+                                "display": "inline-flex",
+                                "paddingLeft": "8px",
+                              }
+                            }
+                          >
+                            <svg
+                              fill="none"
+                              height={12}
+                              style={Object {}}
+                              viewBox="0 0 10 13"
+                              width={12}
+                            >
+                              <path
+                                d="M0 12H10"
+                                stroke="#35D07F"
+                                strokeWidth="1.5"
+                                style={Object {}}
+                              />
+                              <path
+                                d="M5 0V9"
+                                stroke="#35D07F"
+                                strokeWidth="1.5"
+                                style={Object {}}
+                              />
+                              <path
+                                d="M1 5L5 9L9 5"
+                                stroke="#35D07F"
+                                strokeWidth="1.5"
+                                style={Object {}}
+                              />
+                            </svg>
+                          </div>
+                        </a>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

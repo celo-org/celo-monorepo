@@ -20,6 +20,11 @@ export const GARMOND_TRACKING: Tracker = { name: 'Garmond', type: AssetTypes.fon
 
 export const LOGO_PKG_TRACKING: Tracker = { name: 'Logo Package', type: AssetTypes.logo }
 
+export const EXCHANGE_ICONS_PKG_TRACKING: Tracker = {
+  name: 'Exchange Icons Package',
+  type: AssetTypes.icon,
+}
+
 export const VOICE_DOC_TRACKING: Tracker = { name: 'Celo Voice Doc', type: AssetTypes.logo }
 
 export async function trackDownload({ name, type }: Tracker) {
