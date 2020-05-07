@@ -180,6 +180,7 @@ export function* sendInvite(
     if (currency === CURRENCY_ENUM.DOLLAR && amount) {
       const escrowTxId = generateStandbyTransactionId(temporaryAddress + '-escrow')
       try {
+        //TODO wrong hash here
         const phoneHash = getPhoneHash(e164Number)
         yield put(transferEscrowedPayment(phoneHash, amount, temporaryAddress, escrowTxId))
         yield call(waitForTransactionWithId, escrowTxId)
