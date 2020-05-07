@@ -331,7 +331,10 @@ jobs:
       - checkout
       - run:
           name: Install node 10
-          command: brew install node@10
+          command: |
+            brew uninstall --ignore-dependencies node icu4c
+            brew install node@10
+            brew link --overwrite node
       - run:
           name: Check if the test should run
           command: |
