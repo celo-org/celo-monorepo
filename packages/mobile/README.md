@@ -1,6 +1,6 @@
 # Mobile (Celo Wallet)
 
-- [Mobile (Celo Wallet)](#mobile-celo-wallet)
+- [Mobile (Celo Wallet)](<#mobile-(celo-wallet)>)
   - [Overview](#overview)
   - [Architecture](#architecture)
   - [Setup](#setup)
@@ -23,8 +23,8 @@
   - [Running the mobile wallet](#running-the-mobile-wallet)
     - [iOS](#ios-1)
     - [Android](#android-1)
-    - [Running in forno (data saver) mode](#running-in-forno-data-saver-mode)
-  - [Debugging & App Profiling](#debugging--app-profiling)
+    - [Running in forno (data saver) mode](<#running-in-forno-(data-saver)-mode>)
+  - [Debugging & App Profiling](#debugging-&-app-profiling)
     - [Debugging](#debugging)
       - [Optional: Install React Native Debugger](#optional-install-react-native-debugger)
     - [App Profiling](#app-profiling)
@@ -40,10 +40,9 @@
     - [Configuring the SMS Retriever](#configuring-the-sms-retriever)
     - [Generating GraphQL Types](#generating-graphql-types)
     - [How we handle Geth crashes in wallet app on Android](#how-we-handle-geth-crashes-in-wallet-app-on-android)
-    - [Why do we use http(s) provider?](#why-do-we-use-https-provider)
+    - [Why do we use http(s) provider?](<#why-do-we-use-http(s)-provider?>)
     - [Troubleshooting](#troubleshooting)
       - [`Activity class {org.celo.mobile.staging/org.celo.mobile.MainActivity} does not exist.`](#activity-class-orgcelomobilestagingorgcelomobilemainactivity-does-not-exist)
-
 
 ## Overview
 
@@ -52,19 +51,18 @@ It's a self-soverign wallet that enables anyone to onboard onto the Celo network
 
 ![](https://storage.googleapis.com/celo-website/docs/wallet-preview.png)
 
-
 ## Architecture
 
 The app uses [React Native][react native] and a geth [light node][light node].
 
-
 ## Setup
 
-__You must have the [celo-monorepo] successfully set up and built before setting up and running the mobile wallet.__
+**You must have the [celo-monorepo] successfully set up and built before setting up and running the mobile wallet.**
 
 To do this, follow the [setup instructions][setup].
 
 Next, install [watchman][watchman].
+
 ```bash
 # On a mac
 brew install watchman
@@ -103,7 +101,6 @@ bundle exec pod install
 ```
 
 If your machine does not recognize the `gem` command, you may need to [download Ruby](https://rubyinstaller.org/) first.
-
 
 ### Android
 
@@ -237,12 +234,11 @@ After having the binary you only need to run the installer:
 sudo ./genymotion-3.0.2-linux_x64.bin
 ```
 
-
 ## Running the mobile wallet
 
 The below steps should help you successfully run the mobile wallet on either a USB connected or emulated device. For additional information and troublshooting see the [React Native docs][rn running on device].
 
- **Note:** We've seen some issues running the metro bundler from iTerm
+**Note:** We've seen some issues running the metro bundler from iTerm
 
 1. If you haven't already, run `yarn` from the monorepo root to install dependencies.
 
@@ -274,7 +270,6 @@ To run the wallet in forno (Data Saver) mode, using a trusted node rather than t
 
 To debug network requests in forno mode, we use Charles, a proxy for monitoring network traffic to see Celo JSON RPC calls and responses. Follow instructions [here](https://community.tealiumiq.com/t5/Tealium-for-Android/Setting-up-Charles-to-Proxy-your-Android-Device/ta-p/5121) to configure Charles to proxy a test device.
 
-
 ## Debugging & App Profiling
 
 ### Debugging
@@ -284,7 +279,7 @@ _To avoid debugging errors, ensure your device and laptop are connected to the s
 1. Either shake the device or run `yarn run dev:show-menu` (only for Android) to open up the developer menu.
 
 2. Select `Debug` (iOS) or `Start Remote JS Debugging` (Android). This should open a new tab in your browser with React Native logger in the console. In order to get a full picture, the console's filter should be set to
-`All levels`.
+   `All levels`.
 
 3. For the fastest development experience, you likely want to open the developer menu again and ensure `Fast Reloading` (iOS) or `Live Reloading` and `Hot Reloading` (Android) is enabled.
 
@@ -297,7 +292,6 @@ The [React Native Debugger][rn debugger] bundles together the Redux and Chrome d
 Run `yarn run react-devtools`. It should automatically connect to the running app, and includes a profiler (second tab). Start recording with the profiler, use the app, and then stop recording.
 
 The flame graph provides a view of each component and sub-component. The width is proportional to how long it took to load. If it is grey, it was not re-rendered at that 'commit' or DOM change. Details on the react native profiler are [here][rn profiler]. The biggest thing to look for are large number of renders when no state has changed. Reducing renders can be done via pure components in React or overloading the should component update method [example here][rn optimize example].
-
 
 ## Testing
 
@@ -329,7 +323,6 @@ We use [Detox][detox] for E2E testing. In order to run the tests locally, you
 must have the proper emulator set up. Follow the instrutions in [e2e/README.md][e2e readme].
 
 Once setup is done, you can run the tests with `yarn test:e2e:android`
-
 
 ## Building APKs / Bundles
 
@@ -364,7 +357,6 @@ cd android/
 ```
 
 Where `YOUR_BUILD_VARIANT` can be any of the app's build variants, such as debug or release.
-
 
 ## Other
 
@@ -404,7 +396,7 @@ Relevant code references:
 There are two major differences in Forno mode:
 
 1.  Geth won't run at all. Instead, web3 connects to <testnet>-forno.celo-testnet.org using an https provider, for example, [https://integration-forno.celo-testnet.org](https://integration-forno.celo-testnet.org).
-2. Transactions will be signed locally by contractkit.
+2.  Transactions will be signed locally by contractkit.
 
 ### Why do we use http(s) provider?
 
@@ -433,13 +425,12 @@ $ adb kill-server && adb start-server
 * daemon started successfully
 ```
 
-[Celo platform]: https://celo.org
+[celo platform]: https://celo.org
 [celo-monorepo]: https://github.com/celo-org/celo-monorepo
 [celo-blockchain]: https://github.com/celo-org/celo-blockchain
-[Apple Developer Program]: https://developer.apple.com/programs/
+[apple developer program]: https://developer.apple.com/programs/
 [detox]: https://github.com/wix/Detox
 [e2e readme]: ./e2e/README.md
-[enzyme]: https://airbnb.io/enzyme/docs/guides/react-native.html
 [graphql code generator]: https://github.com/dotansimha/graphql-code-generator
 [light node]: https://github.com/ethereum/wiki/wiki/Light-client-protocol
 [protocol readme]: ../protocol/README.md

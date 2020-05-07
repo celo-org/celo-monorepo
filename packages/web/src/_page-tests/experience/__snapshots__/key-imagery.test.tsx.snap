@@ -904,6 +904,101 @@ exports[`Experience/KeyImagery renders 1`] = `
               className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
               data-focusable={true}
               dir="auto"
+              href="/experience/brand/exchange-icons"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
+              role="link"
+              style={
+                Object {
+                  "WebkitAlignItems": "center",
+                  "WebkitBoxAlign": "center",
+                  "WebkitBoxFlex": 0,
+                  "WebkitBoxPack": "center",
+                  "WebkitFlexGrow": 0,
+                  "WebkitJustifyContent": "center",
+                  "alignItems": "center",
+                  "backgroundColor": "rgba(0,0,0,0.00)",
+                  "borderBottomColor": "rgba(0,0,0,0.00)",
+                  "borderLeftColor": "rgba(0,0,0,0.00)",
+                  "borderRightColor": "rgba(0,0,0,0.00)",
+                  "borderTopColor": "rgba(0,0,0,0.00)",
+                  "color": "rgba(46,51,56,1.00)",
+                  "cursor": "pointer",
+                  "display": "inline-flex",
+                  "flexGrow": 0,
+                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                  "fontSize": "16px",
+                  "fontWeight": "normal",
+                  "justifyContent": "center",
+                  "lineHeight": "16px",
+                  "msFlexAlign": "center",
+                  "msFlexPack": "center",
+                  "msFlexPositive": 0,
+                  "opacity": 1,
+                  "outlineColor": "transparent",
+                  "textAlign": "center",
+                  "textRendering": "geometricPrecision",
+                  "width": "fit-content",
+                }
+              }
+            >
+              <div
+                className="css-view-1dbjc4n"
+                style={
+                  Object {
+                    "display": "inline-flex",
+                    "paddingRight": "8px",
+                  }
+                }
+              >
+                <div
+                  className="css-view-1dbjc4n"
+                  style={
+                    Object {
+                      "display": "inline-flex",
+                      "width": "12px",
+                    }
+                  }
+                />
+              </div>
+              Exchange Icons
+            </a>
+          </div>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxDirection": "normal",
+              "WebkitBoxOrient": "horizontal",
+              "WebkitFlexDirection": "row",
+              "flexDirection": "row",
+              "marginBottom": "5px",
+              "marginLeft": "5px",
+              "marginRight": "5px",
+              "marginTop": "5px",
+              "msFlexDirection": "row",
+              "paddingBottom": "5px",
+              "paddingLeft": "5px",
+              "paddingRight": "5px",
+              "paddingTop": "5px",
+            }
+          }
+        >
+          <div
+            className="css-view-1dbjc4n"
+            onClick={[Function]}
+            onMouseDown={[Function]}
+            onMouseEnter={[Function]}
+            onMouseLeave={[Function]}
+            onMouseUp={[Function]}
+            onResponderGrant={[Function]}
+            onResponderRelease={[Function]}
+          >
+            <a
+              className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+              data-focusable={true}
+              dir="auto"
               href="/experience/brand/icons"
               onClick={[Function]}
               onMouseEnter={[Function]}

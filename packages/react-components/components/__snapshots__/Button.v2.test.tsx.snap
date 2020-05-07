@@ -5,7 +5,6 @@ exports[`Button when type is SECONDARY renders 1`] = `
   style={
     Object {
       "flexDirection": "row",
-      "margin": 10,
     }
   }
 >
@@ -54,7 +53,6 @@ exports[`Button when type is TERTIARY renders 1`] = `
   style={
     Object {
       "flexDirection": "row",
-      "margin": 10,
     }
   }
 >
@@ -103,7 +101,6 @@ exports[`Button when type not given defaults to primary 1`] = `
   style={
     Object {
       "flexDirection": "row",
-      "margin": 10,
     }
   }
 >
