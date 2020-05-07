@@ -1,9 +1,9 @@
 import { InitialArgv } from 'src/cmds/deploy/initial'
 import {
-  OracleArgv,
   addOracleMiddleware,
   getOracleAzureContext,
   installHelmChart,
+  OracleArgv,
   switchToAzureContextCluster,
 } from 'src/lib/oracle'
 import yargs from 'yargs'

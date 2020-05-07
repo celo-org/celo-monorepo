@@ -1,10 +1,10 @@
 import { InitialArgv } from 'src/cmds/deploy/initial'
 import { installFullNodeChart } from 'src/lib/aks-fullnode'
 import {
-  OracleArgv,
   addOracleMiddleware,
   getAzureClusterConfig,
   getOracleAzureContext,
+  OracleArgv,
   switchToAzureContextCluster,
 } from 'src/lib/oracle'
 import yargs from 'yargs'

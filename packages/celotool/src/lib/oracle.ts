@@ -1,9 +1,9 @@
-import yargs from 'yargs'
 import { AzureClusterConfig, createIdentityIfNotExists, switchToCluster } from 'src/lib/azure'
 import { getFornoUrl, getFullNodeRpcInternalUrl } from 'src/lib/endpoints'
 import { addCeloEnvMiddleware, envVar, fetchEnv } from 'src/lib/env-utils'
 import { installGenericHelmChart, removeGenericHelmChart } from 'src/lib/helm_deploy'
 import { execCmdWithExitOnFailure } from 'src/lib/utils'
+import yargs from 'yargs'
 
 const helmChartPath = '../helm-charts/oracle'
 const rbacHelmChartPath = '../helm-charts/oracle-rbac'
@@ -19,7 +19,7 @@ export enum OracleAzureContext {
 /**
  * Represents the identity of a single oracle
  */
-type OracleIdentity = {
+interface OracleIdentity {
   address: string
   keyVaultName: string
   azureIdentityName: string
@@ -28,7 +28,7 @@ type OracleIdentity = {
 /**
  * Configuration of multiple oracles
  */
-type OracleConfig = {
+interface OracleConfig {
   identities: OracleIdentity[]
 }
 
@@ -36,7 +36,7 @@ type OracleConfig = {
  * Env vars corresponding to each value for the AzureClusterConfig for a particular context
  */
 const oracleAzureContextClusterConfigEnvVars: {
-  [key in keyof typeof OracleAzureContext]: { [key in keyof AzureClusterConfig]: string }
+  [key in keyof typeof OracleAzureContext]: { [k in keyof AzureClusterConfig]: string }
 } = {
   [OracleAzureContext.PRIMARY]: {
     subscriptionId: envVar.ORACLE_PRIMARY_AZURE_SUBSCRIPTION_ID,
@@ -56,7 +56,7 @@ const oracleAzureContextClusterConfigEnvVars: {
  * Env vars corresponding to each value for the OracleConfig for a particular context
  */
 const oracleAzureContextOracleConfigEnvVars: {
-  [key in keyof typeof OracleAzureContext]: { [key in keyof OracleConfig]: string }
+  [key in keyof typeof OracleAzureContext]: { [k in keyof OracleConfig]: string }
 } = {
   [OracleAzureContext.PRIMARY]: {
     identities: envVar.ORACLE_PRIMARY_ADDRESS_AZURE_KEY_VAULTS,
@@ -171,7 +171,7 @@ function getOracleConfig(context: OracleAzureContext): OracleConfig {
  * eg: 0x0000000000000000000000000000000000000000:keyVault0,0x0000000000000000000000000000000000000001:keyVault1
  * into an array of OracleIdentity in the same order
  */
-function getOracleIdentities(context: OracleAzureContext): Array<OracleIdentity> {
+function getOracleIdentities(context: OracleAzureContext): OracleIdentity[] {
   const identityStrings = fetchEnv(oracleAzureContextOracleConfigEnvVars[context].identities).split(
     ','
   )
@@ -239,7 +239,7 @@ export function switchToAzureContextCluster(celoEnv: string, context: OracleAzur
 /**
  * yargs argv type for an oracle related command.
  */
-export type OracleArgv = {
+export interface OracleArgv {
   primary: boolean
   secondary: boolean
 }
@@ -262,8 +262,8 @@ export function addOracleMiddleware(argv: yargs.Argv) {
       default: false,
       type: 'boolean',
     })
-    .check((argv: OracleArgv) => {
-      if (argv.primary === argv.secondary) {
+    .check((oracleArgv: OracleArgv) => {
+      if (oracleArgv.primary === oracleArgv.secondary) {
         throw Error('Exactly one of `primary` and `secondary` must be true')
       }
       return true

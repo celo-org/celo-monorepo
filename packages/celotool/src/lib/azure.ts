@@ -1,13 +1,13 @@
-import { installPrometheusIfNotExists } from './aks-prometheus'
-import { createNamespaceIfNotExists } from './cluster'
-import { doCheckOrPromptIfStagingOrProduction } from './env-utils'
-import { installAndEnableMetricsDeps, redeployTiller } from './helm_deploy'
-import { execCmd, execCmdWithExitOnFailure, outputIncludes } from './utils'
+import { installPrometheusIfNotExists } from 'src/lib/aks-prometheus'
+import { createNamespaceIfNotExists } from 'src/lib/cluster'
+import { doCheckOrPromptIfStagingOrProduction } from 'src/lib/env-utils'
+import { installAndEnableMetricsDeps, redeployTiller } from 'src/lib/helm_deploy'
+import { execCmd, execCmdWithExitOnFailure, outputIncludes } from 'src/lib/utils'
 
 /**
  * Basic info for an AKS cluster
  */
-export type AzureClusterConfig = {
+export interface AzureClusterConfig {
   tenantId: string
   resourceGroup: string
   clusterName: string

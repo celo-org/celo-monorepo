@@ -1,10 +1,10 @@
 import { DestroyArgv } from 'src/cmds/deploy/destroy'
 import { removeHelmRelease } from 'src/lib/aks-fullnode'
 import {
-  OracleArgv,
   addOracleMiddleware,
   getAzureClusterConfig,
   getOracleAzureContext,
+  OracleArgv,
   switchToAzureContextCluster,
 } from 'src/lib/oracle'
 
