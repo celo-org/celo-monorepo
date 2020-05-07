@@ -27,8 +27,8 @@ export const migrations = {
     return {
       ...state,
       invite: {
-        invitees,
         ...state.invite,
+        invitees,
       },
     }
   },
