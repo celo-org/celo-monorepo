@@ -68,7 +68,6 @@ export default React.memo(function Button(props: ButtonProps) {
 const styles = StyleSheet.create({
   root: {
     flexDirection: 'row',
-    margin: 10,
   },
   button: {
     alignItems: 'center',

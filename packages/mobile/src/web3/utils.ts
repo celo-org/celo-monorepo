@@ -1,9 +1,10 @@
 import { estimateGas as ckEstimateGas } from '@celo/contractkit/lib/utils/web3-utils'
 import { ensureLeading0x } from '@celo/utils/src/address'
 import BigNumber from 'bignumber.js'
+import { call } from 'redux-saga/effects'
 import { GAS_INFLATION_FACTOR } from 'src/config'
 import Logger from 'src/utils/Logger'
-import { getContractKit } from 'src/web3/contracts'
+import { getContractKit, getContractKitOutsideGenerator, web3ForUtils } from 'src/web3/contracts'
 import { Tx } from 'web3-core'
 import { TransactionObject } from 'web3-eth'
 
@@ -11,7 +12,7 @@ const TAG = 'web3/utils'
 
 // Estimate gas taking into account the configured inflation factor
 export async function estimateGas(txObj: TransactionObject<any>, txParams: Tx) {
-  const web3 = getContractKit().web3
+  const web3 = (await getContractKitOutsideGenerator()).web3
   const gasEstimator = (_tx: Tx) => txObj.estimateGas({ ..._tx })
   const getCallTx = (_tx: Tx) => {
     // @ts-ignore missing _parent property from TransactionObject type.
@@ -25,35 +26,32 @@ export async function estimateGas(txObj: TransactionObject<any>, txParams: Tx) {
 }
 
 // Note: This returns Promise<Block>
-export function getLatestBlock() {
+export async function getLatestBlock() {
   Logger.debug(TAG, 'Getting latest block')
-  return getContractKit().web3.eth.getBlock('latest')
+  const contractKit = await getContractKitOutsideGenerator()
+  return contractKit.web3.eth.getBlock('latest')
 }
 
-// Note: This returns Promise<Block>
-export function getBlock(blockNumber: number) {
-  Logger.debug(TAG, 'Getting block ' + blockNumber)
-  return getContractKit().web3.eth.getBlock(blockNumber)
-}
-
-export async function isAccountLocked(address: string) {
+export function* isAccountLocked(address: string) {
   try {
     // Test account to see if it is unlocked
-    await getContractKit().web3.eth.sign('', address)
+    const contractKit = yield call(getContractKit)
+    yield call(contractKit.eth.sign, '', address)
   } catch (e) {
     return true
   }
   return false
 }
 
-export async function getLatestNonce(address: string) {
+export function* getLatestNonce(address: string) {
   Logger.debug(TAG, 'Fetching latest nonce (incl. pending)')
+  const contractKit = yield call(getContractKit)
   // Note tx count is 1-indexed but nonces are 0-indexed
-  const nonce = (await getContractKit().web3.eth.getTransactionCount(address, 'pending')) - 1
+  const nonce = (yield call(contractKit.web3.eth.getTransactionCount, address, 'pending')) - 1
   Logger.debug(TAG, `Latest nonce found: ${nonce}`)
   return nonce
 }
 
 export function getAccountAddressFromPrivateKey(privateKey: string): string {
-  return getContractKit().web3.eth.accounts.privateKeyToAccount(ensureLeading0x(privateKey)).address
+  return web3ForUtils.eth.accounts.privateKeyToAccount(ensureLeading0x(privateKey)).address
 }
