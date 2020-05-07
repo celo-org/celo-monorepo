@@ -1,6 +1,3 @@
-import { configure } from 'enzyme'
-import Adapter from 'enzyme-adapter-react-16'
-
 import * as ReactNative from 'react-native'
 
 jest.doMock('react-native', () => {
@@ -12,8 +9,6 @@ jest.doMock('react-native', () => {
     ReactNative
   )
 })
-
-configure({ adapter: new Adapter() })
 
 jest.useFakeTimers()
 
