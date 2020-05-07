@@ -31,6 +31,8 @@ Github: https://github.com/nestorbonilla/bienvenir
 An integration of a Celo Dollar (Stablecoin) and Mpesa, showing flows of payment between an Mpesa User and a Celo Blockchain wallet from anywhere in the world. Our aim with Pesabase is to provide African’s with a cheap and social option to remit and pay for goods and services.    
   
 Github: https://github.com/Kesholabs/celoBackend  
+
+Google play store: https://play.google.com/store/apps/details?id=com.kesholabs.pesabase_money_remittance_app
   
 
 ### Wallet as a Service
@@ -40,6 +42,13 @@ manage HSM-secured wallets and interact with the underlying blockchain. Our API 
 to execute transactions, check details of past transactions or query account balances without any worries about private 
 key safekeeping. For the Celo Camp 2020 we have developed a prototype version of our product that integrates the Celo blockchain. 
 The [demo project](https://github.com/adrianmitter/celo-camp) presents the new features and provides some code snippets to get started. 
+
+
+### Celo Toolkit by MugglePay
+
+[MugglePay](https://mugglepay.com/) provides a payment SDK for merchants to accept cryptocurrencies. Mugglepay makes crypto payment easy and thousands of merchants are onboarded with MugglePay SDK. For the Celo Camp 2020, we will integrate with cUSD/cGLD for payments on Celo blockchain.
+
+[Celo Toolkit](https://celo.mugglepay.com) is the [open source](https://github.com/MugglePay/celo-toolkit) interface for managing Celo accounts on Web. Celo developer might start with a funded Celo account (Testnet) now in 1 minute. Phone number or app downloads are not necessary.
 
 
 ## Add your app to this list!

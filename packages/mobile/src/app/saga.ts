@@ -22,9 +22,6 @@ import { getCachedPincode } from 'src/pincode/PincodeCache'
 import { PersistedRootState } from 'src/redux/reducers'
 import Logger from 'src/utils/Logger'
 import { clockInSync } from 'src/utils/time'
-import { toggleFornoMode } from 'src/web3/actions'
-import { isInitiallyFornoMode } from 'src/web3/contracts'
-import { fornoSelector } from 'src/web3/selectors'
 import { parse } from 'url'
 
 const TAG = 'app/saga'
@@ -63,18 +60,6 @@ const mapStateToProps = (state: PersistedRootState): PersistedStateProps | null 
     account: state.web3.account,
     hasSeenVerificationNux: state.identity.hasSeenVerificationNux,
     acceptedTerms: state.account.acceptedTerms,
-  }
-}
-
-// Upon every app restart, web3 is initialized according to .env file
-// This updates to the chosen forno mode in store
-export function* toggleToProperSyncMode() {
-  Logger.info(TAG + '@toggleToProperSyncMode/', 'Ensuring proper sync mode...')
-  yield take(REHYDRATE)
-  const fornoMode = yield select(fornoSelector)
-  if (fornoMode !== isInitiallyFornoMode()) {
-    Logger.info(TAG + '@toggleToProperSyncMode/', `Switching to fornoMode: ${fornoMode}`)
-    yield put(toggleFornoMode(fornoMode))
   }
 }
 
@@ -206,7 +191,6 @@ export function* handleSetAppState(action: SetAppState) {
 
 export function* appSaga() {
   yield spawn(navigateToProperScreen)
-  yield spawn(toggleToProperSyncMode)
   yield spawn(watchDeepLinks)
   yield spawn(watchAppState)
   yield takeLatest(Actions.SET_APP_STATE, handleSetAppState)

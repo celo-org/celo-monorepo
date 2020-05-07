@@ -34,8 +34,12 @@ async function helmParameters(celoEnv: string) {
     `--set image.repository=${fetchEnv(envVar.ORACLE_DOCKER_IMAGE_REPOSITORY)}`,
     `--set image.tag=${fetchEnv(envVar.ORACLE_DOCKER_IMAGE_TAG)}`,
     `--set kube.authTokenName=${kubeAuthTokenName}`,
+    `--set oracle.azureHsm.initTryCount=5`,
+    `--set oracle.azureHsm.initMaxRetryBackoffMs=30000`,
     `--set oracle.replicas=${replicas}`,
     `--set oracle.rpcProviderUrl=${getFornoUrl(celoEnv)}`,
+    `--set oracle.metrics.enabled=true`,
+    `--set oracle.metrics.prometheusPort=9090`,
   ].concat(await oracleIdentityHelmParameters(celoEnv))
 }
 
