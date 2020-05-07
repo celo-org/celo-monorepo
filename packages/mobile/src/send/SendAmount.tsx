@@ -277,19 +277,16 @@ export class SendAmount extends React.Component<Props, State> {
 
   renderButtons = (isAmountValid: boolean) => {
     const { t, verificationStatus } = this.props
-    // const { characterLimitExceeded } = this.state
+    const { characterLimitExceeded } = this.state
 
-    // const requestDisabled =
-    //   !isAmountValid ||
-    //   verificationStatus !== RecipientVerificationStatus.VERIFIED ||
-    //   characterLimitExceeded
-    // const sendDisabled =
-    //   !isAmountValid ||
-    //   characterLimitExceeded ||
-    //   verificationStatus === RecipientVerificationStatus.UNKNOWN
-
-    const requestDisabled = false
-    const sendDisabled = false
+    const requestDisabled =
+      !isAmountValid ||
+      verificationStatus !== RecipientVerificationStatus.VERIFIED ||
+      characterLimitExceeded
+    const sendDisabled =
+      !isAmountValid ||
+      characterLimitExceeded ||
+      verificationStatus === RecipientVerificationStatus.UNKNOWN
 
     const separatorContainerStyle =
       sendDisabled && requestDisabled

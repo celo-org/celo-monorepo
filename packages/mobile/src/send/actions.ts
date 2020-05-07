@@ -1,6 +1,8 @@
+import { E164Number } from '@celo/utils/lib/io'
 import BigNumber from 'bignumber.js'
 import { InviteBy } from 'src/invite/actions'
 import { Recipient } from 'src/recipients/recipient'
+import { ConfirmationInput } from 'src/send/SendConfirmation'
 import { Svg } from 'svgs'
 
 export interface QrCode {
@@ -55,6 +57,8 @@ export interface ValidateRecipientAddressAction {
 
 export interface ValidateRecipientAddressSuccessAction {
   type: Actions.VALIDATE_RECIPIENT_ADDRESS_SUCCESS
+  e164Number: string
+  address: string
 }
 
 export interface ValidateRecipientAddressFailureAction {
@@ -83,13 +87,13 @@ export const storeLatestInRecents = (recipient: Recipient): StoreLatestInRecents
 
 export const handleBarcodeDetected = (
   data: QrCode,
-  scanIsForSecureSend: true | undefined,
-  recipient: Recipient | undefined
+  scanIsForSecureSend?: true,
+  confirmationInput?: ConfirmationInput
 ) => ({
   type: Actions.BARCODE_DETECTED,
   data,
   scanIsForSecureSend,
-  recipient,
+  confirmationInput,
 })
 
 export const shareQRCode = (qrCodeSvg: SVG) => ({
@@ -133,8 +137,13 @@ export const validateRecipientAddress = (
   recipient,
 })
 
-export const validateRecipientAddressSuccess = (): ValidateRecipientAddressSuccessAction => ({
+export const validateRecipientAddressSuccess = (
+  e164Number: E164Number,
+  address: string
+): ValidateRecipientAddressSuccessAction => ({
   type: Actions.VALIDATE_RECIPIENT_ADDRESS_SUCCESS,
+  e164Number,
+  address,
 })
 
 export const validateRecipientAddressFailure = (): ValidateRecipientAddressFailureAction => ({

@@ -32,6 +32,7 @@ interface OwnProps {
 
 interface StateProps {
   recipient: Recipient
+  confirmationInput: ConfirmationInput
   fullValidationRequired: boolean
   displayName: string
   startOfSentenceDisplayName: string
@@ -55,12 +56,13 @@ const formatDisplayName = (displayName: string) => {
 
 const mapStateToProps = (state: RootState, ownProps: NavigationInjectedProps): StateProps => {
   const { navigation } = ownProps
-  const confirmationInput: ConfirmationInput = navigation.getParam('confirmationInput')
+  const confirmationInput = navigation.getParam('confirmationInput')
   const fullValidationRequired = navigation.getParam('fullValidationRequired')
   const { recipient } = confirmationInput
   const { displayName, startOfSentenceDisplayName } = formatDisplayName(recipient.displayName)
   return {
     recipient,
+    confirmationInput,
     fullValidationRequired,
     displayName,
     startOfSentenceDisplayName,
@@ -73,14 +75,17 @@ class ConfirmRecipient extends React.Component<Props> {
   })
 
   onPressScanCode = () => {
-    navigate(Screens.QRScanner, { recipient: this.props.recipient, scanIsForSecureSend: true })
+    navigate(Screens.QRScanner, {
+      confirmationInput: this.props.confirmationInput,
+      scanIsForSecureSend: true,
+    })
   }
 
   onPressConfirmAccount = () => {
-    const { fullValidationRequired, recipient } = this.props
+    const { fullValidationRequired, confirmationInput } = this.props
 
     navigate(Screens.ConfirmRecipientAccount, {
-      recipient,
+      confirmationInput,
       fullValidationRequired,
     })
   }

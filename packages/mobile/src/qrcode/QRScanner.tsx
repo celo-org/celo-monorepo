@@ -17,9 +17,9 @@ import { headerWithBackButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import NotAuthorizedView from 'src/qrcode/NotAuthorizedView'
-import { Recipient } from 'src/recipients/recipient'
 import { RootState } from 'src/redux/reducers'
 import { handleBarcodeDetected } from 'src/send/actions'
+import { ConfirmationInput } from 'src/send/SendConfirmation'
 import Logger from 'src/utils/Logger'
 
 type Navigation = NavigationInjectedProps['navigation']
@@ -30,7 +30,7 @@ interface OwnProps {
 
 interface StateProps {
   scanIsForSecureSend: true | undefined
-  recipient: Recipient
+  confirmationInput: ConfirmationInput
   isFocused: boolean
 }
 
@@ -44,7 +44,7 @@ const mapStateToProps = (state: RootState, ownProps: NavigationInjectedProps): S
   const { navigation } = ownProps
   return {
     scanIsForSecureSend: navigation.getParam('scanIsForSecureSend'),
-    recipient: navigation.getParam('recipient'),
+    confirmationInput: navigation.getParam('confirmationInput'),
     isFocused: navigation.getParam('isFocused'),
   }
 }
@@ -60,9 +60,9 @@ class QRScanner extends React.Component<Props> {
   // This method would be called multiple times with the same
   // QR code, so we need to catch only the first one
   onBarCodeDetected = (rawData: any) => {
-    const { scanIsForSecureSend, recipient } = this.props
+    const { scanIsForSecureSend, confirmationInput } = this.props
     Logger.debug('QRScanner', 'Bar code detected')
-    this.props.handleBarcodeDetected(rawData, scanIsForSecureSend, recipient)
+    this.props.handleBarcodeDetected(rawData, scanIsForSecureSend, confirmationInput)
   }
 
   onPressShowYourCode = () => {
