@@ -12,13 +12,14 @@ import { showError, showMessage } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { ALERT_BANNER_DURATION } from 'src/config'
+import { ALERT_BANNER_DURATION, USE_PHONE_NUMBER_PRIVACY } from 'src/config'
 import { transferEscrowedPayment } from 'src/escrow/actions'
 import { calculateFee } from 'src/fees/saga'
 import { generateShortInviteLink } from 'src/firebase/dynamicLinks'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import i18n from 'src/i18n'
 import { setHasSeenVerificationNux } from 'src/identity/actions'
+import { fetchPhoneHashPrivate } from 'src/identity/privacy'
 import {
   Actions,
   InviteBy,
@@ -183,17 +184,7 @@ export function* sendInvite(
 
     // If this invitation has a payment attached to it, send the payment to the escrow.
     if (currency === CURRENCY_ENUM.DOLLAR && amount) {
-      const escrowTxId = generateStandbyTransactionId(temporaryAddress + '-escrow')
-      try {
-        //TODO wrong hash here
-        const phoneHash = getPhoneHash(e164Number)
-        yield put(transferEscrowedPayment(phoneHash, amount, temporaryAddress, escrowTxId))
-        yield call(waitForTransactionWithId, escrowTxId)
-        Logger.debug(TAG + '@sendInviteSaga', 'Escrowed money to new wallet')
-      } catch (e) {
-        Logger.error(TAG, 'Error sending payment to unverified user: ', e)
-        yield put(showError(ErrorMessages.ESCROW_TRANSFER_FAILED))
-      }
+      yield call(initiateEscrowTransfer, temporaryAddress, e164Number, amount)
     } else {
       Logger.error(TAG, 'Currently only dollar escrow payments are allowed')
     }
@@ -202,6 +193,25 @@ export function* sendInvite(
   } catch (e) {
     Logger.error(TAG, 'Send invite error: ', e)
     throw e
+  }
+}
+
+function* initiateEscrowTransfer(temporaryAddress: string, e164Number: string, amount: BigNumber) {
+  const escrowTxId = generateStandbyTransactionId(temporaryAddress + '-escrow')
+  try {
+    let phoneHash: string
+    if (USE_PHONE_NUMBER_PRIVACY) {
+      const phoneHashDetails = yield call(fetchPhoneHashPrivate, e164Number)
+      phoneHash = phoneHashDetails.phoneHash
+    } else {
+      phoneHash = getPhoneHash(e164Number)
+    }
+    yield put(transferEscrowedPayment(phoneHash, amount, temporaryAddress, escrowTxId))
+    yield call(waitForTransactionWithId, escrowTxId)
+    Logger.debug(TAG + '@sendInviteSaga', 'Escrowed money to new wallet')
+  } catch (e) {
+    Logger.error(TAG, 'Error sending payment to unverified user: ', e)
+    yield put(showError(ErrorMessages.ESCROW_TRANSFER_FAILED))
   }
 }
 

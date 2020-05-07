@@ -26942,6 +26942,13 @@ react-native-exit-app@^1.1.0:
     buffer "^5.0.8"
     rfc4648 "^1.0.0"
 
+"react-native-fast-crypto@https://github.com/celo-org/react-native-fast-crypto#df1c171":
+  version "1.8.3"
+  resolved "https://github.com/celo-org/react-native-fast-crypto#df1c171d5383b56199dc2ee0c59db4bfe622172b"
+  dependencies:
+    buffer "^5.0.8"
+    rfc4648 "^1.0.0"
+
 "react-native-flag-secure-android@git://github.com/kristiansorens/react-native-flag-secure-android#e234251":
   version "1.0.0"
   resolved "git://github.com/kristiansorens/react-native-flag-secure-android#e234251220f5d745eec8ebde3e83d4d369e81a14"

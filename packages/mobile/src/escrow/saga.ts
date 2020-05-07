@@ -51,7 +51,6 @@ const TAG = 'escrow/saga'
 function* transferStableTokenToEscrow(action: EscrowTransferPaymentAction) {
   Logger.debug(TAG + '@transferToEscrow', 'Begin transfer to escrow')
   try {
-    //TODO phone hash is wrong
     const { phoneHash, amount, tempWalletAddress } = action
     const account: string = yield call(getConnectedUnlockedAccount)
 

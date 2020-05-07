@@ -1,6 +1,5 @@
 import { getPhoneHash, isE164Number } from '@celo/utils/src/phoneNumbers'
 import crypto from 'crypto'
-import { Platform } from 'react-native'
 import BlindThresholdBls from 'react-native-blind-threshold-bls'
 import { call, put, select } from 'redux-saga/effects'
 import { ErrorMessages } from 'src/app/ErrorMessages'
@@ -73,11 +72,6 @@ async function getPhoneNumberSalt(e164Number: string, account: string) {
     throw new Error(ErrorMessages.INVALID_PHONE_NUMBER)
   }
 
-  // TODO remove when iOS works
-  if (Platform.OS === 'ios') {
-    return 'fakeSalt'
-  }
-
   Logger.debug(`${TAG}@getPhoneNumberSalt`, 'Retrieving blinded message')
   const base64BlindedMessage = await BlindThresholdBls.blindMessage(e164Number)
   const base64BlindSig = await postToSignMessage(base64BlindedMessage, account)
@@ -106,7 +100,6 @@ async function postToSignMessage(base64BlindedMessage: string, account: string) 
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      hashedPhoneNumber: '+1455556600',
       blindedQueryPhoneNumber: base64BlindedMessage.trim(),
       account,
     }),
