@@ -13,7 +13,11 @@ export async function handleGetBlindedMessageForSalt(request: Request, response:
       respondWithError(response, 400, ErrorMessages.INVALID_INPUT)
       return
     }
-    authenticateUser()
+    if (!authenticateUser(request)) {
+      logger.warn(ErrorMessages.UNAUTHENTICATED_USER)
+      respondWithError(response, 401, ErrorMessages.UNAUTHENTICATED_USER)
+      return
+    }
     const remainingQueryCount = await getRemainingQueryCount(
       request.body.account,
       request.body.hashedPhoneNumber
@@ -42,5 +46,13 @@ function hasValidAccountParam(requestBody: any): boolean {
 }
 
 function hasValidQueryPhoneNumberParam(requestBody: any): boolean {
-  return requestBody.blindedQueryPhoneNumber
+  if (!requestBody.blindedQueryPhoneNumber) {
+    return false
+  }
+  try {
+    Buffer.from(requestBody.blindedQueryPhoneNumber, 'base64')
+  } catch {
+    return false
+  }
+  return true
 }

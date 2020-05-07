@@ -25,6 +25,7 @@
     "firebase-functions": "^3.6.0",
     "knex": "^0.20.13",
     "pg": "^7.18.2",
+    "query-string": "^6.12.1",
     "uuid": "^7.0.3"
   },
   "devDependencies": {

@@ -13,7 +13,11 @@ export async function handleGetContactMatches(request: Request, response: Respon
       respondWithError(response, 400, ErrorMessages.INVALID_INPUT)
       return
     }
-    authenticateUser()
+    if (!authenticateUser(request)) {
+      logger.warn(ErrorMessages.UNAUTHENTICATED_USER)
+      respondWithError(response, 401, ErrorMessages.UNAUTHENTICATED_USER)
+      return
+    }
     if (!(await isVerified(request.body.account, request.body.userPhoneNumber))) {
       logger.warn(ErrorMessages.UNVERIFIED_USER_ATTEMPT_TO_MATCHMAKE)
       respondWithError(response, 403, ErrorMessages.UNVERIFIED_USER_ATTEMPT_TO_MATCHMAKE)

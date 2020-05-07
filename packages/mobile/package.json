@@ -17,7 +17,7 @@
     "dev:clean-android": "cd android && ./gradlew clean",
     "dev:send-text": "adb shell input text",
     "dev:reload": "adb shell input text \"RR\"",
-    "dev:emulator": "bash ./scripts/start_emulator.sh &",
+    "dev:emulator": "$ANDROID_HOME/emulator/emulator -avd Nexus_5X_API_28_x86 -no-boot-anim",
     "dev:remote": "remotedev --hostname=localhost --port=8000",
     "test": "export TZ=UTC && jest --silent",
     "test:all": "yarn lint && yarn build && yarn test",

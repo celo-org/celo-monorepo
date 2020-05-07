@@ -99,6 +99,7 @@ interface SignMessageResponse {
 // get back the theshold signed blinded message
 async function postToSignMessage(base64BlindedMessage: string, account: string) {
   Logger.debug(`${TAG}@postToSignMessage`, `Posting to ${SIGN_MESSAGE_ENDPOINT}`)
+  // Cody TODO: Sign payload using account privkey
   const res = await fetch(PHONE_NUM_PRIVACY_SERVICE + SIGN_MESSAGE_ENDPOINT, {
     method: 'POST',
     headers: {

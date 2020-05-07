@@ -1,6 +1,6 @@
 # Mobile (Celo Wallet)
 
-- [Mobile (Celo Wallet)](#mobile-(celo-wallet))
+- [Mobile (Celo Wallet)](#mobile-celo-wallet)
   - [Overview](#overview)
   - [Architecture](#architecture)
   - [Setup](#setup)
@@ -10,13 +10,21 @@
       - [Install Cocopods, Bundler, and download project dependencies](#install-cocopods-bundler-and-download-project-dependencies)
     - [Android](#android)
       - [Install Java](#install-java)
+        - [MacOS](#macos)
+        - [Linux](#linux)
       - [Install Android Dev Tools](#install-android-dev-tools)
+        - [MacOS](#macos-1)
+        - [Linux](#linux-1)
       - [Optional: Install an Android emulator](#optional-install-an-android-emulator)
+        - [Configure an emulator using the Android SDK Manager](#configure-an-emulator-using-the-android-sdk-manager)
+        - [Install Genymotion Emulator Manager](#install-genymotion-emulator-manager)
+          - [MacOS](#macos-2)
+          - [Linux](#linux-2)
   - [Running the mobile wallet](#running-the-mobile-wallet)
     - [iOS](#ios-1)
     - [Android](#android-1)
-    - [Running in forno (data saver) mode](#running-in-forno-(data-saver)-mode)
-  - [Debugging & App Profiling](#debugging-&-app-profiling)
+    - [Running in forno (data saver) mode](#running-in-forno-data-saver-mode)
+  - [Debugging & App Profiling](#debugging--app-profiling)
     - [Debugging](#debugging)
       - [Optional: Install React Native Debugger](#optional-install-react-native-debugger)
     - [App Profiling](#app-profiling)
@@ -25,15 +33,16 @@
     - [React component unit testing](#react-component-unit-testing)
     - [Saga testing](#saga-testing)
     - [End-to-End testing](#end-to-end-testing)
-  - [Building APKs / Bundles](#building-apks-/-bundles)
+  - [Building APKs / Bundles](#building-apks--bundles)
     - [Creating a fake keystore](#creating-a-fake-keystore)
     - [Building an APK or Bundle](#building-an-apk-or-bundle)
   - [Other](#other)
     - [Configuring the SMS Retriever](#configuring-the-sms-retriever)
     - [Generating GraphQL Types](#generating-graphql-types)
     - [How we handle Geth crashes in wallet app on Android](#how-we-handle-geth-crashes-in-wallet-app-on-android)
-    - [Why do we use http(s) provider?](#why-do-we-use-http(s)-provider?)
+    - [Why do we use http(s) provider?](#why-do-we-use-https-provider)
     - [Troubleshooting](#troubleshooting)
+      - [`Activity class {org.celo.mobile.staging/org.celo.mobile.MainActivity} does not exist.`](#activity-class-orgcelomobilestagingorgcelomobilemainactivity-does-not-exist)
 
 
 ## Overview
@@ -141,8 +150,9 @@ brew cask install android-platform-tools
 
 Next install [Android Studio][android studio] and add the [Android NDK][android ndk].
 
-Execute the following (and make sure the lines are in your `~/.bash_profile`):
+Execute the following (and make sure the lines are in your `~/.bash_profile`).
 
+_Note that these paths may differ on your machine. You can find the path to the SDK and NDK via the [Android Studio menu](https://stackoverflow.com/questions/40520324/how-to-find-the-path-to-ndk)._
 ```bash
 export ANDROID_HOME=/usr/local/share/android-sdk
 export ANDROID_NDK=/usr/local/share/android-ndk
