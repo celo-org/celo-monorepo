@@ -44,17 +44,13 @@ Welcome to Kotani Pay. USSD is the most popular communications protocol used by 
 
 This app integrates with Financial services platforms such as Mpesa to give users wider on-ramp and off-ramp options.
 
-Create Account Users can easily create their accounts by accessing a USSD code eg :[*384#] on their GSM or Smartphone device.The user will be issued with an account mapped to their phone number complete with their seed key phrase, blockchain private key, blockchain public key and pin.
-
+Users can easily create their accounts by accessing a USSD code eg :[*384#] on their GSM or Smartphone device.The user will be issued with an account mapped to their phone number complete with their seed key phrase, blockchain private key, blockchain public key and pin.
 ##### Transfer Funds 
 Users can send cUSD and cGOLD to any of their contacts using just the recipient phoneNumber by interacting with the USSD app. 
-
 ##### Deposit cash: 
 Users can deposits cash in their local currency using services such as M-Pesa and instantly be credited with the stable Token on their blockchain Address
-
 ##### Withdraw Cash 
 Users can withdraw cash through local mobile financial services from the Celo Blockchain using their USSD command interfaces or social messaging interfaces.
-
 ##### Check Balance 
 The user is able to check their account balance and also have a link that shows their transaction history
 
