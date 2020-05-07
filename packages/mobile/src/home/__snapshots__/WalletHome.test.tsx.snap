@@ -577,7 +577,7 @@ exports[`Testnet banner Renders when connected with backup complete 1`] = `
         <View
           style={
             Object {
-              "backgroundColor": "rgba(134, 138, 141, 0.15)",
+              "backgroundColor": "#EDEEEF",
               "height": 1,
               "marginHorizontal": 16,
             }
@@ -1193,7 +1193,7 @@ exports[`Testnet banner Renders when disconnected 1`] = `
         <View
           style={
             Object {
-              "backgroundColor": "rgba(134, 138, 141, 0.15)",
+              "backgroundColor": "#EDEEEF",
               "height": 1,
               "marginHorizontal": 16,
             }
@@ -1790,7 +1790,7 @@ exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
         <View
           style={
             Object {
-              "backgroundColor": "rgba(134, 138, 141, 0.15)",
+              "backgroundColor": "#EDEEEF",
               "height": 1,
               "marginHorizontal": 16,
             }

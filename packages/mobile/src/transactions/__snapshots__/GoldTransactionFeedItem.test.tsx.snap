@@ -1,0 +1,134 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`GoldTransactionFeedItem renders correctly 1`] = `
+<View
+  accessible={true}
+  focusable={true}
+  nativeBackgroundAndroid={
+    Object {
+      "attribute": "selectableItemBackground",
+      "type": "ThemeAttrAndroid",
+    }
+  }
+  onClick={[Function]}
+  onResponderGrant={[Function]}
+  onResponderMove={[Function]}
+  onResponderRelease={[Function]}
+  onResponderTerminate={[Function]}
+  onResponderTerminationRequest={[Function]}
+  onStartShouldSetResponder={[Function]}
+>
+  <View
+    style={
+      Object {
+        "flex": 1,
+        "justifyContent": "space-between",
+        "padding": 16,
+      }
+    }
+  >
+    <View
+      style={
+        Object {
+          "flex": 1,
+          "flexDirection": "row",
+          "justifyContent": "space-between",
+          "paddingBottom": 2,
+        }
+      }
+    >
+      <View
+        style={
+          Object {
+            "flexDirection": "row",
+          }
+        }
+      >
+        <Text
+          style={
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Inter-Medium",
+              "fontSize": 15,
+              "lineHeight": 20,
+            }
+          }
+        >
+          feedItemGoldPurchased
+        </Text>
+        <Text
+          style={
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Inter-Medium",
+              "fontSize": 15,
+              "lineHeight": 20,
+            }
+          }
+        >
+           @ 
+        </Text>
+        <Text
+          numberOfLines={1}
+          style={
+            Array [
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Inter-Medium",
+                "fontSize": 15,
+                "lineHeight": 20,
+              },
+              Object {
+                "color": "#2E3338",
+              },
+            ]
+          }
+        >
+          
+          0.1
+           MXN
+        </Text>
+      </View>
+      <View>
+        <Text
+          numberOfLines={1}
+          style={
+            Array [
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Inter-Medium",
+                "fontSize": 15,
+                "lineHeight": 20,
+                "marginRight": 12,
+              },
+              Object {
+                "color": "#2E3338",
+              },
+            ]
+          }
+        >
+          -
+          $
+          1.33
+        </Text>
+      </View>
+    </View>
+    <View
+      style={Object {}}
+    >
+      <Text
+        style={
+          Object {
+            "color": "#9CA4A9",
+            "fontFamily": "Inter-Regular",
+            "fontSize": 14,
+            "lineHeight": 18,
+          }
+        }
+      >
+        Dec 31 global:at 5:00 PM
+      </Text>
+    </View>
+  </View>
+</View>
+`;

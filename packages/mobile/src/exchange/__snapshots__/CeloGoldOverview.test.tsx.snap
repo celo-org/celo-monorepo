@@ -4,7 +4,7 @@ exports[`renders correctly when not ready 1`] = `
 <View
   style={
     Object {
-      "paddingBottom": 20,
+      "marginVertical": 16,
       "paddingHorizontal": 16,
     }
   }
@@ -13,20 +13,24 @@ exports[`renders correctly when not ready 1`] = `
   <Text
     style={
       Object {
-        "fontFamily": "Hind-SemiBold",
-        "fontSize": 18,
+        "color": "#2E3338",
+        "fontFamily": "Inter-SemiBold",
+        "fontSize": 19,
+        "lineHeight": 26,
+        "marginBottom": 8,
       }
     }
   >
-    global:celoGold
+    yourGoldBalance
   </Text>
   <Text
     style={
       Object {
         "color": "#2E3338",
-        "fontSize": 44,
-        "height": 48,
-        "lineHeight": 62,
+        "fontFamily": "Inter-Regular",
+        "fontSize": 24,
+        "lineHeight": 27,
+        "marginBottom": 8,
       }
     }
   >
@@ -34,9 +38,7 @@ exports[`renders correctly when not ready 1`] = `
       numberOfLines={1}
       style={
         Array [
-          Object {
-            "fontFamily": "Hind-SemiBold",
-          },
+          undefined,
           Object {
             "color": undefined,
           },
@@ -51,9 +53,10 @@ exports[`renders correctly when not ready 1`] = `
   <Text
     style={
       Object {
-        "color": "#B0B5B9",
-        "fontFamily": "Hind-Light",
-        "fontSize": 18,
+        "color": "#9CA4A9",
+        "fontFamily": "Inter-Regular",
+        "fontSize": 15,
+        "lineHeight": 20,
       }
     }
   >
@@ -80,7 +83,7 @@ exports[`renders correctly when ready 1`] = `
 <View
   style={
     Object {
-      "paddingBottom": 20,
+      "marginVertical": 16,
       "paddingHorizontal": 16,
     }
   }
@@ -89,20 +92,24 @@ exports[`renders correctly when ready 1`] = `
   <Text
     style={
       Object {
-        "fontFamily": "Hind-SemiBold",
-        "fontSize": 18,
+        "color": "#2E3338",
+        "fontFamily": "Inter-SemiBold",
+        "fontSize": 19,
+        "lineHeight": 26,
+        "marginBottom": 8,
       }
     }
   >
-    global:celoGold
+    yourGoldBalance
   </Text>
   <Text
     style={
       Object {
         "color": "#2E3338",
-        "fontSize": 44,
-        "height": 48,
-        "lineHeight": 62,
+        "fontFamily": "Inter-Regular",
+        "fontSize": 24,
+        "lineHeight": 27,
+        "marginBottom": 8,
       }
     }
   >
@@ -110,9 +117,7 @@ exports[`renders correctly when ready 1`] = `
       numberOfLines={1}
       style={
         Array [
-          Object {
-            "fontFamily": "Hind-SemiBold",
-          },
+          undefined,
           Object {
             "color": undefined,
           },
@@ -127,9 +132,10 @@ exports[`renders correctly when ready 1`] = `
   <Text
     style={
       Object {
-        "color": "#B0B5B9",
-        "fontFamily": "Hind-Light",
-        "fontSize": 18,
+        "color": "#9CA4A9",
+        "fontFamily": "Inter-Regular",
+        "fontSize": 15,
+        "lineHeight": 20,
       }
     }
   >
