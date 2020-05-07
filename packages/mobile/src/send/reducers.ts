@@ -6,6 +6,10 @@ import { Actions, ActionTypes } from 'src/send/actions'
 // Sets the limit of recent recipients we want to store
 const RECENT_RECIPIENTS_TO_STORE = 8
 
+export interface ManuallyValidatedE164NumberToAddress {
+  [e164Number: string]: string
+}
+
 export interface State {
   isSending: boolean
   recentRecipients: Recipient[]
@@ -13,6 +17,7 @@ export interface State {
   isValidRecipient: boolean
   manualAddressValidationRequired: boolean
   fullValidationRequired: boolean
+  manuallyValidatedE164NumberToAddress: ManuallyValidatedE164NumberToAddress
 }
 
 const initialState = {
@@ -22,6 +27,7 @@ const initialState = {
   isValidRecipient: false,
   manualAddressValidationRequired: false,
   fullValidationRequired: false,
+  manuallyValidatedE164NumberToAddress: {},
 }
 
 export const sendReducer = (
@@ -58,11 +64,16 @@ export const sendReducer = (
         isValidRecipient: false,
       }
     case Actions.VALIDATE_RECIPIENT_ADDRESS_SUCCESS:
+      const { manuallyValidatedE164NumberToAddress } = state
+      // overwrite the previous address every time a new one is validated
+      manuallyValidatedE164NumberToAddress[action.e164Number] = action.address
       return {
         ...state,
         isValidatingRecipient: false,
         isValidRecipient: true,
         manualAddressValidationRequired: false,
+        e164NumberToAddressManuallyValidated: { state },
+        manuallyValidatedE164NumberToAddress,
       }
     case Actions.VALIDATE_RECIPIENT_ADDRESS_FAILURE:
       return {

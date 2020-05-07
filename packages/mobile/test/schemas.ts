@@ -30,6 +30,7 @@ export const vNeg1Schema = {
     isValidRecipient: false,
     manualAddressValidationRequired: false,
     fullValidationRequired: false,
+    manuallyValidatedE164NumberToAddress: {},
   },
   recipients: {
     recipientCache: {},

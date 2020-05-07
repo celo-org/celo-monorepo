@@ -74,7 +74,7 @@ export class ConfirmRecipientAccount extends React.Component<Props, State> {
 
   componentDidUpdate = async () => {
     if (this.props.isValidRecipient) {
-      await delay(() => {}, 3000) // artificial delay for the loading animation
+      await delay(() => {}, 2000) // artificial delay for the success animation
       navigate(Screens.SendAmount)
     }
   }

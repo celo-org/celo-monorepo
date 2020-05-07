@@ -75,9 +75,9 @@ export function* watchQrCodeDetections() {
         action.data,
         addressToE164Number,
         recipientCache,
-        action.scanIsForSecureSend,
         e164NumberToAddress,
-        action.recipient
+        action.scanIsForSecureSend,
+        action.confirmationInput
       )
     } catch (error) {
       Logger.error(TAG, 'Error handling the barcode', error)
@@ -219,24 +219,25 @@ export function* validateRecipientAddressSaga({
       return
     }
 
+    let fullAddress = fullAddressOrLastFourDigits
+
     if (fullAddressValidationRequired) {
       yield call(
-        doFullAddressValidation,
+        checkForErrorsInFullAddress,
         fullAddressOrLastFourDigits,
         possibleRecievingAddresses,
         userAddress
       )
     } else {
-      yield call(
-        doPartialAddressValidation,
+      fullAddress = yield call(
+        checkForErrorsInPartialAddressAndReturnMatch,
         fullAddressOrLastFourDigits,
         possibleRecievingAddresses,
         userAddress
       )
     }
 
-    // store successfully validated address
-    yield put(validateRecipientAddressSuccess())
+    yield put(validateRecipientAddressSuccess(e164PhoneNumber, fullAddress))
   } catch (error) {
     Logger.error(TAG2, 'Address validation error: ', error.message)
     yield put(showError(error.message))
@@ -244,7 +245,7 @@ export function* validateRecipientAddressSaga({
   }
 }
 
-export function* doFullAddressValidation(
+export function* checkForErrorsInFullAddress(
   targetAddress: string,
   possibleRecievingAddresses: string[],
   userAddress: string
@@ -260,12 +261,11 @@ export function* doFullAddressValidation(
   }
 
   if (!possibleRecievingAddresses.includes(targetAddress)) {
-    yield put(showError(ErrorMessages.ADDRESS_VALIDATION_NO_MATCH))
-    return
+    throw Error(ErrorMessages.ADDRESS_VALIDATION_NO_MATCH)
   }
 }
 
-export function* doPartialAddressValidation(
+export function* checkForErrorsInPartialAddressAndReturnMatch(
   lastFourDigitsOfTargetAddress: string,
   possibleRecievingAddresses: string[],
   userAddress: string
@@ -280,14 +280,15 @@ export function* doPartialAddressValidation(
     throw Error(ErrorMessages.ADDRESS_VALIDATION_PARTIAL_OWN_ADDRESS)
   }
 
-  const last4DigitsOfPossibleRecievingAddresses = possibleRecievingAddresses.map((address) =>
-    address.slice(-4)
+  const targetAddress = possibleRecievingAddresses.find(
+    (address) => address.slice(-4) === lastFourDigitsOfTargetAddress
   )
 
-  if (!last4DigitsOfPossibleRecievingAddresses.includes(lastFourDigitsOfTargetAddress)) {
-    yield put(showError(ErrorMessages.ADDRESS_VALIDATION_NO_MATCH))
-    return
+  if (!targetAddress) {
+    throw Error(ErrorMessages.ADDRESS_VALIDATION_NO_MATCH)
   }
+
+  return targetAddress
 }
 
 export function* watchSendPaymentOrInvite() {

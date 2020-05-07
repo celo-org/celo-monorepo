@@ -14,7 +14,13 @@ import {
   Recipient,
   RecipientKind,
 } from 'src/recipients/recipient'
-import { QrCode, storeLatestInRecents, SVG } from 'src/send/actions'
+import {
+  QrCode,
+  storeLatestInRecents,
+  SVG,
+  validateRecipientAddressSuccess,
+} from 'src/send/actions'
+import { ConfirmationInput } from 'src/send/SendConfirmation'
 import Logger from 'src/utils/Logger'
 
 export enum BarcodeTypes {
@@ -49,9 +55,9 @@ export function* handleBarcode(
   barcode: QrCode,
   addressToE164Number: AddressToE164NumberType,
   recipientCache: NumberToRecipient,
-  scanIsForSecureSend: true | undefined,
   e164NumberToAddress: E164NumberToAddressType,
-  secureSendRecipient: Recipient | undefined
+  scanIsForSecureSend?: true,
+  confirmationInput?: ConfirmationInput
 ) {
   let data: { address: string; e164PhoneNumber: string; displayName: string } | undefined
 
@@ -71,23 +77,33 @@ export function* handleBarcode(
   }
   try {
     if (scanIsForSecureSend) {
-      if (!secureSendRecipient || !secureSendRecipient.e164PhoneNumber) {
-        throw Error("Error passing through itended recipient or recipient's phone number")
+      if (!confirmationInput) {
+        throw Error(
+          'Error passing through data: Transaction and recipient information not received'
+        )
       }
+
+      const targetRecipient = confirmationInput.recipient
+      if (!targetRecipient.e164PhoneNumber) {
+        throw Error('Error passing through data: Phone number not part of recipient data')
+      }
+
+      const { e164PhoneNumber } = targetRecipient
+      const targetAddress = data.address
       // Typically use 'getAddressFromPhoneNumber' but need all the possible addresses when doing secure send validation
-      const possibleRecievingAddresses = e164NumberToAddress[secureSendRecipient.e164PhoneNumber]
+      const possibleRecievingAddresses = e164NumberToAddress[e164PhoneNumber]
 
       if (!possibleRecievingAddresses) {
         yield put(showError(ErrorMessages.QR_FAILED_NO_PHONE_NUMBER))
         return
       }
 
-      if (!possibleRecievingAddresses.includes(data.address)) {
+      if (!possibleRecievingAddresses.includes(targetAddress)) {
         yield put(showError(ErrorMessages.QR_FAILED_INVALID_RECIPIENT))
         return
       }
 
-      // store as sucess
+      yield put(validateRecipientAddressSuccess(e164PhoneNumber, targetAddress))
     }
   } catch (error) {
     Logger.error(TAG + '@handleBarcode', `Error with secure send validation: `, error)
@@ -120,8 +136,7 @@ export function* handleBarcode(
   yield put(storeLatestInRecents(recipient))
 
   if (scanIsForSecureSend) {
-    // TODO: pass through confirmationDetails
-    replace(Screens.SendConfirmation, { recipient })
+    replace(Screens.SendConfirmation, { confirmationInput })
   } else {
     replace(Screens.SendAmount, { recipient })
   }
