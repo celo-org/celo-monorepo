@@ -5,10 +5,10 @@ set -euo pipefail
 # exit
 
 # Usage: ci_check_if_test_should_run_v2.sh <comma separate list of paths to check>
-DIRS_TO_CHECK=${1}
+PACKAGES_TO_CHECK=${1}
 # This code has to be executed from a dir with 'esModuleInterop' set to true or it fails.
 cd packages/mobile
-CHANGED=$(node -r ts-node/register ../../scripts/check_if_test_should_run_v2.ts --dirs ${DIRS_TO_CHECK})
+CHANGED=$(node -r ts-node/register ../../scripts/check_if_test_should_run_v2.ts --packages ${PACKAGES_TO_CHECK})
 cd -
 if [ $CHANGED = false ] ; then
   echo "No changes in ${1} - skipping  testing"

@@ -6,12 +6,14 @@
 // Prints "false" otherwise
 // All console logging intentionally sent to stderr, so that, stdout is not corrupted
 import { execCmdWithExitOnFailure } from '@celo/celotool/src/lib/utils'
-import { existsSync, readdirSync } from 'fs'
+import { existsSync, readdirSync, readFileSync } from 'fs'
 import fetch from 'node-fetch'
 import { join } from 'path'
-import dependencyGraph from './dependency-graph.json'
 
 const packagesDirectory = join('..', '..', 'packages')
+const dependencyGraph = JSON.parse(
+  readFileSync(join(__dirname, 'dependency-graph.json')).toString()
+)
 
 for (const pkg of readdirSync(packagesDirectory)) {
   if (!dependencyGraph[pkg]) {
@@ -85,15 +87,15 @@ async function checkIfTestShouldRun() {
 }
 
 async function getChangedPackages(commits: string[]): Promise<string[]> {
-  const changedPackages = {}
+  const changedPackages = new Set<string>()
   for (const pkg of allPackages) {
     const changeCommit = await getChangeCommit(join('..', '..', 'packages', pkg))
     if (commits.includes(changeCommit)) {
-      changedPackages[pkg] = true
+      changedPackages.add(pkg)
     }
   }
 
-  return Object.keys(changedPackages)
+  return Array.from(changedPackages)
 }
 
 async function getBranchCommits(): Promise<string[]> {
