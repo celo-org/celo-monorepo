@@ -31,6 +31,18 @@ export const AttestationRequestType = t.type({
 
 export type AttestationRequest = t.TypeOf<typeof AttestationRequestType>
 
+const ATTESTATION_EXPIRY_TIMEOUT_MS = 60 * 60 * 24 * 100 // 1 day
+
+interface AttestationExpiryCache {
+  timestamp: number | null
+  expiryInSeconds: number | null
+}
+
+const attestationExpiryCache: AttestationExpiryCache = {
+  timestamp: null,
+  expiryInSeconds: null,
+}
+
 function toBase64(str: string) {
   return Buffer.from(str.slice(2), 'hex').toString('base64')
 }
@@ -79,10 +91,8 @@ async function ensureLockedRecord(
   return attestationRecord
 }
 
-async function purgeExpiredRecords() {
-  const attestations = await kit.contracts.getAttestations()
-  const expiryTimeInSeconds = (await attestations.attestationExpiryBlocks()) * 5
-  const transaction = await sequelize!.transaction()
+async function purgeExpiredRecords(transaction: Transaction) {
+  const expiryTimeInSeconds = await getAttestationExpiryInSeconds()
   const AttestationTable = await getAttestationTable()
   try {
     await AttestationTable.destroy({
@@ -99,6 +109,21 @@ async function purgeExpiredRecords() {
   } catch (err) {
     await transaction.rollback()
   }
+}
+
+async function getAttestationExpiryInSeconds() {
+  if (
+    attestationExpiryCache.expiryInSeconds &&
+    attestationExpiryCache.timestamp &&
+    Date.now() - attestationExpiryCache.timestamp < ATTESTATION_EXPIRY_TIMEOUT_MS
+  ) {
+    return attestationExpiryCache.expiryInSeconds
+  }
+  const attestations = await kit.contracts.getAttestations()
+  const expiryTimeInSeconds = (await attestations.attestationExpiryBlocks()) * 5
+  attestationExpiryCache.expiryInSeconds = expiryTimeInSeconds
+  attestationExpiryCache.timestamp = Date.now()
+  return expiryTimeInSeconds
 }
 
 class AttestationRequestHandler {
@@ -242,6 +267,7 @@ class AttestationRequestHandler {
         return
       case AttestationStatus.UNABLE_TO_SERVE:
         respondWithError(res, 422, COUNTRY_CODE_NOT_SERVED_ERROR)
+        return
       default:
         this.logger.error({
           err:
@@ -251,6 +277,11 @@ class AttestationRequestHandler {
         respondWithError(res, 500, SMS_SENDING_ERROR)
         return
     }
+  }
+
+  async purgeExpiredAttestations() {
+    const transaction = await sequelize!.transaction({ logging: this.sequelizeLogger })
+    return purgeExpiredRecords(transaction)
   }
 }
 
@@ -282,5 +313,5 @@ export async function handleAttestationRequest(
     respondWithError(res, 500, SMS_SENDING_ERROR)
     return
   }
-  await purgeExpiredRecords()
+  await handler.purgeExpiredAttestations()
 }
