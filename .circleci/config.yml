@@ -334,7 +334,9 @@ jobs:
           command: |
             brew uninstall --ignore-dependencies node icu4c
             brew install node@10
-            brew link --overwrite node
+            brew link --overwrite node@10
+            node --version
+            yarn --version
       - run:
           name: Check if the test should run
           command: |
