@@ -1,6 +1,6 @@
 import yargs from 'yargs'
 import { AzureClusterConfig, createIdentityIfNotExists, switchToCluster } from 'src/lib/azure'
-import { getFornoUrl } from 'src/lib/endpoints'
+import { getFornoUrl, getFullNodeRpcInternalUrl } from 'src/lib/endpoints'
 import { addCeloEnvMiddleware, envVar, fetchEnv } from 'src/lib/env-utils'
 import { installGenericHelmChart, removeGenericHelmChart } from 'src/lib/helm_deploy'
 import { execCmdWithExitOnFailure } from 'src/lib/utils'
@@ -98,7 +98,7 @@ async function helmParameters(celoEnv: string, context: OracleAzureContext, useF
 
   const kubeAuthTokenName = await rbacAuthTokenName(celoEnv)
   const replicas = oracleConfig.identities.length
-  const rpcProviderUrl = useFullNodes ? 'tbd' : getFornoUrl(celoEnv)
+  const rpcProviderUrl = useFullNodes ? getFullNodeRpcInternalUrl(celoEnv) : getFornoUrl(celoEnv)
   return [
     `--set environment.name=${celoEnv}`,
     `--set image.repository=${fetchEnv(envVar.ORACLE_DOCKER_IMAGE_REPOSITORY)}`,
