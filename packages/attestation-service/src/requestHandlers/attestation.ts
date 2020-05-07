@@ -31,7 +31,7 @@ export const AttestationRequestType = t.type({
 
 export type AttestationRequest = t.TypeOf<typeof AttestationRequestType>
 
-const ATTESTATION_EXPIRY_TIMEOUT_MS = 60 * 60 * 24 * 100 // 1 day
+const ATTESTATION_EXPIRY_TIMEOUT_MS = 60 * 60 * 24 * 1000 // 1 day
 
 interface AttestationExpiryCache {
   timestamp: number | null
