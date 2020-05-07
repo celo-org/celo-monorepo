@@ -45,10 +45,15 @@ Welcome to [Kotani Pay](https://github.com/KotaniLabs/kotanipay-USSD). USSD is t
 This app integrates with Financial services platforms such as Mpesa to give users wider on-ramp and off-ramp options.
 
 Users can easily create their accounts by accessing a USSD code eg :[*384#] on their GSM or Smartphone device.
-*Transfer Funds*: ```Users can send cUSD and cGOLD to any of their contacts using just the recipient phoneNumber by interacting with the USSD app. ```
-*Deposit cash*: ```Users can deposits cash in their local currency using services such as M-Pesa and instantly be credited with the stable Token on their blockchain Address```
-*Withdraw Cash*: ```Users can withdraw cash through local mobile financial services from the Celo Blockchain using their USSD command interfaces or social messaging interfaces.```
-*Check Balance*: ```The user is able to check their account balance and also have a link that shows their transaction history```
+From the USSD Menu, the user will be able to:
+  Transfer Funds: 
+    Users can send cUSD and cGOLD to any of their contacts using just the recipient phoneNumber by interacting with the USSD app.
+  Deposit cash: 
+    Users can deposits cash in their local currency using services such as M-Pesa and instantly be credited with the stable Token on their blockchain Address.
+  Withdraw Cash: 
+    Users can withdraw cash through local mobile financial services from the Celo Blockchain using their USSD command interfaces or social messaging interfaces.
+  Check Balance: 
+    The user is able to check their account balance and also receive a link that shows their transaction history
 
 
 ## Add your app to this list!
