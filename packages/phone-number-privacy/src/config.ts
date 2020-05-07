@@ -88,11 +88,11 @@ if (DEV_MODE) {
       host: `/cloudsql/${functionConfig.db.host}`,
     },
     keyVault: {
-      azureClientID: functionConfig.keyVault.azureClientID,
-      azureClientSecret: functionConfig.keyVault.azureClientSecret,
-      azureTenant: functionConfig.keyVault.azureTenant,
-      azureVaultName: functionConfig.keyVault.azureVaultName,
-      azureSecretName: functionConfig.keyVault.azureSecretName,
+      azureClientID: functionConfig.keyvault.azure_client_id,
+      azureClientSecret: functionConfig.keyvault.azure_client_secret,
+      azureTenant: functionConfig.keyvault.azure_tenant,
+      azureVaultName: functionConfig.keyvault.azure_vault_name,
+      azureSecretName: functionConfig.keyvault.azure_secret_name,
     },
     attestations: {
       numberAttestationsRequired: functionConfig.attestations.number_attestations_required,
