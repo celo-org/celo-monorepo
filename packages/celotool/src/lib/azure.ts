@@ -4,6 +4,9 @@ import { doCheckOrPromptIfStagingOrProduction } from './env-utils'
 import { installAndEnableMetricsDeps, redeployTiller } from './helm_deploy'
 import { execCmd, execCmdWithExitOnFailure, outputIncludes } from './utils'
 
+/**
+ * Basic info for an AKS cluster
+ */
 export type AzureClusterConfig = {
   tenantId: string
   resourceGroup: string
