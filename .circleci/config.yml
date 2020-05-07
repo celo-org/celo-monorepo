@@ -185,6 +185,11 @@ jobs:
     resource_class: large
     steps:
       - checkout
+      - run:
+          name: Check if the test should run
+          command: |
+            ./scripts/ci_check_if_test_should_run_v2.sh mobile
+
       - run: cd ~/src/
       - restore_cache:
           keys:
@@ -325,6 +330,11 @@ jobs:
     steps:
       - checkout
       - run:
+          name: Check if the test should run
+          command: |
+            ./scripts/ci_check_if_test_should_run_v2.sh mobile
+
+      - run:
           name: Configure environment variables
           command: |
             echo 'export PATH=/usr/local/opt/node@10/bin:$PATH' >> $BASH_ENV
@@ -462,6 +472,11 @@ jobs:
           at: ~/app
 
       - run:
+          name: Check if the test should run
+          command: |
+            ./scripts/ci_check_if_test_should_run_v2.sh mobile
+
+      - run:
           name: Ensure translations are not missing
           command: |
             cd packages/mobile
@@ -499,6 +514,11 @@ jobs:
           at: ~/app
 
       - run:
+          name: Check if the test should run
+          command: |
+            ./scripts/ci_check_if_test_should_run_v2.sh verification-pool-api
+
+      - run:
           name: jest tests
           command: |
             mkdir -p test-results/jest
@@ -514,8 +534,7 @@ jobs:
       - run:
           name: Check if the test should run
           command: |
-            FILES_TO_CHECK="${PWD}/packages/protocol,${PWD}/packages/utils,${PWD}/.circleci/config.yml"
-            ./scripts/ci_check_if_test_should_run_v2.sh ${FILES_TO_CHECK}
+            ./scripts/ci_check_if_test_should_run_v2.sh protocol
       - run:
           name: test
           # Flaky tests - run them twice
@@ -530,8 +549,7 @@ jobs:
       - run:
           name: Check if the test should run
           command: |
-            FILES_TO_CHECK="${PWD}/packages/protocol,${PWD}/packages/utils,${PWD}/.circleci/config.yml"
-            ./scripts/ci_check_if_test_should_run_v2.sh ${FILES_TO_CHECK}
+            ./scripts/ci_check_if_test_should_run_v2.sh protocol
       - run:
           name: test
           # Flaky tests - run them twice
@@ -548,6 +566,10 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/app
+      - run:
+          name: Check if the test should run
+          command: |
+            ./scripts/ci_check_if_test_should_run_v2.sh contractkit
       - run:
           name: Generate DevChain
           command: |
@@ -570,6 +592,10 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/app
+      - run:
+          name: Check if the test should run
+          command: |
+            ./scripts/ci_check_if_test_should_run_v2.sh cli
       - run:
           name: Generate DevChain
           command: |
@@ -607,7 +633,10 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/app
-
+      - run:
+          name: Check if the test should run
+          command: |
+            ./scripts/ci_check_if_test_should_run_v2.sh typescript
       - run:
           name: Install and test the npm package
           command: |
@@ -622,7 +651,10 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/app
-
+      - run:
+          name: Check if the test should run
+          command: |
+            ./scripts/ci_check_if_test_should_run_v2.sh utils
       - run:
           name: Install and test the npm package
           command: |
@@ -641,8 +673,7 @@ jobs:
       - run:
           name: Check if the test should run
           command: |
-            FILES_TO_CHECK="${PWD}/packages/celotool,${PWD}/packages/protocol,${PWD}/.circleci/config.yml"
-            ./scripts/ci_check_if_test_should_run_v2.sh ${FILES_TO_CHECK}
+            ./scripts/ci_check_if_test_should_run_v2.sh celotool
       - run:
           name: Run test
           no_output_timeout: 20m
@@ -660,8 +691,7 @@ jobs:
       - run:
           name: Check if the test should run
           command: |
-            FILES_TO_CHECK="${PWD}/packages/celotool,${PWD}/packages/protocol,${PWD}/.circleci/config.yml"
-            ./scripts/ci_check_if_test_should_run_v2.sh ${FILES_TO_CHECK}
+            ./scripts/ci_check_if_test_should_run_v2.sh celotool
       - run:
           name: Run test
           no_output_timeout: 20m
@@ -679,8 +709,7 @@ jobs:
       - run:
           name: Check if the test should run
           command: |
-            FILES_TO_CHECK="${PWD}/packages/celotool,${PWD}/packages/protocol,${PWD}/.circleci/config.yml"
-            ./scripts/ci_check_if_test_should_run_v2.sh ${FILES_TO_CHECK}
+            ./scripts/ci_check_if_test_should_run_v2.sh celotool
       - run:
           name: Run test
           no_output_timeout: 20m
@@ -698,8 +727,7 @@ jobs:
       - run:
           name: Check if the test should run
           command: |
-            FILES_TO_CHECK="${PWD}/packages/celotool,${PWD}/packages/protocol,${PWD}/.circleci/config.yml"
-            ./scripts/ci_check_if_test_should_run_v2.sh ${FILES_TO_CHECK}
+            ./scripts/ci_check_if_test_should_run_v2.sh celotool
       - run:
           name: Run test
           no_output_timeout: 20m
@@ -717,8 +745,7 @@ jobs:
       - run:
           name: Check if the test should run
           command: |
-            FILES_TO_CHECK="${PWD}/packages/celotool,${PWD}/packages/protocol,${PWD}/.circleci/config.yml"
-            ./scripts/ci_check_if_test_should_run_v2.sh ${FILES_TO_CHECK}
+            ./scripts/ci_check_if_test_should_run_v2.sh celotool
       - run:
           name: Run test
           command: |
@@ -735,8 +762,7 @@ jobs:
       - run:
           name: Check if the test should run
           command: |
-            FILES_TO_CHECK="${PWD}/packages/celotool,${PWD}/packages/protocol,${PWD}/.circleci/config.yml"
-            ./scripts/ci_check_if_test_should_run_v2.sh ${FILES_TO_CHECK}
+            ./scripts/ci_check_if_test_should_run_v2.sh celotool
       - run:
           name: Run test
           command: |
@@ -751,7 +777,10 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/app
-
+      - run:
+          name: Check if the test should run
+          command: |
+            ./scripts/ci_check_if_test_should_run_v2.sh web
       - run: mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
       - run: cd packages/web && ./circle_deploy.sh
 
@@ -760,6 +789,10 @@ jobs:
     docker:
       - image: celohq/node10-gcloud
     steps:
+      - run:
+          name: Check if the test should run
+          command: |
+            ./scripts/ci_check_if_test_should_run_v2.sh typescript
       - run:
           name: Installing npm package - @celo/typescript
           command: yarn add @celo/typescript
@@ -770,6 +803,10 @@ jobs:
       - image: celohq/node10-gcloud
     steps:
       - run:
+          name: Check if the test should run
+          command: |
+            ./scripts/ci_check_if_test_should_run_v2.sh utils
+      - run:
           name: Installing npm package - @celo/utils
           command: yarn add @celo/utils
 
@@ -778,6 +815,10 @@ jobs:
     docker:
       - image: celohq/node10-gcloud
     steps:
+      - run:
+          name: Check if the test should run
+          command: |
+            ./scripts/ci_check_if_test_should_run_v2.sh contractkit
       - run:
           name: Installing npm package - @celo/contractkit
           command: |
@@ -791,6 +832,10 @@ jobs:
       - image: celohq/node10-gcloud
     steps:
       - run:
+          name: Check if the test should run
+          command: |
+            ./scripts/ci_check_if_test_should_run_v2.sh cli
+      - run:
           name: Installing npm package - @celo/celocli
           command: npm install @celo/celocli
       - run:
@@ -802,6 +847,10 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/app
+      - run:
+          name: Check if the test should run
+          command: |
+            ./scripts/ci_check_if_test_should_run_v2.sh phone-number-privacy
       - run:
           name: Run Tests
           command: yarn --cwd=packages/phone-number-privacy test

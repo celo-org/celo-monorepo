@@ -6,11 +6,23 @@
 // Prints "false" otherwise
 // All console logging intentionally sent to stderr, so that, stdout is not corrupted
 import { execCmdWithExitOnFailure } from '@celo/celotool/src/lib/utils'
-import { existsSync } from 'fs'
+import { existsSync, readdirSync } from 'fs'
 import fetch from 'node-fetch'
+import { join } from 'path'
+import dependencyGraph from './dependency-graph.json'
+
+const packagesDirectory = join('..', '..', 'packages')
+
+for (const pkg of readdirSync(packagesDirectory)) {
+  if (!dependencyGraph[pkg]) {
+    throw new Error(`Dependency graph is missing package ${pkg}!`)
+  }
+}
+
+const allPackages = Object.keys(dependencyGraph)
 
 const argv = require('minimist')(process.argv.slice(2))
-const dirs: string[] = argv.dirs.split(',')
+const packagesToTest: string[] = argv.packages.split(',')
 main()
 
 async function main() {
@@ -39,33 +51,60 @@ async function checkIfTestShouldRun() {
     logMessage('No commits found; this is most likely a bug in the checking script')
     process.exit(1)
   }
-  for (const commit of branchCommits) {
-    logMessage(`\nChecking commit ${commit}...`)
-    const paths: string[] = dirs.concat(['../../yarn.lock'])
-    const anyPathsChanged: boolean = await checkIfAnyPathsChangedInCommit(commit, paths)
-    if (anyPathsChanged) {
+
+  const yarnLockChangeCommit = await getChangeCommit(join('..', '..', 'yarn.lock'))
+  if (branchCommits.includes(yarnLockChangeCommit)) {
+    // always run tests when yarn.lock has changed
+    console.info('true')
+    return
+  }
+
+  const changedPackages = await getChangedPackages(branchCommits)
+  logMessage(`Found ${changedPackages.length} changed packages (${changedPackages.join(', ')})`)
+
+  function hasChangedDependencies(packageName: string): Boolean {
+    if (changedPackages.includes(packageName)) {
+      return true
+    }
+
+    for (const dep of dependencyGraph[packageName]) {
+      return hasChangedDependencies(dep)
+    }
+
+    return false
+  }
+
+  for (const pkg of packagesToTest) {
+    if (hasChangedDependencies(pkg)) {
       console.info('true')
       return
     }
   }
+
   console.info('false')
 }
 
-async function checkIfAnyPathsChangedInCommit(commit: string, dirs: string[]): Promise<boolean> {
-  logMessage(`Checking if any of the paths [${dirs}] have changed in commit ${commit}...`)
-  for (const dir of dirs) {
-    const changeCommit = await getChangeCommit(dir)
-    if (commit == changeCommit) {
-      logMessage(`\nDir "${dir}" has changed in commit ${commit}\n`)
-      return true
-    } else {
-      logMessage(`Dir "${dir}" has not changed in commit ${commit}`)
+async function getChangedPackages(commits: string[]): Promise<string[]> {
+  const changedPackages = {}
+  for (const pkg of allPackages) {
+    const changeCommit = await getChangeCommit(join('..', '..', 'packages', pkg))
+    if (commits.includes(changeCommit)) {
+      changedPackages[pkg] = true
     }
   }
-  return false
+
+  return Object.keys(changedPackages)
 }
 
 async function getBranchCommits(): Promise<string[]> {
+  const isCI = process.env.CI
+  if (!isCI) {
+    // Running locally, let's just compare commits with master instead of fetching
+    // commits from a potentially not existing PR
+    const commits = await execCmdWithExitOnFailure('git cherry master')
+    return commits.filter(Boolean).map((c) => c.slice(1).trim())
+  }
+
   // GitHub + Circle CI-specific approach.
   // Note: Environment variable CIRCLE_PR_NUMBER is only defined when the PR is opened from a
   // repository different than the base respository.
@@ -99,7 +138,7 @@ async function getBranchCommits(): Promise<string[]> {
     return commits
   }
 
-  async function getAllCommits(url: string): Promise<string[]> {
+  async function getAllCommits(url: string, commits: string[] = []): Promise<string[]> {
     const response: any = await fetch(url, {
       headers: {
         Accept: 'application/vnd.github.v3+json',
@@ -120,12 +159,12 @@ async function getBranchCommits(): Promise<string[]> {
       )
     }
     // logMessage(`Commit objects are ${JSON.stringify(commitObjects)}`)
-    let commits = commitObjects.map((commitObject: any) => commitObject.sha)
+    commits = commits.concat(commitObjects.map((commitObject: any) => commitObject.sha))
 
     const nextPageLink: string | null = getNextPageLink(response)
     if (nextPageLink) {
       logMessage(`Getting commits from the next page: ${nextPageLink}`)
-      commits = commits.concat(await getAllCommits(nextPageLink))
+      return getAllCommits(nextPageLink, commits)
     }
     return commits
   }
