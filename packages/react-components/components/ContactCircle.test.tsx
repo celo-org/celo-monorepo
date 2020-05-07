@@ -1,7 +1,6 @@
 import ContactCircle from '@celo/react-components/components/ContactCircle'
-import { shallow } from 'enzyme'
 import * as React from 'react'
-import { Text } from 'react-native'
+import { render } from 'react-native-testing-library'
 import * as renderer from 'react-test-renderer'
 
 const testContact = {
@@ -18,36 +17,24 @@ describe('ContactCircle', () => {
   })
   describe('when given contact', () => {
     it('uses contact name for initial', () => {
-      const contactCircle = shallow(
-        <ContactCircle size={30} name={'Jerry'} contact={testContact} />
-      )
+      const { getByText } = render(<ContactCircle size={30} name={'Jerry'} contact={testContact} />)
 
-      expect(
-        contactCircle
-          .find(Text)
-          .children()
-          .text()
-      ).toEqual('Z')
+      expect(getByText('Z')).toBeTruthy()
     })
   })
   describe('when "preferNameInitial"', () => {
     it('uses name for initial', () => {
-      const contactCircle = shallow(
+      const { getByText } = render(
         <ContactCircle size={30} name={'Jerry'} contact={testContact} preferNameInitial={true} />
       )
 
-      expect(
-        contactCircle
-          .find(Text)
-          .children()
-          .text()
-      ).toEqual('J')
+      expect(getByText('J')).toBeTruthy()
     })
   })
   describe('when has image', () => {
     it('renders image', () => {
       const contactWithImage = { ...testContact, hasThumbnail: true, thumbnailPath: './test.jpg' }
-      const contactCircle = shallow(
+      const { getByName } = render(
         <ContactCircle
           size={30}
           name={'Jerry'}
@@ -55,10 +42,7 @@ describe('ContactCircle', () => {
           preferNameInitial={true}
         />
       )
-
-      expect(contactCircle.find({ resizeMode: 'cover' }).prop('source')).toEqual({
-        uri: './test.jpg',
-      })
+      expect(getByName('Image').props.source).toEqual({ uri: './test.jpg' })
     })
   })
 })
