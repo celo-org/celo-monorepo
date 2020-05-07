@@ -11,7 +11,7 @@ import yargs from 'yargs'
 
 export const command = 'oracle-fullnode'
 
-export const describe = 'upgrade full-node(s) on an AKS cluster'
+export const describe = 'upgrade the oracle full-node(s) on an AKS cluster'
 
 type OracleFullNodeUpgradeArgv = UpgradeArgv & OracleArgv & { reset: boolean }
 

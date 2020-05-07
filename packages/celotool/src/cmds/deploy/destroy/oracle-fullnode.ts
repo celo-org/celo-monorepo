@@ -10,7 +10,7 @@ import {
 
 export const command = 'oracle-fullnode'
 
-export const describe = 'destroy the full-node(s) on an AKS cluster'
+export const describe = 'destroy the oracle full-node(s) on an AKS cluster'
 
 type OracleFullNodeDestroyArgv = DestroyArgv & OracleArgv
 

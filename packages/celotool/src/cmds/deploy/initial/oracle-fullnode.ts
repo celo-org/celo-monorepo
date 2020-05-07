@@ -11,7 +11,7 @@ import yargs from 'yargs'
 
 export const command = 'oracle-fullnode'
 
-export const describe = 'deploy full-node(s) on an AKS cluster'
+export const describe = 'deploy the oracle full-node(s) on an AKS cluster'
 
 type OracleFullNodeInitialArgv = InitialArgv & OracleArgv
 
