@@ -10,7 +10,7 @@ Validator groups can help mitigate the information disparity between voters and 
 
 Equally, a number of organizations may want to attempt to field multiple validators under their own control, or be able to interchange the specific machines or keys under which they validate in the case of hardware or connectivity failure. By switching out validators in the list, groups can accomplish this without users having to change their votes.
 
-Validator groups can have no more than a small, fixed maximum number of validators. This means an organization wanting to get more validators elected than this maximum has the added challenge of managing multiple group identities and reputations simultaneously. This further promotes decentralization and strengthens operational security, making it more likely that the validator set will be composed of nodes operated in different fashions by independent individuals and organizations.
+Validator groups can have no more than a small, fixed maximum number of validators -- 5 in the Release Candidate network. This means an organization wanting to get more validators elected than this maximum has the added challenge of managing multiple group identities and reputations simultaneously. This further promotes decentralization and strengthens operational security, making it more likely that the validator set will be composed of nodes operated in different fashions by independent individuals and organizations.
 
 ## Registration
 
@@ -40,8 +40,8 @@ Validator Groups can receive votes from Locked Gold up to a [voting cap](validat
 
 ## Slashing Penalty
 
-A [slashing penalty](penalties.md), initially `1.0`, is also tracked for each validator group. This value between may be reduced as a penalty for misbehavior of the validator in the group, and affects the future rewards of the group, its validators, and Locked Gold holders receiving rewards for voting for the group.
+A [slashing penalty](penalties.md), initially `1.0`, is also tracked for each validator group. This value may be reduced as a penalty for misbehavior of the validator in the group. It affects the future rewards of the group, its validators, and Locked Gold holders receiving rewards for voting for the group.
 
 ## Metadata
 
-Both validators and validator groups can use [Accounts Metadata](../identity/metadata.md) to provide unverified metadata (such as name and organizational affiliation) as well as claims that can be verified off-chain for control of third-party accounts and domain names.
+Both validators and validator groups can use [Accounts Metadata](../identity/metadata.md) to provide unverified metadata (such as name and organizational affiliation) as well as claims that can be verified off-chain for control of third-party accounts. All validators are encouraged to make a verifiable claim for [domain names](../../../operations-manual/validator-explorer.md).
