@@ -11,12 +11,12 @@
 /packages/azure/ @codyborn
 /packages/blockchain-api/ @jmrossy @cmcewen
 /packages/celotool/ @asaj
-/packages/cli/ @mcortesi
-/packages/contractkit/ @mcortesi
+/packages/cli/ @mcortesi @gastonponti
+/packages/contractkit/ @mcortesi @gastonponti
 /packages/dappkit/ @nambrot
 /packages/devutils/ @mcortesi
 /packages/docs/ @timmoreton
-/packages/faucet/ @mcortesi
+/packages/faucet/ @jmrossy
 /packages/helm-charts/ @nambrot @timmoreton
 /packages/leaderboard/ @mrsmkl
 /packages/metadata-crawler/ @aaitor
@@ -25,7 +25,7 @@
 /packages/notification-service/ @annakaz @cmcewen
 /packages/phone-number-privacy/ @jmrossy
 /packages/protocol/ @asaj @nategraf
-/packages/react-components/ @cmcewen @jmrossy
+/packages/react-components/ @jmrossy @aaronmgdr
 /packages/terraform-modules-public/ @tkporter
 /packages/terraform-modules/ @tkporter
 /packages/transaction-metrics-exporter @nambrot
