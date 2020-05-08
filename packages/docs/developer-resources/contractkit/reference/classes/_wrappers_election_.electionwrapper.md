@@ -49,6 +49,7 @@ Contract for voting for validators and managing validator groups.
 * [getValidatorSigners](_wrappers_election_.electionwrapper.md#getvalidatorsigners)
 * [getVoter](_wrappers_election_.electionwrapper.md#getvoter)
 * [getVoterRewards](_wrappers_election_.electionwrapper.md#getvoterrewards)
+* [getVoterShare](_wrappers_election_.electionwrapper.md#getvotershare)
 * [getVotesForGroupByAccount](_wrappers_election_.electionwrapper.md#getvotesforgroupbyaccount)
 * [hasActivatablePendingVotes](_wrappers_election_.electionwrapper.md#hasactivatablependingvotes)
 * [hasPendingVotes](_wrappers_election_.electionwrapper.md#haspendingvotes)
@@ -591,7 +592,7 @@ ___
 
 ###  getVoterRewards
 
-▸ **getVoterRewards**(`address`: [Address](../modules/_base_.md#address), `epochNumber`: number, `estimate?`: undefined | false | true): *Promise‹[VoterReward](../interfaces/_wrappers_election_.voterreward.md)[]›*
+▸ **getVoterRewards**(`address`: [Address](../modules/_base_.md#address), `epochNumber`: number, `voterShare?`: Record‹[Address](../modules/_base_.md#address), BigNumber›): *Promise‹[VoterReward](../interfaces/_wrappers_election_.voterreward.md)[]›*
 
 *Defined in [contractkit/src/wrappers/Election.ts:488](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L488)*
 
@@ -603,9 +604,28 @@ Name | Type | Description |
 ------ | ------ | ------ |
 `address` | [Address](../modules/_base_.md#address) | The address to retrieve VoterRewards for. |
 `epochNumber` | number | The epoch to retrieve VoterRewards at. |
-`estimate?` | undefined &#124; false &#124; true | Estimate voter's share of rewards from epochNumber based on current share.  |
+`voterShare?` | Record‹[Address](../modules/_base_.md#address), BigNumber› | Optionally address' share of group rewards.  |
 
 **Returns:** *Promise‹[VoterReward](../interfaces/_wrappers_election_.voterreward.md)[]›*
+
+___
+
+###  getVoterShare
+
+▸ **getVoterShare**(`address`: [Address](../modules/_base_.md#address), `blockNumber?`: undefined | number): *Promise‹Record‹[Address](../modules/_base_.md#address), BigNumber››*
+
+*Defined in [contractkit/src/wrappers/Election.ts:518](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L518)*
+
+Retrieves a voter's share of active votes.
+
+**Parameters:**
+
+Name | Type | Description |
+------ | ------ | ------ |
+`address` | [Address](../modules/_base_.md#address) | The voter to retrieve share for. |
+`blockNumber?` | undefined &#124; number | The block to retrieve the voter's share at.  |
+
+**Returns:** *Promise‹Record‹[Address](../modules/_base_.md#address), BigNumber››*
 
 ___
 

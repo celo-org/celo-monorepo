@@ -95,7 +95,7 @@ export default class Show extends BaseCommand {
             const epochVoterRewards = await election.getVoterRewards(
               address,
               epochNumber,
-              res.flags.estimate
+              res.flags.estimate ? await election.getVoterShare(address) : undefined
             )
             voterRewards = voterRewards.concat(
               epochVoterRewards.map(

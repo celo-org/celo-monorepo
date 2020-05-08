@@ -483,42 +483,50 @@ export class ElectionWrapper extends BaseWrapper<Election> {
    * Retrieves VoterRewards for address at epochNumber.
    * @param address The address to retrieve VoterRewards for.
    * @param epochNumber The epoch to retrieve VoterRewards at.
-   * @param estimate Estimate voter's share of rewards from epochNumber based on current share.
+   * @param voterShare Optionally address' share of group rewards.
    */
   async getVoterRewards(
     address: Address,
     epochNumber: number,
-    estimate?: boolean
+    voterShare?: Record<Address, BigNumber>
   ): Promise<VoterReward[]> {
-    const blockNumber = await this.kit.getLastBlockNumberForEpoch(epochNumber)
-    const voter = await this.getVoter(address, estimate ? undefined : blockNumber)
-    const activeVoterVotes: Record<string, BigNumber> = {}
-    for (const vote of voter.votes) {
-      const group: string = normalizeAddress(vote.group)
-      activeVoterVotes[group] = vote.active
-    }
-    const activeGroupVotes: Record<string, BigNumber> = await concurrentValuesMap(
-      10,
-      activeVoterVotes,
-      (_, group: string) => this.getActiveVotesForGroup(group, estimate ? undefined : blockNumber)
-    )
-
+    const activeVoteShare =
+      voterShare ||
+      (await this.getVoterShare(address, await this.kit.getLastBlockNumberForEpoch(epochNumber)))
     const groupVoterRewards = await this.getGroupVoterRewards(epochNumber)
     const voterRewards = groupVoterRewards.filter(
-      (e: GroupVoterReward) => normalizeAddress(e.group.address) in activeVoterVotes
+      (e: GroupVoterReward) => normalizeAddress(e.group.address) in activeVoteShare
     )
     return voterRewards.map(
       (e: GroupVoterReward): VoterReward => {
         const group = normalizeAddress(e.group.address)
         return {
           address,
-          addressPayment: e.groupVoterPayment.times(
-            activeVoterVotes[group].dividedBy(activeGroupVotes[group])
-          ),
+          addressPayment: e.groupVoterPayment.times(activeVoteShare[group]),
           group: e.group,
           epochNumber: e.epochNumber,
         }
       }
+    )
+  }
+
+  /**
+   * Retrieves a voter's share of active votes.
+   * @param address The voter to retrieve share for.
+   * @param blockNumber The block to retrieve the voter's share at.
+   */
+  async getVoterShare(address: Address, blockNumber?: number): Promise<Record<Address, BigNumber>> {
+    const activeVoterVotes: Record<Address, BigNumber> = {}
+    const voter = await this.getVoter(address, blockNumber)
+    for (const vote of voter.votes) {
+      const group: string = normalizeAddress(vote.group)
+      activeVoterVotes[group] = vote.active
+    }
+    return concurrentValuesMap(
+      10,
+      activeVoterVotes,
+      async (voterVotes: BigNumber, group: Address) =>
+        voterVotes.dividedBy(await this.getActiveVotesForGroup(group, blockNumber))
     )
   }
 }
