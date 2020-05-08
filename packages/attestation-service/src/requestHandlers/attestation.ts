@@ -5,7 +5,8 @@ import { AddressType, E164PhoneNumberType, SaltType } from '@celo/utils/lib/io'
 import Logger from 'bunyan'
 import express from 'express'
 import * as t from 'io-ts'
-import { Transaction } from 'sequelize'
+import moment from 'moment'
+import { Op, Transaction } from 'sequelize'
 import { existingAttestationRequestRecord, getAttestationTable, kit, sequelize } from '../db'
 import { getAccountAddress, getAttestationSignerAddress } from '../env'
 import { Counters } from '../metrics'
@@ -31,6 +32,18 @@ export const AttestationRequestType = t.type({
 
 export type AttestationRequest = t.TypeOf<typeof AttestationRequestType>
 
+const ATTESTATION_EXPIRY_TIMEOUT_MS = 60 * 60 * 24 * 1000 // 1 day
+
+interface AttestationExpiryCache {
+  timestamp: number | null
+  expiryInSeconds: number | null
+}
+
+const attestationExpiryCache: AttestationExpiryCache = {
+  timestamp: null,
+  expiryInSeconds: null,
+}
+
 function toBase64(str: string) {
   return Buffer.from(str.slice(2), 'hex').toString('base64')
 }
@@ -43,12 +56,13 @@ function createAttestationTextMessage(attestationCode: string, smsRetrieverAppSi
 
 async function ensureLockedRecord(
   attestationRequest: AttestationRequest,
+  identifier: string,
   transaction: Transaction
 ) {
   const AttestationTable = await getAttestationTable()
   await AttestationTable.findOrCreate({
     where: {
-      phoneNumber: attestationRequest.phoneNumber,
+      identifier,
       account: attestationRequest.account,
       issuer: attestationRequest.issuer,
     },
@@ -61,7 +75,7 @@ async function ensureLockedRecord(
 
   // Query to lock the record
   const attestationRecord = await existingAttestationRequestRecord(
-    attestationRequest.phoneNumber,
+    identifier,
     attestationRequest.account,
     attestationRequest.issuer,
     { transaction, lock: Transaction.LOCK.UPDATE }
@@ -80,17 +94,57 @@ async function ensureLockedRecord(
   return attestationRecord
 }
 
+async function purgeExpiredRecords(transaction: Transaction) {
+  const expiryTimeInSeconds = await getAttestationExpiryInSeconds()
+  const AttestationTable = await getAttestationTable()
+  try {
+    await AttestationTable.destroy({
+      where: {
+        createdAt: {
+          [Op.lte]: moment()
+            .subtract(expiryTimeInSeconds, 'seconds')
+            .toDate(),
+        },
+      },
+      transaction,
+    })
+    await transaction.commit()
+  } catch (err) {
+    await transaction.rollback()
+  }
+}
+
+async function getAttestationExpiryInSeconds() {
+  if (
+    attestationExpiryCache.expiryInSeconds &&
+    attestationExpiryCache.timestamp &&
+    Date.now() - attestationExpiryCache.timestamp < ATTESTATION_EXPIRY_TIMEOUT_MS
+  ) {
+    return attestationExpiryCache.expiryInSeconds
+  }
+  const attestations = await kit.contracts.getAttestations()
+  const expiryTimeInSeconds = (await attestations.attestationExpiryBlocks()) * 5
+  attestationExpiryCache.expiryInSeconds = expiryTimeInSeconds
+  attestationExpiryCache.timestamp = Date.now()
+  return expiryTimeInSeconds
+}
+
 class AttestationRequestHandler {
   logger: Logger
+  identifier: string
   sequelizeLogger: (_msg: string, sequelizeLog: any) => void
   constructor(public readonly attestationRequest: AttestationRequest, logger: Logger) {
     this.logger = logger.child({ attestationRequest })
     this.sequelizeLogger = (msg: string, sequelizeLogArgs: any) =>
       this.logger.debug({ sequelizeLogArgs, component: 'sequelize' }, msg)
+    this.identifier = PhoneNumberUtils.getPhoneHash(
+      this.attestationRequest.phoneNumber,
+      this.attestationRequest.salt
+    )
   }
 
   async validateAttestationRequest() {
-    const { phoneNumber, account, issuer, salt } = this.attestationRequest
+    const { phoneNumber, account, issuer } = this.attestationRequest
 
     const attestationRecord = await existingAttestationRequestRecord(phoneNumber, account, issuer, {
       logging: this.sequelizeLogger,
@@ -109,8 +163,7 @@ class AttestationRequestHandler {
     }
 
     const attestations = await kit.contracts.getAttestations()
-    const identifier = PhoneNumberUtils.getPhoneHash(phoneNumber, salt)
-    const state = await attestations.getAttestationState(identifier, account, issuer)
+    const state = await attestations.getAttestationState(this.identifier, account, issuer)
 
     if (state.attestationState !== AttestationState.Incomplete) {
       Counters.attestationRequestsWOIncompleteAttestation.inc()
@@ -161,7 +214,11 @@ class AttestationRequestHandler {
     const transaction = await sequelize!.transaction({ logging: this.sequelizeLogger })
 
     try {
-      attestationRecord = await ensureLockedRecord(this.attestationRequest, transaction)
+      attestationRecord = await ensureLockedRecord(
+        this.attestationRequest,
+        this.identifier,
+        transaction
+      )
       const provider = smsProviderFor(this.attestationRequest.phoneNumber)
 
       if (!provider) {
@@ -216,6 +273,7 @@ class AttestationRequestHandler {
         return
       case AttestationStatus.UNABLE_TO_SERVE:
         respondWithError(res, 422, COUNTRY_CODE_NOT_SERVED_ERROR)
+        return
       default:
         this.logger.error({
           err:
@@ -225,6 +283,11 @@ class AttestationRequestHandler {
         respondWithError(res, 500, SMS_SENDING_ERROR)
         return
     }
+  }
+
+  async purgeExpiredAttestations() {
+    const transaction = await sequelize!.transaction({ logging: this.sequelizeLogger })
+    return purgeExpiredRecords(transaction)
   }
 }
 
@@ -256,4 +319,5 @@ export async function handleAttestationRequest(
     respondWithError(res, 500, SMS_SENDING_ERROR)
     return
   }
+  await handler.purgeExpiredAttestations()
 }

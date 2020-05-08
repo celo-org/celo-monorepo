@@ -3,7 +3,7 @@ kind: StatefulSet
 metadata:
   name: {{ template "common.fullname" . }}
   labels:
-{{ include "common.standard.labels" .  | indent 4 }}
+{{ include "celo-fullnode.labels" .  | indent 4 }}
 spec:
 {{ if .Values.storage.enable }}
   volumeClaimTemplates:
@@ -23,11 +23,11 @@ spec:
   serviceName: {{ template "common.fullname" . }}
   selector:
     matchLabels:
-{{ include "common.standard.labels" .  | indent 6 }}
+{{ include "celo-fullnode.labels" .  | indent 6 }}
   template:
     metadata:
       labels:
-{{ include "common.standard.labels" .  | indent 8 }}
+{{ include "celo-fullnode.labels" .  | indent 8 }}
     spec:
       initContainers:
 {{ include "common.init-genesis-container" .  | indent 6 }}

@@ -183,6 +183,7 @@ exports[`OutgoingPaymentRequestSummaryNotification renders a number when the add
                   onResponderTerminate={[Function]}
                   onResponderTerminationRequest={[Function]}
                   onStartShouldSetResponder={[Function]}
+                  testID="OutgoingPaymentRequestNotification/FAKE_ID_1/global:remind/Button"
                 >
                   <Text
                     style={
@@ -218,6 +219,7 @@ exports[`OutgoingPaymentRequestSummaryNotification renders a number when the add
                   onResponderTerminate={[Function]}
                   onResponderTerminationRequest={[Function]}
                   onStartShouldSetResponder={[Function]}
+                  testID="OutgoingPaymentRequestNotification/FAKE_ID_1/global:cancel/Button"
                 >
                   <Text
                     style={
@@ -430,6 +432,7 @@ exports[`OutgoingPaymentRequestSummaryNotification renders correctly for just on
                   onResponderTerminate={[Function]}
                   onResponderTerminationRequest={[Function]}
                   onStartShouldSetResponder={[Function]}
+                  testID="OutgoingPaymentRequestNotification/FAKE_ID_1/global:remind/Button"
                 >
                   <Text
                     style={
@@ -465,6 +468,7 @@ exports[`OutgoingPaymentRequestSummaryNotification renders correctly for just on
                   onResponderTerminate={[Function]}
                   onResponderTerminationRequest={[Function]}
                   onStartShouldSetResponder={[Function]}
+                  testID="OutgoingPaymentRequestNotification/FAKE_ID_1/global:cancel/Button"
                 >
                   <Text
                     style={

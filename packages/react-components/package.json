@@ -26,13 +26,10 @@
   },
   "devDependencies": {
     "@celo/typescript": "0.0.1",
-    "@types/enzyme": "^3.9.1",
     "@types/hoist-non-react-statics": "^3.3.1",
     "@types/react": "^16.9.34",
     "@types/react-native": "^0.62.4",
     "@types/react-native-autocomplete-input": "^4.0.1",
-    "enzyme": "^3.9.0",
-    "enzyme-adapter-react-16": "^1.11.2",
     "react": "16.11.0",
     "react-dom": "16.11.0",
     "react-native-testing-library": "^1.12.0",

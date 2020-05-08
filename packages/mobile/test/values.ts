@@ -47,11 +47,73 @@ export const mockCountryCode = '+1'
 
 export const mockQrCodeData = `{"address":"${mockAccount}","e164PhoneNumber":"${mockE164Number}","displayName":"${mockName}"}`
 
-export const mockInvitableRecipient: RecipientWithContact = {
+const mockNameInvite = 'Jane Doe'
+const mockName2Invite = 'George Bogart'
+const mockE164NumberInvite = '+13105550000'
+const mockDisplayNumberInvite = '13105550000'
+const mockE164Number2Invite = '+21255550000'
+const mockDisplayNumber2Invite = '21255550000'
+const mockAccountInvite = '0x9335BaFcE54cAa0D6690d1D4DA6406568b52488F'
+const mockAccountInvitePrivKey =
+  '0xe59c12feb5ea13dabcc068a28d1d521a26e39464faa7bbcc01f43b8340e92fa6'
+const mockAccount2Invite = '0x8e1Df47B7064D005Ef071a89D0D7dc8634BC8A9C'
+const mockAccountInvite2PrivKey =
+  '0xb33eac631fd3a415f3738649db8cad57da78b99ec92cd8f77b76b5dae2ebdf27'
+
+export const mockInviteDetails = {
+  timestamp: 1588200517518,
+  e164Number: mockE164NumberInvite,
+  tempWalletAddress: mockAccount.toLowerCase(),
+  tempWalletPrivateKey: '0x1129eb2fbccdc663f4923a6495c35b096249812b589f7c4cd1dba01e1edaf724',
+  tempWalletRedeemed: false,
+  inviteCode: 'ESnrL7zNxmP0kjpklcNbCWJJgStYn3xM0dugHh7a9yQ=',
+  inviteLink: 'http://celo.page.link/PARAMS',
+}
+
+export const mockInviteDetails2 = {
+  timestamp: 1588200517518,
+  e164Number: mockE164Number2Invite,
+  tempWalletAddress: mockAccountInvite.toLowerCase(),
+  tempWalletPrivateKey: mockAccountInvitePrivKey,
+  tempWalletRedeemed: false,
+  inviteCode: 'sz6sYx/TpBXzc4ZJ24ytV9p4uZ7JLNj3e3a12uLr3yc=',
+  inviteLink: 'http://celo.page.link/PARAMS',
+}
+
+// using the default mock values
+export const mockInviteDetails3 = {
+  timestamp: 1588200517518,
+  e164Number: mockE164NumberInvite,
+  tempWalletAddress: mockAccount2Invite.toLowerCase(),
+  tempWalletPrivateKey: mockAccountInvite2PrivKey,
+  tempWalletRedeemed: false,
+  inviteCode: '5ZwS/rXqE9q8wGiijR1SGibjlGT6p7vMAfQ7g0DpL6Y=',
+  inviteLink: 'http://celo.page.link/PARAMS',
+}
+
+const mockInvitableRecipient: RecipientWithContact = {
   kind: RecipientKind.Contact,
   displayName: mockName,
   displayId: '14155550000',
   e164PhoneNumber: mockE164Number,
+  contactId: 'contactId',
+  phoneNumberLabel: 'phoneNumLabel',
+}
+
+const mockInvitableRecipient2: RecipientWithContact = {
+  kind: RecipientKind.Contact,
+  displayName: mockNameInvite,
+  displayId: mockDisplayNumberInvite,
+  e164PhoneNumber: mockE164NumberInvite,
+  contactId: 'contactId',
+  phoneNumberLabel: 'phoneNumLabel',
+}
+
+const mockInvitableRecipient3: RecipientWithContact = {
+  kind: RecipientKind.Contact,
+  displayName: mockName2Invite,
+  displayId: mockDisplayNumber2Invite,
+  e164PhoneNumber: mockE164Number2Invite,
   contactId: 'contactId',
   phoneNumberLabel: 'phoneNumLabel',
 }
@@ -61,12 +123,26 @@ export const mockRecipient: RecipientWithContact = {
   address: mockAccount,
 }
 
+export const mockRecipient2: RecipientWithContact = {
+  ...mockInvitableRecipient2,
+  address: mockAccountInvite,
+}
+
+export const mockRecipient3: RecipientWithContact = {
+  ...mockInvitableRecipient3,
+  address: mockAccount2Invite,
+}
+
 export const mockE164NumberToInvitableRecipient = {
   [mockE164Number]: mockInvitableRecipient,
+  [mockE164NumberInvite]: mockInvitableRecipient2,
+  [mockE164Number2Invite]: mockInvitableRecipient3,
 }
 
 export const mockRecipientCache = {
   [mockE164Number]: mockRecipient,
+  [mockE164NumberInvite]: mockInvitableRecipient2,
+  [mockE164Number2Invite]: mockInvitableRecipient3,
 }
 
 export const mockRecipientWithPhoneNumber: RecipientWithMobileNumber = {
@@ -105,10 +181,18 @@ export const mockNavigation = {
   emit: jest.fn(),
   isFirstRouteInParent: jest.fn(),
 }
+
 export const mockAddressToE164Number: AddressToE164NumberType = {
   [mockAccount]: mockE164Number,
+  [mockAccountInvite]: mockE164NumberInvite,
+  [mockAccount2Invite]: mockE164Number2Invite,
 }
-export const mockE164NumberToAddress: E164NumberToAddressType = { [mockE164Number]: [mockAccount] }
+
+export const mockE164NumberToAddress: E164NumberToAddressType = {
+  [mockE164Number]: [mockAccount],
+  [mockE164NumberInvite]: [mockAccountInvite],
+  [mockE164Number2Invite]: [mockAccount2Invite],
+}
 
 export const mockAttestationMessage: AttestationCode = {
   code:
