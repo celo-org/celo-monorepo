@@ -46,13 +46,5 @@ function hasValidAccountParam(requestBody: any): boolean {
 }
 
 function hasValidQueryPhoneNumberParam(requestBody: any): boolean {
-  if (!requestBody.blindedQueryPhoneNumber) {
-    return false
-  }
-  try {
-    Buffer.from(requestBody.blindedQueryPhoneNumber, 'base64')
-  } catch {
-    return false
-  }
-  return true
+  return requestBody.blindedQueryPhoneNumber
 }
