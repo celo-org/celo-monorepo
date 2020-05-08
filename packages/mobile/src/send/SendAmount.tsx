@@ -39,9 +39,11 @@ import EstimateFee from 'src/fees/EstimateFee'
 import { getFeeEstimateDollars } from 'src/fees/selectors'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
-import { fetchPhoneAddresses } from 'src/identity/actions'
-import { RecipientVerificationStatus } from 'src/identity/contactMapping'
-import { E164NumberToAddressType } from 'src/identity/reducer'
+import {
+  fetchPhoneAddresses,
+  getRecipientVerificationStatus,
+  RecipientVerificationStatus,
+} from 'src/identity/actions'
 import { LocalCurrencyCode, LocalCurrencySymbol } from 'src/localCurrency/consts'
 import {
   convertDollarsToMaxSupportedPrecision,
@@ -51,12 +53,7 @@ import { getLocalCurrencyCode, getLocalCurrencyExchangeRate } from 'src/localCur
 import { HeaderTitleWithBalance, headerWithBackButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import {
-  getAddressFromRecipient,
-  getRecipientVerificationStatus,
-  Recipient,
-  RecipientKind,
-} from 'src/recipients/recipient'
+import { Recipient, RecipientKind } from 'src/recipients/recipient'
 import { RootState } from 'src/redux/reducers'
 import { ConfirmationInput } from 'src/send/SendConfirmation'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
@@ -84,14 +81,13 @@ type Props = StateProps & DispatchProps & OwnProps & WithTranslation
 
 interface StateProps {
   dollarBalance: string
-  estimateFeeDollars?: BigNumber
   defaultCountryCode: string
-  e164NumberToAddress: E164NumberToAddressType
   feeType: FeeType | null
+  estimateFeeDollars: BigNumber | undefined
   localCurrencyCode: LocalCurrencyCode
   localCurrencyExchangeRate: string | null | undefined
   recipient: Recipient
-  verificationStatus: RecipientVerificationStatus
+  recipientVerificationStatus: RecipientVerificationStatus
   manualAddressValidationRequired: boolean
   fullValidationRequired: boolean
 }
@@ -102,10 +98,11 @@ interface DispatchProps {
   showError: typeof showError
   hideAlert: typeof hideAlert
   fetchPhoneAddresses: typeof fetchPhoneAddresses
+  getRecipientVerificationStatus: typeof getRecipientVerificationStatus
 }
 
-function getFeeType(verificationStatus: RecipientVerificationStatus): FeeType | null {
-  switch (verificationStatus) {
+const getFeeType = (recipientVerificationStatus: RecipientVerificationStatus): FeeType | null => {
+  switch (recipientVerificationStatus) {
     case RecipientVerificationStatus.UNKNOWN:
       return null
     case RecipientVerificationStatus.UNVERIFIED:
@@ -117,25 +114,32 @@ function getFeeType(verificationStatus: RecipientVerificationStatus): FeeType | 
 
 const mapStateToProps = (state: RootState, ownProps: NavigationInjectedProps): StateProps => {
   const { navigation } = ownProps
-  const { e164NumberToAddress } = state.identity
   const recipient = navigation.getParam('recipient')
-  const verificationStatus = getRecipientVerificationStatus(recipient, e164NumberToAddress)
-  const feeType = getFeeType(verificationStatus)
   const { manualAddressValidationRequired, fullValidationRequired } = state.send
+  const { recipientVerificationStatus } = state.identity
+  const feeType = getFeeType(recipientVerificationStatus)
 
   return {
     dollarBalance: state.stableToken.balance || '0',
-    estimateFeeDollars: getFeeEstimateDollars(state, feeType),
     defaultCountryCode: state.account.defaultCountryCode,
-    e164NumberToAddress,
     feeType,
+    estimateFeeDollars: getFeeEstimateDollars(state, feeType),
     localCurrencyCode: getLocalCurrencyCode(state),
     localCurrencyExchangeRate: getLocalCurrencyExchangeRate(state),
     recipient,
-    verificationStatus,
+    recipientVerificationStatus,
     manualAddressValidationRequired,
     fullValidationRequired,
   }
+}
+
+const mapDispatchToProps = {
+  fetchDollarBalance,
+  showError,
+  hideAlert,
+  showMessage,
+  fetchPhoneAddresses,
+  getRecipientVerificationStatus,
 }
 
 const { decimalSeparator } = getNumberFormatSettings()
@@ -154,18 +158,20 @@ export class SendAmount extends React.Component<Props, State> {
 
   componentDidMount() {
     this.props.fetchDollarBalance()
-    this.fetchLatestPhoneAddress()
+    this.fetchLatestPhoneAddressesAndRecipientVerification()
   }
 
-  fetchLatestPhoneAddress = () => {
+  fetchLatestPhoneAddressesAndRecipientVerification = () => {
     const { recipient } = this.props
     if (recipient.kind === RecipientKind.QrCode || recipient.kind === RecipientKind.Address) {
-      // Skip for QR codes or Addresses
-      return
+      // Skip phone number fetch for QR codes or Addresses
+      this.props.getRecipientVerificationStatus(recipient)
     }
+
     if (!recipient.e164PhoneNumber) {
       throw new Error('Missing recipient e164Number')
     }
+
     this.props.fetchPhoneAddresses(recipient.e164PhoneNumber)
   }
 
@@ -231,7 +237,7 @@ export class SendAmount extends React.Component<Props, State> {
 
   onSend = () => {
     const {
-      verificationStatus,
+      recipientVerificationStatus,
       manualAddressValidationRequired,
       fullValidationRequired,
     } = this.props
@@ -243,7 +249,7 @@ export class SendAmount extends React.Component<Props, State> {
 
     let confirmationInput: ConfirmationInput
 
-    if (verificationStatus === RecipientVerificationStatus.VERIFIED) {
+    if (recipientVerificationStatus === RecipientVerificationStatus.VERIFIED) {
       confirmationInput = this.getConfirmationInput(TokenTransactionType.Sent)
       CeloAnalytics.track(CustomEventNames.transaction_details, {
         recipientAddress: confirmationInput.recipientAddress,
@@ -276,17 +282,17 @@ export class SendAmount extends React.Component<Props, State> {
   }
 
   renderButtons = (isAmountValid: boolean) => {
-    const { t, verificationStatus } = this.props
+    const { t, recipientVerificationStatus } = this.props
     const { characterLimitExceeded } = this.state
 
     const requestDisabled =
       !isAmountValid ||
-      verificationStatus !== RecipientVerificationStatus.VERIFIED ||
+      recipientVerificationStatus !== RecipientVerificationStatus.VERIFIED ||
       characterLimitExceeded
     const sendDisabled =
       !isAmountValid ||
       characterLimitExceeded ||
-      verificationStatus === RecipientVerificationStatus.UNKNOWN
+      recipientVerificationStatus === RecipientVerificationStatus.UNKNOWN
 
     const separatorContainerStyle =
       sendDisabled && requestDisabled
@@ -297,7 +303,7 @@ export class SendAmount extends React.Component<Props, State> {
 
     return (
       <View style={[componentStyles.bottomContainer, style.buttonContainer]}>
-        {verificationStatus !== RecipientVerificationStatus.UNVERIFIED && (
+        {recipientVerificationStatus !== RecipientVerificationStatus.UNVERIFIED && (
           <View style={style.button}>
             <Button
               testID="Request"
@@ -318,7 +324,9 @@ export class SendAmount extends React.Component<Props, State> {
             testID="Send"
             onPress={this.onSend}
             text={
-              verificationStatus === RecipientVerificationStatus.VERIFIED ? t('send') : t('invite')
+              recipientVerificationStatus === RecipientVerificationStatus.VERIFIED
+                ? t('send')
+                : t('invite')
             }
             accessibilityLabel={t('send')}
             standard={false}
@@ -357,7 +365,7 @@ export class SendAmount extends React.Component<Props, State> {
       estimateFeeDollars,
       localCurrencyCode,
       recipient,
-      verificationStatus,
+      recipientVerificationStatus,
     } = this.props
 
     return (
@@ -381,10 +389,10 @@ export class SendAmount extends React.Component<Props, State> {
           />
           <View style={style.inviteDescription}>
             <LoadingLabel
-              isLoading={verificationStatus === RecipientVerificationStatus.UNKNOWN}
+              isLoading={recipientVerificationStatus === RecipientVerificationStatus.UNKNOWN}
               loadingLabelText={t('loadingVerificationStatus')}
               labelText={
-                verificationStatus === RecipientVerificationStatus.UNVERIFIED
+                recipientVerificationStatus === RecipientVerificationStatus.UNVERIFIED
                   ? t('inviteMoneyEscrow')
                   : undefined
               }
@@ -504,11 +512,8 @@ const style = StyleSheet.create({
 })
 
 export default componentWithAnalytics(
-  connect<StateProps, DispatchProps, OwnProps, RootState>(mapStateToProps, {
-    fetchDollarBalance,
-    showError,
-    hideAlert,
-    showMessage,
-    fetchPhoneAddresses,
-  })(withTranslation(Namespaces.sendFlow7)(SendAmount))
+  connect<StateProps, DispatchProps, OwnProps, RootState>(
+    mapStateToProps,
+    mapDispatchToProps
+  )(withTranslation(Namespaces.sendFlow7)(SendAmount))
 )

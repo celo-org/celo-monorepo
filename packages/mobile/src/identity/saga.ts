@@ -1,6 +1,10 @@
 import { cancelled, spawn, takeEvery, takeLatest, takeLeading } from 'redux-saga/effects'
 import { Actions } from 'src/identity/actions'
-import { doImportContactsWrapper, fetchPhoneAddresses } from 'src/identity/contactMapping'
+import {
+  doImportContactsWrapper,
+  fetchPhoneAddresses,
+  getAddressFromPhoneNumber,
+} from 'src/identity/contactMapping'
 import { revokeVerification, startVerification } from 'src/identity/verification'
 import Logger from 'src/utils/Logger'
 
@@ -14,6 +18,7 @@ function* watchVerification() {
 function* watchContactMapping() {
   yield takeLeading(Actions.IMPORT_CONTACTS, doImportContactsWrapper)
   yield takeEvery(Actions.FETCH_PHONE_ADDRESSES, fetchPhoneAddresses)
+  yield takeLatest(Actions.GET_ADDRESS_FROM_PHONE_NUMBER, getAddressFromPhoneNumber)
 }
 
 export function* identitySaga() {

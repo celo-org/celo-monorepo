@@ -18,6 +18,9 @@ export enum Actions {
   UPDATE_E164_PHONE_NUMBER_ADDRESSES = 'IDENTITY/UPDATE_E164_PHONE_NUMBER_ADDRESSES',
   UPDATE_E164_PHONE_NUMBER_SALT = 'IDENTITY/UPDATE_E164_PHONE_NUMBER_SALT',
   FETCH_PHONE_ADDRESSES = 'IDENTITY/FETCH_PHONE_ADDRESSES',
+  GET_ADDRESS_FROM_PHONE_NUMBER = 'INDENTITY/GET_ADDRESS_FROM_PHONE_NUMBER',
+  FETCH_RECIPIENT_VERIFICATION_STATUS = 'IDENTITY/FETCH_RECIPIENT_VERIFICATION_STATUS',
+  STORE_RECIPIENT_VERIFICATION_STATUS = 'IDENTITY/STORE_RECIPIENT_VERIFICATION_STATUS',
   IMPORT_CONTACTS = 'IDENTITY/IMPORT_CONTACTS',
   UPDATE_IMPORT_SYNC_PROGRESS = 'IDENTITY/UPDATE_IMPORT_SYNC_PROGRESS',
   INCREMENT_IMPORT_SYNC_PROGRESS = 'IDENTITY/INCREMENT_IMPORT_SYNC_PROGRESS',
@@ -25,6 +28,11 @@ export enum Actions {
   DENY_IMPORT_CONTACTS = 'IDENTITY/DENY_IMPORT_CONTACTS',
 }
 
+export enum RecipientVerificationStatus {
+  UNVERIFIED = 0,
+  VERIFIED = 1,
+  UNKNOWN = 2,
+}
 export interface StartVerificationAction {
   type: Actions.START_VERIFICATION
 }
@@ -83,6 +91,16 @@ export interface FetchPhoneAddressesAction {
   e164Number: string
 }
 
+export interface GetAddressFromPhoneNumberAction {
+  type: Actions.GET_ADDRESS_FROM_PHONE_NUMBER
+  e164Number: string
+}
+
+export interface StoreRecipientVerificationStatusAction {
+  type: Actions.STORE_RECIPIENT_VERIFICATION_STATUS
+  recipientVerificationStatus: RecipientVerificationStatus
+}
+
 export interface ImportContactsAction {
   type: Actions.IMPORT_CONTACTS
 }
@@ -113,6 +131,7 @@ export type ActionTypes =
   | ResetVerificationAction
   | SetVerificationStatusAction
   | SetHasSeenVerificationNux
+  | StoreRecipientVerificationStatusAction
   | ReceiveAttestationMessageAction
   | InputAttestationCodeAction
   | CompleteAttestationCodeAction
@@ -174,6 +193,18 @@ export const completeAttestationCode = (
 export const fetchPhoneAddresses = (e164Number: string): FetchPhoneAddressesAction => ({
   type: Actions.FETCH_PHONE_ADDRESSES,
   e164Number,
+})
+
+export const getAddressFromPhoneNUmber = (e164Number: string): GetAddressFromPhoneNumberAction => ({
+  type: Actions.GET_ADDRESS_FROM_PHONE_NUMBER,
+  e164Number,
+})
+
+export const storeRecipientVerificationStatus = (
+  recipientVerificationStatus: RecipientVerificationStatus
+): StoreRecipientVerificationStatusAction => ({
+  type: Actions.STORE_RECIPIENT_VERIFICATION_STATUS,
+  recipientVerificationStatus,
 })
 
 export const updateE164PhoneNumberAddresses = (
