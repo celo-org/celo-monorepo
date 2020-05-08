@@ -14,3 +14,4 @@ redirects:
   getting-started/using-the-wallet: getting-started/using-the-mobile-wallet.md
   celo-codebase/protocol/release-gold: celo-gold-holder-guide/release-gold.md
   validator-guide/governance: celo-gold-holder-guide/voting-governance.md
+  developer-guide/start/celo-truffle-box: developer-resources/walkthroughs/hello-mobile-dapp.md 
