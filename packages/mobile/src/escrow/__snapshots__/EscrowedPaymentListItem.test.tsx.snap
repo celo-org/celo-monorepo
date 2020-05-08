@@ -83,6 +83,7 @@ exports[`EscrowedPaymentReminderNotification renders correctly 1`] = `
                 "lineHeight": 18,
               }
             }
+            testID="EscrowedPaymentListItem/Title"
           >
             Invited and paid 
             +14155550000
@@ -149,6 +150,7 @@ exports[`EscrowedPaymentReminderNotification renders correctly 1`] = `
                 onResponderTerminate={[Function]}
                 onResponderTerminationRequest={[Function]}
                 onStartShouldSetResponder={[Function]}
+                testID="EscrowedPaymentListItem/global:remind/Button"
               >
                 <Text
                   style={
@@ -184,6 +186,7 @@ exports[`EscrowedPaymentReminderNotification renders correctly 1`] = `
                 onResponderTerminate={[Function]}
                 onResponderTerminationRequest={[Function]}
                 onStartShouldSetResponder={[Function]}
+                testID="EscrowedPaymentListItem/global:reclaim/Button"
               >
                 <Text
                   style={
