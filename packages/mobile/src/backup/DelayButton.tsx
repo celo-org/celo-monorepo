@@ -44,8 +44,7 @@ export default connect<DelayStateProps, DelayDispatchProps, {}, RootState>(
   }, [])
 
   const { t } = useTranslation(Namespaces.accountKeyFlow)
-  console.warn('backupToolate', backupTooLate)
-  console.warn('backupDelayedTime', backupDelayedTime)
+
   if (backupTooLate && !backupDelayedTime) {
     return (
       <TopBarButton style={styles.root} onPress={onPressDelay}>

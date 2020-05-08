@@ -39,8 +39,8 @@ function Switch({ value, onValueChange, style }: Props) {
 const styles = StyleSheet.create({
   nob: {
     backgroundColor: colors.gray2,
-    width: 11,
-    height: 11,
+    width: 10,
+    height: 10,
     borderRadius: 20,
     ...elevationShadowStyle(1),
   },
