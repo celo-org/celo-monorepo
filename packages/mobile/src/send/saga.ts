@@ -60,7 +60,7 @@ export async function getSendFee(
 export function* watchQrCodeDetections() {
   while (true) {
     const action = yield take(Actions.BARCODE_DETECTED)
-    Logger.debug(TAG, 'Bar bar detected in watcher')
+    Logger.debug(TAG, 'Barcode detected in watcher')
     const addressToE164Number = yield select(addressToE164NumberSelector)
     const recipientCache = yield select(recipientCacheSelector)
     try {
