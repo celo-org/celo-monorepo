@@ -60,7 +60,7 @@ class BackupIntroduction extends React.Component<Props> {
     const { backupCompleted } = this.props
     return (
       <SafeAreaView style={styles.container}>
-        {!backupCompleted ? (
+        {backupCompleted ? (
           <AccountKeyPostSetup />
         ) : (
           <AccountKeyIntro onPrimaryPress={this.onPressBackup} />
@@ -85,7 +85,7 @@ function AccountKeyIntro({ onPrimaryPress }: AccountKeyStartProps) {
     </ScrollView>
   )
 }
-// TODO get Real mneumonic
+// TODO in next PR get Real mneumonic
 function AccountKeyPostSetup() {
   const { t } = useTranslation(Namespaces.accountKeyFlow)
   return (

@@ -1,37 +1,48 @@
 import Touchable from '@celo/react-components/components/Touchable'
 import colors from '@celo/react-components/styles/colors.v2'
+import { elevationShadowStyle } from '@celo/react-components/styles/styles'
 import * as React from 'react'
-import { StyleSheet, View } from 'react-native'
+import { Animated, StyleSheet, ViewStyle } from 'react-native'
+
+const OFF_POSITION = 1
+const ON_POSITION = 11
+const SCALE = 2
 
 interface Props {
   value: boolean
   onValueChange: (val: boolean) => void
+  style?: ViewStyle
 }
 
-function Switch({ value, onValueChange }: Props) {
+function getPostion(value: boolean) {
+  return value ? ON_POSITION : OFF_POSITION
+}
+
+function Switch({ value, onValueChange, style }: Props) {
   const onPress = React.useCallback(() => onValueChange(!value), [value, onValueChange])
+  const translateX = React.useRef(new Animated.Value(getPostion(value))).current
+
+  React.useEffect(() => {
+    Animated.spring(translateX, {
+      toValue: getPostion(value),
+      useNativeDriver: true,
+    }).start()
+  }, [value])
 
   return (
-    <>
-      <Touchable style={[styles.root, value && styles.on]} borderless={true} onPress={onPress}>
-        <View style={styles.nob} />
-      </Touchable>
-    </>
+    <Touchable style={[styles.root, style, value && styles.on]} borderless={true} onPress={onPress}>
+      <Animated.View style={{ ...styles.nob, transform: [{ scale: SCALE }, { translateX }] }} />
+    </Touchable>
   )
 }
 
 const styles = StyleSheet.create({
   nob: {
     backgroundColor: colors.gray2,
-    transform: [{ scale: 2 }],
-    width: 10,
-    height: 10,
+    width: 11,
+    height: 11,
     borderRadius: 20,
-    elevation: 1,
-    shadowColor: 'black',
-    shadowOffset: { width: 0, height: 0.5 },
-    shadowOpacity: 0.3,
-    shadowRadius: 0.8,
+    ...elevationShadowStyle(1),
   },
   root: {
     alignItems: 'center',
@@ -43,7 +54,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.gray3,
   },
   on: {
-    flexDirection: 'row-reverse',
     backgroundColor: colors.greenUI,
   },
 })
