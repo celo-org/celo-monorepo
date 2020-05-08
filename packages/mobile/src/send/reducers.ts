@@ -65,14 +65,13 @@ export const sendReducer = (
       }
     case Actions.VALIDATE_RECIPIENT_ADDRESS_SUCCESS:
       const { manuallyValidatedE164NumberToAddress } = state
-      // overwrite the previous address every time a new one is validated
+      // overwrite the previous mapping every time a new one is validated
       manuallyValidatedE164NumberToAddress[action.e164Number] = action.address
       return {
         ...state,
         isValidatingRecipient: false,
         isValidRecipient: true,
         manualAddressValidationRequired: false,
-        e164NumberToAddressManuallyValidated: { state },
         manuallyValidatedE164NumberToAddress,
       }
     case Actions.VALIDATE_RECIPIENT_ADDRESS_FAILURE:
@@ -86,6 +85,8 @@ export const sendReducer = (
         ...state,
         manualAddressValidationRequired: true,
         fullValidationRequired: action.fullValidationRequired,
+        isValidatingRecipient: false,
+        isValidRecipient: false,
       }
 
     default:
@@ -108,3 +109,6 @@ const storeLatestRecentReducer = (state: State, newRecipient: Recipient) => {
 
 export const manualAddressValidationRequiredSelector = (state: RootState) =>
   state.send.manualAddressValidationRequired
+
+export const manuallyValidatedE164NumberToAddressSelector = (state: RootState) =>
+  state.send.manuallyValidatedE164NumberToAddress

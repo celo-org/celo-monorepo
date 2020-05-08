@@ -1,5 +1,5 @@
 import { RehydrateAction } from 'redux-persist'
-import { Actions, ActionTypes } from 'src/identity/actions'
+import { Actions, ActionTypes, RecipientVerificationStatus } from 'src/identity/actions'
 import { AttestationCode, VerificationStatus } from 'src/identity/verification'
 import { getRehydratePayload, REHYDRATE } from 'src/redux/persist-helper'
 import { RootState } from 'src/redux/reducers'
@@ -34,6 +34,7 @@ export interface State {
   acceptedAttestationCodes: AttestationCode[]
   numCompleteAttestations: number
   verificationStatus: VerificationStatus
+  recipientVerificationStatus: RecipientVerificationStatus
   hasSeenVerificationNux: boolean
   addressToE164Number: AddressToE164NumberType
   // Note: Do not access values in this directly, use the `getAddressFromPhoneNumber` helper in contactMapping
@@ -49,6 +50,7 @@ const initialState: State = {
   acceptedAttestationCodes: [],
   numCompleteAttestations: 0,
   verificationStatus: 0,
+  recipientVerificationStatus: 2,
   hasSeenVerificationNux: false,
   addressToE164Number: {},
   e164NumberToAddress: {},
@@ -94,6 +96,11 @@ export const reducer = (
         // to try again with same codes
         acceptedAttestationCodes:
           action.status === VerificationStatus.Failed ? [] : state.acceptedAttestationCodes,
+      }
+    case Actions.STORE_RECIPIENT_VERIFICATION_STATUS:
+      return {
+        ...state,
+        recipientVerificationStatus: action.recipientVerificationStatus,
       }
     case Actions.SET_SEEN_VERIFICATION_NUX:
       return {

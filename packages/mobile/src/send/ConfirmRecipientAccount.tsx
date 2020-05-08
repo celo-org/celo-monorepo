@@ -5,7 +5,6 @@ import TextButton from '@celo/react-components/components/TextButton'
 import Checkmark from '@celo/react-components/icons/Checkmark'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
-import { delay } from 'lodash'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native'
@@ -22,6 +21,7 @@ import { Screens } from 'src/navigator/Screens'
 import { Recipient } from 'src/recipients/recipient'
 import { RootState } from 'src/redux/reducers'
 import { validateRecipientAddress } from 'src/send/actions'
+import { ConfirmationInput } from 'src/send/SendConfirmation'
 
 type Navigation = NavigationInjectedProps['navigation']
 
@@ -31,6 +31,7 @@ interface OwnProps {
 
 interface StateProps {
   recipient: Recipient
+  confirmationInput: ConfirmationInput
   fullValidationRequired: boolean
   isValidRecipient: boolean
   isValidatingRecipient: boolean
@@ -51,8 +52,11 @@ const mapDispatchToProps = {
 
 const mapStateToProps = (state: RootState, ownProps: NavigationInjectedProps): StateProps => {
   const { navigation } = ownProps
+  const confirmationInput = navigation.getParam('confirmationInput')
+  const { recipient } = confirmationInput
   return {
-    recipient: navigation.getParam('recipient'),
+    recipient,
+    confirmationInput,
     fullValidationRequired: navigation.getParam('fullValidationRequired'),
     isValidRecipient: state.send.isValidRecipient,
     isValidatingRecipient: state.send.isValidatingRecipient,
@@ -74,8 +78,8 @@ export class ConfirmRecipientAccount extends React.Component<Props, State> {
 
   componentDidUpdate = async () => {
     if (this.props.isValidRecipient) {
-      await delay(() => {}, 2000) // artificial delay for the success animation
-      navigate(Screens.SendAmount)
+      // OPEN QUESTION: what's the best way to trigger a success animation before navigating to next screen?
+      navigate(Screens.SendConfirmation, { confirmationInput: this.props.confirmationInput })
     }
   }
 

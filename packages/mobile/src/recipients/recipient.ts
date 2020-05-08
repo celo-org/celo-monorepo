@@ -1,12 +1,7 @@
 import { parsePhoneNumber } from '@celo/utils/src/phoneNumbers'
 import * as fuzzysort from 'fuzzysort'
 import { MinimalContact } from 'react-native-contacts'
-import {
-  getAddressFromPhoneNumber,
-  getVerificationStatusFromPhoneNumber,
-  RecipientVerificationStatus,
-} from 'src/identity/contactMapping'
-import { AddressToE164NumberType, E164NumberToAddressType } from 'src/identity/reducer'
+import { AddressToE164NumberType } from 'src/identity/reducer'
 import Logger from 'src/utils/Logger'
 
 const TAG = 'recipients/recipient'
@@ -116,21 +111,6 @@ export function contactsToRecipients(contacts: MinimalContact[], defaultCountryC
   }
 }
 
-export function getAddressFromRecipient(
-  recipient: Recipient,
-  e164NumberToAddress: E164NumberToAddressType
-): string | null | undefined {
-  if (recipient.kind === RecipientKind.QrCode || recipient.kind === RecipientKind.Address) {
-    return recipient.address
-  }
-
-  if (!recipient.e164PhoneNumber) {
-    throw new Error('Missing recipient e164Number')
-  }
-
-  return getAddressFromPhoneNumber(recipient.e164PhoneNumber, e164NumberToAddress)
-}
-
 export function getRecipientFromAddress(
   address: string,
   addressToE164Number: AddressToE164NumberType,
@@ -138,21 +118,6 @@ export function getRecipientFromAddress(
 ) {
   const e164PhoneNumber = addressToE164Number[address]
   return e164PhoneNumber ? recipientCache[e164PhoneNumber] : undefined
-}
-
-export function getRecipientVerificationStatus(
-  recipient: Recipient,
-  e164NumberToAddress: E164NumberToAddressType
-): RecipientVerificationStatus {
-  if (recipient.kind === RecipientKind.QrCode || recipient.kind === RecipientKind.Address) {
-    return RecipientVerificationStatus.VERIFIED
-  }
-
-  if (!recipient.e164PhoneNumber) {
-    throw new Error('No recipient e164Number found')
-  }
-
-  return getVerificationStatusFromPhoneNumber(recipient.e164PhoneNumber, e164NumberToAddress)
 }
 
 export function getRecipientThumbnail(recipient?: Recipient) {
