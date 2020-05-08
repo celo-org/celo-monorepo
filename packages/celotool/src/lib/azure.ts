@@ -97,6 +97,25 @@ export async function createIdentityIfNotExists(
   return JSON.parse(results)
 }
 
+/**
+ * deleteIdentity gets basic info on an existing identity
+ */
+export function deleteIdentity(clusterConfig: AzureClusterConfig, identityName: string) {
+  return execCmdWithExitOnFailure(
+    `az identity delete -n ${identityName} -g ${clusterConfig.resourceGroup} -o json`
+  )
+}
+
+/**
+ * getIdentity gets basic info on an existing identity
+ */
+export async function getIdentity(clusterConfig: AzureClusterConfig, identityName: string) {
+  const [results] = await execCmdWithExitOnFailure(
+    `az identity show -n ${identityName} -g ${clusterConfig.resourceGroup} -o json`
+  )
+  return JSON.parse(results)
+}
+
 export async function getAKSNodeResourceGroup(clusterConfig: AzureClusterConfig) {
   const [nodeResourceGroup] = await execCmdWithExitOnFailure(
     `az aks show --name ${clusterConfig.clusterName} --resource-group ${clusterConfig.resourceGroup} --query nodeResourceGroup -o tsv`

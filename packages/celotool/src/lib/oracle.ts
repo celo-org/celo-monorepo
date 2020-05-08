@@ -1,4 +1,10 @@
-import { AzureClusterConfig, createIdentityIfNotExists, switchToCluster } from 'src/lib/azure'
+import {
+  AzureClusterConfig,
+  createIdentityIfNotExists,
+  deleteIdentity,
+  getIdentity,
+  switchToCluster,
+} from 'src/lib/azure'
 import { getFornoUrl, getFullNodeRpcInternalUrl } from 'src/lib/endpoints'
 import { addCeloEnvMiddleware, envVar, fetchEnv } from 'src/lib/env-utils'
 import { installGenericHelmChart, removeGenericHelmChart } from 'src/lib/helm_deploy'
@@ -88,9 +94,13 @@ export async function installHelmChart(
   )
 }
 
-export async function removeHelmRelease(celoEnv: string) {
+export async function removeHelmRelease(celoEnv: string, context: OracleAzureContext) {
   await removeGenericHelmChart(releaseName(celoEnv))
   await removeOracleRBACHelmRelease(celoEnv)
+  const oracleConfig = getOracleConfig(context)
+  for (const identity of oracleConfig.identities) {
+    await deleteOracleAzureIdentity(context, identity)
+  }
 }
 
 async function helmParameters(celoEnv: string, context: OracleAzureContext, useFullNodes: boolean) {
@@ -150,10 +160,40 @@ async function createOracleAzureIdentityIfNotExists(
     `az role assignment create --role "Managed Identity Operator" --assignee ${servicePrincipalClientId} --scope ${identity.id}`
   )
   // Allow the oracle identity to access the correct key vault
-  await execCmdWithExitOnFailure(
-    `az keyvault set-policy --name ${oracleIdentity.keyVaultName} --key-permissions {get,list,sign} --object-id ${identity.principalId} -g ${clusterConfig.resourceGroup}`
-  )
+  await setOracleKeyVaultPolicy(clusterConfig, oracleIdentity, identity)
   return identity
+}
+
+async function setOracleKeyVaultPolicy(
+  clusterConfig: AzureClusterConfig,
+  oracleIdentity: OracleIdentity,
+  azureIdentity: any
+) {
+  return execCmdWithExitOnFailure(
+    `az keyvault set-policy --name ${oracleIdentity.keyVaultName} --key-permissions {get,list,sign} --object-id ${azureIdentity.principalId} -g ${clusterConfig.resourceGroup}`
+  )
+}
+
+/**
+ * deleteOracleAzureIdentity deletes the key vault policy and the oracle's managed identity
+ */
+async function deleteOracleAzureIdentity(
+  context: OracleAzureContext,
+  oracleIdentity: OracleIdentity
+) {
+  const clusterConfig = getAzureClusterConfig(context)
+  await deleteOracleKeyVaultPolicy(clusterConfig, oracleIdentity)
+  return deleteIdentity(clusterConfig, oracleIdentity.azureIdentityName)
+}
+
+async function deleteOracleKeyVaultPolicy(
+  clusterConfig: AzureClusterConfig,
+  oracleIdentity: OracleIdentity
+) {
+  const azureIdentity = await getIdentity(clusterConfig, oracleIdentity.azureIdentityName)
+  return execCmdWithExitOnFailure(
+    `az keyvault delete-policy --name ${oracleIdentity.keyVaultName} --object-id ${azureIdentity.principalId} -g ${clusterConfig.resourceGroup}`
+  )
 }
 
 /**
@@ -184,7 +224,7 @@ function getOracleIdentities(context: OracleAzureContext): OracleIdentity[] {
       )
     }
     identities.push({
-      azureIdentityName: getOracleAzureIdentityName(address, keyVaultName),
+      azureIdentityName: getOracleAzureIdentityName(keyVaultName, address),
       address,
       keyVaultName,
     })
