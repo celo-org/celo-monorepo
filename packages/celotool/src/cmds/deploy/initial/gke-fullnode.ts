@@ -11,6 +11,7 @@ export const builder = (argv: yargs.Argv) => {
     .option('syncmode', {
       type: 'string',
       description: 'Geth sync mode',
+      choices: ['light', 'lightest', 'fast', 'full'],
       default: 'full',
     })
     .option('namespace', {

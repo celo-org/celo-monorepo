@@ -133,11 +133,12 @@ release: {{ .Release.Name }}
     ACCOUNT_ADDRESS=$(cat /root/.celo/address)
     ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --ethstats=${HOSTNAME}@{{ .ethstats }} --etherbase=${ACCOUNT_ADDRESS}"
     {{- end }}
+    {{- if not (eq (.syncmode | default .Values.geth.syncmode) "light") }}
+    ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --light.serve {{ .light_serve | default 90 }} --light.maxpeers {{ .light_maxpeers | default 1000 }}"
+    {{- end }}
 
     geth \
       --bootnodes=$(cat /root/.celo/bootnodeEnode) \
-      --light.serve {{ .light_serve | default 90 }} \
-      --light.maxpeers {{ .light_maxpeers | default 1000 }} \
       --maxpeers {{ .maxpeers | default 1100 }} \
       --networkid=${NETWORK_ID} \
       --nousb \

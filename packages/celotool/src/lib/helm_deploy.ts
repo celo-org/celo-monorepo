@@ -485,13 +485,22 @@ export async function deleteStaticIPs(celoEnv: string) {
 
 export async function deletePersistentVolumeClaims(celoEnv: string, componentLabels: string[]) {
   console.info(`Deleting persistent volume claims for ${celoEnv}`)
+  for (const component of componentLabels) {
+    deletePersistentVolumeClaimsCustomLabels(celoEnv, 'component', component)
+  }
+}
+
+export async function deletePersistentVolumeClaimsCustomLabels(
+  namespace: string,
+  label: string,
+  value: string
+) {
+  console.info(`Deleting persistent volume claims for ${namespace}`)
   try {
-    for (const component of componentLabels) {
-      const [output] = await execCmd(
-        `kubectl delete pvc --selector='component=${component}' --namespace ${celoEnv}`
-      )
-      console.info(output)
-    }
+    const [output] = await execCmd(
+      `kubectl delete pvc --selector='${label}=${value}' --namespace ${namespace}`
+    )
+    console.info(output)
   } catch (error) {
     console.error(error)
     if (!error.toString().includes('not found')) {

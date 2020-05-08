@@ -12,5 +12,5 @@ export const builder = (argv: yargs.Argv) => {
 
 export const handler = async (argv: GKEFullNodeArgv) => {
   // await switchToClusterFromEnv(argv.celoEnv)
-  await removeHelmRelease(argv.celoEnv, argv.syncmode)
+  await removeHelmRelease(argv.celoEnv, argv.syncmode, argv.namespace)
 }

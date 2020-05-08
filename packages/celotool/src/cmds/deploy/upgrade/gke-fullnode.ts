@@ -2,9 +2,9 @@ import { GKEFullNodeArgv } from 'src/cmds/deploy/initial/gke-fullnode'
 import { upgradeFullNodeChart } from 'src/lib/gke-fullnode'
 import yargs from 'yargs'
 
-export const command = 'aks-fullnode'
+export const command = 'gke-fullnode'
 
-export const describe = 'upgrade full-node(s) to a kubernetes cluster on AKS'
+export const describe = 'upgrade full-node(s) to a kubernetes cluster on GKE'
 
 export const builder = (argv: yargs.Argv) => {
   return argv.option('reset', {

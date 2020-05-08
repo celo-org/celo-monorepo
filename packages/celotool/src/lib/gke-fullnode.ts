@@ -1,7 +1,7 @@
 import { createNamespaceIfNotExists } from 'src/lib/cluster'
 import { installGenericHelmChart, removeGenericHelmChart } from 'src/lib/helm_deploy'
 import { envVar, fetchEnv } from './env-utils'
-import { deletePersistentVolumeClaims, upgradeGenericHelmChart } from './helm_deploy'
+import { deletePersistentVolumeClaimsCustomLabels, upgradeGenericHelmChart } from './helm_deploy'
 import { scaleResource } from './kubernetes'
 
 const helmChartPath = '../helm-charts/celo-fullnode'
@@ -13,13 +13,13 @@ function getKubeNamespace(celoEnv: string, namespace: string) {
   return celoEnv
 }
 
-function getReleaseName(celoEnv: string, syncmode: string) {
-  return `${celoEnv}-${syncmode}-node`
+function getReleaseName(celoEnv: string, syncmode: string, namespace: string) {
+  return `${celoEnv}-${namespace}-${syncmode}-node`
 }
 
 export async function installFullNodeChart(celoEnv: string, syncmode: string, namespace: string) {
   const kubeNamespace = getKubeNamespace(celoEnv, namespace)
-  const releaseName = getReleaseName(celoEnv, syncmode)
+  const releaseName = getReleaseName(celoEnv, syncmode, kubeNamespace)
   await createNamespaceIfNotExists(kubeNamespace)
 
   return installGenericHelmChart(
@@ -46,8 +46,12 @@ function helmParameters(celoEnv: string, syncmode: string, kubeNamespace: string
   ]
 }
 
-export async function removeHelmRelease(celoEnv: string, syncMode: string) {
-  await removeGenericHelmChart(getReleaseName(celoEnv, syncMode))
+export async function removeHelmRelease(celoEnv: string, syncmode: string, namespace: string) {
+  const kubeNamespace = getKubeNamespace(celoEnv, namespace)
+  const releaseName = getReleaseName(celoEnv, syncmode, kubeNamespace)
+
+  await removeGenericHelmChart(releaseName)
+  await deletePersistentVolumeClaimsCustomLabels(kubeNamespace, 'release', releaseName)
 }
 
 export async function upgradeFullNodeChart(
@@ -57,11 +61,11 @@ export async function upgradeFullNodeChart(
   reset: boolean = false
 ) {
   const kubeNamespace = getKubeNamespace(celoEnv, namespace)
-  const releaseName = getReleaseName(celoEnv, syncmode)
+  const releaseName = getReleaseName(celoEnv, syncmode, kubeNamespace)
 
   if (reset) {
-    await scaleResource(celoEnv, 'StatefulSet', `${celoEnv}-fullnodes`, 0)
-    await deletePersistentVolumeClaims(celoEnv, ['celo-fullnode'])
+    await scaleResource(kubeNamespace, 'StatefulSet', `${releaseName}`, 0)
+    await deletePersistentVolumeClaimsCustomLabels(kubeNamespace, 'release', releaseName)
   }
   await upgradeGenericHelmChart(
     kubeNamespace,
@@ -69,6 +73,6 @@ export async function upgradeFullNodeChart(
     helmChartPath,
     await helmParameters(celoEnv, syncmode, kubeNamespace)
   )
-  await scaleResource(celoEnv, 'StatefulSet', `${celoEnv}-fullnodes`, 1)
+  await scaleResource(kubeNamespace, 'StatefulSet', `${releaseName}`, 1)
   return
 }
