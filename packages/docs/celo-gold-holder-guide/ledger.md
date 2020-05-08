@@ -13,7 +13,7 @@ The steps below require technical knowledge. You should be comfortable with the 
 Start by installing the Celo application and setting a PIN on your Ledger device by following steps 1 and 2 [on this page](https://www.ledger.com/start/).
 
 {% hint style="danger" %}
-Make sure to securely back up both the PIN and the recovery phrase, or mnemonic. If you lose them, or they are stolen, you lose access to your Celo assets with no recovery possible. The recovery phrase will be shown only once.
+Make sure to securely back up both the PIN and the recovery phrase ("mnemonic"). If you lose them, or they are stolen, you lose access to your Celo assets with no recovery possible. The recovery phrase will be shown only once.
 {% endhint %}
 
 Open the Ledger Live App on your computer and follow the instructions on the screen.
@@ -55,7 +55,11 @@ On your Ledger Nano device enter the PIN if prompted and press both buttons at t
 You will see `Pending Ledger review` on the device’s screen.
 
 {% hint style="info" %}
-`Pending Ledger review` means that the Celo app is approved to be in the developer store but undergoing additional reviews by the Leger team to be approved in the public store.
+`Pending Ledger review` means that the Celo app is approved to be in the developer store, but is undergoing additional reviews by the Ledger team before it is approved in the public store.
+{% endhint %}
+
+{% hint style="warning" %}
+There have been reports of a possible [issue](https://github.com/celo-org/celo-ledger-spender-app/issues/13) that appears to affect developer store apps on the Ledger Nano X including Celo where a user clicking through the `Pending Ledger review` notice too rapidly can cause the device to freeze. If this occurs, wait until the device's battery is depleted, then charge and power up again.
 {% endhint %}
 
 Press both buttons on the device at the same time to continue.
@@ -174,3 +178,5 @@ If you have issues connecting to the Ledger, try the following:
 - Try unplugging and replugging the device. Some devices appear to trigger a warning on Macs saying: “USB Devices Disabled. Unplug the device using too much power to re-enable USB devices” which is usually resolved by reconnecting.
 - Ensure that you are using the original cable supplied with your Ledger.
 - Ensure that your Ledger has the [latest firmware](https://support.ledger.com/hc/en-us/articles/360002731113-Update-device-firmware). For Ledger Nano S, a firmware version of 1.6 or later is required.
+
+There have been reports of a possible [issue](https://github.com/celo-org/celo-ledger-spender-app/issues/13) that appears to affect developer store apps on the Ledger Nano X including Celo where a user clicking through the `Pending Ledger review` notice too rapidly can cause the device to freeze. If this occurs, wait until the device's battery is depleted, then charge and power up again.
