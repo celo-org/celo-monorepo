@@ -36,7 +36,7 @@ In this guide, you will:
 - Access the `ReleaseGold` account associated with your address using your existing Ledger
 - Authorize a voting key, which you will hold on a new, second Ledger
 - Lock some of the Gold in your `ReleaseGold` account
-- Use that Locked Gold to vote for validator groups to operate Celo's [Proof of Stake](../celo-codebase/protocol/proof-of-stake/README.md) network (and in doing so be ready to receive epoch rewards of 6% when the community enables them in a forthcoming governance proposal)
+- Use that Locked Gold to vote for Validator Groups to operate Celo's [Proof of Stake](../celo-codebase/protocol/proof-of-stake/README.md) network (and in doing so be ready to receive epoch rewards of 6% when the community enables them in a forthcoming governance proposal)
 
 ## Preparing Ledgers
 
@@ -101,7 +101,7 @@ export CELO_BENEFICIARY_ADDRESS=<YOUR-CELO-BENEFICIARY-ADDRESS>
 export CELO_RG_ADDRESS=<YOUR-CELO-RELEASEGOLD-ADDRESS>
 ```
 
-You should find your beneficiary account already has a small Celo Gold balance to pay for transaction fees (values are shown in wei, so For example, 1 cGLD = 1000000000000000000):
+You should find your beneficiary account already has a very small Celo Gold balance to pay for transaction fees (values are shown in wei, so For example, 1 cGLD = 1000000000000000000):
 
 ```bash
 celocli account:balance $CELO_BENEFICIARY_ADDRESS
@@ -117,7 +117,7 @@ Verify the configuration, balance, and beneficiary details. You can find an expl
 
 If any of these details appear to be incorrect, please contact cLabs, and do not proceed with the remainder of this guide.
 
-If the configuration shows `canVote: true`, your contract allows you to participate in electing validator groups for Celo's Proof of Stake protocol, and potentially earn epoch rewards for doing so. Please continue to follow the remainder of this guide (or you can come back and continue at any time).
+If the configuration shows `canVote: true`, your contract allows you to participate in electing Validator Groups for Celo's Proof of Stake protocol, and potentially earn epoch rewards for doing so. Please continue to follow the remainder of this guide (or you can come back and continue at any time).
 
 Otherwise, you're all set. You don't need to take any further action right now.
 
@@ -165,7 +165,7 @@ Now switch ledgers.
 Connect your **Beneficiary Ledger** now, unlock it, and open the Celo application.
 {% endhint %}
 
-Next, designate the `ReleaseGold` contract as a “Locked Gold” account:
+Next, register the `ReleaseGold` contract as a “Locked Gold” account:
 
 ```bash
 # Using the Beneficiary Ledger
@@ -187,7 +187,7 @@ Now, using the proof-of-possession you generated above, as the Locked Gold Accou
 celocli releasegold:authorize --contract $CELO_RG_ADDRESS --role=vote --signer $CELO_VOTE_SIGNER_ADDRESS --signature $CELO_VOTE_SIGNER_SIGNATURE --useLedger
 ```
 
-Verify that your signer was correctly authorized:
+Finally, verify that your signer was correctly authorized:
 
 ```bash
 celocli account:show $CELO_RG_ADDRESS
@@ -195,13 +195,25 @@ celocli account:show $CELO_RG_ADDRESS
 
 The `vote` address under `authorizedSigners` should match `$CELO_VOTE_SIGNER_ADDRESS`.
 
-This operation also transfers 1 cGLD to the vote signer address, for you to use for transaction fees.
+The `ReleaseGold` contract was funded with an additional 1 cGLD that it sends to the first vote signer account to be authorized. This allows the vote signer account to cover transaction fees. You can confirm this:
+
+```bash
+celocli account:balance $CELO_VOTE_SIGNER_SIGNATURE
+```
+
+{% hint style="warning" %}
+**Warning**: Celo Gold transfers are frozen in the Release Candidate network until the network graduates to Mainnet. Until this time, only authorize a vote signer key for a `ReleaseGold` contract once. If you replace that vote signer key by authorizing a new key, the contract cannot transfer it funds to cover transaction fees. This means you will not be able to complete the steps below until Celo Gold transfers are unfrozen.
+{% endhint %}
 
 ## Lock Celo Gold
 
-To vote for validator groups and on governance proposals you will need to lock Celo Gold. This is to keep the network secure by making sure each unit of Celo Gold can only be used to vote once.
+To vote for Validator Groups and on governance proposals you will need to lock Celo Gold. This is to keep the network secure by making sure each unit of Celo Gold can only be used to vote once.
 
-Specify the amount of Celo Gold you wish to lock (don’t include the `< >` braces). All amounts are given as wei, i.e units of 10^-18 Celo Gold. For example, 1 cGLD = 1000000000000000000.
+Specify the amount of Celo Gold you wish to lock (don’t include the `< >`  braces). All amounts are given as wei, i.e units of 10^-18 Celo Gold. For example, 1 cGLD = 1000000000000000000.
+
+{% hint style="warning" %}
+Make sure to leave at least 1 Celo Gold unlocked to pay for transaction fees.
+{% endhint %}
 
 ```bash
 # Using the Beneficiary Ledger
@@ -214,29 +226,25 @@ Check that your Celo Gold was successfully locked.
 celocli lockedgold:show $CELO_RG_ADDRESS
 ```
 
-{% hint style="warning" %}
-Don't lock the small amounts of Celo Gold in your beneficiary account or vote signer account. You may need this to pay for transaction fees.
-{% endhint %}
-
 ## Vote for a Validator Group
 
-Celo Gold (cGLD) holders can vote for Validator groups and not validators directly. This is similar to delegating on other cryptographic networks. cGLD holders who vote for an elected validator group may earn [epoch rewards](https://docs.celo.org/getting-started/glossary#epoch-rewards).
+Celo Gold (cGLD) holders can vote for Validator Groups and not Validators directly. This is similar to delegating on other cryptographic networks. cGLD holders who vote for an elected Validator Group may earn [epoch rewards](https://docs.celo.org/getting-started/glossary#epoch-rewards).
 
-A number of community sites are providing information to help choose a validator group. Start with [the cLabs Validator explorer](https://celo.org/validators/explore), or [Bi23 Labs' `thecelo` dashboard](https://thecelo.com).
+The [Voting on Validators](voting-validators.md) has useful background and guidance on how to select a Validator Group to vote for. Community Validator explorers include the [cLabs Validator explorer](https://celo.org/validators/explore) and [Bi23 Labs' `thecelo` dashboard](https://thecelo.com).
 
-You can also see registered validator groups through the Celo CLI. This will display a list of validator groups, the number of votes they have received, the number of additional votes they are able to receive, and whether or not they are eligible to elect validators:
+You can also see registered Validator Groups through the Celo CLI. This will display a list of Validator Groups, the number of votes they have received, the number of additional votes they are able to receive, and whether or not they are eligible to elect Validators:
 
 ```bash
 celocli election:list
 ```
 
-Once you have found one or more validator groups you’d like to vote for, create an environment variable for its group address (don’t include the `< >` braces):
+Once you have found one or more Validator Groups you’d like to vote for, create an environment variable for its Group address (don’t include the `< >` braces):
 
 ```bash
 export CELO_VALIDATOR_GROUP_ADDRESS=<VALIDATOR-GROUP-ADDRESS-TO-VOTE-FOR>
 ```
 
-To vote, you will use your vote signer key, which is voting _on behalf of_ your Locked Gold account.
+To vote, you will use your vote signer key, which is voting *on behalf of* your Locked Gold account.
 
 For each vote you will need to specify the amount of locked Celo Gold you wish to vote with (don’t include the `< >` braces). All Celo Gold amounts should be expressed in wei: that means 1 cGLD = 1000000000000000000.
 
@@ -261,7 +269,7 @@ Your locked cGLD votes should be displayed next to `pending` under `votes`.
 
 Your vote will apply starting at the next Validator Election, held once per day, and will continue to apply at each subsequent election until you change it.
 
-After that election has occurred, you will need to activate your vote. This will allow you to receive epoch rewards if in that election (or at any subsequent one, until you change your vote) the validator group for which you voted elected at least one validator.
+After that election has occurred, you will need to activate your vote. This will allow you to receive epoch rewards if in that election (or at any subsequent one, until you change your vote) the Validator Group for which you voted elected at least one Validator. Rewards will get added to your votes for that Group and will compound automatically.
 
 {% hint style="info" %}
 Epoch lengths in the Mainnet Release Candidate 1 are set to be the number of blocks produced in a day. As a result, votes may need to be activated up to 24 hours after they are cast.
@@ -273,7 +281,7 @@ Check that your votes were cast in a previous epoch:
 celocli election:show $CELO_RG_ADDRESS --voter
 ```
 
-Your locked cGLD votes should be displayed next to `active` under `votes`.
+Your vote should be displayed next to `pending` under `votes`.
 
 {% hint style="info" %}
 Connect your **Vote Signer Ledger** now, unlock it, and open the Celo application.
@@ -283,9 +291,11 @@ Now activate your votes:
 
 ```bash
 # Using the Vote Signer Ledger
-# You must do this in an epoch after the one you voted in, this may take up to 24h
+# You must do this in an epoch after the one you voted in: this may take up to 24h
 celocli election:activate --from $CELO_VOTE_SIGNER_ADDRESS --useLedger
 ```
+
+If you run `election:show` again, your vote should be displayed next to `active` under `votes`.
 
 Congratulations! You're all set.
 
@@ -295,8 +305,81 @@ You are now set up to participate in the Celo network!
 
 Epoch rewards are not yet enabled on the Release Candidate network, but as part of the network deployment process the community will approve a governance request that enables them.
 
+In the mean time, you might want to read more about [choosing a Validator Group](voting-validators.md) to vote for.  You can vote for up to ten different Groups from a single account.
+
 Locking Celo Gold also enables you to participate in voting for or against [Governance proposals](voting-governance.md).
 
 You can also read more about how Celo's [Proof of Stake](../celo-codebase/protocol/proof-of-stake/README.md) and on-chain [Governance](../celo-codebase/protocol/governance.md) mechanisms work.
 
-At some point, the terms of your `ReleaseGold` contract will allow you to withdraw funds and transfer them to your beneficiary address. Check back for instructions on how to do this.
+## Revoking Votes
+
+At any point you can revoke votes cast for a Validator Group. For example, a Group may be performing poorly and affecting your rewards, and you may prefer to vote for another Group.
+
+{% hint style="info" %}
+When you revoke your votes you will stop receiving voter rewards.
+{% endhint %}
+
+Specify the amount of Celo Gold (cGLD) you wish to revoke (don’t include the  `< >`  braces). All cGLD amounts should be expressed in 18 decimal places. For example, 1 cGLD = 1000000000000000000.
+
+{% hint style="info" %}
+Connect your **Vote Signer Ledger** now, unlock it, and open the Celo application.
+{% endhint %}
+
+Revoke votes for the Group:
+
+```bash
+# Using the Vote Signer Ledger
+celocli election:revoke --from $CELO_VOTE_SIGNER_ADDRESS --for $CELO_VALIDATOR_GROUP_ADDRESS --value <CELO-GOLD-AMOUNT> --useLedger
+```
+
+You can immediately re-use this locked Celo Gold to vote for another Group.
+
+## Unlocking and Withdrawing
+
+At some point, the terms of your `ReleaseGold` contract will allow you to withdraw funds and transfer them to your beneficiary address.
+
+There are actually several steps to this process:
+
+1. First, revoke all outstanding votes as above (including for governance proposals)
+2. Unlock the non-voting Locked Gold, starting a 72 hour unlocking period
+3. After the three day unlocking period is complete, withdraw the Celo Gold back to the `ReleaseGold` contract
+4. Assuming vesting and distribution requirements are met, withdraw the Celo Gold to the beneficiary address
+
+Check the current status of outstanding votes:
+
+```bash
+celocli election:show $CELO_RG_ADDRESS --voter
+```
+
+You can view the balance of locked Celo Gold:
+
+```bash
+celocli account:balance $CELO_RG_ADDRESS
+```
+
+{% hint style="info" %}
+Connect your **Beneficiary Ledger** now, unlock it, and open the Celo application.
+{% endhint %}
+
+Assuming you have non-voting Locked Gold, you can initiate the process to unlock:
+
+```bash
+# Using the Beneficiary Ledger
+celocli releasegold:locked-gold --contract $CELO_RG_ADDRESS --action unlock  --useLedger --value <CELO-GOLD-AMOUNT>
+```
+
+After the 72 hour unlocking period has passed, withdraw the Celo Gold back to the `ReleaseGold` contract:
+
+```bash
+# Using the Beneficiary Ledger
+celocli releasegold:locked-gold --contract $CELO_RG_ADDRESS --action withdraw  --useLedger --value <CELO-GOLD-AMOUNT>
+```
+
+Finally, request that the `ReleaseGold` contract transfer an amount to your beneficiary address:
+
+```bash
+# Using the Beneficiary Ledger
+celocli releasegold:withdraw --contract $CELO_RG_ADDRESS --useLedger --value <CELO-GOLD-AMOUNT>
+```
+
+To vote with any Celo Gold in your beneficiary account, you'll want to register it as a Locked Gold Acccount, authorize a new vote signing key for it, then lock Celo Gold.

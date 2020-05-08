@@ -38,7 +38,7 @@ const stones: Milestone[] = [
   },
   {
     key: 'Validator_Elections_Start',
-    status: Status.unstarted,
+    status: Status.inprogress,
   },
   {
     key: 'Rewards_Activated',

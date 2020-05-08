@@ -12,7 +12,7 @@ import { addStandbyTransaction, removeStandbyTransaction } from 'src/transaction
 import { TransactionStatus } from 'src/transactions/reducer'
 import { sendAndMonitorTransaction } from 'src/transactions/saga'
 import Logger from 'src/utils/Logger'
-import { getContractKit } from 'src/web3/contracts'
+import { getContractKitOutsideGenerator } from 'src/web3/contracts'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
 import * as utf8 from 'utf8'
 
@@ -24,30 +24,30 @@ const contractWeiPerUnit: { [key in CURRENCY_ENUM]: BigNumber | null } = {
   [CURRENCY_ENUM.DOLLAR]: null,
 }
 
-async function getWeiPerUnit(token: CURRENCY_ENUM) {
+function* getWeiPerUnit(token: CURRENCY_ENUM) {
   let weiPerUnit = contractWeiPerUnit[token]
   if (!weiPerUnit) {
-    const contract = await getTokenContract(token)
-    const decimals = await contract.decimals()
+    const contract = yield call(getTokenContract, token)
+    const decimals = yield call(contract.decimals)
     weiPerUnit = new BigNumber(10).pow(decimals)
     contractWeiPerUnit[token] = weiPerUnit
   }
   return weiPerUnit
 }
 
-export async function convertFromContractDecimals(value: BigNumber, token: CURRENCY_ENUM) {
-  const weiPerUnit = await getWeiPerUnit(token)
+export function* convertFromContractDecimals(value: BigNumber, token: CURRENCY_ENUM) {
+  const weiPerUnit = yield call(getWeiPerUnit, token)
   return value.dividedBy(weiPerUnit)
 }
 
-export async function convertToContractDecimals(value: BigNumber, token: CURRENCY_ENUM) {
-  const weiPerUnit = await getWeiPerUnit(token)
+export function* convertToContractDecimals(value: BigNumber, token: CURRENCY_ENUM) {
+  const weiPerUnit = yield call(getWeiPerUnit, token)
   return weiPerUnit.multipliedBy(value)
 }
 
 export async function getTokenContract(token: CURRENCY_ENUM) {
   Logger.debug(TAG + '@getTokenContract', `Fetching contract for ${token}`)
-  const contractKit = getContractKit()
+  const contractKit = await getContractKitOutsideGenerator()
   switch (token) {
     case CURRENCY_ENUM.GOLD:
       return contractKit.contracts.getGoldToken()
@@ -193,7 +193,7 @@ export function tokenTransferFactory({
 }
 
 export async function getCurrencyAddress(currency: CURRENCY_ENUM) {
-  const contractKit = getContractKit()
+  const contractKit = await getContractKitOutsideGenerator()
   switch (currency) {
     case CURRENCY_ENUM.GOLD:
       return contractKit.registry.addressFor(CeloContract.GoldToken)
