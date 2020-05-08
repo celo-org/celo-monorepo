@@ -18,6 +18,8 @@ import { setEducationCompleted as setGoldEducationCompleted } from 'src/goldToke
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import BackupKeyIcon from 'src/icons/BackupKeyIcon'
 import { getVerifiedIcon, homeIcon, inviteFriendsIcon, rewardsAppIcon } from 'src/images/Images'
+import { InviteDetails } from 'src/invite/actions'
+import { inviteesSelector } from 'src/invite/reducer'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import SimpleNotification from 'src/notifications/SimpleNotification'
@@ -38,6 +40,7 @@ interface StateProps {
   outgoingPaymentRequests: PaymentRequest[]
   backupTooLate: boolean
   reclaimableEscrowPayments: EscrowedPayment[]
+  invitees: InviteDetails[]
 }
 
 interface DispatchProps {
@@ -60,6 +63,7 @@ const mapStateToProps = (state: RootState): StateProps => ({
   dismissedGetVerified: state.account.dismissedGetVerified,
   backupTooLate: isBackupTooLate(state),
   reclaimableEscrowPayments: getReclaimableEscrowPayments(state),
+  invitees: inviteesSelector(state),
 })
 
 const mapDispatchToProps = {
@@ -79,10 +83,14 @@ export class NotificationBox extends React.Component<Props, State> {
   }
 
   escrowedPaymentReminderNotification = () => {
-    const { reclaimableEscrowPayments } = this.props
+    const { reclaimableEscrowPayments, invitees } = this.props
     if (reclaimableEscrowPayments && reclaimableEscrowPayments.length) {
       return [
-        <EscrowedPaymentReminderSummaryNotification key={1} payments={reclaimableEscrowPayments} />,
+        <EscrowedPaymentReminderSummaryNotification
+          key={1}
+          payments={reclaimableEscrowPayments}
+          invitees={invitees}
+        />,
       ]
     }
     return []
