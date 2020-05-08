@@ -4,8 +4,6 @@ import { serializeSignature, signMessage } from '@celo/utils/lib/signatureUtils'
 import 'isomorphic-fetch'
 import { getBlindedPhoneNumber } from '../utils'
 
-// Env var should hold service principal credentials
-// https://www.npmjs.com/package/@azure/keyvault-keys
 require('dotenv').config()
 
 const PHONE_NUM_PRIVACY_SERVICE = process.env.PHONE_NUM_PRIVACY_SERVICE_URL
