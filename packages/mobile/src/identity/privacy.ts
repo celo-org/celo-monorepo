@@ -44,6 +44,7 @@ export function* fetchPhoneHashPrivate(e164Number: string) {
       )
       // TODO nav to quota purchase screen
     } else {
+      Logger.error(`${TAG}@fetchPrivatePhoneHash`, 'Unknown error', error)
       throw new Error(ErrorMessages.SALT_FETCH_FAILURE)
     }
   }

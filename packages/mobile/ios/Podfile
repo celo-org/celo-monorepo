@@ -102,8 +102,6 @@ target "celo" do
 
   pod 'Segment-Firebase'
 
-  pod 'react-native-blind-threshold-bls', :path => '../../../node_modules/react-native-blind-threshold-bls'
-
   target "celoTests" do
     inherit! :search_paths
   end
