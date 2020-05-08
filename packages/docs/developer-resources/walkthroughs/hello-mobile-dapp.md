@@ -1,4 +1,4 @@
-# Celo Truffle Box
+# Hello Mobile Dapp
 
 This tutorial includes a walk through of a truffle box to get you started with developing React Native dapps on Celo. We will touch on several key concepts in Celo dapp development including:
  - Creating accounts (private keys)
