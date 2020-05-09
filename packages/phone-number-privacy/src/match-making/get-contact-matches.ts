@@ -15,17 +15,14 @@ export async function handleGetContactMatches(request: Request, response: Respon
       return
     }
     if (!authenticateUser(request)) {
-      logger.warn(ErrorMessages.UNAUTHENTICATED_USER)
       respondWithError(response, 401, ErrorMessages.UNAUTHENTICATED_USER)
       return
     }
     if (!(await isVerified(request.body.account, request.body.userPhoneNumber))) {
-      logger.warn(ErrorMessages.UNVERIFIED_USER_ATTEMPT_TO_MATCHMAKE)
       respondWithError(response, 403, ErrorMessages.UNVERIFIED_USER_ATTEMPT_TO_MATCHMAKE)
       return
     }
     if (await getDidMatchmaking(request.body.account)) {
-      logger.warn(ErrorMessages.DUPLICATE_REQUEST_TO_MATCHMAKE)
       respondWithError(response, 403, ErrorMessages.DUPLICATE_REQUEST_TO_MATCHMAKE)
       return
     }

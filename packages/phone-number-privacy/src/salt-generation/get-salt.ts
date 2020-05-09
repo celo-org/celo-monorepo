@@ -14,7 +14,6 @@ export async function handleGetBlindedMessageForSalt(request: Request, response:
       return
     }
     if (!authenticateUser(request)) {
-      logger.warn(ErrorMessages.UNAUTHENTICATED_USER)
       respondWithError(response, 401, ErrorMessages.UNAUTHENTICATED_USER)
       return
     }
