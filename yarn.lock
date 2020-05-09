@@ -26534,9 +26534,9 @@ react-native-autocomplete-input@^4.1.0:
     react-native-secure-randombytes "^2.2.3"
     unorm "^1.3.3"
 
-"react-native-blind-threshold-bls@https://github.com/celo-org/react-native-blind-threshold-bls#a06682d":
+"react-native-blind-threshold-bls@https://github.com/celo-org/react-native-blind-threshold-bls#1c8bc82":
   version "1.0.0"
-  resolved "https://github.com/celo-org/react-native-blind-threshold-bls#a06682da3dca79b04614feb81faf91e62961a33d"
+  resolved "https://github.com/celo-org/react-native-blind-threshold-bls#1c8bc829fdc549d3b0ad76b9675518c9592d68ab"
 
 react-native-camera@^3.23.1:
   version "3.23.1"
