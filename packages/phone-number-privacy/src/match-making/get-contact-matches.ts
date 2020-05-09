@@ -1,5 +1,6 @@
 import { isValidAddress } from '@celo/utils/lib/address'
 import { Request, Response } from 'firebase-functions'
+import { REASONABLE_BODY_CHAR_LIMIT } from '../common/constants'
 import { ErrorMessages, respondWithError } from '../common/error-utils'
 import { authenticateUser, isVerified } from '../common/identity'
 import logger from '../common/logger'
@@ -48,12 +49,15 @@ function isValidGetContactMatchesInput(requestBody: any): boolean {
   return (
     hasValidAccountParam(requestBody) &&
     hasValidUserPhoneNumberParam(requestBody) &&
-    hasValidContractPhoneNumbersParam(requestBody)
+    hasValidContractPhoneNumbersParam(requestBody) &&
+    isBodyReasonablySized(requestBody)
   )
 }
 
 function hasValidAccountParam(requestBody: any): boolean {
-  return requestBody.account && isValidAddress(requestBody.account)
+  return (
+    requestBody.account && isValidAddress(requestBody.account) && isBodyReasonablySized(requestBody)
+  )
 }
 
 function hasValidUserPhoneNumberParam(requestBody: any): boolean {
@@ -62,4 +66,8 @@ function hasValidUserPhoneNumberParam(requestBody: any): boolean {
 
 function hasValidContractPhoneNumbersParam(requestBody: any): boolean {
   return requestBody.contactPhoneNumbers && Array.isArray(requestBody.contactPhoneNumbers)
+}
+
+function isBodyReasonablySized(requestBody: any): boolean {
+  return JSON.stringify(requestBody).length <= REASONABLE_BODY_CHAR_LIMIT
 }

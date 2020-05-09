@@ -1,7 +1,9 @@
+import { newKitFromWeb3 } from '@celo/contractkit'
 import { PhoneNumberUtils } from '@celo/utils'
 import { normalizeAddressWith0x, privateKeyToAddress } from '@celo/utils/lib/address'
 import { serializeSignature, signMessage } from '@celo/utils/lib/signatureUtils'
 import 'isomorphic-fetch'
+import Web3 from 'web3'
 import { getBlindedPhoneNumber } from '../utils'
 
 require('dotenv').config()
@@ -17,6 +19,7 @@ const PHONE_NUMBER = '+15555555555'
 const IDENTIFIER = PhoneNumberUtils.getPhoneHash(PHONE_NUMBER)
 const BLINDING_FACTOR = new Buffer('0IsBvRfkBrkKCIW6HV0/T1zrzjQSe8wRyU3PKojCnww=', 'base64')
 const BLINDED_PHONE_NUMBER = getBlindedPhoneNumber(PHONE_NUMBER, BLINDING_FACTOR)
+const DEFAULT_FORNO_URL = `https://alfajores-forno.celo-testnet.org`
 
 describe('Running against a deployed service', () => {
   describe('Returns status 400 with invalid input', () => {
@@ -32,6 +35,12 @@ describe('Running against a deployed service', () => {
 
     it('With missing blindedQueryPhoneNumber', async () => {
       const response = await postToSignMessage('', PRIVATE_KEY1, ACCOUNT_ADDRESS1)
+      expect(response.status).toBe(400)
+    })
+
+    // TODO: Enable test when blindedQueryPhoneNumber input validation is added
+    xit('With invalid blindedQueryPhoneNumber', async () => {
+      const response = await postToSignMessage('invalid', PRIVATE_KEY1, ACCOUNT_ADDRESS1)
       expect(response.status).toBe(400)
     })
   })
@@ -76,6 +85,12 @@ describe('Running against a deployed service', () => {
     const response = await postToSignMessage(BLINDED_PHONE_NUMBER, PRIVATE_KEY1, ACCOUNT_ADDRESS1)
     expect(response.status).toBe(403)
   })
+
+  xit('Address salt querying succeeds with funded account', async () => {
+    // TODO: Figure out a common way to prefund account to provide quota
+    const response = await postToSignMessage(BLINDED_PHONE_NUMBER, PRIVATE_KEY2, ACCOUNT_ADDRESS2)
+    expect(response.status).toBe(200)
+  })
 })
 
 async function postToSignMessage(
@@ -90,8 +105,10 @@ async function postToSignMessage(
     account,
   })
   if (!authHeader) {
-    const signature = signMessage(body, privateKey, account)
-    authHeader = serializeSignature(signature)
+    const web3 = new Web3(new Web3.providers.HttpProvider(DEFAULT_FORNO_URL))
+    const contractKit = newKitFromWeb3(web3)
+    contractKit.addAccount(privateKey)
+    authHeader = await contractKit.web3.eth.sign(body, account)
   }
 
   const res = await fetch(PHONE_NUM_PRIVACY_SERVICE + SIGN_MESSAGE_ENDPOINT, {

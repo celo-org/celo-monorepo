@@ -55,7 +55,7 @@ export const FAQ_LINK = 'https://celo.org/faq'
 export const FORUM_LINK = 'https://forum.celo.org/c/support'
 export const CELO_SUPPORT_EMAIL_ADDRESS = 'support@celo.org'
 export const DEFAULT_FORNO_URL = `https://${DEFAULT_TESTNET}-forno.celo-testnet.org`
-// TODO configure per envrionment
+// TODO configure per environment
 export const PHONE_NUM_PRIVACY_SERVICE =
   'https://us-central1-celo-phone-number-privacy-stg.cloudfunctions.net'
 export const PHONE_NUM_PRIVACY_PUBLIC_KEY =
