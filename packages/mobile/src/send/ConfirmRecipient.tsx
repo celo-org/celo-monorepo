@@ -36,6 +36,7 @@ interface StateProps {
   fullValidationRequired: boolean
   displayName: string
   startOfSentenceDisplayName: string
+  isPaymentRequest: true | undefined
 }
 
 interface DispatchProps {
@@ -58,6 +59,7 @@ const mapStateToProps = (state: RootState, ownProps: NavigationInjectedProps): S
   const { navigation } = ownProps
   const transactionData = navigation.getParam('transactionData')
   const fullValidationRequired = navigation.getParam('fullValidationRequired')
+  const isPaymentRequest = navigation.getParam('isPaymentRequest')
   const { recipient } = transactionData
   const { displayName, startOfSentenceDisplayName } = formatDisplayName(recipient.displayName)
   return {
@@ -66,6 +68,7 @@ const mapStateToProps = (state: RootState, ownProps: NavigationInjectedProps): S
     fullValidationRequired,
     displayName,
     startOfSentenceDisplayName,
+    isPaymentRequest,
   }
 }
 
@@ -82,11 +85,12 @@ class ConfirmRecipient extends React.Component<Props> {
   }
 
   onPressConfirmAccount = () => {
-    const { fullValidationRequired, transactionData } = this.props
+    const { fullValidationRequired, transactionData, isPaymentRequest } = this.props
 
     navigate(Screens.ConfirmRecipientAccount, {
       transactionData,
       fullValidationRequired,
+      isPaymentRequest,
     })
   }
 

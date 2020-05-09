@@ -39,7 +39,10 @@ import EstimateFee from 'src/fees/EstimateFee'
 import { getFeeEstimateDollars } from 'src/fees/selectors'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
-import { fetchPhoneAddresses, storeRecipientVerificationStatus } from 'src/identity/actions'
+import {
+  fetchPhoneAddressesAndRecipientVerificationStatus,
+  storeRecipientVerificationStatus,
+} from 'src/identity/actions'
 import { RecipientVerificationStatus } from 'src/identity/reducer'
 import { LocalCurrencyCode, LocalCurrencySymbol } from 'src/localCurrency/consts'
 import {
@@ -66,6 +69,7 @@ export interface TransactionData {
   amount: BigNumber
   reason: string
   type: TokenTransactionType
+  firebasePendingRequestUid?: string | null
 }
 
 interface State {
@@ -100,7 +104,7 @@ interface DispatchProps {
   showMessage: typeof showMessage
   showError: typeof showError
   hideAlert: typeof hideAlert
-  fetchPhoneAddresses: typeof fetchPhoneAddresses
+  fetchPhoneAddressesAndRecipientVerificationStatus: typeof fetchPhoneAddressesAndRecipientVerificationStatus
   storeRecipientVerificationStatus: typeof storeRecipientVerificationStatus
 }
 
@@ -141,7 +145,7 @@ const mapDispatchToProps = {
   showError,
   hideAlert,
   showMessage,
-  fetchPhoneAddresses,
+  fetchPhoneAddressesAndRecipientVerificationStatus,
   storeRecipientVerificationStatus,
 }
 
@@ -161,10 +165,10 @@ export class SendAmount extends React.Component<Props, State> {
 
   componentDidMount() {
     this.props.fetchDollarBalance()
-    this.fetchLatestPhoneAddressesAndRecipientVerification()
+    this.fetchLatestPhoneAddressesAndRecipientVerificationStatus()
   }
 
-  fetchLatestPhoneAddressesAndRecipientVerification = () => {
+  fetchLatestPhoneAddressesAndRecipientVerificationStatus = () => {
     const { recipient } = this.props
     if (recipient.kind === RecipientKind.QrCode || recipient.kind === RecipientKind.Address) {
       // Skip phone number fetch for QR codes or Addresses
@@ -176,7 +180,7 @@ export class SendAmount extends React.Component<Props, State> {
       throw new Error('Missing recipient e164Number')
     }
 
-    this.props.fetchPhoneAddresses(recipient.e164PhoneNumber)
+    this.props.fetchPhoneAddressesAndRecipientVerificationStatus(recipient.e164PhoneNumber)
   }
 
   getDollarsAmount = () => {
@@ -268,7 +272,11 @@ export class SendAmount extends React.Component<Props, State> {
     const transactionData = this.getTransactionData(TokenTransactionType.PayRequest)
 
     if (manualAddressValidationRequired) {
-      navigate(Screens.ConfirmRecipient, { transactionData, fullValidationRequired })
+      navigate(Screens.ConfirmRecipient, {
+        transactionData,
+        fullValidationRequired,
+        isPaymentRequest: true,
+      })
     } else {
       CeloAnalytics.track(CustomEventNames.request_payment_continue)
       navigate(Screens.PaymentRequestConfirmation, { transactionData })

@@ -10,10 +10,12 @@ import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import { declinePaymentRequest } from 'src/firebase/actions'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces, withTranslation } from 'src/i18n'
+import { fetchPhoneAddressesAndRecipientVerificationStatus } from 'src/identity/actions'
 import { unknownUserIcon } from 'src/images/Images'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { getRecipientThumbnail, Recipient } from 'src/recipients/recipient'
+import { TransactionData } from 'src/send/SendAmount'
 import Logger from 'src/utils/Logger'
 
 interface OwnProps {
@@ -22,6 +24,9 @@ interface OwnProps {
   comment: string
   id: string
   declinePaymentRequest: typeof declinePaymentRequest
+  fetchPhoneAddressesAndRecipientVerificationStatus: typeof fetchPhoneAddressesAndRecipientVerificationStatus
+  manualAddressValidationRequired: boolean
+  fullValidationRequired: boolean
 }
 
 type Props = OwnProps & WithTranslation
@@ -29,18 +34,44 @@ type Props = OwnProps & WithTranslation
 const AVATAR_SIZE = 40
 
 export class IncomingPaymentRequestListItem extends React.Component<Props> {
+  componentDidMount() {
+    // need to check latest mapping to prevent user from accepting fradulent requests
+    this.fetchLatestPhoneAddressesAndRecipientVerificationStatus()
+  }
+
+  fetchLatestPhoneAddressesAndRecipientVerificationStatus = () => {
+    const { requester: recipient } = this.props
+
+    if (!recipient.e164PhoneNumber) {
+      throw new Error('Missing recipient e164Number')
+    }
+
+    this.props.fetchPhoneAddressesAndRecipientVerificationStatus(recipient.e164PhoneNumber)
+  }
+
   onPay = () => {
-    const { id, amount, comment: reason, requester: recipient } = this.props
-    navigate(Screens.SendConfirmation, {
-      confirmationInput: {
-        reason,
-        recipient,
-        amount: new BigNumber(amount),
-        recipientAddress: recipient.address,
-        type: TokenTransactionType.PayRequest,
-        firebasePendingRequestUid: id,
-      },
-    })
+    const {
+      id,
+      amount,
+      comment: reason,
+      requester: recipient,
+      manualAddressValidationRequired,
+      fullValidationRequired,
+    } = this.props
+
+    const transactionData: TransactionData = {
+      reason,
+      recipient,
+      amount: new BigNumber(amount),
+      type: TokenTransactionType.PayRequest,
+      firebasePendingRequestUid: id,
+    }
+
+    if (manualAddressValidationRequired) {
+      navigate(Screens.ConfirmRecipient, { transactionData, fullValidationRequired })
+    } else {
+      navigate(Screens.SendConfirmation, { transactionData })
+    }
   }
 
   onPaymentDecline = () => {

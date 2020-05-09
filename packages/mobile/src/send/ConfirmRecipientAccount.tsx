@@ -35,6 +35,7 @@ interface StateProps {
   fullValidationRequired: boolean
   isValidRecipient: boolean
   isValidatingRecipient: boolean
+  isPaymentRequest: true | undefined
 }
 
 interface State {
@@ -53,6 +54,7 @@ const mapDispatchToProps = {
 const mapStateToProps = (state: RootState, ownProps: NavigationInjectedProps): StateProps => {
   const { navigation } = ownProps
   const transactionData = navigation.getParam('transactionData')
+  const isPaymentRequest = navigation.getParam('isPaymentRequest')
   const { recipient } = transactionData
   return {
     recipient,
@@ -60,6 +62,7 @@ const mapStateToProps = (state: RootState, ownProps: NavigationInjectedProps): S
     fullValidationRequired: navigation.getParam('fullValidationRequired'),
     isValidRecipient: state.send.isValidRecipient,
     isValidatingRecipient: state.send.isValidatingRecipient,
+    isPaymentRequest,
   }
 }
 
@@ -77,9 +80,13 @@ export class ConfirmRecipientAccount extends React.Component<Props, State> {
   }
 
   componentDidUpdate = async () => {
-    if (this.props.isValidRecipient) {
-      // OPEN QUESTION: what's the best way to trigger a success animation before navigating to next screen?
-      navigate(Screens.SendConfirmation, { transactionData: this.props.transactionData })
+    const { isValidRecipient, isPaymentRequest, transactionData } = this.props
+    if (isValidRecipient) {
+      if (isPaymentRequest) {
+        navigate(Screens.PaymentRequestConfirmation, { transactionData })
+      } else {
+        navigate(Screens.SendConfirmation, { transactionData })
+      }
     }
   }
 

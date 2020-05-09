@@ -12,14 +12,13 @@ import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import {
   endImportContacts,
-  FetchPhoneAddressesAction,
+  FetchPhoneAddressesAndRecipientVerificationStatusAction,
   storeRecipientVerificationStatus,
   updateE164PhoneNumberAddresses,
 } from 'src/identity/actions'
 import { fetchPhoneHashPrivate, PhoneNumberHashDetails } from 'src/identity/privacy'
 import {
   AddressToE164NumberType,
-  e164NumberToAddressSelector,
   E164NumberToAddressType,
   RecipientVerificationStatus,
 } from 'src/identity/reducer'
@@ -104,7 +103,7 @@ function* updateRecipientsCache(
 }
 
 // Given addresses can be added and deleted we can't rely on changes in length to signal address changes
-// Not sure if order is guaranteed to be consistent so not assuming it
+// Not sure if address order im array is consistent so not assuming it
 const checkIfItemsOfChildArrAreSubsetOfParentArr = (parentArr: string[], childArr: string[]) => {
   const parentArrSorted = parentArr.sort()
   const childArrSorted = childArr.sort()
@@ -118,21 +117,14 @@ const checkIfItemsOfChildArrAreSubsetOfParentArr = (parentArr: string[], childAr
   return true
 }
 
-const checkIfValidationNeeded = (
+const checkIfNewAddressesAdded = (
   oldAddresses: string[] | null | undefined,
   newAddresses: string[]
 ) => {
-  // if there are no addresses or only one, no verification needed
-  if (newAddresses.length < 2) {
-    return false
-  }
-
-  // if there are previously stored addresses and no new addresses have been added, no verification needed
   if (oldAddresses && checkIfItemsOfChildArrAreSubsetOfParentArr(oldAddresses, newAddresses)) {
     return false
   }
 
-  // if there are unaccounted for changes, require validation
   return true
 }
 
@@ -143,34 +135,67 @@ const checkIfLast4DigitsAreUnique = (addressArr: string[]) => {
   return last4DigitArr.length === last4DigitSet.size
 }
 
-export function* fetchPhoneAddresses({ e164Number }: FetchPhoneAddressesAction) {
+const checkIfValidationRequired = (
+  oldAddresses: string[] | undefined | null,
+  newAddresses: string[] | null,
+  userAddress: string
+) => {
+  let validationRequired = false
+  let fullValidationRequired = false
+
+  // if there are no addresses or only one, there is no validation needed
+  if (!newAddresses || newAddresses.length < 2) {
+    return { validationRequired, fullValidationRequired }
+  }
+
+  if (checkIfNewAddressesAdded(oldAddresses, newAddresses)) {
+    Logger.debug(
+      TAG + '@fetchPhoneAddressesAndRecipientVerificationStatus',
+      `Address needs to be validated by user`
+    )
+    validationRequired = true
+
+    // Adding user's address so they don't mistakenly verify with last 4 digits of their own address
+    fullValidationRequired = !checkIfLast4DigitsAreUnique([userAddress, ...newAddresses])
+  }
+
+  return { validationRequired, fullValidationRequired }
+}
+
+export function* fetchPhoneAddressesAndRecipientVerificationStatus({
+  e164Number,
+}: FetchPhoneAddressesAndRecipientVerificationStatusAction) {
   try {
-    Logger.debug(TAG + '@fetchPhoneAddresses', `Fetching addresses for number`)
-    const oldE164NumberToAddress = yield select(e164NumberToAddressSelector)
-    const oldAddresses = oldE164NumberToAddress[e164Number]
-      ? [...oldE164NumberToAddress[e164Number]]
-      : oldE164NumberToAddress[e164Number]
-    // const oldAddresses = [
-    //   '0xf1b1d5a6e7728a309c4a025b122d71ad75a61976',
-    //   '0x4ee307e8bdcaa2695b49cd6af380ac70914c7c78',
-    // ]
+    Logger.debug(
+      TAG + '@fetchPhoneAddressesAndRecipientVerificationStatus',
+      `Fetching addresses for number`
+    )
+    // const oldE164NumberToAddress = yield select(e164NumberToAddressSelector)
+    // const oldAddresses = oldE164NumberToAddress[e164Number]
+    //   ? [...oldE164NumberToAddress[e164Number]]
+    //   : oldE164NumberToAddress[e164Number]
+    const oldAddresses = [
+      '0xf1b1d5a6e7728a309c4a025b122d71ad75a61976',
+      // '0x4ee307e8bdcaa2695b49cd6af380ac70914c7c78',
+    ]
 
     // Clear existing entries for those numbers so our mapping consumers know new status is pending.
-    Logger.debug(TAG + '@fetchPhoneAddresses', `Wiping current address mappings`)
     yield put(updateE164PhoneNumberAddresses({ [e164Number]: undefined }, {}))
 
-    Logger.debug(TAG + '@fetchPhoneAddresses', `Getting new addresses for ${e164Number}`)
-    const addresses: string[] | null = yield call(getAddresses, e164Number)
-    // const addresses = [
-    //   '0xf1b1d5a6e7728a309c4a025b122d71ad75a61976',
-    //   '0x4ee307e8bdcaa2695b49cd6af380ac70914c7c78',
-    // ]
+    // const addresses: string[] | null = yield call(getAddresses, e164Number)
+    const addresses = [
+      '0xf1b1d5a6e7728a309c4a025b122d71ad75a61976',
+      '0x4ee307e8bdcaa2695b49cd6af380ac70914c7c78',
+    ]
 
     const e164NumberToAddressUpdates: E164NumberToAddressType = {}
     const addressToE164NumberUpdates: AddressToE164NumberType = {}
 
     if (!addresses) {
-      Logger.debug(TAG + '@fetchPhoneAddresses', `No addresses for number`)
+      Logger.debug(
+        TAG + '@fetchPhoneAddressesAndRecipientVerificationStatus',
+        `No addresses for number`
+      )
       // Save invalid/0 addresses to avoid checking again
       // null means a contact is unverified, whereas undefined means we haven't checked yet
       e164NumberToAddressUpdates[e164Number] = null
@@ -179,17 +204,12 @@ export function* fetchPhoneAddresses({ e164Number }: FetchPhoneAddressesAction) 
       addresses.map((a) => (addressToE164NumberUpdates[a] = e164Number))
     }
 
-    let validationRequired = false
-    let fullValidationRequired = false
-
-    if (addresses && checkIfValidationNeeded(oldAddresses, addresses)) {
-      Logger.debug(TAG + '@fetchPhoneAddresses', `Address needs to be validated by user`)
-      validationRequired = true
-      const userAddress = yield select(userAddressSelector)
-      // Adding user's own address into the mix to make sure they don't mistakenly verify
-      // with the last 4 digits of their own address
-      fullValidationRequired = !checkIfLast4DigitsAreUnique([userAddress, ...addresses])
-    }
+    const userAddress = yield select(userAddressSelector)
+    const { validationRequired, fullValidationRequired } = checkIfValidationRequired(
+      oldAddresses,
+      addresses,
+      userAddress
+    )
 
     yield put(manualAddressValidationRequired(validationRequired, fullValidationRequired))
 
@@ -203,7 +223,11 @@ export function* fetchPhoneAddresses({ e164Number }: FetchPhoneAddressesAction) 
       updateE164PhoneNumberAddresses(e164NumberToAddressUpdates, addressToE164NumberUpdates)
     )
   } catch (error) {
-    Logger.error(TAG + '@fetchPhoneAddresses', `Error fetching addresses`, error)
+    Logger.error(
+      TAG + '@fetchPhoneAddressesAndRecipientVerificationStatus',
+      `Error fetching addresses`,
+      error
+    )
     yield put(showError(ErrorMessages.ADDRESS_LOOKUP_FAILURE))
   }
 }

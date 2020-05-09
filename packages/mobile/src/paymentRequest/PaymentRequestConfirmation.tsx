@@ -2,7 +2,6 @@ import ReviewFrame from '@celo/react-components/components/ReviewFrame'
 import ReviewHeader from '@celo/react-components/components/ReviewHeader'
 import colors from '@celo/react-components/styles/colors'
 import { CURRENCY_ENUM } from '@celo/utils/src/currencies'
-import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { StyleSheet } from 'react-native'
@@ -19,8 +18,9 @@ import { currencyToShortMap } from 'src/geth/consts'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { navigateBack } from 'src/navigator/NavigationService'
 import PaymentRequestReviewCard from 'src/paymentRequest/PaymentRequestReviewCard'
-import { Recipient } from 'src/recipients/recipient'
 import { RootState } from 'src/redux/reducers'
+import { ConfirmationInput } from 'src/send/SendConfirmation'
+import { getConfirmationInput } from 'src/send/utils'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import Logger from 'src/utils/Logger'
 import { currentAccountSelector } from 'src/web3/selectors'
@@ -28,16 +28,15 @@ import { currentAccountSelector } from 'src/web3/selectors'
 // @ts-ignore
 const TAG = 'paymentRequest/confirmation'
 
-export interface ConfirmationInput {
-  recipient: Recipient
-  amount: BigNumber
-  reason: string
-  recipientAddress: string
-}
+type Navigation = NavigationInjectedProps['navigation']
 
+interface OwnProps {
+  navigation: Navigation
+}
 interface StateProps {
   e164PhoneNumber: string
   account: string | null
+  confirmationInput: ConfirmationInput
 }
 
 interface DispatchProps {
@@ -47,8 +46,18 @@ interface DispatchProps {
 
 const mapDispatchToProps = { showError, writePaymentRequest }
 
-const mapStateToProps = (state: RootState): StateProps => {
+const mapStateToProps = (state: RootState, ownProps: NavigationInjectedProps): StateProps => {
+  const { navigation } = ownProps
+  const transactionData = navigation.getParam('transactionData')
+  const { e164NumberToAddress } = state.identity
+  const { manuallyValidatedE164NumberToAddress } = state.send
+  const confirmationInput = getConfirmationInput(
+    transactionData,
+    e164NumberToAddress,
+    manuallyValidatedE164NumberToAddress
+  )
   return {
+    confirmationInput,
     e164PhoneNumber: state.account.e164PhoneNumber,
     account: currentAccountSelector(state),
   }
@@ -59,21 +68,13 @@ type Props = NavigationInjectedProps & DispatchProps & StateProps & WithTranslat
 class PaymentRequestConfirmation extends React.Component<Props> {
   static navigationOptions = { header: null }
 
-  getConfirmationInput(): ConfirmationInput {
-    const confirmationInput = this.props.navigation.getParam('confirmationInput', '')
-    if (confirmationInput === '') {
-      throw new Error('Confirmation input missing')
-    }
-    return confirmationInput
-  }
-
   onConfirm = async () => {
     const {
       amount,
       reason,
       recipient,
       recipientAddress: requesteeAddress,
-    } = this.getConfirmationInput()
+    } = this.props.confirmationInput
 
     CeloAnalytics.track(CustomEventNames.request_payment_request, {
       requesteeAddress,
@@ -121,7 +122,7 @@ class PaymentRequestConfirmation extends React.Component<Props> {
       reason,
       recipient,
       recipientAddress: requesteeAddress,
-    } = this.getConfirmationInput()
+    } = this.props.confirmationInput
 
     return (
       <SafeAreaView style={styles.container}>
@@ -158,7 +159,7 @@ const styles = StyleSheet.create({
 })
 
 export default componentWithAnalytics(
-  connect<StateProps, DispatchProps, {}, RootState>(
+  connect<StateProps, DispatchProps, OwnProps, RootState>(
     mapStateToProps,
     mapDispatchToProps
   )(withTranslation(Namespaces.sendFlow7)(PaymentRequestConfirmation))
