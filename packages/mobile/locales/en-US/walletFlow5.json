@@ -54,7 +54,9 @@
   "refreshBalances": "Refresh Balances",
   "escrowedPaymentReminder": "Pending Invitations",
   "escrowedPaymentReminderSms":
-    "A friendly reminder that you haven't yet redeemed your Celo Dollars!",
+    "A friendly reminder that you haven't yet redeemed your Celo Dollars! Go to {{link}} and enter your code to get started: {{code}}",
+  "escrowedPaymentReminderSmsNoData":
+    "A friendly reminder that you haven't yet redeemed your Celo Dollars! Download the mobile app to get started!",
   "testnetAlert": {
     "0": "{{testnet}}",
     "1":

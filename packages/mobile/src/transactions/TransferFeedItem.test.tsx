@@ -11,15 +11,13 @@ import {
   mockAccount2,
   mockAddressToE164Number,
   mockComment,
-  mockE164Number,
+  mockInviteDetails,
+  mockInviteDetails2,
   mockPrivateDEK,
   mockPrivateDEK2,
   mockRecipientCache,
 } from 'test/values'
 
-const invitee = {
-  [mockAccount]: mockE164Number,
-}
 // Mock encrypted comment from account 1 to account 2.
 // Generated with `encryptComment(mockComment, Buffer.from(mockPublicDEK2, 'hex'), Buffer.from(mockPublicDEK, 'hex')).comment` from '@celo/utils'
 const encryptedMockComment =
@@ -37,7 +35,6 @@ describe('transfer feed item renders correctly', () => {
           hash={'0x'}
           amount={{ value: '-1', currencyCode: 'cUSD', localAmount: null }}
           address={mockAccount}
-          invitees={{}}
           timestamp={1}
           commentKey={null}
           addressToE164Number={{}}
@@ -59,7 +56,6 @@ describe('transfer feed item renders correctly', () => {
           hash={'0x'}
           amount={{ value: '-1', currencyCode: 'cUSD', localAmount: null }}
           address={mockAccount2}
-          invitees={{}}
           timestamp={1}
           commentKey={mockPrivateDEK}
           addressToE164Number={{}}
@@ -81,7 +77,6 @@ describe('transfer feed item renders correctly', () => {
           hash={'0x'}
           amount={{ value: '100', currencyCode: 'cUSD', localAmount: null }}
           address={mockAccount}
-          invitees={{}}
           timestamp={1}
           commentKey={mockPrivateDEK2}
           addressToE164Number={{}}
@@ -103,7 +98,6 @@ describe('transfer feed item renders correctly', () => {
           hash={'0x'}
           amount={{ value: '-0.33', currencyCode: 'cUSD', localAmount: null }}
           address={mockAccount}
-          invitees={{}}
           timestamp={1}
           commentKey={null}
           addressToE164Number={{}}
@@ -125,7 +119,6 @@ describe('transfer feed item renders correctly', () => {
           hash={'0x'}
           amount={{ value: '-0.002', currencyCode: 'cUSD', localAmount: null }}
           address={mockAccount}
-          invitees={{}}
           timestamp={1}
           commentKey={null}
           addressToE164Number={{}}
@@ -147,7 +140,6 @@ describe('transfer feed item renders correctly', () => {
           hash={'0x'}
           amount={{ value: '-0.0000002', currencyCode: 'cUSD', localAmount: null }}
           address={mockAccount}
-          invitees={{}}
           timestamp={1}
           commentKey={null}
           addressToE164Number={{}}
@@ -169,7 +161,6 @@ describe('transfer feed item renders correctly', () => {
           hash={'0x'}
           amount={{ value: '1', currencyCode: 'cUSD', localAmount: null }}
           address={mockAccount}
-          invitees={{}}
           timestamp={1}
           commentKey={null}
           addressToE164Number={{}}
@@ -191,7 +182,6 @@ describe('transfer feed item renders correctly', () => {
           hash={'0x'}
           amount={{ value: '100', currencyCode: 'cUSD', localAmount: null }}
           address={mockAccount}
-          invitees={{}}
           timestamp={1}
           commentKey={null}
           addressToE164Number={{}}
@@ -212,8 +202,7 @@ describe('transfer feed item renders correctly', () => {
           type={TokenTransactionType.InviteSent}
           hash={'0x'}
           amount={{ value: '-1', currencyCode: 'cUSD', localAmount: null }}
-          address={mockAccount}
-          invitees={invitee}
+          address={mockInviteDetails.e164Number}
           timestamp={1}
           commentKey={null}
           addressToE164Number={{}}
@@ -234,8 +223,7 @@ describe('transfer feed item renders correctly', () => {
           type={TokenTransactionType.InviteReceived}
           hash={'0x'}
           amount={{ value: '1', currencyCode: 'cUSD', localAmount: null }}
-          address={mockAccount}
-          invitees={invitee}
+          address={mockInviteDetails2.e164Number}
           timestamp={1}
           commentKey={null}
           addressToE164Number={{}}
@@ -257,7 +245,6 @@ describe('transfer feed item renders correctly', () => {
           hash={'0x'}
           amount={{ value: '100', currencyCode: 'cUSD', localAmount: null }}
           address={mockAccount}
-          invitees={{}}
           timestamp={1}
           commentKey={null}
           addressToE164Number={{}}
@@ -279,7 +266,6 @@ describe('transfer feed item renders correctly', () => {
           hash={'0x'}
           amount={{ value: '100', currencyCode: 'cUSD', localAmount: null }}
           address={mockAccount}
-          invitees={{}}
           timestamp={1}
           commentKey={null}
           addressToE164Number={mockAddressToE164Number}
@@ -301,7 +287,6 @@ describe('transfer feed item renders correctly', () => {
           hash={'0x'}
           amount={{ value: '-100', currencyCode: 'cUSD', localAmount: null }}
           address={mockAccount}
-          invitees={{}}
           timestamp={1}
           commentKey={null}
           addressToE164Number={{}}
@@ -323,7 +308,6 @@ describe('transfer feed item renders correctly', () => {
           hash={'0x'}
           amount={{ value: '-100', currencyCode: 'cUSD', localAmount: null }}
           address={mockAccount}
-          invitees={{}}
           timestamp={1}
           commentKey={null}
           addressToE164Number={mockAddressToE164Number}
