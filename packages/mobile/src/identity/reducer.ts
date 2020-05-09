@@ -1,5 +1,5 @@
 import { RehydrateAction } from 'redux-persist'
-import { Actions, ActionTypes, RecipientVerificationStatus } from 'src/identity/actions'
+import { Actions, ActionTypes } from 'src/identity/actions'
 import { AttestationCode, VerificationStatus } from 'src/identity/verification'
 import { getRehydratePayload, REHYDRATE } from 'src/redux/persist-helper'
 import { RootState } from 'src/redux/reducers'
@@ -7,9 +7,12 @@ import { RootState } from 'src/redux/reducers'
 export const ATTESTATION_CODE_PLACEHOLDER = 'ATTESTATION_CODE_PLACEHOLDER'
 export const ATTESTATION_ISSUER_PLACEHOLDER = 'ATTESTATION_ISSUER_PLACEHOLDER'
 
-// TODO currently treating addresses to e164Number as 1:1 but
-// there are rare cases where an address could have two numbers mapped to it.
-// E.g. user imported backup phrase onto second phone and then verified again with a new number
+export enum RecipientVerificationStatus {
+  UNVERIFIED = 0,
+  VERIFIED = 1,
+  UNKNOWN = 2,
+}
+
 export interface AddressToE164NumberType {
   [address: string]: string | null
 }

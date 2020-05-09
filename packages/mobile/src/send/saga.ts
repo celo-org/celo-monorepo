@@ -77,7 +77,7 @@ export function* watchQrCodeDetections() {
         recipientCache,
         e164NumberToAddress,
         action.scanIsForSecureSend,
-        action.confirmationInput
+        action.transactionData
       )
     } catch (error) {
       Logger.error(TAG, 'Error handling the barcode', error)
@@ -146,6 +146,11 @@ function* sendPaymentOrInviteSaga({
   inviteMethod,
   firebasePendingRequestUid,
 }: SendPaymentOrInviteAction) {
+  Logger.debug(
+    `================ ${amount} ${typeof amount}| ${
+      recipient.e164PhoneNumber
+    } | ${recipientAddress} | ${inviteMethod}`
+  )
   try {
     recipientAddress
       ? CeloAnalytics.track(CustomEventNames.send_dollar_confirm)

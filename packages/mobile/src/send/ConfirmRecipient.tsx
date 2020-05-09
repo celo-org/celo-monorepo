@@ -19,7 +19,7 @@ import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { getRecipientThumbnail, Recipient } from 'src/recipients/recipient'
 import { RootState } from 'src/redux/reducers'
-import { ConfirmationInput } from 'src/send/SendConfirmation'
+import { TransactionData } from 'src/send/SendAmount'
 
 const AVATAR_SIZE = 120
 const QR_ICON_SIZE = 24
@@ -32,7 +32,7 @@ interface OwnProps {
 
 interface StateProps {
   recipient: Recipient
-  confirmationInput: ConfirmationInput
+  transactionData: TransactionData
   fullValidationRequired: boolean
   displayName: string
   startOfSentenceDisplayName: string
@@ -56,13 +56,13 @@ const formatDisplayName = (displayName: string) => {
 
 const mapStateToProps = (state: RootState, ownProps: NavigationInjectedProps): StateProps => {
   const { navigation } = ownProps
-  const confirmationInput = navigation.getParam('confirmationInput')
+  const transactionData = navigation.getParam('transactionData')
   const fullValidationRequired = navigation.getParam('fullValidationRequired')
-  const { recipient } = confirmationInput
+  const { recipient } = transactionData
   const { displayName, startOfSentenceDisplayName } = formatDisplayName(recipient.displayName)
   return {
     recipient,
-    confirmationInput,
+    transactionData,
     fullValidationRequired,
     displayName,
     startOfSentenceDisplayName,
@@ -76,16 +76,16 @@ class ConfirmRecipient extends React.Component<Props> {
 
   onPressScanCode = () => {
     navigate(Screens.QRScanner, {
-      confirmationInput: this.props.confirmationInput,
+      transactionData: this.props.transactionData,
       scanIsForSecureSend: true,
     })
   }
 
   onPressConfirmAccount = () => {
-    const { fullValidationRequired, confirmationInput } = this.props
+    const { fullValidationRequired, transactionData } = this.props
 
     navigate(Screens.ConfirmRecipientAccount, {
-      confirmationInput,
+      transactionData,
       fullValidationRequired,
     })
   }

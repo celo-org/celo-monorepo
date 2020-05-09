@@ -2,7 +2,7 @@ import { E164Number } from '@celo/utils/lib/io'
 import BigNumber from 'bignumber.js'
 import { InviteBy } from 'src/invite/actions'
 import { Recipient } from 'src/recipients/recipient'
-import { ConfirmationInput } from 'src/send/SendConfirmation'
+import { TransactionData } from 'src/send/SendAmount'
 import { Svg } from 'svgs'
 
 export interface QrCode {
@@ -67,6 +67,7 @@ export interface ValidateRecipientAddressFailureAction {
 
 export interface ManualAddressValidationRequiredAction {
   type: Actions.MANUAL_ADDRESS_VALIDATION_REQUIRED
+  validationRequired: boolean
   fullValidationRequired: boolean
 }
 
@@ -88,12 +89,12 @@ export const storeLatestInRecents = (recipient: Recipient): StoreLatestInRecents
 export const handleBarcodeDetected = (
   data: QrCode,
   scanIsForSecureSend?: true,
-  confirmationInput?: ConfirmationInput
+  transactionData?: TransactionData
 ) => ({
   type: Actions.BARCODE_DETECTED,
   data,
   scanIsForSecureSend,
-  confirmationInput,
+  transactionData,
 })
 
 export const shareQRCode = (qrCodeSvg: SVG) => ({
@@ -151,8 +152,10 @@ export const validateRecipientAddressFailure = (): ValidateRecipientAddressFailu
 })
 
 export const manualAddressValidationRequired = (
+  validationRequired: boolean,
   fullValidationRequired: boolean
 ): ManualAddressValidationRequiredAction => ({
   type: Actions.MANUAL_ADDRESS_VALIDATION_REQUIRED,
+  validationRequired,
   fullValidationRequired,
 })

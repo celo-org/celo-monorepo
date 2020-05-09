@@ -15,9 +15,6 @@ import { USE_PHONE_NUMBER_PRIVACY } from 'src/config'
 import {
   endImportContacts,
   FetchPhoneAddressesAction,
-  GetAddressFromPhoneNumberAction,
-  GetRecipientVerificationStatusAction,
-  RecipientVerificationStatus,
   storeRecipientVerificationStatus,
   updateE164PhoneNumberAddresses,
 } from 'src/identity/actions'
@@ -26,11 +23,12 @@ import {
   AddressToE164NumberType,
   e164NumberToAddressSelector,
   E164NumberToAddressType,
+  RecipientVerificationStatus,
 } from 'src/identity/reducer'
 import { setRecipientCache } from 'src/recipients/actions'
-import { contactsToRecipients, NumberToRecipient, RecipientKind } from 'src/recipients/recipient'
+import { contactsToRecipients, NumberToRecipient } from 'src/recipients/recipient'
 import { manualAddressValidationRequired } from 'src/send/actions'
-import { manuallyValidatedE164NumberToAddressSelector } from 'src/send/reducers'
+import { ManuallyValidatedE164NumberToAddress } from 'src/send/reducers'
 import { getAllContacts } from 'src/utils/contacts'
 import Logger from 'src/utils/Logger'
 import { checkContactsPermission } from 'src/utils/permissions'
@@ -150,33 +148,25 @@ const checkIfLast4DigitsAreUnique = (addressArr: string[]) => {
 export function* fetchPhoneAddresses({ e164Number }: FetchPhoneAddressesAction) {
   try {
     Logger.debug(TAG + '@fetchPhoneAddresses', `Fetching addresses for number`)
-    // const oldE164NumberToAddress = yield select(e164NumberToAddressSelector)
-    // const oldAddresses = oldE164NumberToAddress[e164Number]
-    //   ? [...oldE164NumberToAddress[e164Number]]
-    //   : oldE164NumberToAddress[e164Number]
-    const oldAddresses = ['0xf1b1d5a6e7728a309c4a025b122d71ad75a61976']
+    const oldE164NumberToAddress = yield select(e164NumberToAddressSelector)
+    const oldAddresses = oldE164NumberToAddress[e164Number]
+      ? [...oldE164NumberToAddress[e164Number]]
+      : oldE164NumberToAddress[e164Number]
+    // const oldAddresses = [
+    //   '0xf1b1d5a6e7728a309c4a025b122d71ad75a61976',
+    //   '0x4ee307e8bdcaa2695b49cd6af380ac70914c7c78',
+    // ]
 
-    // Clear existing entries for those numbers so our mapping consumers
-    // know new status is pending.
+    // Clear existing entries for those numbers so our mapping consumers know new status is pending.
     Logger.debug(TAG + '@fetchPhoneAddresses', `Wiping current address mappings`)
     yield put(updateE164PhoneNumberAddresses({ [e164Number]: undefined }, {}))
 
-    const contractKit = yield call(getContractKit)
-    const attestationsWrapper: AttestationsWrapper = yield call([
-      contractKit.contracts,
-      contractKit.contracts.getAttestations,
-    ])
-
     Logger.debug(TAG + '@fetchPhoneAddresses', `Getting new addresses for ${e164Number}`)
-    // const addresses: string[] | null = yield call(getAddresses, e164Number, attestationsWrapper)
-    const addresses = [
-      '0xf1b1d5a6e7728a309c4a025b122d71ad75a61976',
-      '0x4ee307e8bdcaa2695b49cd6af380ac70914c7c78',
-    ]
-
-    if (!addresses.length) {
-      throw Error('Array of addresses from Attestations contract was empty')
-    }
+    const addresses: string[] | null = yield call(getAddresses, e164Number)
+    // const addresses = [
+    //   '0xf1b1d5a6e7728a309c4a025b122d71ad75a61976',
+    //   '0x4ee307e8bdcaa2695b49cd6af380ac70914c7c78',
+    // ]
 
     const e164NumberToAddressUpdates: E164NumberToAddressType = {}
     const addressToE164NumberUpdates: AddressToE164NumberType = {}
@@ -191,17 +181,19 @@ export function* fetchPhoneAddresses({ e164Number }: FetchPhoneAddressesAction) 
       addresses.map((a) => (addressToE164NumberUpdates[a] = e164Number))
     }
 
+    let validationRequired = false
+    let fullValidationRequired = false
+
     if (addresses && checkIfValidationNeeded(oldAddresses, addresses)) {
       Logger.debug(TAG + '@fetchPhoneAddresses', `Address needs to be validated by user`)
+      validationRequired = true
       const userAddress = yield select(userAddressSelector)
       // Adding user's own address into the mix to make sure they don't mistakenly verify
       // with the last 4 digits of their own address
-      const fullValidationRequired: boolean = !checkIfLast4DigitsAreUnique([
-        userAddress,
-        ...addresses,
-      ])
-      yield put(manualAddressValidationRequired(fullValidationRequired))
+      fullValidationRequired = !checkIfLast4DigitsAreUnique([userAddress, ...addresses])
     }
+
+    yield put(manualAddressValidationRequired(validationRequired, fullValidationRequired))
 
     const recipientVerificationStatus = addresses
       ? RecipientVerificationStatus.VERIFIED
@@ -218,8 +210,7 @@ export function* fetchPhoneAddresses({ e164Number }: FetchPhoneAddressesAction) 
   }
 }
 
-function* getAddresses(e164Number: string, attestationsWrapper: AttestationsWrapper) {
-<<<<<<< HEAD
+function* getAddresses(e164Number: string) {
   let phoneHash: string
   if (USE_PHONE_NUMBER_PRIVACY) {
     const phoneHashDetails: PhoneNumberHashDetails = yield call(fetchPhoneHashPrivate, e164Number)
@@ -227,12 +218,12 @@ function* getAddresses(e164Number: string, attestationsWrapper: AttestationsWrap
   } else {
     phoneHash = getPhoneHash(e164Number)
   }
-=======
-  Logger.debug(TAG + '@getAddresses', `Looking up phoneHash for ${e164Number}`)
-  const phoneHashDetails: PhoneNumberHashDetails = yield call(fetchPhoneHashPrivate, e164Number)
-  const phoneHash = phoneHashDetails.phoneHash
-  Logger.debug(TAG + '@getAddresses', `Received phone hash: ${phoneHash}`)
->>>>>>> did more frontend work. still getting the backend error when attempting to fetch numbers for the address
+
+  const contractKit = getContractKit()
+  const attestationsWrapper: AttestationsWrapper = yield call([
+    contractKit.contracts,
+    contractKit.contracts.getAttestations,
+  ])
 
   // Map of identifier -> (Map of address -> AttestationStat)
   const results: IdentifierLookupResult = yield call(
@@ -253,8 +244,11 @@ function* getAddresses(e164Number: string, attestationsWrapper: AttestationsWrap
 const isValidNon0Address = (address: string) =>
   typeof address === 'string' && isValidAddress(address) && !new BigNumber(address).isZero()
 
-export function* getAddressFromPhoneNumber({ e164Number }: GetAddressFromPhoneNumberAction) {
-  const e164NumberToAddress = yield select(e164NumberToAddressSelector)
+export const getAddressFromPhoneNumber = (
+  e164Number: string,
+  e164NumberToAddress: E164NumberToAddressType,
+  manuallyValidatedE164NumberToAddress: ManuallyValidatedE164NumberToAddress
+): string | null | undefined => {
   const addresses = e164NumberToAddress[e164Number]
 
   if (!addresses) {
@@ -267,14 +261,10 @@ export function* getAddressFromPhoneNumber({ e164Number }: GetAddressFromPhoneNu
 
   if (addresses.length > 1) {
     Logger.warn(TAG, 'Number mapped to multiple addresses, need to disambiguate')
-    const manuallyValidatedE164NumberToAddress = yield select(
-      manuallyValidatedE164NumberToAddressSelector
-    )
-
     const validatedAddress = manuallyValidatedE164NumberToAddress[e164Number]
     if (!validatedAddress) {
       throw new Error(
-        'Multiple addresses but none were manually validated. Must go through secure send.'
+        'Multiple addresses but none were manually validated. Should have gone through secure send.'
       )
     }
 
@@ -283,73 +273,3 @@ export function* getAddressFromPhoneNumber({ e164Number }: GetAddressFromPhoneNu
   // Normal verified case, return the first address
   return addresses[0]
 }
-
-export function* getRecipientVerificationStatusSaga({
-  recipient,
-}: GetRecipientVerificationStatusAction) {
-  let recipientVerificationStatus
-  try {
-    if (recipient.kind === RecipientKind.QrCode || recipient.kind === RecipientKind.Address) {
-      // QR codes or Addresses are inherently verified
-      recipientVerificationStatus = RecipientVerificationStatus.VERIFIED
-    } else {
-      const { e164PhoneNumber } = recipient
-
-      if (!e164PhoneNumber) {
-        throw Error(
-          'Error retrieving phone number from recipient object. This should never happen.'
-        )
-      }
-
-      const e164NumberToAddress = yield select(e164NumberToAddressSelector)
-      const addresses = e164NumberToAddress[e164PhoneNumber]
-
-      if (addresses === undefined) {
-        // Undefined means the mapping has no entry for that number or the entry has been cleared
-        recipientVerificationStatus = RecipientVerificationStatus.UNKNOWN
-      } else if (addresses === null) {
-        // Null means we have checked and found that number to be unverified
-        recipientVerificationStatus = RecipientVerificationStatus.UNVERIFIED
-      } else {
-        // Otherwise, verified
-        recipientVerificationStatus = RecipientVerificationStatus.VERIFIED
-      }
-    }
-
-    yield put(storeRecipientVerificationStatus(recipientVerificationStatus))
-  } catch (error) {
-    Logger.error(`${TAG}/getRecipientVerificationStatusSaga`, 'Error with recipient data', error)
-    // TODO: this should never happen but make an error message anyways
-    yield put(showError(error.message))
-  }
-}
-
-// export function getRecipientVerificationStatus(
-//   recipient: Recipient,
-//   e164NumberToAddress: E164NumberToAddressType
-// ): RecipientVerificationStatus {
-//   if (recipient.kind === RecipientKind.QrCode || recipient.kind === RecipientKind.Address) {
-//     return RecipientVerificationStatus.VERIFIED
-//   }
-
-//   if (!recipient.e164PhoneNumber) {
-//     throw new Error('No recipient e164Number found')
-//   }
-
-//   return getVerificationStatusFromPhoneNumber(recipient.e164PhoneNumber, e164NumberToAddress)
-// }
-
-// export function getAddressFromRecipient(
-//   recipient: Recipient,
-//   e164NumberToAddress: E164NumberToAddressType
-// ): string | null | undefined {
-//   if (recipient.kind === RecipientKind.QrCode || recipient.kind === RecipientKind.Address) {
-//     return recipient.address
-//   }
-
-//   if (!recipient.e164PhoneNumber) {
-//     throw new Error('Missing recipient e164Number')
-//   }
-
-//   return getAddressFromPhoneNumber(recipient.e164PhoneNumber, e164NumberToAddress)
-// }

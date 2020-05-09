@@ -83,7 +83,7 @@ export const sendReducer = (
     case Actions.MANUAL_ADDRESS_VALIDATION_REQUIRED:
       return {
         ...state,
-        manualAddressValidationRequired: true,
+        manualAddressValidationRequired: action.validationRequired,
         fullValidationRequired: action.fullValidationRequired,
         isValidatingRecipient: false,
         isValidRecipient: false,

@@ -23,12 +23,16 @@ import CalculateFee, {
 import { getFeeDollars } from 'src/fees/selectors'
 import { completePaymentRequest, declinePaymentRequest } from 'src/firebase/actions'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
+import { getAddressFromPhoneNumber } from 'src/identity/contactMapping'
+import { E164NumberToAddressType } from 'src/identity/reducer'
 import { InviteBy } from 'src/invite/actions'
 import { navigateBack } from 'src/navigator/NavigationService'
-import { Recipient } from 'src/recipients/recipient'
+import { Recipient, RecipientKind } from 'src/recipients/recipient'
 import { RootState } from 'src/redux/reducers'
 import { isAppConnected } from 'src/redux/selectors'
 import { sendPaymentOrInvite } from 'src/send/actions'
+import { ManuallyValidatedE164NumberToAddress } from 'src/send/reducers'
+import { TransactionData } from 'src/send/SendAmount'
 import TransferReviewCard from 'src/send/TransferReviewCard'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { fetchDollarBalance } from 'src/stableToken/actions'
@@ -50,6 +54,13 @@ interface StateProps {
   defaultCountryCode: string
   dollarBalance: string
   appConnected: boolean
+  confirmationInput: ConfirmationInput
+}
+
+type Navigation = NavigationInjectedProps['navigation']
+
+interface OwnProps {
+  navigation: Navigation
 }
 
 interface DispatchProps {
@@ -66,13 +77,48 @@ const mapDispatchToProps = {
   completePaymentRequest,
 }
 
-const mapStateToProps = (state: RootState): StateProps => {
+const getConfirmationInput = (
+  transactionData: TransactionData,
+  e164NumberToAddress: E164NumberToAddressType,
+  manuallyValidatedE164NumberToAddress: ManuallyValidatedE164NumberToAddress
+): ConfirmationInput => {
+  const confirmationInput: ConfirmationInput = transactionData
+  const { recipient } = confirmationInput
+
+  if (recipient.kind === RecipientKind.QrCode || recipient.kind === RecipientKind.Address) {
+    confirmationInput.recipientAddress = recipient.address
+    return confirmationInput
+  }
+
+  if (!recipient.e164PhoneNumber) {
+    throw new Error('Phone number missing')
+  }
+
+  confirmationInput.recipientAddress = getAddressFromPhoneNumber(
+    recipient.e164PhoneNumber,
+    e164NumberToAddress,
+    manuallyValidatedE164NumberToAddress
+  )
+  return confirmationInput
+}
+
+const mapStateToProps = (state: RootState, ownProps: NavigationInjectedProps): StateProps => {
+  const { navigation } = ownProps
+  const transactionData = navigation.getParam('transactionData')
+  const { e164NumberToAddress } = state.identity
+  const { manuallyValidatedE164NumberToAddress } = state.send
+  const confirmationInput = getConfirmationInput(
+    transactionData,
+    e164NumberToAddress,
+    manuallyValidatedE164NumberToAddress
+  )
   return {
     account: currentAccountSelector(state),
     isSending: state.send.isSending,
     defaultCountryCode: state.account.defaultCountryCode,
     dollarBalance: state.stableToken.balance || '0',
     appConnected: isAppConnected(state),
+    confirmationInput,
   }
 }
 
@@ -99,17 +145,8 @@ class SendConfirmation extends React.Component<Props, State> {
     return this.props.navigation.state.params || {}
   }
 
-  getConfirmationInput(): ConfirmationInput {
-    const confirmationInput = this.props.navigation.getParam('confirmationInput', '')
-    if (confirmationInput === '') {
-      throw new Error('Confirmation input missing')
-    }
-    confirmationInput.amount = new BigNumber(confirmationInput.amount)
-    return confirmationInput
-  }
-
   onSendClick = () => {
-    const { recipientAddress } = this.getConfirmationInput()
+    const { recipientAddress } = this.props.confirmationInput
     if (recipientAddress) {
       this.sendOrInvite()
     } else {
@@ -124,7 +161,7 @@ class SendConfirmation extends React.Component<Props, State> {
       recipient,
       recipientAddress,
       firebasePendingRequestUid,
-    } = this.getConfirmationInput()
+    } = this.props.confirmationInput
 
     this.props.sendPaymentOrInvite(
       amount,
@@ -142,7 +179,7 @@ class SendConfirmation extends React.Component<Props, State> {
   }
 
   onCancelClick = () => {
-    const { firebasePendingRequestUid } = this.getConfirmationInput()
+    const { firebasePendingRequestUid } = this.props.confirmationInput
     if (firebasePendingRequestUid) {
       this.props.declinePaymentRequest(firebasePendingRequestUid)
     }
@@ -152,7 +189,7 @@ class SendConfirmation extends React.Component<Props, State> {
 
   renderHeader = () => {
     const { t } = this.props
-    const { type } = this.getConfirmationInput()
+    const { type } = this.props.confirmationInput
     let title
 
     if (type === TokenTransactionType.PayRequest) {
@@ -195,8 +232,8 @@ class SendConfirmation extends React.Component<Props, State> {
   }
 
   renderWithAsyncFee: CalculateFeeChildren = (asyncFee) => {
-    const { t, appConnected, isSending, dollarBalance } = this.props
-    const { amount, reason, recipient, recipientAddress, type } = this.getConfirmationInput()
+    const { t, appConnected, isSending, dollarBalance, confirmationInput } = this.props
+    const { amount, reason, recipient, recipientAddress, type } = confirmationInput
 
     const fee = getFeeDollars(asyncFee.result)
     const amountWithFee = amount.plus(fee || 0)
@@ -272,12 +309,12 @@ class SendConfirmation extends React.Component<Props, State> {
   }
 
   render() {
-    const { account } = this.props
+    const { account, confirmationInput } = this.props
     if (!account) {
       throw Error('Account is required')
     }
 
-    const { amount, reason, recipientAddress } = this.getConfirmationInput()
+    const { amount, reason, recipientAddress } = confirmationInput
 
     const feeProps: CalculateFeeProps = recipientAddress
       ? { feeType: FeeType.SEND, account, recipientAddress, amount, comment: reason }
@@ -309,7 +346,7 @@ const styles = StyleSheet.create({
 })
 
 export default componentWithAnalytics(
-  connect<StateProps, DispatchProps, {}, RootState>(
+  connect<StateProps, DispatchProps, OwnProps, RootState>(
     mapStateToProps,
     mapDispatchToProps
   )(withTranslation(Namespaces.sendFlow7)(SendConfirmation))

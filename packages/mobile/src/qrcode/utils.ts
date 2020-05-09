@@ -20,7 +20,7 @@ import {
   SVG,
   validateRecipientAddressSuccess,
 } from 'src/send/actions'
-import { ConfirmationInput } from 'src/send/SendConfirmation'
+import { TransactionData } from 'src/send/SendAmount'
 import Logger from 'src/utils/Logger'
 
 export enum BarcodeTypes {
@@ -57,7 +57,7 @@ export function* handleBarcode(
   recipientCache: NumberToRecipient,
   e164NumberToAddress: E164NumberToAddressType,
   scanIsForSecureSend?: true,
-  confirmationInput?: ConfirmationInput
+  transactionData?: TransactionData
 ) {
   let data: { address: string; e164PhoneNumber: string; displayName: string } | undefined
 
@@ -77,13 +77,13 @@ export function* handleBarcode(
   }
   try {
     if (scanIsForSecureSend) {
-      if (!confirmationInput) {
+      if (!transactionData) {
         throw Error(
           'Error passing through data: Transaction and recipient information not received'
         )
       }
 
-      const targetRecipient = confirmationInput.recipient
+      const targetRecipient = transactionData.recipient
       if (!targetRecipient.e164PhoneNumber) {
         throw Error('Error passing through data: Phone number not part of recipient data')
       }
@@ -136,7 +136,7 @@ export function* handleBarcode(
   yield put(storeLatestInRecents(recipient))
 
   if (scanIsForSecureSend) {
-    replace(Screens.SendConfirmation, { confirmationInput })
+    replace(Screens.SendConfirmation, { transactionData })
   } else {
     replace(Screens.SendAmount, { recipient })
   }
