@@ -187,7 +187,7 @@ export class AzureKeyVaultClient {
     return new BigNumber(ensureLeading0x(input.toString('hex')))
   }
   private static bigNumberToBuffer(input: BigNumber, hexSize: number): Buffer {
-    return ethUtil.toBuffer(ensureLeading0x(input.toString(16).padString('0', hexSize))) as Buffer
+    return ethUtil.toBuffer(ensureLeading0x(input.toString(16).padStart('0', hexSize))) as Buffer
   }
 
   /**
