@@ -100,8 +100,8 @@ export class AzureKeyVaultClient {
       S = N.minus(S)
     }
 
-    const rBuff = AzureKeyVaultClient.bigNumberToBuffer(R, 64)
-    const sBuff = AzureKeyVaultClient.bigNumberToBuffer(S, 64)
+    const rBuff = AzureKeyVaultClient.bigNumberToBuffer(R, 32)
+    const sBuff = AzureKeyVaultClient.bigNumberToBuffer(S, 32)
     const canonicalizedSignature = Buffer.concat([rBuff, sBuff])
     const publicKey = await this.getPublicKey(keyName)
 
@@ -186,8 +186,9 @@ export class AzureKeyVaultClient {
   private static bufferToBigNumber(input: Buffer): BigNumber {
     return new BigNumber(ensureLeading0x(input.toString('hex')))
   }
-  private static bigNumberToBuffer(input: BigNumber, hexSize: number): Buffer {
+  private static bigNumberToBuffer(input: BigNumber, size: number): Buffer {
     let hex = input.toString(16)
+    const hexSize = size * 2
     if (hex.length < hexSize) {
       hex = '0'.repeat(hexSize - hex.length) + hex
     }
