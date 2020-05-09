@@ -21,7 +21,7 @@ import { Screens } from 'src/navigator/Screens'
 import { Recipient } from 'src/recipients/recipient'
 import { RootState } from 'src/redux/reducers'
 import { validateRecipientAddress } from 'src/send/actions'
-import { ConfirmationInput } from 'src/send/SendConfirmation'
+import { TransactionData } from 'src/send/SendAmount'
 
 type Navigation = NavigationInjectedProps['navigation']
 
@@ -31,7 +31,7 @@ interface OwnProps {
 
 interface StateProps {
   recipient: Recipient
-  confirmationInput: ConfirmationInput
+  transactionData: TransactionData
   fullValidationRequired: boolean
   isValidRecipient: boolean
   isValidatingRecipient: boolean
@@ -52,11 +52,11 @@ const mapDispatchToProps = {
 
 const mapStateToProps = (state: RootState, ownProps: NavigationInjectedProps): StateProps => {
   const { navigation } = ownProps
-  const confirmationInput = navigation.getParam('confirmationInput')
-  const { recipient } = confirmationInput
+  const transactionData = navigation.getParam('transactionData')
+  const { recipient } = transactionData
   return {
     recipient,
-    confirmationInput,
+    transactionData,
     fullValidationRequired: navigation.getParam('fullValidationRequired'),
     isValidRecipient: state.send.isValidRecipient,
     isValidatingRecipient: state.send.isValidatingRecipient,
@@ -79,7 +79,7 @@ export class ConfirmRecipientAccount extends React.Component<Props, State> {
   componentDidUpdate = async () => {
     if (this.props.isValidRecipient) {
       // OPEN QUESTION: what's the best way to trigger a success animation before navigating to next screen?
-      navigate(Screens.SendConfirmation, { confirmationInput: this.props.confirmationInput })
+      navigate(Screens.SendConfirmation, { transactionData: this.props.transactionData })
     }
   }
 

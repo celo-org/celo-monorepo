@@ -39,11 +39,8 @@ import EstimateFee from 'src/fees/EstimateFee'
 import { getFeeEstimateDollars } from 'src/fees/selectors'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
-import {
-  fetchPhoneAddresses,
-  getRecipientVerificationStatus,
-  RecipientVerificationStatus,
-} from 'src/identity/actions'
+import { fetchPhoneAddresses, storeRecipientVerificationStatus } from 'src/identity/actions'
+import { RecipientVerificationStatus } from 'src/identity/reducer'
 import { LocalCurrencyCode, LocalCurrencySymbol } from 'src/localCurrency/consts'
 import {
   convertDollarsToMaxSupportedPrecision,
@@ -55,7 +52,6 @@ import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { Recipient, RecipientKind } from 'src/recipients/recipient'
 import { RootState } from 'src/redux/reducers'
-import { ConfirmationInput } from 'src/send/SendConfirmation'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { fetchDollarBalance } from 'src/stableToken/actions'
 import { withDecimalSeparator } from 'src/utils/withDecimalSeparator'
@@ -64,6 +60,13 @@ const AmountInput = withDecimalSeparator(
   withTextInputLabeling<ValidatedTextInputProps<DecimalValidatorProps>>(ValidatedTextInput)
 )
 const CommentInput = withTextInputLabeling<TextInputProps>(TextInput)
+
+export interface TransactionData {
+  recipient: Recipient
+  amount: BigNumber
+  reason: string
+  type: TokenTransactionType
+}
 
 interface State {
   amount: string
@@ -98,7 +101,7 @@ interface DispatchProps {
   showError: typeof showError
   hideAlert: typeof hideAlert
   fetchPhoneAddresses: typeof fetchPhoneAddresses
-  getRecipientVerificationStatus: typeof getRecipientVerificationStatus
+  storeRecipientVerificationStatus: typeof storeRecipientVerificationStatus
 }
 
 const getFeeType = (recipientVerificationStatus: RecipientVerificationStatus): FeeType | null => {
@@ -139,7 +142,7 @@ const mapDispatchToProps = {
   hideAlert,
   showMessage,
   fetchPhoneAddresses,
-  getRecipientVerificationStatus,
+  storeRecipientVerificationStatus,
 }
 
 const { decimalSeparator } = getNumberFormatSettings()
@@ -165,7 +168,8 @@ export class SendAmount extends React.Component<Props, State> {
     const { recipient } = this.props
     if (recipient.kind === RecipientKind.QrCode || recipient.kind === RecipientKind.Address) {
       // Skip phone number fetch for QR codes or Addresses
-      this.props.getRecipientVerificationStatus(recipient)
+      this.props.storeRecipientVerificationStatus(RecipientVerificationStatus.VERIFIED)
+      return
     }
 
     if (!recipient.e164PhoneNumber) {
@@ -204,20 +208,12 @@ export class SendAmount extends React.Component<Props, State> {
     }
   }
 
-  getConfirmationInput = (type: TokenTransactionType) => {
-    const amount = this.getDollarsAmount()
-    const { recipient, e164NumberToAddress } = this.props
-    const recipientAddress = getAddressFromRecipient(recipient, e164NumberToAddress)
-
-    const confirmationInput: ConfirmationInput = {
-      recipient,
-      amount,
-      reason: this.state.reason,
-      recipientAddress,
-      type,
-    }
-    return confirmationInput
-  }
+  getTransactionData = (type: TokenTransactionType): TransactionData => ({
+    recipient: this.props.recipient,
+    amount: this.getDollarsAmount(),
+    reason: this.state.reason,
+    type,
+  })
 
   onAmountChanged = (amount: string) => {
     this.props.hideAlert()
@@ -247,37 +243,35 @@ export class SendAmount extends React.Component<Props, State> {
       return
     }
 
-    let confirmationInput: ConfirmationInput
+    let transactionData: TransactionData
 
     if (recipientVerificationStatus === RecipientVerificationStatus.VERIFIED) {
-      confirmationInput = this.getConfirmationInput(TokenTransactionType.Sent)
-      CeloAnalytics.track(CustomEventNames.transaction_details, {
-        recipientAddress: confirmationInput.recipientAddress,
-      })
+      transactionData = this.getTransactionData(TokenTransactionType.Sent)
+      CeloAnalytics.track(CustomEventNames.transaction_details)
     } else {
-      confirmationInput = this.getConfirmationInput(TokenTransactionType.InviteSent)
+      transactionData = this.getTransactionData(TokenTransactionType.InviteSent)
       CeloAnalytics.track(CustomEventNames.send_invite_details)
     }
 
     this.props.hideAlert()
 
     if (manualAddressValidationRequired) {
-      navigate(Screens.ConfirmRecipient, { confirmationInput, fullValidationRequired })
+      navigate(Screens.ConfirmRecipient, { transactionData, fullValidationRequired })
     } else {
       CeloAnalytics.track(CustomEventNames.send_continue)
-      navigate(Screens.SendConfirmation, { confirmationInput })
+      navigate(Screens.SendConfirmation, { transactionData })
     }
   }
 
   onRequest = () => {
     const { manualAddressValidationRequired, fullValidationRequired } = this.props
-    const confirmationInput = this.getConfirmationInput(TokenTransactionType.PayRequest)
+    const transactionData = this.getTransactionData(TokenTransactionType.PayRequest)
 
     if (manualAddressValidationRequired) {
-      navigate(Screens.ConfirmRecipient, { confirmationInput, fullValidationRequired })
+      navigate(Screens.ConfirmRecipient, { transactionData, fullValidationRequired })
     } else {
       CeloAnalytics.track(CustomEventNames.request_payment_continue)
-      navigate(Screens.PaymentRequestConfirmation, { confirmationInput })
+      navigate(Screens.PaymentRequestConfirmation, { transactionData })
     }
   }
 
