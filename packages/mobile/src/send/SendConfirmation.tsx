@@ -23,17 +23,14 @@ import CalculateFee, {
 import { getFeeDollars } from 'src/fees/selectors'
 import { completePaymentRequest, declinePaymentRequest } from 'src/firebase/actions'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
-import { getAddressFromPhoneNumber } from 'src/identity/contactMapping'
-import { E164NumberToAddressType } from 'src/identity/reducer'
 import { InviteBy } from 'src/invite/actions'
 import { navigateBack } from 'src/navigator/NavigationService'
-import { Recipient, RecipientKind } from 'src/recipients/recipient'
+import { Recipient } from 'src/recipients/recipient'
 import { RootState } from 'src/redux/reducers'
 import { isAppConnected } from 'src/redux/selectors'
 import { sendPaymentOrInvite } from 'src/send/actions'
-import { ManuallyValidatedE164NumberToAddress } from 'src/send/reducers'
-import { TransactionData } from 'src/send/SendAmount'
 import TransferReviewCard from 'src/send/TransferReviewCard'
+import { getConfirmationInput } from 'src/send/utils'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { fetchDollarBalance } from 'src/stableToken/actions'
 import Logger from 'src/utils/Logger'
@@ -43,7 +40,7 @@ export interface ConfirmationInput {
   recipient: Recipient
   amount: BigNumber
   reason: string
-  recipientAddress?: string | null
+  recipientAddress: string
   type: TokenTransactionType
   firebasePendingRequestUid?: string | null
 }
@@ -75,31 +72,6 @@ const mapDispatchToProps = {
   fetchDollarBalance,
   declinePaymentRequest,
   completePaymentRequest,
-}
-
-const getConfirmationInput = (
-  transactionData: TransactionData,
-  e164NumberToAddress: E164NumberToAddressType,
-  manuallyValidatedE164NumberToAddress: ManuallyValidatedE164NumberToAddress
-): ConfirmationInput => {
-  const confirmationInput: ConfirmationInput = transactionData
-  const { recipient } = confirmationInput
-
-  if (recipient.kind === RecipientKind.QrCode || recipient.kind === RecipientKind.Address) {
-    confirmationInput.recipientAddress = recipient.address
-    return confirmationInput
-  }
-
-  if (!recipient.e164PhoneNumber) {
-    throw new Error('Phone number missing')
-  }
-
-  confirmationInput.recipientAddress = getAddressFromPhoneNumber(
-    recipient.e164PhoneNumber,
-    e164NumberToAddress,
-    manuallyValidatedE164NumberToAddress
-  )
-  return confirmationInput
 }
 
 const mapStateToProps = (state: RootState, ownProps: NavigationInjectedProps): StateProps => {

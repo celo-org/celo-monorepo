@@ -18,7 +18,7 @@ export enum Actions {
   COMPLETE_ATTESTATION_CODE = 'IDENTITY/COMPLETE_ATTESTATION_CODE',
   UPDATE_E164_PHONE_NUMBER_ADDRESSES = 'IDENTITY/UPDATE_E164_PHONE_NUMBER_ADDRESSES',
   UPDATE_E164_PHONE_NUMBER_SALT = 'IDENTITY/UPDATE_E164_PHONE_NUMBER_SALT',
-  FETCH_PHONE_ADDRESSES = 'IDENTITY/FETCH_PHONE_ADDRESSES',
+  FETCH_PHONE_ADDRESSES_AND_VERIFICATION_STATUS = 'IDENTITY/FETCH_PHONE_ADDRESSES_AND_VERIFICATION_STATUS',
   STORE_RECIPIENT_VERIFICATION_STATUS = 'IDENTITY/STORE_RECIPIENT_VERIFICATION_STATUS',
   IMPORT_CONTACTS = 'IDENTITY/IMPORT_CONTACTS',
   UPDATE_IMPORT_SYNC_PROGRESS = 'IDENTITY/UPDATE_IMPORT_SYNC_PROGRESS',
@@ -80,8 +80,8 @@ export interface UpdateE164PhoneNumberSaltAction {
   e164NumberToSalt: E164NumberToSaltType
 }
 
-export interface FetchPhoneAddressesAction {
-  type: Actions.FETCH_PHONE_ADDRESSES
+export interface FetchPhoneAddressesAndRecipientVerificationStatusAction {
+  type: Actions.FETCH_PHONE_ADDRESSES_AND_VERIFICATION_STATUS
   e164Number: string
 }
 
@@ -179,8 +179,10 @@ export const completeAttestationCode = (
   numComplete,
 })
 
-export const fetchPhoneAddresses = (e164Number: string): FetchPhoneAddressesAction => ({
-  type: Actions.FETCH_PHONE_ADDRESSES,
+export const fetchPhoneAddressesAndRecipientVerificationStatus = (
+  e164Number: string
+): FetchPhoneAddressesAndRecipientVerificationStatusAction => ({
+  type: Actions.FETCH_PHONE_ADDRESSES_AND_VERIFICATION_STATUS,
   e164Number,
 })
 
