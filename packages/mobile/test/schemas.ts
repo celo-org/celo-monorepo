@@ -80,7 +80,6 @@ export const vNeg1Schema = {
     isLoadingImportContacts: false,
     acceptedAttestationCodes: [],
     verificationStatus: 0,
-    recipientVerificationStatus: 2,
     hasSeenVerificationNux: false,
     contactMappingProgress: {
       current: 0,
@@ -228,7 +227,6 @@ export const v2Schema = {
     isLoadingImportContacts: false,
     acceptedAttestationCodes: [],
     verificationStatus: 0,
-    recipientVerificationStatus: 2,
     hasSeenVerificationNux: false,
     contactMappingProgress: {
       current: 0,

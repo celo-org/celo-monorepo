@@ -13,19 +13,14 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import {
   endImportContacts,
   FetchPhoneAddressesAndRecipientVerificationStatusAction,
-  storeRecipientVerificationStatus,
   updateE164PhoneNumberAddresses,
 } from 'src/identity/actions'
 import { fetchPhoneHashPrivate, PhoneNumberHashDetails } from 'src/identity/privacy'
-import {
-  AddressToE164NumberType,
-  E164NumberToAddressType,
-  RecipientVerificationStatus,
-} from 'src/identity/reducer'
+import { AddressToE164NumberType, E164NumberToAddressType } from 'src/identity/reducer'
 import { setRecipientCache } from 'src/recipients/actions'
 import { contactsToRecipients, NumberToRecipient } from 'src/recipients/recipient'
 import { manualAddressValidationRequired } from 'src/send/actions'
-import { ManuallyValidatedE164NumberToAddress } from 'src/send/reducers'
+import { checkIfValidationRequired } from 'src/send/utils'
 import { getAllContacts } from 'src/utils/contacts'
 import Logger from 'src/utils/Logger'
 import { checkContactsPermission } from 'src/utils/permissions'
@@ -102,66 +97,6 @@ function* updateRecipientsCache(
   yield put(setRecipientCache({ ...e164NumberToRecipients, ...otherRecipients }))
 }
 
-// Given addresses can be added and deleted we can't rely on changes in length to signal address changes
-// Not sure if address order im array is consistent so not assuming it
-const checkIfItemsOfChildArrAreSubsetOfParentArr = (parentArr: string[], childArr: string[]) => {
-  const parentArrSorted = parentArr.sort()
-  const childArrSorted = childArr.sort()
-
-  for (let i = 0; i < childArrSorted.length; i += 1) {
-    if (parentArrSorted[i] !== childArrSorted[i]) {
-      return false
-    }
-  }
-
-  return true
-}
-
-const checkIfNewAddressesAdded = (
-  oldAddresses: string[] | null | undefined,
-  newAddresses: string[]
-) => {
-  if (oldAddresses && checkIfItemsOfChildArrAreSubsetOfParentArr(oldAddresses, newAddresses)) {
-    return false
-  }
-
-  return true
-}
-
-const checkIfLast4DigitsAreUnique = (addressArr: string[]) => {
-  const last4DigitArr = addressArr.map((address) => address.slice(-4))
-  const last4DigitSet = new Set()
-  last4DigitArr.forEach((endDigits) => last4DigitSet.add(endDigits))
-  return last4DigitArr.length === last4DigitSet.size
-}
-
-const checkIfValidationRequired = (
-  oldAddresses: string[] | undefined | null,
-  newAddresses: string[] | null,
-  userAddress: string
-) => {
-  let validationRequired = false
-  let fullValidationRequired = false
-
-  // if there are no addresses or only one, there is no validation needed
-  if (!newAddresses || newAddresses.length < 2) {
-    return { validationRequired, fullValidationRequired }
-  }
-
-  if (checkIfNewAddressesAdded(oldAddresses, newAddresses)) {
-    Logger.debug(
-      TAG + '@fetchPhoneAddressesAndRecipientVerificationStatus',
-      `Address needs to be validated by user`
-    )
-    validationRequired = true
-
-    // Adding user's address so they don't mistakenly verify with last 4 digits of their own address
-    fullValidationRequired = !checkIfLast4DigitsAreUnique([userAddress, ...newAddresses])
-  }
-
-  return { validationRequired, fullValidationRequired }
-}
-
 export function* fetchPhoneAddressesAndRecipientVerificationStatus({
   e164Number,
 }: FetchPhoneAddressesAndRecipientVerificationStatusAction) {
@@ -208,16 +143,11 @@ export function* fetchPhoneAddressesAndRecipientVerificationStatus({
     const { validationRequired, fullValidationRequired } = checkIfValidationRequired(
       oldAddresses,
       addresses,
-      userAddress
+      userAddress,
+      TAG
     )
 
     yield put(manualAddressValidationRequired(validationRequired, fullValidationRequired))
-
-    const recipientVerificationStatus = addresses
-      ? RecipientVerificationStatus.VERIFIED
-      : RecipientVerificationStatus.UNVERIFIED
-
-    yield put(storeRecipientVerificationStatus(recipientVerificationStatus))
 
     yield put(
       updateE164PhoneNumberAddresses(e164NumberToAddressUpdates, addressToE164NumberUpdates)
@@ -260,33 +190,3 @@ function* getAddresses(e164Number: string) {
 
 const isValidNon0Address = (address: string) =>
   typeof address === 'string' && isValidAddress(address) && !new BigNumber(address).isZero()
-
-export const getAddressFromPhoneNumber = (
-  e164Number: string,
-  e164NumberToAddress: E164NumberToAddressType,
-  manuallyValidatedE164NumberToAddress: ManuallyValidatedE164NumberToAddress
-): string | null | undefined => {
-  const addresses = e164NumberToAddress[e164Number]
-
-  if (!addresses) {
-    return addresses
-  }
-
-  if (addresses.length === 0) {
-    throw new Error('Phone addresses array should never be empty')
-  }
-
-  if (addresses.length > 1) {
-    Logger.warn(TAG, 'Number mapped to multiple addresses, need to disambiguate')
-    const validatedAddress = manuallyValidatedE164NumberToAddress[e164Number]
-    if (!validatedAddress) {
-      throw new Error(
-        'Multiple addresses but none were manually validated. Should have gone through secure send.'
-      )
-    }
-
-    return validatedAddress
-  }
-  // Normal verified case, return the first address
-  return addresses[0]
-}

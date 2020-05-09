@@ -2,7 +2,6 @@ import {
   AddressToE164NumberType,
   E164NumberToAddressType,
   E164NumberToSaltType,
-  RecipientVerificationStatus,
 } from 'src/identity/reducer'
 import { AttestationCode, CodeInputType, VerificationStatus } from 'src/identity/verification'
 
@@ -85,11 +84,6 @@ export interface FetchPhoneAddressesAndRecipientVerificationStatusAction {
   e164Number: string
 }
 
-export interface StoreRecipientVerificationStatusAction {
-  type: Actions.STORE_RECIPIENT_VERIFICATION_STATUS
-  recipientVerificationStatus: RecipientVerificationStatus
-}
-
 export interface ImportContactsAction {
   type: Actions.IMPORT_CONTACTS
 }
@@ -120,7 +114,6 @@ export type ActionTypes =
   | ResetVerificationAction
   | SetVerificationStatusAction
   | SetHasSeenVerificationNux
-  | StoreRecipientVerificationStatusAction
   | ReceiveAttestationMessageAction
   | InputAttestationCodeAction
   | CompleteAttestationCodeAction
@@ -184,13 +177,6 @@ export const fetchPhoneAddressesAndRecipientVerificationStatus = (
 ): FetchPhoneAddressesAndRecipientVerificationStatusAction => ({
   type: Actions.FETCH_PHONE_ADDRESSES_AND_VERIFICATION_STATUS,
   e164Number,
-})
-
-export const storeRecipientVerificationStatus = (
-  recipientVerificationStatus: RecipientVerificationStatus
-): StoreRecipientVerificationStatusAction => ({
-  type: Actions.STORE_RECIPIENT_VERIFICATION_STATUS,
-  recipientVerificationStatus,
 })
 
 export const updateE164PhoneNumberAddresses = (
