@@ -1,8 +1,8 @@
 import PhoneNumberInput from '@celo/react-components/components/PhoneNumberInput'
-import { shallow } from 'enzyme'
+import { requestPhoneNumber } from '@celo/react-native-sms-retriever'
 import * as React from 'react'
 import { Platform } from 'react-native'
-import { fireEvent, render } from 'react-native-testing-library'
+import { fireEvent, flushMicrotasksQueue, render } from 'react-native-testing-library'
 
 const testNumber = '123'
 
@@ -54,7 +54,7 @@ describe('when defaultCountry is truthy', () => {
       // mock
       Platform.OS = 'android'
 
-      const wrapper = shallow<PhoneNumberInput>(
+      const { getByTestId, getByText } = render(
         <PhoneNumberInput
           setE164Number={jest.fn()}
           setCountryCode={jest.fn()}
@@ -62,20 +62,12 @@ describe('when defaultCountry is truthy', () => {
         />
       )
 
-      wrapper.instance().setState({})
-      await wrapper.instance().triggerPhoneNumberRequest()
+      fireEvent(getByTestId('CountryNameFieldTextInput'), 'focus')
+      await flushMicrotasksQueue()
 
-      expect(
-        wrapper.findWhere((node) => node.prop('testID') === 'PhoneNumberField').props().value
-      ).toBe('030 111111')
-      expect(wrapper.instance().state.countryCallingCode).toEqual('+49')
-
-      expect(
-        wrapper.findWhere((node) => node.prop('testID') === 'contryCodeText').props().children
-      ).toBe('+49')
-      expect(
-        wrapper.findWhere((node) => node.prop('testID') === 'CountryNameField').props().defaultValue
-      ).toBe('Germany')
+      expect(getByTestId('PhoneNumberField').props.value).toBe('030 111111')
+      expect(getByText('+49')).toBeTruthy()
+      expect(getByTestId('CountryNameField').props.defaultValue).toBe('Germany')
     })
   })
 
@@ -83,7 +75,7 @@ describe('when defaultCountry is truthy', () => {
     // mock
     Platform.OS = 'android'
 
-    const wrapper = shallow<PhoneNumberInput>(
+    const { getByTestId } = render(
       <PhoneNumberInput
         setE164Number={jest.fn()}
         setCountryCode={jest.fn()}
@@ -91,27 +83,17 @@ describe('when defaultCountry is truthy', () => {
       />
     )
 
-    wrapper.instance().setState({ phoneNumber: testNumber })
-    // await wrapper.instance().triggerPhoneNumberRequest()
-    wrapper.findWhere((node) => node.prop('testID') === 'PhoneNumberField').simulate('focus')
+    fireEvent.changeText(getByTestId('PhoneNumberField'), testNumber)
 
-    expect(
-      wrapper.findWhere((node) => node.prop('testID') === 'PhoneNumberField').props().value
-    ).toBe(testNumber)
-    expect(wrapper.instance().state.countryCallingCode).toEqual('')
-
-    expect(
-      wrapper.findWhere((node) => node.prop('testID') === 'contryCodeText').props().children
-    ).toBe('')
-    expect(
-      wrapper.findWhere((node) => node.prop('testID') === 'CountryNameField').props().defaultValue
-    ).toBe('')
+    expect(getByTestId('PhoneNumberField').props.value).toBe(testNumber)
+    expect(getByTestId('countryCodeText').instance.text).toBeUndefined()
+    expect(getByTestId('CountryNameField').props.defaultValue).toBe('')
   })
 
   it('can read Canada phone', async () => {
     // mock
     Platform.OS = 'android'
-    const wrapper = shallow<PhoneNumberInput>(
+    const { getByTestId, getByText } = render(
       <PhoneNumberInput
         setE164Number={jest.fn()}
         setCountryCode={jest.fn()}
@@ -119,29 +101,20 @@ describe('when defaultCountry is truthy', () => {
       />
     )
 
-    wrapper.instance().getPhoneNumberFromNativePickerAndroid = jest.fn(
-      async () => '+1 416-868-0000'
-    )
+    requestPhoneNumber.mockReturnValue('+1 416-868-0000')
 
-    wrapper.instance().setState({})
-    await wrapper.instance().triggerPhoneNumberRequest()
+    fireEvent(getByTestId('CountryNameFieldTextInput'), 'focus')
+    await flushMicrotasksQueue()
 
-    expect(
-      wrapper.findWhere((node) => node.prop('testID') === 'PhoneNumberField').props().value
-    ).toBe('(416) 868-0000')
-    expect(wrapper.instance().state.countryCallingCode).toEqual('+1')
-    expect(
-      wrapper.findWhere((node) => node.prop('testID') === 'contryCodeText').props().children
-    ).toBe('+1')
-    expect(
-      wrapper.findWhere((node) => node.prop('testID') === 'CountryNameField').props().defaultValue
-    ).toBe('Canada')
+    expect(getByTestId('PhoneNumberField').props.value).toBe('(416) 868-0000')
+    expect(getByText('+1')).toBeTruthy()
+    expect(getByTestId('CountryNameField').props.defaultValue).toBe('Canada')
   })
 
   it('can read US phone', async () => {
     // mock
     Platform.OS = 'android'
-    const wrapper = shallow<PhoneNumberInput>(
+    const { getByTestId, getByText } = render(
       <PhoneNumberInput
         setE164Number={jest.fn()}
         setCountryCode={jest.fn()}
@@ -149,22 +122,13 @@ describe('when defaultCountry is truthy', () => {
       />
     )
 
-    wrapper.instance().getPhoneNumberFromNativePickerAndroid = jest.fn(
-      async () => '+1 415-426-5200'
-    )
+    requestPhoneNumber.mockReturnValue('+1 415-426-5200')
 
-    wrapper.instance().setState({})
-    await wrapper.instance().triggerPhoneNumberRequest()
+    fireEvent(getByTestId('CountryNameFieldTextInput'), 'focus')
+    await flushMicrotasksQueue()
 
-    expect(
-      wrapper.findWhere((node) => node.prop('testID') === 'PhoneNumberField').props().value
-    ).toBe('(415) 426-5200')
-    expect(wrapper.instance().state.countryCallingCode).toEqual('+1')
-    expect(
-      wrapper.findWhere((node) => node.prop('testID') === 'contryCodeText').props().children
-    ).toBe('+1')
-    expect(
-      wrapper.findWhere((node) => node.prop('testID') === 'CountryNameField').props().defaultValue
-    ).toBe('USA')
+    expect(getByTestId('PhoneNumberField').props.value).toBe('(415) 426-5200')
+    expect(getByText('+1')).toBeTruthy()
+    expect(getByTestId('CountryNameField').props.defaultValue).toBe('USA')
   })
 })

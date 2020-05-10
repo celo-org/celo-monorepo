@@ -92,6 +92,7 @@ exports[`BaseNotification renders correctly 1`] = `
               onResponderTerminate={[Function]}
               onResponderTerminationRequest={[Function]}
               onStartShouldSetResponder={[Function]}
+              testID="undefined/it goes boom/Button"
             >
               <Text
                 style={
