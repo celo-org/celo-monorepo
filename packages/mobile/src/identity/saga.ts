@@ -2,7 +2,7 @@ import { cancelled, spawn, takeEvery, takeLatest, takeLeading } from 'redux-saga
 import { Actions } from 'src/identity/actions'
 import {
   doImportContactsWrapper,
-  fetchPhoneAddressesAndRecipientVerificationStatus,
+  fetchPhoneAddressesAndCheckIfRecipientValidationRequired,
 } from 'src/identity/contactMapping'
 import { revokeVerification, startVerification } from 'src/identity/verification'
 import Logger from 'src/utils/Logger'
@@ -18,7 +18,7 @@ function* watchContactMapping() {
   yield takeLeading(Actions.IMPORT_CONTACTS, doImportContactsWrapper)
   yield takeEvery(
     Actions.FETCH_PHONE_ADDRESSES_AND_VERIFICATION_STATUS,
-    fetchPhoneAddressesAndRecipientVerificationStatus
+    fetchPhoneAddressesAndCheckIfRecipientValidationRequired
   )
 }
 

@@ -83,16 +83,14 @@ export function* handleBarcode(
         )
       }
 
-      const targetRecipient = transactionData.recipient
-      if (!targetRecipient.e164PhoneNumber) {
+      const targetAddress = data.address
+      const { e164PhoneNumber } = transactionData.recipient
+      if (!e164PhoneNumber) {
         throw Error('Error passing through data: Phone number not part of recipient data')
       }
 
-      const { e164PhoneNumber } = targetRecipient
-      const targetAddress = data.address
       // Typically use 'getAddressFromPhoneNumber' but need all the possible addresses when doing secure send validation
       const possibleRecievingAddresses = e164NumberToAddress[e164PhoneNumber]
-
       if (!possibleRecievingAddresses) {
         yield put(showError(ErrorMessages.QR_FAILED_NO_PHONE_NUMBER))
         return

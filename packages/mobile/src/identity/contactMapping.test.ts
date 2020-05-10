@@ -8,7 +8,7 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import { updateE164PhoneNumberAddresses } from 'src/identity/actions'
 import {
   doImportContactsWrapper,
-  fetchPhoneAddressesAndRecipientVerificationStatus,
+  fetchPhoneAddressesAndCheckIfRecipientValidationRequired,
 } from 'src/identity/contactMapping'
 import { fetchPhoneHashPrivate } from 'src/identity/privacy'
 import { e164NumberToAddressSelector } from 'src/identity/reducer'
@@ -73,7 +73,7 @@ describe('Import Contacts Saga', () => {
 describe('Fetch Addresses Saga', () => {
   it('fetches and caches addresses correctly', async () => {
     const contractKit = getContractKit()
-    await expectSaga(fetchPhoneAddressesAndRecipientVerificationStatus, {
+    await expectSaga(fetchPhoneAddressesAndCheckIfRecipientValidationRequired, {
       e164Number: mockE164Number,
     })
       .provide([

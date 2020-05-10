@@ -39,7 +39,7 @@ import EstimateFee from 'src/fees/EstimateFee'
 import { getFeeEstimateDollars } from 'src/fees/selectors'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
-import { fetchPhoneAddressesAndRecipientVerificationStatus } from 'src/identity/actions'
+import { fetchPhoneAddressesAndCheckIfRecipientValidationRequired } from 'src/identity/actions'
 import { RecipientVerificationStatus } from 'src/identity/reducer'
 import { LocalCurrencyCode, LocalCurrencySymbol } from 'src/localCurrency/consts'
 import {
@@ -102,7 +102,7 @@ interface DispatchProps {
   showMessage: typeof showMessage
   showError: typeof showError
   hideAlert: typeof hideAlert
-  fetchPhoneAddressesAndRecipientVerificationStatus: typeof fetchPhoneAddressesAndRecipientVerificationStatus
+  fetchPhoneAddressesAndCheckIfRecipientValidationRequired: typeof fetchPhoneAddressesAndCheckIfRecipientValidationRequired
 }
 
 const mapStateToProps = (state: RootState, ownProps: NavigationInjectedProps): StateProps => {
@@ -132,7 +132,7 @@ const mapDispatchToProps = {
   showError,
   hideAlert,
   showMessage,
-  fetchPhoneAddressesAndRecipientVerificationStatus,
+  fetchPhoneAddressesAndCheckIfRecipientValidationRequired,
 }
 
 const { decimalSeparator } = getNumberFormatSettings()
@@ -162,7 +162,7 @@ export class SendAmount extends React.Component<Props, State> {
         throw new Error('Missing recipient e164Number')
       }
 
-      this.props.fetchPhoneAddressesAndRecipientVerificationStatus(recipient.e164PhoneNumber)
+      this.props.fetchPhoneAddressesAndCheckIfRecipientValidationRequired(recipient.e164PhoneNumber)
     }
   }
 
