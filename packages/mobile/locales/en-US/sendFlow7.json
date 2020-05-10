@@ -94,10 +94,9 @@
     "title": "Confirm Account Number",
     "1a": "Please ask {{displayName}} for the last four digits of their account number and enter it below.",
     "1b": "Please ask {{displayName}} for their account number and enter it below.",
-    "2a": "For security, please do not use text messaging (SMS). We strongly recommend asking in person or over the phone, through WhatsApp or Messenger, or by email.",
+    "2a": "For security, please do not use text messaging (SMS). We strongly recommend asking in person or over the phone.",
     "2b": "For security, please do not use text messaging (SMS). We strongly recommend asking in person or over the phone, through WhatsApp or Messenger, or by email.",
-    "help": "Help {{displayName}} find their account number",
-    "placeholder": "0xf1b1d5a6e7728g309c4a025b122d71ad75a61976"
+    "help": "Help {{displayName}} find their account number"
   },
   "accountInputHeaderA": "LAST 4 DIGITS OF ACCOUNT NUMBER",
   "accountInputHeaderB": "ACCOUNT NUMBER",

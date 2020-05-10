@@ -9,9 +9,7 @@ import { Image, ScrollView, StyleSheet, Text, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
-import { setBackupDelayed } from 'src/account/actions'
 import componentWithAnalytics from 'src/analytics/wrapper'
-import { enterBackupFlow, exitBackupFlow } from 'src/app/actions'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { unknownUserIcon } from 'src/images/Images'
 import { headerWithBackButton } from 'src/navigator/Headers'
@@ -20,6 +18,7 @@ import { Screens } from 'src/navigator/Screens'
 import { getRecipientThumbnail, Recipient } from 'src/recipients/recipient'
 import { RootState } from 'src/redux/reducers'
 import { TransactionData } from 'src/send/SendAmount'
+import { formatDisplayName } from 'src/send/utils'
 
 const AVATAR_SIZE = 120
 const QR_ICON_SIZE = 24
@@ -39,21 +38,7 @@ interface StateProps {
   isPaymentRequest: true | undefined
 }
 
-interface DispatchProps {
-  setBackupDelayed: typeof setBackupDelayed
-  enterBackupFlow: typeof enterBackupFlow
-  exitBackupFlow: typeof exitBackupFlow
-}
-
-type Props = WithTranslation & StateProps & DispatchProps & OwnProps
-
-const formatDisplayName = (displayName: string) => {
-  if (displayName !== 'Mobile #') {
-    return { displayName, startOfSentenceDisplayName: displayName }
-  }
-
-  return { displayName: 'your contact', startOfSentenceDisplayName: 'Your contract' }
-}
+type Props = WithTranslation & StateProps & OwnProps
 
 const mapStateToProps = (state: RootState, ownProps: NavigationInjectedProps): StateProps => {
   const { navigation } = ownProps
@@ -122,7 +107,7 @@ class ConfirmRecipient extends React.Component<Props> {
             })}
           </Text>
         </ScrollView>
-        <View>
+        <View style={styles.buttonContainer}>
           <Button
             onPress={this.onPressScanCode}
             text={t('scanQRCode')}
@@ -153,9 +138,16 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 30,
     paddingBottom: 30,
-    justifyContent: 'center',
+    flexDirection: 'column',
+    justifyContent: 'flex-start',
   },
   iconContainer: {
+    paddingTop: 20,
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
+  buttonContainer: {
+    paddingBottom: 30,
     flexDirection: 'column',
     alignItems: 'center',
   },
@@ -171,23 +163,18 @@ const styles = StyleSheet.create({
   },
   h1: {
     ...fontStyles.h1,
-    paddingLeft: 5,
-    paddingRight: 5,
+    paddingVertical: 15,
+    paddingHorizontal: 5,
   },
   body: {
     ...fontStyles.body,
     textAlign: 'center',
-    paddingBottom: 15,
-  },
-  loader: {
-    marginBottom: 20,
+    paddingBottom: 20,
   },
 })
 
 export default componentWithAnalytics(
-  connect<StateProps, DispatchProps, OwnProps, RootState>(mapStateToProps, {
-    setBackupDelayed,
-    enterBackupFlow,
-    exitBackupFlow,
-  })(withTranslation(Namespaces.sendFlow7)(ConfirmRecipient))
+  connect<StateProps, {}, OwnProps, RootState>(mapStateToProps)(
+    withTranslation(Namespaces.sendFlow7)(ConfirmRecipient)
+  )
 )

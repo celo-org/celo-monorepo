@@ -10,7 +10,7 @@ import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import { declinePaymentRequest } from 'src/firebase/actions'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces, withTranslation } from 'src/i18n'
-import { fetchPhoneAddressesAndRecipientVerificationStatus } from 'src/identity/actions'
+import { fetchPhoneAddressesAndCheckIfRecipientValidationRequired } from 'src/identity/actions'
 import { unknownUserIcon } from 'src/images/Images'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -24,7 +24,7 @@ interface OwnProps {
   comment: string
   id: string
   declinePaymentRequest: typeof declinePaymentRequest
-  fetchPhoneAddressesAndRecipientVerificationStatus: typeof fetchPhoneAddressesAndRecipientVerificationStatus
+  fetchPhoneAddressesAndCheckIfRecipientValidationRequired: typeof fetchPhoneAddressesAndCheckIfRecipientValidationRequired
   manualAddressValidationRequired: boolean
   fullValidationRequired: boolean
 }
@@ -46,7 +46,7 @@ export class IncomingPaymentRequestListItem extends React.Component<Props> {
       throw new Error('Missing recipient e164Number')
     }
 
-    this.props.fetchPhoneAddressesAndRecipientVerificationStatus(recipient.e164PhoneNumber)
+    this.props.fetchPhoneAddressesAndCheckIfRecipientValidationRequired(recipient.e164PhoneNumber)
   }
 
   onPay = () => {

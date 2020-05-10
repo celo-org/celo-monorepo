@@ -79,7 +79,7 @@ export interface UpdateE164PhoneNumberSaltAction {
   e164NumberToSalt: E164NumberToSaltType
 }
 
-export interface FetchPhoneAddressesAndRecipientVerificationStatusAction {
+export interface FetchPhoneAddressesAndCheckIfRecipientValidationRequiredAction {
   type: Actions.FETCH_PHONE_ADDRESSES_AND_VERIFICATION_STATUS
   e164Number: string
 }
@@ -172,9 +172,9 @@ export const completeAttestationCode = (
   numComplete,
 })
 
-export const fetchPhoneAddressesAndRecipientVerificationStatus = (
+export const fetchPhoneAddressesAndCheckIfRecipientValidationRequired = (
   e164Number: string
-): FetchPhoneAddressesAndRecipientVerificationStatusAction => ({
+): FetchPhoneAddressesAndCheckIfRecipientValidationRequiredAction => ({
   type: Actions.FETCH_PHONE_ADDRESSES_AND_VERIFICATION_STATUS,
   e164Number,
 })

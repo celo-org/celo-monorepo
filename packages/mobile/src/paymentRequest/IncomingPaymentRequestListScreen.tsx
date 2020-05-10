@@ -7,7 +7,7 @@ import { getIncomingPaymentRequests } from 'src/account/selectors'
 import { PaymentRequest } from 'src/account/types'
 import { declinePaymentRequest } from 'src/firebase/actions'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
-import { fetchPhoneAddressesAndRecipientVerificationStatus } from 'src/identity/actions'
+import { fetchPhoneAddressesAndCheckIfRecipientValidationRequired } from 'src/identity/actions'
 import { e164NumberToAddressSelector, E164NumberToAddressType } from 'src/identity/reducer'
 import {
   NotificationList,
@@ -29,7 +29,7 @@ interface StateProps {
 
 interface DispatchProps {
   declinePaymentRequest: typeof declinePaymentRequest
-  fetchPhoneAddressesAndRecipientVerificationStatus: typeof fetchPhoneAddressesAndRecipientVerificationStatus
+  fetchPhoneAddressesAndCheckIfRecipientValidationRequired: typeof fetchPhoneAddressesAndCheckIfRecipientValidationRequired
 }
 
 const mapStateToProps = (state: RootState): StateProps => {
@@ -46,7 +46,7 @@ const mapStateToProps = (state: RootState): StateProps => {
 
 const mapDispatchToProps = {
   declinePaymentRequest,
-  fetchPhoneAddressesAndRecipientVerificationStatus,
+  fetchPhoneAddressesAndCheckIfRecipientValidationRequired,
 }
 
 type Props = NavigationInjectedProps & WithTranslation & StateProps & DispatchProps
@@ -54,7 +54,7 @@ type Props = NavigationInjectedProps & WithTranslation & StateProps & DispatchPr
 export const listItemRenderer = (params: {
   recipientCache: NumberToRecipient
   declinePaymentRequest: typeof declinePaymentRequest
-  fetchPhoneAddressesAndRecipientVerificationStatus: typeof fetchPhoneAddressesAndRecipientVerificationStatus
+  fetchPhoneAddressesAndCheckIfRecipientValidationRequired: typeof fetchPhoneAddressesAndCheckIfRecipientValidationRequired
   manualAddressValidationRequired: boolean
   fullValidationRequired: boolean
 }) => (request: PaymentRequest, key: number | undefined = undefined) => {
@@ -68,8 +68,8 @@ export const listItemRenderer = (params: {
         requester={requester}
         comment={request.comment}
         declinePaymentRequest={params.declinePaymentRequest}
-        fetchPhoneAddressesAndRecipientVerificationStatus={
-          params.fetchPhoneAddressesAndRecipientVerificationStatus
+        fetchPhoneAddressesAndCheckIfRecipientValidationRequired={
+          params.fetchPhoneAddressesAndCheckIfRecipientValidationRequired
         }
         manualAddressValidationRequired={params.manualAddressValidationRequired}
         fullValidationRequired={params.fullValidationRequired}

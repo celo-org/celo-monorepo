@@ -13,7 +13,6 @@ export interface ManuallyValidatedE164NumberToAddress {
 export interface State {
   isSending: boolean
   recentRecipients: Recipient[]
-  isValidatingRecipient: boolean
   isValidRecipient: boolean
   manualAddressValidationRequired: boolean
   fullValidationRequired: boolean
@@ -23,7 +22,6 @@ export interface State {
 const initialState = {
   isSending: false,
   recentRecipients: [],
-  isValidatingRecipient: false,
   isValidRecipient: false,
   manualAddressValidationRequired: false,
   fullValidationRequired: false,
@@ -60,7 +58,6 @@ export const sendReducer = (
     case Actions.VALIDATE_RECIPIENT_ADDRESS:
       return {
         ...state,
-        isValidatingRecipient: true,
         isValidRecipient: false,
       }
     case Actions.VALIDATE_RECIPIENT_ADDRESS_SUCCESS:
@@ -69,7 +66,6 @@ export const sendReducer = (
       manuallyValidatedE164NumberToAddress[action.e164Number] = action.address
       return {
         ...state,
-        isValidatingRecipient: false,
         isValidRecipient: true,
         manualAddressValidationRequired: false,
         manuallyValidatedE164NumberToAddress,
@@ -77,7 +73,6 @@ export const sendReducer = (
     case Actions.VALIDATE_RECIPIENT_ADDRESS_FAILURE:
       return {
         ...state,
-        isValidatingRecipient: false,
         isValidRecipient: false,
       }
     case Actions.MANUAL_ADDRESS_VALIDATION_REQUIRED:
@@ -85,7 +80,6 @@ export const sendReducer = (
         ...state,
         manualAddressValidationRequired: action.validationRequired,
         fullValidationRequired: action.fullValidationRequired,
-        isValidatingRecipient: false,
         isValidRecipient: false,
       }
 

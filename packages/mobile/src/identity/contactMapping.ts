@@ -14,7 +14,7 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import { USE_PHONE_NUMBER_PRIVACY } from 'src/config'
 import {
   endImportContacts,
-  FetchPhoneAddressesAndRecipientVerificationStatusAction,
+  FetchPhoneAddressesAndCheckIfRecipientValidationRequiredAction,
   updateE164PhoneNumberAddresses,
 } from 'src/identity/actions'
 import { fetchPhoneHashPrivate, PhoneNumberHashDetails } from 'src/identity/privacy'
@@ -99,12 +99,12 @@ function* updateRecipientsCache(
   yield put(setRecipientCache({ ...e164NumberToRecipients, ...otherRecipients }))
 }
 
-export function* fetchPhoneAddressesAndRecipientVerificationStatus({
+export function* fetchPhoneAddressesAndCheckIfRecipientValidationRequired({
   e164Number,
-}: FetchPhoneAddressesAndRecipientVerificationStatusAction) {
+}: FetchPhoneAddressesAndCheckIfRecipientValidationRequiredAction) {
   try {
     Logger.debug(
-      TAG + '@fetchPhoneAddressesAndRecipientVerificationStatus',
+      TAG + '@fetchPhoneAddressesAndCheckIfRecipientValidationRequired',
       `Fetching addresses for number`
     )
     // const oldE164NumberToAddress = yield select(e164NumberToAddressSelector)
@@ -130,7 +130,7 @@ export function* fetchPhoneAddressesAndRecipientVerificationStatus({
 
     if (!addresses) {
       Logger.debug(
-        TAG + '@fetchPhoneAddressesAndRecipientVerificationStatus',
+        TAG + '@fetchPhoneAddressesAndCheckIfRecipientValidationRequired',
         `No addresses for number`
       )
       // Save invalid/0 addresses to avoid checking again
@@ -156,7 +156,7 @@ export function* fetchPhoneAddressesAndRecipientVerificationStatus({
     )
   } catch (error) {
     Logger.error(
-      TAG + '@fetchPhoneAddressesAndRecipientVerificationStatus',
+      TAG + '@fetchPhoneAddressesAndCheckIfRecipientValidationRequired',
       `Error fetching addresses`,
       error
     )

@@ -168,7 +168,6 @@ export const v2Schema = {
   send: {
     isSending: false,
     recentRecipients: [],
-    isValidatingRecipient: false,
     isValidRecipient: false,
     manualAddressValidationRequired: false,
     fullValidationRequired: false,

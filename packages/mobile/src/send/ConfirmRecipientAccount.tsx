@@ -2,18 +2,18 @@ import Button, { BtnTypes } from '@celo/react-components/components/Button'
 import KeyboardAwareScrollView from '@celo/react-components/components/KeyboardAwareScrollView'
 import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
 import TextButton from '@celo/react-components/components/TextButton'
-import Checkmark from '@celo/react-components/icons/Checkmark'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, Text, View } from 'react-native'
 import Modal from 'react-native-modal'
 import SafeAreaView from 'react-native-safe-area-view'
 import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
 import CodeRow, { CodeRowStatus } from 'src/components/CodeRow'
+import { SingleDigitInput } from 'src/components/SingleDigitInput'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import { headerWithBackButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
@@ -34,12 +34,12 @@ interface StateProps {
   transactionData: TransactionData
   fullValidationRequired: boolean
   isValidRecipient: boolean
-  isValidatingRecipient: boolean
   isPaymentRequest: true | undefined
 }
 
 interface State {
   inputValue: string
+  singleDigitInputValueArr: string[]
   isModalVisible: boolean
 }
 
@@ -61,7 +61,6 @@ const mapStateToProps = (state: RootState, ownProps: NavigationInjectedProps): S
     transactionData,
     fullValidationRequired: navigation.getParam('fullValidationRequired'),
     isValidRecipient: state.send.isValidRecipient,
-    isValidatingRecipient: state.send.isValidatingRecipient,
     isPaymentRequest,
   }
 }
@@ -76,6 +75,7 @@ export class ConfirmRecipientAccount extends React.Component<Props, State> {
 
   state: State = {
     inputValue: '',
+    singleDigitInputValueArr: [],
     isModalVisible: false,
   }
 
@@ -91,12 +91,20 @@ export class ConfirmRecipientAccount extends React.Component<Props, State> {
   }
 
   onPressContinue = () => {
+    const { inputValue, singleDigitInputValueArr } = this.state
     const { recipient, fullValidationRequired } = this.props
-    this.props.validateRecipientAddress(this.state.inputValue, fullValidationRequired, recipient)
+    const inputToValidate = fullValidationRequired ? inputValue : singleDigitInputValueArr.join('')
+    this.props.validateRecipientAddress(inputToValidate, fullValidationRequired, recipient)
   }
 
   onInputChange = (value: string) => {
     this.setState({ inputValue: value })
+  }
+
+  onSingleDigitInputChange = (value: string, index: number) => {
+    const { singleDigitInputValueArr } = this.state
+    singleDigitInputValueArr[index] = value
+    this.setState({ singleDigitInputValueArr })
   }
 
   toggleModal = () => {
@@ -107,9 +115,8 @@ export class ConfirmRecipientAccount extends React.Component<Props, State> {
 
   renderInstructionsAndInputField = () => {
     const { t, recipient, fullValidationRequired } = this.props
-    const { inputValue } = this.state
+    const { inputValue, singleDigitInputValueArr } = this.state
     const { displayName } = recipient
-    const codeStatus = CodeRowStatus.INPUTTING
 
     if (fullValidationRequired) {
       return (
@@ -126,15 +133,26 @@ export class ConfirmRecipientAccount extends React.Component<Props, State> {
           </Text>
           <Text style={styles.codeHeader}>{t('accountInputHeaderB')}</Text>
           <CodeRow
-            status={codeStatus}
+            status={CodeRowStatus.INPUTTING}
             inputValue={inputValue}
-            inputPlaceholder={t('confirmAccountNumber.placeholder')}
+            inputPlaceholder={'0xf1b1d5a6e7728g309c4a025k122d71ad75a61976'}
             onInputChange={this.onInputChange}
             shouldShowClipboard={this.shouldShowClipboard}
           />
         </View>
       )
     }
+
+    const singleDigitInputComponentArr = ['k', '0', 'F', '4'].map((placeholderValue, index) => (
+      <SingleDigitInput
+        key={placeholderValue}
+        inputValue={singleDigitInputValueArr[index]}
+        inputPlaceholder={placeholderValue}
+        // tslint:disable-next-line:jsx-no-lambda
+        onInputChange={(value) => this.onSingleDigitInputChange(value, index)}
+        shouldShowClipboard={this.shouldShowClipboard}
+      />
+    ))
 
     return (
       <View>
@@ -149,42 +167,8 @@ export class ConfirmRecipientAccount extends React.Component<Props, State> {
           })}
         </Text>
         <Text style={styles.codeHeader}>{t('accountInputHeaderA')}</Text>
-        <CodeRow
-          status={codeStatus}
-          inputValue={inputValue}
-          inputPlaceholder={t('inviteCodeText.codePlaceholder')}
-          onInputChange={this.onInputChange}
-          shouldShowClipboard={this.shouldShowClipboard}
-        />
+        <View style={styles.singleDigitInputContainer}>{singleDigitInputComponentArr}</View>
       </View>
-    )
-  }
-
-  renderConfirmButtonOrLoadingAnimations = () => {
-    const { t, isValidRecipient, isValidatingRecipient } = this.props
-
-    if (isValidatingRecipient) {
-      return (
-        <ActivityIndicator size="small" color={colors.celoGreen} style={styles.codeInputSpinner} />
-      )
-    }
-
-    if (isValidRecipient) {
-      return (
-        <View style={styles.checkmarkContainer}>
-          <Checkmark height={20} width={20} />
-        </View>
-      )
-    }
-
-    return (
-      <Button
-        onPress={this.onPressContinue}
-        text={t('continue')}
-        standard={false}
-        type={BtnTypes.PRIMARY}
-        testID="ContinueInviteButton"
-      />
     )
   }
 
@@ -203,13 +187,19 @@ export class ConfirmRecipientAccount extends React.Component<Props, State> {
             {t('confirmAccountNumber.help', { displayName })}
           </Text>
         </KeyboardAwareScrollView>
-        <View>{this.renderConfirmButtonOrLoadingAnimations()}</View>
+        <Button
+          onPress={this.onPressContinue}
+          text={t('confirmAccount.button')}
+          standard={false}
+          type={BtnTypes.PRIMARY}
+          testID="ConfirmAccountButton"
+        />
         <KeyboardSpacer />
         <Modal isVisible={this.state.isModalVisible}>
           <View style={styles.modalContainer}>
             <Text style={styles.modalHeader}>{t('helpModal.header')}</Text>
-            <Text style={fontStyles.body}>{t('helpModal.body1')}</Text>
-            <Text style={fontStyles.body}>{t('helpModal.body2')}</Text>
+            <Text style={styles.body}>{t('helpModal.body1')}</Text>
+            <Text style={styles.body}>{t('helpModal.body2')}</Text>
             <View style={styles.modalButtonsContainer}>
               <TextButton onPress={this.toggleModal} style={styles.modalCancelText}>
                 {t('global:close')}
@@ -234,10 +224,18 @@ const styles = StyleSheet.create({
     paddingTop: 40,
     justifyContent: 'space-between',
   },
+  singleDigitInputContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    paddingRight: 10,
+  },
   codeHeader: {
     ...fontStyles.body,
     ...fontStyles.semiBold,
     marginTop: 20,
+    textAlign: 'center',
   },
   h1: {
     ...fontStyles.h1,
@@ -264,7 +262,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
     marginBottom: 10,
     textDecorationLine: 'underline',
-    justifyContent: 'center',
+    textAlign: 'center',
   },
   body: {
     ...fontStyles.body,

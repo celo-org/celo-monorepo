@@ -6,6 +6,14 @@ import { TransactionData } from 'src/send/SendAmount'
 import { ConfirmationInput } from 'src/send/SendConfirmation'
 import Logger from 'src/utils/Logger'
 
+export const formatDisplayName = (displayName: string) => {
+  if (displayName !== 'Mobile #') {
+    return { displayName, startOfSentenceDisplayName: displayName }
+  }
+
+  return { displayName: 'your contact', startOfSentenceDisplayName: 'Your contract' }
+}
+
 export const getAddressFromPhoneNumber = (
   e164Number: string,
   e164NumberToAddress: E164NumberToAddressType,
@@ -26,7 +34,7 @@ export const getAddressFromPhoneNumber = (
     const validatedAddress = manuallyValidatedE164NumberToAddress[e164Number]
     if (!validatedAddress) {
       throw new Error(
-        'Multiple addresses but none were manually validated. Should have gone through secure send.'
+        'Multiple addresses but none were manually validated. Should have routed through secure send.'
       )
     }
 
