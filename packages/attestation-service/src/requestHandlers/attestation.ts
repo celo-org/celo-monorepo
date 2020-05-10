@@ -49,9 +49,10 @@ function toBase64(str: string) {
 }
 
 function createAttestationTextMessage(attestationCode: string, smsRetrieverAppSig?: string) {
-  return `<#> celo://wallet/v/${toBase64(attestationCode)}` + smsRetrieverAppSig
-    ? ' ' + smsRetrieverAppSig
-    : ''
+  return (
+    `<#> celo://wallet/v/${toBase64(attestationCode)}` +
+    (smsRetrieverAppSig ? ' ' + smsRetrieverAppSig : '')
+  )
 }
 
 async function ensureLockedRecord(
