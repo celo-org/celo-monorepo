@@ -10,12 +10,12 @@ import { existsSync, readdirSync, readFileSync } from 'fs'
 import fetch from 'node-fetch'
 import { join } from 'path'
 
-const packagesDirectory = join('..', '..', 'packages')
+const rootDirectory = join('..', '..') // because we're running in package with 'esModuleInterop'
 const dependencyGraph = JSON.parse(
   readFileSync(join(__dirname, 'dependency-graph.json')).toString()
 )
 
-for (const pkg of readdirSync(packagesDirectory)) {
+for (const pkg of readdirSync(join(rootDirectory, 'packages'))) {
   if (!dependencyGraph[pkg]) {
     throw new Error(`Dependency graph is missing package ${pkg}!`)
   }
@@ -54,9 +54,13 @@ async function checkIfTestShouldRun() {
     process.exit(1)
   }
 
-  const yarnLockChangeCommit = await getChangeCommit(join('..', '..', 'yarn.lock'))
-  if (branchCommits.includes(yarnLockChangeCommit)) {
-    // always run tests when yarn.lock has changed
+  const circleciChangeCommit = await getChangeCommit(join(rootDirectory, '.circleci', 'config.yml'))
+  const yarnLockChangeCommit = await getChangeCommit(join(rootDirectory, 'yarn.lock'))
+  if (
+    branchCommits.includes(yarnLockChangeCommit) ||
+    branchCommits.includes(circleciChangeCommit)
+  ) {
+    // always run tests when yarn.lock or circlici config have changed
     console.info('true')
     return
   }
@@ -89,7 +93,7 @@ async function checkIfTestShouldRun() {
 async function getChangedPackages(commits: string[]): Promise<string[]> {
   const changedPackages = new Set<string>()
   for (const pkg of allPackages) {
-    const changeCommit = await getChangeCommit(join('..', '..', 'packages', pkg))
+    const changeCommit = await getChangeCommit(join(rootDirectory, 'packages', pkg))
     if (commits.includes(changeCommit)) {
       changedPackages.add(pkg)
     }
