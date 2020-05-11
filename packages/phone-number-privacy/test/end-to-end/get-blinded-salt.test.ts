@@ -4,6 +4,7 @@ import { normalizeAddressWith0x, privateKeyToAddress } from '@celo/utils/lib/add
 import { serializeSignature, signMessage } from '@celo/utils/lib/signatureUtils'
 import 'isomorphic-fetch'
 import Web3 from 'web3'
+import config from '../../src/config'
 import { getBlindedPhoneNumber } from '../utils'
 
 require('dotenv').config()
@@ -19,7 +20,7 @@ const PHONE_NUMBER = '+15555555555'
 const IDENTIFIER = PhoneNumberUtils.getPhoneHash(PHONE_NUMBER)
 const BLINDING_FACTOR = new Buffer('0IsBvRfkBrkKCIW6HV0/T1zrzjQSe8wRyU3PKojCnww=', 'base64')
 const BLINDED_PHONE_NUMBER = getBlindedPhoneNumber(PHONE_NUMBER, BLINDING_FACTOR)
-const DEFAULT_FORNO_URL = `https://alfajores-forno.celo-testnet.org`
+const DEFAULT_FORNO_URL = config.blockchain.provider
 
 describe('Running against a deployed service', () => {
   describe('Returns status 400 with invalid input', () => {

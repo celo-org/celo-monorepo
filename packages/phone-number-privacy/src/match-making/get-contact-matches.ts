@@ -1,8 +1,12 @@
-import { isValidAddress } from '@celo/utils/lib/address'
 import { Request, Response } from 'firebase-functions'
-import { REASONABLE_BODY_CHAR_LIMIT } from '../common/constants'
 import { ErrorMessages, respondWithError } from '../common/error-utils'
 import { authenticateUser, isVerified } from '../common/identity'
+import {
+  hasValidAccountParam,
+  hasValidContractPhoneNumbersParam,
+  hasValidUserPhoneNumberParam,
+  isBodyReasonablySized,
+} from '../common/input-validation'
 import logger from '../common/logger'
 import { getDidMatchmaking, setDidMatchmaking } from '../database/wrappers/account'
 import { getNumberPairContacts, setNumberPairContacts } from '../database/wrappers/number-pairs'
@@ -49,22 +53,4 @@ function isValidGetContactMatchesInput(requestBody: any): boolean {
     hasValidContractPhoneNumbersParam(requestBody) &&
     isBodyReasonablySized(requestBody)
   )
-}
-
-function hasValidAccountParam(requestBody: any): boolean {
-  return (
-    requestBody.account && isValidAddress(requestBody.account) && isBodyReasonablySized(requestBody)
-  )
-}
-
-function hasValidUserPhoneNumberParam(requestBody: any): boolean {
-  return requestBody.userPhoneNumber
-}
-
-function hasValidContractPhoneNumbersParam(requestBody: any): boolean {
-  return requestBody.contactPhoneNumbers && Array.isArray(requestBody.contactPhoneNumbers)
-}
-
-function isBodyReasonablySized(requestBody: any): boolean {
-  return JSON.stringify(requestBody).length <= REASONABLE_BODY_CHAR_LIMIT
 }
