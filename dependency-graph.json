@@ -1,0 +1,31 @@
+{
+  "attestation-service": [
+    "contractkit",
+    "utils"
+  ],
+  "azure": [],
+  "cli": [
+    "contractkit",
+    "utils"
+  ],
+  "contractkit": [
+    "utils"
+  ],
+  "dappkit": [
+    "contractkit",
+    "utils"
+  ],
+  "dev-utils": [],
+  "docs": [],
+  "faucet": [
+    "contractkit",
+    "utils"
+  ],
+  "moonpay-auth": [],
+  "phone-number-privacy": [
+    "contractkit",
+    "utils"
+  ],
+  "typescript": [],
+  "utils": []
+}

@@ -6,22 +6,15 @@
 // Prints "false" otherwise
 // All console logging intentionally sent to stderr, so that, stdout is not corrupted
 import { execCmdWithExitOnFailure } from '@celo/celotool/src/lib/cmd-utils'
-import { existsSync, readdirSync, readFileSync } from 'fs'
+import { existsSync, readFileSync } from 'fs'
 import fetch from 'node-fetch'
 import { join } from 'path'
+import { filename as dependencyGraphFileName } from './dependency-graph-utils'
 
-const rootDirectory = join('..', '..') // because we're running in package with 'esModuleInterop'
+const rootDirectory = join(__dirname, '..')
 const dependencyGraph = JSON.parse(
-  readFileSync(join(__dirname, 'dependency-graph.json')).toString()
+  readFileSync(join(rootDirectory, dependencyGraphFileName)).toString()
 )
-
-for (const pkg of readdirSync(join(rootDirectory, 'packages'))) {
-  if (!dependencyGraph[pkg]) {
-    throw new Error(`Dependency graph is missing package ${pkg}!`)
-  }
-}
-
-const allPackages = Object.keys(dependencyGraph)
 
 const argv = require('minimist')(process.argv.slice(2))
 const packagesToTest: string[] = argv.packages.split(',')
@@ -73,7 +66,7 @@ async function checkIfTestShouldRun() {
       return true
     }
 
-    for (const dep of dependencyGraph[packageName]) {
+    for (const dep of dependencyGraph[packageName] || []) {
       return hasChangedDependencies(dep)
     }
 
@@ -92,7 +85,7 @@ async function checkIfTestShouldRun() {
 
 async function getChangedPackages(commits: string[]): Promise<string[]> {
   const changedPackages = new Set<string>()
-  for (const pkg of allPackages) {
+  for (const pkg of Object.keys(dependencyGraph)) {
     const changeCommit = await getChangeCommit(join(rootDirectory, 'packages', pkg))
     if (commits.includes(changeCommit)) {
       changedPackages.add(pkg)
@@ -129,8 +122,8 @@ async function getBranchCommits(): Promise<string[]> {
   if (prNumber === undefined) {
     throw new Error(`Unable to get pull request number from $CIRCLE_PULL_REQUEST: ${prUrl}`)
   } else {
-    const owner = process.env.CIRCLE_PROJECT_USERNAME
-    const repo = process.env.CIRCLE_PROJECT_REPONAME
+    const owner = process.env.CIRCLE_PROJECT_USERNAME || 'celo-org'
+    const repo = process.env.CIRCLE_PROJECT_REPONAME || 'celo-monorepo'
     if (owner === undefined) {
       throw new Error('Environment variable CIRCLE_PROJECT_USERNAME is not defined')
     }
