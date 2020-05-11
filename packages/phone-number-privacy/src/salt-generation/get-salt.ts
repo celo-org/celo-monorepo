@@ -4,18 +4,18 @@ import { BLSCryptographyClient } from '../bls/bls-cryptography-client'
 import { ErrorMessages, respondWithError } from '../common/error-utils'
 import { authenticateUser } from '../common/identity'
 import logger from '../common/logger'
-import { getDatabase } from '../database/database'
+import { getTransaction } from '../database/database'
 import { incrementQueryCount } from '../database/wrappers/account'
 import { getRemainingQueryCount } from './query-quota'
 
 export async function handleGetBlindedMessageForSalt(request: Request, response: Response) {
+  const trx = await getTransaction()
   try {
     if (!isValidGetSignatureInput(request.body)) {
       respondWithError(response, 400, ErrorMessages.INVALID_INPUT)
       return
     }
     authenticateUser()
-    const trx = await getDatabase().transaction()
     const remainingQueryCount = await getRemainingQueryCount(
       trx,
       request.body.account,
@@ -33,6 +33,7 @@ export async function handleGetBlindedMessageForSalt(request: Request, response:
     response.json({ success: true, signature })
   } catch (error) {
     logger.error('Failed to getSalt', error)
+    trx.rollback()
     respondWithError(response, 500, ErrorMessages.UNKNOWN_ERROR)
   }
 }
