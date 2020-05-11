@@ -1,9 +1,8 @@
-import Button from '@celo/react-components/components/Button'
 import FullscreenCTA from '@celo/react-components/components/FullscreenCTA'
 import { componentStyles } from '@celo/react-components/styles/styles'
-import { shallow } from 'enzyme'
 import * as React from 'react'
 import { Text, View } from 'react-native'
+import { fireEvent, render } from 'react-native-testing-library'
 import * as renderer from 'react-test-renderer'
 
 function FullscreenCTAContentMaker(errorMessage: string) {
@@ -33,7 +32,7 @@ describe('FullscreenCTA', () => {
   describe('when press the button', () => {
     it('calls the restart prop', () => {
       const restartApp = jest.fn()
-      const contactCircle = shallow(
+      const { getByName } = render(
         <FullscreenCTA
           title={'Opps'}
           subtitle={'Something went wrong'}
@@ -43,7 +42,7 @@ describe('FullscreenCTA', () => {
           {FullscreenCTAContentMaker('There was an unexpected error')}
         </FullscreenCTA>
       )
-      contactCircle.find(Button).simulate('press')
+      fireEvent.press(getByName('Button'))
       expect(restartApp).toHaveBeenCalled()
     })
   })

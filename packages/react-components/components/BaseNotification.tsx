@@ -47,7 +47,12 @@ export default function BaseNotification({ icon, title, children, ctas, onPress,
               {children}
               <View style={styles.ctas}>
                 {ctas.map((cta, j) => (
-                  <TextButton key={j} style={styles.action} onPress={cta.onPress}>
+                  <TextButton
+                    testID={`${testID}/${cta.text}/Button`}
+                    key={j}
+                    style={styles.action}
+                    onPress={cta.onPress}
+                  >
                     {cta.text}
                   </TextButton>
                 ))}

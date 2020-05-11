@@ -186,7 +186,6 @@ exports[`Papers renders 1`] = `
             "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
             "fontSize": "20px",
             "lineHeight": "28px",
-            "marginBottom": "20px",
             "textRendering": "geometricPrecision",
           }
         }
@@ -269,6 +268,7 @@ exports[`Papers renders 1`] = `
                   "fontWeight": "500",
                   "lineHeight": "16px",
                   "marginRight": "30px",
+                  "marginTop": "10px",
                   "msFlexAlign": "center",
                   "textAlign": "center",
                   "textRendering": "geometricPrecision",
@@ -368,6 +368,7 @@ exports[`Papers renders 1`] = `
                   "fontWeight": "500",
                   "lineHeight": "16px",
                   "marginRight": "30px",
+                  "marginTop": "10px",
                   "msFlexAlign": "center",
                   "textAlign": "center",
                   "textRendering": "geometricPrecision",
@@ -510,7 +511,6 @@ exports[`Papers renders 1`] = `
             "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
             "fontSize": "20px",
             "lineHeight": "28px",
-            "marginBottom": "20px",
             "textRendering": "geometricPrecision",
           }
         }
@@ -577,6 +577,7 @@ exports[`Papers renders 1`] = `
                 "fontWeight": "500",
                 "lineHeight": "16px",
                 "marginRight": "30px",
+                "marginTop": "10px",
                 "msFlexAlign": "center",
                 "textAlign": "center",
                 "textRendering": "geometricPrecision",
@@ -718,7 +719,6 @@ exports[`Papers renders 1`] = `
             "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
             "fontSize": "20px",
             "lineHeight": "28px",
-            "marginBottom": "20px",
             "textRendering": "geometricPrecision",
           }
         }
@@ -785,6 +785,7 @@ exports[`Papers renders 1`] = `
                 "fontWeight": "500",
                 "lineHeight": "16px",
                 "marginRight": "30px",
+                "marginTop": "10px",
                 "msFlexAlign": "center",
                 "textAlign": "center",
                 "textRendering": "geometricPrecision",
