@@ -1,4 +1,4 @@
-import { TextButtonGeneric } from '@celo/react-components/components/TextButton.v2'
+import BorderlessButton from '@celo/react-components/components/BorderlessButton.v2'
 import { Props as TouchableProps } from '@celo/react-components/components/Touchable'
 import colors from '@celo/react-components/styles/colors.v2'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
@@ -12,14 +12,14 @@ type Props = TouchableProps & {
 
 export default function TopBarButton({ onPress, style, children, disabled, testID }: Props) {
   return (
-    <TextButtonGeneric
+    <BorderlessButton
       disabled={disabled}
       onPress={onPress}
       testID={testID}
       style={style ? { ...styles.text, ...style } : styles.text}
     >
       {children}
-    </TextButtonGeneric>
+    </BorderlessButton>
   )
 }
 
