@@ -23,8 +23,6 @@ type Props = ExchangeItemFragment & {
 export function ExchangeFeedItem(props: Props) {
   const { t, i18n } = useTranslation(Namespaces.walletFlow5)
   const { amount, makerAmount, takerAmount, status, timestamp } = props
-  const localCurrencyCode = useLocalCurrencyCode()
-
   const onPress = () => {
     navigateToExchangeReview(timestamp, {
       makerAmount,
@@ -37,11 +35,17 @@ export function ExchangeFeedItem(props: Props) {
   const isPending = status === TransactionStatus.Pending
   // We always show Local Currency to cGLD exchage rate
   // independent of transaction type
-  const exchangeRate = new BigNumber((isSellGoldTx ? takerAmount : makerAmount).value).dividedBy(
-    (isSellGoldTx ? makerAmount : takerAmount).value
-  )
-
-  const isRateValid = !exchangeRate.isZero() && exchangeRate.isFinite()
+  const localAmount = (isSellGoldTx ? makerAmount : takerAmount).localAmount!
+  // TODO: find a way on how to show local exchangeRate without this hack
+  const exchangeRateAmount = {
+    value: localAmount.exchangeRate,
+    currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
+    localAmount: {
+      value: localAmount.exchangeRate,
+      exchangeRate: localAmount.exchangeRate,
+      currencyCode: localAmount.currencyCode,
+    },
+  }
 
   return (
     <Touchable onPress={onPress}>
@@ -51,19 +55,16 @@ export function ExchangeFeedItem(props: Props) {
             <Text style={styles.txMode}>
               {isSellGoldTx ? t('feedItemGoldSold') : t('feedItemGoldPurchased')}
             </Text>
-            {isRateValid && (
-              <>
-                <Text style={styles.exchangeRate}> @ </Text>
-                <CurrencyDisplay
-                  amount={{ value: exchangeRate, currencyCode: localCurrencyCode }}
-                  formatType={FormatType.ExchangeRate}
-                  hideSymbol={true}
-                  hideCode={false}
-                  showLocalAmount={false}
-                  style={styles.exchangeRate}
-                />
-              </>
-            )}
+            <>
+              <Text style={styles.exchangeRate}> @ </Text>
+              <CurrencyDisplay
+                amount={exchangeRateAmount}
+                hideSymbol={true}
+                hideCode={false}
+                showLocalAmount={true}
+                style={styles.exchangeRate}
+              />
+            </>
           </View>
           <View>
             <CurrencyDisplay amount={amount} style={styles.amount} />
@@ -107,7 +108,6 @@ const styles = StyleSheet.create({
   amount: {
     ...fontStyles.regular500,
     color: colors.dark,
-    marginRight: 12,
   },
   time: {
     ...fontStyles.small,

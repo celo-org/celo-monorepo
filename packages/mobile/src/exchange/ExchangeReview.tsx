@@ -1,8 +1,9 @@
-import Button, { BtnTypes } from '@celo/react-components/components/Button'
+import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button.v2'
 import HorizontalLine from '@celo/react-components/components/HorizontalLine'
-import colors from '@celo/react-components/styles/colors'
-import { fontStyles } from '@celo/react-components/styles/fonts'
+import colors from '@celo/react-components/styles/colors.v2'
+import fontStyles from '@celo/react-components/styles/fonts.v2'
 import { componentStyles } from '@celo/react-components/styles/styles'
+import variables from '@celo/react-components/styles/variables'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { Trans, WithTranslation } from 'react-i18next'
@@ -15,7 +16,7 @@ import { CustomEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import CurrencyDisplay, { FormatType } from 'src/components/CurrencyDisplay'
 import FeeIcon from 'src/components/FeeIcon'
-import LineItemRow from 'src/components/LineItemRow'
+import LineItemRow from 'src/components/LineItemRow.v2'
 import TotalLineItem from 'src/components/TotalLineItem'
 import { exchangeTokens, fetchExchangeRate, fetchTobinTax } from 'src/exchange/actions'
 import { ExchangeRatePair } from 'src/exchange/reducer'
@@ -227,27 +228,24 @@ export class ExchangeReview extends React.Component<Props, State> {
             </View>
           </ScrollView>
         </View>
-
-        <View style={componentStyles.bottomContainer}>
-          <Button
-            onPress={this.onPressConfirm}
-            text={
-              <Trans
-                i18nKey={
-                  this.state.makerToken === CURRENCY_ENUM.DOLLAR
-                    ? 'buyGoldAmount'
-                    : 'sellGoldAmount'
-                }
-                ns={Namespaces.exchangeFlow9}
-              >
-                Buy or sell <CurrencyDisplay amount={goldAmount} /> Gold
-              </Trans>
-            }
-            standard={false}
-            disabled={!appConnected || exchangeRate.isZero()}
-            type={BtnTypes.PRIMARY}
-          />
-        </View>
+        <Button
+          onPress={this.onPressConfirm}
+          size={BtnSizes.FULL}
+          text={
+            <Trans
+              i18nKey={
+                this.state.makerToken === CURRENCY_ENUM.DOLLAR ? 'buyGoldAmount' : 'sellGoldAmount'
+              }
+              ns={Namespaces.exchangeFlow9}
+            >
+              Buy or sell <CurrencyDisplay amount={goldAmount} /> Gold
+            </Trans>
+          }
+          standard={false}
+          style={styles.buyBtn}
+          disabled={!appConnected || exchangeRate.isZero()}
+          type={BtnTypes.TERTIARY}
+        />
       </SafeAreaView>
     )
   }
@@ -265,20 +263,19 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
   },
   exchangeBodyText: {
-    ...fontStyles.body,
-    fontSize: 15,
+    ...fontStyles.regular,
   },
   currencyAmountText: {
-    ...fontStyles.body,
-    fontSize: 24,
-    lineHeight: 39,
-    color: colors.celoGreen,
+    ...fontStyles.regular,
   },
   amountRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginTop: 30,
+  },
+  buyBtn: {
+    padding: variables.contentPadding,
   },
 })
 
