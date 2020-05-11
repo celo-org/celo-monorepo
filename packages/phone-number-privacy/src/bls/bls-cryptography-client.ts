@@ -1,4 +1,4 @@
-import { AzureKeyVaultClient } from '@celo/contractkit/src/utils/azure-key-vault-client'
+import { AzureKeyVaultClient } from '@celo/contractkit/lib/utils/azure-key-vault-client'
 import threshold from 'blind-threshold-bls'
 import { ErrorMessages } from '../common/error-utils'
 import logger from '../common/logger'

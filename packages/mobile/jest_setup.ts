@@ -1,10 +1,6 @@
-import { configure } from 'enzyme'
-// @ts-ignore TODO(cmcewen): remove enzyme
-import Adapter from 'enzyme-adapter-react-16'
 import { cleanup } from 'react-native-testing-library'
 // @ts-ignore
 const svgMock = require('react-native-svg-mock')
-configure({ adapter: new Adapter() })
 
 jest.useFakeTimers()
 

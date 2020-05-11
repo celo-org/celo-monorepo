@@ -6,7 +6,6 @@ import { FlatList } from 'react-native'
 import { connect } from 'react-redux'
 import { TransactionFeedFragment } from 'src/apollo/types'
 import { AddressToE164NumberType } from 'src/identity/reducer'
-import { Invitees } from 'src/invite/actions'
 import { NumberToRecipient } from 'src/recipients/recipient'
 import { recipientCacheSelector } from 'src/recipients/reducer'
 import { RootState } from 'src/redux/reducers'
@@ -25,7 +24,6 @@ export enum FeedType {
 }
 
 interface StateProps {
-  invitees: Invitees
   commentKey: string | null | undefined
   addressToE164Number: AddressToE164NumberType
   recipientCache: NumberToRecipient
@@ -43,7 +41,6 @@ type Props = {
 } & StateProps
 
 const mapStateToProps = (state: RootState): StateProps => ({
-  invitees: state.invite.invitees,
   commentKey: privateCommentKeySelector(state),
   addressToE164Number: state.identity.addressToE164Number,
   recipientCache: recipientCacheSelector(state),
@@ -68,13 +65,12 @@ export class TransactionFeed extends React.PureComponent<Props> {
     item: FeedItem
     index: number
   }) => {
-    const { addressToE164Number, invitees, recipientCache } = this.props
+    const { addressToE164Number, recipientCache } = this.props
 
     switch (tx.__typename) {
       case 'TokenTransfer':
         return (
           <TransferFeedItem
-            invitees={invitees}
             addressToE164Number={addressToE164Number}
             recipientCache={recipientCache}
             commentKey={commentKeyBuffer}

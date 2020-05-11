@@ -11,7 +11,7 @@ import { fetchPhoneHashPrivate } from 'src/identity/privacy'
 import { setRecipientCache } from 'src/recipients/actions'
 import { contactsToRecipients } from 'src/recipients/recipient'
 import { getAllContacts } from 'src/utils/contacts'
-import { getContractKit } from 'src/web3/contracts'
+import { getContractKitOutsideGenerator } from 'src/web3/contracts'
 import { getConnectedAccount } from 'src/web3/saga'
 import {
   mockAccount,
@@ -68,7 +68,7 @@ describe('Import Contacts Saga', () => {
 
 describe('Fetch Addresses Saga', () => {
   it('fetches and caches addresses correctly', async () => {
-    const contractKit = getContractKit()
+    const contractKit = await getContractKitOutsideGenerator()
     await expectSaga(fetchPhoneAddresses, { e164Number: mockE164Number })
       .provide([
         [call(fetchPhoneHashPrivate, mockE164Number), { phoneHash: mockE164NumberHash }],
