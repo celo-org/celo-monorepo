@@ -3,13 +3,13 @@ import QRCode from '@celo/react-components/icons/QRCode'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
+import { StackNavigationProp } from '@react-navigation/stack'
 import { memoize } from 'lodash'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { Platform, StyleSheet, Text, View } from 'react-native'
 import { RNCamera } from 'react-native-camera'
 import SafeAreaView from 'react-native-safe-area-view'
-import { NavigationFocusInjectedProps, withNavigationFocus } from 'react-navigation'
 import { connect } from 'react-redux'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
@@ -24,7 +24,10 @@ interface DispatchProps {
   handleBarcodeDetected: typeof handleBarcodeDetected
 }
 
-type Props = DispatchProps & WithTranslation & NavigationFocusInjectedProps
+type Props = DispatchProps &
+  WithTranslation & {
+    navigation: StackNavigationProp<any, any>
+  }
 
 class QRScanner extends React.Component<Props> {
   static navigationOptions = () => ({
@@ -54,7 +57,7 @@ class QRScanner extends React.Component<Props> {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.innerContainer}>
-          {(Platform.OS !== 'android' || this.props.isFocused) && (
+          {(Platform.OS !== 'android' || this.props.navigation.isFocused) && (
             <RNCamera
               ref={(ref) => {
                 this.camera = ref
@@ -168,10 +171,7 @@ const styles = StyleSheet.create({
 })
 
 export default componentWithAnalytics(
-  withNavigationFocus(
-    // @ts-ignore
-    connect(null, {
-      handleBarcodeDetected,
-    })(withTranslation(Namespaces.sendFlow7)(QRScanner))
-  )
+  connect(null, {
+    handleBarcodeDetected,
+  })(withTranslation(Namespaces.sendFlow7)(QRScanner))
 )

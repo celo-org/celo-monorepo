@@ -13,13 +13,14 @@ import { fontStyles } from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
 import { ValidatorKind } from '@celo/utils/src/inputValidation'
 import { parseInputAmount } from '@celo/utils/src/parsing'
+import { RouteProp } from '@react-navigation/native'
+import { StackNavigationProp } from '@react-navigation/stack'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { StyleSheet, TextStyle, TouchableWithoutFeedback, View } from 'react-native'
 import { getNumberFormatSettings } from 'react-native-localize'
 import SafeAreaView from 'react-native-safe-area-view'
-import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
 import { hideAlert, showError, showMessage } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
@@ -51,6 +52,7 @@ import { getLocalCurrencyCode, getLocalCurrencyExchangeRate } from 'src/localCur
 import { HeaderTitleWithBalance, headerWithBackButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { StackParamList } from 'src/navigator/types'
 import {
   getAddressFromRecipient,
   getRecipientVerificationStatus,
@@ -74,10 +76,12 @@ interface State {
   characterLimitExceeded: boolean
 }
 
-type Navigation = NavigationInjectedProps['navigation']
+type Navigation = StackNavigationProp<StackParamList, Screens.SendAmount>
+type Route = RouteProp<StackParamList, Screens.SendAmount>
 
 interface OwnProps {
   navigation: Navigation
+  route: Route
 }
 
 type Props = StateProps & DispatchProps & OwnProps & WithTranslation
@@ -100,26 +104,20 @@ interface DispatchProps {
   fetchPhoneAddresses: typeof fetchPhoneAddresses
 }
 
-function getRecipient(navigation: Navigation): Recipient {
-  const recipient = navigation.getParam('recipient')
+function getRecipient(route: Route): Recipient {
+  const recipient = route.params.recipient
   if (!recipient) {
     throw new Error('Recipient expected')
   }
   return recipient
 }
 
-function getVerificationStatus(
-  navigation: Navigation,
-  e164NumberToAddress: E164NumberToAddressType
-) {
-  return getRecipientVerificationStatus(getRecipient(navigation), e164NumberToAddress)
+function getVerificationStatus(route: Route, e164NumberToAddress: E164NumberToAddressType) {
+  return getRecipientVerificationStatus(getRecipient(route), e164NumberToAddress)
 }
 
-function getFeeType(
-  navigation: Navigation,
-  e164NumberToAddress: E164NumberToAddressType
-): FeeType | null {
-  const verificationStatus = getVerificationStatus(navigation, e164NumberToAddress)
+function getFeeType(route: Route, e164NumberToAddress: E164NumberToAddressType): FeeType | null {
+  const verificationStatus = getVerificationStatus(route, e164NumberToAddress)
 
   switch (verificationStatus) {
     case RecipientVerificationStatus.UNKNOWN:
@@ -131,10 +129,10 @@ function getFeeType(
   }
 }
 
-const mapStateToProps = (state: RootState, ownProps: NavigationInjectedProps): StateProps => {
-  const { navigation } = ownProps
+const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
+  const { route } = ownProps
   const { e164NumberToAddress } = state.identity
-  const feeType = getFeeType(navigation, e164NumberToAddress)
+  const feeType = getFeeType(route, e164NumberToAddress)
   return {
     dollarBalance: state.stableToken.balance || '0',
     estimateFeeDollars: getFeeEstimateDollars(state, feeType),
@@ -207,11 +205,11 @@ export class SendAmount extends React.Component<Props, State> {
   }
 
   getRecipient = (): Recipient => {
-    return getRecipient(this.props.navigation)
+    return getRecipient(this.props.route)
   }
 
   getVerificationStatus = () => {
-    return getVerificationStatus(this.props.navigation, this.props.e164NumberToAddress)
+    return getVerificationStatus(this.props.route, this.props.e164NumberToAddress)
   }
 
   getConfirmationInput = (type: TokenTransactionType) => {

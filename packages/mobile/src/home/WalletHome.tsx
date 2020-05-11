@@ -33,7 +33,6 @@ import { callToActNotificationSelector, getActiveNotificationCount } from 'src/h
 import { Namespaces, withTranslation } from 'src/i18n'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import { withDispatchAfterNavigate } from 'src/navigator/WithDispatchAfterNavigate'
 import { NumberToRecipient } from 'src/recipients/recipient'
 import { recipientCacheSelector } from 'src/recipients/reducer'
 import { RootState } from 'src/redux/reducers'
@@ -288,11 +287,9 @@ const styles = StyleSheet.create({
   },
 })
 
-export default withDispatchAfterNavigate(
-  componentWithAnalytics(
-    connect<StateProps, DispatchProps, {}, RootState>(
-      mapStateToProps,
-      mapDispatchToProps
-    )(withTranslation(Namespaces.walletFlow5)(WalletHome))
-  )
+export default componentWithAnalytics(
+  connect<StateProps, DispatchProps, {}, RootState>(
+    mapStateToProps,
+    mapDispatchToProps
+  )(withTranslation(Namespaces.walletFlow5)(WalletHome))
 )

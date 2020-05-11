@@ -40,7 +40,7 @@ import EnterInviteCode from 'src/invite/EnterInviteCode'
 import Language from 'src/language/Language'
 import SelectLocalCurrency from 'src/localCurrency/SelectLocalCurrency'
 import { Screens, Stacks } from 'src/navigator/Screens'
-// import TabNavigator from 'src/navigator/TabNavigator'
+import TabNavigator from 'src/navigator/TabNavigator'
 import IncomingPaymentRequestListScreen from 'src/paymentRequest/IncomingPaymentRequestListScreen'
 import OutgoingPaymentRequestListScreen from 'src/paymentRequest/OutgoingPaymentRequestListScreen'
 import PaymentRequestConfirmation from 'src/paymentRequest/PaymentRequestConfirmation'
@@ -63,6 +63,8 @@ import VerificationInterstitialScreen from 'src/verify/VerificationInterstitialS
 import VerificationLearnMoreScreen from 'src/verify/VerificationLearnMoreScreen'
 import VerificationLoadingScreen from 'src/verify/VerificationLoadingScreen'
 import VerificationSuccessScreen from 'src/verify/VerificationSuccessScreen'
+
+const Stack = createStackNavigator()
 
 export const headerArea = {
   // Force this for now on iOS so screen transitions look normal
@@ -87,77 +89,78 @@ const createStackNavigatorStub = (...args) => {
   console.log(args)
 }
 
-export const commonScreens = {
-  [Screens.PincodeEnter]: { screen: PincodeEnter },
-  [Screens.ErrorScreen]: { screen: ErrorScreen },
-  [Screens.UpgradeScreen]: { screen: UpgradeScreen },
-  [Screens.DappKitAccountAuth]: { screen: DappKitAccountScreen },
-  [Screens.DappKitSignTxScreen]: { screen: DappKitSignTxScreen },
-  [Screens.DappKitTxDataScreen]: { screen: DappKitTxDataScreen },
-  [Screens.Debug]: { screen: Debug },
-  [Screens.DataSaver]: { screen: DataSaver },
-}
-
-const NuxStack = createStackNavigator()
-
-const commonScreensGen = (Navigator: typeof NuxStack) => {
+const commonScreens = (Navigator: typeof Stack) => {
   return (
     <>
       <Navigator.Screen name={Screens.PincodeEnter} component={PincodeEnter} />
+      <Navigator.Screen name={Screens.ErrorScreen} component={ErrorScreen} />
+      <Navigator.Screen name={Screens.UpgradeScreen} component={UpgradeScreen} />
+      <Navigator.Screen name={Screens.DappKitAccountAuth} component={DappKitAccountScreen} />
+      <Navigator.Screen name={Screens.DappKitSignTxScreen} component={DappKitSignTxScreen} />
+      <Navigator.Screen name={Screens.DappKitTxDataScreen} component={DappKitTxDataScreen} />
+      <Navigator.Screen name={Screens.Debug} component={Debug} />
+      <Navigator.Screen name={Screens.DataSaver} component={DataSaver} />
     </>
   )
 }
 
-const verificationScreens = {
-  [Screens.VerificationEducationScreen]: { screen: VerificationEducationScreen },
-  [Screens.VerificationLearnMoreScreen]: { screen: VerificationLearnMoreScreen },
-  [Screens.VerificationLoadingScreen]: { screen: VerificationLoadingScreen },
-  [Screens.VerificationInterstitialScreen]: { screen: VerificationInterstitialScreen },
-  [Screens.VerificationInputScreen]: { screen: VerificationInputScreen },
-  [Screens.VerificationSuccessScreen]: { screen: VerificationSuccessScreen },
+const verificationScreens = (Navigator: typeof Stack) => {
+  return (
+    <>
+      <Navigator.Screen
+        name={Screens.VerificationEducationScreen}
+        component={VerificationEducationScreen}
+      />
+      <Navigator.Screen
+        name={Screens.VerificationLearnMoreScreen}
+        component={VerificationLearnMoreScreen}
+      />
+      <Navigator.Screen
+        name={Screens.VerificationLoadingScreen}
+        component={VerificationLoadingScreen}
+      />
+      <Navigator.Screen
+        name={Screens.VerificationInterstitialScreen}
+        component={VerificationInterstitialScreen}
+      />
+      <Navigator.Screen
+        name={Screens.VerificationInputScreen}
+        component={VerificationInputScreen}
+      />
+      <Navigator.Screen
+        name={Screens.VerificationSuccessScreen}
+        component={VerificationSuccessScreen}
+      />
+    </>
+  )
 }
 
-//   {
-//     [Screens.Language]: { screen: Language },
-//     [Screens.JoinCelo]: { screen: JoinCelo },
-//     [Screens.RegulatoryTerms]: { screen: RegulatoryTerms },
-//     [Screens.PincodeEducation]: { screen: PincodeEducation },
-//     [Screens.PincodeSet]: { screen: PincodeSet },
-//     [Screens.EnterInviteCode]: { screen: EnterInviteCode },
-//     [Screens.ImportWallet]: { screen: ImportWallet },
-//     [Screens.ImportWalletSocial]: { screen: ImportWalletSocial },
-//     [Screens.ImportWalletEmpty]: { screen: ImportWalletEmpty },
-//     ...verificationScreens,
-//     ...commonScreens,
-//   },
-//   {
-//     navigationOptions: {
-//       header: null,
-//     },
-//     ...headerArea,
-//     initialRouteName: Screens.Language,
-//   }
-// )
+const nuxScreens = (Navigator: typeof Stack) => (
+  <>
+    <Navigator.Screen name={Screens.Language} component={Language} />
+    <Navigator.Screen name={Screens.JoinCelo} component={JoinCelo} />
+    <Navigator.Screen name={Screens.RegulatoryTerms} component={RegulatoryTerms} />
+    <Navigator.Screen name={Screens.PincodeEducation} component={PincodeEducation} />
+    <Navigator.Screen name={Screens.PincodeSet} component={PincodeSet} />
+    <Navigator.Screen name={Screens.EnterInviteCode} component={EnterInviteCode} />
+    <Navigator.Screen name={Screens.ImportWallet} component={ImportWallet} />
+    <Navigator.Screen name={Screens.ImportWalletSocial} component={ImportWalletSocial} />
+    <Navigator.Screen name={Screens.ImportWalletEmpty} component={ImportWalletEmpty} />
+  </>
+)
 
-const NuxStackNavigator = () => (
-  <NuxStack.Navigator headerMode={'none'} initialRouteName={Screens.Language}>
-    <NuxStack.Screen name={Screens.Language} component={Language} />
-    <NuxStack.Screen name={Screens.JoinCelo} component={JoinCelo} />
-    <NuxStack.Screen name={Screens.RegulatoryTerms} component={RegulatoryTerms} />
-    <NuxStack.Screen name={Screens.PincodeEducation} component={PincodeEducation} />
-    <NuxStack.Screen name={Screens.PincodeSet} component={PincodeSet} />
-    <NuxStack.Screen name={Screens.EnterInviteCode} component={EnterInviteCode} />
-    <NuxStack.Screen name={Screens.ImportWallet} component={ImportWallet} />
-    <NuxStack.Screen name={Screens.ImportWalletSocial} component={ImportWalletSocial} />
-    <NuxStack.Screen name={Screens.ImportWalletEmpty} component={ImportWalletEmpty} />
-    <NuxStack.Screen name={Screens.PincodeEnter} component={PincodeEnter} />
-  </NuxStack.Navigator>
+const sendScreens = (Navigator: typeof Stack) => (
+  <>
+    <Navigator.Screen name={Screens.Send} component={Send} />
+    <Navigator.Screen name={Screens.QRScanner} component={QRScanner} />
+    <Navigator.Screen name={Screens.SendAmount} component={SendAmount} />
+    <Navigator.Screen name={Screens.SendConfirmation} component={SendConfirmation} />
+  </>
 )
 
 const SendStack = createStackNavigatorStub(
   {
     [Screens.Send]: { screen: Send },
-    ...verificationScreens,
     [Screens.QRScanner]: { screen: QRScanner },
     [Screens.SendAmount]: { screen: SendAmount },
     [Screens.SendConfirmation]: { screen: SendConfirmation },
@@ -283,7 +286,6 @@ const SettingsStack = createStackNavigatorStub(
     [Screens.Support]: { screen: Support },
     [Screens.SupportContact]: { screen: SupportContact },
     [Screens.FiatExchange]: { screen: FiatExchange },
-    ...verificationScreens,
   },
   {
     navigationOptions: {
@@ -320,7 +322,6 @@ const AppStack = createStackNavigatorStub(
     [Screens.GoldEducation]: { screen: GoldEducation },
     [Screens.FeeEducation]: { screen: FeeEducation },
     [Screens.FeeExchangeEducation]: { screen: FeeExchangeEducation }, // Included so it is possible to go back to Home screen from it
-    ...commonScreens,
   },
   {
     ...headerArea,
@@ -328,10 +329,16 @@ const AppStack = createStackNavigatorStub(
   }
 )
 
-const Stack = createStackNavigator()
-
 export function AppNavigatorNew() {
-  return <NuxStackNavigator />
+  return (
+    <Stack.Navigator headerMode={'none'} initialRouteName={Screens.Language}>
+      <Stack.Screen name={Screens.TabNavigator} component={TabNavigator} />
+      {commonScreens(Stack)}
+      {sendScreens(Stack)}
+      {nuxScreens(Stack)}
+      {verificationScreens(Stack)}
+    </Stack.Navigator>
+  )
 }
 
 export default AppNavigatorNew
