@@ -1,12 +1,12 @@
 # Quick Start for Celo Gold Holders
 
-If you are an early holder of Celo Gold on the Celo [Release Candidate](../getting-started/rc1.md) network, this guide will help you access your account and do the setup necessary to earn rewards on those funds.
+If you are an early self-custodying holder of Celo Gold on the Celo [Release Candidate](../getting-started/rc1.md) network, this guide will help you access your account and do the setup necessary to earn rewards on those funds.
 
 ## Prerequisites
 
 This guide assumes:
 
-- You are self-custodying (you hold the private key to your address), and that you have provided that address directly to cLabs. If you are using a custody provider, please contact them for directions.
+- You are self-custodying (you hold the private key to your address), and that you have provided that address directly to cLabs. If you are using a custody provider ([Anchorage](https://anchorage.com), [Coinbase](https://custody.coinbase.com), [CoinList](https://coinlist.co), or others), please contact them for directions.
 
 - Your address is the beneficiary of a [ReleaseGold](release-gold.md) contract, which releases Celo Gold programmatically to a beneficiary over a period of time.
 
@@ -24,7 +24,7 @@ This guide assumes:
 
 ## Support
 
-If you have any questions or need assistance with these instructions, please contact cLabs or ask in the `#celo-gold-holders` channel on [Celo's Discord server](https://chat.celo.org). Remember that Discord is a public channel: never disclose recovery phrases (mnemonics), private keys, unsantized log output, or personal information.
+If you have any questions or need assistance with these instructions, please contact cLabs or ask in the `#celo-gold-holders` channel on [Celo's Discord server](https://chat.celo.org). Remember that Discord is a public channel: never disclose recovery phrases (also known as backup keys, or mnemonics), private keys, unsantized log output, or personal information.
 
 Please refer to the [Ledger Troubleshooting](ledger.md#Troubleshooting) for issues using Ledgers with the Celo CLI.
 

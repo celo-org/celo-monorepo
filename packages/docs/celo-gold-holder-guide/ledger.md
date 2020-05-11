@@ -13,7 +13,7 @@ The steps below require technical knowledge. You should be comfortable with the 
 Start by installing the Celo application and setting a PIN on your Ledger device by following steps 1 and 2 [on this page](https://www.ledger.com/start/).
 
 {% hint style="danger" %}
-Make sure to securely back up both the PIN and the recovery phrase ("mnemonic"). If you lose them, or they are stolen, you lose access to your Celo assets with no recovery possible. The recovery phrase will be shown only once.
+Make sure to securely back up both the PIN and the recovery phrase (also known as a backup key or mnemonic). If you lose them, or they are stolen, you lose access to your Celo assets with no recovery possible. The recovery phrase will be shown only once.
 {% endhint %}
 
 Open the Ledger Live App on your computer and follow the instructions on the screen.
