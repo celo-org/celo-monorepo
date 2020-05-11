@@ -254,8 +254,6 @@ docker run --name celo-proxy -it --restart unless-stopped -p 30303:30303 -p 3030
 
 Hint: If you are running into trouble peering with the full nodes, one of the first things to check is whether your container's ports are properly configured (i.e. specifically, `-p 30303:30303 -p 30303:30303/udp` - which is set in the proxy node's command, but not the account node's command).
 
-{% endhint %}
-
 {% hint style="info" %}
 You can detach from the running container by pressing `ctrl+p ctrl+q`, or start it with `-d` instead of `-it` to start detached. Access the logs for a container in the background with the `docker logs` command.
 {% endhint %}

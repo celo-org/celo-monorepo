@@ -1,3 +1,4 @@
+import colors from '@celo/react-components/styles/colors'
 import { Platform } from 'react-native'
 import { createSwitchNavigator } from 'react-navigation'
 import { createStackNavigator } from 'react-navigation-stack'
@@ -70,6 +71,7 @@ export const headerArea = {
   // given we intentionally hide the bottom separator from the nav bar
   headerMode: 'screen',
   defaultNavigationOptions: {
+    cardStyle: { backgroundColor: colors.background },
     headerStyle: {
       ...Platform.select({
         android: {
@@ -78,6 +80,9 @@ export const headerArea = {
         ios: {
           borderBottomWidth: 0,
           borderBottomColor: 'transparent',
+          shadowOffset: {
+            height: 0,
+          },
         },
       }),
     },
