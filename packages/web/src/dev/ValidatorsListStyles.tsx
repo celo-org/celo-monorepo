@@ -222,11 +222,10 @@ export const styles = StyleSheet.create({
   numberBlock: {
     borderTopWidth: 0,
     borderBottomWidth: 0,
-    borderRightWidth: 0,
     paddingHorizontal: 10,
     borderLeftWidth: 1,
     borderLeftColor: colors.grayHeavy,
-    border: 'solid',
+    borderRightWidth: 0,
   },
   numberBlockFirst: {
     borderLeftWidth: 0,
