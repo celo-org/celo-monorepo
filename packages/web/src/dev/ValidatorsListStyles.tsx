@@ -55,7 +55,7 @@ export const styles = StyleSheet.create({
 
   // Table
   table: {
-    width: 1020,
+    width: 1252,
     margin: 'auto',
     marginBottom: 100,
     backgroundColor: colors.dark,

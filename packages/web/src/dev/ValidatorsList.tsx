@@ -101,6 +101,8 @@ type orderByTypes =
   | 'name'
   | 'total'
   | 'votes'
+  | 'rawVotes'
+  | 'votesAvailables'
   | 'gold'
   | 'commision'
   | 'rewards'
@@ -123,6 +125,8 @@ class ValidatorsList extends React.PureComponent<Props, State> {
     name: (_) => (_.name || '').toLowerCase() || null,
     total: (_) => _.numMembers * 1000 + _.elected,
     votes: (_) => +_.votesAbsolute || 0,
+    rawVotes: (_) => _.votesRaw || 0,
+    votesAvailables: (_) => _.receivableRaw || 0,
     gold: (_) => _.gold || 0,
     commision: (_) => _.commission || 0,
     rewards: (_) => _.rewards || 0,
@@ -188,7 +192,9 @@ class ValidatorsList extends React.PureComponent<Props, State> {
             address: group.address,
             usd: weiToDecimal(+group.usd),
             gold: weiToDecimal(+group.lockedGold),
+            receivableRaw: weiToDecimal(+receivableVotes),
             receivableVotes: receivableVotesPer.toString(),
+            votesRaw: weiToDecimal(+votes),
             votes: votesPer.toString(),
             votesAbsolute: votesAbsolutePer.toString(),
             commission: (+commission * 100) / 10 ** 24,
@@ -296,9 +302,21 @@ class ValidatorsList extends React.PureComponent<Props, State> {
               order={orderBy === 'votes' ? orderAsc : null}
             />
             <HeaderCell
+              onClick={this.orderByFn.votes}
+              style={[styles.sizeM]}
+              name="Votes"
+              order={orderBy === 'rawVotes' ? orderAsc : null}
+            />
+            <HeaderCell
+              onClick={this.orderByFn.votes}
+              style={[styles.sizeM]}
+              name="Votes Available"
+              order={orderBy === 'votesAvailables' ? orderAsc : null}
+            />
+            <HeaderCell
               onClick={this.orderByFn.gold}
               style={[styles.sizeM]}
-              name="Locked CGLD"
+              name="Locked Gold"
               order={orderBy === 'gold' ? orderAsc : null}
             />
             <HeaderCell

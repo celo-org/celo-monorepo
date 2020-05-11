@@ -33,7 +33,9 @@ export interface CeloGroup {
   address: string
   usd: number
   gold: number
+  receivableRaw: number
   receivableVotes: string
+  votesRaw: number
   votes: string
   votesAbsolute: string
   commission: number
@@ -187,6 +189,22 @@ class ValidatorsListRow extends React.PureComponent<Props & I18nProps, State> {
           </Text>
           <Text
             style={[styles.tableCell, styles.tableCellCenter, styles.sizeM]}
+            numberOfLines={2}
+            ellipsizeMode="tail"
+          >
+            {formatNumber(+group.votesRaw, 0)}
+            {'\n'}({formatNumber((group.gold / group.votesRaw) * 100, 1) || 0}%)
+          </Text>
+          <Text
+            style={[styles.tableCell, styles.tableCellCenter, styles.sizeM]}
+            numberOfLines={2}
+            ellipsizeMode="tail"
+          >
+            {formatNumber(+group.receivableRaw, 0)}
+            {'\n'}({formatNumber((group.gold / +group.receivableRaw) * 100, 1) || 0}%)
+          </Text>
+          <Text
+            style={[styles.tableCell, styles.tableCellCenter, styles.sizeM]}
             numberOfLines={1}
             ellipsizeMode="tail"
           >
@@ -261,6 +279,8 @@ class ValidatorsListRow extends React.PureComponent<Props & I18nProps, State> {
                   />
                 </Text>
                 <Text style={[styles.tableCell, styles.sizeXL]} />
+                <Text style={[styles.tableCell, styles.sizeM]} />
+                <Text style={[styles.tableCell, styles.sizeM]} />
                 <Text
                   style={[
                     styles.tableCell,
