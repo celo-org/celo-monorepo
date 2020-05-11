@@ -14,7 +14,7 @@ import { fetchPhoneAddressesAndCheckIfRecipientValidationRequired } from 'src/id
 import { unknownUserIcon } from 'src/images/Images'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import { getRecipientThumbnail, Recipient } from 'src/recipients/recipient'
+import { getRecipientThumbnail, Recipient, RecipientKind } from 'src/recipients/recipient'
 import { TransactionData } from 'src/send/SendAmount'
 import Logger from 'src/utils/Logger'
 
@@ -42,11 +42,14 @@ export class IncomingPaymentRequestListItem extends React.Component<Props> {
   fetchLatestPhoneAddressesAndRecipientVerificationStatus = () => {
     const { requester: recipient } = this.props
 
-    if (!recipient.e164PhoneNumber) {
-      throw new Error('Missing recipient e164Number')
-    }
+    // Skip phone number fetch for QR codes or Addresses
+    if (recipient.kind !== RecipientKind.QrCode && recipient.kind !== RecipientKind.Address) {
+      if (!recipient.e164PhoneNumber) {
+        throw new Error('Missing recipient e164Number')
+      }
 
-    this.props.fetchPhoneAddressesAndCheckIfRecipientValidationRequired(recipient.e164PhoneNumber)
+      this.props.fetchPhoneAddressesAndCheckIfRecipientValidationRequired(recipient.e164PhoneNumber)
+    }
   }
 
   onPay = () => {

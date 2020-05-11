@@ -138,7 +138,7 @@ const checkIfNewAddressesAdded = (
 }
 
 const checkIfLast4DigitsAreUnique = (addressArr: string[]) => {
-  const last4DigitArr = addressArr.map((address) => address.slice(-4))
+  const last4DigitArr = addressArr.map((address) => address.slice(-4).toLowerCase())
   const last4DigitSet = new Set()
   last4DigitArr.forEach((endDigits) => last4DigitSet.add(endDigits))
   return last4DigitArr.length === last4DigitSet.size

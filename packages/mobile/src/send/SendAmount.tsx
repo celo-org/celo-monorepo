@@ -73,7 +73,6 @@ export interface TransactionData {
 interface State {
   amount: string
   reason: string
-  characterLimitExceeded: boolean
 }
 
 type Navigation = NavigationInjectedProps['navigation']
@@ -146,7 +145,6 @@ export class SendAmount extends React.Component<Props, State> {
   state: State = {
     amount: '',
     reason: '',
-    characterLimitExceeded: false,
   }
 
   componentDidMount() {
@@ -208,14 +206,7 @@ export class SendAmount extends React.Component<Props, State> {
   }
 
   onReasonChanged = (reason: string) => {
-    const characterLimitExceeded = reason.length > MAX_COMMENT_LENGTH
-    if (characterLimitExceeded) {
-      this.props.showMessage(this.props.t('characterLimitExceeded', { max: MAX_COMMENT_LENGTH }))
-    } else {
-      this.props.hideAlert()
-    }
-
-    this.setState({ reason, characterLimitExceeded })
+    this.setState({ reason })
   }
 
   onSend = () => {
@@ -268,16 +259,11 @@ export class SendAmount extends React.Component<Props, State> {
 
   renderButtons = (isAmountValid: boolean) => {
     const { t, recipientVerificationStatus } = this.props
-    const { characterLimitExceeded } = this.state
 
     const requestDisabled =
-      !isAmountValid ||
-      recipientVerificationStatus !== RecipientVerificationStatus.VERIFIED ||
-      characterLimitExceeded
+      !isAmountValid || recipientVerificationStatus !== RecipientVerificationStatus.VERIFIED
     const sendDisabled =
-      !isAmountValid ||
-      characterLimitExceeded ||
-      recipientVerificationStatus === RecipientVerificationStatus.UNKNOWN
+      !isAmountValid || recipientVerificationStatus === RecipientVerificationStatus.UNKNOWN
 
     const separatorContainerStyle =
       sendDisabled && requestDisabled
@@ -405,7 +391,7 @@ export class SendAmount extends React.Component<Props, State> {
             title={t('global:for')}
             placeholder={t('groceriesRent')}
             value={this.state.reason}
-            maxLength={70}
+            maxLength={MAX_COMMENT_LENGTH}
             onChangeText={this.onReasonChanged}
           />
           <View style={style.feeContainer}>
