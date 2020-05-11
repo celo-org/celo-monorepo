@@ -119,6 +119,9 @@ class ValidatorsListRow extends React.PureComponent<Props & I18nProps, State> {
                   style={[styles.tableCellTitleFirstRow]}
                   numberOfLines={1}
                   ellipsizeMode="tail"
+                  accessibilityRole="link"
+                  href={`https://explorer.celo.org/address/${group.address}/celo`}
+                  target="_blank"
                 >
                   {group.name || unknownGroupName}
                 </Text>
@@ -232,7 +235,12 @@ class ValidatorsListRow extends React.PureComponent<Props & I18nProps, State> {
                 >
                   <Text style={[styles.tableCell, styles.tableCellTitleNumber]}>{j + 1}</Text>
                   <Text style={[styles.tableCellTitleRows]}>
-                    <Text style={[styles.tableCellTitleFirstRow, styles.tableSecondaryCell]}>
+                    <Text
+                      style={[styles.tableCellTitleFirstRow, styles.tableSecondaryCell]}
+                      accessibilityRole="link"
+                      href={`https://explorer.celo.org/address/${validator.address}/celo`}
+                      target="_blank"
+                    >
                       {validator.name || unknownValidatorName}
                     </Text>
                     <Text
