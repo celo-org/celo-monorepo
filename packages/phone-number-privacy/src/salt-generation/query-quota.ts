@@ -5,15 +5,20 @@ import logger from '../common/logger'
 import config from '../config'
 import { getPerformedQueryCount } from '../database/wrappers/account'
 import { getContractKit } from '../web3/contracts'
+import { Transaction } from 'knex'
 
 /*
  * Returns how many queries the account can make based on the
  * calculated query quota and the number of queries already performed.
  */
-export async function getRemainingQueryCount(account: string, hashedPhoneNumber?: string) {
+export async function getRemainingQueryCount(
+  trx: Transaction,
+  account: string,
+  hashedPhoneNumber?: string
+) {
   logger.debug('Retrieving remaining query count')
   const queryQuota = await getQueryQuota(account, hashedPhoneNumber)
-  const performedQueryCount = await getPerformedQueryCount(account)
+  const performedQueryCount = await getPerformedQueryCount(account, trx)
   return queryQuota - performedQueryCount
 }
 

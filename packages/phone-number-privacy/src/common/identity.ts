@@ -14,7 +14,6 @@ export function authenticateUser() {
 
 export async function isVerified(account: string, hashedPhoneNumber: string): Promise<boolean> {
   // TODO (amyslawson) wrap forno request in retry
-  // TODO (aslawson) update to work with hashed phoneNumber
   const attestationsWrapper: AttestationsWrapper = await getContractKit().contracts.getAttestations()
   const attestationStats = await attestationsWrapper.getAttestationStat(hashedPhoneNumber, account)
   const numAttestationsCompleted = attestationStats.completed

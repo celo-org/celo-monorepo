@@ -1,3 +1,4 @@
+import { Transaction } from 'knex'
 import { ErrorMessages } from '../../common/error-utils'
 import logger from '../../common/logger'
 import { getDatabase } from '../database'
@@ -10,12 +11,13 @@ function accounts() {
 /*
  * Returns how many queries the account has already performed.
  */
-export async function getPerformedQueryCount(account: string): Promise<number> {
+export async function getPerformedQueryCount(account: string, trx: Transaction): Promise<number> {
   logger.debug('Getting performed query count')
   try {
-    const queryCounts = await accounts()
-      .where(ACCOUNTS_COLUMNS.address, account)
+    const queryCounts = await trx(ACCOUNTS_TABLE)
+      .forUpdate()
       .select(ACCOUNTS_COLUMNS.numLookups)
+      .where(ACCOUNTS_COLUMNS.address, account)
       .first()
     return queryCounts === undefined ? 0 : queryCounts[ACCOUNTS_COLUMNS.numLookups]
   } catch (e) {
@@ -34,11 +36,11 @@ async function getAccountExists(account: string): Promise<boolean> {
 /*
  * Increments query count in database.  If record doesn't exist, create one.
  */
-export async function incrementQueryCount(account: string) {
+export async function incrementQueryCount(account: string, trx: Transaction) {
   logger.debug('Incrementing query count')
   try {
     if (await getAccountExists(account)) {
-      return accounts()
+      await trx(ACCOUNTS_TABLE)
         .where(ACCOUNTS_COLUMNS.address, account)
         .increment(ACCOUNTS_COLUMNS.numLookups, 1)
     } else {
@@ -46,8 +48,10 @@ export async function incrementQueryCount(account: string) {
       newAccount[ACCOUNTS_COLUMNS.numLookups] = 1
       return insertRecord(newAccount)
     }
+    await trx.commit()
   } catch (e) {
     logger.error(ErrorMessages.DATABASE_UPDATE_FAILURE, e)
+    await trx.commit() // don't rollback with DB failure. commit to release lock
     return true
   }
 }
@@ -61,7 +65,6 @@ export async function getDidMatchmaking(account: string): Promise<boolean> {
       .where(ACCOUNTS_COLUMNS.address, account)
       .select(ACCOUNTS_COLUMNS.didMatchmaking)
       .first()
-
     if (!didMatchmaking) {
       return false
     }

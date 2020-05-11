@@ -1,9 +1,10 @@
-import { isValidAddress } from '@celo/utils/lib/address'
+import { isValidAddress, trimLeading0x } from '@celo/utils/lib/address'
 import { Request, Response } from 'firebase-functions'
 import { BLSCryptographyClient } from '../bls/bls-cryptography-client'
 import { ErrorMessages, respondWithError } from '../common/error-utils'
 import { authenticateUser } from '../common/identity'
 import logger from '../common/logger'
+import { getDatabase } from '../database/database'
 import { incrementQueryCount } from '../database/wrappers/account'
 import { getRemainingQueryCount } from './query-quota'
 
@@ -14,18 +15,21 @@ export async function handleGetBlindedMessageForSalt(request: Request, response:
       return
     }
     authenticateUser()
+    const trx = await getDatabase().transaction()
     const remainingQueryCount = await getRemainingQueryCount(
+      trx,
       request.body.account,
       request.body.hashedPhoneNumber
     )
     if (remainingQueryCount <= 0) {
+      trx.rollback()
       respondWithError(response, 403, ErrorMessages.EXCEEDED_QUOTA)
       return
     }
     const signature = await BLSCryptographyClient.computeBlindedSignature(
       request.body.blindedQueryPhoneNumber
     )
-    await incrementQueryCount(request.body.account)
+    await incrementQueryCount(request.body.account, trx)
     response.json({ success: true, signature })
   } catch (error) {
     logger.error('Failed to getSalt', error)
@@ -34,7 +38,15 @@ export async function handleGetBlindedMessageForSalt(request: Request, response:
 }
 
 function isValidGetSignatureInput(requestBody: any): boolean {
-  return hasValidAccountParam(requestBody) && hasValidQueryPhoneNumberParam(requestBody)
+  return (
+    hasValidAccountParam(requestBody) &&
+    hasValidQueryPhoneNumberParam(requestBody) &&
+    phoneNumberHashIsValidIfExists(requestBody)
+  )
+}
+
+function phoneNumberHashIsValidIfExists(requestBody: any): boolean {
+  return !requestBody.hashedPhoneNumber || isByte32(requestBody.hashedPhoneNumber)
 }
 
 function hasValidAccountParam(requestBody: any): boolean {
@@ -43,4 +55,8 @@ function hasValidAccountParam(requestBody: any): boolean {
 
 function hasValidQueryPhoneNumberParam(requestBody: any): boolean {
   return requestBody.blindedQueryPhoneNumber
+}
+
+function isByte32(hashedData: string): boolean {
+  return Buffer.byteLength(trimLeading0x(hashedData), 'hex') === 32
 }
