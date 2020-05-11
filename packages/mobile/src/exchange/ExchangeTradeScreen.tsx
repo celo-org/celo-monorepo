@@ -353,7 +353,8 @@ const styles = StyleSheet.create({
     textAlign: 'right',
     fontSize: 24,
     lineHeight: 39,
-    height: 54, // setting height manually b.c. of bug causing text to jump on Android
+    height: 60, // setting height manually b.c. of bug causing text to jump on Android
+    color: colors.goldDark,
   },
   reviewBtn: {
     padding: variables.contentPadding,
