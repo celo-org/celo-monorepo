@@ -11,14 +11,14 @@ export const fontFamily = Inter.Regular
 
 const standards = {
   large: {
-    fontSize: 17,
+    fontSize: 18,
     lineHeight: 24,
     fontFamily: Inter.Regular,
     color: colors.dark,
   },
   regular: {
-    fontSize: 15,
-    lineHeight: 20,
+    fontSize: 16,
+    lineHeight: 22,
     fontFamily: Inter.Regular,
     color: colors.dark,
   },
@@ -61,7 +61,9 @@ const fontStyles = StyleSheet.create({
   large600: { ...standards.large, fontFamily: Inter.SemiBold },
   regular600: { ...standards.regular, fontFamily: Inter.SemiBold },
   small600: { ...standards.small, fontFamily: Inter.SemiBold },
+  large500: { ...standards.large, fontFamily: Inter.Medium },
   regular500: { ...standards.regular, fontFamily: Inter.Medium },
+  small500: { ...standards.small, fontFamily: Inter.Medium },
   center: {
     textAlign: 'center',
   },
