@@ -6,7 +6,7 @@ metadata:
   annotations:
     service.beta.kubernetes.io/azure-load-balancer-mixed-protocols: "true"
   labels:
-{{ include "common.standard.labels" $  | indent 4 }}
+{{ include "celo-fullnode.labels" $ | indent 4 }}
 spec:
   type: {{ $.Values.geth.service_type }}
 {{- if $.Values.geth.use_static_ips }}
@@ -29,7 +29,7 @@ kind: Service
 metadata:
   name: {{ template "common.fullname" . }}-rpc
   labels:
-{{ include "common.standard.labels" .  | indent 4 }}
+{{ include "celo-fullnode.labels" .  | indent 4 }}
 spec:
   type: ClusterIP
   ports:
@@ -38,4 +38,4 @@ spec:
       protocol: TCP
       name: rpc
   selector:
-{{ include "common.standard.labels" .  | indent 4 }}
+{{ include "celo-fullnode.labels" .  | indent 4 }}
