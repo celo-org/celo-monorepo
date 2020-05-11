@@ -1,10 +1,10 @@
-import Button, { BtnTypes } from '@celo/react-components/components/Button'
+import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button.v2'
 import SmallButton from '@celo/react-components/components/SmallButton'
-import TextButton from '@celo/react-components/components/TextButton'
+import Touchable from '@celo/react-components/components/Touchable'
 import Backspace from '@celo/react-components/icons/Backspace'
-import colors from '@celo/react-components/styles/colors'
-import fontStyles from '@celo/react-components/styles/fonts'
-import * as _ from 'lodash'
+import colors from '@celo/react-components/styles/colors.v2'
+import fontStyles from '@celo/react-components/styles/fonts.v2'
+import { chunk, flatMap, shuffle, times } from 'lodash'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
@@ -17,7 +17,7 @@ import componentWithAnalytics from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import DevSkipButton from 'src/components/DevSkipButton'
 import { Namespaces, withTranslation } from 'src/i18n'
-import { headerWithBackButton } from 'src/navigator/Headers'
+import { headerWithCancelButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
@@ -45,7 +45,7 @@ type Props = WithTranslation & DispatchProps & NavigationInjectedProps
 
 export class BackupQuiz extends React.Component<Props, State> {
   static navigationOptions = () => ({
-    ...headerWithBackButton,
+    ...headerWithCancelButton,
   })
 
   state: State = {
@@ -72,8 +72,8 @@ export class BackupQuiz extends React.Component<Props, State> {
   }
 
   getShuffledWordSet(mnemonic: string) {
-    return _.flatMap(
-      _.chunk(mnemonic.split(' '), MNEMONIC_BUTTONS_TO_DISPLAY).map((chunk) => _.shuffle(chunk))
+    return flatMap(
+      chunk(mnemonic.split(' '), MNEMONIC_BUTTONS_TO_DISPLAY).map((chunk) => shuffle(chunk))
     )
   }
 
@@ -148,10 +148,10 @@ export class BackupQuiz extends React.Component<Props, State> {
     return (
       <SafeAreaView style={styles.container}>
         <DevSkipButton nextScreen={Screens.BackupComplete} onSkip={this.onScreenSkip} />
+        {currentWordIndex > 1 && <DeleteWord onPressBackspace={this.onPressBackspace} />}
         <ScrollView contentContainerStyle={styles.scrollContainer}>
-          <Text style={fontStyles.h1}>{t('confirmBackupKey')}</Text>
           <View style={styles.chosenWordsContainer}>
-            {_.times(mnemonicLength, (i) => (
+            {times(mnemonicLength, (i) => (
               <View
                 style={[
                   styles.chosenWordWrapper,
@@ -165,7 +165,6 @@ export class BackupQuiz extends React.Component<Props, State> {
               </View>
             ))}
           </View>
-          <Text style={styles.bodyText}>{t('backupQuizInfo')}</Text>
           {!isQuizComplete && (
             <Text style={styles.bodyTextBold}>
               {t('backupQuizWordCount', { index: currentWordIndex, total: mnemonicLength })}
@@ -182,30 +181,12 @@ export class BackupQuiz extends React.Component<Props, State> {
               />
             ))}
           </View>
-          <View style={styles.backButtonsContainer}>
-            {currentWordIndex > 1 && (
-              <SmallButton
-                onPress={this.onPressBackspace}
-                solid={false}
-                text={this.props.t('global:goBack')}
-                style={styles.backButton}
-                textStyle={styles.backButtonText}
-              >
-                <Backspace color={colors.celoGreen} />
-              </SmallButton>
-            )}
-            {isQuizComplete && (
-              <TextButton onPress={this.onPressReset} style={styles.resetButton}>
-                {t('global:reset')}
-              </TextButton>
-            )}
-          </View>
         </ScrollView>
         {isQuizComplete && (
           <Button
             onPress={this.onPressSubmit}
             text={t('global:submit')}
-            standard={false}
+            size={BtnSizes.FULL}
             type={BtnTypes.PRIMARY}
             testID={'QuizSubmit'}
           />
@@ -213,6 +194,25 @@ export class BackupQuiz extends React.Component<Props, State> {
       </SafeAreaView>
     )
   }
+}
+
+function DeleteWord({ onPressBackspace }: { onPressBackspace: () => void }) {
+  // currentWordIndex > 1
+  return (
+    <Touchable
+      onPress={onPressBackspace}
+      style={{
+        position: 'absolute',
+        right: 0,
+        top: 0,
+        paddingRight: 16,
+        zIndex: 100,
+        transform: [{ translateY: 0 }],
+      }}
+    >
+      <Backspace color={colors.greenUI} />
+    </Touchable>
+  )
 }
 
 export default componentWithAnalytics(
@@ -226,21 +226,20 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
     justifyContent: 'space-between',
+    paddingHorizontal: 24,
+    paddingBottom: 24,
   },
   scrollContainer: {
     flexGrow: 1,
-    paddingHorizontal: 20,
-    paddingBottom: 20,
   },
   bodyText: {
     marginTop: 20,
-    ...fontStyles.bodySecondary,
-    color: colors.lightGray,
+    ...fontStyles.regular,
+    color: colors.dark,
     textAlign: 'center',
   },
   bodyTextBold: {
-    ...fontStyles.body,
-    ...fontStyles.semiBold,
+    ...fontStyles.regular500,
     textAlign: 'center',
     marginTop: 25,
   },
@@ -250,62 +249,40 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   chosenWordWrapper: {
-    paddingVertical: 2,
-    paddingHorizontal: 4,
+    paddingVertical: 4,
+    paddingHorizontal: 8,
     marginHorizontal: 3,
     marginVertical: 4,
     minWidth: 55,
     borderWidth: 1,
-    borderColor: colors.darkLightest,
+    borderColor: colors.gray2,
     borderRadius: 100,
   },
   chosenWordWrapperFilled: {
-    backgroundColor: colors.darkLightest,
+    backgroundColor: colors.gray2,
   },
   chosenWord: {
-    ...fontStyles.bodySmall,
+    ...fontStyles.small,
     textAlign: 'center',
     lineHeight: undefined,
-    color: colors.lightGray,
+    color: colors.gray4,
   },
   chosenWordFilled: {
-    ...fontStyles.bodySmall,
+    ...fontStyles.small,
     textAlign: 'center',
     lineHeight: undefined,
-    color: colors.darkSecondary,
+    color: colors.gray5,
   },
   mnemonicButtonsContainer: {
-    marginTop: 25,
+    marginTop: 24,
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'center',
-    paddingHorizontal: 20,
   },
   mnemonicWordButton: {
     borderRadius: 100,
-    minWidth: 0,
-    marginVertical: 5,
-    marginHorizontal: 5,
-  },
-  backButtonsContainer: {
-    marginTop: 20,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  backButton: {
-    borderWidth: 0,
-    minWidth: 60,
-  },
-  backButtonText: {
-    ...fontStyles.medium,
-    color: colors.celoGreen,
-    fontSize: 14,
-    lineHeight: 18,
-  },
-  resetButton: {
-    paddingTop: 8,
-    paddingLeft: 35,
-    paddingRight: 20,
+    minWidth: 65,
+    marginVertical: 4,
+    marginHorizontal: 4,
   },
 })

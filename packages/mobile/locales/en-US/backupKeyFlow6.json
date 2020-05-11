@@ -7,7 +7,7 @@
   "viewSafeguards": "View Safeguards",
   "failedFetchMnemonic": "Failed to fetch your Backup Key",
   "backupAndRecovery": "Backup and Recovery",
-  "backupKey": "Backup Key",
+  "backupKey": "Write down your key",
   "yourBackupKey": "Your Backup Key",
   "delayBackup": "Dismiss for an hour",
   "backupKeyNotification": "Without a Backup Key, you may lose access to your wallet.",
@@ -30,7 +30,7 @@
   "backupRecovery": "Share your Backup Key with only one other person who you completely trust.",
   "securityTip": "If you lose your backup key, you will lose access to your Celo Dollars and Gold.",
   "backupKeySummary":
-    "Please write down your Backup Key. If your phone is stolen or lost, you will need the Backup Key to access your Celo Wallet.",
+    "Find a private place and write down your Account Key. Please store it somewhere safe. Do not save it in your phone.",
   "bothBackupsDone": {
     "0": "Congratulations!",
     "1":
@@ -41,7 +41,8 @@
   "backupPrompt":
     "For the security of your funds, your account is frozen until you get your Backup Key",
   "copied": "Key copied to clipboard",
-  "savedConfirmation": "I have saved my Backup Key.",
+  "moreInfo": "More Info",
+  "savedConfirmation": "Yes, I have written down my key.",
   "confirmBackupKey": "Confirm Your Backup Key",
   "backupQuizInfo":
     "Please verify your Backup Key by selecting the words below in the correct order.",

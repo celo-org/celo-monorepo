@@ -1,7 +1,6 @@
-import Touchable from '@celo/react-components/components/Touchable'
 import withTextInputPasteAware from '@celo/react-components/components/WithTextInputPasteAware'
-import colors from '@celo/react-components/styles/colors'
-import { fontStyles } from '@celo/react-components/styles/fonts'
+import colors from '@celo/react-components/styles/colors.v2'
+import fontStyles from '@celo/react-components/styles/fonts.v2'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { Clipboard, Platform, StyleSheet, Text, TextInput, View, ViewStyle } from 'react-native'
@@ -27,7 +26,6 @@ type Props = {
   mode: BackupPhraseContainerMode
   type: BackupPhraseType
   index?: number // e.g. index of safeguard phrase
-  showCopy?: boolean
   style?: ViewStyle
   onChangeText?: (value: string) => void
   testID?: string
@@ -66,7 +64,7 @@ export class BackupPhraseContainer extends React.Component<Props> {
   }
 
   render() {
-    const { t, value: words, showCopy, style, mode, type, index, testID } = this.props
+    const { t, value: words, style, mode, type, index, testID } = this.props
 
     return (
       <View style={style}>
@@ -76,11 +74,6 @@ export class BackupPhraseContainer extends React.Component<Props> {
               ? t('backupKey')
               : t('socialBackupPhraseHeader', { index })}
           </Text>
-          {showCopy && (
-            <Touchable borderless={true} onPress={this.onPressCopy}>
-              <Text style={styles.headerButton}>{this.props.t('global:copy')}</Text>
-            </Touchable>
-          )}
         </View>
         {mode === BackupPhraseContainerMode.READONLY && (
           <View style={styles.phraseContainer}>
@@ -124,31 +117,24 @@ const styles = StyleSheet.create({
     paddingHorizontal: 2,
   },
   headerText: {
-    ...fontStyles.body,
-    ...fontStyles.semiBold,
-  },
-  headerButton: {
-    ...fontStyles.headerButton,
-    fontSize: 16,
+    ...fontStyles.regular500,
   },
   phraseContainer: {
-    marginTop: 10,
-    backgroundColor: colors.darkLightest,
+    marginTop: 16,
+    backgroundColor: colors.brownFaint,
     borderRadius: 4,
     alignContent: 'center',
     justifyContent: 'center',
-    padding: 14,
+    padding: 16,
   },
   phraseText: {
-    ...fontStyles.body,
-    lineHeight: 27,
-    color: colors.darkSecondary,
+    ...fontStyles.regular,
   },
   phraseInputContainer: {
     marginTop: 10,
   },
   phraseInputText: {
-    ...fontStyles.body,
+    ...fontStyles.regular,
     borderWidth: 1,
     borderColor: colors.inputBorder,
     borderRadius: 4,
