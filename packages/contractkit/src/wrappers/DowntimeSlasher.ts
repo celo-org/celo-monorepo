@@ -252,6 +252,7 @@ export class DowntimeSlasherWrapper extends BaseWrapper<DowntimeSlasher> {
       }
     }
 
+    // Use the latest grandparent because that is the most recent block eligible for inclusion.
     const latest = (await this.kit.web3.eth.getBlockNumber()) - 2
     return {
       start: latest - length + 1,
