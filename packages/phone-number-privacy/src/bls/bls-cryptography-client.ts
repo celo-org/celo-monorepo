@@ -1,8 +1,8 @@
-// import { AzureKeyVaultClient } from '@celo/contractkit/lib/utils/azure-key-vault-client'
+import { AzureKeyVaultClient } from '@celo/contractkit/lib/utils/azure-key-vault-client'
 import threshold from 'blind-threshold-bls'
 import { ErrorMessages } from '../common/error-utils'
 import logger from '../common/logger'
-// import config, { DEV_MODE, DEV_PRIVATE_KEY } from '../config'
+import config, { DEV_MODE, DEV_PRIVATE_KEY } from '../config'
 
 export class BLSCryptographyClient {
   /*
@@ -10,13 +10,12 @@ export class BLSCryptographyClient {
    */
   public static async computeBlindedSignature(base64BlindedMessage: string) {
     try {
-      // const privateKey = await BLSCryptographyClient.getPrivateKey()
-      const privateKey = 'pknJzIYf4LPbOPao5lk1tVwljmXAddyebYsQ3wI5ywk='
+      const privateKey = await BLSCryptographyClient.getPrivateKey()
       const keyBuffer = Buffer.from(privateKey, 'base64')
       const msgBuffer = Buffer.from(base64BlindedMessage, 'base64')
 
       logger.debug('Calling theshold sign')
-      const signedMsg = threshold.sign(keyBuffer, msgBuffer)
+      const signedMsg = threshold.signBlindedMessage(keyBuffer, msgBuffer)
       logger.debug('Back from threshold sign, parsing results')
 
       if (!signedMsg) {
@@ -30,29 +29,29 @@ export class BLSCryptographyClient {
     }
   }
 
-  // private static privateKey: string
+  private static privateKey: string
 
-  // /**
-  //  * Get singleton privateKey
-  //  */
-  // private static async getPrivateKey(): Promise<string> {
-  //   if (DEV_MODE) {
-  //     return DEV_PRIVATE_KEY
-  //   }
+  /**
+   * Get singleton privateKey
+   */
+  private static async getPrivateKey(): Promise<string> {
+    if (DEV_MODE) {
+      return DEV_PRIVATE_KEY
+    }
 
-  //   if (BLSCryptographyClient.privateKey) {
-  //     return BLSCryptographyClient.privateKey
-  //   }
+    if (BLSCryptographyClient.privateKey) {
+      return BLSCryptographyClient.privateKey
+    }
 
-  //   // Set environment variables for service principal auth
-  //   process.env.AZURE_CLIENT_ID = config.keyVault.azureClientID
-  //   process.env.AZURE_CLIENT_SECRET = config.keyVault.azureClientSecret
-  //   process.env.AZURE_TENANT_ID = config.keyVault.azureTenant
+    // Set environment variables for service principal auth
+    process.env.AZURE_CLIENT_ID = config.keyVault.azureClientID
+    process.env.AZURE_CLIENT_SECRET = config.keyVault.azureClientSecret
+    process.env.AZURE_TENANT_ID = config.keyVault.azureTenant
 
-  //   const vaultName = config.keyVault.azureVaultName
-  //   const keyVaultClient = new AzureKeyVaultClient(vaultName)
-  //   const secretName = config.keyVault.azureSecretName
-  //   BLSCryptographyClient.privateKey = await keyVaultClient.getSecret(secretName)
-  //   return BLSCryptographyClient.privateKey
-  // }
+    const vaultName = config.keyVault.azureVaultName
+    const keyVaultClient = new AzureKeyVaultClient(vaultName)
+    const secretName = config.keyVault.azureSecretName
+    BLSCryptographyClient.privateKey = await keyVaultClient.getSecret(secretName)
+    return BLSCryptographyClient.privateKey
+  }
 }

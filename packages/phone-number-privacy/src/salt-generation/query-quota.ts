@@ -1,11 +1,11 @@
 import { StableTokenWrapper } from '@celo/contractkit/lib/wrappers/StableTokenWrapper'
 import BigNumber from 'bignumber.js'
+import { Transaction } from 'knex'
 import { isVerified } from '../common/identity'
 import logger from '../common/logger'
 import config from '../config'
 import { getPerformedQueryCount } from '../database/wrappers/account'
 import { getContractKit } from '../web3/contracts'
-import { Transaction } from 'knex'
 
 /*
  * Returns how many queries the account can make based on the
