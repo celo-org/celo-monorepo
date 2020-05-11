@@ -2,6 +2,7 @@ import { execSync } from 'child_process'
 import { config } from 'dotenv'
 import { downloadArtifacts, getContractAddresses } from 'src/lib/artifacts'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
+import { execCmd } from 'src/lib/cmd-utils'
 import { addCeloEnvMiddleware, getEnvFile } from 'src/lib/env-utils'
 import {
   coerceMnemonicAccountType,
@@ -9,7 +10,6 @@ import {
   privateKeyToAddress,
 } from 'src/lib/generate_utils'
 import { portForwardAnd } from 'src/lib/port_forward'
-import { execCmd } from 'src/lib/utils'
 import yargs from 'yargs'
 import { UpgradeArgv } from '../../deploy/upgrade'
 

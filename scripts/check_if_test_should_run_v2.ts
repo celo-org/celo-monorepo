@@ -5,7 +5,7 @@
 // Prints "true" to stdout if the tests should run
 // Prints "false" otherwise
 // All console logging intentionally sent to stderr, so that, stdout is not corrupted
-import { execCmdWithExitOnFailure } from '@celo/celotool/src/lib/utils'
+import { execCmdWithExitOnFailure } from '@celo/celotool/src/lib/cmd-utils'
 import { existsSync, readdirSync, readFileSync } from 'fs'
 import fetch from 'node-fetch'
 import { join } from 'path'
