@@ -186,11 +186,11 @@ export class AzureKeyVaultClient {
   private static bufferToBigNumber(input: Buffer): BigNumber {
     return new BigNumber(ensureLeading0x(input.toString('hex')))
   }
-  private static bigNumberToBuffer(input: BigNumber, size: number): Buffer {
+  private static bigNumberToBuffer(input: BigNumber, lengthInBytes: number): Buffer {
     let hex = input.toString(16)
-    const hexSize = size * 2
-    if (hex.length < hexSize) {
-      hex = '0'.repeat(hexSize - hex.length) + hex
+    const hexLength = lengthInBytes * 2 // 2 hex characters per byte.
+    if (hex.length < hexLength) {
+      hex = '0'.repeat(hexLength - hex.length) + hex
     }
     return ethUtil.toBuffer(ensureLeading0x(hex)) as Buffer
   }
