@@ -59,6 +59,7 @@ interface AttesationServiceRevealRequest {
   phoneNumber: string
   issuer: string
   salt?: string
+  smsRetrieverAppSig?: string
 }
 
 export interface UnselectedRequest {
@@ -428,13 +429,15 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     account: Address,
     issuer: Address,
     serviceURL: string,
-    salt?: string
+    salt?: string,
+    smsRetrieverAppSig?: string
   ) {
     const body: AttesationServiceRevealRequest = {
       account,
       phoneNumber,
       issuer,
       salt,
+      smsRetrieverAppSig,
     }
     return fetch(serviceURL + '/attestations', {
       method: 'POST',
