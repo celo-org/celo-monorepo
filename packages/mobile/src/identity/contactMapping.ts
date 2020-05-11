@@ -18,7 +18,11 @@ import {
   updateE164PhoneNumberAddresses,
 } from 'src/identity/actions'
 import { fetchPhoneHashPrivate, PhoneNumberHashDetails } from 'src/identity/privacy'
-import { AddressToE164NumberType, E164NumberToAddressType } from 'src/identity/reducer'
+import {
+  AddressToE164NumberType,
+  e164NumberToAddressSelector,
+  E164NumberToAddressType,
+} from 'src/identity/reducer'
 import { setRecipientCache } from 'src/recipients/actions'
 import { contactsToRecipients, NumberToRecipient } from 'src/recipients/recipient'
 import { manualAddressValidationRequired } from 'src/send/actions'
@@ -107,23 +111,23 @@ export function* fetchPhoneAddressesAndCheckIfRecipientValidationRequired({
       TAG + '@fetchPhoneAddressesAndCheckIfRecipientValidationRequired',
       `Fetching addresses for number`
     )
-    // const oldE164NumberToAddress = yield select(e164NumberToAddressSelector)
-    // const oldAddresses = oldE164NumberToAddress[e164Number]
-    //   ? [...oldE164NumberToAddress[e164Number]]
-    //   : oldE164NumberToAddress[e164Number]
-    const oldAddresses = [
-      '0xf1b1d5a6e7728a309c4a025b122d71ad75a61976',
-      // '0x4ee307e8bdcaa2695b49cd6af380ac70914c7c78',
-    ]
+    const oldE164NumberToAddress = yield select(e164NumberToAddressSelector)
+    const oldAddresses = oldE164NumberToAddress[e164Number]
+      ? [...oldE164NumberToAddress[e164Number]]
+      : oldE164NumberToAddress[e164Number]
+    // const oldAddresses = [
+    //   '0xf1b1d5a6e7728a309c4a025b122d71ad75a61976',
+    //   '0x4ee307e8bdcaa2695b49cd6af380ac70914c7c78',
+    // ]
 
     // Clear existing entries for those numbers so our mapping consumers know new status is pending.
     yield put(updateE164PhoneNumberAddresses({ [e164Number]: undefined }, {}))
 
-    // const addresses: string[] | null = yield call(getAddresses, e164Number)
-    const addresses = [
-      '0xf1b1d5a6e7728a309c4a025b122d71ad75a61976',
-      '0x4ee307e8bdcaa2695b49cd6af380ac70914c7c78',
-    ]
+    const addresses: string[] | null = yield call(getAddresses, e164Number)
+    // const addresses = [
+    //   '0xf1b1d5a6e7728a309c4a025b122d71ad75a61976',
+    //   '0x4ee307e8bdcaa2695b49cd6af380ac70914c7c78',
+    // ]
 
     const e164NumberToAddressUpdates: E164NumberToAddressType = {}
     const addressToE164NumberUpdates: AddressToE164NumberType = {}

@@ -16,6 +16,7 @@ import { setRecipientCache } from 'src/recipients/actions'
 import { contactsToRecipients } from 'src/recipients/recipient'
 import { getAllContacts } from 'src/utils/contacts'
 import { getContractKitOutsideGenerator } from 'src/web3/contracts'
+import { userAddressSelector } from 'src/web3/reducer'
 import { getConnectedAccount } from 'src/web3/saga'
 import {
   mockAccount,
@@ -83,6 +84,7 @@ describe('Fetch Addresses Saga', () => {
           call([contractKit.contracts, contractKit.contracts.getAttestations]),
           mockAttestationsWrapper,
         ],
+        [select(userAddressSelector), { mockAccount }],
       ])
       .put(updateE164PhoneNumberAddresses({ [mockE164Number]: undefined }, {}))
       .put(

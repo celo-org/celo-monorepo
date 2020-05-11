@@ -2,8 +2,14 @@ import { expectSaga } from 'redux-saga-test-plan'
 import { select } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
+<<<<<<< HEAD
 import { addressToE164NumberSelector } from 'src/identity/reducer'
 import { inviteesSelector } from 'src/invite/reducer'
+||||||| constructed merge base
+import { addressToE164NumberSelector } from 'src/identity/reducer'
+=======
+import { addressToE164NumberSelector, e164NumberToAddressSelector } from 'src/identity/reducer'
+>>>>>>> fixing existing tests to be compatible with new changes
 import { replace } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { BarcodeTypes } from 'src/qrcode/utils'
@@ -39,6 +45,7 @@ describe(watchQrCodeDetections, () => {
         [select(inviteesSelector), {}],
         [select(addressToE164NumberSelector), {}],
         [select(recipientCacheSelector), {}],
+        [select(e164NumberToAddressSelector), {}],
       ])
       .dispatch({ type: Actions.BARCODE_DETECTED, data })
       .silentRun()
@@ -61,6 +68,7 @@ describe(watchQrCodeDetections, () => {
         [select(inviteesSelector), {}],
         [select(addressToE164NumberSelector), {}],
         [select(recipientCacheSelector), {}],
+        [select(e164NumberToAddressSelector), {}],
       ])
       .dispatch({ type: Actions.BARCODE_DETECTED, data })
       .silentRun()
@@ -86,6 +94,7 @@ describe(watchQrCodeDetections, () => {
         [select(inviteesSelector), {}],
         [select(addressToE164NumberSelector), {}],
         [select(recipientCacheSelector), {}],
+        [select(e164NumberToAddressSelector), {}],
       ])
       .dispatch({ type: Actions.BARCODE_DETECTED, data })
       .silentRun()
@@ -109,9 +118,10 @@ describe(watchQrCodeDetections, () => {
         [select(inviteesSelector), {}],
         [select(addressToE164NumberSelector), {}],
         [select(recipientCacheSelector), {}],
+        [select(e164NumberToAddressSelector), {}],
       ])
       .dispatch({ type: Actions.BARCODE_DETECTED, data })
-      .put(showError(ErrorMessages.QR_FAILED_NO_ADDRESS))
+      .put(showError(ErrorMessages.QR_FAILED_INVALID_RECIPIENT))
       .silentRun()
     expect(replace).not.toHaveBeenCalled()
   })
@@ -125,9 +135,10 @@ describe(watchQrCodeDetections, () => {
         [select(inviteesSelector), {}],
         [select(addressToE164NumberSelector), {}],
         [select(recipientCacheSelector), {}],
+        [select(e164NumberToAddressSelector), {}],
       ])
       .dispatch({ type: Actions.BARCODE_DETECTED, data })
-      .put(showError(ErrorMessages.QR_FAILED_NO_ADDRESS))
+      .put(showError(ErrorMessages.QR_FAILED_INVALID_RECIPIENT))
       .silentRun()
     expect(replace).not.toHaveBeenCalled()
   })
@@ -142,6 +153,7 @@ describe(watchQrCodeDetections, () => {
         [select(inviteesSelector), {}],
         [select(addressToE164NumberSelector), {}],
         [select(recipientCacheSelector), {}],
+        [select(e164NumberToAddressSelector), {}],
       ])
       .dispatch({ type: Actions.BARCODE_DETECTED, data })
       .put(showError(ErrorMessages.QR_FAILED_INVALID_ADDRESS))

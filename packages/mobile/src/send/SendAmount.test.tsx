@@ -5,7 +5,7 @@ import { fireEvent, render } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
 import { FeeType } from 'src/fees/actions'
-import { fetchPhoneAddresses } from 'src/identity/actions'
+import { fetchPhoneAddressesAndCheckIfRecipientValidationRequired } from 'src/identity/actions'
 import { LocalCurrencyCode } from 'src/localCurrency/consts'
 import SendAmount from 'src/send/SendAmount'
 import { createMockStore, getMockI18nProps } from 'test/utils'
@@ -58,7 +58,7 @@ describe('SendAmount', () => {
 
       const showMessage = jest.fn()
       const wrapper = render(
-        <Provider store={createMockStore()}>
+        <Provider store={store}>
           <SendAmount
             navigation={mockNavigation}
             {...getMockI18nProps()}
@@ -66,7 +66,9 @@ describe('SendAmount', () => {
             showMessage={showMessage}
             showError={jest.fn()}
             hideAlert={jest.fn()}
-            fetchPhoneAddresses={fetchPhoneAddresses}
+            fetchPhoneAddressesAndCheckIfRecipientValidationRequired={
+              fetchPhoneAddressesAndCheckIfRecipientValidationRequired
+            }
             dollarBalance={'1'}
             estimateFeeDollars={new BigNumber(1)}
             e164NumberToAddress={mockE164NumberToAddress}
