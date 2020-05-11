@@ -73,8 +73,9 @@ function ChartAwareSvgText({
     [x]
   )
   return (
-    // @ts-ignore
     <SvgText
+      /* 
+      // @ts-ignore */
       onLayout={onLayout}
       fill={colors.gray4}
       fontSize="14"
@@ -109,7 +110,7 @@ function renderPointOnChart(
         result.push(
           <G key={idx + 'dot'}>
             <Line x1={0} y1={y} x2={chartWidth} y2={y} stroke={colors.gray2} strokeWidth="1" />
-            <Circle cx={x} cy={y} r="5" fill={colors.goldUI} />
+            <Circle cx={x} cy={y} r="4" fill={colors.goldUI} />
           </G>
         )
         break
@@ -117,7 +118,7 @@ function renderPointOnChart(
       case chartData.length - 1:
         result.push(
           <G key={idx + 'dot'}>
-            <Circle cx={x} cy={y} r="5" fill={colors.goldUI} />
+            <Circle cx={x} cy={y} r="4" fill={colors.goldUI} />
           </G>
         )
         break
@@ -274,15 +275,15 @@ function CeloGoldHistoryChart({ t, testID, i18n }: Props) {
         data={chartData.map((el) => el.amount)}
         domain={domain}
       >
+        {/* 
+        // @ts-ignore */}
+        <VictoryScatter dataComponent={<RenderPoint />} />
         <VictoryLine
           interpolation="monotoneX"
           style={{
             data: { stroke: colors.goldUI },
           }}
         />
-        {/* 
-        // @ts-ignore */}
-        <VictoryScatter dataComponent={<RenderPoint />} />
       </VictoryGroup>
       <View style={styles.range}>
         <Text style={styles.timeframe}>
