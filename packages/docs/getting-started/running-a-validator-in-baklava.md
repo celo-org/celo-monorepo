@@ -222,7 +222,7 @@ In addition to the bootnode enode URLs provided by the cLabs team, the Celo vali
 export COMMUNITY_ENODES="enode://7c34cb0b3b9924b21e3c99134a5d46ca8242f4ecc9f722aa548ff80861be246268f1f7d8de815583a970993a7157bb37b3b5478b219c44e05888a659cb22675f@34.193.36.54:30303"
 ```
 
-To use the nodes, set them to the value of the `bootnodes` or `bootnodesv4` options when running your node-starting `docker run...` commands (in this example, we will use `bootnodesv4` to keep the original command intact). To bootstrap your proxy node, you can run the command below (the same command at line 239 appended with `--bootnodesv4 $COMMUNITY_ENODES`):
+To use the nodes, set them to the value of the `bootnodes` or `bootnodesv4` options when running your node-starting `docker run...` commands (in this example, we will use `bootnodesv4` to keep the original command intact). To bootstrap your proxy node, you can run the command below (the same command at line 216 appended with `--bootnodesv4 $COMMUNITY_ENODES`):
 ```bash
 export COMMUNITY_ENODES="enode://7c34cb0b3b9924b21e3c99134a5d46ca8242f4ecc9f722aa548ff80861be246268f1f7d8de815583a970993a7157bb37b3b5478b219c44e05888a659cb22675f@34.193.36.54:30303"
 export PROXY_ADDRESS=<PROXY-PUBLIC-ADDRESS>
