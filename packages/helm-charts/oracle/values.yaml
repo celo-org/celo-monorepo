@@ -26,3 +26,9 @@ oracle:
       id: defaultId1
       clientId: defaultClientId1
       keyVaultName: defaultKeyVaultName1
+  azureHsm:
+    initTryCount: 5
+    initMaxRetryBackoffMs: 30000
+  metrics:
+    enabled: true
+    prometheusPort: 9090

@@ -72,7 +72,6 @@ exports[`renders correctly with backup completed 1`] = `
             <View
               accessible={true}
               focusable={true}
-              isTVSelectable={true}
               nativeBackgroundAndroid={
                 Object {
                   "attribute": "selectableItemBackgroundBorderless",
@@ -225,7 +224,6 @@ exports[`renders correctly with backup not completed 1`] = `
             <View
               accessible={true}
               focusable={true}
-              isTVSelectable={true}
               nativeBackgroundAndroid={
                 Object {
                   "attribute": "selectableItemBackgroundBorderless",
@@ -314,7 +312,7 @@ exports[`renders correctly with backup not completed 1`] = `
       }
     >
       <AndroidSwitch
-        accessibilityRole="button"
+        accessibilityRole="switch"
         enabled={true}
         on={false}
         onChange={[Function]}
@@ -360,7 +358,6 @@ exports[`renders correctly with backup not completed 1`] = `
       <View
         accessible={true}
         focusable={false}
-        isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackground",

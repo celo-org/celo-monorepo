@@ -1,7 +1,7 @@
 import BaseNotification from '@celo/react-components/components/BaseNotification'
-import { shallow } from 'enzyme'
 import * as React from 'react'
 import { Text } from 'react-native'
+import { fireEvent, render } from 'react-native-testing-library'
 import * as renderer from 'react-test-renderer'
 
 const props = (onPress = jest.fn()) => ({
@@ -24,16 +24,13 @@ describe(BaseNotification, () => {
     it('calls the on press function', () => {
       const clickHandler = jest.fn()
 
-      const wrapper = shallow(
+      const { getByName } = render(
         <BaseNotification {...props(clickHandler)}>
           <Text>Test</Text>
         </BaseNotification>
       )
-      wrapper
-        .find('TextButton')
-        .first()
-        .simulate('press')
 
+      fireEvent.press(getByName('TextButton'))
       expect(clickHandler).toHaveBeenCalled()
     })
   })

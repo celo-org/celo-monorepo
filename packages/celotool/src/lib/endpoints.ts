@@ -23,3 +23,7 @@ export function getGenesisGoogleStorageUrl(celoEnv: string) {
 export function getFornoUrl(celoEnv: string) {
   return `https://${celoEnv}-forno.${fetchEnv(envVar.CLUSTER_DOMAIN_NAME)}.org`
 }
+
+export function getFullNodeRpcInternalUrl(celoEnv: string) {
+  return `http://${celoEnv}-fullnodes-rpc.${celoEnv}.svc.cluster.local:8545`
+}

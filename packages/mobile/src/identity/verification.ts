@@ -19,7 +19,7 @@ import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { setNumberVerified } from 'src/app/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { USE_PHONE_NUMBER_PRIVACY } from 'src/config'
+import { SMS_RETRIEVER_APP_SIGNATURE, USE_PHONE_NUMBER_PRIVACY } from 'src/config'
 import { refreshAllBalances } from 'src/home/actions'
 import {
   Actions,
@@ -121,7 +121,7 @@ export function* doVerificationFlow() {
     const privDataKey = yield select(privateCommentKeySelector)
     const dataKey = compressedPubKey(Buffer.from(privDataKey, 'hex'))
 
-    const contractKit = getContractKit()
+    const contractKit = yield call(getContractKit)
 
     const attestationsWrapper: AttestationsWrapper = yield call([
       contractKit.contracts,
@@ -490,13 +490,19 @@ function* tryRevealPhoneNumber(
   CeloAnalytics.track(CustomEventNames.verification_reveal_attestation, { issuer })
 
   try {
+    const smsAppSig =
+      Platform.OS === 'android' && USE_PHONE_NUMBER_PRIVACY
+        ? SMS_RETRIEVER_APP_SIGNATURE
+        : undefined
+
     const response = yield call(
       [attestationsWrapper, attestationsWrapper.revealPhoneNumberToIssuer],
       phoneHashDetails.e164Number,
       account,
       attestation.issuer,
       attestation.attestationServiceURL,
-      phoneHashDetails.salt
+      phoneHashDetails.salt,
+      smsAppSig
     )
     if (!response.ok) {
       const body = yield response.json()
