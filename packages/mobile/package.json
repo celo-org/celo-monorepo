@@ -81,7 +81,7 @@
     "react-native": "^0.62.2",
     "react-native-android-open-settings": "^1.3.0",
     "react-native-bip39": "https://github.com/celo-org/react-native-bip39#a5dd436",
-    "react-native-blind-threshold-bls": "https://github.com/celo-org/react-native-blind-threshold-bls#7a5c513",
+    "react-native-blind-threshold-bls": "https://github.com/celo-org/react-native-blind-threshold-bls#433c2c6",
     "react-native-camera": "^3.23.1",
     "react-native-clock-sync": "^1.0.0",
     "react-native-config": "https://github.com/luggit/react-native-config#89a602b",
