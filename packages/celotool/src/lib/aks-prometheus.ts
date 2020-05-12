@@ -1,6 +1,7 @@
 import fs from 'fs'
 import { AzureClusterConfig } from './azure'
 import { createNamespaceIfNotExists } from './cluster'
+import { execCmdWithExitOnFailure } from './cmd-utils'
 import { envVar, fetchEnv } from './env-utils'
 import { installGenericHelmChart, removeGenericHelmChart } from './helm_deploy'
 import {
@@ -8,11 +9,7 @@ import {
   getServiceAccountEmail,
   getServiceAccountKey,
 } from './service-account-utils'
-import {
-  execCmdWithExitOnFailure,
-  outputIncludes,
-  switchToProjectFromEnv as switchToGCPProjectFromEnv,
-} from './utils'
+import { outputIncludes, switchToProjectFromEnv as switchToGCPProjectFromEnv } from './utils'
 
 const helmChartPath = '../helm-charts/prometheus-stackdriver'
 const releaseName = 'prometheus-stackdriver'

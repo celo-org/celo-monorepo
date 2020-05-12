@@ -1,5 +1,5 @@
+import { execCmd, execCmdWithExitOnFailure } from './cmd-utils'
 import { envVar, fetchEnv } from './env-utils'
-import { execCmd, execCmdWithExitOnFailure } from './utils'
 
 export async function scaleResource(
   celoEnv: string,

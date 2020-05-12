@@ -16,6 +16,7 @@ import sleep from 'sleep-promise'
 import Web3 from 'web3'
 import { TransactionReceipt } from 'web3-core'
 import { Admin } from 'web3-eth-admin'
+import { spawnCmd, spawnCmdWithExitOnFailure } from './cmd-utils'
 import { convertToContractDecimals } from './contract-utils'
 import { envVar, fetchEnv, isVmBased } from './env-utils'
 import {
@@ -28,7 +29,7 @@ import {
 import { retrieveClusterIPAddress, retrieveIPAddress } from './helm_deploy'
 import { GethInstanceConfig } from './interfaces/geth-instance-config'
 import { GethRunConfig } from './interfaces/geth-run-config'
-import { ensure0x, spawnCmd, spawnCmdWithExitOnFailure } from './utils'
+import { ensure0x } from './utils'
 import { getTestnetOutputs } from './vm-testnet-utils'
 
 export async function unlockAccount(

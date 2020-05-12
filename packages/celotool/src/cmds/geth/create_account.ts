@@ -2,9 +2,10 @@
 import fs from 'fs'
 import path from 'path'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
+import { execCmd, execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
 import { addCeloEnvMiddleware, CeloEnvArgv } from 'src/lib/env-utils'
 import { fetchPassword } from 'src/lib/geth'
-import { addCeloGethMiddleware, execCmd, execCmdWithExitOnFailure } from 'src/lib/utils'
+import { addCeloGethMiddleware } from 'src/lib/utils'
 import yargs from 'yargs'
 import { GethArgv } from '../geth'
 
