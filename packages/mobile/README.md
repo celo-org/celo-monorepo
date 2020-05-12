@@ -336,7 +336,7 @@ export CELO_RELEASE_KEY_PASSWORD=celoFakeReleaseKeyPass
 ```sh
 # With fastlane:
 bundle install
-bundle exec fastlane android build_apk env:YOUR_BUILDING_VARIANT sdkEnv:YOUR_SDK_ENV
+bundle exec fastlane android build_apk env:YOUR_BUILDING_VARIANT
 
 # Or, manually
 cd android/
