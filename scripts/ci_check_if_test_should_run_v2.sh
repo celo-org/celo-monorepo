@@ -16,4 +16,4 @@ if [ $CHANGED = false ] ; then
   circleci step halt
   exit 0
 fi
-echo "Something $CHANGED, tests should not be skipped"
+echo "$CHANGED, tests should not be skipped"

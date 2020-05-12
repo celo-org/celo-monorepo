@@ -2,8 +2,7 @@
 // Say the caller is in the celotool dir and wants to check if celotool or protocol dir has changed then
 // the sample usage will be
 // node -r ts-node/register scripts/check_if_test_should_run_v2.ts --dirs packages/protocol,packages/celotool
-// Prints "true" to stdout if the tests should run
-// Prints "false" otherwise
+// Prints "false" if tests shouldn't run, anything else will cause tests to run
 // All console logging intentionally sent to stderr, so that, stdout is not corrupted
 import { execCmdWithExitOnFailure } from '@celo/celotool/src/lib/cmd-utils'
 import { existsSync, readFileSync } from 'fs'
@@ -54,7 +53,7 @@ async function checkIfTestShouldRun() {
     branchCommits.includes(circleciChangeCommit)
   ) {
     // always run tests when yarn.lock or circlici config have changed
-    console.info('true')
+    console.info('circleci config or yarn.lock file changed')
     return
   }
 
@@ -75,7 +74,7 @@ async function checkIfTestShouldRun() {
 
   for (const pkg of packagesToTest) {
     if (hasChangedDependencies(pkg)) {
-      console.info('true')
+      console.info(`${pkg} changed`)
       return
     }
   }
@@ -122,8 +121,8 @@ async function getBranchCommits(): Promise<string[]> {
   if (prNumber === undefined) {
     throw new Error(`Unable to get pull request number from $CIRCLE_PULL_REQUEST: ${prUrl}`)
   } else {
-    const owner = process.env.CIRCLE_PROJECT_USERNAME || 'celo-org'
-    const repo = process.env.CIRCLE_PROJECT_REPONAME || 'celo-monorepo'
+    const owner = process.env.CIRCLE_PROJECT_USERNAME
+    const repo = process.env.CIRCLE_PROJECT_REPONAME
     if (owner === undefined) {
       throw new Error('Environment variable CIRCLE_PROJECT_USERNAME is not defined')
     }
