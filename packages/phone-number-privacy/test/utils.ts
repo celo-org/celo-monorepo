@@ -1,4 +1,6 @@
 import BigNumber from 'bignumber.js'
+import threshold from 'blind-threshold-bls'
+import btoa from 'btoa'
 import Web3 from 'web3'
 
 export function createMockAttestation(completed: number, total: number) {
@@ -42,4 +44,17 @@ export function createMockWeb3(txCount: number) {
       getTransactionCount: jest.fn(() => txCount),
     },
   }
+}
+
+export function getBlindedPhoneNumber(phoneNumber: string, blindingFactor: Buffer): string {
+  const blindedPhoneNumber = threshold.blind(Buffer.from(phoneNumber), blindingFactor).message
+  return uint8ArrayToBase64(blindedPhoneNumber)
+}
+
+function uint8ArrayToBase64(bytes: Uint8Array) {
+  let binary = ''
+  for (let i = 0; i < bytes.byteLength; i++) {
+    binary += String.fromCharCode(bytes[i])
+  }
+  return btoa(binary)
 }

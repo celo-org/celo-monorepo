@@ -1,3 +1,4 @@
+import { execCmd } from 'src/lib/cmd-utils'
 import {
   addCeloEnvMiddleware,
   CeloEnvArgv,
@@ -5,7 +6,6 @@ import {
   failIfNotVmBased,
   fetchEnv,
 } from 'src/lib/env-utils'
-import { execCmd } from 'src/lib/utils'
 import { getNodeVmName, getVmSshCommand } from 'src/lib/vm-testnet-utils'
 import yargs from 'yargs'
 

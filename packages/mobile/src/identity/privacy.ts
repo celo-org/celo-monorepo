@@ -1,4 +1,5 @@
-import { getPhoneHash, isE164Number } from '@celo/utils/src/phoneNumbers'
+import { ContractKit } from '@celo/contractkit'
+import { getPhoneHash, isE164Number, PhoneNumberUtils } from '@celo/utils/src/phoneNumbers'
 import crypto from 'crypto'
 import BlindThresholdBls from 'react-native-blind-threshold-bls'
 import { call, put, select } from 'redux-saga/effects'
@@ -7,6 +8,7 @@ import networkConfig from 'src/geth/networkConfig'
 import { updateE164PhoneNumberSalts } from 'src/identity/actions'
 import { e164NumberToSaltSelector, E164NumberToSaltType } from 'src/identity/reducer'
 import Logger from 'src/utils/Logger'
+import { getContractKit } from 'src/web3/contracts'
 import { currentAccountSelector } from 'src/web3/selectors'
 
 const TAG = 'identity/privacy'
@@ -33,7 +35,13 @@ export function* fetchPhoneHashPrivate(e164Number: string) {
 
     Logger.debug(`${TAG}@fetchPrivatePhoneHash`, 'Salt was not cached, fetching')
     const account: string = yield select(currentAccountSelector)
-    const details: PhoneNumberHashDetails = yield call(getPhoneHashPrivate, e164Number, account)
+    const contractKit = yield call(getContractKit)
+    const details: PhoneNumberHashDetails = yield call(
+      getPhoneHashPrivate,
+      e164Number,
+      account,
+      contractKit
+    )
     yield put(updateE164PhoneNumberSalts({ [e164Number]: details.salt }))
     return details
   } catch (error) {
@@ -55,9 +63,10 @@ export function* fetchPhoneHashPrivate(e164Number: string) {
 // and then appends it before hashing.
 async function getPhoneHashPrivate(
   e164Number: string,
-  account: string
+  account: string,
+  contractKit: ContractKit
 ): Promise<PhoneNumberHashDetails> {
-  const salt = await getPhoneNumberSalt(e164Number, account)
+  const salt = await getPhoneNumberSalt(e164Number, account, contractKit)
   const phoneHash = getPhoneHash(e164Number, salt)
   return {
     e164Number,
@@ -66,7 +75,7 @@ async function getPhoneHashPrivate(
   }
 }
 
-async function getPhoneNumberSalt(e164Number: string, account: string) {
+async function getPhoneNumberSalt(e164Number: string, account: string, contractKit: ContractKit) {
   Logger.debug(`${TAG}@getPhoneNumberSalt`, 'Getting phone number salt')
 
   if (!isE164Number(e164Number)) {
@@ -75,7 +84,13 @@ async function getPhoneNumberSalt(e164Number: string, account: string) {
 
   Logger.debug(`${TAG}@getPhoneNumberSalt`, 'Retrieving blinded message')
   const base64BlindedMessage = await BlindThresholdBls.blindMessage(e164Number)
-  const base64BlindSig = await postToSignMessage(base64BlindedMessage, account)
+  const hashedPhoneNumber = PhoneNumberUtils.getPhoneHash(e164Number)
+  const base64BlindSig = await postToSignMessage(
+    base64BlindedMessage,
+    account,
+    hashedPhoneNumber,
+    contractKit
+  )
   Logger.debug(`${TAG}@getPhoneNumberSalt`, 'Retrieving unblinded signature')
   const { pgpnpPubKey } = networkConfig
   const base64UnblindedSig = await BlindThresholdBls.unblindMessage(base64BlindSig, pgpnpPubKey)
@@ -90,19 +105,29 @@ interface SignMessageResponse {
 
 // Send the blinded message off to the phone number privacy service and
 // get back the theshold signed blinded message
-async function postToSignMessage(base64BlindedMessage: string, account: string) {
+async function postToSignMessage(
+  base64BlindedMessage: string,
+  account: string,
+  hashedPhoneNumber: string,
+  contractKit: ContractKit
+) {
   Logger.debug(`${TAG}@postToSignMessage`, `Posting to ${SIGN_MESSAGE_ENDPOINT}`)
+  const body = JSON.stringify({
+    blindedQueryPhoneNumber: base64BlindedMessage.trim(),
+    account,
+  })
+
+  // Sign payload using account privkey
+  const authHeader = await contractKit.web3.eth.sign(body, account)
   const { pgpnpUrl } = networkConfig
   const res = await fetch(pgpnpUrl + SIGN_MESSAGE_ENDPOINT, {
     method: 'POST',
     headers: {
       Accept: 'application/json',
       'Content-Type': 'application/json',
+      Authorization: authHeader,
     },
-    body: JSON.stringify({
-      blindedQueryPhoneNumber: base64BlindedMessage.trim(),
-      account,
-    }),
+    body,
   })
 
   if (!res.ok) {

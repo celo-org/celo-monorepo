@@ -7,6 +7,7 @@ import {
   registerStaticIP,
 } from './azure'
 import { createNamespaceIfNotExists } from './cluster'
+import { execCmdWithExitOnFailure } from './cmd-utils'
 import { envVar, fetchEnv } from './env-utils'
 import {
   deletePersistentVolumeClaims,
@@ -15,7 +16,6 @@ import {
   upgradeGenericHelmChart,
 } from './helm_deploy'
 import { deleteResource, scaleResource } from './kubernetes'
-import { execCmdWithExitOnFailure } from './utils'
 
 const helmChartPath = '../helm-charts/celo-fullnode'
 
