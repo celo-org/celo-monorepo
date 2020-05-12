@@ -72,7 +72,7 @@
     "header": "¿Volver a intentar la verificación con Ahorro de Datos?",
     "body1": "Se ha producido un problema al verificar su número de teléfono. Recomendamos volver a intentarlo con el modo Ahorro de Datos habilitado",
     "body2": "Ahorro de Datos le permite comunicarse en la red de Celo de manera más consistente utilizando una conexión confiable",
-    "retryButton": "Reintentar con el protector de datos"
+    "retryButton": "Reintentar con Ahorro de Datos"
   },
   "congratsVerified": "¡Felicitaciones se ha verificado tu usuario!",
   "notification": {
