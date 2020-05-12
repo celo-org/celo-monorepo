@@ -46,7 +46,7 @@
   "confirmBackupKey": "Confirm Your Backup Key",
   "backupQuizInfo":
     "Please verify your Backup Key by selecting the words below in the correct order.",
-  "backupQuizWordCount": "Word {{index}} of {{total}}",
+  "backupQuizWordCount": "What's the <0>{{ordinal}}</0> word of your Account Key?",
   "invalidBackupPhrase": "Invalid Backup Key",
   "importBackupFailed": "Importing Wallet Failed",
   "backupQuizFailed": "Incorrect Backup Key, please try again",

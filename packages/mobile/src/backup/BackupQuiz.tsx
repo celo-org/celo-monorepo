@@ -1,12 +1,12 @@
 import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button.v2'
-import SmallButton from '@celo/react-components/components/SmallButton'
 import Touchable from '@celo/react-components/components/Touchable'
 import Backspace from '@celo/react-components/icons/Backspace'
+import Checkmark from '@celo/react-components/icons/Checkmark'
 import colors from '@celo/react-components/styles/colors.v2'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import { chunk, flatMap, shuffle, times } from 'lodash'
 import * as React from 'react'
-import { WithTranslation } from 'react-i18next'
+import { Trans, WithTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { NavigationInjectedProps } from 'react-navigation'
@@ -17,6 +17,7 @@ import componentWithAnalytics from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import DevSkipButton from 'src/components/DevSkipButton'
 import { Namespaces, withTranslation } from 'src/i18n'
+import LoadingSpinner from 'src/icons/LoadingSpinner'
 import { headerWithCancelButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -27,6 +28,7 @@ const TAG = 'backup/BackupQuiz'
 
 const MNEMONIC_BUTTONS_TO_DISPLAY = 6
 
+// TODO Add states for, checking, failed, success
 interface State {
   mnemonicLength: number
   mnemonicWords: string[]
@@ -46,6 +48,7 @@ type Props = WithTranslation & DispatchProps & NavigationInjectedProps
 export class BackupQuiz extends React.Component<Props, State> {
   static navigationOptions = () => ({
     ...headerWithCancelButton,
+    headerRightContainerStyle: { backgroundColor: '#000' },
   })
 
   state: State = {
@@ -56,7 +59,7 @@ export class BackupQuiz extends React.Component<Props, State> {
 
   componentDidMount() {
     const mnemonic = this.getMnemonicFromNavProps()
-    const shuffledMnemonic = this.getShuffledWordSet(mnemonic)
+    const shuffledMnemonic = getShuffledWordSet(mnemonic)
     this.setState({
       mnemonicWords: shuffledMnemonic,
       mnemonicLength: shuffledMnemonic.length,
@@ -69,12 +72,6 @@ export class BackupQuiz extends React.Component<Props, State> {
       throw new Error('Mnemonic missing form nav props')
     }
     return mnemonic
-  }
-
-  getShuffledWordSet(mnemonic: string) {
-    return flatMap(
-      chunk(mnemonic.split(' '), MNEMONIC_BUTTONS_TO_DISPLAY).map((chunk) => shuffle(chunk))
-    )
   }
 
   onPressMnemonicWord = (word: string, index: number) => {
@@ -111,11 +108,12 @@ export class BackupQuiz extends React.Component<Props, State> {
   onPressReset = () => {
     const mnemonic = this.getMnemonicFromNavProps()
     this.setState({
-      mnemonicWords: this.getShuffledWordSet(mnemonic),
+      mnemonicWords: getShuffledWordSet(mnemonic),
       userChosenWords: [],
     })
   }
 
+  // add in
   onPressSubmit = () => {
     const { userChosenWords, mnemonicLength } = this.state
     const mnemonic = this.getMnemonicFromNavProps()
@@ -129,7 +127,6 @@ export class BackupQuiz extends React.Component<Props, State> {
     } else {
       Logger.debug(TAG, 'Backup quiz failed, reseting words')
       this.props.showError(ErrorMessages.BACKUP_QUIZ_FAILED)
-      this.onPressReset()
     }
   }
 
@@ -166,22 +163,32 @@ export class BackupQuiz extends React.Component<Props, State> {
             ))}
           </View>
           {!isQuizComplete && (
-            <Text style={styles.bodyTextBold}>
-              {t('backupQuizWordCount', { index: currentWordIndex, total: mnemonicLength })}
+            <Text style={styles.bodyText}>
+              <Trans
+                i18nKey={'backupQuizWordCount'}
+                ns={Namespaces.backupKeyFlow6}
+                tOptions={{ ordinal: t(`global:ordinals.${currentWordIndex}`) }}
+              >
+                <Text style={styles.bodyTextBold}>X</Text>
+              </Trans>
             </Text>
           )}
           <View style={styles.mnemonicButtonsContainer}>
             {mnemonicWordsToDisplay.map((word, index) => (
-              <SmallButton
+              <Touchable
                 key={'mnemonic-button-' + word}
-                solid={false}
-                text={word}
                 style={styles.mnemonicWordButton}
                 onPress={this.onPressMnemonicWord(word, index)}
-              />
+              >
+                <Text style={styles.mnemonicWordButonText}>{word}</Text>
+              </Touchable>
             ))}
           </View>
         </ScrollView>
+        <View style={styles.successCheck}>
+          <LoadingSpinner width={16} />
+          <Checkmark height={32} />
+        </View>
         {isQuizComplete && (
           <Button
             onPress={this.onPressSubmit}
@@ -212,6 +219,14 @@ function DeleteWord({ onPressBackspace }: { onPressBackspace: () => void }) {
     >
       <Backspace color={colors.greenUI} />
     </Touchable>
+  )
+}
+
+function getShuffledWordSet(mnemonic: string) {
+  return flatMap(
+    chunk(mnemonic.split(' '), MNEMONIC_BUTTONS_TO_DISPLAY).map((mnemonicChunk) =>
+      shuffle(mnemonicChunk)
+    )
   )
 }
 
@@ -281,8 +296,20 @@ const styles = StyleSheet.create({
   },
   mnemonicWordButton: {
     borderRadius: 100,
+    borderWidth: 1.5,
+    borderColor: colors.greenUI,
     minWidth: 65,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
     marginVertical: 4,
     marginHorizontal: 4,
+  },
+  mnemonicWordButonText: {
+    textAlign: 'center',
+    color: colors.greenUI,
+  },
+  successCheck: {
+    alignItems: 'center',
+    marginBottom: 24,
   },
 })
