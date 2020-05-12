@@ -41,7 +41,11 @@ Tangany's custody solution [Wallet as a Service](https://docs.tangany.com/?versi
 manage HSM-secured wallets and interact with the underlying blockchain. Our API makes it incredibly easy for developers 
 to execute transactions, check details of past transactions or query account balances without any worries about private 
 key safekeeping. For the Celo Camp 2020 we have developed a prototype version of our product that integrates the Celo blockchain. 
-The [demo project](https://github.com/adrianmitter/celo-camp) presents the new features and provides some code snippets to get started. 
+The [demo project](https://github.com/adrianmitter/celo-camp) presents the new features and provides some code snippets to get started.
+
+### impactMarket
+
+[impactMarket](https://github.com/impactMarket) enables any vulnerable community to create its own unconditional basic income system for their beneficiaries, where each one can claim a fixed amount on a regular basis and make payments for free.
 
 
 ### Celo Toolkit by MugglePay
