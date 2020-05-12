@@ -9,6 +9,8 @@ import Chevron, { Direction } from 'src/icons/chevron'
 import { colors } from 'src/styles'
 import { weiToDecimal } from 'src/utils/utils'
 
+const localStoragePinnedKey = 'pinnedValidators'
+
 class Text extends RNText {
   render() {
     return <RNText style={[styles.defaultText, this.props.style]}>{this.props.children}</RNText>
@@ -188,6 +190,7 @@ class ValidatorsList extends React.PureComponent<Props, State> {
           const votesPer = new BigNumber(votes).dividedBy(receivableVotes).multipliedBy(100)
           const votesAbsolutePer = receivableVotesPer.multipliedBy(votesPer).dividedBy(100)
           return {
+            pinned: this.isPinned(group.address),
             name: group.name,
             address: group.address,
             usd: weiToDecimal(+group.usd),
@@ -273,16 +276,24 @@ class ValidatorsList extends React.PureComponent<Props, State> {
       .sort((a, b) => b.id - a.id)
       .sort((a, b) => compare(dAccessor(a), dAccessor(b)))
       .sort((a, b) => dir * compare(accessor(a), accessor(b)))
+      .sort((a, b) => this.isPinned(b) - this.isPinned(a))
+  }
+
+  isPinned({ address }: any) {
+    const list = localStorage.getItem(localStoragePinnedKey)?.split(',') || []
+    return +list.includes(address)
   }
 
   render() {
     const { expanded, orderBy, orderAsc } = this.state
     const { data } = this.props
     const validatorGroups = !data ? ([] as CeloGroup[]) : this.sortData(this.cleanData(data))
+    const onPinned = () => this.setState({ update: Math.random() } as any)
     return (
       <View style={styles.pStatic}>
         <View style={[styles.table, styles.pStatic]}>
           <View style={[styles.tableRow, styles.tableHeaderRow]}>
+            <View style={[styles.tableHeaderCell, styles.sizeXXS]} />
             <HeaderCell
               onClick={this.orderByFn.name}
               style={[styles.tableHeaderCellPadding]}
@@ -346,7 +357,7 @@ class ValidatorsList extends React.PureComponent<Props, State> {
           </View>
           {validatorGroups.map((group, i) => (
             <div key={group.id} onClick={this.expand.bind(this, i)}>
-              <ValidatorsListRow group={group} expanded={expanded === i} />
+              <ValidatorsListRow onPinned={onPinned} group={group} expanded={expanded === i} />
             </div>
           ))}
         </View>

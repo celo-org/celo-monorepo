@@ -55,7 +55,7 @@ export const styles = StyleSheet.create({
 
   // Table
   table: {
-    width: 1252,
+    width: 1302,
     margin: 'auto',
     marginBottom: 100,
     backgroundColor: colors.dark,
@@ -193,6 +193,7 @@ export const styles = StyleSheet.create({
   },
 
   // Column sizes
+  sizeXXS: { minWidth: 40, maxWidth: 40 },
   sizeXS: { minWidth: 64 + 6, maxWidth: 64 + 6 },
   sizeS: { minWidth: 74 + 6, maxWidth: 74 + 6 },
   sizeM: { minWidth: 110 + 6, maxWidth: 110 + 6 },
@@ -295,5 +296,10 @@ export const styles = StyleSheet.create({
     textDecorationLine: 'underline',
     marginRight: 6,
     marginLeft: 4,
+  },
+
+  // Pinned
+  noPinned: {
+    opacity: 0.3,
   },
 })

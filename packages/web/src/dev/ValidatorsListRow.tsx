@@ -12,6 +12,8 @@ import { cutAddress, formatNumber } from 'src/utils/utils'
 const unknownGroupName = 'Unnamed Group'
 const unknownValidatorName = 'Unnamed Validator'
 
+const localStoragePinnedKey = 'pinnedValidators'
+
 class Text extends RNText {
   render() {
     return (
@@ -59,20 +61,25 @@ export interface CeloGroup {
 interface Props {
   group: CeloGroup
   expanded: boolean
+  onPinned: () => void
 }
 interface State {
   tooltip?: boolean
+  isPinned?: boolean
 }
 
 class ValidatorsListRow extends React.PureComponent<Props & I18nProps, State> {
   state = {
     tooltip: false,
+    isPinned: false,
   }
   tooltipRef = React.createRef<any>()
   removeDocumentListener: () => void
 
   constructor(...args) {
     super(...(args as [any]))
+
+    this.state.isPinned = this.isPinned()
 
     const onDocumentClick = (event) => {
       if (!this.state.tooltip || !this.tooltipRef.current) {
@@ -93,9 +100,25 @@ class ValidatorsListRow extends React.PureComponent<Props & I18nProps, State> {
     this.removeDocumentListener()
   }
 
+  isPinned(toggle?: boolean) {
+    const { address } = this.props.group
+    let list = localStorage.getItem(localStoragePinnedKey)?.split(',') || []
+    let isPinned = list.includes(address)
+    if (toggle) {
+      list = list.filter((_) => _ !== address)
+      if (!isPinned) {
+        list.push(address)
+      }
+      isPinned = !isPinned
+      localStorage.setItem(localStoragePinnedKey, list.join(','))
+      this.props.onPinned()
+    }
+    return isPinned
+  }
+
   render() {
     const { group, expanded } = this.props
-    const { tooltip } = this.state
+    const { tooltip, isPinned } = this.state
     const stopPropagation = (event: any) => {
       event.stopPropagation()
     }
@@ -103,9 +126,26 @@ class ValidatorsListRow extends React.PureComponent<Props & I18nProps, State> {
       stopPropagation(event)
       this.setState({ tooltip: !tooltip })
     }
+    const togglePinned: any = (event: any) => {
+      stopPropagation(event)
+      const is = this.isPinned(true)
+      this.setState({ isPinned: is })
+    }
     return (
       <div style={tooltip ? { zIndex: 2 } : {}}>
         <View style={[styles.tableRow, styles.tableRowCont, tooltip ? { zIndex: 3 } : {}]}>
+          <Text
+            style={[
+              styles.tableCell,
+              styles.tableCellCenter,
+              styles.sizeXXS,
+              isPinned ? {} : styles.noPinned,
+            ]}
+          >
+            <span style={{ cursor: 'pointer' }} onClick={togglePinned}>
+              📍
+            </span>
+          </Text>
           <View style={[styles.tableCell, styles.tableCellTitle]}>
             <Text style={[styles.tableCell, styles.tableCellTitleArrow]}>
               <Chevron
