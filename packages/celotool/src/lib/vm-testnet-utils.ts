@@ -1,4 +1,5 @@
 import sleep from 'sleep-promise'
+import { execCmd } from './cmd-utils'
 import { confirmAction, envVar, fetchEnv, fetchEnvOrFallback } from './env-utils'
 import {
   AccountType,
@@ -24,7 +25,6 @@ import {
   uploadDataToGoogleStorage,
   uploadTestnetInfoToGoogleStorage,
 } from './testnet-utils'
-import { execCmd } from './utils'
 
 // Keys = gcloud project name
 const projectConfig = {
