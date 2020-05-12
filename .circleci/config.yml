@@ -818,12 +818,12 @@ jobs:
           echo $GCLOUD_SERVICE_KEY > $GOOGLE_APPLICATION_CREDENTIALS
     - attach_workspace:
         at: ~/app
-    # - run:
-    #     name: Rebuild project
-    #     command: |
-    #       set -e
-    #       yarn
-    #       yarn run build
+    - run:
+        name: Rebuild project
+        command: |
+          set -e
+          yarn
+          yarn run build
     - run:
         name: Configure k8s cluster for the fullnode
         command: |
