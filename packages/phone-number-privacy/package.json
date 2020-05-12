@@ -11,7 +11,7 @@
     "deploy:prod": "yarn build && firebase deploy --only functions --project celo-phone-number-privacy",
     "config:get:staging": "firebase functions:config:get --project celo-phone-number-privacy-stg",
     "config:get:prod": "firebase functions:config:get --project celo-phone-number-privacy",
-    "config:set:staging": "firebase functions:config:set --project celo-phone-number-privacy",
+    "config:set:staging": "firebase functions:config:set --project celo-phone-number-privacy-stg",
     "config:set:prod": "firebase functions:config:set --project celo-phone-number-privacy",
     "clean": "tsc -b . --clean",
     "build": "tsc -b .",

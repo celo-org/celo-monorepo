@@ -3,6 +3,7 @@ import { getPhoneHash, isE164Number, PhoneNumberUtils } from '@celo/utils/src/ph
 import crypto from 'crypto'
 import BlindThresholdBls from 'react-native-blind-threshold-bls'
 import { call, put, select } from 'redux-saga/effects'
+import { e164NumberSelector } from 'src/account/selectors'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import networkConfig from 'src/geth/networkConfig'
 import { updateE164PhoneNumberSalts } from 'src/identity/actions'
@@ -35,12 +36,14 @@ export function* fetchPhoneHashPrivate(e164Number: string) {
 
     Logger.debug(`${TAG}@fetchPrivatePhoneHash`, 'Salt was not cached, fetching')
     const account: string = yield select(currentAccountSelector)
-    const contractKit = yield call(getContractKit)
+    const contractKit: ContractKit = yield call(getContractKit)
+    const selfPhoneHash: string | undefined = yield call(getUserSelfPhoneHash)
     const details: PhoneNumberHashDetails = yield call(
       getPhoneHashPrivate,
       e164Number,
       account,
-      contractKit
+      contractKit,
+      selfPhoneHash
     )
     yield put(updateE164PhoneNumberSalts({ [e164Number]: details.salt }))
     return details
@@ -64,9 +67,10 @@ export function* fetchPhoneHashPrivate(e164Number: string) {
 async function getPhoneHashPrivate(
   e164Number: string,
   account: string,
-  contractKit: ContractKit
+  contractKit: ContractKit,
+  selfPhoneHash?: string
 ): Promise<PhoneNumberHashDetails> {
-  const salt = await getPhoneNumberSalt(e164Number, account, contractKit)
+  const salt = await getPhoneNumberSalt(e164Number, account, contractKit, selfPhoneHash)
   const phoneHash = getPhoneHash(e164Number, salt)
   return {
     e164Number,
@@ -75,7 +79,12 @@ async function getPhoneHashPrivate(
   }
 }
 
-async function getPhoneNumberSalt(e164Number: string, account: string, contractKit: ContractKit) {
+async function getPhoneNumberSalt(
+  e164Number: string,
+  account: string,
+  contractKit: ContractKit,
+  selfPhoneHash?: string
+) {
   Logger.debug(`${TAG}@getPhoneNumberSalt`, 'Getting phone number salt')
 
   if (!isE164Number(e164Number)) {
@@ -83,13 +92,12 @@ async function getPhoneNumberSalt(e164Number: string, account: string, contractK
   }
 
   Logger.debug(`${TAG}@getPhoneNumberSalt`, 'Retrieving blinded message')
-  const base64BlindedMessage = await BlindThresholdBls.blindMessage(e164Number)
-  const hashedPhoneNumber = PhoneNumberUtils.getPhoneHash(e164Number)
+  const base64BlindedMessage = (await BlindThresholdBls.blindMessage(e164Number)).trim()
   const base64BlindSig = await postToSignMessage(
     base64BlindedMessage,
     account,
-    hashedPhoneNumber,
-    contractKit
+    contractKit,
+    selfPhoneHash
   )
   Logger.debug(`${TAG}@getPhoneNumberSalt`, 'Retrieving unblinded signature')
   const { pgpnpPubKey } = networkConfig
@@ -108,13 +116,14 @@ interface SignMessageResponse {
 async function postToSignMessage(
   base64BlindedMessage: string,
   account: string,
-  hashedPhoneNumber: string,
-  contractKit: ContractKit
+  contractKit: ContractKit,
+  selfPhoneHash?: string
 ) {
   Logger.debug(`${TAG}@postToSignMessage`, `Posting to ${SIGN_MESSAGE_ENDPOINT}`)
   const body = JSON.stringify({
-    blindedQueryPhoneNumber: base64BlindedMessage.trim(),
+    blindedQueryPhoneNumber: base64BlindedMessage,
     account,
+    hashedPhoneNumber: selfPhoneHash,
   })
 
   // Sign payload using account privkey
@@ -162,4 +171,22 @@ export function getSaltFromThresholdSignature(base64Sig: string) {
     .createHash('sha256')
     .update(sigBuf)
     .digest('hex')
+}
+
+// Get the wallet user's own phone hash details if they're cached
+// null otherwise
+export function* getUserSelfPhoneHash() {
+  const e164Number: string = yield select(e164NumberSelector)
+  if (!e164Number) {
+    return undefined
+  }
+
+  const saltCache: E164NumberToSaltType = yield select(e164NumberToSaltSelector)
+  const salt = saltCache[e164Number]
+
+  if (!salt) {
+    return undefined
+  }
+
+  return PhoneNumberUtils.getPhoneHash(e164Number, salt)
 }
