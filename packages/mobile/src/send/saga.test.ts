@@ -132,7 +132,7 @@ describe(watchQrCodeDetections, () => {
         [select(e164NumberToAddressSelector), {}],
       ])
       .dispatch({ type: Actions.BARCODE_DETECTED, data })
-      .put(showError(ErrorMessages.QR_FAILED_INVALID_RECIPIENT))
+      .put(showError(ErrorMessages.QR_FAILED_NO_ADDRESS))
       .silentRun()
     expect(replace).not.toHaveBeenCalled()
   })

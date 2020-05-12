@@ -2,9 +2,11 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import { FeeType } from 'src/fees/actions'
 import { E164NumberToAddressType, RecipientVerificationStatus } from 'src/identity/reducer'
 import { Recipient, RecipientKind } from 'src/recipients/recipient'
-import { ManuallyValidatedE164NumberToAddress } from 'src/send/reducers'
-import { TransactionData } from 'src/send/SendAmount'
-import { ConfirmationInput } from 'src/send/SendConfirmation'
+import {
+  ConfirmationInput,
+  ManuallyValidatedE164NumberToAddress,
+  TransactionData,
+} from 'src/send/reducers'
 import Logger from 'src/utils/Logger'
 
 export const formatDisplayName = (displayName: string) => {

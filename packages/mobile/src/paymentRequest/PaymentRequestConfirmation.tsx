@@ -19,7 +19,7 @@ import { Namespaces, withTranslation } from 'src/i18n'
 import { navigateBack } from 'src/navigator/NavigationService'
 import PaymentRequestReviewCard from 'src/paymentRequest/PaymentRequestReviewCard'
 import { RootState } from 'src/redux/reducers'
-import { ConfirmationInput } from 'src/send/SendConfirmation'
+import { ConfirmationInput } from 'src/send/reducers'
 import { getConfirmationInput } from 'src/send/utils'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import Logger from 'src/utils/Logger'
@@ -88,6 +88,10 @@ class PaymentRequestConfirmation extends React.Component<Props> {
     const address = this.props.account
     if (!address) {
       throw new Error("Can't request without a valid account")
+    }
+
+    if (!requesteeAddress) {
+      throw new Error('Error passing through the requestee address')
     }
 
     const paymentInfo = {

@@ -21,7 +21,7 @@ import { Screens } from 'src/navigator/Screens'
 import { Recipient } from 'src/recipients/recipient'
 import { RootState } from 'src/redux/reducers'
 import { validateRecipientAddress } from 'src/send/actions'
-import { TransactionData } from 'src/send/SendAmount'
+import { TransactionData } from 'src/send/reducers'
 
 type Navigation = NavigationInjectedProps['navigation']
 
@@ -67,7 +67,7 @@ const mapStateToProps = (state: RootState, ownProps: NavigationInjectedProps): S
 
 type Props = StateProps & DispatchProps & WithTranslation & OwnProps
 
-export class ConfirmRecipientAccount extends React.Component<Props, State> {
+export class ValidateRecipientAccount extends React.Component<Props, State> {
   static navigationOptions = () => ({
     ...headerWithBackButton,
     headerTitle: i18n.t('sendFlow7:confirmAccountNumber.title'),
@@ -297,5 +297,5 @@ export default componentWithAnalytics(
   connect<StateProps, DispatchProps, OwnProps, RootState>(
     mapStateToProps,
     mapDispatchToProps
-  )(withTranslation(Namespaces.sendFlow7)(ConfirmRecipientAccount))
+  )(withTranslation(Namespaces.sendFlow7)(ValidateRecipientAccount))
 )

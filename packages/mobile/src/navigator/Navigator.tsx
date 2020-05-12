@@ -53,12 +53,12 @@ import QRCode from 'src/qrcode/QRCode'
 import QRScanner from 'src/qrcode/QRScanner'
 import JoinCelo from 'src/registration/JoinCelo'
 import RegulatoryTerms from 'src/registration/RegulatoryTerms'
-import ConfirmRecipient from 'src/send/ConfirmRecipient'
-import ConfirmRecipientAccount from 'src/send/ConfirmRecipientAccount'
 import FeeEducation from 'src/send/FeeEducation'
 import Send from 'src/send/Send'
 import SendAmount from 'src/send/SendAmount'
 import SendConfirmation from 'src/send/SendConfirmation'
+import ValidateRecipientAccount from 'src/send/ValidateRecipientAccount'
+import ValidateRecipientIntro from 'src/send/ValidateRecipientIntro'
 import SetClock from 'src/set-clock/SetClock'
 import TransactionReviewScreen from 'src/transactions/TransactionReviewScreen'
 import VerificationEducationScreen from 'src/verify/VerificationEducationScreen'
@@ -139,8 +139,8 @@ const SendStack = createStackNavigator(
     [Screens.Send]: { screen: Send },
     ...verificationScreens,
     [Screens.QRScanner]: { screen: QRScanner },
-    [Screens.ConfirmRecipient]: { screen: ConfirmRecipient },
-    [Screens.ConfirmRecipientAccount]: { screen: ConfirmRecipientAccount },
+    [Screens.ValidateRecipientIntro]: { screen: ValidateRecipientIntro },
+    [Screens.ValidateRecipientAccount]: { screen: ValidateRecipientAccount },
     [Screens.SendAmount]: { screen: SendAmount },
     [Screens.SendConfirmation]: { screen: SendConfirmation },
     [Screens.PaymentRequestConfirmation]: { screen: PaymentRequestConfirmation },

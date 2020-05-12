@@ -15,7 +15,7 @@ import { unknownUserIcon } from 'src/images/Images'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { getRecipientThumbnail, Recipient, RecipientKind } from 'src/recipients/recipient'
-import { TransactionData } from 'src/send/SendAmount'
+import { TransactionData } from 'src/send/reducers'
 import Logger from 'src/utils/Logger'
 
 interface OwnProps {
@@ -71,7 +71,7 @@ export class IncomingPaymentRequestListItem extends React.Component<Props> {
     }
 
     if (manualAddressValidationRequired) {
-      navigate(Screens.ConfirmRecipient, { transactionData, fullValidationRequired })
+      navigate(Screens.ValidateRecipientIntro, { transactionData, fullValidationRequired })
     } else {
       navigate(Screens.SendConfirmation, { transactionData })
     }

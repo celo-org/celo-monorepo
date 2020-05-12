@@ -20,7 +20,7 @@ import {
   SVG,
   validateRecipientAddressSuccess,
 } from 'src/send/actions'
-import { TransactionData } from 'src/send/SendAmount'
+import { TransactionData } from 'src/send/reducers'
 import Logger from 'src/utils/Logger'
 
 export enum BarcodeTypes {
@@ -67,8 +67,7 @@ export function* handleBarcode(
     Logger.warn(TAG, 'QR code read failed with ' + e)
   }
   if (typeof data !== 'object' || isEmpty(data.address)) {
-    // yield put(showError(ErrorMessages.QR_FAILED_NO_ADDRESS))
-    yield put(showError(ErrorMessages.QR_FAILED_INVALID_RECIPIENT))
+    yield put(showError(ErrorMessages.QR_FAILED_NO_ADDRESS))
     return
   }
   if (!isValidAddress(data.address)) {
@@ -83,25 +82,27 @@ export function* handleBarcode(
         )
       }
 
-      const targetAddress = data.address
+      const userScannedAddress = data.address.toLowerCase()
       const { e164PhoneNumber } = transactionData.recipient
       if (!e164PhoneNumber) {
         throw Error('Error passing through data: Phone number not part of recipient data')
       }
 
-      // Typically use 'getAddressFromPhoneNumber' but need all the possible addresses when doing secure send validation
       const possibleRecievingAddresses = e164NumberToAddress[e164PhoneNumber]
       if (!possibleRecievingAddresses) {
         yield put(showError(ErrorMessages.QR_FAILED_NO_PHONE_NUMBER))
         return
       }
 
-      if (!possibleRecievingAddresses.includes(targetAddress)) {
+      const possibleRecievingAddressesFormatted = possibleRecievingAddresses.map((address) =>
+        address.toLowerCase()
+      )
+      if (!possibleRecievingAddressesFormatted.includes(userScannedAddress)) {
         yield put(showError(ErrorMessages.QR_FAILED_INVALID_RECIPIENT))
         return
       }
 
-      yield put(validateRecipientAddressSuccess(e164PhoneNumber, targetAddress))
+      yield put(validateRecipientAddressSuccess(e164PhoneNumber, userScannedAddress))
     }
   } catch (error) {
     Logger.error(TAG + '@handleBarcode', `Error with secure send validation: `, error)

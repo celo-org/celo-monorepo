@@ -52,6 +52,7 @@ import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { Recipient, RecipientKind } from 'src/recipients/recipient'
 import { RootState } from 'src/redux/reducers'
+import { TransactionData } from 'src/send/reducers'
 import { getFeeType, getVerificationStatus } from 'src/send/utils'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { fetchDollarBalance } from 'src/stableToken/actions'
@@ -61,14 +62,6 @@ const AmountInput = withDecimalSeparator(
   withTextInputLabeling<ValidatedTextInputProps<DecimalValidatorProps>>(ValidatedTextInput)
 )
 const CommentInput = withTextInputLabeling<TextInputProps>(TextInput)
-
-export interface TransactionData {
-  recipient: Recipient
-  amount: BigNumber
-  reason: string
-  type: TokenTransactionType
-  firebasePendingRequestUid?: string | null
-}
 
 interface State {
   amount: string
@@ -85,9 +78,9 @@ type Props = StateProps & DispatchProps & OwnProps & WithTranslation
 
 interface StateProps {
   dollarBalance: string
+  estimateFeeDollars: BigNumber | undefined
   defaultCountryCode: string
   feeType: FeeType | null
-  estimateFeeDollars: BigNumber | undefined
   localCurrencyCode: LocalCurrencyCode
   localCurrencyExchangeRate: string | null | undefined
   recipient: Recipient
@@ -114,9 +107,9 @@ const mapStateToProps = (state: RootState, ownProps: NavigationInjectedProps): S
 
   return {
     dollarBalance: state.stableToken.balance || '0',
+    estimateFeeDollars: getFeeEstimateDollars(state, feeType),
     defaultCountryCode: state.account.defaultCountryCode,
     feeType,
-    estimateFeeDollars: getFeeEstimateDollars(state, feeType),
     localCurrencyCode: getLocalCurrencyCode(state),
     localCurrencyExchangeRate: getLocalCurrencyExchangeRate(state),
     recipient,
@@ -234,7 +227,7 @@ export class SendAmount extends React.Component<Props, State> {
     this.props.hideAlert()
 
     if (manualAddressValidationRequired) {
-      navigate(Screens.ConfirmRecipient, { transactionData, fullValidationRequired })
+      navigate(Screens.ValidateRecipientIntro, { transactionData, fullValidationRequired })
     } else {
       CeloAnalytics.track(CustomEventNames.send_continue)
       navigate(Screens.SendConfirmation, { transactionData })
@@ -246,7 +239,7 @@ export class SendAmount extends React.Component<Props, State> {
     const transactionData = this.getTransactionData(TokenTransactionType.PayRequest)
 
     if (manualAddressValidationRequired) {
-      navigate(Screens.ConfirmRecipient, {
+      navigate(Screens.ValidateRecipientIntro, {
         transactionData,
         fullValidationRequired,
         isPaymentRequest: true,

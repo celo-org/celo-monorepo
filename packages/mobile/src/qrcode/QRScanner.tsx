@@ -9,7 +9,7 @@ import { WithTranslation } from 'react-i18next'
 import { Platform, StyleSheet, Text, View } from 'react-native'
 import { RNCamera } from 'react-native-camera'
 import SafeAreaView from 'react-native-safe-area-view'
-import { NavigationInjectedProps, withNavigationFocus } from 'react-navigation'
+import { NavigationFocusInjectedProps, withNavigationFocus } from 'react-navigation'
 import { connect } from 'react-redux'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
@@ -19,10 +19,10 @@ import { Screens } from 'src/navigator/Screens'
 import NotAuthorizedView from 'src/qrcode/NotAuthorizedView'
 import { RootState } from 'src/redux/reducers'
 import { handleBarcodeDetected } from 'src/send/actions'
-import { TransactionData } from 'src/send/SendAmount'
+import { TransactionData } from 'src/send/reducers'
 import Logger from 'src/utils/Logger'
 
-type Navigation = NavigationInjectedProps['navigation']
+type Navigation = NavigationFocusInjectedProps['navigation']
 
 interface OwnProps {
   navigation: Navigation
@@ -40,7 +40,7 @@ interface DispatchProps {
 
 type Props = DispatchProps & WithTranslation & StateProps & OwnProps
 
-const mapStateToProps = (state: RootState, ownProps: NavigationInjectedProps): StateProps => {
+const mapStateToProps = (state: RootState, ownProps: NavigationFocusInjectedProps): StateProps => {
   const { navigation } = ownProps
   return {
     scanIsForSecureSend: navigation.getParam('scanIsForSecureSend'),

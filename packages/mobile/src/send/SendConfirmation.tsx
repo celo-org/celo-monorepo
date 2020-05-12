@@ -2,7 +2,6 @@ import ReviewFrame from '@celo/react-components/components/ReviewFrame'
 import ReviewHeader from '@celo/react-components/components/ReviewHeader'
 import colors from '@celo/react-components/styles/colors'
 import { CURRENCY_ENUM } from '@celo/utils/src/currencies'
-import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { ActivityIndicator, StyleSheet, View } from 'react-native'
@@ -25,25 +24,16 @@ import { completePaymentRequest, declinePaymentRequest } from 'src/firebase/acti
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import { InviteBy } from 'src/invite/actions'
 import { navigateBack } from 'src/navigator/NavigationService'
-import { Recipient } from 'src/recipients/recipient'
 import { RootState } from 'src/redux/reducers'
 import { isAppConnected } from 'src/redux/selectors'
 import { sendPaymentOrInvite } from 'src/send/actions'
+import { ConfirmationInput } from 'src/send/reducers'
 import TransferReviewCard from 'src/send/TransferReviewCard'
 import { getConfirmationInput } from 'src/send/utils'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { fetchDollarBalance } from 'src/stableToken/actions'
 import Logger from 'src/utils/Logger'
 import { currentAccountSelector } from 'src/web3/selectors'
-
-export interface ConfirmationInput {
-  recipient: Recipient
-  amount: BigNumber
-  reason: string
-  recipientAddress: string | null | undefined
-  type: TokenTransactionType
-  firebasePendingRequestUid?: string | null
-}
 
 interface StateProps {
   account: string | null

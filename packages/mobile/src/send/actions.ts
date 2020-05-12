@@ -2,7 +2,7 @@ import { E164Number } from '@celo/utils/lib/io'
 import BigNumber from 'bignumber.js'
 import { InviteBy } from 'src/invite/actions'
 import { Recipient } from 'src/recipients/recipient'
-import { TransactionData } from 'src/send/SendAmount'
+import { TransactionData } from 'src/send/reducers'
 import { Svg } from 'svgs'
 
 export interface QrCode {
@@ -36,7 +36,7 @@ export interface SendPaymentOrInviteAction {
   reason: string
   recipient: Recipient
   recipientAddress: string | null | undefined
-  inviteMethod?: InviteBy | undefined
+  inviteMethod?: InviteBy
   firebasePendingRequestUid: string | null | undefined
 }
 

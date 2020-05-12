@@ -1,6 +1,6 @@
 import { CURRENCY_ENUM } from '@celo/utils/src/currencies'
 import BigNumber from 'bignumber.js'
-import { call, put, select, spawn, take, takeLeading } from 'redux-saga/effects'
+import { call, put, select, spawn, take, takeLatest, takeLeading } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
@@ -147,11 +147,6 @@ function* sendPaymentOrInviteSaga({
   inviteMethod,
   firebasePendingRequestUid,
 }: SendPaymentOrInviteAction) {
-  Logger.debug(
-    `================ ${amount} ${typeof amount}| ${
-      recipient.e164PhoneNumber
-    } | ${recipientAddress} | ${inviteMethod}`
-  )
   try {
     recipientAddress
       ? CeloAnalytics.track(CustomEventNames.send_dollar_confirm)
@@ -230,7 +225,7 @@ export function* watchSendPaymentOrInvite() {
 }
 
 export function* watchValidateRecipientAddress() {
-  yield takeLeading(Actions.VALIDATE_RECIPIENT_ADDRESS, validateRecipientAddressSaga)
+  yield takeLatest(Actions.VALIDATE_RECIPIENT_ADDRESS, validateRecipientAddressSaga)
 }
 
 export function* sendSaga() {

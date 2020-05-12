@@ -1,3 +1,5 @@
+import BigNumber from 'bignumber.js'
+import { TokenTransactionType } from 'src/apollo/types'
 import { areRecipientsEquivalent, Recipient } from 'src/recipients/recipient'
 import { getRehydratePayload, REHYDRATE, RehydrateAction } from 'src/redux/persist-helper'
 import { RootState } from 'src/redux/reducers'
@@ -5,6 +7,23 @@ import { Actions, ActionTypes } from 'src/send/actions'
 
 // Sets the limit of recent recipients we want to store
 const RECENT_RECIPIENTS_TO_STORE = 8
+
+export interface TransactionData {
+  recipient: Recipient
+  amount: BigNumber
+  reason: string
+  type: TokenTransactionType
+  firebasePendingRequestUid?: string | null
+}
+
+export interface ConfirmationInput {
+  recipient: Recipient
+  amount: BigNumber
+  reason: string
+  recipientAddress: string | null | undefined
+  type: TokenTransactionType
+  firebasePendingRequestUid?: string | null
+}
 
 export interface ManuallyValidatedE164NumberToAddress {
   [e164Number: string]: string

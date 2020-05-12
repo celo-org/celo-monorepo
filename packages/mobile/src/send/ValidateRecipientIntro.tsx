@@ -17,7 +17,7 @@ import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { getRecipientThumbnail, Recipient } from 'src/recipients/recipient'
 import { RootState } from 'src/redux/reducers'
-import { TransactionData } from 'src/send/SendAmount'
+import { TransactionData } from 'src/send/reducers'
 import { formatDisplayName } from 'src/send/utils'
 
 const AVATAR_SIZE = 120
@@ -57,7 +57,7 @@ const mapStateToProps = (state: RootState, ownProps: NavigationInjectedProps): S
   }
 }
 
-class ConfirmRecipient extends React.Component<Props> {
+class ValidateRecipientIntro extends React.Component<Props> {
   static navigationOptions = () => ({
     ...headerWithBackButton,
   })
@@ -72,7 +72,7 @@ class ConfirmRecipient extends React.Component<Props> {
   onPressConfirmAccount = () => {
     const { fullValidationRequired, transactionData, isPaymentRequest } = this.props
 
-    navigate(Screens.ConfirmRecipientAccount, {
+    navigate(Screens.ValidateRecipientAccount, {
       transactionData,
       fullValidationRequired,
       isPaymentRequest,
@@ -175,6 +175,6 @@ const styles = StyleSheet.create({
 
 export default componentWithAnalytics(
   connect<StateProps, {}, OwnProps, RootState>(mapStateToProps)(
-    withTranslation(Namespaces.sendFlow7)(ConfirmRecipient)
+    withTranslation(Namespaces.sendFlow7)(ValidateRecipientIntro)
   )
 )

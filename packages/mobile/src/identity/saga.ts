@@ -17,7 +17,7 @@ function* watchVerification() {
 function* watchContactMapping() {
   yield takeLeading(Actions.IMPORT_CONTACTS, doImportContactsWrapper)
   yield takeEvery(
-    Actions.FETCH_PHONE_ADDRESSES_AND_VERIFICATION_STATUS,
+    Actions.FETCH_PHONE_ADDRESSES_AND_VALIDATION_STATUS,
     fetchPhoneAddressesAndCheckIfRecipientValidationRequired
   )
 }
