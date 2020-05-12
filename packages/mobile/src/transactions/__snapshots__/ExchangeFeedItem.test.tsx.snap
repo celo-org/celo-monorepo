@@ -4,7 +4,6 @@ exports[`ExchangeFeedItem renders correctly 1`] = `
 <View
   accessible={true}
   focusable={true}
-  isTVSelectable={true}
   nativeBackgroundAndroid={
     Object {
       "attribute": "selectableItemBackground",
@@ -86,9 +85,6 @@ exports[`ExchangeFeedItem renders correctly 1`] = `
           numberOfLines={1}
           style={
             Array [
-              Object {
-                "color": "#42D689",
-              },
               Array [
                 Object {
                   "marginLeft": "auto",
@@ -101,6 +97,9 @@ exports[`ExchangeFeedItem renders correctly 1`] = `
                   "lineHeight": 20,
                 },
               ],
+              Object {
+                "color": "#81868B",
+              },
             ]
           }
         >
@@ -121,9 +120,6 @@ exports[`ExchangeFeedItem renders correctly 1`] = `
           numberOfLines={1}
           style={
             Array [
-              Object {
-                "color": "#42D689",
-              },
               Array [
                 Object {
                   "fontFamily": "Hind-SemiBold",
@@ -132,6 +128,9 @@ exports[`ExchangeFeedItem renders correctly 1`] = `
                 },
                 false,
               ],
+              Object {
+                "color": "#42D689",
+              },
             ]
           }
         >
@@ -167,9 +166,6 @@ exports[`ExchangeFeedItem renders correctly 1`] = `
           numberOfLines={1}
           style={
             Array [
-              Object {
-                "color": "#FBCC5C",
-              },
               Array [
                 Object {
                   "fontFamily": "Hind-SemiBold",
@@ -178,11 +174,14 @@ exports[`ExchangeFeedItem renders correctly 1`] = `
                 },
                 false,
               ],
+              Object {
+                "color": "#FBCC5C",
+              },
             ]
           }
         >
           
-          10.00
+          10.000
         </Text>
       </View>
       <View

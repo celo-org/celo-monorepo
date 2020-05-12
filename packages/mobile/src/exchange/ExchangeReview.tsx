@@ -5,7 +5,7 @@ import { fontStyles } from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
-import { WithTranslation } from 'react-i18next'
+import { Trans, WithTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { NavigationInjectedProps } from 'react-navigation'
@@ -13,19 +13,19 @@ import { connect } from 'react-redux'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
+import CurrencyDisplay, { FormatType } from 'src/components/CurrencyDisplay'
 import FeeIcon from 'src/components/FeeIcon'
+import LineItemRow from 'src/components/LineItemRow'
+import TotalLineItem from 'src/components/TotalLineItem'
 import { exchangeTokens, fetchExchangeRate, fetchTobinTax } from 'src/exchange/actions'
 import { ExchangeRatePair } from 'src/exchange/reducer'
-import { CURRENCY_ENUM } from 'src/geth/consts'
+import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { exchangeHeader } from 'src/navigator/Headers'
-import { navigate } from 'src/navigator/NavigationService'
-import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
 import { isAppConnected } from 'src/redux/selectors'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { getRateForMakerToken, getTakerAmount } from 'src/utils/currencyExchange'
-import { getMoneyDisplayValue } from 'src/utils/formatting'
 
 interface StateProps {
   exchangeRatePair: ExchangeRatePair | null
@@ -68,9 +68,9 @@ const mapStateToProps = (state: RootState): StateProps => ({
 
 export class ExchangeReview extends React.Component<Props, State> {
   static navigationOptions = ({ navigation }: NavigationInjectedProps<NavProps>) => {
-    const { makerToken, makerTokenBalance } = navigation.getParam('exchangeInput')
+    const { makerToken } = navigation.getParam('exchangeInput')
     return {
-      ...exchangeHeader(makerToken, makerTokenBalance),
+      ...exchangeHeader(makerToken),
     }
   }
 
@@ -89,7 +89,6 @@ export class ExchangeReview extends React.Component<Props, State> {
       makerToken,
       makerAmount,
     })
-    navigate(Screens.ExchangeHomeScreen)
   }
 
   getExchangePropertiesFromNavProps() {
@@ -160,6 +159,36 @@ export class ExchangeReview extends React.Component<Props, State> {
     )
     const dollarAmount = this.getInputAmountInToken(CURRENCY_ENUM.DOLLAR)
 
+    const exchangeAmount = {
+      value: this.state.inputAmount,
+      currencyCode: CURRENCIES[this.state.inputToken].code,
+    }
+    const exchangeRateAmount = {
+      value: exchangeRate,
+      currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
+    }
+    const subtotalAmount = {
+      value: dollarAmount,
+      currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
+    }
+    const exchangeFeeAmount = {
+      value: tobinTax,
+      currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
+    }
+    const securityFeeAmount = {
+      value: fee,
+      currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
+    }
+    const totalAmount = {
+      value: dollarAmount.plus(tobinTax).plus(fee),
+      currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
+    }
+
+    const goldAmount = {
+      value: this.getInputAmountInToken(CURRENCY_ENUM.GOLD),
+      currencyCode: CURRENCIES[CURRENCY_ENUM.GOLD].code,
+    }
+
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.paddedContainer}>
@@ -169,49 +198,32 @@ export class ExchangeReview extends React.Component<Props, State> {
               <View style={styles.amountRow}>
                 <Text style={styles.exchangeBodyText}>
                   {t('exchangeAmount', {
-                    tokenName: t(`global:${this.state.inputTokenDisplayName}`),
+                    tokenName: this.state.inputTokenDisplayName,
                   })}
                 </Text>
-                <Text style={styles.currencyAmountText}>
-                  {getMoneyDisplayValue(this.state.inputAmount, this.state.inputToken, true)}
-                </Text>
+                <CurrencyDisplay style={styles.currencyAmountText} amount={exchangeAmount} />
               </View>
               <HorizontalLine />
-              <View style={styles.subtotalRowContainer}>
-                <Text style={styles.exchangeBodyText}>
-                  {t('subtotalAmount', {
-                    rate: getMoneyDisplayValue(exchangeRate, CURRENCY_ENUM.DOLLAR, true),
-                  })}
-                </Text>
-                <Text style={styles.exchangeBodyText}>
-                  {getMoneyDisplayValue(dollarAmount, CURRENCY_ENUM.DOLLAR, true)}
-                </Text>
-              </View>
-              <View style={styles.feeRowContainer}>
-                <View style={styles.feeTextWithIconContainer}>
-                  <Text style={styles.exchangeBodyText}>{t('exchangeFee')}</Text>
-                  <FeeIcon tintColor={colors.lightGray} isExchange={true} />
-                </View>
-                <Text style={styles.exchangeBodyText}>{getMoneyDisplayValue(tobinTax)}</Text>
-              </View>
-              <View style={styles.feeRowContainer}>
-                <View style={styles.feeTextWithIconContainer}>
-                  <Text style={styles.exchangeBodyText}>{t('securityFee')}</Text>
-                  <FeeIcon tintColor={colors.lightGray} />
-                </View>
-                <Text style={styles.exchangeBodyText}>{getMoneyDisplayValue(fee)}</Text>
-              </View>
+              <LineItemRow
+                title={
+                  <Trans i18nKey="subtotalAmount" ns={Namespaces.exchangeFlow9}>
+                    Subtotal @ <CurrencyDisplay amount={exchangeRateAmount} />
+                  </Trans>
+                }
+                amount={<CurrencyDisplay amount={subtotalAmount} />}
+              />
+              <LineItemRow
+                title={t('exchangeFee')}
+                titleIcon={<FeeIcon />}
+                amount={<CurrencyDisplay amount={exchangeFeeAmount} formatType={FormatType.Fee} />}
+              />
+              <LineItemRow
+                title={t('securityFee')}
+                titleIcon={<FeeIcon isExchange={true} />}
+                amount={<CurrencyDisplay amount={securityFeeAmount} formatType={FormatType.Fee} />}
+              />
               <HorizontalLine />
-              <View style={styles.rowContainer}>
-                <Text style={fontStyles.bodyBold}>{t('sendFlow7:total')}</Text>
-                <Text style={fontStyles.bodyBold}>
-                  {getMoneyDisplayValue(
-                    dollarAmount.plus(tobinTax).plus(fee),
-                    CURRENCY_ENUM.DOLLAR,
-                    true
-                  )}
-                </Text>
-              </View>
+              <TotalLineItem amount={totalAmount} />
             </View>
           </ScrollView>
         </View>
@@ -219,16 +231,18 @@ export class ExchangeReview extends React.Component<Props, State> {
         <View style={componentStyles.bottomContainer}>
           <Button
             onPress={this.onPressConfirm}
-            text={t('buyOrSellGoldAmount', {
-              buyOrSell: this.state.makerToken === CURRENCY_ENUM.DOLLAR ? t('buy') : t('sell'),
-              total: getMoneyDisplayValue(
-                this.getInputAmountInToken(CURRENCY_ENUM.GOLD),
-                CURRENCY_ENUM.GOLD,
-                false,
-                3
-              ),
-              gold: t(`global:gold`),
-            })}
+            text={
+              <Trans
+                i18nKey={
+                  this.state.makerToken === CURRENCY_ENUM.DOLLAR
+                    ? 'buyGoldAmount'
+                    : 'sellGoldAmount'
+                }
+                ns={Namespaces.exchangeFlow9}
+              >
+                Buy or sell <CurrencyDisplay amount={goldAmount} /> Gold
+              </Trans>
+            }
             standard={false}
             disabled={!appConnected || exchangeRate.isZero()}
             type={BtnTypes.PRIMARY}
@@ -250,25 +264,15 @@ const styles = StyleSheet.create({
   flexStart: {
     justifyContent: 'flex-start',
   },
-  headerTextContainer: { flex: 1, alignSelf: 'center', alignItems: 'center' },
-  exchangeBodyText: { ...fontStyles.body, fontSize: 15 },
-  currencyAmountText: { ...fontStyles.body, fontSize: 24, lineHeight: 39, color: colors.celoGreen },
-  feeTextWithIconContainer: { flexDirection: 'row', alignItems: 'center' },
-  rowContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 20,
+  exchangeBodyText: {
+    ...fontStyles.body,
+    fontSize: 15,
   },
-  subtotalRowContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginVertical: 5,
-    marginTop: 20,
-  },
-  feeRowContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginVertical: 5,
+  currencyAmountText: {
+    ...fontStyles.body,
+    fontSize: 24,
+    lineHeight: 39,
+    color: colors.celoGreen,
   },
   amountRow: {
     flexDirection: 'row',

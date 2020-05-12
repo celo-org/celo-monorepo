@@ -55,6 +55,7 @@ export default class KeyboardSpacer extends React.Component<Props> {
 
   _listeners: EmitterSubscription[] = []
   _viewRef = React.createRef<View>()
+  _currentMeasureToken: object | null = null
 
   state = {
     keyboardSpace: 0,
@@ -96,7 +97,16 @@ export default class KeyboardSpacer extends React.Component<Props> {
       return
     }
 
+    // Create a new token to cancel the async measureInWindow
+    // This is needed as both keyboardWillShow and keyboardWillHide are triggered sequentially
+    // when toggling the keyboard visibility on iOS (command + K on simulator)
+    const measureToken = (this._currentMeasureToken = {})
+
     this._viewRef.current.measureInWindow((x, y, width, height) => {
+      if (this._currentMeasureToken !== measureToken) {
+        // Skip action as token is different (i.e. cancelled)
+        return
+      }
       let animationConfig = defaultAnimation
       if (event.duration) {
         animationConfig = LayoutAnimation.create(
@@ -117,6 +127,9 @@ export default class KeyboardSpacer extends React.Component<Props> {
   }
 
   resetKeyboardSpace = (event: KeyboardEvent) => {
+    // This cancels measureInWindow
+    this._currentMeasureToken = null
+
     let animationConfig = defaultAnimation
     if (event && event.duration) {
       animationConfig = LayoutAnimation.create(

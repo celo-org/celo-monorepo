@@ -25,7 +25,7 @@ up being nicer when doing promise/async based programming.
 
 \+ **new TransactionResult**(`pe`: PromiEvent‹any›): *[TransactionResult](_utils_tx_result_.transactionresult.md)*
 
-*Defined in [contractkit/src/utils/tx-result.ts:24](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/tx-result.ts#L24)*
+*Defined in [contractkit/src/utils/tx-result.ts:23](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/tx-result.ts#L23)*
 
 **Parameters:**
 
@@ -41,7 +41,7 @@ Name | Type |
 
 ▸ **getHash**(): *Promise‹string›*
 
-*Defined in [contractkit/src/utils/tx-result.ts:48](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/tx-result.ts#L48)*
+*Defined in [contractkit/src/utils/tx-result.ts:47](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/tx-result.ts#L47)*
 
 Get (& wait for) transaction hash
 
@@ -53,7 +53,7 @@ ___
 
 ▸ **waitReceipt**(): *Promise‹TransactionReceipt›*
 
-*Defined in [contractkit/src/utils/tx-result.ts:60](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/tx-result.ts#L60)*
+*Defined in [contractkit/src/utils/tx-result.ts:59](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/tx-result.ts#L59)*
 
 Get (& wait for) transaction receipt
 

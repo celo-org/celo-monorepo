@@ -13,14 +13,14 @@ const GRAPHQL_PATH: string = '/'
 const PORT: number = Number(process.env.PORT) || 8080
 const INTERFACE: string = process.env.INTERFACE || '0.0.0.0'
 
-const app: any = express()
+const app = express()
 
-app.get('/robots.txt', (req: express.Request, res: express.Response) => {
+app.get('/robots.txt', (_req, res) => {
   res.type('text/plain')
   res.send('User-agent: *\nDisallow: /')
 })
 
-app.head('/', (req: express.Request, res: express.Response) => {
+app.head('/', (_req, res) => {
   // Preventing HEAD requests made by some browsers causing alerts
   // https://github.com/celo-org/celo-monorepo/issues/2189
   res.end()

@@ -1,6 +1,6 @@
 import { ContractKit, newKit } from '@celo/contractkit'
 import { FindOptions, Sequelize } from 'sequelize'
-import { Block } from 'web3/eth/types'
+import { Block } from 'web3-eth'
 import { fetchEnv } from './env'
 import { rootLogger } from './logger'
 import Attestation, { AttestationModel, AttestationStatic } from './models/attestation'
@@ -32,7 +32,7 @@ export async function initializeKit() {
           // To catch the case in which syncing has happened in the past,
           // has stopped, and hasn't started again, check for an old timestamp
           // on the latest block
-          const ageOfBlock = Date.now() / 1000 - latestBlock.timestamp
+          const ageOfBlock = Date.now() / 1000 - Number(latestBlock.timestamp)
           if (ageOfBlock > 120) {
             throw new Error(
               `Latest block is ${ageOfBlock} seconds old, and syncing is not currently in progress`
@@ -63,13 +63,13 @@ export async function getAttestationTable() {
 }
 
 export async function existingAttestationRequestRecord(
-  phoneNumber: string,
+  identifier: string,
   account: string,
   issuer: string,
   options: FindOptions = {}
 ): Promise<AttestationModel | null> {
   return (await getAttestationTable()).findOne({
-    where: { phoneNumber, account, issuer },
+    where: { identifier, account, issuer },
     ...options,
   })
 }

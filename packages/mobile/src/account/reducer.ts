@@ -3,7 +3,6 @@ import { Actions, ActionTypes } from 'src/account/actions'
 import { PaymentRequest } from 'src/account/types'
 import { DEV_SETTINGS_ACTIVE_INITIALLY } from 'src/config'
 import { getRehydratePayload, REHYDRATE, RehydrateAction } from 'src/redux/persist-helper'
-import { RootState } from 'src/redux/reducers'
 import { getRemoteTime } from 'src/utils/time'
 
 export interface State {
@@ -26,6 +25,7 @@ export interface State {
   dismissedInviteFriends: boolean
   dismissedGetVerified: boolean
   promptFornoIfNeeded: boolean
+  acceptedTerms: boolean
 }
 
 export enum PincodeType {
@@ -62,6 +62,7 @@ export const initialState = {
   dismissedInviteFriends: false,
   dismissedGetVerified: false,
   promptFornoIfNeeded: false,
+  acceptedTerms: false,
 }
 
 export const reducer = (
@@ -185,15 +186,10 @@ export const reducer = (
         ...state,
         promptFornoIfNeeded: action.promptIfNeeded,
       }
+    case Actions.ACCEPT_TERMS: {
+      return { ...state, acceptedTerms: true }
+    }
     default:
       return state
   }
 }
-
-export const devModeSelector = (state: RootState) => state.account.devModeActive
-export const nameSelector = (state: RootState) => state.account.name
-export const e164NumberSelector = (state: RootState) => state.account.e164PhoneNumber
-export const defaultCountryCodeSelector = (state: RootState) => state.account.defaultCountryCode
-export const userContactDetailsSelector = (state: RootState) => state.account.contactDetails
-export const pincodeTypeSelector = (state: RootState) => state.account.pincodeType
-export const promptFornoIfNeededSelector = (state: RootState) => state.account.promptFornoIfNeeded

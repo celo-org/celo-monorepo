@@ -1,6 +1,6 @@
 {
   "name": "@celo/utils",
-  "version": "0.1.8-dev",
+  "version": "0.1.15-dev",
   "description": "Celo common utils",
   "author": "Celo",
   "license": "Apache-2.0",
@@ -14,24 +14,28 @@
     "test:verbose": "jest --verbose",
     "lint": "tslint -c tslint.json --project ."
   },
-  "files": ["lib/**/*"],
+  "files": [
+    "lib/**/*"
+  ],
   "dependencies": {
     "@umpirsky/country-list": "git://github.com/umpirsky/country-list#05fda51",
-    "bignumber.js": "^7.2.0",
-    "bls12377js": "https://github.com/celo-org/bls12377js#ea09eba5c54fe63617af494a0c198fcc47582e0c",
+    "bigi": "^1.1.0",
+    "bignumber.js": "^9.0.0",
+    "bls12377js": "https://github.com/celo-org/bls12377js#cb38a4cfb643c778619d79b20ca3e5283a2122a6",
     "bn.js": "4.11.8",
+    "buffer-reverse": "^1.0.1",
     "country-data": "^0.0.31",
     "crypto-js": "^3.1.9-1",
     "elliptic": "^6.4.1",
     "ethereumjs-util": "^5.2.0",
     "futoin-hkdf": "^1.0.3",
     "google-libphonenumber": "^3.2.4",
+    "keccak256": "^1.0.0",
     "lodash": "^4.17.14",
     "numeral": "^2.0.6",
-    "web3-utils": "1.0.0-beta.37",
-    "keccak256": "^1.0.0",
-    "buffer-reverse": "^1.0.1",
-    "bigi": "^1.1.0"
+    "web3-utils": "1.2.4",
+    "bip32": "2.0.5",
+    "bip39": "3.0.2"
   },
   "devDependencies": {
     "@celo/typescript": "0.0.1",
@@ -41,7 +45,7 @@
     "@types/google-libphonenumber": "^7.4.17",
     "@types/lodash": "^4.14.136",
     "@types/node": "^10.12.18",
-    "@types/web3": "^1.0.18"
+    "@types/randombytes": "^2.0.0"
   },
   "resolutions": {
     "elliptic/bn.js": "4.11.8",

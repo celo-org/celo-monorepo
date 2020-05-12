@@ -7,13 +7,15 @@
   "license": "Apache-2.0",
   "private": true,
   "dependencies": {
-    "@celo/contractkit": "0.2.9",
-    "@celo/utils": "0.1.8-dev",
-    "express": "4.16.4",
+    "@celo/contractkit": "0.3.6",
+    "@celo/utils": "0.1.15-dev",
+    "express": "^4.17.1",
     "prom-client": "11.2.0"
   },
   "devDependencies": {
-    "@types/express": "4.17.0"
+    "@types/express": "^4.17.6",
+    "web3-core": "1.2.4",
+    "web3-eth": "1.2.4"
   },
   "scripts": {
     "dev": "ts-node src/index.ts",

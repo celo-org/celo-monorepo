@@ -1,0 +1,238 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Contact renders correctly 1`] = `
+<SafeAreaView
+  style={
+    Object {
+      "backgroundColor": "#FFFFFF",
+      "flex": 1,
+    }
+  }
+>
+  <RCTScrollView
+    contentContainerStyle={
+      Object {
+        "borderColor": "#EEEEEE",
+        "borderTopWidth": 1,
+        "flexGrow": 1,
+        "padding": 20,
+      }
+    }
+  >
+    <View>
+      <Text
+        style={
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Hind-SemiBold",
+            "fontSize": 16,
+            "lineHeight": 24,
+          }
+        }
+      >
+        global:message
+      </Text>
+      <View
+        style={
+          Array [
+            Object {
+              "alignItems": "center",
+              "flex": 1,
+              "flexDirection": "row",
+              "justifyContent": "center",
+            },
+            Object {
+              "alignItems": "flex-start",
+              "borderColor": "#D1D5D8",
+              "borderRadius": 3,
+              "borderWidth": 1,
+              "color": "#D1D5D8",
+              "height": 80,
+              "marginBottom": 6,
+              "marginTop": 10,
+              "maxHeight": 150,
+            },
+          ]
+        }
+      >
+        <TextInput
+          allowFontScaling={true}
+          multiline={true}
+          numberOfLines={10}
+          onBlur={[Function]}
+          onChangeText={[Function]}
+          onFocus={[Function]}
+          placeholder="tellUsMore"
+          placeholderTextColor="#D1D5D8"
+          rejectResponderTermination={true}
+          style={
+            Object {
+              "backgroundColor": "#FFFFFF",
+              "borderColor": "#D1D5D8",
+              "borderRadius": 3,
+              "flex": 1,
+              "fontFamily": "Hind-Regular",
+              "padding": 8,
+              "textAlignVertical": "top",
+            }
+          }
+          testID="MessageEntry"
+          underlineColorAndroid="transparent"
+          value=""
+        />
+      </View>
+      <View
+        style={
+          Object {
+            "flex": 1,
+          }
+        }
+      >
+        <View
+          style={
+            Object {
+              "alignItems": "center",
+              "flexDirection": "row",
+              "flexShrink": 0,
+              "height": 40,
+              "marginBottom": 20,
+              "marginTop": 5,
+            }
+          }
+        >
+          <AndroidSwitch
+            accessibilityRole="switch"
+            enabled={true}
+            on={true}
+            onChange={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              Object {
+                "marginBottom": 3,
+                "marginRight": 10,
+              }
+            }
+            testID="SwitchLogs"
+            thumbTintColor="#FFFFFF"
+            trackColorForFalse="#D1D5D8"
+            trackColorForTrue="#42D689"
+            trackTintColor="#42D689"
+          />
+          <Text
+            style={
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Hind-Regular",
+                "fontSize": 16,
+                "lineHeight": 24,
+              }
+            }
+          >
+            attachLogs
+          </Text>
+        </View>
+      </View>
+      <View>
+        <Text
+          style={
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-Regular",
+              "fontSize": 16,
+              "lineHeight": 24,
+            }
+          }
+        >
+          supportLegalCheckbox
+        </Text>
+      </View>
+    </View>
+  </RCTScrollView>
+  <View
+    style={
+      Array [
+        Object {
+          "alignItems": "center",
+          "borderRadius": 3,
+          "flexDirection": "row",
+        },
+        null,
+        null,
+        undefined,
+        Object {
+          "backgroundColor": "#A3EBC6",
+        },
+      ]
+    }
+  >
+    <View
+      accessible={true}
+      focusable={false}
+      nativeBackgroundAndroid={
+        Object {
+          "attribute": "selectableItemBackground",
+          "type": "ThemeAttrAndroid",
+        }
+      }
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        Array [
+          Object {
+            "alignItems": "center",
+            "flex": 1,
+            "justifyContent": "center",
+          },
+          Object {
+            "backgroundColor": "#A3EBC6",
+          },
+          Object {
+            "height": 50,
+          },
+          Object {
+            "borderWidth": 0,
+          },
+        ]
+      }
+      testID="SubmitContactForm"
+    >
+      <View
+        style={
+          Object {
+            "alignItems": "center",
+            "flex": 1,
+            "flexDirection": "row",
+            "justifyContent": "space-between",
+          }
+        }
+      >
+        <Text
+          style={
+            Array [
+              Object {
+                "fontFamily": "Hind-SemiBold",
+                "fontSize": 16,
+              },
+              Object {
+                "color": "#FFFFFF",
+              },
+              Object {
+                "paddingLeft": 5,
+                "paddingRight": 5,
+              },
+            ]
+          }
+        >
+          global:submit
+        </Text>
+      </View>
+    </View>
+  </View>
+</SafeAreaView>
+`;

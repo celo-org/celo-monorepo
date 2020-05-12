@@ -21,11 +21,11 @@
 
 • **call**: *function*
 
-*Defined in [contractkit/src/utils/rpc-caller.ts:64](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/rpc-caller.ts#L64)*
+*Defined in [contractkit/src/utils/rpc-caller.ts:65](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/rpc-caller.ts#L65)*
 
 #### Type declaration:
 
-▸ (`method`: string, `params`: any[]): *Promise‹JsonRPCResponse›*
+▸ (`method`: string, `params`: any[]): *Promise‹JsonRpcResponse›*
 
 **Parameters:**
 
@@ -40,15 +40,15 @@ ___
 
 • **send**: *function*
 
-*Defined in [contractkit/src/utils/rpc-caller.ts:65](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/rpc-caller.ts#L65)*
+*Defined in [contractkit/src/utils/rpc-caller.ts:66](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/rpc-caller.ts#L66)*
 
 #### Type declaration:
 
-▸ (`payload`: JsonRPCRequest, `callback`: Callback‹JsonRPCResponse›): *void*
+▸ (`payload`: JsonRpcPayload, `callback`: Callback‹JsonRpcResponse›): *void*
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
-`payload` | JsonRPCRequest |
-`callback` | Callback‹JsonRPCResponse› |
+`payload` | JsonRpcPayload |
+`callback` | Callback‹JsonRpcResponse› |

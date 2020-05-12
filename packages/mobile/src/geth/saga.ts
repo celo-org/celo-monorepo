@@ -2,7 +2,8 @@ import { NativeEventEmitter, NativeModules } from 'react-native'
 import { eventChannel } from 'redux-saga'
 import { call, cancel, cancelled, delay, fork, put, race, select, take } from 'redux-saga/effects'
 import { setPromptForno } from 'src/account/actions'
-import { promptFornoIfNeededSelector } from 'src/account/reducer'
+import { promptFornoIfNeededSelector } from 'src/account/selectors'
+import { waitForRehydrate } from 'src/app/saga'
 import { Actions, setGethConnected, setInitState } from 'src/geth/actions'
 import {
   FailedToFetchGenesisBlockError,
@@ -15,6 +16,7 @@ import { navigate, navigateToError } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { deleteChainDataAndRestartApp } from 'src/utils/AppRestart'
 import Logger from 'src/utils/Logger'
+import { setContractKitReady } from 'src/web3/actions'
 import { fornoSelector } from 'src/web3/selectors'
 
 const gethEmitter = new NativeEventEmitter(NativeModules.RNGeth)
@@ -36,7 +38,6 @@ export function* waitForGethConnectivity() {
   if (connected) {
     return
   }
-
   while (true) {
     const action = yield take(Actions.SET_GETH_CONNECTED)
     if (action.connected) {
@@ -184,7 +185,10 @@ export function* gethSaga() {
 }
 
 export function* gethSagaIfNecessary() {
+  yield call(waitForRehydrate) // Wait for rehydrate to know if geth or forno mode
+  yield put(setContractKitReady(true)) // ContractKit is blocked (not ready) before rehydrate
   if (!(yield select(fornoSelector))) {
+    Logger.debug(`${TAG}@gethSagaIfNecessary`, `Starting geth saga...`)
     yield call(gethSaga)
   }
 }

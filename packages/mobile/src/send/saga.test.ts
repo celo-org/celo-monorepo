@@ -3,6 +3,8 @@ import { select } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { addressToE164NumberSelector } from 'src/identity/reducer'
+import { inviteesSelector } from 'src/invite/reducer'
+import { replace } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { BarcodeTypes } from 'src/qrcode/utils'
 import { RecipientKind } from 'src/recipients/recipient'
@@ -15,17 +17,10 @@ jest.mock('src/utils/time', () => ({
   clockInSync: () => true,
 }))
 
-jest.mock('src/identity/reducer', () => ({
-  ...jest.requireActual('src/identity/reducer'),
-  addressToE164NumberSelector: (state: any) => ({}),
+jest.mock('src/invite/reducer', () => ({
+  ...jest.requireActual('src/invite/reducer'),
+  inviteesSelector: () => ({}),
 }))
-
-jest.mock('src/navigator/NavigationService', () => ({
-  ...jest.requireActual('src/navigator/NavigationService'),
-  navigate: jest.fn(),
-}))
-
-const { navigate } = require('src/navigator/NavigationService')
 
 describe(watchQrCodeDetections, () => {
   beforeAll(() => {
@@ -41,12 +36,13 @@ describe(watchQrCodeDetections, () => {
 
     await expectSaga(watchQrCodeDetections)
       .provide([
+        [select(inviteesSelector), {}],
         [select(addressToE164NumberSelector), {}],
         [select(recipientCacheSelector), {}],
       ])
       .dispatch({ type: Actions.BARCODE_DETECTED, data })
       .silentRun()
-    expect(navigate).toHaveBeenCalledWith(Screens.SendAmount, {
+    expect(replace).toHaveBeenCalledWith(Screens.SendAmount, {
       recipient: {
         address: mockAccount,
         displayName: mockName,
@@ -62,12 +58,13 @@ describe(watchQrCodeDetections, () => {
 
     await expectSaga(watchQrCodeDetections)
       .provide([
+        [select(inviteesSelector), {}],
         [select(addressToE164NumberSelector), {}],
         [select(recipientCacheSelector), {}],
       ])
       .dispatch({ type: Actions.BARCODE_DETECTED, data })
       .silentRun()
-    expect(navigate).toHaveBeenCalledWith(Screens.SendAmount, {
+    expect(replace).toHaveBeenCalledWith(Screens.SendAmount, {
       recipient: {
         address: mockAccount,
         displayName: '',
@@ -86,12 +83,13 @@ describe(watchQrCodeDetections, () => {
 
     await expectSaga(watchQrCodeDetections)
       .provide([
+        [select(inviteesSelector), {}],
         [select(addressToE164NumberSelector), {}],
         [select(recipientCacheSelector), {}],
       ])
       .dispatch({ type: Actions.BARCODE_DETECTED, data })
       .silentRun()
-    expect(navigate).toHaveBeenCalledWith(Screens.SendAmount, {
+    expect(replace).toHaveBeenCalledWith(Screens.SendAmount, {
       recipient: {
         address: mockAccount,
         displayName: mockName,
@@ -108,13 +106,14 @@ describe(watchQrCodeDetections, () => {
 
     await expectSaga(watchQrCodeDetections)
       .provide([
+        [select(inviteesSelector), {}],
         [select(addressToE164NumberSelector), {}],
         [select(recipientCacheSelector), {}],
       ])
       .dispatch({ type: Actions.BARCODE_DETECTED, data })
       .put(showError(ErrorMessages.QR_FAILED_NO_ADDRESS))
       .silentRun()
-    expect(navigate).not.toHaveBeenCalled()
+    expect(replace).not.toHaveBeenCalled()
   })
 
   it('displays an error when scanning a qr code with no address', async () => {
@@ -123,13 +122,14 @@ describe(watchQrCodeDetections, () => {
 
     await expectSaga(watchQrCodeDetections)
       .provide([
+        [select(inviteesSelector), {}],
         [select(addressToE164NumberSelector), {}],
         [select(recipientCacheSelector), {}],
       ])
       .dispatch({ type: Actions.BARCODE_DETECTED, data })
       .put(showError(ErrorMessages.QR_FAILED_NO_ADDRESS))
       .silentRun()
-    expect(navigate).not.toHaveBeenCalled()
+    expect(replace).not.toHaveBeenCalled()
   })
 
   it('displays an error when scanning a qr code with an invalid address', async () => {
@@ -139,12 +139,13 @@ describe(watchQrCodeDetections, () => {
 
     await expectSaga(watchQrCodeDetections)
       .provide([
+        [select(inviteesSelector), {}],
         [select(addressToE164NumberSelector), {}],
         [select(recipientCacheSelector), {}],
       ])
       .dispatch({ type: Actions.BARCODE_DETECTED, data })
       .put(showError(ErrorMessages.QR_FAILED_INVALID_ADDRESS))
       .silentRun()
-    expect(navigate).not.toHaveBeenCalled()
+    expect(replace).not.toHaveBeenCalled()
   })
 })

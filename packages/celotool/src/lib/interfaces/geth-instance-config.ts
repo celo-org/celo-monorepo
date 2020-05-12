@@ -1,3 +1,5 @@
+import BigNumber from 'bignumber.js'
+
 export interface GethInstanceConfig {
   name: string
   validating?: boolean
@@ -21,4 +23,5 @@ export interface GethInstanceConfig {
   ethstats?: string
   maxPeers?: number
   setNodeKey?: boolean
+  gatewayFee?: BigNumber
 }

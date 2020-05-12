@@ -1,15 +1,9 @@
 import BigNumber from 'bignumber.js'
 import gql from 'graphql-tag'
 import * as React from 'react'
-import { Query } from 'react-apollo'
+import { Query, QueryResult } from 'react-apollo'
 import { connect } from 'react-redux'
-import {
-  MoneyAmount,
-  Token,
-  TokenTransactionType,
-  UserTransactionsQuery,
-  UserTransactionsQueryVariables,
-} from 'src/apollo/types'
+import { MoneyAmount, Token, TokenTransactionType, UserTransactionsQuery } from 'src/apollo/types'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { refreshAllBalances } from 'src/home/actions'
 import { SENTINEL_INVITE_COMMENT } from 'src/invite/actions'
@@ -37,7 +31,7 @@ interface OwnProps {
 interface StateProps {
   address?: string | null
   standbyTransactions: StandbyTransaction[]
-  localCurrencyCode: LocalCurrencyCode | null
+  localCurrencyCode: LocalCurrencyCode
   localCurrencyExchangeRate: string | null | undefined
 }
 
@@ -62,11 +56,6 @@ export const TRANSACTIONS_QUERY = gql`
   ${TransactionFeed.fragments.transaction}
 `
 
-class UserTransactionsComponent extends Query<
-  UserTransactionsQuery,
-  UserTransactionsQueryVariables
-> {}
-
 const mapStateToProps = (state: RootState): StateProps => ({
   address: currentAccountSelector(state),
   standbyTransactions: state.transactions.standbyTransactions,
@@ -76,7 +65,7 @@ const mapStateToProps = (state: RootState): StateProps => ({
 
 function resolveAmount(
   moneyAmount: Pick<MoneyAmount, 'value' | 'currencyCode'>,
-  localCurrencyCode: LocalCurrencyCode | null,
+  localCurrencyCode: LocalCurrencyCode,
   exchangeRate: string | null | undefined
 ) {
   if (!localCurrencyCode || !exchangeRate) {
@@ -86,7 +75,7 @@ function resolveAmount(
   return {
     ...moneyAmount,
     localAmount: {
-      value: new BigNumber(moneyAmount.value).multipliedBy(exchangeRate).toString(),
+      value: new BigNumber(moneyAmount.value).multipliedBy(exchangeRate),
       currencyCode: localCurrencyCode as string,
       exchangeRate,
     },
@@ -96,28 +85,28 @@ function resolveAmount(
 function mapExchangeStandbyToFeedItem(
   standbyTx: ExchangeStandby,
   currency: CURRENCY_ENUM,
-  localCurrencyCode: LocalCurrencyCode | null,
+  localCurrencyCode: LocalCurrencyCode,
   localCurrencyExchangeRate: string | null | undefined
 ): FeedItem {
   const { type, hash, status, timestamp, inValue, inSymbol, outValue, outSymbol } = standbyTx
 
   const inAmount = {
-    value: inValue,
+    value: new BigNumber(inValue),
     currencyCode: CURRENCIES[inSymbol].code,
   }
   const outAmount = {
-    value: outValue,
+    value: new BigNumber(outValue),
     currencyCode: CURRENCIES[outSymbol].code,
   }
 
   const exchangeRate = new BigNumber(outAmount.value).dividedBy(inAmount.value)
   const localExchangeRate = new BigNumber(localCurrencyExchangeRate ?? 0)
   const makerLocalExchangeRate =
-    inAmount.currencyCode === localCurrencyCode
+    inAmount.currencyCode === CURRENCIES[CURRENCY_ENUM.DOLLAR].code
       ? localExchangeRate
       : exchangeRate.multipliedBy(localExchangeRate)
   const takerLocalExchangeRate =
-    outAmount.currencyCode === localCurrencyCode
+    outAmount.currencyCode === CURRENCIES[CURRENCY_ENUM.DOLLAR].code
       ? localExchangeRate
       : exchangeRate.pow(-1).multipliedBy(localExchangeRate)
 
@@ -144,9 +133,9 @@ function mapExchangeStandbyToFeedItem(
       {
         ...accountAmount,
         // Signed amount relative to the queried account currency
-        value: new BigNumber(accountAmount.value)
-          .multipliedBy(accountAmount === makerAmount ? -1 : 1)
-          .toString(),
+        value: new BigNumber(accountAmount.value).multipliedBy(
+          accountAmount === makerAmount ? -1 : 1
+        ),
       },
       localCurrencyCode,
       accountAmount.localAmount?.exchangeRate
@@ -158,7 +147,7 @@ function mapExchangeStandbyToFeedItem(
 
 function mapTransferStandbyToFeedItem(
   standbyTx: TransferStandby,
-  localCurrencyCode: LocalCurrencyCode | null,
+  localCurrencyCode: LocalCurrencyCode,
   localCurrencyExchangeRate: string | null | undefined
 ): FeedItem {
   const { type, hash, status, timestamp, value, symbol, address, comment } = standbyTx
@@ -173,7 +162,7 @@ function mapTransferStandbyToFeedItem(
       {
         // Signed amount relative to the queried account currency
         // Standby transfers are always outgoing
-        value: new BigNumber(value).multipliedBy(-1).toString(),
+        value: new BigNumber(value).multipliedBy(-1),
         currencyCode: CURRENCIES[symbol].code,
       },
       localCurrencyCode,
@@ -186,7 +175,7 @@ function mapTransferStandbyToFeedItem(
 
 function mapStandbyTransactionToFeedItem(
   currency: CURRENCY_ENUM,
-  localCurrencyCode: LocalCurrencyCode | null,
+  localCurrencyCode: LocalCurrencyCode,
   localCurrencyExchangeRate: string | null | undefined
 ) {
   return (standbyTx: StandbyTransaction): FeedItem => {
@@ -255,45 +244,41 @@ export class TransactionsList extends React.PureComponent<Props> {
     const token = currency === CURRENCY_ENUM.GOLD ? Token.CGld : Token.CUsd
     const kind = currency === CURRENCY_ENUM.GOLD ? FeedType.EXCHANGE : FeedType.HOME
 
+    const UserTransactions = ({ loading, error, data }: QueryResult) => {
+      const transactions = getTransactions(data).map((transaction) => ({
+        ...transaction,
+        status: TransactionStatus.Complete,
+      }))
+
+      // Filter out standby transactions that aren't for the queried currency or are already in the received transactions
+      const queryDataTxHashes = new Set(transactions.map((tx) => tx.hash))
+      const standbyTxs = standbyTransactions
+        .filter((tx) => {
+          const isForQueriedCurrency =
+            (tx as TransferStandby).symbol === currency ||
+            (tx as ExchangeStandby).inSymbol === currency ||
+            (tx as ExchangeStandby).outSymbol === currency
+          const notInQueryTxs =
+            (!tx.hash || !queryDataTxHashes.has(tx.hash)) && tx.status !== TransactionStatus.Failed
+          return isForQueriedCurrency && notInQueryTxs
+        })
+        .map(
+          mapStandbyTransactionToFeedItem(currency, localCurrencyCode, localCurrencyExchangeRate)
+        )
+
+      const feedData = [...standbyTxs, ...transactions].map(mapInvite)
+
+      return <TransactionFeed kind={kind} loading={loading} error={error} data={feedData} />
+    }
+
     return (
-      <UserTransactionsComponent
+      <Query
         query={TRANSACTIONS_QUERY}
         pollInterval={POLL_INTERVAL}
         variables={{ address: queryAddress, token, localCurrencyCode }}
         onCompleted={this.txsFetched}
-      >
-        {({ loading, error, data }) => {
-          const transactions = getTransactions(data).map((transaction) => ({
-            ...transaction,
-            status: TransactionStatus.Complete,
-          }))
-
-          // Filter out standby transactions that aren't for the queried currency or are already in the received transactions
-          const queryDataTxHashes = new Set(transactions.map((tx) => tx.hash))
-          const standbyTxs = standbyTransactions
-            .filter((tx) => {
-              const isForQueriedCurrency =
-                (tx as TransferStandby).symbol === currency ||
-                (tx as ExchangeStandby).inSymbol === currency ||
-                (tx as ExchangeStandby).outSymbol === currency
-              const notInQueryTxs =
-                (!tx.hash || !queryDataTxHashes.has(tx.hash)) &&
-                tx.status !== TransactionStatus.Failed
-              return isForQueriedCurrency && notInQueryTxs
-            })
-            .map(
-              mapStandbyTransactionToFeedItem(
-                currency,
-                localCurrencyCode,
-                localCurrencyExchangeRate
-              )
-            )
-
-          const feedData = [...standbyTxs, ...transactions].map(mapInvite)
-
-          return <TransactionFeed kind={kind} loading={loading} error={error} data={feedData} />
-        }}
-      </UserTransactionsComponent>
+        children={UserTransactions}
+      />
     )
   }
 }

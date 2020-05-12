@@ -1,7 +1,6 @@
-import { hashOfClaim } from '@celo/contractkit/lib/identity/claims/claim'
+import { hashOfClaim, KeybaseClaim } from '@celo/contractkit/lib/identity/claims/claim'
 import {
   createKeybaseClaim,
-  KeybaseClaim,
   keybaseFilePathToProof,
   proofFileName,
   targetURL,
@@ -34,18 +33,18 @@ export default class ClaimKeybase extends ClaimCommand {
 
   async run() {
     const res = this.parse(ClaimKeybase)
-    const address = toChecksumAddress(res.flags.from)
     const username = res.flags.username
-    const metadata = this.readMetadata()
+    const metadata = await this.readMetadata()
+    const accountAddress = toChecksumAddress(metadata.data.meta.address)
     const claim = createKeybaseClaim(username)
     const signature = await this.signer.sign(hashOfClaim(claim))
     await this.addClaim(metadata, claim)
     this.writeMetadata(metadata)
 
     try {
-      await this.uploadProof(claim, signature, username, address)
+      await this.uploadProof(claim, signature, username, accountAddress)
     } catch (error) {
-      this.printManualInstruction(claim, signature, username, address)
+      this.printManualInstruction(claim, signature, username, accountAddress)
     }
   }
 
@@ -73,7 +72,7 @@ export default class ClaimKeybase extends ClaimCommand {
       cli.action.start(`Claim successfully copied to the keybase file system, verifying proof`)
       // Wait for changes to propagate
       await sleep(3000)
-      const verificationError = await verifyKeybaseClaim(claim, address)
+      const verificationError = await verifyKeybaseClaim(this.kit, claim, address)
       if (verificationError) {
         throw new Error(`Claim is not verifiable: ${verificationError}`)
       }

@@ -4,7 +4,6 @@
   "languageSettings": "Language Settings",
   "localCurrencySetting": "Currency",
   "licenses": "Licenses",
-  "sendIssueReport": "Send an Issue Report",
   "security": "Security",
   "requirePinOnAppOpen": "Require PIN on App Open",
   "analytics": "Analytics",
@@ -15,13 +14,8 @@
   "dataSaverDetail": "Data Saver mode allows you to communicate with the Celo Network through a trusted node. You can always change this mode in app settings.",
   "restartModalSwitchOff": {
     "header": "Restart To Switch Off Data Saver",
-    "body": "To switch Data Saver on and off repeatedly, you will need to restart the app.",
+    "body": "To switch Data Saver on and off repeatedly, you will need to restart the app and return to this screen.",
     "restart": "Restart to Switch"
-  },
-  "restartModalSwitchOn": {
-    "header": "Beware Of Restart",
-    "body": "In case of incorrect PIN, you will need to restart the app.",
-    "understand": "I understand"
   },
   "addFunds": "Add Funds",
   "promptFornoModal": {
@@ -40,5 +34,15 @@
   "continue": "Continue",
   "yourName": "Your Name",
   "version": "Version:",
-  "addressCopied": "Address copied to clipboard"
+  "addressCopied": "Address copied to clipboard",
+  "support": "Support",
+  "contact": "Contact",
+  "webFaq": "Web FAQ",
+  "forum": "Forum",
+  "contactText": "Can’t find what you’re looking for?",
+  "contactUs": "Contact Us",
+  "tellUsMore": "Tell us more",
+  "attachLogs": "Attach logs",
+  "supportLegalCheckbox": "By submitting, I agree to share the above information and any attached application log data with Celo Support.",
+  "contactSuccess": "Your issue has been successfully reported! Expect an email response soon!"
 }

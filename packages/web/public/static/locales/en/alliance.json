@@ -1,0 +1,70 @@
+{
+  "title": "Alliance for Prosperity",
+  "thematicStatement": "Money can be beautiful",
+  "mission": "Create a more prosperous world with mission-aligned organizations",
+  "filterLabel": "Refine By",
+  "mediumArticlesTitle": "Stories from the Alliance",
+  "form": {
+    "name": "Name",
+    "email": "Email",
+    "contribution": "How might you contribute to the Alliance?",
+    "subscribe": "Join the Celo Newsletter",
+    "btn": "Apply"
+  },
+  "affirmations": {
+    "smallTitle": "Take action to solve real-world problems",
+    "title":"What the Alliance stands for",
+    "laboratoriaBelief": "We believe we have a lot to learn from <0>one another.</0>",
+    "laboratoriaCopy": "Hosting a design-a-thon with young female coding students in Mexico exploring ideas for blockchain technology.",
+    "wfpBelief": "We believe in designing <0>with communities</0>, not for them.",
+    "wfpCopy": "Collaborating to bring financial tools to refugees.",
+    "wfpButton": "Tanzania Research Report",
+    "cLabsBelief": "We believe systems are complex and require <0>collaboration.</0>",
+    "cLabsCopy": "Exploring how to bring more Filipino merchants & consumers  into the formal economy.",
+    "cLabsButton": "Phillippines Pilot Report"
+  },
+  "members": {
+    "title": "Meet the Alliance",
+    "subtitle": "Member contributions, <0>in no particular order</0>",
+    "categoryTitle": {
+      "all": "Show All",
+      "acquire": "Acquire",
+      "accept": "Accept",
+      "send": "Send",
+      "lend": "Lend",
+      "earn": "Earn",
+      "save": "Save",
+      "give": "Give",
+      "educate": "Educate",
+      "grow": "Grow",
+      "secure": "Secure",
+      "build": "Build",
+      "preserve": "Preserve"
+    },
+    "categoryText": {
+      "preserve": "Preserve natural resources by supporting projects through Celo rewards",
+      "accept": "Enable your communities to easily pay for mobile top ups, utilities, and shopping online with cUSD",
+      "acquire": "Make it easy to acquire cUSD in digital wallets",
+      "send": "Send remittances almost anywhere, instantly for as little as $.01",
+      "lend": "Accelerate speed of delivery and reduce costs by lending cUSD",
+      "earn": "Allow communities to earn stable, digital assets for lending their talents for various tasks",
+      "save": "Help your communities overcome inflation and build for their future by saving in cUSD",
+      "give": "Increase transparency, reduce fraud, and increase mobility by giving cUSD",
+      "educate": "Incentivize communities to learn about Celo and actively engage with the Celo platform",
+      "grow": "Grow the Celo platform through the purchase of the native token, cGLD",
+      "secure": "Keep identity, assets, and the network secure",
+      "build": "Deliver innovative solutions for your customers by building on the Celo platform"
+    }
+  },
+  "benefits": {
+    "headline": "Benefits of collaborating on a mission-driven blockchain",
+    "title": "What the Alliance offers",
+    "offerings": [
+      "Connect with like-minded members",
+      "Build and shape improvements to the Celo platform",
+      "Attend special programs and events",
+      "Access to education and support",
+      "Expand your reach to help more communities"
+    ]
+  }
+}

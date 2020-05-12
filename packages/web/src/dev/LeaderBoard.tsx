@@ -122,7 +122,7 @@ class LeaderBoard extends React.PureComponent<BoardProps & I18nProps & ScreenPro
             })
             .map((leader, index) => ({ ...leader, color: getJersey(index) }))
             .map((leader, index) => (
-              <LazyLoad key={index} height={65}>
+              <LazyLoad key={leader.identity} height={65}>
                 <Fade delay={DELAY_MS + index * 10}>
                   <Racer
                     relativePoints={leader.relativePoints}

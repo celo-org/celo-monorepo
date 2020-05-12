@@ -55,15 +55,16 @@
   "refreshBalances": "Actualizar saldos",
   "escrowedPaymentReminder": "Reacuerda al receptor aceptar el pago",
   "escrowedPaymentReminderSms":
-    "¡Un recordatorio amistoso de que aún no ha canjeado sus dólares de celo!",
+    "¡Un recordatorio amistoso de que aún no has canjeado tus Celo dólares! Dirígite a {{link}} e ingresa tu código para comenzar: {{code}}",
+  "escrowedPaymentReminderSmsNoData":
+    "¡Un recordatorio amistoso de que aún no has canjeado tus Celo dólares! ¡Descarga la aplicación móvil para comenzar!",
   "testnetAlert": {
     "0": "{{testnet}}",
     "1":
       "Un recordatorio amistoso de que está utilizando la compilación de red {{testnet}} - los saldos aquí no son reales."
   },
   "dismiss": "Ocultar",
-  "localCurrencyEqual": "Igual a <2>{{localValue}} {{localCurrencyCode}}</2>",
-  "localCurrencyValue": "{{localValue}} {{localCurrencyCode}}",
+  "dollarBalance": "<0></0> $t(global:celoDollars)",
   "feedItemVerificationFeeTitle": "Celo",
   "feedItemVerificationFeeInfo": "$t(verificationFee)",
   "feedItemNetworkFeeTitle": "Celo",

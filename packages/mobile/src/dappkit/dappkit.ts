@@ -8,12 +8,12 @@ import {
   SignTxResponseSuccess,
 } from '@celo/utils/src/dappkit'
 import { call, select, takeLeading } from 'redux-saga/effects'
-import { e164NumberSelector } from 'src/account/reducer'
+import { e164NumberSelector } from 'src/account/selectors'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { navigateToURI } from 'src/utils/linking'
 import Logger from 'src/utils/Logger'
-import { web3 } from 'src/web3/contracts'
+import { getContractKit } from 'src/web3/contracts'
 import { getConnectedUnlockedAccount } from 'src/web3/saga'
 import { currentAccountSelector } from 'src/web3/selectors'
 
@@ -58,22 +58,36 @@ function* produceTxSignature(action: RequestTxSignatureAction) {
   Logger.debug(TAG, 'Producing tx signature')
 
   yield call(getConnectedUnlockedAccount)
+  const contractKit = yield call(getContractKit)
+
   const rawTxs = yield Promise.all(
     action.request.txs.map(async (tx) => {
+      // TODO offload this logic to walletkit or contractkit, otherwise they
+      // could diverge again and create another bug
+      // See https://github.com/celo-org/celo-monorepo/issues/3045
+
+      // In walletKit we use web3.eth.getCoinbase() to get gateway fee recipient
+      // but that's throwing errors here. Not sure why, but txs work without it.
+      const gatewayFeeRecipient = undefined
+      const gatewayFee = undefined
+      const gas = Math.round(tx.estimatedGas * 1.5)
+
       const params: any = {
         from: tx.from,
         gasPrice: '0',
-        gas: tx.estimatedGas,
+        gas,
         data: tx.txData,
         nonce: tx.nonce,
         value: tx.value,
-        // @ts-ignore
-        feeCurrency: action.request.feeCurrency,
+        feeCurrency: tx.feeCurrencyAddress,
+        gatewayFeeRecipient,
+        gatewayFee,
       }
       if (tx.to) {
         params.to = tx.to
       }
-      const signedTx = await web3.eth.signTransaction(params)
+      Logger.debug(TAG, 'Signing tx with params', JSON.stringify(params))
+      const signedTx = await contractKit.web3.eth.signTransaction(params)
       return signedTx.raw
     })
   )

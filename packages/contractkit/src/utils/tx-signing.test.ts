@@ -1,8 +1,8 @@
 import { privateKeyToAddress } from '@celo/utils/lib/address'
 import debugFactory from 'debug'
 import Web3 from 'web3'
-import { Tx } from 'web3/eth/types'
-import { Callback, JsonRPCRequest, JsonRPCResponse, Provider } from 'web3/providers'
+import { provider, Tx } from 'web3-core'
+import { Callback, JsonRpcPayload, JsonRpcResponse } from 'web3-core-helpers'
 import { CeloProvider } from '../providers/celo-provider'
 import { recoverTransaction } from './signing-utils'
 
@@ -30,7 +30,7 @@ async function verifyLocalSigning(web3: Web3, celoTransaction: Tx): Promise<void
     celoTransaction.from,
     recoveredSigner
   )
-  expect(recoveredSigner.toLowerCase()).toEqual(celoTransaction.from!.toLowerCase())
+  expect(recoveredSigner.toLowerCase()).toEqual(celoTransaction.from!.toString().toLowerCase())
 
   if (celoTransaction.nonce != null) {
     debug(
@@ -135,12 +135,15 @@ async function verifyLocalSigningInAllPermutations(
 // These tests verify the signTransaction WITHOUT the ParamsPopulator
 describe('Transaction Utils', () => {
   // only needed for the eth_coinbase rcp call
-  const mockProvider: Provider = {
-    send: (payload: JsonRPCRequest, callback: Callback<JsonRPCResponse>): any => {
+  let celoProvider: CeloProvider
+  const mockProvider: provider = {
+    host: '',
+    connected: true,
+    send: (payload: JsonRpcPayload, callback: Callback<JsonRpcResponse>): void => {
       if (payload.method === 'eth_coinbase') {
-        const response: JsonRPCResponse = {
+        const response: JsonRpcResponse = {
           jsonrpc: payload.jsonrpc,
-          id: payload.id,
+          id: Number(payload.id),
           result: '0xc94770007dda54cF92009BFF0dE90c06F603a09f',
         }
         callback(null, response)
@@ -148,11 +151,14 @@ describe('Transaction Utils', () => {
         callback(new Error(payload.method))
       }
     },
+    supportsSubscriptions: (): boolean => true,
+    disconnect: (): boolean => true,
   }
   const web3: Web3 = new Web3()
 
   beforeEach(() => {
-    web3.setProvider(new CeloProvider(mockProvider))
+    celoProvider = new CeloProvider(mockProvider)
+    web3.setProvider(celoProvider as any)
   })
 
   afterEach(() => {
@@ -164,7 +170,6 @@ describe('Transaction Utils', () => {
   describe('Signer Testing with single local account and pay gas in Celo Gold', () => {
     it('Test1 should be able to sign and get the signer back with single local account', async () => {
       jest.setTimeout(60 * 1000)
-      const celoProvider = web3.currentProvider as CeloProvider
       celoProvider.addAccount(PRIVATE_KEY1)
       await verifyLocalSigningInAllPermutations(web3, ACCOUNT_ADDRESS1, ACCOUNT_ADDRESS2)
     })
@@ -173,7 +178,6 @@ describe('Transaction Utils', () => {
   describe('Signer Testing with multiple local accounts', () => {
     it('Test2 should be able to sign with first account and get the signer back with multiple local accounts', async () => {
       jest.setTimeout(60 * 1000)
-      const celoProvider = web3.currentProvider as CeloProvider
       celoProvider.addAccount(PRIVATE_KEY1)
       celoProvider.addAccount(PRIVATE_KEY2)
       await verifyLocalSigningInAllPermutations(web3, ACCOUNT_ADDRESS1, ACCOUNT_ADDRESS2)
@@ -181,7 +185,6 @@ describe('Transaction Utils', () => {
 
     it('Test3 should be able to sign with second account and get the signer back with multiple local accounts', async () => {
       jest.setTimeout(60 * 1000)
-      const celoProvider = web3.currentProvider as CeloProvider
       celoProvider.addAccount(PRIVATE_KEY1)
       celoProvider.addAccount(PRIVATE_KEY2)
       await verifyLocalSigningInAllPermutations(web3, ACCOUNT_ADDRESS2, ACCOUNT_ADDRESS1)

@@ -24,9 +24,9 @@ There are a few basic ground rules for contributing:
 
 We encourage you to PR \(pull request\) your work regularly and often to solicit feedback and to ensure everyone has an idea of what you’re working on. If you’ve just started, we suggest creating a PR with “WIP” \(Work In Progress\) in the title and let us know when it’s ready to review in the comments.
 
-Please make sure your PR:
+##### Please make sure your PR:
 
-- Is assigned to one of the core team members building Celo
+- Requests the appropriate reviewers. When in doubt, consult the CODEOWNERS file for suggestions.
 - Provides a comprehensive description of the problem addressed and changes made.
 - Explains dependencies and backwards incompatible changes .
 - Contains unit and end-to-end tests and a description of how these were run.
@@ -34,7 +34,7 @@ Please make sure your PR:
 
 If you are submitting an issue, please double check that there doesn’t already exist and issue for the work you have in mind.
 
-Please make sure your issue:
+##### Please make sure your issue:
 
 - Is created in the correct repository.
 - Has a clear detailed title such that it can’t be confused with other Celo issues.
@@ -67,5 +67,7 @@ CIP template:
 - **Risks:** Highlight any risks and concerns that may affect consensus, proof-of-stake, governance, protocol economics, the stability protocol, security, and privacy.
 
 **Finding Us and Other Contributors**
+
+A list of active contributors can be found at [celo.org/about](https://celo.org/about#contributors)
 
 For code-related questions, comments, and discussions please use the [Celo Forum](https://forum.celo.org)

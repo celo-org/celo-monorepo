@@ -1,23 +1,65 @@
 import { newKitFromWeb3 } from '@celo/contractkit'
-import { addLocalAccount as web3utilsAddLocalAccount } from '@celo/walletkit'
+import { privateKeyToAddress } from '@celo/utils/src/address'
 import { Platform } from 'react-native'
 import * as net from 'react-native-tcp'
+import { select, take } from 'redux-saga/effects'
+import sleep from 'sleep-promise'
 import { DEFAULT_FORNO_URL } from 'src/config'
 import { IPC_PATH } from 'src/geth/geth'
-import networkConfig from 'src/geth/networkConfig'
+import { store } from 'src/redux/store'
 import Logger from 'src/utils/Logger'
+import { Actions } from 'src/web3/actions'
+import { contractKitReadySelector, fornoSelector } from 'src/web3/selectors'
 import Web3 from 'web3'
-import { Provider } from 'web3/providers'
+import { provider } from 'web3-core'
 
-// Logging tag
 const tag = 'web3/contracts'
 
-export const web3: Web3 = getWeb3()
-// @ts-ignore - need to align web3 versions in contractkit
-export const contractKit = newKitFromWeb3(web3)
+const contractKitForno = newKitFromWeb3(getWeb3(true))
+const contractKitGeth = newKitFromWeb3(getWeb3(false))
+// Web3 for utils does not require a provider, using geth web3 to avoid creating another web3 instance
+export const web3ForUtils = contractKitGeth.web3
 
-export function isInitiallyFornoMode() {
-  return networkConfig.initiallyForno
+function getWeb3(fornoMode: boolean): Web3 {
+  Logger.info(
+    `${tag}@getWeb3`,
+    `Initializing web3, platform: ${Platform.OS}, forno mode: ${fornoMode}, provider: ${
+      fornoMode ? DEFAULT_FORNO_URL : 'geth'
+    }`
+  )
+  return fornoMode ? new Web3(getHttpProvider(DEFAULT_FORNO_URL)) : new Web3(getIpcProvider())
+}
+
+// Workaround as contractKit logic is still used outside generators
+// Moving towards generators to allow us to block contractKit calls, see https://github.com/celo-org/celo-monorepo/issues/3727
+export async function getContractKitOutsideGenerator() {
+  // Poll store until rehydrated
+  while (!store) {
+    Logger.debug(`getContractKitOutsideGenerator`, `Still waiting for store...`)
+    await sleep(250) // Every 0.25 seconds
+  }
+  // Use store to ensure ContractKit is ready
+  while (!contractKitReadySelector(store.getState())) {
+    Logger.debug(`getContractKitOutsideGenerator`, `ContractKit is still locked...`)
+    await sleep(250) // Every 0.25 seconds
+  }
+
+  Logger.debug(`${tag}@getContractKitOutsideGenerator`, 'ContractKit ready, returning')
+  return getContractKitBasedOnFornoInStore()
+}
+
+export function* getContractKit() {
+  // No need to waitForRehydrate as contractKitReady set to false for every app reopen
+  while (!(yield select(contractKitReadySelector))) {
+    // If contractKit locked, wait until unlocked
+    yield take(Actions.SET_CONTRACT_KIT_READY)
+  }
+  return getContractKitBasedOnFornoInStore()
+}
+
+export function getContractKitBasedOnFornoInStore() {
+  const forno = fornoSelector(store.getState())
+  return forno ? contractKitForno : contractKitGeth
 }
 
 function getIpcProvider() {
@@ -57,49 +99,23 @@ function getIpcProvider() {
   return ipcProvider
 }
 
-function getHttpProvider(url: string): Provider {
+function getHttpProvider(url: string): provider {
   Logger.debug(tag, 'creating HttpProvider...')
-  const provider = new Web3.providers.HttpProvider(url)
+  const httpProvider = new Web3.providers.HttpProvider(url)
   Logger.debug(tag, 'created HttpProvider')
   // In the future, we might decide to over-ride the error handler via the following code.
   // provider.on('error', () => {
   //   Logger.showError('Error occurred')
   // })
-  return provider as Provider
+  return httpProvider
 }
 
-function getWeb3(): Web3 {
-  Logger.info(
-    `${tag}@getWeb3`,
-    `Initializing web3, platform: ${Platform.OS}, forno mode: ${isInitiallyFornoMode()}`
-  )
-
-  if (isInitiallyFornoMode()) {
-    const url = DEFAULT_FORNO_URL
-    Logger.debug(`${tag}@getWeb3`, `Connecting to url ${url}`)
-    return new Web3(getHttpProvider(url))
-  } else {
-    return new Web3(getIpcProvider())
-  }
-}
-
-// Mutates web3 with new provider
-export function switchWeb3ProviderForSyncMode(forno: boolean) {
-  if (forno) {
-    web3.setProvider(getHttpProvider(DEFAULT_FORNO_URL))
-    Logger.info(`${tag}@switchWeb3ProviderForSyncMode`, `Set provider to ${DEFAULT_FORNO_URL}`)
-  } else {
-    web3.setProvider(getIpcProvider())
-    Logger.info(`${tag}@switchWeb3ProviderForSyncMode`, `Set provider to IPC provider`)
-  }
-}
-
-export function addLocalAccount(web3Instance: Web3, privateKey: string) {
-  if (!web3Instance) {
-    throw new Error(`web3 instance is ${web3Instance}`)
-  }
+export function addLocalAccount(privateKey: string, isDefault: boolean = false) {
   if (!privateKey) {
     throw new Error(`privateKey is ${privateKey}`)
   }
-  web3utilsAddLocalAccount(web3Instance, privateKey)
+  contractKitForno.addAccount(privateKey)
+  if (isDefault) {
+    contractKitForno.defaultAccount = privateKeyToAddress(privateKey)
+  }
 }

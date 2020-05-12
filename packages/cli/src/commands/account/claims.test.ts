@@ -1,4 +1,4 @@
-import { IdentityMetadataWrapper, newKitFromWeb3 } from '@celo/contractkit'
+import { ContractKit, IdentityMetadataWrapper, newKitFromWeb3 } from '@celo/contractkit'
 import { ClaimTypes } from '@celo/contractkit/lib/identity'
 import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
 import { readFileSync, writeFileSync } from 'fs'
@@ -14,8 +14,11 @@ process.env.NO_SYNCCHECK = 'true'
 testWithGanache('account metadata cmds', (web3: Web3) => {
   let account: string
   let accounts: string[]
+  let kit: ContractKit
+
   beforeEach(async () => {
     accounts = await web3.eth.getAccounts()
+    kit = newKitFromWeb3(web3)
     account = accounts[0]
   })
 
@@ -26,7 +29,7 @@ testWithGanache('account metadata cmds', (web3: Web3) => {
     }
 
     const readFile = () => {
-      return IdentityMetadataWrapper.fromFile(emptyFilePath)
+      return IdentityMetadataWrapper.fromFile(kit, emptyFilePath)
     }
 
     test('account:create-metadata cmd', async () => {
@@ -40,7 +43,7 @@ testWithGanache('account metadata cmds', (web3: Web3) => {
       generateEmptyMetadataFile()
       const name = 'myname'
       await ClaimName.run(['--from', account, '--name', name, emptyFilePath])
-      const metadata = readFile()
+      const metadata = await readFile()
       const claim = metadata.findClaim(ClaimTypes.NAME)
       expect(claim).toBeDefined()
       expect(claim!.name).toEqual(name)
@@ -50,7 +53,7 @@ testWithGanache('account metadata cmds', (web3: Web3) => {
       generateEmptyMetadataFile()
       const domain = 'test.com'
       await ClaimDomain.run(['--from', account, '--domain', domain, emptyFilePath])
-      const metadata = readFile()
+      const metadata = await readFile()
       const claim = metadata.findClaim(ClaimTypes.DOMAIN)
       expect(claim).toBeDefined()
       expect(claim!.domain).toEqual(domain)
@@ -60,7 +63,7 @@ testWithGanache('account metadata cmds', (web3: Web3) => {
       generateEmptyMetadataFile()
       const otherAccount = accounts[1]
       await ClaimAccount.run(['--from', account, '--address', otherAccount, emptyFilePath])
-      const metadata = readFile()
+      const metadata = await readFile()
       const claim = metadata.findClaim(ClaimTypes.ACCOUNT)
       expect(claim).toBeDefined()
       expect(claim!.address).toEqual(otherAccount)
@@ -70,17 +73,16 @@ testWithGanache('account metadata cmds', (web3: Web3) => {
   describe('account:register-metadata cmd', () => {
     describe('when the account is registered', () => {
       beforeEach(async () => {
-        const kit = newKitFromWeb3(web3)
         const accountsInstance = await kit.contracts.getAccounts()
         await accountsInstance.createAccount().sendAndWaitForReceipt({ from: account })
       })
 
       test('can register metadata', async () => {
-        await RegisterMetadata.run(['--from', account, '--url', 'https://test.com'])
+        await RegisterMetadata.run(['--force', '--from', account, '--url', 'https://test.com'])
       })
 
       test('fails if url is missing', async () => {
-        await expect(RegisterMetadata.run(['--from', account])).rejects.toThrow(
+        await expect(RegisterMetadata.run(['--force', '--from', account])).rejects.toThrow(
           'Missing required flag'
         )
       })
@@ -88,7 +90,7 @@ testWithGanache('account metadata cmds', (web3: Web3) => {
 
     it('cannot register metadata', async () => {
       await expect(
-        RegisterMetadata.run(['--from', account, '--url', 'https://test.com'])
+        RegisterMetadata.run(['--force', '--from', account, '--url', 'https://test.com'])
       ).rejects.toThrow("Some checks didn't pass!")
     })
   })

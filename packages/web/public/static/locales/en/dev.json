@@ -23,14 +23,14 @@
   "developerSDKTitle": "Celo SDK",
   "developerSDKsubtitle": "Innovative tools to build native mobile dApps",
   "viewGitHub": "View on Github",
-  "getStarted": "Get Wallet",
+  "getStarted": "Get Test Wallet",
   "getInvolved": "Get Involved",
   "seeTutorial": "See Tutorial",
   "featureTitle": "Platform Features",
   "techTitle": "Full Stack Approach",
   "learnMore": "Learn More",
   "readMore": "Read More",
-  "installWallet": "Install Wallet",
+  "installWallet": "Get Test Wallet",
   "seeCode": "See Code",
   "celoStack": "The Celo Stack",
   "stackSubtitle": "Full Stack Approach",
@@ -57,7 +57,7 @@
       "verb": "Extend & Enrich the Ecosystem",
       "network": "Alfajores Testnet",
       "caption": "Try out the Celo Protocol and Celo Wallet.\nBuild dApps for the Celo platform.",
-      "primaryAction": "Get Wallet",
+      "primaryAction": "Get Test Wallet",
       "secondaryAction": "Explore Celo CLI"
     },
     "secure": {
@@ -150,7 +150,7 @@
   },
   "protocol": {
     "title": "Core Contracts",
-    "text": "Designed to support an ecology of stable value currencies. The first stablecoin, cUSD, is pegged to the US Dollar.",
+    "text": "Designed to support an ecology of stable value currencies. The first stablecoin, cUSD, tracks the value of the US Dollar.",
     "algoReserve": "Algorithmic reserve-backed stabilization mechanism",
     "cryptoCollat": "Crypto-asset collateralized",
     "native": "Native support for multiple stablecoins"

@@ -10,7 +10,7 @@ description: >-
 
 ### **Prerequisites**
 
-- **You have a Celo node running.** Commands will connect to a Celo node to execute most functionality. See the [Running a Full Node](../getting-started/running-a-full-node.md) instructions for more details on running a full node.
+- **You have a Celo node running.** Commands will connect to a Celo node to execute most functionality. See the [Running a Full Node](../getting-started/running-a-full-node-in-rc1.md) instructions for more details on running a full node.
 
 ### NPM Package
 
@@ -44,3 +44,19 @@ See documentation on the [config](./config.md) module for information about how 
 {% endhint %}
 
 {% embed url="https://www.npmjs.com/package/@celo/celocli" %}
+
+### Using a Ledger Wallet
+
+The Celo CLI supports using a [Ledger hardware wallet](../celo-gold-holder-guide/ledger.md) to sign transactions.
+
+### Plugins
+
+Additional plugins can be installed which make the CLI experience smoother.
+
+The autocomplete plugin adds an interactive autocomplete for `bash` and `zsh` shells. To enable the autocomplete plugin, follow the instructions provided at:
+
+```text
+celocli autocomplete
+```
+
+The update warning plugin notifies the user if they are using an oudated version of the CLI. This plugin is enabled by default.

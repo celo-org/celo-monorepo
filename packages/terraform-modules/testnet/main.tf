@@ -12,7 +12,7 @@ provider "acme" {
 # For managing terraform state remotely
 terraform {
   backend "gcs" {
-    bucket = "celo_tf_state_prod"
+    bucket = "celo_tf_state"
   }
   required_providers {
     google = "~> 2.16.0"
@@ -22,7 +22,7 @@ terraform {
 data "terraform_remote_state" "state" {
   backend = "gcs"
   config = {
-    bucket = "celo_tf_state_prod"
+    bucket = "celo_tf_state"
     prefix = "${var.celo_env}/testnet"
   }
 }
@@ -32,9 +32,10 @@ locals {
   # any geth node (tx nodes & validators)
   target_tag_node = "${var.celo_env}-node"
 
-  target_tag_proxy     = "${var.celo_env}-proxy"
-  target_tag_tx_node   = "${var.celo_env}-tx-node"
-  target_tag_validator = "${var.celo_env}-validator"
+  target_tag_proxy           = "${var.celo_env}-proxy"
+  target_tag_tx_node         = "${var.celo_env}-tx-node"
+  target_tag_tx_node_private = "${var.celo_env}-tx-node-private"
+  target_tag_validator       = "${var.celo_env}-validator"
 
   target_tag_ssl = "${var.celo_env}-external-ssl"
 
@@ -91,6 +92,21 @@ resource "google_compute_firewall" "geth_metrics_firewall" {
   allow {
     protocol = "tcp"
     ports    = ["9200"]
+  }
+}
+
+resource "google_compute_firewall" "rpc_firewall_internal" {
+  name    = "${var.celo_env}-rpc-firewall-internal"
+  network = data.google_compute_network.network.name
+
+  target_tags = [local.target_tag_tx_node_private]
+
+  # allow all IPs internal to the VPC
+  source_ranges = ["10.0.0.0/8"]
+
+  allow {
+    protocol = "tcp"
+    ports    = ["8545", "8546"]
   }
 }
 
@@ -152,7 +168,35 @@ module "tx_node" {
   name                                  = "tx-node"
   network_id                            = var.network_id
   network_name                          = data.google_compute_network.network.name
+  gcmode                                = "full"
   node_count                            = var.tx_node_count
+  rpc_apis                              = "eth,net,web3"
+}
+
+module "tx_node_private" {
+  source = "./modules/full-node"
+  # variables
+  block_time                            = var.block_time
+  bootnode_ip_address                   = module.bootnode.ip_address
+  celo_env                              = var.celo_env
+  ethstats_host                         = var.ethstats_host
+  gcloud_secrets_base_path              = var.gcloud_secrets_base_path
+  gcloud_secrets_bucket                 = var.gcloud_secrets_bucket
+  gcloud_vm_service_account_email       = var.gcloud_vm_service_account_email
+  genesis_content_base64                = var.genesis_content_base64
+  geth_exporter_docker_image_repository = var.geth_exporter_docker_image_repository
+  geth_exporter_docker_image_tag        = var.geth_exporter_docker_image_tag
+  geth_node_docker_image_repository     = var.geth_node_docker_image_repository
+  geth_node_docker_image_tag            = var.geth_node_docker_image_tag
+  geth_verbosity                        = var.geth_verbosity
+  in_memory_discovery_table             = var.in_memory_discovery_table
+  instance_tags                         = [local.target_tag_tx_node_private]
+  name                                  = "tx-node-private"
+  network_id                            = var.network_id
+  network_name                          = data.google_compute_network.network.name
+  gcmode                                = "archive"
+  node_count                            = var.private_tx_node_count
+  rpc_apis                              = "eth,net,web3,debug,txpool"
 }
 
 # used for access by blockscout
@@ -163,11 +207,11 @@ module "tx_node_lb" {
   dns_gcloud_project              = var.dns_gcloud_project
   dns_zone_name                   = var.dns_zone_name
   forno_host                      = var.forno_host
-  gcloud_credentials_path         = var.gcloud_credentials_path
   gcloud_project                  = var.gcloud_project
   gcloud_vm_service_account_email = var.gcloud_vm_service_account_email
   letsencrypt_email               = var.letsencrypt_email
   network_name                    = data.google_compute_network.network.name
+  private_tx_node_self_links      = module.tx_node_private.self_links
   tx_node_self_links              = module.tx_node.self_links
 }
 
@@ -192,6 +236,5 @@ module "validator" {
   network_id                            = var.network_id
   network_name                          = data.google_compute_network.network.name
   proxied_validator_count               = var.proxied_validator_count
-  tx_node_count                         = var.tx_node_count
   validator_count                       = var.validator_count
 }

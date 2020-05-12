@@ -32,7 +32,7 @@ exports[`Debug renders correctly 1`] = `
       }
     }
   >
-    Version: undefined | Build Number: undefined | Api Level: undefined
+    Version: appVersion | Build Number: undefined | Api Level: undefined
   </Text>
   <Text
     style={
@@ -159,7 +159,6 @@ exports[`Debug renders correctly 1`] = `
     <View
       accessible={true}
       focusable={true}
-      isTVSelectable={true}
       nativeBackgroundAndroid={
         Object {
           "attribute": "selectableItemBackground",

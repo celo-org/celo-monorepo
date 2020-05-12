@@ -14,6 +14,7 @@ import {
   Text,
   View,
 } from 'react-native'
+import { SafeAreaConsumer } from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { AddressToE164NumberType } from 'src/identity/reducer'
@@ -58,11 +59,19 @@ const mapStateToProps = (state: RootState): StateProps => ({
 })
 
 export class RecipientPicker extends React.Component<RecipientProps> {
+  state = {
+    keyboardVisible: false,
+  }
+
+  onToggleKeyboard = (visible: boolean) => {
+    this.setState({ keyboardVisible: visible })
+  }
+
   renderItem = ({ item, index }: ListRenderItemInfo<Recipient>) => (
     <RecipientItem recipient={item} onSelectRecipient={this.props.onSelectRecipient} />
   )
 
-  renderSectionHeader = (info: { section: SectionListData<Section> }) => (
+  renderSectionHeader = (info: { section: SectionListData<Recipient> }) => (
     <SectionHead text={info.section.key as string} />
   )
 
@@ -169,18 +178,31 @@ export class RecipientPicker extends React.Component<RecipientProps> {
 
     return (
       <View style={style.body} testID={this.props.testID}>
-        <SectionList
-          renderItem={this.renderItem}
-          renderSectionHeader={this.renderSectionHeader}
-          sections={sections}
-          ItemSeparatorComponent={this.renderItemSeparator}
-          ListHeaderComponent={listHeaderComponent}
-          ListEmptyComponent={this.renderEmptyView()}
-          keyExtractor={this.keyExtractor}
-          initialNumToRender={30}
-          keyboardShouldPersistTaps="always"
-        />
-        <KeyboardSpacer />
+        <SafeAreaConsumer>
+          {(insets) => (
+            <SectionList
+              // Note: contentInsetAdjustmentBehavior="always" would be simpler
+              // but leaves an incorrect top offset for the scroll bar after hiding the keyboard
+              // so here we manually adjust the padding
+              contentContainerStyle={
+                !this.state.keyboardVisible &&
+                insets && {
+                  paddingBottom: insets.bottom,
+                }
+              }
+              renderItem={this.renderItem}
+              renderSectionHeader={this.renderSectionHeader}
+              sections={sections}
+              ItemSeparatorComponent={this.renderItemSeparator}
+              ListHeaderComponent={listHeaderComponent}
+              ListEmptyComponent={this.renderEmptyView()}
+              keyExtractor={this.keyExtractor}
+              initialNumToRender={30}
+              keyboardShouldPersistTaps="always"
+            />
+          )}
+        </SafeAreaConsumer>
+        <KeyboardSpacer onToggle={this.onToggleKeyboard} />
       </View>
     )
   }

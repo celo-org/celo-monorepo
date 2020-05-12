@@ -1,16 +1,7 @@
+import colors from '@celo/react-components/styles/colors'
 import { Platform } from 'react-native'
-import {
-  CreateNavigatorConfig,
-  createSwitchNavigator,
-  NavigationRoute,
-  NavigationStackRouterConfig,
-} from 'react-navigation'
-import {
-  createStackNavigator,
-  NavigationStackConfig,
-  NavigationStackOptions,
-  NavigationStackProp,
-} from 'react-navigation-stack'
+import { createSwitchNavigator } from 'react-navigation'
+import { createStackNavigator } from 'react-navigation-stack'
 import Account from 'src/account/Account'
 import Analytics from 'src/account/Analytics'
 import DataSaver from 'src/account/DataSaver'
@@ -24,8 +15,9 @@ import Licenses from 'src/account/Licenses'
 import PhotosEducation from 'src/account/PhotosEducation'
 import Profile from 'src/account/Profile'
 import Security from 'src/account/Security'
+import Support from 'src/account/Support'
+import SupportContact from 'src/account/SupportContact'
 import AppLoading from 'src/app/AppLoading'
-import Background from 'src/app/Background'
 import Debug from 'src/app/Debug'
 import ErrorScreen from 'src/app/ErrorScreen'
 import UpgradeScreen from 'src/app/UpgradeScreen'
@@ -47,7 +39,6 @@ import ImportWallet from 'src/import/ImportWallet'
 import ImportWalletEmpty from 'src/import/ImportWalletEmpty'
 import ImportWalletSocial from 'src/import/ImportWalletSocial'
 import EnterInviteCode from 'src/invite/EnterInviteCode'
-import JoinCelo from 'src/invite/JoinCelo'
 import Language from 'src/language/Language'
 import SelectLocalCurrency from 'src/localCurrency/SelectLocalCurrency'
 import { Screens, Stacks } from 'src/navigator/Screens'
@@ -55,11 +46,13 @@ import TabNavigator from 'src/navigator/TabNavigator'
 import IncomingPaymentRequestListScreen from 'src/paymentRequest/IncomingPaymentRequestListScreen'
 import OutgoingPaymentRequestListScreen from 'src/paymentRequest/OutgoingPaymentRequestListScreen'
 import PaymentRequestConfirmation from 'src/paymentRequest/PaymentRequestConfirmation'
-import PincodeConfirmation from 'src/pincode/PincodeConfirmation'
 import PincodeEducation from 'src/pincode/PincodeEducation'
+import PincodeEnter from 'src/pincode/PincodeEnter'
 import PincodeSet from 'src/pincode/PincodeSet'
 import QRCode from 'src/qrcode/QRCode'
 import QRScanner from 'src/qrcode/QRScanner'
+import JoinCelo from 'src/registration/JoinCelo'
+import RegulatoryTerms from 'src/registration/RegulatoryTerms'
 import FeeEducation from 'src/send/FeeEducation'
 import Send from 'src/send/Send'
 import SendAmount from 'src/send/SendAmount'
@@ -73,16 +66,12 @@ import VerificationLearnMoreScreen from 'src/verify/VerificationLearnMoreScreen'
 import VerificationLoadingScreen from 'src/verify/VerificationLoadingScreen'
 import VerificationSuccessScreen from 'src/verify/VerificationSuccessScreen'
 
-export const headerArea: CreateNavigatorConfig<
-  NavigationStackConfig,
-  NavigationStackRouterConfig,
-  NavigationStackOptions,
-  NavigationStackProp<NavigationRoute, any>
-> = {
+export const headerArea = {
   // Force this for now on iOS so screen transitions look normal
   // given we intentionally hide the bottom separator from the nav bar
   headerMode: 'screen',
   defaultNavigationOptions: {
+    cardStyle: { backgroundColor: colors.background },
     headerStyle: {
       ...Platform.select({
         android: {
@@ -91,6 +80,9 @@ export const headerArea: CreateNavigatorConfig<
         ios: {
           borderBottomWidth: 0,
           borderBottomColor: 'transparent',
+          shadowOffset: {
+            height: 0,
+          },
         },
       }),
     },
@@ -98,7 +90,7 @@ export const headerArea: CreateNavigatorConfig<
 }
 
 export const commonScreens = {
-  [Screens.PincodeConfirmation]: { screen: PincodeConfirmation },
+  [Screens.PincodeEnter]: { screen: PincodeEnter },
   [Screens.ErrorScreen]: { screen: ErrorScreen },
   [Screens.UpgradeScreen]: { screen: UpgradeScreen },
   [Screens.DappKitAccountAuth]: { screen: DappKitAccountScreen },
@@ -106,7 +98,6 @@ export const commonScreens = {
   [Screens.DappKitTxDataScreen]: { screen: DappKitTxDataScreen },
   [Screens.Debug]: { screen: Debug },
   [Screens.DataSaver]: { screen: DataSaver },
-  [Screens.Background]: { screen: Background },
 }
 
 const verificationScreens = {
@@ -122,6 +113,7 @@ const NuxStack = createStackNavigator(
   {
     [Screens.Language]: { screen: Language },
     [Screens.JoinCelo]: { screen: JoinCelo },
+    [Screens.RegulatoryTerms]: { screen: RegulatoryTerms },
     [Screens.PincodeEducation]: { screen: PincodeEducation },
     [Screens.PincodeSet]: { screen: PincodeSet },
     [Screens.EnterInviteCode]: { screen: EnterInviteCode },
@@ -266,6 +258,8 @@ const SettingsStack = createStackNavigator(
     [Screens.InviteReview]: { screen: InviteReview },
     [Screens.SelectLocalCurrency]: { screen: SelectLocalCurrency },
     [Screens.Licenses]: { screen: Licenses },
+    [Screens.Support]: { screen: Support },
+    [Screens.SupportContact]: { screen: SupportContact },
     [Screens.FiatExchange]: { screen: FiatExchange },
     ...verificationScreens,
   },
@@ -289,6 +283,8 @@ const AppStack = createStackNavigator(
     [Screens.ReclaimPaymentConfirmationScreen]: {
       screen: ReclaimPaymentConfirmationScreen,
     },
+    // Adding this stack, so it possbile to go back to Home screen from it
+    [Stacks.BackupStack]: { screen: BackupStack },
     [Stacks.QRSendStack]: { screen: QRSendStack },
     [Stacks.ExchangeStack]: { screen: ExchangeStack },
     [Stacks.IncomingRequestStack]: { screen: IncomingRequestStack },
@@ -312,12 +308,12 @@ const AppStack = createStackNavigator(
 
 const AppNavigator = createSwitchNavigator(
   {
-    AppLoading,
+    [Screens.AppLoading]: AppLoading,
     [Stacks.NuxStack]: NuxStack,
     [Stacks.AppStack]: AppStack,
   },
   {
-    initialRouteName: 'AppLoading',
+    initialRouteName: Screens.AppLoading,
   }
 )
 

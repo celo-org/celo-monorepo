@@ -1,0 +1,965 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`JoinCeloScreen renders correctly 1`] = `
+<SafeAreaView
+  style={
+    Object {
+      "backgroundColor": "#FFFFFF",
+      "flex": 1,
+      "justifyContent": "space-between",
+    }
+  }
+>
+  <View
+    style={
+      Object {
+        "height": 35,
+        "paddingRight": 10,
+        "paddingTop": 10,
+        "position": "absolute",
+        "right": 0,
+        "top": 0,
+        "width": 70,
+        "zIndex": 100,
+      }
+    }
+  >
+    <Text
+      accessible={true}
+      focusable={true}
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+    >
+         
+    </Text>
+  </View>
+  <RCTScrollView
+    contentContainerStyle={
+      Object {
+        "padding": 20,
+        "paddingTop": 0,
+      }
+    }
+    keyboardShouldPersistTaps="always"
+  >
+    <View>
+      <View
+        style={
+          Array [
+            Object {
+              "alignItems": "center",
+              "marginBottom": 20,
+            },
+            Object {},
+          ]
+        }
+      >
+        <Image
+          resizeMode="contain"
+          source={
+            Object {
+              "testUri": "../../../packages/mobile/src/images/coins-logo.png",
+            }
+          }
+          style={
+            Object {
+              "height": 35,
+              "width": 35,
+            }
+          }
+        />
+      </View>
+      <Text
+        style={
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Hind-Light",
+            "fontSize": 22,
+            "paddingBottom": 20,
+            "textAlign": "center",
+          }
+        }
+        testID="InviteWallTitle"
+      >
+        welcomeCelo
+      </Text>
+      <Text
+        style={
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Hind-Regular",
+            "fontSize": 14,
+            "lineHeight": 18,
+          }
+        }
+      >
+        joinText
+      </Text>
+      <View
+        style={
+          Array [
+            Object {
+              "alignItems": "center",
+              "flex": 1,
+              "flexDirection": "row",
+              "justifyContent": "center",
+            },
+            Object {
+              "alignItems": "center",
+              "borderColor": "#D1D5D8",
+              "borderRadius": 3,
+              "borderWidth": 1,
+              "color": "#D1D5D8",
+              "height": 50,
+              "marginBottom": 6,
+              "marginTop": 25,
+              "paddingLeft": 9,
+            },
+          ]
+        }
+      >
+        <TextInput
+          allowFontScaling={true}
+          enablesReturnKeyAutomatically={true}
+          onBlur={[Function]}
+          onChangeText={[Function]}
+          onFocus={[Function]}
+          placeholder="fullName"
+          placeholderTextColor="#D1D5D8"
+          rejectResponderTermination={true}
+          style={
+            Object {
+              "backgroundColor": "#FFFFFF",
+              "borderColor": "#D1D5D8",
+              "borderRadius": 3,
+              "flex": 1,
+              "fontFamily": "Hind-Regular",
+              "padding": 8,
+            }
+          }
+          testID="NameEntry"
+          underlineColorAndroid="transparent"
+          value="John Doe"
+        />
+      </View>
+      <View
+        style={
+          Array [
+            undefined,
+            Object {
+              "backgroundColor": "#FFFFFF",
+              "position": "relative",
+            },
+          ]
+        }
+      >
+        <View
+          style={
+            Array [
+              Object {
+                "flex": 1,
+              },
+              undefined,
+            ]
+          }
+        >
+          <View
+            style={
+              Array [
+                Object {
+                  "borderColor": "#b9b9b9",
+                  "borderRadius": 1,
+                  "borderWidth": 1,
+                  "marginBottom": 0,
+                },
+                Array [
+                  Object {
+                    "borderColor": "#D1D5D8",
+                    "borderRadius": 3,
+                    "borderWidth": 1,
+                  },
+                  Object {
+                    "height": 50,
+                  },
+                  Object {
+                    "marginTop": 1,
+                    "padding": 3,
+                  },
+                ],
+              ]
+            }
+          >
+            <View
+              style={
+                Array [
+                  Object {
+                    "alignItems": "center",
+                    "flex": 1,
+                    "flexDirection": "row",
+                    "justifyContent": "center",
+                  },
+                  Array [
+                    Object {
+                      "backgroundColor": "white",
+                      "height": 40,
+                      "paddingLeft": 3,
+                    },
+                    undefined,
+                  ],
+                ]
+              }
+            >
+              <TextInput
+                allowFontScaling={true}
+                autoCapitalize="none"
+                autoCorrect={false}
+                data={Array []}
+                defaultValue="Canadá"
+                flatListProps={Object {}}
+                inputContainerStyle={
+                  Array [
+                    Object {
+                      "borderColor": "#D1D5D8",
+                      "borderRadius": 3,
+                      "borderWidth": 1,
+                    },
+                    Object {
+                      "height": 50,
+                    },
+                    Object {
+                      "marginTop": 1,
+                      "padding": 3,
+                    },
+                  ]
+                }
+                keyExtractor={[Function]}
+                keyboardShouldPersistTaps="always"
+                listContainerStyle={
+                  Object {
+                    "flex": 1,
+                    "padding": 0,
+                    "position": "relative",
+                    "top": 3,
+                  }
+                }
+                listStyle={
+                  Array [
+                    Object {
+                      "borderColor": "#D1D5D8",
+                      "borderRadius": 3,
+                      "borderWidth": 1,
+                    },
+                    Object {
+                      "backgroundColor": "#FFFFFF",
+                      "borderColor": "#D1D5D8",
+                      "borderRadius": 3,
+                      "borderTopWidth": 1,
+                      "borderWidth": 1,
+                      "flex": 1,
+                      "marginHorizontal": 0,
+                      "paddingHorizontal": 0,
+                      "paddingVertical": 6,
+                    },
+                  ]
+                }
+                onBlur={[Function]}
+                onChangeText={[Function]}
+                onFocus={[Function]}
+                onStartShouldSetResponderCapture={[Function]}
+                placeholder="chooseCountry"
+                placeholderTextColor="#D1D5D8"
+                rejectResponderTermination={true}
+                renderItem={[Function]}
+                renderSeparator={null}
+                renderTextInput={[Function]}
+                style={
+                  Object {
+                    "backgroundColor": "#FFFFFF",
+                    "borderColor": "#D1D5D8",
+                    "borderRadius": 3,
+                    "flex": 1,
+                    "fontFamily": "Hind-Regular",
+                    "padding": 8,
+                  }
+                }
+                testID="CountryNameFieldTextInput"
+                underlineColorAndroid="transparent"
+                value="Canadá"
+              />
+            </View>
+          </View>
+          <View
+            onStartShouldSetResponderCapture={[Function]}
+            style={
+              Object {
+                "flex": 1,
+                "padding": 0,
+                "position": "relative",
+                "top": 3,
+              }
+            }
+          />
+        </View>
+        <View
+          style={
+            Array [
+              Object {
+                "alignItems": "center",
+                "flexDirection": "row",
+                "marginTop": 5,
+                "paddingVertical": 2,
+              },
+              Object {
+                "borderColor": "#D1D5D8",
+                "borderRadius": 3,
+                "borderWidth": 1,
+              },
+            ]
+          }
+        >
+          <Text
+            style={
+              Object {
+                "lineHeight": 35,
+                "textAlign": "center",
+                "width": 60,
+              }
+            }
+            testID="countryCodeText"
+          >
+            +1
+          </Text>
+          <View
+            style={
+              Object {
+                "borderColor": "#D1D5D8",
+                "borderRightWidth": 1,
+                "height": 35,
+              }
+            }
+          />
+          <View
+            style={
+              Array [
+                Object {
+                  "alignItems": "center",
+                  "flex": 1,
+                  "flexDirection": "row",
+                  "justifyContent": "center",
+                },
+                Array [
+                  Object {
+                    "height": 50,
+                  },
+                  Object {
+                    "flex": 1,
+                    "marginLeft": 9,
+                  },
+                ],
+              ]
+            }
+          >
+            <TextInput
+              allowFontScaling={true}
+              countryCallingCode="+1"
+              keyboardType="phone-pad"
+              onBlur={[Function]}
+              onChangeText={[Function]}
+              onFocus={[Function]}
+              placeholder="(000) 000-0000"
+              placeholderTextColor="#D1D5D8"
+              rejectResponderTermination={true}
+              style={
+                Object {
+                  "backgroundColor": "#FFFFFF",
+                  "borderColor": "#D1D5D8",
+                  "borderRadius": 3,
+                  "flex": 1,
+                  "fontFamily": "Hind-Regular",
+                  "padding": 8,
+                }
+              }
+              testID="PhoneNumberField"
+              underlineColorAndroid="transparent"
+              validator="phone"
+              value="(415) 555-6666"
+            />
+          </View>
+        </View>
+      </View>
+    </View>
+  </RCTScrollView>
+  <View
+    style={
+      Array [
+        Object {
+          "alignItems": "center",
+          "borderRadius": 3,
+          "flexDirection": "row",
+        },
+        null,
+        null,
+        undefined,
+        Object {
+          "backgroundColor": "#42D689",
+        },
+      ]
+    }
+  >
+    <View
+      accessible={true}
+      focusable={true}
+      nativeBackgroundAndroid={
+        Object {
+          "attribute": "selectableItemBackground",
+          "type": "ThemeAttrAndroid",
+        }
+      }
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        Array [
+          Object {
+            "alignItems": "center",
+            "flex": 1,
+            "justifyContent": "center",
+          },
+          Object {
+            "backgroundColor": "#42D689",
+          },
+          Object {
+            "height": 50,
+          },
+          Object {
+            "borderWidth": 0,
+          },
+        ]
+      }
+      testID="JoinCeloContinueButton"
+    >
+      <View
+        style={
+          Object {
+            "alignItems": "center",
+            "flex": 1,
+            "flexDirection": "row",
+            "justifyContent": "space-between",
+          }
+        }
+      >
+        <Text
+          style={
+            Array [
+              Object {
+                "fontFamily": "Hind-SemiBold",
+                "fontSize": 16,
+              },
+              Object {
+                "color": "#FFFFFF",
+              },
+              Object {
+                "paddingLeft": 5,
+                "paddingRight": 5,
+              },
+            ]
+          }
+        >
+          continue
+        </Text>
+      </View>
+    </View>
+  </View>
+</SafeAreaView>
+`;
+
+exports[`JoinCeloScreen renders with an error 1`] = `
+<SafeAreaView
+  style={
+    Object {
+      "backgroundColor": "#FFFFFF",
+      "flex": 1,
+      "justifyContent": "space-between",
+    }
+  }
+>
+  <View
+    style={
+      Object {
+        "height": 35,
+        "paddingRight": 10,
+        "paddingTop": 10,
+        "position": "absolute",
+        "right": 0,
+        "top": 0,
+        "width": 70,
+        "zIndex": 100,
+      }
+    }
+  >
+    <Text
+      accessible={true}
+      focusable={true}
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+    >
+         
+    </Text>
+  </View>
+  <RCTScrollView
+    contentContainerStyle={
+      Object {
+        "padding": 20,
+        "paddingTop": 0,
+      }
+    }
+    keyboardShouldPersistTaps="always"
+  >
+    <View>
+      <View
+        style={
+          Array [
+            Object {
+              "alignItems": "center",
+              "marginBottom": 20,
+            },
+            Object {},
+          ]
+        }
+      >
+        <Image
+          resizeMode="contain"
+          source={
+            Object {
+              "testUri": "../../../packages/mobile/src/images/coins-logo.png",
+            }
+          }
+          style={
+            Object {
+              "height": 35,
+              "width": 35,
+            }
+          }
+        />
+      </View>
+      <Text
+        style={
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Hind-Light",
+            "fontSize": 22,
+            "paddingBottom": 20,
+            "textAlign": "center",
+          }
+        }
+        testID="InviteWallTitle"
+      >
+        welcomeCelo
+      </Text>
+      <Text
+        style={
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Hind-Regular",
+            "fontSize": 14,
+            "lineHeight": 18,
+          }
+        }
+      >
+        joinText
+      </Text>
+      <View
+        style={
+          Array [
+            Object {
+              "alignItems": "center",
+              "flex": 1,
+              "flexDirection": "row",
+              "justifyContent": "center",
+            },
+            Object {
+              "alignItems": "center",
+              "borderColor": "#D1D5D8",
+              "borderRadius": 3,
+              "borderWidth": 1,
+              "color": "#D1D5D8",
+              "height": 50,
+              "marginBottom": 6,
+              "marginTop": 25,
+              "paddingLeft": 9,
+            },
+          ]
+        }
+      >
+        <TextInput
+          allowFontScaling={true}
+          enablesReturnKeyAutomatically={true}
+          onBlur={[Function]}
+          onChangeText={[Function]}
+          onFocus={[Function]}
+          placeholder="fullName"
+          placeholderTextColor="#D1D5D8"
+          rejectResponderTermination={true}
+          style={
+            Object {
+              "backgroundColor": "#FFFFFF",
+              "borderColor": "#D1D5D8",
+              "borderRadius": 3,
+              "flex": 1,
+              "fontFamily": "Hind-Regular",
+              "padding": 8,
+            }
+          }
+          testID="NameEntry"
+          underlineColorAndroid="transparent"
+          value="John Doe"
+        />
+      </View>
+      <View
+        style={
+          Array [
+            undefined,
+            Object {
+              "backgroundColor": "#FFFFFF",
+              "position": "relative",
+            },
+          ]
+        }
+      >
+        <View
+          style={
+            Array [
+              Object {
+                "flex": 1,
+              },
+              undefined,
+            ]
+          }
+        >
+          <View
+            style={
+              Array [
+                Object {
+                  "borderColor": "#b9b9b9",
+                  "borderRadius": 1,
+                  "borderWidth": 1,
+                  "marginBottom": 0,
+                },
+                Array [
+                  Object {
+                    "borderColor": "#D1D5D8",
+                    "borderRadius": 3,
+                    "borderWidth": 1,
+                  },
+                  Object {
+                    "height": 50,
+                  },
+                  Object {
+                    "marginTop": 1,
+                    "padding": 3,
+                  },
+                ],
+              ]
+            }
+          >
+            <View
+              style={
+                Array [
+                  Object {
+                    "alignItems": "center",
+                    "flex": 1,
+                    "flexDirection": "row",
+                    "justifyContent": "center",
+                  },
+                  Array [
+                    Object {
+                      "backgroundColor": "white",
+                      "height": 40,
+                      "paddingLeft": 3,
+                    },
+                    undefined,
+                  ],
+                ]
+              }
+            >
+              <TextInput
+                allowFontScaling={true}
+                autoCapitalize="none"
+                autoCorrect={false}
+                data={Array []}
+                defaultValue="Canadá"
+                flatListProps={Object {}}
+                inputContainerStyle={
+                  Array [
+                    Object {
+                      "borderColor": "#D1D5D8",
+                      "borderRadius": 3,
+                      "borderWidth": 1,
+                    },
+                    Object {
+                      "height": 50,
+                    },
+                    Object {
+                      "marginTop": 1,
+                      "padding": 3,
+                    },
+                  ]
+                }
+                keyExtractor={[Function]}
+                keyboardShouldPersistTaps="always"
+                listContainerStyle={
+                  Object {
+                    "flex": 1,
+                    "padding": 0,
+                    "position": "relative",
+                    "top": 3,
+                  }
+                }
+                listStyle={
+                  Array [
+                    Object {
+                      "borderColor": "#D1D5D8",
+                      "borderRadius": 3,
+                      "borderWidth": 1,
+                    },
+                    Object {
+                      "backgroundColor": "#FFFFFF",
+                      "borderColor": "#D1D5D8",
+                      "borderRadius": 3,
+                      "borderTopWidth": 1,
+                      "borderWidth": 1,
+                      "flex": 1,
+                      "marginHorizontal": 0,
+                      "paddingHorizontal": 0,
+                      "paddingVertical": 6,
+                    },
+                  ]
+                }
+                onBlur={[Function]}
+                onChangeText={[Function]}
+                onFocus={[Function]}
+                onStartShouldSetResponderCapture={[Function]}
+                placeholder="chooseCountry"
+                placeholderTextColor="#D1D5D8"
+                rejectResponderTermination={true}
+                renderItem={[Function]}
+                renderSeparator={null}
+                renderTextInput={[Function]}
+                style={
+                  Object {
+                    "backgroundColor": "#FFFFFF",
+                    "borderColor": "#D1D5D8",
+                    "borderRadius": 3,
+                    "flex": 1,
+                    "fontFamily": "Hind-Regular",
+                    "padding": 8,
+                  }
+                }
+                testID="CountryNameFieldTextInput"
+                underlineColorAndroid="transparent"
+                value="Canadá"
+              />
+            </View>
+          </View>
+          <View
+            onStartShouldSetResponderCapture={[Function]}
+            style={
+              Object {
+                "flex": 1,
+                "padding": 0,
+                "position": "relative",
+                "top": 3,
+              }
+            }
+          />
+        </View>
+        <View
+          style={
+            Array [
+              Object {
+                "alignItems": "center",
+                "flexDirection": "row",
+                "marginTop": 5,
+                "paddingVertical": 2,
+              },
+              Object {
+                "borderColor": "#D1D5D8",
+                "borderRadius": 3,
+                "borderWidth": 1,
+              },
+            ]
+          }
+        >
+          <Text
+            style={
+              Object {
+                "lineHeight": 35,
+                "textAlign": "center",
+                "width": 60,
+              }
+            }
+            testID="countryCodeText"
+          >
+            +1
+          </Text>
+          <View
+            style={
+              Object {
+                "borderColor": "#D1D5D8",
+                "borderRightWidth": 1,
+                "height": 35,
+              }
+            }
+          />
+          <View
+            style={
+              Array [
+                Object {
+                  "alignItems": "center",
+                  "flex": 1,
+                  "flexDirection": "row",
+                  "justifyContent": "center",
+                },
+                Array [
+                  Object {
+                    "height": 50,
+                  },
+                  Object {
+                    "flex": 1,
+                    "marginLeft": 9,
+                  },
+                ],
+              ]
+            }
+          >
+            <TextInput
+              allowFontScaling={true}
+              countryCallingCode="+1"
+              keyboardType="phone-pad"
+              onBlur={[Function]}
+              onChangeText={[Function]}
+              onFocus={[Function]}
+              placeholder="(000) 000-0000"
+              placeholderTextColor="#D1D5D8"
+              rejectResponderTermination={true}
+              style={
+                Object {
+                  "backgroundColor": "#FFFFFF",
+                  "borderColor": "#D1D5D8",
+                  "borderRadius": 3,
+                  "flex": 1,
+                  "fontFamily": "Hind-Regular",
+                  "padding": 8,
+                }
+              }
+              testID="PhoneNumberField"
+              underlineColorAndroid="transparent"
+              validator="phone"
+              value="(415) 555-6666"
+            />
+          </View>
+        </View>
+      </View>
+    </View>
+  </RCTScrollView>
+  <View
+    style={
+      Array [
+        Object {
+          "alignItems": "center",
+          "borderRadius": 3,
+          "flexDirection": "row",
+        },
+        null,
+        null,
+        undefined,
+        Object {
+          "backgroundColor": "#42D689",
+        },
+      ]
+    }
+  >
+    <View
+      accessible={true}
+      focusable={true}
+      nativeBackgroundAndroid={
+        Object {
+          "attribute": "selectableItemBackground",
+          "type": "ThemeAttrAndroid",
+        }
+      }
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        Array [
+          Object {
+            "alignItems": "center",
+            "flex": 1,
+            "justifyContent": "center",
+          },
+          Object {
+            "backgroundColor": "#42D689",
+          },
+          Object {
+            "height": 50,
+          },
+          Object {
+            "borderWidth": 0,
+          },
+        ]
+      }
+      testID="JoinCeloContinueButton"
+    >
+      <View
+        style={
+          Object {
+            "alignItems": "center",
+            "flex": 1,
+            "flexDirection": "row",
+            "justifyContent": "space-between",
+          }
+        }
+      >
+        <Text
+          style={
+            Array [
+              Object {
+                "fontFamily": "Hind-SemiBold",
+                "fontSize": 16,
+              },
+              Object {
+                "color": "#FFFFFF",
+              },
+              Object {
+                "paddingLeft": 5,
+                "paddingRight": 5,
+              },
+            ]
+          }
+        >
+          continue
+        </Text>
+      </View>
+    </View>
+  </View>
+</SafeAreaView>
+`;

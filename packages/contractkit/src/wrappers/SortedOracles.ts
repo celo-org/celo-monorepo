@@ -2,7 +2,7 @@ import { eqAddress } from '@celo/utils/lib/address'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import { Address, CeloContract, CeloToken, NULL_ADDRESS } from '../base'
-import { SortedOracles } from '../generated/types/SortedOracles'
+import { SortedOracles } from '../generated/SortedOracles'
 import {
   BaseWrapper,
   CeloTransactionObject,
@@ -28,6 +28,18 @@ export interface OracleRate {
   address: Address
   rate: BigNumber
   medianRelation: MedianRelation
+}
+
+export interface OracleTimestamp {
+  address: Address
+  timestamp: BigNumber
+  medianRelation: MedianRelation
+}
+
+export interface OracleReport {
+  address: Address
+  rate: BigNumber
+  timestamp: BigNumber
 }
 
 export interface MedianRate {
@@ -75,6 +87,15 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
   }
 
   /**
+   * Returns the list of whitelisted oracles for a given token.
+   * @returns The list of whitelisted oracles for a given token.
+   */
+  async getOracles(token: CeloToken): Promise<Address[]> {
+    const tokenAddress = await this.kit.registry.addressFor(token)
+    return this.contract.methods.getOracles(tokenAddress).call()
+  }
+
+  /**
    * Returns the report expiry parameter.
    * @returns Current report expiry.
    */
@@ -85,8 +106,39 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
   )
 
   /**
+   * Checks if the oldest report for a given token is expired
+   * @param token The token for which to check reports
+   */
+  async isOldestReportExpired(token: CeloToken): Promise<[boolean, Address]> {
+    const tokenAddress = await this.kit.registry.addressFor(token)
+    const response = await this.contract.methods.isOldestReportExpired(tokenAddress).call()
+    return response as [boolean, Address]
+  }
+
+  /**
+   * Removes expired reports, if any exist
+   * @param token The token to remove reports for
+   * @param numReports The upper-limit of reports to remove. For example, if there
+   * are 2 expired reports, and this param is 5, it will only remove the 2 that
+   * are expired.
+   */
+  async removeExpiredReports(
+    token: CeloToken,
+    numReports?: number
+  ): Promise<CeloTransactionObject<void>> {
+    const tokenAddress = await this.kit.registry.addressFor(token)
+    if (!numReports) {
+      numReports = (await this.getReports(token)).length - 1
+    }
+    return toTransactionObject(
+      this.kit,
+      this.contract.methods.removeExpiredReports(tokenAddress, numReports)
+    )
+  }
+
+  /**
    * Updates an oracle value and the median.
-   * @param token The address of the token for which the Celo Gold exchange rate is being reported.
+   * @param token The token for which the Celo Gold exchange rate is being reported.
    * @param value The amount of `token` equal to one Celo Gold.
    */
   async report(
@@ -155,6 +207,37 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
       })
     }
     return rates
+  }
+
+  /**
+   * Gets all elements from the doubly linked list.
+   * @param token The CeloToken representing the token for which the Celo
+   *   Gold exchange rate is being reported. Example: CeloContract.StableToken
+   * @return An unpacked list of elements from largest to smallest.
+   */
+  async getTimestamps(token: CeloToken): Promise<OracleTimestamp[]> {
+    const tokenAddress = await this.kit.registry.addressFor(token)
+    const response = await this.contract.methods.getTimestamps(tokenAddress).call()
+    const timestamps: OracleTimestamp[] = []
+    for (let i = 0; i < response[0].length; i++) {
+      const medRelIndex = parseInt(response[2][i], 10)
+      timestamps.push({
+        address: response[0][i],
+        timestamp: valueToBigNumber(response[1][i]),
+        medianRelation: medRelIndex,
+      })
+    }
+    return timestamps
+  }
+
+  async getReports(token: CeloToken): Promise<OracleReport[]> {
+    const [rates, timestamps] = await Promise.all([this.getRates(token), this.getTimestamps(token)])
+    const reports: OracleReport[] = []
+    for (const rate of rates) {
+      const match = timestamps.filter((t: OracleTimestamp) => eqAddress(t.address, rate.address))
+      reports.push({ address: rate.address, rate: rate.rate, timestamp: match[0].timestamp })
+    }
+    return reports
   }
 
   private async findLesserAndGreaterKeys(

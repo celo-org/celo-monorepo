@@ -100,11 +100,12 @@ spec:
             --wsorigins=* \
             --wsapi=eth,net,web3,debug \
             --networkid=${NETWORK_ID} \
-            --syncmode=ultralight \
+            --syncmode=lightest \
             --consoleformat=json \
             --consoleoutput=stdout \
             --verbosity={{ .Values.geth.verbosity }} \
-            --metrics
+            --metrics \
+            --allow-insecure-unlock
         env:
         - name: NETWORK_ID
           valueFrom:
@@ -146,8 +147,6 @@ spec:
           value: production
         - name: CELO_PROVIDER
           value: ws://localhost:8546
-        - name: APP_SIGNATURE
-          value: {{ .Values.attestation_service.sms_retriever_hash_code }}
         - name: SMS_PROVIDERS
           value: nexmo
         - name: LOG_FORMAT

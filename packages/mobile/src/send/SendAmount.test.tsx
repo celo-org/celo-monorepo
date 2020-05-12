@@ -1,5 +1,6 @@
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
+import * as RNLocalize from 'react-native-localize'
 import { fireEvent, render } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
@@ -8,14 +9,12 @@ import { fetchPhoneAddresses } from 'src/identity/actions'
 import { LocalCurrencyCode } from 'src/localCurrency/consts'
 import SendAmount, { SendAmount as SendAmountClass } from 'src/send/SendAmount'
 import { createMockStore, getMockI18nProps } from 'test/utils'
-import { mockAccount2, mockE164Number2, mockNavigation } from 'test/values'
+import { mockE164NumberToAddress, mockNavigation } from 'test/values'
 
 const AMOUNT_ZERO = '0.00'
 const AMOUNT_VALID = '4.93'
 const AMOUNT_TOO_MUCH = '106.98'
 const BALANCE_VALID = '23.85'
-
-const numeral = require('numeral')
 
 const storeData = {
   stableToken: { balance: BALANCE_VALID },
@@ -70,7 +69,7 @@ describe('SendAmount', () => {
             fetchPhoneAddresses={fetchPhoneAddresses}
             dollarBalance={'1'}
             estimateFeeDollars={new BigNumber(1)}
-            e164NumberToAddress={{ [mockE164Number2]: mockAccount2 }}
+            e164NumberToAddress={mockE164NumberToAddress}
             defaultCountryCode={'+1'}
             feeType={FeeType.SEND}
             localCurrencyCode={LocalCurrencyCode.MXN}
@@ -86,15 +85,11 @@ describe('SendAmount', () => {
   })
 
   describe('enter amount with balance', () => {
-    afterAll(() => {
-      numeral.locale('en')
-    })
-
     const store = createMockStore(storeData)
-    const getWrapper = (lng?: string) =>
+    const getWrapper = () =>
       render(
         <Provider store={store}>
-          <SendAmount navigation={mockNavigation} lng={lng} />
+          <SendAmount navigation={mockNavigation} />
         </Provider>
       )
 
@@ -105,18 +100,20 @@ describe('SendAmount', () => {
       expect(wrapper.queryAllByDisplayValue(AMOUNT_VALID)).toHaveLength(1)
     })
 
-    // TODO would need to modify react-i18next mock for this or rewrite test
-    // with raw class instead of wrapped class
-    it.skip('handles commas', () => {
-      numeral.locale('es')
-      const wrapper = getWrapper('es_419')
+    it('handles commas', () => {
+      ;(RNLocalize.getNumberFormatSettings as jest.Mock).mockReturnValue({
+        decimalSeparator: ',',
+      })
+      const wrapper = getWrapper()
       const input = wrapper.getByPlaceholder(AMOUNT_PLACEHOLDER)
       fireEvent.changeText(input, '4,0')
       expect(wrapper.queryAllByDisplayValue('4,0')).toHaveLength(1)
+      ;(RNLocalize.getNumberFormatSettings as jest.Mock).mockReturnValue({
+        decimalSeparator: '.',
+      })
     })
 
     it('handles decimals', () => {
-      numeral.locale('en')
       const wrapper = getWrapper()
       const input = wrapper.getByPlaceholder(AMOUNT_PLACEHOLDER)
       fireEvent.changeText(input, '4.0')
@@ -124,29 +121,49 @@ describe('SendAmount', () => {
     })
   })
 
-  describe('enter amount ', () => {
-    const store = createMockStore(storeData)
-    const getWrapper = () =>
-      render(
+  describe('enter amount', () => {
+    it('shows an error when tapping the send button with not enough balance', () => {
+      const store = createMockStore(storeData)
+      const wrapper = render(
         <Provider store={store}>
-          {/*
-          // @ts-ignore */}
           <SendAmount navigation={mockNavigation} />
         </Provider>
       )
 
-    it('is disabled with not enough balance', () => {
-      const wrapper = getWrapper()
       const input = wrapper.getByPlaceholder(AMOUNT_PLACEHOLDER)
       fireEvent.changeText(input, AMOUNT_TOO_MUCH)
-      expect(wrapper.queryAllByProps({ disabled: true }).length).toBeGreaterThan(0)
+
+      const sendButton = wrapper.getByTestId('Send')
+      expect(sendButton.props.disabled).toBe(false)
+
+      store.clearActions()
+      fireEvent.press(sendButton)
+      expect(store.getActions()).toEqual([
+        {
+          alertType: 'error',
+          buttonMessage: null,
+          dismissAfter: 5000,
+          message: 'needMoreFundsToSend',
+          title: null,
+          type: 'ALERT/SHOW',
+          underlyingError: 'needMoreFundsToSend',
+        },
+      ])
     })
 
-    it('is disabled with 0 as amount', () => {
-      const wrapper = getWrapper()
+    it('disables the send button with 0 as amount', () => {
+      const store = createMockStore(storeData)
+      const wrapper = render(
+        <Provider store={store}>
+          <SendAmount navigation={mockNavigation} />
+        </Provider>
+      )
+
       const input = wrapper.getByPlaceholder(AMOUNT_PLACEHOLDER)
       fireEvent.changeText(input, AMOUNT_ZERO)
-      expect(wrapper.queryAllByProps({ disabled: true }).length).toBeGreaterThan(0)
+
+      const sendButton = wrapper.getByTestId('Send')
+      expect(sendButton.props.disabled).toBe(true)
     })
   })
 

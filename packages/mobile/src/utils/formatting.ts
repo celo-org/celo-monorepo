@@ -3,10 +3,7 @@ import BigNumber from 'bignumber.js'
 import { CURRENCIES, CURRENCY_ENUM, WEI_PER_CELO } from 'src/geth/consts'
 import { LocalCurrencyCode, LocalCurrencySymbol } from 'src/localCurrency/consts'
 
-const numeral = require('numeral')
-
 // Returns a localized string that represents the number with the right decimal points.
-// The input value is parsed without consideration for the current numeral locale, i.e. it uses `.` for the decimal separator as JS usually does
 export const getMoneyDisplayValue = (
   value: BigNumber.Value,
   currency: CURRENCY_ENUM = CURRENCY_ENUM.DOLLAR,
@@ -15,9 +12,7 @@ export const getMoneyDisplayValue = (
 ): string => {
   const decimals = CURRENCIES[currency].displayDecimals
   const symbol = CURRENCIES[currency].symbol
-  const formattedValue = numeral(roundDown(value, decimals, roundingTolerance).toNumber()).format(
-    '0,0.' + '0'.repeat(decimals)
-  )
+  const formattedValue = roundDown(value, decimals, roundingTolerance).toFormat(decimals)
   return includeSymbol ? symbol + formattedValue : formattedValue
 }
 
@@ -28,23 +23,26 @@ export const getLocalCurrencyDisplayValue = (
   roundingTolerance: number = 1
 ): string => {
   const symbol = LocalCurrencySymbol[currency]
-  const formattedValue = numeral(roundDown(value, 2, roundingTolerance).toNumber()).format(
-    '0,0.' + '0'.repeat(2)
-  )
+  const formattedValue = roundDown(value, 2, roundingTolerance).toFormat(2)
   return includeSymbol ? symbol + formattedValue : formattedValue
 }
 
-// like getMoneyDisplayValue but only returns cents if they are sigificant
+// like getMoneyDisplayValue but only returns cents if they are significant
 export const getCentAwareMoneyDisplay = (value: BigNumber.Value): string => {
-  return numeral(roundDown(value).toNumber()).format('0,0[.]00')
+  const bigValue = new BigNumber(value)
+  return bigValue.isInteger() ? bigValue.toFixed(0) : roundDown(value).toFormat(2)
 }
 
-export const getExchangeRateDisplayValue = (value: BigNumber): string => {
-  return numeral(value.toNumber()).format('0[.][0000]')
+export const getExchangeRateDisplayValue = (value: BigNumber.Value): string => {
+  return new BigNumber(value).decimalPlaces(4).toFormat()
 }
 
 export const getFeeDisplayValue = (value: BigNumber.Value | null | undefined): string => {
-  return value ? numeral(BigNumber.max(value, 0.001).toNumber()).format('0[.][0000]') : ''
+  return value
+    ? BigNumber.max(value, 0.001)
+        .decimalPlaces(4)
+        .toFormat()
+    : ''
 }
 
 /**
@@ -59,11 +57,11 @@ export const getNetworkFeeDisplayValue = (
 ): string => {
   const roundedNumber = new BigNumber(value)
   if (precise && roundedNumber.isLessThan(0.000001)) {
-    return '<0.000001'
+    return `<${new BigNumber(0.000001).toFormat()}`
   } else if (roundedNumber.isLessThan(0.001)) {
-    return precise ? numeral(roundUp(value, 6).toNumber()).format('0[.][000000]') : '<0.001'
+    return precise ? roundUp(value, 6).toFormat() : `<${new BigNumber(0.001).toFormat()}`
   } else {
-    return numeral(roundUp(value, 3).toNumber()).format('0[.][000]')
+    return roundUp(value, 3).toFormat()
   }
 }
 

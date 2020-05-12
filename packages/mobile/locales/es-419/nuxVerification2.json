@@ -34,7 +34,7 @@
   "loading": {
     "verifyingNumber": "Verificando {{number}}",
     "keepOpen": "Deje abierta la aplicación",
-    "card1": "Verificar su número telefónico permite que sus amigos lo encuentren en la red de Celo.",
+    "card1": "Verificar tu cuenta te permite ver cuál de tus amigos usa Celo Wallet.",
     "card2": "Con Celo, puede enviar dinero a cualquier persona con tan solo el número telefónico.",
     "card3": "Celo ahora envía tres mensajes de texto para confirmar que es dueño de su propia línea telefónica."
   },
@@ -75,7 +75,7 @@
     "enterCodesBody": " Si ya recibió tres códigos por SMS, aún puede ingresarlos.",
     "enterCodesButton": "Ingresar códigos"
   },
-  "congratsVerified": "¡Felicitaciones se ha verificado tu suario!",
+  "congratsVerified": "¡Felicitaciones se ha verificado tu usuario!",
   "notification": {
     "title": "Verificar el Teléfono",
     "body": "La verificación le permite enviar y recibir con sus contactos telefónicos.",

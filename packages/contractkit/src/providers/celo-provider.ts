@@ -1,9 +1,11 @@
 import debugFactory from 'debug'
-import { Callback, JsonRPCRequest, JsonRPCResponse, Provider } from 'web3/providers'
-import { stopProvider } from '../utils/provider-utils'
+import { provider } from 'web3-core'
+import { Callback, JsonRpcPayload, JsonRpcResponse } from 'web3-core-helpers'
+import { hasProperty, stopProvider } from '../utils/provider-utils'
 import { DefaultRpcCaller, RpcCaller, rpcCallHandler } from '../utils/rpc-caller'
 import { TxParamsNormalizer } from '../utils/tx-params-normalizer'
-import { DefaultWallet, Wallet } from '../utils/wallet'
+import { LocalWallet } from '../wallets/local-wallet'
+import { Wallet } from '../wallets/wallet'
 
 const debug = debugFactory('kit:provider:connection')
 const debugPayload = debugFactory('kit:provider:payload')
@@ -18,20 +20,24 @@ enum InterceptedMethods {
   signTypedData = 'eth_signTypedData',
 }
 
-export class CeloProvider implements Provider {
-  private readonly wallet: Wallet
+export class CeloProvider {
   private readonly rpcCaller: RpcCaller
   private readonly paramsPopulator: TxParamsNormalizer
   private alreadyStopped: boolean = false
+  wallet: Wallet
 
-  constructor(readonly existingProvider: Provider) {
+  constructor(readonly existingProvider: provider, wallet: Wallet = new LocalWallet()) {
     this.rpcCaller = new DefaultRpcCaller(existingProvider)
     this.paramsPopulator = new TxParamsNormalizer(this.rpcCaller)
-    this.wallet = new DefaultWallet()
+    this.wallet = wallet
   }
 
   addAccount(privateKey: string) {
-    this.wallet.addAccount(privateKey)
+    if (hasProperty<{ addAccount: (privateKey: string) => void }>(this.wallet, 'addAccount')) {
+      this.wallet.addAccount(privateKey)
+    } else {
+      throw new Error("The wallet used, can't add accounts")
+    }
   }
 
   async getAccounts(): Promise<string[]> {
@@ -47,16 +53,16 @@ export class CeloProvider implements Provider {
   /**
    * Send method as expected by web3.js
    */
-  send(payload: JsonRPCRequest, callback: Callback<JsonRPCResponse>): void {
+  send(payload: JsonRpcPayload, callback: Callback<JsonRpcResponse>): void {
     let txParams: any
     let address: string
 
     debugPayload('%O', payload)
 
-    const decoratedCallback = ((error: Error, result: JsonRPCResponse) => {
+    const decoratedCallback = ((error: Error, result: JsonRpcResponse) => {
       debugResponse('%O', result)
       callback(error as any, result)
-    }) as Callback<JsonRPCResponse>
+    }) as Callback<JsonRpcResponse>
 
     if (this.alreadyStopped) {
       throw Error('CeloProvider already stopped')
@@ -137,41 +143,41 @@ export class CeloProvider implements Provider {
     }
   }
 
-  private async handleAccounts(_payload: JsonRPCRequest): Promise<any> {
+  private async handleAccounts(_payload: JsonRpcPayload): Promise<any> {
     return this.getAccounts()
   }
 
-  private async handleSignTypedData(payload: JsonRPCRequest): Promise<any> {
+  private async handleSignTypedData(payload: JsonRpcPayload): Promise<any> {
     const [address, typedData] = payload.params
     const signature = this.wallet.signTypedData(address, typedData)
     return signature
   }
 
-  private async handleSignPersonalMessage(payload: JsonRPCRequest): Promise<any> {
+  private async handleSignPersonalMessage(payload: JsonRpcPayload): Promise<any> {
     const address = payload.method === 'eth_sign' ? payload.params[0] : payload.params[1]
     const data = payload.method === 'eth_sign' ? payload.params[1] : payload.params[0]
     const ecSignatureHex = this.wallet.signPersonalMessage(address, data)
     return ecSignatureHex
   }
 
-  private async handleSignTransaction(payload: JsonRPCRequest): Promise<any> {
+  private async handleSignTransaction(payload: JsonRpcPayload): Promise<any> {
     const txParams = payload.params[0]
     const filledParams = await this.paramsPopulator.populate(txParams)
     const signedTx = await this.wallet.signTransaction(filledParams)
     return { raw: signedTx.raw, tx: txParams }
   }
 
-  private async handleSendTransaction(payload: JsonRPCRequest): Promise<any> {
+  private async handleSendTransaction(payload: JsonRpcPayload): Promise<any> {
     const signedTx = await this.handleSignTransaction(payload)
     const response = await this.rpcCaller.call('eth_sendRawTransaction', [signedTx.raw])
     return response.result
   }
 
-  private forwardSend(payload: JsonRPCRequest, callback: Callback<JsonRPCResponse>): void {
+  private forwardSend(payload: JsonRpcPayload, callback: Callback<JsonRpcResponse>): void {
     this.rpcCaller.send(payload, callback)
   }
 
-  private checkPayloadWithAtLeastNParams(payload: JsonRPCRequest, n: number) {
+  private checkPayloadWithAtLeastNParams(payload: JsonRpcPayload, n: number) {
     if (!payload.params || payload.params.length < n) {
       throw Error('Invalid params')
     }

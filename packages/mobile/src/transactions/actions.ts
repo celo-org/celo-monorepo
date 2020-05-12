@@ -6,7 +6,7 @@ import { Screens } from 'src/navigator/Screens'
 import { ConfirmationInput as SendConfirmationCardProps } from 'src/send/SendConfirmation'
 import { TransferConfirmationCardProps } from 'src/send/TransferConfirmationCard'
 import { StandbyTransaction } from 'src/transactions/reducer'
-import { web3 } from 'src/web3/contracts'
+import { web3ForUtils } from 'src/web3/contracts'
 
 export enum Actions {
   ADD_STANDBY_TRANSACTION = 'TRANSACTIONS/ADD_STANDBY_TRANSACTION',
@@ -48,7 +48,7 @@ export type ActionTypes =
   | AddHashToStandbyTransaction
 
 export const generateStandbyTransactionId = (recipientAddress: string) => {
-  return web3.utils.sha3(recipientAddress + String(Date.now()))
+  return web3ForUtils.utils.sha3(recipientAddress + String(Date.now()))
 }
 
 export const addStandbyTransaction = (transaction: StandbyTransaction): AddStandbyTransaction => ({

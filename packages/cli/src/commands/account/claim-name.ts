@@ -18,7 +18,7 @@ export default class ClaimName extends ClaimCommand {
   self = ClaimName
   async run() {
     const res = this.parse(ClaimName)
-    const metadata = this.readMetadata()
+    const metadata = await this.readMetadata()
     await this.addClaim(metadata, createNameClaim(res.flags.name))
     this.writeMetadata(metadata)
   }

@@ -1,5 +1,6 @@
 export enum ErrorMessages {
   TRANSACTION_FAILED = 'transactionFailed',
+  TRANSACTION_TIMEOUT = 'transactionTimeout',
   EXCHANGE_FAILED = 'exchangeFailed',
   INVALID_INVITATION = 'invalidInvite',
   INCORRECT_PIN = 'incorrectPin',
@@ -21,6 +22,9 @@ export enum ErrorMessages {
   REVEAL_ATTESTATION_FAILURE = 'nuxVerification2:revealAttestationFailure',
   VERIFICATION_FAILURE = 'nuxVerification2:verificationFailure',
   VERIFICATION_TIMEOUT = 'nuxVerification2:verificationTimeout',
+  ADDRESS_LOOKUP_FAILURE = 'addressLookupFailure',
+  SALT_FETCH_FAILURE = 'saltFetchFailure',
+  SALT_QUOTA_EXCEEDED = 'saltQuotaExceededError',
   INVALID_ACCOUNT = 'invalidAccount',
   CANT_SELECT_INVALID_PHONE = 'cantSelectInvalidPhone',
   CAN_NOT_REQUEST_FROM_UNVERIFIED = 'canNotRequestFromUnverified',

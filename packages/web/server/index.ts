@@ -12,14 +12,18 @@ import ecoFundSubmission from '../server/EcoFundApp'
 import Sentry, { initSentryServer } from '../server/sentry'
 import { RequestType } from '../src/fauceting/FaucetInterfaces'
 import nextI18next from '../src/i18n'
+import { create } from './Alliance'
 import latestAnnouncements from './Announcement'
-import getAssets from './AssetBase'
 import { faucetOrInviteController } from './controllers'
 import getFormattedEvents from './EventHelpers'
 import { submitFellowApp } from './FellowshipApp'
-import getContributors from './getContributors'
 import mailer from './mailer'
-import { getFormattedMediumArticles } from './mediumAPI'
+import rateLimit from './rateLimit'
+import respondError from './respondError'
+
+const CREATED = 201
+const NO_CONTENT = 204
+
 const port = parseInt(process.env.PORT, 10) || 3000
 
 const dev = process.env.NEXT_DEV === 'true'
@@ -65,16 +69,13 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
       res.redirect('/terms')
     })
   })
-  ;['/applications', '/technology', '/dev', '/devs', '/develop', '/developer'].forEach((path) => {
-    server.get(path, (_, res) => {
-      res.redirect('/developers')
-    })
-  })
-  ;['/build'].forEach((path) => {
-    server.get(path, (_, res) => {
-      res.redirect('/validators')
-    })
-  })
+  ;['/applications', '/technology', '/dev', '/devs', '/develop', '/build', '/developer'].forEach(
+    (path) => {
+      server.get(path, (_, res) => {
+        res.redirect('/developers')
+      })
+    }
+  )
   ;['/build/validators'].forEach((path) => {
     server.get(path, (_, res) => {
       res.redirect('/validators/explore')
@@ -84,10 +85,24 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
   server.get('/build/*', (req, res) => {
     res.redirect(`/developers/${req.params[0]}`)
   })
-  ;['/download', '/app', '/mobile-app', '/invite', 'build/download'].forEach((path) => {
+  ;['/app', '/test-wallet', '/mobile-app', 'build/download'].forEach((path) => {
     server.get(path, (_, res) => {
-      res.redirect('/build/wallet')
+      res.redirect('/developers/wallet')
     })
+  })
+
+  server.get('/papers/stability', (_, res) => {
+    res.redirect('/papers/Celo_Stability_Analysis.pdf')
+  })
+
+  server.get('/papers/cbdc-velocity', (_, res) => {
+    res.redirect('/papers/cLabs_CBDC_Velocity_v2_04-2020.pdf')
+  })
+
+  server.get('/papers/whitepaper', (_, res) => {
+    res.redirect(
+      '/papers/Celo_A_Multi_Asset_Cryptographic_Protocol_for_Decentralized_Social_Payments.pdf'
+    )
   })
 
   server.get('/brand', (_, res) => {
@@ -109,7 +124,7 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
   server.use(bodyParser.json())
   server.use(nextI18NextMiddleware(nextI18next))
 
-  server.post('/fellowship', async (req, res) => {
+  server.post('/fellowship', rateLimit, async (req, res) => {
     const { ideas, email, name, bio, deliverables, resume } = req.body
 
     try {
@@ -121,26 +136,26 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
         deliverables,
         resume,
       })
-      res.status(204).json({ id: fellow.id })
+      res.status(CREATED).json({ id: fellow.id })
     } catch (e) {
       Sentry.withScope((scope) => {
         scope.setTag('Service', 'Airtable')
-        Sentry.captureException(e)
+        Sentry.captureEvent({ message: e.message, extra: e })
       })
-      respondToError(res, e)
+      respondError(res, e)
     }
   })
 
-  server.post('/ecosystem/:table', async (req, res) => {
+  server.post('/ecosystem/:table', rateLimit, async (req, res) => {
     try {
       const record = await ecoFundSubmission(req.body, req.params.table as Tables)
-      res.status(204).json({ id: record.id })
+      res.status(CREATED).json({ id: record.id })
     } catch (e) {
       Sentry.withScope((scope) => {
         scope.setTag('Service', 'Airtable')
-        Sentry.captureEvent(e)
+        Sentry.captureEvent({ message: e.message, extra: e })
       })
-      respondToError(res, e)
+      respondError(res, e)
     }
   })
 
@@ -152,9 +167,13 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
     await faucetOrInviteController(req, res, RequestType.Invite)
   })
 
-  server.post('/contacts', async (req, res) => {
-    await addToCRM(req.body)
-    res.status(204).send('ok')
+  server.post('/contacts', rateLimit, async (req, res) => {
+    try {
+      await addToCRM(req.body)
+      res.status(NO_CONTENT).send('ok')
+    } catch (e) {
+      respondError(res, e)
+    }
   })
 
   server.get('/announcement', async (req, res) => {
@@ -162,46 +181,33 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
       const annoucements = await latestAnnouncements(req.ip)
       res.json(annoucements)
     } catch (e) {
-      respondToError(res, e)
+      respondError(res, e)
     }
   })
 
-  server.get('/api/contributors', async (_, res) => {
+  server.post('/api/alliance', rateLimit, async (req, res) => {
     try {
-      const assets = await getContributors()
-      res.json(assets)
+      await create(req.body)
+      res.sendStatus(CREATED)
     } catch (e) {
-      respondToError(res, e)
+      respondError(res, e)
     }
   })
 
-  server.get('/brand/api/assets/:asset', async (req, res) => {
-    try {
-      const assets = await getAssets(req.params.asset)
-      res.json(assets)
-    } catch (e) {
-      respondToError(res, e)
-    }
-  })
-
-  server.post('/partnerships-email', async (req, res) => {
+  server.post('/partnerships-email', rateLimit, async (req, res) => {
     const { email } = req.body
-    await mailer({
-      toName: 'Team Celo',
-      toEmail: 'partnerships@celo.org',
-      fromEmail: 'partnerships@celo.org',
-      subject: `New Partnership Email: ${email}`,
-      text: email,
-    })
-    res.status(204).send('ok')
-  })
-
-  server.get('/proxy/medium', async (_, res) => {
     try {
-      const articlesdata = await getFormattedMediumArticles()
-      res.json(articlesdata)
+      await mailer({
+        toName: 'Team Celo',
+        toEmail: 'partnerships@celo.org',
+        fromEmail: 'partnerships@celo.org',
+        subject: `New Partnership Email: ${email}`,
+        text: email,
+      })
+
+      res.status(NO_CONTENT).send('ok')
     } catch (e) {
-      respondToError(res, e)
+      respondError(res, e)
     }
   })
 
@@ -210,7 +216,7 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
       const events = await getFormattedEvents()
       res.json(events)
     } catch (e) {
-      respondToError(res, e)
+      respondError(res, e)
     }
   })
 
@@ -224,7 +230,3 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
   // tslint:disable-next-line
   console.log(`> Ready on http://localhost:${port}`)
 })()
-
-function respondToError(res: express.Response, error: { message: string; statusCode: number }) {
-  res.status(error.statusCode || 500).json({ message: error.message || 'unknownError' })
-}

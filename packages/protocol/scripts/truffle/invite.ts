@@ -8,7 +8,7 @@ import {
 import BigNumber from 'bignumber.js'
 import * as twilio from 'twilio'
 import { AttestationsInstance, EscrowInstance, GoldTokenInstance, StableTokenInstance } from 'types'
-import Web3 = require('web3')
+import Web3 from 'web3'
 
 const truffle = require('@celo/protocol/truffle-config.js')
 const twilioConfig = require('@celo/protocol/twilio-config')

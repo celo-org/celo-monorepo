@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Invite renders correctly with no recipients 1`] = `
-<SafeAreaView
+<View
   style={
     Object {
       "backgroundColor": "#FFFFFF",
@@ -165,6 +165,11 @@ exports[`Invite renders correctly with no recipients 1`] = `
         </View>
       }
       ListHeaderComponent={[Function]}
+      contentContainerStyle={
+        Object {
+          "paddingBottom": 0,
+        }
+      }
       data={Array []}
       disableVirtualization={false}
       getItem={[Function]}
@@ -182,11 +187,8 @@ exports[`Invite renders correctly with no recipients 1`] = `
       onScrollBeginDrag={[Function]}
       onScrollEndDrag={[Function]}
       renderItem={[Function]}
-      renderSectionHeader={[Function]}
       scrollEventThrottle={50}
-      sections={Array []}
       stickyHeaderIndices={Array []}
-      stickySectionHeadersEnabled={false}
       updateCellsBatchingPeriod={50}
       windowSize={21}
     >
@@ -230,11 +232,11 @@ exports[`Invite renders correctly with no recipients 1`] = `
       </View>
     </RCTScrollView>
   </View>
-</SafeAreaView>
+</View>
 `;
 
 exports[`Invite renders correctly with recipients 1`] = `
-<SafeAreaView
+<View
   style={
     Object {
       "backgroundColor": "#FFFFFF",
@@ -398,10 +400,31 @@ exports[`Invite renders correctly with recipients 1`] = `
         </View>
       }
       ListHeaderComponent={[Function]}
+      contentContainerStyle={
+        Object {
+          "paddingBottom": 0,
+        }
+      }
       data={
         Array [
           Object {
             "data": Array [
+              Object {
+                "contactId": "contactId",
+                "displayId": "21255550000",
+                "displayName": "George Bogart",
+                "e164PhoneNumber": "+21255550000",
+                "kind": "Contact",
+                "phoneNumberLabel": "phoneNumLabel",
+              },
+              Object {
+                "contactId": "contactId",
+                "displayId": "13105550000",
+                "displayName": "Jane Doe",
+                "e164PhoneNumber": "+13105550000",
+                "kind": "Contact",
+                "phoneNumberLabel": "phoneNumLabel",
+              },
               Object {
                 "contactId": "contactId",
                 "displayId": "14155550000",
@@ -431,27 +454,8 @@ exports[`Invite renders correctly with recipients 1`] = `
       onScrollBeginDrag={[Function]}
       onScrollEndDrag={[Function]}
       renderItem={[Function]}
-      renderSectionHeader={[Function]}
       scrollEventThrottle={50}
-      sections={
-        Array [
-          Object {
-            "data": Array [
-              Object {
-                "contactId": "contactId",
-                "displayId": "14155550000",
-                "displayName": "John Doe",
-                "e164PhoneNumber": "+14155550000",
-                "kind": "Contact",
-                "phoneNumberLabel": "phoneNumLabel",
-              },
-            ],
-            "key": "contacts",
-          },
-        ]
-      }
       stickyHeaderIndices={Array []}
-      stickySectionHeadersEnabled={false}
       updateCellsBatchingPeriod={50}
       windowSize={21}
     >
@@ -493,10 +497,285 @@ exports[`Invite renders correctly with recipients 1`] = `
           onLayout={[Function]}
           style={null}
         >
+          <View>
+            <View
+              accessible={true}
+              focusable={true}
+              onClick={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+            >
+              <View
+                style={
+                  Object {
+                    "alignItems": "center",
+                    "flex": 1,
+                    "flexDirection": "row",
+                    "height": 50,
+                    "justifyContent": "space-between",
+                    "paddingHorizontal": 10,
+                  }
+                }
+              >
+                <View
+                  style={
+                    Array [
+                      Object {
+                        "alignItems": "center",
+                        "flexDirection": "row",
+                        "justifyContent": "center",
+                      },
+                      Object {
+                        "marginRight": 10,
+                      },
+                    ]
+                  }
+                >
+                  <View
+                    style={
+                      Array [
+                        Object {
+                          "alignItems": "center",
+                          "justifyContent": "center",
+                        },
+                        Object {
+                          "backgroundColor": "#7AD6FE",
+                          "borderRadius": 20,
+                          "height": 40,
+                          "width": 40,
+                        },
+                      ]
+                    }
+                  >
+                    <Image
+                      source={
+                        Object {
+                          "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
+                        }
+                      }
+                      style={
+                        Object {
+                          "alignItems": "center",
+                          "height": 40,
+                          "justifyContent": "center",
+                          "width": 40,
+                        }
+                      }
+                    />
+                  </View>
+                </View>
+                <View
+                  style={
+                    Object {
+                      "flex": 1,
+                      "flexDirection": "row",
+                      "paddingRight": 5,
+                    }
+                  }
+                >
+                  <Text
+                    ellipsizeMode="tail"
+                    numberOfLines={1}
+                    style={
+                      Array [
+                        Object {
+                          "color": "#2E3338",
+                          "fontFamily": "Hind-SemiBold",
+                          "fontSize": 14,
+                          "lineHeight": 18,
+                        },
+                        Object {
+                          "lineHeight": 41,
+                        },
+                      ]
+                    }
+                  >
+                    George Bogart
+                  </Text>
+                </View>
+                <Text
+                  style={
+                    Array [
+                      Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Hind-SemiBold",
+                        "fontSize": 14,
+                        "lineHeight": 18,
+                      },
+                      Object {
+                        "fontFamily": "Hind-Light",
+                      },
+                      Object {
+                        "lineHeight": 41,
+                        "textAlign": "right",
+                      },
+                    ]
+                  }
+                >
+                  21255550000
+                </Text>
+              </View>
+            </View>
+            <View
+              style={
+                Object {
+                  "backgroundColor": "#EEEEEE",
+                  "height": 1,
+                  "marginLeft": 60,
+                }
+              }
+            />
+          </View>
+        </View>
+        <View
+          onLayout={[Function]}
+          style={null}
+        >
+          <View>
+            <View
+              accessible={true}
+              focusable={true}
+              onClick={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+            >
+              <View
+                style={
+                  Object {
+                    "alignItems": "center",
+                    "flex": 1,
+                    "flexDirection": "row",
+                    "height": 50,
+                    "justifyContent": "space-between",
+                    "paddingHorizontal": 10,
+                  }
+                }
+              >
+                <View
+                  style={
+                    Array [
+                      Object {
+                        "alignItems": "center",
+                        "flexDirection": "row",
+                        "justifyContent": "center",
+                      },
+                      Object {
+                        "marginRight": 10,
+                      },
+                    ]
+                  }
+                >
+                  <View
+                    style={
+                      Array [
+                        Object {
+                          "alignItems": "center",
+                          "justifyContent": "center",
+                        },
+                        Object {
+                          "backgroundColor": "#7AD6FE",
+                          "borderRadius": 20,
+                          "height": 40,
+                          "width": 40,
+                        },
+                      ]
+                    }
+                  >
+                    <Image
+                      source={
+                        Object {
+                          "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
+                        }
+                      }
+                      style={
+                        Object {
+                          "alignItems": "center",
+                          "height": 40,
+                          "justifyContent": "center",
+                          "width": 40,
+                        }
+                      }
+                    />
+                  </View>
+                </View>
+                <View
+                  style={
+                    Object {
+                      "flex": 1,
+                      "flexDirection": "row",
+                      "paddingRight": 5,
+                    }
+                  }
+                >
+                  <Text
+                    ellipsizeMode="tail"
+                    numberOfLines={1}
+                    style={
+                      Array [
+                        Object {
+                          "color": "#2E3338",
+                          "fontFamily": "Hind-SemiBold",
+                          "fontSize": 14,
+                          "lineHeight": 18,
+                        },
+                        Object {
+                          "lineHeight": 41,
+                        },
+                      ]
+                    }
+                  >
+                    Jane Doe
+                  </Text>
+                </View>
+                <Text
+                  style={
+                    Array [
+                      Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Hind-SemiBold",
+                        "fontSize": 14,
+                        "lineHeight": 18,
+                      },
+                      Object {
+                        "fontFamily": "Hind-Light",
+                      },
+                      Object {
+                        "lineHeight": 41,
+                        "textAlign": "right",
+                      },
+                    ]
+                  }
+                >
+                  13105550000
+                </Text>
+              </View>
+            </View>
+            <View
+              style={
+                Object {
+                  "backgroundColor": "#EEEEEE",
+                  "height": 1,
+                  "marginLeft": 60,
+                }
+              }
+            />
+          </View>
+        </View>
+        <View
+          onLayout={[Function]}
+          style={null}
+        >
           <View
             accessible={true}
             focusable={true}
-            isTVSelectable={true}
             onClick={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
@@ -504,7 +783,6 @@ exports[`Invite renders correctly with recipients 1`] = `
             onResponderTerminate={[Function]}
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
-            style={null}
           >
             <View
               style={
@@ -625,5 +903,5 @@ exports[`Invite renders correctly with recipients 1`] = `
       </View>
     </RCTScrollView>
   </View>
-</SafeAreaView>
+</View>
 `;

@@ -1,5 +1,5 @@
 import debugFactory from 'debug'
-import { CeloContract } from './base'
+import { CeloContract, ProxyContracts } from './base'
 import { newAccounts } from './generated/Accounts'
 import { newAttestations } from './generated/Attestations'
 import { newBlockchainParameters } from './generated/BlockchainParameters'
@@ -10,21 +10,25 @@ import { newEpochRewards } from './generated/EpochRewards'
 import { newEscrow } from './generated/Escrow'
 import { newExchange } from './generated/Exchange'
 import { newFeeCurrencyWhitelist } from './generated/FeeCurrencyWhitelist'
+import { newFreezer } from './generated/Freezer'
 import { newGasPriceMinimum } from './generated/GasPriceMinimum'
 import { newGoldToken } from './generated/GoldToken'
 import { newGovernance } from './generated/Governance'
 import { newLockedGold } from './generated/LockedGold'
+import { newMultiSig } from './generated/MultiSig'
+import { newProxy } from './generated/Proxy'
 import { newRandom } from './generated/Random'
 import { newRegistry } from './generated/Registry'
 import { newReserve } from './generated/Reserve'
 import { newSortedOracles } from './generated/SortedOracles'
 import { newStableToken } from './generated/StableToken'
+import { newTransferWhitelist } from './generated/TransferWhitelist'
 import { newValidators } from './generated/Validators'
 import { ContractKit } from './kit'
 
 const debug = debugFactory('kit:web3-contract-cache')
 
-const ContractFactories = {
+export const ContractFactories = {
   [CeloContract.Accounts]: newAccounts,
   [CeloContract.Attestations]: newAttestations,
   [CeloContract.BlockchainParameters]: newBlockchainParameters,
@@ -35,19 +39,22 @@ const ContractFactories = {
   [CeloContract.Escrow]: newEscrow,
   [CeloContract.Exchange]: newExchange,
   [CeloContract.FeeCurrencyWhitelist]: newFeeCurrencyWhitelist,
+  [CeloContract.Freezer]: newFreezer,
   [CeloContract.GasPriceMinimum]: newGasPriceMinimum,
   [CeloContract.GoldToken]: newGoldToken,
   [CeloContract.Governance]: newGovernance,
   [CeloContract.LockedGold]: newLockedGold,
+  [CeloContract.MultiSig]: newMultiSig,
   [CeloContract.Random]: newRandom,
   [CeloContract.Registry]: newRegistry,
   [CeloContract.Reserve]: newReserve,
   [CeloContract.SortedOracles]: newSortedOracles,
   [CeloContract.StableToken]: newStableToken,
+  [CeloContract.TransferWhitelist]: newTransferWhitelist,
   [CeloContract.Validators]: newValidators,
 }
 
-type CFType = typeof ContractFactories
+export type CFType = typeof ContractFactories
 type ContractCacheMap = { [K in keyof CFType]?: ReturnType<CFType[K]> }
 
 /**
@@ -92,6 +99,9 @@ export class Web3ContractCache {
   getFeeCurrencyWhitelist() {
     return this.getContract(CeloContract.FeeCurrencyWhitelist)
   }
+  getFreezer() {
+    return this.getContract(CeloContract.Freezer)
+  }
   getGasPriceMinimum() {
     return this.getContract(CeloContract.GasPriceMinimum)
   }
@@ -103,6 +113,9 @@ export class Web3ContractCache {
   }
   getLockedGold() {
     return this.getContract(CeloContract.LockedGold)
+  }
+  getMultiSig(address: string) {
+    return this.getContract(CeloContract.MultiSig, address)
   }
   getRandom() {
     return this.getContract(CeloContract.Random)
@@ -119,6 +132,9 @@ export class Web3ContractCache {
   getStableToken() {
     return this.getContract(CeloContract.StableToken)
   }
+  getTransferWhitelist() {
+    return this.getContract(CeloContract.TransferWhitelist)
+  }
   getValidators() {
     return this.getContract(CeloContract.Validators)
   }
@@ -126,14 +142,16 @@ export class Web3ContractCache {
   /**
    * Get native web3 contract wrapper
    */
-  async getContract<C extends keyof typeof ContractFactories>(contract: C) {
+  async getContract<C extends keyof typeof ContractFactories>(contract: C, address?: string) {
     if (this.cacheMap[contract] == null) {
       debug('Initiating contract %s', contract)
-      const createFn = ContractFactories[contract] as CFType[C]
+      const createFn = ProxyContracts.includes(contract)
+        ? newProxy
+        : (ContractFactories[contract] as CFType[C])
       // @ts-ignore: Too compplex union type
       this.cacheMap[contract] = createFn(
         this.kit.web3,
-        await this.kit.registry.addressFor(contract)
+        address ? address : await this.kit.registry.addressFor(contract)
       ) as NonNullable<ContractCacheMap[C]>
     }
     // we know it's defined (thus the !)

@@ -162,8 +162,28 @@ exports[`OutgoingPaymentRequestListScreen renders correctly with requests 1`] = 
                           "lineHeight": 18,
                         }
                       }
+                      testID="OutgoingPaymentRequestNotification/7363bvby2ba8270273/Title"
                     >
-                      outgoingPaymentRequestNotificationTitle
+                      Requested
+                       
+                      <Text
+                        numberOfLines={1}
+                        style={
+                          Array [
+                            undefined,
+                            Object {
+                              "color": undefined,
+                            },
+                          ]
+                        }
+                      >
+                        
+                        $
+                        26.60
+                      </Text>
+                       
+                      from 
+                      0x15280126303735b625
                     </Text>
                     <View
                       style={
@@ -197,7 +217,6 @@ exports[`OutgoingPaymentRequestListScreen renders correctly with requests 1`] = 
                         <View
                           accessible={true}
                           focusable={true}
-                          isTVSelectable={true}
                           nativeBackgroundAndroid={
                             Object {
                               "attribute": "selectableItemBackgroundBorderless",
@@ -211,6 +230,7 @@ exports[`OutgoingPaymentRequestListScreen renders correctly with requests 1`] = 
                           onResponderTerminate={[Function]}
                           onResponderTerminationRequest={[Function]}
                           onStartShouldSetResponder={[Function]}
+                          testID="OutgoingPaymentRequestNotification/7363bvby2ba8270273/global:remind/Button"
                         >
                           <Text
                             style={
@@ -233,7 +253,6 @@ exports[`OutgoingPaymentRequestListScreen renders correctly with requests 1`] = 
                         <View
                           accessible={true}
                           focusable={true}
-                          isTVSelectable={true}
                           nativeBackgroundAndroid={
                             Object {
                               "attribute": "selectableItemBackgroundBorderless",
@@ -247,6 +266,7 @@ exports[`OutgoingPaymentRequestListScreen renders correctly with requests 1`] = 
                           onResponderTerminate={[Function]}
                           onResponderTerminationRequest={[Function]}
                           onStartShouldSetResponder={[Function]}
+                          testID="OutgoingPaymentRequestNotification/7363bvby2ba8270273/global:cancel/Button"
                         >
                           <Text
                             style={
@@ -388,8 +408,28 @@ exports[`OutgoingPaymentRequestListScreen renders correctly with requests 1`] = 
                           "lineHeight": 18,
                         }
                       }
+                      testID="OutgoingPaymentRequestNotification/7363bvby2ba8270273/Title"
                     >
-                      outgoingPaymentRequestNotificationTitle
+                      Requested
+                       
+                      <Text
+                        numberOfLines={1}
+                        style={
+                          Array [
+                            undefined,
+                            Object {
+                              "color": undefined,
+                            },
+                          ]
+                        }
+                      >
+                        
+                        $
+                        135.66
+                      </Text>
+                       
+                      from 
+                      0x15280126303735b625
                     </Text>
                     <View
                       style={
@@ -423,7 +463,6 @@ exports[`OutgoingPaymentRequestListScreen renders correctly with requests 1`] = 
                         <View
                           accessible={true}
                           focusable={true}
-                          isTVSelectable={true}
                           nativeBackgroundAndroid={
                             Object {
                               "attribute": "selectableItemBackgroundBorderless",
@@ -437,6 +476,7 @@ exports[`OutgoingPaymentRequestListScreen renders correctly with requests 1`] = 
                           onResponderTerminate={[Function]}
                           onResponderTerminationRequest={[Function]}
                           onStartShouldSetResponder={[Function]}
+                          testID="OutgoingPaymentRequestNotification/7363bvby2ba8270273/global:remind/Button"
                         >
                           <Text
                             style={
@@ -459,7 +499,6 @@ exports[`OutgoingPaymentRequestListScreen renders correctly with requests 1`] = 
                         <View
                           accessible={true}
                           focusable={true}
-                          isTVSelectable={true}
                           nativeBackgroundAndroid={
                             Object {
                               "attribute": "selectableItemBackgroundBorderless",
@@ -473,6 +512,7 @@ exports[`OutgoingPaymentRequestListScreen renders correctly with requests 1`] = 
                           onResponderTerminate={[Function]}
                           onResponderTerminationRequest={[Function]}
                           onStartShouldSetResponder={[Function]}
+                          testID="OutgoingPaymentRequestNotification/7363bvby2ba8270273/global:cancel/Button"
                         >
                           <Text
                             style={
@@ -614,8 +654,28 @@ exports[`OutgoingPaymentRequestListScreen renders correctly with requests 1`] = 
                           "lineHeight": 18,
                         }
                       }
+                      testID="OutgoingPaymentRequestNotification/7363bvby2ba8270273/Title"
                     >
-                      outgoingPaymentRequestNotificationTitle
+                      Requested
+                       
+                      <Text
+                        numberOfLines={1}
+                        style={
+                          Array [
+                            undefined,
+                            Object {
+                              "color": undefined,
+                            },
+                          ]
+                        }
+                      >
+                        
+                        $
+                        1.33
+                      </Text>
+                       
+                      from 
+                      0x15280126303735b625
                     </Text>
                     <View
                       style={
@@ -649,7 +709,6 @@ exports[`OutgoingPaymentRequestListScreen renders correctly with requests 1`] = 
                         <View
                           accessible={true}
                           focusable={true}
-                          isTVSelectable={true}
                           nativeBackgroundAndroid={
                             Object {
                               "attribute": "selectableItemBackgroundBorderless",
@@ -663,6 +722,7 @@ exports[`OutgoingPaymentRequestListScreen renders correctly with requests 1`] = 
                           onResponderTerminate={[Function]}
                           onResponderTerminationRequest={[Function]}
                           onStartShouldSetResponder={[Function]}
+                          testID="OutgoingPaymentRequestNotification/7363bvby2ba8270273/global:remind/Button"
                         >
                           <Text
                             style={
@@ -685,7 +745,6 @@ exports[`OutgoingPaymentRequestListScreen renders correctly with requests 1`] = 
                         <View
                           accessible={true}
                           focusable={true}
-                          isTVSelectable={true}
                           nativeBackgroundAndroid={
                             Object {
                               "attribute": "selectableItemBackgroundBorderless",
@@ -699,6 +758,7 @@ exports[`OutgoingPaymentRequestListScreen renders correctly with requests 1`] = 
                           onResponderTerminate={[Function]}
                           onResponderTerminationRequest={[Function]}
                           onStartShouldSetResponder={[Function]}
+                          testID="OutgoingPaymentRequestNotification/7363bvby2ba8270273/global:cancel/Button"
                         >
                           <Text
                             style={

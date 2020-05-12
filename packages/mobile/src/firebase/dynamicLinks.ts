@@ -1,4 +1,4 @@
-import firebase from 'react-native-firebase'
+import dynamicLinks, { FirebaseDynamicLinksTypes } from '@react-native-firebase/dynamic-links'
 import Logger from 'src/utils/Logger'
 
 const TAG = 'firebase/dynamicLink'
@@ -13,21 +13,26 @@ export async function generateShortInviteLink({
   bundleId: string
 }): Promise<string> {
   try {
-    const firebaseLink = new firebase.links.DynamicLink(link, 'https://l.celo.org')
+    const dynamicLinkParams: FirebaseDynamicLinksTypes.DynamicLinkParameters = {
+      link,
+      domainUriPrefix: 'https://l.celo.org',
+    }
 
     if (bundleId) {
       // bundleId is the same as packageName for Android
-      firebaseLink.android.setPackageName(bundleId)
-      firebaseLink.ios.setBundleId(bundleId)
+      dynamicLinkParams.android = { packageName: bundleId }
+      dynamicLinkParams.ios = { bundleId }
+      if (appStoreId) {
+        dynamicLinkParams.ios.appStoreId = appStoreId
+      }
     }
 
-    if (appStoreId) {
-      firebaseLink.ios.setAppStoreId(appStoreId)
-    }
-
-    // Please note other parameter than UNGUESSABLE is unsafe
-    const shortUrl = await firebase.links().createShortDynamicLink(firebaseLink, 'UNGUESSABLE')
-
+    const shortUrl = await dynamicLinks().buildShortLink(
+      dynamicLinkParams,
+      // @ts-ignore Remove, when https://github.com/invertase/react-native-firebase/issues/3287 is resolved
+      // Please note other parameter than UNGUESSABLE is unsafe
+      'UNGUESSABLE'
+    )
     // It is NOT recommended to shorten this link with another
     // shortener (e.g. bit.ly) because it can break deep links
     return shortUrl

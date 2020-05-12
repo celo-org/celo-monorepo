@@ -21,6 +21,7 @@
 * [fetchBlockRange](_explorer_block_explorer_.blockexplorer.md#fetchblockrange)
 * [parseBlock](_explorer_block_explorer_.blockexplorer.md#parseblock)
 * [tryParseTx](_explorer_block_explorer_.blockexplorer.md#tryparsetx)
+* [tryParseTxInput](_explorer_block_explorer_.blockexplorer.md#tryparsetxinput)
 
 ## Constructors
 
@@ -28,7 +29,7 @@
 
 \+ **new BlockExplorer**(`kit`: [ContractKit](_kit_.contractkit.md), `contractDetails`: [ContractDetails](../interfaces/_explorer_base_.contractdetails.md)[]): *[BlockExplorer](_explorer_block_explorer_.blockexplorer.md)*
 
-*Defined in [contractkit/src/explorer/block-explorer.ts:35](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/explorer/block-explorer.ts#L35)*
+*Defined in [contractkit/src/explorer/block-explorer.ts:36](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/explorer/block-explorer.ts#L36)*
 
 **Parameters:**
 
@@ -45,7 +46,7 @@ Name | Type |
 
 • **contractDetails**: *[ContractDetails](../interfaces/_explorer_base_.contractdetails.md)[]*
 
-*Defined in [contractkit/src/explorer/block-explorer.ts:37](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/explorer/block-explorer.ts#L37)*
+*Defined in [contractkit/src/explorer/block-explorer.ts:38](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/explorer/block-explorer.ts#L38)*
 
 ## Methods
 
@@ -53,7 +54,7 @@ Name | Type |
 
 ▸ **fetchBlock**(`blockNumber`: number): *Promise‹Block›*
 
-*Defined in [contractkit/src/explorer/block-explorer.ts:57](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/explorer/block-explorer.ts#L57)*
+*Defined in [contractkit/src/explorer/block-explorer.ts:58](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/explorer/block-explorer.ts#L58)*
 
 **Parameters:**
 
@@ -69,7 +70,7 @@ ___
 
 ▸ **fetchBlockByHash**(`blockHash`: string): *Promise‹Block›*
 
-*Defined in [contractkit/src/explorer/block-explorer.ts:53](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/explorer/block-explorer.ts#L53)*
+*Defined in [contractkit/src/explorer/block-explorer.ts:54](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/explorer/block-explorer.ts#L54)*
 
 **Parameters:**
 
@@ -85,7 +86,7 @@ ___
 
 ▸ **fetchBlockRange**(`from`: number, `to`: number): *Promise‹Block[]›*
 
-*Defined in [contractkit/src/explorer/block-explorer.ts:61](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/explorer/block-explorer.ts#L61)*
+*Defined in [contractkit/src/explorer/block-explorer.ts:62](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/explorer/block-explorer.ts#L62)*
 
 **Parameters:**
 
@@ -102,7 +103,7 @@ ___
 
 ▸ **parseBlock**(`block`: Block): *[ParsedBlock](../interfaces/_explorer_block_explorer_.parsedblock.md)*
 
-*Defined in [contractkit/src/explorer/block-explorer.ts:69](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/explorer/block-explorer.ts#L69)*
+*Defined in [contractkit/src/explorer/block-explorer.ts:70](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/explorer/block-explorer.ts#L70)*
 
 **Parameters:**
 
@@ -118,7 +119,7 @@ ___
 
 ▸ **tryParseTx**(`tx`: Transaction): *null | [ParsedTx](../interfaces/_explorer_block_explorer_.parsedtx.md)*
 
-*Defined in [contractkit/src/explorer/block-explorer.ts:84](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/explorer/block-explorer.ts#L84)*
+*Defined in [contractkit/src/explorer/block-explorer.ts:87](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/explorer/block-explorer.ts#L87)*
 
 **Parameters:**
 
@@ -127,3 +128,20 @@ Name | Type |
 `tx` | Transaction |
 
 **Returns:** *null | [ParsedTx](../interfaces/_explorer_block_explorer_.parsedtx.md)*
+
+___
+
+###  tryParseTxInput
+
+▸ **tryParseTxInput**(`address`: string, `input`: string): *null | [CallDetails](../interfaces/_explorer_block_explorer_.calldetails.md)*
+
+*Defined in [contractkit/src/explorer/block-explorer.ts:99](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/explorer/block-explorer.ts#L99)*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`address` | string |
+`input` | string |
+
+**Returns:** *null | [CallDetails](../interfaces/_explorer_block_explorer_.calldetails.md)*

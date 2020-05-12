@@ -2,16 +2,31 @@
 # Each line is a file pattern followed by one or more owners.
 # For details on acceptable file patterns, please refer to the [Github Documentation](https://help.github.com/articles/about-codeowners/)
 
+# default owners, overridden by package specific owners below
+* @asaj @cmcewen @timmoreton
+
 # directory and file-level owners. Feel free to add to this!
 /packages/analytics/ @nambrot @timmoreton
+/packages/attestation-service/ @nambrot
+/packages/azure/ @codyborn
 /packages/blockchain-api/ @jmrossy @cmcewen
-/packages/cli/ @mcortesi @asaj
+/packages/celotool/ @asaj
+/packages/cli/ @mcortesi @gastonponti
+/packages/contractkit/ @mcortesi @gastonponti
+/packages/dappkit/ @nambrot
+/packages/devutils/ @mcortesi
+/packages/docs/ @timmoreton
+/packages/faucet/ @jmrossy
 /packages/helm-charts/ @nambrot @timmoreton
+/packages/leaderboard/ @mrsmkl
+/packages/metadata-crawler/ @aaitor
 /packages/mobile/ @cmcewen @jmrossy
+/packages/moonpay-auth/ @annakaz
 /packages/notification-service/ @annakaz @cmcewen
-/packages/protocol/ @asaj @m-chrzan
-/packages/react-components/ @cmcewen @jmrossy
-/packages/walletkit/ @ashishb @yerdua
+/packages/phone-number-privacy/ @jmrossy
+/packages/protocol/ @asaj @nategraf
+/packages/react-components/ @jmrossy @aaronmgdr
+/packages/terraform-modules-public/ @tkporter
 /packages/terraform-modules/ @tkporter
 /packages/transaction-metrics-exporter @nambrot
 /packages/typescript/ @cmcewen

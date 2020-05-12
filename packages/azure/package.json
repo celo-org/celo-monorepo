@@ -5,9 +5,9 @@
   "main": "index.js",
   "scripts": {
     "build-sh": "rm -rf build && mkdir -p build && ./build-sh validator && ./build-sh proxy && ./build-sh attester",
-    "build-json": "node build-json.js components/ > template.json",
+    "build-json": "npm run build-sh && node build-json.js components/ > mainTemplate.json",
     "build-docs": "node build-docs.js > README.md",
-    "build": "npm run build-sh && npm run build-json",
+    "build-app": "zip app.zip createUiDefinition.json mainTemplate.json",
     "test": "exit 0"
   },
   "keywords": [],

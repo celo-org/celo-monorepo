@@ -33,7 +33,6 @@ Array [
       <View
         accessible={true}
         focusable={true}
-        isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackground",
@@ -132,8 +131,26 @@ Array [
                   "lineHeight": 18,
                 }
               }
+              testID="IncomingPaymentRequestNotification/1/Title"
             >
-              incomingPaymentRequestNotificationTitle
+              5126608970
+               requested
+               
+              <Text
+                numberOfLines={1}
+                style={
+                  Array [
+                    undefined,
+                    Object {
+                      "color": undefined,
+                    },
+                  ]
+                }
+              >
+                
+                $
+                31.92
+              </Text>
             </Text>
             <View
               style={
@@ -167,7 +184,6 @@ Array [
                 <View
                   accessible={true}
                   focusable={true}
-                  isTVSelectable={true}
                   nativeBackgroundAndroid={
                     Object {
                       "attribute": "selectableItemBackgroundBorderless",
@@ -181,6 +197,7 @@ Array [
                   onResponderTerminate={[Function]}
                   onResponderTerminationRequest={[Function]}
                   onStartShouldSetResponder={[Function]}
+                  testID="IncomingPaymentRequestNotification/1/global:pay/Button"
                 >
                   <Text
                     style={
@@ -203,7 +220,6 @@ Array [
                 <View
                   accessible={true}
                   focusable={true}
-                  isTVSelectable={true}
                   nativeBackgroundAndroid={
                     Object {
                       "attribute": "selectableItemBackgroundBorderless",
@@ -217,6 +233,7 @@ Array [
                   onResponderTerminate={[Function]}
                   onResponderTerminationRequest={[Function]}
                   onStartShouldSetResponder={[Function]}
+                  testID="IncomingPaymentRequestNotification/1/global:decline/Button"
                 >
                   <Text
                     style={

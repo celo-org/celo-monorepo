@@ -9,6 +9,7 @@
 ### Properties
 
 * [attestations](_kit_.networkconfig.md#attestations)
+* [downtimeSlasher](_kit_.networkconfig.md#downtimeslasher)
 * [election](_kit_.networkconfig.md#election)
 * [exchange](_kit_.networkconfig.md#exchange)
 * [gasPriceMinimum](_kit_.networkconfig.md#gaspriceminimum)
@@ -25,7 +26,15 @@
 
 • **attestations**: *[AttestationsConfig](_wrappers_attestations_.attestationsconfig.md)*
 
-*Defined in [contractkit/src/kit.ts:54](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L54)*
+*Defined in [contractkit/src/kit.ts:64](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L64)*
+
+___
+
+###  downtimeSlasher
+
+• **downtimeSlasher**: *[DowntimeSlasherConfig](_wrappers_downtimeslasher_.downtimeslasherconfig.md)*
+
+*Defined in [contractkit/src/kit.ts:72](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L72)*
 
 ___
 
@@ -33,7 +42,7 @@ ___
 
 • **election**: *[ElectionConfig](_wrappers_election_.electionconfig.md)*
 
-*Defined in [contractkit/src/kit.ts:52](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L52)*
+*Defined in [contractkit/src/kit.ts:62](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L62)*
 
 ___
 
@@ -41,7 +50,7 @@ ___
 
 • **exchange**: *[ExchangeConfig](_wrappers_exchange_.exchangeconfig.md)*
 
-*Defined in [contractkit/src/kit.ts:53](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L53)*
+*Defined in [contractkit/src/kit.ts:63](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L63)*
 
 ___
 
@@ -49,7 +58,7 @@ ___
 
 • **gasPriceMinimum**: *[GasPriceMinimumConfig](_wrappers_gaspriceminimum_.gaspriceminimumconfig.md)*
 
-*Defined in [contractkit/src/kit.ts:58](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L58)*
+*Defined in [contractkit/src/kit.ts:68](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L68)*
 
 ___
 
@@ -57,7 +66,7 @@ ___
 
 • **governance**: *[GovernanceConfig](_wrappers_governance_.governanceconfig.md)*
 
-*Defined in [contractkit/src/kit.ts:55](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L55)*
+*Defined in [contractkit/src/kit.ts:65](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L65)*
 
 ___
 
@@ -65,7 +74,7 @@ ___
 
 • **lockedGold**: *[LockedGoldConfig](_wrappers_lockedgold_.lockedgoldconfig.md)*
 
-*Defined in [contractkit/src/kit.ts:56](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L56)*
+*Defined in [contractkit/src/kit.ts:66](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L66)*
 
 ___
 
@@ -73,7 +82,7 @@ ___
 
 • **reserve**: *[ReserveConfig](_wrappers_reserve_.reserveconfig.md)*
 
-*Defined in [contractkit/src/kit.ts:59](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L59)*
+*Defined in [contractkit/src/kit.ts:69](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L69)*
 
 ___
 
@@ -81,7 +90,7 @@ ___
 
 • **sortedOracles**: *[SortedOraclesConfig](_wrappers_sortedoracles_.sortedoraclesconfig.md)*
 
-*Defined in [contractkit/src/kit.ts:57](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L57)*
+*Defined in [contractkit/src/kit.ts:67](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L67)*
 
 ___
 
@@ -89,7 +98,7 @@ ___
 
 • **stableToken**: *[StableTokenConfig](_wrappers_stabletokenwrapper_.stabletokenconfig.md)*
 
-*Defined in [contractkit/src/kit.ts:60](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L60)*
+*Defined in [contractkit/src/kit.ts:70](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L70)*
 
 ___
 
@@ -97,4 +106,4 @@ ___
 
 • **validators**: *[ValidatorsConfig](_wrappers_validators_.validatorsconfig.md)*
 
-*Defined in [contractkit/src/kit.ts:61](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L61)*
+*Defined in [contractkit/src/kit.ts:71](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/kit.ts#L71)*

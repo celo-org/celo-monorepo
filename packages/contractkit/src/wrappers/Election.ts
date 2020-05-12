@@ -1,16 +1,15 @@
-import { eqAddress, normalizeAddress } from '@celo/utils/lib/address'
+import { eqAddress, findAddressIndex, normalizeAddress } from '@celo/utils/lib/address'
 import { concurrentMap, concurrentValuesMap } from '@celo/utils/lib/async'
 import { zip } from '@celo/utils/lib/collections'
 import BigNumber from 'bignumber.js'
 import { range } from 'lodash'
-import { EventLog } from 'web3/types'
+import { EventLog } from 'web3-core'
 import { Address, NULL_ADDRESS } from '../base'
-import { Election } from '../generated/types/Election'
-import { Validator, ValidatorGroup } from './Validators'
-
+import { Election } from '../generated/Election'
 import {
   BaseWrapper,
   CeloTransactionObject,
+  fixidityValueToBigNumber,
   identity,
   proxyCall,
   proxySend,
@@ -19,6 +18,7 @@ import {
   valueToBigNumber,
   valueToInt,
 } from './BaseWrapper'
+import { Validator, ValidatorGroup } from './Validators'
 
 export interface ValidatorGroupVote {
   address: Address
@@ -61,6 +61,8 @@ export interface ElectionConfig {
   electableValidators: ElectableValidators
   electabilityThreshold: BigNumber
   maxNumGroupsVotedFor: BigNumber
+  totalVotes: BigNumber
+  currentThreshold: BigNumber
 }
 
 /**
@@ -83,7 +85,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
   electabilityThreshold = proxyCall(
     this.contract.methods.getElectabilityThreshold,
     undefined,
-    valueToBigNumber
+    fixidityValueToBigNumber
   )
 
   /**
@@ -129,6 +131,12 @@ export class ElectionWrapper extends BaseWrapper<Election> {
   )
 
   /**
+   * Returns the total votes received across all groups.
+   * @return The total votes received across all groups.
+   */
+  getTotalVotes = proxyCall(this.contract.methods.getTotalVotes, undefined, valueToBigNumber)
+
+  /**
    * Returns the current validator signers using the precompiles.
    * @return List of current validator signers.
    */
@@ -154,7 +162,18 @@ export class ElectionWrapper extends BaseWrapper<Election> {
    * @return The list of elected validators.
    * @dev See https://en.wikipedia.org/wiki/D%27Hondt_method#Allocation for more information.
    */
-  electValidatorSigners = proxyCall(this.contract.methods.electValidatorSigners)
+  async electValidatorSigners(min?: number, max?: number): Promise<Address[]> {
+    if (min !== undefined || max !== undefined) {
+      const config = await this.getConfig()
+      const minArg = min === undefined ? config.electableValidators.min : min
+      const maxArg = max === undefined ? config.electableValidators.max : max
+      return this.contract.methods
+        .electNValidatorSigners(minArg.toString(10), maxArg.toString(10))
+        .call()
+    } else {
+      return this.contract.methods.electValidatorSigners().call()
+    }
+  }
 
   /**
    * Returns the total votes for `group`.
@@ -266,11 +285,14 @@ export class ElectionWrapper extends BaseWrapper<Election> {
       this.electableValidators(),
       this.electabilityThreshold(),
       this.contract.methods.maxNumGroupsVotedFor().call(),
+      this.getTotalVotes(),
     ])
     return {
       electableValidators: res[0],
       electabilityThreshold: res[1],
       maxNumGroupsVotedFor: valueToBigNumber(res[2]),
+      totalVotes: res[3],
+      currentThreshold: res[3].multipliedBy(res[1]),
     }
   }
 
@@ -318,7 +340,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     value: BigNumber
   ): Promise<CeloTransactionObject<boolean>> {
     const groups = await this.contract.methods.getGroupsVotedForByAccount(account).call()
-    const index = groups.indexOf(group)
+    const index = findAddressIndex(group, groups)
     const { lesser, greater } = await this.findLesserAndGreaterAfterVote(group, value.times(-1))
 
     return toTransactionObject(
@@ -333,7 +355,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     value: BigNumber
   ): Promise<CeloTransactionObject<boolean>> {
     const groups = await this.contract.methods.getGroupsVotedForByAccount(account).call()
-    const index = groups.indexOf(group)
+    const index = findAddressIndex(group, groups)
     const { lesser, greater } = await this.findLesserAndGreaterAfterVote(group, value.times(-1))
 
     return toTransactionObject(
@@ -404,33 +426,24 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     voteWeight: BigNumber
   ): Promise<{ lesser: Address; greater: Address }> {
     const currentVotes = await this.getEligibleValidatorGroupsVotes()
-
     const selectedGroup = currentVotes.find((votes) => eqAddress(votes.address, votedGroup))
+    const voteTotal = selectedGroup ? selectedGroup.votes.plus(voteWeight) : voteWeight
+    let greaterKey = NULL_ADDRESS
+    let lesserKey = NULL_ADDRESS
 
-    // modify the list
-    if (selectedGroup) {
-      selectedGroup.votes = selectedGroup.votes.plus(voteWeight)
-    } else {
-      currentVotes.push({
-        address: votedGroup,
-        name: '',
-        votes: voteWeight,
-        // Not used for the purposes of finding lesser and greater.
-        capacity: new BigNumber(0),
-        eligible: true,
-      })
+    // This leverages the fact that the currentVotes are already sorted from
+    // greatest to lowest value
+    for (const vote of currentVotes) {
+      if (!eqAddress(vote.address, votedGroup)) {
+        if (vote.votes.isLessThanOrEqualTo(voteTotal)) {
+          lesserKey = vote.address
+          break
+        }
+        greaterKey = vote.address
+      }
     }
 
-    // re-sort
-    currentVotes.sort((a, b) => a.votes.comparedTo(b.votes))
-
-    // find new index
-    const newIdx = currentVotes.findIndex((votes) => eqAddress(votes.address, votedGroup))
-
-    return {
-      lesser: newIdx === 0 ? NULL_ADDRESS : currentVotes[newIdx - 1].address,
-      greater: newIdx === currentVotes.length - 1 ? NULL_ADDRESS : currentVotes[newIdx + 1].address,
-    }
+    return { lesser: lesserKey, greater: greaterKey }
   }
 
   /**

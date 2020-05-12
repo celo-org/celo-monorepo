@@ -1,9 +1,10 @@
+import { CeloTransactionObject } from '@celo/contractkit'
 import { trimLeading0x } from '@celo/utils/src/address'
 import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
-import { getEscrowContract, getGoldTokenContract, getStableTokenContract } from '@celo/walletkit'
 import BigNumber from 'bignumber.js'
 import { Clipboard, Linking, Platform } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
+import { asyncRandomBytes } from 'react-native-secure-randombytes'
 import SendIntentAndroid from 'react-native-send-intent'
 import SendSMS from 'react-native-sms'
 import { call, delay, put, race, select, spawn, take, takeLeading } from 'redux-saga/effects'
@@ -11,16 +12,18 @@ import { showError, showMessage } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { ALERT_BANNER_DURATION } from 'src/config'
+import { ALERT_BANNER_DURATION, USE_PHONE_NUMBER_PRIVACY } from 'src/config'
 import { transferEscrowedPayment } from 'src/escrow/actions'
 import { calculateFee } from 'src/fees/saga'
 import { generateShortInviteLink } from 'src/firebase/dynamicLinks'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import i18n from 'src/i18n'
-import { denyImportContacts, setHasSeenVerificationNux } from 'src/identity/actions'
+import { setHasSeenVerificationNux, updateE164PhoneNumberAddresses } from 'src/identity/actions'
+import { fetchPhoneHashPrivate } from 'src/identity/privacy'
 import {
   Actions,
   InviteBy,
+  InviteDetails,
   RedeemInviteAction,
   redeemInviteFailure,
   redeemInviteSuccess,
@@ -32,15 +35,21 @@ import {
 } from 'src/invite/actions'
 import { createInviteCode } from 'src/invite/utils'
 import { navigateHome } from 'src/navigator/NavigationService'
-import { getSendTxGas } from 'src/send/saga'
+import { getSendFee, getSendTxGas } from 'src/send/saga'
 import { fetchDollarBalance, transferStableToken } from 'src/stableToken/actions'
-import { createTransaction, fetchTokenBalanceInWeiWithRetry } from 'src/tokens/saga'
+import { createTokenTransferTransaction, fetchTokenBalanceInWeiWithRetry } from 'src/tokens/saga'
 import { generateStandbyTransactionId } from 'src/transactions/actions'
 import { waitForTransactionWithId } from 'src/transactions/saga'
 import { sendTransaction } from 'src/transactions/send'
 import { getAppStoreId } from 'src/utils/appstore'
+import { divideByWei } from 'src/utils/formatting'
 import Logger from 'src/utils/Logger'
-import { addLocalAccount, web3 } from 'src/web3/contracts'
+import {
+  addLocalAccount,
+  getContractKit,
+  getContractKitOutsideGenerator,
+  web3ForUtils,
+} from 'src/web3/contracts'
 import { getConnectedUnlockedAccount, getOrCreateAccount, waitWeb3LastBlock } from 'src/web3/saga'
 import { fornoSelector } from 'src/web3/selectors'
 
@@ -51,25 +60,26 @@ const INVITE_FEE = '0.25'
 
 export async function getInviteTxGas(
   account: string,
-  contractGetter: typeof getStableTokenContract | typeof getGoldTokenContract,
-  amount: string,
+  currency: CURRENCY_ENUM,
+  amount: BigNumber.Value,
   comment: string
 ) {
-  const escrowContract = await getEscrowContract(web3)
-  return getSendTxGas(account, contractGetter, {
+  const contractKit = await getContractKitOutsideGenerator()
+  const escrowContract = await contractKit.contracts.getEscrow()
+  return getSendTxGas(account, currency, {
     amount,
     comment,
-    recipientAddress: escrowContract._address,
+    recipientAddress: escrowContract.address,
   })
 }
 
 export async function getInviteFee(
   account: string,
-  contractGetter: typeof getStableTokenContract | typeof getGoldTokenContract,
+  currency: CURRENCY_ENUM,
   amount: string,
   comment: string
 ) {
-  const gas = await getInviteTxGas(account, contractGetter, amount, comment)
+  const gas = await getInviteTxGas(account, currency, amount, comment)
   return (await calculateFee(gas)).plus(getInvitationVerificationFeeInWei())
 }
 
@@ -78,7 +88,7 @@ export function getInvitationVerificationFeeInDollars() {
 }
 
 export function getInvitationVerificationFeeInWei() {
-  return new BigNumber(web3.utils.toWei(INVITE_FEE))
+  return new BigNumber(web3ForUtils.utils.toWei(INVITE_FEE))
 }
 
 export async function generateInviteLink(inviteCode: string) {
@@ -102,7 +112,7 @@ export async function generateInviteLink(inviteCode: string) {
   return shortUrl
 }
 
-async function sendSms(toPhone: string, msg: string) {
+export async function sendSms(toPhone: string, msg: string) {
   return new Promise((resolve, reject) => {
     try {
       if (Platform.OS === 'android') {
@@ -110,6 +120,7 @@ async function sendSms(toPhone: string, msg: string) {
         resolve()
       } else {
         // react-native-sms types are incorrect
+        // react-native-sms doesn't seem to work on Xcode emulator but works on device
         // tslint:disable-next-line: no-floating-promises
         SendSMS.send(
           {
@@ -139,7 +150,11 @@ export function* sendInvite(
 ) {
   yield call(getConnectedUnlockedAccount)
   try {
-    const temporaryWalletAccount = web3.eth.accounts.create()
+    const contractKit = yield call(getContractKit)
+    const randomness = yield call(asyncRandomBytes, 64)
+    const temporaryWalletAccount = contractKit.web3.eth.accounts.create(
+      randomness.toString('ascii')
+    )
     const temporaryAddress = temporaryWalletAccount.address
     const inviteCode = createInviteCode(temporaryWalletAccount.privateKey)
 
@@ -152,8 +167,18 @@ export function* sendInvite(
       }
     )
 
+    const inviteDetails: InviteDetails = {
+      timestamp: Date.now(),
+      e164Number,
+      tempWalletAddress: temporaryAddress.toLowerCase(),
+      tempWalletPrivateKey: temporaryWalletAccount.privateKey,
+      tempWalletRedeemed: false, // no logic in place to toggle this yet
+      inviteCode,
+      inviteLink: link,
+    }
+
     // Store the Temp Address locally so we know which transactions were invites
-    yield put(storeInviteeData(temporaryAddress.toLowerCase(), inviteCode, e164Number))
+    yield put(storeInviteeData(inviteDetails))
 
     const txId = generateStandbyTransactionId(temporaryAddress)
 
@@ -171,21 +196,36 @@ export function* sendInvite(
 
     // If this invitation has a payment attached to it, send the payment to the escrow.
     if (currency === CURRENCY_ENUM.DOLLAR && amount) {
-      try {
-        const phoneHash = getPhoneHash(e164Number)
-        yield put(transferEscrowedPayment(phoneHash, amount, temporaryAddress))
-      } catch (e) {
-        Logger.error(TAG, 'Error sending payment to unverified user: ', e)
-        yield put(showError(ErrorMessages.ESCROW_TRANSFER_FAILED))
-      }
+      yield call(initiateEscrowTransfer, temporaryAddress, e164Number, amount)
     } else {
       Logger.error(TAG, 'Currently only dollar escrow payments are allowed')
     }
 
+    const addressToE164Number = { [temporaryAddress.toLowerCase()]: e164Number }
+    yield put(updateE164PhoneNumberAddresses({}, addressToE164Number))
     yield call(navigateToInviteMessageApp, e164Number, inviteMode, message)
   } catch (e) {
     Logger.error(TAG, 'Send invite error: ', e)
     throw e
+  }
+}
+
+function* initiateEscrowTransfer(temporaryAddress: string, e164Number: string, amount: BigNumber) {
+  const escrowTxId = generateStandbyTransactionId(temporaryAddress + '-escrow')
+  try {
+    let phoneHash: string
+    if (USE_PHONE_NUMBER_PRIVACY) {
+      const phoneHashDetails = yield call(fetchPhoneHashPrivate, e164Number)
+      phoneHash = phoneHashDetails.phoneHash
+    } else {
+      phoneHash = getPhoneHash(e164Number)
+    }
+    yield put(transferEscrowedPayment(phoneHash, amount, temporaryAddress, escrowTxId))
+    yield call(waitForTransactionWithId, escrowTxId)
+    Logger.debug(TAG + '@sendInviteSaga', 'Escrowed money to new wallet')
+  } catch (e) {
+    Logger.error(TAG, 'Error sending payment to unverified user: ', e)
+    yield put(showError(ErrorMessages.ESCROW_TRANSFER_FAILED))
   }
 }
 
@@ -260,7 +300,8 @@ export function* redeemInviteSaga({ inviteCode }: RedeemInviteAction) {
 
 export function* doRedeemInvite(inviteCode: string) {
   try {
-    const tempAccount = web3.eth.accounts.privateKeyToAccount(inviteCode).address
+    const contractKit = yield call(getContractKit)
+    const tempAccount = contractKit.web3.eth.accounts.privateKeyToAccount(inviteCode).address
     Logger.debug(TAG + '@doRedeemInvite', 'Invite code contains temp account', tempAccount)
     const tempAccountBalanceWei: BigNumber = yield call(
       fetchTokenBalanceInWeiWithRetry,
@@ -290,13 +331,9 @@ export function* doRedeemInvite(inviteCode: string) {
 
 export function* skipInvite() {
   yield take(Actions.SKIP_INVITE)
-  Logger.debug(TAG + '@skipInvite', 'Skip invite action taken')
+  Logger.debug(TAG + '@skipInvite', 'Skip invite action taken, creating account')
   try {
-    Logger.debug(TAG + '@skipInvite', 'Creating new account')
     yield call(getOrCreateAccount)
-    Logger.debug(TAG + '@skipInvite', 'Marking nux flows as complete')
-    // TODO(Rossy): Remove when import screen is removed
-    yield put(denyImportContacts())
     yield put(setHasSeenVerificationNux(true))
     Logger.debug(TAG + '@skipInvite', 'Done skipping invite')
     navigateHome()
@@ -309,20 +346,24 @@ export function* skipInvite() {
 function* addTempAccountToWallet(inviteCode: string) {
   Logger.debug(TAG + '@addTempAccountToWallet', 'Attempting to add temp wallet')
   try {
+    const contractKit = yield call(getContractKit)
     let tempAccount: string | null = null
     const fornoMode = yield select(fornoSelector)
     if (fornoMode) {
-      tempAccount = web3.eth.accounts.privateKeyToAccount(inviteCode).address
+      tempAccount = contractKit.web3.eth.accounts.privateKeyToAccount(inviteCode).address
       Logger.debug(
         TAG + '@redeemInviteCode',
         'web3 is connected:',
-        String(yield call(web3.eth.net.isListening))
+        String(yield call(contractKit.web3.eth.net.isListening))
       )
-      addLocalAccount(web3, inviteCode)
+      addLocalAccount(inviteCode)
     } else {
       // Import account into the local geth node
-      // @ts-ignore
-      tempAccount = yield call(web3.eth.personal.importRawKey, trimLeading0x(inviteCode), TEMP_PW)
+      tempAccount = yield call(
+        contractKit.web3.eth.personal.importRawKey,
+        trimLeading0x(inviteCode),
+        TEMP_PW
+      )
     }
     Logger.debug(TAG + '@addTempAccountToWallet', 'Account added', tempAccount!)
   } catch (e) {
@@ -342,21 +383,45 @@ export function* withdrawFundsFromTempAccount(
 ) {
   Logger.debug(TAG + '@withdrawFundsFromTempAccount', 'Unlocking temporary account')
   const fornoMode = yield select(fornoSelector)
+  const contractKit = yield call(getContractKit)
   if (!fornoMode) {
-    yield call(web3.eth.personal.unlockAccount, tempAccount, TEMP_PW, 600)
+    yield call(contractKit.web3.eth.personal.unlockAccount, tempAccount, TEMP_PW, 600)
   }
-  const tempAccountBalance = new BigNumber(web3.utils.fromWei(tempAccountBalanceWei.toString()))
 
-  Logger.debug(TAG + '@withdrawFundsFromTempAccount', 'Creating send transaction')
-  const tx = yield call(createTransaction, getStableTokenContract, {
+  Logger.debug(
+    TAG + '@withdrawFundsFromTempAccount',
+    `Temp account balance is ${tempAccountBalanceWei.toString()}. Calculating withdrawal fee`
+  )
+  const tempAccountBalance = divideByWei(tempAccountBalanceWei)
+  const sendTokenFeeInWei: BigNumber = yield call(getSendFee, tempAccount, CURRENCY_ENUM.DOLLAR, {
     recipientAddress: newAccount,
+    amount: tempAccountBalance,
     comment: SENTINEL_INVITE_COMMENT,
-    // TODO: appropriately withdraw the balance instead of using gas fees will be less than 1 cent
-    amount: tempAccountBalance.minus(0.01).toString(),
   })
+  // Inflate fee by 10% to harden against minor gas changes
+  const sendTokenFee = divideByWei(sendTokenFeeInWei).times(1.1)
 
-  Logger.debug(TAG + '@withdrawFundsFromTempAccount', 'Sending transaction')
-  yield call(sendTransaction, tx, tempAccount, TAG, 'Transfer from temp wallet')
+  if (sendTokenFee.isGreaterThanOrEqualTo(tempAccountBalance)) {
+    throw new Error('Fee is too large for amount in temp wallet')
+  }
+
+  const netSendAmount = tempAccountBalance.minus(sendTokenFee)
+  Logger.debug(
+    TAG + '@withdrawFundsFromTempAccount',
+    `Withdrawing net amount of ${netSendAmount.toString()}`
+  )
+
+  const tx: CeloTransactionObject<boolean> = yield call(
+    createTokenTransferTransaction,
+    CURRENCY_ENUM.DOLLAR,
+    {
+      recipientAddress: newAccount,
+      amount: netSendAmount,
+      comment: SENTINEL_INVITE_COMMENT,
+    }
+  )
+
+  yield call(sendTransaction, tx.txo, tempAccount, TAG, 'Transfer from temp wallet')
   Logger.debug(TAG + '@withdrawFundsFromTempAccount', 'Done withdrawal')
 }
 

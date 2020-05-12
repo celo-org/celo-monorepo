@@ -326,7 +326,6 @@ exports[`Testnet banner Renders when connected with backup complete 1`] = `
             "top": 15,
           }
         }
-        isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackgroundBorderless",
@@ -436,7 +435,6 @@ exports[`Testnet banner Renders when connected with backup complete 1`] = `
             "top": 15,
           }
         }
-        isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackgroundBorderless",
@@ -519,25 +517,12 @@ exports[`Testnet banner Renders when connected with backup complete 1`] = `
     }
     refreshing={false}
     renderItem={[Function]}
-    renderSectionHeader={[Function]}
     scrollEventThrottle={50}
-    sections={
-      Array [
-        Object {
-          "data": Array [
-            Object {},
-          ],
-          "renderItem": [Function],
-          "title": "activity",
-        },
-      ]
-    }
     stickyHeaderIndices={
       Array [
         1,
       ]
     }
-    stickySectionHeadersEnabled={true}
     style={
       Object {
         "backgroundColor": "#FFFFFF",
@@ -560,64 +545,7 @@ exports[`Testnet banner Renders when connected with backup complete 1`] = `
               "paddingVertical": 20,
             }
           }
-        >
-          <Text
-            style={
-              Object {
-                "color": "#2E3338",
-                "fontSize": 44,
-                "height": 48,
-                "lineHeight": 62,
-              }
-            }
-          >
-            <Text
-              style={
-                Object {
-                  "fontFamily": "Hind-SemiBold",
-                }
-              }
-            >
-              $
-            </Text>
-            <Text
-              style={
-                Object {
-                  "fontFamily": "Hind-SemiBold",
-                }
-              }
-            >
-              0.00
-            </Text>
-            <Text
-              style={
-                Object {
-                  "fontSize": 22,
-                }
-              }
-            >
-               
-              
-            </Text>
-          </Text>
-          <Text
-            style={
-              Object {
-                "color": "#B0B5B9",
-                "fontFamily": "Hind-Light",
-                "fontSize": 18,
-              }
-            }
-          >
-            <Text>
-              0.00
-               
-            </Text>
-            <Text>
-              global:celoDollars
-            </Text>
-          </Text>
-        </View>
+        />
       </View>
       <View
         onLayout={[Function]}
@@ -1014,7 +942,6 @@ exports[`Testnet banner Renders when disconnected 1`] = `
             "top": 15,
           }
         }
-        isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackgroundBorderless",
@@ -1124,7 +1051,6 @@ exports[`Testnet banner Renders when disconnected 1`] = `
             "top": 15,
           }
         }
-        isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackgroundBorderless",
@@ -1207,25 +1133,12 @@ exports[`Testnet banner Renders when disconnected 1`] = `
     }
     refreshing={false}
     renderItem={[Function]}
-    renderSectionHeader={[Function]}
     scrollEventThrottle={50}
-    sections={
-      Array [
-        Object {
-          "data": Array [
-            Object {},
-          ],
-          "renderItem": [Function],
-          "title": "activity",
-        },
-      ]
-    }
     stickyHeaderIndices={
       Array [
         1,
       ]
     }
-    stickySectionHeadersEnabled={true}
     style={
       Object {
         "backgroundColor": "#FFFFFF",
@@ -1248,64 +1161,7 @@ exports[`Testnet banner Renders when disconnected 1`] = `
               "paddingVertical": 20,
             }
           }
-        >
-          <Text
-            style={
-              Object {
-                "color": "#2E3338",
-                "fontSize": 44,
-                "height": 48,
-                "lineHeight": 62,
-              }
-            }
-          >
-            <Text
-              style={
-                Object {
-                  "fontFamily": "Hind-SemiBold",
-                }
-              }
-            >
-              $
-            </Text>
-            <Text
-              style={
-                Object {
-                  "fontFamily": "Hind-SemiBold",
-                }
-              }
-            >
-              0.00
-            </Text>
-            <Text
-              style={
-                Object {
-                  "fontSize": 22,
-                }
-              }
-            >
-               
-              
-            </Text>
-          </Text>
-          <Text
-            style={
-              Object {
-                "color": "#B0B5B9",
-                "fontFamily": "Hind-Light",
-                "fontSize": 18,
-              }
-            }
-          >
-            <Text>
-              0.00
-               
-            </Text>
-            <Text>
-              global:celoDollars
-            </Text>
-          </Text>
-        </View>
+        />
       </View>
       <View
         onLayout={[Function]}
@@ -1683,7 +1539,6 @@ exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
             "top": 15,
           }
         }
-        isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackgroundBorderless",
@@ -1793,7 +1648,6 @@ exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
             "top": 15,
           }
         }
-        isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackgroundBorderless",
@@ -1876,25 +1730,12 @@ exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
     }
     refreshing={false}
     renderItem={[Function]}
-    renderSectionHeader={[Function]}
     scrollEventThrottle={50}
-    sections={
-      Array [
-        Object {
-          "data": Array [
-            Object {},
-          ],
-          "renderItem": [Function],
-          "title": "activity",
-        },
-      ]
-    }
     stickyHeaderIndices={
       Array [
         1,
       ]
     }
-    stickySectionHeadersEnabled={true}
     style={
       Object {
         "backgroundColor": "#FFFFFF",
@@ -1917,64 +1758,7 @@ exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
               "paddingVertical": 20,
             }
           }
-        >
-          <Text
-            style={
-              Object {
-                "color": "#2E3338",
-                "fontSize": 44,
-                "height": 48,
-                "lineHeight": 62,
-              }
-            }
-          >
-            <Text
-              style={
-                Object {
-                  "fontFamily": "Hind-SemiBold",
-                }
-              }
-            >
-              $
-            </Text>
-            <Text
-              style={
-                Object {
-                  "fontFamily": "Hind-SemiBold",
-                }
-              }
-            >
-              0.00
-            </Text>
-            <Text
-              style={
-                Object {
-                  "fontSize": 22,
-                }
-              }
-            >
-               
-              
-            </Text>
-          </Text>
-          <Text
-            style={
-              Object {
-                "color": "#B0B5B9",
-                "fontFamily": "Hind-Light",
-                "fontSize": 18,
-              }
-            }
-          >
-            <Text>
-              0.00
-               
-            </Text>
-            <Text>
-              global:celoDollars
-            </Text>
-          </Text>
-        </View>
+        />
       </View>
       <View
         onLayout={[Function]}

@@ -14,7 +14,7 @@ const soliditySha3 = new (require('web3'))().utils.soliditySha3
 
 // tslint:disable-next-line: ordered-imports
 import BN = require('bn.js')
-import Web3 = require('web3')
+import Web3 from 'web3'
 
 const isNumber = (x: any) =>
   typeof x === 'number' || (BN as any).isBN(x) || BigNumber.isBigNumber(x)
@@ -38,23 +38,27 @@ export function assertContainSubset(superset: any, subset: any) {
 
 export async function jsonRpc(web3: Web3, method: string, params: any[] = []): Promise<any> {
   return new Promise((resolve, reject) => {
-    web3.currentProvider.send(
-      {
-        jsonrpc: '2.0',
-        method,
-        params,
-        // salt id generation, milliseconds might not be
-        // enough to generate unique ids
-        id: (new Date().getTime() * 100) + Math.floor(Math.random() * 100),
-      },
-      // @ts-ignore
-      (err: any, result: any) => {
-        if (err) {
-          return reject(err)
+    if (typeof web3.currentProvider !== 'string') {
+      web3.currentProvider.send(
+        {
+          jsonrpc: '2.0',
+          method,
+          params,
+          // salt id generation, milliseconds might not be
+          // enough to generate unique ids
+          id: new Date().getTime() + Math.floor(Math.random() * ( 1 + 100 - 1 )),
+        },
+        // @ts-ignore
+        (err: any, result: any) => {
+          if (err) {
+            return reject(err)
+          }
+          return resolve(result)
         }
-        return resolve(result.result)
-      }
-    )
+      )
+    } else {
+      reject(new Error('Invalid Provider'))
+    }
   })
 }
 
@@ -275,6 +279,19 @@ export function assertEqualBN(
   assert(
     web3.utils.toBN(actual).eq(web3.utils.toBN(expected)),
     `expected ${expected.toString(10)} and got ${actual.toString(10)}. ${msg || ''}`
+  )
+}
+
+export function assertAlmostEqualBN(
+  actual: number | BN | BigNumber,
+  expected: number | BN | BigNumber,
+  margin: number | BN | BigNumber,
+  msg?: string
+) {
+  const diff = web3.utils.toBN(actual).sub(web3.utils.toBN(expected)).abs()
+  assert(
+    web3.utils.toBN(margin).gte(diff),
+    `expected ${expected.toString(10)} to be within ${margin.toString(10)} of ${actual.toString(10)}. ${msg || ''}`
   )
 }
 
