@@ -57,7 +57,7 @@ import Send from 'src/send/Send'
 import SendAmount from 'src/send/SendAmount'
 import SendConfirmation from 'src/send/SendConfirmation'
 import SetClock from 'src/set-clock/SetClock'
-import TransactionReviewScreen from 'src/transactions/TransactionReviewScreen'
+import TransactionReview from 'src/transactions/TransactionReview'
 import VerificationEducationScreen from 'src/verify/VerificationEducationScreen'
 import VerificationInputScreen from 'src/verify/VerificationInputScreen'
 import VerificationInterstitialScreen from 'src/verify/VerificationInterstitialScreen'
@@ -322,7 +322,7 @@ const AppStack = createStackNavigatorStub(
     [Stacks.SettingsStack]: { screen: SettingsStack },
     [Screens.SetClock]: { screen: SetClock },
     [Screens.DollarEducation]: { screen: DollarEducation },
-    [Screens.TransactionReview]: { screen: TransactionReviewScreen },
+    [Screens.TransactionReview]: { screen: TransactionReview },
     [Screens.PhotosEducation]: { screen: PhotosEducation },
     [Screens.GoldEducation]: { screen: GoldEducation },
     [Screens.FeeEducation]: { screen: FeeEducation },

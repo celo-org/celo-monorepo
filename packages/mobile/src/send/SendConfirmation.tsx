@@ -2,13 +2,13 @@ import ReviewFrame from '@celo/react-components/components/ReviewFrame'
 import ReviewHeader from '@celo/react-components/components/ReviewHeader'
 import colors from '@celo/react-components/styles/colors'
 import { CURRENCY_ENUM } from '@celo/utils/src/currencies'
+import { RouteProp } from '@react-navigation/native'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { ActivityIndicator, StyleSheet, View } from 'react-native'
 import Modal from 'react-native-modal'
 import SafeAreaView from 'react-native-safe-area-view'
-import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
@@ -25,6 +25,8 @@ import { completePaymentRequest, declinePaymentRequest } from 'src/firebase/acti
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import { InviteBy } from 'src/invite/actions'
 import { navigateBack } from 'src/navigator/NavigationService'
+import { Screens } from 'src/navigator/Screens'
+import { StackParamList } from 'src/navigator/types'
 import { Recipient } from 'src/recipients/recipient'
 import { RootState } from 'src/redux/reducers'
 import { isAppConnected } from 'src/redux/selectors'
@@ -81,7 +83,11 @@ interface State {
   buttonReset: boolean
 }
 
-type Props = NavigationInjectedProps & DispatchProps & StateProps & WithTranslation
+type Props = DispatchProps &
+  StateProps &
+  WithTranslation & {
+    route: RouteProp<StackParamList, Screens.SendConfirmation>
+  }
 
 class SendConfirmation extends React.Component<Props, State> {
   static navigationOptions = { header: null }
@@ -96,12 +102,12 @@ class SendConfirmation extends React.Component<Props, State> {
   }
 
   getNavParams = () => {
-    return this.props.navigation.state.params || {}
+    return this.props.route.params
   }
 
   getConfirmationInput(): ConfirmationInput {
-    const confirmationInput = this.props.navigation.getParam('confirmationInput', '')
-    if (confirmationInput === '') {
+    const confirmationInput = this.props.route.params.confirmationInput
+    if (!confirmationInput) {
       throw new Error('Confirmation input missing')
     }
     confirmationInput.amount = new BigNumber(confirmationInput.amount)

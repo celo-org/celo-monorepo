@@ -1,15 +1,16 @@
 import ReviewFrame from '@celo/react-components/components/ReviewFrame'
 import ReviewHeader from '@celo/react-components/components/ReviewHeader'
+import { RouteProp } from '@react-navigation/native'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { StyleSheet } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
-import { NavigationInjectedProps } from 'react-navigation'
 import { TokenTransactionType } from 'src/apollo/types'
 import ExchangeConfirmationCard from 'src/exchange/ExchangeConfirmationCard'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { navigate, navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { StackParamList } from 'src/navigator/types'
 import TransferConfirmationCard from 'src/send/TransferConfirmationCard'
 import { getDatetimeDisplayString } from 'src/utils/time'
 
@@ -24,9 +25,11 @@ export interface ReviewProps {
   header: string
 }
 
-type Props = NavigationInjectedProps<NavigationPropsWrapper> & WithTranslation
+type Props = WithTranslation & {
+  route: RouteProp<StackParamList, Screens.TransactionReview>
+}
 
-class TransactionReviewScreen extends React.PureComponent<Props> {
+class TransactionReview extends React.PureComponent<Props> {
   static navigationOptions = { header: null }
 
   navigateToMain = () => {
@@ -34,7 +37,7 @@ class TransactionReviewScreen extends React.PureComponent<Props> {
   }
 
   getNavigationProps = (): ReviewProps => {
-    const { type, timestamp, header } = this.props.navigation.getParam('reviewProps')
+    const { type, timestamp, header } = this.props.route.params.reviewProps
 
     if (type === undefined || timestamp === undefined) {
       throw new Error('Missing review props')
@@ -47,8 +50,8 @@ class TransactionReviewScreen extends React.PureComponent<Props> {
     }
   }
 
-  getConfirmationProps = (): any => {
-    const confirmationProps = this.props.navigation.getParam('confirmationProps')
+  getConfirmationProps = () => {
+    const confirmationProps = this.props.route.params.confirmationProps
 
     if (confirmationProps === undefined) {
       throw new Error('Missing confirmation props')
@@ -93,4 +96,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default withTranslation(Namespaces.global)(TransactionReviewScreen)
+export default withTranslation(Namespaces.global)(TransactionReview)
