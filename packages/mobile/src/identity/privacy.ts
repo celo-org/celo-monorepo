@@ -3,7 +3,7 @@ import crypto from 'crypto'
 import BlindThresholdBls from 'react-native-blind-threshold-bls'
 import { call, put, select } from 'redux-saga/effects'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { PHONE_NUM_PRIVACY_PUBLIC_KEY, PHONE_NUM_PRIVACY_SERVICE } from 'src/config'
+import networkConfig from 'src/geth/networkConfig'
 import { updateE164PhoneNumberSalts } from 'src/identity/actions'
 import { e164NumberToSaltSelector, E164NumberToSaltType } from 'src/identity/reducer'
 import Logger from 'src/utils/Logger'
@@ -77,10 +77,8 @@ async function getPhoneNumberSalt(e164Number: string, account: string) {
   const base64BlindedMessage = await BlindThresholdBls.blindMessage(e164Number)
   const base64BlindSig = await postToSignMessage(base64BlindedMessage, account)
   Logger.debug(`${TAG}@getPhoneNumberSalt`, 'Retrieving unblinded signature')
-  const base64UnblindedSig = await BlindThresholdBls.unblindMessage(
-    base64BlindSig,
-    PHONE_NUM_PRIVACY_PUBLIC_KEY
-  )
+  const { pgpnpPubKey } = networkConfig
+  const base64UnblindedSig = await BlindThresholdBls.unblindMessage(base64BlindSig, pgpnpPubKey)
   Logger.debug(`${TAG}@getPhoneNumberSalt`, 'Converting sig to salt')
   return getSaltFromThresholdSignature(base64UnblindedSig)
 }
@@ -94,7 +92,8 @@ interface SignMessageResponse {
 // get back the theshold signed blinded message
 async function postToSignMessage(base64BlindedMessage: string, account: string) {
   Logger.debug(`${TAG}@postToSignMessage`, `Posting to ${SIGN_MESSAGE_ENDPOINT}`)
-  const res = await fetch(PHONE_NUM_PRIVACY_SERVICE + SIGN_MESSAGE_ENDPOINT, {
+  const { pgpnpUrl } = networkConfig
+  const res = await fetch(pgpnpUrl + SIGN_MESSAGE_ENDPOINT, {
     method: 'POST',
     headers: {
       Accept: 'application/json',
