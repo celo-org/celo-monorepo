@@ -1,5 +1,6 @@
 import { DEFAULT_SYNC_MODE, DEFAULT_TESTNET, FORNO_ENABLED_INITIALLY } from 'src/config'
 import { GethSyncMode } from 'src/geth/consts'
+import Logger from 'src/utils/Logger'
 
 export enum Testnets {
   integration = 'integration',
@@ -62,5 +63,7 @@ const networkConfigs: { [testnet: string]: NetworkConfig } = {
     blockchainApiUrl: 'https://baklava-dot-celo-testnet-production.appspot.com/',
   },
 }
+
+Logger.info('Connecting to testnet: ', DEFAULT_TESTNET)
 
 export default networkConfigs[DEFAULT_TESTNET]
