@@ -13,7 +13,7 @@ export const sidecarImageTag = '0.7.3'
 export const prometheusImageTag = 'v2.17.0'
 
 export async function installPrometheus() {
-  await createNamespaceIfNotExists('prometheus')
+  await createNamespaceIfNotExists(kubeNamespace)
   return installGenericHelmChart(kubeNamespace, releaseName, helmChartPath, await helmParameters())
 }
 
@@ -22,7 +22,7 @@ export async function removeHelmRelease() {
 }
 
 export function helmParameters() {
-  const kubeClusterName = fetchEnv(envVar.AZURE_KUBERNETES_CLUSTER_NAME)
+  const kubeClusterName = fetchEnv(envVar.KUBERNETES_CLUSTER_NAME)
   return [
     `--set namespace=${kubeNamespace}`,
     `--set cluster=${kubeClusterName}`,
