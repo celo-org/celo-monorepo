@@ -834,7 +834,7 @@ jobs:
         command: |
           set -e
           cd packages/celotool/bin
-          NAMESPACE="circle-${CIRCLE_WORKFLOW_ID}"
+          NAMESPACE="circle-${CIRCLE_BUILD_NUM}"
           echo "Namespace: ${NAMESPACE}"
           kubectl create namespace ${NAMESPACE}
           kubectl config set-context --current --namespace ${NAMESPACE} >/dev/null
