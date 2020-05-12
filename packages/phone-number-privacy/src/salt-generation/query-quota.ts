@@ -23,16 +23,24 @@ export async function getRemainingQueryCount(account: string, hashedPhoneNumber?
  * If the caller is not verified, they must have a minimum balance to get the unverifiedQueryMax.
  */
 async function getQueryQuota(account: string, hashedPhoneNumber?: string) {
-  let queryQuota = 0
   if (hashedPhoneNumber && (await isVerified(account, hashedPhoneNumber))) {
-    queryQuota += config.salt.unverifiedQueryMax
-    queryQuota += config.salt.additionalVerifiedQueryMax
+    logger.debug('Account is verified')
     const transactionCount = await getTransactionCountFromAccount(account)
-    queryQuota += config.salt.queryPerTransaction * transactionCount
-  } else if ((await getDollarBalance(account)) > config.salt.minDollarBalance) {
-    queryQuota += config.salt.unverifiedQueryMax
+    return (
+      config.salt.unverifiedQueryMax +
+      config.salt.additionalVerifiedQueryMax +
+      config.salt.queryPerTransaction * transactionCount
+    )
   }
-  return queryQuota
+
+  const accountBalance = await getDollarBalance(account)
+  if (accountBalance.isGreaterThanOrEqualTo(config.salt.minDollarBalance)) {
+    logger.debug('Account is not verified but meets min balance')
+    return config.salt.unverifiedQueryMax
+  }
+
+  logger.debug('Account does not meet query quota criteria')
+  return 0
 }
 
 async function getTransactionCountFromAccount(account: string): Promise<number> {

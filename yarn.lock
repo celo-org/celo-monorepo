@@ -26531,19 +26531,19 @@ react-native-autocomplete-input@^4.1.0:
   resolved "https://registry.yarnpkg.com/react-native-autocomplete-input/-/react-native-autocomplete-input-4.1.0.tgz#979ece28d891b245ecb967b6d31f1f924445b8ab"
   integrity sha512-Yn4GulZ9F6tde74UUGZHdVFeYWVuL7+EbUZy6kt+QHrzMc5B4OuRop1FT4RyWLpvbySW/vvqYgj9LAmlzkuEqA==
 
-"react-native-bip39@git://github.com/celo-org/react-native-bip39#0439f00":
+"react-native-bip39@https://github.com/celo-org/react-native-bip39#a5dd436":
   version "2.2.0"
-  resolved "git://github.com/celo-org/react-native-bip39#0439f002bea13ff77b1a05a5ebce38645f646016"
+  resolved "https://github.com/celo-org/react-native-bip39#a5dd4367717f2193dfdaad8ddd70087d6bcf8b5f"
   dependencies:
     create-hash "^1.1.0"
     react-native-crypto "^2.0.1"
-    react-native-fast-crypto "git+https://github.com/celo-org/react-native-fast-crypto#3946f9"
+    react-native-fast-crypto "https://github.com/celo-org/react-native-fast-crypto#df1c171"
     react-native-secure-randombytes "^2.2.3"
     unorm "^1.3.3"
 
-"react-native-blind-threshold-bls@https://github.com/celo-org/react-native-blind-threshold-bls#cc36392":
+"react-native-blind-threshold-bls@https://github.com/celo-org/react-native-blind-threshold-bls#433c2c6":
   version "1.0.0"
-  resolved "https://github.com/celo-org/react-native-blind-threshold-bls#cc3639286a29a1fc2ac85a8554061a01680725a0"
+  resolved "https://github.com/celo-org/react-native-blind-threshold-bls#433c2c64780deae23e09986de04ec33b52a747f5"
 
 react-native-camera@^3.23.1:
   version "3.23.1"
@@ -26606,9 +26606,9 @@ react-native-exit-app@^1.1.0:
   resolved "https://registry.yarnpkg.com/react-native-exit-app/-/react-native-exit-app-1.1.0.tgz#5ec082152974240e2d6a93f1608efb49a4385f21"
   integrity sha512-Spne19zfMfJvnUTX909EHUqWMk69rATtLJq9XMBGpNSHhx0M7v5yetx2Z87egBhLOqQm+CWfD/oxWzDG8rbIQA==
 
-"react-native-fast-crypto@git+https://github.com/celo-org/react-native-fast-crypto#3946f9":
+"react-native-fast-crypto@https://github.com/celo-org/react-native-fast-crypto#df1c171":
   version "1.8.3"
-  resolved "git+https://github.com/celo-org/react-native-fast-crypto#3946f918ff314455a6d55fdb49ecc0f1f5bc2ac2"
+  resolved "https://github.com/celo-org/react-native-fast-crypto#df1c171d5383b56199dc2ee0c59db4bfe622172b"
   dependencies:
     buffer "^5.0.8"
     rfc4648 "^1.0.0"

@@ -1,7 +1,6 @@
 import { ContractKit } from '@celo/contractkit'
 import { getPhoneHash, isE164Number, PhoneNumberUtils } from '@celo/utils/src/phoneNumbers'
 import crypto from 'crypto'
-import { Platform } from 'react-native'
 import BlindThresholdBls from 'react-native-blind-threshold-bls'
 import { call, put, select } from 'redux-saga/effects'
 import { ErrorMessages } from 'src/app/ErrorMessages'
@@ -53,6 +52,7 @@ export function* fetchPhoneHashPrivate(e164Number: string) {
       )
       // TODO nav to quota purchase screen
     } else {
+      Logger.error(`${TAG}@fetchPrivatePhoneHash`, 'Unknown error', error)
       throw new Error(ErrorMessages.SALT_FETCH_FAILURE)
     }
   }
@@ -80,11 +80,6 @@ async function getPhoneNumberSalt(e164Number: string, account: string, contractK
 
   if (!isE164Number(e164Number)) {
     throw new Error(ErrorMessages.INVALID_PHONE_NUMBER)
-  }
-
-  // TODO remove when iOS works
-  if (Platform.OS === 'ios') {
-    return 'fakeSalt'
   }
 
   Logger.debug(`${TAG}@getPhoneNumberSalt`, 'Retrieving blinded message')
@@ -120,7 +115,6 @@ async function postToSignMessage(
 ) {
   Logger.debug(`${TAG}@postToSignMessage`, `Posting to ${SIGN_MESSAGE_ENDPOINT}`)
   const body = JSON.stringify({
-    hashedPhoneNumber,
     blindedQueryPhoneNumber: base64BlindedMessage.trim(),
     account,
   })
