@@ -188,11 +188,6 @@ jobs:
     resource_class: large
     steps:
       - checkout
-      - run:
-          name: Check if the test should run
-          command: |
-            ./scripts/ci_check_if_test_should_run_v2.sh mobile
-
       - run: cd ~/src/
       - restore_cache:
           keys:
@@ -333,18 +328,18 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Install node 10
+          name: Install node 10 and dependencies
           command: |
             brew uninstall --ignore-dependencies node icu4c
             brew install node@10
             brew link --overwrite --force node@10
-            node --version
-            yarn --version
+            yarn
+      - run:
+          name: Fail if generated dependency graph doesn't match committed
+          command: ./scripts/ci_check_dependency_graph_changed.sh
       - run:
           name: Check if the test should run
-          command: |
-            yarn
-            ./scripts/ci_check_if_test_should_run_v2.sh mobile
+          command: ./scripts/ci_check_if_test_should_run_v2.sh mobile
 
       - run:
           name: Configure environment variables
