@@ -49,9 +49,6 @@ async function helmParameters(celoEnv: string) {
     `--set attestation_service.image.tag=${fetchEnv(envVar.ATTESTATION_SERVICE_DOCKER_IMAGE_TAG)}`,
     `--set attestation_service.nexmo.apiKey="${fetchEnv(envVar.NEXMO_KEY)}"`,
     `--set attestation_service.nexmo.apiSecret="${fetchEnv(envVar.NEXMO_SECRET)}"`,
-    `--set attestation_service.sms_retriever_hash_code="${fetchEnv(
-      envVar.SMS_RETRIEVER_HASH_CODE
-    )}"`,
     `--set geth.validators="${fetchEnv(envVar.VALIDATORS)}"`,
     `--set domain.name=${fetchEnv(envVar.CLUSTER_DOMAIN_NAME)}`,
     `--set global.postgresql.postgresqlDatabase=AttestationService`,
