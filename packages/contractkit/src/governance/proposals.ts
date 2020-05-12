@@ -138,11 +138,16 @@ export class ProposalBuilder {
    */
   addJsonTx = (tx: ProposalTransactionJSON) =>
     this.builders.push(async () => {
-      const contract = await this.kit._web3Contracts.getContract(tx.contract)
+      let contract = await this.kit._web3Contracts.getContract(tx.contract)
       const methodName = tx.function
-      const method = (contract.methods as Contract['methods'])[methodName]
+      let method = (contract.methods as Contract['methods'])[methodName]
       if (!method) {
-        throw new Error(`Method ${methodName} not found on ${tx.contract}`)
+        // @ts-ignore
+        contract = await this.kit._web3Contracts.getContract(tx.contract + 'Proxy')
+        method = (contract.methods as Contract['methods'])[methodName]
+        if (!method) {
+          throw new Error(`Method ${methodName} not found on ${tx.contract}`)
+        }
       }
       const txo = method(...tx.args)
       if (!txo) {
