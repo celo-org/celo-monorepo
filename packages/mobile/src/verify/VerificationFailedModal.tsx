@@ -33,15 +33,23 @@ export function VerificationFailedModal(props: Props) {
     props.verificationStatus === VerificationStatus.Failed ||
     (props.verificationStatus === VerificationStatus.RevealAttemptFailed && !isDismissed)
 
+  const showRetryWithForno = props.verificationStatus === VerificationStatus.Failed
+
   const allowEnterCodes = props.verificationStatus === VerificationStatus.RevealAttemptFailed
 
   return (
     <Modal isVisible={isVisible}>
       <View style={styles.modalContainer}>
-        <Text style={styles.modalHeader}>{t('failModal.header')}</Text>
-        <Text style={fontStyles.body}>{t('failModal.body1')}</Text>
+        <Text style={styles.modalHeader}>
+          {showRetryWithForno ? t('retryWithFornoModal.header') : t('failModal.header')}
+        </Text>
+        <Text style={fontStyles.body}>
+          {showRetryWithForno ? t('retryWithFornoModal.body1') : t('failModal.body1')}
+        </Text>
         <Text style={[fontStyles.body, componentStyles.marginTop10]}>
-          {t('failModal.body2') + (allowEnterCodes ? t('failModal.enterCodesBody') : '')}
+          {showRetryWithForno
+            ? t('retryWithFornoModal.body2')
+            : t('failModal.body2') + (allowEnterCodes ? t('failModal.enterCodesBody') : '')}
         </Text>
         <View style={styles.modalButtonsContainer}>
           {allowEnterCodes && (
@@ -55,6 +63,27 @@ export function VerificationFailedModal(props: Props) {
         </View>
       </View>
     </Modal>
+  )
+}
+
+function RetryVerificationWithFornoModal(props: Props) {
+  const test = 'hi'
+  return (
+    <>
+      <Text style={styles.modalHeader}>{t('retryWithFornoModal.header')}</Text>
+      <Text style={fontStyles.body}>{t('retryWithFornoModal.body1')}</Text>
+      <Text style={[fontStyles.body, componentStyles.marginTop10]}>
+        {t('retryWithFornoModal.body2')}
+      </Text>
+      <View style={styles.modalButtonsContainer}>
+        <TextButton onPress={onSkip} style={styles.modalSkipText}>
+          {t('missingCodesModal.skip')}
+        </TextButton>
+        <TextButton onPress={onRetry} style={styles.modalSkipText}>
+          {t('retryWithFornoModal.retryButton')}
+        </TextButton>
+      </View>
+    </>
   )
 }
 
