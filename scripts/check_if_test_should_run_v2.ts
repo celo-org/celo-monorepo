@@ -65,18 +65,13 @@ async function checkIfTestShouldRun() {
       return true
     }
 
-    for (const dep of dependencyGraph[packageName] || []) {
-      return hasChangedDependencies(dep)
-    }
-
-    return false
+    return dependencyGraph[packageName].map(hasChangedDependencies).some(Boolean)
   }
 
-  for (const pkg of packagesToTest) {
-    if (hasChangedDependencies(pkg)) {
-      console.info(`${pkg} changed`)
-      return
-    }
+  const anyDependenciesChanged = packagesToTest.map(hasChangedDependencies).some(Boolean)
+  if (anyDependenciesChanged) {
+    console.info(`${packagesToTest.join(', ')} or dependencies have changed`)
+    return
   }
 
   console.info('false')
@@ -99,8 +94,11 @@ async function getBranchCommits(): Promise<string[]> {
   if (!isCI) {
     // Running locally, let's just compare commits with master instead of fetching
     // commits from a potentially not existing PR
-    const commits = await execCmdWithExitOnFailure('git cherry master')
-    return commits.filter(Boolean).map((c) => c.slice(1).trim())
+    const [commits] = await execCmdWithExitOnFailure('git cherry master')
+    return commits
+      .split('\n')
+      .filter(Boolean)
+      .map((c) => c.slice(1).trim())
   }
 
   // GitHub + Circle CI-specific approach.
