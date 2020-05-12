@@ -26,6 +26,7 @@ import {
 import { setRecipientCache } from 'src/recipients/actions'
 import { contactsToRecipients, NumberToRecipient } from 'src/recipients/recipient'
 import { manualAddressValidationRequired } from 'src/send/actions'
+import { manuallyValidatedE164NumberToAddressSelector } from 'src/send/reducers'
 import { checkIfValidationRequired } from 'src/send/utils'
 import { getAllContacts } from 'src/utils/contacts'
 import Logger from 'src/utils/Logger'
@@ -152,10 +153,15 @@ export function* fetchPhoneAddressesAndCheckIfRecipientValidationRequired({
     }
 
     const userAddress = yield select(userAddressSelector)
+    const manuallyValidatedE164NumberToAddress = yield select(
+      manuallyValidatedE164NumberToAddressSelector
+    )
     const { validationRequired, fullValidationRequired } = checkIfValidationRequired(
       oldAddresses,
       addresses,
       userAddress,
+      manuallyValidatedE164NumberToAddress,
+      e164Number,
       TAG
     )
 

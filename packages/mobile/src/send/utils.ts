@@ -1,3 +1,4 @@
+import { ErrorMessages } from 'src/app/ErrorMessages'
 import { FeeType } from 'src/fees/actions'
 import { E164NumberToAddressType, RecipientVerificationStatus } from 'src/identity/reducer'
 import { Recipient, RecipientKind } from 'src/recipients/recipient'
@@ -64,10 +65,6 @@ export const getConfirmationInput = (
       e164NumberToAddress,
       manuallyValidatedE164NumberToAddress
     )
-
-    if (!recipientAddress) {
-      throw new Error("Can't find an address for the phone number")
-    }
   }
 
   return { ...transactionData, recipientAddress }
@@ -144,10 +141,23 @@ const checkIfLast4DigitsAreUnique = (addressArr: string[]) => {
   return last4DigitArr.length === last4DigitSet.size
 }
 
+// Check if there are multiple addresses but somehow a preferred addresses hasn't been set yet
+// Should never happen in production but makes the change backwards compatible for testing env
+const checkIfAccidentallyHasBypassedValidation = (
+  newAddresses: string[] | null,
+  e164Number: string,
+  manuallyValidatedE164NumberToAddress: ManuallyValidatedE164NumberToAddress
+) => {
+  const validatedAddress = manuallyValidatedE164NumberToAddress[e164Number]
+  return newAddresses && newAddresses.length > 1 && !validatedAddress
+}
+
 export const checkIfValidationRequired = (
   oldAddresses: string[] | undefined | null,
   newAddresses: string[] | null,
   userAddress: string,
+  manuallyValidatedE164NumberToAddress: ManuallyValidatedE164NumberToAddress,
+  e164Number: string,
   TAG: string
 ) => {
   let validationRequired = false
@@ -158,7 +168,14 @@ export const checkIfValidationRequired = (
     return { validationRequired, fullValidationRequired }
   }
 
-  if (checkIfNewAddressesAdded(oldAddresses, newAddresses)) {
+  if (
+    checkIfNewAddressesAdded(oldAddresses, newAddresses) ||
+    checkIfAccidentallyHasBypassedValidation(
+      newAddresses,
+      e164Number,
+      manuallyValidatedE164NumberToAddress
+    )
+  ) {
     Logger.debug(
       TAG + '@fetchPhoneAddressesAndAddressValidationStatus',
       `Address needs to be validated by user`
@@ -169,4 +186,80 @@ export const checkIfValidationRequired = (
   }
 
   return { validationRequired, fullValidationRequired }
+}
+
+const checkForSpecialChars = (address: string, fullValidation: boolean) => {
+  const regex = new RegExp('[^0-9A-Za-z]', 'g')
+  const cleanedAddress = address.replace(regex, '')
+
+  if (cleanedAddress !== address) {
+    const errorMessage = fullValidation
+      ? ErrorMessages.ADDRESS_VALIDATION_FULL_POORLY_FORMATTED
+      : ErrorMessages.ADDRESS_VALIDATION_PARTIAL_POORLY_FORMATTED
+    throw Error(errorMessage)
+  }
+}
+
+const checkForErrorsInFullAddress = (
+  userInputtedAddress: string,
+  possibleRecievingAddresses: string[],
+  userAddress: string
+) => {
+  checkForSpecialChars(userInputtedAddress, true)
+
+  if (userInputtedAddress.length !== 42 || userInputtedAddress.slice(0, 2) !== '0x') {
+    throw Error(ErrorMessages.ADDRESS_VALIDATION_FULL_POORLY_FORMATTED)
+  }
+
+  if (userInputtedAddress === userAddress) {
+    throw Error(ErrorMessages.ADDRESS_VALIDATION_FULL_OWN_ADDRESS)
+  }
+
+  if (!possibleRecievingAddresses.includes(userInputtedAddress)) {
+    throw Error(ErrorMessages.ADDRESS_VALIDATION_NO_MATCH)
+  }
+
+  return userInputtedAddress
+}
+
+const checkForErrorsInPartialAddressAndReturnMatch = (
+  lastFourDigitsOfUserInputtedAddress: string,
+  possibleRecievingAddresses: string[],
+  userAddress: string
+) => {
+  checkForSpecialChars(lastFourDigitsOfUserInputtedAddress, false)
+
+  if (lastFourDigitsOfUserInputtedAddress.length !== 4) {
+    throw Error(ErrorMessages.ADDRESS_VALIDATION_PARTIAL_POORLY_FORMATTED)
+  }
+
+  if (lastFourDigitsOfUserInputtedAddress === userAddress.slice(-4)) {
+    throw Error(ErrorMessages.ADDRESS_VALIDATION_PARTIAL_OWN_ADDRESS)
+  }
+
+  const targetAddress = possibleRecievingAddresses.find(
+    (address) => address.slice(-4) === lastFourDigitsOfUserInputtedAddress
+  )
+
+  if (!targetAddress) {
+    throw Error(ErrorMessages.ADDRESS_VALIDATION_NO_MATCH)
+  }
+
+  return targetAddress
+}
+
+export const checkForValidationErrorsAndReturnMatch = (
+  userInputOfFullAddressOrLastFourDigits: string,
+  possibleRecievingAddresses: string[],
+  userAddress: string,
+  fullAddressValidationRequired: boolean
+) => {
+  const userInput = userInputOfFullAddressOrLastFourDigits.toLowerCase()
+  const possibleAddresses = possibleRecievingAddresses.map((address) => address.toLowerCase())
+  const userOwnAddress = userAddress.toLowerCase()
+
+  if (fullAddressValidationRequired) {
+    return checkForErrorsInFullAddress(userInput, possibleAddresses, userOwnAddress)
+  }
+  return checkForErrorsInPartialAddressAndReturnMatch(userInput, possibleAddresses, userOwnAddress)
 }

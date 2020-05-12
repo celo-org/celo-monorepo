@@ -63,7 +63,7 @@ export const sendReducer = (
     case Actions.VALIDATE_RECIPIENT_ADDRESS_SUCCESS:
       const { manuallyValidatedE164NumberToAddress } = state
       // overwrite the previous mapping every time a new one is validated
-      manuallyValidatedE164NumberToAddress[action.e164Number] = action.address
+      manuallyValidatedE164NumberToAddress[action.e164Number] = action.validatedAddress
       return {
         ...state,
         isValidRecipient: true,

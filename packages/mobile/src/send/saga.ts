@@ -25,6 +25,7 @@ import {
   validateRecipientAddressFailure,
   validateRecipientAddressSuccess,
 } from 'src/send/actions'
+import { checkForValidationErrorsAndReturnMatch } from 'src/send/utils'
 import { transferStableToken } from 'src/stableToken/actions'
 import {
   BasicTokenTransfer,
@@ -188,20 +189,8 @@ function* sendPaymentOrInviteSaga({
   }
 }
 
-const checkForSpecialChars = (address: string, fullValidation: boolean) => {
-  const regex = new RegExp('[^0-9A-Za-z]', 'g')
-  const cleanedAddress = address.replace(regex, '')
-
-  if (cleanedAddress !== address) {
-    const errorMessage = fullValidation
-      ? ErrorMessages.ADDRESS_VALIDATION_FULL_POORLY_FORMATTED
-      : ErrorMessages.ADDRESS_VALIDATION_PARTIAL_POORLY_FORMATTED
-    throw Error(errorMessage)
-  }
-}
-
 export function* validateRecipientAddressSaga({
-  fullAddressOrLastFourDigits,
+  userInputOfFullAddressOrLastFourDigits,
   fullAddressValidationRequired,
   recipient,
 }: ValidateRecipientAddressAction) {
@@ -217,83 +206,23 @@ export function* validateRecipientAddressSaga({
     }
 
     const possibleRecievingAddresses = e164NumberToAddress[e164PhoneNumber]
-
     // should never happen since secure send is initiated due to there being several possible addresses
     if (!possibleRecievingAddresses) {
-      yield put(showError(ErrorMessages.QR_FAILED_NO_PHONE_NUMBER))
-      return
+      throw Error('There are no possible recipient addresses to validate against')
     }
 
-    let fullAddress = fullAddressOrLastFourDigits
-
-    if (fullAddressValidationRequired) {
-      yield call(
-        checkForErrorsInFullAddress,
-        fullAddressOrLastFourDigits,
-        possibleRecievingAddresses,
-        userAddress
-      )
-    } else {
-      fullAddress = yield call(
-        checkForErrorsInPartialAddressAndReturnMatch,
-        fullAddressOrLastFourDigits,
-        possibleRecievingAddresses,
-        userAddress
-      )
-    }
-
-    yield put(validateRecipientAddressSuccess(e164PhoneNumber, fullAddress))
+    const validatedAddress = checkForValidationErrorsAndReturnMatch(
+      userInputOfFullAddressOrLastFourDigits,
+      possibleRecievingAddresses,
+      userAddress,
+      fullAddressValidationRequired
+    )
+    yield put(validateRecipientAddressSuccess(e164PhoneNumber, validatedAddress))
   } catch (error) {
     Logger.error(TAG2, 'Address validation error: ', error.message)
     yield put(showError(error.message))
     yield put(validateRecipientAddressFailure())
   }
-}
-
-export function* checkForErrorsInFullAddress(
-  targetAddress: string,
-  possibleRecievingAddresses: string[],
-  userAddress: string
-) {
-  checkForSpecialChars(targetAddress, true)
-
-  if (targetAddress.length !== 42 || targetAddress.slice(0, 2) !== '0x') {
-    throw Error(ErrorMessages.ADDRESS_VALIDATION_FULL_POORLY_FORMATTED)
-  }
-
-  if (targetAddress === userAddress) {
-    throw Error(ErrorMessages.ADDRESS_VALIDATION_FULL_OWN_ADDRESS)
-  }
-
-  if (!possibleRecievingAddresses.includes(targetAddress)) {
-    throw Error(ErrorMessages.ADDRESS_VALIDATION_NO_MATCH)
-  }
-}
-
-export function* checkForErrorsInPartialAddressAndReturnMatch(
-  lastFourDigitsOfTargetAddress: string,
-  possibleRecievingAddresses: string[],
-  userAddress: string
-) {
-  checkForSpecialChars(lastFourDigitsOfTargetAddress, false)
-
-  if (lastFourDigitsOfTargetAddress.length !== 4) {
-    throw Error(ErrorMessages.ADDRESS_VALIDATION_PARTIAL_POORLY_FORMATTED)
-  }
-
-  if (lastFourDigitsOfTargetAddress === userAddress.slice(-4)) {
-    throw Error(ErrorMessages.ADDRESS_VALIDATION_PARTIAL_OWN_ADDRESS)
-  }
-
-  const targetAddress = possibleRecievingAddresses.find(
-    (address) => address.slice(-4) === lastFourDigitsOfTargetAddress
-  )
-
-  if (!targetAddress) {
-    throw Error(ErrorMessages.ADDRESS_VALIDATION_NO_MATCH)
-  }
-
-  return targetAddress
 }
 
 export function* watchSendPaymentOrInvite() {

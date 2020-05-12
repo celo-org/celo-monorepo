@@ -50,7 +50,7 @@ export interface SendPaymentOrInviteFailureAction {
 
 export interface ValidateRecipientAddressAction {
   type: Actions.VALIDATE_RECIPIENT_ADDRESS
-  fullAddressOrLastFourDigits: string
+  userInputOfFullAddressOrLastFourDigits: string
   fullAddressValidationRequired: boolean
   recipient: Recipient
 }
@@ -58,7 +58,7 @@ export interface ValidateRecipientAddressAction {
 export interface ValidateRecipientAddressSuccessAction {
   type: Actions.VALIDATE_RECIPIENT_ADDRESS_SUCCESS
   e164Number: string
-  address: string
+  validatedAddress: string
 }
 
 export interface ValidateRecipientAddressFailureAction {
@@ -128,23 +128,23 @@ export const sendPaymentOrInviteFailure = (): SendPaymentOrInviteFailureAction =
 })
 
 export const validateRecipientAddress = (
-  fullAddressOrLastFourDigits: string,
+  userInputOfFullAddressOrLastFourDigits: string,
   fullAddressValidationRequired: boolean,
   recipient: Recipient
 ): ValidateRecipientAddressAction => ({
   type: Actions.VALIDATE_RECIPIENT_ADDRESS,
-  fullAddressOrLastFourDigits,
+  userInputOfFullAddressOrLastFourDigits,
   fullAddressValidationRequired,
   recipient,
 })
 
 export const validateRecipientAddressSuccess = (
   e164Number: E164Number,
-  address: string
+  validatedAddress: string
 ): ValidateRecipientAddressSuccessAction => ({
   type: Actions.VALIDATE_RECIPIENT_ADDRESS_SUCCESS,
   e164Number,
-  address,
+  validatedAddress,
 })
 
 export const validateRecipientAddressFailure = (): ValidateRecipientAddressFailureAction => ({

@@ -40,7 +40,7 @@ export interface ConfirmationInput {
   recipient: Recipient
   amount: BigNumber
   reason: string
-  recipientAddress: string
+  recipientAddress: string | null | undefined
   type: TokenTransactionType
   firebasePendingRequestUid?: string | null
 }
