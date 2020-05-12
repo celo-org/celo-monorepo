@@ -39,7 +39,7 @@ export default React.memo(function TimeLine() {
         </Cell>
       </GridRow>
       <GridRow allStyle={styles.container}>
-        <Cell span={Spans.half} style={styles.fillSpace}>
+        <Cell span={Spans.half}>
           {isMobile && <Legend />}
           <Text style={subTitleStyle}>{t('timeline.pastTitle')}</Text>
           {(isMobile ? PAST_CHRONOLOGICAL : PAST).map(({ key, date, status }, index) => {
