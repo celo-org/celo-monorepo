@@ -1,3 +1,4 @@
+import colors from '@celo/react-components/styles/colors'
 import { createStackNavigator } from '@react-navigation/stack'
 import * as React from 'react'
 import { Platform } from 'react-native'
@@ -71,6 +72,7 @@ export const headerArea = {
   // given we intentionally hide the bottom separator from the nav bar
   headerMode: 'screen',
   defaultNavigationOptions: {
+    cardStyle: { backgroundColor: colors.background },
     headerStyle: {
       ...Platform.select({
         android: {
@@ -79,6 +81,9 @@ export const headerArea = {
         ios: {
           borderBottomWidth: 0,
           borderBottomColor: 'transparent',
+          shadowOffset: {
+            height: 0,
+          },
         },
       }),
     },
@@ -331,7 +336,7 @@ const AppStack = createStackNavigatorStub(
 
 export function AppNavigatorNew() {
   return (
-    <Stack.Navigator headerMode={'none'} initialRouteName={Screens.Language}>
+    <Stack.Navigator headerMode={'none'} initialRouteName={Screens.TabNavigator}>
       <Stack.Screen name={Screens.TabNavigator} component={TabNavigator} />
       {commonScreens(Stack)}
       {sendScreens(Stack)}

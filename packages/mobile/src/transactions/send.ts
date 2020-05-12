@@ -34,6 +34,9 @@ const getLogger = (tag: string, txId: string) => {
   return (event: SendTransactionLogEvent) => {
     switch (event.type) {
       case SendTransactionLogEventType.Confirmed:
+        if (event.number > 0) {
+          Logger.warn(tag, `Transaction id ${txId} extra confirmation received: ${event.number}`)
+        }
         Logger.debug(tag, `Transaction confirmed with id: ${txId}`)
         break
       case SendTransactionLogEventType.EstimatedGas:
