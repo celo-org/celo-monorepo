@@ -25,7 +25,7 @@ export default class Show extends BaseCommand {
       description: 'Hash of hotfix proposal',
     }),
     notwhitelisted: flags.boolean({
-      description: 'List validators who have not whitelisted the speicified hotfix',
+      description: 'List validators who have not whitelisted the specified hotfix',
     }),
     whitelisters: flags.boolean({
       description: 'If set, displays validators that have whitelisted the hotfix.',
