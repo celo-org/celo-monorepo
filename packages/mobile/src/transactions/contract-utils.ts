@@ -56,8 +56,12 @@ const Started: Started = { type: SendTransactionLogEventType.Started }
 
 interface Confirmed {
   type: SendTransactionLogEventType.Confirmed
+  number: number
 }
-const Confirmed: Confirmed = { type: SendTransactionLogEventType.Confirmed }
+
+function Confirmed(n: number): Confirmed {
+  return { type: SendTransactionLogEventType.Confirmed, number: n }
+}
 
 export type SendTransactionLogEvent =
   | Started
@@ -179,32 +183,24 @@ export async function sendTransactionAsync<T>(
 
     tx.send({ ...txParams, gas: estimatedGas })
       // @ts-ignore
-      .on('receipt', (r: TransactionReceipt) => {
+      .once('receipt', (r: TransactionReceipt) => {
         logger(ReceiptReceived(r))
         if (resolvers.receipt) {
           resolvers.receipt(r)
         }
       })
-      .on('transactionHash', (txHash: string) => {
+      .once('transactionHash', (txHash: string) => {
         logger(TransactionHashReceived(txHash))
 
         if (resolvers.transactionHash) {
           resolvers.transactionHash(txHash)
         }
       })
-      .on('confirmation', (confirmationNumber: number) => {
-        if (confirmationNumber > 1) {
-          // "confirmation" event is called for 24 blocks.
-          // if check to avoid polluting the logs and trying to remove the standby notification more than once
-          return
-        }
-        logger(Confirmed)
-
-        if (resolvers.confirmation) {
-          resolvers.confirmation(true)
-        }
+      .once('confirmation', (confirmationNumber: number) => {
+        logger(Confirmed(confirmationNumber))
+        resolvers.confirmation(true)
       })
-      .on('error', (error: Error) => {
+      .once('error', (error: Error) => {
         logger(Failed(error))
         rejectAll(error)
       })
