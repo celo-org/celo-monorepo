@@ -11,7 +11,7 @@ cd packages/mobile
 CHANGED=$(node -r ts-node/register ../../scripts/check_if_test_should_run_v2.ts --packages ${PACKAGES_TO_CHECK})
 cd -
 if [ $CHANGED = false ] ; then
-  echo "No changes in ${1} - skipping  testing"
+  echo "No changes in ${1} or dependent packages - skipping testing"
   # https://discuss.circleci.com/t/ability-to-return-successfully-from-a-job-before-completing-all-the-next-steps/12969/6
   circleci step halt
   exit 0
