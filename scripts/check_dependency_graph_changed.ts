@@ -1,7 +1,7 @@
-import { changed } from './dependency-graph-utils'
+import { graphHasChanged } from './dependency-graph-utils'
 
 async function main() {
-  const hasChanged = await changed()
+  const hasChanged = await graphHasChanged()
   if (hasChanged) {
     console.info('true')
     return

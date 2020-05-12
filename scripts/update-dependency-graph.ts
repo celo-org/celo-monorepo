@@ -1,6 +1,6 @@
-import { update } from './dependency-graph-utils'
+import { updateGraph } from './dependency-graph-utils'
 
-update()
+updateGraph()
   .then(() => {
     console.info('Successfully updated dependency graph!')
     process.exit(0)

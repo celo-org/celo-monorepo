@@ -6,6 +6,8 @@ import { join } from 'path'
 const packagesDirectory = join(__dirname, '..', 'packages')
 export const filename = 'dependency-graph.json'
 
+// Easier to operate on folder names of packages rather than the name
+// from the package.json file. People are more familiar with folder names as well
 function getFoldersFromPackageNames(): { [x: string]: string } {
   const folders: { [x: string]: string } = {}
   const allPackages = readdirSync(packagesDirectory)
@@ -48,7 +50,7 @@ const hash = (input: string): string =>
     .update(input)
     .digest('base64')
 
-export const changed = async (): Promise<boolean> => {
+export const graphHasChanged = async (): Promise<boolean> => {
   const oldGraph = readFileSync(filename).toString()
   const newGraph = await buildGraph()
 
@@ -59,7 +61,7 @@ export const changed = async (): Promise<boolean> => {
   return false
 }
 
-export const update = async () => {
+export const updateGraph = async () => {
   const graph = await buildGraph()
   writeFileSync(filename, graph)
 }
