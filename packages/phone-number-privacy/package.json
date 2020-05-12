@@ -17,7 +17,8 @@
     "build": "tsc -b .",
     "lint": "tslint --project .",
     "test": "jest --runInBand",
-    "db:migrate": "NODE_ENV=development ts-node scripts/runMigrations.ts"
+    "db:migrate": "NODE_ENV=development ts-node scripts/runMigrations.ts",
+    "keygen": "ts-node scripts/createBlsKeyPair.ts"
   },
   "dependencies": {
     "@celo/contractkit": "0.4.4",

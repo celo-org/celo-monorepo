@@ -25,7 +25,8 @@ const pgpnpUrlStaging = 'https://us-central1-celo-phone-number-privacy-stg.cloud
 const pgpnpPubKeyStaging =
   'B+gJTCmTrf9t3X7YQ2F4xekSzd5xg5bdzcJ8NPefby3mScelg5172zl1GgIO9boADEwE67j6M55GwouQwaG5jDZ5tHa2eNtfC7oLIsevuUmzrXVDry9cmsalB0BHX0EA'
 const pgpnpUrlProd = 'https://us-central1-celo-phone-number-privacy.cloudfunctions.net'
-const pgpnpPubKeyProd = 'TODO'
+const pgpnpPubKeyProd =
+  '6VFX/ufxvL54NDRlJMe0jlbb9wD3L/Kfm6K2qEKoxrDMS42Q1S7ZOH88tdpOJhcAJPdDTjGE6qHQBiV48n/jctSuOJ8HjsRzp6VJWMHW3imqep7nwyhzNfLcPXJfrngB'
 
 const networkConfigs: { [testnet: string]: NetworkConfig } = {
   [Testnets.integration]: {
