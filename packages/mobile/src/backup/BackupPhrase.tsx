@@ -91,6 +91,10 @@ class BackupPhrase extends React.Component<Props, State> {
     })
   }
 
+  onPressConfirmArea = () => {
+    this.setState((state) => ({ isConfirmChecked: !state.isConfirmChecked }))
+  }
+
   onPressContinue = () => {
     const { mnemonic } = this.state
     CeloAnalytics.track(CustomEventNames.backup_continue)
@@ -114,7 +118,9 @@ class BackupPhrase extends React.Component<Props, State> {
           <>
             <View style={styles.confirmationSwitchContainer}>
               <Switch value={isConfirmChecked} onValueChange={this.onPressConfirmSwitch} />
-              <Text style={styles.confirmationSwitchLabel}>{t('savedConfirmation')}</Text>
+              <Text onPress={this.onPressConfirmArea} style={styles.confirmationSwitchLabel}>
+                {t('savedConfirmation')}
+              </Text>
             </View>
             <Button
               disabled={!isConfirmChecked}
@@ -151,7 +157,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   confirmationSwitchContainer: {
-    paddingVertical: 16,
+    marginVertical: 16,
     flexDirection: 'row',
     alignItems: 'center',
   },

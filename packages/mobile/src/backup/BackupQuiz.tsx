@@ -1,7 +1,6 @@
-import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button.v2'
+import TextButton from '@celo/react-components/components/TextButton.v2'
 import Touchable from '@celo/react-components/components/Touchable'
 import Backspace from '@celo/react-components/icons/Backspace'
-import Checkmark from '@celo/react-components/icons/Checkmark'
 import colors from '@celo/react-components/styles/colors.v2'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import { chunk, flatMap, shuffle, times } from 'lodash'
@@ -14,10 +13,9 @@ import { connect } from 'react-redux'
 import { setBackupCompleted } from 'src/account/actions'
 import { showError } from 'src/alert/actions'
 import componentWithAnalytics from 'src/analytics/wrapper'
-import { ErrorMessages } from 'src/app/ErrorMessages'
+import { QuizzBottom } from 'src/backup/QuizzBottom'
 import DevSkipButton from 'src/components/DevSkipButton'
 import { Namespaces, withTranslation } from 'src/i18n'
-import LoadingSpinner from 'src/icons/LoadingSpinner'
 import { headerWithCancelButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -28,8 +26,18 @@ const TAG = 'backup/BackupQuiz'
 
 const MNEMONIC_BUTTONS_TO_DISPLAY = 6
 
+// seconds
+const CHECKING_DURATION = 3.1 * 1000
+
+export enum Mode {
+  entering,
+  checking,
+  failed,
+}
+
 // TODO Add states for, checking, failed, success
 interface State {
+  is: Mode
   mnemonicLength: number
   mnemonicWords: string[]
   userChosenWords: Array<{
@@ -46,18 +54,21 @@ interface DispatchProps {
 type Props = WithTranslation & DispatchProps & NavigationInjectedProps
 
 export class BackupQuiz extends React.Component<Props, State> {
-  static navigationOptions = () => ({
+  static navigationOptions = ({ navigation }: NavigationInjectedProps) => ({
     ...headerWithCancelButton,
-    headerRightContainerStyle: { backgroundColor: '#000' },
+    headerRight: <DeleteWord onPressBackspace={navigation.getParam('onPressBackspace')} />,
   })
 
   state: State = {
     mnemonicLength: 0,
     mnemonicWords: [],
     userChosenWords: [],
+    is: Mode.entering,
   }
 
   componentDidMount() {
+    this.props.navigation.setParams({ onPressBackspace: this.onPressBackspace })
+
     const mnemonic = this.getMnemonicFromNavProps()
     const shuffledMnemonic = getShuffledWordSet(mnemonic)
     this.setState({
@@ -110,24 +121,28 @@ export class BackupQuiz extends React.Component<Props, State> {
     this.setState({
       mnemonicWords: getShuffledWordSet(mnemonic),
       userChosenWords: [],
+      is: Mode.entering,
     })
   }
 
-  // add in
-  onPressSubmit = () => {
+  afterCheck = () => {
     const { userChosenWords, mnemonicLength } = this.state
     const mnemonic = this.getMnemonicFromNavProps()
-    if (
-      userChosenWords.length === mnemonicLength &&
-      userChosenWords.map((w) => w.word).join(' ') === mnemonic
-    ) {
+    const lengthsMatch = userChosenWords.length === mnemonicLength
+
+    if (lengthsMatch && userChosenWords.map((w) => w.word).join(' ') === mnemonic) {
       Logger.debug(TAG, 'Backup quiz passed')
       this.props.setBackupCompleted()
       navigate(Screens.BackupComplete)
     } else {
       Logger.debug(TAG, 'Backup quiz failed, reseting words')
-      this.props.showError(ErrorMessages.BACKUP_QUIZ_FAILED)
+      this.setState({ is: Mode.failed })
     }
+  }
+
+  onPressSubmit = () => {
+    this.setState({ is: Mode.checking })
+    setTimeout(this.afterCheck, CHECKING_DURATION)
   }
 
   onScreenSkip = () => {
@@ -141,82 +156,71 @@ export class BackupQuiz extends React.Component<Props, State> {
     const currentWordIndex = userChosenWords.length + 1
     const isQuizComplete = userChosenWords.length === mnemonicLength
     const mnemonicWordsToDisplay = mnemonicWordButtons.slice(0, MNEMONIC_BUTTONS_TO_DISPLAY)
-
     return (
       <SafeAreaView style={styles.container}>
         <DevSkipButton nextScreen={Screens.BackupComplete} onSkip={this.onScreenSkip} />
-        {currentWordIndex > 1 && <DeleteWord onPressBackspace={this.onPressBackspace} />}
-        <ScrollView contentContainerStyle={styles.scrollContainer}>
-          <View style={styles.chosenWordsContainer}>
-            {times(mnemonicLength, (i) => (
-              <View
-                style={[
-                  styles.chosenWordWrapper,
-                  userChosenWords[i] && styles.chosenWordWrapperFilled,
-                ]}
-                key={`selected-word-${i}`}
-              >
-                <Text style={userChosenWords[i] ? styles.chosenWordFilled : styles.chosenWord}>
-                  {(userChosenWords[i] && userChosenWords[i].word) || i + 1}
-                </Text>
+        <>
+          <ScrollView contentContainerStyle={styles.scrollContainer}>
+            <View style={styles.chosenWordsContainer}>
+              {times(mnemonicLength, (i) => (
+                <View
+                  style={[
+                    styles.chosenWordWrapper,
+                    userChosenWords[i] && styles.chosenWordWrapperFilled,
+                  ]}
+                  key={`selected-word-${i}`}
+                >
+                  <Text style={userChosenWords[i] ? styles.chosenWordFilled : styles.chosenWord}>
+                    {(userChosenWords[i] && userChosenWords[i].word) || i + 1}
+                  </Text>
+                </View>
+              ))}
+            </View>
+            {this.state.is === Mode.failed && (
+              <View style={styles.resetButton}>
+                <TextButton onPress={this.onPressReset}>{t('global:reset')}</TextButton>
               </View>
-            ))}
-          </View>
-          {!isQuizComplete && (
-            <Text style={styles.bodyText}>
-              <Trans
-                i18nKey={'backupQuizWordCount'}
-                ns={Namespaces.backupKeyFlow6}
-                tOptions={{ ordinal: t(`global:ordinals.${currentWordIndex}`) }}
-              >
-                <Text style={styles.bodyTextBold}>X</Text>
-              </Trans>
-            </Text>
-          )}
-          <View style={styles.mnemonicButtonsContainer}>
-            {mnemonicWordsToDisplay.map((word, index) => (
-              <Touchable
-                key={'mnemonic-button-' + word}
-                style={styles.mnemonicWordButton}
-                onPress={this.onPressMnemonicWord(word, index)}
-              >
-                <Text style={styles.mnemonicWordButonText}>{word}</Text>
-              </Touchable>
-            ))}
-          </View>
-        </ScrollView>
-        <View style={styles.successCheck}>
-          <LoadingSpinner width={16} />
-          <Checkmark height={32} />
-        </View>
-        {isQuizComplete && (
-          <Button
-            onPress={this.onPressSubmit}
-            text={t('global:submit')}
-            size={BtnSizes.FULL}
-            type={BtnTypes.PRIMARY}
-            testID={'QuizSubmit'}
+            )}
+            <View style={styles.bottomHalf}>
+              {!isQuizComplete && (
+                <Text style={styles.bodyText}>
+                  <Trans
+                    i18nKey={'backupQuizWordCount'}
+                    ns={Namespaces.backupKeyFlow6}
+                    tOptions={{ ordinal: t(`global:ordinals.${currentWordIndex}`) }}
+                  >
+                    <Text style={styles.bodyTextBold}>X</Text>
+                  </Trans>
+                </Text>
+              )}
+              <View style={styles.mnemonicButtonsContainer}>
+                {mnemonicWordsToDisplay.map((word, index) => (
+                  <View key={'mnemonic-button-' + word} style={styles.mnemonicWordButtonOutterRim}>
+                    <Touchable
+                      style={styles.mnemonicWordButton}
+                      onPress={this.onPressMnemonicWord(word, index)}
+                    >
+                      <Text style={styles.mnemonicWordButonText}>{word}</Text>
+                    </Touchable>
+                  </View>
+                ))}
+              </View>
+            </View>
+          </ScrollView>
+          <QuizzBottom
+            onPressSubmit={this.onPressSubmit}
+            isQuizComplete={isQuizComplete}
+            mode={this.state.is}
           />
-        )}
+        </>
       </SafeAreaView>
     )
   }
 }
 
 function DeleteWord({ onPressBackspace }: { onPressBackspace: () => void }) {
-  // currentWordIndex > 1
   return (
-    <Touchable
-      onPress={onPressBackspace}
-      style={{
-        position: 'absolute',
-        right: 0,
-        top: 0,
-        paddingRight: 16,
-        zIndex: 100,
-        transform: [{ translateY: 0 }],
-      }}
-    >
+    <Touchable borderless={true} onPress={onPressBackspace} style={styles.backWord}>
       <Backspace color={colors.greenUI} />
     </Touchable>
   )
@@ -236,7 +240,7 @@ export default componentWithAnalytics(
   )
 )
 
-const styles = StyleSheet.create({
+export const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
@@ -244,9 +248,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingBottom: 24,
   },
+  successContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   scrollContainer: {
     flexGrow: 1,
   },
+  bottomHalf: { flex: 1, justifyContent: 'center' },
   bodyText: {
     marginTop: 20,
     ...fontStyles.regular,
@@ -262,6 +272,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'center',
+    maxWidth: 288,
+    alignSelf: 'center',
   },
   chosenWordWrapper: {
     paddingVertical: 4,
@@ -294,22 +306,28 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     justifyContent: 'center',
   },
-  mnemonicWordButton: {
+  mnemonicWordButtonOutterRim: {
     borderRadius: 100,
     borderWidth: 1.5,
     borderColor: colors.greenUI,
+    overflow: 'hidden',
+    marginVertical: 4,
+    marginHorizontal: 4,
+  },
+  mnemonicWordButton: {
+    borderRadius: 100,
     minWidth: 65,
     paddingHorizontal: 16,
     paddingVertical: 8,
-    marginVertical: 4,
-    marginHorizontal: 4,
   },
   mnemonicWordButonText: {
     textAlign: 'center',
     color: colors.greenUI,
   },
-  successCheck: {
-    alignItems: 'center',
-    marginBottom: 24,
+  backWord: {
+    paddingRight: 24,
+    paddingLeft: 16,
+    paddingVertical: 4,
   },
+  resetButton: { alignItems: 'center', padding: 24, marginTop: 8 },
 })

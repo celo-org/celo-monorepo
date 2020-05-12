@@ -13,6 +13,7 @@ import { CustomEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import { enterBackupFlow, exitBackupFlow } from 'src/app/actions'
 import DelayButton from 'src/backup/DelayButton'
+import { useAccountKey } from 'src/backup/utils'
 import { Namespaces, withTranslation } from 'src/i18n'
 import Logo from 'src/icons/Logo.v2'
 import { headerWithBackButton } from 'src/navigator/Headers'
@@ -85,19 +86,22 @@ function AccountKeyIntro({ onPrimaryPress }: AccountKeyStartProps) {
     </ScrollView>
   )
 }
-// TODO in next PR get Real mneumonic
+
+// TODO show pin code screen first
 function AccountKeyPostSetup() {
+  const accountKey = useAccountKey()
+
   const { t } = useTranslation(Namespaces.accountKeyFlow)
+
   return (
     <ScrollView contentContainerStyle={styles.postSetupContainer}>
-      <Text style={fontStyles.h2}>{t('introTitle')}</Text>
-      <View style={styles.keyArea}>
-        <Text style={fontStyles.large}>
-          horse leopard dog monkey shark tiger lemur whale squid wolf squirrel mouse lion elephant
-          cat shrimp bear penguin deer turtle fox zebra goat giraffe
-        </Text>
+      <View>
+        <Text style={fontStyles.h2}>{t('introTitle')}</Text>
+        <View style={styles.keyArea}>
+          <Text style={fontStyles.large}>{accountKey}</Text>
+        </View>
+        <Text style={styles.postSetupBody}>{t('postSetupBody')}</Text>
       </View>
-      <Text style={styles.postSetupBody}>{t('postSetupBody')}</Text>
       <View style={styles.postSetupCTA}>
         <TextButton>{t('postSetupCTA')}</TextButton>
       </View>
@@ -116,8 +120,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   postSetupContainer: {
-    paddingTop: Sizes.THICK,
     flex: 1,
+    paddingTop: Sizes.THICK,
     paddingHorizontal: Sizes.REG,
   },
   h1: {
@@ -140,7 +144,7 @@ const styles = StyleSheet.create({
   },
   postSetupCTA: {
     alignSelf: 'center',
-    marginTop: Sizes.REG,
+    paddingVertical: Sizes.THICK,
   },
 })
 

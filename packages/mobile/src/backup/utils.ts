@@ -3,6 +3,8 @@ import * as _ from 'lodash'
 import * as bip39 from 'react-native-bip39'
 import { getKey } from 'src/utils/keyStore'
 import Logger from 'src/utils/Logger'
+import { useAsync } from 'react-async-hook'
+import { useState } from 'react'
 
 const TAG = 'Backup/utils'
 
@@ -103,6 +105,17 @@ export async function getStoredMnemonic(): Promise<string | null> {
     Logger.error(TAG, 'Failed to retrieve mnemonic', error)
     return null
   }
+}
+
+export function useAccountKey() {
+  const [accountKey, setAccountKey] = useState<string | null>(null)
+
+  useAsync(async () => {
+    const mnemonic = accountKey || (await getStoredMnemonic())
+    setAccountKey(mnemonic)
+  }, [])
+
+  return accountKey
 }
 
 // Because of a RN bug, we can't fully clean the text as the user types
