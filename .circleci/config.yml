@@ -161,7 +161,7 @@ jobs:
             yarn build --scope @celo/utils
             yarn build --scope @celo/protocol
             yarn build --ignore @celo/protocol --ignore docs
-                
+
       - run:
           name: Check licenses
           command: |
@@ -835,11 +835,10 @@ jobs:
           set -e
           cd packages/celotool/bin
           NAMESPACE="circle-${CIRCLE_WORKFLOW_ID}"
+          echo "Namespace: ${NAMESPACE}"
           kubectl create namespace ${NAMESPACE}
           kubectl config set-context --current --namespace ${NAMESPACE} >/dev/null
           ./celotooljs.sh deploy initial gke-fullnode -e rc1 --syncmode full --namespace ${NAMESPACE}
-          
-
     # - run:
     #     name: Deploy network
     #     no_output_timeout: 25m
