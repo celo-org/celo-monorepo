@@ -30,14 +30,15 @@ const parseLernaOutput = (raw: string) => {
       ...accum,
       [packageNameToFolderName[packageName]]: dependencies
         .filter((name) => name.startsWith('@celo'))
-        .map((pkg) => packageNameToFolderName[pkg]),
+        .map((pkg) => packageNameToFolderName[pkg])
+        .filter((name) => Boolean(name)), // some @celo packages aren't in the monorepo
     }),
     {}
   )
 }
 
 const buildGraph = async (): Promise<string> => {
-  const [rawResult] = await execCmd('yarn --silent lerna ls --graph')
+  const [rawResult] = await execCmd('yarn --silent lerna ls --graph --all')
   const graph = parseLernaOutput(rawResult)
   return JSON.stringify(graph, null, 2)
 }

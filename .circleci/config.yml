@@ -99,6 +99,9 @@ commands:
               exit 1
             fi
       - run:
+          name: Fail if generated dependency graph doesn't match committed
+          command: ./scripts/ci_check_dependency_graph_changed.sh
+      - run:
           name: Fail if there are vulnerabilities in packages
           command: |
             /bin/bash -c 'yarn audit --groups dependencies --level high; [[ $? -ge 8 ]] && exit 1 || exit 0'
