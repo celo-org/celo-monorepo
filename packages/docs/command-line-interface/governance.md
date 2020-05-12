@@ -251,7 +251,7 @@ OPTIONS
   --account=account        Address of account or voter
   --hotfix=hotfix          Hash of hotfix proposal
   --nonwhitelisters        If set, displays validators that have not whitelisted the hotfix.
-  --notwhitelisted         List validators who have not whitelisted the speicified hotfix
+  --notwhitelisted         List validators who have not whitelisted the specified hotfix
   --proposalID=proposalID  UUID of proposal to view
   --raw                    Display proposal in raw bytes format
   --whitelisters           If set, displays validators that have whitelisted the hotfix.

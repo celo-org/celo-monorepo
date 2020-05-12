@@ -431,7 +431,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
    */
   isQueued = proxyCall(this.contract.methods.isQueued, tupleParser(valueToString))
 
-  /*
+  /**
    * Returns the value of proposal deposits that have been refunded.
    * @param proposer Governance proposer address.
    */

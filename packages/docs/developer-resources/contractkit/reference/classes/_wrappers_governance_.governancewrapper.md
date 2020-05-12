@@ -377,6 +377,10 @@ ___
 
 *Defined in [contractkit/src/wrappers/Governance.ts:438](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L438)*
 
+Returns the value of proposal deposits that have been refunded.
+
+**`param`** Governance proposer address.
+
 #### Type declaration:
 
 ▸ (...`args`: InputArgs): *Promise‹Output›*
