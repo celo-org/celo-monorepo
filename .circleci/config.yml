@@ -837,7 +837,7 @@ jobs:
           NAMESPACE="circle-${CIRCLE_WORKFLOW_ID}"
           kubectl create namespace ${NAMESPACE}
           kubectl config set-context --current --namespace ${NAMESPACE} >/dev/null
-          ./celotooljs.sh deploy initial gke-fullnode -e rc1 --sync-mode fast
+          ./celotooljs.sh deploy initial gke-fullnode -e rc1 --syncmode full --namespace ${NAMESPACE}
           
 
     # - run:
