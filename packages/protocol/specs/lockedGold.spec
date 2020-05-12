@@ -114,6 +114,7 @@ rule withdraw(uint256 index) {
 	uint256 _balance = sinvoke ercBalanceOf(e.msg.sender);
 	uint256 val = sinvoke getPendingWithdrawalsIndex(e.msg.sender, index);
 	sinvoke withdraw(e, index);
+	require (e.msg.sender != currentContract);
 	uint256 balance_ = sinvoke ercBalanceOf(e.msg.sender);
 	assert(
     _balance + val == balance_,
