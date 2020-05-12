@@ -1,8 +1,8 @@
-import { AzureKeyVaultClient } from '@celo/contractkit/src/utils/azure-key-vault-client'
+import { AzureKeyVaultClient } from '@celo/contractkit/lib/utils/azure-key-vault-client'
 import threshold from 'blind-threshold-bls'
 import { ErrorMessages } from '../common/error-utils'
 import logger from '../common/logger'
-import config from '../config'
+import config, { DEV_MODE, DEV_PRIVATE_KEY } from '../config'
 
 export class BLSCryptographyClient {
   /*
@@ -10,13 +10,12 @@ export class BLSCryptographyClient {
    */
   public static async computeBlindedSignature(base64BlindedMessage: string) {
     try {
-      logger.debug('b64 blinded msg', base64BlindedMessage)
       const privateKey = await BLSCryptographyClient.getPrivateKey()
       const keyBuffer = Buffer.from(privateKey, 'base64')
       const msgBuffer = Buffer.from(base64BlindedMessage, 'base64')
 
       logger.debug('Calling theshold sign')
-      const signedMsg = threshold.sign(keyBuffer, msgBuffer)
+      const signedMsg = threshold.signBlindedMessage(keyBuffer, msgBuffer)
       logger.debug('Back from threshold sign, parsing results')
 
       if (!signedMsg) {
@@ -36,6 +35,10 @@ export class BLSCryptographyClient {
    * Get singleton privateKey
    */
   private static async getPrivateKey(): Promise<string> {
+    if (DEV_MODE) {
+      return DEV_PRIVATE_KEY
+    }
+
     if (BLSCryptographyClient.privateKey) {
       return BLSCryptographyClient.privateKey
     }

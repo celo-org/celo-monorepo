@@ -865,7 +865,6 @@ exports[`BackupQuiz renders correctly 1`] = `
               "top": 7,
             }
           }
-          isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
@@ -935,7 +934,6 @@ exports[`BackupQuiz renders correctly 1`] = `
               "top": 7,
             }
           }
-          isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
@@ -1005,7 +1003,6 @@ exports[`BackupQuiz renders correctly 1`] = `
               "top": 7,
             }
           }
-          isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
@@ -1075,7 +1072,6 @@ exports[`BackupQuiz renders correctly 1`] = `
               "top": 7,
             }
           }
-          isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
@@ -1145,7 +1141,6 @@ exports[`BackupQuiz renders correctly 1`] = `
               "top": 7,
             }
           }
-          isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
@@ -1215,7 +1210,6 @@ exports[`BackupQuiz renders correctly 1`] = `
               "top": 7,
             }
           }
-          isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",

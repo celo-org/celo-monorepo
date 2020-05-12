@@ -1,5 +1,7 @@
 import fs from 'fs'
+import { AzureClusterConfig } from './azure'
 import { createNamespaceIfNotExists } from './cluster'
+import { execCmdWithExitOnFailure } from './cmd-utils'
 import { envVar, fetchEnv } from './env-utils'
 import { installGenericHelmChart, removeGenericHelmChart } from './helm_deploy'
 import {
@@ -7,10 +9,7 @@ import {
   getServiceAccountEmail,
   getServiceAccountKey,
 } from './service-account-utils'
-import {
-  execCmdWithExitOnFailure,
-  switchToProjectFromEnv as switchToGCPProjectFromEnv,
-} from './utils'
+import { outputIncludes, switchToProjectFromEnv as switchToGCPProjectFromEnv } from './utils'
 
 const helmChartPath = '../helm-charts/prometheus-stackdriver'
 const releaseName = 'prometheus-stackdriver'
@@ -22,17 +21,34 @@ const sidecarImageTag = '0.7.3'
 // Prometheus container registry with latest tags: https://hub.docker.com/r/prom/prometheus/tags
 const prometheusImageTag = 'v2.17.0'
 
-export async function installPrometheus() {
+export async function installPrometheusIfNotExists(clusterConfig: AzureClusterConfig) {
+  const prometheusExists = await outputIncludes(
+    `helm list`,
+    `prometheus-stackdriver`,
+    `prometheus-stackdriver exists, skipping install`
+  )
+  if (!prometheusExists) {
+    console.info('Installing prometheus-stackdriver')
+    await installPrometheus(clusterConfig)
+  }
+}
+
+export async function installPrometheus(clusterConfig: AzureClusterConfig) {
   await createNamespaceIfNotExists('prometheus')
-  return installGenericHelmChart(kubeNamespace, releaseName, helmChartPath, await helmParameters())
+  return installGenericHelmChart(
+    kubeNamespace,
+    releaseName,
+    helmChartPath,
+    await helmParameters(clusterConfig)
+  )
 }
 
 export async function removeHelmRelease() {
   await removeGenericHelmChart(releaseName)
 }
 
-async function helmParameters() {
-  const kubeClusterName = fetchEnv(envVar.AZURE_KUBERNETES_CLUSTER_NAME)
+async function helmParameters(clusterConfig: AzureClusterConfig) {
+  const kubeClusterName = fetchEnv(clusterConfig.clusterName)
   return [
     `--set namespace=${kubeNamespace}`,
     `--set cluster=${kubeClusterName}`,

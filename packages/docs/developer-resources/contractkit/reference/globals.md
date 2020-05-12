@@ -35,6 +35,7 @@
 * ["utils/signing-utils"](modules/_utils_signing_utils_.md)
 * ["utils/tx-params-normalizer"](modules/_utils_tx_params_normalizer_.md)
 * ["utils/tx-result"](modules/_utils_tx_result_.md)
+* ["utils/tx-uri"](modules/_utils_tx_uri_.md)
 * ["utils/web3-utils"](modules/_utils_web3_utils_.md)
 * ["wallets/azure-hsm-wallet"](modules/_wallets_azure_hsm_wallet_.md)
 * ["wallets/ledger-utils/data"](modules/_wallets_ledger_utils_data_.md)
