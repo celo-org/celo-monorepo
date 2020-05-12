@@ -8,7 +8,7 @@ export const filename = 'dependency-graph.json'
 
 // Easier to operate on folder names of packages rather than the name
 // from the package.json file. People are more familiar with folder names as well
-function getFoldersFromPackageNames(): { [x: string]: string } {
+function getDirectoryFromPackageName(): { [x: string]: string } {
   const folders: { [x: string]: string } = {}
   const allPackages = readdirSync(packagesDirectory)
   allPackages.forEach((pkg) => {
@@ -23,16 +23,16 @@ function getFoldersFromPackageNames(): { [x: string]: string } {
 
   return folders
 }
-const packageNameToFolderName = getFoldersFromPackageNames()
+const packageNameToDirectory = getDirectoryFromPackageName()
 
 const parseLernaOutput = (raw: string) => {
   const fullGraph: { [k: string]: string[] } = JSON.parse(raw)
   return Object.entries(fullGraph).reduce(
     (accum, [packageName, dependencies]) => ({
       ...accum,
-      [packageNameToFolderName[packageName]]: dependencies
+      [packageNameToDirectory[packageName]]: dependencies
         .filter((name) => name.startsWith('@celo'))
-        .map((pkg) => packageNameToFolderName[pkg])
+        .map((pkg) => packageNameToDirectory[pkg])
         .filter((name) => Boolean(name)), // some @celo packages aren't in the monorepo
     }),
     {}
@@ -54,11 +54,7 @@ export const graphHasChanged = async (): Promise<boolean> => {
   const oldGraph = readFileSync(filename).toString()
   const newGraph = await buildGraph()
 
-  if (hash(oldGraph) !== hash(newGraph)) {
-    return true
-  }
-
-  return false
+  return hash(oldGraph) !== hash(newGraph)
 }
 
 export const updateGraph = async () => {
