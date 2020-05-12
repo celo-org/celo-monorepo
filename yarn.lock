@@ -4545,7 +4545,7 @@
   dependencies:
     any-observable "^0.3.0"
 
-"@segment/analytics-react-native-firebase@1.1.1-beta.2":
+"@segment/analytics-react-native-firebase@^1.1.1-beta.2":
   version "1.1.1-beta.2"
   resolved "https://registry.yarnpkg.com/@segment/analytics-react-native-firebase/-/analytics-react-native-firebase-1.1.1-beta.2.tgz#94c386a028bbcea53a93f5278cca064a334099e5"
   integrity sha512-5AYMS7a96DqzkP+wK7kL6c06KoxkFIJFZBqmTOAXmZMciuzPHaXcxifD0HgkxhPLFxyDjFWjulfyKNMBblOq+w==
