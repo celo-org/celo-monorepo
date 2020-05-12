@@ -486,7 +486,7 @@ export async function deleteStaticIPs(celoEnv: string) {
 export async function deletePersistentVolumeClaims(celoEnv: string, componentLabels: string[]) {
   console.info(`Deleting persistent volume claims for ${celoEnv}`)
   for (const component of componentLabels) {
-    deletePersistentVolumeClaimsCustomLabels(celoEnv, 'component', component)
+    await deletePersistentVolumeClaimsCustomLabels(celoEnv, 'component', component)
   }
 }
 
