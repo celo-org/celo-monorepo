@@ -1,8 +1,9 @@
 import { installPrometheusIfNotExists } from 'src/lib/aks-prometheus'
 import { createNamespaceIfNotExists } from 'src/lib/cluster'
+import { execCmd, execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
 import { doCheckOrPromptIfStagingOrProduction } from 'src/lib/env-utils'
 import { installAndEnableMetricsDeps, redeployTiller } from 'src/lib/helm_deploy'
-import { execCmd, execCmdWithExitOnFailure, outputIncludes } from 'src/lib/utils'
+import { outputIncludes } from 'src/lib/utils'
 
 /**
  * Basic info for an AKS cluster
