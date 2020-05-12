@@ -36,6 +36,10 @@ export const nuxNavigationOptionsNoBackButton = {
 export const headerWithBackButton = {
   headerTitle: '',
   headerTitleStyle: [fontStyles.headerTitle, componentStyles.screenHeader],
+  headerTitleContainerStyle: {
+    alignItems: 'center',
+  },
+  headerTitleAlign: 'center',
   headerLeftContainerStyle: { paddingHorizontal: 20 },
   headerLeft: <BackButton />,
   headerRight: <View />, // This helps vertically center the title
@@ -100,6 +104,5 @@ export const exchangeHeader = (makerToken: CURRENCY_ENUM) => {
 const styles = StyleSheet.create({
   header: {
     alignItems: 'center',
-    flex: 1,
   },
 })
