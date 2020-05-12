@@ -23,10 +23,15 @@ import {
   sendPaymentOrInviteSuccess,
 } from 'src/send/actions'
 import { transferStableToken } from 'src/stableToken/actions'
-import { BasicTokenTransfer, createTransaction, getCurrencyAddress } from 'src/tokens/saga'
+import {
+  BasicTokenTransfer,
+  createTokenTransferTransaction,
+  getCurrencyAddress,
+} from 'src/tokens/saga'
 import { generateStandbyTransactionId } from 'src/transactions/actions'
 import Logger from 'src/utils/Logger'
 import { currentAccountSelector } from 'src/web3/selectors'
+import { estimateGas } from 'src/web3/utils'
 
 const TAG = 'send/saga'
 
@@ -36,9 +41,9 @@ export async function getSendTxGas(
   params: BasicTokenTransfer
 ) {
   Logger.debug(`${TAG}/getSendTxGas`, 'Getting gas estimate for send tx')
-  const tx = await createTransaction(currency, params)
+  const tx = await createTokenTransferTransaction(currency, params)
   const txParams = { from: account, feeCurrency: await getCurrencyAddress(currency) }
-  const gas = new BigNumber(await tx.txo.estimateGas(txParams))
+  const gas = await estimateGas(tx.txo, txParams)
   Logger.debug(`${TAG}/getSendTxGas`, `Estimated gas of ${gas.toString()}`)
   return gas
 }
@@ -55,7 +60,7 @@ export async function getSendFee(
 export function* watchQrCodeDetections() {
   while (true) {
     const action = yield take(Actions.BARCODE_DETECTED)
-    Logger.debug(TAG, 'Bar bar detected in watcher')
+    Logger.debug(TAG, 'Barcode detected in watcher')
     const addressToE164Number = yield select(addressToE164NumberSelector)
     const recipientCache = yield select(recipientCacheSelector)
     try {

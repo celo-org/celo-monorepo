@@ -54,34 +54,6 @@ Once you have the account address, you can make calls against your own smart con
   this.setState({ cUSDBalance, isLoadingBalance: false })
 ```
 
-## Get Contact List Addresses
-
-For many real-world applications, your user will want to interact with their friends and family on your DApp. Celo has a built-in [Identity Protocol](../../celo-codebase/protocol/identity/README.md) that maps phone numbers to account addresses. You can use DAppkit to fetch that mapping for a user's contact list.
-
-([expo base template commit](https://github.com/celo-org/dappkit-base/commit/532b72b0a5b0f5356a1e535700e53d649554ed57))
-
-```javascript
-import { fetchContacts } from "@celo/dappkit";
-import * as Permissions from "expo-permissions";
-
-const { status } = await Permissions.askAsync(Permissions.CONTACTS);
-
-if (status != Permissions.PermissionStatus.GRANTED) {
-  return
-}
-
-const { rawContacts, phoneNumbersByAddress } = await fetchContacts(kit)
-
-this.setState({ rawContacts, phoneNumbersByAddress })
-
-Object.entries(this.state.phoneNumbersByAddress).map(([address, entry]) => {
-  const contact = this.state.rawContacts[entry.id]
-  return (
-    <Button key={address} title={contact.name} onPress={() => {}} />
-  )
-})
-```
-
 ## Signing Transactions
 
 Let's go from accessing account information to submitting transactions. To alter state on the blockchain, you need to make a transaction object with your smart contract or any of the Celo Core Contracts in ContractKit. All that is left to do is to pass the transaction object to DAppKit.

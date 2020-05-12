@@ -12,6 +12,7 @@ import {
   isLoadingImportContactsSelector,
 } from 'src/identity/reducer'
 
+// TODO Remove this if we don't end up using it in the matchmaking UI
 export function ContactSyncBanner() {
   const { t } = useTranslation(Namespaces.sendFlow7)
   const isLoadingContacts = useSelector(isLoadingImportContactsSelector)

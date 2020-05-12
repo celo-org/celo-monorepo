@@ -9,7 +9,7 @@ import { headerWithBackButton } from 'src/navigator/Headers'
 const licenseURI = Platform.select({
   ios: './LicenseDisclaimer.txt', // For when iOS is implemented!
   android: 'file:///android_asset/custom/LicenseDisclaimer.txt',
-})
+}) as string
 
 type Props = {} & WithTranslation
 

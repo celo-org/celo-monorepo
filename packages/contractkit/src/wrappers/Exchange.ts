@@ -3,9 +3,10 @@ import { Exchange } from '../generated/Exchange'
 import {
   BaseWrapper,
   CeloTransactionObject,
+  fixidityValueToBigNumber,
   identity,
   proxyCall,
-  toTransactionObject,
+  proxySend,
   tupleParser,
   valueToBigNumber,
   valueToFrac,
@@ -17,6 +18,7 @@ export interface ExchangeConfig {
   reserveFraction: BigNumber
   updateFrequency: BigNumber
   minimumReports: BigNumber
+  lastBucketUpdate: BigNumber
 }
 
 /**
@@ -28,12 +30,16 @@ export class ExchangeWrapper extends BaseWrapper<Exchange> {
    * Query spread parameter
    * @returns Current spread charged on exchanges
    */
-  spread = proxyCall(this.contract.methods.spread, undefined, valueToBigNumber)
+  spread = proxyCall(this.contract.methods.spread, undefined, fixidityValueToBigNumber)
   /**
    * Query reserve fraction parameter
    * @returns Current fraction to commit to the gold bucket
    */
-  reserveFraction = proxyCall(this.contract.methods.reserveFraction, undefined, valueToBigNumber)
+  reserveFraction = proxyCall(
+    this.contract.methods.reserveFraction,
+    undefined,
+    fixidityValueToBigNumber
+  )
   /**
    * Query update frequency parameter
    * @returns The time period that needs to elapse between bucket
@@ -59,14 +65,14 @@ export class ExchangeWrapper extends BaseWrapper<Exchange> {
    * @param sellGold `true` if gold is the sell token
    * @return The corresponding buyToken amount.
    */
-  getBuyTokenAmount: (
-    sellAmount: BigNumber.Value,
-    sellGold: boolean
-  ) => Promise<BigNumber> = proxyCall(
-    this.contract.methods.getBuyTokenAmount,
-    tupleParser(valueToString, identity),
-    valueToBigNumber
-  )
+  async getBuyTokenAmount(sellAmount: BigNumber.Value, sellGold: boolean): Promise<BigNumber> {
+    const sell = valueToString(sellAmount)
+    if (new BigNumber(sell).eq(0)) {
+      return new BigNumber(0)
+    }
+    const res = await this.contract.methods.getBuyTokenAmount(sell, sellGold).call()
+    return valueToBigNumber(res)
+  }
 
   /**
    * Returns the amount of sellToken a user would need to exchange to receive buyAmount of
@@ -75,14 +81,14 @@ export class ExchangeWrapper extends BaseWrapper<Exchange> {
    * @param sellGold `true` if gold is the sell token
    * @return The corresponding sellToken amount.
    */
-  getSellTokenAmount: (
-    buyAmount: BigNumber.Value,
-    sellGold: boolean
-  ) => Promise<BigNumber> = proxyCall(
-    this.contract.methods.getSellTokenAmount,
-    tupleParser(valueToString, identity),
-    valueToBigNumber
-  )
+  async getSellTokenAmount(buyAmount: BigNumber.Value, sellGold: boolean): Promise<BigNumber> {
+    const buy = valueToString(buyAmount)
+    if (new BigNumber(buy).eq(0)) {
+      return new BigNumber(0)
+    }
+    const res = await this.contract.methods.getSellTokenAmount(buy, sellGold).call()
+    return valueToBigNumber(res)
+  }
 
   /**
    * Returns the buy token and sell token bucket sizes, in order. The ratio of
@@ -106,29 +112,15 @@ export class ExchangeWrapper extends BaseWrapper<Exchange> {
    * @param sellGold `true` if gold is the sell token
    * @return The amount of buyToken that was transfered
    */
-  async exchange(
+  exchange: (
     sellAmount: BigNumber.Value,
     minBuyAmount: BigNumber.Value,
     sellGold: boolean
-  ): Promise<CeloTransactionObject<string>> {
-    if (sellGold) {
-      const goldToken = await this.kit.contracts.getGoldToken()
-      await goldToken.increaseAllowance(this.address, sellAmount).send()
-    } else {
-      const stableToken = await this.kit.contracts.getStableToken()
-      await stableToken.increaseAllowance(this.address, sellAmount).send()
-    }
-    return toTransactionObject(
-      this.kit,
-      this.contract.methods.exchange(
-        valueToString(sellAmount),
-        valueToString(minBuyAmount),
-        sellGold
-      ),
-      // Don't estimate gas as the increaseAllowance may not be mined yet.
-      { from: this.kit.defaultAccount, gas: 1000000 }
-    )
-  }
+  ) => CeloTransactionObject<string> = proxySend(
+    this.kit,
+    this.contract.methods.exchange,
+    tupleParser(valueToString, valueToString, identity)
+  )
 
   /**
    * Exchanges amount of cGLD in exchange for at least minUsdAmount of cUsd
@@ -190,12 +182,14 @@ export class ExchangeWrapper extends BaseWrapper<Exchange> {
       this.reserveFraction(),
       this.updateFrequency(),
       this.minimumReports(),
+      this.lastBucketUpdate(),
     ])
     return {
       spread: res[0],
       reserveFraction: res[1],
       updateFrequency: res[2],
       minimumReports: res[3],
+      lastBucketUpdate: res[4],
     }
   }
   /**

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- See https://developer.android.com/guide/topics/data/autobackup on how to modify this file -->
 <full-backup-content>
-    <include domain="file" path=".integration/GethDroid"/>
-    <include domain="file" path=".alfajoresstaging/GethDroid"/>
+  <include domain="file" path=".integration/celoandroid"/>
+  <include domain="file" path=".alfajoresstaging/celoandroid"/>
 </full-backup-content>

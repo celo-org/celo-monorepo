@@ -32,10 +32,10 @@ files=(
   ".env.mnemonic.baklava"
   ".env.mnemonic.baklavastaging"
   ".env.mnemonic.integration"
-  ".env.mnemonic.integrationtesting"
   ".env.mnemonic.pilot"
   ".env.mnemonic.pilotstaging"
   ".env.mnemonic.rc0"
+  ".env.mnemonic.rc1"
 )
 
 if [[ -z "$1" ]]; then

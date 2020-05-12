@@ -1,17 +1,19 @@
+import { notEmpty } from '@celo/utils/lib/collections'
 import * as utf8 from 'utf8'
-// @ts-ignore
-import * as Web3EthAbi from 'web3-eth-abi'
-// @ts-ignore
+import Web3 from 'web3'
 import { hexToUtf8 } from 'web3-utils'
 import { Log, Transfer } from './blockscout'
 
-// Note: topic0 here refers to the sha3 of an ERC20 Transfer event paremeter signature
+// Note: topic0 here refers to the sha3 of an ERC20 Transfer event parameter signature
 // https://codeburst.io/deep-dive-into-ethereum-logs-a8d2047c7371
 const transferTopic0 = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef'
 const commentTopic0 = '0xe5d4e30fb8364e57bc4d662a07d0cf36f4c34552004c4c3624620a2c1d1c03dc'
 
+const web3 = new Web3()
+
 export function decodeLogs(logs: Log[]) {
-  const transfers = new Map<string, Transfer>()
+  // tx hash -> Transfers[]
+  const transfersByTxHash = new Map<string, Transfer[]>()
   const comments = new Map<string, string>()
   let latestBlock = 0
 
@@ -19,9 +21,11 @@ export function decodeLogs(logs: Log[]) {
     latestBlock = Math.max(latestBlock, parseInt(log.blockNumber, 16))
     const topic0 = getLogTopic0(log)
     if (topic0 === transferTopic0) {
-      const decodedLog = decodeTransferLog(log)
-      if (decodedLog) {
-        transfers.set(log.transactionHash, decodedLog)
+      const transfer = decodeTransferLog(log)
+      if (transfer) {
+        const existingTransfers = transfersByTxHash.get(log.transactionHash) || []
+        existingTransfers.push(transfer)
+        transfersByTxHash.set(log.transactionHash, existingTransfers)
       }
     } else if (topic0 === commentTopic0) {
       comments.set(log.transactionHash, decodeCommentLog(log))
@@ -30,12 +34,12 @@ export function decodeLogs(logs: Log[]) {
 
   // Zip the comments into the transfers
   for (const [txHash, comment] of comments) {
-    if (transfers.has(txHash)) {
-      transfers.get(txHash)!.comment = comment
+    if (transfersByTxHash.has(txHash)) {
+      transfersByTxHash.get(txHash)!.forEach((transfer) => (transfer.comment = comment))
     }
   }
 
-  return { transfers, latestBlock }
+  return { transfers: transfersByTxHash, latestBlock }
 }
 
 function getLogTopic0(log: Log): string | null {
@@ -53,13 +57,12 @@ function decodeTransferLog(log: Log): Transfer | null {
   }
 
   /**
-   * Decode using the parameter signture for an ERC20 Transfer event
+   * Decode using the parameter signature for an ERC20 Transfer event
    * For unknown reasons, blockscout includes an extra unknown param in the log's topics list
    * Including this unknown param in the input list or decoding won't work
    */
   try {
-    // @ts-ignore
-    const decodedLog: any = Web3EthAbi.default.decodeLog(
+    const decodedLog = web3.eth.abi.decodeLog(
       [
         {
           indexed: true,
@@ -83,7 +86,7 @@ function decodeTransferLog(log: Log): Transfer | null {
         },
       ],
       log.data,
-      log.topics.filter((t) => t !== null)
+      log.topics.filter(notEmpty)
     )
 
     return {

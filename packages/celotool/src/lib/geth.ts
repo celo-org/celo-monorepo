@@ -16,6 +16,7 @@ import sleep from 'sleep-promise'
 import Web3 from 'web3'
 import { TransactionReceipt } from 'web3-core'
 import { Admin } from 'web3-eth-admin'
+import { spawnCmd, spawnCmdWithExitOnFailure } from './cmd-utils'
 import { convertToContractDecimals } from './contract-utils'
 import { envVar, fetchEnv, isVmBased } from './env-utils'
 import {
@@ -28,7 +29,7 @@ import {
 import { retrieveClusterIPAddress, retrieveIPAddress } from './helm_deploy'
 import { GethInstanceConfig } from './interfaces/geth-instance-config'
 import { GethRunConfig } from './interfaces/geth-run-config'
-import { ensure0x, spawnCmd, spawnCmdWithExitOnFailure } from './utils'
+import { ensure0x } from './utils'
 import { getTestnetOutputs } from './vm-testnet-utils'
 
 export async function unlockAccount(
@@ -147,6 +148,10 @@ export const getEnodesAddresses = async (namespace: string) => {
 
 export const getEnodesWithExternalIPAddresses = async (namespace: string) => {
   return getEnodesWithIpAddresses(namespace, true)
+}
+
+export function getPrivateTxNodeClusterIP(celoEnv: string) {
+  return retrieveClusterIPAddress('service', 'tx-nodes-private', celoEnv)
 }
 
 export const fetchPassword = (passwordFile: string) => {
@@ -1179,36 +1184,12 @@ export async function migrateContracts(
 ) {
   const migrationOverrides = merge(
     {
-      downtimeSlasher: {
-        slashableDowntime: 6,
-      },
-      election: {
-        minElectableValidators: '1',
-      },
-      epochRewards: {
-        frozen: false,
-        targetVotingYieldParameters: {
-          initial: 0.00016,
-          max: 0.0005,
-          adjustmentFactor: 0.1,
-        },
-      },
-      exchange: {
-        frozen: false,
-      },
-      goldToken: {
-        frozen: false,
-      },
-      reserve: {
-        initialBalance: 100000000,
-      },
       stableToken: {
         initialBalances: {
           addresses: validators.map(ensure0x),
           values: validators.map(() => '10000000000000000000000'),
         },
         oracles: validators.map(ensure0x),
-        goldPrice: 10,
       },
       validators: {
         validatorKeys: validatorPrivateKeys.map(ensure0x),

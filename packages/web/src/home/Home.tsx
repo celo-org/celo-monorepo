@@ -9,7 +9,6 @@ import HomeCarousel from 'src/home/HomeCarousel'
 import HomeSystems from 'src/home/HomeSystems'
 import Timeline from 'src/home/roadmap/Timeline'
 import HomeCover from 'src/home/version3/HomeCover'
-import HomeEmail from 'src/home/version3/HomeEmail'
 import HomeHero from 'src/home/version3/HomeHero'
 import HomeWork from 'src/home/version3/HomeWork'
 import { I18nProps, withNamespaces } from 'src/i18n'
@@ -75,7 +74,6 @@ export class Home extends React.Component<Props & I18nProps, State> {
         <HomeWork />
         <HomeCarousel />
         <HomeBackers />
-        <HomeEmail />
       </View>
     )
   }

@@ -1,0 +1,107 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "name" . }}
+  labels:
+{{ include "labels" . | indent 4 }}
+{{ include "oracle-client-component-label" . | indent 4 }}
+spec:
+  clusterIP: None
+  selector:
+{{ include "oracle-client-component-label" . | indent 4 }}
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ template "name" . }}
+  labels:
+{{ include "labels" . | indent 4 }}
+{{ include "oracle-client-component-label" . | indent 4 }}
+spec:
+  podManagementPolicy: Parallel
+  updateStrategy:
+    type: RollingUpdate
+  replicas: {{ .Values.oracle.replicas }}
+  serviceName: oracle
+  selector:
+    matchLabels:
+{{ include "labels" . | indent 6 }}
+{{ include "oracle-client-component-label" . | indent 6 }}
+  template:
+    metadata:
+      labels:
+{{ include "labels" . | indent 8 }}
+{{ include "oracle-client-component-label" . | indent 8 }}
+      annotations:
+{{ if .Values.oracle.metrics.enabled }}
+{{ include "metric-annotations" . | indent 8 }}
+{{ end }}
+    spec:
+      initContainers:
+      - name: set-label
+        image: {{ .Values.kubectl.image.repository }}:{{ .Values.kubectl.image.tag }}
+        command:
+        - sh
+        - -c
+        args:
+        - |
+           kubectl \
+            --namespace "$POD_NAMESPACE" \
+            --server="https://kubernetes.default.svc" \
+            --token="$TOKEN" \
+            --certificate-authority="/var/run/secrets/kubernetes.io/serviceaccount/ca.crt" \
+            label pod "$POD_NAME" \
+            --overwrite \
+            "aadpodidbinding=$POD_NAME-identity-binding"
+        env:
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: TOKEN
+          valueFrom:
+            secretKeyRef:
+              key: token
+              name: {{ .Values.kube.authTokenName }}
+      containers:
+      - name: oracle-client
+        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+        imagePullPolicy: Always
+        ports:
+          - name: prometheus
+            containerPort: {{ .Values.oracle.metrics.prometheusPort }}
+        command:
+          - bash
+          - "-c"
+          - |
+            [[ $REPLICA_NAME =~ -([0-9]+)$ ]] || exit 1
+            RID=${BASH_REMATCH[1]}
+
+            # Get the correct key vault name
+            AZURE_KEY_VAULT_NAMES={{- range $index, $identity := .Values.oracle.identities -}}{{ $identity.azure.keyVaultName }},{{- end }}
+            export AZURE_KEY_VAULT_NAME=`echo -n $AZURE_KEY_VAULT_NAMES | cut -d ',' -f $((RID + 1))`
+
+            # Get the correct oracle account address
+            ADDRESSES={{- range $index, $identity := .Values.oracle.identities -}}{{ $identity.address }},{{- end }}
+            export ADDRESS=`echo -n $ADDRESSES | cut -d ',' -f $((RID + 1))`
+
+            yarn start
+        env:
+        - name: REPLICA_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: RPC_PROVIDER_URL
+          value: {{ .Values.oracle.rpcProviderUrl }}
+        - name: METRICS
+          value: "{{ .Values.oracle.metrics.enabled }}"
+        - name: PROMETHEUS_PORT
+          value: "{{ .Values.oracle.metrics.prometheusPort }}"
+        - name: AZURE_HSM_INIT_TRY_COUNT
+          value: "{{ .Values.oracle.azureHsm.initTryCount }}"
+        - name: AZURE_HSM_INIT_MAX_RETRY_BACKOFF_MS
+          value: "{{ .Values.oracle.azureHsm.initMaxRetryBackoffMs }}"
