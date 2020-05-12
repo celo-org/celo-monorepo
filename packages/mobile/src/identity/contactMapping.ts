@@ -123,7 +123,13 @@ export function* fetchPhoneAddressesAndCheckIfRecipientValidationRequired({
     // Clear existing entries for those numbers so our mapping consumers know new status is pending.
     yield put(updateE164PhoneNumberAddresses({ [e164Number]: undefined }, {}))
 
-    const addresses: string[] | null = yield call(getAddresses, e164Number)
+    const contractKit = yield call(getContractKit)
+    const attestationsWrapper: AttestationsWrapper = yield call([
+      contractKit.contracts,
+      contractKit.contracts.getAttestations,
+    ])
+
+    const addresses: string[] | null = yield call(getAddresses, e164Number, attestationsWrapper)
     // const addresses = [
     //   '0xf1b1d5a6e7728a309c4a025b122d71ad75a61976',
     //   '0x4ee307e8bdcaa2695b49cd6af380ac70914c7c78',
@@ -168,7 +174,7 @@ export function* fetchPhoneAddressesAndCheckIfRecipientValidationRequired({
   }
 }
 
-function* getAddresses(e164Number: string) {
+function* getAddresses(e164Number: string, attestationsWrapper: AttestationsWrapper) {
   let phoneHash: string
   if (USE_PHONE_NUMBER_PRIVACY) {
     const phoneHashDetails: PhoneNumberHashDetails = yield call(fetchPhoneHashPrivate, e164Number)
@@ -176,12 +182,6 @@ function* getAddresses(e164Number: string) {
   } else {
     phoneHash = getPhoneHash(e164Number)
   }
-
-  const contractKit = getContractKit()
-  const attestationsWrapper: AttestationsWrapper = yield call([
-    contractKit.contracts,
-    contractKit.contracts.getAttestations,
-  ])
 
   // Map of identifier -> (Map of address -> AttestationStat)
   const results: IdentifierLookupResult = yield call(

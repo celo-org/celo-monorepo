@@ -145,7 +145,9 @@ export const vNeg1Schema = {
   },
 }
 
-export const v2Schema = {
+export const v0Schema = vNeg1Schema
+
+export const v1Schema = {
   app: {
     inviteCodeEntered: false,
     loggedIn: false,
@@ -168,10 +170,6 @@ export const v2Schema = {
   send: {
     isSending: false,
     recentRecipients: [],
-    isValidRecipient: false,
-    manualAddressValidationRequired: false,
-    fullValidationRequired: false,
-    manuallyValidatedE164NumberToAddress: {},
   },
   recipients: {
     recipientCache: {},
@@ -263,7 +261,7 @@ export const v2Schema = {
     isSendingInvite: false,
     isRedeemingInvite: false,
     isSkippingInvite: false,
-    invitees: {},
+    invitees: [],
     redeemedInviteCode: '',
     redeemComplete: false,
   },
@@ -292,9 +290,7 @@ export const v2Schema = {
   },
 }
 
-export const v0Schema = vNeg1Schema
-
-export const v1Schema = {
+export const v2Schema = {
   app: {
     inviteCodeEntered: false,
     loggedIn: false,
@@ -317,6 +313,10 @@ export const v1Schema = {
   send: {
     isSending: false,
     recentRecipients: [],
+    isValidRecipient: false,
+    manualAddressValidationRequired: false,
+    fullValidationRequired: false,
+    manuallyValidatedE164NumberToAddress: {},
   },
   recipients: {
     recipientCache: {},
