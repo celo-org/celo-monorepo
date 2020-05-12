@@ -967,7 +967,7 @@ ___
 
 ###  signerToAccount
 
-▸ **signerToAccount**(`signerAddress`: [Address](../modules/_base_.md#address), `blockNumber?`: undefined | number): *Promise‹string›*
+▸ **signerToAccount**(`signerAddress`: [Address](../modules/_base_.md#address)): *Promise‹string›*
 
 *Defined in [contractkit/src/wrappers/Validators.ts:192](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Validators.ts#L192)*
 
@@ -980,7 +980,6 @@ Returns the account associated with `signer`.
 Name | Type |
 ------ | ------ |
 `signerAddress` | [Address](../modules/_base_.md#address) |
-`blockNumber?` | undefined &#124; number |
 
 **Returns:** *Promise‹string›*
 
