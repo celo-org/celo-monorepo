@@ -7,9 +7,9 @@ import {
   upgradeHelmChart,
 } from 'src/lib/blockscout'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
+import { execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
 import { envVar, fetchEnvOrFallback } from 'src/lib/env-utils'
 import { resetCloudSQLInstance, retrieveCloudSQLConnectionInfo } from 'src/lib/helm_deploy'
-import { execCmdWithExitOnFailure } from 'src/lib/utils'
 import yargs from 'yargs'
 import { UpgradeArgv } from '../../deploy/upgrade'
 
