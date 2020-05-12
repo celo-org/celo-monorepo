@@ -36,7 +36,6 @@ platform :android do
 
   desc 'Build the Android application - requires environment param'
   lane :build do |options|
-    # clean
     environment = options[:environment].capitalize
     ENV["GRADLE_OPTS"] = '-Dorg.gradle.daemon=false -Dorg.gradle.jvmargs="-Xmx10000m -XX:+HeapDumpOnOutOfMemoryError"'
     if options[:buildApk]

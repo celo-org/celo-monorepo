@@ -85,8 +85,6 @@ project.ext.react = [
         devDisabledInPilot: true,
         cliPath: "../../node_modules/react-native/cli.js",
         entryFile: "index.js",
-        // composeSourceMapsPath: "../../node_modules/react-native/scripts/compose-source-maps.js",
-        // hermesCommand: "../../../../node_modules/hermes-engine/%OS-BIN%/hermes"
 ]
 
 project.ext.envConfigFiles = [
