@@ -864,6 +864,20 @@ jobs:
           cd packages/celotool
           NAMESPACE="circle-${CIRCLE_BUILD_NUM}"
           scripts/test_sync.sh rc1 full ${NAMESPACE}
+    - run:
+        name: Deploy fast mode client connected to rc1
+        command: |
+          set -e
+          cd packages/celotool
+          NAMESPACE="circle-${CIRCLE_BUILD_NUM}"
+          bin/celotooljs.sh deploy initial gke-fullnode -e rc1 --syncmode fast --namespace ${NAMESPACE}
+    - run:
+        name: Test fast mode client connected to rc1
+        command: |
+          set -e
+          cd packages/celotool
+          NAMESPACE="circle-${CIRCLE_BUILD_NUM}"
+          scripts/test_sync.sh rc1 fast ${NAMESPACE}
     # - run:
     #     name: Deploy network
     #     no_output_timeout: 25m

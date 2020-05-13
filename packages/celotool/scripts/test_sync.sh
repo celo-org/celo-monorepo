@@ -56,21 +56,18 @@ test_syn_syncing() {
   echo "Sleeping 180"
   sleep 180
   local target=$(kubectl -n ${namespace} exec -it ${node_pod} -- geth attach --exec 'eth.syncing' | grep highestBlock | cut -d' ' -f4 | tr -d ',' | $aliassed -r "s/\x1B\[([0-9]{1,3}(;[0-9]{1,2})?)?[mGK]//g")
-  echo kubectl -n ${namespace} exec -it ${node_pod} -- geth attach --exec 'eth.syncing'
   target=${target//[$'\t\r\n ']}
-  echo "target: ${target}"
+  echo "Target block: ${target}"
 
   local current=$(kubectl -n ${namespace} exec -it ${node_pod} -- geth attach --exec 'eth.syncing' | grep currentBlock | cut -d' ' -f4 | tr -d ',' | $aliassed -r "s/\x1B\[([0-9]{1,3}(;[0-9]{1,2})?)?[mGK]//g")
   current=${current//[$'\t\r\n ']}
-  echo "current: ${current}"
   
   local current_prev=$(kubectl -n $namespace exec -it ${node_pod} -- geth attach --exec 'eth.syncing' | grep currentBlock | cut -d' ' -f4 | tr -d ',' | $aliassed -r "s/\x1B\[([0-9]{1,3}(;[0-9]{1,2})?)?[mGK]//g")
   current_prev=${current_prev//[$'\t\r\n ']}
-  echo "current_prev: ${current_prev}"
 
   synced=false
   syncing=true
-  local loop_time="60"
+  local loop_time="90"
   while [ "$synced" != "true" ] && [ "$syncing" == "true" ]; do
     echo "Sleeping ${loop_time}"
     sleep $loop_time
