@@ -6,12 +6,15 @@ import {
   hasValidAccountParam,
   hasValidQueryPhoneNumberParam,
   isBodyReasonablySized,
+  phoneNumberHashIsValidIfExists,
 } from '../common/input-validation'
 import logger from '../common/logger'
+import { getTransaction } from '../database/database'
 import { incrementQueryCount } from '../database/wrappers/account'
 import { getRemainingQueryCount } from './query-quota'
 
 export async function handleGetBlindedMessageForSalt(request: Request, response: Response) {
+  const trx = await getTransaction()
   try {
     if (!isValidGetSignatureInput(request.body)) {
       respondWithError(response, 400, ErrorMessages.INVALID_INPUT)
@@ -22,20 +25,23 @@ export async function handleGetBlindedMessageForSalt(request: Request, response:
       return
     }
     const remainingQueryCount = await getRemainingQueryCount(
+      trx,
       request.body.account,
       request.body.hashedPhoneNumber
     )
     if (remainingQueryCount <= 0) {
+      trx.rollback()
       respondWithError(response, 403, ErrorMessages.EXCEEDED_QUOTA)
       return
     }
     const signature = await BLSCryptographyClient.computeBlindedSignature(
       request.body.blindedQueryPhoneNumber
     )
-    await incrementQueryCount(request.body.account)
+    await incrementQueryCount(request.body.account, trx)
     response.json({ success: true, signature })
   } catch (error) {
     logger.error('Failed to getSalt', error)
+    trx.rollback()
     respondWithError(response, 500, ErrorMessages.UNKNOWN_ERROR)
   }
 }
@@ -44,6 +50,7 @@ function isValidGetSignatureInput(requestBody: any): boolean {
   return (
     hasValidAccountParam(requestBody) &&
     hasValidQueryPhoneNumberParam(requestBody) &&
+    phoneNumberHashIsValidIfExists(requestBody) &&
     isBodyReasonablySized(requestBody)
   )
 }
