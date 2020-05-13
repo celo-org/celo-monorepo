@@ -88,6 +88,7 @@ export const MAIN_MENU = [
 
 // TODO: Temporary link to the master branch documentation for 'sdkDocs' and 'sdkTutorial'
 export enum CeloLinks {
+  audits = '/audits',
   agreement = '/user-agreement',
   faucet = '/developers/faucet',
   iconsLicense = 'https://creativecommons.org/licenses/by-nd/4.0/legalcode',

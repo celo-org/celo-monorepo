@@ -45,7 +45,7 @@ describe('Transfer Works', () => {
 
     await element(by.id('NameEntry')).replaceText(EXAMPLE_NAME)
 
-    await element(by.id('CountryNameField')).replaceText(VERIFICATION_COUNTRY)
+    await element(by.id('CountryNameFieldTextInput')).replaceText(VERIFICATION_COUNTRY)
 
     await expect(element(by.id('PhoneNumberField'))).toBeVisible()
     await element(by.id('PhoneNumberField')).replaceText(VERIFICATION_PHONE_NUMBER)

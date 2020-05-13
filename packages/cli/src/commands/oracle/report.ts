@@ -7,7 +7,7 @@ import { Flags } from '../../utils/command'
 
 export default class ReportPrice extends BaseCommand {
   static description =
-    'Report the price of Celo Gold in a specified token (currently just Celo Dollar, aka: "StableToken")'
+    'Report the price of Celo Gold in a specified token (currently just Celo Dollar, aka "StableToken")'
 
   static args = [
     {

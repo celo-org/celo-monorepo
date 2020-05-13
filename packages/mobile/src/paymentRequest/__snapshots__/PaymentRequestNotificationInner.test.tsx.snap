@@ -20,7 +20,7 @@ exports[`renders correctly 1`] = `
       }
     }
   >
-    +14155552671
+    mockDisplayName
      for 
   </Text>
   <Text

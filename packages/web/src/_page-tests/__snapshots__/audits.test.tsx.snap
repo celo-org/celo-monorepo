@@ -1,0 +1,722 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Audits renders 1`] = `
+<div
+  className="css-view-1dbjc4n"
+  style={
+    Object {
+      "marginTop": "75px",
+      "minHeight": "450px",
+      "paddingTop": "75px",
+    }
+  }
+>
+  <div
+    className="css-view-1dbjc4n"
+    style={
+      Object {
+        "WebkitAlignItems": "center",
+        "WebkitAlignSelf": "center",
+        "WebkitBoxAlign": "center",
+        "WebkitBoxDirection": "normal",
+        "WebkitBoxOrient": "vertical",
+        "WebkitBoxPack": "center",
+        "WebkitFlexDirection": "column",
+        "WebkitJustifyContent": "center",
+        "alignItems": "center",
+        "alignSelf": "center",
+        "flexDirection": "column",
+        "justifyContent": "center",
+        "marginBottom": "30px",
+        "maxWidth": "100vw",
+        "msFlexAlign": "center",
+        "msFlexDirection": "column",
+        "msFlexItemAlign": "center",
+        "msFlexPack": "center",
+        "paddingLeft": "10px",
+        "paddingRight": "10px",
+        "width": "100%",
+      }
+    }
+  >
+    <div
+      className="css-view-1dbjc4n"
+      style={
+        Object {
+          "WebkitAlignItems": "center",
+          "WebkitBoxAlign": "center",
+          "WebkitBoxFlex": 0,
+          "WebkitBoxPack": "center",
+          "WebkitFlexGrow": 0,
+          "WebkitFlexShrink": 0,
+          "WebkitJustifyContent": "center",
+          "alignItems": "center",
+          "flexGrow": 0,
+          "flexShrink": 0,
+          "justifyContent": "center",
+          "msFlexAlign": "center",
+          "msFlexNegative": 0,
+          "msFlexPack": "center",
+          "msFlexPositive": 0,
+          "paddingBottom": "10px",
+          "paddingLeft": "10px",
+          "paddingRight": "10px",
+          "paddingTop": "10px",
+          "width": "100%",
+        }
+      }
+    >
+      <h1
+        aria-level="1"
+        className="css-reset-4rbku5 css-text-901oao"
+        dir="auto"
+        role="heading"
+        style={
+          Object {
+            "color": "rgba(46,51,56,1.00)",
+            "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+            "fontSize": "36px",
+            "lineHeight": "40px",
+            "textAlign": "center",
+            "textRendering": "geometricPrecision",
+            "textTransform": "none",
+          }
+        }
+      >
+        Security Audits & Analyses
+      </h1>
+    </div>
+  </div>
+  <div
+    className="css-view-1dbjc4n"
+    style={
+      Object {
+        "WebkitAlignSelf": "center",
+        "WebkitBoxDirection": "normal",
+        "WebkitBoxOrient": "vertical",
+        "WebkitFlexDirection": "column",
+        "alignSelf": "center",
+        "flexDirection": "column",
+        "marginBottom": "20px",
+        "marginTop": "20px",
+        "maxWidth": "100vw",
+        "msFlexDirection": "column",
+        "msFlexItemAlign": "center",
+        "paddingLeft": "10px",
+        "paddingRight": "10px",
+        "width": "100%",
+      }
+    }
+  >
+    <div
+      className="css-view-1dbjc4n"
+      style={
+        Object {
+          "WebkitBoxFlex": 0,
+          "WebkitFlexGrow": 0,
+          "WebkitFlexShrink": 0,
+          "flexGrow": 0,
+          "flexShrink": 0,
+          "msFlexNegative": 0,
+          "msFlexPositive": 0,
+          "paddingBottom": "10px",
+          "paddingLeft": "10px",
+          "paddingRight": "10px",
+          "paddingTop": "10px",
+          "width": "100%",
+        }
+      }
+    >
+      <h3
+        aria-level="3"
+        className="css-reset-4rbku5 css-text-901oao"
+        dir="auto"
+        role="heading"
+        style={
+          Object {
+            "color": "rgba(46,51,56,1.00)",
+            "fontFamily": "Jost, futura-pt, futura, sans-serif",
+            "fontSize": "24px",
+            "lineHeight": "32px",
+            "textRendering": "geometricPrecision",
+            "textTransform": "none",
+          }
+        }
+      >
+        Contracts
+      </h3>
+    </div>
+    <div
+      className="css-view-1dbjc4n"
+      style={
+        Object {
+          "WebkitBoxFlex": 0,
+          "WebkitFlexGrow": 0,
+          "WebkitFlexShrink": 0,
+          "flexGrow": 0,
+          "flexShrink": 0,
+          "msFlexNegative": 0,
+          "msFlexPositive": 0,
+          "paddingBottom": "10px",
+          "paddingLeft": "10px",
+          "paddingRight": "10px",
+          "paddingTop": "10px",
+          "width": "100%",
+        }
+      }
+    >
+      <div
+        className="css-text-901oao"
+        dir="auto"
+        style={
+          Object {
+            "color": "rgba(46,51,56,1.00)",
+            "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+            "fontSize": "20px",
+            "lineHeight": "28px",
+            "textRendering": "geometricPrecision",
+          }
+        }
+      />
+      <div
+        className="css-view-1dbjc4n"
+        style={
+          Object {
+            "marginBottom": "20px",
+          }
+        }
+      >
+        <div
+          className="css-text-901oao"
+          dir="auto"
+          style={
+            Object {
+              "color": "rgba(46,51,56,1.00)",
+              "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+              "fontSize": "20px",
+              "lineHeight": "28px",
+              "textRendering": "geometricPrecision",
+            }
+          }
+        >
+          Smart Contract Audit
+           by 
+          <span
+            className="css-text-901oao css-textHasAncestor-16my406"
+            dir="auto"
+            style={
+              Object {
+                "fontStyle": "italic",
+              }
+            }
+          >
+            OpenZeppelin
+          </span>
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          onClick={[Function]}
+          onMouseDown={[Function]}
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          onMouseUp={[Function]}
+          onResponderGrant={[Function]}
+          onResponderRelease={[Function]}
+        >
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "WebkitBoxDirection": "normal",
+                "WebkitBoxFlex": 0,
+                "WebkitBoxOrient": "horizontal",
+                "WebkitBoxPack": "center",
+                "WebkitFlexDirection": "row",
+                "WebkitFlexGrow": 0,
+                "WebkitJustifyContent": "center",
+                "backgroundColor": "rgba(0,0,0,0.00)",
+                "borderBottomColor": "rgba(0,0,0,0.00)",
+                "borderLeftColor": "rgba(0,0,0,0.00)",
+                "borderRightColor": "rgba(0,0,0,0.00)",
+                "borderTopColor": "rgba(0,0,0,0.00)",
+                "flexDirection": "row",
+                "flexGrow": 0,
+                "justifyContent": "center",
+                "msFlexDirection": "row",
+                "msFlexPack": "center",
+                "msFlexPositive": 0,
+                "opacity": 1,
+                "outlineColor": "transparent",
+                "width": "fit-content",
+              }
+            }
+          >
+            <a
+              className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+              data-focusable={true}
+              dir="auto"
+              href="https://blog.openzeppelin.com/celo-contracts-audit"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
+              rel=" noopener noreferrer"
+              role="link"
+              style={
+                Object {
+                  "WebkitAlignItems": "center",
+                  "WebkitBoxAlign": "center",
+                  "alignItems": "center",
+                  "color": "rgba(53,208,127,1.00)",
+                  "cursor": "pointer",
+                  "display": "inline-flex",
+                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                  "fontSize": "16px",
+                  "fontWeight": "500",
+                  "lineHeight": "16px",
+                  "marginRight": "30px",
+                  "marginTop": "10px",
+                  "msFlexAlign": "center",
+                  "textAlign": "center",
+                  "textRendering": "geometricPrecision",
+                }
+              }
+              target="_blank"
+            >
+              Read
+              <div
+                className="css-view-1dbjc4n"
+                style={
+                  Object {
+                    "display": "inline-flex",
+                    "paddingLeft": "0.4em",
+                    "paddingTop": "0.185em",
+                  }
+                }
+              >
+                <svg
+                  fill="none"
+                  height="0.75em"
+                  style={Object {}}
+                  transform="rotate(0)"
+                  viewBox="0 0 8 12"
+                  width="0.75em"
+                >
+                  <path
+                    clipRule="evenodd"
+                    d="M1.19997 0L1.13249e-05 1.19996L4.80011 6.00006L0 10.8002L1.19996 12.0001L7.19977 6.00032L7.19953 6.00007L7.19979 5.99981L1.19997 0Z"
+                    fill="#35D07F"
+                    fillRule="evenodd"
+                    opacity={1}
+                    style={Object {}}
+                  />
+                </svg>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+      <div
+        className="css-view-1dbjc4n"
+        style={
+          Object {
+            "marginBottom": "20px",
+          }
+        }
+      >
+        <div
+          className="css-text-901oao"
+          dir="auto"
+          style={
+            Object {
+              "color": "rgba(46,51,56,1.00)",
+              "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+              "fontSize": "20px",
+              "lineHeight": "28px",
+              "textRendering": "geometricPrecision",
+            }
+          }
+        >
+          Formal Verification of Smart Contracts
+           by 
+          <span
+            className="css-text-901oao css-textHasAncestor-16my406"
+            dir="auto"
+            style={
+              Object {
+                "fontStyle": "italic",
+              }
+            }
+          >
+            Certora
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    className="css-view-1dbjc4n"
+    style={
+      Object {
+        "WebkitAlignSelf": "center",
+        "WebkitBoxDirection": "normal",
+        "WebkitBoxOrient": "vertical",
+        "WebkitFlexDirection": "column",
+        "alignSelf": "center",
+        "flexDirection": "column",
+        "marginBottom": "20px",
+        "marginTop": "20px",
+        "maxWidth": "100vw",
+        "msFlexDirection": "column",
+        "msFlexItemAlign": "center",
+        "paddingLeft": "10px",
+        "paddingRight": "10px",
+        "width": "100%",
+      }
+    }
+  >
+    <div
+      className="css-view-1dbjc4n"
+      style={
+        Object {
+          "WebkitBoxFlex": 0,
+          "WebkitFlexGrow": 0,
+          "WebkitFlexShrink": 0,
+          "flexGrow": 0,
+          "flexShrink": 0,
+          "msFlexNegative": 0,
+          "msFlexPositive": 0,
+          "paddingBottom": "10px",
+          "paddingLeft": "10px",
+          "paddingRight": "10px",
+          "paddingTop": "10px",
+          "width": "100%",
+        }
+      }
+    >
+      <h3
+        aria-level="3"
+        className="css-reset-4rbku5 css-text-901oao"
+        dir="auto"
+        role="heading"
+        style={
+          Object {
+            "color": "rgba(46,51,56,1.00)",
+            "fontFamily": "Jost, futura-pt, futura, sans-serif",
+            "fontSize": "24px",
+            "lineHeight": "32px",
+            "textRendering": "geometricPrecision",
+            "textTransform": "none",
+          }
+        }
+      >
+        Security
+      </h3>
+    </div>
+    <div
+      className="css-view-1dbjc4n"
+      style={
+        Object {
+          "WebkitBoxFlex": 0,
+          "WebkitFlexGrow": 0,
+          "WebkitFlexShrink": 0,
+          "flexGrow": 0,
+          "flexShrink": 0,
+          "msFlexNegative": 0,
+          "msFlexPositive": 0,
+          "paddingBottom": "10px",
+          "paddingLeft": "10px",
+          "paddingRight": "10px",
+          "paddingTop": "10px",
+          "width": "100%",
+        }
+      }
+    >
+      <div
+        className="css-text-901oao"
+        dir="auto"
+        style={
+          Object {
+            "color": "rgba(46,51,56,1.00)",
+            "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+            "fontSize": "20px",
+            "lineHeight": "28px",
+            "textRendering": "geometricPrecision",
+          }
+        }
+      />
+      <div
+        className="css-view-1dbjc4n"
+        style={
+          Object {
+            "marginBottom": "20px",
+          }
+        }
+      >
+        <div
+          className="css-text-901oao"
+          dir="auto"
+          style={
+            Object {
+              "color": "rgba(46,51,56,1.00)",
+              "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+              "fontSize": "20px",
+              "lineHeight": "28px",
+              "textRendering": "geometricPrecision",
+            }
+          }
+        >
+          Crypto Library Audit
+           by 
+          <span
+            className="css-text-901oao css-textHasAncestor-16my406"
+            dir="auto"
+            style={
+              Object {
+                "fontStyle": "italic",
+              }
+            }
+          >
+            Teserakt
+          </span>
+        </div>
+      </div>
+      <div
+        className="css-view-1dbjc4n"
+        style={
+          Object {
+            "marginBottom": "20px",
+          }
+        }
+      >
+        <div
+          className="css-text-901oao"
+          dir="auto"
+          style={
+            Object {
+              "color": "rgba(46,51,56,1.00)",
+              "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+              "fontSize": "20px",
+              "lineHeight": "28px",
+              "textRendering": "geometricPrecision",
+            }
+          }
+        >
+          Security Audit
+           by 
+          <span
+            className="css-text-901oao css-textHasAncestor-16my406"
+            dir="auto"
+            style={
+              Object {
+                "fontStyle": "italic",
+              }
+            }
+          >
+            Trailofbits
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    className="css-view-1dbjc4n"
+    style={
+      Object {
+        "WebkitAlignSelf": "center",
+        "WebkitBoxDirection": "normal",
+        "WebkitBoxOrient": "vertical",
+        "WebkitFlexDirection": "column",
+        "alignSelf": "center",
+        "flexDirection": "column",
+        "marginBottom": "20px",
+        "marginTop": "20px",
+        "maxWidth": "100vw",
+        "msFlexDirection": "column",
+        "msFlexItemAlign": "center",
+        "paddingLeft": "10px",
+        "paddingRight": "10px",
+        "width": "100%",
+      }
+    }
+  >
+    <div
+      className="css-view-1dbjc4n"
+      style={
+        Object {
+          "WebkitBoxFlex": 0,
+          "WebkitFlexGrow": 0,
+          "WebkitFlexShrink": 0,
+          "flexGrow": 0,
+          "flexShrink": 0,
+          "msFlexNegative": 0,
+          "msFlexPositive": 0,
+          "paddingBottom": "10px",
+          "paddingLeft": "10px",
+          "paddingRight": "10px",
+          "paddingTop": "10px",
+          "width": "100%",
+        }
+      }
+    >
+      <h3
+        aria-level="3"
+        className="css-reset-4rbku5 css-text-901oao"
+        dir="auto"
+        role="heading"
+        style={
+          Object {
+            "color": "rgba(46,51,56,1.00)",
+            "fontFamily": "Jost, futura-pt, futura, sans-serif",
+            "fontSize": "24px",
+            "lineHeight": "32px",
+            "textRendering": "geometricPrecision",
+            "textTransform": "none",
+          }
+        }
+      >
+        Economics
+      </h3>
+    </div>
+    <div
+      className="css-view-1dbjc4n"
+      style={
+        Object {
+          "WebkitBoxFlex": 0,
+          "WebkitFlexGrow": 0,
+          "WebkitFlexShrink": 0,
+          "flexGrow": 0,
+          "flexShrink": 0,
+          "msFlexNegative": 0,
+          "msFlexPositive": 0,
+          "paddingBottom": "10px",
+          "paddingLeft": "10px",
+          "paddingRight": "10px",
+          "paddingTop": "10px",
+          "width": "100%",
+        }
+      }
+    >
+      <div
+        className="css-text-901oao"
+        dir="auto"
+        style={
+          Object {
+            "color": "rgba(46,51,56,1.00)",
+            "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+            "fontSize": "20px",
+            "lineHeight": "28px",
+            "textRendering": "geometricPrecision",
+          }
+        }
+      />
+      <div
+        className="css-view-1dbjc4n"
+        style={
+          Object {
+            "marginBottom": "20px",
+          }
+        }
+      >
+        <div
+          className="css-text-901oao"
+          dir="auto"
+          style={
+            Object {
+              "color": "rgba(46,51,56,1.00)",
+              "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+              "fontSize": "20px",
+              "lineHeight": "28px",
+              "textRendering": "geometricPrecision",
+            }
+          }
+        >
+          Stability Protocol Analysis
+           by 
+          <span
+            className="css-text-901oao css-textHasAncestor-16my406"
+            dir="auto"
+            style={
+              Object {
+                "fontStyle": "italic",
+              }
+            }
+          >
+            Gauntlet
+          </span>
+        </div>
+      </div>
+      <div
+        className="css-view-1dbjc4n"
+        style={
+          Object {
+            "marginBottom": "20px",
+          }
+        }
+      >
+        <div
+          className="css-text-901oao"
+          dir="auto"
+          style={
+            Object {
+              "color": "rgba(46,51,56,1.00)",
+              "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+              "fontSize": "20px",
+              "lineHeight": "28px",
+              "textRendering": "geometricPrecision",
+            }
+          }
+        >
+          Economic Analysis
+           by 
+          <span
+            className="css-text-901oao css-textHasAncestor-16my406"
+            dir="auto"
+            style={
+              Object {
+                "fontStyle": "italic",
+              }
+            }
+          >
+            Prysm Group
+          </span>
+        </div>
+      </div>
+      <div
+        className="css-view-1dbjc4n"
+        style={
+          Object {
+            "marginBottom": "20px",
+          }
+        }
+      >
+        <div
+          className="css-text-901oao"
+          dir="auto"
+          style={
+            Object {
+              "color": "rgba(46,51,56,1.00)",
+              "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+              "fontSize": "20px",
+              "lineHeight": "28px",
+              "textRendering": "geometricPrecision",
+            }
+          }
+        >
+          Reserve Audit
+           by 
+          <span
+            className="css-text-901oao css-textHasAncestor-16my406"
+            dir="auto"
+            style={
+              Object {
+                "fontStyle": "italic",
+              }
+            }
+          >
+            NCC
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;

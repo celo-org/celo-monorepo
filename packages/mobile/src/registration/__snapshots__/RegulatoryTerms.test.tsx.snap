@@ -135,93 +135,92 @@ exports[`RegulatoryTermsScreen renders correctly 1`] = `
           terms.goldDisclaimer
         </Text>
       </View>
+    </View>
+  </RCTScrollView>
+  <View
+    style={
+      Array [
+        Object {
+          "alignItems": "center",
+          "borderRadius": 3,
+          "flexDirection": "row",
+        },
+        null,
+        null,
+        undefined,
+        Object {
+          "backgroundColor": "#42D689",
+        },
+      ]
+    }
+  >
+    <View
+      accessible={true}
+      focusable={true}
+      nativeBackgroundAndroid={
+        Object {
+          "attribute": "selectableItemBackground",
+          "type": "ThemeAttrAndroid",
+        }
+      }
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        Array [
+          Object {
+            "alignItems": "center",
+            "flex": 1,
+            "justifyContent": "center",
+          },
+          Object {
+            "backgroundColor": "#42D689",
+          },
+          Object {
+            "height": 50,
+          },
+          Object {
+            "borderWidth": 0,
+          },
+        ]
+      }
+      testID="AcceptTermsButton"
+    >
       <View
         style={
-          Array [
-            Object {
-              "alignItems": "center",
-              "borderRadius": 3,
-              "flexDirection": "row",
-            },
-            null,
-            null,
-            undefined,
-            Object {
-              "backgroundColor": "#42D689",
-            },
-          ]
+          Object {
+            "alignItems": "center",
+            "flex": 1,
+            "flexDirection": "row",
+            "justifyContent": "space-between",
+          }
         }
       >
-        <View
-          accessible={true}
-          focusable={true}
-          isTVSelectable={true}
-          nativeBackgroundAndroid={
-            Object {
-              "attribute": "selectableItemBackground",
-              "type": "ThemeAttrAndroid",
-            }
-          }
-          onClick={[Function]}
-          onResponderGrant={[Function]}
-          onResponderMove={[Function]}
-          onResponderRelease={[Function]}
-          onResponderTerminate={[Function]}
-          onResponderTerminationRequest={[Function]}
-          onStartShouldSetResponder={[Function]}
+        <Text
           style={
             Array [
               Object {
-                "alignItems": "center",
-                "flex": 1,
-                "justifyContent": "center",
+                "fontFamily": "Hind-SemiBold",
+                "fontSize": 16,
               },
               Object {
-                "backgroundColor": "#42D689",
+                "color": "#FFFFFF",
               },
               Object {
-                "height": 50,
-              },
-              Object {
-                "borderWidth": 0,
+                "paddingLeft": 5,
+                "paddingRight": 5,
               },
             ]
           }
-          testID="AcceptTermsButton"
         >
-          <View
-            style={
-              Object {
-                "alignItems": "center",
-                "flex": 1,
-                "flexDirection": "row",
-                "justifyContent": "space-between",
-              }
-            }
-          >
-            <Text
-              style={
-                Array [
-                  Object {
-                    "fontFamily": "Hind-SemiBold",
-                    "fontSize": 16,
-                  },
-                  Object {
-                    "color": "#FFFFFF",
-                  },
-                  Object {
-                    "paddingLeft": 5,
-                    "paddingRight": 5,
-                  },
-                ]
-              }
-            >
-              global:accept
-            </Text>
-          </View>
-        </View>
+          global:accept
+        </Text>
       </View>
     </View>
-  </RCTScrollView>
+  </View>
 </SafeAreaView>
 `;

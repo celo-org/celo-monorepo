@@ -5,7 +5,7 @@ Welcome to the technical documentation site for the Celo project!
 In this documentation you’ll find information on:
 
 - An [overview](overview.md) of the high-level architecture of Celo
-- Tutorials to get you started with the Celo codebase and the [Celo networks](getting-started/choosing-a-network.md)
+- Tutorials to get you started with the [Celo SDK](developer-resources/start.md) and the [Celo networks](getting-started/choosing-a-network.md)
 - Reference documentation about the [Celo protocol](celo-codebase/protocol/) and [wallet](celo-codebase/wallet/)
 - How to make technical [contributions](community/contributing.md) to the project and community
 

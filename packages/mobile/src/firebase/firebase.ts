@@ -4,7 +4,6 @@ import '@react-native-firebase/messaging'
 // We can't combine the 2 imports otherwise it only imports the type and fails at runtime
 // tslint:disable-next-line: no-duplicate-imports
 import { FirebaseMessagingTypes } from '@react-native-firebase/messaging'
-import * as Sentry from '@sentry/react-native'
 import DeviceInfo from 'react-native-device-info'
 import { eventChannel, EventChannel } from 'redux-saga'
 import { call, put, select, spawn, take } from 'redux-saga/effects'
@@ -85,6 +84,9 @@ export function* initializeCloudMessaging(app: ReactNativeFirebase.Module, addre
     }
   }
 
+  // `registerDeviceForRemoteMessages` must be called before calling `getToken`
+  // Note: `registerDeviceForRemoteMessages` is really only required for iOS and is a no-op on Android
+  yield call([app.messaging(), 'registerDeviceForRemoteMessages'])
   const fcmToken = yield call([app.messaging(), 'getToken'])
   if (fcmToken) {
     yield call(registerTokenToDb, app, address, fcmToken)
@@ -140,9 +142,7 @@ export function* initializeCloudMessaging(app: ReactNativeFirebase.Module, addre
 
   app.messaging().setBackgroundMessageHandler((remoteMessage) => {
     Logger.info(TAG, 'received Notification while app in Background')
-    Sentry.captureMessage(
-      `Received Unknown RNFirebaseBackgroundMessage ${JSON.stringify(remoteMessage)}`
-    )
+    // Nothing to do while app is in background
     return Promise.resolve() // need to return a resolved promise so native code releases the JS context
   })
 }
