@@ -1,3 +1,4 @@
+import { execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
 import { getBlockchainApiUrl, getBlockscoutUrl, getEthstatsUrl } from 'src/lib/endpoints'
 import {
   addCeloEnvMiddleware,
@@ -7,7 +8,6 @@ import {
   fetchEnvOrFallback,
   getEnvFile,
 } from 'src/lib/env-utils'
-import { execCmdWithExitOnFailure } from 'src/lib/utils'
 import { Arguments, Argv } from 'yargs'
 
 export const command = 'links <resource>'

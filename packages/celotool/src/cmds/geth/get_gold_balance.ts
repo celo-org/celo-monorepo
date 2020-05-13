@@ -1,5 +1,6 @@
+import { execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
 import { addCeloEnvMiddleware } from 'src/lib/env-utils'
-import { addCeloGethMiddleware, ensure0x, execCmdWithExitOnFailure } from 'src/lib/utils'
+import { addCeloGethMiddleware, ensure0x } from 'src/lib/utils'
 import yargs from 'yargs'
 import { GethArgv } from '../geth'
 

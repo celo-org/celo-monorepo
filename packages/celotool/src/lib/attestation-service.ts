@@ -1,7 +1,7 @@
+import { execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
 import { getEnodesWithExternalIPAddresses } from 'src/lib/geth'
 import { installGenericHelmChart, removeGenericHelmChart } from 'src/lib/helm_deploy'
 import { getGenesisBlockFromGoogleStorage } from 'src/lib/testnet-utils'
-import { execCmdWithExitOnFailure } from 'src/lib/utils'
 import { envVar, fetchEnv, fetchEnvOrFallback } from './env-utils'
 
 const helmChartPath = '../helm-charts/attestation-service'
