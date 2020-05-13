@@ -1,6 +1,6 @@
 import fs from 'fs'
 import path from 'path'
-import { execCmd } from './utils'
+import { execCmd } from './cmd-utils'
 
 const terraformModulesPath = path.join(__dirname, '../../../terraform-modules')
 
