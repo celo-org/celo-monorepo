@@ -57,13 +57,13 @@ spec:
           volumeMounts:
             - name: prometheus-storage-volume
               mountPath: /prometheus
+{{- if not (kindIs "invalid" .Values.gcloudServiceAccountKeyBase64) }}
             - name: prometheus-service-account-key
               mountPath: /var/secrets/google
-{{- if or (.Values.use_service_account) (eq (.Values.use_service_account | toString) "<nil>") }}
           env:
           - name: GOOGLE_APPLICATION_CREDENTIALS
             value: /var/secrets/google/prometheus-service-account.json
-{{ end -}}
+{{- end }}
       volumes:
         - name: prometheus-config-volume
           configMap:
@@ -71,8 +71,8 @@ spec:
             name: prometheus-server-conf
         - name: prometheus-storage-volume
           emptyDir: {}
-{{- if or (.Values.use_service_account) (eq (.Values.use_service_account | toString) "<nil>") }}
+{{- if not (kindIs "invalid" .Values.gcloudServiceAccountKeyBase64) }}
         - name: prometheus-service-account-key
           secret:
             secretName: prometheus-service-account-key
-{{ end -}}
+{{- end }}

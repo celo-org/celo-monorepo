@@ -1,6 +1,10 @@
 import { createNamespaceIfNotExists } from './cluster'
 import { envVar, fetchEnv } from './env-utils'
-import { installGenericHelmChart, removeGenericHelmChart } from './helm_deploy'
+import {
+  installGenericHelmChart,
+  removeGenericHelmChart,
+  upgradeGenericHelmChart,
+} from './helm_deploy'
 
 export const helmChartPath = '../helm-charts/prometheus-stackdriver'
 export const releaseName = 'prometheus-stackdriver'
@@ -19,6 +23,11 @@ export async function installPrometheus() {
 
 export async function removeHelmRelease() {
   await removeGenericHelmChart(releaseName)
+}
+
+export async function upgradePrometheus() {
+  await createNamespaceIfNotExists(kubeNamespace)
+  return upgradeGenericHelmChart(kubeNamespace, releaseName, helmChartPath, await helmParameters())
 }
 
 export function helmParameters() {

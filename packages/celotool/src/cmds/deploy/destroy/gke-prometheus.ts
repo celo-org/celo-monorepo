@@ -1,10 +1,10 @@
 import { switchToClusterFromEnv } from 'src/lib/cluster'
-import { installPrometheus } from 'src/lib/prometheus'
+import { removeHelmRelease } from 'src/lib/prometheus'
 import yargs from 'yargs'
 
 export const command = 'gke-prometheus'
 
-export const describe = 'deploy prometheus to a kubernetes cluster on GKE using Helm'
+export const describe = 'destroy prometheus on a kubernetes cluster on GKE using Helm'
 
 export const builder = (argv: yargs.Argv) => {
   return argv
@@ -12,5 +12,5 @@ export const builder = (argv: yargs.Argv) => {
 
 export const handler = async () => {
   await switchToClusterFromEnv()
-  await installPrometheus()
+  await removeHelmRelease()
 }
