@@ -11,7 +11,8 @@ contract DowntimeSlasherSlots is SlasherUtil {
   // For each address, associate each epoch with the last block that was slashed on that epoch
   mapping(address => mapping(uint256 => uint256)) lastSlashedBlock;
 
-  // For each user, map of StartBlock to Accumulated ParentSealBitmap (the array will have 2 elements if the slot shares two epochs)
+  // For each user, map of StartBlock to Accumulated ParentSealBitmap of the Slot
+  // (the array will have 2 elements if the slot shares two epochs)
   mapping(address => mapping(uint256 => uint256[2])) private userValidatedSlots;
 
   uint256 public slashableDowntime;
@@ -22,6 +23,7 @@ contract DowntimeSlasherSlots is SlasherUtil {
   event SlashableDowntimeSet(uint256 interval);
   event SlashableDowntimeSlotSizeSet(uint256 interval);
   event DowntimeSlashPerformed(address indexed validator, uint256 indexed startBlock);
+  event SlotValidationPerformed(address indexed user, uint256 indexed startBlock);
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
@@ -139,6 +141,7 @@ contract DowntimeSlasherSlots is SlasherUtil {
 
     if (!slotAlreadyCalculated(startBlock)) {
       calculateSlotDowns(startBlock, endBlock);
+      emit SlotValidationPerformed(msg.sender, startBlock);
     }
 
     return isDownUsingCalculatedSlot(startBlock, startSignerIndex, endSignerIndex);
@@ -147,7 +150,8 @@ contract DowntimeSlasherSlots is SlasherUtil {
   function slotAlreadyCalculated(uint256 startBlock) internal view returns (bool) {
     // It's impossible to have all the validators down in a slot
     return
-      userValidatedSlots[msg.sender][startBlock][0] || serValidatedSlots[msg.sender][startBlock][1];
+      userValidatedSlots[msg.sender][startBlock][0] ||
+      userValidatedSlots[msg.sender][startBlock][1];
   }
 
   function isDownUsingCalculatedSlot(
