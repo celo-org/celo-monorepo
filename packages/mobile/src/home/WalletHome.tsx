@@ -138,11 +138,11 @@ export class WalletHome extends React.Component<Props> {
     }
   }
 
-  renderSection = ({ section: { title, bubbleText } }: { section: SectionListData<any> }) => {
+  renderSection = ({ section: { title } }: { section: SectionListData<any> }) => {
     if (!title) {
       return null
     }
-    return <SectionHeadNew text={title} bubbleText={bubbleText} />
+    return <SectionHeadNew text={title} />
   }
 
   keyExtractor = (_item: any, index: number) => {
@@ -180,7 +180,6 @@ export class WalletHome extends React.Component<Props> {
       sections.push({
         data: [{}],
         renderItem: () => <NotificationBox key={'NotificationBox'} />,
-        bubbleText: activeNotificationCount ? activeNotificationCount.toString() : null,
       })
     }
 
