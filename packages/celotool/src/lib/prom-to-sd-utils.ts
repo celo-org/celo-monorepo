@@ -1,8 +1,8 @@
 import sleep from 'sleep-promise'
+import { execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
 import { envVar, fetchEnv } from 'src/lib/env-utils'
 import { installGenericHelmChart, removeGenericHelmChart } from 'src/lib/helm_deploy'
 import { scaleResource } from 'src/lib/kubernetes'
-import { execCmdWithExitOnFailure } from 'src/lib/utils'
 import {
   getInternalProxyIPs,
   getInternalTxNodeIPs,
