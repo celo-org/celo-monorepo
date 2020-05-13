@@ -31,6 +31,14 @@ const storeData = {
 const TEXT_PLACEHOLDER = 'groceriesRent'
 const AMOUNT_PLACEHOLDER = 'amount'
 
+const mockRoute = {
+  name: Screens.SendAmount as Screens.SendAmount,
+  key: '1',
+  params: {
+    recipient: mockRecipient,
+  },
+}
+
 describe('SendAmount', () => {
   beforeAll(() => {
     jest.useRealTimers()
@@ -41,7 +49,7 @@ describe('SendAmount', () => {
     const getWrapper = () =>
       render(
         <Provider store={store}>
-          <SendAmount navigation={mockNavigation} />
+          <SendAmount navigation={mockNavigation} route={mockRoute} />
         </Provider>
       )
 
@@ -63,7 +71,7 @@ describe('SendAmount', () => {
         <Provider store={createMockStore()}>
           <SendAmountClass
             navigation={mockNavigation}
-            route={{ key: '1', name: Screens.SendAmount, params: { recipient: mockRecipient } }}
+            route={mockRoute}
             {...getMockI18nProps()}
             fetchDollarBalance={jest.fn()}
             showMessage={showMessage}
@@ -92,7 +100,7 @@ describe('SendAmount', () => {
     const getWrapper = () =>
       render(
         <Provider store={store}>
-          <SendAmount navigation={mockNavigation} />
+          <SendAmount navigation={mockNavigation} route={mockRoute} />
         </Provider>
       )
 
@@ -129,7 +137,7 @@ describe('SendAmount', () => {
       const store = createMockStore(storeData)
       const wrapper = render(
         <Provider store={store}>
-          <SendAmount navigation={mockNavigation} />
+          <SendAmount navigation={mockNavigation} route={mockRoute} />
         </Provider>
       )
 
@@ -158,7 +166,7 @@ describe('SendAmount', () => {
       const store = createMockStore(storeData)
       const wrapper = render(
         <Provider store={store}>
-          <SendAmount navigation={mockNavigation} />
+          <SendAmount navigation={mockNavigation} route={mockRoute} />
         </Provider>
       )
 
@@ -177,7 +185,7 @@ describe('SendAmount', () => {
     })
     const tree = renderer.create(
       <Provider store={store}>
-        <SendAmount navigation={mockNavigation} />
+        <SendAmount navigation={mockNavigation} route={mockRoute} />
       </Provider>
     )
     expect(tree).toMatchSnapshot()

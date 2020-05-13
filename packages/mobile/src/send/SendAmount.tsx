@@ -13,7 +13,6 @@ import { fontStyles } from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
 import { ValidatorKind } from '@celo/utils/src/inputValidation'
 import { parseInputAmount } from '@celo/utils/src/parsing'
-import { RouteProp } from '@react-navigation/native'
 import { StackScreenProps } from '@react-navigation/stack'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
@@ -75,7 +74,6 @@ interface State {
   characterLimitExceeded: boolean
 }
 
-type Route = RouteProp<StackParamList, Screens.SendAmount>
 type OwnProps = StackScreenProps<StackParamList, Screens.SendAmount>
 type Props = StateProps & DispatchProps & OwnProps & WithTranslation
 
@@ -97,20 +95,15 @@ interface DispatchProps {
   fetchPhoneAddresses: typeof fetchPhoneAddresses
 }
 
-function getRecipient(route: Route): Recipient {
-  const recipient = route.params.recipient
-  if (!recipient) {
-    throw new Error('Recipient expected')
-  }
-  return recipient
+function getVerificationStatus(recipient: Recipient, e164NumberToAddress: E164NumberToAddressType) {
+  return getRecipientVerificationStatus(recipient, e164NumberToAddress)
 }
 
-function getVerificationStatus(route: Route, e164NumberToAddress: E164NumberToAddressType) {
-  return getRecipientVerificationStatus(getRecipient(route), e164NumberToAddress)
-}
-
-function getFeeType(route: Route, e164NumberToAddress: E164NumberToAddressType): FeeType | null {
-  const verificationStatus = getVerificationStatus(route, e164NumberToAddress)
+function getFeeType(
+  recipient: Recipient,
+  e164NumberToAddress: E164NumberToAddressType
+): FeeType | null {
+  const verificationStatus = getVerificationStatus(recipient, e164NumberToAddress)
 
   switch (verificationStatus) {
     case RecipientVerificationStatus.UNKNOWN:
@@ -125,7 +118,7 @@ function getFeeType(route: Route, e164NumberToAddress: E164NumberToAddressType):
 const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
   const { route } = ownProps
   const { e164NumberToAddress } = state.identity
-  const feeType = getFeeType(route, e164NumberToAddress)
+  const feeType = getFeeType(route.params.recipient, e164NumberToAddress)
   return {
     dollarBalance: state.stableToken.balance || '0',
     estimateFeeDollars: getFeeEstimateDollars(state, feeType),
@@ -197,12 +190,12 @@ export class SendAmount extends React.Component<Props, State> {
     }
   }
 
-  getRecipient = (): Recipient => {
-    return getRecipient(this.props.route)
+  getRecipient = () => {
+    return this.props.route.params.recipient
   }
 
   getVerificationStatus = () => {
-    return getVerificationStatus(this.props.route, this.props.e164NumberToAddress)
+    return getVerificationStatus(this.props.route.params.recipient, this.props.e164NumberToAddress)
   }
 
   getConfirmationInput = (type: TokenTransactionType) => {

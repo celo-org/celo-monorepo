@@ -55,10 +55,9 @@ const mapStateToProps = (state: RootState): StateProps => {
   }
 }
 
-type Props = DispatchProps &
-  StateProps &
-  WithTranslation &
-  StackScreenProps<StackParamList, Screens.PaymentRequestConfirmation>
+type OwnProps = StackScreenProps<StackParamList, Screens.PaymentRequestConfirmation>
+
+type Props = DispatchProps & StateProps & WithTranslation & OwnProps
 
 class PaymentRequestConfirmation extends React.Component<Props> {
   static navigationOptions = { header: null }
@@ -161,7 +160,7 @@ const styles = StyleSheet.create({
   },
 })
 
-export default connect<StateProps, DispatchProps, {}, RootState>(
+export default connect<StateProps, DispatchProps, OwnProps, RootState>(
   mapStateToProps,
   mapDispatchToProps
 )(withTranslation(Namespaces.sendFlow7)(PaymentRequestConfirmation))

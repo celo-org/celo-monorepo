@@ -45,10 +45,9 @@ interface StateProps {
   isImportingWallet: boolean
 }
 
-type Props = StateProps &
-  DispatchProps &
-  WithTranslation &
-  StackScreenProps<StackParamList, Screens.ImportWallet>
+type OwnProps = StackScreenProps<StackParamList, Screens.ImportWallet>
+
+type Props = StateProps & DispatchProps & WithTranslation & OwnProps
 
 const mapStateToProps = (state: RootState): StateProps => {
   return {
@@ -186,7 +185,7 @@ const styles = StyleSheet.create({
   },
 })
 
-export default connect<StateProps, DispatchProps, any, RootState>(mapStateToProps, {
+export default connect<StateProps, DispatchProps, OwnProps, RootState>(mapStateToProps, {
   importBackupPhrase,
   hideAlert,
 })(withTranslation(Namespaces.nuxRestoreWallet3)(ImportWallet))

@@ -472,12 +472,7 @@ exports[`Testnet banner Renders when connected with backup complete 1`] = `
     </View>
   </View>
   <RCTScrollView
-    ListHeaderComponent={
-      Object {
-        "$$typeof": Symbol(react.forward_ref),
-        "render": [Function],
-      }
-    }
+    ListHeaderComponent={[Function]}
     data={
       Array [
         Object {
@@ -1088,12 +1083,7 @@ exports[`Testnet banner Renders when disconnected 1`] = `
     </View>
   </View>
   <RCTScrollView
-    ListHeaderComponent={
-      Object {
-        "$$typeof": Symbol(react.forward_ref),
-        "render": [Function],
-      }
-    }
+    ListHeaderComponent={[Function]}
     data={
       Array [
         Object {
@@ -1685,12 +1675,7 @@ exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
     </View>
   </View>
   <RCTScrollView
-    ListHeaderComponent={
-      Object {
-        "$$typeof": Symbol(react.forward_ref),
-        "render": [Function],
-      }
-    }
+    ListHeaderComponent={[Function]}
     data={
       Array [
         Object {

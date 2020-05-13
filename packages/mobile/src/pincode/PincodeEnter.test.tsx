@@ -14,7 +14,7 @@ const mockRoute = {
   name: Screens.PincodeEnter as Screens.PincodeEnter,
   key: '1',
   params: {
-    withVerification: false,
+    withVerification: true,
     onSuccess: jest.fn(),
   },
 }

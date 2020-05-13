@@ -52,23 +52,15 @@ interface StateProps {
   localCurrencyExchangeRate: string | null | undefined
 }
 
-interface NavProps {
-  makerTokenDisplay: {
-    makerToken: CURRENCY_ENUM
-    makerTokenBalance: string
-  }
-}
-
 interface DispatchProps {
   fetchExchangeRate: typeof fetchExchangeRate
   showError: typeof showError
   hideAlert: typeof hideAlert
 }
 
-type Props = StateProps &
-  DispatchProps &
-  WithTranslation &
-  StackScreenProps<StackParamList, Screens.ExchangeTradeScreen>
+type OwnProps = StackScreenProps<StackParamList, Screens.ExchangeTradeScreen>
+
+type Props = StateProps & DispatchProps & WithTranslation & OwnProps
 
 const mapStateToProps = (state: RootState): StateProps => ({
   exchangeRatePair: state.exchange.exchangeRatePair,
@@ -320,7 +312,7 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
   }
 }
 
-export default connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
+export default connect<StateProps, DispatchProps, OwnProps, RootState>(mapStateToProps, {
   fetchExchangeRate,
   showError,
   hideAlert,

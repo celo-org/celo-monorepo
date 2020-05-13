@@ -163,6 +163,7 @@ export const mockNavigation: StackNavigationProp<any, any> = ({
   setOptions: jest.fn(),
   isFocused: jest.fn(),
   addListener: jest.fn(),
+  removeListener: jest.fn(),
 } as unknown) as StackNavigationProp<any, any>
 
 export const mockAddressToE164Number: AddressToE164NumberType = {

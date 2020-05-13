@@ -2,6 +2,7 @@
 
 import { NavigationActions, StackActions } from '@react-navigation/compat'
 import { NavigationContainerRef } from '@react-navigation/native'
+import { StackNavigationProp } from '@react-navigation/stack'
 import { createRef } from 'react'
 import sleep from 'sleep-promise'
 import { PincodeType } from 'src/account/reducer'
@@ -9,10 +10,13 @@ import { pincodeTypeSelector } from 'src/account/selectors'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { DefaultEventNames } from 'src/analytics/constants'
 import { Screens } from 'src/navigator/Screens'
+import { StackParamList } from 'src/navigator/types'
 import { store } from 'src/redux/store'
 import Logger from 'src/utils/Logger'
 
 const TAG = 'NavigationService'
+
+type NavType = StackNavigationProp<StackParamList, Screens.Account>
 
 export const navigationRef = createRef<NavigationContainerRef>()
 
@@ -107,6 +111,7 @@ export function navigateBack(params?: object) {
   ensureNavigator()
     .then(() => {
       Logger.debug(`${TAG}@navigateBack`, `Dispatch navigate back`)
+      // @ts-ignore
       navigationRef.current?.dispatch(NavigationActions.back(params))
     })
     .catch((reason) => {

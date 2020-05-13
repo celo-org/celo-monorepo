@@ -35,11 +35,6 @@ interface State {
   amountIsValid: boolean
 }
 
-type Props = StateProps &
-  DispatchProps &
-  WithTranslation &
-  StackScreenProps<StackParamList, Screens.InviteReview>
-
 interface StateProps {
   account: string | null
   inviteInProgress: boolean
@@ -52,6 +47,10 @@ interface DispatchProps {
   showError: typeof showError
   hideAlert: typeof hideAlert
 }
+
+type OwnProps = StackScreenProps<StackParamList, Screens.InviteReview>
+
+type Props = StateProps & DispatchProps & WithTranslation & OwnProps
 
 const mapStateToProps = (state: RootState): StateProps => ({
   account: currentAccountSelector(state),
@@ -223,7 +222,7 @@ const style = StyleSheet.create({
   },
 })
 
-export default connect<StateProps, DispatchProps, {}, RootState>(
+export default connect<StateProps, DispatchProps, OwnProps, RootState>(
   mapStateToProps,
   mapDispatchToProps
 )(withTranslation(Namespaces.inviteFlow11)(InviteReview))

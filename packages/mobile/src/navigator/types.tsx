@@ -38,7 +38,7 @@ export type StackParamList = {
   [Screens.DollarEducation]: {}
   [Screens.EditProfile]: {}
   [Screens.ErrorScreen]: {
-    errorMessage: string
+    errorMessage?: string
   }
   [Screens.EscrowedPaymentListScreen]: {}
   [Screens.ExchangeReview]: {
@@ -120,4 +120,5 @@ export type StackParamList = {
   [Screens.VerificationLearnMoreScreen]: {}
   [Screens.VerificationLoadingScreen]: {}
   [Screens.VerificationSuccessScreen]: {}
+  [Screens.WalletHome]: {}
 }

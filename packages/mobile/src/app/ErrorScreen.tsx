@@ -9,11 +9,11 @@ import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 import { deleteChainDataAndRestartApp, RESTART_APP_I18N_KEY } from 'src/utils/AppRestart'
 
-interface OwnProps {
+type OwnProps = {
   errorMessage?: string
-}
+} & StackScreenProps<StackParamList, Screens.ErrorScreen>
 
-type Props = OwnProps & WithTranslation & StackScreenProps<StackParamList, Screens.ErrorScreen>
+type Props = OwnProps & WithTranslation
 
 class ErrorScreen extends React.Component<Props> {
   static navigationOptions = { header: null }
