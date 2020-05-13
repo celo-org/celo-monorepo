@@ -224,7 +224,6 @@ export class ExchangeReview extends React.Component<Props, State> {
               Buy or sell <CurrencyDisplay amount={goldAmount} /> Gold
             </Trans>
           }
-          standard={false}
           style={styles.buyBtn}
           disabled={!appConnected || exchangeRate.isZero()}
           type={BtnTypes.TERTIARY}

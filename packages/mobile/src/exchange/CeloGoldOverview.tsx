@@ -29,7 +29,7 @@ export function CeloGoldOverview({ t, testID }: Props) {
       <Text style={styles.title}>{t('yourGoldBalance')}</Text>
       <Text style={styles.balance}>
         {goldBalanceAmount && (
-          <CurrencyDisplay style={fontStyles.semiBold} amount={goldBalanceAmount} />
+          <CurrencyDisplay style={fontStyles.regular500} amount={goldBalanceAmount} />
         )}
       </Text>
       <Text style={styles.localBalance}>

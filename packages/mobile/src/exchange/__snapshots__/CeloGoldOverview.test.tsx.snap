@@ -55,8 +55,8 @@ exports[`renders correctly when not ready 1`] = `
       Object {
         "color": "#9CA4A9",
         "fontFamily": "Inter-Regular",
-        "fontSize": 15,
-        "lineHeight": 20,
+        "fontSize": 16,
+        "lineHeight": 22,
       }
     }
   >
@@ -134,8 +134,8 @@ exports[`renders correctly when ready 1`] = `
       Object {
         "color": "#9CA4A9",
         "fontFamily": "Inter-Regular",
-        "fontSize": 15,
-        "lineHeight": 20,
+        "fontSize": 16,
+        "lineHeight": 22,
       }
     }
   >

@@ -56,8 +56,8 @@ exports[`renders properly 1`] = `
           Object {
             "color": "#1AB775",
             "fontFamily": "Inter-Regular",
-            "fontSize": 15,
-            "lineHeight": 20,
+            "fontSize": 16,
+            "lineHeight": 22,
           }
         }
       >
@@ -101,6 +101,52 @@ exports[`renders properly 1`] = `
       viewBox="0 0 750 180"
       width={750}
     >
+      <g>
+        <g>
+          <line
+            stroke="#EDEEEF"
+            strokeWidth="1"
+            x1={0}
+            x2={750}
+            y1={152.3076923076923}
+            y2={152.3076923076923}
+          />
+          <circle
+            cx={20.99904361864102}
+            cy={152.3076923076923}
+            fill="#EEB93C"
+            r="4"
+          />
+        </g>
+        <text
+          fill="#9CA4A9"
+          fontSize="14"
+          onLayout={[Function]}
+          textAnchor="middle"
+          x={20.99904361864102}
+          y={177.3076923076923}
+        >
+          
+        </text>
+        <g>
+          <circle
+            cx={729.000956381359}
+            cy={27.692307692307693}
+            fill="#EEB93C"
+            r="4"
+          />
+        </g>
+        <text
+          fill="#9CA4A9"
+          fontSize="14"
+          onLayout={[Function]}
+          textAnchor="middle"
+          x={729.000956381359}
+          y={11.692307692307693}
+        >
+          $10.00
+        </text>
+      </g>
       <g
         clipPath="url(#victory-clip-4)"
         style={
@@ -134,52 +180,6 @@ exports[`renders properly 1`] = `
           strokeWidth={2}
           width={3}
         />
-      </g>
-      <g>
-        <g>
-          <line
-            stroke="#EDEEEF"
-            strokeWidth="1"
-            x1={0}
-            x2={750}
-            y1={152.3076923076923}
-            y2={152.3076923076923}
-          />
-          <circle
-            cx={20.99904361864102}
-            cy={152.3076923076923}
-            fill="#EEB93C"
-            r="5"
-          />
-        </g>
-        <text
-          fill="#9CA4A9"
-          fontSize="14"
-          onLayout={[Function]}
-          textAnchor="middle"
-          x={20.99904361864102}
-          y={177.3076923076923}
-        >
-          
-        </text>
-        <g>
-          <circle
-            cx={729.000956381359}
-            cy={27.692307692307693}
-            fill="#EEB93C"
-            r="5"
-          />
-        </g>
-        <text
-          fill="#9CA4A9"
-          fontSize="14"
-          onLayout={[Function]}
-          textAnchor="middle"
-          x={729.000956381359}
-          y={11.692307692307693}
-        >
-          $10.00
-        </text>
       </g>
     </svg>
     <View
@@ -297,8 +297,8 @@ exports[`renders while update is in progress 1`] = `
           Object {
             "color": "#1AB775",
             "fontFamily": "Inter-Regular",
-            "fontSize": 15,
-            "lineHeight": 20,
+            "fontSize": 16,
+            "lineHeight": 22,
           }
         }
       >
@@ -342,6 +342,52 @@ exports[`renders while update is in progress 1`] = `
       viewBox="0 0 750 180"
       width={750}
     >
+      <g>
+        <g>
+          <line
+            stroke="#EDEEEF"
+            strokeWidth="1"
+            x1={0}
+            x2={750}
+            y1={152.3076923076923}
+            y2={152.3076923076923}
+          />
+          <circle
+            cx={20.99904361864102}
+            cy={152.3076923076923}
+            fill="#EEB93C"
+            r="4"
+          />
+        </g>
+        <text
+          fill="#9CA4A9"
+          fontSize="14"
+          onLayout={[Function]}
+          textAnchor="middle"
+          x={20.99904361864102}
+          y={177.3076923076923}
+        >
+          $0.12
+        </text>
+        <g>
+          <circle
+            cx={729.0009563813591}
+            cy={27.692307692307693}
+            fill="#EEB93C"
+            r="4"
+          />
+        </g>
+        <text
+          fill="#9CA4A9"
+          fontSize="14"
+          onLayout={[Function]}
+          textAnchor="middle"
+          x={729.0009563813591}
+          y={11.692307692307693}
+        >
+          $10.00
+        </text>
+      </g>
       <g
         clipPath="url(#victory-clip-2)"
         style={
@@ -375,52 +421,6 @@ exports[`renders while update is in progress 1`] = `
           strokeWidth={2}
           width={3}
         />
-      </g>
-      <g>
-        <g>
-          <line
-            stroke="#EDEEEF"
-            strokeWidth="1"
-            x1={0}
-            x2={750}
-            y1={152.3076923076923}
-            y2={152.3076923076923}
-          />
-          <circle
-            cx={20.99904361864102}
-            cy={152.3076923076923}
-            fill="#EEB93C"
-            r="5"
-          />
-        </g>
-        <text
-          fill="#9CA4A9"
-          fontSize="14"
-          onLayout={[Function]}
-          textAnchor="middle"
-          x={20.99904361864102}
-          y={177.3076923076923}
-        >
-          $0.12
-        </text>
-        <g>
-          <circle
-            cx={729.0009563813591}
-            cy={27.692307692307693}
-            fill="#EEB93C"
-            r="5"
-          />
-        </g>
-        <text
-          fill="#9CA4A9"
-          fontSize="14"
-          onLayout={[Function]}
-          textAnchor="middle"
-          x={729.0009563813591}
-          y={11.692307692307693}
-        >
-          $10.00
-        </text>
       </g>
     </svg>
     <View
