@@ -370,7 +370,7 @@ export const generateGenesis = ({
   }
 
   if (timestamp > 0) {
-    genesis.timestamp = timestamp
+    genesis.timestamp = timestamp.toString()
   }
 
   return JSON.stringify(genesis, null, 2)
