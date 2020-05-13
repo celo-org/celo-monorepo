@@ -43,7 +43,7 @@ export default connect<DelayStateProps, DelayDispatchProps, {}, RootState>(
     navigateBack()
   }, [])
 
-  const { t } = useTranslation(Namespaces.accountKeyFlow)
+  const { t } = useTranslation(Namespaces.backupKeyFlow6)
 
   if (backupTooLate && !backupDelayedTime) {
     return (

@@ -76,7 +76,7 @@ interface AccountKeyStartProps {
 }
 
 function AccountKeyIntro({ onPrimaryPress }: AccountKeyStartProps) {
-  const { t } = useTranslation(Namespaces.accountKeyFlow)
+  const { t } = useTranslation(Namespaces.backupKeyFlow6)
   return (
     <ScrollView contentContainerStyle={styles.introContainer}>
       <Logo height={32} />
@@ -91,7 +91,7 @@ function AccountKeyIntro({ onPrimaryPress }: AccountKeyStartProps) {
 function AccountKeyPostSetup() {
   const accountKey = useAccountKey()
 
-  const { t } = useTranslation(Namespaces.accountKeyFlow)
+  const { t } = useTranslation(Namespaces.backupKeyFlow6)
 
   return (
     <ScrollView contentContainerStyle={styles.postSetupContainer}>
