@@ -5,7 +5,7 @@ import { Provider } from 'react-redux'
 import PhoneNumberLookupQuotaScreen from 'src/identity/PhoneNumberLookupQuotaScreen'
 import { createMockStore } from 'test/utils'
 
-describe(PhoneNumberLookupQuotaScreen, () => {
+describe('PhoneNumberLookupQuotaScreen', () => {
   const store = createMockStore({})
 
   it('renders correctly', () => {
