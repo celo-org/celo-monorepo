@@ -280,7 +280,7 @@ class ValidatorsList extends React.PureComponent<Props, State> {
   }
 
   isPinned({ address }: any) {
-    const list = localStorage.getItem(localStoragePinnedKey)?.split(',') || []
+    const list = (localStorage.getItem(localStoragePinnedKey) || '').split(',') || []
     return +list.includes(address)
   }
 
@@ -293,7 +293,9 @@ class ValidatorsList extends React.PureComponent<Props, State> {
       <View style={styles.pStatic}>
         <View style={[styles.table, styles.pStatic]}>
           <View style={[styles.tableRow, styles.tableHeaderRow]}>
-            <View style={[styles.tableHeaderCell, styles.sizeXXS]} />
+            <View style={[styles.tableHeaderCell, styles.sizeXXS]}>
+              <Text>Pin</Text>
+            </View>
             <HeaderCell
               onClick={this.orderByFn.name}
               style={[styles.tableHeaderCellPadding]}

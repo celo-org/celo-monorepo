@@ -55,7 +55,7 @@ export const styles = StyleSheet.create({
 
   // Table
   table: {
-    width: 1302,
+    width: 1292,
     margin: 'auto',
     marginBottom: 100,
     backgroundColor: colors.dark,
@@ -193,7 +193,7 @@ export const styles = StyleSheet.create({
   },
 
   // Column sizes
-  sizeXXS: { minWidth: 40, maxWidth: 40 },
+  sizeXXS: { minWidth: 30, maxWidth: 30 },
   sizeXS: { minWidth: 64 + 6, maxWidth: 64 + 6 },
   sizeS: { minWidth: 74 + 6, maxWidth: 74 + 6 },
   sizeM: { minWidth: 110 + 6, maxWidth: 110 + 6 },
@@ -299,7 +299,22 @@ export const styles = StyleSheet.create({
   },
 
   // Pinned
-  noPinned: {
-    opacity: 0.3,
+  pinContainer: {
+    alignSelf: 'flex-start',
+    paddingTop: 16,
+    cursor: 'pointer',
+  },
+  pin: {
+    height: 10,
+    width: 10,
+    margin: 'auto',
+    borderRadius: 5,
+    borderColor: colors.grayHeavy,
+    borderWidth: 2,
+    borderStyle: 'solid',
+  },
+  pinned: {
+    backgroundColor: colors.white,
+    borderColor: colors.white,
   },
 })

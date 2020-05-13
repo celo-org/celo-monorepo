@@ -102,7 +102,7 @@ class ValidatorsListRow extends React.PureComponent<Props & I18nProps, State> {
 
   isPinned(toggle?: boolean) {
     const { address } = this.props.group
-    let list = localStorage.getItem(localStoragePinnedKey)?.split(',') || []
+    let list = (localStorage.getItem(localStoragePinnedKey) || '').split(',') || []
     let isPinned = list.includes(address)
     if (toggle) {
       list = list.filter((_) => _ !== address)
@@ -134,18 +134,12 @@ class ValidatorsListRow extends React.PureComponent<Props & I18nProps, State> {
     return (
       <div style={tooltip ? { zIndex: 2 } : {}}>
         <View style={[styles.tableRow, styles.tableRowCont, tooltip ? { zIndex: 3 } : {}]}>
-          <Text
-            style={[
-              styles.tableCell,
-              styles.tableCellCenter,
-              styles.sizeXXS,
-              isPinned ? {} : styles.noPinned,
-            ]}
+          <View
+            style={[styles.tableCell, styles.pinContainer, styles.sizeXXS]}
+            onClick={togglePinned}
           >
-            <span style={{ cursor: 'pointer' }} onClick={togglePinned}>
-              📍
-            </span>
-          </Text>
+            <View style={[styles.pin, isPinned ? styles.pinned : {}]} />
+          </View>
           <View style={[styles.tableCell, styles.tableCellTitle]}>
             <Text style={[styles.tableCell, styles.tableCellTitleArrow]}>
               <Chevron
@@ -291,6 +285,7 @@ class ValidatorsListRow extends React.PureComponent<Props & I18nProps, State> {
                   numberOfLines={1}
                   ellipsizeMode="tail"
                 >
+                  <Text style={[styles.tableCell, styles.sizeXXS]} />
                   <Text style={[styles.tableCell, styles.tableCellTitleNumber]}>{j + 1}</Text>
                   <Text style={[styles.tableCellTitleRows]}>
                     <Text

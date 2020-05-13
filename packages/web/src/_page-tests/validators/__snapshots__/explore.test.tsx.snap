@@ -20,7 +20,7 @@ exports[`ValidatorsList renders 1`] = `
         "marginRight": "auto",
         "marginTop": "auto",
         "position": "static",
-        "width": "1020px",
+        "width": "1292px",
         "zIndex": "initial",
       }
     }
@@ -61,6 +61,49 @@ exports[`ValidatorsList renders 1`] = `
         }
       }
     >
+      <div
+        className="css-view-1dbjc4n"
+        style={
+          Object {
+            "WebkitAlignItems": "center",
+            "WebkitBoxAlign": "center",
+            "WebkitBoxDirection": "normal",
+            "WebkitBoxFlex": 0,
+            "WebkitBoxOrient": "horizontal",
+            "WebkitFlexDirection": "row",
+            "WebkitFlexGrow": 0,
+            "alignItems": "center",
+            "cursor": "pointer",
+            "flexDirection": "row",
+            "flexGrow": 0,
+            "fontSize": "16px",
+            "lineHeight": "20px",
+            "maxWidth": "30px",
+            "minWidth": "30px",
+            "msFlexAlign": "center",
+            "msFlexDirection": "row",
+            "msFlexPositive": 0,
+            "paddingBottom": "24px",
+            "paddingLeft": "10px",
+            "paddingRight": "10px",
+            "paddingTop": "24px",
+            "textAlign": "center",
+          }
+        }
+      >
+        <span
+          className="css-text-901oao css-textHasAncestor-16my406"
+          dir="auto"
+          style={
+            Object {
+              "color": "rgba(255,255,255,1.00)",
+              "fontFamily": "Jost, futura-pt, futura, sans-serif",
+            }
+          }
+        >
+          Pin
+        </span>
+      </div>
       <div
         className="css-view-1dbjc4n"
         onClick={[Function]}
@@ -322,7 +365,155 @@ exports[`ValidatorsList renders 1`] = `
             }
           }
         >
-          Locked CGLD
+          Votes
+        </span>
+        <span
+          className="css-text-901oao css-textHasAncestor-16my406"
+          dir="auto"
+          style={
+            Object {
+              "color": "rgba(255,255,255,1.00)",
+              "fontFamily": "Jost, futura-pt, futura, sans-serif",
+              "opacity": 0,
+              "paddingLeft": "6px",
+            }
+          }
+        >
+          <svg
+            fill="none"
+            height={10}
+            style={Object {}}
+            transform="rotate(90)"
+            viewBox="0 0 8 12"
+            width={10}
+          >
+            <path
+              clipRule="evenodd"
+              d="M1.19997 0L1.13249e-05 1.19996L4.80011 6.00006L0 10.8002L1.19996 12.0001L7.19977 6.00032L7.19953 6.00007L7.19979 5.99981L1.19997 0Z"
+              fill="#FFFFFF"
+              fillRule="evenodd"
+              opacity={1}
+              style={Object {}}
+            />
+          </svg>
+        </span>
+      </div>
+      <div
+        className="css-view-1dbjc4n"
+        onClick={[Function]}
+        style={
+          Object {
+            "WebkitAlignItems": "center",
+            "WebkitBoxAlign": "center",
+            "WebkitBoxDirection": "normal",
+            "WebkitBoxFlex": 0,
+            "WebkitBoxOrient": "horizontal",
+            "WebkitFlexDirection": "row",
+            "WebkitFlexGrow": 0,
+            "alignItems": "center",
+            "cursor": "pointer",
+            "flexDirection": "row",
+            "flexGrow": 0,
+            "fontSize": "16px",
+            "lineHeight": "20px",
+            "maxWidth": "116px",
+            "minWidth": "116px",
+            "msFlexAlign": "center",
+            "msFlexDirection": "row",
+            "msFlexPositive": 0,
+            "paddingBottom": "24px",
+            "paddingLeft": "10px",
+            "paddingRight": "10px",
+            "paddingTop": "24px",
+            "textAlign": "center",
+          }
+        }
+      >
+        <span
+          className="css-text-901oao css-textHasAncestor-16my406"
+          dir="auto"
+          style={
+            Object {
+              "color": "rgba(255,255,255,1.00)",
+              "fontFamily": "Jost, futura-pt, futura, sans-serif",
+            }
+          }
+        >
+          Votes Available
+        </span>
+        <span
+          className="css-text-901oao css-textHasAncestor-16my406"
+          dir="auto"
+          style={
+            Object {
+              "color": "rgba(255,255,255,1.00)",
+              "fontFamily": "Jost, futura-pt, futura, sans-serif",
+              "opacity": 0,
+              "paddingLeft": "6px",
+            }
+          }
+        >
+          <svg
+            fill="none"
+            height={10}
+            style={Object {}}
+            transform="rotate(90)"
+            viewBox="0 0 8 12"
+            width={10}
+          >
+            <path
+              clipRule="evenodd"
+              d="M1.19997 0L1.13249e-05 1.19996L4.80011 6.00006L0 10.8002L1.19996 12.0001L7.19977 6.00032L7.19953 6.00007L7.19979 5.99981L1.19997 0Z"
+              fill="#FFFFFF"
+              fillRule="evenodd"
+              opacity={1}
+              style={Object {}}
+            />
+          </svg>
+        </span>
+      </div>
+      <div
+        className="css-view-1dbjc4n"
+        onClick={[Function]}
+        style={
+          Object {
+            "WebkitAlignItems": "center",
+            "WebkitBoxAlign": "center",
+            "WebkitBoxDirection": "normal",
+            "WebkitBoxFlex": 0,
+            "WebkitBoxOrient": "horizontal",
+            "WebkitFlexDirection": "row",
+            "WebkitFlexGrow": 0,
+            "alignItems": "center",
+            "cursor": "pointer",
+            "flexDirection": "row",
+            "flexGrow": 0,
+            "fontSize": "16px",
+            "lineHeight": "20px",
+            "maxWidth": "116px",
+            "minWidth": "116px",
+            "msFlexAlign": "center",
+            "msFlexDirection": "row",
+            "msFlexPositive": 0,
+            "paddingBottom": "24px",
+            "paddingLeft": "10px",
+            "paddingRight": "10px",
+            "paddingTop": "24px",
+            "textAlign": "center",
+          }
+        }
+      >
+        <span
+          className="css-text-901oao css-textHasAncestor-16my406"
+          dir="auto"
+          style={
+            Object {
+              "color": "rgba(255,255,255,1.00)",
+              "fontFamily": "Jost, futura-pt, futura, sans-serif",
+            }
+          }
+        >
+          Locked Gold
         </span>
         <span
           className="css-text-901oao css-textHasAncestor-16my406"
@@ -683,6 +874,59 @@ exports[`ValidatorsList renders 1`] = `
         >
           <div
             className="css-view-1dbjc4n"
+            onClick={[Function]}
+            style={
+              Object {
+                "WebkitAlignSelf": "flex-start",
+                "WebkitBoxFlex": 0,
+                "WebkitFlexGrow": 0,
+                "alignSelf": "flex-start",
+                "cursor": "pointer",
+                "flexGrow": 0,
+                "fontSize": "16px",
+                "maxWidth": "30px",
+                "minWidth": "30px",
+                "msFlexItemAlign": "start",
+                "msFlexPositive": 0,
+                "paddingBottom": "12px",
+                "paddingLeft": "10px",
+                "paddingRight": "10px",
+                "paddingTop": "16px",
+              }
+            }
+          >
+            <div
+              className="css-view-1dbjc4n"
+              style={
+                Object {
+                  "borderBottomColor": "rgba(171,173,175,1.00)",
+                  "borderBottomLeftRadius": "5px",
+                  "borderBottomRightRadius": "5px",
+                  "borderBottomStyle": "solid",
+                  "borderBottomWidth": "2px",
+                  "borderLeftColor": "rgba(171,173,175,1.00)",
+                  "borderLeftStyle": "solid",
+                  "borderLeftWidth": "2px",
+                  "borderRightColor": "rgba(171,173,175,1.00)",
+                  "borderRightStyle": "solid",
+                  "borderRightWidth": "2px",
+                  "borderTopColor": "rgba(171,173,175,1.00)",
+                  "borderTopLeftRadius": "5px",
+                  "borderTopRightRadius": "5px",
+                  "borderTopStyle": "solid",
+                  "borderTopWidth": "2px",
+                  "height": "10px",
+                  "marginBottom": "auto",
+                  "marginLeft": "auto",
+                  "marginRight": "auto",
+                  "marginTop": "auto",
+                  "width": "10px",
+                }
+              }
+            />
+          </div>
+          <div
+            className="css-view-1dbjc4n"
             style={
               Object {
                 "WebkitBoxDirection": "normal",
@@ -781,9 +1025,13 @@ exports[`ValidatorsList renders 1`] = `
                   }
                 }
               >
-                <span
-                  className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+                <a
+                  className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+                  data-focusable={true}
                   dir="auto"
+                  href="https://explorer.celo.org/address/0xbcff1270b8aa83232b6d7113144557dfac93b591/celo"
+                  rel=" noopener noreferrer"
+                  role="link"
                   style={
                     Object {
                       "color": "rgba(255,255,255,1.00)",
@@ -797,9 +1045,10 @@ exports[`ValidatorsList renders 1`] = `
                       "whiteSpace": "nowrap",
                     }
                   }
+                  target="_blank"
                 >
                   Test 1
-                </span>
+                </a>
               </span>
               <span
                 className="css-text-901oao css-textHasAncestor-16my406"
@@ -1207,6 +1456,66 @@ exports[`ValidatorsList renders 1`] = `
             </span>
           </span>
           <span
+            className="css-text-901oao css-textHasAncestor-16my406 css-textMultiLine-cens5h"
+            dir="auto"
+            style={
+              Object {
+                "WebkitBoxFlex": 0,
+                "WebkitFlexGrow": 0,
+                "WebkitLineClamp": 2,
+                "color": "rgba(255,255,255,1.00)",
+                "flexGrow": 0,
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "maxWidth": "116px",
+                "minWidth": "116px",
+                "msFlexPositive": 0,
+                "paddingBottom": "12px",
+                "paddingLeft": "10px",
+                "paddingRight": "10px",
+                "paddingTop": "12px",
+                "textAlign": "center",
+              }
+            }
+          >
+            0
+            
+
+            (
+            0
+            %)
+          </span>
+          <span
+            className="css-text-901oao css-textHasAncestor-16my406 css-textMultiLine-cens5h"
+            dir="auto"
+            style={
+              Object {
+                "WebkitBoxFlex": 0,
+                "WebkitFlexGrow": 0,
+                "WebkitLineClamp": 2,
+                "color": "rgba(255,255,255,1.00)",
+                "flexGrow": 0,
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "maxWidth": "116px",
+                "minWidth": "116px",
+                "msFlexPositive": 0,
+                "paddingBottom": "12px",
+                "paddingLeft": "10px",
+                "paddingRight": "10px",
+                "paddingTop": "12px",
+                "textAlign": "center",
+              }
+            }
+          >
+            2,403,121
+            
+
+            (
+            3.8
+            %)
+          </span>
+          <span
             className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
             dir="auto"
             style={
@@ -1409,6 +1718,59 @@ exports[`ValidatorsList renders 1`] = `
         >
           <div
             className="css-view-1dbjc4n"
+            onClick={[Function]}
+            style={
+              Object {
+                "WebkitAlignSelf": "flex-start",
+                "WebkitBoxFlex": 0,
+                "WebkitFlexGrow": 0,
+                "alignSelf": "flex-start",
+                "cursor": "pointer",
+                "flexGrow": 0,
+                "fontSize": "16px",
+                "maxWidth": "30px",
+                "minWidth": "30px",
+                "msFlexItemAlign": "start",
+                "msFlexPositive": 0,
+                "paddingBottom": "12px",
+                "paddingLeft": "10px",
+                "paddingRight": "10px",
+                "paddingTop": "16px",
+              }
+            }
+          >
+            <div
+              className="css-view-1dbjc4n"
+              style={
+                Object {
+                  "borderBottomColor": "rgba(171,173,175,1.00)",
+                  "borderBottomLeftRadius": "5px",
+                  "borderBottomRightRadius": "5px",
+                  "borderBottomStyle": "solid",
+                  "borderBottomWidth": "2px",
+                  "borderLeftColor": "rgba(171,173,175,1.00)",
+                  "borderLeftStyle": "solid",
+                  "borderLeftWidth": "2px",
+                  "borderRightColor": "rgba(171,173,175,1.00)",
+                  "borderRightStyle": "solid",
+                  "borderRightWidth": "2px",
+                  "borderTopColor": "rgba(171,173,175,1.00)",
+                  "borderTopLeftRadius": "5px",
+                  "borderTopRightRadius": "5px",
+                  "borderTopStyle": "solid",
+                  "borderTopWidth": "2px",
+                  "height": "10px",
+                  "marginBottom": "auto",
+                  "marginLeft": "auto",
+                  "marginRight": "auto",
+                  "marginTop": "auto",
+                  "width": "10px",
+                }
+              }
+            />
+          </div>
+          <div
+            className="css-view-1dbjc4n"
             style={
               Object {
                 "WebkitBoxDirection": "normal",
@@ -1507,9 +1869,13 @@ exports[`ValidatorsList renders 1`] = `
                   }
                 }
               >
-                <span
-                  className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+                <a
+                  className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+                  data-focusable={true}
                   dir="auto"
+                  href="https://explorer.celo.org/address/0x4f584db9ec38df930185df315d941d42b3186b9f/celo"
+                  rel=" noopener noreferrer"
+                  role="link"
                   style={
                     Object {
                       "color": "rgba(255,255,255,1.00)",
@@ -1523,9 +1889,10 @@ exports[`ValidatorsList renders 1`] = `
                       "whiteSpace": "nowrap",
                     }
                   }
+                  target="_blank"
                 >
                   Test 2
-                </span>
+                </a>
               </span>
               <span
                 className="css-text-901oao css-textHasAncestor-16my406"
@@ -1933,6 +2300,66 @@ exports[`ValidatorsList renders 1`] = `
             </span>
           </span>
           <span
+            className="css-text-901oao css-textHasAncestor-16my406 css-textMultiLine-cens5h"
+            dir="auto"
+            style={
+              Object {
+                "WebkitBoxFlex": 0,
+                "WebkitFlexGrow": 0,
+                "WebkitLineClamp": 2,
+                "color": "rgba(255,255,255,1.00)",
+                "flexGrow": 0,
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "maxWidth": "116px",
+                "minWidth": "116px",
+                "msFlexPositive": 0,
+                "paddingBottom": "12px",
+                "paddingLeft": "10px",
+                "paddingRight": "10px",
+                "paddingTop": "12px",
+                "textAlign": "center",
+              }
+            }
+          >
+            20,000
+            
+
+            (
+            50.0
+            %)
+          </span>
+          <span
+            className="css-text-901oao css-textHasAncestor-16my406 css-textMultiLine-cens5h"
+            dir="auto"
+            style={
+              Object {
+                "WebkitBoxFlex": 0,
+                "WebkitFlexGrow": 0,
+                "WebkitLineClamp": 2,
+                "color": "rgba(255,255,255,1.00)",
+                "flexGrow": 0,
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "maxWidth": "116px",
+                "minWidth": "116px",
+                "msFlexPositive": 0,
+                "paddingBottom": "12px",
+                "paddingLeft": "10px",
+                "paddingRight": "10px",
+                "paddingTop": "12px",
+                "textAlign": "center",
+              }
+            }
+          >
+            400,520
+            
+
+            (
+            2.5
+            %)
+          </span>
+          <span
             className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
             dir="auto"
             style={
@@ -2135,6 +2562,59 @@ exports[`ValidatorsList renders 1`] = `
         >
           <div
             className="css-view-1dbjc4n"
+            onClick={[Function]}
+            style={
+              Object {
+                "WebkitAlignSelf": "flex-start",
+                "WebkitBoxFlex": 0,
+                "WebkitFlexGrow": 0,
+                "alignSelf": "flex-start",
+                "cursor": "pointer",
+                "flexGrow": 0,
+                "fontSize": "16px",
+                "maxWidth": "30px",
+                "minWidth": "30px",
+                "msFlexItemAlign": "start",
+                "msFlexPositive": 0,
+                "paddingBottom": "12px",
+                "paddingLeft": "10px",
+                "paddingRight": "10px",
+                "paddingTop": "16px",
+              }
+            }
+          >
+            <div
+              className="css-view-1dbjc4n"
+              style={
+                Object {
+                  "borderBottomColor": "rgba(171,173,175,1.00)",
+                  "borderBottomLeftRadius": "5px",
+                  "borderBottomRightRadius": "5px",
+                  "borderBottomStyle": "solid",
+                  "borderBottomWidth": "2px",
+                  "borderLeftColor": "rgba(171,173,175,1.00)",
+                  "borderLeftStyle": "solid",
+                  "borderLeftWidth": "2px",
+                  "borderRightColor": "rgba(171,173,175,1.00)",
+                  "borderRightStyle": "solid",
+                  "borderRightWidth": "2px",
+                  "borderTopColor": "rgba(171,173,175,1.00)",
+                  "borderTopLeftRadius": "5px",
+                  "borderTopRightRadius": "5px",
+                  "borderTopStyle": "solid",
+                  "borderTopWidth": "2px",
+                  "height": "10px",
+                  "marginBottom": "auto",
+                  "marginLeft": "auto",
+                  "marginRight": "auto",
+                  "marginTop": "auto",
+                  "width": "10px",
+                }
+              }
+            />
+          </div>
+          <div
+            className="css-view-1dbjc4n"
             style={
               Object {
                 "WebkitBoxDirection": "normal",
@@ -2233,9 +2713,13 @@ exports[`ValidatorsList renders 1`] = `
                   }
                 }
               >
-                <span
-                  className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+                <a
+                  className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+                  data-focusable={true}
                   dir="auto"
+                  href="https://explorer.celo.org/address/0x57b191f75159f861bae27099391dfae88564b737/celo"
+                  rel=" noopener noreferrer"
+                  role="link"
                   style={
                     Object {
                       "color": "rgba(255,255,255,1.00)",
@@ -2249,9 +2733,10 @@ exports[`ValidatorsList renders 1`] = `
                       "whiteSpace": "nowrap",
                     }
                   }
+                  target="_blank"
                 >
                   Test 3
-                </span>
+                </a>
               </span>
               <span
                 className="css-text-901oao css-textHasAncestor-16my406"
@@ -2659,6 +3144,66 @@ exports[`ValidatorsList renders 1`] = `
             </span>
           </span>
           <span
+            className="css-text-901oao css-textHasAncestor-16my406 css-textMultiLine-cens5h"
+            dir="auto"
+            style={
+              Object {
+                "WebkitBoxFlex": 0,
+                "WebkitFlexGrow": 0,
+                "WebkitLineClamp": 2,
+                "color": "rgba(255,255,255,1.00)",
+                "flexGrow": 0,
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "maxWidth": "116px",
+                "minWidth": "116px",
+                "msFlexPositive": 0,
+                "paddingBottom": "12px",
+                "paddingLeft": "10px",
+                "paddingRight": "10px",
+                "paddingTop": "12px",
+                "textAlign": "center",
+              }
+            }
+          >
+            24,076
+            
+
+            (
+            50.0
+            %)
+          </span>
+          <span
+            className="css-text-901oao css-textHasAncestor-16my406 css-textMultiLine-cens5h"
+            dir="auto"
+            style={
+              Object {
+                "WebkitBoxFlex": 0,
+                "WebkitFlexGrow": 0,
+                "WebkitLineClamp": 2,
+                "color": "rgba(255,255,255,1.00)",
+                "flexGrow": 0,
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "maxWidth": "116px",
+                "minWidth": "116px",
+                "msFlexPositive": 0,
+                "paddingBottom": "12px",
+                "paddingLeft": "10px",
+                "paddingRight": "10px",
+                "paddingTop": "12px",
+                "textAlign": "center",
+              }
+            }
+          >
+            400,520
+            
+
+            (
+            3.0
+            %)
+          </span>
+          <span
             className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
             dir="auto"
             style={
@@ -2861,6 +3406,59 @@ exports[`ValidatorsList renders 1`] = `
         >
           <div
             className="css-view-1dbjc4n"
+            onClick={[Function]}
+            style={
+              Object {
+                "WebkitAlignSelf": "flex-start",
+                "WebkitBoxFlex": 0,
+                "WebkitFlexGrow": 0,
+                "alignSelf": "flex-start",
+                "cursor": "pointer",
+                "flexGrow": 0,
+                "fontSize": "16px",
+                "maxWidth": "30px",
+                "minWidth": "30px",
+                "msFlexItemAlign": "start",
+                "msFlexPositive": 0,
+                "paddingBottom": "12px",
+                "paddingLeft": "10px",
+                "paddingRight": "10px",
+                "paddingTop": "16px",
+              }
+            }
+          >
+            <div
+              className="css-view-1dbjc4n"
+              style={
+                Object {
+                  "borderBottomColor": "rgba(171,173,175,1.00)",
+                  "borderBottomLeftRadius": "5px",
+                  "borderBottomRightRadius": "5px",
+                  "borderBottomStyle": "solid",
+                  "borderBottomWidth": "2px",
+                  "borderLeftColor": "rgba(171,173,175,1.00)",
+                  "borderLeftStyle": "solid",
+                  "borderLeftWidth": "2px",
+                  "borderRightColor": "rgba(171,173,175,1.00)",
+                  "borderRightStyle": "solid",
+                  "borderRightWidth": "2px",
+                  "borderTopColor": "rgba(171,173,175,1.00)",
+                  "borderTopLeftRadius": "5px",
+                  "borderTopRightRadius": "5px",
+                  "borderTopStyle": "solid",
+                  "borderTopWidth": "2px",
+                  "height": "10px",
+                  "marginBottom": "auto",
+                  "marginLeft": "auto",
+                  "marginRight": "auto",
+                  "marginTop": "auto",
+                  "width": "10px",
+                }
+              }
+            />
+          </div>
+          <div
+            className="css-view-1dbjc4n"
             style={
               Object {
                 "WebkitBoxDirection": "normal",
@@ -2959,9 +3557,13 @@ exports[`ValidatorsList renders 1`] = `
                   }
                 }
               >
-                <span
-                  className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+                <a
+                  className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+                  data-focusable={true}
                   dir="auto"
+                  href="https://explorer.celo.org/address/0x7a914a1b9a025eca6a2c06936c94101184741ea2/celo"
+                  rel=" noopener noreferrer"
+                  role="link"
                   style={
                     Object {
                       "color": "rgba(255,255,255,1.00)",
@@ -2975,9 +3577,10 @@ exports[`ValidatorsList renders 1`] = `
                       "whiteSpace": "nowrap",
                     }
                   }
+                  target="_blank"
                 >
                   Test 4
-                </span>
+                </a>
               </span>
               <span
                 className="css-text-901oao css-textHasAncestor-16my406"
@@ -3385,6 +3988,66 @@ exports[`ValidatorsList renders 1`] = `
             </span>
           </span>
           <span
+            className="css-text-901oao css-textHasAncestor-16my406 css-textMultiLine-cens5h"
+            dir="auto"
+            style={
+              Object {
+                "WebkitBoxFlex": 0,
+                "WebkitFlexGrow": 0,
+                "WebkitLineClamp": 2,
+                "color": "rgba(255,255,255,1.00)",
+                "flexGrow": 0,
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "maxWidth": "116px",
+                "minWidth": "116px",
+                "msFlexPositive": 0,
+                "paddingBottom": "12px",
+                "paddingLeft": "10px",
+                "paddingRight": "10px",
+                "paddingTop": "12px",
+                "textAlign": "center",
+              }
+            }
+          >
+            380,210
+            
+
+            (
+            100.0
+            %)
+          </span>
+          <span
+            className="css-text-901oao css-textHasAncestor-16my406 css-textMultiLine-cens5h"
+            dir="auto"
+            style={
+              Object {
+                "WebkitBoxFlex": 0,
+                "WebkitFlexGrow": 0,
+                "WebkitLineClamp": 2,
+                "color": "rgba(255,255,255,1.00)",
+                "flexGrow": 0,
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "maxWidth": "116px",
+                "minWidth": "116px",
+                "msFlexPositive": 0,
+                "paddingBottom": "12px",
+                "paddingLeft": "10px",
+                "paddingRight": "10px",
+                "paddingTop": "12px",
+                "textAlign": "center",
+              }
+            }
+          >
+            400,520
+            
+
+            (
+            94.9
+            %)
+          </span>
+          <span
             className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
             dir="auto"
             style={
@@ -3587,6 +4250,59 @@ exports[`ValidatorsList renders 1`] = `
         >
           <div
             className="css-view-1dbjc4n"
+            onClick={[Function]}
+            style={
+              Object {
+                "WebkitAlignSelf": "flex-start",
+                "WebkitBoxFlex": 0,
+                "WebkitFlexGrow": 0,
+                "alignSelf": "flex-start",
+                "cursor": "pointer",
+                "flexGrow": 0,
+                "fontSize": "16px",
+                "maxWidth": "30px",
+                "minWidth": "30px",
+                "msFlexItemAlign": "start",
+                "msFlexPositive": 0,
+                "paddingBottom": "12px",
+                "paddingLeft": "10px",
+                "paddingRight": "10px",
+                "paddingTop": "16px",
+              }
+            }
+          >
+            <div
+              className="css-view-1dbjc4n"
+              style={
+                Object {
+                  "borderBottomColor": "rgba(171,173,175,1.00)",
+                  "borderBottomLeftRadius": "5px",
+                  "borderBottomRightRadius": "5px",
+                  "borderBottomStyle": "solid",
+                  "borderBottomWidth": "2px",
+                  "borderLeftColor": "rgba(171,173,175,1.00)",
+                  "borderLeftStyle": "solid",
+                  "borderLeftWidth": "2px",
+                  "borderRightColor": "rgba(171,173,175,1.00)",
+                  "borderRightStyle": "solid",
+                  "borderRightWidth": "2px",
+                  "borderTopColor": "rgba(171,173,175,1.00)",
+                  "borderTopLeftRadius": "5px",
+                  "borderTopRightRadius": "5px",
+                  "borderTopStyle": "solid",
+                  "borderTopWidth": "2px",
+                  "height": "10px",
+                  "marginBottom": "auto",
+                  "marginLeft": "auto",
+                  "marginRight": "auto",
+                  "marginTop": "auto",
+                  "width": "10px",
+                }
+              }
+            />
+          </div>
+          <div
+            className="css-view-1dbjc4n"
             style={
               Object {
                 "WebkitBoxDirection": "normal",
@@ -3685,9 +4401,13 @@ exports[`ValidatorsList renders 1`] = `
                   }
                 }
               >
-                <span
-                  className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+                <a
+                  className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+                  data-focusable={true}
                   dir="auto"
+                  href="https://explorer.celo.org/address/0x44e11b8eb591a5b8b0cf4db6b02ad60e6ed89a62/celo"
+                  rel=" noopener noreferrer"
+                  role="link"
                   style={
                     Object {
                       "color": "rgba(255,255,255,1.00)",
@@ -3701,9 +4421,10 @@ exports[`ValidatorsList renders 1`] = `
                       "whiteSpace": "nowrap",
                     }
                   }
+                  target="_blank"
                 >
                   Test 5
-                </span>
+                </a>
               </span>
               <span
                 className="css-text-901oao css-textHasAncestor-16my406"
@@ -4111,6 +4832,66 @@ exports[`ValidatorsList renders 1`] = `
             </span>
           </span>
           <span
+            className="css-text-901oao css-textHasAncestor-16my406 css-textMultiLine-cens5h"
+            dir="auto"
+            style={
+              Object {
+                "WebkitBoxFlex": 0,
+                "WebkitFlexGrow": 0,
+                "WebkitLineClamp": 2,
+                "color": "rgba(255,255,255,1.00)",
+                "flexGrow": 0,
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "maxWidth": "116px",
+                "minWidth": "116px",
+                "msFlexPositive": 0,
+                "paddingBottom": "12px",
+                "paddingLeft": "10px",
+                "paddingRight": "10px",
+                "paddingTop": "12px",
+                "textAlign": "center",
+              }
+            }
+          >
+            19,976
+            
+
+            (
+            50.0
+            %)
+          </span>
+          <span
+            className="css-text-901oao css-textHasAncestor-16my406 css-textMultiLine-cens5h"
+            dir="auto"
+            style={
+              Object {
+                "WebkitBoxFlex": 0,
+                "WebkitFlexGrow": 0,
+                "WebkitLineClamp": 2,
+                "color": "rgba(255,255,255,1.00)",
+                "flexGrow": 0,
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "maxWidth": "116px",
+                "minWidth": "116px",
+                "msFlexPositive": 0,
+                "paddingBottom": "12px",
+                "paddingLeft": "10px",
+                "paddingRight": "10px",
+                "paddingTop": "12px",
+                "textAlign": "center",
+              }
+            }
+          >
+            400,520
+            
+
+            (
+            2.5
+            %)
+          </span>
+          <span
             className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
             dir="auto"
             style={
@@ -4313,6 +5094,59 @@ exports[`ValidatorsList renders 1`] = `
         >
           <div
             className="css-view-1dbjc4n"
+            onClick={[Function]}
+            style={
+              Object {
+                "WebkitAlignSelf": "flex-start",
+                "WebkitBoxFlex": 0,
+                "WebkitFlexGrow": 0,
+                "alignSelf": "flex-start",
+                "cursor": "pointer",
+                "flexGrow": 0,
+                "fontSize": "16px",
+                "maxWidth": "30px",
+                "minWidth": "30px",
+                "msFlexItemAlign": "start",
+                "msFlexPositive": 0,
+                "paddingBottom": "12px",
+                "paddingLeft": "10px",
+                "paddingRight": "10px",
+                "paddingTop": "16px",
+              }
+            }
+          >
+            <div
+              className="css-view-1dbjc4n"
+              style={
+                Object {
+                  "borderBottomColor": "rgba(171,173,175,1.00)",
+                  "borderBottomLeftRadius": "5px",
+                  "borderBottomRightRadius": "5px",
+                  "borderBottomStyle": "solid",
+                  "borderBottomWidth": "2px",
+                  "borderLeftColor": "rgba(171,173,175,1.00)",
+                  "borderLeftStyle": "solid",
+                  "borderLeftWidth": "2px",
+                  "borderRightColor": "rgba(171,173,175,1.00)",
+                  "borderRightStyle": "solid",
+                  "borderRightWidth": "2px",
+                  "borderTopColor": "rgba(171,173,175,1.00)",
+                  "borderTopLeftRadius": "5px",
+                  "borderTopRightRadius": "5px",
+                  "borderTopStyle": "solid",
+                  "borderTopWidth": "2px",
+                  "height": "10px",
+                  "marginBottom": "auto",
+                  "marginLeft": "auto",
+                  "marginRight": "auto",
+                  "marginTop": "auto",
+                  "width": "10px",
+                }
+              }
+            />
+          </div>
+          <div
+            className="css-view-1dbjc4n"
             style={
               Object {
                 "WebkitBoxDirection": "normal",
@@ -4411,9 +5245,13 @@ exports[`ValidatorsList renders 1`] = `
                   }
                 }
               >
-                <span
-                  className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+                <a
+                  className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
+                  data-focusable={true}
                   dir="auto"
+                  href="https://explorer.celo.org/address/0x439d4647515c2007aa916453e7c1105462e19f50/celo"
+                  rel=" noopener noreferrer"
+                  role="link"
                   style={
                     Object {
                       "color": "rgba(255,255,255,1.00)",
@@ -4427,9 +5265,10 @@ exports[`ValidatorsList renders 1`] = `
                       "whiteSpace": "nowrap",
                     }
                   }
+                  target="_blank"
                 >
                   Test 6
-                </span>
+                </a>
               </span>
               <span
                 className="css-text-901oao css-textHasAncestor-16my406"
@@ -4835,6 +5674,66 @@ exports[`ValidatorsList renders 1`] = `
                 </div>
               </div>
             </span>
+          </span>
+          <span
+            className="css-text-901oao css-textHasAncestor-16my406 css-textMultiLine-cens5h"
+            dir="auto"
+            style={
+              Object {
+                "WebkitBoxFlex": 0,
+                "WebkitFlexGrow": 0,
+                "WebkitLineClamp": 2,
+                "color": "rgba(255,255,255,1.00)",
+                "flexGrow": 0,
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "maxWidth": "116px",
+                "minWidth": "116px",
+                "msFlexPositive": 0,
+                "paddingBottom": "12px",
+                "paddingLeft": "10px",
+                "paddingRight": "10px",
+                "paddingTop": "12px",
+                "textAlign": "center",
+              }
+            }
+          >
+            44,375
+            
+
+            (
+            22.5
+            %)
+          </span>
+          <span
+            className="css-text-901oao css-textHasAncestor-16my406 css-textMultiLine-cens5h"
+            dir="auto"
+            style={
+              Object {
+                "WebkitBoxFlex": 0,
+                "WebkitFlexGrow": 0,
+                "WebkitLineClamp": 2,
+                "color": "rgba(255,255,255,1.00)",
+                "flexGrow": 0,
+                "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                "fontSize": "16px",
+                "maxWidth": "116px",
+                "minWidth": "116px",
+                "msFlexPositive": 0,
+                "paddingBottom": "12px",
+                "paddingLeft": "10px",
+                "paddingRight": "10px",
+                "paddingTop": "12px",
+                "textAlign": "center",
+              }
+            }
+          >
+            801,040
+            
+
+            (
+            1.2
+            %)
           </span>
           <span
             className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
