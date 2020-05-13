@@ -867,11 +867,11 @@ jobs:
           name: Build and run - Locked Gold
           command: |
             cd packages/protocol
-            python3 scripts/certora/certoraBuild.py specs/harnesses/GoldTokenHarness.sol specs/harnesses/LockedGoldHarness.sol --link LockedGoldHarness:goldToken=GoldTokenHarness --solc ~/app/solc --verify LockedGoldHarness:specs/lockedGold.spec --settings -assumeUnwindCond
+            python3 scripts/certora/certoraBuild.py specs/harnesses/GoldTokenHarness.sol specs/harnesses/LockedGoldHarness.sol --link LockedGoldHarness:goldToken=GoldTokenHarness --solc ~/app/solc --verify LockedGoldHarness:specs/lockedGold.spec --settings -assumeUnwindCond,-enableWildcardInlining=false
             CERTORA_RUN_NAME=LockedGoldRun`date +%s`           
             java -jar scripts/certora/prover_cli.jar verify --name=$CERTORA_RUN_NAME .
             python3 scripts/certora/getMyCertoraOutput.py celo_ci $CERTORA_RUN_NAME
-            mv out.json LockedGoldActual.json
+            mv output.json LockedGoldActual.json
             res1=`python3 scripts/certora/compareResults.py LockedGoldActual.json specs/LockedGoldExpected.json`||true
             rc1=$?
             echo Result $res1
@@ -880,11 +880,11 @@ jobs:
           name: Build and run - Accounts
           command: |
             cd packages/protocol
-            python3 scripts/certora/certoraBuild.py specs/harnesses/AccountsHarness.sol --solc ~/app/solc --verify AccountsHarness:specs/accounts.spec --settings -assumeUnwindCond # is needed assume unwind cond?
-            CERTORA_RUN_NAME=AccountsRun`date +%s`           
+            python3 scripts/certora/certoraBuild.py specs/harnesses/AccountsHarness.sol --solc ~/app/solc --verify AccountsHarness:specs/accounts.spec --settings -assumeUnwindCond,-enableWildcardInlining=false 
+            CERTORA_RUN_NAME=AccountsRun`date +%s`
             java -jar scripts/certora/prover_cli.jar verify --name=$CERTORA_RUN_NAME .
             python3 scripts/certora/getMyCertoraOutput.py celo_ci $CERTORA_RUN_NAME
-            mv out.json AccountsActual.json
+            mv output.json AccountsActual.json
             res2=`python3 scripts/certora/compareResults.py AccountsActual.json specs/AccountsExpected.json`||true
             rc2=$?
             echo Result $res2
