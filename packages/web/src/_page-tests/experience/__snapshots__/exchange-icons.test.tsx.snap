@@ -1313,6 +1313,7 @@ exports[`Experience/ExchangeIcons renders 1`] = `
                     "fontWeight": "500",
                     "justifyContent": "center",
                     "lineHeight": "16px",
+                    "marginLeft": "10px",
                     "minWidth": "150px",
                     "msFlexAlign": "center",
                     "msFlexPack": "center",
