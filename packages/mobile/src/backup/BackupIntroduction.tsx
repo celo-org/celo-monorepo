@@ -9,7 +9,6 @@ import { connect } from 'react-redux'
 import { setBackupDelayed } from 'src/account/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
-import componentWithAnalytics from 'src/analytics/wrapper'
 import { enterBackupFlow, exitBackupFlow } from 'src/app/actions'
 import { Namespaces, withTranslation } from 'src/i18n'
 import BackupIntroIcon from 'src/icons/BackupIntroIcon'
@@ -218,10 +217,8 @@ const styles = StyleSheet.create({
   },
 })
 
-export default componentWithAnalytics(
-  connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
-    setBackupDelayed,
-    enterBackupFlow,
-    exitBackupFlow,
-  })(withTranslation(Namespaces.backupKeyFlow6)(BackupIntroduction))
-)
+export default connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
+  setBackupDelayed,
+  enterBackupFlow,
+  exitBackupFlow,
+})(withTranslation(Namespaces.backupKeyFlow6)(BackupIntroduction))

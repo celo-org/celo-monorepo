@@ -25,7 +25,6 @@ import { connect } from 'react-redux'
 import { hideAlert, showError, showMessage } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
-import componentWithAnalytics from 'src/analytics/wrapper'
 import { TokenTransactionType } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import Avatar from 'src/components/Avatar'
@@ -141,10 +140,10 @@ const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
 const { decimalSeparator } = getNumberFormatSettings()
 
 export class SendAmount extends React.Component<Props, State> {
-  static navigationOptions = () => ({
+  static navigationOptions = {
     ...headerWithBackButton,
     headerTitle: <HeaderTitleWithBalance title={i18n.t('sendFlow7:sendOrRequest')} />,
-  })
+  }
 
   state: State = {
     amount: '',
@@ -492,12 +491,10 @@ const style = StyleSheet.create({
   },
 })
 
-export default componentWithAnalytics(
-  connect<StateProps, DispatchProps, OwnProps, RootState>(mapStateToProps, {
-    fetchDollarBalance,
-    showError,
-    hideAlert,
-    showMessage,
-    fetchPhoneAddresses,
-  })(withTranslation(Namespaces.sendFlow7)(SendAmount))
-)
+export default connect<StateProps, DispatchProps, OwnProps, RootState>(mapStateToProps, {
+  fetchDollarBalance,
+  showError,
+  hideAlert,
+  showMessage,
+  fetchPhoneAddresses,
+})(withTranslation(Namespaces.sendFlow7)(SendAmount))

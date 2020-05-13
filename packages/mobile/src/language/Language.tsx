@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
-import componentWithAnalytics from 'src/analytics/wrapper'
 import { setLanguage } from 'src/app/actions'
 import { AVAILABLE_LANGUAGES } from 'src/config'
 import i18n, { Namespaces } from 'src/i18n'
@@ -48,4 +47,4 @@ export function Language() {
   )
 }
 
-export default componentWithAnalytics(Language)
+export default Language

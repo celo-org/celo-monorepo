@@ -3,7 +3,6 @@ import { connect } from 'react-redux'
 import Education from 'src/account/Education'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
-import { componentWithAnalytics } from 'src/analytics/wrapper'
 import { sendBetweenPhones, sendFee, stabilityScale } from 'src/images/Images'
 import { navigate, navigateHome } from 'src/navigator/NavigationService'
 import { Stacks } from 'src/navigator/Screens'
@@ -63,6 +62,4 @@ export class DollarEducation extends React.Component<Props> {
   }
 }
 
-export default componentWithAnalytics(
-  connect<{}, DispatchProps>(null, { setEducationCompleted })(DollarEducation)
-)
+export default connect<{}, DispatchProps>(null, { setEducationCompleted })(DollarEducation)

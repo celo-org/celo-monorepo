@@ -14,7 +14,6 @@ import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import { hideAlert, showError } from 'src/alert/actions'
 import { errorSelector } from 'src/alert/reducer'
-import componentWithAnalytics from 'src/analytics/wrapper'
 import { MoneyAmount } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
@@ -321,13 +320,11 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
   }
 }
 
-export default componentWithAnalytics(
-  connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
-    fetchExchangeRate,
-    showError,
-    hideAlert,
-  })(withTranslation(Namespaces.exchangeFlow9)(ExchangeTradeScreen))
-)
+export default connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
+  fetchExchangeRate,
+  showError,
+  hideAlert,
+})(withTranslation(Namespaces.exchangeFlow9)(ExchangeTradeScreen))
 
 const styles = StyleSheet.create({
   container: {

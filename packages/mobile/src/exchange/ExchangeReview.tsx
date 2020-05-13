@@ -12,7 +12,6 @@ import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
-import componentWithAnalytics from 'src/analytics/wrapper'
 import CurrencyDisplay, { FormatType } from 'src/components/CurrencyDisplay'
 import FeeIcon from 'src/components/FeeIcon'
 import LineItemRow from 'src/components/LineItemRow'
@@ -41,16 +40,6 @@ interface DispatchProps {
   exchangeTokens: typeof exchangeTokens
 }
 
-interface NavProps {
-  exchangeInput: {
-    makerToken: CURRENCY_ENUM
-    makerTokenBalance: string
-    inputToken: CURRENCY_ENUM
-    inputTokenDisplayName: string
-    inputAmount: BigNumber
-  }
-}
-
 interface State {
   makerToken: CURRENCY_ENUM
   inputToken: CURRENCY_ENUM
@@ -58,10 +47,9 @@ interface State {
   inputAmount: BigNumber
 }
 
-type Props = StateProps &
-  WithTranslation &
-  DispatchProps &
-  StackScreenProps<StackParamList, Screens.ExchangeReview>
+type OwnProps = StackScreenProps<StackParamList, Screens.ExchangeReview>
+
+type Props = StateProps & WithTranslation & DispatchProps & OwnProps
 
 const mapStateToProps = (state: RootState): StateProps => ({
   exchangeRatePair: state.exchange.exchangeRatePair,
@@ -279,10 +267,8 @@ const styles = StyleSheet.create({
   },
 })
 
-export default componentWithAnalytics(
-  connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
-    exchangeTokens,
-    fetchExchangeRate,
-    fetchTobinTax,
-  })(withTranslation(Namespaces.exchangeFlow9)(ExchangeReview))
-)
+export default connect<StateProps, DispatchProps, OwnProps, RootState>(mapStateToProps, {
+  exchangeTokens,
+  fetchExchangeRate,
+  fetchTobinTax,
+})(withTranslation(Namespaces.exchangeFlow9)(ExchangeReview))

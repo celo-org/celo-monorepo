@@ -21,7 +21,6 @@ import SafeAreaView from 'react-native-safe-area-view'
 import { BoxShadow } from 'react-native-shadow'
 import { connect } from 'react-redux'
 import { showMessage } from 'src/alert/actions'
-import componentWithAnalytics from 'src/analytics/wrapper'
 import { exitBackupFlow } from 'src/app/actions'
 import { ALERT_BANNER_DURATION, DEFAULT_TESTNET, SHOW_TESTNET_BANNER } from 'src/config'
 import { CURRENCY_ENUM } from 'src/geth/consts'
@@ -287,9 +286,7 @@ const styles = StyleSheet.create({
   },
 })
 
-export default componentWithAnalytics(
-  connect<StateProps, DispatchProps, {}, RootState>(
-    mapStateToProps,
-    mapDispatchToProps
-  )(withTranslation(Namespaces.walletFlow5)(WalletHome))
-)
+export default connect<StateProps, DispatchProps, {}, RootState>(
+  mapStateToProps,
+  mapDispatchToProps
+)(withTranslation(Namespaces.walletFlow5)(WalletHome))

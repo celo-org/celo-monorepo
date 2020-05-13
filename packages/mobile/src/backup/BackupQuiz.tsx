@@ -13,7 +13,6 @@ import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import { setBackupCompleted } from 'src/account/actions'
 import { showError } from 'src/alert/actions'
-import componentWithAnalytics from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import DevSkipButton from 'src/components/DevSkipButton'
 import { Namespaces, withTranslation } from 'src/i18n'
@@ -42,7 +41,9 @@ interface DispatchProps {
   showError: typeof showError
 }
 
-type Props = WithTranslation & DispatchProps & StackScreenProps<StackParamList, Screens.BackupQuiz>
+type OwnProps = StackScreenProps<StackParamList, Screens.BackupQuiz>
+
+type Props = WithTranslation & DispatchProps & OwnProps
 
 export class BackupQuiz extends React.Component<Props, State> {
   static navigationOptions = headerWithBackButton
@@ -214,11 +215,10 @@ export class BackupQuiz extends React.Component<Props, State> {
   }
 }
 
-export default componentWithAnalytics(
-  connect<{}, DispatchProps, {}, RootState>(null, { setBackupCompleted, showError })(
-    withTranslation(Namespaces.backupKeyFlow6)(BackupQuiz)
-  )
-)
+export default connect<{}, DispatchProps, OwnProps, RootState>(null, {
+  setBackupCompleted,
+  showError,
+})(withTranslation(Namespaces.backupKeyFlow6)(BackupQuiz))
 
 const styles = StyleSheet.create({
   container: {

@@ -42,7 +42,7 @@ import EnterInviteCode from 'src/invite/EnterInviteCode'
 import Language from 'src/language/Language'
 import SelectLocalCurrency from 'src/localCurrency/SelectLocalCurrency'
 import { exchangeHeader } from 'src/navigator/Headers'
-import { Screens, Stacks } from 'src/navigator/Screens'
+import { Screens } from 'src/navigator/Screens'
 import TabNavigator from 'src/navigator/TabNavigator'
 import { StackParamList } from 'src/navigator/types'
 import IncomingPaymentRequestListScreen from 'src/paymentRequest/IncomingPaymentRequestListScreen'
@@ -93,13 +93,10 @@ export const headerArea = {
   },
 }
 
-const createStackNavigatorStub = (...args) => {
-  console.log(args)
-}
-
 const commonScreens = (Navigator: typeof Stack) => {
   return (
     <>
+      <Navigator.Screen name={Screens.Language} component={Language} />
       <Navigator.Screen name={Screens.PincodeEnter} component={PincodeEnter} />
       <Navigator.Screen name={Screens.ErrorScreen} component={ErrorScreen} />
       <Navigator.Screen name={Screens.UpgradeScreen} component={UpgradeScreen} />
@@ -145,7 +142,6 @@ const verificationScreens = (Navigator: typeof Stack) => {
 
 const nuxScreens = (Navigator: typeof Stack) => (
   <>
-    <Navigator.Screen name={Screens.Language} component={Language} />
     <Navigator.Screen name={Screens.JoinCelo} component={JoinCelo} />
     <Navigator.Screen name={Screens.RegulatoryTerms} component={RegulatoryTerms} />
     <Navigator.Screen name={Screens.PincodeEducation} component={PincodeEducation} />
@@ -161,59 +157,30 @@ const sendScreens = (Navigator: typeof Stack) => (
   <>
     <Navigator.Screen name={Screens.Send} component={Send} />
     <Navigator.Screen name={Screens.QRScanner} component={QRScanner} />
+    <Navigator.Screen name={Screens.QRCode} component={QRCode} />
     <Navigator.Screen name={Screens.SendAmount} component={SendAmount} />
     <Navigator.Screen name={Screens.SendConfirmation} component={SendConfirmation} />
+    <Navigator.Screen
+      name={Screens.PaymentRequestConfirmation}
+      component={PaymentRequestConfirmation}
+    />
+    <Navigator.Screen
+      name={Screens.IncomingPaymentRequestListScreen}
+      component={IncomingPaymentRequestListScreen}
+    />
+    <Navigator.Screen
+      name={Screens.OutgoingPaymentRequestListScreen}
+      component={OutgoingPaymentRequestListScreen}
+    />
+    <Navigator.Screen
+      name={Screens.EscrowedPaymentListScreen}
+      component={EscrowedPaymentListScreen}
+    />
+    <Navigator.Screen
+      name={Screens.ReclaimPaymentConfirmationScreen}
+      component={ReclaimPaymentConfirmationScreen}
+    />
   </>
-)
-
-const SendStack = createStackNavigatorStub(
-  {
-    [Screens.Send]: { screen: Send },
-    [Screens.QRScanner]: { screen: QRScanner },
-    [Screens.SendAmount]: { screen: SendAmount },
-    [Screens.SendConfirmation]: { screen: SendConfirmation },
-    [Screens.PaymentRequestConfirmation]: { screen: PaymentRequestConfirmation },
-  },
-  {
-    navigationOptions: {
-      header: null,
-    },
-    ...headerArea,
-    initialRouteName: Screens.Send,
-  }
-)
-
-const QRSendStack = createStackNavigatorStub(
-  {
-    [Screens.QRCode]: { screen: QRCode },
-    [Screens.QRScanner]: { screen: QRScanner },
-    [Screens.SendAmount]: { screen: SendAmount },
-    [Screens.SendConfirmation]: { screen: SendConfirmation },
-    [Screens.PaymentRequestConfirmation]: { screen: PaymentRequestConfirmation },
-  },
-  {
-    navigationOptions: {
-      header: null,
-    },
-    ...headerArea,
-    initialRouteName: Screens.QRCode,
-  }
-)
-
-const ExchangeStack = createStackNavigatorStub(
-  {
-    // Note, ExchangeHomeScreen isn't in this stack because it's part of the tab navigator
-    [Screens.ExchangeTradeScreen]: { screen: ExchangeTradeScreen },
-    [Screens.ExchangeReview]: { screen: ExchangeReview },
-    [Screens.FeeExchangeEducation]: { screen: FeeExchangeEducation },
-  },
-  {
-    navigationOptions: {
-      header: null,
-    },
-    ...headerArea,
-    initialRouteName: Screens.ExchangeTradeScreen,
-  }
 )
 
 const exchangeTradeOptions = ({
@@ -243,125 +210,43 @@ const exchangeScreens = (Navigator: typeof Stack) => (
   </>
 )
 
-const IncomingRequestStack = createStackNavigatorStub(
-  {
-    [Screens.IncomingPaymentRequestListScreen]: { screen: IncomingPaymentRequestListScreen },
-    [Screens.SendConfirmation]: { screen: SendConfirmation },
-  },
-  {
-    navigationOptions: {
-      header: null,
-    },
-    ...headerArea,
-    initialRouteName: Screens.IncomingPaymentRequestListScreen,
-  }
+const backupScreens = (Navigator: typeof Stack) => (
+  <>
+    <Navigator.Screen name={Screens.BackupIntroduction} component={BackupIntroduction} />
+    <Navigator.Screen name={Screens.BackupPhrase} component={BackupPhrase} />
+    <Navigator.Screen name={Screens.BackupQuiz} component={BackupQuiz} />
+    <Navigator.Screen name={Screens.BackupSocialIntro} component={BackupSocialIntro} />
+    <Navigator.Screen name={Screens.BackupSocial} component={BackupSocial} />
+    <Navigator.Screen name={Screens.BackupComplete} component={BackupComplete} />
+  </>
 )
 
-const OutgoingRequestStack = createStackNavigatorStub(
-  {
-    [Screens.OutgoingPaymentRequestListScreen]: { screen: OutgoingPaymentRequestListScreen },
-  },
-  {
-    navigationOptions: {
-      header: null,
-    },
-    ...headerArea,
-    initialRouteName: Screens.OutgoingPaymentRequestListScreen,
-  }
+const settingsScreens = (Navigator: typeof Stack) => (
+  <>
+    <Navigator.Screen name={Screens.Account} component={Account} />
+    <Navigator.Screen name={Screens.Security} component={Security} />
+    <Navigator.Screen name={Screens.Analytics} component={Analytics} />
+    <Navigator.Screen name={Screens.EditProfile} component={EditProfile} />
+    <Navigator.Screen name={Screens.Profile} component={Profile} />
+    <Navigator.Screen name={Screens.Invite} component={Invite} />
+    <Navigator.Screen name={Screens.InviteReview} component={InviteReview} />
+    <Navigator.Screen name={Screens.SelectLocalCurrency} component={SelectLocalCurrency} />
+    <Navigator.Screen name={Screens.Licenses} component={Licenses} />
+    <Navigator.Screen name={Screens.Support} component={Support} />
+    <Navigator.Screen name={Screens.SupportContact} component={SupportContact} />
+    <Navigator.Screen name={Screens.FiatExchange} component={FiatExchange} />
+  </>
 )
 
-const EscrowStack = createStackNavigatorStub(
-  {
-    [Screens.EscrowedPaymentListScreen]: { screen: EscrowedPaymentListScreen },
-    [Screens.ReclaimPaymentConfirmationScreen]: {
-      screen: ReclaimPaymentConfirmationScreen,
-    },
-  },
-  {
-    navigationOptions: {
-      header: null,
-    },
-    ...headerArea,
-    initialRouteName: Screens.EscrowedPaymentListScreen,
-  }
-)
-
-const BackupStack = createStackNavigatorStub(
-  {
-    [Screens.BackupIntroduction]: { screen: BackupIntroduction },
-    [Screens.BackupPhrase]: { screen: BackupPhrase },
-    [Screens.BackupQuiz]: { screen: BackupQuiz },
-    [Screens.BackupSocialIntro]: { screen: BackupSocialIntro },
-    [Screens.BackupSocial]: { screen: BackupSocial },
-    [Screens.BackupComplete]: { screen: BackupComplete },
-  },
-  {
-    navigationOptions: {
-      header: null,
-    },
-    ...headerArea,
-    initialRouteName: Screens.BackupIntroduction,
-  }
-)
-
-const SettingsStack = createStackNavigatorStub(
-  {
-    [Screens.Account]: { screen: Account },
-    [Stacks.BackupStack]: { screen: BackupStack },
-    [Screens.Language]: { screen: Language },
-    [Screens.Security]: { screen: Security },
-    [Screens.Analytics]: { screen: Analytics },
-    [Screens.DataSaver]: { screen: DataSaver },
-    [Screens.EditProfile]: { screen: EditProfile },
-    [Screens.Profile]: { screen: Profile },
-    [Screens.Invite]: { screen: Invite },
-    [Screens.InviteReview]: { screen: InviteReview },
-    [Screens.SelectLocalCurrency]: { screen: SelectLocalCurrency },
-    [Screens.Licenses]: { screen: Licenses },
-    [Screens.Support]: { screen: Support },
-    [Screens.SupportContact]: { screen: SupportContact },
-    [Screens.FiatExchange]: { screen: FiatExchange },
-  },
-  {
-    navigationOptions: {
-      header: null,
-    },
-    ...headerArea,
-    initialRouteName: Screens.Account,
-  }
-)
-
-const AppStack = createStackNavigatorStub(
-  {
-    // Note, WalletHome isn't in this stack because it's part of the tab navigator
-    // [Screens.TabNavigator]: { screen: TabNavigator },
-    [Stacks.SendStack]: { screen: SendStack },
-    // Adding this screen, so it possbile to go back to Home screen from it
-    [Screens.SendConfirmation]: { screen: SendConfirmation },
-    // Adding this screen, so it possbile to go back to Home screen from it
-    [Screens.ReclaimPaymentConfirmationScreen]: {
-      screen: ReclaimPaymentConfirmationScreen,
-    },
-    // Adding this stack, so it possbile to go back to Home screen from it
-    [Stacks.BackupStack]: { screen: BackupStack },
-    [Stacks.QRSendStack]: { screen: QRSendStack },
-    [Stacks.ExchangeStack]: { screen: ExchangeStack },
-    [Stacks.IncomingRequestStack]: { screen: IncomingRequestStack },
-    [Stacks.OutgoingRequestStack]: { screen: OutgoingRequestStack },
-    [Stacks.EscrowStack]: { screen: EscrowStack },
-    [Stacks.SettingsStack]: { screen: SettingsStack },
-    [Screens.SetClock]: { screen: SetClock },
-    [Screens.DollarEducation]: { screen: DollarEducation },
-    [Screens.TransactionReview]: { screen: TransactionReview },
-    [Screens.PhotosEducation]: { screen: PhotosEducation },
-    [Screens.GoldEducation]: { screen: GoldEducation },
-    [Screens.FeeEducation]: { screen: FeeEducation },
-    [Screens.FeeExchangeEducation]: { screen: FeeExchangeEducation }, // Included so it is possible to go back to Home screen from it
-  },
-  {
-    ...headerArea,
-    initialRouteName: Screens.TabNavigator,
-  }
+const generalScreens = (Navigator: typeof Stack) => (
+  <>
+    <Navigator.Screen name={Screens.SetClock} component={SetClock} />
+    <Navigator.Screen name={Screens.DollarEducation} component={DollarEducation} />
+    <Navigator.Screen name={Screens.TransactionReview} component={TransactionReview} />
+    <Navigator.Screen name={Screens.PhotosEducation} component={PhotosEducation} />
+    <Navigator.Screen name={Screens.GoldEducation} component={GoldEducation} />
+    <Navigator.Screen name={Screens.FeeEducation} component={FeeEducation} />
+  </>
 )
 
 export function AppNavigatorNew() {
@@ -373,6 +258,9 @@ export function AppNavigatorNew() {
       {nuxScreens(Stack)}
       {verificationScreens(Stack)}
       {exchangeScreens(Stack)}
+      {backupScreens(Stack)}
+      {settingsScreens(Stack)}
+      {generalScreens(Stack)}
     </Stack.Navigator>
   )
 }

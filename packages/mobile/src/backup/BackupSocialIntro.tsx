@@ -9,7 +9,6 @@ import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
-import componentWithAnalytics from 'src/analytics/wrapper'
 import { exitBackupFlow } from 'src/app/actions'
 import { Namespaces, withTranslation } from 'src/i18n'
 import SafeguardsPeopleIcon from 'src/icons/SafeguardsPeopleIcon'
@@ -23,9 +22,9 @@ interface DispatchProps {
   exitBackupFlow: typeof exitBackupFlow
 }
 
-type Props = WithTranslation &
-  DispatchProps &
-  StackScreenProps<StackParamList, Screens.BackupSocialIntro>
+type OwnProps = StackScreenProps<StackParamList, Screens.BackupSocialIntro>
+
+type Props = WithTranslation & DispatchProps & OwnProps
 
 class BackupSocialIntro extends React.Component<Props> {
   static navigationOptions = () => ({
@@ -107,8 +106,6 @@ const styles = StyleSheet.create({
   },
 })
 
-export default componentWithAnalytics(
-  connect<{}, DispatchProps, {}, RootState>(null, {
-    exitBackupFlow,
-  })(withTranslation(Namespaces.backupKeyFlow6)(BackupSocialIntro))
-)
+export default connect<{}, DispatchProps, OwnProps, RootState>(null, {
+  exitBackupFlow,
+})(withTranslation(Namespaces.backupKeyFlow6)(BackupSocialIntro))

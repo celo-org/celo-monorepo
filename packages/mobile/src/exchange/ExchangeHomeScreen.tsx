@@ -8,7 +8,6 @@ import { WithTranslation } from 'react-i18next'
 import { StyleSheet, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
-import componentWithAnalytics from 'src/analytics/wrapper'
 import { fetchExchangeRate } from 'src/exchange/actions'
 import CeloGoldHistoryChart from 'src/exchange/CeloGoldHistoryChart'
 import CeloGoldOverview from 'src/exchange/CeloGoldOverview'
@@ -111,11 +110,9 @@ export class ExchangeHomeScreen extends React.Component<Props> {
   }
 }
 
-export default componentWithAnalytics(
-  connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
-    fetchExchangeRate,
-  })(withTranslation(Namespaces.exchangeFlow9)(ExchangeHomeScreen))
-)
+export default connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
+  fetchExchangeRate,
+})(withTranslation(Namespaces.exchangeFlow9)(ExchangeHomeScreen))
 
 const styles = StyleSheet.create({
   activity: {

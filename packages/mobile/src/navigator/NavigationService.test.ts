@@ -1,5 +1,4 @@
 import SplashScreen from 'react-native-splash-screen'
-import { NavigationState } from 'react-navigation'
 import { PincodeType } from 'src/account/reducer'
 import { pincodeTypeSelector } from 'src/account/selectors'
 import {
@@ -23,7 +22,7 @@ jest.spyOn(window, 'requestAnimationFrame').mockImplementation((cb) => cb())
 
 const hide = SplashScreen.hide as jest.Mock
 
-function createNavStateWithRoute(routeName: string): NavigationState {
+function createNavStateWithRoute(routeName: string) {
   return {
     key: 'root',
     // @ts-ignore

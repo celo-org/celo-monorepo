@@ -12,7 +12,6 @@ import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
-import componentWithAnalytics from 'src/analytics/wrapper'
 import { TokenTransactionType } from 'src/apollo/types'
 import InviteOptionsModal from 'src/components/InviteOptionsModal'
 import { FeeType } from 'src/fees/actions'
@@ -83,12 +82,11 @@ interface State {
   buttonReset: boolean
 }
 
-type Props = DispatchProps &
-  StateProps &
-  WithTranslation &
-  StackScreenProps<StackParamList, Screens.SendConfirmation>
+type OwnProps = StackScreenProps<StackParamList, Screens.SendConfirmation>
 
-class SendConfirmation extends React.Component<Props, State> {
+type Props = DispatchProps & StateProps & WithTranslation & OwnProps
+
+export class SendConfirmation extends React.Component<Props, State> {
   static navigationOptions = { header: null }
 
   state = {
@@ -313,9 +311,7 @@ const styles = StyleSheet.create({
   },
 })
 
-export default componentWithAnalytics(
-  connect<StateProps, DispatchProps, {}, RootState>(
-    mapStateToProps,
-    mapDispatchToProps
-  )(withTranslation(Namespaces.sendFlow7)(SendConfirmation))
-)
+export default connect<StateProps, DispatchProps, OwnProps, RootState>(
+  mapStateToProps,
+  mapDispatchToProps
+)(withTranslation(Namespaces.sendFlow7)(SendConfirmation))

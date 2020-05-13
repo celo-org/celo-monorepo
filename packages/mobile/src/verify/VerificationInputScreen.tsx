@@ -15,7 +15,6 @@ import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import { hideAlert } from 'src/alert/actions'
 import { errorSelector } from 'src/alert/reducer'
-import componentWithAnalytics from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import CancelButton from 'src/components/CancelButton'
 import DevSkipButton from 'src/components/DevSkipButton'
@@ -330,9 +329,7 @@ const styles = StyleSheet.create({
   modalSkipTextDisabled: { color: colors.celoGreenInactive },
 })
 
-export default componentWithAnalytics(
-  connect<StateProps, DispatchProps, {}, RootState>(
-    mapStateToProps,
-    mapDispatchToProps
-  )(withTranslation(Namespaces.nuxVerification2)(VerificationInputScreen))
-)
+export default connect<StateProps, DispatchProps, {}, RootState>(
+  mapStateToProps,
+  mapDispatchToProps
+)(withTranslation(Namespaces.nuxVerification2)(VerificationInputScreen))

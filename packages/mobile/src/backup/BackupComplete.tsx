@@ -5,7 +5,6 @@ import { WithTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
-import componentWithAnalytics from 'src/analytics/wrapper'
 import { exitBackupFlow } from 'src/app/actions'
 import { Namespaces, withTranslation } from 'src/i18n'
 import NuxLogo from 'src/icons/NuxLogo'
@@ -91,8 +90,6 @@ const styles = StyleSheet.create({
   },
 })
 
-export default componentWithAnalytics(
-  connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
-    exitBackupFlow,
-  })(withTranslation(Namespaces.backupKeyFlow6)(BackupComplete))
-)
+export default connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
+  exitBackupFlow,
+})(withTranslation(Namespaces.backupKeyFlow6)(BackupComplete))
