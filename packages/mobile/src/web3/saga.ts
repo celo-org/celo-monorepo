@@ -60,7 +60,7 @@ const WEB3_MONITOR_DELAY = 100
 // checks if web3 claims it is currently syncing and attempts to wait for it to complete
 export function* checkWeb3SyncProgress() {
   Logger.debug(TAG, 'checkWeb3SyncProgress', 'Checking sync progress')
-  let initTime = Date.now()
+  const initTime = Date.now()
   let millisecs
 
   let syncLoops = 0
