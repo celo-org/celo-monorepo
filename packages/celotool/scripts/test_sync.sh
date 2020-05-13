@@ -12,13 +12,13 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
 fi
 # Loads some envs
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-if [[ -f $DIR/../../../../.env.${network} ]]; then 
-  source $DIR/../../../../.env.${network}
+if [[ -f $DIR/../../../.env.${network} ]]; then 
+  source $DIR/../../../.env.${network}
 else
-  source $DIR/../../../../.env
+  source $DIR/../../../.env
 fi
 
-forno_url=https://$env-forno.$CLUSTER_DOMAIN_NAME.org
+forno_url=https://${network}-forno.$CLUSTER_DOMAIN_NAME.org
 node_pod="${network}-${namespace}-${syncmode}-node-0"
 
 test_sync_blocknumber() {
@@ -53,19 +53,24 @@ test_sync_blocknumber() {
 }
 
 test_syn_syncing() {
-  local target=$(kubectl -n $namespace exec -it ${node_pod} -- geth attach --exec 'eth.syncing' | grep highestBlock | cut -d' ' -f4 | tr -d ',' | $aliassed -r "s/\x1B\[([0-9]{1,3}(;[0-9]{1,2})?)?[mGK]//g")
+  local target=$(kubectl -n ${namespace} exec -it ${node_pod} -- geth attach --exec 'eth.syncing' | grep highestBlock | cut -d' ' -f4 | tr -d ',' | $aliassed -r "s/\x1B\[([0-9]{1,3}(;[0-9]{1,2})?)?[mGK]//g")
+  echo kubectl -n ${namespace} exec -it ${node_pod} -- geth attach --exec 'eth.syncing'
   target=${target//[$'\t\r\n ']}
+  echo "target: ${target}"
 
-  local current=$(kubectl -n $namespace exec -it ${node_pod} -- geth attach --exec 'eth.syncing' | grep currentBlock | cut -d' ' -f4 | tr -d ',' | $aliassed -r "s/\x1B\[([0-9]{1,3}(;[0-9]{1,2})?)?[mGK]//g")
+  local current=$(kubectl -n ${namespace} exec -it ${node_pod} -- geth attach --exec 'eth.syncing' | grep currentBlock | cut -d' ' -f4 | tr -d ',' | $aliassed -r "s/\x1B\[([0-9]{1,3}(;[0-9]{1,2})?)?[mGK]//g")
   current=${current//[$'\t\r\n ']}
+  echo "current: ${current}"
   
   local current_prev=$(kubectl -n $namespace exec -it ${node_pod} -- geth attach --exec 'eth.syncing' | grep currentBlock | cut -d' ' -f4 | tr -d ',' | $aliassed -r "s/\x1B\[([0-9]{1,3}(;[0-9]{1,2})?)?[mGK]//g")
   current_prev=${current_prev//[$'\t\r\n ']}
+  echo "current_prev: ${current_prev}"
 
   synced=false
   syncing=true
-  local loop_time="60"
+  local loop_time="1"
   while [ "$synced" != "true" ] && [ "$syncing" == "true" ]; do
+    echo "Sleeping ${loop_time}"
     sleep $loop_time
     current=$(kubectl -n "${namespace}" exec -it "${node_pod}" -- geth attach --exec 'eth.syncing' | grep currentBlock | cut -d' ' -f4 | tr -d ',' | $aliassed -r "s/\x1B\[([0-9]{1,3}(;[0-9]{1,2})?)?[mGK]//g")
     current=${current//[$'\t\r\n ']}
@@ -86,7 +91,7 @@ test_syn_syncing() {
 
 #kubectl port-forward -n $namespace ${network}-${namespace}-${syncmode}-node-0 8545 & >/dev/null 2>&1
 # Lets wait until pod starts
-while [[ $(kubectl get pods "${node_pod}" -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}') != "True" ]]; do echo "waiting for pod" && sleep 10; done
+while [[ $(kubectl get pods -n ${namespace} "${node_pod}" -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}') != "True" ]]; do echo "waiting for pod" && sleep 10; done
 
 case ${syncmode} in
   full)

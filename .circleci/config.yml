@@ -837,18 +837,19 @@ jobs:
           echo "Namespace: ${NAMESPACE}"
           kubectl create namespace ${NAMESPACE}
     - run:
-        name: Deploy light mode client connected to rc1
+        name: Deploy lightest mode client connected to rc1
         command: |
           set -e
           cd packages/celotool
           NAMESPACE="circle-${CIRCLE_BUILD_NUM}"
-          bin/celotooljs.sh deploy initial gke-fullnode -e rc1 --syncmode light --namespace ${NAMESPACE}
+          bin/celotooljs.sh deploy initial gke-fullnode -e rc1 --syncmode lightest --namespace ${NAMESPACE}
     - run:
-        name: Test light mode client connected to rc1
+        name: Test lightest mode client connected to rc1
         command: |
           set -e
+          cd packages/celotool
           NAMESPACE="circle-${CIRCLE_BUILD_NUM}"
-          scripts/test_sync.sh rc1 light ${NAMESPACE}
+          scripts/test_sync.sh rc1 lightest ${NAMESPACE}
     # - run:
     #     name: Deploy network
     #     no_output_timeout: 25m
