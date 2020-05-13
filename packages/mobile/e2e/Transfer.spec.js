@@ -6,7 +6,11 @@ const ENABLE_CONTACT_IMPORT = false
 // anyways the emulator currently has no contacts
 
 const SAMPLE_BACKUP_KEY =
-  'nose inherit merry deal scout boss siren soul piece become better unit observe another horn ranch velvet kid frog pretty powder convince identify guilt'
+  'general debate dial flock want basket local machine effort monitor stomach purity attend brand extend salon obscure soul open floor useful like cause exhaust'
+const SAMPLE_SAFEGUARD_PHRASE =
+  'general debate dial flock want basket local machine effort monitor stomach purity celo'
+const SAMPLE_SAFEGUARD_PHRASE_SECONDARY =
+  'celo attend brand extend salon obscure soul open floor useful like cause exhaust'
 const VERIFICATION_COUNTRY = 'Germany'
 const VERIFICATION_PHONE_NUMBER = '030 111111'
 const EXAMPLE_NAME = 'Test Name'
@@ -72,9 +76,10 @@ describe('Transfer Works', () => {
   })
 
   // TODO(erdal) 2 new paths: using invite code, continue without
+  // TODO(erdal) get rid of sleeps if possible to make the tests faster
 
   // Restore existing wallet
-  it('NUX->Invite', async () => {
+  it('NUX->Restore Wallet Backup', async () => {
     await waitFor(element(by.id('InviteCodeTitle')))
       .toBeVisible()
       .withTimeout(8000)
@@ -94,45 +99,31 @@ describe('Transfer Works', () => {
       .withTimeout(20000)
 
     await element(by.id('ImportWalletBackupKeyInputField')).tap()
-
     await element(by.id('ImportWalletBackupKeyInputField')).replaceText(SAMPLE_BACKUP_KEY)
 
-    // TODO(erdal): try to implement these without sleeps
-    // waits for button to be enabled
-    await sleep(10000)
+    await sleep(4000)
 
     await element(by.id('ImportWalletButton')).tap()
-
-    // waits for import to finish
-    await sleep(10000)
-
-    // TODO(erdal) make sure it succeeds (or does not fail)
-    // TODO(erdal) new path restore using safeguards
   })
 
   it('NUX->VerifyEducation', async () => {
-    await waitFor(element(by.id('VerifyEducationHeader')))
+    await waitFor(element(by.id('VerificationEducationHeader')))
       .toBeVisible()
       .withTimeout(10000)
 
-    await waitFor(element(by.id('VerifyContinueButton')))
+    await waitFor(element(by.id('VerificationEducationContinue')))
       .toBeVisible()
       .withTimeout(10000)
 
-    await waitFor(element(by.id('VerifyLogo')))
-      .toBeVisible()
-      .withTimeout(1000)
-
-    // will skip in next test
-    // await element(by.id('VerifyContinueButton')).tap()
+    // skip
+    await element(by.id('VerificationEducationSkip')).tap()
+    // confirmation popup skip
+    await element(by.id('ModalSkip')).tap()
   })
 
-  // TODO(erdal): new path verify phone
-
-  it('NUX->Verify', async () => {
+  it.skip('NUX->Verify', async () => {
     // skipping for now
-    skipTo('WalletHome')
-    await sleep(10000)
+    // TODO(erdal): implement
   })
 
   it('Wallet Home', async () => {
