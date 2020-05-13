@@ -33,7 +33,7 @@ test_sync_blocknumber() {
   current_prev=${current_prev//[$'\t\r\n ']}
   synced=false
   syncing=true
-  local loop_time="30"
+  local loop_time="60"
   while [ "${synced}" != "true" ] && [ "${syncing}" == "true" ]; do
     sleep $loop_time
     current=$(kubectl -n ${namespace} exec -it ${node_pod} -- geth attach --exec 'eth.blockNumber' | $aliassed -r "s/\x1B\[([0-9]{1,3}(;[0-9]{1,2})?)?[mGK]//g")
@@ -92,6 +92,7 @@ test_syn_syncing() {
 #kubectl port-forward -n $namespace ${network}-${namespace}-${syncmode}-node-0 8545 & >/dev/null 2>&1
 # Lets wait until pod starts
 while [[ $(kubectl get pods -n ${namespace} "${node_pod}" -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}') != "True" ]]; do echo "waiting for pod" && sleep 10; done
+sleep 60
 
 case ${syncmode} in
   full)
