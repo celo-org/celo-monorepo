@@ -17,6 +17,7 @@ import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { StyleSheet, TextStyle, TouchableWithoutFeedback, View } from 'react-native'
+import { getNumberFormatSettings } from 'react-native-localize'
 import SafeAreaView from 'react-native-safe-area-view'
 import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
@@ -60,7 +61,6 @@ import { RootState } from 'src/redux/reducers'
 import { ConfirmationInput } from 'src/send/SendConfirmation'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { fetchDollarBalance } from 'src/stableToken/actions'
-import { convertToPeriodDecimalSeparator } from 'src/utils/formatting'
 import { withDecimalSeparator } from 'src/utils/withDecimalSeparator'
 
 const AmountInput = withDecimalSeparator(
@@ -146,6 +146,8 @@ const mapStateToProps = (state: RootState, ownProps: NavigationInjectedProps): S
   }
 }
 
+const { decimalSeparator } = getNumberFormatSettings()
+
 export class SendAmount extends React.Component<Props, State> {
   static navigationOptions = () => ({
     ...headerWithBackButton,
@@ -172,11 +174,11 @@ export class SendAmount extends React.Component<Props, State> {
     if (!recipient.e164PhoneNumber) {
       throw new Error('Missing recipient e164Number')
     }
-    this.props.fetchPhoneAddresses([recipient.e164PhoneNumber])
+    this.props.fetchPhoneAddresses(recipient.e164PhoneNumber)
   }
 
   getDollarsAmount = () => {
-    const parsedInputAmount = parseInputAmount(convertToPeriodDecimalSeparator(this.state.amount))
+    const parsedInputAmount = parseInputAmount(this.state.amount, decimalSeparator)
 
     const { localCurrencyExchangeRate } = this.props
 
@@ -194,7 +196,8 @@ export class SendAmount extends React.Component<Props, State> {
 
   isAmountValid = () => {
     const isAmountValid = parseInputAmount(
-      convertToPeriodDecimalSeparator(this.state.amount)
+      this.state.amount,
+      decimalSeparator
     ).isGreaterThanOrEqualTo(DOLLAR_TRANSACTION_MIN_AMOUNT)
     return {
       isAmountValid,
@@ -214,7 +217,6 @@ export class SendAmount extends React.Component<Props, State> {
   getConfirmationInput = (type: TokenTransactionType) => {
     const amount = this.getDollarsAmount()
     const recipient = this.getRecipient()
-    // TODO (Rossy) Remove address field from some recipient types.
     const recipientAddress = getAddressFromRecipient(recipient, this.props.e164NumberToAddress)
 
     const confirmationInput: ConfirmationInput = {

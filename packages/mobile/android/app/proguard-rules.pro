@@ -27,3 +27,8 @@
 
 # Instabug
 -dontwarn com.instabug.**
+
+# React-native-bls-threshold (for its JNA dependency)
+-dontwarn java.awt.*
+-keep class com.sun.jna.* { *; }
+-keepclassmembers class * extends com.sun.jna.* { public *; }

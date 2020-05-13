@@ -1,4 +1,5 @@
 import sleep from 'sleep-promise'
+import { execCmd, execCmdWithExitOnFailure } from './cmd-utils'
 import { doCheckOrPromptIfStagingOrProduction, EnvTypes, envVar, fetchEnv } from './env-utils'
 import {
   createAndUploadBackupSecretIfNotExists,
@@ -10,7 +11,7 @@ import {
   uploadStorageClass,
 } from './helm_deploy'
 import { createServiceAccountIfNotExists } from './service-account-utils'
-import { execCmd, execCmdWithExitOnFailure, outputIncludes, switchToProjectFromEnv } from './utils'
+import { outputIncludes, switchToProjectFromEnv } from './utils'
 import { networkName } from './vm-testnet-utils'
 
 const SYSTEM_HELM_RELEASES = [
@@ -45,6 +46,7 @@ export async function switchToClusterFromEnv(checkOrPromptIfStagingOrProduction 
       `gcloud container clusters get-credentials ${kubernetesClusterName} --project ${projectName} --zone ${kubernetesClusterZone}`
     )
   }
+  await execCmdWithExitOnFailure(`kubectl config set-context --current --namespace default`)
 }
 
 export async function createClusterIfNotExists() {

@@ -6,7 +6,7 @@ export default class ExchangeShow extends BaseCommand {
   static description = 'Show the current exchange rates offered by the Exchange'
 
   static flags = {
-    ...BaseCommand.flags,
+    ...BaseCommand.flagsWithoutLocalAddresses(),
     amount: flags.string({
       description: 'Amount of the token being exchanged to report rates for',
       default: '1000000000000000000',

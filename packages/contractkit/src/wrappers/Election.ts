@@ -1,4 +1,4 @@
-import { eqAddress, normalizeAddress } from '@celo/utils/lib/address'
+import { eqAddress, findAddressIndex, normalizeAddress } from '@celo/utils/lib/address'
 import { concurrentMap, concurrentValuesMap } from '@celo/utils/lib/async'
 import { zip } from '@celo/utils/lib/collections'
 import BigNumber from 'bignumber.js'
@@ -9,6 +9,7 @@ import { Election } from '../generated/Election'
 import {
   BaseWrapper,
   CeloTransactionObject,
+  fixidityValueToBigNumber,
   identity,
   proxyCall,
   proxySend,
@@ -60,6 +61,8 @@ export interface ElectionConfig {
   electableValidators: ElectableValidators
   electabilityThreshold: BigNumber
   maxNumGroupsVotedFor: BigNumber
+  totalVotes: BigNumber
+  currentThreshold: BigNumber
 }
 
 /**
@@ -82,7 +85,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
   electabilityThreshold = proxyCall(
     this.contract.methods.getElectabilityThreshold,
     undefined,
-    valueToBigNumber
+    fixidityValueToBigNumber
   )
 
   /**
@@ -128,13 +131,18 @@ export class ElectionWrapper extends BaseWrapper<Election> {
   )
 
   /**
+   * Returns the total votes received across all groups.
+   * @return The total votes received across all groups.
+   */
+  getTotalVotes = proxyCall(this.contract.methods.getTotalVotes, undefined, valueToBigNumber)
+
+  /**
    * Returns the current validator signers using the precompiles.
    * @return List of current validator signers.
    */
-  async getCurrentValidatorSigners(blockNumber?: number): Promise<Address[]> {
-    // @ts-ignore: Expected 0-1 arguments, but got 2
-    return this.contract.methods.getCurrentValidatorSigners().call({}, blockNumber)
-  }
+  getCurrentValidatorSigners: () => Promise<Address[]> = proxyCall(
+    this.contract.methods.getCurrentValidatorSigners
+  )
 
   /**
    * Returns the validator signers for block `blockNumber`.
@@ -276,11 +284,14 @@ export class ElectionWrapper extends BaseWrapper<Election> {
       this.electableValidators(),
       this.electabilityThreshold(),
       this.contract.methods.maxNumGroupsVotedFor().call(),
+      this.getTotalVotes(),
     ])
     return {
       electableValidators: res[0],
       electabilityThreshold: res[1],
       maxNumGroupsVotedFor: valueToBigNumber(res[2]),
+      totalVotes: res[3],
+      currentThreshold: res[3].multipliedBy(res[1]),
     }
   }
 
@@ -328,7 +339,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     value: BigNumber
   ): Promise<CeloTransactionObject<boolean>> {
     const groups = await this.contract.methods.getGroupsVotedForByAccount(account).call()
-    const index = groups.indexOf(group)
+    const index = findAddressIndex(group, groups)
     const { lesser, greater } = await this.findLesserAndGreaterAfterVote(group, value.times(-1))
 
     return toTransactionObject(
@@ -343,7 +354,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     value: BigNumber
   ): Promise<CeloTransactionObject<boolean>> {
     const groups = await this.contract.methods.getGroupsVotedForByAccount(account).call()
-    const index = groups.indexOf(group)
+    const index = findAddressIndex(group, groups)
     const { lesser, greater } = await this.findLesserAndGreaterAfterVote(group, value.times(-1))
 
     return toTransactionObject(
@@ -440,11 +451,9 @@ export class ElectionWrapper extends BaseWrapper<Election> {
    */
   async getElectedValidators(epochNumber: number): Promise<Validator[]> {
     const blockNumber = await this.kit.getLastBlockNumberForEpoch(epochNumber)
-    const signers = await this.getCurrentValidatorSigners(blockNumber)
+    const signers = await this.getValidatorSigners(blockNumber)
     const validators = await this.kit.contracts.getValidators()
-    return concurrentMap(10, signers, (addr) =>
-      validators.getValidatorFromSigner(addr, blockNumber)
-    )
+    return concurrentMap(10, signers, (addr) => validators.getValidatorFromSigner(addr))
   }
 
   /**
@@ -459,7 +468,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     })
     const validators = await this.kit.contracts.getValidators()
     const validatorGroup: ValidatorGroup[] = await concurrentMap(10, events, (e: EventLog) =>
-      validators.getValidatorGroup(e.returnValues.group, false, blockNumber)
+      validators.getValidatorGroup(e.returnValues.group, false)
     )
     return events.map(
       (e: EventLog, index: number): GroupVoterReward => ({
@@ -474,37 +483,50 @@ export class ElectionWrapper extends BaseWrapper<Election> {
    * Retrieves VoterRewards for address at epochNumber.
    * @param address The address to retrieve VoterRewards for.
    * @param epochNumber The epoch to retrieve VoterRewards at.
+   * @param voterShare Optionally address' share of group rewards.
    */
-  async getVoterRewards(address: Address, epochNumber: number): Promise<VoterReward[]> {
-    const blockNumber = await this.kit.getLastBlockNumberForEpoch(epochNumber)
-    const voter = await this.getVoter(address, blockNumber)
-    const activeVoterVotes: Record<string, BigNumber> = {}
-    for (const vote of voter.votes) {
-      const group: string = normalizeAddress(vote.group)
-      activeVoterVotes[group] = vote.active
-    }
-    const activeGroupVotes: Record<string, BigNumber> = await concurrentValuesMap(
-      10,
-      activeVoterVotes,
-      (_, group: string) => this.getTotalVotesForGroup(group, blockNumber)
-    )
-
+  async getVoterRewards(
+    address: Address,
+    epochNumber: number,
+    voterShare?: Record<Address, BigNumber>
+  ): Promise<VoterReward[]> {
+    const activeVoteShare =
+      voterShare ||
+      (await this.getVoterShare(address, await this.kit.getLastBlockNumberForEpoch(epochNumber)))
     const groupVoterRewards = await this.getGroupVoterRewards(epochNumber)
     const voterRewards = groupVoterRewards.filter(
-      (e: GroupVoterReward) => normalizeAddress(e.group.address) in activeVoterVotes
+      (e: GroupVoterReward) => normalizeAddress(e.group.address) in activeVoteShare
     )
     return voterRewards.map(
       (e: GroupVoterReward): VoterReward => {
         const group = normalizeAddress(e.group.address)
         return {
           address,
-          addressPayment: e.groupVoterPayment.times(
-            activeVoterVotes[group].dividedBy(activeGroupVotes[group])
-          ),
+          addressPayment: e.groupVoterPayment.times(activeVoteShare[group]),
           group: e.group,
           epochNumber: e.epochNumber,
         }
       }
+    )
+  }
+
+  /**
+   * Retrieves a voter's share of active votes.
+   * @param address The voter to retrieve share for.
+   * @param blockNumber The block to retrieve the voter's share at.
+   */
+  async getVoterShare(address: Address, blockNumber?: number): Promise<Record<Address, BigNumber>> {
+    const activeVoterVotes: Record<Address, BigNumber> = {}
+    const voter = await this.getVoter(address, blockNumber)
+    for (const vote of voter.votes) {
+      const group: string = normalizeAddress(vote.group)
+      activeVoterVotes[group] = vote.active
+    }
+    return concurrentValuesMap(
+      10,
+      activeVoterVotes,
+      async (voterVotes: BigNumber, group: Address) =>
+        voterVotes.dividedBy(await this.getActiveVotesForGroup(group, blockNumber))
     )
   }
 }

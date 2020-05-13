@@ -7,8 +7,15 @@ import {
   AttestationServiceURLClaimType,
   validateAttestationServiceUrl,
 } from './attestation-service-url'
-import { KeybaseClaim, KeybaseClaimType } from './keybase'
 import { ClaimTypes, now, SignatureType, TimestampType } from './types'
+
+export const KeybaseClaimType = t.type({
+  type: t.literal(ClaimTypes.KEYBASE),
+  timestamp: TimestampType,
+  // TODO: Validate compliant username before just interpolating
+  username: t.string,
+})
+export type KeybaseClaim = t.TypeOf<typeof KeybaseClaimType>
 
 const DomainClaimType = t.type({
   type: t.literal(ClaimTypes.DOMAIN),
@@ -35,6 +42,7 @@ export const SignedClaimType = t.type({
   signature: SignatureType,
 })
 
+export const DOMAIN_TXT_HEADER = 'celo-site-verification'
 export type DomainClaim = t.TypeOf<typeof DomainClaimType>
 export type NameClaim = t.TypeOf<typeof NameClaimType>
 export type Claim =

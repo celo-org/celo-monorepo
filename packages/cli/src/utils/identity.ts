@@ -6,6 +6,7 @@ import {
   VERIFIABLE_CLAIM_TYPES,
 } from '@celo/contractkit/lib/identity/claims/types'
 import { verifyClaim } from '@celo/contractkit/lib/identity/claims/verify'
+import { eqAddress } from '@celo/utils/lib/address'
 import { concurrentMap } from '@celo/utils/lib/async'
 import { NativeSigner } from '@celo/utils/lib/signatureUtils'
 import { cli } from 'cli-ux'
@@ -20,7 +21,8 @@ export abstract class ClaimCommand extends BaseCommand {
     ...BaseCommand.flags,
     from: Flags.address({
       required: true,
-      description: 'Addess of the account to set metadata for',
+      description:
+        'Address of the account to set metadata for or an authorized signer for the address in the metadata',
     }),
   }
   static args = [Args.file('file', { description: 'Path of the metadata file' })]
@@ -28,12 +30,26 @@ export abstract class ClaimCommand extends BaseCommand {
   // We need this to properly parse flags for subclasses
   protected self = ClaimCommand
 
-  protected readMetadata = () => {
-    const { args } = this.parse(this.self)
+  protected async checkMetadataAddress(address: string, from: string) {
+    if (eqAddress(address, from)) {
+      return
+    }
+    const accounts = await this.kit.contracts.getAccounts()
+    const signers = await accounts.getCurrentSigners(address)
+    if (!signers.some((a) => eqAddress(a, from))) {
+      throw new Error(
+        'Signing metadata with an address that is not the account or one of its signers'
+      )
+    }
+  }
+
+  protected readMetadata = async () => {
+    const { args, flags } = this.parse(this.self)
     const filePath = args.file
     try {
       cli.action.start(`Read Metadata from ${filePath}`)
-      const data = IdentityMetadataWrapper.fromFile(this.kit, filePath)
+      const data = await IdentityMetadataWrapper.fromFile(this.kit, filePath)
+      await this.checkMetadataAddress(data.data.meta.address, flags.from)
       cli.action.stop()
       return data
     } catch (error) {
@@ -48,11 +64,12 @@ export abstract class ClaimCommand extends BaseCommand {
     return NativeSigner(this.kit.web3.eth.sign, address)
   }
 
-  protected async addClaim(metadata: IdentityMetadataWrapper, claim: Claim) {
+  protected async addClaim(metadata: IdentityMetadataWrapper, claim: Claim): Promise<Claim> {
     try {
       cli.action.start(`Add claim`)
-      await metadata.addClaim(claim, this.signer)
+      const addedClaim = await metadata.addClaim(claim, this.signer)
       cli.action.stop()
+      return addedClaim
     } catch (error) {
       cli.action.stop(`Error: ${error}`)
       throw error

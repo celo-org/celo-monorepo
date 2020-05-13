@@ -4,9 +4,9 @@ env_variables:
   NODE_ENV: "production"
   DEPLOY_ENV: "alfajores"
   EXCHANGE_RATES_API: "https://apilayer.net/api"
-  BLOCKSCOUT_API: "https://alfajores-blockscout.celo-testnet.org/api"
+  BLOCKSCOUT_API: "https://alfajores-blockscout.celo-testnet.org/graphql"
   FIREBASE_DB: "https://celo-org-mobile-alfajores.firebaseio.com"
   # TODO Pull addresses from the build artifacts of the network in protocol/build
-  FAUCET_ADDRESS: "0xCEa3eF8e187490A9d85A1849D98412E5D27D1Bb3"
+  FAUCET_ADDRESS: "0x456f41406B32c45D59E539e4BBA3D7898c3584dA"
   VERIFICATION_REWARDS_ADDRESS: "0xb4fdaf5f3cd313654aa357299ada901b1d2dd3b5"
   WEB3_PROVIDER_URL: "https://alfajores-forno.celo-testnet.org"

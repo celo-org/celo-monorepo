@@ -1,7 +1,8 @@
+import { eqAddress } from '@celo/utils/lib/address'
 import { flags } from '@oclif/command'
 import BigNumber from 'bignumber.js'
 import { newCheckBuilder } from '../../utils/checks'
-import { displaySendTx } from '../../utils/cli'
+import { binaryPrompt, displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
 import { ReleaseGoldCommand } from './release-gold'
 
@@ -18,6 +19,7 @@ export default class LockedGold extends ReleaseGoldCommand {
       required: true,
     }),
     value: Flags.wei({ required: true, description: 'Amount of gold to perform `action` with' }),
+    yes: flags.boolean({ description: 'Answer yes to prompt' }),
   }
 
   static examples = [
@@ -35,6 +37,7 @@ export default class LockedGold extends ReleaseGoldCommand {
     const beneficiary = await this.releaseGoldWrapper.getBeneficiary()
     const releaseOwner = await this.releaseGoldWrapper.getReleaseOwner()
     const lockedGold = await this.kit.contracts.getLockedGold()
+    this.kit.defaultAccount = isRevoked ? releaseOwner : beneficiary
 
     if (flags.action === 'lock') {
       // Must verify contract is account before checking pending withdrawals
@@ -44,7 +47,6 @@ export default class LockedGold extends ReleaseGoldCommand {
       )
       const relockValue = BigNumber.minimum(pendingWithdrawalsValue, value)
       const lockValue = value.minus(relockValue)
-      this.kit.defaultAccount = beneficiary
       await newCheckBuilder(this, this.contractAddress)
         .hasEnoughGold(this.contractAddress, lockValue)
         .runChecks()
@@ -53,6 +55,27 @@ export default class LockedGold extends ReleaseGoldCommand {
         await displaySendTx('lockedGoldRelock', txo, { from: beneficiary })
       }
       if (lockValue.gt(new BigNumber(0))) {
+        const accounts = await this.kit.contracts.getAccounts()
+        const totalValue = await this.releaseGoldWrapper.getRemainingUnlockedBalance()
+        const remaining = totalValue.minus(lockValue)
+        console.log('remaining', remaining.toFixed())
+        if (
+          !flags.yes &&
+          remaining.lt(new BigNumber(2e18)) &&
+          (eqAddress(await accounts.getVoteSigner(flags.contract), flags.contract) ||
+            eqAddress(await accounts.getValidatorSigner(flags.contract), flags.contract))
+        ) {
+          const check = await binaryPrompt(
+            `Only ${remaining.shiftedBy(
+              -18
+            )} cGLD would be left unlocked, you might not be able to fund your signers. Unlock anyway?`,
+            true
+          )
+          if (!check) {
+            console.log('Cancelled')
+            return
+          }
+        }
         await displaySendTx('lockedGoldLock', this.releaseGoldWrapper.lockGold(lockValue))
       }
     } else if (flags.action === 'unlock') {
@@ -60,7 +83,6 @@ export default class LockedGold extends ReleaseGoldCommand {
         .isNotVoting(this.contractAddress)
         .hasEnoughLockedGoldToUnlock(value)
         .runChecks()
-      this.kit.defaultAccount = isRevoked ? releaseOwner : beneficiary
       await displaySendTx('lockedGoldUnlock', this.releaseGoldWrapper.unlockGold(flags.value))
     } else if (flags.action === 'withdraw') {
       await checkBuilder.runChecks()

@@ -1,0 +1,10 @@
+{{- range $index, $identity := .Values.oracle.identities -}}
+apiVersion: "aadpodidentity.k8s.io/v1"
+kind: AzureIdentityBinding
+metadata:
+  name: {{ template "azure-identity-binding-name" (dict "dot" $ "index" $index) }}
+spec:
+  azureIdentity: {{ template "azure-identity-name" (dict "dot" $ "index" $index) }}
+  selector: {{ template "azure-identity-binding-name" (dict "dot" $ "index" $index) }}
+---
+{{ end }}

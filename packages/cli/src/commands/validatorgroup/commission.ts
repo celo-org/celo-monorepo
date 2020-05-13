@@ -7,18 +7,22 @@ import { Flags } from '../../utils/command'
 
 export default class ValidatorGroupCommission extends BaseCommand {
   static description =
-    'Manage the commission for a registered Validator Group. This represents the share of the epoch rewards given to elected Validators that goes to the group they are a member of.'
+    'Manage the commission for a registered Validator Group. This represents the share of the epoch rewards given to elected Validators that goes to the group they are a member of. Updates must be made in a two step process where the group owner first calls uses the queue-update option, then after the required update delay, the apply option. The commission update delay, in blocks, can be viewed with the network:parameters command. A groups next commission update block can be checked with validatorgroup:show'
 
   static flags = {
     ...BaseCommand.flags,
-    from: Flags.address({ required: true, description: 'Address for the Validator Group' }),
+    from: Flags.address({
+      required: true,
+      description: 'Address for the Validator Group or Validator Group validator signer',
+    }),
     apply: flags.boolean({
       exclusive: ['queue-update'],
-      description: 'Applies a previously queued update',
+      description: 'Applies a previously queued update. Should be called after the update delay.',
     }),
     'queue-update': flags.string({
       exclusive: ['apply'],
-      description: 'Queues an update to the commission',
+      description:
+        'Queues an update to the commission, which can be applied after the update delay.',
     }),
   }
 

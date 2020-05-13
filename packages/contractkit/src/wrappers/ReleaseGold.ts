@@ -1,3 +1,4 @@
+import { findAddressIndex } from '@celo/utils/lib/address'
 import {
   hashMessageWithPrefix,
   Signature,
@@ -11,6 +12,7 @@ import {
   CeloTransactionObject,
   proxyCall,
   proxySend,
+  stringIdentity,
   stringToBytes,
   toTransactionObject,
   tupleParser,
@@ -282,7 +284,7 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
   transfer: (to: Address, value: BigNumber.Value) => CeloTransactionObject<void> = proxySend(
     this.kit,
     this.contract.methods.transfer,
-    tupleParser(valueToString, valueToString)
+    tupleParser(stringIdentity, valueToString)
   )
 
   /**
@@ -563,7 +565,7 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
   ): Promise<CeloTransactionObject<void>> {
     const electionContract = await this.kit.contracts.getElection()
     const groups = await electionContract.getGroupsVotedForByAccount(account)
-    const index = groups.indexOf(group)
+    const index = findAddressIndex(group, groups)
     const { lesser, greater } = await electionContract.findLesserAndGreaterAfterVote(
       group,
       value.times(-1)
@@ -588,7 +590,7 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
   ): Promise<CeloTransactionObject<void>> {
     const electionContract = await this.kit.contracts.getElection()
     const groups = await electionContract.getGroupsVotedForByAccount(account)
-    const index = groups.indexOf(group)
+    const index = findAddressIndex(group, groups)
     const { lesser, greater } = await electionContract.findLesserAndGreaterAfterVote(
       group,
       value.times(-1)

@@ -1,5 +1,5 @@
+import { FirebaseMessagingTypes } from '@react-native-firebase/messaging'
 import BigNumber from 'bignumber.js'
-import { Notification } from 'react-native-firebase/notifications'
 import { call, put, select } from 'redux-saga/effects'
 import {
   NotificationReceiveState,
@@ -77,17 +77,20 @@ function* handlePaymentReceived(
 }
 
 export function* handleNotification(
-  notification: Notification,
+  message: FirebaseMessagingTypes.RemoteMessage,
   notificationState: NotificationReceiveState
 ) {
   if (notificationState === NotificationReceiveState.APP_ALREADY_OPEN) {
-    yield put(showMessage(notification.title))
+    const title = message.notification?.title
+    if (title) {
+      yield put(showMessage(title))
+    }
   }
-  switch (notification.data.type) {
+  switch (message.data?.type) {
     case NotificationTypes.PAYMENT_REQUESTED:
       yield call(
         handlePaymentRequested,
-        (notification.data as unknown) as PaymentRequest,
+        (message.data as unknown) as PaymentRequest,
         notificationState
       )
       break
@@ -95,13 +98,13 @@ export function* handleNotification(
     case NotificationTypes.PAYMENT_RECEIVED:
       yield call(
         handlePaymentReceived,
-        (notification.data as unknown) as TransferNotificationData,
+        (message.data as unknown) as TransferNotificationData,
         notificationState
       )
       break
 
     default:
-      Logger.info(TAG, `Got unknown notification type ${notification.data.type}`)
+      Logger.info(TAG, `Got unknown notification type ${message.data?.type}`)
       break
   }
 }
