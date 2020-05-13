@@ -48,17 +48,22 @@ export default class AttestationServicesCurrent extends BaseCommand {
 
     ret.attestationServiceURL = attestationServiceURL
 
-    const statusResponse = await fetch(attestationServiceURL + '/status')
+    try {
+      const statusResponse = await fetch(attestationServiceURL + '/status')
 
-    if (!statusResponse.ok) {
+      if (!statusResponse.ok) {
+        return ret
+      }
+
+      const statusResponseBody = await statusResponse.json()
+      ret.smsProviders = statusResponseBody.smsProviders
+      ret.blacklistedRegionCodes = statusResponseBody.blacklistedRegionCodes
+      ret.rightAccount = eqAddress(validator.address, statusResponseBody.accountAddress)
+      return ret
+    } catch (error) {
+      ret.error = error
       return ret
     }
-
-    const statusResponseBody = await statusResponse.json()
-    ret.smsProviders = statusResponseBody.smsProviders
-    ret.blacklistedRegionCodes = statusResponseBody.blacklistedRegionCodes
-    ret.rightAccount = eqAddress(validator.address, statusResponseBody.accountAddress)
-    return ret
   }
 
   async run() {
