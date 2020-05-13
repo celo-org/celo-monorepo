@@ -1,5 +1,4 @@
 import getConfig from 'next/config'
-import dynamic from 'next/dynamic'
 import Head from 'next/head'
 import * as React from 'react'
 import { StyleSheet, View } from 'react-native'
@@ -13,8 +12,6 @@ import HomeHero from 'src/home/version3/HomeHero'
 import HomeWork from 'src/home/version3/HomeWork'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import Press from 'src/press/Press'
-import { isJurisdictionRestricted } from 'src/utils/countries'
-const CoinList = dynamic(import('src/home/CoinList'))
 
 interface State {
   mobile: boolean
@@ -28,18 +25,6 @@ const DESCRIPTION =
   'Celo is building a monetary system that creates the conditions for prosperity for all. Our stablecoin uses phone numbers as identity and is built on a secure and proven platform.'
 
 export class Home extends React.Component<Props & I18nProps, State> {
-  static async getInitialProps({ req }) {
-    let isRestricted = true
-    if (req) {
-      const getCountryFromIPCached = await import('src/../server/geoip').then(
-        (mod) => mod.getCountryFromIPCached
-      )
-      const country = await getCountryFromIPCached(req.ip)
-      isRestricted = isJurisdictionRestricted(country.toLowerCase())
-    }
-    return { isRestricted }
-  }
-
   state: State
 
   render() {
@@ -68,7 +53,6 @@ export class Home extends React.Component<Props & I18nProps, State> {
         <HomeCover />
         <HomeHero />
         <Press />
-        {!this.props.isRestricted && <CoinList />}
         <HomeSystems />
         <Timeline />
         <HomeWork />
