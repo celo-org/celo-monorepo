@@ -6,7 +6,6 @@ export enum CustomEventNames {
   full_name_input = 'full_name_input',
   invitation_code = 'invitation_code',
   signup_submit = 'signup_submit',
-  blockChainCorruption = 'block_chain_corruption',
   disconnect_banner = 'disconnect_banner',
   gold_cancel1 = 'gold_cancel1',
   gold_cancel2 = 'gold_cancel2',
@@ -31,9 +30,21 @@ export enum CustomEventNames {
   send_invite = 'send_invite',
   edit_send_invite = 'edit_send_invite',
 
+  // Sunc events
+  sync_start = 'sync_start',
+  sync_blockchain_corruption = 'sync_blockchain_corruption',
+  sync_complete = 'sync_complete',
+  sync_invalid_progress = 'sync_invalid_progress',
+  sync_switch_to_forno_timeout = 'sync_switch_to_forno_timeout',
+  sync_unexpected_error = 'sync_unexpected_error',
+
   // Send events, separate from button tracking above
   send_dollar_transaction = 'send_dollar_transaction',
   send_dollar_transaction_confirmed = 'send_dollar_transaction_confirmed',
+  send_gold_transaction = 'send_gold_transaction',
+  send_gold_transaction_confirmed = 'send_gold_transaction_confirmed',
+  send_transaction_confirmed = 'send_transaction_confirmed',
+  send_transaction_failed = 'send_transaction_failed',
 
   fetch_balance = 'fetch_balance',
 
