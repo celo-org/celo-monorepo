@@ -113,6 +113,7 @@ class ValidateRecipientIntro extends React.Component<Props> {
             text={t('scanQRCode')}
             standard={false}
             type={BtnTypes.SECONDARY}
+            testID={'scanQRCode'}
           >
             {<QRCodeBorderlessIcon height={QR_ICON_SIZE} color={colors.celoGreen} />}
           </Button>
@@ -121,6 +122,7 @@ class ValidateRecipientIntro extends React.Component<Props> {
             text={t('confirmAccount.button')}
             standard={false}
             type={BtnTypes.SECONDARY}
+            testID={'confirmAccountButton'}
           />
         </View>
       </SafeAreaView>

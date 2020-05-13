@@ -140,7 +140,7 @@ export class SendAmount extends React.Component<Props, State> {
     reason: '',
   }
 
-  componentDidMount() {
+  componentDidMount = () => {
     this.props.fetchDollarBalance()
     this.fetchLatestPhoneAddressesAndRecipientVerificationStatus()
   }
@@ -208,6 +208,7 @@ export class SendAmount extends React.Component<Props, State> {
       manualAddressValidationRequired,
       fullValidationRequired,
     } = this.props
+    console.log('Recipient Verification Status: ', recipientVerificationStatus)
     const { isDollarBalanceSufficient } = this.isAmountValid()
     if (!isDollarBalanceSufficient) {
       this.props.showError(ErrorMessages.NSF_TO_SEND)

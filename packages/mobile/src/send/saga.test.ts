@@ -1,8 +1,6 @@
-import BigNumber from 'bignumber.js'
 import { expectSaga } from 'redux-saga-test-plan'
 import { select } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
-import { TokenTransactionType } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import {
   addressToE164NumberSelector,
@@ -34,6 +32,7 @@ import {
   mockName,
   mockQrCodeData,
   mockQrCodeData2,
+  mockTransactionData,
 } from 'test/values'
 
 jest.mock('src/utils/time', () => ({
@@ -42,13 +41,6 @@ jest.mock('src/utils/time', () => ({
 
 const mockE164NumberToAddress: E164NumberToAddressType = {
   [mockE164NumberInvite]: [mockAccountInvite, mockAccount2Invite],
-}
-
-const mockTransactionData = {
-  recipient: mockInvitableRecipient2,
-  amount: new BigNumber(1),
-  reason: 'Something',
-  type: TokenTransactionType.Sent,
 }
 
 describe(watchQrCodeDetections, () => {

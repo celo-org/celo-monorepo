@@ -2,6 +2,7 @@
 import BigNumber from 'bignumber.js'
 import { MinimalContact } from 'react-native-contacts'
 import { NotificationTypes, PaymentRequest, PaymentRequestStatus } from 'src/account/types'
+import { TokenTransactionType } from 'src/apollo/types'
 import { EscrowedPayment } from 'src/escrow/actions'
 import { SHORT_CURRENCIES } from 'src/geth/consts'
 import { AddressToE164NumberType, E164NumberToAddressType } from 'src/identity/reducer'
@@ -109,6 +110,13 @@ export const mockInvitableRecipient2: RecipientWithContact = {
   e164PhoneNumber: mockE164NumberInvite,
   contactId: 'contactId',
   phoneNumberLabel: 'phoneNumLabel',
+}
+
+export const mockTransactionData = {
+  recipient: mockInvitableRecipient2,
+  amount: new BigNumber(1),
+  reason: 'Something',
+  type: TokenTransactionType.Sent,
 }
 
 export const mockInvitableRecipient3: RecipientWithContact = {

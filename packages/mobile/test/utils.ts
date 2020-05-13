@@ -83,6 +83,17 @@ export function createMockNavigationProp(params: any): NavigationScreenProp<any>
   }
 }
 
+export function createMockNavigationProp2(params: any): NavigationScreenProp<any> {
+  return {
+    ...mockNavigation,
+    state: {
+      ...mockNavigation.state,
+      params,
+    },
+    getParam: jest.fn((property) => params[property]),
+  }
+}
+
 const mockStore = configureMockStore()
 
 /* Create a mock store with some reasonable default values */
