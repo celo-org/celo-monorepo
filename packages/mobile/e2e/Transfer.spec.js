@@ -14,6 +14,8 @@ const SAMPLE_SAFEGUARD_PHRASE_SECONDARY =
 const VERIFICATION_COUNTRY = 'Germany'
 const VERIFICATION_PHONE_NUMBER = '030 111111'
 const EXAMPLE_NAME = 'Test Name'
+const DEFAULT_RECIPIENT_PHONE_NUMBER = '+10000000000'
+const AMOUNT_TO_SEND = '0.1'
 
 // clicks an element if it sees it
 async function bannerDismiss(inElement, tapElement) {
@@ -142,7 +144,25 @@ describe('Transfer Works', () => {
     await waitFor(element(by.id('RecipientPicker')))
       .toBeVisible()
       .withTimeout(10000)
+    //await element(by.id('RecipientPicker')).tap()
+
+    //await element(by.id('RecipientPicker')).tap()
+    //await element(by.id('RecipientPicker')).replaceText(DEFAULT_RECIPIENT_PHONE_NUMBER)
+
+    await waitFor(element(by.id('RecipientItem')))
+      .toBeVisible()
+      .withTimeout(4000)
+    await element(by.id('RecipientItem')).tap()
   })
 
-  // TODO(erdal) implement send and verify success
+  it('Send -> SendAmount', async () => {
+    await waitFor(element(by.id('AmountInput')))
+      .toBeVisible()
+      .withTimeout(10000)
+
+    await element(by.id('AmountInput')).replaceText(AMOUNT_TO_SEND)
+    await sleep(4000)
+    // TODO(erdal): make sure gas fees are estimated here?
+    await element(by.id('Send')).tap()
+  })
 })

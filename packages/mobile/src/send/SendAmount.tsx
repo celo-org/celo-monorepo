@@ -404,6 +404,7 @@ export class SendAmount extends React.Component<Props, State> {
             autoFocus={true}
             numberOfDecimals={NUMBER_INPUT_MAX_DECIMALS}
             validator={ValidatorKind.Decimal}
+            testID="AmountInput"
           />
           <CommentInput
             title={t('global:for')}

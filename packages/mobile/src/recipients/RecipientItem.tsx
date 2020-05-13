@@ -24,7 +24,11 @@ class RecipientItem extends React.PureComponent<Props> {
     const { recipient } = this.props
 
     return (
-      <TouchableHighlight onPress={this.onPress} underlayColor={colors.altDarkBg}>
+      <TouchableHighlight
+        onPress={this.onPress}
+        underlayColor={colors.altDarkBg}
+        testID="RecipientItem"
+      >
         <View style={style.row}>
           <ContactCircle
             style={style.avatar}
