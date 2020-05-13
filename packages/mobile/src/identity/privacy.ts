@@ -38,9 +38,9 @@ export function* fetchPhoneHashPrivate(e164Number: string) {
         `${TAG}@fetchPrivatePhoneHash`,
         'Salt quota exceeded, navigating to quota purchase screen'
       )
-      const result: boolean = yield call(navigateToQuotaPurchaseScreen)
-      // If quota purchase was successful, try lookup a second time
-      if (result) {
+      const quotaPurchaseSucess: boolean = yield call(navigateToQuotaPurchaseScreen)
+      if (quotaPurchaseSucess) {
+        // If quota purchase was successful, try lookup a second time
         const details: PhoneNumberHashDetails = yield call(doFetchPhoneHashPrivate, e164Number)
         return details
       } else {
@@ -80,7 +80,7 @@ function* doFetchPhoneHashPrivate(e164Number: string) {
   return details
 }
 
-// Unlike the getPhoneHash in utils, this leverage the phone number
+// Unlike the getPhoneHash in utils, this leverages the phone number
 // privacy service to compute a secure, unique salt for the phone number
 // and then appends it before hashing.
 async function getPhoneHashPrivate(
@@ -230,8 +230,8 @@ function* navigateToQuotaPurchaseScreen() {
       })
     )
 
-    const result = yield call(waitForTransactionWithId, txId)
-    if (!result) {
+    const quotaPurchaseTxSuccess = yield call(waitForTransactionWithId, txId)
+    if (!quotaPurchaseTxSuccess) {
       throw new Error('Purchase tx failed')
     }
 
