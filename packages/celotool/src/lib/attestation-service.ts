@@ -1,7 +1,7 @@
+import { execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
 import { getEnodesWithExternalIPAddresses } from 'src/lib/geth'
 import { installGenericHelmChart, removeGenericHelmChart } from 'src/lib/helm_deploy'
 import { getGenesisBlockFromGoogleStorage } from 'src/lib/testnet-utils'
-import { execCmdWithExitOnFailure } from 'src/lib/utils'
 import { envVar, fetchEnv, fetchEnvOrFallback } from './env-utils'
 
 const helmChartPath = '../helm-charts/attestation-service'
@@ -49,9 +49,6 @@ async function helmParameters(celoEnv: string) {
     `--set attestation_service.image.tag=${fetchEnv(envVar.ATTESTATION_SERVICE_DOCKER_IMAGE_TAG)}`,
     `--set attestation_service.nexmo.apiKey="${fetchEnv(envVar.NEXMO_KEY)}"`,
     `--set attestation_service.nexmo.apiSecret="${fetchEnv(envVar.NEXMO_SECRET)}"`,
-    `--set attestation_service.sms_retriever_hash_code="${fetchEnv(
-      envVar.SMS_RETRIEVER_HASH_CODE
-    )}"`,
     `--set geth.validators="${fetchEnv(envVar.VALIDATORS)}"`,
     `--set domain.name=${fetchEnv(envVar.CLUSTER_DOMAIN_NAME)}`,
     `--set global.postgresql.postgresqlDatabase=AttestationService`,

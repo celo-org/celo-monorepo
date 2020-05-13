@@ -9,7 +9,7 @@ export default class List extends BaseCommand {
   static description = 'List live governance proposals (queued and ongoing)'
 
   static flags = {
-    ...BaseCommand.flags,
+    ...BaseCommand.flagsWithoutLocalAddresses(),
   }
 
   static examples = ['list']
@@ -44,8 +44,12 @@ export default class List extends BaseCommand {
     })
 
     console.log(chalk.red.bold('Expired Proposals:'))
-    const expiredQueue = expiredQueueMap.map((_, idx) => queue[idx].proposalID)
-    const expiredDequeue = expiredDequeueMap.map((_, idx) => dequeue[idx])
+    const expiredQueue = queue
+      .filter((_, idx) => expiredQueueMap[idx])
+      .map((_, idx) => queue[idx].proposalID)
+    const expiredDequeue = dequeue
+      .filter((_, idx) => expiredDequeueMap[idx])
+      .map((_, idx) => dequeue[idx])
     cli.table(expiredQueue.concat(expiredDequeue), {
       ID: { get: (id) => valueToString(id) },
     })

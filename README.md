@@ -127,7 +127,6 @@ The repository has the following packages (sub projects):
 - [utils](packages/utils) - no README available (improve?)
 - [verification-pool-api](packages/verification-pool-api) - service that handles a pool of Verifier App instances and requests them to direct SMS for attestation purposes (deprecated)
 - [verifier](packages/verifier) - Android verifier app to send SMS messages, enabling attestations of user phone numbers and their accounts on the Celo network
-- [walletkit](packages/walletkit) - common functions to access smart contracts used by Celo Wallet (deprecated)
 - [web](packages/web) - Celo website ([live](https://celo.org/))
 
 Code owners for each package can be found in [.github/CODEOWNERS](.github/CODEOWNERS).
@@ -153,7 +152,7 @@ twitter intent generator - http://tech.cymi.org/tweet-intents
 - [Blog](https://medium.com/celohq)
 - [YouTube](https://www.youtube.com/channel/UCCZgos_YAJSXm5QX5D5Wkcw/videos?view=0&sort=p&flow=grid)
 - [Forum](https://forum.celo.org)
-- [Discord](https://discord.gg/JvJ66Wc)
+- [Discord](https://discord.gg/vRbExjv)
 - [Twitter](https://twitter.com/CeloDevs)
 - [Reddit](https://www.reddit.com/r/CeloHQ/)
 - [Community Events](https://celo.org/community)

@@ -19,7 +19,7 @@ export default class ClaimAttestationServiceUrl extends ClaimCommand {
 
   async run() {
     const res = this.parse(ClaimAttestationServiceUrl)
-    const metadata = this.readMetadata()
+    const metadata = await this.readMetadata()
     await this.addClaim(metadata, createAttestationServiceURLClaim(res.flags.url))
     this.writeMetadata(metadata)
   }

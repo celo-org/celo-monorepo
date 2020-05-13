@@ -1,6 +1,6 @@
 # Alfajores Testnet
 
-The **Alfajores Testnet** is the first Celo test network. It is a demonstration of the current Celo codebase. You can use it to try out the [Celo Wallet](https://celo.org/build/wallet) or the [Celo CLI](../command-line-interface/introduction.md) \(by sending transfers to yourself or other users of the testnet\). You can also assist in running the network by operating a [full node](running-a-full-node.md) or a [validator](running-a-validator.md) on your machine \(or on a cloud or hosting provider\).
+The **Alfajores Testnet** is a Celo test network for developers building on the Celo platform. You can use it to try out the [Celo Wallet](https://celo.org/build/wallet) or the [Celo CLI](../command-line-interface/introduction.md) \(by sending transfers to yourself or other users of the testnet\). You can also assist in running the network by operating a [full node](running-a-full-node-in-rc1.md) on your machine \(or on a cloud or hosting provider\).
 
 The [Baklava Testnet](baklava-testnet.md) is focused on building operational experience and best practices for node operators.
 
@@ -20,5 +20,5 @@ Your use of the Alfajores Testnet is subject to the [Alfajores Testnet Disclaime
 
 - [Alfajores Testnet Faucet](https://celo.org/build/faucet) - get testnet tokens to experiment with
 - [Celo Wallet for Alfajores](https://celo.org/build/wallet) - download the Android wallet app for the testnet from the Play Store
-- [Alfajores Network Status](https://alfajores-ethstats.celo-testnet.org) - to check the current availability of the testnet
+- [Alfajores Network Status](https://alfajores-celostats.celo-testnet.org) - to check the current availability of the testnet
 - [Alfajores Testnet Block Explorer](https://alfajores-blockscout.celo-testnet.org) - explore the history of the blockchain and view transaction details

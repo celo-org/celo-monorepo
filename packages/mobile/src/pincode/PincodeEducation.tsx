@@ -14,7 +14,6 @@ import LockedPhoneIcon from 'src/icons/LockedPhoneIcon'
 import { nuxNavigationOptions } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import { isPhoneAuthSupported } from 'src/pincode/PincodeUtils.android'
 import { RootState } from 'src/redux/reducers'
 
 interface StateProps {
@@ -67,7 +66,8 @@ class PincodeEducation extends React.Component<Props> {
 
   render() {
     const { t, isSettingPin } = this.props
-    const phoneAuth = isPhoneAuthSupported()
+    // we want to disable PhoneAuth during onboarding only for now
+    const phoneAuth = false
 
     return (
       <SafeAreaView style={style.container}>

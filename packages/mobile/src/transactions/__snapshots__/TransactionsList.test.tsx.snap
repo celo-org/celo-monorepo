@@ -9,8 +9,10 @@ exports[`ignores failed standby transactions 1`] = `
         "__typename": "TokenTransfer",
         "address": "0xce10ce10ce10ce10ce10ce10ce10ce10ce10ce10",
         "amount": Object {
+          "__typename": "MoneyAmount",
           "currencyCode": "cUSD",
           "localAmount": Object {
+            "__typename": "LocalMoneyAmount",
             "currencyCode": "USD",
             "exchangeRate": "1",
             "value": "-0.2",
@@ -26,8 +28,10 @@ exports[`ignores failed standby transactions 1`] = `
       Object {
         "__typename": "TokenExchange",
         "amount": Object {
+          "__typename": "MoneyAmount",
           "currencyCode": "cUSD",
           "localAmount": Object {
+            "__typename": "LocalMoneyAmount",
             "currencyCode": "USD",
             "exchangeRate": "1",
             "value": "0.994982275992944156",
@@ -36,8 +40,10 @@ exports[`ignores failed standby transactions 1`] = `
         },
         "hash": "0x16fbd53c4871f0657f40e1b4515184be04bed8912c6e2abc2cda549e4ad8f852",
         "makerAmount": Object {
+          "__typename": "MoneyAmount",
           "currencyCode": "cGLD",
           "localAmount": Object {
+            "__typename": "LocalMoneyAmount",
             "currencyCode": "USD",
             "exchangeRate": "10.06007113270411465777",
             "value": "1.006007113270411465777",
@@ -46,8 +52,10 @@ exports[`ignores failed standby transactions 1`] = `
         },
         "status": "Complete",
         "takerAmount": Object {
+          "__typename": "MoneyAmount",
           "currencyCode": "cUSD",
           "localAmount": Object {
+            "__typename": "LocalMoneyAmount",
             "currencyCode": "USD",
             "exchangeRate": "1",
             "value": "0.994982275992944156",
@@ -66,7 +74,6 @@ exports[`ignores failed standby transactions 1`] = `
   initialNumToRender={10}
   keyExtractor={[Function]}
   maxToRenderPerBatch={10}
-  numColumns={1}
   onContentSizeChange={[Function]}
   onEndReachedThreshold={2}
   onLayout={[Function]}
@@ -90,7 +97,6 @@ exports[`ignores failed standby transactions 1`] = `
       <View
         accessible={true}
         focusable={true}
-        isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackground",
@@ -282,7 +288,6 @@ exports[`ignores failed standby transactions 1`] = `
       <View
         accessible={true}
         focusable={true}
-        isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackground",
@@ -503,8 +508,10 @@ exports[`ignores pending standby transactions that are completed in the response
         "__typename": "TokenTransfer",
         "address": "0xce10ce10ce10ce10ce10ce10ce10ce10ce10ce10",
         "amount": Object {
+          "__typename": "MoneyAmount",
           "currencyCode": "cUSD",
           "localAmount": Object {
+            "__typename": "LocalMoneyAmount",
             "currencyCode": "USD",
             "exchangeRate": "1",
             "value": "-0.2",
@@ -520,8 +527,10 @@ exports[`ignores pending standby transactions that are completed in the response
       Object {
         "__typename": "TokenExchange",
         "amount": Object {
+          "__typename": "MoneyAmount",
           "currencyCode": "cUSD",
           "localAmount": Object {
+            "__typename": "LocalMoneyAmount",
             "currencyCode": "USD",
             "exchangeRate": "1",
             "value": "0.994982275992944156",
@@ -530,8 +539,10 @@ exports[`ignores pending standby transactions that are completed in the response
         },
         "hash": "0x16fbd53c4871f0657f40e1b4515184be04bed8912c6e2abc2cda549e4ad8f852",
         "makerAmount": Object {
+          "__typename": "MoneyAmount",
           "currencyCode": "cGLD",
           "localAmount": Object {
+            "__typename": "LocalMoneyAmount",
             "currencyCode": "USD",
             "exchangeRate": "10.06007113270411465777",
             "value": "1.006007113270411465777",
@@ -540,8 +551,10 @@ exports[`ignores pending standby transactions that are completed in the response
         },
         "status": "Complete",
         "takerAmount": Object {
+          "__typename": "MoneyAmount",
           "currencyCode": "cUSD",
           "localAmount": Object {
+            "__typename": "LocalMoneyAmount",
             "currencyCode": "USD",
             "exchangeRate": "1",
             "value": "0.994982275992944156",
@@ -560,7 +573,6 @@ exports[`ignores pending standby transactions that are completed in the response
   initialNumToRender={10}
   keyExtractor={[Function]}
   maxToRenderPerBatch={10}
-  numColumns={1}
   onContentSizeChange={[Function]}
   onEndReachedThreshold={2}
   onLayout={[Function]}
@@ -584,7 +596,6 @@ exports[`ignores pending standby transactions that are completed in the response
       <View
         accessible={true}
         focusable={true}
-        isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackground",
@@ -776,7 +787,6 @@ exports[`ignores pending standby transactions that are completed in the response
       <View
         accessible={true}
         focusable={true}
-        isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackground",
@@ -984,13 +994,6 @@ exports[`ignores pending standby transactions that are completed in the response
         </View>
       </View>
     </View>
-    <View
-      style={
-        Object {
-          "height": 0,
-        }
-      }
-    />
   </View>
 </RCTScrollView>
 `;
@@ -1044,8 +1047,8 @@ exports[`renders the received data along with the standby transactions 1`] = `
           "currencyCode": "cGLD",
           "localAmount": Object {
             "currencyCode": "MXN",
-            "exchangeRate": "0.88666666666666666666666666666666666666666666666666666666666666666666666666666711",
-            "value": "26.6000000000000000000000000000000000000000000000000000000000000000000000000000133",
+            "exchangeRate": "0.8866666666666666666711",
+            "value": "26.600000000000000000133",
           },
           "value": "30",
         },
@@ -1068,8 +1071,8 @@ exports[`renders the received data along with the standby transactions 1`] = `
           "currencyCode": "cGLD",
           "localAmount": Object {
             "currencyCode": "MXN",
-            "exchangeRate": "0.88666666666666666666666666666666666666666666666666666666666666666666666666666711",
-            "value": "26.6000000000000000000000000000000000000000000000000000000000000000000000000000133",
+            "exchangeRate": "0.8866666666666666666711",
+            "value": "26.600000000000000000133",
           },
           "value": "30",
         },
@@ -1090,8 +1093,10 @@ exports[`renders the received data along with the standby transactions 1`] = `
         "__typename": "TokenTransfer",
         "address": "0xce10ce10ce10ce10ce10ce10ce10ce10ce10ce10",
         "amount": Object {
+          "__typename": "MoneyAmount",
           "currencyCode": "cUSD",
           "localAmount": Object {
+            "__typename": "LocalMoneyAmount",
             "currencyCode": "USD",
             "exchangeRate": "1",
             "value": "-0.2",
@@ -1107,8 +1112,10 @@ exports[`renders the received data along with the standby transactions 1`] = `
       Object {
         "__typename": "TokenExchange",
         "amount": Object {
+          "__typename": "MoneyAmount",
           "currencyCode": "cUSD",
           "localAmount": Object {
+            "__typename": "LocalMoneyAmount",
             "currencyCode": "USD",
             "exchangeRate": "1",
             "value": "0.994982275992944156",
@@ -1117,8 +1124,10 @@ exports[`renders the received data along with the standby transactions 1`] = `
         },
         "hash": "0x16fbd53c4871f0657f40e1b4515184be04bed8912c6e2abc2cda549e4ad8f852",
         "makerAmount": Object {
+          "__typename": "MoneyAmount",
           "currencyCode": "cGLD",
           "localAmount": Object {
+            "__typename": "LocalMoneyAmount",
             "currencyCode": "USD",
             "exchangeRate": "10.06007113270411465777",
             "value": "1.006007113270411465777",
@@ -1127,8 +1136,10 @@ exports[`renders the received data along with the standby transactions 1`] = `
         },
         "status": "Complete",
         "takerAmount": Object {
+          "__typename": "MoneyAmount",
           "currencyCode": "cUSD",
           "localAmount": Object {
+            "__typename": "LocalMoneyAmount",
             "currencyCode": "USD",
             "exchangeRate": "1",
             "value": "0.994982275992944156",
@@ -1147,7 +1158,6 @@ exports[`renders the received data along with the standby transactions 1`] = `
   initialNumToRender={10}
   keyExtractor={[Function]}
   maxToRenderPerBatch={10}
-  numColumns={1}
   onContentSizeChange={[Function]}
   onEndReachedThreshold={2}
   onLayout={[Function]}
@@ -1171,7 +1181,6 @@ exports[`renders the received data along with the standby transactions 1`] = `
       <View
         accessible={true}
         focusable={true}
-        isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackground",
@@ -1375,7 +1384,6 @@ exports[`renders the received data along with the standby transactions 1`] = `
       <View
         accessible={true}
         focusable={true}
-        isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackground",
@@ -1615,7 +1623,6 @@ exports[`renders the received data along with the standby transactions 1`] = `
       <View
         accessible={true}
         focusable={true}
-        isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackground",
@@ -1855,7 +1862,6 @@ exports[`renders the received data along with the standby transactions 1`] = `
       <View
         accessible={true}
         focusable={true}
-        isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackground",
@@ -2047,7 +2053,6 @@ exports[`renders the received data along with the standby transactions 1`] = `
       <View
         accessible={true}
         focusable={true}
-        isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackground",

@@ -14,8 +14,8 @@ coverage:
           - packages/web/
         flags:
           - web
-        threshold: 2%
-        target: 75%
+        threshold: 1%
+        target: 80%
       # Protocol codecov disabled until coverage tests are fixed.
       #protocol:
         #paths: 'packages/protocol/'

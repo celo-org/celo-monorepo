@@ -255,13 +255,13 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
             allowFontScaling={true}
             autoCorrect={false}
             autoFocus={true}
+            decimalSeparator="."
             keyboardType="numeric"
             labelStyle={
               Object {
                 "color": "#42D689",
               }
             }
-            lng="en"
             numberOfDecimals={2}
             onBlur={[Function]}
             onChangeText={[Function]}
@@ -503,7 +503,6 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
         <View
           accessible={true}
           focusable={false}
-          isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
@@ -627,7 +626,6 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
         <View
           accessible={true}
           focusable={false}
-          isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",

@@ -1,14 +1,14 @@
 /* tslint:disable:no-console */
 // TODO(asa): Refactor and rename to 'deployment-utils.ts'
-import { setAndInitializeImplementation } from '@celo/protocol/lib/proxy-utils'
+import { retryTx, setAndInitializeImplementation } from '@celo/protocol/lib/proxy-utils'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { signTransaction } from '@celo/protocol/lib/signing-utils'
-import { privateKeyToAddress } from '@celo/utils/lib/address'
+import { Address, privateKeyToAddress } from '@celo/utils/lib/address'
 import { BigNumber } from 'bignumber.js'
 import { EscrowInstance, GoldTokenInstance, MultiSigInstance, OwnableInstance, ProxyContract, ProxyInstance, RegistryInstance, StableTokenInstance } from 'types'
+import Web3 from 'web3'
 import { TransactionObject } from 'web3-eth'
 
-import Web3 from 'web3'
 
 export async function sendTransactionWithPrivateKey<T>(
   web3: Web3,
@@ -147,13 +147,23 @@ export async function setInitialProxyImplementation<
 
   const implementation: ContractInstance = await Contract.deployed()
   const proxy: ProxyInstance = await ContractProxy.deployed()
-  await _setInitialProxyImplementation(web3, implementation, proxy, contractName, ...args)
+  await _setInitialProxyImplementation(web3, implementation, proxy, contractName, { from: null, value: null }, ...args)
   return Contract.at(proxy.address) as ContractInstance
 }
 
 export async function _setInitialProxyImplementation<
   ContractInstance extends Truffle.ContractInstance
->(web3: Web3, implementation: ContractInstance, proxy: ProxyInstance, contractName: string, ...args: any[]) {
+>(
+  web3: Web3,
+  implementation: ContractInstance,
+  proxy: ProxyInstance,
+  contractName: string,
+  txOptions: {
+    from: Address,
+    value: string,
+  },
+  ...args: any[]
+) {
   const initializerAbi = (implementation as any).abi.find(
     (abi: any) => abi.type === 'function' && abi.name === 'initialize'
   )
@@ -163,9 +173,20 @@ export async function _setInitialProxyImplementation<
     // TODO(Martin): check types, not just argument number
     checkFunctionArgsLength(args, initializerAbi)
     console.log(`  Setting initial ${contractName} implementation on proxy`)
-    receipt = await setAndInitializeImplementation(web3, proxy, implementation.address, initializerAbi, ...args)
+    receipt = await setAndInitializeImplementation(web3, proxy, implementation.address, initializerAbi, txOptions, ...args)
   } else {
-    receipt = await proxy._setImplementation(implementation.address)
+    if (txOptions.from != null) {
+      receipt = await retryTx(proxy._setImplementation, [implementation.address, { from: txOptions.from }])
+      if (txOptions.value != null) {
+        await retryTx(web3.eth.sendTransaction, [{
+          from: txOptions.from,
+          to: proxy.address,
+          value: txOptions.value,
+        }])
+      }
+    } else {
+      receipt = await retryTx(proxy._setImplementation, [implementation.address])
+    }
   }
   return receipt.tx
 }
@@ -236,7 +257,7 @@ export function deploymentForContract<ContractInstance extends Truffle.ContractI
     deployer.deploy(Contract)
     deployer.then(async () => {
       const proxy: ProxyInstance = await ContractProxy.deployed()
-      await proxy._transferOwnership(_accounts[0])
+      await proxy._transferOwnership(ContractProxy.defaults().from)
       const proxiedContract: ContractInstance = await setInitialProxyImplementation<
         ContractInstance
       >(web3, artifacts, name, ...(await args(networkName)))

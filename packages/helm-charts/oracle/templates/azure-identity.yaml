@@ -1,0 +1,13 @@
+{{- range $index, $identity := .Values.oracle.identities -}}
+apiVersion: aadpodidentity.k8s.io/v1
+kind: AzureIdentity
+metadata:
+  name: {{ template "azure-identity-name" (dict "dot" $ "index" $index) }}
+  annotations:
+    aadpodidentity.k8s.io/Behavior: namespaced
+spec:
+  type: 0
+  resourceID: {{ $identity.azure.id }}
+  clientID: {{ $identity.azure.clientId }}
+---
+{{ end }}

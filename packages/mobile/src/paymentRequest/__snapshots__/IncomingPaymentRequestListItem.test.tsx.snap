@@ -33,7 +33,6 @@ Array [
       <View
         accessible={true}
         focusable={true}
-        isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackground",
@@ -185,7 +184,6 @@ Array [
                 <View
                   accessible={true}
                   focusable={true}
-                  isTVSelectable={true}
                   nativeBackgroundAndroid={
                     Object {
                       "attribute": "selectableItemBackgroundBorderless",
@@ -199,6 +197,7 @@ Array [
                   onResponderTerminate={[Function]}
                   onResponderTerminationRequest={[Function]}
                   onStartShouldSetResponder={[Function]}
+                  testID="IncomingPaymentRequestNotification/1/global:pay/Button"
                 >
                   <Text
                     style={
@@ -221,7 +220,6 @@ Array [
                 <View
                   accessible={true}
                   focusable={true}
-                  isTVSelectable={true}
                   nativeBackgroundAndroid={
                     Object {
                       "attribute": "selectableItemBackgroundBorderless",
@@ -235,6 +233,7 @@ Array [
                   onResponderTerminate={[Function]}
                   onResponderTerminationRequest={[Function]}
                   onStartShouldSetResponder={[Function]}
+                  testID="IncomingPaymentRequestNotification/1/global:decline/Button"
                 >
                   <Text
                     style={

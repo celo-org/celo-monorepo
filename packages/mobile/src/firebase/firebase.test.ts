@@ -12,11 +12,13 @@ import { mockAccount2 } from 'test/values'
 
 const hasPermissionMock = jest.fn(() => null)
 const requestPermissionMock = jest.fn(() => null)
+const registerDeviceForRemoteMessagesMock = jest.fn(() => null)
 const getTokenMock = jest.fn(() => null)
 const onTokenRefreshMock = jest.fn(() => null)
-const onNotificationMock = jest.fn((fn) => null)
-const onNotificationOpenedMock = jest.fn((fn) => null)
+const onMessageMock = jest.fn(() => null)
+const onNotificationOpenedAppMock = jest.fn(() => null)
 const getInitialNotificationMock = jest.fn(() => null)
+const setBackgroundMessageHandler = jest.fn(() => null)
 
 const address = mockAccount2
 const mockFcmToken = 'token'
@@ -25,12 +27,12 @@ const app: any = {
   messaging: () => ({
     hasPermission: hasPermissionMock,
     requestPermission: requestPermissionMock,
+    registerDeviceForRemoteMessages: registerDeviceForRemoteMessagesMock,
     getToken: getTokenMock,
     onTokenRefresh: onTokenRefreshMock,
-  }),
-  notifications: () => ({
-    onNotification: onNotificationMock,
-    onNotificationOpened: onNotificationOpenedMock,
+    setBackgroundMessageHandler,
+    onMessage: onMessageMock,
+    onNotificationOpenedApp: onNotificationOpenedAppMock,
     getInitialNotification: getInitialNotificationMock,
   }),
 }

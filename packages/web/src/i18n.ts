@@ -19,6 +19,7 @@ export enum NameSpaces {
   common = 'common',
   about = 'about',
   applications = 'applications',
+  audits = 'audits',
   brand = 'brand',
   codeofconduct = 'codeofconduct',
   community = 'community',
@@ -28,6 +29,7 @@ export enum NameSpaces {
   faucet = 'faucet',
   home = 'home',
   jobs = 'jobs',
+  papers = 'papers',
   terms = 'terms',
   technology = 'technology',
 }

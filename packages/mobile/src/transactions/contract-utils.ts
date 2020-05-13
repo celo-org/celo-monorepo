@@ -1,8 +1,7 @@
 import { values } from 'lodash'
+import { estimateGas } from 'src/web3/utils'
 import { Tx } from 'web3-core'
 import { TransactionObject, TransactionReceipt } from 'web3-eth'
-
-const gasInflateFactor = 1.5
 
 export type TxLogger = (event: SendTransactionLogEvent) => void
 
@@ -57,8 +56,12 @@ const Started: Started = { type: SendTransactionLogEventType.Started }
 
 interface Confirmed {
   type: SendTransactionLogEventType.Confirmed
+  number: number
 }
-const Confirmed: Confirmed = { type: SendTransactionLogEventType.Confirmed }
+
+function Confirmed(n: number): Confirmed {
+  return { type: SendTransactionLogEventType.Confirmed, number: n }
+}
 
 export type SendTransactionLogEvent =
   | Started
@@ -130,10 +133,10 @@ export async function sendTransactionAsync<T>(
   tx: TransactionObject<T>,
   account: string,
   feeCurrencyAddress: string,
-  nonce: number,
   logger: TxLogger = emptyTxLogger,
-  estimatedGas?: number | undefined,
-  gasPrice?: string | undefined
+  estimatedGas?: number,
+  gasPrice?: string,
+  nonce?: number
 ): Promise<TxPromises> {
   // @ts-ignore
   const resolvers: TxPromiseResolvers = {}
@@ -173,45 +176,31 @@ export async function sendTransactionAsync<T>(
       nonce,
     }
 
-    // This means we are connected to forno
-    // if (gasPrice) {
-    //   txParams.gatewayFeeRecipient = NULL_ADDRESS
-    //   txParams.gatewayFee = '0x' + new BigNumber(10000).toString(16)
-    // }
-
     if (estimatedGas === undefined) {
-      estimatedGas = Math.round((await tx.estimateGas(txParams)) * gasInflateFactor)
+      estimatedGas = (await estimateGas(tx, txParams)).toNumber()
       logger(EstimatedGas(estimatedGas))
     }
 
     tx.send({ ...txParams, gas: estimatedGas })
       // @ts-ignore
-      .on('receipt', (r: TransactionReceipt) => {
+      .once('receipt', (r: TransactionReceipt) => {
         logger(ReceiptReceived(r))
         if (resolvers.receipt) {
           resolvers.receipt(r)
         }
       })
-      .on('transactionHash', (txHash: string) => {
+      .once('transactionHash', (txHash: string) => {
         logger(TransactionHashReceived(txHash))
 
         if (resolvers.transactionHash) {
           resolvers.transactionHash(txHash)
         }
       })
-      .on('confirmation', (confirmationNumber: number) => {
-        if (confirmationNumber > 1) {
-          // "confirmation" event is called for 24 blocks.
-          // if check to avoid polluting the logs and trying to remove the standby notification more than once
-          return
-        }
-        logger(Confirmed)
-
-        if (resolvers.confirmation) {
-          resolvers.confirmation(true)
-        }
+      .once('confirmation', (confirmationNumber: number) => {
+        logger(Confirmed(confirmationNumber))
+        resolvers.confirmation(true)
       })
-      .on('error', (error: Error) => {
+      .once('error', (error: Error) => {
         logger(Failed(error))
         rejectAll(error)
       })

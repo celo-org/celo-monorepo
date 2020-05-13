@@ -136,6 +136,7 @@ exports[`ImportWallet renders correctly and is disabled with no text 1`] = `
                   "minHeight": 125,
                   "padding": 14,
                   "paddingTop": 16,
+                  "textAlignVertical": "top",
                 },
                 false,
               ]
@@ -191,7 +192,6 @@ exports[`ImportWallet renders correctly and is disabled with no text 1`] = `
     <View
       accessible={true}
       focusable={false}
-      isTVSelectable={true}
       nativeBackgroundAndroid={
         Object {
           "attribute": "selectableItemBackground",
@@ -277,7 +277,6 @@ exports[`ImportWallet renders correctly and is disabled with no text 1`] = `
     <View
       accessible={true}
       focusable={true}
-      isTVSelectable={true}
       nativeBackgroundAndroid={
         Object {
           "attribute": "selectableItemBackground",

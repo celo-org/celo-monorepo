@@ -171,6 +171,33 @@ contract('Escrow', (accounts: string[]) => {
         )
       })
 
+      it('should not allow two transfers with same ID', async () => {
+        await escrow.transfer(
+          aPhoneHash,
+          mockERC20Token.address,
+          aValue,
+          oneDayInSecs,
+          withdrawKeyAddress,
+          0,
+          {
+            from: sender,
+          }
+        )
+        await assertRevert(
+          escrow.transfer(
+            aPhoneHash,
+            mockERC20Token.address,
+            aValue,
+            oneDayInSecs,
+            withdrawKeyAddress,
+            0,
+            {
+              from: sender,
+            }
+          )
+        )
+      })
+
       it('should not allow a transfer if token is 0', async () => {
         await assertRevert(
           escrow.transfer(aPhoneHash, NULL_ADDRESS, aValue, oneDayInSecs, withdrawKeyAddress, 0, {

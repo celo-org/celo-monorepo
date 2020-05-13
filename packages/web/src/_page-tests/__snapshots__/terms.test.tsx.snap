@@ -82,7 +82,7 @@ exports[`Terms renders 1`] = `
           }
         }
       >
-        title
+        Celo Terms of Use and FAQ
       </h1>
     </div>
   </div>
@@ -142,7 +142,7 @@ exports[`Terms renders 1`] = `
           }
         }
       >
-        helpfulLinks
+        Helpful Links
       </h3>
     </div>
     <div
@@ -232,6 +232,9 @@ exports[`Terms renders 1`] = `
               data-focusable={true}
               dir="auto"
               href="/user-agreement"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
+              rel=" noopener noreferrer"
               role="link"
               style={
                 Object {
@@ -245,13 +248,16 @@ exports[`Terms renders 1`] = `
                   "fontSize": "16px",
                   "fontWeight": "500",
                   "lineHeight": "16px",
+                  "marginRight": "30px",
+                  "marginTop": "10px",
                   "msFlexAlign": "center",
                   "textAlign": "center",
                   "textRendering": "geometricPrecision",
                 }
               }
+              target="_blank"
             >
-              userAgreementLink
+              User Agreement
               <div
                 className="css-view-1dbjc4n"
                 style={
@@ -326,6 +332,9 @@ exports[`Terms renders 1`] = `
               data-focusable={true}
               dir="auto"
               href="/faq"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
+              rel=" noopener noreferrer"
               role="link"
               style={
                 Object {
@@ -339,13 +348,16 @@ exports[`Terms renders 1`] = `
                   "fontSize": "16px",
                   "fontWeight": "500",
                   "lineHeight": "16px",
+                  "marginRight": "30px",
+                  "marginTop": "10px",
                   "msFlexAlign": "center",
                   "textAlign": "center",
                   "textRendering": "geometricPrecision",
                 }
               }
+              target="_blank"
             >
-              faq
+              FAQ
               <div
                 className="css-view-1dbjc4n"
                 style={
@@ -420,6 +432,9 @@ exports[`Terms renders 1`] = `
               data-focusable={true}
               dir="auto"
               href="/privacy"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
+              rel=" noopener noreferrer"
               role="link"
               style={
                 Object {
@@ -433,13 +448,16 @@ exports[`Terms renders 1`] = `
                   "fontSize": "16px",
                   "fontWeight": "500",
                   "lineHeight": "16px",
+                  "marginRight": "30px",
+                  "marginTop": "10px",
                   "msFlexAlign": "center",
                   "textAlign": "center",
                   "textRendering": "geometricPrecision",
                 }
               }
+              target="_blank"
             >
-              privacyPolicy
+              Privacy Policy
               <div
                 className="css-view-1dbjc4n"
                 style={
@@ -514,6 +532,9 @@ exports[`Terms renders 1`] = `
               data-focusable={true}
               dir="auto"
               href="https://docs.celo.org/important-information/alfajores-testnet-disclaimer"
+              onClick={[Function]}
+              onMouseEnter={[Function]}
+              rel=" noopener noreferrer"
               role="link"
               style={
                 Object {
@@ -527,13 +548,16 @@ exports[`Terms renders 1`] = `
                   "fontSize": "16px",
                   "fontWeight": "500",
                   "lineHeight": "16px",
+                  "marginRight": "30px",
+                  "marginTop": "10px",
                   "msFlexAlign": "center",
                   "textAlign": "center",
                   "textRendering": "geometricPrecision",
                 }
               }
+              target="_blank"
             >
-              disclaimer
+              Disclaimer
               <div
                 className="css-view-1dbjc4n"
                 style={
@@ -624,7 +648,7 @@ exports[`Terms renders 1`] = `
           }
         }
       >
-        privacy
+        A Note on Privacy
       </h3>
     </div>
     <div
@@ -673,7 +697,7 @@ exports[`Terms renders 1`] = `
           }
         }
       >
-        privacyNote
+        The Alfajores Celo Test Network stores phone number hashes to allow for payments to a phone number. By verifying your phone number, you consent to having your hashed phone number stored on the Celo Blockchain.
       </div>
       <div
         className="css-view-1dbjc4n"
@@ -718,6 +742,9 @@ exports[`Terms renders 1`] = `
             data-focusable={true}
             dir="auto"
             href="https://docs.celo.org/celo-codebase/protocol/privacy"
+            onClick={[Function]}
+            onMouseEnter={[Function]}
+            rel=" noopener noreferrer"
             role="link"
             style={
               Object {
@@ -731,13 +758,16 @@ exports[`Terms renders 1`] = `
                 "fontSize": "16px",
                 "fontWeight": "500",
                 "lineHeight": "16px",
+                "marginRight": "30px",
+                "marginTop": "10px",
                 "msFlexAlign": "center",
                 "textAlign": "center",
                 "textRendering": "geometricPrecision",
               }
             }
+            target="_blank"
           >
-            privacyLink
+            Privacy Documentation
             <div
               className="css-view-1dbjc4n"
               style={

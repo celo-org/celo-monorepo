@@ -5,11 +5,11 @@ Welcome to the technical documentation site for the Celo project!
 In this documentation you’ll find information on:
 
 - An [overview](overview.md) of the high-level architecture of Celo
-- [Tutorials](getting-started/running-a-full-node.md) to get you started with the Celo codebase and the Alfajores Testnet
+- Tutorials to get you started with the [Celo SDK](developer-resources/start.md) and the [Celo networks](getting-started/choosing-a-network.md)
 - Reference documentation about the [Celo protocol](celo-codebase/protocol/) and [wallet](celo-codebase/wallet/)
 - How to make technical [contributions](community/contributing.md) to the project and community
 
-### About Celo <a id="about-celo"></a>
+### About Celo
 
 Celo’s purpose is to empower anyone with a smartphone anywhere in the world to have access to financial services, send money to phone numbers, and pay merchants.
 
@@ -37,13 +37,13 @@ Highlights include:
 
   Extremely fast, secure synchronization between mobile devices and the Celo network means that even wallet users with high latency, low bandwidth, or high cost data tariffs can use Celo. Celo removes the need to check every header before a received header can be trusted. Performance will be further improved with BLS signature aggregation and succinct zero-knowledge proofs, via zk-SNARKs.
 
-- **Proof of Stake**
+- **Proof-of-Stake**
 
-  Celo uses a Proof of Stake consensus algorithm. In comparison to Proof of Work systems like Bitcoin and Ethereum, this eliminates the negative environmental impact and means that users can make transactions that are cheaper, faster, and where the outcome cannot be changed once complete.
+  Celo uses a proof-of-stake consensus algorithm. In comparison to Proof of Work systems like Bitcoin and Ethereum, this eliminates the negative environmental impact and means that users can make transactions that are cheaper, faster, and where the outcome cannot be changed once complete.
 
 - **Full Node Incentives**
 
-  The Celo protocol offers incentives for running full nodes to service the light clients that run on each mobile device. Unlike other Proof of Stake systems, users can still earn cryptocurrency in exchange for providing compute resources without having to stake funds.
+  The Celo protocol offers incentives for running full nodes to service the light clients that run on each mobile device. Unlike other proof-of-stake systems, users can still earn cryptocurrency in exchange for providing compute resources without having to stake funds.
 
 - **On-chain Governance**
 
@@ -110,7 +110,7 @@ Alfajores Testnet links:
 
 - [Alfajores Testnet Faucet](https://celo.org/build/faucet) - get testnet tokens to experiment with
 - [Celo Wallet for Alfajores](https://celo.org/build/wallet) - download the Android wallet app for the testnet from the Play Store
-- [Alfajores Testnet Network Status](https://alfajores-ethstats.celo-testnet.org) - to check the current availability of the testnet
+- [Alfajores Testnet Network Status](https://alfajores-celostats.celo-testnet.org) - to check the current availability of the testnet
 - [Alfajores Testnet Block Explorer](https://alfajores-blockscout.celo-testnet.org) - explore the history of the blockchain and view transaction details
 
 Ask questions, find answers, and get in touch:

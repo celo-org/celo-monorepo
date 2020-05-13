@@ -1,18 +1,19 @@
 import AsyncStorage from '@react-native-community/async-storage'
 import { applyMiddleware, compose, createStore } from 'redux'
-import { persistReducer, persistStore } from 'redux-persist'
+import { createMigrate, persistReducer, persistStore } from 'redux-persist'
 import autoMergeLevel2 from 'redux-persist/lib/stateReconciler/autoMergeLevel2'
 import createSagaMiddleware from 'redux-saga'
+import { migrations } from 'src/redux/migrations'
 import rootReducer from 'src/redux/reducers'
 import { rootSaga } from 'src/redux/sagas'
 
 const persistConfig: any = {
   key: 'root',
-  version: -1, // default is -1, increment as we make migrations
+  version: 1, // default is -1, increment as we make migrations
   storage: AsyncStorage,
   blacklist: ['home', 'geth', 'networkInfo', 'alert', 'fees', 'recipients', 'imports'],
   stateReconciler: autoMergeLevel2,
-  // migrate: createMigrate(migrations, { debug: true }),
+  migrate: createMigrate(migrations, { debug: true }),
 }
 
 if (__DEV__) {

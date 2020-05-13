@@ -18,7 +18,7 @@ reference:
 defaults: &defaults
   working_directory: ~/app
   docker:
-    - image: celohq/node10-gcloud
+    - image: celohq/node10-gcloud:v2
   environment:
     # To avoid ENOMEM problem when running node
     NODE_OPTIONS: '--max-old-space-size=4096'
@@ -37,7 +37,6 @@ e2e-defaults: &e2e-defaults
     - image: celohq/circleci:geth1.9-2
   environment:
     CELO_BLOCKCHAIN_BRANCH_TO_TEST: master
-
 general:
   artifacts:
     - 'mobile/coverage'
@@ -99,6 +98,13 @@ commands:
               echo "There are git differences after running yarn install"
               exit 1
             fi
+      - run:
+          name: Fail if generated dependency graph doesn't match committed
+          command: ./scripts/ci_check_dependency_graph_changed.sh
+      - run:
+          name: Fail if there are vulnerabilities in packages
+          command: |
+            /bin/bash -c 'yarn audit --groups dependencies --level high; [[ $? -ge 8 ]] && exit 1 || exit 0'
 
       # Workaround save_cache not supporting globbing for the paths key
       # see note in https://circleci.com/docs/2.0/caching/#basic-example-of-dependency-caching and https://ideas.circleci.com/ideas/CCI-I-239
@@ -157,8 +163,7 @@ jobs:
             # separate build to avoid ENOMEM in CI :(
             yarn build --scope @celo/utils
             yarn build --scope @celo/protocol
-            yarn build --scope @celo/walletkit
-            yarn build --ignore @celo/protocol --ignore docs --ignore @celo/walletkit --ignore @celo/web
+            yarn build --ignore @celo/protocol --ignore docs
 
       - run:
           name: Check licenses
@@ -258,7 +263,6 @@ jobs:
             # fi
             yarn || yarn 
             yarn build || yarn build
-            yarn run jetify
       - save_cache:
           key: yarn-v4-macos-{{ .Branch }}-{{ checksum "yarn.lock" }}
           paths:
@@ -323,6 +327,20 @@ jobs:
     working_directory: ~/app_osx
     steps:
       - checkout
+      - run:
+          name: Install node 10 and dependencies
+          command: |
+            brew uninstall --ignore-dependencies node icu4c
+            brew install node@10
+            brew link --overwrite --force node@10
+            yarn
+      - run:
+          name: Fail if generated dependency graph doesn't match committed
+          command: ./scripts/ci_check_dependency_graph_changed.sh
+      - run:
+          name: Check if the test should run
+          command: ./scripts/ci_check_if_test_should_run_v2.sh mobile
+
       - run:
           name: Configure environment variables
           command: |
@@ -436,7 +454,7 @@ jobs:
           name: jest tests
           command: |
             mkdir -p test-results/jest
-            yarn run lerna --ignore @celo/contractkit --ignore @celo/mobile --ignore @celo/protocol --ignore @celo/celotool --ignore @celo/walletkit --ignore @celo/celocli run test
+            yarn run lerna --ignore @celo/contractkit --ignore @celo/mobile --ignore @celo/protocol --ignore @celo/celotool --ignore @celo/celocli run test
 
       - store_test_results:
           path: test-results
@@ -454,27 +472,16 @@ jobs:
           name: Upload to CodeCov
           command: yarn codecov -F web
 
-  mobile-test-build-app:
-    <<: *android-defaults
-    resource_class: large
-
-    steps:
-      - attach_workspace:
-          at: ~/app
-      - run:
-          name: Build Android app (debug version)
-          command: |
-            set -euo pipefail
-            yarn run jetify
-            cd packages/mobile/android
-            ENVFILE=.env.test ./gradlew assembleDebug
-            cd -
-
   mobile-test:
     <<: *defaults
     steps:
       - attach_workspace:
           at: ~/app
+
+      - run:
+          name: Check if the test should run
+          command: |
+            ./scripts/ci_check_if_test_should_run_v2.sh mobile
 
       - run:
           name: Ensure translations are not missing
@@ -514,6 +521,11 @@ jobs:
           at: ~/app
 
       - run:
+          name: Check if the test should run
+          command: |
+            ./scripts/ci_check_if_test_should_run_v2.sh verification-pool-api
+
+      - run:
           name: jest tests
           command: |
             mkdir -p test-results/jest
@@ -529,8 +541,7 @@ jobs:
       - run:
           name: Check if the test should run
           command: |
-            FILES_TO_CHECK="${PWD}/packages/protocol,${PWD}/packages/utils,${PWD}/.circleci/config.yml"
-            ./scripts/ci_check_if_test_should_run_v2.sh ${FILES_TO_CHECK}
+            ./scripts/ci_check_if_test_should_run_v2.sh protocol
       - run:
           name: test
           # Flaky tests - run them twice
@@ -545,8 +556,7 @@ jobs:
       - run:
           name: Check if the test should run
           command: |
-            FILES_TO_CHECK="${PWD}/packages/protocol,${PWD}/packages/utils,${PWD}/.circleci/config.yml"
-            ./scripts/ci_check_if_test_should_run_v2.sh ${FILES_TO_CHECK}
+            ./scripts/ci_check_if_test_should_run_v2.sh protocol
       - run:
           name: test
           # Flaky tests - run them twice
@@ -564,6 +574,10 @@ jobs:
       - attach_workspace:
           at: ~/app
       - run:
+          name: Check if the test should run
+          command: |
+            ./scripts/ci_check_if_test_should_run_v2.sh contractkit
+      - run:
           name: Generate DevChain
           command: |
             (cd packages/contractkit && yarn test:reset)
@@ -580,32 +594,15 @@ jobs:
               exit 1
             fi
 
-  walletkit-test:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: ~/app
-      - run:
-          name: test alphanet
-          command: |
-            # Test alphanet
-            set -euo pipefail
-            yarn --cwd=packages/walletkit build alfajores
-            yarn --cwd=packages/walletkit test
-
-      - run:
-          name: test alphanet staging
-          command: |
-            # Test alphanet
-            set -euo pipefail
-            yarn --cwd=packages/walletkit build alfajoresstaging
-            yarn --cwd=packages/walletkit test
-
   cli-test:
     <<: *defaults
     steps:
       - attach_workspace:
           at: ~/app
+      - run:
+          name: Check if the test should run
+          command: |
+            ./scripts/ci_check_if_test_should_run_v2.sh cli
       - run:
           name: Generate DevChain
           command: |
@@ -643,7 +640,10 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/app
-
+      - run:
+          name: Check if the test should run
+          command: |
+            ./scripts/ci_check_if_test_should_run_v2.sh typescript
       - run:
           name: Install and test the npm package
           command: |
@@ -658,7 +658,10 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/app
-
+      - run:
+          name: Check if the test should run
+          command: |
+            ./scripts/ci_check_if_test_should_run_v2.sh utils
       - run:
           name: Install and test the npm package
           command: |
@@ -677,8 +680,7 @@ jobs:
       - run:
           name: Check if the test should run
           command: |
-            FILES_TO_CHECK="${PWD}/packages/celotool,${PWD}/packages/protocol,${PWD}/.circleci/config.yml"
-            ./scripts/ci_check_if_test_should_run_v2.sh ${FILES_TO_CHECK}
+            ./scripts/ci_check_if_test_should_run_v2.sh celotool
       - run:
           name: Run test
           no_output_timeout: 20m
@@ -696,8 +698,7 @@ jobs:
       - run:
           name: Check if the test should run
           command: |
-            FILES_TO_CHECK="${PWD}/packages/celotool,${PWD}/packages/protocol,${PWD}/.circleci/config.yml"
-            ./scripts/ci_check_if_test_should_run_v2.sh ${FILES_TO_CHECK}
+            ./scripts/ci_check_if_test_should_run_v2.sh celotool
       - run:
           name: Run test
           no_output_timeout: 20m
@@ -715,8 +716,7 @@ jobs:
       - run:
           name: Check if the test should run
           command: |
-            FILES_TO_CHECK="${PWD}/packages/celotool,${PWD}/packages/protocol,${PWD}/.circleci/config.yml"
-            ./scripts/ci_check_if_test_should_run_v2.sh ${FILES_TO_CHECK}
+            ./scripts/ci_check_if_test_should_run_v2.sh celotool
       - run:
           name: Run test
           no_output_timeout: 20m
@@ -734,8 +734,7 @@ jobs:
       - run:
           name: Check if the test should run
           command: |
-            FILES_TO_CHECK="${PWD}/packages/celotool,${PWD}/packages/protocol,${PWD}/.circleci/config.yml"
-            ./scripts/ci_check_if_test_should_run_v2.sh ${FILES_TO_CHECK}
+            ./scripts/ci_check_if_test_should_run_v2.sh celotool
       - run:
           name: Run test
           no_output_timeout: 20m
@@ -753,8 +752,7 @@ jobs:
       - run:
           name: Check if the test should run
           command: |
-            FILES_TO_CHECK="${PWD}/packages/celotool,${PWD}/packages/protocol,${PWD}/.circleci/config.yml"
-            ./scripts/ci_check_if_test_should_run_v2.sh ${FILES_TO_CHECK}
+            ./scripts/ci_check_if_test_should_run_v2.sh celotool
       - run:
           name: Run test
           command: |
@@ -771,8 +769,7 @@ jobs:
       - run:
           name: Check if the test should run
           command: |
-            FILES_TO_CHECK="${PWD}/packages/celotool,${PWD}/packages/protocol,${PWD}/.circleci/config.yml"
-            ./scripts/ci_check_if_test_should_run_v2.sh ${FILES_TO_CHECK}
+            ./scripts/ci_check_if_test_should_run_v2.sh celotool
       - run:
           name: Run test
           command: |
@@ -787,7 +784,10 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/app
-
+      - run:
+          name: Check if the test should run
+          command: |
+            ./scripts/ci_check_if_test_should_run_v2.sh web
       - run: mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
       - run: cd packages/web && ./circle_deploy.sh
 
@@ -796,6 +796,10 @@ jobs:
     docker:
       - image: celohq/node10-gcloud
     steps:
+      - run:
+          name: Check if the test should run
+          command: |
+            ./scripts/ci_check_if_test_should_run_v2.sh typescript
       - run:
           name: Installing npm package - @celo/typescript
           command: yarn add @celo/typescript
@@ -806,6 +810,10 @@ jobs:
       - image: celohq/node10-gcloud
     steps:
       - run:
+          name: Check if the test should run
+          command: |
+            ./scripts/ci_check_if_test_should_run_v2.sh utils
+      - run:
           name: Installing npm package - @celo/utils
           command: yarn add @celo/utils
 
@@ -815,23 +823,15 @@ jobs:
       - image: celohq/node10-gcloud
     steps:
       - run:
+          name: Check if the test should run
+          command: |
+            ./scripts/ci_check_if_test_should_run_v2.sh contractkit
+      - run:
           name: Installing npm package - @celo/contractkit
           command: |
             # Try one more time in case the first attempt fails
             # to deal with scenarios like https://circleci.com/gh/celo-org/celo-monorepo/23329
             yarn add @celo/contractkit || yarn add @celo/contractkit
-
-  test-walletkit-npm-package-install:
-    working_directory: ~/app
-    docker:
-      - image: celohq/node10-gcloud
-    steps:
-      - run:
-          name: Installing npm package - @celo/walletkit
-          command: |
-            # Try one more time in case the first attempt fails
-            # to deal with scenarios like https://circleci.com/gh/celo-org/celo-monorepo/23329
-            yarn add @celo/walletkit || yarn add @celo/walletkit
 
   test-celocli-npm-package-install:
     working_directory: ~/app
@@ -839,11 +839,28 @@ jobs:
       - image: celohq/node10-gcloud
     steps:
       - run:
+          name: Check if the test should run
+          command: |
+            ./scripts/ci_check_if_test_should_run_v2.sh cli
+      - run:
           name: Installing npm package - @celo/celocli
           command: npm install @celo/celocli
       - run:
           name: Minor test of celocli
           command: ./node_modules/.bin/celocli account:new # Small test
+
+  phone-number-privacy-test:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/app
+      - run:
+          name: Check if the test should run
+          command: |
+            ./scripts/ci_check_if_test_should_run_v2.sh phone-number-privacy
+      - run:
+          name: Run Tests
+          command: yarn --cwd=packages/phone-number-privacy test
 
 workflows:
   version: 2
@@ -856,9 +873,6 @@ workflows:
       - general-test:
           requires:
             - install_dependencies
-      - walletkit-test:
-          requires:
-            - install_dependencies
       - cli-test:
           requires:
             - install_dependencies
@@ -868,9 +882,6 @@ workflows:
       - mobile-test:
           requires:
             - lint-checks
-      - mobile-test-build-app:
-          requires:
-            - mobile-test
       - end-to-end-mobile-test-ios
       - verification-pool-api:
           requires:
@@ -878,7 +889,6 @@ workflows:
       - protocol-test:
           requires:
             - lint-checks
-            - walletkit-test
       - typescript-test:
           requires:
             - install_dependencies
@@ -909,6 +919,9 @@ workflows:
           requires:
             - lint-checks
             - contractkit-test
+      - phone-number-privacy-test:
+          requires:
+            - lint-checks
   npm-install-testing-cron-workflow:
     triggers:
       - schedule:
@@ -922,7 +935,6 @@ workflows:
     jobs:
       - test-typescript-npm-package-install
       - test-utils-npm-package-install
-      - test-walletkit-npm-package-install
       - test-contractkit-npm-package-install
       - test-celocli-npm-package-install
   protocol-testing-with-code-coverage-cron-workflow:
@@ -940,10 +952,6 @@ workflows:
       - lint-checks:
           requires:
             - install_dependencies
-      - walletkit-test:
-          requires:
-            - install_dependencies
       - protocol-test-with-code-coverage:
           requires:
             - lint-checks
-            - walletkit-test

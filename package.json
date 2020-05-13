@@ -22,7 +22,9 @@
     "postinstall": "yarn run lerna run postinstall && patch-package && yarn keys:decrypt",
     "keys:decrypt": "bash scripts/key_placer.sh decrypt",
     "keys:encrypt": "bash scripts/key_placer.sh encrypt",
-    "check:packages": "node ./scripts/check-packages.js"
+    "check:packages": "node ./scripts/check-packages.js",
+    "celotool": "yarn --cwd packages/celotool run --silent cli",
+    "celocli": "yarn --cwd packages/cli run --silent celocli"
   },
   "husky": {
     "hooks": {
@@ -42,13 +44,13 @@
   "devDependencies": {
     "@babel/core": "^7.6.2",
     "@babel/runtime": "^7.6.2",
-    "@types/jest": "^24.0.18",
-    "babel-jest": "^24.9.0",
+    "@types/jest": "^25.1.4",
+    "babel-jest": "^25.1.0",
     "codecov": "^3.6.5",
     "husky": "^3.0.0",
-    "jest": "^24.9.0",
-    "jest-junit": "^8.0.0",
-    "jest-snapshot": "^24.9.0",
+    "jest": "^25.1.0",
+    "jest-junit": "^10.0.0",
+    "jest-snapshot": "^25.1.0",
     "lerna": "^3.16.0",
     "patch-package": "^5.1.1",
     "prettier": "1.19.1",
@@ -56,11 +58,11 @@
     "prettier-plugin-solidity": "1.0.0-alpha.35",
     "pretty-quick": "^2.0.1",
     "solc": "0.5.8",
-    "ts-jest": "^24.1.0",
+    "ts-jest": "^25.2.1",
     "ts-node": "^8.3.0",
     "tsconfig-paths": "^3.8.0",
     "tslint": "^5.20.0",
-    "typescript": "^3.7.3",
+    "typescript": "^3.8.3",
     "typescript-tslint-plugin": "^0.5.4"
   },
   "dependencies": {},
@@ -75,6 +77,13 @@
     "sha3": "1.2.3",
     "bignumber.js": "9.0.0",
     "prettier": "^1.19.1",
-    "@types/prettier": "^1.19.0"
+    "@types/prettier": "^1.19.0",
+    "eslint-utils": "^1.4.1",
+    "set-value": "^3.0.2",
+    "decompress": "^4.2.1",
+    "https-proxy-agent": "^5.0.0",
+    "mixin-deep": "^2.0.1",
+    "js-yaml": "^3.13.1",
+    "ganache-core": "https://github.com/celo-org/ganache-core.git#3dbc32b"
   }
 }

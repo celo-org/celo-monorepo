@@ -70,23 +70,9 @@ rm -f $ENV_FILENAME.bak
 rm -f $ANDROID_GSERVICES_PATH.bak
 rm -f $IOS_GSERVICES_PATH.bak
 
-# Build Wallet Kit for env
-if [ "$FAST" = false ]; then
-  echo "Building sdk for testnet $NETWORK"
-  yarn build:sdk $NETWORK
-  echo "Done building sdk"
-fi
-
 # Build the app and run it
 if [ $PLATFORM = "android" ]; then
   echo "Using platform android"
-
-  # Run jettify to fix non-android-x compatible libs
-  if [ "$FAST" = false ]; then
-    echo "Jetifying react native libraries"
-    cd ../../ && yarn run jetify && cd packages/mobile
-    echo "Jetified"
-  fi
 
   if [ "$BUILD_ONLY" = true ]; then
     echo "Build only enabled, stopping here."

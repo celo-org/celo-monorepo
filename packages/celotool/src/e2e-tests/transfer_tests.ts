@@ -64,7 +64,7 @@ class InflationManager {
   setInflationParameters = async (rate: BigNumber, updatePeriod: number) => {
     const stableToken = await this.kit.contracts.getStableToken()
     await stableToken
-      .setInflationParameters(toFixed(rate).toString(), updatePeriod)
+      .setInflationParameters(toFixed(rate).toFixed(), updatePeriod)
       .sendAndWaitForReceipt({ from: this.validatorAddress })
   }
 }
@@ -72,15 +72,15 @@ class InflationManager {
 const freeze = async (validatorUri: string, validatorAddress: string, token: CeloToken) => {
   const kit = newKit(validatorUri)
   const tokenAddress = await kit.registry.addressFor(token)
-  const freezer = await kit._web3Contracts.getFreezer()
-  await freezer.methods.freeze(tokenAddress).send({ from: validatorAddress })
+  const freezer = await kit.contracts.getFreezer()
+  await freezer.freeze(tokenAddress).sendAndWaitForReceipt({ from: validatorAddress })
 }
 
 const unfreeze = async (validatorUri: string, validatorAddress: string, token: CeloToken) => {
   const kit = newKit(validatorUri)
   const tokenAddress = await kit.registry.addressFor(token)
-  const freezer = await kit._web3Contracts.getFreezer()
-  await freezer.methods.unfreeze(tokenAddress).send({ from: validatorAddress })
+  const freezer = await kit.contracts.getFreezer()
+  await freezer.unfreeze(tokenAddress).sendAndWaitForReceipt({ from: validatorAddress })
 }
 
 const whitelistAddress = async (
@@ -90,7 +90,7 @@ const whitelistAddress = async (
 ) => {
   const kit = newKit(validatorUri)
   const whitelistContract = await kit._web3Contracts.getTransferWhitelist()
-  await whitelistContract.methods.addAddress(address).send({ from: validatorAddress })
+  await whitelistContract.methods.whitelistAddress(address).send({ from: validatorAddress })
 }
 
 const setAddressWhitelist = async (
@@ -101,7 +101,7 @@ const setAddressWhitelist = async (
   const kit = newKit(validatorUri)
   const whitelistContract = await kit._web3Contracts.getTransferWhitelist()
   await whitelistContract.methods
-    .setWhitelist(whitelist)
+    .setDirectlyWhitelistedAddresses(whitelist)
     .send({ from: validatorAddress, gas: 500000 })
 }
 
@@ -119,7 +119,10 @@ const INTRINSIC_TX_GAS_COST = 21000
 // Additional intrinsic gas for a transaction with fee currency specified
 const ADDITIONAL_INTRINSIC_TX_GAS_COST = 50000
 
-const stableTokenTransferGasCost = 29391
+// Gas refund for resetting to the original non-zero value
+const sstoreCleanRefundEIP2200 = 4200
+// Transfer cost of a stable token transfer, accounting for the refund above.
+const stableTokenTransferGasCost = 23631
 
 /** Helper to watch balance changes over accounts */
 interface BalanceWatcher {
@@ -239,6 +242,7 @@ describe('Transfer tests', function(this: any) {
     validating: false,
     syncmode: 'full',
     lightserv: true,
+    gatewayFee: new BigNumber(10000),
     port: 30305,
     rpcport: 8547,
     // We need to set an etherbase here so that the full node will accept transactions from
@@ -285,13 +289,17 @@ describe('Transfer tests', function(this: any) {
     if (currentGethInstance != null) {
       await killInstance(currentGethInstance)
     }
+
+    const light = syncmode === 'light' || syncmode === 'lightest'
     currentGethInstance = {
       name: syncmode,
       validating: false,
       syncmode,
       port: 30307,
       rpcport: 8549,
-      lightserv: syncmode !== 'light' && syncmode !== 'lightest',
+      lightserv: !light,
+      // TODO(nategraf): Remove this when light clients can query for gateway fee.
+      gatewayFee: light ? new BigNumber(10000) : undefined,
       privateKey: DEF_FROM_PK,
     }
 
@@ -741,7 +749,8 @@ describe('Transfer tests', function(this: any) {
 
           describe('feeCurrency = CeloGold >', () => {
             testTransferToken({
-              expectedGas: stableTokenTransferGasCost + INTRINSIC_TX_GAS_COST,
+              expectedGas:
+                stableTokenTransferGasCost + INTRINSIC_TX_GAS_COST + sstoreCleanRefundEIP2200,
               transferToken: CeloContract.StableToken,
               feeToken: CeloContract.GoldToken,
             })
@@ -913,8 +922,8 @@ describe('Transfer tests', function(this: any) {
           describe('check if frozen', () => {
             it('should be frozen', async () => {
               const goldTokenAddress = await kit.registry.addressFor(CeloContract.GoldToken)
-              const freezer = await kit._web3Contracts.getFreezer()
-              const isFrozen = await freezer.methods.isFrozen(goldTokenAddress).call()
+              const freezer = await kit.contracts.getFreezer()
+              const isFrozen = await freezer.isFrozen(goldTokenAddress)
               assert(isFrozen)
             })
           })

@@ -197,7 +197,7 @@ function createDirIfMissing(dir: string) {
 }
 
 function runMigrations(opts: { upto?: number; migrationOverride?: string } = {}) {
-  const cmdArgs = ['truffle', 'migrate']
+  const cmdArgs = ['truffle', 'migrate', '--reset']
 
   if (opts.upto) {
     cmdArgs.push('--to')
@@ -216,10 +216,17 @@ function deployReleaseGold(releaseGoldContracts: string) {
   cmdArgs.push('--network')
   // TODO(lucas): investigate if this can be found dynamically
   cmdArgs.push('development')
+  cmdArgs.push('--from')
+  cmdArgs.push('0x5409ED021D9299bf6814279A6A1411A7e866A631')
   cmdArgs.push('--grants')
   cmdArgs.push(releaseGoldContracts)
   cmdArgs.push('--start_gold')
-  cmdArgs.push('10')
+  cmdArgs.push('1')
+  cmdArgs.push('--deployed_grants')
+  // Random file name to prevent rewriting to it
+  cmdArgs.push('/tmp/deployedGrants' + Math.floor(1000 * Math.random()) + '.json')
+  cmdArgs.push('--output_file')
+  cmdArgs.push('/tmp/releaseGoldOutput.txt')
   // --yesreally command to bypass prompts
   cmdArgs.push('--yesreally')
   cmdArgs.push('--build_directory')
