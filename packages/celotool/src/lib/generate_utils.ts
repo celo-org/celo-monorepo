@@ -236,6 +236,9 @@ export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
     })
   )
 
+  // network start timestamp
+  const timestamp = parseInt(fetchEnvOrFallback(envVar.TIMESTAMP, '0'), 10)
+
   return generateGenesis({
     validators,
     consensusType,
@@ -246,6 +249,7 @@ export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
     chainId,
     requestTimeout,
     enablePetersburg,
+    timestamp,
   })
 }
 
@@ -301,6 +305,7 @@ export const generateGenesis = ({
   chainId,
   requestTimeout,
   enablePetersburg = true,
+  timestamp = 0,
 }: GenesisConfig): string => {
   const genesis: any = { ...TEMPLATE }
 
@@ -362,6 +367,10 @@ export const generateGenesis = ({
         balance: '0',
       }
     }
+  }
+
+  if (timestamp > 0) {
+    genesis.timestamp = timestamp
   }
 
   return JSON.stringify(genesis, null, 2)
