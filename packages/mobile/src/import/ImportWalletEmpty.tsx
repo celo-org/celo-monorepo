@@ -2,7 +2,7 @@ import Button, { BtnTypes } from '@celo/react-components/components/Button'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import { CURRENCIES, CURRENCY_ENUM } from '@celo/utils/src'
-import { RouteProp } from '@react-navigation/native'
+import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native'
@@ -29,9 +29,8 @@ interface StateProps {
 
 type Props = StateProps &
   DispatchProps &
-  WithTranslation & {
-    route: RouteProp<StackParamList, Screens.ImportWalletEmpty>
-  }
+  WithTranslation &
+  StackScreenProps<StackParamList, Screens.ImportWalletEmpty>
 
 const mapStateToProps = (state: RootState): StateProps => {
   return {

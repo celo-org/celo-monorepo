@@ -1,11 +1,11 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
+import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
-import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
@@ -16,17 +16,16 @@ import SafeguardsPeopleIcon from 'src/icons/SafeguardsPeopleIcon'
 import { headerWithBackButton } from 'src/navigator/Headers'
 import { navigate, navigateHome, navigateProtected } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { StackParamList } from 'src/navigator/types'
 import { RootState } from 'src/redux/reducers'
 
 interface DispatchProps {
   exitBackupFlow: typeof exitBackupFlow
 }
 
-interface NavigationProps {
-  incomingFromBackupFlow: boolean
-}
-
-type Props = WithTranslation & DispatchProps & NavigationInjectedProps<NavigationProps>
+type Props = WithTranslation &
+  DispatchProps &
+  StackScreenProps<StackParamList, Screens.BackupSocialIntro>
 
 class BackupSocialIntro extends React.Component<Props> {
   static navigationOptions = () => ({
@@ -34,7 +33,7 @@ class BackupSocialIntro extends React.Component<Props> {
   })
 
   isIncomingFromBackupFlow = () => {
-    return this.props.navigation.getParam('incomingFromBackupFlow', false)
+    return this.props.route.params.incomingFromBackupFlow
   }
 
   onPressContinue = () => {

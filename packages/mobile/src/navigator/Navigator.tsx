@@ -1,4 +1,5 @@
 import colors from '@celo/react-components/styles/colors'
+import { RouteProp } from '@react-navigation/core'
 import { createStackNavigator } from '@react-navigation/stack'
 import * as React from 'react'
 import { Platform } from 'react-native'
@@ -40,8 +41,10 @@ import ImportWalletSocial from 'src/import/ImportWalletSocial'
 import EnterInviteCode from 'src/invite/EnterInviteCode'
 import Language from 'src/language/Language'
 import SelectLocalCurrency from 'src/localCurrency/SelectLocalCurrency'
+import { exchangeHeader } from 'src/navigator/Headers'
 import { Screens, Stacks } from 'src/navigator/Screens'
 import TabNavigator from 'src/navigator/TabNavigator'
+import { StackParamList } from 'src/navigator/types'
 import IncomingPaymentRequestListScreen from 'src/paymentRequest/IncomingPaymentRequestListScreen'
 import OutgoingPaymentRequestListScreen from 'src/paymentRequest/OutgoingPaymentRequestListScreen'
 import PaymentRequestConfirmation from 'src/paymentRequest/PaymentRequestConfirmation'
@@ -65,7 +68,7 @@ import VerificationLearnMoreScreen from 'src/verify/VerificationLearnMoreScreen'
 import VerificationLoadingScreen from 'src/verify/VerificationLoadingScreen'
 import VerificationSuccessScreen from 'src/verify/VerificationSuccessScreen'
 
-const Stack = createStackNavigator()
+const Stack = createStackNavigator<StackParamList>()
 
 export const headerArea = {
   // Force this for now on iOS so screen transitions look normal
@@ -213,6 +216,33 @@ const ExchangeStack = createStackNavigatorStub(
   }
 )
 
+const exchangeTradeOptions = ({
+  route,
+}: {
+  route: RouteProp<StackParamList, Screens.ExchangeTradeScreen>
+}) => exchangeHeader(route.params.makerTokenDisplay.makerToken)
+const exchangeReviewOptions = ({
+  route,
+}: {
+  route: RouteProp<StackParamList, Screens.ExchangeReview>
+}) => exchangeHeader(route.params.exchangeInput.makerToken)
+
+const exchangeScreens = (Navigator: typeof Stack) => (
+  <>
+    <Navigator.Screen
+      name={Screens.ExchangeTradeScreen}
+      component={ExchangeTradeScreen}
+      options={exchangeTradeOptions}
+    />
+    <Navigator.Screen
+      name={Screens.ExchangeReview}
+      component={ExchangeReview}
+      options={exchangeReviewOptions}
+    />
+    <Navigator.Screen name={Screens.FeeExchangeEducation} component={FeeExchangeEducation} />
+  </>
+)
+
 const IncomingRequestStack = createStackNavigatorStub(
   {
     [Screens.IncomingPaymentRequestListScreen]: { screen: IncomingPaymentRequestListScreen },
@@ -342,6 +372,7 @@ export function AppNavigatorNew() {
       {sendScreens(Stack)}
       {nuxScreens(Stack)}
       {verificationScreens(Stack)}
+      {exchangeScreens(Stack)}
     </Stack.Navigator>
   )
 }

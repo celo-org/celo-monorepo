@@ -1,5 +1,5 @@
 import LanguageSelectUI from '@celo/react-components/components/LanguageSelectUI'
-import { useNavigation, useRoute } from '@react-navigation/native'
+import { NavigationProp, RouteProp, useNavigation, useRoute } from '@react-navigation/native'
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
@@ -11,19 +11,12 @@ import { AVAILABLE_LANGUAGES } from 'src/config'
 import i18n, { Namespaces } from 'src/i18n'
 import logo from 'src/images/celo-logo.png'
 import { Screens } from 'src/navigator/Screens'
-
-interface NavParams {
-  name: string
-  key: string
-  params: {
-    nextScreen?: Screens
-  }
-}
+import { StackParamList } from 'src/navigator/types'
 
 export function Language() {
   const [selectedAnswer, setAnswer] = useState(i18n.language || '')
-  const navigation = useNavigation()
-  const route = useRoute<NavParams>()
+  const navigation = useNavigation<NavigationProp<StackParamList, Screens.Language>>()
+  const route = useRoute<RouteProp<StackParamList, Screens.Language>>()
   const dispatch = useDispatch()
   const { t } = useTranslation(Namespaces.accountScreen10)
 

@@ -14,7 +14,7 @@ import { componentStyles } from '@celo/react-components/styles/styles'
 import { ValidatorKind } from '@celo/utils/src/inputValidation'
 import { parseInputAmount } from '@celo/utils/src/parsing'
 import { RouteProp } from '@react-navigation/native'
-import { StackNavigationProp } from '@react-navigation/stack'
+import { StackScreenProps } from '@react-navigation/stack'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
@@ -76,14 +76,8 @@ interface State {
   characterLimitExceeded: boolean
 }
 
-type Navigation = StackNavigationProp<StackParamList, Screens.SendAmount>
 type Route = RouteProp<StackParamList, Screens.SendAmount>
-
-interface OwnProps {
-  navigation: Navigation
-  route: Route
-}
-
+type OwnProps = StackScreenProps<StackParamList, Screens.SendAmount>
 type Props = StateProps & DispatchProps & OwnProps & WithTranslation
 
 interface StateProps {

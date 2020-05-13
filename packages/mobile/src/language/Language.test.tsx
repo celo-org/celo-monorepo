@@ -6,10 +6,9 @@ import Language from 'src/language/Language'
 import { createMockStore } from 'test/utils'
 
 it('renders correctly', () => {
-  const navigation: any = { getParam: jest.fn() }
   const tree = renderer.create(
     <Provider store={createMockStore()}>
-      <Language setLanguage={jest.fn()} navigation={navigation} />
+      <Language setLanguage={jest.fn()} />
     </Provider>
   )
   expect(tree).toMatchSnapshot()

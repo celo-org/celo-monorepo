@@ -25,7 +25,7 @@ export class VerificationReviewScreen extends React.PureComponent<Props> {
   static navigationOptions = { header: null }
 
   getNavigationProps = (): ReviewProps => {
-    const { timestamp, value, phoneNumbers } = this.props.navigation.getParam('reviewProps')
+    const { timestamp, value, phoneNumbers } = this.props.navigation.w('reviewProps')
 
     if (!timestamp || !value || !phoneNumbers) {
       throw new Error('Missing review props')

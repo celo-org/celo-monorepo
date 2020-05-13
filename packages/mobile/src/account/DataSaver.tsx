@@ -2,15 +2,17 @@ import SettingsSwitchItem from '@celo/react-components/components/SettingsSwitch
 import TextButton from '@celo/react-components/components/TextButton'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
+import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import Modal from 'react-native-modal'
-import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import { headerWithBackButton } from 'src/navigator/Headers'
 import { navigateBack } from 'src/navigator/NavigationService'
+import { Screens } from 'src/navigator/Screens'
+import { StackParamList } from 'src/navigator/types'
 import { RootState } from 'src/redux/reducers'
 import { toggleFornoMode } from 'src/web3/actions'
 
@@ -23,7 +25,10 @@ interface DispatchProps {
   toggleFornoMode: typeof toggleFornoMode
 }
 
-type Props = StateProps & DispatchProps & WithTranslation & NavigationInjectedProps
+type Props = StateProps &
+  DispatchProps &
+  WithTranslation &
+  StackScreenProps<StackParamList, Screens.DataSaver>
 
 const mapDispatchToProps = {
   toggleFornoMode,
@@ -90,7 +95,7 @@ export class DataSaver extends React.Component<Props, State> {
   }
 
   componentDidMount() {
-    const promptModalVisible = this.props.navigation.getParam('promptModalVisible')
+    const promptModalVisible = this.props.route.params.promptModalVisible
     if (promptModalVisible) {
       this.setState({
         promptModalVisible,

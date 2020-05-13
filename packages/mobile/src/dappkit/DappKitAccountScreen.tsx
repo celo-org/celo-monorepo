@@ -1,18 +1,19 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
-import { AccountAuthRequest } from '@celo/utils/src/dappkit'
+import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
-import { NavigationParams, NavigationScreenProp } from 'react-navigation'
 import { connect } from 'react-redux'
 import { e164NumberSelector } from 'src/account/selectors'
 import { approveAccountAuth } from 'src/dappkit/dappkit'
 import { Namespaces, withTranslation } from 'src/i18n'
 import DappkitExchangeIcon from 'src/icons/DappkitExchange'
 import { navigateBack, navigateHome } from 'src/navigator/NavigationService'
+import { Screens } from 'src/navigator/Screens'
+import { StackParamList } from 'src/navigator/types'
 import { RootState } from 'src/redux/reducers'
 import Logger from 'src/utils/Logger'
 import { currentAccountSelector } from 'src/web3/selectors'
@@ -22,17 +23,15 @@ const TAG = 'dappkit/DappKitAccountScreen'
 interface State {
   dappName: string | null
 }
-interface OwnProps {
-  errorMessage?: string
-  navigation?: NavigationScreenProp<NavigationParams>
-}
 
 interface StateProps {
   account: string | null
   phoneNumber: string | null
 }
 
-type Props = OwnProps & StateProps & WithTranslation
+type Props = StateProps &
+  WithTranslation &
+  StackScreenProps<StackParamList, Screens.DappKitAccountAuth>
 
 const mapStateToProps = (state: RootState): StateProps => ({
   account: currentAccountSelector(state),
@@ -46,12 +45,7 @@ class DappKitAccountAuthScreen extends React.Component<Props, State> {
   }
 
   componentDidMount() {
-    if (!this.props.navigation) {
-      Logger.error(TAG, 'Missing navigation props')
-      return
-    }
-
-    const request: AccountAuthRequest = this.props.navigation.getParam('dappKitRequest', null)
+    const request = this.props.route.params.dappKitRequest
 
     if (!request) {
       Logger.error(TAG, 'No request found in navigation props')
@@ -61,23 +55,10 @@ class DappKitAccountAuthScreen extends React.Component<Props, State> {
     this.setState({ dappName: request.dappName })
   }
 
-  getErrorMessage() {
-    return (
-      this.props.errorMessage ||
-      (this.props.navigation && this.props.navigation.getParam('errorMessage')) ||
-      ''
-    )
-  }
-
   linkBack = () => {
-    const { account, navigation, phoneNumber } = this.props
+    const { account, route, phoneNumber } = this.props
 
-    if (!navigation) {
-      Logger.error(TAG, 'Missing navigation props')
-      return
-    }
-
-    const request: AccountAuthRequest = navigation.getParam('dappKitRequest', null)
+    const request = route.params.dappKitRequest
 
     if (!request) {
       Logger.error(TAG, 'No request found in navigation props')
@@ -91,7 +72,10 @@ class DappKitAccountAuthScreen extends React.Component<Props, State> {
       Logger.error(TAG, 'No phone number set up for this wallet')
       return
     }
-
+    this.props.navigation.reset({
+      index: 1,
+      routes: [{ name: Screens.WalletHome }],
+    })
     navigateHome({ dispatchAfterNavigate: approveAccountAuth(request) })
   }
 

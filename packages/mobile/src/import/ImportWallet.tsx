@@ -4,8 +4,7 @@ import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
-import { RouteProp } from '@react-navigation/native'
-import { StackNavigationProp } from '@react-navigation/stack'
+import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { ActivityIndicator, Keyboard, StyleSheet, Text, View } from 'react-native'
@@ -48,10 +47,8 @@ interface StateProps {
 
 type Props = StateProps &
   DispatchProps &
-  WithTranslation & {
-    navigation: StackNavigationProp<StackParamList, Screens.ImportWallet>
-    route: RouteProp<StackParamList, Screens.ImportWallet>
-  }
+  WithTranslation &
+  StackScreenProps<StackParamList, Screens.ImportWallet>
 
 const mapStateToProps = (state: RootState): StateProps => {
   return {

@@ -2,7 +2,7 @@ import ReviewFrame from '@celo/react-components/components/ReviewFrame'
 import ReviewHeader from '@celo/react-components/components/ReviewHeader'
 import colors from '@celo/react-components/styles/colors'
 import { CURRENCY_ENUM } from '@celo/utils/src/currencies'
-import { RouteProp } from '@react-navigation/native'
+import { StackScreenProps } from '@react-navigation/stack'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
@@ -85,9 +85,8 @@ interface State {
 
 type Props = DispatchProps &
   StateProps &
-  WithTranslation & {
-    route: RouteProp<StackParamList, Screens.SendConfirmation>
-  }
+  WithTranslation &
+  StackScreenProps<StackParamList, Screens.SendConfirmation>
 
 class SendConfirmation extends React.Component<Props, State> {
   static navigationOptions = { header: null }

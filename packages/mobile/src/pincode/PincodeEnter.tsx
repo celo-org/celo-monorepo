@@ -3,7 +3,7 @@
  * when we need to fetch a PIN from a user.
  */
 import colors from '@celo/react-components/styles/colors'
-import { RouteProp } from '@react-navigation/native'
+import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { StyleSheet } from 'react-native'
@@ -35,9 +35,8 @@ interface DispatchProps {
 
 type Props = StateProps &
   DispatchProps &
-  WithTranslation & {
-    route: RouteProp<StackParamList, Screens.PincodeEnter>
-  }
+  WithTranslation &
+  StackScreenProps<StackParamList, Screens.PincodeEnter>
 
 class PincodeEnter extends React.Component<Props, State> {
   static navigationOptions = { gesturesEnabled: false, ...nuxNavigationOptions }

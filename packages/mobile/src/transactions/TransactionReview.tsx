@@ -1,6 +1,6 @@
 import ReviewFrame from '@celo/react-components/components/ReviewFrame'
 import ReviewHeader from '@celo/react-components/components/ReviewHeader'
-import { RouteProp } from '@react-navigation/native'
+import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { StyleSheet } from 'react-native'
@@ -25,9 +25,7 @@ export interface ReviewProps {
   header: string
 }
 
-type Props = WithTranslation & {
-  route: RouteProp<StackParamList, Screens.TransactionReview>
-}
+type Props = WithTranslation & StackScreenProps<StackParamList, Screens.TransactionReview>
 
 class TransactionReview extends React.PureComponent<Props> {
   static navigationOptions = { header: null }

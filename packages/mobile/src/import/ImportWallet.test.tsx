@@ -11,10 +11,6 @@ jest.mock('src/geth/GethAwareButton', () => {
   return mockButton
 })
 
-jest.mock('react-navigation', () => ({
-  NavigationEvents: 'NavigationEvents',
-}))
-
 describe('ImportWallet', () => {
   it('renders correctly and is disabled with no text', () => {
     const wrapper = render(
