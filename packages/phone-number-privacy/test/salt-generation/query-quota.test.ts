@@ -78,7 +78,7 @@ describe(getRemainingQueryCount, () => {
     mockPerformedQueryCount.mockImplementation(() => new Promise((resolve) => resolve(0)))
     mockIsVerified.mockReturnValue(false)
     mockGetContractKit.mockImplementation(() => contractKitVerifiedNoTx)
-    expect(await getRemainingQueryCount(mockAccount, mockPhoneNumber)).toEqual(2)
+    expect(await getRemainingQueryCount(mockAccount, mockPhoneNumber)).toEqual(202)
   })
   it('Calculates remaining query count for unverified account without any balance', async () => {
     const contractKitVerifiedNoTx = createMockContractKit(
@@ -101,7 +101,7 @@ describe(getRemainingQueryCount, () => {
           new BigNumber(200000000000000000)
         ),
       },
-      createMockWeb3(100)
+      createMockWeb3(0)
     )
     mockPerformedQueryCount.mockImplementation(() => new Promise((resolve) => resolve(0)))
     mockGetContractKit.mockImplementation(() => contractKitVerifiedNoTx)
