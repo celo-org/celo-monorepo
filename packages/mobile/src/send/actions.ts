@@ -25,6 +25,13 @@ export enum Actions {
   MANUAL_ADDRESS_VALIDATION_REQUIRED = 'SEND/MANUAL_ADDRESS_VALIDATION_REQUIRED',
 }
 
+export interface HandleBarcodeDetected {
+  type: Actions.BARCODE_DETECTED
+  data: QrCode
+  scanIsForSecureSend?: true
+  transactionData?: TransactionData
+}
+
 export interface StoreLatestInRecentsAction {
   type: Actions.STORE_LATEST_IN_RECENTS
   recipient: Recipient
@@ -72,6 +79,7 @@ export interface ManualAddressValidationRequiredAction {
 }
 
 export type ActionTypes =
+  | HandleBarcodeDetected
   | StoreLatestInRecentsAction
   | SendPaymentOrInviteAction
   | SendPaymentOrInviteSuccessAction
@@ -90,7 +98,7 @@ export const handleBarcodeDetected = (
   data: QrCode,
   scanIsForSecureSend?: true,
   transactionData?: TransactionData
-) => ({
+): HandleBarcodeDetected => ({
   type: Actions.BARCODE_DETECTED,
   data,
   scanIsForSecureSend,

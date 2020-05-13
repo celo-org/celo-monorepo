@@ -89,9 +89,10 @@ export function* handleBarcode(
       }
 
       const possibleRecievingAddresses = e164NumberToAddress[e164PhoneNumber]
+      // This should never happen as Secure Send is triggered when there are mutliple addrresses
+      // for a given phone number
       if (!possibleRecievingAddresses) {
-        yield put(showError(ErrorMessages.QR_FAILED_NO_PHONE_NUMBER))
-        return
+        throw Error("No addresses associated with recipient's phone number")
       }
 
       const possibleRecievingAddressesFormatted = possibleRecievingAddresses.map((address) =>

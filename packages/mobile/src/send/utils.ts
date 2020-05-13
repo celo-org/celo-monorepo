@@ -207,8 +207,6 @@ const checkForErrorsInFullAddress = (
   possibleRecievingAddresses: string[],
   userAddress: string
 ) => {
-  checkForSpecialChars(userInputtedAddress, true)
-
   if (userInputtedAddress.length !== 42 || userInputtedAddress.slice(0, 2) !== '0x') {
     throw Error(ErrorMessages.ADDRESS_VALIDATION_FULL_POORLY_FORMATTED)
   }
@@ -229,8 +227,6 @@ const checkForErrorsInPartialAddressAndReturnMatch = (
   possibleRecievingAddresses: string[],
   userAddress: string
 ) => {
-  checkForSpecialChars(lastFourDigitsOfUserInputtedAddress, false)
-
   if (lastFourDigitsOfUserInputtedAddress.length !== 4) {
     throw Error(ErrorMessages.ADDRESS_VALIDATION_PARTIAL_POORLY_FORMATTED)
   }
@@ -259,6 +255,8 @@ export const checkForValidationErrorsAndReturnMatch = (
   const userInput = userInputOfFullAddressOrLastFourDigits.toLowerCase()
   const possibleAddresses = possibleRecievingAddresses.map((address) => address.toLowerCase())
   const userOwnAddress = userAddress.toLowerCase()
+
+  checkForSpecialChars(userInputOfFullAddressOrLastFourDigits, fullAddressValidationRequired)
 
   if (fullAddressValidationRequired) {
     return checkForErrorsInFullAddress(userInput, possibleAddresses, userOwnAddress)
