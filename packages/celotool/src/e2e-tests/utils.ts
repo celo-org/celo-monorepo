@@ -245,7 +245,7 @@ export function getContext(gethConfig: GethRunConfig, verbose: boolean = verbose
 
     if (gethConfig.migrate || gethConfig.migrateTo) {
       await migrateContracts(
-        MonorepoRoot,
+        monorepoRoot,
         validatorPrivateKeys,
         attestationKeys,
         validators.map((x) => x.address),
