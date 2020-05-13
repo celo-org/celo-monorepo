@@ -33,7 +33,7 @@ test_sync_blocknumber() {
   current_prev=${current_prev//[$'\t\r\n ']}
   synced=false
   syncing=true
-  local loop_time="60"
+  local loop_time="30"
   while [ "${synced}" != "true" ] && [ "${syncing}" == "true" ]; do
     sleep $loop_time
     current=$(kubectl -n ${namespace} exec -it ${node_pod} -- geth attach --exec 'eth.blockNumber' | $aliassed -r "s/\x1B\[([0-9]{1,3}(;[0-9]{1,2})?)?[mGK]//g")
@@ -68,7 +68,7 @@ test_syn_syncing() {
 
   synced=false
   syncing=true
-  local loop_time="1"
+  local loop_time="60"
   while [ "$synced" != "true" ] && [ "$syncing" == "true" ]; do
     echo "Sleeping ${loop_time}"
     sleep $loop_time
@@ -104,7 +104,7 @@ case ${syncmode} in
     test_syn_syncing
     ;;
   lightest)
-    test_syn_syncing
+    test_sync_blocknumber
     ;;
   *)
     echo "${syncmode} incorrect. Valid values: [full, fast, light, lightest]"
