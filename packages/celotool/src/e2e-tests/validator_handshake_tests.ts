@@ -4,8 +4,8 @@ import { assert } from 'chai'
 import _ from 'lodash'
 import Web3 from 'web3'
 import { Admin } from 'web3-eth-admin'
-import { GethRunConfig } from '../lib/interfaces/geth-run-config'
 import { GethInstanceConfig } from '../lib/interfaces/geth-instance-config'
+import { GethRunConfig } from '../lib/interfaces/geth-run-config'
 import { getContext, killInstance, restartInstance, setProxyConfigurations, sleep } from './utils'
 
 const VALIDATORS = 3
@@ -169,7 +169,7 @@ describe('Validator handshake tests', () => {
       // it is on behalf of the proxied validator.
       await restartInstance(gethConfig, gethConfig.instances[proxyIndex])
       val0ValEnodeTable = await jsonRpc(val0Web3, 'istanbul_getValEnodeTable', [])
-      let val0ProxiedValEntryOld = val0ProxiedValEntry
+      const val0ProxiedValEntryOld = val0ProxiedValEntry
       val0ProxiedValEntry = getValEnodeTableEntry(val0ValEnodeTable, proxiedValAddress)
       assert(
         val0ProxiedValEntry,

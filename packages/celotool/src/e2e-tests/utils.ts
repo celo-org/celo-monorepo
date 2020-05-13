@@ -35,7 +35,7 @@ import { GethRunConfig } from '../lib/interfaces/geth-run-config'
 
 const monorepoRoot = resolvePath(joinPath(__dirname, '../..', '../..'))
 const verboseOutput = false
-const mnemonic =
+const testMnemonic =
   'jazz ripple brown cloth door bridge pen danger deer thumb cable prepare negative library vast'
 
 export async function initAndSyncGethWithRetry(
@@ -195,9 +195,9 @@ export function getHooks(gethConfig: GethRunConfig) {
 export function getContext(gethConfig: GethRunConfig, verbose: boolean = verboseOutput) {
   const validatorInstances = gethConfig.instances.filter((x: any) => x.validating)
   const numValidators = validatorInstances.length
-  const validatorPrivateKeys = getPrivateKeysFor(AccountType.VALIDATOR, mnemonic, numValidators)
-  const attestationKeys = getPrivateKeysFor(AccountType.ATTESTATION, mnemonic, numValidators)
-  const validators = getValidatorsInformation(mnemonic, numValidators)
+  const validatorPrivateKeys = getPrivateKeysFor(AccountType.VALIDATOR, testMnemonic, numValidators)
+  const attestationKeys = getPrivateKeysFor(AccountType.ATTESTATION, testMnemonic, numValidators)
+  const validators = getValidatorsInformation(testMnemonic, numValidators)
 
   const argv = require('minimist')(process.argv.slice(2))
   const branch = argv.branch || 'master'
@@ -227,7 +227,7 @@ export function getContext(gethConfig: GethRunConfig, verbose: boolean = verbose
     let bootnodeEnode: string = ''
 
     if (gethConfig.useBootnode) {
-      bootnodeEnode = await startBootnode(bootnodeBinaryPath, mnemonic, gethConfig, verbose)
+      bootnodeEnode = await startBootnode(bootnodeBinaryPath, testMnemonic, gethConfig, verbose)
     }
 
     setProxyConfigurations(gethConfig, bootnodeEnode)
@@ -268,7 +268,7 @@ export function getContext(gethConfig: GethRunConfig, verbose: boolean = verbose
 
     if (gethConfig.useBootnode) {
       await killBootnode()
-      await startBootnode(bootnodeBinaryPath, mnemonic, gethConfig, verbose)
+      await startBootnode(bootnodeBinaryPath, testMnemonic, gethConfig, verbose)
     }
 
     // just in case
@@ -307,12 +307,12 @@ export function getContext(gethConfig: GethRunConfig, verbose: boolean = verbose
 // Modifies gethConfig to properly configure proxies and proxied instances
 export function setProxyConfigurations(gethConfig: GethRunConfig, bootnodeEnode?: string) {
   const numValidators = gethConfig.instances.filter((x: any) => x.validating).length
-  const validatorPrivateKeys = getPrivateKeysFor(AccountType.VALIDATOR, mnemonic, numValidators)
+  const validatorPrivateKeys = getPrivateKeysFor(AccountType.VALIDATOR, testMnemonic, numValidators)
 
   const proxyInstances = gethConfig.instances.filter((x: any) => x.isProxy)
   const numProxies = proxyInstances.length
 
-  const proxyPrivateKeys = getPrivateKeysFor(AccountType.PROXY, mnemonic, numProxies)
+  const proxyPrivateKeys = getPrivateKeysFor(AccountType.PROXY, testMnemonic, numProxies)
   const proxyEnodes = proxyPrivateKeys.map((x: string, i: number) => {
     const privateKey = proxyInstances[i].privateKey || x
     return [
