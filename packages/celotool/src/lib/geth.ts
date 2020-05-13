@@ -16,6 +16,7 @@ import sleep from 'sleep-promise'
 import Web3 from 'web3'
 import { TransactionReceipt } from 'web3-core'
 import { Admin } from 'web3-eth-admin'
+import { spawnCmd, spawnCmdWithExitOnFailure } from './cmd-utils'
 import { convertToContractDecimals } from './contract-utils'
 import { envVar, fetchEnv, isVmBased } from './env-utils'
 import {
@@ -29,7 +30,7 @@ import {
 import { retrieveClusterIPAddress, retrieveIPAddress } from './helm_deploy'
 import { GethInstanceConfig } from './interfaces/geth-instance-config'
 import { GethRunConfig } from './interfaces/geth-run-config'
-import { ensure0x, spawnCmd, spawnCmdWithExitOnFailure, strip0x } from './utils'
+import { ensure0x, strip0x } from './utils'
 import { getTestnetOutputs } from './vm-testnet-utils'
 
 export async function unlockAccount(
@@ -742,9 +743,9 @@ export async function initAndStartGeth(
   const genesisPath = path.join(gethConfig.runPath, 'genesis.json')
   await init(gethBinaryPath, datadir, genesisPath, verbose)
 
-  // import the key this way only on validators
+  // import the key this way only on validators and groups
   // proxies need another way of importing the key
-  if (instance.privateKey && instance.validating) {
+  if (instance.privateKey && !instance.isProxy) {
     await importPrivateKey(gethConfig, gethBinaryPath, instance, verbose)
   }
 
