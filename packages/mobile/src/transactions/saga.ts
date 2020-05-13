@@ -34,7 +34,7 @@ export function* sendAndMonitorTransaction<T>(
   account: string,
   currency?: CURRENCY_ENUM
 ) {
-  var txTime = Date.now()
+  let txTime = Date.now()
   try {
     Logger.debug(TAG + '@sendAndMonitorTransaction', `Sending transaction with id: ${txId}`)
 
