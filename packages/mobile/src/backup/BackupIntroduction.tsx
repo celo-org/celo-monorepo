@@ -4,7 +4,7 @@ import { default as colors, default as colorsV2 } from '@celo/react-components/s
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import { Sizes } from '@celo/react-components/styles/styles.v2'
 import * as React from 'react'
-import { useTranslation, WithTranslation } from 'react-i18next'
+import { useTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'

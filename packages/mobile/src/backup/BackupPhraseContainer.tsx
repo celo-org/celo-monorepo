@@ -1,3 +1,4 @@
+import Touchable from '@celo/react-components/components/Touchable'
 import withTextInputPasteAware from '@celo/react-components/components/WithTextInputPasteAware'
 import colors from '@celo/react-components/styles/colors.v2'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
@@ -26,6 +27,7 @@ type Props = {
   mode: BackupPhraseContainerMode
   type: BackupPhraseType
   index?: number // e.g. index of safeguard phrase
+  showCopy?: boolean
   style?: ViewStyle
   onChangeText?: (value: string) => void
   testID?: string
@@ -64,7 +66,7 @@ export class BackupPhraseContainer extends React.Component<Props> {
   }
 
   render() {
-    const { t, value: words, style, mode, type, index, testID } = this.props
+    const { t, value: words, showCopy, style, mode, type, index, testID } = this.props
 
     return (
       <View style={style}>
@@ -76,6 +78,11 @@ export class BackupPhraseContainer extends React.Component<Props> {
                 : t('writeDownKey')
               : t('socialBackupPhraseHeader', { index })}
           </Text>
+          {showCopy && (
+            <Touchable borderless={true} onPress={this.onPressCopy}>
+              <Text style={styles.headerButton}>{this.props.t('global:copy')}</Text>
+            </Touchable>
+          )}
         </View>
         {mode === BackupPhraseContainerMode.READONLY && (
           <View style={styles.phraseContainer}>
@@ -120,6 +127,9 @@ const styles = StyleSheet.create({
   },
   headerText: {
     ...fontStyles.regular500,
+  },
+  headerButton: {
+    ...fontStyles.regular,
   },
   phraseContainer: {
     marginTop: 16,
