@@ -125,7 +125,6 @@ exports[`PincodeLock renders correctly 1`] = `
               <View
                 accessible={true}
                 focusable={true}
-                isTVSelectable={true}
                 nativeBackgroundAndroid={
                   Object {
                     "attribute": "selectableItemBackgroundBorderless",
@@ -159,7 +158,6 @@ exports[`PincodeLock renders correctly 1`] = `
               <View
                 accessible={true}
                 focusable={true}
-                isTVSelectable={true}
                 nativeBackgroundAndroid={
                   Object {
                     "attribute": "selectableItemBackgroundBorderless",
@@ -193,7 +191,6 @@ exports[`PincodeLock renders correctly 1`] = `
               <View
                 accessible={true}
                 focusable={true}
-                isTVSelectable={true}
                 nativeBackgroundAndroid={
                   Object {
                     "attribute": "selectableItemBackgroundBorderless",
@@ -238,7 +235,6 @@ exports[`PincodeLock renders correctly 1`] = `
               <View
                 accessible={true}
                 focusable={true}
-                isTVSelectable={true}
                 nativeBackgroundAndroid={
                   Object {
                     "attribute": "selectableItemBackgroundBorderless",
@@ -272,7 +268,6 @@ exports[`PincodeLock renders correctly 1`] = `
               <View
                 accessible={true}
                 focusable={true}
-                isTVSelectable={true}
                 nativeBackgroundAndroid={
                   Object {
                     "attribute": "selectableItemBackgroundBorderless",
@@ -306,7 +301,6 @@ exports[`PincodeLock renders correctly 1`] = `
               <View
                 accessible={true}
                 focusable={true}
-                isTVSelectable={true}
                 nativeBackgroundAndroid={
                   Object {
                     "attribute": "selectableItemBackgroundBorderless",
@@ -351,7 +345,6 @@ exports[`PincodeLock renders correctly 1`] = `
               <View
                 accessible={true}
                 focusable={true}
-                isTVSelectable={true}
                 nativeBackgroundAndroid={
                   Object {
                     "attribute": "selectableItemBackgroundBorderless",
@@ -385,7 +378,6 @@ exports[`PincodeLock renders correctly 1`] = `
               <View
                 accessible={true}
                 focusable={true}
-                isTVSelectable={true}
                 nativeBackgroundAndroid={
                   Object {
                     "attribute": "selectableItemBackgroundBorderless",
@@ -419,7 +411,6 @@ exports[`PincodeLock renders correctly 1`] = `
               <View
                 accessible={true}
                 focusable={true}
-                isTVSelectable={true}
                 nativeBackgroundAndroid={
                   Object {
                     "attribute": "selectableItemBackgroundBorderless",
@@ -477,7 +468,6 @@ exports[`PincodeLock renders correctly 1`] = `
               <View
                 accessible={true}
                 focusable={true}
-                isTVSelectable={true}
                 nativeBackgroundAndroid={
                   Object {
                     "attribute": "selectableItemBackgroundBorderless",
@@ -511,7 +501,6 @@ exports[`PincodeLock renders correctly 1`] = `
               <View
                 accessible={true}
                 focusable={true}
-                isTVSelectable={true}
                 nativeBackgroundAndroid={
                   Object {
                     "attribute": "selectableItemBackgroundBorderless",
@@ -588,7 +577,6 @@ exports[`PincodeLock renders correctly 1`] = `
     <View
       accessible={true}
       focusable={false}
-      isTVSelectable={true}
       nativeBackgroundAndroid={
         Object {
           "attribute": "selectableItemBackground",

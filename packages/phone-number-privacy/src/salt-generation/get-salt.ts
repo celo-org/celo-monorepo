@@ -1,8 +1,12 @@
-import { isValidAddress } from '@celo/utils/lib/address'
 import { Request, Response } from 'firebase-functions'
-import { BLSCryptographyClient } from '../../src/bls/bls-cryptography-client'
+import { BLSCryptographyClient } from '../bls/bls-cryptography-client'
 import { ErrorMessages, respondWithError } from '../common/error-utils'
 import { authenticateUser } from '../common/identity'
+import {
+  hasValidAccountParam,
+  hasValidQueryPhoneNumberParam,
+  isBodyReasonablySized,
+} from '../common/input-validation'
 import logger from '../common/logger'
 import { incrementQueryCount } from '../database/wrappers/account'
 import { getRemainingQueryCount } from './query-quota'
@@ -13,7 +17,10 @@ export async function handleGetBlindedMessageForSalt(request: Request, response:
       respondWithError(response, 400, ErrorMessages.INVALID_INPUT)
       return
     }
-    authenticateUser()
+    if (!authenticateUser(request)) {
+      respondWithError(response, 401, ErrorMessages.UNAUTHENTICATED_USER)
+      return
+    }
     const remainingQueryCount = await getRemainingQueryCount(
       request.body.account,
       request.body.hashedPhoneNumber
@@ -36,20 +43,7 @@ export async function handleGetBlindedMessageForSalt(request: Request, response:
 function isValidGetSignatureInput(requestBody: any): boolean {
   return (
     hasValidAccountParam(requestBody) &&
-    hasValidPhoneNumberParam(requestBody) &&
-    hasValidQueryPhoneNumberParam(requestBody)
+    hasValidQueryPhoneNumberParam(requestBody) &&
+    isBodyReasonablySized(requestBody)
   )
-}
-
-function hasValidAccountParam(requestBody: any): boolean {
-  return requestBody.account && isValidAddress(requestBody.account)
-}
-
-// TODO (amyslawson) make this param optional for user's first request prior to attestation
-function hasValidPhoneNumberParam(requestBody: any): boolean {
-  return requestBody.hashedPhoneNumber
-}
-
-function hasValidQueryPhoneNumberParam(requestBody: any): boolean {
-  return requestBody.blindedQueryPhoneNumber
 }

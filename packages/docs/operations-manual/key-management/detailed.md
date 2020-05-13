@@ -17,17 +17,18 @@ In *most* cases, the Locked Gold Account key has all the privileges as any autho
 Because of the significant priveleges afforded to the Locked Gold Account, it is best to store this key securely and access it as infrequently as is possible. Authorizing other signers is one way to minimize how frequently you need to access your Locked Gold Account key. The Locked Gold Account key will only be used to send transactions and **can be stored on a Ledger hardware wallet.**
 
 ### Creating a Locked Gold Account
+
 A Celo account may be designated as a Locked Gold Account by running the following command:
 
 ```shell
 # Designate the Celo account as a Locked Gold Account
-celocli account:create --from $ADDRESS_TO_DESIGNATE --useLedger
+celocli account:register --from $ADDRESS_TO_DESIGNATE --useLedger
 
 # Confirm the address was designated as a Locked Gold Account
 celocli account:show $ADDRESS_TO_DESIGNATE
 ```
 
-Note that [ReleaseGold](../../celo-codebase/protocol/release-gold) beneficiary keys are considered vanilla Celo accounts with respect to proof-of-stake, and that the `ReleaseGold` contract address is what ultimately gets designated as a Locked Gold Account.
+Note that [ReleaseGold](../../celo-gold-holder-guide/release-gold.md) beneficiary keys are considered vanilla Celo accounts with respect to proof-of-stake, and that the `ReleaseGold` contract address is what ultimately gets designated as a Locked Gold Account.
 
 ## Authorized Vote Signers
 

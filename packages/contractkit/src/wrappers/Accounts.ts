@@ -98,14 +98,12 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
   /**
    * Returns the account associated with `signer`.
    * @param signer The address of the account or previously authorized signer.
-   * @param blockNumber Height of result, defaults to tip.
    * @dev Fails if the `signer` is not an account or previously authorized signer.
    * @return The associated account.
    */
-  signerToAccount(signer: Address, blockNumber?: number): Promise<Address> {
-    // @ts-ignore: Expected 0-1 arguments, but got 2
-    return this.contract.methods.signerToAccount(signer).call({}, blockNumber)
-  }
+  signerToAccount: (signer: Address) => Promise<Address> = proxyCall(
+    this.contract.methods.signerToAccount
+  )
 
   /**
    * Check if an account already exists.
@@ -122,6 +120,14 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
   isSigner: (address: string) => Promise<boolean> = proxyCall(
     this.contract.methods.isAuthorizedSigner
   )
+
+  getCurrentSigners(address: string): Promise<string[]> {
+    return Promise.all([
+      this.getVoteSigner(address),
+      this.getValidatorSigner(address),
+      this.getAttestationSigner(address),
+    ])
+  }
 
   async getAccountSummary(account: string): Promise<AccountSummary> {
     const ret = await Promise.all([

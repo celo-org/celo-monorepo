@@ -1,7 +1,12 @@
-import { isValidAddress } from '@celo/utils/lib/address'
 import { Request, Response } from 'firebase-functions'
 import { ErrorMessages, respondWithError } from '../common/error-utils'
-import { authenticateUser } from '../common/identity'
+import { authenticateUser, isVerified } from '../common/identity'
+import {
+  hasValidAccountParam,
+  hasValidContractPhoneNumbersParam,
+  hasValidUserPhoneNumberParam,
+  isBodyReasonablySized,
+} from '../common/input-validation'
 import logger from '../common/logger'
 import { getDidMatchmaking, setDidMatchmaking } from '../database/wrappers/account'
 import { getNumberPairContacts, setNumberPairContacts } from '../database/wrappers/number-pairs'
@@ -13,10 +18,15 @@ export async function handleGetContactMatches(request: Request, response: Respon
       respondWithError(response, 400, ErrorMessages.INVALID_INPUT)
       return
     }
-    authenticateUser()
-    // TODO (amyslawson) reject unverified user
+    if (!authenticateUser(request)) {
+      respondWithError(response, 401, ErrorMessages.UNAUTHENTICATED_USER)
+      return
+    }
+    if (!(await isVerified(request.body.account, request.body.userPhoneNumber))) {
+      respondWithError(response, 403, ErrorMessages.UNVERIFIED_USER_ATTEMPT_TO_MATCHMAKE)
+      return
+    }
     if (await getDidMatchmaking(request.body.account)) {
-      logger.warn(ErrorMessages.DUPLICATE_REQUEST_TO_MATCHMAKE)
       respondWithError(response, 403, ErrorMessages.DUPLICATE_REQUEST_TO_MATCHMAKE)
       return
     }
@@ -40,18 +50,7 @@ function isValidGetContactMatchesInput(requestBody: any): boolean {
   return (
     hasValidAccountParam(requestBody) &&
     hasValidUserPhoneNumberParam(requestBody) &&
-    hasValidContractPhoneNumbersParam(requestBody)
+    hasValidContractPhoneNumbersParam(requestBody) &&
+    isBodyReasonablySized(requestBody)
   )
-}
-
-function hasValidAccountParam(requestBody: any): boolean {
-  return requestBody.account && isValidAddress(requestBody.account)
-}
-
-function hasValidUserPhoneNumberParam(requestBody: any): boolean {
-  return requestBody.userPhoneNumber
-}
-
-function hasValidContractPhoneNumbersParam(requestBody: any): boolean {
-  return requestBody.contactPhoneNumbers && Array.isArray(requestBody.contactPhoneNumbers)
 }

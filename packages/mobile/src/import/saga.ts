@@ -8,7 +8,6 @@ import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { refreshAllBalances } from 'src/home/actions'
-import { checkVerification } from 'src/identity/verification'
 import {
   Actions,
   backupPhraseEmpty,
@@ -46,7 +45,8 @@ export function* importBackupPhraseSaga({ phrase, useEmptyWallet }: ImportBackup
 
     if (!useEmptyWallet) {
       Logger.debug(TAG + '@importBackupPhraseSaga', 'Checking account balance')
-      const backupAccount = getContractKit().web3.eth.accounts.privateKeyToAccount(
+      const contractKit = yield call(getContractKit)
+      const backupAccount = contractKit.web3.eth.accounts.privateKeyToAccount(
         ensureLeading0x(privateKey)
       ).address
 
@@ -78,10 +78,7 @@ export function* importBackupPhraseSaga({ phrase, useEmptyWallet }: ImportBackup
     yield put(redeemInviteSuccess())
     yield put(refreshAllBalances())
 
-    // Check if the account was verified
-    const isVerified = yield call(checkVerification)
-
-    navigate(isVerified ? Screens.WalletHome : Screens.VerificationEducationScreen)
+    navigate(Screens.VerificationEducationScreen)
 
     yield put(importBackupPhraseSuccess())
   } catch (error) {
