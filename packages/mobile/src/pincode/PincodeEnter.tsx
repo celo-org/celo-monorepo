@@ -34,7 +34,7 @@ interface DispatchProps {
 type Props = StateProps & DispatchProps & WithTranslation & NavigationInjectedProps
 
 class PincodeEnter extends React.Component<Props, State> {
-  static navigationOptions = { gesturesEnabled: false, ...nuxNavigationOptions }
+  static navigationOptions = { gestureEnabled: false, ...nuxNavigationOptions }
 
   state = {
     pin: '',

@@ -23,9 +23,9 @@ export const nuxNavigationOptions = {
   headerTitle: <DisconnectBanner />,
   headerTitleContainerStyle: {
     alignItems: 'center',
-    flex: 1,
     justifyContent: 'center',
   },
+  headerTitleAlign: 'center',
 }
 
 export const nuxNavigationOptionsNoBackButton = {

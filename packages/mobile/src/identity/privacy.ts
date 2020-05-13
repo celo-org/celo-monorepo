@@ -8,8 +8,14 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import networkConfig from 'src/geth/networkConfig'
 import { updateE164PhoneNumberSalts } from 'src/identity/actions'
 import { e164NumberToSaltSelector, E164NumberToSaltType } from 'src/identity/reducer'
+import { navigate, navigateBack } from 'src/navigator/NavigationService'
+import { Screens } from 'src/navigator/Screens'
+import { transferStableToken } from 'src/stableToken/actions'
+import { generateStandbyTransactionId } from 'src/transactions/actions'
+import { waitForTransactionWithId } from 'src/transactions/saga'
 import Logger from 'src/utils/Logger'
 import { getContractKit } from 'src/web3/contracts'
+import { getConnectedUnlockedAccount } from 'src/web3/saga'
 import { currentAccountSelector } from 'src/web3/selectors'
 
 const TAG = 'identity/privacy'
@@ -24,28 +30,7 @@ export interface PhoneNumberHashDetails {
 // Fetch and cache a phone number's salt and hash
 export function* fetchPhoneHashPrivate(e164Number: string) {
   try {
-    Logger.debug(`${TAG}@fetchPrivatePhoneHash`, 'Fetching phone hash details')
-    const saltCache: E164NumberToSaltType = yield select(e164NumberToSaltSelector)
-    const cachedSalt = saltCache[e164Number]
-
-    if (cachedSalt) {
-      Logger.debug(`${TAG}@fetchPrivatePhoneHash`, 'Salt was cached')
-      const phoneHash = getPhoneHash(e164Number, cachedSalt)
-      return { e164Number, phoneHash, salt: cachedSalt }
-    }
-
-    Logger.debug(`${TAG}@fetchPrivatePhoneHash`, 'Salt was not cached, fetching')
-    const account: string = yield select(currentAccountSelector)
-    const contractKit: ContractKit = yield call(getContractKit)
-    const selfPhoneHash: string | undefined = yield call(getUserSelfPhoneHash)
-    const details: PhoneNumberHashDetails = yield call(
-      getPhoneHashPrivate,
-      e164Number,
-      account,
-      contractKit,
-      selfPhoneHash
-    )
-    yield put(updateE164PhoneNumberSalts({ [e164Number]: details.salt }))
+    const details: PhoneNumberHashDetails = yield call(doFetchPhoneHashPrivate, e164Number)
     return details
   } catch (error) {
     if (error.message === ErrorMessages.SALT_QUOTA_EXCEEDED) {
@@ -53,12 +38,46 @@ export function* fetchPhoneHashPrivate(e164Number: string) {
         `${TAG}@fetchPrivatePhoneHash`,
         'Salt quota exceeded, navigating to quota purchase screen'
       )
-      // TODO nav to quota purchase screen
+      const result: boolean = yield call(navigateToQuotaPurchaseScreen)
+      // If quota purchase was successful, try lookup a second time
+      if (result) {
+        const details: PhoneNumberHashDetails = yield call(doFetchPhoneHashPrivate, e164Number)
+        return details
+      } else {
+        throw new Error(ErrorMessages.SALT_QUOTA_EXCEEDED)
+      }
     } else {
       Logger.error(`${TAG}@fetchPrivatePhoneHash`, 'Unknown error', error)
       throw new Error(ErrorMessages.SALT_FETCH_FAILURE)
     }
   }
+}
+
+function* doFetchPhoneHashPrivate(e164Number: string) {
+  yield call(getConnectedUnlockedAccount)
+  Logger.debug(`${TAG}@fetchPrivatePhoneHash`, 'Fetching phone hash details')
+  const saltCache: E164NumberToSaltType = yield select(e164NumberToSaltSelector)
+  const cachedSalt = saltCache[e164Number]
+
+  if (cachedSalt) {
+    Logger.debug(`${TAG}@fetchPrivatePhoneHash`, 'Salt was cached')
+    const phoneHash = getPhoneHash(e164Number, cachedSalt)
+    return { e164Number, phoneHash, salt: cachedSalt }
+  }
+
+  Logger.debug(`${TAG}@fetchPrivatePhoneHash`, 'Salt was not cached, fetching')
+  const account: string = yield select(currentAccountSelector)
+  const contractKit: ContractKit = yield call(getContractKit)
+  const selfPhoneHash: string | undefined = yield call(getUserSelfPhoneHash)
+  const details: PhoneNumberHashDetails = yield call(
+    getPhoneHashPrivate,
+    e164Number,
+    account,
+    contractKit,
+    selfPhoneHash
+  )
+  yield put(updateE164PhoneNumberSalts({ [e164Number]: details.salt }))
+  return details
 }
 
 // Unlike the getPhoneHash in utils, this leverage the phone number
@@ -189,4 +208,43 @@ export function* getUserSelfPhoneHash() {
   }
 
   return PhoneNumberUtils.getPhoneHash(e164Number, salt)
+}
+
+function* navigateToQuotaPurchaseScreen() {
+  try {
+    yield new Promise((resolve, reject) => {
+      navigate(Screens.PhoneNumberLookupQuota, {
+        onBuy: resolve,
+        onSkip: reject,
+      })
+    })
+
+    const ownAddress: string = yield select(currentAccountSelector)
+    const txId = generateStandbyTransactionId(ownAddress)
+    yield put(
+      transferStableToken({
+        recipientAddress: ownAddress, // send payment to yourself
+        amount: '0.01', // one penny
+        comment: 'Lookup Quota Purchase',
+        txId,
+      })
+    )
+
+    const result = yield call(waitForTransactionWithId, txId)
+    if (!result) {
+      throw new Error('Purchase tx failed')
+    }
+
+    Logger.debug(`${TAG}@navigateToQuotaPurchaseScreen`, `Quota purchase successful`)
+    navigateBack()
+    return true
+  } catch (error) {
+    Logger.error(
+      `${TAG}@navigateToQuotaPurchaseScreen`,
+      `Quota purchase cancelled or skipped`,
+      error
+    )
+    navigateBack()
+    return false
+  }
 }

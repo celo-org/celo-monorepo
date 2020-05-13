@@ -49,7 +49,7 @@ const mapStateToProps = (state: RootState): StateProps => {
 }
 
 class VerificationLoadingScreen extends React.Component<Props> {
-  static navigationOptions = { header: null }
+  static navigationOptions = { gestureEnabled: false, header: null }
 
   componentDidMount() {
     BackHandler.addEventListener('hardwareBackPress', this.handleBackButton)
