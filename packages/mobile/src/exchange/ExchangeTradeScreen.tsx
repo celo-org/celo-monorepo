@@ -18,20 +18,21 @@ import { errorSelector } from 'src/alert/reducer'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import { MoneyAmount } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
+import CancelButton from 'src/components/CancelButton.v2'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import LineItemRow from 'src/components/LineItemRow'
 import { DOLLAR_TRANSACTION_MIN_AMOUNT, GOLD_TRANSACTION_MIN_AMOUNT } from 'src/config'
 import { fetchExchangeRate } from 'src/exchange/actions'
 import { ExchangeRatePair } from 'src/exchange/reducer'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
-import { Namespaces, withTranslation } from 'src/i18n'
+import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import { LocalCurrencyCode } from 'src/localCurrency/consts'
 import {
   convertDollarsToMaxSupportedPrecision,
   convertLocalAmountToDollars,
 } from 'src/localCurrency/convert'
 import { getLocalCurrencyCode, getLocalCurrencyExchangeRate } from 'src/localCurrency/selectors'
-import { exchangeHeader } from 'src/navigator/Headers'
+import { HeaderTitleWithBalance, headerWithCancelButton } from 'src/navigator/Headers.v2'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
@@ -79,8 +80,14 @@ const mapStateToProps = (state: RootState): StateProps => ({
 export class ExchangeTradeScreen extends React.Component<Props, State> {
   static navigationOptions = ({ navigation }: NavigationInjectedProps<NavProps>) => {
     const { makerToken } = navigation.getParam('makerTokenDisplay')
+    const title =
+      makerToken === CURRENCY_ENUM.DOLLAR
+        ? i18n.t('exchangeFlow9:buyGold')
+        : i18n.t('exchangeFlow9:sellGold')
     return {
-      ...exchangeHeader(makerToken),
+      ...headerWithCancelButton,
+      headerLeft: <CancelButton style={{ color: colors.dark }} />,
+      headerTitle: <HeaderTitleWithBalance title={title} token={makerToken} />,
     }
   }
 

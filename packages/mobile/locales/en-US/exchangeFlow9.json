@@ -37,5 +37,7 @@
   "feeExchangeEducation": "When making exchanges, a small additional fee goes towards maintaining the stable value of Celo Dollar. To learn more about Celo fees, visit the FAQ.",
   "goldPrice": "Celo Gold Price",
   "yourGoldBalance": "Your Gold Balance",
-  "goldAmount": "Gold Amount"
+  "goldAmount": "Gold Amount",
+  "purchasedGold": "Purchased Gold",
+  "soldGold": "Sold Gold"
 }

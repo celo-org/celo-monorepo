@@ -246,7 +246,7 @@ function CeloGoldHistoryChart({ t, testID, i18n }: Props) {
     const offset = CHART_MIN_VERTICAL_RANGE - (max - min) / 2
     domain = {
       y: [min - offset, max + offset] as [number, number],
-      x: [0, chartData.length] as [number, number],
+      x: [0, chartData.length - 1] as [number, number],
     }
   }
   const rateWentUp = rateChange.gt(0)

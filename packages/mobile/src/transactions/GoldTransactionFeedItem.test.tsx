@@ -7,6 +7,12 @@ import GoldTransactionFeedItem from 'src/transactions/GoldTransactionFeedItem'
 import { TransactionStatus } from 'src/transactions/reducer'
 import { createMockStore, getMockI18nProps } from 'test/utils'
 
+const localAmount = {
+  value: '1.23',
+  exchangeRate: '0.555',
+  currencyCode: 'EUR',
+}
+
 describe('GoldTransactionFeedItem', () => {
   let dateNowSpy: any
   beforeAll(() => {
@@ -30,9 +36,9 @@ describe('GoldTransactionFeedItem', () => {
           __typename="TokenExchange"
           type={TokenTransactionType.Exchange}
           hash={'0x'}
-          amount={{ value: '-1', currencyCode: 'cUSD', localAmount: null }}
-          makerAmount={{ value: '1', currencyCode: 'cUSD', localAmount: null }}
-          takerAmount={{ value: '10', currencyCode: 'cGLD', localAmount: null }}
+          amount={{ value: '-1', currencyCode: 'cUSD', localAmount }}
+          makerAmount={{ value: '1', currencyCode: 'cUSD', localAmount }}
+          takerAmount={{ value: '10', currencyCode: 'cGLD', localAmount }}
           timestamp={1}
           {...getMockI18nProps()}
         />

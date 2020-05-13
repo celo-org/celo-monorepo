@@ -39,7 +39,7 @@ export function ExchangeFeedItem(props: Props) {
       ? exchangeGoldGreen
       : exchangeGreenGold
   const timeFormatted = formatFeedTime(timestamp, i18n)
-  const dateTimeFormatted = getDatetimeDisplayString(timestamp, t, i18n)
+  const dateTimeFormatted = getDatetimeDisplayString(timestamp, i18n)
   const isPending = status === TransactionStatus.Pending
   const exchangeStyle = [styles.exchangeCurrency, isPending && { color: colors.gray }]
   const isSent = new BigNumber(amount.value).isNegative()

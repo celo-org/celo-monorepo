@@ -25,7 +25,7 @@ export enum BtnSizes {
 export interface ButtonProps {
   onPress: () => void
   style?: StyleProp<ViewStyle>
-  text: string
+  text: string | JSX.Element
   accessibilityLabel?: string
   type?: BtnTypes
   disabled?: boolean

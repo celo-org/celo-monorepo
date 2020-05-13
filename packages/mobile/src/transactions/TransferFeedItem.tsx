@@ -76,7 +76,7 @@ export function TransferFeedItem(props: Props) {
 
   const isSent = new BigNumber(amount.value).isNegative()
   const timeFormatted = formatFeedTime(timestamp, i18n)
-  const dateTimeFormatted = getDatetimeDisplayString(timestamp, t, i18n)
+  const dateTimeFormatted = getDatetimeDisplayString(timestamp, i18n)
   const isPending = status === TransactionStatus.Pending
 
   const { title, info, recipient } = getTransferFeedParams(

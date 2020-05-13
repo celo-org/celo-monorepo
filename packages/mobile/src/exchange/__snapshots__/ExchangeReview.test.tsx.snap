@@ -39,9 +39,9 @@ exports[`ExchangeReview renders correctly 1`] = `
               style={
                 Object {
                   "color": "#2E3338",
-                  "fontFamily": "Hind-Regular",
-                  "fontSize": 15,
-                  "lineHeight": 24,
+                  "fontFamily": "Inter-Regular",
+                  "fontSize": 16,
+                  "lineHeight": 22,
                 }
               }
             >
@@ -52,13 +52,13 @@ exports[`ExchangeReview renders correctly 1`] = `
               style={
                 Array [
                   Object {
-                    "color": "#42D689",
-                    "fontFamily": "Hind-Regular",
-                    "fontSize": 24,
-                    "lineHeight": 39,
+                    "color": "#2E3338",
+                    "fontFamily": "Inter-Regular",
+                    "fontSize": 16,
+                    "lineHeight": 22,
                   },
                   Object {
-                    "color": "#42D689",
+                    "color": "#2E3338",
                   },
                 ]
               }
@@ -106,9 +106,9 @@ exports[`ExchangeReview renders correctly 1`] = `
                   Array [
                     Object {
                       "color": "#2E3338",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 15,
-                      "lineHeight": 24,
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 22,
                     },
                     undefined,
                   ]
@@ -137,9 +137,9 @@ exports[`ExchangeReview renders correctly 1`] = `
                 Array [
                   Object {
                     "color": "#2E3338",
-                    "fontFamily": "Hind-Regular",
-                    "fontSize": 15,
-                    "lineHeight": 24,
+                    "fontFamily": "Inter-Regular",
+                    "fontSize": 16,
+                    "lineHeight": 22,
                   },
                   undefined,
                 ]
@@ -188,9 +188,9 @@ exports[`ExchangeReview renders correctly 1`] = `
                   Array [
                     Object {
                       "color": "#2E3338",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 15,
-                      "lineHeight": 24,
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 22,
                     },
                     undefined,
                   ]
@@ -251,9 +251,9 @@ exports[`ExchangeReview renders correctly 1`] = `
                 Array [
                   Object {
                     "color": "#2E3338",
-                    "fontFamily": "Hind-Regular",
-                    "fontSize": 15,
-                    "lineHeight": 24,
+                    "fontFamily": "Inter-Regular",
+                    "fontSize": 16,
+                    "lineHeight": 22,
                   },
                   undefined,
                 ]
@@ -302,9 +302,9 @@ exports[`ExchangeReview renders correctly 1`] = `
                   Array [
                     Object {
                       "color": "#2E3338",
-                      "fontFamily": "Hind-Regular",
-                      "fontSize": 15,
-                      "lineHeight": 24,
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 22,
                     },
                     undefined,
                   ]
@@ -365,9 +365,9 @@ exports[`ExchangeReview renders correctly 1`] = `
                 Array [
                   Object {
                     "color": "#2E3338",
-                    "fontFamily": "Hind-Regular",
-                    "fontSize": 15,
-                    "lineHeight": 24,
+                    "fontFamily": "Inter-Regular",
+                    "fontSize": 16,
+                    "lineHeight": 22,
                   },
                   undefined,
                 ]
@@ -574,111 +574,68 @@ exports[`ExchangeReview renders correctly 1`] = `
   </View>
   <View
     style={
-      Object {
-        "borderTopColor": "rgba(0, 0, 0, 0.05)",
-        "borderTopWidth": 1,
-      }
+      Array [
+        Object {
+          "flexDirection": "row",
+        },
+        Object {
+          "padding": 16,
+        },
+      ]
     }
   >
     <View
+      accessible={true}
+      focusable={true}
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
       style={
-        Array [
-          Object {
-            "alignItems": "center",
-            "borderRadius": 3,
-            "flexDirection": "row",
-          },
-          null,
-          null,
-          undefined,
-          Object {
-            "backgroundColor": "#42D689",
-          },
-        ]
+        Object {
+          "alignItems": "center",
+          "backgroundColor": "#EEB93C",
+          "borderRadius": 100,
+          "flex": 1,
+          "height": 48,
+          "justifyContent": "center",
+          "opacity": 1,
+          "paddingHorizontal": 16,
+          "paddingVertical": 5,
+        }
       }
     >
-      <View
-        accessible={true}
-        focusable={true}
-        nativeBackgroundAndroid={
-          Object {
-            "attribute": "selectableItemBackground",
-            "type": "ThemeAttrAndroid",
-          }
-        }
-        onClick={[Function]}
-        onResponderGrant={[Function]}
-        onResponderMove={[Function]}
-        onResponderRelease={[Function]}
-        onResponderTerminate={[Function]}
-        onResponderTerminationRequest={[Function]}
-        onStartShouldSetResponder={[Function]}
+      <Text
         style={
-          Array [
-            Object {
-              "alignItems": "center",
-              "flex": 1,
-              "justifyContent": "center",
-            },
-            Object {
-              "backgroundColor": "#42D689",
-            },
-            Object {
-              "height": 50,
-            },
-            Object {
-              "borderWidth": 0,
-            },
-          ]
+          Object {
+            "color": "#FFFFFF",
+            "fontFamily": "Inter-SemiBold",
+            "fontSize": 16,
+            "lineHeight": 22,
+          }
         }
       >
-        <View
+        Buy or sell 
+        <Text
+          numberOfLines={1}
           style={
-            Object {
-              "alignItems": "center",
-              "flex": 1,
-              "flexDirection": "row",
-              "justifyContent": "space-between",
-            }
+            Array [
+              undefined,
+              Object {
+                "color": undefined,
+              },
+            ]
           }
         >
-          <Text
-            style={
-              Array [
-                Object {
-                  "fontFamily": "Hind-SemiBold",
-                  "fontSize": 16,
-                },
-                Object {
-                  "color": "#FFFFFF",
-                },
-                Object {
-                  "paddingLeft": 5,
-                  "paddingRight": 5,
-                },
-              ]
-            }
-          >
-            Buy or sell 
-            <Text
-              numberOfLines={1}
-              style={
-                Array [
-                  undefined,
-                  Object {
-                    "color": undefined,
-                  },
-                ]
-              }
-            >
-              
-              
-              10.000
-            </Text>
-             Gold
-          </Text>
-        </View>
-      </View>
+          
+          
+          10.000
+        </Text>
+         Gold
+      </Text>
     </View>
   </View>
 </SafeAreaView>

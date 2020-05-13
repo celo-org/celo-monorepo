@@ -49,8 +49,8 @@ exports[`GoldTransactionFeedItem renders correctly 1`] = `
             Object {
               "color": "#2E3338",
               "fontFamily": "Inter-Medium",
-              "fontSize": 15,
-              "lineHeight": 20,
+              "fontSize": 16,
+              "lineHeight": 22,
             }
           }
         >
@@ -61,8 +61,8 @@ exports[`GoldTransactionFeedItem renders correctly 1`] = `
             Object {
               "color": "#2E3338",
               "fontFamily": "Inter-Medium",
-              "fontSize": 15,
-              "lineHeight": 20,
+              "fontSize": 16,
+              "lineHeight": 22,
             }
           }
         >
@@ -75,8 +75,8 @@ exports[`GoldTransactionFeedItem renders correctly 1`] = `
               Object {
                 "color": "#2E3338",
                 "fontFamily": "Inter-Medium",
-                "fontSize": 15,
-                "lineHeight": 20,
+                "fontSize": 16,
+                "lineHeight": 22,
               },
               Object {
                 "color": "#2E3338",
@@ -85,8 +85,8 @@ exports[`GoldTransactionFeedItem renders correctly 1`] = `
           }
         >
           
-          0.1
-           MXN
+          0.55
+           EUR
         </Text>
       </View>
       <View>
@@ -97,9 +97,8 @@ exports[`GoldTransactionFeedItem renders correctly 1`] = `
               Object {
                 "color": "#2E3338",
                 "fontFamily": "Inter-Medium",
-                "fontSize": 15,
-                "lineHeight": 20,
-                "marginRight": 12,
+                "fontSize": 16,
+                "lineHeight": 22,
               },
               Object {
                 "color": "#2E3338",
@@ -107,9 +106,9 @@ exports[`GoldTransactionFeedItem renders correctly 1`] = `
             ]
           }
         >
-          -
-          $
-          1.33
+          
+          €
+          1.23
         </Text>
       </View>
     </View>

@@ -2,7 +2,6 @@ import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Bu
 import HorizontalLine from '@celo/react-components/components/HorizontalLine'
 import colors from '@celo/react-components/styles/colors.v2'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
-import { componentStyles } from '@celo/react-components/styles/styles'
 import variables from '@celo/react-components/styles/variables'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
@@ -14,6 +13,7 @@ import { connect } from 'react-redux'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import componentWithAnalytics from 'src/analytics/wrapper'
+import CancelButton from 'src/components/CancelButton.v2'
 import CurrencyDisplay, { FormatType } from 'src/components/CurrencyDisplay'
 import FeeIcon from 'src/components/FeeIcon'
 import LineItemRow from 'src/components/LineItemRow.v2'
@@ -21,8 +21,11 @@ import TotalLineItem from 'src/components/TotalLineItem'
 import { exchangeTokens, fetchExchangeRate, fetchTobinTax } from 'src/exchange/actions'
 import { ExchangeRatePair } from 'src/exchange/reducer'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
-import { Namespaces, withTranslation } from 'src/i18n'
-import { exchangeHeader } from 'src/navigator/Headers'
+import i18n, { Namespaces, withTranslation } from 'src/i18n'
+import { HeaderTitleWithBalance, headerWithCancelButton } from 'src/navigator/Headers.v2'
+import { navigate, navigateBack } from 'src/navigator/NavigationService'
+import { Screens } from 'src/navigator/Screens'
+import { TopBarTextButton } from 'src/navigator/TopBarButton.v2'
 import { RootState } from 'src/redux/reducers'
 import { isAppConnected } from 'src/redux/selectors'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
@@ -70,8 +73,24 @@ const mapStateToProps = (state: RootState): StateProps => ({
 export class ExchangeReview extends React.Component<Props, State> {
   static navigationOptions = ({ navigation }: NavigationInjectedProps<NavProps>) => {
     const { makerToken } = navigation.getParam('exchangeInput')
+    const goBack = () => navigateBack()
+    const goExchangeHome = () => navigate(Screens.ExchangeHomeScreen)
+    const title =
+      makerToken === CURRENCY_ENUM.DOLLAR
+        ? i18n.t('exchangeFlow9:buyGold')
+        : i18n.t('exchangeFlow9:sellGold')
     return {
-      ...exchangeHeader(makerToken),
+      ...headerWithCancelButton,
+      headerLeft: <CancelButton style={{ color: colors.dark }} onCancel={goExchangeHome} />,
+      headerRight: (
+        <TopBarTextButton
+          title={i18n.t('global:edit')}
+          testID="EditButton"
+          onPress={goBack}
+          titleStyle={{ color: colors.goldDark }}
+        />
+      ),
+      headerTitle: <HeaderTitleWithBalance title={title} token={makerToken} />,
     }
   }
 
@@ -241,7 +260,6 @@ export class ExchangeReview extends React.Component<Props, State> {
               Buy or sell <CurrencyDisplay amount={goldAmount} /> Gold
             </Trans>
           }
-          standard={false}
           style={styles.buyBtn}
           disabled={!appConnected || exchangeRate.isZero()}
           type={BtnTypes.TERTIARY}
