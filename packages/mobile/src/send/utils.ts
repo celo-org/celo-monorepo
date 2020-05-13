@@ -2,11 +2,7 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import { FeeType } from 'src/fees/actions'
 import { E164NumberToAddressType, RecipientVerificationStatus } from 'src/identity/reducer'
 import { Recipient, RecipientKind } from 'src/recipients/recipient'
-import {
-  ConfirmationInput,
-  ManuallyValidatedE164NumberToAddress,
-  TransactionData,
-} from 'src/send/reducers'
+import { ConfirmationInput, SecureSendPhoneNumberMapping, TransactionData } from 'src/send/reducers'
 import Logger from 'src/utils/Logger'
 
 export const formatDisplayName = (displayName: string) => {
@@ -20,7 +16,7 @@ export const formatDisplayName = (displayName: string) => {
 export const getAddressFromPhoneNumber = (
   e164Number: string,
   e164NumberToAddress: E164NumberToAddressType,
-  manuallyValidatedE164NumberToAddress: ManuallyValidatedE164NumberToAddress
+  secureSendPhoneNumberMapping: SecureSendPhoneNumberMapping
 ): string | null | undefined => {
   const addresses = e164NumberToAddress[e164Number]
 
@@ -34,7 +30,11 @@ export const getAddressFromPhoneNumber = (
 
   if (addresses.length > 1) {
     Logger.warn('Number mapped to multiple addresses, need to disambiguate')
-    const validatedAddress = manuallyValidatedE164NumberToAddress[e164Number]
+    let validatedAddress
+    if (secureSendPhoneNumberMapping[e164Number]) {
+      validatedAddress = secureSendPhoneNumberMapping[e164Number].address
+    }
+
     if (!validatedAddress) {
       throw new Error(
         'Multiple addresses but none were manually validated. Should have routed through secure send.'
@@ -50,7 +50,7 @@ export const getAddressFromPhoneNumber = (
 export const getConfirmationInput = (
   transactionData: TransactionData,
   e164NumberToAddress: E164NumberToAddressType,
-  manuallyValidatedE164NumberToAddress: ManuallyValidatedE164NumberToAddress
+  secureSendPhoneNumberMapping: SecureSendPhoneNumberMapping
 ): ConfirmationInput => {
   const { recipient } = transactionData
   let recipientAddress: string | null | undefined
@@ -65,7 +65,7 @@ export const getConfirmationInput = (
     recipientAddress = getAddressFromPhoneNumber(
       recipient.e164PhoneNumber,
       e164NumberToAddress,
-      manuallyValidatedE164NumberToAddress
+      secureSendPhoneNumberMapping
     )
   }
 
@@ -148,9 +148,10 @@ const checkIfLast4DigitsAreUnique = (addressArr: string[]) => {
 const checkIfAccidentallyHasBypassedValidation = (
   newAddresses: string[] | null,
   e164Number: string,
-  manuallyValidatedE164NumberToAddress: ManuallyValidatedE164NumberToAddress
+  secureSendPhoneNumberMapping: SecureSendPhoneNumberMapping
 ) => {
-  const validatedAddress = manuallyValidatedE164NumberToAddress[e164Number]
+  const validatedAddress =
+    secureSendPhoneNumberMapping[e164Number] || secureSendPhoneNumberMapping[e164Number].address
   return newAddresses && newAddresses.length > 1 && !validatedAddress
 }
 
@@ -158,7 +159,7 @@ export const checkIfValidationRequired = (
   oldAddresses: string[] | undefined | null,
   newAddresses: string[] | null,
   userAddress: string,
-  manuallyValidatedE164NumberToAddress: ManuallyValidatedE164NumberToAddress,
+  secureSendPhoneNumberMapping: SecureSendPhoneNumberMapping,
   e164Number: string,
   TAG: string
 ) => {
@@ -172,11 +173,7 @@ export const checkIfValidationRequired = (
 
   if (
     checkIfNewAddressesAdded(oldAddresses, newAddresses) ||
-    checkIfAccidentallyHasBypassedValidation(
-      newAddresses,
-      e164Number,
-      manuallyValidatedE164NumberToAddress
-    )
+    checkIfAccidentallyHasBypassedValidation(newAddresses, e164Number, secureSendPhoneNumberMapping)
   ) {
     Logger.debug(
       TAG + '@fetchPhoneAddressesAndAddressValidationStatus',
@@ -262,4 +259,34 @@ export const checkForValidationErrorsAndReturnMatch = (
     return checkForErrorsInFullAddress(userInput, possibleAddresses, userOwnAddress)
   }
   return checkForErrorsInPartialAddressAndReturnMatch(userInput, possibleAddresses, userOwnAddress)
+}
+
+export const checkIfAddressValidationRequired = (
+  recipient: Recipient,
+  secureSendPhoneNumberMapping: SecureSendPhoneNumberMapping
+) => {
+  let addressValidationRequired = false
+  let fullValidationRequired = false
+
+  if (recipient.kind === RecipientKind.QrCode || recipient.kind === RecipientKind.Address) {
+    return { addressValidationRequired, fullValidationRequired }
+  }
+
+  const { e164PhoneNumber } = recipient
+
+  if (!e164PhoneNumber) {
+    throw new Error('Missing recipient e164Number')
+  }
+
+  if (
+    secureSendPhoneNumberMapping[e164PhoneNumber] &&
+    secureSendPhoneNumberMapping[e164PhoneNumber].addressValidationRequired
+  ) {
+    ;({ addressValidationRequired, fullValidationRequired } = secureSendPhoneNumberMapping[
+      e164PhoneNumber
+    ])
+    return { addressValidationRequired, fullValidationRequired }
+  }
+
+  return { addressValidationRequired, fullValidationRequired }
 }

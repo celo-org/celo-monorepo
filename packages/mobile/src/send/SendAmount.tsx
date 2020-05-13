@@ -53,7 +53,7 @@ import { Screens } from 'src/navigator/Screens'
 import { Recipient, RecipientKind } from 'src/recipients/recipient'
 import { RootState } from 'src/redux/reducers'
 import { TransactionData } from 'src/send/reducers'
-import { getFeeType, getVerificationStatus } from 'src/send/utils'
+import { checkIfAddressValidationRequired, getFeeType, getVerificationStatus } from 'src/send/utils'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { fetchDollarBalance } from 'src/stableToken/actions'
 import { withDecimalSeparator } from 'src/utils/withDecimalSeparator'
@@ -85,7 +85,7 @@ interface StateProps {
   localCurrencyExchangeRate: string | null | undefined
   recipient: Recipient
   recipientVerificationStatus: RecipientVerificationStatus
-  manualAddressValidationRequired: boolean
+  addressValidationRequired: boolean
   fullValidationRequired: boolean
 }
 
@@ -100,7 +100,11 @@ interface DispatchProps {
 const mapStateToProps = (state: RootState, ownProps: NavigationInjectedProps): StateProps => {
   const { navigation } = ownProps
   const recipient = navigation.getParam('recipient')
-  const { manualAddressValidationRequired, fullValidationRequired } = state.send
+  const { secureSendPhoneNumberMapping } = state.send
+  const { addressValidationRequired, fullValidationRequired } = checkIfAddressValidationRequired(
+    recipient,
+    secureSendPhoneNumberMapping
+  )
   const { e164NumberToAddress } = state.identity
   const recipientVerificationStatus = getVerificationStatus(recipient, e164NumberToAddress)
   const feeType = getFeeType(recipientVerificationStatus)
@@ -114,7 +118,7 @@ const mapStateToProps = (state: RootState, ownProps: NavigationInjectedProps): S
     localCurrencyExchangeRate: getLocalCurrencyExchangeRate(state),
     recipient,
     recipientVerificationStatus,
-    manualAddressValidationRequired,
+    addressValidationRequired,
     fullValidationRequired,
   }
 }
@@ -205,10 +209,10 @@ export class SendAmount extends React.Component<Props, State> {
   onSend = () => {
     const {
       recipientVerificationStatus,
-      manualAddressValidationRequired,
+      addressValidationRequired,
       fullValidationRequired,
     } = this.props
-    console.log('Recipient Verification Status: ', recipientVerificationStatus)
+
     const { isDollarBalanceSufficient } = this.isAmountValid()
     if (!isDollarBalanceSufficient) {
       this.props.showError(ErrorMessages.NSF_TO_SEND)
@@ -227,7 +231,7 @@ export class SendAmount extends React.Component<Props, State> {
 
     this.props.hideAlert()
 
-    if (manualAddressValidationRequired) {
+    if (addressValidationRequired) {
       navigate(Screens.ValidateRecipientIntro, { transactionData, fullValidationRequired })
     } else {
       CeloAnalytics.track(CustomEventNames.send_continue)
@@ -236,10 +240,10 @@ export class SendAmount extends React.Component<Props, State> {
   }
 
   onRequest = () => {
-    const { manualAddressValidationRequired, fullValidationRequired } = this.props
+    const { addressValidationRequired, fullValidationRequired } = this.props
     const transactionData = this.getTransactionData(TokenTransactionType.PayRequest)
 
-    if (manualAddressValidationRequired) {
+    if (addressValidationRequired) {
       navigate(Screens.ValidateRecipientIntro, {
         transactionData,
         fullValidationRequired,

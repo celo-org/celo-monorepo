@@ -50,11 +50,11 @@ const mapStateToProps = (state: RootState, ownProps: NavigationInjectedProps): S
   const { navigation } = ownProps
   const transactionData = navigation.getParam('transactionData')
   const { e164NumberToAddress } = state.identity
-  const { manuallyValidatedE164NumberToAddress } = state.send
+  const { secureSendPhoneNumberMapping } = state.send
   const confirmationInput = getConfirmationInput(
     transactionData,
     e164NumberToAddress,
-    manuallyValidatedE164NumberToAddress
+    secureSendPhoneNumberMapping
   )
   return {
     confirmationInput,

@@ -174,8 +174,12 @@ describe('SendAmount', () => {
     it('navigates to ValidatRecipientIntro screen on Send click when a manual address check is needed', () => {
       const store = createMockStore({
         send: {
-          manualAddressValidationRequired: true,
-          fullValidationRequired: true,
+          secureSendPhoneNumberMapping: {
+            [mockE164NumberInvite]: {
+              addressValidationRequired: true,
+              fullValidationRequired: true,
+            },
+          },
         },
         identity: {
           e164NumberToAddress: mockE164NumberToAddress,
@@ -202,8 +206,12 @@ describe('SendAmount', () => {
     it('navigates to SendConfirmation screen on Send click when a manual address check is not needed', () => {
       const store = createMockStore({
         send: {
-          manualAddressValidationRequired: false,
-          fullValidationRequired: true,
+          secureSendPhoneNumberMapping: {
+            [mockE164NumberInvite]: {
+              addressValidationRequired: false,
+              fullValidationRequired: true,
+            },
+          },
         },
         identity: {
           e164NumberToAddress: mockE164NumberToAddress,
@@ -229,11 +237,15 @@ describe('SendAmount', () => {
     it('navigates to ValidatRecipientIntro screen on Request click when a manual address check is needed', () => {
       const store = createMockStore({
         send: {
-          manualAddressValidationRequired: true,
-          fullValidationRequired: true,
+          secureSendPhoneNumberMapping: {
+            [mockE164NumberInvite]: {
+              addressValidationRequired: true,
+              fullValidationRequired: true,
+            },
+          },
         },
         identity: {
-          e164NumberToAddress: { [mockE164NumberInvite]: [mockAccountInvite] },
+          e164NumberToAddress: mockE164NumberToAddress,
         },
         ...storeData,
       })
@@ -259,11 +271,15 @@ describe('SendAmount', () => {
     it('navigates to PaymentRequestConfirmation screen on Request click when a manual address check is not needed', () => {
       const store = createMockStore({
         send: {
-          manualAddressValidationRequired: false,
-          fullValidationRequired: true,
+          secureSendPhoneNumberMapping: {
+            [mockE164NumberInvite]: {
+              addressValidationRequired: false,
+              fullValidationRequired: true,
+            },
+          },
         },
         identity: {
-          e164NumberToAddress: { [mockE164NumberInvite]: [mockAccountInvite] },
+          e164NumberToAddress: mockE164NumberToAddress,
         },
         ...storeData,
       })

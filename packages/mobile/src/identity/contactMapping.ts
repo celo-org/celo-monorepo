@@ -25,8 +25,8 @@ import {
 } from 'src/identity/reducer'
 import { setRecipientCache } from 'src/recipients/actions'
 import { contactsToRecipients, NumberToRecipient } from 'src/recipients/recipient'
-import { manualAddressValidationRequired } from 'src/send/actions'
-import { manuallyValidatedE164NumberToAddressSelector } from 'src/send/reducers'
+import { secureSendRequired } from 'src/send/actions'
+import { secureSendPhoneNumberMappingSelector } from 'src/send/reducers'
 import { checkIfValidationRequired } from 'src/send/utils'
 import { getAllContacts } from 'src/utils/contacts'
 import Logger from 'src/utils/Logger'
@@ -153,19 +153,19 @@ export function* fetchPhoneAddressesAndCheckIfRecipientValidationRequired({
     }
 
     const userAddress = yield select(userAddressSelector)
-    const manuallyValidatedE164NumberToAddress = yield select(
-      manuallyValidatedE164NumberToAddressSelector
-    )
+    const secureSendPhoneNumberMapping = yield select(secureSendPhoneNumberMappingSelector)
     const { validationRequired, fullValidationRequired } = checkIfValidationRequired(
       oldAddresses,
       addresses,
       userAddress,
-      manuallyValidatedE164NumberToAddress,
+      secureSendPhoneNumberMapping,
       e164Number,
       TAG
     )
 
-    yield put(manualAddressValidationRequired(validationRequired, fullValidationRequired))
+    if (validationRequired) {
+      yield put(secureSendRequired(e164Number, fullValidationRequired))
+    }
 
     yield put(
       updateE164PhoneNumberAddresses(e164NumberToAddressUpdates, addressToE164NumberUpdates)

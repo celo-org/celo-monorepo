@@ -22,7 +22,7 @@ export enum Actions {
   VALIDATE_RECIPIENT_ADDRESS = 'SEND/VALIDATE_RECIPIENT_ADDRESS',
   VALIDATE_RECIPIENT_ADDRESS_SUCCESS = 'SEND/VALIDATE_RECIPIENT_ADDRESS_SUCCESS',
   VALIDATE_RECIPIENT_ADDRESS_FAILURE = 'SEND/VALIDATE_RECIPIENT_ADDRESS_FAILURE',
-  MANUAL_ADDRESS_VALIDATION_REQUIRED = 'SEND/MANUAL_ADDRESS_VALIDATION_REQUIRED',
+  SECURE_SEND_REQUIRED = 'SEND/SECURE_SEND_REQUIRED',
 }
 
 export interface HandleBarcodeDetected {
@@ -72,9 +72,9 @@ export interface ValidateRecipientAddressFailureAction {
   type: Actions.VALIDATE_RECIPIENT_ADDRESS_FAILURE
 }
 
-export interface ManualAddressValidationRequiredAction {
-  type: Actions.MANUAL_ADDRESS_VALIDATION_REQUIRED
-  validationRequired: boolean
+export interface SecureSendRequiredAction {
+  type: Actions.SECURE_SEND_REQUIRED
+  e164Number: E164Number
   fullValidationRequired: boolean
 }
 
@@ -87,7 +87,7 @@ export type ActionTypes =
   | ValidateRecipientAddressAction
   | ValidateRecipientAddressSuccessAction
   | ValidateRecipientAddressFailureAction
-  | ManualAddressValidationRequiredAction
+  | SecureSendRequiredAction
 
 export const storeLatestInRecents = (recipient: Recipient): StoreLatestInRecentsAction => ({
   type: Actions.STORE_LATEST_IN_RECENTS,
@@ -159,11 +159,11 @@ export const validateRecipientAddressFailure = (): ValidateRecipientAddressFailu
   type: Actions.VALIDATE_RECIPIENT_ADDRESS_FAILURE,
 })
 
-export const manualAddressValidationRequired = (
-  validationRequired: boolean,
+export const secureSendRequired = (
+  e164Number: E164Number,
   fullValidationRequired: boolean
-): ManualAddressValidationRequiredAction => ({
-  type: Actions.MANUAL_ADDRESS_VALIDATION_REQUIRED,
-  validationRequired,
+): SecureSendRequiredAction => ({
+  type: Actions.SECURE_SEND_REQUIRED,
+  e164Number,
   fullValidationRequired,
 })

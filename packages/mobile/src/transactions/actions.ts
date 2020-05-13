@@ -3,7 +3,7 @@ import { ExchangeConfirmationCardProps } from 'src/exchange/ExchangeConfirmation
 import i18n from 'src/i18n'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import { ConfirmationInput as SendConfirmationCardProps } from 'src/send/SendConfirmation'
+import { ConfirmationInput } from 'src/send/reducers'
 import { TransferConfirmationCardProps } from 'src/send/TransferConfirmationCard'
 import { StandbyTransaction } from 'src/transactions/reducer'
 import { web3ForUtils } from 'src/web3/contracts'
@@ -139,6 +139,6 @@ export const navigateToExchangeReview = (
   })
 }
 
-export const navigateToRequestedPaymentReview = (confirmationInput: SendConfirmationCardProps) => {
+export const navigateToRequestedPaymentReview = (confirmationInput: ConfirmationInput) => {
   navigate(Screens.SendConfirmation, { confirmationInput })
 }

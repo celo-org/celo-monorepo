@@ -1,3 +1,4 @@
+import { CURRENCY_ENUM } from '@celo/utils/src/currencies'
 import React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { View } from 'react-native'
@@ -9,12 +10,13 @@ import { declinePaymentRequest } from 'src/firebase/actions'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import { fetchPhoneAddressesAndCheckIfRecipientValidationRequired } from 'src/identity/actions'
 import { e164NumberToAddressSelector, E164NumberToAddressType } from 'src/identity/reducer'
-import {
-  NotificationList,
-  titleWithBalanceNavigationOptions,
-} from 'src/notifications/NotificationList'
+import { HeaderTitleWithBalance } from 'src/navigator/Headers'
+import { NotificationList } from 'src/notifications/NotificationList'
 import IncomingPaymentRequestListItem from 'src/paymentRequest/IncomingPaymentRequestListItem'
-import { getRecipientFromPaymentRequest } from 'src/paymentRequest/utils'
+import {
+  getAddressValidationCheckCache,
+  getRecipientFromPaymentRequest,
+} from 'src/paymentRequest/utils'
 import { NumberToRecipient } from 'src/recipients/recipient'
 import { recipientCacheSelector } from 'src/recipients/reducer'
 import { RootState } from 'src/redux/reducers'
@@ -23,8 +25,7 @@ interface StateProps {
   paymentRequests: PaymentRequest[]
   e164PhoneNumberAddressMapping: E164NumberToAddressType
   recipientCache: NumberToRecipient
-  manualAddressValidationRequired: boolean
-  fullValidationRequired: boolean
+  addressValidationCheckCache: AddressValidationCheckCache
 }
 
 interface DispatchProps {
@@ -32,15 +33,30 @@ interface DispatchProps {
   fetchPhoneAddressesAndCheckIfRecipientValidationRequired: typeof fetchPhoneAddressesAndCheckIfRecipientValidationRequired
 }
 
+export interface AddressValidationCheckCache {
+  [e164Number: string]: {
+    addressValidationRequired: boolean
+    fullValidationRequired: boolean
+  }
+}
+
 const mapStateToProps = (state: RootState): StateProps => {
-  const { manualAddressValidationRequired, fullValidationRequired } = state.send
+  const paymentRequests = getIncomingPaymentRequests(state)
+  const e164PhoneNumberAddressMapping = e164NumberToAddressSelector(state)
+  const recipientCache = recipientCacheSelector(state)
+  const { secureSendPhoneNumberMapping } = state.send
+  const addressValidationCheckCache = getAddressValidationCheckCache(
+    paymentRequests,
+    recipientCache,
+    secureSendPhoneNumberMapping
+  )
+
   return {
     dollarBalance: state.stableToken.balance,
-    paymentRequests: getIncomingPaymentRequests(state),
-    e164PhoneNumberAddressMapping: e164NumberToAddressSelector(state),
-    recipientCache: recipientCacheSelector(state),
-    manualAddressValidationRequired,
-    fullValidationRequired,
+    paymentRequests,
+    e164PhoneNumberAddressMapping,
+    recipientCache,
+    addressValidationCheckCache,
   }
 }
 
@@ -54,11 +70,18 @@ type Props = NavigationInjectedProps & WithTranslation & StateProps & DispatchPr
 export const listItemRenderer = (params: {
   recipientCache: NumberToRecipient
   declinePaymentRequest: typeof declinePaymentRequest
-  fetchPhoneAddressesAndCheckIfRecipientValidationRequired: typeof fetchPhoneAddressesAndCheckIfRecipientValidationRequired
-  manualAddressValidationRequired: boolean
-  fullValidationRequired: boolean
+  addressValidationCheckCache?: AddressValidationCheckCache
 }) => (request: PaymentRequest, key: number | undefined = undefined) => {
   const requester = getRecipientFromPaymentRequest(request, params.recipientCache)
+  const { addressValidationCheckCache } = params
+  let validationObj
+
+  if (addressValidationCheckCache) {
+    if (!requester.e164PhoneNumber) {
+      throw Error('Error finding phone number')
+    }
+    validationObj = addressValidationCheckCache[requester.e164PhoneNumber]
+  }
 
   return (
     <View key={key}>
@@ -68,29 +91,52 @@ export const listItemRenderer = (params: {
         requester={requester}
         comment={request.comment}
         declinePaymentRequest={params.declinePaymentRequest}
-        fetchPhoneAddressesAndCheckIfRecipientValidationRequired={
-          params.fetchPhoneAddressesAndCheckIfRecipientValidationRequired
-        }
-        manualAddressValidationRequired={params.manualAddressValidationRequired}
-        fullValidationRequired={params.fullValidationRequired}
+        validationObj={validationObj}
       />
     </View>
   )
 }
 
-const IncomingPaymentRequestListScreen = (props: Props) => {
-  return (
-    <NotificationList
-      items={props.paymentRequests}
-      listItemRenderer={listItemRenderer(props)}
-      dollarBalance={props.dollarBalance}
-    />
-  )
-}
+class IncomingPaymentRequestListScreen extends React.Component<Props> {
+  static navigationOptions = () => ({
+    headerTitle: (
+      <HeaderTitleWithBalance
+        title={i18n.t('walletFlow5:incomingPaymentRequests')}
+        token={CURRENCY_ENUM.DOLLAR}
+      />
+    ),
+  })
 
-IncomingPaymentRequestListScreen.navigationOptions = titleWithBalanceNavigationOptions(
-  i18n.t('walletFlow5:incomingPaymentRequests')
-)
+  componentDidMount() {
+    // need to check latest mapping to prevent user from accepting fradulent requests
+    this.fetchLatestPhoneAddressesAndRecipientVerificationStatuses()
+  }
+
+  fetchLatestPhoneAddressesAndRecipientVerificationStatuses = () => {
+    const { paymentRequests } = this.props
+
+    // TODO: look into creating a batch lookup function so we dont rerender on each lookup
+    paymentRequests.forEach((payment) => {
+      const recipient = getRecipientFromPaymentRequest(payment, this.props.recipientCache)
+      const { e164PhoneNumber } = recipient
+      if (!e164PhoneNumber) {
+        throw new Error('Missing recipient e164Number for payment request')
+      }
+
+      this.props.fetchPhoneAddressesAndCheckIfRecipientValidationRequired(e164PhoneNumber)
+    })
+  }
+
+  render = () => {
+    return (
+      <NotificationList
+        items={this.props.paymentRequests}
+        listItemRenderer={listItemRenderer(this.props)}
+        dollarBalance={this.props.dollarBalance}
+      />
+    )
+  }
+}
 
 export default connect<StateProps, DispatchProps, {}, RootState>(
   mapStateToProps,

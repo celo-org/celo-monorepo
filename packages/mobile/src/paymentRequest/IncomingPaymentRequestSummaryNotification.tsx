@@ -7,7 +7,6 @@ import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { declinePaymentRequest } from 'src/firebase/actions'
 import { Namespaces, withTranslation } from 'src/i18n'
-import { fetchPhoneAddressesAndCheckIfRecipientValidationRequired } from 'src/identity/actions'
 import {
   addressToE164NumberSelector,
   AddressToE164NumberType,
@@ -31,7 +30,6 @@ interface OwnProps {
 
 interface DispatchProps {
   declinePaymentRequest: typeof declinePaymentRequest
-  fetchPhoneAddressesAndCheckIfRecipientValidationRequired: typeof fetchPhoneAddressesAndCheckIfRecipientValidationRequired
 }
 
 type Props = OwnProps & DispatchProps & WithTranslation & StateProps
@@ -40,24 +38,18 @@ interface StateProps {
   e164PhoneNumberAddressMapping: E164NumberToAddressType
   addressToE164Number: AddressToE164NumberType
   recipientCache: NumberToRecipient
-  manualAddressValidationRequired: boolean
-  fullValidationRequired: boolean
 }
 
 const mapStateToProps = (state: RootState): StateProps => {
-  const { manualAddressValidationRequired, fullValidationRequired } = state.send
   return {
     e164PhoneNumberAddressMapping: e164NumberToAddressSelector(state),
     addressToE164Number: addressToE164NumberSelector(state),
     recipientCache: recipientCacheSelector(state),
-    manualAddressValidationRequired,
-    fullValidationRequired,
   }
 }
 
 const mapDispatchToProps = {
   declinePaymentRequest,
-  fetchPhoneAddressesAndCheckIfRecipientValidationRequired,
 }
 
 // Payment Request notification for the notification center on home screen
@@ -82,23 +74,13 @@ export class IncomingPaymentRequestSummaryNotification extends React.Component<P
   }
 
   render() {
-    const {
-      recipientCache,
-      requests,
-      t,
-      manualAddressValidationRequired,
-      fullValidationRequired,
-    } = this.props
+    const { recipientCache, requests, t } = this.props
 
     return requests.length === 1 ? (
       listItemRenderer({
         // accessing via this.props.<...> to avoid shadowing
         declinePaymentRequest: this.props.declinePaymentRequest,
         recipientCache,
-        fetchPhoneAddressesAndCheckIfRecipientValidationRequired: this.props
-          .fetchPhoneAddressesAndCheckIfRecipientValidationRequired,
-        manualAddressValidationRequired,
-        fullValidationRequired,
       })(requests[0])
     ) : (
       <SummaryNotification<PaymentRequest>

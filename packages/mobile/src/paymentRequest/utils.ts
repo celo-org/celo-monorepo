@@ -1,6 +1,9 @@
 import { PaymentRequest } from 'src/account/types'
 import { AddressToE164NumberType } from 'src/identity/reducer'
+import { AddressValidationCheckCache } from 'src/paymentRequest/IncomingPaymentRequestListScreen'
 import { NumberToRecipient, Recipient, RecipientKind } from 'src/recipients/recipient'
+import { SecureSendPhoneNumberMapping } from 'src/send/reducers'
+import { checkIfAddressValidationRequired } from 'src/send/utils'
 
 export function getRecipientFromPaymentRequest(
   paymentRequest: PaymentRequest,
@@ -13,14 +16,15 @@ export function getRecipientFromPaymentRequest(
   if (cachedRecipient) {
     return {
       ...cachedRecipient,
-      kind: RecipientKind.Address,
+      kind: RecipientKind.Contact,
       address: paymentRequest.requesterAddress,
     }
   } else {
     return {
-      kind: RecipientKind.Address,
+      kind: RecipientKind.MobileNumber,
       address: paymentRequest.requesterAddress,
       displayName: paymentRequest.requesterE164Number || paymentRequest.requesterAddress,
+      e164PhoneNumber: paymentRequest.requesterE164Number,
     }
   }
 }
@@ -54,4 +58,32 @@ export function getSenderFromPaymentRequest(
       displayName: e164PhoneNumber,
     }
   }
+}
+
+export const getAddressValidationCheckCache = (
+  paymentRequests: PaymentRequest[],
+  recipientCache: NumberToRecipient,
+  secureSendPhoneNumberMapping: SecureSendPhoneNumberMapping
+): AddressValidationCheckCache => {
+  const addressValidationCheckCache: AddressValidationCheckCache = {}
+
+  paymentRequests.forEach((payment) => {
+    const recipient = getRecipientFromPaymentRequest(payment, recipientCache)
+    const { addressValidationRequired, fullValidationRequired } = checkIfAddressValidationRequired(
+      recipient,
+      secureSendPhoneNumberMapping
+    )
+
+    const { e164PhoneNumber } = recipient
+    if (!e164PhoneNumber) {
+      throw new Error('Missing recipient e164Number for payment request')
+    }
+
+    addressValidationCheckCache[e164PhoneNumber] = {
+      addressValidationRequired,
+      fullValidationRequired,
+    }
+  })
+
+  return addressValidationCheckCache
 }

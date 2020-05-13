@@ -315,9 +315,7 @@ export const v2Schema = {
     isSending: false,
     recentRecipients: [],
     isValidRecipient: false,
-    manualAddressValidationRequired: false,
-    fullValidationRequired: false,
-    manuallyValidatedE164NumberToAddress: {},
+    secureSendPhoneNumberMapping: {},
   },
   recipients: {
     recipientCache: {},

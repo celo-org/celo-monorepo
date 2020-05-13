@@ -10,11 +10,10 @@ import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import { declinePaymentRequest } from 'src/firebase/actions'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces, withTranslation } from 'src/i18n'
-import { fetchPhoneAddressesAndCheckIfRecipientValidationRequired } from 'src/identity/actions'
 import { unknownUserIcon } from 'src/images/Images'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import { getRecipientThumbnail, Recipient, RecipientKind } from 'src/recipients/recipient'
+import { getRecipientThumbnail, Recipient } from 'src/recipients/recipient'
 import { TransactionData } from 'src/send/reducers'
 import Logger from 'src/utils/Logger'
 
@@ -24,9 +23,10 @@ interface OwnProps {
   comment: string
   id: string
   declinePaymentRequest: typeof declinePaymentRequest
-  fetchPhoneAddressesAndCheckIfRecipientValidationRequired: typeof fetchPhoneAddressesAndCheckIfRecipientValidationRequired
-  manualAddressValidationRequired: boolean
-  fullValidationRequired: boolean
+  validationObj?: {
+    addressValidationRequired: boolean
+    fullValidationRequired: boolean
+  }
 }
 
 type Props = OwnProps & WithTranslation
@@ -34,33 +34,8 @@ type Props = OwnProps & WithTranslation
 const AVATAR_SIZE = 40
 
 export class IncomingPaymentRequestListItem extends React.Component<Props> {
-  componentDidMount() {
-    // need to check latest mapping to prevent user from accepting fradulent requests
-    this.fetchLatestPhoneAddressesAndRecipientVerificationStatus()
-  }
-
-  fetchLatestPhoneAddressesAndRecipientVerificationStatus = () => {
-    const { requester: recipient } = this.props
-
-    // Skip phone number fetch for QR codes or Addresses
-    if (recipient.kind !== RecipientKind.QrCode && recipient.kind !== RecipientKind.Address) {
-      if (!recipient.e164PhoneNumber) {
-        throw new Error('Missing recipient e164Number')
-      }
-
-      this.props.fetchPhoneAddressesAndCheckIfRecipientValidationRequired(recipient.e164PhoneNumber)
-    }
-  }
-
   onPay = () => {
-    const {
-      id,
-      amount,
-      comment: reason,
-      requester: recipient,
-      manualAddressValidationRequired,
-      fullValidationRequired,
-    } = this.props
+    const { id, amount, comment: reason, requester: recipient, validationObj } = this.props
 
     const transactionData: TransactionData = {
       reason,
@@ -70,7 +45,8 @@ export class IncomingPaymentRequestListItem extends React.Component<Props> {
       firebasePendingRequestUid: id,
     }
 
-    if (manualAddressValidationRequired) {
+    if (validationObj && validationObj.addressValidationRequired) {
+      const { fullValidationRequired } = validationObj
       navigate(Screens.ValidateRecipientIntro, { transactionData, fullValidationRequired })
     } else {
       navigate(Screens.SendConfirmation, { transactionData })

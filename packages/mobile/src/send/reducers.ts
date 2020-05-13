@@ -25,26 +25,26 @@ export interface ConfirmationInput {
   firebasePendingRequestUid?: string | null
 }
 
-export interface ManuallyValidatedE164NumberToAddress {
-  [e164Number: string]: string
+export interface SecureSendPhoneNumberMapping {
+  [e164Number: string]: {
+    address: string | undefined
+    addressValidationRequired: boolean
+    fullValidationRequired: boolean
+  }
 }
 
 export interface State {
   isSending: boolean
   recentRecipients: Recipient[]
   isValidRecipient: boolean
-  manualAddressValidationRequired: boolean
-  fullValidationRequired: boolean
-  manuallyValidatedE164NumberToAddress: ManuallyValidatedE164NumberToAddress
+  secureSendPhoneNumberMapping: SecureSendPhoneNumberMapping
 }
 
 const initialState = {
   isSending: false,
   recentRecipients: [],
   isValidRecipient: false,
-  manualAddressValidationRequired: false,
-  fullValidationRequired: false,
-  manuallyValidatedE164NumberToAddress: {},
+  secureSendPhoneNumberMapping: {},
 }
 
 export const sendReducer = (
@@ -80,28 +80,37 @@ export const sendReducer = (
         isValidRecipient: false,
       }
     case Actions.VALIDATE_RECIPIENT_ADDRESS_SUCCESS:
-      const { manuallyValidatedE164NumberToAddress } = state
+      const { secureSendPhoneNumberMapping } = state
       // overwrite the previous mapping every time a new one is validated
-      manuallyValidatedE164NumberToAddress[action.e164Number] = action.validatedAddress
+      secureSendPhoneNumberMapping[action.e164Number] = {
+        address: action.validatedAddress,
+        addressValidationRequired: false,
+        fullValidationRequired: false,
+      }
+
       return {
         ...state,
         isValidRecipient: true,
-        manualAddressValidationRequired: false,
-        manuallyValidatedE164NumberToAddress,
+        secureSendPhoneNumberMapping,
       }
     case Actions.VALIDATE_RECIPIENT_ADDRESS_FAILURE:
       return {
         ...state,
         isValidRecipient: false,
       }
-    case Actions.MANUAL_ADDRESS_VALIDATION_REQUIRED:
-      return {
-        ...state,
-        manualAddressValidationRequired: action.validationRequired,
+    case Actions.SECURE_SEND_REQUIRED:
+      const newSecureSendMapping = state.secureSendPhoneNumberMapping
+      newSecureSendMapping[action.e164Number] = {
+        address: undefined,
+        addressValidationRequired: true,
         fullValidationRequired: action.fullValidationRequired,
-        isValidRecipient: false,
       }
 
+      return {
+        ...state,
+        isValidRecipient: false,
+        secureSendPhoneNumberMapping: newSecureSendMapping,
+      }
     default:
       return state
   }
@@ -120,8 +129,5 @@ const storeLatestRecentReducer = (state: State, newRecipient: Recipient) => {
   }
 }
 
-export const manualAddressValidationRequiredSelector = (state: RootState) =>
-  state.send.manualAddressValidationRequired
-
-export const manuallyValidatedE164NumberToAddressSelector = (state: RootState) =>
-  state.send.manuallyValidatedE164NumberToAddress
+export const secureSendPhoneNumberMappingSelector = (state: RootState) =>
+  state.send.secureSendPhoneNumberMapping
