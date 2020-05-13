@@ -18,7 +18,6 @@
 /packages/docs/ @timmoreton
 /packages/faucet/ @jmrossy
 /packages/helm-charts/ @nambrot @timmoreton
-/packages/leaderboard/ @mrsmkl
 /packages/metadata-crawler/ @aaitor
 /packages/mobile/ @cmcewen @jmrossy
 /packages/moonpay-auth/ @annakaz
