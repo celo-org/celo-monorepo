@@ -5,7 +5,7 @@ import TopBarButton from 'src/navigator/TopBarButton.v2'
 
 describe('TopBarButton', () => {
   it('displays children', () => {
-    const { queryByText } = render(<TopBarButton>label</TopBarButton>)
+    const { queryByText } = render(<TopBarButton title={'label'} />)
     expect(queryByText('label')?.props.children).toEqual('label')
   })
 })

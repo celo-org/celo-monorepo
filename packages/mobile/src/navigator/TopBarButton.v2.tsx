@@ -1,31 +1,32 @@
-import BorderlessButton from '@celo/react-components/components/BorderlessButton.v2'
-import { Props as TouchableProps } from '@celo/react-components/components/Touchable'
 import colors from '@celo/react-components/styles/colors.v2'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import * as React from 'react'
-import { StyleProp, StyleSheet, TextStyle } from 'react-native'
+import {
+  StyleProp,
+  StyleSheet,
+  Text,
+  TextStyle,
+  TouchableOpacity,
+  TouchableOpacityProps,
+} from 'react-native'
 
-type Props = TouchableProps & {
-  style?: StyleProp<TextStyle>
+type Props = TouchableOpacityProps & {
+  textStyle?: StyleProp<TextStyle>
   testID?: string
+  title: string
 }
 
-export default function TopBarButton({ onPress, style, children, disabled, testID }: Props) {
+export default function TopBarButton({ onPress, textStyle, title, disabled, testID }: Props) {
   return (
-    <BorderlessButton
-      disabled={disabled}
-      onPress={onPress}
-      testID={testID}
-      style={style ? { ...styles.text, ...style } : styles.text}
-    >
-      {children}
-    </BorderlessButton>
+    <TouchableOpacity onPress={onPress} disabled={disabled} testID={testID}>
+      <Text style={textStyle ? [styles.text, textStyle] : styles.text}>{title}</Text>
+    </TouchableOpacity>
   )
 }
 
 const styles = StyleSheet.create({
   text: {
-    ...fontStyles.regular500,
+    ...fontStyles.regular,
     color: colors.greenUI,
     paddingHorizontal: 16,
   },
