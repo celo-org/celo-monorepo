@@ -17,14 +17,10 @@ interface State {
   mobile: boolean
 }
 
-interface Props {
-  isRestricted: boolean
-}
-
 const DESCRIPTION =
   'Celo is building a monetary system that creates the conditions for prosperity for all. Our stablecoin uses phone numbers as identity and is built on a secure and proven platform.'
 
-export class Home extends React.Component<Props & I18nProps, State> {
+export class Home extends React.Component<I18nProps, State> {
   state: State
 
   render() {
