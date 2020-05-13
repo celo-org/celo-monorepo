@@ -1,10 +1,10 @@
 import { generateMnemonic, MnemonicLanguages, MnemonicStrength } from '@celo/utils/src/account'
 import * as _ from 'lodash'
+import { useState } from 'react'
+import { useAsync } from 'react-async-hook'
 import * as bip39 from 'react-native-bip39'
 import { getKey } from 'src/utils/keyStore'
 import Logger from 'src/utils/Logger'
-import { useAsync } from 'react-async-hook'
-import { useState } from 'react'
 
 const TAG = 'Backup/utils'
 

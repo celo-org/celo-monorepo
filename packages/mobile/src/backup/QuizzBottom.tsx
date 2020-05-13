@@ -4,9 +4,9 @@ import fonts from '@celo/react-components/styles/fonts.v2'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
+import { Mode } from 'src/backup/BackupQuiz'
 import { Namespaces } from 'src/i18n'
 import LoadingSpinner from 'src/icons/LoadingSpinner'
-import { Mode } from 'src/backup/BackupQuiz'
 
 interface Props {
   onPressSubmit: () => void

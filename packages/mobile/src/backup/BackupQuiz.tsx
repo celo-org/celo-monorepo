@@ -55,7 +55,7 @@ type Props = WithTranslation & DispatchProps & NavigationInjectedProps
 
 export class BackupQuiz extends React.Component<Props, State> {
   static navigationOptions = ({ navigation }: NavigationInjectedProps) => ({
-    ...headerWithCancelButton, //TODO switch to v2 once Ivans PR is in
+    ...headerWithCancelButton, // TODO switch to v2 once Ivans PR is in
     headerRight: <DeleteWord onPressBackspace={navigation.getParam('onPressBackspace')} />,
   })
 
