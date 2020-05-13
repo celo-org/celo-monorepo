@@ -37,12 +37,12 @@ describe('Transfer Works', () => {
     await bannerDismiss(by.id('SmartTopAlertButton'))
   })
 
-  it('NUX->Language', async () => {
+  it('Language', async () => {
     await element(by.id('ChooseLanguage/en-US')).tap()
     await element(by.id('ChooseLanguageButton')).tap()
   })
 
-  it('NUX->Join', async () => {
+  it('Join', async () => {
     await waitFor(element(by.id('JoinCeloContinueButton')))
       .toBeVisible()
       .withTimeout(2000)
@@ -57,18 +57,18 @@ describe('Transfer Works', () => {
     await element(by.id('JoinCeloContinueButton')).tap()
   })
 
-  it('NUX-Terms', async () => {
+  it('Terms', async () => {
     await element(by.id('scrollView')).scrollTo('bottom')
     expect(element(by.id('AcceptTermsButton'))).toBeVisible()
     await element(by.id('AcceptTermsButton')).tap()
   })
 
-  it('NUX->PincodeEducation', async () => {
+  it('PincodeEducation', async () => {
     await expect(element(by.id('SystemAuthContinue'))).toBeVisible()
     await element(by.id('SystemAuthContinue')).tap()
   })
 
-  it('NUX->Pin', async () => {
+  it('Pin', async () => {
     // Set pin
     await enterPinUi()
     // Verify pin
@@ -79,7 +79,7 @@ describe('Transfer Works', () => {
   // TODO(erdal) get rid of sleeps if possible to make the tests faster
 
   // Restore existing wallet
-  it('NUX->Restore Wallet Backup', async () => {
+  it('Restore Wallet Backup', async () => {
     await waitFor(element(by.id('InviteCodeTitle')))
       .toBeVisible()
       .withTimeout(8000)
@@ -106,7 +106,7 @@ describe('Transfer Works', () => {
     await element(by.id('ImportWalletButton')).tap()
   })
 
-  it('NUX->VerifyEducation', async () => {
+  it('VerifyEducation', async () => {
     await waitFor(element(by.id('VerificationEducationHeader')))
       .toBeVisible()
       .withTimeout(10000)
@@ -121,17 +121,17 @@ describe('Transfer Works', () => {
     await element(by.id('ModalSkip')).tap()
   })
 
-  it.skip('NUX->Verify', async () => {
+  it.skip('Verify', async () => {
     // skipping for now
     // TODO(erdal): implement
   })
 
   it('Wallet Home', async () => {
-    await waitFor(element(by.id('AccountOverviewInHome/dollarBalance')))
+    await waitFor(element(by.id('DollarBalance')))
       .toBeVisible()
       .withTimeout(10000)
 
-    await waitFor(element(by.id('AccountOverviewInHome/goldBalance')))
+    await waitFor(element(by.id('GoldBalance')))
       .toBeVisible()
       .withTimeout(10000)
   })

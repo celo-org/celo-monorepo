@@ -101,7 +101,7 @@ export const TabNavigator = createBottomTabNavigator(
         tabBarButtonComponent: TabBarButtonComponent,
         tabBarIcon: (props: any) => (
           <View style={styles.alignPaymentIcon}>
-            <PaymentsIcon color={props.tintColor} />
+            <PaymentsIcon color={props.tintColor} testID="SendNavigator" />
           </View>
         ),
         tabBarLabel: () => null,
