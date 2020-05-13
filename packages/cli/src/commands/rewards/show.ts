@@ -24,6 +24,7 @@ export default class Show extends BaseCommand {
 
   static flags = {
     ...BaseCommand.flagsWithoutLocalAddresses(),
+    estimate: flags.boolean({ description: 'Estimate voter rewards from current votes' }),
     voter: Flags.address({ description: 'Voter to show rewards for' }),
     validator: Flags.address({ description: 'Validator to show rewards for' }),
     group: Flags.address({ description: 'Validator Group to show rewards for' }),
@@ -90,15 +91,30 @@ export default class Show extends BaseCommand {
           )
         } else if (res.flags.voter) {
           const address = res.flags.voter
-          const epochVoterRewards = await election.getVoterRewards(address, epochNumber)
-          voterRewards = voterRewards.concat(
-            epochVoterRewards.map(
-              (e: VoterReward): ExplainedVoterReward => ({
-                ...e,
-                validators: filterValidatorsByGroup(electedValidators, e.group.address),
-              })
+          try {
+            const epochVoterRewards = await election.getVoterRewards(
+              address,
+              epochNumber,
+              res.flags.estimate ? await election.getVoterShare(address) : undefined
             )
-          )
+            voterRewards = voterRewards.concat(
+              epochVoterRewards.map(
+                (e: VoterReward): ExplainedVoterReward => ({
+                  ...e,
+                  validators: filterValidatorsByGroup(electedValidators, e.group.address),
+                })
+              )
+            )
+          } catch (error) {
+            if (error.message.includes('missing trie node')) {
+              throw new Error(
+                'Exact voter information is avaiable only for 1024 blocks after each epoch.\n' +
+                  'Supply --estimate to estimate rewards based on current votes, or use an archive node.'
+              )
+            } else {
+              throw error
+            }
+          }
         }
       }
 
