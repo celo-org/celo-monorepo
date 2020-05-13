@@ -137,7 +137,7 @@ describe('Transfer Works', () => {
   })
 
   it('Wallet Home->Send', async () => {
-    await element(by.id('SendNavigator')).tap()
+    await element(by.id('SendNavigator').withDescendant(by.id('SendNavigator'))).tap()
 
     await waitFor(element(by.id('RecipientPicker')))
       .toBeVisible()

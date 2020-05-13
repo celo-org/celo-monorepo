@@ -101,7 +101,7 @@ export const TabNavigator = createBottomTabNavigator(
         tabBarButtonComponent: TabBarButtonComponent,
         tabBarIcon: (props: any) => (
           <View style={styles.alignPaymentIcon}>
-            <PaymentsIcon color={props.tintColor} testID="SendNavigator" />
+            <PaymentsIcon color={props.tintColor} />
           </View>
         ),
         tabBarLabel: () => null,
@@ -111,6 +111,7 @@ export const TabNavigator = createBottomTabNavigator(
         tabBarOnLongPress: () => {
           navigate(Stacks.SendStack)
         },
+        tabBarTestID: 'SendNavigator',
       },
     },
     [Screens.ExchangeHomeScreen]: {
