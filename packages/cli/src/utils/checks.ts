@@ -91,10 +91,12 @@ class CheckBuilder {
     }
   }
 
-  withGovernance<A>(f: (accounts: GovernanceWrapper) => A): () => Promise<Resolve<A>> {
+  withGovernance<A>(
+    f: (governance: GovernanceWrapper, signer: Address, account: Address, ctx: CheckBuilder) => A
+  ): () => Promise<Resolve<A>> {
     return async () => {
       const governance = await this.kit.contracts.getGovernance()
-      return f(governance) as Resolve<A>
+      return f(governance, '', '', this) as Resolve<A>
     }
   }
 
@@ -297,6 +299,12 @@ class CheckBuilder {
     this.addCheck(
       `Deposit is greater than or equal to governance proposal minDeposit`,
       this.withGovernance(async (g) => deposit.gte(await g.minDeposit()))
+    )
+
+  hasRefundedDeposits = (account: Address) =>
+    this.addCheck(
+      `${account} has refunded governance deposits`,
+      this.withGovernance(async (g) => !(await g.getRefundedDeposits(account)).isZero())
     )
 
   hasEnoughLockedGold = (value: BigNumber) => {
