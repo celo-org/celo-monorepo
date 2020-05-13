@@ -1,4 +1,5 @@
 import { BaseCommand } from '../../base'
+import { displaySendTx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
 
 export default class Dequeue extends BaseCommand {
@@ -17,6 +18,6 @@ export default class Dequeue extends BaseCommand {
     this.kit.defaultAccount = account
     const governance = await this.kit.contracts.getGovernance()
 
-    await governance.dequeueProposalsIfReady().sendAndWaitForReceipt()
+    await displaySendTx('dequeue', governance.dequeueProposalsIfReady(), {}, 'ProposalsDequeued')
   }
 }
