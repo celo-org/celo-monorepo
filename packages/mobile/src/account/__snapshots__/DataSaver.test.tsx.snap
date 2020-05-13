@@ -108,7 +108,7 @@ exports[`DataSaver renders correctly 1`] = `
       }
       swipeThreshold={100}
       transparent={true}
-      visible={true}
+      visible={false}
     >
       <View
         accessible={true}
@@ -153,7 +153,7 @@ exports[`DataSaver renders correctly 1`] = `
             "margin": 37.5,
             "transform": Array [
               Object {
-                "translateY": 1334,
+                "translateY": 0,
               },
             ],
           }
