@@ -26,8 +26,8 @@ const TAG = 'backup/BackupQuiz'
 
 const MNEMONIC_BUTTONS_TO_DISPLAY = 6
 
-// seconds
-const CHECKING_DURATION = 3.1 * 1000
+// miliseconds
+const CHECKING_DURATION = 2.6 * 1000
 
 export enum Mode {
   entering,

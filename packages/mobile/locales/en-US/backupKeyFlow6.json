@@ -9,7 +9,8 @@
   "setUpSocialBackup": "Set Up Safeguards",
   "failedFetchMnemonic": "Failed to fetch your Account Key",
   "backupAndRecovery": "Backup and Recovery",
-  "backupKey": "Write down your key",
+  "writeDownKey": "Write down your key",
+  "backupKey": "Account Key",
   "yourBackupKey": "Your Backup Key",
   "backupKeyNotification": "Without a Backup Key, you may lose access to your wallet.",
   "backupKeySummary":

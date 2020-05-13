@@ -14,7 +14,7 @@ import componentWithAnalytics from 'src/analytics/wrapper'
 import { enterBackupFlow, exitBackupFlow } from 'src/app/actions'
 import DelayButton from 'src/backup/DelayButton'
 import { useAccountKey } from 'src/backup/utils'
-import { Namespaces, withTranslation } from 'src/i18n'
+import { Namespaces } from 'src/i18n'
 import Logo from 'src/icons/Logo.v2'
 import { headerWithBackButton } from 'src/navigator/Headers'
 import { navigateProtected } from 'src/navigator/NavigationService'
@@ -30,7 +30,7 @@ interface DispatchProps {
   exitBackupFlow: typeof exitBackupFlow
 }
 
-type Props = WithTranslation & StateProps & DispatchProps
+type Props = StateProps & DispatchProps
 
 const mapStateToProps = (state: RootState): StateProps => {
   return {
@@ -87,7 +87,6 @@ function AccountKeyIntro({ onPrimaryPress }: AccountKeyStartProps) {
   )
 }
 
-// TODO show pin code screen first
 function AccountKeyPostSetup() {
   const accountKey = useAccountKey()
 
@@ -152,5 +151,5 @@ export default componentWithAnalytics(
   connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
     enterBackupFlow,
     exitBackupFlow,
-  })(withTranslation(Namespaces.backupKeyFlow6)(BackupIntroduction))
+  })(BackupIntroduction)
 )

@@ -71,7 +71,9 @@ export class BackupPhraseContainer extends React.Component<Props> {
         <View style={styles.headerContainer}>
           <Text style={styles.headerText}>
             {type === BackupPhraseType.BACKUP_KEY
-              ? t('backupKey')
+              ? BackupPhraseContainerMode.INPUT
+                ? t('backupKey')
+                : t('writeDownKey')
               : t('socialBackupPhraseHeader', { index })}
           </Text>
         </View>

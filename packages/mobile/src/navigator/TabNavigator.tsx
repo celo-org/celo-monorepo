@@ -7,7 +7,7 @@ import { StyleSheet, Text, View } from 'react-native'
 import { createBottomTabNavigator } from 'react-navigation-tabs'
 import { connect } from 'react-redux'
 import ExchangeHomeScreen from 'src/exchange/ExchangeHomeScreen'
-import WalletHome from 'src/home/WalletHome'
+// import WalletHome from 'src/home/WalletHome'
 import { Namespaces, withTranslation } from 'src/i18n'
 import GoldTabIcon from 'src/icons/GoldTab'
 import PaymentsIcon from 'src/icons/PaymentsIcon'
@@ -18,6 +18,7 @@ import TabBar from 'src/navigator/TabBar'
 import { RootState } from 'src/redux/reducers'
 import { getTabBarActiveNotification } from 'src/redux/selectors'
 import Send from 'src/send/Send'
+import ImportWallet from 'src/import/ImportWallet'
 
 interface LabelProps {
   tintColor: string
@@ -86,7 +87,7 @@ const SmartWalletIcon = connect<StateProps, {}, {}, RootState>(mapStateToProps)(
 export const TabNavigator = createBottomTabNavigator(
   {
     [Screens.WalletHome]: {
-      screen: WalletHome,
+      screen: ImportWallet,
       navigationOptions: {
         tabBarButtonComponent: TabBarButtonComponent,
         tabBarIcon: (props: any) => <SmartWalletIcon {...props} />,

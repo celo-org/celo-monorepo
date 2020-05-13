@@ -9,18 +9,18 @@
   "setUpSocialBackup": "Configurar Salvaguardas",
   "failedFetchMnemonic": "No se pudo obtener su clave de respaldo",
   "backupAndRecovery": "Respaldo y recuperación",
-  "backupKey": "Clave de respaldo",
+  "writeDownKey": "Escriba su llave",
+  "backupKey": "Clave de la cuenta",
   "yourBackupKey": "Su clave de respaldo",
   "backupKeyNotification": "Sin una clave de respaldo, puede perder el acceso a la billetera.",
-  "backupKeySummary":
-    "Escriba su clave de respaldo. Si se pierde o le roban su teléfono, necesitará su clave de respaldo para acceder a la billetera Celo.",
+  "backupKeySummary":  "Encuentra un lugar privado y anota tu Clave de Cuenta. Por favor, guárdela en un lugar seguro. No la guardes en tu teléfono.",
   "backupPrompt":
     "Para seguridad de sus fondos, su cuenta está bloqueada hasta que obtenga su clave de respaldo.",
   "copied": "Clave copiada al portapapeles",
-  "savedConfirmation": "He guardado mi clave de respaldo",
+  "savedConfirmation": "Sí, he escrito mi llave",
   "invalidBackupPhrase": "Clave de respaldo inválida",
   "importBackupFailed": "No se pudo importar la billetera",
-  "backupQuizFailed": "Clave de respaldo incorrecta; vuelva a intentarlo",
+  "backupQuizFailed": "La clave de la cuenta que ha introducido es incorrecta. Por favor, inténtelo de nuevo.",
   "backupComplete": {
     "header": "Copia de Seguridad Completa",
     "0": "¡Correcto!",
@@ -35,6 +35,7 @@
     "skip": "Omitir por ahora"
   },
   "socialBackupPhraseHeader": "Frase de protección {{index}}",
+  "backupQuizWordCount":"¿Cuál es la palabra <0>{{{ordinal}}</0> de su clave de cuenta?",
   "socialBackup": {
     "body":
       "Comparta cada frase que aparece a continuación con un amigo. Asegúrese de enviar solo una frase a cada persona.",
@@ -44,3 +45,4 @@
   "backupPhrasePlaceholder":
     "caballo leopardo perro mono tiburón tigre lémur ballena calamar lobo ardilla ratón león elefante gato langostino oso pingüino ciervo tortuga zorro cebra cabra jirafa"
 }
+,
