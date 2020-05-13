@@ -225,7 +225,7 @@ export class WalletHome extends React.Component<Props> {
           refreshing={this.props.loading}
           style={styles.container}
           sections={sections}
-          stickySectionHeadersEnabled={true}
+          stickySectionHeadersEnabled={false}
           renderSectionHeader={this.renderSection}
           keyExtractor={this.keyExtractor}
         />
