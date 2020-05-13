@@ -11,7 +11,6 @@ import { TokenTransactionType, TransferItemFragment } from 'src/apollo/types'
 import CurrencyDisplay, { FormatType } from 'src/components/CurrencyDisplay'
 import { Namespaces } from 'src/i18n'
 import { AddressToE164NumberType } from 'src/identity/reducer'
-import { Invitees } from 'src/invite/actions'
 import { getRecipientFromAddress, NumberToRecipient } from 'src/recipients/recipient'
 import { navigateToPaymentTransferReview } from 'src/transactions/actions'
 import { TransactionStatus } from 'src/transactions/reducer'
@@ -22,7 +21,6 @@ import { formatFeedTime, getDatetimeDisplayString } from 'src/utils/time'
 type Props = TransferItemFragment & {
   type: TokenTransactionType
   status: TransactionStatus
-  invitees: Invitees
   addressToE164Number: AddressToE164NumberType
   recipientCache: NumberToRecipient
   commentKey: Buffer | null
@@ -35,7 +33,6 @@ function navigateToTransactionReview({
   commentKey,
   timestamp,
   amount,
-  invitees,
   addressToE164Number,
   recipientCache,
 }: Props) {
@@ -44,11 +41,7 @@ function navigateToTransactionReview({
     return
   }
 
-  const recipient = getRecipientFromAddress(
-    address,
-    type === TokenTransactionType.InviteSent ? invitees : addressToE164Number,
-    recipientCache
-  )
+  const recipient = getRecipientFromAddress(address, addressToE164Number, recipientCache)
 
   navigateToPaymentTransferReview(type, timestamp, {
     address,
@@ -77,7 +70,6 @@ export function TransferFeedItem(props: Props) {
     comment,
     commentKey,
     status,
-    invitees,
     addressToE164Number,
     recipientCache,
   } = props
@@ -90,7 +82,6 @@ export function TransferFeedItem(props: Props) {
   const { title, info, recipient } = getTransferFeedParams(
     type,
     t,
-    invitees,
     recipientCache,
     address,
     addressToE164Number,

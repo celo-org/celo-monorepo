@@ -9,12 +9,14 @@ import EscrowedPaymentLineItem from 'src/escrow/EscrowedPaymentLineItem'
 import { listItemRenderer } from 'src/escrow/EscrowedPaymentListScreen'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { inviteFriendsIcon } from 'src/images/Images'
+import { InviteDetails } from 'src/invite/actions'
 import { navigate } from 'src/navigator/NavigationService'
 import { Stacks } from 'src/navigator/Screens'
 import SummaryNotification from 'src/notifications/SummaryNotification'
 
 interface OwnProps {
   payments: EscrowedPayment[]
+  invitees: InviteDetails[]
 }
 
 type Props = OwnProps & WithTranslation
@@ -30,9 +32,9 @@ export class EscrowedPaymentReminderSummaryNotification extends React.Component<
   }
 
   render() {
-    const { payments, t } = this.props
+    const { payments, invitees, t } = this.props
     return payments.length === 1 ? (
-      listItemRenderer(payments[0])
+      listItemRenderer({ payment: payments[0], invitees })
     ) : (
       <SummaryNotification<EscrowedPayment>
         items={payments}
