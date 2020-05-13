@@ -1,5 +1,4 @@
 import SectionHeadNew from '@celo/react-components/components/SectionHeadNew'
-import QRCodeBorderlessIcon from '@celo/react-components/icons/QRCodeBorderless'
 import SettingsIcon from '@celo/react-components/icons/Settings'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
@@ -26,10 +25,10 @@ import { exitBackupFlow } from 'src/app/actions'
 import { ALERT_BANNER_DURATION, DEFAULT_TESTNET, SHOW_TESTNET_BANNER } from 'src/config'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { refreshAllBalances, setLoading } from 'src/home/actions'
-import CeloDollarsOverview from 'src/home/CeloDollarsOverview'
 import HeaderButton from 'src/home/HeaderButton'
 import NotificationBox from 'src/home/NotificationBox'
 import { callToActNotificationSelector, getActiveNotificationCount } from 'src/home/selectors'
+import SendOrRequestBar from 'src/home/SendOrRequestBar'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -160,10 +159,6 @@ export class WalletHome extends React.Component<Props> {
     )
   }
 
-  onPressQrCode = () => {
-    navigate(Screens.QRCode)
-  }
-
   onPressSettings = () => {
     navigate(Screens.Account)
   }
@@ -218,16 +213,12 @@ export class WalletHome extends React.Component<Props> {
             </View>
           )}
           <View style={styles.headerRight}>
-            <HeaderButton style={styles.headerButton} onPress={this.onPressQrCode}>
-              <QRCodeBorderlessIcon height={HEADER_ICON_SIZE} color={colors.celoGreen} />
-            </HeaderButton>
+            {/* TODO: remove settings from here once we have the drawer menu */}
             <HeaderButton style={styles.headerButton} onPress={this.onPressSettings}>
               <SettingsIcon height={HEADER_ICON_SIZE} color={colors.celoGreen} />
             </HeaderButton>
           </View>
         </View>
-        {/*
-        // @ts-ignore */}
         <AnimatedSectionList
           onScroll={this.onScroll}
           refreshControl={refresh}
@@ -237,9 +228,9 @@ export class WalletHome extends React.Component<Props> {
           sections={sections}
           stickySectionHeadersEnabled={true}
           renderSectionHeader={this.renderSection}
-          ListHeaderComponent={CeloDollarsOverview}
           keyExtractor={this.keyExtractor}
         />
+        <SendOrRequestBar />
       </SafeAreaView>
     )
   }
