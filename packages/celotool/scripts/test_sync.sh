@@ -53,6 +53,8 @@ test_sync_blocknumber() {
 }
 
 test_syn_syncing() {
+  echo "Sleeping 180"
+  sleep 180
   local target=$(kubectl -n ${namespace} exec -it ${node_pod} -- geth attach --exec 'eth.syncing' | grep highestBlock | cut -d' ' -f4 | tr -d ',' | $aliassed -r "s/\x1B\[([0-9]{1,3}(;[0-9]{1,2})?)?[mGK]//g")
   echo kubectl -n ${namespace} exec -it ${node_pod} -- geth attach --exec 'eth.syncing'
   target=${target//[$'\t\r\n ']}
