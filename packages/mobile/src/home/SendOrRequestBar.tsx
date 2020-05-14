@@ -10,9 +10,7 @@ import { Namespaces } from 'src/i18n'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens, Stacks } from 'src/navigator/Screens'
 
-interface Props {}
-
-export default function SendOrRequestBar(props: Props) {
+export default function SendOrRequestBar() {
   const { t } = useTranslation(Namespaces.sendFlow7)
 
   const onPressSend = useCallback(() => {
@@ -51,6 +49,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: variables.contentPadding,
     paddingVertical: 12,
+    borderTopColor: colors.gray2,
+    borderTopWidth: 1,
   },
   button: {
     flex: 1,
