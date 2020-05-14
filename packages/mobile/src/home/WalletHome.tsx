@@ -43,7 +43,6 @@ import { resetStandbyTransactions } from 'src/transactions/actions'
 import TransactionsList from 'src/transactions/TransactionsList'
 import { currentAccountSelector } from 'src/web3/selectors'
 
-const SCREEN_WIDTH = variables.width
 const HEADER_ICON_SIZE = 24
 const HEADER_BUTTON_MARGIN = 12
 
