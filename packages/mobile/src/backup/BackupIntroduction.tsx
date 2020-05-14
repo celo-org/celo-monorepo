@@ -2,7 +2,7 @@ import Button from '@celo/react-components/components/Button.v2'
 import TextButton from '@celo/react-components/components/TextButton.v2'
 import { default as colors, default as colorsV2 } from '@celo/react-components/styles/colors.v2'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
-import { Sizes } from '@celo/react-components/styles/styles.v2'
+import { Spacing } from '@celo/react-components/styles/styles.v2'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
@@ -115,35 +115,35 @@ const styles = StyleSheet.create({
   },
   introContainer: {
     flex: 1,
-    paddingHorizontal: Sizes.THICK,
+    paddingHorizontal: Spacing.Thick24,
     justifyContent: 'center',
   },
   postSetupContainer: {
     flex: 1,
-    paddingTop: Sizes.THICK,
-    paddingHorizontal: Sizes.REG,
+    paddingTop: Spacing.Thick24,
+    paddingHorizontal: Spacing.Regular16,
   },
   h1: {
     ...fontStyles.h1,
-    paddingBottom: Sizes.REG,
-    paddingTop: Sizes.REG,
+    paddingBottom: Spacing.Regular16,
+    paddingTop: Spacing.Regular16,
   },
   body: {
     ...fontStyles.large,
-    paddingBottom: Sizes.REG,
+    paddingBottom: Spacing.Regular16,
   },
   keyArea: {
-    padding: Sizes.REG,
+    padding: Spacing.Regular16,
     backgroundColor: colorsV2.brownFaint,
-    marginTop: Sizes.REG,
+    marginTop: Spacing.Regular16,
   },
   postSetupBody: {
     ...fontStyles.regular,
-    marginVertical: Sizes.REG,
+    marginVertical: Spacing.Regular16,
   },
   postSetupCTA: {
     alignSelf: 'center',
-    paddingVertical: Sizes.THICK,
+    paddingVertical: Spacing.Thick24,
   },
 })
 
