@@ -35,7 +35,7 @@ test_sync_blocknumber() {
   synced=false
   syncing=true
   local loop_time="60"
-  local max_tries=3
+  local max_tries=10
   local tries=max_tries
   while [ "${synced}" != "true" ] && [ "${syncing}" == "true" ]; do
     sleep $loop_time
@@ -76,7 +76,7 @@ test_syn_syncing() {
   synced=false
   syncing=true
   local loop_time="90"
-  local max_tries=3
+  local max_tries=10
   local tries=max_tries
   while [ "$synced" != "true" ] && [ "$syncing" == "true" ]; do
     echo "Sleeping ${loop_time}"
