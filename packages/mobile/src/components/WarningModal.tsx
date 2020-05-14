@@ -39,7 +39,7 @@ export function WarningModal({
               {cancelTitle}
             </TextButton>
           )}
-          <TextButton onPress={onContinue} style={styles.modalSkipText}>
+          <TextButton onPress={onContinue} style={styles.modalContinueText}>
             {continueTitle}
           </TextButton>
         </View>
@@ -69,12 +69,12 @@ const styles = StyleSheet.create({
   modalCancelText: {
     ...fontStyles.body,
     ...fontStyles.semiBold,
-    paddingRight: 20,
+    color: colors.gray,
+    paddingRight: 40,
   },
-  modalSkipText: {
+  modalContinueText: {
     ...fontStyles.body,
     ...fontStyles.semiBold,
     color: colors.celoGreen,
-    paddingLeft: 20,
   },
 })

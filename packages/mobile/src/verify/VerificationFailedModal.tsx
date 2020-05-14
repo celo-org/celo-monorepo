@@ -45,20 +45,30 @@ export function VerificationFailedModal(props: Props) {
       body1={t('retryWithFornoModal.body1')}
       body2={t('retryWithFornoModal.body2')}
       continueTitle={t('retryWithFornoModal.retryButton')}
-      cancelTitle={t('skip')} // TODO(anna) make sure translation works
+      cancelTitle={t('education.skip')}
       onCancel={onSkip}
       onContinue={onRetry}
     />
-  ) : (
-    // Skip verification with option to enter codes if reveal attempt failed
+  ) : allowEnterCodes ? (
+    // Else skip verification
     <WarningModal
       isVisible={isVisible}
       header={t('failModal.header')}
-      body1={t('promptFornoModal.body')}
-      body2={allowEnterCodes ? t('failModal.enterCodesBody') : undefined}
-      continueTitle={t('promptFornoModal.switchToDataSaver')}
+      body1={t('failModal.body1')}
+      body2={t('failModal.enterCodesBody')}
+      continueTitle={t('education.skip')}
       cancelTitle={t('global:goBack')} // TODO may need to add text
-      onCancel={allowEnterCodes ? onDismiss : undefined}
+      onCancel={onDismiss}
+      onContinue={onSkip}
+    />
+  ) : (
+    // Option to enter codes if reveal attempt failed
+    <WarningModal
+      isVisible={isVisible}
+      header={t('failModal.header')}
+      body1={t('failModal.body1')}
+      body2={t('failModal.body2')}
+      continueTitle={t('education.skip')}
       onContinue={onSkip}
     />
   )
