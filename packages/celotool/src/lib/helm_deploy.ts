@@ -1,12 +1,13 @@
 import { entries, range } from 'lodash'
 import sleep from 'sleep-promise'
 import { getKubernetesClusterRegion, switchToClusterFromEnv } from './cluster'
+import { execCmd, execCmdWithExitOnFailure } from './cmd-utils'
 import { EnvTypes, envVar, fetchEnv, fetchEnvOrFallback, isProduction } from './env-utils'
 import { ensureAuthenticatedGcloudAccount } from './gcloud_utils'
 import { generateGenesisFromEnv } from './generate_utils'
 import { getStatefulSetReplicas, scaleResource } from './kubernetes'
 import { getGenesisBlockFromGoogleStorage } from './testnet-utils'
-import { execCmd, execCmdWithExitOnFailure, outputIncludes } from './utils'
+import { outputIncludes } from './utils'
 
 const CLOUDSQL_SECRET_NAME = 'blockscout-cloudsql-credentials'
 const BACKUP_GCS_SECRET_NAME = 'backup-blockchain-credentials'
@@ -574,6 +575,7 @@ async function helmParameters(celoEnv: string, useExistingGenesis: boolean) {
     `--set genesis.genesisFileBase64=${Buffer.from(genesisContent).toString('base64')}`,
     `--set genesis.networkId=${fetchEnv(envVar.NETWORK_ID)}`,
     `--set geth.verbosity=${fetchEnvOrFallback('GETH_VERBOSITY', '4')}`,
+    `--set geth.vmodule=${fetchEnvOrFallback('GETH_VMODULE', '')}`,
     `--set geth.resources.requests.cpu=${fetchEnv('GETH_NODE_CPU_REQUEST')}`,
     `--set geth.resources.requests.memory=${fetchEnv('GETH_NODE_MEMORY_REQUEST')}`,
     `--set geth.image.repository=${fetchEnv('GETH_NODE_DOCKER_IMAGE_REPOSITORY')}`,
