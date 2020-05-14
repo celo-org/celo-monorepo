@@ -64,7 +64,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     flex: 1,
-    padding: variables.contentPadding,
+    paddingVertical: 12,
+    paddingHorizontal: variables.contentPadding,
   },
   iconContainer: {
     flexDirection: 'column',
