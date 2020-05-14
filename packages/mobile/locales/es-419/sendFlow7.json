@@ -48,6 +48,7 @@
   "inviteFailed": "Falló el envío de la invitación",
   "loadingContacts": "Encontrando tus contactos",
   "QRCode": "QR código",
+  "scanQRCode": "Scan QR Code",
   "shareCodeImage": "Compartir imagen de código",
   "scanCode": "Escanear código",
   "writeStorageNeededForQrDownload": "Se necesita permiso de escritura de almacenamiento para descargar el código QR",

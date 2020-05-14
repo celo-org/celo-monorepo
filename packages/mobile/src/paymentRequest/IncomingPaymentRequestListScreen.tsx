@@ -109,10 +109,10 @@ class IncomingPaymentRequestListScreen extends React.Component<Props> {
 
   componentDidMount() {
     // Need to check latest mapping to prevent user from accepting fradulent requests
-    this.fetchLatestPhoneAddressesAndRecipientVerificationStatuses()
+    this.fetchLatestAddressesAndValidate()
   }
 
-  fetchLatestPhoneAddressesAndRecipientVerificationStatuses = () => {
+  fetchLatestAddressesAndValidate = () => {
     const { paymentRequests } = this.props
 
     // TODO: Look into creating a batch lookup function so we dont rerender on each lookup

@@ -22,6 +22,12 @@ import { handleBarcodeDetected } from 'src/send/actions'
 import { TransactionData } from 'src/send/reducers'
 import Logger from 'src/utils/Logger'
 
+type Navigation = NavigationFocusInjectedProps['navigation']
+
+interface OwnProps {
+  navigation: Navigation
+}
+
 interface StateProps {
   scanIsForSecureSend: true | undefined
   transactionData: TransactionData
@@ -32,10 +38,10 @@ interface DispatchProps {
   handleBarcodeDetected: typeof handleBarcodeDetected
 }
 
-type Props = DispatchProps & WithTranslation & StateProps & NavigationFocusInjectedProps
+type Props = DispatchProps & WithTranslation & StateProps & OwnProps
 
-const mapStateToProps = (state: RootState, navProps: NavigationFocusInjectedProps): StateProps => {
-  const { navigation } = navProps
+const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
+  const { navigation } = ownProps
   return {
     scanIsForSecureSend: navigation.getParam('scanIsForSecureSend'),
     transactionData: navigation.getParam('transactionData'),
@@ -187,7 +193,7 @@ const styles = StyleSheet.create({
 export default componentWithAnalytics(
   withNavigationFocus(
     // @ts-ignore
-    connect<StateProps, DispatchProps, NavigationFocusInjectedProps, RootState>(mapStateToProps, {
+    connect<StateProps, DispatchProps, OwnProps, RootState>(mapStateToProps, {
       handleBarcodeDetected,
     })(withTranslation(Namespaces.sendFlow7)(QRScanner))
   )

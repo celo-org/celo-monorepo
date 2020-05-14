@@ -35,6 +35,11 @@ import { fetchDollarBalance } from 'src/stableToken/actions'
 import Logger from 'src/utils/Logger'
 import { currentAccountSelector } from 'src/web3/selectors'
 
+type Navigation = NavigationInjectedProps['navigation']
+
+interface OwnProps {
+  navigation: Navigation
+}
 interface StateProps {
   account: string | null
   isSending: boolean
@@ -58,7 +63,7 @@ const mapDispatchToProps = {
   completePaymentRequest,
 }
 
-const mapStateToProps = (state: RootState, ownProps: NavigationInjectedProps): StateProps => {
+const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
   const { navigation } = ownProps
   const transactionData = navigation.getParam('transactionData')
   const { e164NumberToAddress } = state.identity
@@ -83,7 +88,7 @@ interface State {
   buttonReset: boolean
 }
 
-type Props = NavigationInjectedProps & DispatchProps & StateProps & WithTranslation
+type Props = OwnProps & DispatchProps & StateProps & WithTranslation
 
 class SendConfirmation extends React.Component<Props, State> {
   static navigationOptions = { header: null }
@@ -302,7 +307,7 @@ const styles = StyleSheet.create({
 })
 
 export default componentWithAnalytics(
-  connect<StateProps, DispatchProps, NavigationInjectedProps, RootState>(
+  connect<StateProps, DispatchProps, OwnProps, RootState>(
     mapStateToProps,
     mapDispatchToProps
   )(withTranslation(Namespaces.sendFlow7)(SendConfirmation))

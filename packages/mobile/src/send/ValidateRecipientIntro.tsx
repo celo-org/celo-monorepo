@@ -23,6 +23,11 @@ import { formatDisplayName } from 'src/send/utils'
 const AVATAR_SIZE = 120
 const QR_ICON_SIZE = 24
 
+type Navigation = NavigationInjectedProps['navigation']
+
+interface OwnProps {
+  navigation: Navigation
+}
 interface StateProps {
   recipient: Recipient
   transactionData: TransactionData
@@ -32,10 +37,10 @@ interface StateProps {
   isPaymentRequest: true | undefined
 }
 
-type Props = WithTranslation & StateProps & NavigationInjectedProps
+type Props = WithTranslation & StateProps & OwnProps
 
-const mapStateToProps = (state: RootState, navProps: NavigationInjectedProps): StateProps => {
-  const { navigation } = navProps
+const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
+  const { navigation } = ownProps
   const transactionData = navigation.getParam('transactionData')
   const fullValidationRequired = navigation.getParam('fullValidationRequired')
   const isPaymentRequest = navigation.getParam('isPaymentRequest')
@@ -170,7 +175,7 @@ const styles = StyleSheet.create({
 })
 
 export default componentWithAnalytics(
-  connect<StateProps, {}, NavigationInjectedProps, RootState>(mapStateToProps)(
+  connect<StateProps, {}, OwnProps, RootState>(mapStateToProps)(
     withTranslation(Namespaces.sendFlow7)(ValidateRecipientIntro)
   )
 )

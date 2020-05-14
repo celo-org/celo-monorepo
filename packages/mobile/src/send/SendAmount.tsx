@@ -63,12 +63,18 @@ const AmountInput = withDecimalSeparator(
 )
 const CommentInput = withTextInputLabeling<TextInputProps>(TextInput)
 
+type Navigation = NavigationFocusInjectedProps['navigation']
+
+interface OwnProps {
+  navigation: Navigation
+}
+
 interface State {
   amount: string
   reason: string
 }
 
-type Props = StateProps & DispatchProps & NavigationFocusInjectedProps & WithTranslation
+type Props = StateProps & DispatchProps & OwnProps & WithTranslation
 
 interface StateProps {
   dollarBalance: string
@@ -91,8 +97,8 @@ interface DispatchProps {
   fetchAddressesAndValidate: typeof fetchAddressesAndValidate
 }
 
-const mapStateToProps = (state: RootState, navProps: NavigationFocusInjectedProps): StateProps => {
-  const { navigation } = navProps
+const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
+  const { navigation } = ownProps
   const recipient = navigation.getParam('recipient')
   const { secureSendPhoneNumberMapping } = state.send
   const { addressValidationRequired, fullValidationRequired } = checkIfAddressValidationRequired(
@@ -140,10 +146,10 @@ export class SendAmount extends React.Component<Props, State> {
 
   componentDidMount = () => {
     this.props.fetchDollarBalance()
-    this.fetchLatestPhoneAddressesAndRecipientValidationStatus()
+    this.fetchLatestAddressesAndValidate()
   }
 
-  fetchLatestPhoneAddressesAndRecipientValidationStatus = () => {
+  fetchLatestAddressesAndValidate = () => {
     const { recipient } = this.props
     if (recipient.kind === RecipientKind.MobileNumber) {
       this.props.fetchAddressesAndValidate(recipient.e164PhoneNumber)
@@ -473,7 +479,7 @@ const style = StyleSheet.create({
 })
 
 export default componentWithAnalytics(
-  connect<StateProps, DispatchProps, NavigationFocusInjectedProps, RootState>(
+  connect<StateProps, DispatchProps, OwnProps, RootState>(
     mapStateToProps,
     mapDispatchToProps
   )(withTranslation(Namespaces.sendFlow7)(SendAmount))

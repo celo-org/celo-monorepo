@@ -26,6 +26,12 @@ import { TransactionData } from 'src/send/reducers'
 const FULL_ADDRESS_PLACEHOLDER = '0xf1b1d5a6e7728g309c4a025k122d71ad75a61976'
 const PARTIAL_ADDRESS_PLACEHOLDER = ['k', '0', 'F', '4']
 
+type Navigation = NavigationInjectedProps['navigation']
+
+interface OwnProps {
+  navigation: Navigation
+}
+
 interface StateProps {
   recipient: Recipient
   transactionData: TransactionData
@@ -48,8 +54,8 @@ const mapDispatchToProps = {
   validateRecipientAddress,
 }
 
-const mapStateToProps = (state: RootState, navProps: NavigationInjectedProps): StateProps => {
-  const { navigation } = navProps
+const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
+  const { navigation } = ownProps
   const transactionData = navigation.getParam('transactionData')
   const isPaymentRequest = navigation.getParam('isPaymentRequest')
   const { recipient } = transactionData
@@ -293,7 +299,7 @@ const styles = StyleSheet.create({
 })
 
 export default componentWithAnalytics(
-  connect<StateProps, DispatchProps, NavigationInjectedProps, RootState>(
+  connect<StateProps, DispatchProps, OwnProps, RootState>(
     mapStateToProps,
     mapDispatchToProps
   )(withTranslation(Namespaces.sendFlow7)(ValidateRecipientAccount))
