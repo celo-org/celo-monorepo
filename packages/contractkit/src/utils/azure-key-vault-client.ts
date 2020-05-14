@@ -100,8 +100,8 @@ export class AzureKeyVaultClient {
       S = N.minus(S)
     }
 
-    const rBuff = AzureKeyVaultClient.bigNumberToBuffer(R)
-    const sBuff = AzureKeyVaultClient.bigNumberToBuffer(S)
+    const rBuff = AzureKeyVaultClient.bigNumberToBuffer(R, 32)
+    const sBuff = AzureKeyVaultClient.bigNumberToBuffer(S, 32)
     const canonicalizedSignature = Buffer.concat([rBuff, sBuff])
     const publicKey = await this.getPublicKey(keyName)
 
@@ -151,18 +151,12 @@ export class AzureKeyVaultClient {
   ): number {
     for (let i = 0; i < 4; i++) {
       const compressed = false
-      try {
-        const recoveredPublicKeyByteArr = ecdsaRecover(signature, i, hash, compressed)
-        const publicKeyBuff = Buffer.from(recoveredPublicKeyByteArr)
-        const recoveredPublicKey = AzureKeyVaultClient.bufferToBigNumber(publicKeyBuff)
-        debug('Recovered key: ' + recoveredPublicKey)
-        if (publicKey.eq(recoveredPublicKey)) {
-          return i
-        }
-      } catch (e) {
-        if (e.message === 'Public key could not be recover') {
-          throw new Error('Invalid public key. Ensure that the key type is ECDSA')
-        }
+      const recoveredPublicKeyByteArr = ecdsaRecover(signature, i, hash, compressed)
+      const publicKeyBuff = Buffer.from(recoveredPublicKeyByteArr)
+      const recoveredPublicKey = AzureKeyVaultClient.bufferToBigNumber(publicKeyBuff)
+      debug('Recovered key: ' + recoveredPublicKey)
+      if (publicKey.eq(recoveredPublicKey)) {
+        return i
       }
     }
     throw new Error('Unable to generate recovery key from signature.')
@@ -192,8 +186,13 @@ export class AzureKeyVaultClient {
   private static bufferToBigNumber(input: Buffer): BigNumber {
     return new BigNumber(ensureLeading0x(input.toString('hex')))
   }
-  private static bigNumberToBuffer(input: BigNumber): Buffer {
-    return ethUtil.toBuffer(ensureLeading0x(input.toString(16))) as Buffer
+  private static bigNumberToBuffer(input: BigNumber, lengthInBytes: number): Buffer {
+    let hex = input.toString(16)
+    const hexLength = lengthInBytes * 2 // 2 hex characters per byte.
+    if (hex.length < hexLength) {
+      hex = '0'.repeat(hexLength - hex.length) + hex
+    }
+    return ethUtil.toBuffer(ensureLeading0x(hex)) as Buffer
   }
 
   /**
