@@ -26,15 +26,18 @@ const DESCRIPTION =
 
 export class Home extends React.Component<I18nProps & Props, State> {
   static async getInitialProps({ req }) {
-    let milestones
-    if (req) {
-      const getMilestones = await import('src/../server/fetchMilestones')
-      milestones = await getMilestones.default()
-    } else {
-      milestones = await fetch(`/api/milestones`).then((result) => result.json())
+    let milestones = []
+    try {
+      if (req) {
+        const getMilestones = await import('src/../server/fetchMilestones')
+        milestones = await getMilestones.default()
+      } else {
+        milestones = await fetch(`/api/milestones`).then((result) => result.json())
+      }
+      return { milestones }
+    } catch {
+      return { milestones }
     }
-
-    return { milestones }
   }
 
   state: State
