@@ -71,10 +71,8 @@ function linkBytecode(Contract: Truffle.Contract<any>) {
   const data = artifact.networks[network.network_id].links
   let code: string = artifact.bytecode.slice(2)
   for (const a of Object.keys(data)) {
-    // console.log("link", a, code.match(fill(a)))
     code = code.replace(fill(a), data[a].slice(2))
   }
-  // console.log("linked", code)
   return code.toLowerCase()
 }
 
@@ -115,10 +113,6 @@ function stripMetadata(bytecode: string) {
 }
 
 async function needsUpgrade(Contract: Truffle.Contract<any>, proxy: ProxyInstance) {
-  // const impl = await getImplementationBytecode(proxy)
-  // console.log("comparing", Contract.contractName, impl.slice(2).length, linkDeployedBytecode(Contract).length)
-  // console.log("comparing", Contract.contractName,
-  // stripMetadata(impl.slice(2)) === stripMetadata(linkDeployedBytecode(Contract)))
   const implementationBytecode = stripMetadata(await getImplementationBytecode(proxy))
   const compiledBytecode = stripMetadata(await getCompiledBytecode(Contract))
   const res = implementationBytecode !== compiledBytecode
@@ -178,6 +172,9 @@ module.exports = async (callback: (error?: any) => number) => {
     const contractNeedsUpgrade = await Promise.all(
       proxiedContracts.map(
         async ([Contract, Proxy]: [Truffle.Contract<any>, Truffle.Contract<ProxyInstance>]) => {
+          if (argv['force-upgrade']) {
+            return true
+          }
           try {
             const proxy = await Proxy.deployed()
             const res = await needsUpgrade(Contract, proxy)
