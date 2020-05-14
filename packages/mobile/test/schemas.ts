@@ -294,8 +294,7 @@ export const v1Schema = {
 export const v2Schema = {
   ...v1Schema,
   send: {
-    isSending: false,
-    recentRecipients: [],
+    ...v1Schema.send,
     isValidRecipient: false,
     secureSendPhoneNumberMapping: {},
   },
