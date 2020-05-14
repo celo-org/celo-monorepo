@@ -109,7 +109,7 @@ exports[`ValidateRecipientIntro renders correctly 1`] = `
           }
         }
       >
-        secureSendExplanation.1
+        secureSendExplanation.body1
       </Text>
       <Text
         style={
@@ -123,7 +123,7 @@ exports[`ValidateRecipientIntro renders correctly 1`] = `
           }
         }
       >
-        secureSendExplanation.2
+        secureSendExplanation.body2
       </Text>
     </View>
   </RCTScrollView>

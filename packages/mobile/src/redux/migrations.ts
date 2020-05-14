@@ -32,4 +32,17 @@ export const migrations = {
       },
     }
   },
+  2: (state: any) => {
+    const secureSendPhoneNumberMapping = {}
+    const isValidRecipient = false
+
+    return {
+      ...state,
+      send: {
+        ...state.send,
+        secureSendPhoneNumberMapping,
+        isValidRecipient,
+      },
+    }
+  },
 }

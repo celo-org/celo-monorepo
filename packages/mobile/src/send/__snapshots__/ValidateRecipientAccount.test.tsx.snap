@@ -36,7 +36,7 @@ exports[`ValidateRecipientAccount renders correctly when full validation require
               }
             }
           >
-            confirmAccountNumber.1b
+            confirmAccountNumber.body1Full
           </Text>
           <Text
             style={
@@ -50,7 +50,7 @@ exports[`ValidateRecipientAccount renders correctly when full validation require
               }
             }
           >
-            confirmAccountNumber.2b
+            confirmAccountNumber.body2Full
           </Text>
           <Text
             style={
@@ -436,7 +436,7 @@ exports[`ValidateRecipientAccount renders correctly when partial validation requ
               }
             }
           >
-            confirmAccountNumber.1a
+            confirmAccountNumber.body1Partial
           </Text>
           <Text
             style={
@@ -450,7 +450,7 @@ exports[`ValidateRecipientAccount renders correctly when partial validation requ
               }
             }
           >
-            confirmAccountNumber.2a
+            confirmAccountNumber.body2Partial
           </Text>
           <Text
             style={

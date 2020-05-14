@@ -1,8 +1,8 @@
 import { migrations } from 'src/redux/migrations'
-import { v0Schema, vNeg1Schema } from 'test/schemas'
+import { v0Schema, v1Schema, vNeg1Schema } from 'test/schemas'
 
 describe('Redux persist migrations', () => {
-  it('work for v-1 to v0', () => {
+  it('works for v-1 to v0', () => {
     const mockNumber = '+111111111111'
     const mockAddress = '0x00000000000000000000'
     const vNeg1Stub = {
@@ -16,7 +16,7 @@ describe('Redux persist migrations', () => {
     expect(migratedSchema.identity.e164NumberToAddress).toEqual({ [mockNumber]: [mockAddress] })
   })
 
-  it('work for v0 to v1', () => {
+  it('works for v0 to v1', () => {
     const mockNumber = '+111111111111'
     const mockAddress = '0x00000000000000000000'
     const v0Stub = {
@@ -30,5 +30,18 @@ describe('Redux persist migrations', () => {
     }
     const migratedSchema = migrations[1](v0Stub)
     expect(migratedSchema.invite.invitees[0].tempWalletAddress).toEqual(mockAddress)
+  })
+
+  it('works for v1 to v2', () => {
+    const v1Stub = {
+      ...v1Schema,
+      send: {
+        ...v1Schema.send,
+        secureSendPhoneNumberMapping: {},
+        isValidRecipient: false,
+      },
+    }
+    const migratedSchema = migrations[1](v1Stub)
+    expect(migratedSchema.send.isValidRecipient).toEqual(false)
   })
 })
