@@ -38,7 +38,7 @@
       "Each week, a very small fee (less than 0.01%) of every user's Celo Dollar Balance is used to keep the Celo Dollar's value stable. To learn more about Celo fees, visit the ",
     "1": "FAQ"
   },
-  "confirmingPayment": "Confirming…",
+  "confirmingTransaction": "Confirming…",
   "confirmingExchange": "Confirming…",
   "paymentFailed": "Payment Failed",
   "exchangeFailed": "Exchange Failed",

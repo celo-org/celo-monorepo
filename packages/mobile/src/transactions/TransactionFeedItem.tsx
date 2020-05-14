@@ -10,7 +10,6 @@ import { MoneyAmount, TokenTransactionType } from 'src/apollo/types'
 import CurrencyDisplay, { FormatType } from 'src/components/CurrencyDisplay'
 import { Namespaces } from 'src/i18n'
 import { TransactionStatus } from 'src/transactions/reducer'
-import { formatFeedTime, getDatetimeDisplayString } from 'src/utils/time'
 
 interface Props {
   type: TokenTransactionType
@@ -24,18 +23,16 @@ interface Props {
 }
 
 export function TransactionFeedItem(props: Props) {
-  const { t, i18n } = useTranslation(Namespaces.walletFlow5)
+  const { t } = useTranslation(Namespaces.walletFlow5)
 
-  const { type, amount, title, info, icon, timestamp, status, onPress } = props
+  const { type, amount, title, info, icon, status, onPress } = props
 
   const isReceived = new BigNumber(amount.value).isPositive()
-  const timeFormatted = formatFeedTime(timestamp, i18n)
-  const dateTimeFormatted = getDatetimeDisplayString(timestamp, t, i18n)
   const isPending = status === TransactionStatus.Pending
 
   let subtitle = info
   if (isPending) {
-    subtitle = t('confirmingPayment')
+    subtitle = t('confirmingTransaction')
   }
 
   return (
@@ -56,23 +53,6 @@ export function TransactionFeedItem(props: Props) {
             />
           </View>
           {!!subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
-          {/* <View style={[styles.statusContainer, !!info && styles.statusContainerUnderComment]}>
-            {isPending && (
-              <Text style={styles.transactionStatus}>
-                <Text style={styles.textPending}>{t('confirmingPayment')}</Text>
-                {' ' + timeFormatted}
-              </Text>
-            )}
-            {status === TransactionStatus.Complete && (
-              <Text style={styles.transactionStatus}>{dateTimeFormatted}</Text>
-            )}
-            {status === TransactionStatus.Failed && (
-              <Text style={styles.transactionStatus}>
-                <Text style={styles.textStatusFailed}>{t('paymentFailed')}</Text>
-                {' ' + timeFormatted}
-              </Text>
-            )}
-          </View> */}
         </View>
       </View>
     </Touchable>
@@ -112,30 +92,6 @@ const styles = StyleSheet.create({
   },
   amountReceived: {
     color: colors.greenUI,
-  },
-  statusContainer: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  statusContainerUnderComment: {
-    marginTop: 8,
-  },
-  textPending: {
-    // ...fontStyles.bodySmallBold,
-    fontSize: 13,
-    lineHeight: 18,
-    color: colors.celoGreen,
-  },
-  transactionStatus: {
-    // ...fontStyles.bodySmall,
-    color: colors.gray,
-  },
-  textStatusFailed: {
-    // ...fontStyles.semiBold,
-    fontSize: 13,
-    lineHeight: 17,
-    color: colors.darkSecondary,
   },
 })
 
