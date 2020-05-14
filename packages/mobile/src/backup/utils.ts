@@ -108,14 +108,8 @@ export async function getStoredMnemonic(): Promise<string | null> {
 }
 
 export function useAccountKey() {
-  const [accountKey, setAccountKey] = useState<string | null>(null)
-
-  useAsync(async () => {
-    const mnemonic = accountKey || (await getStoredMnemonic())
-    setAccountKey(mnemonic)
-  }, [])
-
-  return accountKey
+  asyncAccountKey = useAsync(getStoredMnemonic, [])
+  return asyncAccountKey.result;
 }
 
 // Because of a RN bug, we can't fully clean the text as the user types
