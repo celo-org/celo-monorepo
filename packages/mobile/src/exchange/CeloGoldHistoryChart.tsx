@@ -22,8 +22,8 @@ import { VictoryGroup, VictoryLine, VictoryScatter } from 'victory-native'
 const CHART_POINTS_NUMBER = 60
 const CHART_WIDTH = variables.width - variables.contentPadding * 2
 const CHART_HEIGHT = 180
-const CHART_MIN_VERTICAL_RANGE = 0.1
-const CHART_DOMAIN_PADDING = { y: [30, 30], x: [5, 5] }
+const CHART_MIN_VERTICAL_RANGE = 0.1 // one cent
+const CHART_DOMAIN_PADDING = { y: [30, 30] as [number, number], x: [5, 5] as [number, number] }
 
 interface OwnProps {
   testID?: string
@@ -208,11 +208,14 @@ function CeloGoldHistoryChart({ t, testID, i18n }: Props) {
   const values = chartData.map((el) => el.amount)
   const min = Math.min(...values)
   const max = Math.max(...values)
-  let domain = null
+  let domain
   // ensure that vertical chart range is at least CHART_MIN_VERTICAL_RANGE
   if (max - min < CHART_MIN_VERTICAL_RANGE) {
     const offset = CHART_MIN_VERTICAL_RANGE - (max - min) / 2
-    domain = { y: [min - offset, max + offset] }
+    domain = {
+      y: [min - offset, max + offset] as [number, number],
+      x: [0, chartData.length] as [number, number],
+    }
   }
   const rateWentUp = rateChange.gt(0)
 
@@ -232,8 +235,6 @@ function CeloGoldHistoryChart({ t, testID, i18n }: Props) {
           </Text>
         </View>
       </View>
-      {/* 
-        // @ts-ignore */}
       <VictoryGroup
         domainPadding={CHART_DOMAIN_PADDING}
         singleQuadrantDomainPadding={false}

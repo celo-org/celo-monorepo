@@ -1,12 +1,12 @@
 # Quick Start for Celo Gold Holders
 
-If you are an early holder of Celo Gold on the Celo [Release Candidate](../getting-started/rc1.md) network, this guide will help you access your account and do the setup necessary to earn rewards on those funds.
+If you are an early self-custodying holder of Celo Gold on the Celo [Release Candidate](../getting-started/rc1.md) network, this guide will help you access your account and do the setup necessary to earn rewards on those funds.
 
 ## Prerequisites
 
 This guide assumes:
 
-- You are self-custodying (you hold the private key to your address), and that you have provided that address directly to cLabs. If you are using a custody provider, please contact them for directions.
+- You are self-custodying (you hold the private key to your address), and that you have provided that address directly to cLabs. If you are using a custody provider ([Anchorage](https://anchorage.com), [Coinbase](https://custody.coinbase.com), [CoinList](https://coinlist.co), or others), please contact them for directions.
 
 - Your address is the beneficiary of a [ReleaseGold](release-gold.md) contract, which releases Celo Gold programmatically to a beneficiary over a period of time.
 
@@ -24,7 +24,7 @@ This guide assumes:
 
 ## Support
 
-If you have any questions or need assistance with these instructions, please contact cLabs or ask in the `#celo-gold-holders` channel on [Celo's Discord server](https://chat.celo.org). Remember that Discord is a public channel: never disclose mnemonics, private keys, unsantized log output, or personal information.
+If you have any questions or need assistance with these instructions, please contact cLabs or ask in the `#celo-gold-holders` channel on [Celo's Discord server](https://chat.celo.org). Remember that Discord is a public channel: never disclose recovery phrases (also known as backup keys, or mnemonics), private keys, unsantized log output, or personal information.
 
 Please refer to the [Ledger Troubleshooting](ledger.md#Troubleshooting) for issues using Ledgers with the Celo CLI.
 
@@ -48,7 +48,7 @@ You will need:
 
 As a first step, follow [these instructions](ledger.md) for both Ledgers to install the Ledger Celo app, obtain and verify the associated addresses, and (recommended) run a test transaction on the Alfajores test network.
 
-The remainder of this guide assumes you are using the first address available on each Ledger. You can add the flags described in the above instructions to commands below to use different addresses.
+The remainder of this guide assumes you are using the first address available on each Ledger. You can add the flags described in [these instructions](ledger.md) to commands below to use different addresses.
 
 ## Deployment
 
@@ -198,7 +198,7 @@ The `vote` address under `authorizedSigners` should match `$CELO_VOTE_SIGNER_ADD
 The `ReleaseGold` contract was funded with an additional 1 cGLD that it sends to the first vote signer account to be authorized. This allows the vote signer account to cover transaction fees. You can confirm this:
 
 ```bash
-celocli account:balance $CELO_VOTE_SIGNER_SIGNATURE
+celocli account:balance $CELO_VOTE_SIGNER_ADDRESS
 ```
 
 {% hint style="warning" %}
@@ -244,9 +244,15 @@ Once you have found one or more Validator Groups you’d like to vote for, creat
 export CELO_VALIDATOR_GROUP_ADDRESS=<VALIDATOR-GROUP-ADDRESS-TO-VOTE-FOR>
 ```
 
-To vote, you will use your vote signer key, which is voting *on behalf of* your Locked Gold account.
+For each vote you will need to select the amount of locked Celo Gold you wish to vote with. You can lookup your balance again if you need to:
 
-For each vote you will need to specify the amount of locked Celo Gold you wish to vote with (don’t include the `< >` braces). All Celo Gold amounts should be expressed in wei: that means 1 cGLD = 1000000000000000000.
+```bash
+celocli account:balance $CELO_RG_ADDRESS
+```
+
+All Celo Gold amounts should be expressed in wei: that means 1 cGLD = 1000000000000000000. Don’t include the `< >` braces in the line below.
+
+To vote, you will use your vote signer key, which is voting *on behalf of* your Locked Gold account.
 
 {% hint style="info" %}
 Connect your **Vote Signer Ledger** now, unlock it, and open the Celo application.

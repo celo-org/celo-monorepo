@@ -756,7 +756,7 @@ SPEC CHECKSUMS:
   React-jsi: b6dc94a6a12ff98e8877287a0b7620d365201161
   React-jsiexecutor: 1540d1c01bb493ae3124ed83351b1b6a155db7da
   React-jsinspector: 512e560d0e985d0e8c479a54a4e5c147a9c83493
-  react-native-blind-threshold-bls: ff203478b661b165924ba56f81f87bd14f6a779a
+  react-native-blind-threshold-bls: 86068a0a8890b04b5492a4a8787b53dbde1aea8d
   react-native-camera: 1b52abea404d04e040edb3e74b7c5523c01a3089
   react-native-config: 8f6b2b9e017f6a5e92a97353c768e19e67294bb1
   react-native-contacts: d1a60e38dadb67dbbe481480338988e00966a30d
