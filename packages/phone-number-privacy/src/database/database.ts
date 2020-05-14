@@ -10,3 +10,7 @@ const db = knex({
 export function getDatabase() {
   return db
 }
+
+export function getTransaction() {
+  return db.transaction()
+}
