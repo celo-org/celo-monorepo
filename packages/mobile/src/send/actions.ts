@@ -42,7 +42,7 @@ export interface SendPaymentOrInviteAction {
   amount: BigNumber
   reason: string
   recipient: Recipient
-  recipientAddress: string | null | undefined
+  recipientAddress?: string | null
   inviteMethod?: InviteBy
   firebasePendingRequestUid: string | null | undefined
 }

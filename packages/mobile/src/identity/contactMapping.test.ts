@@ -6,10 +6,7 @@ import { defaultCountryCodeSelector, e164NumberSelector } from 'src/account/sele
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { updateE164PhoneNumberAddresses } from 'src/identity/actions'
-import {
-  doImportContactsWrapper,
-  fetchPhoneAddressesAndCheckIfRecipientValidationRequired,
-} from 'src/identity/contactMapping'
+import { doImportContactsWrapper, fetchAddressesAndValidateSaga } from 'src/identity/contactMapping'
 import { fetchPhoneHashPrivate } from 'src/identity/privacy'
 import { e164NumberToAddressSelector } from 'src/identity/reducer'
 import { setRecipientCache } from 'src/recipients/actions'
@@ -75,7 +72,7 @@ describe('Fetch Addresses Saga', () => {
   // TODO reenable when PGPNP gets enabled
   it.skip('fetches and caches addresses correctly', async () => {
     const contractKit = await getContractKitOutsideGenerator()
-    await expectSaga(fetchPhoneAddressesAndCheckIfRecipientValidationRequired, {
+    await expectSaga(fetchAddressesAndValidateSaga, {
       e164Number: mockE164Number,
     })
       .provide([

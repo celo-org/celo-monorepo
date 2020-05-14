@@ -22,12 +22,6 @@ import { handleBarcodeDetected } from 'src/send/actions'
 import { TransactionData } from 'src/send/reducers'
 import Logger from 'src/utils/Logger'
 
-type Navigation = NavigationFocusInjectedProps['navigation']
-
-interface OwnProps {
-  navigation: Navigation
-}
-
 interface StateProps {
   scanIsForSecureSend: true | undefined
   transactionData: TransactionData
@@ -38,10 +32,10 @@ interface DispatchProps {
   handleBarcodeDetected: typeof handleBarcodeDetected
 }
 
-type Props = DispatchProps & WithTranslation & StateProps & OwnProps
+type Props = DispatchProps & WithTranslation & StateProps & NavigationFocusInjectedProps
 
-const mapStateToProps = (state: RootState, ownProps: NavigationFocusInjectedProps): StateProps => {
-  const { navigation } = ownProps
+const mapStateToProps = (state: RootState, navProps: NavigationFocusInjectedProps): StateProps => {
+  const { navigation } = navProps
   return {
     scanIsForSecureSend: navigation.getParam('scanIsForSecureSend'),
     transactionData: navigation.getParam('transactionData'),
@@ -69,32 +63,8 @@ class QRScanner extends React.Component<Props> {
     navigate(Screens.QRCode)
   }
 
-  renderUsersOwnQRCode = () => {
-    const { t, scanIsForSecureSend } = this.props
-
-    // Hide option to return to user's own QR code if scan happens as part of Secure Send flow
-    if (scanIsForSecureSend) {
-      return null
-    }
-
-    return (
-      <View style={styles.footerContainer}>
-        <Button
-          onPress={this.onPressShowYourCode}
-          text={t('showYourQRCode')}
-          standard={false}
-          type={BtnTypes.SECONDARY}
-        >
-          <View style={styles.footerIcon}>
-            <QRCode />
-          </View>
-        </Button>
-      </View>
-    )
-  }
-
   render() {
-    const { t } = this.props
+    const { t, scanIsForSecureSend } = this.props
 
     return (
       <SafeAreaView style={styles.container}>
@@ -133,7 +103,20 @@ class QRScanner extends React.Component<Props> {
             </RNCamera>
           )}
         </View>
-        {this.renderUsersOwnQRCode()}
+        {!scanIsForSecureSend && (
+          <View style={styles.footerContainer}>
+            <Button
+              onPress={this.onPressShowYourCode}
+              text={t('showYourQRCode')}
+              standard={false}
+              type={BtnTypes.SECONDARY}
+            >
+              <View style={styles.footerIcon}>
+                <QRCode />
+              </View>
+            </Button>
+          </View>
+        )}
       </SafeAreaView>
     )
   }
@@ -204,7 +187,7 @@ const styles = StyleSheet.create({
 export default componentWithAnalytics(
   withNavigationFocus(
     // @ts-ignore
-    connect<StateProps, DispatchProps, OwnProps, RootState>(mapStateToProps, {
+    connect<StateProps, DispatchProps, NavigationFocusInjectedProps, RootState>(mapStateToProps, {
       handleBarcodeDetected,
     })(withTranslation(Namespaces.sendFlow7)(QRScanner))
   )

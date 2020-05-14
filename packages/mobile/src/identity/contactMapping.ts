@@ -14,7 +14,7 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import { USE_PHONE_NUMBER_PRIVACY } from 'src/config'
 import {
   endImportContacts,
-  FetchPhoneAddressesAndCheckIfRecipientValidationRequiredAction,
+  FetchAddressesAndValidateAction,
   updateE164PhoneNumberAddresses,
 } from 'src/identity/actions'
 import { fetchPhoneHashPrivate, PhoneNumberHashDetails } from 'src/identity/privacy'
@@ -104,22 +104,13 @@ function* updateRecipientsCache(
   yield put(setRecipientCache({ ...e164NumberToRecipients, ...otherRecipients }))
 }
 
-export function* fetchPhoneAddressesAndCheckIfRecipientValidationRequired({
-  e164Number,
-}: FetchPhoneAddressesAndCheckIfRecipientValidationRequiredAction) {
+export function* fetchAddressesAndValidateSaga({ e164Number }: FetchAddressesAndValidateAction) {
   try {
-    Logger.debug(
-      TAG + '@fetchPhoneAddressesAndCheckIfRecipientValidationRequired',
-      `Fetching addresses for number`
-    )
+    Logger.debug(TAG + '@fetchAddressesAndValidate', `Fetching addresses for number`)
     const oldE164NumberToAddress = yield select(e164NumberToAddressSelector)
     const oldAddresses = oldE164NumberToAddress[e164Number]
       ? [...oldE164NumberToAddress[e164Number]]
       : oldE164NumberToAddress[e164Number]
-    // const oldAddresses = [
-    //   '0xf1b1d5a6e7728a309c4a025b122d71ad75a61976',
-    //   '0x4ee307e8bdcaa2695b49cd6af380ac70914c7c78',
-    // ]
 
     // Clear existing entries for those numbers so our mapping consumers know new status is pending.
     yield put(updateE164PhoneNumberAddresses({ [e164Number]: undefined }, {}))
@@ -131,19 +122,12 @@ export function* fetchPhoneAddressesAndCheckIfRecipientValidationRequired({
     ])
 
     const addresses: string[] | null = yield call(getAddresses, e164Number, attestationsWrapper)
-    // const addresses = [
-    //   '0xf1b1d5a6e7728a309c4a025b122d71ad75a61976',
-    //   '0x4ee307e8bdcaa2695b49cd6af380ac70914c7c78',
-    // ]
 
     const e164NumberToAddressUpdates: E164NumberToAddressType = {}
     const addressToE164NumberUpdates: AddressToE164NumberType = {}
 
     if (!addresses) {
-      Logger.debug(
-        TAG + '@fetchPhoneAddressesAndCheckIfRecipientValidationRequired',
-        `No addresses for number`
-      )
+      Logger.debug(TAG + '@fetchAddressesAndValidate', `No addresses for number`)
       // Save invalid/0 addresses to avoid checking again
       // null means a contact is unverified, whereas undefined means we haven't checked yet
       e164NumberToAddressUpdates[e164Number] = null
@@ -171,11 +155,7 @@ export function* fetchPhoneAddressesAndCheckIfRecipientValidationRequired({
       updateE164PhoneNumberAddresses(e164NumberToAddressUpdates, addressToE164NumberUpdates)
     )
   } catch (error) {
-    Logger.error(
-      TAG + '@fetchPhoneAddressesAndCheckIfRecipientValidationRequired',
-      `Error fetching addresses`,
-      error
-    )
+    Logger.error(TAG + '@fetchAddressesAndValidate', `Error fetching addresses`, error)
     yield put(showError(ErrorMessages.ADDRESS_LOOKUP_FAILURE))
   }
 }

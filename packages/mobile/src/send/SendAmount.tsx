@@ -19,7 +19,7 @@ import { WithTranslation } from 'react-i18next'
 import { StyleSheet, TextStyle, TouchableWithoutFeedback, View } from 'react-native'
 import { getNumberFormatSettings } from 'react-native-localize'
 import SafeAreaView from 'react-native-safe-area-view'
-import { NavigationInjectedProps } from 'react-navigation'
+import { NavigationFocusInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
 import { hideAlert, showError, showMessage } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
@@ -39,7 +39,7 @@ import EstimateFee from 'src/fees/EstimateFee'
 import { getFeeEstimateDollars } from 'src/fees/selectors'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
-import { fetchPhoneAddressesAndCheckIfRecipientValidationRequired } from 'src/identity/actions'
+import { fetchAddressesAndValidate } from 'src/identity/actions'
 import { RecipientVerificationStatus } from 'src/identity/reducer'
 import { LocalCurrencyCode, LocalCurrencySymbol } from 'src/localCurrency/consts'
 import {
@@ -68,13 +68,7 @@ interface State {
   reason: string
 }
 
-type Navigation = NavigationInjectedProps['navigation']
-
-interface OwnProps {
-  navigation: Navigation
-}
-
-type Props = StateProps & DispatchProps & OwnProps & WithTranslation
+type Props = StateProps & DispatchProps & NavigationFocusInjectedProps & WithTranslation
 
 interface StateProps {
   dollarBalance: string
@@ -94,11 +88,11 @@ interface DispatchProps {
   showMessage: typeof showMessage
   showError: typeof showError
   hideAlert: typeof hideAlert
-  fetchPhoneAddressesAndCheckIfRecipientValidationRequired: typeof fetchPhoneAddressesAndCheckIfRecipientValidationRequired
+  fetchAddressesAndValidate: typeof fetchAddressesAndValidate
 }
 
-const mapStateToProps = (state: RootState, ownProps: NavigationInjectedProps): StateProps => {
-  const { navigation } = ownProps
+const mapStateToProps = (state: RootState, navProps: NavigationFocusInjectedProps): StateProps => {
+  const { navigation } = navProps
   const recipient = navigation.getParam('recipient')
   const { secureSendPhoneNumberMapping } = state.send
   const { addressValidationRequired, fullValidationRequired } = checkIfAddressValidationRequired(
@@ -128,7 +122,7 @@ const mapDispatchToProps = {
   showError,
   hideAlert,
   showMessage,
-  fetchPhoneAddressesAndCheckIfRecipientValidationRequired,
+  fetchAddressesAndValidate,
 }
 
 const { decimalSeparator } = getNumberFormatSettings()
@@ -146,18 +140,13 @@ export class SendAmount extends React.Component<Props, State> {
 
   componentDidMount = () => {
     this.props.fetchDollarBalance()
-    this.fetchLatestPhoneAddressesAndRecipientVerificationStatus()
+    this.fetchLatestPhoneAddressesAndRecipientValidationStatus()
   }
 
-  fetchLatestPhoneAddressesAndRecipientVerificationStatus = () => {
+  fetchLatestPhoneAddressesAndRecipientValidationStatus = () => {
     const { recipient } = this.props
-    // Skip phone number fetch for QR codes or Addresses
-    if (recipient.kind !== RecipientKind.QrCode && recipient.kind !== RecipientKind.Address) {
-      if (!recipient.e164PhoneNumber) {
-        throw new Error('Missing recipient e164Number')
-      }
-
-      this.props.fetchPhoneAddressesAndCheckIfRecipientValidationRequired(recipient.e164PhoneNumber)
+    if (recipient.kind === RecipientKind.MobileNumber) {
+      this.props.fetchAddressesAndValidate(recipient.e164PhoneNumber)
     }
   }
 
@@ -232,7 +221,10 @@ export class SendAmount extends React.Component<Props, State> {
     this.props.hideAlert()
 
     if (addressValidationRequired) {
-      navigate(Screens.ValidateRecipientIntro, { transactionData, fullValidationRequired })
+      navigate(Screens.ValidateRecipientIntro, {
+        transactionData,
+        fullValidationRequired,
+      })
     } else {
       CeloAnalytics.track(CustomEventNames.send_continue)
       navigate(Screens.SendConfirmation, { transactionData })
@@ -481,7 +473,7 @@ const style = StyleSheet.create({
 })
 
 export default componentWithAnalytics(
-  connect<StateProps, DispatchProps, OwnProps, RootState>(
+  connect<StateProps, DispatchProps, NavigationFocusInjectedProps, RootState>(
     mapStateToProps,
     mapDispatchToProps
   )(withTranslation(Namespaces.sendFlow7)(SendAmount))

@@ -15,6 +15,7 @@ import { InviteBy } from 'src/invite/actions'
 import { sendInvite } from 'src/invite/saga'
 import { navigateHome } from 'src/navigator/NavigationService'
 import { handleBarcode, shareSVGImage } from 'src/qrcode/utils'
+import { RecipientKind } from 'src/recipients/recipient'
 import { recipientCacheSelector } from 'src/recipients/reducer'
 import {
   Actions,
@@ -25,7 +26,7 @@ import {
   validateRecipientAddressFailure,
   validateRecipientAddressSuccess,
 } from 'src/send/actions'
-import { checkForValidationErrorsAndReturnMatch } from 'src/send/utils'
+import { validateAndReturnMatch } from 'src/send/utils'
 import { transferStableToken } from 'src/stableToken/actions'
 import {
   BasicTokenTransfer,
@@ -39,7 +40,6 @@ import { currentAccountSelector } from 'src/web3/selectors'
 import { estimateGas } from 'src/web3/utils'
 
 const TAG = 'send/saga'
-const TAG2 = 'secureSend/saga'
 
 export async function getSendTxGas(
   account: string,
@@ -70,6 +70,12 @@ export function* watchQrCodeDetections() {
     const addressToE164Number = yield select(addressToE164NumberSelector)
     const recipientCache = yield select(recipientCacheSelector)
     const e164NumberToAddress = yield select(e164NumberToAddressSelector)
+    let secureSendTxData
+
+    if (action.scanIsForSecureSend) {
+      secureSendTxData = action.transactionData
+    }
+
     try {
       yield call(
         handleBarcode,
@@ -77,8 +83,7 @@ export function* watchQrCodeDetections() {
         addressToE164Number,
         recipientCache,
         e164NumberToAddress,
-        action.scanIsForSecureSend,
-        action.transactionData
+        secureSendTxData
       )
     } catch (error) {
       Logger.error(TAG, 'Error handling the barcode', error)
@@ -191,22 +196,21 @@ export function* validateRecipientAddressSaga({
 }: ValidateRecipientAddressAction) {
   Logger.debug(TAG, 'Starting Recipient Address Validation')
   try {
+    if (recipient.kind !== RecipientKind.MobileNumber) {
+      throw Error(`Invalid recipient type: ${recipient.kind}`)
+    }
+
     const userAddress = yield select(userAddressSelector)
     const e164NumberToAddress = yield select(e164NumberToAddressSelector)
     const { e164PhoneNumber } = recipient
-
-    // should never happen, if it does it means there's an error passing through recipient object
-    if (!e164PhoneNumber) {
-      throw Error('There is no phone number associated with this recipient')
-    }
-
     const possibleRecievingAddresses = e164NumberToAddress[e164PhoneNumber]
-    // should never happen since secure send is initiated due to there being several possible addresses
+
+    // Should never happen since secure send is initiated due to there being several possible addresses
     if (!possibleRecievingAddresses) {
       throw Error('There are no possible recipient addresses to validate against')
     }
 
-    const validatedAddress = checkForValidationErrorsAndReturnMatch(
+    const validatedAddress = validateAndReturnMatch(
       userInputOfFullAddressOrLastFourDigits,
       possibleRecievingAddresses,
       userAddress,
@@ -214,7 +218,7 @@ export function* validateRecipientAddressSaga({
     )
     yield put(validateRecipientAddressSuccess(e164PhoneNumber, validatedAddress))
   } catch (error) {
-    Logger.error(TAG2, 'Address validation error: ', error.message)
+    Logger.error(TAG, 'validateRecipientAddressSaga/Address validation error: ', error.message)
     yield put(showError(error.message))
     yield put(validateRecipientAddressFailure())
   }

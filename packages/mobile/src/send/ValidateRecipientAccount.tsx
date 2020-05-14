@@ -23,11 +23,8 @@ import { RootState } from 'src/redux/reducers'
 import { validateRecipientAddress } from 'src/send/actions'
 import { TransactionData } from 'src/send/reducers'
 
-type Navigation = NavigationInjectedProps['navigation']
-
-interface OwnProps {
-  navigation: Navigation
-}
+const FULL_ADDRESS_PLACEHOLDER = '0xf1b1d5a6e7728g309c4a025k122d71ad75a61976'
+const PARTIAL_ADDRESS_PLACEHOLDER = ['k', '0', 'F', '4']
 
 interface StateProps {
   recipient: Recipient
@@ -51,8 +48,8 @@ const mapDispatchToProps = {
   validateRecipientAddress,
 }
 
-const mapStateToProps = (state: RootState, ownProps: NavigationInjectedProps): StateProps => {
-  const { navigation } = ownProps
+const mapStateToProps = (state: RootState, navProps: NavigationInjectedProps): StateProps => {
+  const { navigation } = navProps
   const transactionData = navigation.getParam('transactionData')
   const isPaymentRequest = navigation.getParam('isPaymentRequest')
   const { recipient } = transactionData
@@ -65,7 +62,7 @@ const mapStateToProps = (state: RootState, ownProps: NavigationInjectedProps): S
   }
 }
 
-type Props = StateProps & DispatchProps & WithTranslation & OwnProps
+type Props = StateProps & DispatchProps & WithTranslation & NavigationInjectedProps
 
 export class ValidateRecipientAccount extends React.Component<Props, State> {
   static navigationOptions = () => ({
@@ -79,9 +76,9 @@ export class ValidateRecipientAccount extends React.Component<Props, State> {
     isModalVisible: false,
   }
 
-  componentDidUpdate = async () => {
+  componentDidUpdate = (prevProps: Props) => {
     const { isValidRecipient, isPaymentRequest, transactionData } = this.props
-    if (isValidRecipient) {
+    if (isValidRecipient && !prevProps.isValidRecipient) {
       if (isPaymentRequest) {
         navigate(Screens.PaymentRequestConfirmation, { transactionData })
       } else {
@@ -122,12 +119,12 @@ export class ValidateRecipientAccount extends React.Component<Props, State> {
       return (
         <View>
           <Text style={styles.body}>
-            {t('confirmAccountNumber.1b', {
+            {t('confirmAccountNumber.body1Full', {
               displayName,
             })}
           </Text>
           <Text style={styles.body}>
-            {t('confirmAccountNumber.2b', {
+            {t('confirmAccountNumber.body2Full', {
               displayName,
             })}
           </Text>
@@ -135,7 +132,7 @@ export class ValidateRecipientAccount extends React.Component<Props, State> {
           <CodeRow
             status={CodeRowStatus.INPUTTING}
             inputValue={inputValue}
-            inputPlaceholder={'0xf1b1d5a6e7728g309c4a025k122d71ad75a61976'}
+            inputPlaceholder={FULL_ADDRESS_PLACEHOLDER}
             onInputChange={this.onInputChange}
             shouldShowClipboard={this.shouldShowClipboard}
           />
@@ -143,26 +140,28 @@ export class ValidateRecipientAccount extends React.Component<Props, State> {
       )
     }
 
-    const singleDigitInputComponentArr = ['k', '0', 'F', '4'].map((placeholderValue, index) => (
-      <SingleDigitInput
-        key={placeholderValue}
-        inputValue={singleDigitInputValueArr[index]}
-        inputPlaceholder={placeholderValue}
-        // tslint:disable-next-line:jsx-no-lambda
-        onInputChange={(value) => this.onSingleDigitInputChange(value, index)}
-        shouldShowClipboard={this.shouldShowClipboard}
-      />
-    ))
+    const singleDigitInputComponentArr = PARTIAL_ADDRESS_PLACEHOLDER.map(
+      (placeholderValue, index) => (
+        <SingleDigitInput
+          key={placeholderValue}
+          inputValue={singleDigitInputValueArr[index]}
+          inputPlaceholder={placeholderValue}
+          // tslint:disable-next-line:jsx-no-lambda
+          onInputChange={(value) => this.onSingleDigitInputChange(value, index)}
+          shouldShowClipboard={this.shouldShowClipboard}
+        />
+      )
+    )
 
     return (
       <View>
         <Text style={styles.body}>
-          {t('confirmAccountNumber.1a', {
+          {t('confirmAccountNumber.body1Partial', {
             displayName,
           })}
         </Text>
         <Text style={styles.body}>
-          {t('confirmAccountNumber.2a', {
+          {t('confirmAccountNumber.body2Partial', {
             displayName,
           })}
         </Text>
@@ -294,7 +293,7 @@ const styles = StyleSheet.create({
 })
 
 export default componentWithAnalytics(
-  connect<StateProps, DispatchProps, OwnProps, RootState>(
+  connect<StateProps, DispatchProps, NavigationInjectedProps, RootState>(
     mapStateToProps,
     mapDispatchToProps
   )(withTranslation(Namespaces.sendFlow7)(ValidateRecipientAccount))

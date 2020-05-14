@@ -23,36 +23,30 @@ import { formatDisplayName } from 'src/send/utils'
 const AVATAR_SIZE = 120
 const QR_ICON_SIZE = 24
 
-type Navigation = NavigationInjectedProps['navigation']
-
-interface OwnProps {
-  navigation: Navigation
-}
-
 interface StateProps {
   recipient: Recipient
   transactionData: TransactionData
   fullValidationRequired: boolean
   displayName: string
-  startOfSentenceDisplayName: string
+  displayNameCapitalized: string
   isPaymentRequest: true | undefined
 }
 
-type Props = WithTranslation & StateProps & OwnProps
+type Props = WithTranslation & StateProps & NavigationInjectedProps
 
-const mapStateToProps = (state: RootState, ownProps: NavigationInjectedProps): StateProps => {
-  const { navigation } = ownProps
+const mapStateToProps = (state: RootState, navProps: NavigationInjectedProps): StateProps => {
+  const { navigation } = navProps
   const transactionData = navigation.getParam('transactionData')
   const fullValidationRequired = navigation.getParam('fullValidationRequired')
   const isPaymentRequest = navigation.getParam('isPaymentRequest')
   const { recipient } = transactionData
-  const { displayName, startOfSentenceDisplayName } = formatDisplayName(recipient.displayName)
+  const { displayName, displayNameCapitalized } = formatDisplayName(recipient.displayName)
   return {
     recipient,
     transactionData,
     fullValidationRequired,
     displayName,
-    startOfSentenceDisplayName,
+    displayNameCapitalized,
     isPaymentRequest,
   }
 }
@@ -80,7 +74,7 @@ class ValidateRecipientIntro extends React.Component<Props> {
   }
 
   render() {
-    const { t, recipient, displayName, startOfSentenceDisplayName } = this.props
+    const { t, recipient, displayName, displayNameCapitalized } = this.props
 
     return (
       <SafeAreaView style={styles.container}>
@@ -96,13 +90,13 @@ class ValidateRecipientIntro extends React.Component<Props> {
             })}
           </Text>
           <Text style={styles.body}>
-            {t('secureSendExplanation.1', {
+            {t('secureSendExplanation.body1', {
               e164Number: recipient.e164PhoneNumber,
-              displayName: startOfSentenceDisplayName,
+              displayName: displayNameCapitalized,
             })}
           </Text>
           <Text style={styles.body}>
-            {t('secureSendExplanation.2', {
+            {t('secureSendExplanation.body2', {
               displayName,
             })}
           </Text>
@@ -176,7 +170,7 @@ const styles = StyleSheet.create({
 })
 
 export default componentWithAnalytics(
-  connect<StateProps, {}, OwnProps, RootState>(mapStateToProps)(
+  connect<StateProps, {}, NavigationInjectedProps, RootState>(mapStateToProps)(
     withTranslation(Namespaces.sendFlow7)(ValidateRecipientIntro)
   )
 )

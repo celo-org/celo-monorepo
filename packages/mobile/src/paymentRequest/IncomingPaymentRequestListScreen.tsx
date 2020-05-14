@@ -8,7 +8,7 @@ import { getIncomingPaymentRequests } from 'src/account/selectors'
 import { PaymentRequest } from 'src/account/types'
 import { declinePaymentRequest } from 'src/firebase/actions'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
-import { fetchPhoneAddressesAndCheckIfRecipientValidationRequired } from 'src/identity/actions'
+import { fetchAddressesAndValidate } from 'src/identity/actions'
 import { e164NumberToAddressSelector, E164NumberToAddressType } from 'src/identity/reducer'
 import { HeaderTitleWithBalance } from 'src/navigator/Headers'
 import { NotificationList } from 'src/notifications/NotificationList'
@@ -17,7 +17,7 @@ import {
   getAddressValidationCheckCache,
   getRecipientFromPaymentRequest,
 } from 'src/paymentRequest/utils'
-import { NumberToRecipient } from 'src/recipients/recipient'
+import { NumberToRecipient, RecipientKind } from 'src/recipients/recipient'
 import { recipientCacheSelector } from 'src/recipients/reducer'
 import { RootState } from 'src/redux/reducers'
 interface StateProps {
@@ -30,7 +30,7 @@ interface StateProps {
 
 interface DispatchProps {
   declinePaymentRequest: typeof declinePaymentRequest
-  fetchPhoneAddressesAndCheckIfRecipientValidationRequired: typeof fetchPhoneAddressesAndCheckIfRecipientValidationRequired
+  fetchAddressesAndValidate: typeof fetchAddressesAndValidate
 }
 
 export interface AddressValidationCheckCache {
@@ -62,7 +62,7 @@ const mapStateToProps = (state: RootState): StateProps => {
 
 const mapDispatchToProps = {
   declinePaymentRequest,
-  fetchPhoneAddressesAndCheckIfRecipientValidationRequired,
+  fetchAddressesAndValidate,
 }
 
 type Props = NavigationInjectedProps & WithTranslation & StateProps & DispatchProps
@@ -108,22 +108,21 @@ class IncomingPaymentRequestListScreen extends React.Component<Props> {
   })
 
   componentDidMount() {
-    // need to check latest mapping to prevent user from accepting fradulent requests
+    // Need to check latest mapping to prevent user from accepting fradulent requests
     this.fetchLatestPhoneAddressesAndRecipientVerificationStatuses()
   }
 
   fetchLatestPhoneAddressesAndRecipientVerificationStatuses = () => {
     const { paymentRequests } = this.props
 
-    // TODO: look into creating a batch lookup function so we dont rerender on each lookup
+    // TODO: Look into creating a batch lookup function so we dont rerender on each lookup
     paymentRequests.forEach((paymentRequest) => {
       const recipient = getRecipientFromPaymentRequest(paymentRequest, this.props.recipientCache)
-      const { e164PhoneNumber } = recipient
-      if (!e164PhoneNumber) {
-        throw new Error('Missing recipient e164Number for payment request')
+      if (recipient.kind !== RecipientKind.MobileNumber) {
+        throw Error(`Invalid recipient type: ${recipient.kind}`)
       }
-
-      this.props.fetchPhoneAddressesAndCheckIfRecipientValidationRequired(e164PhoneNumber)
+      const { e164PhoneNumber } = recipient
+      this.props.fetchAddressesAndValidate(e164PhoneNumber)
     })
   }
 

@@ -81,7 +81,7 @@ export const sendReducer = (
       }
     case Actions.VALIDATE_RECIPIENT_ADDRESS_SUCCESS:
       const { secureSendPhoneNumberMapping } = state
-      // overwrite the previous mapping every time a new one is validated
+      // Overwrite the previous mapping every time a new one is validated
       secureSendPhoneNumberMapping[action.e164Number] = {
         address: action.validatedAddress,
         addressValidationRequired: false,

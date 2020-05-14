@@ -56,8 +56,7 @@ export function* handleBarcode(
   addressToE164Number: AddressToE164NumberType,
   recipientCache: NumberToRecipient,
   e164NumberToAddress: E164NumberToAddressType,
-  scanIsForSecureSend?: true,
-  transactionData?: TransactionData
+  secureSendTxData?: TransactionData
 ) {
   let data: { address: string; e164PhoneNumber: string; displayName: string } | undefined
 
@@ -75,22 +74,16 @@ export function* handleBarcode(
     return
   }
   try {
-    if (scanIsForSecureSend) {
-      if (!transactionData) {
-        throw Error(
-          'Error passing through data: Transaction and recipient information not received'
-        )
+    if (secureSendTxData) {
+      if (secureSendTxData.recipient.kind !== RecipientKind.MobileNumber) {
+        throw Error(`Invalid recipient type for Secure Send: ${secureSendTxData.recipient.kind}`)
       }
 
       const userScannedAddress = data.address.toLowerCase()
-      const { e164PhoneNumber } = transactionData.recipient
-      if (!e164PhoneNumber) {
-        throw Error('Error passing through data: Phone number not part of recipient data')
-      }
-
+      const { e164PhoneNumber } = secureSendTxData.recipient
       const possibleRecievingAddresses = e164NumberToAddress[e164PhoneNumber]
-      // This should never happen as Secure Send is triggered when there are mutliple addrresses
-      // for a given phone number
+      // This should never happen. Secure Send is triggered when there are
+      // mutliple addrresses for a given phone number
       if (!possibleRecievingAddresses) {
         throw Error("No addresses associated with recipient's phone number")
       }
@@ -106,7 +99,7 @@ export function* handleBarcode(
       yield put(validateRecipientAddressSuccess(e164PhoneNumber, userScannedAddress))
     }
   } catch (error) {
-    Logger.error(TAG + '@handleBarcode', `Error with secure send validation: `, error)
+    Logger.error(TAG + '@handleBarcode', `Error with Secure Send: `, error)
   }
 
   if (typeof data.e164PhoneNumber !== 'string') {
@@ -135,8 +128,8 @@ export function* handleBarcode(
       }
   yield put(storeLatestInRecents(recipient))
 
-  if (scanIsForSecureSend) {
-    replace(Screens.SendConfirmation, { transactionData })
+  if (secureSendTxData) {
+    replace(Screens.SendConfirmation, { transactionData: secureSendTxData })
   } else {
     replace(Screens.SendAmount, { recipient })
   }

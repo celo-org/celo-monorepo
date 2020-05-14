@@ -44,12 +44,6 @@ interface StateProps {
   confirmationInput: ConfirmationInput
 }
 
-type Navigation = NavigationInjectedProps['navigation']
-
-interface OwnProps {
-  navigation: Navigation
-}
-
 interface DispatchProps {
   sendPaymentOrInvite: typeof sendPaymentOrInvite
   fetchDollarBalance: typeof fetchDollarBalance
@@ -308,7 +302,7 @@ const styles = StyleSheet.create({
 })
 
 export default componentWithAnalytics(
-  connect<StateProps, DispatchProps, OwnProps, RootState>(
+  connect<StateProps, DispatchProps, NavigationInjectedProps, RootState>(
     mapStateToProps,
     mapDispatchToProps
   )(withTranslation(Namespaces.sendFlow7)(SendConfirmation))

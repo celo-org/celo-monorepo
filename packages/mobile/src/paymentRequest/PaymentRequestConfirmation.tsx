@@ -28,11 +28,6 @@ import { currentAccountSelector } from 'src/web3/selectors'
 // @ts-ignore
 const TAG = 'paymentRequest/confirmation'
 
-type Navigation = NavigationInjectedProps['navigation']
-
-interface OwnProps {
-  navigation: Navigation
-}
 interface StateProps {
   e164PhoneNumber: string
   account: string | null
@@ -46,8 +41,8 @@ interface DispatchProps {
 
 const mapDispatchToProps = { showError, writePaymentRequest }
 
-const mapStateToProps = (state: RootState, ownProps: NavigationInjectedProps): StateProps => {
-  const { navigation } = ownProps
+const mapStateToProps = (state: RootState, navProps: NavigationInjectedProps): StateProps => {
+  const { navigation } = navProps
   const transactionData = navigation.getParam('transactionData')
   const { e164NumberToAddress } = state.identity
   const { secureSendPhoneNumberMapping } = state.send
@@ -163,7 +158,7 @@ const styles = StyleSheet.create({
 })
 
 export default componentWithAnalytics(
-  connect<StateProps, DispatchProps, OwnProps, RootState>(
+  connect<StateProps, DispatchProps, NavigationInjectedProps, RootState>(
     mapStateToProps,
     mapDispatchToProps
   )(withTranslation(Namespaces.sendFlow7)(PaymentRequestConfirmation))
