@@ -14,7 +14,7 @@ import Carousel, { CarouselItem } from 'src/components/Carousel'
 import DevSkipButton from 'src/components/DevSkipButton'
 import { Namespaces, withTranslation } from 'src/i18n'
 import LoadingSpinner from 'src/icons/LoadingSpinner'
-import { cancelVerification, startVerification } from 'src/identity/actions'
+import { cancelVerification, setRetryWithForno, startVerification } from 'src/identity/actions'
 import { VerificationStatus } from 'src/identity/verification'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -27,11 +27,13 @@ const TAG = 'VerificationLoadingScreen'
 interface StateProps {
   e164Number: string
   verificationStatus: VerificationStatus
+  retryWithForno: boolean
 }
 
 interface DispatchProps {
   startVerification: typeof startVerification
   cancelVerification: typeof cancelVerification
+  setRetryWithForno: typeof setRetryWithForno
 }
 
 type Props = StateProps & DispatchProps & WithTranslation
@@ -39,12 +41,14 @@ type Props = StateProps & DispatchProps & WithTranslation
 const mapDispatchToProps = {
   startVerification,
   cancelVerification,
+  setRetryWithForno,
 }
 
 const mapStateToProps = (state: RootState): StateProps => {
   return {
     e164Number: state.account.e164PhoneNumber,
     verificationStatus: state.identity.verificationStatus,
+    retryWithForno: state.identity.retryWithForno,
   }
 }
 
@@ -81,7 +85,7 @@ class VerificationLoadingScreen extends React.Component<Props> {
   }
 
   render() {
-    const { e164Number, t, verificationStatus } = this.props
+    const { e164Number, t, retryWithForno, verificationStatus } = this.props
 
     const items: CarouselItem[] = [
       {
@@ -117,6 +121,8 @@ class VerificationLoadingScreen extends React.Component<Props> {
         </View>
         <VerificationFailedModal
           verificationStatus={verificationStatus}
+          retryWithForno={retryWithForno}
+          setRetryWithForno={this.props.setRetryWithForno}
           cancelVerification={this.props.cancelVerification}
         />
       </SafeAreaView>

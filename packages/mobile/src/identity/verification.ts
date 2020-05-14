@@ -28,6 +28,7 @@ import {
   InputAttestationCodeAction,
   ReceiveAttestationMessageAction,
   resetVerification,
+  setRetryWithForno,
   setVerificationStatus,
 } from 'src/identity/actions'
 import { fetchPhoneHashPrivate, PhoneNumberHashDetails } from 'src/identity/privacy'
@@ -225,6 +226,9 @@ export function* requestAndRetrieveAttestations(
     account
   )
 
+  // Any verification failure past this point will be after sending a tx
+  // so do not prompt forno retry as account may have insufficient balance
+  yield put(setRetryWithForno(false))
   while (attestations.length < attestationsRemaining) {
     // Request any additional attestations beyond the original set
     yield call(

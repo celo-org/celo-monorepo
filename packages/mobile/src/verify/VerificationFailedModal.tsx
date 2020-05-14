@@ -2,13 +2,16 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { WarningModal } from 'src/components/WarningModal'
 import { Namespaces } from 'src/i18n'
-import { cancelVerification } from 'src/identity/actions'
+import { cancelVerification, setRetryWithForno } from 'src/identity/actions'
 import { VerificationStatus } from 'src/identity/verification'
-import { navigateHome } from 'src/navigator/NavigationService'
+import { navigate, navigateHome } from 'src/navigator/NavigationService'
+import { Screens } from 'src/navigator/Screens'
 
 interface Props {
   verificationStatus: VerificationStatus
+  retryWithForno: boolean
   cancelVerification: typeof cancelVerification
+  setRetryWithForno: typeof setRetryWithForno
 }
 
 export function VerificationFailedModal(props: Props) {
@@ -24,20 +27,18 @@ export function VerificationFailedModal(props: Props) {
     navigateHome()
   }, [props.cancelVerification])
 
-  const onRetry = () => {
-    // TODO retry verification
-  }
+  const onRetry = React.useCallback(() => {
+    props.setRetryWithForno(false) // Only prompt retry with forno once
+    navigate(Screens.VerificationLoadingScreen)
+  }, [props.setRetryWithForno])
 
   const isVisible =
     props.verificationStatus === VerificationStatus.Failed ||
     (props.verificationStatus === VerificationStatus.RevealAttemptFailed && !isDismissed)
-
-  // TODO may need to check
-  const showRetryWithForno = props.verificationStatus === VerificationStatus.Failed // TODO some check to only show modal once
-
   const allowEnterCodes = props.verificationStatus === VerificationStatus.RevealAttemptFailed
 
-  return showRetryWithForno ? (
+  return props.retryWithForno ? (
+    // Retry verification with forno with option to skip verificaion
     <WarningModal
       isVisible={isVisible}
       header={t('retryWithFornoModal.header')}
@@ -49,13 +50,14 @@ export function VerificationFailedModal(props: Props) {
       onContinue={onRetry}
     />
   ) : (
+    // Skip verification with option to enter codes if reveal attempt failed
     <WarningModal
       isVisible={isVisible}
       header={t('failModal.header')}
       body1={t('promptFornoModal.body')}
       body2={allowEnterCodes ? t('failModal.enterCodesBody') : undefined}
       continueTitle={t('promptFornoModal.switchToDataSaver')}
-      cancelTitle={t('global:goBack')}
+      cancelTitle={t('global:goBack')} // TODO may need to add text
       onCancel={allowEnterCodes ? onDismiss : undefined}
       onContinue={onSkip}
     />
