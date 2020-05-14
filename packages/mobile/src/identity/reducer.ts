@@ -3,6 +3,7 @@ import { Actions, ActionTypes } from 'src/identity/actions'
 import { AttestationCode, VerificationStatus } from 'src/identity/verification'
 import { getRehydratePayload, REHYDRATE } from 'src/redux/persist-helper'
 import { RootState } from 'src/redux/reducers'
+import { features } from 'src/flags'
 
 export const ATTESTATION_CODE_PLACEHOLDER = 'ATTESTATION_CODE_PLACEHOLDER'
 export const ATTESTATION_ISSUER_PLACEHOLDER = 'ATTESTATION_ISSUER_PLACEHOLDER'
@@ -42,6 +43,7 @@ export interface State {
   askedContactsPermission: boolean
   isLoadingImportContacts: boolean
   contactMappingProgress: ContactMappingProgress
+  retryWithForno: boolean
 }
 
 const initialState: State = {
@@ -59,6 +61,7 @@ const initialState: State = {
     current: 0,
     total: 0,
   },
+  retryWithForno: features.VERIFICATION_FORNO_RETRY,
 }
 
 export const reducer = (
@@ -161,6 +164,12 @@ export const reducer = (
         ...state,
         askedContactsPermission: true,
       }
+    case Actions.SET_RETRY_WITH_FORNO:
+      return {
+        ...state,
+        retryWithForno: action.retryWithForno,
+      }
+
     default:
       return state
   }

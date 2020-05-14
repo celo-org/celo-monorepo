@@ -23,6 +23,7 @@ export enum Actions {
   INCREMENT_IMPORT_SYNC_PROGRESS = 'IDENTITY/INCREMENT_IMPORT_SYNC_PROGRESS',
   END_IMPORT_CONTACTS = 'IDENTITY/END_IMPORT_CONTACTS',
   DENY_IMPORT_CONTACTS = 'IDENTITY/DENY_IMPORT_CONTACTS',
+  SET_RETRY_WITH_FORNO = 'IDENTITY/SET_RETRY_WITH_FORNO',
 }
 
 export interface StartVerificationAction {
@@ -107,6 +108,11 @@ export interface DenyImportContactsAction {
   type: Actions.DENY_IMPORT_CONTACTS
 }
 
+export interface SetRetryWithFornoAction {
+  type: Actions.SET_RETRY_WITH_FORNO
+  retryWithForno: boolean
+}
+
 export type ActionTypes =
   | StartVerificationAction
   | CancelVerificationAction
@@ -123,6 +129,7 @@ export type ActionTypes =
   | IncrementImportSyncProgress
   | EndImportContactsAction
   | DenyImportContactsAction
+  | SetRetryWithFornoAction
 
 export const startVerification = (): StartVerificationAction => ({
   type: Actions.START_VERIFICATION,
@@ -217,4 +224,9 @@ export const endImportContacts = (success: boolean): EndImportContactsAction => 
 
 export const denyImportContacts = (): DenyImportContactsAction => ({
   type: Actions.DENY_IMPORT_CONTACTS,
+})
+
+export const setRetryWithForno = (retryWithForno: boolean): SetRetryWithFornoAction => ({
+  type: Actions.SET_RETRY_WITH_FORNO,
+  retryWithForno,
 })
