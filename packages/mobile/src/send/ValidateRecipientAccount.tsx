@@ -90,7 +90,7 @@ export class ValidateRecipientAccount extends React.Component<Props, State> {
     }
   }
 
-  onPressContinue = () => {
+  onPressConfirm = () => {
     const { inputValue, singleDigitInputValueArr } = this.state
     const { recipient, fullValidationRequired } = this.props
     const inputToValidate = fullValidationRequired ? inputValue : singleDigitInputValueArr.join('')
@@ -172,7 +172,7 @@ export class ValidateRecipientAccount extends React.Component<Props, State> {
     )
   }
 
-  render() {
+  render = () => {
     const { t, recipient } = this.props
     const { displayName } = recipient
 
@@ -188,7 +188,7 @@ export class ValidateRecipientAccount extends React.Component<Props, State> {
           </Text>
         </KeyboardAwareScrollView>
         <Button
-          onPress={this.onPressContinue}
+          onPress={this.onPressConfirm}
           text={t('confirmAccount.button')}
           standard={false}
           type={BtnTypes.PRIMARY}

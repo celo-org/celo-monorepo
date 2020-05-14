@@ -74,13 +74,13 @@ export const listItemRenderer = (params: {
 }) => (request: PaymentRequest, key: number | undefined = undefined) => {
   const requester = getRecipientFromPaymentRequest(request, params.recipientCache)
   const { addressValidationCheckCache } = params
-  let validationObj
+  let validationDetails
 
   if (addressValidationCheckCache) {
     if (!requester.e164PhoneNumber) {
       throw Error('Error finding phone number')
     }
-    validationObj = addressValidationCheckCache[requester.e164PhoneNumber]
+    validationDetails = addressValidationCheckCache[requester.e164PhoneNumber]
   }
 
   return (
@@ -91,7 +91,7 @@ export const listItemRenderer = (params: {
         requester={requester}
         comment={request.comment}
         declinePaymentRequest={params.declinePaymentRequest}
-        validationObj={validationObj}
+        validationDetails={validationDetails}
       />
     </View>
   )
@@ -116,8 +116,8 @@ class IncomingPaymentRequestListScreen extends React.Component<Props> {
     const { paymentRequests } = this.props
 
     // TODO: look into creating a batch lookup function so we dont rerender on each lookup
-    paymentRequests.forEach((payment) => {
-      const recipient = getRecipientFromPaymentRequest(payment, this.props.recipientCache)
+    paymentRequests.forEach((paymentRequest) => {
+      const recipient = getRecipientFromPaymentRequest(paymentRequest, this.props.recipientCache)
       const { e164PhoneNumber } = recipient
       if (!e164PhoneNumber) {
         throw new Error('Missing recipient e164Number for payment request')

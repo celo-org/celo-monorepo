@@ -23,7 +23,7 @@ interface OwnProps {
   comment: string
   id: string
   declinePaymentRequest: typeof declinePaymentRequest
-  validationObj?: {
+  validationDetails?: {
     addressValidationRequired: boolean
     fullValidationRequired: boolean
   }
@@ -35,7 +35,7 @@ const AVATAR_SIZE = 40
 
 export class IncomingPaymentRequestListItem extends React.Component<Props> {
   onPay = () => {
-    const { id, amount, comment: reason, requester: recipient, validationObj } = this.props
+    const { id, amount, comment: reason, requester: recipient, validationDetails } = this.props
 
     const transactionData: TransactionData = {
       reason,
@@ -45,8 +45,8 @@ export class IncomingPaymentRequestListItem extends React.Component<Props> {
       firebasePendingRequestUid: id,
     }
 
-    if (validationObj && validationObj.addressValidationRequired) {
-      const { fullValidationRequired } = validationObj
+    if (validationDetails && validationDetails.addressValidationRequired) {
+      const { fullValidationRequired } = validationDetails
       navigate(Screens.ValidateRecipientIntro, { transactionData, fullValidationRequired })
     } else {
       navigate(Screens.SendConfirmation, { transactionData })

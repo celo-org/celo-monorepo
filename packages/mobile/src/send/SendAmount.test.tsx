@@ -3,7 +3,6 @@ import * as React from 'react'
 import * as RNLocalize from 'react-native-localize'
 import { fireEvent, render } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
-import * as renderer from 'react-test-renderer'
 import { TokenTransactionType } from 'src/apollo/types'
 import { E164NumberToAddressType } from 'src/identity/reducer'
 import { navigate } from 'src/navigator/NavigationService'
@@ -149,7 +148,7 @@ describe('SendAmount', () => {
       ...storeData,
       stableToken: { balance: AMOUNT_ZERO },
     })
-    const tree = renderer.create(
+    const tree = render(
       <Provider store={store}>
         <SendAmount navigation={mockNavigation} />
       </Provider>
