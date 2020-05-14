@@ -99,14 +99,14 @@ contract DowntimeSlasherSlots is SlasherUtil {
     for (uint256 n = startBlock + 1; n <= (lastBlockOfStartEpoch + 1); n++) {
       accumulator |= uint256(getParentSealBitmap(n));
     }
-    userValidatedSlots[startBlock][0] = accumulator;
+    userValidatedSlots[msg.sender][startBlock][0] = accumulator;
 
     accumulator = 0;
     // Same comments as the last 'for'
     for (uint256 n = lastBlockOfStartEpoch + 2; n <= (endBlock + 1); n++) {
       accumulator |= uint256(getParentSealBitmap(n));
     }
-    userValidatedSlots[startBlock][1] = accumulator;
+    userValidatedSlots[msg.sender][startBlock][1] = accumulator;
   }
 
   /**
@@ -150,8 +150,8 @@ contract DowntimeSlasherSlots is SlasherUtil {
   function slotAlreadyCalculated(uint256 startBlock) internal view returns (bool) {
     // It's impossible to have all the validators down in a slot
     return
-      userValidatedSlots[msg.sender][startBlock][0] ||
-      userValidatedSlots[msg.sender][startBlock][1];
+      userValidatedSlots[msg.sender][startBlock][0] != 0 ||
+      userValidatedSlots[msg.sender][startBlock][1] != 0;
   }
 
   function isDownUsingCalculatedSlot(
@@ -166,6 +166,7 @@ contract DowntimeSlasherSlots is SlasherUtil {
 
   function isDown(uint256 startBlock, uint256 startSignerIndex, uint256 endSignerIndex)
     public
+    view
     returns (bool)
   {
     uint256 endBlock = getEndBlockForSlashing(startBlock);
@@ -179,7 +180,7 @@ contract DowntimeSlasherSlots is SlasherUtil {
   }
 
   /**
-   * @notice Returns the end block for the interval.
+   * @notice Returns the end block for the interval required for slashing.
    */
   function getEndBlockForSlashing(uint256 startBlock) internal view returns (uint256) {
     return startBlock.add(slashableDowntime).sub(1);
