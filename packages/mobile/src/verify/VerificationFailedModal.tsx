@@ -63,7 +63,7 @@ export function VerificationFailedModal(props: Props) {
       onContinue={onRetry}
     />
   ) : allowEnterCodes ? (
-    // Else skip verification
+    // Option to enter codes if reveal attempt failed
     <WarningModal
       isVisible={isVisible}
       header={t('failModal.header')}
@@ -75,7 +75,7 @@ export function VerificationFailedModal(props: Props) {
       onContinue={onSkip}
     />
   ) : (
-    // Option to enter codes if reveal attempt failed
+    // Else skip verification
     <WarningModal
       isVisible={isVisible}
       header={t('failModal.header')}
