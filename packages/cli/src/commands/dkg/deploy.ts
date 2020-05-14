@@ -1,8 +1,7 @@
+import { flags } from '@oclif/command'
 import { BaseCommand } from '../../base'
 import { displayWeb3Tx } from '../../utils/cli'
-import { flags } from '@oclif/command'
 import { Flags } from '../../utils/command'
-
 const DKG = require('./DKG.json')
 
 export default class DKGDeploy extends BaseCommand {
@@ -10,8 +9,11 @@ export default class DKGDeploy extends BaseCommand {
 
   static flags = {
     ...BaseCommand.flags,
-    phaseDuration: flags.integer({ required: true }),
-    threshold: flags.integer({ required: true }),
+    phaseDuration: flags.integer({
+      required: true,
+      description: 'Duration of each DKG phase in blocks',
+    }),
+    threshold: flags.integer({ required: true, description: 'The threshold to use for the DKG' }),
     from: Flags.address({ required: true, description: 'Address of the sender' }),
   }
 

@@ -1,7 +1,6 @@
+import { flags } from '@oclif/command'
 import { BaseCommand } from '../../base'
 import { Flags } from '../../utils/command'
-import { flags } from '@oclif/command'
-
 const DKG = require('./DKG.json')
 
 export enum Method {
@@ -25,7 +24,7 @@ export default class DKGGet extends BaseCommand {
       required: true,
       description: 'Getter method to call',
     }),
-    address: Flags.address({ required: true }),
+    address: Flags.address({ required: true, description: 'DKG Contract Address' }),
   }
 
   async run() {

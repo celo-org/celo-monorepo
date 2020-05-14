@@ -9,7 +9,7 @@ export default class DKGStart extends BaseCommand {
 
   static flags = {
     ...BaseCommand.flags,
-    address: Flags.address({ required: true }),
+    address: Flags.address({ required: true, description: 'DKG Contract Address' }),
     from: Flags.address({ required: true, description: 'Address of the sender' }),
   }
 

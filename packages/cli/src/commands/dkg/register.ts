@@ -1,8 +1,7 @@
+import { flags } from '@oclif/command'
 import { BaseCommand } from '../../base'
 import { displayWeb3Tx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
-import { flags } from '@oclif/command'
-
 import fs from 'fs'
 
 const DKG = require('./DKG.json')
@@ -13,7 +12,7 @@ export default class DKGRegister extends BaseCommand {
   static flags = {
     ...BaseCommand.flags,
     blsKey: flags.string({ required: true }),
-    address: Flags.address({ required: true }),
+    address: Flags.address({ required: true, description: 'DKG Contract Address' }),
     from: Flags.address({ required: true, description: 'Address of the sender' }),
   }
 
