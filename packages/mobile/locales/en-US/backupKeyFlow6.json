@@ -24,6 +24,7 @@
   "backupQuizWordCount": "What's the <0>{{ordinal}}</0> word of your Account Key?",
   "importBackupFailed": "Importing Wallet Failed",
   "backupQuizFailed": "The Account Key you entered is incorrect. Please try again.",
+  "invalidBackupPhrase": "Invalid Account Key",
   "backupComplete": {
     "header": "Backup Complete",
     "0": "Success!",

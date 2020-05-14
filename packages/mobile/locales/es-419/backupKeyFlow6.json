@@ -19,7 +19,7 @@
     "Para seguridad de sus fondos, su cuenta está bloqueada hasta que obtenga su clave de respaldo.",
   "copied": "Clave copiada al portapapeles",
   "savedConfirmation": "Sí, he escrito mi llave",
-  "invalidBackupPhrase": "Clave de respaldo inválida",
+  "invalidBackupPhrase": "Clave de cuenta inválida",
   "importBackupFailed": "No se pudo importar la billetera",
   "backupQuizFailed": "La clave de la cuenta que ha introducido es incorrecta. Por favor, inténtelo de nuevo.",
   "backupComplete": {
