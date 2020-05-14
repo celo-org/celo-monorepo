@@ -870,7 +870,7 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/app
-      -run:
+      - run:
           name: Certora dependencies
           command: |
             sudo apt-get update || sudo apt-get update
