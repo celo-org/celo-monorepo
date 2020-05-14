@@ -25,6 +25,7 @@ import { exitBackupFlow } from 'src/app/actions'
 import { ALERT_BANNER_DURATION, DEFAULT_TESTNET, SHOW_TESTNET_BANNER } from 'src/config'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { refreshAllBalances, setLoading } from 'src/home/actions'
+import CeloDollarsOverview from 'src/home/CeloDollarsOverview'
 import HeaderButton from 'src/home/HeaderButton'
 import NotificationBox from 'src/home/NotificationBox'
 import { callToActNotificationSelector, getActiveNotificationCount } from 'src/home/selectors'
@@ -227,6 +228,8 @@ export class WalletHome extends React.Component<Props> {
           sections={sections}
           stickySectionHeadersEnabled={false}
           renderSectionHeader={this.renderSection}
+          // TODO: remove this once we have the drawer menu with the balance
+          ListHeaderComponent={CeloDollarsOverview}
           keyExtractor={this.keyExtractor}
         />
         <SendOrRequestBar />
