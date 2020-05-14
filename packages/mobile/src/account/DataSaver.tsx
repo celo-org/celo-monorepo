@@ -107,7 +107,7 @@ export class DataSaver extends React.Component<Props, State> {
         <WarningModal
           isVisible={this.state.promptModalVisible}
           header={t('promptFornoModal.header')}
-          body={t('promptFornoModal.body')}
+          body1={t('promptFornoModal.body')}
           continueTitle={t('promptFornoModal.switchToDataSaver')}
           cancelTitle={t('global:goBack')}
           onCancel={this.hidePromptModal}
@@ -116,7 +116,7 @@ export class DataSaver extends React.Component<Props, State> {
         <WarningModal
           isVisible={this.state.switchOffModalVisible}
           header={t('restartModalSwitchOff.header')}
-          body={t('restartModalSwitchOff.body')}
+          body1={t('restartModalSwitchOff.body')}
           continueTitle={t('restartModalSwitchOff.restart')}
           cancelTitle={t('global:cancel')}
           onCancel={this.hideSwitchOffModal}

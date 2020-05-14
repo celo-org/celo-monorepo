@@ -8,19 +8,21 @@ import { WithTranslation } from 'react-i18next'
 import { BackHandler, ScrollView, StyleSheet, Text, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
+import { setRetryVerificationWithForno } from 'src/account/actions'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import CancelButton from 'src/components/CancelButton'
 import Carousel, { CarouselItem } from 'src/components/Carousel'
 import DevSkipButton from 'src/components/DevSkipButton'
 import { Namespaces, withTranslation } from 'src/i18n'
 import LoadingSpinner from 'src/icons/LoadingSpinner'
-import { cancelVerification, setRetryWithForno, startVerification } from 'src/identity/actions'
+import { cancelVerification, startVerification } from 'src/identity/actions'
 import { VerificationStatus } from 'src/identity/verification'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
 import Logger from 'src/utils/Logger'
 import { VerificationFailedModal } from 'src/verify/VerificationFailedModal'
+import { toggleFornoMode } from 'src/web3/actions'
 
 const TAG = 'VerificationLoadingScreen'
 
@@ -33,7 +35,8 @@ interface StateProps {
 interface DispatchProps {
   startVerification: typeof startVerification
   cancelVerification: typeof cancelVerification
-  setRetryWithForno: typeof setRetryWithForno
+  setRetryVerificationWithForno: typeof setRetryVerificationWithForno
+  toggleFornoMode: typeof toggleFornoMode
 }
 
 type Props = StateProps & DispatchProps & WithTranslation
@@ -41,14 +44,15 @@ type Props = StateProps & DispatchProps & WithTranslation
 const mapDispatchToProps = {
   startVerification,
   cancelVerification,
-  setRetryWithForno,
+  setRetryVerificationWithForno,
+  toggleFornoMode,
 }
 
 const mapStateToProps = (state: RootState): StateProps => {
   return {
     e164Number: state.account.e164PhoneNumber,
     verificationStatus: state.identity.verificationStatus,
-    retryWithForno: state.identity.retryWithForno,
+    retryWithForno: state.account.retryVerificationWithForno,
   }
 }
 
@@ -122,7 +126,8 @@ class VerificationLoadingScreen extends React.Component<Props> {
         <VerificationFailedModal
           verificationStatus={verificationStatus}
           retryWithForno={retryWithForno}
-          setRetryWithForno={this.props.setRetryWithForno}
+          setRetryVerificationWithForno={this.props.setRetryVerificationWithForno}
+          toggleFornoMode={this.props.toggleFornoMode}
           cancelVerification={this.props.cancelVerification}
         />
       </SafeAreaView>

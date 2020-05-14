@@ -13,6 +13,7 @@ import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
 import { Platform } from 'react-native'
 import { Task } from 'redux-saga'
 import { all, call, delay, fork, put, race, select, take, takeEvery } from 'redux-saga/effects'
+import { setRetryVerificationWithForno } from 'src/account/actions'
 import { e164NumberSelector } from 'src/account/selectors'
 import { showError, showMessage } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
@@ -28,7 +29,6 @@ import {
   InputAttestationCodeAction,
   ReceiveAttestationMessageAction,
   resetVerification,
-  setRetryWithForno,
   setVerificationStatus,
 } from 'src/identity/actions'
 import { fetchPhoneHashPrivate, PhoneNumberHashDetails } from 'src/identity/privacy'
@@ -228,7 +228,7 @@ export function* requestAndRetrieveAttestations(
 
   // Any verification failure past this point will be after sending a tx
   // so do not prompt forno retry as account may have insufficient balance
-  yield put(setRetryWithForno(false))
+  yield put(setRetryVerificationWithForno(false))
   while (attestations.length < attestationsRemaining) {
     // Request any additional attestations beyond the original set
     yield call(
@@ -517,6 +517,7 @@ function* tryRevealPhoneNumber(
     }
 
     Logger.debug(TAG + '@tryRevealPhoneNumber', `Revealing for issuer ${issuer} successful`)
+    throw new Error('Force fail verification')
   } catch (error) {
     // This is considered a recoverable error because the user may have received the code in a previous run
     // So instead of propagating the error, we catch it just update status. This will trigger the modal,

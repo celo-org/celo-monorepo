@@ -1,22 +1,30 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { setRetryVerificationWithForno } from 'src/account/actions'
 import { WarningModal } from 'src/components/WarningModal'
 import { Namespaces } from 'src/i18n'
-import { cancelVerification, setRetryWithForno } from 'src/identity/actions'
+import { cancelVerification } from 'src/identity/actions'
 import { VerificationStatus } from 'src/identity/verification'
 import { navigate, navigateHome } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { toggleFornoMode } from 'src/web3/actions'
+import Logger from 'src/utils/Logger'
 
 interface Props {
   verificationStatus: VerificationStatus
   retryWithForno: boolean
   cancelVerification: typeof cancelVerification
-  setRetryWithForno: typeof setRetryWithForno
+  setRetryVerificationWithForno: typeof setRetryVerificationWithForno
+  toggleFornoMode: typeof toggleFornoMode
 }
 
 export function VerificationFailedModal(props: Props) {
   const { t } = useTranslation(Namespaces.nuxVerification2)
-  const [isDismissed, setIsDismissed] = React.useState(false)
+  const [isDismissed, setIsDismissed] = React.useState(true)
+
+  React.useEffect(() => {
+    setIsDismissed(false)
+  }, [setIsDismissed])
 
   const onDismiss = React.useCallback(() => {
     setIsDismissed(true)
@@ -28,15 +36,19 @@ export function VerificationFailedModal(props: Props) {
   }, [props.cancelVerification])
 
   const onRetry = React.useCallback(() => {
-    props.setRetryWithForno(false) // Only prompt retry with forno once
-    navigate(Screens.VerificationLoadingScreen)
-  }, [props.setRetryWithForno])
+    props.toggleFornoMode(true)
+    props.setRetryVerificationWithForno(false) // Only prompt retry with forno once
+    setIsDismissed(true)
+    navigate(Screens.VerificationEducationScreen)
+  }, [setIsDismissed, props.setRetryVerificationWithForno])
 
   const isVisible =
-    props.verificationStatus === VerificationStatus.Failed ||
-    (props.verificationStatus === VerificationStatus.RevealAttemptFailed && !isDismissed)
+    (props.verificationStatus === VerificationStatus.Failed ||
+      props.verificationStatus === VerificationStatus.RevealAttemptFailed) &&
+    !isDismissed
   const allowEnterCodes = props.verificationStatus === VerificationStatus.RevealAttemptFailed
 
+  Logger.debug(`Should show modal:${props.retryWithForno} `)
   return props.retryWithForno ? (
     // Retry verification with forno with option to skip verificaion
     <WarningModal
