@@ -30,6 +30,7 @@ interface StateProps {
   e164Number: string
   verificationStatus: VerificationStatus
   retryWithForno: boolean
+  fornoMode: boolean
 }
 
 interface DispatchProps {
@@ -53,6 +54,7 @@ const mapStateToProps = (state: RootState): StateProps => {
     e164Number: state.account.e164PhoneNumber,
     verificationStatus: state.identity.verificationStatus,
     retryWithForno: state.account.retryVerificationWithForno,
+    fornoMode: state.web3.fornoMode,
   }
 }
 
@@ -89,7 +91,7 @@ class VerificationLoadingScreen extends React.Component<Props> {
   }
 
   render() {
-    const { e164Number, t, retryWithForno, verificationStatus } = this.props
+    const { e164Number, t, fornoMode, retryWithForno, verificationStatus } = this.props
 
     const items: CarouselItem[] = [
       {
@@ -126,6 +128,7 @@ class VerificationLoadingScreen extends React.Component<Props> {
         <VerificationFailedModal
           verificationStatus={verificationStatus}
           retryWithForno={retryWithForno}
+          fornoMode={fornoMode}
           setRetryVerificationWithForno={this.props.setRetryVerificationWithForno}
           toggleFornoMode={this.props.toggleFornoMode}
           cancelVerification={this.props.cancelVerification}

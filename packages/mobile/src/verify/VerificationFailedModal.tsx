@@ -8,11 +8,11 @@ import { VerificationStatus } from 'src/identity/verification'
 import { navigate, navigateHome } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { toggleFornoMode } from 'src/web3/actions'
-import Logger from 'src/utils/Logger'
 
 interface Props {
   verificationStatus: VerificationStatus
   retryWithForno: boolean
+  fornoMode: boolean
   cancelVerification: typeof cancelVerification
   setRetryVerificationWithForno: typeof setRetryVerificationWithForno
   toggleFornoMode: typeof toggleFornoMode
@@ -46,10 +46,11 @@ export function VerificationFailedModal(props: Props) {
     (props.verificationStatus === VerificationStatus.Failed ||
       props.verificationStatus === VerificationStatus.RevealAttemptFailed) &&
     !isDismissed
-  const allowEnterCodes = props.verificationStatus === VerificationStatus.RevealAttemptFailed
 
-  Logger.debug(`Should show modal:${props.retryWithForno} `)
-  return props.retryWithForno ? (
+  const allowEnterCodes = props.verificationStatus === VerificationStatus.RevealAttemptFailed
+  const promptRetryWithForno = props.retryWithForno && !props.fornoMode // Only prompt forno switch if not already in forno mode
+
+  return promptRetryWithForno ? (
     // Retry verification with forno with option to skip verificaion
     <WarningModal
       isVisible={isVisible}
@@ -69,7 +70,7 @@ export function VerificationFailedModal(props: Props) {
       body1={t('failModal.body1')}
       body2={t('failModal.enterCodesBody')}
       continueTitle={t('education.skip')}
-      cancelTitle={t('global:goBack')} // TODO may need to add text
+      cancelTitle={t('global:goBack')}
       onCancel={onDismiss}
       onContinue={onSkip}
     />
