@@ -119,7 +119,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   postSetupContainer: {
-    flex: 1,
     paddingTop: Spacing.Thick24,
     paddingHorizontal: Spacing.Regular16,
   },
@@ -143,7 +142,7 @@ const styles = StyleSheet.create({
   },
   postSetupCTA: {
     alignSelf: 'center',
-    paddingVertical: Spacing.Thick24,
+    paddingVertical: Spacing.Regular16,
   },
 })
 

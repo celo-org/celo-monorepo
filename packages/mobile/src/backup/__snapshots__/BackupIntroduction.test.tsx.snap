@@ -12,7 +12,6 @@ exports[`BackupIntroduction renders correctly when backup completed 1`] = `
   <RCTScrollView
     contentContainerStyle={
       Object {
-        "flex": 1,
         "paddingHorizontal": 16,
         "paddingTop": 24,
       }
@@ -70,7 +69,7 @@ exports[`BackupIntroduction renders correctly when backup completed 1`] = `
         style={
           Object {
             "alignSelf": "center",
-            "paddingVertical": 24,
+            "paddingVertical": 16,
           }
         }
       >

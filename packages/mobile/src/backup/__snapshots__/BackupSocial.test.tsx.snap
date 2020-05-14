@@ -69,6 +69,36 @@ exports[`BackupSocialIntro renders correctly when social backup is complete 1`] 
             >
               socialBackupPhraseHeader
             </Text>
+            <View
+              accessible={true}
+              focusable={true}
+              nativeBackgroundAndroid={
+                Object {
+                  "attribute": "selectableItemBackgroundBorderless",
+                  "type": "ThemeAttrAndroid",
+                }
+              }
+              onClick={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+            >
+              <Text
+                style={
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Inter-Regular",
+                    "fontSize": 16,
+                    "lineHeight": 22,
+                  }
+                }
+              >
+                global:copy
+              </Text>
+            </View>
           </View>
           <View
             style={
@@ -111,6 +141,36 @@ exports[`BackupSocialIntro renders correctly when social backup is complete 1`] 
             >
               socialBackupPhraseHeader
             </Text>
+            <View
+              accessible={true}
+              focusable={true}
+              nativeBackgroundAndroid={
+                Object {
+                  "attribute": "selectableItemBackgroundBorderless",
+                  "type": "ThemeAttrAndroid",
+                }
+              }
+              onClick={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+            >
+              <Text
+                style={
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Inter-Regular",
+                    "fontSize": 16,
+                    "lineHeight": 22,
+                  }
+                }
+              >
+                global:copy
+              </Text>
+            </View>
           </View>
           <View
             style={
@@ -200,6 +260,36 @@ exports[`BackupSocialIntro renders correctly when social backup is not complete 
             >
               socialBackupPhraseHeader
             </Text>
+            <View
+              accessible={true}
+              focusable={true}
+              nativeBackgroundAndroid={
+                Object {
+                  "attribute": "selectableItemBackgroundBorderless",
+                  "type": "ThemeAttrAndroid",
+                }
+              }
+              onClick={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+            >
+              <Text
+                style={
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Inter-Regular",
+                    "fontSize": 16,
+                    "lineHeight": 22,
+                  }
+                }
+              >
+                global:copy
+              </Text>
+            </View>
           </View>
           <View
             style={
@@ -242,6 +332,36 @@ exports[`BackupSocialIntro renders correctly when social backup is not complete 
             >
               socialBackupPhraseHeader
             </Text>
+            <View
+              accessible={true}
+              focusable={true}
+              nativeBackgroundAndroid={
+                Object {
+                  "attribute": "selectableItemBackgroundBorderless",
+                  "type": "ThemeAttrAndroid",
+                }
+              }
+              onClick={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+            >
+              <Text
+                style={
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Inter-Regular",
+                    "fontSize": 16,
+                    "lineHeight": 22,
+                  }
+                }
+              >
+                global:copy
+              </Text>
+            </View>
           </View>
           <View
             style={

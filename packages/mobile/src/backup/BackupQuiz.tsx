@@ -15,7 +15,7 @@ import { showError } from 'src/alert/actions'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import { QuizzBottom } from 'src/backup/QuizzBottom'
 import DevSkipButton from 'src/components/DevSkipButton'
-import { Namespaces, withTranslation } from 'src/i18n'
+import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import { headerWithCancelButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -56,6 +56,7 @@ type Props = WithTranslation & DispatchProps & NavigationInjectedProps
 export class BackupQuiz extends React.Component<Props, State> {
   static navigationOptions = ({ navigation }: NavigationInjectedProps) => ({
     ...headerWithCancelButton, // TODO switch to v2 once Ivans PR is in
+    headerTitle: i18n.t(`${Namespaces.backupKeyFlow6}:headerTitle`),
     headerRight: <DeleteWord onPressBackspace={navigation.getParam('onPressBackspace')} />,
   })
 
