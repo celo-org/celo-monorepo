@@ -106,11 +106,21 @@ const mockActionableAttestations: ActionableAttestation[] = [
 ]
 
 const mockAttestationsWrapperVerified = {
-  getAttestationStat: jest.fn(() => ({ completed: 3, total: 3 })),
+  getAttestationStatus: jest.fn(() => ({
+    isVerified: true,
+    numAttestationsRemaining: 0,
+    total: 3,
+    fractionAttestation: 1,
+  })),
 }
 
 const mockAttestationsWrapperUnverified = {
-  getAttestationStat: jest.fn(() => ({ completed: 0, total: 0 })),
+  getAttestationStatus: jest.fn(() => ({
+    isVerified: false,
+    numAttestationsRemaining: 3,
+    total: 0,
+    fractionAttestation: 0,
+  })),
   getActionableAttestations: jest
     .fn()
     .mockImplementationOnce(() => [])
@@ -128,7 +138,12 @@ const mockAttestationsWrapperUnverified = {
 
 const mockAttestationsWrapperPartlyVerified = {
   ...mockAttestationsWrapperUnverified,
-  getAttestationStat: jest.fn(() => ({ completed: 2, total: 3 })),
+  getAttestationStatus: jest.fn(() => ({
+    isVerified: false,
+    numAttestationsRemaining: 1,
+    total: 3,
+    fractionAttestation: 2 / 3,
+  })),
   getActionableAttestations: jest.fn(() => mockActionableAttestations),
 }
 

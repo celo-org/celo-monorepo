@@ -15,9 +15,19 @@ import {
   valueToInt,
 } from './BaseWrapper'
 
+// TODO (amyslawson) is there a proper config to put this in?
+const DEFAULT_NUM_ATTESTATIONS_REQUIRED = 3
+const DEFAULT_ATTESTATION_THRESHOLD = 0.8
 export interface AttestationStat {
   completed: number
   total: number
+}
+
+export interface AttestationsStatus {
+  isVerified: boolean
+  numAttestationsRemaining: number
+  total: number
+  fractionAttestation: number
 }
 
 export interface AttestationStateForIssuer {
@@ -187,7 +197,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   )
 
   /**
-   * Returns the attestation stats of a phone number/account pair
+   * Returns the attestation stats of a identifer/account pair
    * @param identifier Attestation identifier (e.g. phone hash)
    * @param account Address of the account
    */
@@ -199,6 +209,42 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     undefined,
     (stat) => ({ completed: valueToInt(stat[0]), total: valueToInt(stat[1]) })
   )
+
+  /**
+   * Returns the attestation status of an identifer/account pair indicating whether the pair
+   * is verified.
+   * @param identifier Attestation identifier (e.g. phone hash)
+   * @param account Address of the account
+   * @param numAttestationsRequired Optional number of attestations required.  Will default to
+   *  hardcoded value if absent.
+   * @param attestationThreshold Optional threshold for fraction attestations completed. Will
+   *  default to hardcoded value if absent.
+   */
+  async getAttestationStatus(
+    identifier: string,
+    account: Address,
+    numAttestationsRequired?: number,
+    attestationThreshold?: number
+  ): Promise<AttestationsStatus> {
+    if (!numAttestationsRequired) {
+      numAttestationsRequired = DEFAULT_NUM_ATTESTATIONS_REQUIRED
+    }
+    if (!attestationThreshold) {
+      attestationThreshold = DEFAULT_ATTESTATION_THRESHOLD
+    }
+    const attestationStats = await this.getAttestationStat(identifier, account)
+    const numAttestationsRemaining = numAttestationsRequired - attestationStats.completed
+    const fractionAttestation =
+      attestationStats.total < 1 ? 0 : attestationStats.completed / attestationStats.total
+    const isVerified = numAttestationsRemaining <= 0 && fractionAttestation > attestationThreshold
+
+    return {
+      isVerified,
+      numAttestationsRemaining,
+      total: attestationStats.total,
+      fractionAttestation,
+    }
+  }
 
   /**
    * Calculates the amount of StableToken required to request Attestations
