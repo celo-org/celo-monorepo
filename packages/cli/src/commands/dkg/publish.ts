@@ -1,8 +1,8 @@
 import { flags } from '@oclif/command'
+import fs from 'fs'
 import { BaseCommand } from '../../base'
 import { displayWeb3Tx } from '../../utils/cli'
 import { Flags } from '../../utils/command'
-import fs from 'fs'
 
 const DKG = require('./DKG.json')
 

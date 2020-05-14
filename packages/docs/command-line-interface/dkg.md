@@ -3,6 +3,7 @@ description: Publish your locally computed DKG results to the blockchain
 ---
 
 ## Commands
+
 ### Deploy
 
 Deploys the DKG
