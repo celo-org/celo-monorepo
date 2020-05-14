@@ -1,4 +1,4 @@
-import { getStableTokenContract } from '@celo/walletkit'
+import { CURRENCY_ENUM } from '@celo/utils/src'
 import BigNumber from 'bignumber.js'
 import { call, CallEffect, put, select, takeLatest } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
@@ -11,7 +11,7 @@ import { CeloDefaultRecipient } from 'src/send/Send'
 import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
 import { BasicTokenTransfer } from 'src/tokens/saga'
 import Logger from 'src/utils/Logger'
-import { web3 } from 'src/web3/contracts'
+import { web3ForUtils } from 'src/web3/contracts'
 import { getGasPrice } from 'src/web3/gas'
 import { getConnectedAccount } from 'src/web3/saga'
 
@@ -20,9 +20,10 @@ const TAG = 'fees/saga'
 // Prevents us from having to recreate txs and estimate their gas each time
 const feeGasCache = new Map<FeeType, BigNumber>()
 // Just use default values here since it doesn't matter for fee estimation
+
 const placeholderSendTx: BasicTokenTransfer = {
   recipientAddress: CeloDefaultRecipient.address,
-  amount: web3.utils.fromWei('1'),
+  amount: web3ForUtils.utils.fromWei('1'),
   comment: 'Coffee or Tea?',
 }
 
@@ -58,7 +59,7 @@ export function* estimateFeeSaga({ feeType }: EstimateFeeAction) {
           call(
             getInviteTxGas,
             account,
-            getStableTokenContract,
+            CURRENCY_ENUM.DOLLAR,
             placeholderSendTx.amount,
             placeholderSendTx.comment
           )
@@ -69,7 +70,7 @@ export function* estimateFeeSaga({ feeType }: EstimateFeeAction) {
         feeInWei = yield call(
           getOrSetFee,
           FeeType.SEND,
-          call(getSendTxGas, account, getStableTokenContract, placeholderSendTx)
+          call(getSendTxGas, account, CURRENCY_ENUM.DOLLAR, placeholderSendTx)
         )
         break
       case FeeType.EXCHANGE:

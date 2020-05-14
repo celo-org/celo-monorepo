@@ -29,6 +29,7 @@ exports[`ExchangeTradeScreen renders correctly 1`] = `
           Object {
             "alignItems": "center",
             "flexDirection": "row",
+            "marginBottom": 8,
             "marginTop": 38,
           }
         }
@@ -38,9 +39,9 @@ exports[`ExchangeTradeScreen renders correctly 1`] = `
             style={
               Object {
                 "color": "#2E3338",
-                "fontFamily": "Hind-Bold",
+                "fontFamily": "Hind-Regular",
                 "fontSize": 15,
-                "fontWeight": "600",
+                "fontWeight": "700",
                 "lineHeight": 20,
               }
             }
@@ -50,7 +51,6 @@ exports[`ExchangeTradeScreen renders correctly 1`] = `
           <View
             accessible={true}
             focusable={true}
-            isTVSelectable={true}
             onClick={[Function]}
             onResponderGrant={[Function]}
             onResponderMove={[Function]}
@@ -67,17 +67,13 @@ exports[`ExchangeTradeScreen renders correctly 1`] = `
           >
             <Text
               style={
-                Array [
-                  Object {
-                    "color": "#81868B",
-                    "fontFamily": "Hind-Regular",
-                    "fontSize": 14,
-                    "lineHeight": 20,
-                  },
-                  Object {
-                    "textDecorationLine": "underline",
-                  },
-                ]
+                Object {
+                  "color": "#81868B",
+                  "fontFamily": "Hind-Regular",
+                  "fontSize": 13,
+                  "lineHeight": 20,
+                  "textDecorationLine": "underline",
+                }
               }
             >
               switchTo
@@ -111,71 +107,96 @@ exports[`ExchangeTradeScreen renders correctly 1`] = `
       </View>
       <View
         style={
-          Object {
-            "borderStyle": "solid",
-            "borderTopColor": "#EEEEEE",
-            "borderTopWidth": 1,
-            "marginTop": 10,
-            "width": "100%",
-          }
-        }
-      />
-      <View
-        style={
-          Object {
-            "flexDirection": "row",
-            "justifyContent": "space-between",
-            "marginTop": 16,
-          }
+          Array [
+            Object {
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+              "marginVertical": 5,
+            },
+            undefined,
+          ]
         }
       >
-        <Text
+        <View
           style={
             Object {
-              "color": "#2E3338",
-              "fontFamily": "Hind-Bold",
-              "fontSize": 15,
-              "fontWeight": "600",
-              "lineHeight": 20,
+              "alignItems": "center",
+              "flexDirection": "row",
+              "marginRight": 5,
             }
           }
         >
-          Subtotal (@
-           
+          <Text
+            style={
+              Array [
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Hind-Regular",
+                  "fontSize": 15,
+                  "lineHeight": 24,
+                },
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Hind-Regular",
+                  "fontSize": 15,
+                  "lineHeight": 20,
+                },
+              ]
+            }
+          >
+            Subtotal (@
+             
+            <Text
+              numberOfLines={1}
+              style={
+                Array [
+                  undefined,
+                  Object {
+                    "color": undefined,
+                  },
+                ]
+              }
+            >
+              
+              $
+              12.09
+            </Text>
+            )
+          </Text>
+        </View>
+        <Text
+          style={
+            Array [
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Hind-Regular",
+                "fontSize": 15,
+                "lineHeight": 24,
+              },
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Hind-Regular",
+                "fontSize": 15,
+                "lineHeight": 20,
+              },
+            ]
+          }
+        >
           <Text
             numberOfLines={1}
             style={
               Array [
+                undefined,
                 Object {
                   "color": undefined,
                 },
-                undefined,
               ]
             }
           >
             
             $
-            12.09
+            0.00
           </Text>
-          )
-        </Text>
-        <Text
-          numberOfLines={1}
-          style={
-            Array [
-              Object {
-                "color": undefined,
-              },
-              Object {
-                "fontFamily": "Hind-Regular",
-                "marginLeft": 10,
-              },
-            ]
-          }
-        >
-          
-          $
-          0.00
         </Text>
       </View>
     </View>
@@ -208,7 +229,6 @@ exports[`ExchangeTradeScreen renders correctly 1`] = `
       <View
         accessible={true}
         focusable={false}
-        isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackground",

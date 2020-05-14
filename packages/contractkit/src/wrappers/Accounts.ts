@@ -9,7 +9,7 @@ import {
 } from '@celo/utils/lib/signatureUtils'
 import Web3 from 'web3'
 import { Address } from '../base'
-import { Accounts } from '../generated/types/Accounts'
+import { Accounts } from '../generated/Accounts'
 import {
   BaseWrapper,
   bytesToString,
@@ -21,6 +21,7 @@ import {
 } from '../wrappers/BaseWrapper'
 
 interface AccountSummary {
+  address: string
   name: string
   authorizedSigners: {
     vote: Address
@@ -49,6 +50,16 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
   getAttestationSigner: (account: string) => Promise<Address> = proxyCall(
     this.contract.methods.getAttestationSigner
   )
+
+  /**
+   * Returns if the account has authorized an attestation signer
+   * @param account The address of the account.
+   * @return If the account has authorized an attestation signer
+   */
+  hasAuthorizedAttestationSigner: (account: string) => Promise<boolean> = proxyCall(
+    this.contract.methods.hasAuthorizedAttestationSigner
+  )
+
   /**
    * Returns the vote signer for the specified account.
    * @param account The address of the account.
@@ -87,14 +98,12 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
   /**
    * Returns the account associated with `signer`.
    * @param signer The address of the account or previously authorized signer.
-   * @param blockNumber Height of result, defaults to tip.
    * @dev Fails if the `signer` is not an account or previously authorized signer.
    * @return The associated account.
    */
-  signerToAccount(signer: Address, blockNumber?: number): Promise<Address> {
-    // @ts-ignore: Expected 0-1 arguments, but got 2
-    return this.contract.methods.signerToAccount(signer).call({}, blockNumber)
-  }
+  signerToAccount: (signer: Address) => Promise<Address> = proxyCall(
+    this.contract.methods.signerToAccount
+  )
 
   /**
    * Check if an account already exists.
@@ -112,6 +121,14 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
     this.contract.methods.isAuthorizedSigner
   )
 
+  getCurrentSigners(address: string): Promise<string[]> {
+    return Promise.all([
+      this.getVoteSigner(address),
+      this.getValidatorSigner(address),
+      this.getAttestationSigner(address),
+    ])
+  }
+
   async getAccountSummary(account: string): Promise<AccountSummary> {
     const ret = await Promise.all([
       this.getName(account),
@@ -123,6 +140,7 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
       this.getDataEncryptionKey(account),
     ])
     return {
+      address: account,
       name: ret[0],
       authorizedSigners: {
         vote: ret[1],

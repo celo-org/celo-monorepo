@@ -1,13 +1,13 @@
-import { ContractKit, IdentityMetadataWrapper, newKitFromWeb3 } from '@celo/contractkit'
+import { ContractKit, IdentityMetadataWrapper, newKit } from '@celo/contractkit'
 import { ClaimTypes } from '@celo/contractkit/lib/identity'
 import { verifyAccountClaim } from '@celo/contractkit/lib/identity/claims/verify'
 import { BigNumber } from 'bignumber.js'
 import fs from 'fs'
 import { google } from 'googleapis'
 import readline from 'readline'
-import Web3 from 'web3'
 
 process.on('unhandledRejection', (reason, _promise) => {
+  // @ts-ignore
   console.log('Unhandled Rejection at:', reason.stack || reason)
   process.exit(0)
 })
@@ -38,7 +38,7 @@ async function getMetadata(kit: ContractKit, address: string) {
   console.log(address, 'has url', url)
   if (url === '') return IdentityMetadataWrapper.fromEmpty(address)
   try {
-    let data = await IdentityMetadataWrapper.fetchFromURL(url)
+    let data = await IdentityMetadataWrapper.fetchFromURL(kit, url)
     return data
   } catch (err) {
     console.error('Cannot fetch metadata', err)
@@ -59,14 +59,13 @@ async function getClaims(
     address = address.substr(2)
   }
   const res = [address]
-  const accounts = await kit.contracts.getAccounts()
   for (const claim of data.claims) {
     switch (claim.type) {
       case ClaimTypes.KEYBASE:
         break
       case ClaimTypes.ACCOUNT:
         try {
-          const status = await verifyAccountClaim(claim, '0x' + address, accounts.getMetadataURL)
+          const status = await verifyAccountClaim(kit, claim, '0x' + address)
           if (status) console.error('Cannot verify claim:', status)
           else {
             console.log('Claim success', address, claim.address)
@@ -278,8 +277,7 @@ async function updateAttestations(kit: ContractKit, rows: string[][], sheets: an
 }
 
 function main() {
-  const web3 = new Web3(LEADERBOARD_WEB3)
-  const kit: ContractKit = newKitFromWeb3(web3)
+  const kit: ContractKit = newKit(LEADERBOARD_WEB3)
   readSheet(async (rows: any[][], sheets: any) => {
     let addresses = rows.map((a) => a[0])
     updateNames(kit, addresses, sheets)

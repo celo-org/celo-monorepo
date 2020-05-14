@@ -4,12 +4,13 @@ import { concurrentMap } from '@celo/utils/lib/async'
 import BigNumber from 'bignumber.js'
 import Web3 from 'web3'
 import { CeloContract } from '..'
-import { Registry } from '../generated/types/Registry'
+import { Registry } from '../generated/Registry'
 import { ProposalBuilder } from '../governance'
 import { newKitFromWeb3 } from '../kit'
 import { AccountsWrapper } from './Accounts'
 import { GovernanceWrapper, Proposal, VoteValue } from './Governance'
 import { LockedGoldWrapper } from './LockedGold'
+import { MultiSigWrapper } from './MultiSig'
 
 const expConfig = NetworkConfig.governance
 
@@ -17,10 +18,11 @@ testWithGanache('Governance Wrapper', (web3: Web3) => {
   const ONE_SEC = 1000
   const kit = newKitFromWeb3(web3)
   const minDeposit = web3.utils.toWei(expConfig.minDeposit.toString(), 'ether')
-  const ONE_USD = web3.utils.toWei('1', 'ether')
+  const ONE_CGLD = web3.utils.toWei('1', 'ether')
 
   let accounts: Address[] = []
   let governance: GovernanceWrapper
+  let governanceApproverMultiSig: MultiSigWrapper
   let lockedGold: LockedGoldWrapper
   let accountWrapper: AccountsWrapper
   let registry: Registry
@@ -29,13 +31,14 @@ testWithGanache('Governance Wrapper', (web3: Web3) => {
     accounts = await web3.eth.getAccounts()
     kit.defaultAccount = accounts[0]
     governance = await kit.contracts.getGovernance()
+    governanceApproverMultiSig = await kit.contracts.getMultiSig(await governance.getApprover())
     registry = await kit._web3Contracts.getRegistry()
     lockedGold = await kit.contracts.getLockedGold()
     accountWrapper = await kit.contracts.getAccounts()
 
     await concurrentMap(4, accounts.slice(0, 4), async (account) => {
       await accountWrapper.createAccount().sendAndWaitForReceipt({ from: account })
-      await lockedGold.lock().sendAndWaitForReceipt({ from: account, value: ONE_USD })
+      await lockedGold.lock().sendAndWaitForReceipt({ from: account, value: ONE_CGLD })
     })
   }, 5 * ONE_SEC)
 
@@ -45,7 +48,8 @@ testWithGanache('Governance Wrapper', (web3: Web3) => {
     const builder = new ProposalBuilder(kit)
     repoints.forEach((repoint) =>
       builder.addWeb3Tx(registry.methods.setAddressFor(...repoint), {
-        to: registry._address,
+        // TODO fix types
+        to: (registry as any)._address,
         value: '0',
       })
     )
@@ -96,7 +100,11 @@ testWithGanache('Governance Wrapper', (web3: Web3) => {
     // protocol/truffle-config defines approver address as accounts[0]
     const approveFn = async () => {
       const tx = await governance.approve(proposalID)
-      await tx.sendAndWaitForReceipt({ from: accounts[0] })
+      const multisigTx = await governanceApproverMultiSig.submitOrConfirmTransaction(
+        governance.address,
+        tx.txo
+      )
+      await multisigTx.sendAndWaitForReceipt({ from: accounts[0] })
       await timeTravel(expConfig.approvalStageDuration, web3)
     }
 
@@ -124,6 +132,7 @@ testWithGanache('Governance Wrapper', (web3: Web3) => {
       const voteWeight = await governance.getVoteWeight(accounts[1])
       const upvotes = await governance.getUpvotes(proposalID)
       expect(upvotes).toEqBigNumber(voteWeight)
+      expect(upvotes).toEqBigNumber(ONE_CGLD)
     })
 
     it('#revokeUpvote', async () => {
@@ -179,6 +188,24 @@ testWithGanache('Governance Wrapper', (web3: Web3) => {
       },
       10 * ONE_SEC
     )
+
+    it('#getVoter', async () => {
+      await proposeFn(accounts[0])
+      await upvoteFn(accounts[1])
+      await approveFn()
+      await voteFn(accounts[2])
+
+      const proposer = await governance.getVoter(accounts[0])
+      expect(proposer.refundedDeposits).toEqBigNumber(minDeposit)
+
+      const upvoter = await governance.getVoter(accounts[1])
+      const expectedUpvoteRecord = { proposalID, upvotes: new BigNumber(ONE_CGLD) }
+      expect(upvoter.upvote).toEqual(expectedUpvoteRecord)
+
+      const voter = await governance.getVoter(accounts[2])
+      const expectedVoteRecord = { proposalID, votes: new BigNumber(ONE_CGLD), value: 'Yes' }
+      expect(voter.votes[0]).toEqual(expectedVoteRecord)
+    })
   })
 
   // Disabled until validator set precompile is available in ganache

@@ -26,13 +26,17 @@ export const TYPE_PATH = `${ROOT}/typography`
 
 export const IMAGERY_PATH = `${ROOT}/key-imagery`
 export const ICONS_PATH = `${ROOT}/icons`
+export const EXCHANGE_ICONS_PATH = `${ROOT}/exchange-icons`
 export const COMPOSITION_PATH = `${ROOT}/composition`
 
 const PAGES = [
   {
     title: 'Introduction',
     href: ROOT,
-    sections: [],
+    sections: [
+      { title: 'Overview', href: `${ROOT}#${hashNav.brandIntro.overview}` },
+      { title: 'Brand Voice', href: `${ROOT}#${hashNav.brandIntro.brandVoice}` },
+    ],
   },
   {
     title: 'Logo',
@@ -70,6 +74,11 @@ const PAGES = [
       { title: 'Overview', href: `${COMPOSITION_PATH}#${hashNav.brandComposition.overview}` },
       { title: 'The Grid', href: `${COMPOSITION_PATH}#${hashNav.brandComposition.grid}` },
     ],
+  },
+  {
+    title: 'Exchange Icons',
+    href: EXCHANGE_ICONS_PATH,
+    sections: [],
   },
   {
     title: 'Icons',
@@ -245,7 +254,7 @@ class Page extends React.Component<Props & ScreenProps, State> {
     return (
       <>
         <OpenGraph
-          title={`Celo Experience / Brand Kit / ${title}`}
+          title={`Celo Experience / BrandKit / ${title}`}
           path={path}
           description={metaDescription}
           image={require('src/brandkit/images/ogimage-brandkit.png')}

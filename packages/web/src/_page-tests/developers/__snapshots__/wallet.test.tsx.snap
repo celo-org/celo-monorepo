@@ -161,7 +161,7 @@ Array [
                 }
               }
             >
-              coverTitle
+              Celo Test Wallet
             </h1>
             <h4
               aria-level="4"
@@ -174,13 +174,13 @@ Array [
                   "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                   "fontSize": "24px",
                   "lineHeight": "32px",
-                  "marginBottom": "20px",
                   "textRendering": "geometricPrecision",
                   "textTransform": "none",
                 }
               }
             >
-              coverSubTitle
+              Available for Android and iOS.
+Units in this wallet have no real value.
             </h4>
             <div
               className="css-view-1dbjc4n"
@@ -220,7 +220,7 @@ Array [
                   }
                 }
               >
-                chooseMobileOS
+                Choose Mobile OS
               </div>
               <div
                 className="css-view-1dbjc4n"
@@ -583,7 +583,7 @@ Array [
                       }
                     }
                   >
-                    getStarted
+                    Get Started
                   </a>
                 </div>
                 <div
@@ -930,7 +930,7 @@ Array [
                 }
               }
             >
-              coverAction.faucet.title
+              Testnet Faucet
             </h3>
             <div
               className="css-text-901oao"
@@ -946,7 +946,7 @@ Array [
                 }
               }
             >
-              coverAction.faucet.text
+              If you already have an account, faucet yourself to get more Celo Dollars.
             </div>
           </div>
           <div
@@ -992,6 +992,8 @@ Array [
                 data-focusable={true}
                 dir="auto"
                 href="/developers/faucet"
+                onClick={[Function]}
+                onMouseEnter={[Function]}
                 role="link"
                 style={
                   Object {
@@ -1011,7 +1013,7 @@ Array [
                   }
                 }
               >
-                coverAction.faucet.link
+                Get Testnet cUSD
                 <div
                   className="css-view-1dbjc4n"
                   style={
@@ -1126,7 +1128,7 @@ Array [
                 }
               }
             >
-              coverAction.payments.title
+              Send and Request Payments
             </h3>
             <div
               className="css-text-901oao"
@@ -1142,7 +1144,7 @@ Array [
                 }
               }
             >
-              coverAction.payments.text
+              Account start with 10 cUSD of Testnet funds. Try sending and requesting payments. Use the faucet page if you run out.
             </div>
           </div>
         </div>
@@ -1228,7 +1230,7 @@ Array [
                 }
               }
             >
-              coverAction.exchange.title
+              Exchange cUSD and cGLD
             </h3>
             <div
               className="css-text-901oao"
@@ -1244,7 +1246,7 @@ Array [
                 }
               }
             >
-              coverAction.exchange.text
+              Check the exchange rate and swap between Celo’s stable coin (cUSD) and variable value token (cGLD) as you see fit.
             </div>
           </div>
         </div>
@@ -1322,7 +1324,8 @@ Array [
                 }
               }
             >
-              downloadDirect
+              Go straight to download
+for your Android or Apple mobile phone
             </h2>
           </div>
         </div>
@@ -1622,7 +1625,7 @@ Array [
                 }
               }
             >
-              haveAccount
+              Already have an Alfajores testnet account?
             </h2>
             <h4
               aria-level="4"
@@ -1644,7 +1647,7 @@ Array [
                 }
               }
             >
-              useSeed
+              Use your seed phrase to import your account into the Celo Test Wallet.
             </h4>
             <div
               className="css-view-1dbjc4n"
@@ -1689,6 +1692,8 @@ Array [
                   data-focusable={true}
                   dir="auto"
                   href="https://docs.celo.org/getting-started/alfajores-testnet"
+                  onClick={[Function]}
+                  onMouseEnter={[Function]}
                   role="link"
                   style={
                     Object {
@@ -1708,7 +1713,7 @@ Array [
                     }
                   }
                 >
-                  learnMore
+                  Learn More
                   <div
                     className="css-view-1dbjc4n"
                     style={

@@ -6,22 +6,18 @@ jest.mock('src/web3/actions', () => ({
   unlockAccount: jest.fn(async () => true),
 }))
 
-jest.mock('@celo/walletkit', () => ({
-  ...jest.requireActual('@celo/walletkit'),
-  sendTransaction: jest.fn(async () => null),
-}))
-
 describe('Encrypt Comment', () => {
   it('Empty comment', async () => {
-    expect(await encryptComment('', 'toAddr', 'fromAddr')).toBe('')
+    expect(encryptComment('', 'toAddr', 'fromAddr').next().value).toBe('')
   })
 
   it('Empty to/from address', async () => {
-    expect(await encryptComment(mockComment, '', 'fromAddr')).toBe(mockComment)
-    expect(await encryptComment(mockComment, 'toAddr', '')).toBe(mockComment)
-    expect(await encryptComment(mockComment, '', '')).toBe(mockComment)
-    expect(await encryptComment(mockComment, '', undefined)).toBe(mockComment)
-    expect(await encryptComment(mockComment, null, undefined)).toBe(mockComment)
-    expect(await encryptComment(mockComment, null, 'fromAddr')).toBe(mockComment)
+    expect(encryptComment(mockComment, '', 'fromAddr').next().value).toBe(mockComment)
+    expect(encryptComment(mockComment, '', 'fromAddr').next().value).toBe(mockComment)
+    expect(encryptComment(mockComment, 'toAddr', '').next().value).toBe(mockComment)
+    expect(encryptComment(mockComment, '', '').next().value).toBe(mockComment)
+    expect(encryptComment(mockComment, '', undefined).next().value).toBe(mockComment)
+    expect(encryptComment(mockComment, null, undefined).next().value).toBe(mockComment)
+    expect(encryptComment(mockComment, null, 'fromAddr').next().value).toBe(mockComment)
   })
 })

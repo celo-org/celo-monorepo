@@ -1,5 +1,5 @@
 // tslint:disable-next-line: no-reference (Required to make this work w/ ts-node)
-/// <reference path="../../../contractkit/types/web3.d.ts" />
+/// <reference path="../../../contractkit/types/web3-celo.d.ts" />
 
 import { CeloContract, CeloToken, ContractKit, newKit, newKitFromWeb3 } from '@celo/contractkit'
 import { TransactionResult } from '@celo/contractkit/lib/utils/tx-result'
@@ -8,11 +8,10 @@ import { eqAddress } from '@celo/utils/src/address'
 import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 import Web3 from 'web3'
-import { TransactionReceipt } from 'web3/types'
-import { connectPeers, initAndStartGeth } from '../lib/geth'
+import { TransactionReceipt } from 'web3-core'
 import { GethInstanceConfig } from '../lib/interfaces/geth-instance-config'
 import { GethRunConfig } from '../lib/interfaces/geth-run-config'
-import { getHooks, killInstance, sleep, waitToFinishInstanceSyncing } from './utils'
+import { getHooks, initAndSyncGethWithRetry, killInstance, sleep } from './utils'
 
 const TMP_PATH = '/tmp/e2e'
 const verbose = false
@@ -30,7 +29,7 @@ class InflationManager {
   }
 
   now = async (): Promise<number> => {
-    return (await this.kit.web3.eth.getBlock('pending')).timestamp
+    return Number((await this.kit.web3.eth.getBlock('pending')).timestamp)
   }
 
   getNextUpdateRate = async (): Promise<number> => {
@@ -65,7 +64,7 @@ class InflationManager {
   setInflationParameters = async (rate: BigNumber, updatePeriod: number) => {
     const stableToken = await this.kit.contracts.getStableToken()
     await stableToken
-      .setInflationParameters(toFixed(rate).toString(), updatePeriod)
+      .setInflationParameters(toFixed(rate).toFixed(), updatePeriod)
       .sendAndWaitForReceipt({ from: this.validatorAddress })
   }
 }
@@ -73,15 +72,15 @@ class InflationManager {
 const freeze = async (validatorUri: string, validatorAddress: string, token: CeloToken) => {
   const kit = newKit(validatorUri)
   const tokenAddress = await kit.registry.addressFor(token)
-  const freezer = await kit._web3Contracts.getFreezer()
-  await freezer.methods.freeze(tokenAddress).send({ from: validatorAddress })
+  const freezer = await kit.contracts.getFreezer()
+  await freezer.freeze(tokenAddress).sendAndWaitForReceipt({ from: validatorAddress })
 }
 
 const unfreeze = async (validatorUri: string, validatorAddress: string, token: CeloToken) => {
   const kit = newKit(validatorUri)
   const tokenAddress = await kit.registry.addressFor(token)
-  const freezer = await kit._web3Contracts.getFreezer()
-  await freezer.methods.unfreeze(tokenAddress).send({ from: validatorAddress })
+  const freezer = await kit.contracts.getFreezer()
+  await freezer.unfreeze(tokenAddress).sendAndWaitForReceipt({ from: validatorAddress })
 }
 
 const whitelistAddress = async (
@@ -91,7 +90,7 @@ const whitelistAddress = async (
 ) => {
   const kit = newKit(validatorUri)
   const whitelistContract = await kit._web3Contracts.getTransferWhitelist()
-  await whitelistContract.methods.addAddress(address).send({ from: validatorAddress })
+  await whitelistContract.methods.whitelistAddress(address).send({ from: validatorAddress })
 }
 
 const setAddressWhitelist = async (
@@ -101,7 +100,9 @@ const setAddressWhitelist = async (
 ) => {
   const kit = newKit(validatorUri)
   const whitelistContract = await kit._web3Contracts.getTransferWhitelist()
-  await whitelistContract.methods.setWhitelist(whitelist).send({ from: validatorAddress })
+  await whitelistContract.methods
+    .setDirectlyWhitelistedAddresses(whitelist)
+    .send({ from: validatorAddress, gas: 500000 })
 }
 
 const setIntrinsicGas = async (validatorUri: string, validatorAddress: string, gasCost: number) => {
@@ -118,7 +119,10 @@ const INTRINSIC_TX_GAS_COST = 21000
 // Additional intrinsic gas for a transaction with fee currency specified
 const ADDITIONAL_INTRINSIC_TX_GAS_COST = 50000
 
-const stableTokenTransferGasCost = 29391
+// Gas refund for resetting to the original non-zero value
+const sstoreCleanRefundEIP2200 = 4200
+// Transfer cost of a stable token transfer, accounting for the refund above.
+const stableTokenTransferGasCost = 23631
 
 /** Helper to watch balance changes over accounts */
 interface BalanceWatcher {
@@ -222,8 +226,15 @@ describe('Transfer tests', function(this: any) {
 
   const hooks = getHooks(gethConfig)
 
-  after(hooks.after)
-  before(hooks.before)
+  before(async function(this: any) {
+    this.timeout(0)
+    await hooks.before()
+  })
+
+  after(async function(this: any) {
+    this.timeout(0)
+    await hooks.after()
+  })
 
   // Spin up a node that we can sync with.
   const fullInstance: GethInstanceConfig = {
@@ -231,6 +242,7 @@ describe('Transfer tests', function(this: any) {
     validating: false,
     syncmode: 'full',
     lightserv: true,
+    gatewayFee: new BigNumber(10000),
     port: 30305,
     rpcport: 8547,
     // We need to set an etherbase here so that the full node will accept transactions from
@@ -249,9 +261,14 @@ describe('Transfer tests', function(this: any) {
     // Assuming empty password
     await kit.web3.eth.personal.unlockAccount(validatorAddress, '', 1000000)
 
-    await initAndStartGeth(gethConfig, hooks.gethBinaryPath, fullInstance, verbose)
-    await connectPeers([...gethConfig.instances, fullInstance], verbose)
-    await waitToFinishInstanceSyncing(fullInstance)
+    await initAndSyncGethWithRetry(
+      gethConfig,
+      hooks.gethBinaryPath,
+      fullInstance,
+      [...gethConfig.instances, fullInstance],
+      verbose,
+      3
+    )
 
     // Install an arbitrary address as the goverance address to act as the infrastructure fund.
     // This is chosen instead of full migration for speed and to avoid the need for a governance
@@ -272,29 +289,32 @@ describe('Transfer tests', function(this: any) {
     if (currentGethInstance != null) {
       await killInstance(currentGethInstance)
     }
-    const instance: GethInstanceConfig = {
+
+    const light = syncmode === 'light' || syncmode === 'lightest'
+    currentGethInstance = {
       name: syncmode,
       validating: false,
       syncmode,
       port: 30307,
       rpcport: 8549,
-      lightserv: syncmode !== 'light' && syncmode !== 'lightest',
+      lightserv: !light,
+      // TODO(nategraf): Remove this when light clients can query for gateway fee.
+      gatewayFee: light ? new BigNumber(10000) : undefined,
       privateKey: DEF_FROM_PK,
     }
 
     // Spin up the node to run transfers as.
-    currentGethInstance = await initAndStartGeth(
+    await initAndSyncGethWithRetry(
       gethConfig,
       hooks.gethBinaryPath,
-      instance,
-      verbose
+      currentGethInstance,
+      [fullInstance, currentGethInstance],
+      verbose,
+      3
     )
 
-    await connectPeers([fullInstance, currentGethInstance])
-    await waitToFinishInstanceSyncing(currentGethInstance)
-
     // Reset contracts to send RPCs through transferring node.
-    kit.web3.currentProvider = new kit.web3.providers.HttpProvider('http://localhost:8549')
+    kit.web3.setProvider(new Web3.providers.HttpProvider('http://localhost:8549'))
 
     // Give the node time to sync the latest block.
     const upstream = await new Web3('http://localhost:8545').eth.getBlock('latest')
@@ -729,7 +749,8 @@ describe('Transfer tests', function(this: any) {
 
           describe('feeCurrency = CeloGold >', () => {
             testTransferToken({
-              expectedGas: stableTokenTransferGasCost + INTRINSIC_TX_GAS_COST,
+              expectedGas:
+                stableTokenTransferGasCost + INTRINSIC_TX_GAS_COST + sstoreCleanRefundEIP2200,
               transferToken: CeloContract.StableToken,
               feeToken: CeloContract.GoldToken,
             })
@@ -901,8 +922,8 @@ describe('Transfer tests', function(this: any) {
           describe('check if frozen', () => {
             it('should be frozen', async () => {
               const goldTokenAddress = await kit.registry.addressFor(CeloContract.GoldToken)
-              const freezer = await kit._web3Contracts.getFreezer()
-              const isFrozen = await freezer.methods.isFrozen(goldTokenAddress).call()
+              const freezer = await kit.contracts.getFreezer()
+              const isFrozen = await freezer.isFrozen(goldTokenAddress)
               assert(isFrozen)
             })
           })

@@ -1,7 +1,4 @@
 /* tslint:disable:no-console */
-import Web3 = require('web3')
-import Web3Utils = require('web3-utils')
-
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
   deploymentForCoreContract,
@@ -10,6 +7,9 @@ import {
 import { config } from '@celo/protocol/migrationsConfig'
 import { toFixed } from '@celo/utils/lib/fixidity'
 import { RegistryInstance, ReserveInstance, ReserveSpenderMultiSigInstance } from 'types'
+import Web3 from 'web3'
+import Web3Utils = require('web3-utils')
+
 const truffle = require('@celo/protocol/truffle-config.js')
 
 const initializeArgs = async (): Promise<[
@@ -19,7 +19,9 @@ const initializeArgs = async (): Promise<[
   number,
   number,
   string[],
-  string[]
+  string[],
+  string,
+  string
 ]> => {
   const registry: RegistryInstance = await getDeployedProxiedContract<RegistryInstance>(
     'Registry',
@@ -29,12 +31,14 @@ const initializeArgs = async (): Promise<[
     registry.address,
     config.reserve.tobinTaxStalenessThreshold,
     config.reserve.dailySpendingRatio,
-    config.reserve.frozenGold,
-    config.reserve.frozenDays,
+    0, // frozenGold cannot be set until the reserve us funded
+    0, // frozenGold cannot be set until the reserve us funded
     config.reserve.assetAllocationSymbols.map((assetSymbol) =>
       Web3Utils.padRight(Web3Utils.utf8ToHex(assetSymbol), 64)
     ),
     config.reserve.assetAllocationWeights.map((assetWeight) => toFixed(assetWeight).toFixed()),
+    config.reserve.tobinTax,
+    config.reserve.tobinTaxReserveRatio,
   ]
 }
 
@@ -59,7 +63,7 @@ module.exports = deploymentForCoreContract<ReserveInstance>(
       await web3.eth.sendTransaction({
         from: network.from,
         to: reserve.address,
-        value: web3.utils.toWei(config.reserve.initialBalance.toString(), 'ether') as string,
+        value: web3.utils.toWei(config.reserve.initialBalance.toString(), 'ether').toString(),
       })
     }
 

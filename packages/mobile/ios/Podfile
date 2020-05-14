@@ -1,7 +1,68 @@
 source 'https://cdn.cocoapods.org/'
 
 platform :ios, "9.0"
+
+# Allow using RNFirebase as static frameworks
+# https://rnfirebase.io/#allow-ios-static-frameworks
+# Otherwise we get the following error:
+# `The 'Pods-celo' target has transitive dependencies that include statically linked binaries [...]`
+$RNFirebaseAsStaticFramework = true
+
 require_relative "../../../node_modules/@react-native-community/cli-platform-ios/native_modules"
+
+def add_flipper_pods!(versions = {})
+  versions['Flipper'] ||= '~> 0.33.1'
+  versions['DoubleConversion'] ||= '1.1.7'
+  versions['Flipper-Folly'] ||= '~> 2.1'
+  versions['Flipper-Glog'] ||= '0.3.6'
+  versions['Flipper-PeerTalk'] ||= '~> 0.0.4'
+  versions['Flipper-RSocket'] ||= '~> 1.0'
+  pod 'FlipperKit', versions['Flipper'], :configuration => 'Debug'
+  pod 'FlipperKit/FlipperKitLayoutPlugin', versions['Flipper'], :configuration => 'Debug'
+  pod 'FlipperKit/SKIOSNetworkPlugin', versions['Flipper'], :configuration => 'Debug'
+  pod 'FlipperKit/FlipperKitUserDefaultsPlugin', versions['Flipper'], :configuration => 'Debug'
+  pod 'FlipperKit/FlipperKitReactPlugin', versions['Flipper'], :configuration => 'Debug'
+  # List all transitive dependencies for FlipperKit pods
+  # to avoid them being linked in Release builds
+  pod 'Flipper', versions['Flipper'], :configuration => 'Debug'
+  pod 'Flipper-DoubleConversion', versions['DoubleConversion'], :configuration => 'Debug'
+  pod 'Flipper-Folly', versions['Flipper-Folly'], :configuration => 'Debug'
+  pod 'Flipper-Glog', versions['Flipper-Glog'], :configuration => 'Debug'
+  pod 'Flipper-PeerTalk', versions['Flipper-PeerTalk'], :configuration => 'Debug'
+  pod 'Flipper-RSocket', versions['Flipper-RSocket'], :configuration => 'Debug'
+  pod 'FlipperKit/Core', versions['Flipper'], :configuration => 'Debug'
+  pod 'FlipperKit/CppBridge', versions['Flipper'], :configuration => 'Debug'
+  pod 'FlipperKit/FBCxxFollyDynamicConvert', versions['Flipper'], :configuration => 'Debug'
+  pod 'FlipperKit/FBDefines', versions['Flipper'], :configuration => 'Debug'
+  pod 'FlipperKit/FKPortForwarding', versions['Flipper'], :configuration => 'Debug'
+  pod 'FlipperKit/FlipperKitHighlightOverlay', versions['Flipper'], :configuration => 'Debug'
+  pod 'FlipperKit/FlipperKitLayoutTextSearchable', versions['Flipper'], :configuration => 'Debug'
+  pod 'FlipperKit/FlipperKitNetworkPlugin', versions['Flipper'], :configuration => 'Debug'
+end
+# Post Install processing for Flipper
+def flipper_post_install(installer)
+  installer.pods_project.targets.each do |target|
+    if target.name == 'YogaKit'
+      target.build_configurations.each do |config|
+        config.build_settings['SWIFT_VERSION'] = '4.1'
+      end
+    end
+  end
+  file_name = Dir.glob("*.xcodeproj")[0]
+  app_project = Xcodeproj::Project.open(file_name)
+  app_project.native_targets.each do |target|
+    target.build_configurations.each do |config|
+      cflags = config.build_settings['OTHER_CFLAGS'] || '$(inherited) '
+      unless cflags.include? '-DFB_SONARKIT_ENABLED=1'
+        puts 'Adding -DFB_SONARKIT_ENABLED=1 in OTHER_CFLAGS...'
+        cflags << '-DFB_SONARKIT_ENABLED=1'
+      end
+      config.build_settings['OTHER_CFLAGS'] = cflags
+    end
+    app_project.save
+  end
+  installer.pods_project.save
+end
 
 target "celo" do
   use_frameworks!
@@ -29,45 +90,51 @@ target "celo" do
   pod "React-jsi", :path => "../../../node_modules/react-native/ReactCommon/jsi"
   pod "React-jsiexecutor", :path => "../../../node_modules/react-native/ReactCommon/jsiexecutor"
   pod "React-jsinspector", :path => "../../../node_modules/react-native/ReactCommon/jsinspector"
-  pod "ReactCommon/jscallinvoker", :path => "../../../node_modules/react-native/ReactCommon"
+  pod 'ReactCommon/callinvoker', :path => "../../../node_modules/react-native/ReactCommon"
   pod "ReactCommon/turbomodule/core", :path => "../../../node_modules/react-native/ReactCommon"
-  pod "Yoga", :path => "../../../node_modules/react-native/ReactCommon/yoga"
+  pod 'Yoga', :path => '../../../node_modules/react-native/ReactCommon/yoga', :modular_headers => true
   pod "DoubleConversion", :podspec => "../../../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec"
   pod "glog", :podspec => "../../../node_modules/react-native/third-party-podspecs/glog.podspec"
   pod "Folly", :podspec => "../../../node_modules/react-native/third-party-podspecs/Folly.podspec"
 
   pod "react-native-geth", :path => "../../../node_modules/react-native-geth"
-  pod "CeloBlockchain", :path => "../../../node_modules/@celo/client/CeloBlockchain.podspec"
+  pod "CeloBlockchain", :path => "../../../node_modules/@celo/client/CeloBlockchain.podspec", :modular_headers => true
 
-  pod "Firebase/Core", "~> 5.20.2"
-  pod "Firebase/Auth"
-  pod "Firebase/Storage"
-  pod "Firebase/Messaging"
-  pod "Firebase/Database"
-  pod "Firebase/DynamicLinks"
-  pod "GoogleUtilities", "~> 5.3.7"
-
-  # Using a custom fork so we can have a specific bug fix (crash when firebase already initialized)
-  # without upgrading to firebase 6
-  # TODO: remove this once we upgrade to Firebase >= 6
-  pod "Segment-Firebase", :git => "https://github.com/celo-org/analytics-ios-integration-firebase.git", :commit => "e849d040239a7e56e02df96aabc0851e56a4cb19"
+  pod 'Segment-Firebase'
 
   target "celoTests" do
     inherit! :search_paths
   end
 
   use_native_modules!
+
+  # Enables Flipper.
+  #
+  # Note that if you have use_frameworks! enabled, Flipper will not work and
+  # you should disable these next few lines.
+  # add_flipper_pods!
 end
 
 post_install do |installer|
+  # flipper_post_install(installer)
+
   installer.pods_project.targets.each do |target|
     target.build_configurations.each do |config|
       config.build_settings["ENABLE_BITCODE"] = "NO"
     end
   end
 
-  rnfirebase = installer.pods_project.targets.find { |target| target.name == "RNFirebase" }
-  rnfirebase.build_configurations.each do |config|
-    config.build_settings["HEADER_SEARCH_PATHS"] = "$(inherited) ${PODS_ROOT}/Headers/Public/**"
+  # Include env xccconfig generated by React Native Config
+  installer.aggregate_targets.each do |target|
+    target.user_build_configurations.each_key do |key|
+      cocoapods_xcconfig = target.xcconfig_path(key)
+      rnconfig_xcconfig = target.client_root + "env.xcconfig"
+      File.open(cocoapods_xcconfig, 'a') do |f|
+        f.write <<~EOF
+          // Env config generated by React Native Config
+          #include? "#{rnconfig_xcconfig.relative_path_from(cocoapods_xcconfig.dirname)}"
+        EOF
+      end
+    end
   end
 end

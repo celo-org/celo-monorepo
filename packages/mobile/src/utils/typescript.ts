@@ -6,12 +6,13 @@ export const assertUnreachable = (x: never): never => {
 }
 
 /**
- * Utility type to infer the Props of a ComponentType
- * Inspired by https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/react-navigation/index.d.ts
+ * Utility type to extract external Props of a component (respecting defaultProps)
+ * See https://github.com/Microsoft/TypeScript/issues/26704
+ * Usage: ExtractProps<typeof SomeComponent>
  */
-export type InferProps<T extends React.ComponentType<any>> = T extends React.ComponentType<infer P>
-  ? P
-  : never
+export type ExtractProps<
+  T extends keyof JSX.IntrinsicElements | React.JSXElementConstructor<any>
+> = JSX.LibraryManagedAttributes<T, React.ComponentProps<T>>
 
 /**
  * Utility to workaround TypeScript not inferring a non nullable type when filtering null objects:

@@ -26,8 +26,16 @@ describe('censor', () => {
     })
   })
   describe('when an announcment does not contain the given country', () => {
-    it('makes no modifyication to list', () => {
+    it('makes no modification to list', () => {
       expect(censor(ANNOUNCEMENTS, 'au')).toEqual(ANNOUNCEMENTS)
+    })
+  })
+
+  describe('when announcment is blocked but country is not found', () => {
+    it('returns the unblocked announcement', () => {
+      expect(censor(ANNOUNCEMENTS, null)).toEqual([
+        { live: true, text: 'no array', link: 'example.com' },
+      ])
     })
   })
 })

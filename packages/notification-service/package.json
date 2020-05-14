@@ -16,29 +16,28 @@
     "deploy": "./deploy.sh"
   },
   "dependencies": {
-    "@celo/contractkit": "0.1.5",
-    "@celo/utils": "0.1.5",
+    "@celo/contractkit": "0.3.6",
+    "@celo/utils": "0.1.9",
     "async-polling": "^0.2.1",
-    "bignumber.js": "^7.2.0",
+    "bignumber.js": "^9.0.0",
     "dotenv": "^6.0.0",
-    "express": "^4.16.4",
-    "firebase-admin": "^8.6.1",
+    "express": "^4.17.1",
+    "firebase-admin": "^8.10.0",
     "i18next": "^19.0.2",
     "node-fetch": "^2.2.0",
     "utf8": "^3.0.0",
-    "web3": "1.0.0-beta.37",
-    "web3-eth-abi": "1.0.0-beta.37",
-    "web3-utils": "1.0.0-beta.37"
+    "web3": "1.2.4",
+    "web3-eth-abi": "1.2.4",
+    "web3-utils": "1.2.4"
   },
   "devDependencies": {
     "@google-cloud/nodejs-repo-tools": "^2.3.3",
     "@types/async-polling": "^0.0.3",
     "@types/dotenv": "^4.0.3",
-    "@types/express": "^4.16.1",
+    "@types/express": "^4.17.6",
     "@types/node-fetch": "^2.1.2",
     "@types/utf8": "^2.1.6",
-    "@types/web3": "^1.0.18",
-    "typescript": "^3.7.3"
+    "typescript": "^3.8.3"
   },
   "engines": {
     "node": "10"

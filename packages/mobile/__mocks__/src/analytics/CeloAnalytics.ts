@@ -11,6 +11,9 @@ class WalletAnalytics {
   stopTracking = jest.fn((event: string) => {
     console.log('Stop tracking', event)
   })
+  page = jest.fn((page: string, eventProperties: {}) => {
+    console.log('Page', page, eventProperties)
+  })
 }
 
 export default new WalletAnalytics()

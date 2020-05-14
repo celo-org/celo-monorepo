@@ -1,14 +1,16 @@
-name: ethereum
-version: 0.1.2
+name: testnet
+version: 0.2.0
 description: private Ethereum network Helm chart for Kubernetes
 keywords:
+- celo
 - ethereum
 - blockchain
-home: https://www.ethereum.org/
+home: https://www.celo.org/
 sources:
-- https://github.com/ethereum/go-ethereum
+- https://github.com/celo-org/celo-monorepo
 maintainers:
-- name: jpoon
-  email: kubernetes@jasonpoon.ca
-icon: https://www.ethereum.org/images/logos/ETHEREUM-LOGO_PORTRAIT_Black_small.png
-appVersion: v1.7.3
+- name: celo
+  email: contact@celo.org
+icon: https://avatars1.githubusercontent.com/u/37552875?s=200&v=4
+appVersion: v1.0.0
+

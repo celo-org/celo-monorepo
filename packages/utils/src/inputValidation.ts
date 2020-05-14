@@ -11,25 +11,23 @@ export interface BaseProps {
   validator?: ValidatorKind
   customValidator?: (input: string) => string
   countryCallingCode?: string
-  lng?: string
+  decimalSeparator?: string
 }
 
 export function validateInteger(input: string): string {
   return input.replace(/[^0-9]/g, '')
 }
 
-export function validateDecimal(input: string, lng?: string): string {
-  // Comma decimal points -- only supports es right now
-  const decimalChar = lng && lng.startsWith('es') ? ',' : '.'
-  const regex = decimalChar === ',' ? /[^0-9,]/g : /[^0-9.]/g
+export function validateDecimal(input: string, decimalSeparator: string = '.'): string {
+  const regex = decimalSeparator === ',' ? /[^0-9,]/g : /[^0-9.]/g
 
-  const cleanedArray = input.replace(regex, '').split(decimalChar)
+  const cleanedArray = input.replace(regex, '').split(decimalSeparator)
 
   if (cleanedArray.length <= 1) {
     // Empty string or no decimals
     return cleanedArray.join('')
   } else {
-    return cleanedArray.shift() + decimalChar + cleanedArray.join('')
+    return cleanedArray.shift() + decimalSeparator + cleanedArray.join('')
   }
 }
 
@@ -56,7 +54,7 @@ export function validateInput(input: string, props: BaseProps): string {
 
   switch (props.validator) {
     case 'decimal':
-      return validateDecimal(input, props.lng)
+      return validateDecimal(input, props.decimalSeparator)
     case 'integer':
       return validateInteger(input)
     case 'phone':

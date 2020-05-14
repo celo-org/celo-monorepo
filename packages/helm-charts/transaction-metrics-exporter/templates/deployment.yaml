@@ -1,7 +1,7 @@
 apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
-  name: {{ .Values.environment }}-transaction-metrics-exporter
+  name: {{ .Values.environment }}-transaction-metrics-exporter-{{ .Values.deploymentSuffix }}
   labels:
     app: transaction-metrics-exporter
     chart: transaction-metrics-exporter
@@ -23,12 +23,20 @@ spec:
         component: transaction-metrics-exporter
     spec:
       containers:
-      - name: transaction-metrics-exporter
+      - name: transaction-metrics-exporter-{{ .Values.deploymentSuffix }}
         image: {{ required "A valid image repository required!" .Values.imageRepository }}:{{ required "A valid image tag required!" .Values.imageTag }}
         imagePullPolicy: {{ .Values.imagePullPolicy }}
         env:
           - name: WEB3_PROVIDER
             value: {{ .Values.web3Provider }}
+          - name: FROM_BLOCK
+            value: "{{ .Values.fromBlock }}"
+          - name: TO_BLOCK
+            value: "{{ .Values.toBlock }}"
+          - name: BLOCK_INTERVAL
+            value: "{{ .Values.blockInterval }}"
+          - name: WATCH_ADDRESS
+            value: "{{ .Values.watchAddress }}"
         ports:
           - name: http
             containerPort: 3000

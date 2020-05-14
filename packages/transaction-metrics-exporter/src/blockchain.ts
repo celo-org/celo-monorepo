@@ -8,8 +8,8 @@ import { newLogExplorer } from '@celo/contractkit/lib/explorer/log-explorer'
 import { Future } from '@celo/utils/lib/future'
 import { consoleLogger } from '@celo/utils/lib/logger'
 import { conditionWatcher, tryObtainValueWithRetries } from '@celo/utils/lib/task'
-import { Block, BlockHeader } from 'web3/eth/types'
-import { WebsocketProvider } from 'web3/providers'
+import { Transaction, WebsocketProvider } from 'web3-core'
+import { BlockHeader } from 'web3-eth'
 import { Counters } from './metrics'
 
 const EMPTY_INPUT = 'empty_input'
@@ -137,15 +137,15 @@ async function newBlockHeaderProcessor(kit: ContractKit): Promise<(block: BlockH
     Counters.blockheader.inc({ miner: header.miner })
 
     const block = await blockExplorer.fetchBlock(header.number)
-    const previousBlock: Block = await blockExplorer.fetchBlock(header.number - 1)
+    const previousBlock = await blockExplorer.fetchBlock(header.number - 1)
 
-    const blockTime = block.timestamp - previousBlock.timestamp
+    const blockTime = Number(block.timestamp) - Number(previousBlock.timestamp)
     logEvent('RECEIVED_BLOCK', { ...block, blockTime })
 
     const parsedBlock = blockExplorer.parseBlock(block)
     const parsedTxMap = toTxMap(parsedBlock)
 
-    for (const tx of parsedBlock.block.transactions) {
+    for (const tx of parsedBlock.block.transactions as Transaction[]) {
       const parsedTx: ParsedTx | undefined = parsedTxMap.get(tx.hash)
 
       logEvent('RECEIVED_TRANSACTION', tx)
@@ -153,7 +153,7 @@ async function newBlockHeaderProcessor(kit: ContractKit): Promise<(block: BlockH
       logEvent('RECEIVED_TRANSACTION_RECEIPT', receipt)
 
       const labels = {
-        to: parsedTx ? tx.to : NOT_WHITELISTED_ADDRESS,
+        to: parsedTx ? (tx.to as string) : NOT_WHITELISTED_ADDRESS,
         methodId: toMethodId(tx.input, parsedTx != null),
         status: receipt.status.toString(),
       }

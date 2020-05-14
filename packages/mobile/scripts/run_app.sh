@@ -44,7 +44,9 @@ echo "Current directory: `pwd`"
 
 # Read values from the .env file and put them in env vars
 ENV_FILENAME="${ENVFILE:-.env}"
-export $(grep -v '^#' $ENV_FILENAME | xargs)
+# From https://stackoverflow.com/a/56229034/158525
+# Supports vars with spaces and single or double quotes
+eval $(grep -v -e '^#' $ENV_FILENAME | xargs -I {} echo export \'{}\')
 
 if [ -z "$NETWORK" ]; then
   echo "No network set, using $DEFAULT_TESTNET network set in $ENV_FILENAME file."
@@ -59,7 +61,7 @@ sed -i.bak "s/DEV_RESTORE_NAV_STATE_ON_RELOAD=.*/DEV_RESTORE_NAV_STATE_ON_RELOAD
 
 # Set Firebase settings in google service config files
 ANDROID_GSERVICES_PATH="./android/app/src/debug/google-services.json"
-IOS_GSERVICES_PATH="./ios/GoogleService-Info.plist"
+IOS_GSERVICES_PATH="./ios/$IOS_GOOGLE_SERVICE_PLIST"
 sed -i.bak "s/celo-org-mobile-.*firebaseio.com/celo-org-mobile-$NETWORK.firebaseio.com/g" $ANDROID_GSERVICES_PATH || true
 sed -i.bak "s/celo-org-mobile-.*firebaseio.com/celo-org-mobile-$NETWORK.firebaseio.com/g" $IOS_GSERVICES_PATH || true
 
@@ -68,23 +70,9 @@ rm -f $ENV_FILENAME.bak
 rm -f $ANDROID_GSERVICES_PATH.bak
 rm -f $IOS_GSERVICES_PATH.bak
 
-# Build Wallet Kit for env
-if [ "$FAST" = false ]; then
-  echo "Building sdk for testnet $NETWORK"
-  yarn build:sdk $NETWORK
-  echo "Done building sdk"
-fi
-
 # Build the app and run it
 if [ $PLATFORM = "android" ]; then
   echo "Using platform android"
-
-  # Run jettify to fix non-android-x compatible libs
-  if [ "$FAST" = false ]; then
-    echo "Jetifying react native libraries"
-    cd ../../ && yarn run jetify && cd packages/mobile
-    echo "Jetified"
-  fi
 
   if [ "$BUILD_ONLY" = true ]; then
     echo "Build only enabled, stopping here."

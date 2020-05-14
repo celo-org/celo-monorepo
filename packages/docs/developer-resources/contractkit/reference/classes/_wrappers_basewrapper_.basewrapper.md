@@ -28,6 +28,8 @@ Base ContractWrapper
 
   ↳ [ExchangeWrapper](_wrappers_exchange_.exchangewrapper.md)
 
+  ↳ [FreezerWrapper](_wrappers_freezer_.freezerwrapper.md)
+
   ↳ [GasPriceMinimumWrapper](_wrappers_gaspriceminimum_.gaspriceminimumwrapper.md)
 
   ↳ [GoldTokenWrapper](_wrappers_goldtokenwrapper_.goldtokenwrapper.md)
@@ -36,17 +38,25 @@ Base ContractWrapper
 
   ↳ [LockedGoldWrapper](_wrappers_lockedgold_.lockedgoldwrapper.md)
 
+  ↳ [MultiSigWrapper](_wrappers_multisig_.multisigwrapper.md)
+
   ↳ [ReserveWrapper](_wrappers_reserve_.reservewrapper.md)
 
   ↳ [SortedOraclesWrapper](_wrappers_sortedoracles_.sortedoracleswrapper.md)
 
   ↳ [StableTokenWrapper](_wrappers_stabletokenwrapper_.stabletokenwrapper.md)
 
+  ↳ [ReleaseGoldWrapper](_wrappers_releasegold_.releasegoldwrapper.md)
+
 ## Index
 
 ### Constructors
 
 * [constructor](_wrappers_basewrapper_.basewrapper.md#constructor)
+
+### Properties
+
+* [events](_wrappers_basewrapper_.basewrapper.md#events)
 
 ### Accessors
 
@@ -58,7 +68,7 @@ Base ContractWrapper
 
 \+ **new BaseWrapper**(`kit`: [ContractKit](_kit_.contractkit.md), `contract`: T): *[BaseWrapper](_wrappers_basewrapper_.basewrapper.md)*
 
-*Defined in [contractkit/src/wrappers/BaseWrapper.ts:15](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L15)*
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L19)*
 
 **Parameters:**
 
@@ -69,13 +79,21 @@ Name | Type |
 
 **Returns:** *[BaseWrapper](_wrappers_basewrapper_.basewrapper.md)*
 
+## Properties
+
+###  events
+
+• **events**: *any* = this.contract.events
+
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:33](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L33)*
+
 ## Accessors
 
 ###  address
 
 • **get address**(): *string*
 
-*Defined in [contractkit/src/wrappers/BaseWrapper.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L19)*
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:23](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L23)*
 
 Contract address
 

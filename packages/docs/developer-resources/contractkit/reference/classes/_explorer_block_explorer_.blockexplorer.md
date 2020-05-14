@@ -21,6 +21,7 @@
 * [fetchBlockRange](_explorer_block_explorer_.blockexplorer.md#fetchblockrange)
 * [parseBlock](_explorer_block_explorer_.blockexplorer.md#parseblock)
 * [tryParseTx](_explorer_block_explorer_.blockexplorer.md#tryparsetx)
+* [tryParseTxInput](_explorer_block_explorer_.blockexplorer.md#tryparsetxinput)
 
 ## Constructors
 
@@ -118,7 +119,7 @@ ___
 
 ▸ **tryParseTx**(`tx`: Transaction): *null | [ParsedTx](../interfaces/_explorer_block_explorer_.parsedtx.md)*
 
-*Defined in [contractkit/src/explorer/block-explorer.ts:85](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/explorer/block-explorer.ts#L85)*
+*Defined in [contractkit/src/explorer/block-explorer.ts:87](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/explorer/block-explorer.ts#L87)*
 
 **Parameters:**
 
@@ -127,3 +128,20 @@ Name | Type |
 `tx` | Transaction |
 
 **Returns:** *null | [ParsedTx](../interfaces/_explorer_block_explorer_.parsedtx.md)*
+
+___
+
+###  tryParseTxInput
+
+▸ **tryParseTxInput**(`address`: string, `input`: string): *null | [CallDetails](../interfaces/_explorer_block_explorer_.calldetails.md)*
+
+*Defined in [contractkit/src/explorer/block-explorer.ts:99](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/explorer/block-explorer.ts#L99)*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`address` | string |
+`input` | string |
+
+**Returns:** *null | [CallDetails](../interfaces/_explorer_block_explorer_.calldetails.md)*

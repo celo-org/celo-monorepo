@@ -1,7 +1,7 @@
 import { findAddressIndex } from '@celo/utils/lib/address'
 import BigNumber from 'bignumber.js'
 import { Address } from '../base'
-import { DowntimeSlasher } from '../generated/types/DowntimeSlasher'
+import { DowntimeSlasher } from '../generated/DowntimeSlasher'
 import {
   BaseWrapper,
   CeloTransactionObject,
@@ -11,6 +11,20 @@ import {
   valueToInt,
 } from './BaseWrapper'
 import { Validator } from './Validators'
+
+export interface DowntimeSlasherConfig {
+  slashableDowntime: number
+  slashingIncentives: {
+    reward: BigNumber
+    penalty: BigNumber
+  }
+}
+
+export interface DowntimeWindow {
+  start: number
+  end: number
+  length: number
+}
 
 /**
  * Contract handling slashing for Validator downtime
@@ -36,6 +50,17 @@ export class DowntimeSlasherWrapper extends BaseWrapper<DowntimeSlasher> {
   slashableDowntime = proxyCall(this.contract.methods.slashableDowntime, undefined, valueToInt)
 
   /**
+   * Returns current configuration parameters.
+   */
+  async getConfig(): Promise<DowntimeSlasherConfig> {
+    const res = await Promise.all([this.slashableDowntime(), this.slashingIncentives()])
+    return {
+      slashableDowntime: res[0],
+      slashingIncentives: res[1],
+    }
+  }
+
+  /**
    * Tests if a validator has been down.
    * @param startBlock First block of the downtime.
    * @param startSignerIndex Validator index at the first block.
@@ -44,33 +69,60 @@ export class DowntimeSlasherWrapper extends BaseWrapper<DowntimeSlasher> {
   isDown = proxyCall(this.contract.methods.isDown)
 
   /**
-   * Slash a Validator for downtime.
-   * @param validator Validator to slash for downtime.
+   * Tests if the given validator or signer has been down.
+   * @param validatorOrSignerAddress Address of the validator account or signer.
    * @param startBlock First block of the downtime, undefined if using endBlock.
-   * @param endBlock Last block of the downtime.
+   * @param endBlock Last block of the downtime. Determined from startBlock or grandparent of latest block if not provided.
+   */
+  async isValidatorDown(validatorOrSignerAddress: Address, startBlock?: number, endBlock?: number) {
+    const window = await this.getSlashableDowntimeWindow(startBlock, endBlock)
+    const startSignerIndex = await this.getValidatorSignerIndex(
+      validatorOrSignerAddress,
+      window.start
+    )
+    const endSignerIndex = await this.getValidatorSignerIndex(validatorOrSignerAddress, window.end)
+    return this.isDown(window.start, startSignerIndex, endSignerIndex)
+  }
+
+  /**
+   * Determines the validator signer given an account or signer address and block number.
+   * @param validatorOrSignerAddress Address of the validator account or signer.
+   * @param blockNumber Block at which to determine the signer index.
+   */
+  async getValidatorSignerIndex(validatorOrSignerAddress: Address, blockNumber: number) {
+    // If the provided address is the account, fetch the signer at the given block.
+    const accounts = await this.kit.contracts.getAccounts()
+    const validators = await this.kit.contracts.getValidators()
+    const isAccount = await accounts.isAccount(validatorOrSignerAddress)
+    const signer = isAccount
+      ? (await validators.getValidator(validatorOrSignerAddress, blockNumber)).signer
+      : validatorOrSignerAddress
+
+    // Determine the index of the validator signer in the elected set at the given block.
+    const election = await this.kit.contracts.getElection()
+    const index = findAddressIndex(signer, await election.getValidatorSigners(blockNumber))
+    if (index < 0) {
+      throw new Error(`Validator signer ${signer} was not elected at block ${blockNumber}`)
+    }
+    return index
+  }
+
+  /**
+   * Slash a Validator for downtime.
+   * @param validator Validator account or signer to slash for downtime.
+   * @param startBlock First block of the downtime, undefined if using endBlock.
+   * @param endBlock Last block of the downtime. Determined from startBlock or grandparent of latest block if not provided.
    */
   async slashValidator(
-    validatorAddress: Address,
+    validatorOrSignerAddress: Address,
     startBlock?: number,
     endBlock?: number
   ): Promise<CeloTransactionObject<void>> {
-    const election = await this.kit.contracts.getElection()
-    const validators = await this.kit.contracts.getValidators()
-    if (endBlock) {
-      const validator = await validators.getValidator(validatorAddress, endBlock)
-      return this.slashEndSignerIndex(
-        endBlock,
-        findAddressIndex(validator.signer, await election.getValidatorSigners(endBlock))
-      )
-    } else if (startBlock) {
-      const validator = await validators.getValidator(validatorAddress, startBlock)
-      return this.slashStartSignerIndex(
-        startBlock,
-        findAddressIndex(validator.signer, await election.getValidatorSigners(startBlock))
-      )
-    } else {
-      throw new Error(`No block specified`)
-    }
+    const window = await this.getSlashableDowntimeWindow(startBlock, endBlock)
+    return this.slashEndSignerIndex(
+      window.end,
+      await this.getValidatorSignerIndex(validatorOrSignerAddress, window.end)
+    )
   }
 
   /**
@@ -163,5 +215,49 @@ export class DowntimeSlasherWrapper extends BaseWrapper<DowntimeSlasher> {
         slashGroup.indices
       )
     )
+  }
+
+  /**
+   * Calculate the slashable window with respect to a provided start or end block number.
+   * @param startBlock First block of the downtime. Determined from endBlock if not provided.
+   * @param endBlock Last block of the downtime. Determined from startBlock or grandparent of latest block if not provided.
+   */
+  private async getSlashableDowntimeWindow(
+    startBlock?: number,
+    endBlock?: number
+  ): Promise<DowntimeWindow> {
+    const length = await this.slashableDowntime()
+    if (startBlock !== undefined && endBlock !== undefined) {
+      if (endBlock - startBlock + 1 !== length) {
+        throw new Error(`Start and end block must define a window of ${length} blocks`)
+      }
+      return {
+        start: startBlock,
+        end: endBlock,
+        length,
+      }
+    }
+    if (endBlock !== undefined) {
+      return {
+        start: endBlock - length + 1,
+        end: endBlock,
+        length,
+      }
+    }
+    if (startBlock !== undefined) {
+      return {
+        start: startBlock,
+        end: startBlock + length - 1,
+        length,
+      }
+    }
+
+    // Use the latest grandparent because that is the most recent block eligible for inclusion.
+    const latest = (await this.kit.web3.eth.getBlockNumber()) - 2
+    return {
+      start: latest - length + 1,
+      end: latest,
+      length,
+    }
   }
 }

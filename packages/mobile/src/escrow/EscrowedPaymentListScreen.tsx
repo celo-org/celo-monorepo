@@ -7,11 +7,11 @@ import { EscrowedPayment } from 'src/escrow/actions'
 import EscrowedPaymentListItem from 'src/escrow/EscrowedPaymentListItem'
 import { getReclaimableEscrowPayments } from 'src/escrow/reducer'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
-import { fetchPhoneAddresses } from 'src/identity/actions'
+import { InviteDetails } from 'src/invite/actions'
+import { inviteesSelector } from 'src/invite/reducer'
 import {
   NotificationList,
   titleWithBalanceNavigationOptions,
-  useBalanceInNavigationParam,
 } from 'src/notifications/NotificationList'
 import { NumberToRecipient } from 'src/recipients/recipient'
 import { recipientCacheSelector } from 'src/recipients/reducer'
@@ -21,34 +21,43 @@ interface StateProps {
   dollarBalance: string | null
   sentEscrowedPayments: EscrowedPayment[]
   recipientCache: NumberToRecipient
-}
-
-interface DispatchProps {
-  fetchPhoneAddresses: typeof fetchPhoneAddresses
+  invitees: InviteDetails[]
 }
 
 const mapStateToProps = (state: RootState): StateProps => ({
   dollarBalance: state.stableToken.balance,
   sentEscrowedPayments: getReclaimableEscrowPayments(state),
   recipientCache: recipientCacheSelector(state),
+  invitees: inviteesSelector(state),
 })
 
-type Props = NavigationInjectedProps & WithTranslation & StateProps & DispatchProps
+interface SentEscrowPaymentsAndInvitees {
+  payment: EscrowedPayment
+  invitees: InviteDetails[]
+}
 
-export const listItemRenderer = (payment: EscrowedPayment, key: number | undefined = undefined) => {
+type Props = NavigationInjectedProps & WithTranslation & StateProps
+
+export const listItemRenderer = (
+  item: SentEscrowPaymentsAndInvitees,
+  key: number | undefined = undefined
+) => {
+  const { payment, invitees } = item
   return (
     <View key={key}>
-      <EscrowedPaymentListItem payment={payment} />
+      <EscrowedPaymentListItem payment={payment} invitees={invitees} />
     </View>
   )
 }
 
 const EscrowedPaymentListScreen = (props: Props) => {
-  const { dollarBalance, navigation } = props
-  useBalanceInNavigationParam(dollarBalance, navigation)
+  const items: SentEscrowPaymentsAndInvitees[] = props.sentEscrowedPayments.map((payment) => ({
+    payment,
+    invitees: props.invitees,
+  }))
   return (
     <NotificationList
-      items={props.sentEscrowedPayments}
+      items={items}
       listItemRenderer={listItemRenderer}
       dollarBalance={props.dollarBalance}
     />
@@ -59,6 +68,6 @@ EscrowedPaymentListScreen.navigationOptions = titleWithBalanceNavigationOptions(
   i18n.t('walletFlow5:escrowedPaymentReminder')
 )
 
-export default connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
-  fetchPhoneAddresses,
-})(withTranslation(Namespaces.global)(EscrowedPaymentListScreen))
+export default connect<StateProps, {}, {}, RootState>(mapStateToProps)(
+  withTranslation(Namespaces.global)(EscrowedPaymentListScreen)
+)

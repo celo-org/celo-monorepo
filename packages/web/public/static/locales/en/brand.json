@@ -1,9 +1,15 @@
 {
   "home": {
-    "title": "Welcome to the Celo Brand Kit",
-    "introduction": "The Celo Brand Kit includes resources to visually represent Celo and the mission of prosperity for all. The kit offers instructions and assets for community contributors to appropriately communicate Celo brand affiliation. By using the Celo brand consistently, we can connect in our shared purpose.",
+    "title": "Welcome to the Celo BrandKit",
+    "introduction": "The Celo BrandKit includes resources to visually represent Celo and the mission of prosperity for all. The kit offers instructions and assets for community contributors to appropriately communicate Celo brand affiliation. By using the Celo brand consistently, we can connect in our shared purpose.",
     "useageTitle": "How to use this guide?",
-    "useageText": "Shared norms and behaviors are the foundation of a beautiful community. Support the effort responsibly and uphold <0>Celo’s Code of Conduct.</0>"
+    "useageText": "Shared norms and behaviors are the foundation of a beautiful community. Support the effort responsibly and uphold <0>Celo’s Code of Conduct.</0>",
+    "importantRemember": "Important things to remember",
+    "celoOwner": "Celo is the owner of all the brand assets and derivatives. You may not:",
+    "celoOwnerBullets": "<0>Register the trademark, domain, Celo Brand Asset, or derivative</0><1>Modify Celo Brand Assets in any way such as by changing a design or color or adding words or elements</1>",
+    "brandVoice": "Brand Voice",
+    "brandVoiceText": "Words matter. Celo’s brand voice sounds as if you are writing or speaking to a friend. When writing and talking about Celo, please review the <0>Celo Brand Voice.</0>"
+  
   },
   "logo": {
     "title": "Logo",
@@ -80,15 +86,25 @@
   },
   "icons": {
     "title": "Icons",
-    "license": "All icons are licensed under a <0>Creative Commons Attribution-NoDerivatives 4.0 International License</0> (CC BY-ND 4.0).",
-    "headline": "Used to simplify the complexities of Celo technology, icons are useful visual tools that can educate, clarify, and instruct in ways simple text can not.\n\nCelo icons have descriptions that act as guidelines. While some descriptions are specific, many icons have multiple meanings and we encourage the Celo community to find new culturally appropriate applications for them. "
+    "license": "You may copy and redistribute icons as long as you are abiding by the <0>Community Code of Conduct</0>. You may not remix or transform the icons. ",
+    "headline": "Used to simplify the complexities of Celo technology, icons are useful visual tools that can educate, clarify, and instruct in ways simple text can not.\n\nCelo icons have descriptions that act as guidelines. While some descriptions are specific, many icons have multiple meanings and we encourage the Celo community to find new culturally appropriate applications for them.",
+    "searchPlaceholder": "Ex. Stable Coin",
+    "searchLabel": "Explore Icons",
+    "matching": "One Matching Icon",
+    "matching_0": "No Matching Icons",
+    "matching_plural": "{{count}} Matching Icons"
+  },
+  "exchangeIcons": {
+    "title": "Exchange Icons",
+    "headline": "Celo currently has two asset units: cUSD and cGLD. Celo Gold (cGLD) is Celo’s native asset (not related to physical gold). Celo Dollar (cUSD) is the initial Celo stable value asset tracking the US dollar.\n\nThese exchange icons visually represent cUSD and cGLD.\n\n",
+    "license": "These assets may only be used to represent Celo assets on exchanges. The use of the Celo Exchange Icons requires following the Celo Community Code of Conduct as provided <0>here</0> and Brand Policy."
   },
   "keyImagery": {
     "title": "Key Imagery",
     "headline":
       "Used to tell a story, key images are visual tools that bring the text to life. These images help the user comprehend the material multidimensionally.\n\nImages have descriptions that act as guidelines for both accessibility and communication clarity. Most images can have multiple meanings and we encourage the Celo community to find new culturally appropriate applications for them.",
     "license":
-      "All imagery is licensed under a <0>Creative Commons Attribution-NoDerivatives 4.0 International License</0> (CC BY-ND 4.0).",
+      "You may copy and redistribute illustrations and abstract graphics as long as you are abiding by the <0>Community Code of Conduct</0>. You may not remix or transform them.",
     "illoTitle": "Illustrations",
     "illoText":
       "Illustrations show concrete ways that humans interact with an idea. They utilize current mental models to simplify a concept.",

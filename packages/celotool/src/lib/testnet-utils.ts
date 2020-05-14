@@ -1,16 +1,16 @@
-import { StaticNodeUtils } from '@celo/walletkit'
-import { GenesisBlocksGoogleStorageBucketName } from '@celo/walletkit/lib/src/genesis-block-utils'
+import { StaticNodeUtils } from '@celo/contractkit'
+import { GenesisBlocksGoogleStorageBucketName } from '@celo/contractkit/lib/network-utils/genesis-block-utils'
 import { Storage } from '@google-cloud/storage'
 import * as fs from 'fs'
 import fetch from 'node-fetch'
 import * as path from 'path'
 import sleep from 'sleep-promise'
+import { execCmdWithExitOnFailure } from './cmd-utils'
 import { getGenesisGoogleStorageUrl } from './endpoints'
 import { getEnvFile } from './env-utils'
 import { ensureAuthenticatedGcloudAccount } from './gcloud_utils'
 import { generateGenesisFromEnv } from './generate_utils'
 import { getBootnodeEnode, getEnodesWithExternalIPAddresses } from './geth'
-import { execCmdWithExitOnFailure } from './utils'
 
 const genesisBlocksBucketName = GenesisBlocksGoogleStorageBucketName
 const staticNodesBucketName = StaticNodeUtils.getStaticNodesGoogleStorageBucketName()

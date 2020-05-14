@@ -27,7 +27,6 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
       <View
         accessible={true}
         focusable={true}
-        isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackgroundBorderless",
@@ -126,6 +125,7 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
             <View
               autoPlay={true}
               enableMergePathsAndroidForKitKatAndAbove={false}
+              forwardedRef={[Function]}
               loop={true}
               onAnimationFinish={[Function]}
               progress={0}
@@ -212,6 +212,7 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
     <View
       accessible={true}
       focusable={true}
+      forwardedRef={[Function]}
       onClick={[Function]}
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
@@ -234,6 +235,7 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
       }
     />
     <View
+      forwardedRef={[Function]}
       hideModalContentWhileAnimating={false}
       onModalHide={[Function]}
       onModalWillHide={[Function]}
@@ -328,7 +330,6 @@ exports[`VerificationLoadingScreen renders correctly 1`] = `
           <View
             accessible={true}
             focusable={true}
-            isTVSelectable={true}
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackgroundBorderless",
@@ -398,7 +399,6 @@ exports[`VerificationLoadingScreen renders correctly with fail modal 1`] = `
       <View
         accessible={true}
         focusable={true}
-        isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackgroundBorderless",
@@ -497,6 +497,7 @@ exports[`VerificationLoadingScreen renders correctly with fail modal 1`] = `
             <View
               autoPlay={true}
               enableMergePathsAndroidForKitKatAndAbove={false}
+              forwardedRef={[Function]}
               loop={true}
               onAnimationFinish={[Function]}
               progress={0}
@@ -583,6 +584,7 @@ exports[`VerificationLoadingScreen renders correctly with fail modal 1`] = `
     <View
       accessible={true}
       focusable={true}
+      forwardedRef={[Function]}
       onClick={[Function]}
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
@@ -605,6 +607,7 @@ exports[`VerificationLoadingScreen renders correctly with fail modal 1`] = `
       }
     />
     <View
+      forwardedRef={[Function]}
       hideModalContentWhileAnimating={false}
       onModalHide={[Function]}
       onModalWillHide={[Function]}
@@ -699,7 +702,6 @@ exports[`VerificationLoadingScreen renders correctly with fail modal 1`] = `
           <View
             accessible={true}
             focusable={true}
-            isTVSelectable={true}
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackgroundBorderless",

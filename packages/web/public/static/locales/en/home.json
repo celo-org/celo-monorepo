@@ -71,12 +71,12 @@
   "whitepaperCopy":
     "Celo is a proof-of-stake based blockchain with smart contracts. The technology uses a phone number-based identity system with address-based encryption and eigentrust-based reputation.",
   "stabilityAnalysisCopy":
-    "Celo’s stablecoins are stable value currencies, implemented by an algorithmic reserve-backed stabilization mechanism. The first stablecoin, cUSD, is pegged to the US Dollar.",
+    "Celo’s stablecoins are stable value currencies, implemented by an algorithmic reserve-backed stabilization mechanism. The first stablecoin, cUSD, tracks the value of the US Dollar.",
   "downloadPDF": "Download .PDF",
   "learnMore": "Learn More",
   "hero3":
     "Celo is an open platform that makes financial tools accessible to anyone with a mobile phone",
-  "workOnCelo": "Work on Celo in San Francisco, Berlin, and around the world",
+  "workOnCelo": "Work on Celo in Berlin, Buenos Aires, San Francisco, and around the world",
   "viewRoles": "View Open Roles",
   "stayConnectedThanks":
     "Thanks for your contact info! We look forward to having you in the Celo community, expect our newsletter soon.",
@@ -85,5 +85,89 @@
   "reachOut": "Reach out to participate in Celo’s ecosystem",
   "receiveUpdates": "Receive the latest updates to your inbox",
   "startConversation": "Start A Conversation",
-  "recentNews": "Recent News"
+  "recentNews": "Recent News",
+  "timeline": {
+    "title": "Celo's Journey",
+    "subtitle": "Milestones",
+    "intro": "The Celo Community's past and upcoming milestones, focused on finding use cases, innovating on technology, and preparing for Mainnet release.",
+    "upcomingTitle": "Upcoming Milestones",
+    "pastTitle": "Previous Milestones",
+    "legendTitle": "Milestone Key",
+    "legend": {
+      "half": "In Progress",
+      "empty": "Pending"
+    },
+    "milestones": {
+      "New_Baklava_Testnet": {
+      "title": "New Baklava Testnet",
+      "text": "Validators stand up new testnet with feature complete software"
+    },
+    "Security_audits_complete": 
+    {
+      "title": "Security Audits Complete",
+      "text": "Resolve any outstanding issues to harden codebase"
+    },
+    "Mainnet_Release_Candidate_1": {
+      "title": "Mainnet Release Candidate 1",
+      "text": "Validators stand up release candidate network with production-ready software"
+    },
+    "Validator_Elections_Start": {
+      "title": "Validator Elections Start",
+      "text": "With validators and groups registered and staked, validator elections and epoch rewards enabled via on-chain governance proposal"
+    },
+    "Rewards_Activated": {
+      "title": "Celo Gold Voter Rewards Activate",
+      "text": "Voter rewards enabled via on-chain governance proposal"
+    },
+    "Mainnet_Release_Candidate_X": {
+      "title": "Mainnet Release Candidate X",
+      "text": "Possible additional release candidates in the event critical issues are discovered"
+    },
+    "Celo_Gold_is_live": {
+      "title": "Celo Gold Live",
+      "text": "When the network is running smoothly, Celo Gold transfers can be enabled via on-chain governance proposal"
+    },
+    "Celo_Dollar_is_live": {
+      "title": "Celo Dollars Live",
+      "text": "When Oracles can provide pricing for Celo Gold, Celo Dollar transfers can be enabled via on-chain governance proposal"
+    },
+    "Mainnet_Mobile_Wallet_Release": {
+      "title": "Mainnet Mobile Wallet Release",
+      "text": "The Mainnet Mobile Wallet will be fully available for download on iOS and Android"
+    },
+    "SDK_Release": {
+      "title": "SDK Release",
+      "text": "ContractKit and DAppKit simplify development of dApps"
+    },
+    "Baklava_Testnet": {
+      "title": "Baklava Testnet – The Great Celo Stake Off",
+      "text": "Validators gain operational experience and chance to earn Mainnet Celo Gold, software hardened"       
+    },
+    "100_Community": {
+      "title": "100th Community Event",
+      "text": "100 events hosted in 100 days in more than 35 countries"  
+    },
+    "Alfajores_Testnet": {
+      "title": "Alfajores Testnet Release",
+      "text": "First full network release for protocol and app developers"       
+    },
+    "MIT_Stability_Challenge": {
+      "title": "MIT Stability Challenge",
+      "text": "Stability Protocol tested and improved"       
+    },
+    "First_user_research_trip": {
+      "title": "First User Research Trip",
+      "text": "Field research on mobile money adoption in Kenya"       
+    },
+    "Wallet_in_market_testing_begins": {
+      "title": "Mobile Wallet in Market Testing Begins",
+      "text": "Ongoing research in emerging markets"     
+    }
+  }
+  },
+  "coinlist": {
+    "title": "Become a Backer of Celo",
+    "text": "Celo Gold will be available for purchase via CoinList. Everyone participating pays the same fair price and the minimum contribution is $100 USD. Available to non-US persons only, other restrictions apply.",
+    "btn": "Participate"
+  }
 }

@@ -1,0 +1,1 @@
+{{ include "celo.full-node-statefulset" (dict "Values" $.Values "Release" $.Release "Chart" $.Chart "name" "tx-nodes-private" "component_label" "tx_nodes_private" "replicas" .Values.geth.private_tx_nodes "mnemonic_account_type" "tx_node" "syncmode" "full" "gcmode" "archive" "rpc_apis" "eth,net,web3,debug,txpool" "ip_addresses" .Values.geth.private_tx_node_ip_addresses ) }}

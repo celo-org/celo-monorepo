@@ -100,7 +100,7 @@ contract Governance is
   uint256[] public emptyIndices;
   ParticipationParameters private participationParameters;
 
-  event ApproverSet(address approver);
+  event ApproverSet(address indexed approver);
 
   event ConcurrentProposalsSet(uint256 concurrentProposals);
 
@@ -147,7 +147,7 @@ contract Governance is
 
   event ProposalExecuted(uint256 indexed proposalId);
 
-  event ProposalExpired(uint256 proposalId);
+  event ProposalExpired(uint256 indexed proposalId);
 
   event ParticipationBaselineUpdated(uint256 participationBaseline);
 
@@ -858,11 +858,15 @@ contract Governance is
    * @notice Returns an accounts vote record on a particular index in `dequeued`.
    * @param account The address of the account to get the record for.
    * @param index The index in `dequeued`.
-   * @return The corresponding proposal ID and vote value.
+   * @return The corresponding proposal ID, vote value, and weight.
    */
-  function getVoteRecord(address account, uint256 index) external view returns (uint256, uint256) {
+  function getVoteRecord(address account, uint256 index)
+    external
+    view
+    returns (uint256, uint256, uint256)
+  {
     VoteRecord storage record = voters[account].referendumVotes[index];
-    return (record.proposalId, uint256(record.value));
+    return (record.proposalId, uint256(record.value), record.weight);
   }
 
   /**

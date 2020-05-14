@@ -1,7 +1,9 @@
 /* tslint:disable no-console */
+import Web3V1Celo from '@celo/typechain-target-web3-v1-celo'
 import { execSync } from 'child_process'
 import * as fs from 'fs'
 import * as path from 'path'
+import { tsGenerator } from 'ts-generator'
 
 const ROOT_DIR = path.normalize(path.join(__dirname, '../'))
 const BUILD_DIR = path.join(ROOT_DIR, 'build')
@@ -24,7 +26,7 @@ export const ProxyContracts = [
   'GovernanceProxy',
   'LockedGoldProxy',
   'ReserveProxy',
-  'ReserveSpenderMultiSig',
+  'ReserveSpenderMultiSigProxy',
   'StableTokenProxy',
   'SortedOraclesProxy',
   'RegistryProxy',
@@ -45,6 +47,7 @@ export const CoreContracts = [
   'Election',
   'EpochRewards',
   'Governance',
+  'GovernanceApproverMultiSig',
   'BlockchainParameters',
   'DoubleSigningSlasher',
   'DowntimeSlasher',
@@ -60,6 +63,7 @@ export const CoreContracts = [
   // stability
   'Exchange',
   'Reserve',
+  'ReserveSpenderMultiSig',
   'StableToken',
   'SortedOracles',
 ]
@@ -115,42 +119,34 @@ function generateFilesForTruffle() {
   )
 }
 
-function generateFilesForContractKit() {
+async function generateFilesForContractKit() {
   console.log('contractkit: Generating Types')
   exec(`rm -rf ${CONTRACTKIT_GEN_DIR}`)
   const relativePath = path.relative(ROOT_DIR, CONTRACTKIT_GEN_DIR)
 
-  const globPattern = `${BUILD_DIR}/contracts/@(${CoreContracts.join('|')}).json`
-  exec(
-    `yarn run --silent typechain --target="web3-1.0.0" --outDir "${relativePath}/types" "${globPattern}" `
-  )
+  const contractKitContracts = CoreContracts.concat('Proxy')
 
-  console.log('contractkit: Generating Contract Factories')
-  for (const contractName of CoreContracts) {
-    const contract = getArtifact(contractName)
-    writeContractFactoryFile(relativePath, contractName, contract.abi)
-  }
+  const globPattern = `${BUILD_DIR}/contracts/@(${contractKitContracts.join('|')}).json`
+
+  const cwd = process.cwd()
+
+  const web3Generator = new Web3V1Celo({
+    cwd,
+    rawConfig: {
+      files: globPattern,
+      outDir: relativePath,
+    },
+  })
+
+  await tsGenerator({ cwd, loggingLvl: 'info' }, web3Generator)
 
   exec(`yarn --cwd "${ROOT_DIR}/../.." prettier --write "${CONTRACTKIT_GEN_DIR}/**/*.ts"`)
-}
-
-function writeContractFactoryFile(outputDir: string, contractName: string, abi: any[]) {
-  const contents = [
-    "import Web3 from 'web3'",
-    `import { ${contractName} } from './types/${contractName}'`,
-    `export const ABI = ${JSON.stringify(abi)}`,
-    ``,
-    `export function new${contractName}(web3: Web3, address: string): ${contractName} {`,
-    ' return new web3.eth.Contract(ABI, address) as any',
-    '}',
-  ].join('\n')
-  fs.writeFileSync(path.join(outputDir, `${contractName}.ts`), contents)
 }
 
 async function main() {
   compile()
   generateFilesForTruffle()
-  generateFilesForContractKit()
+  await generateFilesForContractKit()
 }
 
 main().catch((err) => {

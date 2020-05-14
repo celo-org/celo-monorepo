@@ -1,23 +1,23 @@
 # Baklava Testnet
 
-The **Baklava Testnet** is the second Celo test network after [Alfajores](alfajores-testnet.md). You can use it to participate in the [The Great Celo Stake Off](https://forum.celo.org/t/the-great-celo-stake-off-the-details/136). Subject to these [Terms and Conditions](https://docs.google.com/document/d/1b5SzeRbq60nx50NeezAEMpwLkaBDQ9hjZc0QAh4Mbdk/), eligible participants will have the opportunity to receive Celo Gold at the Mainnet launch of the Celo Protocol. The Stake Off will operate in phases, with each phase focusing on a different part of the protocol or infrastructure to test.
+The Baklava Testnet is a non-production Testnet for the Validator community. It serves several purposes:
 
-Once you have [registered for The Great Celo Stake Off](https://docs.google.com/forms/d/e/1FAIpQLSfbn5hTJ4UIWpN92-o2qMTUB0UnrFsL0fm97XqGe4VhhN_r5A/viewform), follow these instructions to set up a [full node](running-a-full-node.md) or a [validator](running-a-validator.md) on your machine \(or on a cloud or hosting provider\).
-
-Please refer to [Key Concepts](../overview.md#background-and-key-concepts) for background on blockchains and an explanation of terms used in the section.
+- **Operational excellence**: It helps you get familiarized with the processes that will be used to create RC1, and verify the security and stability of your infrastructure with the new software.
+- **Detecting vulnerabilities**: It helps the Celo community discover any remaining bugs before RC1.
+- **Future testnet**: If all goes well, it will continue to function as a testnet, serving as a testing ground for changes after mainnet is launched.
 
 {% hint style="warning" %}
-Baklava is an incentivized testnet for the Celo Protocol. Its tokens hold no real world economic value. It is an early, partially audited release of the Celo Protocol. Transitions between each phases of The Great Celo Stake Off may require a full network reset, a hard fork, or an upgrade. Network resets will erase your accounts, their balance and your transaction history. You may encounter bugs and limitations with the software and documentation. Continued participation may require you to upgrade your client software.
+The Baklava Testnet is designed for testing and experimentation by developers. Its tokens hold no real world economic value. The testnet software will be upgraded and the entirety of its data reset on a regular basis. This will erase your accounts, their balance and your transaction history. The testnet software will be upgraded on a regular basis. You may encounter bugs and limitations with the software and documentation.
 {% endhint %}
 
-Please help the community to improve Celo by asking questions on the [Forum](https://forum.celo.org/c/baklava-testnet)!
+Please help the community to improve Celo by asking questions on [Discord](https://chat.celo.org) the [Forum](https://forum.celo.org/c/baklava-testnet)!
 
 {% hint style="info" %}
-Your use of the Baklava Testnet is subject to the [Baklava Testnet Disclaimer](../important-information/baklava-testnet-disclaimer.md). Participation in The Great Celo Stake Off is subject to the [Terms and Conditions](https://docs.google.com/document/d/1b5SzeRbq60nx50NeezAEMpwLkaBDQ9hjZc0QAh4Mbdk/).
+Your use of the Baklava Testnet is subject to the [Baklava Testnet Disclaimer](../important-information/baklava-testnet-disclaimer.md).
 {% endhint %}
 
 ## Useful links
 
-- [Register for The Great Celo Stake Off](https://docs.google.com/forms/d/e/1FAIpQLSfbn5hTJ4UIWpN92-o2qMTUB0UnrFsL0fm97XqGe4VhhN_r5A/viewform) - to receive an allocation Baklava Testnet Units
-- [Baklava Network Status](https://baklava-ethstats.celo-testnet.org) - to check the current availability of the testnet
+- [Baklava Faucet Request Form](https://forms.gle/JTYkMAJWTAUQp1sv9) - to request faucetted funds to become a Validator on the Baklava network.
+- [Baklava Network Status](https://baklava-celostats.celo-testnet.org) - to check the current availability of the testnet
 - [Baklava Network Block Explorer](https://baklava-blockscout.celo-testnet.org) - explore the history of the blockchain and view transaction details

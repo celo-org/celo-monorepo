@@ -70,9 +70,10 @@ contract EpochRewards is
 
   event TargetVotingGoldFractionSet(uint256 fraction);
   event CommunityRewardFractionSet(uint256 fraction);
-  event CarbonOffsettingFundSet(address partner, uint256 fraction);
+  event CarbonOffsettingFundSet(address indexed partner, uint256 fraction);
   event TargetValidatorEpochPaymentSet(uint256 payment);
   event TargetVotingYieldParametersSet(uint256 max, uint256 adjustmentFactor);
+  event TargetVotingYieldSet(uint256 target);
   event RewardsMultiplierParametersSet(
     uint256 max,
     uint256 underspendAdjustmentFactor,
@@ -125,7 +126,7 @@ contract EpochRewards is
     setTargetValidatorEpochPayment(_targetValidatorEpochPayment);
     setCommunityRewardFraction(_communityRewardFraction);
     setCarbonOffsettingFund(_carbonOffsettingPartner, _carbonOffsettingFraction);
-    targetVotingYieldParams.target = FixidityLib.wrap(targetVotingYieldInitial);
+    setTargetVotingYield(targetVotingYieldInitial);
     startTime = now;
   }
 
@@ -288,6 +289,23 @@ contract EpochRewards is
   }
 
   /**
+   * @notice Sets the target voting yield.  Uses fixed point arithmetic
+   * for protection against overflow.
+   * @param targetVotingYield The relative target block reward for voters.
+   * @return True upon success.
+   */
+  function setTargetVotingYield(uint256 targetVotingYield) public onlyOwner returns (bool) {
+    FixidityLib.Fraction memory target = FixidityLib.wrap(targetVotingYield);
+    require(
+      target.lte(targetVotingYieldParams.max),
+      "Target voting yield must be less than or equal to max"
+    );
+    targetVotingYieldParams.target = target;
+    emit TargetVotingYieldSet(targetVotingYield);
+    return true;
+  }
+
+  /**
    * @notice Returns the target Gold supply according to the epoch rewards target schedule.
    * @return The target Gold supply according to the epoch rewards target schedule.
    */
@@ -383,7 +401,9 @@ contract EpochRewards is
     // increase /= (1 - fraction) st the final community reward is fraction * increase
     targetGoldSupplyIncrease = FixidityLib
       .newFixed(targetGoldSupplyIncrease)
-      .divide(FixidityLib.newFixed(1).subtract(communityRewardFraction))
+      .divide(
+      FixidityLib.newFixed(1).subtract(communityRewardFraction).subtract(carbonOffsettingFraction)
+    )
       .fromFixed();
     return targetGoldSupplyIncrease;
   }

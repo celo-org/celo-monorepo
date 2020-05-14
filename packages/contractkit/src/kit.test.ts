@@ -1,6 +1,5 @@
-import { TransactionObject, Tx } from 'web3/eth/types'
-import PromiEvent from 'web3/promiEvent'
-import { TransactionReceipt } from 'web3/types'
+import { PromiEvent, TransactionReceipt, Tx } from 'web3-core'
+import { TransactionObject } from 'web3-eth'
 import { newKit } from './kit'
 import { promiEventSpy } from './test-utils/PromiEventStub'
 

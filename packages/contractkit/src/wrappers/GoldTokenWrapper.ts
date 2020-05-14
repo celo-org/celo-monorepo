@@ -1,11 +1,19 @@
 // NOTE: removing this import results in `yarn build` failures in Dockerfiles
 // after the move to node 10. This allows types to be inferred without
 // referencing '@celo/utils/node_modules/bignumber.js'
-import _ from 'bignumber.js'
-
+import 'bignumber.js'
 import { Address } from '../base'
-import { GoldToken } from '../generated/types/GoldToken'
-import { BaseWrapper, proxyCall, proxySend, valueToBigNumber, valueToInt } from './BaseWrapper'
+import { GoldToken } from '../generated/GoldToken'
+import {
+  BaseWrapper,
+  proxyCall,
+  proxySend,
+  stringIdentity,
+  tupleParser,
+  valueToBigNumber,
+  valueToInt,
+  valueToString,
+} from './BaseWrapper'
 
 /**
  * ERC-20 contract for Celo native currency.
@@ -55,7 +63,11 @@ export class GoldTokenWrapper extends BaseWrapper<GoldToken> {
    * @param value The increment of the amount of Celo Gold approved to the spender.
    * @returns true if success.
    */
-  increaseAllowance = proxySend(this.kit, this.contract.methods.increaseAllowance)
+  increaseAllowance = proxySend(
+    this.kit,
+    this.contract.methods.increaseAllowance,
+    tupleParser(stringIdentity, valueToString)
+  )
   /**
    * Decreases the allowance of another user.
    * @param spender The address which is being approved to spend Celo Gold.

@@ -2,13 +2,14 @@ import { Address } from '@celo/contractkit'
 import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
 import { GovernanceWrapper, ProposalStage } from '@celo/contractkit/lib/wrappers/Governance'
 import { LockedGoldWrapper } from '@celo/contractkit/lib/wrappers/LockedGold'
+import { MultiSigWrapper } from '@celo/contractkit/lib/wrappers/MultiSig'
 import { ValidatorsWrapper } from '@celo/contractkit/lib/wrappers/Validators'
 import { eqAddress, NULL_ADDRESS } from '@celo/utils/lib/address'
 import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import BigNumber from 'bignumber.js'
 import chalk from 'chalk'
 import { BaseCommand } from '../base'
-import { printValueMap } from './cli'
+import { printValueMapRecursive } from './cli'
 
 export interface CommandCheck {
   name: string
@@ -90,15 +91,29 @@ class CheckBuilder {
     }
   }
 
-  withGovernance<A>(f: (accounts: GovernanceWrapper) => A): () => Promise<Resolve<A>> {
+  withGovernance<A>(
+    f: (governance: GovernanceWrapper, signer: Address, account: Address, ctx: CheckBuilder) => A
+  ): () => Promise<Resolve<A>> {
     return async () => {
       const governance = await this.kit.contracts.getGovernance()
-      return f(governance) as Resolve<A>
+      return f(governance, '', '', this) as Resolve<A>
     }
   }
 
   addCheck(name: string, predicate: () => Promise<boolean> | boolean, errorMessage?: string) {
     this.checks.push(check(name, predicate, errorMessage))
+    return this
+  }
+
+  addConditionalCheck(
+    name: string,
+    runCondition: boolean,
+    predicate: () => Promise<boolean> | boolean,
+    errorMessage?: string
+  ) {
+    if (runCondition) {
+      return this.addCheck(name, predicate, errorMessage)
+    }
     return this
   }
 
@@ -120,8 +135,8 @@ class CheckBuilder {
       this.withGovernance(async (g) => {
         const match = (await g.getProposalStage(proposalID)) === stage
         if (!match) {
-          const waitTimes = await g.timeUntilStages(proposalID)
-          printValueMap({ waitTimes })
+          const timeUntilStages = await g.timeUntilStages(proposalID)
+          printValueMapRecursive({ timeUntilStages })
         }
         return match
       })
@@ -135,13 +150,13 @@ class CheckBuilder {
 
   hotfixIsPassing = (hash: Buffer) =>
     this.addCheck(
-      `Hotfix ${hash} is whitelisted by quorum of validators`,
+      `Hotfix 0x${hash.toString('hex')} is whitelisted by quorum of validators`,
       this.withGovernance((g) => g.isHotfixPassing(hash))
     )
 
   hotfixNotExecuted = (hash: Buffer) =>
     this.addCheck(
-      `Hotfix ${hash} is not already executed`,
+      `Hotfix 0x${hash.toString('hex')} is not already executed`,
       this.withGovernance(async (g) => !(await g.getHotfixRecord(hash)).executed)
     )
 
@@ -250,7 +265,7 @@ class CheckBuilder {
       `${this.signer!} is vote signer or registered account`,
       this.withAccounts(async (accs) => {
         return accs.voteSignerToAccount(this.signer!).then(
-          () => true,
+          (addr) => !eqAddress(addr, NULL_ADDRESS),
           () => false
         )
       })
@@ -284,6 +299,12 @@ class CheckBuilder {
     this.addCheck(
       `Deposit is greater than or equal to governance proposal minDeposit`,
       this.withGovernance(async (g) => deposit.gte(await g.minDeposit()))
+    )
+
+  hasRefundedDeposits = (account: Address) =>
+    this.addCheck(
+      `${account} has refunded governance deposits`,
+      this.withGovernance(async (g) => !(await g.getRefundedDeposits(account)).isZero())
     )
 
   hasEnoughLockedGold = (value: BigNumber) => {
@@ -340,7 +361,18 @@ class CheckBuilder {
           account
         )
         const { duration } = await v.getValidatorLockedGoldRequirements()
-        return duration.toNumber() + lastRemovedFromGroupTimestamp < Date.now()
+        return duration.toNumber() + lastRemovedFromGroupTimestamp < Date.now() / 1000
+      })
+    )
+  }
+
+  resetSlashingmultiplierPeriodPassed = () => {
+    return this.addCheck(
+      `Enough time has passed since the last halving of the slashing multiplier`,
+      this.withValidators(async (v, _signer, account) => {
+        const { lastSlashed } = await v.getValidatorGroup(account)
+        const duration = await v.getSlashingMultiplierResetPeriod()
+        return duration.toNumber() + lastSlashed.toNumber() < Date.now() / 1000
       })
     )
   }
@@ -363,6 +395,13 @@ class CheckBuilder {
         return vg.nextCommissionBlock.lte(blockNumber)
       })
     )
+
+  isMultiSigOwner = (from: string, multisig: MultiSigWrapper) => {
+    return this.addCheck('The provided address is an owner of the multisig', async () => {
+      const owners = await multisig.getOwners()
+      return owners.indexOf(from) > -1
+    })
+  }
 
   async runChecks() {
     console.log(`Running Checks:`)

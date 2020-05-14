@@ -16,7 +16,6 @@ exports[`ReviewFrame renders correctly 1`] = `
   <RCTScrollView
     contentContainerStyle={
       Object {
-        "alignItems": "center",
         "justifyContent": "flex-start",
         "paddingVertical": 10,
       }
@@ -26,7 +25,8 @@ exports[`ReviewFrame renders correctly 1`] = `
       <View
         style={
           Object {
-            "margin": 20,
+            "marginHorizontal": 16,
+            "marginVertical": 20,
           }
         }
       />
@@ -62,7 +62,6 @@ exports[`ReviewFrame renders correctly 1`] = `
             "top": 10,
           }
         }
-        isTVSelectable={true}
         onClick={[Function]}
         onResponderGrant={[Function]}
         onResponderMove={[Function]}

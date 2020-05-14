@@ -1,5 +1,4 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
-import HorizontalLine from '@celo/react-components/components/HorizontalLine'
 import KeyboardAwareScrollView from '@celo/react-components/components/KeyboardAwareScrollView'
 import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
 import { fontStyles } from '@celo/react-components/styles/fonts'
@@ -9,6 +8,7 @@ import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { Trans, WithTranslation } from 'react-i18next'
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { getNumberFormatSettings } from 'react-native-localize'
 import SafeAreaView from 'react-native-safe-area-view'
 import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
@@ -18,6 +18,7 @@ import componentWithAnalytics from 'src/analytics/wrapper'
 import { MoneyAmount } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
+import LineItemRow from 'src/components/LineItemRow'
 import { DOLLAR_TRANSACTION_MIN_AMOUNT, GOLD_TRANSACTION_MIN_AMOUNT } from 'src/config'
 import { fetchExchangeRate } from 'src/exchange/actions'
 import { ExchangeRatePair } from 'src/exchange/reducer'
@@ -35,6 +36,8 @@ import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { getRateForMakerToken, getTakerAmount } from 'src/utils/currencyExchange'
+
+const { decimalSeparator } = getNumberFormatSettings()
 
 interface State {
   inputToken: CURRENCY_ENUM
@@ -74,9 +77,9 @@ const mapStateToProps = (state: RootState): StateProps => ({
 
 export class ExchangeTradeScreen extends React.Component<Props, State> {
   static navigationOptions = ({ navigation }: NavigationInjectedProps<NavProps>) => {
-    const { makerToken, makerTokenBalance } = navigation.getParam('makerTokenDisplay')
+    const { makerToken } = navigation.getParam('makerTokenDisplay')
     return {
-      ...exchangeHeader(makerToken, makerTokenBalance),
+      ...exchangeHeader(makerToken),
     }
   }
 
@@ -192,7 +195,8 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
   // Output is either cGLD or cUSD based on input token
   // Local amounts are converted to cUSD
   getInputTokenAmount = () => {
-    const parsedInputAmount = parseInputAmount(this.state.inputAmount)
+    const parsedInputAmount = parseInputAmount(this.state.inputAmount, decimalSeparator)
+
     if (this.state.inputToken === CURRENCY_ENUM.GOLD) {
       return parsedInputAmount
     }
@@ -235,7 +239,7 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
 
   getSubtotalAmount = (): MoneyAmount => {
     return {
-      value: this.getOppositeInputTokenAmount(this.getInputTokenAmount()).toString(),
+      value: this.getOppositeInputTokenAmount(this.getInputTokenAmount()),
       currencyCode: CURRENCIES[this.getOppositeInputToken()].code,
     }
   }
@@ -267,7 +271,7 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
                 {t('exchangeAmount', { tokenName: this.getInputTokenDisplayText() })}
               </Text>
               <TouchableOpacity onPress={this.switchInputToken} testID="ExchangeSwitchInput">
-                <Text style={[fontStyles.subSmall, { textDecorationLine: 'underline' }]}>
+                <Text style={styles.switchToText}>
                   {t('switchTo', { tokenName: this.getOppositeInputTokenDisplayText() })}
                 </Text>
               </TouchableOpacity>
@@ -283,9 +287,9 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
               testID="ExchangeInput"
             />
           </View>
-          <HorizontalLine />
-          <View style={styles.subtotalContainer}>
-            <Text style={styles.exchangeBodyText}>
+          <LineItemRow
+            textStyle={styles.subtotalBodyText}
+            title={
               <Trans
                 i18nKey="inputSubtotal"
                 tOptions={{ context: this.isDollarInput() ? 'gold' : null }}
@@ -294,15 +298,15 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
                 Subtotal (@{' '}
                 <CurrencyDisplay
                   amount={{
-                    value: exchangeRateDisplay.toString(),
+                    value: exchangeRateDisplay,
                     currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
                   }}
                 />
                 )
               </Trans>
-            </Text>
-            <CurrencyDisplay style={styles.subtotal} amount={this.getSubtotalAmount()} />
-          </View>
+            }
+            amount={<CurrencyDisplay amount={this.getSubtotalAmount()} />}
+          />
         </KeyboardAwareScrollView>
         <View style={componentStyles.bottomContainer}>
           <Button
@@ -341,12 +345,23 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginTop: 38,
     alignItems: 'center',
+    marginBottom: 8,
   },
   exchangeBodyText: {
-    ...fontStyles.bodyBold,
+    ...fontStyles.bodySmall,
     fontSize: 15,
     lineHeight: 20,
-    fontWeight: '600',
+    fontWeight: '700',
+  },
+  subtotalBodyText: {
+    ...fontStyles.bodySmall,
+    fontSize: 15,
+    lineHeight: 20,
+  },
+  switchToText: {
+    ...fontStyles.subSmall,
+    textDecorationLine: 'underline',
+    fontSize: 13,
   },
   currencyInput: {
     ...fontStyles.body,
@@ -356,14 +371,5 @@ const styles = StyleSheet.create({
     fontSize: 24,
     lineHeight: 39,
     height: 54, // setting height manually b.c. of bug causing text to jump on Android
-  },
-  subtotalContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 16,
-  },
-  subtotal: {
-    ...fontStyles.regular,
-    marginLeft: 10,
   },
 })

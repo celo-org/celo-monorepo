@@ -37,13 +37,10 @@ platform :android do
   desc 'Build the Android application - requires environment param'
   lane :build do |options|
     clean
-    sh('yarn', 'run', 'build:sdk', options[:sdkEnv])
     environment = options[:environment].capitalize
-    ENV["GRADLE_OPTS"] = '-Dorg.gradle.daemon=false -Dorg.gradle.jvmargs="-Xmx256m -XX:+HeapDumpOnOutOfMemoryError"'
-    gradle(task: 'bundle' + environment + 'JsAndAssets', project_dir: 'android/')
-    ENV["GRADLE_OPTS"] = '-Dorg.gradle.daemon=false -Dorg.gradle.jvmargs="-Xmx3500m -XX:+HeapDumpOnOutOfMemoryError"'
+    ENV["GRADLE_OPTS"] = '-Dorg.gradle.daemon=false -Dorg.gradle.jvmargs="-Xmx10000m -XX:+HeapDumpOnOutOfMemoryError"'
     if options[:buildApk]
-      gradle(task: 'assemble', build_type: environment, project_dir: 'android/', flags: '-x bundle' + environment + 'JsAndAssets')
+      gradle(task: 'assemble', build_type: environment, project_dir: 'android/')
     else
       gradle(task: 'bundle', build_type: environment, project_dir: 'android/', flags: '-x bundle' + environment + 'JsAndAssets')
     end
@@ -52,56 +49,83 @@ platform :android do
   desc 'Ship Integration to Playstore Internal'
   lane :integration do
     env = 'integration'
-    sdkEnv = 'integration'
-    build(environment: env, sdkEnv: sdkEnv)
+    build(environment: env)
     fastlane_supply(env, 'internal', env)
   end
 
   desc 'Ship Staging to Playstore Internal'
   lane :staging do
     env = 'staging'
-    sdkEnv = 'alfajoresstaging'
-    build(environment: env, sdkEnv: sdkEnv)
+    build(environment: env)
     fastlane_supply(env, 'internal', env)
   end
 
   desc 'Ship Production to Playstore Alpha.'
   lane :production do
     env = 'release'
-    sdkEnv = 'argentinaproduction'
-    build(environment: env, sdkEnv: sdkEnv)
+    build(environment: env)
     fastlane_supply(env, 'alpha', 'production')
   end
 
   desc 'Ship Alfajores to Playstore Internal'
   lane :alfajores do
     env = 'alfajores'
-    sdkEnv = 'alfajores'
-    build(environment: env, sdkEnv: sdkEnv)
+    build(environment: env)
     fastlane_supply(env, 'internal', env)
   end
 
   desc 'Ship Pilot to Playstore Internal'
   lane :pilotapp do
     env = 'pilot'
-    sdkEnv = 'pilot'
-    build(environment: env, sdkEnv: sdkEnv)
+    build(environment: env)
     fastlane_supply(env, 'internal', env)
   end
 
   desc 'Build an Android apk'
   lane :build_apk do |options|
     env = options[:env]
-    sdkEnv = options[:sdkEnv]
-    build(environment: env, sdkEnv: sdkEnv, buildApk: true)
+    build(environment: env, buildApk: true)
   end
 
   desc 'Build an Android bundle'
   lane :build_bundle do |options|
     env = options[:env]
-    sdkEnv = options[:sdkEnv]
-    build(environment: env, sdkEnv: sdkEnv)
+    build(environment: env)
   end
+end
+
+platform :ios do
+
+  desc 'Build the iOS application - requires environment param'
+  lane :build do |options|
+    gym(
+      workspace: 'ios/celo.xcworkspace',
+      scheme: "celo-#{options[:environment]}",
+      configuration: "Release",
+      xcargs: "-allowProvisioningUpdates",
+      output_directory: "build",
+      # verbose: true
+     ) 
+  end
+
+  desc 'Ship Alfajores to TestFlight'
+  lane :alfajores do
+    env = 'alfajores'
+    build(environment: env)
+    upload_to_testflight(
+      skip_waiting_for_build_processing: true,
+    )
+  end
+
+  desc 'Ship Pilot to TestFlight'
+  lane :pilotapp do
+    env = 'pilot'
+    build(environment: env)
+    upload_to_testflight(
+      skip_waiting_for_build_processing: true,
+    )
+  end
+
 end
 
 

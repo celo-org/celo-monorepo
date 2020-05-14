@@ -115,16 +115,24 @@ exports[`EscrowedPaymentReminderSummaryNotification renders correctly 1`] = `
                  for 
               </Text>
               <Text
+                numberOfLines={1}
                 style={
-                  Object {
-                    "color": "#81868B",
-                    "fontFamily": "Hind-SemiBold",
-                    "fontSize": 14,
-                    "lineHeight": 20,
-                  }
+                  Array [
+                    Object {
+                      "color": "#81868B",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 14,
+                      "lineHeight": 20,
+                    },
+                    Object {
+                      "color": "#81868B",
+                    },
+                  ]
                 }
               >
-                11870000
+                
+                $
+                9.31
               </Text>
             </Text>
             <Text
@@ -150,16 +158,24 @@ exports[`EscrowedPaymentReminderSummaryNotification renders correctly 1`] = `
                  for 
               </Text>
               <Text
+                numberOfLines={1}
                 style={
-                  Object {
-                    "color": "#81868B",
-                    "fontFamily": "Hind-SemiBold",
-                    "fontSize": 14,
-                    "lineHeight": 20,
-                  }
+                  Array [
+                    Object {
+                      "color": "#81868B",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 14,
+                      "lineHeight": 20,
+                    },
+                    Object {
+                      "color": "#81868B",
+                    },
+                  ]
                 }
               >
-                11870000
+                
+                $
+                9.31
               </Text>
             </Text>
           </View>
@@ -175,7 +191,6 @@ exports[`EscrowedPaymentReminderSummaryNotification renders correctly 1`] = `
           <View
             accessible={true}
             focusable={true}
-            isTVSelectable={true}
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackgroundBorderless",
@@ -299,8 +314,27 @@ exports[`EscrowedPaymentReminderSummaryNotification when more 1 requests renders
                   "lineHeight": 18,
                 }
               }
+              testID="EscrowedPaymentListItem/Title"
             >
-              escrowPaymentNotificationTitle
+              Invited and paid 
+              +491522345678
+               (
+              <Text
+                numberOfLines={1}
+                style={
+                  Array [
+                    undefined,
+                    Object {
+                      "color": undefined,
+                    },
+                  ]
+                }
+              >
+                
+                $
+                9.31
+              </Text>
+              )
             </Text>
             <View
               style={
@@ -334,7 +368,6 @@ exports[`EscrowedPaymentReminderSummaryNotification when more 1 requests renders
                 <View
                   accessible={true}
                   focusable={true}
-                  isTVSelectable={true}
                   nativeBackgroundAndroid={
                     Object {
                       "attribute": "selectableItemBackgroundBorderless",
@@ -348,6 +381,7 @@ exports[`EscrowedPaymentReminderSummaryNotification when more 1 requests renders
                   onResponderTerminate={[Function]}
                   onResponderTerminationRequest={[Function]}
                   onStartShouldSetResponder={[Function]}
+                  testID="EscrowedPaymentListItem/global:remind/Button"
                 >
                   <Text
                     style={
@@ -370,7 +404,6 @@ exports[`EscrowedPaymentReminderSummaryNotification when more 1 requests renders
                 <View
                   accessible={true}
                   focusable={true}
-                  isTVSelectable={true}
                   nativeBackgroundAndroid={
                     Object {
                       "attribute": "selectableItemBackgroundBorderless",
@@ -384,6 +417,7 @@ exports[`EscrowedPaymentReminderSummaryNotification when more 1 requests renders
                   onResponderTerminate={[Function]}
                   onResponderTerminationRequest={[Function]}
                   onStartShouldSetResponder={[Function]}
+                  testID="EscrowedPaymentListItem/global:reclaim/Button"
                 >
                   <Text
                     style={
@@ -528,16 +562,24 @@ exports[`EscrowedPaymentReminderSummaryNotification when more than 2 requests re
                  for 
               </Text>
               <Text
+                numberOfLines={1}
                 style={
-                  Object {
-                    "color": "#81868B",
-                    "fontFamily": "Hind-SemiBold",
-                    "fontSize": 14,
-                    "lineHeight": 20,
-                  }
+                  Array [
+                    Object {
+                      "color": "#81868B",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 14,
+                      "lineHeight": 20,
+                    },
+                    Object {
+                      "color": "#81868B",
+                    },
+                  ]
                 }
               >
-                11870000
+                
+                $
+                9.31
               </Text>
             </Text>
             <Text
@@ -563,16 +605,24 @@ exports[`EscrowedPaymentReminderSummaryNotification when more than 2 requests re
                  for 
               </Text>
               <Text
+                numberOfLines={1}
                 style={
-                  Object {
-                    "color": "#81868B",
-                    "fontFamily": "Hind-SemiBold",
-                    "fontSize": 14,
-                    "lineHeight": 20,
-                  }
+                  Array [
+                    Object {
+                      "color": "#81868B",
+                      "fontFamily": "Hind-Regular",
+                      "fontSize": 14,
+                      "lineHeight": 20,
+                    },
+                    Object {
+                      "color": "#81868B",
+                    },
+                  ]
                 }
               >
-                11870000
+                
+                $
+                9.31
               </Text>
             </Text>
           </View>
@@ -588,7 +638,6 @@ exports[`EscrowedPaymentReminderSummaryNotification when more than 2 requests re
           <View
             accessible={true}
             focusable={true}
-            isTVSelectable={true}
             nativeBackgroundAndroid={
               Object {
                 "attribute": "selectableItemBackgroundBorderless",

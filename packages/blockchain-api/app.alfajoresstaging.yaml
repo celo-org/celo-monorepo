@@ -4,7 +4,7 @@ env_variables:
   NODE_ENV: "development"
   DEPLOY_ENV: "alfajoresstaging"
   EXCHANGE_RATES_API: "https://apilayer.net/api"
-  BLOCKSCOUT_API: "https://alfajoresstaging-blockscout.celo-testnet.org/api"
+  BLOCKSCOUT_API: "https://alfajoresstaging-blockscout.celo-testnet.org/graphql"
   FIREBASE_DB: "https://celo-org-mobile-alfajoresstaging.firebaseio.com"
   # TODO Pull addresses from the build artifacts of the network in protocol/build
   FAUCET_ADDRESS: "0xF4314cb9046bECe6AA54bb9533155434d0c76909"

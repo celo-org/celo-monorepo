@@ -56,6 +56,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
   event UnlockingPeriodSet(uint256 period);
   event GoldLocked(address indexed account, uint256 value);
   event GoldUnlocked(address indexed account, uint256 value, uint256 available);
+  event GoldRelocked(address indexed account, uint256 value);
   event GoldWithdrawn(address indexed account, uint256 value);
   event SlasherWhitelistAdded(string indexed slasherIdentifier);
   event SlasherWhitelistRemoved(string indexed slasherIdentifier);
@@ -183,7 +184,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
       pendingWithdrawal.value = pendingWithdrawal.value.sub(value);
     }
     _incrementNonvotingAccountBalance(msg.sender, value);
-    emit GoldLocked(msg.sender, value);
+    emit GoldRelocked(msg.sender, value);
   }
 
   /**
@@ -198,6 +199,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     require(now >= pendingWithdrawal.timestamp, "Pending withdrawal not available");
     uint256 value = pendingWithdrawal.value;
     deletePendingWithdrawal(account.pendingWithdrawals, index);
+    require(value <= address(this).balance, "Inconsistent balance");
     msg.sender.transfer(value);
     emit GoldWithdrawn(msg.sender, value);
   }
@@ -260,6 +262,15 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     return (values, timestamps);
   }
 
+  function getTotalPendingWithdrawals(address account) external view returns (uint256) {
+    uint256 pendingWithdrawalSum = 0;
+    PendingWithdrawal[] memory withdrawals = balances[account].pendingWithdrawals;
+    for (uint256 i = 0; i < withdrawals.length; i = i.add(1)) {
+      pendingWithdrawalSum = pendingWithdrawalSum.add(withdrawals[i].value);
+    }
+    return pendingWithdrawalSum;
+  }
+
   function getSlashingWhitelist() external view returns (bytes32[] memory) {
     return slashingWhitelist;
   }
@@ -297,6 +308,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     bytes32 keyBytes = keccak256(abi.encodePacked(slasherIdentifier));
     require(slashingMap[keyBytes], "Cannot remove slasher ID not yet added.");
     require(index < slashingWhitelist.length, "Provided index exceeds whitelist bounds.");
+    require(slashingWhitelist[index] == keyBytes, "Index doesn't match identifier");
     slashingWhitelist[index] = slashingWhitelist[slashingWhitelist.length - 1];
     slashingWhitelist.pop();
     slashingMap[keyBytes] = false;
@@ -350,6 +362,7 @@ contract LockedGold is ILockedGold, ReentrancyGuard, Initializable, UsingRegistr
     }
     address communityFund = registry.getAddressForOrDie(GOVERNANCE_REGISTRY_ID);
     address payable communityFundPayable = address(uint160(communityFund));
+    require(maxSlash.sub(reward) <= address(this).balance, "Inconsistent balance");
     communityFundPayable.transfer(maxSlash.sub(reward));
     emit AccountSlashed(account, maxSlash, reporter, reward);
   }

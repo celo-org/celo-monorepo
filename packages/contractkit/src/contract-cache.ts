@@ -9,10 +9,12 @@ import { ElectionWrapper } from './wrappers/Election'
 // import { EpochRewardsWrapper } from './wrappers/EpochRewards'
 import { EscrowWrapper } from './wrappers/Escrow'
 import { ExchangeWrapper } from './wrappers/Exchange'
+import { FreezerWrapper } from './wrappers/Freezer'
 import { GasPriceMinimumWrapper } from './wrappers/GasPriceMinimum'
 import { GoldTokenWrapper } from './wrappers/GoldTokenWrapper'
 import { GovernanceWrapper } from './wrappers/Governance'
 import { LockedGoldWrapper } from './wrappers/LockedGold'
+import { MultiSigWrapper } from './wrappers/MultiSig'
 import { ReserveWrapper } from './wrappers/Reserve'
 import { SortedOraclesWrapper } from './wrappers/SortedOracles'
 import { StableTokenWrapper } from './wrappers/StableTokenWrapper'
@@ -29,13 +31,14 @@ const WrapperFactories = {
   [CeloContract.Escrow]: EscrowWrapper,
   [CeloContract.Exchange]: ExchangeWrapper,
   // [CeloContract.FeeCurrencyWhitelist]: FeeCurrencyWhitelistWrapper,
+  [CeloContract.Freezer]: FreezerWrapper,
   [CeloContract.GasPriceMinimum]: GasPriceMinimumWrapper,
   [CeloContract.GoldToken]: GoldTokenWrapper,
   [CeloContract.Governance]: GovernanceWrapper,
   [CeloContract.LockedGold]: LockedGoldWrapper,
-  // [CeloContract.MultiSig]: MultiSigWrapper,
   // [CeloContract.Random]: RandomWrapper,
   // [CeloContract.Registry]: RegistryWrapper,
+  [CeloContract.MultiSig]: MultiSigWrapper,
   [CeloContract.Reserve]: ReserveWrapper,
   [CeloContract.SortedOracles]: SortedOraclesWrapper,
   [CeloContract.StableToken]: StableTokenWrapper,
@@ -56,11 +59,12 @@ interface WrapperCacheMap {
   [CeloContract.Escrow]?: EscrowWrapper
   [CeloContract.Exchange]?: ExchangeWrapper
   // [CeloContract.FeeCurrencyWhitelist]?: FeeCurrencyWhitelistWrapper,
+  [CeloContract.Freezer]?: FreezerWrapper
   [CeloContract.GasPriceMinimum]?: GasPriceMinimumWrapper
   [CeloContract.GoldToken]?: GoldTokenWrapper
   [CeloContract.Governance]?: GovernanceWrapper
   [CeloContract.LockedGold]?: LockedGoldWrapper
-  // [CeloContract.MultiSig]?: MultiSigWrapper,
+  [CeloContract.MultiSig]?: MultiSigWrapper
   // [CeloContract.Random]?: RandomWrapper,
   // [CeloContract.Registry]?: RegistryWrapper,
   [CeloContract.Reserve]?: ReserveWrapper
@@ -107,6 +111,9 @@ export class WrapperCache {
   getExchange() {
     return this.getContract(CeloContract.Exchange)
   }
+  getFreezer() {
+    return this.getContract(CeloContract.Freezer)
+  }
   // getFeeCurrencyWhitelist() {
   //   return this.getWrapper(CeloContract.FeeCurrencyWhitelist, newFeeCurrencyWhitelist)
   // }
@@ -122,9 +129,9 @@ export class WrapperCache {
   getLockedGold() {
     return this.getContract(CeloContract.LockedGold)
   }
-  // getMultiSig() {
-  //   return this.getWrapper(CeloContract.MultiSig, newMultiSig)
-  // }
+  getMultiSig(address: string) {
+    return this.getContract(CeloContract.MultiSig, address)
+  }
   // getRegistry() {
   //   return this.getWrapper(CeloContract.Registry, newRegistry)
   // }
@@ -144,9 +151,9 @@ export class WrapperCache {
   /**
    * Get Contract wrapper
    */
-  public async getContract<C extends ValidWrappers>(contract: C) {
+  public async getContract<C extends ValidWrappers>(contract: C, address?: string) {
     if (this.wrapperCache[contract] == null) {
-      const instance = await this.kit._web3Contracts.getContract(contract)
+      const instance = await this.kit._web3Contracts.getContract(contract, address)
       const Klass: CFType[C] = WrapperFactories[contract]
       this.wrapperCache[contract] = new Klass(this.kit, instance as any) as any
     }

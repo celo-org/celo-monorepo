@@ -6,17 +6,11 @@ import androidx.multidex.MultiDexApplication;
 import cl.json.ShareApplication;
 import com.facebook.react.PackageList;
 import com.facebook.react.ReactApplication;
+import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
-import com.reactnativegeth.RNGethPackage;
-import io.invertase.firebase.auth.RNFirebaseAuthPackage;
-import io.invertase.firebase.database.RNFirebaseDatabasePackage;
-import io.invertase.firebase.links.RNFirebaseLinksPackage;
-import io.invertase.firebase.messaging.RNFirebaseMessagingPackage;
-import io.invertase.firebase.notifications.RNFirebaseNotificationsPackage;
-import io.invertase.firebase.storage.RNFirebaseStoragePackage;
 import io.sentry.RNSentryPackage;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -47,13 +41,6 @@ public class MainApplication
         // above API 23.
         packages.add(new RNConfirmDeviceCredentialsPackage());
       }
-      packages.add(new RNGethPackage());
-      packages.add(new RNFirebaseAuthPackage());
-      packages.add(new RNFirebaseDatabasePackage());
-      packages.add(new RNFirebaseStoragePackage());
-      packages.add(new RNFirebaseMessagingPackage());
-      packages.add(new RNFirebaseNotificationsPackage());
-      packages.add(new RNFirebaseLinksPackage());
       return packages;
     }
 
@@ -72,7 +59,7 @@ public class MainApplication
   public void onCreate() {
     super.onCreate();
     SoLoader.init(this, /* native exopackage */false);
-    initializeFlipper(this); // Remove this line if you don't want Flipper enabled
+    initializeFlipper(this, getReactNativeHost().getReactInstanceManager());
     initNdkCrashHandler();
   }
 
@@ -98,19 +85,27 @@ public class MainApplication
   }
 
   /**
-   * Loads Flipper in React Native templates.
+   * Loads Flipper in React Native templates. Call this in the onCreate method
+   * with something like initializeFlipper(this,
+   * getReactNativeHost().getReactInstanceManager());
    *
    * @param context
+   * @param reactInstanceManager
    */
-  private static void initializeFlipper(Context context) {
+  private static void initializeFlipper(
+    Context context,
+    ReactInstanceManager reactInstanceManager
+  ) {
     if (BuildConfig.DEBUG) {
       try {
         /*
          * We use reflection here to pick up the class that initializes Flipper, since
          * Flipper library is not available in release mode
          */
-        Class<?> aClass = Class.forName("com.facebook.flipper.ReactNativeFlipper");
-        aClass.getMethod("initializeFlipper", Context.class).invoke(null, context);
+        Class<?> aClass = Class.forName("org.celo.mobile.ReactNativeFlipper");
+        aClass
+          .getMethod("initializeFlipper", Context.class, ReactInstanceManager.class)
+          .invoke(null, context, reactInstanceManager);
       } catch (ClassNotFoundException e) {
         e.printStackTrace();
       } catch (NoSuchMethodException e) {

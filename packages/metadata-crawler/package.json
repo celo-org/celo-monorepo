@@ -1,0 +1,35 @@
+{
+  "name": "@celo/metadata-crawler",
+  "version": "0.0.1",
+  "description": "Celo metadata crawler",
+  "main": "index.js",
+  "types": "./lib/index.d.ts",
+  "author": "Celo",
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/celo-org/celo-monorepo/tree/master/packages/metadata-crawler",
+  "repository": "https://github.com/celo-org/celo-monorepo/tree/master/packages/metadata-crawler",
+  "dependencies": {
+    "@celo/contractkit": "0.4.5-dev",
+    "@celo/utils": "^0.1.15-dev",
+    "@types/pg": "^7.14.3",
+    "bunyan": "1.8.12",
+    "bunyan-gke-stackdriver": "0.1.2",
+    "debug": "^4.1.1",
+    "dotenv": "8.0.0",
+    "googleapis": "^39.2.0",
+    "pg": "^7.18.0",
+    "ts-node": "^8.5.4"
+  },
+  "devDependencies": {
+    "@types/bunyan": "1.8.4",
+    "@types/dotenv": "4.0.3",
+    "bunyan-debug-stream": "^2.0.0"
+  },
+  "scripts": {
+    "dev": "ts-node src/crawler.ts",
+    "build": "tsc -b .",
+    "clean": "tsc -b . --clean",
+    "clean:all": "yarn clean && rm -rf lib"
+  },
+  "private": true
+}

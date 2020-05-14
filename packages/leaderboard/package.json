@@ -6,7 +6,7 @@
   "author": "Celo",
   "license": "Apache-2.0",
   "dependencies": {
-    "@celo/contractkit": "0.2.15-dev",
+    "@celo/contractkit": "0.4.5-dev",
     "@types/pg": "^7.11.2",
     "google-spreadsheet": "^2.0.8",
     "pg": "^7.12.1",
