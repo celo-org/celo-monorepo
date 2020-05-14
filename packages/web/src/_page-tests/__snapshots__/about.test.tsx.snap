@@ -466,7 +466,17 @@ exports[`About renders 1`] = `
           }
         }
       >
-        Celo Foundation
+        <span
+          className="css-text-901oao css-textHasAncestor-16my406"
+          dir="auto"
+          style={
+            Object {
+              "lineHeight": "42px",
+            }
+          }
+        >
+          Celo Foundation
+        </span>
       </h3>
     </div>
     <div
@@ -488,8 +498,8 @@ exports[`About renders 1`] = `
         }
       }
     >
-      <h1
-        aria-level="1"
+      <h2
+        aria-level="2"
         className="css-reset-4rbku5 css-text-901oao"
         dir="auto"
         role="heading"
@@ -497,8 +507,8 @@ exports[`About renders 1`] = `
           Object {
             "color": "rgba(46,51,56,1.00)",
             "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-            "fontSize": "36px",
-            "lineHeight": "40px",
+            "fontSize": "28px",
+            "lineHeight": "32px",
             "marginBottom": "20px",
             "textRendering": "geometricPrecision",
             "textTransform": "none",
@@ -506,7 +516,7 @@ exports[`About renders 1`] = `
         }
       >
         Believes in a future where everyone can prosper
-      </h1>
+      </h2>
       <div
         className="css-text-901oao"
         dir="auto"
@@ -604,8 +614,8 @@ exports[`About renders 1`] = `
         }
       }
     >
-      <h1
-        aria-level="1"
+      <h2
+        aria-level="2"
         className="css-reset-4rbku5 css-text-901oao"
         dir="auto"
         role="heading"
@@ -711,7 +721,7 @@ exports[`About renders 1`] = `
         </div>
         
 means ‘purpose’ in Esperanto.
-      </h1>
+      </h2>
       <div
         className="css-text-901oao"
         dir="auto"
