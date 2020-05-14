@@ -2,7 +2,7 @@ import SectionHeadNew from '@celo/react-components/components/SectionHeadNew'
 import SettingsIcon from '@celo/react-components/icons/Settings'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
-import { componentStyles, TOP_BAR_HEIGHT } from '@celo/react-components/styles/styles'
+import { componentStyles } from '@celo/react-components/styles/styles'
 import variables from '@celo/react-components/styles/variables'
 import * as _ from 'lodash'
 import * as React from 'react'
@@ -17,7 +17,6 @@ import {
   View,
 } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
-import { BoxShadow } from 'react-native-shadow'
 import { connect } from 'react-redux'
 import { showMessage } from 'src/alert/actions'
 import componentWithAnalytics from 'src/analytics/wrapper'
@@ -89,20 +88,10 @@ const mapStateToProps = (state: RootState): StateProps => ({
 const AnimatedSectionList = Animated.createAnimatedComponent(SectionList)
 
 const HEADER_FADE_HEIGHT = 100
-const SHADOW_SCROLL_HEIGHT = 226
-const SHADOW_STYLE = {
-  width: SCREEN_WIDTH,
-  height: TOP_BAR_HEIGHT,
-  color: '#2e3338',
-  radius: 1,
-  opacity: 0.1,
-  x: 0,
-  y: 1,
-}
+
 export class WalletHome extends React.Component<Props> {
   animatedValue: Animated.Value
   headerOpacity: Animated.AnimatedInterpolation
-  shadowOpacity: Animated.AnimatedInterpolation
   onScroll: () => void
 
   constructor(props: Props) {
@@ -112,11 +101,6 @@ export class WalletHome extends React.Component<Props> {
     this.headerOpacity = this.animatedValue.interpolate({
       inputRange: [0, HEADER_FADE_HEIGHT],
       outputRange: [0, 1],
-      extrapolate: 'clamp',
-    })
-    this.shadowOpacity = this.animatedValue.interpolate({
-      inputRange: [0, HEADER_FADE_HEIGHT, SHADOW_SCROLL_HEIGHT, SHADOW_SCROLL_HEIGHT + 1],
-      outputRange: [0, 1, 1, 0],
       extrapolate: 'clamp',
     })
     this.onScroll = Animated.event(
@@ -194,14 +178,6 @@ export class WalletHome extends React.Component<Props> {
 
     return (
       <SafeAreaView style={styles.container}>
-        {/* Why this mess? Android only has shadows from elevation, and we have to fade in under
-            If we use elevation, it appears on top of the title. The box shadow enables to fade
-            in a shadow from underneath */}
-        <Animated.View style={[styles.shadowContainer, { opacity: this.shadowOpacity }]}>
-          <BoxShadow setting={SHADOW_STYLE}>
-            <View style={styles.shadowPlaceholder} />
-          </BoxShadow>
-        </Animated.View>
         <View style={[componentStyles.topBar, styles.header]}>
           {this.props.appConnected ? (
             <Animated.Text style={[fontStyles.headerTitle, { opacity: this.headerOpacity }]}>
@@ -266,18 +242,6 @@ const styles = StyleSheet.create({
   headerButton: {
     justifyContent: 'flex-end',
     margin: HEADER_BUTTON_MARGIN,
-  },
-  shadowContainer: {
-    height: TOP_BAR_HEIGHT,
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    zIndex: 1,
-  },
-  shadowPlaceholder: {
-    width: SCREEN_WIDTH,
-    height: TOP_BAR_HEIGHT,
   },
 })
 
