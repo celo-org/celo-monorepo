@@ -421,6 +421,121 @@ exports[`About renders 1`] = `
         "WebkitFlexDirection": "column",
         "alignSelf": "center",
         "flexDirection": "column",
+        "marginTop": "30px",
+        "maxWidth": "100vw",
+        "msFlexDirection": "column",
+        "msFlexItemAlign": "center",
+        "paddingLeft": "10px",
+        "paddingRight": "10px",
+        "width": "100%",
+      }
+    }
+  >
+    <div
+      className="css-view-1dbjc4n"
+      style={
+        Object {
+          "WebkitBoxFlex": 0,
+          "WebkitFlexGrow": 0,
+          "WebkitFlexShrink": 0,
+          "flexGrow": 0,
+          "flexShrink": 0,
+          "msFlexNegative": 0,
+          "msFlexPositive": 0,
+          "paddingBottom": "10px",
+          "paddingLeft": "10px",
+          "paddingRight": "10px",
+          "paddingTop": "10px",
+          "width": "100%",
+        }
+      }
+    >
+      <h3
+        aria-level="3"
+        className="css-reset-4rbku5 css-text-901oao"
+        dir="auto"
+        role="heading"
+        style={
+          Object {
+            "color": "rgba(46,51,56,1.00)",
+            "fontFamily": "Jost, futura-pt, futura, sans-serif",
+            "fontSize": "24px",
+            "lineHeight": "32px",
+            "textRendering": "geometricPrecision",
+            "textTransform": "none",
+          }
+        }
+      >
+        Celo Foundation
+      </h3>
+    </div>
+    <div
+      className="css-view-1dbjc4n"
+      style={
+        Object {
+          "WebkitBoxFlex": 0,
+          "WebkitFlexGrow": 0,
+          "WebkitFlexShrink": 0,
+          "flexGrow": 0,
+          "flexShrink": 0,
+          "msFlexNegative": 0,
+          "msFlexPositive": 0,
+          "paddingBottom": "10px",
+          "paddingLeft": "10px",
+          "paddingRight": "10px",
+          "paddingTop": "10px",
+          "width": "100%",
+        }
+      }
+    >
+      <h1
+        aria-level="1"
+        className="css-reset-4rbku5 css-text-901oao"
+        dir="auto"
+        role="heading"
+        style={
+          Object {
+            "color": "rgba(46,51,56,1.00)",
+            "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+            "fontSize": "36px",
+            "lineHeight": "40px",
+            "marginBottom": "20px",
+            "textRendering": "geometricPrecision",
+            "textTransform": "none",
+          }
+        }
+      >
+        Believes in a future where everyone can prosper
+      </h1>
+      <div
+        className="css-text-901oao"
+        dir="auto"
+        style={
+          Object {
+            "color": "rgba(46,51,56,1.00)",
+            "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+            "fontSize": "20px",
+            "lineHeight": "28px",
+            "marginBottom": "20px",
+            "marginTop": "20px",
+            "textRendering": "geometricPrecision",
+          }
+        }
+      >
+        The Celo Foundation is a non-profit organization based in the US that supports the growth and development of the open-source Celo Platform. Guided by the Celo community tenets, the Foundation contributes to education, technical research, environmental health, community engagement, and ecosystem outreach—activities that support and encourage an inclusive financial system that creates the conditions for prosperity for everyone.
+      </div>
+    </div>
+  </div>
+  <div
+    className="css-view-1dbjc4n"
+    style={
+      Object {
+        "WebkitAlignSelf": "center",
+        "WebkitBoxDirection": "normal",
+        "WebkitBoxOrient": "vertical",
+        "WebkitFlexDirection": "column",
+        "alignSelf": "center",
+        "flexDirection": "column",
         "marginBottom": "50px",
         "marginTop": "30px",
         "maxWidth": "100vw",

@@ -72,6 +72,10 @@ export class About extends React.Component<Props & I18nProps> {
           <BookLayout label={t('MissionTitle')}>
             <H1>{t('MissionText')}</H1>
           </BookLayout>
+          <BookLayout label={t('celoFoundation')}>
+            <H1 style={standardStyles.elementalMarginBottom}>{t('celoFoundationBelieves')}</H1>
+            <Text style={[fonts.p, standardStyles.elementalMargin]}>{t('celoFoundationText')}</Text>
+          </BookLayout>
           <BookLayout label={t('MeaningTile')} endBlock={true}>
             <H1 style={standardStyles.elementalMarginBottom}>
               <Trans
