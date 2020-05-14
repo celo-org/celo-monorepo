@@ -513,7 +513,7 @@ exports[`ValidatorsList renders 1`] = `
             }
           }
         >
-          Locked Gold
+          Locked Celo Gold
         </span>
         <span
           className="css-text-901oao css-textHasAncestor-16my406"

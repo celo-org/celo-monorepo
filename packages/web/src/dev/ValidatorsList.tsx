@@ -2,14 +2,12 @@ import { BigNumber } from 'bignumber.js'
 import { SingletonRouter as Router } from 'next/router'
 import * as React from 'react'
 import { Text as RNText, View } from 'react-native'
-import ValidatorsListRow, { CeloGroup } from 'src/dev/ValidatorsListRow'
+import ValidatorsListRow, { CeloGroup, localStoragePinnedKey } from 'src/dev/ValidatorsListRow'
 import { styles } from 'src/dev/ValidatorsListStyles'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import Chevron, { Direction } from 'src/icons/chevron'
 import { colors } from 'src/styles'
 import { weiToDecimal } from 'src/utils/utils'
-
-const localStoragePinnedKey = 'pinnedValidators'
 
 class Text extends RNText {
   render() {
@@ -284,11 +282,15 @@ class ValidatorsList extends React.PureComponent<Props, State> {
     return +list.includes(address)
   }
 
+  onPinned() {
+    this.setState({ update: Math.random() } as any)
+  }
+
   render() {
     const { expanded, orderBy, orderAsc } = this.state
     const { data } = this.props
     const validatorGroups = !data ? ([] as CeloGroup[]) : this.sortData(this.cleanData(data))
-    const onPinned = () => this.setState({ update: Math.random() } as any)
+    const onPinned = () => this.onPinned()
     return (
       <View style={styles.pStatic}>
         <View style={[styles.table, styles.pStatic]}>
@@ -329,7 +331,7 @@ class ValidatorsList extends React.PureComponent<Props, State> {
             <HeaderCell
               onClick={this.orderByFn.gold}
               style={[styles.sizeM]}
-              name="Locked Gold"
+              name="Locked Celo Gold"
               order={orderBy === 'gold' ? orderAsc : null}
             />
             <HeaderCell
