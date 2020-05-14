@@ -92,10 +92,10 @@
   },
   "confirmAccountNumber": {
     "title": "Confirm Account Number",
-    "body1Full": "Please ask {{displayName}} for the last four digits of their account number and enter it below.",
-    "body1Partial": "Please ask {{displayName}} for their account number and enter it below.",
-    "body2Full": "For security, please do not use text messaging (SMS). We strongly recommend asking in person or over the phone.",
-    "body2Partial": "For security, please do not use text messaging (SMS). We strongly recommend asking in person or over the phone, through WhatsApp or Messenger, or by email.",
+    "body1Partial": "Please ask {{displayName}} for the last four digits of their account number and enter it below.",
+    "body1Full": "Please ask {{displayName}} for their account number and enter it below.",
+    "body2Partial": "For security, please do not use text messaging (SMS). We strongly recommend asking in person or over the phone.",
+    "body2Full": "For security, please do not use text messaging (SMS). We strongly recommend asking in person or over the phone, through WhatsApp or Messenger, or by email.",
     "help": "Help {{displayName}} find their account number"
   },
   "accountInputHeaderA": "LAST 4 DIGITS OF ACCOUNT NUMBER",

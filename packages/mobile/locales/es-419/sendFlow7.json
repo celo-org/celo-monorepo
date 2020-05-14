@@ -47,10 +47,10 @@
   "inviteSent": "Código de invitación enviado!",
   "inviteFailed": "Falló el envío de la invitación",
   "loadingContacts": "Encontrando tus contactos",
-  "QRCode": "QR código",
-  "scanQRCode": "Scan QR Code",
-  "shareCodeImage": "Compartir imagen de código",
-  "scanCode": "Escanear código",
+  "QRCode": "QR Código",
+  "shareCodeImage": "Compartir Imagen de Código",
+  "scanCode": "Escanear Código",
+  "scanQRCode": "Escanear Código QR",
   "writeStorageNeededForQrDownload": "Se necesita permiso de escritura de almacenamiento para descargar el código QR",
   "cameraScanInfo": "Escanee el código colocándolo en la caja",
   "cameraNotAuthorizedTitle": "Habilitar Cámara",
@@ -81,5 +81,28 @@
     "header": "Sincronización de Contactos",
     "progress": "{{current}} de {{total}}",
     "importing": "Importar..."
+  },
+  "confirmAccount": {
+    "header": "Por favor confirma la cuenta de {{displayName}}",
+    "button": "Confirma el número de cuenta"
+  },
+  "secureSendExplanation": {
+    "body1": "{{e164Number}} tiene multipes cuentas asociadas. {{displayName}} puede haber creado una nueva cuenta de Celo, perdido su teléfono o su cuenta puede haber sido interceptada o comprometida.",
+    "body2": "Antes de realizar transacciones, debes confirmar la cuenta de {{displayName}}. Puedes realizar esto escaneando el código QR o confirmado su número de cuenta directamente"
+  },
+  "confirmAccountNumber": {
+    "title": "Confirma el número de cuenta",
+    "body1Partial": "Por favor solicita a {{displayName}} los últimos cuatro dígitos de su número de cuenta e ingrésalos ",
+    "body1PFull": "Por favor solicita a {{displayName}} su número de cuenta e ingrésalo",
+    "body2Partial": "Por razones de seguridad, por favor no utilices mensajes de texto (SMS). Se recomienda altamente preguntar en persona o por teléfono",
+    "body2Full": "Por razones de seguridad, por favor no utilices mensajes de texto (SMS). Se recomienda altamente preguntar en persona o por teléfono a través de WhastApp, Messenger o por correo electrónico",
+    "help": "Ayude a {{displayName}} a encontrar su número de cuenta"
+  },
+  "accountInputHeaderA": "4 Últimos Dígitos del Número de Cuenta",
+  "accountInputHeaderB": "NÚMERO DE CUENTA",
+  "helpModal": {
+    "header": "Encuentra el número de cuenta de tu contacto",
+    "body1": "Tu contacto puede encontrar su número de cuenta (también conocido como dirección) al inicio del Menú de Ajustes",
+    "body2": "Los números de cuenta comienzan con \"0x\" y tienen una longitud de 42 caracteres. Se encuentran directamente debajo de la foto de perfil"
   }
 }
