@@ -281,8 +281,6 @@ export async function submitMultiSigTransaction(
   value: number | BigNumber = 0
 ) {
   const txId = await multiSig.submitTransaction.call(address, value, data)
-  // @ts-ignore Typechain generating wrong type for data argument
-  // TODO(asa): Fix this
   await multiSig.submitTransaction(address, value, data)
   const txExecuted = (await multiSig.transactions(txId))[3]
   if (!txExecuted) {

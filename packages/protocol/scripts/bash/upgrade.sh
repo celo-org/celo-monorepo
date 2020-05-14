@@ -24,6 +24,6 @@ if ! nc -z 127.0.0.1 8545 ; then
 fi
 
 yarn run build && \
-yarn run truffle-compile -n $NETWORK && \
+yarn run truffle compile -n $NETWORK --build_directory $PWD/build/$NETWORK && \
 yarn run truffle exec ./scripts/truffle/upgrade.js \
   --network $NETWORK --build_directory $PWD/build/$NETWORK \

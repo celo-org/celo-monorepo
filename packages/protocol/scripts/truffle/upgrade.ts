@@ -7,7 +7,8 @@ import { MultiSigInstance, ProxyInstance } from 'types'
 
 const Artifactor = require('truffle-artifactor')
 import fs = require('fs')
-const VM = require('ethereumjs-vm')
+const VM = require('ethereumjs-vm').default
+const BN = require('bn.js')
 
 const vm = new VM()
 
@@ -36,14 +37,45 @@ function getProxiedContracts() {
     return proxyFilename.slice(0, -'Proxy.json'.length)
   }
 
-  return fs
-    .readdirSync(contractsDir)
-    .filter((filename: string) => /\w+Proxy.json$/.test(filename))
-    .map(contractNameFromProxyFilename)
-    .map((contractName: string) => [
+  let names = []
+  if (argv.contract) {
+    names.push(argv.contract)
+  } else {
+    names = fs
+      .readdirSync(contractsDir)
+      .filter((filename: string) => /\w+Proxy.json$/.test(filename))
+      .map(contractNameFromProxyFilename)
+  }
+
+  return names.map((contractName: string) => {
+    // tslint:disable-next-line:no-console
+    console.log('Reading artifact', contractName)
+    return [
       artifacts.require(contractName) as Truffle.Contract<any>,
       artifacts.require(contractName + 'Proxy') as Truffle.Contract<ProxyInstance>,
-    ])
+    ]
+  })
+}
+
+function fill(a: string) {
+  let res = '__' + a
+  while (res.length < 40) {
+    res = res + '_'
+  }
+  return new RegExp(res, 'g')
+}
+
+function linkBytecode(Contract: Truffle.Contract<any>) {
+  // @ts-ignore
+  const artifact = Contract._json
+  const data = artifact.networks[network.network_id].links
+  let code: string = artifact.bytecode.slice(2)
+  for (const a of Object.keys(data)) {
+    // console.log("link", a, code.match(fill(a)))
+    code = code.replace(fill(a), data[a].slice(2))
+  }
+  // console.log("linked", code)
+  return code.toLowerCase()
 }
 
 /*
@@ -53,28 +85,18 @@ function getProxiedContracts() {
  * This function returns the bytecode that would be stored on the blockchain if
  * Contract were deployed.
  */
-function getCompiledBytecode(Contract: Truffle.Contract<any>): Promise<string> {
-  return new Promise((resolve, reject) => {
-    vm.runCode(
-      {
-        // @ts-ignore
-        code: Buffer.from(Contract.bytecode.slice(2), 'hex'),
-        gasLimit: Buffer.from('fffffffff', 'hex'),
-      },
-      (err: any, results: any) => {
-        if (err) {
-          reject(err)
-        } else {
-          resolve('0x' + results.return.toString('hex'))
-        }
-      }
-    )
+async function getCompiledBytecode(Contract: Truffle.Contract<any>): Promise<string> {
+  const res = await vm.runCode({
+    code: Buffer.from(linkBytecode(Contract), 'hex'),
+    gasLimit: new BN('0xfffffffff'),
   })
+  return res.returnValue.toString('hex')
 }
 
 async function getImplementationBytecode(proxy: ProxyInstance) {
   const implementationAddress = await proxy._getImplementation()
-  return web3.eth.getCode(implementationAddress)
+  const res = await web3.eth.getCode(implementationAddress)
+  return res.slice(2)
 }
 
 /*
@@ -93,9 +115,17 @@ function stripMetadata(bytecode: string) {
 }
 
 async function needsUpgrade(Contract: Truffle.Contract<any>, proxy: ProxyInstance) {
+  // const impl = await getImplementationBytecode(proxy)
+  // console.log("comparing", Contract.contractName, impl.slice(2).length, linkDeployedBytecode(Contract).length)
+  // console.log("comparing", Contract.contractName,
+  // stripMetadata(impl.slice(2)) === stripMetadata(linkDeployedBytecode(Contract)))
   const implementationBytecode = stripMetadata(await getImplementationBytecode(proxy))
   const compiledBytecode = stripMetadata(await getCompiledBytecode(Contract))
-  return implementationBytecode !== compiledBytecode
+  const res = implementationBytecode !== compiledBytecode
+  if (!res) {
+    console.info('Not changed', Contract.contractName)
+  }
+  return res
 }
 
 async function updateArtifact(Contract: Truffle.Contract<any>, contract: Truffle.ContractInstance) {
@@ -121,10 +151,25 @@ async function setImplementation(contract: Truffle.ContractInstance, proxy: Prox
   )
 }
 
-async function upgradeContract(Contract: Truffle.Contract<any>, proxy: ProxyInstance) {
-  const contract = await Contract.new()
-  await setImplementation(contract, proxy)
-  await updateArtifact(Contract, contract)
+async function upgradeContract(
+  Contract: Truffle.Contract<any>,
+  proxy: ProxyInstance
+): Promise<any> {
+  try {
+    const contract = await Contract.new()
+    if (argv['set-implementation']) {
+      await setImplementation(contract, proxy)
+    }
+    await updateArtifact(Contract, contract)
+    return {
+      contract: Contract.contractName + 'Proxy',
+      function: '_setImplementation',
+      value: 0,
+      args: [contract.address],
+    }
+  } catch (err) {
+    console.error('Error', err)
+  }
 }
 
 module.exports = async (callback: (error?: any) => number) => {
@@ -133,8 +178,14 @@ module.exports = async (callback: (error?: any) => number) => {
     const contractNeedsUpgrade = await Promise.all(
       proxiedContracts.map(
         async ([Contract, Proxy]: [Truffle.Contract<any>, Truffle.Contract<ProxyInstance>]) => {
-          const proxy = await Proxy.deployed()
-          return needsUpgrade(Contract, proxy)
+          try {
+            const proxy = await Proxy.deployed()
+            const res = await needsUpgrade(Contract, proxy)
+            return res
+          } catch (err) {
+            console.error('Not upgrading', Contract.contractName, err)
+            return false
+          }
         }
       )
     )
@@ -161,14 +212,20 @@ module.exports = async (callback: (error?: any) => number) => {
         process.exit(0)
       }
 
-      contractsToUpgrade.forEach(
-        async ([Contract, Proxy]: [Truffle.Contract<any>, Truffle.Contract<ProxyInstance>]) => {
-          // tslint:disable-next-line:no-console
-          console.log('Updating', Contract.contractName)
-          const proxy = await Proxy.deployed()
-          await upgradeContract(Contract, proxy)
-        }
+      const lst = await Promise.all(
+        contractsToUpgrade.map(
+          async ([Contract, Proxy]: [Truffle.Contract<any>, Truffle.Contract<ProxyInstance>]) => {
+            // tslint:disable-next-line:no-console
+            console.log('Updating', Contract.contractName)
+            const proxy = await Proxy.deployed()
+            return upgradeContract(Contract, proxy)
+          }
+        )
       )
+      // tslint:disable-next-line:no-console
+      console.log('Generated proposal')
+      // tslint:disable-next-line:no-console
+      console.log(JSON.stringify(lst, null, 2))
     } else {
       // tslint:disable-next-line:no-console
       console.log('All contracts up to date')
