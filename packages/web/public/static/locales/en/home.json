@@ -2,17 +2,7 @@
   "pageTitle": "Celo: A platform for fast, secure, stable digital payments",
   "subtitle":
     "A platform for fast, secure, stable digital payments to any mobile number at a fraction of today’s cost.",
-  "parallax": {
-    "0": "Earn cryptocurrency on your smartphone.",
-    "1": "Your phone number is your bank account.",
-    "2": "Send payments to anyone anywhere."
-  },
-  "hero": {
-    "tag":
-      "An open platform for fast, secure, stable digital payments to any mobile number at a fraction of today’s cost.",
-    "backers": "See More Backers",
-    "emailButton": "Get Our Newsletter"
-  },
+  "coverText": "Celo is an open platform that makes financial tools accessible to anyone with a mobile phone",
   "mission": {
     "title": "Mission & Meaning",
     "text": {

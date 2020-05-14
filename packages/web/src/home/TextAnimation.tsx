@@ -1,32 +1,39 @@
-import hexRgba from 'hex-rgba'
 import * as React from 'react'
 import { StyleSheet, View, ViewStyle } from 'react-native'
-import { H1 } from 'src/fonts/Fonts'
-import Responsive from 'src/shared/Responsive'
+import { H2 } from 'src/fonts/Fonts'
 import { colors, textStyles } from 'src/styles'
-const words = ['universal', 'move', 'sustainable', 'connected', 'accessible']
+
+const words = ['finance', 'saving', 'education', 'sending', 'giving', 'lending', 'regeneration']
 
 const textTransitionTime = 800
 
 const timings = {
-  universal: {
-    length: 4400,
-    pause: 600,
+  finance: {
+    length: 8000,
+    pause: 300,
   },
-  move: {
-    length: 4250,
+  saving: {
+    length: 2000,
     pause: 200,
   },
-  sustainable: {
-    length: 4600,
+  education: {
+    length: 6000,
     pause: 200,
   },
-  connected: {
-    length: 3200,
-    pause: 600,
+  sending: {
+    length: 2000,
+    pause: 200,
   },
-  accessible: {
-    length: 6350,
+  giving: {
+    length: 9000,
+    pause: 200,
+  },
+  lending: {
+    length: 2000,
+    pause: 200,
+  },
+  regeneration: {
+    length: 10000,
     pause: 200,
   },
 }
@@ -103,8 +110,6 @@ Object.keys(timings).forEach((key) => {
 
 interface Props {
   playing: boolean
-  stillMode: boolean
-  willTransition: boolean
 }
 
 interface State {
@@ -120,8 +125,12 @@ class TextAnimation extends React.PureComponent<Props, State> {
 
   timeout: number
 
+  componentDidMount = () => {
+    this.startAnimation()
+  }
+
   componentDidUpdate(prevProps: Props) {
-    if (!prevProps.playing && this.props.playing && !this.props.stillMode) {
+    if (!prevProps.playing && this.props.playing) {
       this.startAnimation()
     }
   }
@@ -135,8 +144,11 @@ class TextAnimation extends React.PureComponent<Props, State> {
     const word = words[this.state.currentWord]
     const duration = timings[word].length + timings[word].pause
     this.timeout = setTimeout(() => {
-      if (this.state.currentWord !== 4) {
-        this.setState({ currentWord: (this.state.currentWord + 1) % 5, initial: false })
+      if (this.state.currentWord !== words.length - 1) {
+        this.setState({ currentWord: (this.state.currentWord + 1) % words.length, initial: false })
+        this.changeWord()
+      } else {
+        this.setState({ currentWord: 0 })
         this.changeWord()
       }
     }, duration)
@@ -160,87 +172,29 @@ class TextAnimation extends React.PureComponent<Props, State> {
       : {}
 
     return (
-      <Responsive large={[styles.textContainer, styles.textContainerLarge]}>
-        <View style={styles.textContainer}>
-          <>
-            <H1
-              ariaLevel={'2'}
-              accessibilityRole={'heading'}
-              style={[styles.white, styles.letsMake]}
-            >
-              Let's make money{' '}
-            </H1>
-            <View>
-              {this.props.stillMode ? (
-                <View
-                  style={this.props.willTransition && [styles.mask, styles.stillOut]}
-                  key={`stillmode-mask1`}
-                />
-              ) : (
-                <>
-                  <View style={[styles.mask, fadeOut]} key={`${this.state.currentWord}-mask1`} />
-
-                  <View style={[styles.mask2, fadeIn]} key={`${this.state.currentWord}-mask2`} />
-                </>
-              )}
-              <H1
-                ariaLevel={'2'}
-                accessibilityRole={'heading'}
-                style={[styles.white, textStyles.heavy, textStyles.center]}
-              >
-                {this.props.stillMode ? 'serve everyone' : words[this.state.currentWord]}
-              </H1>
-            </View>
-          </>
-        </View>
-      </Responsive>
+      <View style={styles.textContainer}>
+        <>
+          <H2 ariaLevel={'2'} accessibilityRole={'heading'} style={styles.letsMake}>
+            A new story in
+          </H2>
+          <View>
+            <View style={[styles.mask, fadeOut]} key={`${this.state.currentWord}-mask1`} />
+            <View style={[styles.mask2, fadeIn]} key={`${this.state.currentWord}-mask2`} />
+            <H2 ariaLevel={'2'} accessibilityRole={'heading'} style={textStyles.heavy}>
+              {words[this.state.currentWord]}
+            </H2>
+          </View>
+        </>
+      </View>
     )
   }
 }
 
 export default TextAnimation
 
-const gradientOpaque = hexRgba(colors.dark, 100)
-const gradientTransparent = hexRgba(colors.dark, 0)
-
 const styles = StyleSheet.create({
-  stillOut: {
-    animationFillMode: 'both',
-    animationDelay: '3s',
-    animationDuration: '1000ms',
-    animationKeyframes: [
-      {
-        '0%': {
-          transform: [
-            {
-              translateX: '-100%',
-            },
-          ],
-        },
-        '100%': {
-          transform: [
-            {
-              translateX: 0,
-            },
-          ],
-        },
-      },
-    ],
-  },
-  textContainer: {
-    flexDirection: 'column',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-  },
-  textContainerLarge: {
-    flexDirection: 'row',
-    marginLeft: 25,
-  },
-  white: {
-    color: colors.white,
-  },
+  textContainer: {},
   letsMake: {
-    textAlign: 'center',
     zIndex: 1,
   },
   mask: {
@@ -249,17 +203,17 @@ const styles = StyleSheet.create({
     left: 0,
     right: -30,
     top: 0,
-    backgroundImage: `linear-gradient(90deg, ${gradientOpaque} 0%, ${gradientOpaque} 90%, ${gradientTransparent} 100%)`,
     position: 'absolute',
     animationIterationCount: 1,
+    backgroundColor: colors.white,
   },
   mask2: {
     bottom: 0,
     left: -20,
     right: 0,
     top: 0,
-    backgroundImage: `linear-gradient(90deg, ${gradientTransparent} 0%, ${gradientOpaque} 10%, ${gradientOpaque} 100%)`,
     position: 'absolute',
+    backgroundColor: colors.white,
     animationIterationCount: 1,
   },
 })
