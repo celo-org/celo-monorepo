@@ -3,6 +3,7 @@ import { RouteProp } from '@react-navigation/core'
 import { createStackNavigator } from '@react-navigation/stack'
 import * as React from 'react'
 import { Platform } from 'react-native'
+import SplashScreen from 'react-native-splash-screen'
 import Account from 'src/account/Account'
 import Analytics from 'src/account/Analytics'
 import DataSaver from 'src/account/DataSaver'
@@ -15,9 +16,11 @@ import InviteReview from 'src/account/InviteReview'
 import Licenses from 'src/account/Licenses'
 import PhotosEducation from 'src/account/PhotosEducation'
 import Profile from 'src/account/Profile'
+import { PincodeType } from 'src/account/reducer'
 import Security from 'src/account/Security'
 import Support from 'src/account/Support'
 import SupportContact from 'src/account/SupportContact'
+import AppLoading from 'src/app/AppLoading'
 import Debug from 'src/app/Debug'
 import ErrorScreen from 'src/app/ErrorScreen'
 import UpgradeScreen from 'src/app/UpgradeScreen'
@@ -53,6 +56,8 @@ import PincodeEnter from 'src/pincode/PincodeEnter'
 import PincodeSet from 'src/pincode/PincodeSet'
 import QRCode from 'src/qrcode/QRCode'
 import QRScanner from 'src/qrcode/QRScanner'
+import { RootState } from 'src/redux/reducers'
+import { store } from 'src/redux/store'
 import JoinCelo from 'src/registration/JoinCelo'
 import RegulatoryTerms from 'src/registration/RegulatoryTerms'
 import FeeEducation from 'src/send/FeeEducation'
@@ -249,9 +254,60 @@ const generalScreens = (Navigator: typeof Stack) => (
   </>
 )
 
+const mapStateToProps = (state: RootState) => {
+  return {
+    language: state.app.language,
+    e164Number: state.account.e164PhoneNumber,
+    pincodeType: state.account.pincodeType,
+    redeemComplete: state.invite.redeemComplete,
+    account: state.web3.account,
+    hasSeenVerificationNux: state.identity.hasSeenVerificationNux,
+    acceptedTerms: state.account.acceptedTerms,
+  }
+}
+
 export function AppNavigatorNew() {
+  const [initialRouteName, setInitialRoute] = React.useState<Screens | undefined>(undefined)
+  React.useEffect(() => {
+    const {
+      language,
+      e164Number,
+      pincodeType,
+      redeemComplete,
+      account,
+      hasSeenVerificationNux,
+      acceptedTerms,
+    } = mapStateToProps(store.getState())
+
+    let initialRoute
+
+    if (!language) {
+      initialRoute = Screens.Language
+    } else if (!e164Number) {
+      initialRoute = Screens.JoinCelo
+    } else if (!acceptedTerms) {
+      initialRoute = Screens.RegulatoryTerms
+    } else if (pincodeType === PincodeType.Unset) {
+      initialRoute = Screens.PincodeEducation
+    } else if (!redeemComplete && !account) {
+      initialRoute = Screens.EnterInviteCode
+    } else if (!hasSeenVerificationNux) {
+      initialRoute = Screens.VerificationEducationScreen
+    } else {
+      initialRoute = Screens.TabNavigator
+    }
+
+    setInitialRoute(initialRoute)
+
+    SplashScreen.hide()
+  })
+
+  if (!initialRouteName) {
+    return <AppLoading />
+  }
+
   return (
-    <Stack.Navigator headerMode={'none'} initialRouteName={Screens.TabNavigator}>
+    <Stack.Navigator headerMode={'none'} initialRouteName={initialRouteName}>
       <Stack.Screen name={Screens.TabNavigator} component={TabNavigator} />
       {commonScreens(Stack)}
       {sendScreens(Stack)}
