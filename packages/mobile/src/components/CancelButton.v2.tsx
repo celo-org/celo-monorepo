@@ -5,7 +5,7 @@ import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { Namespaces } from 'src/i18n'
 import { navigateBack } from 'src/navigator/NavigationService'
-import TopBarButton from 'src/navigator/TopBarButton.v2'
+import { TopBarTextButton } from 'src/navigator/TopBarButton.v2'
 
 interface Props {
   eventName?: CustomEventNames
@@ -29,10 +29,10 @@ export default function CancelButton({ eventName, onCancel, style }: Props) {
   const { t } = useTranslation(Namespaces.global)
 
   return (
-    <TopBarButton
+    <TopBarTextButton
       testID="CancelButton"
       onPress={onPressCancel}
-      textStyle={style}
+      titleStyle={style}
       title={t('cancel')}
     />
   )

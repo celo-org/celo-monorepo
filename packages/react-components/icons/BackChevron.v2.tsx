@@ -1,12 +1,13 @@
+import colors from '@celo/react-components/styles/colors.v2'
 import * as React from 'react'
 import Svg, { Path } from 'svgs'
 
 export interface Props {
-  height: number
-  color: string
+  height?: number
+  color?: string
 }
 
-export default function BackChevron({ color, height }: Props) {
+function BackChevron({ color, height }: Props) {
   return (
     <Svg xmlns="http://www.w3.org/2000/svg" height={height} width={height} viewBox="0 0 15 15">
       <Path
@@ -16,3 +17,10 @@ export default function BackChevron({ color, height }: Props) {
     </Svg>
   )
 }
+
+BackChevron.defaultProps = {
+  height: 16,
+  color: colors.dark,
+}
+
+export default BackChevron
