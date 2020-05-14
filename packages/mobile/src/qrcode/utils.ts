@@ -75,7 +75,7 @@ export function* handleBarcode(
   }
   try {
     if (secureSendTxData) {
-      if (secureSendTxData.recipient.kind !== RecipientKind.MobileNumber) {
+      if (!secureSendTxData.recipient.e164PhoneNumber) {
         throw Error(`Invalid recipient type for Secure Send: ${secureSendTxData.recipient.kind}`)
       }
 

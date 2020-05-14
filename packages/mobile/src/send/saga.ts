@@ -15,7 +15,6 @@ import { InviteBy } from 'src/invite/actions'
 import { sendInvite } from 'src/invite/saga'
 import { navigateHome } from 'src/navigator/NavigationService'
 import { handleBarcode, shareSVGImage } from 'src/qrcode/utils'
-import { RecipientKind } from 'src/recipients/recipient'
 import { recipientCacheSelector } from 'src/recipients/reducer'
 import {
   Actions,
@@ -196,8 +195,8 @@ export function* validateRecipientAddressSaga({
 }: ValidateRecipientAddressAction) {
   Logger.debug(TAG, 'Starting Recipient Address Validation')
   try {
-    if (recipient.kind !== RecipientKind.MobileNumber) {
-      throw Error(`Invalid recipient type: ${recipient.kind}`)
+    if (!recipient.e164PhoneNumber) {
+      throw Error(`Invalid recipient type for Secure Send: ${recipient.kind}`)
     }
 
     const userAddress = yield select(userAddressSelector)

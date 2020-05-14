@@ -50,7 +50,7 @@ import { getLocalCurrencyCode, getLocalCurrencyExchangeRate } from 'src/localCur
 import { HeaderTitleWithBalance, headerWithBackButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import { Recipient, RecipientKind } from 'src/recipients/recipient'
+import { Recipient } from 'src/recipients/recipient'
 import { RootState } from 'src/redux/reducers'
 import { TransactionData } from 'src/send/reducers'
 import { checkIfAddressValidationRequired, getFeeType, getVerificationStatus } from 'src/send/utils'
@@ -151,7 +151,8 @@ export class SendAmount extends React.Component<Props, State> {
 
   fetchLatestAddressesAndValidate = () => {
     const { recipient } = this.props
-    if (recipient.kind === RecipientKind.MobileNumber) {
+
+    if (recipient.e164PhoneNumber) {
       this.props.fetchAddressesAndValidate(recipient.e164PhoneNumber)
     }
   }

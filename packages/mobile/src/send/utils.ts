@@ -66,7 +66,7 @@ export const getConfirmationInput = (
 
   if (recipient.kind === RecipientKind.QrCode || recipient.kind === RecipientKind.Address) {
     recipientAddress = recipient.address
-  } else if (recipient.kind === RecipientKind.MobileNumber) {
+  } else if (recipient.e164PhoneNumber) {
     recipientAddress = getAddressFromPhoneNumber(
       recipient.e164PhoneNumber,
       e164NumberToAddress,
@@ -85,7 +85,7 @@ export const getVerificationStatus = (
     return RecipientVerificationStatus.VERIFIED
   }
 
-  if (recipient.kind === RecipientKind.MobileNumber) {
+  if (recipient.e164PhoneNumber) {
     const addresses = e164NumberToAddress[recipient.e164PhoneNumber]
 
     if (addresses === undefined) {
@@ -270,7 +270,7 @@ export const checkIfAddressValidationRequired = (
   recipient: Recipient,
   secureSendPhoneNumberMapping: SecureSendPhoneNumberMapping
 ) => {
-  if (recipient.kind === RecipientKind.MobileNumber) {
+  if (recipient.e164PhoneNumber) {
     const { e164PhoneNumber } = recipient
 
     if (
