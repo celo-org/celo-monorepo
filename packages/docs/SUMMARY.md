@@ -15,6 +15,7 @@
 - [Alfajores Testnet](getting-started/alfajores-testnet.md)
   - [Using the Mobile Wallet](getting-started/using-the-mobile-wallet.md)
   - [Getting an Account and Funds](getting-started/faucet.md)
+  - [Running a Full Node](getting-started/running-a-full-node-in-alfajores.md)
 - [Glossary](GLOSSARY.md)
 
 ## Celo Gold Holder Guide
