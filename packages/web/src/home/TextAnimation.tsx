@@ -83,32 +83,36 @@ Object.keys(timings).forEach((key) => {
     out: [
       {
         '0%': {
-          transform: [
-            {
-              translateX: '-100%',
-            },
-          ],
+          opacity: 0,
+          // transform: [
+          //   {
+          //     translateX: '-100%',
+          //   },
+          // ],
         },
         [`${fadeOut * 100}%`]: {
-          transform: [
-            {
-              translateX: '-100%',
-            },
-          ],
+          opacity: 0,
+          // transform: [
+          //   {
+          //     translateX: '-100%',
+          //   },
+          // ],
         },
         [`${fadeOutStop * 100}%`]: {
-          transform: [
-            {
-              translateX: 0,
-            },
-          ],
+          opacity: 1,
+          // transform: [
+          //   {
+          //     translateX: 0,
+          //   },
+          // ],
         },
         '100%': {
-          transform: [
-            {
-              translateX: 0,
-            },
-          ],
+          opacity: 1,
+          // transform: [
+          //   {
+          //     translateX: 0,
+          //   },
+          // ],
         },
       },
     ],
