@@ -4,7 +4,7 @@ import { showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { CURRENCY_ENUM, CURRENCIES } from 'src/geth/consts'
+import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { fetchGoldBalance } from 'src/goldToken/actions'
 import { fetchDollarBalance } from 'src/stableToken/actions'
 import {
