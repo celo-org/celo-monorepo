@@ -507,7 +507,6 @@ exports[`ValidateRecipientAccount renders correctly when partial validation requ
                 onFocus={[Function]}
                 placeholder="k"
                 rejectResponderTermination={true}
-                shouldShowClipboard={[Function]}
                 style={
                   Object {
                     "backgroundColor": "#FFFFFF",
@@ -552,7 +551,6 @@ exports[`ValidateRecipientAccount renders correctly when partial validation requ
                 onFocus={[Function]}
                 placeholder="0"
                 rejectResponderTermination={true}
-                shouldShowClipboard={[Function]}
                 style={
                   Object {
                     "backgroundColor": "#FFFFFF",
@@ -597,7 +595,6 @@ exports[`ValidateRecipientAccount renders correctly when partial validation requ
                 onFocus={[Function]}
                 placeholder="F"
                 rejectResponderTermination={true}
-                shouldShowClipboard={[Function]}
                 style={
                   Object {
                     "backgroundColor": "#FFFFFF",
@@ -642,7 +639,6 @@ exports[`ValidateRecipientAccount renders correctly when partial validation requ
                 onFocus={[Function]}
                 placeholder="4"
                 rejectResponderTermination={true}
-                shouldShowClipboard={[Function]}
                 style={
                   Object {
                     "backgroundColor": "#FFFFFF",
