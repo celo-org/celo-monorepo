@@ -190,41 +190,54 @@ exports[`renders correctly with backup not completed 1`] = `
     }
   >
     <View
-      accessible={true}
-      focusable={true}
-      onClick={[Function]}
-      onResponderGrant={[Function]}
-      onResponderMove={[Function]}
-      onResponderRelease={[Function]}
-      onResponderTerminate={[Function]}
-      onResponderTerminationRequest={[Function]}
-      onStartShouldSetResponder={[Function]}
       style={
         Object {
-          "alignItems": "center",
-          "backgroundColor": "#F5F4F0",
           "borderRadius": 100,
-          "flex": 1,
-          "height": 48,
-          "justifyContent": "center",
-          "opacity": 1,
-          "paddingHorizontal": 16,
-          "paddingVertical": 5,
+          "overflow": "hidden",
         }
       }
     >
-      <Text
+      <View
+        accessible={true}
+        focusable={false}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackground",
+            "type": "ThemeAttrAndroid",
+          }
+        }
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
         style={
           Object {
-            "color": "#9CA4A9",
-            "fontFamily": "Inter-SemiBold",
-            "fontSize": 16,
-            "lineHeight": 22,
+            "alignItems": "center",
+            "backgroundColor": "#F5F4F0",
+            "flex": 1,
+            "height": 48,
+            "justifyContent": "center",
+            "paddingHorizontal": 16,
+            "paddingVertical": 5,
           }
         }
       >
-        global:continue
-      </Text>
+        <Text
+          style={
+            Object {
+              "color": "#9CA4A9",
+              "fontFamily": "Inter-SemiBold",
+              "fontSize": 16,
+              "lineHeight": 22,
+            }
+          }
+        >
+          global:continue
+        </Text>
+      </View>
     </View>
   </View>
 </SafeAreaView>
