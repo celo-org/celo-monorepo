@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { StyleSheet, View, ViewStyle } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import { H2 } from 'src/fonts/Fonts'
 import { colors, fonts, textStyles } from 'src/styles'
 
@@ -8,116 +8,9 @@ const words = ['finance', 'saving', 'education', 'sending', 'giving', 'lending',
 const DURATION = 8510
 const SLIDE_IN_DURATION = 3500
 const PAUSE = 3000
-
-const timings = {
-  finance: {
-    length: 6000,
-    pause: 2000,
-  },
-  saving: {
-    length: 6000,
-    pause: 2000,
-  },
-  education: {
-    length: 6000,
-    pause: 2000,
-  },
-  sending: {
-    length: 6000,
-    pause: 2000,
-  },
-  giving: {
-    length: 6000,
-    pause: 2000,
-  },
-  lending: {
-    length: 6000,
-    pause: 2000,
-  },
-  regeneration: {
-    length: 6000,
-    pause: 2000,
-  },
-}
-
-const animations = {}
-
-Object.keys(timings).forEach((key) => {
-  const slideIn = SLIDE_IN_DURATION / DURATION
-  const fadeOut = (PAUSE + SLIDE_IN_DURATION) / DURATION
-  const fadeOutStop = 1
-  animations[key] = {
-    duration: `${DURATION}ms`,
-    in: [
-      {
-        '0%': {
-          transform: [
-            {
-              translateX: 0,
-            },
-          ],
-        },
-        '2%': {
-          transform: [
-            {
-              translateX: 0,
-            },
-          ],
-        },
-        [`${slideIn * 100}%`]: {
-          transform: [
-            {
-              translateX: '100%',
-            },
-          ],
-        },
-        '100%': {
-          transform: [
-            {
-              translateX: '100%',
-            },
-          ],
-        },
-      },
-    ],
-    out: [
-      {
-        '0%': {
-          opacity: 0,
-          // transform: [
-          //   {
-          //     translateX: '-100%',
-          //   },
-          // ],
-        },
-        [`${fadeOut * 100}%`]: {
-          opacity: 0,
-          // transform: [
-          //   {
-          //     translateX: '-100%',
-          //   },
-          // ],
-        },
-        [`${fadeOutStop * 100}%`]: {
-          opacity: 1,
-          // transform: [
-          //   {
-          //     translateX: 0,
-          //   },
-          // ],
-        },
-        '100%': {
-          opacity: 1,
-          // transform: [
-          //   {
-          //     translateX: 0,
-          //   },
-          // ],
-        },
-      },
-    ],
-  }
-})
+const SLIDE_IN = SLIDE_IN_DURATION / DURATION
+const FADE_OUT_START = (PAUSE + SLIDE_IN_DURATION) / DURATION
+const FADE_OUT_STOP = 1
 
 interface Props {
   playing: boolean
@@ -164,30 +57,14 @@ class TextAnimation extends React.PureComponent<Props, State> {
   }
 
   render() {
-    const word = words[this.state.currentWord]
-
-    const fadeOut: ViewStyle = this.props.playing
-      ? {
-          animationDuration: animations[word].duration,
-          animationKeyframes: animations[word].out,
-        }
-      : {}
-
-    const slideIn: ViewStyle = this.props.playing
-      ? {
-          animationDuration: animations[word].duration,
-          animationKeyframes: animations[word].in,
-        }
-      : {}
-
     return (
       <View>
         <H2 ariaLevel={'2'} accessibilityRole={'heading'} style={[fonts.h2, styles.letsMake]}>
           A new story in
         </H2>
         <View style={styles.textContainer}>
-          <View style={[styles.mask, fadeOut]} key={`${this.state.currentWord}-mask1`} />
-          <View style={[styles.mask2, slideIn]} key={`${this.state.currentWord}-mask2`} />
+          <View style={[styles.mask, styles.fadeOut]} key={`${this.state.currentWord}-mask1`} />
+          <View style={[styles.mask2, styles.slideIn]} key={`${this.state.currentWord}-mask2`} />
           <H2 ariaLevel={'2'} accessibilityRole={'heading'} style={[fonts.h2, textStyles.medium]}>
             {words[this.state.currentWord]}
           </H2>
@@ -208,6 +85,7 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   mask: {
+    animationDuration: `${DURATION}ms`,
     height: 45,
     bottom: 0,
     left: 0,
@@ -219,6 +97,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
   },
   mask2: {
+    animationDuration: `${DURATION}ms`,
     height: 45,
     bottom: 0,
     left: -20,
@@ -227,5 +106,77 @@ const styles = StyleSheet.create({
     position: 'absolute',
     backgroundColor: colors.white,
     animationIterationCount: 1,
+  },
+  fadeOut: {
+    animationKeyframes: [
+      {
+        '0%': {
+          opacity: 0,
+          // transform: [
+          //   {
+          //     translateX: '-100%',
+          //   },
+          // ],
+        },
+        [`${FADE_OUT_START * 100}%`]: {
+          opacity: 0,
+          // transform: [
+          //   {
+          //     translateX: '-100%',
+          //   },
+          // ],
+        },
+        [`${FADE_OUT_STOP * 100}%`]: {
+          opacity: 1,
+          // transform: [
+          //   {
+          //     translateX: 0,
+          //   },
+          // ],
+        },
+        '100%': {
+          opacity: 1,
+          // transform: [
+          //   {
+          //     translateX: 0,
+          //   },
+          // ],
+        },
+      },
+    ],
+  },
+  slideIn: {
+    animationKeyframes: [
+      {
+        '0%': {
+          transform: [
+            {
+              translateX: 0,
+            },
+          ],
+        },
+        '2%': {
+          transform: [
+            {
+              translateX: 0,
+            },
+          ],
+        },
+        [`${SLIDE_IN * 100}%`]: {
+          transform: [
+            {
+              translateX: '100%',
+            },
+          ],
+        },
+        '100%': {
+          transform: [
+            {
+              translateX: '100%',
+            },
+          ],
+        },
+      },
+    ],
   },
 })
