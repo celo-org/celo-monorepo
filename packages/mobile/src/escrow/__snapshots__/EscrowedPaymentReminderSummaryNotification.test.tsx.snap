@@ -314,6 +314,7 @@ exports[`EscrowedPaymentReminderSummaryNotification when more 1 requests renders
                   "lineHeight": 18,
                 }
               }
+              testID="EscrowedPaymentListItem/Title"
             >
               Invited and paid 
               +491522345678
@@ -380,6 +381,7 @@ exports[`EscrowedPaymentReminderSummaryNotification when more 1 requests renders
                   onResponderTerminate={[Function]}
                   onResponderTerminationRequest={[Function]}
                   onStartShouldSetResponder={[Function]}
+                  testID="EscrowedPaymentListItem/global:remind/Button"
                 >
                   <Text
                     style={
@@ -415,6 +417,7 @@ exports[`EscrowedPaymentReminderSummaryNotification when more 1 requests renders
                   onResponderTerminate={[Function]}
                   onResponderTerminationRequest={[Function]}
                   onStartShouldSetResponder={[Function]}
+                  testID="EscrowedPaymentListItem/global:reclaim/Button"
                 >
                   <Text
                     style={

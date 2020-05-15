@@ -15,14 +15,15 @@
 - [Alfajores Testnet](getting-started/alfajores-testnet.md)
   - [Using the Mobile Wallet](getting-started/using-the-mobile-wallet.md)
   - [Getting an Account and Funds](getting-started/faucet.md)
+  - [Running a Full Node](getting-started/running-a-full-node-in-alfajores.md)
 - [Glossary](GLOSSARY.md)
 
 ## Celo Gold Holder Guide
 - [Quick Start](celo-gold-holder-guide/quick-start.md)
 - [Using a Ledger Wallet](celo-gold-holder-guide/ledger.md)
 - [Understanding ReleaseGold](celo-gold-holder-guide/release-gold.md)
+- [Voting on Validator Groups](celo-gold-holder-guide/voting-validators.md)
 - [Voting on Governance](celo-gold-holder-guide/voting-governance.md)
-<!-- - [Voting on Validator Groups](celo-gold-holder-guide/voting-validators.md) -->
 
 ## Validator Guide
 
@@ -39,7 +40,7 @@
   - [Hello Celo](developer-resources/walkthroughs/hellocelo.md)
   - [Hello Contracts](developer-resources/walkthroughs/hellocontracts.md)
   - [Hello Contract (Truffle + Remote Node)](developer-resources/walkthroughs/hello-contract-remote-node.md)
-  - [Celo Truffle Box](developer-resources/walkthroughs/celo-truffle-box.md)
+  - [Hello Mobile Dapp](developer-resources/walkthroughs/hello-mobile-dapp.md)
   - [Using Windows](developer-resources/develop-on-windows.md)
   <!-- - [Building a dApp with Contracts on Celo]() -->
 - [Overview]()
@@ -197,6 +198,7 @@
       - [wrappers/DowntimeSlasher](developer-resources/contractkit/reference/modules/_wrappers_downtimeslasher_.md)
       - [DowntimeSlasherWrapper](developer-resources/contractkit/reference/classes/_wrappers_downtimeslasher_.downtimeslasherwrapper.md)
       - [DowntimeSlasherConfig](developer-resources/contractkit/reference/interfaces/_wrappers_downtimeslasher_.downtimeslasherconfig.md)
+      - [DowntimeWindow](developer-resources/contractkit/reference/interfaces/_wrappers_downtimeslasher_.downtimewindow.md)
       - [wrappers/Election](developer-resources/contractkit/reference/modules/_wrappers_election_.md)
       - [ElectionWrapper](developer-resources/contractkit/reference/classes/_wrappers_election_.electionwrapper.md)
       - [ElectableValidators](developer-resources/contractkit/reference/interfaces/_wrappers_election_.electablevalidators.md)
@@ -229,6 +231,8 @@
       - [ProposalRecord](developer-resources/contractkit/reference/interfaces/_wrappers_governance_.proposalrecord.md)
       - [ProposalStageDurations](developer-resources/contractkit/reference/interfaces/_wrappers_governance_.proposalstagedurations.md)
       - [UpvoteRecord](developer-resources/contractkit/reference/interfaces/_wrappers_governance_.upvoterecord.md)
+      - [VoteRecord](developer-resources/contractkit/reference/interfaces/_wrappers_governance_.voterecord.md)
+      - [Voter](developer-resources/contractkit/reference/interfaces/_wrappers_governance_.voter.md)
       - [Votes](developer-resources/contractkit/reference/interfaces/_wrappers_governance_.votes.md)
       - [wrappers/LockedGold](developer-resources/contractkit/reference/modules/_wrappers_lockedgold_.md)
       - [LockedGoldWrapper](developer-resources/contractkit/reference/classes/_wrappers_lockedgold_.lockedgoldwrapper.md)
@@ -348,6 +352,7 @@
       - [UnselectedRequest](developer-resources/contractkit/reference/interfaces/_wrappers_attestations_.unselectedrequest.md)
       - [Filter](developer-resources/contractkit/reference/interfaces/_wrappers_basewrapper_.filter.md)
       - [DowntimeSlasherConfig](developer-resources/contractkit/reference/interfaces/_wrappers_downtimeslasher_.downtimeslasherconfig.md)
+      - [DowntimeWindow](developer-resources/contractkit/reference/interfaces/_wrappers_downtimeslasher_.downtimewindow.md)
       - [ElectableValidators](developer-resources/contractkit/reference/interfaces/_wrappers_election_.electablevalidators.md)
       - [ElectionConfig](developer-resources/contractkit/reference/interfaces/_wrappers_election_.electionconfig.md)
       - [GroupVote](developer-resources/contractkit/reference/interfaces/_wrappers_election_.groupvote.md)
@@ -364,6 +369,8 @@
       - [ProposalRecord](developer-resources/contractkit/reference/interfaces/_wrappers_governance_.proposalrecord.md)
       - [ProposalStageDurations](developer-resources/contractkit/reference/interfaces/_wrappers_governance_.proposalstagedurations.md)
       - [UpvoteRecord](developer-resources/contractkit/reference/interfaces/_wrappers_governance_.upvoterecord.md)
+      - [VoteRecord](developer-resources/contractkit/reference/interfaces/_wrappers_governance_.voterecord.md)
+      - [Voter](developer-resources/contractkit/reference/interfaces/_wrappers_governance_.voter.md)
       - [Votes](developer-resources/contractkit/reference/interfaces/_wrappers_governance_.votes.md)
       - [AccountSlashed](developer-resources/contractkit/reference/interfaces/_wrappers_lockedgold_.accountslashed.md)
       - [LockedGoldConfig](developer-resources/contractkit/reference/interfaces/_wrappers_lockedgold_.lockedgoldconfig.md)
@@ -434,17 +441,23 @@
 ## Command Line Interface
 
 - [Introduction](command-line-interface/introduction.md)
-- [Config](command-line-interface/config.md)
 - [Account](command-line-interface/account.md)
+- [Config](command-line-interface/config.md)
 - [Election](command-line-interface/election.md)
 - [Exchange](command-line-interface/exchange.md)
 - [Governance](command-line-interface/governance.md)
-- [Locked Gold](command-line-interface/lockedgold.md)
+- [Identity](command-line-interface/identity.md)
+- [LockedGold](command-line-interface/lockedgold.md)
 - [Network](command-line-interface/network.md)
 - [Node](command-line-interface/node.md)
+- [Multisig](command-line-interface/multisig.md)
+- [Oracle](command-line-interface/oracle.md)
+- [ReleaseGold](command-line-interface/releasegold.md)
+- [Reserve](command-line-interface/reserve.md)
+- [Rewards](command-line-interface/rewards.md)
 - [Transfer](command-line-interface/transfer.md)
-- [Validator Node](command-line-interface/validator.md)
-- [Validator Groups](command-line-interface/validatorgroup.md)
+- [Validator](command-line-interface/validator.md)
+- [ValidatorGroup](command-line-interface/validatorgroup.md)
 - [Help](command-line-interface/help.md)
 
 ## Community

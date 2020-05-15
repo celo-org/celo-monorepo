@@ -13,7 +13,7 @@ The steps below require technical knowledge. You should be comfortable with the 
 Start by installing the Celo application and setting a PIN on your Ledger device by following steps 1 and 2 [on this page](https://www.ledger.com/start/).
 
 {% hint style="danger" %}
-Make sure to securely back up both the PIN and the recovery phrase, or mnemonic. If you lose them, or they are stolen, you lose access to your Celo assets with no recovery possible. The recovery phrase will be shown only once.
+Make sure to securely back up both the PIN and the recovery phrase (also known as a backup key or mnemonic). If you lose them, or they are stolen, you lose access to your Celo assets with no recovery possible. The recovery phrase will be shown only once.
 {% endhint %}
 
 Open the Ledger Live App on your computer and follow the instructions on the screen.
@@ -55,7 +55,11 @@ On your Ledger Nano device enter the PIN if prompted and press both buttons at t
 You will see `Pending Ledger review` on the device’s screen.
 
 {% hint style="info" %}
-`Pending Ledger review` means that the Celo app is approved to be in the developer store but undergoing additional reviews by the Leger team to be approved in the public store.
+`Pending Ledger review` means that the Celo app is approved to be in the developer store, but is undergoing additional reviews by the Ledger team before it is approved in the public store.
+{% endhint %}
+
+{% hint style="warning" %}
+There have been reports of a possible [issue](https://github.com/celo-org/celo-ledger-spender-app/issues/13) that appears to affect developer store apps on the Ledger Nano X including Celo where a user clicking through the `Pending Ledger review` notice too rapidly can cause the device to freeze. If this occurs, wait until the device's battery is depleted, then charge and power up again.
 {% endhint %}
 
 Press both buttons on the device at the same time to continue.
@@ -122,7 +126,7 @@ celocli account:list --useLedger --ledgerCustomAddresses "[M, N]"
 {% endhint %}
 
 {% hint style="tip" %}
-**Advanced:** Celo uses a [BIP-32](https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki) derivation path of `m/44'/52752'/0/0/index`, where `index >= 0`.  
+**Advanced:** Celo uses a [BIP-32](https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki) derivation path of `m/44'/52752'/0'/0/index`, where `index >= 0`.  
 {% endhint %}
 
 ## Performing a Test transaction
@@ -165,21 +169,6 @@ To use `celocli` with your Ledger, ensure the device is connected to your comput
 
 Then, simply append the `--useLedger` flag to any `celocli` commands with which you'd like to use a Ledger. You may also append the `--ledgerConfirmAddress` flag, which will require that you manually verify on the Ledger the address from which the transaction is being sent.
 
-The following commands are an example of how you might authorize a vote signer whose private key is stored on a Ledger, on behalf of your Locked Gold account, whose private key is also stored on a Ledger, or for your ReleaseGold Locked Gold Account, for which the beneficiary key is stored on a Ledger.
-
-```bash
-# Plug in the Ledger containing the vote signer key and run the following command to securely generate the proof-of-possession.
-celocli account:proof-of-possession --account $LOCKED_GOLD_ACCOUNT --signer $SIGNER_TO_AUTHORIZE --useLedger
-
-# If you wish to authorize a vote signer for your Locked Gold Account, plug in the Ledger containing
-# the Locked Gold Account key and run the following command.
-celocli account:authorize --from $LOCKED_GOLD_ACCOUNT --role vote --signer $SIGNER_TO_AUTHORIZE --signature $SIGNER_PROOF_OF_POSSESSION --useLedger
-
-# If instead you wish to authorize a vote signer for a Locked Gold Account that was created via a ReleaseGold contract,
-# plug in the Ledger containing the beneficiary key and run the following command.
-celocli release-gold:authorize --contract $RELEASE_GOLD_CONTRACT_ADDRESS --role vote --signer $SIGNER_TO_AUTHORIZE --signature $SIGNER_PROOF_OF_POSSESSION --useLedger
-```
-
 ## Troubleshooting
 
 If you have issues connecting to the Ledger, try the following:
@@ -189,3 +178,5 @@ If you have issues connecting to the Ledger, try the following:
 - Try unplugging and replugging the device. Some devices appear to trigger a warning on Macs saying: “USB Devices Disabled. Unplug the device using too much power to re-enable USB devices” which is usually resolved by reconnecting.
 - Ensure that you are using the original cable supplied with your Ledger.
 - Ensure that your Ledger has the [latest firmware](https://support.ledger.com/hc/en-us/articles/360002731113-Update-device-firmware). For Ledger Nano S, a firmware version of 1.6 or later is required.
+
+There have been reports of a possible [issue](https://github.com/celo-org/celo-ledger-spender-app/issues/13) that appears to affect developer store apps on the Ledger Nano X including Celo where a user clicking through the `Pending Ledger review` notice too rapidly can cause the device to freeze. If this occurs, wait until the device's battery is depleted, then charge and power up again.

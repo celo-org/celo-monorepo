@@ -7,8 +7,3 @@ it('renders text', () => {
   const tree = renderer.create(<SectionHeadNew text={'This is a Test'} />)
   expect(tree).toMatchSnapshot()
 })
-
-it('renders bubble text', () => {
-  const tree = renderer.create(<SectionHeadNew bubbleText={'This is a Bubble'} text={''} />)
-  expect(tree).toMatchSnapshot()
-})

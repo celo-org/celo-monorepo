@@ -45,6 +45,7 @@ export const ESCROW_PAYMENT_EXPIRY_SECONDS = 86400 // 1 days
 // We need to fallback to `integration` for testing under jest where react-native-config is undefined.
 export const DEFAULT_TESTNET = Config.DEFAULT_TESTNET || 'integration'
 export const DAILY_PAYMENT_LIMIT_CUSD = 500
+export const SMS_RETRIEVER_APP_SIGNATURE = Config.SMS_RETRIEVER_APP_SIGNATURE
 
 // LINKS
 export const CELO_VERIFIER_DOWNLOAD_LINK = 'https://celo.org/rewards'
@@ -56,7 +57,7 @@ export const FAQ_LINK = 'https://celo.org/faq'
 export const FORUM_LINK = 'https://forum.celo.org/c/support'
 export const CELO_SUPPORT_EMAIL_ADDRESS = 'support@celo.org'
 export const DEFAULT_FORNO_URL = `https://${DEFAULT_TESTNET}-forno.celo-testnet.org`
-// TODO configure per envrionment
+// TODO configure per environment
 export const PHONE_NUM_PRIVACY_SERVICE =
   'https://us-central1-celo-phone-number-privacy-stg.cloudfunctions.net'
 export const PHONE_NUM_PRIVACY_PUBLIC_KEY =

@@ -26,6 +26,7 @@ export const TYPE_PATH = `${ROOT}/typography`
 
 export const IMAGERY_PATH = `${ROOT}/key-imagery`
 export const ICONS_PATH = `${ROOT}/icons`
+export const EXCHANGE_ICONS_PATH = `${ROOT}/exchange-icons`
 export const COMPOSITION_PATH = `${ROOT}/composition`
 
 const PAGES = [
@@ -73,6 +74,11 @@ const PAGES = [
       { title: 'Overview', href: `${COMPOSITION_PATH}#${hashNav.brandComposition.overview}` },
       { title: 'The Grid', href: `${COMPOSITION_PATH}#${hashNav.brandComposition.grid}` },
     ],
+  },
+  {
+    title: 'Exchange Icons',
+    href: EXCHANGE_ICONS_PATH,
+    sections: [],
   },
   {
     title: 'Icons',

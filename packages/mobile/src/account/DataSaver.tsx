@@ -38,7 +38,6 @@ const mapStateToProps = (state: RootState): StateProps => {
 
 interface State {
   switchOffModalVisible: boolean
-  switchOnModalVisible: boolean
   promptModalVisible: boolean
 }
 
@@ -87,7 +86,6 @@ export class DataSaver extends React.Component<Props, State> {
 
   state = {
     switchOffModalVisible: false,
-    switchOnModalVisible: false,
     promptModalVisible: false,
   }
 
@@ -113,19 +111,6 @@ export class DataSaver extends React.Component<Props, State> {
     this.hideSwitchOffModal()
   }
 
-  showSwitchOnModal = () => {
-    this.setState({ switchOnModalVisible: true })
-  }
-
-  hideSwitchOnModal = () => {
-    this.setState({ switchOnModalVisible: false })
-  }
-
-  onPressToggleWithSwitchOnModal = () => {
-    this.props.toggleFornoMode(true)
-    this.hideSwitchOnModal()
-  }
-
   onPressPromptModal = () => {
     this.props.toggleFornoMode(true)
     navigateBack()
@@ -137,18 +122,12 @@ export class DataSaver extends React.Component<Props, State> {
   }
 
   handleFornoToggle = (fornoMode: boolean) => {
-    if (!fornoMode) {
-      if (this.props.gethStartedThisSession) {
-        // Starting geth a second time this app session which will
-        // require an app restart, so show restart modal
-        this.showSwitchOffModal()
-      } else {
-        this.props.toggleFornoMode(false)
-      }
+    if (!fornoMode && this.props.gethStartedThisSession) {
+      // Starting geth a second time this app session which will
+      // require an app restart, so show restart modal
+      this.showSwitchOffModal()
     } else {
-      // If move to forno was not successful we will need
-      // to rollback starting geth a second time
-      this.showSwitchOnModal()
+      this.props.toggleFornoMode(fornoMode)
     }
   }
 
@@ -180,15 +159,6 @@ export class DataSaver extends React.Component<Props, State> {
           cancelTitle={t('global:cancel')}
           onCancel={this.hideSwitchOffModal}
           onContinue={this.onPressToggleWithSwitchOffModal}
-        />
-        <WarningModal
-          isVisible={this.state.switchOnModalVisible}
-          header={t('restartModalSwitchOn.header')}
-          body={t('restartModalSwitchOn.body')}
-          continueTitle={t('restartModalSwitchOn.understand')}
-          cancelTitle={t('global:cancel')}
-          onCancel={this.hideSwitchOnModal}
-          onContinue={this.onPressToggleWithSwitchOnModal}
         />
       </ScrollView>
     )

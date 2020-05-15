@@ -1,7 +1,7 @@
 import SummaryNotification from '@celo/react-components/components/SummaryNotification'
-import { shallow } from 'enzyme'
 import * as React from 'react'
 import { Text } from 'react-native'
+import { fireEvent, render } from 'react-native-testing-library'
 import * as renderer from 'react-test-renderer'
 
 const props = (onPress = jest.fn()) => ({
@@ -24,15 +24,12 @@ describe(SummaryNotification, () => {
     it('calls the on press function', () => {
       const clickHandler = jest.fn()
 
-      const wrapper = shallow(
+      const { getByName } = render(
         <SummaryNotification {...props(clickHandler)}>
           <Text>Test</Text>
         </SummaryNotification>
       )
-      wrapper
-        .find('TextButton')
-        .first()
-        .simulate('press')
+      fireEvent.press(getByName('TextButton'))
 
       expect(clickHandler).toHaveBeenCalled()
     })
