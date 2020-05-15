@@ -318,3 +318,14 @@ function quickFormat(timestamp: number, i18next: i18nType, formatRule: string) {
     locale: i18next.language.includes('es') ? es : enUS,
   })
 }
+
+// update moving average for time ellapsed
+export function updateAverageMillisecs(
+  meanMillisecs: number,
+  millisecs: number,
+  onceEvery: number
+) {
+  let multiplier = meanMillisecs > 0.0 ? meanMillisecs / onceEvery : 1.0
+  meanMillisecs = meanMillisecs * (1.0 - multiplier) + multiplier * millisecs
+  return meanMillisecs
+}
