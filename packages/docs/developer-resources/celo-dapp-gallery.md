@@ -22,8 +22,6 @@ Decentralized application to help coordinate and improve the impact metric of no
 
 Github: https://github.com/nestorbonilla/bienvenir
 
-
-
 ## [Celo Camp](https://www.celocamp.com/) Projects  
   
 ### Pesabase  
@@ -33,7 +31,6 @@ An integration of a Celo Dollar (Stablecoin) and Mpesa, showing flows of payment
 Github: https://github.com/Kesholabs/celoBackend  
 
 Google play store: https://play.google.com/store/apps/details?id=com.kesholabs.pesabase_money_remittance_app
-  
 
 ### Wallet as a Service
 
@@ -47,13 +44,17 @@ The [demo project](https://github.com/adrianmitter/celo-camp) presents the new f
 
 [impactMarket](https://github.com/impactMarket) enables any vulnerable community to create its own unconditional basic income system for their beneficiaries, where each one can claim a fixed amount on a regular basis and make payments for free.
 
-
 ### Celo Toolkit by MugglePay
 
 [MugglePay](https://mugglepay.com/) provides a payment SDK for merchants to accept cryptocurrencies. Mugglepay makes crypto payment easy and thousands of merchants are onboarded with MugglePay SDK. For the Celo Camp 2020, we will integrate with cUSD/cGLD for payments on Celo blockchain.
 
 [Celo Toolkit](https://celo.mugglepay.com) is the [open source](https://github.com/MugglePay/celo-toolkit) interface for managing Celo accounts on Web. Celo developer might start with a funded Celo account (Testnet) now in 1 minute. Phone number or app downloads are not necessary.
 
+### Dunia Pay Wallet 
+
+At Dunia Payment, we are building an electronic wallet that will let people in Sub Saharan Africa send and receive money directly on their phone.The app will use the Celo light client to process transactions faster, even in low internet connection areas common in Africa. The wallet will be built on top of the Celo platform and also using a set of external open source smart contracts.
+
+Github : https://github.com/duniapay/Dunia-Wallet-Celo
 
 ## Add your app to this list!
 
