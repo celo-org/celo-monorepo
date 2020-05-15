@@ -1,3 +1,4 @@
+import { ensureLeading0x } from '@celo/utils/lib/address'
 import { flags } from '@oclif/command'
 import fs from 'fs'
 import { BaseCommand } from '../../base'
@@ -23,8 +24,8 @@ export default class DKGRegister extends BaseCommand {
     const dkg = new web3.eth.Contract(DKG.abi, res.flags.address)
 
     // read the pubkey and publish it
-    const blsKey = fs.readFileSync(res.flags.blsKey)
-    await displayWeb3Tx('registerBlsKey', dkg.methods.register('0x' + blsKey.toString('hex')), {
+    const blsKey = fs.readFileSync(res.flags.blsKey).toString('hex')
+    await displayWeb3Tx('registerBlsKey', dkg.methods.register(ensureLeading0x(blsKey)), {
       from: res.flags.from,
     })
   }

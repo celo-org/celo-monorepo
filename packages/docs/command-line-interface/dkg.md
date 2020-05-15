@@ -6,7 +6,7 @@ description: Publish your locally computed DKG results to the blockchain
 
 ### Deploy
 
-Deploys the DKG
+Deploys the DKG smart contract
 
 ```
 USAGE

@@ -5,7 +5,7 @@ import { Flags } from '../../utils/command'
 const DKG = require('./DKG.json')
 
 export default class DKGDeploy extends BaseCommand {
-  static description = 'Deploys the DKG'
+  static description = 'Deploys the DKG smart contract'
 
   static flags = {
     ...BaseCommand.flags,

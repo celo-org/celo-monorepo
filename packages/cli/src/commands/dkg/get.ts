@@ -57,7 +57,7 @@ export default class DKGGet extends BaseCommand {
       }
       case Method.phase: {
         const phase = await dkg.methods.inPhase().call()
-        console.log('In phase', phase)
+        this.log(`In phase: ${phase}`)
         break
       }
       case Method.group: {

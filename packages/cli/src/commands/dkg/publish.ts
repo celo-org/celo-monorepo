@@ -1,3 +1,4 @@
+import { ensureLeading0x } from '@celo/utils/lib/address'
 import { flags } from '@oclif/command'
 import fs from 'fs'
 import { BaseCommand } from '../../base'
@@ -22,8 +23,8 @@ export default class DKGPublish extends BaseCommand {
 
     const dkg = new web3.eth.Contract(DKG.abi, res.flags.address)
 
-    const data = fs.readFileSync(res.flags.data)
-    await displayWeb3Tx('publishData', dkg.methods.publish('0x' + data.toString('hex')), {
+    const data = fs.readFileSync(res.flags.data).toString('hex')
+    await displayWeb3Tx('publishData', dkg.methods.publish(ensureLeading0x(data)), {
       from: res.flags.from,
     })
   }
