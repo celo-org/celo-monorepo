@@ -1,54 +1,29 @@
 {
+  "headerTitle": "Clave de la cuenta",
+  "introTitle": "La clave de tu cuenta",
+  "introBody": "La llave de su cuenta es la parte más importante de su cuenta. Lleva unos cinco minutos",
+  "introPrimaryAction": "Configurar ahora",
+  "delayBackup": "Espere una hora",
+  "postSetupTitle":"La clave de tu cuenta",
+  "postSetupBody": "Si pierdes tu Clave de Cuenta, perderás el acceso a todos tus Celo Dólares y Oro. Nadie, ni siquiera Celo, podrá ayudarle a recuperar su cuenta sin su clave. Guárdela en un lugar seguro y no la comparta",
+  "postSetupCTA": "Conozca las claves de la cuenta",
   "getBackupKey": "Obtener Clave de Respaldo",
-  "getYourKey": "Obtenga su clave",
-  "viewBackupKey": "Ver Clave de Respaldo",
-  "setUpBackupKey": "Configurar Clave de Respaldo",
   "setUpSocialBackup": "Configurar Salvaguardas",
-  "viewSafeguards": "Ver Salvaguardas",
   "failedFetchMnemonic": "No se pudo obtener su clave de respaldo",
   "backupAndRecovery": "Respaldo y recuperación",
-  "backupKey": "Clave de respaldo",
+  "writeDownKey": "Escriba su llave",
+  "backupKey": "Clave de la cuenta",
   "yourBackupKey": "Su clave de respaldo",
-  "delayBackup": "Descartar por una hora",
+  "moreInfo": "Más Información",
   "backupKeyNotification": "Sin una clave de respaldo, puede perder el acceso a la billetera.",
-  "backupKeyIntro": {
-    "0":
-      "Su clave de respaldo es la única clave para la billetera Celo. Con esta clave, puede acceder a sus fondos en cualquier momento y en cualquier lugar.",
-    "1": "MANTENGA LA SEGURIDAD Y PRIVACIDAD DE ESTA CLAVE.",
-    "2": "¡Felicitaciones! Ha recuperado correctamente su clave de respaldo. Un recordatorio, ",
-    "3": "MANTENGA LA SEGURIDAD DE ESTA CLAVE.",
-    "4": "Para mayor seguridad, configure las Salvaguardas de su billetera.",
-    "5":
-      "¡También ha configurado las salvaguardas! Podrá restaurar su cuenta con la ayuda de dos amigos. ",
-    "6": "MANTENGA EN SECRETO SUS SALVAGUARDAS",
-    "7": "Ahora, configuraremos su clave para que usted, y solo usted, pueda acceder a sus fondos en cualquier momento y en cualquier lugar."
-  },
-  "backupSkipText": {
-    "0": "Sin una clave de respaldo, puede perder el acceso a la billetera ",
-    "1": "para siempre."
-  },
-  "backupRecovery": "Comparta la clave de respaldo con una sola persona en la que confíe plenamente.",
-  "securityTip": "Si pierde su clave de respaldo, perderá el acceso a sus dólares y oro Celo.",
-  "backupKeySummary":
-    "Escriba su clave de respaldo. Si se pierde o le roban su teléfono, necesitará su clave de respaldo para acceder a la billetera Celo.",
-  "bothBackupsDone": {
-    "0": "¡Felicitaciones!",
-    "1":
-      "¡Listo! Si desea revisar sus secretos para recuperación, siempre puede volver aquí más tarde."
-  },
-  "dontLoseIt":
-    "No pierda esta clave. Es de suma importancia que la mantenga en un lugar seguro, ya que es la única forma de desbloquear su billetera si pierde su celular.",
+  "backupKeySummary":  "Encuentra un lugar privado y anota tu Clave de Cuenta. Por favor, guárdela en un lugar seguro. No la guardes en tu teléfono.",
   "backupPrompt":
     "Para seguridad de sus fondos, su cuenta está bloqueada hasta que obtenga su clave de respaldo.",
   "copied": "Clave copiada al portapapeles",
-  "savedConfirmation": "He guardado mi clave de respaldo",
-  "confirmBackupKey": "Confirme su clave de respaldo",
-  "backupQuizInfo":
-    "Verifique su clave de respaldo seleccionando las palabras que aparecen debajo en el orden correcto.",
-  "backupQuizWordCount": "Palabra {{index}} de {{total}}",
-  "invalidBackupPhrase": "Clave de respaldo inválida",
+  "savedConfirmation": "Sí, he escrito mi llave",
+  "invalidBackupPhrase": "Clave de cuenta inválida",
   "importBackupFailed": "No se pudo importar la billetera",
-  "backupQuizFailed": "Clave de respaldo incorrecta; vuelva a intentarlo",
+  "backupQuizFailed": "La clave de la cuenta que ha introducido es incorrecta. Por favor, inténtelo de nuevo.",
   "backupComplete": {
     "header": "Copia de Seguridad Completa",
     "0": "¡Correcto!",
@@ -63,6 +38,7 @@
     "skip": "Omitir por ahora"
   },
   "socialBackupPhraseHeader": "Frase de protección {{index}}",
+  "backupQuizWordCount":"¿Cuál es la palabra <0>{{{ordinal}}</0> de su clave de cuenta?",
   "socialBackup": {
     "body":
       "Comparta cada frase que aparece a continuación con un amigo. Asegúrese de enviar solo una frase a cada persona.",

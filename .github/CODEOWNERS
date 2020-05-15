@@ -13,7 +13,7 @@
 /packages/celotool/ @asaj
 /packages/cli/ @mcortesi @gastonponti
 /packages/contractkit/ @mcortesi @gastonponti
-/packages/dappkit/ @nambrot
+/packages/dappkit/ @cmcewen
 /packages/devutils/ @mcortesi
 /packages/docs/ @timmoreton
 /packages/faucet/ @jmrossy
