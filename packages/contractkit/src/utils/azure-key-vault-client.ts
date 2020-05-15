@@ -1,12 +1,11 @@
 import { DefaultAzureCredential } from '@azure/identity'
 import { CryptographyClient, KeyClient, KeyVaultKey } from '@azure/keyvault-keys'
 import { SecretClient } from '@azure/keyvault-secrets'
-import { ensureLeading0x } from '@celo/utils/lib/address'
 import { BigNumber } from 'bignumber.js'
 import debugFactory from 'debug'
 import { ec as EC } from 'elliptic'
-import * as ethUtil from 'ethereumjs-util'
 import { ecdsaRecover } from 'secp256k1'
+import { bigNumberToBuffer, bufferToBigNumber } from './signing-utils'
 
 const debug = debugFactory('kit:wallet:akv-client')
 
@@ -58,7 +57,7 @@ export class AzureKeyVaultClient {
       Buffer.from(signingKey.key!.x!),
       Buffer.from(signingKey.key!.y!),
     ])
-    const publicKey = AzureKeyVaultClient.bufferToBigNumber(rawPublicKey)
+    const publicKey = bufferToBigNumber(rawPublicKey)
     return publicKey
   }
 
@@ -88,20 +87,20 @@ export class AzureKeyVaultClient {
     const rawSignature = signResult.result
 
     // Canonicalize signature
-    const R = AzureKeyVaultClient.bufferToBigNumber(Buffer.from(rawSignature.slice(0, 32)))
-    let S = AzureKeyVaultClient.bufferToBigNumber(Buffer.from(rawSignature.slice(32, 64)))
+    const R = bufferToBigNumber(Buffer.from(rawSignature.slice(0, 32)))
+    let S = bufferToBigNumber(Buffer.from(rawSignature.slice(32, 64)))
 
     // The Azure Signature MAY not be canonical, which is illegal in Ethereum
     // thus it must be transposed to the lower intersection.
     // https://github.com/bitcoin/bips/blob/master/bip-0062.mediawiki#Low_S_values_in_signatures
-    const N = AzureKeyVaultClient.bufferToBigNumber(this.secp256k1Curve.curve.n)
+    const N = bufferToBigNumber(this.secp256k1Curve.curve.n)
     if (!AzureKeyVaultClient.isCanonical(S, N)) {
       debug('Canonicalizing signature')
       S = N.minus(S)
     }
 
-    const rBuff = AzureKeyVaultClient.bigNumberToBuffer(R, 32)
-    const sBuff = AzureKeyVaultClient.bigNumberToBuffer(S, 32)
+    const rBuff = bigNumberToBuffer(R, 32)
+    const sBuff = bigNumberToBuffer(S, 32)
     const canonicalizedSignature = Buffer.concat([rBuff, sBuff])
     const publicKey = await this.getPublicKey(keyName)
 
@@ -153,7 +152,7 @@ export class AzureKeyVaultClient {
       const compressed = false
       const recoveredPublicKeyByteArr = ecdsaRecover(signature, i, hash, compressed)
       const publicKeyBuff = Buffer.from(recoveredPublicKeyByteArr)
-      const recoveredPublicKey = AzureKeyVaultClient.bufferToBigNumber(publicKeyBuff)
+      const recoveredPublicKey = bufferToBigNumber(publicKeyBuff)
       debug('Recovered key: ' + recoveredPublicKey)
       if (publicKey.eq(recoveredPublicKey)) {
         return i
@@ -181,18 +180,6 @@ export class AzureKeyVaultClient {
       }
       throw new Error(`Unexpected KeyVault error ${e.message}`)
     }
-  }
-
-  private static bufferToBigNumber(input: Buffer): BigNumber {
-    return new BigNumber(ensureLeading0x(input.toString('hex')))
-  }
-  private static bigNumberToBuffer(input: BigNumber, lengthInBytes: number): Buffer {
-    let hex = input.toString(16)
-    const hexLength = lengthInBytes * 2 // 2 hex characters per byte.
-    if (hex.length < hexLength) {
-      hex = '0'.repeat(hexLength - hex.length) + hex
-    }
-    return ethUtil.toBuffer(ensureLeading0x(hex)) as Buffer
   }
 
   /**

@@ -1,5 +1,6 @@
 import { ensureLeading0x, trimLeading0x } from '@celo/utils/lib/address'
 import { verifySignature } from '@celo/utils/lib/signatureUtils'
+import BigNumber from 'bignumber.js'
 import debugFactory from 'debug'
 // @ts-ignore-next-line
 import { account as Account, bytes as Bytes, hash as Hash, RLP } from 'eth-lib'
@@ -204,4 +205,16 @@ export function verifyEIP712TypedDataSigner(
   const trimmedData = dataBuff.toString('hex')
   const valid = verifySignature(ensureLeading0x(trimmedData), signedData, expectedAddress)
   return valid
+}
+
+export function bufferToBigNumber(input: Buffer): BigNumber {
+  return new BigNumber(ensureLeading0x(input.toString('hex')))
+}
+export function bigNumberToBuffer(input: BigNumber, lengthInBytes: number): Buffer {
+  let hex = input.toString(16)
+  const hexLength = lengthInBytes * 2 // 2 hex characters per byte.
+  if (hex.length < hexLength) {
+    hex = '0'.repeat(hexLength - hex.length) + hex
+  }
+  return ethUtil.toBuffer(ensureLeading0x(hex)) as Buffer
 }
