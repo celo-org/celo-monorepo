@@ -1,10 +1,16 @@
 import AsyncStorage from '@react-native-community/async-storage'
 import { NavigationContainer, NavigationState } from '@react-navigation/native'
 import * as React from 'react'
+import { StyleSheet, View } from 'react-native'
+import AlertBanner from 'src/alert/AlertBanner'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
+import { getAppLocked } from 'src/app/selectors'
 import { DEV_RESTORE_NAV_STATE_ON_RELOAD } from 'src/config'
 import { navigationRef } from 'src/navigator/NavigationService'
 import Navigator from 'src/navigator/Navigator'
+import PincodeLock from 'src/pincode/PincodeLock'
+import useTypedSelector from 'src/redux/useSelector'
+import BackupPrompt from 'src/shared/BackupPrompt'
 import Logger from 'src/utils/Logger'
 
 // This uses RN Navigation's experimental nav state persistence
@@ -12,6 +18,7 @@ import Logger from 'src/utils/Logger'
 // https://reactnavigation.org/docs/en/state-persistence.html
 const PERSISTENCE_KEY = 'NAVIGATION_STATE'
 
+// @ts-ignore https://reactnavigation.org/docs/screen-tracking/
 const getActiveRouteName = (state: NavigationState) => {
   const route = state.routes[state.index]
 
@@ -23,20 +30,22 @@ const getActiveRouteName = (state: NavigationState) => {
   return route.name
 }
 
-export const NavigatorWrapper = () => {
-  const [isReady, setIsReady] = React.useState(
-    __DEV__ || DEV_RESTORE_NAV_STATE_ON_RELOAD ? false : true
-  )
-  const [initialState, setInitialState] = React.useState()
+const RESTORE_STATE = __DEV__ && DEV_RESTORE_NAV_STATE_ON_RELOAD
 
+export const NavigatorWrapper = () => {
+  const [isReady, setIsReady] = React.useState(RESTORE_STATE ? false : true)
+  const [initialState, setInitialState] = React.useState()
+  const appLocked = useTypedSelector(getAppLocked)
   const routeNameRef = React.useRef()
 
   React.useEffect(() => {
     if (navigationRef && navigationRef.current) {
       const state = navigationRef.current.getRootState()
 
-      // Save the initial route name
-      routeNameRef.current = getActiveRouteName(state)
+      if (state) {
+        // Save the initial route name
+        routeNameRef.current = getActiveRouteName(state)
+      }
     }
   }, [])
 
@@ -71,9 +80,11 @@ export const NavigatorWrapper = () => {
       return
     }
 
-    AsyncStorage.setItem(PERSISTENCE_KEY, JSON.stringify(state)).catch((error) =>
-      Logger.error('NavigatorWrapper', 'Error persisting nav state', error)
-    )
+    if (RESTORE_STATE) {
+      AsyncStorage.setItem(PERSISTENCE_KEY, JSON.stringify(state)).catch((error) =>
+        Logger.error('NavigatorWrapper', 'Error persisting nav state', error)
+      )
+    }
 
     const previousRouteName = routeNameRef.current
     const currentRouteName = getActiveRouteName(state)
@@ -97,10 +108,43 @@ export const NavigatorWrapper = () => {
       onStateChange={handleStateChange}
       initialState={initialState}
     >
-      <Navigator />
+      <View style={styles.container}>
+        <Navigator />
+        {appLocked && (
+          <View style={styles.locked}>
+            <PincodeLock />
+          </View>
+        )}
+        <View style={styles.floating}>
+          {!appLocked && <BackupPrompt />}
+          <AlertBanner />
+        </View>
+      </View>
     </NavigationContainer>
   )
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    flexDirection: 'column',
+    alignItems: 'stretch',
+    justifyContent: 'flex-start',
+  },
+  floating: {
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    right: 0,
+  },
+  locked: {
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    right: 0,
+    bottom: 0,
+  },
+})
 
 export const navbarStyle: {
   headerMode: 'none'

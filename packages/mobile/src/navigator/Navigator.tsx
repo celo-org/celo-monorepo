@@ -4,6 +4,7 @@ import { createStackNavigator } from '@react-navigation/stack'
 import * as React from 'react'
 import { Platform } from 'react-native'
 import SplashScreen from 'react-native-splash-screen'
+import { useSelector } from 'react-redux'
 import Account from 'src/account/Account'
 import Analytics from 'src/account/Analytics'
 import DataSaver from 'src/account/DataSaver'
@@ -23,6 +24,7 @@ import SupportContact from 'src/account/SupportContact'
 import AppLoading from 'src/app/AppLoading'
 import Debug from 'src/app/Debug'
 import ErrorScreen from 'src/app/ErrorScreen'
+import { getAppLocked } from 'src/app/selectors'
 import UpgradeScreen from 'src/app/UpgradeScreen'
 import BackupComplete from 'src/backup/BackupComplete'
 import BackupIntroduction from 'src/backup/BackupIntroduction'
@@ -301,6 +303,7 @@ export function AppNavigatorNew() {
 
     SplashScreen.hide()
   })
+  const appLocked = useSelector(getAppLocked)
 
   if (!initialRouteName) {
     return <AppLoading />

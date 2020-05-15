@@ -25,10 +25,9 @@ interface DispatchProps {
   toggleFornoMode: typeof toggleFornoMode
 }
 
-type Props = StateProps &
-  DispatchProps &
-  WithTranslation &
-  StackScreenProps<StackParamList, Screens.DataSaver>
+type OwnProps = StackScreenProps<StackParamList, Screens.DataSaver>
+
+type Props = StateProps & DispatchProps & WithTranslation & OwnProps
 
 const mapDispatchToProps = {
   toggleFornoMode,
@@ -205,7 +204,7 @@ const styles = StyleSheet.create({
   },
 })
 
-export default connect<StateProps, DispatchProps, {}, RootState>(
+export default connect<StateProps, DispatchProps, OwnProps, RootState>(
   mapStateToProps,
   mapDispatchToProps
 )(withTranslation(Namespaces.accountScreen10)(DataSaver))
