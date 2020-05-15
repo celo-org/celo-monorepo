@@ -9,6 +9,7 @@ import { ConfirmationInput } from 'src/send/SendConfirmation'
 import { TransferConfirmationCardProps } from 'src/send/TransferConfirmationCard'
 import { ReviewProps } from 'src/transactions/TransactionReview'
 
+// tslint:disable-next-line
 export type StackParamList = {
   [Screens.Account]: {}
   [Screens.Analytics]: {}
