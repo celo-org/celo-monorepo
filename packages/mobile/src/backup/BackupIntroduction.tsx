@@ -95,7 +95,7 @@ function AccountKeyPostSetup() {
   return (
     <ScrollView contentContainerStyle={styles.postSetupContainer}>
       <View>
-        <Text style={fontStyles.h2}>{t('introTitle')}</Text>
+        <Text style={fontStyles.h2}>{t('postSetupTitle')}</Text>
         <View style={styles.keyArea}>
           <Text style={fontStyles.large}>{accountKey}</Text>
         </View>

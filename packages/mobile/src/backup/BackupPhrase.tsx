@@ -53,6 +53,7 @@ class BackupPhrase extends React.Component<Props, State> {
   static navigationOptions = () => ({
     ...headerWithCancelButton,
     headerLeft: <CancelButton color={colors.gray4} />,
+    headerTitle: 'Account Key',
     headerRight: <HeaderRight />,
   })
   state = {

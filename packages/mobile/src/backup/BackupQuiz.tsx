@@ -30,14 +30,14 @@ const MNEMONIC_BUTTONS_TO_DISPLAY = 6
 const CHECKING_DURATION = 2.6 * 1000
 
 export enum Mode {
-  entering,
-  checking,
-  failed,
+  Entering,
+  Checking,
+  Failed,
 }
 
 // TODO Add states for, checking, failed, success
 interface State {
-  is: Mode
+  mode: Mode
   mnemonicLength: number
   mnemonicWords: string[]
   userChosenWords: Array<{
@@ -57,14 +57,16 @@ export class BackupQuiz extends React.Component<Props, State> {
   static navigationOptions = ({ navigation }: NavigationInjectedProps) => ({
     ...headerWithCancelButton, // TODO switch to v2 once Ivans PR is in
     headerTitle: i18n.t(`${Namespaces.backupKeyFlow6}:headerTitle`),
-    headerRight: <DeleteWord onPressBackspace={navigation.getParam('onPressBackspace')} />,
+    headerRight: (
+      <DeleteWord onPressBackspace={navigation.getParam('onPressBackspace') || fallBackPress} />
+    ),
   })
 
   state: State = {
     mnemonicLength: 0,
     mnemonicWords: [],
     userChosenWords: [],
-    is: Mode.entering,
+    mode: Mode.Entering,
   }
 
   componentDidMount() {
@@ -122,7 +124,7 @@ export class BackupQuiz extends React.Component<Props, State> {
     this.setState({
       mnemonicWords: getShuffledWordSet(mnemonic),
       userChosenWords: [],
-      is: Mode.entering,
+      mode: Mode.Entering,
     })
   }
 
@@ -131,18 +133,18 @@ export class BackupQuiz extends React.Component<Props, State> {
     const mnemonic = this.getMnemonicFromNavProps()
     const lengthsMatch = userChosenWords.length === mnemonicLength
 
-    if (lengthsMatch && userChosenWords.map((w) => w.word).join(' ') === mnemonic) {
+    if (lengthsMatch && contentMatches(userChosenWords, mnemonic)) {
       Logger.debug(TAG, 'Backup quiz passed')
       this.props.setBackupCompleted()
       navigate(Screens.BackupComplete)
     } else {
       Logger.debug(TAG, 'Backup quiz failed, reseting words')
-      this.setState({ is: Mode.failed })
+      this.setState({ mode: Mode.Failed })
     }
   }
 
   onPressSubmit = () => {
-    this.setState({ is: Mode.checking })
+    this.setState({ mode: Mode.Checking })
     setTimeout(this.afterCheck, CHECKING_DURATION)
   }
 
@@ -177,7 +179,7 @@ export class BackupQuiz extends React.Component<Props, State> {
                 </View>
               ))}
             </View>
-            {this.state.is === Mode.failed && (
+            {this.state.mode === Mode.Failed && (
               <View style={styles.resetButton}>
                 <TextButton onPress={this.onPressReset}>{t('global:reset')}</TextButton>
               </View>
@@ -211,12 +213,25 @@ export class BackupQuiz extends React.Component<Props, State> {
           <QuizzBottom
             onPressSubmit={this.onPressSubmit}
             isQuizComplete={isQuizComplete}
-            mode={this.state.is}
+            mode={this.state.mode}
           />
         </>
       </SafeAreaView>
     )
   }
+}
+
+function fallBackPress() {
+  Logger.error(`${TAG}@deleteWord`, 'onBackspacePress function not passed from navigator')
+}
+
+interface Content {
+  word: string
+  index: number
+}
+
+function contentMatches(userChosenWords: Content[], mnemonic: string) {
+  return userChosenWords.map((w) => w.word).join(' ') === mnemonic
 }
 
 function DeleteWord({ onPressBackspace }: { onPressBackspace: () => void }) {
@@ -241,7 +256,7 @@ export default componentWithAnalytics(
   )
 )
 
-export const styles = StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,

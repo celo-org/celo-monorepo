@@ -2,7 +2,7 @@ import colors from '@celo/react-components/styles/colors.v2'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet, View } from 'react-native'
-import { connect } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { setBackupDelayed } from 'src/account/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
@@ -16,9 +16,6 @@ interface DelayStateProps {
   backupTooLate: boolean
   backupDelayedTime: number
 }
-interface DelayDispatchProps {
-  setBackupAsDelayed: typeof setBackupDelayed
-}
 
 const mapStateToHeaderProps = (state: RootState): DelayStateProps => {
   return {
@@ -27,21 +24,15 @@ const mapStateToHeaderProps = (state: RootState): DelayStateProps => {
   }
 }
 
-const dispatchToProps = {
-  setBackupAsDelayed: setBackupDelayed,
-}
-
-export default connect<DelayStateProps, DelayDispatchProps, {}, RootState>(
-  mapStateToHeaderProps,
-  dispatchToProps
-)(function DelayButton(props: DelayDispatchProps & DelayStateProps) {
-  const { backupTooLate, backupDelayedTime, setBackupAsDelayed } = props
+export default function DelayButton() {
+  const { backupTooLate, backupDelayedTime } = useSelector(mapStateToHeaderProps)
+  const dispatch = useDispatch()
 
   const onPressDelay = React.useCallback(() => {
-    setBackupAsDelayed()
+    dispatch(setBackupDelayed())
     CeloAnalytics.track(CustomEventNames.delay_backup)
     navigateBack()
-  }, [])
+  }, [dispatch])
 
   const { t } = useTranslation(Namespaces.backupKeyFlow6)
 
@@ -54,7 +45,7 @@ export default connect<DelayStateProps, DelayDispatchProps, {}, RootState>(
   } else {
     return <View />
   }
-})
+}
 
 const styles = StyleSheet.create({
   root: {

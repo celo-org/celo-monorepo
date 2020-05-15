@@ -29,7 +29,7 @@ exports[`BackupIntroduction renders correctly when backup completed 1`] = `
             }
           }
         >
-          introTitle
+          postSetupTitle
         </Text>
         <View
           style={

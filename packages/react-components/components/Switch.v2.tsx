@@ -5,7 +5,7 @@ import { Switch as RNSwitch, SwitchProps } from 'react-native'
 export default function Switch(props: SwitchProps) {
   return (
     <RNSwitch
-      trackColor={switchTrackColors}
+      trackColor={SWITCH_TRACK}
       thumbColor={colors.gray2}
       ios_backgroundColor={colors.gray3}
       {...props}
@@ -13,7 +13,7 @@ export default function Switch(props: SwitchProps) {
   )
 }
 
-const switchTrackColors = {
+const SWITCH_TRACK = {
   false: colors.gray3,
   true: colors.greenUI,
 }

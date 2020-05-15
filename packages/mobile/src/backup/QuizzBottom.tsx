@@ -20,13 +20,13 @@ export function QuizzBottom({ onPressSubmit, isQuizComplete, mode }: Props) {
     return null
   }
   switch (mode) {
-    case Mode.checking:
+    case Mode.Checking:
       return (
         <View style={styles.successCheck}>
           <LoadingSpinner width={24} />
         </View>
       )
-    case Mode.failed:
+    case Mode.Failed:
       return (
         <View>
           <Text style={styles.incorrect}>{t('backupQuizFailed')}</Text>
