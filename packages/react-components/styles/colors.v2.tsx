@@ -1,5 +1,5 @@
 // Designer Created Figma Colors
-export enum colorsEnum {
+export enum Colors {
   greenFaint = '#97DFC1', // green disabled
   greenBrand = '#42D689',
   greenUI = '#1AB775',
@@ -20,23 +20,23 @@ export enum colorsEnum {
 }
 
 export default {
-  greenFaint: colorsEnum.greenFaint,
-  greenBrand: colorsEnum.greenBrand,
-  greenUI: colorsEnum.greenUI,
-  goldFaint: colorsEnum.goldFaint,
-  goldBrand: colorsEnum.goldBrand,
-  goldUI: colorsEnum.goldUI,
-  goldDark: colorsEnum.goldDark,
-  beige: colorsEnum.beige,
-  brownFaint: colorsEnum.brownFaint,
-  warning: colorsEnum.warning,
-  dark: colorsEnum.dark,
-  gray5: colorsEnum.gray5,
-  gray4: colorsEnum.gray4,
-  gray3: colorsEnum.gray3,
-  gray2: colorsEnum.gray2,
-  gray1: colorsEnum.gray1,
-  light: colorsEnum.light,
+  greenFaint: Colors.greenFaint,
+  greenBrand: Colors.greenBrand,
+  greenUI: Colors.greenUI,
+  goldFaint: Colors.goldFaint,
+  goldBrand: Colors.goldBrand,
+  goldUI: Colors.goldUI,
+  goldDark: Colors.goldDark,
+  beige: Colors.beige,
+  brownFaint: Colors.brownFaint,
+  warning: Colors.warning,
+  dark: Colors.dark,
+  gray5: Colors.gray5,
+  gray4: Colors.gray4,
+  gray3: Colors.gray3,
+  gray2: Colors.gray2,
+  gray1: Colors.gray1,
+  light: Colors.light,
   get background() {
     return deprecationNotice('light')
   },
@@ -84,5 +84,5 @@ export default {
 function deprecationNotice(color: string) {
   console.warn(`deprecated: trying colors.${color}`)
   // @ts-ignore
-  return colorsEnum[color]
+  return Colors[color]
 }
