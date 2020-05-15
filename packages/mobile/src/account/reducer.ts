@@ -65,7 +65,7 @@ export const initialState = {
   dismissedGetVerified: false,
   promptFornoIfNeeded: false,
   acceptedTerms: false,
-  retryVerificationWithForno: features.VERIFICATION_FORNO_RETRY && !FORNO_ENABLED_INITIALLY,
+  retryVerificationWithForno: features.VERIFICATION_FORNO_RETRY,
 }
 
 export const reducer = (
