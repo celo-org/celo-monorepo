@@ -90,21 +90,24 @@ const styles = StyleSheet.create({
   animationHolder: {
     flex: 2,
     minWidth: 350,
-    paddingRight: 40,
     zIndex: 10,
   },
   animationPlaceDesktop: {
     marginTop: 30,
     paddingTop: '6%',
+    paddingRight: 30,
     transform: [
       {
         // @ts-ignore
-        translateX: '-8%',
+        translateX: '-17%',
       },
+      { scale: 1.1 },
     ],
   },
   animationPlaceTablet: {
     paddingTop: '10%',
+    paddingRight: 40,
+
     transform: [
       {
         translateX: -80,
