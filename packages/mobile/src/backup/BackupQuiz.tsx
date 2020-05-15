@@ -222,10 +222,6 @@ export class BackupQuiz extends React.Component<Props, State> {
   }
 }
 
-function fallBackPress() {
-  Logger.error(`${TAG}@deleteWord`, 'onBackspacePress function not passed from navigator')
-}
-
 interface Content {
   word: string
   index: number
