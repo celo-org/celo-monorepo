@@ -9,7 +9,6 @@ import { setAccountCreationTime, setPromptForno } from 'src/account/actions'
 import { getPincode } from 'src/account/saga'
 import { promptFornoIfNeededSelector } from 'src/account/selectors'
 import { showError } from 'src/alert/actions'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { currentLanguageSelector } from 'src/app/reducers'
@@ -26,7 +25,7 @@ import { setCachedPincode } from 'src/pincode/PincodeCache'
 import { restartApp } from 'src/utils/AppRestart'
 import { setKey } from 'src/utils/keyStore'
 import Logger from 'src/utils/Logger'
-import { updateMeanMillisecs } from 'src/utils/time'
+import { trackMeanMillisecs } from 'src/utils/time'
 import {
   Actions,
   completeWeb3Sync,
@@ -67,7 +66,6 @@ let trackCount = 0
 export function* checkWeb3SyncProgress() {
   Logger.debug(TAG, 'checkWeb3SyncProgress', 'Checking sync progress')
   const initTime = Date.now()
-  let millisecs: number
 
   let syncLoops = 0
   while (true) {
@@ -83,14 +81,15 @@ export function* checkWeb3SyncProgress() {
 
         const latestBlock: Block = yield call(getLatestBlock)
         if (latestBlock && latestBlock.number > 0) {
+          ;[meanMillisecs, trackCount] = trackMeanMillisecs(
+            initTime,
+            meanMillisecs,
+            trackCount,
+            TRACK_EVERY_SYNC,
+            CustomEventNames.sync_complete
+          )
           yield put(completeWeb3Sync(latestBlock.number))
           Logger.debug(TAG, 'checkWeb3SyncProgress', 'Sync is complete')
-          millisecs = Date.now() - initTime
-          meanMillisecs = updateMeanMillisecs(meanMillisecs, millisecs, TRACK_EVERY_SYNC)
-          if (trackCount % TRACK_EVERY_SYNC === 0) {
-            CeloAnalytics.track(CustomEventNames.sync_complete, { meanMillisecs, millisecs })
-          }
-          trackCount += 1
           return true
         } else {
           Logger.debug(TAG, 'checkWeb3SyncProgress', 'Sync not actually complete, still waiting')
@@ -98,60 +97,55 @@ export function* checkWeb3SyncProgress() {
       } else if (typeof syncProgress === 'object') {
         yield put(updateWeb3SyncProgress(syncProgress))
       } else {
-        millisecs = Date.now() - initTime
-        meanMillisecs = updateMeanMillisecs(meanMillisecs, millisecs, TRACK_EVERY_SYNC)
-        if (trackCount % TRACK_EVERY_SYNC === 0) {
-          CeloAnalytics.track(CustomEventNames.sync_invalid_progress, { meanMillisecs, millisecs })
-        }
-        trackCount += 1
+        ;[meanMillisecs, trackCount] = trackMeanMillisecs(
+          initTime,
+          meanMillisecs,
+          trackCount,
+          TRACK_EVERY_SYNC,
+          CustomEventNames.sync_invalid_progress
+        )
         throw new Error('Invalid syncProgress type')
       }
       yield delay(WEB3_MONITOR_DELAY) // wait 100ms while web3 syncs then check again
       syncLoops += 1
       if (syncLoops * WEB3_MONITOR_DELAY > SWITCH_TO_FORNO_TIMEOUT) {
         if (yield select(promptFornoIfNeededSelector) && features.DATA_SAVER) {
+          ;[meanMillisecs, trackCount] = trackMeanMillisecs(
+            initTime,
+            meanMillisecs,
+            trackCount,
+            TRACK_EVERY_SYNC,
+            CustomEventNames.sync_switch_to_forno_timeout
+          )
           yield put(setPromptForno(false))
           navigate(Screens.DataSaver, { promptModalVisible: true })
-          millisecs = Date.now() - initTime
-          meanMillisecs = updateMeanMillisecs(meanMillisecs, millisecs, TRACK_EVERY_SYNC)
-          if (trackCount % TRACK_EVERY_SYNC === 0) {
-            CeloAnalytics.track(CustomEventNames.sync_switch_to_forno_timeout, {
-              meanMillisecs,
-              millisecs,
-            })
-          }
-          trackCount += 1
           return true
         }
       }
     } catch (error) {
       if (error.toString().toLowerCase() === BLOCK_CHAIN_CORRUPTION_ERROR.toLowerCase()) {
-        millisecs = Date.now() - initTime
-        meanMillisecs = updateMeanMillisecs(meanMillisecs, millisecs, TRACK_EVERY_SYNC)
-        if (trackCount % TRACK_EVERY_SYNC === 0) {
-          CeloAnalytics.track(
-            CustomEventNames.sync_blockchain_corruption,
-            { meanMillisecs, millisecs },
-            true
-          )
-        }
-        trackCount += 1
+        ;[meanMillisecs, trackCount] = trackMeanMillisecs(
+          initTime,
+          meanMillisecs,
+          trackCount,
+          TRACK_EVERY_SYNC,
+          CustomEventNames.sync_blockchain_corruption,
+          true
+        )
         const deleted = yield call(deleteChainData)
         if (deleted) {
           navigateToError('corruptedChainDeleted')
         }
       } else {
+        ;[meanMillisecs, trackCount] = trackMeanMillisecs(
+          initTime,
+          meanMillisecs,
+          trackCount,
+          TRACK_EVERY_SYNC,
+          CustomEventNames.sync_unexpected_error,
+          true
+        )
         Logger.error(TAG, 'Unexpected sync error', error)
-        millisecs = Date.now() - initTime
-        meanMillisecs = updateMeanMillisecs(meanMillisecs, millisecs, TRACK_EVERY_SYNC)
-        if (trackCount % TRACK_EVERY_SYNC === 0) {
-          CeloAnalytics.track(
-            CustomEventNames.sync_unexpected_error,
-            { meanMillisecs, millisecs },
-            true
-          )
-        }
-        trackCount += 1
       }
       return false
     }

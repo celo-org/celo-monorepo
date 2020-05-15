@@ -129,7 +129,7 @@ async function initGeth() {
     }
 
     if (!(await ensureGenesisBlockWritten())) {
-      trackMeanMillisecs(
+      ;[meanMillisecs, trackCount] = trackMeanMillisecs(
         initTime,
         meanMillisecs,
         trackCount,
@@ -139,7 +139,7 @@ async function initGeth() {
       throw FailedToFetchGenesisBlockError
     }
     if (!(await ensureStaticNodesInitialized())) {
-      trackMeanMillisecs(
+      ;[meanMillisecs, trackCount] = trackMeanMillisecs(
         initTime,
         meanMillisecs,
         trackCount,
@@ -157,34 +157,36 @@ async function initGeth() {
     } catch (e) {
       const errorType = getGethErrorType(e)
       if (errorType === ErrorType.GethAlreadyRunning) {
-        Logger.error('Geth@init/startInstance', 'Geth start reported geth already running')
-        trackMeanMillisecs(
+        ;[meanMillisecs, trackCount] = trackMeanMillisecs(
           initTime,
           meanMillisecs,
           trackCount,
           TRACK_EVERY_GETH,
           CustomEventNames.geth_error_already_running
         )
+        Logger.error('Geth@init/startInstance', 'Geth start reported geth already running')
         throw new Error('Geth already running, need to restart app')
       } else if (errorType === ErrorType.CorruptChainData) {
-        Logger.warn('Geth@init/startInstance', 'Geth start reported chain data error')
-        trackMeanMillisecs(
+        ;[meanMillisecs, trackCount] = trackMeanMillisecs(
           initTime,
           meanMillisecs,
           trackCount,
           TRACK_EVERY_GETH,
-          CustomEventNames.geth_error_corrupt_chain
+          CustomEventNames.geth_error_corrupt_chain,
+          true
         )
+        Logger.warn('Geth@init/startInstance', 'Geth start reported chain data error')
         await attemptGethCorruptionFix(geth)
       } else {
-        Logger.error('Geth@init/startInstance', 'Unexpected error starting geth', e)
-        trackMeanMillisecs(
+        ;[meanMillisecs, trackCount] = trackMeanMillisecs(
           initTime,
           meanMillisecs,
           trackCount,
           TRACK_EVERY_GETH,
-          CustomEventNames.geth_error_unexpected
+          CustomEventNames.geth_error_unexpected,
+          true
         )
+        Logger.error('Geth@init/startInstance', 'Unexpected error starting geth', e)
         throw e
       }
     }

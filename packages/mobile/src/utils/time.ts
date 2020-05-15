@@ -6,10 +6,10 @@ import { enUS, es } from 'date-fns/locale'
 import { i18n as i18nType, TFunction } from 'i18next'
 import * as _ from 'lodash'
 import clockSync from 'react-native-clock-sync'
+import CeloAnalytics from 'src/analytics/CeloAnalytics'
+import { CustomEventNames } from 'src/analytics/constants'
 import i18n from 'src/i18n'
 import Logger from 'src/utils/Logger'
-import { CustomEventNames } from 'src/analytics/constants'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
 
 const clock = new clockSync({})
 
@@ -335,12 +335,14 @@ export const trackMeanMillisecs = (
   meanMillisecs: number,
   trackCount: number,
   onceEvery: number,
-  eventName: CustomEventNames
-) => {
+  eventName: CustomEventNames,
+  attachDeviceInfo: boolean = false
+): [number, number] => {
   const millisecs = Date.now() - initTime
   meanMillisecs = updateMeanMillisecs(meanMillisecs, millisecs, onceEvery)
   if (trackCount % onceEvery === 0) {
     CeloAnalytics.track(eventName, { meanMillisecs, millisecs })
   }
   trackCount += 1
+  return [meanMillisecs, trackCount]
 }
