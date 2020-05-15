@@ -103,13 +103,12 @@ export async function upgradeOracleChart(
   context: OracleAzureContext,
   useFullNodes: boolean
 ) {
-  await upgradeGenericHelmChart(
+  return upgradeGenericHelmChart(
     celoEnv,
     releaseName(celoEnv),
     helmChartPath,
     await helmParameters(celoEnv, context, useFullNodes)
   )
-  return
 }
 
 export async function removeHelmRelease(celoEnv: string, context: OracleAzureContext) {

@@ -15,7 +15,6 @@ export const describe = 'upgrade the oracle(s) on an AKS cluster'
 type OracleUpgradeArgv = UpgradeArgv &
   OracleArgv & {
     useFullNodes: boolean
-    reset: boolean
   }
 
 export const builder = (argv: yargs.Argv) => {
