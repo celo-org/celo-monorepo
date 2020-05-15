@@ -320,11 +320,7 @@ function quickFormat(timestamp: number, i18next: i18nType, formatRule: string) {
 }
 
 // update moving average for time ellapsed
-export function updateAverageMillisecs(
-  meanMillisecs: number,
-  millisecs: number,
-  onceEvery: number
-) {
+export function updateMeanMillisecs(meanMillisecs: number, millisecs: number, onceEvery: number) {
   const multiplier = meanMillisecs > 0.0 ? meanMillisecs / onceEvery : 1.0
   meanMillisecs = meanMillisecs * (1.0 - multiplier) + multiplier * millisecs
   return meanMillisecs

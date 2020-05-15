@@ -10,10 +10,33 @@ import { DEFAULT_TESTNET } from 'src/config'
 import networkConfig from 'src/geth/networkConfig'
 import Logger from 'src/utils/Logger'
 import FirebaseLogUploader from 'src/utils/LogUploader'
-import { updateAverageMillisecs } from 'src/utils/time'
+import { updateMeanMillisecs } from 'src/utils/time'
 
 let gethLock = false
 let gethInstance: typeof RNGeth | null = null
+
+let meanMillisecs = 0.0
+let trackCount = 0
+
+// track geth setup first time and then only one every so many events.
+const TRACK_EVERY_GETH = 100
+
+// warning: this functions has side-effects on module
+//          vars meanMillisecs and trackCount.
+export const trackMeanMillisecs = (
+  initTime: number,
+  meanMillisecs: number,
+  trackCount: number,
+  onceEvery: number,
+  eventName: CustomEventNames
+) => {
+  const millisecs = Date.now() - initTime
+  meanMillisecs = updateMeanMillisecs(meanMillisecs, millisecs, onceEvery)
+  if (trackCount % onceEvery === 0) {
+    CeloAnalytics.track(eventName, { meanMillisecs, millisecs })
+  }
+  trackCount += 1
+}
 
 export const FailedToFetchStaticNodesError = new Error(
   'Failed to fetch static nodes from Google storage'
@@ -68,12 +91,6 @@ export const IPC_PATH =
     ? './geth.ipc'
     : `${RNFS.DocumentDirectoryPath}/.${DEFAULT_TESTNET}/geth.ipc`
 
-// track geth setup first time and then only one every so many events.
-const TRACK_EVERY_GETH = 100
-
-let meanMillisecs = 0.0
-let trackCount = 0
-
 function getNodeInstancePath(nodeDir: string) {
   return `${RNFS.DocumentDirectoryPath}/${nodeDir}/${INSTANCE_FOLDER}`
 }
@@ -121,7 +138,6 @@ async function initGeth() {
     return
   }
   gethLock = true
-  let millisecs: number
   const initTime = Date.now()
 
   try {
@@ -131,24 +147,23 @@ async function initGeth() {
     }
 
     if (!(await ensureGenesisBlockWritten())) {
-      millisecs = Date.now() - initTime
-      meanMillisecs = updateAverageMillisecs(meanMillisecs, millisecs, TRACK_EVERY_GETH)
-      if (trackCount % TRACK_EVERY_GETH === 0) {
-        CeloAnalytics.track(CustomEventNames.geth_failed_genesis_block, {
-          meanMillisecs,
-          millisecs,
-        })
-      }
-      trackCount += 1
+      trackMeanMillisecs(
+        initTime,
+        meanMillisecs,
+        trackCount,
+        TRACK_EVERY_GETH,
+        CustomEventNames.geth_failed_genesis_block
+      )
       throw FailedToFetchGenesisBlockError
     }
     if (!(await ensureStaticNodesInitialized())) {
-      millisecs = Date.now() - initTime
-      meanMillisecs = updateAverageMillisecs(meanMillisecs, millisecs, TRACK_EVERY_GETH)
-      if (trackCount % TRACK_EVERY_GETH === 0) {
-        CeloAnalytics.track(CustomEventNames.geth_failed_static_nodes, { meanMillisecs, millisecs })
-      }
-      trackCount += 1
+      trackMeanMillisecs(
+        initTime,
+        meanMillisecs,
+        trackCount,
+        TRACK_EVERY_GETH,
+        CustomEventNames.geth_failed_static_nodes
+      )
       throw FailedToFetchStaticNodesError
     }
     const geth = await createNewGeth()
@@ -161,40 +176,33 @@ async function initGeth() {
       const errorType = getGethErrorType(e)
       if (errorType === ErrorType.GethAlreadyRunning) {
         Logger.error('Geth@init/startInstance', 'Geth start reported geth already running')
-        millisecs = Date.now() - initTime
-        meanMillisecs = updateAverageMillisecs(meanMillisecs, millisecs, TRACK_EVERY_GETH)
-        if (trackCount % TRACK_EVERY_GETH === 0) {
-          CeloAnalytics.track(CustomEventNames.geth_error_already_running, {
-            meanMillisecs,
-            millisecs,
-          })
-        }
-        trackCount += 1
+        trackMeanMillisecs(
+          initTime,
+          meanMillisecs,
+          trackCount,
+          TRACK_EVERY_GETH,
+          CustomEventNames.geth_error_already_running
+        )
         throw new Error('Geth already running, need to restart app')
       } else if (errorType === ErrorType.CorruptChainData) {
         Logger.warn('Geth@init/startInstance', 'Geth start reported chain data error')
-        millisecs = Date.now() - initTime
-        meanMillisecs = updateAverageMillisecs(meanMillisecs, millisecs, TRACK_EVERY_GETH)
-        if (trackCount % TRACK_EVERY_GETH === 0) {
-          CeloAnalytics.track(CustomEventNames.geth_error_already_running, {
-            meanMillisecs,
-            millisecs,
-          })
-        }
-        trackCount += 1
+        trackMeanMillisecs(
+          initTime,
+          meanMillisecs,
+          trackCount,
+          TRACK_EVERY_GETH,
+          CustomEventNames.geth_error_corrupt_chain
+        )
         await attemptGethCorruptionFix(geth)
       } else {
         Logger.error('Geth@init/startInstance', 'Unexpected error starting geth', e)
-        millisecs = Date.now() - initTime
-        meanMillisecs = updateAverageMillisecs(meanMillisecs, millisecs, TRACK_EVERY_GETH)
-        if (trackCount % TRACK_EVERY_GETH === 0) {
-          CeloAnalytics.track(
-            CustomEventNames.geth_error_unexpected,
-            { meanMillisecs, millisecs },
-            true
-          )
-        }
-        trackCount += 1
+        trackMeanMillisecs(
+          initTime,
+          meanMillisecs,
+          trackCount,
+          TRACK_EVERY_GETH,
+          CustomEventNames.geth_error_unexpected
+        )
         throw e
       }
     }

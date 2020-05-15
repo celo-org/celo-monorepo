@@ -33,6 +33,7 @@ export enum CustomEventNames {
   // Geth events
   geth_failed_genesis_block = 'geth_failed_genesis_block',
   geth_failed_static_nodes = 'geth_failed_static_nodes',
+  geth_error_corrupt_chain = 'geth_error_corrupt_chain',
   geth_error_already_running = 'geth_error_already_running',
   geth_error_unexpected = 'geth_error_unexpected',
 
