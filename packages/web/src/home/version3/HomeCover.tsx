@@ -49,8 +49,8 @@ export default function HomeCover() {
         </View>
         <View style={[styles.contentHolder, standardStyles.blockMarginTablet]}>
           <TextAnimation playing={true} />
-          <H4 style={standardStyles.elementalMargin}>{t('coverText')}</H4>
-          <Text style={fonts.h6}>{t('coverJoinList')}</Text>
+          <H4 style={styles.coverText}>{t('coverText')}</H4>
+          <Text style={[fonts.h6, styles.coverJoinList]}>{t('coverJoinList')}</Text>
           <EmailForm submitText={'Submit'} route={'/contacts'} isDarkMode={false} />
         </View>
       </Cell>
@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
   },
   animationPlaceDesktop: {
     marginTop: 30,
-    paddingTop: '10%',
+    paddingTop: '6%',
     transform: [
       {
         // @ts-ignore
@@ -107,5 +107,14 @@ const styles = StyleSheet.create({
   },
   container: {
     flexWrap: 'wrap',
+  },
+  coverText: {
+    marginTop: 10,
+    marginBottom: 30,
+  },
+  coverJoinList: {
+    paddingTop: 10,
+    paddingLeft: 3,
+    paddingBottom: 2,
   },
 })
