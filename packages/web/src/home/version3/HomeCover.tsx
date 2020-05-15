@@ -1,16 +1,19 @@
 import * as React from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import { Image, StyleSheet, View } from 'react-native'
+import { H4 } from 'src/fonts/Fonts'
 import EmailForm from 'src/forms/EmailForm'
+import changeStoryPlaceHolder from 'src/home/change-story.png'
 import TextAnimation from 'src/home/TextAnimation'
 import { NameSpaces, useTranslation } from 'src/i18n'
+import { Cell, GridRow, Spans } from 'src/layout/GridRow'
+import { ScreenSizes, useScreenSize } from 'src/layout/ScreenSize'
+import AspectRatio from 'src/shared/AspectRatio'
 import { BANNER_HEIGHT, HEADER_HEIGHT } from 'src/shared/Styles'
-import { fonts, standardStyles } from 'src/styles'
-import { GridRow, Cell, Spans } from 'src/layout/GridRow'
-import { useScreenSize } from 'src/layout/ScreenSize'
+import { standardStyles } from 'src/styles'
 
 export default function HomeCover() {
   const { t } = useTranslation(NameSpaces.home)
-  const { isMobile } = useScreenSize()
+  const { isMobile, screen } = useScreenSize()
   return (
     <GridRow
       allStyle={{ paddingTop: BANNER_HEIGHT + HEADER_HEIGHT }}
@@ -18,178 +21,71 @@ export default function HomeCover() {
       desktopStyle={standardStyles.sectionMargin}
     >
       <Cell span={Spans.full} style={[styles.container, !isMobile && standardStyles.row]}>
-        <View style={styles.animationHolder}>{}</View>
-        <View style={styles.contentHolder}>
+        <View
+          style={[styles.animationHolder, standardStyles.blockMarginTablet, getplacement(screen)]}
+        >
+          <AspectRatio ratio={814 / 216}>
+            <Image
+              source={changeStoryPlaceHolder}
+              style={{ width: '100%', height: '100%', zIndex: 10 }}
+            />
+          </AspectRatio>
+        </View>
+        <View style={[styles.contentHolder, standardStyles.blockMarginTablet]}>
           <TextAnimation playing={true} />
-          <Text style={[fonts.p, standardStyles.elementalMargin]}>{t('coverText')}</Text>
+          <H4 style={standardStyles.elementalMargin}>{t('coverText')}</H4>
           <EmailForm submitText={'Sign Up'} route={'/contacts'} isDarkMode={false} />
         </View>
       </Cell>
     </GridRow>
-
-    // <Responsive large={styles.largeCover} medium={styles.mediumCover}>
-    //   <View style={styles.smallCover}>
-    //     <View style={styles.animationBackground}>
-    //       <Responsive large={[styles.animationWrapper, styles.animationWrapperLargeAug]}>
-    //         <View style={styles.animationWrapper}>
-    //           <HomeAnimation
-    //             onLoaded={this.onLoaded}
-    //             onFinished={this.onFinished}
-    //             onError={this.setStill}
-    //             mode={mode}
-    //           />
-    //         </View>
-    //       </Responsive>
-    //     </View>
-    //     <Responsive large={styles.largeTextHolder}>
-    //       <View style={styles.textHolder}>
-    //         <Responsive large={[styles.textWrapper, styles.largeTextWrapper]}>
-    //           <View style={styles.textWrapper}>
-    //             <TextAnimation
-    //               playing={this.state.playing}
-    //               willTransition={mode === Mode.transition}
-    //               stillMode={
-    //                 mode === Mode.wait || mode === Mode.transition || mode === Mode.graphic
-    //               }
-    //             />
-    //             <Responsive
-    //               large={styles.content}
-    //               medium={[styles.contentTablet, standardStyles.sectionMarginBottomTablet]}
-    //             >
-    //               <View style={styles.contentMobile}>
-    //                 <View style={styles.form}>
-    //                   <Text style={[fonts.navigation, styles.foreground]}>
-    //                     {this.props.t('stayConnected')}
-    //                   </Text>
-    //                   <EmailForm submitText={'Sign Up'} route={'/contacts'} isDarkMode={true} />
-    //                 </View>
-    //               </View>
-    //             </Responsive>
-    //           </View>
-    //         </Responsive>
-    //       </View>
-    //     </Responsive>
-    //   </View>
-    // </Responsive>
   )
+}
+
+function getplacement(screen: ScreenSizes) {
+  switch (screen) {
+    case ScreenSizes.DESKTOP:
+      return styles.animationPlaceDesktop
+    case ScreenSizes.TABLET:
+      return styles.animationPlaceTablet
+    default:
+      return styles.animationPlaceMobile
+  }
 }
 
 const styles = StyleSheet.create({
   animationHolder: {
     flex: 2,
-    marginRight: 40,
+    minWidth: 300,
+    paddingRight: 20,
+    zIndex: 10,
+  },
+  animationPlaceDesktop: {
+    transform: [
+      {
+        // @ts-ignore
+        translateX: '-10%',
+      },
+    ],
+  },
+  animationPlaceTablet: {
+    transform: [
+      {
+        translateX: -80,
+      },
+    ],
+  },
+  animationPlaceMobile: {
+    transform: [
+      {
+        translateX: -60,
+      },
+    ],
   },
   contentHolder: {
     flexBasis: 370,
   },
   container: {
     paddingVertical: 50,
+    flexWrap: 'wrap',
   },
 })
-
-// const styles = StyleSheet.create({
-//   animationWrapper: {
-//     flex: 1,
-//     height: '100%',
-//     justifyContent: 'center',
-//   },
-//   animationWrapperLargeAug: {
-//     justifyContent: 'flex-start',
-//     marginTop: 20,
-//   },
-//   stillText: {
-//     marginLeft: 25,
-//   },
-//   smallCover: {
-//     minHeight: 600,
-//     marginTop: HEADER_HEIGHT,
-//     height: '100vh',
-//     maxHeight: 800,
-//     flex: 1,
-//     justifyContent: 'flex-end',
-//     backgroundColor: colors.dark,
-//   },
-//   mediumCover: {
-//     minHeight: 600,
-//     paddingTop: BANNER_HEIGHT,
-//     marginTop: HEADER_HEIGHT,
-//     height: 'max-contents',
-//     maxHeight: '100vh',
-//     justifyContent: 'flex-end',
-//     backgroundColor: colors.dark,
-//   },
-//   largeCover: {
-//     paddingTop: HEADER_HEIGHT + BANNER_HEIGHT,
-//     minHeight: '100vh',
-//     height: '100vh',
-//     maxHeight: '100vh',
-//     flex: 1,
-//     justifyContent: 'flex-end',
-//     backgroundColor: colors.dark,
-//   },
-//   content: {
-//     flexDirection: 'row',
-//     justifyContent: 'flex-end',
-//     flexWrap: 'wrap',
-//     paddingHorizontal: 25,
-//     alignSelf: 'flex-end',
-//     maxWidth: 500,
-//     width: '100%',
-//   },
-//   contentTablet: {
-//     maxWidth: 500,
-//     width: '100%',
-//     flexDirection: 'column',
-//     paddingHorizontal: 30,
-//     paddingTop: 30,
-//     alignSelf: 'center',
-//   },
-//   contentMobile: {
-//     flexDirection: 'column',
-//     paddingHorizontal: 30,
-//     paddingVertical: 30,
-//     alignItems: 'center',
-//   },
-//   form: {
-//     width: '100%',
-//     alignItems: 'flex-start',
-//   },
-//   foreground: {
-//     color: colors.white,
-//   },
-//   textHolder: {
-//     flex: 1,
-//     height: 'contents',
-//   },
-//   textWrapper: {
-//     flexDirection: 'column',
-//     justifyContent: 'flex-end',
-//   },
-//   largeTextWrapper: {
-//     flexDirection: 'row',
-//     justifyContent: 'space-between',
-//     alignItems: 'flex-end',
-//     paddingBottom: 65,
-//   },
-//   largeTextHolder: {
-//     position: 'absolute',
-//     top: 0,
-//     left: 0,
-//     right: 0,
-//     bottom: 0,
-//     justifyContent: 'flex-end',
-//   },
-//   textContainer: {
-//     flexDirection: 'column',
-//   },
-//   textContainerLarge: {
-//     flexDirection: 'row',
-//     marginLeft: 25,
-//   },
-//   animationBackground: {
-//     flex: 1,
-//     flexDirection: 'column',
-//     alignItems: 'stretch',
-//     justifyContent: 'center',
-//     maxWidth: '100vw',
-//   },

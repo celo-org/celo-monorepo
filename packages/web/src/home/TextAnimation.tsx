@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { StyleSheet, View, ViewStyle } from 'react-native'
 import { H2 } from 'src/fonts/Fonts'
-import { colors, textStyles } from 'src/styles'
+import { colors, fonts, textStyles } from 'src/styles'
 
 const words = ['finance', 'saving', 'education', 'sending', 'giving', 'lending', 'regeneration']
 
@@ -9,32 +9,32 @@ const textTransitionTime = 800
 
 const timings = {
   finance: {
-    length: 8000,
-    pause: 300,
+    length: 6000,
+    pause: 150,
   },
   saving: {
-    length: 2000,
-    pause: 200,
+    length: 4900,
+    pause: 150,
   },
   education: {
-    length: 6000,
-    pause: 200,
+    length: 5000,
+    pause: 150,
   },
   sending: {
-    length: 2000,
-    pause: 200,
+    length: 5000,
+    pause: 150,
   },
   giving: {
-    length: 9000,
-    pause: 200,
+    length: 4500,
+    pause: 150,
   },
   lending: {
-    length: 2000,
-    pause: 200,
+    length: 4700,
+    pause: 150,
   },
   regeneration: {
-    length: 10000,
-    pause: 200,
+    length: 4800,
+    pause: 150,
   },
 }
 
@@ -174,13 +174,13 @@ class TextAnimation extends React.PureComponent<Props, State> {
     return (
       <View style={styles.textContainer}>
         <>
-          <H2 ariaLevel={'2'} accessibilityRole={'heading'} style={styles.letsMake}>
+          <H2 ariaLevel={'2'} accessibilityRole={'heading'} style={[fonts.h2, styles.letsMake]}>
             A new story in
           </H2>
           <View>
             <View style={[styles.mask, fadeOut]} key={`${this.state.currentWord}-mask1`} />
             <View style={[styles.mask2, fadeIn]} key={`${this.state.currentWord}-mask2`} />
-            <H2 ariaLevel={'2'} accessibilityRole={'heading'} style={textStyles.heavy}>
+            <H2 ariaLevel={'2'} accessibilityRole={'heading'} style={[fonts.h2, textStyles.heavy]}>
               {words[this.state.currentWord]}
             </H2>
           </View>
