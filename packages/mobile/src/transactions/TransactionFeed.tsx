@@ -1,4 +1,3 @@
-import ItemSeparator from '@celo/react-components/components/ItemSeparator'
 import { ApolloError } from 'apollo-boost'
 import gql from 'graphql-tag'
 import * as React from 'react'
@@ -103,7 +102,6 @@ export class TransactionFeed extends React.PureComponent<Props> {
         <FlatList
           data={data}
           keyExtractor={this.keyExtractor}
-          ItemSeparatorComponent={ItemSeparator}
           renderItem={this.renderItem(commentKeyBuffer)}
         />
       )
