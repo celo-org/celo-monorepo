@@ -2,11 +2,12 @@
 import { newKit } from '@celo/contractkit'
 import { sleep } from '@celo/utils/lib/async'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
+import { execCmd } from 'src/lib/cmd-utils'
 import { convertToContractDecimals } from 'src/lib/contract-utils'
 import { getBlockscoutUrl } from 'src/lib/endpoints'
 import { envVar, fetchEnv } from 'src/lib/env-utils'
 import { portForwardAnd } from 'src/lib/port_forward'
-import { execCmd, validateAccountAddress } from 'src/lib/utils'
+import { validateAccountAddress } from 'src/lib/utils'
 import yargs from 'yargs'
 import { AccountArgv } from '../account'
 

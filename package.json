@@ -84,6 +84,6 @@
     "https-proxy-agent": "^5.0.0",
     "mixin-deep": "^2.0.1",
     "js-yaml": "^3.13.1",
-    "ganache-core": "https://github.com/celo-org/ganache-core.git#3dbc32b"
+    "ganache-core": "https://github.com/celo-org/ganache-core.git#e7bc0bd"
   }
 }
