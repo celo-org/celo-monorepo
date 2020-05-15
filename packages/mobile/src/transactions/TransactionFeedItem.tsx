@@ -30,10 +30,7 @@ export function TransactionFeedItem(props: Props) {
   const isReceived = new BigNumber(amount.value).isPositive()
   const isPending = status === TransactionStatus.Pending
 
-  let subtitle = info
-  if (isPending) {
-    subtitle = t('confirmingTransaction')
-  }
+  const subtitle = isPending ? t('confirmingTransaction') : info
 
   return (
     <Touchable onPress={onPress}>
