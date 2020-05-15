@@ -5,7 +5,7 @@ import { SingletonRouter as Router, withRouter } from 'next/router'
 import * as React from 'react'
 import { Dimensions, StyleSheet, View, ViewStyle } from 'react-native'
 import { styles as bannerStyle } from 'src/header/BlueBanner'
-import cssStyles from 'src/header/Header.3.scss'
+import Hamburger from 'src/header/Hamburger'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import MediumLogo from 'src/icons/MediumLogo'
 import Octocat from 'src/icons/Octocat'
@@ -32,6 +32,8 @@ const DARK_PAGES = new Set([
   menu.ALLIANCE_COLLECTIVE.link,
   menu.DEVELOPERS.link,
   menu.VALIDATORS_LIST.link,
+  menu.VALIDATORS_LIST__BAKLAVA.link,
+  menu.VALIDATORS_LIST_BAKLAVASTAGING.link,
   CeloLinks.walletApp,
 ])
 
@@ -59,8 +61,6 @@ function scrollOffset() {
 function menuHidePoint() {
   return Dimensions.get('window').height - HEADER_HEIGHT - 1
 }
-
-const HAMBURGER_INNER = cssStyles['hamburger-inner']
 
 export class Header extends React.PureComponent<Props, State> {
   lastScrollOffset: number
@@ -179,7 +179,6 @@ export class Header extends React.PureComponent<Props, State> {
     const isDesktop = screen === ScreenSizes.DESKTOP
     const foreground = this.getForegroundColor()
     const background = this.state.menuFaded && isDesktop ? 'transparent' : this.getBackgroundColor()
-    const hamburger = this.state.mobileMenuActive ? colors.dark : foreground
     const isHomePage = this.props.router.pathname === menu.HOME.link
 
     return (
@@ -192,13 +191,6 @@ export class Header extends React.PureComponent<Props, State> {
           this.state.mobileMenuActive && styles.mobileMenuActive,
         ]}
       >
-        {/*
-        // @ts-ignore */}
-        <style global={true} jsx={true}>{`
-          .${HAMBURGER_INNER}, .${HAMBURGER_INNER}::before, .${HAMBURGER_INNER}::after {
-            background-color: ${hamburger} !important;
-          }
-        `}</style>
         {isHomePage && (
           <BlueBanner onVisibilityChange={this.toggleBanner} getHeight={this.setBannerHeight} />
         )}
@@ -303,16 +295,11 @@ export class Header extends React.PureComponent<Props, State> {
                 },
             ]}
           >
-            <div
-              className={`${cssStyles.hamburger} ${cssStyles['hamburger--squeeze']} ${
-                this.state.mobileMenuActive ? cssStyles['is-active'] : ''
-              }`}
-              onClick={this.clickHamburger}
-            >
-              <div className={cssStyles['hamburger-box']}>
-                <div className={cssStyles['hamburger-inner']} />
-              </div>
-            </div>
+            <Hamburger
+              isOpen={this.state.mobileMenuActive}
+              onPress={this.clickHamburger}
+              color={this.getForegroundColor()}
+            />
           </View>
         )}
       </View>

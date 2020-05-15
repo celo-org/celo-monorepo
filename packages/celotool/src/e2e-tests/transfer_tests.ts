@@ -72,15 +72,15 @@ class InflationManager {
 const freeze = async (validatorUri: string, validatorAddress: string, token: CeloToken) => {
   const kit = newKit(validatorUri)
   const tokenAddress = await kit.registry.addressFor(token)
-  const freezer = await kit._web3Contracts.getFreezer()
-  await freezer.methods.freeze(tokenAddress).send({ from: validatorAddress })
+  const freezer = await kit.contracts.getFreezer()
+  await freezer.freeze(tokenAddress).sendAndWaitForReceipt({ from: validatorAddress })
 }
 
 const unfreeze = async (validatorUri: string, validatorAddress: string, token: CeloToken) => {
   const kit = newKit(validatorUri)
   const tokenAddress = await kit.registry.addressFor(token)
-  const freezer = await kit._web3Contracts.getFreezer()
-  await freezer.methods.unfreeze(tokenAddress).send({ from: validatorAddress })
+  const freezer = await kit.contracts.getFreezer()
+  await freezer.unfreeze(tokenAddress).sendAndWaitForReceipt({ from: validatorAddress })
 }
 
 const whitelistAddress = async (
@@ -119,7 +119,10 @@ const INTRINSIC_TX_GAS_COST = 21000
 // Additional intrinsic gas for a transaction with fee currency specified
 const ADDITIONAL_INTRINSIC_TX_GAS_COST = 50000
 
-const stableTokenTransferGasCost = 29391
+// Gas refund for resetting to the original non-zero value
+const sstoreCleanRefundEIP2200 = 4200
+// Transfer cost of a stable token transfer, accounting for the refund above.
+const stableTokenTransferGasCost = 23631
 
 /** Helper to watch balance changes over accounts */
 interface BalanceWatcher {
@@ -746,7 +749,8 @@ describe('Transfer tests', function(this: any) {
 
           describe('feeCurrency = CeloGold >', () => {
             testTransferToken({
-              expectedGas: stableTokenTransferGasCost + INTRINSIC_TX_GAS_COST,
+              expectedGas:
+                stableTokenTransferGasCost + INTRINSIC_TX_GAS_COST + sstoreCleanRefundEIP2200,
               transferToken: CeloContract.StableToken,
               feeToken: CeloContract.GoldToken,
             })
@@ -918,8 +922,8 @@ describe('Transfer tests', function(this: any) {
           describe('check if frozen', () => {
             it('should be frozen', async () => {
               const goldTokenAddress = await kit.registry.addressFor(CeloContract.GoldToken)
-              const freezer = await kit._web3Contracts.getFreezer()
-              const isFrozen = await freezer.methods.isFrozen(goldTokenAddress).call()
+              const freezer = await kit.contracts.getFreezer()
+              const isFrozen = await freezer.isFrozen(goldTokenAddress)
               assert(isFrozen)
             })
           })

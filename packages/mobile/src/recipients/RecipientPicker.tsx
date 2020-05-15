@@ -29,7 +29,6 @@ import {
 import RecipientItem from 'src/recipients/RecipientItem'
 import { recipientCacheSelector } from 'src/recipients/reducer'
 import { RootState } from 'src/redux/reducers'
-import { ContactSyncBanner } from 'src/send/ContactSyncBanner'
 import Logger from 'src/utils/Logger'
 import { assertUnreachable } from 'src/utils/typescript'
 
@@ -44,7 +43,6 @@ interface Props {
   sections: Section[]
   defaultCountryCode: string
   listHeaderComponent?: React.ComponentType<any>
-  showContactSyncBanner?: boolean
   onSelectRecipient(recipient: Recipient): void
 }
 
@@ -73,7 +71,7 @@ export class RecipientPicker extends React.Component<RecipientProps> {
     <RecipientItem recipient={item} onSelectRecipient={this.props.onSelectRecipient} />
   )
 
-  renderSectionHeader = (info: { section: SectionListData<Section> }) => (
+  renderSectionHeader = (info: { section: SectionListData<Recipient> }) => (
     <SectionHead text={info.section.key as string} />
   )
 
@@ -176,11 +174,10 @@ export class RecipientPicker extends React.Component<RecipientProps> {
   }
 
   render() {
-    const { sections, listHeaderComponent, showContactSyncBanner } = this.props
+    const { sections, listHeaderComponent } = this.props
 
     return (
       <View style={style.body} testID={this.props.testID}>
-        {showContactSyncBanner && <ContactSyncBanner />}
         <SafeAreaConsumer>
           {(insets) => (
             <SectionList

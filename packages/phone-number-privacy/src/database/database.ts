@@ -11,6 +11,6 @@ export function getDatabase() {
   return db
 }
 
-export async function setSerializable() {
-  await db.raw('BEGIN TRANSACTION ISOLATION LEVEL SERIALIZABLE;')
+export function getTransaction() {
+  return db.transaction()
 }

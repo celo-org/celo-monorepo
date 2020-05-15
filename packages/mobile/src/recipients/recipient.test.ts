@@ -1,12 +1,10 @@
 import { contactsToRecipients, RecipientKind } from 'src/recipients/recipient'
-import { mockAccount, mockContactList, mockDisplayNumber, mockE164Number } from 'test/values'
+import { mockContactList, mockDisplayNumber, mockE164Number } from 'test/values'
 
 describe('contactsToRecipients', () => {
   it('returns a recipient per phone number', () => {
     const countryCode = '+1'
-    const recipients = contactsToRecipients(mockContactList, countryCode, {
-      [mockE164Number]: mockAccount,
-    })
+    const recipients = contactsToRecipients(mockContactList, countryCode)
 
     if (!recipients) {
       return expect(false).toBeTruthy()

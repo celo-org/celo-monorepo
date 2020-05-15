@@ -6,27 +6,31 @@ description: View and manage Validator Groups
 
 ### Commission
 
-Manage the commission for a registered Validator Group. This represents the share of the epoch rewards given to elected Validators that goes to the group they are a member of.
+Manage the commission for a registered Validator Group. This represents the share of the epoch rewards given to elected Validators that goes to the group they are a member of. Updates must be made in a two step process where the group owner first calls uses the queue-update option, then after the required update delay, the apply option. The commission update delay, in blocks, can be viewed with the network:parameters command. A groups next commission update block can be checked with validatorgroup:show
 
 ```
 USAGE
   $ celocli validatorgroup:commission
 
 OPTIONS
-  --apply                                            Applies a previously queued update
-  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address for the Validator Group
+  --apply                                            Applies a previously queued update. Should be called after the
+                                                     update delay.
 
-  --ledgerAddresses=ledgerAddresses                  [default: 1] If --userLedger is set, this will get the first N
+  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address for the Validator Group or Validator Group
+                                                     validator signer
+
+  --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
 
   --ledgerConfirmAddress                             Set it to ask confirmation for the address of the transaction from
                                                      the ledger
 
-  --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --userLedger is set, this will get the array of
+  --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
 
-  --queue-update=queue-update                        Queues an update to the commission
+  --queue-update=queue-update                        Queues an update to the commission, which can be applied after the
+                                                     update delay.
 
   --useLedger                                        Set it to use a ledger wallet
 
@@ -48,13 +52,13 @@ USAGE
 OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Signer or ValidatorGroup's address
 
-  --ledgerAddresses=ledgerAddresses                  [default: 1] If --userLedger is set, this will get the first N
+  --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
 
   --ledgerConfirmAddress                             Set it to ask confirmation for the address of the transaction from
                                                      the ledger
 
-  --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --userLedger is set, this will get the array of
+  --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
 
@@ -95,19 +99,19 @@ OPTIONS
   --accept                                           Accept a validator whose affiliation is already set to the group
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) ValidatorGroup's address
 
-  --ledgerAddresses=ledgerAddresses                  [default: 1] If --userLedger is set, this will get the first N
+  --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
 
   --ledgerConfirmAddress                             Set it to ask confirmation for the address of the transaction from
                                                      the ledger
 
-  --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --userLedger is set, this will get the array of
+  --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
 
   --remove                                           Remove a validator from the members list
 
-  --reorder=reorder                                  Reorder a validator within the members list
+  --reorder=reorder                                  Reorder a validator within the members list. Indices are 0 based
 
   --useLedger                                        Set it to use a ledger wallet
 
@@ -133,13 +137,13 @@ OPTIONS
 
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address for the Validator Group
 
-  --ledgerAddresses=ledgerAddresses                  [default: 1] If --userLedger is set, this will get the first N
+  --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
 
   --ledgerConfirmAddress                             Set it to ask confirmation for the address of the transaction from
                                                      the ledger
 
-  --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --userLedger is set, this will get the array of
+  --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
 
@@ -165,13 +169,13 @@ ARGUMENTS
   GROUPADDRESS  ValidatorGroup's address
 
 OPTIONS
-  --ledgerAddresses=ledgerAddresses              [default: 1] If --userLedger is set, this will get the first N
-                                                 addresses for local signing
+  --ledgerAddresses=ledgerAddresses              [default: 1] If --useLedger is set, this will get the first N addresses
+                                                 for local signing
 
   --ledgerConfirmAddress                         Set it to ask confirmation for the address of the transaction from the
                                                  ledger
 
-  --ledgerCustomAddresses=ledgerCustomAddresses  [default: [0]] If --userLedger is set, this will get the array of index
+  --ledgerCustomAddresses=ledgerCustomAddresses  [default: [0]] If --useLedger is set, this will get the array of index
                                                  addresses for local signing. Example --ledgerCustomAddresses "[4,99]"
 
   --useLedger                                    Set it to use a ledger wallet

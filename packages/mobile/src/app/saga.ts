@@ -22,9 +22,6 @@ import { getCachedPincode } from 'src/pincode/PincodeCache'
 import { PersistedRootState } from 'src/redux/reducers'
 import Logger from 'src/utils/Logger'
 import { clockInSync } from 'src/utils/time'
-import { toggleFornoMode } from 'src/web3/actions'
-import { isInitiallyFornoMode } from 'src/web3/contracts'
-import { fornoSelector } from 'src/web3/selectors'
 import { parse } from 'url'
 
 const TAG = 'app/saga'
@@ -48,6 +45,7 @@ interface PersistedStateProps {
   redeemComplete: boolean
   account: string | null
   hasSeenVerificationNux: boolean
+  acceptedTerms: boolean
 }
 
 const mapStateToProps = (state: PersistedRootState): PersistedStateProps | null => {
@@ -61,18 +59,7 @@ const mapStateToProps = (state: PersistedRootState): PersistedStateProps | null 
     redeemComplete: state.invite.redeemComplete,
     account: state.web3.account,
     hasSeenVerificationNux: state.identity.hasSeenVerificationNux,
-  }
-}
-
-// Upon every app restart, web3 is initialized according to .env file
-// This updates to the chosen forno mode in store
-export function* toggleToProperSyncMode() {
-  Logger.info(TAG + '@toggleToProperSyncMode/', 'Ensuring proper sync mode...')
-  yield take(REHYDRATE)
-  const fornoMode = yield select(fornoSelector)
-  if (fornoMode !== isInitiallyFornoMode()) {
-    Logger.info(TAG + '@toggleToProperSyncMode/', `Switching to fornoMode: ${fornoMode}`)
-    yield put(toggleFornoMode(fornoMode))
+    acceptedTerms: state.account.acceptedTerms,
   }
 }
 
@@ -103,6 +90,7 @@ export function* navigateToProperScreen() {
     redeemComplete,
     account,
     hasSeenVerificationNux,
+    acceptedTerms,
   } = mappedState
 
   const deepLink = yield call(Linking.getInitialURL)
@@ -123,6 +111,8 @@ export function* navigateToProperScreen() {
     navigate(Screens.SetClock)
   } else if (!e164Number) {
     navigate(Screens.JoinCelo)
+  } else if (!acceptedTerms) {
+    navigate(Screens.RegulatoryTerms)
   } else if (pincodeType === PincodeType.Unset) {
     navigate(Screens.PincodeEducation)
   } else if (!redeemComplete && !account) {
@@ -201,7 +191,6 @@ export function* handleSetAppState(action: SetAppState) {
 
 export function* appSaga() {
   yield spawn(navigateToProperScreen)
-  yield spawn(toggleToProperSyncMode)
   yield spawn(watchDeepLinks)
   yield spawn(watchAppState)
   yield takeLatest(Actions.SET_APP_STATE, handleSetAppState)

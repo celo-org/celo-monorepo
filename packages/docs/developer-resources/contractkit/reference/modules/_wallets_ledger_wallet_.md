@@ -24,7 +24,7 @@
 
 • **CELO_BASE_DERIVATION_PATH**: *string* = CELO_DERIVATION_PATH_BASE.slice(2)
 
-*Defined in [contractkit/src/wallets/ledger-wallet.ts:24](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/ledger-wallet.ts#L24)*
+*Defined in [contractkit/src/wallets/ledger-wallet.ts:12](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/ledger-wallet.ts#L12)*
 
 ## Functions
 
@@ -32,7 +32,7 @@
 
 ▸ **newLedgerWalletWithSetup**(`transport`: any, `derivationPathIndexes?`: number[], `baseDerivationPath?`: undefined | string, `ledgerAddressValidation?`: [AddressValidation](../enums/_wallets_ledger_wallet_.addressvalidation.md)): *Promise‹[LedgerWallet](../classes/_wallets_ledger_wallet_.ledgerwallet.md)›*
 
-*Defined in [contractkit/src/wallets/ledger-wallet.ts:40](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/ledger-wallet.ts#L40)*
+*Defined in [contractkit/src/wallets/ledger-wallet.ts:27](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/ledger-wallet.ts#L27)*
 
 **Parameters:**
 

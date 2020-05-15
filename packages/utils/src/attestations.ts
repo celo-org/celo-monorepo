@@ -1,33 +1,50 @@
 import * as Web3Utils from 'web3-utils'
 import { privateKeyToAddress } from './address'
+import { PhoneNumberUtils } from './phoneNumbers'
 import { Signature, SignatureUtils } from './signatureUtils'
 
-enum IdentifierType {
-  PHONE_NUMBER,
+// Supported identifer types for attestations
+export enum IdentifierType {
+  PHONE_NUMBER = 0,
+  // In the future, other types like usernames or emails could go here
 }
 
-function hashIdentifier(identifier: string, type: IdentifierType) {
+// Each identifer type has a unique prefix to prevent unlikely but possible collisions
+export function getIdentifierPrefix(type: IdentifierType) {
   switch (type) {
     case IdentifierType.PHONE_NUMBER:
-      return Web3Utils.soliditySha3({ type: 'string', value: identifier })
+      return 'tel://'
     default:
-      return ''
+      throw new Error('Unsupported Identifier Type')
+  }
+}
+
+export function hashIdentifier(identifier: string, type: IdentifierType, salt?: string) {
+  switch (type) {
+    case IdentifierType.PHONE_NUMBER:
+      return PhoneNumberUtils.getPhoneHash(identifier, salt)
+    default:
+      throw new Error('Unsupported Identifier Type')
   }
 }
 
 export function getAttestationMessageToSignFromIdentifier(identifier: string, account: string) {
-  return getAttestationMessageToSignFromPhoneHash(
-    hashIdentifier(identifier, IdentifierType.PHONE_NUMBER),
-    account
-  )
-}
-
-export function getAttestationMessageToSignFromPhoneHash(phoneHash: string, account: string) {
   const messageHash: string = Web3Utils.soliditySha3(
-    { type: 'bytes32', value: phoneHash },
+    { type: 'bytes32', value: identifier },
     { type: 'address', value: account }
   )
   return messageHash
+}
+
+export function getAttestationMessageToSignFromPhoneNumber(
+  phoneNumber: string,
+  account: string,
+  phoneSalt?: string
+) {
+  return getAttestationMessageToSignFromIdentifier(
+    hashIdentifier(phoneNumber, IdentifierType.PHONE_NUMBER, phoneSalt),
+    account
+  )
 }
 
 export function base64ToHex(base64String: string) {
@@ -76,8 +93,11 @@ export function extractAttestationCodeFromMessage(message: string) {
 }
 
 export const AttestationUtils = {
+  IdentifierType,
+  getIdentifierPrefix,
+  hashIdentifier,
   getAttestationMessageToSignFromIdentifier,
-  getAttestationMessageToSignFromPhoneHash,
+  getAttestationMessageToSignFromPhoneNumber,
   base64ToHex,
   attestToIdentifier,
   sanitizeMessageBase64,

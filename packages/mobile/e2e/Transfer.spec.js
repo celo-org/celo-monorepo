@@ -45,12 +45,18 @@ describe('Transfer Works', () => {
 
     await element(by.id('NameEntry')).replaceText(EXAMPLE_NAME)
 
-    await element(by.id('CountryNameField')).replaceText(VERIFICATION_COUNTRY)
+    await element(by.id('CountryNameFieldTextInput')).replaceText(VERIFICATION_COUNTRY)
 
     await expect(element(by.id('PhoneNumberField'))).toBeVisible()
     await element(by.id('PhoneNumberField')).replaceText(VERIFICATION_PHONE_NUMBER)
 
     await element(by.id('JoinCeloContinueButton')).tap()
+  })
+
+  it('NUX-Terms', async () => {
+    await element(by.id('scrollView')).scrollTo('bottom')
+    expect(element(by.id('AcceptTermsButton'))).toBeVisible()
+    await element(by.id('AcceptTermsButton')).tap()
   })
 
   it('NUX->Pin', async () => {

@@ -4,7 +4,7 @@ import { Callback, JsonRpcPayload, JsonRpcResponse } from 'web3-core-helpers'
 import { hasProperty, stopProvider } from '../utils/provider-utils'
 import { DefaultRpcCaller, RpcCaller, rpcCallHandler } from '../utils/rpc-caller'
 import { TxParamsNormalizer } from '../utils/tx-params-normalizer'
-import { DefaultWallet } from '../wallets/default-wallet'
+import { LocalWallet } from '../wallets/local-wallet'
 import { Wallet } from '../wallets/wallet'
 
 const debug = debugFactory('kit:provider:connection')
@@ -26,7 +26,7 @@ export class CeloProvider {
   private alreadyStopped: boolean = false
   wallet: Wallet
 
-  constructor(readonly existingProvider: provider, wallet: Wallet = new DefaultWallet()) {
+  constructor(readonly existingProvider: provider, wallet: Wallet = new LocalWallet()) {
     this.rpcCaller = new DefaultRpcCaller(existingProvider)
     this.paramsPopulator = new TxParamsNormalizer(this.rpcCaller)
     this.wallet = wallet

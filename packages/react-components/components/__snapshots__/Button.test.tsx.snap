@@ -1,5 +1,98 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Button renders with minimum props 1`] = `
+<View
+  style={
+    Array [
+      Object {
+        "alignItems": "center",
+        "borderRadius": 3,
+        "flexDirection": "row",
+      },
+      Object {
+        "marginVertical": 10,
+      },
+      Object {
+        "marginBottom": 10,
+      },
+      undefined,
+      Object {
+        "backgroundColor": "#42D689",
+      },
+    ]
+  }
+>
+  <View
+    accessible={true}
+    focusable={true}
+    nativeBackgroundAndroid={
+      Object {
+        "attribute": "selectableItemBackground",
+        "type": "ThemeAttrAndroid",
+      }
+    }
+    onClick={[Function]}
+    onResponderGrant={[Function]}
+    onResponderMove={[Function]}
+    onResponderRelease={[Function]}
+    onResponderTerminate={[Function]}
+    onResponderTerminationRequest={[Function]}
+    onStartShouldSetResponder={[Function]}
+    style={
+      Array [
+        Object {
+          "alignItems": "center",
+          "flex": 1,
+          "justifyContent": "center",
+        },
+        Object {
+          "backgroundColor": "#42D689",
+        },
+        Object {
+          "height": 50,
+        },
+        Object {
+          "borderColor": "#42D689",
+          "borderRadius": 3,
+          "borderWidth": 2,
+        },
+      ]
+    }
+  >
+    <View
+      style={
+        Object {
+          "alignItems": "center",
+          "flex": 1,
+          "flexDirection": "row",
+          "justifyContent": "space-between",
+        }
+      }
+    >
+      <Text
+        style={
+          Array [
+            Object {
+              "fontFamily": "Hind-SemiBold",
+              "fontSize": 16,
+            },
+            Object {
+              "color": "#FFFFFF",
+            },
+            Object {
+              "paddingLeft": 5,
+              "paddingRight": 5,
+            },
+          ]
+        }
+      >
+        TEST_TEXT
+      </Text>
+    </View>
+  </View>
+</View>
+`;
+
 exports[`Button when type is SECONDARY renders 1`] = `
 <View
   style={
@@ -25,7 +118,6 @@ exports[`Button when type is SECONDARY renders 1`] = `
   <View
     accessible={true}
     focusable={true}
-    isTVSelectable={true}
     nativeBackgroundAndroid={
       Object {
         "attribute": "selectableItemBackground",
@@ -122,7 +214,6 @@ exports[`Button when type is TERTIARY renders 1`] = `
   <View
     accessible={true}
     focusable={true}
-    isTVSelectable={true}
     nativeBackgroundAndroid={
       Object {
         "attribute": "selectableItemBackground",

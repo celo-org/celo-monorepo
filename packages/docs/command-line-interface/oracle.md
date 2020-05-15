@@ -1,12 +1,12 @@
 ---
-description: Remove expired oracle reports for a specified token (currently just Celo Dollar, aka: "StableToken")
+description: Remove expired oracle reports for a specified token (currently just Celo Dollar, aka "StableToken")
 ---
 
 ## Commands
 
 ### Remove-expired-reports
 
-Remove expired oracle reports for a specified token (currently just Celo Dollar, aka: "StableToken")
+Remove expired oracle reports for a specified token (currently just Celo Dollar, aka "StableToken")
 
 ```
 USAGE
@@ -18,13 +18,13 @@ ARGUMENTS
 OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the account removing oracle reports
 
-  --ledgerAddresses=ledgerAddresses                  [default: 1] If --userLedger is set, this will get the first N
+  --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
 
   --ledgerConfirmAddress                             Set it to ask confirmation for the address of the transaction from
                                                      the ledger
 
-  --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --userLedger is set, this will get the array of
+  --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
 
@@ -39,7 +39,7 @@ _See code: [packages/cli/src/commands/oracle/remove-expired-reports.ts](https://
 
 ### Report
 
-Report the price of Celo Gold in a specified token (currently just Celo Dollar, aka: "StableToken")
+Report the price of Celo Gold in a specified token (currently just Celo Dollar, aka "StableToken")
 
 ```
 USAGE
@@ -51,13 +51,13 @@ ARGUMENTS
 OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the oracle account
 
-  --ledgerAddresses=ledgerAddresses                  [default: 1] If --userLedger is set, this will get the first N
+  --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
 
   --ledgerConfirmAddress                             Set it to ask confirmation for the address of the transaction from
                                                      the ledger
 
-  --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --userLedger is set, this will get the array of
+  --ledgerCustomAddresses=ledgerCustomAddresses      [default: [0]] If --useLedger is set, this will get the array of
                                                      index addresses for local signing. Example --ledgerCustomAddresses
                                                      "[4,99]"
 

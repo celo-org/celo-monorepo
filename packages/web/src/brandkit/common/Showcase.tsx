@@ -17,6 +17,7 @@ interface Props {
   loading: boolean
   size: number | '100%'
   assetType: AssetTypes
+  variant?: 'circle' | 'circle-white' | 'circle-black'
 }
 
 export default React.memo(function Showcase({
@@ -28,6 +29,7 @@ export default React.memo(function Showcase({
   assetType,
   size,
   ratio,
+  variant,
 }: Props) {
   const trackingData = React.useMemo(() => ({ name: `${name} ${assetType}`, type: assetType }), [
     name,
@@ -54,7 +56,7 @@ export default React.memo(function Showcase({
                 resizeMode="contain"
                 accessibilityLabel={`Preview of ${name}`}
                 source={{ uri: preview }}
-                style={standardStyles.image}
+                style={[standardStyles.image, styles[`variant-${variant}`]]}
               />
             )}
           </AspectRatio>
@@ -81,5 +83,16 @@ const styles = StyleSheet.create({
   pullStart: { paddingLeft: 0 },
   container: {
     justifyContent: 'space-between',
+  },
+  'variant-circle': {
+    borderRadius: 60,
+  },
+  'variant-circle-white': {
+    borderRadius: 60,
+    boxShadow: `inset 0 0 0 1px ${colors.placeholderGray}`,
+  },
+  'variant-circle-black': {
+    borderRadius: 60,
+    backgroundColor: '#000000',
   },
 })

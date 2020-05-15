@@ -4,7 +4,7 @@ env_variables:
   NODE_ENV: "development"
   DEPLOY_ENV: "pilotstaging"
   EXCHANGE_RATES_API: "https://apilayer.net/api"
-  BLOCKSCOUT_API: "https://pilotstaging-blockscout.celo-testnet.org/api"
+  BLOCKSCOUT_API: "https://pilotstaging-blockscout.celo-testnet.org/graphql"
   FIREBASE_DB: "https://celo-org-mobile-pilotstaging.firebaseio.com"
   # TODO Pull addresses from the build artifacts of the network in protocol/build
   FAUCET_ADDRESS: "0x545DEBe3030B570731EDab192640804AC8Cf65CA"

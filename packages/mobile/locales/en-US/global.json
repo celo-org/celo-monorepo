@@ -1,4 +1,5 @@
 {
+  "accept": "Accept",
   "at": "at",
   "yourClockIsBroke": "Your phone date and time is inaccurate",
   "adjustYourClock": "Adjust your clock to read time automatically and try again. If the issue persists, you may need to restart the application",
@@ -112,5 +113,8 @@
   "timeframes": {
     "30d": "30 days"
   },
-  "message": "Message"
+  "message": "Message",
+  "addressLookupFailure": "Failed to look up phone number address",
+  "saltFetchFailure": "Failed to retrieve phone number secret",
+  "saltQuotaExceededError": "Your phone number lookup quota is used up"
 }
