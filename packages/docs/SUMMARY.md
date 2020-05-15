@@ -15,6 +15,7 @@
 - [Alfajores Testnet](getting-started/alfajores-testnet.md)
   - [Using the Mobile Wallet](getting-started/using-the-mobile-wallet.md)
   - [Getting an Account and Funds](getting-started/faucet.md)
+  - [Running a Full Node](getting-started/running-a-full-node-in-alfajores.md)
 - [Glossary](GLOSSARY.md)
 
 ## Celo Gold Holder Guide
@@ -230,6 +231,8 @@
       - [ProposalRecord](developer-resources/contractkit/reference/interfaces/_wrappers_governance_.proposalrecord.md)
       - [ProposalStageDurations](developer-resources/contractkit/reference/interfaces/_wrappers_governance_.proposalstagedurations.md)
       - [UpvoteRecord](developer-resources/contractkit/reference/interfaces/_wrappers_governance_.upvoterecord.md)
+      - [VoteRecord](developer-resources/contractkit/reference/interfaces/_wrappers_governance_.voterecord.md)
+      - [Voter](developer-resources/contractkit/reference/interfaces/_wrappers_governance_.voter.md)
       - [Votes](developer-resources/contractkit/reference/interfaces/_wrappers_governance_.votes.md)
       - [wrappers/LockedGold](developer-resources/contractkit/reference/modules/_wrappers_lockedgold_.md)
       - [LockedGoldWrapper](developer-resources/contractkit/reference/classes/_wrappers_lockedgold_.lockedgoldwrapper.md)
@@ -366,6 +369,8 @@
       - [ProposalRecord](developer-resources/contractkit/reference/interfaces/_wrappers_governance_.proposalrecord.md)
       - [ProposalStageDurations](developer-resources/contractkit/reference/interfaces/_wrappers_governance_.proposalstagedurations.md)
       - [UpvoteRecord](developer-resources/contractkit/reference/interfaces/_wrappers_governance_.upvoterecord.md)
+      - [VoteRecord](developer-resources/contractkit/reference/interfaces/_wrappers_governance_.voterecord.md)
+      - [Voter](developer-resources/contractkit/reference/interfaces/_wrappers_governance_.voter.md)
       - [Votes](developer-resources/contractkit/reference/interfaces/_wrappers_governance_.votes.md)
       - [AccountSlashed](developer-resources/contractkit/reference/interfaces/_wrappers_lockedgold_.accountslashed.md)
       - [LockedGoldConfig](developer-resources/contractkit/reference/interfaces/_wrappers_lockedgold_.lockedgoldconfig.md)

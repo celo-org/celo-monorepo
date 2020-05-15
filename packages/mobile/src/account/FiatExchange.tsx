@@ -30,7 +30,7 @@ const mapStateToProps = (state: RootState): StateProps => {
 
 type Props = StateProps & WithTranslation
 
-const celoCurrencyCode = 'ETH' // TODO switch to cUSD when added to Moonpay
+const celoCurrencyCode = 'CUSD'
 const signMoonpayFirebaseUrl = 'https://us-central1-celo-org-mobile.cloudfunctions.net/signMoonpay'
 
 async function signMoonpayUrl(account: string, localCurrencyCode: LocalCurrencyCode) {

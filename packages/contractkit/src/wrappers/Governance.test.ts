@@ -18,7 +18,7 @@ testWithGanache('Governance Wrapper', (web3: Web3) => {
   const ONE_SEC = 1000
   const kit = newKitFromWeb3(web3)
   const minDeposit = web3.utils.toWei(expConfig.minDeposit.toString(), 'ether')
-  const ONE_USD = web3.utils.toWei('1', 'ether')
+  const ONE_CGLD = web3.utils.toWei('1', 'ether')
 
   let accounts: Address[] = []
   let governance: GovernanceWrapper
@@ -38,7 +38,7 @@ testWithGanache('Governance Wrapper', (web3: Web3) => {
 
     await concurrentMap(4, accounts.slice(0, 4), async (account) => {
       await accountWrapper.createAccount().sendAndWaitForReceipt({ from: account })
-      await lockedGold.lock().sendAndWaitForReceipt({ from: account, value: ONE_USD })
+      await lockedGold.lock().sendAndWaitForReceipt({ from: account, value: ONE_CGLD })
     })
   }, 5 * ONE_SEC)
 
@@ -132,6 +132,7 @@ testWithGanache('Governance Wrapper', (web3: Web3) => {
       const voteWeight = await governance.getVoteWeight(accounts[1])
       const upvotes = await governance.getUpvotes(proposalID)
       expect(upvotes).toEqBigNumber(voteWeight)
+      expect(upvotes).toEqBigNumber(ONE_CGLD)
     })
 
     it('#revokeUpvote', async () => {
@@ -187,6 +188,24 @@ testWithGanache('Governance Wrapper', (web3: Web3) => {
       },
       10 * ONE_SEC
     )
+
+    it('#getVoter', async () => {
+      await proposeFn(accounts[0])
+      await upvoteFn(accounts[1])
+      await approveFn()
+      await voteFn(accounts[2])
+
+      const proposer = await governance.getVoter(accounts[0])
+      expect(proposer.refundedDeposits).toEqBigNumber(minDeposit)
+
+      const upvoter = await governance.getVoter(accounts[1])
+      const expectedUpvoteRecord = { proposalID, upvotes: new BigNumber(ONE_CGLD) }
+      expect(upvoter.upvote).toEqual(expectedUpvoteRecord)
+
+      const voter = await governance.getVoter(accounts[2])
+      const expectedVoteRecord = { proposalID, votes: new BigNumber(ONE_CGLD), value: 'Yes' }
+      expect(voter.votes[0]).toEqual(expectedVoteRecord)
+    })
   })
 
   // Disabled until validator set precompile is available in ganache
