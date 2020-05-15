@@ -6,10 +6,10 @@ import { colors, fonts, textStyles } from 'src/styles'
 const words = ['finance', 'saving', 'education', 'sending', 'giving', 'lending', 'regeneration']
 
 const DURATION = 8510
-const SLIDE_IN_DURATION = 3500
-const PAUSE = 3000
+const SLIDE_IN_DURATION = 2000
+const PAUSE = 6500
 const SLIDE_IN = SLIDE_IN_DURATION / DURATION
-const FADE_OUT_START = (PAUSE + SLIDE_IN_DURATION) / DURATION
+const FADE_OUT_START = PAUSE / DURATION
 const FADE_OUT_STOP = 1
 
 interface Props {
