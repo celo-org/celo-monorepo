@@ -2,7 +2,7 @@ import colors from '@celo/react-components/styles/colors.v2'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet, View } from 'react-native'
-import { useDispatch, useSelector } from 'react-redux'
+import { shallowEqual, useDispatch, useSelector } from 'react-redux'
 import { setBackupDelayed } from 'src/account/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
@@ -12,12 +12,12 @@ import TopBarButton from 'src/navigator/TopBarButton.v2'
 import { RootState } from 'src/redux/reducers'
 import { isBackupTooLate } from 'src/redux/selectors'
 
-interface DelayStateProps {
+interface StateProps {
   backupTooLate: boolean
   backupDelayedTime: number
 }
 
-const mapStateToHeaderProps = (state: RootState): DelayStateProps => {
+const mapStateToProps = (state: RootState): StateProps => {
   return {
     backupTooLate: isBackupTooLate(state),
     backupDelayedTime: state.account.backupDelayedTime,
@@ -25,7 +25,7 @@ const mapStateToHeaderProps = (state: RootState): DelayStateProps => {
 }
 
 export default function DelayButton() {
-  const { backupTooLate, backupDelayedTime } = useSelector(mapStateToHeaderProps)
+  const { backupTooLate, backupDelayedTime } = useSelector(mapStateToProps, shallowEqual)
   const dispatch = useDispatch()
 
   const onPressDelay = React.useCallback(() => {
