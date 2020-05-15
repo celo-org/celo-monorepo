@@ -5,49 +5,49 @@ import { colors, fonts, textStyles } from 'src/styles'
 
 const words = ['finance', 'saving', 'education', 'sending', 'giving', 'lending', 'regeneration']
 
-const textTransitionTime = 800
+const DURATION = 8510
+const SLIDE_IN_DURATION = 3500
+const PAUSE = 3000
 
 const timings = {
   finance: {
     length: 6000,
-    pause: 150,
+    pause: 2000,
   },
   saving: {
-    length: 4900,
-    pause: 150,
+    length: 6000,
+    pause: 2000,
   },
   education: {
-    length: 5000,
-    pause: 150,
+    length: 6000,
+    pause: 2000,
   },
   sending: {
-    length: 5000,
-    pause: 150,
+    length: 6000,
+    pause: 2000,
   },
   giving: {
-    length: 4500,
-    pause: 150,
+    length: 6000,
+    pause: 2000,
   },
   lending: {
-    length: 4700,
-    pause: 150,
+    length: 6000,
+    pause: 2000,
   },
   regeneration: {
-    length: 4800,
-    pause: 150,
+    length: 6000,
+    pause: 2000,
   },
 }
 
 const animations = {}
 
 Object.keys(timings).forEach((key) => {
-  const duration = timings[key].length + timings[key].pause
-  const fadeIn = textTransitionTime / duration
-  const fadeOut = (timings[key].length - textTransitionTime) / duration
-  const fadeOutStop = timings[key].length / duration
-
+  const slideIn = SLIDE_IN_DURATION / DURATION
+  const fadeOut = (PAUSE + SLIDE_IN_DURATION) / DURATION
+  const fadeOutStop = 1
   animations[key] = {
-    duration: `${duration}ms`,
+    duration: `${DURATION}ms`,
     in: [
       {
         '0%': {
@@ -57,7 +57,14 @@ Object.keys(timings).forEach((key) => {
             },
           ],
         },
-        [`${fadeIn * 100}%`]: {
+        '2%': {
+          transform: [
+            {
+              translateX: 0,
+            },
+          ],
+        },
+        [`${slideIn * 100}%`]: {
           transform: [
             {
               translateX: '100%',
@@ -141,8 +148,6 @@ class TextAnimation extends React.PureComponent<Props, State> {
   }
 
   changeWord = () => {
-    const word = words[this.state.currentWord]
-    const duration = timings[word].length + timings[word].pause
     this.timeout = setTimeout(() => {
       if (this.state.currentWord !== words.length - 1) {
         this.setState({ currentWord: (this.state.currentWord + 1) % words.length, initial: false })
@@ -151,7 +156,7 @@ class TextAnimation extends React.PureComponent<Props, State> {
         this.setState({ currentWord: 0 })
         this.changeWord()
       }
-    }, duration)
+    }, DURATION)
   }
 
   render() {
@@ -164,7 +169,7 @@ class TextAnimation extends React.PureComponent<Props, State> {
         }
       : {}
 
-    const fadeIn: ViewStyle = this.props.playing
+    const slideIn: ViewStyle = this.props.playing
       ? {
           animationDuration: animations[word].duration,
           animationKeyframes: animations[word].in,
@@ -172,19 +177,17 @@ class TextAnimation extends React.PureComponent<Props, State> {
       : {}
 
     return (
-      <View style={styles.textContainer}>
-        <>
-          <H2 ariaLevel={'2'} accessibilityRole={'heading'} style={[fonts.h2, styles.letsMake]}>
-            A new story in
+      <View>
+        <H2 ariaLevel={'2'} accessibilityRole={'heading'} style={[fonts.h2, styles.letsMake]}>
+          A new story in
+        </H2>
+        <View style={styles.textContainer}>
+          <View style={[styles.mask, fadeOut]} key={`${this.state.currentWord}-mask1`} />
+          <View style={[styles.mask2, slideIn]} key={`${this.state.currentWord}-mask2`} />
+          <H2 ariaLevel={'2'} accessibilityRole={'heading'} style={[fonts.h2, textStyles.medium]}>
+            {words[this.state.currentWord]}
           </H2>
-          <View>
-            <View style={[styles.mask, fadeOut]} key={`${this.state.currentWord}-mask1`} />
-            <View style={[styles.mask2, fadeIn]} key={`${this.state.currentWord}-mask2`} />
-            <H2 ariaLevel={'2'} accessibilityRole={'heading'} style={[fonts.h2, textStyles.heavy]}>
-              {words[this.state.currentWord]}
-            </H2>
-          </View>
-        </>
+        </View>
       </View>
     )
   }
@@ -193,25 +196,30 @@ class TextAnimation extends React.PureComponent<Props, State> {
 export default TextAnimation
 
 const styles = StyleSheet.create({
-  textContainer: {},
+  textContainer: {
+    display: 'inline-flex',
+    width: 'fit-content',
+  },
   letsMake: {
     zIndex: 1,
   },
   mask: {
-    height: 60,
+    height: 45,
     bottom: 0,
     left: 0,
     right: -30,
-    top: 0,
+    top: 8,
     position: 'absolute',
+    animationFillMode: 'both',
     animationIterationCount: 1,
     backgroundColor: colors.white,
   },
   mask2: {
+    height: 45,
     bottom: 0,
     left: -20,
     right: 0,
-    top: 0,
+    top: 8,
     position: 'absolute',
     backgroundColor: colors.white,
     animationIterationCount: 1,

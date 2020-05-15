@@ -3,6 +3,7 @@ import * as React from 'react'
 interface Props {
   path?: string
   data?: object
+  renderer?: 'svg' | 'canvas'
   loop: boolean
 }
 
@@ -14,7 +15,7 @@ export default class LottieBase extends React.Component<Props> {
   componentDidMount = () => {
     this.animation = lottie.loadAnimation({
       container: this.elementRef.current,
-      renderer: 'svg',
+      renderer: this.props.renderer || 'svg',
       loop: this.props.loop,
       autoplay: true,
       animationData: this.props.data,
