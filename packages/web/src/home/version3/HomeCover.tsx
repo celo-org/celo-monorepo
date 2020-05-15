@@ -25,10 +25,10 @@ export default function HomeCover() {
       tabletStyle={{
         paddingTop: BANNER_HEIGHT + HEADER_HEIGHT,
         marginTop: 90,
-        minHeight: '80vw',
+        minHeight: '80vh',
         marginBottom: 100,
       }}
-      mobileStyle={{ paddingTop: BANNER_HEIGHT + HEADER_HEIGHT, marginTop: 90 }}
+      mobileStyle={{ paddingTop: BANNER_HEIGHT + HEADER_HEIGHT, marginTop: 90, minHeight: '100vh' }}
     >
       <Cell
         span={Spans.full}
