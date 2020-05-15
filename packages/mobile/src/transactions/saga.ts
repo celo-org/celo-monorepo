@@ -56,19 +56,19 @@ export function* sendAndMonitorTransaction<T>(
     yield put(transactionConfirmed(txId))
 
     millisecs = Date.now() - millisecs
-    let ccySent = ''
+    let ccyTicker = ''
     if (currency === CURRENCY_ENUM.GOLD) {
-      ccySent = CURRENCIES[currency].code
+      ccyTicker = CURRENCIES[currency].code
       yield put(fetchGoldBalance())
     } else if (currency === CURRENCY_ENUM.DOLLAR) {
-      ccySent = CURRENCIES[currency].code
+      ccyTicker = CURRENCIES[currency].code
       yield put(fetchDollarBalance())
     } else {
       // Fetch both balances for exchange
       yield put(fetchGoldBalance())
       yield put(fetchDollarBalance())
     }
-    CeloAnalytics.track(CustomEventNames.send_transaction_confirmed, { millisecs, ccySent })
+    CeloAnalytics.track(CustomEventNames.send_transaction_confirmed, { millisecs, ccyTicker })
   } catch (error) {
     Logger.error(TAG + '@sendAndMonitorTransaction', `Error sending tx ${txId}`, error)
     millisecs = Date.now() - millisecs

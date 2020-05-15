@@ -133,7 +133,7 @@ async function initGeth() {
     if (!(await ensureGenesisBlockWritten())) {
       millisecs = Date.now() - initTime
       meanMillisecs = updateAverageMillisecs(meanMillisecs, millisecs, TRACK_EVERY_GETH)
-      if (trackCount % TRACK_EVERY_GETH == 0) {
+      if (trackCount % TRACK_EVERY_GETH === 0) {
         CeloAnalytics.track(CustomEventNames.geth_failed_genesis_block, {
           meanMillisecs,
           millisecs,
@@ -145,7 +145,7 @@ async function initGeth() {
     if (!(await ensureStaticNodesInitialized())) {
       millisecs = Date.now() - initTime
       meanMillisecs = updateAverageMillisecs(meanMillisecs, millisecs, TRACK_EVERY_GETH)
-      if (trackCount % TRACK_EVERY_GETH == 0) {
+      if (trackCount % TRACK_EVERY_GETH === 0) {
         CeloAnalytics.track(CustomEventNames.geth_failed_static_nodes, { meanMillisecs, millisecs })
       }
       trackCount += 1
@@ -163,7 +163,7 @@ async function initGeth() {
         Logger.error('Geth@init/startInstance', 'Geth start reported geth already running')
         millisecs = Date.now() - initTime
         meanMillisecs = updateAverageMillisecs(meanMillisecs, millisecs, TRACK_EVERY_GETH)
-        if (trackCount % TRACK_EVERY_GETH == 0) {
+        if (trackCount % TRACK_EVERY_GETH === 0) {
           CeloAnalytics.track(CustomEventNames.geth_error_already_running, {
             meanMillisecs,
             millisecs,
@@ -175,7 +175,7 @@ async function initGeth() {
         Logger.warn('Geth@init/startInstance', 'Geth start reported chain data error')
         millisecs = Date.now() - initTime
         meanMillisecs = updateAverageMillisecs(meanMillisecs, millisecs, TRACK_EVERY_GETH)
-        if (trackCount % TRACK_EVERY_GETH == 0) {
+        if (trackCount % TRACK_EVERY_GETH === 0) {
           CeloAnalytics.track(CustomEventNames.geth_error_already_running, {
             meanMillisecs,
             millisecs,
@@ -187,7 +187,7 @@ async function initGeth() {
         Logger.error('Geth@init/startInstance', 'Unexpected error starting geth', e)
         millisecs = Date.now() - initTime
         meanMillisecs = updateAverageMillisecs(meanMillisecs, millisecs, TRACK_EVERY_GETH)
-        if (trackCount % TRACK_EVERY_GETH == 0) {
+        if (trackCount % TRACK_EVERY_GETH === 0) {
           CeloAnalytics.track(
             CustomEventNames.geth_error_unexpected,
             { meanMillisecs, millisecs },
