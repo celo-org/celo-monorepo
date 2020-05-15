@@ -11,20 +11,11 @@ import { ScreenSizes, useScreenSize } from 'src/layout/ScreenSize'
 import AspectRatio from 'src/shared/AspectRatio'
 import { BANNER_HEIGHT, HEADER_HEIGHT } from 'src/shared/Styles'
 import { fonts, standardStyles } from 'src/styles'
-
-function canUseWebP() {
-  const elem = document.createElement('canvas')
-
-  if (!!(elem.getContext && elem.getContext('2d'))) {
-    return elem.toDataURL('image/webp').indexOf('data:image/webp') === 0
-  }
-
-  return false
-}
+import { canUseWebP } from 'src/utils/utils'
 
 export default function HomeCover() {
+  // on chrome on desktop the lottie file has weird artifacts so we use webp instead.
   const [canWebP, setCanWebP] = React.useState(false)
-
   React.useEffect(() => {
     setCanWebP(canUseWebP())
   }, [])
