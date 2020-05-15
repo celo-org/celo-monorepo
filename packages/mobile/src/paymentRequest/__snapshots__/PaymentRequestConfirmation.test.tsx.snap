@@ -536,6 +536,7 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
               },
             ]
           }
+          testID="ConfirmButton"
         >
           <View
             style={

@@ -700,6 +700,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
               },
             ]
           }
+          testID="ConfirmButton"
         >
           <View
             style={
@@ -1526,6 +1527,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
               },
             ]
           }
+          testID="ConfirmButton"
         >
           <View
             style={
@@ -2349,6 +2351,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
               },
             ]
           }
+          testID="ConfirmButton"
         >
           <View
             style={

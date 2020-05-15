@@ -295,6 +295,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation 1`]
                     "textAlign": "center",
                   }
                 }
+                testID="Comment"
               >
                 My Reason
               </Text>
@@ -1142,6 +1143,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation 1`]
               },
             ]
           }
+          testID="ConfirmButton"
         >
           <View
             style={
@@ -1563,6 +1565,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
                     "textAlign": "center",
                   }
                 }
+                testID="Comment"
               >
                 My Reason
               </Text>
@@ -2410,6 +2413,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
               },
             ]
           }
+          testID="ConfirmButton"
         >
           <View
             style={
@@ -2831,6 +2835,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
                     "textAlign": "center",
                   }
                 }
+                testID="Comment"
               >
                 My Reason
               </Text>
@@ -3675,6 +3680,7 @@ exports[`SendConfirmation renders correctly for payment request confirmation whe
               },
             ]
           }
+          testID="ConfirmButton"
         >
           <View
             style={
@@ -4096,6 +4102,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
                     "textAlign": "center",
                   }
                 }
+                testID="Comment"
               >
                 My Reason
               </Text>
@@ -4943,6 +4950,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
               },
             ]
           }
+          testID="ConfirmButton"
         >
           <View
             style={
@@ -5364,6 +5372,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                     "textAlign": "center",
                   }
                 }
+                testID="Comment"
               >
                 My Reason
               </Text>
@@ -6211,6 +6220,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
               },
             ]
           }
+          testID="ConfirmButton"
         >
           <View
             style={
@@ -6632,6 +6642,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                     "textAlign": "center",
                   }
                 }
+                testID="Comment"
               >
                 My Reason
               </Text>
@@ -7476,6 +7487,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
               },
             ]
           }
+          testID="ConfirmButton"
         >
           <View
             style={

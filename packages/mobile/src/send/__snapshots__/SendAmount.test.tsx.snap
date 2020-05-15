@@ -279,6 +279,7 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
                 "padding": 8,
               }
             }
+            testID="AmountInput"
             title="$"
             underlineColorAndroid="transparent"
             validator="decimal"
@@ -381,6 +382,7 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
                 "padding": 8,
               }
             }
+            testID="CommentInput"
             title="global:for"
             underlineColorAndroid="transparent"
             value=""
