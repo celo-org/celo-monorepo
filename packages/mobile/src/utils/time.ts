@@ -8,6 +8,8 @@ import * as _ from 'lodash'
 import clockSync from 'react-native-clock-sync'
 import i18n from 'src/i18n'
 import Logger from 'src/utils/Logger'
+import { CustomEventNames } from 'src/analytics/constants'
+import CeloAnalytics from 'src/analytics/CeloAnalytics'
 
 const clock = new clockSync({})
 
@@ -324,4 +326,21 @@ export function updateMeanMillisecs(meanMillisecs: number, millisecs: number, on
   const multiplier = meanMillisecs > 0.0 ? meanMillisecs / onceEvery : 1.0
   meanMillisecs = meanMillisecs * (1.0 - multiplier) + multiplier * millisecs
   return meanMillisecs
+}
+
+// warning: this function has side-effects on module
+//          vars meanMillisecs and trackCount.
+export const trackMeanMillisecs = (
+  initTime: number,
+  meanMillisecs: number,
+  trackCount: number,
+  onceEvery: number,
+  eventName: CustomEventNames
+) => {
+  const millisecs = Date.now() - initTime
+  meanMillisecs = updateMeanMillisecs(meanMillisecs, millisecs, onceEvery)
+  if (trackCount % onceEvery === 0) {
+    CeloAnalytics.track(eventName, { meanMillisecs, millisecs })
+  }
+  trackCount += 1
 }

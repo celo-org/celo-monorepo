@@ -4,13 +4,12 @@ import { Platform } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 import * as RNFS from 'react-native-fs'
 import RNGeth from 'react-native-geth'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { DEFAULT_TESTNET } from 'src/config'
 import networkConfig from 'src/geth/networkConfig'
 import Logger from 'src/utils/Logger'
 import FirebaseLogUploader from 'src/utils/LogUploader'
-import { updateMeanMillisecs } from 'src/utils/time'
+import { trackMeanMillisecs } from 'src/utils/time'
 
 let gethLock = false
 let gethInstance: typeof RNGeth | null = null
@@ -20,23 +19,6 @@ let trackCount = 0
 
 // track geth setup first time and then only one every so many events.
 const TRACK_EVERY_GETH = 100
-
-// warning: this functions has side-effects on module
-//          vars meanMillisecs and trackCount.
-export const trackMeanMillisecs = (
-  initTime: number,
-  meanMillisecs: number,
-  trackCount: number,
-  onceEvery: number,
-  eventName: CustomEventNames
-) => {
-  const millisecs = Date.now() - initTime
-  meanMillisecs = updateMeanMillisecs(meanMillisecs, millisecs, onceEvery)
-  if (trackCount % onceEvery === 0) {
-    CeloAnalytics.track(eventName, { meanMillisecs, millisecs })
-  }
-  trackCount += 1
-}
 
 export const FailedToFetchStaticNodesError = new Error(
   'Failed to fetch static nodes from Google storage'
