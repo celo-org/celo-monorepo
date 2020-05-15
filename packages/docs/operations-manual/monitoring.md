@@ -42,19 +42,34 @@ Note that metric name separators differ between these endpoints.
 
 All metrics are soft-state and are cleared when the process is restarted.
 
-<!--
-### System health metrics
+### Memory metrics
 
-Various metrics to monitor [Golang mstats](https://godoc.org/github.com/go-graphite/carbonzipper/mstats)
+Memory metrics derived from [mstats](https://godoc.org/github.com/go-graphite/carbonzipper/mstats):
 
-- `system_memory_used`: Memory used by the system 
-- `system_memory_allocs`: Memory allocations made
-- `system_memory_held`: Memory used by the Celo Blockchain process
--->
+- `system_memory_held`: Gauge of virtual address space allocated by the Celo Blockchain process, measured in bytes.
+- `system_memory_used`: Gauge of Memory in use by the Celo Blockchain process, measured as bytes of allocated heap objects.
+- `system_memory_allocs`: Counter for memory allocations made, measured in bytes. Consider monitoring the rate.
+- `system_memory_pauses`: Counter for stop-the-world Garbage Collection pauses, measured in nanoseconds. Consider monitoring the rate.
 
-### Network and blockchain metrics
+### CPU metrics
+
+- `system_cpu_sysload`: Gauge of load average for the system.
+- `system_cpu_syswait`: Gauge of IO wait time for the system.
+- `system_cpu_procload`: Gauge of load average for the Celo Blockchain process.
+
+### Network metrics
 
 - `p2p_peers`: The number of connected peers. This should remain at exactly `1` for a proxied validator (just its proxy). It should remain at a relatively steady level for proxy nodes.
+
+- `p2p_ingress`: Counter for total inbound traffic, measured in bytes. Consider monitoring the rate.
+
+- `p2p_egress`: Counter for total outbound traffic, measured in bytes. Consider monitoring the rate.
+
+- `p2p_dials`: Counter for outbound connection attempts. Consider monitoring the rate.
+
+- `p2p_serves`: Counter for accepted inbound connection attempts. Consider monitoring the rate.
+
+### Blockchain metrics
 
 - `chain_inserts_count`: The count of insertions of new blocks into this node's chain. The rate of this metric should be close to constant at `0.2` /second.
 
@@ -64,11 +79,11 @@ A number of metrics are tracked for the parent of the last sealed block received
 
 - `consensus_istanbul_blocks_elected`: Counts the number of blocks for which this validator has been elected
 
-- `consensus_istanbul_blocks_signedbyus`: Counts the blocks for which this validator was elected and its signature was included in the seal. This means the validator completed consensus correctly, sent a `COMMIT`, its commit was received in time to make the seal of the parent received by the next proposer, or was received directly by the next proposer itself, and so the block will not count as downtime.
+- `consensus_istanbul_blocks_signedbyus`: Counts the blocks for which this validator was elected and its signature was included in the seal. This means the validator completed consensus correctly, sent a `COMMIT`, its commit was received in time to make the seal of the parent received by the next proposer, or was received directly by the next proposer itself, and so the block will not count as downtime. Consider monitoring the rate.
 
-- `consensus_istanbul_blocks_missedbyus`: Counts the blocks for which this validator was elected but not included in the child's parent seal (this block could count towards downtime if 12 successive blocks are missed)
+- `consensus_istanbul_blocks_missedbyus`: Counts the blocks for which this validator was elected but not included in the child's parent seal (this block could count towards downtime if 12 successive blocks are missed).  Consider monitoring the rate.
 
-- `consensus_istanbul_blocks_proposedbyus`: Counts the blocks for which this validator was elected and for which a block it proposed was succesfully included in the chain. (_Future release_)
+- `consensus_istanbul_blocks_proposedbyus`: (_Future release_) Counts the blocks for which this validator was elected and for which a block it proposed was succesfully included in the chain. Consider monitoring the rate.
 
 ### Consensus metrics
 
@@ -84,7 +99,7 @@ A number of metrics are tracked for the parent of the last sealed block received
 
 - `consensus_istanbul_blocks_missedrounds`: Sum of the `round` included in the `parentAggregatedSeal` for the blocks seen. That is, the cumulative number of consensus round changes these blocks needed to make to get to this agreed block. This metric is only incremented when a block is succesfully produced after consensus rounds fails, indicating down validators or network issues.
 
-- `consensus_istanbul_blocks_validators`: Total number of validators eligible to sign blocks. (_Future release_)
+- `consensus_istanbul_blocks_validators`: (_Future release_) Total number of validators eligible to sign blocks.
 
 - `consensus_istanbul_core_consensus_count`: Count and timer for succesful completions of consensus (Use `quantile` tag to find percentiles: `0.5`, `0.75`, `0.95`, `0.99`, `0.999`)
 
@@ -141,7 +156,7 @@ It also exposes the following Prometheus format metrics at `/metrics`:
 
 ### Test Endpoint
 
-Attestation Service provides a test endpoint. 
+Attestation Service provides a test endpoint.
 
 You can run the following command ([reference](../command-line-interface/identity.md#test-attestation-service)) to test an Attestation Service and send an SMS to yourself:
 
