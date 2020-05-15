@@ -17,14 +17,28 @@ export default function HomeCover() {
   const { isMobile, screen, isDesktop } = useScreenSize()
   return (
     <GridRow
-      allStyle={{ paddingTop: BANNER_HEIGHT + HEADER_HEIGHT }}
-      tabletStyle={standardStyles.sectionMarginTablet}
-      desktopStyle={standardStyles.sectionMargin}
+      desktopStyle={{
+        paddingTop: BANNER_HEIGHT + HEADER_HEIGHT,
+        maxHeight: '100vw',
+        minHeight: '100vh',
+      }}
+      tabletStyle={{
+        paddingTop: BANNER_HEIGHT + HEADER_HEIGHT,
+        marginTop: 90,
+        minHeight: '80vw',
+        marginBottom: 100,
+      }}
+      mobileStyle={{ paddingTop: BANNER_HEIGHT + HEADER_HEIGHT, marginTop: 90 }}
     >
-      <Cell span={Spans.full} style={[styles.container, !isMobile && standardStyles.row]}>
-        <View
-          style={[styles.animationHolder, standardStyles.blockMarginTablet, getplacement(screen)]}
-        >
+      <Cell
+        span={Spans.full}
+        style={[
+          styles.container,
+          isDesktop && { alignSelf: 'center' },
+          !isMobile && standardStyles.row,
+        ]}
+      >
+        <View style={[styles.animationHolder, getplacement(screen)]}>
           <AspectRatio ratio={970 / 270}>
             {isDesktop ? (
               <Image source={changeStoryGif} style={standardStyles.image} />
@@ -58,19 +72,22 @@ function getplacement(screen: ScreenSizes) {
 const styles = StyleSheet.create({
   animationHolder: {
     flex: 2,
-    minWidth: 300,
-    paddingRight: 20,
+    minWidth: 350,
+    paddingRight: 40,
     zIndex: 10,
   },
   animationPlaceDesktop: {
+    marginTop: 30,
+    paddingTop: '10%',
     transform: [
       {
         // @ts-ignore
-        translateX: '-7%',
+        translateX: '-8%',
       },
     ],
   },
   animationPlaceTablet: {
+    paddingTop: '10%',
     transform: [
       {
         translateX: -80,
@@ -86,9 +103,9 @@ const styles = StyleSheet.create({
   },
   contentHolder: {
     flexBasis: 370,
+    maxWidth: '85vw',
   },
   container: {
-    paddingVertical: 50,
     flexWrap: 'wrap',
   },
 })

@@ -70,7 +70,7 @@ export default React.memo(function EmailForm({
                     isDarkMode ? standardStyles.inputDarkFocused : standardStyles.inputFocused
                   }
                   onChange={onInput}
-                  placeholder={t('common:email') + '*'}
+                  placeholder={'saluton@celo.org'}
                   placeholderTextColor={
                     isDarkMode ? colors.placeholderDarkMode : colors.placeholderGray
                   }
