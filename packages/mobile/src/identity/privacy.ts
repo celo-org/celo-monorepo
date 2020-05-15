@@ -189,7 +189,8 @@ export function getSaltFromThresholdSignature(base64Sig: string) {
   return crypto
     .createHash('sha256')
     .update(sigBuf)
-    .digest('hex')
+    .digest('base64')
+    .slice(0, 10)
 }
 
 // Get the wallet user's own phone hash details if they're cached

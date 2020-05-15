@@ -409,7 +409,7 @@ export class SendAmount extends React.Component<Props, State> {
             title={t('global:for')}
             placeholder={t('groceriesRent')}
             value={this.state.reason}
-            maxLength={70}
+            maxLength={MAX_COMMENT_LENGTH}
             onChangeText={this.onReasonChanged}
           />
           <View style={style.feeContainer}>
