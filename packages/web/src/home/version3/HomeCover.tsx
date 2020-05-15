@@ -2,7 +2,7 @@ import * as React from 'react'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import { H4 } from 'src/fonts/Fonts'
 import EmailForm from 'src/forms/EmailForm'
-import changeStoryGif from 'src/home/change-story/Change-the-story.gif'
+import changeStoryWebP from 'src/home/change-story/change-story.webp'
 import ChangeStory from 'src/home/change-story/ChangeStory'
 import TextAnimation from 'src/home/TextAnimation'
 import { NameSpaces, useTranslation } from 'src/i18n'
@@ -12,9 +12,26 @@ import AspectRatio from 'src/shared/AspectRatio'
 import { BANNER_HEIGHT, HEADER_HEIGHT } from 'src/shared/Styles'
 import { fonts, standardStyles } from 'src/styles'
 
+function canUseWebP() {
+  const elem = document.createElement('canvas')
+
+  if (!!(elem.getContext && elem.getContext('2d'))) {
+    return elem.toDataURL('image/webp').indexOf('data:image/webp') === 0
+  }
+
+  return false
+}
+
 export default function HomeCover() {
+  const [canWebP, setCanWebP] = React.useState(false)
+
+  React.useEffect(() => {
+    setCanWebP(canUseWebP())
+  }, [])
+
   const { t } = useTranslation(NameSpaces.home)
   const { isMobile, screen, isDesktop } = useScreenSize()
+
   return (
     <GridRow
       desktopStyle={{
@@ -40,8 +57,8 @@ export default function HomeCover() {
       >
         <View style={[styles.animationHolder, getplacement(screen)]}>
           <AspectRatio ratio={970 / 270}>
-            {isDesktop ? (
-              <Image source={changeStoryGif} style={standardStyles.image} />
+            {isDesktop && canWebP ? (
+              <Image source={changeStoryWebP} style={standardStyles.image} />
             ) : (
               <ChangeStory />
             )}
