@@ -34,7 +34,7 @@ export function* sendAndMonitorTransaction<T>(
   account: string,
   currency?: CURRENCY_ENUM
 ) {
-  let txTime = Date.now()
+  let millisecs = Date.now()
   try {
     Logger.debug(TAG + '@sendAndMonitorTransaction', `Sending transaction with id: ${txId}`)
 
@@ -55,31 +55,23 @@ export function* sendAndMonitorTransaction<T>(
     yield call(wrapSendTransactionWithRetry, txId, sendTxMethod)
     yield put(transactionConfirmed(txId))
 
-    txTime = Date.now() - txTime
+    millisecs = Date.now() - millisecs
     if (currency === CURRENCY_ENUM.GOLD) {
-      Logger.debug(
-        TAG + '@sendAndMonitorTransaction',
-        `send_gold_transaction_confirmed Performance (ms) = ` + txTime.toString()
-      )
-      CeloAnalytics.track(CustomEventNames.send_gold_transaction_confirmed, { txTime })
+      CeloAnalytics.track(CustomEventNames.send_gold_transaction_confirmed, { millisecs })
       yield put(fetchGoldBalance())
     } else if (currency === CURRENCY_ENUM.DOLLAR) {
-      Logger.debug(
-        TAG + '@sendAndMonitorTransaction',
-        `send_dollar_transaction_confirmed Performance (ms) = ` + txTime.toString()
-      )
-      CeloAnalytics.track(CustomEventNames.send_dollar_transaction_confirmed, { txTime })
+      CeloAnalytics.track(CustomEventNames.send_dollar_transaction_confirmed, { millisecs })
       yield put(fetchDollarBalance())
     } else {
       // Fetch both balances for exchange
       yield put(fetchGoldBalance())
       yield put(fetchDollarBalance())
     }
-    CeloAnalytics.track(CustomEventNames.send_transaction_confirmed, { txTime })
+    CeloAnalytics.track(CustomEventNames.send_transaction_confirmed, { millisecs })
   } catch (error) {
     Logger.error(TAG + '@sendAndMonitorTransaction', `Error sending tx ${txId}`, error)
-    txTime = Date.now() - txTime
-    CeloAnalytics.track(CustomEventNames.send_transaction_failed, { txTime })
+    millisecs = Date.now() - millisecs
+    CeloAnalytics.track(CustomEventNames.send_transaction_failed, { millisecs })
     yield put(removeStandbyTransaction(txId))
     yield put(showError(ErrorMessages.TRANSACTION_FAILED))
   }
