@@ -20,7 +20,7 @@ import {
   SVG,
   validateRecipientAddressSuccess,
 } from 'src/send/actions'
-import { TransactionData } from 'src/send/reducers'
+import { TransactionDataInput } from 'src/send/SendAmount'
 import Logger from 'src/utils/Logger'
 
 export enum BarcodeTypes {
@@ -56,7 +56,7 @@ export function* handleBarcode(
   addressToE164Number: AddressToE164NumberType,
   recipientCache: NumberToRecipient,
   e164NumberToAddress: E164NumberToAddressType,
-  secureSendTxData?: TransactionData
+  secureSendTxData?: TransactionDataInput
 ) {
   let data: { address: string; e164PhoneNumber: string; displayName: string } | undefined
 

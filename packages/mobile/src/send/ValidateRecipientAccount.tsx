@@ -21,7 +21,7 @@ import { Screens } from 'src/navigator/Screens'
 import { Recipient } from 'src/recipients/recipient'
 import { RootState } from 'src/redux/reducers'
 import { validateRecipientAddress } from 'src/send/actions'
-import { TransactionData } from 'src/send/reducers'
+import { TransactionDataInput } from 'src/send/SendAmount'
 
 const FULL_ADDRESS_PLACEHOLDER = '0xf1b1d5a6e7728g309c4a025k122d71ad75a61976'
 const PARTIAL_ADDRESS_PLACEHOLDER = ['k', '0', 'F', '4']
@@ -34,7 +34,7 @@ interface OwnProps {
 
 interface StateProps {
   recipient: Recipient
-  transactionData: TransactionData
+  transactionData: TransactionDataInput
   fullValidationRequired: boolean
   isValidRecipient: boolean
   isPaymentRequest: true | undefined

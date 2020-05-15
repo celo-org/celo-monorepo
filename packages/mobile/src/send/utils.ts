@@ -2,25 +2,17 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import { FeeType } from 'src/fees/actions'
 import { E164NumberToAddressType, RecipientVerificationStatus } from 'src/identity/reducer'
 import { Recipient, RecipientKind } from 'src/recipients/recipient'
-import { ConfirmationInput, SecureSendPhoneNumberMapping, TransactionData } from 'src/send/reducers'
+import { SecureSendPhoneNumberMapping } from 'src/send/reducers'
+import { TransactionDataInput } from 'src/send/SendAmount'
+import { ConfirmationInput } from 'src/send/SendConfirmation'
 import Logger from 'src/utils/Logger'
-
-export const formatDisplayName = (displayName: string) => {
-  // Default displayName is "Mobile #" when no contact is saved
-  // To make the copy nicer, we make the displayName "your contact" isntead
-  if (displayName === 'Mobile #') {
-    return { displayName: 'your contact', displayNameCapitalized: 'Your contract' }
-  }
-
-  return { displayName, displayNameCapitalized: displayName }
-}
 
 export const getAddressFromPhoneNumber = (
   e164Number: string,
   e164NumberToAddress: E164NumberToAddressType,
   secureSendPhoneNumberMapping: SecureSendPhoneNumberMapping
 ): string | null | undefined => {
-  const TAG = 'send/utils/getAddressFromPhoneNumber'
+  const TAG = 'send/utils'
   try {
     const addresses = e164NumberToAddress[e164Number]
 
@@ -57,7 +49,7 @@ export const getAddressFromPhoneNumber = (
 }
 
 export const getConfirmationInput = (
-  transactionData: TransactionData,
+  transactionData: TransactionDataInput,
   e164NumberToAddress: E164NumberToAddressType,
   secureSendPhoneNumberMapping: SecureSendPhoneNumberMapping
 ): ConfirmationInput => {

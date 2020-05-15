@@ -1,5 +1,4 @@
-import BigNumber from 'bignumber.js'
-import { TokenTransactionType } from 'src/apollo/types'
+import dotProp from 'dot-prop-immutable'
 import { areRecipientsEquivalent, Recipient } from 'src/recipients/recipient'
 import { getRehydratePayload, REHYDRATE, RehydrateAction } from 'src/redux/persist-helper'
 import { RootState } from 'src/redux/reducers'
@@ -7,23 +6,6 @@ import { Actions, ActionTypes } from 'src/send/actions'
 
 // Sets the limit of recent recipients we want to store
 const RECENT_RECIPIENTS_TO_STORE = 8
-
-export interface TransactionData {
-  recipient: Recipient
-  amount: BigNumber
-  reason: string
-  type: TokenTransactionType
-  firebasePendingRequestUid?: string | null
-}
-
-export interface ConfirmationInput {
-  recipient: Recipient
-  amount: BigNumber
-  reason: string
-  recipientAddress: string | null | undefined
-  type: TokenTransactionType
-  firebasePendingRequestUid?: string | null
-}
 
 export interface SecureSendPhoneNumberMapping {
   [e164Number: string]: {
@@ -80,24 +62,19 @@ export const sendReducer = (
         isValidRecipient: false,
       }
     case Actions.VALIDATE_RECIPIENT_ADDRESS_SUCCESS:
-      // Overwrite the previous mapping every time a new one is validated
-      // const newSecureSendMapping = dotProp.set(state, `send.secureSendPhoneNumberMapping.${action.e164Number}`, {
-      //   address: action.validatedAddress,
-      //   addressValidationRequired: false,
-      //   fullValidationRequired: false,
-      // })
-
-      const { secureSendPhoneNumberMapping } = state
-      secureSendPhoneNumberMapping[action.e164Number] = {
-        address: action.validatedAddress,
-        addressValidationRequired: false,
-        fullValidationRequired: false,
-      }
-
       return {
         ...state,
         isValidRecipient: true,
-        secureSendPhoneNumberMapping,
+        // Overwrite the previous mapping every time a new one is validated
+        secureSendPhoneNumberMapping: dotProp.set(
+          state.secureSendPhoneNumberMapping,
+          `${action.e164Number}`,
+          {
+            address: action.validatedAddress,
+            addressValidationRequired: false,
+            fullValidationRequired: false,
+          }
+        ),
       }
     case Actions.VALIDATE_RECIPIENT_ADDRESS_FAILURE:
       return {
@@ -105,22 +82,19 @@ export const sendReducer = (
         isValidRecipient: false,
       }
     case Actions.REQUIRE_SECURE_SEND:
-      // const newSecureSendMapping = dotProp.set(state, `send.secureSendPhoneNumberMapping.${action.e164Number}`, {
-      //   address: action.validatedAddress,
-      //   addressValidationRequired: false,
-      //   fullValidationRequired: false,
-      // })
-      const newSecureSendMapping = state.secureSendPhoneNumberMapping
-      newSecureSendMapping[action.e164Number] = {
-        address: undefined,
-        addressValidationRequired: true,
-        fullValidationRequired: action.fullValidationRequired,
-      }
-
       return {
         ...state,
         isValidRecipient: false,
-        secureSendPhoneNumberMapping: newSecureSendMapping,
+        // Overwrite the previous mapping every time a new one is validated
+        secureSendPhoneNumberMapping: dotProp.set(
+          state.secureSendPhoneNumberMapping,
+          `${action.e164Number}`,
+          {
+            address: undefined,
+            addressValidationRequired: true,
+            fullValidationRequired: action.fullValidationRequired,
+          }
+        ),
       }
     default:
       return state

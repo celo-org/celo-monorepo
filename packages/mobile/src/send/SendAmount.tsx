@@ -52,11 +52,18 @@ import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { Recipient } from 'src/recipients/recipient'
 import { RootState } from 'src/redux/reducers'
-import { TransactionData } from 'src/send/reducers'
 import { checkIfAddressValidationRequired, getFeeType, getVerificationStatus } from 'src/send/utils'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { fetchDollarBalance } from 'src/stableToken/actions'
 import { withDecimalSeparator } from 'src/utils/withDecimalSeparator'
+
+export interface TransactionDataInput {
+  recipient: Recipient
+  amount: BigNumber
+  reason: string
+  type: TokenTransactionType
+  firebasePendingRequestUid?: string | null
+}
 
 const AmountInput = withDecimalSeparator(
   withTextInputLabeling<ValidatedTextInputProps<DecimalValidatorProps>>(ValidatedTextInput)
@@ -186,7 +193,7 @@ export class SendAmount extends React.Component<Props, State> {
     }
   }
 
-  getTransactionData = (type: TokenTransactionType): TransactionData => ({
+  getTransactionData = (type: TokenTransactionType): TransactionDataInput => ({
     recipient: this.props.recipient,
     amount: this.getDollarsAmount(),
     reason: this.state.reason,
@@ -215,7 +222,7 @@ export class SendAmount extends React.Component<Props, State> {
       return
     }
 
-    let transactionData: TransactionData
+    let transactionData: TransactionDataInput
 
     if (recipientVerificationStatus === RecipientVerificationStatus.VERIFIED) {
       transactionData = this.getTransactionData(TokenTransactionType.Sent)

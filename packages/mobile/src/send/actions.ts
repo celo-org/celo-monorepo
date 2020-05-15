@@ -2,7 +2,7 @@ import { E164Number } from '@celo/utils/lib/io'
 import BigNumber from 'bignumber.js'
 import { InviteBy } from 'src/invite/actions'
 import { Recipient } from 'src/recipients/recipient'
-import { TransactionData } from 'src/send/reducers'
+import { TransactionDataInput } from 'src/send/SendAmount'
 import { Svg } from 'svgs'
 
 export interface QrCode {
@@ -29,7 +29,7 @@ export interface HandleBarcodeDetectedAction {
   type: Actions.BARCODE_DETECTED
   data: QrCode
   scanIsForSecureSend?: true
-  transactionData?: TransactionData
+  transactionData?: TransactionDataInput
 }
 
 export interface StoreLatestInRecentsAction {
@@ -97,7 +97,7 @@ export const storeLatestInRecents = (recipient: Recipient): StoreLatestInRecents
 export const handleBarcodeDetected = (
   data: QrCode,
   scanIsForSecureSend?: true,
-  transactionData?: TransactionData
+  transactionData?: TransactionDataInput
 ): HandleBarcodeDetectedAction => ({
   type: Actions.BARCODE_DETECTED,
   data,

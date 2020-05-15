@@ -119,7 +119,11 @@ export function* fetchAddressesAndValidateSaga({ e164Number }: FetchAddressesAnd
       contractKit.contracts.getAttestations,
     ])
 
-    const addresses: string[] | null = yield call(getAddresses, e164Number, attestationsWrapper)
+    // const addresses: string[] | null = yield call(getAddresses, e164Number, attestationsWrapper)
+    const addresses = [
+      '0xd95cd73a485ded85460daafeb3e8d66afa4091d8',
+      '0xd95cd73a485ded85460daafeb3e8d66afa4091d7',
+    ]
 
     const e164NumberToAddressUpdates: E164NumberToAddressType = {}
     const addressToE164NumberUpdates: AddressToE164NumberType = {}

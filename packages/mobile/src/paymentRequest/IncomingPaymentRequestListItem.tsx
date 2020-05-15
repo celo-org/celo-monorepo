@@ -14,7 +14,7 @@ import { unknownUserIcon } from 'src/images/Images'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { getRecipientThumbnail, Recipient } from 'src/recipients/recipient'
-import { TransactionData } from 'src/send/reducers'
+import { TransactionDataInput } from 'src/send/SendAmount'
 import Logger from 'src/utils/Logger'
 
 interface OwnProps {
@@ -37,7 +37,7 @@ export class IncomingPaymentRequestListItem extends React.Component<Props> {
   onPay = () => {
     const { id, amount, comment: reason, requester: recipient, validationDetails } = this.props
 
-    const transactionData: TransactionData = {
+    const transactionData: TransactionDataInput = {
       reason,
       recipient,
       amount: new BigNumber(amount),

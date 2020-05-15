@@ -19,7 +19,7 @@ import { Screens } from 'src/navigator/Screens'
 import NotAuthorizedView from 'src/qrcode/NotAuthorizedView'
 import { RootState } from 'src/redux/reducers'
 import { handleBarcodeDetected } from 'src/send/actions'
-import { TransactionData } from 'src/send/reducers'
+import { TransactionDataInput } from 'src/send/SendAmount'
 import Logger from 'src/utils/Logger'
 
 type Navigation = NavigationFocusInjectedProps['navigation']
@@ -30,7 +30,7 @@ interface OwnProps {
 
 interface StateProps {
   scanIsForSecureSend: true | undefined
-  transactionData: TransactionData
+  transactionData: TransactionDataInput
   isFocused: boolean
 }
 

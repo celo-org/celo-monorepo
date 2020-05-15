@@ -17,8 +17,8 @@ import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { getRecipientThumbnail, Recipient } from 'src/recipients/recipient'
 import { RootState } from 'src/redux/reducers'
-import { TransactionData } from 'src/send/reducers'
-import { formatDisplayName } from 'src/send/utils'
+import { TransactionDataInput } from 'src/send/SendAmount'
+import { formatDisplayName } from 'src/utils/formatting'
 
 const AVATAR_SIZE = 120
 const QR_ICON_SIZE = 24
@@ -30,7 +30,7 @@ interface OwnProps {
 }
 interface StateProps {
   recipient: Recipient
-  transactionData: TransactionData
+  transactionData: TransactionDataInput
   fullValidationRequired: boolean
   displayName: string
   displayNameCapitalized: string
