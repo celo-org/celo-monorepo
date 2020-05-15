@@ -1,6 +1,6 @@
 {
   "name": "@celo/contractkit",
-  "version": "0.4.5-dev",
+  "version": "0.4.6",
   "description": "Celo's ContractKit to interact with Celo network",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
@@ -30,7 +30,7 @@
     "@azure/identity": "^1.0.2",
     "@azure/keyvault-keys": "^4.0.2",
     "@azure/keyvault-secrets": "^4.0.2",
-    "@celo/utils": "0.1.15-dev",
+    "@celo/utils": "file:../utils",
     "@ledgerhq/hw-app-eth": "^5.11.0",
     "@ledgerhq/hw-transport": "^5.11.0",
     "bignumber.js": "^9.0.0",
@@ -52,9 +52,9 @@
     "web3-utils": "1.2.4"
   },
   "devDependencies": {
-    "@celo/dev-utils": "0.0.1-dev",
+    "@celo/dev-utils": "file:../dev-utils",
     "@celo/ganache-cli": "git+https://github.com/celo-org/ganache-cli.git#25ff8dd",
-    "@celo/protocol": "1.0.0",
+    "@celo/protocol": "file:../protocol",
     "@types/debug": "^4.1.5",
     "@types/ethereumjs-util": "^5.2.0",
     "@types/secp256k1": "^3.5.3",

@@ -1,6 +1,6 @@
 {
   "name": "@celo/dev-utils",
-  "version": "0.0.1-dev",
+  "version": "0.0.1",
   "description": "util package for celo packages that should only be a devDependency",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",

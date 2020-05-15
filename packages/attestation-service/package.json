@@ -27,8 +27,8 @@
     "lint": "tslint -c tslint.json --project ."
   },
   "dependencies": {
-    "@celo/contractkit": "0.4.5-dev",
-    "@celo/utils": "0.1.15-dev",
+    "@celo/contractkit": "file:../contractkit",
+    "@celo/utils": "file:../utils",
     "bignumber.js": "^9.0.0",
     "body-parser": "1.19.0",
     "bunyan": "1.8.12",
@@ -55,7 +55,7 @@
     "yargs": "13.3.0"
   },
   "devDependencies": {
-    "@celo/protocol": "1.0.0",
+    "@celo/protocol": "file:../protocol",
     "@types/bunyan": "1.8.4",
     "@types/dotenv": "4.0.3",
     "@types/debug": "^4.1.5",
