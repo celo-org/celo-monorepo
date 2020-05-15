@@ -93,7 +93,7 @@
   "confirmAccountNumber": {
     "title": "Confirma el número de cuenta",
     "body1Partial": "Por favor solicita a {{displayName}} los últimos cuatro dígitos de su número de cuenta e ingrésalos ",
-    "body1PFull": "Por favor solicita a {{displayName}} su número de cuenta e ingrésalo",
+    "body1Full": "Por favor solicita a {{displayName}} su número de cuenta e ingrésalo",
     "body2Partial": "Por razones de seguridad, por favor no utilices mensajes de texto (SMS). Se recomienda altamente preguntar en persona o por teléfono",
     "body2Full": "Por razones de seguridad, por favor no utilices mensajes de texto (SMS). Se recomienda altamente preguntar en persona o por teléfono a través de WhastApp, Messenger o por correo electrónico",
     "help": "Ayude a {{displayName}} a encontrar su número de cuenta"
