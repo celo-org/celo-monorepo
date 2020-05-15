@@ -26,7 +26,7 @@ interface StateProps {
 const mapStateToProps = (state: RootState): StateProps => {
   return {
     localCurrency: getLocalCurrencyCode(state),
-    account: state.web3.account,
+    account: state.geth.account,
   }
 }
 

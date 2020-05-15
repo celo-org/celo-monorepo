@@ -4,7 +4,7 @@ import { call } from 'redux-saga/effects'
 import { setTobinTax } from 'src/exchange/actions'
 import { doFetchTobinTax } from 'src/exchange/saga'
 import { CURRENCY_ENUM } from 'src/geth/consts'
-import { getConnectedAccount } from 'src/web3/saga'
+import { getConnectedAccount } from 'src/geth/saga'
 
 const SELL_AMOUNT = 50 // in dollars/gold (not wei)
 

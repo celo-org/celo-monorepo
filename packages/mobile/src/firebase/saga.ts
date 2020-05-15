@@ -41,9 +41,9 @@ import {
   paymentRequestWriter,
   setUserLanguage,
 } from 'src/firebase/firebase'
+import { getAccount } from 'src/geth/saga'
+import { currentAccountSelector } from 'src/geth/selectors'
 import Logger from 'src/utils/Logger'
-import { getAccount } from 'src/web3/saga'
-import { currentAccountSelector } from 'src/web3/selectors'
 
 const TAG = 'firebase/saga'
 const REQUEST_DB = 'pendingRequests'

@@ -5,9 +5,6 @@ import { Actions, ActionTypes, Web3SyncProgress } from 'src/web3/actions'
 export interface State {
   syncProgress: Web3SyncProgress
   latestBlockNumber: number
-  account: string | null
-  accountInWeb3Keystore: string | null
-  commentKey: string | null
   fornoMode: boolean
   contractKitReady: boolean
 }
@@ -19,9 +16,6 @@ const initialState: State = {
     highestBlock: 0,
   },
   latestBlockNumber: 0,
-  account: null,
-  accountInWeb3Keystore: null,
-  commentKey: null,
   fornoMode: networkConfig.initiallyForno,
   contractKitReady: false,
 }
@@ -47,25 +41,10 @@ export const reducer = (
         // store is persisted and forno mode known
       }
     }
-    case Actions.SET_ACCOUNT:
-      return {
-        ...state,
-        account: action.address.toLowerCase(),
-      }
-    case Actions.SET_ACCOUNT_IN_WEB3_KEYSTORE:
-      return {
-        ...state,
-        accountInWeb3Keystore: action.address,
-      }
     case Actions.SET_IS_FORNO:
       return {
         ...state,
         fornoMode: action.fornoMode,
-      }
-    case Actions.SET_COMMENT_KEY:
-      return {
-        ...state,
-        commentKey: action.commentKey,
       }
     case Actions.COMPLETE_WEB3_SYNC:
       return {

@@ -51,7 +51,7 @@ import {
   getContractKitOutsideGenerator,
   web3ForUtils,
 } from 'src/web3/contracts'
-import { getConnectedUnlockedAccount, getOrCreateAccount, waitWeb3LastBlock } from 'src/web3/saga'
+import { waitWeb3LastBlock } from 'src/web3/saga'
 import { fornoSelector } from 'src/web3/selectors'
 
 const TAG = 'invite/saga'

@@ -12,12 +12,18 @@ export interface State {
   initialized: InitializationState
   connected: boolean
   gethStartedThisSession: boolean
+  account: string | null
+  accountInGethKeystore: string | null
+  commentKey: string | null
 }
 
 const initialState: State = {
   initialized: InitializationState.NOT_YET_INITIALIZED,
   connected: false,
   gethStartedThisSession: false,
+  account: null,
+  accountInGethKeystore: null,
+  commentKey: null,
 }
 
 export function gethReducer(state: State = initialState, action: ActionTypes) {
@@ -33,6 +39,21 @@ export function gethReducer(state: State = initialState, action: ActionTypes) {
       return {
         ...state,
         connected: action.connected,
+      }
+    case Actions.SET_ACCOUNT:
+      return {
+        ...state,
+        account: action.address.toLowerCase(),
+      }
+    case Actions.SET_ACCOUNT_IN_GETH_KEYSTORE:
+      return {
+        ...state,
+        accountInWeb3Keystore: action.address,
+      }
+    case Actions.SET_COMMENT_KEY:
+      return {
+        ...state,
+        commentKey: action.commentKey,
       }
     default:
       return state

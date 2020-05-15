@@ -6,10 +6,10 @@ import { GAS_PRICE_INFLATION_FACTOR } from 'src/config'
 import { getReclaimEscrowGas } from 'src/escrow/saga'
 import { feeEstimated, FeeType } from 'src/fees/actions'
 import { estimateFeeSaga } from 'src/fees/saga'
+import { getConnectedAccount } from 'src/geth/saga'
 import { getInvitationVerificationFeeInWei, getInviteTxGas } from 'src/invite/saga'
 import { getSendTxGas } from 'src/send/saga'
 import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
-import { getConnectedAccount } from 'src/web3/saga'
 import { mockAccount } from 'test/values'
 
 const GAS_AMOUNT = 500000

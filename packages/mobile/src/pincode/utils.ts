@@ -1,5 +1,4 @@
 import { getContractKitOutsideGenerator } from 'src/web3/contracts'
-import { readPrivateKeyFromLocalDisk } from 'src/web3/privateKey'
 
 export const PIN_LENGTH = 6
 
@@ -13,10 +12,11 @@ export function isPinCorrect(
   currentAccount: string
 ): Promise<typeof pin> {
   return new Promise((resolve, reject) => {
+    // TODO(yorke: fix
     if (fornoMode) {
-      readPrivateKeyFromLocalDisk(currentAccount, pin)
-        .then(() => resolve(pin))
-        .catch(reject)
+      // readPrivateKeyFromLocalDisk(currentAccount, pin)
+      //   .then(() => resolve(pin))
+      //   .catch(reject)
     } else {
       getContractKitOutsideGenerator()
         .then((contractKit: any) =>

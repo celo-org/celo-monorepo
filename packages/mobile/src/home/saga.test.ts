@@ -1,5 +1,6 @@
 import { expectSaga } from 'redux-saga-test-plan'
 import { call, put, select } from 'redux-saga/effects'
+import { getConnectedAccount } from 'src/geth/saga'
 import { fetchGoldBalance } from 'src/goldToken/actions'
 import { refreshAllBalances, setLoading } from 'src/home/actions'
 import { autoRefreshSaga, refreshBalances, watchRefreshBalances, withLoading } from 'src/home/saga'
@@ -7,7 +8,6 @@ import { fetchCurrentRate } from 'src/localCurrency/actions'
 import { shouldFetchCurrentRate } from 'src/localCurrency/selectors'
 import { shouldUpdateBalance } from 'src/redux/selectors'
 import { fetchDollarBalance } from 'src/stableToken/actions'
-import { getConnectedAccount } from 'src/web3/saga'
 
 jest.useRealTimers()
 

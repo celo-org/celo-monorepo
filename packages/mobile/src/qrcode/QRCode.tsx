@@ -7,8 +7,8 @@ import { shallowEqual, useSelector } from 'react-redux'
 import { AvatarSelf } from 'src/components/AvatarSelf'
 import QRCode from 'src/qrcode/QRGen'
 import { RootState } from 'src/redux/reducers'
-import { SVG } from 'src/send/actions'
 import { currentAccountSelector } from 'src/web3/selectors'
+import { shareQRCode, SVG } from 'src/send/actions'
 
 interface Props {
   qrSvgRef: React.MutableRefObject<SVG>

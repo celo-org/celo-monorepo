@@ -1,20 +1,38 @@
+import { generateKeys, generateMnemonic, MnemonicStrength } from '@celo/utils/src/account'
+import { deriveCEK } from '@celo/utils/src/commentEncryption'
+import * as Sentry from '@sentry/react-native'
 import { NativeEventEmitter, NativeModules } from 'react-native'
+import * as bip39 from 'react-native-bip39'
+import { REHYDRATE } from 'redux-persist'
 import { eventChannel } from 'redux-saga'
 import { call, cancel, cancelled, delay, fork, put, race, select, take } from 'redux-saga/effects'
-import { setPromptForno } from 'src/account/actions'
+import { setAccountCreationTime, setPromptForno } from 'src/account/actions'
+import { getPincode } from 'src/account/saga'
 import { promptFornoIfNeededSelector } from 'src/account/selectors'
+import { ErrorMessages } from 'src/app/ErrorMessages'
+import { currentLanguageSelector } from 'src/app/reducers'
 import { waitForRehydrate } from 'src/app/saga'
-import { Actions, setGethConnected, setInitState } from 'src/geth/actions'
+import { getWordlist } from 'src/backup/utils'
+import {
+  Actions,
+  setAccount,
+  setAccountInGethKeystore,
+  setGethConnected,
+  setInitState,
+  setPrivateCommentKey,
+} from 'src/geth/actions'
 import {
   FailedToFetchGenesisBlockError,
   FailedToFetchStaticNodesError,
   getGeth,
 } from 'src/geth/geth'
 import { InitializationState } from 'src/geth/reducer'
-import { isGethConnectedSelector } from 'src/geth/selectors'
+import { currentAccountSelector, isGethConnectedSelector } from 'src/geth/selectors'
 import { navigate, navigateToError } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { setCachedPincode } from 'src/pincode/PincodeCache'
 import { deleteChainDataAndRestartApp } from 'src/utils/AppRestart'
+import { setKey } from 'src/utils/keyStore'
 import Logger from 'src/utils/Logger'
 import { setContractKitReady } from 'src/web3/actions'
 import { fornoSelector } from 'src/web3/selectors'
@@ -190,5 +208,167 @@ export function* gethSagaIfNecessary() {
   if (!(yield select(fornoSelector))) {
     Logger.debug(`${TAG}@gethSagaIfNecessary`, `Starting geth saga...`)
     yield call(gethSaga)
+  }
+}
+
+const MNEMONIC_BIT_LENGTH = MnemonicStrength.s256_24words
+
+export function* getOrCreateAccount() {
+  const account = yield select(currentAccountSelector)
+  if (account) {
+    Logger.debug(
+      TAG + '@getOrCreateAccount',
+      'Tried to create account twice, returning the existing one'
+    )
+    return account
+  }
+
+  try {
+    Logger.debug(TAG + '@getOrCreateAccount', 'Creating a new account')
+
+    const wordlist = getWordlist(yield select(currentLanguageSelector))
+    let mnemonic: string = yield call(generateMnemonic, MNEMONIC_BIT_LENGTH, wordlist, bip39)
+
+    // Ensure no duplicates in mnemonic
+    const checkDuplicate = (someString: string) => {
+      return new Set(someString.split(' ')).size !== someString.split(' ').length
+    }
+    let duplicateInMnemonic = true
+    do {
+      Logger.debug(TAG + '@getOrCreateAccount', 'Regenerating mnemonic to avoid duplicates')
+      mnemonic = yield call(generateMnemonic, MNEMONIC_BIT_LENGTH, wordlist, bip39)
+      duplicateInMnemonic = checkDuplicate(mnemonic)
+    } while (duplicateInMnemonic)
+
+    if (!mnemonic) {
+      throw new Error('Failed to generate mnemonic')
+    }
+
+    // TODO(yorke): consider using address index parameter
+    const keys = yield call(generateKeys, mnemonic, undefined, undefined, bip39)
+    const privateKey = keys.privateKey
+    if (!privateKey) {
+      throw new Error('Failed to convert mnemonic to hex')
+    }
+
+    const accountAddress = yield call(assignAccountFromPrivateKey, privateKey)
+    if (!accountAddress) {
+      throw new Error('Failed to assign account from private key')
+    }
+
+    yield call(setKey, 'mnemonic', mnemonic)
+
+    return accountAddress
+  } catch (error) {
+    // Capturing error in sentry for now as we debug backup key issue
+    Sentry.captureException(error)
+    Logger.error(TAG + '@getOrCreateAccount', 'Error creating account', error)
+    throw new Error(ErrorMessages.ACCOUNT_SETUP_FAILED)
+  }
+}
+
+export function* assignAccountFromPrivateKey(privateKey: string) {
+  try {
+    const pincode = yield call(getPincode, false)
+    if (!pincode) {
+      Logger.error(TAG + '@assignAccountFromPrivateKey', 'Got falsy pin')
+      throw Error('Cannot create account without having the pin set')
+    }
+
+    // NOTE: currentAccount can be null
+    const currentAccount = yield select(currentAccountSelector)
+    const account = yield call(addAccountToGethKeystore, privateKey, currentAccount, pincode)
+    Logger.debug(TAG + '@assignAccountFromPrivateKey', `Added to wallet: ${account}`)
+
+    yield put(setAccount(account))
+    yield put(setAccountCreationTime())
+    yield call(assignDataKeyFromPrivateKey, privateKey)
+    return account
+  } catch (e) {
+    Logger.error(TAG + '@assignAccountFromPrivateKey', 'Error assigning account', e)
+    throw e
+  }
+}
+
+function* assignDataKeyFromPrivateKey(privateKey: string) {
+  const privateCEK = deriveCEK(privateKey).toString('hex')
+  yield put(setPrivateCommentKey(privateCEK))
+}
+
+export function* getAccount() {
+  while (true) {
+    const account = yield select(currentAccountSelector)
+    if (account) {
+      return account
+    }
+
+    const action = yield take([Actions.SET_ACCOUNT, REHYDRATE])
+    if (action.type === REHYDRATE) {
+      // Wait for rehydrate and select the state again
+      continue
+    }
+    if (action.address) {
+      // account exists
+      return action.address
+    }
+  }
+}
+
+// Stores account and private key in geth keystore
+export function* addAccountToGethKeystore(key: string, currentAccount: string, pincode: string) {
+  Logger.debug(TAG + '@addAccountToGethKeystore', `using key ${key} for account ${currentAccount}`)
+
+  let account: string
+  try {
+    const gethInstance = yield call(getGeth)
+    // TODO(yorke): account for pincode changes
+    account = gethInstance.importKey(key, pincode, pincode)
+    Logger.debug(
+      TAG + '@addAccountToGethKeystore',
+      `Successfully imported raw key for account ${account}`
+    )
+    yield put(setAccountInGethKeystore(account))
+  } catch (e) {
+    Logger.error(TAG + '@addAccountToGethKeystore', 'Failed to import raw key', e)
+    if (e.toString().includes('account already exists')) {
+      account = currentAccount
+      Logger.debug(TAG + '@addAccountToGethKeystore', 'Importing same account as current one')
+    } else {
+      Logger.error(TAG + '@addAccountToGethKeystore', 'Error importing raw key')
+      throw e
+    }
+  }
+
+  return account
+}
+
+export function* unlockAccount(account: string) {
+  Logger.debug(TAG + '@unlockAccount', `Unlocking account: ${account}`)
+
+  try {
+    const pincode = yield call(getPincode, true)
+    const geth = yield call(getGeth)
+    return geth.unlockAccount(account, pincode)
+  } catch (error) {
+    setCachedPincode(null)
+    Logger.error(TAG + '@unlockAccount', 'Geth account unlock failed', error)
+    return false
+  }
+}
+
+export function* getConnectedAccount() {
+  yield call(waitForGethConnectivity)
+  const account: string = yield call(getAccount)
+  return account
+}
+
+// Wait for geth to be connected, geth ready, and get unlocked account
+export function* getConnectedUnlockedAccount() {
+  const account: string = yield call(getConnectedAccount)
+  const success: boolean = yield call(unlockAccount, account)
+  if (success) {
+    return account
+  } else {
+    throw new Error(ErrorMessages.INCORRECT_PIN)
   }
 }

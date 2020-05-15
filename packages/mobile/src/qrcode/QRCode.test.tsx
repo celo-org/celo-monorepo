@@ -9,7 +9,7 @@ import { mockAccount, mockName } from 'test/values'
 describe('QRCode', () => {
   const store = createMockStore({
     account: { name: mockName },
-    web3: {
+    geth: {
       account: mockAccount,
     },
   })

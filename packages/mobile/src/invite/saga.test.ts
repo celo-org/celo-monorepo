@@ -9,6 +9,7 @@ import { call } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { generateShortInviteLink } from 'src/firebase/dynamicLinks'
+import { getConnectedUnlockedAccount, getOrCreateAccount } from 'src/geth/saga'
 import { updateE164PhoneNumberAddresses } from 'src/identity/actions'
 import {
   InviteBy,
@@ -30,7 +31,7 @@ import { fetchDollarBalance, transferStableToken } from 'src/stableToken/actions
 import { transactionConfirmed } from 'src/transactions/actions'
 import { waitForTransactionWithId } from 'src/transactions/saga'
 import { getContractKitOutsideGenerator } from 'src/web3/contracts'
-import { getConnectedUnlockedAccount, getOrCreateAccount, waitWeb3LastBlock } from 'src/web3/saga'
+import { waitWeb3LastBlock } from 'src/web3/saga'
 import { createMockStore, mockContractKitBalance } from 'test/utils'
 import { mockAccount, mockInviteDetails } from 'test/values'
 
@@ -59,7 +60,7 @@ jest.mock('@celo/contractkit')
 SendIntentAndroid.sendSms = jest.fn()
 SendSMS.send = jest.fn()
 
-const state = createMockStore({ web3: { account: mockAccount } }).getState()
+const state = createMockStore({ geth: { account: mockAccount } }).getState()
 
 describe(watchSendInvite, () => {
   beforeAll(() => {

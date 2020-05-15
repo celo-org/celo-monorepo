@@ -9,13 +9,13 @@ import {
 } from '@celo/utils/src/dappkit'
 import { call, select, takeLeading } from 'redux-saga/effects'
 import { e164NumberSelector } from 'src/account/selectors'
+import { getConnectedUnlockedAccount } from 'src/geth/saga'
+import { currentAccountSelector } from 'src/geth/selectors'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { navigateToURI } from 'src/utils/linking'
 import Logger from 'src/utils/Logger'
 import { getContractKit } from 'src/web3/contracts'
-import { getConnectedUnlockedAccount } from 'src/web3/saga'
-import { currentAccountSelector } from 'src/web3/selectors'
 
 const TAG = 'dappkit/dappkit'
 

@@ -12,10 +12,11 @@ import { useDispatch, useSelector } from 'react-redux'
 import { showError } from 'src/alert/actions'
 import { appUnlock } from 'src/app/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
+import { currentAccountSelector } from 'src/geth/selectors'
 import { Namespaces } from 'src/i18n'
 import Pincode from 'src/pincode/Pincode'
 import { isPinCorrect, isPinValid, PIN_LENGTH } from 'src/pincode/utils'
-import { currentAccountSelector, fornoSelector } from 'src/web3/selectors'
+import { fornoSelector } from 'src/web3/selectors'
 
 function PincodeLock() {
   const [pin, setPin] = useState('')

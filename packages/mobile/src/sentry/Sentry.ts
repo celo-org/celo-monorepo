@@ -3,8 +3,8 @@ import DeviceInfo from 'react-native-device-info'
 import * as RNFS from 'react-native-fs'
 import { select } from 'redux-saga/effects'
 import { SENTRY_URL } from 'src/config'
+import { currentAccountSelector } from 'src/geth/selectors'
 import Logger from 'src/utils/Logger'
-import { currentAccountSelector } from 'src/web3/selectors'
 
 const TAG = 'sentry/Sentry'
 

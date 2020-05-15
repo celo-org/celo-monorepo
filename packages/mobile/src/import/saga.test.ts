@@ -5,6 +5,7 @@ import { call } from 'redux-saga/effects'
 import { setBackupCompleted } from 'src/account/actions'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
+import { assignAccountFromPrivateKey } from 'src/geth/saga'
 import { refreshAllBalances } from 'src/home/actions'
 import {
   backupPhraseEmpty,
@@ -15,7 +16,7 @@ import { importBackupPhraseSaga } from 'src/import/saga'
 import { redeemInviteSuccess } from 'src/invite/actions'
 import { fetchTokenBalanceInWeiWithRetry } from 'src/tokens/saga'
 import { setKey } from 'src/utils/keyStore'
-import { assignAccountFromPrivateKey, waitWeb3LastBlock } from 'src/web3/saga'
+import { waitWeb3LastBlock } from 'src/web3/saga'
 import { mockAccount } from 'test/values'
 
 const mockPhraseValid =
