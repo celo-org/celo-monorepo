@@ -49,6 +49,7 @@ export default React.memo(function Button(props: ButtonProps) {
 
   return (
     <View style={style ? [styles.root, style] : styles.root}>
+      {/* these Views cannot be combined as it will cause ripple to not respect the border radius */}
       <View style={styles.containRipple}>
         <Touchable
           onPress={debouncedOnPress}
