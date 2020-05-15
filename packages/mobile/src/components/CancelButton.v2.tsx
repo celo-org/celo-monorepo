@@ -1,4 +1,4 @@
-import { colorsEnum } from '@celo/react-components/styles/colors.v2'
+import { Colors } from '@celo/react-components/styles/colors.v2'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
@@ -8,7 +8,7 @@ import { navigateBack } from 'src/navigator/NavigationService'
 import TopBarButton from 'src/navigator/TopBarButton.v2'
 
 interface Props {
-  color?: colorsEnum
+  color?: Colors
   eventName?: CustomEventNames
   onCancel?: () => void
 }
