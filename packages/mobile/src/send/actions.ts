@@ -22,10 +22,10 @@ export enum Actions {
   VALIDATE_RECIPIENT_ADDRESS = 'SEND/VALIDATE_RECIPIENT_ADDRESS',
   VALIDATE_RECIPIENT_ADDRESS_SUCCESS = 'SEND/VALIDATE_RECIPIENT_ADDRESS_SUCCESS',
   VALIDATE_RECIPIENT_ADDRESS_FAILURE = 'SEND/VALIDATE_RECIPIENT_ADDRESS_FAILURE',
-  SECURE_SEND_REQUIRED = 'SEND/SECURE_SEND_REQUIRED',
+  REQUIRE_SECURE_SEND = 'SEND/REQUIRE_SECURE_SEND',
 }
 
-export interface HandleBarcodeDetected {
+export interface HandleBarcodeDetectedAction {
   type: Actions.BARCODE_DETECTED
   data: QrCode
   scanIsForSecureSend?: true
@@ -73,13 +73,13 @@ export interface ValidateRecipientAddressFailureAction {
 }
 
 export interface SecureSendRequiredAction {
-  type: Actions.SECURE_SEND_REQUIRED
+  type: Actions.REQUIRE_SECURE_SEND
   e164Number: E164Number
   fullValidationRequired: boolean
 }
 
 export type ActionTypes =
-  | HandleBarcodeDetected
+  | HandleBarcodeDetectedAction
   | StoreLatestInRecentsAction
   | SendPaymentOrInviteAction
   | SendPaymentOrInviteSuccessAction
@@ -98,7 +98,7 @@ export const handleBarcodeDetected = (
   data: QrCode,
   scanIsForSecureSend?: true,
   transactionData?: TransactionData
-): HandleBarcodeDetected => ({
+): HandleBarcodeDetectedAction => ({
   type: Actions.BARCODE_DETECTED,
   data,
   scanIsForSecureSend,
@@ -163,7 +163,7 @@ export const secureSendRequired = (
   e164Number: E164Number,
   fullValidationRequired: boolean
 ): SecureSendRequiredAction => ({
-  type: Actions.SECURE_SEND_REQUIRED,
+  type: Actions.REQUIRE_SECURE_SEND,
   e164Number,
   fullValidationRequired,
 })

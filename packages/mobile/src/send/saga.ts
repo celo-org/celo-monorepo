@@ -34,7 +34,6 @@ import {
 } from 'src/tokens/saga'
 import { generateStandbyTransactionId } from 'src/transactions/actions'
 import Logger from 'src/utils/Logger'
-import { userAddressSelector } from 'src/web3/reducer'
 import { currentAccountSelector } from 'src/web3/selectors'
 import { estimateGas } from 'src/web3/utils'
 
@@ -199,7 +198,7 @@ export function* validateRecipientAddressSaga({
       throw Error(`Invalid recipient type for Secure Send: ${recipient.kind}`)
     }
 
-    const userAddress = yield select(userAddressSelector)
+    const userAddress = yield select(currentAccountSelector)
     const e164NumberToAddress = yield select(e164NumberToAddressSelector)
     const { e164PhoneNumber } = recipient
     const possibleRecievingAddresses = e164NumberToAddress[e164PhoneNumber]
@@ -217,7 +216,7 @@ export function* validateRecipientAddressSaga({
     )
     yield put(validateRecipientAddressSuccess(e164PhoneNumber, validatedAddress))
   } catch (error) {
-    Logger.error(TAG, 'validateRecipientAddressSaga/Address validation error: ', error.message)
+    Logger.error(TAG, 'validateRecipientAddressSaga/Address validation error: ', error)
     yield put(showError(error.message))
     yield put(validateRecipientAddressFailure())
   }

@@ -14,14 +14,14 @@ import { RecipientKind } from 'src/recipients/recipient'
 import { recipientCacheSelector } from 'src/recipients/reducer'
 import {
   Actions,
-  HandleBarcodeDetected,
+  HandleBarcodeDetectedAction,
   QrCode,
   ValidateRecipientAddressAction,
   validateRecipientAddressFailure,
   validateRecipientAddressSuccess,
 } from 'src/send/actions'
 import { watchQrCodeDetections, watchValidateRecipientAddress } from 'src/send/saga'
-import { userAddressSelector } from 'src/web3/reducer'
+import { currentAccountSelector } from 'src/web3/selectors'
 import {
   mockAccount,
   mockAccount2Invite,
@@ -172,7 +172,7 @@ describe(watchQrCodeDetections, () => {
 
   it('navigates to the send confirmation screen when secure send scan is successful', async () => {
     const data: QrCode = { type: BarcodeTypes.QR_CODE, data: mockQrCodeData2 }
-    const qrAction: HandleBarcodeDetected = {
+    const qrAction: HandleBarcodeDetectedAction = {
       type: Actions.BARCODE_DETECTED,
       data,
       scanIsForSecureSend: true,
@@ -194,7 +194,7 @@ describe(watchQrCodeDetections, () => {
 
   it("displays an error when QR code scanned for secure send doesn't map to the recipient", async () => {
     const data: QrCode = { type: BarcodeTypes.QR_CODE, data: mockQrCodeData }
-    const qrAction: HandleBarcodeDetected = {
+    const qrAction: HandleBarcodeDetectedAction = {
       type: Actions.BARCODE_DETECTED,
       data,
       scanIsForSecureSend: true,
@@ -232,7 +232,7 @@ describe(watchValidateRecipientAddress, () => {
 
     await expectSaga(watchValidateRecipientAddress)
       .provide([
-        [select(userAddressSelector), mockAccount],
+        [select(currentAccountSelector), mockAccount],
         [select(e164NumberToAddressSelector), mockE164NumberToAddress],
       ])
       .dispatch(validateAction)
@@ -250,7 +250,7 @@ describe(watchValidateRecipientAddress, () => {
 
     await expectSaga(watchValidateRecipientAddress)
       .provide([
-        [select(userAddressSelector), mockAccount],
+        [select(currentAccountSelector), mockAccount],
         [select(e164NumberToAddressSelector), mockE164NumberToAddress],
       ])
       .dispatch(validateAction)
@@ -268,7 +268,7 @@ describe(watchValidateRecipientAddress, () => {
 
     await expectSaga(watchValidateRecipientAddress)
       .provide([
-        [select(userAddressSelector), mockAccount],
+        [select(currentAccountSelector), mockAccount],
         [select(e164NumberToAddressSelector), mockE164NumberToAddress],
       ])
       .dispatch(validateAction)
@@ -286,7 +286,7 @@ describe(watchValidateRecipientAddress, () => {
 
     await expectSaga(watchValidateRecipientAddress)
       .provide([
-        [select(userAddressSelector), mockAccount],
+        [select(currentAccountSelector), mockAccount],
         [select(e164NumberToAddressSelector), mockE164NumberToAddress],
       ])
       .dispatch(validateAction)

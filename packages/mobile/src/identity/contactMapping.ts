@@ -32,8 +32,8 @@ import { getAllContacts } from 'src/utils/contacts'
 import Logger from 'src/utils/Logger'
 import { checkContactsPermission } from 'src/utils/permissions'
 import { getContractKit } from 'src/web3/contracts'
-import { userAddressSelector } from 'src/web3/reducer'
 import { getConnectedAccount } from 'src/web3/saga'
+import { currentAccountSelector } from 'src/web3/selectors'
 
 const TAG = 'identity/contactMapping'
 
@@ -108,9 +108,7 @@ export function* fetchAddressesAndValidateSaga({ e164Number }: FetchAddressesAnd
   try {
     Logger.debug(TAG + '@fetchAddressesAndValidate', `Fetching addresses for number`)
     const oldE164NumberToAddress = yield select(e164NumberToAddressSelector)
-    const oldAddresses = oldE164NumberToAddress[e164Number]
-      ? [...oldE164NumberToAddress[e164Number]]
-      : oldE164NumberToAddress[e164Number]
+    const oldAddresses: string[] = oldE164NumberToAddress[e164Number] || []
 
     // Clear existing entries for those numbers so our mapping consumers know new status is pending.
     yield put(updateE164PhoneNumberAddresses({ [e164Number]: undefined }, {}))
@@ -136,7 +134,7 @@ export function* fetchAddressesAndValidateSaga({ e164Number }: FetchAddressesAnd
       addresses.map((a) => (addressToE164NumberUpdates[a] = e164Number))
     }
 
-    const userAddress = yield select(userAddressSelector)
+    const userAddress = yield select(currentAccountSelector)
     const secureSendPhoneNumberMapping = yield select(secureSendPhoneNumberMappingSelector)
     const { validationRequired, fullValidationRequired } = checkIfValidationRequired(
       oldAddresses,

@@ -116,29 +116,18 @@ export const getFeeType = (
 }
 
 // Given addresses can be added and deleted we can't rely on changes in length to signal address changes
-// Not sure if address order im array is consistent so not assuming it
-const itemsOfChildArrAreSubsetOfParentArr = (parentArr: string[], childArr: string[]) => {
-  const parentArrSorted = parentArr.sort()
-  const childArrSorted = childArr.sort()
+// Not sure if address order in array is consistent so not assuming it
+const newAddressesAdded = (oldAddresses: string[], newAddresses: string[]) => {
+  const oldAddressesSorted = oldAddresses.sort()
+  const newAddressesSorted = newAddresses.sort()
 
-  for (let i = 0; i < childArrSorted.length; i += 1) {
-    if (parentArrSorted[i] !== childArrSorted[i]) {
-      return false
+  for (let i = 0; i < newAddressesSorted.length; i += 1) {
+    if (oldAddressesSorted[i] !== newAddressesSorted[i]) {
+      return true
     }
   }
 
-  return true
-}
-
-const checkIfNewAddressesAdded = (
-  oldAddresses: string[] | null | undefined,
-  newAddresses: string[]
-) => {
-  if (oldAddresses && itemsOfChildArrAreSubsetOfParentArr(oldAddresses, newAddresses)) {
-    return false
-  }
-
-  return true
+  return false
 }
 
 const last4DigitsAreUnique = (addressArr: string[]) => {
@@ -161,7 +150,7 @@ const accidentallyBypassedValidation = (
 }
 
 export const checkIfValidationRequired = (
-  oldAddresses: string[] | undefined | null,
+  oldAddresses: string[],
   newAddresses: string[] | null,
   userAddress: string,
   secureSendPhoneNumberMapping: SecureSendPhoneNumberMapping,
@@ -177,7 +166,7 @@ export const checkIfValidationRequired = (
   }
 
   if (
-    checkIfNewAddressesAdded(oldAddresses, newAddresses) ||
+    newAddressesAdded(oldAddresses, newAddresses) ||
     accidentallyBypassedValidation(newAddresses, e164Number, secureSendPhoneNumberMapping)
   ) {
     Logger.debug(

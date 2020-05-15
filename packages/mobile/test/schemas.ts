@@ -146,9 +146,7 @@ export const vNeg1Schema = {
   },
 }
 
-export const v0Schema = vNeg1Schema
-
-export const v1Schema = {
+export const v0Schema = {
   app: {
     inviteCodeEntered: false,
     loggedIn: false,
@@ -171,6 +169,8 @@ export const v1Schema = {
   send: {
     isSending: false,
     recentRecipients: [],
+    isValidRecipient: false,
+    secureSendPhoneNumberMapping: {},
   },
   recipients: {
     recipientCache: {},
@@ -291,15 +291,6 @@ export const v1Schema = {
   },
 }
 
-export const v2Schema = {
-  ...v1Schema,
-  send: {
-    ...v1Schema.send,
-    isValidRecipient: false,
-    secureSendPhoneNumberMapping: {},
-  },
-}
-
 export function getLatestSchema(): Partial<RootState> {
-  return v2Schema as Partial<RootState>
+  return v0Schema as Partial<RootState>
 }

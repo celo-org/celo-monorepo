@@ -154,7 +154,6 @@ export class ValidateRecipientAccount extends React.Component<Props, State> {
           inputPlaceholder={placeholderValue}
           // tslint:disable-next-line:jsx-no-lambda
           onInputChange={(value) => this.onSingleDigitInputChange(value, index)}
-          shouldShowClipboard={this.shouldShowClipboard}
         />
       )
     )

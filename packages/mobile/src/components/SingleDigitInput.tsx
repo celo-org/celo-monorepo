@@ -8,22 +8,15 @@ export interface SingleDigitInputProps {
   inputValue: string
   inputPlaceholder: string
   onInputChange: (value: string) => void
-  shouldShowClipboard: (value: string) => boolean
 }
 
 type Props = SingleDigitInputProps
 
-export function SingleDigitInput({
-  inputValue,
-  inputPlaceholder,
-  onInputChange,
-  shouldShowClipboard,
-}: Props) {
+export function SingleDigitInput({ inputValue, inputPlaceholder, onInputChange }: Props) {
   return (
     <TextInput
       value={inputValue}
       placeholder={inputPlaceholder}
-      shouldShowClipboard={shouldShowClipboard}
       onChangeText={onInputChange}
       maxLength={1}
       showClearButton={false}

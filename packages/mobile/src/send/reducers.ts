@@ -80,8 +80,14 @@ export const sendReducer = (
         isValidRecipient: false,
       }
     case Actions.VALIDATE_RECIPIENT_ADDRESS_SUCCESS:
-      const { secureSendPhoneNumberMapping } = state
       // Overwrite the previous mapping every time a new one is validated
+      // const newSecureSendMapping = dotProp.set(state, `send.secureSendPhoneNumberMapping.${action.e164Number}`, {
+      //   address: action.validatedAddress,
+      //   addressValidationRequired: false,
+      //   fullValidationRequired: false,
+      // })
+
+      const { secureSendPhoneNumberMapping } = state
       secureSendPhoneNumberMapping[action.e164Number] = {
         address: action.validatedAddress,
         addressValidationRequired: false,
@@ -98,7 +104,12 @@ export const sendReducer = (
         ...state,
         isValidRecipient: false,
       }
-    case Actions.SECURE_SEND_REQUIRED:
+    case Actions.REQUIRE_SECURE_SEND:
+      // const newSecureSendMapping = dotProp.set(state, `send.secureSendPhoneNumberMapping.${action.e164Number}`, {
+      //   address: action.validatedAddress,
+      //   addressValidationRequired: false,
+      //   fullValidationRequired: false,
+      // })
       const newSecureSendMapping = state.secureSendPhoneNumberMapping
       newSecureSendMapping[action.e164Number] = {
         address: undefined,
