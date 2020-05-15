@@ -72,10 +72,6 @@ class DappKitAccountAuthScreen extends React.Component<Props, State> {
       Logger.error(TAG, 'No phone number set up for this wallet')
       return
     }
-    this.props.navigation.reset({
-      index: 1,
-      routes: [{ name: Screens.WalletHome }],
-    })
     navigateHome({ dispatchAfterNavigate: approveAccountAuth(request) })
   }
 

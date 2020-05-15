@@ -1,6 +1,6 @@
 import FullscreenCTA from '@celo/react-components/components/FullscreenCTA'
 import { componentStyles } from '@celo/react-components/styles/styles'
-import { StackScreenProps } from '@react-navigation/stack'
+import { RouteProp } from '@react-navigation/native'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { Text, View } from 'react-native'
@@ -9,17 +9,18 @@ import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 import { deleteChainDataAndRestartApp, RESTART_APP_I18N_KEY } from 'src/utils/AppRestart'
 
-type OwnProps = {
+interface OwnProps {
   errorMessage?: string
-} & StackScreenProps<StackParamList, Screens.ErrorScreen>
+  route?: RouteProp<StackParamList, Screens.ErrorScreen>
+}
 
 type Props = OwnProps & WithTranslation
 
 class ErrorScreen extends React.Component<Props> {
   static navigationOptions = { header: null }
 
-  getErrorMessage() {
-    return this.props.errorMessage || this.props.route.params.errorMessage || 'unknown'
+  getErrorMessage = () => {
+    return this.props.errorMessage || this.props.route?.params.errorMessage || 'unknown'
   }
 
   render() {

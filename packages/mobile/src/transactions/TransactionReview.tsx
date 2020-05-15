@@ -8,7 +8,7 @@ import SafeAreaView from 'react-native-safe-area-view'
 import { TokenTransactionType } from 'src/apollo/types'
 import ExchangeConfirmationCard from 'src/exchange/ExchangeConfirmationCard'
 import { Namespaces, withTranslation } from 'src/i18n'
-import { navigate, navigateBack } from 'src/navigator/NavigationService'
+import { navigateBack, navigateHome } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 import TransferConfirmationCard from 'src/send/TransferConfirmationCard'
@@ -31,7 +31,7 @@ class TransactionReview extends React.PureComponent<Props> {
   static navigationOptions = { header: null }
 
   navigateToMain = () => {
-    navigate(Screens.WalletHome)
+    navigateHome()
   }
 
   getNavigationProps = (): ReviewProps => {

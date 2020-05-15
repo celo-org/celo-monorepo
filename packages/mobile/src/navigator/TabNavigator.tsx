@@ -55,6 +55,7 @@ function TabBarButtonComponent(props: BottomTabBarButtonProps & { isSend?: boole
     <Touchable
       // @ts-ignore
       {...props}
+      // @ts-ignore
       onPress={onPress}
       borderless={true}
       disabled={backupTooLate}

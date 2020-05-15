@@ -27,7 +27,7 @@ import {
   NUM_ATTESTATIONS_REQUIRED,
   VerificationStatus,
 } from 'src/identity/verification'
-import { navigate } from 'src/navigator/NavigationService'
+import { navigate, navigateHome } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
 import Logger from 'src/utils/Logger'
@@ -168,7 +168,7 @@ class VerificationInputScreen extends React.Component<Props, State> {
 
   onPressSkip = () => {
     this.props.cancelVerification()
-    navigate(Screens.WalletHome)
+    navigateHome()
   }
 
   render() {

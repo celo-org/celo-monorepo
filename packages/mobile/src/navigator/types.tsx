@@ -37,10 +37,12 @@ export type StackParamList = {
   [Screens.Debug]: {}
   [Screens.DollarEducation]: {}
   [Screens.EditProfile]: {}
+  [Screens.EnterInviteCode]: {}
   [Screens.ErrorScreen]: {
     errorMessage?: string
   }
   [Screens.EscrowedPaymentListScreen]: {}
+  [Screens.ExchangeHomeScreen]: {}
   [Screens.ExchangeReview]: {
     exchangeInput: {
       makerToken: CURRENCY_ENUM
@@ -50,7 +52,6 @@ export type StackParamList = {
       inputAmount: BigNumber
     }
   }
-  [Screens.EnterInviteCode]: {}
   [Screens.ExchangeTradeScreen]: {
     makerTokenDisplay: {
       makerToken: CURRENCY_ENUM
@@ -75,7 +76,7 @@ export type StackParamList = {
   }
   [Screens.JoinCelo]: {}
   [Screens.Language]: {
-    nextScreen?: Screens
+    nextScreen?: Screens.Account
   }
   [Screens.Licenses]: {}
   [Screens.OutgoingPaymentRequestListScreen]: {}
@@ -89,6 +90,7 @@ export type StackParamList = {
   }
   [Screens.PincodeSet]: {}
   [Screens.PhotosEducation]: {}
+  [Screens.PhotosNUX]: {}
   [Screens.Profile]: {}
   [Screens.QRCode]: {}
   [Screens.QRScanner]: {}
@@ -106,8 +108,10 @@ export type StackParamList = {
     confirmationInput: ConfirmationInput
   }
   [Screens.SetClock]: {}
+  [Screens.Settings]: {}
   [Screens.Support]: {}
   [Screens.SupportContact]: {}
+  [Screens.Sync]: {}
   [Screens.TabNavigator]: {}
   [Screens.TransactionReview]: {
     reviewProps: ReviewProps

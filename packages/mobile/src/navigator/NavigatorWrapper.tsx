@@ -1,11 +1,7 @@
 import AsyncStorage from '@react-native-community/async-storage'
 import { NavigationContainer, NavigationState } from '@react-navigation/native'
 import * as React from 'react'
-import { StyleSheet } from 'react-native'
-import SplashScreen from 'react-native-splash-screen'
-import { useSelector } from 'react-redux'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
-import { getAppLocked } from 'src/app/selectors'
 import { DEV_RESTORE_NAV_STATE_ON_RELOAD } from 'src/config'
 import { navigationRef } from 'src/navigator/NavigationService'
 import Navigator from 'src/navigator/Navigator'
@@ -28,7 +24,6 @@ const getActiveRouteName = (state: NavigationState) => {
 }
 
 export const NavigatorWrapper = () => {
-  const appLocked = useSelector(getAppLocked)
   const [isReady, setIsReady] = React.useState(
     __DEV__ || DEV_RESTORE_NAV_STATE_ON_RELOAD ? false : true
   )
@@ -37,8 +32,6 @@ export const NavigatorWrapper = () => {
   const routeNameRef = React.useRef()
 
   React.useEffect(() => {
-    SplashScreen.hide()
-
     if (navigationRef && navigationRef.current) {
       const state = navigationRef.current.getRootState()
 
@@ -108,28 +101,6 @@ export const NavigatorWrapper = () => {
     </NavigationContainer>
   )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    flexDirection: 'column',
-    alignItems: 'stretch',
-    justifyContent: 'flex-start',
-  },
-  floating: {
-    position: 'absolute',
-    left: 0,
-    top: 0,
-    right: 0,
-  },
-  locked: {
-    position: 'absolute',
-    left: 0,
-    top: 0,
-    right: 0,
-    bottom: 0,
-  },
-})
 
 export const navbarStyle: {
   headerMode: 'none'

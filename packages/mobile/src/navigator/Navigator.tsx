@@ -279,7 +279,7 @@ export function AppNavigatorNew() {
       acceptedTerms,
     } = mapStateToProps(store.getState())
 
-    let initialRoute
+    let initialRoute: Screens | undefined
 
     if (!language) {
       initialRoute = Screens.Language
@@ -307,7 +307,11 @@ export function AppNavigatorNew() {
   }
 
   return (
-    <Stack.Navigator headerMode={'none'} initialRouteName={initialRouteName}>
+    <Stack.Navigator
+      headerMode={'none'}
+      // @ts-ignore
+      initialRouteName={initialRouteName}
+    >
       <Stack.Screen name={Screens.TabNavigator} component={TabNavigator} />
       {commonScreens(Stack)}
       {sendScreens(Stack)}

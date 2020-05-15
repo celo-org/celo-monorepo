@@ -16,7 +16,9 @@ describe('BackupSocialIntro', () => {
           route={{
             name: Screens.BackupSocialIntro as Screens.BackupSocialIntro,
             key: '1',
-            params: {},
+            params: {
+              incomingFromBackupFlow: true,
+            },
           }}
         />
       </Provider>
