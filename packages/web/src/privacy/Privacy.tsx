@@ -35,7 +35,7 @@ export default class Privacy extends React.Component {
           </Cell>
           <Cell span={Spans.three4th}>
             <P>
-              This Privacy Policy and Cookies Statement describes how A Protocol Inc. and its
+              This Privacy Policy and Cookies Statement describes how the Celo Foundation and its
               affiliated companies (referred to in this document as “Celo,” “we,” “us” or “our”)
               collects, uses, shares and otherwise processes Personal Data (defined below)
               including:
