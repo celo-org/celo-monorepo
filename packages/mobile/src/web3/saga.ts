@@ -87,7 +87,7 @@ export function* checkWeb3SyncProgress() {
           Logger.debug(TAG, 'checkWeb3SyncProgress', 'Sync is complete')
           millisecs = Date.now() - initTime
           meanMillisecs = updateAverageMillisecs(meanMillisecs, millisecs, TRACK_EVERY_SYNC)
-          if (trackCount % TRACK_EVERY_SYNC == 0) {
+          if (trackCount % TRACK_EVERY_SYNC === 0) {
             CeloAnalytics.track(CustomEventNames.sync_complete, { meanMillisecs, millisecs })
           }
           trackCount += 1
@@ -100,7 +100,7 @@ export function* checkWeb3SyncProgress() {
       } else {
         millisecs = Date.now() - initTime
         meanMillisecs = updateAverageMillisecs(meanMillisecs, millisecs, TRACK_EVERY_SYNC)
-        if (trackCount % TRACK_EVERY_SYNC == 0) {
+        if (trackCount % TRACK_EVERY_SYNC === 0) {
           CeloAnalytics.track(CustomEventNames.sync_invalid_progress, { meanMillisecs, millisecs })
         }
         trackCount += 1
@@ -114,7 +114,7 @@ export function* checkWeb3SyncProgress() {
           navigate(Screens.DataSaver, { promptModalVisible: true })
           millisecs = Date.now() - initTime
           meanMillisecs = updateAverageMillisecs(meanMillisecs, millisecs, TRACK_EVERY_SYNC)
-          if (trackCount % TRACK_EVERY_SYNC == 0) {
+          if (trackCount % TRACK_EVERY_SYNC === 0) {
             CeloAnalytics.track(CustomEventNames.sync_switch_to_forno_timeout, {
               meanMillisecs,
               millisecs,
@@ -128,7 +128,7 @@ export function* checkWeb3SyncProgress() {
       if (error.toString().toLowerCase() === BLOCK_CHAIN_CORRUPTION_ERROR.toLowerCase()) {
         millisecs = Date.now() - initTime
         meanMillisecs = updateAverageMillisecs(meanMillisecs, millisecs, TRACK_EVERY_SYNC)
-        if (trackCount % TRACK_EVERY_SYNC == 0) {
+        if (trackCount % TRACK_EVERY_SYNC === 0) {
           CeloAnalytics.track(
             CustomEventNames.sync_blockchain_corruption,
             { meanMillisecs, millisecs },
@@ -144,7 +144,7 @@ export function* checkWeb3SyncProgress() {
         Logger.error(TAG, 'Unexpected sync error', error)
         millisecs = Date.now() - initTime
         meanMillisecs = updateAverageMillisecs(meanMillisecs, millisecs, TRACK_EVERY_SYNC)
-        if (trackCount % TRACK_EVERY_SYNC == 0) {
+        if (trackCount % TRACK_EVERY_SYNC === 0) {
           CeloAnalytics.track(
             CustomEventNames.sync_unexpected_error,
             { meanMillisecs, millisecs },

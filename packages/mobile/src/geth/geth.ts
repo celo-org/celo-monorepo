@@ -4,13 +4,13 @@ import { Platform } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 import * as RNFS from 'react-native-fs'
 import RNGeth from 'react-native-geth'
+import { CustomEventNames } from 'src/analytics/constants'
+import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { DEFAULT_TESTNET } from 'src/config'
 import networkConfig from 'src/geth/networkConfig'
 import Logger from 'src/utils/Logger'
 import FirebaseLogUploader from 'src/utils/LogUploader'
-import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { updateAverageMillisecs } from 'src/utils/time'
-import { CustomEventNames } from 'src/analytics/constants'
 
 let gethLock = false
 let gethInstance: typeof RNGeth | null = null
