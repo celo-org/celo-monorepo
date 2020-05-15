@@ -38,7 +38,19 @@ const steps = [
   },
 ]
 
+const revert = (commitHash) => {
+  console.log('> reverting to', commitHash)
+}
+
 async function main() {
+  const [dirtyFiles] = await execCmd('git status -s')
+  if (dirtyFiles) {
+    // console.warn(
+    //   'Untracked changes in working tree, aborting. This is a descructive script and work could be lost.'
+    // )
+    // process.exit(1)
+  }
+
   const { packageName, version } = await prompt(steps)
 
   const [currentCommit] = await execCmd('git rev-parse HEAD')
@@ -56,8 +68,23 @@ async function main() {
   const newVersion = [major, minor, patch].map(String).join('.')
   writeFileSync(packageJsonPath, JSON.stringify({ ...packageJson, version: newVersion }, null, 2))
 
-  await execCmd(`git add ${packageJsonPath}`)
-  await execCmd(`git commit -m "Update ${packageName} to v${newVersion}"`)
+  // await execCmd(`git add ${packageJsonPath}`)
+  // await execCmd(`git commit -m "Update ${packageName} to v${newVersion}"`)
+
+  const { installationWorks } = await prompt({
+    type: 'confirm',
+    name: 'installationWorks',
+    message: `Verify docker installation works. Run the following in another terminal to verify:
+
+celo-monorepo $ docker run --rm -v $PWD/packages/${packageName}:/tmp/npm_package -it --entrypoint bash node:10
+root@e0d56700584f:/# mkdir /tmp/tmp1 && cd /tmp/tmp1
+root@e0d56700584f:/tmp/tmp1# npm install /tmp/npm_package/
+
+all OK?`,
+  })
+  if (!installationWorks) {
+    revert(currentCommit)
+  }
 }
 
 main()
