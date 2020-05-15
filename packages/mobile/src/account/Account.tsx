@@ -44,6 +44,7 @@ interface StateProps {
   analyticsEnabled: boolean
   numberVerified: boolean
   pincodeType: PincodeType
+  backupCompleted: boolean
 }
 
 type Props = StateProps & DispatchProps & WithTranslation
@@ -54,6 +55,7 @@ interface State {
 
 const mapStateToProps = (state: RootState): StateProps => {
   return {
+    backupCompleted: state.account.backupCompleted,
     account: state.web3.account,
     devModeActive: state.account.devModeActive || false,
     e164PhoneNumber: state.account.e164PhoneNumber,
@@ -88,8 +90,12 @@ export class Account extends React.Component<Props, State> {
     navigate(Screens.Profile)
   }
 
-  goToBackupScreen() {
-    navigate(Screens.BackupIntroduction)
+  goToBackupScreen = () => {
+    if (this.props.backupCompleted) {
+      navigateProtected(Screens.BackupIntroduction)
+    } else {
+      navigate(Screens.BackupIntroduction)
+    }
   }
 
   goToVerification() {
