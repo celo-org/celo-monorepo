@@ -4,7 +4,7 @@ import { showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { CURRENCY_ENUM } from 'src/geth/consts'
+import { CURRENCY_ENUM, CURRENCIES } from 'src/geth/consts'
 import { fetchGoldBalance } from 'src/goldToken/actions'
 import { fetchDollarBalance } from 'src/stableToken/actions'
 import {
@@ -56,18 +56,19 @@ export function* sendAndMonitorTransaction<T>(
     yield put(transactionConfirmed(txId))
 
     millisecs = Date.now() - millisecs
+    let ccySent = ''
     if (currency === CURRENCY_ENUM.GOLD) {
-      CeloAnalytics.track(CustomEventNames.send_gold_transaction_confirmed, { millisecs })
+      ccySent = CURRENCIES[currency].code
       yield put(fetchGoldBalance())
     } else if (currency === CURRENCY_ENUM.DOLLAR) {
-      CeloAnalytics.track(CustomEventNames.send_dollar_transaction_confirmed, { millisecs })
+      ccySent = CURRENCIES[currency].code
       yield put(fetchDollarBalance())
     } else {
       // Fetch both balances for exchange
       yield put(fetchGoldBalance())
       yield put(fetchDollarBalance())
     }
-    CeloAnalytics.track(CustomEventNames.send_transaction_confirmed, { millisecs })
+    CeloAnalytics.track(CustomEventNames.send_transaction_confirmed, { millisecs, ccySent })
   } catch (error) {
     Logger.error(TAG + '@sendAndMonitorTransaction', `Error sending tx ${txId}`, error)
     millisecs = Date.now() - millisecs
