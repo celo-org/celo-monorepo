@@ -46,6 +46,7 @@ interface StateProps {
   analyticsEnabled: boolean
   numberVerified: boolean
   pincodeType: PincodeType
+  backupCompleted: boolean
 }
 
 type OwnProps = StackScreenProps<StackParamList, Screens.Account>
@@ -58,6 +59,7 @@ interface State {
 
 const mapStateToProps = (state: RootState): StateProps => {
   return {
+    backupCompleted: state.account.backupCompleted,
     account: state.web3.account,
     devModeActive: state.account.devModeActive || false,
     e164PhoneNumber: state.account.e164PhoneNumber,
@@ -92,15 +94,19 @@ export class Account extends React.Component<Props, State> {
     this.props.navigation.navigate(Screens.Profile)
   }
 
-  goToBackupScreen() {
-    this.props.navigation.navigate(Screens.BackupIntroduction)
+  goToBackupScreen = () => {
+    if (this.props.backupCompleted) {
+      navigateProtected(Screens.BackupIntroduction)
+    } else {
+      this.props.navigation.navigate(Screens.BackupIntroduction)
+    }
   }
 
-  goToVerification() {
+  goToVerification = () => {
     this.props.navigation.navigate(Screens.VerificationEducationScreen)
   }
 
-  goToInvite() {
+  goToInvite = () => {
     this.props.navigation.navigate(Screens.Invite)
   }
 
