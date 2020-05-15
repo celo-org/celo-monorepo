@@ -92,6 +92,7 @@ function Overview() {
       <Button
         kind={BTN.PRIMARY}
         text={t('logo.overviewBtn')}
+        style={styles.download}
         onPress={onPressDownload}
         href="/assets/CeloMarketplaceIcons.zip"
       />
@@ -132,5 +133,8 @@ const styles = StyleSheet.create({
   break: {
     width: '100%',
     display: 'block',
+  },
+  download: {
+    marginLeft: 10,
   },
 })

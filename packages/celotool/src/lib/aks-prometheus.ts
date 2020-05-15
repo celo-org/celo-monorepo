@@ -48,17 +48,21 @@ export async function removeHelmRelease() {
 }
 
 async function helmParameters(clusterConfig: AzureClusterConfig) {
-  const kubeClusterName = fetchEnv(clusterConfig.clusterName)
   return [
     `--set namespace=${kubeNamespace}`,
-    `--set cluster=${kubeClusterName}`,
+    `--set cluster=${clusterConfig.clusterName}`,
     `--set gcloud.project=${fetchEnv(envVar.TESTNET_PROJECT_NAME)}`,
     `--set gcloud.region=${fetchEnv(envVar.KUBERNETES_CLUSTER_ZONE)}`,
     `--set sidecar.imageTag=${sidecarImageTag}`,
     `--set prometheus.imageTag=${prometheusImageTag}`,
     `--set gcloudServiceAccountKeyBase64=${await getPrometheusGcloudServiceAccountKeyBase64(
-      kubeClusterName
+      clusterConfig.clusterName
     )}`,
+    // Stackdriver allows a maximum of 10 custom labels. kube-state-metrics
+    // has some metrics of the form "kube_.+_labels" that provides the labels
+    // of k8s resources as metric labels. If some k8s resources have too many labels,
+    // this results in a bunch of errors when the sidecar tries to send metrics to Stackdriver.
+    `--set-string includeFilter='\\{job=~".+"\\,__name__!~"kube_.+_labels"\\}'`,
   ]
 }
 
