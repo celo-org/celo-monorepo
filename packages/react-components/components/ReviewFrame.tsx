@@ -55,6 +55,7 @@ class ReviewFrame extends React.PureComponent<Props, State> {
               standard={true}
               type={BtnTypes.PRIMARY}
               disabled={confirmButton.disabled || this.state.confirmed}
+              testID="ConfirmButton"
             />
           )}
           {modifyButton && (

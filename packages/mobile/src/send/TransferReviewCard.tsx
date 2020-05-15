@@ -75,7 +75,11 @@ export default function TransferReviewCard({
       <Avatar recipient={recipient} address={address} e164Number={e164PhoneNumber} />
       <CurrencyDisplay type={DisplayType.Big} style={styles.amount} amount={amount} />
       <View style={styles.bottomContainer}>
-        {!!comment && <Text style={styles.comment}>{comment}</Text>}
+        {!!comment && (
+          <Text style={styles.comment} testID="Comment">
+            {comment}
+          </Text>
+        )}
         <HorizontalLine />
         {subtotalAmount && (
           <LineItemRow

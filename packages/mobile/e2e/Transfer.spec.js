@@ -16,6 +16,7 @@ const VERIFICATION_PHONE_NUMBER = '030 111111'
 const EXAMPLE_NAME = 'Test Name'
 const DEFAULT_RECIPIENT_PHONE_NUMBER = '+10000000000'
 const AMOUNT_TO_SEND = '0.1'
+const RANDOM_COMMENT = 'poker night winnings'
 
 // clicks an element if it sees it
 async function bannerDismiss(inElement, tapElement) {
@@ -144,10 +145,6 @@ describe('Transfer Works', () => {
     await waitFor(element(by.id('RecipientPicker')))
       .toBeVisible()
       .withTimeout(10000)
-    //await element(by.id('RecipientPicker')).tap()
-
-    //await element(by.id('RecipientPicker')).tap()
-    //await element(by.id('RecipientPicker')).replaceText(DEFAULT_RECIPIENT_PHONE_NUMBER)
 
     await waitFor(element(by.id('RecipientItem')))
       .toBeVisible()
@@ -161,8 +158,37 @@ describe('Transfer Works', () => {
       .withTimeout(10000)
 
     await element(by.id('AmountInput')).replaceText(AMOUNT_TO_SEND)
-    await sleep(4000)
+    await sleep(2000)
+
+    await element(by.id('CommentInput')).replaceText(RANDOM_COMMENT)
+    await sleep(2000)
+
     // TODO(erdal): make sure gas fees are estimated here?
     await element(by.id('Send')).tap()
   })
+
+  it('SendAmount -> SendConfirmation', async () => {
+    await waitFor(element(by.id('Comment')))
+      .toBeVisible()
+      .withTimeout(10000)
+
+    await expect(element(by.id('Comment'))).toHaveText(RANDOM_COMMENT)
+
+    await element(by.id('ConfirmButton')).tap()
+  })
+
+  it('SendConfirmation -> Home', async () => {
+    await waitFor(element(by.id('DollarBalance')))
+      .toBeVisible()
+      .withTimeout(10000)
+
+    await waitFor(element(by.id('GoldBalance')))
+      .toBeVisible()
+      .withTimeout(10000)
+
+    // TODO(erdal): look for the latest transaction and
+    // make sure it was successful
+  })
+
+  // TODO(erdal): generate a new invite
 })

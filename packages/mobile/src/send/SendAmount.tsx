@@ -412,6 +412,7 @@ export class SendAmount extends React.Component<Props, State> {
             value={this.state.reason}
             maxLength={70}
             onChangeText={this.onReasonChanged}
+            testID="CommentInput"
           />
           <View style={style.feeContainer}>
             <LoadingLabel
