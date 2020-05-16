@@ -85,6 +85,7 @@ describe('SendAmount', () => {
             feeType={FeeType.SEND}
             localCurrencyCode={LocalCurrencyCode.MXN}
             localCurrencyExchangeRate={'1.33'}
+            recentPayments={[]}
           />
         </Provider>
       )

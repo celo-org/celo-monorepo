@@ -29,6 +29,7 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import Avatar from 'src/components/Avatar'
 import CurrencyDisplay, { FormatType } from 'src/components/CurrencyDisplay'
 import {
+  DAILY_PAYMENT_LIMIT_CUSD,
   DOLLAR_TRANSACTION_MIN_AMOUNT,
   MAX_COMMENT_LENGTH,
   NUMBER_INPUT_MAX_DECIMALS,
@@ -43,6 +44,7 @@ import { RecipientVerificationStatus } from 'src/identity/contactMapping'
 import { E164NumberToAddressType } from 'src/identity/reducer'
 import { LocalCurrencyCode, LocalCurrencySymbol } from 'src/localCurrency/consts'
 import {
+  convertDollarsToLocalAmount,
   convertDollarsToMaxSupportedPrecision,
   convertLocalAmountToDollars,
 } from 'src/localCurrency/convert'
@@ -58,7 +60,10 @@ import {
   RecipientKind,
 } from 'src/recipients/recipient'
 import { RootState } from 'src/redux/reducers'
+import { PaymentInfo } from 'src/send/reducers'
+import { getRecentPayments } from 'src/send/selectors'
 import { ConfirmationInput } from 'src/send/SendConfirmation'
+import { dailyAmountRemaining, isPaymentLimitReached } from 'src/send/utils'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { fetchDollarBalance } from 'src/stableToken/actions'
 import { withDecimalSeparator } from 'src/utils/withDecimalSeparator'
@@ -85,6 +90,7 @@ interface StateProps {
   feeType: FeeType | null
   localCurrencyCode: LocalCurrencyCode
   localCurrencyExchangeRate: string | null | undefined
+  recentPayments: PaymentInfo[]
 }
 
 interface DispatchProps {
@@ -119,6 +125,8 @@ const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
   const { route } = ownProps
   const { e164NumberToAddress } = state.identity
   const feeType = getFeeType(route.params.recipient, e164NumberToAddress)
+  const recentPayments = getRecentPayments(state)
+
   return {
     dollarBalance: state.stableToken.balance || '0',
     estimateFeeDollars: getFeeEstimateDollars(state, feeType),
@@ -127,6 +135,7 @@ const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
     feeType,
     localCurrencyCode: getLocalCurrencyCode(state),
     localCurrencyExchangeRate: getLocalCurrencyExchangeRate(state),
+    recentPayments,
   }
 }
 
@@ -229,10 +238,40 @@ export class SendAmount extends React.Component<Props, State> {
     this.setState({ reason, characterLimitExceeded })
   }
 
+  showLimitReachedError = (now: number) => {
+    const dailyRemainingcUSD = dailyAmountRemaining(now, this.props.recentPayments)
+    const dailyRemaining = convertDollarsToLocalAmount(
+      dailyRemainingcUSD,
+      this.props.localCurrencyExchangeRate
+    )
+    const dailyLimit = convertDollarsToLocalAmount(
+      DAILY_PAYMENT_LIMIT_CUSD,
+      this.props.localCurrencyExchangeRate
+    )
+    const currencySymbol = LocalCurrencySymbol[this.props.localCurrencyCode]
+
+    const translationParams = {
+      currencySymbol,
+      dailyRemaining,
+      dailyLimit,
+      dailyRemainingcUSD,
+      dailyLimitcUSD: DAILY_PAYMENT_LIMIT_CUSD,
+    }
+    this.props.showError(ErrorMessages.PAYMENT_LIMIT_REACHED, null, translationParams)
+  }
+
   onSend = () => {
     const { isDollarBalanceSufficient } = this.isAmountValid()
     if (!isDollarBalanceSufficient) {
       this.props.showError(ErrorMessages.NSF_TO_SEND)
+      return
+    }
+
+    const amount = this.getDollarsAmount().toNumber()
+    const now = Date.now()
+    const isLimitReached = isPaymentLimitReached(now, this.props.recentPayments, amount)
+    if (isLimitReached) {
+      this.showLimitReachedError(now)
       return
     }
 
