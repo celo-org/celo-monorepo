@@ -27,6 +27,7 @@ export interface StoreLatestInRecentsAction {
 export interface SendPaymentOrInviteAction {
   type: Actions.SEND_PAYMENT_OR_INVITE
   amount: BigNumber
+  timestamp: number
   reason: string
   recipient: Recipient
   recipientAddress?: string | null
@@ -65,6 +66,7 @@ export const shareQRCode = (qrCodeSvg: SVG) => ({
 
 export const sendPaymentOrInvite = (
   amount: BigNumber,
+  timestamp: number,
   reason: string,
   recipient: Recipient,
   recipientAddress: string | null | undefined,
@@ -73,6 +75,7 @@ export const sendPaymentOrInvite = (
 ): SendPaymentOrInviteAction => ({
   type: Actions.SEND_PAYMENT_OR_INVITE,
   amount,
+  timestamp,
   reason,
   recipient,
   recipientAddress,

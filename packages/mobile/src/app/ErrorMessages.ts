@@ -32,6 +32,7 @@ export enum ErrorMessages {
   INVITE_FAILED = 'inviteFailed',
   INVITE_OPEN_APP_FAILED = 'inviteOpenAppFailed',
   SEND_PAYMENT_FAILED = 'sendPaymentFailed',
+  PAYMENT_LIMIT_REACHED = 'paymentLimitReached',
   PAYMENT_REQUEST_FAILED = 'paymentRequestFailed',
   ESCROW_TRANSFER_FAILED = 'escrowTransferFailed',
   ESCROW_WITHDRAWAL_FAILED = 'escrowWithdrawalFailed',
