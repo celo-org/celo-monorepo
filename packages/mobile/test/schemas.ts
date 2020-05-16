@@ -172,6 +172,7 @@ export const v1Schema = {
   send: {
     isSending: false,
     recentRecipients: [],
+    recentPayments: [],
   },
   recipients: {
     recipientCache: {},
