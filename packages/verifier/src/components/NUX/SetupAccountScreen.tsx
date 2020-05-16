@@ -4,19 +4,18 @@ import TextInput from '@celo/react-components/components/TextInput'
 import { navigate } from '@celo/react-components/services/NavigationService'
 import colors from '@celo/react-components/styles/colors'
 import fonts from '@celo/react-components/styles/fonts'
-import { StackScreenProps } from '@react-navigation/stack'
 import { Namespaces } from 'locales'
 import * as React from 'react'
 import { WithTranslation, withTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { clearError, setCountryCode, setE164Number, setName, showError } from 'src/app/actions'
 import { errorMessages } from 'src/app/reducer'
 import { Screens } from 'src/navigator/Screens'
-import { StackParamList } from 'src/navigator/types'
 import { setVerifier } from 'src/services/FirebaseDb'
 import VerifierService from 'src/services/VerifierService'
 import CancelButton from 'src/shared/CancelButton'
@@ -35,6 +34,10 @@ interface State {
   isSubmitting: boolean
 }
 
+interface NavigationParams {
+  isNUXMode: boolean
+}
+
 interface DispatchProps {
   setE164Number: typeof setE164Number
   setCountryCode: typeof setCountryCode
@@ -46,7 +49,7 @@ interface DispatchProps {
 type Props = WithTranslation &
   DispatchProps &
   StateProps &
-  StackScreenProps<StackParamList, Screens.SetupAccount>
+  NavigationInjectedProps<NavigationParams>
 
 const mapDispatchToProps = {
   setE164Number,
@@ -173,7 +176,7 @@ class SetupAccountScreen extends React.Component<Props, State> {
   }
 
   isNUXMode() {
-    return this.props.route.params?.isNUXMode
+    return this.props.navigation.getParam('isNUXMode', true)
   }
 
   render() {
