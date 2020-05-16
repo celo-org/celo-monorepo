@@ -22,7 +22,7 @@ import { Namespaces, withTranslation } from 'src/i18n'
 import { headerWithCancelButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import TopBarButton from 'src/navigator/TopBarButton.v2'
+import { TopBarTextButton } from 'src/navigator/TopBarButton.v2'
 import { RootState } from 'src/redux/reducers'
 import Logger from 'src/utils/Logger'
 
@@ -52,7 +52,7 @@ class BackupPhrase extends React.Component<Props, State> {
   // TODO(Rossy): Show modal when cancelling if backup flow incomplete
   static navigationOptions = () => ({
     ...headerWithCancelButton,
-    headerLeft: <CancelButton color={colors.gray4} />,
+    headerLeft: <CancelButton style={{ color: colors.gray4 }} />,
     headerTitle: 'Account Key',
     headerRight: <HeaderRight />,
   })
@@ -139,7 +139,10 @@ class BackupPhrase extends React.Component<Props, State> {
 
 function HeaderRight() {
   const { t } = useTranslation(Namespaces.backupKeyFlow6)
-  return <TopBarButton>{t('moreInfo')}</TopBarButton>
+  const onMoreInfoPressed = () => {
+    // TODO: Implement this
+  }
+  return <TopBarTextButton onPress={onMoreInfoPressed} title={t('moreInfo')} />
 }
 
 const styles = StyleSheet.create({
