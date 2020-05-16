@@ -147,7 +147,7 @@ exports[`Privacy renders 1`] = `
           }
         }
       >
-        Valid as of Feb 24, 2020
+        Valid as of May 17, 2020
       </div>
     </div>
     <div
@@ -357,7 +357,7 @@ exports[`Privacy renders 1`] = `
           }
         }
       >
-        Unless we specifically state otherwise, Celo is the data processor of the Personal Data we process, and is therefore responsible for ensuring that the systems and processes we use are compliant with data protection laws, to the extent applicable to us.
+        Unless we specifically state otherwise, the Celo Foundation is the data processor of the Personal Data we process, and is therefore responsible for ensuring that the systems and processes we use are compliant with data protection laws, to the extent applicable to us.
       </div>
       <div
         className="css-text-901oao"
@@ -373,7 +373,7 @@ exports[`Privacy renders 1`] = `
           }
         }
       >
-        Celo personnel are required to comply with this Privacy Policy and complete data protection training, where appropriate.
+        Celo Foundation personnel are required to comply with this Privacy Policy and complete data protection training, where appropriate.
       </div>
     </div>
   </div>
@@ -482,7 +482,7 @@ exports[`Privacy renders 1`] = `
           }
         }
       >
-        Celo collects information that you provide directly to us when you browse our Site, register to receive newsletter requests or other information, provide feedback through surveys, participate in any interactive features on our Sites including contests, promotions, challenges, activities or events.
+        The Celo Foundation collects information that you provide directly to us when you browse our Site, register to receive newsletter requests or other information, provide feedback through surveys, participate in any interactive features on our Sites including contests, promotions, challenges, activities or events.
       </div>
       <div
         className="css-text-901oao"
@@ -1198,7 +1198,7 @@ exports[`Privacy renders 1`] = `
           }
         }
       >
-        Celo Sub-Processors
+        Celo Foundation Sub-Processors
       </h3>
     </div>
     <div

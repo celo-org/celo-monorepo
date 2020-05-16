@@ -47,18 +47,12 @@
     "text": "Shared norms and behaviors are the foundation of a beautiful community. Please read and support the effort.",
     "button": "Read Code"
   },
-  "communityTenets": "Celo Community Tenets",
   "communityGuidelines": "Community Guidelines",
-  "writingAbout": "What We're Writing About",
-  "recentNews": "Recent news from the core Celo team.",
-  "whereToSayHello": "Where to Say Hello",
-  "hearFromCelo": "Hear from the Celo team at these upcoming events",
   "comeMeetUsAt": "Come meet us at these upcoming events.",
   "readMoreOn": "Read More On",
   "contactUs": "Questions? Email us",
   "readMore": "Read More",
   "learnMore": "Learn More",
-  "interested": "Interested in what we are building?",
   "interestedText": {
     "0": "Stay up-to-date by signing up for our newsletter.  If you'd like to share, we'd love to learn more about you so that we can collectively build the Celo community. Our",
     "1": "Privacy Policy",
@@ -108,7 +102,7 @@
       "topic": "Interest",
       "partnership": "Partnership opportunities",
       "community": "Developer community",
-      "jobs": "Jobs at Celo",
+      "jobs": "Jobs working on Celo",
       "other": "Other"
     }
   },
