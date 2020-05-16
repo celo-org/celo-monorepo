@@ -88,20 +88,19 @@
   },
   "secureSendExplanation": {
     "body1": "{{e164Number}} has multiple accounts associated with it. {{displayName}} could have created a new Celo account, or may have lost their phone or had their account compromised.",
-    "body2": "Before transacting, you must confirm {{displayName}}'s account. You can do this by scanning their QR code or confirming their account number with them."
+    "body2": "You must scan their QR code or confirm their account number before transacting."
   },
   "confirmAccountNumber": {
     "title": "Confirm Account Number",
-    "body1Partial": "Please ask {{displayName}} for the last four digits of their account number and enter it below.",
-    "body1Full": "Please ask {{displayName}} for their account number and enter it below.",
-    "body2Partial": "For security, please do not use text messaging (SMS). We strongly recommend asking in person or over the phone.",
+    "bodyPartial": "Please ask {{displayName}} for the last four digits of their account number. It's safest to do this in person or by phone.",
+    "body1Full": "Please ask {{displayName}} for their account number.",
     "body2Full": "For security, please do not use text messaging (SMS). We strongly recommend asking in person or over the phone, through WhatsApp or Messenger, or by email.",
-    "help": "Help {{displayName}} find their account number"
+    "help": "Help locating an account number"
   },
-  "accountInputHeaderA": "LAST 4 DIGITS OF ACCOUNT NUMBER",
-  "accountInputHeaderB": "ACCOUNT NUMBER",
+  "accountInputHeaderPartial": "Last 4 Digits",
+  "accountInputHeaderFull": "Account Number",
   "helpModal": {
-    "header": "Find your contact's account number",
+    "header": "Locating an Account Number",
     "body1": "Your contact can find their account number (also known as an address) at the top of the Settings menu.",
     "body2": "Account numbers begin with “0x” and are 42 characters long. They appear directly beneath the profile photo."
   }

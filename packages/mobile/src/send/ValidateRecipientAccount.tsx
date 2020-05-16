@@ -1,9 +1,9 @@
-import Button, { BtnTypes } from '@celo/react-components/components/Button'
+import Button, { BtnTypes } from '@celo/react-components/components/Button.v2'
 import KeyboardAwareScrollView from '@celo/react-components/components/KeyboardAwareScrollView'
 import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
 import TextButton from '@celo/react-components/components/TextButton'
-import colors from '@celo/react-components/styles/colors'
-import fontStyles from '@celo/react-components/styles/fonts'
+import colors from '@celo/react-components/styles/colors.v2'
+import fontStyles from '@celo/react-components/styles/fonts.v2'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
@@ -14,7 +14,7 @@ import { connect } from 'react-redux'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
 import CodeRow, { CodeRowStatus } from 'src/components/CodeRow'
 import { SingleDigitInput } from 'src/components/SingleDigitInput'
-import i18n, { Namespaces, withTranslation } from 'src/i18n'
+import { Namespaces, withTranslation } from 'src/i18n'
 import { headerWithBackButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -73,7 +73,6 @@ type Props = StateProps & DispatchProps & WithTranslation & NavigationInjectedPr
 export class ValidateRecipientAccount extends React.Component<Props, State> {
   static navigationOptions = () => ({
     ...headerWithBackButton,
-    headerTitle: i18n.t('sendFlow7:confirmAccountNumber.title'),
   })
 
   state: State = {
@@ -129,12 +128,8 @@ export class ValidateRecipientAccount extends React.Component<Props, State> {
               displayName,
             })}
           </Text>
-          <Text style={styles.body}>
-            {t('confirmAccountNumber.body2Full', {
-              displayName,
-            })}
-          </Text>
-          <Text style={styles.codeHeader}>{t('accountInputHeaderB')}</Text>
+          <Text style={styles.body}>{t('confirmAccountNumber.body2Full')}</Text>
+          <Text style={styles.codeHeader}>{t('accountInputHeaderFull')}</Text>
           <CodeRow
             status={CodeRowStatus.INPUTTING}
             inputValue={inputValue}
@@ -148,29 +143,25 @@ export class ValidateRecipientAccount extends React.Component<Props, State> {
 
     const singleDigitInputComponentArr = PARTIAL_ADDRESS_PLACEHOLDER.map(
       (placeholderValue, index) => (
-        <SingleDigitInput
-          key={placeholderValue}
-          inputValue={singleDigitInputValueArr[index]}
-          inputPlaceholder={placeholderValue}
-          // tslint:disable-next-line:jsx-no-lambda
-          onInputChange={(value) => this.onSingleDigitInputChange(value, index)}
-        />
+        <View style={styles.singleDigitInputWrapper} key={placeholderValue}>
+          <SingleDigitInput
+            inputValue={singleDigitInputValueArr[index]}
+            inputPlaceholder={placeholderValue}
+            // tslint:disable-next-line:jsx-no-lambda
+            onInputChange={(value) => this.onSingleDigitInputChange(value, index)}
+          />
+        </View>
       )
     )
 
     return (
       <View>
         <Text style={styles.body}>
-          {t('confirmAccountNumber.body1Partial', {
+          {t('confirmAccountNumber.bodyPartial', {
             displayName,
           })}
         </Text>
-        <Text style={styles.body}>
-          {t('confirmAccountNumber.body2Partial', {
-            displayName,
-          })}
-        </Text>
-        <Text style={styles.codeHeader}>{t('accountInputHeaderA')}</Text>
+        <Text style={styles.codeHeader}>{t('accountInputHeaderPartial')}</Text>
         <View style={styles.singleDigitInputContainer}>{singleDigitInputComponentArr}</View>
       </View>
     )
@@ -186,7 +177,10 @@ export class ValidateRecipientAccount extends React.Component<Props, State> {
           contentContainerStyle={styles.scrollContainer}
           keyboardShouldPersistTaps={'always'}
         >
-          <View>{this.renderInstructionsAndInputField()}</View>
+          <View>
+            <Text style={styles.h2}>{t('confirmAccountNumber.title')}</Text>
+            <View>{this.renderInstructionsAndInputField()}</View>
+          </View>
           <Text onPress={this.toggleModal} style={styles.askHelpText}>
             {t('confirmAccountNumber.help', { displayName })}
           </Text>
@@ -194,7 +188,6 @@ export class ValidateRecipientAccount extends React.Component<Props, State> {
         <Button
           onPress={this.onPressConfirm}
           text={t('confirmAccount.button')}
-          standard={false}
           type={BtnTypes.PRIMARY}
           testID="ConfirmAccountButton"
         />
@@ -219,70 +212,47 @@ export class ValidateRecipientAccount extends React.Component<Props, State> {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: colors.light,
     justifyContent: 'space-between',
   },
   scrollContainer: {
     flexGrow: 1,
-    padding: 20,
-    paddingTop: 40,
+    padding: 16,
     justifyContent: 'space-between',
   },
   singleDigitInputContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    paddingRight: 10,
+  },
+  singleDigitInputWrapper: {
+    paddingRight: 8,
   },
   codeHeader: {
-    ...fontStyles.body,
-    ...fontStyles.semiBold,
-    marginTop: 20,
-    textAlign: 'center',
+    ...fontStyles.small600,
+    paddingVertical: 8,
   },
-  h1: {
-    ...fontStyles.h1,
-    marginTop: 20,
-    flex: 1,
-    justifyContent: 'center',
-  },
-  codeInputSpinner: {
-    backgroundColor: '#FFF',
-    position: 'absolute',
-    top: 5,
-    right: 3,
-    padding: 10,
-  },
-  checkmarkContainer: {
-    backgroundColor: colors.darkLightest,
-    position: 'absolute',
-    top: 3,
-    right: 3,
-    padding: 10,
+  h2: {
+    ...fontStyles.h2,
+    paddingVertical: 16,
   },
   askHelpText: {
-    ...fontStyles.bodySmall,
+    ...fontStyles.small,
     marginTop: 20,
     marginBottom: 10,
     textDecorationLine: 'underline',
-    textAlign: 'center',
   },
   body: {
-    ...fontStyles.body,
-    textAlign: 'center',
-    paddingBottom: 15,
+    ...fontStyles.regular,
+    paddingBottom: 16,
   },
   modalContainer: {
     backgroundColor: colors.background,
-    padding: 20,
-    marginHorizontal: 10,
+    margin: 24,
     borderRadius: 4,
   },
   modalHeader: {
     ...fontStyles.h2,
-    ...fontStyles.bold,
     marginVertical: 15,
+    textAlign: 'center',
   },
   modalButtonsContainer: {
     marginTop: 25,
@@ -291,8 +261,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-evenly',
   },
   modalCancelText: {
-    ...fontStyles.body,
-    ...fontStyles.semiBold,
     paddingRight: 20,
   },
 })
