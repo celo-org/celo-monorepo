@@ -8,7 +8,7 @@ import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { Namespaces } from 'src/i18n'
 import { navigateBack } from 'src/navigator/NavigationService'
-import TopBarButton from 'src/navigator/TopBarButton.v2'
+import { TopBarTextButton } from 'src/navigator/TopBarButton.v2'
 import { RootState } from 'src/redux/reducers'
 import { isBackupTooLate } from 'src/redux/selectors'
 
@@ -38,9 +38,7 @@ export default function DelayButton() {
 
   if (backupTooLate && !backupDelayedTime) {
     return (
-      <TopBarButton style={styles.root} onPress={onPressDelay}>
-        {t('delayBackup')}
-      </TopBarButton>
+      <TopBarTextButton titleStyle={styles.root} onPress={onPressDelay} title={t('delayBackup')} />
     )
   } else {
     return <View />
