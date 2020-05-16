@@ -42,7 +42,7 @@ export const sendReducer = (
       }
     }
     case Actions.SEND_PAYMENT_OR_INVITE:
-      return sendPaymentOrInvite(state, action.amount)
+      return sendPaymentOrInvite(state, action.amount, action.timestamp)
     case Actions.SEND_PAYMENT_OR_INVITE_SUCCESS:
     case Actions.SEND_PAYMENT_OR_INVITE_FAILURE:
       return {
@@ -57,8 +57,7 @@ export const sendReducer = (
   }
 }
 
-const sendPaymentOrInvite = (state: State, amount: BigNumber) => {
-  const timestamp = Date.now()
+const sendPaymentOrInvite = (state: State, amount: BigNumber, timestamp: number) => {
   const latestPayment = { timestamp, amount }
 
   // keep only the last 24 hours
