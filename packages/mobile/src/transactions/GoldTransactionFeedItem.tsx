@@ -57,8 +57,8 @@ export function ExchangeFeedItem(props: Props) {
               <Text style={styles.exchangeRate}> @ </Text>
               <CurrencyDisplay
                 amount={exchangeRateAmount}
-                hideSymbol={true}
-                hideCode={false}
+                hideSymbol={false}
+                hideCode={true}
                 showLocalAmount={true}
                 style={styles.exchangeRate}
               />

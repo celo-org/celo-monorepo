@@ -85,8 +85,8 @@ exports[`GoldTransactionFeedItem renders correctly 1`] = `
           }
         >
           
+          €
           0.55
-           EUR
         </Text>
       </View>
       <View>

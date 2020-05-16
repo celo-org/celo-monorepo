@@ -205,7 +205,7 @@ exports[`ExchangeTradeScreen renders correctly 1`] = `
     style={
       Array [
         Object {
-          "flexDirection": "row",
+          "flexDirection": "column",
         },
         Object {
           "padding": 16,
@@ -214,43 +214,56 @@ exports[`ExchangeTradeScreen renders correctly 1`] = `
     }
   >
     <View
-      accessible={true}
-      focusable={true}
-      onClick={[Function]}
-      onResponderGrant={[Function]}
-      onResponderMove={[Function]}
-      onResponderRelease={[Function]}
-      onResponderTerminate={[Function]}
-      onResponderTerminationRequest={[Function]}
-      onStartShouldSetResponder={[Function]}
       style={
         Object {
-          "alignItems": "center",
-          "backgroundColor": "#E3C376",
           "borderRadius": 100,
-          "flex": 1,
-          "height": 48,
-          "justifyContent": "center",
-          "opacity": 1,
-          "paddingHorizontal": 16,
-          "paddingVertical": 5,
+          "overflow": "hidden",
         }
       }
-      testID="ExchangeReviewButton"
     >
-      <Text
-        accessibilityLabel="continue"
-        style={
+      <View
+        accessible={true}
+        focusable={false}
+        nativeBackgroundAndroid={
           Object {
-            "color": "#FFFFFF",
-            "fontFamily": "Inter-SemiBold",
-            "fontSize": 16,
-            "lineHeight": 22,
+            "attribute": "selectableItemBackground",
+            "type": "ThemeAttrAndroid",
           }
         }
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          Object {
+            "alignItems": "center",
+            "backgroundColor": "#E3C376",
+            "flexGrow": 1,
+            "height": 48,
+            "justifyContent": "center",
+            "paddingHorizontal": 16,
+            "paddingVertical": 5,
+          }
+        }
+        testID="ExchangeReviewButton"
       >
-        undefined:review
-      </Text>
+        <Text
+          accessibilityLabel="continue"
+          style={
+            Object {
+              "color": "#FFFFFF",
+              "fontFamily": "Inter-SemiBold",
+              "fontSize": 16,
+              "lineHeight": 22,
+            }
+          }
+        >
+          undefined:review
+        </Text>
+      </View>
     </View>
   </View>
 </SafeAreaView>

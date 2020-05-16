@@ -576,7 +576,7 @@ exports[`ExchangeReview renders correctly 1`] = `
     style={
       Array [
         Object {
-          "flexDirection": "row",
+          "flexDirection": "column",
         },
         Object {
           "padding": 16,
@@ -585,57 +585,70 @@ exports[`ExchangeReview renders correctly 1`] = `
     }
   >
     <View
-      accessible={true}
-      focusable={true}
-      onClick={[Function]}
-      onResponderGrant={[Function]}
-      onResponderMove={[Function]}
-      onResponderRelease={[Function]}
-      onResponderTerminate={[Function]}
-      onResponderTerminationRequest={[Function]}
-      onStartShouldSetResponder={[Function]}
       style={
         Object {
-          "alignItems": "center",
-          "backgroundColor": "#EEB93C",
           "borderRadius": 100,
-          "flex": 1,
-          "height": 48,
-          "justifyContent": "center",
-          "opacity": 1,
-          "paddingHorizontal": 16,
-          "paddingVertical": 5,
+          "overflow": "hidden",
         }
       }
     >
-      <Text
+      <View
+        accessible={true}
+        focusable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackground",
+            "type": "ThemeAttrAndroid",
+          }
+        }
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
         style={
           Object {
-            "color": "#FFFFFF",
-            "fontFamily": "Inter-SemiBold",
-            "fontSize": 16,
-            "lineHeight": 22,
+            "alignItems": "center",
+            "backgroundColor": "#EEB93C",
+            "flexGrow": 1,
+            "height": 48,
+            "justifyContent": "center",
+            "paddingHorizontal": 16,
+            "paddingVertical": 5,
           }
         }
       >
-        Buy or sell 
         <Text
-          numberOfLines={1}
           style={
-            Array [
-              undefined,
-              Object {
-                "color": undefined,
-              },
-            ]
+            Object {
+              "color": "#FFFFFF",
+              "fontFamily": "Inter-SemiBold",
+              "fontSize": 16,
+              "lineHeight": 22,
+            }
           }
         >
-          
-          
-          10.000
+          Buy or sell 
+          <Text
+            numberOfLines={1}
+            style={
+              Array [
+                undefined,
+                Object {
+                  "color": undefined,
+                },
+              ]
+            }
+          >
+            
+            
+            10.000
+          </Text>
+           Gold
         </Text>
-         Gold
-      </Text>
+      </View>
     </View>
   </View>
 </SafeAreaView>
