@@ -11,12 +11,23 @@ const mockRoute = {
   name: Screens.DataSaver as Screens.DataSaver,
   key: '1',
   params: {
-    promptModalVisible: false,
+    promptModalVisible: true,
   },
 }
 
 describe('DataSaver', () => {
-  it('renders correctly', () => {
+  it('renders correctly with prompt', () => {
+    const tree = renderer.create(
+      <Provider store={createMockStore({})}>
+        <DataSaver navigation={mockNavigation} route={mockRoute} />
+      </Provider>
+    )
+    expect(tree).toMatchSnapshot()
+  })
+
+  it('renders correctly no prompt', () => {
+    mockRoute.params.promptModalVisible = false
+
     const tree = renderer.create(
       <Provider store={createMockStore({})}>
         <DataSaver navigation={mockNavigation} route={mockRoute} />
