@@ -16,8 +16,6 @@ import { WritePaymentRequest } from 'src/firebase/actions'
 import { handleNotification } from 'src/firebase/notifications'
 import { navigateHome } from 'src/navigator/NavigationService'
 import Logger from 'src/utils/Logger'
-// We can't combine the 2 imports otherwise it only imports the type and fails at runtime
-// tslint:disable-next-line: no-duplicate-imports
 
 const TAG = 'firebase/firebase'
 
