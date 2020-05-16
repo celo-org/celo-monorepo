@@ -33,11 +33,15 @@ export const showMessage = (
   return showAlert(AlertTypes.MESSAGE, message, dismissAfter, buttonMessage, title)
 }
 
-export const showError = (error: ErrorMessages, dismissAfter?: number): ShowAlertAction => {
+export const showError = (
+  error: ErrorMessages,
+  dismissAfter?: number | null,
+  i18nOptions?: object
+): ShowAlertAction => {
   CeloAnalytics.track(DefaultEventNames.errorDisplayed, { error })
   return showAlert(
     AlertTypes.ERROR,
-    i18n.t(error, { ns: 'global' }),
+    i18n.t(error, { ns: 'global', ...(i18nOptions || {}) }),
     dismissAfter,
     null,
     null,

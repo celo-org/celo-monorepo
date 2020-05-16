@@ -76,6 +76,7 @@ export const headerArea = {
       ...Platform.select({
         android: {
           elevation: 0,
+          backgroundColor: 'transparent',
         },
         ios: {
           borderBottomWidth: 0,

@@ -126,8 +126,11 @@ class SendConfirmation extends React.Component<Props, State> {
       firebasePendingRequestUid,
     } = this.getConfirmationInput()
 
+    const timestamp = Date.now()
+
     this.props.sendPaymentOrInvite(
       amount,
+      timestamp,
       reason,
       recipient,
       recipientAddress,
