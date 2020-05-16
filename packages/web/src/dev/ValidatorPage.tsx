@@ -9,7 +9,7 @@ import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
 import menuItems from 'src/shared/menu-items'
 const previewImage = require('src/dev/opengraph.jpg')
 
-class BuildPage extends React.PureComponent<I18nProps> {
+class ValidatorPage extends React.PureComponent<I18nProps> {
   static getInitialProps() {
     return { namespacesRequired: ['common', 'dev'] }
   }
@@ -32,7 +32,7 @@ class BuildPage extends React.PureComponent<I18nProps> {
   }
 }
 
-export default withNamespaces(NameSpaces.dev)(BuildPage)
+export default withNamespaces(NameSpaces.dev)(ValidatorPage)
 
 const styles = StyleSheet.create({
   container: { scrollPadding: 20 },
