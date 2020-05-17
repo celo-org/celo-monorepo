@@ -1782,10 +1782,10 @@
     web3-eth-contract "1.2.4"
     web3-utils "1.2.4"
 
-"@celo/dev-cli@^2.0.3":
-  version "2.0.3"
-  resolved "https://registry.yarnpkg.com/@celo/dev-cli/-/dev-cli-2.0.3.tgz#67f61dfee373ad8b412925e386cf122aabada5f5"
-  integrity sha512-4p+Ot9FNxWDXvkV0bluXYbk3DRyj7m9qt/NmygugydioSGTDqRWqpi/Kh/QYGSz5T+hKhsQtaiU0XayzbxykVQ==
+"@celo/dev-cli@2.0.4":
+  version "2.0.4"
+  resolved "https://registry.yarnpkg.com/@celo/dev-cli/-/dev-cli-2.0.4.tgz#8ac3693fe28c0d7d1414fac8a9072df4054d04bf"
+  integrity sha512-LuhO7fFuxOo6LRqubd1loWBX14Zr9Xi3zx31k8M4cjwI17FVZKR2ScSEvqMlE4N0ZVBi6KMrKksVorhSQiaQEQ==
   dependencies:
     "@oclif/command" "^1.5.13"
     "@oclif/config" "^1.12.12"
