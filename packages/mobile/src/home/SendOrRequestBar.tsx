@@ -8,19 +8,19 @@ import { useTranslation } from 'react-i18next'
 import { StyleSheet, View } from 'react-native'
 import { Namespaces } from 'src/i18n'
 import { navigate } from 'src/navigator/NavigationService'
-import { Screens, Stacks } from 'src/navigator/Screens'
+import { Screens } from 'src/navigator/Screens'
 
 export default function SendOrRequestBar() {
   const { t } = useTranslation(Namespaces.sendFlow7)
 
   const onPressSend = useCallback(() => {
     // TODO: use new send flow
-    navigate(Stacks.SendStack)
+    navigate(Screens.Send)
   }, [])
 
   const onPressRequest = useCallback(() => {
     // TODO: use new request flow
-    navigate(Stacks.SendStack)
+    navigate(Screens.Send)
   }, [])
 
   const onPressQrCode = useCallback(() => {

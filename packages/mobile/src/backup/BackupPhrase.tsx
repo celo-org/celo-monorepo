@@ -10,7 +10,6 @@ import { connect } from 'react-redux'
 import { hideAlert, showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
-import componentWithAnalytics from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import BackupPhraseContainer, {
   BackupPhraseContainerMode,
@@ -172,8 +171,7 @@ const styles = StyleSheet.create({
   },
 })
 
-export default componentWithAnalytics(
-  connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, { showError, hideAlert })(
-    withTranslation(Namespaces.backupKeyFlow6)(BackupPhrase)
-  )
-)
+export default connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
+  showError,
+  hideAlert,
+})(withTranslation(Namespaces.backupKeyFlow6)(BackupPhrase))

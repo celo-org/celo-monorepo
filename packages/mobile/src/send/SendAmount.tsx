@@ -13,18 +13,17 @@ import { fontStyles } from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
 import { ValidatorKind } from '@celo/utils/src/inputValidation'
 import { parseInputAmount } from '@celo/utils/src/parsing'
+import { StackScreenProps } from '@react-navigation/stack'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { StyleSheet, TextStyle, TouchableWithoutFeedback, View } from 'react-native'
 import { getNumberFormatSettings } from 'react-native-localize'
 import SafeAreaView from 'react-native-safe-area-view'
-import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
 import { hideAlert, showError, showMessage } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
-import componentWithAnalytics from 'src/analytics/wrapper'
 import { TokenTransactionType } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import Avatar from 'src/components/Avatar'
@@ -53,6 +52,7 @@ import { getLocalCurrencyCode, getLocalCurrencyExchangeRate } from 'src/localCur
 import { HeaderTitleWithBalance, headerWithBackButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { StackParamList } from 'src/navigator/types'
 import {
   getAddressFromRecipient,
   getRecipientVerificationStatus,
@@ -79,12 +79,7 @@ interface State {
   characterLimitExceeded: boolean
 }
 
-type Navigation = NavigationInjectedProps['navigation']
-
-interface OwnProps {
-  navigation: Navigation
-}
-
+type OwnProps = StackScreenProps<StackParamList, Screens.SendAmount>
 type Props = StateProps & DispatchProps & OwnProps & WithTranslation
 
 interface StateProps {
@@ -106,26 +101,15 @@ interface DispatchProps {
   fetchPhoneAddresses: typeof fetchPhoneAddresses
 }
 
-function getRecipient(navigation: Navigation): Recipient {
-  const recipient = navigation.getParam('recipient')
-  if (!recipient) {
-    throw new Error('Recipient expected')
-  }
-  return recipient
-}
-
-function getVerificationStatus(
-  navigation: Navigation,
-  e164NumberToAddress: E164NumberToAddressType
-) {
-  return getRecipientVerificationStatus(getRecipient(navigation), e164NumberToAddress)
+function getVerificationStatus(recipient: Recipient, e164NumberToAddress: E164NumberToAddressType) {
+  return getRecipientVerificationStatus(recipient, e164NumberToAddress)
 }
 
 function getFeeType(
-  navigation: Navigation,
+  recipient: Recipient,
   e164NumberToAddress: E164NumberToAddressType
 ): FeeType | null {
-  const verificationStatus = getVerificationStatus(navigation, e164NumberToAddress)
+  const verificationStatus = getVerificationStatus(recipient, e164NumberToAddress)
 
   switch (verificationStatus) {
     case RecipientVerificationStatus.UNKNOWN:
@@ -137,10 +121,10 @@ function getFeeType(
   }
 }
 
-const mapStateToProps = (state: RootState, ownProps: NavigationInjectedProps): StateProps => {
-  const { navigation } = ownProps
+const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
+  const { route } = ownProps
   const { e164NumberToAddress } = state.identity
-  const feeType = getFeeType(navigation, e164NumberToAddress)
+  const feeType = getFeeType(route.params.recipient, e164NumberToAddress)
   const recentPayments = getRecentPayments(state)
 
   return {
@@ -158,10 +142,10 @@ const mapStateToProps = (state: RootState, ownProps: NavigationInjectedProps): S
 const { decimalSeparator } = getNumberFormatSettings()
 
 export class SendAmount extends React.Component<Props, State> {
-  static navigationOptions = () => ({
+  static navigationOptions = {
     ...headerWithBackButton,
     headerTitle: <HeaderTitleWithBalance title={i18n.t('sendFlow7:sendOrRequest')} />,
-  })
+  }
 
   state: State = {
     amount: '',
@@ -215,12 +199,12 @@ export class SendAmount extends React.Component<Props, State> {
     }
   }
 
-  getRecipient = (): Recipient => {
-    return getRecipient(this.props.navigation)
+  getRecipient = () => {
+    return this.props.route.params.recipient
   }
 
   getVerificationStatus = () => {
-    return getVerificationStatus(this.props.navigation, this.props.e164NumberToAddress)
+    return getVerificationStatus(this.props.route.params.recipient, this.props.e164NumberToAddress)
   }
 
   getConfirmationInput = (type: TokenTransactionType) => {
@@ -539,12 +523,10 @@ const style = StyleSheet.create({
   },
 })
 
-export default componentWithAnalytics(
-  connect<StateProps, DispatchProps, OwnProps, RootState>(mapStateToProps, {
-    fetchDollarBalance,
-    showError,
-    hideAlert,
-    showMessage,
-    fetchPhoneAddresses,
-  })(withTranslation(Namespaces.sendFlow7)(SendAmount))
-)
+export default connect<StateProps, DispatchProps, OwnProps, RootState>(mapStateToProps, {
+  fetchDollarBalance,
+  showError,
+  hideAlert,
+  showMessage,
+  fetchPhoneAddresses,
+})(withTranslation(Namespaces.sendFlow7)(SendAmount))

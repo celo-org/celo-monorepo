@@ -8,7 +8,6 @@ import { WithTranslation } from 'react-i18next'
 import { BackHandler, ScrollView, StyleSheet, Text, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
-import componentWithAnalytics from 'src/analytics/wrapper'
 import CancelButton from 'src/components/CancelButton'
 import Carousel, { CarouselItem } from 'src/components/Carousel'
 import DevSkipButton from 'src/components/DevSkipButton'
@@ -160,9 +159,7 @@ const styles = StyleSheet.create({
   },
 })
 
-export default componentWithAnalytics(
-  connect<StateProps, DispatchProps, {}, RootState>(
-    mapStateToProps,
-    mapDispatchToProps
-  )(withTranslation(Namespaces.nuxVerification2)(VerificationLoadingScreen))
-)
+export default connect<StateProps, DispatchProps, {}, RootState>(
+  mapStateToProps,
+  mapDispatchToProps
+)(withTranslation(Namespaces.nuxVerification2)(VerificationLoadingScreen))
