@@ -10,7 +10,6 @@ import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
-import componentWithAnalytics from 'src/analytics/wrapper'
 import { enterBackupFlow, exitBackupFlow } from 'src/app/actions'
 import DelayButton from 'src/backup/DelayButton'
 import { useAccountKey } from 'src/backup/utils'
@@ -146,9 +145,7 @@ const styles = StyleSheet.create({
   },
 })
 
-export default componentWithAnalytics(
-  connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
-    enterBackupFlow,
-    exitBackupFlow,
-  })(BackupIntroduction)
-)
+export default connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
+  enterBackupFlow,
+  exitBackupFlow,
+})(BackupIntroduction)

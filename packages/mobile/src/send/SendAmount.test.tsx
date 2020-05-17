@@ -7,9 +7,10 @@ import * as renderer from 'react-test-renderer'
 import { FeeType } from 'src/fees/actions'
 import { fetchPhoneAddresses } from 'src/identity/actions'
 import { LocalCurrencyCode } from 'src/localCurrency/consts'
+import { Screens } from 'src/navigator/Screens'
 import SendAmount, { SendAmount as SendAmountClass } from 'src/send/SendAmount'
 import { createMockStore, getMockI18nProps } from 'test/utils'
-import { mockE164NumberToAddress, mockNavigation } from 'test/values'
+import { mockE164NumberToAddress, mockNavigation, mockRecipient } from 'test/values'
 
 const AMOUNT_ZERO = '0.00'
 const AMOUNT_VALID = '4.93'
@@ -30,6 +31,14 @@ const storeData = {
 const TEXT_PLACEHOLDER = 'groceriesRent'
 const AMOUNT_PLACEHOLDER = 'amount'
 
+const mockRoute = {
+  name: Screens.SendAmount as Screens.SendAmount,
+  key: '1',
+  params: {
+    recipient: mockRecipient,
+  },
+}
+
 describe('SendAmount', () => {
   beforeAll(() => {
     jest.useRealTimers()
@@ -40,7 +49,7 @@ describe('SendAmount', () => {
     const getWrapper = () =>
       render(
         <Provider store={store}>
-          <SendAmount navigation={mockNavigation} />
+          <SendAmount navigation={mockNavigation} route={mockRoute} />
         </Provider>
       )
 
@@ -57,10 +66,12 @@ describe('SendAmount', () => {
         'This is a long comment with 🌈👏.It will be longer than most comments.In fact, it will be far more than our limit.'
 
       const showMessage = jest.fn()
+
       const wrapper = render(
         <Provider store={createMockStore()}>
           <SendAmountClass
             navigation={mockNavigation}
+            route={mockRoute}
             {...getMockI18nProps()}
             fetchDollarBalance={jest.fn()}
             showMessage={showMessage}
@@ -90,7 +101,7 @@ describe('SendAmount', () => {
     const getWrapper = () =>
       render(
         <Provider store={store}>
-          <SendAmount navigation={mockNavigation} />
+          <SendAmount navigation={mockNavigation} route={mockRoute} />
         </Provider>
       )
 
@@ -127,7 +138,7 @@ describe('SendAmount', () => {
       const store = createMockStore(storeData)
       const wrapper = render(
         <Provider store={store}>
-          <SendAmount navigation={mockNavigation} />
+          <SendAmount navigation={mockNavigation} route={mockRoute} />
         </Provider>
       )
 
@@ -156,7 +167,7 @@ describe('SendAmount', () => {
       const store = createMockStore(storeData)
       const wrapper = render(
         <Provider store={store}>
-          <SendAmount navigation={mockNavigation} />
+          <SendAmount navigation={mockNavigation} route={mockRoute} />
         </Provider>
       )
 
@@ -175,7 +186,7 @@ describe('SendAmount', () => {
     })
     const tree = renderer.create(
       <Provider store={store}>
-        <SendAmount navigation={mockNavigation} />
+        <SendAmount navigation={mockNavigation} route={mockRoute} />
       </Provider>
     )
     expect(tree).toMatchSnapshot()
