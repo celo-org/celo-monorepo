@@ -1,5 +1,5 @@
 import { newKitFromWeb3 } from '@celo/contractkit'
-import { privateKeyToAddress } from '@celo/utils/src/address'
+import { RpcWallet } from '@celo/contractkit/lib/wallets/rpc-wallet'
 import { Platform } from 'react-native'
 import * as net from 'react-native-tcp'
 import { select, take } from 'redux-saga/effects'
@@ -15,8 +15,11 @@ import { provider } from 'web3-core'
 
 const tag = 'web3/contracts'
 
-const contractKitForno = newKitFromWeb3(getWeb3(true))
-const contractKitGeth = newKitFromWeb3(getWeb3(false))
+// TODO(yorke): merge instances of contractkit and refactor retrieval of providers
+const IpcProvider = getIpcProvider()
+export const gethWallet = new RpcWallet(IpcProvider)
+const contractKitForno = newKitFromWeb3(getWeb3(true), gethWallet)
+const contractKitGeth = newKitFromWeb3(getWeb3(false), gethWallet)
 // Web3 for utils does not require a provider, using geth web3 to avoid creating another web3 instance
 export const web3ForUtils = contractKitGeth.web3
 
@@ -27,7 +30,7 @@ function getWeb3(fornoMode: boolean): Web3 {
       fornoMode ? DEFAULT_FORNO_URL : 'geth'
     }`
   )
-  return fornoMode ? new Web3(getHttpProvider(DEFAULT_FORNO_URL)) : new Web3(getIpcProvider())
+  return fornoMode ? new Web3(getHttpProvider(DEFAULT_FORNO_URL)) : new Web3(IpcProvider)
 }
 
 // Workaround as contractKit logic is still used outside generators
@@ -108,14 +111,4 @@ function getHttpProvider(url: string): provider {
   //   Logger.showError('Error occurred')
   // })
   return httpProvider
-}
-
-export function addLocalAccount(privateKey: string, isDefault: boolean = false) {
-  if (!privateKey) {
-    throw new Error(`privateKey is ${privateKey}`)
-  }
-  contractKitForno.addAccount(privateKey)
-  if (isDefault) {
-    contractKitForno.defaultAccount = privateKeyToAddress(privateKey)
-  }
 }

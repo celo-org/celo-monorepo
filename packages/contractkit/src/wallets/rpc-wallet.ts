@@ -38,7 +38,7 @@ export class RpcWallet implements Wallet {
     privateKey = ensureLeading0x(privateKey)
     const address = privateKeyToAddress(privateKey)
     if (this.hasAccount(address)) {
-      throw new Error(`RpcWallet: already has address ${address}`)
+      throw new Error(`RpcWallet: ${address} account already exists`)
     }
     await this.callRpc(
       RpcMethod.addPersonal,

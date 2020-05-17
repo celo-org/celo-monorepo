@@ -7,7 +7,7 @@ import DeviceInfo from 'react-native-device-info'
 import { asyncRandomBytes } from 'react-native-secure-randombytes'
 import SendIntentAndroid from 'react-native-send-intent'
 import SendSMS from 'react-native-sms'
-import { call, delay, put, race, select, spawn, take, takeLeading } from 'redux-saga/effects'
+import { call, delay, put, race, spawn, take, takeLeading } from 'redux-saga/effects'
 import { showError, showMessage } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
@@ -46,13 +46,12 @@ import { getAppStoreId } from 'src/utils/appstore'
 import { divideByWei } from 'src/utils/formatting'
 import Logger from 'src/utils/Logger'
 import {
-  addLocalAccount,
   getContractKit,
   getContractKitOutsideGenerator,
+  gethWallet,
   web3ForUtils,
 } from 'src/web3/contracts'
 import { waitWeb3LastBlock } from 'src/web3/saga'
-import { fornoSelector } from 'src/web3/selectors'
 
 const TAG = 'invite/saga'
 export const TEMP_PW = 'ce10'
@@ -356,25 +355,13 @@ export function* skipInvite() {
 function* addTempAccountToWallet(inviteCode: string) {
   Logger.debug(TAG + '@addTempAccountToWallet', 'Attempting to add temp wallet')
   try {
-    const contractKit = yield call(getContractKit)
-    let tempAccount: string | null = null
-    const fornoMode = yield select(fornoSelector)
-    if (fornoMode) {
-      tempAccount = contractKit.web3.eth.accounts.privateKeyToAccount(inviteCode).address
-      Logger.debug(
-        TAG + '@redeemInviteCode',
-        'web3 is connected:',
-        String(yield call(contractKit.web3.eth.net.isListening))
-      )
-      addLocalAccount(inviteCode)
-    } else {
-      // Import account into the local geth node
-      tempAccount = yield call(
-        contractKit.web3.eth.personal.importRawKey,
-        trimLeading0x(inviteCode),
-        TEMP_PW
-      )
-    }
+    yield call(waitForGethConnectivity)
+    // Import account into the local geth node
+    const tempAccount: string | null = yield call(
+      gethWallet.addAccount,
+      trimLeading0x(inviteCode),
+      TEMP_PW
+    )
     Logger.debug(TAG + '@addTempAccountToWallet', 'Account added', tempAccount!)
   } catch (e) {
     if (e.toString().includes('account already exists')) {
@@ -392,11 +379,8 @@ export function* withdrawFundsFromTempAccount(
   newAccount: string
 ) {
   Logger.debug(TAG + '@withdrawFundsFromTempAccount', 'Unlocking temporary account')
-  const fornoMode = yield select(fornoSelector)
-  const contractKit = yield call(getContractKit)
-  if (!fornoMode) {
-    yield call(contractKit.web3.eth.personal.unlockAccount, tempAccount, TEMP_PW, 600)
-  }
+  yield call(waitForGethConnectivity)
+  yield call(gethWallet.unlockAccount, tempAccount, TEMP_PW, 600)
 
   Logger.debug(
     TAG + '@withdrawFundsFromTempAccount',

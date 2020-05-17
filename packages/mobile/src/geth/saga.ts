@@ -21,6 +21,7 @@ import {
   setInitState,
   setPrivateCommentKey,
 } from 'src/geth/actions'
+import { UNLOCK_DURATION } from 'src/geth/consts'
 import {
   FailedToFetchGenesisBlockError,
   FailedToFetchStaticNodesError,
@@ -35,6 +36,7 @@ import { deleteChainDataAndRestartApp } from 'src/utils/AppRestart'
 import { setKey } from 'src/utils/keyStore'
 import Logger from 'src/utils/Logger'
 import { setContractKitReady } from 'src/web3/actions'
+import { gethWallet } from 'src/web3/contracts'
 import { fornoSelector } from 'src/web3/selectors'
 
 const gethEmitter = new NativeEventEmitter(NativeModules.RNGeth)
@@ -320,9 +322,8 @@ export function* addAccountToGethKeystore(key: string, currentAccount: string, p
 
   let account: string
   try {
-    const gethInstance = yield call(getGeth)
-    // TODO(yorke): account for pincode changes
-    account = gethInstance.importKey(key, pincode, pincode)
+    yield call(waitForGethConnectivity)
+    account = yield call(gethWallet.addAccount, key, pincode)
     Logger.debug(
       TAG + '@addAccountToGethKeystore',
       `Successfully imported raw key for account ${account}`
@@ -347,8 +348,8 @@ export function* unlockAccount(account: string) {
 
   try {
     const pincode = yield call(getPincode, true)
-    const geth = yield call(getGeth)
-    return geth.unlockAccount(account, pincode)
+    yield call(waitForGethConnectivity)
+    yield call(gethWallet.unlockAccount, account, pincode, UNLOCK_DURATION)
   } catch (error) {
     setCachedPincode(null)
     Logger.error(TAG + '@unlockAccount', 'Geth account unlock failed', error)
@@ -365,10 +366,13 @@ export function* getConnectedAccount() {
 // Wait for geth to be connected, geth ready, and get unlocked account
 export function* getConnectedUnlockedAccount() {
   const account: string = yield call(getConnectedAccount)
-  const success: boolean = yield call(unlockAccount, account)
-  if (success) {
-    return account
-  } else {
-    throw new Error(ErrorMessages.INCORRECT_PIN)
+  if (!gethWallet.isAccountUnlocked(account)) {
+    const success: boolean = yield call(unlockAccount, account)
+    if (success) {
+      return account
+    } else {
+      throw new Error(ErrorMessages.INCORRECT_PIN)
+    }
   }
+  return account
 }

@@ -37,12 +37,11 @@ import { sendTransaction } from 'src/transactions/send'
 import { TransactionStatus } from 'src/transactions/types'
 import Logger from 'src/utils/Logger'
 import {
-  addLocalAccount,
   getContractKit,
   getContractKitOutsideGenerator,
+  gethWallet,
   web3ForUtils,
 } from 'src/web3/contracts'
-import { fornoSelector } from 'src/web3/selectors'
 import { estimateGas } from 'src/web3/utils'
 
 const TAG = 'escrow/saga'
@@ -130,12 +129,7 @@ function* withdrawFromEscrow() {
       return
     }
 
-    const tempWalletAddress = contractKit.web3.eth.accounts.privateKeyToAccount(tmpWalletPrivateKey)
-      .address
-    const fornoMode = yield select(fornoSelector)
-    if (fornoMode) {
-      addLocalAccount(tmpWalletPrivateKey)
-    }
+    const tempWalletAddress = yield call(gethWallet.addAccount, tmpWalletPrivateKey, TEMP_PW)
     Logger.debug(TAG + '@withdrawFromEscrow', 'Added temp account to wallet: ' + tempWalletAddress)
 
     // Check if there is a payment associated with this invite code
@@ -146,15 +140,8 @@ function* withdrawFromEscrow() {
       return
     }
 
-    if (fornoMode) {
-      Logger.info(
-        TAG + '@withdrawFromEscrow',
-        'Forno mode is on, no need to unlock the temporary account'
-      )
-    } else {
-      // Unlock temporary account
-      yield call(contractKit.web3.eth.personal.unlockAccount, tempWalletAddress, TEMP_PW, 600)
-    }
+    // Unlock temporary account
+    yield call(gethWallet.unlockAccount, tempWalletAddress, TEMP_PW, 600)
 
     const msgHash = contractKit.web3.utils.soliditySha3({ type: 'address', value: account })
 
