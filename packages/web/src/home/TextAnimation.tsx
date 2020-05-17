@@ -3,7 +3,15 @@ import { StyleSheet, View } from 'react-native'
 import { H2 } from 'src/fonts/Fonts'
 import { colors, fonts, textStyles } from 'src/styles'
 
-const words = ['finance', 'saving', 'education', 'sending', 'giving', 'lending', 'regeneration']
+export const WORDS = [
+  'finance',
+  'saving',
+  'education',
+  'sending',
+  'giving',
+  'lending',
+  'regeneration',
+]
 
 const DURATION = 8510
 const SLIDE_IN_DURATION = 2000
@@ -13,49 +21,10 @@ const FADE_OUT_START = PAUSE / DURATION
 const FADE_OUT_STOP = 1
 
 interface Props {
-  playing: boolean
-}
-
-interface State {
   currentWord: number
-  initial: boolean
 }
 
-class TextAnimation extends React.PureComponent<Props, State> {
-  state = {
-    currentWord: 0,
-    initial: true,
-  }
-
-  timeout: number
-
-  componentDidMount = () => {
-    this.startAnimation()
-  }
-
-  componentDidUpdate(prevProps: Props) {
-    if (!prevProps.playing && this.props.playing) {
-      this.startAnimation()
-    }
-  }
-
-  startAnimation = () => {
-    clearTimeout(this.timeout)
-    this.setState({ currentWord: 0 }, this.changeWord)
-  }
-
-  changeWord = () => {
-    this.timeout = setTimeout(() => {
-      if (this.state.currentWord !== words.length - 1) {
-        this.setState({ currentWord: (this.state.currentWord + 1) % words.length, initial: false })
-        this.changeWord()
-      } else {
-        this.setState({ currentWord: 0 })
-        this.changeWord()
-      }
-    }, DURATION)
-  }
-
+class TextAnimation extends React.PureComponent<Props> {
   render() {
     return (
       <View>
@@ -63,10 +32,10 @@ class TextAnimation extends React.PureComponent<Props, State> {
           A new story in
         </H2>
         <View style={styles.textContainer}>
-          <View style={[styles.mask, styles.fadeOut]} key={`${this.state.currentWord}-mask1`} />
-          <View style={[styles.mask2, styles.slideIn]} key={`${this.state.currentWord}-mask2`} />
+          <View style={[styles.mask, styles.fadeOut]} key={`${this.props.currentWord}-mask1`} />
+          <View style={[styles.mask2, styles.slideIn]} key={`${this.props.currentWord}-mask2`} />
           <H2 ariaLevel={'2'} accessibilityRole={'heading'} style={[fonts.h2, textStyles.medium]}>
-            {words[this.state.currentWord]}
+            {WORDS[this.props.currentWord]}
           </H2>
         </View>
       </View>

@@ -3,8 +3,10 @@ import * as React from 'react'
 interface Props {
   path?: string
   data?: object
-  renderer?: 'svg' | 'canvas'
   loop: boolean
+  autoPlay: boolean
+  onReady?: () => void
+  onLooped?: () => void
 }
 
 export default class LottieBase extends React.Component<Props> {
@@ -15,12 +17,22 @@ export default class LottieBase extends React.Component<Props> {
   componentDidMount = () => {
     this.animation = lottie.loadAnimation({
       container: this.elementRef.current,
-      renderer: this.props.renderer || 'svg',
+      renderer: 'svg',
       loop: this.props.loop,
-      autoplay: true,
+      autoplay: this.props.autoPlay,
       animationData: this.props.data,
       path: this.props.path ? `/lottieFiles/${this.props.path}` : undefined,
     })
+    if (this.props.onReady) {
+      this.animation.addEventListener('data_ready', this.props.onReady)
+    }
+    if (this.props.onLooped) {
+      this.animation.addEventListener('loopComplete', this.onLoop)
+    }
+  }
+  onLoop = (data) => {
+    this.props.onLooped()
+    console.info(data)
   }
 
   componentWillUnmount = () => {

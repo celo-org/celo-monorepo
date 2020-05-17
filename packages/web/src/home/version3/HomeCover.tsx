@@ -4,7 +4,7 @@ import { H4 } from 'src/fonts/Fonts'
 import EmailForm from 'src/forms/EmailForm'
 import changeStoryWebP from 'src/home/change-story/change-story.webp'
 import ChangeStory from 'src/home/change-story/ChangeStory'
-import TextAnimation from 'src/home/TextAnimation'
+import TextAnimation, { WORDS } from 'src/home/TextAnimation'
 import { NameSpaces, useTranslation } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import { ScreenSizes, useScreenSize } from 'src/layout/ScreenSize'
@@ -16,6 +16,17 @@ import { canUseWebP } from 'src/utils/utils'
 export default function HomeCover() {
   // on chrome on desktop the lottie file has weird artifacts so we use webp instead.
   const [canWebP, setCanWebP] = React.useState(false)
+
+  const [currentWordIndex, setWord] = React.useState(0)
+
+  const changeWord = React.useCallback(() => {
+    if (currentWordIndex !== WORDS.length - 1) {
+      setWord(currentWordIndex + 1)
+    } else {
+      setWord(0)
+    }
+  }, [currentWordIndex])
+
   React.useEffect(() => {
     setCanWebP(canUseWebP())
   }, [])
@@ -49,14 +60,14 @@ export default function HomeCover() {
         <View style={[styles.animationHolder, getplacement(screen)]}>
           <AspectRatio ratio={970 / 270}>
             {isDesktop && canWebP ? (
-              <Image source={changeStoryWebP} style={standardStyles.image} />
+              <Image source={changeStoryWebP} style={standardStyles.image} onLoad={changeWord} />
             ) : (
-              <ChangeStory />
+              <ChangeStory onReady={changeWord} onLooped={changeWord} />
             )}
           </AspectRatio>
         </View>
         <View style={[styles.contentHolder, standardStyles.blockMarginTablet]}>
-          <TextAnimation playing={true} />
+          <TextAnimation currentWord={currentWordIndex} />
           <H4 style={styles.coverText}>{t('coverText')}</H4>
           <Text style={[fonts.h6, styles.coverJoinList]}>{t('coverJoinList')}</Text>
           <EmailForm submitText={'Submit'} route={'/contacts'} isDarkMode={false} />
