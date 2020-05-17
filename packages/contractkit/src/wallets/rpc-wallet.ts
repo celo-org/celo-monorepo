@@ -1,4 +1,8 @@
-import { ensureLeading0x, privateKeyToAddress } from '@celo/utils/lib/address'
+import {
+  ensureLeading0x,
+  normalizeAddressWith0x,
+  privateKeyToAddress,
+} from '@celo/utils/lib/address'
 // @ts-ignore-next-line
 import { account as Account } from 'eth-lib'
 import * as ethUtil from 'ethereumjs-util'
@@ -19,7 +23,7 @@ enum RpcMethod {
 const currentTimeInSeconds = () => Math.round(Date.now() / 1000)
 
 export class RpcWallet implements Wallet {
-  protected rpc: RpcCaller
+  public readonly rpc: RpcCaller
   private accounts: Map<string, { unlockedAt: number; duration: number }>
 
   constructor(protected _provider: provider) {
@@ -36,7 +40,11 @@ export class RpcWallet implements Wallet {
     if (this.hasAccount(address)) {
       throw new Error(`RpcWallet: already has address ${address}`)
     }
-    await this.callRpc(RpcMethod.addPersonal, [privateKey, passphrase], address)
+    await this.callRpc(
+      RpcMethod.addPersonal,
+      [privateKey, passphrase],
+      normalizeAddressWith0x(address)
+    )
     this.accounts.set(address, { unlockedAt: -1, duration: -1 })
     return address
   }
