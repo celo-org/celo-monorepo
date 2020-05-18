@@ -1,10 +1,10 @@
 import { expectSaga } from 'redux-saga-test-plan'
 import { select } from 'redux-saga/effects'
 import { pincodeTypeSelector } from 'src/account/selectors'
+import { getOrCreateAccount } from 'src/geth/saga'
 import { currentAccountSelector } from 'src/geth/selectors'
 import { createMockStore } from 'test/utils'
 import { mockAccount } from 'test/values'
-import { getOrCreateAccount } from './saga'
 
 jest.mock('src/account/actions', () => ({
   ...jest.requireActual('src/account/actions'),

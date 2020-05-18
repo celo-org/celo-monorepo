@@ -23,6 +23,7 @@ import {
   requestAndRetrieveAttestations,
   startVerification,
   VERIFICATION_TIMEOUT,
+  VerificationStatus,
 } from 'src/identity/verification'
 import { getContractKitOutsideGenerator } from 'src/web3/contracts'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
