@@ -1,5 +1,7 @@
 import { entries, range } from 'lodash'
 import sleep from 'sleep-promise'
+import { AzureClusterConfig } from 'src/lib/azure'
+import { installPrometheusIfNotExists } from 'src/lib/prometheus'
 import { getKubernetesClusterRegion, switchToClusterFromEnv } from './cluster'
 import { execCmd, execCmdWithExitOnFailure } from './cmd-utils'
 import { EnvTypes, envVar, fetchEnv, fetchEnvOrFallback, isProduction } from './env-utils'
@@ -211,7 +213,10 @@ export async function installCertManager() {
   )
 }
 
-export async function installAndEnableMetricsDeps(installPromToSd: boolean) {
+export async function installAndEnableMetricsDeps(
+  installPrometheus: boolean,
+  clusterConfig?: AzureClusterConfig
+) {
   const kubeStateMetricsReleaseExists = await outputIncludes(
     `helm list`,
     `kube-state-metrics`,
@@ -222,24 +227,8 @@ export async function installAndEnableMetricsDeps(installPromToSd: boolean) {
       `helm install --name kube-state-metrics stable/kube-state-metrics --set rbac.create=true`
     )
   }
-  if (installPromToSd) {
-    const kubeStateMetricsPrometheusReleaseExists = await outputIncludes(
-      `helm list`,
-      `kube-state-metrics-prometheus-to-sd`,
-      `kube-state-metrics-prometheus-to-sd exists, skipping install`
-    )
-    if (!kubeStateMetricsPrometheusReleaseExists) {
-      const promToSdParams = [
-        `--set "metricsSources.kube-state-metrics=http://kube-state-metrics.default.svc.cluster.local:8080"`,
-        `--set promtosd.scrape_interval=${fetchEnv('PROMTOSD_SCRAPE_INTERVAL')}`,
-        `--set promtosd.export_interval=${fetchEnv('PROMTOSD_EXPORT_INTERVAL')}`,
-      ]
-      await execCmdWithExitOnFailure(
-        `helm install --name kube-state-metrics-prometheus-to-sd ../helm-charts/prometheus-to-sd ${promToSdParams.join(
-          ' '
-        )}`
-      )
-    }
+  if (installPrometheus) {
+    await installPrometheusIfNotExists(clusterConfig)
   }
 }
 
@@ -486,13 +475,22 @@ export async function deleteStaticIPs(celoEnv: string) {
 
 export async function deletePersistentVolumeClaims(celoEnv: string, componentLabels: string[]) {
   console.info(`Deleting persistent volume claims for ${celoEnv}`)
+  for (const component of componentLabels) {
+    await deletePersistentVolumeClaimsCustomLabels(celoEnv, 'component', component)
+  }
+}
+
+export async function deletePersistentVolumeClaimsCustomLabels(
+  namespace: string,
+  label: string,
+  value: string
+) {
+  console.info(`Deleting persistent volume claims for ${namespace}`)
   try {
-    for (const component of componentLabels) {
-      const [output] = await execCmd(
-        `kubectl delete pvc --selector='component=${component}' --namespace ${celoEnv}`
-      )
-      console.info(output)
-    }
+    const [output] = await execCmd(
+      `kubectl delete pvc --selector='${label}=${value}' --namespace ${namespace}`
+    )
+    console.info(output)
   } catch (error) {
     console.error(error)
     if (!error.toString().includes('not found')) {

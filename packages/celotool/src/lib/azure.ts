@@ -1,4 +1,3 @@
-import { installPrometheusIfNotExists } from 'src/lib/aks-prometheus'
 import { createNamespaceIfNotExists } from 'src/lib/cluster'
 import { execCmd, execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
 import { doCheckOrPromptIfStagingOrProduction } from 'src/lib/env-utils'
@@ -62,8 +61,7 @@ async function setupCluster(celoEnv: string, clusterConfig: AzureClusterConfig) 
   console.info('Performing any cluster setup that needs to be done...')
 
   await redeployTiller()
-  await installPrometheusIfNotExists(clusterConfig)
-  await installAndEnableMetricsDeps(false)
+  await installAndEnableMetricsDeps(true, clusterConfig)
   await installAADPodIdentity()
 }
 
