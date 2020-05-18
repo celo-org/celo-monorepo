@@ -18,7 +18,6 @@ import BackupPhraseContainer, {
 import { getStoredMnemonic } from 'src/backup/utils'
 import CancelButton from 'src/components/CancelButton.v2'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
-import { headerWithCancelButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { TopBarTextButton } from 'src/navigator/TopBarButton.v2'
@@ -49,7 +48,7 @@ const mapStateToProps = (state: RootState): StateProps => {
 
 export const navOptionsForBackupPhrase = {
   headerLeft: () => <CancelButton style={{ color: colors.gray4 }} />,
-  // headerTitle:  i18n.t(`${Namespaces.backupKeyFlow6}:headerTitle`),
+  headerTitle: i18n.t(`${Namespaces.backupKeyFlow6}:headerTitle`),
   headerRight: () => <HeaderRight />,
 }
 
