@@ -2,13 +2,13 @@
 description: Exchange Celo Dollars and Celo Gold via the stability mechanism
 ---
 
-# Exchange
+## Commands
 
-## Dollars
+### Dollars
 
 Exchange Celo Dollars for Celo Gold via the stability mechanism
 
-```text
+```
 USAGE
   $ celocli exchange:dollars
 
@@ -37,13 +37,13 @@ EXAMPLES
   dollars --value 10000000000000 --forAtLeast 50000000000000 --from 0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d
 ```
 
-_See code:_ [_packages/cli/src/commands/exchange/dollars.ts_](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/exchange/dollars.ts)
+_See code: [packages/cli/src/commands/exchange/dollars.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/exchange/dollars.ts)_
 
-## Gold
+### Gold
 
 Exchange Celo Gold for Celo Dollars via the stability mechanism
 
-```text
+```
 USAGE
   $ celocli exchange:gold
 
@@ -72,13 +72,13 @@ EXAMPLES
   gold --value 5000000000000 --forAtLeast 100000000000000 --from 0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d
 ```
 
-_See code:_ [_packages/cli/src/commands/exchange/gold.ts_](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/exchange/gold.ts)
+_See code: [packages/cli/src/commands/exchange/gold.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/exchange/gold.ts)_
 
-## Show
+### Show
 
 Show the current exchange rates offered by the Exchange
 
-```text
+```
 USAGE
   $ celocli exchange:show
 
@@ -89,5 +89,4 @@ EXAMPLE
   list
 ```
 
-_See code:_ [_packages/cli/src/commands/exchange/show.ts_](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/exchange/show.ts)
-
+_See code: [packages/cli/src/commands/exchange/show.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/exchange/show.ts)_
