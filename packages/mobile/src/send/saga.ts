@@ -140,12 +140,12 @@ function* sendPaymentOrInviteSaga({
       throw new Error("Can't send to recipient without valid e164 number or address")
     }
 
-    const ownAddress = yield select(currentAccountSelector)
-    const comment = features.USE_COMMENT_ENCRYPTION
-      ? yield call(encryptComment, reason, recipientAddress, ownAddress)
-      : reason
-
+    const ownAddress: string = yield select(currentAccountSelector)
     if (recipientAddress) {
+      const comment = features.USE_COMMENT_ENCRYPTION
+        ? yield call(encryptComment, reason, recipientAddress, ownAddress)
+        : reason
+
       yield call(sendPayment, recipientAddress, amount, comment, CURRENCY_ENUM.DOLLAR)
       CeloAnalytics.track(CustomEventNames.send_dollar_transaction)
     } else if (recipient.e164PhoneNumber) {

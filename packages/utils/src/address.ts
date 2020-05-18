@@ -25,6 +25,8 @@ export const isHexString = (input: string) => HEX_REGEX.test(input)
 
 export const hexToBuffer = (input: string) => Buffer.from(trimLeading0x(input), 'hex')
 
+export const bufferToHex = (buf: Buffer) => ensureLeading0x(buf.toString('hex'))
+
 export const privateKeyToAddress = (privateKey: string) =>
   toChecksumAddress(ensureLeading0x(privateToAddress(hexToBuffer(privateKey)).toString('hex')))
 
