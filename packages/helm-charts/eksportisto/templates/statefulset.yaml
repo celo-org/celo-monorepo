@@ -30,6 +30,10 @@ spec:
         app: eksportisto
         release: {{ .Release.Name }}
         component: eksportisto
+      annotations:
+        prometheus.io/path: /metrics
+        prometheus.io/port: "8080"
+        prometheus.io/scrape: "true"
     spec:
       containers:
       - name: eksportisto-{{ .Values.deploymentSuffix }}
@@ -44,6 +48,9 @@ spec:
           requests:
             memory: 256Mi
             cpu: 2400m
+        ports:
+        - name: prometheus
+          containerPort: 8080
         volumeMounts:
         - name: data
           mountPath: /root/.eksportisto

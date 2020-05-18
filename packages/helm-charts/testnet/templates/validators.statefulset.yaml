@@ -28,7 +28,7 @@ spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:
         requests:
-          storage: 1Gi
+          storage: 2Gi
   podManagementPolicy: Parallel
   updateStrategy:
     type: RollingUpdate
