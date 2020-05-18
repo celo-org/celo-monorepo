@@ -17,7 +17,7 @@ import BackupPhraseContainer, {
 } from 'src/backup/BackupPhraseContainer'
 import { getStoredMnemonic } from 'src/backup/utils'
 import CancelButton from 'src/components/CancelButton.v2'
-import { Namespaces, withTranslation } from 'src/i18n'
+import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import { headerWithCancelButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -47,14 +47,13 @@ const mapStateToProps = (state: RootState): StateProps => {
   }
 }
 
+export const navOptionsForBackupPhrase = {
+  headerLeft: () => <CancelButton style={{ color: colors.gray4 }} />,
+  // headerTitle:  i18n.t(`${Namespaces.backupKeyFlow6}:headerTitle`),
+  headerRight: () => <HeaderRight />,
+}
+
 class BackupPhrase extends React.Component<Props, State> {
-  // TODO(Rossy): Show modal when cancelling if backup flow incomplete
-  static navigationOptions = () => ({
-    ...headerWithCancelButton,
-    headerLeft: <CancelButton style={{ color: colors.gray4 }} />,
-    headerTitle: 'Account Key',
-    headerRight: <HeaderRight />,
-  })
   state = {
     mnemonic: '',
     isConfirmChecked: false,
