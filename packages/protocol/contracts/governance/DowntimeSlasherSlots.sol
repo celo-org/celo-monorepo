@@ -35,11 +35,13 @@ contract DowntimeSlasherSlots is SlasherUtil {
 
   uint256 public slashableDowntime;
   uint256 public slotSize;
+  bool public oncePerEpoch;
 
   uint256 constant MAX_SLOT_SIZE = 4320; // 4 hours (1 block/5seg)
 
   event SlashableDowntimeSet(uint256 interval);
   event SlashableDowntimeSlotSizeSet(uint256 interval);
+  event SlashableDowntimeOncePerEpochSet(bool oncePerEpoch);
   event DowntimeSlashPerformed(address indexed validator, uint256 indexed startBlock);
   event SlotValidationPerformed(address indexed user, uint256 indexed startBlock);
 
@@ -50,19 +52,23 @@ contract DowntimeSlasherSlots is SlasherUtil {
    * @param _reward Reward that the observer gets.
    * @param _slashableDowntime Slashable downtime in blocks.
    * @param _slotSize Slot size that will be used to calculate the downtime.
+   * @param _oncePerEpoch If true, the validator will only be slashed once per 
+   * epoch of the StartBlock
    */
   function initialize(
     address registryAddress,
     uint256 _penalty,
     uint256 _reward,
     uint256 _slashableDowntime,
-    uint256 _slotSize
+    uint256 _slotSize,
+    bool _oncePerEpoch
   ) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
     setSlashingIncentives(_penalty, _reward);
     setSlashableDowntime(_slashableDowntime);
     setSlashableDowntimeSlotSize(_slotSize);
+    setSlashableDowntimeOncePerEpoch(_oncePerEpoch);
   }
 
   /**
@@ -90,6 +96,21 @@ contract DowntimeSlasherSlots is SlasherUtil {
 
     slotSize = _slotSize;
     emit SlashableDowntimeSlotSizeSet(_slotSize);
+  }
+
+  /**
+   * @notice Enables/Disables the possibility of multiple slashes in the same epoch, taking in
+   * count that every slashable window, won't share any block, and the epoch is the one of the 
+   * StartBlock.
+   * Example: the SlashableDowntime is set to 10 hours. A validator was down all the epoch (24hs)
+   * the validator could be slashed for the first 10 hours and the last 10 hours of the epoch.
+   * @param _oncePerEpoch Slot size in which the downtime validation will be divided.
+   */
+  function setSlashableDowntimeOncePerEpoch(uint256 _oncePerEpoch) public onlyOwner {
+    require(_slotSize < getEpochSize(), "Slot size must be smaller than epoch size");
+
+    oncePerEpoch = _oncePerEpoch;
+    emit SlashableDowntimeOncePerEpochSet(_oncePerEpoch);
   }
 
   /**
@@ -252,10 +273,13 @@ contract DowntimeSlasherSlots is SlasherUtil {
     uint256 endEpoch = getEpochNumberOfBlock(endBlock);
 
     SlashedInterval[] storage intervals = lastSlashedBlock[validator][startEpoch];
+    // The oncePerEpoch=true validation
+    require(oncePerEpoch && intervals.length > 0, "Already slashed in that epoch");
+
     for (uint256 i = 0; i < intervals.length; i = i.add(1)) {
       require(
         intervals[i].endBlock < startBlock || intervals[i].startBlock > endBlock,
-        "Already slashed"
+        "Slash shares blocks with another slash"
       );
     }
 
@@ -264,7 +288,7 @@ contract DowntimeSlasherSlots is SlasherUtil {
       for (uint256 i = 0; i < intervals.length; i = i.add(1)) {
         require(
           intervals[i].endBlock < startBlock || intervals[i].startBlock > endBlock,
-          "Already slashed"
+          "Slash shares blocks with another slash"
         );
       }
     }
