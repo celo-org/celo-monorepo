@@ -227,7 +227,8 @@ export function* requestAndRetrieveAttestations(
   )
 
   // Any verification failure past this point will be after sending a tx
-  // so do not prompt forno retry as account may have insufficient balance
+  // so do not prompt forno retry as these failures are not always
+  // light client related, and account may have insufficient balance
   yield put(setRetryVerificationWithForno(false))
   while (attestations.length < attestationsRemaining) {
     // Request any additional attestations beyond the original set

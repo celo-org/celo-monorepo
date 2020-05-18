@@ -36,7 +36,7 @@ export function VerificationFailedModal(props: Props) {
   }, [props.cancelVerification])
 
   const onRetry = React.useCallback(() => {
-    props.toggleFornoMode(true)
+    props.toggleFornoMode(true) // Note that forno remains toggled on after verification retry
     props.setRetryVerificationWithForno(false) // Only prompt retry with forno once
     setIsDismissed(true)
     navigate(Screens.VerificationEducationScreen)
