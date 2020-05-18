@@ -42,7 +42,7 @@ platform :android do
     if options[:buildApk]
       gradle(task: 'assemble', build_type: environment, project_dir: 'android/')
     else
-      gradle(task: 'bundle', build_type: environment, project_dir: 'android/')
+      gradle(task: 'bundle', build_type: environment, project_dir: 'android/', flags: '-x bundle' + environment + 'JsAndAssets')
     end
   end
 
