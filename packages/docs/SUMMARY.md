@@ -16,11 +16,13 @@
   - [Using the Mobile Wallet](getting-started/using-the-mobile-wallet.md)
   - [Getting an Account and Funds](getting-started/faucet.md)
   - [Running a Full Node](getting-started/running-a-full-node-in-alfajores.md)
+- [Validator Setup FAQ](getting-started/validator-setup-faq.md)
 - [Glossary](GLOSSARY.md)
 
 ## Celo Gold Holder Guide
 - [Quick Start](celo-gold-holder-guide/quick-start.md)
 - [Using a Ledger Wallet](celo-gold-holder-guide/ledger.md)
+- [Using a Cloud HSM](celo-gold-holder-guide/cloud-hsm.md)
 - [Understanding ReleaseGold](celo-gold-holder-guide/release-gold.md)
 - [Voting on Validator Groups](celo-gold-holder-guide/voting-validators.md)
 - [Voting on Governance](celo-gold-holder-guide/voting-governance.md)
