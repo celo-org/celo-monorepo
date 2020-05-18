@@ -2,11 +2,11 @@ import Button, { BtnTypes } from '@celo/react-components/components/Button'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import { CURRENCIES, CURRENCY_ENUM } from '@celo/utils/src'
+import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
-import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import GethAwareButton from 'src/geth/GethAwareButton'
@@ -16,6 +16,7 @@ import { importBackupPhrase } from 'src/import/actions'
 import { nuxNavigationOptions } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { StackParamList } from 'src/navigator/types'
 import { RootState } from 'src/redux/reducers'
 
 interface DispatchProps {
@@ -26,7 +27,10 @@ interface StateProps {
   isImportingWallet: boolean
 }
 
-type Props = StateProps & DispatchProps & NavigationInjectedProps & WithTranslation
+type Props = StateProps &
+  DispatchProps &
+  WithTranslation &
+  StackScreenProps<StackParamList, Screens.ImportWalletEmpty>
 
 const mapStateToProps = (state: RootState): StateProps => {
   return {
@@ -37,8 +41,8 @@ const mapStateToProps = (state: RootState): StateProps => {
 export class ImportWalletEmpty extends React.Component<Props> {
   static navigationOptions = nuxNavigationOptions
 
-  getBackupPhraseFromNavProps(): string {
-    const backupPhrase = this.props.navigation.getParam('backupPhrase', '')
+  getBackupPhraseFromNavProps = () => {
+    const backupPhrase = this.props.route.params.backupPhrase
     if (!backupPhrase) {
       throw new Error('Mnemonic missing form nav props')
     }

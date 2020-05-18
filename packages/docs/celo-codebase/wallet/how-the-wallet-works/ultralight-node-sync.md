@@ -5,3 +5,4 @@ The Celo Wallet first fetches the latest header to learn about the likely latest
 Once the latest header is verified, all the block from that point onwards are fetched. When the app restarts, only the epoch blocks between the last fetched block and the latest header are fetched.
 
 In the future, Celo will support zk-SNARK-based proofs that can succinctly prove this sequence of steps, which will lower the sync times and data usage even more.
+

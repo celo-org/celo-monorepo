@@ -2,10 +2,12 @@ import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { render, waitForElement } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
+import { TokenTransactionType } from 'src/apollo/types'
+import { Screens } from 'src/navigator/Screens'
 import { getSendFee } from 'src/send/saga'
 import SendConfirmation from 'src/send/SendConfirmation'
-import { createMockNavigationProp, createMockStore } from 'test/utils'
-import { mockAccount, mockRecipient } from 'test/values'
+import { createMockStore } from 'test/utils'
+import { mockAccount, mockNavigation, mockRecipient } from 'test/values'
 
 const TEST_FEE = new BigNumber(10000000000000000)
 
@@ -19,6 +21,20 @@ const store = createMockStore({
   },
 })
 
+const mockRoute = {
+  name: Screens.SendConfirmation as Screens.SendConfirmation,
+  key: '',
+  params: {
+    confirmationInput: {
+      recipient: mockRecipient,
+      type: TokenTransactionType.Sent,
+      recipientAddress: mockAccount,
+      amount: new BigNumber(10),
+      reason: 'My Reason',
+    },
+  },
+}
+
 describe('SendConfirmation', () => {
   beforeAll(() => {
     jest.useRealTimers()
@@ -29,18 +45,11 @@ describe('SendConfirmation', () => {
   })
 
   it('renders correctly for send payment confirmation', async () => {
-    const navigation = createMockNavigationProp({
-      recipient: mockRecipient,
-      recipientAddress: mockAccount,
-      amount: new BigNumber(10),
-      reason: 'My Reason',
-    })
-
     mockedGetSendFee.mockImplementation(async () => TEST_FEE)
 
     const { toJSON, queryByText } = render(
       <Provider store={store}>
-        <SendConfirmation navigation={navigation} />
+        <SendConfirmation navigation={mockNavigation} route={mockRoute} />
       </Provider>
     )
 
@@ -58,76 +67,13 @@ describe('SendConfirmation', () => {
   })
 
   it('renders correctly for send payment confirmation when fee calculation fails', async () => {
-    const navigation = createMockNavigationProp({
-      recipient: mockRecipient,
-      recipientAddress: mockAccount,
-      amount: new BigNumber(10),
-      reason: 'My Reason',
-    })
-
     mockedGetSendFee.mockImplementation(async () => {
       throw new Error('Calculate fee failed')
     })
 
     const { queryByText, getByText, toJSON } = render(
       <Provider store={store}>
-        <SendConfirmation navigation={navigation} />
-      </Provider>
-    )
-
-    // Initial render
-    expect(toJSON()).toMatchSnapshot()
-    expect(queryByText('securityFee')).not.toBeNull()
-    expect(queryByText('0.0100')).toBeNull()
-
-    // Wait for fee error
-    await waitForElement(() => getByText('---'))
-
-    expect(toJSON()).toMatchSnapshot()
-  })
-
-  it('renders correctly for payment request confirmation', async () => {
-    const navigation = createMockNavigationProp({
-      recipient: mockRecipient,
-      recipientAddress: mockAccount,
-      amount: new BigNumber(10),
-      reason: 'My Reason',
-    })
-
-    mockedGetSendFee.mockImplementation(async () => TEST_FEE)
-
-    const { queryByText, toJSON } = render(
-      <Provider store={store}>
-        <SendConfirmation navigation={navigation} />
-      </Provider>
-    )
-
-    // Initial render
-    expect(toJSON()).toMatchSnapshot()
-    expect(queryByText('securityFee')).not.toBeNull()
-    expect(queryByText('0.0100')).toBeNull()
-
-    // Wait for fee to be calculated and displayed
-    // await waitForElement(() => getByText('0.0100'))
-
-    // expect(toJSON()).toMatchSnapshot()
-  })
-
-  it('renders correctly for payment request confirmation when fee calculation fails', async () => {
-    const navigation = createMockNavigationProp({
-      recipient: mockRecipient,
-      recipientAddress: mockAccount,
-      amount: new BigNumber(10),
-      reason: 'My Reason',
-    })
-
-    mockedGetSendFee.mockImplementation(async () => {
-      throw new Error('Calculate fee failed')
-    })
-
-    const { queryByText, getByText, toJSON } = render(
-      <Provider store={store}>
-        <SendConfirmation navigation={navigation} />
+        <SendConfirmation navigation={mockNavigation} route={mockRoute} />
       </Provider>
     )
 
