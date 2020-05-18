@@ -43,6 +43,7 @@ testWithGanache('rpc-wallet', (web3) => {
     })
 
     // TODO: enable when ganache supports eth_signTransaction
+    // see https://github.com/trufflesuite/ganache-core/issues/408
     // it('SBAT to sign tx from unlocked account', async () => {
     //   const account = await rpcWallet.addAccount(keys.privateKey, passphrase)
     //   const tx = await paramsPopulator.populate({ from: account })

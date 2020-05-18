@@ -26,7 +26,7 @@ export class RpcWallet implements Wallet {
   public readonly rpc: RpcCaller
   private accounts: Map<string, { unlockedAt: number; duration: number }>
 
-  constructor(protected _provider: provider) {
+  constructor(protected _provider: provider, protected _unlockBufferSeconds = 10) {
     this.rpc = new DefaultRpcCaller(_provider)
     this.accounts = new Map()
   }
@@ -58,7 +58,10 @@ export class RpcWallet implements Wallet {
   isAccountUnlocked(address: string) {
     this.requireHasAccount(address)
     const unlockedInfo = this.accounts.get(address)!
-    return unlockedInfo.unlockedAt + unlockedInfo.duration > currentTimeInSeconds()
+    return (
+      unlockedInfo.unlockedAt + unlockedInfo.duration - this._unlockBufferSeconds >
+      currentTimeInSeconds()
+    )
   }
 
   async signTransaction(txParams: Tx): Promise<EncodedTransaction> {
