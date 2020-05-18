@@ -2,24 +2,24 @@
 description: Configure CLI options which persist across commands
 ---
 
-# Config
+## Commands
 
-## Get
+### Get
 
 Output network node configuration
 
-```text
+```
 USAGE
   $ celocli config:get
 ```
 
-_See code:_ [_packages/cli/src/commands/config/get.ts_](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/config/get.ts)
+_See code: [packages/cli/src/commands/config/get.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/config/get.ts)_
 
-## Set
+### Set
 
 Configure running node information for propogating transactions to network
 
-```text
+```
 USAGE
   $ celocli config:set
 
@@ -31,5 +31,4 @@ EXAMPLES
   set  --node <geth-location>/geth.ipc
 ```
 
-_See code:_ [_packages/cli/src/commands/config/set.ts_](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/config/set.ts)
-
+_See code: [packages/cli/src/commands/config/set.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/config/set.ts)_

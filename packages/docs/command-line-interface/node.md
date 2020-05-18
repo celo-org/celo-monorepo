@@ -2,13 +2,13 @@
 description: Manage your Celo node
 ---
 
-# Node
+## Commands
 
-## Accounts
+### Accounts
 
 List the addresses that this node has the private keys for.
 
-```text
+```
 USAGE
   $ celocli node:accounts
 
@@ -25,13 +25,13 @@ OPTIONS
   --useLedger                                    Set it to use a ledger wallet
 ```
 
-_See code:_ [_packages/cli/src/commands/node/accounts.ts_](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/node/accounts.ts)
+_See code: [packages/cli/src/commands/node/accounts.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/node/accounts.ts)_
 
-## Synced
+### Synced
 
 Check if the node is synced
 
-```text
+```
 USAGE
   $ celocli node:synced
 
@@ -39,5 +39,4 @@ OPTIONS
   --verbose  output the full status if syncing
 ```
 
-_See code:_ [_packages/cli/src/commands/node/synced.ts_](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/node/synced.ts)
-
+_See code: [packages/cli/src/commands/node/synced.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/node/synced.ts)_
