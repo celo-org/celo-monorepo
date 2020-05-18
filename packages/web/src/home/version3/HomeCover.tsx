@@ -1,8 +1,8 @@
 import * as React from 'react'
-import { Image, StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, Text, View } from 'react-native'
 import { H4 } from 'src/fonts/Fonts'
 import EmailForm from 'src/forms/EmailForm'
-import changeStoryWebP from 'src/home/change-story/change-story.webp'
+// import changeStoryWebP from 'src/home/change-story/change-story.webp'
 import ChangeStory from 'src/home/change-story/ChangeStory'
 import TextAnimation, { WORDS } from 'src/home/TextAnimation'
 import { NameSpaces, useTranslation } from 'src/i18n'
@@ -11,11 +11,11 @@ import { ScreenSizes, useScreenSize } from 'src/layout/ScreenSize'
 import AspectRatio from 'src/shared/AspectRatio'
 import { BANNER_HEIGHT, HEADER_HEIGHT } from 'src/shared/Styles'
 import { fonts, standardStyles } from 'src/styles'
-import { canUseWebP } from 'src/utils/utils'
+// import { canUseWebP } from 'src/utils/utils'
 
 export default function HomeCover() {
   // on chrome on desktop the lottie file has weird artifacts so we use webp instead.
-  const [canWebP, setCanWebP] = React.useState(false)
+  // const [canWebP, setCanWebP] = React.useState(false)
 
   const [currentWordIndex, setWord] = React.useState(0)
 
@@ -27,43 +27,30 @@ export default function HomeCover() {
     }
   }, [currentWordIndex])
 
-  React.useEffect(() => {
-    setCanWebP(canUseWebP())
-  }, [])
+  // React.useEffect(() => {
+  //   setCanWebP(canUseWebP())
+  // }, [])
 
   const { t } = useTranslation(NameSpaces.home)
   const { isMobile, screen, isDesktop } = useScreenSize()
 
   return (
     <GridRow
-      desktopStyle={{
-        paddingTop: BANNER_HEIGHT + HEADER_HEIGHT,
-        maxHeight: '100vw',
-        minHeight: '100vh',
-      }}
-      tabletStyle={{
-        paddingTop: BANNER_HEIGHT + HEADER_HEIGHT,
-        marginTop: 90,
-        minHeight: '80vh',
-        marginBottom: 100,
-      }}
-      mobileStyle={{ paddingTop: BANNER_HEIGHT + HEADER_HEIGHT, marginTop: 90, minHeight: '100vh' }}
+      desktopStyle={styles.desktopContainer}
+      tabletStyle={styles.tabletContainer}
+      mobileStyle={styles.mobileContainer}
     >
       <Cell
         span={Spans.full}
-        style={[
-          styles.container,
-          isDesktop && { alignSelf: 'center' },
-          !isMobile && standardStyles.row,
-        ]}
+        style={[styles.container, isDesktop && styles.centerMe, !isMobile && standardStyles.row]}
       >
         <View style={[styles.animationHolder, getplacement(screen)]}>
           <AspectRatio ratio={970 / 270}>
-            {isDesktop && canWebP ? (
-              <Image source={changeStoryWebP} style={standardStyles.image} onLoad={changeWord} />
-            ) : (
-              <ChangeStory onReady={changeWord} onLooped={changeWord} />
-            )}
+            {/* {isDesktop && canWebP ? (
+              <Image source={changeStoryWebP} style={standardStyles.image} onLoad={changeWord} /> */}
+            {/* ) : ( */}
+            <ChangeStory onReady={changeWord} onLooped={changeWord} />
+            {/* )} */}
           </AspectRatio>
         </View>
         <View style={[styles.contentHolder, standardStyles.blockMarginTablet]}>
@@ -89,10 +76,25 @@ function getplacement(screen: ScreenSizes) {
 }
 
 const styles = StyleSheet.create({
+  desktopContainer: {
+    paddingTop: BANNER_HEIGHT + HEADER_HEIGHT,
+    maxHeight: '100vw',
+    minHeight: '100vh',
+  },
+  tabletContainer: {
+    paddingTop: BANNER_HEIGHT + HEADER_HEIGHT,
+    marginTop: 90,
+    minHeight: '80vh',
+    marginBottom: 100,
+  },
+  mobileContainer: { paddingTop: BANNER_HEIGHT + HEADER_HEIGHT, marginTop: 90, minHeight: '100vh' },
   animationHolder: {
     flex: 2,
     minWidth: 350,
     zIndex: 10,
+  },
+  centerMe: {
+    alignSelf: 'center',
   },
   animationPlaceDesktop: {
     marginTop: 30,

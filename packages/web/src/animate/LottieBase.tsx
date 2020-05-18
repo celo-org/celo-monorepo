@@ -22,6 +22,9 @@ export default class LottieBase extends React.Component<Props> {
       autoplay: this.props.autoPlay,
       animationData: this.props.data,
       path: this.props.path ? `/lottieFiles/${this.props.path}` : undefined,
+      rendererSettings: {
+        progressiveLoad: true,
+      },
     })
     if (this.props.onReady) {
       this.animation.addEventListener('data_ready', this.props.onReady)
