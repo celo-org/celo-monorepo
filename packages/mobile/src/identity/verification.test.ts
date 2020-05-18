@@ -9,8 +9,6 @@ import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames, DefaultEventNames } from 'src/analytics/constants'
 import { setNumberVerified } from 'src/app/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/geth/saga'
-import { privateCommentKeySelector } from 'src/geth/selectors'
 import {
   cancelVerification,
   completeAttestationCode,
@@ -27,6 +25,8 @@ import {
   VERIFICATION_TIMEOUT,
 } from 'src/identity/verification'
 import { getContractKitOutsideGenerator } from 'src/web3/contracts'
+import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
+import { privateCommentKeySelector } from 'src/web3/selectors'
 import { sleep } from 'test/utils'
 import {
   mockAccount,

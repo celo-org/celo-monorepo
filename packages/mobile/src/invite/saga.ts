@@ -52,7 +52,6 @@ import {
   web3ForUtils,
 } from 'src/web3/contracts'
 import { waitWeb3LastBlock } from 'src/web3/saga'
-
 const TAG = 'invite/saga'
 export const TEMP_PW = 'ce10'
 export const REDEEM_INVITE_TIMEOUT = 2 * 60 * 1000 // 2 minutes

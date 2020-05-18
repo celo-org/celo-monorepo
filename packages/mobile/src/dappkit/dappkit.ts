@@ -15,7 +15,7 @@ import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { navigateToURI } from 'src/utils/linking'
 import Logger from 'src/utils/Logger'
-import { getContractKit } from 'src/web3/contracts'
+import { gethWallet } from 'src/web3/contracts'
 
 const TAG = 'dappkit/dappkit'
 
@@ -58,7 +58,6 @@ function* produceTxSignature(action: RequestTxSignatureAction) {
   Logger.debug(TAG, 'Producing tx signature')
 
   yield call(getConnectedUnlockedAccount)
-  const contractKit = yield call(getContractKit)
 
   const rawTxs = yield Promise.all(
     action.request.txs.map(async (tx) => {
@@ -87,7 +86,7 @@ function* produceTxSignature(action: RequestTxSignatureAction) {
         params.to = tx.to
       }
       Logger.debug(TAG, 'Signing tx with params', JSON.stringify(params))
-      const signedTx = await contractKit.web3.eth.signTransaction(params)
+      const signedTx = await gethWallet.signTransaction(params)
       return signedTx.raw
     })
   )
