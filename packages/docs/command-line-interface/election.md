@@ -2,13 +2,13 @@
 description: Participate in and view the state of Validator Elections
 ---
 
-# Election
+## Commands
 
-## Activate
+### Activate
 
 Activate pending votes in validator elections to begin earning rewards. To earn rewards as a voter, it is required to activate your pending votes at some point after the end of the epoch in which they were made.
 
-```text
+```
 USAGE
   $ celocli election:activate
 
@@ -34,13 +34,13 @@ EXAMPLES
   activate --from 0x4443d0349e8b3075cba511a0a87796597602a0f1 --wait
 ```
 
-_See code:_ [_packages/cli/src/commands/election/activate.ts_](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/election/activate.ts)
+_See code: [packages/cli/src/commands/election/activate.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/election/activate.ts)_
 
-## Current
+### Current
 
 Outputs the set of validators currently participating in BFT to create blocks. An election is run to select the validator set at the end of every epoch.
 
-```text
+```
 USAGE
   $ celocli election:current
 
@@ -49,13 +49,13 @@ OPTIONS
             checking if keys have been rotated.
 ```
 
-_See code:_ [_packages/cli/src/commands/election/current.ts_](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/election/current.ts)
+_See code: [packages/cli/src/commands/election/current.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/election/current.ts)_
 
-## List
+### List
 
 Prints the list of validator groups, the number of votes they have received, the number of additional votes they are able to receive, and whether or not they are eligible to elect validators.
 
-```text
+```
 USAGE
   $ celocli election:list
 
@@ -63,13 +63,13 @@ EXAMPLE
   list
 ```
 
-_See code:_ [_packages/cli/src/commands/election/list.ts_](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/election/list.ts)
+_See code: [packages/cli/src/commands/election/list.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/election/list.ts)_
 
-## Revoke
+### Revoke
 
 Revoke votes for a Validator Group in validator elections.
 
-```text
+```
 USAGE
   $ celocli election:revoke
 
@@ -96,24 +96,24 @@ EXAMPLE
   1000000
 ```
 
-_See code:_ [_packages/cli/src/commands/election/revoke.ts_](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/election/revoke.ts)
+_See code: [packages/cli/src/commands/election/revoke.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/election/revoke.ts)_
 
-## Run
+### Run
 
 Runs a "mock" election and prints out the validators that would be elected if the epoch ended right now.
 
-```text
+```
 USAGE
   $ celocli election:run
 ```
 
-_See code:_ [_packages/cli/src/commands/election/run.ts_](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/election/run.ts)
+_See code: [packages/cli/src/commands/election/run.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/election/run.ts)_
 
-## Show
+### Show
 
 Show election information about a voter or registered Validator Group
 
-```text
+```
 USAGE
   $ celocli election:show ADDRESS
 
@@ -129,13 +129,13 @@ EXAMPLES
   show 0x97f7333c51897469E8D98E7af8653aAb468050a3 --group
 ```
 
-_See code:_ [_packages/cli/src/commands/election/show.ts_](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/election/show.ts)
+_See code: [packages/cli/src/commands/election/show.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/election/show.ts)_
 
-## Vote
+### Vote
 
 Vote for a Validator Group in validator elections.
 
-```text
+```
 USAGE
   $ celocli election:vote
 
@@ -162,5 +162,4 @@ EXAMPLE
   1000000
 ```
 
-_See code:_ [_packages/cli/src/commands/election/vote.ts_](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/election/vote.ts)
-
+_See code: [packages/cli/src/commands/election/vote.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/election/vote.ts)_
