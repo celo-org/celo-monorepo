@@ -11,7 +11,7 @@ const debug = debugFactory('kit:provider:connection')
 const debugPayload = debugFactory('kit:provider:payload')
 const debugResponse = debugFactory('kit:provider:response')
 
-enum InterceptedMethods {
+export enum InterceptedMethods {
   accounts = 'eth_accounts',
   sendTransaction = 'eth_sendTransaction',
   signTransaction = 'eth_signTransaction',

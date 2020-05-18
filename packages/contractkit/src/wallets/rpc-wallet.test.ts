@@ -1,15 +1,17 @@
 import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
 import { generateKeys, generateMnemonic } from '@celo/utils/src/account'
-import { privateKeyToAddress } from '@celo/utils/src/address'
+import { normalizeAddressWith0x, privateKeyToAddress } from '@celo/utils/src/address'
 import { RpcWallet } from './rpc-wallet'
 
 testWithGanache('rpc-wallet', (web3) => {
   const provider = web3.currentProvider
 
-  it('should initialize with zero accounts', () => {
+  it('should initialize with default accounts', async () => {
     const rpcWallet = new RpcWallet(provider)
+    await rpcWallet.init()
     const accounts = rpcWallet.getAccounts()
-    expect(accounts).toEqual([])
+    const web3Accounts = await web3.eth.getAccounts()
+    expect(accounts).toEqual(web3Accounts.map(normalizeAddressWith0x))
   })
 
   describe('once initialized', () => {
@@ -19,27 +21,32 @@ testWithGanache('rpc-wallet', (web3) => {
     let keys: any
     // let paramsPopulator: TxParamsNormalizer
 
-    beforeAll(async () => {
+    beforeEach(async () => {
       mnemonic = await generateMnemonic()
       keys = await generateKeys(mnemonic)
-    })
-
-    beforeEach(async () => {
       rpcWallet = new RpcWallet(provider)
+      await rpcWallet.init()
       // paramsPopulator = new TxParamsNormalizer(rpcWallet.rpc)
     })
 
-    it('SBAT add an account', async () => {
+    it('should add account', async () => {
       await rpcWallet.addAccount(keys.privateKey, passphrase)
       const accounts = rpcWallet.getAccounts()
-      expect(accounts).toEqual([privateKeyToAddress(keys.privateKey)])
+      expect(accounts).toContain(normalizeAddressWith0x(privateKeyToAddress(keys.privateKey)))
     })
 
-    it('SBAT to unlock added account', async () => {
+    it('should indicate unlocked', async () => {
+      const account = await rpcWallet.addAccount(keys.privateKey, passphrase)
+      await rpcWallet.unlockAccount(account, passphrase, 10)
+      const isUnlocked = rpcWallet.isAccountUnlocked(account)
+      expect(isUnlocked).toBeTruthy()
+    })
+
+    it('should indicate locked when buffer not exceeded', async () => {
       const account = await rpcWallet.addAccount(keys.privateKey, passphrase)
       await rpcWallet.unlockAccount(account, passphrase, 5)
       const isUnlocked = rpcWallet.isAccountUnlocked(account)
-      expect(isUnlocked).toBeTruthy()
+      expect(isUnlocked).toBeFalsy()
     })
 
     // TODO: enable when ganache supports eth_signTransaction

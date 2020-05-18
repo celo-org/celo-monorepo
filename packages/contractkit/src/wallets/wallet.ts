@@ -21,7 +21,7 @@ export interface Wallet {
 export abstract class WalletBase implements Wallet {
   // By creating the Signers in advance we can have a common pattern across wallets
   // Each implementation is responsible for populating this map through addSigner
-  private accountSigners = new Map<Address, Signer>()
+  protected accountSigners = new Map<Address, Signer>()
 
   /**
    * Gets a list of accounts that have been registered
