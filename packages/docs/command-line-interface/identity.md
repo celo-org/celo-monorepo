@@ -1,25 +1,27 @@
 ---
-description: Outputs the set of validators currently participating in BFT and which ones are participating in Celo's lightweight identity protocol
+description: >-
+  Outputs the set of validators currently participating in BFT and which ones
+  are participating in Celo's lightweight identity protocol
 ---
 
-## Commands
+# Identity
 
-### Current-attestation-services
+## Current-attestation-services
 
 Outputs the set of validators currently participating in BFT and which ones are participating in Celo's lightweight identity protocol
 
-```
+```text
 USAGE
   $ celocli identity:current-attestation-services
 ```
 
-_See code: [packages/cli/src/commands/identity/current-attestation-services.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/identity/current-attestation-services.ts)_
+_See code:_ [_packages/cli/src/commands/identity/current-attestation-services.ts_](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/identity/current-attestation-services.ts)
 
-### Test-attestation-service
+## Test-attestation-service
 
 Tests whether the account has setup the attestation service properly by calling the test endpoint on it
 
-```
+```text
 USAGE
   $ celocli identity:test-attestation-service
 
@@ -46,4 +48,5 @@ EXAMPLE
   test-attestation-service --from 0x97f7333c51897469E8D98E7af8653aAb468050a3
 ```
 
-_See code: [packages/cli/src/commands/identity/test-attestation-service.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/identity/test-attestation-service.ts)_
+_See code:_ [_packages/cli/src/commands/identity/test-attestation-service.ts_](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/identity/test-attestation-service.ts)
+

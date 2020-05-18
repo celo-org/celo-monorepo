@@ -2,13 +2,13 @@
 description: Transfer Celo Gold and Celo Dollars
 ---
 
-## Commands
+# Transfer
 
-### Dollars
+## Dollars
 
 Transfer Celo Dollars to a specified address.
 
-```
+```text
 USAGE
   $ celocli transfer:dollars
 
@@ -36,13 +36,13 @@ EXAMPLE
   1000000000000000000
 ```
 
-_See code: [packages/cli/src/commands/transfer/dollars.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/transfer/dollars.ts)_
+_See code:_ [_packages/cli/src/commands/transfer/dollars.ts_](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/transfer/dollars.ts)
 
-### Gold
+## Gold
 
 Transfer Celo Gold to a specified address.
 
-```
+```text
 USAGE
   $ celocli transfer:gold
 
@@ -70,4 +70,5 @@ EXAMPLE
   10000000000000000000
 ```
 
-_See code: [packages/cli/src/commands/transfer/gold.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/transfer/gold.ts)_
+_See code:_ [_packages/cli/src/commands/transfer/gold.ts_](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/transfer/gold.ts)
+
