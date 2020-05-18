@@ -185,12 +185,13 @@ export function getSaltFromThresholdSignature(base64Sig: string) {
     throw new Error('Invalid base64Sig')
   }
 
+  // Currently uses 13 chars for a 78 bit salt
   const sigBuf = Buffer.from(base64Sig, 'base64')
   return crypto
     .createHash('sha256')
     .update(sigBuf)
     .digest('base64')
-    .slice(0, 10)
+    .slice(0, 13)
 }
 
 // Get the wallet user's own phone hash details if they're cached

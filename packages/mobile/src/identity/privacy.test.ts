@@ -27,8 +27,8 @@ describe('Fetch phone hash details', () => {
         signature: '0Uj+qoAu7ASMVvm6hvcUGx2eO/cmNdyEgGn0mSoZH8/dujrC1++SZ1N6IP6v2I8A',
       })
     )
-    const expectedSalt = 'piWqRHHYWt'
-    const expectedHash = '0xfacf63e3e086dadb44ac3661534ebca947d38e69c59f953bab6b470dc248d83f'
+    const expectedSalt = 'piWqRHHYWtfg9'
+    const expectedHash = '0xf6429456331dedf8bd32b5e3a578e5bc589a28d012724dcd3e0a4b1be67bb454'
 
     await expectSaga(fetchPhoneHashPrivate, mockE164Number)
       .provide([
@@ -59,6 +59,6 @@ describe('Fetch phone hash details', () => {
 describe(getSaltFromThresholdSignature, () => {
   it('Hashes sigs correctly', () => {
     const base64Sig = 'vJeFZJ3MY5KlpI9+kIIozKkZSR4cMymLPh2GHZUatWIiiLILyOcTiw2uqK/LBReA'
-    expect(getSaltFromThresholdSignature(base64Sig)).toBe('piWqRHHYWt')
+    expect(getSaltFromThresholdSignature(base64Sig)).toBe('piWqRHHYWtfg9')
   })
 })
