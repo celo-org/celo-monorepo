@@ -62,10 +62,10 @@ On the Attestations machine, port 80 should accept TCP connections from all IP a
 To illustrate this, you may refer to the following table:
 
 | Machine \\ IPs open to | 0\.0\.0\.0/0 \(all\) | your\-validator\-ip | your\-proxy\-ip |
-|------------------------|----------------------|-----------------------|-------------------|
-| Validator              |                      |                       | tcp:30503        |
-| Proxy                  | tcp:30303, udp:30303 | tcp:30503             |                   |
-| Attestation            | tcp:80               |                       |                   |
+| ---------------------- | -------------------- | ------------------- | --------------- |
+| Validator              |                      |                     | tcp:30503       |
+| Proxy                  | tcp:30303, udp:30303 | tcp:30503           |                 |
+| Attestation            | tcp:80               |                     |                 |
 
 ### Software requirements
 
@@ -112,52 +112,52 @@ It is important to note that when a key is unlocked you need to be particularly 
 
 There are a number of environment variables in this guide, and you may use this table as a reference.
 
-| Variable                             | Explanation                                                                                                                          |
-| ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------ |
-| CELO_IMAGE                           | The Docker image used for the Validator and proxy containers                                                                         |
-| NETWORK_ID                           | The Celo RC1 network chain ID                                                                                                    |
-| CELO_VALIDATOR_GROUP_ADDRESS         | The account address for the Validator Group; the `ReleaseGold` beneficiary address for the Validator Group                                                                                          |
-| CELO_VALIDATOR_ADDRESS         | The account address for the Validator; the `ReleaseGold` beneficiary address for the Validator                                                                                          |
-| CELO_VALIDATOR_GROUP_RG_ADDRESS         | The `ReleaseGold` contract address for the Validator Group                                                                                          |
-| CELO_VALIDATOR_RG_ADDRESS         | The `ReleaseGold` contract address for the Validator                                                                                          |
-| CELO_VALIDATOR_GROUP_SIGNER_ADDRESS        | The validator (group) signer address authorized by the Validator Group account.
-| CELO_VALIDATOR_GROUP_SIGNER_SIGNATURE      | The proof-of-possession of the Validator Group signer key                                                                                  |
-| CELO_VALIDATOR_SIGNER_ADDRESS        | The validator signer address authorized by the Validator Account
-| CELO_VALIDATOR_SIGNER_PUBLIC_KEY     | The ECDSA public key associated with the Validator signer address                                                                    |
-| CELO_VALIDATOR_SIGNER_SIGNATURE      | The proof-of-possession of the Validator signer key                                                                                  |
-| CELO_VALIDATOR_SIGNER_BLS_PUBLIC_KEY | The BLS public key for the Validator instance                                                                                        |
-| CELO_VALIDATOR_SIGNER_BLS_SIGNATURE  | A proof-of-possession of the BLS public key                                                                                          |
-| CELO_VALIDATOR_GROUP_VOTE_SIGNER_ADDRESS        | The address of the Validator Group vote signer                                                              |
-| CELO_VALIDATOR_GROUP_VOTE_SIGNER_PUBLIC_KEY     | The ECDSA public key associated with the Validator Group vote signer address                                                                    |
-| CELO_VALIDATOR_GROUP_VOTE_SIGNER_SIGNATURE      | The proof-of-possession of the Validator Group vote signer key                                                                                  |
-| CELO_VALIDATOR_VOTE_SIGNER_ADDRESS        | The address of the Validator vote signer                                                              |
-| CELO_VALIDATOR_VOTE_SIGNER_PUBLIC_KEY     | The ECDSA public key associated with the Validator vote signer address                                                                    |
-| CELO_VALIDATOR_VOTE_SIGNER_SIGNATURE      | The proof-of-possession of the Validator vote signer key                                                                                  |
-| PROXY_ENODE                          | The enode address for the Validator proxy                                                                                            |
-| PROXY_INTERNAL_IP                    | (Optional) The internal IP address over which your Validator can communicate with your proxy                                         |
-| PROXY_EXTERNAL_IP                    | The external IP address of the proxy. May be used by the Validator to communicate with the proxy if PROXY_INTERNAL_IP is unspecified |
-| CELO_ATTESTATION_SIGNER_ADDRESS           | The address of the attestation signer authorized by the Validator Account                                                            |
-| CELO_ATTESTATION_SIGNER_SIGNATURE         | The proof-of-possession of the attestation signer key                                                                                |
-| CELO_ATTESTATION_SERVICE_URL              | The URL to access the deployed Attestation Service                                                                                   |
-| METADATA_URL                         | The URL to access the metadata file for your Attestation Service                                                                     |
-| DATABASE_URL                         | The URL under which your database is accessible, currently supported are `postgres://`, `mysql://` and `sqlite://`                   |
-| APP_SIGNATURE                        | The hash with which clients can auto-read SMS messages on android                                                                    |
-| SMS_PROVIDERS                        | A comma-separated list of providers you want to configure, Celo currently supports `nexmo` & `twilio`                                   |
+| Variable                                    | Explanation                                                                                                                          |
+| ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| CELO_IMAGE                                  | The Docker image used for the Validator and proxy containers                                                                         |
+| NETWORK_ID                                  | The Celo RC1 network chain ID                                                                                                        |
+| CELO_VALIDATOR_GROUP_ADDRESS                | The account address for the Validator Group; the `ReleaseGold` beneficiary address for the Validator Group                           |
+| CELO_VALIDATOR_ADDRESS                      | The account address for the Validator; the `ReleaseGold` beneficiary address for the Validator                                       |
+| CELO_VALIDATOR_GROUP_RG_ADDRESS             | The `ReleaseGold` contract address for the Validator Group                                                                           |
+| CELO_VALIDATOR_RG_ADDRESS                   | The `ReleaseGold` contract address for the Validator                                                                                 |
+| CELO_VALIDATOR_GROUP_SIGNER_ADDRESS         | The validator (group) signer address authorized by the Validator Group account.                                                      |
+| CELO_VALIDATOR_GROUP_SIGNER_SIGNATURE       | The proof-of-possession of the Validator Group signer key                                                                            |
+| CELO_VALIDATOR_SIGNER_ADDRESS               | The validator signer address authorized by the Validator Account                                                                     |
+| CELO_VALIDATOR_SIGNER_PUBLIC_KEY            | The ECDSA public key associated with the Validator signer address                                                                    |
+| CELO_VALIDATOR_SIGNER_SIGNATURE             | The proof-of-possession of the Validator signer key                                                                                  |
+| CELO_VALIDATOR_SIGNER_BLS_PUBLIC_KEY        | The BLS public key for the Validator instance                                                                                        |
+| CELO_VALIDATOR_SIGNER_BLS_SIGNATURE         | A proof-of-possession of the BLS public key                                                                                          |
+| CELO_VALIDATOR_GROUP_VOTE_SIGNER_ADDRESS    | The address of the Validator Group vote signer                                                                                       |
+| CELO_VALIDATOR_GROUP_VOTE_SIGNER_PUBLIC_KEY | The ECDSA public key associated with the Validator Group vote signer address                                                         |
+| CELO_VALIDATOR_GROUP_VOTE_SIGNER_SIGNATURE  | The proof-of-possession of the Validator Group vote signer key                                                                       |
+| CELO_VALIDATOR_VOTE_SIGNER_ADDRESS          | The address of the Validator vote signer                                                                                             |
+| CELO_VALIDATOR_VOTE_SIGNER_PUBLIC_KEY       | The ECDSA public key associated with the Validator vote signer address                                                               |
+| CELO_VALIDATOR_VOTE_SIGNER_SIGNATURE        | The proof-of-possession of the Validator vote signer key                                                                             |
+| PROXY_ENODE                                 | The enode address for the Validator proxy                                                                                            |
+| PROXY_INTERNAL_IP                           | (Optional) The internal IP address over which your Validator can communicate with your proxy                                         |
+| PROXY_EXTERNAL_IP                           | The external IP address of the proxy. May be used by the Validator to communicate with the proxy if PROXY_INTERNAL_IP is unspecified |
+| CELO_ATTESTATION_SIGNER_ADDRESS             | The address of the attestation signer authorized by the Validator Account                                                            |
+| CELO_ATTESTATION_SIGNER_SIGNATURE           | The proof-of-possession of the attestation signer key                                                                                |
+| CELO_ATTESTATION_SERVICE_URL                | The URL to access the deployed Attestation Service                                                                                   |
+| METADATA_URL                                | The URL to access the metadata file for your Attestation Service                                                                     |
+| DATABASE_URL                                | The URL under which your database is accessible, currently supported are `postgres://`, `mysql://` and `sqlite://`                   |
+| APP_SIGNATURE                               | The hash with which clients can auto-read SMS messages on android                                                                    |
+| SMS_PROVIDERS                               | A comma-separated list of providers you want to configure, Celo currently supports `nexmo` & `twilio`                                |
 
 ## Network Deployment Timeline
 
 The setup of RC1 is similar to the new Baklava network and the deployment timeline is as follows (all dates are subject to change):
 
-* 4/19 00:00 UTC: Docker image with genesis block distributed
-* 4/19 - 4/22: Infrastructure setup
-* 4/22 16:00 UTC: Block production begins
-* 4/22: Celo Core Contracts and `ReleaseGold` contracts are deployed
-* 4/27: Governance proposals submitted to unfreeze validator elections and validator epoch rewards
-* 5/1: Elections and validator rewards enabled if governance proposals pass; validators have been registered and affiliated with a Validator Group for first election
-* 5/9: Governance proposals submitted to enable voter rewards and enable Celo Gold (cGLD) transfers
-* 5/13: RC1 is declared Mainnet and cGLD transfers are enabled, if governance proposals pass
-* 5/22: Governance proposal submitted to unfreeze stability protocol
-* 5/26: Stability protocol goes live if governance proposal passes
+- 4/19 00:00 UTC: Docker image with genesis block distributed
+- 4/19 - 4/22: Infrastructure setup
+- 4/22 16:00 UTC: Block production begins
+- 4/22: Celo Core Contracts and `ReleaseGold` contracts are deployed
+- 4/27: Governance proposals submitted to unfreeze validator elections and validator epoch rewards
+- 5/1: Elections and validator rewards enabled if governance proposals pass; validators have been registered and affiliated with a Validator Group for first election
+- 5/9: Governance proposals submitted to enable voter rewards and enable Celo Gold (cGLD) transfers
+- 5/13: RC1 is declared Mainnet and cGLD transfers are enabled, if governance proposals pass
+- 5/22: Governance proposal submitted to unfreeze stability protocol
+- 5/26: Stability protocol goes live if governance proposal passes
 
 {% hint style="info" %}
 A [timeline](https://forum.celo.org/t/release-candidate-1-rc1-timeline-and-details/428) of the Release Candidate 1 is available to provide further context.
@@ -209,7 +209,6 @@ docker run --name celo-accounts -it --restart always -p 127.0.0.1:8545:8545 -v $
 **Security**: The command line above includes the parameter `--rpcaddr 0.0.0.0` which makes the Celo Blockchain software listen for incoming RPC requests on all network adaptors. Exercise extreme caution in doing this when running outside Docker, as it means that any unlocked accounts and their funds may be accessed from other machines on the Internet. In the context of running a Docker container on your local machine, this together with the `docker -p 127.0.0.1:localport:containerport` flags allows you to make RPC calls from outside the container, i.e from your local host, but not from outside your machine. Read more about [Docker Networking](https://docs.docker.com/network/network-tutorial-standalone/#use-user-defined-bridge-networks) here.
 {% endhint %}
 
-
 ### Deploy a proxy
 
 ```bash
@@ -241,11 +240,13 @@ docker run --name celo-proxy -it --restart unless-stopped -p 30303:30303 -p 3030
 
 **OPTIONAL**
 In addition to the bootnode enode URLs provided by the cLabs team, the Celo validator community will contribute full node peers to help kickstart your nodes' peer discovery and block synchronisation processes. Here is the current list, set to `COMMUNITY_ENODES`:
+
 ```bash
 export COMMUNITY_ENODES="enode://f65013f1ac6827e275c2d2737ce13357f620d4364124d02227a19321c57f8fbf9214a9411de49d49f180b085b031d9d23211a6ead4499fc5f9d3592b55322123@50.17.60.161:30303"
 ```
 
 To use the nodes, set them to the value of the `bootnodes` or `bootnodesv4` options when running your node-starting `docker run...` commands (in this example, we will use `bootnodesv4` to keep the original command intact). To bootstrap your proxy node, you can run the command below (the same command at line 239 appended with `--bootnodesv4 $COMMUNITY_ENODES`):
+
 ```bash
 export COMMUNITY_ENODES="enode://f65013f1ac6827e275c2d2737ce13357f620d4364124d02227a19321c57f8fbf9214a9411de49d49f180b085b031d9d23211a6ead4499fc5f9d3592b55322123@50.17.60.161:30303"
 export PROXY_ADDRESS=<PROXY-PUBLIC-ADDRESS>
@@ -445,6 +446,10 @@ export CELO_VALIDATOR_SIGNER_BLS_PUBLIC_KEY=<YOUR-VALIDATOR-SIGNER-BLS-PUBLIC-KE
 ```
 
 In order to validate we need to authorize the Validator signer:
+
+{% hint style="info" %}
+The first time you authorize a validator signer for a ReleaseGold account the signer address is funded 1 cGLD to cover tx fees. Any subsequent validator signers you authorize will not be funded.
+{% endhint %}
 
 ```bash
 # On your local machine
@@ -708,11 +713,11 @@ Currently the SMS providers supported are [Twilio](https://www.twilio.com/try-tw
 
 Twilio is the most common and popular provider. For that you will need to provision the following variables:
 
-| Variable                     | Explanation                                                     |
-| ---------------------------- | --------------------------------------------------------------- |
-| TWILIO_ACCOUNT_SID           | The Twilio account ID                                           |
-| TWILIO_MESSAGING_SERVICE_SID | The Twilio Message Service ID. Starts by `MG`                   |
-| TWILIO_AUTH_TOKEN            | The API authentication token                                    |
+| Variable                     | Explanation                                                      |
+| ---------------------------- | ---------------------------------------------------------------- |
+| TWILIO_ACCOUNT_SID           | The Twilio account ID                                            |
+| TWILIO_MESSAGING_SERVICE_SID | The Twilio Message Service ID. Starts by `MG`                    |
+| TWILIO_AUTH_TOKEN            | The API authentication token                                     |
 | TWILIO_BLACKLIST             | A comma-separated list of country codes you do not want to serve |
 
 After you signed up for Twilio at [https://www.twilio.com/try-twilio](https://www.twilio.com/try-twilio), you should see your `ACCOUNT SID` and your `AUTH_TOKEN` in the top right of the console. You'll also want to enter in a credit card to fund the account. For most text messages, the costs are typically very low (and significantly lower than the attestation fee paid by the user). Find a more comprehensive price list at [https://www.twilio.com/sms/pricing](https://www.twilio.com/sms/pricing). If there are countries that you do not want to serve, you can specify them with the `TWILIO_BLACKLIST`. In any case, you'll want to adjust your Geo settings to serve phone numbers globally under [https://www.twilio.com/console/sms/settings/geo-permissions](https://www.twilio.com/console/sms/settings/geo-permissions).
@@ -727,10 +732,10 @@ To actually be able to send SMS, you need to create a messaging service under [P
 
 Here is the list of the environment variables needed to use the Nexmo SMS broker:
 
-| Variable        | Explanation                                                     |
-| --------------- | --------------------------------------------------------------- |
-| NEXMO_KEY       | The API key to the Nexmo API                                    |
-| NEXMO_SECRET    | The API secret to the Nexmo API                                 |
+| Variable        | Explanation                                                      |
+| --------------- | ---------------------------------------------------------------- |
+| NEXMO_KEY       | The API key to the Nexmo API                                     |
+| NEXMO_SECRET    | The API secret to the Nexmo API                                  |
 | NEXMO_BLACKLIST | A comma-separated list of country codes you do not want to serve |
 
 ### Database Configuration
@@ -760,6 +765,7 @@ export DATABASE_URL="postgres://postgres:<DATABASE_PASSWORD>@localhost:5432/atte
 ## Running the Attestation Service
 
 Before running the attestation service, ensure that your local node is fully synced.
+
 ```bash
 # On the Attestation machine
 sudo celocli node:synced --node geth.ipc
