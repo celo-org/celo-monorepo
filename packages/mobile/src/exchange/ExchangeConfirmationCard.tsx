@@ -21,10 +21,6 @@ export interface ExchangeConfirmationCardProps {
 
 type Props = ExchangeConfirmationCardProps
 
-// const getExchangeRate = (makerAmount: DisplayedAmount, takerAmount: DisplayedAmount) => {
-// return new BigNumber(makerAmount.value).dividedBy(takerAmount.value)
-// }
-
 export default function ExchangeConfirmationCard(props: Props) {
   const { t } = useTranslation(Namespaces.exchangeFlow9)
   const { makerAmount, takerAmount } = props

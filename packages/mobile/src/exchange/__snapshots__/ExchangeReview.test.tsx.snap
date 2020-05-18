@@ -574,14 +574,10 @@ exports[`ExchangeReview renders correctly 1`] = `
   </View>
   <View
     style={
-      Array [
-        Object {
-          "flexDirection": "column",
-        },
-        Object {
-          "padding": 16,
-        },
-      ]
+      Object {
+        "flexDirection": "column",
+        "padding": 16,
+      }
     }
   >
     <View

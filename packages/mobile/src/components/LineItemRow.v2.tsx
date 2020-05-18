@@ -22,10 +22,11 @@ export default function LineItemRow({
   isLoading,
   hasError,
 }: LineItemProps) {
-  const textStyle = [styles.text, textStyleProp]
+  const textStyle = { ...styles.text, ...textStyleProp }
+  const viewStyle = { ...styles.container, ...style }
 
   return (
-    <View style={[styles.container, style]}>
+    <View style={viewStyle}>
       <View style={styles.description}>
         <Text style={textStyle}>{title}</Text>
         {titleIcon}

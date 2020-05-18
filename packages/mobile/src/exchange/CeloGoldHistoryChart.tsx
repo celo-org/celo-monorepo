@@ -54,7 +54,7 @@ function ChartAwareSvgText({
     y = y + 25
   }
   const [adjustedX, setAdjustedX] = useState(x)
-  const horizontalOffset = 16
+  const horizontalOffset = variables.contentPadding
   const onLayout = useCallback(
     ({
       nativeEvent: {

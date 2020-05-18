@@ -184,12 +184,9 @@ exports[`renders correctly with backup not completed 1`] = `
   </View>
   <View
     style={
-      Array [
-        Object {
-          "flexDirection": "column",
-        },
-        undefined,
-      ]
+      Object {
+        "flexDirection": "column",
+      }
     }
   >
     <View

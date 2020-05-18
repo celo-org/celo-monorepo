@@ -218,15 +218,10 @@ exports[`Testnet banner Renders when connected with backup complete 1`] = `
   >
     <View
       style={
-        Array [
-          Object {
-            "flexDirection": "row",
-          },
-          Object {
-            "flex": 1,
-            "flexDirection": "column",
-          },
-        ]
+        Object {
+          "flex": 1,
+          "flexDirection": "column",
+        }
       }
     >
       <View
@@ -282,20 +277,16 @@ exports[`Testnet banner Renders when connected with backup complete 1`] = `
     </View>
     <View
       style={
-        Array [
-          Object {
-            "flexDirection": "row",
+        Object {
+          "0": Object {
+            "flex": 1,
+            "flexDirection": "column",
           },
-          Array [
-            Object {
-              "flex": 1,
-              "flexDirection": "column",
-            },
-            Object {
-              "marginHorizontal": 12,
-            },
-          ],
-        ]
+          "1": Object {
+            "marginHorizontal": 12,
+          },
+          "flexDirection": "row",
+        }
       }
     >
       <View
@@ -653,15 +644,10 @@ exports[`Testnet banner Renders when disconnected 1`] = `
   >
     <View
       style={
-        Array [
-          Object {
-            "flexDirection": "row",
-          },
-          Object {
-            "flex": 1,
-            "flexDirection": "column",
-          },
-        ]
+        Object {
+          "flex": 1,
+          "flexDirection": "column",
+        }
       }
     >
       <View
@@ -717,20 +703,16 @@ exports[`Testnet banner Renders when disconnected 1`] = `
     </View>
     <View
       style={
-        Array [
-          Object {
-            "flexDirection": "row",
+        Object {
+          "0": Object {
+            "flex": 1,
+            "flexDirection": "column",
           },
-          Array [
-            Object {
-              "flex": 1,
-              "flexDirection": "column",
-            },
-            Object {
-              "marginHorizontal": 12,
-            },
-          ],
-        ]
+          "1": Object {
+            "marginHorizontal": 12,
+          },
+          "flexDirection": "row",
+        }
       }
     >
       <View
@@ -1069,15 +1051,10 @@ exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
   >
     <View
       style={
-        Array [
-          Object {
-            "flexDirection": "row",
-          },
-          Object {
-            "flex": 1,
-            "flexDirection": "column",
-          },
-        ]
+        Object {
+          "flex": 1,
+          "flexDirection": "column",
+        }
       }
     >
       <View
@@ -1133,20 +1110,16 @@ exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
     </View>
     <View
       style={
-        Array [
-          Object {
-            "flexDirection": "row",
+        Object {
+          "0": Object {
+            "flex": 1,
+            "flexDirection": "column",
           },
-          Array [
-            Object {
-              "flex": 1,
-              "flexDirection": "column",
-            },
-            Object {
-              "marginHorizontal": 12,
-            },
-          ],
-        ]
+          "1": Object {
+            "marginHorizontal": 12,
+          },
+          "flexDirection": "row",
+        }
       }
     >
       <View

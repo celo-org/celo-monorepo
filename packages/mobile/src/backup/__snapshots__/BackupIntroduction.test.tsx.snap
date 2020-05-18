@@ -180,12 +180,9 @@ exports[`BackupIntroduction renders correctly when backup not complete 1`] = `
       </Text>
       <View
         style={
-          Array [
-            Object {
-              "flexDirection": "row",
-            },
-            undefined,
-          ]
+          Object {
+            "flexDirection": "row",
+          }
         }
       >
         <View
