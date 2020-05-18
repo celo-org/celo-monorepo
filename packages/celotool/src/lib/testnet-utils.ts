@@ -5,12 +5,12 @@ import * as fs from 'fs'
 import fetch from 'node-fetch'
 import * as path from 'path'
 import sleep from 'sleep-promise'
+import { execCmdWithExitOnFailure } from './cmd-utils'
 import { getGenesisGoogleStorageUrl } from './endpoints'
 import { getEnvFile } from './env-utils'
 import { ensureAuthenticatedGcloudAccount } from './gcloud_utils'
 import { generateGenesisFromEnv } from './generate_utils'
 import { getBootnodeEnode, getEnodesWithExternalIPAddresses } from './geth'
-import { execCmdWithExitOnFailure } from './utils'
 
 const genesisBlocksBucketName = GenesisBlocksGoogleStorageBucketName
 const staticNodesBucketName = StaticNodeUtils.getStaticNodesGoogleStorageBucketName()

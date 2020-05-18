@@ -148,6 +148,7 @@ release: {{ .Release.Name }}
       --consoleformat=json \
       --consoleoutput=stdout \
       --verbosity={{ .Values.geth.verbosity }} \
+      --vmodule={{ .Values.geth.vmodule }} \
       --metrics \
       ${ADDITIONAL_FLAGS}
   env:

@@ -1,14 +1,16 @@
 ---
-description: Remove expired oracle reports for a specified token (currently just Celo Dollar, aka: "StableToken")
+description: >-
+  Remove expired oracle reports for a specified token (currently just Celo
+  Dollar, aka "StableToken")
 ---
 
-## Commands
+# Oracle
 
-### Remove-expired-reports
+## Remove-expired-reports
 
-Remove expired oracle reports for a specified token (currently just Celo Dollar, aka: "StableToken")
+Remove expired oracle reports for a specified token \(currently just Celo Dollar, aka "StableToken"\)
 
-```
+```text
 USAGE
   $ celocli oracle:remove-expired-reports TOKEN
 
@@ -35,13 +37,13 @@ EXAMPLES
   remove-expired-reports --from 0x8c349AAc7065a35B7166f2659d6C35D75A3893C1
 ```
 
-_See code: [packages/cli/src/commands/oracle/remove-expired-reports.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/oracle/remove-expired-reports.ts)_
+_See code:_ [_packages/cli/src/commands/oracle/remove-expired-reports.ts_](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/oracle/remove-expired-reports.ts)
 
-### Report
+## Report
 
-Report the price of Celo Gold in a specified token (currently just Celo Dollar, aka: "StableToken")
+Report the price of Celo Gold in a specified token \(currently just Celo Dollar, aka "StableToken"\)
 
-```
+```text
 USAGE
   $ celocli oracle:report TOKEN
 
@@ -70,13 +72,13 @@ EXAMPLES
   report --value 0.99 --from 0x8c349AAc7065a35B7166f2659d6C35D75A3893C1
 ```
 
-_See code: [packages/cli/src/commands/oracle/report.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/oracle/report.ts)_
+_See code:_ [_packages/cli/src/commands/oracle/report.ts_](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/oracle/report.ts)
 
-### Reports
+## Reports
 
 List oracle reports for a given token
 
-```
+```text
 USAGE
   $ celocli oracle:reports TOKEN
 
@@ -88,4 +90,5 @@ EXAMPLES
   reports
 ```
 
-_See code: [packages/cli/src/commands/oracle/reports.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/oracle/reports.ts)_
+_See code:_ [_packages/cli/src/commands/oracle/reports.ts_](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/oracle/reports.ts)
+

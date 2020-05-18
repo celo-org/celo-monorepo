@@ -1,45 +1,68 @@
 import fs from 'fs'
+import { AzureClusterConfig } from './azure'
 import { createNamespaceIfNotExists } from './cluster'
+import { execCmdWithExitOnFailure } from './cmd-utils'
 import { envVar, fetchEnv } from './env-utils'
 import { installGenericHelmChart, removeGenericHelmChart } from './helm_deploy'
-import {
-  helmChartPath,
-  kubeNamespace,
-  prometheusImageTag,
-  releaseName,
-  sidecarImageTag,
-} from './prometheus'
 import {
   createServiceAccountIfNotExists,
   getServiceAccountEmail,
   getServiceAccountKey,
 } from './service-account-utils'
-import {
-  execCmdWithExitOnFailure,
-  switchToProjectFromEnv as switchToGCPProjectFromEnv,
-} from './utils'
+import { outputIncludes, switchToProjectFromEnv as switchToGCPProjectFromEnv } from './utils'
 
-export async function installPrometheus() {
+const helmChartPath = '../helm-charts/prometheus-stackdriver'
+const releaseName = 'prometheus-stackdriver'
+const kubeNamespace = 'prometheus'
+// stackdriver-prometheus-sidecar relevant links:
+// GitHub: https://github.com/Stackdriver/stackdriver-prometheus-sidecar
+// Container registry with latest tags: https://console.cloud.google.com/gcr/images/stackdriver-prometheus/GLOBAL/stackdriver-prometheus-sidecar?gcrImageListsize=30
+const sidecarImageTag = '0.7.3'
+// Prometheus container registry with latest tags: https://hub.docker.com/r/prom/prometheus/tags
+const prometheusImageTag = 'v2.17.0'
+
+export async function installPrometheusIfNotExists(clusterConfig: AzureClusterConfig) {
+  const prometheusExists = await outputIncludes(
+    `helm list`,
+    `prometheus-stackdriver`,
+    `prometheus-stackdriver exists, skipping install`
+  )
+  if (!prometheusExists) {
+    console.info('Installing prometheus-stackdriver')
+    await installPrometheus(clusterConfig)
+  }
+}
+
+export async function installPrometheus(clusterConfig: AzureClusterConfig) {
   await createNamespaceIfNotExists('prometheus')
-  return installGenericHelmChart(kubeNamespace, releaseName, helmChartPath, await helmParameters())
+  return installGenericHelmChart(
+    kubeNamespace,
+    releaseName,
+    helmChartPath,
+    await helmParameters(clusterConfig)
+  )
 }
 
 export async function removeHelmRelease() {
   await removeGenericHelmChart(releaseName)
 }
 
-async function helmParameters() {
-  const kubeClusterName = fetchEnv(envVar.AZURE_KUBERNETES_CLUSTER_NAME)
+async function helmParameters(clusterConfig: AzureClusterConfig) {
   return [
     `--set namespace=${kubeNamespace}`,
-    `--set cluster=${kubeClusterName}`,
+    `--set cluster=${clusterConfig.clusterName}`,
     `--set gcloud.project=${fetchEnv(envVar.TESTNET_PROJECT_NAME)}`,
     `--set gcloud.region=${fetchEnv(envVar.KUBERNETES_CLUSTER_ZONE)}`,
     `--set sidecar.imageTag=${sidecarImageTag}`,
     `--set prometheus.imageTag=${prometheusImageTag}`,
     `--set gcloudServiceAccountKeyBase64=${await getPrometheusGcloudServiceAccountKeyBase64(
-      kubeClusterName
+      clusterConfig.clusterName
     )}`,
+    // Stackdriver allows a maximum of 10 custom labels. kube-state-metrics
+    // has some metrics of the form "kube_.+_labels" that provides the labels
+    // of k8s resources as metric labels. If some k8s resources have too many labels,
+    // this results in a bunch of errors when the sidecar tries to send metrics to Stackdriver.
+    `--set-string includeFilter='\\{job=~".+"\\,__name__!~"kube_.+_labels"\\}'`,
   ]
 }
 

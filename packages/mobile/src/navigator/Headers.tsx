@@ -1,5 +1,6 @@
 import fontStyles from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
+import { StackHeaderOptions } from '@react-navigation/stack/lib/typescript/src/types'
 import * as React from 'react'
 import { Trans } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
@@ -11,16 +12,16 @@ import i18n, { Namespaces } from 'src/i18n'
 import useSelector from 'src/redux/useSelector'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 
-export const noHeader = {
-  headerLeft: <View />,
+export const noHeader: StackHeaderOptions = {
+  headerLeft: () => <View />,
 }
 
-export const nuxNavigationOptions = {
+export const nuxNavigationOptions: StackHeaderOptions = {
   headerLeftContainerStyle: { paddingHorizontal: 10 },
-  headerLeft: <BackButton />,
+  headerLeft: BackButton,
   headerRightContainerStyle: { paddingHorizontal: 10 },
-  headerRight: <View />,
-  headerTitle: <DisconnectBanner />,
+  headerRight: () => <View />,
+  headerTitle: () => <DisconnectBanner />,
   headerTitleContainerStyle: {
     alignItems: 'center',
     flex: 1,
@@ -28,24 +29,28 @@ export const nuxNavigationOptions = {
   },
 }
 
-export const nuxNavigationOptionsNoBackButton = {
+export const nuxNavigationOptionsNoBackButton: StackHeaderOptions = {
   ...nuxNavigationOptions,
-  headerLeft: <View />,
+  headerLeft: () => <View />,
 }
 
-export const headerWithBackButton = {
+export const headerWithBackButton: StackHeaderOptions = {
   headerTitle: '',
   headerTitleStyle: [fontStyles.headerTitle, componentStyles.screenHeader],
+  headerTitleContainerStyle: {
+    alignItems: 'center',
+  },
+  headerTitleAlign: 'center',
   headerLeftContainerStyle: { paddingHorizontal: 20 },
-  headerLeft: <BackButton />,
-  headerRight: <View />, // This helps vertically center the title
+  headerLeft: () => <BackButton />,
+  headerRight: () => <View />, // This helps vertically center the title
 }
 
 // TODO(Rossy) align designs to consistently use back button
-export const headerWithCancelButton = {
+export const headerWithCancelButton: StackHeaderOptions = {
   ...headerWithBackButton,
   headerLeftContainerStyle: { paddingHorizontal: 0 },
-  headerLeft: <CancelButton />,
+  headerLeft: () => <CancelButton />,
 }
 
 interface Props {
@@ -93,13 +98,12 @@ export const exchangeHeader = (makerToken: CURRENCY_ENUM) => {
       : i18n.t('exchangeFlow9:sellGold')
   return {
     ...headerWithCancelButton,
-    headerTitle: <HeaderTitleWithBalance title={title} token={makerToken} />,
+    headerTitle: () => <HeaderTitleWithBalance title={title} token={makerToken} />,
   }
 }
 
 const styles = StyleSheet.create({
   header: {
     alignItems: 'center',
-    flex: 1,
   },
 })

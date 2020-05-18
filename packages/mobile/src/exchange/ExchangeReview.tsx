@@ -3,16 +3,15 @@ import HorizontalLine from '@celo/react-components/components/HorizontalLine'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
+import { StackScreenProps } from '@react-navigation/stack'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { Trans, WithTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
-import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
-import componentWithAnalytics from 'src/analytics/wrapper'
 import CurrencyDisplay, { FormatType } from 'src/components/CurrencyDisplay'
 import FeeIcon from 'src/components/FeeIcon'
 import LineItemRow from 'src/components/LineItemRow'
@@ -21,9 +20,8 @@ import { exchangeTokens, fetchExchangeRate, fetchTobinTax } from 'src/exchange/a
 import { ExchangeRatePair } from 'src/exchange/reducer'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces, withTranslation } from 'src/i18n'
-import { exchangeHeader } from 'src/navigator/Headers'
-import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { StackParamList } from 'src/navigator/types'
 import { RootState } from 'src/redux/reducers'
 import { isAppConnected } from 'src/redux/selectors'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
@@ -42,16 +40,6 @@ interface DispatchProps {
   exchangeTokens: typeof exchangeTokens
 }
 
-interface NavProps {
-  exchangeInput: {
-    makerToken: CURRENCY_ENUM
-    makerTokenBalance: string
-    inputToken: CURRENCY_ENUM
-    inputTokenDisplayName: string
-    inputAmount: BigNumber
-  }
-}
-
 interface State {
   makerToken: CURRENCY_ENUM
   inputToken: CURRENCY_ENUM
@@ -59,7 +47,9 @@ interface State {
   inputAmount: BigNumber
 }
 
-type Props = StateProps & WithTranslation & DispatchProps & NavigationInjectedProps
+type OwnProps = StackScreenProps<StackParamList, Screens.ExchangeReview>
+
+type Props = StateProps & WithTranslation & DispatchProps & OwnProps
 
 const mapStateToProps = (state: RootState): StateProps => ({
   exchangeRatePair: state.exchange.exchangeRatePair,
@@ -69,13 +59,6 @@ const mapStateToProps = (state: RootState): StateProps => ({
 })
 
 export class ExchangeReview extends React.Component<Props, State> {
-  static navigationOptions = ({ navigation }: NavigationInjectedProps<NavProps>) => {
-    const { makerToken } = navigation.getParam('exchangeInput')
-    return {
-      ...exchangeHeader(makerToken),
-    }
-  }
-
   state: State = {
     makerToken: CURRENCY_ENUM.GOLD,
     inputToken: CURRENCY_ENUM.GOLD,
@@ -91,7 +74,6 @@ export class ExchangeReview extends React.Component<Props, State> {
       makerToken,
       makerAmount,
     })
-    navigate(Screens.ExchangeHomeScreen)
   }
 
   getExchangePropertiesFromNavProps() {
@@ -100,7 +82,7 @@ export class ExchangeReview extends React.Component<Props, State> {
       inputAmount,
       inputToken,
       inputTokenDisplayName,
-    } = this.props.navigation.getParam('exchangeInput')
+    } = this.props.route.params.exchangeInput
     if (!makerToken || !inputAmount || !inputToken || !inputTokenDisplayName) {
       throw new Error('Missing exchange input from nav props')
     }
@@ -285,10 +267,8 @@ const styles = StyleSheet.create({
   },
 })
 
-export default componentWithAnalytics(
-  connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
-    exchangeTokens,
-    fetchExchangeRate,
-    fetchTobinTax,
-  })(withTranslation(Namespaces.exchangeFlow9)(ExchangeReview))
-)
+export default connect<StateProps, DispatchProps, OwnProps, RootState>(mapStateToProps, {
+  exchangeTokens,
+  fetchExchangeRate,
+  fetchTobinTax,
+})(withTranslation(Namespaces.exchangeFlow9)(ExchangeReview))

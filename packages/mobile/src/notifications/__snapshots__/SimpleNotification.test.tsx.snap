@@ -139,6 +139,7 @@ exports[`SimpleNotification renders correctly with a react node (svg) icon 1`] =
               onResponderTerminate={[Function]}
               onResponderTerminationRequest={[Function]}
               onStartShouldSetResponder={[Function]}
+              testID="undefined/it goes boom/Button"
             >
               <Text
                 style={
@@ -298,6 +299,7 @@ exports[`SimpleNotification renders correctly with an image icon 1`] = `
               onResponderTerminate={[Function]}
               onResponderTerminationRequest={[Function]}
               onStartShouldSetResponder={[Function]}
+              testID="undefined/it goes boom/Button"
             >
               <Text
                 style={

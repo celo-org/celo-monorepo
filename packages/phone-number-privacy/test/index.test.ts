@@ -8,6 +8,7 @@ import {
 import { getNumberPairContacts, setNumberPairContacts } from '../src/database/wrappers/number-pairs'
 import { getBlindedSalt, getContactMatches } from '../src/index'
 import { getRemainingQueryCount } from '../src/salt-generation/query-quota'
+import { getTransaction } from '../src/database/database'
 
 const BLS_SIGNATURE = '6546544323114343'
 
@@ -36,12 +37,16 @@ const mockSetNumberPairContacts = setNumberPairContacts as jest.Mock
 mockSetNumberPairContacts.mockImplementation()
 const mockGetNumberPairContacts = getNumberPairContacts as jest.Mock
 
+jest.mock('../src/database/database')
+const mockGetTransaction = getTransaction as jest.Mock
+mockGetTransaction.mockReturnValue({})
+
 // TODO the failures are nested in the res structure as a deep equality which does not fail
 // the full test
 describe(`POST /getBlindedMessageSignature endpoint`, () => {
   describe('with valid input', () => {
     const blindedQueryPhoneNumber = '+5555555555'
-    const hashedPhoneNumber = '+1234567890'
+    const hashedPhoneNumber = '0x5f6e88c3f724b3a09d3194c0514426494955eff7127c29654e48a361a19b4b96'
     const account = '0x78dc5D2D739606d31509C31d654056A45185ECb6'
 
     const mockRequestData = {
@@ -96,8 +101,30 @@ describe(`POST /getBlindedMessageSignature endpoint`, () => {
   describe('with invalid input', () => {
     it('invalid address returns 400', () => {
       const blindedQueryPhoneNumber = '+5555555555'
-      const hashedPhoneNumber = '+1234567890'
+      const hashedPhoneNumber = '0x5f6e88c3f724b3a09d3194c0514426494955eff7127c29654e48a361a19b4b96'
       const account = 'd31509C31d654056A45185ECb6'
+
+      const mockRequestData = {
+        blindedQueryPhoneNumber,
+        hashedPhoneNumber,
+        account,
+      }
+      const req = { body: mockRequestData }
+
+      const res = {
+        status: (status: any) => {
+          expect(status).toEqual(400)
+          // tslint:disable-next-line: no-empty
+          return { json: () => {} }
+        },
+      }
+      // @ts-ignore TODO fix req type to make it a mock express req
+      getBlindedSalt(req, res)
+    })
+    it('invalid hashedPhoneNumber returns 400', () => {
+      const blindedQueryPhoneNumber = '+5555555555'
+      const hashedPhoneNumber = '+1234567890'
+      const account = '0x78dc5D2D739606d31509C31d654056A45185ECb6'
 
       const mockRequestData = {
         blindedQueryPhoneNumber,

@@ -2,13 +2,13 @@
 description: Shows information about reserve
 ---
 
-## Commands
+# Reserve
 
-### Status
+## Status
 
 Shows information about reserve
 
-```
+```text
 USAGE
   $ celocli reserve:status
 
@@ -16,13 +16,13 @@ EXAMPLE
   status
 ```
 
-_See code: [packages/cli/src/commands/reserve/status.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/reserve/status.ts)_
+_See code:_ [_packages/cli/src/commands/reserve/status.ts_](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/reserve/status.ts)
 
-### Transfergold
+## Transfergold
 
 Transfers reserve gold to other reserve address
 
-```
+```text
 USAGE
   $ celocli reserve:transfergold
 
@@ -54,4 +54,5 @@ EXAMPLES
   0x5409ed021d9299bf6814279a6a1411a7e866a631 --useMultiSig
 ```
 
-_See code: [packages/cli/src/commands/reserve/transfergold.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/reserve/transfergold.ts)_
+_See code:_ [_packages/cli/src/commands/reserve/transfergold.ts_](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/reserve/transfergold.ts)
+

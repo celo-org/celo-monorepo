@@ -52,6 +52,9 @@ spec:
             - --stackdriver.kubernetes.location={{ .Values.gcloud.region }}
             - --stackdriver.kubernetes.cluster-name={{ .Values.cluster }}
             - --include={job=~".+",__name__!~"kube_.+_labels"}
+{{ if .Values.includeFilter }}
+{{ indent 12 (printf "- --include=%s" .Values.includeFilter) }}
+{{ end }}
           ports:
             - name: sidecar
               containerPort: 9091

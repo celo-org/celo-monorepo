@@ -3,6 +3,7 @@ import {
   IdentifierLookupResult,
 } from '@celo/contractkit/lib/wrappers/Attestations'
 import { isValidAddress } from '@celo/utils/src/address'
+import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
 import BigNumber from 'bignumber.js'
 import { MinimalContact } from 'react-native-contacts'
 import { call, put, select } from 'redux-saga/effects'
@@ -10,6 +11,7 @@ import { setUserContactDetails } from 'src/account/actions'
 import { defaultCountryCodeSelector, e164NumberSelector } from 'src/account/selectors'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
+import { USE_PHONE_NUMBER_PRIVACY } from 'src/config'
 import {
   endImportContacts,
   FetchPhoneAddressesAction,
@@ -101,7 +103,7 @@ export function* fetchPhoneAddresses({ e164Number }: FetchPhoneAddressesAction) 
     // know new status is pending.
     yield put(updateE164PhoneNumberAddresses({ [e164Number]: undefined }, {}))
 
-    const contractKit = getContractKit()
+    const contractKit = yield call(getContractKit)
     const attestationsWrapper: AttestationsWrapper = yield call([
       contractKit.contracts,
       contractKit.contracts.getAttestations,
@@ -132,13 +134,19 @@ export function* fetchPhoneAddresses({ e164Number }: FetchPhoneAddressesAction) 
 }
 
 function* getAddresses(e164Number: string, attestationsWrapper: AttestationsWrapper) {
-  const phoneHashDetails: PhoneNumberHashDetails = yield call(fetchPhoneHashPrivate, e164Number)
-  const phoneHash = phoneHashDetails.phoneHash
+  let phoneHash: string
+  if (USE_PHONE_NUMBER_PRIVACY) {
+    const phoneHashDetails: PhoneNumberHashDetails = yield call(fetchPhoneHashPrivate, e164Number)
+    phoneHash = phoneHashDetails.phoneHash
+  } else {
+    phoneHash = getPhoneHash(e164Number)
+  }
 
   // Map of identifier -> (Map of address -> AttestationStat)
-  const results: IdentifierLookupResult = yield call(attestationsWrapper.lookupIdentifiers, [
-    phoneHash,
-  ])
+  const results: IdentifierLookupResult = yield call(
+    [attestationsWrapper, attestationsWrapper.lookupIdentifiers],
+    [phoneHash]
+  )
 
   if (!results || !results[phoneHash]) {
     return null

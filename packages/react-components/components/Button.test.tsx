@@ -1,63 +1,62 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
-import Touchable from '@celo/react-components/components/Touchable'
-import { shallow } from 'enzyme'
 import * as React from 'react'
 import { Text } from 'react-native'
+import { fireEvent, render } from 'react-native-testing-library'
 import * as renderer from 'react-test-renderer'
+
+const TEST_TEXT = 'TEST_TEXT'
 
 describe('Button', () => {
   describe('when pressed', () => {
     it('fires the onPress prop', () => {
       const handler = jest.fn()
-      const button = shallow(
+      const { getByName } = render(
         <Button standard={true} onPress={handler} text="Button" type={BtnTypes.PRIMARY} />
       )
-      button.find(Touchable).simulate('press')
+      fireEvent.press(getByName('Button'))
       expect(handler).toBeCalled()
     })
 
     it('multiple times fires once', () => {
       const handler = jest.fn()
-      const button = shallow(
-        <Button standard={true} onPress={handler} text="Button" type={BtnTypes.PRIMARY} />
+      const { getByName } = render(
+        <Button
+          standard={true}
+          onPress={handler}
+          text="Button"
+          type={BtnTypes.PRIMARY}
+          testID={'ButtonTestId'}
+        />
       )
-      button.find(Touchable).simulate('press')
-      button.find(Touchable).simulate('press')
-      button.find(Touchable).simulate('press')
+      const button = getByName('TouchableDefault')
+      fireEvent.press(button)
+      fireEvent.press(button)
+      fireEvent.press(button)
       expect(handler).toBeCalledTimes(1)
     })
   })
 
   it('renders with minimum props', () => {
-    const button = shallow(
-      <Button standard={true} onPress={jest.fn()} text="Button" type={BtnTypes.PRIMARY} />
+    const tree = renderer.create(
+      <Button standard={true} onPress={jest.fn()} text={TEST_TEXT} type={BtnTypes.PRIMARY} />
     )
-    expect(
-      button
-        .find('Text')
-        .children()
-        .text()
-    ).toEqual('Button')
+    expect(tree).toMatchSnapshot()
   })
+
   describe('when children passed', () => {
     it('renders with children and text', () => {
-      const button = shallow(
+      const { getByText } = render(
         <Button standard={true} onPress={jest.fn()} text="Button" type={BtnTypes.PRIMARY}>
           <Text>child text</Text>
         </Button>
       )
-      expect(
-        button
-          .findWhere((node) => node.type() === Text && node.children().text() === 'child text')
-          .children()
-          .text()
-      ).toEqual('child text')
+      expect(getByText('child text')).toBeTruthy()
     })
   })
   describe('when disabled / testID props', () => {
     it('passes them to Touchable', () => {
       const onPress = jest.fn()
-      const button = shallow(
+      const { getByName } = render(
         <Button
           disabled={true}
           testID={'jest-test'}
@@ -69,14 +68,15 @@ describe('Button', () => {
           <Text>child text</Text>
         </Button>
       )
-      expect(button.find(Touchable).props()).toEqual(
-        expect.objectContaining({ testID: 'jest-test', disabled: true })
-      )
+      expect(getByName('TouchableDefault').props).toMatchObject({
+        testID: 'jest-test',
+        disabled: true,
+      })
     })
   })
   describe('when passed accessibilityLabel', () => {
     it('sets it', () => {
-      const button = shallow(
+      const { getByA11yLabel } = render(
         <Button
           accessibilityLabel="link"
           standard={true}
@@ -86,7 +86,7 @@ describe('Button', () => {
         />
       )
 
-      expect(button.find({ accessibilityLabel: 'link' }).length).toEqual(1)
+      expect(getByA11yLabel('link')).toBeTruthy()
     })
   })
   describe('when type is SECONDARY', () => {

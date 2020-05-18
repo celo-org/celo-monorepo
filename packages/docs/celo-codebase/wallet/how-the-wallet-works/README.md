@@ -9,3 +9,4 @@ This section describes the technology powering key functionality of the Celo Wal
 {% page-ref page="sending-and-requesting-payments.md" %}
 
 {% page-ref page="ultralight-node-sync.md" %}
+

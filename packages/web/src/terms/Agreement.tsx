@@ -40,7 +40,7 @@ class Agreement extends React.PureComponent<I18nProps> {
             </Cell>
             <Cell span={Spans.three4th}>
               <Text style={fonts.p}>
-                {`This User Agreement and Test Terms (“Agreement”) constitute a contract between you and A Protocol Inc. (“Company” or “Celo” and including all affiliates) and applies to your use of the Celo Products, including the Celo Wallet, and other features, technologies and functionalities offered by the Company to you through a website, app, or through other means (the “Celo Services.”) as part of a limited test. The Celo Services are provided to you subject to this Agreement as well as the Celo Privacy Policy available at `}{' '}
+                {`This User Agreement and Test Terms (“Agreement”) constitute a contract between you and the Celo Foundation (“Company” or “Celo” and including all affiliates) and applies to your use of the Celo Products, including the Celo Wallet, and other features, technologies and functionalities offered by the Company to you through a website, app, or through other means (the “Celo Services.”) as part of a limited test. The Celo Services are provided to you subject to this Agreement as well as the Celo Privacy Policy available at `}{' '}
                 <Link href={menuItems.PRIVACY.link}>celo.org/privacy</Link>,
                 {`incorporated by this Agreement by this reference.
 

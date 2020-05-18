@@ -10,7 +10,7 @@ description: >-
 
 ### **Prerequisites**
 
-- **You have a Celo node running.** Commands will connect to a Celo node to execute most functionality. See the [Running a Full Node](../getting-started/running-a-full-node-in-rc1.md) instructions for more details on running a full node.
+* **You have a Celo node running.** Commands will connect to a Celo node to execute most functionality. See the [Running a Full Node](../getting-started/rc1/running-a-full-node-in-rc1.md) instructions for more details on running a full node.
 
 ### NPM Package
 
@@ -25,7 +25,7 @@ We are currently deploying the CLI with only Node v10.x LTS support. If you are 
 {% endhint %}
 
 {% hint style="info" %}
-If you have trouble installing globally (i.e. with the `-g` flag), try installing to a local directory instead with `npm install @celo/celocli` and run with `npx celocli`.
+If you have trouble installing globally \(i.e. with the `-g` flag\), try installing to a local directory instead with `npm install @celo/celocli` and run with `npx celocli`.
 {% endhint %}
 
 ### Overview
@@ -36,14 +36,17 @@ The tool is broken down into modules and commands with the following pattern:
 celocli <module>:<command> <...args> <...flags?>
 ```
 
-The `celocli` tool assumes that users are running a node which they have access to signing transactions on.
-See documentation on the [config](./config.md) module for information about how set which node commands are sent to.
+The `celocli` tool assumes that users are running a node which they have access to signing transactions on. See documentation on the [config](config.md) module for information about how set which node commands are sent to.
 
 {% hint style="info" %}
-**All balances of Celo Gold or Celo Dollars are expressed in units of 10<sup>-18</sup>**
+**All balances of Celo Gold or Celo Dollars are expressed in units of 10-18**
 {% endhint %}
 
-{% embed url="https://www.npmjs.com/package/@celo/celocli" %}
+{% embed url="https://www.npmjs.com/package/@celo/celocli" caption="" %}
+
+### Using a Ledger Wallet
+
+The Celo CLI supports using a [Ledger hardware wallet](../celo-gold-holder-guide/ledger.md) to sign transactions.
 
 ### Plugins
 
@@ -56,3 +59,4 @@ celocli autocomplete
 ```
 
 The update warning plugin notifies the user if they are using an oudated version of the CLI. This plugin is enabled by default.
+
