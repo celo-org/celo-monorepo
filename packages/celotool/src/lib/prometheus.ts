@@ -115,5 +115,5 @@ async function createPrometheusGcloudServiceAccountforAKS(serviceAccountName: st
 }
 
 function getServiceAccountNameforAKS(kubeClusterName: string) {
-  return `prometheus-aks-${kubeClusterName}`
+  return `prometheus-aks-${kubeClusterName}`.substring(0, 30)
 }
