@@ -118,10 +118,11 @@ export interface State {
 class ValidatorsList extends React.PureComponent<Props, State> {
   state = {
     expanded: undefined,
-    orderBy: 'name' as orderByTypes,
+    orderBy: undefined,
     orderAsc: true,
   }
   private orderAccessors = {
+    order: (_) => _.order,
     name: (_) => (_.name || '').toLowerCase() || null,
     total: (_) => _.numMembers * 1000 + _.elected,
     votes: (_) => +_.votesAbsolute || 0,
@@ -133,7 +134,7 @@ class ValidatorsList extends React.PureComponent<Props, State> {
     uptime: (_) => _.uptime || 0,
     attestation: (_) => _.attestation || 0,
   }
-  private defaultOrderAccessor = 'name'
+  private defaultOrderAccessor = 'order'
   private cachedCleanData: CeloGroup[]
   private orderByFn: { [by: string]: any } = {}
 
@@ -188,6 +189,7 @@ class ValidatorsList extends React.PureComponent<Props, State> {
           const votesPer = new BigNumber(votes).dividedBy(receivableVotes).multipliedBy(100)
           const votesAbsolutePer = receivableVotesPer.multipliedBy(votesPer).dividedBy(100)
           return {
+            order: Math.random(),
             pinned: this.isPinned(group.address),
             name: group.name,
             address: group.address,
@@ -256,7 +258,7 @@ class ValidatorsList extends React.PureComponent<Props, State> {
 
   sortData<T extends any & { id: number }>(data: T[]): T[] {
     const { orderBy, orderAsc } = this.state
-    const accessor = this.orderAccessors[orderBy]
+    const accessor = this.orderAccessors[orderBy] || (() => 0)
     const dAccessor = this.orderAccessors[this.defaultOrderAccessor]
     const dir = orderAsc ? 1 : -1
 
@@ -271,7 +273,6 @@ class ValidatorsList extends React.PureComponent<Props, State> {
     }
 
     return (data || [])
-      .sort((a, b) => b.id - a.id)
       .sort((a, b) => compare(dAccessor(a), dAccessor(b)))
       .sort((a, b) => dir * compare(accessor(a), accessor(b)))
       .sort((a, b) => this.isPinned(b) - this.isPinned(a))
@@ -317,13 +318,13 @@ class ValidatorsList extends React.PureComponent<Props, State> {
               order={orderBy === 'votes' ? orderAsc : null}
             />
             <HeaderCell
-              onClick={this.orderByFn.votes}
+              onClick={this.orderByFn.rawVotes}
               style={[styles.sizeM]}
               name="Votes"
               order={orderBy === 'rawVotes' ? orderAsc : null}
             />
             <HeaderCell
-              onClick={this.orderByFn.votes}
+              onClick={this.orderByFn.votesAvailables}
               style={[styles.sizeM]}
               name="Votes Available"
               order={orderBy === 'votesAvailables' ? orderAsc : null}

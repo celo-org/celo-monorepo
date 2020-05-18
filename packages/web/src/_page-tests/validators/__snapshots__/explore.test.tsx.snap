@@ -152,7 +152,7 @@ exports[`ValidatorsList renders 1`] = `
             Object {
               "color": "rgba(255,255,255,1.00)",
               "fontFamily": "Jost, futura-pt, futura, sans-serif",
-              "opacity": 0.6,
+              "opacity": 0,
               "paddingLeft": "6px",
             }
           }
@@ -161,7 +161,7 @@ exports[`ValidatorsList renders 1`] = `
             fill="none"
             height={10}
             style={Object {}}
-            transform="rotate(270)"
+            transform="rotate(90)"
             viewBox="0 0 8 12"
             width={10}
           >
