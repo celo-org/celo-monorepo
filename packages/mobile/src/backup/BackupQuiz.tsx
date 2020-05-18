@@ -3,22 +3,22 @@ import Touchable from '@celo/react-components/components/Touchable'
 import Backspace from '@celo/react-components/icons/Backspace'
 import colors from '@celo/react-components/styles/colors.v2'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
+import { StackScreenProps } from '@react-navigation/stack'
 import { chunk, flatMap, shuffle, times } from 'lodash'
 import * as React from 'react'
 import { Trans, WithTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
-import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
 import { setBackupCompleted } from 'src/account/actions'
 import { showError } from 'src/alert/actions'
-import componentWithAnalytics from 'src/analytics/wrapper'
 import { QuizzBottom } from 'src/backup/QuizzBottom'
 import DevSkipButton from 'src/components/DevSkipButton'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import { headerWithCancelButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { StackParamList } from 'src/navigator/types'
 import { RootState } from 'src/redux/reducers'
 import Logger from 'src/utils/Logger'
 
@@ -51,16 +51,15 @@ interface DispatchProps {
   showError: typeof showError
 }
 
-type Props = WithTranslation & DispatchProps & NavigationInjectedProps
+type OwnProps = StackScreenProps<StackParamList, Screens.BackupQuiz>
+
+type Props = WithTranslation & DispatchProps & OwnProps
 
 export class BackupQuiz extends React.Component<Props, State> {
-  static navigationOptions = ({ navigation }: NavigationInjectedProps) => ({
-    ...headerWithCancelButton, // TODO switch to v2 once Ivans PR is in
+  static navigationOptions = {
+    ...headerWithCancelButton,
     headerTitle: i18n.t(`${Namespaces.backupKeyFlow6}:headerTitle`),
-    headerRight: (
-      <DeleteWord onPressBackspace={navigation.getParam('onPressBackspace') || fallBackPress} />
-    ),
-  })
+  }
 
   state: State = {
     mnemonicLength: 0,
@@ -70,7 +69,9 @@ export class BackupQuiz extends React.Component<Props, State> {
   }
 
   componentDidMount() {
-    this.props.navigation.setParams({ onPressBackspace: this.onPressBackspace })
+    this.props.navigation.setOptions({
+      headerRight: () => <DeleteWord onPressBackspace={this.onPressBackspace} />,
+    })
 
     const mnemonic = this.getMnemonicFromNavProps()
     const shuffledMnemonic = getShuffledWordSet(mnemonic)
@@ -80,8 +81,8 @@ export class BackupQuiz extends React.Component<Props, State> {
     })
   }
 
-  getMnemonicFromNavProps(): string {
-    const mnemonic = this.props.navigation.getParam('mnemonic', '')
+  getMnemonicFromNavProps() {
+    const mnemonic = this.props.route.params.mnemonic
     if (!mnemonic) {
       throw new Error('Mnemonic missing form nav props')
     }
@@ -221,10 +222,6 @@ export class BackupQuiz extends React.Component<Props, State> {
   }
 }
 
-function fallBackPress() {
-  Logger.error(`${TAG}@deleteWord`, 'onBackspacePress function not passed from navigator')
-}
-
 interface Content {
   word: string
   index: number
@@ -250,11 +247,10 @@ function getShuffledWordSet(mnemonic: string) {
   )
 }
 
-export default componentWithAnalytics(
-  connect<{}, DispatchProps, {}, RootState>(null, { setBackupCompleted, showError })(
-    withTranslation(Namespaces.backupKeyFlow6)(BackupQuiz)
-  )
-)
+export default connect<{}, DispatchProps, OwnProps, RootState>(null, {
+  setBackupCompleted,
+  showError,
+})(withTranslation(Namespaces.backupKeyFlow6)(BackupQuiz))
 
 const styles = StyleSheet.create({
   container: {

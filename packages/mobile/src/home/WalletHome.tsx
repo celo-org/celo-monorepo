@@ -19,7 +19,6 @@ import {
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import { showMessage } from 'src/alert/actions'
-import componentWithAnalytics from 'src/analytics/wrapper'
 import { exitBackupFlow } from 'src/app/actions'
 import { ALERT_BANNER_DURATION, DEFAULT_TESTNET, SHOW_TESTNET_BANNER } from 'src/config'
 import { CURRENCY_ENUM } from 'src/geth/consts'
@@ -32,7 +31,6 @@ import SendOrRequestBar from 'src/home/SendOrRequestBar'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import { withDispatchAfterNavigate } from 'src/navigator/WithDispatchAfterNavigate'
 import { NumberToRecipient } from 'src/recipients/recipient'
 import { recipientCacheSelector } from 'src/recipients/reducer'
 import { RootState } from 'src/redux/reducers'
@@ -244,11 +242,7 @@ const styles = StyleSheet.create({
   },
 })
 
-export default withDispatchAfterNavigate(
-  componentWithAnalytics(
-    connect<StateProps, DispatchProps, {}, RootState>(
-      mapStateToProps,
-      mapDispatchToProps
-    )(withTranslation(Namespaces.walletFlow5)(WalletHome))
-  )
-)
+export default connect<StateProps, DispatchProps, {}, RootState>(
+  mapStateToProps,
+  mapDispatchToProps
+)(withTranslation(Namespaces.walletFlow5)(WalletHome))

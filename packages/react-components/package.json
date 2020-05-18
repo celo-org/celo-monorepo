@@ -33,12 +33,10 @@
     "react": "16.11.0",
     "react-dom": "16.11.0",
     "react-native-testing-library": "^1.12.0",
-    "react-navigation": "^4.0.10",
     "react-test-renderer": "16.11.0"
   },
   "peerDependencies": {
     "react": "*",
-    "react-native": "*",
-    "react-navigation": "*"
+    "react-native": "*"
   }
 }

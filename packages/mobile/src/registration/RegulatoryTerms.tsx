@@ -7,7 +7,6 @@ import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import { acceptTerms } from 'src/account/actions'
 import { PincodeType } from 'src/account/reducer'
-import { componentWithAnalytics } from 'src/analytics/wrapper'
 import DevSkipButton from 'src/components/DevSkipButton'
 import { CELO_TERMS_LINK } from 'src/config'
 import { Namespaces, withTranslation } from 'src/i18n'
@@ -90,12 +89,10 @@ export class RegulatoryTerms extends React.Component<Props> {
   }
 }
 
-export default componentWithAnalytics(
-  connect<StateProps, DispatchProps, {}, RootState>(
-    mapStateToProps,
-    mapDispatchToProps
-  )(withTranslation(Namespaces.nuxNamePin1)(RegulatoryTerms))
-)
+export default connect<StateProps, DispatchProps, {}, RootState>(
+  mapStateToProps,
+  mapDispatchToProps
+)(withTranslation(Namespaces.nuxNamePin1)(RegulatoryTerms))
 
 const styles = StyleSheet.create({
   container: {
