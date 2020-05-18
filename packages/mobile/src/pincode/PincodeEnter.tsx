@@ -11,6 +11,7 @@ import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
+import { currentAccountSelector } from 'src/geth/selectors'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { nuxNavigationOptions } from 'src/navigator/Headers'
 import { Screens } from 'src/navigator/Screens'
@@ -18,8 +19,6 @@ import { StackParamList } from 'src/navigator/types'
 import Pincode from 'src/pincode/Pincode'
 import { isPinCorrect, isPinValid, PIN_LENGTH } from 'src/pincode/utils'
 import { RootState } from 'src/redux/reducers'
-import { fornoSelector } from 'src/web3/selectors'
-import { currentAccountSelector } from 'src/geth/selectors'
 
 interface State {
   pin: string
@@ -27,7 +26,6 @@ interface State {
 
 interface StateProps {
   currentAccount: string | null
-  fornoMode: boolean
 }
 
 interface DispatchProps {
@@ -63,11 +61,11 @@ class PincodeEnter extends React.Component<Props, State> {
   }
 
   onPressConfirm = () => {
-    const { fornoMode, route, currentAccount } = this.props
+    const { route, currentAccount } = this.props
     const { pin } = this.state
     const withVerification = route.params.withVerification
     if (withVerification && currentAccount) {
-      isPinCorrect(pin, fornoMode, currentAccount)
+      isPinCorrect(pin, currentAccount)
         .then(this.onCorrectPin)
         .catch(this.onWrongPin)
     } else {
@@ -105,7 +103,6 @@ const style = StyleSheet.create({
 
 const mapStateToProps = (state: RootState): StateProps => ({
   currentAccount: currentAccountSelector(state),
-  fornoMode: fornoSelector(state),
 })
 
 export default connect(mapStateToProps, { showError })(

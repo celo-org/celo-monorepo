@@ -16,13 +16,11 @@ import { currentAccountSelector } from 'src/geth/selectors'
 import { Namespaces } from 'src/i18n'
 import Pincode from 'src/pincode/Pincode'
 import { isPinCorrect, isPinValid, PIN_LENGTH } from 'src/pincode/utils'
-import { fornoSelector } from 'src/web3/selectors'
 
 function PincodeLock() {
   const [pin, setPin] = useState('')
   const dispatch = useDispatch()
   const { t } = useTranslation(Namespaces.nuxNamePin1)
-  const fornoMode = useSelector(fornoSelector)
   const currentAccount = useSelector(currentAccountSelector)
 
   const onWrongPin = useCallback(() => {
@@ -36,7 +34,7 @@ function PincodeLock() {
 
   const onPress = () => {
     if (currentAccount) {
-      return isPinCorrect(pin, fornoMode, currentAccount)
+      return isPinCorrect(pin, currentAccount)
         .then(onCorrectPin)
         .catch(onWrongPin)
     } else {
