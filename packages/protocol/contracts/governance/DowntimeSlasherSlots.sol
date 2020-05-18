@@ -106,9 +106,7 @@ contract DowntimeSlasherSlots is SlasherUtil {
    * the validator could be slashed for the first 10 hours and the last 10 hours of the epoch.
    * @param _oncePerEpoch Slot size in which the downtime validation will be divided.
    */
-  function setSlashableDowntimeOncePerEpoch(uint256 _oncePerEpoch) public onlyOwner {
-    require(_slotSize < getEpochSize(), "Slot size must be smaller than epoch size");
-
+  function setSlashableDowntimeOncePerEpoch(bool _oncePerEpoch) public onlyOwner {
     oncePerEpoch = _oncePerEpoch;
     emit SlashableDowntimeOncePerEpochSet(_oncePerEpoch);
   }
