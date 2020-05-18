@@ -3466,7 +3466,7 @@ exports[`BuildPage renders 1`] = `
               }
             }
           >
-            Deploy Celo blockchain software and connect to Mainnet Release Candidate 1
+            Deploy Celo blockchain software and connect to Mainnet
           </div>
           <div
             className="css-view-1dbjc4n"
