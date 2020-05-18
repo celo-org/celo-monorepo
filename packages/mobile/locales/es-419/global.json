@@ -68,7 +68,7 @@
   "balanceAvailable": "<0></0> disponibles",
   "subtotal": "Total parcial",
   "total": "Total",
-  "totalInDollars": "{{CeloDollars}} (@ <2></2>)",
+  "totalInDollars": "{{CeloDollars}} @ <2></2>",
   "oops": "¡Uy!",
   "somethingWrong": "Había un problema",
   "verifyFailed": "Falla durante la verificación",
@@ -149,6 +149,6 @@
     "veintisiete",
     "veintiocho",
     "veintinueve",
-    "trigésimo"  
+    "trigésimo"
   ]
 }
