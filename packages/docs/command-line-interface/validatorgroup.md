@@ -2,13 +2,13 @@
 description: View and manage Validator Groups
 ---
 
-## Commands
+# ValidatorGroup
 
-### Commission
+## Commission
 
 Manage the commission for a registered Validator Group. This represents the share of the epoch rewards given to elected Validators that goes to the group they are a member of. Updates must be made in a two step process where the group owner first calls uses the queue-update option, then after the required update delay, the apply option. The commission update delay, in blocks, can be viewed with the network:parameters command. A groups next commission update block can be checked with validatorgroup:show
 
-```
+```text
 USAGE
   $ celocli validatorgroup:commission
 
@@ -39,13 +39,13 @@ EXAMPLES
   commission --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95 --apply
 ```
 
-_See code: [packages/cli/src/commands/validatorgroup/commission.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validatorgroup/commission.ts)_
+_See code:_ [_packages/cli/src/commands/validatorgroup/commission.ts_](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validatorgroup/commission.ts)
 
-### Deregister
+## Deregister
 
-Deregister a Validator Group. Approximately 60 days after deregistration, the 10,000 Gold locked up to register the Validator Group will become possible to unlock. Note that the Group must be empty (i.e. no members) before deregistering.
+Deregister a Validator Group. Approximately 60 days after deregistration, the 10,000 Gold locked up to register the Validator Group will become possible to unlock. Note that the Group must be empty \(i.e. no members\) before deregistering.
 
-```
+```text
 USAGE
   $ celocli validatorgroup:deregister
 
@@ -68,13 +68,13 @@ EXAMPLE
   deregister --from 0x47e172f6cfb6c7d01c1574fa3e2be7cc73269d95
 ```
 
-_See code: [packages/cli/src/commands/validatorgroup/deregister.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validatorgroup/deregister.ts)_
+_See code:_ [_packages/cli/src/commands/validatorgroup/deregister.ts_](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validatorgroup/deregister.ts)
 
-### List
+## List
 
-List registered Validator Groups, their names (if provided), commission, and members.
+List registered Validator Groups, their names \(if provided\), commission, and members.
 
-```
+```text
 USAGE
   $ celocli validatorgroup:list
 
@@ -82,13 +82,13 @@ EXAMPLE
   list
 ```
 
-_See code: [packages/cli/src/commands/validatorgroup/list.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validatorgroup/list.ts)_
+_See code:_ [_packages/cli/src/commands/validatorgroup/list.ts_](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validatorgroup/list.ts)
 
-### Member
+## Member
 
 Add or remove members from a Validator Group
 
-```
+```text
 USAGE
   $ celocli validatorgroup:member VALIDATORADDRESS
 
@@ -121,13 +121,13 @@ EXAMPLES
   member --from 0x47e172f6cfb6c7d01c1574fa3e2be7cc73269d95 --reorder 3 0x47e172f6cfb6c7d01c1574fa3e2be7cc73269d95
 ```
 
-_See code: [packages/cli/src/commands/validatorgroup/member.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validatorgroup/member.ts)_
+_See code:_ [_packages/cli/src/commands/validatorgroup/member.ts_](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validatorgroup/member.ts)
 
-### Register
+## Register
 
 Register a new Validator Group
 
-```
+```text
 USAGE
   $ celocli validatorgroup:register
 
@@ -155,13 +155,13 @@ EXAMPLE
   register --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95 --commission 0.1
 ```
 
-_See code: [packages/cli/src/commands/validatorgroup/register.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validatorgroup/register.ts)_
+_See code:_ [_packages/cli/src/commands/validatorgroup/register.ts_](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validatorgroup/register.ts)
 
-### Reset-slashing-multiplier
+## Reset-slashing-multiplier
 
 Reset validator group slashing multiplier.
 
-```
+```text
 USAGE
   $ celocli validatorgroup:reset-slashing-multiplier GROUPADDRESS
 
@@ -184,13 +184,13 @@ EXAMPLE
   reset-slashing-multiplier 0x97f7333c51897469E8D98E7af8653aAb468050a3
 ```
 
-_See code: [packages/cli/src/commands/validatorgroup/reset-slashing-multiplier.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validatorgroup/reset-slashing-multiplier.ts)_
+_See code:_ [_packages/cli/src/commands/validatorgroup/reset-slashing-multiplier.ts_](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validatorgroup/reset-slashing-multiplier.ts)
 
-### Show
+## Show
 
 Show information about an existing Validator Group
 
-```
+```text
 USAGE
   $ celocli validatorgroup:show GROUPADDRESS
 
@@ -201,4 +201,5 @@ EXAMPLE
   show 0x97f7333c51897469E8D98E7af8653aAb468050a3
 ```
 
-_See code: [packages/cli/src/commands/validatorgroup/show.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validatorgroup/show.ts)_
+_See code:_ [_packages/cli/src/commands/validatorgroup/show.ts_](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validatorgroup/show.ts)
+

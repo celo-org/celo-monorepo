@@ -2,13 +2,13 @@
 description: View and manage Release Gold contracts
 ---
 
-## Commands
+# ReleaseGold
 
-### Authorize
+## Authorize
 
-Authorize an alternative key to be used for a given action (Vote, Validate, Attest) on behalf of the ReleaseGold instance contract.
+Authorize an alternative key to be used for a given action \(Vote, Validate, Attest\) on behalf of the ReleaseGold instance contract.
 
-```
+```text
 USAGE
   $ celocli releasegold:authorize
 
@@ -56,13 +56,13 @@ EXAMPLES
   1a1eebad8452eb
 ```
 
-_See code: [packages/cli/src/commands/releasegold/authorize.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/releasegold/authorize.ts)_
+_See code:_ [_packages/cli/src/commands/releasegold/authorize.ts_](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/releasegold/authorize.ts)
 
-### Create-account
+## Create-account
 
 Creates a new account for the ReleaseGold instance
 
-```
+```text
 USAGE
   $ celocli releasegold:create-account
 
@@ -85,13 +85,13 @@ EXAMPLE
   create-account --contract 0x5409ED021D9299bf6814279A6A1411A7e866A631
 ```
 
-_See code: [packages/cli/src/commands/releasegold/create-account.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/releasegold/create-account.ts)_
+_See code:_ [_packages/cli/src/commands/releasegold/create-account.ts_](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/releasegold/create-account.ts)
 
-### Locked-gold
+## Locked-gold
 
-Perform actions [lock, unlock, withdraw] on Celo Gold that has been locked via the provided ReleaseGold contract.
+Perform actions \[lock, unlock, withdraw\] on Celo Gold that has been locked via the provided ReleaseGold contract.
 
-```
+```text
 USAGE
   $ celocli releasegold:locked-gold
 
@@ -121,13 +121,13 @@ EXAMPLES
   locked-gold --contract 0xCcc8a47BE435F1590809337BB14081b256Ae26A8 --action withdraw --value 10000000000000000000000
 ```
 
-_See code: [packages/cli/src/commands/releasegold/locked-gold.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/releasegold/locked-gold.ts)_
+_See code:_ [_packages/cli/src/commands/releasegold/locked-gold.ts_](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/releasegold/locked-gold.ts)
 
-### Refund-and-finalize
+## Refund-and-finalize
 
 Refund the given contract's balance to the appopriate parties and destroy the contact. Can only be called by the release owner of revocable ReleaseGold instances.
 
-```
+```text
 USAGE
   $ celocli releasegold:refund-and-finalize
 
@@ -150,11 +150,11 @@ EXAMPLE
   refund-and-finalize --contract 0x5409ED021D9299bf6814279A6A1411A7e866A631
 ```
 
-_See code: [packages/cli/src/commands/releasegold/refund-and-finalize.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/releasegold/refund-and-finalize.ts)_
+_See code:_ [_packages/cli/src/commands/releasegold/refund-and-finalize.ts_](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/releasegold/refund-and-finalize.ts)
 
-### Release-gold
+## Release-gold
 
-```
+```text
 USAGE
   $ celocli releasegold:release-gold
 
@@ -174,13 +174,13 @@ OPTIONS
   --useLedger                                            Set it to use a ledger wallet
 ```
 
-_See code: [packages/cli/src/commands/releasegold/release-gold.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/releasegold/release-gold.ts)_
+_See code:_ [_packages/cli/src/commands/releasegold/release-gold.ts_](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/releasegold/release-gold.ts)
 
-### Revoke
+## Revoke
 
 Revoke the given contract instance. Once revoked, any Locked Gold can be unlocked by the release owner. The beneficiary will then be able to withdraw any released Gold that had yet to be withdrawn, and the remainder can be transferred by the release owner to the refund address. Note that not all ReleaseGold instances are revokable.
 
-```
+```text
 USAGE
   $ celocli releasegold:revoke
 
@@ -205,13 +205,13 @@ EXAMPLE
   revoke --contract 0x5409ED021D9299bf6814279A6A1411A7e866A631
 ```
 
-_See code: [packages/cli/src/commands/releasegold/revoke.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/releasegold/revoke.ts)_
+_See code:_ [_packages/cli/src/commands/releasegold/revoke.ts_](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/releasegold/revoke.ts)
 
-### Revoke-votes
+## Revoke-votes
 
 Revokes `votes` for the given contract's account from the given group's account
 
-```
+```text
 USAGE
   $ celocli releasegold:revoke-votes
 
@@ -238,13 +238,13 @@ EXAMPLE
   --votes 100
 ```
 
-_See code: [packages/cli/src/commands/releasegold/revoke-votes.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/releasegold/revoke-votes.ts)_
+_See code:_ [_packages/cli/src/commands/releasegold/revoke-votes.ts_](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/releasegold/revoke-votes.ts)
 
-### Set-account
+## Set-account
 
 Set account properties of the ReleaseGold instance account such as name, data encryption key, and the metadata URL
 
-```
+```text
 USAGE
   $ celocli releasegold:set-account
 
@@ -273,13 +273,13 @@ EXAMPLES
   set-account --contract 0x5719118266779B58D0f9519383A4A27aA7b829E5 --property metaURL --value www.test.com
 ```
 
-_See code: [packages/cli/src/commands/releasegold/set-account.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/releasegold/set-account.ts)_
+_See code:_ [_packages/cli/src/commands/releasegold/set-account.ts_](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/releasegold/set-account.ts)
 
-### Set-account-wallet-address
+## Set-account-wallet-address
 
 Set the ReleaseGold contract account's wallet address
 
-```
+```text
 USAGE
   $ celocli releasegold:set-account-wallet-address
 
@@ -311,13 +311,13 @@ EXAMPLE
   e2f8f08117e25b
 ```
 
-_See code: [packages/cli/src/commands/releasegold/set-account-wallet-address.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/releasegold/set-account-wallet-address.ts)_
+_See code:_ [_packages/cli/src/commands/releasegold/set-account-wallet-address.ts_](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/releasegold/set-account-wallet-address.ts)
 
-### Set-beneficiary
+## Set-beneficiary
 
 Set the beneficiary of the ReleaseGold contract. This command is gated via a multi-sig, so this is expected to be called twice: once by the contract's beneficiary and once by the contract's releaseOwner. Once both addresses call this command with the same parameters, the tx will execute.
 
-```
+```text
 USAGE
   $ celocli releasegold:set-beneficiary
 
@@ -347,13 +347,13 @@ EXAMPLE
   0xE36Ea790bc9d7AB70C55260C66D52b1eca985f84 --beneficiary 0x6Ecbe1DB9EF729CBe972C83Fb886247691Fb6beb
 ```
 
-_See code: [packages/cli/src/commands/releasegold/set-beneficiary.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/releasegold/set-beneficiary.ts)_
+_See code:_ [_packages/cli/src/commands/releasegold/set-beneficiary.ts_](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/releasegold/set-beneficiary.ts)
 
-### Set-can-expire
+## Set-can-expire
 
 Set the canExpire flag for the given ReleaseGold contract
 
-```
+```text
 USAGE
   $ celocli releasegold:set-can-expire
 
@@ -380,13 +380,13 @@ EXAMPLE
   set-can-expire --contract 0x5409ED021D9299bf6814279A6A1411A7e866A631 --value true
 ```
 
-_See code: [packages/cli/src/commands/releasegold/set-can-expire.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/releasegold/set-can-expire.ts)_
+_See code:_ [_packages/cli/src/commands/releasegold/set-can-expire.ts_](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/releasegold/set-can-expire.ts)
 
-### Set-liquidity-provision
+## Set-liquidity-provision
 
 Set the liquidity provision to true, allowing the beneficiary to withdraw released gold.
 
-```
+```text
 USAGE
   $ celocli releasegold:set-liquidity-provision
 
@@ -411,13 +411,13 @@ EXAMPLE
   set-liquidity-provision --contract 0x5409ED021D9299bf6814279A6A1411A7e866A631
 ```
 
-_See code: [packages/cli/src/commands/releasegold/set-liquidity-provision.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/releasegold/set-liquidity-provision.ts)_
+_See code:_ [_packages/cli/src/commands/releasegold/set-liquidity-provision.ts_](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/releasegold/set-liquidity-provision.ts)
 
-### Set-max-distribution
+## Set-max-distribution
 
 Set the maximum distribution of gold for the given contract
 
-```
+```text
 USAGE
   $ celocli releasegold:set-max-distribution
 
@@ -445,13 +445,13 @@ EXAMPLE
   set-max-distribution --contract 0x5409ED021D9299bf6814279A6A1411A7e866A631 --distributionRatio 1000
 ```
 
-_See code: [packages/cli/src/commands/releasegold/set-max-distribution.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/releasegold/set-max-distribution.ts)_
+_See code:_ [_packages/cli/src/commands/releasegold/set-max-distribution.ts_](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/releasegold/set-max-distribution.ts)
 
-### Show
+## Show
 
 Show info on a ReleaseGold instance contract.
 
-```
+```text
 USAGE
   $ celocli releasegold:show
 
@@ -474,13 +474,13 @@ EXAMPLE
   show --contract 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95
 ```
 
-_See code: [packages/cli/src/commands/releasegold/show.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/releasegold/show.ts)_
+_See code:_ [_packages/cli/src/commands/releasegold/show.ts_](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/releasegold/show.ts)
 
-### Transfer-dollars
+## Transfer-dollars
 
 Transfer Celo Dollars from the given contract address. Dollars may be accrued to the ReleaseGold contract via validator epoch rewards.
 
-```
+```text
 USAGE
   $ celocli releasegold:transfer-dollars
 
@@ -508,13 +508,13 @@ EXAMPLE
   --value 10000000000000000000000
 ```
 
-_See code: [packages/cli/src/commands/releasegold/transfer-dollars.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/releasegold/transfer-dollars.ts)_
+_See code:_ [_packages/cli/src/commands/releasegold/transfer-dollars.ts_](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/releasegold/transfer-dollars.ts)
 
-### Withdraw
+## Withdraw
 
 Withdraws `value` released gold to the beneficiary address. Fails if `value` worth of gold has not been released yet.
 
-```
+```text
 USAGE
   $ celocli releasegold:withdraw
 
@@ -539,4 +539,5 @@ EXAMPLE
   withdraw --contract 0x5409ED021D9299bf6814279A6A1411A7e866A631 --value 10000000000000000000000
 ```
 
-_See code: [packages/cli/src/commands/releasegold/withdraw.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/releasegold/withdraw.ts)_
+_See code:_ [_packages/cli/src/commands/releasegold/withdraw.ts_](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/releasegold/withdraw.ts)
+
