@@ -240,6 +240,7 @@ const styles = StyleSheet.create({
   },
   paddedContainer: {
     paddingHorizontal: 16,
+    flex: 1,
   },
   flexStart: {
     justifyContent: 'flex-start',

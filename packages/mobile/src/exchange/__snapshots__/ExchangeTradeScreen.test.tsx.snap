@@ -203,10 +203,14 @@ exports[`ExchangeTradeScreen renders correctly 1`] = `
   </RCTScrollView>
   <View
     style={
-      Object {
-        "flexDirection": "column",
-        "padding": 16,
-      }
+      Array [
+        Object {
+          "flexDirection": "column",
+        },
+        Object {
+          "padding": 16,
+        },
+      ]
     }
   >
     <View

@@ -131,5 +131,5 @@ function getStyleForWrapper(
   size: BtnSizes | undefined,
   style: StyleProp<ViewStyle>
 ): StyleProp<ViewStyle> {
-  return { flexDirection: size === BtnSizes.FULL ? 'column' : 'row', ...(style as ViewStyle) }
+  return [{ flexDirection: size === BtnSizes.FULL ? 'column' : 'row' }, style]
 }

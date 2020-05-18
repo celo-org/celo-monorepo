@@ -9,7 +9,7 @@ import { StackScreenProps } from '@react-navigation/stack'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { Trans, WithTranslation } from 'react-i18next'
-import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import { getNumberFormatSettings } from 'react-native-localize'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
@@ -17,21 +17,19 @@ import { hideAlert, showError } from 'src/alert/actions'
 import { errorSelector } from 'src/alert/reducer'
 import { MoneyAmount } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import CancelButton from 'src/components/CancelButton.v2'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import LineItemRow from 'src/components/LineItemRow'
 import { DOLLAR_TRANSACTION_MIN_AMOUNT, GOLD_TRANSACTION_MIN_AMOUNT } from 'src/config'
 import { fetchExchangeRate } from 'src/exchange/actions'
 import { ExchangeRatePair } from 'src/exchange/reducer'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
-import i18n, { Namespaces, withTranslation } from 'src/i18n'
+import { Namespaces, withTranslation } from 'src/i18n'
 import { LocalCurrencyCode } from 'src/localCurrency/consts'
 import {
   convertDollarsToMaxSupportedPrecision,
   convertLocalAmountToDollars,
 } from 'src/localCurrency/convert'
 import { getLocalCurrencyCode, getLocalCurrencyExchangeRate } from 'src/localCurrency/selectors'
-import { HeaderTitleWithBalance, headerWithCancelButton } from 'src/navigator/Headers.v2'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
@@ -354,7 +352,7 @@ const styles = StyleSheet.create({
     flex: 1,
     textAlign: 'right',
     fontSize: 24,
-    lineHeight: 39,
+    lineHeight: Platform.select({ android: 39, ios: 30 }), // vertical align = center
     height: 60, // setting height manually b.c. of bug causing text to jump on Android
     color: colors.goldDark,
   },

@@ -91,17 +91,6 @@ HeaderTitleWithBalance.defaultProps = {
   token: CURRENCY_ENUM.DOLLAR,
 }
 
-export const exchangeHeader = (makerToken: CURRENCY_ENUM) => {
-  const title =
-    makerToken === CURRENCY_ENUM.DOLLAR
-      ? i18n.t('exchangeFlow9:buyGold')
-      : i18n.t('exchangeFlow9:sellGold')
-  return {
-    ...headerWithCancelButton,
-    headerTitle: () => <HeaderTitleWithBalance title={title} token={makerToken} />,
-  }
-}
-
 const styles = StyleSheet.create({
   header: {
     alignItems: 'center',

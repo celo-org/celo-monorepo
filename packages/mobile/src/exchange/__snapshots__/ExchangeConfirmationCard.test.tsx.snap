@@ -12,6 +12,7 @@ exports[`renders correctly with giant numbers 1`] = `
   <View
     style={
       Object {
+        "flex": 1,
         "paddingHorizontal": 16,
       }
     }
@@ -82,11 +83,14 @@ exports[`renders correctly with giant numbers 1`] = `
           />
           <View
             style={
-              Object {
-                "flexDirection": "row",
-                "justifyContent": "space-between",
-                "marginVertical": 5,
-              }
+              Array [
+                Object {
+                  "flexDirection": "row",
+                  "justifyContent": "space-between",
+                  "marginVertical": 5,
+                },
+                undefined,
+              ]
             }
           >
             <View
@@ -100,12 +104,15 @@ exports[`renders correctly with giant numbers 1`] = `
             >
               <Text
                 style={
-                  Object {
-                    "color": "#2E3338",
-                    "fontFamily": "Inter-Regular",
-                    "fontSize": 16,
-                    "lineHeight": 22,
-                  }
+                  Array [
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 22,
+                    },
+                    undefined,
+                  ]
                 }
               >
                 Subtotal @ 
@@ -128,12 +135,15 @@ exports[`renders correctly with giant numbers 1`] = `
             </View>
             <Text
               style={
-                Object {
-                  "color": "#2E3338",
-                  "fontFamily": "Inter-Regular",
-                  "fontSize": 16,
-                  "lineHeight": 22,
-                }
+                Array [
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Inter-Regular",
+                    "fontSize": 16,
+                    "lineHeight": 22,
+                  },
+                  undefined,
+                ]
               }
             >
               <Text
@@ -155,11 +165,14 @@ exports[`renders correctly with giant numbers 1`] = `
           </View>
           <View
             style={
-              Object {
-                "flexDirection": "row",
-                "justifyContent": "space-between",
-                "marginVertical": 5,
-              }
+              Array [
+                Object {
+                  "flexDirection": "row",
+                  "justifyContent": "space-between",
+                  "marginVertical": 5,
+                },
+                undefined,
+              ]
             }
           >
             <View
@@ -173,12 +186,15 @@ exports[`renders correctly with giant numbers 1`] = `
             >
               <Text
                 style={
-                  Object {
-                    "color": "#2E3338",
-                    "fontFamily": "Inter-Regular",
-                    "fontSize": 16,
-                    "lineHeight": 22,
-                  }
+                  Array [
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 22,
+                    },
+                    undefined,
+                  ]
                 }
               >
                 exchangeFee
@@ -233,12 +249,15 @@ exports[`renders correctly with giant numbers 1`] = `
             </View>
             <Text
               style={
-                Object {
-                  "color": "#2E3338",
-                  "fontFamily": "Inter-Regular",
-                  "fontSize": 16,
-                  "lineHeight": 22,
-                }
+                Array [
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Inter-Regular",
+                    "fontSize": 16,
+                    "lineHeight": 22,
+                  },
+                  undefined,
+                ]
               }
             >
               <Text
@@ -259,11 +278,14 @@ exports[`renders correctly with giant numbers 1`] = `
           </View>
           <View
             style={
-              Object {
-                "flexDirection": "row",
-                "justifyContent": "space-between",
-                "marginVertical": 5,
-              }
+              Array [
+                Object {
+                  "flexDirection": "row",
+                  "justifyContent": "space-between",
+                  "marginVertical": 5,
+                },
+                undefined,
+              ]
             }
           >
             <View
@@ -277,12 +299,15 @@ exports[`renders correctly with giant numbers 1`] = `
             >
               <Text
                 style={
-                  Object {
-                    "color": "#2E3338",
-                    "fontFamily": "Inter-Regular",
-                    "fontSize": 16,
-                    "lineHeight": 22,
-                  }
+                  Array [
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 22,
+                    },
+                    undefined,
+                  ]
                 }
               >
                 securityFee
@@ -337,12 +362,15 @@ exports[`renders correctly with giant numbers 1`] = `
             </View>
             <Text
               style={
-                Object {
-                  "color": "#2E3338",
-                  "fontFamily": "Inter-Regular",
-                  "fontSize": 16,
-                  "lineHeight": 22,
-                }
+                Array [
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Inter-Regular",
+                    "fontSize": 16,
+                    "lineHeight": 22,
+                  },
+                  undefined,
+                ]
               }
             >
               <Text
@@ -558,6 +586,7 @@ exports[`renders correctly with no exchange rate 1`] = `
   <View
     style={
       Object {
+        "flex": 1,
         "paddingHorizontal": 16,
       }
     }
@@ -628,11 +657,14 @@ exports[`renders correctly with no exchange rate 1`] = `
           />
           <View
             style={
-              Object {
-                "flexDirection": "row",
-                "justifyContent": "space-between",
-                "marginVertical": 5,
-              }
+              Array [
+                Object {
+                  "flexDirection": "row",
+                  "justifyContent": "space-between",
+                  "marginVertical": 5,
+                },
+                undefined,
+              ]
             }
           >
             <View
@@ -646,12 +678,15 @@ exports[`renders correctly with no exchange rate 1`] = `
             >
               <Text
                 style={
-                  Object {
-                    "color": "#2E3338",
-                    "fontFamily": "Inter-Regular",
-                    "fontSize": 16,
-                    "lineHeight": 22,
-                  }
+                  Array [
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 22,
+                    },
+                    undefined,
+                  ]
                 }
               >
                 Subtotal @ 
@@ -674,12 +709,15 @@ exports[`renders correctly with no exchange rate 1`] = `
             </View>
             <Text
               style={
-                Object {
-                  "color": "#2E3338",
-                  "fontFamily": "Inter-Regular",
-                  "fontSize": 16,
-                  "lineHeight": 22,
-                }
+                Array [
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Inter-Regular",
+                    "fontSize": 16,
+                    "lineHeight": 22,
+                  },
+                  undefined,
+                ]
               }
             >
               <Text
@@ -701,11 +739,14 @@ exports[`renders correctly with no exchange rate 1`] = `
           </View>
           <View
             style={
-              Object {
-                "flexDirection": "row",
-                "justifyContent": "space-between",
-                "marginVertical": 5,
-              }
+              Array [
+                Object {
+                  "flexDirection": "row",
+                  "justifyContent": "space-between",
+                  "marginVertical": 5,
+                },
+                undefined,
+              ]
             }
           >
             <View
@@ -719,12 +760,15 @@ exports[`renders correctly with no exchange rate 1`] = `
             >
               <Text
                 style={
-                  Object {
-                    "color": "#2E3338",
-                    "fontFamily": "Inter-Regular",
-                    "fontSize": 16,
-                    "lineHeight": 22,
-                  }
+                  Array [
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 22,
+                    },
+                    undefined,
+                  ]
                 }
               >
                 exchangeFee
@@ -779,12 +823,15 @@ exports[`renders correctly with no exchange rate 1`] = `
             </View>
             <Text
               style={
-                Object {
-                  "color": "#2E3338",
-                  "fontFamily": "Inter-Regular",
-                  "fontSize": 16,
-                  "lineHeight": 22,
-                }
+                Array [
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Inter-Regular",
+                    "fontSize": 16,
+                    "lineHeight": 22,
+                  },
+                  undefined,
+                ]
               }
             >
               <Text
@@ -805,11 +852,14 @@ exports[`renders correctly with no exchange rate 1`] = `
           </View>
           <View
             style={
-              Object {
-                "flexDirection": "row",
-                "justifyContent": "space-between",
-                "marginVertical": 5,
-              }
+              Array [
+                Object {
+                  "flexDirection": "row",
+                  "justifyContent": "space-between",
+                  "marginVertical": 5,
+                },
+                undefined,
+              ]
             }
           >
             <View
@@ -823,12 +873,15 @@ exports[`renders correctly with no exchange rate 1`] = `
             >
               <Text
                 style={
-                  Object {
-                    "color": "#2E3338",
-                    "fontFamily": "Inter-Regular",
-                    "fontSize": 16,
-                    "lineHeight": 22,
-                  }
+                  Array [
+                    Object {
+                      "color": "#2E3338",
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 16,
+                      "lineHeight": 22,
+                    },
+                    undefined,
+                  ]
                 }
               >
                 securityFee
@@ -883,12 +936,15 @@ exports[`renders correctly with no exchange rate 1`] = `
             </View>
             <Text
               style={
-                Object {
-                  "color": "#2E3338",
-                  "fontFamily": "Inter-Regular",
-                  "fontSize": 16,
-                  "lineHeight": 22,
-                }
+                Array [
+                  Object {
+                    "color": "#2E3338",
+                    "fontFamily": "Inter-Regular",
+                    "fontSize": 16,
+                    "lineHeight": 22,
+                  },
+                  undefined,
+                ]
               }
             >
               <Text

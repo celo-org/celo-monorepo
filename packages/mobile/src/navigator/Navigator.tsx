@@ -91,27 +91,24 @@ import VerificationSuccessScreen from 'src/verify/VerificationSuccessScreen'
 
 const Stack = createStackNavigator<StackParamList>()
 
-export const headerArea = {
+export const defaultScreenOptions = {
   // Force this for now on iOS so screen transitions look normal
   // given we intentionally hide the bottom separator from the nav bar
-  headerMode: 'screen',
-  defaultNavigationOptions: {
-    cardStyle: { backgroundColor: colors.background },
-    headerStyle: {
-      ...Platform.select({
-        android: {
-          elevation: 0,
-          backgroundColor: 'transparent',
+  cardStyle: { backgroundColor: colors.background },
+  headerStyle: {
+    ...Platform.select({
+      android: {
+        elevation: 0,
+        backgroundColor: 'transparent',
+      },
+      ios: {
+        borderBottomWidth: 0,
+        borderBottomColor: 'transparent',
+        shadowOffset: {
+          height: 0,
         },
-        ios: {
-          borderBottomWidth: 0,
-          borderBottomColor: 'transparent',
-          shadowOffset: {
-            height: 0,
-          },
-        },
-      }),
-    },
+      },
+    }),
   },
 }
 
@@ -245,8 +242,8 @@ const exchangeTradeOptions = ({
       : i18n.t('exchangeFlow9:sellGold')
   return {
     ...headerWithCancelButton,
-    headerLeft: <CancelButton style={{ color: colors.dark }} />,
-    headerTitle: <HeaderTitleWithBalance title={title} token={makerToken} />,
+    headerLeft: () => <CancelButton style={{ color: colors.dark }} />,
+    headerTitle: () => <HeaderTitleWithBalance title={title} token={makerToken} />,
   }
 }
 
@@ -265,8 +262,8 @@ const exchangeReviewOptions = ({
       : i18n.t('exchangeFlow9:sellGold')
   return {
     ...headerWithCancelButton,
-    headerLeft: <CancelButton style={{ color: colors.dark }} onCancel={goExchangeHome} />,
-    headerRight: (
+    headerLeft: () => <CancelButton style={{ color: colors.dark }} onCancel={goExchangeHome} />,
+    headerRight: () => (
       <TopBarTextButton
         title={i18n.t('global:edit')}
         testID="EditButton"
@@ -274,7 +271,7 @@ const exchangeReviewOptions = ({
         titleStyle={{ color: colors.goldDark }}
       />
     ),
-    headerTitle: <HeaderTitleWithBalance title={title} token={makerToken} />,
+    headerTitle: () => <HeaderTitleWithBalance title={title} token={makerToken} />,
   }
 }
 
@@ -361,14 +358,14 @@ const settingsScreens = (Navigator: typeof Stack) => (
 const transactionReviewOptions = ({
   route,
 }: {
-  route: RouteProp<StackParamList, Screens.ExchangeReview>
+  route: RouteProp<StackParamList, Screens.TransactionReview>
 }) => {
   const { header, timestamp } = route.params?.reviewProps
   const dateTimeStatus = getDatetimeDisplayString(timestamp, i18n)
   return {
     ...emptyHeader,
-    headerLeft: <BackButton color={colors.dark} />,
-    headerTitle: <HeaderTitleWithSubtitle title={header} subTitle={dateTimeStatus} />,
+    headerLeft: () => <BackButton color={colors.dark} />,
+    headerTitle: () => <HeaderTitleWithSubtitle title={header} subTitle={dateTimeStatus} />,
   }
 }
 
