@@ -15,7 +15,6 @@ import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import { hideAlert } from 'src/alert/actions'
 import { errorSelector } from 'src/alert/reducer'
-import componentWithAnalytics from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import CancelButton from 'src/components/CancelButton'
 import DevSkipButton from 'src/components/DevSkipButton'
@@ -28,7 +27,7 @@ import {
   NUM_ATTESTATIONS_REQUIRED,
   VerificationStatus,
 } from 'src/identity/verification'
-import { navigate } from 'src/navigator/NavigationService'
+import { navigate, navigateHome } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
 import Logger from 'src/utils/Logger'
@@ -169,7 +168,7 @@ class VerificationInputScreen extends React.Component<Props, State> {
 
   onPressSkip = () => {
     this.props.cancelVerification()
-    navigate(Screens.WalletHome)
+    navigateHome()
   }
 
   render() {
@@ -330,9 +329,7 @@ const styles = StyleSheet.create({
   modalSkipTextDisabled: { color: colors.celoGreenInactive },
 })
 
-export default componentWithAnalytics(
-  connect<StateProps, DispatchProps, {}, RootState>(
-    mapStateToProps,
-    mapDispatchToProps
-  )(withTranslation(Namespaces.nuxVerification2)(VerificationInputScreen))
-)
+export default connect<StateProps, DispatchProps, {}, RootState>(
+  mapStateToProps,
+  mapDispatchToProps
+)(withTranslation(Namespaces.nuxVerification2)(VerificationInputScreen))
