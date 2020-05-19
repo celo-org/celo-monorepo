@@ -26,6 +26,7 @@ export const vNeg1Schema = {
   send: {
     isSending: false,
     recentRecipients: [],
+    recentPayments: [],
   },
   recipients: {
     recipientCache: {},
@@ -169,8 +170,7 @@ export const v0Schema = {
   send: {
     isSending: false,
     recentRecipients: [],
-    isValidRecipient: false,
-    secureSendPhoneNumberMapping: {},
+    recentPayments: [],
   },
   recipients: {
     recipientCache: {},

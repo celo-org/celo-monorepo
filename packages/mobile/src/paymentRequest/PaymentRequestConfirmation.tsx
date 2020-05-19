@@ -2,21 +2,22 @@ import ReviewFrame from '@celo/react-components/components/ReviewFrame'
 import ReviewHeader from '@celo/react-components/components/ReviewHeader'
 import colors from '@celo/react-components/styles/colors'
 import { CURRENCY_ENUM } from '@celo/utils/src/currencies'
+import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { StyleSheet } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
-import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
 import { PaymentRequestStatus } from 'src/account/types'
 import { showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
-import componentWithAnalytics from 'src/analytics/wrapper'
 import { writePaymentRequest } from 'src/firebase/actions'
 import { currencyToShortMap } from 'src/geth/consts'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { navigateBack } from 'src/navigator/NavigationService'
+import { Screens } from 'src/navigator/Screens'
+import { StackParamList } from 'src/navigator/types'
 import PaymentRequestReviewCard from 'src/paymentRequest/PaymentRequestReviewCard'
 import { RootState } from 'src/redux/reducers'
 import { ConfirmationInput, getConfirmationInput } from 'src/send/utils'
@@ -27,11 +28,6 @@ import { currentAccountSelector } from 'src/web3/selectors'
 // @ts-ignore
 const TAG = 'paymentRequest/confirmation'
 
-type Navigation = NavigationInjectedProps['navigation']
-
-interface OwnProps {
-  navigation: Navigation
-}
 interface StateProps {
   e164PhoneNumber: string
   account: string | null
@@ -46,8 +42,8 @@ interface DispatchProps {
 const mapDispatchToProps = { showError, writePaymentRequest }
 
 const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
-  const { navigation } = ownProps
-  const transactionData = navigation.getParam('transactionData')
+  const { route } = ownProps
+  const transactionData = route.params.transactionData
   const { e164NumberToAddress } = state.identity
   const { secureSendPhoneNumberMapping } = state.identity
   const confirmationInput = getConfirmationInput(
@@ -62,7 +58,9 @@ const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
   }
 }
 
-type Props = OwnProps & DispatchProps & StateProps & WithTranslation
+type OwnProps = StackScreenProps<StackParamList, Screens.PaymentRequestConfirmation>
+
+type Props = DispatchProps & StateProps & WithTranslation & OwnProps
 
 class PaymentRequestConfirmation extends React.Component<Props> {
   static navigationOptions = { header: null }
@@ -161,9 +159,7 @@ const styles = StyleSheet.create({
   },
 })
 
-export default componentWithAnalytics(
-  connect<StateProps, DispatchProps, OwnProps, RootState>(
-    mapStateToProps,
-    mapDispatchToProps
-  )(withTranslation(Namespaces.sendFlow7)(PaymentRequestConfirmation))
-)
+export default connect<StateProps, DispatchProps, OwnProps, RootState>(
+  mapStateToProps,
+  mapDispatchToProps
+)(withTranslation(Namespaces.sendFlow7)(PaymentRequestConfirmation))

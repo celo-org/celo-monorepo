@@ -4,14 +4,13 @@ import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
 import TextButton from '@celo/react-components/components/TextButton'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
+import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import Modal from 'react-native-modal'
 import SafeAreaView from 'react-native-safe-area-view'
-import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
-import { componentWithAnalytics } from 'src/analytics/wrapper'
 import CodeRow, { CodeRowStatus } from 'src/components/CodeRow'
 import { SingleDigitInput } from 'src/components/SingleDigitInput'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
@@ -20,18 +19,13 @@ import { AddressValidationType } from 'src/identity/reducer'
 import { headerWithBackButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { StackParamList } from 'src/navigator/types'
 import { Recipient } from 'src/recipients/recipient'
 import { RootState } from 'src/redux/reducers'
 import { TransactionDataInput } from 'src/send/SendAmount'
 
 const FULL_ADDRESS_PLACEHOLDER = '0xf1b1d5a6e7728g309c4a025k122d71ad75a61976'
 const PARTIAL_ADDRESS_PLACEHOLDER = ['k', '0', 'F', '4']
-
-type Navigation = NavigationInjectedProps['navigation']
-
-interface OwnProps {
-  navigation: Navigation
-}
 
 interface StateProps {
   recipient: Recipient
@@ -51,24 +45,25 @@ interface DispatchProps {
   validateRecipientAddress: typeof validateRecipientAddress
 }
 
+type OwnProps = StackScreenProps<StackParamList, Screens.ValidateRecipientAccount>
+type Props = StateProps & DispatchProps & WithTranslation & OwnProps
+
 const mapDispatchToProps = {
   validateRecipientAddress,
 }
 
 const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
-  const { navigation } = ownProps
-  const transactionData = navigation.getParam('transactionData')
+  const { route } = ownProps
+  const transactionData = route.params.transactionData
   const { recipient } = transactionData
   return {
     recipient,
     transactionData,
     isValidRecipient: state.identity.isValidRecipient,
-    isPaymentRequest: navigation.getParam('isPaymentRequest'),
-    addressValidationType: navigation.getParam('addressValidationType'),
+    isPaymentRequest: route.params.isPaymentRequest,
+    addressValidationType: route.params.addressValidationType,
   }
 }
-
-type Props = StateProps & DispatchProps & WithTranslation & NavigationInjectedProps
 
 export class ValidateRecipientAccount extends React.Component<Props, State> {
   static navigationOptions = () => ({
@@ -300,9 +295,7 @@ const styles = StyleSheet.create({
   },
 })
 
-export default componentWithAnalytics(
-  connect<StateProps, DispatchProps, OwnProps, RootState>(
-    mapStateToProps,
-    mapDispatchToProps
-  )(withTranslation(Namespaces.sendFlow7)(ValidateRecipientAccount))
-)
+export default connect<StateProps, DispatchProps, OwnProps, RootState>(
+  mapStateToProps,
+  mapDispatchToProps
+)(withTranslation(Namespaces.sendFlow7)(ValidateRecipientAccount))

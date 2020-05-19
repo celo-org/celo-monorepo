@@ -8,7 +8,6 @@ import { WithTranslation } from 'react-i18next'
 import { ActivityIndicator, Clipboard, StyleSheet, Text, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
-import { componentWithAnalytics } from 'src/analytics/wrapper'
 import CodeRow, { CodeRowStatus } from 'src/components/CodeRow'
 import DevSkipButton from 'src/components/DevSkipButton'
 import { CELO_FAUCET_LINK, SHOW_GET_INVITE_LINK } from 'src/config'
@@ -226,9 +225,7 @@ const styles = StyleSheet.create({
   },
 })
 
-export default componentWithAnalytics(
-  connect<StateProps, DispatchProps, {}, RootState>(
-    mapStateToProps,
-    mapDispatchToProps
-  )(withTranslation(Namespaces.nuxNamePin1)(EnterInviteCode))
-)
+export default connect<StateProps, DispatchProps, {}, RootState>(
+  mapStateToProps,
+  mapDispatchToProps
+)(withTranslation(Namespaces.nuxNamePin1)(EnterInviteCode))

@@ -1,8 +1,10 @@
-import colors, { colorsEnum } from '@celo/react-components/styles/colors.v2'
+import Touchable from '@celo/react-components/components/Touchable'
+import colors, { Colors } from '@celo/react-components/styles/colors.v2'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import { debounce } from 'lodash'
+
 import React, { useCallback } from 'react'
-import { StyleProp, StyleSheet, Text, TouchableOpacity, View, ViewStyle } from 'react-native'
+import { StyleProp, StyleSheet, Text, View, ViewStyle } from 'react-native'
 
 const BUTTON_TAP_DEBOUNCE_TIME = 300 // milliseconds
 const DEBOUNCE_OPTIONS = {
@@ -47,20 +49,22 @@ export default React.memo(function Button(props: ButtonProps) {
 
   return (
     <View style={style ? [styles.root, style] : styles.root}>
-      <TouchableOpacity
-        activeOpacity={0.75}
-        onPress={debouncedOnPress}
-        disabled={disabled}
-        style={getStyle(size, backgroundColor)}
-        testID={testID}
-      >
-        <Text
-          accessibilityLabel={accessibilityLabel}
-          style={{ ...fontStyles.regular600, color: textColor }}
+      {/* these Views cannot be combined as it will cause ripple to not respect the border radius */}
+      <View style={styles.containRipple}>
+        <Touchable
+          onPress={debouncedOnPress}
+          disabled={disabled}
+          style={getStyle(size, backgroundColor)}
+          testID={testID}
         >
-          {text}
-        </Text>
-      </TouchableOpacity>
+          <Text
+            accessibilityLabel={accessibilityLabel}
+            style={{ ...fontStyles.regular600, color: textColor }}
+          >
+            {text}
+          </Text>
+        </Touchable>
+      </View>
     </View>
   )
 })
@@ -69,10 +73,14 @@ const styles = StyleSheet.create({
   root: {
     flexDirection: 'row',
   },
+  // on android Touchable Provides a ripple effeft, by itself it does not respect the border radius on Touchable
+  containRipple: {
+    borderRadius: 100,
+    overflow: 'hidden',
+  },
   button: {
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 100,
     paddingVertical: 5,
     paddingHorizontal: 16,
   },
@@ -111,7 +119,7 @@ function getColors(type: BtnTypes, disabled: boolean | undefined) {
   return [textColor, backgroundColor]
 }
 
-function getStyle(size: BtnSizes | undefined, backgroundColor: colorsEnum) {
+function getStyle(size: BtnSizes | undefined, backgroundColor: Colors) {
   switch (size) {
     case BtnSizes.SMALL:
       return { ...styles.button, ...styles.small, backgroundColor }

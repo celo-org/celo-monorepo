@@ -12,7 +12,7 @@ This guide assumes:
 
 - You have been informed by cLabs that the `ReleaseGold` instance corresponding to your address has been deployed.
 
-- You have your private key held on a [Ledger Nano S or Ledger Nano X](ledger.md) device, and you have a second such device available for managing a voting key.
+- You have your private key held on a [Ledger Nano S or Ledger Nano X](ledger.md) device, and you have a second such device available for managing a voting key. If you only have a single Ledger available, see [below](#Using-a-single-Ledger).
 
 {% hint style="warning" %}
 **Warning**: Self-custodying keys has associated security and financial risks. Loss or theft of keys can result in irrecovable loss of funds. This guide also requires technical knowledge. You should be comfortable with using a Command Line Interface (CLI) and understand the basics of how cryptographic network accounts work.
@@ -48,15 +48,33 @@ You will need:
 
 As a first step, follow [these instructions](ledger.md) for both Ledgers to install the Ledger Celo app, obtain and verify the associated addresses, and (recommended) run a test transaction on the Alfajores test network.
 
+{% hint style="info" %}
+The latest version of the Celo Ledger app is 1.0.3. If you are already using a Ledger with an earlier version installed, please [upgrade]](ledger.md).
+{% endhint %}
+
 The remainder of this guide assumes you are using the first address available on each Ledger. You can add the flags described in [these instructions](ledger.md) to commands below to use different addresses.
+
+### Using a single Ledger
+
+If you only have a single Ledger, and are comfortable losing the security advantage of keeping the beneficiary key offline when voting, you can configure a second address on the same Ledger as your voting key.
+
+First, read [these instructions](ledger.md) carefully. Then, whereever you see instructions to connect your Vote Signer Ledger, for each command line containing `--useLedger` also add `--ledgerCustomAddresses "[1]"`. If in doubt, [ask for help](#Support).
 
 ## Deployment
 
-If you haven't already, open a terminal window and install the Celo CLI:
+If you haven't already, open a terminal window and install the [Celo CLI](https://docs.celo.org/command-line-interface/introduction):
 
 ```bash
  npm install -g @celo/celocli
 ```
+
+If you have previously installed the CLI, ensure that you are using version 0.0.47 or later:
+
+```bash
+celocli --version
+```
+
+And if not, upgrade by running the same command as above.
 
 You will now need to point the Celo CLI to a node that is synchronized with the [Release Candidate](../getting-started/rc1.md) network. There are two options:
 
@@ -71,8 +89,8 @@ You will now need to point the Celo CLI to a node that is synchronized with the 
   celocli config:set --node http://localhost:8545
   ```
 
-- **cLabs-operated node**: As an alternative to using your own node, you can use existing an transaction
-  nodes service. Forno, operated by cLabs, is one example. While this approach does not require you to deploy a node locally, it requires you to trust cLabs and the remote Forno nodes (in the same way you would trust a centralized web service). An attacker may be able to manipulate data returned to you from the service, which the CLI may rely on to complete operations.
+- **cLabs-operated node**: As an alternative to using your own node, you can use an existing transaction
+  node service. Forno, operated by cLabs, is one example. While this approach does not require you to deploy a node locally, it requires you to trust cLabs and the remote Forno nodes (in the same way you would trust a centralized web service). An attacker may be able to manipulate data returned to you from the service, which the CLI may rely on to complete operations.
 
   To use Forno, run this command:
 
@@ -89,6 +107,8 @@ Use the mapping from this list (you can use Edit>Find in your browser):
 - [RC1 ReleaseGold deployments on 4/23/20 ("Wave 1")](https://gist.githubusercontent.com/timmoreton/704404484cf8f641b5464a237592a341/raw/6ad2615f219c71fe370bac84e5ac7aa1653fffac/CeloRC1ReleaseGoldWave1.json)
 
 - [RC1 ReleaseGold deployments on 4/30/20 ("Wave 1b")](https://gist.githubusercontent.com/timmoreton/32d36dcc48e52a4747df8cfa8e4a4d0f/raw/1557209b59fa863cc8ed9b66e72e6111fbfe3475/CeloRC1ReleaseGoldWave1b.json)
+
+- [RC1 ReleaseGold deployments on 5/16/20 ("Wave 2")](https://gist.githubusercontent.com/timmoreton/27e975bbca63723e218288b1a1f9fa54/raw/d55f51fde470fe040407c02462aeb5a7adc3d57f/CeloRC1ReleaseGoldWave2.json): includes self-custodying CoinList auction participants that completed the address submission process by 5/14/20
 
 If you have more than one beneficiary address, you'll want to step through this guide for each one.
 

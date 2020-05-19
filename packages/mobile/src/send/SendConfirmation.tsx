@@ -2,16 +2,15 @@ import ReviewFrame from '@celo/react-components/components/ReviewFrame'
 import ReviewHeader from '@celo/react-components/components/ReviewHeader'
 import colors from '@celo/react-components/styles/colors'
 import { CURRENCY_ENUM } from '@celo/utils/src/currencies'
+import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { ActivityIndicator, StyleSheet, View } from 'react-native'
 import Modal from 'react-native-modal'
 import SafeAreaView from 'react-native-safe-area-view'
-import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
-import componentWithAnalytics from 'src/analytics/wrapper'
 import { TokenTransactionType } from 'src/apollo/types'
 import InviteOptionsModal from 'src/components/InviteOptionsModal'
 import { FeeType } from 'src/fees/actions'
@@ -24,6 +23,8 @@ import { completePaymentRequest, declinePaymentRequest } from 'src/firebase/acti
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import { InviteBy } from 'src/invite/actions'
 import { navigateBack } from 'src/navigator/NavigationService'
+import { Screens } from 'src/navigator/Screens'
+import { StackParamList } from 'src/navigator/types'
 import { RootState } from 'src/redux/reducers'
 import { isAppConnected } from 'src/redux/selectors'
 import { sendPaymentOrInvite } from 'src/send/actions'
@@ -33,12 +34,6 @@ import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { fetchDollarBalance } from 'src/stableToken/actions'
 import Logger from 'src/utils/Logger'
 import { currentAccountSelector } from 'src/web3/selectors'
-
-type Navigation = NavigationInjectedProps['navigation']
-
-interface OwnProps {
-  navigation: Navigation
-}
 interface StateProps {
   account: string | null
   isSending: boolean
@@ -55,6 +50,14 @@ interface DispatchProps {
   completePaymentRequest: typeof completePaymentRequest
 }
 
+interface State {
+  modalVisible: boolean
+  buttonReset: boolean
+}
+
+type OwnProps = StackScreenProps<StackParamList, Screens.SendConfirmation>
+type Props = DispatchProps & StateProps & WithTranslation & OwnProps
+
 const mapDispatchToProps = {
   sendPaymentOrInvite,
   fetchDollarBalance,
@@ -63,8 +66,8 @@ const mapDispatchToProps = {
 }
 
 const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
-  const { navigation } = ownProps
-  const transactionData = navigation.getParam('transactionData')
+  const { route } = ownProps
+  const transactionData = route.params.transactionData
   const { e164NumberToAddress } = state.identity
   const { secureSendPhoneNumberMapping } = state.identity
   const confirmationInput = getConfirmationInput(
@@ -82,14 +85,7 @@ const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
   }
 }
 
-interface State {
-  modalVisible: boolean
-  buttonReset: boolean
-}
-
-type Props = OwnProps & DispatchProps & StateProps & WithTranslation
-
-class SendConfirmation extends React.Component<Props, State> {
+export class SendConfirmation extends React.Component<Props, State> {
   static navigationOptions = { header: null }
 
   state = {
@@ -102,7 +98,7 @@ class SendConfirmation extends React.Component<Props, State> {
   }
 
   getNavParams = () => {
-    return this.props.navigation.state.params || {}
+    return this.props.route.params
   }
 
   onSendClick = () => {
@@ -123,8 +119,11 @@ class SendConfirmation extends React.Component<Props, State> {
       firebasePendingRequestUid,
     } = this.props.confirmationInput
 
+    const timestamp = Date.now()
+
     this.props.sendPaymentOrInvite(
       amount,
+      timestamp,
       reason,
       recipient,
       recipientAddress,
@@ -305,9 +304,7 @@ const styles = StyleSheet.create({
   },
 })
 
-export default componentWithAnalytics(
-  connect<StateProps, DispatchProps, OwnProps, RootState>(
-    mapStateToProps,
-    mapDispatchToProps
-  )(withTranslation(Namespaces.sendFlow7)(SendConfirmation))
-)
+export default connect<StateProps, DispatchProps, OwnProps, RootState>(
+  mapStateToProps,
+  mapDispatchToProps
+)(withTranslation(Namespaces.sendFlow7)(SendConfirmation))
