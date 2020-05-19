@@ -26,7 +26,7 @@ Validators and groups can also supply [verifiable DNS claims](../operations-manu
 
 ### [Celo Validator Explorer](https://validators.celo.org) (cLabs)
 
-The Celo Validator Explorer has tabs to show either Mainnet or Baklava networks.
+The Celo Validator Explorer has tabs to show either Mainnet or the Baklava Testnet.
 
 The list shows Validator Groups and, when you expand each group, the Validators that are affiliated to that group.
 

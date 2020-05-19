@@ -294,7 +294,7 @@ Your vote will apply starting at the next Validator Election, held once per day,
 After that election has occurred, you will need to activate your vote. This will allow you to receive epoch rewards if in that election (or at any subsequent one, until you change your vote) the Validator Group for which you voted elected at least one Validator. Rewards will get added to your votes for that Group and will compound automatically.
 
 {% hint style="info" %}
-Epoch lengths in the Mainnet network are set to be the number of blocks produced in a day. As a result, votes may need to be activated up to 24 hours after they are cast.
+Epoch lengths in Mainnet are set to be the number of blocks produced in a day. As a result, votes may need to be activated up to 24 hours after they are cast.
 {% endhint %}
 
 Check that your votes were cast in a previous epoch:
