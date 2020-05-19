@@ -168,7 +168,7 @@ celocli identity:test-attestation-service --from $CELO_ATTESTATION_SIGNER_ADDRES
 
 ### [Pretoria Research Lab RC1 Signed Blocks Map](https://cauldron.pretoriaresearchlab.io/rc1-block-map)
 
-Shows current and historic data on validator signatures collected in each block for the RC1 network.
+Shows current and historic data on validator signatures collected in each block of the Mainnet network.
 
 _Please raise a Pull Request against [this page](https://github.com/celo-org/celo-monorepo/blob/master/packages/docs/celo-gold-holder-guide/voting-validators.md) to add/amend details of any community services!_
 

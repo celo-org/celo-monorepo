@@ -1,6 +1,6 @@
 # Quick Start for Celo Gold Holders
 
-If you are an early self-custodying holder of Celo Gold on the Celo [Release Candidate](../getting-started/rc1.md) network, this guide will help you access your account and do the setup necessary to earn rewards on those funds.
+If you are an self-custodying holder of Celo Gold on the Celo [Mainnet](../getting-started/mainnet.md), this guide will help you access your account and do the setup necessary to earn rewards on those funds.
 
 ## Prerequisites
 
@@ -16,10 +16,6 @@ This guide assumes:
 
 {% hint style="warning" %}
 **Warning**: Self-custodying keys has associated security and financial risks. Loss or theft of keys can result in irrecovable loss of funds. This guide also requires technical knowledge. You should be comfortable with using a Command Line Interface (CLI) and understand the basics of how cryptographic network accounts work.
-{% endhint %}
-
-{% hint style="info" %}
-**Release Candidate**: Use of Celo Mainnet Release Candidate network is subject to [these terms](../important-information/rc-network-disclaimer.md). Please note that this network may not graduate to Celo Mainnet, in which case a new network will be stood up, and new `ReleaseGold` contracts deployed with different addresses. You will then need to follow this guide again.
 {% endhint %}
 
 ## Support
@@ -76,12 +72,12 @@ celocli --version
 
 And if not, upgrade by running the same command as above.
 
-You will now need to point the Celo CLI to a node that is synchronized with the [Release Candidate](../getting-started/rc1.md) network. There are two options:
+You will now need to point the Celo CLI to a node that is synchronized with the [Mainnet](../getting-started/mainnet.md) network. There are two options:
 
 - **Local Celo Blockchain node**: You can run a full node on your local machine which will communicate
   with other nodes and cryptographically verify all data it receives. Since this approach does not require you to trust the network, it is most secure.
 
-  To do this, follow the tutorial for [running a full node](../getting-started/running-a-full-node-in-rc1.md) (and make sure to pass `--nousb`).
+  To do this, follow the tutorial for [running a full node](../getting-started/running-a-full-node-in-mainnet.md) (and make sure to pass `--nousb`).
 
   Then run:
 
@@ -222,7 +218,7 @@ celocli account:balance $CELO_VOTE_SIGNER_ADDRESS
 ```
 
 {% hint style="warning" %}
-**Warning**: Celo Gold transfers are frozen in the Release Candidate network until the network graduates to Mainnet. Until this time, only authorize a vote signer key for a `ReleaseGold` contract once. If you replace that vote signer key by authorizing a new key, the contract cannot transfer it funds to cover transaction fees. This means you will not be able to complete the steps below until Celo Gold transfers are unfrozen.
+**Warning**: If you authorize a second vote signer, it will not be automatically funded by the `ReleaseGold` contract. You will need to transfer a fraction of 1 cGLD from your beneficiary address to it in order to cover transaction fees when using it.
 {% endhint %}
 
 ## Lock Celo Gold
@@ -298,7 +294,7 @@ Your vote will apply starting at the next Validator Election, held once per day,
 After that election has occurred, you will need to activate your vote. This will allow you to receive epoch rewards if in that election (or at any subsequent one, until you change your vote) the Validator Group for which you voted elected at least one Validator. Rewards will get added to your votes for that Group and will compound automatically.
 
 {% hint style="info" %}
-Epoch lengths in the Mainnet Release Candidate 1 are set to be the number of blocks produced in a day. As a result, votes may need to be activated up to 24 hours after they are cast.
+Epoch lengths in the Mainnet network are set to be the number of blocks produced in a day. As a result, votes may need to be activated up to 24 hours after they are cast.
 {% endhint %}
 
 Check that your votes were cast in a previous epoch:
@@ -325,15 +321,23 @@ If you run `election:show` again, your vote should be displayed next to `active`
 
 Congratulations! You're all set.
 
+At the end of the epoch following your vote activation, you may receive voter rewards (if at least one Validator from the Validator Group for which you voted was elected).
+
+You can see rewards using:
+
+```bash
+celocli rewards:show --voter $CELO_RG_ADDRESS
+```
+
+Or by searching for your `ReleaseGold` address on the [Block Explorer](https://explorer.celo.org) and clicking the "Celo Info" tab.
+
 ## Next Steps
 
 You are now set up to participate in the Celo network!
 
-Epoch rewards are not yet enabled on the Release Candidate network, but as part of the network deployment process the community will approve a governance request that enables them.
+You might want to read more about [choosing a Validator Group](voting-validators.md) to vote for, and how [voter rewards](../celo-codebase/protocol/proof-of-stake/locked-gold-rewards.md) are calculated.  You can vote for up to ten different Groups from a single account.
 
-In the mean time, you might want to read more about [choosing a Validator Group](voting-validators.md) to vote for.  You can vote for up to ten different Groups from a single account.
-
-Locking Celo Gold also enables you to participate in voting for or against [Governance proposals](voting-governance.md).
+Now you've locked Celo Gold, you can use it to participate in voting for or against [Governance proposals](voting-governance.md). You can do this without affecting any vote you have made for Validator Groups.
 
 You can also read more about how Celo's [Proof of Stake](../celo-codebase/protocol/proof-of-stake/README.md) and on-chain [Governance](../celo-codebase/protocol/governance.md) mechanisms work.
 

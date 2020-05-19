@@ -15,3 +15,7 @@ redirects:
   celo-codebase/protocol/release-gold: celo-gold-holder-guide/release-gold.md
   validator-guide/governance: celo-gold-holder-guide/voting-governance.md
   developer-guide/start/celo-truffle-box: developer-resources/walkthroughs/hello-mobile-dapp.md 
+  important-information/rc-network-disclaimer: important-information/mainnet-network-disclaimer.md
+  getting-started/rc1: getting-started/mainnet.md
+  getting-started/running-a-full-node-in-rc1: getting-started/running-a-full-node-in-mainnet.md
+  getting-started/running-a-validator-in-rc1: getting-started/running-a-validator-in-mainnet.md

@@ -28,7 +28,7 @@ You can view information about a specific proposal with:
 celocli governance:view --proposalID=<PROPOSAL_ID>
 ```
 
-For example, the first proposal on the Mainnet Release Candidate network was as follows:
+For example, the first proposal on the Mainnet network was as follows:
 
 ```
 Running Checks:

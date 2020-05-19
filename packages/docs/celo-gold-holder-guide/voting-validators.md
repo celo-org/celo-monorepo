@@ -26,7 +26,7 @@ Validators and groups can also supply [verifiable DNS claims](../operations-manu
 
 ### [Celo Validator Explorer](https://validators.celo.org) (cLabs)
 
-The Celo Validator Explorer has tabs to show either Release Candidate or Baklava networks.
+The Celo Validator Explorer has tabs to show either Mainnet or Baklava networks.
 
 The list shows Validator Groups and, when you expand each group, the Validators that are affiliated to that group.
 
@@ -58,7 +58,7 @@ You might consider these factors when choosing a Validator Group for whom to vot
 
 - **Can receive votes**: Validator Groups can receive votes up to a certain [voting cap](../celo-codebase/protocol/proof-of-stake/validator-elections.md#group-voting-caps). You cannot vote for groups with a balance that would put it beyond its cap.
 
-- **Participated in The Great Celo Stake Off**: [The Great Celo Stake Off](https://forum.celo.org/t/the-great-celo-stake-off-the-details/136) was a Validator challenge that ran on the [Baklava Testnet](../getting-started/baklava-testnet.md) between November 2019 and March 2020. Its aims were to help organizations interested in operating Celo Validators build operational experience. Validators that participated have had an opportunity to build tooling, understand the Celo protocol, and in many cases undergo a security audit. The [final Stake Off leaderboard](https://docs.google.com/spreadsheets/d/e/2PACX-1vQwk10o6YV0uriR8LuYfLqB1irjmOX_-L6Jljn3BtKlmz_R_TsUU8aI-pMqGVlu4HQKIQlQaFkUhsyl/pubhtml?gid=1970613133&single=true) is public, although addresses that Validators used for the Stake Off are different to those on the Mainnet Release Candidate network.
+- **Participated in The Great Celo Stake Off**: [The Great Celo Stake Off](https://forum.celo.org/t/the-great-celo-stake-off-the-details/136) was a Validator challenge that ran on the [Baklava Testnet](../getting-started/baklava-testnet.md) between November 2019 and March 2020. Its aims were to help organizations interested in operating Celo Validators build operational experience. Validators that participated have had an opportunity to build tooling, understand the Celo protocol, and in many cases undergo a security audit. The [final Stake Off leaderboard](https://docs.google.com/spreadsheets/d/e/2PACX-1vQwk10o6YV0uriR8LuYfLqB1irjmOX_-L6Jljn3BtKlmz_R_TsUU8aI-pMqGVlu4HQKIQlQaFkUhsyl/pubhtml?gid=1970613133&single=true) is public, although addresses that Validators used for the Stake Off are different to those on the Mainnet network.
 
 - **Will get elected**: Locked Gold only receives voter rewards during an epoch if it is used to vote for a Validator Group that elects at least one Validator during that epoch. Put another way, your vote does not contribute to securing the network or earning you rewards if your group does not receive enough other votes to elect a Validator.
 
