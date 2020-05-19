@@ -21,7 +21,7 @@ export interface Wallet {
 export abstract class WalletBase implements Wallet {
   // By creating the Signers in advance we can have a common pattern across wallets
   // Each implementation is responsible for populating this map through addSigner
-  protected accountSigners = new Map<Address, Signer>()
+  private accountSigners = new Map<Address, Signer>()
 
   /**
    * Gets a list of accounts that have been registered
@@ -109,7 +109,7 @@ export abstract class WalletBase implements Wallet {
     return ethUtil.toRpcSig(sig.v, sig.r, sig.s)
   }
 
-  private getSigner(address: string): Signer {
+  protected getSigner(address: string): Signer {
     const normalizedAddress = normalizeAddressWith0x(address)
     if (!this.accountSigners.has(normalizedAddress)) {
       throw new Error(`Could not find address ${normalizedAddress}`)
