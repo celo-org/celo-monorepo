@@ -15,7 +15,7 @@ import {
 } from 'src/identity/reducer'
 import { sendDollar } from 'src/images/Images'
 import { navigate } from 'src/navigator/NavigationService'
-import { Stacks } from 'src/navigator/Screens'
+import { Screens } from 'src/navigator/Screens'
 import SummaryNotification from 'src/notifications/SummaryNotification'
 import { listItemRenderer } from 'src/paymentRequest/IncomingPaymentRequestListScreen'
 import PaymentRequestNotificationInner from 'src/paymentRequest/PaymentRequestNotificationInner'
@@ -50,7 +50,7 @@ const mapStateToProps = (state: RootState): StateProps => ({
 export class IncomingPaymentRequestSummaryNotification extends React.Component<Props> {
   onReview = () => {
     CeloAnalytics.track(CustomEventNames.incoming_request_payment_review)
-    navigate(Stacks.IncomingRequestStack)
+    navigate(Screens.IncomingPaymentRequestListScreen)
   }
 
   itemRenderer = (item: PaymentRequest) => {

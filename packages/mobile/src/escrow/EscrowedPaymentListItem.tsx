@@ -5,7 +5,6 @@ import { Trans, WithTranslation } from 'react-i18next'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
-import { componentWithAnalytics } from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import { EscrowedPayment } from 'src/escrow/actions'
@@ -138,6 +137,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default componentWithAnalytics(
-  withTranslation(Namespaces.inviteFlow11)(EscrowedPaymentListItem)
-)
+export default withTranslation(Namespaces.inviteFlow11)(EscrowedPaymentListItem)
