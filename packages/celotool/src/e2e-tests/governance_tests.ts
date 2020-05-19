@@ -411,10 +411,8 @@ describe('governance tests', () => {
 
       const group: string = (await groupWeb3.eth.getAccounts())[0]
 
-      const txos = await (await groupKit.contracts.getElection()).activate(group)
-      for (const txo of txos) {
-        await txo.sendAndWaitForReceipt({ from: group })
-      }
+      console.log(`Activating group: ${group}`)
+      await election.methods.activate(group)
 
       validators = await groupKit._web3Contracts.getValidators()
       const membersToSwap = [validatorAccounts[0], validatorAccounts[1]]
