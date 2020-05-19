@@ -12,6 +12,7 @@ import SafeAreaView from 'react-native-safe-area-view'
 import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
 import { componentWithAnalytics } from 'src/analytics/wrapper'
+import { ErrorMessages } from 'src/app/ErrorMessages'
 import CodeRow, { CodeRowStatus } from 'src/components/CodeRow'
 import { SingleDigitInput } from 'src/components/SingleDigitInput'
 import { Namespaces, withTranslation } from 'src/i18n'
@@ -38,7 +39,8 @@ interface StateProps {
   transactionData: TransactionDataInput
   fullValidationRequired: boolean
   isValidRecipient: boolean
-  isPaymentRequest: true | undefined
+  isPaymentRequest?: true
+  error?: ErrorMessages | null
 }
 
 interface State {
@@ -60,12 +62,14 @@ const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
   const transactionData = navigation.getParam('transactionData')
   const isPaymentRequest = navigation.getParam('isPaymentRequest')
   const { recipient } = transactionData
+  const error = state.alert ? state.alert.underlyingError : null
   return {
     recipient,
     transactionData,
     fullValidationRequired: navigation.getParam('fullValidationRequired'),
     isValidRecipient: state.send.isValidRecipient,
     isPaymentRequest,
+    error,
   }
 }
 
@@ -169,7 +173,7 @@ export class ValidateRecipientAccount extends React.Component<Props, State> {
   }
 
   render = () => {
-    const { t, recipient } = this.props
+    const { t, recipient, error } = this.props
     const { displayName } = recipient
 
     return (
@@ -181,6 +185,9 @@ export class ValidateRecipientAccount extends React.Component<Props, State> {
           <View>
             <Text style={styles.h2}>{t('confirmAccountNumber.title')}</Text>
             <View>{this.renderInstructionsAndInputField()}</View>
+            <View>
+              {error && <Text style={styles.errorMessage}>{t(error, { ns: 'global' })}</Text>}
+            </View>
             <Button
               style={styles.button}
               onPress={this.onPressConfirm}
@@ -238,6 +245,11 @@ const styles = StyleSheet.create({
   },
   button: {
     paddingVertical: 16,
+  },
+  errorMessage: {
+    ...fontStyles.small,
+    color: colors.warning,
+    paddingVertical: 8,
   },
   askHelpText: {
     ...fontStyles.small,

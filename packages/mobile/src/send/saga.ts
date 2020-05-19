@@ -217,7 +217,9 @@ export function* validateRecipientAddressSaga({
     yield put(validateRecipientAddressSuccess(e164PhoneNumber, validatedAddress))
   } catch (error) {
     Logger.error(TAG, 'validateRecipientAddressSaga/Address validation error: ', error)
-    yield put(showError(error.message))
+    // Dismissing the error banner immediately because we are showing
+    // this error inline at ValidateRecipientAccount
+    yield put(showError(error.message, 0.01))
     yield put(validateRecipientAddressFailure())
   }
 }
