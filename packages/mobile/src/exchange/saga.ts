@@ -20,7 +20,6 @@ import {
 } from 'src/exchange/actions'
 import { ExchangeRatePair, exchangeRatePairSelector } from 'src/exchange/reducer'
 import { CURRENCY_ENUM } from 'src/geth/consts'
-import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/geth/saga'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { convertToContractDecimals } from 'src/tokens/saga'
@@ -36,6 +35,7 @@ import { getRateForMakerToken, getTakerAmount } from 'src/utils/currencyExchange
 import { roundDown } from 'src/utils/formatting'
 import Logger from 'src/utils/Logger'
 import { getContractKit } from 'src/web3/contracts'
+import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
 import * as util from 'util'
 
 const TAG = 'exchange/saga'

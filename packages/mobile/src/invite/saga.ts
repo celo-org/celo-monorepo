@@ -17,6 +17,7 @@ import { transferEscrowedPayment } from 'src/escrow/actions'
 import { calculateFee } from 'src/fees/saga'
 import { generateShortInviteLink } from 'src/firebase/dynamicLinks'
 import { CURRENCY_ENUM } from 'src/geth/consts'
+import { waitForGethConnectivity } from 'src/geth/saga'
 import { refreshAllBalances } from 'src/home/actions'
 import i18n from 'src/i18n'
 import { setHasSeenVerificationNux, updateE164PhoneNumberAddresses } from 'src/identity/actions'
@@ -51,7 +52,8 @@ import {
   gethWallet,
   web3ForUtils,
 } from 'src/web3/contracts'
-import { waitWeb3LastBlock } from 'src/web3/saga'
+import { getOrCreateAccount, waitWeb3LastBlock } from 'src/web3/saga'
+
 const TAG = 'invite/saga'
 export const TEMP_PW = 'ce10'
 export const REDEEM_INVITE_TIMEOUT = 2 * 60 * 1000 // 2 minutes
@@ -155,7 +157,6 @@ export function* sendInvite(
   amount?: BigNumber,
   currency?: CURRENCY_ENUM
 ) {
-  yield call(getConnectedUnlockedAccount)
   try {
     const contractKit = yield call(getContractKit)
     const randomness = yield call(asyncRandomBytes, 64)

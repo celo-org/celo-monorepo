@@ -5,11 +5,11 @@ import DeviceInfo from 'react-native-device-info'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import LogView from 'src/app/LogView'
-import { currentAccountSelector } from 'src/geth/selectors'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
 import Logger from 'src/utils/Logger'
+import { currentAccountSelector } from 'src/web3/selectors'
 import { getLatestBlock } from 'src/web3/utils'
 
 interface State {

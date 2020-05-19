@@ -17,7 +17,6 @@ import ReclaimPaymentConfirmationCard from 'src/escrow/ReclaimPaymentConfirmatio
 import { FeeType } from 'src/fees/actions'
 import CalculateFee, { CalculateFeeChildren } from 'src/fees/CalculateFee'
 import { getFeeDollars } from 'src/fees/selectors'
-import { currentAccountSelector } from 'src/geth/selectors'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -27,6 +26,7 @@ import { isAppConnected } from 'src/redux/selectors'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { divideByWei } from 'src/utils/formatting'
 import Logger from 'src/utils/Logger'
+import { currentAccountSelector } from 'src/web3/selectors'
 
 const TAG = 'escrow/ReclaimPaymentConfirmationScreen'
 

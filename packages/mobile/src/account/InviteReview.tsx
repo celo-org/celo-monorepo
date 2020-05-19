@@ -23,7 +23,6 @@ import { FeeType } from 'src/fees/actions'
 import CalculateFee from 'src/fees/CalculateFee'
 import { getFeeDollars } from 'src/fees/selectors'
 import GethAwareButton from 'src/geth/GethAwareButton'
-import { currentAccountSelector } from 'src/geth/selectors'
 import { Namespaces, withTranslation } from 'src/i18n'
 import SMSLogo from 'src/icons/InviteSendReceive'
 import WhatsAppLogo from 'src/icons/WhatsAppLogo'
@@ -34,6 +33,7 @@ import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 import { RootState } from 'src/redux/reducers'
 import { fetchDollarBalance } from 'src/stableToken/actions'
+import { currentAccountSelector } from 'src/web3/selectors'
 
 interface State {
   amountIsValid: boolean

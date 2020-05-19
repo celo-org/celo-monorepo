@@ -10,7 +10,7 @@ const store = createMockStore({
   account: {
     e164PhoneNumber: mockE164Number,
   },
-  geth: {
+  web3: {
     account: mockAccount2,
   },
 })

@@ -19,7 +19,6 @@ import {
 } from 'src/escrow/actions'
 import { calculateFee } from 'src/fees/saga'
 import { CURRENCY_ENUM, SHORT_CURRENCIES } from 'src/geth/consts'
-import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/geth/saga'
 import i18n from 'src/i18n'
 import { Actions as IdentityActions, SetVerificationStatusAction } from 'src/identity/actions'
 import { addressToE164NumberSelector } from 'src/identity/reducer'
@@ -42,6 +41,7 @@ import {
   gethWallet,
   web3ForUtils,
 } from 'src/web3/contracts'
+import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
 import { estimateGas } from 'src/web3/utils'
 
 const TAG = 'escrow/saga'

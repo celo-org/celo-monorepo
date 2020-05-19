@@ -13,8 +13,6 @@ import { defaultCountryCodeSelector, e164NumberSelector } from 'src/account/sele
 import { showErrorOrFallback } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { USE_PHONE_NUMBER_PRIVACY } from 'src/config'
-import { getConnectedAccount } from 'src/geth/saga'
-import { currentAccountSelector } from 'src/geth/selectors'
 import {
   Actions,
   endImportContacts,
@@ -42,6 +40,8 @@ import { getAllContacts } from 'src/utils/contacts'
 import Logger from 'src/utils/Logger'
 import { checkContactsPermission } from 'src/utils/permissions'
 import { getContractKit } from 'src/web3/contracts'
+import { getConnectedAccount } from 'src/web3/saga'
+import { currentAccountSelector } from 'src/web3/selectors'
 
 const TAG = 'identity/contactMapping'
 export const IMPORT_CONTACTS_TIMEOUT = 1 * 60 * 1000 // 1 minute

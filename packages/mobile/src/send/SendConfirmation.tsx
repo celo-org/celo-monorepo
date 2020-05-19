@@ -28,7 +28,6 @@ import CalculateFee, {
 } from 'src/fees/CalculateFee'
 import { getFeeDollars } from 'src/fees/selectors'
 import { completePaymentRequest, declinePaymentRequest } from 'src/firebase/actions'
-import { currentAccountSelector } from 'src/geth/selectors'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import { AddressValidationType } from 'src/identity/reducer'
 import { getAddressValidationType, getSecureSendAddress } from 'src/identity/secureSend'
@@ -50,6 +49,7 @@ import { ConfirmationInput, getConfirmationInput } from 'src/send/utils'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { fetchDollarBalance } from 'src/stableToken/actions'
 import Logger from 'src/utils/Logger'
+import { currentAccountSelector } from 'src/web3/selectors'
 
 interface StateProps {
   account: string | null

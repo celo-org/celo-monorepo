@@ -7,7 +7,6 @@ import { setBackupCompleted } from 'src/account/actions'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { CURRENCY_ENUM } from 'src/geth/consts'
-import { assignAccountFromPrivateKey } from 'src/geth/saga'
 import { refreshAllBalances } from 'src/home/actions'
 import {
   Actions,
@@ -22,7 +21,7 @@ import { Screens } from 'src/navigator/Screens'
 import { fetchTokenBalanceInWeiWithRetry } from 'src/tokens/saga'
 import { setKey } from 'src/utils/keyStore'
 import Logger from 'src/utils/Logger'
-import { waitWeb3LastBlock } from 'src/web3/saga'
+import { assignAccountFromPrivateKey, waitWeb3LastBlock } from 'src/web3/saga'
 
 const TAG = 'import/saga'
 
@@ -54,6 +53,7 @@ export function* importBackupPhraseSaga({ phrase, useEmptyWallet }: ImportBackup
       )
 
       // TODO(Rossy) Check gold here too once verificiation is made optional
+
       if (dollarBalance.isLessThanOrEqualTo(0)) {
         yield put(backupPhraseEmpty())
         navigate(Screens.ImportWalletEmpty, { backupPhrase: phrase })

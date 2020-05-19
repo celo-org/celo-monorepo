@@ -73,7 +73,6 @@ export interface PersistedRootState {
   stableToken: StableTokenState
   transactions: TransactionsState
   web3: Web3State
-  geth: GethState
   identity: IdentityState
   account: AccountState
   invite: InviteState

@@ -18,7 +18,6 @@ import { showMessage } from 'src/alert/actions'
 import { exitBackupFlow } from 'src/app/actions'
 import { ALERT_BANNER_DURATION, DEFAULT_TESTNET, SHOW_TESTNET_BANNER } from 'src/config'
 import { CURRENCY_ENUM } from 'src/geth/consts'
-import { currentAccountSelector } from 'src/geth/selectors'
 import { refreshAllBalances, setLoading } from 'src/home/actions'
 import NotificationBox from 'src/home/NotificationBox'
 import { callToActNotificationSelector, getActiveNotificationCount } from 'src/home/selectors'
@@ -31,6 +30,7 @@ import { RootState } from 'src/redux/reducers'
 import { isAppConnected } from 'src/redux/selectors'
 import { initializeSentryUserContext } from 'src/sentry/actions'
 import TransactionsList from 'src/transactions/TransactionsList'
+import { currentAccountSelector } from 'src/web3/selectors'
 
 const HEADER_BUTTON_MARGIN = 12
 

@@ -6,8 +6,6 @@ import { setUserContactDetails } from 'src/account/actions'
 import { defaultCountryCodeSelector, e164NumberSelector } from 'src/account/selectors'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { getConnectedAccount } from 'src/geth/saga'
-import { currentAccountSelector } from 'src/geth/selectors'
 import { requireSecureSend, updateE164PhoneNumberAddresses } from 'src/identity/actions'
 import { doImportContactsWrapper, fetchAddressesAndValidateSaga } from 'src/identity/contactMapping'
 import { fetchPhoneHashPrivate } from 'src/identity/privateHashing'
@@ -20,6 +18,8 @@ import { setRecipientCache } from 'src/recipients/actions'
 import { contactsToRecipients } from 'src/recipients/recipient'
 import { getAllContacts } from 'src/utils/contacts'
 import { getContractKitOutsideGenerator } from 'src/web3/contracts'
+import { getConnectedAccount } from 'src/web3/saga'
+import { currentAccountSelector } from 'src/web3/selectors'
 import {
   mockAccount,
   mockAccount2,

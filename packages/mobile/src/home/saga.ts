@@ -10,7 +10,6 @@ import {
   takeLeading,
 } from 'redux-saga/effects'
 import { fetchSentEscrowPayments } from 'src/escrow/actions'
-import { getConnectedAccount } from 'src/geth/saga'
 import { fetchGoldBalance } from 'src/goldToken/actions'
 import { Actions, refreshAllBalances, setLoading } from 'src/home/actions'
 import { fetchCurrentRate } from 'src/localCurrency/actions'
@@ -20,6 +19,7 @@ import { shouldUpdateBalance } from 'src/redux/selectors'
 import { fetchDollarBalance } from 'src/stableToken/actions'
 import { Actions as TransactionActions } from 'src/transactions/actions'
 import Logger from 'src/utils/Logger'
+import { getConnectedAccount } from 'src/web3/saga'
 
 const REFRESH_TIMEOUT = 15000
 const TAG = 'home/saga'
