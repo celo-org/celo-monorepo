@@ -16,6 +16,7 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import CodeRow, { CodeRowStatus } from 'src/components/CodeRow'
 import { SingleDigitInput } from 'src/components/SingleDigitInput'
 import { Namespaces, withTranslation } from 'src/i18n'
+import MenuBurger from 'src/icons/menuBurger'
 import { headerWithBackButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -206,9 +207,11 @@ export class ValidateRecipientAccount extends React.Component<Props, State> {
             <Text style={styles.modalHeader}>{t('helpModal.header')}</Text>
             <Text style={styles.body}>{t('helpModal.body1')}</Text>
             <Text style={styles.body}>{t('helpModal.body2')}</Text>
+            <Text style={styles.body}>{t('helpModal.body3')}</Text>
+            <MenuBurger />
             <View style={styles.modalButtonsContainer}>
               <TextButton onPress={this.toggleModal} style={styles.modalCancelText}>
-                {t('global:close')}
+                {t('global:dismiss')}
               </TextButton>
             </View>
           </View>
