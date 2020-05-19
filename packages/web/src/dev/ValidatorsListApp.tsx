@@ -19,7 +19,7 @@ import Spinner from 'src/shared/Spinner'
 import { colors, standardStyles, textStyles } from 'src/styles'
 
 const networkMenu = [
-  ['Release Candidate', menuItems.VALIDATORS_LIST.link],
+  ['Mainnet', menuItems.VALIDATORS_LIST.link],
   ['Baklava', menuItems.VALIDATORS_LIST__BAKLAVA.link],
   // ['Baklavastaging', menuItems.VALIDATORS_LIST_BAKLAVASTAGING.link],
 ]

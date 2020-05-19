@@ -1,2 +1,0 @@
-# wallets/ledger-utils/data
-
