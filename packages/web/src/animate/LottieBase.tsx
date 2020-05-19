@@ -30,12 +30,8 @@ export default class LottieBase extends React.Component<Props> {
       this.animation.addEventListener('data_ready', this.props.onReady)
     }
     if (this.props.onLooped) {
-      this.animation.addEventListener('loopComplete', this.onLoop)
+      this.animation.addEventListener('loopComplete', this.props.onLooped)
     }
-  }
-  onLoop = (data) => {
-    this.props.onLooped()
-    console.info(data)
   }
 
   componentWillUnmount = () => {

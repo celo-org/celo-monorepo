@@ -2,7 +2,6 @@ import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { H4 } from 'src/fonts/Fonts'
 import EmailForm from 'src/forms/EmailForm'
-// import changeStoryWebP from 'src/home/change-story/change-story.webp'
 import ChangeStory from 'src/home/change-story/ChangeStory'
 import TextAnimation, { WORDS } from 'src/home/TextAnimation'
 import { NameSpaces, useTranslation } from 'src/i18n'
@@ -11,12 +10,8 @@ import { ScreenSizes, useScreenSize } from 'src/layout/ScreenSize'
 import AspectRatio from 'src/shared/AspectRatio'
 import { BANNER_HEIGHT, HEADER_HEIGHT } from 'src/shared/Styles'
 import { fonts, standardStyles } from 'src/styles'
-// import { canUseWebP } from 'src/utils/utils'
 
 export default function HomeCover() {
-  // on chrome on desktop the lottie file has weird artifacts so we use webp instead.
-  // const [canWebP, setCanWebP] = React.useState(false)
-
   const [currentWordIndex, setWord] = React.useState(0)
 
   const changeWord = React.useCallback(() => {
@@ -26,10 +21,6 @@ export default function HomeCover() {
       setWord(0)
     }
   }, [currentWordIndex])
-
-  // React.useEffect(() => {
-  //   setCanWebP(canUseWebP())
-  // }, [])
 
   const { t } = useTranslation(NameSpaces.home)
   const { isMobile, screen, isDesktop } = useScreenSize()
@@ -46,11 +37,7 @@ export default function HomeCover() {
       >
         <View style={[styles.animationHolder, getplacement(screen)]}>
           <AspectRatio ratio={970 / 270}>
-            {/* {isDesktop && canWebP ? (
-              <Image source={changeStoryWebP} style={standardStyles.image} onLoad={changeWord} /> */}
-            {/* ) : ( */}
             <ChangeStory onReady={changeWord} onLooped={changeWord} />
-            {/* )} */}
           </AspectRatio>
         </View>
         <View style={[styles.contentHolder, standardStyles.blockMarginTablet]}>
