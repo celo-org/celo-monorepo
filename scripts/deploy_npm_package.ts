@@ -14,6 +14,7 @@ import { readFileSync, writeFileSync } from 'fs'
 import { prompt } from 'inquirer'
 import { join } from 'path'
 import { execCmd } from '../packages/celotool/lib/lib/cmd-utils'
+import { packageNameToDirectory } from './dependency-graph-utils'
 // console.log(inquirer)
 enum ReleaseType {
   PATCH = 'patch',
@@ -21,7 +22,7 @@ enum ReleaseType {
   MAJOR = 'major',
 }
 
-const deployablePackages = ['contractkit', 'utils', 'cli']
+const deployablePackages = ['@celo/contractkit', '@celo/utils', '@celo/celocli']
 
 const steps = [
   {
@@ -38,8 +39,17 @@ const steps = [
   },
 ]
 
+const dependencyGraph = JSON.parse(
+  readFileSync(join(__dirname, '..', 'dependency-graph.json')).toString()
+)
+
 const revert = (commitHash) => {
   console.log('> reverting to', commitHash)
+}
+
+function readPackageJson(dir) {
+  const packageJsonPath = join(__dirname, '..', 'packages', dir, 'package.json')
+  return JSON.parse(readFileSync(packageJsonPath).toString())
 }
 
 async function main() {
@@ -52,9 +62,12 @@ async function main() {
   }
 
   const { packageName, version } = await prompt(steps)
+  const packageDir = packageNameToDirectory[packageName]
 
-  const [currentCommit] = await execCmd('git rev-parse HEAD')
-  const packageJsonPath = join(__dirname, '..', 'packages', packageName, 'package.json')
+  const [currentCommit] = await execCmd('git rev-parse HEAD', {
+    cwd: join(__dirname, '..', 'packages', packageDir),
+  })
+  const packageJsonPath = join(__dirname, '..', 'packages', packageDir, 'package.json')
   const packageJson = JSON.parse(readFileSync(packageJsonPath).toString())
   const currentVersion = packageJson.version
   let [major, minor, patch] = currentVersion.split('.').map(Number)
@@ -67,6 +80,39 @@ async function main() {
   }
   const newVersion = [major, minor, patch].map(String).join('.')
   writeFileSync(packageJsonPath, JSON.stringify({ ...packageJson, version: newVersion }, null, 2))
+
+  // make new package.json and test installation
+  // look at each dependency, verify we're happy to deploy with this commit
+  console.log(packageName, 'will be deployed with the following dependencies is this OK?')
+  const dependencies = Object.keys(packageJson.dependencies).filter((name) =>
+    name.startsWith('@celo')
+  )
+  let celoDependencyVersions = {}
+  for (const dep of dependencies) {
+    const depPackageJson = readPackageJson(packageNameToDirectory[dep])
+    const [latestPublished] = await execCmd('npm view . version', {
+      cwd: join(__dirname, '..', 'packages', packageNameToDirectory[dep]),
+    })
+    const [distTagsResponse] = await execCmd('npm view . dist-tags --json', {
+      cwd: join(__dirname, '..', 'packages', packageNameToDirectory[dep]),
+    })
+    console.log(latestPublished.trim())
+    console.log(Object.entries(JSON.parse(distTagsResponse)))
+    const found = Object.entries(JSON.parse(distTagsResponse)).find(
+      ([hash, tag]) => hash.length === 40 && tag === latestPublished.trim()
+    )
+    console.log('last tag commit hash', found)
+    const [lastTagCommitHash] = found
+
+    console.log(
+      `${dep} local version ${depPackageJson.version} (), remote version ${latestPublished}`
+    )
+  }
+  // console.log('')
+  // const [distTagsResponse] = await execCmdWithExitOnFailure('npm view . dist-tags --json')
+
+  // console.log(dir, depPackageJson.version)
+  // console.log('>>> need to check these', dependencies)
 
   // await execCmd(`git add ${packageJsonPath}`)
   // await execCmd(`git commit -m "Update ${packageName} to v${newVersion}"`)

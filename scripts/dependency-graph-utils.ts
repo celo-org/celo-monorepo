@@ -23,7 +23,11 @@ function getDirectoryFromPackageName(): { [x: string]: string } {
 
   return folders
 }
-const packageNameToDirectory = getDirectoryFromPackageName()
+export const packageNameToDirectory = getDirectoryFromPackageName()
+export const directoryToPackageName = Object.entries(packageNameToDirectory).reduce(
+  (accum, [key, value]) => ({ ...accum, [value]: key }),
+  {}
+)
 
 const parseLernaOutput = (raw: string) => {
   const fullGraph: { [k: string]: string[] } = JSON.parse(raw)
