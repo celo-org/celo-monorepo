@@ -43,6 +43,10 @@ Outputs the set of validators currently participating in BFT to create blocks. A
 ```
 USAGE
   $ celocli election:current
+
+OPTIONS
+  --valset  Show currently used signers from valset (by default the authorized validator signers are shown). Useful for
+            checking if keys have been rotated.
 ```
 
 _See code: [packages/cli/src/commands/election/current.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/election/current.ts)_

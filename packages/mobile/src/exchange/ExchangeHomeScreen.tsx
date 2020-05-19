@@ -2,20 +2,20 @@ import Button, { BtnTypes } from '@celo/react-components/components/Button'
 import ItemSeparator from '@celo/react-components/components/ItemSeparator'
 import ScrollContainer from '@celo/react-components/components/ScrollContainer'
 import SectionHeadNew from '@celo/react-components/components/SectionHeadNew'
+import { StackScreenProps } from '@react-navigation/stack'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { StyleSheet, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
-import componentWithAnalytics from 'src/analytics/wrapper'
 import { fetchExchangeRate } from 'src/exchange/actions'
 import CeloGoldHistoryChart from 'src/exchange/CeloGoldHistoryChart'
 import CeloGoldOverview from 'src/exchange/CeloGoldOverview'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces, withTranslation } from 'src/i18n'
-import { navigate } from 'src/navigator/NavigationService'
-import { Stacks } from 'src/navigator/Screens'
+import { Screens } from 'src/navigator/Screens'
+import { StackParamList } from 'src/navigator/types'
 import { RootState } from 'src/redux/reducers'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import TransactionsList from 'src/transactions/TransactionsList'
@@ -31,7 +31,9 @@ interface DispatchProps {
   fetchExchangeRate: typeof fetchExchangeRate
 }
 
-type Props = StateProps & DispatchProps & WithTranslation
+type OwnProps = StackScreenProps<StackParamList, Screens.ExchangeHomeScreen>
+
+type Props = StateProps & DispatchProps & WithTranslation & OwnProps
 
 const mapStateToProps = (state: RootState): StateProps => ({
   exchangeRate: getRateForMakerToken(state.exchange.exchangeRatePair, CURRENCY_ENUM.DOLLAR),
@@ -45,7 +47,7 @@ export class ExchangeHomeScreen extends React.Component<Props> {
   }
 
   goToBuyGold = () => {
-    navigate(Stacks.ExchangeStack, {
+    this.props.navigation.navigate(Screens.ExchangeTradeScreen, {
       makerTokenDisplay: {
         makerToken: CURRENCY_ENUM.DOLLAR,
         makerTokenBalance: this.props.dollarBalance || '0',
@@ -54,7 +56,7 @@ export class ExchangeHomeScreen extends React.Component<Props> {
   }
 
   goToBuyDollars = () => {
-    navigate(Stacks.ExchangeStack, {
+    this.props.navigation.navigate(Screens.ExchangeTradeScreen, {
       makerTokenDisplay: {
         makerToken: CURRENCY_ENUM.GOLD,
         makerTokenBalance: this.props.goldBalance || '0',
@@ -111,11 +113,9 @@ export class ExchangeHomeScreen extends React.Component<Props> {
   }
 }
 
-export default componentWithAnalytics(
-  connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
-    fetchExchangeRate,
-  })(withTranslation(Namespaces.exchangeFlow9)(ExchangeHomeScreen))
-)
+export default connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
+  fetchExchangeRate,
+})(withTranslation(Namespaces.exchangeFlow9)(ExchangeHomeScreen))
 
 const styles = StyleSheet.create({
   activity: {

@@ -5,10 +5,10 @@ import {
   getIdentity,
   switchToCluster,
 } from 'src/lib/azure'
+import { execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
 import { getFornoUrl, getFullNodeRpcInternalUrl } from 'src/lib/endpoints'
 import { addCeloEnvMiddleware, envVar, fetchEnv } from 'src/lib/env-utils'
 import { installGenericHelmChart, removeGenericHelmChart } from 'src/lib/helm_deploy'
-import { execCmdWithExitOnFailure } from 'src/lib/utils'
 import yargs from 'yargs'
 
 const helmChartPath = '../helm-charts/oracle'

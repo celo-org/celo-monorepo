@@ -147,8 +147,6 @@ spec:
           value: production
         - name: CELO_PROVIDER
           value: ws://localhost:8546
-        - name: APP_SIGNATURE
-          value: {{ .Values.attestation_service.sms_retriever_hash_code }}
         - name: SMS_PROVIDERS
           value: nexmo
         - name: LOG_FORMAT

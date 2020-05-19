@@ -41,7 +41,7 @@
     "@0x/sol-profiler": "^3.0.0",
     "@0x/sol-trace": "^2.0.16",
     "@0x/subproviders": "^5.0.0",
-    "@celo/ganache-cli": "git+https://github.com/celo-org/ganache-cli.git#d5ff1f1",
+    "@celo/ganache-cli": "git+https://github.com/celo-org/ganache-cli.git#25ff8dd",
     "@celo/utils": "0.1.15-dev",
     "@openzeppelin/upgrades": "^2.8.0",
     "apollo-client": "^2.4.13",
