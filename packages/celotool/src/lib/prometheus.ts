@@ -68,7 +68,7 @@ async function helmParameters(clusterConfig?: AzureClusterConfig) {
     // has some metrics of the form "kube_.+_labels" that provides the labels
     // of k8s resources as metric labels. If some k8s resources have too many labels,
     // this results in a bunch of errors when the sidecar tries to send metrics to Stackdriver.
-    `--set-string includeFilter='\\{job=~".+"\\,__name__!~"kube_.+_labels"\\}'`,
+    `--set-string includeFilter='\\{job=~".+"\\,__name__!~"kube_.+_labels"\\,__name__!~"phoenix_.+"\\}'`,
   ]
   if (clusterConfig) {
     params.push(
