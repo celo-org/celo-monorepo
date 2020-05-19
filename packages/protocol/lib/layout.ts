@@ -1,10 +1,16 @@
 import {
   BuildArtifacts,
+<<<<<<< HEAD
   compareStorageLayouts,
   Contract as ZContract,
   getStorageLayout,
   Operation,
   StorageLayoutInfo,
+=======
+  getStorageLayout,
+  compareStorageLayouts,
+  Contract as ZContract
+>>>>>>> Add script for layout checking
 } from '@openzeppelin/upgrades'
 const  Web3 = require('web3')
 import { Contract as Web3Contract } from 'web3-eth-contract';
@@ -12,6 +18,7 @@ import { Contract as Web3Contract } from 'web3-eth-contract';
 const web3 = new Web3(null)
 
 // Inlined from OpenZeppelin SDK since its not exported.
+<<<<<<< HEAD
 interface Artifact {
   abi: any[]
   ast: any
@@ -49,6 +56,24 @@ interface StorageInfo {
   src: string;
   path?: string;
   contract?: string;
+=======
+export interface Artifact {
+  abi: any[];
+  ast: any;
+  bytecode: string;
+  compiler: any;
+  contractName: string;
+  deployedBytecode: string;
+  deployedSourceMap: string;
+  fileName: string;
+  legacyAST?: any;
+  networks: any;
+  schemaVersion: string;
+  source: string;
+  sourceMap: string;
+  sourcePath: string;
+  updatedAt: string;
+>>>>>>> Add script for layout checking
 }
 
 // getStorageLayout needs an oz-sdk Contract class instance. This class is a
@@ -60,7 +85,11 @@ interface StorageInfo {
 const addSchemaForLayoutChecking = (web3Contract: Web3Contract, artifact: any): ZContract => {
   // @ts-ignore
   const contract = web3Contract as Contract
+<<<<<<< HEAD
   // @ts-ignore
+=======
+  //@ts-ignore
+>>>>>>> Add script for layout checking
   contract.schema = {}
   contract.schema.ast = artifact.ast
   contract.schema.contractName = artifact.contractName
@@ -73,6 +102,7 @@ const makeZContract = (artifact: any): ZContract => {
   return addSchemaForLayoutChecking(contract, artifact)
 }
 
+<<<<<<< HEAD
 export const getLayout = (artifact: Artifact, artifacts: BuildArtifacts) => {
   const contract = makeZContract(artifact)
 
@@ -213,4 +243,15 @@ export const reportLayoutIncompatibilities = (oldArtifacts: BuildArtifacts, newA
       return generateCompatibilityReport(oldArtifact, oldArtifacts, newArtifact, newArtifacts)
     }
   })
+=======
+export const getLayoutDiff = (oldArtifact: Artifact, oldArtifacts: BuildArtifacts,
+                       newArtifact: Artifact, newArtifacts: BuildArtifacts) => {
+  const oldContract = makeZContract(oldArtifact)
+  const newContract = makeZContract(newArtifact)
+
+  const oldLayout = getStorageLayout(oldContract, oldArtifacts)
+  const newLayout = getStorageLayout(newContract, newArtifacts)
+
+  return compareStorageLayouts(oldLayout, newLayout)
+>>>>>>> Add script for layout checking
 }
