@@ -7,10 +7,10 @@ import HomeBackers from 'src/home/HomeBackers'
 import HomeSystems from 'src/home/HomeSystems'
 import Timeline, { MileStone } from 'src/home/roadmap/Timeline'
 import HomeCover from 'src/home/version3/HomeCover'
-import HomeHero from 'src/home/version3/HomeHero'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import Press from 'src/press/Press'
 import HomeBenefits from './HomeBenefits'
+import { TwoAssets } from './TwoAssets'
 
 interface State {
   mobile: boolean
@@ -66,7 +66,7 @@ export class Home extends React.Component<I18nProps & Props, State> {
         </Head>
         <HomeCover />
         <HomeBenefits />
-        <HomeHero />
+        <TwoAssets />
         <Press />
         <HomeSystems />
         <Timeline milestones={milestones} />

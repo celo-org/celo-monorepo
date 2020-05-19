@@ -68,7 +68,7 @@ interface Props {
 function Prong({ title, text, source }: Props) {
   return (
     <Cell span={Spans.third}>
-      <Image source={source} style={{ width: 100, height: 100 }} resizeMode="contain" />
+      <Image source={source} style={styles.image} resizeMode="contain" />
       <Text style={[fonts.h6, standardStyles.elementalMargin]}>{title}</Text>
       <Text style={fonts.p}>{text}</Text>
     </Cell>
@@ -82,6 +82,7 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
   },
   link: {
-    paddingHorizontal: 10,
+    padding: 10,
   },
+  image: { width: 100, height: 100 },
 })
