@@ -72,19 +72,6 @@ function createSendMethod(): SendMethod {
   }))
 }
 
-// The getParam method on this function returns the whole paramter
-// object instead of the specific property
-export function createMockNavigationPropDeprecated(params: any): NavigationScreenProp<any> {
-  return {
-    ...mockNavigation,
-    state: {
-      ...mockNavigation.state,
-      params,
-    },
-    getParam: jest.fn(() => params),
-  }
-}
-
 export function createMockNavigationProp(params: any): NavigationScreenProp<any> {
   return {
     ...mockNavigation,
@@ -92,7 +79,7 @@ export function createMockNavigationProp(params: any): NavigationScreenProp<any>
       ...mockNavigation.state,
       params,
     },
-    getParam: jest.fn((property) => params[property]),
+    getParam: jest.fn(() => params),
   }
 }
 

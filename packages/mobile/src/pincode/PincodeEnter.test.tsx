@@ -6,11 +6,11 @@ import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import PincodeEnter from 'src/pincode/PincodeEnter'
 import { isPinCorrect } from 'src/pincode/utils'
-import { createMockNavigationPropDeprecated, createMockStore } from 'test/utils'
+import { createMockNavigationProp, createMockStore } from 'test/utils'
 
 describe('PincodeEnter', () => {
   it('renders correctly', () => {
-    const navigation = createMockNavigationPropDeprecated({
+    const navigation = createMockNavigationProp({
       reject: jest.fn(),
       resolve: jest.fn(),
     })
@@ -27,7 +27,7 @@ describe('PincodeEnter', () => {
   it('calls onSuccess when PIN is correct', (done) => {
     const pin = '123456'
     const onSuccess = jest.fn()
-    const navigation = createMockNavigationPropDeprecated(onSuccess)
+    const navigation = createMockNavigationProp(onSuccess)
     ;(isPinCorrect as jest.Mock).mockResolvedValueOnce(pin)
     const store = createMockStore()
 
@@ -47,7 +47,7 @@ describe('PincodeEnter', () => {
   })
 
   it('shows wrong PIN notification', (done) => {
-    const navigation = createMockNavigationPropDeprecated({})
+    const navigation = createMockNavigationProp({})
     ;(isPinCorrect as jest.Mock).mockRejectedValueOnce('')
     const store = createMockStore()
 

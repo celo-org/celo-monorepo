@@ -3,7 +3,7 @@ import * as React from 'react'
 import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
 import PaymentRequestConfirmation from 'src/paymentRequest/PaymentRequestConfirmation'
-import { createMockNavigationPropDeprecated, createMockStore } from 'test/utils'
+import { createMockNavigationProp, createMockStore } from 'test/utils'
 import { mockAccount, mockAccount2, mockE164Number, mockRecipient } from 'test/values'
 
 const store = createMockStore({
@@ -17,7 +17,7 @@ const store = createMockStore({
 
 describe('PaymentRequestConfirmation', () => {
   it('renders correctly for request payment confirmation', () => {
-    const navigation = createMockNavigationPropDeprecated({
+    const navigation = createMockNavigationProp({
       amount: new BigNumber(10),
       reason: 'My Reason',
       recipient: mockRecipient,

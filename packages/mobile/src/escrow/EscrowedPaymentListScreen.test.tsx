@@ -6,12 +6,12 @@ import * as renderer from 'react-test-renderer'
 import { escrowPaymentDouble } from 'src/escrow/__mocks__'
 import { EscrowedPayment } from 'src/escrow/actions'
 import EscrowedPaymentListScreen from 'src/escrow/EscrowedPaymentListScreen'
-import { createMockNavigationPropDeprecated, createMockStore } from 'test/utils'
+import { createMockNavigationProp, createMockStore } from 'test/utils'
 import { mockAccount, mockRecipient } from 'test/values'
 
 const payments = [escrowPaymentDouble({}), escrowPaymentDouble({}), escrowPaymentDouble({})]
 
-const navigation = createMockNavigationPropDeprecated({
+const navigation = createMockNavigationProp({
   recipient: mockRecipient,
   recipientAddress: mockAccount,
   amount: new BigNumber(10),

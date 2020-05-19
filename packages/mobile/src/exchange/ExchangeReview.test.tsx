@@ -5,7 +5,7 @@ import * as renderer from 'react-test-renderer'
 import ExchangeReview from 'src/exchange/ExchangeReview'
 import { ExchangeRatePair } from 'src/exchange/reducer'
 import { CURRENCY_ENUM } from 'src/geth/consts'
-import { createMockNavigationPropDeprecated, createMockStore } from 'test/utils'
+import { createMockNavigationProp, createMockStore } from 'test/utils'
 
 const exchangeRatePair: ExchangeRatePair = { goldMaker: '0.11', dollarMaker: '10' }
 
@@ -27,7 +27,7 @@ const store = createMockStore({
 
 describe('ExchangeReview', () => {
   it('renders correctly', () => {
-    const navigation = createMockNavigationPropDeprecated({
+    const navigation = createMockNavigationProp({
       makerToken: CURRENCY_ENUM.GOLD,
       makerTokenBalance: '20',
       inputToken: CURRENCY_ENUM.GOLD,

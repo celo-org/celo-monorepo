@@ -3,12 +3,12 @@ import 'react-native'
 import { render } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
 import ImportWalletEmpty from 'src/import/ImportWalletEmpty'
-import { createMockNavigationPropDeprecated, createMockStore } from 'test/utils'
+import { createMockNavigationProp, createMockStore } from 'test/utils'
 import { mockMnemonic } from 'test/values'
 
 describe('ImportWalletEmpty', () => {
   it('renders correctly', () => {
-    const navigation = createMockNavigationPropDeprecated(mockMnemonic)
+    const navigation = createMockNavigationProp(mockMnemonic)
     const wrapper = render(
       <Provider store={createMockStore()}>
         <ImportWalletEmpty navigation={navigation} />

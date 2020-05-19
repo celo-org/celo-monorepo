@@ -6,7 +6,7 @@ import * as renderer from 'react-test-renderer'
 import { PaymentRequest } from 'src/account/types'
 import { paymentRequestDouble } from 'src/paymentRequest/__mocks__'
 import OutgoingPaymentRequestListScreen from 'src/paymentRequest/OutgoingPaymentRequestListScreen'
-import { createMockNavigationPropDeprecated, createMockStore } from 'test/utils'
+import { createMockNavigationProp, createMockStore } from 'test/utils'
 import { mockAccount, mockE164Number, mockRecipient } from 'test/values'
 
 const requests = [
@@ -30,7 +30,7 @@ const requests = [
   }),
 ]
 
-const navigation = createMockNavigationPropDeprecated({
+const navigation = createMockNavigationProp({
   recipient: mockRecipient,
   recipientAddress: mockAccount,
   amount: new BigNumber(10),

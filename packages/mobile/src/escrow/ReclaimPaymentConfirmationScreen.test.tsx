@@ -5,7 +5,7 @@ import { Provider } from 'react-redux'
 import ReclaimPaymentConfirmationScreen from 'src/escrow/ReclaimPaymentConfirmationScreen'
 import { getReclaimEscrowFee } from 'src/escrow/saga'
 import { SHORT_CURRENCIES, WEI_PER_CELO } from 'src/geth/consts'
-import { createMockNavigationPropDeprecated, createMockStore } from 'test/utils'
+import { createMockNavigationProp, createMockStore } from 'test/utils'
 import { mockAccount, mockAccount2, mockE164Number, mockRecipient } from 'test/values'
 
 const TEST_FEE = new BigNumber(10000000000000000)
@@ -26,7 +26,7 @@ describe('ReclaimPaymentConfirmationScreen', () => {
   })
 
   it('renders correctly', async () => {
-    const navigation = createMockNavigationPropDeprecated({
+    const navigation = createMockNavigationProp({
       senderAddress: mockAccount2,
       recipientPhone: mockE164Number,
       recipientContact: mockRecipient,
@@ -59,7 +59,7 @@ describe('ReclaimPaymentConfirmationScreen', () => {
   })
 
   it('renders correctly when fee calculation fails', async () => {
-    const navigation = createMockNavigationPropDeprecated({
+    const navigation = createMockNavigationProp({
       senderAddress: mockAccount2,
       recipientPhone: mockE164Number,
       recipientContact: mockRecipient,
