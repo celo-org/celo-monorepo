@@ -65,6 +65,7 @@ First, read [these instructions](ledger.md) carefully. Then, whereever you see i
 If you haven't already, open a terminal window and install the [Celo CLI](https://docs.celo.org/command-line-interface/introduction):
 
 ```bash
+ apt-get install lsb-release libudev-dev libusb-dev libusb-1.0-0 -y
  npm install -g @celo/celocli
 ```
 

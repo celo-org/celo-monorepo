@@ -17,6 +17,7 @@ description: >-
 The Celo CLI is published as a node module on NPM. Assuming you have [npm installed](https://www.npmjs.com/get-npm), you can install the Celo CLI using the following command:
 
 ```bash
+apt-get install lsb-release libudev-dev libusb-dev libusb-1.0-0 -y
 npm install -g @celo/celocli
 ```
 

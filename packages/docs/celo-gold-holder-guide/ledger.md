@@ -67,6 +67,7 @@ Now that you have installed the Celo app on to your ledger, you can begin to use
 Open the terminal application on your computer and install the [Celo CLI](https://docs.celo.org/command-line-interface/introduction):
 
 ```bash
+apt-get install lsb-release libudev-dev libusb-dev libusb-1.0-0 -y
 npm install -g @celo/celocli
 ```
 

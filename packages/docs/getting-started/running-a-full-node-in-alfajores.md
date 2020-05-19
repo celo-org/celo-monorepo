@@ -114,6 +114,7 @@ You will have fully synced with the network once you have pulled the latest bloc
 
 Once the full node is running, it can serve the [Command Line Interface](../command-line-interface/introduction.md) tool `celocli`. For example:
 ```bash
+$ apt-get install lsb-release libudev-dev libusb-dev libusb-1.0-0 -y
 $ npm install -g @celo/celocli
 ...
 $ celocli node:synced
