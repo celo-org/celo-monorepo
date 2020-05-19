@@ -1,16 +1,14 @@
 ---
-description: >-
-  Show rewards information about a voter, registered Validator, or Validator
-  Group
+description: Show rewards information about a voter, registered Validator, or Validator Group
 ---
 
-# Rewards
+## Commands
 
-## Show
+### Show
 
 Show rewards information about a voter, registered Validator, or Validator Group
 
-```text
+```
 USAGE
   $ celocli rewards:show
 
@@ -26,5 +24,4 @@ EXAMPLE
   show --address 0x5409ed021d9299bf6814279a6a1411a7e866a631
 ```
 
-_See code:_ [_packages/cli/src/commands/rewards/show.ts_](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/rewards/show.ts)
-
+_See code: [packages/cli/src/commands/rewards/show.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/rewards/show.ts)_

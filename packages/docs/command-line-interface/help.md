@@ -2,13 +2,13 @@
 description: display help for celocli
 ---
 
-# Help
+## Commands
 
-## Help
+### Help
 
 display help for celocli
 
-```text
+```
 USAGE
   $ celocli help [COMMAND]
 
@@ -19,5 +19,4 @@ OPTIONS
   --all  see all commands in CLI
 ```
 
-_See code:_ [_packages/cli/@oclif/plugin-help_](https://github.com/oclif/plugin-help/blob/v2.2.0/src/commands/help.ts)
-
+_See code: [packages/cli/@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v2.2.0/src/commands/help.ts)_
