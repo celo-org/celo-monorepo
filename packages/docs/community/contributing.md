@@ -46,7 +46,7 @@ If you are submitting an issue, please double check that there doesn’t already
 
 To edit an existing page in the documentation, create a new branch for your work, commit your edits and submit a PR. 
 
-To add a new page to the documentation, create a new branch, add the new pages and update the [table of contents file (SUMMARY.md)](SUMMARY.md) to include your new pages in the appropriate location.
+To add a new page to the documentation, create a new branch, add the new pages and update the [table of contents file (SUMMARY.md)](../SUMMARY.md) to include your new pages in the appropriate location.
 
 #### **Finding Us and Other Contributors**
 
