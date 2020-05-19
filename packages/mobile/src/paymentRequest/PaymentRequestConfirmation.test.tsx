@@ -1,17 +1,10 @@
-import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
 import { Screens } from 'src/navigator/Screens'
 import PaymentRequestConfirmation from 'src/paymentRequest/PaymentRequestConfirmation'
 import { createMockStore } from 'test/utils'
-import {
-  mockAccount,
-  mockAccount2,
-  mockE164Number,
-  mockNavigation,
-  mockRecipient,
-} from 'test/values'
+import { mockAccount2, mockE164Number, mockNavigation, mockTransactionData } from 'test/values'
 
 const store = createMockStore({
   account: {
@@ -26,12 +19,7 @@ const mockRoute = {
   name: Screens.PaymentRequestConfirmation as Screens.PaymentRequestConfirmation,
   key: '1',
   params: {
-    confirmationInput: {
-      amount: new BigNumber(10),
-      reason: 'My Reason',
-      recipient: mockRecipient,
-      recipientAddress: mockAccount,
-    },
+    transactionData: mockTransactionData,
   },
 }
 

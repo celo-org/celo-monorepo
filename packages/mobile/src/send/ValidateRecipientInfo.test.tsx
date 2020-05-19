@@ -5,21 +5,25 @@ import { AddressValidationType } from 'src/identity/reducer'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import ValidateRecipientIntro from 'src/send/ValidateRecipientIntro'
-import { createMockNavigationProp, createMockStore } from 'test/utils'
-import { mockTransactionData } from 'test/values'
+import { createMockStore } from 'test/utils'
+import { mockNavigation, mockTransactionData } from 'test/values'
 
-const navigation = createMockNavigationProp({
-  transactionData: mockTransactionData,
-  addressValidationType: AddressValidationType.FULL,
-  isPaymentRequest: false,
-})
 const store = createMockStore()
+
+const mockRoute = {
+  name: Screens.ValidateRecipientIntro as Screens.ValidateRecipientIntro,
+  key: '1',
+  params: {
+    transactionData: mockTransactionData,
+    addressValidationType: AddressValidationType.FULL,
+  },
+}
 
 describe('ValidateRecipientIntro', () => {
   it('renders correctly', () => {
     const tree = render(
       <Provider store={store}>
-        <ValidateRecipientIntro navigation={navigation} />
+        <ValidateRecipientIntro navigation={mockNavigation} route={mockRoute} />
       </Provider>
     )
     expect(tree).toMatchSnapshot()
@@ -28,21 +32,20 @@ describe('ValidateRecipientIntro', () => {
   it('navigates to account confirmation screen when Confirm Account button clicked', () => {
     const tree = render(
       <Provider store={store}>
-        <ValidateRecipientIntro navigation={navigation} />
+        <ValidateRecipientIntro navigation={mockNavigation} route={mockRoute} />
       </Provider>
     )
     fireEvent.press(tree.getByTestId('confirmAccountButton'))
     expect(navigate).toHaveBeenCalledWith(Screens.ValidateRecipientAccount, {
       transactionData: mockTransactionData,
       addressValidationType: AddressValidationType.FULL,
-      isPaymentRequest: false,
     })
   })
 
   it('navigates to QR Scanner screen when Scan QR Code button clicked', () => {
     const tree = render(
       <Provider store={store}>
-        <ValidateRecipientIntro navigation={navigation} />
+        <ValidateRecipientIntro navigation={mockNavigation} route={mockRoute} />
       </Provider>
     )
     fireEvent.press(tree.getByTestId('scanQRCode'))
