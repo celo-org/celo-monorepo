@@ -161,6 +161,7 @@ const styles = StyleSheet.create({
     ...fontStyles.h2,
     paddingVertical: 20,
     paddingHorizontal: 5,
+    textAlign: 'center',
   },
   body: {
     ...fontStyles.small,

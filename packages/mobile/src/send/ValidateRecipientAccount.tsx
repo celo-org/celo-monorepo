@@ -25,6 +25,7 @@ import { TransactionDataInput } from 'src/send/SendAmount'
 
 const FULL_ADDRESS_PLACEHOLDER = '0xf1b1d5a6e7728g309c4a025k122d71ad75a61976'
 const PARTIAL_ADDRESS_PLACEHOLDER = ['k', '0', 'F', '4']
+const TEXT_SPACING = '   '
 
 type Navigation = NavigationInjectedProps['navigation']
 
@@ -180,17 +181,18 @@ export class ValidateRecipientAccount extends React.Component<Props, State> {
           <View>
             <Text style={styles.h2}>{t('confirmAccountNumber.title')}</Text>
             <View>{this.renderInstructionsAndInputField()}</View>
+            <Button
+              style={styles.button}
+              onPress={this.onPressConfirm}
+              text={`${TEXT_SPACING}${t('confirmAccountNumber.submit')}${TEXT_SPACING}`}
+              type={BtnTypes.PRIMARY}
+              testID="ConfirmAccountButton"
+            />
           </View>
           <Text onPress={this.toggleModal} style={styles.askHelpText}>
             {t('confirmAccountNumber.help', { displayName })}
           </Text>
         </KeyboardAwareScrollView>
-        <Button
-          onPress={this.onPressConfirm}
-          text={t('confirmAccount.button')}
-          type={BtnTypes.PRIMARY}
-          testID="ConfirmAccountButton"
-        />
         <KeyboardSpacer />
         <Modal isVisible={this.state.isModalVisible}>
           <View style={styles.modalContainer}>
@@ -232,6 +234,9 @@ const styles = StyleSheet.create({
   },
   h2: {
     ...fontStyles.h2,
+    paddingVertical: 16,
+  },
+  button: {
     paddingVertical: 16,
   },
   askHelpText: {

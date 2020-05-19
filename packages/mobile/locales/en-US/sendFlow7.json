@@ -95,7 +95,8 @@
     "bodyPartial": "Please ask {{displayName}} for the last four digits of their account number. It's safest to do this in person or by phone.",
     "body1Full": "Please ask {{displayName}} for their account number.",
     "body2Full": "For security, please do not use text messaging (SMS). We strongly recommend asking in person or over the phone, through WhatsApp or Messenger, or by email.",
-    "help": "Help locating an account number"
+    "help": "Help locating an account number",
+    "submit": "Submit"
   },
   "accountInputHeaderPartial": "Last 4 Digits",
   "accountInputHeaderFull": "Account Number",

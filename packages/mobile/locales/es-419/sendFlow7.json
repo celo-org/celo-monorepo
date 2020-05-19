@@ -95,7 +95,8 @@
     "bodyPartial": "Por favor solicita a {{displayName}} los últimos cuatro dígitos de su número de cuenta. Por razones de seguridad, preguntar en persona o por teléfono.",
     "body1Full": "Por favor solicita a {{displayName}} su número de cuenta",
     "body2Full": "Por razones de seguridad, por favor no utilices mensajes de texto (SMS). Se recomienda altamente preguntar en persona o por teléfono a través de WhastApp, Messenger o por correo electrónico",
-    "help": "Ayude a encontrar su número de cuenta"
+    "help": "Ayude a encontrar su número de cuenta",
+    "submit": "Enviar"
   },
   "accountInputHeaderPartial": "4 Últimos Dígitos",
   "accountInputHeaderFull": "Número de Cuenta",
