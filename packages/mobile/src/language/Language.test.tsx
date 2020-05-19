@@ -5,11 +5,23 @@ import * as renderer from 'react-test-renderer'
 import Language from 'src/language/Language'
 import { createMockStore } from 'test/utils'
 
+jest.mock('@react-navigation/native', () => {
+  const { mockNavigation } = require('test/values')
+  const { Screens } = require('src/navigator/Screens')
+  return {
+    useNavigation: () => mockNavigation,
+    useRoute: () => ({
+      name: Screens.Language,
+      key: '1',
+      params: {},
+    }),
+  }
+})
+
 it('renders correctly', () => {
-  const navigation: any = { getParam: jest.fn() }
   const tree = renderer.create(
     <Provider store={createMockStore()}>
-      <Language setLanguage={jest.fn()} navigation={navigation} />
+      <Language />
     </Provider>
   )
   expect(tree).toMatchSnapshot()

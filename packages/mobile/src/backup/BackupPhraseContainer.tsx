@@ -1,7 +1,7 @@
 import Touchable from '@celo/react-components/components/Touchable'
 import withTextInputPasteAware from '@celo/react-components/components/WithTextInputPasteAware'
-import colors from '@celo/react-components/styles/colors'
-import { fontStyles } from '@celo/react-components/styles/fonts'
+import colors from '@celo/react-components/styles/colors.v2'
+import fontStyles from '@celo/react-components/styles/fonts.v2'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { Clipboard, Platform, StyleSheet, Text, TextInput, View, ViewStyle } from 'react-native'
@@ -73,7 +73,9 @@ export class BackupPhraseContainer extends React.Component<Props> {
         <View style={styles.headerContainer}>
           <Text style={styles.headerText}>
             {type === BackupPhraseType.BACKUP_KEY
-              ? t('backupKey')
+              ? BackupPhraseContainerMode.INPUT
+                ? t('backupKey')
+                : t('writeDownKey')
               : t('socialBackupPhraseHeader', { index })}
           </Text>
           {showCopy && (
@@ -124,31 +126,27 @@ const styles = StyleSheet.create({
     paddingHorizontal: 2,
   },
   headerText: {
-    ...fontStyles.body,
-    ...fontStyles.semiBold,
+    ...fontStyles.regular500,
   },
   headerButton: {
-    ...fontStyles.headerButton,
-    fontSize: 16,
+    ...fontStyles.regular,
   },
   phraseContainer: {
-    marginTop: 10,
-    backgroundColor: colors.darkLightest,
+    marginTop: 16,
+    backgroundColor: colors.brownFaint,
     borderRadius: 4,
     alignContent: 'center',
     justifyContent: 'center',
-    padding: 14,
+    padding: 16,
   },
   phraseText: {
-    ...fontStyles.body,
-    lineHeight: 27,
-    color: colors.darkSecondary,
+    ...fontStyles.regular,
   },
   phraseInputContainer: {
     marginTop: 10,
   },
   phraseInputText: {
-    ...fontStyles.body,
+    ...fontStyles.regular,
     borderWidth: 1,
     borderColor: colors.inputBorder,
     borderRadius: 4,

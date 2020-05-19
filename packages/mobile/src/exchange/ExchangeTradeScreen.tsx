@@ -4,17 +4,16 @@ import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
 import { parseInputAmount } from '@celo/utils/src/parsing'
+import { StackScreenProps } from '@react-navigation/stack'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { Trans, WithTranslation } from 'react-i18next'
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import { getNumberFormatSettings } from 'react-native-localize'
 import SafeAreaView from 'react-native-safe-area-view'
-import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
 import { hideAlert, showError } from 'src/alert/actions'
 import { errorSelector } from 'src/alert/reducer'
-import componentWithAnalytics from 'src/analytics/wrapper'
 import { MoneyAmount } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
@@ -30,9 +29,9 @@ import {
   convertLocalAmountToDollars,
 } from 'src/localCurrency/convert'
 import { getLocalCurrencyCode, getLocalCurrencyExchangeRate } from 'src/localCurrency/selectors'
-import { exchangeHeader } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { StackParamList } from 'src/navigator/types'
 import { RootState } from 'src/redux/reducers'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { getRateForMakerToken, getTakerAmount } from 'src/utils/currencyExchange'
@@ -53,20 +52,15 @@ interface StateProps {
   localCurrencyExchangeRate: string | null | undefined
 }
 
-interface NavProps {
-  makerTokenDisplay: {
-    makerToken: CURRENCY_ENUM
-    makerTokenBalance: string
-  }
-}
-
 interface DispatchProps {
   fetchExchangeRate: typeof fetchExchangeRate
   showError: typeof showError
   hideAlert: typeof hideAlert
 }
 
-type Props = StateProps & DispatchProps & NavigationInjectedProps & WithTranslation
+type OwnProps = StackScreenProps<StackParamList, Screens.ExchangeTradeScreen>
+
+type Props = StateProps & DispatchProps & WithTranslation & OwnProps
 
 const mapStateToProps = (state: RootState): StateProps => ({
   exchangeRatePair: state.exchange.exchangeRatePair,
@@ -76,13 +70,6 @@ const mapStateToProps = (state: RootState): StateProps => ({
 })
 
 export class ExchangeTradeScreen extends React.Component<Props, State> {
-  static navigationOptions = ({ navigation }: NavigationInjectedProps<NavProps>) => {
-    const { makerToken } = navigation.getParam('makerTokenDisplay')
-    return {
-      ...exchangeHeader(makerToken),
-    }
-  }
-
   state: State = {
     inputToken: CURRENCY_ENUM.GOLD,
     makerToken: CURRENCY_ENUM.DOLLAR,
@@ -95,7 +82,7 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
   }
 
   getMakerTokenPropertiesFromNavProps = () => {
-    const { makerToken, makerTokenBalance } = this.props.navigation.getParam('makerTokenDisplay')
+    const { makerToken, makerTokenBalance } = this.props.route.params.makerTokenDisplay
 
     if (!makerToken) {
       throw new Error('Maker token missing from nav props')
@@ -109,7 +96,7 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
       makerToken,
       makerTokenAvailableBalance: makerTokenBalance,
     })
-    this.props.fetchExchangeRate(makerToken, makerTokenBalance)
+    this.props.fetchExchangeRate(makerToken, new BigNumber(makerTokenBalance))
   }
 
   onChangeExchangeAmount = (amount: string) => {
@@ -325,13 +312,11 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
   }
 }
 
-export default componentWithAnalytics(
-  connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
-    fetchExchangeRate,
-    showError,
-    hideAlert,
-  })(withTranslation(Namespaces.exchangeFlow9)(ExchangeTradeScreen))
-)
+export default connect<StateProps, DispatchProps, OwnProps, RootState>(mapStateToProps, {
+  fetchExchangeRate,
+  showError,
+  hideAlert,
+})(withTranslation(Namespaces.exchangeFlow9)(ExchangeTradeScreen))
 
 const styles = StyleSheet.create({
   container: {

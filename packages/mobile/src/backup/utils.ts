@@ -1,5 +1,6 @@
 import { generateMnemonic, MnemonicLanguages, MnemonicStrength } from '@celo/utils/src/account'
 import * as _ from 'lodash'
+import { useAsync } from 'react-async-hook'
 import * as bip39 from 'react-native-bip39'
 import { getKey } from 'src/utils/keyStore'
 import Logger from 'src/utils/Logger'
@@ -103,6 +104,11 @@ export async function getStoredMnemonic(): Promise<string | null> {
     Logger.error(TAG, 'Failed to retrieve mnemonic', error)
     return null
   }
+}
+
+export function useAccountKey() {
+  const asyncAccountKey = useAsync(getStoredMnemonic, [])
+  return asyncAccountKey.result
 }
 
 // Because of a RN bug, we can't fully clean the text as the user types

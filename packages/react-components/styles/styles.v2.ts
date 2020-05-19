@@ -1,8 +1,8 @@
 const BASE_UNIT = 8
 
-export enum Sizes {
-  SMALLEST = BASE_UNIT * 1.5,
-  SMALLER = BASE_UNIT,
-  REG = BASE_UNIT * 2,
-  THICK = BASE_UNIT * 3,
+export enum Spacing {
+  Smallest8 = BASE_UNIT,
+  Small12 = BASE_UNIT * 1.5,
+  Regular16 = BASE_UNIT * 2,
+  Thick24 = BASE_UNIT * 3,
 }

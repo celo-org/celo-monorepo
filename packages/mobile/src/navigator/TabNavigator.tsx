@@ -1,152 +1,133 @@
 import Touchable from '@celo/react-components/components/Touchable'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
+import { BottomTabBarButtonProps } from '@react-navigation/bottom-tabs/lib/typescript/src/types'
+import { useNavigation } from '@react-navigation/core'
 import * as React from 'react'
-import { WithTranslation } from 'react-i18next'
-import { StyleSheet, Text, View } from 'react-native'
-import { createBottomTabNavigator } from 'react-navigation-tabs'
-import { connect } from 'react-redux'
+import { useTranslation } from 'react-i18next'
+import { StyleSheet, View } from 'react-native'
+import { useSelector } from 'react-redux'
 import ExchangeHomeScreen from 'src/exchange/ExchangeHomeScreen'
 import WalletHome from 'src/home/WalletHome'
-import { Namespaces, withTranslation } from 'src/i18n'
+import { Namespaces } from 'src/i18n'
 import GoldTabIcon from 'src/icons/GoldTab'
 import PaymentsIcon from 'src/icons/PaymentsIcon'
 import WalletIcon from 'src/icons/Wallet'
-import { navigate } from 'src/navigator/NavigationService'
-import { Screens, Stacks } from 'src/navigator/Screens'
-import TabBar from 'src/navigator/TabBar'
-import { RootState } from 'src/redux/reducers'
-import { getTabBarActiveNotification } from 'src/redux/selectors'
-import Send from 'src/send/Send'
+import { Screens } from 'src/navigator/Screens'
+import { getTabBarActiveNotification, isBackupTooLate } from 'src/redux/selectors'
 
-interface LabelProps {
-  tintColor: string
+const TabNav = createBottomTabNavigator()
+
+function SendIcon() {
+  const tooLate = useSelector(isBackupTooLate)
+  const color = tooLate ? colors.inactive : colors.dark
+
+  return (
+    <View style={styles.alignPaymentIcon}>
+      <PaymentsIcon color={color} />
+    </View>
+  )
 }
 
-function TabBarButtonComponent(props: any) {
+const SmartWalletIcon = ({ color }: { color: string }) => {
+  const hasActiveNotifications = useSelector(getTabBarActiveNotification)
+
   return (
-    <Touchable {...props} borderless={true}>
-      <View {...props}>{props.children}</View>
+    <View style={styles.alignWallet}>
+      {hasActiveNotifications && <View style={styles.circle} />}
+      <WalletIcon color={color} />
+    </View>
+  )
+}
+
+function TabBarButtonComponent(props: BottomTabBarButtonProps & { isSend?: boolean }) {
+  const backupTooLate = useSelector(isBackupTooLate)
+  const navigation = useNavigation()
+  let { onPress } = props
+  if (props.isSend) {
+    onPress = () => {
+      navigation.dangerouslyGetParent()?.navigate(Screens.Send)
+    }
+  }
+
+  return (
+    <Touchable
+      // @ts-ignore
+      {...props}
+      // @ts-ignore
+      onPress={onPress}
+      borderless={true}
+      disabled={backupTooLate}
+    >
+      {props.children}
     </Touchable>
   )
 }
 
-interface StateProps {
-  hasActiveNotifications: boolean
-}
+const SendButton = (props: BottomTabBarButtonProps) => (
+  <TabBarButtonComponent {...props} isSend={true} />
+)
 
-type Props = StateProps & { tintColor: any }
-const mapStateToProps = (state: RootState): StateProps => ({
-  hasActiveNotifications: getTabBarActiveNotification(state),
-})
+export default function TabNavigator() {
+  const { t } = useTranslation(Namespaces.global)
+  const backupTooLate = useSelector(isBackupTooLate)
+  const inactiveTintColor = backupTooLate ? colors.inactive : colors.dark
 
-class WalletIconWithCircle extends React.Component<Props> {
-  render() {
-    return (
-      <View style={styles.alignWallet}>
-        {this.props.hasActiveNotifications && <View style={styles.circle} />}
-        <WalletIcon color={this.props.tintColor} />
-      </View>
-    )
-  }
-}
-
-interface LanguageProps {
-  language: string | null
-}
-
-const mapLanguageStateToProps = (state: RootState): LanguageProps => {
-  return {
-    language: state.app.language,
-  }
-}
-
-type MenuTextProps = WithTranslation & {
-  transKey: string
-  tintColor: string
-  testID: string
-} & LanguageProps
-
-const MenuText = connect<LanguageProps, {}, {}, RootState>(mapLanguageStateToProps)(
-  withTranslation(Namespaces.global)(
-    ({ transKey, tintColor, testID, t, language }: MenuTextProps) => {
-      return (
-        <Text style={[styles.label, { color: tintColor }]} testID={testID}>
-          {t(transKey)}
-        </Text>
-      )
-    }
+  return (
+    <TabNav.Navigator
+      initialRouteName={Screens.WalletHome}
+      screenOptions={{
+        tabBarButton: TabBarButtonComponent,
+      }}
+      tabBarOptions={{
+        activeTintColor: colors.celoGreen,
+        inactiveTintColor,
+        labelStyle: styles.label,
+        style: styles.tabBar,
+      }}
+    >
+      <TabNav.Screen
+        name={Screens.WalletHome}
+        component={WalletHome}
+        options={{
+          tabBarLabel: t('wallet'),
+          tabBarIcon: SmartWalletIcon,
+        }}
+      />
+      <TabNav.Screen
+        name={Screens.Send}
+        component={View}
+        options={{
+          tabBarLabel: () => null,
+          tabBarIcon: SendIcon,
+          tabBarButton: SendButton,
+        }}
+      />
+      <TabNav.Screen
+        name={Screens.ExchangeHomeScreen}
+        component={ExchangeHomeScreen}
+        options={{
+          tabBarLabel: t('gold'),
+          tabBarIcon: ({ color }) => <GoldTabIcon color={color} />,
+        }}
+      />
+    </TabNav.Navigator>
   )
-)
-
-const SmartWalletIcon = connect<StateProps, {}, {}, RootState>(mapStateToProps)(
-  WalletIconWithCircle
-)
-
-export const TabNavigator = createBottomTabNavigator(
-  {
-    [Screens.WalletHome]: {
-      screen: WalletHome,
-      navigationOptions: {
-        tabBarButtonComponent: TabBarButtonComponent,
-        tabBarIcon: (props: any) => <SmartWalletIcon {...props} />,
-        tabBarLabel: ({ tintColor }: LabelProps) => {
-          return <MenuText testID="WalletNavigator" transKey="wallet" tintColor={tintColor} />
-        },
-      },
-    },
-    [Screens.Send]: {
-      screen: Send,
-      navigationOptions: {
-        tabBarButtonComponent: TabBarButtonComponent,
-        tabBarIcon: (props: any) => (
-          <View style={styles.alignPaymentIcon}>
-            <PaymentsIcon color={props.tintColor} />
-          </View>
-        ),
-        tabBarLabel: () => null,
-        tabBarOnPress: () => {
-          navigate(Stacks.SendStack)
-        },
-        tabBarOnLongPress: () => {
-          navigate(Stacks.SendStack)
-        },
-      },
-    },
-    [Screens.ExchangeHomeScreen]: {
-      screen: ExchangeHomeScreen,
-      navigationOptions: {
-        tabBarButtonComponent: TabBarButtonComponent,
-        tabBarIcon: (props: any) => <GoldTabIcon color={props.tintColor} />,
-        tabBarLabel: ({ tintColor }: LabelProps) => {
-          return <MenuText testID="ExchangeNavigator" transKey="gold" tintColor={tintColor} />
-        },
-      },
-    },
-  },
-  {
-    navigationOptions: { header: null },
-    initialRouteName: Screens.WalletHome,
-    tabBarComponent: TabBar as any,
-    tabBarOptions: {
-      activeTintColor: colors.celoGreen,
-      inactiveTintColor: colors.dark,
-      style: {
-        height: 60,
-        paddingBottom: 5,
-        paddingTop: 10,
-        borderTopWidth: 1,
-        borderTopColor: 'rgba(0, 0, 0, 0.05)',
-      },
-    },
-  }
-)
+}
 
 const styles = StyleSheet.create({
   label: {
     alignSelf: 'center',
     fontSize: 13,
     ...fontStyles.semiBold,
+  },
+  tabBar: {
+    height: 60,
+    paddingBottom: 5,
+    paddingTop: 10,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(0, 0, 0, 0.05)',
   },
   circle: {
     position: 'absolute',
@@ -166,5 +147,3 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
 })
-
-export default TabNavigator
