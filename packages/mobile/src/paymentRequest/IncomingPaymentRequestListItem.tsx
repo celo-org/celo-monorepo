@@ -10,6 +10,7 @@ import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import { declinePaymentRequest } from 'src/firebase/actions'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces, withTranslation } from 'src/i18n'
+import { AddressValidationType } from 'src/identity/reducer'
 import { unknownUserIcon } from 'src/images/Images'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -23,10 +24,7 @@ interface OwnProps {
   comment: string
   id: string
   declinePaymentRequest: typeof declinePaymentRequest
-  validationDetails?: {
-    addressValidationRequired: boolean
-    fullValidationRequired: boolean
-  }
+  addressValidationType?: AddressValidationType
 }
 
 type Props = OwnProps & WithTranslation
@@ -35,7 +33,7 @@ const AVATAR_SIZE = 40
 
 export class IncomingPaymentRequestListItem extends React.Component<Props> {
   onPay = () => {
-    const { id, amount, comment: reason, requester: recipient, validationDetails } = this.props
+    const { id, amount, comment: reason, requester: recipient, addressValidationType } = this.props
 
     const transactionData: TransactionDataInput = {
       reason,
@@ -45,9 +43,8 @@ export class IncomingPaymentRequestListItem extends React.Component<Props> {
       firebasePendingRequestUid: id,
     }
 
-    if (validationDetails && validationDetails.addressValidationRequired) {
-      const { fullValidationRequired } = validationDetails
-      navigate(Screens.ValidateRecipientIntro, { transactionData, fullValidationRequired })
+    if (addressValidationType !== AddressValidationType.NONE) {
+      navigate(Screens.ValidateRecipientIntro, { transactionData, addressValidationType })
     } else {
       navigate(Screens.SendConfirmation, { transactionData })
     }

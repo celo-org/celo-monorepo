@@ -40,7 +40,8 @@ import { getFeeEstimateDollars } from 'src/fees/selectors'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import { fetchAddressesAndValidate } from 'src/identity/actions'
-import { RecipientVerificationStatus } from 'src/identity/reducer'
+import { AddressValidationType, RecipientVerificationStatus } from 'src/identity/reducer'
+import { checkIfAddressValidationRequired } from 'src/identity/secureSend'
 import { LocalCurrencyCode, LocalCurrencySymbol } from 'src/localCurrency/consts'
 import {
   convertDollarsToMaxSupportedPrecision,
@@ -50,9 +51,9 @@ import { getLocalCurrencyCode, getLocalCurrencyExchangeRate } from 'src/localCur
 import { HeaderTitleWithBalance, headerWithBackButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import { Recipient } from 'src/recipients/recipient'
+import { getRecipientVerificationStatus, Recipient } from 'src/recipients/recipient'
 import { RootState } from 'src/redux/reducers'
-import { checkIfAddressValidationRequired, getFeeType, getVerificationStatus } from 'src/send/utils'
+import { getFeeType } from 'src/send/utils'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { fetchDollarBalance } from 'src/stableToken/actions'
 import { withDecimalSeparator } from 'src/utils/withDecimalSeparator'
@@ -92,8 +93,7 @@ interface StateProps {
   localCurrencyExchangeRate: string | null | undefined
   recipient: Recipient
   recipientVerificationStatus: RecipientVerificationStatus
-  addressValidationRequired: boolean
-  fullValidationRequired: boolean
+  addressValidationType: AddressValidationType
 }
 
 interface DispatchProps {
@@ -107,13 +107,13 @@ interface DispatchProps {
 const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
   const { navigation } = ownProps
   const recipient = navigation.getParam('recipient')
-  const { secureSendPhoneNumberMapping } = state.send
-  const { addressValidationRequired, fullValidationRequired } = checkIfAddressValidationRequired(
+  const { secureSendPhoneNumberMapping } = state.identity
+  const addressValidationType: AddressValidationType = checkIfAddressValidationRequired(
     recipient,
     secureSendPhoneNumberMapping
   )
   const { e164NumberToAddress } = state.identity
-  const recipientVerificationStatus = getVerificationStatus(recipient, e164NumberToAddress)
+  const recipientVerificationStatus = getRecipientVerificationStatus(recipient, e164NumberToAddress)
   const feeType = getFeeType(recipientVerificationStatus)
 
   return {
@@ -125,8 +125,7 @@ const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
     localCurrencyExchangeRate: getLocalCurrencyExchangeRate(state),
     recipient,
     recipientVerificationStatus,
-    addressValidationRequired,
-    fullValidationRequired,
+    addressValidationType,
   }
 }
 
@@ -210,11 +209,7 @@ export class SendAmount extends React.Component<Props, State> {
   }
 
   onSend = () => {
-    const {
-      recipientVerificationStatus,
-      addressValidationRequired,
-      fullValidationRequired,
-    } = this.props
+    const { recipientVerificationStatus, addressValidationType } = this.props
 
     const { isDollarBalanceSufficient } = this.isAmountValid()
     if (!isDollarBalanceSufficient) {
@@ -234,10 +229,10 @@ export class SendAmount extends React.Component<Props, State> {
 
     this.props.hideAlert()
 
-    if (addressValidationRequired) {
+    if (addressValidationType !== AddressValidationType.FULL) {
       navigate(Screens.ValidateRecipientIntro, {
         transactionData,
-        fullValidationRequired,
+        addressValidationType,
       })
     } else {
       CeloAnalytics.track(CustomEventNames.send_continue)
@@ -246,13 +241,13 @@ export class SendAmount extends React.Component<Props, State> {
   }
 
   onRequest = () => {
-    const { addressValidationRequired, fullValidationRequired } = this.props
+    const { addressValidationType } = this.props
     const transactionData = this.getTransactionData(TokenTransactionType.PayRequest)
 
-    if (addressValidationRequired) {
+    if (addressValidationType !== AddressValidationType.FULL) {
       navigate(Screens.ValidateRecipientIntro, {
         transactionData,
-        fullValidationRequired,
+        addressValidationType,
         isPaymentRequest: true,
       })
     } else {

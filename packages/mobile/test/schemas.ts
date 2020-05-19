@@ -291,6 +291,15 @@ export const v0Schema = {
   },
 }
 
+const v1Schema = {
+  ...v0Schema,
+  identity: {
+    ...v0Schema.identity,
+    isValidRecipient: false,
+    secureSendPhoneNumberMapping: {},
+  },
+}
+
 export function getLatestSchema(): Partial<RootState> {
-  return v0Schema as Partial<RootState>
+  return v1Schema as Partial<RootState>
 }

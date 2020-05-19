@@ -15,19 +15,21 @@ import { USE_PHONE_NUMBER_PRIVACY } from 'src/config'
 import {
   endImportContacts,
   FetchAddressesAndValidateAction,
+  requireSecureSend,
   updateE164PhoneNumberAddresses,
 } from 'src/identity/actions'
 import { fetchPhoneHashPrivate, PhoneNumberHashDetails } from 'src/identity/privacy'
 import {
   AddressToE164NumberType,
+  AddressValidationType,
   e164NumberToAddressSelector,
   E164NumberToAddressType,
+  SecureSendPhoneNumberMapping,
+  secureSendPhoneNumberMappingSelector,
 } from 'src/identity/reducer'
+import { checkIfValidationRequired } from 'src/identity/secureSend'
 import { setRecipientCache } from 'src/recipients/actions'
 import { contactsToRecipients, NumberToRecipient } from 'src/recipients/recipient'
-import { secureSendRequired } from 'src/send/actions'
-import { secureSendPhoneNumberMappingSelector } from 'src/send/reducers'
-import { checkIfValidationRequired } from 'src/send/utils'
 import { getAllContacts } from 'src/utils/contacts'
 import Logger from 'src/utils/Logger'
 import { checkContactsPermission } from 'src/utils/permissions'
@@ -136,17 +138,16 @@ export function* fetchAddressesAndValidateSaga({ e164Number }: FetchAddressesAnd
 
     const userAddress = yield select(currentAccountSelector)
     const secureSendPhoneNumberMapping = yield select(secureSendPhoneNumberMappingSelector)
-    const { validationRequired, fullValidationRequired } = checkIfValidationRequired(
+    const addressValidationType = checkIfValidationRequired(
       oldAddresses,
       addresses,
       userAddress,
       secureSendPhoneNumberMapping,
-      e164Number,
-      TAG
+      e164Number
     )
 
-    if (validationRequired) {
-      yield put(secureSendRequired(e164Number, fullValidationRequired))
+    if (addressValidationType !== AddressValidationType.NONE) {
+      yield put(requireSecureSend(e164Number, addressValidationType))
     }
 
     yield put(
@@ -185,3 +186,45 @@ function* getAddresses(e164Number: string, attestationsWrapper: AttestationsWrap
 
 const isValidNon0Address = (address: string) =>
   typeof address === 'string' && isValidAddress(address) && !new BigNumber(address).isZero()
+
+// Only use with multiple addresses if user has
+// gone through SecureSend
+export const getAddressFromPhoneNumber = (
+  e164Number: string,
+  e164NumberToAddress: E164NumberToAddressType,
+  secureSendPhoneNumberMapping: SecureSendPhoneNumberMapping
+): string | null | undefined => {
+  try {
+    const addresses = e164NumberToAddress[e164Number]
+
+    // If address is null (unverified) or undefined (in the process
+    // of being updated) then just return that falsy value
+    if (!addresses) {
+      return addresses
+    }
+
+    // If there are multiple addresses, need to determine which to use
+    if (addresses.length > 1) {
+      // Check if the user has gone through Secure Send and validated a
+      // recipient address
+      const validatedAddress = secureSendPhoneNumberMapping[e164Number]
+        ? secureSendPhoneNumberMapping[e164Number].address
+        : undefined
+
+      // If they have not, they shouldn't have been able to
+      // get to this point
+      if (!validatedAddress) {
+        throw new Error(
+          'Multiple addresses but none were validated. Should have routed through Secure Send.'
+        )
+      }
+
+      return validatedAddress
+    }
+
+    // Normal case when there is only one address in the mapping
+    return addresses[0]
+  } catch (error) {
+    Logger.error(TAG, error.message)
+  }
+}

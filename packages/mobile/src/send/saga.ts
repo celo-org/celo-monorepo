@@ -1,6 +1,6 @@
 import { CURRENCY_ENUM } from '@celo/utils/src/currencies'
 import BigNumber from 'bignumber.js'
-import { call, put, select, spawn, take, takeLatest, takeLeading } from 'redux-saga/effects'
+import { call, put, select, spawn, take, takeLeading } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
@@ -9,8 +9,14 @@ import { calculateFee } from 'src/fees/saga'
 import { completePaymentRequest } from 'src/firebase/actions'
 import { features } from 'src/flags'
 import { transferGoldToken } from 'src/goldToken/actions'
+import {
+  ValidateRecipientAddressAction,
+  validateRecipientAddressFailure,
+  validateRecipientAddressSuccess,
+} from 'src/identity/actions'
 import { encryptComment } from 'src/identity/commentKey'
 import { addressToE164NumberSelector, e164NumberToAddressSelector } from 'src/identity/reducer'
+import { validateAndReturnMatch } from 'src/identity/secureSend'
 import { InviteBy } from 'src/invite/actions'
 import { sendInvite } from 'src/invite/saga'
 import { navigateHome } from 'src/navigator/NavigationService'
@@ -21,11 +27,7 @@ import {
   SendPaymentOrInviteAction,
   sendPaymentOrInviteFailure,
   sendPaymentOrInviteSuccess,
-  ValidateRecipientAddressAction,
-  validateRecipientAddressFailure,
-  validateRecipientAddressSuccess,
 } from 'src/send/actions'
-import { validateAndReturnMatch } from 'src/send/utils'
 import { transferStableToken } from 'src/stableToken/actions'
 import {
   BasicTokenTransfer,
@@ -189,7 +191,7 @@ function* sendPaymentOrInviteSaga({
 
 export function* validateRecipientAddressSaga({
   userInputOfFullAddressOrLastFourDigits,
-  fullAddressValidationRequired,
+  addressValidationType,
   recipient,
 }: ValidateRecipientAddressAction) {
   Logger.debug(TAG, 'Starting Recipient Address Validation')
@@ -212,12 +214,16 @@ export function* validateRecipientAddressSaga({
       userInputOfFullAddressOrLastFourDigits,
       possibleRecievingAddresses,
       userAddress,
-      fullAddressValidationRequired
+      addressValidationType
     )
     yield put(validateRecipientAddressSuccess(e164PhoneNumber, validatedAddress))
   } catch (error) {
     Logger.error(TAG, 'validateRecipientAddressSaga/Address validation error: ', error)
-    yield put(showError(error.message))
+    if (error.message in ErrorMessages) {
+      yield put(showError(error.message))
+    } else {
+      yield put(showError(ErrorMessages.ADDRESS_VALIDATION_ERROR))
+    }
     yield put(validateRecipientAddressFailure())
   }
 }
@@ -226,13 +232,8 @@ export function* watchSendPaymentOrInvite() {
   yield takeLeading(Actions.SEND_PAYMENT_OR_INVITE, sendPaymentOrInviteSaga)
 }
 
-export function* watchValidateRecipientAddress() {
-  yield takeLatest(Actions.VALIDATE_RECIPIENT_ADDRESS, validateRecipientAddressSaga)
-}
-
 export function* sendSaga() {
   yield spawn(watchQrCodeDetections)
   yield spawn(watchQrCodeShare)
   yield spawn(watchSendPaymentOrInvite)
-  yield spawn(watchValidateRecipientAddress)
 }

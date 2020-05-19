@@ -4,7 +4,7 @@ import { render, waitForElement } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
 import { getSendFee } from 'src/send/saga'
 import SendConfirmation from 'src/send/SendConfirmation'
-import { createMockNavigationProp, createMockStore } from 'test/utils'
+import { createMockNavigationPropDeprecated, createMockStore } from 'test/utils'
 import { mockAccount, mockRecipient } from 'test/values'
 
 const TEST_FEE = new BigNumber(10000000000000000)
@@ -29,7 +29,7 @@ describe('SendConfirmation', () => {
   })
 
   it('renders correctly for send payment confirmation', async () => {
-    const navigation = createMockNavigationProp({
+    const navigation = createMockNavigationPropDeprecated({
       recipient: mockRecipient,
       recipientAddress: mockAccount,
       amount: new BigNumber(10),
@@ -58,7 +58,7 @@ describe('SendConfirmation', () => {
   })
 
   it('renders correctly for send payment confirmation when fee calculation fails', async () => {
-    const navigation = createMockNavigationProp({
+    const navigation = createMockNavigationPropDeprecated({
       recipient: mockRecipient,
       recipientAddress: mockAccount,
       amount: new BigNumber(10),
@@ -87,7 +87,7 @@ describe('SendConfirmation', () => {
   })
 
   it('renders correctly for payment request confirmation', async () => {
-    const navigation = createMockNavigationProp({
+    const navigation = createMockNavigationPropDeprecated({
       recipient: mockRecipient,
       recipientAddress: mockAccount,
       amount: new BigNumber(10),
@@ -114,7 +114,7 @@ describe('SendConfirmation', () => {
   })
 
   it('renders correctly for payment request confirmation when fee calculation fails', async () => {
-    const navigation = createMockNavigationProp({
+    const navigation = createMockNavigationPropDeprecated({
       recipient: mockRecipient,
       recipientAddress: mockAccount,
       amount: new BigNumber(10),

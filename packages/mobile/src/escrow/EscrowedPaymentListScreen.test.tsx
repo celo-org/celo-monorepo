@@ -3,15 +3,15 @@ import * as React from 'react'
 import 'react-native'
 import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
-import { escrowPaymentDouble } from 'src/escrow/__mocks__'
 import { EscrowedPayment } from 'src/escrow/actions'
 import EscrowedPaymentListScreen from 'src/escrow/EscrowedPaymentListScreen'
-import { createMockNavigationProp, createMockStore } from 'test/utils'
+import { escrowPaymentDouble } from 'src/escrow/__mocks__'
+import { createMockNavigationPropDeprecated, createMockStore } from 'test/utils'
 import { mockAccount, mockRecipient } from 'test/values'
 
 const payments = [escrowPaymentDouble({}), escrowPaymentDouble({}), escrowPaymentDouble({})]
 
-const navigation = createMockNavigationProp({
+const navigation = createMockNavigationPropDeprecated({
   recipient: mockRecipient,
   recipientAddress: mockAccount,
   amount: new BigNumber(10),

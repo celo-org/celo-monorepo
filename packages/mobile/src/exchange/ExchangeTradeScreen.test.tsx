@@ -6,7 +6,7 @@ import { ExchangeTradeScreen } from 'src/exchange/ExchangeTradeScreen'
 import { ExchangeRatePair } from 'src/exchange/reducer'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { LocalCurrencyCode } from 'src/localCurrency/consts'
-import { createMockNavigationProp, createMockStore, getMockI18nProps } from 'test/utils'
+import { createMockNavigationPropDeprecated, createMockStore, getMockI18nProps } from 'test/utils'
 
 const exchangeRatePair: ExchangeRatePair = { goldMaker: '0.11', dollarMaker: '10' }
 
@@ -22,7 +22,7 @@ describe(ExchangeTradeScreen, () => {
   })
 
   it('renders correctly', () => {
-    const navigation = createMockNavigationProp({
+    const navigation = createMockNavigationPropDeprecated({
       makerToken: CURRENCY_ENUM.GOLD,
       makerTokenBalance: '20',
     })
@@ -47,7 +47,7 @@ describe(ExchangeTradeScreen, () => {
   it('validates the amount when selling gold', () => {
     const mockShowError = jest.fn()
     const mockhideAlert = jest.fn()
-    const navigation = createMockNavigationProp({
+    const navigation = createMockNavigationPropDeprecated({
       makerToken: CURRENCY_ENUM.GOLD,
       makerTokenBalance: '20',
     })
@@ -85,7 +85,7 @@ describe(ExchangeTradeScreen, () => {
   it('validates the amount when selling dollars', () => {
     const mockShowError = jest.fn()
     const mockhideAlert = jest.fn()
-    const navigation = createMockNavigationProp({
+    const navigation = createMockNavigationPropDeprecated({
       makerToken: CURRENCY_ENUM.DOLLAR,
       makerTokenBalance: '20.02', // equals 400.4 MXN
     })
@@ -121,7 +121,7 @@ describe(ExchangeTradeScreen, () => {
   })
 
   it('checks the minimum amount when selling gold', () => {
-    const navigation = createMockNavigationProp({
+    const navigation = createMockNavigationPropDeprecated({
       makerToken: CURRENCY_ENUM.GOLD,
       makerTokenBalance: '20',
     })
@@ -155,7 +155,7 @@ describe(ExchangeTradeScreen, () => {
   })
 
   it('checks the minimum amount when selling dollars', () => {
-    const navigation = createMockNavigationProp({
+    const navigation = createMockNavigationPropDeprecated({
       makerToken: CURRENCY_ENUM.DOLLAR,
       makerTokenBalance: '200',
     })

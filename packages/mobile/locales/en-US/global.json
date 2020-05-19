@@ -119,6 +119,7 @@
   "addressLookupFailure": "Failed to look up phone number address",
   "saltFetchFailure": "Failed to retrieve phone number secret",
   "saltQuotaExceededError": "Your phone number lookup quota is used up",
+  "addressValidationError": "The account information entered was not valid",
   "addressValidationNoMatch": "The account information entered does not match any associated with your contact",
   "addressValidationFullPoorlyFormatted": "Account numbers begin with \"0x\", contain only numbers and letters, and are 42 characters long. Press the link below for help",
   "addressValidationPartialPoorlyFormatted": "Account numbers only contain numbers and letters, please provide the last 4 digits. Press the link below for help",

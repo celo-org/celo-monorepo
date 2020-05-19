@@ -11,6 +11,7 @@ import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
 import componentWithAnalytics from 'src/analytics/wrapper'
 import { Namespaces, withTranslation } from 'src/i18n'
+import { AddressValidationType } from 'src/identity/reducer'
 import { unknownUserIcon } from 'src/images/Images'
 import { headerWithBackButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
@@ -31,7 +32,7 @@ interface OwnProps {
 interface StateProps {
   recipient: Recipient
   transactionData: TransactionDataInput
-  fullValidationRequired: boolean
+  addressValidationType: AddressValidationType
   displayName: string
   displayNameCapitalized: string
   isPaymentRequest: true | undefined
@@ -42,14 +43,14 @@ type Props = WithTranslation & StateProps & OwnProps
 const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
   const { navigation } = ownProps
   const transactionData = navigation.getParam('transactionData')
-  const fullValidationRequired = navigation.getParam('fullValidationRequired')
+  const addressValidationType = navigation.getParam('addressValidationType')
   const isPaymentRequest = navigation.getParam('isPaymentRequest')
   const { recipient } = transactionData
   const { displayName, displayNameCapitalized } = formatDisplayName(recipient.displayName)
   return {
     recipient,
     transactionData,
-    fullValidationRequired,
+    addressValidationType,
     displayName,
     displayNameCapitalized,
     isPaymentRequest,
@@ -69,11 +70,11 @@ class ValidateRecipientIntro extends React.Component<Props> {
   }
 
   onPressConfirmAccount = () => {
-    const { fullValidationRequired, transactionData, isPaymentRequest } = this.props
+    const { addressValidationType, transactionData, isPaymentRequest } = this.props
 
     navigate(Screens.ValidateRecipientAccount, {
       transactionData,
-      fullValidationRequired,
+      addressValidationType,
       isPaymentRequest,
     })
   }

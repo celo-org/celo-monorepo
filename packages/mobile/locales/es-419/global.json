@@ -119,6 +119,7 @@
   "addressLookupFailure": "Error al buscar la dirección del número de teléfono",
   "saltFetchFailure": "Error al recuperar el secreto del número de teléfono",
   "saltQuotaExceededError": "Su cuota de búsqueda de número de teléfono está agotada",
+  "addressValidationError": "La información de cuenta ingresada no coincide con ninguna cuenta asociada a tu contacto",
   "addressValidationNoMatch": "La información de cuenta ingresada no coincide con ninguna cuenta asociada a tu contacto",
   "addressValidationFullPoorlyFormatted": "Los números de cuenta comienzan con 0x, contienen solo números y letras y tienen 42 caracteres. Haz click en el siguiente enlace para obtener ayuda",
   "addressValidationPartialPoorlyFormatted": "Los números de cuenta solo contienen números y letras, ingresa los últimos 4 dígitos. Haz click en el siguiente enlace para obtener ayuda",

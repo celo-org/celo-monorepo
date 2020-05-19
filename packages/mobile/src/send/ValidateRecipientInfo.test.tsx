@@ -4,10 +4,10 @@ import { Provider } from 'react-redux'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import ValidateRecipientIntro from 'src/send/ValidateRecipientIntro'
-import { createMockNavigationProp2, createMockStore } from 'test/utils'
+import { createMockNavigationProp, createMockStore } from 'test/utils'
 import { mockTransactionData } from 'test/values'
 
-const navigation = createMockNavigationProp2({
+const navigation = createMockNavigationProp({
   transactionData: mockTransactionData,
   fullValidationRequired: true,
   isPaymentRequest: false,

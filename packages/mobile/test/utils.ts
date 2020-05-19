@@ -72,7 +72,9 @@ function createSendMethod(): SendMethod {
   }))
 }
 
-export function createMockNavigationProp(params: any): NavigationScreenProp<any> {
+// The getParam method on this function returns the whole paramter
+// object instead of the specific property
+export function createMockNavigationPropDeprecated(params: any): NavigationScreenProp<any> {
   return {
     ...mockNavigation,
     state: {
@@ -83,7 +85,7 @@ export function createMockNavigationProp(params: any): NavigationScreenProp<any>
   }
 }
 
-export function createMockNavigationProp2(params: any): NavigationScreenProp<any> {
+export function createMockNavigationProp(params: any): NavigationScreenProp<any> {
   return {
     ...mockNavigation,
     state: {

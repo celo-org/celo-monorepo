@@ -15,12 +15,13 @@ import { componentWithAnalytics } from 'src/analytics/wrapper'
 import CodeRow, { CodeRowStatus } from 'src/components/CodeRow'
 import { SingleDigitInput } from 'src/components/SingleDigitInput'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
+import { validateRecipientAddress } from 'src/identity/actions'
+import { AddressValidationType } from 'src/identity/reducer'
 import { headerWithBackButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { Recipient } from 'src/recipients/recipient'
 import { RootState } from 'src/redux/reducers'
-import { validateRecipientAddress } from 'src/send/actions'
 import { TransactionDataInput } from 'src/send/SendAmount'
 
 const FULL_ADDRESS_PLACEHOLDER = '0xf1b1d5a6e7728g309c4a025k122d71ad75a61976'
@@ -35,7 +36,7 @@ interface OwnProps {
 interface StateProps {
   recipient: Recipient
   transactionData: TransactionDataInput
-  fullValidationRequired: boolean
+  addressValidationType: AddressValidationType
   isValidRecipient: boolean
   isPaymentRequest: true | undefined
 }
@@ -57,14 +58,13 @@ const mapDispatchToProps = {
 const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
   const { navigation } = ownProps
   const transactionData = navigation.getParam('transactionData')
-  const isPaymentRequest = navigation.getParam('isPaymentRequest')
   const { recipient } = transactionData
   return {
     recipient,
     transactionData,
-    fullValidationRequired: navigation.getParam('fullValidationRequired'),
-    isValidRecipient: state.send.isValidRecipient,
-    isPaymentRequest,
+    isValidRecipient: state.identity.isValidRecipient,
+    isPaymentRequest: navigation.getParam('isPaymentRequest'),
+    addressValidationType: navigation.getParam('addressValidationType'),
   }
 }
 
@@ -95,9 +95,12 @@ export class ValidateRecipientAccount extends React.Component<Props, State> {
 
   onPressConfirm = () => {
     const { inputValue, singleDigitInputValueArr } = this.state
-    const { recipient, fullValidationRequired } = this.props
-    const inputToValidate = fullValidationRequired ? inputValue : singleDigitInputValueArr.join('')
-    this.props.validateRecipientAddress(inputToValidate, fullValidationRequired, recipient)
+    const { recipient, addressValidationType } = this.props
+    const inputToValidate =
+      addressValidationType === AddressValidationType.FULL
+        ? inputValue
+        : singleDigitInputValueArr.join('')
+    this.props.validateRecipientAddress(inputToValidate, addressValidationType, recipient)
   }
 
   onInputChange = (value: string) => {
@@ -117,11 +120,11 @@ export class ValidateRecipientAccount extends React.Component<Props, State> {
   shouldShowClipboard = () => false
 
   renderInstructionsAndInputField = () => {
-    const { t, recipient, fullValidationRequired } = this.props
+    const { t, recipient, addressValidationType } = this.props
     const { inputValue, singleDigitInputValueArr } = this.state
     const { displayName } = recipient
 
-    if (fullValidationRequired) {
+    if (addressValidationType === AddressValidationType.FULL) {
       return (
         <View>
           <Text style={styles.body}>
