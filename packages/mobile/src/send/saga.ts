@@ -7,9 +7,8 @@ import { CustomEventNames } from 'src/analytics/constants'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { calculateFee } from 'src/fees/saga'
 import { completePaymentRequest } from 'src/firebase/actions'
-import { features } from 'src/flags'
 import { transferGoldToken } from 'src/goldToken/actions'
-import { encryptComment } from 'src/identity/commentKey'
+import { encryptComment } from 'src/identity/commentEncryption'
 import { addressToE164NumberSelector } from 'src/identity/reducer'
 import { InviteBy } from 'src/invite/actions'
 import { sendInvite } from 'src/invite/saga'
@@ -142,10 +141,7 @@ function* sendPaymentOrInviteSaga({
 
     const ownAddress: string = yield select(currentAccountSelector)
     if (recipientAddress) {
-      const comment = features.USE_COMMENT_ENCRYPTION
-        ? yield call(encryptComment, reason, recipientAddress, ownAddress)
-        : reason
-
+      const comment = yield call(encryptComment, reason, recipientAddress, ownAddress)
       yield call(sendPayment, recipientAddress, amount, comment, CURRENCY_ENUM.DOLLAR)
       CeloAnalytics.track(CustomEventNames.send_dollar_transaction)
     } else if (recipient.e164PhoneNumber) {

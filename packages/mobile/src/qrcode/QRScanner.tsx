@@ -17,7 +17,7 @@ import { headerWithBackButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import NotAuthorizedView from 'src/qrcode/NotAuthorizedView'
-import { handleBarcodeDetected } from 'src/send/actions'
+import { handleBarcodeDetected, QrCode } from 'src/send/actions'
 import Logger from 'src/utils/Logger'
 
 interface DispatchProps {
@@ -40,10 +40,13 @@ class QRScanner extends React.Component<Props> {
 
   // This method would be called multiple times with the same
   // QR code, so we need to catch only the first one
-  onBarCodeDetected = (rawData: any) => {
-    Logger.debug('QRScanner', 'Bar code detected')
-    this.props.handleBarcodeDetected(rawData)
-  }
+  onBarCodeDetected = memoize(
+    (qrCode: QrCode) => {
+      Logger.debug('QRScanner', 'Bar code detected')
+      this.props.handleBarcodeDetected(qrCode)
+    },
+    (qrCode) => qrCode.data
+  )
 
   onPressShowYourCode = () => {
     navigate(Screens.QRCode)
@@ -61,7 +64,7 @@ class QRScanner extends React.Component<Props> {
               }}
               style={styles.preview}
               type={RNCamera.Constants.Type.back}
-              onBarCodeRead={memoize(this.onBarCodeDetected, (qr) => qr.data)}
+              onBarCodeRead={this.onBarCodeDetected}
               barCodeTypes={[RNCamera.Constants.BarCodeType.qr]}
               flashMode={RNCamera.Constants.FlashMode.auto}
               captureAudio={false}

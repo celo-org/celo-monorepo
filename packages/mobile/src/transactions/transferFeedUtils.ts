@@ -1,24 +1,21 @@
-import { decryptComment as decryptCommentRaw } from '@celo/utils/src/commentEncryption'
 import { TFunction } from 'i18next'
 import * as _ from 'lodash'
 import { TokenTransactionType } from 'src/apollo/types'
 import { DEFAULT_TESTNET } from 'src/config'
-import { features } from 'src/flags'
+import { decryptComment } from 'src/identity/commentEncryption'
 import { AddressToE164NumberType } from 'src/identity/reducer'
 import { getRecipientFromAddress, NumberToRecipient } from 'src/recipients/recipient'
 
-export function decryptComment(
-  comment: string | null | undefined,
-  commentKey: Buffer | null,
+export function getDecryptedTransferFeedComment(
+  comment: string | null,
+  commentKey: string | null,
   type: TokenTransactionType
 ) {
-  return comment && commentKey && features.USE_COMMENT_ENCRYPTION
-    ? decryptCommentRaw(
-        comment,
-        commentKey,
-        type === TokenTransactionType.Sent || type === TokenTransactionType.EscrowSent
-      ).comment
-    : comment
+  return decryptComment(
+    comment,
+    commentKey,
+    type === TokenTransactionType.Sent || type === TokenTransactionType.EscrowSent
+  )
 }
 
 export function getTransferFeedParams(
@@ -28,9 +25,9 @@ export function getTransferFeedParams(
   address: string,
   addressToE164Number: AddressToE164NumberType,
   comment: string | null,
-  commentKey: Buffer | null
+  commentKey: string | null
 ) {
-  let info = decryptComment(comment, commentKey, type)
+  let info = getDecryptedTransferFeedComment(comment, commentKey, type)
   let title, recipient
 
   switch (type) {

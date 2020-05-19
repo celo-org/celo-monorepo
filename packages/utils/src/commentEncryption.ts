@@ -1,6 +1,6 @@
 import { randomBytes } from 'crypto'
 import { ec as EC } from 'elliptic'
-import { memoize } from 'lodash'
+import { ensureLeading0x } from './address'
 import {
   AES128DecryptAndHMAC,
   AES128EncryptAndHMAC,
@@ -11,10 +11,11 @@ const hkdf = require('futoin-hkdf')
 const ec = new EC('secp256k1')
 
 const ECIES_SESSION_KEY_LEN = 129
+const MIN_COMMENT_KEY_LENGTH = 33
 const TAG = 'CommentEncryption'
 
 export interface EncryptionStatus {
-  encrypted: boolean
+  success: boolean
   comment: string
 }
 
@@ -74,17 +75,23 @@ export function encryptComment(
   pubKeySelf: Buffer
 ): EncryptionStatus {
   try {
+    if (
+      pubKeyRecipient.length < MIN_COMMENT_KEY_LENGTH ||
+      pubKeySelf.length < MIN_COMMENT_KEY_LENGTH
+    ) {
+      throw new Error('Comment key too short')
+    }
     // Uncompress public keys & strip out the leading 0x04
     const pubRecip = decompressPublicKey(pubKeyRecipient)
     const pubSelf = decompressPublicKey(pubKeySelf)
     const data = encryptData(Buffer.from(comment, 'ucs2'), pubRecip, pubSelf).toString('base64')
     return {
-      encrypted: true,
+      success: true,
       comment: data,
     }
   } catch (e) {
     console.info(`${TAG}/Error encrypting comment: ${e}`)
-    return { encrypted: false, comment }
+    return { success: false, comment }
   }
 }
 
@@ -97,19 +104,16 @@ export function encryptComment(
  * @param {boolean} sender If the decryptor is the sender of the message.
  * @returns {string} Decrypted comment if can decrypt, otherwise comment.
  */
-
-export const decryptComment = memoize(
-  (comment: string, key: Buffer, sender: boolean): EncryptionStatus => {
-    try {
-      const buf = Buffer.from(comment, 'base64')
-      const data = decryptData(buf, key, sender).toString('ucs2')
-      return { encrypted: true, comment: data }
-    } catch (error) {
-      console.info(`${TAG}/Could not decrypt: ${error.message}`)
-      return { encrypted: false, comment }
-    }
+export function decryptComment(comment: string, key: Buffer, sender: boolean): EncryptionStatus {
+  try {
+    const buf = Buffer.from(comment, 'base64')
+    const data = decryptData(buf, key, sender).toString('ucs2')
+    return { success: true, comment: data }
+  } catch (error) {
+    console.info(`${TAG}/Could not decrypt: ${error.message}`)
+    return { success: false, comment }
   }
-)
+}
 
 /**
  * Turns a private key to a compressed public key (hex string with hex leader).
@@ -119,7 +123,7 @@ export const decryptComment = memoize(
  */
 export function compressedPubKey(privateKey: Buffer): string {
   const key = ec.keyFromPrivate(privateKey)
-  return '0x' + key.getPublic(true, 'hex')
+  return ensureLeading0x(key.getPublic(true, 'hex'))
 }
 
 /**

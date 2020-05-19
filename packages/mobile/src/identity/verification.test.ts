@@ -21,8 +21,8 @@ import {
   doVerificationFlow,
   requestAndRetrieveAttestations,
   startVerification,
-  VERIFICATION_TIMEOUT,
   VerificationStatus,
+  VERIFICATION_TIMEOUT,
 } from 'src/identity/verification'
 import { getContractKitOutsideGenerator } from 'src/web3/contracts'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
@@ -192,7 +192,7 @@ describe('Do Verification Saga', () => {
           call(fetchPhoneHashPrivate, mockE164Number),
           { phoneHash: mockE164NumberHash, e164Number: mockE164Number },
         ],
-        [select(privateCommentKeySelector), mockPrivateDEK.toString('hex')],
+        [select(privateCommentKeySelector), mockPrivateDEK],
         [
           call([contractKit.contracts, contractKit.contracts.getAttestations]),
           mockAttestationsWrapperUnverified,
@@ -229,7 +229,7 @@ describe('Do Verification Saga', () => {
           call(fetchPhoneHashPrivate, mockE164Number),
           { phoneHash: mockE164NumberHash, e164Number: mockE164Number },
         ],
-        [select(privateCommentKeySelector), mockPrivateDEK.toString('hex')],
+        [select(privateCommentKeySelector), mockPrivateDEK],
         [select(attestationCodesSelector), attestationCodes],
       ])
       .put(completeAttestationCode())
@@ -249,7 +249,7 @@ describe('Do Verification Saga', () => {
           call(fetchPhoneHashPrivate, mockE164Number),
           { phoneHash: mockE164NumberHash, e164Number: mockE164Number },
         ],
-        [select(privateCommentKeySelector), mockPrivateDEK.toString('hex')],
+        [select(privateCommentKeySelector), mockPrivateDEK],
         [
           call([contractKit.contracts, contractKit.contracts.getAttestations]),
           mockAttestationsWrapperVerified,
@@ -271,7 +271,7 @@ describe('Do Verification Saga', () => {
           call(fetchPhoneHashPrivate, mockE164Number),
           { phoneHash: mockE164NumberHash, e164Number: mockE164Number },
         ],
-        [select(privateCommentKeySelector), mockPrivateDEK.toString('hex')],
+        [select(privateCommentKeySelector), mockPrivateDEK],
         [
           call([contractKit.contracts, contractKit.contracts.getAttestations]),
           mockAttestationsWrapperUnverified,
@@ -301,7 +301,7 @@ describe('Do Verification Saga', () => {
           call(fetchPhoneHashPrivate, mockE164Number),
           { phoneHash: mockE164NumberHash, e164Number: mockE164Number },
         ],
-        [select(privateCommentKeySelector), mockPrivateDEK.toString('hex')],
+        [select(privateCommentKeySelector), mockPrivateDEK],
         [
           call([contractKit.contracts, contractKit.contracts.getAttestations]),
           mockAttestationsWrapperRevealFailure,

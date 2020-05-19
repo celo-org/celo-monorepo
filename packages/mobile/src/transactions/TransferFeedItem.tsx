@@ -15,7 +15,10 @@ import { getRecipientFromAddress, NumberToRecipient } from 'src/recipients/recip
 import { navigateToPaymentTransferReview } from 'src/transactions/actions'
 import { TransactionStatus } from 'src/transactions/reducer'
 import TransferFeedIcon from 'src/transactions/TransferFeedIcon'
-import { decryptComment, getTransferFeedParams } from 'src/transactions/transferFeedUtils'
+import {
+  getDecryptedTransferFeedComment,
+  getTransferFeedParams,
+} from 'src/transactions/transferFeedUtils'
 import { formatFeedTime, getDatetimeDisplayString } from 'src/utils/time'
 
 type Props = TransferItemFragment & {
@@ -23,7 +26,7 @@ type Props = TransferItemFragment & {
   status: TransactionStatus
   addressToE164Number: AddressToE164NumberType
   recipientCache: NumberToRecipient
-  commentKey: Buffer | null
+  commentKey: string | null
 }
 
 function navigateToTransactionReview({
@@ -45,7 +48,7 @@ function navigateToTransactionReview({
 
   navigateToPaymentTransferReview(type, timestamp, {
     address,
-    comment: decryptComment(comment, commentKey, type),
+    comment: getDecryptedTransferFeedComment(comment, commentKey, type),
     amount,
     recipient,
     type,

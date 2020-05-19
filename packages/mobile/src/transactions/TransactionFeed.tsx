@@ -24,7 +24,7 @@ export enum FeedType {
 }
 
 interface StateProps {
-  commentKey: string | null | undefined
+  commentKey: string | null
   addressToE164Number: AddressToE164NumberType
   recipientCache: NumberToRecipient
 }
@@ -59,12 +59,7 @@ export class TransactionFeed extends React.PureComponent<Props> {
     `,
   }
 
-  renderItem = (commentKeyBuffer: Buffer | null) => ({
-    item: tx,
-  }: {
-    item: FeedItem
-    index: number
-  }) => {
+  renderItem = (commentKey: string | null) => ({ item: tx }: { item: FeedItem; index: number }) => {
     const { addressToE164Number, recipientCache } = this.props
 
     switch (tx.__typename) {
@@ -73,7 +68,7 @@ export class TransactionFeed extends React.PureComponent<Props> {
           <TransferFeedItem
             addressToE164Number={addressToE164Number}
             recipientCache={recipientCache}
-            commentKey={commentKeyBuffer}
+            commentKey={commentKey}
             {...tx}
           />
         )
@@ -96,15 +91,13 @@ export class TransactionFeed extends React.PureComponent<Props> {
       return <NoActivity kind={kind} loading={loading} error={error} />
     }
 
-    const commentKeyBuffer = commentKey ? Buffer.from(commentKey, 'hex') : null
-
     if (data && data.length > 0) {
       return (
         <FlatList
           data={data}
           keyExtractor={this.keyExtractor}
           ItemSeparatorComponent={ItemSeparator}
-          renderItem={this.renderItem(commentKeyBuffer)}
+          renderItem={this.renderItem(commentKey)}
         />
       )
     } else {

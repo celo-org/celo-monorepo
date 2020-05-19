@@ -5,7 +5,7 @@ import {
   AttestationsWrapper,
   UnselectedRequest,
 } from '@celo/contractkit/lib/wrappers/Attestations'
-import { eqAddress } from '@celo/utils/src/address'
+import { eqAddress, hexToBuffer } from '@celo/utils/src/address'
 import { retryAsync } from '@celo/utils/src/async'
 import { extractAttestationCodeFromMessage } from '@celo/utils/src/attestations'
 import { compressedPubKey } from '@celo/utils/src/commentEncryption'
@@ -119,7 +119,7 @@ export function* doVerificationFlow() {
       }
     }
     const privDataKey = yield select(privateCommentKeySelector)
-    const dataKey = compressedPubKey(Buffer.from(privDataKey, 'hex'))
+    const dataKey = compressedPubKey(hexToBuffer(privDataKey))
 
     const contractKit = yield call(getContractKit)
 
