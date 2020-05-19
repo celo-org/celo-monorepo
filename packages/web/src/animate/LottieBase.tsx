@@ -6,7 +6,7 @@ interface Props {
   loop: boolean
   autoPlay: boolean
   onReady?: () => void
-  onLooped?: () => void
+  onLooped?: (data: any) => void
 }
 
 export default class LottieBase extends React.Component<Props> {
@@ -27,11 +27,14 @@ export default class LottieBase extends React.Component<Props> {
       },
     })
     if (this.props.onReady) {
-      this.animation.addEventListener('data_ready', this.props.onReady)
+      this.animation.addEventListener('DOMLoaded', this.props.onReady)
     }
     if (this.props.onLooped) {
-      this.animation.addEventListener('loopComplete', this.props.onLooped)
+      this.animation.addEventListener('loopComplete', this.onLoop)
     }
+  }
+  onLoop = (data) => {
+    this.props.onLooped(data)
   }
 
   componentWillUnmount = () => {

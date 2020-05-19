@@ -13,6 +13,7 @@ import { fonts, standardStyles } from 'src/styles'
 
 export default function HomeCover() {
   const [currentWordIndex, setWord] = React.useState(0)
+  const [isReady, setReady] = React.useState(false)
 
   const changeWord = React.useCallback(() => {
     if (currentWordIndex !== WORDS.length - 1) {
@@ -21,6 +22,8 @@ export default function HomeCover() {
       setWord(0)
     }
   }, [currentWordIndex])
+
+  const onReady = React.useCallback(() => setReady(true), [])
 
   const { t } = useTranslation(NameSpaces.home)
   const { isMobile, screen, isDesktop } = useScreenSize()
@@ -37,11 +40,11 @@ export default function HomeCover() {
       >
         <View style={[styles.animationHolder, getplacement(screen)]}>
           <AspectRatio ratio={970 / 270}>
-            <ChangeStory onReady={changeWord} onLooped={changeWord} />
+            <ChangeStory onReady={onReady} onLooped={changeWord} />
           </AspectRatio>
         </View>
         <View style={[styles.contentHolder, standardStyles.blockMarginTablet]}>
-          <TextAnimation currentWord={currentWordIndex} />
+          <TextAnimation currentWord={currentWordIndex} isAnimating={isReady} />
           <H4 style={styles.coverText}>{t('coverText')}</H4>
           <Text style={[fonts.h6, styles.coverJoinList]}>{t('coverJoinList')}</Text>
           <EmailForm submitText={'Submit'} route={'/contacts'} isDarkMode={false} />

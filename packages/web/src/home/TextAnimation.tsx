@@ -22,28 +22,29 @@ const FADE_OUT_STOP = 1
 
 interface Props {
   currentWord: number
+  isAnimating: boolean
 }
 
-class TextAnimation extends React.PureComponent<Props> {
-  render() {
-    return (
-      <View>
-        <H2 ariaLevel={'2'} accessibilityRole={'heading'} style={[fonts.h2, styles.letsMake]}>
-          A new story in
+export default React.memo(function TextAnimation({ currentWord, isAnimating }: Props) {
+  return (
+    <View>
+      <H2 ariaLevel={'2'} accessibilityRole={'heading'} style={[fonts.h2, styles.letsMake]}>
+        A new story in
+      </H2>
+      <View style={styles.textContainer}>
+        {isAnimating && (
+          <>
+            <View style={[styles.mask, styles.fadeOut]} key={`${currentWord}-mask1`} />
+            <View style={[styles.mask2, styles.slideIn]} key={`${currentWord}-mask2`} />
+          </>
+        )}
+        <H2 ariaLevel={'2'} accessibilityRole={'heading'} style={[fonts.h2, textStyles.medium]}>
+          {WORDS[currentWord]}
         </H2>
-        <View style={styles.textContainer}>
-          <View style={[styles.mask, styles.fadeOut]} key={`${this.props.currentWord}-mask1`} />
-          <View style={[styles.mask2, styles.slideIn]} key={`${this.props.currentWord}-mask2`} />
-          <H2 ariaLevel={'2'} accessibilityRole={'heading'} style={[fonts.h2, textStyles.medium]}>
-            {WORDS[this.props.currentWord]}
-          </H2>
-        </View>
       </View>
-    )
-  }
-}
-
-export default TextAnimation
+    </View>
+  )
+})
 
 const styles = StyleSheet.create({
   textContainer: {
