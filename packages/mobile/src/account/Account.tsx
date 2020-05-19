@@ -2,6 +2,7 @@ import Link from '@celo/react-components/components/Link'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import { isE164Number } from '@celo/utils/src/phoneNumbers'
+import { StackScreenProps } from '@react-navigation/stack'
 import * as Sentry from '@sentry/react-native'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
@@ -22,8 +23,9 @@ import { features } from 'src/flags'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { revokeVerification } from 'src/identity/actions'
 import { headerWithBackButton } from 'src/navigator/Headers'
-import { navigate, navigateProtected } from 'src/navigator/NavigationService'
+import { navigateProtected } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { StackParamList } from 'src/navigator/types'
 import { RootState } from 'src/redux/reducers'
 import { navigateToURI, navigateToVerifierApp } from 'src/utils/linking'
 import Logger from 'src/utils/Logger'
@@ -47,7 +49,9 @@ interface StateProps {
   backupCompleted: boolean
 }
 
-type Props = StateProps & DispatchProps & WithTranslation
+type OwnProps = StackScreenProps<StackParamList, Screens.Account>
+
+type Props = StateProps & DispatchProps & WithTranslation & OwnProps
 
 interface State {
   version: string
@@ -87,51 +91,51 @@ export class Account extends React.Component<Props, State> {
 
   goToProfile = () => {
     CeloAnalytics.track(CustomEventNames.edit_profile)
-    navigate(Screens.Profile)
+    this.props.navigation.navigate(Screens.Profile)
   }
 
   goToBackupScreen = () => {
     if (this.props.backupCompleted) {
       navigateProtected(Screens.BackupIntroduction)
     } else {
-      navigate(Screens.BackupIntroduction)
+      this.props.navigation.navigate(Screens.BackupIntroduction)
     }
   }
 
-  goToVerification() {
-    navigate(Screens.VerificationEducationScreen)
+  goToVerification = () => {
+    this.props.navigation.navigate(Screens.VerificationEducationScreen)
   }
 
-  goToInvite() {
-    navigate(Screens.Invite)
+  goToInvite = () => {
+    this.props.navigation.navigate(Screens.Invite)
   }
 
-  goToLanguageSetting() {
-    navigate(Screens.Language, { nextScreen: Screens.Account })
+  goToLanguageSetting = () => {
+    this.props.navigation.navigate(Screens.Language, { nextScreen: Screens.Account })
   }
 
-  goToLocalCurrencySetting() {
-    navigate(Screens.SelectLocalCurrency)
+  goToLocalCurrencySetting = () => {
+    this.props.navigation.navigate(Screens.SelectLocalCurrency)
   }
 
-  goToLicenses() {
-    navigate(Screens.Licenses)
+  goToLicenses = () => {
+    this.props.navigation.navigate(Screens.Licenses)
   }
 
-  goToSupport() {
-    navigate(Screens.Support)
+  goToSupport = () => {
+    this.props.navigation.navigate(Screens.Support)
   }
 
   goToSecurity = () => {
     navigateProtected(Screens.Security, { nextScreen: Screens.Account })
   }
 
-  goToAnalytics() {
-    navigate(Screens.Analytics, { nextScreen: Screens.Account })
+  goToAnalytics = () => {
+    this.props.navigation.navigate(Screens.Analytics, { nextScreen: Screens.Account })
   }
 
-  goToDataSaver() {
-    navigate(Screens.DataSaver, { nextScreen: Screens.Account })
+  goToDataSaver = () => {
+    this.props.navigation.navigate(Screens.DataSaver)
   }
 
   goToFAQ() {
@@ -142,8 +146,8 @@ export class Account extends React.Component<Props, State> {
     navigateToURI(TOS_LINK)
   }
 
-  goToFiatExchange() {
-    navigate(Screens.FiatExchange)
+  goToFiatExchange = () => {
+    this.props.navigation.navigate(Screens.FiatExchange)
   }
 
   resetAppOpenedState = () => {
@@ -168,8 +172,8 @@ export class Account extends React.Component<Props, State> {
     this.props.resetBackupState()
   }
 
-  showDebugScreen = async () => {
-    navigate(Screens.Debug)
+  showDebugScreen = () => {
+    this.props.navigation.navigate(Screens.Debug)
   }
 
   onPressAddress = () => {
@@ -346,7 +350,7 @@ const style = StyleSheet.create({
   },
 })
 
-export default connect<StateProps, DispatchProps, {}, RootState>(
+export default connect<StateProps, DispatchProps, OwnProps, RootState>(
   mapStateToProps,
   mapDispatchToProps
 )(withTranslation(Namespaces.accountScreen10)(Account))

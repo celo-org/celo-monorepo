@@ -304,6 +304,10 @@ export const timeDeltaInDays = (currTime: number, prevTime: number) => {
   return (1.0 * (currTime - prevTime)) / 1000 / 60 / 60 / 24
 }
 
+export const timeDeltaInHours = (currTime: number, prevTime: number) => {
+  return (1.0 * (currTime - prevTime)) / 1000 / 60 / 60
+}
+
 export const timeDeltaInSeconds = (currTime: number, prevTime: number) => {
   return (1.0 * (currTime - prevTime)) / 1000
 }

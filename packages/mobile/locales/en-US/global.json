@@ -117,6 +117,7 @@
   "addressLookupFailure": "Failed to look up phone number address",
   "saltFetchFailure": "Failed to retrieve phone number secret",
   "saltQuotaExceededError": "Your phone number lookup quota is used up",
+  "paymentLimitReached": "The daily limit is {{dailyLimitcUSD}}CUSD ({{currencySymbol}}{{dailyLimit}})\n{{dailyRemainingcUSD}}CUSD ({{currencySymbol}}{{dailyRemaining}}) remaining",
   "ordinals": [
     "zeroth",
     "first",

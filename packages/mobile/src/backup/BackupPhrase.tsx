@@ -10,7 +10,6 @@ import { connect } from 'react-redux'
 import { hideAlert, showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
-import componentWithAnalytics from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import BackupPhraseContainer, {
   BackupPhraseContainerMode,
@@ -18,11 +17,10 @@ import BackupPhraseContainer, {
 } from 'src/backup/BackupPhraseContainer'
 import { getStoredMnemonic } from 'src/backup/utils'
 import CancelButton from 'src/components/CancelButton.v2'
-import { Namespaces, withTranslation } from 'src/i18n'
-import { headerWithCancelButton } from 'src/navigator/Headers'
+import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import TopBarButton from 'src/navigator/TopBarButton.v2'
+import { TopBarTextButton } from 'src/navigator/TopBarButton.v2'
 import { RootState } from 'src/redux/reducers'
 import Logger from 'src/utils/Logger'
 
@@ -48,14 +46,13 @@ const mapStateToProps = (state: RootState): StateProps => {
   }
 }
 
+export const navOptionsForBackupPhrase = {
+  headerLeft: () => <CancelButton style={{ color: colors.gray4 }} />,
+  headerTitle: i18n.t(`${Namespaces.backupKeyFlow6}:headerTitle`),
+  headerRight: () => <HeaderRight />,
+}
+
 class BackupPhrase extends React.Component<Props, State> {
-  // TODO(Rossy): Show modal when cancelling if backup flow incomplete
-  static navigationOptions = () => ({
-    ...headerWithCancelButton,
-    headerLeft: <CancelButton color={colors.gray4} />,
-    headerTitle: 'Account Key',
-    headerRight: <HeaderRight />,
-  })
   state = {
     mnemonic: '',
     isConfirmChecked: false,
@@ -139,7 +136,10 @@ class BackupPhrase extends React.Component<Props, State> {
 
 function HeaderRight() {
   const { t } = useTranslation(Namespaces.backupKeyFlow6)
-  return <TopBarButton>{t('moreInfo')}</TopBarButton>
+  const onMoreInfoPressed = () => {
+    // TODO: Implement this
+  }
+  return <TopBarTextButton onPress={onMoreInfoPressed} title={t('moreInfo')} />
 }
 
 const styles = StyleSheet.create({
@@ -169,8 +169,7 @@ const styles = StyleSheet.create({
   },
 })
 
-export default componentWithAnalytics(
-  connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, { showError, hideAlert })(
-    withTranslation(Namespaces.backupKeyFlow6)(BackupPhrase)
-  )
-)
+export default connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
+  showError,
+  hideAlert,
+})(withTranslation(Namespaces.backupKeyFlow6)(BackupPhrase))
