@@ -1,7 +1,15 @@
 {
   "getStarted": "Primeros pasos",
   "incomingPaymentRequests": "Solicitudes de otros",
-  "outgoingPaymentRequests": "Pagos que ha solicitado",
+  "incomingPaymentRequestsSummaryTitle": "{{count}} Solicitudes Pendientes",
+  "incomingPaymentRequestsSummaryDetails_exactly2Items": "<0></0> y <1></1> te están esperando",
+  "incomingPaymentRequestsSummaryDetails_exactly3Items": "<0></0>, <1></1> y otro te están esperando",
+  "incomingPaymentRequestsSummaryDetails_moreThan3Items": "<0></0>, <1></1> y otros te están esperando",
+  "outgoingPaymentRequests": "En espera de Pagos",
+  "outgoingPaymentRequestsSummaryTitle": "Esperando {{count}} Pagos",
+  "outgoingPaymentRequestsSummaryDetails_exactly2Items": "Estás esperando los pagos de <0></0> y <1></1>",
+  "outgoingPaymentRequestsSummaryDetails_exactly3Items": "Estás esperando los pagos de <0></0>, <1></1> y otro",
+  "outgoingPaymentRequestsSummaryDetails_moreThan3Items": "Estás esperando los pagos de <0></0>, <1></1> y otros",
   "SMSError": "Error al enviar SMS",
   "notifications": "Notificaciones",
   "getBackupKey": "Obtener clave de respaldo",
@@ -14,7 +22,7 @@
   "received": "Recibido",
   "pending": "Pendiente",
   "exchange": "Cambio",
-  "review": "Revisión",
+  "viewAll": "Ver Todo",
   "thanksForVerifying": "Gracias por completar la verificación",
   "earnCeloRewards": "Gana Recompensas Celo por verificar a otros",
   "earnCeloGold":
@@ -54,6 +62,10 @@
   "balanceNeedUpdating": "Saldo necesita actualizarse",
   "refreshBalances": "Actualizar saldos",
   "escrowedPaymentReminder": "Reacuerda al receptor aceptar el pago",
+  "escrowedPaymentReminderSummaryTitle": "{{count}} Invitaciones Pendientes",
+  "escrowedPaymentReminderSummaryDetails_exactly2Items": "<0></0> e <1></1> aún no han aceptado sus invitaciones",
+  "escrowedPaymentReminderSummaryDetails_exactly3Items": "<0></0>, <1></1> y otro aún no han aceptado sus invitaciones",
+  "escrowedPaymentReminderSummaryDetails_moreThan3Items": "<0></0>, <1></1> y otros aún no han aceptado sus invitaciones",
   "escrowedPaymentReminderSms":
     "¡Un recordatorio amistoso de que aún no has canjeado tus Celo dólares! Dirígite a {{link}} e ingresa tu código para comenzar: {{code}}",
   "escrowedPaymentReminderSmsNoData":
