@@ -260,7 +260,7 @@ async function getAttestationsStatus(
 ): Promise<AttestationsStatus> {
   Logger.debug(TAG + '@getAttestationsStatus', 'Getting verification status from contract')
 
-  const attestationStatus = await attestationsWrapper.getAttestationStatus(phoneHash, account)
+  const attestationStatus = await attestationsWrapper.getVerifiedStatus(phoneHash, account)
 
   Logger.debug(
     TAG + '@getAttestationsStatus',
