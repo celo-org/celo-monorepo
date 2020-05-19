@@ -12,7 +12,6 @@ import { PincodeType } from 'src/account/reducer'
 import { showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
-import { componentWithAnalytics } from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import DevSkipButton from 'src/components/DevSkipButton'
 import { Namespaces, withTranslation } from 'src/i18n'
@@ -128,9 +127,7 @@ const style = StyleSheet.create({
   },
 })
 
-export default componentWithAnalytics(
-  connect<{}, DispatchProps>(
-    null,
-    mapDispatchToProps
-  )(withTranslation(Namespaces.nuxNamePin1)(PincodeSet))
-)
+export default connect<{}, DispatchProps>(
+  null,
+  mapDispatchToProps
+)(withTranslation(Namespaces.nuxNamePin1)(PincodeSet))
