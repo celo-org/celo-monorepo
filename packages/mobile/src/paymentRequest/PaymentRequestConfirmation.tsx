@@ -19,8 +19,7 @@ import { Namespaces, withTranslation } from 'src/i18n'
 import { navigateBack } from 'src/navigator/NavigationService'
 import PaymentRequestReviewCard from 'src/paymentRequest/PaymentRequestReviewCard'
 import { RootState } from 'src/redux/reducers'
-import { ConfirmationInput } from 'src/send/SendConfirmation'
-import { getConfirmationInput } from 'src/send/utils'
+import { ConfirmationInput, getConfirmationInput } from 'src/send/utils'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import Logger from 'src/utils/Logger'
 import { currentAccountSelector } from 'src/web3/selectors'
@@ -50,7 +49,7 @@ const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
   const { navigation } = ownProps
   const transactionData = navigation.getParam('transactionData')
   const { e164NumberToAddress } = state.identity
-  const { secureSendPhoneNumberMapping } = state.send
+  const { secureSendPhoneNumberMapping } = state.identity
   const confirmationInput = getConfirmationInput(
     transactionData,
     e164NumberToAddress,

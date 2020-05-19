@@ -71,15 +71,14 @@ type Props = NavigationInjectedProps & WithTranslation & StateProps & DispatchPr
 export const listItemRenderer = (props: {
   recipientCache: NumberToRecipient
   declinePaymentRequest: typeof declinePaymentRequest
-  addressValidationCheckCache: AddressValidationCheckCache
+  addressValidationCheckCache?: AddressValidationCheckCache
 }) => (request: PaymentRequest, key: number | undefined = undefined) => {
   const requester = getRecipientFromPaymentRequest(request, props.recipientCache)
   const { addressValidationCheckCache } = props
   let addressValidationType
 
-  if (requester.e164PhoneNumber) {
-    addressValidationType =
-      addressValidationCheckCache[requester.e164PhoneNumber] || AddressValidationType.FULL
+  if (addressValidationCheckCache && requester.e164PhoneNumber) {
+    addressValidationType = addressValidationCheckCache[requester.e164PhoneNumber]
   }
 
   return (
