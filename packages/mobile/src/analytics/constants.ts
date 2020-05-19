@@ -84,6 +84,16 @@ export enum CustomEventNames {
   invite_friends_sms = 'invite_friends_sms', // to count the # of taps on “Invite with SMS" button on Invite_Friends_Review
   invite_friends_whatsapp = 'invite_friends_whatsapp', // to count the # of taps on “Invite with WhatsApp" button on Invite_Friends_Review
 
+  backup_start = 'backup_start', // ‘set up now’ button click
+  backup_setup_info = 'backup_setup_info',
+
+  backup_quiz_submit = 'backup_quiz_submit',
+  backup_quiz_success = 'backup_quiz_success',
+  backup_quiz_incorrect = 'backup_quiz_incorrect',
+
+  backup_setup_toggle_complete = 'backup_setup_toggle_complete',
+  backup_setup_toggle_incomplete = 'backup_setup_toggle_incomplete',
+
   // Screen name: Backup_Phrase, Backup_Insist, Backup_Share, Backup_Set
   set_backup_phrase = 'set_backup_phrase', // (count # of taps on “Set Backup Phrase” in Backup_Phrase) [we should not track the actual value of this field, just whether the user filled it out]
   set_social_backup = 'set_social_backup', // (count # of taps on "Set up Social Backup")
@@ -190,6 +200,7 @@ export enum CommonValues {
 // TODO(nitya): separate this out by event name
 export const PROPERTY_PATH_WHITELIST = [
   'address',
+  'backSpaceTaps',
   'component',
   'countryCode',
   'cta',
@@ -200,6 +211,7 @@ export const PROPERTY_PATH_WHITELIST = [
   'exchangeInputAmount',
   'exchangeRate',
   'fullName',
+  'firstWordToSubmitTime',
   'goldBalance',
   'goldPendingBalance',
   'inviteCode',

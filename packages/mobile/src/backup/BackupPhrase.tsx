@@ -24,7 +24,6 @@ import { Screens } from 'src/navigator/Screens'
 import { TopBarTextButton } from 'src/navigator/TopBarButton.v2'
 import { RootState } from 'src/redux/reducers'
 import Logger from 'src/utils/Logger'
-
 interface State {
   mnemonic: string
   isConfirmChecked: boolean
@@ -55,6 +54,7 @@ class BackupPhrase extends React.Component<Props, State> {
     headerTitle: 'Account Key',
     headerRight: <HeaderRight />,
   })
+
   state = {
     mnemonic: '',
     isConfirmChecked: false,
@@ -89,6 +89,12 @@ class BackupPhrase extends React.Component<Props, State> {
     this.setState({
       isConfirmChecked: value,
     })
+
+    CeloAnalytics.track(
+      value
+        ? CustomEventNames.backup_setup_toggle_complete
+        : CustomEventNames.backup_setup_toggle_incomplete
+    )
   }
 
   onPressConfirmArea = () => {
@@ -140,6 +146,7 @@ function HeaderRight() {
   const { t } = useTranslation(Namespaces.backupKeyFlow6)
   const onMoreInfoPressed = () => {
     // TODO: Implement this
+    CeloAnalytics.track(CustomEventNames.backup_setup_info)
   }
   return <TopBarTextButton onPress={onMoreInfoPressed} title={t('moreInfo')} />
 }
