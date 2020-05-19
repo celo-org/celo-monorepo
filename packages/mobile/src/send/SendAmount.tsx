@@ -229,7 +229,7 @@ export class SendAmount extends React.Component<Props, State> {
 
     this.props.hideAlert()
 
-    if (addressValidationType !== AddressValidationType.FULL) {
+    if (addressValidationType !== AddressValidationType.NONE) {
       navigate(Screens.ValidateRecipientIntro, {
         transactionData,
         addressValidationType,
@@ -244,7 +244,7 @@ export class SendAmount extends React.Component<Props, State> {
     const { addressValidationType } = this.props
     const transactionData = this.getTransactionData(TokenTransactionType.PayRequest)
 
-    if (addressValidationType !== AddressValidationType.FULL) {
+    if (addressValidationType !== AddressValidationType.NONE) {
       navigate(Screens.ValidateRecipientIntro, {
         transactionData,
         addressValidationType,

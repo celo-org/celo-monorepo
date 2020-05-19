@@ -9,14 +9,8 @@ import { calculateFee } from 'src/fees/saga'
 import { completePaymentRequest } from 'src/firebase/actions'
 import { features } from 'src/flags'
 import { transferGoldToken } from 'src/goldToken/actions'
-import {
-  ValidateRecipientAddressAction,
-  validateRecipientAddressFailure,
-  validateRecipientAddressSuccess,
-} from 'src/identity/actions'
 import { encryptComment } from 'src/identity/commentKey'
 import { addressToE164NumberSelector, e164NumberToAddressSelector } from 'src/identity/reducer'
-import { validateAndReturnMatch } from 'src/identity/secureSend'
 import { InviteBy } from 'src/invite/actions'
 import { sendInvite } from 'src/invite/saga'
 import { navigateHome } from 'src/navigator/NavigationService'
@@ -186,45 +180,6 @@ function* sendPaymentOrInviteSaga({
   } catch (e) {
     yield put(showError(ErrorMessages.SEND_PAYMENT_FAILED))
     yield put(sendPaymentOrInviteFailure())
-  }
-}
-
-export function* validateRecipientAddressSaga({
-  userInputOfFullAddressOrLastFourDigits,
-  addressValidationType,
-  recipient,
-}: ValidateRecipientAddressAction) {
-  Logger.debug(TAG, 'Starting Recipient Address Validation')
-  try {
-    if (!recipient.e164PhoneNumber) {
-      throw Error(`Invalid recipient type for Secure Send: ${recipient.kind}`)
-    }
-
-    const userAddress = yield select(currentAccountSelector)
-    const e164NumberToAddress = yield select(e164NumberToAddressSelector)
-    const { e164PhoneNumber } = recipient
-    const possibleRecievingAddresses = e164NumberToAddress[e164PhoneNumber]
-
-    // Should never happen since secure send is initiated due to there being several possible addresses
-    if (!possibleRecievingAddresses) {
-      throw Error('There are no possible recipient addresses to validate against')
-    }
-
-    const validatedAddress = validateAndReturnMatch(
-      userInputOfFullAddressOrLastFourDigits,
-      possibleRecievingAddresses,
-      userAddress,
-      addressValidationType
-    )
-    yield put(validateRecipientAddressSuccess(e164PhoneNumber, validatedAddress))
-  } catch (error) {
-    Logger.error(TAG, 'validateRecipientAddressSaga/Address validation error: ', error)
-    if (error.message in ErrorMessages) {
-      yield put(showError(error.message))
-    } else {
-      yield put(showError(ErrorMessages.ADDRESS_VALIDATION_ERROR))
-    }
-    yield put(validateRecipientAddressFailure())
   }
 }
 

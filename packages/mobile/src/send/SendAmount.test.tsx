@@ -4,7 +4,7 @@ import * as RNLocalize from 'react-native-localize'
 import { fireEvent, render } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
 import { TokenTransactionType } from 'src/apollo/types'
-import { E164NumberToAddressType } from 'src/identity/reducer'
+import { AddressValidationType, E164NumberToAddressType } from 'src/identity/reducer'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import SendAmount from 'src/send/SendAmount'
@@ -176,8 +176,7 @@ describe('SendAmount', () => {
           e164NumberToAddress: mockE164NumberToAddress,
           secureSendPhoneNumberMapping: {
             [mockE164NumberInvite]: {
-              addressValidationRequired: true,
-              fullValidationRequired: true,
+              addressValidationType: AddressValidationType.FULL,
             },
           },
         },
@@ -196,7 +195,7 @@ describe('SendAmount', () => {
       fireEvent.press(tree.getByTestId('Send'))
       expect(navigate).toHaveBeenCalledWith(Screens.ValidateRecipientIntro, {
         transactionData: mockTransactionData2,
-        fullValidationRequired: true,
+        addressValidationType: AddressValidationType.FULL,
       })
     })
 
@@ -206,8 +205,7 @@ describe('SendAmount', () => {
           e164NumberToAddress: mockE164NumberToAddress,
           secureSendPhoneNumberMapping: {
             [mockE164NumberInvite]: {
-              addressValidationRequired: false,
-              fullValidationRequired: true,
+              addressValidationType: AddressValidationType.NONE,
             },
           },
         },
@@ -235,8 +233,7 @@ describe('SendAmount', () => {
           e164NumberToAddress: mockE164NumberToAddress,
           secureSendPhoneNumberMapping: {
             [mockE164NumberInvite]: {
-              addressValidationRequired: true,
-              fullValidationRequired: true,
+              addressValidationType: AddressValidationType.FULL,
             },
           },
         },
@@ -256,7 +253,7 @@ describe('SendAmount', () => {
       fireEvent.press(tree.getByTestId('Request'))
       expect(navigate).toHaveBeenCalledWith(Screens.ValidateRecipientIntro, {
         transactionData: mockTransactionData2,
-        fullValidationRequired: true,
+        addressValidationType: AddressValidationType.FULL,
         isPaymentRequest: true,
       })
     })
@@ -267,8 +264,7 @@ describe('SendAmount', () => {
           e164NumberToAddress: mockE164NumberToAddress,
           secureSendPhoneNumberMapping: {
             [mockE164NumberInvite]: {
-              addressValidationRequired: false,
-              fullValidationRequired: true,
+              addressValidationType: AddressValidationType.NONE,
             },
           },
         },

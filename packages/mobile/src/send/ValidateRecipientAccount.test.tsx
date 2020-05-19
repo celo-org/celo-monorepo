@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { render } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
+import { AddressValidationType } from 'src/identity/reducer'
 import ValidateRecipientAccount from 'src/send/ValidateRecipientAccount'
 import { createMockNavigationProp, createMockStore } from 'test/utils'
 import { mockTransactionData } from 'test/values'
@@ -11,7 +12,7 @@ describe('ValidateRecipientAccount', () => {
   it('renders correctly when full validation required', () => {
     const navigation = createMockNavigationProp({
       transactionData: mockTransactionData,
-      fullValidationRequired: true,
+      addressValidationType: AddressValidationType.FULL,
       isPaymentRequest: false,
     })
 
@@ -26,7 +27,7 @@ describe('ValidateRecipientAccount', () => {
   it('renders correctly when partial validation required', () => {
     const navigation = createMockNavigationProp({
       transactionData: mockTransactionData,
-      fullValidationRequired: false,
+      addressValidationType: AddressValidationType.PARTIAL,
       isPaymentRequest: false,
     })
 

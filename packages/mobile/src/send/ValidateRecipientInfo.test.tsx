@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { fireEvent, render } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
+import { AddressValidationType } from 'src/identity/reducer'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import ValidateRecipientIntro from 'src/send/ValidateRecipientIntro'
@@ -9,7 +10,7 @@ import { mockTransactionData } from 'test/values'
 
 const navigation = createMockNavigationProp({
   transactionData: mockTransactionData,
-  fullValidationRequired: true,
+  addressValidationType: AddressValidationType.FULL,
   isPaymentRequest: false,
 })
 const store = createMockStore()
@@ -33,7 +34,7 @@ describe('ValidateRecipientIntro', () => {
     fireEvent.press(tree.getByTestId('confirmAccountButton'))
     expect(navigate).toHaveBeenCalledWith(Screens.ValidateRecipientAccount, {
       transactionData: mockTransactionData,
-      fullValidationRequired: true,
+      addressValidationType: AddressValidationType.FULL,
       isPaymentRequest: false,
     })
   })
