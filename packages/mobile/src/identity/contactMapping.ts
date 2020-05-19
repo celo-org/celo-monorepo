@@ -194,37 +194,33 @@ export const getAddressFromPhoneNumber = (
   e164NumberToAddress: E164NumberToAddressType,
   secureSendPhoneNumberMapping: SecureSendPhoneNumberMapping
 ): string | null | undefined => {
-  try {
-    const addresses = e164NumberToAddress[e164Number]
+  const addresses = e164NumberToAddress[e164Number]
 
-    // If address is null (unverified) or undefined (in the process
-    // of being updated) then just return that falsy value
-    if (!addresses) {
-      return addresses
-    }
-
-    // If there are multiple addresses, need to determine which to use
-    if (addresses.length > 1) {
-      // Check if the user has gone through Secure Send and validated a
-      // recipient address
-      const validatedAddress = secureSendPhoneNumberMapping[e164Number]
-        ? secureSendPhoneNumberMapping[e164Number].address
-        : undefined
-
-      // If they have not, they shouldn't have been able to
-      // get to this point
-      if (!validatedAddress) {
-        throw new Error(
-          'Multiple addresses but none were validated. Should have routed through Secure Send.'
-        )
-      }
-
-      return validatedAddress
-    }
-
-    // Normal case when there is only one address in the mapping
-    return addresses[0]
-  } catch (error) {
-    Logger.error(TAG, error.message)
+  // If address is null (unverified) or undefined (in the process
+  // of being updated) then just return that falsy value
+  if (!addresses) {
+    return addresses
   }
+
+  // If there are multiple addresses, need to determine which to use
+  if (addresses.length > 1) {
+    // Check if the user has gone through Secure Send and validated a
+    // recipient address
+    const validatedAddress = secureSendPhoneNumberMapping[e164Number]
+      ? secureSendPhoneNumberMapping[e164Number].address
+      : undefined
+
+    // If they have not, they shouldn't have been able to
+    // get to this point
+    if (!validatedAddress) {
+      throw new Error(
+        'Multiple addresses but none were validated. Should have routed through Secure Send.'
+      )
+    }
+
+    return validatedAddress
+  }
+
+  // Normal case when there is only one address in the mapping
+  return addresses[0]
 }
