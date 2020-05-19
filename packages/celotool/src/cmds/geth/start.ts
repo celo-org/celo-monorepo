@@ -190,7 +190,7 @@ export const handler = async (argv: StartArgv) => {
 
   const bootnodePort = 30300
 
-  if (withProxy) {
+  if (withProxy && gethConfig.useBootnode) {
     bootnodeEnode = getEnodeAddress(
       privateKeyToPublicKey(bootnodePrivateKey),
       '127.0.0.1',
@@ -252,7 +252,9 @@ export const handler = async (argv: StartArgv) => {
   })
 
   if (withProxy) {
-    await startBootnode(bootnodePrivateKey, gethConfig, bootnodePort, verbose)
+    if (gethConfig.useBootnode) {
+      await startBootnode(bootnodePrivateKey, gethConfig, bootnodePort, verbose)
+    }
 
     await connectPeers(gethConfig.instances.filter((i) => i.isProxy))
   }
