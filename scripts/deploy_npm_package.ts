@@ -203,20 +203,25 @@ all OK?`)
       {}
     )
   )
-  await execCmd(`git add ./packages/${packageNameToDirectory[packageName]}`)
+  console.log(`git add ${getPackageDir(packageName)}`)
+  await execCmd(`git add ${getPackageDir(packageName)}`)
+  console.log(`git commit -m "Update ${packageName} to v${newVersion}
+  
+  shasum: ${shasum}"`)
   await execCmd(`git commit -m "Update ${packageName} to v${newVersion}
   
 shasum: ${shasum}"`)
 
   const newCommit = await getCurrentCommit()
 
-  await Promise.all(
-    [...networks, 'latest', newCommit].map((tag) =>
-      execCmd(`npm dist-tag add ${packageName}@${packageJson.version} ${tag}`, {
-        cwd: getPackageDir(packageName),
-      })
-    )
-  )
+  for (const tag of [...networks, 'latest', newCommit]) {
+    console.log(`npm dist-tag add ${packageName}@${packageJson.version} ${tag}`)
+    await execCmd(`npm dist-tag add ${packageName}@${packageJson.version} ${tag}`, {
+      cwd: getPackageDir(packageName),
+    })
+  }
+
+  console.log(`git push origin ${releaseBranch}`)
   await execCmd(`git push origin ${releaseBranch}`)
 
   console.log(packageName, 'released!')
