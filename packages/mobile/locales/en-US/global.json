@@ -68,7 +68,7 @@
   "balanceAvailable": "<0></0> available",
   "subtotal": "Subtotal",
   "total": "Total",
-  "totalInDollars": "{{CeloDollars}} (@ <2></2>)",
+  "totalInDollars": "{{CeloDollars}} @ <2></2>",
   "oops": "Oops!",
   "somethingWrong": "Something went wrong.",
   "verifyFailed": "Failed to verify",
