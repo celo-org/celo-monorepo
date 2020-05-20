@@ -14,7 +14,7 @@ const deployablePackages = [
   '@celo/contractkit',
   '@celo/utils',
   '@celo/celocli',
-  'alexs-test-package-2',
+  'alexs-interesting-package',
 ]
 
 const rootDir = join(__dirname, '..')

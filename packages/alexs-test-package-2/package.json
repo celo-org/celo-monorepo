@@ -1,5 +1,5 @@
 {
-  "name": "alexs-test-package-2",
+  "name": "alexs-interesting-package",
   "version": "1.0.0",
   "description": "> TODO: description",
   "author": "alexbruceharley@gmail.com <alexbruceharley@gmail.com>",
@@ -24,7 +24,5 @@
     "url": "https://github.com/celo-org/celo-monorepo/issues"
   },
   "dependencies": {
-    "@celo/utils": "file:../utils",
-    "@celo/contractkit": "file:../contractkit"
   }
 }
