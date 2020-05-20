@@ -208,7 +208,7 @@ all OK?`)
       {}
     )
   )
-  await execCmd(`git add ./packages/${packageNameToDirectory[packageName]}`)
+  await execCmd(`git add ${getPackageDir(packageName)}`)
   await execCmd(`git commit -m "Update ${packageName} to v${newVersion}
   
 shasum: ${shasum}"`)
