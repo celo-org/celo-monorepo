@@ -18,6 +18,7 @@ export interface ParsedPhoneNumber {
 const phoneUtil = PhoneNumberUtil.getInstance()
 const MIN_PHONE_LENGTH = 4
 const PHONE_SALT_SEPARATOR = '__'
+const E164_REGEX = /^\+[1-9][0-9]{1,14}$/
 
 export function getCountryEmoji(
   e164PhoneNumber: string,
@@ -110,8 +111,7 @@ export function getE164Number(phoneNumber: string, defaultCountryCode: string) {
 }
 
 export function isE164Number(phoneNumber: string) {
-  const E164RegEx = /^\+[1-9][0-9]{1,14}$/
-  return E164RegEx.test(phoneNumber)
+  return E164_REGEX.test(phoneNumber)
 }
 
 // Actually runs through the parsing instead of using a regex

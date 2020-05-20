@@ -1,4 +1,8 @@
-import { encryptComment } from 'src/identity/commentEncryption'
+import {
+  embedPhoneNumberMetadata,
+  encryptComment,
+  extractPhoneNumberMetadata,
+} from 'src/identity/commentEncryption'
 import { mockComment } from 'test/values'
 
 jest.mock('src/web3/actions', () => ({
@@ -28,6 +32,36 @@ describe('Decrypt Comment', () => {
   })
 
   it('Empty to/from address', async () => {
+    // TODO
+  })
+})
+
+describe(embedPhoneNumberMetadata, () => {
+  it('comment with phone details', () => {
+    // TODO
+    // comment with emoji 😇🤠👳🏽‍♂️~+14155556666piWqRHHYWtfg9
+  })
+
+  it('comment without phone details', () => {
+    // TODO
+  })
+})
+
+describe(extractPhoneNumberMetadata, () => {
+  it('Empty comment', () => {
+    // TODO
+  })
+
+  it('comment with metadata', () => {
+    // TODO
+    // comment with emoji 😇🤠👳🏽‍♂️~+14155556666piWqRHHYWtfg9
+  })
+
+  it('comment with emoji and metadata', () => {
+    // TODO
+  })
+
+  it('comment without metadata', () => {
     // TODO
   })
 })
