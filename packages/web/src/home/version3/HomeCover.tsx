@@ -73,19 +73,20 @@ function getplacement(screen: ScreenSizes) {
 const styles = StyleSheet.create({
   desktopContainer: {
     paddingTop: BANNER_HEIGHT + HEADER_HEIGHT,
-    maxHeight: '100vw',
-    minHeight: '100vh',
+    maxHeight: '110vw',
+    height: '100vh',
   },
   tabletContainer: {
     paddingTop: BANNER_HEIGHT + HEADER_HEIGHT,
     marginTop: 90,
-    minHeight: '80vh',
+    height: '100vh',
     marginBottom: 100,
   },
   mobileContainer: { paddingTop: BANNER_HEIGHT + HEADER_HEIGHT, marginTop: 90, minHeight: '100vh' },
   animationHolder: {
-    flex: 2,
+    flex: 4,
     minWidth: 350,
+    flexBasis: '50%',
     zIndex: 10,
   },
   centerMe: {
@@ -114,6 +115,7 @@ const styles = StyleSheet.create({
     ],
   },
   animationPlaceMobile: {
+    paddingBottom: 15,
     transform: [
       {
         translateX: -60,
@@ -121,8 +123,9 @@ const styles = StyleSheet.create({
     ],
   },
   contentHolder: {
+    flexGrow: 1,
     flexBasis: 370,
-    maxWidth: '85vw',
+    maxWidth: '90vw',
   },
   container: {
     flexWrap: 'wrap',
@@ -130,6 +133,7 @@ const styles = StyleSheet.create({
   coverText: {
     marginTop: 10,
     marginBottom: 30,
+    maxWidth: 450,
   },
   coverJoinList: {
     paddingTop: 10,
