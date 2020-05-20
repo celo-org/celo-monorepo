@@ -1,7 +1,7 @@
 import { isE164Number } from '@celo/utils/src/phoneNumbers'
 import { Actions, ActionTypes } from 'src/account/actions'
 import { PaymentRequest } from 'src/account/types'
-import { DEV_SETTINGS_ACTIVE_INITIALLY, FORNO_ENABLED_INITIALLY } from 'src/config'
+import { DEV_SETTINGS_ACTIVE_INITIALLY } from 'src/config'
 import { features } from 'src/flags'
 import { getRehydratePayload, REHYDRATE, RehydrateAction } from 'src/redux/persist-helper'
 import { getRemoteTime } from 'src/utils/time'
