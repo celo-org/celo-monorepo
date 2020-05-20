@@ -57,16 +57,9 @@ testWithGanache('rpc-wallet', (web3) => {
   const rpcWallet = new RpcWallet(provider)
 
   describe('with ganache web3 provider', () => {
-    let web3Accounts: string[]
-
-    beforeAll(async () => {
-      web3Accounts = (await web3.eth.getAccounts()).map(normalizeAddressWith0x)
-      await rpcWallet.init()
-    })
-
-    test('initalizes with default accounts', async () => {
+    test('initalizes with no accounts', async () => {
       const accounts = rpcWallet.getAccounts()
-      expect(accounts).toEqual(web3Accounts)
+      expect(accounts).toEqual([])
     })
 
     test('fails if you add an invalid private key', async () => {
@@ -99,9 +92,7 @@ testWithGanache('rpc-wallet', (web3) => {
 
     describe('with added accounts', () => {
       test('all addresses can be retrieved', () => {
-        expect(rpcWallet.getAccounts()).toEqual(
-          web3Accounts.concat([ACCOUNT_ADDRESS1, ACCOUNT_ADDRESS2])
-        )
+        expect(rpcWallet.getAccounts()).toEqual([ACCOUNT_ADDRESS1, ACCOUNT_ADDRESS2])
       })
 
       describe('unlocking', () => {
