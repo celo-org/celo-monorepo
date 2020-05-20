@@ -22,7 +22,12 @@ enum ReleaseType {
   MAJOR = 'major',
 }
 
-const deployablePackages = ['@celo/contractkit', '@celo/utils', '@celo/celocli']
+const deployablePackages = [
+  '@celo/contractkit',
+  '@celo/utils',
+  '@celo/celocli',
+  'alexbhs-publish-test',
+]
 
 const steps = [
   {
@@ -50,6 +55,16 @@ const revert = (commitHash) => {
 function readPackageJson(dir) {
   const packageJsonPath = join(__dirname, '..', 'packages', dir, 'package.json')
   return JSON.parse(readFileSync(packageJsonPath).toString())
+}
+
+function updatePackageJson(packageDir, property, value) {
+  const packageJsonPath = join(__dirname, '..', 'packages', packageDir, 'package.json')
+  const packageJson = JSON.parse(readFileSync(packageJsonPath).toString())
+  const updated =
+    typeof value === 'object'
+      ? { ...packageJson, [property]: { ...packageJson[property], ...value } }
+      : { ...packageJson, [property]: value }
+  writeFileSync(packageJsonPath, JSON.stringify(updated, null, 2))
 }
 
 async function main() {
@@ -83,54 +98,135 @@ async function main() {
 
   // make new package.json and test installation
   // look at each dependency, verify we're happy to deploy with this commit
-  console.log(packageName, 'will be deployed with the following dependencies is this OK?')
   const dependencies = Object.keys(packageJson.dependencies).filter((name) =>
     name.startsWith('@celo')
   )
   let celoDependencyVersions = {}
   for (const dep of dependencies) {
     const depPackageJson = readPackageJson(packageNameToDirectory[dep])
-    const [latestPublished] = await execCmd('npm view . version', {
+    const latestPublishedVersion = await execCmd('npm view . version', {
       cwd: join(__dirname, '..', 'packages', packageNameToDirectory[dep]),
-    })
+    }).then(([stdout]) => stdout.trim())
     const [distTagsResponse] = await execCmd('npm view . dist-tags --json', {
       cwd: join(__dirname, '..', 'packages', packageNameToDirectory[dep]),
     })
-    console.log(latestPublished.trim())
-    console.log(Object.entries(JSON.parse(distTagsResponse)))
     const found = Object.entries(JSON.parse(distTagsResponse)).find(
-      ([hash, tag]) => hash.length === 40 && tag === latestPublished.trim()
+      ([hash, tag]) => hash.length === 40 && tag === latestPublishedVersion.trim()
     )
-    console.log('last tag commit hash', found)
+    if (!found) {
+      // we don't have an associated commit
+      const { ok } = await prompt({
+        type: 'confirm',
+        name: 'ok',
+        message: `Dependencies: local version of ${dep} is ${depPackageJson.version}, latest published is ${latestPublishedVersion}. OK?`,
+      })
+      if (!ok) {
+        console.log('Please deploy', dep, 'before trying to deploy', packageName)
+        return
+      }
+      celoDependencyVersions = { ...celoDependencyVersions, [dep]: latestPublishedVersion }
+      continue
+    }
+
     const [lastTagCommitHash] = found
-
-    console.log(
-      `${dep} local version ${depPackageJson.version} (), remote version ${latestPublished}`
+    const [
+      commitsSinceLastRelease,
+    ] = await execCmd(
+      `git log --pretty=oneline ${lastTagCommitHash}..HEAD ./packages/${packageNameToDirectory[dep]}`,
+      { cwd: join(__dirname, '..') }
     )
+    const { ok } = await prompt({
+      type: 'confirm',
+      name: 'ok',
+      message: `Dependencies: local version of ${dep} is ${depPackageJson.version} (${
+        commitsSinceLastRelease.split('\n').length
+      } commits since last release), latest published version is ${latestPublishedVersion}`,
+    })
+    if (!ok) {
+      console.log('Please deploy', dep, 'before trying to deploy', packageName)
+      return
+    }
+    celoDependencyVersions = { ...celoDependencyVersions, [dep]: latestPublishedVersion }
   }
-  // console.log('')
-  // const [distTagsResponse] = await execCmdWithExitOnFailure('npm view . dist-tags --json')
 
-  // console.log(dir, depPackageJson.version)
-  // console.log('>>> need to check these', dependencies)
+  updatePackageJson(packageDir, 'dependencies', celoDependencyVersions)
 
-  // await execCmd(`git add ${packageJsonPath}`)
-  // await execCmd(`git commit -m "Update ${packageName} to v${newVersion}"`)
+  console.log('> versions to overwrite', celoDependencyVersions)
 
-  const { installationWorks } = await prompt({
+  const { installWorks } = await prompt({
     type: 'confirm',
-    name: 'installationWorks',
+    name: 'installWorks',
     message: `Verify docker installation works. Run the following in another terminal to verify:
-
-celo-monorepo $ docker run --rm -v $PWD/packages/${packageName}:/tmp/npm_package -it --entrypoint bash node:10
+    
+celo-monorepo $ docker run --rm -v $PWD/packages/${packageDir}:/tmp/npm_package -it --entrypoint bash node:10
 root@e0d56700584f:/# mkdir /tmp/tmp1 && cd /tmp/tmp1
 root@e0d56700584f:/tmp/tmp1# npm install /tmp/npm_package/
-
+    
 all OK?`,
   })
-  if (!installationWorks) {
+  if (!installWorks) {
     revert(currentCommit)
   }
+
+  const [, packOutput] = await execCmd('npm pack', {
+    cwd: join(__dirname, '..', 'packages', packageDir),
+  })
+  console.log(packOutput)
+  const [stdout, stderr] = await execCmd(
+    `yarn publish --public ${packageName}-${newVersion}.tar.gz`,
+    {
+      cwd: join(__dirname, '..', 'packages', packageDir),
+    }
+  )
+  console.log(stdout, stderr)
+
+  const { remoteInstallWorks } = await prompt({
+    type: 'confirm',
+    name: 'remoteInstallWorks',
+    message: `Verify remote installation works, run the following in another terminal to verify:
+
+celo-monorepo $ docker run --rm -it --entrypoint bash node:10
+root@e0d56700584f:/# mkdir /tmp/tmp1 && cd /tmp/tmp1
+root@e0d56700584f:/tmp/tmp1# npm install ${packageName}@${newVersion}
+  
+all OK?`,
+  })
+  if (!remoteInstallWorks) {
+    console.warn(
+      `Seems like we've released a broken version of ${packageName}, fix up any problems and redeploy.`
+    )
+    return
+  }
+
+  await execCmd(`npm dist-tag add ${packageName}@${packageJson.version} ${'what goes here...'}`, {
+    cwd: join(__dirname, '..', 'packages', packageDir),
+  })
+  await execCmd(`npm dist-tag add ${packageName}@${packageJson.version} ${'network'}`, {
+    cwd: join(__dirname, '..', 'packages', packageDir),
+  })
+  await execCmd(`npm dist-tag add ${packageName}@${packageJson.version} latest`, {
+    cwd: join(__dirname, '..', 'packages', packageDir),
+  })
+
+  const shasum = packOutput
+    .split('\n')
+    .find((line) => line.match(/shasum/))
+    .split(' ')
+    .pop()
+
+  // the package json we need to push will only have an updated version field... not dependencies
+  await execCmd('git stash')
+
+  const releaseBranch = `release/${packageName}-${newVersion}`
+  await execCmd(`git checkout -b ${releaseBranch}`)
+  updatePackageJson(packageDir, 'version', newVersion)
+  await execCmd(`git add ${packageJsonPath}`)
+  await execCmd(`git commit -m "Update ${packageName} to v${newVersion}
+
+shasum: ${shasum}"`)
+  await execCmd(`git push origin ${releaseBranch}`)
+
+  console.log(packageName, 'released!')
 }
 
 main()
