@@ -72,18 +72,19 @@ exports[`HomePage renders 1`] = `
         className="css-view-1dbjc4n"
         style={
           Object {
-            "WebkitBoxFlex": 2,
-            "WebkitFlexBasis": "0%",
-            "WebkitFlexGrow": 2,
+            "WebkitBoxFlex": 4,
+            "WebkitFlexBasis": "50%",
+            "WebkitFlexGrow": 4,
             "WebkitFlexShrink": 1,
             "WebkitTransform": "translateX(-60px)",
-            "flexBasis": "0%",
-            "flexGrow": 2,
+            "flexBasis": "50%",
+            "flexGrow": 4,
             "flexShrink": 1,
             "minWidth": "350px",
             "msFlexNegative": 1,
-            "msFlexPositive": 2,
-            "msFlexPreferredSize": "0%",
+            "msFlexPositive": 4,
+            "msFlexPreferredSize": "50%",
+            "paddingBottom": "15px",
             "transform": "translateX(-60px)",
             "zIndex": 10,
           }
@@ -146,11 +147,15 @@ exports[`HomePage renders 1`] = `
         className="css-view-1dbjc4n"
         style={
           Object {
+            "WebkitBoxFlex": 1,
             "WebkitFlexBasis": "370px",
+            "WebkitFlexGrow": 1,
             "flexBasis": "370px",
+            "flexGrow": 1,
             "marginBottom": "40px",
             "marginTop": "40px",
-            "maxWidth": "85vw",
+            "maxWidth": "90vw",
+            "msFlexPositive": 1,
             "msFlexPreferredSize": "370px",
           }
         }
@@ -167,8 +172,8 @@ exports[`HomePage renders 1`] = `
               Object {
                 "color": "rgba(46,51,56,1.00)",
                 "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                "fontSize": "40px",
-                "lineHeight": "48px",
+                "fontSize": "52px",
+                "lineHeight": "58px",
                 "textRendering": "geometricPrecision",
                 "textTransform": "none",
                 "zIndex": 1,
@@ -195,9 +200,9 @@ exports[`HomePage renders 1`] = `
                 Object {
                   "color": "rgba(46,51,56,1.00)",
                   "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                  "fontSize": "40px",
+                  "fontSize": "52px",
                   "fontWeight": "500",
-                  "lineHeight": "48px",
+                  "lineHeight": "58px",
                   "textRendering": "geometricPrecision",
                   "textTransform": "none",
                 }
@@ -220,6 +225,7 @@ exports[`HomePage renders 1`] = `
               "lineHeight": "32px",
               "marginBottom": "30px",
               "marginTop": "10px",
+              "maxWidth": "450px",
               "textRendering": "geometricPrecision",
               "textTransform": "none",
             }
