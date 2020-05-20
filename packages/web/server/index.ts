@@ -96,7 +96,7 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
   })
 
   server.get('/papers/cbdc-velocity', (_, res) => {
-    res.redirect('/papers/cLabs_CBDC_Velocity_v2_04-2020.pdf')
+    res.redirect('/papers/cLabs_CBDC_Velocity_v3.pdf')
   })
 
   server.get('/papers/whitepaper', (_, res) => {
