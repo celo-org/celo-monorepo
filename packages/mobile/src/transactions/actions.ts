@@ -15,6 +15,7 @@ export enum Actions {
   RESET_STANDBY_TRANSACTIONS = 'TRANSACTIONS/RESET_STANDBY_TRANSACTIONS',
   ADD_HASH_TO_STANDBY_TRANSACTIONS = 'TRANSACTIONS/ADD_HASH_TO_STANDBY_TRANSACTIONS',
   TRANSACTION_CONFIRMED = 'TRANSACTIONS/TRANSACTION_CONFIRMED',
+  TRANSACTION_FAILED = 'TRANSACTIONS/TRANSACTION_FAILED',
 }
 
 export interface AddStandbyTransaction {
@@ -39,6 +40,11 @@ export interface AddHashToStandbyTransaction {
 
 export interface TransactionConfirmed {
   type: Actions.TRANSACTION_CONFIRMED
+  txId: string
+}
+
+export interface TransactionFailed {
+  type: Actions.TRANSACTION_FAILED
   txId: string
 }
 
@@ -68,6 +74,11 @@ export const resetStandbyTransactions = (): ResetStandbyTransactions => ({
 
 export const transactionConfirmed = (txId: string): TransactionConfirmed => ({
   type: Actions.TRANSACTION_CONFIRMED,
+  txId,
+})
+
+export const transactionFailed = (txId: string): TransactionFailed => ({
+  type: Actions.TRANSACTION_FAILED,
   txId,
 })
 

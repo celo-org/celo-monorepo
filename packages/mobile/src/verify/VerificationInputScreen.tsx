@@ -77,7 +77,7 @@ const mapStateToProps = (state: RootState): StateProps => {
 }
 
 class VerificationInputScreen extends React.Component<Props, State> {
-  static navigationOptions = { header: null }
+  static navigationOptions = { gestureEnabled: false, header: null }
 
   interval?: number
   keyboardDidShowListener?: EmitterSubscription
