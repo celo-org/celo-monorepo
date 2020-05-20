@@ -21124,7 +21124,7 @@ lottie-react-native@^3.3.2:
     prop-types "^15.5.10"
     react-native-safe-modules "^1.0.0"
 
-lottie-web@5.6:
+lottie-web@^5.6.10:
   version "5.6.10"
   resolved "https://registry.yarnpkg.com/lottie-web/-/lottie-web-5.6.10.tgz#9c2959df12976f49637f563dcc96db2078010b4d"
   integrity sha512-ucTzaiBJOMm56/K7Wqjajyh7qXlonHKB3+b5fHvhSiz+jOrXt6QDNKAinI3qdw/zvvYHKzXvFMy5SgOXbOJ5ng==
