@@ -12,8 +12,8 @@ export default function MenuBurger() {
           x2="40.75"
           y2="23.75"
           stroke="#2E3338"
-          stroke-width="2.5"
-          stroke-linecap="round"
+          strokeWidth="2.5"
+          strokeLinecap="round"
         />
         <Line
           x1="23.25"
@@ -21,8 +21,8 @@ export default function MenuBurger() {
           x2="40.75"
           y2="29.75"
           stroke="#2E3338"
-          stroke-width="2.5"
-          stroke-linecap="round"
+          strokeWidth="2.5"
+          strokeLinecap="round"
         />
         <Line
           x1="23.25"
@@ -30,8 +30,8 @@ export default function MenuBurger() {
           x2="40.75"
           y2="35.75"
           stroke="#2E3338"
-          stroke-width="2.5"
-          stroke-linecap="round"
+          strokeWidth="2.5"
+          strokeLinecap="round"
         />
       </G>
       <defs>
@@ -42,9 +42,9 @@ export default function MenuBurger() {
           width="64"
           height="64"
           filterUnits="userSpaceOnUse"
-          color-interpolation-filters="sRGB"
+          colorInterpolationFilters="sRGB"
         >
-          <feFlood flood-opacity="0" result="BackgroundImageFix" />
+          <feFlood floodOpacity="0" result="BackgroundImageFix" />
           <feColorMatrix
             in="SourceAlpha"
             type="matrix"
