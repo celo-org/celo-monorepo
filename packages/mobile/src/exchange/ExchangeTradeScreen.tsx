@@ -1,20 +1,20 @@
-import Button, { BtnTypes } from '@celo/react-components/components/Button'
+import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button.v2'
 import KeyboardAwareScrollView from '@celo/react-components/components/KeyboardAwareScrollView'
 import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
-import { fontStyles } from '@celo/react-components/styles/fonts'
-import { componentStyles } from '@celo/react-components/styles/styles'
+import colors from '@celo/react-components/styles/colors.v2'
+import fontStyles from '@celo/react-components/styles/fonts.v2'
+import variables from '@celo/react-components/styles/variables'
 import { parseInputAmount } from '@celo/utils/src/parsing'
+import { StackScreenProps } from '@react-navigation/stack'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { Trans, WithTranslation } from 'react-i18next'
-import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import { getNumberFormatSettings } from 'react-native-localize'
 import SafeAreaView from 'react-native-safe-area-view'
-import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
 import { hideAlert, showError } from 'src/alert/actions'
 import { errorSelector } from 'src/alert/reducer'
-import componentWithAnalytics from 'src/analytics/wrapper'
 import { MoneyAmount } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
@@ -30,9 +30,9 @@ import {
   convertLocalAmountToDollars,
 } from 'src/localCurrency/convert'
 import { getLocalCurrencyCode, getLocalCurrencyExchangeRate } from 'src/localCurrency/selectors'
-import { exchangeHeader } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { StackParamList } from 'src/navigator/types'
 import { RootState } from 'src/redux/reducers'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { getRateForMakerToken, getTakerAmount } from 'src/utils/currencyExchange'
@@ -53,20 +53,15 @@ interface StateProps {
   localCurrencyExchangeRate: string | null | undefined
 }
 
-interface NavProps {
-  makerTokenDisplay: {
-    makerToken: CURRENCY_ENUM
-    makerTokenBalance: string
-  }
-}
-
 interface DispatchProps {
   fetchExchangeRate: typeof fetchExchangeRate
   showError: typeof showError
   hideAlert: typeof hideAlert
 }
 
-type Props = StateProps & DispatchProps & NavigationInjectedProps & WithTranslation
+type OwnProps = StackScreenProps<StackParamList, Screens.ExchangeTradeScreen>
+
+type Props = StateProps & DispatchProps & WithTranslation & OwnProps
 
 const mapStateToProps = (state: RootState): StateProps => ({
   exchangeRatePair: state.exchange.exchangeRatePair,
@@ -76,13 +71,6 @@ const mapStateToProps = (state: RootState): StateProps => ({
 })
 
 export class ExchangeTradeScreen extends React.Component<Props, State> {
-  static navigationOptions = ({ navigation }: NavigationInjectedProps<NavProps>) => {
-    const { makerToken } = navigation.getParam('makerTokenDisplay')
-    return {
-      ...exchangeHeader(makerToken),
-    }
-  }
-
   state: State = {
     inputToken: CURRENCY_ENUM.GOLD,
     makerToken: CURRENCY_ENUM.DOLLAR,
@@ -95,7 +83,7 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
   }
 
   getMakerTokenPropertiesFromNavProps = () => {
-    const { makerToken, makerTokenBalance } = this.props.navigation.getParam('makerTokenDisplay')
+    const { makerToken, makerTokenBalance } = this.props.route.params.makerTokenDisplay
 
     if (!makerToken) {
       throw new Error('Maker token missing from nav props')
@@ -109,7 +97,7 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
       makerToken,
       makerTokenAvailableBalance: makerTokenBalance,
     })
-    this.props.fetchExchangeRate(makerToken, makerTokenBalance)
+    this.props.fetchExchangeRate(makerToken, new BigNumber(makerTokenBalance))
   }
 
   onChangeExchangeAmount = (amount: string) => {
@@ -295,43 +283,39 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
                 tOptions={{ context: this.isDollarInput() ? 'gold' : null }}
                 ns={Namespaces.exchangeFlow9}
               >
-                Subtotal (@{' '}
+                Subtotal @{' '}
                 <CurrencyDisplay
                   amount={{
                     value: exchangeRateDisplay,
                     currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
                   }}
                 />
-                )
               </Trans>
             }
             amount={<CurrencyDisplay amount={this.getSubtotalAmount()} />}
           />
         </KeyboardAwareScrollView>
-        <View style={componentStyles.bottomContainer}>
-          <Button
-            onPress={this.goToReview}
-            text={t(`${Namespaces.walletFlow5}:review`)}
-            accessibilityLabel={t('continue')}
-            standard={false}
-            disabled={this.isExchangeInvalid()}
-            type={BtnTypes.PRIMARY}
-            testID="ExchangeReviewButton"
-          />
-        </View>
+        <Button
+          onPress={this.goToReview}
+          text={t(`${Namespaces.walletFlow5}:review`)}
+          accessibilityLabel={t('continue')}
+          disabled={this.isExchangeInvalid()}
+          type={BtnTypes.TERTIARY}
+          size={BtnSizes.FULL}
+          style={styles.reviewBtn}
+          testID="ExchangeReviewButton"
+        />
         <KeyboardSpacer />
       </SafeAreaView>
     )
   }
 }
 
-export default componentWithAnalytics(
-  connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
-    fetchExchangeRate,
-    showError,
-    hideAlert,
-  })(withTranslation(Namespaces.exchangeFlow9)(ExchangeTradeScreen))
-)
+export default connect<StateProps, DispatchProps, OwnProps, RootState>(mapStateToProps, {
+  fetchExchangeRate,
+  showError,
+  hideAlert,
+})(withTranslation(Namespaces.exchangeFlow9)(ExchangeTradeScreen))
 
 const styles = StyleSheet.create({
   container: {
@@ -348,28 +332,31 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   exchangeBodyText: {
-    ...fontStyles.bodySmall,
+    ...fontStyles.regular500,
     fontSize: 15,
     lineHeight: 20,
     fontWeight: '700',
   },
   subtotalBodyText: {
-    ...fontStyles.bodySmall,
-    fontSize: 15,
-    lineHeight: 20,
+    ...fontStyles.small,
   },
   switchToText: {
-    ...fontStyles.subSmall,
+    ...fontStyles.label,
     textDecorationLine: 'underline',
-    fontSize: 13,
+    color: colors.gray4,
+    marginTop: 4,
   },
   currencyInput: {
-    ...fontStyles.body,
+    ...fontStyles.regular,
     marginLeft: 10,
     flex: 1,
     textAlign: 'right',
     fontSize: 24,
-    lineHeight: 39,
-    height: 54, // setting height manually b.c. of bug causing text to jump on Android
+    lineHeight: Platform.select({ android: 39, ios: 30 }), // vertical align = center
+    height: 60, // setting height manually b.c. of bug causing text to jump on Android
+    color: colors.goldDark,
+  },
+  reviewBtn: {
+    padding: variables.contentPadding,
   },
 })

@@ -26,6 +26,7 @@ export const vNeg1Schema = {
   send: {
     isSending: false,
     recentRecipients: [],
+    recentPayments: [],
   },
   recipients: {
     recipientCache: {},
@@ -171,6 +172,7 @@ export const v1Schema = {
   send: {
     isSending: false,
     recentRecipients: [],
+    recentPayments: [],
   },
   recipients: {
     recipientCache: {},
