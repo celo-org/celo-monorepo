@@ -12,6 +12,7 @@ import {
   addHashToStandbyTransaction,
   removeStandbyTransaction,
   transactionConfirmed,
+  transactionFailed,
 } from 'src/transactions/actions'
 import { TxPromises } from 'src/transactions/contract-utils'
 import { sendTransactionPromises, wrapSendTransactionWithRetry } from 'src/transactions/send'
@@ -21,9 +22,10 @@ const TAG = 'transactions/saga'
 
 export function* waitForTransactionWithId(txId: string) {
   while (true) {
-    const action = yield take(Actions.TRANSACTION_CONFIRMED)
+    const action = yield take([Actions.TRANSACTION_CONFIRMED, Actions.TRANSACTION_FAILED])
     if (action.txId === txId) {
-      return
+      // Return true for success, false otherwise
+      return action.type === Actions.TRANSACTION_CONFIRMED
     }
   }
 }
@@ -67,6 +69,7 @@ export function* sendAndMonitorTransaction<T>(
   } catch (error) {
     Logger.error(TAG + '@sendAndMonitorTransaction', `Error sending tx ${txId}`, error)
     yield put(removeStandbyTransaction(txId))
+    yield put(transactionFailed(txId))
     yield put(showError(ErrorMessages.TRANSACTION_FAILED))
   }
 }
