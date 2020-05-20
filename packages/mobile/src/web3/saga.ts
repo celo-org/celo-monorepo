@@ -19,11 +19,9 @@ import { cancelGethSaga } from 'src/geth/actions'
 import { UNLOCK_DURATION } from 'src/geth/consts'
 import { deleteChainData, stopGethIfInitialized } from 'src/geth/geth'
 import { gethSaga, waitForGethConnectivity } from 'src/geth/saga'
-import { gethStartedThisSessionSelector } from 'src/geth/selectors'
 import { navigate, navigateToError } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { setCachedPincode } from 'src/pincode/PincodeCache'
-import { restartApp } from 'src/utils/AppRestart'
 import { setKey } from 'src/utils/keyStore'
 import Logger from 'src/utils/Logger'
 import {
@@ -285,68 +283,21 @@ export function* getConnectedUnlockedAccount() {
   }
 }
 
-export function* switchToGethFromForno() {
-  Logger.debug(TAG, 'Switching to geth from forno..')
-  const gethAlreadyStartedThisSession = yield select(gethStartedThisSessionSelector)
-  if (gethAlreadyStartedThisSession) {
-    // Restart app to allow users to start geth a second time
-    // TODO remove when https://github.com/celo-org/celo-monorepo/issues/2101 fixed
-    Logger.debug(TAG + '@switchToGethFromForno', 'Restarting...')
-    restartApp()
-    return
-  }
-  try {
-    yield put(setContractKitReady(false)) // Lock contractKit during provider switch
-    yield put(setFornoMode(false))
-    yield spawn(gethSaga)
-    yield call(waitForGethConnectivity)
-    yield put(setContractKitReady(true))
-    Logger.debug(TAG + '@switchToGethFromForno', 'Ensured in keystore')
-  } catch (e) {
-    Logger.error(TAG + '@switchToGethFromForno', 'Error switching to geth from forno')
-    yield put(showError(ErrorMessages.FAILED_TO_SWITCH_SYNC_MODES))
-    yield put(setContractKitReady(true))
-  }
-}
-
-export function* switchToFornoFromGeth() {
-  Logger.debug(TAG, 'Switching to forno from geth..')
-  try {
-    yield put(setContractKitReady(false)) // Lock contractKit during provider switch
-    yield put(setFornoMode(true))
-    yield put(cancelGethSaga())
-    yield call(stopGethIfInitialized)
-    yield put(setContractKitReady(true))
-  } catch (e) {
-    Logger.error(TAG + '@switchToFornoFromGeth', 'Error switching to forno from geth')
-    yield put(showError(ErrorMessages.FAILED_TO_SWITCH_SYNC_MODES))
-    yield put(setContractKitReady(true))
-  }
-}
-
 export function* toggleFornoMode(action: SetIsFornoAction) {
+  Logger.debug(TAG + '@toggleFornoMode', ` to: ${action.fornoMode}`)
   if ((yield select(fornoSelector)) !== action.fornoMode) {
-    Logger.debug(TAG + '@toggleFornoMode', ` to: ${action.fornoMode}`)
-    if (action.fornoMode) {
-      yield call(switchToFornoFromGeth)
-    } else {
-      yield call(switchToGethFromForno)
-    }
-    // Unlock account to ensure private keys are accessible in new mode
+    yield put(setContractKitReady(false)) // Lock contractKit during provider switch
     try {
-      const account = yield call(getConnectedUnlockedAccount)
-      Logger.debug(
-        TAG + '@toggleFornoMode',
-        `Switched to ${action.fornoMode} and able to unlock account ${account}`
-      )
+      yield put(setFornoMode(action.fornoMode))
+      yield put(cancelGethSaga())
+      yield call(stopGethIfInitialized)
+      yield spawn(gethSaga)
+      yield call(waitForGethConnectivity)
     } catch (e) {
-      // Rollback if private keys aren't accessible in new mode
-      if (action.fornoMode) {
-        yield call(switchToGethFromForno)
-      } else {
-        yield call(switchToFornoFromGeth)
-      }
+      Logger.error(TAG + '@switchToFornoFromGeth', 'Error switching to forno from geth')
+      yield put(showError(ErrorMessages.FAILED_TO_SWITCH_SYNC_MODES))
     }
+    yield put(setContractKitReady(true))
   } else {
     Logger.debug(TAG + '@toggleFornoMode', ` already in desired state: ${action.fornoMode}`)
   }

@@ -73,7 +73,7 @@ function getFolder(filePath: string) {
   return filePath.substr(0, filePath.lastIndexOf('/'))
 }
 
-async function createNewGeth(): Promise<typeof RNGeth> {
+async function createNewGeth(sync: boolean = true): Promise<typeof RNGeth> {
   Logger.debug('Geth@newGeth', 'Configure and create new Geth')
   const { nodeDir, syncMode } = networkConfig
   const genesis: string = await readGenesisBlockFile(nodeDir)
@@ -81,11 +81,14 @@ async function createNewGeth(): Promise<typeof RNGeth> {
 
   Logger.debug('Geth@newGeth', `Network ID is ${networkID}, syncMode is ${syncMode}`)
 
+  const maxPeers = sync ? 25 : 0
+
   const gethOptions: any = {
     nodeDir,
     networkID,
     genesis,
     syncMode,
+    maxPeers,
     useLightweightKDF: true,
     ipcPath: IPC_PATH,
   }
@@ -104,8 +107,8 @@ async function createNewGeth(): Promise<typeof RNGeth> {
   return new RNGeth(gethOptions)
 }
 
-async function initGeth() {
-  Logger.info('Geth@init', 'Create a new Geth instance')
+async function initGeth(sync: boolean = true) {
+  Logger.info('Geth@init', `Create a new Geth instance with sync=${sync}`)
 
   if (gethLock) {
     Logger.warn('Geth@init', 'Geth create already in progress.')
@@ -122,10 +125,10 @@ async function initGeth() {
     if (!(await ensureGenesisBlockWritten())) {
       throw FailedToFetchGenesisBlockError
     }
-    if (!(await ensureStaticNodesInitialized())) {
+    if (sync && !(await ensureStaticNodesInitialized())) {
       throw FailedToFetchStaticNodesError
     }
-    const geth = await createNewGeth()
+    const geth = await createNewGeth(sync)
 
     try {
       await geth.start()
