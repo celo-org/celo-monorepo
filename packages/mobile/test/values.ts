@@ -1,4 +1,5 @@
 /* Shared mock values to facilitate testing */
+import { StackNavigationProp } from '@react-navigation/stack'
 import BigNumber from 'bignumber.js'
 import { MinimalContact } from 'react-native-contacts'
 import { NotificationTypes, PaymentRequest, PaymentRequestStatus } from 'src/account/types'
@@ -147,34 +148,17 @@ export const mockRecipientWithPhoneNumber: RecipientWithMobileNumber = {
   e164PhoneNumber: mockE164Number,
 }
 
-export const mockNavigation = {
-  state: {
-    params: { recipient: mockRecipient },
-    index: 0,
-    routes: [],
-    isTransitioning: false,
-    key: 'key',
-    routeName: 'routeName',
-  },
-  dispatch: jest.fn(),
-  goBack: jest.fn(),
-  dismiss: jest.fn(),
+export const mockNavigation: StackNavigationProp<any, any> = ({
   navigate: jest.fn(),
-  openDrawer: jest.fn(),
-  closeDrawer: jest.fn(),
-  toggleDrawer: jest.fn(),
-  getParam: jest.fn(() => mockRecipient),
+  reset: jest.fn(),
+  goBack: jest.fn(),
   setParams: jest.fn(),
-  addListener: jest.fn(),
-  push: jest.fn(),
-  replace: jest.fn(),
-  pop: jest.fn(),
-  popToTop: jest.fn(),
+  dispatch: jest.fn(),
+  setOptions: jest.fn(),
   isFocused: jest.fn(),
-  dangerouslyGetParent: jest.fn(),
-  emit: jest.fn(),
-  isFirstRouteInParent: jest.fn(),
-}
+  addListener: jest.fn(),
+  removeListener: jest.fn(),
+} as unknown) as StackNavigationProp<any, any>
 
 export const mockAddressToE164Number: AddressToE164NumberType = {
   [mockAccount]: mockE164Number,

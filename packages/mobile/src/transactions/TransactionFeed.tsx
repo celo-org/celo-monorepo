@@ -1,4 +1,3 @@
-import ItemSeparator from '@celo/react-components/components/ItemSeparator'
 import { ApolloError } from 'apollo-boost'
 import gql from 'graphql-tag'
 import * as React from 'react'
@@ -10,6 +9,7 @@ import { NumberToRecipient } from 'src/recipients/recipient'
 import { recipientCacheSelector } from 'src/recipients/reducer'
 import { RootState } from 'src/redux/reducers'
 import ExchangeFeedItem from 'src/transactions/ExchangeFeedItem'
+import GoldTransactionFeedItem from 'src/transactions/GoldTransactionFeedItem'
 import NoActivity from 'src/transactions/NoActivity'
 import { TransactionStatus } from 'src/transactions/reducer'
 import TransferFeedItem from 'src/transactions/TransferFeedItem'
@@ -59,7 +59,12 @@ export class TransactionFeed extends React.PureComponent<Props> {
     `,
   }
 
-  renderItem = (commentKey: string | null) => ({ item: tx }: { item: FeedItem; index: number }) => {
+  renderItem = (commentKeyBuffer: string | null, kind: FeedType) => ({
+    item: tx,
+  }: {
+    item: FeedItem
+    index: number
+  }) => {
     const { addressToE164Number, recipientCache } = this.props
 
     switch (tx.__typename) {
@@ -73,10 +78,12 @@ export class TransactionFeed extends React.PureComponent<Props> {
           />
         )
       case 'TokenExchange':
-        return <ExchangeFeedItem {...tx} />
+        if (kind === FeedType.HOME) {
+          return <ExchangeFeedItem {...tx} />
+        } else {
+          return <GoldTransactionFeedItem {...tx} />
+        }
     }
-
-    return <React.Fragment />
   }
 
   keyExtractor = (item: TransactionFeedFragment) => {
@@ -96,8 +103,7 @@ export class TransactionFeed extends React.PureComponent<Props> {
         <FlatList
           data={data}
           keyExtractor={this.keyExtractor}
-          ItemSeparatorComponent={ItemSeparator}
-          renderItem={this.renderItem(commentKey)}
+          renderItem={this.renderItem(commentKey, kind)}
         />
       )
     } else {

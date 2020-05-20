@@ -50,7 +50,7 @@ export default class ImagePanes extends React.PureComponent {
                 />
               </AspectRatio>
               <Text style={[fonts.legal, textStyles.caption]}>
-                Quarterly Celo retreat focusing on self, team, and company evolution
+                Retreat focusing on self, team, and organizational evolution
               </Text>
             </View>
           </Fade>

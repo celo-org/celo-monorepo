@@ -14,8 +14,7 @@ import { currentLanguageSelector } from 'src/app/reducers'
 import { FIREBASE_ENABLED } from 'src/config'
 import { WritePaymentRequest } from 'src/firebase/actions'
 import { handleNotification } from 'src/firebase/notifications'
-import { navigate } from 'src/navigator/NavigationService'
-import { Screens } from 'src/navigator/Screens'
+import { navigateHome } from 'src/navigator/NavigationService'
 import Logger from 'src/utils/Logger'
 
 const TAG = 'firebase/firebase'
@@ -170,7 +169,7 @@ export function* paymentRequestWriter({ paymentInfo }: WritePaymentRequest) {
     const pendingRequestRef = firebase.database().ref(`pendingRequests`)
     yield call(() => pendingRequestRef.push(paymentInfo))
 
-    navigate(Screens.WalletHome)
+    navigateHome()
   } catch (error) {
     Logger.error(TAG, 'Failed to write payment request to Firebase DB', error)
     yield put(showError(ErrorMessages.PAYMENT_REQUEST_FAILED))
