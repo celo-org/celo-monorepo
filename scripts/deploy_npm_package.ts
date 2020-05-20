@@ -29,7 +29,8 @@ function updatePackageJson(packageName: string, property: string, value: any) {
   const packageJson = JSON.parse(readFileSync(packageJsonPath).toString())
   const updated =
     typeof value === 'object'
-      ? { ...packageJson, [property]: { ...packageJson[property], ...value } }
+      ? // todo: this won't be sorted...
+        { ...packageJson, [property]: { ...packageJson[property], ...value } }
       : { ...packageJson, [property]: value }
   writeFileSync(packageJsonPath, JSON.stringify(updated, null, 2))
 }
@@ -43,6 +44,11 @@ const confirm = async (message: string): Promise<boolean> => {
   return value
 }
 
+const getCurrentCommit = async (): Promise<string> => {
+  const [hash] = await execCmd('git rev-parse HEAD')
+  return hash
+}
+
 async function main() {
   const [dirtyFiles] = await execCmd('git status -s')
   if (dirtyFiles) {
@@ -52,7 +58,7 @@ async function main() {
     return
   }
 
-  const { packageName, version } = await prompt([
+  const { packageName, version, networks } = await prompt([
     {
       type: 'select',
       name: 'packageName',
@@ -65,11 +71,18 @@ async function main() {
       choices: Object.values(ReleaseType).map((type) => ({ title: type, value: type })),
       name: 'version',
     },
+    {
+      type: 'multiselect',
+      name: 'networks',
+      message: 'Which networks would you like to tag this release for?',
+      choices: ['alfajores', 'integration', 'baklava'].map((network) => ({
+        title: network,
+        value: network,
+      })),
+    },
   ])
 
-  const [currentCommit] = await execCmd('git rev-parse HEAD', {
-    cwd: getPackageDir(packageName),
-  })
+  const currentCommit = await getCurrentCommit()
 
   const packageJson = readPackageJson(packageName)
   const currentVersion = packageJson.version
@@ -148,6 +161,10 @@ all OK?`)
     return reset(currentCommit)
   }
 
+  const releaseBranch = `release/${packageName}-${newVersion}`
+  await execCmd(`git checkout -b ${releaseBranch}`)
+
+  updatePackageJson(packageName, 'version', newVersion)
   const [packStdOut, packStdErr] = await execCmd('npm pack', {
     cwd: getPackageDir(packageName),
   })
@@ -157,8 +174,9 @@ all OK?`)
     console.log(packStdOut, packStdErr)
     return reset(currentCommit)
   }
+  const shasum = shasumLine.split(' ').pop()
 
-  await execCmd(`yarn publish --public ${packageName}-${newVersion}.tar.gz`, {
+  await execCmd(`yarn publish --public ${packageName}-${newVersion}.tgz`, {
     cwd: getPackageDir(packageName),
   })
 
@@ -176,27 +194,29 @@ all OK?`)
     return
   }
 
-  await execCmd(`npm dist-tag add ${packageName}@${packageJson.version} ${'what goes here...'}`, {
-    cwd: getPackageDir(packageName),
-  })
-  await execCmd(`npm dist-tag add ${packageName}@${packageJson.version} ${'network'}`, {
-    cwd: getPackageDir(packageName),
-  })
-  await execCmd(`npm dist-tag add ${packageName}@${packageJson.version} latest`, {
-    cwd: getPackageDir(packageName),
-  })
-
   // the package json we need to push will only have an updated version field... not dependencies
-  await execCmd('git stash')
-
-  const shasum = shasumLine.split(' ').pop()
-  const releaseBranch = `release/${packageName}-${newVersion}`
-  await execCmd(`git checkout -b ${releaseBranch}`)
-  updatePackageJson(packageName, 'version', newVersion)
+  updatePackageJson(
+    packageName,
+    'dependencies',
+    Object.keys(celoDependencyVersions).reduce(
+      (accum, cur) => ({ ...accum, [cur]: `file:../${packageNameToDirectory[cur]}` }),
+      {}
+    )
+  )
   await execCmd(`git add ./packages/${packageNameToDirectory[packageName]}`)
   await execCmd(`git commit -m "Update ${packageName} to v${newVersion}
-
+  
 shasum: ${shasum}"`)
+
+  const newCommit = await getCurrentCommit()
+
+  await Promise.all(
+    [...networks, 'latest', newCommit].map((tag) =>
+      execCmd(`npm dist-tag add ${packageName}@${packageJson.version} ${newCommit}`, {
+        cwd: getPackageDir(packageName),
+      })
+    )
+  )
   await execCmd(`git push origin ${releaseBranch}`)
 
   console.log(packageName, 'released!')
