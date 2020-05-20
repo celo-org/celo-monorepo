@@ -4,6 +4,7 @@ import 'react-native'
 import { fireEvent, render } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
 import { TokenTransactionType } from 'src/apollo/types'
+import { AddressValidationType } from 'src/identity/reducer'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import IncomingPaymentRequestListItem from 'src/paymentRequest/IncomingPaymentRequestListItem'
@@ -50,10 +51,7 @@ describe('IncomingPaymentRequestListItem', () => {
       amount: new BigNumber(1),
       comment: 'Something',
       requester: mockInvitableRecipient2,
-      validationDetails: {
-        addressValidationRequired: true,
-        fullValidationRequired: true,
-      },
+      addressValidationType: AddressValidationType.FULL,
     }
 
     const tree = render(
@@ -66,7 +64,7 @@ describe('IncomingPaymentRequestListItem', () => {
     fireEvent.press(tree.getByTestId(`IncomingPaymentRequestNotification/${props.id}`))
     expect(navigate).toHaveBeenCalledWith(Screens.ValidateRecipientIntro, {
       transactionData: mockTransactionData2,
-      fullValidationRequired: true,
+      addressValidationType: AddressValidationType.FULL,
     })
   })
 
@@ -76,10 +74,7 @@ describe('IncomingPaymentRequestListItem', () => {
       amount: new BigNumber(1),
       comment: 'Something',
       requester: mockInvitableRecipient2,
-      validationDetails: {
-        addressValidationRequired: false,
-        fullValidationRequired: false,
-      },
+      addressValidationType: AddressValidationType.NONE,
     }
 
     const tree = render(

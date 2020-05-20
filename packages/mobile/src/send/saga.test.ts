@@ -2,6 +2,7 @@ import { expectSaga } from 'redux-saga-test-plan'
 import { select } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
+import { validateRecipientAddressSuccess } from 'src/identity/actions'
 import {
   addressToE164NumberSelector,
   e164NumberToAddressSelector,
@@ -12,23 +13,14 @@ import { Screens } from 'src/navigator/Screens'
 import { BarcodeTypes } from 'src/qrcode/utils'
 import { RecipientKind } from 'src/recipients/recipient'
 import { recipientCacheSelector } from 'src/recipients/reducer'
-import {
-  Actions,
-  HandleBarcodeDetectedAction,
-  QrCode,
-  ValidateRecipientAddressAction,
-  validateRecipientAddressFailure,
-  validateRecipientAddressSuccess,
-} from 'src/send/actions'
-import { watchQrCodeDetections, watchValidateRecipientAddress } from 'src/send/saga'
-import { currentAccountSelector } from 'src/web3/selectors'
+import { Actions, HandleBarcodeDetectedAction, QrCode } from 'src/send/actions'
+import { watchQrCodeDetections } from 'src/send/saga'
 import {
   mockAccount,
   mockAccount2Invite,
   mockAccountInvite,
   mockE164Number,
   mockE164NumberInvite,
-  mockInvitableRecipient2,
   mockName,
   mockQrCodeData,
   mockQrCodeData2,
@@ -210,87 +202,5 @@ describe(watchQrCodeDetections, () => {
       .put(showError(ErrorMessages.QR_FAILED_INVALID_RECIPIENT))
       .silentRun()
     expect(replace).not.toHaveBeenCalled()
-  })
-})
-
-describe(watchValidateRecipientAddress, () => {
-  beforeAll(() => {
-    jest.useRealTimers()
-  })
-
-  afterEach(() => {
-    jest.clearAllMocks()
-  })
-
-  it('full validation fails if the inputted address does not belong to the recipient', async () => {
-    const validateAction: ValidateRecipientAddressAction = {
-      type: Actions.VALIDATE_RECIPIENT_ADDRESS,
-      userInputOfFullAddressOrLastFourDigits: mockAccount,
-      fullAddressValidationRequired: true,
-      recipient: mockInvitableRecipient2,
-    }
-
-    await expectSaga(watchValidateRecipientAddress)
-      .provide([
-        [select(currentAccountSelector), mockAccount],
-        [select(e164NumberToAddressSelector), mockE164NumberToAddress],
-      ])
-      .dispatch(validateAction)
-      .put(validateRecipientAddressFailure())
-      .run()
-  })
-
-  it('full validation succeeds if the inputted address belongs to the recipient', async () => {
-    const validateAction: ValidateRecipientAddressAction = {
-      type: Actions.VALIDATE_RECIPIENT_ADDRESS,
-      userInputOfFullAddressOrLastFourDigits: mockAccount2Invite,
-      fullAddressValidationRequired: true,
-      recipient: mockInvitableRecipient2,
-    }
-
-    await expectSaga(watchValidateRecipientAddress)
-      .provide([
-        [select(currentAccountSelector), mockAccount],
-        [select(e164NumberToAddressSelector), mockE164NumberToAddress],
-      ])
-      .dispatch(validateAction)
-      .put(validateRecipientAddressSuccess(mockE164NumberInvite, mockAccount2Invite.toLowerCase()))
-      .run()
-  })
-
-  it('partial validation fails if the inputted address does not belong to the recipient', async () => {
-    const validateAction: ValidateRecipientAddressAction = {
-      type: Actions.VALIDATE_RECIPIENT_ADDRESS,
-      userInputOfFullAddressOrLastFourDigits: mockAccount.slice(-4),
-      fullAddressValidationRequired: false,
-      recipient: mockInvitableRecipient2,
-    }
-
-    await expectSaga(watchValidateRecipientAddress)
-      .provide([
-        [select(currentAccountSelector), mockAccount],
-        [select(e164NumberToAddressSelector), mockE164NumberToAddress],
-      ])
-      .dispatch(validateAction)
-      .put(validateRecipientAddressFailure())
-      .run()
-  })
-
-  it('partial validation succeeds if the inputted address belongs to the recipient', async () => {
-    const validateAction: ValidateRecipientAddressAction = {
-      type: Actions.VALIDATE_RECIPIENT_ADDRESS,
-      userInputOfFullAddressOrLastFourDigits: mockAccount2Invite.slice(-4),
-      fullAddressValidationRequired: false,
-      recipient: mockInvitableRecipient2,
-    }
-
-    await expectSaga(watchValidateRecipientAddress)
-      .provide([
-        [select(currentAccountSelector), mockAccount],
-        [select(e164NumberToAddressSelector), mockE164NumberToAddress],
-      ])
-      .dispatch(validateAction)
-      .put(validateRecipientAddressSuccess(mockE164NumberInvite, mockAccount2Invite.toLowerCase()))
-      .run()
   })
 })

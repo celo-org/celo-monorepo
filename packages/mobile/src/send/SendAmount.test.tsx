@@ -4,16 +4,15 @@ import * as RNLocalize from 'react-native-localize'
 import { fireEvent, render } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
 import { TokenTransactionType } from 'src/apollo/types'
-import { E164NumberToAddressType } from 'src/identity/reducer'
+import { AddressValidationType, E164NumberToAddressType } from 'src/identity/reducer'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import SendAmount from 'src/send/SendAmount'
-import { createMockNavigationProp2, createMockStore } from 'test/utils'
+import { createMockStore } from 'test/utils'
 import {
   mockAccount2Invite,
   mockAccountInvite,
   mockE164NumberInvite,
-  mockInvitableRecipient2,
   mockNavigation,
   mockTransactionData,
 } from 'test/values'
@@ -37,6 +36,14 @@ const storeData = {
 const TEXT_PLACEHOLDER = 'groceriesRent'
 const AMOUNT_PLACEHOLDER = 'amount'
 
+const mockRoute = {
+  name: Screens.SendAmount as Screens.SendAmount,
+  key: '1',
+  params: {
+    recipient: mockTransactionData.recipient,
+  },
+}
+
 describe('SendAmount', () => {
   beforeAll(() => {
     jest.useRealTimers()
@@ -47,7 +54,7 @@ describe('SendAmount', () => {
     const getWrapper = () =>
       render(
         <Provider store={store}>
-          <SendAmount navigation={mockNavigation} />
+          <SendAmount navigation={mockNavigation} route={mockRoute} />
         </Provider>
       )
 
@@ -65,7 +72,7 @@ describe('SendAmount', () => {
     const getWrapper = () =>
       render(
         <Provider store={store}>
-          <SendAmount navigation={mockNavigation} />
+          <SendAmount navigation={mockNavigation} route={mockRoute} />
         </Provider>
       )
 
@@ -102,7 +109,7 @@ describe('SendAmount', () => {
       const store = createMockStore(storeData)
       const wrapper = render(
         <Provider store={store}>
-          <SendAmount navigation={mockNavigation} />
+          <SendAmount navigation={mockNavigation} route={mockRoute} />
         </Provider>
       )
 
@@ -131,7 +138,7 @@ describe('SendAmount', () => {
       const store = createMockStore(storeData)
       const wrapper = render(
         <Provider store={store}>
-          <SendAmount navigation={mockNavigation} />
+          <SendAmount navigation={mockNavigation} route={mockRoute} />
         </Provider>
       )
 
@@ -150,17 +157,13 @@ describe('SendAmount', () => {
     })
     const tree = render(
       <Provider store={store}>
-        <SendAmount navigation={mockNavigation} />
+        <SendAmount navigation={mockNavigation} route={mockRoute} />
       </Provider>
     )
     expect(tree).toMatchSnapshot()
   })
 
   describe('Navigation', () => {
-    const navigation = createMockNavigationProp2({
-      recipient: mockInvitableRecipient2,
-    })
-
     const mockE164NumberToAddress: E164NumberToAddressType = {
       [mockE164NumberInvite]: [mockAccountInvite, mockAccount2Invite],
     }
@@ -172,23 +175,20 @@ describe('SendAmount', () => {
 
     it('navigates to ValidatRecipientIntro screen on Send click when a manual address check is needed', () => {
       const store = createMockStore({
-        send: {
-          secureSendPhoneNumberMapping: {
-            [mockE164NumberInvite]: {
-              addressValidationRequired: true,
-              fullValidationRequired: true,
-            },
-          },
-        },
         identity: {
           e164NumberToAddress: mockE164NumberToAddress,
+          secureSendPhoneNumberMapping: {
+            [mockE164NumberInvite]: {
+              addressValidationType: AddressValidationType.FULL,
+            },
+          },
         },
         ...storeData,
       })
 
       const tree = render(
         <Provider store={store}>
-          <SendAmount navigation={navigation} />
+          <SendAmount navigation={mockNavigation} route={mockRoute} />
         </Provider>
       )
       const input = tree.getByPlaceholder(AMOUNT_PLACEHOLDER)
@@ -198,29 +198,26 @@ describe('SendAmount', () => {
       fireEvent.press(tree.getByTestId('Send'))
       expect(navigate).toHaveBeenCalledWith(Screens.ValidateRecipientIntro, {
         transactionData: mockTransactionData2,
-        fullValidationRequired: true,
+        addressValidationType: AddressValidationType.FULL,
       })
     })
 
     it('navigates to SendConfirmation screen on Send click when a manual address check is not needed', () => {
       const store = createMockStore({
-        send: {
-          secureSendPhoneNumberMapping: {
-            [mockE164NumberInvite]: {
-              addressValidationRequired: false,
-              fullValidationRequired: true,
-            },
-          },
-        },
         identity: {
           e164NumberToAddress: mockE164NumberToAddress,
+          secureSendPhoneNumberMapping: {
+            [mockE164NumberInvite]: {
+              addressValidationType: AddressValidationType.NONE,
+            },
+          },
         },
         ...storeData,
       })
 
       const tree = render(
         <Provider store={store}>
-          <SendAmount navigation={navigation} />
+          <SendAmount navigation={mockNavigation} route={mockRoute} />
         </Provider>
       )
       const input = tree.getByPlaceholder(AMOUNT_PLACEHOLDER)
@@ -235,16 +232,13 @@ describe('SendAmount', () => {
 
     it('navigates to ValidatRecipientIntro screen on Request click when a manual address check is needed', () => {
       const store = createMockStore({
-        send: {
-          secureSendPhoneNumberMapping: {
-            [mockE164NumberInvite]: {
-              addressValidationRequired: true,
-              fullValidationRequired: true,
-            },
-          },
-        },
         identity: {
           e164NumberToAddress: mockE164NumberToAddress,
+          secureSendPhoneNumberMapping: {
+            [mockE164NumberInvite]: {
+              addressValidationType: AddressValidationType.FULL,
+            },
+          },
         },
         ...storeData,
       })
@@ -252,7 +246,7 @@ describe('SendAmount', () => {
 
       const tree = render(
         <Provider store={store}>
-          <SendAmount navigation={navigation} />
+          <SendAmount navigation={mockNavigation} route={mockRoute} />
         </Provider>
       )
       const input = tree.getByPlaceholder(AMOUNT_PLACEHOLDER)
@@ -262,23 +256,20 @@ describe('SendAmount', () => {
       fireEvent.press(tree.getByTestId('Request'))
       expect(navigate).toHaveBeenCalledWith(Screens.ValidateRecipientIntro, {
         transactionData: mockTransactionData2,
-        fullValidationRequired: true,
+        addressValidationType: AddressValidationType.FULL,
         isPaymentRequest: true,
       })
     })
 
     it('navigates to PaymentRequestConfirmation screen on Request click when a manual address check is not needed', () => {
       const store = createMockStore({
-        send: {
-          secureSendPhoneNumberMapping: {
-            [mockE164NumberInvite]: {
-              addressValidationRequired: false,
-              fullValidationRequired: true,
-            },
-          },
-        },
         identity: {
           e164NumberToAddress: mockE164NumberToAddress,
+          secureSendPhoneNumberMapping: {
+            [mockE164NumberInvite]: {
+              addressValidationType: AddressValidationType.NONE,
+            },
+          },
         },
         ...storeData,
       })
@@ -286,7 +277,7 @@ describe('SendAmount', () => {
 
       const tree = render(
         <Provider store={store}>
-          <SendAmount navigation={navigation} />
+          <SendAmount navigation={mockNavigation} route={mockRoute} />
         </Provider>
       )
       const input = tree.getByPlaceholder(AMOUNT_PLACEHOLDER)

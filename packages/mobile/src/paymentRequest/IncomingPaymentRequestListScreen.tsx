@@ -2,14 +2,17 @@ import { CURRENCY_ENUM } from '@celo/utils/src/currencies'
 import React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { View } from 'react-native'
-import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
 import { getIncomingPaymentRequests } from 'src/account/selectors'
 import { PaymentRequest } from 'src/account/types'
 import { declinePaymentRequest } from 'src/firebase/actions'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import { fetchAddressesAndValidate } from 'src/identity/actions'
-import { e164NumberToAddressSelector, E164NumberToAddressType } from 'src/identity/reducer'
+import {
+  AddressValidationType,
+  e164NumberToAddressSelector,
+  E164NumberToAddressType,
+} from 'src/identity/reducer'
 import { HeaderTitleWithBalance } from 'src/navigator/Headers'
 import { NotificationList } from 'src/notifications/NotificationList'
 import IncomingPaymentRequestListItem from 'src/paymentRequest/IncomingPaymentRequestListItem'
@@ -17,7 +20,7 @@ import {
   getAddressValidationCheckCache,
   getRecipientFromPaymentRequest,
 } from 'src/paymentRequest/utils'
-import { NumberToRecipient, RecipientKind } from 'src/recipients/recipient'
+import { NumberToRecipient } from 'src/recipients/recipient'
 import { recipientCacheSelector } from 'src/recipients/reducer'
 import { RootState } from 'src/redux/reducers'
 interface StateProps {
@@ -34,17 +37,14 @@ interface DispatchProps {
 }
 
 export interface AddressValidationCheckCache {
-  [e164Number: string]: {
-    addressValidationRequired: boolean
-    fullValidationRequired: boolean
-  }
+  [e164Number: string]: AddressValidationType
 }
 
 const mapStateToProps = (state: RootState): StateProps => {
   const paymentRequests = getIncomingPaymentRequests(state)
   const e164PhoneNumberAddressMapping = e164NumberToAddressSelector(state)
   const recipientCache = recipientCacheSelector(state)
-  const { secureSendPhoneNumberMapping } = state.send
+  const { secureSendPhoneNumberMapping } = state.identity
   const addressValidationCheckCache = getAddressValidationCheckCache(
     paymentRequests,
     recipientCache,
@@ -65,22 +65,19 @@ const mapDispatchToProps = {
   fetchAddressesAndValidate,
 }
 
-type Props = NavigationInjectedProps & WithTranslation & StateProps & DispatchProps
+type Props = WithTranslation & StateProps & DispatchProps
 
-export const listItemRenderer = (params: {
+export const listItemRenderer = (props: {
   recipientCache: NumberToRecipient
   declinePaymentRequest: typeof declinePaymentRequest
   addressValidationCheckCache?: AddressValidationCheckCache
 }) => (request: PaymentRequest, key: number | undefined = undefined) => {
-  const requester = getRecipientFromPaymentRequest(request, params.recipientCache)
-  const { addressValidationCheckCache } = params
-  let validationDetails
+  const requester = getRecipientFromPaymentRequest(request, props.recipientCache)
+  const { addressValidationCheckCache } = props
+  let addressValidationType
 
-  if (addressValidationCheckCache) {
-    if (!requester.e164PhoneNumber) {
-      throw Error('Error finding phone number')
-    }
-    validationDetails = addressValidationCheckCache[requester.e164PhoneNumber]
+  if (addressValidationCheckCache && requester.e164PhoneNumber) {
+    addressValidationType = addressValidationCheckCache[requester.e164PhoneNumber]
   }
 
   return (
@@ -90,8 +87,8 @@ export const listItemRenderer = (params: {
         amount={request.amount}
         requester={requester}
         comment={request.comment}
-        declinePaymentRequest={params.declinePaymentRequest}
-        validationDetails={validationDetails}
+        declinePaymentRequest={props.declinePaymentRequest}
+        addressValidationType={addressValidationType}
       />
     </View>
   )
@@ -118,11 +115,10 @@ class IncomingPaymentRequestListScreen extends React.Component<Props> {
     // TODO: Look into creating a batch lookup function so we dont rerender on each lookup
     paymentRequests.forEach((paymentRequest) => {
       const recipient = getRecipientFromPaymentRequest(paymentRequest, this.props.recipientCache)
-      if (recipient.kind !== RecipientKind.MobileNumber) {
-        throw Error(`Invalid recipient type: ${recipient.kind}`)
-      }
       const { e164PhoneNumber } = recipient
-      this.props.fetchAddressesAndValidate(e164PhoneNumber)
+      if (e164PhoneNumber) {
+        this.props.fetchAddressesAndValidate(e164PhoneNumber)
+      }
     })
   }
 

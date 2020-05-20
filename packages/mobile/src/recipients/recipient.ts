@@ -1,7 +1,11 @@
 import { parsePhoneNumber } from '@celo/utils/src/phoneNumbers'
 import * as fuzzysort from 'fuzzysort'
 import { MinimalContact } from 'react-native-contacts'
-import { AddressToE164NumberType } from 'src/identity/reducer'
+import {
+  AddressToE164NumberType,
+  E164NumberToAddressType,
+  RecipientVerificationStatus,
+} from 'src/identity/reducer'
 import Logger from 'src/utils/Logger'
 
 const TAG = 'recipients/recipient'
@@ -118,6 +122,31 @@ export function getRecipientFromAddress(
 ) {
   const e164PhoneNumber = addressToE164Number[address]
   return e164PhoneNumber ? recipientCache[e164PhoneNumber] : undefined
+}
+
+export const getRecipientVerificationStatus = (
+  recipient: Recipient,
+  e164NumberToAddress: E164NumberToAddressType
+): RecipientVerificationStatus => {
+  if (recipient.kind === RecipientKind.QrCode || recipient.kind === RecipientKind.Address) {
+    return RecipientVerificationStatus.VERIFIED
+  }
+
+  if (recipient.e164PhoneNumber) {
+    const addresses = e164NumberToAddress[recipient.e164PhoneNumber]
+
+    if (addresses === undefined) {
+      return RecipientVerificationStatus.UNKNOWN
+    }
+
+    if (addresses === null) {
+      return RecipientVerificationStatus.UNVERIFIED
+    }
+
+    return RecipientVerificationStatus.VERIFIED
+  }
+
+  return RecipientVerificationStatus.UNKNOWN
 }
 
 export function getRecipientThumbnail(recipient?: Recipient) {

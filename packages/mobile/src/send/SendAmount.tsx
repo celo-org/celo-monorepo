@@ -13,23 +13,23 @@ import { fontStyles } from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
 import { ValidatorKind } from '@celo/utils/src/inputValidation'
 import { parseInputAmount } from '@celo/utils/src/parsing'
+import { StackScreenProps } from '@react-navigation/stack'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { StyleSheet, TextStyle, TouchableWithoutFeedback, View } from 'react-native'
 import { getNumberFormatSettings } from 'react-native-localize'
 import SafeAreaView from 'react-native-safe-area-view'
-import { NavigationFocusInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
 import { hideAlert, showError, showMessage } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
-import componentWithAnalytics from 'src/analytics/wrapper'
 import { TokenTransactionType } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import Avatar from 'src/components/Avatar'
 import CurrencyDisplay, { FormatType } from 'src/components/CurrencyDisplay'
 import {
+  DAILY_PAYMENT_LIMIT_CUSD,
   DOLLAR_TRANSACTION_MIN_AMOUNT,
   MAX_COMMENT_LENGTH,
   NUMBER_INPUT_MAX_DECIMALS,
@@ -40,9 +40,11 @@ import { getFeeEstimateDollars } from 'src/fees/selectors'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import { fetchAddressesAndValidate } from 'src/identity/actions'
-import { RecipientVerificationStatus } from 'src/identity/reducer'
+import { AddressValidationType, RecipientVerificationStatus } from 'src/identity/reducer'
+import { checkIfAddressValidationRequired } from 'src/identity/secureSend'
 import { LocalCurrencyCode, LocalCurrencySymbol } from 'src/localCurrency/consts'
 import {
+  convertDollarsToLocalAmount,
   convertDollarsToMaxSupportedPrecision,
   convertLocalAmountToDollars,
 } from 'src/localCurrency/convert'
@@ -50,9 +52,12 @@ import { getLocalCurrencyCode, getLocalCurrencyExchangeRate } from 'src/localCur
 import { HeaderTitleWithBalance, headerWithBackButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import { Recipient } from 'src/recipients/recipient'
+import { StackParamList } from 'src/navigator/types'
+import { getRecipientVerificationStatus, Recipient } from 'src/recipients/recipient'
 import { RootState } from 'src/redux/reducers'
-import { checkIfAddressValidationRequired, getFeeType, getVerificationStatus } from 'src/send/utils'
+import { PaymentInfo } from 'src/send/reducers'
+import { getRecentPayments } from 'src/send/selectors'
+import { dailyAmountRemaining, getFeeType } from 'src/send/utils'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { fetchDollarBalance } from 'src/stableToken/actions'
 import { withDecimalSeparator } from 'src/utils/withDecimalSeparator'
@@ -70,17 +75,12 @@ const AmountInput = withDecimalSeparator(
 )
 const CommentInput = withTextInputLabeling<TextInputProps>(TextInput)
 
-type Navigation = NavigationFocusInjectedProps['navigation']
-
-interface OwnProps {
-  navigation: Navigation
-}
-
 interface State {
   amount: string
   reason: string
 }
 
+type OwnProps = StackScreenProps<StackParamList, Screens.SendAmount>
 type Props = StateProps & DispatchProps & OwnProps & WithTranslation
 
 interface StateProps {
@@ -92,8 +92,8 @@ interface StateProps {
   localCurrencyExchangeRate: string | null | undefined
   recipient: Recipient
   recipientVerificationStatus: RecipientVerificationStatus
-  addressValidationRequired: boolean
-  fullValidationRequired: boolean
+  addressValidationType: AddressValidationType
+  recentPayments: PaymentInfo[]
 }
 
 interface DispatchProps {
@@ -105,16 +105,17 @@ interface DispatchProps {
 }
 
 const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
-  const { navigation } = ownProps
-  const recipient = navigation.getParam('recipient')
-  const { secureSendPhoneNumberMapping } = state.send
-  const { addressValidationRequired, fullValidationRequired } = checkIfAddressValidationRequired(
+  const { route } = ownProps
+  const recipient = route.params.recipient
+  const { secureSendPhoneNumberMapping } = state.identity
+  const addressValidationType: AddressValidationType = checkIfAddressValidationRequired(
     recipient,
     secureSendPhoneNumberMapping
   )
   const { e164NumberToAddress } = state.identity
-  const recipientVerificationStatus = getVerificationStatus(recipient, e164NumberToAddress)
+  const recipientVerificationStatus = getRecipientVerificationStatus(recipient, e164NumberToAddress)
   const feeType = getFeeType(recipientVerificationStatus)
+  const recentPayments = getRecentPayments(state)
 
   return {
     dollarBalance: state.stableToken.balance || '0',
@@ -125,8 +126,8 @@ const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
     localCurrencyExchangeRate: getLocalCurrencyExchangeRate(state),
     recipient,
     recipientVerificationStatus,
-    addressValidationRequired,
-    fullValidationRequired,
+    addressValidationType,
+    recentPayments,
   }
 }
 
@@ -141,10 +142,10 @@ const mapDispatchToProps = {
 const { decimalSeparator } = getNumberFormatSettings()
 
 export class SendAmount extends React.Component<Props, State> {
-  static navigationOptions = () => ({
+  static navigationOptions = {
     ...headerWithBackButton,
     headerTitle: <HeaderTitleWithBalance title={i18n.t('sendFlow7:sendOrRequest')} />,
-  })
+  }
 
   state: State = {
     amount: '',
@@ -209,12 +210,30 @@ export class SendAmount extends React.Component<Props, State> {
     this.setState({ reason })
   }
 
+  showLimitReachedError = (now: number) => {
+    const dailyRemainingcUSD = dailyAmountRemaining(now, this.props.recentPayments)
+    const dailyRemaining = convertDollarsToLocalAmount(
+      dailyRemainingcUSD,
+      this.props.localCurrencyExchangeRate
+    )
+    const dailyLimit = convertDollarsToLocalAmount(
+      DAILY_PAYMENT_LIMIT_CUSD,
+      this.props.localCurrencyExchangeRate
+    )
+    const currencySymbol = LocalCurrencySymbol[this.props.localCurrencyCode]
+
+    const translationParams = {
+      currencySymbol,
+      dailyRemaining,
+      dailyLimit,
+      dailyRemainingcUSD,
+      dailyLimitcUSD: DAILY_PAYMENT_LIMIT_CUSD,
+    }
+    this.props.showError(ErrorMessages.PAYMENT_LIMIT_REACHED, null, translationParams)
+  }
+
   onSend = () => {
-    const {
-      recipientVerificationStatus,
-      addressValidationRequired,
-      fullValidationRequired,
-    } = this.props
+    const { recipientVerificationStatus, addressValidationType } = this.props
 
     const { isDollarBalanceSufficient } = this.isAmountValid()
     if (!isDollarBalanceSufficient) {
@@ -234,10 +253,10 @@ export class SendAmount extends React.Component<Props, State> {
 
     this.props.hideAlert()
 
-    if (addressValidationRequired) {
+    if (addressValidationType !== AddressValidationType.NONE) {
       navigate(Screens.ValidateRecipientIntro, {
         transactionData,
-        fullValidationRequired,
+        addressValidationType,
       })
     } else {
       CeloAnalytics.track(CustomEventNames.send_continue)
@@ -246,13 +265,13 @@ export class SendAmount extends React.Component<Props, State> {
   }
 
   onRequest = () => {
-    const { addressValidationRequired, fullValidationRequired } = this.props
+    const { addressValidationType } = this.props
     const transactionData = this.getTransactionData(TokenTransactionType.PayRequest)
 
-    if (addressValidationRequired) {
+    if (addressValidationType !== AddressValidationType.NONE) {
       navigate(Screens.ValidateRecipientIntro, {
         transactionData,
-        fullValidationRequired,
+        addressValidationType,
         isPaymentRequest: true,
       })
     } else {
@@ -486,9 +505,7 @@ const style = StyleSheet.create({
   },
 })
 
-export default componentWithAnalytics(
-  connect<StateProps, DispatchProps, OwnProps, RootState>(
-    mapStateToProps,
-    mapDispatchToProps
-  )(withTranslation(Namespaces.sendFlow7)(SendAmount))
-)
+export default connect<StateProps, DispatchProps, OwnProps, RootState>(
+  mapStateToProps,
+  mapDispatchToProps
+)(withTranslation(Namespaces.sendFlow7)(SendAmount))

@@ -4,12 +4,21 @@ import { fireEvent, render } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
 import InviteReviewConnected, { InviteReview } from 'src/account/InviteReview'
+import { Screens } from 'src/navigator/Screens'
 import { createMockStore, getMockI18nProps } from 'test/utils'
-import { mockNavigation } from 'test/values'
+import { mockNavigation, mockRecipient } from 'test/values'
 
 jest.mock('src/geth/GethAwareButton', () => {
   return mockButton
 })
+
+const mockRoute = {
+  name: Screens.InviteReview as Screens.InviteReview,
+  key: '1',
+  params: {
+    recipient: mockRecipient,
+  },
+}
 
 describe('InviteReview', () => {
   beforeAll(() => {
@@ -23,7 +32,7 @@ describe('InviteReview', () => {
   it('renders correctly', () => {
     const tree = renderer.create(
       <Provider store={createMockStore()}>
-        <InviteReviewConnected navigation={mockNavigation} />
+        <InviteReviewConnected navigation={mockNavigation} route={mockRoute} />
       </Provider>
     )
     expect(tree).toMatchSnapshot()
@@ -47,6 +56,7 @@ describe('InviteReview', () => {
           sendInvite={sendInvite}
           {...getMockI18nProps()}
           navigation={mockNavigation}
+          route={mockRoute}
         />
       </Provider>
     )

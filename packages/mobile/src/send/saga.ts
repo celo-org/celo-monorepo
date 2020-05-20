@@ -1,6 +1,6 @@
 import { CURRENCY_ENUM } from '@celo/utils/src/currencies'
 import BigNumber from 'bignumber.js'
-import { call, put, select, spawn, take, takeLatest, takeLeading } from 'redux-saga/effects'
+import { call, put, select, spawn, take, takeLeading } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
@@ -21,11 +21,7 @@ import {
   SendPaymentOrInviteAction,
   sendPaymentOrInviteFailure,
   sendPaymentOrInviteSuccess,
-  ValidateRecipientAddressAction,
-  validateRecipientAddressFailure,
-  validateRecipientAddressSuccess,
 } from 'src/send/actions'
-import { validateAndReturnMatch } from 'src/send/utils'
 import { transferStableToken } from 'src/stableToken/actions'
 import {
   BasicTokenTransfer,
@@ -187,54 +183,12 @@ function* sendPaymentOrInviteSaga({
   }
 }
 
-export function* validateRecipientAddressSaga({
-  userInputOfFullAddressOrLastFourDigits,
-  fullAddressValidationRequired,
-  recipient,
-}: ValidateRecipientAddressAction) {
-  Logger.debug(TAG, 'Starting Recipient Address Validation')
-  try {
-    if (!recipient.e164PhoneNumber) {
-      throw Error(`Invalid recipient type for Secure Send: ${recipient.kind}`)
-    }
-
-    const userAddress = yield select(currentAccountSelector)
-    const e164NumberToAddress = yield select(e164NumberToAddressSelector)
-    const { e164PhoneNumber } = recipient
-    const possibleRecievingAddresses = e164NumberToAddress[e164PhoneNumber]
-
-    // Should never happen since secure send is initiated due to there being several possible addresses
-    if (!possibleRecievingAddresses) {
-      throw Error('There are no possible recipient addresses to validate against')
-    }
-
-    const validatedAddress = validateAndReturnMatch(
-      userInputOfFullAddressOrLastFourDigits,
-      possibleRecievingAddresses,
-      userAddress,
-      fullAddressValidationRequired
-    )
-    yield put(validateRecipientAddressSuccess(e164PhoneNumber, validatedAddress))
-  } catch (error) {
-    Logger.error(TAG, 'validateRecipientAddressSaga/Address validation error: ', error)
-    // Dismissing the error banner immediately because we are showing
-    // this error inline at ValidateRecipientAccount
-    yield put(showError(error.message, 0.01))
-    yield put(validateRecipientAddressFailure())
-  }
-}
-
 export function* watchSendPaymentOrInvite() {
   yield takeLeading(Actions.SEND_PAYMENT_OR_INVITE, sendPaymentOrInviteSaga)
-}
-
-export function* watchValidateRecipientAddress() {
-  yield takeLatest(Actions.VALIDATE_RECIPIENT_ADDRESS, validateRecipientAddressSaga)
 }
 
 export function* sendSaga() {
   yield spawn(watchQrCodeDetections)
   yield spawn(watchQrCodeShare)
   yield spawn(watchSendPaymentOrInvite)
-  yield spawn(watchValidateRecipientAddress)
 }

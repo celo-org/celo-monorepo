@@ -1,9 +1,8 @@
 import { PaymentRequest } from 'src/account/types'
-import { AddressToE164NumberType } from 'src/identity/reducer'
+import { AddressToE164NumberType, SecureSendPhoneNumberMapping } from 'src/identity/reducer'
+import { checkIfAddressValidationRequired } from 'src/identity/secureSend'
 import { AddressValidationCheckCache } from 'src/paymentRequest/IncomingPaymentRequestListScreen'
 import { NumberToRecipient, Recipient, RecipientKind } from 'src/recipients/recipient'
-import { SecureSendPhoneNumberMapping } from 'src/send/reducers'
-import { checkIfAddressValidationRequired } from 'src/send/utils'
 
 export function getRecipientFromPaymentRequest(
   paymentRequest: PaymentRequest,
@@ -69,19 +68,14 @@ export const getAddressValidationCheckCache = (
 
   paymentRequests.forEach((payment) => {
     const recipient = getRecipientFromPaymentRequest(payment, recipientCache)
-    const { addressValidationRequired, fullValidationRequired } = checkIfAddressValidationRequired(
+    const addressValidationType = checkIfAddressValidationRequired(
       recipient,
       secureSendPhoneNumberMapping
     )
 
     const { e164PhoneNumber } = recipient
-    if (!e164PhoneNumber) {
-      throw new Error('Missing recipient e164Number for payment request')
-    }
-
-    addressValidationCheckCache[e164PhoneNumber] = {
-      addressValidationRequired,
-      fullValidationRequired,
+    if (e164PhoneNumber) {
+      addressValidationCheckCache[e164PhoneNumber] = addressValidationType
     }
   })
 

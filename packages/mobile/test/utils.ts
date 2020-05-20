@@ -1,18 +1,12 @@
 /* Utilities to facilitate testing */
 import BigNumber from 'bignumber.js'
-import { NavigationScreenProp } from 'react-navigation'
 import { ReactTestInstance } from 'react-test-renderer'
 import configureMockStore from 'redux-mock-store'
 import { InitializationState } from 'src/geth/reducer'
 import i18n from 'src/i18n'
 import { RootState } from 'src/redux/reducers'
 import { getLatestSchema } from 'test/schemas'
-import {
-  mockAddressToE164Number,
-  mockContractAddress,
-  mockE164NumberToAddress,
-  mockNavigation,
-} from 'test/values'
+import { mockAddressToE164Number, mockContractAddress, mockE164NumberToAddress } from 'test/values'
 
 // Sleep for a number of ms
 export const sleep = (time: number) =>
@@ -70,28 +64,6 @@ function createSendMethod(): SendMethod {
   return jest.fn(() => ({
     on: createSendMethod(),
   }))
-}
-
-export function createMockNavigationProp(params: any): NavigationScreenProp<any> {
-  return {
-    ...mockNavigation,
-    state: {
-      ...mockNavigation.state,
-      params,
-    },
-    getParam: jest.fn(() => params),
-  }
-}
-
-export function createMockNavigationProp2(params: any): NavigationScreenProp<any> {
-  return {
-    ...mockNavigation,
-    state: {
-      ...mockNavigation.state,
-      params,
-    },
-    getParam: jest.fn((property) => params[property]),
-  }
 }
 
 const mockStore = configureMockStore()

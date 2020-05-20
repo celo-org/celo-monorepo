@@ -25,8 +25,7 @@ import { addressToE164NumberSelector } from 'src/identity/reducer'
 import { NUM_ATTESTATIONS_REQUIRED, VerificationStatus } from 'src/identity/verification'
 import { TEMP_PW } from 'src/invite/saga'
 import { isValidPrivateKey } from 'src/invite/utils'
-import { navigate } from 'src/navigator/NavigationService'
-import { Screens } from 'src/navigator/Screens'
+import { navigateHome } from 'src/navigator/NavigationService'
 import { RootState } from 'src/redux/reducers'
 import { fetchDollarBalance } from 'src/stableToken/actions'
 import { getCurrencyAddress } from 'src/tokens/saga'
@@ -221,7 +220,7 @@ function* reclaimFromEscrow({ paymentID }: EscrowReclaimPaymentAction) {
     yield put(fetchDollarBalance())
     yield put(fetchSentEscrowPayments())
 
-    yield call(navigate, Screens.WalletHome)
+    yield call(navigateHome)
     yield put(reclaimEscrowPaymentSuccess())
   } catch (e) {
     Logger.error(TAG + '@reclaimFromEscrow', 'Error reclaiming payment from escrow', e)

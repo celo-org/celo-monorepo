@@ -12,7 +12,6 @@ import { connect } from 'react-redux'
 import { setName, setPhoneNumber, setPromptForno } from 'src/account/actions'
 import { PincodeType } from 'src/account/reducer'
 import { hideAlert, showError } from 'src/alert/actions'
-import { componentWithAnalytics } from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import DevSkipButton from 'src/components/DevSkipButton'
 import { Namespaces, withTranslation } from 'src/i18n'
@@ -230,9 +229,7 @@ const styles = StyleSheet.create({
   },
 })
 
-export default componentWithAnalytics(
-  connect<StateProps, DispatchProps, {}, RootState>(
-    mapStateToProps,
-    mapDispatchToProps
-  )(withTranslation(Namespaces.nuxNamePin1)(JoinCelo))
-)
+export default connect<StateProps, DispatchProps, {}, RootState>(
+  mapStateToProps,
+  mapDispatchToProps
+)(withTranslation(Namespaces.nuxNamePin1)(JoinCelo))

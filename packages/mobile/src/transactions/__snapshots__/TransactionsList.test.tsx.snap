@@ -2,7 +2,6 @@
 
 exports[`ignores failed standby transactions 1`] = `
 <RCTScrollView
-  ItemSeparatorComponent={[Function]}
   data={
     Array [
       Object {
@@ -117,7 +116,8 @@ exports[`ignores failed standby transactions 1`] = `
               "flex": 1,
               "flexDirection": "row",
               "justifyContent": "space-between",
-              "padding": 16,
+              "paddingHorizontal": 16,
+              "paddingVertical": 12,
             }
           }
         >
@@ -195,8 +195,9 @@ exports[`ignores failed standby transactions 1`] = `
                 style={
                   Object {
                     "color": "#2E3338",
-                    "fontFamily": "Hind-SemiBold",
-                    "fontSize": 15,
+                    "fontFamily": "Inter-Medium",
+                    "fontSize": 16,
+                    "lineHeight": 22,
                   }
                 }
               >
@@ -208,23 +209,21 @@ exports[`ignores failed standby transactions 1`] = `
                   Array [
                     Array [
                       Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Inter-Medium",
+                        "fontSize": 16,
+                        "lineHeight": 22,
                         "marginLeft": "auto",
                         "paddingLeft": 10,
                       },
-                      Object {
-                        "color": "#81868B",
-                        "fontFamily": "Hind-Regular",
-                        "fontSize": 15,
-                        "lineHeight": 20,
-                      },
+                      false,
                     ],
                     Object {
-                      "color": "#81868B",
+                      "color": "#2E3338",
                     },
                   ]
                 }
               >
-                -
                 $
                 0.20
               </Text>
@@ -232,54 +231,18 @@ exports[`ignores failed standby transactions 1`] = `
             <Text
               style={
                 Object {
-                  "color": "#81868B",
-                  "fontFamily": "Hind-Regular",
-                  "fontSize": 15,
-                  "marginTop": -2,
+                  "color": "#9CA4A9",
+                  "fontFamily": "Inter-Regular",
+                  "fontSize": 14,
+                  "lineHeight": 18,
                 }
               }
             >
-              Hi
+              feedItemSentInfo
             </Text>
-            <View
-              style={
-                Array [
-                  Object {
-                    "alignItems": "center",
-                    "flex": 1,
-                    "flexDirection": "row",
-                  },
-                  Object {
-                    "marginTop": 8,
-                  },
-                ]
-              }
-            >
-              <Text
-                style={
-                  Object {
-                    "color": "#BDBDBD",
-                    "fontFamily": "Hind-Regular",
-                    "fontSize": 14,
-                    "lineHeight": 18,
-                  }
-                }
-              >
-                Jan 9 global:at 12:42 AM
-              </Text>
-            </View>
           </View>
         </View>
       </View>
-      <View
-        style={
-          Object {
-            "backgroundColor": "rgba(134, 138, 141, 0.15)",
-            "height": 1,
-            "marginHorizontal": 16,
-          }
-        }
-      />
     </View>
     <View
       onLayout={[Function]}
@@ -308,7 +271,8 @@ exports[`ignores failed standby transactions 1`] = `
               "flex": 1,
               "flexDirection": "row",
               "justifyContent": "space-between",
-              "padding": 16,
+              "paddingHorizontal": 16,
+              "paddingVertical": 12,
             }
           }
         >
@@ -317,9 +281,6 @@ exports[`ignores failed standby transactions 1`] = `
               Object {
                 "alignItems": "center",
                 "flexDirection": "column",
-                "height": 40,
-                "justifyContent": "center",
-                "width": 40,
               }
             }
           >
@@ -332,6 +293,7 @@ exports[`ignores failed standby transactions 1`] = `
               }
               style={
                 Object {
+                  "height": 40,
                   "width": 40,
                 }
               }
@@ -349,7 +311,7 @@ exports[`ignores failed standby transactions 1`] = `
               style={
                 Object {
                   "flexDirection": "row",
-                  "marginTop": 3,
+                  "marginTop": -1,
                 }
               }
             >
@@ -357,13 +319,13 @@ exports[`ignores failed standby transactions 1`] = `
                 style={
                   Object {
                     "color": "#2E3338",
-                    "fontFamily": "Hind-SemiBold",
-                    "fontSize": 14,
-                    "lineHeight": 18,
+                    "fontFamily": "Inter-Medium",
+                    "fontSize": 16,
+                    "lineHeight": 22,
                   }
                 }
               >
-                exchange
+                feedItemExchangeTitle
               </Text>
               <Text
                 numberOfLines={1}
@@ -371,32 +333,35 @@ exports[`ignores failed standby transactions 1`] = `
                   Array [
                     Array [
                       Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Inter-Medium",
+                        "fontSize": 16,
+                        "lineHeight": 22,
                         "marginLeft": "auto",
                         "paddingLeft": 10,
                       },
                       Object {
-                        "color": "#2E3338",
-                        "fontFamily": "Hind-SemiBold",
-                        "fontSize": 15,
-                        "lineHeight": 20,
+                        "color": "#1AB775",
                       },
                     ],
                     Object {
-                      "color": "#2E3338",
+                      "color": "#1AB775",
                     },
                   ]
                 }
               >
-                
+                +
                 $
                 0.99
               </Text>
             </View>
-            <View
+            <Text
               style={
                 Object {
-                  "alignItems": "center",
-                  "flexDirection": "row",
+                  "color": "#9CA4A9",
+                  "fontFamily": "Inter-Regular",
+                  "fontSize": 14,
+                  "lineHeight": 18,
                 }
               }
             >
@@ -404,16 +369,9 @@ exports[`ignores failed standby transactions 1`] = `
                 numberOfLines={1}
                 style={
                   Array [
-                    Array [
-                      Object {
-                        "fontFamily": "Hind-SemiBold",
-                        "fontSize": 16,
-                        "lineHeight": 20,
-                      },
-                      false,
-                    ],
+                    undefined,
                     Object {
-                      "color": "#FBCC5C",
+                      "color": undefined,
                     },
                   ]
                 }
@@ -421,76 +379,7 @@ exports[`ignores failed standby transactions 1`] = `
                 
                 0.100
               </Text>
-              <View
-                style={
-                  Object {
-                    "paddingBottom": 8,
-                    "paddingHorizontal": 5,
-                  }
-                }
-              >
-                <svg
-                  fill="none"
-                  height="6"
-                  style={Object {}}
-                  viewBox="0 0 9 6"
-                  width="9"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    clip-rule="evenodd"
-                    d="M5.0998 5.45001L8.39993 3.02504L5.0998 0.600067V2.22512L0.399933 2.22512V3.82518L5.0998 3.82518V5.45001Z"
-                    fill="rgba(0, 0, 0, .4)"
-                    fill-rule="evenodd"
-                    style={Object {}}
-                  />
-                </svg>
-              </View>
-              <Text
-                numberOfLines={1}
-                style={
-                  Array [
-                    Array [
-                      Object {
-                        "fontFamily": "Hind-SemiBold",
-                        "fontSize": 16,
-                        "lineHeight": 20,
-                      },
-                      false,
-                    ],
-                    Object {
-                      "color": "#42D689",
-                    },
-                  ]
-                }
-              >
-                
-                0.99
-              </Text>
-            </View>
-            <View
-              style={
-                Object {
-                  "alignItems": "center",
-                  "flex": 1,
-                  "flexDirection": "row",
-                  "marginTop": 8,
-                }
-              }
-            >
-              <Text
-                style={
-                  Object {
-                    "color": "#BDBDBD",
-                    "fontFamily": "Hind-Regular",
-                    "fontSize": 14,
-                    "lineHeight": 18,
-                  }
-                }
-              >
-                Jan 9 global:at 12:41 AM
-              </Text>
-            </View>
+            </Text>
           </View>
         </View>
       </View>
@@ -501,7 +390,6 @@ exports[`ignores failed standby transactions 1`] = `
 
 exports[`ignores pending standby transactions that are completed in the response and removes them 1`] = `
 <RCTScrollView
-  ItemSeparatorComponent={[Function]}
   data={
     Array [
       Object {
@@ -616,7 +504,8 @@ exports[`ignores pending standby transactions that are completed in the response
               "flex": 1,
               "flexDirection": "row",
               "justifyContent": "space-between",
-              "padding": 16,
+              "paddingHorizontal": 16,
+              "paddingVertical": 12,
             }
           }
         >
@@ -694,8 +583,9 @@ exports[`ignores pending standby transactions that are completed in the response
                 style={
                   Object {
                     "color": "#2E3338",
-                    "fontFamily": "Hind-SemiBold",
-                    "fontSize": 15,
+                    "fontFamily": "Inter-Medium",
+                    "fontSize": 16,
+                    "lineHeight": 22,
                   }
                 }
               >
@@ -707,23 +597,21 @@ exports[`ignores pending standby transactions that are completed in the response
                   Array [
                     Array [
                       Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Inter-Medium",
+                        "fontSize": 16,
+                        "lineHeight": 22,
                         "marginLeft": "auto",
                         "paddingLeft": 10,
                       },
-                      Object {
-                        "color": "#81868B",
-                        "fontFamily": "Hind-Regular",
-                        "fontSize": 15,
-                        "lineHeight": 20,
-                      },
+                      false,
                     ],
                     Object {
-                      "color": "#81868B",
+                      "color": "#2E3338",
                     },
                   ]
                 }
               >
-                -
                 $
                 0.20
               </Text>
@@ -731,54 +619,18 @@ exports[`ignores pending standby transactions that are completed in the response
             <Text
               style={
                 Object {
-                  "color": "#81868B",
-                  "fontFamily": "Hind-Regular",
-                  "fontSize": 15,
-                  "marginTop": -2,
+                  "color": "#9CA4A9",
+                  "fontFamily": "Inter-Regular",
+                  "fontSize": 14,
+                  "lineHeight": 18,
                 }
               }
             >
-              Hi
+              feedItemSentInfo
             </Text>
-            <View
-              style={
-                Array [
-                  Object {
-                    "alignItems": "center",
-                    "flex": 1,
-                    "flexDirection": "row",
-                  },
-                  Object {
-                    "marginTop": 8,
-                  },
-                ]
-              }
-            >
-              <Text
-                style={
-                  Object {
-                    "color": "#BDBDBD",
-                    "fontFamily": "Hind-Regular",
-                    "fontSize": 14,
-                    "lineHeight": 18,
-                  }
-                }
-              >
-                Jan 9 global:at 12:42 AM
-              </Text>
-            </View>
           </View>
         </View>
       </View>
-      <View
-        style={
-          Object {
-            "backgroundColor": "rgba(134, 138, 141, 0.15)",
-            "height": 1,
-            "marginHorizontal": 16,
-          }
-        }
-      />
     </View>
     <View
       onLayout={[Function]}
@@ -807,7 +659,8 @@ exports[`ignores pending standby transactions that are completed in the response
               "flex": 1,
               "flexDirection": "row",
               "justifyContent": "space-between",
-              "padding": 16,
+              "paddingHorizontal": 16,
+              "paddingVertical": 12,
             }
           }
         >
@@ -816,9 +669,6 @@ exports[`ignores pending standby transactions that are completed in the response
               Object {
                 "alignItems": "center",
                 "flexDirection": "column",
-                "height": 40,
-                "justifyContent": "center",
-                "width": 40,
               }
             }
           >
@@ -831,6 +681,7 @@ exports[`ignores pending standby transactions that are completed in the response
               }
               style={
                 Object {
+                  "height": 40,
                   "width": 40,
                 }
               }
@@ -848,7 +699,7 @@ exports[`ignores pending standby transactions that are completed in the response
               style={
                 Object {
                   "flexDirection": "row",
-                  "marginTop": 3,
+                  "marginTop": -1,
                 }
               }
             >
@@ -856,13 +707,13 @@ exports[`ignores pending standby transactions that are completed in the response
                 style={
                   Object {
                     "color": "#2E3338",
-                    "fontFamily": "Hind-SemiBold",
-                    "fontSize": 14,
-                    "lineHeight": 18,
+                    "fontFamily": "Inter-Medium",
+                    "fontSize": 16,
+                    "lineHeight": 22,
                   }
                 }
               >
-                exchange
+                feedItemExchangeTitle
               </Text>
               <Text
                 numberOfLines={1}
@@ -870,32 +721,35 @@ exports[`ignores pending standby transactions that are completed in the response
                   Array [
                     Array [
                       Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Inter-Medium",
+                        "fontSize": 16,
+                        "lineHeight": 22,
                         "marginLeft": "auto",
                         "paddingLeft": 10,
                       },
                       Object {
-                        "color": "#2E3338",
-                        "fontFamily": "Hind-SemiBold",
-                        "fontSize": 15,
-                        "lineHeight": 20,
+                        "color": "#1AB775",
                       },
                     ],
                     Object {
-                      "color": "#2E3338",
+                      "color": "#1AB775",
                     },
                   ]
                 }
               >
-                
+                +
                 $
                 0.99
               </Text>
             </View>
-            <View
+            <Text
               style={
                 Object {
-                  "alignItems": "center",
-                  "flexDirection": "row",
+                  "color": "#9CA4A9",
+                  "fontFamily": "Inter-Regular",
+                  "fontSize": 14,
+                  "lineHeight": 18,
                 }
               }
             >
@@ -903,16 +757,9 @@ exports[`ignores pending standby transactions that are completed in the response
                 numberOfLines={1}
                 style={
                   Array [
-                    Array [
-                      Object {
-                        "fontFamily": "Hind-SemiBold",
-                        "fontSize": 16,
-                        "lineHeight": 20,
-                      },
-                      false,
-                    ],
+                    undefined,
                     Object {
-                      "color": "#FBCC5C",
+                      "color": undefined,
                     },
                   ]
                 }
@@ -920,76 +767,7 @@ exports[`ignores pending standby transactions that are completed in the response
                 
                 0.100
               </Text>
-              <View
-                style={
-                  Object {
-                    "paddingBottom": 8,
-                    "paddingHorizontal": 5,
-                  }
-                }
-              >
-                <svg
-                  fill="none"
-                  height="6"
-                  style={Object {}}
-                  viewBox="0 0 9 6"
-                  width="9"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    clip-rule="evenodd"
-                    d="M5.0998 5.45001L8.39993 3.02504L5.0998 0.600067V2.22512L0.399933 2.22512V3.82518L5.0998 3.82518V5.45001Z"
-                    fill="rgba(0, 0, 0, .4)"
-                    fill-rule="evenodd"
-                    style={Object {}}
-                  />
-                </svg>
-              </View>
-              <Text
-                numberOfLines={1}
-                style={
-                  Array [
-                    Array [
-                      Object {
-                        "fontFamily": "Hind-SemiBold",
-                        "fontSize": 16,
-                        "lineHeight": 20,
-                      },
-                      false,
-                    ],
-                    Object {
-                      "color": "#42D689",
-                    },
-                  ]
-                }
-              >
-                
-                0.99
-              </Text>
-            </View>
-            <View
-              style={
-                Object {
-                  "alignItems": "center",
-                  "flex": 1,
-                  "flexDirection": "row",
-                  "marginTop": 8,
-                }
-              }
-            >
-              <Text
-                style={
-                  Object {
-                    "color": "#BDBDBD",
-                    "fontFamily": "Hind-Regular",
-                    "fontSize": 14,
-                    "lineHeight": 18,
-                  }
-                }
-              >
-                Jan 9 global:at 12:41 AM
-              </Text>
-            </View>
+            </Text>
           </View>
         </View>
       </View>
@@ -1000,7 +778,6 @@ exports[`ignores pending standby transactions that are completed in the response
 
 exports[`renders the received data along with the standby transactions 1`] = `
 <RCTScrollView
-  ItemSeparatorComponent={[Function]}
   data={
     Array [
       Object {
@@ -1201,7 +978,8 @@ exports[`renders the received data along with the standby transactions 1`] = `
               "flex": 1,
               "flexDirection": "row",
               "justifyContent": "space-between",
-              "padding": 16,
+              "paddingHorizontal": 16,
+              "paddingVertical": 12,
             }
           }
         >
@@ -1279,8 +1057,9 @@ exports[`renders the received data along with the standby transactions 1`] = `
                 style={
                   Object {
                     "color": "#2E3338",
-                    "fontFamily": "Hind-SemiBold",
-                    "fontSize": 15,
+                    "fontFamily": "Inter-Medium",
+                    "fontSize": 16,
+                    "lineHeight": 22,
                   }
                 }
               >
@@ -1292,23 +1071,21 @@ exports[`renders the received data along with the standby transactions 1`] = `
                   Array [
                     Array [
                       Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Inter-Medium",
+                        "fontSize": 16,
+                        "lineHeight": 22,
                         "marginLeft": "auto",
                         "paddingLeft": 10,
                       },
-                      Object {
-                        "color": "#81868B",
-                        "fontFamily": "Hind-Regular",
-                        "fontSize": 15,
-                        "lineHeight": 20,
-                      },
+                      false,
                     ],
                     Object {
-                      "color": "#81868B",
+                      "color": "#2E3338",
                     },
                   ]
                 }
               >
-                -
                 $
                 133.00
               </Text>
@@ -1316,66 +1093,18 @@ exports[`renders the received data along with the standby transactions 1`] = `
             <Text
               style={
                 Object {
-                  "color": "#81868B",
-                  "fontFamily": "Hind-Regular",
-                  "fontSize": 15,
-                  "marginTop": -2,
+                  "color": "#9CA4A9",
+                  "fontFamily": "Inter-Regular",
+                  "fontSize": 14,
+                  "lineHeight": 18,
                 }
               }
             >
-              Eye for an Eye
+              confirmingTransaction
             </Text>
-            <View
-              style={
-                Array [
-                  Object {
-                    "alignItems": "center",
-                    "flex": 1,
-                    "flexDirection": "row",
-                  },
-                  Object {
-                    "marginTop": 8,
-                  },
-                ]
-              }
-            >
-              <Text
-                style={
-                  Object {
-                    "color": "#BDBDBD",
-                    "fontFamily": "Hind-Regular",
-                    "fontSize": 14,
-                    "lineHeight": 18,
-                  }
-                }
-              >
-                <Text
-                  style={
-                    Object {
-                      "color": "#42D689",
-                      "fontFamily": "Hind-Bold",
-                      "fontSize": 13,
-                      "lineHeight": 18,
-                    }
-                  }
-                >
-                  confirmingPayment
-                </Text>
-                 10:08 PM
-              </Text>
-            </View>
           </View>
         </View>
       </View>
-      <View
-        style={
-          Object {
-            "backgroundColor": "rgba(134, 138, 141, 0.15)",
-            "height": 1,
-            "marginHorizontal": 16,
-          }
-        }
-      />
     </View>
     <View
       onLayout={[Function]}
@@ -1404,7 +1133,8 @@ exports[`renders the received data along with the standby transactions 1`] = `
               "flex": 1,
               "flexDirection": "row",
               "justifyContent": "space-between",
-              "padding": 16,
+              "paddingHorizontal": 16,
+              "paddingVertical": 12,
             }
           }
         >
@@ -1413,9 +1143,6 @@ exports[`renders the received data along with the standby transactions 1`] = `
               Object {
                 "alignItems": "center",
                 "flexDirection": "column",
-                "height": 40,
-                "justifyContent": "center",
-                "width": 40,
               }
             }
           >
@@ -1428,6 +1155,7 @@ exports[`renders the received data along with the standby transactions 1`] = `
               }
               style={
                 Object {
+                  "height": 40,
                   "width": 40,
                 }
               }
@@ -1445,7 +1173,7 @@ exports[`renders the received data along with the standby transactions 1`] = `
               style={
                 Object {
                   "flexDirection": "row",
-                  "marginTop": 3,
+                  "marginTop": -1,
                 }
               }
             >
@@ -1453,13 +1181,13 @@ exports[`renders the received data along with the standby transactions 1`] = `
                 style={
                   Object {
                     "color": "#2E3338",
-                    "fontFamily": "Hind-SemiBold",
-                    "fontSize": 14,
-                    "lineHeight": 18,
+                    "fontFamily": "Inter-Medium",
+                    "fontSize": 16,
+                    "lineHeight": 22,
                   }
                 }
               >
-                exchange
+                feedItemExchangeTitle
               </Text>
               <Text
                 numberOfLines={1}
@@ -1467,154 +1195,40 @@ exports[`renders the received data along with the standby transactions 1`] = `
                   Array [
                     Array [
                       Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Inter-Medium",
+                        "fontSize": 16,
+                        "lineHeight": 22,
                         "marginLeft": "auto",
                         "paddingLeft": 10,
                       },
-                      Object {
-                        "color": "#81868B",
-                        "fontFamily": "Hind-Regular",
-                        "fontSize": 15,
-                        "lineHeight": 20,
-                      },
+                      false,
                     ],
                     Object {
-                      "color": "#81868B",
+                      "color": "#2E3338",
                     },
                   ]
                 }
               >
-                -
                 $
                 26.60
               </Text>
             </View>
-            <View
+            <Text
               style={
                 Object {
-                  "alignItems": "center",
-                  "flexDirection": "row",
+                  "color": "#9CA4A9",
+                  "fontFamily": "Inter-Regular",
+                  "fontSize": 14,
+                  "lineHeight": 18,
                 }
               }
             >
-              <Text
-                numberOfLines={1}
-                style={
-                  Array [
-                    Array [
-                      Object {
-                        "fontFamily": "Hind-SemiBold",
-                        "fontSize": 16,
-                        "lineHeight": 20,
-                      },
-                      Object {
-                        "color": "rgba(0, 0, 0, .4)",
-                      },
-                    ],
-                    Object {
-                      "color": "#42D689",
-                    },
-                  ]
-                }
-              >
-                
-                26.60
-              </Text>
-              <View
-                style={
-                  Object {
-                    "paddingBottom": 8,
-                    "paddingHorizontal": 5,
-                  }
-                }
-              >
-                <svg
-                  fill="none"
-                  height="6"
-                  style={Object {}}
-                  viewBox="0 0 9 6"
-                  width="9"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    clip-rule="evenodd"
-                    d="M5.0998 5.45001L8.39993 3.02504L5.0998 0.600067V2.22512L0.399933 2.22512V3.82518L5.0998 3.82518V5.45001Z"
-                    fill="rgba(0, 0, 0, .4)"
-                    fill-rule="evenodd"
-                    style={Object {}}
-                  />
-                </svg>
-              </View>
-              <Text
-                numberOfLines={1}
-                style={
-                  Array [
-                    Array [
-                      Object {
-                        "fontFamily": "Hind-SemiBold",
-                        "fontSize": 16,
-                        "lineHeight": 20,
-                      },
-                      Object {
-                        "color": "rgba(0, 0, 0, .4)",
-                      },
-                    ],
-                    Object {
-                      "color": "#FBCC5C",
-                    },
-                  ]
-                }
-              >
-                
-                30.000
-              </Text>
-            </View>
-            <View
-              style={
-                Object {
-                  "alignItems": "center",
-                  "flex": 1,
-                  "flexDirection": "row",
-                  "marginTop": 8,
-                }
-              }
-            >
-              <Text
-                style={
-                  Object {
-                    "color": "#BDBDBD",
-                    "fontFamily": "Hind-Regular",
-                    "fontSize": 14,
-                    "lineHeight": 18,
-                  }
-                }
-              >
-                <Text
-                  style={
-                    Object {
-                      "color": "#42D689",
-                      "fontFamily": "Hind-Bold",
-                      "fontSize": 13,
-                      "lineHeight": 18,
-                    }
-                  }
-                >
-                  confirmingExchange
-                </Text>
-                 10:58 PM
-              </Text>
-            </View>
+              confirmingTransaction
+            </Text>
           </View>
         </View>
       </View>
-      <View
-        style={
-          Object {
-            "backgroundColor": "rgba(134, 138, 141, 0.15)",
-            "height": 1,
-            "marginHorizontal": 16,
-          }
-        }
-      />
     </View>
     <View
       onLayout={[Function]}
@@ -1643,7 +1257,8 @@ exports[`renders the received data along with the standby transactions 1`] = `
               "flex": 1,
               "flexDirection": "row",
               "justifyContent": "space-between",
-              "padding": 16,
+              "paddingHorizontal": 16,
+              "paddingVertical": 12,
             }
           }
         >
@@ -1652,9 +1267,6 @@ exports[`renders the received data along with the standby transactions 1`] = `
               Object {
                 "alignItems": "center",
                 "flexDirection": "column",
-                "height": 40,
-                "justifyContent": "center",
-                "width": 40,
               }
             }
           >
@@ -1667,6 +1279,7 @@ exports[`renders the received data along with the standby transactions 1`] = `
               }
               style={
                 Object {
+                  "height": 40,
                   "width": 40,
                 }
               }
@@ -1684,7 +1297,7 @@ exports[`renders the received data along with the standby transactions 1`] = `
               style={
                 Object {
                   "flexDirection": "row",
-                  "marginTop": 3,
+                  "marginTop": -1,
                 }
               }
             >
@@ -1692,13 +1305,13 @@ exports[`renders the received data along with the standby transactions 1`] = `
                 style={
                   Object {
                     "color": "#2E3338",
-                    "fontFamily": "Hind-SemiBold",
-                    "fontSize": 14,
-                    "lineHeight": 18,
+                    "fontFamily": "Inter-Medium",
+                    "fontSize": 16,
+                    "lineHeight": 22,
                   }
                 }
               >
-                exchange
+                feedItemExchangeTitle
               </Text>
               <Text
                 numberOfLines={1}
@@ -1706,154 +1319,43 @@ exports[`renders the received data along with the standby transactions 1`] = `
                   Array [
                     Array [
                       Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Inter-Medium",
+                        "fontSize": 16,
+                        "lineHeight": 22,
                         "marginLeft": "auto",
                         "paddingLeft": 10,
                       },
                       Object {
-                        "color": "#2E3338",
-                        "fontFamily": "Hind-SemiBold",
-                        "fontSize": 15,
-                        "lineHeight": 20,
+                        "color": "#1AB775",
                       },
                     ],
                     Object {
-                      "color": "#2E3338",
+                      "color": "#1AB775",
                     },
                   ]
                 }
               >
-                
+                +
                 $
                 26.60
               </Text>
             </View>
-            <View
+            <Text
               style={
                 Object {
-                  "alignItems": "center",
-                  "flexDirection": "row",
+                  "color": "#9CA4A9",
+                  "fontFamily": "Inter-Regular",
+                  "fontSize": 14,
+                  "lineHeight": 18,
                 }
               }
             >
-              <Text
-                numberOfLines={1}
-                style={
-                  Array [
-                    Array [
-                      Object {
-                        "fontFamily": "Hind-SemiBold",
-                        "fontSize": 16,
-                        "lineHeight": 20,
-                      },
-                      Object {
-                        "color": "rgba(0, 0, 0, .4)",
-                      },
-                    ],
-                    Object {
-                      "color": "#FBCC5C",
-                    },
-                  ]
-                }
-              >
-                
-                30.000
-              </Text>
-              <View
-                style={
-                  Object {
-                    "paddingBottom": 8,
-                    "paddingHorizontal": 5,
-                  }
-                }
-              >
-                <svg
-                  fill="none"
-                  height="6"
-                  style={Object {}}
-                  viewBox="0 0 9 6"
-                  width="9"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    clip-rule="evenodd"
-                    d="M5.0998 5.45001L8.39993 3.02504L5.0998 0.600067V2.22512L0.399933 2.22512V3.82518L5.0998 3.82518V5.45001Z"
-                    fill="rgba(0, 0, 0, .4)"
-                    fill-rule="evenodd"
-                    style={Object {}}
-                  />
-                </svg>
-              </View>
-              <Text
-                numberOfLines={1}
-                style={
-                  Array [
-                    Array [
-                      Object {
-                        "fontFamily": "Hind-SemiBold",
-                        "fontSize": 16,
-                        "lineHeight": 20,
-                      },
-                      Object {
-                        "color": "rgba(0, 0, 0, .4)",
-                      },
-                    ],
-                    Object {
-                      "color": "#42D689",
-                    },
-                  ]
-                }
-              >
-                
-                26.60
-              </Text>
-            </View>
-            <View
-              style={
-                Object {
-                  "alignItems": "center",
-                  "flex": 1,
-                  "flexDirection": "row",
-                  "marginTop": 8,
-                }
-              }
-            >
-              <Text
-                style={
-                  Object {
-                    "color": "#BDBDBD",
-                    "fontFamily": "Hind-Regular",
-                    "fontSize": 14,
-                    "lineHeight": 18,
-                  }
-                }
-              >
-                <Text
-                  style={
-                    Object {
-                      "color": "#42D689",
-                      "fontFamily": "Hind-Bold",
-                      "fontSize": 13,
-                      "lineHeight": 18,
-                    }
-                  }
-                >
-                  confirmingExchange
-                </Text>
-                 10:58 PM
-              </Text>
-            </View>
+              confirmingTransaction
+            </Text>
           </View>
         </View>
       </View>
-      <View
-        style={
-          Object {
-            "backgroundColor": "rgba(134, 138, 141, 0.15)",
-            "height": 1,
-            "marginHorizontal": 16,
-          }
-        }
-      />
     </View>
     <View
       onLayout={[Function]}
@@ -1882,7 +1384,8 @@ exports[`renders the received data along with the standby transactions 1`] = `
               "flex": 1,
               "flexDirection": "row",
               "justifyContent": "space-between",
-              "padding": 16,
+              "paddingHorizontal": 16,
+              "paddingVertical": 12,
             }
           }
         >
@@ -1960,8 +1463,9 @@ exports[`renders the received data along with the standby transactions 1`] = `
                 style={
                   Object {
                     "color": "#2E3338",
-                    "fontFamily": "Hind-SemiBold",
-                    "fontSize": 15,
+                    "fontFamily": "Inter-Medium",
+                    "fontSize": 16,
+                    "lineHeight": 22,
                   }
                 }
               >
@@ -1973,23 +1477,21 @@ exports[`renders the received data along with the standby transactions 1`] = `
                   Array [
                     Array [
                       Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Inter-Medium",
+                        "fontSize": 16,
+                        "lineHeight": 22,
                         "marginLeft": "auto",
                         "paddingLeft": 10,
                       },
-                      Object {
-                        "color": "#81868B",
-                        "fontFamily": "Hind-Regular",
-                        "fontSize": 15,
-                        "lineHeight": 20,
-                      },
+                      false,
                     ],
                     Object {
-                      "color": "#81868B",
+                      "color": "#2E3338",
                     },
                   ]
                 }
               >
-                -
                 $
                 0.20
               </Text>
@@ -1997,54 +1499,18 @@ exports[`renders the received data along with the standby transactions 1`] = `
             <Text
               style={
                 Object {
-                  "color": "#81868B",
-                  "fontFamily": "Hind-Regular",
-                  "fontSize": 15,
-                  "marginTop": -2,
+                  "color": "#9CA4A9",
+                  "fontFamily": "Inter-Regular",
+                  "fontSize": 14,
+                  "lineHeight": 18,
                 }
               }
             >
-              Hi
+              feedItemSentInfo
             </Text>
-            <View
-              style={
-                Array [
-                  Object {
-                    "alignItems": "center",
-                    "flex": 1,
-                    "flexDirection": "row",
-                  },
-                  Object {
-                    "marginTop": 8,
-                  },
-                ]
-              }
-            >
-              <Text
-                style={
-                  Object {
-                    "color": "#BDBDBD",
-                    "fontFamily": "Hind-Regular",
-                    "fontSize": 14,
-                    "lineHeight": 18,
-                  }
-                }
-              >
-                Jan 9 global:at 12:42 AM
-              </Text>
-            </View>
           </View>
         </View>
       </View>
-      <View
-        style={
-          Object {
-            "backgroundColor": "rgba(134, 138, 141, 0.15)",
-            "height": 1,
-            "marginHorizontal": 16,
-          }
-        }
-      />
     </View>
     <View
       onLayout={[Function]}
@@ -2073,7 +1539,8 @@ exports[`renders the received data along with the standby transactions 1`] = `
               "flex": 1,
               "flexDirection": "row",
               "justifyContent": "space-between",
-              "padding": 16,
+              "paddingHorizontal": 16,
+              "paddingVertical": 12,
             }
           }
         >
@@ -2082,9 +1549,6 @@ exports[`renders the received data along with the standby transactions 1`] = `
               Object {
                 "alignItems": "center",
                 "flexDirection": "column",
-                "height": 40,
-                "justifyContent": "center",
-                "width": 40,
               }
             }
           >
@@ -2097,6 +1561,7 @@ exports[`renders the received data along with the standby transactions 1`] = `
               }
               style={
                 Object {
+                  "height": 40,
                   "width": 40,
                 }
               }
@@ -2114,7 +1579,7 @@ exports[`renders the received data along with the standby transactions 1`] = `
               style={
                 Object {
                   "flexDirection": "row",
-                  "marginTop": 3,
+                  "marginTop": -1,
                 }
               }
             >
@@ -2122,13 +1587,13 @@ exports[`renders the received data along with the standby transactions 1`] = `
                 style={
                   Object {
                     "color": "#2E3338",
-                    "fontFamily": "Hind-SemiBold",
-                    "fontSize": 14,
-                    "lineHeight": 18,
+                    "fontFamily": "Inter-Medium",
+                    "fontSize": 16,
+                    "lineHeight": 22,
                   }
                 }
               >
-                exchange
+                feedItemExchangeTitle
               </Text>
               <Text
                 numberOfLines={1}
@@ -2136,32 +1601,35 @@ exports[`renders the received data along with the standby transactions 1`] = `
                   Array [
                     Array [
                       Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Inter-Medium",
+                        "fontSize": 16,
+                        "lineHeight": 22,
                         "marginLeft": "auto",
                         "paddingLeft": 10,
                       },
                       Object {
-                        "color": "#2E3338",
-                        "fontFamily": "Hind-SemiBold",
-                        "fontSize": 15,
-                        "lineHeight": 20,
+                        "color": "#1AB775",
                       },
                     ],
                     Object {
-                      "color": "#2E3338",
+                      "color": "#1AB775",
                     },
                   ]
                 }
               >
-                
+                +
                 $
                 0.99
               </Text>
             </View>
-            <View
+            <Text
               style={
                 Object {
-                  "alignItems": "center",
-                  "flexDirection": "row",
+                  "color": "#9CA4A9",
+                  "fontFamily": "Inter-Regular",
+                  "fontSize": 14,
+                  "lineHeight": 18,
                 }
               }
             >
@@ -2169,16 +1637,9 @@ exports[`renders the received data along with the standby transactions 1`] = `
                 numberOfLines={1}
                 style={
                   Array [
-                    Array [
-                      Object {
-                        "fontFamily": "Hind-SemiBold",
-                        "fontSize": 16,
-                        "lineHeight": 20,
-                      },
-                      false,
-                    ],
+                    undefined,
                     Object {
-                      "color": "#FBCC5C",
+                      "color": undefined,
                     },
                   ]
                 }
@@ -2186,76 +1647,7 @@ exports[`renders the received data along with the standby transactions 1`] = `
                 
                 0.100
               </Text>
-              <View
-                style={
-                  Object {
-                    "paddingBottom": 8,
-                    "paddingHorizontal": 5,
-                  }
-                }
-              >
-                <svg
-                  fill="none"
-                  height="6"
-                  style={Object {}}
-                  viewBox="0 0 9 6"
-                  width="9"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    clip-rule="evenodd"
-                    d="M5.0998 5.45001L8.39993 3.02504L5.0998 0.600067V2.22512L0.399933 2.22512V3.82518L5.0998 3.82518V5.45001Z"
-                    fill="rgba(0, 0, 0, .4)"
-                    fill-rule="evenodd"
-                    style={Object {}}
-                  />
-                </svg>
-              </View>
-              <Text
-                numberOfLines={1}
-                style={
-                  Array [
-                    Array [
-                      Object {
-                        "fontFamily": "Hind-SemiBold",
-                        "fontSize": 16,
-                        "lineHeight": 20,
-                      },
-                      false,
-                    ],
-                    Object {
-                      "color": "#42D689",
-                    },
-                  ]
-                }
-              >
-                
-                0.99
-              </Text>
-            </View>
-            <View
-              style={
-                Object {
-                  "alignItems": "center",
-                  "flex": 1,
-                  "flexDirection": "row",
-                  "marginTop": 8,
-                }
-              }
-            >
-              <Text
-                style={
-                  Object {
-                    "color": "#BDBDBD",
-                    "fontFamily": "Hind-Regular",
-                    "fontSize": 14,
-                    "lineHeight": 18,
-                  }
-                }
-              >
-                Jan 9 global:at 12:41 AM
-              </Text>
-            </View>
+            </Text>
           </View>
         </View>
       </View>
