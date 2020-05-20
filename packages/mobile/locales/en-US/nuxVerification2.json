@@ -79,5 +79,11 @@
     "title": "Verify Your Phone",
     "body": "Verifying allows you to send and receive with your phone contacts.",
     "cta": "Get Verified"
+  },
+  "quotaLookup": {
+    "title": "Lookup quota exceeded",
+    "body1": "To keep your phone number safe and private, Celo limits how many phone numbers users can lookup.",
+    "body2": "You can purchase more lookups for a small fee.",
+    "cta": "Purchase lookups (2)"
   }
 }
