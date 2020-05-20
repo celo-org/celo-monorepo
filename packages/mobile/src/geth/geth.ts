@@ -152,10 +152,10 @@ async function initGeth(sync: boolean = true) {
   }
 }
 
-export async function getGeth(): Promise<typeof gethInstance> {
+export async function getGeth(sync: boolean = true): Promise<typeof gethInstance> {
   Logger.debug('Geth@getGeth', 'Getting Geth Instance')
   if (!gethInstance) {
-    await initGeth()
+    await initGeth(sync)
   }
   return gethInstance
 }

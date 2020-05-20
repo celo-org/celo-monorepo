@@ -48,7 +48,9 @@ export function* waitForGethConnectivity() {
 
 function* waitForGethInstance() {
   try {
-    const gethInstance = yield call(getGeth)
+    const fornoMode = yield select(fornoSelector)
+    // get geth without syncing if fornoMode
+    const gethInstance = yield call(getGeth, !fornoMode)
     if (gethInstance == null) {
       throw new Error('geth instance is null')
     }
@@ -177,18 +179,18 @@ function* monitorGeth() {
 }
 
 export function* gethSaga() {
-  yield call(initGethSaga)
-  const gethRelatedSagas = yield fork(monitorGeth)
-  yield take(Actions.CANCEL_GETH_SAGA)
-  yield cancel(gethRelatedSagas)
-  yield put(setGethConnected(true))
-}
-
-export function* gethSagaIfNecessary() {
   yield call(waitForRehydrate) // Wait for rehydrate to know if geth or forno mode
-  yield put(setContractKitReady(true)) // ContractKit is blocked (not ready) before rehydrate
-  if (!(yield select(fornoSelector))) {
-    Logger.debug(`${TAG}@gethSagaIfNecessary`, `Starting geth saga...`)
-    yield call(gethSaga)
+  yield put(setContractKitReady(true)) // TODO(yorke): consider moving elsewhere
+  const fornoMode = yield select(fornoSelector)
+  yield call(initGethSaga)
+  if (!fornoMode) {
+    const gethRelatedSagas = yield fork(monitorGeth)
+    yield take(Actions.CANCEL_GETH_SAGA)
+    yield cancel(gethRelatedSagas)
+  } else {
+    yield put(setGethConnected(true))
+    yield take(Actions.CANCEL_GETH_SAGA)
   }
+
+  yield put(setGethConnected(false))
 }
