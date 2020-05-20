@@ -22,7 +22,7 @@ export function* encryptComment(
   fromAddress: string | null | undefined
 ) {
   // Don't encrypt empty comments
-  if (comment === '') {
+  if (!comment) {
     return comment
   }
   // Must have addresses to lookup CEK
