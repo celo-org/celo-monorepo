@@ -3,22 +3,22 @@ import Touchable from '@celo/react-components/components/Touchable'
 import Backspace from '@celo/react-components/icons/Backspace'
 import colors from '@celo/react-components/styles/colors.v2'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
+import { StackNavigationOptions, StackScreenProps } from '@react-navigation/stack'
 import { chunk, flatMap, shuffle, times } from 'lodash'
 import * as React from 'react'
 import { Trans, WithTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
-import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
 import { setBackupCompleted } from 'src/account/actions'
 import { showError } from 'src/alert/actions'
-import componentWithAnalytics from 'src/analytics/wrapper'
 import { QuizzBottom } from 'src/backup/QuizzBottom'
 import DevSkipButton from 'src/components/DevSkipButton'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
-import { headerWithCancelButton } from 'src/navigator/Headers'
+import { headerWithCancelButton } from 'src/navigator/Headers.v2'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { StackParamList } from 'src/navigator/types'
 import { RootState } from 'src/redux/reducers'
 import Logger from 'src/utils/Logger'
 
@@ -35,7 +35,6 @@ export enum Mode {
   Failed,
 }
 
-// TODO Add states for, checking, failed, success
 interface State {
   mode: Mode
   mnemonicLength: number
@@ -51,17 +50,16 @@ interface DispatchProps {
   showError: typeof showError
 }
 
-type Props = WithTranslation & DispatchProps & NavigationInjectedProps
+type OwnProps = StackScreenProps<StackParamList, Screens.BackupQuiz>
+
+type Props = WithTranslation & DispatchProps & OwnProps
+
+export const navOptionsForQuiz: StackNavigationOptions = {
+  ...headerWithCancelButton,
+  headerTitle: i18n.t(`${Namespaces.backupKeyFlow6}:headerTitle`),
+}
 
 export class BackupQuiz extends React.Component<Props, State> {
-  static navigationOptions = ({ navigation }: NavigationInjectedProps) => ({
-    ...headerWithCancelButton, // TODO switch to v2 once Ivans PR is in
-    headerTitle: i18n.t(`${Namespaces.backupKeyFlow6}:headerTitle`),
-    headerRight: (
-      <DeleteWord onPressBackspace={navigation.getParam('onPressBackspace') || fallBackPress} />
-    ),
-  })
-
   state: State = {
     mnemonicLength: 0,
     mnemonicWords: [],
@@ -69,9 +67,20 @@ export class BackupQuiz extends React.Component<Props, State> {
     mode: Mode.Entering,
   }
 
-  componentDidMount() {
-    this.props.navigation.setParams({ onPressBackspace: this.onPressBackspace })
+  setBackSpace = () => {
+    const isVisible = this.state.userChosenWords.length > 0 && this.state.mode === Mode.Entering
 
+    this.props.navigation.setOptions({
+      headerRight: () => (
+        <DeleteWord onPressBackspace={this.onPressBackspace} visible={isVisible} />
+      ),
+    })
+  }
+  componentDidUpdate = () => {
+    this.setBackSpace()
+  }
+
+  componentDidMount() {
     const mnemonic = this.getMnemonicFromNavProps()
     const shuffledMnemonic = getShuffledWordSet(mnemonic)
     this.setState({
@@ -80,8 +89,8 @@ export class BackupQuiz extends React.Component<Props, State> {
     })
   }
 
-  getMnemonicFromNavProps(): string {
-    const mnemonic = this.props.navigation.getParam('mnemonic', '')
+  getMnemonicFromNavProps() {
+    const mnemonic = this.props.route.params.mnemonic
     if (!mnemonic) {
       throw new Error('Mnemonic missing form nav props')
     }
@@ -89,16 +98,14 @@ export class BackupQuiz extends React.Component<Props, State> {
   }
 
   onPressMnemonicWord = (word: string, index: number) => {
-    return () => {
-      const { mnemonicWords, userChosenWords } = this.state
-      const mnemonicWordsUpdated = [...mnemonicWords]
-      mnemonicWordsUpdated.splice(index, 1)
+    const { mnemonicWords, userChosenWords } = this.state
+    const mnemonicWordsUpdated = [...mnemonicWords]
+    mnemonicWordsUpdated.splice(index, 1)
 
-      this.setState({
-        mnemonicWords: mnemonicWordsUpdated,
-        userChosenWords: [...userChosenWords, { word, index }],
-      })
-    }
+    this.setState({
+      mnemonicWords: mnemonicWordsUpdated,
+      userChosenWords: [...userChosenWords, { word, index }],
+    })
   }
 
   onPressBackspace = () => {
@@ -198,14 +205,12 @@ export class BackupQuiz extends React.Component<Props, State> {
               )}
               <View style={styles.mnemonicButtonsContainer}>
                 {mnemonicWordsToDisplay.map((word, index) => (
-                  <View key={'mnemonic-button-' + word} style={styles.mnemonicWordButtonOutterRim}>
-                    <Touchable
-                      style={styles.mnemonicWordButton}
-                      onPress={this.onPressMnemonicWord(word, index)}
-                    >
-                      <Text style={styles.mnemonicWordButonText}>{word}</Text>
-                    </Touchable>
-                  </View>
+                  <Word
+                    key={word}
+                    word={word}
+                    index={index}
+                    onPressWord={this.onPressMnemonicWord}
+                  />
                 ))}
               </View>
             </View>
@@ -221,9 +226,25 @@ export class BackupQuiz extends React.Component<Props, State> {
   }
 }
 
-function fallBackPress() {
-  Logger.error(`${TAG}@deleteWord`, 'onBackspacePress function not passed from navigator')
+interface WordProps {
+  word: string
+  index: number
+  onPressWord: (word: string, index: number) => void
 }
+
+const Word = React.memo(function _Word({ word, index, onPressWord }: WordProps) {
+  const onPressMnemonicWord = React.useCallback(() => {
+    onPressWord(word, index)
+  }, [word, index])
+
+  return (
+    <View key={'mnemonic-button-' + word} style={styles.mnemonicWordButtonOutterRim}>
+      <Touchable style={styles.mnemonicWordButton} onPress={onPressMnemonicWord}>
+        <Text style={styles.mnemonicWordButonText}>{word}</Text>
+      </Touchable>
+    </View>
+  )
+})
 
 interface Content {
   word: string
@@ -234,7 +255,16 @@ function contentMatches(userChosenWords: Content[], mnemonic: string) {
   return userChosenWords.map((w) => w.word).join(' ') === mnemonic
 }
 
-function DeleteWord({ onPressBackspace }: { onPressBackspace: () => void }) {
+function DeleteWord({
+  onPressBackspace,
+  visible,
+}: {
+  onPressBackspace: () => void
+  visible: boolean
+}) {
+  if (!visible) {
+    return null
+  }
   return (
     <Touchable borderless={true} onPress={onPressBackspace} style={styles.backWord}>
       <Backspace color={colors.greenUI} />
@@ -250,11 +280,10 @@ function getShuffledWordSet(mnemonic: string) {
   )
 }
 
-export default componentWithAnalytics(
-  connect<{}, DispatchProps, {}, RootState>(null, { setBackupCompleted, showError })(
-    withTranslation(Namespaces.backupKeyFlow6)(BackupQuiz)
-  )
-)
+export default connect<{}, DispatchProps, OwnProps, RootState>(null, {
+  setBackupCompleted,
+  showError,
+})(withTranslation(Namespaces.backupKeyFlow6)(BackupQuiz))
 
 const styles = StyleSheet.create({
   container: {

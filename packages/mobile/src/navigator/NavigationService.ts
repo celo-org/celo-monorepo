@@ -1,13 +1,8 @@
 // (https://github.com/react-navigation/react-navigation/issues/1439)
-import SplashScreen from 'react-native-splash-screen'
-import {
-  NavigationActions,
-  NavigationBackActionPayload,
-  NavigationContainerComponent,
-  NavigationParams,
-  NavigationState,
-  StackActions,
-} from 'react-navigation'
+
+import { NavigationActions, StackActions } from '@react-navigation/compat'
+import { NavigationContainerRef } from '@react-navigation/native'
+import { createRef } from 'react'
 import sleep from 'sleep-promise'
 import { PincodeType } from 'src/account/reducer'
 import { pincodeTypeSelector } from 'src/account/selectors'
@@ -19,36 +14,24 @@ import Logger from 'src/utils/Logger'
 
 const TAG = 'NavigationService'
 
-export enum NavActions {
-  SET_NAVIGATOR = 'NAVIGATION/SET_NAVIGATOR',
-}
-
-let navigator: NavigationContainerComponent
-
-export const setTopLevelNavigator = (navigatorRef: any) => {
-  Logger.debug(`${TAG}@setTopLevelNavigator`, 'Initialized')
-  navigator = navigatorRef
-  return {
-    type: NavActions.SET_NAVIGATOR,
-  }
-}
+export const navigationRef = createRef<NavigationContainerRef>()
 
 async function ensureNavigator() {
   let retries = 0
-  while (!navigator && retries < 3) {
+  while (!navigationRef.current && retries < 3) {
     await sleep(200)
     retries++
   }
-  if (!navigator) {
+  if (!navigationRef.current) {
     throw new Error('navigator is not initialized')
   }
 }
 
-export function replace(routeName: string, params?: NavigationParams) {
+export function replace(routeName: string, params?: object) {
   ensureNavigator()
     .then(() => {
       Logger.debug(`${TAG}@replace`, `Dispatch ${routeName}`)
-      navigator.dispatch(
+      navigationRef.current?.dispatch(
         StackActions.replace({
           routeName,
           params,
@@ -60,11 +43,12 @@ export function replace(routeName: string, params?: NavigationParams) {
     })
 }
 
-export function navigate(routeName: string, params?: NavigationParams) {
+export function navigate(routeName: string, params?: object) {
   ensureNavigator()
     .then(() => {
       Logger.debug(`${TAG}@navigate`, `Dispatch ${routeName}`)
-      navigator.dispatch(
+
+      navigationRef.current?.dispatch(
         NavigationActions.navigate({
           routeName,
           params,
@@ -107,7 +91,7 @@ async function ensurePincode(): Promise<boolean> {
   return true
 }
 
-export function navigateProtected(routeName: string, params?: NavigationParams) {
+export function navigateProtected(routeName: string, params?: object) {
   ensurePincode()
     .then((ensured) => {
       if (ensured) {
@@ -119,56 +103,23 @@ export function navigateProtected(routeName: string, params?: NavigationParams) 
     })
 }
 
-// Source: https://v1.reactnavigation.org/docs/screen-tracking.html
-function getCurrentRouteName(navState: NavigationState): string {
-  if (!navState) {
-    return ''
-  }
-
-  const route = navState.routes[navState.index]
-  // dive into nested navigators
-  // @ts-ignore
-  if (route.routes) {
-    // @ts-ignore
-    return getCurrentRouteName(route)
-  }
-  return route.routeName
-}
-
-let splashHidden = false
-
-export function handleNavigationStateChange(
-  prevState: NavigationState,
-  currentState: NavigationState
-) {
-  const currentScreen = getCurrentRouteName(currentState)
-  const previousScreen = getCurrentRouteName(prevState)
-
-  // Hide native splash if necessary, once we navigate away from AppLoading
-  if (!splashHidden && currentScreen && currentScreen !== Screens.AppLoading) {
-    splashHidden = true
-    // Use requestAnimationFrame to prevent a one frame gap when hiding
-    requestAnimationFrame(() => {
-      SplashScreen.hide()
-    })
-  }
-
-  CeloAnalytics.page(currentScreen, { previousScreen, currentScreen })
-}
-
-export function navigateBack(params?: NavigationBackActionPayload) {
+export function navigateBack(params?: object) {
   ensureNavigator()
     .then(() => {
       Logger.debug(`${TAG}@navigateBack`, `Dispatch navigate back`)
-      navigator.dispatch(NavigationActions.back(params))
+      // @ts-ignore
+      navigationRef.current?.dispatch(NavigationActions.back(params))
     })
     .catch((reason) => {
       Logger.error(`${TAG}@navigateBack`, `Navigation failure: ${reason}`)
     })
 }
 
-export function navigateHome(params?: NavigationParams) {
-  navigate(Screens.WalletHome, params)
+export function navigateHome(params?: object) {
+  navigationRef.current?.reset({
+    index: 0,
+    routes: [{ name: Screens.TabNavigator, params }],
+  })
 }
 
 export function navigateToError(errorMessage: string, error?: Error) {
