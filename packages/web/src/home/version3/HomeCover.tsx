@@ -47,7 +47,12 @@ export default function HomeCover() {
           <TextAnimation currentWord={currentWordIndex} isAnimating={isReady} />
           <H4 style={styles.coverText}>{t('coverText')}</H4>
           <Text style={[fonts.h6, styles.coverJoinList]}>{t('coverJoinList')}</Text>
-          <EmailForm submitText={'Submit'} route={'/contacts'} isDarkMode={false} />
+          <EmailForm
+            placeholder={'saluton@celo.org'}
+            submitText={'Submit'}
+            route={'/contacts'}
+            isDarkMode={false}
+          />
         </View>
       </Cell>
     </GridRow>

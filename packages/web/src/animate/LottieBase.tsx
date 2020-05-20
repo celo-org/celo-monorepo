@@ -26,10 +26,10 @@ export default class LottieBase extends React.Component<Props> {
         progressiveLoad: true,
       },
     })
-    if (this.props.onReady) {
+    if (this.props.onReady && this.animation.addEventListener) {
       this.animation.addEventListener('DOMLoaded', this.props.onReady)
     }
-    if (this.props.onLooped) {
+    if (this.props.onLooped && this.animation.addEventListener) {
       this.animation.addEventListener('loopComplete', this.onLoop)
     }
   }
