@@ -1,8 +1,8 @@
 import * as React from 'react'
 import { StyleSheet, View } from 'react-native'
 import { H1 } from 'src/fonts/Fonts'
-import { colors, fonts, textStyles } from 'src/styles'
 import { useScreenSize } from 'src/layout/ScreenSize'
+import { colors, fonts, textStyles } from 'src/styles'
 
 export const WORDS = [
   'finance',
