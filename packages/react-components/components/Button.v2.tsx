@@ -3,7 +3,7 @@ import colors, { Colors } from '@celo/react-components/styles/colors.v2'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import { debounce } from 'lodash'
 
-import React, { useCallback } from 'react'
+import React, { ReactNode, useCallback } from 'react'
 import { StyleProp, StyleSheet, Text, View, ViewStyle } from 'react-native'
 
 const BUTTON_TAP_DEBOUNCE_TIME = 300 // milliseconds
@@ -27,7 +27,8 @@ export enum BtnSizes {
 export interface ButtonProps {
   onPress: () => void
   style?: StyleProp<ViewStyle>
-  text: string | JSX.Element
+  text: string | ReactNode
+
   accessibilityLabel?: string
   type?: BtnTypes
   disabled?: boolean

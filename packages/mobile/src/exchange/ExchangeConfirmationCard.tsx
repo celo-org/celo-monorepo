@@ -70,9 +70,9 @@ export default function ExchangeConfirmationCard(props: Props) {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.paddedContainer}>
-        <ScrollView>
+    <ScrollView>
+      <SafeAreaView style={styles.container}>
+        <View style={styles.paddedContainer}>
           <View style={styles.flexStart}>
             <View style={styles.amountRow}>
               <Text style={styles.exchangeBodyText}>{t('goldAmount')}</Text>
@@ -100,9 +100,9 @@ export default function ExchangeConfirmationCard(props: Props) {
             <HorizontalLine />
             <TotalLineItem amount={totalAmount} />
           </View>
-        </ScrollView>
-      </View>
-    </SafeAreaView>
+        </View>
+      </SafeAreaView>
+    </ScrollView>
   )
 }
 

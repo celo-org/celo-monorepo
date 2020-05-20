@@ -1,7 +1,7 @@
 import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button.v2'
 import ItemSeparator from '@celo/react-components/components/ItemSeparator'
 import ScrollContainer from '@celo/react-components/components/ScrollContainer'
-import SectionHead from '@celo/react-components/components/SectionHead.v2'
+import SectionHead from '@celo/react-components/components/SectionHeadGold'
 import { StackScreenProps } from '@react-navigation/stack'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'

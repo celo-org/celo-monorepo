@@ -62,6 +62,7 @@ export const emptyHeader: StackNavigationOptions = {
     alignItems: 'center' as 'center',
   },
   headerTitleAlign: 'center',
+  cardStyle: { backgroundColor: colors.background },
   headerStyle: {
     backgroundColor: colors.light,
     ...Platform.select({

@@ -1,4 +1,4 @@
-import SectionHead from '@celo/react-components/components/SectionHead.v2'
+import SectionHead from '@celo/react-components/components/SectionHeadGold'
 import * as React from 'react'
 import 'react-native'
 import * as renderer from 'react-test-renderer'

@@ -92,8 +92,6 @@ import VerificationSuccessScreen from 'src/verify/VerificationSuccessScreen'
 const Stack = createStackNavigator<StackParamList>()
 
 export const defaultScreenOptions = {
-  // Force this for now on iOS so screen transitions look normal
-  // given we intentionally hide the bottom separator from the nav bar
   cardStyle: { backgroundColor: colors.background },
   headerStyle: {
     ...Platform.select({

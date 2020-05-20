@@ -24,6 +24,7 @@ const CHART_WIDTH = variables.width
 const CHART_HEIGHT = 180
 const CHART_MIN_VERTICAL_RANGE = 0.1 // one cent
 const CHART_DOMAIN_PADDING = { y: [30, 30] as [number, number], x: [5, 5] as [number, number] }
+const CHART_PADDING = { left: variables.contentPadding, right: variables.contentPadding }
 
 interface OwnProps {
   testID?: string
@@ -269,7 +270,7 @@ function CeloGoldHistoryChart({ t, testID, i18n }: Props) {
       <VictoryGroup
         domainPadding={CHART_DOMAIN_PADDING}
         singleQuadrantDomainPadding={false}
-        padding={{ left: variables.contentPadding, right: variables.contentPadding }}
+        padding={CHART_PADDING}
         width={CHART_WIDTH}
         height={CHART_HEIGHT}
         data={chartData.map((el) => el.amount)}
