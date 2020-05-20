@@ -212,7 +212,7 @@ shasum: ${shasum}"`)
 
   await Promise.all(
     [...networks, 'latest', newCommit].map((tag) =>
-      execCmd(`npm dist-tag add ${packageName}@${packageJson.version} ${newCommit}`, {
+      execCmd(`npm dist-tag add ${packageName}@${packageJson.version} ${tag}`, {
         cwd: getPackageDir(packageName),
       })
     )
