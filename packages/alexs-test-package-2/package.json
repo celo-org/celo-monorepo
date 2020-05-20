@@ -1,6 +1,6 @@
 {
   "name": "alexs-interesting-package",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "> TODO: description",
   "author": "alexbruceharley@gmail.com <alexbruceharley@gmail.com>",
   "homepage": "https://github.com/celo-org/celo-monorepo#readme",
@@ -23,6 +23,5 @@
   "bugs": {
     "url": "https://github.com/celo-org/celo-monorepo/issues"
   },
-  "dependencies": {
-  }
+  "dependencies": {}
 }
