@@ -38,7 +38,7 @@ export class RpcWallet extends RemoteWallet {
     privateKey = ensureLeading0x(privateKey)
     const address = normalizeAddressWith0x(privateKeyToAddress(privateKey))
     if (this.hasAccount(address)) {
-      throw new Error(`RpcWallet: account ${address} already exists`)
+      throw new Error(`RpcWallet: account already exists`)
     }
     const signer = new RpcSigner(this.rpc, address)
     const resp = await signer.init(privateKey, passphrase)

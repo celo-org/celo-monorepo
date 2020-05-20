@@ -1,5 +1,4 @@
 import { CeloTransactionObject } from '@celo/contractkit'
-import { trimLeading0x } from '@celo/utils/src/address'
 import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
 import BigNumber from 'bignumber.js'
 import { Clipboard, Linking, Platform } from 'react-native'
@@ -357,12 +356,8 @@ function* addTempAccountToWallet(inviteCode: string) {
   try {
     yield call(waitForGethConnectivity)
     // Import account into the local geth node
-    const tempAccount: string | null = yield call(
-      gethWallet.addAccount,
-      trimLeading0x(inviteCode),
-      TEMP_PW
-    )
-    Logger.debug(TAG + '@addTempAccountToWallet', 'Account added', tempAccount!)
+    const tempAccount = yield call(gethWallet.addAccount, inviteCode, TEMP_PW)
+    Logger.debug(TAG + '@addTempAccountToWallet', 'Account added', tempAccount)
   } catch (e) {
     if (e.toString().includes('account already exists')) {
       Logger.warn(TAG + '@addTempAccountToWallet', 'Account already exists, using it')

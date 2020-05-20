@@ -30,7 +30,6 @@ import {
   Actions,
   completeWeb3Sync,
   setAccount,
-  setAccountInWeb3Keystore,
   setContractKitReady,
   setFornoMode,
   SetIsFornoAction,
@@ -38,14 +37,9 @@ import {
   updateWeb3SyncProgress,
   Web3SyncProgress,
 } from 'src/web3/actions'
-import { addLocalAccount, getContractKit } from 'src/web3/contracts'
-import { readPrivateKeyFromLocalDisk, savePrivateKeyToLocalDisk } from 'src/web3/privateKey'
-import {
-  currentAccountInWeb3KeystoreSelector,
-  currentAccountSelector,
-  fornoSelector,
-} from 'src/web3/selectors'
-import { getLatestBlock, isAccountLocked } from 'src/web3/utils'
+import { getContractKit, gethWallet } from 'src/web3/contracts'
+import { currentAccountSelector, fornoSelector } from 'src/web3/selectors'
+import { getLatestBlock } from 'src/web3/utils'
 import { Block } from 'web3-eth'
 
 const TAG = 'web3/saga'
@@ -204,31 +198,18 @@ export function* assignAccountFromPrivateKey(privateKey: string) {
       Logger.error(TAG + '@assignAccountFromPrivateKey', 'Got falsy pin')
       throw Error('Cannot create account without having the pin set')
     }
-
-    // Save the account to a local file on the disk.
-    // This is done for all sync modes, to allow users to switch into forno mode.
-    // Note that if geth is running it saves the key using web3.personal.
     const account = privateKeyToAddress(privateKey)
-    yield call(savePrivateKeyToLocalDisk, account, privateKey, pincode)
-
-    const fornoMode = yield select(fornoSelector)
-    const contractKit = yield call(getContractKit)
-    if (fornoMode) {
-      Logger.debug(TAG + '@assignAccountFromPrivateKey', 'Init web3 with private key')
-      addLocalAccount(privateKey, true)
-    } else {
-      try {
-        yield call(contractKit.web3.eth.personal.importRawKey, privateKey, pincode)
-      } catch (e) {
-        if (e.toString().includes('account already exists')) {
-          Logger.warn(TAG + '@assignAccountFromPrivateKey', 'Attempted to import same account')
-        } else {
-          Logger.error(TAG + '@assignAccountFromPrivateKey', 'Error importing raw key')
-          throw e
-        }
+    try {
+      yield call(gethWallet.addAccount, privateKey, pincode)
+    } catch (e) {
+      if (e.toString().includes('account already exists')) {
+        Logger.warn(TAG + '@assignAccountFromPrivateKey', 'Attempted to import same account')
+      } else {
+        Logger.error(TAG + '@assignAccountFromPrivateKey', 'Error importing raw key')
+        throw e
       }
-      yield call(contractKit.web3.eth.personal.unlockAccount, account, pincode, UNLOCK_DURATION)
-      contractKit.web3.eth.defaultAccount = account
+
+      yield call(gethWallet.unlockAccount, account, pincode, UNLOCK_DURATION)
     }
 
     Logger.debug(TAG + '@assignAccountFromPrivateKey', `Added to wallet: ${account}`)
@@ -267,44 +248,28 @@ export function* getAccount() {
   }
 }
 
-let accountAlreadyAddedInFornoMode = false
-
 export function* unlockAccount(account: string) {
   Logger.debug(TAG + '@unlockAccount', `Unlocking account: ${account}`)
-  try {
-    const isLocked = yield call(isAccountLocked, account)
-    if (!isLocked) {
-      return true
-    }
+  if (!gethWallet.isAccountUnlocked(account)) {
+    return true
+  }
 
+  try {
     const pincode = yield call(getPincode, true)
-    const fornoMode = yield select(fornoSelector)
-    if (fornoMode) {
-      if (accountAlreadyAddedInFornoMode) {
-        Logger.info(TAG + 'unlockAccount', `Account ${account} already added to web3 for signing`)
-      } else {
-        Logger.info(TAG + '@unlockAccount', `unlockDuration is ignored in forno mode`)
-        const privateKey: string = yield call(readPrivateKeyFromLocalDisk, account, pincode)
-        addLocalAccount(privateKey, true)
-        accountAlreadyAddedInFornoMode = true
-      }
-      return true
-    } else {
-      const contractKit = yield call(getContractKit)
-      yield call(contractKit.web3.eth.personal.unlockAccount, account, pincode, UNLOCK_DURATION)
-      Logger.debug(TAG + '@unlockAccount', `Account unlocked: ${account}`)
-      return true
-    }
+    yield call(waitForGethConnectivity)
+    yield call(gethWallet.unlockAccount, account, pincode, UNLOCK_DURATION)
+    Logger.debug(TAG + '@unlockAccount', `Account unlocked: ${account}`)
+    return true
   } catch (error) {
     setCachedPincode(null)
-    Logger.error(TAG + '@unlockAccount', 'Web3 account unlock failed', error)
+    Logger.error(TAG + '@unlockAccount', 'account unlock failed', error)
     return false
   }
 }
 
 // Wait for geth to be connected and account ready
 export function* getConnectedAccount() {
-  yield call(waitWeb3LastBlock)
+  yield call(waitForGethConnectivity)
   const account: string = yield call(getAccount)
   return account
 }
@@ -317,68 +282,6 @@ export function* getConnectedUnlockedAccount() {
     return account
   } else {
     throw new Error(ErrorMessages.INCORRECT_PIN)
-  }
-}
-
-// Stores account and private key in web3 keystore using web3.eth.personal
-export function* addAccountToWeb3Keystore(key: string, currentAccount: string, pincode: string) {
-  let account: string
-  Logger.debug(TAG + '@addAccountToWeb3Keystore', `using key ${key} for account ${currentAccount}`)
-  const fornoMode = yield select(fornoSelector)
-  const contractKit = yield call(getContractKit)
-  if (fornoMode) {
-    // web3.eth.personal is not accessible in forno mode
-    throw new Error('Cannot add account to Web3 keystore while in forno mode')
-  }
-  try {
-    account = yield call(contractKit.web3.eth.personal.importRawKey, key, pincode)
-    Logger.debug(
-      TAG + '@addAccountToWeb3Keystore',
-      `Successfully imported raw key for account ${account}`
-    )
-    yield put(setAccountInWeb3Keystore(account))
-  } catch (e) {
-    Logger.error(TAG + '@addAccountToWeb3Keystore', 'Failed to import raw key', e)
-    if (e.toString().includes('account already exists')) {
-      account = currentAccount
-      Logger.debug(TAG + '@addAccountToWeb3Keystore', 'Importing same account as current one')
-    } else {
-      Logger.error(TAG + '@addAccountToWeb3Keystore', 'Error importing raw key')
-      throw e
-    }
-  }
-  yield call(contractKit.web3.eth.personal.unlockAccount, account, pincode, UNLOCK_DURATION)
-  contractKit.web3.eth.defaultAccount = account
-  return account
-}
-
-export function* ensureAccountInWeb3Keystore() {
-  const currentAccount: string = yield select(currentAccountSelector)
-  if (currentAccount) {
-    const accountInWeb3Keystore: string = yield select(currentAccountInWeb3KeystoreSelector)
-    if (!accountInWeb3Keystore) {
-      Logger.debug(
-        TAG + '@ensureAccountInWeb3Keystore',
-        'Importing account from private key to web3 keystore'
-      )
-      const pincode = yield call(getPincode, true)
-      const privateKey: string = yield call(readPrivateKeyFromLocalDisk, currentAccount, pincode)
-      const account: string = yield call(
-        addAccountToWeb3Keystore,
-        privateKey,
-        currentAccount,
-        pincode
-      )
-      return account
-    } else if (accountInWeb3Keystore.toLowerCase() === currentAccount.toLowerCase()) {
-      return accountInWeb3Keystore
-    } else {
-      throw new Error(
-        `Account in web3 keystore (${accountInWeb3Keystore}) does not match current account (${currentAccount})`
-      )
-    }
-  } else {
-    throw new Error('Account not yet initialized')
   }
 }
 
@@ -398,9 +301,6 @@ export function* switchToGethFromForno() {
     yield spawn(gethSaga)
     yield call(waitForGethConnectivity)
     yield put(setContractKitReady(true))
-    // After switching off forno mode, ensure key is stored in web3.personal
-    // Note that this must happen after contractKit unlocked
-    yield call(ensureAccountInWeb3Keystore)
     Logger.debug(TAG + '@switchToGethFromForno', 'Ensured in keystore')
   } catch (e) {
     Logger.error(TAG + '@switchToGethFromForno', 'Error switching to geth from forno')

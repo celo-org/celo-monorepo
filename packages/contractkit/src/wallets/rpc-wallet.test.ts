@@ -88,7 +88,7 @@ testWithGanache('rpc-wallet', (web3) => {
         await rpcWallet.addAccount(PRIVATE_KEY1, PASSPHRASE)
         throw new Error('Expected exception to be thrown')
       } catch (e) {
-        expect(e.message).toBe(`RpcWallet: account ${ACCOUNT_ADDRESS1} already exists`)
+        expect(e.message).toBe(`RpcWallet: account already exists`)
       }
     })
 
