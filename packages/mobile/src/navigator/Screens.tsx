@@ -42,6 +42,7 @@ export enum Screens {
   PhotosEducation = 'PhotosEducation',
   PhotosNUX = 'PhotosNUX',
   Profile = 'Profile',
+  PhoneNumberLookupQuota = 'PhoneNumberLookupQuota',
   QRCode = 'QRCode',
   QRScanner = 'QRScanner',
   ReclaimPaymentConfirmationScreen = 'ReclaimPaymentConfirmationScreen',
