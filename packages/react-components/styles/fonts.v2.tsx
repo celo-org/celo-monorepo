@@ -67,6 +67,12 @@ const fontStyles = StyleSheet.create({
   center: {
     textAlign: 'center',
   },
+  mediumNumber: {
+    lineHeight: 27,
+    fontSize: 24,
+    fontFamily: Inter.Regular,
+    color: colors.dark,
+  },
 })
 
 export default fontStyles
