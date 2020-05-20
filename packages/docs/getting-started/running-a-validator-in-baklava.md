@@ -2,11 +2,11 @@
 
 The Baklava Testnet is a non-production Testnet for the Validator community. It serves several purposes:
 
-- **Operational excellence**: It helps you get familiarized with the processes that will be used to create RC1, and verify the security and stability of your infrastructure with the new software.
-- **Detecting vulnerabilities**: It helps the Celo community discover any remaining bugs before RC1.
+- **Operational excellence**: It helps you get familiarized with the processes that are being used to create Mainnet and verify the security and stability of your infrastructure with the new software.
+- **Detecting vulnerabilities**: It helps the Celo community discover issues before software and updates are promoted to Mainnet.
 - **Future testnet**: If all goes well, it will continue to function as a testnet, serving as a testing ground for changes after mainnet is launched.
 
-The Baklava testnet is the best place to get started running a validator, or test out new validator configurations before deploying to the [Release Candidate Network](rc1.md) or, in the future, Mainnet.
+The Baklava testnet is the best place to get started running a validator, or test out new validator configurations before deploying to [Mainnet](mainnet.md).
 
 {% hint style="info" %}
 A previous version of the Baklava testnet hosted The Great Celo Stake Off, however the network is now available for more general use.

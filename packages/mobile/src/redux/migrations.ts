@@ -33,15 +33,21 @@ export const migrations = {
     }
   },
   2: (state: any) => {
-    const secureSendPhoneNumberMapping = {}
-    const isValidRecipient = false
-
+    return {
+      ...state,
+      app: {
+        ...state.app,
+        numberVerified: false,
+      },
+    }
+  },
+  3: (state: any) => {
     return {
       ...state,
       send: {
         ...state.send,
-        secureSendPhoneNumberMapping,
-        isValidRecipient,
+        secureSendPhoneNumberMapping: {},
+        isValidRecipient: false,
       },
     }
   },

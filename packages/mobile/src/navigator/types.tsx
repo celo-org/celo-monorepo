@@ -90,6 +90,10 @@ export type StackParamList = {
     onSuccess: (pin: string) => void
   }
   [Screens.PincodeSet]: {}
+  [Screens.PhoneNumberLookupQuota]: {
+    onBuy: () => void
+    onSkip: () => void
+  }
   [Screens.PhotosEducation]: {}
   [Screens.PhotosNUX]: {}
   [Screens.Profile]: {}
