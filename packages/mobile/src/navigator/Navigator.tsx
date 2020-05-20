@@ -1,4 +1,4 @@
-import colors from '@celo/react-components/styles/colors'
+import colors from '@celo/react-components/styles/colors.v2'
 import { RouteProp } from '@react-navigation/core'
 import { createStackNavigator } from '@react-navigation/stack'
 import * as React from 'react'
@@ -30,6 +30,8 @@ import BackupPhrase, { navOptionsForBackupPhrase } from 'src/backup/BackupPhrase
 import BackupQuiz, { navOptionsForQuiz } from 'src/backup/BackupQuiz'
 import BackupSocial from 'src/backup/BackupSocial'
 import BackupSocialIntro from 'src/backup/BackupSocialIntro'
+import BackButton from 'src/components/BackButton.v2'
+import CancelButton from 'src/components/CancelButton.v2'
 import DappKitAccountScreen from 'src/dappkit/DappKitAccountScreen'
 import DappKitSignTxScreen from 'src/dappkit/DappKitSignTxScreen'
 import DappKitTxDataScreen from 'src/dappkit/DappKitTxDataScreen'
@@ -38,22 +40,28 @@ import ReclaimPaymentConfirmationScreen from 'src/escrow/ReclaimPaymentConfirmat
 import ExchangeReview from 'src/exchange/ExchangeReview'
 import ExchangeTradeScreen from 'src/exchange/ExchangeTradeScreen'
 import FeeExchangeEducation from 'src/exchange/FeeExchangeEducation'
+import { CURRENCY_ENUM } from 'src/geth/consts'
+import i18n from 'src/i18n'
 import ImportWallet from 'src/import/ImportWallet'
 import ImportWalletEmpty from 'src/import/ImportWalletEmpty'
 import ImportWalletSocial from 'src/import/ImportWalletSocial'
 import EnterInviteCode from 'src/invite/EnterInviteCode'
 import Language from 'src/language/Language'
 import SelectLocalCurrency from 'src/localCurrency/SelectLocalCurrency'
-import { exchangeHeader } from 'src/navigator/Headers'
 import {
   emptyHeader,
+  HeaderTitleWithBalance,
+  HeaderTitleWithSubtitle,
   headerWithBackButton,
+  headerWithCancelButton,
   noHeader,
   nuxNavigationOptions,
   nuxNavigationOptionsNoBackButton,
 } from 'src/navigator/Headers.v2'
+import { navigate, navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import TabNavigator from 'src/navigator/TabNavigator'
+import { TopBarTextButton } from 'src/navigator/TopBarButton.v2'
 import { StackParamList } from 'src/navigator/types'
 import IncomingPaymentRequestListScreen from 'src/paymentRequest/IncomingPaymentRequestListScreen'
 import OutgoingPaymentRequestListScreen from 'src/paymentRequest/OutgoingPaymentRequestListScreen'
@@ -73,6 +81,7 @@ import SendAmount from 'src/send/SendAmount'
 import SendConfirmation from 'src/send/SendConfirmation'
 import SetClock from 'src/set-clock/SetClock'
 import TransactionReview from 'src/transactions/TransactionReview'
+import { getDatetimeDisplayString } from 'src/utils/time'
 import VerificationEducationScreen from 'src/verify/VerificationEducationScreen'
 import VerificationInputScreen from 'src/verify/VerificationInputScreen'
 import VerificationInterstitialScreen from 'src/verify/VerificationInterstitialScreen'
@@ -82,27 +91,22 @@ import VerificationSuccessScreen from 'src/verify/VerificationSuccessScreen'
 
 const Stack = createStackNavigator<StackParamList>()
 
-export const headerArea = {
-  // Force this for now on iOS so screen transitions look normal
-  // given we intentionally hide the bottom separator from the nav bar
-  headerMode: 'screen',
-  defaultNavigationOptions: {
-    cardStyle: { backgroundColor: colors.background },
-    headerStyle: {
-      ...Platform.select({
-        android: {
-          elevation: 0,
-          backgroundColor: 'transparent',
+export const defaultScreenOptions = {
+  cardStyle: { backgroundColor: colors.background },
+  headerStyle: {
+    ...Platform.select({
+      android: {
+        elevation: 0,
+        backgroundColor: 'transparent',
+      },
+      ios: {
+        borderBottomWidth: 0,
+        borderBottomColor: 'transparent',
+        shadowOffset: {
+          height: 0,
         },
-        ios: {
-          borderBottomWidth: 0,
-          borderBottomColor: 'transparent',
-          shadowOffset: {
-            height: 0,
-          },
-        },
-      }),
-    },
+      },
+    }),
   },
 }
 
@@ -228,12 +232,46 @@ const exchangeTradeOptions = ({
   route,
 }: {
   route: RouteProp<StackParamList, Screens.ExchangeTradeScreen>
-}) => exchangeHeader(route.params.makerTokenDisplay.makerToken)
+}) => {
+  const { makerToken } = route.params?.makerTokenDisplay
+  const title =
+    makerToken === CURRENCY_ENUM.DOLLAR
+      ? i18n.t('exchangeFlow9:buyGold')
+      : i18n.t('exchangeFlow9:sellGold')
+  return {
+    ...headerWithCancelButton,
+    headerLeft: () => <CancelButton style={{ color: colors.dark }} />,
+    headerTitle: () => <HeaderTitleWithBalance title={title} token={makerToken} />,
+  }
+}
+
 const exchangeReviewOptions = ({
   route,
 }: {
   route: RouteProp<StackParamList, Screens.ExchangeReview>
-}) => exchangeHeader(route.params.exchangeInput.makerToken)
+}) => {
+  const { makerToken } = route.params?.exchangeInput
+  const goBack = () => navigateBack()
+
+  const goExchangeHome = () => navigate(Screens.ExchangeHomeScreen)
+  const title =
+    makerToken === CURRENCY_ENUM.DOLLAR
+      ? i18n.t('exchangeFlow9:buyGold')
+      : i18n.t('exchangeFlow9:sellGold')
+  return {
+    ...headerWithCancelButton,
+    headerLeft: () => <CancelButton style={{ color: colors.dark }} onCancel={goExchangeHome} />,
+    headerRight: () => (
+      <TopBarTextButton
+        title={i18n.t('global:edit')}
+        testID="EditButton"
+        onPress={goBack}
+        titleStyle={{ color: colors.goldDark }}
+      />
+    ),
+    headerTitle: () => <HeaderTitleWithBalance title={title} token={makerToken} />,
+  }
+}
 
 const exchangeScreens = (Navigator: typeof Stack) => (
   <>
@@ -315,11 +353,29 @@ const settingsScreens = (Navigator: typeof Stack) => (
   </>
 )
 
+const transactionReviewOptions = ({
+  route,
+}: {
+  route: RouteProp<StackParamList, Screens.TransactionReview>
+}) => {
+  const { header, timestamp } = route.params?.reviewProps
+  const dateTimeStatus = getDatetimeDisplayString(timestamp, i18n)
+  return {
+    ...emptyHeader,
+    headerLeft: () => <BackButton color={colors.dark} />,
+    headerTitle: () => <HeaderTitleWithSubtitle title={header} subTitle={dateTimeStatus} />,
+  }
+}
+
 const generalScreens = (Navigator: typeof Stack) => (
   <>
     <Navigator.Screen name={Screens.SetClock} component={SetClock} />
     <Navigator.Screen name={Screens.DollarEducation} component={DollarEducation} />
-    <Navigator.Screen name={Screens.TransactionReview} component={TransactionReview} />
+    <Navigator.Screen
+      name={Screens.TransactionReview}
+      component={TransactionReview}
+      options={transactionReviewOptions}
+    />
     <Navigator.Screen name={Screens.PhotosEducation} component={PhotosEducation} />
     <Navigator.Screen name={Screens.GoldEducation} component={GoldEducation} />
     <Navigator.Screen name={Screens.FeeEducation} component={FeeEducation} />
