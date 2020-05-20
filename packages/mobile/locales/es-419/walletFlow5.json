@@ -5,8 +5,7 @@
   "SMSError": "Error al enviar SMS",
   "notifications": "Notificaciones",
   "getBackupKey": "Obtener clave de respaldo",
-  "setBackupKey":
-    "Configure tu clave de respaldo para mejorar la seguridad y habilitar la recuperación de la cuenta",
+  "setBackupKey": "Configure tu clave de respaldo para mejorar la seguridad y habilitar la recuperación de la cuenta",
   "activity": "Actividad",
   "wallet": "Monedero",
   "send": "Envío",
@@ -17,8 +16,7 @@
   "review": "Revisión",
   "thanksForVerifying": "Gracias por completar la verificación",
   "earnCeloRewards": "Gana Recompensas Celo por verificar a otros",
-  "earnCeloGold":
-    "Gane Celo Oro al permitir que la red envíe mensajes de verificación desde tu teléfono",
+  "earnCeloGold": "Gane Celo Oro al permitir que la red envíe mensajes de verificación desde tu teléfono",
   "startEarning": "Comenzar a ganar",
   "learnMore": "Saber más",
   "goldIsWhereYouSave": "Convierta sus {{CeloDollars}} en Celo Oro",
@@ -35,8 +33,7 @@
   "verificationFee": "Tasa de Verificación",
   "networkFee": "Tasa de Red",
   "networkFeeExplanation": {
-    "0":
-      "Cada semana, se utiliza una tarifa muy pequeña (menos del 0.01%) del saldo de Celo Dollar de cada usuario para mantener estable el valor del Celo Dollar. Para obtener más información sobre las tarifas de Celo, visite ",
+    "0": "Cada semana, se utiliza una tarifa muy pequeña (menos del 0.01%) del saldo de Celo Dollar de cada usuario para mantener estable el valor del Celo Dollar. Para obtener más información sobre las tarifas de Celo, visite ",
     "1": "las Preguntas frecuentes."
   },
   "confirmingTransaction": "Confirmando…",
@@ -54,14 +51,11 @@
   "balanceNeedUpdating": "Saldo necesita actualizarse",
   "refreshBalances": "Actualizar saldos",
   "escrowedPaymentReminder": "Reacuerda al receptor aceptar el pago",
-  "escrowedPaymentReminderSms":
-    "¡Un recordatorio amistoso de que aún no has canjeado tus Celo dólares! Dirígite a {{link}} e ingresa tu código para comenzar: {{code}}",
-  "escrowedPaymentReminderSmsNoData":
-    "¡Un recordatorio amistoso de que aún no has canjeado tus Celo dólares! ¡Descarga la aplicación móvil para comenzar!",
+  "escrowedPaymentReminderSms": "¡Un recordatorio amistoso de que aún no has canjeado tus Celo dólares! Dirígite a {{link}} e ingresa tu código para comenzar: {{code}}",
+  "escrowedPaymentReminderSmsNoData": "¡Un recordatorio amistoso de que aún no has canjeado tus Celo dólares! ¡Descarga la aplicación móvil para comenzar!",
   "testnetAlert": {
     "0": "{{testnet}}",
-    "1":
-      "Un recordatorio amistoso de que está utilizando la compilación de red {{testnet}} - los saldos aquí no son reales."
+    "1": "Un recordatorio amistoso de que está utilizando la compilación de red {{testnet}} - los saldos aquí no son reales."
   },
   "dismiss": "Ocultar",
   "dollarBalance": "<0></0> $t(global:celoDollars)",
@@ -99,5 +93,7 @@
   "feedItemEscrowReceivedInfo": "{{comment}}",
   "feedItemEscrowReceivedInfo_noComment": "Escrow Pago Recibido",
   "feedItemGenericTitle": "{{nameOrNumber}}",
-  "feedItemGenericTitle_noRecipientDetails": "Desconocido"
+  "feedItemGenericTitle_noRecipientDetails": "Desconocido",
+  "feedItemGoldSold": "Vendido",
+  "feedItemGoldPurchased": "Comprado"
 }
