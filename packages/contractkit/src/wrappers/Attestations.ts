@@ -232,7 +232,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
       attestationStats.total < 1 ? 0 : attestationStats.completed / attestationStats.total
     // 'verified' is a term of convenience to mean that the attestation stats for a
     // given identifier are beyond a certain threshold of confidence
-    const isVerified = numAttestationsRemaining <= 0 && fractionAttestation > attestationThreshold
+    const isVerified = numAttestationsRemaining <= 0 && fractionAttestation >= attestationThreshold
 
     return {
       isVerified,
