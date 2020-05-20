@@ -5,9 +5,9 @@ import { execCmd } from '../packages/celotool/lib/lib/cmd-utils'
 import { packageNameToDirectory } from './dependency-graph-utils'
 
 enum ReleaseType {
-  MAJOR = 'patch',
+  MAJOR = 'major',
   MINOR = 'minor',
-  PATCH = 'major',
+  PATCH = 'patch',
 }
 
 const deployablePackages = ['@celo/contractkit', '@celo/utils', '@celo/celocli']
