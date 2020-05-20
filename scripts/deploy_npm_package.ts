@@ -1,6 +1,6 @@
 import { readFileSync, writeFileSync } from 'fs'
-import { prompt } from 'inquirer'
 import { join } from 'path'
+import { prompt } from 'prompts'
 import { execCmd } from '../packages/celotool/lib/lib/cmd-utils'
 import { packageNameToDirectory } from './dependency-graph-utils'
 
@@ -17,35 +17,16 @@ const deployablePackages = [
   'alexbhs-publish-test',
 ]
 
-const steps = [
-  {
-    type: 'list',
-    name: 'packageName',
-    choices: deployablePackages,
-    message: 'Which package would you like to deploy?',
-  },
-  {
-    type: 'list',
-    message: 'Is this a major, minor or patch release?',
-    choices: Object.values(ReleaseType),
-    name: 'version',
-  },
-]
-
-const dependencyGraph = JSON.parse(
-  readFileSync(join(__dirname, '..', 'dependency-graph.json')).toString()
-)
-
-const revert = (commitHash) => {
+const revert = (commitHash: string) => {
   console.log('> reverting to', commitHash)
 }
 
-function readPackageJson(dir) {
+function readPackageJson(dir: string): { [x: string]: any } {
   const packageJsonPath = join(__dirname, '..', 'packages', dir, 'package.json')
   return JSON.parse(readFileSync(packageJsonPath).toString())
 }
 
-function updatePackageJson(packageDir, property, value) {
+function updatePackageJson(packageDir: string, property: string, value: any) {
   const packageJsonPath = join(__dirname, '..', 'packages', packageDir, 'package.json')
   const packageJson = JSON.parse(readFileSync(packageJsonPath).toString())
   const updated =
@@ -64,7 +45,22 @@ async function main() {
     // process.exit(1)
   }
 
-  const { packageName, version } = await prompt(steps)
+  const response = await prompt([
+    {
+      type: 'select',
+      name: 'packageName',
+      choices: deployablePackages,
+      message: 'Which package would you like to deploy?',
+    },
+    {
+      type: 'list',
+      message: 'Is this a major, minor or patch release?',
+      choices: Object.values(ReleaseType),
+      name: 'version',
+    },
+  ])
+  const { packageName, version } = response
+  console.log(packageName, version)
   const packageDir = packageNameToDirectory[packageName]
 
   const [currentCommit] = await execCmd('git rev-parse HEAD', {
@@ -156,15 +152,19 @@ all OK?`,
     revert(currentCommit)
   }
 
-  const [, packOutput] = await execCmd('npm pack', {
+  const [packStdOut, packStdErr] = await execCmd('npm pack', {
     cwd: join(__dirname, '..', 'packages', packageDir),
   })
-  const [stdout, stderr] = await execCmd(
-    `yarn publish --public ${packageName}-${newVersion}.tar.gz`,
-    {
-      cwd: join(__dirname, '..', 'packages', packageDir),
-    }
-  )
+  const shasumLine = packStdErr.split('\n').find((line) => line.match(/shasum/))
+  if (!shasumLine) {
+    console.log('Unable to get shasum from "npm pack" output')
+    console.log(packStdOut, packStdErr)
+    return
+  }
+
+  await execCmd(`yarn publish --public ${packageName}-${newVersion}.tar.gz`, {
+    cwd: join(__dirname, '..', 'packages', packageDir),
+  })
 
   const { remoteInstallWorks } = await prompt({
     type: 'confirm',
@@ -194,15 +194,10 @@ all OK?`,
     cwd: join(__dirname, '..', 'packages', packageDir),
   })
 
-  const shasum = packOutput
-    .split('\n')
-    .find((line) => line.match(/shasum/))
-    .split(' ')
-    .pop()
-
   // the package json we need to push will only have an updated version field... not dependencies
   await execCmd('git stash')
 
+  const shasum = shasumLine.split(' ').pop()
   const releaseBranch = `release/${packageName}-${newVersion}`
   await execCmd(`git checkout -b ${releaseBranch}`)
   updatePackageJson(packageDir, 'version', newVersion)
