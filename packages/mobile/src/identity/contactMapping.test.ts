@@ -5,10 +5,14 @@ import { setUserContactDetails } from 'src/account/actions'
 import { defaultCountryCodeSelector, e164NumberSelector } from 'src/account/selectors'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { updateE164PhoneNumberAddresses } from 'src/identity/actions'
+import { requireSecureSend, updateE164PhoneNumberAddresses } from 'src/identity/actions'
 import { doImportContactsWrapper, fetchAddressesAndValidateSaga } from 'src/identity/contactMapping'
 import { fetchPhoneHashPrivate } from 'src/identity/privacy'
-import { e164NumberToAddressSelector } from 'src/identity/reducer'
+import {
+  AddressValidationType,
+  e164NumberToAddressSelector,
+  secureSendPhoneNumberMappingSelector,
+} from 'src/identity/reducer'
 import { setRecipientCache } from 'src/recipients/actions'
 import { contactsToRecipients } from 'src/recipients/recipient'
 import { getAllContacts } from 'src/utils/contacts'
@@ -17,19 +21,13 @@ import { getConnectedAccount } from 'src/web3/saga'
 import { currentAccountSelector } from 'src/web3/selectors'
 import {
   mockAccount,
+  mockAccount2,
+  mockAccountInvite,
   mockContactList,
   mockContactWithPhone2,
   mockE164Number,
   mockE164NumberHash,
 } from 'test/values'
-
-const mockPhoneNumberLookup = {
-  [mockE164NumberHash]: { [mockAccount]: { complete: 3, total: 3 } },
-}
-
-const mockAttestationsWrapper = {
-  lookupIdentifiers: jest.fn(() => mockPhoneNumberLookup),
-}
 
 const recipients = contactsToRecipients(mockContactList, '+1')
 const e164NumberRecipients = recipients!.e164NumberToRecipients
@@ -71,17 +69,31 @@ describe('Import Contacts Saga', () => {
 describe('Fetch Addresses Saga', () => {
   it('fetches and caches addresses correctly', async () => {
     const contractKit = await getContractKitOutsideGenerator()
+
+    const mockE164NumberToAddress = {
+      [mockE164Number]: [mockAccount.toLowerCase()],
+    }
+
+    const mockPhoneNumberLookup = {
+      [mockE164NumberHash]: { [mockAccount]: { complete: 3, total: 3 } },
+    }
+
+    const mockAttestationsWrapper = {
+      lookupIdentifiers: jest.fn(() => mockPhoneNumberLookup),
+    }
+
     await expectSaga(fetchAddressesAndValidateSaga, {
       e164Number: mockE164Number,
     })
       .provide([
-        [select(e164NumberToAddressSelector), {}], // placeholder
+        [select(e164NumberToAddressSelector), mockE164NumberToAddress],
         [call(fetchPhoneHashPrivate, mockE164Number), { phoneHash: mockE164NumberHash }],
         [
           call([contractKit.contracts, contractKit.contracts.getAttestations]),
           mockAttestationsWrapper,
         ],
-        [select(currentAccountSelector), { mockAccount }],
+        [select(currentAccountSelector), mockAccount],
+        [select(secureSendPhoneNumberMappingSelector), {}],
       ])
       .put(updateE164PhoneNumberAddresses({ [mockE164Number]: undefined }, {}))
       .put(
@@ -91,6 +103,92 @@ describe('Fetch Addresses Saga', () => {
           },
           {
             [mockAccount.toLowerCase()]: mockE164Number,
+          }
+        )
+      )
+      .run()
+  })
+
+  it('requires SecureSend with partial verification when a new adddress is added and last 4 digits are unique', async () => {
+    const contractKit = await getContractKitOutsideGenerator()
+
+    const mockPhoneNumberLookup = {
+      [mockE164NumberHash]: {
+        [mockAccount]: { complete: 3, total: 3 },
+        [mockAccount2]: { complete: 3, total: 3 },
+      },
+    }
+
+    const mockAttestationsWrapper = {
+      lookupIdentifiers: jest.fn(() => mockPhoneNumberLookup),
+    }
+
+    await expectSaga(fetchAddressesAndValidateSaga, {
+      e164Number: mockE164Number,
+    })
+      .provide([
+        [select(e164NumberToAddressSelector), {}],
+        [call(fetchPhoneHashPrivate, mockE164Number), { phoneHash: mockE164NumberHash }],
+        [
+          call([contractKit.contracts, contractKit.contracts.getAttestations]),
+          mockAttestationsWrapper,
+        ],
+        [select(currentAccountSelector), mockAccountInvite],
+        [select(secureSendPhoneNumberMappingSelector), {}],
+      ])
+      .put(updateE164PhoneNumberAddresses({ [mockE164Number]: undefined }, {}))
+      .put(requireSecureSend(mockE164Number, AddressValidationType.PARTIAL))
+      .put(
+        updateE164PhoneNumberAddresses(
+          {
+            [mockE164Number]: [mockAccount.toLowerCase(), mockAccount2.toLowerCase()],
+          },
+          {
+            [mockAccount.toLowerCase()]: mockE164Number,
+            [mockAccount2.toLowerCase()]: mockE164Number,
+          }
+        )
+      )
+      .run()
+  })
+
+  it('requires SecureSend with full verification when a new adddress is added and last 4 digits are not unique', async () => {
+    const contractKit = await getContractKitOutsideGenerator()
+
+    const mockPhoneNumberLookup = {
+      [mockE164NumberHash]: {
+        [mockAccount]: { complete: 3, total: 3 },
+        [mockAccountInvite]: { complete: 3, total: 3 },
+      },
+    }
+
+    const mockAttestationsWrapper = {
+      lookupIdentifiers: jest.fn(() => mockPhoneNumberLookup),
+    }
+
+    await expectSaga(fetchAddressesAndValidateSaga, {
+      e164Number: mockE164Number,
+    })
+      .provide([
+        [select(e164NumberToAddressSelector), {}],
+        [call(fetchPhoneHashPrivate, mockE164Number), { phoneHash: mockE164NumberHash }],
+        [
+          call([contractKit.contracts, contractKit.contracts.getAttestations]),
+          mockAttestationsWrapper,
+        ],
+        [select(currentAccountSelector), mockAccountInvite],
+        [select(secureSendPhoneNumberMappingSelector), {}],
+      ])
+      .put(updateE164PhoneNumberAddresses({ [mockE164Number]: undefined }, {}))
+      .put(requireSecureSend(mockE164Number, AddressValidationType.FULL))
+      .put(
+        updateE164PhoneNumberAddresses(
+          {
+            [mockE164Number]: [mockAccount.toLowerCase(), mockAccountInvite.toLowerCase()],
+          },
+          {
+            [mockAccount.toLowerCase()]: mockE164Number,
+            [mockAccountInvite.toLowerCase()]: mockE164Number,
           }
         )
       )
