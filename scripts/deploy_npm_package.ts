@@ -46,7 +46,7 @@ const confirm = async (message: string): Promise<boolean> => {
 
 const getCurrentCommit = async (): Promise<string> => {
   const [hash] = await execCmd('git rev-parse HEAD')
-  return hash
+  return hash.trim()
 }
 
 async function main() {
