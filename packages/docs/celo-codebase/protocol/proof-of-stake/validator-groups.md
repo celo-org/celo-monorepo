@@ -10,7 +10,7 @@ Validator groups can help mitigate the information disparity between voters and 
 
 Equally, a number of organizations may want to attempt to field multiple validators under their own control, or be able to interchange the specific machines or keys under which they validate in the case of hardware or connectivity failure. By switching out validators in the list, groups can accomplish this without users having to change their votes.
 
-Validator groups can have no more than a small, fixed maximum number of validators -- 5 in the Release Candidate network. This means an organization wanting to get more validators elected than this maximum has the added challenge of managing multiple group identities and reputations simultaneously. This further promotes decentralization and strengthens operational security, making it more likely that the validator set will be composed of nodes operated in different fashions by independent individuals and organizations.
+Validator groups can have no more than a small, fixed maximum number of validators -- currently 5 in Mainnet. This means an organization wanting to get more validators elected than this maximum has the added challenge of managing multiple group identities and reputations simultaneously. This further promotes decentralization and strengthens operational security, making it more likely that the validator set will be composed of nodes operated in different fashions by independent individuals and organizations.
 
 ## Registration
 
@@ -24,13 +24,13 @@ While an account has a registered validator group, or for up to a `deregistratio
 
 ## Group Share
 
-Validator groups are compensated by taking a share \(the 'Group Share'\) of the [validator rewards](epoch-rewards/validator-rewards.md) from any of its member validators that are elected during an epoch. This value is set at registration time and can be changed later.
+Validator groups are compensated by taking a share (the 'Group Share') of the [validator rewards](validator-rewards.md) from any of its member validators that are elected during an epoch. This value is set at registration time and can be changed later.
 
 ## Changing Group Members
 
 The account owner controls the list of validators in their group and can at any time add, remove, or re-order validators.
 
-For a validator to be added to a group, several conditions must hold: the number of members in the group must be less than the maximum; the Locked Gold balance of the group's account must be sufficient \(the stake is per-member validator\); and the validator must first have set its affiliation to the group.
+For a validator to be added to a group, several conditions must hold: the number of members in the group must be less than the maximum; the Locked Gold balance of the group's account must be sufficient (the stake is per-member validator); and the validator must first have set its affiliation to the group.
 
 This means that while a group can unilaterally remove a validator, and a validator can unilaterally leave by changing its affiliation, both parties have to agree before a validator can become a member of a group.
 
@@ -44,5 +44,4 @@ A [slashing penalty](penalties.md), initially `1.0`, is also tracked for each va
 
 ## Metadata
 
-Both validators and validator groups can use [Accounts Metadata](../identity/metadata.md) to provide unverified metadata \(such as name and organizational affiliation\) as well as claims that can be verified off-chain for control of third-party accounts. All validators are encouraged to make a verifiable claim for [domain names](../../../validator-guide/validator-explorer.md).
-
+Both validators and validator groups can use [Accounts Metadata](../identity/metadata.md) to provide unverified metadata (such as name and organizational affiliation) as well as claims that can be verified off-chain for control of third-party accounts. All validators are encouraged to make a verifiable claim for [domain names](../../../operations-manual/validator-explorer.md).

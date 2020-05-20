@@ -1,7 +1,7 @@
-import Button, { BtnTypes } from '@celo/react-components/components/Button'
+import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button.v2'
 import ItemSeparator from '@celo/react-components/components/ItemSeparator'
 import ScrollContainer from '@celo/react-components/components/ScrollContainer'
-import SectionHeadNew from '@celo/react-components/components/SectionHeadNew'
+import SectionHead from '@celo/react-components/components/SectionHeadGold'
 import { StackScreenProps } from '@react-navigation/stack'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
@@ -70,43 +70,32 @@ export class ExchangeHomeScreen extends React.Component<Props> {
 
     return (
       <SafeAreaView style={styles.background}>
-        <ScrollContainer
-          heading={t('global:gold')}
-          testID="ExchangeScrollView"
-          stickyHeaderIndices={[2]}
-        >
+        <ScrollContainer heading={t('global:gold')} testID="ExchangeScrollView">
           <DisconnectBanner />
-          <View>
-            <CeloGoldOverview testID="ExchangeAccountOverview" />
-            <ItemSeparator />
-            <CeloGoldHistoryChart />
-            <ItemSeparator />
-            <View style={styles.buttonContainer}>
+          <CeloGoldHistoryChart />
+          <View style={styles.buttonContainer}>
+            <Button
+              text={t('buy')}
+              size={BtnSizes.FULL}
+              onPress={this.goToBuyGold}
+              style={styles.button}
+              type={BtnTypes.TERTIARY}
+            />
+            {hasGold && (
               <Button
-                text={t('buy')}
-                onPress={this.goToBuyGold}
+                size={BtnSizes.FULL}
+                text={t('sell')}
+                onPress={this.goToBuyDollars}
                 style={styles.button}
-                standard={true}
-                type={BtnTypes.PRIMARY}
+                type={BtnTypes.TERTIARY}
               />
-              {hasGold && (
-                <>
-                  <View style={styles.buttonDivider} />
-                  <Button
-                    text={t('sell')}
-                    onPress={this.goToBuyDollars}
-                    style={styles.button}
-                    standard={true}
-                    type={BtnTypes.PRIMARY}
-                  />
-                </>
-              )}
-            </View>
+            )}
           </View>
-          <SectionHeadNew text={t('goldActivity')} />
-          <View style={styles.activity}>
-            <TransactionsList currency={CURRENCY_ENUM.GOLD} />
-          </View>
+          <ItemSeparator />
+          <CeloGoldOverview testID="ExchangeAccountOverview" />
+          <ItemSeparator />
+          <SectionHead text={t('global:activity')} />
+          <TransactionsList currency={CURRENCY_ENUM.GOLD} />
         </ScrollContainer>
       </SafeAreaView>
     )
@@ -118,9 +107,6 @@ export default connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps
 })(withTranslation(Namespaces.exchangeFlow9)(ExchangeHomeScreen))
 
 const styles = StyleSheet.create({
-  activity: {
-    flex: 1,
-  },
   exchangeEvent: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -131,25 +117,15 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     justifyContent: 'space-between',
   },
-  pseudoHeader: {
-    height: 40,
-  },
-  lowerTop: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingBottom: 20,
-  },
   buttonContainer: {
     flexDirection: 'row',
-    marginHorizontal: 16,
+    flex: 1,
+    marginTop: 24,
+    marginBottom: 28,
+    marginHorizontal: 12,
   },
   button: {
-    alignItems: 'center',
-    justifyContent: 'space-around',
-    paddingHorizontal: 20,
+    marginHorizontal: 4,
     flex: 1,
-  },
-  buttonDivider: {
-    marginLeft: 16,
   },
 })
