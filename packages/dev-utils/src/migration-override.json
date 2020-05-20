@@ -2,6 +2,10 @@
   "downtimeSlasher": {
     "slashableDowntime": 60
   },
+  "downtimeSlasherSlots": {
+    "slashableDowntime": 60,
+    "slotSize": 30
+  },
   "epochRewards": {
     "frozen": false
   },

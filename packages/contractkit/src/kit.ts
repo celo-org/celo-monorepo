@@ -14,6 +14,7 @@ import { Wallet } from './wallets/wallet'
 import { Web3ContractCache } from './web3-contract-cache'
 import { AttestationsConfig } from './wrappers/Attestations'
 import { DowntimeSlasherConfig } from './wrappers/DowntimeSlasher'
+import { DowntimeSlasherSlotsConfig } from './wrappers/DowntimeSlasherSlots'
 import { ElectionConfig } from './wrappers/Election'
 import { ExchangeConfig } from './wrappers/Exchange'
 import { GasPriceMinimumConfig } from './wrappers/GasPriceMinimum'
@@ -70,6 +71,7 @@ export interface NetworkConfig {
   stableToken: StableTokenConfig
   validators: ValidatorsConfig
   downtimeSlasher: DowntimeSlasherConfig
+  downtimeSlasherSlots: DowntimeSlasherSlotsConfig
 }
 
 export interface KitOptions {
@@ -158,6 +160,7 @@ export class ContractKit {
       this.contracts.getStableToken(),
       this.contracts.getValidators(),
       this.contracts.getDowntimeSlasher(),
+      this.contracts.getDowntimeSlasherSlots(),
     ]
     const contracts = await Promise.all(promises)
     const res = await Promise.all([
@@ -172,6 +175,7 @@ export class ContractKit {
       contracts[8].getConfig(),
       contracts[9].getConfig(),
       contracts[10].getConfig(),
+      contracts[11].getConfig(),
     ])
     return {
       exchange: res[0],
@@ -185,6 +189,7 @@ export class ContractKit {
       stableToken: res[8],
       validators: res[9],
       downtimeSlasher: res[10],
+      downtimeSlasherSlots: res[11],
     }
   }
 

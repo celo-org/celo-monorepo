@@ -24,6 +24,12 @@ const DefaultConstitution = {
     setSlashingIncentives: 0.7,
     setSlashableDowntime: 0.7,
   },
+  // TODO CHECK THIS FOR DOWNTIME_SLASHER_SLOTS
+  DowntimeSlasherSlots: {
+    default: 0.7,
+    setSlashingIncentives: 0.7,
+    setSlashableDowntime: 0.7,
+  },
   Election: {
     default: 0.8,
     setRegistry: 0.9,

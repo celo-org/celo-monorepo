@@ -52,6 +52,13 @@ const DefaultConfig = {
     penalty: '100000000000000000000', // 100 cGLD
     slashableDowntime: (8 * HOUR) / 5, // ~8 hours
   },
+  downtimeSlasherSlots: {
+    reward: '10000000000000000000', // 10 cGLD
+    penalty: '100000000000000000000', // 100 cGLD
+    slashableDowntime: (8 * HOUR) / 5, // ~8 hours
+    slotSize: (8 * HOUR) / 5 / 2, // ~4 hours
+    oncePerEpoch: false,
+  },
   election: {
     minElectableValidators: '22',
     maxElectableValidators: '100',
@@ -266,6 +273,10 @@ const NetworkConfigs = {
     downtimeSlasher: {
       slashableDowntime: 60, // epoch length is 100 for unit tests
     },
+    downtimeSlasherSlots: {
+      slashableDowntime: 60,
+      slotSize: 30,
+    },
     election: {
       minElectableValidators: '10',
       frozen: false,
@@ -303,6 +314,10 @@ const NetworkConfigs = {
   testing: {
     downtimeSlasher: {
       slashableDowntime: 6,
+    },
+    downtimeSlasherSlots: {
+      slashableDowntime: 6,
+      slotSize: 3,
     },
     election: {
       minElectableValidators: '1',
