@@ -14,9 +14,11 @@ export const WORDS = [
 ]
 
 const DURATION = 8510
+const START_SLIDE = 600
 const SLIDE_IN_DURATION = 2100
 const PAUSE = 6600
-const SLIDE_IN = SLIDE_IN_DURATION / DURATION
+const SLIDE_IN_START = START_SLIDE / DURATION
+const SLIDE_IN_END = (SLIDE_IN_DURATION + START_SLIDE) / DURATION
 const FADE_OUT_START = PAUSE / DURATION
 const FADE_OUT_STOP = 1
 
@@ -105,14 +107,14 @@ const styles = StyleSheet.create({
             },
           ],
         },
-        '2%': {
+        [`${SLIDE_IN_START * 100}%`]: {
           transform: [
             {
               translateX: 0,
             },
           ],
         },
-        [`${SLIDE_IN * 100}%`]: {
+        [`${SLIDE_IN_END * 100}%`]: {
           transform: [
             {
               translateX: '100%',
