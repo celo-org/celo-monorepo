@@ -10,7 +10,12 @@ enum ReleaseType {
   PATCH = 'patch',
 }
 
-const deployablePackages = ['@celo/contractkit', '@celo/utils', '@celo/celocli']
+const deployablePackages = [
+  '@celo/contractkit',
+  '@celo/utils',
+  '@celo/celocli',
+  'alexs-test-package-2',
+]
 
 const rootDir = join(__dirname, '..')
 const packagesDir = join(rootDir, 'packages')
