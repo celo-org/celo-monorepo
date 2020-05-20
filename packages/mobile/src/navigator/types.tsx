@@ -94,7 +94,10 @@ export type StackParamList = {
   [Screens.PhotosNUX]: {}
   [Screens.Profile]: {}
   [Screens.QRCode]: {}
-  [Screens.QRScanner]: {}
+  [Screens.QRScanner]: {
+    scanIsForSecureSend?: true
+    transactionData?: TransactionDataInput
+  }
   [Screens.ReclaimPaymentConfirmationScreen]: {
     reclaimPaymentInput: EscrowedPayment
   }

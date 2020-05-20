@@ -3,6 +3,7 @@ import QRCode from '@celo/react-components/icons/QRCode'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
+import { useIsFocused } from '@react-navigation/native'
 import { StackScreenProps } from '@react-navigation/stack'
 import { memoize } from 'lodash'
 import * as React from 'react'
@@ -31,7 +32,7 @@ interface DispatchProps {
   handleBarcodeDetected: typeof handleBarcodeDetected
 }
 
-type OwnProps = StackScreenProps<StackParamList, Screens.QRScanner>
+type OwnProps = StackScreenProps<StackParamList, Screens.QRScanner> & { isFocused: boolean }
 type Props = DispatchProps & WithTranslation & StateProps & OwnProps
 
 const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
@@ -44,6 +45,11 @@ const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
 
 const mapDispatchToProps = {
   handleBarcodeDetected,
+}
+
+const QRScannerWrapper = (props: Props) => {
+  const isFocused = useIsFocused()
+  return <QRScanner {...props} isFocused={isFocused} />
 }
 
 class QRScanner extends React.Component<Props> {
@@ -67,12 +73,12 @@ class QRScanner extends React.Component<Props> {
   }
 
   render() {
-    const { t, scanIsForSecureSend } = this.props
+    const { t, scanIsForSecureSend, isFocused } = this.props
 
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.innerContainer}>
-          {Platform.OS !== 'android' && (
+          {(Platform.OS !== 'android' || isFocused) && (
             <RNCamera
               ref={(ref) => {
                 this.camera = ref
@@ -190,4 +196,4 @@ const styles = StyleSheet.create({
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(withTranslation(Namespaces.sendFlow7)(QRScanner))
+)(withTranslation(Namespaces.sendFlow7)(QRScannerWrapper))
