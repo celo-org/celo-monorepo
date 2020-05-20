@@ -115,6 +115,9 @@
       },
       "releasegold": {
         "description": "View and manage Release Gold contracts"
+      },
+      "dkg": {
+        "description": "Publish your locally computed DKG results to the blockchain"
       }
     },
     "bin": "celocli",

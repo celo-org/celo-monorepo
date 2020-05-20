@@ -49,12 +49,12 @@ describe('Phone number formatting and utilities', () => {
   describe('Phone hashing', () => {
     it('Hashes an valid number without a salt', () => {
       expect(getPhoneHash(TEST_PHONE_NUMBERS.VALID_E164)).toBe(
-        '0x4465dd287f82f531502bb84201231dac162cbc2077abf455a5a87f9738c0337d'
+        '0x483128504c69591aed5751690805ba9aad6c390644421dc189f6dbb6e085aadf'
       )
     })
     it('Hashes an valid number with a salt', () => {
       expect(getPhoneHash(TEST_PHONE_NUMBERS.VALID_E164, 'abcdefg')).toBe(
-        '0xfe2835a235ffb2f98dcf259a710dc23751af20bf1a0284829a0cde0c720c3595'
+        '0xf08257f6b126597dbd090fecf4f5106cfb59c98ef997644cef16f9349464810c'
       )
     })
     it('Throws for an invalid number', () => {
