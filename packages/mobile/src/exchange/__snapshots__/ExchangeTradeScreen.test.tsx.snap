@@ -39,7 +39,7 @@ exports[`ExchangeTradeScreen renders correctly 1`] = `
             style={
               Object {
                 "color": "#2E3338",
-                "fontFamily": "Hind-Regular",
+                "fontFamily": "Inter-Medium",
                 "fontSize": 15,
                 "fontWeight": "700",
                 "lineHeight": 20,
@@ -68,10 +68,11 @@ exports[`ExchangeTradeScreen renders correctly 1`] = `
             <Text
               style={
                 Object {
-                  "color": "#81868B",
-                  "fontFamily": "Hind-Regular",
+                  "color": "#9CA4A9",
+                  "fontFamily": "Inter-Regular",
                   "fontSize": 13,
-                  "lineHeight": 20,
+                  "lineHeight": 16,
+                  "marginTop": 4,
                   "textDecorationLine": "underline",
                 }
               }
@@ -90,11 +91,11 @@ exports[`ExchangeTradeScreen renders correctly 1`] = `
           rejectResponderTermination={true}
           style={
             Object {
-              "color": "#2E3338",
+              "color": "#9C6E00",
               "flex": 1,
-              "fontFamily": "Hind-Regular",
+              "fontFamily": "Inter-Regular",
               "fontSize": 24,
-              "height": 54,
+              "height": 60,
               "lineHeight": 39,
               "marginLeft": 10,
               "textAlign": "right",
@@ -137,14 +138,14 @@ exports[`ExchangeTradeScreen renders correctly 1`] = `
                 },
                 Object {
                   "color": "#2E3338",
-                  "fontFamily": "Hind-Regular",
-                  "fontSize": 15,
-                  "lineHeight": 20,
+                  "fontFamily": "Inter-Regular",
+                  "fontSize": 14,
+                  "lineHeight": 18,
                 },
               ]
             }
           >
-            Subtotal (@
+            Subtotal @
              
             <Text
               numberOfLines={1}
@@ -161,7 +162,6 @@ exports[`ExchangeTradeScreen renders correctly 1`] = `
               $
               12.09
             </Text>
-            )
           </Text>
         </View>
         <Text
@@ -175,9 +175,9 @@ exports[`ExchangeTradeScreen renders correctly 1`] = `
               },
               Object {
                 "color": "#2E3338",
-                "fontFamily": "Hind-Regular",
-                "fontSize": 15,
-                "lineHeight": 20,
+                "fontFamily": "Inter-Regular",
+                "fontSize": 14,
+                "lineHeight": 18,
               },
             ]
           }
@@ -203,27 +203,22 @@ exports[`ExchangeTradeScreen renders correctly 1`] = `
   </RCTScrollView>
   <View
     style={
-      Object {
-        "borderTopColor": "rgba(0, 0, 0, 0.05)",
-        "borderTopWidth": 1,
-      }
+      Array [
+        Object {
+          "flexDirection": "column",
+        },
+        Object {
+          "padding": 16,
+        },
+      ]
     }
   >
     <View
       style={
-        Array [
-          Object {
-            "alignItems": "center",
-            "borderRadius": 3,
-            "flexDirection": "row",
-          },
-          null,
-          null,
-          undefined,
-          Object {
-            "backgroundColor": "#A3EBC6",
-          },
-        ]
+        Object {
+          "borderRadius": 100,
+          "overflow": "hidden",
+        }
       }
     >
       <View
@@ -243,56 +238,31 @@ exports[`ExchangeTradeScreen renders correctly 1`] = `
         onResponderTerminationRequest={[Function]}
         onStartShouldSetResponder={[Function]}
         style={
-          Array [
-            Object {
-              "alignItems": "center",
-              "flex": 1,
-              "justifyContent": "center",
-            },
-            Object {
-              "backgroundColor": "#A3EBC6",
-            },
-            Object {
-              "height": 50,
-            },
-            Object {
-              "borderWidth": 0,
-            },
-          ]
+          Object {
+            "alignItems": "center",
+            "backgroundColor": "#E3C376",
+            "flexGrow": 1,
+            "height": 48,
+            "justifyContent": "center",
+            "paddingHorizontal": 16,
+            "paddingVertical": 5,
+          }
         }
         testID="ExchangeReviewButton"
       >
-        <View
+        <Text
+          accessibilityLabel="continue"
           style={
             Object {
-              "alignItems": "center",
-              "flex": 1,
-              "flexDirection": "row",
-              "justifyContent": "space-between",
+              "color": "#FFFFFF",
+              "fontFamily": "Inter-SemiBold",
+              "fontSize": 16,
+              "lineHeight": 22,
             }
           }
         >
-          <Text
-            accessibilityLabel="continue"
-            style={
-              Array [
-                Object {
-                  "fontFamily": "Hind-SemiBold",
-                  "fontSize": 16,
-                },
-                Object {
-                  "color": "#FFFFFF",
-                },
-                Object {
-                  "paddingLeft": 5,
-                  "paddingRight": 5,
-                },
-              ]
-            }
-          >
-            undefined:review
-          </Text>
-        </View>
+          undefined:review
+        </Text>
       </View>
     </View>
   </View>
