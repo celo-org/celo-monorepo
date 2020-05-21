@@ -1,6 +1,5 @@
 import { CeloProvider } from '@celo/contractkit/lib'
 import { flags } from '@oclif/command'
-import { ParserOutput } from '@oclif/parser/lib/parse'
 import { toChecksumAddress } from 'ethereumjs-util'
 import { BaseCommand } from '../../base'
 
