@@ -60,6 +60,8 @@ export enum Screens {
   TabNavigator = 'TabNavigator',
   TransactionReview = 'TransactionReview',
   UpgradeScreen = 'UpgradeScreen',
+  ValidateRecipientIntro = 'ValidateRecipientIntro',
+  ValidateRecipientAccount = 'ValidatemRecipientAccount',
   VerificationEducationScreen = 'VerificationEducationScreen',
   VerificationInputScreen = 'VerificationInputScreen',
   VerificationInterstitialScreen = 'VerificationInterstitialScreen',

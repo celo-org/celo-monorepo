@@ -2,10 +2,10 @@ import { AccountAuthRequest, CURRENCY_ENUM, SignTxRequest } from '@celo/utils'
 import BigNumber from 'bignumber.js'
 import { EscrowedPayment } from 'src/escrow/actions'
 import { ExchangeConfirmationCardProps } from 'src/exchange/ExchangeConfirmationCard'
+import { AddressValidationType } from 'src/identity/reducer'
 import { Screens } from 'src/navigator/Screens'
-import { ConfirmationInput as PaymentRequestConfirmationInput } from 'src/paymentRequest/PaymentRequestConfirmation'
 import { Recipient } from 'src/recipients/recipient'
-import { ConfirmationInput } from 'src/send/SendConfirmation'
+import { TransactionDataInput } from 'src/send/SendAmount'
 import { TransferConfirmationCardProps } from 'src/send/TransferConfirmationCard'
 import { ReviewProps } from 'src/transactions/TransactionReview'
 
@@ -82,7 +82,7 @@ export type StackParamList = {
   [Screens.Licenses]: {}
   [Screens.OutgoingPaymentRequestListScreen]: {}
   [Screens.PaymentRequestConfirmation]: {
-    confirmationInput: PaymentRequestConfirmationInput
+    transactionData: TransactionDataInput
   }
   [Screens.PincodeEducation]: {}
   [Screens.PincodeEnter]: {
@@ -98,7 +98,10 @@ export type StackParamList = {
   [Screens.PhotosNUX]: {}
   [Screens.Profile]: {}
   [Screens.QRCode]: {}
-  [Screens.QRScanner]: {}
+  [Screens.QRScanner]: {
+    scanIsForSecureSend?: true
+    transactionData?: TransactionDataInput
+  }
   [Screens.ReclaimPaymentConfirmationScreen]: {
     reclaimPaymentInput: EscrowedPayment
   }
@@ -110,7 +113,7 @@ export type StackParamList = {
     recipient: Recipient
   }
   [Screens.SendConfirmation]: {
-    confirmationInput: ConfirmationInput
+    transactionData: TransactionDataInput
   }
   [Screens.SetClock]: {}
   [Screens.Settings]: {}
@@ -123,6 +126,16 @@ export type StackParamList = {
     confirmationProps: TransferConfirmationCardProps | ExchangeConfirmationCardProps
   }
   [Screens.UpgradeScreen]: {}
+  [Screens.ValidateRecipientIntro]: {
+    transactionData: TransactionDataInput
+    addressValidationType: AddressValidationType
+    isPaymentRequest?: true
+  }
+  [Screens.ValidateRecipientAccount]: {
+    transactionData: TransactionDataInput
+    addressValidationType: AddressValidationType
+    isPaymentRequest?: true
+  }
   [Screens.VerificationEducationScreen]: {}
   [Screens.VerificationInputScreen]: {}
   [Screens.VerificationInterstitialScreen]: {}
