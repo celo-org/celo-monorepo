@@ -1,6 +1,7 @@
 import * as React from 'react'
-import Svg, { G, Line, Rect } from 'svgs'
+import Svg, { Defs, G, Line, Rect } from 'svgs'
 
+// TODO: Use the Card component here once merged
 export default function MenuBurger() {
   return (
     <Svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -34,8 +35,8 @@ export default function MenuBurger() {
           strokeLinecap="round"
         />
       </G>
-      <defs>
-        <filter
+      <Defs>
+        {/* <filter
           id="filter0_d"
           x="0"
           y="0"
@@ -58,8 +59,8 @@ export default function MenuBurger() {
           />
           <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow" />
           <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow" result="shape" />
-        </filter>
-      </defs>
+        </filter> */}
+      </Defs>
     </Svg>
   )
 }

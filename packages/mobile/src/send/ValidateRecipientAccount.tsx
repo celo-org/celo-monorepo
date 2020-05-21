@@ -1,7 +1,7 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button.v2'
 import KeyboardAwareScrollView from '@celo/react-components/components/KeyboardAwareScrollView'
 import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
-import TextButton from '@celo/react-components/components/TextButton'
+import TextButton from '@celo/react-components/components/TextButton.v2'
 import colors from '@celo/react-components/styles/colors.v2'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import { StackScreenProps } from '@react-navigation/stack'
@@ -15,6 +15,7 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import CodeRow, { CodeRowStatus } from 'src/components/CodeRow'
 import { SingleDigitInput } from 'src/components/SingleDigitInput'
 import { Namespaces, withTranslation } from 'src/i18n'
+import InfoIcon from 'src/icons/InfoIcon.v2'
 import MenuBurger from 'src/icons/MenuBurger'
 import { validateRecipientAddress } from 'src/identity/actions'
 import { AddressValidationType } from 'src/identity/reducer'
@@ -195,22 +196,29 @@ export class ValidateRecipientAccount extends React.Component<Props, State> {
               testID="ConfirmAccountButton"
             />
           </View>
-          <Text onPress={this.toggleModal} style={styles.askHelpText}>
-            {t('confirmAccountNumber.help', { displayName })}
-          </Text>
+          <View style={styles.helpContainer}>
+            <InfoIcon />
+            <Text onPress={this.toggleModal} style={styles.askHelpText}>
+              {t('confirmAccountNumber.help', { displayName })}
+            </Text>
+          </View>
         </KeyboardAwareScrollView>
         <KeyboardSpacer />
         <Modal isVisible={this.state.isModalVisible}>
           <View style={styles.modalContainer}>
             <Text style={styles.modalHeader}>{t('helpModal.header')}</Text>
-            <Text style={styles.body}>{t('helpModal.body1')}</Text>
-            <Text style={styles.body}>{t('helpModal.body2')}</Text>
-            <Text style={styles.body}>{t('helpModal.body3')}</Text>
-            <MenuBurger />
-            <View style={styles.modalButtonsContainer}>
-              <TextButton onPress={this.toggleModal} style={styles.modalCancelText}>
-                {t('global:dismiss')}
-              </TextButton>
+            <Text style={styles.modalBody}>{t('helpModal.body1')}</Text>
+            <View style={styles.menuContainer}>
+              <MenuBurger />
+              <Text style={styles.menuText}>Menu</Text>
+            </View>
+            <Text style={styles.modalBody}>{t('helpModal.body2')}</Text>
+            <View style={styles.addressContainer}>
+              <MenuBurger />
+              <Text style={styles.modalBody2}>{t('helpModal.body3')}</Text>
+            </View>
+            <View style={styles.modalButtonContainer}>
+              <TextButton onPress={this.toggleModal}>{t('global:dismiss')}</TextButton>
             </View>
           </View>
         </Modal>
@@ -252,18 +260,30 @@ const styles = StyleSheet.create({
     color: colors.warning,
     paddingVertical: 8,
   },
+  helpContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   askHelpText: {
     ...fontStyles.small,
-    marginTop: 20,
-    marginBottom: 10,
+    paddingLeft: 8,
     textDecorationLine: 'underline',
   },
   body: {
     ...fontStyles.regular,
     paddingBottom: 16,
   },
+  modalBody: {
+    ...fontStyles.regular,
+    textAlign: 'center',
+  },
+  modalBody2: {
+    ...fontStyles.small,
+    textAlign: 'center',
+    color: colors.gray4,
+  },
   modalContainer: {
-    backgroundColor: colors.background,
+    backgroundColor: colors.light,
     margin: 24,
     borderRadius: 4,
   },
@@ -272,14 +292,25 @@ const styles = StyleSheet.create({
     marginVertical: 15,
     textAlign: 'center',
   },
-  modalButtonsContainer: {
-    marginTop: 25,
+  menuContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  menuText: {
+    ...fontStyles.small,
+    color: colors.gray4,
+  },
+  addressContainer: {
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalButtonContainer: {
+    paddingVertical: 24,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-evenly',
-  },
-  modalCancelText: {
-    paddingRight: 20,
   },
 })
 
