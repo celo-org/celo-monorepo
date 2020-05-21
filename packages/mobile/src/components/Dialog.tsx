@@ -5,25 +5,24 @@ import * as React from 'react'
 import { Image, ImageSourcePropType, ScrollView, StyleSheet, Text, View } from 'react-native'
 import Modal from 'src/components/Modal'
 
-interface Action {
-  text: string
-  onPress: () => void
-}
-
 interface Props {
   image?: ImageSourcePropType
   title: string
   children: React.ReactNode
-  action: Action
-  secondaryAction?: Action
+  actionText: string
+  actionPress: () => void
+  secondaryActionText?: string
+  secondaryActionPress?: () => void
   isVisible: boolean
 }
 
 export default function Dialog({
   title,
   children,
-  action,
-  secondaryAction,
+  actionPress,
+  actionText,
+  secondaryActionText,
+  secondaryActionPress,
   image,
   isVisible,
 }: Props) {
@@ -35,13 +34,13 @@ export default function Dialog({
         <Text style={styles.body}>{children}</Text>
       </ScrollView>
       <View style={styles.actions}>
-        {secondaryAction && (
-          <TextButton style={styles.secondary} onPress={secondaryAction.onPress}>
-            {secondaryAction.text}
+        {secondaryActionText && (
+          <TextButton style={styles.secondary} onPress={secondaryActionPress}>
+            {secondaryActionText}
           </TextButton>
         )}
-        <TextButton style={styles.primary} onPress={action.onPress}>
-          {action.text}
+        <TextButton style={styles.primary} onPress={actionPress}>
+          {actionText}
         </TextButton>
       </View>
     </Modal>
