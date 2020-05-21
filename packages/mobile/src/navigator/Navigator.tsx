@@ -44,6 +44,7 @@ import ImportWalletSocial from 'src/import/ImportWalletSocial'
 import EnterInviteCode from 'src/invite/EnterInviteCode'
 import Language from 'src/language/Language'
 import SelectLocalCurrency from 'src/localCurrency/SelectLocalCurrency'
+import DrawerNavigator from 'src/navigator/DrawerNavigator'
 import { exchangeHeader } from 'src/navigator/Headers'
 import {
   emptyHeader,
@@ -53,7 +54,6 @@ import {
   nuxNavigationOptionsNoBackButton,
 } from 'src/navigator/Headers.v2'
 import { Screens } from 'src/navigator/Screens'
-import TabNavigator from 'src/navigator/TabNavigator'
 import { StackParamList } from 'src/navigator/types'
 import IncomingPaymentRequestListScreen from 'src/paymentRequest/IncomingPaymentRequestListScreen'
 import OutgoingPaymentRequestListScreen from 'src/paymentRequest/OutgoingPaymentRequestListScreen'
@@ -366,7 +366,7 @@ export function AppNavigatorNew() {
     } else if (!hasSeenVerificationNux) {
       initialRoute = Screens.VerificationEducationScreen
     } else {
-      initialRoute = Screens.TabNavigator
+      initialRoute = Screens.DrawerNavigator
     }
 
     setInitialRoute(initialRoute)
@@ -384,7 +384,7 @@ export function AppNavigatorNew() {
       initialRouteName={initialRouteName}
       screenOptions={emptyHeader}
     >
-      <Stack.Screen name={Screens.TabNavigator} component={TabNavigator} options={noHeader} />
+      <Stack.Screen name={Screens.DrawerNavigator} component={DrawerNavigator} options={noHeader} />
       {commonScreens(Stack)}
       {sendScreens(Stack)}
       {nuxScreens(Stack)}

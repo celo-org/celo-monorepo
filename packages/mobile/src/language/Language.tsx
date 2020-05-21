@@ -32,6 +32,7 @@ export function Language() {
       selectedAnswer,
     })
     navigation.navigate(nextScreen)
+    dispatch(setLanguage(selectedAnswer))
   }
 
   return (
