@@ -17,7 +17,6 @@ import { Screens } from 'src/navigator/Screens'
 import { deleteChainDataAndRestartApp } from 'src/utils/AppRestart'
 import Logger from 'src/utils/Logger'
 import { setContractKitReady } from 'src/web3/actions'
-import { fornoSelector } from 'src/web3/selectors'
 
 const gethEmitter = new NativeEventEmitter(NativeModules.RNGeth)
 
@@ -187,8 +186,8 @@ export function* gethSaga() {
 export function* gethSagaIfNecessary() {
   yield call(waitForRehydrate) // Wait for rehydrate to know if geth or forno mode
   yield put(setContractKitReady(true)) // ContractKit is blocked (not ready) before rehydrate
-  if (!(yield select(fornoSelector))) {
-    Logger.debug(`${TAG}@gethSagaIfNecessary`, `Starting geth saga...`)
-    yield call(gethSaga)
-  }
+  // if (!(yield select(fornoSelector))) {
+  //   Logger.debug(`${TAG}@gethSagaIfNecessary`, `Starting geth saga...`)
+  //   yield call(gethSaga)
+  // }
 }

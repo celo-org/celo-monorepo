@@ -1,6 +1,6 @@
 {
   "name": "@celo/mobile",
-  "version": "1.8.0",
+  "version": "1.8.1",
   "author": "Celo",
   "license": "Apache-2.0",
   "private": true,
@@ -93,7 +93,6 @@
     "react-native-flag-secure-android": "git://github.com/kristiansorens/react-native-flag-secure-android#e234251",
     "react-native-fs": "^2.16.6",
     "react-native-gesture-handler": "^1.6.1",
-    "react-native-geth": "https://github.com/celo-org/react-native-geth#8583b07",
     "react-native-keep-awake": "^4.0.0",
     "react-native-keyboard-aware-scroll-view": "^0.9.1",
     "react-native-localize": "^1.4.0",

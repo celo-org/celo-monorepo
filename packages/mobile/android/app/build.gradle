@@ -158,7 +158,7 @@ android {
         minSdkVersion isDetoxTestBuild ? 18 : rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode appVersionCode
-        versionName "1.8.0"
+        versionName "1.8.1"
         testBuildType System.getProperty('testBuildType', 'debug')
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         resValue "string", "build_config_package", "org.celo.mobile"
@@ -221,8 +221,9 @@ android {
 
         alfajores {
             applicationIdSuffix ".alfajores"
-            minifyEnabled enableProguardInReleaseBuilds
-            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+            multiDexEnabled true
+            minifyEnabled false
+            // proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
             signingConfig signingConfigs.release
             matchingFallbacks = ['release']
         }
@@ -269,7 +270,7 @@ dependencies {
     implementation 'ru.ivanarh.ndcrash:jndcrash-libunwind:0.7'
     implementation 'androidx.appcompat:appcompat:1.1.0-rc01'
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0-alpha02'
-    implementation project(':react-native-geth')
+    // implementation project(':react-native-geth')
     implementation project(':react-native-confirm-device-credentials')
     implementation fileTree(dir: "libs", include: ["*.jar"])
     //noinspection GradleDynamicVersion
