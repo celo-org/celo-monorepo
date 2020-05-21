@@ -40,11 +40,17 @@ interface StateProps {
   recipientCache: NumberToRecipient
 }
 
-const mapStateToProps = (state: RootState): StateProps => ({
-  e164PhoneNumberAddressMapping: e164NumberToAddressSelector(state),
-  addressToE164Number: addressToE164NumberSelector(state),
-  recipientCache: recipientCacheSelector(state),
-})
+const mapStateToProps = (state: RootState): StateProps => {
+  return {
+    e164PhoneNumberAddressMapping: e164NumberToAddressSelector(state),
+    addressToE164Number: addressToE164NumberSelector(state),
+    recipientCache: recipientCacheSelector(state),
+  }
+}
+
+const mapDispatchToProps = {
+  declinePaymentRequest,
+}
 
 // Payment Request notification for the notification center on home screen
 export class IncomingPaymentRequestSummaryNotification extends React.Component<Props> {
@@ -95,6 +101,7 @@ const styles = StyleSheet.create({
   },
 })
 
-export default connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
-  declinePaymentRequest,
-})(withTranslation(Namespaces.walletFlow5)(IncomingPaymentRequestSummaryNotification))
+export default connect<StateProps, DispatchProps, {}, RootState>(
+  mapStateToProps,
+  mapDispatchToProps
+)(withTranslation(Namespaces.walletFlow5)(IncomingPaymentRequestSummaryNotification))
