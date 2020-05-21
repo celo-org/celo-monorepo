@@ -104,35 +104,33 @@ class BackupPhrase extends React.Component<Props, State> {
     const { t, backupCompleted } = this.props
     const { mnemonic, isConfirmChecked } = this.state
     return (
-      <>
-        <SafeAreaView style={styles.container}>
-          <ScrollView contentContainerStyle={styles.scrollContainer}>
-            <BackupPhraseContainer
-              value={mnemonic}
-              mode={BackupPhraseContainerMode.READONLY}
-              type={BackupPhraseType.BACKUP_KEY}
+      <SafeAreaView style={styles.container}>
+        <ScrollView contentContainerStyle={styles.scrollContainer}>
+          <BackupPhraseContainer
+            value={mnemonic}
+            mode={BackupPhraseContainerMode.READONLY}
+            type={BackupPhraseType.BACKUP_KEY}
+          />
+          <Text style={styles.body}>{t('backupKeySummary')}</Text>
+        </ScrollView>
+        {!backupCompleted && (
+          <>
+            <View style={styles.confirmationSwitchContainer}>
+              <Switch value={isConfirmChecked} onValueChange={this.onPressConfirmSwitch} />
+              <Text onPress={this.onPressConfirmArea} style={styles.confirmationSwitchLabel}>
+                {t('savedConfirmation')}
+              </Text>
+            </View>
+            <Button
+              disabled={!isConfirmChecked}
+              onPress={this.onPressContinue}
+              text={t('global:continue')}
+              size={BtnSizes.FULL}
+              type={BtnTypes.SECONDARY}
             />
-            <Text style={styles.body}>{t('backupKeySummary')}</Text>
-          </ScrollView>
-          {!backupCompleted && (
-            <>
-              <View style={styles.confirmationSwitchContainer}>
-                <Switch value={isConfirmChecked} onValueChange={this.onPressConfirmSwitch} />
-                <Text onPress={this.onPressConfirmArea} style={styles.confirmationSwitchLabel}>
-                  {t('savedConfirmation')}
-                </Text>
-              </View>
-              <Button
-                disabled={!isConfirmChecked}
-                onPress={this.onPressContinue}
-                text={t('global:continue')}
-                size={BtnSizes.FULL}
-                type={BtnTypes.SECONDARY}
-              />
-            </>
-          )}
-        </SafeAreaView>
-      </>
+          </>
+        )}
+      </SafeAreaView>
     )
   }
 }
