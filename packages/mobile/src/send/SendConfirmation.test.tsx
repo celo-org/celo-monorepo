@@ -2,12 +2,11 @@ import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { render, waitForElement } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
-import { TokenTransactionType } from 'src/apollo/types'
 import { Screens } from 'src/navigator/Screens'
 import { getSendFee } from 'src/send/saga'
 import SendConfirmation from 'src/send/SendConfirmation'
 import { createMockStore } from 'test/utils'
-import { mockAccount, mockNavigation, mockRecipient } from 'test/values'
+import { mockNavigation, mockTransactionData } from 'test/values'
 
 const TEST_FEE = new BigNumber(10000000000000000)
 
@@ -25,13 +24,7 @@ const mockRoute = {
   name: Screens.SendConfirmation as Screens.SendConfirmation,
   key: '',
   params: {
-    confirmationInput: {
-      recipient: mockRecipient,
-      type: TokenTransactionType.Sent,
-      recipientAddress: mockAccount,
-      amount: new BigNumber(10),
-      reason: 'My Reason',
-    },
+    transactionData: mockTransactionData,
   },
 }
 
