@@ -59,8 +59,7 @@
     "A friendly reminder that you haven't yet redeemed your Celo Dollars! Download the mobile app to get started!",
   "testnetAlert": {
     "0": "{{testnet}}",
-    "1":
-      "A friendly reminder you're using the {{testnet}} network build - the balances are not real"
+    "1": "A friendly reminder you're using the {{testnet}} network build - the balances are not real and data saver is enabled"
   },
   "dismiss": "Dismiss",
   "dollarBalance": "<0></0> $t(global:celoDollars)",

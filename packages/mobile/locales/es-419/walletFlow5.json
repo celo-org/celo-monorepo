@@ -60,8 +60,7 @@
     "¡Un recordatorio amistoso de que aún no has canjeado tus Celo dólares! ¡Descarga la aplicación móvil para comenzar!",
   "testnetAlert": {
     "0": "{{testnet}}",
-    "1":
-      "Un recordatorio amistoso de que está utilizando la compilación de red {{testnet}} - los saldos aquí no son reales."
+    "1": "Un recordatorio amistoso de que está utilizando la compilación de red {{testnet}} - los saldos aquí no son reales y ahorro de datos está habilitado."
   },
   "dismiss": "Ocultar",
   "dollarBalance": "<0></0> $t(global:celoDollars)",
