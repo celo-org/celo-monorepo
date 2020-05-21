@@ -17,9 +17,9 @@ export function TwoAssets() {
   return (
     <View style={standardStyles.darkBackground}>
       <GridRow
-        desktopStyle={standardStyles.blockMargin}
-        tabletStyle={standardStyles.blockMarginTablet}
-        mobileStyle={standardStyles.blockMarginMobile}
+        desktopStyle={[standardStyles.blockMargin, standardStyles.sectionMarginTop]}
+        tabletStyle={[standardStyles.blockMarginTablet, standardStyles.sectionMarginTopTablet]}
+        mobileStyle={[standardStyles.blockMarginMobile, standardStyles.sectionMarginTopMobile]}
         allStyle={standardStyles.centered}
       >
         <Cell span={Spans.half} style={standardStyles.centered}>
@@ -37,9 +37,9 @@ export function TwoAssets() {
         </Cell>
       </GridRow>
       <GridRow
-        desktopStyle={standardStyles.sectionMarginBottom}
-        tabletStyle={standardStyles.sectionMarginBottomTablet}
-        mobileStyle={standardStyles.sectionMarginBottomMobile}
+        desktopStyle={standardStyles.blockMarginBottom}
+        tabletStyle={standardStyles.blockMarginBottomTablet}
+        mobileStyle={standardStyles.blockMarginBottomMobile}
       >
         <AssetToken ticker="cUSD" info={t('cUSDinfo')} icon={<ExchangeCUSD size={ICON_SIZE} />}>
           <Button

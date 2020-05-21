@@ -1,3 +1,4 @@
+import * as React from 'react'
 import { Image, ImageSourcePropType, StyleSheet, Text, View } from 'react-native'
 import Fade from 'react-reveal/Fade'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
