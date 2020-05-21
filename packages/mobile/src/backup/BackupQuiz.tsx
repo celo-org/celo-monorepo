@@ -12,10 +12,11 @@ import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import { setBackupCompleted } from 'src/account/actions'
 import { showError } from 'src/alert/actions'
+import CancelConfirm from 'src/backup/CancelConfirm'
 import { QuizzBottom } from 'src/backup/QuizzBottom'
 import DevSkipButton from 'src/components/DevSkipButton'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
-import { headerWithCancelButton } from 'src/navigator/Headers.v2'
+import { emptyHeader } from 'src/navigator/Headers.v2'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
@@ -55,7 +56,8 @@ type OwnProps = StackScreenProps<StackParamList, Screens.BackupQuiz>
 type Props = WithTranslation & DispatchProps & OwnProps
 
 export const navOptionsForQuiz: StackNavigationOptions = {
-  ...headerWithCancelButton,
+  ...emptyHeader,
+  headerLeft: () => <CancelConfirm screen={TAG} />,
   headerTitle: i18n.t(`${Namespaces.backupKeyFlow6}:headerTitle`),
 }
 

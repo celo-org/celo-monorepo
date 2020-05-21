@@ -430,6 +430,8 @@ export function AppNavigatorNew() {
       initialRoute = Screens.TabNavigator
     }
 
+    initialRoute = Screens.BackupPhrase
+
     setInitialRoute(initialRoute)
 
     SplashScreen.hide()
