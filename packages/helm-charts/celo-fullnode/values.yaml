@@ -40,7 +40,7 @@ storage:
   # AKS default storageclasses:
   #   - default for Azure Standard storage (HDD)
   #   - managed-premium for Azure Premium Disks (SSD)
-  storageClass: default
+  storageClass: ssd
   accessModes: ReadWriteOnce
   size: 20Gi
 
@@ -61,19 +61,19 @@ geth:
   gcmode: full
   ping_ip_from_packet: false
   in_memory_discovery_table: false
-  verbosity: 2
+  verbosity: 3
   # Azure static ips
+  # public_ips:
+  # - 1.2.3.4
+  # - 5.6.7.8
   public_ips:
-  - 1.2.3.4
-  - 5.6.7.8
   service_type: LoadBalancer
   azure_mixed_protocols: true
   use_static_ips: true
   updateStrategy:
     type: RollingUpdate
     rollingUpdate:
-      maxUnavailable: 25%
-      maxSurge: 25%
+      partition: 0
 
 genesis:
   networkId: 31418

@@ -111,7 +111,7 @@ commands:
       - run:
           name: Create cached node_modules (if necessary)
           command: |
-            if [ ! -e ~/.tmp/node_modules.tgz ]; then 
+            if [ ! -e ~/.tmp/node_modules.tgz ]; then
               tar -c node_modules/ packages/*/node_modules/ | gzip --fast > ~/.tmp/node_modules.tgz
             fi
       - save_cache:
@@ -261,7 +261,7 @@ jobs:
             #   echo "Cache found, just run post-script."
             #   yarn postinstall
             # fi
-            yarn || yarn 
+            yarn || yarn
             yarn build || yarn build
       - save_cache:
           key: yarn-v4-macos-{{ .Branch }}-{{ checksum "yarn.lock" }}
@@ -850,6 +850,107 @@ jobs:
           name: Minor test of celocli
           command: ./node_modules/.bin/celocli account:new # Small test
 
+  integration-celotool-install:
+    <<: *defaults
+    environment:
+      CI_INTEGRATION_ENV: integration
+      DESIRED_VERSION: v2.11.0
+      GOOGLE_APPLICATION_CREDENTIALS: /tmp/sa.json
+    steps:
+    - run:
+        name: Install helm 2
+        command: |
+          curl https://raw.githubusercontent.com/helm/helm/master/scripts/get | bash
+          helm init --client-only
+    - run:
+        name: Activate gcloud
+        command: |
+          echo $GCLOUD_SERVICE_KEY | gcloud auth activate-service-account --key-file=-
+          gcloud --quiet config set project ${GOOGLE_PROJECT_ID}
+          gcloud --quiet config set compute/zone ${GOOGLE_COMPUTE_ZONE}
+          echo $GCLOUD_SERVICE_KEY > $GOOGLE_APPLICATION_CREDENTIALS
+    - attach_workspace:
+        at: ~/app
+    - run:
+        name: Rebuild celotool project
+        command: |
+          set -e
+          yarn
+          yarn run build
+    - run:
+        name: Configure k8s cluster for the fullnode
+        command: |
+          set -e
+          gcloud container clusters --quiet --project=${GOOGLE_PROJECT_ID} --region ${GOOGLE_COMPUTE_ZONE} get-credentials celo-networks-dev
+    - run:
+        name: Configure Kubernetes namespace
+        command: |
+          set -e
+          NAMESPACE="circle-${CIRCLE_BUILD_NUM}"
+          echo "Namespace: ${NAMESPACE}"
+          kubectl create namespace ${NAMESPACE}
+    - run:
+        name: Deploy lightest mode client connected to rc1
+        command: |
+          set -e
+          cd packages/celotool
+          NAMESPACE="circle-${CIRCLE_BUILD_NUM}"
+          bin/celotooljs.sh deploy initial gke-fullnode -e rc1 --syncmode lightest --namespace ${NAMESPACE}
+    - run:
+        name: Test lightest mode client connected to rc1
+        command: |
+          set -e
+          cd packages/celotool
+          NAMESPACE="circle-${CIRCLE_BUILD_NUM}"
+          scripts/test_sync.sh rc1 lightest ${NAMESPACE}
+    - run:
+        name: Deploy full mode client connected to rc1
+        command: |
+          set -e
+          cd packages/celotool
+          NAMESPACE="circle-${CIRCLE_BUILD_NUM}"
+          bin/celotooljs.sh deploy initial gke-fullnode -e rc1 --syncmode full --namespace ${NAMESPACE}
+    - run:
+        name: Test full mode client connected to rc1
+        command: |
+          set -e
+          cd packages/celotool
+          NAMESPACE="circle-${CIRCLE_BUILD_NUM}"
+          scripts/test_sync.sh rc1 full ${NAMESPACE}
+    - run:
+        name: Deploy fast mode client connected to rc1
+        command: |
+          set -e
+          cd packages/celotool
+          NAMESPACE="circle-${CIRCLE_BUILD_NUM}"
+          bin/celotooljs.sh deploy initial gke-fullnode -e rc1 --syncmode fast --namespace ${NAMESPACE}
+    - run:
+        name: Test fast mode client connected to rc1
+        command: |
+          set -e
+          cd packages/celotool
+          NAMESPACE="circle-${CIRCLE_BUILD_NUM}"
+          scripts/test_sync.sh rc1 fast ${NAMESPACE}
+    # - run:
+    #     name: Deploy network
+    #     no_output_timeout: 25m
+    #     command: |
+    #       cd packages/celotool/bin
+    #       bash integration.sh ${CI_INTEGRATION_ENV}
+    # - run:
+    #     name: Deploy contracts
+    #     command: |
+    #       echo $(pwd)
+    #       cd ~/app/
+    #       source ".env.${CI_INTEGRATION_ENV}"
+    #       packages/celotool/bin/celotooljs.sh deploy initial contracts -e ${CI_INTEGRATION_ENV} --verbose 2>&1
+    # - run:
+    #     name: Deploy celostats
+    #     command: |
+    #       echo $(pwd)
+    #       cd ~/app/
+    #       packages/celotool/bin/celotooljs.sh deploy initial celostats -e ${CI_INTEGRATION_ENV} --verbose 2>&1
+
   phone-number-privacy-test:
     <<: *defaults
     steps:
@@ -920,6 +1021,9 @@ workflows:
           requires:
             - lint-checks
             - contractkit-test
+      - integration-celotool-install:
+          requires:
+            - lint-checks
       - phone-number-privacy-test:
           requires:
             - lint-checks
@@ -956,3 +1060,15 @@ workflows:
       - protocol-test-with-code-coverage:
           requires:
             - lint-checks
+  # nightly-integration:
+  #   triggers:
+  #     - schedule:
+  #         # 11 AM in UTC = 3 AM in PDT (winter time)
+  #         cron: '20 9 * * *'
+  #         # filters:
+  #         #   branches:
+  #         #     only:
+  #         #       - master
+  #   jobs:
+  #     - install_dependencies
+  #     - integration-celotool-install

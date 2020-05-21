@@ -96,8 +96,10 @@ release: {{ .Release.Name }}
     NAT_FLAG=""
     if [[ ! -z $IP_ADDRESSES ]]; then
       NAT_IP=$(echo "$IP_ADDRESSES" | awk -v RID=$(expr "$RID" + "1") '{split($0,a,","); print a[RID]}')
-    else
+    elif [[ -f /root/.celo/ipAddress ]]; then
       NAT_IP=$(cat /root/.celo/ipAddress)
+    else
+      NAT_IP=$(hostname -i)
     fi
     NAT_FLAG="--nat=extip:${NAT_IP}"
     ADDITIONAL_FLAGS='{{ .geth_flags | default "" }}'
@@ -131,11 +133,12 @@ release: {{ .Release.Name }}
     ACCOUNT_ADDRESS=$(cat /root/.celo/address)
     ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --ethstats=${HOSTNAME}@{{ .ethstats }} --etherbase=${ACCOUNT_ADDRESS}"
     {{- end }}
+    {{- if not (eq (.syncmode | default .Values.geth.syncmode) "light") }}
+    ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --light.serve {{ .light_serve | default 90 }} --light.maxpeers {{ .light_maxpeers | default 1000 }}"
+    {{- end }}
 
     geth \
       --bootnodes=$(cat /root/.celo/bootnodeEnode) \
-      --light.serve {{ .light_serve | default 90 }} \
-      --light.maxpeers {{ .light_maxpeers | default 1000 }} \
       --maxpeers {{ .maxpeers | default 1100 }} \
       --networkid=${NETWORK_ID} \
       --nousb \
