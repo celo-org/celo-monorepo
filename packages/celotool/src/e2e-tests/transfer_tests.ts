@@ -675,7 +675,10 @@ describe('Transfer tests', function(this: any) {
                               await res.waitReceipt()
                               assert.fail('no error was thrown')
                             } catch (error) {
-                              assert.include(error.toString(), `Returned error: no suitable peers available`)
+                              assert.include(
+                                error.toString(),
+                                `Returned error: no suitable peers available`
+                              )
                             }
                           })
                         } else {
