@@ -664,10 +664,6 @@ describe('Transfer tests', function(this: any) {
                           gatewayFee: feeValue(feeValueChoice),
                         }
                         if (recipientChoice === 'random' || feeValueChoice === 'insufficient') {
-                          const errMsg =
-                            recipientChoice === 'random'
-                              ? 'no peer with etherbase found'
-                              : 'gateway fee too low to broadcast to peers'
                           it('should get rejected by the sending node before being added to the tx pool', async () => {
                             try {
                               const res = await transferCeloGold(
@@ -679,7 +675,7 @@ describe('Transfer tests', function(this: any) {
                               await res.waitReceipt()
                               assert.fail('no error was thrown')
                             } catch (error) {
-                              assert.include(error.toString(), `Returned error: ${errMsg}`)
+                              assert.include(error.toString(), `Returned error: no suitable peers available`)
                             }
                           })
                         } else {
