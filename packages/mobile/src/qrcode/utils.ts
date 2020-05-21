@@ -2,10 +2,13 @@ import { isValidAddress } from '@celo/utils/src/address'
 import { isEmpty } from 'lodash'
 import * as RNFS from 'react-native-fs'
 import Share from 'react-native-share'
-import { put } from 'redux-saga/effects'
+import { call, put } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { validateRecipientAddressSuccess } from 'src/identity/actions'
+import {
+  validateRecipientAddressFailure,
+  validateRecipientAddressSuccess,
+} from 'src/identity/actions'
 import { AddressToE164NumberType, E164NumberToAddressType } from 'src/identity/reducer'
 import { replace } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -47,6 +50,37 @@ export async function shareSVGImage(svg: SVG) {
   })
 }
 
+function* handleSecureSend(
+  data: { address: string; e164PhoneNumber: string; displayName: string },
+  e164NumberToAddress: E164NumberToAddressType,
+  secureSendTxData: TransactionDataInput
+) {
+  if (!secureSendTxData.recipient.e164PhoneNumber) {
+    throw Error(`Invalid recipient type for Secure Send: ${secureSendTxData.recipient.kind}`)
+  }
+
+  const userScannedAddress = data.address.toLowerCase()
+  const { e164PhoneNumber } = secureSendTxData.recipient
+  const possibleRecievingAddresses = e164NumberToAddress[e164PhoneNumber]
+  // This should never happen. Secure Send is triggered when there are
+  // multiple addrresses for a given phone number
+  if (!possibleRecievingAddresses) {
+    throw Error("No addresses associated with recipient's phone number")
+  }
+
+  const possibleRecievingAddressesFormatted = possibleRecievingAddresses.map((address) =>
+    address.toLowerCase()
+  )
+  if (!possibleRecievingAddressesFormatted.includes(userScannedAddress)) {
+    yield put(showError(ErrorMessages.QR_FAILED_INVALID_RECIPIENT))
+    yield put(validateRecipientAddressFailure())
+    return false
+  }
+
+  yield put(validateRecipientAddressSuccess(e164PhoneNumber, userScannedAddress))
+  return true
+}
+
 export function* handleBarcode(
   barcode: QrCode,
   addressToE164Number: AddressToE164NumberType,
@@ -69,33 +103,12 @@ export function* handleBarcode(
     yield put(showError(ErrorMessages.QR_FAILED_INVALID_ADDRESS))
     return
   }
-  try {
-    if (secureSendTxData) {
-      if (!secureSendTxData.recipient.e164PhoneNumber) {
-        throw Error(`Invalid recipient type for Secure Send: ${secureSendTxData.recipient.kind}`)
-      }
 
-      const userScannedAddress = data.address.toLowerCase()
-      const { e164PhoneNumber } = secureSendTxData.recipient
-      const possibleRecievingAddresses = e164NumberToAddress[e164PhoneNumber]
-      // This should never happen. Secure Send is triggered when there are
-      // mutliple addrresses for a given phone number
-      if (!possibleRecievingAddresses) {
-        throw Error("No addresses associated with recipient's phone number")
-      }
-
-      const possibleRecievingAddressesFormatted = possibleRecievingAddresses.map((address) =>
-        address.toLowerCase()
-      )
-      if (!possibleRecievingAddressesFormatted.includes(userScannedAddress)) {
-        yield put(showError(ErrorMessages.QR_FAILED_INVALID_RECIPIENT))
-        return
-      }
-
-      yield put(validateRecipientAddressSuccess(e164PhoneNumber, userScannedAddress))
+  if (secureSendTxData) {
+    const success = yield call(handleSecureSend, data, e164NumberToAddress, secureSendTxData)
+    if (!success) {
+      return
     }
-  } catch (error) {
-    Logger.error(TAG + '@handleBarcode', `Error with Secure Send: `, error)
   }
 
   if (typeof data.e164PhoneNumber !== 'string') {

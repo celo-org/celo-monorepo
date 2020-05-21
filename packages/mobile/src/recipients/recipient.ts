@@ -124,29 +124,28 @@ export function getRecipientFromAddress(
   return e164PhoneNumber ? recipientCache[e164PhoneNumber] : undefined
 }
 
-export const getRecipientVerificationStatus = (
+export function getRecipientVerificationStatus(
   recipient: Recipient,
   e164NumberToAddress: E164NumberToAddressType
-): RecipientVerificationStatus => {
+): RecipientVerificationStatus {
   if (recipient.kind === RecipientKind.QrCode || recipient.kind === RecipientKind.Address) {
     return RecipientVerificationStatus.VERIFIED
   }
 
-  if (recipient.e164PhoneNumber) {
-    const addresses = e164NumberToAddress[recipient.e164PhoneNumber]
-
-    if (addresses === undefined) {
-      return RecipientVerificationStatus.UNKNOWN
-    }
-
-    if (addresses === null) {
-      return RecipientVerificationStatus.UNVERIFIED
-    }
-
-    return RecipientVerificationStatus.VERIFIED
+  if (!recipient.e164PhoneNumber) {
+    return RecipientVerificationStatus.UNKNOWN
   }
 
-  return RecipientVerificationStatus.UNKNOWN
+  const addresses = e164NumberToAddress[recipient.e164PhoneNumber]
+  if (addresses === undefined) {
+    return RecipientVerificationStatus.UNKNOWN
+  }
+
+  if (addresses === null) {
+    return RecipientVerificationStatus.UNVERIFIED
+  }
+
+  return RecipientVerificationStatus.VERIFIED
 }
 
 export function getRecipientThumbnail(recipient?: Recipient) {
