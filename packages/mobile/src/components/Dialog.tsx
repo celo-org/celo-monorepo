@@ -1,6 +1,6 @@
 import Modal from 'src/components/Modal'
 import * as React from 'react'
-import { StyleSheet, Text, ScrollView, View } from 'react-native'
+import { Image, StyleSheet, Text, ScrollView, View, ImageSourcePropType } from 'react-native'
 import TextButton from '@celo/react-components/components/TextButton.v2'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import colorsV2 from '@celo/react-components/styles/colors.v2'
@@ -11,18 +11,26 @@ interface Action {
 }
 
 interface Props {
-  image?: React.ReactNode
+  image?: ImageSourcePropType
   title: string
   children: React.ReactNode
   action: Action
   secondaryAction?: Action
+  isVisible: boolean
 }
 
-export default function Dialog({ title, children, action, secondaryAction, image }: Props) {
+export default function Dialog({
+  title,
+  children,
+  action,
+  secondaryAction,
+  image,
+  isVisible,
+}: Props) {
   return (
-    <Modal isVisible={true} style={styles.root}>
-      <ScrollView>
-        {image && <View style={styles.imageContainer}>{image}</View>}
+    <Modal isVisible={isVisible}>
+      <ScrollView contentContainerStyle={styles.root}>
+        {image && <Image style={styles.imageContainer} source={image} resizeMode="contain" />}
         <Text style={styles.title}>{title}</Text>
         <Text style={styles.body}>{children}</Text>
       </ScrollView>
@@ -57,6 +65,7 @@ const styles = StyleSheet.create({
   actions: {
     paddingTop: 16,
     flexDirection: 'row',
+    justifyContent: 'center',
   },
   secondary: {
     color: colorsV2.gray4,
@@ -68,5 +77,7 @@ const styles = StyleSheet.create({
   },
   imageContainer: {
     marginBottom: 12,
+    width: 100,
+    height: 100,
   },
 })
