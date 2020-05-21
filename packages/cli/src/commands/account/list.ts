@@ -9,8 +9,9 @@ export default class AccountList extends BaseCommand {
   static flags = {
     ...BaseCommand.flags,
     local: flags.boolean({
-      default: false,
-      description: 'If set, only show local and hardware wallet accounts',
+      allowNo: true,
+      description:
+        'If set, only show local and hardware wallet accounts. Use no-local to only show keystore addresses.',
     }),
   }
 
@@ -19,26 +20,26 @@ export default class AccountList extends BaseCommand {
   async run() {
     const res = this.parse(AccountList)
 
-    const celoProvider: CeloProvider = this.kit.web3.currentProvider as any
-
     // Retreive accounts from the connected Celo node.
-    const addresses = []
-    if (res.flags.local) {
-      addresses.push(...(await this.kit.web3.eth.getAccounts()))
-    }
+    const nodeAddresses = !res.flags.local ? await this.kit.web3.eth.getAccounts() : []
 
     // Get addresses from the local wallet.
-    const localAddresses = celoProvider.wallet
-      .getAccounts()
-      .map((value) => toChecksumAddress(value))
+    const celoProvider: CeloProvider = this.kit.web3.currentProvider as any
+    const localAddresses =
+      res.flags.local ?? true
+        ? celoProvider.wallet.getAccounts().map((value) => toChecksumAddress(value))
+        : []
 
     // Display the addresses.
     const localName = res.flags.useLedger ? 'Ledger' : 'Local'
-    console.log('All Addresses: ', addresses)
-    console.log(
-      'Keystore Addresses: ',
-      addresses.filter((address) => !localAddresses.includes(address))
-    )
-    console.log(`${localName} Addresses: `, localAddresses)
+    if (res.flags.local === undefined) {
+      console.log('All Addresses: ', nodeAddresses.concat(localAddresses))
+    }
+    if (!res.flags.local) {
+      console.log('Keystore Addresses: ', nodeAddresses)
+    }
+    if (res.flags.local ?? true) {
+      console.log(`${localName} Addresses: `, localAddresses)
+    }
   }
 }
