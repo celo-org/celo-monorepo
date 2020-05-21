@@ -94,6 +94,11 @@
     "matching_0": "No Matching Icons",
     "matching_plural": "{{count}} Matching Icons"
   },
+  "exchangeIcons": {
+    "title": "Exchange Icons",
+    "headline": "Celo currently has two asset units: cUSD and cGLD. Celo Gold (cGLD) is Celo’s native asset (not related to physical gold). Celo Dollar (cUSD) is the initial Celo stable value asset tracking the US dollar.\n\nThese exchange icons visually represent cUSD and cGLD.\n\n",
+    "license": "These assets may only be used to represent Celo assets on exchanges. The use of the Celo Exchange Icons requires following the Celo Community Code of Conduct as provided <0>here</0> and Brand Policy."
+  },
   "keyImagery": {
     "title": "Key Imagery",
     "headline":

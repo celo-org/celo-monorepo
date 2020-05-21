@@ -1,0 +1,38 @@
+apiVersion: apps/v1beta2
+kind: StatefulSet
+metadata:
+  name: {{ template "common.fullname" . }}
+  labels:
+{{ include "celo-fullnode.labels" .  | indent 4 }}
+spec:
+{{ if .Values.storage.enable }}
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      storageClassName: {{ .Values.storage.storageClass }}
+      accessModes: [ "{{ .Values.storage.accessModes }}" ]
+      resources:
+        requests:
+          storage: {{ .Values.storage.size }}
+{{ end }}
+  podManagementPolicy: Parallel
+  updateStrategy:
+{{ toYaml .Values.geth.updateStrategy | indent 4 }}
+  replicas: {{ .Values.replicaCount }}
+  serviceName: {{ template "common.fullname" . }}
+  selector:
+    matchLabels:
+{{ include "celo-fullnode.labels" .  | indent 6 }}
+  template:
+    metadata:
+      labels:
+{{ include "celo-fullnode.labels" .  | indent 8 }}
+    spec:
+      initContainers:
+{{ include "common.init-genesis-container" .  | indent 6 }}
+      containers:
+{{ include "common.full-node-container" (dict "Values" $.Values "Release" $.Release "Chart" $.Chart "expose" true "ip_addresses" .Values.geth.public_ips "syncmode" .Values.geth.syncmode "gcmode" .Values.geth.syncmodex) | indent 6 }}
+      volumes:
+      - name: data
+        emptyDir: {}

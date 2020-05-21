@@ -7,6 +7,8 @@ exports[`BackupQuiz renders correctly 1`] = `
       "backgroundColor": "#FFFFFF",
       "flex": 1,
       "justifyContent": "space-between",
+      "paddingBottom": 24,
+      "paddingHorizontal": 24,
     }
   }
 >
@@ -42,31 +44,18 @@ exports[`BackupQuiz renders correctly 1`] = `
     contentContainerStyle={
       Object {
         "flexGrow": 1,
-        "paddingBottom": 20,
-        "paddingHorizontal": 20,
       }
     }
   >
     <View>
-      <Text
-        style={
-          Object {
-            "color": "#2E3338",
-            "fontFamily": "Hind-Light",
-            "fontSize": 22,
-            "paddingBottom": 20,
-            "textAlign": "center",
-          }
-        }
-      >
-        confirmBackupKey
-      </Text>
       <View
         style={
           Object {
+            "alignSelf": "center",
             "flexDirection": "row",
             "flexWrap": "wrap",
             "justifyContent": "center",
+            "maxWidth": 288,
           }
         }
       >
@@ -74,14 +63,14 @@ exports[`BackupQuiz renders correctly 1`] = `
           style={
             Array [
               Object {
-                "borderColor": "#EEEEEE",
+                "borderColor": "#EDEEEF",
                 "borderRadius": 100,
                 "borderWidth": 1,
                 "marginHorizontal": 3,
                 "marginVertical": 4,
                 "minWidth": 55,
-                "paddingHorizontal": 4,
-                "paddingVertical": 2,
+                "paddingHorizontal": 8,
+                "paddingVertical": 4,
               },
               undefined,
             ]
@@ -90,8 +79,8 @@ exports[`BackupQuiz renders correctly 1`] = `
           <Text
             style={
               Object {
-                "color": "#BDBDBD",
-                "fontFamily": "Hind-Regular",
+                "color": "#9CA4A9",
+                "fontFamily": "Inter-Regular",
                 "fontSize": 14,
                 "lineHeight": undefined,
                 "textAlign": "center",
@@ -105,14 +94,14 @@ exports[`BackupQuiz renders correctly 1`] = `
           style={
             Array [
               Object {
-                "borderColor": "#EEEEEE",
+                "borderColor": "#EDEEEF",
                 "borderRadius": 100,
                 "borderWidth": 1,
                 "marginHorizontal": 3,
                 "marginVertical": 4,
                 "minWidth": 55,
-                "paddingHorizontal": 4,
-                "paddingVertical": 2,
+                "paddingHorizontal": 8,
+                "paddingVertical": 4,
               },
               undefined,
             ]
@@ -121,8 +110,8 @@ exports[`BackupQuiz renders correctly 1`] = `
           <Text
             style={
               Object {
-                "color": "#BDBDBD",
-                "fontFamily": "Hind-Regular",
+                "color": "#9CA4A9",
+                "fontFamily": "Inter-Regular",
                 "fontSize": 14,
                 "lineHeight": undefined,
                 "textAlign": "center",
@@ -136,14 +125,14 @@ exports[`BackupQuiz renders correctly 1`] = `
           style={
             Array [
               Object {
-                "borderColor": "#EEEEEE",
+                "borderColor": "#EDEEEF",
                 "borderRadius": 100,
                 "borderWidth": 1,
                 "marginHorizontal": 3,
                 "marginVertical": 4,
                 "minWidth": 55,
-                "paddingHorizontal": 4,
-                "paddingVertical": 2,
+                "paddingHorizontal": 8,
+                "paddingVertical": 4,
               },
               undefined,
             ]
@@ -152,8 +141,8 @@ exports[`BackupQuiz renders correctly 1`] = `
           <Text
             style={
               Object {
-                "color": "#BDBDBD",
-                "fontFamily": "Hind-Regular",
+                "color": "#9CA4A9",
+                "fontFamily": "Inter-Regular",
                 "fontSize": 14,
                 "lineHeight": undefined,
                 "textAlign": "center",
@@ -167,14 +156,14 @@ exports[`BackupQuiz renders correctly 1`] = `
           style={
             Array [
               Object {
-                "borderColor": "#EEEEEE",
+                "borderColor": "#EDEEEF",
                 "borderRadius": 100,
                 "borderWidth": 1,
                 "marginHorizontal": 3,
                 "marginVertical": 4,
                 "minWidth": 55,
-                "paddingHorizontal": 4,
-                "paddingVertical": 2,
+                "paddingHorizontal": 8,
+                "paddingVertical": 4,
               },
               undefined,
             ]
@@ -183,8 +172,8 @@ exports[`BackupQuiz renders correctly 1`] = `
           <Text
             style={
               Object {
-                "color": "#BDBDBD",
-                "fontFamily": "Hind-Regular",
+                "color": "#9CA4A9",
+                "fontFamily": "Inter-Regular",
                 "fontSize": 14,
                 "lineHeight": undefined,
                 "textAlign": "center",
@@ -198,14 +187,14 @@ exports[`BackupQuiz renders correctly 1`] = `
           style={
             Array [
               Object {
-                "borderColor": "#EEEEEE",
+                "borderColor": "#EDEEEF",
                 "borderRadius": 100,
                 "borderWidth": 1,
                 "marginHorizontal": 3,
                 "marginVertical": 4,
                 "minWidth": 55,
-                "paddingHorizontal": 4,
-                "paddingVertical": 2,
+                "paddingHorizontal": 8,
+                "paddingVertical": 4,
               },
               undefined,
             ]
@@ -214,8 +203,8 @@ exports[`BackupQuiz renders correctly 1`] = `
           <Text
             style={
               Object {
-                "color": "#BDBDBD",
-                "fontFamily": "Hind-Regular",
+                "color": "#9CA4A9",
+                "fontFamily": "Inter-Regular",
                 "fontSize": 14,
                 "lineHeight": undefined,
                 "textAlign": "center",
@@ -229,14 +218,14 @@ exports[`BackupQuiz renders correctly 1`] = `
           style={
             Array [
               Object {
-                "borderColor": "#EEEEEE",
+                "borderColor": "#EDEEEF",
                 "borderRadius": 100,
                 "borderWidth": 1,
                 "marginHorizontal": 3,
                 "marginVertical": 4,
                 "minWidth": 55,
-                "paddingHorizontal": 4,
-                "paddingVertical": 2,
+                "paddingHorizontal": 8,
+                "paddingVertical": 4,
               },
               undefined,
             ]
@@ -245,8 +234,8 @@ exports[`BackupQuiz renders correctly 1`] = `
           <Text
             style={
               Object {
-                "color": "#BDBDBD",
-                "fontFamily": "Hind-Regular",
+                "color": "#9CA4A9",
+                "fontFamily": "Inter-Regular",
                 "fontSize": 14,
                 "lineHeight": undefined,
                 "textAlign": "center",
@@ -260,14 +249,14 @@ exports[`BackupQuiz renders correctly 1`] = `
           style={
             Array [
               Object {
-                "borderColor": "#EEEEEE",
+                "borderColor": "#EDEEEF",
                 "borderRadius": 100,
                 "borderWidth": 1,
                 "marginHorizontal": 3,
                 "marginVertical": 4,
                 "minWidth": 55,
-                "paddingHorizontal": 4,
-                "paddingVertical": 2,
+                "paddingHorizontal": 8,
+                "paddingVertical": 4,
               },
               undefined,
             ]
@@ -276,8 +265,8 @@ exports[`BackupQuiz renders correctly 1`] = `
           <Text
             style={
               Object {
-                "color": "#BDBDBD",
-                "fontFamily": "Hind-Regular",
+                "color": "#9CA4A9",
+                "fontFamily": "Inter-Regular",
                 "fontSize": 14,
                 "lineHeight": undefined,
                 "textAlign": "center",
@@ -291,14 +280,14 @@ exports[`BackupQuiz renders correctly 1`] = `
           style={
             Array [
               Object {
-                "borderColor": "#EEEEEE",
+                "borderColor": "#EDEEEF",
                 "borderRadius": 100,
                 "borderWidth": 1,
                 "marginHorizontal": 3,
                 "marginVertical": 4,
                 "minWidth": 55,
-                "paddingHorizontal": 4,
-                "paddingVertical": 2,
+                "paddingHorizontal": 8,
+                "paddingVertical": 4,
               },
               undefined,
             ]
@@ -307,8 +296,8 @@ exports[`BackupQuiz renders correctly 1`] = `
           <Text
             style={
               Object {
-                "color": "#BDBDBD",
-                "fontFamily": "Hind-Regular",
+                "color": "#9CA4A9",
+                "fontFamily": "Inter-Regular",
                 "fontSize": 14,
                 "lineHeight": undefined,
                 "textAlign": "center",
@@ -322,14 +311,14 @@ exports[`BackupQuiz renders correctly 1`] = `
           style={
             Array [
               Object {
-                "borderColor": "#EEEEEE",
+                "borderColor": "#EDEEEF",
                 "borderRadius": 100,
                 "borderWidth": 1,
                 "marginHorizontal": 3,
                 "marginVertical": 4,
                 "minWidth": 55,
-                "paddingHorizontal": 4,
-                "paddingVertical": 2,
+                "paddingHorizontal": 8,
+                "paddingVertical": 4,
               },
               undefined,
             ]
@@ -338,8 +327,8 @@ exports[`BackupQuiz renders correctly 1`] = `
           <Text
             style={
               Object {
-                "color": "#BDBDBD",
-                "fontFamily": "Hind-Regular",
+                "color": "#9CA4A9",
+                "fontFamily": "Inter-Regular",
                 "fontSize": 14,
                 "lineHeight": undefined,
                 "textAlign": "center",
@@ -353,14 +342,14 @@ exports[`BackupQuiz renders correctly 1`] = `
           style={
             Array [
               Object {
-                "borderColor": "#EEEEEE",
+                "borderColor": "#EDEEEF",
                 "borderRadius": 100,
                 "borderWidth": 1,
                 "marginHorizontal": 3,
                 "marginVertical": 4,
                 "minWidth": 55,
-                "paddingHorizontal": 4,
-                "paddingVertical": 2,
+                "paddingHorizontal": 8,
+                "paddingVertical": 4,
               },
               undefined,
             ]
@@ -369,8 +358,8 @@ exports[`BackupQuiz renders correctly 1`] = `
           <Text
             style={
               Object {
-                "color": "#BDBDBD",
-                "fontFamily": "Hind-Regular",
+                "color": "#9CA4A9",
+                "fontFamily": "Inter-Regular",
                 "fontSize": 14,
                 "lineHeight": undefined,
                 "textAlign": "center",
@@ -384,14 +373,14 @@ exports[`BackupQuiz renders correctly 1`] = `
           style={
             Array [
               Object {
-                "borderColor": "#EEEEEE",
+                "borderColor": "#EDEEEF",
                 "borderRadius": 100,
                 "borderWidth": 1,
                 "marginHorizontal": 3,
                 "marginVertical": 4,
                 "minWidth": 55,
-                "paddingHorizontal": 4,
-                "paddingVertical": 2,
+                "paddingHorizontal": 8,
+                "paddingVertical": 4,
               },
               undefined,
             ]
@@ -400,8 +389,8 @@ exports[`BackupQuiz renders correctly 1`] = `
           <Text
             style={
               Object {
-                "color": "#BDBDBD",
-                "fontFamily": "Hind-Regular",
+                "color": "#9CA4A9",
+                "fontFamily": "Inter-Regular",
                 "fontSize": 14,
                 "lineHeight": undefined,
                 "textAlign": "center",
@@ -415,14 +404,14 @@ exports[`BackupQuiz renders correctly 1`] = `
           style={
             Array [
               Object {
-                "borderColor": "#EEEEEE",
+                "borderColor": "#EDEEEF",
                 "borderRadius": 100,
                 "borderWidth": 1,
                 "marginHorizontal": 3,
                 "marginVertical": 4,
                 "minWidth": 55,
-                "paddingHorizontal": 4,
-                "paddingVertical": 2,
+                "paddingHorizontal": 8,
+                "paddingVertical": 4,
               },
               undefined,
             ]
@@ -431,8 +420,8 @@ exports[`BackupQuiz renders correctly 1`] = `
           <Text
             style={
               Object {
-                "color": "#BDBDBD",
-                "fontFamily": "Hind-Regular",
+                "color": "#9CA4A9",
+                "fontFamily": "Inter-Regular",
                 "fontSize": 14,
                 "lineHeight": undefined,
                 "textAlign": "center",
@@ -446,14 +435,14 @@ exports[`BackupQuiz renders correctly 1`] = `
           style={
             Array [
               Object {
-                "borderColor": "#EEEEEE",
+                "borderColor": "#EDEEEF",
                 "borderRadius": 100,
                 "borderWidth": 1,
                 "marginHorizontal": 3,
                 "marginVertical": 4,
                 "minWidth": 55,
-                "paddingHorizontal": 4,
-                "paddingVertical": 2,
+                "paddingHorizontal": 8,
+                "paddingVertical": 4,
               },
               undefined,
             ]
@@ -462,8 +451,8 @@ exports[`BackupQuiz renders correctly 1`] = `
           <Text
             style={
               Object {
-                "color": "#BDBDBD",
-                "fontFamily": "Hind-Regular",
+                "color": "#9CA4A9",
+                "fontFamily": "Inter-Regular",
                 "fontSize": 14,
                 "lineHeight": undefined,
                 "textAlign": "center",
@@ -477,14 +466,14 @@ exports[`BackupQuiz renders correctly 1`] = `
           style={
             Array [
               Object {
-                "borderColor": "#EEEEEE",
+                "borderColor": "#EDEEEF",
                 "borderRadius": 100,
                 "borderWidth": 1,
                 "marginHorizontal": 3,
                 "marginVertical": 4,
                 "minWidth": 55,
-                "paddingHorizontal": 4,
-                "paddingVertical": 2,
+                "paddingHorizontal": 8,
+                "paddingVertical": 4,
               },
               undefined,
             ]
@@ -493,8 +482,8 @@ exports[`BackupQuiz renders correctly 1`] = `
           <Text
             style={
               Object {
-                "color": "#BDBDBD",
-                "fontFamily": "Hind-Regular",
+                "color": "#9CA4A9",
+                "fontFamily": "Inter-Regular",
                 "fontSize": 14,
                 "lineHeight": undefined,
                 "textAlign": "center",
@@ -508,14 +497,14 @@ exports[`BackupQuiz renders correctly 1`] = `
           style={
             Array [
               Object {
-                "borderColor": "#EEEEEE",
+                "borderColor": "#EDEEEF",
                 "borderRadius": 100,
                 "borderWidth": 1,
                 "marginHorizontal": 3,
                 "marginVertical": 4,
                 "minWidth": 55,
-                "paddingHorizontal": 4,
-                "paddingVertical": 2,
+                "paddingHorizontal": 8,
+                "paddingVertical": 4,
               },
               undefined,
             ]
@@ -524,8 +513,8 @@ exports[`BackupQuiz renders correctly 1`] = `
           <Text
             style={
               Object {
-                "color": "#BDBDBD",
-                "fontFamily": "Hind-Regular",
+                "color": "#9CA4A9",
+                "fontFamily": "Inter-Regular",
                 "fontSize": 14,
                 "lineHeight": undefined,
                 "textAlign": "center",
@@ -539,14 +528,14 @@ exports[`BackupQuiz renders correctly 1`] = `
           style={
             Array [
               Object {
-                "borderColor": "#EEEEEE",
+                "borderColor": "#EDEEEF",
                 "borderRadius": 100,
                 "borderWidth": 1,
                 "marginHorizontal": 3,
                 "marginVertical": 4,
                 "minWidth": 55,
-                "paddingHorizontal": 4,
-                "paddingVertical": 2,
+                "paddingHorizontal": 8,
+                "paddingVertical": 4,
               },
               undefined,
             ]
@@ -555,8 +544,8 @@ exports[`BackupQuiz renders correctly 1`] = `
           <Text
             style={
               Object {
-                "color": "#BDBDBD",
-                "fontFamily": "Hind-Regular",
+                "color": "#9CA4A9",
+                "fontFamily": "Inter-Regular",
                 "fontSize": 14,
                 "lineHeight": undefined,
                 "textAlign": "center",
@@ -570,14 +559,14 @@ exports[`BackupQuiz renders correctly 1`] = `
           style={
             Array [
               Object {
-                "borderColor": "#EEEEEE",
+                "borderColor": "#EDEEEF",
                 "borderRadius": 100,
                 "borderWidth": 1,
                 "marginHorizontal": 3,
                 "marginVertical": 4,
                 "minWidth": 55,
-                "paddingHorizontal": 4,
-                "paddingVertical": 2,
+                "paddingHorizontal": 8,
+                "paddingVertical": 4,
               },
               undefined,
             ]
@@ -586,8 +575,8 @@ exports[`BackupQuiz renders correctly 1`] = `
           <Text
             style={
               Object {
-                "color": "#BDBDBD",
-                "fontFamily": "Hind-Regular",
+                "color": "#9CA4A9",
+                "fontFamily": "Inter-Regular",
                 "fontSize": 14,
                 "lineHeight": undefined,
                 "textAlign": "center",
@@ -601,14 +590,14 @@ exports[`BackupQuiz renders correctly 1`] = `
           style={
             Array [
               Object {
-                "borderColor": "#EEEEEE",
+                "borderColor": "#EDEEEF",
                 "borderRadius": 100,
                 "borderWidth": 1,
                 "marginHorizontal": 3,
                 "marginVertical": 4,
                 "minWidth": 55,
-                "paddingHorizontal": 4,
-                "paddingVertical": 2,
+                "paddingHorizontal": 8,
+                "paddingVertical": 4,
               },
               undefined,
             ]
@@ -617,8 +606,8 @@ exports[`BackupQuiz renders correctly 1`] = `
           <Text
             style={
               Object {
-                "color": "#BDBDBD",
-                "fontFamily": "Hind-Regular",
+                "color": "#9CA4A9",
+                "fontFamily": "Inter-Regular",
                 "fontSize": 14,
                 "lineHeight": undefined,
                 "textAlign": "center",
@@ -632,14 +621,14 @@ exports[`BackupQuiz renders correctly 1`] = `
           style={
             Array [
               Object {
-                "borderColor": "#EEEEEE",
+                "borderColor": "#EDEEEF",
                 "borderRadius": 100,
                 "borderWidth": 1,
                 "marginHorizontal": 3,
                 "marginVertical": 4,
                 "minWidth": 55,
-                "paddingHorizontal": 4,
-                "paddingVertical": 2,
+                "paddingHorizontal": 8,
+                "paddingVertical": 4,
               },
               undefined,
             ]
@@ -648,8 +637,8 @@ exports[`BackupQuiz renders correctly 1`] = `
           <Text
             style={
               Object {
-                "color": "#BDBDBD",
-                "fontFamily": "Hind-Regular",
+                "color": "#9CA4A9",
+                "fontFamily": "Inter-Regular",
                 "fontSize": 14,
                 "lineHeight": undefined,
                 "textAlign": "center",
@@ -663,14 +652,14 @@ exports[`BackupQuiz renders correctly 1`] = `
           style={
             Array [
               Object {
-                "borderColor": "#EEEEEE",
+                "borderColor": "#EDEEEF",
                 "borderRadius": 100,
                 "borderWidth": 1,
                 "marginHorizontal": 3,
                 "marginVertical": 4,
                 "minWidth": 55,
-                "paddingHorizontal": 4,
-                "paddingVertical": 2,
+                "paddingHorizontal": 8,
+                "paddingVertical": 4,
               },
               undefined,
             ]
@@ -679,8 +668,8 @@ exports[`BackupQuiz renders correctly 1`] = `
           <Text
             style={
               Object {
-                "color": "#BDBDBD",
-                "fontFamily": "Hind-Regular",
+                "color": "#9CA4A9",
+                "fontFamily": "Inter-Regular",
                 "fontSize": 14,
                 "lineHeight": undefined,
                 "textAlign": "center",
@@ -694,14 +683,14 @@ exports[`BackupQuiz renders correctly 1`] = `
           style={
             Array [
               Object {
-                "borderColor": "#EEEEEE",
+                "borderColor": "#EDEEEF",
                 "borderRadius": 100,
                 "borderWidth": 1,
                 "marginHorizontal": 3,
                 "marginVertical": 4,
                 "minWidth": 55,
-                "paddingHorizontal": 4,
-                "paddingVertical": 2,
+                "paddingHorizontal": 8,
+                "paddingVertical": 4,
               },
               undefined,
             ]
@@ -710,8 +699,8 @@ exports[`BackupQuiz renders correctly 1`] = `
           <Text
             style={
               Object {
-                "color": "#BDBDBD",
-                "fontFamily": "Hind-Regular",
+                "color": "#9CA4A9",
+                "fontFamily": "Inter-Regular",
                 "fontSize": 14,
                 "lineHeight": undefined,
                 "textAlign": "center",
@@ -725,14 +714,14 @@ exports[`BackupQuiz renders correctly 1`] = `
           style={
             Array [
               Object {
-                "borderColor": "#EEEEEE",
+                "borderColor": "#EDEEEF",
                 "borderRadius": 100,
                 "borderWidth": 1,
                 "marginHorizontal": 3,
                 "marginVertical": 4,
                 "minWidth": 55,
-                "paddingHorizontal": 4,
-                "paddingVertical": 2,
+                "paddingHorizontal": 8,
+                "paddingVertical": 4,
               },
               undefined,
             ]
@@ -741,8 +730,8 @@ exports[`BackupQuiz renders correctly 1`] = `
           <Text
             style={
               Object {
-                "color": "#BDBDBD",
-                "fontFamily": "Hind-Regular",
+                "color": "#9CA4A9",
+                "fontFamily": "Inter-Regular",
                 "fontSize": 14,
                 "lineHeight": undefined,
                 "textAlign": "center",
@@ -756,14 +745,14 @@ exports[`BackupQuiz renders correctly 1`] = `
           style={
             Array [
               Object {
-                "borderColor": "#EEEEEE",
+                "borderColor": "#EDEEEF",
                 "borderRadius": 100,
                 "borderWidth": 1,
                 "marginHorizontal": 3,
                 "marginVertical": 4,
                 "minWidth": 55,
-                "paddingHorizontal": 4,
-                "paddingVertical": 2,
+                "paddingHorizontal": 8,
+                "paddingVertical": 4,
               },
               undefined,
             ]
@@ -772,8 +761,8 @@ exports[`BackupQuiz renders correctly 1`] = `
           <Text
             style={
               Object {
-                "color": "#BDBDBD",
-                "fontFamily": "Hind-Regular",
+                "color": "#9CA4A9",
+                "fontFamily": "Inter-Regular",
                 "fontSize": 14,
                 "lineHeight": undefined,
                 "textAlign": "center",
@@ -787,14 +776,14 @@ exports[`BackupQuiz renders correctly 1`] = `
           style={
             Array [
               Object {
-                "borderColor": "#EEEEEE",
+                "borderColor": "#EDEEEF",
                 "borderRadius": 100,
                 "borderWidth": 1,
                 "marginHorizontal": 3,
                 "marginVertical": 4,
                 "minWidth": 55,
-                "paddingHorizontal": 4,
-                "paddingVertical": 2,
+                "paddingHorizontal": 8,
+                "paddingVertical": 4,
               },
               undefined,
             ]
@@ -803,8 +792,8 @@ exports[`BackupQuiz renders correctly 1`] = `
           <Text
             style={
               Object {
-                "color": "#BDBDBD",
-                "fontFamily": "Hind-Regular",
+                "color": "#9CA4A9",
+                "fontFamily": "Inter-Regular",
                 "fontSize": 14,
                 "lineHeight": undefined,
                 "textAlign": "center",
@@ -815,476 +804,347 @@ exports[`BackupQuiz renders correctly 1`] = `
           </Text>
         </View>
       </View>
-      <Text
-        style={
-          Object {
-            "color": "#BDBDBD",
-            "fontFamily": "Hind-Regular",
-            "fontSize": 16,
-            "lineHeight": 24,
-            "marginTop": 20,
-            "textAlign": "center",
-          }
-        }
-      >
-        backupQuizInfo
-      </Text>
-      <Text
-        style={
-          Object {
-            "color": "#2E3338",
-            "fontFamily": "Hind-SemiBold",
-            "fontSize": 16,
-            "lineHeight": 24,
-            "marginTop": 25,
-            "textAlign": "center",
-          }
-        }
-      >
-        backupQuizWordCount
-      </Text>
       <View
         style={
           Object {
-            "flexDirection": "row",
-            "flexWrap": "wrap",
+            "flex": 1,
             "justifyContent": "center",
-            "marginTop": 25,
-            "paddingHorizontal": 20,
           }
         }
       >
-        <View
-          accessible={true}
-          focusable={true}
-          hitSlop={
-            Object {
-              "bottom": 7,
-              "left": 7,
-              "right": 7,
-              "top": 7,
-            }
-          }
-          isTVSelectable={true}
-          nativeBackgroundAndroid={
-            Object {
-              "attribute": "selectableItemBackground",
-              "type": "ThemeAttrAndroid",
-            }
-          }
-          onClick={[Function]}
-          onResponderGrant={[Function]}
-          onResponderMove={[Function]}
-          onResponderRelease={[Function]}
-          onResponderTerminate={[Function]}
-          onResponderTerminationRequest={[Function]}
-          onStartShouldSetResponder={[Function]}
+        <Text
           style={
-            Array [
-              Object {
-                "alignItems": "center",
-                "alignSelf": "flex-start",
-                "borderRadius": 2,
-                "flexDirection": "row",
-                "paddingHorizontal": 16,
-                "paddingVertical": 6,
-              },
-              Object {
-                "backgroundColor": "transparent",
-                "borderColor": "#42D689",
-                "borderWidth": 2,
-              },
-              Object {
-                "borderRadius": 100,
-                "marginHorizontal": 5,
-                "marginVertical": 5,
-                "minWidth": 0,
-              },
-            ]
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Inter-Regular",
+              "fontSize": 16,
+              "lineHeight": 22,
+              "marginTop": 20,
+              "textAlign": "center",
+            }
           }
         >
           <Text
             style={
-              Array [
-                Object {
-                  "color": "#81868B",
-                  "fontFamily": "Hind-SemiBold",
-                  "fontSize": 13,
-                  "lineHeight": 20,
-                  "textAlign": "center",
-                },
-                Object {
-                  "color": "#42D689",
-                },
-                null,
-                undefined,
-              ]
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Inter-Medium",
+                "fontSize": 16,
+                "lineHeight": 22,
+                "marginTop": 25,
+                "textAlign": "center",
+              }
             }
           >
-            prosper
+            X
           </Text>
-        </View>
+        </Text>
         <View
-          accessible={true}
-          focusable={true}
-          hitSlop={
-            Object {
-              "bottom": 7,
-              "left": 7,
-              "right": 7,
-              "top": 7,
-            }
-          }
-          isTVSelectable={true}
-          nativeBackgroundAndroid={
-            Object {
-              "attribute": "selectableItemBackground",
-              "type": "ThemeAttrAndroid",
-            }
-          }
-          onClick={[Function]}
-          onResponderGrant={[Function]}
-          onResponderMove={[Function]}
-          onResponderRelease={[Function]}
-          onResponderTerminate={[Function]}
-          onResponderTerminationRequest={[Function]}
-          onStartShouldSetResponder={[Function]}
           style={
-            Array [
-              Object {
-                "alignItems": "center",
-                "alignSelf": "flex-start",
-                "borderRadius": 2,
-                "flexDirection": "row",
-                "paddingHorizontal": 16,
-                "paddingVertical": 6,
-              },
-              Object {
-                "backgroundColor": "transparent",
-                "borderColor": "#42D689",
-                "borderWidth": 2,
-              },
-              Object {
-                "borderRadius": 100,
-                "marginHorizontal": 5,
-                "marginVertical": 5,
-                "minWidth": 0,
-              },
-            ]
+            Object {
+              "flexDirection": "row",
+              "flexWrap": "wrap",
+              "justifyContent": "center",
+              "marginTop": 24,
+            }
           }
         >
-          <Text
+          <View
             style={
-              Array [
-                Object {
-                  "color": "#81868B",
-                  "fontFamily": "Hind-SemiBold",
-                  "fontSize": 13,
-                  "lineHeight": 20,
-                  "textAlign": "center",
-                },
-                Object {
-                  "color": "#42D689",
-                },
-                null,
-                undefined,
-              ]
-            }
-          >
-            winner
-          </Text>
-        </View>
-        <View
-          accessible={true}
-          focusable={true}
-          hitSlop={
-            Object {
-              "bottom": 7,
-              "left": 7,
-              "right": 7,
-              "top": 7,
-            }
-          }
-          isTVSelectable={true}
-          nativeBackgroundAndroid={
-            Object {
-              "attribute": "selectableItemBackground",
-              "type": "ThemeAttrAndroid",
-            }
-          }
-          onClick={[Function]}
-          onResponderGrant={[Function]}
-          onResponderMove={[Function]}
-          onResponderRelease={[Function]}
-          onResponderTerminate={[Function]}
-          onResponderTerminationRequest={[Function]}
-          onStartShouldSetResponder={[Function]}
-          style={
-            Array [
               Object {
-                "alignItems": "center",
-                "alignSelf": "flex-start",
-                "borderRadius": 2,
-                "flexDirection": "row",
-                "paddingHorizontal": 16,
-                "paddingVertical": 6,
-              },
-              Object {
-                "backgroundColor": "transparent",
-                "borderColor": "#42D689",
-                "borderWidth": 2,
-              },
-              Object {
+                "borderColor": "#1AB775",
                 "borderRadius": 100,
-                "marginHorizontal": 5,
-                "marginVertical": 5,
-                "minWidth": 0,
-              },
-            ]
-          }
-        >
-          <Text
-            style={
-              Array [
-                Object {
-                  "color": "#81868B",
-                  "fontFamily": "Hind-SemiBold",
-                  "fontSize": 13,
-                  "lineHeight": 20,
-                  "textAlign": "center",
-                },
-                Object {
-                  "color": "#42D689",
-                },
-                null,
-                undefined,
-              ]
+                "borderWidth": 1.5,
+                "marginHorizontal": 4,
+                "marginVertical": 4,
+                "overflow": "hidden",
+              }
             }
           >
-            find
-          </Text>
-        </View>
-        <View
-          accessible={true}
-          focusable={true}
-          hitSlop={
-            Object {
-              "bottom": 7,
-              "left": 7,
-              "right": 7,
-              "top": 7,
-            }
-          }
-          isTVSelectable={true}
-          nativeBackgroundAndroid={
-            Object {
-              "attribute": "selectableItemBackground",
-              "type": "ThemeAttrAndroid",
-            }
-          }
-          onClick={[Function]}
-          onResponderGrant={[Function]}
-          onResponderMove={[Function]}
-          onResponderRelease={[Function]}
-          onResponderTerminate={[Function]}
-          onResponderTerminationRequest={[Function]}
-          onStartShouldSetResponder={[Function]}
-          style={
-            Array [
+            <View
+              accessible={true}
+              focusable={true}
+              nativeBackgroundAndroid={
+                Object {
+                  "attribute": "selectableItemBackground",
+                  "type": "ThemeAttrAndroid",
+                }
+              }
+              onClick={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                Object {
+                  "borderRadius": 100,
+                  "minWidth": 65,
+                  "paddingHorizontal": 16,
+                  "paddingVertical": 8,
+                }
+              }
+            >
+              <Text
+                style={
+                  Object {
+                    "color": "#1AB775",
+                    "textAlign": "center",
+                  }
+                }
+              >
+                prosper
+              </Text>
+            </View>
+          </View>
+          <View
+            style={
               Object {
-                "alignItems": "center",
-                "alignSelf": "flex-start",
-                "borderRadius": 2,
-                "flexDirection": "row",
-                "paddingHorizontal": 16,
-                "paddingVertical": 6,
-              },
-              Object {
-                "backgroundColor": "transparent",
-                "borderColor": "#42D689",
-                "borderWidth": 2,
-              },
-              Object {
+                "borderColor": "#1AB775",
                 "borderRadius": 100,
-                "marginHorizontal": 5,
-                "marginVertical": 5,
-                "minWidth": 0,
-              },
-            ]
-          }
-        >
-          <Text
-            style={
-              Array [
-                Object {
-                  "color": "#81868B",
-                  "fontFamily": "Hind-SemiBold",
-                  "fontSize": 13,
-                  "lineHeight": 20,
-                  "textAlign": "center",
-                },
-                Object {
-                  "color": "#42D689",
-                },
-                null,
-                undefined,
-              ]
+                "borderWidth": 1.5,
+                "marginHorizontal": 4,
+                "marginVertical": 4,
+                "overflow": "hidden",
+              }
             }
           >
-            donate
-          </Text>
-        </View>
-        <View
-          accessible={true}
-          focusable={true}
-          hitSlop={
-            Object {
-              "bottom": 7,
-              "left": 7,
-              "right": 7,
-              "top": 7,
-            }
-          }
-          isTVSelectable={true}
-          nativeBackgroundAndroid={
-            Object {
-              "attribute": "selectableItemBackground",
-              "type": "ThemeAttrAndroid",
-            }
-          }
-          onClick={[Function]}
-          onResponderGrant={[Function]}
-          onResponderMove={[Function]}
-          onResponderRelease={[Function]}
-          onResponderTerminate={[Function]}
-          onResponderTerminationRequest={[Function]}
-          onStartShouldSetResponder={[Function]}
-          style={
-            Array [
+            <View
+              accessible={true}
+              focusable={true}
+              nativeBackgroundAndroid={
+                Object {
+                  "attribute": "selectableItemBackground",
+                  "type": "ThemeAttrAndroid",
+                }
+              }
+              onClick={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                Object {
+                  "borderRadius": 100,
+                  "minWidth": 65,
+                  "paddingHorizontal": 16,
+                  "paddingVertical": 8,
+                }
+              }
+            >
+              <Text
+                style={
+                  Object {
+                    "color": "#1AB775",
+                    "textAlign": "center",
+                  }
+                }
+              >
+                winner
+              </Text>
+            </View>
+          </View>
+          <View
+            style={
               Object {
-                "alignItems": "center",
-                "alignSelf": "flex-start",
-                "borderRadius": 2,
-                "flexDirection": "row",
-                "paddingHorizontal": 16,
-                "paddingVertical": 6,
-              },
-              Object {
-                "backgroundColor": "transparent",
-                "borderColor": "#42D689",
-                "borderWidth": 2,
-              },
-              Object {
+                "borderColor": "#1AB775",
                 "borderRadius": 100,
-                "marginHorizontal": 5,
-                "marginVertical": 5,
-                "minWidth": 0,
-              },
-            ]
-          }
-        >
-          <Text
-            style={
-              Array [
-                Object {
-                  "color": "#81868B",
-                  "fontFamily": "Hind-SemiBold",
-                  "fontSize": 13,
-                  "lineHeight": 20,
-                  "textAlign": "center",
-                },
-                Object {
-                  "color": "#42D689",
-                },
-                null,
-                undefined,
-              ]
+                "borderWidth": 1.5,
+                "marginHorizontal": 4,
+                "marginVertical": 4,
+                "overflow": "hidden",
+              }
             }
           >
-            tape
-          </Text>
-        </View>
-        <View
-          accessible={true}
-          focusable={true}
-          hitSlop={
-            Object {
-              "bottom": 7,
-              "left": 7,
-              "right": 7,
-              "top": 7,
-            }
-          }
-          isTVSelectable={true}
-          nativeBackgroundAndroid={
-            Object {
-              "attribute": "selectableItemBackground",
-              "type": "ThemeAttrAndroid",
-            }
-          }
-          onClick={[Function]}
-          onResponderGrant={[Function]}
-          onResponderMove={[Function]}
-          onResponderRelease={[Function]}
-          onResponderTerminate={[Function]}
-          onResponderTerminationRequest={[Function]}
-          onStartShouldSetResponder={[Function]}
-          style={
-            Array [
+            <View
+              accessible={true}
+              focusable={true}
+              nativeBackgroundAndroid={
+                Object {
+                  "attribute": "selectableItemBackground",
+                  "type": "ThemeAttrAndroid",
+                }
+              }
+              onClick={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                Object {
+                  "borderRadius": 100,
+                  "minWidth": 65,
+                  "paddingHorizontal": 16,
+                  "paddingVertical": 8,
+                }
+              }
+            >
+              <Text
+                style={
+                  Object {
+                    "color": "#1AB775",
+                    "textAlign": "center",
+                  }
+                }
+              >
+                find
+              </Text>
+            </View>
+          </View>
+          <View
+            style={
               Object {
-                "alignItems": "center",
-                "alignSelf": "flex-start",
-                "borderRadius": 2,
-                "flexDirection": "row",
-                "paddingHorizontal": 16,
-                "paddingVertical": 6,
-              },
-              Object {
-                "backgroundColor": "transparent",
-                "borderColor": "#42D689",
-                "borderWidth": 2,
-              },
-              Object {
+                "borderColor": "#1AB775",
                 "borderRadius": 100,
-                "marginHorizontal": 5,
-                "marginVertical": 5,
-                "minWidth": 0,
-              },
-            ]
-          }
-        >
-          <Text
-            style={
-              Array [
-                Object {
-                  "color": "#81868B",
-                  "fontFamily": "Hind-SemiBold",
-                  "fontSize": 13,
-                  "lineHeight": 20,
-                  "textAlign": "center",
-                },
-                Object {
-                  "color": "#42D689",
-                },
-                null,
-                undefined,
-              ]
+                "borderWidth": 1.5,
+                "marginHorizontal": 4,
+                "marginVertical": 4,
+                "overflow": "hidden",
+              }
             }
           >
-            history
-          </Text>
+            <View
+              accessible={true}
+              focusable={true}
+              nativeBackgroundAndroid={
+                Object {
+                  "attribute": "selectableItemBackground",
+                  "type": "ThemeAttrAndroid",
+                }
+              }
+              onClick={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                Object {
+                  "borderRadius": 100,
+                  "minWidth": 65,
+                  "paddingHorizontal": 16,
+                  "paddingVertical": 8,
+                }
+              }
+            >
+              <Text
+                style={
+                  Object {
+                    "color": "#1AB775",
+                    "textAlign": "center",
+                  }
+                }
+              >
+                donate
+              </Text>
+            </View>
+          </View>
+          <View
+            style={
+              Object {
+                "borderColor": "#1AB775",
+                "borderRadius": 100,
+                "borderWidth": 1.5,
+                "marginHorizontal": 4,
+                "marginVertical": 4,
+                "overflow": "hidden",
+              }
+            }
+          >
+            <View
+              accessible={true}
+              focusable={true}
+              nativeBackgroundAndroid={
+                Object {
+                  "attribute": "selectableItemBackground",
+                  "type": "ThemeAttrAndroid",
+                }
+              }
+              onClick={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                Object {
+                  "borderRadius": 100,
+                  "minWidth": 65,
+                  "paddingHorizontal": 16,
+                  "paddingVertical": 8,
+                }
+              }
+            >
+              <Text
+                style={
+                  Object {
+                    "color": "#1AB775",
+                    "textAlign": "center",
+                  }
+                }
+              >
+                tape
+              </Text>
+            </View>
+          </View>
+          <View
+            style={
+              Object {
+                "borderColor": "#1AB775",
+                "borderRadius": 100,
+                "borderWidth": 1.5,
+                "marginHorizontal": 4,
+                "marginVertical": 4,
+                "overflow": "hidden",
+              }
+            }
+          >
+            <View
+              accessible={true}
+              focusable={true}
+              nativeBackgroundAndroid={
+                Object {
+                  "attribute": "selectableItemBackground",
+                  "type": "ThemeAttrAndroid",
+                }
+              }
+              onClick={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                Object {
+                  "borderRadius": 100,
+                  "minWidth": 65,
+                  "paddingHorizontal": 16,
+                  "paddingVertical": 8,
+                }
+              }
+            >
+              <Text
+                style={
+                  Object {
+                    "color": "#1AB775",
+                    "textAlign": "center",
+                  }
+                }
+              >
+                history
+              </Text>
+            </View>
+          </View>
         </View>
       </View>
-      <View
-        style={
-          Object {
-            "alignItems": "center",
-            "flexDirection": "row",
-            "justifyContent": "center",
-            "marginTop": 20,
-          }
-        }
-      />
     </View>
   </RCTScrollView>
 </SafeAreaView>

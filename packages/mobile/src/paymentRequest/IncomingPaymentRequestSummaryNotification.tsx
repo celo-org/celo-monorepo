@@ -15,11 +15,12 @@ import {
 } from 'src/identity/reducer'
 import { sendDollar } from 'src/images/Images'
 import { navigate } from 'src/navigator/NavigationService'
-import { Stacks } from 'src/navigator/Screens'
+import { Screens } from 'src/navigator/Screens'
 import SummaryNotification from 'src/notifications/SummaryNotification'
 import { listItemRenderer } from 'src/paymentRequest/IncomingPaymentRequestListScreen'
 import PaymentRequestNotificationInner from 'src/paymentRequest/PaymentRequestNotificationInner'
-import { NumberToRecipient, phoneNumberToRecipient } from 'src/recipients/recipient'
+import { getSenderFromPaymentRequest } from 'src/paymentRequest/utils'
+import { NumberToRecipient } from 'src/recipients/recipient'
 import { recipientCacheSelector } from 'src/recipients/reducer'
 import { RootState } from 'src/redux/reducers'
 
@@ -39,25 +40,23 @@ interface StateProps {
   recipientCache: NumberToRecipient
 }
 
-const mapStateToProps = (state: RootState): StateProps => ({
-  e164PhoneNumberAddressMapping: e164NumberToAddressSelector(state),
-  addressToE164Number: addressToE164NumberSelector(state),
-  recipientCache: recipientCacheSelector(state),
-})
+const mapStateToProps = (state: RootState): StateProps => {
+  return {
+    e164PhoneNumberAddressMapping: e164NumberToAddressSelector(state),
+    addressToE164Number: addressToE164NumberSelector(state),
+    recipientCache: recipientCacheSelector(state),
+  }
+}
+
+const mapDispatchToProps = {
+  declinePaymentRequest,
+}
 
 // Payment Request notification for the notification center on home screen
 export class IncomingPaymentRequestSummaryNotification extends React.Component<Props> {
-  getRequesterRecipient = (requesterE164Number: string) => {
-    return phoneNumberToRecipient(
-      requesterE164Number,
-      this.props.e164PhoneNumberAddressMapping[requesterE164Number],
-      this.props.recipientCache
-    )
-  }
-
   onReview = () => {
     CeloAnalytics.track(CustomEventNames.incoming_request_payment_review)
-    navigate(Stacks.IncomingRequestStack)
+    navigate(Screens.IncomingPaymentRequestListScreen)
   }
 
   itemRenderer = (item: PaymentRequest) => {
@@ -65,8 +64,11 @@ export class IncomingPaymentRequestSummaryNotification extends React.Component<P
       <PaymentRequestNotificationInner
         key={item.uid}
         amount={item.amount}
-        requesterE164Number={item.requesterE164Number}
-        requesterRecipient={this.getRequesterRecipient(item.requesterE164Number)}
+        requesterRecipient={getSenderFromPaymentRequest(
+          item,
+          this.props.addressToE164Number,
+          this.props.recipientCache
+        )}
       />
     )
   }
@@ -99,6 +101,7 @@ const styles = StyleSheet.create({
   },
 })
 
-export default connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
-  declinePaymentRequest,
-})(withTranslation(Namespaces.walletFlow5)(IncomingPaymentRequestSummaryNotification))
+export default connect<StateProps, DispatchProps, {}, RootState>(
+  mapStateToProps,
+  mapDispatchToProps
+)(withTranslation(Namespaces.walletFlow5)(IncomingPaymentRequestSummaryNotification))

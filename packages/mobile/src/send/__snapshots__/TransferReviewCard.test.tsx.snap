@@ -385,7 +385,6 @@ exports[`TransferReviewCard renders correctly for invite review 1`] = `
               "top": 10,
             }
           }
-          isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackgroundBorderless",
@@ -946,7 +945,6 @@ exports[`TransferReviewCard renders correctly for pay request review 1`] = `
               "top": 10,
             }
           }
-          isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackgroundBorderless",
@@ -1485,7 +1483,6 @@ exports[`TransferReviewCard renders correctly for send review 1`] = `
               "top": 10,
             }
           }
-          isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackgroundBorderless",

@@ -6,6 +6,7 @@ import {
   PhoneNumberUtil,
 } from 'google-libphonenumber'
 import * as Web3Utils from 'web3-utils'
+import { getIdentifierPrefix, IdentifierType } from './attestations'
 
 export interface ParsedPhoneNumber {
   e164Number: string
@@ -16,6 +17,7 @@ export interface ParsedPhoneNumber {
 
 const phoneUtil = PhoneNumberUtil.getInstance()
 const MIN_PHONE_LENGTH = 4
+const PHONE_SALT_SEPARATOR = '__'
 
 export function getCountryEmoji(
   e164PhoneNumber: string,
@@ -38,11 +40,13 @@ export function getCountryEmoji(
   return (country ? country.emoji : '') + ` +${countryCode}`
 }
 
-export const getPhoneHash = (phoneNumber: string): string => {
+export const getPhoneHash = (phoneNumber: string, salt?: string): string => {
   if (!phoneNumber || !isE164Number(phoneNumber)) {
     throw Error('Attempting to hash a non-e164 number: ' + phoneNumber)
   }
-  return Web3Utils.soliditySha3({ type: 'string', value: phoneNumber })
+  const prefix = getIdentifierPrefix(IdentifierType.PHONE_NUMBER)
+  const value = prefix + (salt ? phoneNumber + PHONE_SALT_SEPARATOR + salt : phoneNumber)
+  return Web3Utils.soliditySha3({ type: 'string', value })
 }
 
 export function getCountryCode(e164PhoneNumber: string) {

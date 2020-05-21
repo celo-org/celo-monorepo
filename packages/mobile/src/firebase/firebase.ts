@@ -4,7 +4,6 @@ import '@react-native-firebase/messaging'
 // We can't combine the 2 imports otherwise it only imports the type and fails at runtime
 // tslint:disable-next-line: no-duplicate-imports
 import { FirebaseMessagingTypes } from '@react-native-firebase/messaging'
-import * as Sentry from '@sentry/react-native'
 import DeviceInfo from 'react-native-device-info'
 import { eventChannel, EventChannel } from 'redux-saga'
 import { call, put, select, spawn, take } from 'redux-saga/effects'
@@ -15,8 +14,7 @@ import { currentLanguageSelector } from 'src/app/reducers'
 import { FIREBASE_ENABLED } from 'src/config'
 import { WritePaymentRequest } from 'src/firebase/actions'
 import { handleNotification } from 'src/firebase/notifications'
-import { navigate } from 'src/navigator/NavigationService'
-import { Screens } from 'src/navigator/Screens'
+import { navigateHome } from 'src/navigator/NavigationService'
 import Logger from 'src/utils/Logger'
 
 const TAG = 'firebase/firebase'
@@ -85,6 +83,9 @@ export function* initializeCloudMessaging(app: ReactNativeFirebase.Module, addre
     }
   }
 
+  // `registerDeviceForRemoteMessages` must be called before calling `getToken`
+  // Note: `registerDeviceForRemoteMessages` is really only required for iOS and is a no-op on Android
+  yield call([app.messaging(), 'registerDeviceForRemoteMessages'])
   const fcmToken = yield call([app.messaging(), 'getToken'])
   if (fcmToken) {
     yield call(registerTokenToDb, app, address, fcmToken)
@@ -140,9 +141,7 @@ export function* initializeCloudMessaging(app: ReactNativeFirebase.Module, addre
 
   app.messaging().setBackgroundMessageHandler((remoteMessage) => {
     Logger.info(TAG, 'received Notification while app in Background')
-    Sentry.captureMessage(
-      `Received Unknown RNFirebaseBackgroundMessage ${JSON.stringify(remoteMessage)}`
-    )
+    // Nothing to do while app is in background
     return Promise.resolve() // need to return a resolved promise so native code releases the JS context
   })
 }
@@ -170,7 +169,7 @@ export function* paymentRequestWriter({ paymentInfo }: WritePaymentRequest) {
     const pendingRequestRef = firebase.database().ref(`pendingRequests`)
     yield call(() => pendingRequestRef.push(paymentInfo))
 
-    navigate(Screens.WalletHome)
+    navigateHome()
   } catch (error) {
     Logger.error(TAG, 'Failed to write payment request to Firebase DB', error)
     yield put(showError(ErrorMessages.PAYMENT_REQUEST_FAILED))

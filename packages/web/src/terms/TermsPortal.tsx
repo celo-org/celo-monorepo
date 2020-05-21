@@ -5,10 +5,10 @@ import OpenGraph from 'src/header/OpenGraph'
 import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
 import SideTitledSection from 'src/layout/SideTitledSection'
-import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import menuItems, { CeloLinks } from 'src/shared/menu-items'
 import { HEADER_HEIGHT } from 'src/shared/Styles'
 import { fonts, standardStyles, textStyles } from 'src/styles'
+import { HelpfullLink } from './HelpfullLink'
 
 class TermsPortal extends React.PureComponent<I18nProps> {
   static getInitialProps() {
@@ -46,10 +46,6 @@ class TermsPortal extends React.PureComponent<I18nProps> {
       </>
     )
   }
-}
-
-function HelpfullLink({ text, href }) {
-  return <Button kind={BTN.NAKED} text={text} href={href} size={SIZE.normal} />
 }
 
 export default withNamespaces(NameSpaces.terms)(TermsPortal)

@@ -44,6 +44,8 @@ export const GOLD_TRANSACTION_MIN_AMOUNT = 0.001
 export const ESCROW_PAYMENT_EXPIRY_SECONDS = 86400 // 1 days
 // We need to fallback to `integration` for testing under jest where react-native-config is undefined.
 export const DEFAULT_TESTNET = Config.DEFAULT_TESTNET || 'integration'
+export const DAILY_PAYMENT_LIMIT_CUSD = 500
+export const SMS_RETRIEVER_APP_SIGNATURE = Config.SMS_RETRIEVER_APP_SIGNATURE
 
 // LINKS
 export const CELO_VERIFIER_DOWNLOAD_LINK = 'https://celo.org/rewards'
@@ -66,7 +68,9 @@ export const FORNO_ENABLED_INITIALLY = Config.FORNO_ENABLED_INITIALLY
   : false
 export const DEFAULT_SYNC_MODE: GethSyncMode = Config.DEFAULT_SYNC_MODE
   ? new BigNumber(Config.DEFAULT_SYNC_MODE).toNumber()
-  : GethSyncMode.Ultralight
+  : GethSyncMode.Lightest
+// TODO Remove when feature is stable
+export const USE_PHONE_NUMBER_PRIVACY = true
 
 // SECRETS
 export const SEGMENT_API_KEY = keyOrUndefined(secretsFile, Config.SECRETS_KEY, 'SEGMENT_API_KEY')

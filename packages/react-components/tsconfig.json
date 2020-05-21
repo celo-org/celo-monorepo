@@ -14,8 +14,7 @@
     "strictNullChecks": true,
     "skipLibCheck": true,
     "strict": true,
-    "target": "es2015",
-    "resolveJsonModule": true
+    "target": "es2015"
   },
   "exclude": ["node_modules"],
   "references": [{ "path": "../utils" }]

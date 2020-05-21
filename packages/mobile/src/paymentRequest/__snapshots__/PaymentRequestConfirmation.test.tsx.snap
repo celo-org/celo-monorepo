@@ -161,7 +161,7 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
                   ]
                 }
               >
-                John Doe
+                Jane Doe
               </Text>
               <View
                 style={
@@ -206,7 +206,7 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
                     }
                   }
                 >
-                  (415) 555-0000
+                  (310) 555-0000
                 </Text>
               </View>
             </View>
@@ -273,7 +273,7 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
                   ]
                 }
               >
-                13.30
+                1.33
               </Text>
             </View>
             <Text
@@ -288,7 +288,7 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
                 }
               }
             >
-              My Reason
+              Something
             </Text>
             <View
               style={
@@ -375,7 +375,7 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
                 >
                   
                   $
-                  13.30
+                  1.33
                 </Text>
               </Text>
             </View>
@@ -464,7 +464,7 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
                   }
                 >
                   
-                  10.00
+                  1.00
                 </Text>
               </Text>
             </View>
@@ -503,7 +503,6 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
         <View
           accessible={true}
           focusable={true}
-          isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
@@ -593,7 +592,6 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
         <View
           accessible={true}
           focusable={true}
-          isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",

@@ -1,0 +1,83 @@
+{
+  "attestation-service": [
+    "contractkit",
+    "protocol",
+    "utils"
+  ],
+  "azure": [],
+  "blockchain-api": [
+    "contractkit",
+    "utils"
+  ],
+  "celotool": [
+    "contractkit",
+    "protocol",
+    "utils",
+    "verification-pool-api"
+  ],
+  "cli": [
+    "contractkit",
+    "dev-utils",
+    "utils"
+  ],
+  "contractkit": [
+    "dev-utils",
+    "protocol",
+    "utils"
+  ],
+  "dappkit": [
+    "contractkit",
+    "utils"
+  ],
+  "dev-utils": [],
+  "docs": [],
+  "faucet": [
+    "contractkit",
+    "utils"
+  ],
+  "leaderboard": [
+    "contractkit"
+  ],
+  "metadata-crawler": [
+    "contractkit",
+    "utils"
+  ],
+  "mobile": [
+    "contractkit",
+    "react-components",
+    "typescript",
+    "utils"
+  ],
+  "moonpay-auth": [],
+  "notification-service": [
+    "contractkit",
+    "utils"
+  ],
+  "phone-number-privacy": [
+    "contractkit",
+    "utils"
+  ],
+  "protocol": [
+    "typescript",
+    "utils"
+  ],
+  "react-components": [
+    "typescript",
+    "utils"
+  ],
+  "transaction-metrics-exporter": [
+    "contractkit",
+    "utils"
+  ],
+  "typescript": [],
+  "utils": [
+    "typescript"
+  ],
+  "verification-pool-api": [
+    "contractkit",
+    "utils"
+  ],
+  "web": [
+    "utils"
+  ]
+}

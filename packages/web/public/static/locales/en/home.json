@@ -2,60 +2,14 @@
   "pageTitle": "Celo: A platform for fast, secure, stable digital payments",
   "subtitle":
     "A platform for fast, secure, stable digital payments to any mobile number at a fraction of today’s cost.",
-  "parallax": {
-    "0": "Earn cryptocurrency on your smartphone.",
-    "1": "Your phone number is your bank account.",
-    "2": "Send payments to anyone anywhere."
-  },
-  "hero": {
-    "tag":
-      "An open platform for fast, secure, stable digital payments to any mobile number at a fraction of today’s cost.",
-    "backers": "See More Backers",
-    "emailButton": "Get Our Newsletter"
-  },
-  "mission": {
-    "title": "Mission & Meaning",
-    "text": {
-      "0": "",
-      "1": "Celo, pronounced /ˈtselo/, ",
-      "2":
-        "means ‘purpose’ in Esperanto. In a similar spirit, we are aiming to create a new platform to connect people globally and bring financial stability to those who need it most. We believe blockchain technology is one of the most exciting innovations in recent history and as a team we look to push the boundaries of what is possible with it today. More importantly, we are driven by purpose -- to solve real-world problems such as lack of access to sound currency, or friction for cash-transfer programs aimed to alleviate poverty. Our mission is to build a monetary system that creates the conditions for prosperity for all.",
-      "3":
-        "If you are passionate about our mission and want to join us, learn about current opportunities here:"
-    }
-  },
-  "blog": {
-    "asseenon": "As seen on",
-    "prelude": "Read more about ",
-    "linktext": "what we're building at Celo"
-  },
-  "research": {
-    "header": "Early User Research Findings",
-    "1":
-      "As we’re building our mobile-first stable currency, we’re in our target markets doing initial research to better understand our users’ needs. Read more about the market research we’re doing ",
-    "here": "here",
-    "15": ".",
-    "2":
-      "In the spirit of decentralization, we’ve established a fellowship program open to those who’d like to collaborate with Celo, from any location and for a flexible amount of time. We’re accepting project proposals now. Please ",
-    "3": "reach out",
-    "4": " to us."
-  },
-  "aboutUsTitle": "About Us",
-  "aboutUsDescription": "Our core team, contributors, and backers",
-  "aboutUsLink": "Meet the team",
-  "applicationsTitle": "Applications",
-  "applicationsDescription":
-    "Build on top of the Celo platform to support global financial inclusion",
-  "applicationsLink": "Stay updated",
-  "technologyTitle": "Technology",
-  "technologyDescription": "Sending money is as easy as sending a text",
-  "technologyLink": "Find out how",
+  "coverText": "Celo is an open platform that makes financial tools accessible to anyone with a mobile phone",
+  "coverJoinList": "Join Mailing List",
   "whitePaper": "White Paper",
   "stabilityAnalysis": "Stability Analysis",
   "readMore": "Read more about our technology",
 
   "stayConnected": "Stay Connected",
-
+  "backers": "Backers",
   "systemsApproach": "We embrace a full-stack approach, reimagining technology at each layer",
   "designedWithCommunities": "Our innovations are designed with communities around the world",
   "buildOnCelo": "Build on Celo",
@@ -96,74 +50,7 @@
     "legend": {
       "half": "In Progress",
       "empty": "Pending"
-    },
-    "milestones": {
-      "New_Baklava_Testnet": {
-      "title": "New Baklava Testnet",
-      "text": "Validators stand up new testnet with feature complete software"
-    },
-    "Security_audits_complete": 
-    {
-      "title": "Security Audits Complete",
-      "text": "Resolve any outstanding issues to harden codebase"
-    },
-    "Mainnet_Release_Candidate_1": {
-      "title": "Mainnet Release Candidate 1",
-      "text": "Validators stand up release candidate network with production-ready software"
-    },
-    "Validator_Elections_Start": {
-      "title": "Validator Elections Start",
-      "text": "When sufficient validators and groups are registered and staked, validator elections and epoch rewards can be enabled via on-chain governance proposal"
-    },
-    "Rewards_Activated": {
-      "title": "Celo Gold Voter Rewards Activate",
-      "text": "Voter rewards can be enabled via on-chain governance proposal"
-    },
-    "Mainnet_Release_Candidate_X": {
-      "title": "Mainnet Release Candidate X",
-      "text": "Possible additional release candidates in the event critical issues are discovered"
-    },
-    "Celo_Gold_is_live": {
-      "title": "Celo Gold Live",
-      "text": "When the network is running smoothly, Celo Gold transfers can be enabled via on-chain governance proposal"
-    },
-    "Celo_Dollar_is_live": {
-      "title": "Celo Dollars Live",
-      "text": "When Oracles can provide pricing for Celo Gold, Celo Dollar transfers can be enabled via on-chain governance proposal"
-    },
-    "Mainnet_Mobile_Wallet_Release": {
-      "title": "Mainnet Mobile Wallet Release",
-      "text": "The Mainnet Mobile Wallet will be fully available for download on iOS and Android"
-    },
-    "SDK_Release": {
-      "title": "SDK Release",
-      "text": "ContractKit and DAppKit simplify development of dApps"
-    },
-    "Baklava_Testnet": {
-      "title": "Baklava Testnet – The Great Celo Stake Off",
-      "text": "Validators gain operational experience and chance to earn Mainnet Celo Gold, software hardened"       
-    },
-    "100_Community": {
-      "title": "100th Community Event",
-      "text": "100 events hosted in 100 days in more than 35 countries"  
-    },
-    "Alfajores_Testnet": {
-      "title": "Alfajores Testnet Release",
-      "text": "First full network release for protocol and app developers"       
-    },
-    "MIT_Stability_Challenge": {
-      "title": "MIT Stability Challenge",
-      "text": "Stability Protocol tested and improved"       
-    },
-    "First_user_research_trip": {
-      "title": "First User Research Trip",
-      "text": "Field research on mobile money adoption in Kenya"       
-    },
-    "Wallet_in_market_testing_begins": {
-      "title": "Mobile Wallet in Market Testing Begins",
-      "text": "Ongoing research in emerging markets"     
     }
-  }
   },
   "coinlist": {
     "title": "Become a Backer of Celo",

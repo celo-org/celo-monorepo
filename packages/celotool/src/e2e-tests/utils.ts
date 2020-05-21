@@ -2,10 +2,10 @@
 import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 import fs from 'fs'
-import _ from 'lodash'
 import { join as joinPath, resolve as resolvePath } from 'path'
 import readLastLines from 'read-last-lines'
 import Web3 from 'web3'
+import { spawnCmd } from '../lib/cmd-utils'
 import {
   AccountType,
   getPrivateKeysFor,
@@ -31,7 +31,6 @@ import {
 import { GethInstanceConfig } from '../lib/interfaces/geth-instance-config'
 import { GethRepository } from '../lib/interfaces/geth-repository'
 import { GethRunConfig } from '../lib/interfaces/geth-run-config'
-import { spawnCmd } from '../lib/utils'
 
 const MonorepoRoot = resolvePath(joinPath(__dirname, '../..', '../..'))
 const verboseOutput = false

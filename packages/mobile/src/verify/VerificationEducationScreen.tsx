@@ -11,7 +11,6 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import Modal from 'react-native-modal'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
-import componentWithAnalytics from 'src/analytics/wrapper'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { setHasSeenVerificationNux } from 'src/identity/actions'
 import { nuxNavigationOptions } from 'src/navigator/Headers'
@@ -164,9 +163,7 @@ const styles = StyleSheet.create({
   },
 })
 
-export default componentWithAnalytics(
-  connect<{}, DispatchProps>(
-    null,
-    mapDispatchToProps
-  )(withTranslation(Namespaces.nuxVerification2)(VerificationEducationScreen))
-)
+export default connect<{}, DispatchProps>(
+  null,
+  mapDispatchToProps
+)(withTranslation(Namespaces.nuxVerification2)(VerificationEducationScreen))

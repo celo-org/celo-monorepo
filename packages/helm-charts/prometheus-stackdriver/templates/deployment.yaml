@@ -51,6 +51,9 @@ spec:
             - --prometheus.wal-directory=/prometheus/wal
             - --stackdriver.kubernetes.location={{ .Values.gcloud.region }}
             - --stackdriver.kubernetes.cluster-name={{ .Values.cluster }}
+{{ if .Values.includeFilter }}
+{{ indent 12 (printf "- --include=%s" .Values.includeFilter) }}
+{{ end }}
           ports:
             - name: sidecar
               containerPort: 9091

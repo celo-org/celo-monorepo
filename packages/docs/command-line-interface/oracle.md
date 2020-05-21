@@ -1,12 +1,12 @@
 ---
-description: Remove expired oracle reports for a specified token (currently just Celo Dollar, aka: "StableToken")
+description: Remove expired oracle reports for a specified token (currently just Celo Dollar, aka "StableToken")
 ---
 
 ## Commands
 
 ### Remove-expired-reports
 
-Remove expired oracle reports for a specified token (currently just Celo Dollar, aka: "StableToken")
+Remove expired oracle reports for a specified token (currently just Celo Dollar, aka "StableToken")
 
 ```
 USAGE
@@ -39,7 +39,7 @@ _See code: [packages/cli/src/commands/oracle/remove-expired-reports.ts](https://
 
 ### Report
 
-Report the price of Celo Gold in a specified token (currently just Celo Dollar, aka: "StableToken")
+Report the price of Celo Gold in a specified token (currently just Celo Dollar, aka "StableToken")
 
 ```
 USAGE

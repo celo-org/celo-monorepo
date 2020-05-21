@@ -3,14 +3,14 @@ import { expectSaga } from 'redux-saga-test-plan'
 import { call, select } from 'redux-saga/effects'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { appLock, openDeepLink, setAppState } from 'src/app/actions'
-import { handleDeepLink, handleSetAppState, navigateToProperScreen } from 'src/app/saga'
+import { handleDeepLink, handleSetAppState, watchRehydrate } from 'src/app/saga'
 import { getAppLocked, getLastTimeBackgrounded, getLockWithPinEnabled } from 'src/app/selectors'
 import { handleDappkitDeepLink } from 'src/dappkit/dappkit'
 import { isAppVersionDeprecated } from 'src/firebase/firebase'
 import { receiveAttestationMessage } from 'src/identity/actions'
 import { CodeInputType } from 'src/identity/verification'
-import { NavActions, navigate } from 'src/navigator/NavigationService'
-import { Screens, Stacks } from 'src/navigator/Screens'
+import { navigate } from 'src/navigator/NavigationService'
+import { Screens } from 'src/navigator/Screens'
 import { getCachedPincode } from 'src/pincode/PincodeCache'
 
 jest.mock('src/utils/time', () => ({
@@ -21,29 +21,6 @@ jest.mock('src/dappkit/dappkit')
 
 const MockedAnalytics = CeloAnalytics as any
 
-const initialState = {
-  app: {
-    language: undefined,
-  },
-  verify: {},
-  web3: {},
-  account: {},
-  invite: {},
-  identity: {},
-}
-
-const navigationSagaTest = (testName: string, state: any, expectedScreen: any) => {
-  test(testName, async () => {
-    await expectSaga(navigateToProperScreen)
-      .withState(state)
-      .dispatch({ type: REHYDRATE })
-      .dispatch({ type: NavActions.SET_NAVIGATOR })
-      .provide([[call(isAppVersionDeprecated), false]])
-      .run()
-    expect(navigate).toHaveBeenCalledWith(expectedScreen)
-  })
-}
-
 describe('App saga', () => {
   beforeEach(() => {
     MockedAnalytics.track = jest.fn()
@@ -53,9 +30,8 @@ describe('App saga', () => {
   })
 
   it('Version Deprecated', async () => {
-    await expectSaga(navigateToProperScreen)
+    await expectSaga(watchRehydrate)
       .dispatch({ type: REHYDRATE })
-      .dispatch({ type: NavActions.SET_NAVIGATOR })
       .provide([[call(isAppVersionDeprecated), true]])
       .run()
     expect(navigate).toHaveBeenCalledWith(Screens.UpgradeScreen)
@@ -119,6 +95,3 @@ describe('App saga', () => {
       .run()
   })
 })
-
-navigationSagaTest('Navigates to the nux stack with no state', null, Stacks.NuxStack)
-navigationSagaTest('Navigates to the nux stack with no language', initialState, Stacks.NuxStack)

@@ -1,0 +1,36 @@
+patch-package
+--- a/node_modules/@segment/analytics-react-native-firebase/android/build.gradle
++++ b/node_modules/@segment/analytics-react-native-firebase/android/build.gradle
+@@ -26,6 +26,10 @@ android {
+         versionName '1.0'
+ 
+     }
++
++    packagingOptions {
++        exclude 'META-INF/-no-jdk.kotlin_module'
++    }
+ }
+ 
+ repositories {
+--- a/node_modules/@segment/analytics-react-native-firebase/ios/main.m
++++ b/node_modules/@segment/analytics-react-native-firebase/ios/main.m
+@@ -8,7 +8,7 @@
+ 
+ #import <React/RCTBridgeModule.h>
+ #import <RNAnalytics/RNAnalytics.h>
+-#import <Segment-Firebase/SEGFirebaseIntegrationFactory.h>
++#import <Segment_Firebase/SEGFirebaseIntegrationFactory.h>
+ 
+ @interface RNAnalyticsIntegration_Firebase: NSObject<RCTBridgeModule>
+ @end
+--- a/node_modules/@segment/analytics-react-native-firebase/android/build.gradle
++++ b/node_modules/@segment/analytics-react-native-firebase/android/build.gradle
+@@ -42,7 +42,7 @@ repositories {
+
+
+ dependencies {
+-    api project(":@segment_analytics-react-native")
++    api project(":segment_analytics-react-native")
+     api('com.segment.analytics.android.integrations:firebase:+@aar') {
+         transitive = true
+     }

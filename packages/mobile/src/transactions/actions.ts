@@ -1,12 +1,13 @@
 import { TokenTransactionType } from 'src/apollo/types'
 import { ExchangeConfirmationCardProps } from 'src/exchange/ExchangeConfirmationCard'
+import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import i18n from 'src/i18n'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import { ConfirmationInput as SendConfirmationCardProps } from 'src/send/SendConfirmation'
 import { TransferConfirmationCardProps } from 'src/send/TransferConfirmationCard'
+import { ConfirmationInput } from 'src/send/utils'
 import { StandbyTransaction } from 'src/transactions/reducer'
-import { getContractKit } from 'src/web3/contracts'
+import { web3ForUtils } from 'src/web3/contracts'
 
 export enum Actions {
   ADD_STANDBY_TRANSACTION = 'TRANSACTIONS/ADD_STANDBY_TRANSACTION',
@@ -14,6 +15,7 @@ export enum Actions {
   RESET_STANDBY_TRANSACTIONS = 'TRANSACTIONS/RESET_STANDBY_TRANSACTIONS',
   ADD_HASH_TO_STANDBY_TRANSACTIONS = 'TRANSACTIONS/ADD_HASH_TO_STANDBY_TRANSACTIONS',
   TRANSACTION_CONFIRMED = 'TRANSACTIONS/TRANSACTION_CONFIRMED',
+  TRANSACTION_FAILED = 'TRANSACTIONS/TRANSACTION_FAILED',
 }
 
 export interface AddStandbyTransaction {
@@ -41,6 +43,11 @@ export interface TransactionConfirmed {
   txId: string
 }
 
+export interface TransactionFailed {
+  type: Actions.TRANSACTION_FAILED
+  txId: string
+}
+
 export type ActionTypes =
   | AddStandbyTransaction
   | RemoveStandbyTransaction
@@ -48,7 +55,7 @@ export type ActionTypes =
   | AddHashToStandbyTransaction
 
 export const generateStandbyTransactionId = (recipientAddress: string) => {
-  return getContractKit().web3.utils.sha3(recipientAddress + String(Date.now()))
+  return web3ForUtils.utils.sha3(recipientAddress + String(Date.now()))
 }
 
 export const addStandbyTransaction = (transaction: StandbyTransaction): AddStandbyTransaction => ({
@@ -67,6 +74,11 @@ export const resetStandbyTransactions = (): ResetStandbyTransactions => ({
 
 export const transactionConfirmed = (txId: string): TransactionConfirmed => ({
   type: Actions.TRANSACTION_CONFIRMED,
+  txId,
+})
+
+export const transactionFailed = (txId: string): TransactionFailed => ({
+  type: Actions.TRANSACTION_FAILED,
   txId,
 })
 
@@ -129,16 +141,18 @@ export const navigateToExchangeReview = (
   timestamp: number,
   confirmationProps: ExchangeConfirmationCardProps
 ) => {
+  const { makerAmount } = confirmationProps
+  const isSold = makerAmount.currencyCode === CURRENCIES[CURRENCY_ENUM.GOLD].code
   navigate(Screens.TransactionReview, {
     reviewProps: {
       type: TokenTransactionType.Exchange,
       timestamp,
-      header: i18n.t('exchangeFlow9:exchange'),
+      header: isSold ? i18n.t('exchangeFlow9:soldGold') : i18n.t('exchangeFlow9:purchasedGold'),
     },
     confirmationProps,
   })
 }
 
-export const navigateToRequestedPaymentReview = (confirmationInput: SendConfirmationCardProps) => {
+export const navigateToRequestedPaymentReview = (confirmationInput: ConfirmationInput) => {
   navigate(Screens.SendConfirmation, { confirmationInput })
 }

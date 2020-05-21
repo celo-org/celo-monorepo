@@ -146,7 +146,19 @@ export function parseSignatureWithoutPrefix(
     return { v, r, s }
   }
 
-  throw new Error('Unable to parse signature')
+  throw new Error(`Unable to parse signature (expected signer ${signer})`)
+}
+
+export function guessSigner(message: string, signature: string): string {
+  const messageHash = hashMessageWithPrefix(message)
+  const { r, s, v } = parseSignatureAsRsv(signature.slice(2))
+  const publicKey = ethjsutil.ecrecover(
+    ethjsutil.toBuffer(messageHash),
+    v,
+    ethjsutil.toBuffer(r),
+    ethjsutil.toBuffer(s)
+  )
+  return ethjsutil.bufferToHex(ethjsutil.pubToAddress(publicKey))
 }
 
 function parseSignatureAsVrs(signature: string) {

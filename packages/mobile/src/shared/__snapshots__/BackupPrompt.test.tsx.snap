@@ -12,6 +12,7 @@ exports[`BackupPrompt renders correctly 1`] = `
   <View
     accessible={true}
     focusable={true}
+    forwardedRef={[Function]}
     onClick={[Function]}
     onResponderGrant={[Function]}
     onResponderMove={[Function]}
@@ -67,7 +68,6 @@ exports[`BackupPrompt renders correctly 1`] = `
           "top": 7,
         }
       }
-      isTVSelectable={true}
       nativeBackgroundAndroid={
         Object {
           "attribute": "selectableItemBackground",
