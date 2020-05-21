@@ -100,11 +100,13 @@ Next, you will find the address of the `ReleaseGold` contract deployed for your 
 
 Use the mapping from this list (you can use Edit>Find in your browser):
 
-- [RC1 ReleaseGold deployments on 4/23/20 ("Wave 1")](https://gist.githubusercontent.com/timmoreton/704404484cf8f641b5464a237592a341/raw/6ad2615f219c71fe370bac84e5ac7aa1653fffac/CeloRC1ReleaseGoldWave1.json)
+- [ReleaseGold deployments on 4/23/20 ("Wave 1")](https://gist.githubusercontent.com/timmoreton/704404484cf8f641b5464a237592a341/raw/6ad2615f219c71fe370bac84e5ac7aa1653fffac/CeloRC1ReleaseGoldWave1.json)
 
-- [RC1 ReleaseGold deployments on 4/30/20 ("Wave 1b")](https://gist.githubusercontent.com/timmoreton/32d36dcc48e52a4747df8cfa8e4a4d0f/raw/1557209b59fa863cc8ed9b66e72e6111fbfe3475/CeloRC1ReleaseGoldWave1b.json)
+- [ReleaseGold deployments on 4/30/20 ("Wave 1b")](https://gist.githubusercontent.com/timmoreton/32d36dcc48e52a4747df8cfa8e4a4d0f/raw/1557209b59fa863cc8ed9b66e72e6111fbfe3475/CeloRC1ReleaseGoldWave1b.json)
 
-- [RC1 ReleaseGold deployments on 5/16/20 ("Wave 2")](https://gist.githubusercontent.com/timmoreton/27e975bbca63723e218288b1a1f9fa54/raw/d55f51fde470fe040407c02462aeb5a7adc3d57f/CeloRC1ReleaseGoldWave2.json): includes self-custodying CoinList auction participants that completed the address submission process by 5/14/20
+- [ReleaseGold deployments on 5/16/20 ("Wave 2")](https://gist.githubusercontent.com/timmoreton/27e975bbca63723e218288b1a1f9fa54/raw/d55f51fde470fe040407c02462aeb5a7adc3d57f/CeloRC1ReleaseGoldWave2.json): includes self-custodying CoinList auction participants that completed the address submission process by 5/14/20
+
+- [ReleaseGold deployments on 5/29/20 ("Wave 2b")](https://gist.githubusercontent.com/timmoreton/f22e70b8149706f738327da8ff71c7d7/raw/944458feda304c7077f2bbb3e190ec677a5ed976/CeloMainnetReleaseGoldWave2b.json): includes self-custodying CoinList auction participants that completed the address submission process by 5/16/20
 
 If you have more than one beneficiary address, you'll want to step through this guide for each one.
 
