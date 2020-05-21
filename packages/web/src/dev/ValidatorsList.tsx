@@ -2,7 +2,7 @@ import { BigNumber } from 'bignumber.js'
 import { SingletonRouter as Router } from 'next/router'
 import * as React from 'react'
 import { Text as RNText, View } from 'react-native'
-import ValidatorsListRow, { CeloGroup } from 'src/dev/ValidatorsListRow'
+import ValidatorsListRow, { CeloGroup, localStoragePinnedKey } from 'src/dev/ValidatorsListRow'
 import { styles } from 'src/dev/ValidatorsListStyles'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import Chevron, { Direction } from 'src/icons/chevron'
@@ -101,6 +101,8 @@ type orderByTypes =
   | 'name'
   | 'total'
   | 'votes'
+  | 'rawVotes'
+  | 'votesAvailables'
   | 'gold'
   | 'commision'
   | 'rewards'
@@ -116,20 +118,23 @@ export interface State {
 class ValidatorsList extends React.PureComponent<Props, State> {
   state = {
     expanded: undefined,
-    orderBy: 'name' as orderByTypes,
+    orderBy: undefined,
     orderAsc: true,
   }
   private orderAccessors = {
+    order: (_) => _.order,
     name: (_) => (_.name || '').toLowerCase() || null,
     total: (_) => _.numMembers * 1000 + _.elected,
     votes: (_) => +_.votesAbsolute || 0,
+    rawVotes: (_) => _.votesRaw || 0,
+    votesAvailables: (_) => _.receivableRaw || 0,
     gold: (_) => _.gold || 0,
     commision: (_) => _.commission || 0,
     rewards: (_) => _.rewards || 0,
     uptime: (_) => _.uptime || 0,
     attestation: (_) => _.attestation || 0,
   }
-  private defaultOrderAccessor = 'name'
+  private defaultOrderAccessor = 'order'
   private cachedCleanData: CeloGroup[]
   private orderByFn: { [by: string]: any } = {}
 
@@ -184,11 +189,15 @@ class ValidatorsList extends React.PureComponent<Props, State> {
           const votesPer = new BigNumber(votes).dividedBy(receivableVotes).multipliedBy(100)
           const votesAbsolutePer = receivableVotesPer.multipliedBy(votesPer).dividedBy(100)
           return {
+            order: Math.random(),
+            pinned: this.isPinned(group.address),
             name: group.name,
             address: group.address,
             usd: weiToDecimal(+group.usd),
             gold: weiToDecimal(+group.lockedGold),
+            receivableRaw: weiToDecimal(+receivableVotes),
             receivableVotes: receivableVotesPer.toString(),
+            votesRaw: weiToDecimal(+votes),
             votes: votesPer.toString(),
             votesAbsolute: votesAbsolutePer.toString(),
             commission: (+commission * 100) / 10 ** 24,
@@ -249,7 +258,7 @@ class ValidatorsList extends React.PureComponent<Props, State> {
 
   sortData<T extends any & { id: number }>(data: T[]): T[] {
     const { orderBy, orderAsc } = this.state
-    const accessor = this.orderAccessors[orderBy]
+    const accessor = this.orderAccessors[orderBy] || (() => 0)
     const dAccessor = this.orderAccessors[this.defaultOrderAccessor]
     const dir = orderAsc ? 1 : -1
 
@@ -264,19 +273,32 @@ class ValidatorsList extends React.PureComponent<Props, State> {
     }
 
     return (data || [])
-      .sort((a, b) => b.id - a.id)
       .sort((a, b) => compare(dAccessor(a), dAccessor(b)))
       .sort((a, b) => dir * compare(accessor(a), accessor(b)))
+      .sort((a, b) => this.isPinned(b) - this.isPinned(a))
+  }
+
+  isPinned({ address }: any) {
+    const list = (localStorage.getItem(localStoragePinnedKey) || '').split(',') || []
+    return +list.includes(address)
+  }
+
+  onPinned() {
+    this.setState({ update: Math.random() } as any)
   }
 
   render() {
     const { expanded, orderBy, orderAsc } = this.state
     const { data } = this.props
     const validatorGroups = !data ? ([] as CeloGroup[]) : this.sortData(this.cleanData(data))
+    const onPinned = () => this.onPinned()
     return (
       <View style={styles.pStatic}>
         <View style={[styles.table, styles.pStatic]}>
           <View style={[styles.tableRow, styles.tableHeaderRow]}>
+            <View style={[styles.tableHeaderCell, styles.sizeXXS]}>
+              <Text>Pin</Text>
+            </View>
             <HeaderCell
               onClick={this.orderByFn.name}
               style={[styles.tableHeaderCellPadding]}
@@ -296,9 +318,21 @@ class ValidatorsList extends React.PureComponent<Props, State> {
               order={orderBy === 'votes' ? orderAsc : null}
             />
             <HeaderCell
+              onClick={this.orderByFn.rawVotes}
+              style={[styles.sizeM]}
+              name="Votes"
+              order={orderBy === 'rawVotes' ? orderAsc : null}
+            />
+            <HeaderCell
+              onClick={this.orderByFn.votesAvailables}
+              style={[styles.sizeM]}
+              name="Votes Available"
+              order={orderBy === 'votesAvailables' ? orderAsc : null}
+            />
+            <HeaderCell
               onClick={this.orderByFn.gold}
               style={[styles.sizeM]}
-              name="Locked CGLD"
+              name="Locked Celo Gold"
               order={orderBy === 'gold' ? orderAsc : null}
             />
             <HeaderCell
@@ -328,7 +362,7 @@ class ValidatorsList extends React.PureComponent<Props, State> {
           </View>
           {validatorGroups.map((group, i) => (
             <div key={group.id} onClick={this.expand.bind(this, i)}>
-              <ValidatorsListRow group={group} expanded={expanded === i} />
+              <ValidatorsListRow onPinned={onPinned} group={group} expanded={expanded === i} />
             </div>
           ))}
         </View>

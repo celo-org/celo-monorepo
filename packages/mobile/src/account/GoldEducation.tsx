@@ -3,7 +3,6 @@ import { connect } from 'react-redux'
 import Education from 'src/account/Education'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
-import { componentWithAnalytics } from 'src/analytics/wrapper'
 import { setEducationCompleted } from 'src/goldToken/actions'
 import { exchangeIcon, goldValue, shinyGold } from 'src/images/Images'
 import { navigate, navigateHome } from 'src/navigator/NavigationService'
@@ -61,6 +60,4 @@ export class GoldEducation extends React.Component<Props> {
   }
 }
 
-export default componentWithAnalytics(
-  connect<{}, DispatchProps>(null, { setEducationCompleted })(GoldEducation)
-)
+export default connect<{}, DispatchProps>(null, { setEducationCompleted })(GoldEducation)

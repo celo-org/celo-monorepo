@@ -129,7 +129,11 @@ export function* fetchPhoneAddresses({ e164Number }: FetchPhoneAddressesAction) 
     )
   } catch (error) {
     Logger.error(TAG + '@fetchPhoneAddresses', `Error fetching addresses`, error)
-    yield put(showError(ErrorMessages.ADDRESS_LOOKUP_FAILURE))
+    if (error.message in ErrorMessages) {
+      yield put(showError(error.message))
+    } else {
+      yield put(showError(ErrorMessages.ADDRESS_LOOKUP_FAILURE))
+    }
   }
 }
 

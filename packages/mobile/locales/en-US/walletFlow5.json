@@ -16,8 +16,7 @@
   "review": "Review",
   "thanksForVerifying": "Thanks for verifying",
   "earnCeloRewards": "Earn Celo Rewards for verifying others",
-  "earnCeloGold":
-    "Earn Celo Gold by allowing the network to send verification texts from your phone",
+  "earnCeloGold": "Earn Celo Gold by allowing the network to send verification texts from your phone",
   "startEarning": "Start Earning",
   "learnMore": "Learn More",
   "goldIsWhereYouSave": "Gold is where you can save {{CeloDollars}} you have",
@@ -34,11 +33,10 @@
   "verificationFee": "Verification Fee",
   "networkFee": "Network Fee",
   "networkFeeExplanation": {
-    "0":
-      "Each week, a very small fee (less than 0.01%) of every user's Celo Dollar Balance is used to keep the Celo Dollar's value stable. To learn more about Celo fees, visit the ",
+    "0": "Each week, a very small fee (less than 0.01%) of every user's Celo Dollar Balance is used to keep the Celo Dollar's value stable. To learn more about Celo fees, visit the ",
     "1": "FAQ"
   },
-  "confirmingPayment": "Confirming…",
+  "confirmingTransaction": "Confirming…",
   "confirmingExchange": "Confirming…",
   "paymentFailed": "Payment Failed",
   "exchangeFailed": "Exchange Failed",
@@ -53,17 +51,17 @@
   "balanceNeedUpdating": "Balance needs updating",
   "refreshBalances": "Refresh Balances",
   "escrowedPaymentReminder": "Pending Invitations",
-  "escrowedPaymentReminderSms":
-    "A friendly reminder that you haven't yet redeemed your Celo Dollars! Go to {{link}} and enter your code to get started: {{code}}",
-  "escrowedPaymentReminderSmsNoData":
-    "A friendly reminder that you haven't yet redeemed your Celo Dollars! Download the mobile app to get started!",
+  "escrowedPaymentReminderSms": "A friendly reminder that you haven't yet redeemed your Celo Dollars! Go to {{link}} and enter your code to get started: {{code}}",
+  "escrowedPaymentReminderSmsNoData": "A friendly reminder that you haven't yet redeemed your Celo Dollars! Download the mobile app to get started!",
   "testnetAlert": {
     "0": "{{testnet}}",
-    "1":
-      "A friendly reminder you're using the {{testnet}} network build - the balances are not real"
+    "1": "A friendly reminder you're using the {{testnet}} network build - the balances are not real"
   },
   "dismiss": "Dismiss",
   "dollarBalance": "<0></0> $t(global:celoDollars)",
+  "feedItemExchangeTitle": "Celo Gold",
+  "feedItemExchangeInfo_boughtGold": "Bought <0></0> Gold",
+  "feedItemExchangeInfo_soldGold": "Sold <0></0> Gold",
   "feedItemVerificationFeeTitle": "Celo",
   "feedItemVerificationFeeInfo": "$t(verificationFee)",
   "feedItemNetworkFeeTitle": "Celo",
@@ -72,14 +70,30 @@
   "feedItemVerificationRewardInfo": "Verifier Reward",
   "feedItemFaucetTitle": "Celo",
   "feedItemFaucetInfo": "{{faucet}} Faucet",
-  "feedItemFaucetInfo_missingTestnet": "Faucet",
+  "feedItemFaucetInfo_noTestnet": "Faucet",
   "feedItemInviteSentTitle": "Celo",
   "feedItemInviteSentInfo": "Invited {{nameOrNumber}}",
-  "feedItemInviteSentInfo_missingInviteeDetails": "$t(inviteFlow11:inviteSent)",
+  "feedItemInviteSentInfo_noInviteeDetails": "$t(inviteFlow11:inviteSent)",
   "feedItemInviteReceivedTitle": "Celo",
   "feedItemInviteReceivedInfo": "$t(inviteFlow11:inviteReceived)",
-  "feedItemReceivedTitle_missingSenderDetails": "Payment Received",
-  "feedItemReceivedTitle_escrowRecieved": "Escrow Payment Received",
-  "feedItemSentTitle_missingReceiverDetails": "Payment Sent",
-  "feedItemSentTitle_escrowSent": "Escrow Payment Sent"
+  "feedItemSentTitle": "{{nameOrNumber}}",
+  "feedItemSentTitle_noReceiverDetails": "Unknown",
+  "feedItemSentInfo": "{{comment}}",
+  "feedItemSentInfo_noComment": "Payment Sent",
+  "feedItemReceivedTitle": "{{nameOrNumber}}",
+  "feedItemReceivedTitle_noSenderDetails": "Unknown",
+  "feedItemReceivedInfo": "{{comment}}",
+  "feedItemReceivedInfo_noComment": "Payment Received",
+  "feedItemEscrowSentTitle": "{{nameOrNumber}}",
+  "feedItemEscrowSentTitle_noReceiverDetails": "Unknown",
+  "feedItemEscrowSentInfo": "{{comment}}",
+  "feedItemEscrowSentInfo_noComment": "Escrow Payment Sent",
+  "feedItemEscrowReceivedTitle": "{{nameOrNumber}}",
+  "feedItemEscrowReceivedTitle_noSenderDetails": "Unknown",
+  "feedItemEscrowReceivedInfo": "{{comment}}",
+  "feedItemEscrowReceivedInfo_noComment": "Escrow Payment Received",
+  "feedItemGenericTitle": "{{nameOrNumber}}",
+  "feedItemGenericTitle_noRecipientDetails": "Unknown",
+  "feedItemGoldSold": "Sold",
+  "feedItemGoldPurchased": "Purchased"
 }

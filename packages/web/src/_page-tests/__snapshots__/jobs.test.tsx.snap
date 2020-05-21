@@ -4369,7 +4369,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
             }
           }
         >
-          Three Pillars of Celo's Culture
+          Three Pillars of the Celo Foundations's Culture
         </h3>
         <h2
           aria-level="2"
@@ -5024,7 +5024,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
               }
             }
           >
-            Quarterly Celo retreat focusing on self, team, and company evolution
+            Retreat focusing on self, team, and organizational evolution
           </div>
         </div>
       </div>
@@ -11690,7 +11690,7 @@ exports[`JoinJobsPage without jobs renders 1`] = `
             }
           }
         >
-          Three Pillars of Celo's Culture
+          Three Pillars of the Celo Foundations's Culture
         </h3>
         <h2
           aria-level="2"
@@ -12345,7 +12345,7 @@ exports[`JoinJobsPage without jobs renders 1`] = `
               }
             }
           >
-            Quarterly Celo retreat focusing on self, team, and company evolution
+            Retreat focusing on self, team, and organizational evolution
           </div>
         </div>
       </div>

@@ -5,8 +5,15 @@ import { Provider } from 'react-redux'
 import ReclaimPaymentConfirmationScreen from 'src/escrow/ReclaimPaymentConfirmationScreen'
 import { getReclaimEscrowFee } from 'src/escrow/saga'
 import { SHORT_CURRENCIES, WEI_PER_CELO } from 'src/geth/consts'
-import { createMockNavigationProp, createMockStore } from 'test/utils'
-import { mockAccount, mockAccount2, mockE164Number, mockRecipient } from 'test/values'
+import { Screens } from 'src/navigator/Screens'
+import { createMockStore } from 'test/utils'
+import {
+  mockAccount,
+  mockAccount2,
+  mockE164Number,
+  mockNavigation,
+  mockRecipient,
+} from 'test/values'
 
 const TEST_FEE = new BigNumber(10000000000000000)
 
@@ -15,6 +22,23 @@ jest.mock('src/escrow/saga')
 const mockedGetReclaimEscrowFee = getReclaimEscrowFee as jest.Mock
 
 const store = createMockStore()
+
+const mockRoute = {
+  name: Screens.ReclaimPaymentConfirmationScreen as Screens.ReclaimPaymentConfirmationScreen,
+  key: '1',
+  params: {
+    reclaimPaymentInput: {
+      senderAddress: mockAccount2,
+      recipientPhone: mockE164Number,
+      recipientContact: mockRecipient,
+      paymentID: mockAccount,
+      currency: SHORT_CURRENCIES.DOLLAR,
+      amount: new BigNumber(10 * WEI_PER_CELO),
+      timestamp: new BigNumber(10000),
+      expirySeconds: new BigNumber(50000),
+    },
+  },
+}
 
 describe('ReclaimPaymentConfirmationScreen', () => {
   beforeAll(() => {
@@ -26,22 +50,11 @@ describe('ReclaimPaymentConfirmationScreen', () => {
   })
 
   it('renders correctly', async () => {
-    const navigation = createMockNavigationProp({
-      senderAddress: mockAccount2,
-      recipientPhone: mockE164Number,
-      recipientContact: mockRecipient,
-      paymentID: mockAccount,
-      currency: SHORT_CURRENCIES.DOLLAR,
-      amount: new BigNumber(10 * WEI_PER_CELO),
-      timestamp: new BigNumber(10000),
-      expirySeconds: new BigNumber(50000),
-    })
-
     mockedGetReclaimEscrowFee.mockImplementation(async () => TEST_FEE)
 
     const { queryByText, toJSON } = render(
       <Provider store={store}>
-        <ReclaimPaymentConfirmationScreen navigation={navigation} />
+        <ReclaimPaymentConfirmationScreen navigation={mockNavigation} route={mockRoute} />
       </Provider>
     )
 
@@ -59,24 +72,13 @@ describe('ReclaimPaymentConfirmationScreen', () => {
   })
 
   it('renders correctly when fee calculation fails', async () => {
-    const navigation = createMockNavigationProp({
-      senderAddress: mockAccount2,
-      recipientPhone: mockE164Number,
-      recipientContact: mockRecipient,
-      paymentID: mockAccount,
-      currency: SHORT_CURRENCIES.DOLLAR,
-      amount: new BigNumber(10 * WEI_PER_CELO),
-      timestamp: new BigNumber(10000),
-      expirySeconds: new BigNumber(50000),
-    })
-
     mockedGetReclaimEscrowFee.mockImplementation(async () => {
       throw new Error('Calculate fee failed')
     })
 
     const { queryAllByText, queryByText, getByText, toJSON } = render(
       <Provider store={store}>
-        <ReclaimPaymentConfirmationScreen navigation={navigation} />
+        <ReclaimPaymentConfirmationScreen navigation={mockNavigation} route={mockRoute} />
       </Provider>
     )
 
