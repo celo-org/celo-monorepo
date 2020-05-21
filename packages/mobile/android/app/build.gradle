@@ -221,9 +221,8 @@ android {
 
         alfajores {
             applicationIdSuffix ".alfajores"
-            multiDexEnabled true
-            minifyEnabled false
-            // proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+            minifyEnabled enableProguardInReleaseBuilds
+            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
             signingConfig signingConfigs.release
             matchingFallbacks = ['release']
         }
