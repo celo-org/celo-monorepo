@@ -1,7 +1,7 @@
 import Card from '@celo/react-components/components/Card'
 import colors from '@celo/react-components/styles/colors.v2'
 import * as React from 'react'
-import { StyleSheet, StyleProp, ViewStyle } from 'react-native'
+import { StyleProp, StyleSheet, ViewStyle } from 'react-native'
 import ReactNativeModal from 'react-native-modal'
 
 interface Props {

@@ -1,9 +1,9 @@
-import Modal from 'src/components/Modal'
-import * as React from 'react'
-import { Image, StyleSheet, Text, ScrollView, View, ImageSourcePropType } from 'react-native'
 import TextButton from '@celo/react-components/components/TextButton.v2'
-import fontStyles from '@celo/react-components/styles/fonts.v2'
 import colorsV2 from '@celo/react-components/styles/colors.v2'
+import fontStyles from '@celo/react-components/styles/fonts.v2'
+import * as React from 'react'
+import { Image, ImageSourcePropType, ScrollView, StyleSheet, Text, View } from 'react-native'
+import Modal from 'src/components/Modal'
 
 interface Action {
   text: string
@@ -63,17 +63,17 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   actions: {
-    paddingTop: 16,
     flexDirection: 'row',
-    justifyContent: 'center',
+    justifyContent: 'space-around',
+    maxWidth: '100%',
+    flexWrap: 'wrap',
   },
   secondary: {
     color: colorsV2.gray4,
-    marginLeft: 24,
-    marginRight: 40,
+    paddingTop: 16,
   },
   primary: {
-    marginHorizontal: 16,
+    paddingTop: 16,
   },
   imageContainer: {
     marginBottom: 12,
