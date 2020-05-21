@@ -30,15 +30,15 @@ export default function HomeBenefits() {
           <View style={styles.links}>
             <Button
               kind={BTN.NAKED}
-              href={menuItems.PAPERS.link}
-              text={t('whitePaper')}
+              href={'https://medium.com/celoorg/an-introductory-guide-to-celo-b185c62d3067'}
+              text={t('readIntroGuide')}
               size={SIZE.normal}
               style={styles.link}
             />
             <Button
               kind={BTN.NAKED}
               href={menuItems.PAPERS.link}
-              text={t('watchVideo')}
+              text={t('whitePaper')}
               size={SIZE.normal}
               style={styles.link}
             />
