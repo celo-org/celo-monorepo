@@ -2,10 +2,14 @@ import { isValidAddress } from '@celo/utils/src/address'
 import { isEmpty } from 'lodash'
 import * as RNFS from 'react-native-fs'
 import Share from 'react-native-share'
-import { put } from 'redux-saga/effects'
+import { call, put } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { AddressToE164NumberType } from 'src/identity/reducer'
+import {
+  validateRecipientAddressFailure,
+  validateRecipientAddressSuccess,
+} from 'src/identity/actions'
+import { AddressToE164NumberType, E164NumberToAddressType } from 'src/identity/reducer'
 import { replace } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import {
@@ -15,6 +19,7 @@ import {
   RecipientKind,
 } from 'src/recipients/recipient'
 import { QrCode, storeLatestInRecents, SVG } from 'src/send/actions'
+import { TransactionDataInput } from 'src/send/SendAmount'
 import Logger from 'src/utils/Logger'
 
 export enum BarcodeTypes {
@@ -45,12 +50,46 @@ export async function shareSVGImage(svg: SVG) {
   })
 }
 
+function* handleSecureSend(
+  data: { address: string; e164PhoneNumber: string; displayName: string },
+  e164NumberToAddress: E164NumberToAddressType,
+  secureSendTxData: TransactionDataInput
+) {
+  if (!secureSendTxData.recipient.e164PhoneNumber) {
+    throw Error(`Invalid recipient type for Secure Send: ${secureSendTxData.recipient.kind}`)
+  }
+
+  const userScannedAddress = data.address.toLowerCase()
+  const { e164PhoneNumber } = secureSendTxData.recipient
+  const possibleRecievingAddresses = e164NumberToAddress[e164PhoneNumber]
+  // This should never happen. Secure Send is triggered when there are
+  // multiple addrresses for a given phone number
+  if (!possibleRecievingAddresses) {
+    throw Error("No addresses associated with recipient's phone number")
+  }
+
+  const possibleRecievingAddressesFormatted = possibleRecievingAddresses.map((address) =>
+    address.toLowerCase()
+  )
+  if (!possibleRecievingAddressesFormatted.includes(userScannedAddress)) {
+    yield put(showError(ErrorMessages.QR_FAILED_INVALID_RECIPIENT))
+    yield put(validateRecipientAddressFailure())
+    return false
+  }
+
+  yield put(validateRecipientAddressSuccess(e164PhoneNumber, userScannedAddress))
+  return true
+}
+
 export function* handleBarcode(
   barcode: QrCode,
   addressToE164Number: AddressToE164NumberType,
-  recipientCache: NumberToRecipient
+  recipientCache: NumberToRecipient,
+  e164NumberToAddress: E164NumberToAddressType,
+  secureSendTxData?: TransactionDataInput
 ) {
   let data: { address: string; e164PhoneNumber: string; displayName: string } | undefined
+
   try {
     data = JSON.parse(barcode.data)
   } catch (e) {
@@ -64,6 +103,14 @@ export function* handleBarcode(
     yield put(showError(ErrorMessages.QR_FAILED_INVALID_ADDRESS))
     return
   }
+
+  if (secureSendTxData) {
+    const success = yield call(handleSecureSend, data, e164NumberToAddress, secureSendTxData)
+    if (!success) {
+      return
+    }
+  }
+
   if (typeof data.e164PhoneNumber !== 'string') {
     // Default for invalid e164PhoneNumber
     data.e164PhoneNumber = ''
@@ -90,5 +137,9 @@ export function* handleBarcode(
       }
   yield put(storeLatestInRecents(recipient))
 
-  replace(Screens.SendAmount, { recipient })
+  if (secureSendTxData) {
+    replace(Screens.SendConfirmation, { transactionData: secureSendTxData })
+  } else {
+    replace(Screens.SendAmount, { recipient })
+  }
 }

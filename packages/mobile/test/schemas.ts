@@ -147,9 +147,7 @@ export const vNeg1Schema = {
   },
 }
 
-export const v0Schema = vNeg1Schema
-
-export const v1Schema = {
+export const v0Schema = {
   app: {
     inviteCodeEntered: false,
     loggedIn: false,
@@ -290,6 +288,15 @@ export const v1Schema = {
       lastTimeUpdated: 0,
     },
     tobinTax: '0',
+  },
+}
+
+export const v1Schema = {
+  ...v0Schema,
+  identity: {
+    ...v0Schema.identity,
+    isValidRecipient: false,
+    secureSendPhoneNumberMapping: {},
   },
 }
 

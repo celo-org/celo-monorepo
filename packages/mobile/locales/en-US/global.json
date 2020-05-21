@@ -97,6 +97,8 @@
   "update": "Update",
   "qrFailedNoAddress": "QR code read failed. Reason: wallet address not found.",
   "qrFailedInvalidAddress": "QR code read failed. Reason: wallet address invalid.",
+  "qrFailedInvalidRecipient": "QR code does not belong to the selected recipient",
+  "qrFailedNoPhoneNumber": "QR code is not associated with your contact's phone number",
   "corruptedChainDeleted": "Corrupted chain data has been deleted, please restart the app",
   "web3FailedToSync": "Failing to sync, check your network connection",
   "errorDuringSync": "Error occurred during sync, please try again later",
@@ -150,5 +152,13 @@
     "twenty-eighth",
     "twenty-ninth",
     "thirtieth"
-  ]
+  ],
+  "addressValidationError": "The account information entered was not valid",
+  "addressValidationNoMatch": "The account information entered does not match any associated with your contact",
+  "addressValidationFullPoorlyFormatted": "Account numbers begin with \"0x\", contain only numbers and letters, and are 42 characters long. Press the link below for help",
+  "addressValidationPartialPoorlyFormatted": "Account numbers only contain numbers and letters, please provide the last 4 digits. Press the link below for help",
+  "addressValidationFullOwnAddress": "Please enter your contact's account number, not your own. Press the link below for help",
+  "addressValidationPartialOwnAddress": "Please enter the last 4 digits of your contact's account number, not your own. Press the link below for help",
+  "helpFindAccount": "Help your contact find their account number",
+  "close": "Close"
 }
