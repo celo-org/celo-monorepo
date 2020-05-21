@@ -154,8 +154,12 @@ export function* fetchAddressesAndValidateSaga({ e164Number }: FetchAddressesAnd
       updateE164PhoneNumberAddresses(e164NumberToAddressUpdates, addressToE164NumberUpdates)
     )
   } catch (error) {
-    Logger.error(TAG + '@fetchAddressesAndValidate', `Error fetching addresses`, error)
-    yield put(showError(ErrorMessages.ADDRESS_LOOKUP_FAILURE))
+    Logger.error(TAG + '@fetchAddressesAndValidateSaga', `Error fetching addresses`, error)
+    if (error.message in ErrorMessages) {
+      yield put(showError(error.message))
+    } else {
+      yield put(showError(ErrorMessages.ADDRESS_LOOKUP_FAILURE))
+    }
   }
 }
 

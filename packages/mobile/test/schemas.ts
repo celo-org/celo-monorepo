@@ -291,7 +291,7 @@ export const v0Schema = {
   },
 }
 
-const v1Schema = {
+export const v1Schema = {
   ...v0Schema,
   identity: {
     ...v0Schema.identity,
