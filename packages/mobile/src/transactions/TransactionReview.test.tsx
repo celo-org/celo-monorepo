@@ -25,7 +25,7 @@ describe('TransactionReview', () => {
       name: Screens.TransactionReview as Screens.TransactionReview,
       key: '',
       params: {
-        transferConfirmationProps: {
+        confirmationProps: {
           address: mockAccount,
           comment: 'Pay up!',
           amount: {

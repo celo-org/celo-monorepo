@@ -123,8 +123,7 @@ export type StackParamList = {
   [Screens.TabNavigator]: {}
   [Screens.TransactionReview]: {
     reviewProps: ReviewProps
-    transferConfirmationProps?: TransferConfirmationCardProps
-    exchangeConfirmationProps?: ExchangeConfirmationCardProps
+    confirmationProps: TransferConfirmationCardProps | ExchangeConfirmationCardProps
   }
   [Screens.UpgradeScreen]: {}
   [Screens.ValidateRecipientIntro]: {

@@ -5,7 +5,9 @@ import { StyleSheet } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import { TokenTransactionType } from 'src/apollo/types'
-import ExchangeConfirmationCard from 'src/exchange/ExchangeConfirmationCard'
+import ExchangeConfirmationCard, {
+  ExchangeConfirmationCardProps,
+} from 'src/exchange/ExchangeConfirmationCard'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { SecureSendPhoneNumberMapping } from 'src/identity/reducer'
 import { navigateHome } from 'src/navigator/NavigationService'
@@ -28,15 +30,20 @@ export interface ReviewProps {
 type OwnProps = StackScreenProps<StackParamList, Screens.TransactionReview>
 type Props = WithTranslation & OwnProps & StateProps
 
+const isTransferConfirmationCardProps = (
+  confirmationProps: TransferConfirmationCardProps | ExchangeConfirmationCardProps
+): confirmationProps is TransferConfirmationCardProps =>
+  (confirmationProps as TransferConfirmationCardProps).address !== undefined
+
 const hasAddressChanged = (
-  transferConfirmationProps: TransferConfirmationCardProps | undefined,
+  confirmationProps: TransferConfirmationCardProps | ExchangeConfirmationCardProps,
   secureSendPhoneNumberMapping: SecureSendPhoneNumberMapping
 ) => {
-  if (!transferConfirmationProps) {
+  if (!isTransferConfirmationCardProps(confirmationProps)) {
     return false
   }
 
-  const { address, e164PhoneNumber } = transferConfirmationProps
+  const { address, e164PhoneNumber } = confirmationProps
   if (!address || !e164PhoneNumber || !secureSendPhoneNumberMapping[e164PhoneNumber]) {
     return false
   }
@@ -50,16 +57,11 @@ const hasAddressChanged = (
 }
 
 const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
-  const { transferConfirmationProps } = ownProps.route.params
+  const { confirmationProps } = ownProps.route.params
   const { secureSendPhoneNumberMapping } = state.identity
-  const addressHasChanged = hasAddressChanged(
-    transferConfirmationProps,
-    secureSendPhoneNumberMapping
-  )
+  const addressHasChanged = hasAddressChanged(confirmationProps, secureSendPhoneNumberMapping)
 
-  return {
-    addressHasChanged,
-  }
+  return { addressHasChanged }
 }
 
 class TransactionReview extends React.PureComponent<Props> {
@@ -84,9 +86,7 @@ class TransactionReview extends React.PureComponent<Props> {
   }
 
   getConfirmationProps = () => {
-    const confirmationProps =
-      this.props.route.params.transferConfirmationProps ||
-      this.props.route.params.exchangeConfirmationProps
+    const { confirmationProps } = this.props.route.params
 
     if (confirmationProps === undefined) {
       throw new Error('Missing confirmation props')
