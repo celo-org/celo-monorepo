@@ -83,7 +83,9 @@ export default function TransferReviewCard({
           <Text>{`${validatedRecipientAddress.slice(0, 6)}...${validatedRecipientAddress.slice(
             -4
           )}`}</Text>
-          <TextButton onPress={onEditAddressClick}>{t('edit')}</TextButton>
+          <TextButton testID={'accountEditButton'} onPress={onEditAddressClick}>
+            {t('edit')}
+          </TextButton>
         </View>
       )}
       <CurrencyDisplay type={DisplayType.Big} style={styles.amount} amount={amount} />
