@@ -105,5 +105,6 @@
     "body1": "Account numbers (also known as addresses) are located in the menu. From the Home screen, open the menu by tapping the icon in the top left corner.",
     "body2": "The account number is near the bottom of the menu.",
     "body3": "Account numbers begin with \"0x\" and are 42 characters long"
-  }
+  },
+  "transferAddressChanged": "This contact changed their account number since the transaction. This payment was sent to:"
 }
