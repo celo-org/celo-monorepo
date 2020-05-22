@@ -3,6 +3,7 @@ import { useNavigation } from '@react-navigation/native'
 import * as React from 'react'
 import { StyleSheet, TouchableOpacity, View } from 'react-native'
 import { Line, Svg } from 'react-native-svg'
+import Logo from 'src/icons/Logo.v2'
 
 const Hamburger = () => {
   return (
@@ -48,6 +49,10 @@ const DrawerTopBar = () => {
       <TouchableOpacity style={styles.hamburger} onPress={navigation.toggleDrawer}>
         <Hamburger />
       </TouchableOpacity>
+      <View style={styles.logo}>
+        <Logo />
+      </View>
+      <View style={styles.spacer} />
     </View>
   )
 }
@@ -58,14 +63,20 @@ const styles = StyleSheet.create({
     height: 62,
     backgroundColor: colorsV2.white,
     alignItems: 'flex-end',
-    justifyContent: 'flex-start',
+    justifyContent: 'space-between',
     borderBottomWidth: 1,
     borderBottomColor: colorsV2.gray2,
   },
   hamburger: {
-    padding: 10,
-    marginLeft: 2,
+    padding: 8,
+    marginLeft: 4,
     marginBottom: 0,
+  },
+  logo: {
+    marginBottom: 13,
+  },
+  spacer: {
+    width: 45,
   },
 })
 
