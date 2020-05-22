@@ -12,8 +12,6 @@ Abstract class representing a remote wallet that requires async initialization
 
   ↳ [LedgerWallet](_wallets_ledger_wallet_.ledgerwallet.md)
 
-  ↳ [RpcWallet](_wallets_rpc_wallet_.rpcwallet.md)
-
 ## Implements
 
 * [Wallet](../interfaces/_wallets_wallet_.wallet.md)

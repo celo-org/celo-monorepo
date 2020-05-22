@@ -146,6 +146,7 @@ export function* getOrCreateAccount() {
     return account
   }
 
+  let privateKey: string | undefined
   try {
     Logger.debug(TAG + '@getOrCreateAccount', 'Creating a new account')
 
@@ -168,7 +169,7 @@ export function* getOrCreateAccount() {
     }
 
     const keys = yield call(generateKeys, mnemonic, undefined, undefined, bip39)
-    const privateKey = keys.privateKey
+    privateKey = keys.privateKey
     if (!privateKey) {
       throw new Error('Failed to convert mnemonic to hex')
     }
@@ -182,8 +183,10 @@ export function* getOrCreateAccount() {
 
     return accountAddress
   } catch (error) {
+    if (privateKey && !error.message.contains(privateKey)) {
+      Sentry.captureException(error)
+    }
     // Capturing error in sentry for now as we debug backup key issue
-    Sentry.captureException(error)
     Logger.error(TAG + '@getOrCreateAccount', 'Error creating account', error)
     throw new Error(ErrorMessages.ACCOUNT_SETUP_FAILED)
   }

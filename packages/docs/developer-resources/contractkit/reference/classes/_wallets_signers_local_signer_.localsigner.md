@@ -54,7 +54,7 @@ ___
 
 ▸ **signPersonalMessage**(`data`: string): *Promise‹object›*
 
-*Defined in [contractkit/src/wallets/signers/local-signer.ts:36](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/local-signer.ts#L36)*
+*Defined in [contractkit/src/wallets/signers/local-signer.ts:31](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/signers/local-signer.ts#L31)*
 
 **Parameters:**
 

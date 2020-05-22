@@ -2,13 +2,12 @@
 
 ## Hierarchy
 
-  ↳ [RemoteWallet](_wallets_remote_wallet_.remotewallet.md)
+* [WalletBase](_wallets_wallet_.walletbase.md)
 
   ↳ **RpcWallet**
 
 ## Implements
 
-* [Wallet](../interfaces/_wallets_wallet_.wallet.md)
 * [Wallet](../interfaces/_wallets_wallet_.wallet.md)
 
 ## Index
@@ -17,18 +16,12 @@
 
 * [constructor](_wallets_rpc_wallet_.rpcwallet.md#constructor)
 
-### Properties
-
-* [rpc](_wallets_rpc_wallet_.rpcwallet.md#rpc)
-
 ### Methods
 
 * [addAccount](_wallets_rpc_wallet_.rpcwallet.md#addaccount)
 * [getAccounts](_wallets_rpc_wallet_.rpcwallet.md#getaccounts)
 * [hasAccount](_wallets_rpc_wallet_.rpcwallet.md#hasaccount)
-* [init](_wallets_rpc_wallet_.rpcwallet.md#init)
 * [isAccountUnlocked](_wallets_rpc_wallet_.rpcwallet.md#isaccountunlocked)
-* [loadAccountSigners](_wallets_rpc_wallet_.rpcwallet.md#loadaccountsigners)
 * [signPersonalMessage](_wallets_rpc_wallet_.rpcwallet.md#signpersonalmessage)
 * [signTransaction](_wallets_rpc_wallet_.rpcwallet.md#signtransaction)
 * [signTypedData](_wallets_rpc_wallet_.rpcwallet.md#signtypeddata)
@@ -40,7 +33,7 @@
 
 \+ **new RpcWallet**(`_provider`: provider): *[RpcWallet](_wallets_rpc_wallet_.rpcwallet.md)*
 
-*Defined in [contractkit/src/wallets/rpc-wallet.ts:18](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/rpc-wallet.ts#L18)*
+*Defined in [contractkit/src/wallets/rpc-wallet.ts:17](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/rpc-wallet.ts#L17)*
 
 **Parameters:**
 
@@ -50,21 +43,13 @@ Name | Type |
 
 **Returns:** *[RpcWallet](_wallets_rpc_wallet_.rpcwallet.md)*
 
-## Properties
-
-###  rpc
-
-• **rpc**: *[RpcCaller](../interfaces/_utils_rpc_caller_.rpccaller.md)*
-
-*Defined in [contractkit/src/wallets/rpc-wallet.ts:18](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/rpc-wallet.ts#L18)*
-
 ## Methods
 
 ###  addAccount
 
 ▸ **addAccount**(`privateKey`: string, `passphrase`: string): *Promise‹string›*
 
-*Defined in [contractkit/src/wallets/rpc-wallet.ts:37](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/rpc-wallet.ts#L37)*
+*Defined in [contractkit/src/wallets/rpc-wallet.ts:24](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/rpc-wallet.ts#L24)*
 
 **Parameters:**
 
@@ -81,13 +66,11 @@ ___
 
 ▸ **getAccounts**(): *[Address](../modules/_base_.md#address)[]*
 
-*Inherited from [RemoteWallet](_wallets_remote_wallet_.remotewallet.md).[getAccounts](_wallets_remote_wallet_.remotewallet.md#getaccounts)*
+*Inherited from [WalletBase](_wallets_wallet_.walletbase.md).[getAccounts](_wallets_wallet_.walletbase.md#getaccounts)*
 
-*Overrides [WalletBase](_wallets_wallet_.walletbase.md).[getAccounts](_wallets_wallet_.walletbase.md#getaccounts)*
+*Defined in [contractkit/src/wallets/wallet.ts:29](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L29)*
 
-*Defined in [contractkit/src/wallets/remote-wallet.ts:61](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/remote-wallet.ts#L61)*
-
-Get a list of accounts in the remote wallet
+Gets a list of accounts that have been registered
 
 **Returns:** *[Address](../modules/_base_.md#address)[]*
 
@@ -97,13 +80,11 @@ ___
 
 ▸ **hasAccount**(`address?`: [Address](../modules/_base_.md#address)): *boolean*
 
-*Inherited from [RemoteWallet](_wallets_remote_wallet_.remotewallet.md).[hasAccount](_wallets_remote_wallet_.remotewallet.md#hasaccount)*
+*Inherited from [WalletBase](_wallets_wallet_.walletbase.md).[hasAccount](_wallets_wallet_.walletbase.md#hasaccount)*
 
-*Overrides [WalletBase](_wallets_wallet_.walletbase.md).[hasAccount](_wallets_wallet_.walletbase.md#hasaccount)*
+*Defined in [contractkit/src/wallets/wallet.ts:37](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L37)*
 
-*Defined in [contractkit/src/wallets/remote-wallet.ts:70](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/remote-wallet.ts#L70)*
-
-Returns true if account is in the remote wallet
+Returns true if account has been registered
 
 **Parameters:**
 
@@ -115,26 +96,11 @@ Name | Type | Description |
 
 ___
 
-###  init
-
-▸ **init**(): *Promise‹void›*
-
-*Inherited from [RemoteWallet](_wallets_remote_wallet_.remotewallet.md).[init](_wallets_remote_wallet_.remotewallet.md#init)*
-
-*Defined in [contractkit/src/wallets/remote-wallet.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/remote-wallet.ts#L20)*
-
-Discovers wallet accounts and caches results in memory
-Idempotent to ensure multiple calls are benign
-
-**Returns:** *Promise‹void›*
-
-___
-
 ###  isAccountUnlocked
 
 ▸ **isAccountUnlocked**(`address`: string): *boolean*
 
-*Defined in [contractkit/src/wallets/rpc-wallet.ts:54](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/rpc-wallet.ts#L54)*
+*Defined in [contractkit/src/wallets/rpc-wallet.ts:41](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/rpc-wallet.ts#L41)*
 
 **Parameters:**
 
@@ -146,25 +112,15 @@ Name | Type |
 
 ___
 
-###  loadAccountSigners
-
-▸ **loadAccountSigners**(): *Promise‹Map‹string, [Signer](../interfaces/_wallets_signers_signer_.signer.md)››*
-
-*Defined in [contractkit/src/wallets/rpc-wallet.ts:25](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/rpc-wallet.ts#L25)*
-
-**Returns:** *Promise‹Map‹string, [Signer](../interfaces/_wallets_signers_signer_.signer.md)››*
-
-___
-
 ###  signPersonalMessage
 
 ▸ **signPersonalMessage**(`address`: [Address](../modules/_base_.md#address), `data`: string): *Promise‹string›*
 
-*Inherited from [RemoteWallet](_wallets_remote_wallet_.remotewallet.md).[signPersonalMessage](_wallets_remote_wallet_.remotewallet.md#signpersonalmessage)*
+*Inherited from [WalletBase](_wallets_wallet_.walletbase.md).[signPersonalMessage](_wallets_wallet_.walletbase.md#signpersonalmessage)*
 
-*Overrides [WalletBase](_wallets_wallet_.walletbase.md).[signPersonalMessage](_wallets_wallet_.walletbase.md#signpersonalmessage)*
+*Defined in [contractkit/src/wallets/wallet.ts:81](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L81)*
 
-*Defined in [contractkit/src/wallets/remote-wallet.ts:89](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/remote-wallet.ts#L89)*
+Sign a personal Ethereum signed message.
 
 **Parameters:**
 
@@ -183,9 +139,9 @@ ___
 
 ▸ **signTransaction**(`txParams`: Tx): *Promise‹EncodedTransaction›*
 
-*Overrides [RemoteWallet](_wallets_remote_wallet_.remotewallet.md).[signTransaction](_wallets_remote_wallet_.remotewallet.md#signtransaction)*
+*Overrides [WalletBase](_wallets_wallet_.walletbase.md).[signTransaction](_wallets_wallet_.walletbase.md#signtransaction)*
 
-*Defined in [contractkit/src/wallets/rpc-wallet.ts:64](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/rpc-wallet.ts#L64)*
+*Defined in [contractkit/src/wallets/rpc-wallet.ts:51](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/rpc-wallet.ts#L51)*
 
 Gets the signer based on the 'from' field in the tx body
 
@@ -205,11 +161,11 @@ ___
 
 ▸ **signTypedData**(`address`: [Address](../modules/_base_.md#address), `typedData`: [EIP712TypedData](../interfaces/_utils_sign_typed_data_utils_.eip712typeddata.md)): *Promise‹string›*
 
-*Inherited from [RemoteWallet](_wallets_remote_wallet_.remotewallet.md).[signTypedData](_wallets_remote_wallet_.remotewallet.md#signtypeddata)*
+*Inherited from [WalletBase](_wallets_wallet_.walletbase.md).[signTypedData](_wallets_wallet_.walletbase.md#signtypeddata)*
 
-*Overrides [WalletBase](_wallets_wallet_.walletbase.md).[signTypedData](_wallets_wallet_.walletbase.md#signtypeddata)*
+*Defined in [contractkit/src/wallets/wallet.ts:98](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/wallet.ts#L98)*
 
-*Defined in [contractkit/src/wallets/remote-wallet.ts:99](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/remote-wallet.ts#L99)*
+Sign an EIP712 Typed Data message.
 
 **Parameters:**
 
@@ -228,7 +184,7 @@ ___
 
 ▸ **unlockAccount**(`address`: string, `passphrase`: string, `duration`: number): *Promise‹void›*
 
-*Defined in [contractkit/src/wallets/rpc-wallet.ts:49](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/rpc-wallet.ts#L49)*
+*Defined in [contractkit/src/wallets/rpc-wallet.ts:36](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wallets/rpc-wallet.ts#L36)*
 
 **Parameters:**
 

@@ -9,6 +9,7 @@
 ### Functions
 
 * [chainIdTransformationForSigning](_utils_signing_utils_.md#chainidtransformationforsigning)
+* [decodeSig](_utils_signing_utils_.md#decodesig)
 * [encodeTransaction](_utils_signing_utils_.md#encodetransaction)
 * [getHashFromEncoded](_utils_signing_utils_.md#gethashfromencoded)
 * [recoverMessageSigner](_utils_signing_utils_.md#recovermessagesigner)
@@ -31,6 +32,28 @@ Name | Type |
 `chainId` | number |
 
 **Returns:** *number*
+
+___
+
+###  decodeSig
+
+▸ **decodeSig**(`sig`: any): *object*
+
+*Defined in [contractkit/src/utils/signing-utils.ts:209](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/utils/signing-utils.ts#L209)*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`sig` | any |
+
+**Returns:** *object*
+
+* **r**: *Buffer‹›* = ethUtil.toBuffer(r) as Buffer
+
+* **s**: *Buffer‹›* = ethUtil.toBuffer(s) as Buffer
+
+* **v**: *number* = parseInt(v, 16)
 
 ___
 

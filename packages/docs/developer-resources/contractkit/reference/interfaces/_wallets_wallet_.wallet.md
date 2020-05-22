@@ -17,7 +17,6 @@
 * [RemoteWallet](../classes/_wallets_remote_wallet_.remotewallet.md)
 * [RemoteWallet](../classes/_wallets_remote_wallet_.remotewallet.md)
 * [RpcWallet](../classes/_wallets_rpc_wallet_.rpcwallet.md)
-* [RpcWallet](../classes/_wallets_rpc_wallet_.rpcwallet.md)
 * [WalletBase](../classes/_wallets_wallet_.walletbase.md)
 
 ## Index

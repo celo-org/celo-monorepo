@@ -1,23 +1,25 @@
-// @ts-ignore-next-line
-import { account as Account } from 'eth-lib'
-import * as ethUtil from 'ethereumjs-util'
 import { InterceptedMethods } from '../../providers/celo-provider'
 import { RpcCaller } from '../../utils/rpc-caller'
-import { RLPEncodedTx } from '../../utils/signing-utils'
+import { decodeSig, RLPEncodedTx } from '../../utils/signing-utils'
 import { Signer } from './signer'
-
-const decodeSig = (sig: any) => {
-  const [v, r, s] = Account.decodeSignature(sig)
-  return {
-    v: parseInt(v, 16),
-    r: ethUtil.toBuffer(r) as Buffer,
-    s: ethUtil.toBuffer(s) as Buffer,
-  }
-}
 
 const currentTimeInSeconds = () => Math.round(Date.now() / 1000)
 
+/**
+ * Implements the signer interface on top of the JSON-RPC interface.
+ */
 export class RpcSigner implements Signer {
+  /**
+   * Construct a new instance of the RPC signer
+   *
+   * @param rpc RPC caller instance
+   * @param account Account address derived from the private key to be called in init
+   * @param unlockBufferSeconds Number of seconds to shrink the unlocked duration by to account for
+   * latency and timing inconsistencies on the node
+   * @param unlockTime Timestamp in seconds when the signer was last unlocked
+   * @param unlockDuration Number of seconds that the signer was last unlocked for
+   *
+   */
   constructor(
     protected rpc: RpcCaller,
     protected account: string,
@@ -29,6 +31,9 @@ export class RpcSigner implements Signer {
   init = (privateKey: string, passphrase: string) =>
     this.rpc.call('personal_importRawKey', [privateKey, passphrase])
 
+  /**
+   * @dev addToV is unused because the geth JSON-RPC adds this.
+   */
   async signTransaction(
     _: number,
     encodedTx: RLPEncodedTx

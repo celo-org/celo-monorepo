@@ -53,6 +53,8 @@ export class RpcWallet extends WalletBase {
     // Get the signer from the 'from' field
     const fromAddress = txParams.from!.toString()
     const signer = this.getSigner(fromAddress)
+    // addToV set to 0 because geth RPC performs EIP155 replay prevention by default
+    // see: https://github.com/celo-org/celo-blockchain/blob/master/core/types/transaction_signing.go#L148
     const signature = await signer.signTransaction(0, rlpEncoded)
     return encodeTransaction(rlpEncoded, signature)
   }

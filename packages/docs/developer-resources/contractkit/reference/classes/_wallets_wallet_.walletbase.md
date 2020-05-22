@@ -8,6 +8,8 @@
 
   ↳ [RemoteWallet](_wallets_remote_wallet_.remotewallet.md)
 
+  ↳ [RpcWallet](_wallets_rpc_wallet_.rpcwallet.md)
+
 ## Implements
 
 * [Wallet](../interfaces/_wallets_wallet_.wallet.md)

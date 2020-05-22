@@ -1,5 +1,8 @@
 import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
 import { normalizeAddressWith0x, privateKeyToAddress } from '@celo/utils/src/address'
+import { verifySignature } from '@celo/utils/src/signatureUtils'
+import { EncodedTransaction, Tx } from 'web3-core'
+import { recoverTransaction, verifyEIP712TypedDataSigner } from '../utils/signing-utils'
 import { RpcWallet } from './rpc-wallet'
 
 export const CHAIN_ID = 44378
@@ -103,130 +106,136 @@ testWithGanache('rpc-wallet', (web3) => {
             expect(e.message).toContain('RpcSigner unlock failed')
           }
         })
+
+        test('suceeds if you use the correct passphrase', async () => {
+          await rpcWallet.unlockAccount(ACCOUNT_ADDRESS1, PASSPHRASE, DURATION)
+          const unlocked = rpcWallet.isAccountUnlocked(ACCOUNT_ADDRESS1)
+          expect(unlocked).toBeTruthy()
+        })
       })
 
       // TODO(yorke): ENABLE WHEN GANACHE SUPPORTS THESE METHODS PROPERLY
-      // describe('signing', () => {
-      //   describe('using a locked address', () => {
-      //     const lockedAddress: string = ACCOUNT_ADDRESS2
-      //     const celoTransaction: Tx = {
-      //       from: lockedAddress,
-      //       to: ACCOUNT_ADDRESS1,
-      //       chainId: 2,
-      //       value: web3.utils.toWei('1', 'ether'),
-      //       nonce: 0,
-      //       gas: '10',
-      //       gasPrice: '99',
-      //       feeCurrency: '0x124356',
-      //       gatewayFeeRecipient: '0x1234',
-      //       gatewayFee: '0x5678',
-      //       data: '0xabcdef',
-      //     }
+      describe.skip('signing', () => {
+        describe('using a locked address', () => {
+          const lockedAddress: string = ACCOUNT_ADDRESS2
+          const celoTransaction: Tx = {
+            from: lockedAddress,
+            to: ACCOUNT_ADDRESS1,
+            chainId: 2,
+            value: web3.utils.toWei('1', 'ether'),
+            nonce: 0,
+            gas: '10',
+            gasPrice: '99',
+            feeCurrency: '0x124356',
+            gatewayFeeRecipient: '0x1234',
+            gatewayFee: '0x5678',
+            data: '0xabcdef',
+          }
 
-      //     test('fails calling signTransaction', async () => {
-      //       await expect(await rpcWallet.signTransaction(celoTransaction)).rejects.toThrowError()
-      //     })
+          test('fails calling signTransaction', async () => {
+            await expect(await rpcWallet.signTransaction(celoTransaction)).rejects.toThrowError()
+          })
 
-      //     test('fails calling signPersonalMessage', async () => {
-      //       const hexStr: string = '0xa1'
-      //       await expect(
-      //         await rpcWallet.signPersonalMessage(lockedAddress, hexStr)
-      //       ).rejects.toThrowError()
-      //     })
+          test('fails calling signPersonalMessage', async () => {
+            const hexStr: string = '0xa1'
+            await expect(
+              await rpcWallet.signPersonalMessage(lockedAddress, hexStr)
+            ).rejects.toThrowError()
+          })
 
-      //     test('fails calling signTypedData', async () => {
-      //       await expect(
-      //         await rpcWallet.signTypedData(lockedAddress, TYPED_DATA)
-      //       ).rejects.toThrowError()
-      //     })
-      //   })
+          test('fails calling signTypedData', async () => {
+            await expect(
+              await rpcWallet.signTypedData(lockedAddress, TYPED_DATA)
+            ).rejects.toThrowError()
+          })
+        })
 
-      //   describe('using an unlocked address', () => {
-      //     beforeAll(async () => {
-      //       await rpcWallet.unlockAccount(ACCOUNT_ADDRESS1, PASSPHRASE, DURATION)
-      //     })
+        describe('using an unlocked address', () => {
+          beforeAll(async () => {
+            await rpcWallet.unlockAccount(ACCOUNT_ADDRESS1, PASSPHRASE, DURATION)
+          })
 
-      //     describe('when calling signTransaction', () => {
-      //       let celoTransaction: Tx
+          describe('when calling signTransaction', () => {
+            let celoTransaction: Tx
 
-      //       beforeEach(() => {
-      //         celoTransaction = {
-      //           from: ACCOUNT_ADDRESS1,
-      //           to: ACCOUNT_ADDRESS2,
-      //           chainId: CHAIN_ID,
-      //           value: web3.utils.toWei('1', 'ether'),
-      //           nonce: 0,
-      //           gas: '10',
-      //           gasPrice: '99',
-      //           feeCurrency: '0x',
-      //           gatewayFeeRecipient: '0x1234',
-      //           gatewayFee: '0x5678',
-      //           data: '0xabcdef',
-      //         }
-      //       })
+            beforeEach(() => {
+              celoTransaction = {
+                from: ACCOUNT_ADDRESS1,
+                to: ACCOUNT_ADDRESS2,
+                chainId: CHAIN_ID,
+                value: web3.utils.toWei('1', 'ether'),
+                nonce: 0,
+                gas: '10',
+                gasPrice: '99',
+                feeCurrency: '0x',
+                gatewayFeeRecipient: '0x1234',
+                gatewayFee: '0x5678',
+                data: '0xabcdef',
+              }
+            })
 
-      //       test('succeeds', async () => {
-      //         await expect(
-      //           await rpcWallet.signTransaction(celoTransaction)
-      //         ).resolves.not.toBeUndefined()
-      //       })
+            test('succeeds', async () => {
+              await expect(
+                await rpcWallet.signTransaction(celoTransaction)
+              ).resolves.not.toBeUndefined()
+            })
 
-      //       test('with same signer', async () => {
-      //         const signedTx: EncodedTransaction = await rpcWallet.signTransaction(celoTransaction)
-      //         const [, recoveredSigner] = recoverTransaction(signedTx.raw)
-      //         expect(normalizeAddressWith0x(recoveredSigner)).toBe(
-      //           normalizeAddressWith0x(ACCOUNT_ADDRESS1)
-      //         )
-      //       })
+            test('with same signer', async () => {
+              const signedTx: EncodedTransaction = await rpcWallet.signTransaction(celoTransaction)
+              const [, recoveredSigner] = recoverTransaction(signedTx.raw)
+              expect(normalizeAddressWith0x(recoveredSigner)).toBe(
+                normalizeAddressWith0x(ACCOUNT_ADDRESS1)
+              )
+            })
 
-      //       // https://github.com/ethereum/go-ethereum/blob/38aab0aa831594f31d02c9f02bfacc0bef48405d/rlp/decode.go#L664
-      //       test('signature with 0x00 prefix is canonicalized', async () => {
-      //         // This tx is carefully constructed to produce an S value with the first byte as 0x00
-      //         const celoTransactionZeroPrefix = {
-      //           from: ACCOUNT_ADDRESS1,
-      //           to: ACCOUNT_ADDRESS2,
-      //           chainId: CHAIN_ID,
-      //           value: web3.utils.toWei('1', 'ether'),
-      //           nonce: 65,
-      //           gas: '10',
-      //           gasPrice: '99',
-      //           feeCurrency: '0x',
-      //           gatewayFeeRecipient: '0x1234',
-      //           gatewayFee: '0x5678',
-      //           data: '0xabcdef',
-      //         }
+            // https://github.com/ethereum/go-ethereum/blob/38aab0aa831594f31d02c9f02bfacc0bef48405d/rlp/decode.go#L664
+            test('signature with 0x00 prefix is canonicalized', async () => {
+              // This tx is carefully constructed to produce an S value with the first byte as 0x00
+              const celoTransactionZeroPrefix = {
+                from: ACCOUNT_ADDRESS1,
+                to: ACCOUNT_ADDRESS2,
+                chainId: CHAIN_ID,
+                value: web3.utils.toWei('1', 'ether'),
+                nonce: 65,
+                gas: '10',
+                gasPrice: '99',
+                feeCurrency: '0x',
+                gatewayFeeRecipient: '0x1234',
+                gatewayFee: '0x5678',
+                data: '0xabcdef',
+              }
 
-      //         const signedTx: EncodedTransaction = await rpcWallet.signTransaction(
-      //           celoTransactionZeroPrefix
-      //         )
-      //         expect(signedTx.tx.s.startsWith('0x00')).toBeFalsy()
-      //         const [, recoveredSigner] = recoverTransaction(signedTx.raw)
-      //         expect(normalizeAddressWith0x(recoveredSigner)).toBe(
-      //           normalizeAddressWith0x(ACCOUNT_ADDRESS1)
-      //         )
-      //       })
-      //     })
+              const signedTx: EncodedTransaction = await rpcWallet.signTransaction(
+                celoTransactionZeroPrefix
+              )
+              expect(signedTx.tx.s.startsWith('0x00')).toBeFalsy()
+              const [, recoveredSigner] = recoverTransaction(signedTx.raw)
+              expect(normalizeAddressWith0x(recoveredSigner)).toBe(
+                normalizeAddressWith0x(ACCOUNT_ADDRESS1)
+              )
+            })
+          })
 
-      //     describe('when calling signPersonalMessage', () => {
-      //       test('succeeds', async () => {
-      //         const hexStr: string = ACCOUNT_ADDRESS2
-      //         const signedMessage = await rpcWallet.signPersonalMessage(ACCOUNT_ADDRESS1, hexStr)
-      //         expect(signedMessage).not.toBeUndefined()
-      //         const valid = verifySignature(hexStr, signedMessage, ACCOUNT_ADDRESS1)
-      //         expect(valid).toBeTruthy()
-      //       })
-      //     })
+          describe('when calling signPersonalMessage', () => {
+            test('succeeds', async () => {
+              const hexStr: string = ACCOUNT_ADDRESS2
+              const signedMessage = await rpcWallet.signPersonalMessage(ACCOUNT_ADDRESS1, hexStr)
+              expect(signedMessage).not.toBeUndefined()
+              const valid = verifySignature(hexStr, signedMessage, ACCOUNT_ADDRESS1)
+              expect(valid).toBeTruthy()
+            })
+          })
 
-      //     describe('when calling signTypedData', () => {
-      //       test('succeeds', async () => {
-      //         const signedMessage = await rpcWallet.signTypedData(ACCOUNT_ADDRESS1, TYPED_DATA)
-      //         expect(signedMessage).not.toBeUndefined()
-      //         const valid = verifyEIP712TypedDataSigner(TYPED_DATA, signedMessage, ACCOUNT_ADDRESS1)
-      //         expect(valid).toBeTruthy()
-      //       })
-      //     })
-      //   })
-      // })
+          describe('when calling signTypedData', () => {
+            test('succeeds', async () => {
+              const signedMessage = await rpcWallet.signTypedData(ACCOUNT_ADDRESS1, TYPED_DATA)
+              expect(signedMessage).not.toBeUndefined()
+              const valid = verifyEIP712TypedDataSigner(TYPED_DATA, signedMessage, ACCOUNT_ADDRESS1)
+              expect(valid).toBeTruthy()
+            })
+          })
+        })
+      })
     })
   })
 })
