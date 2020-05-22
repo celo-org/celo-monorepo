@@ -208,7 +208,6 @@ export enum CommonValues {
 // TODO(nitya): separate this out by event name
 export const PROPERTY_PATH_WHITELIST = [
   'address',
-  'backSpaceTaps',
   'component',
   'countryCode',
   'cta',
@@ -219,7 +218,6 @@ export const PROPERTY_PATH_WHITELIST = [
   'exchangeInputAmount',
   'exchangeRate',
   'fullName',
-  'firstWordToSubmitTime',
   'goldBalance',
   'goldPendingBalance',
   'inviteCode',
