@@ -244,7 +244,7 @@ export function EngageAsValidator() {
           screen={screen}
           text={t('engage.tutorial.copy')}
           title={t('engage.tutorial.title')}
-          href="https://docs.celo.org/getting-started/running-a-validator-in-rc1"
+          href="https://docs.celo.org/getting-started/running-a-validator-in-mainnet"
           btnText={t('engage.tutorial.btnText')}
           image={require('src/icons/download-dark.png')}
         />
