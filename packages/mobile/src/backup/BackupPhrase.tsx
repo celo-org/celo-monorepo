@@ -89,13 +89,23 @@ class BackupPhrase extends React.Component<Props, State> {
 
     CeloAnalytics.track(
       value
-        ? CustomEventNames.backup_setup_toggle_complete
-        : CustomEventNames.backup_setup_toggle_incomplete
+        ? CustomEventNames.backup_setup_toggle_enable
+        : CustomEventNames.backup_setup_toggle_disable
     )
   }
 
   onPressConfirmArea = () => {
-    this.setState((state) => ({ isConfirmChecked: !state.isConfirmChecked }))
+    this.setState((state) => {
+      const willBeEnabled = !state.isConfirmChecked
+
+      CeloAnalytics.track(
+        willBeEnabled
+          ? CustomEventNames.backup_setup_toggle_enable
+          : CustomEventNames.backup_setup_toggle_disable
+      )
+
+      return { isConfirmChecked: willBeEnabled }
+    })
   }
 
   onPressContinue = () => {

@@ -113,6 +113,8 @@ export enum CustomEventNames {
   insist_skip_backup = 'insist_skip_backup', // (count # of taps on “Do Later” in Backup_Insist)
   whatsapp_backup = 'whatsapp_backup', // (count # of taps on “Send with Whatsapp” in Backup_Share)
   backup_continue = 'backup_continue', // (count # of taps on “Continue” button in Backup_Phrase)
+  backup_setup_toggle_enable = 'backup_setup_toggle_enable',
+  backup_setup_toggle_disable = 'backup_setup_toggle_disable',
   social_backup_continue = 'social_backup_continue', // (Count # of taps on "Backup with Friends" in Backup_Phrase)
 
   // Screen name: Backup_Quiz, Question_Incorrect, Backup_Confirmed

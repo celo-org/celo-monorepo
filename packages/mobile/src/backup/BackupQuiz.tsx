@@ -100,21 +100,19 @@ export class BackupQuiz extends React.Component<Props, State> {
   }
 
   onPressMnemonicWord = (word: string, index: number) => {
-    return () => {
-      const { mnemonicWords, userChosenWords } = this.state
-      const mnemonicWordsUpdated = [...mnemonicWords]
-      mnemonicWordsUpdated.splice(index, 1)
+    const { mnemonicWords, userChosenWords } = this.state
+    const mnemonicWordsUpdated = [...mnemonicWords]
+    mnemonicWordsUpdated.splice(index, 1)
 
-      const newUserChosenWords = [...userChosenWords, { word, index }]
+    const newUserChosenWords = [...userChosenWords, { word, index }]
 
-      this.setState({
-        mnemonicWords: mnemonicWordsUpdated,
-        userChosenWords: newUserChosenWords,
-      })
+    this.setState({
+      mnemonicWords: mnemonicWordsUpdated,
+      userChosenWords: newUserChosenWords,
+    })
 
-      if (newUserChosenWords.length === 1) {
-        CeloAnalytics.startTracking(CustomEventNames.backup_quiz_submit)
-      }
+    if (newUserChosenWords.length === 1) {
+      CeloAnalytics.startTracking(CustomEventNames.backup_quiz_submit)
     }
   }
 
@@ -198,7 +196,10 @@ export class BackupQuiz extends React.Component<Props, State> {
                   ]}
                   key={`selected-word-${i}`}
                 >
-                  <Text style={userChosenWords[i] ? styles.chosenWordFilled : styles.chosenWord}>
+                  <Text
+                    testID={`selected-word-${i}`}
+                    style={userChosenWords[i] ? styles.chosenWordFilled : styles.chosenWord}
+                  >
                     {(userChosenWords[i] && userChosenWords[i].word) || i + 1}
                   </Text>
                 </View>
@@ -317,6 +318,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   scrollContainer: {
+    paddingTop: 24,
     flexGrow: 1,
   },
   bottomHalf: { flex: 1, justifyContent: 'center' },
