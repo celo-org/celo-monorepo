@@ -65,11 +65,13 @@ Through its use of the Celo blockchain, implemented on Air Protocol, it creates 
 This app is one example of what developers can achieve by using Celo and the Air Protocol. Air Protocol provides the infrastructure to create decentralized P2P transactions and Celo provides the blockchain to exchange and store the crypto assets safely.
 
 Air Protocol Github: https://github.com/air-protocol/nitrogen 
-To download Syklo Android apk click [here](https://www.airprotocol.org/syklo-v1.apk) 
+
+To download Syklo Android apk click [here](https://www.airprotocol.org/syklo-v1.apk)
 For Syklo iOS app, we'll be sharing through TestFlight, so please share your TestFlight account [here](https://forms.gle/1oLc9S8n71bK7sTi6) 
+
 Coming soon! We'll open source Syklo code too, so anyone can use it or change it for their needs :) 
 
-Note: To be able to accept offers in "Market", please fund your account (you can find in on the menu -> Wallet) by using the following link: https://celo.org/developers/faucet or wait for someone to accept your transaction after making a proposal of "Add funds" (menu -> Add funds)
+Note: To be able to accept offers in "Market", please fund your account (you can find it on the menu -> Wallet) by using the following [link](https://celo.org/developers/faucet) or wait for someone to accept your transaction after making a proposal of "Add funds" (menu -> Add funds)
 
 ## Add your app to this list!
 
