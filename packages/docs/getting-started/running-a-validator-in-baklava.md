@@ -411,7 +411,7 @@ In order to validate we need to authorize the Validator signer:
 celocli releasegold:authorize --contract $CELO_VALIDATOR_RG_ADDRESS --role validator --signature 0x$CELO_VALIDATOR_SIGNER_SIGNATURE --signer $CELO_VALIDATOR_SIGNER_ADDRESS
 ```
 
-{% hint style="info" %} The first time you authorize a validator signer for a ReleaseGold account the signer address is funded 1 cGLD to cover tx fees. Any subsequent validator signers you authorize will not be funded. {% endhint %}
+{% hint style="info" %} The first time you authorize a validator signer for a ReleaseGold account the signer address is funded 1 cGLD to cover transaction fees. Any subsequent signer keys you authorize will not be funded, and you will need to transfer a nominal amount of cGLD to them from other accounts. {% endhint %}
 
 Using the newly authorized Validator signer, register a validator on behalf of the registered Account:
 

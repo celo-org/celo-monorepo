@@ -1,6 +1,6 @@
 # Using a Cloud HSM
 
-A cloud Hardware Security Module (HSM) provides a good balance between security and accessibility. A cloud HSM can manage a Celo private key and can be used seamlessly with `celocli` and `contractkit`. Similar to a ledger device, a key in an HSM is more secure than an in-memory key since the key can never leave the hardware boundary and all signing is performed remotely. To authenticate to the HSM, it's recommended to create a service principal account that has been granted access to sign with the managed keys. A cloud HSM can be a great option for managing voting keys, since you may want these accounts to be portable but still desire to maintain good security practices. This guide will walk you through creating a cloud HSM in Azure and connecting it to `celocli`. 
+A cloud Hardware Security Module (HSM) provides a good balance between security and accessibility. A cloud HSM can manage a Celo private key and can be used seamlessly with `celocli` and `contractkit`. Similar to a ledger device, a key in an HSM is more secure than an in-memory key since the key can never leave the hardware boundary and all signing is performed remotely. To authenticate to the HSM, it's recommended to create a service principal account that has been granted access to sign with the managed keys. A cloud HSM can be a great option for managing vote signer keys, since you may want these keys to be portable but also maintain good security practices. This guide will walk you through creating a cloud HSM in Azure and connecting it to `celocli`. 
 
 ## Create an Azure subscription
 
@@ -43,7 +43,7 @@ Create a service principal and configure its access to Azure resources:
 az ad sp create-for-rbac -n <your-application-name> --skip-assignment
 ```
 
-The account will be created and will output the account's credentials
+The account will be created and will output the account's credentials.
 
 ```bash
 {
@@ -98,4 +98,3 @@ await akvWallet.init()
 console.log(`Found addresses: ${await akvWallet.getAccounts()}`)
 const contractKit = newKitFromWeb3(this.web3, akvWallet)
 ```
-

@@ -20,7 +20,7 @@ ssh USERNAME@IPADDRESS "sudo cat /root/.celo/keystore/<KEYSTORE_FILE>" > ./nodeI
 You can then back this file up to a cloud storage for redundancy.
 
 {% hint style="warning" %}
-**Warning**: It's important that a strong password used since this file will be held in potentially insecure environments.
+**Warning**: It's important that you use a strong password to encrypt this file since it will be held in potentially insecure environments.
 {% endhint %}
 
 ## How do I install and use celocli on my node?
