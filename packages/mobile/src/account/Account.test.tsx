@@ -4,8 +4,7 @@ import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
 import Account from 'src/account/Account'
 import { Screens } from 'src/navigator/Screens'
-import { createMockStore } from 'test/utils'
-import { getMockStackScreenProps } from 'test/values'
+import { createMockStore, getMockStackScreenProps } from 'test/utils'
 
 describe('Account', () => {
   beforeAll(() => {

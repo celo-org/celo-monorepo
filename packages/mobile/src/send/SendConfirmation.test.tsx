@@ -5,8 +5,8 @@ import { Provider } from 'react-redux'
 import { Screens } from 'src/navigator/Screens'
 import { getSendFee } from 'src/send/saga'
 import SendConfirmation from 'src/send/SendConfirmation'
-import { createMockStore } from 'test/utils'
-import { mockNavigation, mockTransactionData } from 'test/values'
+import { createMockStore, getMockStackScreenProps } from 'test/utils'
+import { mockTransactionData } from 'test/values'
 
 const TEST_FEE = new BigNumber(10000000000000000)
 
@@ -20,13 +20,9 @@ const store = createMockStore({
   },
 })
 
-const mockRoute = {
-  name: Screens.SendConfirmation as Screens.SendConfirmation,
-  key: '',
-  params: {
-    transactionData: mockTransactionData,
-  },
-}
+const mockScreenProps = getMockStackScreenProps(Screens.SendConfirmation, {
+  transactionData: mockTransactionData,
+})
 
 describe('SendConfirmation', () => {
   beforeAll(() => {
@@ -42,7 +38,7 @@ describe('SendConfirmation', () => {
 
     const { toJSON, queryByText } = render(
       <Provider store={store}>
-        <SendConfirmation navigation={mockNavigation} route={mockRoute} />
+        <SendConfirmation {...mockScreenProps} />
       </Provider>
     )
 
@@ -66,7 +62,7 @@ describe('SendConfirmation', () => {
 
     const { queryByText, getByText, toJSON } = render(
       <Provider store={store}>
-        <SendConfirmation navigation={mockNavigation} route={mockRoute} />
+        <SendConfirmation {...mockScreenProps} />
       </Provider>
     )
 
