@@ -4,7 +4,7 @@ import { Storage } from '@google-cloud/storage'
 import * as fs from 'fs'
 import fetch from 'node-fetch'
 import * as path from 'path'
-import sleep from 'sleep-promise'
+import { retryCmd } from 'src/lib/utils'
 import { execCmdWithExitOnFailure } from './cmd-utils'
 import { getGenesisGoogleStorageUrl } from './endpoints'
 import { getEnvFile } from './env-utils'
@@ -112,29 +112,6 @@ export async function uploadEnvFileToGoogleStorage(networkName: string) {
     false /* keep file private */,
     'text/plain'
   )
-}
-
-async function retryCmd(
-  cmd: () => Promise<any>,
-  numAttempts: number = 100,
-  maxTimeoutMs: number = 15000
-) {
-  for (let i = 1; i <= numAttempts; i++) {
-    try {
-      const result = await cmd()
-      return result
-    } catch (error) {
-      const sleepTimeBasisInMs = 1000
-      const sleepTimeInMs = Math.min(sleepTimeBasisInMs * Math.pow(2, i), maxTimeoutMs)
-      console.warn(
-        `${new Date().toLocaleTimeString()} Retry attempt: ${i}/${numAttempts}, ` +
-          `retry after sleeping for ${sleepTimeInMs} milli-seconds`,
-        error
-      )
-      await sleep(sleepTimeInMs)
-    }
-  }
-  return null
 }
 
 async function getGoogleCloudUserInfo(): Promise<string> {
