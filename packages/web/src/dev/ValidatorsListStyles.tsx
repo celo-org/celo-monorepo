@@ -14,6 +14,7 @@ export const styles = StyleSheet.create({
     marginTop: HEADER_HEIGHT,
     backgroundColor: colors.dark,
     minWidth: '100vw',
+    overflow: 'scroll',
     width: '100%',
   },
   defaultText: {

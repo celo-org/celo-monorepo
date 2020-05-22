@@ -38,7 +38,8 @@ export class EscrowedPaymentReminderSummaryNotification extends React.Component<
     ) : (
       <SummaryNotification<EscrowedPayment>
         items={payments}
-        title={t('escrowedPaymentReminder')}
+        title={t('escrowedPaymentReminderSummaryTitle', { count: payments.length })}
+        detailsI18nKey="walletFlow5:escrowedPaymentReminderSummaryDetails"
         icon={<Image source={inviteFriendsIcon} style={styles.image} resizeMode="contain" />}
         onReview={this.onReview}
         itemRenderer={this.itemRenderer}

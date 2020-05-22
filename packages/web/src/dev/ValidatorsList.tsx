@@ -347,12 +347,12 @@ class ValidatorsList extends React.PureComponent<Props, State> {
               name="Voter Rewards"
               order={orderBy === 'rewards' ? orderAsc : null}
             />
-            <HeaderCell
+            {/* <HeaderCell
               onClick={this.orderByFn.uptime}
               style={[styles.sizeS]}
               name="Uptime"
               order={orderBy === 'uptime' ? orderAsc : null}
-            />
+            /> */}
             <HeaderCell
               onClick={this.orderByFn.attestation}
               style={[styles.sizeS]}

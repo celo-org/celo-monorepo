@@ -266,13 +266,13 @@ class ValidatorsListRow extends React.PureComponent<Props & I18nProps, State> {
               <Text style={[styles.bar, group.rewardsStyle, { width: `${group.rewards}%` }]} />
             </Text>
           </Text>
-          <Text
+          {/* <Text
             style={[styles.tableCell, styles.tableCellCenter, styles.sizeS]}
             numberOfLines={1}
             ellipsizeMode="tail"
           >
             {formatNumber(group.uptime, 1)}%
-          </Text>
+          </Text> */}
           <Text
             style={[styles.tableCell, styles.tableCellCenter, styles.sizeS]}
             numberOfLines={1}

@@ -61,8 +61,6 @@ describe('EnterInviteCode Screen', () => {
         <EnterInviteCodeClass
           redeemInvite={redeem}
           skipInvite={jest.fn()}
-          showError={jest.fn()}
-          hideAlert={jest.fn()}
           redeemComplete={false}
           isRedeemingInvite={false}
           isSkippingInvite={false}
@@ -86,8 +84,6 @@ describe('EnterInviteCode Screen', () => {
         <EnterInviteCodeClass
           redeemInvite={redeem}
           skipInvite={jest.fn()}
-          showError={jest.fn()}
-          hideAlert={jest.fn()}
           redeemComplete={false}
           isRedeemingInvite={false}
           isSkippingInvite={false}
@@ -109,8 +105,6 @@ describe('EnterInviteCode Screen', () => {
         <EnterInviteCodeClass
           redeemInvite={redeem}
           skipInvite={jest.fn()}
-          showError={jest.fn()}
-          hideAlert={jest.fn()}
           redeemComplete={false}
           isRedeemingInvite={false}
           isSkippingInvite={false}
@@ -134,8 +128,6 @@ describe('EnterInviteCode Screen', () => {
         <EnterInviteCodeClass
           redeemInvite={redeem}
           skipInvite={jest.fn()}
-          showError={jest.fn()}
-          hideAlert={jest.fn()}
           redeemComplete={false}
           isRedeemingInvite={false}
           isSkippingInvite={false}
@@ -159,8 +151,6 @@ describe('EnterInviteCode Screen', () => {
         <EnterInviteCodeClass
           redeemInvite={redeem}
           skipInvite={jest.fn()}
-          showError={jest.fn()}
-          hideAlert={jest.fn()}
           redeemComplete={false}
           isRedeemingInvite={false}
           isSkippingInvite={false}
