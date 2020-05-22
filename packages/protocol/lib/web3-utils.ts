@@ -141,9 +141,10 @@ function checkFunctionArgsLength(args: any[], abi: any) {
 
 export async function setInitialProxyImplementation<
   ContractInstance extends Truffle.ContractInstance
->(web3: Web3, artifacts: any, contractName: string, ...args: any[]): Promise<ContractInstance> {
+>(web3: Web3, artifacts: any, contractName: string, proxyName?: string,...args: any[]): Promise<ContractInstance> {
   const Contract: Truffle.Contract<ContractInstance> = artifacts.require(contractName)
-  const ContractProxy: Truffle.Contract<ProxyInstance> = artifacts.require(contractName + 'Proxy')
+  proxyName = proxyName ?? contractName + 'Proxy'
+  const ContractProxy: Truffle.Contract<ProxyInstance> = artifacts.require(proxyName)
 
   const implementation: ContractInstance = await Contract.deployed()
   const proxy: ProxyInstance = await ContractProxy.deployed()
@@ -260,12 +261,44 @@ export function deploymentForContract<ContractInstance extends Truffle.ContractI
       await proxy._transferOwnership(ContractProxy.defaults().from)
       const proxiedContract: ContractInstance = await setInitialProxyImplementation<
         ContractInstance
-      >(web3, artifacts, name, ...(await args(networkName)))
+      >(web3, artifacts, name, undefined, ...(await args(networkName)))
 
       if (registerAddress) {
         const registry = await getDeployedProxiedContract<RegistryInstance>('Registry', artifacts)
         await registry.setAddressFor(name, proxiedContract.address)
       }
+
+      if (then) {
+        await then(proxiedContract, web3, networkName)
+      }
+    })
+  }
+}
+
+export function deploymentForContractWithCustomRegistryId<ContractInstance extends Truffle.ContractInstance>(
+  web3: Web3,
+  artifacts: any,
+  name: CeloContractName,
+  registryId: CeloContractName,
+  args: (networkName?: string) => Promise<any[]> = async () => [],
+  then?: (contract: ContractInstance, web3: Web3, networkName: string) => void
+) {
+  const Contract = artifacts.require(name)
+  const proxyName = registryId + 'Proxy'
+  const ContractProxy = artifacts.require(proxyName)
+  return (deployer: any, networkName: string, _accounts: string[]) => {
+    console.log('Deploying', name)
+    deployer.deploy(ContractProxy)
+    deployer.deploy(Contract)
+    deployer.then(async () => {
+      const proxy: ProxyInstance = await ContractProxy.deployed()
+      await proxy._transferOwnership(ContractProxy.defaults().from)
+      const proxiedContract: ContractInstance = await setInitialProxyImplementation<
+        ContractInstance
+      >(web3, artifacts, name, proxyName, ...(await args(networkName)))
+
+      const registry = await getDeployedProxiedContract<RegistryInstance>('Registry', artifacts)
+      await registry.setAddressFor(registryId, proxiedContract.address)
 
       if (then) {
         await then(proxiedContract, web3, networkName)

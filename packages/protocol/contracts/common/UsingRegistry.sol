@@ -33,9 +33,6 @@ contract UsingRegistry is Ownable {
   bytes32 constant ACCOUNTS_REGISTRY_ID = keccak256(abi.encodePacked("Accounts"));
   bytes32 constant ATTESTATIONS_REGISTRY_ID = keccak256(abi.encodePacked("Attestations"));
   bytes32 constant DOWNTIME_SLASHER_REGISTRY_ID = keccak256(abi.encodePacked("DowntimeSlasher"));
-  bytes32 constant DOWNTIME_SLASHER_SLOTS_REGISTRY_ID = keccak256(
-    abi.encodePacked("DowntimeSlasherSlots")
-  );
   bytes32 constant DOUBLE_SIGNING_SLASHER_REGISTRY_ID = keccak256(
     abi.encodePacked("DoubleSigningSlasher")
   );

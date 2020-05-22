@@ -18,7 +18,6 @@ export default class Contracts extends BaseCommand {
       CeloContract.BlockchainParameters,
       CeloContract.DoubleSigningSlasher,
       CeloContract.DowntimeSlasher,
-      CeloContract.DowntimeSlasherSlots,
       CeloContract.Election,
       CeloContract.EpochRewards,
       CeloContract.Escrow,

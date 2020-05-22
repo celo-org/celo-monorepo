@@ -65,6 +65,8 @@ export class DowntimeSlasherSlotsWrapper extends BaseWrapper<DowntimeSlasherSlot
    */
   oncePerEpoch = proxyCall(this.contract.methods.oncePerEpoch)
 
+  getEpochSize = proxyCall(this.contract.methods.getEpochSize, undefined, valueToBigNumber)
+
   /**
    * Returns current configuration parameters.
    */
@@ -143,13 +145,7 @@ export class DowntimeSlasherSlotsWrapper extends BaseWrapper<DowntimeSlasherSlot
     )
     const endSignerIndex = await this.getValidatorSignerIndex(validatorOrSignerAddress, window.end)
     if (calculateSlots) {
-      return this.calculateSlots(
-        validatorOrSignerAddress,
-        window,
-        startSignerIndex,
-        endSignerIndex,
-        calculateSlotsAsync
-      )
+      return this.calculateSlots(window, startSignerIndex, endSignerIndex, calculateSlotsAsync)
     }
     return this.isDown(window.start, startSignerIndex, endSignerIndex)
   }
@@ -319,7 +315,6 @@ export class DowntimeSlasherSlotsWrapper extends BaseWrapper<DowntimeSlasherSlot
 
     if (calculateSlots) {
       await this.calculateSlots(
-        validator.address,
         slashableWindow,
         startSignerIndex,
         endSignerIndex,
@@ -369,7 +364,6 @@ export class DowntimeSlasherSlotsWrapper extends BaseWrapper<DowntimeSlasherSlot
 
   /**
    * Calculate all the slots required to cover the SlashableDowntime window. This function
-   * @param validatorOrSignerAddress Address of the validator account or signer.
    * @param slashableWindow Slashable Downtime Window to cover with the slots
    * @param startSignerIndex Validator index at the first block.
    * @param endSignerIndex Validator index at the last block.
@@ -378,43 +372,29 @@ export class DowntimeSlasherSlotsWrapper extends BaseWrapper<DowntimeSlasherSlot
    * trigger every slot at the same time (will save time).
    */
   private async calculateSlots(
-    validatorOrSignerAddress: Address,
     slashableWindow: DowntimeWindow,
     startSignerIndex: number,
     endSignerIndex: number,
     calculateSlotsAsync: boolean = true
   ): Promise<boolean> {
     const slotSize = await this.slotSize()
+    const epochSize = (await this.getEpochSize()).toNumber()
     const promisesForAsync = []
 
-    // This will save some calls when the endSignerIndex and the lastEndSigner are the same and
-    // will use the
-    let startSignerIndexSlot = startSignerIndex
-    let endSignerIndexSlot = endSignerIndex
+    // Epoch 1 starts in the block 1
+    const blockEpochChange =
+      (Math.floor((slashableWindow.start - 1) / epochSize) + 1) * epochSize + 1
+
     for (let i = slashableWindow.start; i <= slashableWindow.end; i += slotSize) {
-      // We are in the last epoch of the window or in the last slot
-      if (startSignerIndexSlot === endSignerIndex || slashableWindow.end < i + slotSize) {
-        endSignerIndexSlot = endSignerIndex
-      } else {
-        endSignerIndexSlot = await this.getValidatorSignerIndex(
-          validatorOrSignerAddress,
-          i + slotSize - 1
-        )
-      }
+      const startSignerIndexSlot = i < blockEpochChange ? startSignerIndex : endSignerIndex
+      const endSignerIndexSlot =
+        i + slotSize - 1 < blockEpochChange ? startSignerIndex : endSignerIndex
       if (calculateSlotsAsync) {
         if (!(await this.isDownForSlot(i, startSignerIndexSlot, endSignerIndexSlot))) {
           return false
         }
       } else {
         promisesForAsync.push(this.isDownForSlot(i, startSignerIndexSlot, endSignerIndexSlot))
-      }
-      if (endSignerIndexSlot === endSignerIndex) {
-        startSignerIndexSlot = endSignerIndexSlot
-      } else {
-        startSignerIndexSlot = await this.getValidatorSignerIndex(
-          validatorOrSignerAddress,
-          i + slotSize
-        )
       }
     }
     if (calculateSlotsAsync) {
