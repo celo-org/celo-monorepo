@@ -71,48 +71,22 @@ class TransactionReview extends React.PureComponent<Props> {
     navigateHome()
   }
 
-  getNavigationProps = (): ReviewProps => {
-    const { type, timestamp, header } = this.props.route.params.reviewProps
-
-    if (type === undefined || timestamp === undefined) {
-      throw new Error('Missing review props')
+  renderCard = (
+    confirmationProps: TransferConfirmationCardProps | ExchangeConfirmationCardProps
+  ) => {
+    if (isTransferConfirmationCardProps(confirmationProps)) {
+      const props = { ...confirmationProps, addressHasChanged: this.props.addressHasChanged }
+      return <TransferConfirmationCard {...props} />
     }
 
-    return {
-      type,
-      timestamp,
-      header,
-    }
-  }
-
-  getConfirmationProps = () => {
-    const { confirmationProps } = this.props.route.params
-
-    if (confirmationProps === undefined) {
-      throw new Error('Missing confirmation props')
-    }
-
-    return confirmationProps
-  }
-
-  renderCard = (type: TokenTransactionType, props: any) => {
-    switch (type) {
-      case TokenTransactionType.Exchange:
-        return <ExchangeConfirmationCard {...props} />
-      default:
-        props.addressHasChanged = this.props.addressHasChanged
-        return <TransferConfirmationCard {...props} />
-    }
+    return <ExchangeConfirmationCard {...confirmationProps} />
   }
 
   render() {
-    const { type } = this.getNavigationProps()
-    const confirmationProps = this.getConfirmationProps()
+    const { confirmationProps } = this.props.route.params
 
     return (
-      <SafeAreaView style={styles.container}>
-        {this.renderCard(type, confirmationProps)}
-      </SafeAreaView>
+      <SafeAreaView style={styles.container}>{this.renderCard(confirmationProps)}</SafeAreaView>
     )
   }
 }
