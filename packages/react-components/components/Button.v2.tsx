@@ -3,7 +3,7 @@ import colors, { Colors } from '@celo/react-components/styles/colors.v2'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import { debounce } from 'lodash'
 
-import React, { useCallback } from 'react'
+import React, { ReactNode, useCallback } from 'react'
 import { StyleProp, StyleSheet, Text, View, ViewStyle } from 'react-native'
 
 const BUTTON_TAP_DEBOUNCE_TIME = 300 // milliseconds
@@ -27,7 +27,8 @@ export enum BtnSizes {
 export interface ButtonProps {
   onPress: () => void
   style?: StyleProp<ViewStyle>
-  text: string
+  text: string | ReactNode
+
   accessibilityLabel?: string
   type?: BtnTypes
   disabled?: boolean
@@ -48,7 +49,7 @@ export default React.memo(function Button(props: ButtonProps) {
   const [textColor, backgroundColor] = getColors(type, disabled)
 
   return (
-    <View style={style ? [styles.root, style] : styles.root}>
+    <View style={getStyleForWrapper(size, style)}>
       {/* these Views cannot be combined as it will cause ripple to not respect the border radius */}
       <View style={styles.containRipple}>
         <Touchable
@@ -70,9 +71,6 @@ export default React.memo(function Button(props: ButtonProps) {
 })
 
 const styles = StyleSheet.create({
-  root: {
-    flexDirection: 'row',
-  },
   // on android Touchable Provides a ripple effeft, by itself it does not respect the border radius on Touchable
   containRipple: {
     borderRadius: 100,
@@ -94,7 +92,7 @@ const styles = StyleSheet.create({
   },
   full: {
     height: 48,
-    flex: 1,
+    flexGrow: 1,
   },
 })
 
@@ -128,4 +126,11 @@ function getStyle(size: BtnSizes | undefined, backgroundColor: Colors) {
     default:
       return { ...styles.button, ...styles.medium, backgroundColor }
   }
+}
+
+function getStyleForWrapper(
+  size: BtnSizes | undefined,
+  style: StyleProp<ViewStyle>
+): StyleProp<ViewStyle> {
+  return [{ flexDirection: size === BtnSizes.FULL ? 'column' : 'row' }, style]
 }

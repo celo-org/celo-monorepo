@@ -42,9 +42,15 @@ If you are submitting an issue, please double check that there doesn’t already
 - Is tagged with the relevant labels.
 - Is assigned if you or someone else is already working on it.
 
+#### Contributing to the documentation
+
+To edit an existing page in the documentation, create a fork of the repo, commit your edits and submit a PR. 
+
+To add a new page to the documentation, create a fork, add the new pages and update the [table of contents file](https://github.com/celo-org/celo-monorepo/blob/master/packages/docs/SUMMARY.md) to include your new pages in the appropriate location and submit a PR.
+
 #### **Finding Us and Other Contributors**
 
-For code-related questions, comments, and discussions please use the [Celo Forum](https://forum.celo.org).
+For code-related questions, comments, and discussions please use the [Celo Forum](https://forum.celo.org) or [Discord](https://chat.celo.org).
 
 ### Improving Celo
 
@@ -70,4 +76,4 @@ CIP template:
 
 A list of active contributors can be found at [celo.org/about](https://celo.org/about#contributors)
 
-For code-related questions, comments, and discussions please use the [Celo Forum](https://forum.celo.org)
+For code-related questions, comments, and discussions please use the [Celo Forum](https://forum.celo.org) or [Discord](https://chat.celo.org).

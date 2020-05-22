@@ -1,3 +1,4 @@
+import dotProp from 'dot-prop-immutable'
 import { RehydrateAction } from 'redux-persist'
 import { Actions, ActionTypes } from 'src/identity/actions'
 import { AttestationCode, VerificationStatus } from 'src/identity/verification'
@@ -7,9 +8,12 @@ import { RootState } from 'src/redux/reducers'
 export const ATTESTATION_CODE_PLACEHOLDER = 'ATTESTATION_CODE_PLACEHOLDER'
 export const ATTESTATION_ISSUER_PLACEHOLDER = 'ATTESTATION_ISSUER_PLACEHOLDER'
 
-// TODO currently treating addresses to e164Number as 1:1 but
-// there are rare cases where an address could have two numbers mapped to it.
-// E.g. user imported backup phrase onto second phone and then verified again with a new number
+export enum RecipientVerificationStatus {
+  UNVERIFIED = 0,
+  VERIFIED = 1,
+  UNKNOWN = 2,
+}
+
 export interface AddressToE164NumberType {
   [address: string]: string | null
 }
@@ -27,6 +31,19 @@ export interface ContactMappingProgress {
   total: number
 }
 
+export enum AddressValidationType {
+  FULL = 'full',
+  PARTIAL = 'partial',
+  NONE = 'none',
+}
+
+export interface SecureSendPhoneNumberMapping {
+  [e164Number: string]: {
+    address: string | undefined
+    addressValidationType: AddressValidationType
+  }
+}
+
 export interface State {
   attestationCodes: AttestationCode[]
   // we store acceptedAttestationCodes to tell user if code
@@ -42,6 +59,8 @@ export interface State {
   askedContactsPermission: boolean
   isLoadingImportContacts: boolean
   contactMappingProgress: ContactMappingProgress
+  isValidRecipient: boolean
+  secureSendPhoneNumberMapping: SecureSendPhoneNumberMapping
 }
 
 const initialState: State = {
@@ -59,6 +78,8 @@ const initialState: State = {
     current: 0,
     total: 0,
   },
+  isValidRecipient: false,
+  secureSendPhoneNumberMapping: {},
 }
 
 export const reducer = (
@@ -161,6 +182,44 @@ export const reducer = (
         ...state,
         askedContactsPermission: true,
       }
+    case Actions.VALIDATE_RECIPIENT_ADDRESS:
+      return {
+        ...state,
+        isValidRecipient: false,
+      }
+    case Actions.VALIDATE_RECIPIENT_ADDRESS_SUCCESS:
+      return {
+        ...state,
+        isValidRecipient: true,
+        // Overwrite the previous mapping every time a new one is validated
+        secureSendPhoneNumberMapping: dotProp.set(
+          state.secureSendPhoneNumberMapping,
+          `${action.e164Number}`,
+          {
+            address: action.validatedAddress,
+            addressValidationType: AddressValidationType.NONE,
+          }
+        ),
+      }
+    case Actions.VALIDATE_RECIPIENT_ADDRESS_FAILURE:
+      return {
+        ...state,
+        isValidRecipient: false,
+      }
+    case Actions.REQUIRE_SECURE_SEND:
+      return {
+        ...state,
+        isValidRecipient: false,
+        // Overwrite the previous mapping every time a new one is validated
+        secureSendPhoneNumberMapping: dotProp.set(
+          state.secureSendPhoneNumberMapping,
+          `${action.e164Number}`,
+          {
+            address: undefined,
+            addressValidationType: action.addressValidationType,
+          }
+        ),
+      }
     default:
       return state
   }
@@ -191,3 +250,5 @@ export const contactMappingProgressSelector = (state: RootState) =>
   state.identity.contactMappingProgress
 export const isLoadingImportContactsSelector = (state: RootState) =>
   state.identity.isLoadingImportContacts
+export const secureSendPhoneNumberMappingSelector = (state: RootState) =>
+  state.identity.secureSendPhoneNumberMapping
