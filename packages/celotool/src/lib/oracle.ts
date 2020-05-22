@@ -9,7 +9,6 @@ import { execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
 import { getFornoUrl, getFullNodeRpcInternalUrl } from 'src/lib/endpoints'
 import { addCeloEnvMiddleware, envVar, fetchEnv } from 'src/lib/env-utils'
 import { installGenericHelmChart, removeGenericHelmChart } from 'src/lib/helm_deploy'
-import { retryCmd } from 'src/lib/utils'
 import yargs from 'yargs'
 
 const helmChartPath = '../helm-charts/oracle'
@@ -153,10 +152,12 @@ async function createOracleAzureIdentityIfNotExists(
 
   // Grant the service principal permission to manage the oracle identity.
   // See: https://github.com/Azure/aad-pod-identity#6-set-permissions-for-mic
-  await retryCmd(() =>
-    execCmdWithExitOnFailure(
-      `az role assignment create --role "Managed Identity Operator" --assignee-object-id ${identity.principalId} --scope ${identity.id}`
-    )
+  const [rawServicePrincipalClientId] = await execCmdWithExitOnFailure(
+    `az aks show -n ${clusterConfig.clusterName} --query servicePrincipalProfile.clientId -g ${clusterConfig.resourceGroup} -o tsv`
+  )
+  const servicePrincipalClientId = rawServicePrincipalClientId.trim()
+  await execCmdWithExitOnFailure(
+    `az role assignment create --role "Managed Identity Operator" --assignee ${servicePrincipalClientId} --scope ${identity.id}`
   )
   // Allow the oracle identity to access the correct key vault
   await setOracleKeyVaultPolicy(clusterConfig, oracleIdentity, identity)
