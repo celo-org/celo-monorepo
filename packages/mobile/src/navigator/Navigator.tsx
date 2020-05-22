@@ -80,6 +80,8 @@ import FeeEducation from 'src/send/FeeEducation'
 import Send from 'src/send/Send'
 import SendAmount from 'src/send/SendAmount'
 import SendConfirmation from 'src/send/SendConfirmation'
+import ValidateRecipientAccount from 'src/send/ValidateRecipientAccount'
+import ValidateRecipientIntro from 'src/send/ValidateRecipientIntro'
 import SetClock from 'src/set-clock/SetClock'
 import TransactionReview from 'src/transactions/TransactionReview'
 import { getDatetimeDisplayString } from 'src/utils/time'
@@ -210,6 +212,11 @@ const sendScreens = (Navigator: typeof Stack) => (
     <Navigator.Screen name={Screens.QRCode} component={QRCode} />
     <Navigator.Screen name={Screens.SendAmount} component={SendAmount} />
     <Navigator.Screen name={Screens.SendConfirmation} component={SendConfirmation} />
+    <Navigator.Screen name={Screens.ValidateRecipientIntro} component={ValidateRecipientIntro} />
+    <Navigator.Screen
+      name={Screens.ValidateRecipientAccount}
+      component={ValidateRecipientAccount}
+    />
     <Navigator.Screen
       name={Screens.PaymentRequestConfirmation}
       component={PaymentRequestConfirmation}

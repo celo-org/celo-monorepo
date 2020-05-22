@@ -14,11 +14,20 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import { USE_PHONE_NUMBER_PRIVACY } from 'src/config'
 import {
   endImportContacts,
-  FetchPhoneAddressesAction,
+  FetchAddressesAndValidateAction,
+  requireSecureSend,
   updateE164PhoneNumberAddresses,
 } from 'src/identity/actions'
 import { fetchPhoneHashPrivate, PhoneNumberHashDetails } from 'src/identity/privacy'
-import { AddressToE164NumberType, E164NumberToAddressType } from 'src/identity/reducer'
+import {
+  AddressToE164NumberType,
+  AddressValidationType,
+  e164NumberToAddressSelector,
+  E164NumberToAddressType,
+  SecureSendPhoneNumberMapping,
+  secureSendPhoneNumberMappingSelector,
+} from 'src/identity/reducer'
+import { checkIfValidationRequired } from 'src/identity/secureSend'
 import { setRecipientCache } from 'src/recipients/actions'
 import { contactsToRecipients, NumberToRecipient } from 'src/recipients/recipient'
 import { getAllContacts } from 'src/utils/contacts'
@@ -26,6 +35,7 @@ import Logger from 'src/utils/Logger'
 import { checkContactsPermission } from 'src/utils/permissions'
 import { getContractKit } from 'src/web3/contracts'
 import { getConnectedAccount } from 'src/web3/saga'
+import { currentAccountSelector } from 'src/web3/selectors'
 
 const TAG = 'identity/contactMapping'
 
@@ -96,11 +106,13 @@ function* updateRecipientsCache(
   yield put(setRecipientCache({ ...e164NumberToRecipients, ...otherRecipients }))
 }
 
-export function* fetchPhoneAddresses({ e164Number }: FetchPhoneAddressesAction) {
+export function* fetchAddressesAndValidateSaga({ e164Number }: FetchAddressesAndValidateAction) {
   try {
-    Logger.debug(TAG + '@fetchPhoneAddresses', `Fetching addresses for number`)
-    // Clear existing entries for those numbers so our mapping consumers
-    // know new status is pending.
+    Logger.debug(TAG + '@fetchAddressesAndValidate', `Fetching addresses for number`)
+    const oldE164NumberToAddress = yield select(e164NumberToAddressSelector)
+    const oldAddresses: string[] = oldE164NumberToAddress[e164Number] || []
+
+    // Clear existing entries for those numbers so our mapping consumers know new status is pending.
     yield put(updateE164PhoneNumberAddresses({ [e164Number]: undefined }, {}))
 
     const contractKit = yield call(getContractKit)
@@ -115,7 +127,7 @@ export function* fetchPhoneAddresses({ e164Number }: FetchPhoneAddressesAction) 
     const addressToE164NumberUpdates: AddressToE164NumberType = {}
 
     if (!addresses) {
-      Logger.debug(TAG + '@fetchPhoneAddresses', `No addresses for for number`)
+      Logger.debug(TAG + '@fetchAddressesAndValidate', `No addresses for number`)
       // Save invalid/0 addresses to avoid checking again
       // null means a contact is unverified, whereas undefined means we haven't checked yet
       e164NumberToAddressUpdates[e164Number] = null
@@ -124,11 +136,25 @@ export function* fetchPhoneAddresses({ e164Number }: FetchPhoneAddressesAction) 
       addresses.map((a) => (addressToE164NumberUpdates[a] = e164Number))
     }
 
+    const userAddress = yield select(currentAccountSelector)
+    const secureSendPhoneNumberMapping = yield select(secureSendPhoneNumberMappingSelector)
+    const addressValidationType = checkIfValidationRequired(
+      oldAddresses,
+      addresses,
+      userAddress,
+      secureSendPhoneNumberMapping,
+      e164Number
+    )
+
+    if (addressValidationType !== AddressValidationType.NONE) {
+      yield put(requireSecureSend(e164Number, addressValidationType))
+    }
+
     yield put(
       updateE164PhoneNumberAddresses(e164NumberToAddressUpdates, addressToE164NumberUpdates)
     )
   } catch (error) {
-    Logger.error(TAG + '@fetchPhoneAddresses', `Error fetching addresses`, error)
+    Logger.error(TAG + '@fetchAddressesAndValidateSaga', `Error fetching addresses`, error)
     if (error.message in ErrorMessages) {
       yield put(showError(error.message))
     } else {
@@ -165,56 +191,40 @@ function* getAddresses(e164Number: string, attestationsWrapper: AttestationsWrap
 const isValidNon0Address = (address: string) =>
   typeof address === 'string' && isValidAddress(address) && !new BigNumber(address).isZero()
 
-export function getAddressFromPhoneNumber(
+// Only use with multiple addresses if user has
+// gone through SecureSend
+export const getAddressFromPhoneNumber = (
   e164Number: string,
-  e164NumberToAddress: E164NumberToAddressType
-): string | null | undefined {
-  if (!e164NumberToAddress || !e164Number) {
-    throw new Error('Invalid params @getPhoneNumberAddress')
-  }
-
+  e164NumberToAddress: E164NumberToAddressType,
+  secureSendPhoneNumberMapping: SecureSendPhoneNumberMapping
+): string | null | undefined => {
   const addresses = e164NumberToAddress[e164Number]
 
+  // If address is null (unverified) or undefined (in the process
+  // of being updated) then just return that falsy value
   if (!addresses) {
     return addresses
   }
 
-  if (addresses.length === 0) {
-    throw new Error('Phone addresses array should never be empty')
-  }
-
+  // If there are multiple addresses, need to determine which to use
   if (addresses.length > 1) {
-    Logger.warn(TAG, 'Number mapped to multiple addresses, need to disambiguate')
-    // TODO handle with Secure Send flow, return latest for now
-    return addresses[addresses.length - 1]
+    // Check if the user has gone through Secure Send and validated a
+    // recipient address
+    const validatedAddress = secureSendPhoneNumberMapping[e164Number]
+      ? secureSendPhoneNumberMapping[e164Number].address
+      : undefined
+
+    // If they have not, they shouldn't have been able to
+    // get to this point
+    if (!validatedAddress) {
+      throw new Error(
+        'Multiple addresses but none were validated. Should have routed through Secure Send.'
+      )
+    }
+
+    return validatedAddress
   }
 
-  // Normal verified case, return the first address
+  // Normal case when there is only one address in the mapping
   return addresses[0]
-}
-
-export enum RecipientVerificationStatus {
-  UNVERIFIED = 0,
-  VERIFIED = 1,
-  UNKNOWN = 2,
-}
-
-export function getVerificationStatusFromPhoneNumber(
-  e164Number: string,
-  e164NumberToAddress: E164NumberToAddressType
-): RecipientVerificationStatus {
-  const address = getAddressFromPhoneNumber(e164Number, e164NumberToAddress)
-
-  // Undefined means the mapping has no entry for that number
-  // or the entry has been cleared
-  if (address === undefined) {
-    return RecipientVerificationStatus.UNKNOWN
-  }
-  // null means we have checked and found that number to be unverified
-  if (address === null) {
-    return RecipientVerificationStatus.UNVERIFIED
-  }
-
-  // Otherwise, verified
-  return RecipientVerificationStatus.VERIFIED
 }
