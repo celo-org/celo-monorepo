@@ -30,7 +30,7 @@ interface Props {
   e164PhoneNumber?: string
   recipient?: Recipient
   validatedRecipientAddress?: string | null
-  onEditAddressClick: () => void
+  onEditAddressClick?: () => void
 }
 
 // Content placed in a ReviewFrame
