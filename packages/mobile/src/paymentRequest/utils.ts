@@ -52,7 +52,7 @@ export function getSenderFromPaymentRequest(
   } else {
     return {
       kind: RecipientKind.MobileNumber,
-      address: paymentRequest.requesterAddress,
+      address: paymentRequest.requesteeAddress,
       e164PhoneNumber,
       displayName: e164PhoneNumber,
     }
