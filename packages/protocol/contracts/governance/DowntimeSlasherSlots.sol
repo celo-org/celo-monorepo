@@ -40,8 +40,8 @@ contract DowntimeSlasherSlots is SlasherUtil {
   uint256 constant MAX_SLOT_SIZE = 4320; // 4 hours (1 block/5seg)
 
   event SlashableDowntimeSet(uint256 interval);
-  event SlashableDowntimeSlotSizeSet(uint256 interval);
-  event SlashableDowntimeOncePerEpochSet(bool oncePerEpoch);
+  event SlotSizeSet(uint256 interval);
+  event OncePerEpochSet(bool oncePerEpoch);
   event DowntimeSlashPerformed(address indexed validator, uint256 indexed startBlock);
   event SlotValidationPerformed(address indexed user, uint256 indexed startBlock);
 
@@ -67,8 +67,8 @@ contract DowntimeSlasherSlots is SlasherUtil {
     setRegistry(registryAddress);
     setSlashingIncentives(_penalty, _reward);
     setSlashableDowntime(_slashableDowntime);
-    setSlashableDowntimeSlotSize(_slotSize);
-    setSlashableDowntimeOncePerEpoch(_oncePerEpoch);
+    setSlotSize(_slotSize);
+    setOncePerEpoch(_oncePerEpoch);
   }
 
   /**
@@ -86,7 +86,7 @@ contract DowntimeSlasherSlots is SlasherUtil {
    * @notice Sets the slot size to be validated
    * @param _slotSize Slot size in which the downtime validation will be divided.
    */
-  function setSlashableDowntimeSlotSize(uint256 _slotSize) public onlyOwner {
+  function setSlotSize(uint256 _slotSize) public onlyOwner {
     require(_slotSize != 0, "Slot size cannot be zero");
     require(
       _slotSize <= MAX_SLOT_SIZE,
@@ -95,7 +95,7 @@ contract DowntimeSlasherSlots is SlasherUtil {
     require(_slotSize < getEpochSize(), "Slot size must be smaller than epoch size");
 
     slotSize = _slotSize;
-    emit SlashableDowntimeSlotSizeSet(_slotSize);
+    emit SlotSizeSet(_slotSize);
   }
 
   /**
@@ -106,9 +106,9 @@ contract DowntimeSlasherSlots is SlasherUtil {
    * the validator could be slashed for the first 10 hours and the last 10 hours of the epoch.
    * @param _oncePerEpoch Slot size in which the downtime validation will be divided.
    */
-  function setSlashableDowntimeOncePerEpoch(bool _oncePerEpoch) public onlyOwner {
+  function setOncePerEpoch(bool _oncePerEpoch) public onlyOwner {
     oncePerEpoch = _oncePerEpoch;
-    emit SlashableDowntimeOncePerEpochSet(_oncePerEpoch);
+    emit OncePerEpochSet(_oncePerEpoch);
   }
 
   /**
@@ -232,7 +232,7 @@ contract DowntimeSlasherSlots is SlasherUtil {
   {
     uint256 endBlock = getEndBlockForSlashing(startBlock);
     uint256 sz = getEpochSize();
-    uint256 epochChangeBlock = epochNumberOfBlock(startBlock, sz).mul(sz);
+    uint256 epochChangeBlock = epochNumberOfBlock(startBlock, sz).mul(sz).add(1);
     uint256 indexActualEpoch = startSignerIndex;
     for (uint256 n = startBlock; n < endBlock; ) {
       require(slotAlreadyCalculated(n), "Slots missing to be calculated");
