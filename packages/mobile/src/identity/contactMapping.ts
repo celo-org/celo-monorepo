@@ -193,11 +193,11 @@ const isValidNon0Address = (address: string) =>
 
 // Only use with multiple addresses if user has
 // gone through SecureSend
-export const getAddressFromPhoneNumber = (
+export function getAddressFromPhoneNumber(
   e164Number: string,
   e164NumberToAddress: E164NumberToAddressType,
   secureSendPhoneNumberMapping: SecureSendPhoneNumberMapping
-): string | null | undefined => {
+): string | null | undefined {
   const addresses = e164NumberToAddress[e164Number]
 
   // If address is null (unverified) or undefined (in the process
