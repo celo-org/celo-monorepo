@@ -29,7 +29,7 @@ const TAG = 'backup/BackupQuiz'
 const MNEMONIC_BUTTONS_TO_DISPLAY = 6
 
 // miliseconds
-const CHECKING_DURATION = 2.6 * 1000
+const CHECKING_DURATION = 1.8 * 1000
 
 export enum Mode {
   Entering,
@@ -37,7 +37,6 @@ export enum Mode {
   Failed,
 }
 
-// TODO Add states for, checking, failed, success
 interface State {
   mode: Mode
   mnemonicLength: number
@@ -70,11 +69,6 @@ export class BackupQuiz extends React.Component<Props, State> {
     mode: Mode.Entering,
   }
 
-  analyticsData = {
-    time: 0,
-    backSpaceTaps: 0,
-  }
-
   componentDidMount() {
     this.props.navigation.setOptions({
       headerRight: () => <DeleteWord onPressBackspace={this.onPressBackspace} />,
@@ -102,11 +96,16 @@ export class BackupQuiz extends React.Component<Props, State> {
       const mnemonicWordsUpdated = [...mnemonicWords]
       mnemonicWordsUpdated.splice(index, 1)
 
+      const newUserChosenWords = [...userChosenWords, { word, index }]
+
       this.setState({
         mnemonicWords: mnemonicWordsUpdated,
-        userChosenWords: [...userChosenWords, { word, index }],
+        userChosenWords: newUserChosenWords,
       })
-      this.analyticsData.time = this.analyticsData.time || Date.now()
+
+      if (newUserChosenWords.length === 1) {
+        CeloAnalytics.startTracking(CustomEventNames.backup_quiz_submit)
+      }
     }
   }
 
@@ -126,7 +125,10 @@ export class BackupQuiz extends React.Component<Props, State> {
       mnemonicWords: mnemonicWordsUpdated,
       userChosenWords: userChosenWordsUpdated,
     })
-    ++this.analyticsData.backSpaceTaps
+    CeloAnalytics.trackSubEvent(
+      CustomEventNames.backup_quiz_submit,
+      CustomEventNames.backup_quiz_backspace
+    )
   }
 
   onPressReset = () => {
@@ -136,7 +138,6 @@ export class BackupQuiz extends React.Component<Props, State> {
       userChosenWords: [],
       mode: Mode.Entering,
     })
-    this.analyticsData.time = 0
   }
 
   afterCheck = () => {
@@ -159,10 +160,8 @@ export class BackupQuiz extends React.Component<Props, State> {
   onPressSubmit = () => {
     this.setState({ mode: Mode.Checking })
     setTimeout(this.afterCheck, CHECKING_DURATION)
-    CeloAnalytics.track(CustomEventNames.backup_quiz_submit, {
-      firstWordToSubmitTime: durationInSeconds(this.analyticsData.time),
-      backSpaceTaps: this.analyticsData.backSpaceTaps,
-    })
+
+    CeloAnalytics.stopTracking(CustomEventNames.backup_quiz_submit)
   }
 
   onScreenSkip = () => {
@@ -236,10 +235,6 @@ export class BackupQuiz extends React.Component<Props, State> {
       </SafeAreaView>
     )
   }
-}
-
-function durationInSeconds(inital: number) {
-  return (Date.now() - inital) / 1000
 }
 
 interface Content {

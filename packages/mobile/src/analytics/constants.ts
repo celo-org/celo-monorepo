@@ -87,6 +87,8 @@ export enum CustomEventNames {
   backup_start = 'backup_start', // ‘set up now’ button click
   backup_setup_info = 'backup_setup_info',
 
+  backup_quiz_backspace = 'backup_quiz_backspace', // whenever the backspace is pressed
+
   backup_quiz_submit = 'backup_quiz_submit',
   backup_quiz_success = 'backup_quiz_success',
   backup_quiz_incorrect = 'backup_quiz_incorrect',
