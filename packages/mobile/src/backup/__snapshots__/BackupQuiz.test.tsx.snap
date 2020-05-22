@@ -7,8 +7,8 @@ exports[`BackupQuiz renders correctly 1`] = `
       "backgroundColor": "#FFFFFF",
       "flex": 1,
       "justifyContent": "space-between",
+      "paddingBottom": 24,
       "paddingHorizontal": 24,
-      "paddingVertical": 24,
     }
   }
 >
@@ -44,6 +44,7 @@ exports[`BackupQuiz renders correctly 1`] = `
     contentContainerStyle={
       Object {
         "flexGrow": 1,
+        "paddingTop": 24,
       }
     }
   >

@@ -70,7 +70,7 @@ export enum CustomEventNames {
   redeem_invite_failed = 'redeem_invite_failed',
 
   photos_education = 'photos_education',
-  get_backup_key = 'earn_celo_gold',
+  get_backup_key = 'get_backup_key',
   earn_celo_gold = 'earn_celo_gold',
   user_restart = 'user_restart',
   pin_continue = 'pin_continue',
@@ -101,7 +101,6 @@ export enum CustomEventNames {
   backup_setup_toggle_incomplete = 'backup_setup_toggle_incomplete',
 
   // Screen name: Backup_Phrase, Backup_Insist, Backup_Share, Backup_Set
-  set_backup_phrase = 'set_backup_phrase', // (count # of taps on “Set Backup Phrase” in Backup_Phrase) [we should not track the actual value of this field, just whether the user filled it out]
   set_social_backup = 'set_social_backup', // (count # of taps on "Set up Social Backup")
   delay_backup = 'delay_backup', // (Count # of taps on "Delay" button in Backup_Phrase)
   skip_backup = 'skip_backup', // (count # of taps on “Skip” button in Backup_Phrase)
@@ -111,7 +110,6 @@ export enum CustomEventNames {
   backup_cancel = 'backup_cancel', // (count # of taps on "Cancel" button in Backup_Phrase)
   insist_backup_phrase = 'insist_backup_phrase', // (count # of taps on “Set Backup Phrase” in Backup_Insist)
   insist_skip_backup = 'insist_skip_backup', // (count # of taps on “Do Later” in Backup_Insist)
-  whatsapp_backup = 'whatsapp_backup', // (count # of taps on “Send with Whatsapp” in Backup_Share)
   backup_continue = 'backup_continue', // (count # of taps on “Continue” button in Backup_Phrase)
   backup_setup_toggle_enable = 'backup_setup_toggle_enable',
   backup_setup_toggle_disable = 'backup_setup_toggle_disable',
