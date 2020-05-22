@@ -1,6 +1,6 @@
-# Mainnet Release Candidate Network Disclaimer
+# Mainnet Network Disclaimer
 
-By using, and contributing to, Celo blockchain and cryptographic network (Celo), you (the User) agree to these terms and acknowledge that  the use of Celo, including any and all release candidates, is entirely at the User’s sole risk. You also agree to adhere to the [Celo Code of Conduct](https://celo.org/code-of-conduct).
+By using, and contributing to, Celo blockchain and cryptographic network (Celo), you (the User) agree to these terms and acknowledge that the use of Celo, including any and all release candidates, is entirely at the User’s sole risk. You also agree to adhere to the [Celo Code of Conduct](https://celo.org/code-of-conduct).
 
 All content provided on Celo is subject to the License included and is provided on an ‘AS IS’ and ‘AS AVAILABLE’ basis, without any representations or warranties of any kind. All implied terms are excluded to the fullest extent permitted by law. No party involved in, or having contributed to the development of, Celo including any of their affiliates, directors, employees, contractors, service providers or agents (the Parties Involved) accepts any responsibility or liability to the User or any third parties in relation to any materials or information accessed or downloaded via Celo. The User acknowledges and agrees that the Parties Involved are not responsible for any damage to the User’s computer systems, loss of data, or any other loss or damage resulting (directly or indirectly) from use of Celo.
 

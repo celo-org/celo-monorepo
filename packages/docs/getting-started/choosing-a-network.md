@@ -6,7 +6,7 @@ The best place to start exploring Celo depends on your interests and objectives:
 
 * **[Baklava](baklava-testnet.md), the Node Operator Testnet**: If you're interested in operating one or more nodes that make up Celo's infrastructure, start with [Baklava](baklava-testnet.md). Baklava's validators and full nodes are operated by the community. It is intended to provide a venue to test new builds of the Celo Blockchain software, trial on-chain governance proposals, and for node operators to build operational best practices. Support for developers and users of the Wallet is not the primary focus.
 
-* **[Release Candidate 1](rc1.md):** This network will become the Celo Mainnet and is being deployed by the Celo community starting 4/22/20. Most of the activity is being driven by the validator organisations that featured on the leaderboard of [The Great Celo Stake Off](https://forum.celo.org/t/the-great-celo-stake-off-the-details/136).
+* **[Mainnet](mainnet.md):** The production Celo network, Mainnet was previously known as the Release Candidate 1 network. Deployed by the Celo community starting 4/22/20, the network is currently working towards enabling the Celo stability mechansim. Much of the activity is being driven by the validator organisations that featured on the leaderboard of [The Great Celo Stake Off](https://forum.celo.org/t/the-great-celo-stake-off-the-details/136).
 
 {% hint style="success" %}
 **Roadmap**: For more information on Celo's journey so far and next steps, see [Celo Timeline](https://celo.org/#timeline).

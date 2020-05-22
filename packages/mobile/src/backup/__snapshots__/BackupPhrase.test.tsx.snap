@@ -184,9 +184,12 @@ exports[`renders correctly with backup not completed 1`] = `
   </View>
   <View
     style={
-      Object {
-        "flexDirection": "row",
-      }
+      Array [
+        Object {
+          "flexDirection": "column",
+        },
+        undefined,
+      ]
     }
   >
     <View
@@ -217,7 +220,7 @@ exports[`renders correctly with backup not completed 1`] = `
           Object {
             "alignItems": "center",
             "backgroundColor": "#F5F4F0",
-            "flex": 1,
+            "flexGrow": 1,
             "height": 48,
             "justifyContent": "center",
             "paddingHorizontal": 16,

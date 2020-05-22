@@ -8,7 +8,11 @@ import {
 import { execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
 import { getFornoUrl, getFullNodeRpcInternalUrl } from 'src/lib/endpoints'
 import { addCeloEnvMiddleware, envVar, fetchEnv } from 'src/lib/env-utils'
-import { installGenericHelmChart, removeGenericHelmChart } from 'src/lib/helm_deploy'
+import {
+  installGenericHelmChart,
+  removeGenericHelmChart,
+  upgradeGenericHelmChart,
+} from 'src/lib/helm_deploy'
 import { retryCmd } from 'src/lib/utils'
 import yargs from 'yargs'
 
@@ -88,6 +92,19 @@ export async function installHelmChart(
   await installOracleRBACHelmChart(celoEnv)
   // Then install the oracle helm chart
   return installGenericHelmChart(
+    celoEnv,
+    releaseName(celoEnv),
+    helmChartPath,
+    await helmParameters(celoEnv, context, useFullNodes)
+  )
+}
+
+export async function upgradeOracleChart(
+  celoEnv: string,
+  context: OracleAzureContext,
+  useFullNodes: boolean
+) {
+  return upgradeGenericHelmChart(
     celoEnv,
     releaseName(celoEnv),
     helmChartPath,

@@ -6,9 +6,9 @@
 ## Getting Started
 
 - [Choosing a Network](getting-started/choosing-a-network.md)
-- [Mainnet Release Candidate 1](getting-started/rc1.md)
-  - [Running a Validator](getting-started/running-a-validator-in-rc1.md)
-  - [Running a Full Node](getting-started/running-a-full-node-in-rc1.md)
+- [Mainnet](getting-started/mainnet.md)
+  - [Running a Validator](getting-started/running-a-validator-in-mainnet.md)
+  - [Running a Full Node](getting-started/running-a-full-node-in-mainnet.md)
 - [Baklava Testnet](getting-started/baklava-testnet.md)
   - [Running a Validator](getting-started/running-a-validator-in-baklava.md)
   - [Running a Full Node](getting-started/running-a-full-node-in-baklava.md)
@@ -186,6 +186,7 @@
       - [AttestationStat](developer-resources/contractkit/reference/interfaces/_wrappers_attestations_.attestationstat.md)
       - [AttestationStateForIssuer](developer-resources/contractkit/reference/interfaces/_wrappers_attestations_.attestationstateforissuer.md)
       - [AttestationsConfig](developer-resources/contractkit/reference/interfaces/_wrappers_attestations_.attestationsconfig.md)
+      - [AttestationsStatus](developer-resources/contractkit/reference/interfaces/_wrappers_attestations_.attestationsstatus.md)
       - [AttestationsToken](developer-resources/contractkit/reference/interfaces/_wrappers_attestations_.attestationstoken.md)
       - [UnselectedRequest](developer-resources/contractkit/reference/interfaces/_wrappers_attestations_.unselectedrequest.md)
       - [wrappers/BaseWrapper](developer-resources/contractkit/reference/modules/_wrappers_basewrapper_.md)
@@ -349,6 +350,7 @@
       - [AttestationStat](developer-resources/contractkit/reference/interfaces/_wrappers_attestations_.attestationstat.md)
       - [AttestationStateForIssuer](developer-resources/contractkit/reference/interfaces/_wrappers_attestations_.attestationstateforissuer.md)
       - [AttestationsConfig](developer-resources/contractkit/reference/interfaces/_wrappers_attestations_.attestationsconfig.md)
+      - [AttestationsStatus](developer-resources/contractkit/reference/interfaces/_wrappers_attestations_.attestationsstatus.md)
       - [AttestationsToken](developer-resources/contractkit/reference/interfaces/_wrappers_attestations_.attestationstoken.md)
       - [UnselectedRequest](developer-resources/contractkit/reference/interfaces/_wrappers_attestations_.unselectedrequest.md)
       - [Filter](developer-resources/contractkit/reference/interfaces/_wrappers_basewrapper_.filter.md)
@@ -471,4 +473,4 @@
 
 - [Alfajores Testnet Disclaimer](important-information/alfajores-testnet-disclaimer.md)
 - [Baklava Testnet Disclaimer](important-information/baklava-testnet-disclaimer.md)
-- [Release Candidate Network Disclaimer](important-information/rc-network-disclaimer.md)
+- [Mainnet Disclaimer](important-information/mainnet-network-disclaimer.md)
