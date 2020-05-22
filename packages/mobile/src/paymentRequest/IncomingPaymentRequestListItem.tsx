@@ -9,10 +9,12 @@ import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import { declinePaymentRequest } from 'src/firebase/actions'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces, withTranslation } from 'src/i18n'
+import { AddressValidationType } from 'src/identity/reducer'
 import { unknownUserIcon } from 'src/images/Images'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { getRecipientThumbnail, Recipient } from 'src/recipients/recipient'
+import { TransactionDataInput } from 'src/send/SendAmount'
 import Logger from 'src/utils/Logger'
 
 interface OwnProps {
@@ -21,6 +23,7 @@ interface OwnProps {
   comment: string
   id: string
   declinePaymentRequest: typeof declinePaymentRequest
+  addressValidationType?: AddressValidationType
 }
 
 type Props = OwnProps & WithTranslation
@@ -29,17 +32,21 @@ const AVATAR_SIZE = 40
 
 export class IncomingPaymentRequestListItem extends React.Component<Props> {
   onPay = () => {
-    const { id, amount, comment: reason, requester: recipient } = this.props
-    navigate(Screens.SendConfirmation, {
-      confirmationInput: {
-        reason,
-        recipient,
-        amount: new BigNumber(amount),
-        recipientAddress: recipient.address,
-        type: TokenTransactionType.PayRequest,
-        firebasePendingRequestUid: id,
-      },
-    })
+    const { id, amount, comment: reason, requester: recipient, addressValidationType } = this.props
+
+    const transactionData: TransactionDataInput = {
+      reason,
+      recipient,
+      amount: new BigNumber(amount),
+      type: TokenTransactionType.PayRequest,
+      firebasePendingRequestUid: id,
+    }
+
+    if (addressValidationType !== AddressValidationType.NONE) {
+      navigate(Screens.ValidateRecipientIntro, { transactionData, addressValidationType })
+    } else {
+      navigate(Screens.SendConfirmation, { transactionData })
+    }
   }
 
   onPaymentDecline = () => {
