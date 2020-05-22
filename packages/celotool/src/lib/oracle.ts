@@ -170,10 +170,12 @@ async function createOracleAzureIdentityIfNotExists(
 
   // Grant the service principal permission to manage the oracle identity.
   // See: https://github.com/Azure/aad-pod-identity#6-set-permissions-for-mic
-  await retryCmd(() =>
-    execCmdWithExitOnFailure(
-      `az role assignment create --role "Managed Identity Operator" --assignee-object-id ${identity.principalId} --scope ${identity.id}`
-    )
+  await retryCmd(
+    () =>
+      execCmdWithExitOnFailure(
+        `az role assignment create --role "Managed Identity Operator" --assignee-object-id ${identity.principalId} --scope ${identity.id}`
+      ),
+    10
   )
   // Allow the oracle identity to access the correct key vault
   await setOracleKeyVaultPolicy(clusterConfig, oracleIdentity, identity)
