@@ -1,5 +1,3 @@
-import colors from '@celo/react-components/styles/colors'
-import fontStyles from '@celo/react-components/styles/fonts'
 import {
   createDrawerNavigator,
   DrawerContentComponentProps,
@@ -9,13 +7,11 @@ import {
 } from '@react-navigation/drawer'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { StyleSheet, View } from 'react-native'
-import { TouchableHighlight } from 'react-native-gesture-handler'
-import { Line, Svg } from 'react-native-svg'
 import { useSelector } from 'react-redux'
 import Account from 'src/account/Account'
 import FiatExchange from 'src/account/FiatExchange'
 import Invite from 'src/account/Invite'
+import Support from 'src/account/Support'
 import BackupIntroduction from 'src/backup/BackupIntroduction'
 import { AvatarSelf } from 'src/components/AvatarSelf'
 import ExchangeHomeScreen from 'src/exchange/ExchangeHomeScreen'
@@ -33,44 +29,6 @@ function CustomDrawerContent(props: DrawerContentComponentProps<DrawerContentOpt
 
       <DrawerItemList {...props} />
     </DrawerContentScrollView>
-  )
-}
-
-function Hamburger() {
-  return (
-    <TouchableHighlight>
-      <View>
-        <Svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-          <Line
-            x1="7.25"
-            y1="9.75"
-            x2="24.75"
-            y2="9.75"
-            stroke="#2E3338"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-          />
-          <Line
-            x1="7.25"
-            y1="15.75"
-            x2="24.75"
-            y2="15.75"
-            stroke="#2E3338"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-          />
-          <Line
-            x1="7.25"
-            y1="21.75"
-            x2="24.75"
-            y2="21.75"
-            stroke="#2E3338"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-          />
-        </Svg>
-      </View>
-    </TouchableHighlight>
   )
 }
 
@@ -110,38 +68,7 @@ export default function DrawerNavigator() {
         component={Account}
         options={{ title: t('settings') }}
       />
+      <Drawer.Screen name={Screens.Support} component={Support} options={{ title: t('help') }} />
     </Drawer.Navigator>
   )
 }
-
-const styles = StyleSheet.create({
-  label: {
-    alignSelf: 'center',
-    fontSize: 13,
-    ...fontStyles.semiBold,
-  },
-  tabBar: {
-    height: 60,
-    paddingBottom: 5,
-    paddingTop: 10,
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(0, 0, 0, 0.05)',
-  },
-  circle: {
-    position: 'absolute',
-    zIndex: 99,
-    right: -6,
-    top: 0,
-    borderRadius: 8,
-    marginHorizontal: 5,
-    height: 6,
-    width: 6,
-    backgroundColor: colors.messageBlue,
-  },
-  alignWallet: {
-    marginLeft: 3,
-  },
-  alignPaymentIcon: {
-    marginBottom: 8,
-  },
-})
