@@ -2,9 +2,10 @@ import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { H2, H4 } from 'src/fonts/Fonts'
 import { NameSpaces, useTranslation } from 'src/i18n'
-import ExchangeCUSD from 'src/icons/ExchangeIconCUSD'
 import ExchangeCGLD from 'src/icons/ExchangeIconCGLD'
+import ExchangeCUSD from 'src/icons/ExchangeIconCUSD'
 import { Cell, GridRow, Spans } from 'src/layout/GridRow'
+import { ScreenSizes, useScreenSize } from 'src/layout/ScreenSize'
 import RingsGlyph from 'src/logos/RingsGlyph'
 import Button, { BTN, SIZE } from 'src/shared/Button.3'
 import menuItems from 'src/shared/menu-items'
@@ -17,9 +18,9 @@ export function TwoAssets() {
   return (
     <View style={standardStyles.darkBackground}>
       <GridRow
-        desktopStyle={[standardStyles.blockMargin, standardStyles.sectionMarginTop]}
-        tabletStyle={[standardStyles.blockMarginTablet, standardStyles.sectionMarginTopTablet]}
-        mobileStyle={[standardStyles.blockMarginMobile, standardStyles.sectionMarginTopMobile]}
+        desktopStyle={standardStyles.sectionMarginTop}
+        tabletStyle={standardStyles.sectionMarginTopTablet}
+        mobileStyle={standardStyles.sectionMarginTopMobile}
         allStyle={standardStyles.centered}
       >
         <Cell span={Spans.half} style={standardStyles.centered}>
@@ -71,15 +72,37 @@ interface Props {
   children?: React.ReactNode
 }
 
+function getMargin(screen) {
+  switch (screen) {
+    case ScreenSizes.DESKTOP:
+      return standardStyles.blockMarginTop
+    case ScreenSizes.TABLET:
+      return standardStyles.blockMarginTopTablet
+    default:
+      return standardStyles.blockMarginTopMobile
+  }
+}
+
 function AssetToken({ ticker, info, icon, children }: Props) {
+  const { screen } = useScreenSize()
+  const containerStyle = [getMargin(screen), styles.container]
   return (
-    <Cell span={Spans.half} style={standardStyles.centered}>
+    <Cell span={Spans.half} style={containerStyle}>
       <View style={styles.root}>
-        <View style={styles.image}>{icon}</View>
-        <H4 style={textStyles.readingOnDark}>{ticker}</H4>
-        <Text style={[fonts.p, textStyles.readingOnDark, standardStyles.elementalMarginBottom]}>
-          {info}
-        </Text>
+        <View>
+          <View style={styles.image}>{icon}</View>
+          <H4 style={textStyles.readingOnDark}>{ticker}</H4>
+          <Text
+            style={[
+              fonts.p,
+              textStyles.readingOnDark,
+              standardStyles.halfElement,
+              standardStyles.elementalMarginBottom,
+            ]}
+          >
+            {info}
+          </Text>
+        </View>
         {children}
       </View>
     </Cell>
@@ -88,11 +111,12 @@ function AssetToken({ ticker, info, icon, children }: Props) {
 
 const styles = StyleSheet.create({
   container: {
-    justifyContent: 'space-between',
+    alignItems: 'center',
   },
-
   root: {
     maxWidth: 330,
+    flex: 1,
+    justifyContent: 'space-between',
   },
   title: {
     maxWidth: 380,
