@@ -139,8 +139,6 @@ describe('SendConfirmation', () => {
     expect(tree).toMatchSnapshot()
   })
 
-  mockedGetSendFee.mockImplementation(async () => TEST_FEE)
-
   it('navigates to ValidateRecipientIntro when "edit" button is pressed', async () => {
     const mockE164NumberToAddress: E164NumberToAddressType = {
       [mockE164NumberInvite]: [mockAccountInvite, mockAccount2Invite],
@@ -211,8 +209,6 @@ describe('SendConfirmation', () => {
         transactionData: mockTransactionData,
       },
     }
-
-    mockedGetSendFee.mockImplementation(async () => TEST_FEE)
 
     const tree = render(
       <Provider store={store}>

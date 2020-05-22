@@ -27,12 +27,16 @@ export interface TransferConfirmationCardProps {
   comment?: string | null
   amount: MoneyAmount
   type: TokenTransactionType
-  e164PhoneNumber?: string
+  e164PhoneNumber?: string | null
   dollarBalance?: BigNumber
   recipient?: Recipient
 }
 
-type Props = TransferConfirmationCardProps & WithTranslation
+interface OwnProps {
+  addressHasChanged: boolean
+}
+
+type Props = TransferConfirmationCardProps & WithTranslation & OwnProps
 
 // Content placed in a ReviewFrame
 // Differs from TransferReviewCard which is used during Send flow, this is for completed txs
@@ -73,7 +77,7 @@ function Amount(props: ExtractProps<typeof CurrencyDisplay>) {
 }
 
 const renderTopSection = (props: Props) => {
-  const { address, recipient, type, e164PhoneNumber } = props
+  const { t, address, recipient, type, e164PhoneNumber, addressHasChanged } = props
   if (
     type === TokenTransactionType.VerificationFee ||
     type === TokenTransactionType.NetworkFee ||
@@ -82,12 +86,17 @@ const renderTopSection = (props: Props) => {
     return <Image source={faucetIcon} style={style.icon} />
   } else {
     return (
-      <Avatar
-        recipient={recipient}
-        address={address}
-        e164Number={e164PhoneNumber}
-        iconSize={iconSize}
-      />
+      <View>
+        {addressHasChanged && (
+          <Text testID={'transferAddressChanged'}>{t('transferAddressChanged')}</Text>
+        )}
+        <Avatar
+          recipient={recipient}
+          address={address}
+          e164Number={e164PhoneNumber || undefined}
+          iconSize={iconSize}
+        />
+      </View>
     )
   }
 }

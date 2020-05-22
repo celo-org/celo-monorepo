@@ -17,6 +17,8 @@ const store = createMockStore({
   },
 })
 
+const mockEditAddressClick = jest.fn()
+
 describe('TransferReviewCard', () => {
   it('renders correctly for send review', () => {
     const props = {
@@ -25,6 +27,8 @@ describe('TransferReviewCard', () => {
       comment: '',
       value: new BigNumber(0.3),
       currency: CURRENCY_ENUM.DOLLAR,
+      validatedRecipientAddress: undefined,
+      onEditAddressClick: mockEditAddressClick,
     }
 
     const tree = renderer.create(
@@ -42,6 +46,8 @@ describe('TransferReviewCard', () => {
       comment: '',
       value: new BigNumber(100),
       currency: CURRENCY_ENUM.DOLLAR,
+      validatedRecipientAddress: undefined,
+      onEditAddressClick: mockEditAddressClick,
     }
 
     const tree = renderer.create(
@@ -59,6 +65,8 @@ describe('TransferReviewCard', () => {
       comment: '',
       value: new BigNumber(100),
       currency: CURRENCY_ENUM.DOLLAR,
+      validatedRecipientAddress: undefined,
+      onEditAddressClick: mockEditAddressClick,
       contact: mockContactWithPhone,
       e164PhoneNumber: mockE164Number,
     }

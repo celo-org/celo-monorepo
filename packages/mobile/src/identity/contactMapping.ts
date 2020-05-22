@@ -77,7 +77,7 @@ function* doImportContacts() {
   yield call(updateUserContact, e164NumberToRecipients)
 
   // We call this here before we've refreshed the contact mapping
-  //   so that users can see a recipients list asap
+  // so that users can see a recipients list asap
   yield call(updateRecipientsCache, e164NumberToRecipients, otherRecipients)
 }
 

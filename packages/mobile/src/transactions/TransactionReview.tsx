@@ -3,26 +3,64 @@ import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { StyleSheet } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
+import { connect } from 'react-redux'
 import { TokenTransactionType } from 'src/apollo/types'
 import ExchangeConfirmationCard from 'src/exchange/ExchangeConfirmationCard'
 import { Namespaces, withTranslation } from 'src/i18n'
+import { SecureSendPhoneNumberMapping } from 'src/identity/reducer'
 import { navigateHome } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
-import TransferConfirmationCard from 'src/send/TransferConfirmationCard'
+import { RootState } from 'src/redux/reducers'
+import TransferConfirmationCard, {
+  TransferConfirmationCardProps,
+} from 'src/send/TransferConfirmationCard'
 
-export interface NavigationPropsWrapper {
-  reviewProps: ReviewProps
-  confirmationProps: any
+interface StateProps {
+  addressHasChanged: boolean
 }
-
 export interface ReviewProps {
   type: TokenTransactionType
   timestamp: number
   header: string
 }
 
-type Props = WithTranslation & StackScreenProps<StackParamList, Screens.TransactionReview>
+type OwnProps = StackScreenProps<StackParamList, Screens.TransactionReview>
+type Props = WithTranslation & OwnProps & StateProps
+
+const hasAddressChanged = (
+  transferConfirmationProps: TransferConfirmationCardProps | undefined,
+  secureSendPhoneNumberMapping: SecureSendPhoneNumberMapping
+) => {
+  if (!transferConfirmationProps) {
+    return false
+  }
+
+  const { address, e164PhoneNumber } = transferConfirmationProps
+  if (!address || !e164PhoneNumber || !secureSendPhoneNumberMapping[e164PhoneNumber]) {
+    return false
+  }
+
+  const newAddress = secureSendPhoneNumberMapping[e164PhoneNumber].address
+  if (!newAddress || newAddress === address) {
+    return false
+  }
+
+  return true
+}
+
+const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
+  const { transferConfirmationProps } = ownProps.route.params
+  const { secureSendPhoneNumberMapping } = state.identity
+  const addressHasChanged = hasAddressChanged(
+    transferConfirmationProps,
+    secureSendPhoneNumberMapping
+  )
+
+  return {
+    addressHasChanged,
+  }
+}
 
 class TransactionReview extends React.PureComponent<Props> {
   static navigationOptions = { header: null }
@@ -46,7 +84,9 @@ class TransactionReview extends React.PureComponent<Props> {
   }
 
   getConfirmationProps = () => {
-    const confirmationProps = this.props.route.params.confirmationProps
+    const confirmationProps =
+      this.props.route.params.transferConfirmationProps ||
+      this.props.route.params.exchangeConfirmationProps
 
     if (confirmationProps === undefined) {
       throw new Error('Missing confirmation props')
@@ -55,12 +95,13 @@ class TransactionReview extends React.PureComponent<Props> {
     return confirmationProps
   }
 
-  renderCard = (type: TokenTransactionType, confirmationProps: any) => {
+  renderCard = (type: TokenTransactionType, props: any) => {
     switch (type) {
       case TokenTransactionType.Exchange:
-        return <ExchangeConfirmationCard {...confirmationProps} />
+        return <ExchangeConfirmationCard {...props} />
       default:
-        return <TransferConfirmationCard {...confirmationProps} />
+        props.addressHasChanged = this.props.addressHasChanged
+        return <TransferConfirmationCard {...props} />
     }
   }
 
@@ -82,4 +123,7 @@ const styles = StyleSheet.create({
   },
 })
 
-export default withTranslation(Namespaces.global)(TransactionReview)
+export default connect<StateProps, {}, OwnProps, RootState>(
+  mapStateToProps,
+  {}
+)(withTranslation(Namespaces.global)(TransactionReview))
