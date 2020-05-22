@@ -1,9 +1,10 @@
 import colors from '@celo/react-components/styles/colors.v2'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import { componentStyles } from '@celo/react-components/styles/styles'
+import { StackNavigationOptions } from '@react-navigation/stack'
 import * as React from 'react'
 import { Trans } from 'react-i18next'
-import { StyleSheet, Text, View } from 'react-native'
+import { Platform, StyleSheet, Text, View } from 'react-native'
 import BackButton from 'src/components/BackButton.v2'
 import CancelButton from 'src/components/CancelButton.v2'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
@@ -12,8 +13,8 @@ import i18n, { Namespaces } from 'src/i18n'
 import useSelector from 'src/redux/useSelector'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 
-export const noHeader = {
-  headerLeft: <View />,
+export const noHeader: StackNavigationOptions = {
+  headerShown: false,
 }
 
 const styles = StyleSheet.create({
@@ -30,41 +31,64 @@ const styles = StyleSheet.create({
   },
 })
 
-export const nuxNavigationOptions = {
+export const nuxNavigationOptions: StackNavigationOptions = {
+  headerShown: true,
+  headerTransparent: true,
   headerLeftContainerStyle: { paddingHorizontal: 10 },
-  headerLeft: <BackButton />,
+  headerLeft: () => <BackButton />,
   headerRightContainerStyle: { paddingHorizontal: 10 },
-  headerRight: <View />,
-  headerTitle: <DisconnectBanner />,
+  headerRight: () => <View />,
+  headerTitle: () => <DisconnectBanner />,
   headerTitleContainerStyle: {
     alignItems: 'center',
     flex: 1,
     justifyContent: 'center',
   },
+  headerStyle: {
+    backgroundColor: colors.light,
+  },
 }
 
-export const nuxNavigationOptionsNoBackButton = {
+export const nuxNavigationOptionsNoBackButton: StackNavigationOptions = {
   ...nuxNavigationOptions,
-  headerLeft: <View />,
+  headerLeft: () => <View />,
 }
 
-export const emptyHeader = {
-  headerTitle: '',
+export const emptyHeader: StackNavigationOptions = {
+  headerTitle: ' ',
+  headerShown: true,
   headerTitleStyle: [styles.headerTitle, componentStyles.screenHeader],
   headerTitleContainerStyle: {
-    alignItems: 'center',
+    alignItems: 'center' as 'center',
   },
   headerTitleAlign: 'center',
+  cardStyle: { backgroundColor: colors.background },
+  headerStyle: {
+    backgroundColor: colors.light,
+    ...Platform.select({
+      android: {
+        elevation: 0,
+      },
+      ios: {
+        borderBottomWidth: 0,
+        borderBottomColor: 'transparent',
+      },
+    }),
+  },
 }
 
-export const headerWithBackButton = {
+export const drawerHeader: StackNavigationOptions = {
   ...emptyHeader,
-  headerLeft: <BackButton />,
 }
 
-export const headerWithCancelButton = {
+export const headerWithBackButton: StackNavigationOptions = {
   ...emptyHeader,
-  headerLeft: <CancelButton />,
+  headerLeft: () => <BackButton />,
+}
+
+export const headerWithCancelButton: StackNavigationOptions = {
+  ...emptyHeader,
+  headerLeft: () => <CancelButton />,
 }
 
 interface Props {

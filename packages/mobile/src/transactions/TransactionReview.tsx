@@ -1,5 +1,3 @@
-import ReviewFrame from '@celo/react-components/components/ReviewFrame'
-import ReviewHeader from '@celo/react-components/components/ReviewHeader'
 import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
@@ -8,11 +6,10 @@ import SafeAreaView from 'react-native-safe-area-view'
 import { TokenTransactionType } from 'src/apollo/types'
 import ExchangeConfirmationCard from 'src/exchange/ExchangeConfirmationCard'
 import { Namespaces, withTranslation } from 'src/i18n'
-import { navigateBack, navigateHome } from 'src/navigator/NavigationService'
+import { navigateHome } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 import TransferConfirmationCard from 'src/send/TransferConfirmationCard'
-import { getDatetimeDisplayString } from 'src/utils/time'
 
 export interface NavigationPropsWrapper {
   reviewProps: ReviewProps
@@ -58,13 +55,6 @@ class TransactionReview extends React.PureComponent<Props> {
     return confirmationProps
   }
 
-  renderHeader = () => {
-    const { t, i18n } = this.props
-    const { header, timestamp } = this.getNavigationProps()
-    const dateTimeStatus = getDatetimeDisplayString(timestamp, t, i18n)
-    return <ReviewHeader title={header} subtitle={dateTimeStatus} />
-  }
-
   renderCard = (type: TokenTransactionType, confirmationProps: any) => {
     switch (type) {
       case TokenTransactionType.Exchange:
@@ -80,9 +70,7 @@ class TransactionReview extends React.PureComponent<Props> {
 
     return (
       <SafeAreaView style={styles.container}>
-        <ReviewFrame HeaderComponent={this.renderHeader} navigateBack={navigateBack}>
-          {this.renderCard(type, confirmationProps)}
-        </ReviewFrame>
+        {this.renderCard(type, confirmationProps)}
       </SafeAreaView>
     )
   }
