@@ -9,7 +9,7 @@ import { calculateFee } from 'src/fees/saga'
 import { completePaymentRequest } from 'src/firebase/actions'
 import { transferGoldToken } from 'src/goldToken/actions'
 import { encryptComment } from 'src/identity/commentEncryption'
-import { addressToE164NumberSelector } from 'src/identity/reducer'
+import { addressToE164NumberSelector, e164NumberToAddressSelector } from 'src/identity/reducer'
 import { InviteBy } from 'src/invite/actions'
 import { sendInvite } from 'src/invite/saga'
 import { navigateHome } from 'src/navigator/NavigationService'
@@ -62,8 +62,22 @@ export function* watchQrCodeDetections() {
     Logger.debug(TAG, 'Barcode detected in watcher')
     const addressToE164Number = yield select(addressToE164NumberSelector)
     const recipientCache = yield select(recipientCacheSelector)
+    const e164NumberToAddress = yield select(e164NumberToAddressSelector)
+    let secureSendTxData
+
+    if (action.scanIsForSecureSend) {
+      secureSendTxData = action.transactionData
+    }
+
     try {
-      yield call(handleBarcode, action.data, addressToE164Number, recipientCache)
+      yield call(
+        handleBarcode,
+        action.data,
+        addressToE164Number,
+        recipientCache,
+        e164NumberToAddress,
+        secureSendTxData
+      )
     } catch (error) {
       Logger.error(TAG, 'Error handling the barcode', error)
     }

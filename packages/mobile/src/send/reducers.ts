@@ -51,7 +51,6 @@ export const sendReducer = (
       }
     case Actions.STORE_LATEST_IN_RECENTS:
       return storeLatestRecentReducer(state, action.recipient)
-
     default:
       return state
   }

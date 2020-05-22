@@ -3,7 +3,8 @@ import QRCode from '@celo/react-components/icons/QRCode'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
-import { StackNavigationProp } from '@react-navigation/stack'
+import { useIsFocused } from '@react-navigation/native'
+import { StackScreenProps } from '@react-navigation/stack'
 import { memoize } from 'lodash'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
@@ -15,28 +16,47 @@ import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import { headerWithBackButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { StackParamList } from 'src/navigator/types'
 import NotAuthorizedView from 'src/qrcode/NotAuthorizedView'
+import { RootState } from 'src/redux/reducers'
 import { handleBarcodeDetected, QrCode } from 'src/send/actions'
+import { TransactionDataInput } from 'src/send/SendAmount'
 import Logger from 'src/utils/Logger'
+
+interface StateProps {
+  scanIsForSecureSend?: true
+  transactionData?: TransactionDataInput
+}
 
 interface DispatchProps {
   handleBarcodeDetected: typeof handleBarcodeDetected
 }
 
-type Props = DispatchProps &
-  WithTranslation & {
-    navigation: StackNavigationProp<any, any>
+type OwnProps = StackScreenProps<StackParamList, Screens.QRScanner> & { isFocused: boolean }
+type Props = DispatchProps & WithTranslation & StateProps & OwnProps
+
+const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
+  const { route } = ownProps
+  return {
+    scanIsForSecureSend: route.params.scanIsForSecureSend,
+    transactionData: route.params.transactionData,
   }
+}
+
+const mapDispatchToProps = {
+  handleBarcodeDetected,
+}
+
+const QRScannerWrapper = (props: Props) => {
+  const isFocused = useIsFocused()
+  return <QRScanner {...props} isFocused={isFocused} />
+}
 
 class QRScanner extends React.Component<Props> {
   static navigationOptions = () => ({
     ...headerWithBackButton,
     headerTitle: i18n.t('sendFlow7:scanCode'),
   })
-
-  timeout: undefined | number = undefined
-
-  state = {}
 
   camera: RNCamera | null = null
 
@@ -45,7 +65,8 @@ class QRScanner extends React.Component<Props> {
   onBarCodeDetected = memoize(
     (qrCode: QrCode) => {
       Logger.debug('QRScanner', 'Bar code detected')
-      this.props.handleBarcodeDetected(qrCode)
+      const { scanIsForSecureSend, transactionData } = this.props
+      this.props.handleBarcodeDetected(qrCode, scanIsForSecureSend, transactionData)
     },
     (qrCode) => qrCode.data
   )
@@ -55,11 +76,12 @@ class QRScanner extends React.Component<Props> {
   }
 
   render() {
-    const { t } = this.props
+    const { t, scanIsForSecureSend, isFocused } = this.props
+
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.innerContainer}>
-          {(Platform.OS !== 'android' || this.props.navigation.isFocused) && (
+          {(Platform.OS !== 'android' || isFocused) && (
             <RNCamera
               ref={(ref) => {
                 this.camera = ref
@@ -93,18 +115,20 @@ class QRScanner extends React.Component<Props> {
             </RNCamera>
           )}
         </View>
-        <View style={styles.footerContainer}>
-          <Button
-            onPress={this.onPressShowYourCode}
-            text={t('showYourQRCode')}
-            standard={false}
-            type={BtnTypes.SECONDARY}
-          >
-            <View style={styles.footerIcon}>
-              <QRCode />
-            </View>
-          </Button>
-        </View>
+        {!scanIsForSecureSend && (
+          <View style={styles.footerContainer}>
+            <Button
+              onPress={this.onPressShowYourCode}
+              text={t('showYourQRCode')}
+              standard={false}
+              type={BtnTypes.SECONDARY}
+            >
+              <View style={styles.footerIcon}>
+                <QRCode />
+              </View>
+            </Button>
+          </View>
+        )}
       </SafeAreaView>
     )
   }
@@ -172,6 +196,7 @@ const styles = StyleSheet.create({
   },
 })
 
-export default connect(null, {
-  handleBarcodeDetected,
-})(withTranslation(Namespaces.sendFlow7)(QRScanner))
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(withTranslation(Namespaces.sendFlow7)(QRScannerWrapper))

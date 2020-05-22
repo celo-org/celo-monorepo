@@ -16,6 +16,7 @@ export const DEVELOPER_LIST = '10'
 
 interface OwnProps {
   submitText: string
+  placeholder?: string
   route?: string
   listID?: string
   isDarkMode?: boolean
@@ -45,6 +46,7 @@ const emailErrorStyle = (errors: string[]) => {
 export default React.memo(function EmailForm({
   isDarkMode,
   submitText,
+  placeholder,
   listID = NEWSLETTER_LIST,
   route = '/contacts',
 }: Props) {
@@ -70,7 +72,7 @@ export default React.memo(function EmailForm({
                     isDarkMode ? standardStyles.inputDarkFocused : standardStyles.inputFocused
                   }
                   onChange={onInput}
-                  placeholder={t('common:email') + '*'}
+                  placeholder={placeholder || t('common:email') + '*'}
                   placeholderTextColor={
                     isDarkMode ? colors.placeholderDarkMode : colors.placeholderGray
                   }
