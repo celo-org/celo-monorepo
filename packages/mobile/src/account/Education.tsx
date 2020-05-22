@@ -8,7 +8,6 @@ import { Dimensions, Image, StyleSheet, Text, View } from 'react-native'
 import Swiper from 'react-native-swiper'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
-import { componentWithAnalytics } from 'src/analytics/wrapper'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { placeholder } from 'src/images/Images'
 import { navigateBack } from 'src/navigator/NavigationService'
@@ -219,4 +218,4 @@ const style = StyleSheet.create({
   },
 })
 
-export default componentWithAnalytics(withTranslation(Namespaces.nuxCurrencyPhoto4)(Education))
+export default withTranslation(Namespaces.nuxCurrencyPhoto4)(Education)

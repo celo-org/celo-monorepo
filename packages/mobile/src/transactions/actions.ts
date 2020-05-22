@@ -1,5 +1,6 @@
 import { TokenTransactionType } from 'src/apollo/types'
 import { ExchangeConfirmationCardProps } from 'src/exchange/ExchangeConfirmationCard'
+import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import i18n from 'src/i18n'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -140,11 +141,13 @@ export const navigateToExchangeReview = (
   timestamp: number,
   confirmationProps: ExchangeConfirmationCardProps
 ) => {
+  const { makerAmount } = confirmationProps
+  const isSold = makerAmount.currencyCode === CURRENCIES[CURRENCY_ENUM.GOLD].code
   navigate(Screens.TransactionReview, {
     reviewProps: {
       type: TokenTransactionType.Exchange,
       timestamp,
-      header: i18n.t('exchangeFlow9:exchange'),
+      header: isSold ? i18n.t('exchangeFlow9:soldGold') : i18n.t('exchangeFlow9:purchasedGold'),
     },
     confirmationProps,
   })

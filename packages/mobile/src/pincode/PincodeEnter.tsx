@@ -3,16 +3,18 @@
  * when we need to fetch a PIN from a user.
  */
 import colors from '@celo/react-components/styles/colors'
+import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { StyleSheet } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
-import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { nuxNavigationOptions } from 'src/navigator/Headers'
+import { Screens } from 'src/navigator/Screens'
+import { StackParamList } from 'src/navigator/types'
 import Pincode from 'src/pincode/Pincode'
 import { isPinCorrect, isPinValid, PIN_LENGTH } from 'src/pincode/utils'
 import { RootState } from 'src/redux/reducers'
@@ -31,7 +33,10 @@ interface DispatchProps {
   showError: typeof showError
 }
 
-type Props = StateProps & DispatchProps & WithTranslation & NavigationInjectedProps
+type Props = StateProps &
+  DispatchProps &
+  WithTranslation &
+  StackScreenProps<StackParamList, Screens.PincodeEnter>
 
 class PincodeEnter extends React.Component<Props, State> {
   static navigationOptions = { gestureEnabled: false, ...nuxNavigationOptions }
@@ -45,7 +50,7 @@ class PincodeEnter extends React.Component<Props, State> {
   }
 
   onCorrectPin = (pin: string) => {
-    const onSuccess = this.props.navigation.getParam('onSuccess')
+    const onSuccess = this.props.route.params.onSuccess
     if (onSuccess) {
       onSuccess(pin)
     }
@@ -57,9 +62,9 @@ class PincodeEnter extends React.Component<Props, State> {
   }
 
   onPressConfirm = () => {
-    const { fornoMode, navigation, currentAccount } = this.props
+    const { fornoMode, route, currentAccount } = this.props
     const { pin } = this.state
-    const withVerification = navigation.getParam('withVerification')
+    const withVerification = route.params.withVerification
     if (withVerification && currentAccount) {
       isPinCorrect(pin, fornoMode, currentAccount)
         .then(this.onCorrectPin)

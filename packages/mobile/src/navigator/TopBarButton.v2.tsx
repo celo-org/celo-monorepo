@@ -1,31 +1,59 @@
-import BorderlessButton from '@celo/react-components/components/BorderlessButton.v2'
-import { Props as TouchableProps } from '@celo/react-components/components/Touchable'
+import Touchable from '@celo/react-components/components/Touchable'
 import colors from '@celo/react-components/styles/colors.v2'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
+import variables from '@celo/react-components/styles/variables'
 import * as React from 'react'
-import { StyleProp, StyleSheet, TextStyle } from 'react-native'
+import { StyleProp, StyleSheet, Text, TextStyle } from 'react-native'
 
-type Props = TouchableProps & {
-  style?: StyleProp<TextStyle>
+interface CommonProps {
+  disabled?: boolean
   testID?: string
+  onPress: () => void
 }
 
-export default function TopBarButton({ onPress, style, children, disabled, testID }: Props) {
+type WrapperProps = CommonProps & {
+  children: JSX.Element
+}
+
+function Wrapper({ onPress, disabled, testID, children }: WrapperProps) {
   return (
-    <BorderlessButton
+    <Touchable
       disabled={disabled}
-      onPress={onPress}
       testID={testID}
-      style={style ? { ...styles.text, ...style } : styles.text}
+      onPress={onPress}
+      borderless={true}
+      hitSlop={variables.iconHitslop}
     >
       {children}
-    </BorderlessButton>
+    </Touchable>
+  )
+}
+
+export type TopBarIconButtonProps = CommonProps & {
+  icon: JSX.Element
+}
+
+export function TopBarIconButton(props: TopBarIconButtonProps) {
+  return <Wrapper {...props}>{props.icon}</Wrapper>
+}
+
+export type TopBarTextButtonProps = CommonProps & {
+  title: string
+  titleStyle?: StyleProp<TextStyle>
+}
+
+export function TopBarTextButton(props: TopBarTextButtonProps) {
+  const { titleStyle, title } = props
+  return (
+    <Wrapper {...props}>
+      <Text style={titleStyle ? [styles.text, titleStyle] : styles.text}>{title}</Text>
+    </Wrapper>
   )
 }
 
 const styles = StyleSheet.create({
   text: {
-    ...fontStyles.regular500,
+    ...fontStyles.regular,
     color: colors.greenUI,
     paddingHorizontal: 16,
   },
