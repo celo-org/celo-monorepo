@@ -56,6 +56,21 @@ At Dunia Payment, we are building an electronic wallet that will let people in S
 
 Github : https://github.com/duniapay/Dunia-Wallet-Celo
 
+### Syklo by Air Protocol 
+
+Syklo is the first peer-to-peer mobile application, on [Air Protocol](https://www.airprotocol.org), that allows users to send remittances from anywhere in the world. It also serves as a digital wallet to store USDs thus enabling users to save in a stable currency.
+
+Through its use of the Celo blockchain, implemented on Air Protocol, it creates dynamic multisig escrows (using a threshold of 2/3). The escrows enable users to be confident their crypto payment is safe while sending their off-chain (P2P) transaction, such as sending USD via PayPal. If the exchange goes smoothly then the escrow is released, however if something goes sideways, then a mediation team can give a ruling and sign the release of the escrow to the appropriate user.
+
+This app is one example of what developers can achieve by using Celo and the Air Protocol. Air Protocol provides the infrastructure to create decentralized P2P transactions and Celo provides the blockchain to exchange and store the crypto assets safely.
+
+Air Protocol Github: https://github.com/air-protocol/nitrogen 
+To download Syklo Android apk click [here](https://www.airprotocol.org/syklo-v1.apk) 
+For Syklo iOS app, we'll be sharing through TestFlight, so please share your TestFlight account [here](https://forms.gle/1oLc9S8n71bK7sTi6) 
+Coming soon! We'll open source Syklo code too, so anyone can use it or change it for their needs :) 
+
+Note: To be able to accept offers in "Market", please fund your account (you can find in on the menu -> Wallet) by using the following link: https://celo.org/developers/faucet or wait for someone to accept your transaction after making a proposal of "Add funds" (menu -> Add funds)
+
 ## Add your app to this list!
 
 _Are you building on Celo? To add your project, please submit a pull request updating this page!_
