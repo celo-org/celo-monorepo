@@ -1,4 +1,5 @@
 import firebase, { ReactNativeFirebase } from '@react-native-firebase/app'
+import '@react-native-firebase/auth'
 import '@react-native-firebase/database'
 import '@react-native-firebase/messaging'
 // We can't combine the 2 imports otherwise it only imports the type and fails at runtime
