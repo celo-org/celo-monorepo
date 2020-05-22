@@ -69,7 +69,8 @@ export function* getPincode(withVerification = true) {
     const pin = yield new Promise((resolve, reject) => {
       navigate(Screens.PincodeEnter, {
         onSuccess: resolve,
-        onFail: reject,
+        // Looks like this param is not used/needed anymore
+        // onFail: reject,
         withVerification,
       })
     })

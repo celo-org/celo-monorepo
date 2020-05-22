@@ -1,5 +1,5 @@
 /* Shared mock values to facilitate testing */
-import { StackNavigationProp } from '@react-navigation/stack'
+import { StackNavigationProp, StackScreenProps } from '@react-navigation/stack'
 import BigNumber from 'bignumber.js'
 import { MinimalContact } from 'react-native-contacts'
 import { NotificationTypes, PaymentRequest, PaymentRequestStatus } from 'src/account/types'
@@ -8,6 +8,7 @@ import { EscrowedPayment } from 'src/escrow/actions'
 import { SHORT_CURRENCIES } from 'src/geth/consts'
 import { AddressToE164NumberType, E164NumberToAddressType } from 'src/identity/reducer'
 import { AttestationCode } from 'src/identity/verification'
+import { StackParamList } from 'src/navigator/types'
 import {
   RecipientKind,
   RecipientWithContact,
@@ -175,6 +176,23 @@ export const mockNavigation: StackNavigationProp<any, any> = ({
   addListener: jest.fn(),
   removeListener: jest.fn(),
 } as unknown) as StackNavigationProp<any, any>
+
+export function getMockStackScreenProps<RouteName extends keyof StackParamList>(
+  ...args: undefined extends StackParamList[RouteName]
+    ? [RouteName] | [RouteName, StackParamList[RouteName]]
+    : [RouteName, StackParamList[RouteName]]
+): StackScreenProps<StackParamList, RouteName> {
+  const [name, params] = args
+  return {
+    navigation: mockNavigation,
+    // @ts-ignore
+    route: {
+      key: '1',
+      name,
+      params,
+    },
+  }
+}
 
 export const mockAddressToE164Number: AddressToE164NumberType = {
   [mockAccount]: mockE164Number,
