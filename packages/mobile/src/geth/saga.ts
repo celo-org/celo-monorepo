@@ -188,6 +188,7 @@ export function* gethSaga() {
     yield take(Actions.CANCEL_GETH_SAGA)
     yield cancel(gethRelatedSagas)
   } else {
+    // TODO(yorke): monitor to make sure RPC is still available
     yield put(setGethConnected(true))
     yield take(Actions.CANCEL_GETH_SAGA)
   }

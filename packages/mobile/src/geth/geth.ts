@@ -81,6 +81,7 @@ async function createNewGeth(sync: boolean = true): Promise<typeof RNGeth> {
 
   Logger.debug('Geth@newGeth', `Network ID is ${networkID}, syncMode is ${syncMode}`)
 
+  // 25 is react native geth default
   const maxPeers = sync ? 25 : 0
 
   const gethOptions: any = {

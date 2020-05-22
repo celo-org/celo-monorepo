@@ -1,4 +1,5 @@
 import { newKitFromWeb3 } from '@celo/contractkit'
+import { privateKeyToAddress } from '@celo/utils/lib/address'
 import Web3 from 'web3'
 
 export function* getContractKit() {
@@ -10,3 +11,14 @@ export async function getContractKitOutsideGenerator() {
 }
 
 export const web3ForUtils = new Web3()
+
+export function* getWallet() {
+  const mockGethWallet = {
+    addAccount: jest.fn(async (privateKey: string, passphrase: string) =>
+      privateKeyToAddress(privateKey)
+    ),
+    unlockAccount: jest.fn(),
+    isAccountUnlocked: jest.fn(() => true),
+  }
+  return mockGethWallet
+}

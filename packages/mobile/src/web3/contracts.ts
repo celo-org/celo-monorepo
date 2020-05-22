@@ -2,10 +2,11 @@ import { newKitFromWeb3 } from '@celo/contractkit'
 import { RpcWallet } from '@celo/contractkit/lib/wallets/rpc-wallet'
 import { Platform } from 'react-native'
 import * as net from 'react-native-tcp'
-import { select, take } from 'redux-saga/effects'
+import { call, select, take } from 'redux-saga/effects'
 import sleep from 'sleep-promise'
 import { DEFAULT_FORNO_URL } from 'src/config'
 import { IPC_PATH } from 'src/geth/geth'
+import { waitForGethConnectivity } from 'src/geth/saga'
 import { store } from 'src/redux/store'
 import Logger from 'src/utils/Logger'
 import { Actions } from 'src/web3/actions'
@@ -16,8 +17,8 @@ import { provider } from 'web3-core'
 const tag = 'web3/contracts'
 
 // TODO(yorke): merge instances of contractkit and refactor retrieval of providers
-const IpcProvider = getIpcProvider()
-export const gethWallet = new RpcWallet(IpcProvider)
+const ipcProvider = getIpcProvider()
+const gethWallet = new RpcWallet(ipcProvider)
 const contractKitForno = newKitFromWeb3(getWeb3(true), gethWallet)
 const contractKitGeth = newKitFromWeb3(getWeb3(false), gethWallet)
 // Web3 for utils does not require a provider, using geth web3 to avoid creating another web3 instance
@@ -30,7 +31,12 @@ function getWeb3(fornoMode: boolean): Web3 {
       fornoMode ? DEFAULT_FORNO_URL : 'geth'
     }`
   )
-  return fornoMode ? new Web3(getHttpProvider(DEFAULT_FORNO_URL)) : new Web3(IpcProvider)
+  return fornoMode ? new Web3(getHttpProvider(DEFAULT_FORNO_URL)) : new Web3(ipcProvider)
+}
+
+export function* getWallet() {
+  yield call(waitForGethConnectivity)
+  return gethWallet
 }
 
 // Workaround as contractKit logic is still used outside generators
@@ -65,17 +71,17 @@ export function getContractKitBasedOnFornoInStore() {
   return forno ? contractKitForno : contractKitGeth
 }
 
-function getIpcProvider() {
+export function getIpcProvider() {
   Logger.debug(tag, 'creating IPCProvider...')
 
-  const ipcProvider = new Web3.providers.IpcProvider(IPC_PATH, net)
+  const _ipcProvider = new Web3.providers.IpcProvider(IPC_PATH, net)
   Logger.debug(tag, 'created IPCProvider')
 
   // More details on the IPC objects can be seen via this
   // console.debug("Ipc connection object is " + Object.keys(ipcProvider.connection));
   // console.debug("Ipc data handle is " + ipcProvider.connection._events['data']);
   // @ts-ignore
-  const ipcProviderConnection: any = ipcProvider.connection
+  const ipcProviderConnection: any = _ipcProvider.connection
   const dataResponseHandlerKey: string = 'data'
   const oldDataHandler = ipcProviderConnection._events[dataResponseHandlerKey]
   // Since we are modifying internal properties of IpcProvider, it is best to add this check to ensure that
@@ -99,7 +105,7 @@ function getIpcProvider() {
   // ipcProvider.on("error", () => {
   //   Logger.showError("Error occurred");
   // })
-  return ipcProvider
+  return _ipcProvider
 }
 
 function getHttpProvider(url: string): provider {

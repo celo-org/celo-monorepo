@@ -35,7 +35,7 @@ import {
   updateWeb3SyncProgress,
   Web3SyncProgress,
 } from 'src/web3/actions'
-import { getContractKit, gethWallet } from 'src/web3/contracts'
+import { getContractKit, getWallet } from 'src/web3/contracts'
 import { currentAccountSelector, fornoSelector } from 'src/web3/selectors'
 import { getLatestBlock } from 'src/web3/utils'
 import { Block } from 'web3-eth'
@@ -197,8 +197,9 @@ export function* assignAccountFromPrivateKey(privateKey: string) {
       throw Error('Cannot create account without having the pin set')
     }
     const account = privateKeyToAddress(privateKey)
+    const wallet = yield call(getWallet)
     try {
-      yield call(gethWallet.addAccount, privateKey, pincode)
+      yield call(wallet.addAccount, privateKey, pincode)
     } catch (e) {
       if (e.toString().includes('account already exists')) {
         Logger.warn(TAG + '@assignAccountFromPrivateKey', 'Attempted to import same account')
@@ -207,7 +208,7 @@ export function* assignAccountFromPrivateKey(privateKey: string) {
         throw e
       }
 
-      yield call(gethWallet.unlockAccount, account, pincode, UNLOCK_DURATION)
+      yield call(wallet.unlockAccount, account, pincode, UNLOCK_DURATION)
     }
 
     Logger.debug(TAG + '@assignAccountFromPrivateKey', `Added to wallet: ${account}`)
@@ -248,14 +249,14 @@ export function* getAccount() {
 
 export function* unlockAccount(account: string) {
   Logger.debug(TAG + '@unlockAccount', `Unlocking account: ${account}`)
-  if (!gethWallet.isAccountUnlocked(account)) {
+  const wallet = yield call(getWallet)
+  if (!wallet.isAccountUnlocked(account)) {
     return true
   }
 
   try {
     const pincode = yield call(getPincode, true)
-    yield call(waitForGethConnectivity)
-    yield call(gethWallet.unlockAccount, account, pincode, UNLOCK_DURATION)
+    yield call(wallet.unlockAccount, account, pincode, UNLOCK_DURATION)
     Logger.debug(TAG + '@unlockAccount', `Account unlocked: ${account}`)
     return true
   } catch (error) {

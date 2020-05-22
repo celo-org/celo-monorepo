@@ -16,7 +16,6 @@ import { transferEscrowedPayment } from 'src/escrow/actions'
 import { calculateFee } from 'src/fees/saga'
 import { generateShortInviteLink } from 'src/firebase/dynamicLinks'
 import { CURRENCY_ENUM } from 'src/geth/consts'
-import { waitForGethConnectivity } from 'src/geth/saga'
 import { refreshAllBalances } from 'src/home/actions'
 import i18n from 'src/i18n'
 import { setHasSeenVerificationNux, updateE164PhoneNumberAddresses } from 'src/identity/actions'
@@ -48,7 +47,7 @@ import Logger from 'src/utils/Logger'
 import {
   getContractKit,
   getContractKitOutsideGenerator,
-  gethWallet,
+  getWallet,
   web3ForUtils,
 } from 'src/web3/contracts'
 import { getOrCreateAccount, waitWeb3LastBlock } from 'src/web3/saga'
@@ -354,9 +353,9 @@ export function* skipInvite() {
 function* addTempAccountToWallet(inviteCode: string) {
   Logger.debug(TAG + '@addTempAccountToWallet', 'Attempting to add temp wallet')
   try {
-    yield call(waitForGethConnectivity)
     // Import account into the local geth node
-    const tempAccount = yield call(gethWallet.addAccount, inviteCode, TEMP_PW)
+    const wallet = yield call(getWallet)
+    const tempAccount = yield call(wallet.addAccount, inviteCode, TEMP_PW)
     Logger.debug(TAG + '@addTempAccountToWallet', 'Account added', tempAccount)
   } catch (e) {
     if (e.toString().includes('account already exists')) {
@@ -374,8 +373,8 @@ export function* withdrawFundsFromTempAccount(
   newAccount: string
 ) {
   Logger.debug(TAG + '@withdrawFundsFromTempAccount', 'Unlocking temporary account')
-  yield call(waitForGethConnectivity)
-  yield call(gethWallet.unlockAccount, tempAccount, TEMP_PW, 600)
+  const wallet = yield call(getWallet)
+  yield call(wallet.unlockAccount, tempAccount, TEMP_PW, 600)
 
   Logger.debug(
     TAG + '@withdrawFundsFromTempAccount',
