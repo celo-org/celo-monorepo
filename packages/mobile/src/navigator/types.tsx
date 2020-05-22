@@ -63,9 +63,11 @@ export type StackParamList = {
   [Screens.FeeExchangeEducation]: {}
   [Screens.FiatExchange]: {}
   [Screens.GoldEducation]: {}
-  [Screens.ImportWallet]: {
-    clean: boolean
-  }
+  [Screens.ImportWallet]:
+    | {
+        clean: boolean
+      }
+    | undefined
   [Screens.ImportWalletEmpty]: {
     backupPhrase: string
   }
