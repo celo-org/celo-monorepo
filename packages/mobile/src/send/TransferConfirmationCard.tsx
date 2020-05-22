@@ -27,7 +27,7 @@ export interface TransferConfirmationCardProps {
   comment?: string | null
   amount: MoneyAmount
   type: TokenTransactionType
-  e164PhoneNumber?: string | null
+  e164PhoneNumber?: string
   dollarBalance?: BigNumber
   recipient?: Recipient
 }
@@ -93,7 +93,7 @@ const renderTopSection = (props: Props) => {
         <Avatar
           recipient={recipient}
           address={address}
-          e164Number={e164PhoneNumber || undefined}
+          e164Number={e164PhoneNumber}
           iconSize={iconSize}
         />
       </View>

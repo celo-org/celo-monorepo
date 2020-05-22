@@ -35,7 +35,7 @@ function navigateToTransactionReview({
   }
 
   const recipient = getRecipientFromAddress(address, addressToE164Number, recipientCache)
-  const e164PhoneNumber = addressToE164Number[address]
+  const e164PhoneNumber = addressToE164Number[address] || undefined
 
   navigateToPaymentTransferReview(type, timestamp, {
     address,
