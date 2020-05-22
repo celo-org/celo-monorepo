@@ -132,21 +132,20 @@ export const getRecipientVerificationStatus = (
     return RecipientVerificationStatus.VERIFIED
   }
 
-  if (recipient.e164PhoneNumber) {
-    const addresses = e164NumberToAddress[recipient.e164PhoneNumber]
-
-    if (addresses === undefined) {
-      return RecipientVerificationStatus.UNKNOWN
-    }
-
-    if (addresses === null) {
-      return RecipientVerificationStatus.UNVERIFIED
-    }
-
-    return RecipientVerificationStatus.VERIFIED
+  if (!recipient.e164PhoneNumber) {
+    return RecipientVerificationStatus.UNKNOWN
   }
 
-  return RecipientVerificationStatus.UNKNOWN
+  const addresses = e164NumberToAddress[recipient.e164PhoneNumber]
+  if (addresses === undefined) {
+    return RecipientVerificationStatus.UNKNOWN
+  }
+
+  if (addresses === null) {
+    return RecipientVerificationStatus.UNVERIFIED
+  }
+
+  return RecipientVerificationStatus.VERIFIED
 }
 
 export function getRecipientThumbnail(recipient?: Recipient) {

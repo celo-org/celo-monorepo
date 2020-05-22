@@ -19,7 +19,7 @@ import { Screens } from 'src/navigator/Screens'
 import SummaryNotification from 'src/notifications/SummaryNotification'
 import { listItemRenderer } from 'src/paymentRequest/IncomingPaymentRequestListScreen'
 import PaymentRequestNotificationInner from 'src/paymentRequest/PaymentRequestNotificationInner'
-import { getSenderFromPaymentRequest } from 'src/paymentRequest/utils'
+import { getRecipientFromPaymentRequest } from 'src/paymentRequest/utils'
 import { NumberToRecipient } from 'src/recipients/recipient'
 import { recipientCacheSelector } from 'src/recipients/reducer'
 import { RootState } from 'src/redux/reducers'
@@ -64,11 +64,7 @@ export class IncomingPaymentRequestSummaryNotification extends React.Component<P
       <PaymentRequestNotificationInner
         key={item.uid}
         amount={item.amount}
-        requesterRecipient={getSenderFromPaymentRequest(
-          item,
-          this.props.addressToE164Number,
-          this.props.recipientCache
-        )}
+        recipient={getRecipientFromPaymentRequest(item, this.props.recipientCache)}
       />
     )
   }
@@ -85,7 +81,8 @@ export class IncomingPaymentRequestSummaryNotification extends React.Component<P
     ) : (
       <SummaryNotification<PaymentRequest>
         items={requests}
-        title={t('incomingPaymentRequests')}
+        title={t('incomingPaymentRequestsSummaryTitle', { count: requests.length })}
+        detailsI18nKey="walletFlow5:incomingPaymentRequestsSummaryDetails"
         icon={<Image source={sendDollar} style={styles.image} resizeMode="contain" />}
         onReview={this.onReview}
         itemRenderer={this.itemRenderer}
