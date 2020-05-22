@@ -61,6 +61,10 @@ export enum CustomEventNames {
   verification_validate_code_start = 'verification_validate_code_start',
   verification_validate_code_finish = 'verification_validate_code_finish',
 
+  phone_number_quota_purchase_success = 'phone_number_quota_purchase_success',
+  phone_number_quota_purchase_failure = 'phone_number_quota_purchase_failure',
+  phone_number_quota_purchase_skip = 'phone_number_quota_purchase_skip',
+
   redeem_invite_success = 'redeem_invite_success',
   redeem_invite_timed_out = 'redeem_invite_timed_out',
   redeem_invite_failed = 'redeem_invite_failed',

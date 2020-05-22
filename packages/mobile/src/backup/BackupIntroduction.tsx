@@ -3,6 +3,7 @@ import TextButton from '@celo/react-components/components/TextButton.v2'
 import { default as colors, default as colorsV2 } from '@celo/react-components/styles/colors.v2'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import { Spacing } from '@celo/react-components/styles/styles.v2'
+import { StackNavigationOptions } from '@react-navigation/stack'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
@@ -15,7 +16,7 @@ import DelayButton from 'src/backup/DelayButton'
 import { useAccountKey } from 'src/backup/utils'
 import { Namespaces } from 'src/i18n'
 import Logo from 'src/icons/Logo.v2'
-import { headerWithBackButton } from 'src/navigator/Headers'
+import { drawerHeader } from 'src/navigator/Headers.v2'
 import { navigateProtected } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
@@ -37,12 +38,13 @@ const mapStateToProps = (state: RootState): StateProps => {
   }
 }
 
-class BackupIntroduction extends React.Component<Props> {
-  static navigationOptions = () => ({
-    ...headerWithBackButton,
-    headerRight: <DelayButton />,
-  })
+export const navOptionsForAccount: StackNavigationOptions = {
+  ...drawerHeader,
+  headerTitle: '',
+  headerRight: () => <DelayButton />,
+}
 
+class BackupIntroduction extends React.Component<Props> {
   componentDidMount() {
     this.props.enterBackupFlow()
   }
