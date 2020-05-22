@@ -1539,7 +1539,6 @@ exports[`HomePage renders 1`] = `
           "alignSelf": "center",
           "flexDirection": "column",
           "justifyContent": "center",
-          "marginBottom": "30px",
           "marginTop": "50px",
           "maxWidth": "100vw",
           "msFlexAlign": "center",
@@ -1653,17 +1652,14 @@ exports[`HomePage renders 1`] = `
             "WebkitAlignItems": "center",
             "WebkitBoxAlign": "center",
             "WebkitBoxFlex": 0,
-            "WebkitBoxPack": "center",
             "WebkitFlexGrow": 0,
             "WebkitFlexShrink": 0,
-            "WebkitJustifyContent": "center",
             "alignItems": "center",
             "flexGrow": 0,
             "flexShrink": 0,
-            "justifyContent": "center",
+            "marginTop": "30px",
             "msFlexAlign": "center",
             "msFlexNegative": 0,
-            "msFlexPack": "center",
             "msFlexPositive": 0,
             "paddingBottom": "10px",
             "paddingLeft": "10px",
@@ -1677,85 +1673,104 @@ exports[`HomePage renders 1`] = `
           className="css-view-1dbjc4n"
           style={
             Object {
+              "WebkitBoxFlex": 1,
+              "WebkitBoxPack": "justify",
+              "WebkitFlexBasis": "0%",
+              "WebkitFlexGrow": 1,
+              "WebkitFlexShrink": 1,
+              "WebkitJustifyContent": "space-between",
+              "flexBasis": "0%",
+              "flexGrow": 1,
+              "flexShrink": 1,
+              "justifyContent": "space-between",
               "maxWidth": "330px",
+              "msFlexNegative": 1,
+              "msFlexPack": "justify",
+              "msFlexPositive": 1,
+              "msFlexPreferredSize": "0%",
             }
           }
         >
           <div
             className="css-view-1dbjc4n"
-            style={
-              Object {
-                "borderBottomLeftRadius": "60px",
-                "borderBottomRightRadius": "60px",
-                "borderTopLeftRadius": "60px",
-                "borderTopRightRadius": "60px",
-                "height": "60px",
-                "marginBottom": "20px",
-                "overflowX": "hidden",
-                "overflowY": "hidden",
-                "width": "60px",
-              }
-            }
           >
-            <svg
-              height="60px"
-              style={Object {}}
-              viewBox="0 0 1000 1000"
-              width="60px"
+            <div
+              className="css-view-1dbjc4n"
+              style={
+                Object {
+                  "borderBottomLeftRadius": "60px",
+                  "borderBottomRightRadius": "60px",
+                  "borderTopLeftRadius": "60px",
+                  "borderTopRightRadius": "60px",
+                  "height": "60px",
+                  "marginBottom": "20px",
+                  "overflowX": "hidden",
+                  "overflowY": "hidden",
+                  "width": "60px",
+                }
+              }
             >
-              <desc>
-                Symbol for the Celo cUSD Currency
-              </desc>
-              <path
-                d="M0 0h1000v1000H0z"
-                fill="#45CD85"
+              <svg
+                height="60px"
                 style={Object {}}
-              />
-              <path
-                d="M479 770c104 0 196-69 226-170h-81c-25 57-82 94-145 94-88 0-159-71-159-159 0-63 37-120 94-145v-81c-101 30-170 122-170 226 0 129 106 235 235 235zm82-206h72v-23l-3-16c56-10 90-44 90-91 0-113-180-79-180-117 0-12 18-21 50-21s67 9 102 27v-75c-22-7-44-12-66-13l2-16v-23h-72v23l3 16c-58 9-93 40-93 84 0 119 180 76 180 119 0 13-19 23-49 23-36 0-74-11-128-38v76c29 15 60 23 94 26l-2 16v23z"
-                fill="#35C071"
-                style={Object {}}
-              />
-              <path
-                d="M479 760c98 0 181-63 212-150h-61c-27 56-85 94-151 94-93 0-169-76-169-169 0-66 38-124 94-151v-61c-87 31-150 114-150 212 0 124 101 225 225 225zm92-206h52v-12l-4-26c56-6 91-37 91-82 0-106-180-63-180-117 0-19 22-31 60-31 30 0 62 8 92 21v-52c-21-6-44-10-68-11l4-26v-12h-52v12l4 26c-59 6-94 34-94 75 0 110 180 60 180 119 0 20-24 33-59 33-36 0-73-11-118-32v54c30 14 62 21 96 23l-4 26v12z"
-                fill="#FFF"
-                style={Object {}}
-              />
-            </svg>
-          </div>
-          <h4
-            aria-level="4"
-            className="css-reset-4rbku5 css-text-901oao"
-            dir="auto"
-            role="heading"
-            style={
-              Object {
-                "color": "rgba(221,221,221,1.00)",
-                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                "fontSize": "24px",
-                "lineHeight": "32px",
-                "textRendering": "geometricPrecision",
-                "textTransform": "none",
+                viewBox="0 0 1000 1000"
+                width="60px"
+              >
+                <desc>
+                  Symbol for the Celo cUSD Currency
+                </desc>
+                <path
+                  d="M0 0h1000v1000H0z"
+                  fill="#45CD85"
+                  style={Object {}}
+                />
+                <path
+                  d="M479 770c104 0 196-69 226-170h-81c-25 57-82 94-145 94-88 0-159-71-159-159 0-63 37-120 94-145v-81c-101 30-170 122-170 226 0 129 106 235 235 235zm82-206h72v-23l-3-16c56-10 90-44 90-91 0-113-180-79-180-117 0-12 18-21 50-21s67 9 102 27v-75c-22-7-44-12-66-13l2-16v-23h-72v23l3 16c-58 9-93 40-93 84 0 119 180 76 180 119 0 13-19 23-49 23-36 0-74-11-128-38v76c29 15 60 23 94 26l-2 16v23z"
+                  fill="#35C071"
+                  style={Object {}}
+                />
+                <path
+                  d="M479 760c98 0 181-63 212-150h-61c-27 56-85 94-151 94-93 0-169-76-169-169 0-66 38-124 94-151v-61c-87 31-150 114-150 212 0 124 101 225 225 225zm92-206h52v-12l-4-26c56-6 91-37 91-82 0-106-180-63-180-117 0-19 22-31 60-31 30 0 62 8 92 21v-52c-21-6-44-10-68-11l4-26v-12h-52v12l4 26c-59 6-94 34-94 75 0 110 180 60 180 119 0 20-24 33-59 33-36 0-73-11-118-32v54c30 14 62 21 96 23l-4 26v12z"
+                  fill="#FFF"
+                  style={Object {}}
+                />
+              </svg>
+            </div>
+            <h4
+              aria-level="4"
+              className="css-reset-4rbku5 css-text-901oao"
+              dir="auto"
+              role="heading"
+              style={
+                Object {
+                  "color": "rgba(221,221,221,1.00)",
+                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                  "fontSize": "24px",
+                  "lineHeight": "32px",
+                  "textRendering": "geometricPrecision",
+                  "textTransform": "none",
+                }
               }
-            }
-          >
-            cUSD
-          </h4>
-          <div
-            className="css-text-901oao"
-            dir="auto"
-            style={
-              Object {
-                "color": "rgba(221,221,221,1.00)",
-                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                "fontSize": "20px",
-                "lineHeight": "28px",
-                "marginBottom": "20px",
-                "textRendering": "geometricPrecision",
+            >
+              cUSD
+            </h4>
+            <div
+              className="css-text-901oao"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(221,221,221,1.00)",
+                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                  "fontSize": "20px",
+                  "lineHeight": "28px",
+                  "marginBottom": "20px",
+                  "marginTop": "10px",
+                  "textRendering": "geometricPrecision",
+                }
               }
-            }
-          >
-            cUSD (Celo Dollars) are a stable asset that follows the US Dollar. With cUSD, you can share money faster, cheaper, and more easily on your mobile phone.
+            >
+              cUSD (Celo Dollars) are a stable asset that follows the US Dollar. With cUSD, you can share money faster, cheaper, and more easily on your mobile phone.
+            </div>
           </div>
           <div
             className="css-view-1dbjc4n"
@@ -1862,17 +1877,14 @@ exports[`HomePage renders 1`] = `
             "WebkitAlignItems": "center",
             "WebkitBoxAlign": "center",
             "WebkitBoxFlex": 0,
-            "WebkitBoxPack": "center",
             "WebkitFlexGrow": 0,
             "WebkitFlexShrink": 0,
-            "WebkitJustifyContent": "center",
             "alignItems": "center",
             "flexGrow": 0,
             "flexShrink": 0,
-            "justifyContent": "center",
+            "marginTop": "30px",
             "msFlexAlign": "center",
             "msFlexNegative": 0,
-            "msFlexPack": "center",
             "msFlexPositive": 0,
             "paddingBottom": "10px",
             "paddingLeft": "10px",
@@ -1886,86 +1898,105 @@ exports[`HomePage renders 1`] = `
           className="css-view-1dbjc4n"
           style={
             Object {
+              "WebkitBoxFlex": 1,
+              "WebkitBoxPack": "justify",
+              "WebkitFlexBasis": "0%",
+              "WebkitFlexGrow": 1,
+              "WebkitFlexShrink": 1,
+              "WebkitJustifyContent": "space-between",
+              "flexBasis": "0%",
+              "flexGrow": 1,
+              "flexShrink": 1,
+              "justifyContent": "space-between",
               "maxWidth": "330px",
+              "msFlexNegative": 1,
+              "msFlexPack": "justify",
+              "msFlexPositive": 1,
+              "msFlexPreferredSize": "0%",
             }
           }
         >
           <div
             className="css-view-1dbjc4n"
-            style={
-              Object {
-                "borderBottomLeftRadius": "60px",
-                "borderBottomRightRadius": "60px",
-                "borderTopLeftRadius": "60px",
-                "borderTopRightRadius": "60px",
-                "height": "60px",
-                "marginBottom": "20px",
-                "overflowX": "hidden",
-                "overflowY": "hidden",
-                "width": "60px",
-              }
-            }
           >
-            <svg
-              height="60px"
-              style={Object {}}
-              viewBox="0 0 1000 1000"
-              width="60px"
+            <div
+              className="css-view-1dbjc4n"
+              style={
+                Object {
+                  "borderBottomLeftRadius": "60px",
+                  "borderBottomRightRadius": "60px",
+                  "borderTopLeftRadius": "60px",
+                  "borderTopRightRadius": "60px",
+                  "height": "60px",
+                  "marginBottom": "20px",
+                  "overflowX": "hidden",
+                  "overflowY": "hidden",
+                  "width": "60px",
+                }
+              }
             >
-              <desc>
-                Symbol for the Celo cGLD Currency
-              </desc>
-              <path
-                d="M0 0h1000v1000H0z"
-                fill="#FBCC5C"
+              <svg
+                height="60px"
                 style={Object {}}
-              />
-              <path
-                d="M453 778c104 0 196-69 226-170h-81c-25 57-82 94-145 94-88 0-159-71-159-159 0-63 37-120 94-145v-81c-101 30-170 122-170 226 0 129 106 235 235 235zm154-210c95 0 163-71 163-170v-35H603l-23 71h112c-6 35-41 62-83 62-61 0-105-45-105-108s45-108 108-108c36 0 65 9 104 31v-80c-32-15-68-23-104-23-102 0-183 80-182 180 1 103 77 180 177 180z"
-                fill="#F9B73E"
-                style={Object {}}
-              />
-              <path
-                d="M453 768c98 0 181-63 212-150h-61c-27 56-85 94-151 94-93 0-169-76-169-169 0-66 38-124 94-151v-61c-87 31-150 114-150 212 0 124 101 225 225 225zm154-210c90 0 153-67 153-160v-25H610l-16 51h109c0 45-42 82-94 82-67 0-115-50-115-118s50-118 118-118c33 0 61 7 94 24v-57c-30-13-63-19-94-19-97 0-173 76-172 170 1 97 72 170 167 170z"
-                fill="#FFF"
-                id="symbol-celo-gold"
-                style={Object {}}
-              />
-            </svg>
-          </div>
-          <h4
-            aria-level="4"
-            className="css-reset-4rbku5 css-text-901oao"
-            dir="auto"
-            role="heading"
-            style={
-              Object {
-                "color": "rgba(221,221,221,1.00)",
-                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                "fontSize": "24px",
-                "lineHeight": "32px",
-                "textRendering": "geometricPrecision",
-                "textTransform": "none",
+                viewBox="0 0 1000 1000"
+                width="60px"
+              >
+                <desc>
+                  Symbol for the Celo cGLD Currency
+                </desc>
+                <path
+                  d="M0 0h1000v1000H0z"
+                  fill="#FBCC5C"
+                  style={Object {}}
+                />
+                <path
+                  d="M453 778c104 0 196-69 226-170h-81c-25 57-82 94-145 94-88 0-159-71-159-159 0-63 37-120 94-145v-81c-101 30-170 122-170 226 0 129 106 235 235 235zm154-210c95 0 163-71 163-170v-35H603l-23 71h112c-6 35-41 62-83 62-61 0-105-45-105-108s45-108 108-108c36 0 65 9 104 31v-80c-32-15-68-23-104-23-102 0-183 80-182 180 1 103 77 180 177 180z"
+                  fill="#F9B73E"
+                  style={Object {}}
+                />
+                <path
+                  d="M453 768c98 0 181-63 212-150h-61c-27 56-85 94-151 94-93 0-169-76-169-169 0-66 38-124 94-151v-61c-87 31-150 114-150 212 0 124 101 225 225 225zm154-210c90 0 153-67 153-160v-25H610l-16 51h109c0 45-42 82-94 82-67 0-115-50-115-118s50-118 118-118c33 0 61 7 94 24v-57c-30-13-63-19-94-19-97 0-173 76-172 170 1 97 72 170 167 170z"
+                  fill="#FFF"
+                  id="symbol-celo-gold"
+                  style={Object {}}
+                />
+              </svg>
+            </div>
+            <h4
+              aria-level="4"
+              className="css-reset-4rbku5 css-text-901oao"
+              dir="auto"
+              role="heading"
+              style={
+                Object {
+                  "color": "rgba(221,221,221,1.00)",
+                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                  "fontSize": "24px",
+                  "lineHeight": "32px",
+                  "textRendering": "geometricPrecision",
+                  "textTransform": "none",
+                }
               }
-            }
-          >
-            cGLD
-          </h4>
-          <div
-            className="css-text-901oao"
-            dir="auto"
-            style={
-              Object {
-                "color": "rgba(221,221,221,1.00)",
-                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                "fontSize": "20px",
-                "lineHeight": "28px",
-                "marginBottom": "20px",
-                "textRendering": "geometricPrecision",
+            >
+              cGLD
+            </h4>
+            <div
+              className="css-text-901oao"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(221,221,221,1.00)",
+                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                  "fontSize": "20px",
+                  "lineHeight": "28px",
+                  "marginBottom": "20px",
+                  "marginTop": "10px",
+                  "textRendering": "geometricPrecision",
+                }
               }
-            }
-          >
-            cGLD (Celo Gold) is a utility and governance asset for the Celo community, which has a fixed supply and variable value. With cGLD, you can help shape the direction of the Celo Platform.
+            >
+              cGLD (Celo Gold) is a utility and governance asset for the Celo community, which has a fixed supply and variable value. With cGLD, you can help shape the direction of the Celo Platform.
+            </div>
           </div>
           <div
             className="css-view-1dbjc4n"
