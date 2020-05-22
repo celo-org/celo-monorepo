@@ -33,7 +33,7 @@ type Props = WithTranslation & OwnProps & StateProps
 const isTransferConfirmationCardProps = (
   confirmationProps: TransferConfirmationCardProps | ExchangeConfirmationCardProps
 ): confirmationProps is TransferConfirmationCardProps =>
-  (confirmationProps as TransferConfirmationCardProps).address !== undefined
+  (confirmationProps as TransferConfirmationCardProps).type !== undefined
 
 const hasAddressChanged = (
   confirmationProps: TransferConfirmationCardProps | ExchangeConfirmationCardProps,

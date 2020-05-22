@@ -94,7 +94,7 @@ export const addHashToStandbyTransaction = (
 export const navigateToPaymentTransferReview = (
   type: string,
   timestamp: number,
-  transferConfirmationProps: TransferConfirmationCardProps
+  confirmationProps: TransferConfirmationCardProps
 ) => {
   let headerText = ''
   switch (type) {
@@ -133,15 +133,15 @@ export const navigateToPaymentTransferReview = (
       timestamp,
       header: headerText,
     },
-    transferConfirmationProps,
+    confirmationProps,
   })
 }
 
 export const navigateToExchangeReview = (
   timestamp: number,
-  exchangeConfirmationProps: ExchangeConfirmationCardProps
+  confirmationProps: ExchangeConfirmationCardProps
 ) => {
-  const { makerAmount } = exchangeConfirmationProps
+  const { makerAmount } = confirmationProps
   const isSold = makerAmount.currencyCode === CURRENCIES[CURRENCY_ENUM.GOLD].code
   navigate(Screens.TransactionReview, {
     reviewProps: {
@@ -149,7 +149,7 @@ export const navigateToExchangeReview = (
       timestamp,
       header: isSold ? i18n.t('exchangeFlow9:soldGold') : i18n.t('exchangeFlow9:purchasedGold'),
     },
-    exchangeConfirmationProps,
+    confirmationProps,
   })
 }
 
