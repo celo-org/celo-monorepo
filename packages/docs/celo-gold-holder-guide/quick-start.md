@@ -65,7 +65,6 @@ First, read [these instructions](ledger.md) carefully. Then, whereever you see i
 If you haven't already, open a terminal window and install the [Celo CLI](https://docs.celo.org/command-line-interface/introduction):
 
 ```bash
- apt-get install lsb-release libudev-dev libusb-dev libusb-1.0-0 -y
  npm install -g @celo/celocli
 ```
 
@@ -144,11 +143,13 @@ Otherwise, you're all set. You don't need to take any further action right now.
 
 ## Authorize Vote Signer Keys
 
-To allow you to keep your Beneficiary Ledger offline on a day-to-day basis, it’s recommended to use a seperate [Authorized Vote Signer Account](https://docs.celo.org/validator-guide/summary/detailed#authorized-vote-signers) that will vote on behalf of the beneficiary.
+To allow you to keep your Beneficiary Ledger offline on a day-to-day basis, it’s recommended to use a separate [Authorized Vote Signer Account](https://docs.celo.org/validator-guide/summary/detailed#authorized-vote-signers) that will vote on behalf of the beneficiary.
+
+{% hint style="info" %}
+A vote signer can either be another Ledger device or a cloud Hardware Security Module (HSM). Explore [this guide](cloud-hsm.md) to learn more about cloud HSM setup and celocli integration.
+{% endhint %}
 
 This is a two step process. First, you create a "proof of possession" that shows that the holder of the beneficiary key also holds the vote signer key. Then, you will use that when the benficiary signs a transaction authorizing the vote signer key. This proves to the Celo network that a single entity holds both keys.
-
-A vote signer can either be another Ledger device or a cloud Hardware Security Module (HSM). Explore [this guide](cloud-hsm.md) to learn more about cloud HSM setup and celocli integration.
 
 {% hint style="info" %}
 Connect your **Vote Signer Ledger** now, unlock it, and open the Celo application.

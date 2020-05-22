@@ -1,4 +1,4 @@
-# Validator Setup FAQ
+# Validator Troubleshooting FAQ
 
 This is a living document. Please contribute if you have a solution to a common problem.
 
@@ -27,9 +27,14 @@ You can then back this file up to a cloud storage for redundancy.
 
 To install celocli on a Linux machine, run the following:
 ``` bash
-sudo apt-get update -y
-sudo apt-get install lsb-release libudev-dev libusb-dev libusb-1.0-0 -y
+sudo apt-get update
+sudo apt-get install libusb-1.0-0 -y
 sudo npm install -g @celo/celocli --unsafe-perm
+```
+
+To install celocli on a Mac/Windows machine, run the following:
+```bash
+npm install @celo/celocli
 ```
 
 You can then run celocli and point it to your local geth.ipc file:

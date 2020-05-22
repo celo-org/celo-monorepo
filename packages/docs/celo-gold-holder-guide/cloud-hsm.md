@@ -4,7 +4,7 @@ A cloud Hardware Security Module (HSM) provides a good balance between security 
 
 ## Create an Azure subscription
 
-If you don't have an Azure subscription already, you can [create a free trial here](https://azure.microsoft.com/free/) that starts with $200 credit. You can [view the pricing for ECC HSM keys here](https://azure.microsoft.com/pricing/details/key-vault/).
+If you don't have an Azure subscription already, you can [create a free trial here](https://azure.microsoft.com/free/) that starts with $200 credit. You can [view the pricing for Eliptic Curve Cryptography (ECC) HSM keys here](https://azure.microsoft.com/pricing/details/key-vault/).
 
 ## Deploy your Azure Key Vault
 
@@ -73,16 +73,16 @@ In the Cloud Shell or Access Policies pane of the Key Vault, set the [GET, LIST,
 az keyvault set-policy --name <your-key-vault-name> --spn $AZURE_CLIENT_ID --key-permissions get list sign
 ```
 
-## Run CeloCLI
+## Connecting CeloCLI to KeyVault
 
-Now that your environment variables are set, we just need to let `celocli` know that we want to use this Key Vault wallet. We do this by passing in the flag `--useAKV` and `--azureVaultName`. Similar to `--useLedger`, all CLI commands will use the HSM signer when `--useAKV` is specified.
+Now that your environment variables are set, we just need to let `celocli` know that we want to use this Key Vault signer. We do this by passing in the flag `--useAKV` and `--azureVaultName`. Similar to `--useLedger`, all CLI commands will use the HSM signer when `--useAKV` is specified.
 
 ```bash
 # On your local machine
 celocli account:list --useAKV --azureVaultName $AZURE_VAULT_NAME
 ```
 
-Your Key Vault address will show up under "Local Addresses".
+Your Key Vault address will show up under "Local Addresses". If you'd like to use this key as your vote signer key, you can follow [this guide](./quick-start.md#authorize-vote-signer-keys) and replace `--useLedger` with `--useAKV --azureVaultName $AZURE_VAULT_NAME`.
 
 ## Connecting ContractKit to KeyVault
 
@@ -99,3 +99,6 @@ console.log(`Found addresses: ${await akvWallet.getAccounts()}`)
 const contractKit = newKitFromWeb3(this.web3, akvWallet)
 ```
 
+## Summary
+
+You can now leverage a cloud HSM key to perform signing as a user or application. This improves both security and availability of your Celo keys. We also recommend enabling two-factor authentication across your Azure subscription and to leverage [Managed Service Identities](https://docs.microsoft.com/azure/active-directory/managed-identities-azure-resources/overview) where possible.
