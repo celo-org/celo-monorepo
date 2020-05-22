@@ -29,7 +29,7 @@ interface Props {
   type: TokenTransactionType
   e164PhoneNumber?: string
   recipient?: Recipient
-  validatedRecipientAddress?: string | null
+  validatedRecipientAddress?: string
   onEditAddressClick?: () => void
 }
 

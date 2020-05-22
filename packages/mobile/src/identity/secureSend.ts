@@ -165,7 +165,7 @@ export function getSecureSendAddress(
 ) {
   const { e164PhoneNumber } = recipient
   if (!e164PhoneNumber || !secureSendPhoneNumberMapping[e164PhoneNumber]) {
-    return null
+    return undefined
   }
 
   return secureSendPhoneNumberMapping[e164PhoneNumber].address

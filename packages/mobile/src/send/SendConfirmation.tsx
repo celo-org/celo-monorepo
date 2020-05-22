@@ -46,7 +46,7 @@ interface StateProps {
   transactionData: TransactionDataInput
   confirmationInput: ConfirmationInput
   addressValidationType: AddressValidationType
-  validatedRecipientAddress?: string | null
+  validatedRecipientAddress?: string
 }
 
 interface DispatchProps {
