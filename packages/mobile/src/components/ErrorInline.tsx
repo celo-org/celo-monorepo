@@ -26,12 +26,13 @@ const mapDispatchToProps = {
 
 type Props = DispatchProps & OwnProps & WithTranslation
 
+// Pass null as dismissAfter value to show error indefinitely
 function ErrorMessageInline(props: Props) {
   const { error, dismissAfter, t } = props
 
   // Keep the space empty when there isn't an error
   if (!error) {
-    return <View style={styles.errorContainer} />
+    return <View style={dismissAfter !== null && styles.errorContainer} />
   }
 
   if (dismissAfter !== null) {
@@ -39,7 +40,7 @@ function ErrorMessageInline(props: Props) {
   }
 
   return (
-    <View style={styles.errorContainer}>
+    <View style={dismissAfter !== null && styles.errorContainer}>
       <Text style={styles.errorMessage}>{t(error)} </Text>
     </View>
   )

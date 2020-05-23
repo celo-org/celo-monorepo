@@ -8,16 +8,16 @@ import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
-import Modal from 'react-native-modal'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import CodeRow, { CodeRowStatus } from 'src/components/CodeRow'
 import ErrorMessageInline from 'src/components/ErrorInline'
+import Modal from 'src/components/Modal'
 import { SingleDigitInput } from 'src/components/SingleDigitInput'
 import { Namespaces, withTranslation } from 'src/i18n'
 import InfoIcon from 'src/icons/InfoIcon.v2'
-import MenuBurger from 'src/icons/MenuBurger'
+import MenuBurgerCard from 'src/icons/MenuBurgerCard'
 import { validateRecipientAddress } from 'src/identity/actions'
 import { AddressValidationType } from 'src/identity/reducer'
 import { headerWithBackButton } from 'src/navigator/Headers'
@@ -204,21 +204,19 @@ export class ValidateRecipientAccount extends React.Component<Props, State> {
         </KeyboardAwareScrollView>
         <KeyboardSpacer />
         <Modal isVisible={this.state.isModalVisible}>
-          <View style={styles.modalContainer}>
-            <Text style={styles.modalHeader}>{t('helpModal.header')}</Text>
-            <Text style={styles.modalBody}>{t('helpModal.body1')}</Text>
-            <View style={styles.menuContainer}>
-              <MenuBurger />
-              <Text style={styles.menuText}>Menu</Text>
-            </View>
-            <Text style={styles.modalBody}>{t('helpModal.body2')}</Text>
-            <View style={styles.addressContainer}>
-              <MenuBurger />
-              <Text style={styles.modalBody2}>{t('helpModal.body3')}</Text>
-            </View>
-            <View style={styles.modalButtonContainer}>
-              <TextButton onPress={this.toggleModal}>{t('global:dismiss')}</TextButton>
-            </View>
+          <Text style={styles.modalHeader}>{t('helpModal.header')}</Text>
+          <Text style={styles.modalBody}>{t('helpModal.body1')}</Text>
+          <View style={styles.menuContainer}>
+            <MenuBurgerCard length={30} />
+            <Text style={styles.menuText}>Menu</Text>
+          </View>
+          <Text style={styles.modalBody}>{t('helpModal.body2')}</Text>
+          <View style={styles.addressContainer}>
+            <MenuBurgerCard length={30} />
+            <Text style={styles.modalBody2}>{t('helpModal.body3')}</Text>
+          </View>
+          <View style={styles.modalButtonContainer}>
+            <TextButton onPress={this.toggleModal}>{t('global:dismiss')}</TextButton>
           </View>
         </Modal>
       </SafeAreaView>
@@ -270,30 +268,29 @@ const styles = StyleSheet.create({
   modalBody: {
     ...fontStyles.regular,
     textAlign: 'center',
+    paddingVertical: 8,
+  },
+  modalHeader: {
+    ...fontStyles.h2,
+    textAlign: 'center',
+    paddingBottom: 4,
   },
   modalBody2: {
     ...fontStyles.small,
     textAlign: 'center',
     color: colors.gray4,
-  },
-  modalContainer: {
-    backgroundColor: colors.light,
-    margin: 24,
-    borderRadius: 4,
-  },
-  modalHeader: {
-    ...fontStyles.h2,
-    marginVertical: 15,
-    textAlign: 'center',
+    paddingVertical: 8,
   },
   menuContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+    paddingVertical: 8,
   },
   menuText: {
     ...fontStyles.small,
     color: colors.gray4,
+    paddingLeft: 16,
   },
   addressContainer: {
     flexDirection: 'column',
