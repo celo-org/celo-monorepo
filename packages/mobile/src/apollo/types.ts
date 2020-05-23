@@ -161,6 +161,10 @@ export enum TokenTransactionType {
   NetworkFee = 'NETWORK_FEE',
 }
 
+export function isTokenTxTypeSent(type: TokenTransactionType) {
+  return type === TokenTransactionType.Sent || type === TokenTransactionType.EscrowSent
+}
+
 export type TokenTransfer = TokenTransaction & {
   __typename?: 'TokenTransfer'
   type: TokenTransactionType

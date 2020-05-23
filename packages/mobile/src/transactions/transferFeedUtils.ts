@@ -1,6 +1,6 @@
 import { TFunction } from 'i18next'
 import * as _ from 'lodash'
-import { TokenTransactionType, UserTransactionsQuery } from 'src/apollo/types'
+import { isTokenTxTypeSent, TokenTransactionType, UserTransactionsQuery } from 'src/apollo/types'
 import { DEFAULT_TESTNET } from 'src/config'
 import { decryptComment } from 'src/identity/commentEncryption'
 import { AddressToE164NumberType } from 'src/identity/reducer'
@@ -12,11 +12,7 @@ export function getDecryptedTransferFeedComment(
   commentKey: string | null,
   type: TokenTransactionType
 ) {
-  return decryptComment(
-    comment,
-    commentKey,
-    type === TokenTransactionType.Sent || type === TokenTransactionType.EscrowSent
-  )
+  return decryptComment(comment, commentKey, isTokenTxTypeSent(type))
 }
 
 export function getTransferFeedParams(

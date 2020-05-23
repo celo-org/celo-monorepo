@@ -10,16 +10,19 @@ import {
   encryptComment as encryptCommentRaw,
 } from '@celo/utils/src/commentEncryption'
 import { memoize, values } from 'lodash'
-import { call, put } from 'redux-saga/effects'
+import { call, put, select } from 'redux-saga/effects'
+import { isTokenTxTypeSent } from 'src/apollo/types'
 import { features } from 'src/flags'
 import {
   getUserSelfPhoneHashDetails,
   PhoneNumberHashDetails,
   SALT_CHAR_LENGTH,
 } from 'src/identity/privacy'
+import { NewTransactionsInFeedAction } from 'src/transactions/actions'
 import Logger from 'src/utils/Logger'
 import { setPrivateCommentKey } from 'src/web3/actions'
 import { getContractKit } from 'src/web3/contracts'
+import { privateCommentKeySelector } from 'src/web3/selectors'
 
 const TAG = 'identity/commentKey'
 // A separator to split the comment content from the metadata
@@ -59,6 +62,9 @@ export function* encryptComment(
     return comment
   }
 
+  // TODO currently users register this key when the get verified
+  // We should nudge unverified users to register a key as well otherwise
+  // they don't benefit from comment encryption
   const fromKey: Buffer | null = yield call(getCommentKey, fromAddress)
   if (!fromKey) {
     Logger.debug(TAG, 'No sender key found, skipping encryption')
@@ -90,30 +96,40 @@ export function* encryptComment(
   }
 }
 
+interface DecryptedComment {
+  comment: string | null
+  e164Number?: string
+  salt?: string
+}
+
+// Memoize to avoid computing decryptions more than once per comment
+// TODO investigate whether its worth it to save this in persisted state, maybe Apollo cache?
 export const decryptComment = memoize(_decryptComment, (...args) => values(args).join('_'))
 
-function _decryptComment(comment: string | null, commentKey: string | null, isSender: boolean) {
+function _decryptComment(
+  comment: string | null,
+  commentKeyPrivate: string | null,
+  isSender: boolean
+): DecryptedComment {
   Logger.debug(TAG, 'Decrypting comment')
 
-  if (!features.USE_COMMENT_ENCRYPTION || !comment || !commentKey) {
+  if (!features.USE_COMMENT_ENCRYPTION || !comment || !commentKeyPrivate) {
     Logger.debug(TAG, 'Invalid params, skipping decryption')
-    return comment
+    return { comment }
   }
 
   const { comment: decryptedComment, success } = decryptCommentRaw(
     comment,
-    hexToBuffer(commentKey),
+    hexToBuffer(commentKeyPrivate),
     isSender
   )
 
   if (success) {
     Logger.debug(TAG, 'Comment decryption succeeded')
-    const { content, e164Number, salt } = extractPhoneNumberMetadata(decryptedComment)
-    // TODO confirm and register e164Number + salt somehow
-    return content
+    return extractPhoneNumberMetadata(decryptedComment)
   } else {
     Logger.error(TAG, 'Decrypting comment failed, returning raw comment')
-    return comment
+    return { comment }
   }
 }
 
@@ -129,12 +145,52 @@ export function embedPhoneNumberMetadata(
 export function extractPhoneNumberMetadata(commentData: string) {
   const phoneNumMetadata = commentData.match(PHONE_METADATA_REGEX)
   if (!phoneNumMetadata || phoneNumMetadata.length < 4) {
-    return { content: commentData }
+    return { comment: commentData }
   }
 
   return {
-    content: phoneNumMetadata[1],
+    comment: phoneNumMetadata[1],
     e164Number: phoneNumMetadata[2],
     salt: phoneNumMetadata[3],
   }
+}
+
+// Check tx comments (if they exist) for identity metadata like phone numbers and salts
+export function* checkTxsForIdentityMetadata({ transactions }: NewTransactionsInFeedAction) {
+  if (!transactions || !transactions.length) {
+    return
+  }
+
+  const commentKeyPrivate: string | null = yield select(privateCommentKeySelector)
+  if (!commentKeyPrivate) {
+    Logger.error(
+      TAG + 'checkTxsForIdentityMetadata',
+      'Missing comment key. Should never happen here.'
+    )
+    return
+  }
+
+  const newIdentityData: DecryptedComment[] = []
+  // Check all comments for metadata
+  for (const tx of transactions) {
+    if (tx.__typename !== 'TokenTransfer') {
+      continue
+    }
+    const decryptedComment = decryptComment(
+      tx.comment,
+      commentKeyPrivate,
+      isTokenTxTypeSent(tx.type)
+    )
+    if (!decryptedComment.e164Number || !decryptedComment.salt) {
+      continue
+    }
+    Logger.debug(TAG + 'checkTxsForIdentityMetadata', `Found metadata in tx hash ${tx.hash}`)
+    newIdentityData.push(decryptedComment)
+  }
+
+  if (!newIdentityData.length) {
+    return
+  }
+
+  // Verify the metadata claims (they could be spoofed)
 }
