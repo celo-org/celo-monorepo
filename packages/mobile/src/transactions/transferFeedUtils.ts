@@ -1,10 +1,11 @@
 import { TFunction } from 'i18next'
 import * as _ from 'lodash'
-import { TokenTransactionType } from 'src/apollo/types'
+import { TokenTransactionType, UserTransactionsQuery } from 'src/apollo/types'
 import { DEFAULT_TESTNET } from 'src/config'
 import { decryptComment } from 'src/identity/commentEncryption'
 import { AddressToE164NumberType } from 'src/identity/reducer'
 import { NumberToRecipient } from 'src/recipients/recipient'
+import { isPresent } from 'src/utils/typescript'
 
 export function getDecryptedTransferFeedComment(
   comment: string | null,
@@ -114,4 +115,8 @@ export function getTransferFeedParams(
     }
   }
   return { title, info, recipient }
+}
+
+export function getTxsFromUserTxQuery(data: UserTransactionsQuery | undefined) {
+  return data?.tokenTransactions?.edges.map((edge) => edge.node).filter(isPresent) ?? []
 }

@@ -26,7 +26,7 @@ const TAG = 'identity/commentKey'
 const METADATA_CONTENT_SEPARATOR = '~'
 // Format should be separator + e164Number + salt
 const PHONE_METADATA_REGEX = new RegExp(
-  `(.*)${METADATA_CONTENT_SEPARATOR}(\+[1-9][0-9]{1,14})([a-zA-Z0-9+/]{${SALT_CHAR_LENGTH}})$`
+  `(.*)${METADATA_CONTENT_SEPARATOR}([+][1-9][0-9]{1,14})([a-zA-Z0-9+/]{${SALT_CHAR_LENGTH}})$`
 )
 
 // Derive a new comment key from the provided private key

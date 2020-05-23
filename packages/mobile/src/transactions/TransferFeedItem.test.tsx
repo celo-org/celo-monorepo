@@ -3,8 +3,8 @@ import 'react-native'
 import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
 import { TokenTransactionType } from 'src/apollo/types'
-import { TransactionStatus } from 'src/transactions/reducer'
 import { TransferFeedItem } from 'src/transactions/TransferFeedItem'
+import { TransactionStatus } from 'src/transactions/types'
 import { createMockStore, getMockI18nProps } from 'test/utils'
 import {
   mockAccount,

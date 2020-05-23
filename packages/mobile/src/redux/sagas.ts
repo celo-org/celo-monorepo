@@ -37,6 +37,7 @@ const loggerBlacklist = [
   'INVITE/REDEEM_INVITE',
   'INVITE/STORE_INVITEE_DATA',
   'EXCHANGE/UPDATE_CELO_GOLD_EXCHANGE_RATE_HISTORY', // Not private, just noisy
+  'TRANSACTIONS/NEW_TRANSACTIONS_IN_FEED',
 ]
 
 function* loggerSaga() {

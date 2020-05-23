@@ -10,9 +10,9 @@ import {
   UserTransactionsQuery,
 } from 'src/apollo/types'
 import { CURRENCY_ENUM } from 'src/geth/consts'
-import { StandbyTransaction, TransactionStatus } from 'src/transactions/reducer'
 import { TransactionFeed } from 'src/transactions/TransactionFeed'
 import TransactionsList, { TRANSACTIONS_QUERY } from 'src/transactions/TransactionsList'
+import { StandbyTransaction, TransactionStatus } from 'src/transactions/types'
 import { createMockStore } from 'test/utils'
 
 jest.unmock('react-apollo')

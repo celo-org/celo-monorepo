@@ -1,24 +1,130 @@
 import { CeloTransactionObject } from '@celo/contractkit'
-import { call, put, take } from 'redux-saga/effects'
+import '@react-native-firebase/database'
+import '@react-native-firebase/messaging'
+import { eventChannel, EventChannel } from 'redux-saga'
+import { call, put, select, spawn, take } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
+import { apolloClient } from 'src/apollo'
+import { Token, TransactionFeedFragment, UserTransactionsQuery } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { fetchGoldBalance } from 'src/goldToken/actions'
+import { getLocalCurrencyCode } from 'src/localCurrency/selectors'
 import { fetchDollarBalance } from 'src/stableToken/actions'
 import {
   Actions,
   addHashToStandbyTransaction,
+  newTransactionsInFeed,
   removeStandbyTransaction,
   transactionConfirmed,
   transactionFailed,
 } from 'src/transactions/actions'
 import { TxPromises } from 'src/transactions/contract-utils'
+import { knownFeedTransactionsSelector, KnownFeedTransactionsType } from 'src/transactions/reducer'
 import { sendTransactionPromises, wrapSendTransactionWithRetry } from 'src/transactions/send'
+import { TRANSACTIONS_QUERY } from 'src/transactions/TransactionsList'
+import { getTxsFromUserTxQuery } from 'src/transactions/transferFeedUtils'
 import Logger from 'src/utils/Logger'
+import { getAccount } from 'src/web3/saga'
 
 const TAG = 'transactions/saga'
+
+//TODO
+// [{"data": {"tokenTransactions": [Object]}, "loading": false, "networkStatus": 7, "stale": false}]
+
+// interface QuerySubscriptionUpdate {
+//   data: {
+//     tokenTransactions:
+// }
+
+// let querySubscription: any
+
+// const querySubscription = apolloClient
+//   .watchQuery({
+//     query: TRANSACTIONS_QUERY,
+//     variables: {
+//       address: '0xc598440e31339f4a68335017b8e99e6707fa6d70',
+//       token: Token.CUsd,
+//       localCurrencyCode: 'USD',
+//     },
+//     fetchPolicy: 'cache-and-network',
+//   })
+//   .subscribe({
+//     next: (value) => {
+//       console.log('===OUTSIDE===', JSON.stringify(value))
+//     },
+//     error: (e) => console.error(e),
+//   })
+interface UserTxQueryChannelEvent {
+  transactionFeedFragments: TransactionFeedFragment[]
+}
+
+export function* initializeUserTxListQueryWatcher() {
+  const address: string | null = yield call(getAccount)
+  const localCurrencyCode = yield select(getLocalCurrencyCode)
+  const token = Token.CUsd
+
+  const userTxQueryChannel: EventChannel<UserTxQueryChannelEvent> = eventChannel((emitter) => {
+    const querySubscription = apolloClient
+      .watchQuery<UserTransactionsQuery | undefined>({
+        query: TRANSACTIONS_QUERY,
+        variables: {
+          address,
+          token,
+          localCurrencyCode,
+        },
+        fetchPolicy: 'cache-and-network',
+      })
+      .subscribe({
+        next: (queryResult) => {
+          if (queryResult.loading) {
+            return
+          }
+
+          if (queryResult.errors) {
+            Logger.error(TAG, 'Error watching user tx query' + JSON.stringify(queryResult.errors))
+            return
+          }
+          emitter({
+            transactionFeedFragments: getTxsFromUserTxQuery(queryResult.data),
+          })
+        },
+        error: (e) => console.error(e),
+      })
+
+    return querySubscription.unsubscribe
+  })
+  yield spawn(watchUserTxQueryChannel, userTxQueryChannel)
+}
+
+function* watchUserTxQueryChannel(channel: EventChannel<UserTxQueryChannelEvent>) {
+  try {
+    Logger.debug(`${TAG}/watchUserTransactionQueryChannel`, 'Started channel watching')
+    while (true) {
+      const event: UserTxQueryChannelEvent = yield take(channel)
+      if (!event) {
+        Logger.debug(`${TAG}/watchUserTransactionQueryChannel`, 'Data in channel was empty')
+        continue
+      }
+      Logger.info(`${TAG}/watchUserTransactionQueryChannel`, 'Notification received in the channel')
+      const knownTxs: KnownFeedTransactionsType = yield select(knownFeedTransactionsSelector)
+      const newTxs = event.transactionFeedFragments.filter((tx) => !knownTxs[tx.hash])
+      if (newTxs.length) {
+        yield put(newTransactionsInFeed(newTxs))
+      }
+    }
+  } catch (error) {
+    Logger.error(
+      `${TAG}/watchUserTransactionQueryChannel`,
+      'Error proccesing user tx query channel event',
+      error
+    )
+  } finally {
+    Logger.debug(`${TAG}/watchUserTransactionQueryChannel`, 'User tx channel terminated')
+  }
+}
 
 export function* waitForTransactionWithId(txId: string) {
   while (true) {

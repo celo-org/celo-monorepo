@@ -11,8 +11,8 @@ import { RootState } from 'src/redux/reducers'
 import ExchangeFeedItem from 'src/transactions/ExchangeFeedItem'
 import GoldTransactionFeedItem from 'src/transactions/GoldTransactionFeedItem'
 import NoActivity from 'src/transactions/NoActivity'
-import { TransactionStatus } from 'src/transactions/reducer'
 import TransferFeedItem from 'src/transactions/TransferFeedItem'
+import { TransactionStatus } from 'src/transactions/types'
 import Logger from 'src/utils/Logger'
 import { privateCommentKeySelector } from 'src/web3/selectors'
 
@@ -59,7 +59,7 @@ export class TransactionFeed extends React.PureComponent<Props> {
     `,
   }
 
-  renderItem = (commentKeyBuffer: string | null, kind: FeedType) => ({
+  renderItem = (commentKey: string | null, kind: FeedType) => ({
     item: tx,
   }: {
     item: FeedItem

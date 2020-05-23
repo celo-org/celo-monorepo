@@ -6,13 +6,13 @@ import { Namespaces } from 'src/i18n'
 import { AddressToE164NumberType } from 'src/identity/reducer'
 import { getRecipientFromAddress, NumberToRecipient } from 'src/recipients/recipient'
 import { navigateToPaymentTransferReview } from 'src/transactions/actions'
-import { TransactionStatus } from 'src/transactions/reducer'
 import TransactionFeedItem from 'src/transactions/TransactionFeedItem'
 import TransferFeedIcon from 'src/transactions/TransferFeedIcon'
 import {
   getDecryptedTransferFeedComment,
   getTransferFeedParams,
 } from 'src/transactions/transferFeedUtils'
+import { TransactionStatus } from 'src/transactions/types'
 
 type Props = TransferItemFragment & {
   type: TokenTransactionType

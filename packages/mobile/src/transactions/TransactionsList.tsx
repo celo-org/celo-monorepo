@@ -11,18 +11,18 @@ import { LocalCurrencyCode } from 'src/localCurrency/consts'
 import { getLocalCurrencyCode, getLocalCurrencyExchangeRate } from 'src/localCurrency/selectors'
 import { RootState } from 'src/redux/reducers'
 import { removeStandbyTransaction } from 'src/transactions/actions'
+import TransactionFeed, { FeedItem, FeedType } from 'src/transactions/TransactionFeed'
+import { getTxsFromUserTxQuery } from 'src/transactions/transferFeedUtils'
 import {
   ExchangeStandby,
   StandbyTransaction,
   TransactionStatus,
   TransferStandby,
-} from 'src/transactions/reducer'
-import TransactionFeed, { FeedItem, FeedType } from 'src/transactions/TransactionFeed'
-import { isPresent } from 'src/utils/typescript'
+} from 'src/transactions/types'
 import { currentAccountSelector } from 'src/web3/selectors'
 
 // Query poll interval
-const POLL_INTERVAL = 10000 // 10 secs
+export const POLL_INTERVAL = 10000 // 10 secs
 
 interface OwnProps {
   currency: CURRENCY_ENUM
@@ -209,13 +209,9 @@ function mapInvite(tx: FeedItem): FeedItem {
   return tx
 }
 
-function getTransactions(data: UserTransactionsQuery | undefined) {
-  return data?.tokenTransactions?.edges.map((edge) => edge.node).filter(isPresent) ?? []
-}
-
 export class TransactionsList extends React.PureComponent<Props> {
   txsFetched = (data: UserTransactionsQuery | undefined) => {
-    const transactions = getTransactions(data)
+    const transactions = getTxsFromUserTxQuery(data)
     if (transactions.length < 1) {
       return
     }
@@ -244,8 +240,12 @@ export class TransactionsList extends React.PureComponent<Props> {
     const token = currency === CURRENCY_ENUM.GOLD ? Token.CGld : Token.CUsd
     const kind = currency === CURRENCY_ENUM.GOLD ? FeedType.EXCHANGE : FeedType.HOME
 
-    const UserTransactions = ({ loading, error, data }: QueryResult) => {
-      const transactions = getTransactions(data).map((transaction) => ({
+    const UserTransactions = ({
+      loading,
+      error,
+      data,
+    }: QueryResult<UserTransactionsQuery | undefined>) => {
+      const transactions = getTxsFromUserTxQuery(data).map((transaction) => ({
         ...transaction,
         status: TransactionStatus.Complete,
       }))
