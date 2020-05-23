@@ -13,6 +13,7 @@ import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import CodeRow, { CodeRowStatus } from 'src/components/CodeRow'
+import ErrorMessageInline from 'src/components/ErrorInline'
 import { SingleDigitInput } from 'src/components/SingleDigitInput'
 import { Namespaces, withTranslation } from 'src/i18n'
 import InfoIcon from 'src/icons/InfoIcon.v2'
@@ -185,9 +186,7 @@ export class ValidateRecipientAccount extends React.Component<Props, State> {
           <View>
             <Text style={styles.h2}>{t('confirmAccountNumber.title')}</Text>
             <View>{this.renderInstructionsAndInputField()}</View>
-            <View>
-              {error && <Text style={styles.errorMessage}>{t(error, { ns: 'global' })}</Text>}
-            </View>
+            <ErrorMessageInline error={error} />
             <Button
               style={styles.button}
               onPress={this.onPressConfirm}
@@ -254,11 +253,6 @@ const styles = StyleSheet.create({
   },
   button: {
     paddingVertical: 16,
-  },
-  errorMessage: {
-    ...fontStyles.small,
-    color: colors.warning,
-    paddingVertical: 8,
   },
   helpContainer: {
     flexDirection: 'row',
