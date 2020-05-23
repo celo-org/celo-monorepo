@@ -4,14 +4,13 @@ import { Storage } from '@google-cloud/storage'
 import * as fs from 'fs'
 import fetch from 'node-fetch'
 import * as path from 'path'
-import { retryCmd } from 'src/lib/utils'
+import { retryCmd } from '../lib/utils'
 import { execCmdWithExitOnFailure } from './cmd-utils'
 import { getGenesisGoogleStorageUrl } from './endpoints'
 import { getEnvFile } from './env-utils'
 import { ensureAuthenticatedGcloudAccount } from './gcloud_utils'
 import { generateGenesisFromEnv } from './generate_utils'
 import { getBootnodeEnode, getEnodesWithExternalIPAddresses } from './geth'
-
 const genesisBlocksBucketName = GenesisBlocksGoogleStorageBucketName
 const staticNodesBucketName = StaticNodeUtils.getStaticNodesGoogleStorageBucketName()
 // Someone has taken env_files and I don't even has permission to modify it :/

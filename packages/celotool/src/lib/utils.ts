@@ -1,4 +1,3 @@
-// import prompts from 'prompts'
 import sleep from 'sleep-promise'
 import yargs from 'yargs'
 import { switchToClusterFromEnv } from './cluster'
