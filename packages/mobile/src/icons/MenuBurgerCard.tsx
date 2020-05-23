@@ -8,7 +8,7 @@ interface Props {
   length: number
 }
 
-export default function MenuBurgerButton({ length }: Props) {
+export default function MenuBurgerCard({ length }: Props) {
   return (
     <View style={[styles.container, { height: length, width: length }]}>
       <MenuBurger height={length * 1.75} width={length * 1.75} />

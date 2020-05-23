@@ -94,7 +94,7 @@
     "title": "Confirm Account Number",
     "bodyPartial": "Please ask {{displayName}} for the last four digits of their account number. It's safest to do this in person or by phone.",
     "body1Full": "Please ask {{displayName}} for their account number.",
-    "body2Full": "For security, please do not use text messaging (SMS). We strongly recommend asking in person or over the phone, through WhatsApp or Messenger, or by email.",
+    "body2Full": "We strongly recommend asking in person or over the phone, through WhatsApp or Messenger, or by email. For security, please do not use text messaging (SMS).",
     "help": "Help locating an account number",
     "submit": "Submit"
   },
@@ -106,5 +106,6 @@
     "body2": "The account number is near the bottom of the menu.",
     "body3": "Account numbers begin with \"0x\" and are 42 characters long"
   },
-  "transferAddressChanged": "This contact changed their account number since the transaction. This payment was sent to:"
+  "transferAddressChanged": "This contact changed their account number since the transaction. This payment was sent to:",
+  "addressConfirmed": "Account number confirmed"
 }

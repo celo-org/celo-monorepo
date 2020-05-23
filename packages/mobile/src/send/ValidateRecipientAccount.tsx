@@ -90,7 +90,7 @@ export class ValidateRecipientAccount extends React.Component<Props, State> {
       if (isPaymentRequest) {
         navigate(Screens.PaymentRequestConfirmation, { transactionData })
       } else {
-        navigate(Screens.SendConfirmation, { transactionData })
+        navigate(Screens.SendConfirmation, { transactionData, addressJustValidated: true })
       }
     }
   }
@@ -207,7 +207,9 @@ export class ValidateRecipientAccount extends React.Component<Props, State> {
           <Text style={styles.modalHeader}>{t('helpModal.header')}</Text>
           <Text style={styles.modalBody}>{t('helpModal.body1')}</Text>
           <View style={styles.menuContainer}>
-            <MenuBurgerCard length={30} />
+            <View style={styles.menuCardContainer}>
+              <MenuBurgerCard length={30} />
+            </View>
             <Text style={styles.menuText}>Menu</Text>
           </View>
           <Text style={styles.modalBody}>{t('helpModal.body2')}</Text>
@@ -287,10 +289,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingVertical: 8,
   },
+  menuCardContainer: {
+    paddingHorizontal: 8,
+  },
   menuText: {
     ...fontStyles.small,
     color: colors.gray4,
-    paddingLeft: 16,
+    paddingHorizontal: 8,
   },
   addressContainer: {
     flexDirection: 'column',

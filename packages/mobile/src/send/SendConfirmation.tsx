@@ -47,6 +47,7 @@ interface StateProps {
   confirmationInput: ConfirmationInput
   addressValidationType: AddressValidationType
   validatedRecipientAddress?: string
+  addressJustValidated?: true
 }
 
 interface DispatchProps {
@@ -73,7 +74,7 @@ const mapDispatchToProps = {
 
 const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
   const { route } = ownProps
-  const transactionData = route.params.transactionData
+  const { transactionData, addressJustValidated } = route.params
   const { e164NumberToAddress } = state.identity
   const { secureSendPhoneNumberMapping } = state.identity
   const confirmationInput = getConfirmationInput(
@@ -83,7 +84,7 @@ const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
   )
   const { recipient } = transactionData
   const addressValidationType = getAddressValidationType(recipient, secureSendPhoneNumberMapping)
-  // Undefined or null means no addresses validated through secure send
+  // Undefined or null means no addresses ever validated through secure send
   const validatedRecipientAddress = getSecureSendAddress(recipient, secureSendPhoneNumberMapping)
 
   return {
@@ -96,6 +97,7 @@ const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
     confirmationInput,
     addressValidationType,
     validatedRecipientAddress,
+    addressJustValidated,
   }
 }
 
@@ -108,7 +110,12 @@ export class SendConfirmation extends React.Component<Props, State> {
   }
 
   async componentDidMount() {
+    const { addressJustValidated, t } = this.props
     this.props.fetchDollarBalance()
+
+    if (addressJustValidated) {
+      Logger.showMessage(t('sendFlow7:addressConfirmed'))
+    }
   }
 
   getNavParams = () => {
