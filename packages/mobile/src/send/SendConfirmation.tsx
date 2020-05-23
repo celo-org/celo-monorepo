@@ -21,13 +21,16 @@ import CalculateFee, {
 import { getFeeDollars } from 'src/fees/selectors'
 import { completePaymentRequest, declinePaymentRequest } from 'src/firebase/actions'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
+import { AddressValidationType } from 'src/identity/reducer'
+import { getAddressValidationType, getSecureSendAddress } from 'src/identity/secureSend'
 import { InviteBy } from 'src/invite/actions'
-import { navigateBack } from 'src/navigator/NavigationService'
+import { navigate, navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 import { RootState } from 'src/redux/reducers'
 import { isAppConnected } from 'src/redux/selectors'
 import { sendPaymentOrInvite } from 'src/send/actions'
+import { TransactionDataInput } from 'src/send/SendAmount'
 import TransferReviewCard from 'src/send/TransferReviewCard'
 import { ConfirmationInput, getConfirmationInput } from 'src/send/utils'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
@@ -40,7 +43,10 @@ interface StateProps {
   defaultCountryCode: string
   dollarBalance: string
   appConnected: boolean
+  transactionData: TransactionDataInput
   confirmationInput: ConfirmationInput
+  addressValidationType: AddressValidationType
+  validatedRecipientAddress?: string
 }
 
 interface DispatchProps {
@@ -75,13 +81,21 @@ const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
     e164NumberToAddress,
     secureSendPhoneNumberMapping
   )
+  const { recipient } = transactionData
+  const addressValidationType = getAddressValidationType(recipient, secureSendPhoneNumberMapping)
+  // Undefined or null means no addresses validated through secure send
+  const validatedRecipientAddress = getSecureSendAddress(recipient, secureSendPhoneNumberMapping)
+
   return {
     account: currentAccountSelector(state),
     isSending: state.send.isSending,
     defaultCountryCode: state.account.defaultCountryCode,
     dollarBalance: state.stableToken.balance || '0',
     appConnected: isAppConnected(state),
+    transactionData,
     confirmationInput,
+    addressValidationType,
+    validatedRecipientAddress,
   }
 }
 
@@ -130,6 +144,14 @@ export class SendConfirmation extends React.Component<Props, State> {
       inviteMethod,
       firebasePendingRequestUid
     )
+  }
+
+  onEditAddressClick = () => {
+    const { transactionData, addressValidationType } = this.props
+    navigate(Screens.ValidateRecipientIntro, {
+      transactionData,
+      addressValidationType,
+    })
   }
 
   onEditClick = () => {
@@ -191,7 +213,14 @@ export class SendConfirmation extends React.Component<Props, State> {
   }
 
   renderWithAsyncFee: CalculateFeeChildren = (asyncFee) => {
-    const { t, appConnected, isSending, dollarBalance, confirmationInput } = this.props
+    const {
+      t,
+      appConnected,
+      isSending,
+      dollarBalance,
+      confirmationInput,
+      validatedRecipientAddress,
+    } = this.props
     const { amount, reason, recipient, recipientAddress, type } = confirmationInput
 
     const fee = getFeeDollars(asyncFee.result)
@@ -242,6 +271,8 @@ export class SendConfirmation extends React.Component<Props, State> {
             isLoadingFee={asyncFee.loading}
             feeError={asyncFee.error}
             type={type}
+            validatedRecipientAddress={validatedRecipientAddress}
+            onEditAddressClick={this.onEditAddressClick}
           />
           <Modal
             isVisible={this.state.modalVisible}

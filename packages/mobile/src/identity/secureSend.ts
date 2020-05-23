@@ -142,20 +142,31 @@ export function validateAndReturnMatch(
   return validatePartialAddressAndReturnMatch(userInput, possibleAddresses, userOwnAddress)
 }
 
-export function checkIfAddressValidationRequired(
+export function getAddressValidationType(
   recipient: Recipient,
   secureSendPhoneNumberMapping: SecureSendPhoneNumberMapping
 ) {
-  if (recipient.e164PhoneNumber) {
-    const { e164PhoneNumber } = recipient
+  const { e164PhoneNumber } = recipient
 
-    if (
-      secureSendPhoneNumberMapping[e164PhoneNumber] &&
-      secureSendPhoneNumberMapping[e164PhoneNumber].addressValidationType
-    ) {
-      return secureSendPhoneNumberMapping[e164PhoneNumber].addressValidationType
-    }
+  if (
+    !e164PhoneNumber ||
+    !secureSendPhoneNumberMapping[e164PhoneNumber] ||
+    !secureSendPhoneNumberMapping[e164PhoneNumber].addressValidationType
+  ) {
+    return AddressValidationType.NONE
   }
 
-  return AddressValidationType.NONE
+  return secureSendPhoneNumberMapping[e164PhoneNumber].addressValidationType
+}
+
+export function getSecureSendAddress(
+  recipient: Recipient,
+  secureSendPhoneNumberMapping: SecureSendPhoneNumberMapping
+) {
+  const { e164PhoneNumber } = recipient
+  if (!e164PhoneNumber || !secureSendPhoneNumberMapping[e164PhoneNumber]) {
+    return undefined
+  }
+
+  return secureSendPhoneNumberMapping[e164PhoneNumber].address
 }

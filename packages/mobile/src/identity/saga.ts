@@ -12,7 +12,6 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import {
   Actions,
   ValidateRecipientAddressAction,
-  validateRecipientAddressFailure,
   validateRecipientAddressSuccess,
 } from 'src/identity/actions'
 import { checkTxsForIdentityMetadata } from 'src/identity/commentEncryption'
@@ -56,12 +55,11 @@ export function* validateRecipientAddressSaga({
     yield put(validateRecipientAddressSuccess(e164PhoneNumber, validatedAddress))
   } catch (error) {
     Logger.error(TAG, 'validateRecipientAddressSaga/Address validation error: ', error)
-    if (error.message in ErrorMessages) {
+    if (Object.values(ErrorMessages).includes(error.message)) {
       yield put(showError(error.message))
     } else {
       yield put(showError(ErrorMessages.ADDRESS_VALIDATION_ERROR))
     }
-    yield put(validateRecipientAddressFailure())
   }
 }
 function* watchVerification() {

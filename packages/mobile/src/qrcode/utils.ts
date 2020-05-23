@@ -5,10 +5,7 @@ import Share from 'react-native-share'
 import { call, put } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import {
-  validateRecipientAddressFailure,
-  validateRecipientAddressSuccess,
-} from 'src/identity/actions'
+import { validateRecipientAddressSuccess } from 'src/identity/actions'
 import { AddressToE164NumberType, E164NumberToAddressType } from 'src/identity/reducer'
 import { replace } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -73,7 +70,6 @@ function* handleSecureSend(
   )
   if (!possibleRecievingAddressesFormatted.includes(userScannedAddress)) {
     yield put(showError(ErrorMessages.QR_FAILED_INVALID_RECIPIENT))
-    yield put(validateRecipientAddressFailure())
     return false
   }
 

@@ -28,7 +28,6 @@ export enum Actions {
   DENY_IMPORT_CONTACTS = 'IDENTITY/DENY_IMPORT_CONTACTS',
   VALIDATE_RECIPIENT_ADDRESS = 'SEND/VALIDATE_RECIPIENT_ADDRESS',
   VALIDATE_RECIPIENT_ADDRESS_SUCCESS = 'SEND/VALIDATE_RECIPIENT_ADDRESS_SUCCESS',
-  VALIDATE_RECIPIENT_ADDRESS_FAILURE = 'SEND/VALIDATE_RECIPIENT_ADDRESS_FAILURE',
   REQUIRE_SECURE_SEND = 'SEND/REQUIRE_SECURE_SEND',
 }
 
@@ -127,10 +126,6 @@ export interface ValidateRecipientAddressSuccessAction {
   validatedAddress: string
 }
 
-export interface ValidateRecipientAddressFailureAction {
-  type: Actions.VALIDATE_RECIPIENT_ADDRESS_FAILURE
-}
-
 export interface RequireSecureSendAction {
   type: Actions.REQUIRE_SECURE_SEND
   e164Number: E164Number
@@ -155,7 +150,6 @@ export type ActionTypes =
   | DenyImportContactsAction
   | ValidateRecipientAddressAction
   | ValidateRecipientAddressSuccessAction
-  | ValidateRecipientAddressFailureAction
   | RequireSecureSendAction
 
 export const startVerification = (): StartVerificationAction => ({
@@ -271,10 +265,6 @@ export const validateRecipientAddressSuccess = (
   type: Actions.VALIDATE_RECIPIENT_ADDRESS_SUCCESS,
   e164Number,
   validatedAddress,
-})
-
-export const validateRecipientAddressFailure = (): ValidateRecipientAddressFailureAction => ({
-  type: Actions.VALIDATE_RECIPIENT_ADDRESS_FAILURE,
 })
 
 export const requireSecureSend = (
