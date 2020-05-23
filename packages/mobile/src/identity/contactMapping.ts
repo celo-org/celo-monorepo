@@ -121,11 +121,11 @@ export function* fetchAddressesAndValidateSaga({ e164Number }: FetchAddressesAnd
       contractKit.contracts.getAttestations,
     ])
 
-    // const addresses: string[] | null = yield call(getAddresses, e164Number, attestationsWrapper)
-    const addresses = [
-      '0xfe74f43f1f3d81dbbe767cf390b312685f0c4913',
-      '0xfe74f43f1f3d81dbbe767cf390b312685f0c0000',
-    ]
+    const addresses: string[] | null = yield call(getAddresses, e164Number, attestationsWrapper)
+    // const addresses = [
+    //   '0xfe74f43f1f3d81dbbe767cf390b312685f0c4913',
+    //   '0xfe74f43f1f3d81dbbe767cf390b312685f0c0000',
+    // ]
 
     const e164NumberToAddressUpdates: E164NumberToAddressType = {}
     const addressToE164NumberUpdates: AddressToE164NumberType = {}

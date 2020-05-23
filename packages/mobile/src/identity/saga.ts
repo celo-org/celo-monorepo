@@ -7,7 +7,7 @@ import {
   takeLatest,
   takeLeading,
 } from 'redux-saga/effects'
-import { showError } from 'src/alert/actions'
+import { logError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import {
   Actions,
@@ -54,9 +54,9 @@ export function* validateRecipientAddressSaga({
   } catch (error) {
     Logger.error(TAG, 'validateRecipientAddressSaga/Address validation error: ', error)
     if (Object.values(ErrorMessages).includes(error.message)) {
-      yield put(showError(error.message))
+      yield put(logError(error.message))
     } else {
-      yield put(showError(ErrorMessages.ADDRESS_VALIDATION_ERROR))
+      yield put(logError(ErrorMessages.ADDRESS_VALIDATION_ERROR))
     }
   }
 }

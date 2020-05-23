@@ -3,6 +3,7 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import { RootState } from 'src/redux/reducers'
 
 export interface State {
+  errorType: 'show' | 'log'
   type: 'message' | 'error'
   message: string
   dismissAfter?: number | null
@@ -16,10 +17,21 @@ const initialState = null
 export const reducer = (state: State | null = initialState, action: ActionTypes): State | null => {
   switch (action.type) {
     case Actions.SHOW:
-      const { type, alertType, ...other } = action
       return {
-        type: alertType,
-        ...other,
+        errorType: 'show',
+        type: action.alertType,
+        message: action.message,
+        dismissAfter: action.dismissAfter,
+        buttonMessage: action.buttonMessage,
+        title: action.title,
+        underlyingError: action.underlyingError,
+      }
+    case Actions.LOG:
+      return {
+        errorType: 'log',
+        type: action.alertType,
+        message: action.message,
+        underlyingError: action.underlyingError,
       }
     case Actions.HIDE:
       return null

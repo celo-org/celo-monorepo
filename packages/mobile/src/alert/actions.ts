@@ -7,6 +7,7 @@ import i18n from 'src/i18n'
 export enum Actions {
   SHOW = 'ALERT/SHOW',
   HIDE = 'ALERT/HIDE',
+  LOG = 'ALERT/LOG',
 }
 
 enum AlertTypes {
@@ -22,6 +23,13 @@ interface ShowAlertAction {
   buttonMessage?: string | null
   title?: string | null
   underlyingError?: ErrorMessages | null
+}
+
+interface LogAlertAction {
+  type: Actions.LOG
+  alertType: AlertTypes
+  message: string
+  underlyingError: ErrorMessages
 }
 
 export const showMessage = (
@@ -48,6 +56,13 @@ export const showError = (
     error
   )
 }
+
+export const logError = (error: ErrorMessages, i18nOptions?: object): LogAlertAction => ({
+  type: Actions.LOG,
+  alertType: AlertTypes.ERROR,
+  message: i18n.t(error, { ns: 'global', ...(i18nOptions || {}) }),
+  underlyingError: error,
+})
 
 const showAlert = (
   alertType: AlertTypes,
@@ -76,4 +91,4 @@ export const hideAlert = (): HideAlertAction => ({
   type: Actions.HIDE,
 })
 
-export type ActionTypes = ShowAlertAction | HideAlertAction
+export type ActionTypes = ShowAlertAction | HideAlertAction | LogAlertAction
