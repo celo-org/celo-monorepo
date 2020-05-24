@@ -1,9 +1,9 @@
 import {
   BuildArtifacts,
-  Operation,
-  getStorageLayout,
   compareStorageLayouts,
   Contract as ZContract
+  getStorageLayout,
+  Operation,
 } from '@openzeppelin/upgrades'
 const  Web3 = require('web3')
 import { Contract as Web3Contract } from 'web3-eth-contract';
@@ -38,7 +38,7 @@ export interface Artifact {
 const addSchemaForLayoutChecking = (web3Contract: Web3Contract, artifact: any): ZContract => {
   // @ts-ignore
   const contract = web3Contract as Contract
-  //@ts-ignore
+  // @ts-ignore
   contract.schema = {}
   contract.schema.ast = artifact.ast
   contract.schema.contractName = artifact.contractName

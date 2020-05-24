@@ -5,7 +5,7 @@ import { getBuildArtifacts } from '@openzeppelin/upgrades'
  * lines.
  */
 import { MigrationsContract } from 'types'
-//@ts-ignore
+// @ts-ignore
 const Migrations: MigrationsContract = artifacts.require('Migrations')
 
 import { reportLayoutIncompatibilities } from '@celo/protocol/lib/layout'
