@@ -191,7 +191,7 @@ export const reducer = (
       return {
         ...state,
         isValidRecipient: true,
-        // Overwrite the previous mapping every time a new one is validated
+        // Overwrite the previous mapping when a new address is validated
         secureSendPhoneNumberMapping: dotProp.set(
           state.secureSendPhoneNumberMapping,
           `${action.e164Number}`,
@@ -201,16 +201,11 @@ export const reducer = (
           }
         ),
       }
-    case Actions.VALIDATE_RECIPIENT_ADDRESS_FAILURE:
-      return {
-        ...state,
-        isValidRecipient: false,
-      }
     case Actions.REQUIRE_SECURE_SEND:
       return {
         ...state,
         isValidRecipient: false,
-        // Overwrite the previous mapping every time a new one is validated
+        // Erase the previous mapping when new validation is required
         secureSendPhoneNumberMapping: dotProp.set(
           state.secureSendPhoneNumberMapping,
           `${action.e164Number}`,
