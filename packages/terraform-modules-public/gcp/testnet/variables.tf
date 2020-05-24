@@ -111,6 +111,11 @@ variable validator_signer_account_passwords {
   description = "Array with the Validator etherbase account passwords"
 }
 
+variable validator_release_gold_addresses {
+  type        = list(string)
+  description = "Array with the Validator release gold address(es)"
+}
+
 variable proxy_enodes {
   type        = list(string)
   description = "Array list with the proxy enode address (without enode://)"
@@ -171,6 +176,11 @@ variable attestation_signer_private_keys {
   type        = list(string)
   description = "The account private key for signing the attestations. Must be the private key of the associated validator"
   default     = [""]
+}
+
+variable attestation_signer_account_passwords {
+  type        = list(string)
+  description = "Array with the attestation_signer account passwords"
 }
 
 
@@ -241,4 +251,25 @@ variable proxy_name {
 variable proxy_addresses {
   type        = list(string)
   description = "The proxy address for ethstats"
+}
+
+variable "stackdriver_logging_exclusions" {
+  description = "List of objects that define logs to exclude on stackdriver"
+  type = map(object({
+    description  = string
+    filter       = string
+  }))
+}
+
+variable "stackdriver_logging_metrics" {
+  description = "List of objects that define COUNT (DELTA) logging metric filters to apply to Stackdriver to graph and alert on useful signals"
+  type        = map(object({
+    description = string
+    filter      = string
+  }))
+}
+
+variable "service_account_scopes" {
+  description = "Scopes to apply to the service account which all nodes in the cluster will inherit"
+  type        = list(string)
 }

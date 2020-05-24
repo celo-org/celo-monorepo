@@ -13,6 +13,11 @@ variable gcloud_region {
   description = "Name of the Google Cloud region to use"
 }
 
+variable gcloud_project {
+  type        = string
+  description = "Name of the Google Cloud project to use"
+}
+
 variable instance_type {
   description = "The instance type"
   type        = string
@@ -52,6 +57,16 @@ variable account_address {
 variable attestation_key {
   type        = list(string)
   description = "The account private key for signing the attestations. Must be the private key of an authorized address for the associated validator"
+}
+
+variable validator_signer_account_addresses {
+  type        = list(string)
+  description = "Array with the Validator account addresses"
+}
+
+variable validator_release_gold_addresses {
+  type        = list(string)
+  description = "Array with the Validator release gold addresses"
 }
 
 variable celo_provider {
@@ -97,4 +112,15 @@ variable twilio_auth_token {
 variable twilio_blacklist {
   type        = string
   description = "Twilio blacklisted country codes, separated by comma  (check twilio documentation)"
+}
+
+variable "service_account_scopes" {
+  description = "Scopes to apply to the service account which all nodes in the cluster will inherit"
+  type        = list(string)
+
+  default = [
+    "https://www.googleapis.com/auth/monitoring.write",
+    "https://www.googleapis.com/auth/logging.write",
+    "https://www.googleapis.com/auth/sqlservice.admin"
+    ]
 }

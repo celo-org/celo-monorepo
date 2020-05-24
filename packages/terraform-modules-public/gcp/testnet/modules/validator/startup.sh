@@ -1,5 +1,145 @@
 #!/bin/bash
 
+# ---- Configure logrotate ----
+echo "Configuring logrotate" | logger
+cat <<'EOF' > '/etc/logrotate.d/rsyslog'
+/var/log/syslog
+{
+        rotate 7
+        daily
+        missingok
+        notifempty
+        delaycompress
+        compress
+        postrotate
+                invoke-rc.d rsyslog rotate > /dev/null
+        endscript
+}
+
+/var/log/mail.info
+/var/log/mail.warn
+/var/log/mail.err
+/var/log/mail.log
+/var/log/daemon.log
+{
+        rotate 7
+        daily
+        missingok
+        notifempty
+        delaycompress
+        compress
+        postrotate
+                invoke-rc.d rsyslog rotate > /dev/null
+        endscript
+}
+
+/var/log/kern.log
+/var/log/auth.log
+/var/log/user.log
+/var/log/lpr.log
+/var/log/cron.log
+/var/log/debug
+/var/log/messages
+{
+        rotate 4
+        weekly
+        missingok
+        notifempty
+        compress
+        delaycompress
+        sharedscripts
+        postrotate
+                invoke-rc.d rsyslog rotate > /dev/null
+        endscript
+}
+EOF
+
+# ---- Config /etc/screenrc ----
+echo "Configuring /etc/screenrc" | logger
+cat <<'EOF' > '/etc/screenrc'
+bindkey -k k1 select 1  #  F1 = screen 1
+bindkey -k k2 select 2  #  F2 = screen 2
+bindkey -k k3 select 3  #  F3 = screen 3
+bindkey -k k4 select 4  #  F4 = screen 4
+bindkey -k k5 select 5  #  F5 = screen 5
+bindkey -k k6 select 6  #  F6 = screen 6
+bindkey -k k7 select 7  #  F7 = screen 7
+bindkey -k k8 select 8  #  F8 = screen 8
+bindkey -k k9 select 9  #  F9 = screen 9
+bindkey -k F1 prev      # F11 = prev
+bindkey -k F2 next      # F12 = next
+EOF
+
+# ---- Create backup script
+echo "Creating chaindata backup script" | logger
+cat <<'EOF' > /root/backup.sh
+#!/bin/bash
+set -x
+systemctl stop geth.service
+sleep 5
+#note this will likely need to be upgraded to rsync, as the tar operation is slow on the persistent disk storage
+tar -C /root/.celo/celo -zcvf /root/chaindata.tgz chaindata
+gsutil cp /root/chaindata.tgz gs://${gcloud_project}-chaindata
+sleep 3
+systemctl start geth.service
+EOF
+chmod u+x /root/backup.sh
+
+# ---- Create restore script
+echo "Creating chaindata restore script" | logger
+cat <<'EOF' > /root/restore.sh
+#!/bin/bash
+set -x
+gsutil -q stat gs://${gcloud_project}-chaindata/chaindata.tgz
+if [ $? -eq 0 ]
+then
+  #chaindata exists in bucket
+  echo "downloading chaindata from gs://${gcloud_project}-chaindata/chaindata.tgz"
+  gsutil cp gs://${gcloud_project}-chaindata/chaindata.tgz /root/chaindata.tgz
+  mkdir -p /root/.celo/celo
+  systemctl stop geth.service
+  sleep 3
+  tar zxvf /root/chaindata.tgz --directory /root/.celo/celo/
+  rm -rf /root/chaindata.tgz
+  sleep 3
+  systemctl start geth.service
+  else
+    echo "No chaindata.tgz found in bucket gs://${gcloud_project}-chaindata, aborting restore"
+  fi
+EOF
+chmod u+x /root/restore.sh
+
+# ---- Useful aliases ----
+echo "Configuring aliases" | logger
+echo "alias ll='ls -laF'" >> /etc/skel/.bashrc
+echo "alias ll='ls -laF'" >> /root/.profile
+echo "alias gattach='docker exec -it geth geth attach'" >> /etc/skel/.bashrc
+
+# ---- Install Stackdriver Agent
+echo "Installing Stackdriver agent" | logger
+curl -sSO https://dl.google.com/cloudagents/add-monitoring-agent-repo.sh
+bash add-monitoring-agent-repo.sh
+apt update -y
+apt install -y stackdriver-agent
+systemctl restart stackdriver-agent
+
+# ---- Install Fluent Log Collector
+echo "Installing google fluent log collector agent" | logger
+curl -sSO https://dl.google.com/cloudagents/add-logging-agent-repo.sh
+bash add-logging-agent-repo.sh
+apt update -y
+apt install -y google-fluentd
+apt install -y google-fluentd-catch-all-config-structured
+systemctl restart google-fluentd
+
+# ---- Setup swap
+echo "Setting up swapfile" | logger
+fallocate -l 2G /swapfile
+chmod 600 /swapfile
+mkswap /swapfile
+swapon /swapfile
+swapon -s
+
 # ---- Set Up Persistent Disk ----
 
 # gives a path similar to `/dev/sdb`
@@ -35,16 +175,16 @@ mkdir -p $DATA_DIR/account
 
 # ---- Install Docker ----
 
-echo "Installing Docker..."
+echo "Installing Docker..." | logger
 apt update -y && apt upgrade -y
-apt install -y apt-transport-https ca-certificates curl software-properties-common gnupg2
+apt install -y apt-transport-https ca-certificates curl software-properties-common gnupg2 htop
 curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add -
 add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable"
 apt update -y && apt upgrade -y
 apt install -y docker-ce
 systemctl start docker
 
-echo "Configuring Docker..."
+echo "Configuring Docker..." | logger
 cat <<'EOF' > '/etc/docker/daemon.json'
 {
   "log-driver": "json-file",
@@ -54,9 +194,12 @@ cat <<'EOF' > '/etc/docker/daemon.json'
   }
 }
 EOF
+
 systemctl restart docker
 
 # ---- Set Up and Run Geth ----
+
+echo "Configuring Geth" | logger
 
 GETH_NODE_DOCKER_IMAGE=${geth_node_docker_image_repository}:${geth_node_docker_image_tag}
 
@@ -90,10 +233,11 @@ echo -n '${validator_geth_account_secret}' > $DATA_DIR/account/accountSecret
 echo -n $PROXY_INTERNAL_ENODE > /root/.celo/proxyInternalEnode
 echo -n $PROXY_EXTERNAL_ENODE > /root/.celo/proxyExternalEnode
 
-echo "Starting geth..."
+echo "Starting geth..." | logger
 # We need to override the entrypoint in the geth image (which is originally `geth`).
 # `geth account import` fails when the account has already been imported. In
 # this case, we do not want to pipefail
+
 docker run \
   --rm \
   --net=host \
@@ -111,13 +255,14 @@ After=docker.service
 [Service]
 Restart=always
 ExecStart=/usr/bin/docker run \\
+  --rm \\
   --name geth \\
-  --restart=always \\
   --net=host \\
   -v $DATA_DIR:$DATA_DIR \\
   --entrypoint /bin/sh \\
   $GETH_NODE_DOCKER_IMAGE -c "\\
     geth \\
+      --etherbase=$ACCOUNT_ADDRESS \\
       --password=$DATA_DIR/account/accountSecret \\
       --unlock=$ACCOUNT_ADDRESS \\
       --allow-insecure-unlock \\
@@ -132,8 +277,6 @@ ExecStart=/usr/bin/docker run \\
       --wsaddr 0.0.0.0 \\
       --wsorigins=* \\
       --wsapi=eth,net,web3 \\
-      --nodekey=$DATA_DIR/pkey \\
-      --etherbase=$ACCOUNT_ADDRESS \\
       --networkid=${network_id} \\
       --syncmode=full \\
       --consoleformat=json \\
@@ -150,18 +293,19 @@ ExecStart=/usr/bin/docker run \\
       --proxy.proxied \\
       --proxy.proxyenodeurlpair=\\"$PROXY_URL\\" \\
   "
-ExecStop=/usr/bin/docker rm -f %N
+ExecStop=/usr/bin/docker stop -t 60 %N
 
 [Install]
 WantedBy=default.target
 EOF
 
+echo "Starting Geth" | logger
 systemctl daemon-reload
 systemctl enable geth.service
-systemctl restart geth.service
+#systemctl restart geth.service
 
 # ---- Set Up and Run Geth Exporter ----
-
+echo "Configuring Geth Exporter" | logger
 GETH_EXPORTER_DOCKER_IMAGE=${geth_exporter_docker_image_repository}:${geth_exporter_docker_image_tag}
 
 echo "Pulling geth exporter..."
@@ -176,20 +320,28 @@ After=docker.service
 [Service]
 Restart=always
 ExecStart=/usr/bin/docker run \\
+  --rm \\
   --name geth-exporter \\
-  --restart=always \\
   -v $DATA_DIR:$DATA_DIR \\
   --net=host \\
   $GETH_EXPORTER_DOCKER_IMAGE \\
   /usr/local/bin/geth_exporter \\
     -ipc $DATA_DIR/geth.ipc \\
     -filter "(.*overall|percentiles_95)"
-ExecStop=/usr/bin/docker rm -f %N
+ExecStop=/usr/bin/docker stop -t 30 %N
 
 [Install]
 WantedBy=default.target
 EOF
 
+echo "Starting Geth Exporter" | logger
 systemctl daemon-reload
 systemctl enable geth-exporter.service
 systemctl restart geth-exporter.service
+
+echo "Adding DC to docker group" | logger
+usermod -aG docker dc
+
+#--- run restore script
+echo "Restoring chaindata from backup" | logger
+bash /root/restore.sh

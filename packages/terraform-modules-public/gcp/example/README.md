@@ -1,37 +1,69 @@
-# Configure your setup
+# Overview
 
-You can take this terraform code as base for your setup. You need to configure the next parameters.
+This repository allows you to run a fully functional Celo validator setup on mainnet, including the following instances:
+* a geth proxy that peers with other nodes over the Internet, and is exposed to the Internet
+* a validator ithat peers only with the proxy (via VPC), has no public IP address
+* a txnode that peers with other nodes over the Internet, and exposes an RPC interface for the attestation service via the VPC
+* an attestation service that is exposed to the Internet
 
-## Project parameters
+# Initial Configuration
 
-The file [variables.tf](./variables.tf) contains most of the parameters used by the module. The first parameters to configure are the Google Cloud parameters. Please configure your GCP project, region and zone. Additionally you can configure, directly on [main.tf](./main.tf) the configuration for remote tfstate.
+## Install gcloud cli
+### OSX
+Via brew cask:
+```brew cask install google-cloud-sdk```
+or follow the [Google Docs](https://cloud.google.com/sdk/docs/quickstart-macos) for other install methods
 
-Most of the parameters are safe to go with the default value. You can configure the replica count for each service, but a good starting point would be 1 validator, 1 proxy, and 1 attestation service. Each validator service has an attached proxy service.
+## Create a new GCP project for Terraform with bootstrap.sh
+Run bootstrap.sh, which will create a skeleton gcloud.env file.  Now open gcloud.env in an editor, and set the following variables:
+```bash
+export TF_VAR_org_id=YOUR_ORG_ID
+export TF_VAR_billing_account=YOUR_BILLING_ACCOUNT
+export TF_VAR_project=NAME_OF_PROJECT_TO_BE_CREATED_BY_THIS_SCRIPT
+export TF_CREDS=~/.config/gcloud/${USER}-${TF_VAR_project}.json     #cred file will be created by bootstrap.sh
+export GOOGLE_APPLICATION_CREDENTIALS=${TF_CREDS}
+export GOOGLE_PROJECT=${TF_VAR_project}
+```
 
-## Required changes/parameters
+Once you have entered these variables, save the file and run bootstrap.sh again.  This will do everything required to:
+* Create a new project within your GCP organization
+* Create an IAM service account for Terraform, with permissions required to create/modify/destroy resources *only within this project*
+* Create GCP keys for the Terraform service account to use, and download them to the filesystem
+* Grants the following permissions *within this project* to the Terraform service account 
+   roles/storage.admin
+   roles/logging.configWriter
+   roles/editor
+   roles/monitoring.admin
+* Enables the following GCP API's *within this project*
+   cloudresourcemanager.googleapis.com
+   cloudbilling.googleapis.com
+   iam.googleapis.com
+   compute.googleapis.com
+   serviceusage.googleapis.com
+   stackdriver.googleapis.com
+   clouderrorreporting.googleapis.com
+* Creates a GCS bucket for storing Terraform state.  Note that the Terraform state contains sensitive information, so do not expose this bucket publicly.  TODO: ensure that the GCP default service account for the project has no access to this bucket, to avoid compromise of a lower security context node (eg txnode or proxy) from compromising a higher security node (eg validator).
 
-In order to run this example module in your Google Cloud account, you need to follow the next steps:
 
-- It is recommended to [create a new Project](https://cloud.google.com/resource-manager/docs/creating-managing-projects) for this, so every resource can be easily located.
-- You need to [create a storage bucket](https://cloud.google.com/storage/docs/creating-buckets) for storing the Terraform remote state and lock. You can use also an existing one if you prefer. Then, update the storage bucket parameters in the [main.tf](./main.tf#L9-L12). Please take care that the account secrets will be stored in this terraform state/bucket, so proper bucket access policies may apply to safe those values.
-- You need to create and configure the values for the etherbase needed accounts, as described in the [Ethereum accounts](#ethereum-accounts) section. Particularly, you will need the next accounts (for each instance/replica count):
-  - An account for the Validator address. This account does not have to be submitted to the terraform module, and it is the account that must run for election as a validator.
-  - An account for the validator instance. It is recommended to use a validator authorized signer address and submit to the module as `validator_signer_accounts` parameter. You can use the validator address here, but is recommended to use an authorized account instead.
-  - An account for the proxy. This account is only used for having a fixed enode address, so we can configure correctly the validator<->proxy communication. Submit this address using the `proxy_accounts` parameter.
-  - An account for the attestation service. Again, it is recommended to use a validator authorized signer address and submit to the module as `attestation_signer_accounts` parameter.
-  - Additionally, you will need an account for the validation group each 5 validator instances. This account does not need to be submitted to terraform.
-- The management of the accounts for election, authorizing, etc... has to be done using the `celocli` tool following the official [documentation](https://docs.celo.org/getting-started/baklava-testnet/running-a-validator). This steps can be done before of after deploying the terraform instances.
-- Finally, update the rest of values as the `replicas`, `instance_types`, `validator_name` and `proxy_name` as you prefer.
+## Configure secrets in terraform.tfvars
+Copy terraform.tfvars.example to terraform.tfvars, and edit as necessary to provide the required secrets.  The .example file includes descriptions of each secret.  terraform.tfvars is excluded in .gitignore, so be sure to safely back this up into a password management system.
+
+
+## (Optional) Configure variables.tf
+The file [variables.tf](./variables.tf) contains most of the (non sensitive) parameters used by the module, that can safely be checked into source control.
+
+The parameters in this file have sane defaults. You can configure the replica count for each service, but a good starting point would be 1 validator, 1 proxy, and 1 attestation service. Each validator service has an attached proxy service.  Note that if you set the txnode count to 0, the modules will fail, due to a bug not yet fixed.
+
 
 ## Ethereum accounts
 
-The terraform module uses as input the different account parameters: public address, public key (that also corresponds to the enode address), and the private key. These accounts are submitted as an array variable, and you have to include inputs as much as instances of that service you are deploying. Although you can specify different number or validators and attestation service, makes more sense to deploy the same number of instances for both services. The number of proxy instances will be coupled always with the number of validator instances.
+The terraform module uses as input the different account parameters: public address, public key (that also corresponds to the enode address), and the private key. These accounts are submitted as an array variable, and you have to include inputs as much as instances of that service you are deploying. Although you can specify different number or validators and attestation service, it makes more sense to deploy the same number of instances for both services. The number of proxy instances will be matched 1:1 with the number of validator instances.
 
-These accounts are imported as json keystore files in the nodes that need them using the `password` parameter configured in the variables.
+These accounts are imported by geth as json keystore files in the nodes that need them using the `password` parameter configured in the variables.
 
-It is important to check and get used to the [validator documentation](https://docs.celo.org/getting-started/baklava-testnet/running-a-validator). The addresses submitted here should corresponds `CELO_VALIDATOR_ADDRESS` and `ATTESTATION_SIGNER_ADDRESS` from that documentation, and have to be associated to your validator addresses with `celocli` following that documentation.
+It is important to be familiar with the [validator documentation](https://docs.celo.org/getting-started/mainnet/running-a-validator-in-mainnet). The addresses submitted here should corresponds `CELO_VALIDATOR_SIGNER_ADDRESS` and `ATTESTATION_SIGNER_ADDRESS` from that documentation, and have to be associated to your validator addresses with `celocli` following that documentation.
 
-Using the [celocli](https://www.npmjs.com/package/@celo/celocli), run the next command to get credentials for the needed accounts:
+Using the [celocli](https://www.npmjs.com/package/@celo/celocli), run the following command to get credentials for the required accounts:
 
 ```bash
 $ celocli account:new
@@ -43,15 +75,15 @@ publicKey: 041e9f487477b7d9f5c5818a1337601f05b790267ffc052aa98b49bea88a920bb2667
 accountAddress: 0x2A809BeE654AAe41794838291390BC75BEd100BB
 ```
 
-In the example, `0x2A809BeE654AAe41794838291390BC75BEd100BB` would be an account address, `d497b2c97f5cd276c09e53b80ee5300ff37bbf6c6e9b814d908d2ab654e56137` a private key, and the `publicKey` removing the two first characters (`1e9f487477b7d9f5c5818a1337601f05b790267ffc052aa98b49bea88a920bb2667aea5c99b47718da9198645669d6fa3643e547b9e2e1d386c4d9ee300db0cd` in the example) corresponds to the enode address.
+In the example, `0x2A809BeE654AAe41794838291390BC75BEd100BB` would be an account address, `d497b2c97f5cd276c09e53b80ee5300ff37bbf6c6e9b814d908d2ab654e56137` a private key, and the `publicKey` removing the two first characters (`1e9f487477b7d9f5c5818a1337601f05b790267ffc052aa98b49bea88a920bb2667aea5c99b47718da9198645669d6fa3643e547b9e2e1d386c4d9ee300db0cd` in the example) corresponds to the enode address.  (TODO: there is a bug in celocli which is truncating the public key, making it presently unusable for generating the enode deterministically)
 
-You have to generate an account for each instance of each component you want to deploy. Please save this credentials securely so you can recover or access your account when you need.
+You have to generate an account for each instance of each component you want to deploy.
 
-The passwords referred in the variables will be used to import the accounts in the geth deployed (i.e.: the password are using to import the private keys as json keystore format required by geth). They will keep your account safe if somebody access to the keystore file or if you want to unlock the account.
+The passwords referred in the variables will be used by geth to import the accounts into the json keystore on the filesystem of the deployed instance.
 
 ## Running terraform
 
-Once you have configured the variables with your accounts and parameters, proceed executing Terraform (gcloud cli must be correctly configured):
+Once you have configured the variables with your accounts and parameters, proceed with initializing Terraform and deploy your infrastructure:
 
 ```bash
 terraform init
@@ -59,3 +91,21 @@ teerraform plan
 # Check the resources that will be created
 terraform apply
 ```
+
+## Logging and Monitoring
+
+### Logging
+Stackdriver exclusions are configured to silently drop noisy log entries from geth.  Logging metrics are created for events critical to running Celo validator infrastructure, including proposing (mining) blocks and signing blocks proposed by others.  Genesis mismatches and p2p network failures are also instrumented.
+
+### Dashboards
+Terraform's GCP provider doesn't presently support management of dashboard resources.  However, you can use the gcloud SDK to import a Celo dashboard as follows:
+```gcloud monitoring dashboards create --config-from-file=dashboards/hud.json```
+
+### Alerting
+Stackdriver can be easily configured with notification channels, and alerts can be added for important situations, such as your validator failing to mine or sign blocks within a period of time.  TODO: add support for [alert policies](https://www.terraform.io/docs/providers/google/r/monitoring_alert_policy.html) and [notification channels](https://www.terraform.io/docs/providers/google/r/monitoring_notification_channel.html).  These are not yet implemented in this module.
+
+
+## Areas for improvement
+
+- Make stackdriver optional (use variable "enable_stackdriver") to control installation of the agents and injection of the exclusions.  This is super powerful, but perhaps not everybody who is in GCP will want to use Stackdriver
+- Lock down Storage such that the default creds on all instances do NOT have ability to pull terraform state

@@ -1,6 +1,7 @@
 locals {
   attached_disk_name = "celo-data"
-  name_prefix        = "${var.celo_env}-proxy"
+  #name_prefix        = "${var.celo_env}-proxy"
+  name_prefix = "${var.gcloud_project}-proxy"
 }
 
 resource "google_compute_address" "proxy" {
@@ -21,6 +22,8 @@ resource "google_compute_address" "proxy_internal" {
 resource "google_compute_instance" "proxy" {
   name         = "${local.name_prefix}-${count.index}"
   machine_type = var.instance_type
+
+  deletion_protection = true
 
   count = var.validator_count
 
@@ -63,8 +66,9 @@ resource "google_compute_instance" "proxy" {
       istanbul_request_timeout_ms : var.istanbul_request_timeout_ms,
       max_peers : var.proxy_max_peers,
       network_id : var.network_id,
+      gcloud_project : var.gcloud_project,
       rid : count.index,
-      proxy_name : var.proxy_name,
+      proxy_name : var.proxy_name,  
       proxy_address: var.proxy_addresses[count.index],
       proxy_private_key : var.proxy_private_keys[count.index],
       proxy_geth_account_secret : var.proxy_account_passwords[count.index],
@@ -73,14 +77,20 @@ resource "google_compute_instance" "proxy" {
       reset_geth_data : var.reset_geth_data
     }
   )
+
+  service_account {
+    scopes = var.service_account_scopes
+  }
+
 }
 
 resource "google_compute_disk" "proxy" {
   name  = "${local.name_prefix}-disk-${count.index}"
   count = var.validator_count
 
-  type = "pd-ssd"
+  #type = "pd-ssd"
+  type = "pd-standard"      #disk I/O doesn't yet warrant SSD backed validators/proxies
   # in GB
-  size                      = 100
+  size                      = 25
   physical_block_size_bytes = 4096
 }
