@@ -1,49 +1,34 @@
-import ItemSeparator from '@celo/react-components/components/ItemSeparator'
-import colors from '@celo/react-components/styles/colors'
-import { fontStyles } from '@celo/react-components/styles/fonts'
+import colors from '@celo/react-components/styles/colors.v2'
+import fontStyles from '@celo/react-components/styles/fonts.v2'
 import variables from '@celo/react-components/styles/variables'
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 
 interface Props {
   text: string
-  bubbleText?: string | null
 }
 
-export default class SectionHeadNew extends React.PureComponent<Props> {
-  render() {
-    return (
-      <>
-        <View style={style.sectionHead}>
-          <Text style={fontStyles.sectionLabelNew}>{this.props.text}</Text>
-          {this.props.bubbleText && (
-            <Text style={[fontStyles.notification, style.bubble]}>{this.props.bubbleText}</Text>
-          )}
-        </View>
-        <ItemSeparator />
-      </>
-    )
-  }
+export default function SectionheadNew({ text }: Props) {
+  return (
+    <View style={styles.container}>
+      <Text style={styles.text}>{text}</Text>
+    </View>
+  )
 }
 
-const style = StyleSheet.create({
-  sectionHead: {
+const styles = StyleSheet.create({
+  container: {
     backgroundColor: colors.background,
-    padding: variables.contentPadding,
+    paddingHorizontal: variables.contentPadding,
+    paddingVertical: 8,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  bubble: {
-    textAlign: 'center',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-around',
-    backgroundColor: colors.messageBlue,
-    borderRadius: 10,
-    padding: 1,
-    margin: 5,
-    height: 20,
-    width: 20,
+  text: {
+    ...fontStyles.sectionHeader,
+    fontSize: 13,
+    lineHeight: 16,
+    color: colors.gray4,
   },
 })

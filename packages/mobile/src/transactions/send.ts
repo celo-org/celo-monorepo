@@ -15,7 +15,6 @@ import Logger from 'src/utils/Logger'
 import { assertNever } from 'src/utils/typescript'
 import { getGasPrice } from 'src/web3/gas'
 import { fornoSelector } from 'src/web3/selectors'
-import { getLatestNonce } from 'src/web3/utils'
 import { TransactionObject } from 'web3-eth'
 
 const TAG = 'transactions/send'
@@ -25,7 +24,7 @@ const TAG = 'transactions/send'
 // causing failures when a tx times out (rare but can happen on slow devices)
 const TX_NUM_TRIES = 1 // Try txs up to this many times
 const TX_RETRY_DELAY = 2000 // 2s
-const TX_TIMEOUT = 40000 // 40s
+const TX_TIMEOUT = 45000 // 45s
 const NONCE_TOO_LOW_ERROR = 'nonce too low'
 const OUT_OF_GAS_ERROR = 'out of gas'
 const ALWAYS_FAILING_ERROR = 'always failing transaction'
@@ -35,6 +34,9 @@ const getLogger = (tag: string, txId: string) => {
   return (event: SendTransactionLogEvent) => {
     switch (event.type) {
       case SendTransactionLogEventType.Confirmed:
+        if (event.number > 0) {
+          Logger.warn(tag, `Transaction id ${txId} extra confirmation received: ${event.number}`)
+        }
         Logger.debug(tag, `Transaction confirmed with id: ${txId}`)
         break
       case SendTransactionLogEventType.EstimatedGas:
@@ -76,7 +78,7 @@ export function* sendTransactionPromises(
   account: string,
   tag: string,
   txId: string,
-  nonce: number,
+  nonce?: number,
   staticGas?: number
 ) {
   Logger.debug(`${TAG}@sendTransactionPromises`, `Going to send a transaction with id ${txId}`)
@@ -104,10 +106,10 @@ export function* sendTransactionPromises(
     tx,
     account,
     stableTokenAddress,
-    nonce,
     getLogger(tag, txId),
     staticGas,
-    gasPrice ? gasPrice.toString() : gasPrice
+    gasPrice ? gasPrice.toString() : gasPrice,
+    nonce
   )
   return transactionPromises
 }
@@ -122,7 +124,7 @@ export function* sendTransaction(
   staticGas?: number,
   cancelAction?: string
 ) {
-  const sendTxMethod = function*(nonce: number) {
+  const sendTxMethod = function*(nonce?: number) {
     const { confirmation } = yield call(
       sendTransactionPromises,
       tx,
@@ -135,20 +137,18 @@ export function* sendTransaction(
     const result = yield confirmation
     return result
   }
-  yield call(wrapSendTransactionWithRetry, txId, account, sendTxMethod, cancelAction)
+  yield call(wrapSendTransactionWithRetry, txId, sendTxMethod, cancelAction)
 }
 
 export function* wrapSendTransactionWithRetry(
   txId: string,
-  account: string,
-  sendTxMethod: (nonce: number) => Generator<any, any, any>,
+  sendTxMethod: (nonce?: number) => Generator<any, any, any>,
   cancelAction?: string
 ) {
-  const latestNonce = yield call(getLatestNonce, account)
   for (let i = 1; i <= TX_NUM_TRIES; i++) {
     try {
       const { result, timeout, cancel } = yield race({
-        result: call(sendTxMethod, latestNonce + 1),
+        result: call(sendTxMethod),
         timeout: delay(TX_TIMEOUT * i),
         ...(cancelAction && {
           cancel: take(cancelAction),

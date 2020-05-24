@@ -22,823 +22,20 @@ exports[`HomePage renders 1`] = `
     className="css-view-1dbjc4n"
     style={
       Object {
-        "WebkitBoxFlex": 1,
-        "WebkitBoxPack": "end",
-        "WebkitFlexBasis": "0%",
-        "WebkitFlexGrow": 1,
-        "WebkitFlexShrink": 1,
-        "WebkitJustifyContent": "flex-end",
-        "backgroundColor": "rgba(46,51,56,1.00)",
-        "flexBasis": "0%",
-        "flexGrow": 1,
-        "flexShrink": 1,
-        "height": "100vh",
-        "justifyContent": "flex-end",
-        "marginTop": "75px",
-        "maxHeight": "800px",
-        "minHeight": "600px",
-        "msFlexNegative": 1,
-        "msFlexPack": "end",
-        "msFlexPositive": 1,
-        "msFlexPreferredSize": "0%",
-      }
-    }
-  >
-    <div
-      className="css-view-1dbjc4n"
-      style={
-        Object {
-          "WebkitAlignItems": "stretch",
-          "WebkitBoxAlign": "stretch",
-          "WebkitBoxDirection": "normal",
-          "WebkitBoxFlex": 1,
-          "WebkitBoxOrient": "vertical",
-          "WebkitBoxPack": "center",
-          "WebkitFlexBasis": "0%",
-          "WebkitFlexDirection": "column",
-          "WebkitFlexGrow": 1,
-          "WebkitFlexShrink": 1,
-          "WebkitJustifyContent": "center",
-          "alignItems": "stretch",
-          "flexBasis": "0%",
-          "flexDirection": "column",
-          "flexGrow": 1,
-          "flexShrink": 1,
-          "justifyContent": "center",
-          "maxWidth": "100vw",
-          "msFlexAlign": "stretch",
-          "msFlexDirection": "column",
-          "msFlexNegative": 1,
-          "msFlexPack": "center",
-          "msFlexPositive": 1,
-          "msFlexPreferredSize": "0%",
-        }
-      }
-    >
-      <div
-        className="css-view-1dbjc4n"
-        style={
-          Object {
-            "WebkitBoxFlex": 1,
-            "WebkitBoxPack": "center",
-            "WebkitFlexBasis": "0%",
-            "WebkitFlexGrow": 1,
-            "WebkitFlexShrink": 1,
-            "WebkitJustifyContent": "center",
-            "flexBasis": "0%",
-            "flexGrow": 1,
-            "flexShrink": 1,
-            "height": "100%",
-            "justifyContent": "center",
-            "msFlexNegative": 1,
-            "msFlexPack": "center",
-            "msFlexPositive": 1,
-            "msFlexPreferredSize": "0%",
-          }
-        }
-      >
-        <div
-          className="css-view-1dbjc4n"
-          style={
-            Object {
-              "WebkitBoxPack": "center",
-              "WebkitJustifyContent": "center",
-              "height": "100%",
-              "justifyContent": "center",
-              "msFlexPack": "center",
-              "paddingTop": "50px",
-            }
-          }
-        >
-          <svg
-            fill="none"
-            style={Object {}}
-            viewBox="0 0 1104 275"
-          >
-            <g
-              style={
-                Object {
-                  "mixedBlendMode": "screen",
-                }
-              }
-            >
-              <g
-                style={
-                  Object {
-                    "mixedBlendMode": "screen",
-                  }
-                }
-              >
-                <path
-                  d="m3 176.62s129.42-167.62 550-167.62 550 167.62 550 167.62"
-                  fill="url(#i)"
-                  fillOpacity=".1"
-                />
-                <path
-                  d="m3 176.62s129.42-167.62 550-167.62 550 167.62 550 167.62"
-                  stroke="url(#h)"
-                  strokeMiterlimit="10"
-                />
-              </g>
-              <g
-                style={
-                  Object {
-                    "mixedBlendMode": "screen",
-                  }
-                }
-              >
-                <path
-                  d="m3 177.62s57.029-51.554 181.85-51.554c124.82 0 240.25 103.11 363.84 103.11s270.07-103.11 394.89-103.11c59.495 0 109.7 26.419 159.34 50.937"
-                  fill="url(#g)"
-                  fillOpacity=".1"
-                />
-                <path
-                  d="m3 177.62s57.029-51.554 181.85-51.554c124.82 0 240.25 103.11 363.84 103.11s270.07-103.11 394.89-103.11c59.495 0 109.7 26.419 159.34 50.937"
-                  stroke="url(#f)"
-                  strokeMiterlimit="10"
-                />
-              </g>
-              <path
-                d="m3 176.62s79.689 96.908 275 96.908c195.31 0 358.72-193.81 550-193.81 191.28 0 275 96.907 275 96.907"
-                fill="url(#e)"
-                fillOpacity=".1"
-              />
-              <path
-                d="m3 176.62s79.689 96.908 275 96.908c195.31 0 358.72-193.81 550-193.81 191.28 0 275 96.907 275 96.907"
-                stroke="url(#d)"
-                strokeMiterlimit="10"
-                strokeOpacity=".9"
-              />
-              <path
-                d="m1101 176.62s-79.69 96.908-275 96.908c-195.31 0-358.72-193.81-550-193.81-191.28 0-275 96.907-275 96.907"
-                fill="url(#c)"
-                fillOpacity=".1"
-              />
-              <path
-                d="m1101 176.62s-79.69 96.908-275 96.908c-195.31 0-358.72-193.81-550-193.81-191.28 0-275 96.907-275 96.907"
-                stroke="url(#b)"
-                strokeMiterlimit="10"
-                strokeOpacity=".9"
-              />
-              <path
-                d="m3 176.62h1100"
-                stroke="url(#a)"
-                strokeMiterlimit="10"
-                strokeOpacity=".4"
-              />
-            </g>
-            <path
-              d="m835.3 177.14c0.581-2.856 1.888-5.47 3.535-7.455 1.646-1.985 3.632-3.34 5.665-3.631 0.194-0.048 0.388-0.048 0.533-0.048 1.743-0.097 3.341 0.532 4.504 1.839 1.694 1.84 2.324 4.793 1.743 8.085-0.969 5.664-4.988 10.408-9.298 11.135-1.937 0.29-3.728-0.291-5.036-1.646-1.743-1.937-2.373-4.938-1.646-8.279z"
-              fill="#4CDD91"
-            />
-            <path
-              d="m613.86 140.39c0.26-2.903 1.27-5.646 2.686-7.801 1.416-2.156 3.239-3.723 5.228-4.237 0.187-0.07 0.379-0.091 0.524-0.108 1.721-0.289 3.379 0.159 4.679 1.329 1.889 1.64 2.842 4.505 2.63 7.841-0.334 5.737-3.802 10.898-8.005 12.098-1.893 0.503-3.738 0.125-5.188-1.077-1.947-1.731-2.906-4.644-2.554-8.045z"
-              fill="#E58175"
-            />
-            <path
-              d="m433.82 11.108c1.078-2.7081 2.828-5.0491 4.8-6.7107 1.973-1.6616 4.167-2.6437 6.22-2.5691 0.199-0.01331 0.39 0.02101 0.533 0.04677 1.733 0.21371 3.194 1.1164 4.106 2.6088 1.342 2.1109 1.438 5.1288 0.283 8.2657-1.958 5.4028-6.754 9.3595-11.124 9.3103-1.958-0.0575-3.619-0.9468-4.665-2.5126-1.373-2.2148-1.46-5.2804-0.153-8.4391z"
-              fill="#C2ACE5"
-            />
-            <path
-              d="m374.59 93.613c1.495-2.5022 3.595-4.5353 5.807-5.8623 2.211-1.3269 4.533-1.9478 6.549-1.5477 0.198 0.0185 0.381 0.0827 0.518 0.1308 1.677 0.4865 2.976 1.6099 3.639 3.2283 0.99 2.2974 0.605 5.2923-1.034 8.2056-2.792 5.0226-8.156 8.1666-12.463 7.4236-1.924-0.368-3.422-1.51-4.206-3.222-1.003-2.4049-0.602-5.4454 1.19-8.3563z"
-              fill="#7BCBE5"
-            />
-            <path
-              d="m548.55 229.63c0.64-2.844 2.002-5.431 3.689-7.381s3.7-3.265 5.739-3.513c0.195-0.044 0.389-0.04 0.534-0.037 1.745-0.061 3.329 0.601 4.464 1.932 1.657 1.874 2.225 4.84 1.576 8.119-1.085 5.643-5.202 10.303-9.526 10.94-1.942 0.25-3.722-0.367-5.001-1.75-1.703-1.972-2.27-4.986-1.475-8.31z"
-              fill="#E5A964"
-            />
-            <defs>
-              <linearGradient
-                gradientUnits="userSpaceOnUse"
-                id="i"
-                x1="553"
-                x2="553"
-                y1="9"
-                y2="93"
-              >
-                <stop
-                  offset="0"
-                  stopColor="#D8C0FF"
-                />
-                <stop
-                  offset="1"
-                  stopColor="#D8C0FF"
-                  stopOpacity="0"
-                />
-              </linearGradient>
-              <linearGradient
-                gradientUnits="userSpaceOnUse"
-                id="h"
-                x1="3"
-                x2="1103"
-                y1="176.62"
-                y2="176.62"
-              >
-                <stop
-                  offset=".23204"
-                  stopColor="#D8C0FF"
-                  stopOpacity="0"
-                />
-                <stop
-                  offset=".54696"
-                  stopColor="#AE7CFF"
-                />
-                <stop
-                  offset=".85083"
-                  stopColor="#D8C0FF"
-                  stopOpacity="0"
-                />
-              </linearGradient>
-              <radialGradient
-                cx="0"
-                cy="0"
-                gradientTransform="translate(552.95 177.62) rotate(89.947) scale(51.383 744.22)"
-                gradientUnits="userSpaceOnUse"
-                id="g"
-                r="1"
-              >
-                <stop
-                  offset=".23958"
-                  stopColor="#FFBC6F"
-                />
-                <stop
-                  offset=".65104"
-                  stopColor="#FFBC6F"
-                  stopOpacity="0"
-                />
-              </radialGradient>
-              <linearGradient
-                gradientUnits="userSpaceOnUse"
-                id="f"
-                x1="1103"
-                x2="3"
-                y1="229"
-                y2="229"
-              >
-                <stop
-                  offset=".088398"
-                  stopColor="#FFBC6F"
-                  stopOpacity="0"
-                />
-                <stop
-                  offset=".51381"
-                  stopColor="#FFBC6F"
-                />
-                <stop
-                  offset=".87293"
-                  stopColor="#FFBC6F"
-                  stopOpacity="0"
-                />
-              </linearGradient>
-              <radialGradient
-                cx="0"
-                cy="0"
-                gradientTransform="translate(553 176.62) rotate(90) scale(96.907 550)"
-                gradientUnits="userSpaceOnUse"
-                id="e"
-                r="1"
-              >
-                <stop
-                  offset="0"
-                  stopColor="#FF9082"
-                />
-                <stop
-                  offset="1"
-                  stopColor="#FF9082"
-                  stopOpacity="0"
-                />
-              </radialGradient>
-              <linearGradient
-                gradientUnits="userSpaceOnUse"
-                id="d"
-                x1="1103"
-                x2="3"
-                y1="273.52"
-                y2="273.52"
-              >
-                <stop
-                  offset=".18784"
-                  stopColor="#FF9082"
-                  stopOpacity="0"
-                />
-                <stop
-                  offset=".58011"
-                  stopColor="#FF9082"
-                />
-                <stop
-                  offset=".87845"
-                  stopColor="#FF9082"
-                  stopOpacity="0"
-                />
-              </linearGradient>
-              <radialGradient
-                cx="0"
-                cy="0"
-                gradientTransform="translate(551 176.62) rotate(90) scale(96.907)"
-                gradientUnits="userSpaceOnUse"
-                id="c"
-                r="1"
-              >
-                <stop
-                  offset="0"
-                  stopColor="#89E2FF"
-                />
-                <stop
-                  offset="1"
-                  stopColor="#89E2FF"
-                  stopOpacity="0"
-                />
-              </radialGradient>
-              <linearGradient
-                gradientUnits="userSpaceOnUse"
-                id="b"
-                x1="1"
-                x2="1101"
-                y1="273.52"
-                y2="273.52"
-              >
-                <stop
-                  offset=".18784"
-                  stopColor="#89E2FF"
-                  stopOpacity="0"
-                />
-                <stop
-                  offset=".49883"
-                  stopColor="#89E2FF"
-                />
-                <stop
-                  offset=".87845"
-                  stopColor="#89E2FF"
-                  stopOpacity="0"
-                />
-              </linearGradient>
-              <linearGradient
-                gradientUnits="userSpaceOnUse"
-                id="a"
-                x1="3"
-                x2="1103"
-                y1="176.62"
-                y2="176.62"
-              >
-                <stop
-                  offset=".14917"
-                  stopColor="#35D07F"
-                  stopOpacity="0"
-                />
-                <stop
-                  offset=".70312"
-                  stopColor="#35D07F"
-                />
-                <stop
-                  offset=".84896"
-                  stopColor="#35D07F"
-                  stopOpacity="0"
-                />
-              </linearGradient>
-            </defs>
-          </svg>
-        </div>
-      </div>
-    </div>
-    <div
-      className="css-view-1dbjc4n"
-      style={
-        Object {
-          "WebkitBoxFlex": 1,
-          "WebkitFlexBasis": "0%",
-          "WebkitFlexGrow": 1,
-          "WebkitFlexShrink": 1,
-          "flexBasis": "0%",
-          "flexGrow": 1,
-          "flexShrink": 1,
-          "height": "contents",
-          "msFlexNegative": 1,
-          "msFlexPositive": 1,
-          "msFlexPreferredSize": "0%",
-        }
-      }
-    >
-      <div
-        className="css-view-1dbjc4n"
-        style={
-          Object {
-            "WebkitBoxDirection": "normal",
-            "WebkitBoxOrient": "vertical",
-            "WebkitBoxPack": "end",
-            "WebkitFlexDirection": "column",
-            "WebkitJustifyContent": "flex-end",
-            "flexDirection": "column",
-            "justifyContent": "flex-end",
-            "msFlexDirection": "column",
-            "msFlexPack": "end",
-          }
-        }
-      >
-        <div
-          className="css-view-1dbjc4n"
-          style={
-            Object {
-              "WebkitAlignItems": "center",
-              "WebkitBoxAlign": "center",
-              "WebkitBoxDirection": "normal",
-              "WebkitBoxOrient": "vertical",
-              "WebkitFlexDirection": "column",
-              "alignItems": "center",
-              "flexDirection": "column",
-              "msFlexAlign": "center",
-              "msFlexDirection": "column",
-              "paddingLeft": "20px",
-              "paddingRight": "20px",
-            }
-          }
-        >
-          <h2
-            aria-level="2"
-            className="css-reset-4rbku5 css-text-901oao"
-            dir="auto"
-            role="heading"
-            style={
-              Object {
-                "color": "rgba(255,255,255,1.00)",
-                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                "fontSize": "36px",
-                "lineHeight": "40px",
-                "textAlign": "center",
-                "textRendering": "geometricPrecision",
-                "textTransform": "none",
-                "zIndex": 1,
-              }
-            }
-          >
-            Let's make money
-             
-          </h2>
-          <div
-            className="css-view-1dbjc4n"
-          >
-            <div
-              className="css-view-1dbjc4n"
-            />
-            <h2
-              aria-level="2"
-              className="css-reset-4rbku5 css-text-901oao"
-              dir="auto"
-              role="heading"
-              style={
-                Object {
-                  "color": "rgba(255,255,255,1.00)",
-                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                  "fontSize": "36px",
-                  "fontWeight": "bold",
-                  "lineHeight": "40px",
-                  "textAlign": "center",
-                  "textRendering": "geometricPrecision",
-                  "textTransform": "none",
-                }
-              }
-            >
-              serve everyone
-            </h2>
-          </div>
-        </div>
-        <div
-          className="css-view-1dbjc4n"
-          style={
-            Object {
-              "WebkitAlignItems": "center",
-              "WebkitBoxAlign": "center",
-              "WebkitBoxDirection": "normal",
-              "WebkitBoxOrient": "vertical",
-              "WebkitFlexDirection": "column",
-              "alignItems": "center",
-              "flexDirection": "column",
-              "msFlexAlign": "center",
-              "msFlexDirection": "column",
-              "paddingBottom": "30px",
-              "paddingLeft": "30px",
-              "paddingRight": "30px",
-              "paddingTop": "30px",
-            }
-          }
-        >
-          <div
-            className="css-view-1dbjc4n"
-            style={
-              Object {
-                "WebkitAlignItems": "flex-start",
-                "WebkitBoxAlign": "start",
-                "alignItems": "flex-start",
-                "msFlexAlign": "start",
-                "width": "100%",
-              }
-            }
-          >
-            <div
-              className="css-text-901oao"
-              dir="auto"
-              style={
-                Object {
-                  "color": "rgba(255,255,255,1.00)",
-                  "cursor": "pointer",
-                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                  "fontSize": "16px",
-                  "fontWeight": "500",
-                  "lineHeight": "16px",
-                  "textAlign": "center",
-                  "textRendering": "geometricPrecision",
-                }
-              }
-            >
-              Stay Connected
-            </div>
-            <div
-              className="css-view-1dbjc4n"
-              style={
-                Object {
-                  "marginBottom": "5px",
-                  "marginTop": "5px",
-                  "paddingBottom": "15px",
-                  "width": "100%",
-                }
-              }
-            >
-              <input
-                autoCapitalize="sentences"
-                autoComplete="on"
-                autoCorrect="on"
-                className="css-textinput-1cwyjr8 r-placeholderTextColor-13wn3lk"
-                data-focusable={true}
-                dir="auto"
-                name="email"
-                onBlur={[Function]}
-                onChange={[Function]}
-                onFocus={[Function]}
-                onKeyDown={[Function]}
-                onKeyPress={[Function]}
-                onSelect={[Function]}
-                placeholder="Email*"
-                readOnly={false}
-                required={true}
-                spellCheck={true}
-                style={
-                  Object {
-                    "WebkitBoxFlex": 1,
-                    "WebkitFlexBasis": "0%",
-                    "WebkitFlexGrow": 1,
-                    "WebkitFlexShrink": 1,
-                    "borderBottomColor": "rgba(221,221,221,1.00)",
-                    "borderBottomLeftRadius": "3px",
-                    "borderBottomRightRadius": "3px",
-                    "borderBottomWidth": "1px",
-                    "borderLeftColor": "rgba(221,221,221,1.00)",
-                    "borderLeftWidth": "1px",
-                    "borderRightColor": "rgba(221,221,221,1.00)",
-                    "borderRightWidth": "1px",
-                    "borderTopColor": "rgba(221,221,221,1.00)",
-                    "borderTopLeftRadius": "3px",
-                    "borderTopRightRadius": "3px",
-                    "borderTopWidth": "1px",
-                    "color": "rgba(255,255,255,1.00)",
-                    "flexBasis": "0%",
-                    "flexGrow": 1,
-                    "flexShrink": 1,
-                    "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                    "fontSize": "20px",
-                    "lineHeight": "28px",
-                    "marginBottom": "5px",
-                    "marginTop": "5px",
-                    "msFlexNegative": 1,
-                    "msFlexPositive": 1,
-                    "msFlexPreferredSize": "0%",
-                    "outlineStyle": "none",
-                    "paddingBottom": "15px",
-                    "paddingLeft": "10px",
-                    "paddingRight": "10px",
-                    "paddingTop": "13px",
-                    "textRendering": "geometricPrecision",
-                  }
-                }
-                type="text"
-                value=""
-              />
-              <div
-                className="css-view-1dbjc4n"
-              >
-                <div
-                  className="css-view-1dbjc4n"
-                  style={
-                    Object {
-                      "MozTransitionProperty": "max-height",
-                      "WebkitTransitionDuration": "600ms",
-                      "WebkitTransitionProperty": "max-height",
-                      "height": "auto",
-                      "marginBottom": "5px",
-                      "marginTop": "5px",
-                      "maxHeight": "0px",
-                      "transitionDuration": "600ms",
-                      "transitionProperty": "max-height",
-                    }
-                  }
-                >
-                  <div
-                    className="css-text-901oao"
-                    dir="auto"
-                    style={
-                      Object {
-                        "MozTransitionProperty": "opacity",
-                        "WebkitTransitionDuration": "700ms",
-                        "WebkitTransitionProperty": "opacity",
-                        "color": "rgba(255,127,109,1.00)",
-                        "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                        "fontSize": "16px",
-                        "fontWeight": "500",
-                        "lineHeight": "18px",
-                        "opacity": 0,
-                        "textRendering": "geometricPrecision",
-                        "transitionDuration": "700ms",
-                        "transitionProperty": "opacity",
-                      }
-                    }
-                  >
-                    Please enter a valid email
-                  </div>
-                </div>
-              </div>
-              <div
-                className="css-view-1dbjc4n"
-                onClick={[Function]}
-                onMouseDown={[Function]}
-                onMouseEnter={[Function]}
-                onMouseLeave={[Function]}
-                onMouseUp={[Function]}
-                onResponderGrant={[Function]}
-                onResponderRelease={[Function]}
-              >
-                <a
-                  className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
-                  data-focusable={true}
-                  dir="auto"
-                  role="link"
-                  style={
-                    Object {
-                      "WebkitAlignItems": "center",
-                      "WebkitBoxAlign": "center",
-                      "WebkitBoxFlex": 1,
-                      "WebkitBoxPack": "center",
-                      "WebkitFlexGrow": 1,
-                      "WebkitJustifyContent": "center",
-                      "alignItems": "center",
-                      "backgroundColor": "rgba(53,208,127,1.00)",
-                      "borderBottomColor": "rgba(53,208,127,1.00)",
-                      "borderBottomLeftRadius": "3px",
-                      "borderBottomRightRadius": "3px",
-                      "borderBottomWidth": "1px",
-                      "borderLeftColor": "rgba(53,208,127,1.00)",
-                      "borderLeftWidth": "1px",
-                      "borderRightColor": "rgba(53,208,127,1.00)",
-                      "borderRightWidth": "1px",
-                      "borderTopColor": "rgba(53,208,127,1.00)",
-                      "borderTopLeftRadius": "3px",
-                      "borderTopRightRadius": "3px",
-                      "borderTopWidth": "1px",
-                      "color": "rgba(255,255,255,1.00)",
-                      "cursor": "pointer",
-                      "display": "inline-flex",
-                      "flexGrow": 1,
-                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                      "fontSize": "16px",
-                      "fontWeight": "500",
-                      "justifyContent": "center",
-                      "lineHeight": "16px",
-                      "msFlexAlign": "center",
-                      "msFlexPack": "center",
-                      "msFlexPositive": 1,
-                      "opacity": 1,
-                      "paddingBottom": "15px",
-                      "paddingLeft": "20px",
-                      "paddingRight": "20px",
-                      "paddingTop": "15px",
-                      "textAlign": "center",
-                      "textRendering": "geometricPrecision",
-                      "width": "100%",
-                    }
-                  }
-                >
-                  Sign Up
-                </a>
-              </div>
-              <div
-                className="css-view-1dbjc4n"
-                style={
-                  Object {
-                    "position": "absolute",
-                    "top": "65px",
-                  }
-                }
-              />
-            </div>
-            <div
-              className="css-view-1dbjc4n"
-              style={
-                Object {
-                  "marginTop": "10px",
-                }
-              }
-            >
-              <div
-                className="css-view-1dbjc4n"
-                style={
-                  Object {
-                    "MozTransitionProperty": "max-height",
-                    "WebkitTransitionDuration": "600ms",
-                    "WebkitTransitionProperty": "max-height",
-                    "height": "auto",
-                    "marginBottom": "5px",
-                    "marginTop": "5px",
-                    "maxHeight": "0px",
-                    "transitionDuration": "600ms",
-                    "transitionProperty": "max-height",
-                  }
-                }
-              >
-                <div
-                  className="css-text-901oao"
-                  dir="auto"
-                  style={
-                    Object {
-                      "MozTransitionProperty": "opacity",
-                      "WebkitTransitionDuration": "700ms",
-                      "WebkitTransitionProperty": "opacity",
-                      "color": "rgba(53,208,127,1.00)",
-                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                      "fontSize": "16px",
-                      "fontWeight": "500",
-                      "lineHeight": "18px",
-                      "opacity": 0,
-                      "textRendering": "geometricPrecision",
-                      "transitionDuration": "700ms",
-                      "transitionProperty": "opacity",
-                    }
-                  }
-                >
-                  <svg
-                    fill="none"
-                    height={16}
-                    style={Object {}}
-                    viewBox="0 0 11 9"
-                    width={16}
-                  >
-                    <path
-                      clipRule="evenodd"
-                      d="M10.7932 1.85263L3.96211 8.64309L0.180176 4.88366L1.85967 3.19411L3.96211 5.28404L9.11373 0.163086L10.7932 1.85263Z"
-                      fill="#35D07F"
-                      fillRule="evenodd"
-                      style={Object {}}
-                    />
-                  </svg>
-                  <span
-                    className="css-text-901oao css-textHasAncestor-16my406"
-                    dir="auto"
-                    style={
-                      Object {
-                        "marginLeft": "10px",
-                      }
-                    }
-                  >
-                    Submitted
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div
-    className="css-view-1dbjc4n"
-    style={
-      Object {
-        "WebkitAlignItems": "center",
         "WebkitAlignSelf": "center",
-        "WebkitBoxAlign": "center",
         "WebkitBoxDirection": "normal",
         "WebkitBoxOrient": "vertical",
-        "WebkitBoxPack": "center",
         "WebkitFlexDirection": "column",
-        "WebkitJustifyContent": "center",
-        "alignItems": "center",
         "alignSelf": "center",
         "flexDirection": "column",
-        "justifyContent": "center",
-        "marginTop": "50px",
+        "marginTop": "90px",
         "maxWidth": "100vw",
-        "msFlexAlign": "center",
+        "minHeight": "100vh",
         "msFlexDirection": "column",
         "msFlexItemAlign": "center",
-        "msFlexPack": "center",
         "paddingLeft": "10px",
         "paddingRight": "10px",
+        "paddingTop": "75px",
         "width": "100%",
       }
     }
@@ -847,17 +44,22 @@ exports[`HomePage renders 1`] = `
       className="css-view-1dbjc4n"
       style={
         Object {
-          "WebkitAlignItems": "center",
-          "WebkitBoxAlign": "center",
+          "WebkitBoxDirection": "normal",
           "WebkitBoxFlex": 0,
+          "WebkitBoxLines": "multiple",
+          "WebkitBoxOrient": "horizontal",
+          "WebkitFlexDirection": "row",
           "WebkitFlexGrow": 0,
           "WebkitFlexShrink": 0,
-          "alignItems": "center",
+          "WebkitFlexWrap": "wrap",
+          "flexDirection": "row",
           "flexGrow": 0,
           "flexShrink": 0,
-          "msFlexAlign": "center",
+          "flexWrap": "wrap",
+          "msFlexDirection": "row",
           "msFlexNegative": 0,
           "msFlexPositive": 0,
+          "msFlexWrap": "wrap",
           "paddingBottom": "10px",
           "paddingLeft": "10px",
           "paddingRight": "10px",
@@ -870,14 +72,21 @@ exports[`HomePage renders 1`] = `
         className="css-view-1dbjc4n"
         style={
           Object {
-            "WebkitFlexBasis": "auto",
-            "flexBasis": "auto",
-            "height": "126px",
-            "msFlexPreferredSize": "auto",
-            "overflowX": "hidden",
-            "overflowY": "hidden",
-            "width": "242px",
-            "zIndex": 0,
+            "WebkitBoxFlex": 4,
+            "WebkitFlexBasis": "50%",
+            "WebkitFlexGrow": 4,
+            "WebkitFlexShrink": 1,
+            "WebkitTransform": "translateX(-60px)",
+            "flexBasis": "50%",
+            "flexGrow": 4,
+            "flexShrink": 1,
+            "minWidth": "350px",
+            "msFlexNegative": 1,
+            "msFlexPositive": 4,
+            "msFlexPreferredSize": "50%",
+            "paddingBottom": "15px",
+            "transform": "translateX(-60px)",
+            "zIndex": 10,
           }
         }
       >
@@ -885,44 +94,74 @@ exports[`HomePage renders 1`] = `
           className="css-view-1dbjc4n"
           style={
             Object {
-              "backgroundColor": "rgba(0,0,0,0.00)",
-              "backgroundImage": "url(\\"image.png\\")",
-              "backgroundPosition": "center",
-              "backgroundRepeat": "no-repeat",
-              "backgroundSize": "contain",
-              "bottom": "0px",
-              "height": "100%",
-              "left": "0px",
-              "position": "absolute",
-              "right": "0px",
-              "top": "0px",
-              "width": "100%",
-              "zIndex": -1,
+              "display": "block",
+              "overflowX": "hidden",
+              "overflowY": "hidden",
             }
           }
-        />
-        <img
-          alt=""
-          className="css-accessibilityImage-9pa8cd"
-          draggable={false}
-          src="image.png"
-        />
+        >
+          <div
+            style={
+              Object {
+                "display": "block",
+                "paddingBottom": "27.835051546391753%",
+                "width": "100%",
+              }
+            }
+          />
+          <div
+            style={
+              Object {
+                "bottom": "0px",
+                "height": "100%",
+                "left": "0px",
+                "position": "absolute",
+                "top": "0px",
+                "width": "100%",
+              }
+            }
+          >
+            <div
+              aria-label="changeStory-animation"
+              className="css-view-1dbjc4n"
+              style={
+                Object {
+                  "height": "100%",
+                  "width": "100%",
+                }
+              }
+            >
+              <span
+                style={
+                  Object {
+                    "height": "100%",
+                    "width": "100%",
+                  }
+                }
+              />
+            </div>
+          </div>
+        </div>
       </div>
       <div
-        className="react-reveal"
+        className="css-view-1dbjc4n"
         style={
           Object {
-            "opacity": undefined,
+            "WebkitBoxFlex": 1,
+            "WebkitFlexBasis": "370px",
+            "WebkitFlexGrow": 1,
+            "flexBasis": "370px",
+            "flexGrow": 1,
+            "marginBottom": "40px",
+            "marginTop": "40px",
+            "maxWidth": "90vw",
+            "msFlexPositive": 1,
+            "msFlexPreferredSize": "370px",
           }
         }
       >
         <div
           className="css-view-1dbjc4n"
-          style={
-            Object {
-              "maxWidth": "550px",
-            }
-          }
         >
           <h2
             aria-level="2"
@@ -933,16 +172,344 @@ exports[`HomePage renders 1`] = `
               Object {
                 "color": "rgba(46,51,56,1.00)",
                 "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                "fontSize": "28px",
-                "lineHeight": "32px",
-                "textAlign": "center",
+                "fontSize": "52px",
+                "lineHeight": "58px",
                 "textRendering": "geometricPrecision",
                 "textTransform": "none",
+                "zIndex": 1,
               }
             }
           >
-            Celo is an open platform that makes financial tools accessible to anyone with a mobile phone
+            A new story in
           </h2>
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "display": "inline-flex",
+                "width": "fit-content",
+              }
+            }
+          >
+            <h2
+              aria-level="2"
+              className="css-reset-4rbku5 css-text-901oao"
+              dir="auto"
+              role="heading"
+              style={
+                Object {
+                  "color": "rgba(46,51,56,1.00)",
+                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                  "fontSize": "52px",
+                  "fontWeight": "500",
+                  "lineHeight": "58px",
+                  "textRendering": "geometricPrecision",
+                  "textTransform": "none",
+                }
+              }
+            >
+              finance
+            </h2>
+          </div>
+        </div>
+        <h4
+          aria-level="4"
+          className="css-reset-4rbku5 css-text-901oao"
+          dir="auto"
+          role="heading"
+          style={
+            Object {
+              "color": "rgba(46,51,56,1.00)",
+              "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+              "fontSize": "24px",
+              "lineHeight": "32px",
+              "marginBottom": "30px",
+              "marginTop": "10px",
+              "maxWidth": "450px",
+              "textRendering": "geometricPrecision",
+              "textTransform": "none",
+            }
+          }
+        >
+          Celo is an open platform that makes financial tools accessible to anyone with a mobile phone
+        </h4>
+        <div
+          className="css-text-901oao"
+          dir="auto"
+          style={
+            Object {
+              "color": "rgba(46,51,56,1.00)",
+              "fontFamily": "Jost, futura-pt, futura, sans-serif",
+              "fontSize": "16px",
+              "fontWeight": "500",
+              "lineHeight": "18px",
+              "paddingBottom": "2px",
+              "paddingLeft": "3px",
+              "paddingTop": "10px",
+              "textRendering": "geometricPrecision",
+            }
+          }
+        >
+          Join Mailing List
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "marginBottom": "5px",
+              "marginTop": "5px",
+              "paddingBottom": "15px",
+              "width": "100%",
+            }
+          }
+        >
+          <input
+            autoCapitalize="sentences"
+            autoComplete="on"
+            autoCorrect="on"
+            className="css-textinput-1cwyjr8 r-placeholderTextColor-tf24u1"
+            data-focusable={true}
+            dir="auto"
+            name="email"
+            onBlur={[Function]}
+            onChange={[Function]}
+            onFocus={[Function]}
+            onKeyDown={[Function]}
+            onKeyPress={[Function]}
+            onSelect={[Function]}
+            placeholder="saluton@celo.org"
+            readOnly={false}
+            required={true}
+            spellCheck={true}
+            style={
+              Object {
+                "WebkitBoxFlex": 1,
+                "WebkitFlexBasis": "0%",
+                "WebkitFlexGrow": 1,
+                "WebkitFlexShrink": 1,
+                "borderBottomColor": "rgba(221,221,221,1.00)",
+                "borderBottomLeftRadius": "3px",
+                "borderBottomRightRadius": "3px",
+                "borderBottomWidth": "1px",
+                "borderLeftColor": "rgba(221,221,221,1.00)",
+                "borderLeftWidth": "1px",
+                "borderRightColor": "rgba(221,221,221,1.00)",
+                "borderRightWidth": "1px",
+                "borderTopColor": "rgba(221,221,221,1.00)",
+                "borderTopLeftRadius": "3px",
+                "borderTopRightRadius": "3px",
+                "borderTopWidth": "1px",
+                "color": "rgba(46,51,56,1.00)",
+                "flexBasis": "0%",
+                "flexGrow": 1,
+                "flexShrink": 1,
+                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                "fontSize": "20px",
+                "lineHeight": "28px",
+                "marginBottom": "5px",
+                "marginTop": "5px",
+                "msFlexNegative": 1,
+                "msFlexPositive": 1,
+                "msFlexPreferredSize": "0%",
+                "outlineStyle": "none",
+                "paddingBottom": "15px",
+                "paddingLeft": "10px",
+                "paddingRight": "10px",
+                "paddingTop": "13px",
+                "textRendering": "geometricPrecision",
+              }
+            }
+            type="text"
+            value=""
+          />
+          <div
+            className="css-view-1dbjc4n"
+          >
+            <div
+              className="css-view-1dbjc4n"
+              style={
+                Object {
+                  "MozTransitionProperty": "max-height",
+                  "WebkitTransitionDuration": "600ms",
+                  "WebkitTransitionProperty": "max-height",
+                  "height": "auto",
+                  "marginBottom": "5px",
+                  "marginTop": "5px",
+                  "maxHeight": "0px",
+                  "transitionDuration": "600ms",
+                  "transitionProperty": "max-height",
+                }
+              }
+            >
+              <div
+                className="css-text-901oao"
+                dir="auto"
+                style={
+                  Object {
+                    "MozTransitionProperty": "opacity",
+                    "WebkitTransitionDuration": "700ms",
+                    "WebkitTransitionProperty": "opacity",
+                    "color": "rgba(255,127,109,1.00)",
+                    "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                    "fontSize": "16px",
+                    "fontWeight": "500",
+                    "lineHeight": "18px",
+                    "opacity": 0,
+                    "textRendering": "geometricPrecision",
+                    "transitionDuration": "700ms",
+                    "transitionProperty": "opacity",
+                  }
+                }
+              >
+                Please enter a valid email
+              </div>
+            </div>
+          </div>
+          <div
+            className="css-view-1dbjc4n"
+            onClick={[Function]}
+            onMouseDown={[Function]}
+            onMouseEnter={[Function]}
+            onMouseLeave={[Function]}
+            onMouseUp={[Function]}
+            onResponderGrant={[Function]}
+            onResponderRelease={[Function]}
+          >
+            <a
+              className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+              data-focusable={true}
+              dir="auto"
+              role="link"
+              style={
+                Object {
+                  "WebkitAlignItems": "center",
+                  "WebkitBoxAlign": "center",
+                  "WebkitBoxFlex": 1,
+                  "WebkitBoxPack": "center",
+                  "WebkitFlexGrow": 1,
+                  "WebkitJustifyContent": "center",
+                  "alignItems": "center",
+                  "backgroundColor": "rgba(53,208,127,1.00)",
+                  "borderBottomColor": "rgba(53,208,127,1.00)",
+                  "borderBottomLeftRadius": "3px",
+                  "borderBottomRightRadius": "3px",
+                  "borderBottomWidth": "1px",
+                  "borderLeftColor": "rgba(53,208,127,1.00)",
+                  "borderLeftWidth": "1px",
+                  "borderRightColor": "rgba(53,208,127,1.00)",
+                  "borderRightWidth": "1px",
+                  "borderTopColor": "rgba(53,208,127,1.00)",
+                  "borderTopLeftRadius": "3px",
+                  "borderTopRightRadius": "3px",
+                  "borderTopWidth": "1px",
+                  "color": "rgba(255,255,255,1.00)",
+                  "cursor": "pointer",
+                  "display": "inline-flex",
+                  "flexGrow": 1,
+                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                  "fontSize": "16px",
+                  "fontWeight": "500",
+                  "justifyContent": "center",
+                  "lineHeight": "16px",
+                  "msFlexAlign": "center",
+                  "msFlexPack": "center",
+                  "msFlexPositive": 1,
+                  "opacity": 1,
+                  "paddingBottom": "15px",
+                  "paddingLeft": "20px",
+                  "paddingRight": "20px",
+                  "paddingTop": "15px",
+                  "textAlign": "center",
+                  "textRendering": "geometricPrecision",
+                  "width": "100%",
+                }
+              }
+            >
+              Submit
+            </a>
+          </div>
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "position": "absolute",
+                "top": "65px",
+              }
+            }
+          />
+        </div>
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "marginTop": "10px",
+            }
+          }
+        >
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "MozTransitionProperty": "max-height",
+                "WebkitTransitionDuration": "600ms",
+                "WebkitTransitionProperty": "max-height",
+                "height": "auto",
+                "marginBottom": "5px",
+                "marginTop": "5px",
+                "maxHeight": "0px",
+                "transitionDuration": "600ms",
+                "transitionProperty": "max-height",
+              }
+            }
+          >
+            <div
+              className="css-text-901oao"
+              dir="auto"
+              style={
+                Object {
+                  "MozTransitionProperty": "opacity",
+                  "WebkitTransitionDuration": "700ms",
+                  "WebkitTransitionProperty": "opacity",
+                  "color": "rgba(53,208,127,1.00)",
+                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                  "fontSize": "16px",
+                  "fontWeight": "500",
+                  "lineHeight": "18px",
+                  "opacity": 0,
+                  "textRendering": "geometricPrecision",
+                  "transitionDuration": "700ms",
+                  "transitionProperty": "opacity",
+                }
+              }
+            >
+              <svg
+                fill="none"
+                height={16}
+                style={Object {}}
+                viewBox="0 0 11 9"
+                width={16}
+              >
+                <path
+                  clipRule="evenodd"
+                  d="M10.7932 1.85263L3.96211 8.64309L0.180176 4.88366L1.85967 3.19411L3.96211 5.28404L9.11373 0.163086L10.7932 1.85263Z"
+                  fill="#35D07F"
+                  fillRule="evenodd"
+                  style={Object {}}
+                />
+              </svg>
+              <span
+                className="css-text-901oao css-textHasAncestor-16my406"
+                dir="auto"
+                style={
+                  Object {
+                    "marginLeft": "10px",
+                  }
+                }
+              >
+                Submitted
+              </span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -2998,15 +2565,11 @@ exports[`HomePage renders 1`] = `
       style={
         Object {
           "WebkitBoxFlex": 0,
-          "WebkitBoxPack": "justify",
           "WebkitFlexGrow": 0,
           "WebkitFlexShrink": 0,
-          "WebkitJustifyContent": "space-between",
           "flexGrow": 0,
           "flexShrink": 0,
-          "justifyContent": "space-between",
           "msFlexNegative": 0,
-          "msFlexPack": "justify",
           "msFlexPositive": 0,
           "paddingBottom": "10px",
           "paddingLeft": "10px",
@@ -3039,23 +2602,177 @@ exports[`HomePage renders 1`] = `
         style={
           Object {
             "WebkitBoxDirection": "normal",
-            "WebkitBoxFlex": 1,
             "WebkitBoxOrient": "horizontal",
-            "WebkitFlexBasis": "0%",
             "WebkitFlexDirection": "row",
-            "WebkitFlexGrow": 1,
-            "WebkitFlexShrink": 1,
-            "flexBasis": "0%",
             "flexDirection": "row",
-            "flexGrow": 1,
-            "flexShrink": 1,
             "marginLeft": "15px",
             "marginRight": "15px",
             "maxWidth": "450px",
             "msFlexDirection": "row",
-            "msFlexNegative": 1,
-            "msFlexPositive": 1,
-            "msFlexPreferredSize": "0%",
+          }
+        }
+      >
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitTransform": "translateY(10px)",
+              "backgroundColor": "rgba(251,204,92,1.00)",
+              "transform": "translateY(10px)",
+              "width": "2px",
+            }
+          }
+        />
+        <div
+          className="css-view-1dbjc4n"
+          style={
+            Object {
+              "WebkitBoxFlex": 1,
+              "WebkitFlexBasis": "0%",
+              "WebkitFlexGrow": 1,
+              "WebkitFlexShrink": 1,
+              "flexBasis": "0%",
+              "flexGrow": 1,
+              "flexShrink": 1,
+              "marginBottom": "0px",
+              "marginTop": "0px",
+              "msFlexNegative": 1,
+              "msFlexPositive": 1,
+              "msFlexPreferredSize": "0%",
+              "paddingBottom": "30px",
+              "paddingLeft": "25px",
+              "paddingRight": "25px",
+            }
+          }
+        >
+          <div
+            className="css-view-1dbjc4n"
+            style={
+              Object {
+                "WebkitTransform": "translateX(-36px) translateY(1px)",
+                "position": "absolute",
+                "transform": "translateX(-36px) translateY(1px)",
+              }
+            }
+          >
+            <div
+              className="react-reveal"
+              style={
+                Object {
+                  "opacity": undefined,
+                }
+              }
+            >
+              <svg
+                fill="none"
+                height={18}
+                style={Object {}}
+                viewBox="0 0 83 98"
+                width={18}
+              >
+                <g
+                  style={
+                    Object {
+                      "mixBlendMode": "normal",
+                    }
+                  }
+                >
+                  <path
+                    d="M54.5568 0.387939C34.0744 0.387939 12.1108 19.8688 3.46956 45.6981C-1.53621 60.694 -0.736234 75.0526 5.66354 85.0874C10.0911 92.0973 17.0453 96.3807 25.243 97.147C26.0351 97.2277 26.8667 97.268 27.8806 97.268C37.2426 97.268 47.5393 92.6781 56.8776 84.3534C66.2396 76.0367 73.97 64.5498 78.6431 51.9982C84.33 36.6474 83.6568 22.0387 76.7976 11.9232C71.7602 4.48578 63.8634 0.387939 54.5568 0.387939Z"
+                    fill="#FBCC5C"
+                  />
+                </g>
+              </svg>
+            </div>
+          </div>
+          <div
+            className="react-reveal"
+            style={
+              Object {
+                "opacity": undefined,
+              }
+            }
+          >
+            <div
+              className="css-text-901oao"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(216,161,31,1.00)",
+                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                  "fontSize": "16px",
+                  "fontWeight": "bold",
+                  "lineHeight": "20px",
+                  "textRendering": "geometricPrecision",
+                }
+              }
+            >
+              April 2020
+            </div>
+          </div>
+          <div
+            className="react-reveal"
+            style={
+              Object {
+                "opacity": undefined,
+              }
+            }
+          >
+            <div
+              className="css-text-901oao"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(46,51,56,1.00)",
+                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                  "fontSize": "16px",
+                  "fontWeight": "bold",
+                  "lineHeight": "20px",
+                  "textRendering": "geometricPrecision",
+                }
+              }
+            >
+              Validator Elections Start
+            </div>
+          </div>
+          <div
+            className="react-reveal"
+            style={
+              Object {
+                "opacity": undefined,
+              }
+            }
+          >
+            <div
+              className="css-text-901oao"
+              dir="auto"
+              style={
+                Object {
+                  "color": "rgba(46,51,56,1.00)",
+                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                  "fontSize": "16px",
+                  "lineHeight": "20px",
+                  "textRendering": "geometricPrecision",
+                }
+              }
+            >
+              With validators and groups registered and staked, validator elections and epoch rewards enabled via on-chain governance proposal
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        className="css-view-1dbjc4n"
+        style={
+          Object {
+            "WebkitBoxDirection": "normal",
+            "WebkitBoxOrient": "horizontal",
+            "WebkitFlexDirection": "row",
+            "flexDirection": "row",
+            "marginLeft": "15px",
+            "marginRight": "15px",
+            "maxWidth": "450px",
+            "msFlexDirection": "row",
           }
         }
       >
@@ -3213,23 +2930,13 @@ exports[`HomePage renders 1`] = `
         style={
           Object {
             "WebkitBoxDirection": "normal",
-            "WebkitBoxFlex": 1,
             "WebkitBoxOrient": "horizontal",
-            "WebkitFlexBasis": "0%",
             "WebkitFlexDirection": "row",
-            "WebkitFlexGrow": 1,
-            "WebkitFlexShrink": 1,
-            "flexBasis": "0%",
             "flexDirection": "row",
-            "flexGrow": 1,
-            "flexShrink": 1,
             "marginLeft": "15px",
             "marginRight": "15px",
             "maxWidth": "450px",
             "msFlexDirection": "row",
-            "msFlexNegative": 1,
-            "msFlexPositive": 1,
-            "msFlexPreferredSize": "0%",
           }
         }
       >
@@ -3387,23 +3094,13 @@ exports[`HomePage renders 1`] = `
         style={
           Object {
             "WebkitBoxDirection": "normal",
-            "WebkitBoxFlex": 1,
             "WebkitBoxOrient": "horizontal",
-            "WebkitFlexBasis": "0%",
             "WebkitFlexDirection": "row",
-            "WebkitFlexGrow": 1,
-            "WebkitFlexShrink": 1,
-            "flexBasis": "0%",
             "flexDirection": "row",
-            "flexGrow": 1,
-            "flexShrink": 1,
             "marginLeft": "15px",
             "marginRight": "15px",
             "maxWidth": "450px",
             "msFlexDirection": "row",
-            "msFlexNegative": 1,
-            "msFlexPositive": 1,
-            "msFlexPreferredSize": "0%",
           }
         }
       >
@@ -3561,23 +3258,13 @@ exports[`HomePage renders 1`] = `
         style={
           Object {
             "WebkitBoxDirection": "normal",
-            "WebkitBoxFlex": 1,
             "WebkitBoxOrient": "horizontal",
-            "WebkitFlexBasis": "0%",
             "WebkitFlexDirection": "row",
-            "WebkitFlexGrow": 1,
-            "WebkitFlexShrink": 1,
-            "flexBasis": "0%",
             "flexDirection": "row",
-            "flexGrow": 1,
-            "flexShrink": 1,
             "marginLeft": "15px",
             "marginRight": "15px",
             "maxWidth": "450px",
             "msFlexDirection": "row",
-            "msFlexNegative": 1,
-            "msFlexPositive": 1,
-            "msFlexPreferredSize": "0%",
           }
         }
       >
@@ -3735,23 +3422,13 @@ exports[`HomePage renders 1`] = `
         style={
           Object {
             "WebkitBoxDirection": "normal",
-            "WebkitBoxFlex": 1,
             "WebkitBoxOrient": "horizontal",
-            "WebkitFlexBasis": "0%",
             "WebkitFlexDirection": "row",
-            "WebkitFlexGrow": 1,
-            "WebkitFlexShrink": 1,
-            "flexBasis": "0%",
             "flexDirection": "row",
-            "flexGrow": 1,
-            "flexShrink": 1,
             "marginLeft": "15px",
             "marginRight": "15px",
             "maxWidth": "450px",
             "msFlexDirection": "row",
-            "msFlexNegative": 1,
-            "msFlexPositive": 1,
-            "msFlexPreferredSize": "0%",
           }
         }
       >
@@ -3909,23 +3586,13 @@ exports[`HomePage renders 1`] = `
         style={
           Object {
             "WebkitBoxDirection": "normal",
-            "WebkitBoxFlex": 1,
             "WebkitBoxOrient": "horizontal",
-            "WebkitFlexBasis": "0%",
             "WebkitFlexDirection": "row",
-            "WebkitFlexGrow": 1,
-            "WebkitFlexShrink": 1,
-            "flexBasis": "0%",
             "flexDirection": "row",
-            "flexGrow": 1,
-            "flexShrink": 1,
             "marginLeft": "15px",
             "marginRight": "15px",
             "maxWidth": "450px",
             "msFlexDirection": "row",
-            "msFlexNegative": 1,
-            "msFlexPositive": 1,
-            "msFlexPreferredSize": "0%",
           }
         }
       >
@@ -4083,23 +3750,13 @@ exports[`HomePage renders 1`] = `
         style={
           Object {
             "WebkitBoxDirection": "normal",
-            "WebkitBoxFlex": 1,
             "WebkitBoxOrient": "horizontal",
-            "WebkitFlexBasis": "0%",
             "WebkitFlexDirection": "row",
-            "WebkitFlexGrow": 1,
-            "WebkitFlexShrink": 1,
-            "flexBasis": "0%",
             "flexDirection": "row",
-            "flexGrow": 1,
-            "flexShrink": 1,
             "marginLeft": "15px",
             "marginRight": "15px",
             "maxWidth": "450px",
             "msFlexDirection": "row",
-            "msFlexNegative": 1,
-            "msFlexPositive": 1,
-            "msFlexPreferredSize": "0%",
           }
         }
       >
@@ -4257,23 +3914,13 @@ exports[`HomePage renders 1`] = `
         style={
           Object {
             "WebkitBoxDirection": "normal",
-            "WebkitBoxFlex": 1,
             "WebkitBoxOrient": "horizontal",
-            "WebkitFlexBasis": "0%",
             "WebkitFlexDirection": "row",
-            "WebkitFlexGrow": 1,
-            "WebkitFlexShrink": 1,
-            "flexBasis": "0%",
             "flexDirection": "row",
-            "flexGrow": 1,
-            "flexShrink": 1,
             "marginLeft": "15px",
             "marginRight": "15px",
             "maxWidth": "450px",
             "msFlexDirection": "row",
-            "msFlexNegative": 1,
-            "msFlexPositive": 1,
-            "msFlexPreferredSize": "0%",
           }
         }
       >
@@ -4431,23 +4078,13 @@ exports[`HomePage renders 1`] = `
         style={
           Object {
             "WebkitBoxDirection": "normal",
-            "WebkitBoxFlex": 1,
             "WebkitBoxOrient": "horizontal",
-            "WebkitFlexBasis": "0%",
             "WebkitFlexDirection": "row",
-            "WebkitFlexGrow": 1,
-            "WebkitFlexShrink": 1,
-            "flexBasis": "0%",
             "flexDirection": "row",
-            "flexGrow": 1,
-            "flexShrink": 1,
             "marginLeft": "15px",
             "marginRight": "15px",
             "maxWidth": "450px",
             "msFlexDirection": "row",
-            "msFlexNegative": 1,
-            "msFlexPositive": 1,
-            "msFlexPreferredSize": "0%",
           }
         }
       >
@@ -5073,167 +4710,6 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              Validator Elections Start
-            </div>
-          </div>
-          <div
-            className="react-reveal"
-            style={
-              Object {
-                "opacity": undefined,
-              }
-            }
-          >
-            <div
-              className="css-text-901oao"
-              dir="auto"
-              style={
-                Object {
-                  "color": "rgba(46,51,56,1.00)",
-                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                  "fontSize": "16px",
-                  "lineHeight": "20px",
-                  "textRendering": "geometricPrecision",
-                }
-              }
-            >
-              When sufficient validators and groups are registered and staked, validator elections and epoch rewards can be enabled via on-chain governance proposal
-            </div>
-          </div>
-        </div>
-      </div>
-      <div
-        className="css-view-1dbjc4n"
-        style={
-          Object {
-            "WebkitBoxDirection": "normal",
-            "WebkitBoxOrient": "horizontal",
-            "WebkitFlexDirection": "row",
-            "flexDirection": "row",
-            "marginLeft": "15px",
-            "marginRight": "15px",
-            "maxWidth": "450px",
-            "msFlexDirection": "row",
-          }
-        }
-      >
-        <div
-          className="css-view-1dbjc4n"
-          style={
-            Object {
-              "visibility": "hidden",
-              "width": "2px",
-            }
-          }
-        />
-        <div
-          className="css-view-1dbjc4n"
-          style={
-            Object {
-              "WebkitBoxFlex": 1,
-              "WebkitFlexBasis": "0%",
-              "WebkitFlexGrow": 1,
-              "WebkitFlexShrink": 1,
-              "flexBasis": "0%",
-              "flexGrow": 1,
-              "flexShrink": 1,
-              "marginBottom": "0px",
-              "marginTop": "0px",
-              "msFlexNegative": 1,
-              "msFlexPositive": 1,
-              "msFlexPreferredSize": "0%",
-              "paddingBottom": "30px",
-              "paddingLeft": "25px",
-              "paddingRight": "25px",
-            }
-          }
-        >
-          <div
-            className="css-view-1dbjc4n"
-            style={
-              Object {
-                "WebkitTransform": "translateX(-35px) translateY(1px)",
-                "position": "absolute",
-                "transform": "translateX(-35px) translateY(1px)",
-              }
-            }
-          >
-            <div
-              className="react-reveal"
-              style={
-                Object {
-                  "opacity": undefined,
-                }
-              }
-            >
-              <svg
-                fill="none"
-                height={18}
-                style={Object {}}
-                viewBox="0 0 12 15"
-                width={15.84}
-              >
-                <g
-                  style={
-                    Object {
-                      "mixBlendMode": "normal",
-                    }
-                  }
-                >
-                  <path
-                    d="M0.694644 8.03832L0.694854 8.03733C1.11106 6.0762 2.01314 4.31934 3.15316 2.97222C4.29262 1.62577 5.67668 0.756708 6.97518 0.535182L6.99246 0.532234L7.00949 0.528084C7.08947 0.50859 7.14342 0.507067 7.2886 0.507067H7.30252L7.31641 0.506293C8.43398 0.444037 9.44602 0.844847 10.2113 1.6515C11.3029 2.84313 11.7636 4.74522 11.3503 6.96114L11.3497 6.96425C11.0041 8.88501 10.1393 10.6528 8.99112 11.9944C7.84052 13.3387 6.43203 14.226 5.00847 14.4498C3.7403 14.6396 2.60967 14.2904 1.79643 13.4367L1.79645 13.4366L1.79296 13.433C0.645198 12.252 0.211033 10.2946 0.694644 8.03832Z"
-                    stroke="#FBCC5C"
-                    strokeWidth="1"
-                  />
-                </g>
-              </svg>
-            </div>
-          </div>
-          <div
-            className="react-reveal"
-            style={
-              Object {
-                "opacity": undefined,
-              }
-            }
-          >
-            <div
-              className="css-text-901oao"
-              dir="auto"
-              style={
-                Object {
-                  "color": "rgba(216,161,31,1.00)",
-                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                  "fontSize": "16px",
-                  "fontWeight": "bold",
-                  "lineHeight": "20px",
-                  "textRendering": "geometricPrecision",
-                }
-              }
-            />
-          </div>
-          <div
-            className="react-reveal"
-            style={
-              Object {
-                "opacity": undefined,
-              }
-            }
-          >
-            <div
-              className="css-text-901oao"
-              dir="auto"
-              style={
-                Object {
-                  "color": "rgba(46,51,56,1.00)",
-                  "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                  "fontSize": "16px",
-                  "fontWeight": "bold",
-                  "lineHeight": "20px",
-                  "textRendering": "geometricPrecision",
-                }
-              }
-            >
               Celo Gold Voter Rewards Activate
             </div>
           </div>
@@ -5258,7 +4734,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              Voter rewards can be enabled via on-chain governance proposal
+              Voter rewards enabled via on-chain governance proposal
             </div>
           </div>
         </div>
@@ -5913,377 +5389,6 @@ exports[`HomePage renders 1`] = `
     className="css-view-1dbjc4n"
     style={
       Object {
-        "WebkitAlignItems": "center",
-        "WebkitAlignSelf": "center",
-        "WebkitBoxAlign": "center",
-        "WebkitBoxDirection": "normal",
-        "WebkitBoxOrient": "vertical",
-        "WebkitBoxPack": "center",
-        "WebkitFlexDirection": "column",
-        "WebkitJustifyContent": "center",
-        "alignItems": "center",
-        "alignSelf": "center",
-        "flexDirection": "column",
-        "justifyContent": "center",
-        "marginBottom": "50px",
-        "marginTop": "50px",
-        "maxWidth": "100vw",
-        "msFlexAlign": "center",
-        "msFlexDirection": "column",
-        "msFlexItemAlign": "center",
-        "msFlexPack": "center",
-        "paddingLeft": "10px",
-        "paddingRight": "10px",
-        "width": "100%",
-      }
-    }
-  >
-    <div
-      className="css-view-1dbjc4n"
-      style={
-        Object {
-          "WebkitAlignItems": "center",
-          "WebkitBoxAlign": "center",
-          "WebkitBoxFlex": 0,
-          "WebkitFlexGrow": 0,
-          "WebkitFlexShrink": 0,
-          "alignItems": "center",
-          "flexGrow": 0,
-          "flexShrink": 0,
-          "msFlexAlign": "center",
-          "msFlexNegative": 0,
-          "msFlexPositive": 0,
-          "paddingBottom": "10px",
-          "paddingLeft": "10px",
-          "paddingRight": "10px",
-          "paddingTop": "10px",
-          "width": "100%",
-        }
-      }
-    >
-      <div
-        className="react-reveal"
-        style={
-          Object {
-            "opacity": undefined,
-          }
-        }
-      >
-        <div
-          className="css-view-1dbjc4n"
-        >
-          <h2
-            aria-level="2"
-            className="css-reset-4rbku5 css-text-901oao"
-            dir="auto"
-            role="heading"
-            style={
-              Object {
-                "color": "rgba(46,51,56,1.00)",
-                "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-                "fontSize": "36px",
-                "lineHeight": "40px",
-                "textAlign": "center",
-                "textRendering": "geometricPrecision",
-                "textTransform": "none",
-              }
-            }
-          >
-            Work on Celo in Berlin, Buenos Aires, San Francisco, and around the world
-          </h2>
-        </div>
-      </div>
-      <div
-        className="react-reveal"
-        style={
-          Object {
-            "opacity": undefined,
-          }
-        }
-      >
-        <div
-          className="css-view-1dbjc4n"
-          style={
-            Object {
-              "height": "30px",
-            }
-          }
-        />
-      </div>
-      <div
-        className="react-reveal"
-        style={
-          Object {
-            "opacity": undefined,
-          }
-        }
-      >
-        <div
-          className="css-view-1dbjc4n"
-          onClick={[Function]}
-          onMouseDown={[Function]}
-          onMouseEnter={[Function]}
-          onMouseLeave={[Function]}
-          onMouseUp={[Function]}
-          onResponderGrant={[Function]}
-          onResponderRelease={[Function]}
-        >
-          <div
-            className="css-view-1dbjc4n"
-            style={
-              Object {
-                "WebkitBoxDirection": "normal",
-                "WebkitBoxFlex": 0,
-                "WebkitBoxOrient": "horizontal",
-                "WebkitBoxPack": "center",
-                "WebkitFlexDirection": "row",
-                "WebkitFlexGrow": 0,
-                "WebkitJustifyContent": "center",
-                "backgroundColor": "rgba(0,0,0,0.00)",
-                "borderBottomColor": "rgba(0,0,0,0.00)",
-                "borderLeftColor": "rgba(0,0,0,0.00)",
-                "borderRightColor": "rgba(0,0,0,0.00)",
-                "borderTopColor": "rgba(0,0,0,0.00)",
-                "flexDirection": "row",
-                "flexGrow": 0,
-                "justifyContent": "center",
-                "msFlexDirection": "row",
-                "msFlexPack": "center",
-                "msFlexPositive": 0,
-                "opacity": 1,
-                "outlineColor": "transparent",
-                "width": "fit-content",
-              }
-            }
-          >
-            <a
-              className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
-              data-focusable={true}
-              dir="auto"
-              href="/jobs"
-              onClick={[Function]}
-              onMouseEnter={[Function]}
-              role="link"
-              style={
-                Object {
-                  "WebkitAlignItems": "center",
-                  "WebkitBoxAlign": "center",
-                  "alignItems": "center",
-                  "color": "rgba(53,208,127,1.00)",
-                  "cursor": "pointer",
-                  "display": "inline-flex",
-                  "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                  "fontSize": "16px",
-                  "fontWeight": "500",
-                  "lineHeight": "16px",
-                  "msFlexAlign": "center",
-                  "textAlign": "center",
-                  "textRendering": "geometricPrecision",
-                }
-              }
-            >
-              View Open Roles
-              <div
-                className="css-view-1dbjc4n"
-                style={
-                  Object {
-                    "display": "inline-flex",
-                    "paddingLeft": "0.4em",
-                    "paddingTop": "0.185em",
-                  }
-                }
-              >
-                <svg
-                  fill="none"
-                  height="0.75em"
-                  style={Object {}}
-                  transform="rotate(0)"
-                  viewBox="0 0 8 12"
-                  width="0.75em"
-                >
-                  <path
-                    clipRule="evenodd"
-                    d="M1.19997 0L1.13249e-05 1.19996L4.80011 6.00006L0 10.8002L1.19996 12.0001L7.19977 6.00032L7.19953 6.00007L7.19979 5.99981L1.19997 0Z"
-                    fill="#35D07F"
-                    fillRule="evenodd"
-                    opacity={1}
-                    style={Object {}}
-                  />
-                </svg>
-              </div>
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div
-    className="css-view-1dbjc4n"
-    style={
-      Object {
-        "WebkitBoxFlex": 1,
-        "WebkitFlexBasis": "0%",
-        "WebkitFlexGrow": 1,
-        "WebkitFlexShrink": 1,
-        "flexBasis": "0%",
-        "flexGrow": 1,
-        "flexShrink": 1,
-        "msFlexNegative": 1,
-        "msFlexPositive": 1,
-        "msFlexPreferredSize": "0%",
-        "paddingBottom": "0px",
-        "paddingTop": "0px",
-      }
-    }
-  >
-    <div
-      className="css-view-1dbjc4n"
-      style={
-        Object {
-          "WebkitAlignItems": "center",
-          "WebkitBoxAlign": "center",
-          "WebkitBoxPack": "center",
-          "WebkitJustifyContent": "center",
-          "alignItems": "center",
-          "justifyContent": "center",
-          "msFlexAlign": "center",
-          "msFlexPack": "center",
-        }
-      }
-    >
-      <div
-        className="css-view-1dbjc4n"
-        style={
-          Object {
-            "WebkitAlignItems": "flex-start",
-            "WebkitBoxAlign": "start",
-            "WebkitBoxFlex": 1,
-            "WebkitBoxPack": "start",
-            "WebkitFlexBasis": "0%",
-            "WebkitFlexGrow": 1,
-            "WebkitFlexShrink": 1,
-            "WebkitJustifyContent": "flex-start",
-            "alignItems": "flex-start",
-            "flexBasis": "0%",
-            "flexGrow": 1,
-            "flexShrink": 1,
-            "height": "383.3333333333333px",
-            "justifyContent": "flex-start",
-            "msFlexAlign": "start",
-            "msFlexNegative": 1,
-            "msFlexPack": "start",
-            "msFlexPositive": 1,
-            "msFlexPreferredSize": "0%",
-          }
-        }
-      >
-        <div
-          className="css-view-1dbjc4n"
-          style={
-            Object {
-              "WebkitFlexBasis": "auto",
-              "flexBasis": "auto",
-              "height": "250px",
-              "msFlexPreferredSize": "auto",
-              "overflowX": "hidden",
-              "overflowY": "hidden",
-              "width": "375px",
-              "zIndex": 0,
-            }
-          }
-        >
-          <div
-            className="css-view-1dbjc4n"
-            style={
-              Object {
-                "backgroundColor": "rgba(0,0,0,0.00)",
-                "backgroundPosition": "center",
-                "backgroundRepeat": "no-repeat",
-                "backgroundSize": "cover",
-                "bottom": "0px",
-                "height": "100%",
-                "left": "0px",
-                "position": "absolute",
-                "right": "0px",
-                "top": "0px",
-                "width": "100%",
-                "zIndex": -1,
-              }
-            }
-          />
-        </div>
-        <div
-          className="css-text-901oao"
-          dir="auto"
-          style={
-            Object {
-              "color": "rgba(46,51,56,1.00)",
-              "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
-              "fontSize": "16px",
-              "lineHeight": "20px",
-              "paddingTop": "5px",
-              "textRendering": "geometricPrecision",
-            }
-          }
-        >
-          
-        </div>
-      </div>
-    </div>
-    <div
-      className="css-view-1dbjc4n r-pointerEvents-633pao"
-      style={
-        Object {
-          "WebkitAlignItems": "center",
-          "WebkitBoxAlign": "center",
-          "WebkitBoxPack": "center",
-          "WebkitJustifyContent": "center",
-          "alignItems": "center",
-          "bottom": "20px",
-          "justifyContent": "center",
-          "left": "0px",
-          "msFlexAlign": "center",
-          "msFlexPack": "center",
-          "position": "absolute",
-          "right": "0px",
-          "top": "0px",
-        }
-      }
-    >
-      <div
-        className="css-view-1dbjc4n r-animationKeyframes-1muuchs"
-        style={
-          Object {
-            "WebkitAnimationDuration": "3s",
-            "WebkitAnimationIterationCount": "infinite",
-            "WebkitAnimationTimingFunction": "easeOut",
-            "WebkitTransformOrigin": "middle right",
-            "animationDuration": "3s",
-            "animationIterationCount": "infinite",
-            "animationTimingFunction": "easeOut",
-            "transformOrigin": "middle right",
-          }
-        }
-      />
-    </div>
-    <div
-      className="css-view-1dbjc4n r-pointerEvents-633pao"
-      style={
-        Object {
-          "backgroundImage": "linear-gradient(to right, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0) 10%, rgba(255, 255, 255, 0) 90%, rgba(255, 255, 255, 0.6) 100%)",
-          "bottom": "0px",
-          "left": "0px",
-          "position": "absolute",
-          "right": "0px",
-          "top": "0px",
-        }
-      }
-    />
-  </div>
-  <div
-    className="css-view-1dbjc4n"
-    style={
-      Object {
         "WebkitAlignSelf": "center",
         "WebkitBoxDirection": "normal",
         "WebkitBoxOrient": "vertical",
@@ -6676,7 +5781,7 @@ exports[`HomePage renders 1`] = `
                 }
               }
             >
-              See More Backers
+              Backers
               <div
                 className="css-view-1dbjc4n"
                 style={

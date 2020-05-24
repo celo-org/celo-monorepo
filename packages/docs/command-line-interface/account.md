@@ -83,7 +83,9 @@ ARGUMENTS
 
 OPTIONS
   --address=address                                  (required) The address of the account you want to claim
-  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Addess of the account to set metadata for
+
+  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the account to set metadata for or an
+                                                     authorized signer for the address in the metadata
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
@@ -119,7 +121,8 @@ ARGUMENTS
   FILE  Path of the metadata file
 
 OPTIONS
-  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Addess of the account to set metadata for
+  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the account to set metadata for or an
+                                                     authorized signer for the address in the metadata
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
@@ -155,7 +158,9 @@ ARGUMENTS
 
 OPTIONS
   --domain=domain                                    (required) The domain you want to claim
-  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Addess of the account to set metadata for
+
+  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the account to set metadata for or an
+                                                     authorized signer for the address in the metadata
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
@@ -187,7 +192,8 @@ ARGUMENTS
   FILE  Path of the metadata file
 
 OPTIONS
-  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Addess of the account to set metadata for
+  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the account to set metadata for or an
+                                                     authorized signer for the address in the metadata
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
@@ -221,7 +227,8 @@ ARGUMENTS
   FILE  Path of the metadata file
 
 OPTIONS
-  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Addess of the account to set metadata for
+  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the account to set metadata for or an
+                                                     authorized signer for the address in the metadata
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
@@ -255,7 +262,8 @@ ARGUMENTS
   FILE  Path where the metadata should be saved
 
 OPTIONS
-  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Addess of the account to set metadata for
+  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the account to set metadata for or an
+                                                     authorized signer for the address in the metadata
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
                                                      addresses for local signing
@@ -326,6 +334,23 @@ OPTIONS
 ```
 
 _See code: [packages/cli/src/commands/account/list.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/list.ts)_
+
+### Lock
+
+Lock an account which was previously unlocked
+
+```
+USAGE
+  $ celocli account:lock ACCOUNT
+
+ARGUMENTS
+  ACCOUNT  Account address
+
+EXAMPLE
+  lock 0x5409ed021d9299bf6814279a6a1411a7e866a631
+```
+
+_See code: [packages/cli/src/commands/account/lock.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/lock.ts)_
 
 ### New
 
@@ -575,10 +600,12 @@ ARGUMENTS
   ACCOUNT  Account address
 
 OPTIONS
-  --password=password
+  --duration=duration  Duration in seconds to leave the account unlocked. Unlocks until the node exits by default.
+  --password=password  Password used to unlock the account. If not specified, you will be prompted for a password.
 
-EXAMPLE
+EXAMPLES
   unlock 0x5409ed021d9299bf6814279a6a1411a7e866a631
+  unlock 0x5409ed021d9299bf6814279a6a1411a7e866a631 --duration 600
 ```
 
 _See code: [packages/cli/src/commands/account/unlock.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/unlock.ts)_

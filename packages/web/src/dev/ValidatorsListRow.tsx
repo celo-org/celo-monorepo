@@ -12,9 +12,15 @@ import { cutAddress, formatNumber } from 'src/utils/utils'
 const unknownGroupName = 'Unnamed Group'
 const unknownValidatorName = 'Unnamed Validator'
 
+export const localStoragePinnedKey = 'pinnedValidators'
+
 class Text extends RNText {
   render() {
-    return <RNText style={[styles.defaultText, this.props.style]}>{this.props.children}</RNText>
+    return (
+      <RNText {...this.props} style={[styles.defaultText, this.props.style]}>
+        {this.props.children}
+      </RNText>
+    )
   }
 }
 
@@ -29,7 +35,9 @@ export interface CeloGroup {
   address: string
   usd: number
   gold: number
+  receivableRaw: number
   receivableVotes: string
+  votesRaw: number
   votes: string
   votesAbsolute: string
   commission: number
@@ -53,14 +61,17 @@ export interface CeloGroup {
 interface Props {
   group: CeloGroup
   expanded: boolean
+  onPinned: () => void
 }
 interface State {
   tooltip?: boolean
+  isPinned?: boolean
 }
 
 class ValidatorsListRow extends React.PureComponent<Props & I18nProps, State> {
   state = {
     tooltip: false,
+    isPinned: false,
   }
   tooltipRef = React.createRef<any>()
   removeDocumentListener: () => void
@@ -83,24 +94,57 @@ class ValidatorsListRow extends React.PureComponent<Props & I18nProps, State> {
       document.removeEventListener('click', onDocumentClick, false)
   }
 
+  componentDidMount() {
+    this.setState({ isPinned: this.isPinned() })
+  }
+
   componentWillUnmount() {
     this.removeDocumentListener()
   }
 
+  isPinned(toggle?: boolean) {
+    const { address } = this.props.group
+    let list = (localStorage.getItem(localStoragePinnedKey) || '').split(',') || []
+    let isPinned = list.includes(address)
+    if (toggle) {
+      if (!isPinned) {
+        list.push(address)
+      } else {
+        list = list.filter((_) => _ !== address)
+      }
+      isPinned = !isPinned
+      localStorage.setItem(localStoragePinnedKey, list.join(','))
+      this.props.onPinned()
+    }
+    return isPinned
+  }
+
+  stopPropagation = (event) => {
+    event.stopPropagation()
+  }
+  toggleTooltip = (event) => {
+    event.stopPropagation()
+    this.setState({ tooltip: !this.state.tooltip })
+  }
+  togglePinned: any = (event) => {
+    event.stopPropagation()
+    const is = this.isPinned(true)
+    this.setState({ isPinned: is })
+  }
+
   render() {
     const { group, expanded } = this.props
-    const { tooltip } = this.state
-    const stopPropagation = (event: any) => {
-      event.preventDefault()
-      event.stopPropagation()
-    }
-    const toggleTooltip = (event: any) => {
-      stopPropagation(event)
-      this.setState({ tooltip: !tooltip })
-    }
+    const { tooltip, isPinned } = this.state
+
     return (
       <div style={tooltip ? { zIndex: 2 } : {}}>
         <View style={[styles.tableRow, styles.tableRowCont, tooltip ? { zIndex: 3 } : {}]}>
+          <View
+            style={[styles.tableCell, styles.pinContainer, styles.sizeXXS]}
+            onClick={this.togglePinned}
+          >
+            <View style={[styles.pin, isPinned ? styles.pinned : {}]} />
+          </View>
           <View style={[styles.tableCell, styles.tableCellTitle]}>
             <Text style={[styles.tableCell, styles.tableCellTitleArrow]}>
               <Chevron
@@ -116,14 +160,17 @@ class ValidatorsListRow extends React.PureComponent<Props & I18nProps, State> {
                   style={[styles.tableCellTitleFirstRow]}
                   numberOfLines={1}
                   ellipsizeMode="tail"
+                  accessibilityRole="link"
+                  href={`https://explorer.celo.org/address/${group.address}/celo`}
+                  target="_blank"
                 >
                   {group.name || unknownGroupName}
                 </Text>
 
                 {!!group.claims.length && (
                   <Text style={[styles.checkmark]}>
-                    <div onClick={stopPropagation}>
-                      <div ref={this.tooltipRef} onClick={toggleTooltip}>
+                    <div onClick={this.stopPropagation}>
+                      <div ref={this.tooltipRef} onClick={this.toggleTooltip}>
                         <Checkmark color={colors.black} size={8} />
                       </div>
 
@@ -131,7 +178,15 @@ class ValidatorsListRow extends React.PureComponent<Props & I18nProps, State> {
                         <Text style={[styles.tooltip]}>
                           {group.claims.map((domain, i) => (
                             <Text key={domain} style={[styles.tooltipRow]}>
-                              {i + 1}. <Text style={[styles.tooltipText]}>{domain}</Text>
+                              {i + 1}.
+                              <Text
+                                accessibilityRole="link"
+                                target="_blank"
+                                href={`https://${domain}`}
+                                style={[styles.tooltipText]}
+                              >
+                                {domain}
+                              </Text>
                               <Text style={[styles.checkmark]}>
                                 <Checkmark color={colors.black} size={8} />
                               </Text>
@@ -173,6 +228,22 @@ class ValidatorsListRow extends React.PureComponent<Props & I18nProps, State> {
           </Text>
           <Text
             style={[styles.tableCell, styles.tableCellCenter, styles.sizeM]}
+            numberOfLines={2}
+            ellipsizeMode="tail"
+          >
+            {formatNumber(+group.votesRaw, 0)}
+            {'\n'}({formatNumber((group.gold / group.votesRaw) * 100, 1) || 0}%)
+          </Text>
+          <Text
+            style={[styles.tableCell, styles.tableCellCenter, styles.sizeM]}
+            numberOfLines={2}
+            ellipsizeMode="tail"
+          >
+            {formatNumber(+group.receivableRaw, 0)}
+            {'\n'}({formatNumber((group.gold / +group.receivableRaw) * 100, 1) || 0}%)
+          </Text>
+          <Text
+            style={[styles.tableCell, styles.tableCellCenter, styles.sizeM]}
             numberOfLines={1}
             ellipsizeMode="tail"
           >
@@ -195,13 +266,13 @@ class ValidatorsListRow extends React.PureComponent<Props & I18nProps, State> {
               <Text style={[styles.bar, group.rewardsStyle, { width: `${group.rewards}%` }]} />
             </Text>
           </Text>
-          <Text
+          {/* <Text
             style={[styles.tableCell, styles.tableCellCenter, styles.sizeS]}
             numberOfLines={1}
             ellipsizeMode="tail"
           >
             {formatNumber(group.uptime, 1)}%
-          </Text>
+          </Text> */}
           <Text
             style={[styles.tableCell, styles.tableCellCenter, styles.sizeS]}
             numberOfLines={1}
@@ -219,9 +290,15 @@ class ValidatorsListRow extends React.PureComponent<Props & I18nProps, State> {
                   numberOfLines={1}
                   ellipsizeMode="tail"
                 >
+                  <Text style={[styles.tableCell, styles.sizeXXS]} />
                   <Text style={[styles.tableCell, styles.tableCellTitleNumber]}>{j + 1}</Text>
                   <Text style={[styles.tableCellTitleRows]}>
-                    <Text style={[styles.tableCellTitleFirstRow, styles.tableSecondaryCell]}>
+                    <Text
+                      style={[styles.tableCellTitleFirstRow, styles.tableSecondaryCell]}
+                      accessibilityRole="link"
+                      href={`https://explorer.celo.org/address/${validator.address}/celo`}
+                      target="_blank"
+                    >
                       {validator.name || unknownValidatorName}
                     </Text>
                     <Text
@@ -242,6 +319,8 @@ class ValidatorsListRow extends React.PureComponent<Props & I18nProps, State> {
                   />
                 </Text>
                 <Text style={[styles.tableCell, styles.sizeXL]} />
+                <Text style={[styles.tableCell, styles.sizeM]} />
+                <Text style={[styles.tableCell, styles.sizeM]} />
                 <Text
                   style={[
                     styles.tableCell,

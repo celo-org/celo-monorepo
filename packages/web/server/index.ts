@@ -69,16 +69,13 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
       res.redirect('/terms')
     })
   })
-  ;['/applications', '/technology', '/dev', '/devs', '/develop', '/developer'].forEach((path) => {
-    server.get(path, (_, res) => {
-      res.redirect('/developers')
-    })
-  })
-  ;['/build'].forEach((path) => {
-    server.get(path, (_, res) => {
-      res.redirect('/validators')
-    })
-  })
+  ;['/applications', '/technology', '/dev', '/devs', '/develop', '/build', '/developer'].forEach(
+    (path) => {
+      server.get(path, (_, res) => {
+        res.redirect('/developers')
+      })
+    }
+  )
   ;['/build/validators'].forEach((path) => {
     server.get(path, (_, res) => {
       res.redirect('/validators/explore')
@@ -88,9 +85,9 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
   server.get('/build/*', (req, res) => {
     res.redirect(`/developers/${req.params[0]}`)
   })
-  ;['/download', '/app', '/mobile-app', '/invite', 'build/download'].forEach((path) => {
+  ;['/app', '/test-wallet', '/mobile-app', 'build/download'].forEach((path) => {
     server.get(path, (_, res) => {
-      res.redirect('/build/wallet')
+      res.redirect('/developers/wallet')
     })
   })
 
@@ -99,7 +96,7 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
   })
 
   server.get('/papers/cbdc-velocity', (_, res) => {
-    res.redirect('/papers/cLabs_CBDC_Velocity_v2_04-2020.pdf')
+    res.redirect('/papers/cLabs_CBDC_Velocity_v3.pdf')
   })
 
   server.get('/papers/whitepaper', (_, res) => {

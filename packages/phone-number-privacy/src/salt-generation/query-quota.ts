@@ -1,50 +1,61 @@
-import { AttestationsWrapper } from '@celo/contractkit/lib/wrappers/Attestations'
+import { StableTokenWrapper } from '@celo/contractkit/lib/wrappers/StableTokenWrapper'
+import BigNumber from 'bignumber.js'
+import { Transaction } from 'knex'
+import { isVerified } from '../common/identity'
+import logger from '../common/logger'
 import config from '../config'
 import { getPerformedQueryCount } from '../database/wrappers/account'
 import { getContractKit } from '../web3/contracts'
 
-export default class QueryQuota {
-  /*
-   * Returns how many queries the account can make based on the
-   * calculated query quota and the number of queries already performed.
-   */
-  async getRemainingQueryCount(account: string, hashedPhoneNumber: string) {
-    const queryQuota = await this.getQueryQuota(account, hashedPhoneNumber)
-    const performedQueryCount = await getPerformedQueryCount(account)
-    return queryQuota - performedQueryCount
-  }
+/*
+ * Returns how many queries the account can make based on the
+ * calculated query quota and the number of queries already performed.
+ */
+export async function getRemainingQueryCount(
+  trx: Transaction,
+  account: string,
+  hashedPhoneNumber?: string
+) {
+  logger.debug('Retrieving remaining query count')
+  const queryQuota = await getQueryQuota(account, hashedPhoneNumber)
+  const performedQueryCount = await getPerformedQueryCount(account, trx)
+  return queryQuota - performedQueryCount
+}
 
-  /*
-   * Calculates how many queries the caller has unlocked based on the algorithm
-   * unverifiedQueryCount + verifiedQueryCount + (queryPerTransaction * transactionCount)
-   */
-  async getQueryQuota(account: string, hashedPhoneNumber: string) {
-    // TODO (amyslawson) check balance meets a minimum before granting any quota
-    let queryQuota = config.salt.unverifiedQueryMax
-    if (await this.isVerified(account, hashedPhoneNumber)) {
-      queryQuota += config.salt.additionalVerifiedQueryMax
-      const transactionCount = await this.getTransactionCountFromAccount(account)
-      queryQuota += config.salt.queryPerTransaction * transactionCount
-    }
-    return queryQuota
-  }
-
-  async isVerified(account: string, hashedPhoneNumber: string): Promise<boolean> {
-    // TODO (amyslawson) wrap forno request in retry
-    // TODO (aslawson) update to work with hashed phoneNumber
-    const attestationsWrapper: AttestationsWrapper = await getContractKit().contracts.getAttestations()
-    const attestationStats = await attestationsWrapper.getAttestationStat(
-      hashedPhoneNumber,
-      account
+/*
+ * Calculates how many queries the caller has unlocked based on the algorithm
+ * unverifiedQueryCount + verifiedQueryCount + (queryPerTransaction * transactionCount)
+ * If the caller is not verified, they must have a minimum balance to get the unverifiedQueryMax.
+ */
+async function getQueryQuota(account: string, hashedPhoneNumber?: string) {
+  if (hashedPhoneNumber && (await isVerified(account, hashedPhoneNumber))) {
+    logger.debug('Account is verified')
+    const transactionCount = await getTransactionCountFromAccount(account)
+    return (
+      config.salt.unverifiedQueryMax +
+      config.salt.additionalVerifiedQueryMax +
+      config.salt.queryPerTransaction * transactionCount
     )
-    const numAttestationsCompleted = attestationStats.completed
-    const numAttestationsRemaining =
-      config.attestations.numberAttestationsRequired - numAttestationsCompleted
-    return numAttestationsRemaining <= 0
   }
 
-  async getTransactionCountFromAccount(account: string): Promise<number> {
-    // TODO (amyslawson) wrap forno request in retry
-    return getContractKit().web3.eth.getTransactionCount(account)
+  const accountBalance = await getDollarBalance(account)
+  if (accountBalance.isGreaterThanOrEqualTo(config.salt.minDollarBalance)) {
+    logger.debug('Account is not verified but meets min balance')
+    // TODO consider granting these unverified users slightly less queryPerTx
+    const transactionCount = await getTransactionCountFromAccount(account)
+    return config.salt.unverifiedQueryMax + config.salt.queryPerTransaction * transactionCount
   }
+
+  logger.debug('Account does not meet query quota criteria')
+  return 0
+}
+
+async function getTransactionCountFromAccount(account: string): Promise<number> {
+  // TODO (amyslawson) wrap forno request in retry
+  return getContractKit().web3.eth.getTransactionCount(account)
+}
+
+async function getDollarBalance(account: string): Promise<BigNumber> {
+  const stableTokenWrapper: StableTokenWrapper = await getContractKit().contracts.getStableToken()
+  return stableTokenWrapper.balanceOf(account)
 }

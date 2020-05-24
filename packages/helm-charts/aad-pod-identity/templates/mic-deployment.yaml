@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    component: mic
+    k8s-app: aad-pod-id
+  name: mic
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      component: mic
+      app: mic
+  template:
+    metadata:
+      labels:
+        component: mic
+        app: mic
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "{{ .Values.nmi.prometheusPort }}"
+    spec:
+      serviceAccountName: aad-pod-id-mic-service-account
+      containers:
+      - name: mic
+        image: {{ .Values.mic.image.repo }}:{{ .Values.mic.image.tag }}
+        imagePullPolicy: Always
+        args:
+          - "--syncRetryDuration={{ .Values.mic.syncRetryDuration }}"
+          - "--cloudconfig=/etc/kubernetes/azure.json"
+          - "--logtostderr"
+          - "--prometheus-port={{ .Values.mic.prometheusPort }}"
+        env:
+        - name: MIC_POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: FORCENAMESPACED
+          value: "{{ .Values.mic.forceNamespaced }}"
+        ports:
+        - name: prometheus
+          containerPort: {{ .Values.mic.prometheusPort }}
+        resources:
+{{ toYaml .Values.mic.resources | indent 10 }}
+        volumeMounts:
+        - name: k8s-azure-file
+          mountPath: /etc/kubernetes/azure.json
+          readOnly: true
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 5
+      volumes:
+      - name: k8s-azure-file
+        hostPath:
+          path: /etc/kubernetes/azure.json
+      nodeSelector:
+        beta.kubernetes.io/os: linux

@@ -1,9 +1,8 @@
 import SectionHeadNew from '@celo/react-components/components/SectionHeadNew'
-import QRCodeBorderlessIcon from '@celo/react-components/icons/QRCodeBorderless'
 import SettingsIcon from '@celo/react-components/icons/Settings'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
-import { componentStyles, TOP_BAR_HEIGHT } from '@celo/react-components/styles/styles'
+import { componentStyles } from '@celo/react-components/styles/styles'
 import variables from '@celo/react-components/styles/variables'
 import * as _ from 'lodash'
 import * as React from 'react'
@@ -18,10 +17,8 @@ import {
   View,
 } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
-import { BoxShadow } from 'react-native-shadow'
 import { connect } from 'react-redux'
 import { showMessage } from 'src/alert/actions'
-import componentWithAnalytics from 'src/analytics/wrapper'
 import { exitBackupFlow } from 'src/app/actions'
 import { ALERT_BANNER_DURATION, DEFAULT_TESTNET, SHOW_TESTNET_BANNER } from 'src/config'
 import { CURRENCY_ENUM } from 'src/geth/consts'
@@ -30,10 +27,10 @@ import CeloDollarsOverview from 'src/home/CeloDollarsOverview'
 import HeaderButton from 'src/home/HeaderButton'
 import NotificationBox from 'src/home/NotificationBox'
 import { callToActNotificationSelector, getActiveNotificationCount } from 'src/home/selectors'
+import SendOrRequestBar from 'src/home/SendOrRequestBar'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import { withDispatchAfterNavigate } from 'src/navigator/WithDispatchAfterNavigate'
 import { NumberToRecipient } from 'src/recipients/recipient'
 import { recipientCacheSelector } from 'src/recipients/reducer'
 import { RootState } from 'src/redux/reducers'
@@ -44,7 +41,6 @@ import { resetStandbyTransactions } from 'src/transactions/actions'
 import TransactionsList from 'src/transactions/TransactionsList'
 import { currentAccountSelector } from 'src/web3/selectors'
 
-const SCREEN_WIDTH = variables.width
 const HEADER_ICON_SIZE = 24
 const HEADER_BUTTON_MARGIN = 12
 
@@ -86,23 +82,13 @@ const mapStateToProps = (state: RootState): StateProps => ({
   appConnected: isAppConnected(state),
 })
 
-const AnimatedSectionList: SectionList<any> = Animated.createAnimatedComponent(SectionList)
+const AnimatedSectionList = Animated.createAnimatedComponent(SectionList)
 
 const HEADER_FADE_HEIGHT = 100
-const SHADOW_SCROLL_HEIGHT = 226
-const SHADOW_STYLE = {
-  width: SCREEN_WIDTH,
-  height: TOP_BAR_HEIGHT,
-  color: '#2e3338',
-  radius: 1,
-  opacity: 0.1,
-  x: 0,
-  y: 1,
-}
+
 export class WalletHome extends React.Component<Props> {
   animatedValue: Animated.Value
   headerOpacity: Animated.AnimatedInterpolation
-  shadowOpacity: Animated.AnimatedInterpolation
   onScroll: () => void
 
   constructor(props: Props) {
@@ -112,11 +98,6 @@ export class WalletHome extends React.Component<Props> {
     this.headerOpacity = this.animatedValue.interpolate({
       inputRange: [0, HEADER_FADE_HEIGHT],
       outputRange: [0, 1],
-      extrapolate: 'clamp',
-    })
-    this.shadowOpacity = this.animatedValue.interpolate({
-      inputRange: [0, HEADER_FADE_HEIGHT, SHADOW_SCROLL_HEIGHT, SHADOW_SCROLL_HEIGHT + 1],
-      outputRange: [0, 1, 1, 0],
       extrapolate: 'clamp',
     })
     this.onScroll = Animated.event(
@@ -139,11 +120,11 @@ export class WalletHome extends React.Component<Props> {
     }
   }
 
-  renderSection = ({ section: { title, bubbleText } }: { section: SectionListData<any> }) => {
+  renderSection = ({ section: { title } }: { section: SectionListData<any> }) => {
     if (!title) {
       return null
     }
-    return <SectionHeadNew text={title} bubbleText={bubbleText} />
+    return <SectionHeadNew text={title} />
   }
 
   keyExtractor = (_item: any, index: number) => {
@@ -158,10 +139,6 @@ export class WalletHome extends React.Component<Props> {
       null,
       t('testnetAlert.0', { testnet: _.startCase(DEFAULT_TESTNET) })
     )
-  }
-
-  onPressQrCode = () => {
-    navigate(Screens.QRCode)
   }
 
   onPressSettings = () => {
@@ -185,7 +162,6 @@ export class WalletHome extends React.Component<Props> {
       sections.push({
         data: [{}],
         renderItem: () => <NotificationBox key={'NotificationBox'} />,
-        bubbleText: activeNotificationCount ? activeNotificationCount.toString() : null,
       })
     }
 
@@ -199,14 +175,6 @@ export class WalletHome extends React.Component<Props> {
 
     return (
       <SafeAreaView style={styles.container}>
-        {/* Why this mess? Android only has shadows from elevation, and we have to fade in under
-            If we use elevation, it appears on top of the title. The box shadow enables to fade
-            in a shadow from underneath */}
-        <Animated.View style={[styles.shadowContainer, { opacity: this.shadowOpacity }]}>
-          <BoxShadow setting={SHADOW_STYLE}>
-            <View style={styles.shadowPlaceholder} />
-          </BoxShadow>
-        </Animated.View>
         <View style={[componentStyles.topBar, styles.header]}>
           {this.props.appConnected ? (
             <Animated.Text style={[fontStyles.headerTitle, { opacity: this.headerOpacity }]}>
@@ -218,16 +186,12 @@ export class WalletHome extends React.Component<Props> {
             </View>
           )}
           <View style={styles.headerRight}>
-            <HeaderButton style={styles.headerButton} onPress={this.onPressQrCode}>
-              <QRCodeBorderlessIcon height={HEADER_ICON_SIZE} color={colors.celoGreen} />
-            </HeaderButton>
+            {/* TODO: remove settings from here once we have the drawer menu */}
             <HeaderButton style={styles.headerButton} onPress={this.onPressSettings}>
               <SettingsIcon height={HEADER_ICON_SIZE} color={colors.celoGreen} />
             </HeaderButton>
           </View>
         </View>
-        {/*
-        // @ts-ignore */}
         <AnimatedSectionList
           onScroll={this.onScroll}
           refreshControl={refresh}
@@ -235,11 +199,13 @@ export class WalletHome extends React.Component<Props> {
           refreshing={this.props.loading}
           style={styles.container}
           sections={sections}
-          stickySectionHeadersEnabled={true}
+          stickySectionHeadersEnabled={false}
           renderSectionHeader={this.renderSection}
+          // TODO: remove this once we have the drawer menu with the balance
           ListHeaderComponent={CeloDollarsOverview}
           keyExtractor={this.keyExtractor}
         />
+        <SendOrRequestBar />
       </SafeAreaView>
     )
   }
@@ -274,25 +240,9 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
     margin: HEADER_BUTTON_MARGIN,
   },
-  shadowContainer: {
-    height: TOP_BAR_HEIGHT,
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    zIndex: 1,
-  },
-  shadowPlaceholder: {
-    width: SCREEN_WIDTH,
-    height: TOP_BAR_HEIGHT,
-  },
 })
 
-export default withDispatchAfterNavigate(
-  componentWithAnalytics(
-    connect<StateProps, DispatchProps, {}, RootState>(
-      mapStateToProps,
-      mapDispatchToProps
-    )(withTranslation(Namespaces.walletFlow5)(WalletHome))
-  )
-)
+export default connect<StateProps, DispatchProps, {}, RootState>(
+  mapStateToProps,
+  mapDispatchToProps
+)(withTranslation(Namespaces.walletFlow5)(WalletHome))

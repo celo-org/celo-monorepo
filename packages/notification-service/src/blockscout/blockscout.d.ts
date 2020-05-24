@@ -29,11 +29,14 @@ export interface Transaction {
 export interface Log {
   transactionIndex: string
   transactionHash: string
-  topics: string[]
+  topics: Array<string | null>
   timeStamp: string
   logIndex: string
   gasUsed: string
   gasPrice: string
+  gatewayFee: string
+  gatewayFeeRecipient: string | null
+  feeCurrency: string | null
   data: string
   blockNumber: string
   address: string

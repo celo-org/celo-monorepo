@@ -1,31 +1,50 @@
 import { Request, Response } from 'firebase-functions'
-import { computeBlindedSignature } from '../bls/bls-signature'
+import { BLSCryptographyClient } from '../bls/bls-cryptography-client'
 import { ErrorMessages, respondWithError } from '../common/error-utils'
 import { authenticateUser } from '../common/identity'
+import {
+  hasValidAccountParam,
+  hasValidQueryPhoneNumberParam,
+  isBodyReasonablySized,
+  phoneNumberHashIsValidIfExists,
+} from '../common/input-validation'
+import logger from '../common/logger'
+import { getTransaction } from '../database/database'
 import { incrementQueryCount } from '../database/wrappers/account'
-import QueryQuota from './query-quota'
+import { getRemainingQueryCount } from './query-quota'
 
 export async function handleGetBlindedMessageForSalt(request: Request, response: Response) {
+  let trx
   try {
-    const queryQuota: QueryQuota = new QueryQuota()
+    trx = await getTransaction()
     if (!isValidGetSignatureInput(request.body)) {
       respondWithError(response, 400, ErrorMessages.INVALID_INPUT)
       return
     }
-    authenticateUser()
-    const remainingQueryCount = await queryQuota.getRemainingQueryCount(
+    if (!authenticateUser(request)) {
+      respondWithError(response, 401, ErrorMessages.UNAUTHENTICATED_USER)
+      return
+    }
+    const remainingQueryCount = await getRemainingQueryCount(
+      trx,
       request.body.account,
       request.body.hashedPhoneNumber
     )
     if (remainingQueryCount <= 0) {
+      trx.rollback()
       respondWithError(response, 403, ErrorMessages.EXCEEDED_QUOTA)
       return
     }
-    const signature = computeBlindedSignature(request.body.blindedQueryPhoneNumber)
-    await incrementQueryCount(request.body.account)
+    const signature = await BLSCryptographyClient.computeBlindedSignature(
+      request.body.blindedQueryPhoneNumber
+    )
+    await incrementQueryCount(request.body.account, trx)
     response.json({ success: true, signature })
   } catch (error) {
-    console.error(ErrorMessages.UNKNOWN_ERROR + ' Failed to getSalt', error)
+    logger.error('Failed to getSalt', error)
+    if (trx) {
+      trx.rollback()
+    }
     respondWithError(response, 500, ErrorMessages.UNKNOWN_ERROR)
   }
 }
@@ -33,20 +52,8 @@ export async function handleGetBlindedMessageForSalt(request: Request, response:
 function isValidGetSignatureInput(requestBody: any): boolean {
   return (
     hasValidAccountParam(requestBody) &&
-    hasValidPhoneNumberParam(requestBody) &&
-    hasValidQueryPhoneNumberParam(requestBody)
+    hasValidQueryPhoneNumberParam(requestBody) &&
+    phoneNumberHashIsValidIfExists(requestBody) &&
+    isBodyReasonablySized(requestBody)
   )
-}
-
-function hasValidAccountParam(requestBody: any): boolean {
-  return requestBody.account && (requestBody.account as string).startsWith('0x')
-}
-
-// TODO (amyslawson) make this param optional for user's first request prior to attestation
-function hasValidPhoneNumberParam(requestBody: any): boolean {
-  return requestBody.hashedPhoneNumber
-}
-
-function hasValidQueryPhoneNumberParam(requestBody: any): boolean {
-  return requestBody.blindedQueryPhoneNumber
 }

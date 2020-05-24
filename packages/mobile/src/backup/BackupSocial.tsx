@@ -10,7 +10,6 @@ import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import { setSocialBackupCompleted } from 'src/account/actions'
 import { showError } from 'src/alert/actions'
-import componentWithAnalytics from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import BackupPhraseContainer, {
   BackupPhraseContainerMode,
@@ -178,9 +177,7 @@ const styles = StyleSheet.create({
   },
 })
 
-export default componentWithAnalytics(
-  connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
-    setSocialBackupCompleted,
-    showError,
-  })(withTranslation(Namespaces.backupKeyFlow6)(BackupSocial))
-)
+export default connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
+  setSocialBackupCompleted,
+  showError,
+})(withTranslation(Namespaces.backupKeyFlow6)(BackupSocial))

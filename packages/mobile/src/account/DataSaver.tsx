@@ -2,15 +2,17 @@ import SettingsSwitchItem from '@celo/react-components/components/SettingsSwitch
 import TextButton from '@celo/react-components/components/TextButton'
 import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
+import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import Modal from 'react-native-modal'
-import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import { headerWithBackButton } from 'src/navigator/Headers'
 import { navigateBack } from 'src/navigator/NavigationService'
+import { Screens } from 'src/navigator/Screens'
+import { StackParamList } from 'src/navigator/types'
 import { RootState } from 'src/redux/reducers'
 import { toggleFornoMode } from 'src/web3/actions'
 
@@ -23,7 +25,9 @@ interface DispatchProps {
   toggleFornoMode: typeof toggleFornoMode
 }
 
-type Props = StateProps & DispatchProps & WithTranslation & NavigationInjectedProps
+type OwnProps = StackScreenProps<StackParamList, Screens.DataSaver>
+
+type Props = StateProps & DispatchProps & WithTranslation & OwnProps
 
 const mapDispatchToProps = {
   toggleFornoMode,
@@ -38,7 +42,6 @@ const mapStateToProps = (state: RootState): StateProps => {
 
 interface State {
   switchOffModalVisible: boolean
-  switchOnModalVisible: boolean
   promptModalVisible: boolean
 }
 
@@ -87,12 +90,11 @@ export class DataSaver extends React.Component<Props, State> {
 
   state = {
     switchOffModalVisible: false,
-    switchOnModalVisible: false,
     promptModalVisible: false,
   }
 
   componentDidMount() {
-    const promptModalVisible = this.props.navigation.getParam('promptModalVisible')
+    const promptModalVisible = this.props.route.params.promptModalVisible
     if (promptModalVisible) {
       this.setState({
         promptModalVisible,
@@ -113,19 +115,6 @@ export class DataSaver extends React.Component<Props, State> {
     this.hideSwitchOffModal()
   }
 
-  showSwitchOnModal = () => {
-    this.setState({ switchOnModalVisible: true })
-  }
-
-  hideSwitchOnModal = () => {
-    this.setState({ switchOnModalVisible: false })
-  }
-
-  onPressToggleWithSwitchOnModal = () => {
-    this.props.toggleFornoMode(true)
-    this.hideSwitchOnModal()
-  }
-
   onPressPromptModal = () => {
     this.props.toggleFornoMode(true)
     navigateBack()
@@ -137,18 +126,12 @@ export class DataSaver extends React.Component<Props, State> {
   }
 
   handleFornoToggle = (fornoMode: boolean) => {
-    if (!fornoMode) {
-      if (this.props.gethStartedThisSession) {
-        // Starting geth a second time this app session which will
-        // require an app restart, so show restart modal
-        this.showSwitchOffModal()
-      } else {
-        this.props.toggleFornoMode(false)
-      }
+    if (!fornoMode && this.props.gethStartedThisSession) {
+      // Starting geth a second time this app session which will
+      // require an app restart, so show restart modal
+      this.showSwitchOffModal()
     } else {
-      // If move to forno was not successful we will need
-      // to rollback starting geth a second time
-      this.showSwitchOnModal()
+      this.props.toggleFornoMode(fornoMode)
     }
   }
 
@@ -180,15 +163,6 @@ export class DataSaver extends React.Component<Props, State> {
           cancelTitle={t('global:cancel')}
           onCancel={this.hideSwitchOffModal}
           onContinue={this.onPressToggleWithSwitchOffModal}
-        />
-        <WarningModal
-          isVisible={this.state.switchOnModalVisible}
-          header={t('restartModalSwitchOn.header')}
-          body={t('restartModalSwitchOn.body')}
-          continueTitle={t('restartModalSwitchOn.understand')}
-          cancelTitle={t('global:cancel')}
-          onCancel={this.hideSwitchOnModal}
-          onContinue={this.onPressToggleWithSwitchOnModal}
         />
       </ScrollView>
     )
@@ -230,7 +204,7 @@ const styles = StyleSheet.create({
   },
 })
 
-export default connect<StateProps, DispatchProps, {}, RootState>(
+export default connect<StateProps, DispatchProps, OwnProps, RootState>(
   mapStateToProps,
   mapDispatchToProps
 )(withTranslation(Namespaces.accountScreen10)(DataSaver))
