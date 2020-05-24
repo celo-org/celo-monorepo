@@ -8,8 +8,12 @@ import { getLayoutDiff } from '../lib/layout'
 >>>>>>> Add script for layout checking
 =======
 import { getBuildArtifacts } from '@openzeppelin/upgrades'
+<<<<<<< HEAD
 import { reportLayoutIncompatibilities, CompatibilityInfo } from '../lib/layout'
 >>>>>>> Move functions from script to library
+=======
+import { CompatibilityInfo, reportLayoutIncompatibilities } from '../lib/layout'
+>>>>>>> Appease the linter
 
 const args = process.argv.slice(2)
 
@@ -73,8 +77,10 @@ const reportDiff = (diff: Operation[]) => {
 const compatibilityReport = reportLayoutIncompatibilities(artifacts1, artifacts2)
 
 const printIncompatibility = (incompatibility: CompatibilityInfo) => {
-  console.log(`ERROR: upgraded storage of ${incompatibility.contract} is not backwards compatible!`)
-  incompatibility.errors.forEach((error) => console.log(`  ${error}`))
+  console.error(
+    `ERROR: upgraded storage of ${incompatibility.contract} is not backwards compatible!`
+  )
+  incompatibility.errors.forEach((error) => console.error(`  ${error}`))
 }
 
 const printReport = (report: CompatibilityInfo[]) => {

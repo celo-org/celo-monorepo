@@ -12,8 +12,12 @@ import { MigrationsContract } from 'types'
  * lines.
  */
 import { MigrationsContract } from 'types'
+<<<<<<< HEAD
 //@ts-ignore
 >>>>>>> Start adding tests for layout checking script
+=======
+// @ts-ignore
+>>>>>>> Appease the linter
 const Migrations: MigrationsContract = artifacts.require('Migrations')
 
 import { reportLayoutIncompatibilities } from '@celo/protocol/lib/layout'

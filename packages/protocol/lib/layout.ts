@@ -2,6 +2,7 @@ import {
   BuildArtifacts,
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   compareStorageLayouts,
   Contract as ZContract,
   getStorageLayout,
@@ -15,6 +16,12 @@ import {
   compareStorageLayouts,
   Contract as ZContract
 >>>>>>> Add script for layout checking
+=======
+  compareStorageLayouts,
+  Contract as ZContract
+  getStorageLayout,
+  Operation,
+>>>>>>> Appease the linter
 } from '@openzeppelin/upgrades'
 const  Web3 = require('web3')
 import { Contract as Web3Contract } from 'web3-eth-contract';
@@ -108,10 +115,14 @@ const addSchemaForLayoutChecking = (web3Contract: Web3Contract, artifact: any): 
   // @ts-ignore
   const contract = web3Contract as Contract
 <<<<<<< HEAD
+<<<<<<< HEAD
   // @ts-ignore
 =======
   //@ts-ignore
 >>>>>>> Add script for layout checking
+=======
+  // @ts-ignore
+>>>>>>> Appease the linter
   contract.schema = {}
   contract.schema.ast = artifact.ast
   contract.schema.contractName = artifact.contractName
