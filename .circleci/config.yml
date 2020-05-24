@@ -867,11 +867,13 @@ jobs:
           curl https://raw.githubusercontent.com/helm/helm/master/scripts/get | bash
           helm init --client-only
           export TEST_VARIABLE="This is a test"
+          echo "test: ${SLACK_WEBHOOK}"
     - slack/status:
         fail_only: true
         mentions: 'jcortejoso'
         failure_message: ':red_circle: Job $CIRCLE_JOB failed: Reason $TEST_VARIABLE'
         success_message: ':tada: Job $CIRCLE_JOB succeeded: Reason $TEST_VARIABLE'
+        webhook: '${SLACK_WEBHOOK}'
         #only_for_branches: master
     # - run:
     #     name: Activate gcloud
