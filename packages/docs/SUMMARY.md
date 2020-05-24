@@ -22,7 +22,6 @@
 ## Celo Gold Holder Guide
 - [Quick Start](celo-gold-holder-guide/quick-start.md)
 - [Using a Ledger Wallet](celo-gold-holder-guide/ledger.md)
-- [Using a Cloud HSM](celo-gold-holder-guide/cloud-hsm.md)
 - [Understanding ReleaseGold](celo-gold-holder-guide/release-gold.md)
 - [Voting on Validator Groups](celo-gold-holder-guide/voting-validators.md)
 - [Voting on Governance](celo-gold-holder-guide/voting-governance.md)
@@ -85,6 +84,7 @@
   - [Integrations](developer-resources/integrations/integrations.md)
     - [General](developer-resources/integrations/general.md)
     - [Custody](developer-resources/integrations/custody.md)
+    - [Using a Cloud HSM](developer-resources/integrations/cloud-hsm.md)
   - [Reference](developer-resources/contractkit/reference/SUMMARY.md)
     <!-- contractkit-reference-start -->
     - [Globals](developer-resources/contractkit/reference/globals.md)
