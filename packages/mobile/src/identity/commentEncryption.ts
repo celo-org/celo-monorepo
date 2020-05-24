@@ -70,7 +70,7 @@ export function* encryptComment(
   fromAddress: string | null,
   includePhoneNumMetadata: boolean = false
 ) {
-  Logger.debug(TAG, 'Encrypting comment')
+  Logger.debug(TAG + 'encryptComment', 'Encrypting comment')
   if (!features.USE_COMMENT_ENCRYPTION || !comment || !toAddress || !fromAddress) {
     Logger.debug(TAG, 'Invalid params, skipping encryption')
     return comment
@@ -81,18 +81,19 @@ export function* encryptComment(
   // they don't benefit from comment encryption
   const fromKey: Buffer | null = yield call(getCommentKey, fromAddress)
   if (!fromKey) {
-    Logger.debug(TAG, 'No sender key found, skipping encryption')
+    Logger.debug(TAG + 'encryptComment', 'No sender key found, skipping encryption')
     return comment
   }
 
   const toKey: Buffer | null = yield call(getCommentKey, toAddress)
   if (!toKey) {
-    Logger.debug(TAG, 'No recipient key found, skipping encryption')
+    Logger.debug(TAG + 'encryptComment', 'No recipient key found, skipping encryption')
     return comment
   }
 
   let commentToEncrypt = comment
   if (features.PHONE_NUM_METADATA_IN_TRANSFERS && includePhoneNumMetadata) {
+    Logger.debug(TAG + 'encryptComment', 'Including phone number metadata in comment')
     const selfPhoneDetails: PhoneNumberHashDetails | undefined = yield call(
       getUserSelfPhoneHashDetails
     )
@@ -102,10 +103,10 @@ export function* encryptComment(
   const { comment: encryptedComment, success } = encryptCommentRaw(commentToEncrypt, toKey, fromKey)
 
   if (success) {
-    Logger.debug(TAG, 'Comment encryption succeeded')
+    Logger.debug(TAG + 'encryptComment', 'Encryption succeeded')
     return encryptedComment
   } else {
-    Logger.error(TAG, 'Encryting comment failed, returning raw comment')
+    Logger.error(TAG + 'encryptComment', 'Encrytion failed, returning raw comment')
     return comment
   }
 }
@@ -125,10 +126,10 @@ function _decryptComment(
   commentKeyPrivate: string | null,
   isSender: boolean
 ): DecryptedComment {
-  Logger.debug(TAG, 'Decrypting comment')
+  Logger.debug(TAG + 'decryptComment', 'Decrypting comment')
 
   if (!features.USE_COMMENT_ENCRYPTION || !comment || !commentKeyPrivate) {
-    Logger.debug(TAG, 'Invalid params, skipping decryption')
+    Logger.debug(TAG + 'decryptComment', 'Invalid params, skipping decryption')
     return { comment }
   }
 
@@ -139,10 +140,10 @@ function _decryptComment(
   )
 
   if (success) {
-    Logger.debug(TAG, 'Comment decryption succeeded')
+    Logger.debug(TAG + 'decryptComment', 'Comment decryption succeeded')
     return extractPhoneNumberMetadata(decryptedComment)
   } else {
-    Logger.error(TAG, 'Decrypting comment failed, returning raw comment')
+    Logger.error(TAG + 'decryptComment', 'Decrypting comment failed, returning raw comment')
     return { comment }
   }
 }
