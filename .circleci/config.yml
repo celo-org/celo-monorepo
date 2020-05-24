@@ -2,6 +2,10 @@
 # and https://github.com/facebook/react-native/blob/master/.circleci/config.yml
 
 version: 2.1
+
+orbs:
+  slack: circleci/slack@3.4.2
+
 reference:
   workspace: &workspace ~/src
   ## Configurations
@@ -862,75 +866,83 @@ jobs:
         command: |
           curl https://raw.githubusercontent.com/helm/helm/master/scripts/get | bash
           helm init --client-only
-    - run:
-        name: Activate gcloud
-        command: |
-          echo $GCLOUD_SERVICE_KEY | gcloud auth activate-service-account --key-file=-
-          gcloud --quiet config set project ${GOOGLE_PROJECT_ID}
-          gcloud --quiet config set compute/zone ${GOOGLE_COMPUTE_ZONE}
-          echo $GCLOUD_SERVICE_KEY > $GOOGLE_APPLICATION_CREDENTIALS
-    - attach_workspace:
-        at: ~/app
-    - run:
-        name: Rebuild celotool project
-        command: |
-          set -e
-          yarn
-          yarn run build
-    - run:
-        name: Configure k8s cluster for the fullnode
-        command: |
-          set -e
-          gcloud container clusters --quiet --project=${GOOGLE_PROJECT_ID} --region ${GOOGLE_COMPUTE_ZONE} get-credentials celo-networks-dev
-    - run:
-        name: Configure Kubernetes namespace
-        command: |
-          set -e
-          NAMESPACE="circle-${CIRCLE_BUILD_NUM}"
-          echo "Namespace: ${NAMESPACE}"
-          kubectl create namespace ${NAMESPACE}
-    - run:
-        name: Deploy lightest mode client connected to rc1
-        command: |
-          set -e
-          cd packages/celotool
-          NAMESPACE="circle-${CIRCLE_BUILD_NUM}"
-          bin/celotooljs.sh deploy initial gke-fullnode -e rc1 --syncmode lightest --namespace ${NAMESPACE}
-    - run:
-        name: Test lightest mode client connected to rc1
-        command: |
-          set -e
-          cd packages/celotool
-          NAMESPACE="circle-${CIRCLE_BUILD_NUM}"
-          scripts/test_sync.sh rc1 lightest ${NAMESPACE}
-    - run:
-        name: Deploy full mode client connected to rc1
-        command: |
-          set -e
-          cd packages/celotool
-          NAMESPACE="circle-${CIRCLE_BUILD_NUM}"
-          bin/celotooljs.sh deploy initial gke-fullnode -e rc1 --syncmode full --namespace ${NAMESPACE}
-    - run:
-        name: Test full mode client connected to rc1
-        command: |
-          set -e
-          cd packages/celotool
-          NAMESPACE="circle-${CIRCLE_BUILD_NUM}"
-          scripts/test_sync.sh rc1 full ${NAMESPACE}
-    - run:
-        name: Deploy fast mode client connected to rc1
-        command: |
-          set -e
-          cd packages/celotool
-          NAMESPACE="circle-${CIRCLE_BUILD_NUM}"
-          bin/celotooljs.sh deploy initial gke-fullnode -e rc1 --syncmode fast --namespace ${NAMESPACE}
-    - run:
-        name: Test fast mode client connected to rc1
-        command: |
-          set -e
-          cd packages/celotool
-          NAMESPACE="circle-${CIRCLE_BUILD_NUM}"
-          scripts/test_sync.sh rc1 fast ${NAMESPACE}
+          export TEST_VARIABLE="This is a test"
+    - slack/status:
+        fail_only: true
+        mentions: 'jcortejoso'
+        failure_message: ':red_circle: Job $CIRCLE_JOB failed: Reason $TEST_VARIABLE'
+        success_message: ':tada: Job $CIRCLE_JOB succeeded: Reason $TEST_VARIABLE'
+        #only_for_branches: master
+    # - run:
+    #     name: Activate gcloud
+    #     command: |
+    #       echo $GCLOUD_SERVICE_KEY | gcloud auth activate-service-account --key-file=-
+    #       gcloud --quiet config set project ${GOOGLE_PROJECT_ID}
+    #       gcloud --quiet config set compute/zone ${GOOGLE_COMPUTE_ZONE}
+    #       echo $GCLOUD_SERVICE_KEY > $GOOGLE_APPLICATION_CREDENTIALS
+    # - attach_workspace:
+    #     at: ~/app
+    # - run:
+    #     name: Rebuild celotool project
+    #     command: |
+    #       set -e
+    #       yarn
+    #       yarn run build
+    # - run:
+    #     name: Configure k8s cluster for the fullnode
+    #     command: |
+    #       set -e
+    #       gcloud container clusters --quiet --project=${GOOGLE_PROJECT_ID} --region ${GOOGLE_COMPUTE_ZONE} get-credentials celo-networks-dev
+    # - run:
+    #     name: Configure Kubernetes namespace
+    #     command: |
+    #       set -e
+    #       NAMESPACE="circle-${CIRCLE_BUILD_NUM}"
+    #       echo "Namespace: ${NAMESPACE}"
+    #       kubectl create namespace ${NAMESPACE}
+    # - run:
+    #     name: Deploy lightest mode client connected to rc1
+    #     command: |
+    #       set -e
+    #       cd packages/celotool
+    #       NAMESPACE="circle-${CIRCLE_BUILD_NUM}"
+    #       bin/celotooljs.sh deploy initial gke-fullnode -e rc1 --syncmode lightest --namespace ${NAMESPACE}
+    # - run:
+    #     name: Test lightest mode client connected to rc1
+    #     command: |
+    #       set -e
+    #       cd packages/celotool
+    #       NAMESPACE="circle-${CIRCLE_BUILD_NUM}"
+    #       scripts/test_sync.sh rc1 lightest ${NAMESPACE}
+    # - run:
+    #     name: Deploy full mode client connected to rc1
+    #     command: |
+    #       set -e
+    #       cd packages/celotool
+    #       NAMESPACE="circle-${CIRCLE_BUILD_NUM}"
+    #       bin/celotooljs.sh deploy initial gke-fullnode -e rc1 --syncmode full --namespace ${NAMESPACE}
+    # - run:
+    #     name: Test full mode client connected to rc1
+    #     command: |
+    #       set -e
+    #       cd packages/celotool
+    #       NAMESPACE="circle-${CIRCLE_BUILD_NUM}"
+    #       scripts/test_sync.sh rc1 full ${NAMESPACE}
+    # - run:
+    #     name: Deploy fast mode client connected to rc1
+    #     command: |
+    #       set -e
+    #       cd packages/celotool
+    #       NAMESPACE="circle-${CIRCLE_BUILD_NUM}"
+    #       bin/celotooljs.sh deploy initial gke-fullnode -e rc1 --syncmode fast --namespace ${NAMESPACE}
+    # - run:
+    #     name: Test fast mode client connected to rc1
+    #     command: |
+    #       set -e
+    #       cd packages/celotool
+    #       NAMESPACE="circle-${CIRCLE_BUILD_NUM}"
+    #       scripts/test_sync.sh rc1 fast ${NAMESPACE}
+
     # - run:
     #     name: Deploy network
     #     no_output_timeout: 25m
