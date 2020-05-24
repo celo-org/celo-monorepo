@@ -1,4 +1,5 @@
 import {
+  checkTxsForIdentityMetadata,
   embedPhoneNumberMetadata,
   encryptComment,
   extractPhoneNumberMetadata,
@@ -24,6 +25,20 @@ describe('Encrypt Comment', () => {
     expect(encryptComment(mockComment, null, null).next().value).toBe(mockComment)
     expect(encryptComment(mockComment, null, 'fromAddr').next().value).toBe(mockComment)
   })
+
+  it('Basic comment', async () => {
+    expect(encryptComment('My simple comment', 'toAddr', 'fromAddr').next().value).toBe('')
+  })
+
+  it('Complex comment', async () => {
+    expect(encryptComment('comment with emoji 😇🤠👳🏽‍♂️~', 'toAddr', 'fromAddr').next().value).toBe('')
+  })
+
+  it('Comment with metadata enabled', async () => {
+    expect(
+      encryptComment('comment with emoji 😇🤠👳🏽‍♂️~', 'toAddr', 'fromAddr', true).next().value
+    ).toBe('')
+  })
 })
 
 describe('Decrypt Comment', () => {
@@ -32,6 +47,18 @@ describe('Decrypt Comment', () => {
   })
 
   it('Empty to/from address', async () => {
+    // TODO
+  })
+
+  it('Basic comment', async () => {
+    // TODO
+  })
+
+  it('Complex comment', async () => {
+    // TODO
+  })
+
+  it('Comment with metadata', async () => {
     // TODO
   })
 })
@@ -62,6 +89,12 @@ describe(extractPhoneNumberMetadata, () => {
   })
 
   it('comment without metadata', () => {
+    // TODO
+  })
+})
+
+describe(checkTxsForIdentityMetadata, () => {
+  it('Finds metadata and dispatches updates', () => {
     // TODO
   })
 })

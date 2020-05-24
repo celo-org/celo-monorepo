@@ -31,32 +31,6 @@ import { getAccount } from 'src/web3/saga'
 
 const TAG = 'transactions/saga'
 
-//TODO
-// [{"data": {"tokenTransactions": [Object]}, "loading": false, "networkStatus": 7, "stale": false}]
-
-// interface QuerySubscriptionUpdate {
-//   data: {
-//     tokenTransactions:
-// }
-
-// let querySubscription: any
-
-// const querySubscription = apolloClient
-//   .watchQuery({
-//     query: TRANSACTIONS_QUERY,
-//     variables: {
-//       address: '0xc598440e31339f4a68335017b8e99e6707fa6d70',
-//       token: Token.CUsd,
-//       localCurrencyCode: 'USD',
-//     },
-//     fetchPolicy: 'cache-and-network',
-//   })
-//   .subscribe({
-//     next: (value) => {
-//       console.log('===OUTSIDE===', JSON.stringify(value))
-//     },
-//     error: (e) => console.error(e),
-//   })
 interface UserTxQueryChannelEvent {
   transactionFeedFragments: TransactionFeedFragment[]
 }

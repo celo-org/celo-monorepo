@@ -298,6 +298,10 @@ export const v1Schema = {
     isValidRecipient: false,
     secureSendPhoneNumberMapping: {},
   },
+  transactions: {
+    ...v0Schema.transactions,
+    knownFeedTransactions: {},
+  },
 }
 
 export function getLatestSchema(): Partial<RootState> {

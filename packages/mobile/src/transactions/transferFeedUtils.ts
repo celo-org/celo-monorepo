@@ -12,7 +12,8 @@ export function getDecryptedTransferFeedComment(
   commentKey: string | null,
   type: TokenTransactionType
 ) {
-  return decryptComment(comment, commentKey, isTokenTxTypeSent(type))
+  const { comment: decryptedComment } = decryptComment(comment, commentKey, isTokenTxTypeSent(type))
+  return decryptedComment
 }
 
 export function getTransferFeedParams(
