@@ -1,9 +1,8 @@
-import BaseNotification from '@celo/react-components/components/BaseNotification'
 import ContactCircle from '@celo/react-components/components/ContactCircle'
-import fontStyles from '@celo/react-components/styles/fonts'
+import RequestMessagingCard from '@celo/react-components/components/RequestMessagingCard'
 import * as React from 'react'
-import { Trans, WithTranslation } from 'react-i18next'
-import { Image, StyleSheet, Text, View } from 'react-native'
+import { WithTranslation } from 'react-i18next'
+import { Image, StyleSheet, View } from 'react-native'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
@@ -54,13 +53,20 @@ export class OutgoingPaymentRequestListItem extends React.Component<Props> {
   }
 
   render() {
-    const { requestee, id, t } = this.props
+    const { requestee, id, comment, t } = this.props
     const name = requestee.displayName
+    const amount = {
+      value: this.props.amount,
+      currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
+    }
 
     return (
       <View style={styles.container}>
-        <BaseNotification
+        <RequestMessagingCard
           testID={`OutgoingPaymentRequestNotification/${id}`}
+          title={t('outgoingPaymentRequestNotificationTitle', { name })}
+          amount={<CurrencyDisplay amount={amount} />}
+          details={comment}
           icon={
             <ContactCircle
               size={AVATAR_SIZE}
@@ -71,26 +77,8 @@ export class OutgoingPaymentRequestListItem extends React.Component<Props> {
               <Image source={unknownUserIcon} style={styles.unknownUser} />
             </ContactCircle>
           }
-          title={
-            <Trans
-              i18nKey="outgoingPaymentRequestNotificationTitle"
-              ns={Namespaces.paymentRequestFlow}
-              values={{ name }}
-            >
-              Requested{' '}
-              <CurrencyDisplay
-                amount={{
-                  value: this.props.amount,
-                  currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
-                }}
-              />{' '}
-              from {{ name }}
-            </Trans>
-          }
-          ctas={this.getCTA()}
-        >
-          <Text style={fontStyles.bodySmall}>{this.props.comment || t('defaultComment')}</Text>
-        </BaseNotification>
+          callToActions={this.getCTA()}
+        />
       </View>
     )
   }
