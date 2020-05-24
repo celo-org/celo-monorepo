@@ -1,11 +1,19 @@
 import { getBuildArtifacts } from '@openzeppelin/upgrades'
 
 /* HACK! truffle test was unable to compile this test (TypeScript would end up
+<<<<<<< HEAD
  * claiming that it couldn't find the name `assert`) without the following
  * lines.
  */
 import { MigrationsContract } from 'types'
 // @ts-ignore
+=======
+ * claiming that it couldn't find the name `assert`) without the following 5
+ * lines.
+ */
+import { MigrationsContract } from 'types'
+//@ts-ignore
+>>>>>>> Start adding tests for layout checking script
 const Migrations: MigrationsContract = artifacts.require('Migrations')
 
 import { reportLayoutIncompatibilities } from '@celo/protocol/lib/layout'
@@ -23,6 +31,7 @@ const getTestArtifacts = (caseName: string) => {
 
 const testCases = {
   original: getTestArtifacts('original'),
+<<<<<<< HEAD
   inserted_constant: getTestArtifacts('inserted_constant'),
   appended: getTestArtifacts('appended'),
   inserted: getTestArtifacts('inserted'),
@@ -292,6 +301,15 @@ describe('#reportLayoutIncompatibilities()', () => {
       )
       assertNotCompatible(report)
       assertContractErrorsMatch(report, 'TestContract', [/had type/])
+=======
+}
+
+describe('reportLayoutIncompatibilities', () => {
+  describe('when the contracts are the same', () => {
+    it('reports no incompatibilities', () => {
+      const report = reportLayoutIncompatibilities(testCases.original, testCases.original)
+      assert.isTrue(report.every((contractReport) => contractReport.compatible))
+>>>>>>> Start adding tests for layout checking script
     })
   })
 })
