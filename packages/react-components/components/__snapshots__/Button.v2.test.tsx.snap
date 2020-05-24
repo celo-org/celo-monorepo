@@ -3,9 +3,12 @@
 exports[`Button when type is SECONDARY renders 1`] = `
 <View
   style={
-    Object {
-      "flexDirection": "row",
-    }
+    Array [
+      Object {
+        "flexDirection": "row",
+      },
+      undefined,
+    ]
   }
 >
   <View
@@ -64,9 +67,12 @@ exports[`Button when type is SECONDARY renders 1`] = `
 exports[`Button when type is TERTIARY renders 1`] = `
 <View
   style={
-    Object {
-      "flexDirection": "row",
-    }
+    Array [
+      Object {
+        "flexDirection": "row",
+      },
+      undefined,
+    ]
   }
 >
   <View
@@ -125,9 +131,12 @@ exports[`Button when type is TERTIARY renders 1`] = `
 exports[`Button when type not given defaults to primary 1`] = `
 <View
   style={
-    Object {
-      "flexDirection": "row",
-    }
+    Array [
+      Object {
+        "flexDirection": "row",
+      },
+      undefined,
+    ]
   }
 >
   <View

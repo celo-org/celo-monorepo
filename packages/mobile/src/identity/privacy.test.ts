@@ -1,15 +1,17 @@
 import { FetchMock } from 'jest-fetch-mock'
 import { expectSaga } from 'redux-saga-test-plan'
-import { select } from 'redux-saga/effects'
+import { call, select } from 'redux-saga/effects'
+import { e164NumberSelector } from 'src/account/selectors'
 import { updateE164PhoneNumberSalts } from 'src/identity/actions'
 import { fetchPhoneHashPrivate, getSaltFromThresholdSignature } from 'src/identity/privacy'
 import { e164NumberToSaltSelector } from 'src/identity/reducer'
+import { getConnectedUnlockedAccount } from 'src/web3/saga'
 import { currentAccountSelector } from 'src/web3/selectors'
-import { mockAccount, mockE164Number } from 'test/values'
+import { mockAccount, mockE164Number, mockE164Number2 } from 'test/values'
 
 jest.mock('react-native-blind-threshold-bls', () => ({
-  blindMessage: jest.fn(() => 'abc123'),
-  unblindMessage: jest.fn(() => 'YWJjMTIz'), // base64 of 'abc123'
+  blindMessage: jest.fn(() => '0Uj+qoAu7ASMVvm6hvcUGx2eO/cmNdyEgGn0mSoZH8/dujrC1++SZ1N6IP6v2I8A'),
+  unblindMessage: jest.fn(() => 'vJeFZJ3MY5KlpI9+kIIozKkZSR4cMymLPh2GHZUatWIiiLILyOcTiw2uqK/LBReA'),
 }))
 
 describe('Fetch phone hash details', () => {
@@ -19,12 +21,19 @@ describe('Fetch phone hash details', () => {
   })
 
   it('retrieves salts correctly', async () => {
-    mockFetch.mockResponseOnce(JSON.stringify({ salt: 'foobar' }))
-    const expectedSalt = '6ca13d52ca70c883e0f0bb101e425a89e8624de51db2d2392593af6a84118090'
-    const expectedHash = '0x73585dd92c08c7fa648132310efd8f30a370e657b223fae92d7cc51f71b2dea8'
+    mockFetch.mockResponseOnce(
+      JSON.stringify({
+        success: false,
+        signature: '0Uj+qoAu7ASMVvm6hvcUGx2eO/cmNdyEgGn0mSoZH8/dujrC1++SZ1N6IP6v2I8A',
+      })
+    )
+    const expectedSalt = 'piWqRHHYWtfg9'
+    const expectedHash = '0xf6429456331dedf8bd32b5e3a578e5bc589a28d012724dcd3e0a4b1be67bb454'
 
     await expectSaga(fetchPhoneHashPrivate, mockE164Number)
       .provide([
+        [call(getConnectedUnlockedAccount), mockAccount],
+        [select(e164NumberSelector), mockE164Number2],
         [select(e164NumberToSaltSelector), {}],
         [select(currentAccountSelector), mockAccount],
       ])
@@ -49,9 +58,7 @@ describe('Fetch phone hash details', () => {
 
 describe(getSaltFromThresholdSignature, () => {
   it('Hashes sigs correctly', () => {
-    const base64Sig = 'YWJjMTIz' // base64 of 'abc123'
-    expect(getSaltFromThresholdSignature(base64Sig)).toBe(
-      '6ca13d52ca70c883e0f0bb101e425a89e8624de51db2d2392593af6a84118090'
-    )
+    const base64Sig = 'vJeFZJ3MY5KlpI9+kIIozKkZSR4cMymLPh2GHZUatWIiiLILyOcTiw2uqK/LBReA'
+    expect(getSaltFromThresholdSignature(base64Sig)).toBe('piWqRHHYWtfg9')
   })
 })

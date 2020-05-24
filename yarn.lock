@@ -1704,10 +1704,10 @@
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
-"@celo/client@0.0.300":
-  version "0.0.300"
-  resolved "https://registry.yarnpkg.com/@celo/client/-/client-0.0.300.tgz#60c0658905a1fb8bbbe75befed4a493057c53fd5"
-  integrity sha512-xem/Ucy0DckNUjP90zxtPIDLOMwYIUD6GpZDAgh9G84LB/tDnVl8OOfbVBGrl7ouOTR+K92nBbNDdweMHkEImw==
+"@celo/client@0.0.305":
+  version "0.0.305"
+  resolved "https://registry.yarnpkg.com/@celo/client/-/client-0.0.305.tgz#fe414efcc108f2e3fff0a9ab7521542b278497c7"
+  integrity sha512-kN/VTelleu28TiVir2wKvUGGe2xpt74z2J4ULVmB/0bQ3lU/yJQ0+o0wqaqsBR757oAHDInE/2x0hzbDW6CaNg==
 
 "@celo/contractkit@0.3.1":
   version "0.3.1"
@@ -21236,10 +21236,10 @@ lottie-react-native@^3.3.2:
     prop-types "^15.5.10"
     react-native-safe-modules "^1.0.0"
 
-lottie-web@^5.5.10:
-  version "5.5.10"
-  resolved "https://registry.yarnpkg.com/lottie-web/-/lottie-web-5.5.10.tgz#7ca10af84a139cb1db772f686cc33ac101ece46d"
-  integrity sha512-8U/WSNKx4y3JdGq1lZh8Phuz/pQsiM6BGQ/rNFjLPGJSaKQ92VTVN7NAOHUsvV0bywsC+ShBWSVUhbuP3NV2tg==
+lottie-web@^5.6.10:
+  version "5.6.10"
+  resolved "https://registry.yarnpkg.com/lottie-web/-/lottie-web-5.6.10.tgz#9c2959df12976f49637f563dcc96db2078010b4d"
+  integrity sha512-ucTzaiBJOMm56/K7Wqjajyh7qXlonHKB3+b5fHvhSiz+jOrXt6QDNKAinI3qdw/zvvYHKzXvFMy5SgOXbOJ5ng==
 
 loud-rejection@^1.0.0, loud-rejection@^1.2.0:
   version "1.6.0"

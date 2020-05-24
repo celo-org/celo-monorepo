@@ -2,11 +2,11 @@
 
 The Baklava Testnet is a non-production Testnet for the Validator community. It serves several purposes:
 
-- **Operational excellence**: It helps you get familiarized with the processes that will be used to create RC1, and verify the security and stability of your infrastructure with the new software.
-- **Detecting vulnerabilities**: It helps the Celo community discover any remaining bugs before RC1.
+- **Operational excellence**: It helps you get familiarized with the processes that are being used to create Mainnet and verify the security and stability of your infrastructure with the new software.
+- **Detecting vulnerabilities**: It helps the Celo community discover issues before software and updates are promoted to Mainnet.
 - **Future testnet**: If all goes well, it will continue to function as a testnet, serving as a testing ground for changes after mainnet is launched.
 
-The Baklava testnet is the best place to get started running a validator, or test out new validator configurations before deploying to the [Release Candidate Network](rc1.md) or, in the future, Mainnet.
+The Baklava testnet is the best place to get started running a validator, or test out new validator configurations before deploying to [Mainnet](mainnet.md).
 
 {% hint style="info" %}
 A previous version of the Baklava testnet hosted The Great Celo Stake Off, however the network is now available for more general use.
@@ -352,11 +352,11 @@ celocli account:show $CELO_VALIDATOR_GROUP_RG_ADDRESS
 celocli account:show $CELO_VALIDATOR_RG_ADDRESS
 ```
 
-Lock cGLD from your `ReleaseGold` contracts to fulfill the lock-up requirements to register a Validator and Validator Group. The current requirement is 10,000 cGLD to register a Validator, and 10,000 cGLD _per member validator_ to register a Validator Group.
+Lock cGLD from your `ReleaseGold` contracts to fulfill the lock-up requirements to register a Validator and Validator Group. The current requirement is any value strictly greater than 10,000 cGLD to register a Validator, and any value strictly greater than 10,000 cGLD _per member validator_ to register a Validator Group. Here we lock up 10000.1 cGLD for each.
 
 ```bash
-celocli releasegold:locked-gold --contract $CELO_VALIDATOR_GROUP_RG_ADDRESS --action lock --value 10000e18
-celocli releasegold:locked-gold --contract $CELO_VALIDATOR_RG_ADDRESS --action lock --value 10000e18
+celocli releasegold:locked-gold --contract $CELO_VALIDATOR_GROUP_RG_ADDRESS --action lock --value 100001e17
+celocli releasegold:locked-gold --contract $CELO_VALIDATOR_RG_ADDRESS --action lock --value 100001e17
 ```
 
 Check that your cGLD was successfully locked with the following commands:

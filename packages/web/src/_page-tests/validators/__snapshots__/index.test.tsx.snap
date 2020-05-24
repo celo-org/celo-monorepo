@@ -420,7 +420,7 @@ exports[`BuildPage renders 1`] = `
               }
             }
           >
-            Build Celo
+            Operate Celo
           </div>
         </h2>
         <h4
@@ -3466,7 +3466,7 @@ exports[`BuildPage renders 1`] = `
               }
             }
           >
-            Deploy Celo blockchain software and connect to Mainnet Release Candidate 1
+            Deploy Celo blockchain software and connect to Mainnet
           </div>
           <div
             className="css-view-1dbjc4n"
@@ -3510,7 +3510,7 @@ exports[`BuildPage renders 1`] = `
                 className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
                 data-focusable={true}
                 dir="auto"
-                href="https://docs.celo.org/getting-started/running-a-validator-in-rc1"
+                href="https://docs.celo.org/getting-started/running-a-validator-in-mainnet"
                 onClick={[Function]}
                 onMouseEnter={[Function]}
                 role="link"

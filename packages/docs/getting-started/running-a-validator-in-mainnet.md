@@ -1,6 +1,6 @@
-# Running a Validator in RC1
+# Running a Validator in Mainnet
 
-This section explains how to get a Validator node running on Mainnet Release Candidate 1 (RC1) Network.
+This section explains how to get a Validator node running on [Mainnet](mainnet.md).
 
 Validators help secure the Celo network by participating in Celo’s proof-of-stake protocol. Validators are organized into Validator Groups, analogous to parties in representative democracies. A Validator Group is essentially an ordered list of Validators.
 
@@ -115,7 +115,7 @@ There are a number of environment variables in this guide, and you may use this 
 | Variable                             | Explanation                                                                                                                          |
 | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------ |
 | CELO_IMAGE                           | The Docker image used for the Validator and proxy containers                                                                         |
-| NETWORK_ID                           | The Celo RC1 network chain ID                                                                                                    |
+| NETWORK_ID                           | The Celo Mainnet network chain ID                                                                                                    |
 | CELO_VALIDATOR_GROUP_ADDRESS         | The account address for the Validator Group; the `ReleaseGold` beneficiary address for the Validator Group                                                                                          |
 | CELO_VALIDATOR_ADDRESS         | The account address for the Validator; the `ReleaseGold` beneficiary address for the Validator                                                                                          |
 | CELO_VALIDATOR_GROUP_RG_ADDRESS         | The `ReleaseGold` contract address for the Validator Group                                                                                          |
@@ -148,19 +148,23 @@ There are a number of environment variables in this guide, and you may use this 
 
 The setup of RC1 is similar to the new Baklava network and the deployment timeline is as follows (all dates are subject to change):
 
+Done:
 * 4/19 00:00 UTC: Docker image with genesis block distributed
 * 4/19 - 4/22: Infrastructure setup
 * 4/22 16:00 UTC: Block production begins
 * 4/22: Celo Core Contracts and `ReleaseGold` contracts are deployed
 * 4/27: Governance proposals submitted to unfreeze validator elections and validator epoch rewards
 * 5/1: Elections and validator rewards enabled if governance proposals pass; validators have been registered and affiliated with a Validator Group for first election
-* 5/9: Governance proposals submitted to enable voter rewards and enable Celo Gold (cGLD) transfers
-* 5/13: RC1 is declared Mainnet and cGLD transfers are enabled, if governance proposals pass
-* 5/22: Governance proposal submitted to unfreeze stability protocol
-* 5/26: Stability protocol goes live if governance proposal passes
+* 5/14: Governance proposals submitted to enable voter rewards and enable Celo Gold (cGLD) transfers
+* 5/18: RC1 is declared Mainnet and cGLD transfers are enabled, if governance proposals pass
+
+Upcoming:
+* ~5/25: Deployment of cGLD/USD Oracles
+* ~5/31: Governance proposal submitted to unfreeze stability protocol
+* ~6/3: Stability protocol goes live if governance proposal passes
 
 {% hint style="info" %}
-A [timeline](https://forum.celo.org/t/release-candidate-1-rc1-timeline-and-details/428) of the Release Candidate 1 is available to provide further context.
+A [timeline](https://forum.celo.org/t/release-candidate-1-rc1-timeline-and-details/428) of the Release Candidate 1 and Mainnet networks is available to provide further context.
 {% endhint %}
 
 ## Validator Node Setup
@@ -334,7 +338,7 @@ docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE init /celo/genesis.json
 docker run --name celo-validator -it --restart unless-stopped -p 30303:30303 -p 30303:30303/udp -v $PWD:/root/.celo $CELO_IMAGE --verbosity 3 --networkid $NETWORK_ID --syncmode full --mine --istanbul.blockperiod=5 --istanbul.requesttimeout=3000 --etherbase $CELO_VALIDATOR_SIGNER_ADDRESS --nodiscover --nousb --proxy.proxied --proxy.proxyenodeurlpair=enode://$PROXY_ENODE@$PROXY_INTERNAL_IP:30503\;enode://$PROXY_ENODE@$PROXY_EXTERNAL_IP:30303 --unlock=$CELO_VALIDATOR_SIGNER_ADDRESS --password /root/.celo/.password --ethstats=<YOUR-VALIDATOR-NAME>@stats-server.celo.org
 ```
 
-The `networkid` parameter value of `42220` indicates we are connecting to the Mainnet Release Candidate 1 network.
+The `networkid` parameter value of `42220` indicates we are connecting to the Mainnet network.
 
 At this point your Validator and Proxy machines should be configured, and both should be syncing to the network. You should see `Imported new chain segment` in your node logs, about once every 5 seconds once the node is synced to the latest block which you can find on the [Network Stats](https://stats.celo.org) page.
 
@@ -392,11 +396,11 @@ celocli account:show $CELO_VALIDATOR_GROUP_RG_ADDRESS
 celocli account:show $CELO_VALIDATOR_RG_ADDRESS
 ```
 
-Lock cGLD from your `ReleaseGold` contracts to fulfill the lock-up requirements to register a Validator and Validator Group. The current requirement is 10,000 cGLD to register a Validator, and 10,000 cGLD _per member validator_ to register a Validator Group.
+Lock cGLD from your `ReleaseGold` contracts to fulfill the lock-up requirements to register a Validator and Validator Group. The current requirement is any value strictly greater than 10,000 cGLD to register a Validator, and any value strictly greater than 10,000 cGLD _per member validator_ to register a Validator Group. Here we lock up 10000.1 cGLD for each.
 
 ```bash
-celocli releasegold:locked-gold --contract $CELO_VALIDATOR_GROUP_RG_ADDRESS --action lock --value 10000e18
-celocli releasegold:locked-gold --contract $CELO_VALIDATOR_RG_ADDRESS --action lock --value 10000e18
+celocli releasegold:locked-gold --contract $CELO_VALIDATOR_GROUP_RG_ADDRESS --action lock --value 100001e17
+celocli releasegold:locked-gold --contract $CELO_VALIDATOR_RG_ADDRESS --action lock --value 100001e17
 ```
 
 Check that your cGLD was successfully locked with the following commands:
@@ -631,7 +635,7 @@ celocli lockedgold:show $CELO_VALIDATOR_GROUP_RG_ADDRESS
 celocli lockedgold:show $CELO_VALIDATOR_RG_ADDRESS
 ```
 
-You're all set! Elections are finalized at the end of each epoch, roughly once a day in the RC1 network. If you get elected, your node will start participating in BFT consensus and validating blocks. After the first epoch in which your Validator participates in BFT, you should receive your first set of epoch rewards.
+You're all set! Elections are finalized at the end of each epoch, roughly once a day in the Mainnet network. If you get elected, your node will start participating in BFT consensus and validating blocks. After the first epoch in which your Validator participates in BFT, you should receive your first set of epoch rewards.
 
 You can inspect the current state of the Validator elections by running:
 
