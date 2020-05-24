@@ -868,6 +868,7 @@ jobs:
           helm init --client-only
           export TEST_VARIABLE="This is a test"
           echo "test: ${SLACK_WEBHOOK}"
+          exit 1
     - slack/status:
         fail_only: false
         mentions: 'jcortejoso'
