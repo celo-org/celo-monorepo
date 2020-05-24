@@ -1,10 +1,15 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { getBuildArtifacts } from '@openzeppelin/upgrades'
 import { CompatibilityInfo, reportLayoutIncompatibilities } from '../lib/layout'
 =======
 import { getBuildArtifacts, Operation } from '@openzeppelin/upgrades'
 import { getLayoutDiff } from '../lib/layout'
 >>>>>>> Add script for layout checking
+=======
+import { getBuildArtifacts } from '@openzeppelin/upgrades'
+import { reportLayoutIncompatibilities, CompatibilityInfo } from '../lib/layout'
+>>>>>>> Move functions from script to library
 
 const args = process.argv.slice(2)
 
@@ -20,6 +25,7 @@ const buildDirectory2 = args[1]
 const artifacts1 = getBuildArtifacts(buildDirectory1)
 const artifacts2 = getBuildArtifacts(buildDirectory2)
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 const compatibilityReport = reportLayoutIncompatibilities(artifacts1, artifacts2)
 
@@ -63,10 +69,24 @@ const reportDiff = (diff: Operation[]) => {
       default:
         console.log(operation)
 >>>>>>> Add script for layout checking
+=======
+const compatibilityReport = reportLayoutIncompatibilities(artifacts1, artifacts2)
+
+const printIncompatibility = (incompatibility: CompatibilityInfo) => {
+  console.log(`ERROR: upgraded storage of ${incompatibility.contract} is not backwards compatible!`)
+  incompatibility.errors.forEach((error) => console.log(`  ${error}`))
+}
+
+const printReport = (report: CompatibilityInfo[]) => {
+  report.forEach((contractReport) => {
+    if (!contractReport.compatible) {
+      printIncompatibility(contractReport)
+>>>>>>> Move functions from script to library
     }
   })
 }
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 if (compatibilityReport.some((report) => !report.compatible)) {
   printReport(compatibilityReport)
@@ -86,5 +106,9 @@ artifacts2.listArtifacts().forEach((newArtifact) => {
 
 if (backwardsIncompatibilities > 0) {
 >>>>>>> Add script for layout checking
+=======
+if (compatibilityReport.some((report) => !report.compatible)) {
+  printReport(compatibilityReport)
+>>>>>>> Move functions from script to library
   process.exit(1)
 }

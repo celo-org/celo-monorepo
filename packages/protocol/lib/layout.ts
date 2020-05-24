@@ -1,12 +1,16 @@
 import {
   BuildArtifacts,
 <<<<<<< HEAD
+<<<<<<< HEAD
   compareStorageLayouts,
   Contract as ZContract,
   getStorageLayout,
   Operation,
   StorageLayoutInfo,
 =======
+=======
+  Operation,
+>>>>>>> Move functions from script to library
   getStorageLayout,
   compareStorageLayouts,
   Contract as ZContract
@@ -58,6 +62,7 @@ interface StorageInfo {
   contract?: string;
 =======
 export interface Artifact {
+<<<<<<< HEAD
   abi: any[];
   ast: any;
   bytecode: string;
@@ -74,6 +79,23 @@ export interface Artifact {
   sourcePath: string;
   updatedAt: string;
 >>>>>>> Add script for layout checking
+=======
+  abi: any[]
+  ast: any
+  bytecode: string
+  compiler: any
+  contractName: string
+  deployedBytecode: string
+  deployedSourceMap: string
+  fileName: string
+  legacyAST?: any
+  networks: any
+  schemaVersion: string
+  source: string
+  sourceMap: string
+  sourcePath: string
+  updatedAt: string
+>>>>>>> Move functions from script to library
 }
 
 // getStorageLayout needs an oz-sdk Contract class instance. This class is a
@@ -254,4 +276,66 @@ export const getLayoutDiff = (oldArtifact: Artifact, oldArtifacts: BuildArtifact
 
   return compareStorageLayouts(oldLayout, newLayout)
 >>>>>>> Add script for layout checking
+}
+
+const selectIncompatibleOperations = (diff: Operation[]) =>
+  diff.filter(operation => operation.action !== 'append')
+
+export interface CompatibilityInfo {
+  contract: string
+  compatible: boolean
+  errors: string[]
+}
+
+const generateErrorMessage = (operation: Operation) => {
+  let message: string
+
+  const updated = operation.updated
+  const original = operation.original
+
+  switch (operation.action) {
+    case 'typechange':
+      message = `variable ${updated.label} had type ${original.type}, now has type ${updated.type}`
+      break
+    case 'insert':
+      message = `variable ${updated.label} was inserted`
+      break
+    case 'pop':
+      message = `variable ${original.label} was removed`
+      break
+    case 'rename':
+      message = `variable ${updated.label} was renamed from ${original.label}`
+      break
+    default:
+      message = `unknown operation ${operation.action}`
+  }
+
+  return message
+}
+
+const generateCompatibilityReport = (diff: Operation[], contract: string): CompatibilityInfo => {
+  const incompatibilities = selectIncompatibleOperations(diff)
+  if (incompatibilities.length === 0) {
+    return {
+      contract,
+      compatible: true,
+      errors: []
+    }
+  } else {
+    return {
+      contract,
+      compatible: false,
+      errors: incompatibilities.map(generateErrorMessage)
+    }
+  }
+}
+
+export const reportLayoutIncompatibilities = (oldArtifacts: BuildArtifacts, newArtifacts: BuildArtifacts): CompatibilityInfo[] => {
+  return newArtifacts.listArtifacts().map((newArtifact) => {
+    const oldArtifact = oldArtifacts.getArtifactByName(newArtifact.contractName)
+    if (oldArtifact !== undefined) {
+      const layoutDiff = getLayoutDiff(oldArtifact, oldArtifacts, newArtifact, newArtifacts)
+      return generateCompatibilityReport(layoutDiff, newArtifact.contractName)
+    }
+  })
 }
