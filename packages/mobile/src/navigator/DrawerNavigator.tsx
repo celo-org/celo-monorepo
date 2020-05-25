@@ -19,6 +19,7 @@ import FiatExchange from 'src/account/FiatExchange'
 import { default as InviteScreen } from 'src/account/Invite'
 import {
   defaultCountryCodeSelector,
+  e164NumberSelector,
   nameSelector,
   userContactDetailsSelector,
 } from 'src/account/selectors'
@@ -44,7 +45,7 @@ const Drawer = createDrawerNavigator()
 
 function CustomDrawerContent(props: DrawerContentComponentProps<DrawerContentOptions>) {
   const displayName = useSelector(nameSelector)
-  const e164PhoneNumber = '+14155552671' // useSelector(e164NumberSelector)
+  const e164PhoneNumber = useSelector(e164NumberSelector)
   const contactDetails = useSelector(userContactDetailsSelector)
   const defaultCountryCode = useSelector(defaultCountryCodeSelector)
   const balance = useSelector(stableTokenBalanceSelector)
