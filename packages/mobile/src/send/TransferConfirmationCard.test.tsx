@@ -23,6 +23,7 @@ describe('TransferConfirmationCard', () => {
   it('renders correctly for verification fee drilldown', () => {
     const props = {
       type: TokenTransactionType.VerificationFee,
+      addressHasChanged: false,
       address: mockAccount,
       comment: '',
       amount: { value: '-0.3', currencyCode: 'cUSD', localAmount: null },
@@ -39,6 +40,7 @@ describe('TransferConfirmationCard', () => {
   it('renders correctly for faucet drilldown', () => {
     const props = {
       type: TokenTransactionType.Faucet,
+      addressHasChanged: false,
       address: mockAccount,
       comment: '',
       amount: { value: '100', currencyCode: 'cUSD', localAmount: null },
@@ -55,6 +57,7 @@ describe('TransferConfirmationCard', () => {
   it('renders correctly for received transaction drilldown', () => {
     const props = {
       type: TokenTransactionType.Received,
+      addressHasChanged: false,
       address: mockAccount,
       comment: '',
       amount: { value: '100', currencyCode: 'cUSD', localAmount: null },
@@ -73,6 +76,7 @@ describe('TransferConfirmationCard', () => {
   it('renders correctly for received escrow transaction drilldown', () => {
     const props = {
       type: TokenTransactionType.EscrowReceived,
+      addressHasChanged: false,
       address: mockAccount,
       comment: '',
       amount: { value: '100', currencyCode: 'cUSD', localAmount: null },
@@ -91,6 +95,7 @@ describe('TransferConfirmationCard', () => {
   it('renders correctly for sent transaction drilldown', () => {
     const props = {
       type: TokenTransactionType.Sent,
+      addressHasChanged: false,
       address: mockAccount,
       comment: mockComment,
       amount: { value: '-100', currencyCode: 'cUSD', localAmount: null },
@@ -110,6 +115,7 @@ describe('TransferConfirmationCard', () => {
   it('renders correctly for sent escrow transaction drilldown', () => {
     const props = {
       type: TokenTransactionType.EscrowSent,
+      addressHasChanged: false,
       address: mockAccount,
       comment: mockComment,
       amount: { value: '-100', currencyCode: 'cUSD', localAmount: null },

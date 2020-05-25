@@ -105,3 +105,10 @@ spec:
           value: "{{ .Values.oracle.azureHsm.initTryCount }}"
         - name: AZURE_HSM_INIT_MAX_RETRY_BACKOFF_MS
           value: "{{ .Values.oracle.azureHsm.initMaxRetryBackoffMs }}"
+        readinessProbe:
+          exec:
+            command:
+            - /celo-oracle/readinessProbe.sh
+            - "{{ .Values.oracle.metrics.prometheusPort }}"
+          initialDelaySeconds: 10
+          periodSeconds: 5

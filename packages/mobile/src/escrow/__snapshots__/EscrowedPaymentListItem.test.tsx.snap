@@ -13,202 +13,191 @@ exports[`EscrowedPaymentReminderNotification renders correctly 1`] = `
       Array [
         Object {
           "backgroundColor": "#FFFFFF",
-          "width": "100%",
-        },
-        Object {
-          "elevation": 2,
+          "elevation": 12,
+          "padding": 16,
           "shadowColor": "black",
           "shadowOffset": Object {
-            "height": 1,
+            "height": 6,
             "width": 0,
           },
           "shadowOpacity": 0.3,
-          "shadowRadius": 1.6,
+          "shadowRadius": 9.600000000000001,
         },
+        Object {
+          "borderRadius": 8,
+        },
+        Array [
+          Object {
+            "height": 144,
+          },
+          Object {},
+        ],
       ]
     }
+    testID="EscrowedPaymentListItem"
   >
     <View
       style={
         Object {
-          "padding": 16,
+          "flex": 1,
+          "flexDirection": "row",
         }
       }
     >
       <View
         style={
           Object {
-            "flexDirection": "row",
-            "justifyContent": "space-between",
+            "flex": 1,
+            "marginRight": 16,
           }
         }
       >
-        <View
+        <Text
+          numberOfLines={2}
           style={
             Object {
-              "alignItems": "center",
-              "paddingRight": 16,
+              "color": "#9CA4A9",
+              "fontFamily": "Inter-Regular",
+              "fontSize": 13,
+              "lineHeight": 16,
+              "marginBottom": 4,
             }
           }
+          testID="EscrowedPaymentListItem/Title"
         >
-          <Image
-            resizeMode="contain"
-            source={
-              Object {
-                "testUri": "../../../packages/mobile/src/images/Invite-Friends.png",
-              }
-            }
-            style={
-              Object {
-                "height": 30,
-                "width": 30,
-              }
-            }
-          />
-        </View>
-        <View
+          escrowPaymentNotificationTitle
+        </Text>
+        <Text
+          numberOfLines={1}
           style={
             Object {
-              "flex": 1,
-              "justifyContent": "space-between",
+              "color": "#2E3338",
+              "fontFamily": "Inter-SemiBold",
+              "fontSize": 24,
+              "lineHeight": 28,
+              "marginBottom": 2,
             }
           }
+          testID="EscrowedPaymentListItem/Amount"
         >
           <Text
+            numberOfLines={1}
             style={
-              Object {
-                "color": "#2E3338",
-                "fontFamily": "Hind-SemiBold",
-                "fontSize": 14,
-                "lineHeight": 18,
-              }
+              Array [
+                undefined,
+                Object {
+                  "color": undefined,
+                },
+              ]
             }
-            testID="EscrowedPaymentListItem/Title"
           >
-            Invited and paid 
-            +14155550000
-             (
-            <Text
-              numberOfLines={1}
-              style={
-                Array [
-                  undefined,
-                  Object {
-                    "color": undefined,
-                  },
-                ]
-              }
-            >
-              
-              $
-              0.00
-            </Text>
-            )
+            
+            $
+            0.00
           </Text>
-          <View
-            style={
-              Object {
-                "justifyContent": "space-between",
-                "minHeight": 60,
-                "paddingTop": 2,
-              }
+        </Text>
+        <Text
+          style={
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Inter-Regular",
+              "fontSize": 14,
+              "lineHeight": 18,
             }
-          >
-            <Text
-              style={
-                Object {
-                  "color": "#2E3338",
-                  "fontFamily": "Hind-Regular",
-                  "fontSize": 14,
-                  "lineHeight": 18,
-                }
-              }
-            >
-              defaultComment
-            </Text>
-            <View
-              style={
-                Object {
-                  "flexDirection": "row",
-                  "marginTop": 12,
-                }
-              }
-            >
-              <View
-                accessible={true}
-                focusable={true}
-                nativeBackgroundAndroid={
-                  Object {
-                    "attribute": "selectableItemBackgroundBorderless",
-                    "type": "ThemeAttrAndroid",
-                  }
-                }
-                onClick={[Function]}
-                onResponderGrant={[Function]}
-                onResponderMove={[Function]}
-                onResponderRelease={[Function]}
-                onResponderTerminate={[Function]}
-                onResponderTerminationRequest={[Function]}
-                onStartShouldSetResponder={[Function]}
-                testID="EscrowedPaymentListItem/global:remind/Button"
-              >
-                <Text
-                  style={
-                    Array [
-                      Object {
-                        "color": "#42D689",
-                        "fontFamily": "Hind-SemiBold",
-                        "fontSize": 14,
-                        "lineHeight": 18,
-                      },
-                      Object {
-                        "paddingEnd": 15,
-                      },
-                    ]
-                  }
-                >
-                  global:remind
-                </Text>
-              </View>
-              <View
-                accessible={true}
-                focusable={true}
-                nativeBackgroundAndroid={
-                  Object {
-                    "attribute": "selectableItemBackgroundBorderless",
-                    "type": "ThemeAttrAndroid",
-                  }
-                }
-                onClick={[Function]}
-                onResponderGrant={[Function]}
-                onResponderMove={[Function]}
-                onResponderRelease={[Function]}
-                onResponderTerminate={[Function]}
-                onResponderTerminationRequest={[Function]}
-                onStartShouldSetResponder={[Function]}
-                testID="EscrowedPaymentListItem/global:reclaim/Button"
-              >
-                <Text
-                  style={
-                    Array [
-                      Object {
-                        "color": "#42D689",
-                        "fontFamily": "Hind-SemiBold",
-                        "fontSize": 14,
-                        "lineHeight": 18,
-                      },
-                      Object {
-                        "paddingEnd": 15,
-                      },
-                    ]
-                  }
-                >
-                  global:reclaim
-                </Text>
-              </View>
-            </View>
-          </View>
-        </View>
+          }
+          testID="EscrowedPaymentListItem/Details"
+        />
+      </View>
+      <View
+        style={Object {}}
+      >
+        <Image
+          resizeMode="contain"
+          source={
+            Object {
+              "testUri": "../../../packages/mobile/src/images/Invite-Friends.png",
+            }
+          }
+          style={
+            Object {
+              "height": 30,
+              "width": 30,
+            }
+          }
+        />
+      </View>
+    </View>
+    <View
+      style={
+        Object {
+          "flexDirection": "row",
+        }
+      }
+      testID="EscrowedPaymentListItem/CallToActions"
+    >
+      <View
+        accessible={true}
+        focusable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackgroundBorderless",
+            "type": "ThemeAttrAndroid",
+          }
+        }
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        testID="EscrowedPaymentListItem/CallToActions/global:remind/Button"
+      >
+        <Text
+          style={
+            Object {
+              "color": "#1AB775",
+              "fontFamily": "Inter-SemiBold",
+              "fontSize": 14,
+              "lineHeight": 16,
+              "marginRight": 24,
+            }
+          }
+        >
+          global:remind
+        </Text>
+      </View>
+      <View
+        accessible={true}
+        focusable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackgroundBorderless",
+            "type": "ThemeAttrAndroid",
+          }
+        }
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        testID="EscrowedPaymentListItem/CallToActions/global:reclaim/Button"
+      >
+        <Text
+          style={
+            Object {
+              "color": "#1AB775",
+              "fontFamily": "Inter-SemiBold",
+              "fontSize": 14,
+              "lineHeight": 16,
+              "marginRight": 24,
+            }
+          }
+        >
+          global:reclaim
+        </Text>
       </View>
     </View>
   </View>
