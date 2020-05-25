@@ -14,6 +14,7 @@ import CeloGoldHistoryChart from 'src/exchange/CeloGoldHistoryChart'
 import CeloGoldOverview from 'src/exchange/CeloGoldOverview'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces, withTranslation } from 'src/i18n'
+import DrawerTopBar from 'src/navigator/DrawerTopBar'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 import { RootState } from 'src/redux/reducers'
@@ -70,6 +71,7 @@ export class ExchangeHomeScreen extends React.Component<Props> {
 
     return (
       <SafeAreaView style={styles.background}>
+        <DrawerTopBar />
         <ScrollContainer heading={t('global:gold')} testID="ExchangeScrollView">
           <DisconnectBanner />
           <CeloGoldHistoryChart />

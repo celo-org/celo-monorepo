@@ -170,17 +170,6 @@ export class WalletHome extends React.Component<Props> {
     return (
       <SafeAreaView style={styles.container}>
         <DrawerTopBar />
-        {/* <View style={[componentStyles.topBar, styles.header]}>
-          {this.props.appConnected ? (
-            <Animated.Text style={[fontStyles.headerTitle, { opacity: this.headerOpacity }]}>
-              {t('wallet')}
-            </Animated.Text>
-          ) : (
-            <View style={styles.banner}>
-              <DisconnectBanner />
-            </View>
-          )}
-        </View> */}
         <AnimatedSectionList
           onScroll={this.onScroll}
           refreshControl={refresh}

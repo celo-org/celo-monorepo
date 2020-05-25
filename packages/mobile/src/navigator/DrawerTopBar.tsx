@@ -1,4 +1,5 @@
 import colorsV2 from '@celo/react-components/styles/colors.v2'
+import { elevationShadowStyle } from '@celo/react-components/styles/styles'
 import { useNavigation } from '@react-navigation/native'
 import * as React from 'react'
 import { StyleSheet, TouchableOpacity, View } from 'react-native'
@@ -39,11 +40,13 @@ const Hamburger = () => {
   )
 }
 
+const shadow = elevationShadowStyle(1)
+
 const DrawerTopBar = () => {
   const navigation = useNavigation()
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, shadow]}>
       {/*
       // @ts-ignore Only used in a drawer */}
       <TouchableOpacity style={styles.hamburger} onPress={navigation.toggleDrawer}>
@@ -64,8 +67,8 @@ const styles = StyleSheet.create({
     backgroundColor: colorsV2.white,
     alignItems: 'flex-end',
     justifyContent: 'space-between',
-    borderBottomWidth: 1,
-    borderBottomColor: colorsV2.gray2,
+    // borderBottomWidth: 1,
+    // borderBottomColor: colorsV2.gray2,
   },
   hamburger: {
     padding: 8,

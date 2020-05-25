@@ -2,6 +2,7 @@ import colors from '@celo/react-components/styles/colors'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { ActivityIndicator, StyleSheet } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { WebView } from 'react-native-webview'
 import { connect } from 'react-redux'
 import { showError } from 'src/alert/actions'
@@ -9,6 +10,7 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import { LocalCurrencyCode } from 'src/localCurrency/consts'
 import { getLocalCurrencyCode } from 'src/localCurrency/selectors'
+import DrawerTopBar from 'src/navigator/DrawerTopBar'
 import { headerWithBackButton } from 'src/navigator/Headers'
 import { RootState } from 'src/redux/reducers'
 
@@ -80,16 +82,27 @@ class FiatExchange extends React.Component<Props, State> {
   }
 
   render() {
-    return this.state.signedUrl === '' ? (
-      <ActivityIndicator size="large" color={colors.celoGreen} />
-    ) : (
-      <WebView style={styles.exchangeWebView} source={{ uri: this.state.signedUrl }} />
+    return (
+      <SafeAreaView style={styles.background}>
+        <DrawerTopBar />
+        {this.state.signedUrl === '' ? (
+          <ActivityIndicator size="large" color={colors.celoGreen} />
+        ) : (
+          <WebView style={styles.exchangeWebView} source={{ uri: this.state.signedUrl }} />
+        )}
+      </SafeAreaView>
     )
   }
 }
 
 const styles = StyleSheet.create({
   exchangeWebView: {},
+  background: {
+    backgroundColor: 'white',
+    flex: 1,
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+  },
 })
 
 export default connect<StateProps, {}, {}, RootState>(mapStateToProps)(
