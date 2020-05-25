@@ -18,7 +18,7 @@ import {
 >>>>>>> Add script for layout checking
 =======
   compareStorageLayouts,
-  Contract as ZContract
+  Contract as ZContract,
   getStorageLayout,
   Operation,
 >>>>>>> Appease the linter
@@ -312,6 +312,9 @@ const generateErrorMessage = (operation: Operation) => {
       message = `variable ${updated.label} was inserted`
       break
     case 'pop':
+      message = `variable ${original.label} was removed`
+      break
+    case 'delete':
       message = `variable ${original.label} was removed`
       break
     case 'rename':
