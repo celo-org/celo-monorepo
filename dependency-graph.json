@@ -11,6 +11,7 @@
   ],
   "celotool": [
     "contractkit",
+    "dev-utils",
     "protocol",
     "utils",
     "verification-pool-api"
