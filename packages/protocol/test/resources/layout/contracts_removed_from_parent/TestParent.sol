@@ -2,13 +2,14 @@ pragma solidity ^0.5.3;
 
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
-import "./TestLibrary.sol"
+import "./TestLibrary.sol";
 
 contract TestParent is Ownable {
-  using TestLibary for TestLibrary.Thing;
+  using TestLibrary for TestLibrary.Thing;
 
-  uint256 private p
+  uint256 private p;
   address private q;
 
-  TestLibrary.Thing libraryThing;
+  // TestLibrary.Thing libraryThing;
+
 }

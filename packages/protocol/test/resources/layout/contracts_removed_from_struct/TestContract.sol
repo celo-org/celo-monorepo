@@ -1,13 +1,11 @@
 pragma solidity ^0.5.3;
 
-import "./TestParent.sol"
+import "./TestParent.sol";
 
 contract TestContract is TestParent {
-  using TestLibary for TestLibrary.Thing;
-
   struct Thing {
     uint128 a;
-    uint128 b;
+    // uint128 b;
     uint128 c;
   }
 
