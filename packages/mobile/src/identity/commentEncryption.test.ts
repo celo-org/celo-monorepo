@@ -1,6 +1,10 @@
+import { IdentifierLookupResult } from '@celo/contractkit/lib/wrappers/Attestations'
 import { hexToBuffer } from '@celo/utils/src/address'
 import { expectSaga } from 'redux-saga-test-plan'
-import { call } from 'redux-saga/effects'
+import * as matchers from 'redux-saga-test-plan/matchers'
+import { call, select } from 'redux-saga/effects'
+import { TokenTransactionType, TransactionFeedFragment } from 'src/apollo/types'
+import { updateE164PhoneNumberAddresses, updateE164PhoneNumberSalts } from 'src/identity/actions'
 import {
   checkTxsForIdentityMetadata,
   decryptComment,
@@ -9,13 +13,17 @@ import {
   extractPhoneNumberMetadata,
   getCommentKey,
 } from 'src/identity/commentEncryption'
+import { lookupAttestationIdentifiers } from 'src/identity/contactMapping'
 import { PhoneNumberHashDetails } from 'src/identity/privacy'
+import { e164NumberToAddressSelector, e164NumberToSaltSelector } from 'src/identity/reducer'
+import { privateCommentKeySelector } from 'src/web3/selectors'
 import { getMockStoreData } from 'test/utils'
 import {
   mockAccount,
   mockAccount2,
   mockComment,
   mockE164Number,
+  mockE164NumberHashWithSalt,
   mockE164NumberSalt,
   mockPrivateDEK,
   mockPrivateDEK2,
@@ -170,8 +178,82 @@ describe(extractPhoneNumberMetadata, () => {
   })
 })
 
-describe.only(checkTxsForIdentityMetadata, () => {
-  it('Finds metadata and dispatches updates', () => {
-    // TODO
+describe(checkTxsForIdentityMetadata, () => {
+  const transactions: TransactionFeedFragment[] = [
+    {
+      __typename: 'TokenTransfer',
+      type: TokenTransactionType.Sent,
+      hash: '0x4607df6d11e63bb024cf1001956de7b6bd7adc253146f8412e8b3756752b8353',
+      amount: {
+        __typename: 'MoneyAmount',
+        value: '-0.2',
+        currencyCode: 'cUSD',
+        localAmount: {
+          __typename: 'LocalMoneyAmount',
+          value: '-0.2',
+          currencyCode: 'USD',
+          exchangeRate: '1',
+        },
+      },
+      timestamp: 1578530538,
+      address: mockAccount,
+      comment: simpleComment,
+    },
+    {
+      __typename: 'TokenExchange',
+      type: TokenTransactionType.Exchange,
+      hash: '0x16fbd53c4871f0657f40e1b4515184be04bed8912c6e2abc2cda549e4ad8f852',
+    } as any,
+    {
+      __typename: 'TokenTransfer',
+      type: TokenTransactionType.Received,
+      hash: '0x28147e5953639687915e9b152173076611cc9e51e8634fad3850374ccc87d7aa',
+      amount: {
+        __typename: 'MoneyAmount',
+        value: '-0.2',
+        currencyCode: 'cUSD',
+        localAmount: {
+          __typename: 'LocalMoneyAmount',
+          value: '-0.2',
+          currencyCode: 'USD',
+          exchangeRate: '1',
+        },
+      },
+      timestamp: 1578530602,
+      address: mockAccount,
+      comment: simpleCommentWithMetadataEnc,
+    },
+  ]
+
+  it('Finds metadata and dispatches updates', async () => {
+    const lookupResult: IdentifierLookupResult = {
+      [mockE164NumberHashWithSalt]: {
+        [mockAccount]: { completed: 3, total: 5 },
+      },
+    }
+    await expectSaga(checkTxsForIdentityMetadata, { transactions })
+      .provide([
+        [select(privateCommentKeySelector), mockPrivateDEK2],
+        [matchers.call.fn(lookupAttestationIdentifiers), lookupResult],
+        [select(e164NumberToSaltSelector), {}],
+        [select(e164NumberToAddressSelector), {}],
+      ])
+      .put(updateE164PhoneNumberSalts({ [mockE164Number]: mockE164NumberSalt }))
+      .put(
+        updateE164PhoneNumberAddresses(
+          { [mockE164Number]: [mockAccount] },
+          { [mockAccount]: mockE164Number }
+        )
+      )
+      .run()
+  })
+
+  it('Ignores invalid identity claims', async () => {
+    await expectSaga(checkTxsForIdentityMetadata, { transactions })
+      .provide([
+        [select(privateCommentKeySelector), mockPrivateDEK2],
+        [matchers.call.fn(lookupAttestationIdentifiers), {}],
+      ])
+      .run()
   })
 })

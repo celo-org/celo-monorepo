@@ -2,13 +2,12 @@ import { CeloTransactionObject } from '@celo/contractkit'
 import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
 import {
   ActionableAttestation,
-  AttestationsStatus,
   AttestationsWrapper,
   UnselectedRequest,
 } from '@celo/contractkit/lib/wrappers/Attestations'
 import { eqAddress, hexToBuffer } from '@celo/utils/src/address'
 import { retryAsync } from '@celo/utils/src/async'
-import { extractAttestationCodeFromMessage } from '@celo/utils/src/attestations'
+import { AttestationsStatus, extractAttestationCodeFromMessage } from '@celo/utils/src/attestations'
 import { compressedPubKey } from '@celo/utils/src/commentEncryption'
 import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
 import { Platform } from 'react-native'

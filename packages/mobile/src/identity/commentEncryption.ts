@@ -13,7 +13,7 @@ import {
 import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
 import { memoize, values } from 'lodash'
 import { call, put, select } from 'redux-saga/effects'
-import { isTokenTxTypeSent, TokenTransactionType, TransactionFeedFragment } from 'src/apollo/types'
+import { TokenTransactionType, TransactionFeedFragment } from 'src/apollo/types'
 import { features } from 'src/flags'
 import { updateE164PhoneNumberAddresses, updateE164PhoneNumberSalts } from 'src/identity/actions'
 import {
@@ -198,6 +198,7 @@ export function* checkTxsForIdentityMetadata({ transactions }: NewTransactionsIn
       newIdentityData
     )
     yield call(updatePhoneNumberMappings, verifiedMetadata)
+    Logger.debug(TAG + 'checkTxsForIdentityMetadata', 'Done checking txs')
   } catch (error) {
     Logger.error(TAG + 'checkTxsForIdentityMetadata', 'Error checking metadata', error)
     // Allowing error to be swallowed for now. Impact is just that tx may not be labelled with full contact info
@@ -214,11 +215,7 @@ function findIdentityMetadataInComments(
     if (tx.__typename !== 'TokenTransfer' || tx.type !== TokenTransactionType.Received) {
       continue
     }
-    const { e164Number, salt } = decryptComment(
-      tx.comment,
-      commentKeyPrivate,
-      isTokenTxTypeSent(tx.type)
-    )
+    const { e164Number, salt } = decryptComment(tx.comment, commentKeyPrivate, false)
     if (!e164Number || !salt) {
       continue
     }

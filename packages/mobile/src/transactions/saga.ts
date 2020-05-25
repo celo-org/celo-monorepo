@@ -24,7 +24,6 @@ import {
 import { TxPromises } from 'src/transactions/contract-utils'
 import { knownFeedTransactionsSelector, KnownFeedTransactionsType } from 'src/transactions/reducer'
 import { sendTransactionPromises, wrapSendTransactionWithRetry } from 'src/transactions/send'
-import { TRANSACTIONS_QUERY } from 'src/transactions/TransactionsList'
 import { getTxsFromUserTxQuery } from 'src/transactions/transferFeedUtils'
 import Logger from 'src/utils/Logger'
 import { getAccount } from 'src/web3/saga'
@@ -40,10 +39,14 @@ export function* initializeUserTxListQueryWatcher() {
   const localCurrencyCode = yield select(getLocalCurrencyCode)
   const token = Token.CUsd
 
+  // Using a dynamic require import here because of an import cycle around TransactionsList that is
+  // causing many tests to fail. Alternative is to mock this entire saga file or significantly restructure things.
+  const query = require('src/transactions/TransactionsList').TRANSACTIONS_QUERY
+
   const userTxQueryChannel: EventChannel<UserTxQueryChannelEvent> = eventChannel((emitter) => {
     const querySubscription = apolloClient
       .watchQuery<UserTransactionsQuery | undefined>({
-        query: TRANSACTIONS_QUERY,
+        query,
         variables: {
           address,
           token,

@@ -3,6 +3,7 @@ import {
   IdentifierLookupResult,
 } from '@celo/contractkit/lib/wrappers/Attestations'
 import { isValidAddress } from '@celo/utils/src/address'
+import { isAccountConsideredVerified } from '@celo/utils/src/attestations'
 import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
 import BigNumber from 'bignumber.js'
 import { MinimalContact } from 'react-native-contacts'
@@ -184,6 +185,8 @@ export function* lookupAttestationIdentifiers(ids: string[]) {
   return yield call([attestationsWrapper, attestationsWrapper.lookupIdentifiers], ids)
 }
 
+// Deconstruct the lookup result and return
+// any addresess that are considered verified
 export function getAddressesFromLookupResult(
   lookupResult: IdentifierLookupResult,
   phoneHash: string
@@ -192,10 +195,25 @@ export function getAddressesFromLookupResult(
     return null
   }
 
-  const addresses = Object.keys(lookupResult[phoneHash]!)
-    .filter(isValidNon0Address)
-    .map((a) => a.toLowerCase())
-  return addresses.length ? addresses : null
+  const addressToStats = lookupResult[phoneHash]!
+  const verifiedAddresses: string[] = []
+  for (const address of Object.keys(addressToStats)) {
+    if (!isValidNon0Address(address)) {
+      continue
+    }
+    // Check if result for given hash is considered 'verified'
+    const { isVerified } = isAccountConsideredVerified(addressToStats[address])
+    if (!isVerified) {
+      Logger.debug(
+        TAG + 'getAddressesFromLookupResult',
+        `Address ${address} has attestation stats but is not considered verified. Skipping it.`
+      )
+      continue
+    }
+    verifiedAddresses.push(address.toLowerCase())
+  }
+
+  return verifiedAddresses.length ? verifiedAddresses : null
 }
 
 const isValidNon0Address = (address: string) =>
