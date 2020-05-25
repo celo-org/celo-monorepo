@@ -22,9 +22,14 @@ import {
   transactionFailed,
 } from 'src/transactions/actions'
 import { TxPromises } from 'src/transactions/contract-utils'
-import { knownFeedTransactionsSelector, KnownFeedTransactionsType } from 'src/transactions/reducer'
+import {
+  knownFeedTransactionsSelector,
+  KnownFeedTransactionsType,
+  standbyTransactionsSelector,
+} from 'src/transactions/reducer'
 import { sendTransactionPromises, wrapSendTransactionWithRetry } from 'src/transactions/send'
 import { getTxsFromUserTxQuery } from 'src/transactions/transferFeedUtils'
+import { StandbyTransaction, TransactionStatus } from 'src/transactions/types'
 import Logger from 'src/utils/Logger'
 import { getAccount } from 'src/web3/saga'
 
@@ -88,9 +93,11 @@ function* watchUserTxQueryChannel(channel: EventChannel<UserTxQueryChannelEvent>
       Logger.info(`${TAG}/watchUserTransactionQueryChannel`, 'Notification received in the channel')
       const knownTxs: KnownFeedTransactionsType = yield select(knownFeedTransactionsSelector)
       const newTxs = event.transactionFeedFragments.filter((tx) => !knownTxs[tx.hash])
-      if (newTxs.length) {
-        yield put(newTransactionsInFeed(newTxs))
+      if (!newTxs.length) {
+        continue
       }
+      yield put(newTransactionsInFeed(newTxs))
+      yield call(cleanupStandbyTransacitons, newTxs)
     }
   } catch (error) {
     Logger.error(
@@ -100,6 +107,24 @@ function* watchUserTxQueryChannel(channel: EventChannel<UserTxQueryChannelEvent>
     )
   } finally {
     Logger.debug(`${TAG}/watchUserTransactionQueryChannel`, 'User tx channel terminated')
+  }
+}
+
+// Remove standby txs from redux state when the real ones show up in the feed
+function* cleanupStandbyTransacitons(newFeedTransactions: TransactionFeedFragment[]) {
+  const standbyTxs: StandbyTransaction[] = yield select(standbyTransactionsSelector)
+  const newFeedTxHashes = new Set(newFeedTransactions.map((tx) => tx?.hash))
+  // const inQueryTxs = (tx: StandbyTransaction) =>
+  //   tx.hash && queryDataTxHashes.has(tx.hash) && tx.status !== TransactionStatus.Failed
+  // const filteredStandbyTxs = this.props.standbyTransactions.filter(inQueryTxs)
+  for (const standbyTx of standbyTxs) {
+    if (
+      standbyTx.hash &&
+      standbyTx.status !== TransactionStatus.Failed &&
+      newFeedTxHashes.has(standbyTx.hash)
+    ) {
+      yield put(removeStandbyTransaction(standbyTx.id))
+    }
   }
 }
 

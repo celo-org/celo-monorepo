@@ -210,23 +210,6 @@ function mapInvite(tx: FeedItem): FeedItem {
 }
 
 export class TransactionsList extends React.PureComponent<Props> {
-  txsFetched = (data: UserTransactionsQuery | undefined) => {
-    const transactions = getTxsFromUserTxQuery(data)
-    if (transactions.length < 1) {
-      return
-    }
-    // Transaction list has changed and we need to refresh the balances
-    this.props.refreshAllBalances()
-
-    const queryDataTxHashes = new Set(transactions.map((tx) => tx?.hash))
-    const inQueryTxs = (tx: StandbyTransaction) =>
-      tx.hash && queryDataTxHashes.has(tx.hash) && tx.status !== TransactionStatus.Failed
-    const filteredStandbyTxs = this.props.standbyTransactions.filter(inQueryTxs)
-    filteredStandbyTxs.forEach((tx) => {
-      this.props.removeStandbyTransaction(tx.id)
-    })
-  }
-
   render() {
     const {
       address,
@@ -276,7 +259,6 @@ export class TransactionsList extends React.PureComponent<Props> {
         query={TRANSACTIONS_QUERY}
         pollInterval={POLL_INTERVAL}
         variables={{ address: queryAddress, token, localCurrencyCode }}
-        onCompleted={this.txsFetched}
         children={UserTransactions}
       />
     )

@@ -80,5 +80,8 @@ export const reducer = (
   }
 }
 
+export const standbyTransactionsSelector = (state: RootState) =>
+  state.transactions.standbyTransactions
+
 export const knownFeedTransactionsSelector = (state: RootState) =>
   state.transactions.knownFeedTransactions
