@@ -1800,6 +1800,16 @@
     qqjs "^0.3.10"
     tslib "^1.9.3"
 
+"@celo/dev-utils@file:packages/dev-utils":
+  version "0.0.1-dev"
+  dependencies:
+    bignumber.js "^9.0.0"
+    fs-extra "^8.1.0"
+    targz "^1.0.1"
+    tmp "^0.1.0"
+    web3 "1.2.4"
+    web3-core-helpers "1.2.4"
+
 "@celo/ganache-cli@git+https://github.com/celo-org/ganache-cli.git#25ff8dd":
   version "6.6.1"
   resolved "git+https://github.com/celo-org/ganache-cli.git#25ff8dd8a532ffbff001f9b08d38f74e1fca3ffd"
