@@ -5,6 +5,7 @@ export { IdentityMetadataWrapper } from './identity'
 export * from './kit'
 export { GenesisBlockUtils } from './network-utils/genesis-block-utils'
 export { StaticNodeUtils } from './network-utils/static-node-utils'
+export { BootnodeUtils } from './network-utils/bootnode-utils'
 export { CeloProvider } from './providers/celo-provider'
 export { CeloTransactionObject, CeloTransactionParams } from './wrappers/BaseWrapper'
 

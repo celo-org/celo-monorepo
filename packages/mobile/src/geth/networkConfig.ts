@@ -1,4 +1,10 @@
-import { DEFAULT_SYNC_MODE, DEFAULT_TESTNET, FORNO_ENABLED_INITIALLY } from 'src/config'
+import { BootnodeUtils } from '@celo/contractkit'
+import {
+  DEFAULT_SYNC_MODE,
+  DEFAULT_TESTNET,
+  FORNO_ENABLED_INITIALLY,
+  USE_FULL_NODE_DISCOVERY,
+} from 'src/config'
 import { GethSyncMode } from 'src/geth/consts'
 import Logger from 'src/utils/Logger'
 
@@ -16,9 +22,11 @@ interface NetworkConfig {
   nodeDir: string
   syncMode: GethSyncMode
   initiallyForno: boolean
+  peerDiscovery: boolean
   blockchainApiUrl: string
   pgpnpUrl: string // Phone Number Privacy service url
   pgpnpPubKey: string
+  bootnodeEnodes: string[]
 }
 
 const pgpnpUrlStaging = 'https://us-central1-celo-phone-number-privacy-stg.cloudfunctions.net'
@@ -36,6 +44,8 @@ const networkConfigs: { [testnet: string]: NetworkConfig } = {
     blockchainApiUrl: 'https://integration-dot-celo-testnet.appspot.com/',
     pgpnpUrl: pgpnpUrlStaging,
     pgpnpPubKey: pgpnpPubKeyStaging,
+    peerDiscovery: USE_FULL_NODE_DISCOVERY,
+    bootnodeEnodes: BootnodeUtils.getBootnodesAsync(Testnets.integration),
   },
   [Testnets.alfajoresstaging]: {
     nodeDir: `.${Testnets.alfajoresstaging}`,
@@ -44,6 +54,8 @@ const networkConfigs: { [testnet: string]: NetworkConfig } = {
     blockchainApiUrl: 'https://alfajoresstaging-dot-celo-testnet.appspot.com/',
     pgpnpUrl: pgpnpUrlStaging,
     pgpnpPubKey: pgpnpPubKeyStaging,
+    peerDiscovery: USE_FULL_NODE_DISCOVERY,
+    bootnodeEnodes: BootnodeUtils.getBootnodesAsync(Testnets.alfajoresstaging),
   },
   [Testnets.alfajores]: {
     nodeDir: `.${Testnets.alfajores}`,
@@ -52,6 +64,8 @@ const networkConfigs: { [testnet: string]: NetworkConfig } = {
     blockchainApiUrl: 'https://alfajores-dot-celo-testnet-production.appspot.com/',
     pgpnpUrl: pgpnpUrlProd,
     pgpnpPubKey: pgpnpPubKeyProd,
+    peerDiscovery: USE_FULL_NODE_DISCOVERY,
+    bootnodeEnodes: BootnodeUtils.getBootnodesAsync(Testnets.alfajores),
   },
   [Testnets.pilot]: {
     nodeDir: `.${Testnets.pilot}`,
@@ -60,6 +74,8 @@ const networkConfigs: { [testnet: string]: NetworkConfig } = {
     blockchainApiUrl: 'https://pilot-dot-celo-testnet-production.appspot.com/',
     pgpnpUrl: pgpnpUrlStaging,
     pgpnpPubKey: pgpnpPubKeyStaging,
+    peerDiscovery: USE_FULL_NODE_DISCOVERY,
+    bootnodeEnodes: BootnodeUtils.getBootnodesAsync(Testnets.pilot),
   },
   [Testnets.pilotstaging]: {
     nodeDir: `.${Testnets.pilotstaging}`,
@@ -68,6 +84,8 @@ const networkConfigs: { [testnet: string]: NetworkConfig } = {
     blockchainApiUrl: 'https://pilotstaging-dot-celo-testnet.appspot.com/',
     pgpnpUrl: pgpnpUrlStaging,
     pgpnpPubKey: pgpnpPubKeyStaging,
+    peerDiscovery: USE_FULL_NODE_DISCOVERY,
+    bootnodeEnodes: BootnodeUtils.getBootnodesAsync(Testnets.pilotstaging),
   },
   [Testnets.baklavastaging]: {
     nodeDir: `.${Testnets.baklavastaging}`,
@@ -76,6 +94,8 @@ const networkConfigs: { [testnet: string]: NetworkConfig } = {
     blockchainApiUrl: 'https://baklavastaging-dot-celo-testnet.appspot.com/',
     pgpnpUrl: pgpnpUrlStaging,
     pgpnpPubKey: pgpnpPubKeyStaging,
+    peerDiscovery: USE_FULL_NODE_DISCOVERY,
+    bootnodeEnodes: BootnodeUtils.getBootnodesAsync(Testnets.baklavastaging),
   },
   [Testnets.baklava]: {
     nodeDir: `.${Testnets.baklava}`,
@@ -84,6 +104,8 @@ const networkConfigs: { [testnet: string]: NetworkConfig } = {
     blockchainApiUrl: 'https://baklava-dot-celo-testnet-production.appspot.com/',
     pgpnpUrl: pgpnpUrlStaging,
     pgpnpPubKey: pgpnpPubKeyStaging,
+    peerDiscovery: USE_FULL_NODE_DISCOVERY,
+    bootnodeEnodes: BootnodeUtils.getBootnodesAsync(Testnets.baklava),
   },
 }
 
