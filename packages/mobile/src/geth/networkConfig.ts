@@ -45,7 +45,7 @@ const networkConfigs: { [testnet: string]: NetworkConfig } = {
     pgpnpUrl: pgpnpUrlStaging,
     pgpnpPubKey: pgpnpPubKeyStaging,
     peerDiscovery: USE_FULL_NODE_DISCOVERY,
-    bootnodeEnodes: BootnodeUtils.getBootnodesAsync(Testnets.integration),
+    bootnodeEnodes: BootnodeUtils.getBootnodes(Testnets.integration).split(';'),
   },
   [Testnets.alfajoresstaging]: {
     nodeDir: `.${Testnets.alfajoresstaging}`,
@@ -55,7 +55,7 @@ const networkConfigs: { [testnet: string]: NetworkConfig } = {
     pgpnpUrl: pgpnpUrlStaging,
     pgpnpPubKey: pgpnpPubKeyStaging,
     peerDiscovery: USE_FULL_NODE_DISCOVERY,
-    bootnodeEnodes: BootnodeUtils.getBootnodesAsync(Testnets.alfajoresstaging),
+    bootnodeEnodes: BootnodeUtils.getBootnodes(Testnets.alfajoresstaging).split(';'),
   },
   [Testnets.alfajores]: {
     nodeDir: `.${Testnets.alfajores}`,
@@ -65,7 +65,7 @@ const networkConfigs: { [testnet: string]: NetworkConfig } = {
     pgpnpUrl: pgpnpUrlProd,
     pgpnpPubKey: pgpnpPubKeyProd,
     peerDiscovery: USE_FULL_NODE_DISCOVERY,
-    bootnodeEnodes: BootnodeUtils.getBootnodesAsync(Testnets.alfajores),
+    bootnodeEnodes: BootnodeUtils.getBootnodes(Testnets.alfajores).split(';'),
   },
   [Testnets.pilot]: {
     nodeDir: `.${Testnets.pilot}`,
@@ -75,7 +75,7 @@ const networkConfigs: { [testnet: string]: NetworkConfig } = {
     pgpnpUrl: pgpnpUrlStaging,
     pgpnpPubKey: pgpnpPubKeyStaging,
     peerDiscovery: USE_FULL_NODE_DISCOVERY,
-    bootnodeEnodes: BootnodeUtils.getBootnodesAsync(Testnets.pilot),
+    bootnodeEnodes: BootnodeUtils.getBootnodes(Testnets.pilot).split(';'),
   },
   [Testnets.pilotstaging]: {
     nodeDir: `.${Testnets.pilotstaging}`,
@@ -85,7 +85,7 @@ const networkConfigs: { [testnet: string]: NetworkConfig } = {
     pgpnpUrl: pgpnpUrlStaging,
     pgpnpPubKey: pgpnpPubKeyStaging,
     peerDiscovery: USE_FULL_NODE_DISCOVERY,
-    bootnodeEnodes: BootnodeUtils.getBootnodesAsync(Testnets.pilotstaging),
+    bootnodeEnodes: BootnodeUtils.getBootnodes(Testnets.pilotstaging).split(';'),
   },
   [Testnets.baklavastaging]: {
     nodeDir: `.${Testnets.baklavastaging}`,
@@ -95,7 +95,7 @@ const networkConfigs: { [testnet: string]: NetworkConfig } = {
     pgpnpUrl: pgpnpUrlStaging,
     pgpnpPubKey: pgpnpPubKeyStaging,
     peerDiscovery: USE_FULL_NODE_DISCOVERY,
-    bootnodeEnodes: BootnodeUtils.getBootnodesAsync(Testnets.baklavastaging),
+    bootnodeEnodes: BootnodeUtils.getBootnodes(Testnets.baklavastaging).split(';'),
   },
   [Testnets.baklava]: {
     nodeDir: `.${Testnets.baklava}`,
@@ -105,7 +105,7 @@ const networkConfigs: { [testnet: string]: NetworkConfig } = {
     pgpnpUrl: pgpnpUrlStaging,
     pgpnpPubKey: pgpnpPubKeyStaging,
     peerDiscovery: USE_FULL_NODE_DISCOVERY,
-    bootnodeEnodes: BootnodeUtils.getBootnodesAsync(Testnets.baklava),
+    bootnodeEnodes: BootnodeUtils.getBootnodes(Testnets.baklava).split(';'),
   },
 }
 
