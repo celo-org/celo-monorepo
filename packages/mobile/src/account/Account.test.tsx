@@ -25,7 +25,10 @@ describe('Account', () => {
   it('renders correctly', () => {
     const tree = renderer.create(
       <Provider store={createMockStore({})}>
-        <Account navigation={mockNavigation} route={mockRoute} />
+        <Account //@ts-ignore
+          navigation={mockNavigation}
+          route={mockRoute}
+        />
       </Provider>
     )
     expect(tree).toMatchSnapshot()
@@ -40,7 +43,10 @@ describe('Account', () => {
           },
         })}
       >
-        <Account navigation={mockNavigation} route={mockRoute} />
+        <Account //@ts-ignore
+          navigation={mockNavigation}
+          route={mockRoute}
+        />
       </Provider>
     )
     expect(tree).toMatchSnapshot()

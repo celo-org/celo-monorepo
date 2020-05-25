@@ -78,7 +78,7 @@ export type StackParamList = {
   }
   [Screens.JoinCelo]: undefined
   [Screens.Language]: {
-    nextScreen?: Screens.Account
+    nextScreen?: keyof StackParamList
   }
   [Screens.Licenses]: undefined
   [Screens.OutgoingPaymentRequestListScreen]: undefined

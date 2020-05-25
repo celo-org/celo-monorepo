@@ -132,7 +132,7 @@ export class Account extends React.Component<Props, State> {
   }
 
   goToAnalytics = () => {
-    this.props.navigation.navigate(Screens.Analytics, { nextScreen: Screens.Account })
+    this.props.navigation.navigate(Screens.Analytics)
   }
 
   goToDataSaver = () => {

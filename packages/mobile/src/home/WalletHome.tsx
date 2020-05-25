@@ -24,8 +24,6 @@ import { callToActNotificationSelector, getActiveNotificationCount } from 'src/h
 import SendOrRequestBar from 'src/home/SendOrRequestBar'
 import { Namespaces, withTranslation } from 'src/i18n'
 import DrawerTopBar from 'src/navigator/DrawerTopBar'
-import { navigate } from 'src/navigator/NavigationService'
-import { Screens } from 'src/navigator/Screens'
 import { NumberToRecipient } from 'src/recipients/recipient'
 import { recipientCacheSelector } from 'src/recipients/reducer'
 import { RootState } from 'src/redux/reducers'
@@ -35,7 +33,6 @@ import { resetStandbyTransactions } from 'src/transactions/actions'
 import TransactionsList from 'src/transactions/TransactionsList'
 import { currentAccountSelector } from 'src/web3/selectors'
 
-const HEADER_ICON_SIZE = 24
 const HEADER_BUTTON_MARGIN = 12
 
 interface StateProps {
@@ -133,10 +130,6 @@ export class WalletHome extends React.Component<Props> {
       null,
       t('testnetAlert.0', { testnet: _.startCase(DEFAULT_TESTNET) })
     )
-  }
-
-  onPressSettings = () => {
-    navigate(Screens.Account)
   }
 
   render() {

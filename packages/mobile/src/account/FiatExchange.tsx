@@ -2,16 +2,15 @@ import colors from '@celo/react-components/styles/colors'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { ActivityIndicator, StyleSheet } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
+import SafeAreaView from 'react-native-safe-area-view'
 import { WebView } from 'react-native-webview'
 import { connect } from 'react-redux'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import i18n, { Namespaces, withTranslation } from 'src/i18n'
+import { Namespaces, withTranslation } from 'src/i18n'
 import { LocalCurrencyCode } from 'src/localCurrency/consts'
 import { getLocalCurrencyCode } from 'src/localCurrency/selectors'
 import DrawerTopBar from 'src/navigator/DrawerTopBar'
-import { headerWithBackButton } from 'src/navigator/Headers'
 import { RootState } from 'src/redux/reducers'
 
 interface State {
@@ -53,11 +52,6 @@ async function signMoonpayUrl(account: string, localCurrencyCode: LocalCurrencyC
 }
 
 class FiatExchange extends React.Component<Props, State> {
-  static navigationOptions = () => ({
-    ...headerWithBackButton,
-    headerTitle: i18n.t('accountScreen10:addFunds'),
-  })
-
   state: State = {
     signedUrl: '',
   }

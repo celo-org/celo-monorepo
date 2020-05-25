@@ -161,9 +161,9 @@
   "helpFindAccount": "Ayuda a tu contacto a encontrar su número de cuenta",
   "close": "Cerrar",
   "home": "Casa",
-  "accountKey": "Account Key",
-  "addAndWithdraw": "Add and Withdraw",
-  "invite": "Invite",
-  "settings": "Settings",
-  "help": "Help"
+  "accountKey": "Clave de Cuenta",
+  "addAndWithdraw": "Agregar y Retirar",
+  "invite": "Invitar",
+  "settings": "Configuración",
+  "help": "Ayuda"
 }
