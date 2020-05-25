@@ -25,7 +25,8 @@ describe('Account', () => {
   it('renders correctly', () => {
     const tree = renderer.create(
       <Provider store={createMockStore({})}>
-        <Account //@ts-ignore
+        <Account
+          // @ts-ignore
           navigation={mockNavigation}
           route={mockRoute}
         />
@@ -43,7 +44,8 @@ describe('Account', () => {
           },
         })}
       >
-        <Account //@ts-ignore
+        <Account
+          // @ts-ignore
           navigation={mockNavigation}
           route={mockRoute}
         />
