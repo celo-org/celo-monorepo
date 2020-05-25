@@ -1,6 +1,8 @@
 import colors from '@celo/react-components/styles/colors.v2'
+import QRCodeBorderlessIcon from '@celo/react-components/icons/QRCodeBorderless'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import { componentStyles } from '@celo/react-components/styles/styles'
+import { RouteProp } from '@react-navigation/core'
 import { StackNavigationOptions } from '@react-navigation/stack'
 import * as React from 'react'
 import { Trans } from 'react-i18next'
@@ -10,8 +12,13 @@ import CancelButton from 'src/components/CancelButton.v2'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import i18n, { Namespaces } from 'src/i18n'
+import { navigate, navigateBack } from 'src/navigator/NavigationService'
+import { Screens } from 'src/navigator/Screens'
+import { TopBarTextButton, TopBarIconButton } from 'src/navigator/TopBarButton.v2'
+import { StackParamList } from 'src/navigator/types'
 import useSelector from 'src/redux/useSelector'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
+import Times, { Props as TimesProps } from '@celo/react-components/icons/Times'
 
 export const noHeader: StackNavigationOptions = {
   headerShown: false,
@@ -65,6 +72,11 @@ export const emptyHeader: StackNavigationOptions = {
   cardStyle: { backgroundColor: colors.background },
   headerStyle: {
     backgroundColor: colors.light,
+    shadowRadius: 0,
+    shadowOffset: {
+      height: 0,
+      width: 0,
+    },
     ...Platform.select({
       android: {
         elevation: 0,
@@ -75,6 +87,76 @@ export const emptyHeader: StackNavigationOptions = {
       },
     }),
   },
+}
+
+export const exchangeTradeOptions = ({
+  route,
+}: {
+  route: RouteProp<StackParamList, Screens.ExchangeTradeScreen>
+}) => {
+  const { makerToken } = route.params?.makerTokenDisplay
+  const title =
+    makerToken === CURRENCY_ENUM.DOLLAR
+      ? i18n.t('exchangeFlow9:buyGold')
+      : i18n.t('exchangeFlow9:sellGold')
+  return {
+    ...headerWithCancelButton,
+    headerLeft: () => <CancelButton style={{ color: colors.dark }} />,
+    headerTitle: () => <HeaderTitleWithBalance title={title} token={makerToken} />,
+  }
+}
+
+export const exchangeReviewOptions = ({
+  route,
+}: {
+  route: RouteProp<StackParamList, Screens.ExchangeReview>
+}) => {
+  const { makerToken } = route.params?.exchangeInput
+  const goExchangeHome = () => navigate(Screens.ExchangeHomeScreen)
+  const title =
+    makerToken === CURRENCY_ENUM.DOLLAR
+      ? i18n.t('exchangeFlow9:buyGold')
+      : i18n.t('exchangeFlow9:sellGold')
+  return {
+    ...headerWithCancelButton,
+    headerLeft: () => <CancelButton style={{ color: colors.dark }} onCancel={goExchangeHome} />,
+    headerRight: () => (
+      <TopBarTextButton
+        title={i18n.t('global:edit')}
+        testID="EditButton"
+        onPress={navigateBack}
+        titleStyle={{ color: colors.goldDark }}
+      />
+    ),
+    headerTitle: () => <HeaderTitleWithBalance title={title} token={makerToken} />,
+  }
+}
+
+export const sendOptions = () => {
+  const goQr = () => navigate(Screens.QRCode)
+  return {
+    ...emptyHeader,
+    headerLeft: () => <TopBarIconButton icon={<Times />} onPress={navigateBack} />,
+    headerLeftContainerStyle: { paddingLeft: 20 },
+    headerRight: () => (
+      <TopBarIconButton
+        icon={<QRCodeBorderlessIcon height={32} color={colors.greenUI} />}
+        onPress={goQr}
+      />
+    ),
+    headerRightContainerStyle: { paddingRight: 16 },
+    headerTitle: i18n.t('global:send'),
+  }
+}
+
+export const sendAmountOptions = () => {
+  return {
+    ...emptyHeader,
+    headerLeft: () => <BackButton />,
+    headerTitle: () => (
+      <HeaderTitleWithBalance title={i18n.t('global:send')} token={CURRENCY_ENUM.DOLLAR} />
+    ),
+  }
 }
 
 export const drawerHeader: StackNavigationOptions = {

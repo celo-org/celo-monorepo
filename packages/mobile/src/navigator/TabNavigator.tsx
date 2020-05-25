@@ -3,7 +3,6 @@ import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { BottomTabBarButtonProps } from '@react-navigation/bottom-tabs/lib/typescript/src/types'
-import { useNavigation } from '@react-navigation/core'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet, View } from 'react-native'
@@ -12,23 +11,11 @@ import ExchangeHomeScreen from 'src/exchange/ExchangeHomeScreen'
 import WalletHome from 'src/home/WalletHome'
 import { Namespaces } from 'src/i18n'
 import GoldTabIcon from 'src/icons/GoldTab'
-import PaymentsIcon from 'src/icons/PaymentsIcon'
 import WalletIcon from 'src/icons/Wallet'
 import { Screens } from 'src/navigator/Screens'
 import { getTabBarActiveNotification, isBackupTooLate } from 'src/redux/selectors'
 
 const TabNav = createBottomTabNavigator()
-
-function SendIcon() {
-  const tooLate = useSelector(isBackupTooLate)
-  const color = tooLate ? colors.inactive : colors.dark
-
-  return (
-    <View style={styles.alignPaymentIcon}>
-      <PaymentsIcon color={color} />
-    </View>
-  )
-}
 
 const SmartWalletIcon = ({ color }: { color: string }) => {
   const hasActiveNotifications = useSelector(getTabBarActiveNotification)
@@ -41,15 +28,9 @@ const SmartWalletIcon = ({ color }: { color: string }) => {
   )
 }
 
-function TabBarButtonComponent(props: BottomTabBarButtonProps & { isSend?: boolean }) {
+function TabBarButtonComponent(props: BottomTabBarButtonProps) {
   const backupTooLate = useSelector(isBackupTooLate)
-  const navigation = useNavigation()
-  let { onPress } = props
-  if (props.isSend) {
-    onPress = () => {
-      navigation.dangerouslyGetParent()?.navigate(Screens.Send)
-    }
-  }
+  const { onPress } = props
 
   return (
     <Touchable
@@ -64,10 +45,6 @@ function TabBarButtonComponent(props: BottomTabBarButtonProps & { isSend?: boole
     </Touchable>
   )
 }
-
-const SendButton = (props: BottomTabBarButtonProps) => (
-  <TabBarButtonComponent {...props} isSend={true} />
-)
 
 export default function TabNavigator() {
   const { t } = useTranslation(Namespaces.global)
@@ -93,15 +70,6 @@ export default function TabNavigator() {
         options={{
           tabBarLabel: t('wallet'),
           tabBarIcon: SmartWalletIcon,
-        }}
-      />
-      <TabNav.Screen
-        name={Screens.Send}
-        component={View}
-        options={{
-          tabBarLabel: () => null,
-          tabBarIcon: SendIcon,
-          tabBarButton: SendButton,
         }}
       />
       <TabNav.Screen
