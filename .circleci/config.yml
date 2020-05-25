@@ -877,6 +877,7 @@ jobs:
         at: ~/app
     - run:
         name: Rebuild celotool project
+        no_output_timeout: 20m
         command: |
           set -e
           yarn
