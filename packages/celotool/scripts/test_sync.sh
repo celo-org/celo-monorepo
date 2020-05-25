@@ -42,18 +42,18 @@ test_sync_blocknumber() {
     current=$(kubectl -n ${namespace} exec -it ${node_pod} -- geth attach --exec 'eth.blockNumber' | $aliassed -r "s/\x1B\[([0-9]{1,3}(;[0-9]{1,2})?)?[mGK]//g")
     current=${current//[$'\t\r\n ']}
     if (( current >= target )); then
-      echo "Full node synced at block ${target}"
+      echo "Node synced at block ${target}"
       synced=true
     elif (( current <= current_prev )); then
       echo "No progress the last ${loop_time} seconds. Current block ${current}"
       tries=$((tries-1))
       if (( tries == 0 )); then
-        echo "Full node is not syncing. Stopped at block ${current}"
+        echo "Node is not syncing. Stopped at block ${current}"
         syncing=false
+        exit 1
       fi
-      exit 1
     else
-      echo "Full node Syncing. Current block ${current}. Target block ${target}"
+      echo "Node Syncing. Current block ${current}. Target block ${target}"
       current_prev="${current}"
       tries=max_tries
     fi
@@ -85,18 +85,18 @@ test_syn_syncing() {
     current=${current//[$'\t\r\n ']}
     
     if (( current >= target )); then
-      echo "Full node synced at block ${target}"
+      echo "Node synced at block ${target}"
       synced=true
     elif (( current <= current_prev )); then
       echo "No progress the last ${loop_time} seconds. Current block ${current}"
       tries=$((tries-1))
       if (( tries == 0 )); then
-        echo "Full node is not syncing. Stopped at block ${current}"
+        echo "Node is not syncing. Stopped at block ${current}"
         syncing=false
+        exit 1
       fi
-      exit 1
     else
-      echo "Full node Syncing. Current block ${current}. Target block ${target}"
+      echo "Node Syncing. Current block ${current}. Target block ${target}"
       current_prev="${current}"
       tries=max_tries
     fi

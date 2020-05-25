@@ -980,6 +980,7 @@ jobs:
           else
             printf -v FAILED_STRING '%s,' "${FAILED_MODES[@]}"
             FAILED_STRING="${FAILED_STRING%,}"
+            FAILED_STRING="${FAILED_STRING%,}"
             echo "$FAILED_STRING failed"
             echo "export FAILED_STRING=${FAILED_STRING}" >> $BASH_ENV
             exit 1
