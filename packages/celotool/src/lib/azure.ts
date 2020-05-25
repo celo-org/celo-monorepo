@@ -33,7 +33,7 @@ export async function switchToCluster(
     console.info('No azure account subscription currently set')
   }
   if (currentTenantId === null || currentTenantId.trim() !== clusterConfig.tenantId) {
-    await execCmdWithExitOnFailure(`az account set --subscription ${clusterConfig.tenantId}`)
+    await execCmdWithExitOnFailure(`az account set --subscription ${clusterConfig.subscriptionId}`)
   }
 
   let currentCluster = null
