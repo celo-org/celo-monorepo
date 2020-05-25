@@ -907,7 +907,15 @@ jobs:
           set -e
           cd packages/celotool
           NAMESPACE="circle-${CIRCLE_BUILD_NUM}"
+          set +e
           scripts/test_sync.sh rc1 lightest ${NAMESPACE}
+          if [ $? -eq 0 ]; then
+            echo "lightest mode synced OK"
+            echo 'export LIGHTEST=OK' >> $BASH_ENV
+          else
+            echo "lightest mode synced FAIL"
+            echo 'export LIGHTEST=FAIL' >> $BASH_ENV
+          fi
     - run:
         name: Deploy full mode client connected to rc1
         command: |
@@ -921,7 +929,15 @@ jobs:
           set -e
           cd packages/celotool
           NAMESPACE="circle-${CIRCLE_BUILD_NUM}"
+          set +e
           scripts/test_sync.sh rc1 full ${NAMESPACE}
+          if [ $? -eq 0 ]; then
+            echo "full mode synced OK"
+            echo 'export FULL=OK' >> $BASH_ENV
+          else
+            echo "full mode synced FAIL"
+            echo 'export FULL=FAIL' >> $BASH_ENV
+          fi
     - run:
         name: Deploy fast mode client connected to rc1
         command: |
@@ -935,12 +951,44 @@ jobs:
           set -e
           cd packages/celotool
           NAMESPACE="circle-${CIRCLE_BUILD_NUM}"
+          set +e
           scripts/test_sync.sh rc1 fast ${NAMESPACE}
+          if [ $? -eq 0 ]; then
+            echo "fast mode synced OK"
+            echo 'export FAST=OK' >> $BASH_ENV
+          else
+            echo "fast mode synced FAIL"
+            echo 'export FAST=FAIL' >> $BASH_ENV
+          fi
+    - run:
+        name: Fail job if some mode failed
+        command: |
+          set -e
+          declare -a FAILED_MODES
+          if [ $LIGHTEST == "FAIL" ]; then
+            FAILED_MODES+=("LIGHTEST")
+          fi
+          if [ $FULL == "FAIL" ]; then
+            FAILED_MODES="${FAILED_MODES},"
+            FAILED_MODES+=("FULL")
+          fi
+          if [ $FAST == "FAIL" ]; then
+            FAILED_MODES+=("FAST")
+          fi
+          if [ ${#FAILED_MODES[@]} -eq 0 ]; then
+            echo "All modes could sync"
+          else
+            printf -v FAILED_STRING '%s,' "${FAILED_MODES[@]}"
+            FAILED_STRING="${FAILED_STRING%,}"
+            echo "$FAILED_STRING failed"
+            echo "export FAILED_STRING=${FAILED_STRING}" >> $BASH_ENV
+            exit 1
+          fi
     - slack/status:
         fail_only: false
-        mentions: 'Javier Cortejoso '
-        failure_message: ':red_circle: Job $CIRCLE_JOB failed: Reason $TEST_VARIABLE'
-        success_message: ':tada: Job $CIRCLE_JOB succeeded: Reason $TEST_VARIABLE'
+        mentions: 'Javier Cortejoso'
+        failure_message: ':red_circle: Job $CIRCLE_JOB failed: The syncmodes $FAILED_STRING failed to sync on Mainnet'
+        success_message: ':tada: Job $CIRCLE_JOB succeeded. All modes could sync successfully on Mainnet'
         #only_for_branches: master
     # - run:
     #     name: Deploy network

@@ -51,7 +51,7 @@ test_sync_blocknumber() {
         echo "Full node is not syncing. Stopped at block ${current}"
         syncing=false
       fi
-      # exit 1
+      exit 1
     else
       echo "Full node Syncing. Current block ${current}. Target block ${target}"
       current_prev="${current}"
@@ -94,7 +94,7 @@ test_syn_syncing() {
         echo "Full node is not syncing. Stopped at block ${current}"
         syncing=false
       fi
-      # exit 1
+      exit 1
     else
       echo "Full node Syncing. Current block ${current}. Target block ${target}"
       current_prev="${current}"
