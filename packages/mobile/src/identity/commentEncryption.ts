@@ -20,11 +20,7 @@ import {
   getAddressesFromLookupResult,
   lookupAttestationIdentifiers,
 } from 'src/identity/contactMapping'
-import {
-  getUserSelfPhoneHashDetails,
-  PhoneNumberHashDetails,
-  SALT_CHAR_LENGTH,
-} from 'src/identity/privacy'
+import { getUserSelfPhoneHashDetails, PhoneNumberHashDetails } from 'src/identity/privacy'
 import {
   AddressToE164NumberType,
   e164NumberToAddressSelector,
@@ -43,7 +39,7 @@ const TAG = 'identity/commentKey'
 const METADATA_CONTENT_SEPARATOR = '~'
 // Format should be separator + e164Number + salt
 const PHONE_METADATA_REGEX = new RegExp(
-  `(.*)${METADATA_CONTENT_SEPARATOR}([+][1-9][0-9]{1,14})([a-zA-Z0-9+/]{${SALT_CHAR_LENGTH}})$`
+  `(.*)${METADATA_CONTENT_SEPARATOR}([+][1-9][0-9]{1,14})([a-zA-Z0-9+/]{13})$`
 )
 
 // Derive a new comment key from the provided private key
@@ -60,7 +56,6 @@ export function* getCommentKey(address: string) {
     contractKit.contracts.getAccounts,
   ])
   const hexString: string = yield call(accountsWrapper.getDataEncryptionKey, address)
-  // No comment key -> empty string returned from getDEK. This is expected for old addresses created before comment encryption change
   return !hexString ? null : hexToBuffer(hexString)
 }
 

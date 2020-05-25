@@ -56,7 +56,7 @@ type SolidityBytes = string | number[]
 export const stringToSolidityBytes = (input: string) => ensureLeading0x(input) as SolidityBytes
 export const bufferToSolidityBytes = (input: Buffer) => stringToSolidityBytes(bufferToHex(input))
 export const solidityBytesToString = (input: SolidityBytes): string => {
-  if (typeof input === 'string') {
+  if (input === null || input === undefined || typeof input === 'string') {
     return input
   } else if (Array.isArray(input)) {
     let hex = ''
