@@ -18,7 +18,9 @@ export class BootnodeUtils {
     const bucketName = BootnodesGoogleStorageBucketName
     const fileName = networkName
     let ret = ''
-    GoogleStorageUtils.fetchFileFromGoogleStorage(bucketName, fileName).then((res) => (ret = res))
+    GoogleStorageUtils.fetchFileFromGoogleStorage(bucketName, fileName)
+      // tslint:disable-next-line:no-unsafe-any
+      .then((res) => (ret = res))
     return ret
   }
 }
