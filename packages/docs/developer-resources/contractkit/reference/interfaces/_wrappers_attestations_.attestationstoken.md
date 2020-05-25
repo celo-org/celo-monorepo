@@ -17,7 +17,7 @@
 
 • **address**: *[Address](../modules/_base_.md#address)*
 
-*Defined in [contractkit/src/wrappers/Attestations.ts:28](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L28)*
+*Defined in [contractkit/src/wrappers/Attestations.ts:38](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L38)*
 
 ___
 
@@ -25,4 +25,4 @@ ___
 
 • **fee**: *BigNumber*
 
-*Defined in [contractkit/src/wrappers/Attestations.ts:29](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L29)*
+*Defined in [contractkit/src/wrappers/Attestations.ts:39](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L39)*

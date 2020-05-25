@@ -8,7 +8,6 @@ import { WithTranslation } from 'react-i18next'
 import { ActivityIndicator, Clipboard, StyleSheet, Text, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
-import { hideAlert, showError } from 'src/alert/actions'
 import CodeRow, { CodeRowStatus } from 'src/components/CodeRow'
 import DevSkipButton from 'src/components/DevSkipButton'
 import { CELO_FAUCET_LINK, SHOW_GET_INVITE_LINK } from 'src/config'
@@ -36,15 +35,11 @@ interface State {
 interface DispatchProps {
   redeemInvite: typeof redeemInvite
   skipInvite: typeof skipInvite
-  showError: typeof showError
-  hideAlert: typeof hideAlert
 }
 
 const mapDispatchToProps = {
   redeemInvite,
   skipInvite,
-  showError,
-  hideAlert,
 }
 
 const mapStateToProps = (state: RootState): StateProps => {
