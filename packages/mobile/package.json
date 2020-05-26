@@ -1,6 +1,6 @@
 {
   "name": "@celo/mobile",
-  "version": "1.8.0",
+  "version": "1.8.2",
   "author": "Celo",
   "license": "Apache-2.0",
   "private": true,
@@ -36,8 +36,8 @@
     ]
   },
   "dependencies": {
-    "@celo/client": "0.0.300",
-    "@celo/contractkit": "0.4.5-dev",
+    "@celo/client": "0.0.305",
+    "@celo/contractkit": "0.4.6-dev",
     "@celo/react-components": "1.0.0",
     "@celo/react-native-sms-retriever": "git+https://github.com/celo-org/react-native-sms-retriever#b88e502",
     "@celo/utils": "0.1.15-dev",
