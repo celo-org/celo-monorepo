@@ -1,5 +1,6 @@
 import VerifyPhone from '@celo/react-components/icons/VerifyPhone'
 import colors from '@celo/react-components/styles/colors'
+import { StackScreenProps } from '@react-navigation/stack'
 import { throttle } from 'lodash'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
@@ -16,6 +17,7 @@ import { importContacts } from 'src/identity/actions'
 import { headerWithCancelButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { StackParamList } from 'src/navigator/types'
 import {
   filterRecipientFactory,
   filterRecipients,
@@ -76,7 +78,9 @@ interface DispatchProps {
   estimateFee: typeof estimateFee
 }
 
-type Props = StateProps & DispatchProps & WithTranslation
+type RouteProps = StackScreenProps<StackParamList, Screens.Send>
+
+type Props = StateProps & DispatchProps & WithTranslation & RouteProps
 
 const mapStateToProps = (state: RootState): StateProps => ({
   defaultCountryCode: state.account.defaultCountryCode,
@@ -100,12 +104,6 @@ const mapDispatchToProps = {
 type FilterType = (searchQuery: string) => Recipient[]
 
 class Send extends React.Component<Props, State> {
-  static navigationOptions = () => ({
-    ...headerWithCancelButton,
-    headerTitle: i18n.t('sendFlow7:sendOrRequest'),
-    headerRight: <QRCodeIcon />,
-  })
-
   throttledSearch: (searchQuery: string) => void
   allRecipientsFilter: FilterType
   recentRecipientsFilter: FilterType
@@ -187,6 +185,7 @@ class Send extends React.Component<Props, State> {
 
   onSelectRecipient = (recipient: Recipient) => {
     this.props.hideAlert()
+    const isRequest = this.props.route.params?.isRequest ?? false
     CeloAnalytics.track(CustomEventNames.send_input, {
       selectedRecipientAddress: recipient.address,
     })
@@ -203,7 +202,7 @@ class Send extends React.Component<Props, State> {
       this.props.storeLatestInRecents(recipient)
     }
 
-    navigate(Screens.SendAmount, { recipient })
+    navigate(Screens.SendAmount, { recipient, isRequest })
   }
 
   onPermissionsAccepted = async () => {

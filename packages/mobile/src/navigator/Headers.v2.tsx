@@ -1,5 +1,6 @@
-import colors from '@celo/react-components/styles/colors.v2'
 import QRCodeBorderlessIcon from '@celo/react-components/icons/QRCodeBorderless'
+import Times from '@celo/react-components/icons/Times'
+import colors from '@celo/react-components/styles/colors.v2'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import { componentStyles } from '@celo/react-components/styles/styles'
 import { RouteProp } from '@react-navigation/core'
@@ -14,11 +15,10 @@ import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import i18n, { Namespaces } from 'src/i18n'
 import { navigate, navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import { TopBarTextButton, TopBarIconButton } from 'src/navigator/TopBarButton.v2'
+import { TopBarIconButton, TopBarTextButton } from 'src/navigator/TopBarButton.v2'
 import { StackParamList } from 'src/navigator/types'
 import useSelector from 'src/redux/useSelector'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
-import Times, { Props as TimesProps } from '@celo/react-components/icons/Times'
 
 export const noHeader: StackNavigationOptions = {
   headerShown: false,
@@ -132,7 +132,7 @@ export const exchangeReviewOptions = ({
   }
 }
 
-export const sendOptions = () => {
+export const sendOptions = ({ route }: { route: RouteProp<StackParamList, Screens.Send> }) => {
   const goQr = () => navigate(Screens.QRCode)
   return {
     ...emptyHeader,
@@ -145,16 +145,23 @@ export const sendOptions = () => {
       />
     ),
     headerRightContainerStyle: { paddingRight: 16 },
-    headerTitle: i18n.t('global:send'),
+    headerTitle: i18n.t(`sendFlow7:${route.params?.isRequest ? 'request' : 'send'}`),
   }
 }
 
-export const sendAmountOptions = () => {
+export const sendAmountOptions = ({
+  route,
+}: {
+  route: RouteProp<StackParamList, Screens.Send>
+}) => {
   return {
     ...emptyHeader,
     headerLeft: () => <BackButton />,
     headerTitle: () => (
-      <HeaderTitleWithBalance title={i18n.t('global:send')} token={CURRENCY_ENUM.DOLLAR} />
+      <HeaderTitleWithBalance
+        title={i18n.t(`sendFlow7:${route.params?.isRequest ? 'request' : 'send'}`)}
+        token={CURRENCY_ENUM.DOLLAR}
+      />
     ),
   }
 }

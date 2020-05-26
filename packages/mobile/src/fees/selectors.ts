@@ -29,19 +29,21 @@ export const getReclaimEscrowFeeEstimateDollars = feeEstimateDollarsSelectorFact
   getReclaimEscrowFeeEstimateInWei
 )
 
-export const getFeeEstimateDollars = (state: RootState, feeType: FeeType | null) => {
-  if (feeType === null) {
-    return undefined
-  }
+export const getFeeEstimateDollars = (feeType: FeeType | null) => {
+  return (state: RootState) => {
+    if (feeType === null) {
+      return undefined
+    }
 
-  switch (feeType) {
-    case FeeType.INVITE:
-      return getInviteFeeEstimateDollars(state)
-    case FeeType.SEND:
-      return getSendFeeEstimateDollars(state)
-    case FeeType.EXCHANGE:
-      return getExchangeFeeEstimateDollars(state)
-    case FeeType.RECLAIM_ESCROW:
-      return getReclaimEscrowFeeEstimateDollars(state)
+    switch (feeType) {
+      case FeeType.INVITE:
+        return getInviteFeeEstimateDollars(state)
+      case FeeType.SEND:
+        return getSendFeeEstimateDollars(state)
+      case FeeType.EXCHANGE:
+        return getExchangeFeeEstimateDollars(state)
+      case FeeType.RECLAIM_ESCROW:
+        return getReclaimEscrowFeeEstimateDollars(state)
+    }
   }
 }
