@@ -18,11 +18,11 @@ export default class FeeIcon extends React.Component<Props> {
   }
 
   navigateToEducate() {
-    navigate(Screens.FeeEducation, {})
+    navigate(Screens.FeeEducation)
   }
 
   navigateToExchangeEducate() {
-    navigate(Screens.FeeExchangeEducation, {})
+    navigate(Screens.FeeExchangeEducation)
   }
 
   render() {

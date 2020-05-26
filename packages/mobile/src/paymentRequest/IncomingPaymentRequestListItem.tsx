@@ -42,7 +42,7 @@ export class IncomingPaymentRequestListItem extends React.Component<Props> {
       firebasePendingRequestUid: id,
     }
 
-    if (addressValidationType !== AddressValidationType.NONE) {
+    if (addressValidationType && addressValidationType !== AddressValidationType.NONE) {
       navigate(Screens.ValidateRecipientIntro, { transactionData, addressValidationType })
     } else {
       navigate(Screens.SendConfirmation, { transactionData })

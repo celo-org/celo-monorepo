@@ -128,7 +128,7 @@ export class Account extends React.Component<Props, State> {
   }
 
   goToSecurity = () => {
-    navigateProtected(Screens.Security, { nextScreen: Screens.Account })
+    navigateProtected(Screens.Security)
   }
 
   goToAnalytics = () => {

@@ -1,4 +1,4 @@
-import { AccountAuthRequest, CURRENCY_ENUM, SignTxRequest } from '@celo/utils'
+import { AccountAuthRequest, CURRENCY_ENUM, SignTxRequest, TxToSignParam } from '@celo/utils'
 import BigNumber from 'bignumber.js'
 import { EscrowedPayment } from 'src/escrow/actions'
 import { ExchangeConfirmationCardProps } from 'src/exchange/ExchangeConfirmationCard'
@@ -30,7 +30,7 @@ export type StackParamList = {
     dappKitRequest: SignTxRequest
   }
   [Screens.DappKitTxDataScreen]: {
-    dappKitData: SignTxRequest
+    dappKitData: TxToSignParam['txData']
   }
   [Screens.DataSaver]: {
     promptModalVisible: boolean
@@ -64,9 +64,11 @@ export type StackParamList = {
   [Screens.FeeExchangeEducation]: undefined
   [Screens.FiatExchange]: undefined
   [Screens.GoldEducation]: undefined
-  [Screens.ImportWallet]: {
-    clean: boolean
-  }
+  [Screens.ImportWallet]:
+    | {
+        clean: boolean
+      }
+    | undefined
   [Screens.ImportWalletEmpty]: {
     backupPhrase: string
   }
@@ -99,10 +101,12 @@ export type StackParamList = {
   [Screens.PhotosNUX]: undefined
   [Screens.Profile]: undefined
   [Screens.QRCode]: undefined
-  [Screens.QRScanner]: {
-    scanIsForSecureSend?: true
-    transactionData?: TransactionDataInput
-  }
+  [Screens.QRScanner]:
+    | {
+        scanIsForSecureSend?: true
+        transactionData?: TransactionDataInput
+      }
+    | undefined
   [Screens.ReclaimPaymentConfirmationScreen]: {
     reclaimPaymentInput: EscrowedPayment
   }
