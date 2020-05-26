@@ -14,7 +14,9 @@ import { setBackupCompleted } from 'src/account/actions'
 import { showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
+import { ErrorMessages } from 'src/app/ErrorMessages'
 import { QuizzBottom } from 'src/backup/QuizzBottom'
+import { getStoredMnemonic } from 'src/backup/utils'
 import DevSkipButton from 'src/components/DevSkipButton'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import { headerWithCancelButton } from 'src/navigator/Headers.v2'
@@ -82,8 +84,8 @@ export class BackupQuiz extends React.Component<Props, State> {
     this.setBackSpace()
   }
 
-  componentDidMount() {
-    const mnemonic = this.getMnemonicFromNavProps()
+  componentDidMount = async () => {
+    const mnemonic = await this.retrieveMnemonic()
     const shuffledMnemonic = getShuffledWordSet(mnemonic)
     this.setState({
       mnemonicWords: shuffledMnemonic,
@@ -91,12 +93,23 @@ export class BackupQuiz extends React.Component<Props, State> {
     })
   }
 
-  getMnemonicFromNavProps() {
-    const mnemonic = this.props.route.params.mnemonic
-    if (!mnemonic) {
-      throw new Error('Mnemonic missing from nav props')
+  retrieveMnemonic = async () => {
+    try {
+      const mnemonic = await getStoredMnemonic()
+      if (!mnemonic) {
+        throw new Error('Mnemonic not found in key store')
+      }
+      return mnemonic
+    } catch {
+      const message = 'Failed to retrieve mnemonic'
+      Logger.error('BackupQuiz/retrieveMnemonic', message)
+      this.props.showError(ErrorMessages.FAILED_FETCH_MNEMONIC)
+      CeloAnalytics.track(CustomEventNames.backup_error, {
+        title: message,
+        component: 'BackupQuiz',
+      })
+      return ''
     }
-    return mnemonic
   }
 
   onPressMnemonicWord = (word: string, index: number) => {
@@ -138,8 +151,8 @@ export class BackupQuiz extends React.Component<Props, State> {
     )
   }
 
-  onPressReset = () => {
-    const mnemonic = this.getMnemonicFromNavProps()
+  onPressReset = async () => {
+    const mnemonic = await this.retrieveMnemonic()
     this.setState({
       mnemonicWords: getShuffledWordSet(mnemonic),
       userChosenWords: [],
@@ -147,9 +160,9 @@ export class BackupQuiz extends React.Component<Props, State> {
     })
   }
 
-  afterCheck = () => {
+  afterCheck = async () => {
     const { userChosenWords, mnemonicLength } = this.state
-    const mnemonic = this.getMnemonicFromNavProps()
+    const mnemonic = await this.retrieveMnemonic()
     const lengthsMatch = userChosenWords.length === mnemonicLength
 
     if (lengthsMatch && contentMatches(userChosenWords, mnemonic)) {
@@ -180,7 +193,7 @@ export class BackupQuiz extends React.Component<Props, State> {
     const { t } = this.props
     const { mnemonicWords: mnemonicWordButtons, userChosenWords, mnemonicLength } = this.state
     const currentWordIndex = userChosenWords.length + 1
-    const isQuizComplete = userChosenWords.length === mnemonicLength
+    const isQuizComplete = userChosenWords.length === mnemonicLength && mnemonicLength !== 0
     const mnemonicWordsToDisplay = mnemonicWordButtons.slice(0, MNEMONIC_BUTTONS_TO_DISPLAY)
     return (
       <SafeAreaView style={styles.container}>

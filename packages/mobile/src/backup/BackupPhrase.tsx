@@ -99,9 +99,8 @@ class BackupPhrase extends React.Component<Props, State> {
   }
 
   onPressContinue = () => {
-    const { mnemonic } = this.state
     CeloAnalytics.track(CustomEventNames.backup_continue)
-    navigate(Screens.BackupQuiz, { mnemonic })
+    navigate(Screens.BackupQuiz)
   }
 
   render() {

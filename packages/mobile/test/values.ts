@@ -13,6 +13,7 @@ import {
   RecipientWithContact,
   RecipientWithMobileNumber,
 } from 'src/recipients/recipient'
+import { Screens } from 'src/navigator/Screens'
 
 export const mockName = 'John Doe'
 export const mockAccount = '0x0000000000000000000000000000000000007E57'
