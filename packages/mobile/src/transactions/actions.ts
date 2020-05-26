@@ -4,7 +4,7 @@ import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import i18n from 'src/i18n'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import { ConfirmationInput as SendConfirmationCardProps } from 'src/send/SendConfirmation'
+import { TransactionDataInput } from 'src/send/SendAmount'
 import { TransferConfirmationCardProps } from 'src/send/TransferConfirmationCard'
 import { StandbyTransaction } from 'src/transactions/reducer'
 import { web3ForUtils } from 'src/web3/contracts'
@@ -92,7 +92,7 @@ export const addHashToStandbyTransaction = (
 })
 
 export const navigateToPaymentTransferReview = (
-  type: string,
+  type: TokenTransactionType,
   timestamp: number,
   confirmationProps: TransferConfirmationCardProps
 ) => {
@@ -153,6 +153,6 @@ export const navigateToExchangeReview = (
   })
 }
 
-export const navigateToRequestedPaymentReview = (confirmationInput: SendConfirmationCardProps) => {
-  navigate(Screens.SendConfirmation, { confirmationInput })
+export const navigateToRequestedPaymentReview = (transactionData: TransactionDataInput) => {
+  navigate(Screens.SendConfirmation, { transactionData })
 }

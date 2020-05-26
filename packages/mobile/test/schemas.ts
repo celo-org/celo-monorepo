@@ -147,9 +147,7 @@ export const vNeg1Schema = {
   },
 }
 
-export const v0Schema = vNeg1Schema
-
-export const v1Schema = {
+export const v0Schema = {
   app: {
     inviteCodeEntered: false,
     loggedIn: false,
@@ -293,14 +291,19 @@ export const v1Schema = {
   },
 }
 
-export const v2Schema = {
-  ...v1Schema,
+export const v1Schema = {
+  ...v0Schema,
+  identity: {
+    ...v0Schema.identity,
+    isValidRecipient: false,
+    secureSendPhoneNumberMapping: {},
+  },
   account: {
-    ...v1Schema.account,
+    ...v0Schema.account,
     retryVerificationWithForno: true,
   },
 }
 
 export function getLatestSchema(): Partial<RootState> {
-  return v2Schema as Partial<RootState>
+  return v1Schema as Partial<RootState>
 }

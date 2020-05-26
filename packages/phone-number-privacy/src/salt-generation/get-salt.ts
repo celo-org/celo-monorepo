@@ -14,8 +14,9 @@ import { incrementQueryCount } from '../database/wrappers/account'
 import { getRemainingQueryCount } from './query-quota'
 
 export async function handleGetBlindedMessageForSalt(request: Request, response: Response) {
-  const trx = await getTransaction()
+  let trx
   try {
+    trx = await getTransaction()
     if (!isValidGetSignatureInput(request.body)) {
       respondWithError(response, 400, ErrorMessages.INVALID_INPUT)
       return
@@ -41,7 +42,9 @@ export async function handleGetBlindedMessageForSalt(request: Request, response:
     response.json({ success: true, signature })
   } catch (error) {
     logger.error('Failed to getSalt', error)
-    trx.rollback()
+    if (trx) {
+      trx.rollback()
+    }
     respondWithError(response, 500, ErrorMessages.UNKNOWN_ERROR)
   }
 }
