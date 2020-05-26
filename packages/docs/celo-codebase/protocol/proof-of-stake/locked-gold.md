@@ -8,7 +8,7 @@ Locking up Celo Gold guarantees that the same asset is not used more than once i
 
 ## Unlocking Period
 
-Celo implements an **unlocking period**, a delay of 3 days after making a request to unlock Locked Gold before it can be recovered from the escrow.
+Celo implements an **unlocking period**, a delay of 15 days after making a request to unlock Locked Gold before it can be recovered from the escrow.
 
 This value balances two concerns. First, it is long enough that an election will have taken place since the request to unlock, so that those units of Celo Gold will no longer have any impact on which validators are managing the network. This deters an attacker from manipulations in the form of borrowing funds to purchase Celo Gold, then using it to elect malicious validators, since they will not be able to return the borrowed funds until after the attack, when presumably it would have been detected and the borrowed funds’ value have fallen.
 
