@@ -1,7 +1,7 @@
 {
-  "name": "@celo/phone-number-privacy",
+  "name": "@celo/phone-number-privacy-signer",
   "version": "1.0.0",
-  "description": "Generates unique salt for phone numbers.",
+  "description": "Signing participator of a the PGPNP threshold signature scheme",
   "author": "Celo",
   "license": "Apache-2.0",
   "main": "dist/index.js",

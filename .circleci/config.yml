@@ -860,8 +860,11 @@ jobs:
           command: |
             ./scripts/ci_check_if_test_should_run_v2.sh phone-number-privacy
       - run:
-          name: Run Tests
-          command: yarn --cwd=packages/phone-number-privacy test
+          name: Run Tests for combiner
+          command: yarn --cwd=packages/phone-number-privacy/combiner test
+      - run:
+          name: Run Tests for signer
+          command: yarn --cwd=packages/phone-number-privacy/signer test
 
 workflows:
   version: 2
