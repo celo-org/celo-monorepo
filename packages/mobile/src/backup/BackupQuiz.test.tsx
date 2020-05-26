@@ -4,21 +4,15 @@ import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
 import BackupQuiz, { BackupQuiz as BackupQuizRaw } from 'src/backup/BackupQuiz'
 import { Screens } from 'src/navigator/Screens'
-import { createMockStore, getMockI18nProps } from 'test/utils'
-import { mockMnemonic, mockNavigation } from 'test/values'
+import { createMockStore, getMockI18nProps, getMockStackScreenProps } from 'test/utils'
+import { mockMnemonic } from 'test/values'
 
 jest.mock('lodash', () => ({
   ...jest.requireActual('lodash'),
   shuffle: jest.fn((array) => array),
 }))
 
-const mockRoute = {
-  name: Screens.BackupQuiz as Screens.BackupQuiz,
-  key: '1',
-  params: {
-    mnemonic: mockMnemonic,
-  },
-}
+const mockScreenProps = getMockStackScreenProps(Screens.BackupQuiz, { mnemonic: mockMnemonic })
 
 describe('BackupQuiz', () => {
   const store = createMockStore()
@@ -31,7 +25,7 @@ describe('BackupQuiz', () => {
   it('renders correctly', () => {
     const tree = renderer.create(
       <Provider store={store}>
-        <BackupQuiz navigation={mockNavigation} route={mockRoute} />
+        <BackupQuiz {...mockScreenProps} />
       </Provider>
     )
     expect(tree).toMatchSnapshot()
@@ -48,8 +42,7 @@ describe('BackupQuiz', () => {
     const { getByText, getByTestId } = render(
       <Provider store={store}>
         <BackupQuizRaw
-          navigation={mockNavigation}
-          route={mockRoute}
+          {...mockScreenProps}
           setBackupCompleted={mockSetBackupCompleted}
           showError={jest.fn()}
           {...getMockI18nProps()}
