@@ -28,17 +28,18 @@ The following smart contracts are helpful to understand in order to map the conc
 
 The [createAccount](https://github.com/celo-org/celo-monorepo/blob/master/packages/protocol/contracts/common/Accounts.sol#L103) function indexes the address as an account in storage, and is required to differentiate an arbitrary key-pair from a user-owned account in the Celo network.
 
-The Accounts contract also allows for the authorization of various signer keys, such as a [vote signer key](https://github.com/celo-org/celo-monorepo/blob/master/packages/protocol/contracts/common/Accounts.sol#L175). This allows for the user who owns the primary account key to authorize a separate key that can only vote on behalf of the account. This allows for the ability to custody keys in a manner corresponding to their exposure or "warmth". Eg. the primary account private key can be kept in cold storage after authorizing the signer keys, which can be in warmer environments, and potentially more exposed to the network. See the key management 
+The `Accounts` contract also allows for the authorization of various signer keys, such as a [vote signer key](https://github.com/celo-org/celo-monorepo/blob/master/packages/protocol/contracts/common/Accounts.sol#L175). This allows for the user who owns the primary account key to authorize a separate key that can only vote on behalf of the account. This allows for the ability to custody keys in a manner corresponding to their exposure or "warmth". Eg. the primary account private key can be kept in cold storage after authorizing the signer keys, which can be in warmer environments, and potentially more exposed to the network. See the [key management guide](../../validator-guide/summary) for more details.
 
 ### LockedGold
 
-The `LockedGold` contract is part of Celo's [proof-of-stake](/../../celo-codebase/protocol/proof-of-stake/README.md) mechanism. Users can lock Celo Gold by creating an account in the [Accounts smart contract](https://github.com/celo-org/celo-monorepo/blob/master/packages/protocol/contracts/common/Accounts.sol#L89) and sending it to LockedGold. This allows users to vote in validator elections, receive epoch rewards, and participate in on-chain governance.
+[LockedGold.sol](https://github.com/celo-org/celo-monorepo/blob/master/packages/protocol/contracts/governance/LockedGold.sol) is used as part of Celo's [proof-of-stake](/../../celo-codebase/protocol/proof-of-stake/README.md) mechanism. Users can lock Celo Gold by sending it to the `LockedGold` contract after creating an account via the `Accounts` contract as described above. This allows users to vote in validator elections, receive epoch rewards, and participate in on-chain governance.
 
 There are two ways in which users can vote:
 
 - Directly, by sending voting transactions with the same key used to lock up Celo Gold
+- Via an authorized vote signer, which can submit voting transactions on behalf of the account with locked Celo Gold
 
-- Via an authorized validator signer, which can submit voting transactions on behalf of the account with locked Celo Gold
+`LockedGold` has a [`Balances` type](https://github.com/celo-org/celo-monorepo/blob/master/packages/protocol/contracts/governance/LockedGold.sol#L26) that contains both the `nonvoting` amount of cGLD as well as `pendingWithdrawals`, which contain values corresponding to timestamps at which they can be withdrawn. The reason for the latter is because all locked cGLD has an unlocking period that is [set at time of contract initialization](https://github.com/celo-org/celo-monorepo/blob/master/packages/protocol/contracts/governance/LockedGold.sol#L78), which is 3 days in the Celo network's deployed `LockedGold` contract. Hence, if users unlock cGLD in tranches, multiple pending withdrawals could exist at once.
 
 ### Election
 
@@ -48,7 +49,7 @@ A common problem in more recent PoS projects is the fact that early token holder
 
 Many users are likely to prefer custodians that support this functionality so that they can maximize their epoch rewards and participate in governance of the network.
 
-## Tracing
+## Useful Tools
 
 Since monitoring balance changing operations is important to be able to display user balances properly, it can be helpful to use a tracing or reconciling system. Several tools exist to help application developers with this process:
 
