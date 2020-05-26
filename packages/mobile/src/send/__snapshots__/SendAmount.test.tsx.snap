@@ -2,224 +2,46 @@
 
 exports[`SendAmount renders correctly for request payment confirmation 1`] = `
 <SafeAreaView
-  forceInset={
-    Object {
-      "bottom": "always",
-    }
-  }
   style={
     Object {
-      "backgroundColor": "white",
       "flex": 1,
-      "flexDirection": "column",
-      "justifyContent": "space-between",
+      "paddingHorizontal": 16,
     }
   }
 >
   <RCTScrollView
     contentContainerStyle={
       Object {
-        "paddingTop": 8,
+        "flex": 1,
       }
     }
-    keyboardShouldPersistTaps="always"
   >
     <View>
       <View
         style={
           Object {
-            "flexDirection": "column",
+            "flex": 1,
+            "flexDirection": "row",
             "justifyContent": "center",
-            "marginBottom": 10,
           }
         }
       >
         <View
           style={
-            Array [
-              Object {
-                "alignItems": "center",
-                "flexDirection": "row",
-                "justifyContent": "center",
-              },
-              Object {
-                "alignSelf": "center",
-                "margin": "auto",
-              },
-            ]
-          }
-        >
-          <View
-            style={
-              Array [
-                Object {
-                  "alignItems": "center",
-                  "justifyContent": "center",
-                },
-                Object {
-                  "backgroundColor": "#7AD6FE",
-                  "borderRadius": 20,
-                  "height": 40,
-                  "width": 40,
-                },
-              ]
-            }
-          >
-            <Image
-              source={
-                Object {
-                  "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
-                }
-              }
-              style={
-                Array [
-                  Object {
-                    "alignSelf": "center",
-                    "margin": "auto",
-                  },
-                  Object {
-                    "height": 40,
-                    "width": 40,
-                  },
-                ]
-              }
-            />
-          </View>
-        </View>
-        <Text
-          ellipsizeMode="tail"
-          numberOfLines={1}
-          style={
-            Array [
-              Object {
-                "color": "#2E3338",
-                "fontFamily": "Hind-SemiBold",
-                "fontSize": 14,
-                "lineHeight": 18,
-              },
-              Object {
-                "marginHorizontal": 20,
-                "paddingTop": 6,
-                "textAlign": "center",
-              },
-            ]
-          }
-        >
-          Jane Doe
-        </Text>
-        <View
-          style={
             Object {
-              "alignItems": "center",
-              "alignSelf": "center",
-              "flexDirection": "row",
               "justifyContent": "center",
             }
           }
         >
-          <Text
-            style={
-              Array [
-                Object {
-                  "color": "#2E3338",
-                  "fontFamily": "Hind-Light",
-                  "fontSize": 14,
-                  "textAlignVertical": "center",
-                },
-                Object {
-                  "alignItems": "center",
-                  "backgroundColor": "#EEEEEE",
-                  "borderRadius": 3,
-                  "justifyContent": "center",
-                  "marginRight": 5,
-                  "paddingLeft": 6,
-                  "paddingRight": 3,
-                },
-              ]
-            }
-          >
-            🇺🇸 +1
-          </Text>
           <Text
             style={
               Object {
                 "color": "#2E3338",
-                "fontFamily": "Hind-Light",
-                "fontSize": 14,
-                "textAlignVertical": "center",
+                "fontFamily": "Inter-Regular",
+                "fontSize": 32,
+                "lineHeight": 64,
+                "marginRight": 8,
               }
-            }
-          >
-            (310) 555-0000
-          </Text>
-        </View>
-      </View>
-      <View
-        style={
-          Object {
-            "marginVertical": 2,
-            "paddingHorizontal": 65,
-            "textAlign": "center",
-          }
-        }
-      >
-        <View
-          style={
-            Object {
-              "alignItems": "center",
-              "flexDirection": "row",
-              "justifyContent": "center",
-            }
-          }
-        />
-      </View>
-      <View
-        style={
-          Array [
-            Object {
-              "alignItems": "center",
-              "borderColor": "#EEEEEE",
-              "borderRadius": 3,
-              "borderWidth": 1,
-              "flexDirection": "row",
-              "height": 50,
-              "marginHorizontal": 10,
-              "marginVertical": 5,
-            },
-            Object {
-              "borderColor": "#EEEEEE",
-            },
-          ]
-        }
-      >
-        <View
-          style={
-            Object {
-              "alignItems": "center",
-              "flexDirection": "column",
-              "justifyContent": "center",
-              "minWidth": 45,
-            }
-          }
-        >
-          <Text
-            style={
-              Array [
-                Object {
-                  "color": "#81868B",
-                  "fontFamily": "Hind-Regular",
-                  "fontSize": 16,
-                  "lineHeight": 24,
-                },
-                Object {
-                  "alignSelf": "center",
-                  "color": "#81868B",
-                  "lineHeight": 30,
-                },
-                Object {
-                  "color": "#42D689",
-                },
-              ]
             }
           >
             $
@@ -227,170 +49,53 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
         </View>
         <View
           style={
-            Array [
-              Object {
-                "height": 35,
-                "width": 1,
-              },
-              Object {
-                "backgroundColor": "#EEEEEE",
-              },
-            ]
-          }
-        />
-        <View
-          style={
-            Array [
-              Object {
-                "alignItems": "center",
-                "flex": 1,
-                "flexDirection": "row",
-                "justifyContent": "center",
-              },
-              undefined,
-            ]
-          }
-        >
-          <TextInput
-            allowFontScaling={true}
-            autoCorrect={false}
-            autoFocus={true}
-            decimalSeparator="."
-            keyboardType="numeric"
-            labelStyle={
-              Object {
-                "color": "#42D689",
-              }
-            }
-            numberOfDecimals={2}
-            onBlur={[Function]}
-            onChangeText={[Function]}
-            onFocus={[Function]}
-            placeholder="amount"
-            placeholderTextColor="#A3EBC6"
-            rejectResponderTermination={true}
-            style={
-              Object {
-                "backgroundColor": "#FFFFFF",
-                "borderColor": "#D1D5D8",
-                "borderRadius": 3,
-                "flex": 1,
-                "fontFamily": "Hind-Regular",
-                "padding": 8,
-              }
-            }
-            title="$"
-            underlineColorAndroid="transparent"
-            validator="decimal"
-            value=""
-          />
-        </View>
-      </View>
-      <View
-        style={
-          Array [
             Object {
-              "alignItems": "center",
-              "borderColor": "#EEEEEE",
-              "borderRadius": 3,
-              "borderWidth": 1,
-              "flexDirection": "row",
-              "height": 50,
-              "marginHorizontal": 10,
-              "marginVertical": 5,
-            },
-            Object {
-              "borderColor": "#EEEEEE",
-            },
-          ]
-        }
-      >
-        <View
-          style={
-            Object {
-              "alignItems": "center",
-              "flexDirection": "column",
               "justifyContent": "center",
-              "minWidth": 45,
             }
           }
         >
           <Text
             style={
-              Array [
-                Object {
-                  "color": "#81868B",
-                  "fontFamily": "Hind-Regular",
-                  "fontSize": 16,
-                  "lineHeight": 24,
-                },
-                Object {
-                  "alignSelf": "center",
-                  "color": "#81868B",
-                  "lineHeight": 30,
-                },
-                undefined,
-              ]
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Inter-Regular",
+                "fontSize": 64,
+                "lineHeight": 88,
+              }
             }
           >
-            global:for
+            0
           </Text>
         </View>
         <View
           style={
-            Array [
-              Object {
-                "height": 35,
-                "width": 1,
-              },
-              Object {
-                "backgroundColor": "#EEEEEE",
-              },
-            ]
-          }
-        />
-        <View
-          style={
-            Array [
-              Object {
-                "alignItems": "center",
-                "flex": 1,
-                "flexDirection": "row",
-                "justifyContent": "center",
-              },
-              undefined,
-            ]
+            Object {
+              "justifyContent": "center",
+            }
           }
         >
-          <TextInput
-            allowFontScaling={true}
-            maxLength={70}
-            onBlur={[Function]}
-            onChangeText={[Function]}
-            onFocus={[Function]}
-            placeholder="groceriesRent"
-            placeholderTextColor="rgba(0, 0, 0, .4)"
-            rejectResponderTermination={true}
+          <Text
             style={
               Object {
-                "backgroundColor": "#FFFFFF",
-                "borderColor": "#D1D5D8",
-                "borderRadius": 3,
-                "flex": 1,
-                "fontFamily": "Hind-Regular",
-                "padding": 8,
+                "color": "transparent",
+                "fontFamily": "Inter-Regular",
+                "fontSize": 32,
+                "lineHeight": 64,
+                "marginLeft": 8,
               }
             }
-            title="global:for"
-            underlineColorAndroid="transparent"
-            value=""
-          />
+          >
+            $
+          </Text>
         </View>
       </View>
       <View
         style={
           Object {
-            "marginTop": 15,
+            "alignItems": "center",
+            "justifyContent": "center",
+            "paddingHorizontal": 12,
+            "width": "100%",
           }
         }
       >
@@ -399,79 +104,496 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
             Object {
               "alignItems": "center",
               "flexDirection": "row",
-              "justifyContent": "center",
+              "justifyContent": "space-between",
+              "width": "100%",
             }
           }
         >
-          <Text
-            style={
-              Array [
-                Object {
-                  "color": "#2E3338",
-                  "fontFamily": "Hind-Regular",
-                  "fontSize": 14,
-                  "lineHeight": 18,
-                },
-                undefined,
-              ]
+          <View
+            accessible={true}
+            focusable={true}
+            nativeBackgroundAndroid={
+              Object {
+                "attribute": "selectableItemBackgroundBorderless",
+                "type": "ThemeAttrAndroid",
+              }
             }
-          >
-            estimatedFee
-          </Text>
-          <Text
-            style={
-              Array [
-                Object {
-                  "color": "#2E3338",
-                  "fontFamily": "Hind-Regular",
-                  "fontSize": 14,
-                  "lineHeight": 18,
-                },
-                Object {
-                  "fontFamily": "Hind-SemiBold",
-                },
-              ]
-            }
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
           >
             <Text
-              numberOfLines={1}
               style={
-                Array [
-                  undefined,
-                  Object {
-                    "color": undefined,
-                  },
-                ]
+                Object {
+                  "alignItems": "center",
+                  "color": "#2E3338",
+                  "fontFamily": "Inter-Medium",
+                  "fontSize": 22,
+                  "justifyContent": "center",
+                  "lineHeight": 28,
+                  "padding": 24,
+                  "textAlign": "center",
+                  "width": 64,
+                }
               }
             >
-              
-              $
-              0.001
+              1
             </Text>
-          </Text>
+          </View>
+          <View
+            accessible={true}
+            focusable={true}
+            nativeBackgroundAndroid={
+              Object {
+                "attribute": "selectableItemBackgroundBorderless",
+                "type": "ThemeAttrAndroid",
+              }
+            }
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+          >
+            <Text
+              style={
+                Object {
+                  "alignItems": "center",
+                  "color": "#2E3338",
+                  "fontFamily": "Inter-Medium",
+                  "fontSize": 22,
+                  "justifyContent": "center",
+                  "lineHeight": 28,
+                  "padding": 24,
+                  "textAlign": "center",
+                  "width": 64,
+                }
+              }
+            >
+              2
+            </Text>
+          </View>
+          <View
+            accessible={true}
+            focusable={true}
+            nativeBackgroundAndroid={
+              Object {
+                "attribute": "selectableItemBackgroundBorderless",
+                "type": "ThemeAttrAndroid",
+              }
+            }
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+          >
+            <Text
+              style={
+                Object {
+                  "alignItems": "center",
+                  "color": "#2E3338",
+                  "fontFamily": "Inter-Medium",
+                  "fontSize": 22,
+                  "justifyContent": "center",
+                  "lineHeight": 28,
+                  "padding": 24,
+                  "textAlign": "center",
+                  "width": 64,
+                }
+              }
+            >
+              3
+            </Text>
+          </View>
+        </View>
+        <View
+          style={
+            Object {
+              "alignItems": "center",
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+              "width": "100%",
+            }
+          }
+        >
+          <View
+            accessible={true}
+            focusable={true}
+            nativeBackgroundAndroid={
+              Object {
+                "attribute": "selectableItemBackgroundBorderless",
+                "type": "ThemeAttrAndroid",
+              }
+            }
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+          >
+            <Text
+              style={
+                Object {
+                  "alignItems": "center",
+                  "color": "#2E3338",
+                  "fontFamily": "Inter-Medium",
+                  "fontSize": 22,
+                  "justifyContent": "center",
+                  "lineHeight": 28,
+                  "padding": 24,
+                  "textAlign": "center",
+                  "width": 64,
+                }
+              }
+            >
+              4
+            </Text>
+          </View>
+          <View
+            accessible={true}
+            focusable={true}
+            nativeBackgroundAndroid={
+              Object {
+                "attribute": "selectableItemBackgroundBorderless",
+                "type": "ThemeAttrAndroid",
+              }
+            }
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+          >
+            <Text
+              style={
+                Object {
+                  "alignItems": "center",
+                  "color": "#2E3338",
+                  "fontFamily": "Inter-Medium",
+                  "fontSize": 22,
+                  "justifyContent": "center",
+                  "lineHeight": 28,
+                  "padding": 24,
+                  "textAlign": "center",
+                  "width": 64,
+                }
+              }
+            >
+              5
+            </Text>
+          </View>
+          <View
+            accessible={true}
+            focusable={true}
+            nativeBackgroundAndroid={
+              Object {
+                "attribute": "selectableItemBackgroundBorderless",
+                "type": "ThemeAttrAndroid",
+              }
+            }
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+          >
+            <Text
+              style={
+                Object {
+                  "alignItems": "center",
+                  "color": "#2E3338",
+                  "fontFamily": "Inter-Medium",
+                  "fontSize": 22,
+                  "justifyContent": "center",
+                  "lineHeight": 28,
+                  "padding": 24,
+                  "textAlign": "center",
+                  "width": 64,
+                }
+              }
+            >
+              6
+            </Text>
+          </View>
+        </View>
+        <View
+          style={
+            Object {
+              "alignItems": "center",
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+              "width": "100%",
+            }
+          }
+        >
+          <View
+            accessible={true}
+            focusable={true}
+            nativeBackgroundAndroid={
+              Object {
+                "attribute": "selectableItemBackgroundBorderless",
+                "type": "ThemeAttrAndroid",
+              }
+            }
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+          >
+            <Text
+              style={
+                Object {
+                  "alignItems": "center",
+                  "color": "#2E3338",
+                  "fontFamily": "Inter-Medium",
+                  "fontSize": 22,
+                  "justifyContent": "center",
+                  "lineHeight": 28,
+                  "padding": 24,
+                  "textAlign": "center",
+                  "width": 64,
+                }
+              }
+            >
+              7
+            </Text>
+          </View>
+          <View
+            accessible={true}
+            focusable={true}
+            nativeBackgroundAndroid={
+              Object {
+                "attribute": "selectableItemBackgroundBorderless",
+                "type": "ThemeAttrAndroid",
+              }
+            }
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+          >
+            <Text
+              style={
+                Object {
+                  "alignItems": "center",
+                  "color": "#2E3338",
+                  "fontFamily": "Inter-Medium",
+                  "fontSize": 22,
+                  "justifyContent": "center",
+                  "lineHeight": 28,
+                  "padding": 24,
+                  "textAlign": "center",
+                  "width": 64,
+                }
+              }
+            >
+              8
+            </Text>
+          </View>
+          <View
+            accessible={true}
+            focusable={true}
+            nativeBackgroundAndroid={
+              Object {
+                "attribute": "selectableItemBackgroundBorderless",
+                "type": "ThemeAttrAndroid",
+              }
+            }
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+          >
+            <Text
+              style={
+                Object {
+                  "alignItems": "center",
+                  "color": "#2E3338",
+                  "fontFamily": "Inter-Medium",
+                  "fontSize": 22,
+                  "justifyContent": "center",
+                  "lineHeight": 28,
+                  "padding": 24,
+                  "textAlign": "center",
+                  "width": 64,
+                }
+              }
+            >
+              9
+            </Text>
+          </View>
+        </View>
+        <View
+          style={
+            Object {
+              "alignItems": "center",
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+              "width": "100%",
+            }
+          }
+        >
+          <View
+            accessible={true}
+            focusable={true}
+            nativeBackgroundAndroid={
+              Object {
+                "attribute": "selectableItemBackgroundBorderless",
+                "type": "ThemeAttrAndroid",
+              }
+            }
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+          >
+            <Text
+              style={
+                Object {
+                  "alignItems": "center",
+                  "color": "#2E3338",
+                  "fontFamily": "Inter-Medium",
+                  "fontSize": 22,
+                  "justifyContent": "center",
+                  "lineHeight": 28,
+                  "padding": 24,
+                  "textAlign": "center",
+                  "width": 64,
+                }
+              }
+            >
+              .
+            </Text>
+          </View>
+          <View
+            accessible={true}
+            focusable={true}
+            nativeBackgroundAndroid={
+              Object {
+                "attribute": "selectableItemBackgroundBorderless",
+                "type": "ThemeAttrAndroid",
+              }
+            }
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+          >
+            <Text
+              style={
+                Object {
+                  "alignItems": "center",
+                  "color": "#2E3338",
+                  "fontFamily": "Inter-Medium",
+                  "fontSize": 22,
+                  "justifyContent": "center",
+                  "lineHeight": 28,
+                  "padding": 24,
+                  "textAlign": "center",
+                  "width": 64,
+                }
+              }
+            >
+              0
+            </Text>
+          </View>
+          <View
+            accessible={true}
+            focusable={true}
+            nativeBackgroundAndroid={
+              Object {
+                "attribute": "selectableItemBackgroundBorderless",
+                "type": "ThemeAttrAndroid",
+              }
+            }
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+          >
+            <View
+              style={
+                Object {
+                  "alignItems": "center",
+                  "color": "#2E3338",
+                  "fontFamily": "Inter-Medium",
+                  "fontSize": 22,
+                  "justifyContent": "center",
+                  "lineHeight": 28,
+                  "padding": 24,
+                  "textAlign": "center",
+                  "width": 64,
+                }
+              }
+            >
+              <svg
+                fill="none"
+                height={30}
+                style={Object {}}
+                viewBox="0 0 35 18"
+                width={30}
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M1.82198 9.7422L9.57436 16.7422C9.75813 16.9081 9.99693 17 10.2445 17H33C33.5523 17 34 16.5523 34 16V2C34 1.44772 33.5523 1 33 1H10.2445C9.99693 1 9.75813 1.09186 9.57436 1.25779L1.82198 8.25779C1.38221 8.65488 1.38221 9.34512 1.82198 9.7422Z"
+                  stroke="#2E3338"
+                  strokeWidth="3"
+                  style={Object {}}
+                />
+                <path
+                  d="M17 5L25 13M17 13L25 5"
+                  stroke="#2E3338"
+                  strokeWidth="3"
+                  style={Object {}}
+                />
+              </svg>
+            </View>
+          </View>
         </View>
       </View>
     </View>
   </RCTScrollView>
   <View
-    accessible={true}
-    focusable={true}
-    onClick={[Function]}
-    onResponderGrant={[Function]}
-    onResponderMove={[Function]}
-    onResponderRelease={[Function]}
-    onResponderTerminate={[Function]}
-    onResponderTerminationRequest={[Function]}
-    onStartShouldSetResponder={[Function]}
     style={
       Array [
         Object {
-          "borderTopColor": "rgba(0, 0, 0, 0.05)",
-          "borderTopWidth": 1,
+          "flexDirection": "column",
         },
         Object {
-          "display": "flex",
-          "flexDirection": "row",
+          "paddingVertical": 16,
         },
       ]
     }
@@ -479,218 +601,51 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
     <View
       style={
         Object {
-          "flex": 1,
+          "borderRadius": 100,
+          "overflow": "hidden",
         }
       }
     >
       <View
+        accessible={true}
+        focusable={false}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackground",
+            "type": "ThemeAttrAndroid",
+          }
+        }
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
         style={
-          Array [
-            Object {
-              "alignItems": "center",
-              "borderRadius": 3,
-              "flexDirection": "row",
-            },
-            null,
-            null,
-            undefined,
-            Object {
-              "backgroundColor": "#A3EBC6",
-            },
-          ]
+          Object {
+            "alignItems": "center",
+            "backgroundColor": "#F5F4F0",
+            "flexGrow": 1,
+            "height": 48,
+            "justifyContent": "center",
+            "paddingHorizontal": 16,
+            "paddingVertical": 5,
+          }
         }
       >
-        <View
-          accessible={true}
-          focusable={false}
-          nativeBackgroundAndroid={
-            Object {
-              "attribute": "selectableItemBackground",
-              "type": "ThemeAttrAndroid",
-            }
-          }
-          onClick={[Function]}
-          onResponderGrant={[Function]}
-          onResponderMove={[Function]}
-          onResponderRelease={[Function]}
-          onResponderTerminate={[Function]}
-          onResponderTerminationRequest={[Function]}
-          onStartShouldSetResponder={[Function]}
+        <Text
           style={
-            Array [
-              Object {
-                "alignItems": "center",
-                "flex": 1,
-                "justifyContent": "center",
-              },
-              Object {
-                "backgroundColor": "#A3EBC6",
-              },
-              Object {
-                "height": 50,
-              },
-              Object {
-                "borderWidth": 0,
-              },
-            ]
+            Object {
+              "color": "#9CA4A9",
+              "fontFamily": "Inter-SemiBold",
+              "fontSize": 16,
+              "lineHeight": 22,
+            }
           }
-          testID="Request"
         >
-          <View
-            style={
-              Object {
-                "alignItems": "center",
-                "flex": 1,
-                "flexDirection": "row",
-                "justifyContent": "space-between",
-              }
-            }
-          >
-            <Text
-              accessibilityLabel="request"
-              style={
-                Array [
-                  Object {
-                    "fontFamily": "Hind-SemiBold",
-                    "fontSize": 16,
-                  },
-                  Object {
-                    "color": "#FFFFFF",
-                  },
-                  Object {
-                    "paddingLeft": 5,
-                    "paddingRight": 5,
-                  },
-                ]
-              }
-            >
-              request
-            </Text>
-          </View>
-        </View>
-      </View>
-    </View>
-    <View
-      style={
-        Array [
-          Object {
-            "display": "flex",
-            "flexDirection": "column",
-            "height": 50,
-            "justifyContent": "space-around",
-          },
-          Object {
-            "backgroundColor": "#A3EBC6",
-          },
-        ]
-      }
-    >
-      <View
-        style={
-          Array [
-            Object {
-              "height": 40,
-              "width": 2,
-            },
-            Object {
-              "backgroundColor": "#5ee8ae",
-            },
-          ]
-        }
-      />
-    </View>
-    <View
-      style={
-        Object {
-          "flex": 1,
-        }
-      }
-    >
-      <View
-        style={
-          Array [
-            Object {
-              "alignItems": "center",
-              "borderRadius": 3,
-              "flexDirection": "row",
-            },
-            null,
-            null,
-            undefined,
-            Object {
-              "backgroundColor": "#A3EBC6",
-            },
-          ]
-        }
-      >
-        <View
-          accessible={true}
-          focusable={false}
-          nativeBackgroundAndroid={
-            Object {
-              "attribute": "selectableItemBackground",
-              "type": "ThemeAttrAndroid",
-            }
-          }
-          onClick={[Function]}
-          onResponderGrant={[Function]}
-          onResponderMove={[Function]}
-          onResponderRelease={[Function]}
-          onResponderTerminate={[Function]}
-          onResponderTerminationRequest={[Function]}
-          onStartShouldSetResponder={[Function]}
-          style={
-            Array [
-              Object {
-                "alignItems": "center",
-                "flex": 1,
-                "justifyContent": "center",
-              },
-              Object {
-                "backgroundColor": "#A3EBC6",
-              },
-              Object {
-                "height": 50,
-              },
-              Object {
-                "borderWidth": 0,
-              },
-            ]
-          }
-          testID="Send"
-        >
-          <View
-            style={
-              Object {
-                "alignItems": "center",
-                "flex": 1,
-                "flexDirection": "row",
-                "justifyContent": "space-between",
-              }
-            }
-          >
-            <Text
-              accessibilityLabel="send"
-              style={
-                Array [
-                  Object {
-                    "fontFamily": "Hind-SemiBold",
-                    "fontSize": 16,
-                  },
-                  Object {
-                    "color": "#FFFFFF",
-                  },
-                  Object {
-                    "paddingLeft": 5,
-                    "paddingRight": 5,
-                  },
-                ]
-              }
-            >
-              send
-            </Text>
-          </View>
-        </View>
+          review
+        </Text>
       </View>
     </View>
   </View>

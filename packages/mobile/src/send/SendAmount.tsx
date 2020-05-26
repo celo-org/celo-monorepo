@@ -1,11 +1,6 @@
 import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button.v2'
-import { dailyAmountRemaining, isPaymentLimitReached, getFeeType } from 'src/send/utils'
-import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
-import LoadingLabel from '@celo/react-components/components/LoadingLabel'
 import NumberKeypad from '@celo/react-components/components/NumberKeypad'
-import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
-import { componentStyles } from '@celo/react-components/styles/styles'
 import variables from '@celo/react-components/styles/variables'
 import { parseInputAmount } from '@celo/utils/src/parsing'
 import { StackScreenProps } from '@react-navigation/stack'
@@ -15,7 +10,7 @@ import { useTranslation, WithTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import { getNumberFormatSettings } from 'react-native-localize'
 import SafeAreaView from 'react-native-safe-area-view'
-import { connect } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { hideAlert, showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
@@ -27,14 +22,15 @@ import {
   NUMBER_INPUT_MAX_DECIMALS,
 } from 'src/config'
 import { getFeeEstimateDollars } from 'src/fees/selectors'
-import { Namespaces, withTranslation } from 'src/i18n'
+import { Namespaces } from 'src/i18n'
+import { fetchAddressesAndValidate } from 'src/identity/actions'
 import {
-  e164NumberToAddressSelector,
-  secureSendPhoneNumberMappingSelector,
   AddressValidationType,
+  e164NumberToAddressSelector,
   RecipientVerificationStatus,
+  secureSendPhoneNumberMappingSelector,
 } from 'src/identity/reducer'
-import { getAddressValidationType, checkIfAddressValidationRequired } from 'src/identity/secureSend'
+import { getAddressValidationType } from 'src/identity/secureSend'
 import {
   convertDollarsToLocalAmount,
   convertDollarsToMaxSupportedPrecision,
@@ -45,16 +41,15 @@ import {
   getLocalCurrencyExchangeRate,
   getLocalCurrencySymbol,
 } from 'src/localCurrency/selectors'
-// import { navigate } from 'src/navigator/NavigationService'
+import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 import { getRecipientVerificationStatus, Recipient } from 'src/recipients/recipient'
-import { RootState } from 'src/redux/reducers'
 import useSelector from 'src/redux/useSelector'
-import { useDispatch } from 'react-redux'
 import { getRecentPayments } from 'src/send/selectors'
+import { dailyAmountRemaining, getFeeType, isPaymentLimitReached } from 'src/send/utils'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
-// import { fetchDollarBalance } from 'src/stableToken/actions'
+import { fetchDollarBalance } from 'src/stableToken/actions'
 import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
 
 export interface TransactionDataInput {
@@ -70,13 +65,30 @@ type Props = RouteProps & WithTranslation
 const { decimalSeparator } = getNumberFormatSettings()
 
 function SendAmount(props: Props) {
-  const { t } = useTranslation(Namespaces.sendFlow7)
   const dispatch = useDispatch()
+
+  const isRequest = props.route.params?.isRequest ?? false
+  const recipient = props.route.params?.recipient
+
+  React.useEffect(() => {
+    dispatch(fetchDollarBalance())
+    if (recipient.e164PhoneNumber) {
+      dispatch(fetchAddressesAndValidate(recipient.e164PhoneNumber))
+    }
+  }, [])
+
+  const { t } = useTranslation(Namespaces.sendFlow7)
+
+  const [amount, setAmount] = React.useState('')
 
   const localCurrencyCode = useSelector(getLocalCurrencyCode)
   const localCurrencyExchangeRate = useSelector(getLocalCurrencyExchangeRate)
   const localCurrencySymbol = useSelector(getLocalCurrencySymbol)
-  const [amount, setAmount] = React.useState('')
+  const e164NumberToAddress = useSelector(e164NumberToAddressSelector)
+  const dollarBalance = useSelector(stableTokenBalanceSelector)
+  const recipientVerificationStatus = getRecipientVerificationStatus(recipient, e164NumberToAddress)
+  const feeType = getFeeType(recipientVerificationStatus)
+  const estimateFeeDollars = useSelector(getFeeEstimateDollars(feeType))
 
   const maxLength = React.useMemo(() => {
     const decimalPos = amount.indexOf(decimalSeparator ?? '.')
@@ -108,8 +120,6 @@ function SendAmount(props: Props) {
     }
   }, [amount, setAmount])
 
-  const isRequest = props.route.params?.isRequest ?? false
-
   const getDollarAmount = React.useCallback(
     (localAmount: BigNumber.Value) => {
       const dollarsAmount =
@@ -119,13 +129,6 @@ function SendAmount(props: Props) {
     },
     [localCurrencyExchangeRate]
   )
-
-  const e164NumberToAddress = useSelector(e164NumberToAddressSelector)
-  const recipient = props.route.params?.recipient
-  const recipientVerificationStatus = getRecipientVerificationStatus(recipient, e164NumberToAddress)
-  const dollarBalance = useSelector(stableTokenBalanceSelector)
-  const feeType = getFeeType(recipientVerificationStatus)
-  const estimateFeeDollars = useSelector(getFeeEstimateDollars(feeType))
 
   const parsedLocalAmount = parseInputAmount(amount, decimalSeparator)
   const dollarAmount = getDollarAmount(parsedLocalAmount)
@@ -137,8 +140,6 @@ function SendAmount(props: Props) {
   const isAmountValid = parsedLocalAmount.isGreaterThanOrEqualTo(DOLLAR_TRANSACTION_MIN_AMOUNT)
   const isDollarBalanceSufficient = isAmountValid && newAccountBalance.isGreaterThanOrEqualTo(0)
 
-  console.log(isAmountValid, isDollarBalanceSufficient, dollarBalance)
-
   const reviewBtnDisabled =
     !isAmountValid ||
     (isRequest
@@ -146,7 +147,7 @@ function SendAmount(props: Props) {
       : recipientVerificationStatus === RecipientVerificationStatus.UNKNOWN)
 
   const secureSendPhoneNumberMapping = useSelector(secureSendPhoneNumberMappingSelector)
-  const addressValidationType: AddressValidationType = checkIfAddressValidationRequired(
+  const addressValidationType: AddressValidationType = getAddressValidationType(
     recipient,
     secureSendPhoneNumberMapping
   )
@@ -211,17 +212,36 @@ function SendAmount(props: Props) {
     dispatch(hideAlert())
 
     if (addressValidationType !== AddressValidationType.NONE) {
-      console.log(Screens.ValidateRecipientIntro, {
+      navigate(Screens.ValidateRecipientIntro, {
         transactionData,
         addressValidationType,
       })
     } else {
       CeloAnalytics.track(CustomEventNames.send_continue)
-      console.log(Screens.SendConfirmation, { transactionData })
+      navigate(Screens.SendConfirmation, { transactionData })
     }
-  }, [recipientVerificationStatus, addressValidationType])
+  }, [
+    recipientVerificationStatus,
+    addressValidationType,
+    recentPayments,
+    dollarAmount,
+    getTransactionData,
+  ])
 
-  const onRequest = React.useCallback(() => {}, [])
+  const onRequest = React.useCallback(() => {
+    const transactionData = getTransactionData(TokenTransactionType.PayRequest)
+
+    if (addressValidationType !== AddressValidationType.NONE) {
+      navigate(Screens.ValidateRecipientIntro, {
+        transactionData,
+        addressValidationType,
+        isPaymentRequest: true,
+      })
+    } else {
+      CeloAnalytics.track(CustomEventNames.request_payment_continue)
+      navigate(Screens.PaymentRequestConfirmation, { transactionData })
+    }
+  }, [addressValidationType, getTransactionData])
 
   return (
     <SafeAreaView style={styles.paddedContainer}>
