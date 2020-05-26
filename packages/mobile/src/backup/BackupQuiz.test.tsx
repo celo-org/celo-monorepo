@@ -5,7 +5,13 @@ import * as renderer from 'react-test-renderer'
 import BackupQuiz, { BackupQuiz as BackupQuizRaw } from 'src/backup/BackupQuiz'
 import { Screens } from 'src/navigator/Screens'
 import { createMockStore, getMockI18nProps, getMockStackScreenProps } from 'test/utils'
-import { mockMnemonic } from 'test/values'
+import { mockMnemonic, mockMnemonicShard1, mockNavigation } from 'test/values'
+
+const mockRoute = {
+  name: Screens.BackupQuiz as Screens.BackupQuiz,
+  key: '1',
+  params: { mnemonic: mockMnemonicShard1 },
+}
 
 jest.mock('lodash', () => ({
   ...jest.requireActual('lodash'),
