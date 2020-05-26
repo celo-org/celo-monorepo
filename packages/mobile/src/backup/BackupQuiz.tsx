@@ -28,7 +28,7 @@ const TAG = 'backup/BackupQuiz'
 
 const MNEMONIC_BUTTONS_TO_DISPLAY = 6
 
-// miliseconds
+// miliseconds to wait until showing success or failure
 const CHECKING_DURATION = 1.8 * 1000
 
 export enum Mode {
