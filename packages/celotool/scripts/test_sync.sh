@@ -22,6 +22,14 @@ fi
 forno_url=https://${network}-forno.$CLUSTER_DOMAIN_NAME.org
 node_pod="${network}-${namespace}-${syncmode}-node-0"
 
+check_synced_false() {
+  local syncstatus=$(kubectl -n ${namespace} exec -it ${node_pod} -- geth attach --exec 'eth.syncing' | $aliassed -r "s/\x1B\[([0-9]{1,3}(;[0-9]{1,2})?)?[mGK]//g" | tr -d '\r')
+  if [ "${syncstatus}" == "false" ]; then
+    echo "Node synced"
+    exit 0
+  fi
+}
+
 test_sync_blocknumber() {
   local target=$(curl -X POST -s --data '{"jsonrpc":"2.0","method":"eth_blockNumber","params":[],"id":1}' ${forno_url} -H 'Content-Type: application/json' | jq -r .result)
   target=$((target))
@@ -75,12 +83,13 @@ test_syn_syncing() {
 
   synced=false
   syncing=true
-  local loop_time="90"
+  local loop_time="60"
   local max_tries=10
   local tries=max_tries
   while [ "$synced" != "true" ] && [ "$syncing" == "true" ]; do
     echo "Sleeping ${loop_time}"
     sleep $loop_time
+    check_synced_false
     current=$(kubectl -n "${namespace}" exec -it "${node_pod}" -- geth attach --exec 'eth.syncing' | grep currentBlock | cut -d' ' -f4 | tr -d ',' | $aliassed -r "s/\x1B\[([0-9]{1,3}(;[0-9]{1,2})?)?[mGK]//g")
     current=${current//[$'\t\r\n ']}
     
@@ -108,6 +117,7 @@ test_syn_syncing() {
 while [[ $(kubectl get pods -n ${namespace} "${node_pod}" -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}') != "True" ]]; do echo "waiting for pod" && sleep 10; done
 sleep 60
 
+check_synced_false
 case ${syncmode} in
   full)
     test_syn_syncing
