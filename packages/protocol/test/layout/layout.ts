@@ -45,12 +45,18 @@ const testCases = {
   appended_in_parent: getTestArtifacts('appended_in_parent'),
   removed: getTestArtifacts('removed'),
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> Add typechange tests
   typechange: getTestArtifacts('typechange'),
   typechange_in_struct: getTestArtifacts('typechange_in_struct'),
   typechange_in_parent: getTestArtifacts('typechange_in_parent'),
   typechange_in_library_struct: getTestArtifacts('typechange_in_library_struct'),
+<<<<<<< HEAD
 =======
 >>>>>>> Add tests
+=======
+>>>>>>> Add typechange tests
   removed_from_struct: getTestArtifacts('removed_from_struct'),
   removed_from_parent: getTestArtifacts('removed_from_parent'),
   inserted_in_struct: getTestArtifacts('inserted_in_struct'),
@@ -403,6 +409,25 @@ describe('#reportLayoutIncompatibilities()', () => {
       assertNotCompatible(report)
       assertContractErrorsMatch(report, 'TestContract', [/removed/])
 >>>>>>> Add tests
+    })
+  })
+
+  describe(`when a variable's type changes in a contract`, () => {
+    it('reports a typechanged variable', () => {
+      const report = reportLayoutIncompatibilities(testCases.original, testCases.typechange)
+      assertNotCompatible(report)
+      assertContractErrorsMatch(report, 'TestContract', [/had type/])
+    })
+  })
+
+  describe(`when a variable's type changes in a parent contract`, () => {
+    it('reports a typechanged variable', () => {
+      const report = reportLayoutIncompatibilities(
+        testCases.original,
+        testCases.typechange_in_parent
+      )
+      assertNotCompatible(report)
+      assertContractErrorsMatch(report, 'TestContract', [/had type/])
     })
   })
 })
