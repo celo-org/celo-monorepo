@@ -8,12 +8,11 @@ import { AddressValidationType, E164NumberToAddressType } from 'src/identity/red
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import SendAmount from 'src/send/SendAmount'
-import { createMockStore } from 'test/utils'
+import { createMockStore, getMockStackScreenProps } from 'test/utils'
 import {
   mockAccount2Invite,
   mockAccountInvite,
   mockE164NumberInvite,
-  mockNavigation,
   mockTransactionData,
 } from 'test/values'
 
@@ -36,13 +35,9 @@ const storeData = {
 const TEXT_PLACEHOLDER = 'groceriesRent'
 const AMOUNT_PLACEHOLDER = 'amount'
 
-const mockRoute = {
-  name: Screens.SendAmount as Screens.SendAmount,
-  key: '1',
-  params: {
-    recipient: mockTransactionData.recipient,
-  },
-}
+const mockScreenProps = getMockStackScreenProps(Screens.SendAmount, {
+  recipient: mockTransactionData.recipient,
+})
 
 describe('SendAmount', () => {
   beforeAll(() => {
@@ -54,7 +49,7 @@ describe('SendAmount', () => {
     const getWrapper = () =>
       render(
         <Provider store={store}>
-          <SendAmount navigation={mockNavigation} route={mockRoute} />
+          <SendAmount {...mockScreenProps} />
         </Provider>
       )
 
@@ -72,7 +67,7 @@ describe('SendAmount', () => {
     const getWrapper = () =>
       render(
         <Provider store={store}>
-          <SendAmount navigation={mockNavigation} route={mockRoute} />
+          <SendAmount {...mockScreenProps} />
         </Provider>
       )
 
@@ -109,7 +104,7 @@ describe('SendAmount', () => {
       const store = createMockStore(storeData)
       const wrapper = render(
         <Provider store={store}>
-          <SendAmount navigation={mockNavigation} route={mockRoute} />
+          <SendAmount {...mockScreenProps} />
         </Provider>
       )
 
@@ -138,7 +133,7 @@ describe('SendAmount', () => {
       const store = createMockStore(storeData)
       const wrapper = render(
         <Provider store={store}>
-          <SendAmount navigation={mockNavigation} route={mockRoute} />
+          <SendAmount {...mockScreenProps} />
         </Provider>
       )
 
@@ -157,7 +152,7 @@ describe('SendAmount', () => {
     })
     const tree = render(
       <Provider store={store}>
-        <SendAmount navigation={mockNavigation} route={mockRoute} />
+        <SendAmount {...mockScreenProps} />
       </Provider>
     )
     expect(tree).toMatchSnapshot()
@@ -188,7 +183,7 @@ describe('SendAmount', () => {
 
       const tree = render(
         <Provider store={store}>
-          <SendAmount navigation={mockNavigation} route={mockRoute} />
+          <SendAmount {...mockScreenProps} />
         </Provider>
       )
       const input = tree.getByPlaceholder(AMOUNT_PLACEHOLDER)
@@ -217,7 +212,7 @@ describe('SendAmount', () => {
 
       const tree = render(
         <Provider store={store}>
-          <SendAmount navigation={mockNavigation} route={mockRoute} />
+          <SendAmount {...mockScreenProps} />
         </Provider>
       )
       const input = tree.getByPlaceholder(AMOUNT_PLACEHOLDER)
@@ -246,7 +241,7 @@ describe('SendAmount', () => {
 
       const tree = render(
         <Provider store={store}>
-          <SendAmount navigation={mockNavigation} route={mockRoute} />
+          <SendAmount {...mockScreenProps} />
         </Provider>
       )
       const input = tree.getByPlaceholder(AMOUNT_PLACEHOLDER)
@@ -277,7 +272,7 @@ describe('SendAmount', () => {
 
       const tree = render(
         <Provider store={store}>
-          <SendAmount navigation={mockNavigation} route={mockRoute} />
+          <SendAmount {...mockScreenProps} />
         </Provider>
       )
       const input = tree.getByPlaceholder(AMOUNT_PLACEHOLDER)

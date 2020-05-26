@@ -5,20 +5,14 @@ import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
 import InviteReviewConnected, { InviteReview } from 'src/account/InviteReview'
 import { Screens } from 'src/navigator/Screens'
-import { createMockStore, getMockI18nProps } from 'test/utils'
-import { mockNavigation, mockRecipient } from 'test/values'
+import { createMockStore, getMockI18nProps, getMockStackScreenProps } from 'test/utils'
+import { mockRecipient } from 'test/values'
 
 jest.mock('src/geth/GethAwareButton', () => {
   return mockButton
 })
 
-const mockRoute = {
-  name: Screens.InviteReview as Screens.InviteReview,
-  key: '1',
-  params: {
-    recipient: mockRecipient,
-  },
-}
+const mockScreenProps = getMockStackScreenProps(Screens.InviteReview, { recipient: mockRecipient })
 
 describe('InviteReview', () => {
   beforeAll(() => {
@@ -32,7 +26,7 @@ describe('InviteReview', () => {
   it('renders correctly', () => {
     const tree = renderer.create(
       <Provider store={createMockStore()}>
-        <InviteReviewConnected navigation={mockNavigation} route={mockRoute} />
+        <InviteReviewConnected {...mockScreenProps} />
       </Provider>
     )
     expect(tree).toMatchSnapshot()
@@ -55,8 +49,7 @@ describe('InviteReview', () => {
           showError={jest.fn()}
           sendInvite={sendInvite}
           {...getMockI18nProps()}
-          navigation={mockNavigation}
-          route={mockRoute}
+          {...mockScreenProps}
         />
       </Provider>
     )
