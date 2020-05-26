@@ -2,7 +2,7 @@ import * as React from 'react'
 import { Text, View } from 'react-native'
 import { brandStyles } from 'src/eventkit/common/constants'
 import Page, { ROOT } from 'src/eventkit/common/Page'
-import { H1, H4 } from 'src/fonts/Fonts'
+import { H1, H4, Li, Ul } from 'src/fonts/Fonts'
 import { I18nProps, NameSpaces, Trans, withNamespaces } from 'src/i18n'
 import InlineAnchor from 'src/shared/InlineAnchor'
 import menuItems, { hashNav } from 'src/shared/menu-items'
@@ -15,7 +15,7 @@ export default React.memo(
         <Page
           title="Home"
           path={ROOT}
-          metaDescription={t('home.introduction')}
+          metaDescription={t('flavor.introduction')}
           sections={[{ id: hashNav.eventsIntro.overview, children: <Overview /> }]}
         />
       </>
@@ -26,20 +26,23 @@ export default React.memo(
 const Overview = withNamespaces(NameSpaces.events)(function _Overview({ t }: I18nProps) {
   return (
     <View style={brandStyles.gap}>
-      <H1 style={standardStyles.elementalMarginBottom}>{t('home.title')}</H1>
-      <H4 style={standardStyles.blockMarginBottom}>{t('home.introduction')}</H4>
+      <H1 style={standardStyles.elementalMarginBottom}>{t('flavor.title')}</H1>
 
-      <Text style={[fonts.h5, standardStyles.elementalMarginBottom]}>{t('home.useageTitle')}</Text>
-      <Text style={[fonts.p, standardStyles.elementalMarginBottom]}>{t('home.useageText')}</Text>
-
-      <Text style={[fonts.h5, standardStyles.elementalMargin]}>{t('home.importantRemember')}</Text>
-      <Text style={[fonts.p, standardStyles.elementalMarginBottom]}>
-        <Trans ns={NameSpaces.events} i18nKey="home.importantRememberText">
-          {/* TODO: Use correct link */}
-          <InlineAnchor href={menuItems.CODE_OF_CONDUCT.link}>
-            Community Code Of Conduct
-          </InlineAnchor>
-        </Trans>
+      <Text style={fonts.p}>{t('flavor.introduction')}</Text>
+      <Text style={fonts.p}>
+        {t('flavor.introductionP2')}
+        <Ul>
+          <Trans ns={NameSpaces.brand} i18nKey={'flavor.introductionBullets'}>
+            <Li>{}</Li>
+            <Ul>
+              <Li>{}</Li>
+              <Li>{}</Li>
+            </Ul>
+            <Li>{}</Li>
+            <Li>{}</Li>
+            <Li>{}</Li>
+          </Trans>
+        </Ul>
       </Text>
     </View>
   )
