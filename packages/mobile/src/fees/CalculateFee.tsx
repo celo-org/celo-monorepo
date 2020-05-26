@@ -23,7 +23,7 @@ interface InviteProps extends CommonProps {
   feeType: FeeType.INVITE
   account: string
   amount: BigNumber
-  comment: string
+  comment?: string
 }
 
 interface SendProps extends CommonProps {
@@ -31,7 +31,7 @@ interface SendProps extends CommonProps {
   account: string
   recipientAddress: string
   amount: BigNumber
-  comment: string
+  comment?: string
 }
 
 interface ExchangeProps extends CommonProps {
@@ -56,6 +56,12 @@ export type PropsWithoutChildren =
 
 type Props = InviteProps | SendProps | ExchangeProps | ReclaimEscrowProps
 
+// Max lengthed comment to fetch fee estimate before user finalizes comment
+const MAX_PLACEHOLDER_COMMENT: string = new Array(7)
+  .fill(null)
+  .map(() => '0123456789')
+  .join('')
+
 function useAsyncShowError<R, Args extends any[]>(
   asyncFunction: ((...args: Args) => Promise<R>) | (() => Promise<R>),
   params: Args
@@ -76,7 +82,7 @@ function useAsyncShowError<R, Args extends any[]>(
 
 const CalculateInviteFee: FunctionComponent<InviteProps> = (props) => {
   const asyncResult = useAsyncShowError(
-    (account: string, amount: BigNumber, comment: string) =>
+    (account: string, amount: BigNumber, comment: string = MAX_PLACEHOLDER_COMMENT) =>
       getInviteFee(account, CURRENCY_ENUM.DOLLAR, amount.valueOf(), comment),
     [props.account, props.amount, props.comment]
   )
@@ -85,7 +91,12 @@ const CalculateInviteFee: FunctionComponent<InviteProps> = (props) => {
 
 const CalculateSendFee: FunctionComponent<SendProps> = (props) => {
   const asyncResult = useAsyncShowError(
-    (account: string, recipientAddress: string, amount: BigNumber, comment: string) =>
+    (
+      account: string,
+      recipientAddress: string,
+      amount: BigNumber,
+      comment: string = MAX_PLACEHOLDER_COMMENT
+    ) =>
       getSendFee(account, CURRENCY_ENUM.DOLLAR, {
         recipientAddress,
         amount: amount.valueOf(),

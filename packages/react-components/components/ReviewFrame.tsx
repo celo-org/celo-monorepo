@@ -15,8 +15,9 @@ interface Props extends ViewProps {
   confirmButton?: ButtonProps
   modifyButton?: ButtonProps
   HeaderComponent?: React.ComponentType<any>
-  FooterComponent?: React.ComponentType<any>
+  FooterComponent?: React.FunctionComponent
   shouldReset?: boolean
+  isSending?: boolean
 }
 
 interface State {
@@ -42,11 +43,12 @@ class ReviewFrame extends React.PureComponent<Props, State> {
   }
 
   renderButtons = () => {
-    const { navigateBack, confirmButton, modifyButton, FooterComponent } = this.props
+    const { navigateBack, confirmButton, modifyButton, FooterComponent, isSending } = this.props
 
     if (confirmButton || modifyButton) {
       return (
         <View style={styles.bottomButtonStyle}>
+          {isSending && <ActivityIndicator size="large" color={colors.celoGreen} />}
           {confirmButton && (
             <Button
               onPress={this.onConfirm}
@@ -107,7 +109,7 @@ const styles = StyleSheet.create({
   },
   scrollViewContentContainer: {
     paddingVertical: 10,
-    justifyContent: 'flex-start',
+    justifyContent: 'space-between',
   },
   confirmationContainer: {
     marginVertical: 20,

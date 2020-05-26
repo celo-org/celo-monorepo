@@ -15,7 +15,7 @@
   "amount": "Amount",
   "celoDollarAmount": "<0></0> {{CeloDollar}}",
   "celoDollarAmount_plural": "<0></0> {{CeloDollars}}",
-  "groceriesRent": "Groceries, rent, etc. (Optional)",
+  "addDescription": "Add description",
   "fee": "Fee",
   "securityFee": "Security Fee",
   "inviteFee": "Invitation Fee",

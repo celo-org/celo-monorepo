@@ -1,7 +1,6 @@
 import ReviewFrame from '@celo/react-components/components/ReviewFrame'
 import ReviewHeader from '@celo/react-components/components/ReviewHeader'
 import TextButton from '@celo/react-components/components/TextButton.v2'
-import withTextInputLabeling from '@celo/react-components/components/WithTextInputLabeling'
 import colors from '@celo/react-components/styles/colors.v2'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import { componentStyles } from '@celo/react-components/styles/styles'
@@ -10,7 +9,7 @@ import { StackScreenProps } from '@react-navigation/stack'
 import { TFunction } from 'i18next'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
-import { ActivityIndicator, StyleSheet, Text, TextInput, TextInputProps, View } from 'react-native'
+import { StyleSheet, Text, TextInput, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
@@ -47,8 +46,6 @@ import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { fetchDollarBalance } from 'src/stableToken/actions'
 import Logger from 'src/utils/Logger'
 import { currentAccountSelector } from 'src/web3/selectors'
-
-const CommentInput = withTextInputLabeling<TextInputProps>(TextInput)
 
 interface StateProps {
   account: string | null
@@ -145,6 +142,15 @@ export class SendConfirmation extends React.Component<Props, State> {
     reason: '',
   }
 
+  reasonInputRef: React.RefObject<TextInput> = React.createRef()
+
+  reasonInputIsFocused = () => {
+    if (this.reasonInputRef && this.reasonInputRef.current) {
+      return this.reasonInputRef.current.isFocused()
+    }
+    return false
+  }
+
   async componentDidMount() {
     const { addressJustValidated, t } = this.props
     this.props.fetchDollarBalance()
@@ -166,11 +172,11 @@ export class SendConfirmation extends React.Component<Props, State> {
   sendOrInvite = (inviteMethod?: InviteBy) => {
     const {
       amount,
-      reason,
       recipient,
       recipientAddress,
       firebasePendingRequestUid,
     } = this.props.confirmationInput
+    const { reason } = this.state
 
     const timestamp = Date.now()
 
@@ -223,11 +229,6 @@ export class SendConfirmation extends React.Component<Props, State> {
     return <ReviewHeader title={title} />
   }
 
-  renderFooter = () => {
-    // Replace with activity indicator inside of a full button
-    return this.props.isSending ? <ActivityIndicator size="large" color={colors.celoGreen} /> : null
-  }
-
   showModal = () => {
     this.setState({ modalVisible: true })
   }
@@ -265,34 +266,21 @@ export class SendConfirmation extends React.Component<Props, State> {
       confirmationInput,
       validatedRecipientAddress,
     } = this.props
-    const { amount, reason, recipient, recipientAddress, type } = confirmationInput
+    const { amount, recipient, recipientAddress, type } = confirmationInput
 
     const fee = getFeeDollars(asyncFee.result)
     const amountWithFee = amount.plus(fee || 0)
     const userHasEnough = !asyncFee.loading && amountWithFee.isLessThanOrEqualTo(dollarBalance)
     const isPrimaryButtonDisabled = isSending || !userHasEnough || !appConnected || !!asyncFee.error
-    const isInvite = type === TokenTransactionType.InviteSent
+
     const inviteFee = getInvitationVerificationFeeInDollars()
     const inviteFeeAmount = {
       value: inviteFee,
       currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
     }
 
-    // 'fee' already contains the invitation fee for invites
-    // so we adjust it here
-    const securityFee = isInvite && fee ? fee.minus(inviteFee) : fee
-
-    const securityFeeAmount = securityFee && {
-      value: securityFee,
-      currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
-    }
     const subtotalAmount = amount.isGreaterThan(0) && {
       value: amount,
-      currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
-    }
-
-    const totalAmount = {
-      value: amount.plus(fee || 0),
       currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
     }
 
@@ -311,83 +299,108 @@ export class SendConfirmation extends React.Component<Props, State> {
       }
     }
 
+    const renderFeeContainer = () => {
+      const isInvite = type === TokenTransactionType.InviteSent
+
+      // 'fee' already contains the invitation fee for invites
+      // so we adjust it here
+      const securityFee = isInvite && fee ? fee.minus(inviteFee) : fee
+
+      const securityFeeAmount = securityFee && {
+        value: securityFee,
+        currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
+      }
+
+      const totalAmount = {
+        value: amountWithFee,
+        currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
+      }
+
+      // Replace fee lines with a fee drawer
+      return (
+        <View>
+          {subtotalAmount && (
+            <LineItemRow
+              title={t('global:subtotal')}
+              amount={<CurrencyDisplay amount={subtotalAmount} />}
+            />
+          )}
+          {isInvite && (
+            <LineItemRow
+              title={t('inviteFee')}
+              amount={<CurrencyDisplay amount={inviteFeeAmount} />}
+            />
+          )}
+          <LineItemRow
+            title={t('securityFee')}
+            titleIcon={<FeeIcon />}
+            amount={
+              securityFeeAmount && (
+                <CurrencyDisplay amount={securityFeeAmount} formatType={FormatType.Fee} />
+              )
+            }
+            isLoading={asyncFee.loading}
+            hasError={!!asyncFee.error}
+          />
+          {/* <HorizontalLine /> */}
+          <TotalLineItem amount={totalAmount} />
+        </View>
+      )
+    }
+
     return (
       <SafeAreaView style={styles.container}>
         <DisconnectBanner />
         <ReviewFrame
-          FooterComponent={this.renderFooter}
+          FooterComponent={renderFeeContainer}
           confirmButton={primaryBtnInfo}
           shouldReset={this.state.buttonReset}
+          isSending={this.props.isSending}
         >
           <View style={styles.transferContainer}>
             <View style={styles.headerContainer}>
-              <ContactCircle
-                thumbnailPath={getRecipientThumbnail(recipient)}
-                address={recipientAddress || ''}
-              />
-              <View style={styles.recipientInfoContainer}>
-                <Text style={styles.headerText}>Sending</Text>
-                <Text style={styles.displayName}>
-                  {getDisplayName({ recipient, recipientAddress, t })}
-                </Text>
-                {validatedRecipientAddress && (
-                  <View style={styles.editContainer}>
-                    <Text style={styles.address}>{`${validatedRecipientAddress.slice(
-                      0,
-                      6
-                    )}...${validatedRecipientAddress.slice(-4)}`}</Text>
-                    <TextButton
-                      style={styles.editButton}
-                      testID={'accountEditButton'}
-                      onPress={this.onEditAddressClick}
-                    >
-                      {t('edit')}
-                    </TextButton>
-                  </View>
-                )}
+              <View style={styles.thumbnailContainer}>
+                <ContactCircle
+                  thumbnailPath={getRecipientThumbnail(recipient)}
+                  address={recipientAddress || ''}
+                />
+                <View style={styles.recipientInfoContainer}>
+                  <Text style={styles.headerText}>Sending</Text>
+                  <Text style={styles.displayName}>
+                    {getDisplayName({ recipient, recipientAddress, t })}
+                  </Text>
+                  {validatedRecipientAddress && (
+                    <View style={styles.editContainer}>
+                      <Text style={styles.address}>{`${validatedRecipientAddress.slice(
+                        0,
+                        6
+                      )}...${validatedRecipientAddress.slice(-4)}`}</Text>
+                      <TextButton
+                        style={styles.editButton}
+                        testID={'accountEditButton'}
+                        onPress={this.onEditAddressClick}
+                      >
+                        {t('edit')}
+                      </TextButton>
+                    </View>
+                  )}
+                </View>
               </View>
-            </View>
-            <CurrencyDisplay
-              type={DisplayType.Big}
-              style={styles.amount}
-              amount={subtotalAmount || inviteFeeAmount}
-            />
-            <CommentInput
-              title={t('global:for')}
-              placeholder={t('groceriesRent')}
-              value={this.state.reason}
-              maxLength={MAX_COMMENT_LENGTH}
-              onChangeText={this.onReasonChanged}
-            />
-            <View style={styles.bottomContainer}>
-              {!!reason && <Text style={styles.comment}>{reason}</Text>}
-              {/* Replace with the fee drawer */}
-              {/* <HorizontalLine />
-        {subtotalAmount && (
-          <LineItemRow
-            title={t('global:subtotal')}
-            amount={<CurrencyDisplay amount={subtotalAmount} />}
-          />
-        )}
-        {isInvite && (
-          <LineItemRow
-            title={t('inviteFee')}
-            amount={<CurrencyDisplay amount={inviteFeeAmount} />}
-          />
-        )} */}
-              <LineItemRow
-                title={t('securityFee')}
-                titleIcon={<FeeIcon />}
-                amount={
-                  securityFeeAmount && (
-                    <CurrencyDisplay amount={securityFeeAmount} formatType={FormatType.Fee} />
-                  )
-                }
-                isLoading={asyncFee.loading}
-                hasError={!!asyncFee.error}
+              <CurrencyDisplay
+                type={DisplayType.Big}
+                style={styles.amount}
+                amount={subtotalAmount || inviteFeeAmount}
               />
-              {/* <HorizontalLine /> */}
-              <TotalLineItem amount={totalAmount} />
+              <TextInput
+                multiline={true}
+                maxLength={MAX_COMMENT_LENGTH}
+                numberOfLines={4}
+                onChangeText={this.onReasonChanged}
+                value={this.state.reason}
+                placeholder={t('addDescription')}
+                placeholderTextColor={colors.greenUI}
+                style={styles.inputContainer}
+              />
             </View>
           </View>
         </ReviewFrame>
@@ -401,7 +414,13 @@ export class SendConfirmation extends React.Component<Props, State> {
       throw Error('Account is required')
     }
 
-    const { amount, reason, recipientAddress } = confirmationInput
+    const { amount, recipientAddress } = confirmationInput
+    let reason
+    // If the user has entered a comment, use that for fee estimate
+    // otherwise estimate will assume max length comment
+    if (!this.reasonInputIsFocused() && this.state.reason.length) {
+      reason = this.state.reason
+    }
 
     const feeProps: CalculateFeeProps = recipientAddress
       ? { feeType: FeeType.SEND, account, recipientAddress, amount, comment: reason }
@@ -420,15 +439,26 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
     padding: 8,
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+  },
+  transferContainer: {
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+    paddingBottom: 25,
   },
   headerContainer: {
+    flex: 1,
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+  },
+  thumbnailContainer: {
     flexDirection: 'row',
     alignItems: 'flex-start',
   },
   recipientInfoContainer: {
     flexDirection: 'column',
     paddingLeft: 8,
-    paddingBottom: 8,
   },
   headerText: {
     ...fontStyles.regular,
@@ -446,11 +476,6 @@ const styles = StyleSheet.create({
     alignItems: 'stretch',
     flex: 1,
   },
-  transferContainer: {
-    flexGrow: 1,
-    justifyContent: 'flex-start',
-    paddingBottom: 25,
-  },
   editContainer: {
     flexDirection: 'row',
   },
@@ -464,13 +489,17 @@ const styles = StyleSheet.create({
     color: colors.gray5,
     textDecorationLine: 'underline',
   },
+  inputContainer: {
+    ...fontStyles.large,
+    color: colors.greenUI,
+  },
   bottomContainer: {
     marginTop: 5,
     flexDirection: 'column',
     alignItems: 'stretch',
   },
   amount: {
-    marginTop: 15,
+    paddingVertical: 8,
   },
   comment: {
     ...componentStyles.paddingTop5,

@@ -16,7 +16,6 @@ import { timeDeltaInHours } from 'src/utils/time'
 export interface ConfirmationInput {
   recipient: Recipient
   amount: BigNumber
-  reason: string
   recipientAddress: string | null | undefined
   type: TokenTransactionType
   firebasePendingRequestUid?: string | null
