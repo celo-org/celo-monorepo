@@ -9,10 +9,13 @@ import { pincodeTypeSelector } from 'src/account/selectors'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { DefaultEventNames } from 'src/analytics/constants'
 import { Screens } from 'src/navigator/Screens'
+import { StackParamList } from 'src/navigator/types'
 import { store } from 'src/redux/store'
 import Logger from 'src/utils/Logger'
 
 const TAG = 'NavigationService'
+
+type SafeNavigate = typeof navigate
 
 export const navigationRef = createRef<NavigationContainerRef>()
 
@@ -27,7 +30,8 @@ async function ensureNavigator() {
   }
 }
 
-export function replace(routeName: string, params?: object) {
+export const replace: SafeNavigate = (...args) => {
+  const [routeName, params] = args
   ensureNavigator()
     .then(() => {
       Logger.debug(`${TAG}@replace`, `Dispatch ${routeName}`)
@@ -43,7 +47,12 @@ export function replace(routeName: string, params?: object) {
     })
 }
 
-export function navigate(routeName: string, params?: object) {
+export function navigate<RouteName extends keyof StackParamList>(
+  ...args: undefined extends StackParamList[RouteName]
+    ? [RouteName] | [RouteName, StackParamList[RouteName]]
+    : [RouteName, StackParamList[RouteName]]
+) {
+  const [routeName, params] = args
   ensureNavigator()
     .then(() => {
       Logger.debug(`${TAG}@navigate`, `Dispatch ${routeName}`)
@@ -91,11 +100,11 @@ async function ensurePincode(): Promise<boolean> {
   return true
 }
 
-export function navigateProtected(routeName: string, params?: object) {
+export const navigateProtected: SafeNavigate = (...args) => {
   ensurePincode()
     .then((ensured) => {
       if (ensured) {
-        navigate(routeName, params)
+        navigate(...args)
       }
     })
     .catch((error) => {
@@ -125,5 +134,5 @@ export function navigateHome(params?: object) {
 export function navigateToError(errorMessage: string, error?: Error) {
   Logger.error(`${TAG}@navigateToError`, `Navigating to error screen: ${errorMessage}`, error)
   CeloAnalytics.track(DefaultEventNames.errorDisplayed, { error }, true)
-  navigate(Screens.ErrorScreen, { errorMessage, error })
+  navigate(Screens.ErrorScreen, { errorMessage })
 }

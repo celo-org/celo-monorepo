@@ -19,9 +19,8 @@ interface StateProps {
   userContact: UserContactDetails
 }
 
-interface OwnProps {
-  navigation: any
-}
+// tslint:disable-next-line: no-empty-interface
+interface OwnProps {}
 
 type Props = OwnProps & StateProps & WithTranslation
 const mapStateToProps = (state: RootState) => {
