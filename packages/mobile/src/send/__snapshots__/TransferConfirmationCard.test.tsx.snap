@@ -141,28 +141,14 @@ exports[`TransferConfirmationCard renders correctly for received escrow transact
     }
   }
 >
-  <View
-    style={
-      Object {
-        "flexDirection": "column",
-        "justifyContent": "center",
-        "marginBottom": 10,
-      }
-    }
-  >
+  <View>
     <View
       style={
-        Array [
-          Object {
-            "alignItems": "center",
-            "flexDirection": "row",
-            "justifyContent": "center",
-          },
-          Object {
-            "alignSelf": "center",
-            "margin": "auto",
-          },
-        ]
+        Object {
+          "flexDirection": "column",
+          "justifyContent": "center",
+          "marginBottom": 10,
+        }
       }
     >
       <View
@@ -170,104 +156,120 @@ exports[`TransferConfirmationCard renders correctly for received escrow transact
           Array [
             Object {
               "alignItems": "center",
+              "flexDirection": "row",
               "justifyContent": "center",
             },
             Object {
-              "backgroundColor": "#7AD6FE",
-              "borderRadius": 20,
-              "height": 40,
-              "width": 40,
+              "alignSelf": "center",
+              "margin": "auto",
             },
           ]
         }
       >
-        <Image
-          source={
-            Object {
-              "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
-            }
-          }
+        <View
           style={
             Array [
               Object {
-                "alignSelf": "center",
-                "margin": "auto",
+                "alignItems": "center",
+                "justifyContent": "center",
               },
               Object {
+                "backgroundColor": "#7AD6FE",
+                "borderRadius": 20,
                 "height": 40,
                 "width": 40,
               },
             ]
           }
-        />
+        >
+          <Image
+            source={
+              Object {
+                "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
+              }
+            }
+            style={
+              Array [
+                Object {
+                  "alignSelf": "center",
+                  "margin": "auto",
+                },
+                Object {
+                  "height": 40,
+                  "width": 40,
+                },
+              ]
+            }
+          />
+        </View>
       </View>
-    </View>
-    <Text
-      ellipsizeMode="tail"
-      numberOfLines={1}
-      style={
-        Array [
-          Object {
-            "color": "#2E3338",
-            "fontFamily": "Hind-SemiBold",
-            "fontSize": 14,
-            "lineHeight": 18,
-          },
-          Object {
-            "marginHorizontal": 20,
-            "paddingTop": 6,
-            "textAlign": "center",
-          },
-        ]
-      }
-    >
-      mobileNumber
-    </Text>
-    <View
-      style={
-        Object {
-          "alignItems": "center",
-          "alignSelf": "center",
-          "flexDirection": "row",
-          "justifyContent": "center",
-        }
-      }
-    >
       <Text
+        ellipsizeMode="tail"
+        numberOfLines={1}
         style={
           Array [
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-SemiBold",
+              "fontSize": 14,
+              "lineHeight": 18,
+            },
+            Object {
+              "marginHorizontal": 20,
+              "paddingTop": 6,
+              "textAlign": "center",
+            },
+          ]
+        }
+      >
+        mobileNumber
+      </Text>
+      <View
+        style={
+          Object {
+            "alignItems": "center",
+            "alignSelf": "center",
+            "flexDirection": "row",
+            "justifyContent": "center",
+          }
+        }
+      >
+        <Text
+          style={
+            Array [
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Hind-Light",
+                "fontSize": 14,
+                "textAlignVertical": "center",
+              },
+              Object {
+                "alignItems": "center",
+                "backgroundColor": "#EEEEEE",
+                "borderRadius": 3,
+                "justifyContent": "center",
+                "marginRight": 5,
+                "paddingLeft": 6,
+                "paddingRight": 3,
+              },
+            ]
+          }
+        >
+          🇺🇸 +1
+        </Text>
+        <Text
+          style={
             Object {
               "color": "#2E3338",
               "fontFamily": "Hind-Light",
               "fontSize": 14,
               "textAlignVertical": "center",
-            },
-            Object {
-              "alignItems": "center",
-              "backgroundColor": "#EEEEEE",
-              "borderRadius": 3,
-              "justifyContent": "center",
-              "marginRight": 5,
-              "paddingLeft": 6,
-              "paddingRight": 3,
-            },
-          ]
-        }
-      >
-        🇺🇸 +1
-      </Text>
-      <Text
-        style={
-          Object {
-            "color": "#2E3338",
-            "fontFamily": "Hind-Light",
-            "fontSize": 14,
-            "textAlignVertical": "center",
+            }
           }
-        }
-      >
-        (415) 555-0000
-      </Text>
+        >
+          (415) 555-0000
+        </Text>
+      </View>
     </View>
   </View>
   <View>
@@ -359,28 +361,14 @@ exports[`TransferConfirmationCard renders correctly for received transaction dri
     }
   }
 >
-  <View
-    style={
-      Object {
-        "flexDirection": "column",
-        "justifyContent": "center",
-        "marginBottom": 10,
-      }
-    }
-  >
+  <View>
     <View
       style={
-        Array [
-          Object {
-            "alignItems": "center",
-            "flexDirection": "row",
-            "justifyContent": "center",
-          },
-          Object {
-            "alignSelf": "center",
-            "margin": "auto",
-          },
-        ]
+        Object {
+          "flexDirection": "column",
+          "justifyContent": "center",
+          "marginBottom": 10,
+        }
       }
     >
       <View
@@ -388,104 +376,120 @@ exports[`TransferConfirmationCard renders correctly for received transaction dri
           Array [
             Object {
               "alignItems": "center",
+              "flexDirection": "row",
               "justifyContent": "center",
             },
             Object {
-              "backgroundColor": "#7AD6FE",
-              "borderRadius": 20,
-              "height": 40,
-              "width": 40,
+              "alignSelf": "center",
+              "margin": "auto",
             },
           ]
         }
       >
-        <Image
-          source={
-            Object {
-              "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
-            }
-          }
+        <View
           style={
             Array [
               Object {
-                "alignSelf": "center",
-                "margin": "auto",
+                "alignItems": "center",
+                "justifyContent": "center",
               },
               Object {
+                "backgroundColor": "#7AD6FE",
+                "borderRadius": 20,
                 "height": 40,
                 "width": 40,
               },
             ]
           }
-        />
+        >
+          <Image
+            source={
+              Object {
+                "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
+              }
+            }
+            style={
+              Array [
+                Object {
+                  "alignSelf": "center",
+                  "margin": "auto",
+                },
+                Object {
+                  "height": 40,
+                  "width": 40,
+                },
+              ]
+            }
+          />
+        </View>
       </View>
-    </View>
-    <Text
-      ellipsizeMode="tail"
-      numberOfLines={1}
-      style={
-        Array [
-          Object {
-            "color": "#2E3338",
-            "fontFamily": "Hind-SemiBold",
-            "fontSize": 14,
-            "lineHeight": 18,
-          },
-          Object {
-            "marginHorizontal": 20,
-            "paddingTop": 6,
-            "textAlign": "center",
-          },
-        ]
-      }
-    >
-      mobileNumber
-    </Text>
-    <View
-      style={
-        Object {
-          "alignItems": "center",
-          "alignSelf": "center",
-          "flexDirection": "row",
-          "justifyContent": "center",
-        }
-      }
-    >
       <Text
+        ellipsizeMode="tail"
+        numberOfLines={1}
         style={
           Array [
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-SemiBold",
+              "fontSize": 14,
+              "lineHeight": 18,
+            },
+            Object {
+              "marginHorizontal": 20,
+              "paddingTop": 6,
+              "textAlign": "center",
+            },
+          ]
+        }
+      >
+        mobileNumber
+      </Text>
+      <View
+        style={
+          Object {
+            "alignItems": "center",
+            "alignSelf": "center",
+            "flexDirection": "row",
+            "justifyContent": "center",
+          }
+        }
+      >
+        <Text
+          style={
+            Array [
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Hind-Light",
+                "fontSize": 14,
+                "textAlignVertical": "center",
+              },
+              Object {
+                "alignItems": "center",
+                "backgroundColor": "#EEEEEE",
+                "borderRadius": 3,
+                "justifyContent": "center",
+                "marginRight": 5,
+                "paddingLeft": 6,
+                "paddingRight": 3,
+              },
+            ]
+          }
+        >
+          🇺🇸 +1
+        </Text>
+        <Text
+          style={
             Object {
               "color": "#2E3338",
               "fontFamily": "Hind-Light",
               "fontSize": 14,
               "textAlignVertical": "center",
-            },
-            Object {
-              "alignItems": "center",
-              "backgroundColor": "#EEEEEE",
-              "borderRadius": 3,
-              "justifyContent": "center",
-              "marginRight": 5,
-              "paddingLeft": 6,
-              "paddingRight": 3,
-            },
-          ]
-        }
-      >
-        🇺🇸 +1
-      </Text>
-      <Text
-        style={
-          Object {
-            "color": "#2E3338",
-            "fontFamily": "Hind-Light",
-            "fontSize": 14,
-            "textAlignVertical": "center",
+            }
           }
-        }
-      >
-        (415) 555-0000
-      </Text>
+        >
+          (415) 555-0000
+        </Text>
+      </View>
     </View>
   </View>
   <View>
@@ -577,28 +581,14 @@ exports[`TransferConfirmationCard renders correctly for sent escrow transaction 
     }
   }
 >
-  <View
-    style={
-      Object {
-        "flexDirection": "column",
-        "justifyContent": "center",
-        "marginBottom": 10,
-      }
-    }
-  >
+  <View>
     <View
       style={
-        Array [
-          Object {
-            "alignItems": "center",
-            "flexDirection": "row",
-            "justifyContent": "center",
-          },
-          Object {
-            "alignSelf": "center",
-            "margin": "auto",
-          },
-        ]
+        Object {
+          "flexDirection": "column",
+          "justifyContent": "center",
+          "marginBottom": 10,
+        }
       }
     >
       <View
@@ -606,104 +596,120 @@ exports[`TransferConfirmationCard renders correctly for sent escrow transaction 
           Array [
             Object {
               "alignItems": "center",
+              "flexDirection": "row",
               "justifyContent": "center",
             },
             Object {
-              "backgroundColor": "#7AD6FE",
-              "borderRadius": 20,
-              "height": 40,
-              "width": 40,
+              "alignSelf": "center",
+              "margin": "auto",
             },
           ]
         }
       >
-        <Image
-          source={
-            Object {
-              "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
-            }
-          }
+        <View
           style={
             Array [
               Object {
-                "alignSelf": "center",
-                "margin": "auto",
+                "alignItems": "center",
+                "justifyContent": "center",
               },
               Object {
+                "backgroundColor": "#7AD6FE",
+                "borderRadius": 20,
                 "height": 40,
                 "width": 40,
               },
             ]
           }
-        />
+        >
+          <Image
+            source={
+              Object {
+                "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
+              }
+            }
+            style={
+              Array [
+                Object {
+                  "alignSelf": "center",
+                  "margin": "auto",
+                },
+                Object {
+                  "height": 40,
+                  "width": 40,
+                },
+              ]
+            }
+          />
+        </View>
       </View>
-    </View>
-    <Text
-      ellipsizeMode="tail"
-      numberOfLines={1}
-      style={
-        Array [
-          Object {
-            "color": "#2E3338",
-            "fontFamily": "Hind-SemiBold",
-            "fontSize": 14,
-            "lineHeight": 18,
-          },
-          Object {
-            "marginHorizontal": 20,
-            "paddingTop": 6,
-            "textAlign": "center",
-          },
-        ]
-      }
-    >
-      mobileNumber
-    </Text>
-    <View
-      style={
-        Object {
-          "alignItems": "center",
-          "alignSelf": "center",
-          "flexDirection": "row",
-          "justifyContent": "center",
-        }
-      }
-    >
       <Text
+        ellipsizeMode="tail"
+        numberOfLines={1}
         style={
           Array [
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-SemiBold",
+              "fontSize": 14,
+              "lineHeight": 18,
+            },
+            Object {
+              "marginHorizontal": 20,
+              "paddingTop": 6,
+              "textAlign": "center",
+            },
+          ]
+        }
+      >
+        mobileNumber
+      </Text>
+      <View
+        style={
+          Object {
+            "alignItems": "center",
+            "alignSelf": "center",
+            "flexDirection": "row",
+            "justifyContent": "center",
+          }
+        }
+      >
+        <Text
+          style={
+            Array [
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Hind-Light",
+                "fontSize": 14,
+                "textAlignVertical": "center",
+              },
+              Object {
+                "alignItems": "center",
+                "backgroundColor": "#EEEEEE",
+                "borderRadius": 3,
+                "justifyContent": "center",
+                "marginRight": 5,
+                "paddingLeft": 6,
+                "paddingRight": 3,
+              },
+            ]
+          }
+        >
+          🇺🇸 +1
+        </Text>
+        <Text
+          style={
             Object {
               "color": "#2E3338",
               "fontFamily": "Hind-Light",
               "fontSize": 14,
               "textAlignVertical": "center",
-            },
-            Object {
-              "alignItems": "center",
-              "backgroundColor": "#EEEEEE",
-              "borderRadius": 3,
-              "justifyContent": "center",
-              "marginRight": 5,
-              "paddingLeft": 6,
-              "paddingRight": 3,
-            },
-          ]
-        }
-      >
-        🇺🇸 +1
-      </Text>
-      <Text
-        style={
-          Object {
-            "color": "#2E3338",
-            "fontFamily": "Hind-Light",
-            "fontSize": 14,
-            "textAlignVertical": "center",
+            }
           }
-        }
-      >
-        (415) 555-0000
-      </Text>
+        >
+          (415) 555-0000
+        </Text>
+      </View>
     </View>
   </View>
   <View>
@@ -813,28 +819,14 @@ exports[`TransferConfirmationCard renders correctly for sent transaction drilldo
     }
   }
 >
-  <View
-    style={
-      Object {
-        "flexDirection": "column",
-        "justifyContent": "center",
-        "marginBottom": 10,
-      }
-    }
-  >
+  <View>
     <View
       style={
-        Array [
-          Object {
-            "alignItems": "center",
-            "flexDirection": "row",
-            "justifyContent": "center",
-          },
-          Object {
-            "alignSelf": "center",
-            "margin": "auto",
-          },
-        ]
+        Object {
+          "flexDirection": "column",
+          "justifyContent": "center",
+          "marginBottom": 10,
+        }
       }
     >
       <View
@@ -842,104 +834,120 @@ exports[`TransferConfirmationCard renders correctly for sent transaction drilldo
           Array [
             Object {
               "alignItems": "center",
+              "flexDirection": "row",
               "justifyContent": "center",
             },
             Object {
-              "backgroundColor": "#7AD6FE",
-              "borderRadius": 20,
-              "height": 40,
-              "width": 40,
+              "alignSelf": "center",
+              "margin": "auto",
             },
           ]
         }
       >
-        <Image
-          source={
-            Object {
-              "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
-            }
-          }
+        <View
           style={
             Array [
               Object {
-                "alignSelf": "center",
-                "margin": "auto",
+                "alignItems": "center",
+                "justifyContent": "center",
               },
               Object {
+                "backgroundColor": "#7AD6FE",
+                "borderRadius": 20,
                 "height": 40,
                 "width": 40,
               },
             ]
           }
-        />
+        >
+          <Image
+            source={
+              Object {
+                "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
+              }
+            }
+            style={
+              Array [
+                Object {
+                  "alignSelf": "center",
+                  "margin": "auto",
+                },
+                Object {
+                  "height": 40,
+                  "width": 40,
+                },
+              ]
+            }
+          />
+        </View>
       </View>
-    </View>
-    <Text
-      ellipsizeMode="tail"
-      numberOfLines={1}
-      style={
-        Array [
-          Object {
-            "color": "#2E3338",
-            "fontFamily": "Hind-SemiBold",
-            "fontSize": 14,
-            "lineHeight": 18,
-          },
-          Object {
-            "marginHorizontal": 20,
-            "paddingTop": 6,
-            "textAlign": "center",
-          },
-        ]
-      }
-    >
-      mobileNumber
-    </Text>
-    <View
-      style={
-        Object {
-          "alignItems": "center",
-          "alignSelf": "center",
-          "flexDirection": "row",
-          "justifyContent": "center",
-        }
-      }
-    >
       <Text
+        ellipsizeMode="tail"
+        numberOfLines={1}
         style={
           Array [
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Hind-SemiBold",
+              "fontSize": 14,
+              "lineHeight": 18,
+            },
+            Object {
+              "marginHorizontal": 20,
+              "paddingTop": 6,
+              "textAlign": "center",
+            },
+          ]
+        }
+      >
+        mobileNumber
+      </Text>
+      <View
+        style={
+          Object {
+            "alignItems": "center",
+            "alignSelf": "center",
+            "flexDirection": "row",
+            "justifyContent": "center",
+          }
+        }
+      >
+        <Text
+          style={
+            Array [
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Hind-Light",
+                "fontSize": 14,
+                "textAlignVertical": "center",
+              },
+              Object {
+                "alignItems": "center",
+                "backgroundColor": "#EEEEEE",
+                "borderRadius": 3,
+                "justifyContent": "center",
+                "marginRight": 5,
+                "paddingLeft": 6,
+                "paddingRight": 3,
+              },
+            ]
+          }
+        >
+          🇺🇸 +1
+        </Text>
+        <Text
+          style={
             Object {
               "color": "#2E3338",
               "fontFamily": "Hind-Light",
               "fontSize": 14,
               "textAlignVertical": "center",
-            },
-            Object {
-              "alignItems": "center",
-              "backgroundColor": "#EEEEEE",
-              "borderRadius": 3,
-              "justifyContent": "center",
-              "marginRight": 5,
-              "paddingLeft": 6,
-              "paddingRight": 3,
-            },
-          ]
-        }
-      >
-        🇺🇸 +1
-      </Text>
-      <Text
-        style={
-          Object {
-            "color": "#2E3338",
-            "fontFamily": "Hind-Light",
-            "fontSize": 14,
-            "textAlignVertical": "center",
+            }
           }
-        }
-      >
-        (415) 555-0000
-      </Text>
+        >
+          (415) 555-0000
+        </Text>
+      </View>
     </View>
   </View>
   <View>

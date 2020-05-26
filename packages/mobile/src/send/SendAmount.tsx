@@ -41,7 +41,7 @@ import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import { fetchAddressesAndValidate } from 'src/identity/actions'
 import { AddressValidationType, RecipientVerificationStatus } from 'src/identity/reducer'
-import { checkIfAddressValidationRequired } from 'src/identity/secureSend'
+import { getAddressValidationType } from 'src/identity/secureSend'
 import { LocalCurrencyCode, LocalCurrencySymbol } from 'src/localCurrency/consts'
 import {
   convertDollarsToLocalAmount,
@@ -108,10 +108,7 @@ const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
   const { route } = ownProps
   const recipient = route.params.recipient
   const { secureSendPhoneNumberMapping } = state.identity
-  const addressValidationType: AddressValidationType = checkIfAddressValidationRequired(
-    recipient,
-    secureSendPhoneNumberMapping
-  )
+  const addressValidationType = getAddressValidationType(recipient, secureSendPhoneNumberMapping)
   const { e164NumberToAddress } = state.identity
   const recipientVerificationStatus = getRecipientVerificationStatus(recipient, e164NumberToAddress)
   const feeType = getFeeType(recipientVerificationStatus)

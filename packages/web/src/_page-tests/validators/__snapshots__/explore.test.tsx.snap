@@ -735,80 +735,6 @@ exports[`ValidatorsList renders 1`] = `
             }
           }
         >
-          Uptime
-        </span>
-        <span
-          className="css-text-901oao css-textHasAncestor-16my406"
-          dir="auto"
-          style={
-            Object {
-              "color": "rgba(255,255,255,1.00)",
-              "fontFamily": "Jost, futura-pt, futura, sans-serif",
-              "opacity": 0,
-              "paddingLeft": "6px",
-            }
-          }
-        >
-          <svg
-            fill="none"
-            height={10}
-            style={Object {}}
-            transform="rotate(90)"
-            viewBox="0 0 8 12"
-            width={10}
-          >
-            <path
-              clipRule="evenodd"
-              d="M1.19997 0L1.13249e-05 1.19996L4.80011 6.00006L0 10.8002L1.19996 12.0001L7.19977 6.00032L7.19953 6.00007L7.19979 5.99981L1.19997 0Z"
-              fill="#FFFFFF"
-              fillRule="evenodd"
-              opacity={1}
-              style={Object {}}
-            />
-          </svg>
-        </span>
-      </div>
-      <div
-        className="css-view-1dbjc4n"
-        onClick={[Function]}
-        style={
-          Object {
-            "WebkitAlignItems": "center",
-            "WebkitBoxAlign": "center",
-            "WebkitBoxDirection": "normal",
-            "WebkitBoxFlex": 0,
-            "WebkitBoxOrient": "horizontal",
-            "WebkitFlexDirection": "row",
-            "WebkitFlexGrow": 0,
-            "alignItems": "center",
-            "cursor": "pointer",
-            "flexDirection": "row",
-            "flexGrow": 0,
-            "fontSize": "16px",
-            "lineHeight": "20px",
-            "maxWidth": "80px",
-            "minWidth": "80px",
-            "msFlexAlign": "center",
-            "msFlexDirection": "row",
-            "msFlexPositive": 0,
-            "paddingBottom": "24px",
-            "paddingLeft": "10px",
-            "paddingRight": "10px",
-            "paddingTop": "24px",
-            "textAlign": "center",
-          }
-        }
-      >
-        <span
-          className="css-text-901oao css-textHasAncestor-16my406"
-          dir="auto"
-          style={
-            Object {
-              "color": "rgba(255,255,255,1.00)",
-              "fontFamily": "Jost, futura-pt, futura, sans-serif",
-            }
-          }
-        >
           Attestation
         </span>
         <span
@@ -1659,31 +1585,6 @@ exports[`ValidatorsList renders 1`] = `
             0.0
             %
           </span>
-          <span
-            className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
-            dir="auto"
-            style={
-              Object {
-                "WebkitBoxFlex": 0,
-                "WebkitFlexGrow": 0,
-                "color": "rgba(255,255,255,1.00)",
-                "flexGrow": 0,
-                "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                "fontSize": "16px",
-                "maxWidth": "80px",
-                "minWidth": "80px",
-                "msFlexPositive": 0,
-                "paddingBottom": "12px",
-                "paddingLeft": "10px",
-                "paddingRight": "10px",
-                "paddingTop": "12px",
-                "textAlign": "center",
-              }
-            }
-          >
-            0.0
-            %
-          </span>
         </div>
       </div>
     </div>
@@ -2503,31 +2404,6 @@ exports[`ValidatorsList renders 1`] = `
             0.0
             %
           </span>
-          <span
-            className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
-            dir="auto"
-            style={
-              Object {
-                "WebkitBoxFlex": 0,
-                "WebkitFlexGrow": 0,
-                "color": "rgba(255,255,255,1.00)",
-                "flexGrow": 0,
-                "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                "fontSize": "16px",
-                "maxWidth": "80px",
-                "minWidth": "80px",
-                "msFlexPositive": 0,
-                "paddingBottom": "12px",
-                "paddingLeft": "10px",
-                "paddingRight": "10px",
-                "paddingTop": "12px",
-                "textAlign": "center",
-              }
-            }
-          >
-            0.0
-            %
-          </span>
         </div>
       </div>
     </div>
@@ -3321,31 +3197,6 @@ exports[`ValidatorsList renders 1`] = `
                 }
               />
             </span>
-          </span>
-          <span
-            className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
-            dir="auto"
-            style={
-              Object {
-                "WebkitBoxFlex": 0,
-                "WebkitFlexGrow": 0,
-                "color": "rgba(255,255,255,1.00)",
-                "flexGrow": 0,
-                "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                "fontSize": "16px",
-                "maxWidth": "80px",
-                "minWidth": "80px",
-                "msFlexPositive": 0,
-                "paddingBottom": "12px",
-                "paddingLeft": "10px",
-                "paddingRight": "10px",
-                "paddingTop": "12px",
-                "textAlign": "center",
-              }
-            }
-          >
-            34.4
-            %
           </span>
           <span
             className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
@@ -4191,31 +4042,6 @@ exports[`ValidatorsList renders 1`] = `
             0.0
             %
           </span>
-          <span
-            className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
-            dir="auto"
-            style={
-              Object {
-                "WebkitBoxFlex": 0,
-                "WebkitFlexGrow": 0,
-                "color": "rgba(255,255,255,1.00)",
-                "flexGrow": 0,
-                "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                "fontSize": "16px",
-                "maxWidth": "80px",
-                "minWidth": "80px",
-                "msFlexPositive": 0,
-                "paddingBottom": "12px",
-                "paddingLeft": "10px",
-                "paddingRight": "10px",
-                "paddingTop": "12px",
-                "textAlign": "center",
-              }
-            }
-          >
-            0.0
-            %
-          </span>
         </div>
       </div>
     </div>
@@ -5035,31 +4861,6 @@ exports[`ValidatorsList renders 1`] = `
             0.0
             %
           </span>
-          <span
-            className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
-            dir="auto"
-            style={
-              Object {
-                "WebkitBoxFlex": 0,
-                "WebkitFlexGrow": 0,
-                "color": "rgba(255,255,255,1.00)",
-                "flexGrow": 0,
-                "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                "fontSize": "16px",
-                "maxWidth": "80px",
-                "minWidth": "80px",
-                "msFlexPositive": 0,
-                "paddingBottom": "12px",
-                "paddingLeft": "10px",
-                "paddingRight": "10px",
-                "paddingTop": "12px",
-                "textAlign": "center",
-              }
-            }
-          >
-            0.0
-            %
-          </span>
         </div>
       </div>
     </div>
@@ -5853,31 +5654,6 @@ exports[`ValidatorsList renders 1`] = `
                 }
               />
             </span>
-          </span>
-          <span
-            className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
-            dir="auto"
-            style={
-              Object {
-                "WebkitBoxFlex": 0,
-                "WebkitFlexGrow": 0,
-                "color": "rgba(255,255,255,1.00)",
-                "flexGrow": 0,
-                "fontFamily": "Jost, futura-pt, futura, sans-serif",
-                "fontSize": "16px",
-                "maxWidth": "80px",
-                "minWidth": "80px",
-                "msFlexPositive": 0,
-                "paddingBottom": "12px",
-                "paddingLeft": "10px",
-                "paddingRight": "10px",
-                "paddingTop": "12px",
-                "textAlign": "center",
-              }
-            }
-          >
-            0.0
-            %
           </span>
           <span
             className="css-text-901oao css-textHasAncestor-16my406 css-textOneLine-bfa6kz"
