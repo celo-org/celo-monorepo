@@ -2,7 +2,6 @@ import Button, { BtnTypes } from '@celo/react-components/components/Button'
 import KeyboardAwareScrollView from '@celo/react-components/components/KeyboardAwareScrollView'
 import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
 import LoadingLabel from '@celo/react-components/components/LoadingLabel'
-import TextInput, { TextInputProps } from '@celo/react-components/components/TextInput'
 import ValidatedTextInput, {
   DecimalValidatorProps,
   ValidatedTextInputProps,
@@ -31,7 +30,6 @@ import CurrencyDisplay, { FormatType } from 'src/components/CurrencyDisplay'
 import {
   DAILY_PAYMENT_LIMIT_CUSD,
   DOLLAR_TRANSACTION_MIN_AMOUNT,
-  MAX_COMMENT_LENGTH,
   NUMBER_INPUT_MAX_DECIMALS,
 } from 'src/config'
 import { FeeType } from 'src/fees/actions'
@@ -65,7 +63,7 @@ import { withDecimalSeparator } from 'src/utils/withDecimalSeparator'
 export interface TransactionDataInput {
   recipient: Recipient
   amount: BigNumber
-  reason: string
+  reason?: string
   type: TokenTransactionType
   firebasePendingRequestUid?: string | null
 }
@@ -73,11 +71,9 @@ export interface TransactionDataInput {
 const AmountInput = withDecimalSeparator(
   withTextInputLabeling<ValidatedTextInputProps<DecimalValidatorProps>>(ValidatedTextInput)
 )
-const CommentInput = withTextInputLabeling<TextInputProps>(TextInput)
 
 interface State {
   amount: string
-  reason: string
 }
 
 type OwnProps = StackScreenProps<StackParamList, Screens.SendAmount>
@@ -146,7 +142,6 @@ export class SendAmount extends React.Component<Props, State> {
 
   state: State = {
     amount: '',
-    reason: '',
   }
 
   componentDidMount = () => {
@@ -194,17 +189,12 @@ export class SendAmount extends React.Component<Props, State> {
   getTransactionData = (type: TokenTransactionType): TransactionDataInput => ({
     recipient: this.props.recipient,
     amount: this.getDollarsAmount(),
-    reason: this.state.reason,
     type,
   })
 
   onAmountChanged = (amount: string) => {
     this.props.hideAlert()
     this.setState({ amount })
-  }
-
-  onReasonChanged = (reason: string) => {
-    this.setState({ reason })
   }
 
   showLimitReachedError = (now: number) => {
@@ -406,13 +396,6 @@ export class SendAmount extends React.Component<Props, State> {
             autoFocus={true}
             numberOfDecimals={NUMBER_INPUT_MAX_DECIMALS}
             validator={ValidatorKind.Decimal}
-          />
-          <CommentInput
-            title={t('global:for')}
-            placeholder={t('groceriesRent')}
-            value={this.state.reason}
-            maxLength={MAX_COMMENT_LENGTH}
-            onChangeText={this.onReasonChanged}
           />
           <View style={style.feeContainer}>
             <LoadingLabel

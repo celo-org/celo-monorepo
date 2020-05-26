@@ -1,22 +1,25 @@
-import HorizontalLine from '@celo/react-components/components/HorizontalLine'
 import TextButton from '@celo/react-components/components/TextButton.v2'
+import withTextInputLabeling from '@celo/react-components/components/WithTextInputLabeling'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, Text, TextInput, TextInputProps, View } from 'react-native'
 import { TokenTransactionType } from 'src/apollo/types'
 import Avatar from 'src/components/Avatar'
 import CurrencyDisplay, { DisplayType, FormatType } from 'src/components/CurrencyDisplay'
 import FeeIcon from 'src/components/FeeIcon'
 import LineItemRow from 'src/components/LineItemRow'
 import TotalLineItem from 'src/components/TotalLineItem'
+import { MAX_COMMENT_LENGTH } from 'src/config'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
 import { getInvitationVerificationFeeInDollars } from 'src/invite/saga'
 import { Recipient } from 'src/recipients/recipient'
+
+const CommentInput = withTextInputLabeling<TextInputProps>(TextInput)
 
 interface Props {
   address?: string
@@ -69,14 +72,14 @@ export default function TransferReviewCard({
     value,
     currencyCode: CURRENCIES[currency].code,
   }
-  const amount = subtotalAmount || inviteFeeAmount
+  const displayAmount = subtotalAmount || inviteFeeAmount
   const totalAmount = {
     value: value.plus(fee || 0),
     currencyCode: CURRENCIES[currency].code,
   }
 
   return (
-    <View style={styles.container}>
+    <View style={styles.transferContainer}>
       <Avatar recipient={recipient} address={address} e164Number={e164PhoneNumber} />
       {validatedRecipientAddress && (
         <View style={styles.editContainer}>
@@ -88,10 +91,18 @@ export default function TransferReviewCard({
           </TextButton>
         </View>
       )}
-      <CurrencyDisplay type={DisplayType.Big} style={styles.amount} amount={amount} />
+      <CurrencyDisplay type={DisplayType.Big} style={styles.amount} amount={displayAmount} />
+      <CommentInput
+        title={t('global:for')}
+        placeholder={t('groceriesRent')}
+        value={this.state.reason}
+        maxLength={MAX_COMMENT_LENGTH}
+        onChangeText={this.onReasonChanged}
+      />
       <View style={styles.bottomContainer}>
         {!!comment && <Text style={styles.comment}>{comment}</Text>}
-        <HorizontalLine />
+        {/* Replace with the fee drawer */}
+        {/* <HorizontalLine />
         {subtotalAmount && (
           <LineItemRow
             title={t('global:subtotal')}
@@ -103,7 +114,7 @@ export default function TransferReviewCard({
             title={t('inviteFee')}
             amount={<CurrencyDisplay amount={inviteFeeAmount} />}
           />
-        )}
+        )} */}
         <LineItemRow
           title={t('securityFee')}
           titleIcon={<FeeIcon />}
@@ -115,7 +126,7 @@ export default function TransferReviewCard({
           isLoading={isLoadingFee}
           hasError={!!feeError}
         />
-        <HorizontalLine />
+        {/* <HorizontalLine /> */}
         <TotalLineItem amount={totalAmount} />
       </View>
     </View>
@@ -123,7 +134,7 @@ export default function TransferReviewCard({
 }
 
 const styles = StyleSheet.create({
-  container: {
+  transferContainer: {
     flexGrow: 1,
     justifyContent: 'flex-start',
     paddingBottom: 25,

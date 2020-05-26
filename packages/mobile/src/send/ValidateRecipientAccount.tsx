@@ -214,6 +214,7 @@ export class ValidateRecipientAccount extends React.Component<Props, State> {
           </View>
           <Text style={styles.modalBody}>{t('helpModal.body2')}</Text>
           <View style={styles.addressContainer}>
+            {/* Placeholder for the address card */}
             <MenuBurgerCard length={30} />
             <Text style={styles.modalBody2}>{t('helpModal.body3')}</Text>
           </View>

@@ -1,4 +1,4 @@
-import Button, { BtnTypes } from '@celo/react-components/components/Button'
+import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button.v2'
 import CircleButton from '@celo/react-components/components/CircleButton'
 import colors from '@celo/react-components/styles/colors'
 import * as React from 'react'
@@ -52,8 +52,8 @@ class ReviewFrame extends React.PureComponent<Props, State> {
               onPress={this.onConfirm}
               text={confirmButton.text}
               accessibilityLabel={confirmButton.text}
-              standard={true}
               type={BtnTypes.PRIMARY}
+              size={BtnSizes.FULL}
               disabled={confirmButton.disabled || this.state.confirmed}
             />
           )}
@@ -62,8 +62,8 @@ class ReviewFrame extends React.PureComponent<Props, State> {
               onPress={modifyButton.action}
               text={modifyButton.text}
               accessibilityLabel={modifyButton.text}
-              standard={false}
               type={BtnTypes.SECONDARY}
+              size={BtnSizes.FULL}
               disabled={modifyButton.disabled}
               style={styles.modifyButton}
             />
