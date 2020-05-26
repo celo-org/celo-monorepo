@@ -1,0 +1,232 @@
+{
+  "contractName": "TestLibrary",
+  "abi": [],
+  "metadata": "{\"compiler\":{\"version\":\"0.5.8+commit.23d335f2\"},\"language\":\"Solidity\",\"output\":{\"abi\":[],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/home/martx/celo/celo-monorepo/packages/protocol/contracts/TestLibrary.sol\":\"TestLibrary\"},\"evmVersion\":\"petersburg\",\"libraries\":{},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/home/martx/celo/celo-monorepo/packages/protocol/contracts/TestLibrary.sol\":{\"keccak256\":\"0x94e806dba4a88bdbf8847f312589842dc38d184fc16bde4d0eb5ee4f891c195b\",\"urls\":[\"bzzr://8749017209911d4c36679b167545b87c1d2957baafa48456745cbcd1084618d1\"]}},\"version\":1}",
+  "bytecode": "0x604c6023600b82828239805160001a607314601657fe5b30600052607381538281f3fe73000000000000000000000000000000000000000030146080604052600080fdfea165627a7a723058204b4df27be7253f43f9a59ccee401f222e60c29295b409a65409f78f04ca9cc1f0029",
+  "deployedBytecode": "0x73000000000000000000000000000000000000000030146080604052600080fdfea165627a7a723058204b4df27be7253f43f9a59ccee401f222e60c29295b409a65409f78f04ca9cc1f0029",
+  "sourceMap": "25:80:2:-;;132:2:-1;166:7;155:9;146:7;137:37;255:7;249:14;246:1;241:23;235:4;232:33;222:2;;269:9;222:2;293:9;290:1;283:20;323:4;314:7;306:22;347:7;338;331:24",
+  "deployedSourceMap": "25:80:2:-;;;;;;;;",
+  "source": "pragma solidity ^0.5.3;\n\nlibrary TestLibrary {\n  struct Thing {\n    bool field1;\n    uint16 field2;\n  }\n}\n",
+  "sourcePath": "/home/martx/celo/celo-monorepo/packages/protocol/contracts/TestLibrary.sol",
+  "ast": {
+    "absolutePath": "/home/martx/celo/celo-monorepo/packages/protocol/contracts/TestLibrary.sol",
+    "exportedSymbols": {
+      "TestLibrary": [
+        83
+      ]
+    },
+    "id": 84,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 77,
+        "literals": [
+          "solidity",
+          "^",
+          "0.5",
+          ".3"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "0:23:2"
+      },
+      {
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "library",
+        "documentation": null,
+        "fullyImplemented": true,
+        "id": 83,
+        "linearizedBaseContracts": [
+          83
+        ],
+        "name": "TestLibrary",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "canonicalName": "TestLibrary.Thing",
+            "id": 82,
+            "members": [
+              {
+                "constant": false,
+                "id": 79,
+                "name": "field1",
+                "nodeType": "VariableDeclaration",
+                "scope": 82,
+                "src": "68:11:2",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bool",
+                  "typeString": "bool"
+                },
+                "typeName": {
+                  "id": 78,
+                  "name": "bool",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "68:4:2",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 81,
+                "name": "field2",
+                "nodeType": "VariableDeclaration",
+                "scope": 82,
+                "src": "85:13:2",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint16",
+                  "typeString": "uint16"
+                },
+                "typeName": {
+                  "id": 80,
+                  "name": "uint16",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "85:6:2",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint16",
+                    "typeString": "uint16"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              }
+            ],
+            "name": "Thing",
+            "nodeType": "StructDefinition",
+            "scope": 83,
+            "src": "49:54:2",
+            "visibility": "public"
+          }
+        ],
+        "scope": 84,
+        "src": "25:80:2"
+      }
+    ],
+    "src": "0:106:2"
+  },
+  "legacyAST": {
+    "absolutePath": "/home/martx/celo/celo-monorepo/packages/protocol/contracts/TestLibrary.sol",
+    "exportedSymbols": {
+      "TestLibrary": [
+        83
+      ]
+    },
+    "id": 84,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 77,
+        "literals": [
+          "solidity",
+          "^",
+          "0.5",
+          ".3"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "0:23:2"
+      },
+      {
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "library",
+        "documentation": null,
+        "fullyImplemented": true,
+        "id": 83,
+        "linearizedBaseContracts": [
+          83
+        ],
+        "name": "TestLibrary",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "canonicalName": "TestLibrary.Thing",
+            "id": 82,
+            "members": [
+              {
+                "constant": false,
+                "id": 79,
+                "name": "field1",
+                "nodeType": "VariableDeclaration",
+                "scope": 82,
+                "src": "68:11:2",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bool",
+                  "typeString": "bool"
+                },
+                "typeName": {
+                  "id": 78,
+                  "name": "bool",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "68:4:2",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 81,
+                "name": "field2",
+                "nodeType": "VariableDeclaration",
+                "scope": 82,
+                "src": "85:13:2",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint16",
+                  "typeString": "uint16"
+                },
+                "typeName": {
+                  "id": 80,
+                  "name": "uint16",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "85:6:2",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint16",
+                    "typeString": "uint16"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              }
+            ],
+            "name": "Thing",
+            "nodeType": "StructDefinition",
+            "scope": 83,
+            "src": "49:54:2",
+            "visibility": "public"
+          }
+        ],
+        "scope": 84,
+        "src": "25:80:2"
+      }
+    ],
+    "src": "0:106:2"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.5.8+commit.23d335f2.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "3.0.23",
+  "updatedAt": "2020-05-26T10:23:29.314Z",
+  "devdoc": {
+    "methods": {}
+  },
+  "userdoc": {
+    "methods": {}
+  }
+}
