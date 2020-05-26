@@ -38,8 +38,8 @@ type Props = DispatchProps & WithTranslation & StateProps & OwnProps
 const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
   const { route } = ownProps
   return {
-    scanIsForSecureSend: route.params.scanIsForSecureSend,
-    transactionData: route.params.transactionData,
+    scanIsForSecureSend: route.params?.scanIsForSecureSend,
+    transactionData: route.params?.transactionData,
   }
 }
 
