@@ -93,12 +93,9 @@ export enum CustomEventNames {
 
   backup_quiz_backspace = 'backup_quiz_backspace', // whenever the backspace is pressed
 
-  backup_quiz_submit = 'backup_quiz_submit',
-  backup_quiz_success = 'backup_quiz_success',
-  backup_quiz_incorrect = 'backup_quiz_incorrect',
-
-  backup_setup_toggle_complete = 'backup_setup_toggle_complete',
-  backup_setup_toggle_incomplete = 'backup_setup_toggle_incomplete',
+  backup_quiz_submit = 'backup_quiz_submit', // (Count # of taps on "Submit" button in Backup_Quiz)
+  backup_quiz_success = 'backup_quiz_success', // (Count # of successful Account Key confirmations Backup_Quiz)
+  backup_quiz_incorrect = 'backup_quiz_incorrect', // (Count # of failed Account Key confirmations Backup_Quiz)
 
   // Screen name: Backup_Phrase, Backup_Insist, Backup_Share, Backup_Set
   set_social_backup = 'set_social_backup', // (count # of taps on "Set up Social Backup")
@@ -111,8 +108,8 @@ export enum CustomEventNames {
   insist_backup_phrase = 'insist_backup_phrase', // (count # of taps on “Set Backup Phrase” in Backup_Insist)
   insist_skip_backup = 'insist_skip_backup', // (count # of taps on “Do Later” in Backup_Insist)
   backup_continue = 'backup_continue', // (count # of taps on “Continue” button in Backup_Phrase)
-  backup_setup_toggle_enable = 'backup_setup_toggle_enable',
-  backup_setup_toggle_disable = 'backup_setup_toggle_disable',
+  backup_setup_toggle_enable = 'backup_setup_toggle_enable', // (count # of slides to agree on "I wrote down account key" Switch in Backup_Phrase)
+  backup_setup_toggle_disable = 'backup_setup_toggle_disable', // (count # of slides to disagree on "I wrote down account key" Switch in Backup_Phrase)
   social_backup_continue = 'social_backup_continue', // (Count # of taps on "Backup with Friends" in Backup_Phrase)
 
   // Screen name: Backup_Quiz, Question_Incorrect, Backup_Confirmed
