@@ -152,7 +152,7 @@ export const sendOptions = ({ route }: { route: RouteProp<StackParamList, Screen
 export const sendAmountOptions = ({
   route,
 }: {
-  route: RouteProp<StackParamList, Screens.Send>
+  route: RouteProp<StackParamList, Screens.SendAmount>
 }) => {
   return {
     ...emptyHeader,

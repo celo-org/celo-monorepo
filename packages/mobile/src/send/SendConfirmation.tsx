@@ -304,12 +304,11 @@ export class SendConfirmation extends React.Component<Props, State> {
       throw Error('Account is required')
     }
 
-    const { amount, recipientAddress } = confirmationInput
-    const comment = confirmationInput.reason ?? ''
+    const { amount, reason, recipientAddress } = confirmationInput
 
     const feeProps: CalculateFeeProps = recipientAddress
-      ? { feeType: FeeType.SEND, account, recipientAddress, amount, comment }
-      : { feeType: FeeType.INVITE, account, amount, comment }
+      ? { feeType: FeeType.SEND, account, recipientAddress, amount, comment: reason }
+      : { feeType: FeeType.INVITE, account, amount, comment: reason }
 
     return (
       // Note: intentionally passing a new child func here otherwise

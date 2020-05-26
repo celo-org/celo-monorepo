@@ -12,7 +12,7 @@ import { Screens } from 'src/navigator/Screens'
 import { FeedType } from 'src/transactions/TransactionFeed'
 
 const goToSend = () => {
-  navigate(Screens.Send)
+  navigate(Screens.Send, {})
 }
 
 interface OwnProps {

@@ -6,7 +6,7 @@ import { parseInputAmount } from '@celo/utils/src/parsing'
 import { StackScreenProps } from '@react-navigation/stack'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
-import { useTranslation, WithTranslation } from 'react-i18next'
+import { useTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import { getNumberFormatSettings } from 'react-native-localize'
 import SafeAreaView from 'react-native-safe-area-view'
@@ -56,11 +56,12 @@ export interface TransactionDataInput {
   recipient: Recipient
   amount: BigNumber
   type: TokenTransactionType
+  reason: string
   firebasePendingRequestUid?: string | null
 }
 
 type RouteProps = StackScreenProps<StackParamList, Screens.SendAmount>
-type Props = RouteProps & WithTranslation
+type Props = RouteProps
 
 const { decimalSeparator } = getNumberFormatSettings()
 
@@ -157,6 +158,7 @@ function SendAmount(props: Props) {
       recipient,
       amount: dollarAmount,
       type,
+      reason: '',
     }),
     [recipient, dollarAmount]
   )
@@ -242,7 +244,6 @@ function SendAmount(props: Props) {
       navigate(Screens.PaymentRequestConfirmation, { transactionData })
     }
   }, [addressValidationType, getTransactionData])
-
   return (
     <SafeAreaView style={styles.paddedContainer}>
       <DisconnectBanner />
@@ -274,6 +275,7 @@ function SendAmount(props: Props) {
         type={BtnTypes.SECONDARY}
         onPress={isRequest ? onRequest : onSend}
         disabled={reviewBtnDisabled}
+        testID="Review"
       />
     </SafeAreaView>
   )

@@ -113,11 +113,11 @@ export type StackParamList = {
   [Screens.Security]: undefined
   [Screens.SelectLocalCurrency]: undefined
   [Screens.Send]: {
-    isRequest: boolean
+    isRequest?: boolean
   }
   [Screens.SendAmount]: {
     recipient: Recipient
-    isRequest: boolean
+    isRequest?: boolean
   }
   [Screens.SendConfirmation]: {
     transactionData: TransactionDataInput

@@ -55,8 +55,8 @@ import {
   noHeader,
   nuxNavigationOptions,
   nuxNavigationOptionsNoBackButton,
-  sendOptions,
   sendAmountOptions,
+  sendOptions,
 } from 'src/navigator/Headers.v2'
 import { Screens } from 'src/navigator/Screens'
 import TabNavigator from 'src/navigator/TabNavigator'
