@@ -22,13 +22,16 @@ export class RpcWallet extends WalletBase {
   }
 
   async addAccount(privateKey: string, passphrase: string): Promise<string> {
-    privateKey = ensureLeading0x(privateKey)
-    const address = normalizeAddressWith0x(privateKeyToAddress(privateKey))
+    const formattedPrivateKey = ensureLeading0x(privateKey)
+    const address = normalizeAddressWith0x(privateKeyToAddress(formattedPrivateKey))
     if (this.hasAccount(address)) {
       throw new Error(`RpcWallet: account already exists`)
     }
     const signer = new RpcSigner(this.rpc, address)
-    const resp = await signer.init(privateKey, passphrase)
+    const resp = await signer.init(formattedPrivateKey, passphrase)
+    if (resp.error) {
+      throw new Error(`RpcSigner init failed with ${resp.error}`)
+    }
     this.addSigner(resp.result!, signer)
     return resp.result!
   }

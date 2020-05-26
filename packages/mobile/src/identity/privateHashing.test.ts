@@ -1,22 +1,13 @@
 import { FetchMock } from 'jest-fetch-mock'
 import { expectSaga } from 'redux-saga-test-plan'
-<<<<<<< HEAD
 import { call, select } from 'redux-saga/effects'
 import { e164NumberSelector } from 'src/account/selectors'
-import { currentAccountSelector } from 'src/geth/selectors'
 import { updateE164PhoneNumberSalts } from 'src/identity/actions'
 import { fetchPhoneHashPrivate, getSaltFromThresholdSignature } from 'src/identity/privateHashing'
 import { e164NumberToSaltSelector } from 'src/identity/reducer'
 import { getConnectedUnlockedAccount } from 'src/web3/saga'
-import { mockAccount, mockE164Number, mockE164Number2 } from 'test/values'
-=======
-import { select } from 'redux-saga/effects'
-import { updateE164PhoneNumberSalts } from 'src/identity/actions'
-import { fetchPhoneHashPrivate, getSaltFromThresholdSignature } from 'src/identity/privacy'
-import { e164NumberToSaltSelector } from 'src/identity/reducer'
 import { currentAccountSelector } from 'src/web3/selectors'
-import { mockAccount, mockE164Number } from 'test/values'
->>>>>>> Revert "Move account management from web3 to geth"
+import { mockAccount, mockE164Number, mockE164Number2 } from 'test/values'
 
 jest.mock('react-native-blind-threshold-bls', () => ({
   blindMessage: jest.fn(() => '0Uj+qoAu7ASMVvm6hvcUGx2eO/cmNdyEgGn0mSoZH8/dujrC1++SZ1N6IP6v2I8A'),

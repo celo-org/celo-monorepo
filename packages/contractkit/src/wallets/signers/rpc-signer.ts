@@ -1,3 +1,4 @@
+import { trimLeading0x } from '@celo/utils/src/address'
 import { InterceptedMethods } from '../../providers/celo-provider'
 import { RpcCaller } from '../../utils/rpc-caller'
 import { decodeSig, RLPEncodedTx } from '../../utils/signing-utils'
@@ -29,7 +30,7 @@ export class RpcSigner implements Signer {
   ) {}
 
   init = (privateKey: string, passphrase: string) =>
-    this.rpc.call('personal_importRawKey', [privateKey, passphrase])
+    this.rpc.call('personal_importRawKey', [trimLeading0x(privateKey), passphrase])
 
   /**
    * @dev addToV is unused because the geth JSON-RPC adds this.

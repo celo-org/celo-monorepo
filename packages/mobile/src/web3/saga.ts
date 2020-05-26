@@ -1,3 +1,4 @@
+import { RpcWallet } from '@celo/contractkit/lib/wallets/rpc-wallet'
 import { generateKeys, generateMnemonic, MnemonicStrength } from '@celo/utils/src/account'
 import { privateKeyToAddress } from '@celo/utils/src/address'
 import { deriveCEK } from '@celo/utils/src/commentEncryption'
@@ -200,9 +201,9 @@ export function* assignAccountFromPrivateKey(privateKey: string) {
       throw Error('Cannot create account without having the pin set')
     }
     const account = privateKeyToAddress(privateKey)
-    const wallet = yield call(getWallet)
+    const wallet: RpcWallet = yield call(getWallet)
     try {
-      yield call(wallet.addAccount, privateKey, pincode)
+      yield call([wallet, wallet.addAccount], privateKey, pincode)
     } catch (e) {
       if (e.toString().includes('account already exists')) {
         Logger.warn(TAG + '@assignAccountFromPrivateKey', 'Attempted to import same account')
@@ -211,7 +212,7 @@ export function* assignAccountFromPrivateKey(privateKey: string) {
         throw e
       }
 
-      yield call(wallet.unlockAccount, account, pincode, UNLOCK_DURATION)
+      yield call([wallet, wallet.unlockAccount], account, pincode, UNLOCK_DURATION)
     }
 
     Logger.debug(TAG + '@assignAccountFromPrivateKey', `Added to wallet: ${account}`)
@@ -252,14 +253,14 @@ export function* getAccount() {
 
 export function* unlockAccount(account: string) {
   Logger.debug(TAG + '@unlockAccount', `Unlocking account: ${account}`)
-  const wallet = yield call(getWallet)
+  const wallet: RpcWallet = yield call(getWallet)
   if (!wallet.isAccountUnlocked(account)) {
     return true
   }
 
   try {
     const pincode = yield call(getPincode, true)
-    yield call(wallet.unlockAccount, account, pincode, UNLOCK_DURATION)
+    yield call([wallet, wallet.unlockAccount], account, pincode, UNLOCK_DURATION)
     Logger.debug(TAG + '@unlockAccount', `Account unlocked: ${account}`)
     return true
   } catch (error) {

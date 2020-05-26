@@ -1,4 +1,5 @@
 import { CeloTransactionObject } from '@celo/contractkit'
+import { RpcWallet } from '@celo/contractkit/lib/wallets/rpc-wallet'
 import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
 import BigNumber from 'bignumber.js'
 import { Clipboard, Linking, Platform } from 'react-native'
@@ -354,8 +355,8 @@ function* addTempAccountToWallet(inviteCode: string) {
   Logger.debug(TAG + '@addTempAccountToWallet', 'Attempting to add temp wallet')
   try {
     // Import account into the local geth node
-    const wallet = yield call(getWallet)
-    const tempAccount = yield call(wallet.addAccount, inviteCode, TEMP_PW)
+    const wallet: RpcWallet = yield call(getWallet)
+    const tempAccount = yield call([wallet, wallet.addAccount], inviteCode, TEMP_PW)
     Logger.debug(TAG + '@addTempAccountToWallet', 'Account added', tempAccount)
   } catch (e) {
     if (e.toString().includes('account already exists')) {
@@ -373,8 +374,8 @@ export function* withdrawFundsFromTempAccount(
   newAccount: string
 ) {
   Logger.debug(TAG + '@withdrawFundsFromTempAccount', 'Unlocking temporary account')
-  const wallet = yield call(getWallet)
-  yield call(wallet.unlockAccount, tempAccount, TEMP_PW, 600)
+  const wallet: RpcWallet = yield call(getWallet)
+  yield call([wallet, wallet.unlockAccount], tempAccount, TEMP_PW, 600)
 
   Logger.debug(
     TAG + '@withdrawFundsFromTempAccount',
