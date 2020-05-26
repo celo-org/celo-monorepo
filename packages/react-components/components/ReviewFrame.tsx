@@ -1,8 +1,8 @@
 import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button.v2'
 import CircleButton from '@celo/react-components/components/CircleButton'
-import colors from '@celo/react-components/styles/colors'
+import colors from '@celo/react-components/styles/colors.v2'
 import * as React from 'react'
-import { ScrollView, StyleSheet, View, ViewProps } from 'react-native'
+import { ActivityIndicator, ScrollView, StyleSheet, View, ViewProps } from 'react-native'
 
 interface ButtonProps {
   text: string
@@ -48,11 +48,16 @@ class ReviewFrame extends React.PureComponent<Props, State> {
     if (confirmButton || modifyButton) {
       return (
         <View style={styles.bottomButtonStyle}>
-          {isSending && <ActivityIndicator size="large" color={colors.celoGreen} />}
           {confirmButton && (
             <Button
               onPress={this.onConfirm}
-              text={confirmButton.text}
+              text={
+                isSending ? (
+                  <ActivityIndicator size="small" color={colors.celoGreen} />
+                ) : (
+                  confirmButton.text
+                )
+              }
               accessibilityLabel={confirmButton.text}
               type={BtnTypes.PRIMARY}
               size={BtnSizes.FULL}
@@ -104,12 +109,10 @@ class ReviewFrame extends React.PureComponent<Props, State> {
 const styles = StyleSheet.create({
   body: {
     flex: 1,
-    backgroundColor: colors.background,
-    justifyContent: 'space-between',
+    backgroundColor: colors.light,
   },
   scrollViewContentContainer: {
     paddingVertical: 10,
-    justifyContent: 'space-between',
   },
   confirmationContainer: {
     marginVertical: 20,

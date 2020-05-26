@@ -9,7 +9,15 @@ import { StackScreenProps } from '@react-navigation/stack'
 import { TFunction } from 'i18next'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
-import { StyleSheet, Text, TextInput, View } from 'react-native'
+import {
+  Keyboard,
+  NativeSyntheticEvent,
+  StyleSheet,
+  Text,
+  TextInput,
+  TextInputKeyPressEventData,
+  View,
+} from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
@@ -71,6 +79,7 @@ interface State {
   modalVisible: boolean
   buttonReset: boolean
   reason: string
+  newReason: string
 }
 
 type OwnProps = StackScreenProps<StackParamList, Screens.SendConfirmation>
@@ -140,15 +149,7 @@ export class SendConfirmation extends React.Component<Props, State> {
     modalVisible: false,
     buttonReset: false,
     reason: '',
-  }
-
-  reasonInputRef: React.RefObject<TextInput> = React.createRef()
-
-  reasonInputIsFocused = () => {
-    if (this.reasonInputRef && this.reasonInputRef.current) {
-      return this.reasonInputRef.current.isFocused()
-    }
-    return false
+    newReason: '',
   }
 
   async componentDidMount() {
@@ -189,6 +190,18 @@ export class SendConfirmation extends React.Component<Props, State> {
       inviteMethod,
       firebasePendingRequestUid
     )
+  }
+
+  onKeyDown = (e: NativeSyntheticEvent<TextInputKeyPressEventData>) => {
+    if (e.nativeEvent.key === 'Enter') {
+      Keyboard.dismiss()
+    }
+  }
+
+  // Erase the "enter" keystroke from the comment
+  cleanInput = () => {
+    const reason = this.state.reason.replace('\n', '')
+    this.setState({ reason })
   }
 
   onEditAddressClick = () => {
@@ -359,49 +372,51 @@ export class SendConfirmation extends React.Component<Props, State> {
         >
           <View style={styles.transferContainer}>
             <View style={styles.headerContainer}>
-              <View style={styles.thumbnailContainer}>
-                <ContactCircle
-                  thumbnailPath={getRecipientThumbnail(recipient)}
-                  address={recipientAddress || ''}
-                />
-                <View style={styles.recipientInfoContainer}>
-                  <Text style={styles.headerText}>Sending</Text>
-                  <Text style={styles.displayName}>
-                    {getDisplayName({ recipient, recipientAddress, t })}
-                  </Text>
-                  {validatedRecipientAddress && (
-                    <View style={styles.editContainer}>
-                      <Text style={styles.address}>{`${validatedRecipientAddress.slice(
-                        0,
-                        6
-                      )}...${validatedRecipientAddress.slice(-4)}`}</Text>
-                      <TextButton
-                        style={styles.editButton}
-                        testID={'accountEditButton'}
-                        onPress={this.onEditAddressClick}
-                      >
-                        {t('edit')}
-                      </TextButton>
-                    </View>
-                  )}
-                </View>
+              <ContactCircle
+                thumbnailPath={getRecipientThumbnail(recipient)}
+                address={recipientAddress || ''}
+              />
+              <View style={styles.recipientInfoContainer}>
+                <Text style={styles.headerText}>Sending</Text>
+                <Text style={styles.displayName}>
+                  {getDisplayName({ recipient, recipientAddress, t })}
+                </Text>
+                {validatedRecipientAddress && (
+                  <View style={styles.editContainer}>
+                    <Text style={styles.address}>{`${validatedRecipientAddress.slice(
+                      0,
+                      6
+                    )}...${validatedRecipientAddress.slice(-4)}`}</Text>
+                    <TextButton
+                      style={styles.editButton}
+                      testID={'accountEditButton'}
+                      onPress={this.onEditAddressClick}
+                    >
+                      {t('edit')}
+                    </TextButton>
+                  </View>
+                )}
               </View>
-              <CurrencyDisplay
-                type={DisplayType.Big}
-                style={styles.amount}
-                amount={subtotalAmount || inviteFeeAmount}
-              />
-              <TextInput
-                multiline={true}
-                maxLength={MAX_COMMENT_LENGTH}
-                numberOfLines={4}
-                onChangeText={this.onReasonChanged}
-                value={this.state.reason}
-                placeholder={t('addDescription')}
-                placeholderTextColor={colors.greenUI}
-                style={styles.inputContainer}
-              />
             </View>
+            <CurrencyDisplay
+              type={DisplayType.Big}
+              style={styles.amount}
+              amount={subtotalAmount || inviteFeeAmount}
+            />
+            <TextInput
+              style={styles.inputContainer}
+              autoFocus={true}
+              multiline={true}
+              numberOfLines={5}
+              maxLength={MAX_COMMENT_LENGTH}
+              onChangeText={this.onReasonChanged}
+              value={this.state.reason}
+              placeholder={t('addDescription')}
+              placeholderTextColor={colors.greenUI}
+              returnKeyType="done"
+              onKeyPress={this.onKeyDown}
+              onBlur={this.cleanInput}
+            />
           </View>
         </ReviewFrame>
       </SafeAreaView>
@@ -415,16 +430,10 @@ export class SendConfirmation extends React.Component<Props, State> {
     }
 
     const { amount, recipientAddress } = confirmationInput
-    let reason
-    // If the user has entered a comment, use that for fee estimate
-    // otherwise estimate will assume max length comment
-    if (!this.reasonInputIsFocused() && this.state.reason.length) {
-      reason = this.state.reason
-    }
 
     const feeProps: CalculateFeeProps = recipientAddress
-      ? { feeType: FeeType.SEND, account, recipientAddress, amount, comment: reason }
-      : { feeType: FeeType.INVITE, account, amount, comment: reason }
+      ? { feeType: FeeType.SEND, account, recipientAddress, amount }
+      : { feeType: FeeType.INVITE, account, amount }
 
     return (
       // Note: intentionally passing a new child func here otherwise
@@ -440,19 +449,13 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
     padding: 8,
     flexDirection: 'column',
-    justifyContent: 'space-between',
   },
   transferContainer: {
     flexDirection: 'column',
-    justifyContent: 'space-between',
+    alignItems: 'flex-start',
     paddingBottom: 25,
   },
   headerContainer: {
-    flex: 1,
-    flexDirection: 'column',
-    alignItems: 'flex-start',
-  },
-  thumbnailContainer: {
     flexDirection: 'row',
     alignItems: 'flex-start',
   },
@@ -490,8 +493,12 @@ const styles = StyleSheet.create({
     textDecorationLine: 'underline',
   },
   inputContainer: {
+    flex: 1,
+    // Fixed height to increase surface area for input
+    // to focus on press
+    height: 200,
+    alignSelf: 'stretch',
     ...fontStyles.large,
-    color: colors.greenUI,
   },
   bottomContainer: {
     marginTop: 5,
