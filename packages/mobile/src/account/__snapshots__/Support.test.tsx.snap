@@ -11,25 +11,21 @@ exports[`Support renders correctly 1`] = `
 >
   <View
     style={
-      Array [
-        Object {
-          "alignItems": "flex-end",
-          "backgroundColor": "#FFFFFF",
-          "flexDirection": "row",
-          "height": 62,
-          "justifyContent": "space-between",
+      Object {
+        "alignItems": "flex-end",
+        "backgroundColor": "#FFFFFF",
+        "elevation": 1,
+        "flexDirection": "row",
+        "height": 62,
+        "justifyContent": "space-between",
+        "shadowColor": "black",
+        "shadowOffset": Object {
+          "height": 0.5,
+          "width": 0,
         },
-        Object {
-          "elevation": 1,
-          "shadowColor": "black",
-          "shadowOffset": Object {
-            "height": 0.5,
-            "width": 0,
-          },
-          "shadowOpacity": 0.3,
-          "shadowRadius": 0.8,
-        },
-      ]
+        "shadowOpacity": 0.3,
+        "shadowRadius": 0.8,
+      }
     }
   >
     <View
