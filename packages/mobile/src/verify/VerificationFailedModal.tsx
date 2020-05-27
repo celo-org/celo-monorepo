@@ -23,8 +23,8 @@ export function VerificationFailedModal(props: Props) {
   const [isDismissed, setIsDismissed] = React.useState(true)
 
   React.useEffect(() => {
-    setIsDismissed(false)
-  }, [setIsDismissed])
+    setIsDismissed(false) // Prevents a ghost modal from showing up briefly
+  }, [setIsDismissed]) // after opening Verification Loading when it is already dismissed
 
   const onDismiss = React.useCallback(() => {
     setIsDismissed(true)
