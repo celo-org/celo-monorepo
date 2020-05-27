@@ -14,9 +14,8 @@ import { setBackupCompleted } from 'src/account/actions'
 import { showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
-import { ErrorMessages } from 'src/app/ErrorMessages'
 import { QuizzBottom } from 'src/backup/QuizzBottom'
-import { getStoredMnemonic } from 'src/backup/utils'
+import { getStoredMnemonic, onGetMnemonicFail } from 'src/backup/utils'
 import DevSkipButton from 'src/components/DevSkipButton'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import { headerWithCancelButton } from 'src/navigator/Headers.v2'
@@ -101,13 +100,7 @@ export class BackupQuiz extends React.Component<Props, State> {
         mnemonicLength: shuffledMnemonic.length,
       })
     } else {
-      const message = 'Failed to retrieve Account Key'
-      this.props.showError(ErrorMessages.FAILED_FETCH_MNEMONIC)
-
-      CeloAnalytics.track(CustomEventNames.backup_error, {
-        title: message,
-        component: 'BackupQuiz',
-      })
+      onGetMnemonicFail(this.props.showError, 'BackupQuiz')
     }
   }
 
