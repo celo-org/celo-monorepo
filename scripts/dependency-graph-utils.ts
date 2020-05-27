@@ -7,7 +7,8 @@ export const DEP_GRAPH_FILENAME = 'dependency-graph.json'
 
 function getWorkspacePackageDirs() {
   const rootPackageJson = require(join(__dirname, '..', 'package.json'))
-  return rootPackageJson.workspaces.packages.map((dir: string) => dir.replace('/*', ''))
+  const packages: string[] = rootPackageJson.workspaces.packages
+  return packages.map((dir: string) => dir.replace('/*', ''))
 }
 
 // Easier to operate on folder names of packages rather than the name
