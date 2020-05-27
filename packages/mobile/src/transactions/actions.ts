@@ -5,8 +5,8 @@ import i18n from 'src/i18n'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { TransactionDataInput } from 'src/send/SendAmount'
-import { TransferConfirmationCardProps } from 'src/send/TransferConfirmationCard'
 import { StandbyTransaction } from 'src/transactions/reducer'
+import { TransferConfirmationCardProps } from 'src/transactions/TransferConfirmationCard'
 import { web3ForUtils } from 'src/web3/contracts'
 
 export enum Actions {
