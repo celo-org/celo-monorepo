@@ -1,4 +1,4 @@
-# Custody
+# Custodying Celo Assets and Tracking Balances
 
 This section is intended for Custodians, Exchanges, and other services that intend to custody Celo assets such as Celo Dollar and Celo Gold on behalf of a user. Generally speaking, custodying Celo Gold (cGLD), the native token on the Celo network, requires understanding the various states that cGLD can exist in at any time. This is to provide useful services beyond custody such as allowing users to lock up their cGLD and vote with it. Many of these "states" are implemented as smart contracts, and involve sending cGLD from a user owned account to a contract address. Thus, in order to be able to show a user's true balance, services need to be able to observe every balance changing operation and reconcile cGLD balances from all the various contracts and states cGLD can be in.
 
@@ -20,13 +20,13 @@ Celo Gold as described previously can also exist in various states that represen
 
 ## Smart Contracts
 
-The following smart contracts are helpful to understand in order to map the conceptual states to actual accounts and function calls
+The following smart contracts are helpful to understand in order to map the conceptual states to actual accounts and function calls.
 
 ### Accounts
 
 [Accounts.sol](https://github.com/celo-org/celo-monorepo/blob/master/packages/protocol/contracts/common/Accounts.sol) allows the mapping of an address to an account in storage, after which all further functionality (locking, voting, etc.) can be accessed. 
 
-The [createAccount](https://github.com/celo-org/celo-monorepo/blob/master/packages/protocol/contracts/common/Accounts.sol#L103) function indexes the address as an account in storage, and is required to differentiate an arbitrary key-pair from a user-owned account in the Celo network.
+The [`createAccount`](https://github.com/celo-org/celo-monorepo/blob/master/packages/protocol/contracts/common/Accounts.sol#L103) function indexes the address as an account in storage, and is required to differentiate an arbitrary key-pair from a user-owned account in the Celo network.
 
 The `Accounts` contract also allows for the authorization of various signer keys, such as a [vote signer key](https://github.com/celo-org/celo-monorepo/blob/master/packages/protocol/contracts/common/Accounts.sol#L175). This allows for the user who owns the primary account key to authorize a separate key that can only vote on behalf of the account. This allows for the ability to custody keys in a manner corresponding to their exposure or "warmth". Eg. the primary account private key can be kept in cold storage after authorizing the signer keys, which can be in warmer environments, and potentially more exposed to the network. See the [key management guide](../../validator-guide/summary) for more details.
 
@@ -45,7 +45,7 @@ There are two ways in which users can vote:
 
 Once cGLD has been locked via `LockedGold`, it can then be used to vote for validator groups. [Election.sol](https://github.com/celo-org/celo-monorepo/blob/master/packages/protocol/contracts/governance/Election.sol) is the contract that manages this functionality.
 
-The `votes` in this contract are tracked by a [Votes type](https://github.com/celo-org/celo-monorepo/blob/master/packages/protocol/contracts/governance/Election.sol#L87) which has `pending`, `active`, and `total` votes. `pending` votes are those that have been cast for a validator group, and `active` votes are those that have been activated after an epoch, meaning that these votes generate voter rewards.
+The `votes` in this contract are tracked by a [Votes type](https://github.com/celo-org/celo-monorepo/blob/master/packages/protocol/contracts/governance/Election.sol#L87) which has `pending`, `active`, and `total` votes. Pending votes are those that have been cast for a validator group, and active votes are those that have been activated after an epoch, meaning that these votes generate voter rewards.
 
 Votes are cast for a validator group using the [`vote` function](https://github.com/celo-org/celo-monorepo/blob/master/packages/protocol/contracts/governance/Election.sol#L229). This increments the `pending` and `total` votes in the `Election` contract, and decrements the equivalent amount of cGLD from the `nonvoting` balance in the `LockedGold` contract, for the associated account.
 
@@ -63,9 +63,20 @@ From a technical perspective, `ReleaseGold` can be thought of as a "puppet" acco
 
 Notice that all these functions have corresponding functions that are called on the underlying contract. The `ReleaseGold` contract can then just be thought of as brokering the transaction to the correct place, when necessary.
 
+## Other Balance Changing Operations
+
+In addition to transfers (both native and ERC-20) and locking / voting flows affecting user balances, there are also several additional Celo network features that may cause user balances to change:
+
+- Gas fee payments: the fee paid by transaction senders to use the network
+- Tobin tax: a tax on cGLD transfers when the reserve balance is low and needs to be repleted
+- Epoch rewards distribution: reward payments to voters, validators, and validator groups
+
+Some of these may occur as events rather than transactions on the network, and therefore when updating balances, special attention should be paid to them.
+
 ## Useful Tools
+
 
 Since monitoring balance changing operations is important to be able to display user balances properly, it can be helpful to use a tracing or reconciling system. Several tools exist to help application developers with this process:
 
 - Tracer
-- Rosetta
+- [Celo Rosetta](https://github.com/celo-org/rosetta)
