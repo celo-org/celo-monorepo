@@ -96,7 +96,9 @@ export enum CustomEventNames {
   view_backup_phrase = 'view_backup_phrase', // (count # of taps on "View Backup Phrase" after already backed up)
   view_social_backup = 'view_social_backup', // (count # of taps on "View Social Backup" after already set up)
   skip_social_backup = 'skip_social_backup', // (count # of taps on "Skip Social Backup" )
-  backup_cancel = 'backup_cancel', // (count # of taps on "Cancel" button in Backup_Phrase)
+  backup_cancel = 'backup_cancel', // (count # of taps on "Cancel" button in Backup_Phrase/BackupQuiz)
+  backup_cancel_complete = 'backup_cancel_complete', // when choising to abort the cancel and continue the setup
+  backup_cancel_procrastinate = 'backup_cancel_procrastinate', // when choosing to continue cancel and delay setup
   insist_backup_phrase = 'insist_backup_phrase', // (count # of taps on “Set Backup Phrase” in Backup_Insist)
   insist_skip_backup = 'insist_skip_backup', // (count # of taps on “Do Later” in Backup_Insist)
   whatsapp_backup = 'whatsapp_backup', // (count # of taps on “Send with Whatsapp” in Backup_Share)
