@@ -331,11 +331,14 @@ class CheckBuilder {
     const valueInEth = this.kit.web3.utils.fromWei(value.toFixed(), 'ether')
     return this.addCheck(
       `Account has at least ${valueInEth} non-voting Locked Gold over requirement`,
-      this.withLockedGold(async (l, _signer, account, v) =>
-        value
-          .plus(await v.getAccountLockedGoldRequirement(account))
-          .isLessThanOrEqualTo(await l.getAccountNonvotingLockedGold(account))
-      )
+      this.withLockedGold(async (l, _signer, account, v) => {
+        const requirement = await v.getAccountLockedGoldRequirement(account)
+        return (
+          (requirement.eq(0) ||
+            value.plus(requirement).lte(await l.getAccountTotalLockedGold(account))) &&
+          value.lte(await l.getAccountNonvotingLockedGold(account))
+        )
+      })
     )
   }
 
