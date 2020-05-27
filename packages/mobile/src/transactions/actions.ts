@@ -108,7 +108,7 @@ export const navigateToPaymentTransferReview = (
       headerText = i18n.t('walletFlow5:transactionHeaderReceived')
       break
     case TokenTransactionType.EscrowReceived:
-      headerText = i18n.t('walletFlow5:transactionHeaderEscrowedReceived')
+      headerText = i18n.t('walletFlow5:transactionHeaderEscrowReceived')
       break
     case TokenTransactionType.VerificationFee:
       headerText = i18n.t('walletFlow5:transactionHeaderVerificationFee')
