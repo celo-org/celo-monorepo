@@ -53,9 +53,15 @@ The [`activate` function](https://github.com/celo-org/celo-monorepo/blob/master/
 
 ### ReleaseGold
 
-A common problem in other proof-of-stake protocols is the fact that early token holders have their balances release over time to ensure long-term alignment, yet wanting to have those balances participate in the PoS system to increase the security of the network. For that purpose, many early token balances are released via the [`ReleaseGold`](https://github.com/celo-org/celo-monorepo/blob/master/packages/protocol/contracts/governance/ReleaseGold.sol) contract. Beneficiaries of these contracts can participate in the PoS system by locking/unlocking already-released/to-be-released Celo Gold and authoring voting/validating keys to act on behalf of the beneficiary.
+A common problem in other proof-of-stake protocols is the tension between wanting early token holders' balances to release over time to ensure long-term alignment, while also wanting them to be able to participate in consensus to increase the security of the network. To bridge both goals, many early token balances in the Celo network are released via the [`ReleaseGold`](https://github.com/celo-org/celo-monorepo/blob/master/packages/protocol/contracts/governance/ReleaseGold.sol) contract. Beneficiaries of these contracts can then participate in the proof-of-stake system by staking and voting with cGLD that has not yet been "released" for transfers. Please find more high level information about the `ReleaseGold` contract [here](../../celo-gold-holder-guide/release-gold).
 
-Many users are likely to prefer custodians that support this functionality so that they can maximize their epoch rewards and participate in governance of the network.
+From a technical perspective, `ReleaseGold` can be thought of as a "puppet" account controlled by the "puppeteer", or the beneficiary private key corresponding to the `beneficiary` address in the contract. This beneficiary key can then authorize validator signer and vote signer keys that can then call respective functions associated with validating or voting. Most of the required function calls described above can be made by the signer keys directly to the `LockedGold` or `Election` contracts associated with the `ReleaseGold` account. However, some functions in the `ReleaseGold` contract are proxied to the underlying `LockedGold` or `Election` contracts, and have a separate function signature that can be called by the `beneficiary` address. Notably:
+
+- [`createAccount`](https://github.com/celo-org/celo-monorepo/blob/master/packages/protocol/contracts/governance/ReleaseGold.sol#L669)
+- [`authorizeVoteSigner`](https://github.com/celo-org/celo-monorepo/blob/master/packages/protocol/contracts/governance/ReleaseGold.sol#L525) and similar functions for other signer keys
+- [`lockGold`](https://github.com/celo-org/celo-monorepo/blob/master/packages/protocol/contracts/governance/ReleaseGold.sol#L469) and [`unlockGold`](https://github.com/celo-org/celo-monorepo/blob/master/packages/protocol/contracts/governance/ReleaseGold.sol#L477)
+
+Notice that all these functions have corresponding functions that are called on the underlying contract. The `ReleaseGold` contract can then just be thought of as brokering the transaction to the correct place, when necessary.
 
 ## Useful Tools
 
