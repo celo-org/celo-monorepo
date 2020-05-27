@@ -12,6 +12,8 @@ import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import { setBackupCompleted } from 'src/account/actions'
 import { showError } from 'src/alert/actions'
+import CeloAnalytics from 'src/analytics/CeloAnalytics'
+import { CustomEventNames } from 'src/analytics/constants'
 import { QuizzBottom } from 'src/backup/QuizzBottom'
 import DevSkipButton from 'src/components/DevSkipButton'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
@@ -26,8 +28,8 @@ const TAG = 'backup/BackupQuiz'
 
 const MNEMONIC_BUTTONS_TO_DISPLAY = 6
 
-// miliseconds
-const CHECKING_DURATION = 2.6 * 1000
+// miliseconds to wait until showing success or failure
+const CHECKING_DURATION = 1.8 * 1000
 
 export enum Mode {
   Entering,
@@ -92,7 +94,7 @@ export class BackupQuiz extends React.Component<Props, State> {
   getMnemonicFromNavProps() {
     const mnemonic = this.props.route.params.mnemonic
     if (!mnemonic) {
-      throw new Error('Mnemonic missing form nav props')
+      throw new Error('Mnemonic missing from nav props')
     }
     return mnemonic
   }
@@ -102,10 +104,16 @@ export class BackupQuiz extends React.Component<Props, State> {
     const mnemonicWordsUpdated = [...mnemonicWords]
     mnemonicWordsUpdated.splice(index, 1)
 
+    const newUserChosenWords = [...userChosenWords, { word, index }]
+
     this.setState({
       mnemonicWords: mnemonicWordsUpdated,
-      userChosenWords: [...userChosenWords, { word, index }],
+      userChosenWords: newUserChosenWords,
     })
+
+    if (newUserChosenWords.length === 1) {
+      CeloAnalytics.startTracking(CustomEventNames.backup_quiz_submit)
+    }
   }
 
   onPressBackspace = () => {
@@ -124,6 +132,10 @@ export class BackupQuiz extends React.Component<Props, State> {
       mnemonicWords: mnemonicWordsUpdated,
       userChosenWords: userChosenWordsUpdated,
     })
+    CeloAnalytics.trackSubEvent(
+      CustomEventNames.backup_quiz_submit,
+      CustomEventNames.backup_quiz_backspace
+    )
   }
 
   onPressReset = () => {
@@ -144,15 +156,19 @@ export class BackupQuiz extends React.Component<Props, State> {
       Logger.debug(TAG, 'Backup quiz passed')
       this.props.setBackupCompleted()
       navigate(Screens.BackupComplete)
+      CeloAnalytics.track(CustomEventNames.backup_quiz_success)
     } else {
       Logger.debug(TAG, 'Backup quiz failed, reseting words')
       this.setState({ mode: Mode.Failed })
+      CeloAnalytics.track(CustomEventNames.backup_quiz_incorrect)
     }
   }
 
   onPressSubmit = () => {
     this.setState({ mode: Mode.Checking })
     setTimeout(this.afterCheck, CHECKING_DURATION)
+
+    CeloAnalytics.stopTracking(CustomEventNames.backup_quiz_submit)
   }
 
   onScreenSkip = () => {
@@ -180,7 +196,10 @@ export class BackupQuiz extends React.Component<Props, State> {
                   ]}
                   key={`selected-word-${i}`}
                 >
-                  <Text style={userChosenWords[i] ? styles.chosenWordFilled : styles.chosenWord}>
+                  <Text
+                    testID={`selected-word-${i}`}
+                    style={userChosenWords[i] ? styles.chosenWordFilled : styles.chosenWord}
+                  >
                     {(userChosenWords[i] && userChosenWords[i].word) || i + 1}
                   </Text>
                 </View>
@@ -299,6 +318,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   scrollContainer: {
+    paddingTop: 24,
     flexGrow: 1,
   },
   bottomHalf: { flex: 1, justifyContent: 'center' },
