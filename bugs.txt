@@ -1,5 +1,0 @@
-random bugs I found while playing with celo
-
-confirmation that the sending worked on the faucet page: https://celo.org/developers/faucet
-
-on the ios app (at least, haven't tested android) you receive a notification of the new funds, you tap on it, it opens on a page, swipe back to go "home" and the balance is not refreshed to reflect the new funds
