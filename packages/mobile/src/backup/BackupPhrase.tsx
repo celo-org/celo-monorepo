@@ -22,6 +22,8 @@ import { Screens } from 'src/navigator/Screens'
 import { TopBarTextButton } from 'src/navigator/TopBarButton.v2'
 import { RootState } from 'src/redux/reducers'
 
+const TAG = 'backup/BackupPhrase'
+
 interface State {
   mnemonic: string
   isConfirmChecked: boolean

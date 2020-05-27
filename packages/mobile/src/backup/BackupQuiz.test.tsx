@@ -4,13 +4,7 @@ import { Provider } from 'react-redux'
 import BackupQuiz, { BackupQuiz as BackupQuizRaw } from 'src/backup/BackupQuiz'
 import { Screens } from 'src/navigator/Screens'
 import { createMockStore, getMockI18nProps, getMockStackScreenProps } from 'test/utils'
-import { mockMnemonic, mockMnemonicShard1, mockNavigation } from 'test/values'
-
-const mockRoute = {
-  name: Screens.BackupQuiz as Screens.BackupQuiz,
-  key: '1',
-  params: { mnemonic: mockMnemonicShard1 },
-}
+import { mockMnemonic } from 'test/values'
 
 jest.mock('lodash', () => ({
   ...jest.requireActual('lodash'),
@@ -85,8 +79,7 @@ describe('BackupQuiz', () => {
       const { getByTestId, getByText } = render(
         <Provider store={store}>
           <BackupQuizRaw
-            navigation={mockNavigation}
-            route={mockRoute}
+            {...mockScreenProps}
             setBackupCompleted={mockSetBackupCompleted}
             showError={jest.fn()}
             {...getMockI18nProps()}
