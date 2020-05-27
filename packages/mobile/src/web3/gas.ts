@@ -32,10 +32,10 @@ export async function getGasPrice(currency: CURRENCY_ENUM = CURRENCY_ENUM.DOLLAR
 
 async function fetchGasPrice(currency: CURRENCY_ENUM) {
   const contractKit = await getContractKitOutsideGenerator()
-  // TODO: Try running these concurrently
-  // const [gasPriceMinimum, address] = await Promise.all([contractKit.contracts.getGasPriceMinimum(), getCurrencyAddress(currency)])
-  const gasPriceMinimum = await contractKit.contracts.getGasPriceMinimum()
-  const address = await getCurrencyAddress(currency)
+  const [gasPriceMinimum, address] = await Promise.all([
+    contractKit.contracts.getGasPriceMinimum(),
+    getCurrencyAddress(currency),
+  ])
   const latestGasPrice = await gasPriceMinimum.getGasPriceMinimum(address)
   const inflatedGasPrice = latestGasPrice.times(GAS_PRICE_INFLATION_FACTOR)
   Logger.debug(

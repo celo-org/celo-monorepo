@@ -41,14 +41,4 @@ export const migrations = {
       },
     }
   },
-  3: (state: any) => {
-    return {
-      ...state,
-      send: {
-        ...state.send,
-        secureSendPhoneNumberMapping: {},
-        isValidRecipient: false,
-      },
-    }
-  },
 }

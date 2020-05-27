@@ -124,10 +124,10 @@ export function getRecipientFromAddress(
   return e164PhoneNumber ? recipientCache[e164PhoneNumber] : undefined
 }
 
-export const getRecipientVerificationStatus = (
+export function getRecipientVerificationStatus(
   recipient: Recipient,
   e164NumberToAddress: E164NumberToAddressType
-): RecipientVerificationStatus => {
+): RecipientVerificationStatus {
   if (recipient.kind === RecipientKind.QrCode || recipient.kind === RecipientKind.Address) {
     return RecipientVerificationStatus.VERIFIED
   }
