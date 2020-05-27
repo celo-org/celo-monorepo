@@ -112,7 +112,7 @@ commands:
           name: Create cached node_modules (if necessary)
           command: |
             if [ ! -e ~/.tmp/node_modules.tgz ]; then 
-              tar -c node_modules/ packages/*/node_modules/ packages/phone-number-privacy/*/node_modules/ | gzip --fast > ~/.tmp/node_modules.tgz
+              tar -c node_modules/ packages/*/node_modules/ | gzip --fast > ~/.tmp/node_modules.tgz
             fi
       - save_cache:
           name: Save cached node_modules
@@ -860,11 +860,8 @@ jobs:
           command: |
             ./scripts/ci_check_if_test_should_run_v2.sh phone-number-privacy
       - run:
-          name: Run Tests for combiner
-          command: yarn --cwd=packages/phone-number-privacy/combiner test
-      - run:
-          name: Run Tests for signer
-          command: yarn --cwd=packages/phone-number-privacy/signer test
+          name: Run Tests
+          command: yarn --cwd=packages/phone-number-privacy test
 
 workflows:
   version: 2
