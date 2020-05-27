@@ -15,6 +15,7 @@ describe('AlertBanner', () => {
           {...baseProps}
           alert={{
             type: 'message',
+            errorType: 'show',
             message: 'This is your shadow speaking',
             dismissAfter: 0,
           }}
@@ -31,6 +32,7 @@ describe('AlertBanner', () => {
           {...baseProps}
           alert={{
             type: 'message',
+            errorType: 'show',
             title: 'Declaration',
             message: 'This is your shadow speaking',
             dismissAfter: 0,
@@ -48,6 +50,7 @@ describe('AlertBanner', () => {
           {...baseProps}
           alert={{
             type: 'error',
+            errorType: 'show',
             message: 'This is an error',
             dismissAfter: 0,
           }}

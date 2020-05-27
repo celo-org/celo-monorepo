@@ -115,7 +115,6 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   confirmationContainer: {
-    marginVertical: 20,
     marginHorizontal: 16,
   },
   circleButtonContainer: {

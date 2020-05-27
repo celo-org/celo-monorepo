@@ -62,6 +62,7 @@ import { withDecimalSeparator } from 'src/utils/withDecimalSeparator'
 export interface TransactionDataInput {
   recipient: Recipient
   amount: BigNumber
+  reason?: string
   type: TokenTransactionType
   firebasePendingRequestUid?: string | null
 }
