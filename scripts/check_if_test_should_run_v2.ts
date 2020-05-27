@@ -8,7 +8,7 @@ import { execCmdWithExitOnFailure } from '@celo/celotool/src/lib/cmd-utils'
 import { existsSync, readFileSync } from 'fs'
 import fetch from 'node-fetch'
 import { join } from 'path'
-import { DEP_GRAPH_FILENAME as dependencyGraphFileName } from './dependency-graph-utils'
+import { filename as dependencyGraphFileName } from './dependency-graph-utils'
 
 const rootDirectory = join(__dirname, '..')
 const dependencyGraph = JSON.parse(
