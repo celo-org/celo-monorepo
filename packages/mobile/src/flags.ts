@@ -3,4 +3,5 @@ export const features = {
   USE_COMMENT_ENCRYPTION: true,
   SHOW_ADD_FUNDS: false,
   DATA_SAVER: true,
+  VERIFICATION_FORNO_RETRY: true,
 }
