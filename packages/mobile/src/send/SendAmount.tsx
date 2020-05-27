@@ -41,7 +41,7 @@ import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import { fetchAddressesAndValidate } from 'src/identity/actions'
 import { AddressValidationType, RecipientVerificationStatus } from 'src/identity/reducer'
-import { checkIfAddressValidationRequired } from 'src/identity/secureSend'
+import { getAddressValidationType } from 'src/identity/secureSend'
 import { LocalCurrencyCode, LocalCurrencySymbol } from 'src/localCurrency/consts'
 import {
   convertDollarsToLocalAmount,
@@ -53,7 +53,7 @@ import { HeaderTitleWithBalance, headerWithBackButton } from 'src/navigator/Head
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
-import { getRecipientVerificationStatus, Recipient } from 'src/recipients/recipient'
+import { getRecipientVerificationStatus, Recipient, RecipientKind } from 'src/recipients/recipient'
 import { RootState } from 'src/redux/reducers'
 import { PaymentInfo } from 'src/send/reducers'
 import { getRecentPayments } from 'src/send/selectors'
@@ -108,10 +108,7 @@ const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
   const { route } = ownProps
   const recipient = route.params.recipient
   const { secureSendPhoneNumberMapping } = state.identity
-  const addressValidationType: AddressValidationType = checkIfAddressValidationRequired(
-    recipient,
-    secureSendPhoneNumberMapping
-  )
+  const addressValidationType = getAddressValidationType(recipient, secureSendPhoneNumberMapping)
   const { e164NumberToAddress } = state.identity
   const recipientVerificationStatus = getRecipientVerificationStatus(recipient, e164NumberToAddress)
   const feeType = getFeeType(recipientVerificationStatus)
@@ -160,9 +157,15 @@ export class SendAmount extends React.Component<Props, State> {
   fetchLatestAddressesAndValidate = () => {
     const { recipient } = this.props
 
-    if (recipient.e164PhoneNumber) {
-      this.props.fetchAddressesAndValidate(recipient.e164PhoneNumber)
+    if (recipient.kind === RecipientKind.QrCode || recipient.kind === RecipientKind.Address) {
+      return
     }
+
+    if (!recipient.e164PhoneNumber) {
+      throw Error('Recipient phone number is required if not sending via QR Code or address')
+    }
+
+    this.props.fetchAddressesAndValidate(recipient.e164PhoneNumber)
   }
 
   getDollarsAmount = () => {

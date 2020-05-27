@@ -14,22 +14,18 @@
   "education": {
     "header": "Verificar el teléfono",
     "body1": "Le solicitamos que verifique su número telefónico.",
-    "body2":
-      "Esto facilita el envío y la recepción de valores entre amigos. Puede omitir este paso ahora y hacerlo después.",
+    "body2": "Esto facilita el envío y la recepción de valores entre amigos. Puede omitir este paso ahora y hacerlo después.",
     "learnMore": "Más información sobre la verificación telefónica",
     "start": "Comenzar la verificación",
     "skip": "Omitir por ahora"
   },
   "learnMore": {
     "header": "Verificación del teléfono",
-    "intro":
-      "La verificación del número telefónico de Celo consiste en asociar su billetera de Celo con su teléfono.",
+    "intro": "La verificación del número telefónico de Celo consiste en asociar su billetera de Celo con su teléfono.",
     "section1Header": "¿Tengo que completar este paso?",
-    "section1Body":
-      "La verificación no es obligatoria.  Sin verificar, solo es posible enviar y recibir valor utilizando códigos QR o direcciones.",
+    "section1Body": "La verificación no es obligatoria.  Sin verificar, solo es posible enviar y recibir valor utilizando códigos QR o direcciones.",
     "section2Header": "Seguridad y privacidad",
-    "section2Body":
-      "Para proteger su privacidad, solo se guarda una versión oculta de su teléfono en la cadena de bloques de Celo."
+    "section2Body": "Para proteger su privacidad, solo se guarda una versión oculta de su teléfono en la cadena de bloques de Celo."
   },
   "loading": {
     "verifyingNumber": "Verificando {{number}}",
@@ -41,13 +37,11 @@
   "skipModal": {
     "header": "¿Omitir la verificación?",
     "body1": "La verificación permite que otras personas le envíen valores a su número telefónico.",
-    "body2":
-      "Sin la verificación, igual podrá recibir pagos, pero solo mediante las direcciones de Celo o códigos QR."
+    "body2": "Sin la verificación, igual podrá recibir pagos, pero solo mediante las direcciones de Celo o códigos QR."
   },
   "interstitial": {
     "header": "Ya casi estamos",
-    "body1":
-      "¡Estamos enviando sus mensajes de texto! Ingrese los tres códigos a medida que los reciba.",
+    "body1": "¡Estamos enviando sus mensajes de texto! Ingrese los tres códigos a medida que los reciba.",
     "body2": "Esto puede tardar un poco."
   },
   "input": {
@@ -63,8 +57,7 @@
   },
   "missingCodesModal": {
     "header": "¿Falta algún código?",
-    "body":
-      "Si no recibe todos los códigos después de 60 segundos, puede saltar la verificación y volver a intentarlo más tarde.",
+    "body": "Si no recibe todos los códigos después de 60 segundos, puede saltar la verificación y volver a intentarlo más tarde.",
     "wait": "Esperar los códigos.",
     "skip": "Omitir por ahora"
   },
@@ -74,6 +67,12 @@
     "body2": "Puede saltar la verificación y volver a intentarlo más tarde.",
     "enterCodesBody": " Si ya recibió tres códigos por SMS, aún puede ingresarlos.",
     "enterCodesButton": "Ingresar códigos"
+  },
+  "retryWithFornoModal": {
+    "header": "¿Volver a intentar la verificación con Ahorro de Datos?",
+    "body1": "Se ha producido un problema al verificar su número de teléfono. Recomendamos volver a intentarlo con el modo Ahorro de Datos habilitado",
+    "body2": "Ahorro de Datos le permite comunicarse en la red de Celo de manera más consistente utilizando una conexión confiable",
+    "retryButton": "Reintentar con Ahorro de Datos"
   },
   "congratsVerified": "¡Felicitaciones se ha verificado tu usuario!",
   "notification": {
