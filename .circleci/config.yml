@@ -112,7 +112,7 @@ commands:
           name: Create cached node_modules (if necessary)
           command: |
             if [ ! -e ~/.tmp/node_modules.tgz ]; then 
-              tar -c node_modules/ packages/*/node_modules/ packages/phone-number-privacy/node_modules/ | gzip --fast > ~/.tmp/node_modules.tgz
+              tar -c node_modules/ packages/*/node_modules/ packages/phone-number-privacy/*/node_modules/ | gzip --fast > ~/.tmp/node_modules.tgz
             fi
       - save_cache:
           name: Save cached node_modules

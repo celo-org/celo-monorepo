@@ -1753,10 +1753,10 @@
     web3-eth-contract "1.2.4"
     web3-utils "1.2.4"
 
-"@celo/contractkit@0.4.4":
-  version "0.4.4"
-  resolved "https://registry.yarnpkg.com/@celo/contractkit/-/contractkit-0.4.4.tgz#763a17a70c3683a492f1b66058fb9c9306a1ec41"
-  integrity sha512-Rs8W1Tqpa9r+BgxhB1TZe2Jn/455Ndt7LLhc53qG8tMF3ByQpgFyIA4WcUqDAKEpIYJtpk8yceA7Rv1MMNoUaw==
+"@celo/contractkit@0.4.5":
+  version "0.4.5"
+  resolved "https://registry.yarnpkg.com/@celo/contractkit/-/contractkit-0.4.5.tgz#8b4e249e67ecd87ae383804b37d7a235e49ff17d"
+  integrity sha512-DyzDY+ZR4HRkJubqw7uVVU70lbts7D7oQA+yRUc0rleiZKFZHGhjp7rmCorqtCv6ptAEtIyG+VDtUKZ/a2Nl6A==
   dependencies:
     "@azure/identity" "^1.0.2"
     "@azure/keyvault-keys" "^4.0.2"
