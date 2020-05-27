@@ -42,7 +42,8 @@ export class MultiSigWrapper extends BaseWrapper<MultiSig> {
       if (
         transaction.data === data &&
         transaction.destination === destination &&
-        transaction.value === '0'
+        transaction.value === '0' &&
+        !transaction.executed
       ) {
         return toTransactionObject(
           this.kit,
