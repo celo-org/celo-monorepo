@@ -69,7 +69,7 @@ function SendAmount(props: Props) {
   const dispatch = useDispatch()
 
   const isRequest = props.route.params?.isRequest ?? false
-  const recipient = props.route.params?.recipient
+  const recipient = props.route.params.recipient
 
   React.useEffect(() => {
     dispatch(fetchDollarBalance())
@@ -114,6 +114,11 @@ function SendAmount(props: Props) {
   }, [amount, setAmount])
 
   const onDecimalPress = React.useCallback(() => {
+    const decimalPos = amount.indexOf(decimalSeparator ?? '.')
+    if (decimalPos !== -1) {
+      return
+    }
+
     if (!amount) {
       setAmount('0' + decimalSeparator)
     } else {
@@ -271,7 +276,7 @@ function SendAmount(props: Props) {
       <Button
         style={styles.nextBtn}
         size={BtnSizes.FULL}
-        text={t('review')}
+        text={t('global:review')}
         type={BtnTypes.SECONDARY}
         onPress={isRequest ? onRequest : onSend}
         disabled={reviewBtnDisabled}

@@ -35,4 +35,4 @@ Times.defaultProps = {
   strokeWidth: 2,
 }
 
-export default Times
+export default React.memo(Times)

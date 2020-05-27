@@ -1,3 +1,5 @@
+import QRCodeBorderlessIcon from '@celo/react-components/icons/QRCodeBorderless'
+import Times from '@celo/react-components/icons/Times'
 import colors from '@celo/react-components/styles/colors.v2'
 import { RouteProp } from '@react-navigation/core'
 import { createStackNavigator } from '@react-navigation/stack'
@@ -30,6 +32,7 @@ import BackupQuiz, { navOptionsForQuiz } from 'src/backup/BackupQuiz'
 import BackupSocial from 'src/backup/BackupSocial'
 import BackupSocialIntro from 'src/backup/BackupSocialIntro'
 import BackButton from 'src/components/BackButton.v2'
+import CancelButton from 'src/components/CancelButton.v2'
 import DappKitAccountScreen from 'src/dappkit/DappKitAccountScreen'
 import DappKitSignTxScreen from 'src/dappkit/DappKitSignTxScreen'
 import DappKitTxDataScreen from 'src/dappkit/DappKitTxDataScreen'
@@ -38,6 +41,7 @@ import ReclaimPaymentConfirmationScreen from 'src/escrow/ReclaimPaymentConfirmat
 import ExchangeReview from 'src/exchange/ExchangeReview'
 import ExchangeTradeScreen from 'src/exchange/ExchangeTradeScreen'
 import FeeExchangeEducation from 'src/exchange/FeeExchangeEducation'
+import { CURRENCY_ENUM } from 'src/geth/consts'
 import i18n from 'src/i18n'
 import PhoneNumberLookupQuotaScreen from 'src/identity/PhoneNumberLookupQuotaScreen'
 import ImportWallet from 'src/import/ImportWallet'
@@ -48,18 +52,18 @@ import Language from 'src/language/Language'
 import SelectLocalCurrency from 'src/localCurrency/SelectLocalCurrency'
 import {
   emptyHeader,
-  exchangeReviewOptions,
-  exchangeTradeOptions,
+  HeaderTitleWithBalance,
   HeaderTitleWithSubtitle,
   headerWithBackButton,
+  headerWithCancelButton,
   noHeader,
   nuxNavigationOptions,
   nuxNavigationOptionsNoBackButton,
-  sendAmountOptions,
-  sendOptions,
 } from 'src/navigator/Headers.v2'
+import { navigate, navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import TabNavigator from 'src/navigator/TabNavigator'
+import { TopBarIconButton, TopBarTextButton } from 'src/navigator/TopBarButton.v2'
 import { StackParamList } from 'src/navigator/types'
 import IncomingPaymentRequestListScreen from 'src/paymentRequest/IncomingPaymentRequestListScreen'
 import OutgoingPaymentRequestListScreen from 'src/paymentRequest/OutgoingPaymentRequestListScreen'
@@ -184,15 +188,47 @@ const nuxScreens = (Navigator: typeof Stack) => (
   </>
 )
 
+const sendScreenOptions = ({ route }: { route: RouteProp<StackParamList, Screens.Send> }) => {
+  const goQr = () => navigate(Screens.QRCode)
+  return {
+    ...emptyHeader,
+    headerLeft: () => <TopBarIconButton icon={<Times />} onPress={navigateBack} />,
+    headerLeftContainerStyle: { paddingLeft: 20 },
+    headerRight: () => (
+      <TopBarIconButton
+        icon={<QRCodeBorderlessIcon height={32} color={colors.greenUI} />}
+        onPress={goQr}
+      />
+    ),
+    headerRightContainerStyle: { paddingRight: 16 },
+    headerTitle: i18n.t(`sendFlow7:${route.params?.isRequest ? 'request' : 'send'}`),
+  }
+}
+const sendAmountScreenOptions = ({
+  route,
+}: {
+  route: RouteProp<StackParamList, Screens.SendAmount>
+}) => {
+  return {
+    ...emptyHeader,
+    headerLeft: () => <BackButton />,
+    headerTitle: () => (
+      <HeaderTitleWithBalance
+        title={i18n.t(`sendFlow7:${route.params?.isRequest ? 'request' : 'send'}`)}
+        token={CURRENCY_ENUM.DOLLAR}
+      />
+    ),
+  }
+}
 const sendScreens = (Navigator: typeof Stack) => (
   <>
-    <Navigator.Screen name={Screens.Send} component={Send} options={sendOptions} />
+    <Navigator.Screen name={Screens.Send} component={Send} options={sendScreenOptions} />
     <Navigator.Screen name={Screens.QRScanner} component={QRScanner} />
     <Navigator.Screen name={Screens.QRCode} component={QRCode} />
     <Navigator.Screen
       name={Screens.SendAmount}
       component={SendAmount}
-      options={sendAmountOptions}
+      options={sendAmountScreenOptions}
     />
     <Navigator.Screen name={Screens.SendConfirmation} component={SendConfirmation} />
     <Navigator.Screen name={Screens.ValidateRecipientIntro} component={ValidateRecipientIntro} />
@@ -223,17 +259,59 @@ const sendScreens = (Navigator: typeof Stack) => (
   </>
 )
 
+const exchangeTradeScreenOptions = ({
+  route,
+}: {
+  route: RouteProp<StackParamList, Screens.ExchangeTradeScreen>
+}) => {
+  const { makerToken } = route.params?.makerTokenDisplay
+  const title =
+    makerToken === CURRENCY_ENUM.DOLLAR
+      ? i18n.t('exchangeFlow9:buyGold')
+      : i18n.t('exchangeFlow9:sellGold')
+  return {
+    ...headerWithCancelButton,
+    headerLeft: () => <CancelButton />,
+    headerTitle: () => <HeaderTitleWithBalance title={title} token={makerToken} />,
+  }
+}
+
+const exchangeReviewScreenOptions = ({
+  route,
+}: {
+  route: RouteProp<StackParamList, Screens.ExchangeReview>
+}) => {
+  const { makerToken } = route.params?.exchangeInput
+  const goExchangeHome = () => navigate(Screens.ExchangeHomeScreen)
+  const title =
+    makerToken === CURRENCY_ENUM.DOLLAR
+      ? i18n.t('exchangeFlow9:buyGold')
+      : i18n.t('exchangeFlow9:sellGold')
+  return {
+    ...headerWithCancelButton,
+    headerLeft: () => <CancelButton onCancel={goExchangeHome} />,
+    headerRight: () => (
+      <TopBarTextButton
+        title={i18n.t('global:edit')}
+        testID="EditButton"
+        onPress={navigateBack}
+        titleStyle={{ color: colors.goldDark }}
+      />
+    ),
+    headerTitle: () => <HeaderTitleWithBalance title={title} token={makerToken} />,
+  }
+}
 const exchangeScreens = (Navigator: typeof Stack) => (
   <>
     <Navigator.Screen
       name={Screens.ExchangeTradeScreen}
       component={ExchangeTradeScreen}
-      options={exchangeTradeOptions}
+      options={exchangeTradeScreenOptions}
     />
     <Navigator.Screen
       name={Screens.ExchangeReview}
       component={ExchangeReview}
-      options={exchangeReviewOptions}
+      options={exchangeReviewScreenOptions}
     />
     <Navigator.Screen name={Screens.FeeExchangeEducation} component={FeeExchangeEducation} />
   </>
