@@ -59,9 +59,8 @@ export const solidityBytesToString = (input: SolidityBytes): string => {
   if (input === null || input === undefined || typeof input === 'string') {
     return input
   } else if (Array.isArray(input)) {
-    let hex = ''
-    input.map((num) => (hex += num))
-    return ensureLeading0x(hex)
+    const hexString = input.reduce((acc, num) => acc + num.toString(16).padStart(2, '0'), '')
+    return ensureLeading0x(hexString)
   } else {
     throw new Error('Unexpected input type for solidity bytes')
   }
