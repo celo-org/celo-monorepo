@@ -59,7 +59,7 @@ export const emptyHeader: StackNavigationOptions = {
   headerShown: true,
   headerTitleStyle: [styles.headerTitle, componentStyles.screenHeader],
   headerTitleContainerStyle: {
-    alignItems: 'center' as 'center',
+    alignItems: 'center',
   },
   headerTitleAlign: 'center',
   cardStyle: { backgroundColor: colors.background },
