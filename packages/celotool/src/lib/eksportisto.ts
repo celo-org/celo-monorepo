@@ -1,6 +1,6 @@
 import { envVar, fetchEnv, fetchEnvOrFallback, isVmBased } from 'src/lib/env-utils'
-import { execCmdWithExitOnFailure } from 'src/lib/utils'
 import { getInternalTxNodeLoadBalancerIP } from 'src/lib/vm-testnet-utils'
+import { execCmdWithExitOnFailure } from './cmd-utils'
 
 export async function installHelmChart(celoEnv: string) {
   const suffix = fetchEnvOrFallback(envVar.EKSPORTISTO_SUFFIX, '1')
