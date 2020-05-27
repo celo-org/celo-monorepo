@@ -36,6 +36,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  cancelBtn: {
+    color: colors.dark,
+  },
 })
 
 export const nuxNavigationOptions: StackNavigationOptions = {
@@ -101,7 +104,7 @@ export const exchangeTradeOptions = ({
       : i18n.t('exchangeFlow9:sellGold')
   return {
     ...headerWithCancelButton,
-    headerLeft: () => <CancelButton style={{ color: colors.dark }} />,
+    headerLeft: () => <CancelButton style={styles.cancelBtn} />,
     headerTitle: () => <HeaderTitleWithBalance title={title} token={makerToken} />,
   }
 }
@@ -119,7 +122,7 @@ export const exchangeReviewOptions = ({
       : i18n.t('exchangeFlow9:sellGold')
   return {
     ...headerWithCancelButton,
-    headerLeft: () => <CancelButton style={{ color: colors.dark }} onCancel={goExchangeHome} />,
+    headerLeft: () => <CancelButton style={styles.cancelBtn} onCancel={goExchangeHome} />,
     headerRight: () => (
       <TopBarTextButton
         title={i18n.t('global:edit')}

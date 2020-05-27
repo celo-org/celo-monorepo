@@ -20,7 +20,7 @@ export class DollarEducation extends React.Component<Props> {
   goToSend = () => {
     this.props.setEducationCompleted()
     CeloAnalytics.track(CustomEventNames.send_dollar_nux)
-    navigate(Screens.Send, {})
+    navigate(Screens.Send)
   }
 
   goToWalletHome = () => {
