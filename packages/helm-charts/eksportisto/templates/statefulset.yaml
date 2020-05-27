@@ -39,15 +39,15 @@ spec:
       - name: eksportisto-{{ .Values.deploymentSuffix }}
         image: {{ .Values.imageRepository }}:{{ .Values.imageTag }}
         imagePullPolicy: {{ .Values.imagePullPolicy }}
-        command:
-          - sh
-          - "-c"
-          - |
-            /rosetta/eksportisto --nodeUri $WEB3_PROVIDER
+        args:
+          - --nodeUri
+          - $(WEB3_PROVIDER)
+          - --datadir
+          - /root/.eksportisto
         resources:
           requests:
-            memory: 256Mi
-            cpu: 2400m
+            memory: 100Mi
+            cpu: 1700m
         ports:
         - name: prometheus
           containerPort: 8080
