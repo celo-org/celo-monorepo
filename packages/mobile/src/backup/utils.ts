@@ -4,6 +4,9 @@ import { useAsync } from 'react-async-hook'
 import * as bip39 from 'react-native-bip39'
 import { getKey } from 'src/utils/keyStore'
 import Logger from 'src/utils/Logger'
+import { useDispatch } from 'react-redux'
+import { showError } from 'src/alert/actions'
+import { ErrorMessages } from 'src/app/ErrorMessages'
 
 const TAG = 'Backup/utils'
 
@@ -107,7 +110,13 @@ export async function getStoredMnemonic(): Promise<string | null> {
 }
 
 export function useAccountKey() {
+  const dispatch = useDispatch()
   const asyncAccountKey = useAsync(getStoredMnemonic, [])
+
+  if (asyncAccountKey.error) {
+    dispatch(showError(ErrorMessages.FAILED_FETCH_MNEMONIC))
+  }
+
   return asyncAccountKey.result
 }
 

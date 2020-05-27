@@ -41,7 +41,7 @@ export enum Mode {
 
 interface State {
   mode: Mode
-  mnemonic: string,
+  mnemonic: string
   mnemonicLength: number
   mnemonicWords: string[]
   userChosenWords: Array<{
@@ -91,11 +91,8 @@ export class BackupQuiz extends React.Component<Props, State> {
   }
 
   retrieveMnemonic = async () => {
-    try {
-      const mnemonic = await getStoredMnemonic()
-      if (!mnemonic) {
-        throw new Error('Mnemonic not found in key store')
-      }
+    const mnemonic = await getStoredMnemonic()
+    if (mnemonic) {
       const shuffledMnemonic = getShuffledWordSet(mnemonic)
 
       this.setState({
@@ -103,11 +100,10 @@ export class BackupQuiz extends React.Component<Props, State> {
         mnemonicWords: shuffledMnemonic,
         mnemonicLength: shuffledMnemonic.length,
       })
-
-    } catch {
+    } else {
       const message = 'Failed to retrieve Account Key'
       this.props.showError(ErrorMessages.FAILED_FETCH_MNEMONIC)
-      
+
       CeloAnalytics.track(CustomEventNames.backup_error, {
         title: message,
         component: 'BackupQuiz',
