@@ -14,6 +14,7 @@ import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
 import { Platform } from 'react-native'
 import { Task } from 'redux-saga'
 import { all, call, delay, fork, put, race, select, take, takeEvery } from 'redux-saga/effects'
+import { setRetryVerificationWithForno } from 'src/account/actions'
 import { e164NumberSelector } from 'src/account/selectors'
 import { showError, showMessage } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
@@ -221,6 +222,10 @@ export function* requestAndRetrieveAttestations(
     account
   )
 
+  // Any verification failure past this point will be after sending a tx
+  // so do not prompt forno retry as these failures are not always
+  // light client related, and account may have insufficient balance
+  yield put(setRetryVerificationWithForno(false))
   while (attestations.length < attestationsRemaining) {
     // Request any additional attestations beyond the original set
     yield call(
