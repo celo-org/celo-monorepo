@@ -10,4 +10,5 @@ export interface GenesisConfig {
   chainId?: number
   requestTimeout?: number
   enablePetersburg?: boolean
+  timestamp?: number
 }

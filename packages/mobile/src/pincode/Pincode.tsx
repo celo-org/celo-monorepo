@@ -3,7 +3,6 @@
  * with an input, e.g. get/ensure/set pincode.
  */
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
-import HorizontalLine from '@celo/react-components/components/HorizontalLine'
 import NumberKeypad from '@celo/react-components/components/NumberKeypad'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
@@ -51,16 +50,7 @@ function Pincode(props: Props) {
             <PincodeTextbox pin={pin} placeholder={placeholder} />
           </View>
         </View>
-        <View>
-          <HorizontalLine />
-          <View style={style.keypadContainer}>
-            <NumberKeypad
-              showDecimal={false}
-              onDigitPress={onDigitPress}
-              onBackspacePress={onBackspacePress}
-            />
-          </View>
-        </View>
+        <NumberKeypad onDigitPress={onDigitPress} onBackspacePress={onBackspacePress} />
       </ScrollView>
       <Button
         testID="Pincode-Submit"
@@ -84,10 +74,6 @@ const style = StyleSheet.create({
   pincodeContainer: {
     marginBottom: 20,
     alignItems: 'center',
-  },
-  keypadContainer: {
-    marginBottom: 15,
-    paddingHorizontal: 20,
   },
 })
 

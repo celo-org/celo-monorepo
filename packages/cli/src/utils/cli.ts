@@ -7,6 +7,14 @@ import Table from 'cli-table'
 import { cli } from 'cli-ux'
 import { EventLog, Tx } from 'web3-core'
 
+// TODO: How can we deploy contracts with the Celo provider w/o a CeloTransactionObject?
+export async function displayWeb3Tx(name: string, txObj: any, tx?: Omit<Tx, 'data'>) {
+  cli.action.start(`Sending Transaction: ${name}`)
+  const result = await txObj.send(tx)
+  console.log(result)
+  cli.action.stop()
+}
+
 export async function displaySendTx<A>(
   name: string,
   txObj: CeloTransactionObject<A>,

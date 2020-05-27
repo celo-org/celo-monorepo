@@ -21,14 +21,18 @@ import menu, { CeloLinks, hashNav, MAIN_MENU } from 'src/shared/menu-items'
 import { colors, fonts, standardStyles, textStyles } from 'src/styles'
 
 const MENU = [menu.HOME, ...MAIN_MENU]
-const TECH_MENU = [menu.PAPERS, { name: 'Docs', link: CeloLinks.docs }]
+const TECH_MENU = [
+  { name: 'Docs', link: CeloLinks.docs },
+  { name: 'Security Audits', link: CeloLinks.audits },
+  menu.PAPERS,
+]
 const eventsLink = `${menu.COMMUNITY.link}#${hashNav.connect.events}`
 const ecoFundLink = `${menu.COMMUNITY.link}#${hashNav.connect.fund}`
 const RESOURCE_MENU = [
   menu.CODE_OF_CONDUCT,
   { name: 'Events', link: eventsLink },
   menu.BRAND,
-  { name: 'EcoSystem Fund', link: ecoFundLink },
+  { name: 'Ecosystem Fund', link: ecoFundLink },
 ]
 
 const ICON_SIZE = 13
@@ -127,8 +131,7 @@ export default function Footer() {
         mobileStyle={standardStyles.blockMarginMobile}
       >
         <Cell span={Spans.full} style={isMobile ? standardStyles.centered : styles.toes}>
-          <Lazy once={true}>
-            {' '}
+          <Lazy unmountIfInvisible={true}>
             <ChangeStory />
           </Lazy>
           <Text style={[fonts.legal, styles.copyright, isMobile && textStyles.center]}>

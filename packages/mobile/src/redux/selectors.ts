@@ -5,7 +5,7 @@ import { BALANCE_OUT_OF_SYNC_THRESHOLD } from 'src/config'
 import { isGethConnectedSelector } from 'src/geth/selectors'
 import { RootState } from 'src/redux/reducers'
 import { timeDeltaInDays, timeDeltaInSeconds } from 'src/utils/time'
-import { fornoSelector } from 'src/web3/selectors'
+import { contractKitReadySelector, fornoSelector } from 'src/web3/selectors'
 
 export const disabledDueToNoBackup = (
   accountCreationTime: number,
@@ -29,10 +29,11 @@ export const getNetworkConnected = (state: RootState) => state.networkInfo.conne
 
 export const isAppConnected = createSelector(
   fornoSelector,
+  contractKitReadySelector, // App acts as if disconnected when contractKit is locked
   isGethConnectedSelector,
   getNetworkConnected,
-  (fornoEnabled, gethConnected, networkConnected) =>
-    (fornoEnabled || gethConnected) && networkConnected
+  (fornoEnabled, contractKitReady, gethConnected, networkConnected) =>
+    (fornoEnabled || gethConnected) && contractKitReady && networkConnected
 )
 
 export const isAppSynced = (state: RootState) => {

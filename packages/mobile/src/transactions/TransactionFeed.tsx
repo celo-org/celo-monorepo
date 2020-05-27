@@ -1,4 +1,3 @@
-import ItemSeparator from '@celo/react-components/components/ItemSeparator'
 import { ApolloError } from 'apollo-boost'
 import gql from 'graphql-tag'
 import * as React from 'react'
@@ -6,11 +5,11 @@ import { FlatList } from 'react-native'
 import { connect } from 'react-redux'
 import { TransactionFeedFragment } from 'src/apollo/types'
 import { AddressToE164NumberType } from 'src/identity/reducer'
-import { Invitees } from 'src/invite/actions'
 import { NumberToRecipient } from 'src/recipients/recipient'
 import { recipientCacheSelector } from 'src/recipients/reducer'
 import { RootState } from 'src/redux/reducers'
 import ExchangeFeedItem from 'src/transactions/ExchangeFeedItem'
+import GoldTransactionFeedItem from 'src/transactions/GoldTransactionFeedItem'
 import NoActivity from 'src/transactions/NoActivity'
 import { TransactionStatus } from 'src/transactions/reducer'
 import TransferFeedItem from 'src/transactions/TransferFeedItem'
@@ -25,7 +24,6 @@ export enum FeedType {
 }
 
 interface StateProps {
-  invitees: Invitees
   commentKey: string | null | undefined
   addressToE164Number: AddressToE164NumberType
   recipientCache: NumberToRecipient
@@ -43,7 +41,6 @@ type Props = {
 } & StateProps
 
 const mapStateToProps = (state: RootState): StateProps => ({
-  invitees: state.invite.invitees,
   commentKey: privateCommentKeySelector(state),
   addressToE164Number: state.identity.addressToE164Number,
   recipientCache: recipientCacheSelector(state),
@@ -62,19 +59,18 @@ export class TransactionFeed extends React.PureComponent<Props> {
     `,
   }
 
-  renderItem = (commentKeyBuffer: Buffer | null) => ({
+  renderItem = (commentKeyBuffer: Buffer | null, kind: FeedType) => ({
     item: tx,
   }: {
     item: FeedItem
     index: number
   }) => {
-    const { addressToE164Number, invitees, recipientCache } = this.props
+    const { addressToE164Number, recipientCache } = this.props
 
     switch (tx.__typename) {
       case 'TokenTransfer':
         return (
           <TransferFeedItem
-            invitees={invitees}
             addressToE164Number={addressToE164Number}
             recipientCache={recipientCache}
             commentKey={commentKeyBuffer}
@@ -82,10 +78,12 @@ export class TransactionFeed extends React.PureComponent<Props> {
           />
         )
       case 'TokenExchange':
-        return <ExchangeFeedItem {...tx} />
+        if (kind === FeedType.HOME) {
+          return <ExchangeFeedItem {...tx} />
+        } else {
+          return <GoldTransactionFeedItem {...tx} />
+        }
     }
-
-    return <React.Fragment />
   }
 
   keyExtractor = (item: TransactionFeedFragment) => {
@@ -107,8 +105,7 @@ export class TransactionFeed extends React.PureComponent<Props> {
         <FlatList
           data={data}
           keyExtractor={this.keyExtractor}
-          ItemSeparatorComponent={ItemSeparator}
-          renderItem={this.renderItem(commentKeyBuffer)}
+          renderItem={this.renderItem(commentKeyBuffer, kind)}
         />
       )
     } else {

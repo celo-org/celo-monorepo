@@ -105,7 +105,7 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
             ]
           }
         >
-          John Doe
+          Jane Doe
         </Text>
         <View
           style={
@@ -150,7 +150,7 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
               }
             }
           >
-            (415) 555-0000
+            (310) 555-0000
           </Text>
         </View>
       </View>
@@ -503,7 +503,6 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
         <View
           accessible={true}
           focusable={false}
-          isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",
@@ -627,7 +626,6 @@ exports[`SendAmount renders correctly for request payment confirmation 1`] = `
         <View
           accessible={true}
           focusable={false}
-          isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackground",

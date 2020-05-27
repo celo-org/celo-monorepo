@@ -18,6 +18,8 @@ import {
 } from 'src/exchange/actions'
 import { ExchangeRatePair, exchangeRatePairSelector } from 'src/exchange/reducer'
 import { CURRENCY_ENUM } from 'src/geth/consts'
+import { navigate } from 'src/navigator/NavigationService'
+import { Screens } from 'src/navigator/Screens'
 import { convertToContractDecimals } from 'src/tokens/saga'
 import {
   addStandbyTransaction,
@@ -46,7 +48,7 @@ export function* doFetchTobinTax({ makerAmount, makerToken }: FetchTobinTaxActio
     if (makerToken === CURRENCY_ENUM.GOLD) {
       yield call(getConnectedAccount)
 
-      const contractKit = getContractKit()
+      const contractKit = yield call(getContractKit)
       const reserve: ReserveWrapper = yield call([
         contractKit.contracts,
         contractKit.contracts.getReserve,
@@ -104,7 +106,7 @@ export function* doFetchExchangeRate(action: FetchExchangeRateAction) {
         ? makerAmountInWei
         : LARGE_DOLLARS_SELL_AMOUNT_IN_WEI
 
-    const contractKit = getContractKit()
+    const contractKit = yield call(getContractKit)
 
     const exchange: ExchangeWrapper = yield call([
       contractKit.contracts,
@@ -146,6 +148,7 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
   Logger.debug(TAG, `Exchanging ${makerAmount.toString()} of token ${makerToken}`)
   let txId: string | null = null
   try {
+    navigate(Screens.ExchangeHomeScreen) // Must navigate to final screen before getting unlocked account which prompts pin
     const account: string = yield call(getConnectedUnlockedAccount)
     const exchangeRatePair: ExchangeRatePair = yield select(exchangeRatePairSelector)
     const exchangeRate = getRateForMakerToken(exchangeRatePair, makerToken)
@@ -160,7 +163,7 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
 
     txId = yield createStandbyTx(makerToken, makerAmount, exchangeRate, account)
 
-    const contractKit = getContractKit()
+    const contractKit = yield call(getContractKit)
 
     const goldTokenContract: GoldTokenWrapper = yield call([
       contractKit.contracts,
@@ -305,7 +308,6 @@ export function* watchFetchExchangeRate() {
 }
 
 export function* watchExchangeTokens() {
-  // @ts-ignore saga doesn't seem to understand the action with multiple params?
   yield takeEvery(Actions.EXCHANGE_TOKENS, exchangeGoldAndStableTokens)
 }
 
