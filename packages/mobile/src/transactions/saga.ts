@@ -114,9 +114,6 @@ function* watchUserTxQueryChannel(channel: EventChannel<UserTxQueryChannelEvent>
 function* cleanupStandbyTransacitons(newFeedTransactions: TransactionFeedFragment[]) {
   const standbyTxs: StandbyTransaction[] = yield select(standbyTransactionsSelector)
   const newFeedTxHashes = new Set(newFeedTransactions.map((tx) => tx?.hash))
-  // const inQueryTxs = (tx: StandbyTransaction) =>
-  //   tx.hash && queryDataTxHashes.has(tx.hash) && tx.status !== TransactionStatus.Failed
-  // const filteredStandbyTxs = this.props.standbyTransactions.filter(inQueryTxs)
   for (const standbyTx of standbyTxs) {
     if (
       standbyTx.hash &&
