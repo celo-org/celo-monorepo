@@ -1,0 +1,11 @@
+PROBLEM:
+
+FAILURE: Build failed with an exception.
+* Where:
+Script '/Users/aaronmgdr/celo-monorepo/node_modules/@react-native-community/cli-platform-android/native_modules.gradle' line: 191
+* What went wrong:
+A problem occurred evaluating settings 'celo'.
+> Text must not be null or empty
+
+FIX:
+yarn

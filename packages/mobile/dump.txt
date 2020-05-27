@@ -1,0 +1,5 @@
+*** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***
+pid: 0, tid: 0 >>> org.celo.mobile.alfajores <<<
+
+backtrace:
+  #00  pc 0000000000b32b70  /data/app/org.celo.mobile.alfajores-uKuWZeo4v85rgvPdF4eKVA==/split_config.arm64_v8a.apk (offset 0x3b4000)
