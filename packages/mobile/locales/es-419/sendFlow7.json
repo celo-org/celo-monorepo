@@ -105,5 +105,6 @@
     "body1": "Tu contacto puede encontrar su número de cuenta (también conocido como dirección) al inicio del Menú de Ajustes",
     "body2": "Los números de cuenta comienzan con \"0x\" y tienen una longitud de 42 caracteres. Se encuentran directamente debajo de la foto de perfil"
   },
-  "transferAddressChanged": "Este contacto cambió su número de cuenta desde la transacción. Este pago fue enviado a:"
+  "transferAddressChanged": "Este contacto cambió su número de cuenta desde la transacción. Este pago fue enviado a:",
+  "review": "Revisión"
 }
