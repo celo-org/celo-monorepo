@@ -219,16 +219,17 @@ USAGE
   $ celocli validator:signed-blocks
 
 OPTIONS
-  --at-block=at-block                                  latest block to examine for sginer activity
+  --at-block=at-block                                  latest block to examine for signer activity
   --lookback=lookback                                  [default: 120] how many blocks to look back for signer activity
   --signer=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) address of the signer to check for signatures
   --width=width                                        [default: 40] line width for printing marks
 
 EXAMPLES
-  heartbeat --signer 0x5409ED021D9299bf6814279A6A1411A7e866A631
-  heartbeat --at-block 100000 --signer 0x5409ED021D9299bf6814279A6A1411A7e866A631
-  heartbeat --lookback 500 --signer 0x5409ED021D9299bf6814279A6A1411A7e866A631
-  heartbeat --lookback 50 --width 10 --signer 0x5409ED021D9299bf6814279A6A1411A7e866A631
+  signed-blocks --signer 0x5409ED021D9299bf6814279A6A1411A7e866A631
+  signed-blocks --signer 0x5409ED021D9299bf6814279A6A1411A7e866A631 --follow
+  signed-blocks --at-block 100000 --signer 0x5409ED021D9299bf6814279A6A1411A7e866A631
+  signed-blocks --lookback 500 --signer 0x5409ED021D9299bf6814279A6A1411A7e866A631
+  signed-blocks --lookback 50 --width 10 --signer 0x5409ED021D9299bf6814279A6A1411A7e866A631
 ```
 
 _See code: [packages/cli/src/commands/validator/signed-blocks.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/validator/signed-blocks.ts)_
