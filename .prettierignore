@@ -5,8 +5,8 @@ package.json
 **/privacy/*
 .git/
 
-packages/**/dist
-packages/**/lib
+packages/*/dist
+packages/*/lib
 
 packages/docs/_book
 packages/mobile/src/geth/*.json

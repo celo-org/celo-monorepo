@@ -1,6 +1,7 @@
 import { AttestationsWrapper } from '@celo/contractkit/lib/wrappers/Attestations'
 import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import { Request } from 'firebase-functions'
+import config from '../config'
 import { getContractKit } from '../web3/contracts'
 import logger from './logger'
 
@@ -25,11 +26,9 @@ export function authenticateUser(request: Request): boolean {
 export async function isVerified(account: string, hashedPhoneNumber: string): Promise<boolean> {
   // TODO (amyslawson) wrap forno request in retry
   const attestationsWrapper: AttestationsWrapper = await getContractKit().contracts.getAttestations()
-  const attestationStatus = await attestationsWrapper.getVerifiedStatus(hashedPhoneNumber, account)
-
-  logger.debug(
-    `CELO_PNP_DEBUG user is verified=${attestationStatus.isVerified} with ${attestationStatus.completed} completed attestations and
-      ${attestationStatus.numAttestationsRemaining} verifications remaining. Total of ${attestationStatus.total} requested.`
-  )
-  return attestationStatus.isVerified
+  const attestationStats = await attestationsWrapper.getAttestationStat(hashedPhoneNumber, account)
+  const numAttestationsCompleted = attestationStats.completed
+  const numAttestationsRemaining =
+    config.attestations.numberAttestationsRequired - numAttestationsCompleted
+  return numAttestationsRemaining <= 0
 }
