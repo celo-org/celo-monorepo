@@ -1,7 +1,7 @@
 {
-  "name": "@celo/phone-number-privacy",
+  "name": "@celo/phone-number-privacy-signer",
   "version": "1.0.0",
-  "description": "Generates unique salt for phone numbers.",
+  "description": "Signing participator of a the PGPNP threshold signature scheme",
   "author": "Celo",
   "license": "Apache-2.0",
   "main": "dist/index.js",
@@ -21,7 +21,7 @@
     "keygen": "ts-node scripts/createBlsKeyPair.ts"
   },
   "dependencies": {
-    "@celo/contractkit": "0.4.4",
+    "@celo/contractkit": "0.4.5",
     "@celo/utils": "0.1.13",
     "blind-threshold-bls": "https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a",
     "firebase-admin": "^8.10.0",
