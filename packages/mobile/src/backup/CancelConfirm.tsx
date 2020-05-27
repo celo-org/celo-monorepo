@@ -14,11 +14,11 @@ interface Props {
 }
 
 export default function CancelConfirm({ screen }: Props) {
-  const [isOpen, setOpenState] = React.useState(true)
+  const [isOpen, setOpenState] = React.useState(false)
   const { t } = useTranslation(Namespaces.backupKeyFlow6)
 
-  const actionText = t('cancelDialogAction')
-  const secondaryText = t('cancelDialogSecondary')
+  const actionText = t('cancelDialog.action')
+  const secondaryText = t('cancelDialog.secondary')
 
   const onCancel = React.useCallback(() => {
     setOpenState(true)
@@ -42,14 +42,14 @@ export default function CancelConfirm({ screen }: Props) {
   return (
     <>
       <Dialog
-        title={t('cancelDialogTitle')}
+        title={t('cancelDialog.title')}
         isVisible={isOpen}
         actionText={actionText}
         actionPress={onComplete}
         secondaryActionPress={onProcrastinate}
         secondaryActionText={secondaryText}
       >
-        {t('cancelDialogBody')}
+        {t('cancelDialog.body')}
       </Dialog>
       <CancelButton onCancel={onCancel} style={styles.button} />
     </>
