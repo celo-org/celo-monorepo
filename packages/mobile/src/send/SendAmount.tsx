@@ -157,12 +157,12 @@ export class SendAmount extends React.Component<Props, State> {
   fetchLatestAddressesAndValidate = () => {
     const { recipient } = this.props
 
-    if (recipient.kind === RecipientKind.QrCode || recipient.kind === RecipientKind.Address) {
+    if (recipient.kind === RecipientKind.QrCode) {
       return
     }
 
     if (!recipient.e164PhoneNumber) {
-      throw Error('Recipient phone number is required if not sending via QR Code or address')
+      throw Error('Recipient phone number is required if not sending via QR Code')
     }
 
     this.props.fetchAddressesAndValidate(recipient.e164PhoneNumber)
