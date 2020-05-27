@@ -6,7 +6,7 @@ import {
   switchToCluster,
 } from 'src/lib/azure'
 import { execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
-import { getFornoUrl, getFullNodeRpcInternalUrl } from 'src/lib/endpoints'
+import { getFornoUrl, getFullNodeWebSocketRpcInternalUrl } from 'src/lib/endpoints'
 import { addCeloEnvMiddleware, envVar, fetchEnv } from 'src/lib/env-utils'
 import {
   installGenericHelmChart,
@@ -83,7 +83,7 @@ function releaseName(celoEnv: string) {
 export async function installHelmChart(
   celoEnv: string,
   context: OracleAzureContext,
-  useFullNodes: boolean
+  useForno: boolean
 ) {
   // First install the oracle-rbac helm chart.
   // This must be deployed before so we can use a resulting auth token so that
@@ -94,7 +94,7 @@ export async function installHelmChart(
     celoEnv,
     releaseName(celoEnv),
     helmChartPath,
-    await helmParameters(celoEnv, context, useFullNodes)
+    await helmParameters(celoEnv, context, useForno)
   )
 }
 
@@ -120,12 +120,14 @@ export async function removeHelmRelease(celoEnv: string, context: OracleAzureCon
   }
 }
 
-async function helmParameters(celoEnv: string, context: OracleAzureContext, useFullNodes: boolean) {
+async function helmParameters(celoEnv: string, context: OracleAzureContext, useForno: boolean) {
   const oracleConfig = getOracleConfig(context)
 
   const kubeAuthTokenName = await rbacAuthTokenName(celoEnv)
   const replicas = oracleConfig.identities.length
-  const rpcProviderUrl = useFullNodes ? getFullNodeRpcInternalUrl(celoEnv) : getFornoUrl(celoEnv)
+  const rpcProviderUrl = useForno
+    ? getFornoUrl(celoEnv)
+    : getFullNodeWebSocketRpcInternalUrl(celoEnv)
   return [
     `--set environment.name=${celoEnv}`,
     `--set image.repository=${fetchEnv(envVar.ORACLE_DOCKER_IMAGE_REPOSITORY)}`,
