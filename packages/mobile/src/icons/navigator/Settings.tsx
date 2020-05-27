@@ -1,7 +1,7 @@
 import * as React from 'react'
 import Svg, { Circle, Path } from 'react-native-svg'
 
-function Settings() {
+export function Settings() {
   return (
     <Svg width={32} height={32} viewBox="0 0 32 32" fill="none">
       <Path
@@ -24,4 +24,4 @@ function Settings() {
   )
 }
 
-export default Settings
+export default React.memo(Settings)

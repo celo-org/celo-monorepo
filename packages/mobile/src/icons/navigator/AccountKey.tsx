@@ -1,7 +1,7 @@
 import * as React from 'react'
 import Svg, { Circle, Path } from 'react-native-svg'
 
-function AccountKey() {
+export function AccountKey() {
   return (
     <Svg width={32} height={32} viewBox="0 0 32 32" fill="none">
       <Path
@@ -20,4 +20,4 @@ function AccountKey() {
   )
 }
 
-export default AccountKey
+export default React.memo(AccountKey)

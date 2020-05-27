@@ -28,13 +28,13 @@ import BackupIntroduction from 'src/backup/BackupIntroduction'
 import ExchangeHomeScreen from 'src/exchange/ExchangeHomeScreen'
 import WalletHome from 'src/home/WalletHome'
 import { Namespaces } from 'src/i18n'
-import AccountKey from 'src/icons/navigator/AccountKey'
-import AddWithdraw from 'src/icons/navigator/AddWithdraw'
-import Gold from 'src/icons/navigator/Gold'
-import Help from 'src/icons/navigator/Help'
-import Home from 'src/icons/navigator/Home'
-import Invite from 'src/icons/navigator/Invite'
-import Settings from 'src/icons/navigator/Settings'
+import { AccountKey } from 'src/icons/navigator/AccountKey'
+import { AddWithdraw } from 'src/icons/navigator/AddWithdraw'
+import { Gold } from 'src/icons/navigator/Gold'
+import { Help } from 'src/icons/navigator/Help'
+import { Home } from 'src/icons/navigator/Home'
+import { Invite } from 'src/icons/navigator/Invite'
+import { Settings } from 'src/icons/navigator/Settings'
 import { useDollarsToLocalAmount, useLocalCurrencySymbol } from 'src/localCurrency/hooks'
 import { Screens } from 'src/navigator/Screens'
 import useSelector from 'src/redux/useSelector'
@@ -60,7 +60,7 @@ function CustomDrawerContent(props: DrawerContentComponentProps<DrawerContentOpt
     <DrawerContentScrollView {...props}>
       <View style={styles.drawerTop}>
         <ContactCircle thumbnailPath={contactDetails.thumbnailPath} size={64} />
-        <Text style={[fontStyles.large600, styles.nameLabel]}>{displayName}</Text>
+        <Text style={styles.nameLabel}>{displayName}</Text>
         <PhoneNumberWithFlag
           e164PhoneNumber={e164PhoneNumber}
           defaultCountryCode={defaultCountryCode}
@@ -157,6 +157,7 @@ const styles = StyleSheet.create({
     marginRight: 16,
   },
   nameLabel: {
+    ...fontStyles.large600,
     marginTop: 8,
   },
   border: {

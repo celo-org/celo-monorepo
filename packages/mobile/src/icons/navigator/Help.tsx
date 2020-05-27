@@ -1,7 +1,7 @@
 import * as React from 'react'
 import Svg, { Circle, Path } from 'react-native-svg'
 
-function Help() {
+export function Help() {
   return (
     <Svg width={32} height={32} viewBox="0 0 32 32" fill="none">
       <Circle cx={16} cy={16} r={11} stroke="#B4B9BD" strokeWidth={2} />
@@ -14,4 +14,4 @@ function Help() {
   )
 }
 
-export default Help
+export default React.memo(Help)

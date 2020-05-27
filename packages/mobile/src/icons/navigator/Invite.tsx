@@ -1,7 +1,7 @@
 import * as React from 'react'
 import Svg, { ClipPath, Defs, G, Path } from 'react-native-svg'
 
-function Invite() {
+export function Invite() {
   return (
     <Svg width={32} height={32} viewBox="0 0 32 32" fill="none">
       <G clipPath="url(#prefix__clip0)">
@@ -37,4 +37,4 @@ function Invite() {
   )
 }
 
-export default Invite
+export default React.memo(Invite)

@@ -3,50 +3,14 @@ import { elevationShadowStyle } from '@celo/react-components/styles/styles'
 import { useNavigation } from '@react-navigation/native'
 import * as React from 'react'
 import { StyleSheet, TouchableOpacity, View } from 'react-native'
-import { Line, Svg } from 'react-native-svg'
 import Logo from 'src/icons/Logo.v2'
-
-const Hamburger = () => {
-  return (
-    <Svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-      <Line
-        x1="7.25"
-        y1="9.75"
-        x2="24.75"
-        y2="9.75"
-        stroke="#2E3338"
-        strokeWidth="2.5"
-        strokeLinecap="round"
-      />
-      <Line
-        x1="7.25"
-        y1="15.75"
-        x2="24.75"
-        y2="15.75"
-        stroke="#2E3338"
-        strokeWidth="2.5"
-        strokeLinecap="round"
-      />
-      <Line
-        x1="7.25"
-        y1="21.75"
-        x2="24.75"
-        y2="21.75"
-        stroke="#2E3338"
-        strokeWidth="2.5"
-        strokeLinecap="round"
-      />
-    </Svg>
-  )
-}
-
-const shadow = elevationShadowStyle(1)
+import Hamburger from 'src/navigator/Hamburger'
 
 const DrawerTopBar = () => {
   const navigation = useNavigation()
 
   return (
-    <View style={[styles.container, shadow]}>
+    <View style={styles.container}>
       {/*
       // @ts-ignore Only used in a drawer */}
       <TouchableOpacity style={styles.hamburger} onPress={navigation.toggleDrawer}>
@@ -67,8 +31,7 @@ const styles = StyleSheet.create({
     backgroundColor: colorsV2.white,
     alignItems: 'flex-end',
     justifyContent: 'space-between',
-    // borderBottomWidth: 1,
-    // borderBottomColor: colorsV2.gray2,
+    ...elevationShadowStyle(1),
   },
   hamburger: {
     padding: 8,

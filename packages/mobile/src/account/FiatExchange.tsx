@@ -1,4 +1,5 @@
 import colors from '@celo/react-components/styles/colors'
+import colorsV2 from '@celo/react-components/styles/colors.v2'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { ActivityIndicator, StyleSheet } from 'react-native'
@@ -92,9 +93,8 @@ class FiatExchange extends React.Component<Props, State> {
 const styles = StyleSheet.create({
   exchangeWebView: {},
   background: {
-    backgroundColor: 'white',
+    backgroundColor: colorsV2.background,
     flex: 1,
-    flexDirection: 'column',
     justifyContent: 'space-between',
   },
 })
