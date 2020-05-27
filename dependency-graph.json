@@ -54,6 +54,10 @@
     "contractkit",
     "utils"
   ],
+  "phone-number-privacy": [
+    "contractkit",
+    "utils"
+  ],
   "protocol": [
     "typescript",
     "utils"
@@ -75,14 +79,6 @@
     "utils"
   ],
   "web": [
-    "utils"
-  ],
-  "combiner": [
-    "contractkit",
-    "utils"
-  ],
-  "signer": [
-    "contractkit",
     "utils"
   ]
 }
