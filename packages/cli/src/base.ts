@@ -97,6 +97,7 @@ export abstract class BaseCommand extends LocalCommand {
   private _web3: Web3 | null = null
   private _kit: ContractKit | null = null
   private _wallet?: Wallet
+  private _provider: any = null
 
   get web3() {
     if (!this._web3) {
@@ -106,8 +107,17 @@ export abstract class BaseCommand extends LocalCommand {
         nodeUrl && nodeUrl.endsWith('.ipc')
           ? new Web3(new Web3.providers.IpcProvider(nodeUrl, net))
           : new Web3(nodeUrl)
+      this._provider = this._web3.currentProvider
     }
     return this._web3
+  }
+
+  async newWeb3() {
+    const res: ParserOutput<any, any> = this.parse()
+    const nodeUrl = (res.flags && res.flags.node) || getNodeUrl(this.config.configDir)
+    return nodeUrl && nodeUrl.endsWith('.ipc')
+      ? new Web3(new Web3.providers.IpcProvider(nodeUrl, net))
+      : new Web3(nodeUrl)
   }
 
   get kit() {
