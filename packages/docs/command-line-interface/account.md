@@ -367,6 +367,11 @@ OPTIONS
   --language=chinese_simplified|chinese_traditional|english|french|italian|japanese|korean|spanish
       [default: english] Language for the mnemonic words. **WARNING**, some hardware wallets don't support other languages
 
+  --mnemonic=mnemonic
+      Instead of generating a new mnemonic (seed phrases) the user can set the mnemonic to be used. It is required to set
+      it as a string with all the words in order, separated by spaces (example: "word1 word2 word3 ... word24"). If the
+      words are in other language than enaglish, the --language flag must be used. Should be a bip39 mnemonic
+
   --password=password
       Choose a password to generate the keys
 
@@ -375,6 +380,7 @@ EXAMPLES
   new --password 12341234
   new --language spanish
   new --password 12341234 --language japanese --indexAddress 5
+  new --password 12341234 --mnemonic "word1 word2 word3 ... word24" --indexAddress 5
 ```
 
 _See code: [packages/cli/src/commands/account/new.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/new.ts)_
