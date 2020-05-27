@@ -118,6 +118,7 @@ exports[`PincodeLock renders correctly 1`] = `
             onResponderTerminate={[Function]}
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
+            testID="1"
           >
             <Text
               style={
@@ -153,6 +154,7 @@ exports[`PincodeLock renders correctly 1`] = `
             onResponderTerminate={[Function]}
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
+            testID="2"
           >
             <Text
               style={
@@ -188,6 +190,7 @@ exports[`PincodeLock renders correctly 1`] = `
             onResponderTerminate={[Function]}
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
+            testID="3"
           >
             <Text
               style={
@@ -234,6 +237,7 @@ exports[`PincodeLock renders correctly 1`] = `
             onResponderTerminate={[Function]}
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
+            testID="4"
           >
             <Text
               style={
@@ -269,6 +273,7 @@ exports[`PincodeLock renders correctly 1`] = `
             onResponderTerminate={[Function]}
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
+            testID="5"
           >
             <Text
               style={
@@ -304,6 +309,7 @@ exports[`PincodeLock renders correctly 1`] = `
             onResponderTerminate={[Function]}
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
+            testID="6"
           >
             <Text
               style={
@@ -350,6 +356,7 @@ exports[`PincodeLock renders correctly 1`] = `
             onResponderTerminate={[Function]}
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
+            testID="7"
           >
             <Text
               style={
@@ -385,6 +392,7 @@ exports[`PincodeLock renders correctly 1`] = `
             onResponderTerminate={[Function]}
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
+            testID="8"
           >
             <Text
               style={
@@ -420,6 +428,7 @@ exports[`PincodeLock renders correctly 1`] = `
             onResponderTerminate={[Function]}
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
+            testID="9"
           >
             <Text
               style={
@@ -481,6 +490,7 @@ exports[`PincodeLock renders correctly 1`] = `
             onResponderTerminate={[Function]}
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
+            testID="0"
           >
             <Text
               style={

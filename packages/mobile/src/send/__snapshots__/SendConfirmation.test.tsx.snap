@@ -3680,6 +3680,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
               },
             ]
           }
+          testID="ConfirmButton"
         >
           <View
             style={
@@ -4143,6 +4144,7 @@ exports[`SendConfirmation renders correctly when there are multiple user address
                     "textAlign": "center",
                   }
                 }
+                testID="Comment"
               >
                 Something
               </Text>
