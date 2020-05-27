@@ -138,6 +138,7 @@ describe('SendAmount', () => {
       type: mockTransactionData.type,
       recipient: mockTransactionData.recipient,
       amount: new BigNumber('3.70676691729323309'),
+      reason: '',
     }
 
     it('navigates to ValidateRecipientIntro screen on Send click when a manual address check is needed', () => {
