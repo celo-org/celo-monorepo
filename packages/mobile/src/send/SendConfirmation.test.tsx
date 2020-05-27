@@ -7,7 +7,7 @@ import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { getSendFee } from 'src/send/saga'
 import SendConfirmation from 'src/send/SendConfirmation'
-import { createMockStore } from 'test/utils'
+import { createMockStore, getMockStackScreenProps } from 'test/utils'
 import {
   mockAccount2Invite,
   mockAccountInvite,
@@ -38,12 +38,17 @@ const mockRoute = {
   },
 }
 
+const mockedGetSendFee = getSendFee as jest.Mock
+
+const mockScreenProps = getMockStackScreenProps(Screens.SendConfirmation, {
+  transactionData: mockTransactionData,
+})
+
 describe('SendConfirmation', () => {
   beforeAll(() => {
     jest.useRealTimers()
   })
 
-  const mockedGetSendFee = getSendFee as jest.Mock
   beforeEach(() => {
     mockedGetSendFee.mockClear()
   })
@@ -67,6 +72,8 @@ describe('SendConfirmation', () => {
   })
 
   it('renders correctly for send payment confirmation', async () => {
+    mockedGetSendFee.mockImplementation(async () => TEST_FEE)
+
     const store = createMockStore({
       stableToken: {
         balance: '200',
@@ -77,7 +84,7 @@ describe('SendConfirmation', () => {
 
     const { toJSON, queryByText } = render(
       <Provider store={store}>
-        <SendConfirmation navigation={mockNavigation} route={mockRoute} />
+        <SendConfirmation {...mockScreenProps} />
       </Provider>
     )
 
@@ -95,6 +102,10 @@ describe('SendConfirmation', () => {
   })
 
   it('renders correctly for send payment confirmation when fee calculation fails', async () => {
+    mockedGetSendFee.mockImplementation(async () => {
+      throw new Error('Calculate fee failed')
+    })
+
     const store = createMockStore({
       stableToken: {
         balance: '200',
@@ -107,7 +118,7 @@ describe('SendConfirmation', () => {
 
     const { queryByText, getByText, toJSON } = render(
       <Provider store={store}>
-        <SendConfirmation navigation={mockNavigation} route={mockRoute} />
+        <SendConfirmation {...mockScreenProps} />
       </Provider>
     )
 
@@ -144,7 +155,7 @@ describe('SendConfirmation', () => {
 
     const tree = render(
       <Provider store={store}>
-        <SendConfirmation navigation={mockNavigation} route={mockRoute} />
+        <SendConfirmation {...mockScreenProps} />
       </Provider>
     )
 
@@ -175,7 +186,7 @@ describe('SendConfirmation', () => {
 
     const tree = render(
       <Provider store={store}>
-        <SendConfirmation navigation={mockNavigation} route={mockRoute} />
+        <SendConfirmation {...mockScreenProps} />
       </Provider>
     )
 
@@ -208,7 +219,7 @@ describe('SendConfirmation', () => {
 
     const tree = render(
       <Provider store={store}>
-        <SendConfirmation navigation={mockNavigation} route={mockRoute} />
+        <SendConfirmation {...mockScreenProps} />
       </Provider>
     )
 
