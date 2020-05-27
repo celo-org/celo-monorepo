@@ -41,6 +41,7 @@ export enum Mode {
 
 interface State {
   mode: Mode
+  mnemonic: string,
   mnemonicLength: number
   mnemonicWords: string[]
   userChosenWords: Array<{
@@ -65,6 +66,7 @@ export const navOptionsForQuiz: StackNavigationOptions = {
 
 export class BackupQuiz extends React.Component<Props, State> {
   state: State = {
+    mnemonic: '',
     mnemonicLength: 0,
     mnemonicWords: [],
     userChosenWords: [],
@@ -85,12 +87,7 @@ export class BackupQuiz extends React.Component<Props, State> {
   }
 
   componentDidMount = async () => {
-    const mnemonic = await this.retrieveMnemonic()
-    const shuffledMnemonic = getShuffledWordSet(mnemonic)
-    this.setState({
-      mnemonicWords: shuffledMnemonic,
-      mnemonicLength: shuffledMnemonic.length,
-    })
+    await this.retrieveMnemonic()
   }
 
   retrieveMnemonic = async () => {
@@ -99,16 +96,22 @@ export class BackupQuiz extends React.Component<Props, State> {
       if (!mnemonic) {
         throw new Error('Mnemonic not found in key store')
       }
-      return mnemonic
+      const shuffledMnemonic = getShuffledWordSet(mnemonic)
+
+      this.setState({
+        mnemonic,
+        mnemonicWords: shuffledMnemonic,
+        mnemonicLength: shuffledMnemonic.length,
+      })
+
     } catch {
-      const message = 'Failed to retrieve mnemonic'
-      Logger.error('BackupQuiz/retrieveMnemonic', message)
+      const message = 'Failed to retrieve Account Key'
       this.props.showError(ErrorMessages.FAILED_FETCH_MNEMONIC)
+      
       CeloAnalytics.track(CustomEventNames.backup_error, {
         title: message,
         component: 'BackupQuiz',
       })
-      return ''
     }
   }
 
@@ -152,7 +155,7 @@ export class BackupQuiz extends React.Component<Props, State> {
   }
 
   onPressReset = async () => {
-    const mnemonic = await this.retrieveMnemonic()
+    const mnemonic = this.state.mnemonic
     this.setState({
       mnemonicWords: getShuffledWordSet(mnemonic),
       userChosenWords: [],
@@ -162,7 +165,7 @@ export class BackupQuiz extends React.Component<Props, State> {
 
   afterCheck = async () => {
     const { userChosenWords, mnemonicLength } = this.state
-    const mnemonic = await this.retrieveMnemonic()
+    const mnemonic = this.state.mnemonic
     const lengthsMatch = userChosenWords.length === mnemonicLength
 
     if (lengthsMatch && contentMatches(userChosenWords, mnemonic)) {
