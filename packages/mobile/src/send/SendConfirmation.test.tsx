@@ -20,6 +20,24 @@ const TEST_FEE = new BigNumber(10000000000000000)
 
 jest.mock('src/send/saga')
 
+const storeData = {
+  fees: {
+    estimates: {
+      send: {
+        feeInWei: '1',
+      },
+    },
+  },
+}
+
+const mockRoute = {
+  name: Screens.SendConfirmation as Screens.SendConfirmation,
+  key: '',
+  params: {
+    transactionData: mockTransactionData,
+  },
+}
+
 describe('SendConfirmation', () => {
   beforeAll(() => {
     jest.useRealTimers()
@@ -30,20 +48,30 @@ describe('SendConfirmation', () => {
     mockedGetSendFee.mockClear()
   })
 
+  describe('when commenting', () => {
+    const store = createMockStore(storeData)
+    const getWrapper = () =>
+      render(
+        <Provider store={store}>
+          <SendConfirmation navigation={mockNavigation} route={mockRoute} />
+        </Provider>
+      )
+
+    it('updates the comment/reason', () => {
+      const wrapper = getWrapper()
+      const input = wrapper.getByTestId('commentInput')
+      const comment = 'A comment!'
+      fireEvent.changeText(input, comment)
+      expect(wrapper.queryAllByDisplayValue(comment)).toHaveLength(1)
+    })
+  })
+
   it('renders correctly for send payment confirmation', async () => {
     const store = createMockStore({
       stableToken: {
         balance: '200',
       },
     })
-
-    const mockRoute = {
-      name: Screens.SendConfirmation as Screens.SendConfirmation,
-      key: '',
-      params: {
-        transactionData: mockTransactionData,
-      },
-    }
 
     mockedGetSendFee.mockImplementation(async () => TEST_FEE)
 
@@ -72,14 +100,6 @@ describe('SendConfirmation', () => {
         balance: '200',
       },
     })
-
-    const mockRoute = {
-      name: Screens.SendConfirmation as Screens.SendConfirmation,
-      key: '',
-      params: {
-        transactionData: mockTransactionData,
-      },
-    }
 
     mockedGetSendFee.mockImplementation(async () => {
       throw new Error('Calculate fee failed')
@@ -122,14 +142,6 @@ describe('SendConfirmation', () => {
       },
     })
 
-    const mockRoute = {
-      name: Screens.SendConfirmation as Screens.SendConfirmation,
-      key: '',
-      params: {
-        transactionData: mockTransactionData,
-      },
-    }
-
     const tree = render(
       <Provider store={store}>
         <SendConfirmation navigation={mockNavigation} route={mockRoute} />
@@ -160,14 +172,6 @@ describe('SendConfirmation', () => {
         },
       },
     })
-
-    const mockRoute = {
-      name: Screens.SendConfirmation as Screens.SendConfirmation,
-      key: '',
-      params: {
-        transactionData: mockTransactionData,
-      },
-    }
 
     const tree = render(
       <Provider store={store}>
@@ -201,14 +205,6 @@ describe('SendConfirmation', () => {
         },
       },
     })
-
-    const mockRoute = {
-      name: Screens.SendConfirmation as Screens.SendConfirmation,
-      key: '',
-      params: {
-        transactionData: mockTransactionData,
-      },
-    }
 
     const tree = render(
       <Provider store={store}>

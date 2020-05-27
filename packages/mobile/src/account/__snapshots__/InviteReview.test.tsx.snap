@@ -14,7 +14,6 @@ exports[`InviteReview renders correctly 1`] = `
         Object {
           "backgroundColor": "#FFFFFF",
           "flex": 1,
-          "justifyContent": "space-between",
         },
         undefined,
       ]
@@ -23,7 +22,6 @@ exports[`InviteReview renders correctly 1`] = `
     <RCTScrollView
       contentContainerStyle={
         Object {
-          "justifyContent": "flex-start",
           "paddingVertical": 10,
         }
       }
@@ -44,10 +42,9 @@ exports[`InviteReview renders correctly 1`] = `
               Array [
                 Object {
                   "color": "#2E3338",
-                  "fontFamily": "Hind-Light",
-                  "fontSize": 22,
-                  "paddingBottom": 20,
-                  "textAlign": "center",
+                  "fontFamily": "Inter-Medium",
+                  "fontSize": 24,
+                  "lineHeight": 32,
                 },
                 Object {
                   "alignSelf": "center",
@@ -65,7 +62,6 @@ exports[`InviteReview renders correctly 1`] = `
           style={
             Object {
               "marginHorizontal": 16,
-              "marginVertical": 20,
             }
           }
         >

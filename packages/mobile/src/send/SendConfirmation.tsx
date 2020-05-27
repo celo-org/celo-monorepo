@@ -26,7 +26,9 @@ import { TokenTransactionType } from 'src/apollo/types'
 import ContactCircle from 'src/components/ContactCircle.v2'
 import CurrencyDisplay, { DisplayType, FormatType } from 'src/components/CurrencyDisplay.v2'
 import FeeIcon from 'src/components/FeeIcon'
+import InviteOptionsModal from 'src/components/InviteOptionsModal'
 import LineItemRow from 'src/components/LineItemRow.v2'
+import Modal from 'src/components/Modal'
 import TotalLineItem from 'src/components/TotalLineItem'
 import { MAX_COMMENT_LENGTH } from 'src/config'
 import { FeeType } from 'src/fees/actions'
@@ -154,6 +156,9 @@ export class SendConfirmation extends React.Component<Props, State> {
 
   async componentDidMount() {
     const { addressJustValidated, t } = this.props
+    this.setState({ buttonReset: true }, () => {
+      this.setState({ buttonReset: false })
+    })
     this.props.fetchDollarBalance()
 
     if (addressJustValidated) {
@@ -162,11 +167,11 @@ export class SendConfirmation extends React.Component<Props, State> {
   }
 
   onSendClick = () => {
-    const { recipientAddress } = this.props.confirmationInput
-    if (recipientAddress) {
-      this.sendOrInvite()
+    const { type } = this.props.confirmationInput
+    if (type === TokenTransactionType.InviteSent) {
+      this.showInviteModal()
     } else {
-      this.showModal()
+      this.sendOrInvite()
     }
   }
 
@@ -198,10 +203,13 @@ export class SendConfirmation extends React.Component<Props, State> {
     }
   }
 
-  // Erase the "enter" keystroke from the comment
   cleanInput = () => {
-    const reason = this.state.reason.replace('\n', '')
-    this.setState({ reason })
+    // Erase the "enter" keystroke from the comment
+    // if it was used to submit input
+    if (this.state.reason.slice(-1) === '\n') {
+      const reason = this.state.reason.slice(0, -1)
+      this.setState({ reason })
+    }
   }
 
   onEditAddressClick = () => {
@@ -242,11 +250,11 @@ export class SendConfirmation extends React.Component<Props, State> {
     return <ReviewHeader title={title} />
   }
 
-  showModal = () => {
+  showInviteModal = () => {
     this.setState({ modalVisible: true })
   }
 
-  hideModal = () => {
+  hideInviteModal = () => {
     this.setState({ modalVisible: false })
   }
 
@@ -257,12 +265,12 @@ export class SendConfirmation extends React.Component<Props, State> {
   }
 
   sendWhatsApp = () => {
-    this.hideModal()
+    this.hideInviteModal()
     this.sendOrInvite(InviteBy.WhatsApp)
   }
 
   sendSMS = () => {
-    this.hideModal()
+    this.hideInviteModal()
     this.sendOrInvite(InviteBy.SMS)
   }
 
@@ -286,6 +294,7 @@ export class SendConfirmation extends React.Component<Props, State> {
     const userHasEnough = !asyncFee.loading && amountWithFee.isLessThanOrEqualTo(dollarBalance)
     const isPrimaryButtonDisabled = isSending || !userHasEnough || !appConnected || !!asyncFee.error
 
+    const isInvite = type === TokenTransactionType.InviteSent
     const inviteFee = getInvitationVerificationFeeInDollars()
     const inviteFeeAmount = {
       value: inviteFee,
@@ -313,8 +322,6 @@ export class SendConfirmation extends React.Component<Props, State> {
     }
 
     const renderFeeContainer = () => {
-      const isInvite = type === TokenTransactionType.InviteSent
-
       // 'fee' already contains the invitation fee for invites
       // so we adjust it here
       const securityFee = isInvite && fee ? fee.minus(inviteFee) : fee
@@ -371,6 +378,7 @@ export class SendConfirmation extends React.Component<Props, State> {
           isSending={this.props.isSending}
         >
           <View style={styles.transferContainer}>
+            {isInvite && <Text style={styles.inviteText}>{t('inviteMoneyEscrow')}</Text>}
             <View style={styles.headerContainer}>
               <ContactCircle
                 thumbnailPath={getRecipientThumbnail(recipient)}
@@ -404,6 +412,7 @@ export class SendConfirmation extends React.Component<Props, State> {
               amount={subtotalAmount || inviteFeeAmount}
             />
             <TextInput
+              testID={'commentInput'}
               style={styles.inputContainer}
               autoFocus={true}
               multiline={true}
@@ -413,11 +422,29 @@ export class SendConfirmation extends React.Component<Props, State> {
               value={this.state.reason}
               placeholder={t('addDescription')}
               placeholderTextColor={colors.greenUI}
-              returnKeyType="done"
+              returnKeyType={'done'}
               onKeyPress={this.onKeyDown}
               onBlur={this.cleanInput}
             />
           </View>
+          <Modal
+            isVisible={this.state.modalVisible}
+            style={styles.modal}
+            useNativeDriver={true}
+            hideModalContentWhileAnimating={true}
+          >
+            <View style={styles.modalContainer}>
+              <InviteOptionsModal
+                onWhatsApp={this.sendWhatsApp}
+                onSMS={this.sendSMS}
+                onCancel={this.cancelModal}
+                cancelText={t('cancel')}
+                SMSText={t('inviteFlow11:inviteWithSMS')}
+                whatsAppText={t('inviteFlow11:inviteWithWhatsapp')}
+                margin={15}
+              />
+            </View>
+          </Modal>
         </ReviewFrame>
       </SafeAreaView>
     )
@@ -446,14 +473,19 @@ export class SendConfirmation extends React.Component<Props, State> {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: colors.light,
     padding: 8,
     flexDirection: 'column',
+  },
+  inviteText: {
+    ...fontStyles.small,
+    color: colors.gray4,
+    paddingBottom: 24,
   },
   transferContainer: {
     flexDirection: 'column',
     alignItems: 'flex-start',
-    paddingBottom: 25,
+    paddingBottom: 24,
   },
   headerContainer: {
     flexDirection: 'row',

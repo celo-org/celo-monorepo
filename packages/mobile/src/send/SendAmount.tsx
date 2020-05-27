@@ -26,7 +26,6 @@ import { CustomEventNames } from 'src/analytics/constants'
 import { TokenTransactionType } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import Avatar from 'src/components/Avatar'
-import CurrencyDisplay, { FormatType } from 'src/components/CurrencyDisplay'
 import {
   DAILY_PAYMENT_LIMIT_CUSD,
   DOLLAR_TRANSACTION_MIN_AMOUNT,
@@ -339,14 +338,7 @@ export class SendAmount extends React.Component<Props, State> {
   }
 
   render() {
-    const {
-      t,
-      feeType,
-      estimateFeeDollars,
-      localCurrencyCode,
-      recipient,
-      recipientVerificationStatus,
-    } = this.props
+    const { t, feeType, localCurrencyCode, recipient, recipientVerificationStatus } = this.props
 
     return (
       <SafeAreaView
@@ -396,25 +388,6 @@ export class SendAmount extends React.Component<Props, State> {
             numberOfDecimals={NUMBER_INPUT_MAX_DECIMALS}
             validator={ValidatorKind.Decimal}
           />
-          <View style={style.feeContainer}>
-            <LoadingLabel
-              isLoading={!estimateFeeDollars}
-              loadingLabelText={t('estimatingFee')}
-              labelText={t('estimatedFee')}
-              valueText={
-                estimateFeeDollars && (
-                  <CurrencyDisplay
-                    amount={{
-                      value: estimateFeeDollars,
-                      currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
-                    }}
-                    formatType={FormatType.Fee}
-                  />
-                )
-              }
-              valueTextStyle={fontStyles.semiBold}
-            />
-          </View>
         </KeyboardAwareScrollView>
         {this.renderBottomContainer()}
         <KeyboardSpacer />

@@ -33,7 +33,6 @@ const storeData = {
   },
 }
 
-const TEXT_PLACEHOLDER = 'groceriesRent'
 const AMOUNT_PLACEHOLDER = 'amount'
 
 const mockRoute = {
@@ -49,25 +48,7 @@ describe('SendAmount', () => {
     jest.useRealTimers()
   })
 
-  describe('when commenting', () => {
-    const store = createMockStore(storeData)
-    const getWrapper = () =>
-      render(
-        <Provider store={store}>
-          <SendAmount navigation={mockNavigation} route={mockRoute} />
-        </Provider>
-      )
-
-    it('updates the comment/reason', () => {
-      const wrapper = getWrapper()
-      const input = wrapper.getByPlaceholder(TEXT_PLACEHOLDER)
-      const comment = 'A comment!'
-      fireEvent.changeText(input, comment)
-      expect(wrapper.queryAllByDisplayValue(comment)).toHaveLength(1)
-    })
-  })
-
-  describe('enter amount with balance', () => {
+  describe('enters amount with balance', () => {
     const store = createMockStore(storeData)
     const getWrapper = () =>
       render(
@@ -192,9 +173,7 @@ describe('SendAmount', () => {
         </Provider>
       )
       const input = tree.getByPlaceholder(AMOUNT_PLACEHOLDER)
-      const input2 = tree.getByPlaceholder(TEXT_PLACEHOLDER)
       fireEvent.changeText(input, AMOUNT_VALID)
-      fireEvent.changeText(input2, 'Something')
       fireEvent.press(tree.getByTestId('Send'))
       expect(navigate).toHaveBeenCalledWith(Screens.ValidateRecipientIntro, {
         transactionData: mockTransactionData2,
@@ -221,9 +200,7 @@ describe('SendAmount', () => {
         </Provider>
       )
       const input = tree.getByPlaceholder(AMOUNT_PLACEHOLDER)
-      const input2 = tree.getByPlaceholder(TEXT_PLACEHOLDER)
       fireEvent.changeText(input, AMOUNT_VALID)
-      fireEvent.changeText(input2, 'Something')
       fireEvent.press(tree.getByTestId('Send'))
       expect(navigate).toHaveBeenCalledWith(Screens.SendConfirmation, {
         transactionData: mockTransactionData2,
@@ -250,9 +227,7 @@ describe('SendAmount', () => {
         </Provider>
       )
       const input = tree.getByPlaceholder(AMOUNT_PLACEHOLDER)
-      const input2 = tree.getByPlaceholder(TEXT_PLACEHOLDER)
       fireEvent.changeText(input, AMOUNT_VALID)
-      fireEvent.changeText(input2, 'Something')
       fireEvent.press(tree.getByTestId('Request'))
       expect(navigate).toHaveBeenCalledWith(Screens.ValidateRecipientIntro, {
         transactionData: mockTransactionData2,
@@ -281,9 +256,7 @@ describe('SendAmount', () => {
         </Provider>
       )
       const input = tree.getByPlaceholder(AMOUNT_PLACEHOLDER)
-      const input2 = tree.getByPlaceholder(TEXT_PLACEHOLDER)
       fireEvent.changeText(input, AMOUNT_VALID)
-      fireEvent.changeText(input2, 'Something')
       fireEvent.press(tree.getByTestId('Request'))
       expect(navigate).toHaveBeenCalledWith(Screens.PaymentRequestConfirmation, {
         transactionData: mockTransactionData2,

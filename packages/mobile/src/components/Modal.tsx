@@ -1,18 +1,31 @@
 import colors from '@celo/react-components/styles/colors.v2'
 import { elevationShadowStyle } from '@celo/react-components/styles/styles'
 import React from 'react'
-import { StyleSheet, View } from 'react-native'
+import { StyleProp, StyleSheet, View, ViewStyle } from 'react-native'
 import RNModal from 'react-native-modal'
 
 interface Props {
+  style?: StyleProp<ViewStyle>
   isVisible: boolean
+  useNativeDriver?: boolean
+  hideModalContentWhileAnimating?: boolean
   children?: React.ReactNode
 }
 
-export default function Modal({ isVisible, ...props }: Props) {
+export default function Modal({
+  style,
+  useNativeDriver,
+  hideModalContentWhileAnimating,
+  isVisible,
+  ...props
+}: Props) {
   return (
-    <RNModal isVisible={isVisible}>
-      <View style={styles.container} {...props} />
+    <RNModal
+      isVisible={isVisible}
+      useNativeDriver={useNativeDriver}
+      hideModalContentWhileAnimating={hideModalContentWhileAnimating}
+    >
+      <View style={[style, styles.container]} {...props} />
     </RNModal>
   )
 }

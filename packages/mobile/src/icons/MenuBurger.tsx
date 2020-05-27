@@ -17,28 +17,28 @@ export default function MenuBurger({ height, width }: Props) {
     >
       <G filter="url(#filter0_d)">
         <Line
-          x1="24"
-          y1="26.25"
+          x1="23.5"
+          y1="26.5"
           x2="41"
-          y2="26.25"
+          y2="26.5"
           stroke="#2E3338"
           strokeWidth="2.5"
           strokeLinecap="round"
         />
         <Line
-          x1="24"
-          y1="32.5"
+          x1="23.5"
+          y1="32.75"
           x2="41"
-          y2="32.5"
+          y2="32.75"
           stroke="#2E3338"
           strokeWidth="2.5"
           strokeLinecap="round"
         />
         <Line
-          x1="24"
-          y1="38.75"
+          x1="23.5"
+          y1="39"
           x2="41"
-          y2="38.75"
+          y2="39"
           stroke="#2E3338"
           strokeWidth="2.5"
           strokeLinecap="round"
