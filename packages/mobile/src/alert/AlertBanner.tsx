@@ -29,19 +29,16 @@ export class AlertBanner extends React.Component<Props> {
   render() {
     const { alert, hideAlert: hideAlertAction } = this.props
 
-    if (!alert || alert.displayMethod === ErrorDisplayType.INLINE) {
-      return null
-    }
-
     return (
       <SmartTopAlert
+        isVisible={alert && alert.displayMethod === ErrorDisplayType.BANNER}
         timestamp={Date.now()}
-        text={alert.message}
+        text={alert && alert.message}
         onPress={hideAlertAction}
-        type={alert.type === 'error' ? NotificationTypes.ERROR : NotificationTypes.MESSAGE}
-        dismissAfter={alert.dismissAfter}
-        buttonMessage={alert.buttonMessage}
-        title={alert.title}
+        type={alert && alert.type === 'error' ? NotificationTypes.ERROR : NotificationTypes.MESSAGE}
+        dismissAfter={alert && alert.dismissAfter}
+        buttonMessage={alert && alert.buttonMessage}
+        title={alert && alert.title}
       />
     )
   }

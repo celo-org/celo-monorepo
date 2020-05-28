@@ -5,11 +5,16 @@ import { WithTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import { connect } from 'react-redux'
 import { hideAlert } from 'src/alert/actions'
+import { ErrorDisplayType } from 'src/alert/reducer'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { RootState } from 'src/redux/reducers'
 
 const DISMISS_DEFAULT = 5
+
+interface StateProps {
+  displayMethod: ErrorDisplayType | null
+}
 
 interface OwnProps {
   error?: ErrorMessages | null
@@ -20,18 +25,25 @@ interface DispatchProps {
   hideAlert: typeof hideAlert
 }
 
+const mapStateToProps = (state: RootState): StateProps => {
+  const displayMethod = state.alert ? state.alert.displayMethod : null
+  return {
+    displayMethod,
+  }
+}
+
 const mapDispatchToProps = {
   hideAlert,
 }
 
-type Props = DispatchProps & OwnProps & WithTranslation
+type Props = DispatchProps & OwnProps & WithTranslation & StateProps
 
 // Pass null as dismissAfter value to show error indefinitely
 function ErrorMessageInline(props: Props) {
-  const { error, dismissAfter, t } = props
+  const { error, displayMethod, dismissAfter, t } = props
 
   // Keep the space empty when there isn't an error
-  if (!error) {
+  if (!error || displayMethod !== ErrorDisplayType.INLINE) {
     return <View style={dismissAfter !== null && styles.errorContainer} />
   }
 
@@ -56,7 +68,7 @@ const styles = StyleSheet.create({
   },
 })
 
-export default connect<{}, DispatchProps, {}, RootState>(
-  (state: RootState) => ({}),
+export default connect<StateProps, DispatchProps, OwnProps, RootState>(
+  (state: RootState) => mapStateToProps,
   mapDispatchToProps
 )(withTranslation(Namespaces.global)(ErrorMessageInline))
