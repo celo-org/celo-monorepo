@@ -79,6 +79,11 @@ const fontStyles = StyleSheet.create({
     fontFamily: Inter.SemiBold,
     color: colors.dark,
   },
+  iconText: {
+    fontSize: 16,
+    fontFamily: Inter.Medium,
+    color: colors.white,
+  },
 })
 
 export default fontStyles
