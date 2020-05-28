@@ -1,41 +1,32 @@
+import Card from '@celo/react-components/components/Card'
 import colors from '@celo/react-components/styles/colors.v2'
-import { elevationShadowStyle } from '@celo/react-components/styles/styles'
-import React from 'react'
-import { StyleProp, StyleSheet, View, ViewStyle } from 'react-native'
-import RNModal from 'react-native-modal'
+import * as React from 'react'
+import { StyleProp, StyleSheet, ViewStyle } from 'react-native'
+import ReactNativeModal from 'react-native-modal'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
 interface Props {
-  style?: StyleProp<ViewStyle>
+  children: React.ReactNode
   isVisible: boolean
-  useNativeDriver?: boolean
-  hideModalContentWhileAnimating?: boolean
-  children?: React.ReactNode
+  style?: StyleProp<ViewStyle>
 }
 
-export default function Modal({
-  style,
-  useNativeDriver,
-  hideModalContentWhileAnimating,
-  isVisible,
-  ...props
-}: Props) {
+export default function Modal({ children, isVisible, style }: Props) {
   return (
-    <RNModal
-      isVisible={isVisible}
-      useNativeDriver={useNativeDriver}
-      hideModalContentWhileAnimating={hideModalContentWhileAnimating}
-    >
-      <View style={[style, styles.container]} {...props} />
-    </RNModal>
+    <ReactNativeModal isVisible={isVisible} backdropOpacity={0.1}>
+      <SafeAreaView>
+        <Card style={[styles.root, style]} rounded={true}>
+          {children}
+        </Card>
+      </SafeAreaView>
+    </ReactNativeModal>
   )
 }
 
 const styles = StyleSheet.create({
-  container: {
+  root: {
     backgroundColor: colors.light,
-    ...elevationShadowStyle(12),
     padding: 24,
-    margin: 8,
-    borderRadius: 8,
+    maxHeight: '100%',
   },
 })

@@ -52,7 +52,7 @@ const fontStyles = StyleSheet.create({
   label: {
     fontSize: 13,
     lineHeight: 16,
-    fontFamily: Inter.Regular,
+    fontFamily: Inter.SemiBold,
     color: colors.dark,
   },
   large: standards.large,
