@@ -54,7 +54,9 @@ const styles = StyleSheet.create({
     marginRight: 16,
   },
   title: {
-    ...fonts.label,
+    ...fonts.small,
+    fontSize: 13,
+    lineHeight: 16,
     color: colors.gray4,
     marginBottom: 4,
   },

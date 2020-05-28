@@ -3,7 +3,7 @@ import * as React from 'react'
 import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
 import { TokenTransactionType } from 'src/apollo/types'
-import TransferConfirmationCard from 'src/send/TransferConfirmationCard'
+import TransferConfirmationCard from 'src/transactions/TransferConfirmationCard'
 import { createMockStore } from 'test/utils'
 import {
   mockAccount,
