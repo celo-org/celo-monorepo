@@ -141,4 +141,67 @@ describe('#reportLayoutIncompatibilities()', () => {
       assertContractErrorsMatch(report, 'TestContract', [/had type/])
     })
   })
+
+  describe('when a field is added to a struct', () => {
+    it('reports a struct change', () => {
+      const report = reportLayoutIncompatibilities(testCases.original, testCases.inserted_in_struct)
+      assertNotCompatible(report)
+      assertContractErrorsMatch(report, 'TestContract', [/struct.*changed/])
+    })
+  })
+
+  describe('when a field changes type in a struct', () => {
+    it('reports a struct change', () => {
+      const report = reportLayoutIncompatibilities(
+        testCases.original,
+        testCases.typechange_in_struct
+      )
+      assertNotCompatible(report)
+      assertContractErrorsMatch(report, 'TestContract', [/struct.*changed/])
+    })
+  })
+
+  describe('when a field changes type in a library struct', () => {
+    it('reports a struct change', () => {
+      const report = reportLayoutIncompatibilities(
+        testCases.original,
+        testCases.typechange_in_library_struct
+      )
+      assertNotCompatible(report)
+      assertContractErrorsMatch(report, 'TestContract', [/struct.*changed/])
+    })
+  })
+
+  describe('when a field is removed from a struct', () => {
+    it('reports a struct change', () => {
+      const report = reportLayoutIncompatibilities(
+        testCases.original,
+        testCases.removed_from_struct
+      )
+      assertNotCompatible(report)
+      assertContractErrorsMatch(report, 'TestContract', [/struct.*changed/])
+    })
+  })
+
+  describe('when a field is removed from a library struct', () => {
+    it('reports a struct change', () => {
+      const report = reportLayoutIncompatibilities(
+        testCases.original,
+        testCases.removed_from_library_struct
+      )
+      assertNotCompatible(report)
+      assertContractErrorsMatch(report, 'TestContract', [/struct.*changed/])
+    })
+  })
+
+  describe('when a field is inserted in a library struct', () => {
+    it('reports a struct change', () => {
+      const report = reportLayoutIncompatibilities(
+        testCases.original,
+        testCases.inserted_in_library_struct
+      )
+      assertNotCompatible(report)
+      assertContractErrorsMatch(report, 'TestContract', [/struct.*changed/])
+    })
+  })
 })

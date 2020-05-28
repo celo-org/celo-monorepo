@@ -3,6 +3,7 @@ import {
   compareStorageLayouts,
   Contract as ZContract,
   getStorageLayout,
+  StorageLayoutInfo,
   Operation,
 } from '@openzeppelin/upgrades'
 const  Web3 = require('web3')
@@ -11,7 +12,7 @@ import { Contract as Web3Contract } from 'web3-eth-contract';
 const web3 = new Web3(null)
 
 // Inlined from OpenZeppelin SDK since its not exported.
-export interface Artifact {
+interface Artifact {
   abi: any[]
   ast: any
   bytecode: string
@@ -27,6 +28,27 @@ export interface Artifact {
   sourceMap: string
   sourcePath: string
   updatedAt: string
+}
+
+// Inlined from OpenZeppelin SDK since its not exported.
+interface TypeInfo {
+  id: string;
+  kind: string;
+  label: string;
+  valueType?: string;
+  length?: number;
+  members?: StorageInfo[];
+  src?: any;
+}
+
+// Inlined from OpenZeppelin SDK since its not exported.
+interface StorageInfo {
+  label: string;
+  astId: number;
+  type: any;
+  src: string;
+  path?: string;
+  contract?: string;
 }
 
 // getStorageLayout needs an oz-sdk Contract class instance. This class is a
@@ -51,15 +73,10 @@ const makeZContract = (artifact: any): ZContract => {
   return addSchemaForLayoutChecking(contract, artifact)
 }
 
-export const getLayoutDiff = (oldArtifact: Artifact, oldArtifacts: BuildArtifacts,
-                       newArtifact: Artifact, newArtifacts: BuildArtifacts) => {
-  const oldContract = makeZContract(oldArtifact)
-  const newContract = makeZContract(newArtifact)
+export const getLayout = (artifact: Artifact, artifacts: BuildArtifacts) => {
+  const contract = makeZContract(artifact)
 
-  const oldLayout = getStorageLayout(oldContract, oldArtifacts)
-  const newLayout = getStorageLayout(newContract, newArtifacts)
-
-  return compareStorageLayouts(oldLayout, newLayout)
+  return getStorageLayout(contract, artifacts)
 }
 
 const selectIncompatibleOperations = (diff: Operation[]) =>
@@ -100,29 +117,96 @@ const generateErrorMessage = (operation: Operation) => {
   return message
 }
 
-const generateCompatibilityReport = (diff: Operation[], contract: string): CompatibilityInfo => {
+const generateLayoutCompatibilityReport = (oldLayout: StorageLayoutInfo, newLayout: StorageLayoutInfo) => {
+  const diff = compareStorageLayouts(oldLayout, newLayout)
   const incompatibilities = selectIncompatibleOperations(diff)
   if (incompatibilities.length === 0) {
     return {
-      contract,
       compatible: true,
       errors: []
     }
   } else {
     return {
-      contract,
       compatible: false,
       errors: incompatibilities.map(generateErrorMessage)
     }
   }
 }
 
+const compareStructDefinitions = (oldType: TypeInfo, newType: TypeInfo) => {
+  if (oldType.kind !== 'struct') {
+    return {
+      same: false,
+      errors: [`${newType.label} wasn't a struct type, now is`]
+    }
+  }
+
+  if (oldType.members.length !== newType.members.length) {
+    return {
+      same: false,
+      errors: [`struct ${newType.label} has changed members`]
+    }
+  }
+
+  const memberErrors = newType.members.map((newMember, i) => {
+    const oldMember = oldType.members[i]
+    if (oldMember.label !== newMember.label) {
+      return `struct ${newType.label} has new member ${newMember.label}`
+    } 
+
+    if (oldMember.type !== newMember.type) {
+      return `struct ${newType.label}'s member ${newMember.label} changed type from ${oldMember.type} to ${newMember.type}`
+    }
+
+    return ''
+  }).filter(error => error !== '')
+
+  return {
+    same: memberErrors.length === 0,
+    errors: memberErrors
+  }
+}
+
+const generateStructsCompatibilityReport = (oldLayout: StorageLayoutInfo, newLayout: StorageLayoutInfo) => { let compatible = true
+  let errors = []
+
+  for (let typeName in newLayout.types) {
+    const newType = newLayout.types[typeName]
+    const oldType = oldLayout.types[typeName]
+
+    if (newType.kind === 'struct' && oldType !== undefined) {
+      const structReport = compareStructDefinitions(oldType, newType)
+      if (!structReport.same) {
+        compatible = false
+        errors = errors.concat(structReport.errors)
+      }
+    }
+  }
+
+  return {
+    compatible,
+    errors
+  }
+}
+
+export const generateCompatibilityReport  = (oldArtifact: Artifact, oldArtifacts: BuildArtifacts,
+                       newArtifact: Artifact, newArtifacts: BuildArtifacts) => {
+      const oldLayout = getLayout(oldArtifact, oldArtifacts)
+      const newLayout = getLayout(newArtifact, newArtifacts)
+      const layoutReport = generateLayoutCompatibilityReport(oldLayout, newLayout)
+      const structsReport = generateStructsCompatibilityReport(oldLayout, newLayout)
+      return {
+        contract: newArtifact.contractName,
+        compatible: layoutReport.compatible && structsReport.compatible,
+        errors: layoutReport.errors.concat(structsReport.errors)
+      }
+}
+
 export const reportLayoutIncompatibilities = (oldArtifacts: BuildArtifacts, newArtifacts: BuildArtifacts): CompatibilityInfo[] => {
   return newArtifacts.listArtifacts().map((newArtifact) => {
     const oldArtifact = oldArtifacts.getArtifactByName(newArtifact.contractName)
     if (oldArtifact !== undefined) {
-      const layoutDiff = getLayoutDiff(oldArtifact, oldArtifacts, newArtifact, newArtifacts)
-      return generateCompatibilityReport(layoutDiff, newArtifact.contractName)
+      return generateCompatibilityReport(oldArtifact, oldArtifacts, newArtifact, newArtifacts)
     }
   })
 }
