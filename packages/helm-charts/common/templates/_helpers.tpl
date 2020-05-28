@@ -94,7 +94,7 @@ release: {{ .Release.Name }}
     set -euo pipefail
     RID=$(echo $REPLICA_NAME | grep -Eo '[0-9]+$')
     NAT_FLAG=""
-    if [[ ! -z $IP_ADDRESSES ]]; then
+    if [[ ! -z "$IP_ADDRESSES" ]] && [[ "$IP_ADDRESSES" != "<nil>" ]]; then
       NAT_IP=$(echo "$IP_ADDRESSES" | awk -v RID=$(expr "$RID" + "1") '{split($0,a,","); print a[RID]}')
     elif [[ -f /root/.celo/ipAddress ]]; then
       NAT_IP=$(cat /root/.celo/ipAddress)
