@@ -205,7 +205,8 @@ describe('Transfer tests', function(this: any) {
   // Arbitrary addresses.
   const governanceAddress = '0x00000000000000000000000000000000DeaDBeef'
   const ToAddress = '0xbBae99F0E1EE565404465638d40827b54D343638'
-  const FeeRecipientAddress = '0x4f5f8a3f45d179553e7b95119ce296010f50f6f1'
+  const TxFeeRecipientAddress = '0x4f5f8a3f45d179553e7b95119ce296010f50f6f1'
+  const GatewayFeeRecipientAddress = '0xEC41e29f6df1A02b62B39F3725a419d317C9f033'
 
   const syncModes = ['full', 'fast', 'light', 'lightest']
   const gethConfig: GethRunConfig = {
@@ -221,7 +222,7 @@ describe('Transfer tests', function(this: any) {
         port: 30303,
         rpcport: 8545,
         validator: validatorAddress,
-        txFeeRecipient: validatorAddress,
+        txFeeRecipient: TxFeeRecipientAddress,
       },
     ],
   }
@@ -249,7 +250,7 @@ describe('Transfer tests', function(this: any) {
     rpcport: 8547,
     // We need to set an etherbase here so that the full node will accept transactions from
     // light clients.
-    etherbase: FeeRecipientAddress,
+    txFeeRecipient: GatewayFeeRecipientAddress,
   }
 
   const restartWithCleanNodes = async () => {
@@ -531,7 +532,8 @@ describe('Transfer tests', function(this: any) {
         fromAddress,
         toAddress,
         validatorAddress,
-        FeeRecipientAddress,
+        GatewayFeeRecipientAddress,
+        TxFeeRecipientAddress,
         governanceAddress,
       ]
       balances = await newBalanceWatcher(kit, accounts)
@@ -611,14 +613,14 @@ describe('Transfer tests', function(this: any) {
     }
 
     it(`should increment the gateway fee recipient's ${feeToken} balance by the gateway fee`, () =>
-      assertEqualBN(balances.delta(FeeRecipientAddress, feeToken), txRes.fees.gateway))
+      assertEqualBN(balances.delta(GatewayFeeRecipientAddress, feeToken), txRes.fees.gateway))
 
     it(`should increment the infrastructure fund's ${feeToken} balance by the base portion of the gas fee`, () =>
       assertEqualBN(balances.delta(governanceAddress, feeToken), txRes.fees.base))
 
     it(`should increment the proposers's ${feeToken} balance by the rest of the gas fee`, () => {
       assertEqualBN(
-        balances.delta(validatorAddress, feeToken).mod(expectedProposerBlockReward),
+        balances.delta(TxFeeRecipientAddress, feeToken).mod(expectedProposerBlockReward),
         txRes.fees.tip
       )
     })
@@ -638,7 +640,7 @@ describe('Transfer tests', function(this: any) {
                 const recipient = (choice: string) => {
                   switch (choice) {
                     case 'peer':
-                      return FeeRecipientAddress
+                      return GatewayFeeRecipientAddress
                     case 'random':
                       return Web3.utils.randomHex(20)
                     default:
@@ -841,7 +843,8 @@ describe('Transfer tests', function(this: any) {
                 FromAddress,
                 ToAddress,
                 validatorAddress,
-                FeeRecipientAddress,
+                GatewayFeeRecipientAddress,
+                TxFeeRecipientAddress,
                 governanceAddress,
               ])
 
@@ -888,8 +891,10 @@ describe('Transfer tests', function(this: any) {
             it("should halve the gateway fee recipient's Celo Dollar balance then increase it by the gateway fee", () => {
               assertEqualBN(
                 balances
-                  .current(FeeRecipientAddress, CeloContract.StableToken)
-                  .minus(balances.initial(FeeRecipientAddress, CeloContract.StableToken).idiv(2)),
+                  .current(GatewayFeeRecipientAddress, CeloContract.StableToken)
+                  .minus(
+                    balances.initial(GatewayFeeRecipientAddress, CeloContract.StableToken).idiv(2)
+                  ),
                 expectedFees.gateway
               )
             })

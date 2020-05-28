@@ -943,6 +943,14 @@ export async function startGeth(
     gethArgs.push('--etherbase', etherbase)
   }
 
+  if (validator) {
+    gethArgs.push('--validator', validator)
+  }
+
+  if (txFeeRecipient) {
+    gethArgs.push('--tx-fee-recipient', txFeeRecipient)
+  }
+
   if (lightserv) {
     gethArgs.push('--light.serve=90')
     gethArgs.push('--light.maxpeers=10')
