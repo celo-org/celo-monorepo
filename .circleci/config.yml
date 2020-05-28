@@ -858,7 +858,8 @@ jobs:
     <<: *defaults
     environment:
       CI_INTEGRATION_ENV: integration
-      DESIRED_VERSION: v2.11.0
+      # DESIRED_VERSION: v2.11.0
+      DESIRED_VERSION: v2.9.1
       GOOGLE_APPLICATION_CREDENTIALS: /tmp/sa.json
       NETWORK: rc1
     steps:
