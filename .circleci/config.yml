@@ -908,7 +908,7 @@ jobs:
           else
             source ../../.env
           fi
-          helm install ../packages/helm-charts/celo-fullnode "${NETWORK}-${NAMESPACE}-${SYNC_MODE}-node" --set genesis.network="${NETWORK}" --set genesis.networkId="${NETWORK_ID}" --set geth.gcmode="full" --set geth.image.repository="${GETH_NODE_DOCKER_IMAGE_REPOSITORY}" --set geth.image.tag="master" --set geth.syncmode="${SYNC_MODE}" --set geth.use_static_ips="false" --set namespace="${NAMESPACE}" --set replicaCount="1" --set storage.size="10Gi" --set storage.storageClass="standard"
+          helm install ../helm-charts/celo-fullnode --name "${NETWORK}-${NAMESPACE}-${SYNC_MODE}-node" --set genesis.network="${NETWORK}" --set genesis.networkId="${NETWORK_ID}" --set geth.gcmode="full" --set geth.image.repository="${GETH_NODE_DOCKER_IMAGE_REPOSITORY}" --set geth.image.tag="master" --set geth.syncmode="${SYNC_MODE}" --set geth.use_static_ips="false" --set namespace="${NAMESPACE}" --set replicaCount="1" --set storage.size="10Gi" --set storage.storageClass="standard"
     - run:
         name: Test lightest mode client connected to rc1
         command: |
@@ -937,7 +937,7 @@ jobs:
           else
             source ../../.env
           fi
-          helm install ../packages/helm-charts/celo-fullnode "${NETWORK}-${NAMESPACE}-${SYNC_MODE}-node" --set genesis.network="${NETWORK}" --set genesis.networkId="${NETWORK_ID}" --set geth.gcmode="full" --set geth.image.repository="${GETH_NODE_DOCKER_IMAGE_REPOSITORY}" --set geth.image.tag="master" --set geth.syncmode="${SYNC_MODE}" --set geth.use_static_ips="false" --set namespace="${NAMESPACE}" --set replicaCount="1" --set storage.size="10Gi" --set storage.storageClass="standard"
+          helm install ../helm-charts/celo-fullnode --name "${NETWORK}-${NAMESPACE}-${SYNC_MODE}-node" --set genesis.network="${NETWORK}" --set genesis.networkId="${NETWORK_ID}" --set geth.gcmode="full" --set geth.image.repository="${GETH_NODE_DOCKER_IMAGE_REPOSITORY}" --set geth.image.tag="master" --set geth.syncmode="${SYNC_MODE}" --set geth.use_static_ips="false" --set namespace="${NAMESPACE}" --set replicaCount="1" --set storage.size="10Gi" --set storage.storageClass="standard"
 
     - run:
         name: Test full mode client connected to rc1
@@ -967,7 +967,7 @@ jobs:
           else
             source ../../.env
           fi
-          helm install ../packages/helm-charts/celo-fullnode "${NETWORK}-${NAMESPACE}-${SYNC_MODE}-node" --set genesis.network="${NETWORK}" --set genesis.networkId="${NETWORK_ID}" --set geth.gcmode="full" --set geth.image.repository="${GETH_NODE_DOCKER_IMAGE_REPOSITORY}" --set geth.image.tag="master" --set geth.syncmode="${SYNC_MODE}" --set geth.use_static_ips="false" --set namespace="${NAMESPACE}" --set replicaCount="1" --set storage.size="10Gi" --set storage.storageClass="standard"
+          helm install ../helm-charts/celo-fullnode --name "${NETWORK}-${NAMESPACE}-${SYNC_MODE}-node" --set genesis.network="${NETWORK}" --set genesis.networkId="${NETWORK_ID}" --set geth.gcmode="full" --set geth.image.repository="${GETH_NODE_DOCKER_IMAGE_REPOSITORY}" --set geth.image.tag="master" --set geth.syncmode="${SYNC_MODE}" --set geth.use_static_ips="false" --set namespace="${NAMESPACE}" --set replicaCount="1" --set storage.size="10Gi" --set storage.storageClass="standard"
 
     - run:
         name: Test fast mode client connected to rc1
