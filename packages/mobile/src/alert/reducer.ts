@@ -2,9 +2,14 @@ import { Actions, ActionTypes } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { RootState } from 'src/redux/reducers'
 
+export enum ErrorDisplayType {
+  'BANNER' = 0,
+  'INLINE' = 1,
+}
+
 export interface State {
-  errorType: 'show' | 'log'
   type: 'message' | 'error'
+  displayMethod: ErrorDisplayType
   message: string
   dismissAfter?: number | null
   buttonMessage?: string | null
@@ -18,19 +23,12 @@ export const reducer = (state: State | null = initialState, action: ActionTypes)
   switch (action.type) {
     case Actions.SHOW:
       return {
-        errorType: 'show',
+        displayMethod: action.displayMethod,
         type: action.alertType,
         message: action.message,
         dismissAfter: action.dismissAfter,
         buttonMessage: action.buttonMessage,
         title: action.title,
-        underlyingError: action.underlyingError,
-      }
-    case Actions.LOG:
-      return {
-        errorType: 'log',
-        type: action.alertType,
-        message: action.message,
         underlyingError: action.underlyingError,
       }
     case Actions.HIDE:

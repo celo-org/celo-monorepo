@@ -1,3 +1,4 @@
+import { ErrorDisplayType } from 'src/alert/reducer'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { DefaultEventNames } from 'src/analytics/constants'
 import { ErrorMessages } from 'src/app/ErrorMessages'
@@ -18,6 +19,7 @@ enum AlertTypes {
 interface ShowAlertAction {
   type: Actions.SHOW
   alertType: AlertTypes
+  displayMethod: ErrorDisplayType
   message: string
   dismissAfter?: number | null
   buttonMessage?: string | null
@@ -57,9 +59,10 @@ export const showError = (
   )
 }
 
-export const logError = (error: ErrorMessages, i18nOptions?: object): LogAlertAction => ({
-  type: Actions.LOG,
+export const showErrorInline = (error: ErrorMessages, i18nOptions?: object): ShowAlertAction => ({
+  type: Actions.SHOW,
   alertType: AlertTypes.ERROR,
+  displayMethod: ErrorDisplayType.INLINE,
   message: i18n.t(error, { ns: 'global', ...(i18nOptions || {}) }),
   underlyingError: error,
 })
@@ -75,6 +78,7 @@ const showAlert = (
   return {
     type: Actions.SHOW,
     alertType,
+    displayMethod: ErrorDisplayType.BANNER,
     message,
     dismissAfter,
     buttonMessage,

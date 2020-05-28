@@ -3,6 +3,7 @@ import * as React from 'react'
 import * as RNLocalize from 'react-native-localize'
 import { fireEvent, render } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
+import { ErrorDisplayType } from 'src/alert/reducer'
 import { TokenTransactionType } from 'src/apollo/types'
 import { AddressValidationType, E164NumberToAddressType } from 'src/identity/reducer'
 import { navigate } from 'src/navigator/NavigationService'
@@ -102,6 +103,7 @@ describe('SendAmount', () => {
           alertType: 'error',
           buttonMessage: null,
           dismissAfter: 5000,
+          displayMethod: ErrorDisplayType.BANNER,
           message: 'needMoreFundsToSend',
           title: null,
           type: 'ALERT/SHOW',
