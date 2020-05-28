@@ -48,7 +48,7 @@ data:
         - source_labels: [__name__]
           regex: .*
           replacement: '{{ .Values.cluster }}'
-          target_label: cluster
+          target_label: cluster_name
 
       - job_name: 'kubernetes-nodes'
 
@@ -73,7 +73,7 @@ data:
         - source_labels: [__name__]
           regex: .*
           replacement: '{{ .Values.cluster }}'
-          target_label: cluster
+          target_label: cluster_name
 
 
       - job_name: 'kubernetes-pods'
@@ -105,7 +105,7 @@ data:
         - source_labels: [__name__]
           regex: .*
           replacement: '{{ .Values.cluster }}'
-          target_label: cluster
+          target_label: cluster_name
 
       - job_name: 'kubernetes-cadvisor'
 
@@ -130,7 +130,7 @@ data:
         - source_labels: [__name__]
           regex: .*
           replacement: '{{ .Values.cluster }}'
-          target_label: cluster
+          target_label: cluster_name
 
       - job_name: 'kubernetes-service-endpoints'
 
@@ -165,4 +165,4 @@ data:
         - source_labels: [__name__]
           regex: .*
           replacement: '{{ .Values.cluster }}'
-          target_label: cluster
+          target_label: cluster_name
