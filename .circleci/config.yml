@@ -1124,10 +1124,10 @@ workflows:
     triggers:
       - schedule:
           # 11 AM in UTC = 3 AM in PDT (winter time)
-          cron: '30 20 * * *'
-          # filters:
-          #   branches:
-          #     only:
-          #       - master
+          cron: '53 6 * * *'
+          filters:
+            branches:
+              only:
+                - jcortejoso/sync-test
     jobs:
       - integration-celotool-install
