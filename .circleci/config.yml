@@ -854,7 +854,7 @@ jobs:
           name: Minor test of celocli
           command: ./node_modules/.bin/celocli account:new # Small test
 
-  integration-celotool-install:
+  integration-sync-geth-mainnet:
     <<: *defaults
     environment:
       CI_INTEGRATION_ENV: integration
@@ -1107,9 +1107,9 @@ workflows:
           requires:
             - lint-checks
             - contractkit-test
-      - integration-celotool-install:
-          requires:
-            - lint-checks
+      # - integration-sync-geth-mainnet:
+      #     requires:
+      #       - lint-checks
       - phone-number-privacy-test:
           requires:
             - lint-checks
@@ -1149,8 +1149,8 @@ workflows:
   nightly-integration:
     triggers:
       - schedule:
-          # 11 AM in UTC = 3 AM in PDT (winter time)
-          cron: '18 8 * * *'
+          # 7 AM in UTC = 12 AM (midnight) in PDT (summer time)
+          cron: '0 7 * * *'
           filters:
             branches:
               only:
@@ -1160,6 +1160,6 @@ workflows:
       - lint-checks:
           requires:
             - install_dependencies
-      - integration-celotool-install:
+      - integration-sync-geth-mainnet:
           requires:
             - lint-checks
