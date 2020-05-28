@@ -1,14 +1,15 @@
-import Button, { BtnTypes } from '@celo/react-components/components/Button'
+import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button.v2'
 import KeyboardAwareScrollView from '@celo/react-components/components/KeyboardAwareScrollView'
 import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
-import { fontStyles } from '@celo/react-components/styles/fonts'
-import { componentStyles } from '@celo/react-components/styles/styles'
+import colors from '@celo/react-components/styles/colors.v2'
+import fontStyles from '@celo/react-components/styles/fonts.v2'
+import variables from '@celo/react-components/styles/variables'
 import { parseInputAmount } from '@celo/utils/src/parsing'
 import { StackScreenProps } from '@react-navigation/stack'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { Trans, WithTranslation } from 'react-i18next'
-import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import { getNumberFormatSettings } from 'react-native-localize'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
@@ -282,30 +283,28 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
                 tOptions={{ context: this.isDollarInput() ? 'gold' : null }}
                 ns={Namespaces.exchangeFlow9}
               >
-                Subtotal (@{' '}
+                Subtotal @{' '}
                 <CurrencyDisplay
                   amount={{
                     value: exchangeRateDisplay,
                     currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code,
                   }}
                 />
-                )
               </Trans>
             }
             amount={<CurrencyDisplay amount={this.getSubtotalAmount()} />}
           />
         </KeyboardAwareScrollView>
-        <View style={componentStyles.bottomContainer}>
-          <Button
-            onPress={this.goToReview}
-            text={t(`${Namespaces.walletFlow5}:review`)}
-            accessibilityLabel={t('continue')}
-            standard={false}
-            disabled={this.isExchangeInvalid()}
-            type={BtnTypes.PRIMARY}
-            testID="ExchangeReviewButton"
-          />
-        </View>
+        <Button
+          onPress={this.goToReview}
+          text={t(`${Namespaces.walletFlow5}:review`)}
+          accessibilityLabel={t('continue')}
+          disabled={this.isExchangeInvalid()}
+          type={BtnTypes.TERTIARY}
+          size={BtnSizes.FULL}
+          style={styles.reviewBtn}
+          testID="ExchangeReviewButton"
+        />
         <KeyboardSpacer />
       </SafeAreaView>
     )
@@ -333,28 +332,32 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   exchangeBodyText: {
-    ...fontStyles.bodySmall,
+    ...fontStyles.regular500,
     fontSize: 15,
     lineHeight: 20,
     fontWeight: '700',
   },
   subtotalBodyText: {
-    ...fontStyles.bodySmall,
-    fontSize: 15,
-    lineHeight: 20,
+    ...fontStyles.small,
   },
   switchToText: {
-    ...fontStyles.subSmall,
-    textDecorationLine: 'underline',
+    ...fontStyles.small,
     fontSize: 13,
+    textDecorationLine: 'underline',
+    color: colors.gray4,
+    marginTop: 4,
   },
   currencyInput: {
-    ...fontStyles.body,
+    ...fontStyles.regular,
     marginLeft: 10,
     flex: 1,
     textAlign: 'right',
     fontSize: 24,
-    lineHeight: 39,
-    height: 54, // setting height manually b.c. of bug causing text to jump on Android
+    lineHeight: Platform.select({ android: 39, ios: 30 }), // vertical align = center
+    height: 60, // setting height manually b.c. of bug causing text to jump on Android
+    color: colors.goldDark,
+  },
+  reviewBtn: {
+    padding: variables.contentPadding,
   },
 })

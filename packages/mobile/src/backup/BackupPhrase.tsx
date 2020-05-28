@@ -15,8 +15,8 @@ import BackupPhraseContainer, {
   BackupPhraseContainerMode,
   BackupPhraseType,
 } from 'src/backup/BackupPhraseContainer'
+import CancelConfirm from 'src/backup/CancelConfirm'
 import { getStoredMnemonic } from 'src/backup/utils'
-import CancelButton from 'src/components/CancelButton.v2'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -24,6 +24,7 @@ import { TopBarTextButton } from 'src/navigator/TopBarButton.v2'
 import { RootState } from 'src/redux/reducers'
 import Logger from 'src/utils/Logger'
 
+const TAG = 'backup/BackupPhrase'
 interface State {
   mnemonic: string
   isConfirmChecked: boolean
@@ -47,7 +48,7 @@ const mapStateToProps = (state: RootState): StateProps => {
 }
 
 export const navOptionsForBackupPhrase = {
-  headerLeft: () => <CancelButton style={{ color: colors.gray4 }} />,
+  headerLeft: () => <CancelConfirm screen={TAG} />,
   headerTitle: i18n.t(`${Namespaces.backupKeyFlow6}:headerTitle`),
   headerRight: () => <HeaderRight />,
 }
@@ -87,10 +88,16 @@ class BackupPhrase extends React.Component<Props, State> {
     this.setState({
       isConfirmChecked: value,
     })
+
+    CeloAnalytics.track(
+      value
+        ? CustomEventNames.backup_setup_toggle_enable
+        : CustomEventNames.backup_setup_toggle_disable
+    )
   }
 
   onPressConfirmArea = () => {
-    this.setState((state) => ({ isConfirmChecked: !state.isConfirmChecked }))
+    this.onPressConfirmSwitch(!this.state.isConfirmChecked)
   }
 
   onPressContinue = () => {
@@ -138,6 +145,7 @@ function HeaderRight() {
   const { t } = useTranslation(Namespaces.backupKeyFlow6)
   const onMoreInfoPressed = () => {
     // TODO: Implement this
+    CeloAnalytics.track(CustomEventNames.backup_setup_info)
   }
   return <TopBarTextButton onPress={onMoreInfoPressed} title={t('moreInfo')} />
 }

@@ -2,6 +2,7 @@ import { CeloTransactionObject } from '@celo/contractkit'
 import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
 import {
   ActionableAttestation,
+  AttestationsStatus,
   AttestationsWrapper,
   UnselectedRequest,
 } from '@celo/contractkit/lib/wrappers/Attestations'
@@ -13,6 +14,7 @@ import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
 import { Platform } from 'react-native'
 import { Task } from 'redux-saga'
 import { all, call, delay, fork, put, race, select, take, takeEvery } from 'redux-saga/effects'
+import { setRetryVerificationWithForno } from 'src/account/actions'
 import { e164NumberSelector } from 'src/account/selectors'
 import { showError, showMessage } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
@@ -205,11 +207,6 @@ export function* doVerificationFlow() {
   }
 }
 
-interface AttestationsStatus {
-  isVerified: boolean // user has sufficiently many attestations?
-  numAttestationsRemaining: number // number of attestations still needed
-}
-
 // Requests if necessary additional attestations and returns all revealable attetations
 export function* requestAndRetrieveAttestations(
   attestationsWrapper: AttestationsWrapper,
@@ -225,6 +222,10 @@ export function* requestAndRetrieveAttestations(
     account
   )
 
+  // Any verification failure past this point will be after sending a tx
+  // so do not prompt forno retry as these failures are not always
+  // light client related, and account may have insufficient balance
+  yield put(setRetryVerificationWithForno(false))
   while (attestations.length < attestationsRemaining) {
     // Request any additional attestations beyond the original set
     yield call(
@@ -264,31 +265,18 @@ async function getAttestationsStatus(
 ): Promise<AttestationsStatus> {
   Logger.debug(TAG + '@getAttestationsStatus', 'Getting verification status from contract')
 
-  const attestationStats = await attestationsWrapper.getAttestationStat(phoneHash, account)
-  // Number of complete (verified) attestations
-  const numAttestationsCompleted = attestationStats.completed
-  // Total number of attestation requests made
-  const numAttestationRequests = attestationStats.total
-  // Number of attestations remaining to be verified
-  const numAttestationsRemaining = NUM_ATTESTATIONS_REQUIRED - numAttestationsCompleted
+  const attestationStatus = await attestationsWrapper.getVerifiedStatus(phoneHash, account)
 
   Logger.debug(
     TAG + '@getAttestationsStatus',
-    `${numAttestationsRemaining} verifications remaining. Total of ${numAttestationRequests} requested.`
+    `${attestationStatus.numAttestationsRemaining} verifications remaining. Total of ${attestationStatus.total} requested.`
   )
 
-  if (numAttestationsRemaining <= 0) {
+  if (attestationStatus.numAttestationsRemaining <= 0) {
     Logger.debug(TAG + '@getAttestationsStatus', 'User is already verified')
-    return {
-      isVerified: true,
-      numAttestationsRemaining,
-    }
   }
 
-  return {
-    isVerified: false,
-    numAttestationsRemaining,
-  }
+  return attestationStatus
 }
 
 function* requestAttestations(

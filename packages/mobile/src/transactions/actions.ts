@@ -1,11 +1,12 @@
 import { TokenTransactionType } from 'src/apollo/types'
 import { ExchangeConfirmationCardProps } from 'src/exchange/ExchangeConfirmationCard'
+import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import i18n from 'src/i18n'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import { ConfirmationInput as SendConfirmationCardProps } from 'src/send/SendConfirmation'
-import { TransferConfirmationCardProps } from 'src/send/TransferConfirmationCard'
+import { TransactionDataInput } from 'src/send/SendAmount'
 import { StandbyTransaction } from 'src/transactions/reducer'
+import { TransferConfirmationCardProps } from 'src/transactions/TransferConfirmationCard'
 import { web3ForUtils } from 'src/web3/contracts'
 
 export enum Actions {
@@ -14,6 +15,7 @@ export enum Actions {
   RESET_STANDBY_TRANSACTIONS = 'TRANSACTIONS/RESET_STANDBY_TRANSACTIONS',
   ADD_HASH_TO_STANDBY_TRANSACTIONS = 'TRANSACTIONS/ADD_HASH_TO_STANDBY_TRANSACTIONS',
   TRANSACTION_CONFIRMED = 'TRANSACTIONS/TRANSACTION_CONFIRMED',
+  TRANSACTION_FAILED = 'TRANSACTIONS/TRANSACTION_FAILED',
 }
 
 export interface AddStandbyTransaction {
@@ -38,6 +40,11 @@ export interface AddHashToStandbyTransaction {
 
 export interface TransactionConfirmed {
   type: Actions.TRANSACTION_CONFIRMED
+  txId: string
+}
+
+export interface TransactionFailed {
+  type: Actions.TRANSACTION_FAILED
   txId: string
 }
 
@@ -70,6 +77,11 @@ export const transactionConfirmed = (txId: string): TransactionConfirmed => ({
   txId,
 })
 
+export const transactionFailed = (txId: string): TransactionFailed => ({
+  type: Actions.TRANSACTION_FAILED,
+  txId,
+})
+
 export const addHashToStandbyTransaction = (
   idx: string,
   hash: string
@@ -80,38 +92,38 @@ export const addHashToStandbyTransaction = (
 })
 
 export const navigateToPaymentTransferReview = (
-  type: string,
+  type: TokenTransactionType,
   timestamp: number,
   confirmationProps: TransferConfirmationCardProps
 ) => {
   let headerText = ''
   switch (type) {
     case TokenTransactionType.Sent:
-      headerText = i18n.t('sendFlow7:sentPayment')
+      headerText = i18n.t('walletFlow5:transactionHeaderSent')
       break
     case TokenTransactionType.EscrowSent:
-      headerText = i18n.t('sendFlow7:sentEscrowPayment')
+      headerText = i18n.t('walletFlow5:transactionHeaderEscrowSent')
       break
     case TokenTransactionType.Received:
-      headerText = i18n.t('receiveFlow8:receivedPayment')
+      headerText = i18n.t('walletFlow5:transactionHeaderReceived')
       break
     case TokenTransactionType.EscrowReceived:
-      headerText = i18n.t('receiveFlow8:receivedEscrowPayment')
+      headerText = i18n.t('walletFlow5:transactionHeaderEscrowReceived')
       break
     case TokenTransactionType.VerificationFee:
-      headerText = i18n.t('walletFlow5:verificationFee')
+      headerText = i18n.t('walletFlow5:transactionHeaderVerificationFee')
       break
     case TokenTransactionType.Faucet:
-      headerText = i18n.t('receiveFlow8:receivedDollars')
+      headerText = i18n.t('walletFlow5:transactionHeaderFaucet')
       break
     case TokenTransactionType.InviteSent:
-      headerText = i18n.t('inviteFlow11:inviteComplete')
+      headerText = i18n.t('walletFlow5:transactionHeaderInviteSent')
       break
     case TokenTransactionType.InviteReceived:
-      headerText = i18n.t('inviteFlow11:inviteReceived')
+      headerText = i18n.t('walletFlow5:transactionHeaderInviteReceived')
       break
     case TokenTransactionType.NetworkFee:
-      headerText = i18n.t('walletFlow5:networkFee')
+      headerText = i18n.t('walletFlow5:transactionHeaderNetworkFee')
       break
   }
 
@@ -129,16 +141,18 @@ export const navigateToExchangeReview = (
   timestamp: number,
   confirmationProps: ExchangeConfirmationCardProps
 ) => {
+  const { makerAmount } = confirmationProps
+  const isSold = makerAmount.currencyCode === CURRENCIES[CURRENCY_ENUM.GOLD].code
   navigate(Screens.TransactionReview, {
     reviewProps: {
       type: TokenTransactionType.Exchange,
       timestamp,
-      header: i18n.t('exchangeFlow9:exchange'),
+      header: isSold ? i18n.t('exchangeFlow9:soldGold') : i18n.t('exchangeFlow9:purchasedGold'),
     },
     confirmationProps,
   })
 }
 
-export const navigateToRequestedPaymentReview = (confirmationInput: SendConfirmationCardProps) => {
-  navigate(Screens.SendConfirmation, { confirmationInput })
+export const navigateToRequestedPaymentReview = (transactionData: TransactionDataInput) => {
+  navigate(Screens.SendConfirmation, { transactionData })
 }

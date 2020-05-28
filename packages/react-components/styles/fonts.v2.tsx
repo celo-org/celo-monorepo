@@ -52,7 +52,7 @@ const fontStyles = StyleSheet.create({
   label: {
     fontSize: 13,
     lineHeight: 16,
-    fontFamily: Inter.Regular,
+    fontFamily: Inter.SemiBold,
     color: colors.dark,
   },
   large: standards.large,
@@ -66,6 +66,12 @@ const fontStyles = StyleSheet.create({
   small500: { ...standards.small, fontFamily: Inter.Medium },
   center: {
     textAlign: 'center',
+  },
+  mediumNumber: {
+    lineHeight: 27,
+    fontSize: 24,
+    fontFamily: Inter.Regular,
+    color: colors.dark,
   },
 })
 

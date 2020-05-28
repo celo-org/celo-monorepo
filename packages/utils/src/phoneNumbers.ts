@@ -6,10 +6,12 @@ import {
   PhoneNumberUtil,
 } from 'google-libphonenumber'
 import * as Web3Utils from 'web3-utils'
+import { getIdentifierPrefix, IdentifierType } from './attestations'
 
 export interface ParsedPhoneNumber {
   e164Number: string
   displayNumber: string
+  displayNumberInternational: string
   countryCode?: number
   regionCode?: string
 }
@@ -43,9 +45,8 @@ export const getPhoneHash = (phoneNumber: string, salt?: string): string => {
   if (!phoneNumber || !isE164Number(phoneNumber)) {
     throw Error('Attempting to hash a non-e164 number: ' + phoneNumber)
   }
-  // TODO re-enable when we turn on phone-number-privacy everywhere
-  // const prefix = getIdentifierPrefix(IdentifierType.PHONE_NUMBER)
-  const value = salt ? phoneNumber + PHONE_SALT_SEPARATOR + salt : phoneNumber
+  const prefix = getIdentifierPrefix(IdentifierType.PHONE_NUMBER)
+  const value = prefix + (salt ? phoneNumber + PHONE_SALT_SEPARATOR + salt : phoneNumber)
   return Web3Utils.soliditySha3({ type: 'string', value })
 }
 
@@ -92,6 +93,17 @@ export function getDisplayPhoneNumber(phoneNumber: string, defaultCountryCode: s
   } else {
     // Fallback to input instead of showing nothing for invalid numbers
     return phoneNumber
+  }
+}
+
+export function getDisplayNumberInternational(e164PhoneNumber: string) {
+  const countryCode = getCountryCode(e164PhoneNumber)
+  const phoneDetails = parsePhoneNumber(e164PhoneNumber, (countryCode || '').toString())
+  if (phoneDetails) {
+    return phoneDetails.displayNumberInternational
+  } else {
+    // Fallback to input instead of showing nothing for invalid numbers
+    return e164PhoneNumber
   }
 }
 
@@ -152,6 +164,10 @@ export function parsePhoneNumber(
       ? {
           e164Number: phoneUtil.format(parsedNumber, PhoneNumberFormat.E164),
           displayNumber: handleSpecialCasesForDisplay(parsedNumber, parsedCountryCode),
+          displayNumberInternational: phoneUtil.format(
+            parsedNumber,
+            PhoneNumberFormat.INTERNATIONAL
+          ),
           countryCode: parsedCountryCode,
           regionCode: parsedRegionCode,
         }
