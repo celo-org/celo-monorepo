@@ -57,10 +57,7 @@ export type PropsWithoutChildren =
 type Props = InviteProps | SendProps | ExchangeProps | ReclaimEscrowProps
 
 // Max lengthed comment to fetch fee estimate before user finalizes comment
-const MAX_PLACEHOLDER_COMMENT: string = new Array(7)
-  .fill(null)
-  .map(() => '0123456789')
-  .join('')
+const MAX_PLACEHOLDER_COMMENT: string = '0123456789'.repeat(7)
 
 function useAsyncShowError<R, Args extends any[]>(
   asyncFunction: ((...args: Args) => Promise<R>) | (() => Promise<R>),
