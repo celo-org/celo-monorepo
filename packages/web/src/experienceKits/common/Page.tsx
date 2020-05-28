@@ -190,7 +190,7 @@ class Page extends React.Component<Props & ScreenProps, State> {
         />
         <View style={styles.conatiner}>
           <View style={[styles.topbar, (this.state.isLineVisible || isMobile) && styles.grayLine]}>
-            <Topbar isMobile={isMobile} />
+            <Topbar title={this.props.title} link={this.props.pages[0].href} />
           </View>
           <View style={styles.justNeedSpace} />
           {isMobile && (

@@ -2,9 +2,9 @@ import * as React from 'react'
 import Page from 'src/experienceKits/common/Page'
 import menu, { hashNav } from 'src/shared/menu-items'
 
-export const ROOT = menu.BRAND.link
+export const ROOT = menu.EVENTS_KIT.link
 
-export const FLAVOR_PATH = `${ROOT}/logo`
+export const FLAVOR_PATH = `${ROOT}/flavor`
 
 const PAGES = [
   {

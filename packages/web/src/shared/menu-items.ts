@@ -31,6 +31,10 @@ export const pagePaths = {
     name: 'Community',
     link: '/community',
   },
+  EVENTS_KIT: {
+    name: 'EventsKit',
+    link: '/experience/events',
+  },
   DEVELOPERS: {
     name: 'Developers',
     link: '/developers',

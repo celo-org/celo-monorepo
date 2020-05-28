@@ -1,24 +1,25 @@
 import * as React from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import { I18nProps, NameSpaces, withNamespaces } from 'src/i18n'
+import { NameSpaces, useTranslation } from 'src/i18n'
 import Octocat from 'src/icons/Octocat'
+import { useScreenSize } from 'src/layout/ScreenSize'
 import LogoLightBg from 'src/logos/LogoLightBg'
 import Button, { BTN } from 'src/shared/Button.3'
-import menuItems, { CeloLinks } from 'src/shared/menu-items'
+import { CeloLinks } from 'src/shared/menu-items'
 import { colors, fonts, standardStyles } from 'src/styles'
 
 interface Props {
-  isMobile: boolean
+  title: string
+  link: string
 }
 
-export default withNamespaces(NameSpaces.common)(function TopBar({
-  t,
-  isMobile,
-}: I18nProps & Props) {
+export default function TopBar({ title, link }: Props) {
+  const { isMobile } = useScreenSize()
+  const { t } = useTranslation(NameSpaces.common)
   return (
     <View style={standardStyles.centered}>
       <View style={[standardStyles.row, styles.container]}>
-        <a href={menuItems.BRAND.link}>
+        <a href={link}>
           <TouchableOpacity style={styles.logo}>
             <LogoLightBg height={30} />
             {!isMobile && (
@@ -26,7 +27,7 @@ export default withNamespaces(NameSpaces.common)(function TopBar({
                 // @ts-ignore -- added initial to the aug but it still isnt liking it
                 style={[fonts.h3, styles.title]}
               >
-                BrandKit
+                {title}
               </Text>
             )}
           </TouchableOpacity>
@@ -41,7 +42,7 @@ export default withNamespaces(NameSpaces.common)(function TopBar({
       </View>
     </View>
   )
-})
+}
 
 const styles = StyleSheet.create({
   title: {
