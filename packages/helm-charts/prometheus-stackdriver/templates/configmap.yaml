@@ -45,8 +45,10 @@ data:
         - source_labels: [__meta_kubernetes_namespace, __meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name]
           action: keep
           regex: default;kubernetes;https
-        labels:
-          cluster: {{ .Values.cluster }}
+        - source_labels: [__name__]
+          regex: .*
+          replacement: '{{ .Values.cluster }}'
+          target_label: cluster
 
       - job_name: 'kubernetes-nodes'
 
@@ -59,9 +61,6 @@ data:
         kubernetes_sd_configs:
         - role: node
 
-        labels:
-          cluster: {{ .Values.cluster }}
-
         relabel_configs:
         - action: labelmap
           regex: __meta_kubernetes_node_label_(.+)
@@ -71,15 +70,16 @@ data:
           regex: (.+)
           target_label: __metrics_path__
           replacement: /api/v1/nodes/${1}/proxy/metrics
+        - source_labels: [__name__]
+          regex: .*
+          replacement: '{{ .Values.cluster }}'
+          target_label: cluster
 
 
       - job_name: 'kubernetes-pods'
 
         kubernetes_sd_configs:
         - role: pod
-
-        labels:
-          cluster: {{ .Values.cluster }}
 
         relabel_configs:
         - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
@@ -102,6 +102,10 @@ data:
         - source_labels: [__meta_kubernetes_pod_name]
           action: replace
           target_label: kubernetes_pod_name
+        - source_labels: [__name__]
+          regex: .*
+          replacement: '{{ .Values.cluster }}'
+          target_label: cluster
 
       - job_name: 'kubernetes-cadvisor'
 
@@ -114,9 +118,6 @@ data:
         kubernetes_sd_configs:
         - role: node
 
-        labels:
-          cluster: {{ .Values.cluster }}
-
         relabel_configs:
         - action: labelmap
           regex: __meta_kubernetes_node_label_(.+)
@@ -126,14 +127,15 @@ data:
           regex: (.+)
           target_label: __metrics_path__
           replacement: /api/v1/nodes/${1}/proxy/metrics/cadvisor
+        - source_labels: [__name__]
+          regex: .*
+          replacement: '{{ .Values.cluster }}'
+          target_label: cluster
 
       - job_name: 'kubernetes-service-endpoints'
 
         kubernetes_sd_configs:
         - role: endpoints
-
-        labels:
-          cluster: {{ .Values.cluster }}
 
         relabel_configs:
         - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_scrape]
@@ -160,3 +162,7 @@ data:
         - source_labels: [__meta_kubernetes_service_name]
           action: replace
           target_label: kubernetes_name
+        - source_labels: [__name__]
+          regex: .*
+          replacement: '{{ .Values.cluster }}'
+          target_label: cluster
