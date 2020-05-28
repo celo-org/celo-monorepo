@@ -94,7 +94,7 @@ exports[`OutgoingPaymentRequestSummaryNotification renders a number when the add
             >
               
               $
-              266,000.00
+              266000.00
             </Text>
           </Text>
           <Text
@@ -142,21 +142,22 @@ exports[`OutgoingPaymentRequestSummaryNotification renders a number when the add
                 ]
               }
             >
-              <Image
-                source={
-                  Object {
-                    "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
-                  }
-                }
+              <Text
                 style={
-                  Object {
-                    "alignItems": "center",
-                    "height": 40,
-                    "justifyContent": "center",
-                    "width": 40,
-                  }
+                  Array [
+                    Object {
+                      "color": "#FFFFFF",
+                      "fontFamily": "Inter-Medium",
+                      "fontSize": 16,
+                    },
+                    Object {
+                      "fontSize": 20,
+                    },
+                  ]
                 }
-              />
+              >
+                0
+              </Text>
             </View>
           </View>
         </View>
@@ -333,7 +334,7 @@ exports[`OutgoingPaymentRequestSummaryNotification renders correctly for just on
             >
               
               $
-              266,000.00
+              266000.00
             </Text>
           </Text>
           <Text
@@ -381,21 +382,22 @@ exports[`OutgoingPaymentRequestSummaryNotification renders correctly for just on
                 ]
               }
             >
-              <Image
-                source={
-                  Object {
-                    "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
-                  }
-                }
+              <Text
                 style={
-                  Object {
-                    "alignItems": "center",
-                    "height": 40,
-                    "justifyContent": "center",
-                    "width": 40,
-                  }
+                  Array [
+                    Object {
+                      "color": "#FFFFFF",
+                      "fontFamily": "Inter-Medium",
+                      "fontSize": 16,
+                    },
+                    Object {
+                      "fontSize": 20,
+                    },
+                  ]
                 }
-              />
+              >
+                +
+              </Text>
             </View>
           </View>
         </View>

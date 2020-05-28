@@ -53,10 +53,7 @@ exports[`Account renders correctly 1`] = `
                     "flexDirection": "row",
                     "justifyContent": "center",
                   },
-                  Object {
-                    "alignSelf": "center",
-                    "margin": "auto",
-                  },
+                  undefined,
                 ]
               }
             >
@@ -76,25 +73,22 @@ exports[`Account renders correctly 1`] = `
                   ]
                 }
               >
-                <Image
-                  source={
-                    Object {
-                      "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
-                    }
-                  }
+                <Text
                   style={
                     Array [
                       Object {
-                        "alignSelf": "center",
-                        "margin": "auto",
+                        "color": "#FFFFFF",
+                        "fontFamily": "Inter-Medium",
+                        "fontSize": 16,
                       },
                       Object {
-                        "height": 40,
-                        "width": 40,
+                        "fontSize": 20,
                       },
                     ]
                   }
-                />
+                >
+                  J
+                </Text>
               </View>
             </View>
             <Text
@@ -1147,10 +1141,7 @@ exports[`Account renders correctly when dev mode active 1`] = `
                     "flexDirection": "row",
                     "justifyContent": "center",
                   },
-                  Object {
-                    "alignSelf": "center",
-                    "margin": "auto",
-                  },
+                  undefined,
                 ]
               }
             >
@@ -1170,25 +1161,22 @@ exports[`Account renders correctly when dev mode active 1`] = `
                   ]
                 }
               >
-                <Image
-                  source={
-                    Object {
-                      "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
-                    }
-                  }
+                <Text
                   style={
                     Array [
                       Object {
-                        "alignSelf": "center",
-                        "margin": "auto",
+                        "color": "#FFFFFF",
+                        "fontFamily": "Inter-Medium",
+                        "fontSize": 16,
                       },
                       Object {
-                        "height": 40,
-                        "width": 40,
+                        "fontSize": 20,
                       },
                     ]
                   }
-                />
+                >
+                  J
+                </Text>
               </View>
             </View>
             <Text

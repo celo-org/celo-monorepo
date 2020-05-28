@@ -188,7 +188,7 @@ exports[`ValidateRecipientAccount renders correctly when full validation require
                   }
                 }
               >
-                   confirmAccountNumber.submit   
+                confirmAccountNumber.submit
               </Text>
             </View>
           </View>
@@ -973,7 +973,7 @@ exports[`ValidateRecipientAccount renders correctly when partial validation requ
                   }
                 }
               >
-                   confirmAccountNumber.submit   
+                confirmAccountNumber.submit
               </Text>
             </View>
           </View>

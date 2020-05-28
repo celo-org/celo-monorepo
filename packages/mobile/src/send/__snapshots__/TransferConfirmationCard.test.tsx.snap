@@ -159,10 +159,7 @@ exports[`TransferConfirmationCard renders correctly for received escrow transact
               "flexDirection": "row",
               "justifyContent": "center",
             },
-            Object {
-              "alignSelf": "center",
-              "margin": "auto",
-            },
+            undefined,
           ]
         }
       >
@@ -182,25 +179,22 @@ exports[`TransferConfirmationCard renders correctly for received escrow transact
             ]
           }
         >
-          <Image
-            source={
-              Object {
-                "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
-              }
-            }
+          <Text
             style={
               Array [
                 Object {
-                  "alignSelf": "center",
-                  "margin": "auto",
+                  "color": "#FFFFFF",
+                  "fontFamily": "Inter-Medium",
+                  "fontSize": 16,
                 },
                 Object {
-                  "height": 40,
-                  "width": 40,
+                  "fontSize": 20,
                 },
               ]
             }
-          />
+          >
+            M
+          </Text>
         </View>
       </View>
       <Text
@@ -379,10 +373,7 @@ exports[`TransferConfirmationCard renders correctly for received transaction dri
               "flexDirection": "row",
               "justifyContent": "center",
             },
-            Object {
-              "alignSelf": "center",
-              "margin": "auto",
-            },
+            undefined,
           ]
         }
       >
@@ -402,25 +393,22 @@ exports[`TransferConfirmationCard renders correctly for received transaction dri
             ]
           }
         >
-          <Image
-            source={
-              Object {
-                "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
-              }
-            }
+          <Text
             style={
               Array [
                 Object {
-                  "alignSelf": "center",
-                  "margin": "auto",
+                  "color": "#FFFFFF",
+                  "fontFamily": "Inter-Medium",
+                  "fontSize": 16,
                 },
                 Object {
-                  "height": 40,
-                  "width": 40,
+                  "fontSize": 20,
                 },
               ]
             }
-          />
+          >
+            M
+          </Text>
         </View>
       </View>
       <Text
@@ -599,10 +587,7 @@ exports[`TransferConfirmationCard renders correctly for sent escrow transaction 
               "flexDirection": "row",
               "justifyContent": "center",
             },
-            Object {
-              "alignSelf": "center",
-              "margin": "auto",
-            },
+            undefined,
           ]
         }
       >
@@ -622,25 +607,22 @@ exports[`TransferConfirmationCard renders correctly for sent escrow transaction 
             ]
           }
         >
-          <Image
-            source={
-              Object {
-                "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
-              }
-            }
+          <Text
             style={
               Array [
                 Object {
-                  "alignSelf": "center",
-                  "margin": "auto",
+                  "color": "#FFFFFF",
+                  "fontFamily": "Inter-Medium",
+                  "fontSize": 16,
                 },
                 Object {
-                  "height": 40,
-                  "width": 40,
+                  "fontSize": 20,
                 },
               ]
             }
-          />
+          >
+            M
+          </Text>
         </View>
       </View>
       <Text
@@ -837,10 +819,7 @@ exports[`TransferConfirmationCard renders correctly for sent transaction drilldo
               "flexDirection": "row",
               "justifyContent": "center",
             },
-            Object {
-              "alignSelf": "center",
-              "margin": "auto",
-            },
+            undefined,
           ]
         }
       >
@@ -860,25 +839,22 @@ exports[`TransferConfirmationCard renders correctly for sent transaction drilldo
             ]
           }
         >
-          <Image
-            source={
-              Object {
-                "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
-              }
-            }
+          <Text
             style={
               Array [
                 Object {
-                  "alignSelf": "center",
-                  "margin": "auto",
+                  "color": "#FFFFFF",
+                  "fontFamily": "Inter-Medium",
+                  "fontSize": 16,
                 },
                 Object {
-                  "height": 40,
-                  "width": 40,
+                  "fontSize": 20,
                 },
               ]
             }
-          />
+          >
+            M
+          </Text>
         </View>
       </View>
       <Text

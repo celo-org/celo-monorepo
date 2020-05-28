@@ -92,10 +92,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                       "flexDirection": "row",
                       "justifyContent": "center",
                     },
-                    Object {
-                      "alignSelf": "center",
-                      "margin": "auto",
-                    },
+                    undefined,
                   ]
                 }
               >
@@ -115,25 +112,22 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                     ]
                   }
                 >
-                  <Image
-                    source={
-                      Object {
-                        "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
-                      }
-                    }
+                  <Text
                     style={
                       Array [
                         Object {
-                          "alignSelf": "center",
-                          "margin": "auto",
+                          "color": "#FFFFFF",
+                          "fontFamily": "Inter-Medium",
+                          "fontSize": 16,
                         },
                         Object {
-                          "height": 40,
-                          "width": 40,
+                          "fontSize": 20,
                         },
                       ]
                     }
-                  />
+                  >
+                    M
+                  </Text>
                 </View>
               </View>
               <Text
@@ -862,10 +856,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                       "flexDirection": "row",
                       "justifyContent": "center",
                     },
-                    Object {
-                      "alignSelf": "center",
-                      "margin": "auto",
-                    },
+                    undefined,
                   ]
                 }
               >
@@ -885,25 +876,22 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                     ]
                   }
                 >
-                  <Image
-                    source={
-                      Object {
-                        "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
-                      }
-                    }
+                  <Text
                     style={
                       Array [
                         Object {
-                          "alignSelf": "center",
-                          "margin": "auto",
+                          "color": "#FFFFFF",
+                          "fontFamily": "Inter-Medium",
+                          "fontSize": 16,
                         },
                         Object {
-                          "height": 40,
-                          "width": 40,
+                          "fontSize": 20,
                         },
                       ]
                     }
-                  />
+                  >
+                    M
+                  </Text>
                 </View>
               </View>
               <Text
@@ -1632,10 +1620,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                       "flexDirection": "row",
                       "justifyContent": "center",
                     },
-                    Object {
-                      "alignSelf": "center",
-                      "margin": "auto",
-                    },
+                    undefined,
                   ]
                 }
               >
@@ -1655,25 +1640,22 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                     ]
                   }
                 >
-                  <Image
-                    source={
-                      Object {
-                        "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
-                      }
-                    }
+                  <Text
                     style={
                       Array [
                         Object {
-                          "alignSelf": "center",
-                          "margin": "auto",
+                          "color": "#FFFFFF",
+                          "fontFamily": "Inter-Medium",
+                          "fontSize": 16,
                         },
                         Object {
-                          "height": 40,
-                          "width": 40,
+                          "fontSize": 20,
                         },
                       ]
                     }
-                  />
+                  >
+                    M
+                  </Text>
                 </View>
               </View>
               <Text

@@ -314,21 +314,22 @@ exports[`transfer feed item renders correctly for known received 1`] = `
             ]
           }
         >
-          <Image
-            source={
-              Object {
-                "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
-              }
-            }
+          <Text
             style={
-              Object {
-                "alignItems": "center",
-                "height": 40,
-                "justifyContent": "center",
-                "width": 40,
-              }
+              Array [
+                Object {
+                  "color": "#FFFFFF",
+                  "fontFamily": "Inter-Medium",
+                  "fontSize": 16,
+                },
+                Object {
+                  "fontSize": 20,
+                },
+              ]
             }
-          />
+          >
+            J
+          </Text>
         </View>
       </View>
     </View>
@@ -470,21 +471,22 @@ exports[`transfer feed item renders correctly for known sent 1`] = `
             ]
           }
         >
-          <Image
-            source={
-              Object {
-                "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
-              }
-            }
+          <Text
             style={
-              Object {
-                "alignItems": "center",
-                "height": 40,
-                "justifyContent": "center",
-                "width": 40,
-              }
+              Array [
+                Object {
+                  "color": "#FFFFFF",
+                  "fontFamily": "Inter-Medium",
+                  "fontSize": 16,
+                },
+                Object {
+                  "fontSize": 20,
+                },
+              ]
             }
-          />
+          >
+            J
+          </Text>
         </View>
       </View>
     </View>
@@ -747,18 +749,17 @@ exports[`transfer feed item renders correctly for received 1`] = `
           }
         >
           <Image
-            source={
-              Object {
-                "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
-              }
-            }
             style={
-              Object {
-                "alignItems": "center",
-                "height": 40,
-                "justifyContent": "center",
-                "width": 40,
-              }
+              Array [
+                Object {
+                  "alignSelf": "center",
+                  "margin": "auto",
+                },
+                Object {
+                  "height": 40,
+                  "width": 40,
+                },
+              ]
             }
           />
         </View>
@@ -1029,18 +1030,17 @@ exports[`transfer feed item renders correctly for received with encrypted commen
           }
         >
           <Image
-            source={
-              Object {
-                "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
-              }
-            }
             style={
-              Object {
-                "alignItems": "center",
-                "height": 40,
-                "justifyContent": "center",
-                "width": 40,
-              }
+              Array [
+                Object {
+                  "alignSelf": "center",
+                  "margin": "auto",
+                },
+                Object {
+                  "height": 40,
+                  "width": 40,
+                },
+              ]
             }
           />
         </View>
@@ -1185,18 +1185,17 @@ exports[`transfer feed item renders correctly for sent 1`] = `
           }
         >
           <Image
-            source={
-              Object {
-                "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
-              }
-            }
             style={
-              Object {
-                "alignItems": "center",
-                "height": 40,
-                "justifyContent": "center",
-                "width": 40,
-              }
+              Array [
+                Object {
+                  "alignSelf": "center",
+                  "margin": "auto",
+                },
+                Object {
+                  "height": 40,
+                  "width": 40,
+                },
+              ]
             }
           />
         </View>
@@ -1461,18 +1460,17 @@ exports[`transfer feed item renders correctly for sent transaction 1`] = `
           }
         >
           <Image
-            source={
-              Object {
-                "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
-              }
-            }
             style={
-              Object {
-                "alignItems": "center",
-                "height": 40,
-                "justifyContent": "center",
-                "width": 40,
-              }
+              Array [
+                Object {
+                  "alignSelf": "center",
+                  "margin": "auto",
+                },
+                Object {
+                  "height": 40,
+                  "width": 40,
+                },
+              ]
             }
           />
         </View>
@@ -1614,18 +1612,17 @@ exports[`transfer feed item renders correctly for sent with encrypted comment 1`
           }
         >
           <Image
-            source={
-              Object {
-                "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
-              }
-            }
             style={
-              Object {
-                "alignItems": "center",
-                "height": 40,
-                "justifyContent": "center",
-                "width": 40,
-              }
+              Array [
+                Object {
+                  "alignSelf": "center",
+                  "margin": "auto",
+                },
+                Object {
+                  "height": 40,
+                  "width": 40,
+                },
+              ]
             }
           />
         </View>

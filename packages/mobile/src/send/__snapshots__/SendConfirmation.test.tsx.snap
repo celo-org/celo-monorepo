@@ -56,11 +56,14 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
             >
               <View
                 style={
-                  Object {
-                    "alignItems": "center",
-                    "flexDirection": "row",
-                    "justifyContent": "center",
-                  }
+                  Array [
+                    Object {
+                      "alignItems": "center",
+                      "flexDirection": "row",
+                      "justifyContent": "center",
+                    },
+                    undefined,
+                  ]
                 }
               >
                 <View
@@ -79,25 +82,22 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
                     ]
                   }
                 >
-                  <Image
-                    source={
-                      Object {
-                        "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
-                      }
-                    }
+                  <Text
                     style={
                       Array [
                         Object {
-                          "alignSelf": "center",
-                          "margin": "auto",
+                          "color": "#FFFFFF",
+                          "fontFamily": "Inter-Medium",
+                          "fontSize": 16,
                         },
                         Object {
-                          "height": 40,
-                          "width": 40,
+                          "fontSize": 20,
                         },
                       ]
                     }
-                  />
+                  >
+                    J
+                  </Text>
                 </View>
               </View>
               <View
@@ -134,65 +134,27 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
                 </Text>
               </View>
             </View>
-            <View
+            <Text
+              numberOfLines={1}
               style={
                 Array [
                   Object {
-                    "flexDirection": "row",
+                    "color": "#2E3338",
+                    "fontFamily": "Inter-SemiBold",
+                    "fontSize": 32,
+                    "lineHeight": 40,
+                    "paddingVertical": 8,
                   },
                   Object {
-                    "paddingVertical": 8,
+                    "color": "#2E3338",
                   },
                 ]
               }
             >
-              <Text
-                numberOfLines={1}
-                style={
-                  Array [
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Inter-Regular",
-                      "fontSize": 16,
-                      "lineHeight": 22,
-                    },
-                    Object {
-                      "color": undefined,
-                      "fontSize": 23,
-                    },
-                  ]
-                }
-              >
-                
-              </Text>
-              <Text
-                numberOfLines={1}
-                style={
-                  Object {
-                    "color": "#2E3338",
-                    "fontFamily": "Inter-SemiBold",
-                    "fontSize": 32,
-                    "lineHeight": 40,
-                  }
-                }
-              >
-                $
-              </Text>
-              <Text
-                numberOfLines={1}
-                style={
-                  Object {
-                    "color": "#2E3338",
-                    "fontFamily": "Inter-SemiBold",
-                    "fontSize": 32,
-                    "lineHeight": 40,
-                    "paddingHorizontal": 3,
-                  }
-                }
-              >
-                1.33
-              </Text>
-            </View>
+              
+              $
+              1.33
+            </Text>
             <TextInput
               allowFontScaling={true}
               autoFocus={true}
@@ -1133,11 +1095,14 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
             >
               <View
                 style={
-                  Object {
-                    "alignItems": "center",
-                    "flexDirection": "row",
-                    "justifyContent": "center",
-                  }
+                  Array [
+                    Object {
+                      "alignItems": "center",
+                      "flexDirection": "row",
+                      "justifyContent": "center",
+                    },
+                    undefined,
+                  ]
                 }
               >
                 <View
@@ -1156,25 +1121,22 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                     ]
                   }
                 >
-                  <Image
-                    source={
-                      Object {
-                        "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
-                      }
-                    }
+                  <Text
                     style={
                       Array [
                         Object {
-                          "alignSelf": "center",
-                          "margin": "auto",
+                          "color": "#FFFFFF",
+                          "fontFamily": "Inter-Medium",
+                          "fontSize": 16,
                         },
                         Object {
-                          "height": 40,
-                          "width": 40,
+                          "fontSize": 20,
                         },
                       ]
                     }
-                  />
+                  >
+                    J
+                  </Text>
                 </View>
               </View>
               <View
@@ -1211,65 +1173,27 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                 </Text>
               </View>
             </View>
-            <View
+            <Text
+              numberOfLines={1}
               style={
                 Array [
                   Object {
-                    "flexDirection": "row",
+                    "color": "#2E3338",
+                    "fontFamily": "Inter-SemiBold",
+                    "fontSize": 32,
+                    "lineHeight": 40,
+                    "paddingVertical": 8,
                   },
                   Object {
-                    "paddingVertical": 8,
+                    "color": "#2E3338",
                   },
                 ]
               }
             >
-              <Text
-                numberOfLines={1}
-                style={
-                  Array [
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Inter-Regular",
-                      "fontSize": 16,
-                      "lineHeight": 22,
-                    },
-                    Object {
-                      "color": undefined,
-                      "fontSize": 23,
-                    },
-                  ]
-                }
-              >
-                
-              </Text>
-              <Text
-                numberOfLines={1}
-                style={
-                  Object {
-                    "color": "#2E3338",
-                    "fontFamily": "Inter-SemiBold",
-                    "fontSize": 32,
-                    "lineHeight": 40,
-                  }
-                }
-              >
-                $
-              </Text>
-              <Text
-                numberOfLines={1}
-                style={
-                  Object {
-                    "color": "#2E3338",
-                    "fontFamily": "Inter-SemiBold",
-                    "fontSize": 32,
-                    "lineHeight": 40,
-                    "paddingHorizontal": 3,
-                  }
-                }
-              >
-                1.33
-              </Text>
-            </View>
+              
+              $
+              1.33
+            </Text>
             <TextInput
               allowFontScaling={true}
               autoFocus={true}
@@ -2210,11 +2134,14 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
             >
               <View
                 style={
-                  Object {
-                    "alignItems": "center",
-                    "flexDirection": "row",
-                    "justifyContent": "center",
-                  }
+                  Array [
+                    Object {
+                      "alignItems": "center",
+                      "flexDirection": "row",
+                      "justifyContent": "center",
+                    },
+                    undefined,
+                  ]
                 }
               >
                 <View
@@ -2233,25 +2160,22 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                     ]
                   }
                 >
-                  <Image
-                    source={
-                      Object {
-                        "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
-                      }
-                    }
+                  <Text
                     style={
                       Array [
                         Object {
-                          "alignSelf": "center",
-                          "margin": "auto",
+                          "color": "#FFFFFF",
+                          "fontFamily": "Inter-Medium",
+                          "fontSize": 16,
                         },
                         Object {
-                          "height": 40,
-                          "width": 40,
+                          "fontSize": 20,
                         },
                       ]
                     }
-                  />
+                  >
+                    J
+                  </Text>
                 </View>
               </View>
               <View
@@ -2288,65 +2212,27 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                 </Text>
               </View>
             </View>
-            <View
+            <Text
+              numberOfLines={1}
               style={
                 Array [
                   Object {
-                    "flexDirection": "row",
+                    "color": "#2E3338",
+                    "fontFamily": "Inter-SemiBold",
+                    "fontSize": 32,
+                    "lineHeight": 40,
+                    "paddingVertical": 8,
                   },
                   Object {
-                    "paddingVertical": 8,
+                    "color": "#2E3338",
                   },
                 ]
               }
             >
-              <Text
-                numberOfLines={1}
-                style={
-                  Array [
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Inter-Regular",
-                      "fontSize": 16,
-                      "lineHeight": 22,
-                    },
-                    Object {
-                      "color": undefined,
-                      "fontSize": 23,
-                    },
-                  ]
-                }
-              >
-                
-              </Text>
-              <Text
-                numberOfLines={1}
-                style={
-                  Object {
-                    "color": "#2E3338",
-                    "fontFamily": "Inter-SemiBold",
-                    "fontSize": 32,
-                    "lineHeight": 40,
-                  }
-                }
-              >
-                $
-              </Text>
-              <Text
-                numberOfLines={1}
-                style={
-                  Object {
-                    "color": "#2E3338",
-                    "fontFamily": "Inter-SemiBold",
-                    "fontSize": 32,
-                    "lineHeight": 40,
-                    "paddingHorizontal": 3,
-                  }
-                }
-              >
-                1.33
-              </Text>
-            </View>
+              
+              $
+              1.33
+            </Text>
             <TextInput
               allowFontScaling={true}
               autoFocus={true}
@@ -3284,11 +3170,14 @@ exports[`SendConfirmation renders correctly when there are multiple user address
             >
               <View
                 style={
-                  Object {
-                    "alignItems": "center",
-                    "flexDirection": "row",
-                    "justifyContent": "center",
-                  }
+                  Array [
+                    Object {
+                      "alignItems": "center",
+                      "flexDirection": "row",
+                      "justifyContent": "center",
+                    },
+                    undefined,
+                  ]
                 }
               >
                 <View
@@ -3307,25 +3196,22 @@ exports[`SendConfirmation renders correctly when there are multiple user address
                     ]
                   }
                 >
-                  <Image
-                    source={
-                      Object {
-                        "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
-                      }
-                    }
+                  <Text
                     style={
                       Array [
                         Object {
-                          "alignSelf": "center",
-                          "margin": "auto",
+                          "color": "#FFFFFF",
+                          "fontFamily": "Inter-Medium",
+                          "fontSize": 16,
                         },
                         Object {
-                          "height": 40,
-                          "width": 40,
+                          "fontSize": 20,
                         },
                       ]
                     }
-                  />
+                  >
+                    J
+                  </Text>
                 </View>
               </View>
               <View
@@ -3415,65 +3301,27 @@ exports[`SendConfirmation renders correctly when there are multiple user address
                 </View>
               </View>
             </View>
-            <View
+            <Text
+              numberOfLines={1}
               style={
                 Array [
                   Object {
-                    "flexDirection": "row",
+                    "color": "#2E3338",
+                    "fontFamily": "Inter-SemiBold",
+                    "fontSize": 32,
+                    "lineHeight": 40,
+                    "paddingVertical": 8,
                   },
                   Object {
-                    "paddingVertical": 8,
+                    "color": "#2E3338",
                   },
                 ]
               }
             >
-              <Text
-                numberOfLines={1}
-                style={
-                  Array [
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Inter-Regular",
-                      "fontSize": 16,
-                      "lineHeight": 22,
-                    },
-                    Object {
-                      "color": undefined,
-                      "fontSize": 23,
-                    },
-                  ]
-                }
-              >
-                
-              </Text>
-              <Text
-                numberOfLines={1}
-                style={
-                  Object {
-                    "color": "#2E3338",
-                    "fontFamily": "Inter-SemiBold",
-                    "fontSize": 32,
-                    "lineHeight": 40,
-                  }
-                }
-              >
-                $
-              </Text>
-              <Text
-                numberOfLines={1}
-                style={
-                  Object {
-                    "color": "#2E3338",
-                    "fontFamily": "Inter-SemiBold",
-                    "fontSize": 32,
-                    "lineHeight": 40,
-                    "paddingHorizontal": 3,
-                  }
-                }
-              >
-                1.33
-              </Text>
-            </View>
+              
+              $
+              1.33
+            </Text>
             <TextInput
               allowFontScaling={true}
               autoFocus={true}

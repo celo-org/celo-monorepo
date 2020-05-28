@@ -12,7 +12,6 @@ import {
   mockAccount2Invite,
   mockAccountInvite,
   mockE164NumberInvite,
-  mockNavigation,
   mockTransactionData,
 } from 'test/values'
 
@@ -27,14 +26,6 @@ const storeData = {
         feeInWei: '1',
       },
     },
-  },
-}
-
-const mockRoute = {
-  name: Screens.SendConfirmation as Screens.SendConfirmation,
-  key: '',
-  params: {
-    transactionData: mockTransactionData,
   },
 }
 
@@ -58,7 +49,11 @@ describe('SendConfirmation', () => {
     const getWrapper = () =>
       render(
         <Provider store={store}>
-          <SendConfirmation navigation={mockNavigation} route={mockRoute} />
+          <SendConfirmation
+            {...getMockStackScreenProps(Screens.SendConfirmation, {
+              transactionData: mockTransactionData,
+            })}
+          />
         </Provider>
       )
 
