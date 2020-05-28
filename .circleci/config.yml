@@ -858,7 +858,7 @@ jobs:
       - run:
           name: Check if the test should run
           command: |
-            ./scripts/ci_check_if_test_should_run_v2.sh phone-number-privacy
+            ./scripts/ci_check_if_test_should_run_v2.sh combiner,signer
       - run:
           name: Run Tests for combiner
           command: yarn --cwd=packages/phone-number-privacy/combiner test
