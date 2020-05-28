@@ -97,7 +97,7 @@ function* watchUserTxQueryChannel(channel: EventChannel<UserTxQueryChannelEvent>
         continue
       }
       yield put(newTransactionsInFeed(newTxs))
-      yield call(cleanupStandbyTransacitons, newTxs)
+      yield call(cleanupStandbyTransactions, newTxs)
     }
   } catch (error) {
     Logger.error(
@@ -111,7 +111,7 @@ function* watchUserTxQueryChannel(channel: EventChannel<UserTxQueryChannelEvent>
 }
 
 // Remove standby txs from redux state when the real ones show up in the feed
-function* cleanupStandbyTransacitons(newFeedTransactions: TransactionFeedFragment[]) {
+function* cleanupStandbyTransactions(newFeedTransactions: TransactionFeedFragment[]) {
   const standbyTxs: StandbyTransaction[] = yield select(standbyTransactionsSelector)
   const newFeedTxHashes = new Set(newFeedTransactions.map((tx) => tx?.hash))
   for (const standbyTx of standbyTxs) {

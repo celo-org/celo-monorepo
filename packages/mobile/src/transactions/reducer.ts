@@ -70,7 +70,7 @@ export const reducer = (
       }
     case Actions.NEW_TRANSACTIONS_IN_FEED:
       const newKnownFeedTransactions = { ...state.knownFeedTransactions }
-      action.transactions.map((tx) => (newKnownFeedTransactions[tx.hash] = true))
+      action.transactions.forEach((tx) => (newKnownFeedTransactions[tx.hash] = true))
       return {
         ...state,
         knownFeedTransactions: newKnownFeedTransactions,

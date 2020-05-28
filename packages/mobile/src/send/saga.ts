@@ -139,7 +139,7 @@ function* sendPayment(
 
 function* sendPaymentOrInviteSaga({
   amount,
-  reason,
+  comment,
   recipient,
   recipientAddress,
   inviteMethod,
@@ -155,8 +155,14 @@ function* sendPaymentOrInviteSaga({
 
     const ownAddress: string = yield select(currentAccountSelector)
     if (recipientAddress) {
-      const comment = yield call(encryptComment, reason, recipientAddress, ownAddress, true)
-      yield call(sendPayment, recipientAddress, amount, comment, CURRENCY_ENUM.DOLLAR)
+      const encryptedComment = yield call(
+        encryptComment,
+        comment,
+        recipientAddress,
+        ownAddress,
+        true
+      )
+      yield call(sendPayment, recipientAddress, amount, encryptedComment, CURRENCY_ENUM.DOLLAR)
       CeloAnalytics.track(CustomEventNames.send_dollar_transaction)
     } else if (recipient.e164PhoneNumber) {
       yield call(

@@ -108,7 +108,7 @@ interface AttestationStat {
 }
 
 /**
- * Returns true if an AttetationStat is considered verified using the given factors,
+ * Returns true if an AttestationStat is considered verified using the given factors,
  * or defaults if factors are ommited.
  * @param stats AttestationStat of the account's attestation identitifer, retrievable via lookupIdentitfiers
  * @param numAttestationsRequired Optional number of attestations required.  Will default to

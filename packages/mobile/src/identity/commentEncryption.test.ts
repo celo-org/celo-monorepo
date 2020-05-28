@@ -53,11 +53,11 @@ const phoneDetails: PhoneNumberHashDetails = {
 }
 
 describe('Encrypt Comment', () => {
-  it('Empty comment', async () => {
+  it('Handles empty comment', async () => {
     expect(encryptComment('', 'toAddr', 'fromAddr').next().value).toBe('')
   })
 
-  it('Empty to/from address', async () => {
+  it('Handles empty to/from address', async () => {
     expect(encryptComment(mockComment, '', 'fromAddr').next().value).toBe(mockComment)
     expect(encryptComment(mockComment, '', 'fromAddr').next().value).toBe(mockComment)
     expect(encryptComment(mockComment, 'toAddr', '').next().value).toBe(mockComment)
@@ -67,7 +67,7 @@ describe('Encrypt Comment', () => {
     expect(encryptComment(mockComment, null, 'fromAddr').next().value).toBe(mockComment)
   })
 
-  it('Basic comment', async () => {
+  it('Handles basic comment', async () => {
     await expectSaga(encryptComment, simpleComment, mockAccount2, mockAccount)
       .provide([
         [call(getCommentKey, mockAccount), hexToBuffer(mockPublicDEK)],
@@ -77,7 +77,7 @@ describe('Encrypt Comment', () => {
       .run()
   })
 
-  it('Complex comment', async () => {
+  it('Handles complex comment', async () => {
     await expectSaga(encryptComment, complexComment, mockAccount2, mockAccount)
       .provide([
         [call(getCommentKey, mockAccount), hexToBuffer(mockPublicDEK)],
@@ -87,7 +87,7 @@ describe('Encrypt Comment', () => {
       .run()
   })
 
-  it('Comment with metadata enabled', async () => {
+  it('Handles comment with metadata enabled', async () => {
     const mockState = getMockStoreData({
       account: { e164PhoneNumber: mockE164Number },
       identity: { e164NumberToSalt: { [mockE164Number]: mockE164NumberSalt } },
@@ -104,33 +104,33 @@ describe('Encrypt Comment', () => {
 })
 
 describe('Decrypt Comment', () => {
-  it('Empty comment', () => {
+  it('Handles empty comment', () => {
     expect(decryptComment('', mockPrivateDEK, false)).toMatchObject({ comment: '' })
   })
 
-  it('Empty to/from address', async () => {
+  it('Handles empty to/from address', async () => {
     expect(decryptComment(simpleComment, null, false)).toMatchObject({ comment: simpleComment })
   })
 
-  it('Basic comment as sender', async () => {
+  it('Handles basic comment as sender', async () => {
     expect(decryptComment(simpleCommentEnc, mockPrivateDEK, true)).toMatchObject({
       comment: simpleComment,
     })
   })
 
-  it('Basic comment as receiver', async () => {
+  it('Handles basic comment as receiver', async () => {
     expect(decryptComment(simpleCommentEnc, mockPrivateDEK2, false)).toMatchObject({
       comment: simpleComment,
     })
   })
 
-  it('Complex comment', async () => {
+  it('Handles complex comment', async () => {
     expect(decryptComment(complexCommentEnc, mockPrivateDEK, true)).toMatchObject({
       comment: complexComment,
     })
   })
 
-  it('Comment with metadata', async () => {
+  it('Handles comment with metadata', async () => {
     expect(decryptComment(simpleCommentWithMetadataEnc, mockPrivateDEK2, false)).toMatchObject({
       comment: simpleComment,
       e164Number: mockE164Number,
@@ -140,11 +140,11 @@ describe('Decrypt Comment', () => {
 })
 
 describe(embedPhoneNumberMetadata, () => {
-  it('comment without phone details', () => {
+  it('Handles comment without phone details', () => {
     expect(embedPhoneNumberMetadata(complexComment, undefined)).toBe(complexComment)
   })
 
-  it('comment with phone details', () => {
+  it('Handles comment with phone details', () => {
     expect(embedPhoneNumberMetadata(complexComment, phoneDetails)).toBe(
       complexComment + '~+14155550000piWqRHHYWtfg9'
     )
@@ -152,15 +152,15 @@ describe(embedPhoneNumberMetadata, () => {
 })
 
 describe(extractPhoneNumberMetadata, () => {
-  it('Empty comment', () => {
+  it('Handles empty comment', () => {
     expect(extractPhoneNumberMetadata('')).toMatchObject({ comment: '' })
   })
 
-  it('comment without metadata', () => {
+  it('Handles comment without metadata', () => {
     expect(extractPhoneNumberMetadata(complexComment)).toMatchObject({ comment: complexComment })
   })
 
-  it('simple comment with metadata', () => {
+  it('Handles simple comment with metadata', () => {
     expect(extractPhoneNumberMetadata(simpleCommentWithMetadata)).toMatchObject({
       comment: simpleComment,
       e164Number: mockE164Number,
@@ -168,7 +168,7 @@ describe(extractPhoneNumberMetadata, () => {
     })
   })
 
-  it('complex comment with metadata', () => {
+  it('Handles complex comment with metadata', () => {
     const comment = embedPhoneNumberMetadata(complexComment, phoneDetails)
     expect(extractPhoneNumberMetadata(comment)).toMatchObject({
       comment: complexComment,

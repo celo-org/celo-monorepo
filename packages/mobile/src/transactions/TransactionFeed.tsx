@@ -59,13 +59,8 @@ export class TransactionFeed extends React.PureComponent<Props> {
     `,
   }
 
-  renderItem = (commentKey: string | null, kind: FeedType) => ({
-    item: tx,
-  }: {
-    item: FeedItem
-    index: number
-  }) => {
-    const { addressToE164Number, recipientCache } = this.props
+  renderItem = ({ item: tx }: { item: FeedItem; index: number }) => {
+    const { addressToE164Number, recipientCache, commentKey, kind } = this.props
 
     switch (tx.__typename) {
       case 'TokenTransfer':
@@ -91,7 +86,7 @@ export class TransactionFeed extends React.PureComponent<Props> {
   }
 
   render() {
-    const { kind, loading, error, data, commentKey } = this.props
+    const { kind, loading, error, data } = this.props
 
     if (error) {
       Logger.error(TAG, 'Failure while loading transaction feed', error)
@@ -99,13 +94,7 @@ export class TransactionFeed extends React.PureComponent<Props> {
     }
 
     if (data && data.length > 0) {
-      return (
-        <FlatList
-          data={data}
-          keyExtractor={this.keyExtractor}
-          renderItem={this.renderItem(commentKey, kind)}
-        />
-      )
+      return <FlatList data={data} keyExtractor={this.keyExtractor} renderItem={this.renderItem} />
     } else {
       return <NoActivity kind={kind} loading={loading} error={error} />
     }

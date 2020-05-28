@@ -1,6 +1,6 @@
 import { TFunction } from 'i18next'
 import * as _ from 'lodash'
-import { isTokenTxTypeSent, TokenTransactionType, UserTransactionsQuery } from 'src/apollo/types'
+import { TokenTransactionType, UserTransactionsQuery } from 'src/apollo/types'
 import { DEFAULT_TESTNET } from 'src/config'
 import { decryptComment } from 'src/identity/commentEncryption'
 import { AddressToE164NumberType } from 'src/identity/reducer'
@@ -116,4 +116,8 @@ export function getTransferFeedParams(
 
 export function getTxsFromUserTxQuery(data: UserTransactionsQuery | undefined) {
   return data?.tokenTransactions?.edges.map((edge) => edge.node).filter(isPresent) ?? []
+}
+
+export function isTokenTxTypeSent(type: TokenTransactionType) {
+  return type === TokenTransactionType.Sent || type === TokenTransactionType.EscrowSent
 }
