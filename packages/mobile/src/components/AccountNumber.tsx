@@ -1,6 +1,6 @@
 import colors from '@celo/react-components/styles/colors.v2'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
-import { trimLeading0x } from '@celo/utils/src/address'
+import { getAddressChunks } from '@celo/utils/src/address'
 import React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 
@@ -9,7 +9,9 @@ interface Props {
 }
 
 export default function AccountNumber({ address }: Props) {
-  const formattedAddress = (trimLeading0x(address).match(/.{1,4}/g) || []).join(' ')
+  // Turns '0xce10ce10ce10ce10ce10ce10ce10ce10ce10ce10'
+  // into 'ce10 ce10 ce10 ce10 ce10 ce10 ce10 ce10 ce10 ce10'
+  const formattedAddress = getAddressChunks(address).join(' ')
   return (
     <View style={styles.container}>
       <Text style={styles.text}>0x </Text>

@@ -1,3 +1,4 @@
+import colors from '@celo/react-components/styles/colors.v2'
 import { elevationShadowStyle } from '@celo/react-components/styles/styles'
 import * as React from 'react'
 import { StyleSheet, View, ViewStyle } from 'react-native'
@@ -15,7 +16,7 @@ export default function CircleArrowIcon({ style }: Props) {
       <Svg width={13} height={9} viewBox="0 0 13 9" fill="none">
         <Path
           d="M1 4.5h11m0 0L8.264 1M12 4.5L8.264 8"
-          stroke="#2E3338"
+          stroke={colors.dark}
           strokeWidth={1.5}
           strokeLinecap="round"
           strokeLinejoin="round"

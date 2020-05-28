@@ -9,7 +9,7 @@ interface Props {
   size: number
 }
 
-// An contact circle for the wallet user themselves
+// A contact circle for the wallet user themselves
 export default function ContactCircleSelf({ style, size }: Props) {
   const displayName = useSelector(nameSelector)
   const contactDetails = useSelector(userContactDetailsSelector)

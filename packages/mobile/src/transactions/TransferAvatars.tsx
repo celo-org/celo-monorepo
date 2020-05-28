@@ -21,6 +21,7 @@ export default function TransferAvatars({ type, address, recipient }: Props) {
       size={AVATAR_SIZE}
       thumbnailPath={getRecipientThumbnail(recipient)}
     >
+      {/* TODO: see if this is needed once we redesign ContactCircle/Avatar */}
       {/* <Image source={unknownUserIcon} style={styles.image} /> */}
     </ContactCircle>
   )

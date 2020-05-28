@@ -1,7 +1,7 @@
 import Touchable from '@celo/react-components/components/Touchable'
 import colors from '@celo/react-components/styles/colors.v2'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
-import { trimLeading0x } from '@celo/utils/src/address'
+import { getAddressChunks } from '@celo/utils/src/address'
 import { getDisplayNumberInternational } from '@celo/utils/src/phoneNumbers'
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -20,7 +20,8 @@ function getDisplayName(recipient?: Recipient, e164Number?: string, address?: st
     return number
   }
   if (address) {
-    const addressChunks = trimLeading0x(address).match(/.{1,4}/g) || []
+    // TODO: extract this into a reusable getShortAddressDisplay function
+    const addressChunks = getAddressChunks(address)
     return `0x ${addressChunks[0]}…${addressChunks[addressChunks.length - 1]}`
   }
 
