@@ -53,7 +53,7 @@ import { HeaderTitleWithBalance, headerWithBackButton } from 'src/navigator/Head
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
-import { getRecipientVerificationStatus, Recipient } from 'src/recipients/recipient'
+import { getRecipientVerificationStatus, Recipient, RecipientKind } from 'src/recipients/recipient'
 import { RootState } from 'src/redux/reducers'
 import { PaymentInfo } from 'src/send/reducers'
 import { getRecentPayments } from 'src/send/selectors'
@@ -157,9 +157,15 @@ export class SendAmount extends React.Component<Props, State> {
   fetchLatestAddressesAndValidate = () => {
     const { recipient } = this.props
 
-    if (recipient.e164PhoneNumber) {
-      this.props.fetchAddressesAndValidate(recipient.e164PhoneNumber)
+    if (recipient.kind === RecipientKind.QrCode || recipient.kind === RecipientKind.Address) {
+      return
     }
+
+    if (!recipient.e164PhoneNumber) {
+      throw Error('Recipient phone number is required if not sending via QR Code or address')
+    }
+
+    this.props.fetchAddressesAndValidate(recipient.e164PhoneNumber)
   }
 
   getDollarsAmount = () => {
