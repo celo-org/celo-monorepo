@@ -860,6 +860,7 @@ jobs:
       CI_INTEGRATION_ENV: integration
       DESIRED_VERSION: v2.11.0
       GOOGLE_APPLICATION_CREDENTIALS: /tmp/sa.json
+      NETWORK: rc1
     steps:
     - run:
         name: Install helm 2
@@ -875,13 +876,13 @@ jobs:
           echo $GCLOUD_SERVICE_KEY > $GOOGLE_APPLICATION_CREDENTIALS
     - attach_workspace:
         at: ~/app
-    - run:
-        name: Rebuild celotool project
-        no_output_timeout: 20m
-        command: |
-          set -e
-          yarn
-          yarn build
+    # - run:
+    #     name: Rebuild celotool project
+    #     no_output_timeout: 20m
+    #     command: |
+    #       set -e
+    #       yarn
+    #       yarn build
     - run:
         name: Configure k8s cluster for the fullnode
         command: |
@@ -900,7 +901,14 @@ jobs:
           set -e
           cd packages/celotool
           NAMESPACE="circle-${CIRCLE_BUILD_NUM}"
-          bin/celotooljs.sh deploy initial gke-fullnode -e rc1 --syncmode lightest --namespace ${NAMESPACE}
+          SYNC_MODE="lightest"
+          # bin/celotooljs.sh deploy initial gke-fullnode -e rc1 --syncmode lightest --namespace ${NAMESPACE}
+          if [ -f ../../.env.${NETWORK} ]; then
+            source ../../.env.${NETWORK}
+          else
+            source ../../.env
+          fi
+          helm install ../packages/helm-charts/celo-fullnode "${NETWORK}-${NAMESPACE}-${SYNC_MODE}-node" --set genesis.network="${NETWORK}" --set genesis.networkId="${NETWORK_ID}" --set geth.gcmode="full" --set geth.image.repository="${GETH_NODE_DOCKER_IMAGE_REPOSITORY}" --set geth.image.tag="master" --set geth.syncmode="${SYNC_MODE}" --set geth.use_static_ips="false" --set namespace="${NAMESPACE}" --set replicaCount="1" --set storage.size="10Gi" --set storage.storageClass="standard"
     - run:
         name: Test lightest mode client connected to rc1
         command: |
@@ -922,7 +930,15 @@ jobs:
           set -e
           cd packages/celotool
           NAMESPACE="circle-${CIRCLE_BUILD_NUM}"
-          bin/celotooljs.sh deploy initial gke-fullnode -e rc1 --syncmode full --namespace ${NAMESPACE}
+          SYNC_MODE="full"
+          # bin/celotooljs.sh deploy initial gke-fullnode -e rc1 --syncmode full --namespace ${NAMESPACE}
+          if [ -f ../../.env.${NETWORK} ]; then
+            source ../../.env.${NETWORK}
+          else
+            source ../../.env
+          fi
+          helm install ../packages/helm-charts/celo-fullnode "${NETWORK}-${NAMESPACE}-${SYNC_MODE}-node" --set genesis.network="${NETWORK}" --set genesis.networkId="${NETWORK_ID}" --set geth.gcmode="full" --set geth.image.repository="${GETH_NODE_DOCKER_IMAGE_REPOSITORY}" --set geth.image.tag="master" --set geth.syncmode="${SYNC_MODE}" --set geth.use_static_ips="false" --set namespace="${NAMESPACE}" --set replicaCount="1" --set storage.size="10Gi" --set storage.storageClass="standard"
+
     - run:
         name: Test full mode client connected to rc1
         command: |
@@ -944,7 +960,15 @@ jobs:
           set -e
           cd packages/celotool
           NAMESPACE="circle-${CIRCLE_BUILD_NUM}"
-          bin/celotooljs.sh deploy initial gke-fullnode -e rc1 --syncmode fast --namespace ${NAMESPACE}
+          SYNC_MODE="fast"
+          # bin/celotooljs.sh deploy initial gke-fullnode -e rc1 --syncmode fast --namespace ${NAMESPACE}
+          if [ -f ../../.env.${NETWORK} ]; then
+            source ../../.env.${NETWORK}
+          else
+            source ../../.env
+          fi
+          helm install ../packages/helm-charts/celo-fullnode "${NETWORK}-${NAMESPACE}-${SYNC_MODE}-node" --set genesis.network="${NETWORK}" --set genesis.networkId="${NETWORK_ID}" --set geth.gcmode="full" --set geth.image.repository="${GETH_NODE_DOCKER_IMAGE_REPOSITORY}" --set geth.image.tag="master" --set geth.syncmode="${SYNC_MODE}" --set geth.use_static_ips="false" --set namespace="${NAMESPACE}" --set replicaCount="1" --set storage.size="10Gi" --set storage.storageClass="standard"
+
     - run:
         name: Test fast mode client connected to rc1
         command: |
