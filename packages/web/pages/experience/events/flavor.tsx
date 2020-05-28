@@ -1,3 +1,3 @@
-import flavor from 'src/eventkit/flavor'
+import flavor from 'src/experienceKits/eventkit/flavor'
 
 export default flavor

@@ -1,3 +1,3 @@
-import Intro from 'src/eventkit/Intro'
+import Intro from 'src/experienceKits/eventkit/Intro'
 
 export default Intro

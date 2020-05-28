@@ -1,2 +1,2 @@
-import KeyImagery from 'src/brandkit/KeyImagery'
+import KeyImagery from 'src/experienceKits/brandkit/KeyImagery'
 export default KeyImagery

@@ -174,6 +174,7 @@ export const hashNav = {
   brandTypography: { overview: 'overview', scale: 'type-scale' },
   eventsIntro: {
     overview: 'overview',
+    brandVoice: 'brand-voice',
   },
 }
 
