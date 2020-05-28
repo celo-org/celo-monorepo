@@ -19,6 +19,7 @@ import { networkInfoSaga } from 'src/networkInfo/saga'
 import { sendSaga } from 'src/send/saga'
 import { sentrySaga } from 'src/sentry/saga'
 import { stableTokenSaga } from 'src/stableToken/saga'
+import { transactionSaga } from 'src/transactions/saga'
 import Logger from 'src/utils/Logger'
 import { web3Saga } from 'src/web3/saga'
 
@@ -73,6 +74,7 @@ export function* rootSaga() {
   yield spawn(stableTokenSaga)
   yield spawn(sendSaga)
   yield spawn(exchangeSaga)
+  yield spawn(transactionSaga)
   yield spawn(homeSaga)
   yield spawn(escrowSaga)
   yield spawn(firebaseSaga)

@@ -18,7 +18,6 @@ import { withTimeout } from 'src/redux/sagas-helpers'
 import { shouldUpdateBalance } from 'src/redux/selectors'
 import { fetchDollarBalance } from 'src/stableToken/actions'
 import { Actions as TransactionActions } from 'src/transactions/actions'
-import { initializeUserTxListQueryWatcher } from 'src/transactions/saga'
 import Logger from 'src/utils/Logger'
 import { getConnectedAccount } from 'src/web3/saga'
 
@@ -80,5 +79,4 @@ export function* watchRefreshBalances() {
 export function* homeSaga() {
   yield spawn(watchRefreshBalances)
   yield spawn(autoRefreshWatcher)
-  yield spawn(initializeUserTxListQueryWatcher)
 }

@@ -5,22 +5,24 @@ import { Query, QueryResult } from 'react-apollo'
 import { connect } from 'react-redux'
 import { MoneyAmount, Token, TokenTransactionType, UserTransactionsQuery } from 'src/apollo/types'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
-import { refreshAllBalances } from 'src/home/actions'
 import { SENTINEL_INVITE_COMMENT } from 'src/invite/actions'
 import { LocalCurrencyCode } from 'src/localCurrency/consts'
 import { getLocalCurrencyCode, getLocalCurrencyExchangeRate } from 'src/localCurrency/selectors'
 import { RootState } from 'src/redux/reducers'
-import { removeStandbyTransaction } from 'src/transactions/actions'
+import { newTransactionsInFeed } from 'src/transactions/actions'
+import { knownFeedTransactionsSelector, KnownFeedTransactionsType } from 'src/transactions/reducer'
 import TransactionFeed, { FeedItem, FeedType } from 'src/transactions/TransactionFeed'
-import { getTxsFromUserTxQuery } from 'src/transactions/transferFeedUtils'
+import { getNewTxsFromUserTxQuery, getTxsFromUserTxQuery } from 'src/transactions/transferFeedUtils'
 import {
   ExchangeStandby,
   StandbyTransaction,
   TransactionStatus,
   TransferStandby,
 } from 'src/transactions/types'
+import Logger from 'src/utils/Logger'
 import { currentAccountSelector } from 'src/web3/selectors'
 
+const TAG = 'transactions/TransactionsList'
 // Query poll interval
 export const POLL_INTERVAL = 10000 // 10 secs
 
@@ -33,11 +35,11 @@ interface StateProps {
   standbyTransactions: StandbyTransaction[]
   localCurrencyCode: LocalCurrencyCode
   localCurrencyExchangeRate: string | null | undefined
+  knownFeedTransactions: KnownFeedTransactionsType
 }
 
 interface DispatchProps {
-  removeStandbyTransaction: typeof removeStandbyTransaction
-  refreshAllBalances: typeof refreshAllBalances
+  newTransactionsInFeed: typeof newTransactionsInFeed
 }
 
 type Props = OwnProps & StateProps & DispatchProps
@@ -61,6 +63,7 @@ const mapStateToProps = (state: RootState): StateProps => ({
   standbyTransactions: state.transactions.standbyTransactions,
   localCurrencyCode: getLocalCurrencyCode(state),
   localCurrencyExchangeRate: getLocalCurrencyExchangeRate(state),
+  knownFeedTransactions: knownFeedTransactionsSelector(state),
 })
 
 function resolveAmount(
@@ -210,6 +213,16 @@ function mapInvite(tx: FeedItem): FeedItem {
 }
 
 export class TransactionsList extends React.PureComponent<Props> {
+  onTxsFetched = (data: UserTransactionsQuery | undefined) => {
+    Logger.debug(TAG, 'onTxsFetched handler triggered')
+    const newTxs = getNewTxsFromUserTxQuery(data, this.props.knownFeedTransactions)
+    if (!newTxs || !newTxs.length) {
+      return
+    }
+
+    this.props.newTransactionsInFeed(newTxs)
+  }
+
   render() {
     const {
       address,
@@ -260,12 +273,16 @@ export class TransactionsList extends React.PureComponent<Props> {
         pollInterval={POLL_INTERVAL}
         variables={{ address: queryAddress, token, localCurrencyCode }}
         children={UserTransactions}
+        onCompleted={this.onTxsFetched}
+        // Adding this option because the onCompleted doesn't work properly without it.
+        // It causes the onCompleted to trigger too often but that's okay.
+        // https://github.com/apollographql/react-apollo/issues/2293
+        notifyOnNetworkStatusChange={true}
       />
     )
   }
 }
 
 export default connect<StateProps, DispatchProps, OwnProps, RootState>(mapStateToProps, {
-  removeStandbyTransaction,
-  refreshAllBalances,
+  newTransactionsInFeed,
 })(TransactionsList)

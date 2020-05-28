@@ -5,6 +5,7 @@ import { DEFAULT_TESTNET } from 'src/config'
 import { decryptComment } from 'src/identity/commentEncryption'
 import { AddressToE164NumberType } from 'src/identity/reducer'
 import { NumberToRecipient } from 'src/recipients/recipient'
+import { KnownFeedTransactionsType } from 'src/transactions/reducer'
 import { isPresent } from 'src/utils/typescript'
 
 export function getDecryptedTransferFeedComment(
@@ -116,6 +117,14 @@ export function getTransferFeedParams(
 
 export function getTxsFromUserTxQuery(data: UserTransactionsQuery | undefined) {
   return data?.tokenTransactions?.edges.map((edge) => edge.node).filter(isPresent) ?? []
+}
+
+export function getNewTxsFromUserTxQuery(
+  data: UserTransactionsQuery | undefined,
+  knownFeedTxs: KnownFeedTransactionsType
+) {
+  const txFragments = getTxsFromUserTxQuery(data)
+  return txFragments.filter((tx) => !knownFeedTxs[tx.hash])
 }
 
 export function isTokenTxTypeSent(type: TokenTransactionType) {
