@@ -377,6 +377,7 @@ export class SendConfirmation extends React.Component<Props, State> {
             {isInvite && <Text style={styles.inviteText}>{t('inviteMoneyEscrow')}</Text>}
             <View style={styles.headerContainer}>
               <ContactCircle
+                name={this.props.transactionData.recipient.displayName}
                 thumbnailPath={getRecipientThumbnail(recipient)}
                 address={recipientAddress || ''}
               />

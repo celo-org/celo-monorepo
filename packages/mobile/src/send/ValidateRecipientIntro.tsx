@@ -25,9 +25,6 @@ interface StateProps {
   recipient: Recipient
   transactionData: TransactionDataInput
   addressValidationType: AddressValidationType
-  name: string
-  displayName: string
-  displayNameCapitalized: string
   isPaymentRequest?: true
 }
 
@@ -37,13 +34,8 @@ type Props = WithTranslation & StateProps & OwnProps
 const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
   const { route } = ownProps
   const { recipient } = route.params.transactionData
-  const name = recipient.displayName
-  const { displayName, displayNameCapitalized } = formatDisplayName(name)
   return {
     recipient,
-    name,
-    displayName,
-    displayNameCapitalized,
     transactionData: route.params.transactionData,
     addressValidationType: route.params.addressValidationType,
     isPaymentRequest: route.params.isPaymentRequest,
@@ -73,7 +65,8 @@ class ValidateRecipientIntro extends React.Component<Props> {
   }
 
   render() {
-    const { t, recipient, name, displayName, displayNameCapitalized } = this.props
+    const { t, recipient } = this.props
+    const { displayName, displayNameCapitalized } = formatDisplayName(recipient.displayName)
 
     return (
       <SafeAreaView style={styles.container}>
@@ -81,7 +74,7 @@ class ValidateRecipientIntro extends React.Component<Props> {
           <View style={styles.iconContainer}>
             <ContactCircle
               size={AVATAR_SIZE}
-              name={name}
+              name={recipient.displayName}
               thumbnailPath={getRecipientThumbnail(recipient)}
             />
           </View>
