@@ -45,6 +45,8 @@ data:
         - source_labels: [__meta_kubernetes_namespace, __meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name]
           action: keep
           regex: default;kubernetes;https
+        labels:
+          cluster: {{ .Values.cluster }}
 
       - job_name: 'kubernetes-nodes'
 
@@ -56,6 +58,9 @@ data:
 
         kubernetes_sd_configs:
         - role: node
+
+        labels:
+          cluster: {{ .Values.cluster }}
 
         relabel_configs:
         - action: labelmap
@@ -72,6 +77,9 @@ data:
 
         kubernetes_sd_configs:
         - role: pod
+
+        labels:
+          cluster: {{ .Values.cluster }}
 
         relabel_configs:
         - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
@@ -106,6 +114,9 @@ data:
         kubernetes_sd_configs:
         - role: node
 
+        labels:
+          cluster: {{ .Values.cluster }}
+
         relabel_configs:
         - action: labelmap
           regex: __meta_kubernetes_node_label_(.+)
@@ -120,6 +131,9 @@ data:
 
         kubernetes_sd_configs:
         - role: endpoints
+
+        labels:
+          cluster: {{ .Values.cluster }}
 
         relabel_configs:
         - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_scrape]

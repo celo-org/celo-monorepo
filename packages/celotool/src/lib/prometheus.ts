@@ -60,6 +60,7 @@ async function helmParameters(clusterConfig?: AzureClusterConfig) {
   const params = [
     `--set namespace=${kubeNamespace}`,
     `--set gcloud.project=${fetchEnv(envVar.TESTNET_PROJECT_NAME)}`,
+    `--set cluster=${fetchEnv(envVar.KUBERNETES_CLUSTER_NAME)}`,
     `--set gcloud.region=${fetchEnv(envVar.KUBERNETES_CLUSTER_ZONE)}`,
     `--set sidecar.imageTag=${sidecarImageTag}`,
     `--set prometheus.imageTag=${prometheusImageTag}`,
