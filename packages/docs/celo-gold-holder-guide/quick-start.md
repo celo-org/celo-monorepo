@@ -1,6 +1,6 @@
 # Quick Start for Celo Gold Holders
 
-If you are an self-custodying holder of Celo Gold on the Celo [Mainnet](../getting-started/mainnet.md), this guide will help you access your account and do the setup necessary to earn rewards on those funds.
+If you are a self-custodying holder of Celo Gold on the Celo [Mainnet](../getting-started/mainnet.md), this guide will help you access your account and do the setup necessary to earn rewards on those funds.
 
 ## Prerequisites
 
@@ -107,6 +107,8 @@ Use the mapping from this list (you can use Edit>Find in your browser):
 - [ReleaseGold deployments on 5/16/20 ("Wave 2")](https://gist.githubusercontent.com/timmoreton/27e975bbca63723e218288b1a1f9fa54/raw/d55f51fde470fe040407c02462aeb5a7adc3d57f/CeloRC1ReleaseGoldWave2.json): includes self-custodying CoinList auction participants that completed the address submission process by 5/14/20
 
 - [ReleaseGold deployments on 5/20/20 ("Wave 2b")](https://gist.githubusercontent.com/timmoreton/f22e70b8149706f738327da8ff71c7d7/raw/944458feda304c7077f2bbb3e190ec677a5ed976/CeloMainnetReleaseGoldWave2b.json): includes self-custodying CoinList auction participants that completed the address submission process by 5/16/20
+
+- [ReleaseGold deployments on 5/27/20 ("Wave 3")](https://gist.githubusercontent.com/timmoreton/40c4a4136827c00a5cc1bc9b5885136e/raw/ebf5cb3b3934e295785d52c35e3129302592bece/CeloMainnetReleaseGoldWave3.json): includes self-custodying CoinList auction participants that completed the address submission process by 5/22/20
 
 If you have more than one beneficiary address, you'll want to step through this guide for each one.
 
