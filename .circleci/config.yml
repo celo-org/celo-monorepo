@@ -863,11 +863,6 @@ jobs:
       NETWORK: rc1
     steps:
     - run:
-        name: Install helm 2
-        command: |
-          curl https://raw.githubusercontent.com/helm/helm/master/scripts/get | bash
-          helm init --client-only
-    - run:
         name: Activate gcloud
         command: |
           echo $GCLOUD_SERVICE_KEY | gcloud auth activate-service-account --key-file=-
@@ -888,6 +883,12 @@ jobs:
         command: |
           set -e
           gcloud container clusters --quiet --project=${GOOGLE_PROJECT_ID} --region ${GOOGLE_COMPUTE_ZONE} get-credentials ${K8S_CLUSTER}
+    - run:
+        name: Install helm 2
+        command: |
+          curl https://raw.githubusercontent.com/helm/helm/master/scripts/get | bash
+          helm init --client-only
+          helm dep build packages/helm-charts/celo-fullnode
     - run:
         name: Configure Kubernetes namespace
         command: |
