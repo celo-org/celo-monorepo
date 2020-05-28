@@ -6,8 +6,8 @@ import { AddressValidationType } from 'src/identity/reducer'
 import { Screens } from 'src/navigator/Screens'
 import { Recipient } from 'src/recipients/recipient'
 import { TransactionDataInput } from 'src/send/SendAmount'
-import { TransferConfirmationCardProps } from 'src/send/TransferConfirmationCard'
 import { ReviewProps } from 'src/transactions/TransactionReview'
+import { TransferConfirmationCardProps } from 'src/transactions/TransferConfirmationCard'
 
 // tslint:disable-next-line
 export type StackParamList = {
