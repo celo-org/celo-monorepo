@@ -1124,10 +1124,16 @@ workflows:
     triggers:
       - schedule:
           # 11 AM in UTC = 3 AM in PDT (winter time)
-          cron: '53 6 * * *'
+          cron: '18 8 * * *'
           filters:
             branches:
               only:
                 - jcortejoso/sync-test
     jobs:
-      - integration-celotool-install
+      - install_dependencies
+      - lint-checks:
+          requires:
+            - install_dependencies
+      - integration-celotool-install:
+          requires:
+            - lint-checks
