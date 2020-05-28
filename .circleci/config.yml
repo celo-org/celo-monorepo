@@ -886,7 +886,7 @@ jobs:
         name: Configure k8s cluster for the fullnode
         command: |
           set -e
-          gcloud container clusters --quiet --project=${GOOGLE_PROJECT_ID} --region ${GOOGLE_COMPUTE_ZONE} get-credentials celo-networks-dev
+          gcloud container clusters --quiet --project=${GOOGLE_PROJECT_ID} --region ${GOOGLE_COMPUTE_ZONE} get-credentials ${K8S_CLUSTER}
     - run:
         name: Configure Kubernetes namespace
         command: |
@@ -1081,9 +1081,9 @@ workflows:
           requires:
             - lint-checks
             - contractkit-test
-      # - integration-celotool-install:
-      #     requires:
-      #       - lint-checks
+      - integration-celotool-install:
+          requires:
+            - lint-checks
       - phone-number-privacy-test:
           requires:
             - lint-checks
