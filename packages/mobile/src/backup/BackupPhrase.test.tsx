@@ -5,11 +5,7 @@ import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
 import BackupPhrase from 'src/backup/BackupPhrase'
 import { createMockStore } from 'test/utils'
-import { render } from 'react-native-testing-library'
-
 import { mockMnemonic } from 'test/values'
-import { showError } from 'src/alert/actions'
-import { ErrorMessages } from 'src/app/ErrorMessages'
 
 jest.mock('react-native-secure-key-store', () => {
   return {
