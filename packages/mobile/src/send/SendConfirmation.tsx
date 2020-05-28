@@ -1,3 +1,4 @@
+import ContactCircle from '@celo/react-components/components/ContactCircle'
 import ReviewFrame from '@celo/react-components/components/ReviewFrame'
 import ReviewHeader from '@celo/react-components/components/ReviewHeader'
 import TextButton from '@celo/react-components/components/TextButton.v2'
@@ -23,8 +24,7 @@ import { connect } from 'react-redux'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { TokenTransactionType } from 'src/apollo/types'
-import ContactCircle from 'src/components/ContactCircle.v2'
-import CurrencyDisplay, { DisplayType, FormatType } from 'src/components/CurrencyDisplay.v2'
+import CurrencyDisplay, { DisplayType, FormatType } from 'src/components/CurrencyDisplay'
 import FeeIcon from 'src/components/FeeIcon'
 import InviteOptionsModal from 'src/components/InviteOptionsModal'
 import LineItemRow from 'src/components/LineItemRow.v2'
@@ -67,7 +67,7 @@ interface StateProps {
   confirmationInput: ConfirmationInput
   addressValidationType: AddressValidationType
   validatedRecipientAddress?: string
-  addressJustValidated?: true
+  addressJustValidated?: boolean
 }
 
 interface DispatchProps {
@@ -156,9 +156,6 @@ export class SendConfirmation extends React.Component<Props, State> {
 
   async componentDidMount() {
     const { addressJustValidated, t } = this.props
-    this.setState({ buttonReset: true }, () => {
-      this.setState({ buttonReset: false })
-    })
     this.props.fetchDollarBalance()
 
     if (addressJustValidated) {
@@ -362,7 +359,6 @@ export class SendConfirmation extends React.Component<Props, State> {
             isLoading={asyncFee.loading}
             hasError={!!asyncFee.error}
           />
-          {/* <HorizontalLine /> */}
           <TotalLineItem amount={totalAmount} />
         </View>
       )
@@ -407,7 +403,7 @@ export class SendConfirmation extends React.Component<Props, State> {
               </View>
             </View>
             <CurrencyDisplay
-              type={DisplayType.Big}
+              type={DisplayType.Default}
               style={styles.amount}
               amount={subtotalAmount || inviteFeeAmount}
             />
@@ -539,6 +535,7 @@ const styles = StyleSheet.create({
   },
   amount: {
     paddingVertical: 8,
+    ...fontStyles.largeNumber,
   },
   comment: {
     ...componentStyles.paddingTop5,

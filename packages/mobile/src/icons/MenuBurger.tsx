@@ -6,7 +6,7 @@ interface Props {
   width: number
 }
 
-export default function MenuBurger({ height, width }: Props) {
+function MenuBurger({ height, width }: Props) {
   return (
     <Svg
       width={`${width}`}
@@ -47,3 +47,5 @@ export default function MenuBurger({ height, width }: Props) {
     </Svg>
   )
 }
+
+export default React.memo(MenuBurger)

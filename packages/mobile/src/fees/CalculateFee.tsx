@@ -5,6 +5,7 @@ import { useAsync, UseAsyncReturn } from 'react-async-hook'
 import { useDispatch } from 'react-redux'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
+import { MAX_COMMENT_LENGTH } from 'src/config'
 import { getReclaimEscrowFee } from 'src/escrow/saga'
 import { FeeType } from 'src/fees/actions'
 import { getInviteFee } from 'src/invite/saga'
@@ -57,7 +58,7 @@ export type PropsWithoutChildren =
 type Props = InviteProps | SendProps | ExchangeProps | ReclaimEscrowProps
 
 // Max lengthed comment to fetch fee estimate before user finalizes comment
-const MAX_PLACEHOLDER_COMMENT: string = '0123456789'.repeat(7)
+const MAX_PLACEHOLDER_COMMENT: string = '0'.repeat(MAX_COMMENT_LENGTH)
 
 function useAsyncShowError<R, Args extends any[]>(
   asyncFunction: ((...args: Args) => Promise<R>) | (() => Promise<R>),

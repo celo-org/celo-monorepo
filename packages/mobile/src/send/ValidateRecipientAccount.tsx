@@ -12,7 +12,7 @@ import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import CodeRow, { CodeRowStatus } from 'src/components/CodeRow'
-import ErrorMessageInline from 'src/components/ErrorInline'
+import ErrorMessageInline from 'src/components/ErrorMessageInline'
 import Modal from 'src/components/Modal'
 import { SingleDigitInput } from 'src/components/SingleDigitInput'
 import { Namespaces, withTranslation } from 'src/i18n'
@@ -30,7 +30,6 @@ import { TransactionDataInput } from 'src/send/SendAmount'
 
 const FULL_ADDRESS_PLACEHOLDER = '0xf1b1d5a6e7728g309c4a025k122d71ad75a61976'
 const PARTIAL_ADDRESS_PLACEHOLDER = ['k', '0', 'F', '4']
-const TEXT_SPACING = '   '
 
 interface StateProps {
   recipient: Recipient
@@ -190,7 +189,7 @@ export class ValidateRecipientAccount extends React.Component<Props, State> {
             <Button
               style={styles.button}
               onPress={this.onPressConfirm}
-              text={`${TEXT_SPACING}${t('confirmAccountNumber.submit')}${TEXT_SPACING}`}
+              text={t('confirmAccountNumber.submit')}
               type={BtnTypes.PRIMARY}
               testID="ConfirmAccountButton"
             />

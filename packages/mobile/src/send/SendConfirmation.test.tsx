@@ -80,8 +80,6 @@ describe('SendConfirmation', () => {
       },
     })
 
-    mockedGetSendFee.mockImplementation(async () => TEST_FEE)
-
     const { toJSON, queryByText } = render(
       <Provider store={store}>
         <SendConfirmation {...mockScreenProps} />
@@ -110,10 +108,6 @@ describe('SendConfirmation', () => {
       stableToken: {
         balance: '200',
       },
-    })
-
-    mockedGetSendFee.mockImplementation(async () => {
-      throw new Error('Calculate fee failed')
     })
 
     const { queryByText, getByText, toJSON } = render(

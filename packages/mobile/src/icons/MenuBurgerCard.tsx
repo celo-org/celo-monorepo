@@ -8,7 +8,7 @@ interface Props {
   length: number
 }
 
-export default function MenuBurgerCard({ length }: Props) {
+function MenuBurgerCard({ length }: Props) {
   return (
     <View style={[styles.container, { height: length, width: length }]}>
       <MenuBurger height={length * 1.75} width={length * 1.75} />
@@ -25,3 +25,5 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
 })
+
+export default React.memo(MenuBurgerCard)

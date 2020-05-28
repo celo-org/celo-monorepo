@@ -3,8 +3,8 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import { RootState } from 'src/redux/reducers'
 
 export enum ErrorDisplayType {
-  'BANNER' = 0,
-  'INLINE' = 1,
+  'BANNER',
+  'INLINE',
 }
 
 export interface State {

@@ -5,12 +5,11 @@ import fontStyles from '@celo/react-components/styles/fonts.v2'
 import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
-import { Image, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { AddressValidationType } from 'src/identity/reducer'
-import { unknownUserIcon } from 'src/images/Images'
 import { headerWithBackButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -26,6 +25,7 @@ interface StateProps {
   recipient: Recipient
   transactionData: TransactionDataInput
   addressValidationType: AddressValidationType
+  name: string
   displayName: string
   displayNameCapitalized: string
   isPaymentRequest?: true
@@ -37,9 +37,11 @@ type Props = WithTranslation & StateProps & OwnProps
 const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
   const { route } = ownProps
   const { recipient } = route.params.transactionData
-  const { displayName, displayNameCapitalized } = formatDisplayName(recipient.displayName)
+  const name = recipient.displayName
+  const { displayName, displayNameCapitalized } = formatDisplayName(name)
   return {
     recipient,
+    name,
     displayName,
     displayNameCapitalized,
     transactionData: route.params.transactionData,
@@ -71,15 +73,17 @@ class ValidateRecipientIntro extends React.Component<Props> {
   }
 
   render() {
-    const { t, recipient, displayName, displayNameCapitalized } = this.props
+    const { t, recipient, name, displayName, displayNameCapitalized } = this.props
 
     return (
       <SafeAreaView style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           <View style={styles.iconContainer}>
-            <ContactCircle size={AVATAR_SIZE} thumbnailPath={getRecipientThumbnail(recipient)}>
-              {<Image source={unknownUserIcon} style={styles.image} />}
-            </ContactCircle>
+            <ContactCircle
+              size={AVATAR_SIZE}
+              name={name}
+              thumbnailPath={getRecipientThumbnail(recipient)}
+            />
           </View>
           <Text style={styles.h2}>
             {t('confirmAccount.header', {
@@ -140,12 +144,6 @@ const styles = StyleSheet.create({
   },
   button: {
     paddingVertical: 16,
-  },
-  image: {
-    height: AVATAR_SIZE,
-    width: AVATAR_SIZE,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   qrLogo: {
     alignSelf: 'center',

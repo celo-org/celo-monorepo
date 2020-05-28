@@ -42,7 +42,7 @@ type Props = DispatchProps & OwnProps & WithTranslation & StateProps
 function ErrorMessageInline(props: Props) {
   const { error, displayMethod, dismissAfter, t } = props
 
-  // Keep the space empty when there isn't an error
+  // Keep the space empty when there isn't an inline error
   if (!error || displayMethod !== ErrorDisplayType.INLINE) {
     return <View style={dismissAfter !== null && styles.errorContainer} />
   }
