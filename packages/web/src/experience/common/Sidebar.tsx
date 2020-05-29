@@ -3,7 +3,7 @@ import { StyleSheet, View } from 'react-native'
 import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
 import Button, { BTN } from 'src/shared/Button.3'
 import OvalCoin from 'src/shared/OvalCoin'
-import { colors, standardStyles } from 'src/styles'
+import { colors } from 'src/styles'
 
 interface Section {
   title: string
@@ -107,21 +107,19 @@ const COIN_SIZE = 12
 
 const Link = React.memo(function _Link(props: LinkProps & Section) {
   return (
-    <View style={[standardStyles.row, styles.item]}>
-      <Button
-        iconLeft={
-          props.active ? (
-            <OvalCoin color={color(props.kind)} size={COIN_SIZE} />
-          ) : (
-            <View style={styles.iconPlaceholder} />
-          )
-        }
-        kind={BTN.NAV}
-        href={props.href}
-        text={props.title}
-        style={!props.active && styles.inactiveText}
-      />
-    </View>
+    <Button
+      iconLeft={
+        props.active ? (
+          <OvalCoin color={color(props.kind)} size={COIN_SIZE} />
+        ) : (
+          <View style={styles.iconPlaceholder} />
+        )
+      }
+      kind={BTN.NAV}
+      href={props.href}
+      text={props.title}
+      style={[styles.item, !props.active && styles.inactiveText]}
+    />
   )
 })
 

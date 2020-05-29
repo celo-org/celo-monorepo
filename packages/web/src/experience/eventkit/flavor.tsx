@@ -20,7 +20,6 @@ const sections = [
     children: <Section content={require(`src/experience/eventkit/content/flavor/${id}.md`)} />,
   }
 })
-
 export default function Flavor() {
   const { t } = useTranslation(NameSpaces.eventskit)
   return (

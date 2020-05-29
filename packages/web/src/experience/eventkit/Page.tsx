@@ -22,16 +22,16 @@ const PAGES = [
     sections: [
       { title: 'Overview', href: `${FLAVOR_PATH}#${hashNav.eventsFlavor.overview}` },
       {
-        title: 'Community Code of Conduct',
+        title: 'Code of Conduct',
         href: `${FLAVOR_PATH}#${hashNav.eventsFlavor.codeOfConduct}`,
       },
       {
-        title: 'Fostering Learning & Growing',
+        title: 'Foster Growth',
         href: `${FLAVOR_PATH}#${hashNav.eventsFlavor.foster}`,
       },
       { title: 'Unique Gifts', href: `${FLAVOR_PATH}#${hashNav.eventsFlavor.uniqueGifts}` },
       { title: 'Rituals', href: `${FLAVOR_PATH}#${hashNav.eventsFlavor.rituals}` },
-      { title: 'Community Tenets', href: `${FLAVOR_PATH}#${hashNav.eventsFlavor.tenets}` },
+      { title: 'Tenets', href: `${FLAVOR_PATH}#${hashNav.eventsFlavor.tenets}` },
     ],
   },
   {
