@@ -180,6 +180,20 @@ export const hashNav = {
     overview: 'overview',
     brandVoice: 'brand-voice',
   },
+  eventsFlavor: {
+    overview: 'overview',
+    codeOfConduct: 'code-of-conduct',
+    foster: 'foster',
+    uniqueGifts: 'unique-gifts',
+    rituals: 'rituals',
+    tenets: 'tenets',
+  },
+  eventsResources: {
+    overview: 'overview',
+    quickTips: 'quick-tips',
+    planning: 'planning',
+    social: 'social-media',
+  },
 }
 
 export default pagePaths

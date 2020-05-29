@@ -1,3 +1,3 @@
-import Logo from 'src/experienceKits/brandkit/Logo'
+import Logo from 'src/experience/brandkit/Logo'
 
 export default Logo
