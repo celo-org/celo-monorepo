@@ -9,7 +9,6 @@ import i18n, { Namespaces } from 'src/i18n'
 export enum Actions {
   SHOW = 'ALERT/SHOW',
   HIDE = 'ALERT/HIDE',
-  LOG = 'ALERT/LOG',
 }
 
 enum AlertTypes {
@@ -26,13 +25,6 @@ interface ShowAlertAction {
   buttonMessage?: string | null
   title?: string | null
   underlyingError?: ErrorMessages | null
-}
-
-interface LogAlertAction {
-  type: Actions.LOG
-  alertType: AlertTypes
-  message: string
-  underlyingError: ErrorMessages
 }
 
 export const showMessage = (
@@ -96,4 +88,4 @@ export const hideAlert = (): HideAlertAction => ({
   type: Actions.HIDE,
 })
 
-export type ActionTypes = ShowAlertAction | HideAlertAction | LogAlertAction
+export type ActionTypes = ShowAlertAction | HideAlertAction

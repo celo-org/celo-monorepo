@@ -10,7 +10,6 @@ import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { AddressValidationType } from 'src/identity/reducer'
-import { headerWithBackButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
@@ -43,10 +42,6 @@ const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
 }
 
 class ValidateRecipientIntro extends React.Component<Props> {
-  static navigationOptions = () => ({
-    ...headerWithBackButton,
-  })
-
   onPressScanCode = () => {
     navigate(Screens.QRScanner, {
       transactionData: this.props.transactionData,
