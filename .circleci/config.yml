@@ -858,7 +858,7 @@ jobs:
       - run:
           name: Check if the test should run
           command: |
-            ./scripts/ci_check_if_test_should_run_v2.sh @celo/phone-number-privacy-combiner,@celo/phone-number-privacy-signer
+            ./scripts/ci_check_if_test_should_run_v2.sh @celo/phone-number-privacy
       - run:
           name: Run Tests
           command: yarn --cwd=packages/phone-number-privacy test
