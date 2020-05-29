@@ -8,12 +8,15 @@ import { execCmdWithExitOnFailure } from '@celo/celotool/src/lib/cmd-utils'
 import { existsSync, readFileSync } from 'fs'
 import fetch from 'node-fetch'
 import { join } from 'path'
-import { filename as dependencyGraphFileName } from './dependency-graph-utils'
+import {
+  DependencyGraph,
+  DEP_GRAPH_FILENAME as dependencyGraphFileName,
+} from './dependency-graph-utils'
 
 const rootDirectory = join(__dirname, '..')
 const dependencyGraph = JSON.parse(
   readFileSync(join(rootDirectory, dependencyGraphFileName)).toString()
-)
+) as DependencyGraph
 
 const argv = require('minimist')(process.argv.slice(2))
 const packagesToTest: string[] = argv.packages.split(',')
@@ -46,16 +49,16 @@ async function checkIfTestShouldRun() {
     process.exit(1)
   }
 
-  const circleciChangeCommit = await getChangeCommit(join(rootDirectory, '.circleci', 'config.yml'))
-  const yarnLockChangeCommit = await getChangeCommit(join(rootDirectory, 'yarn.lock'))
-  if (
-    branchCommits.includes(yarnLockChangeCommit) ||
-    branchCommits.includes(circleciChangeCommit)
-  ) {
-    // always run tests when yarn.lock or circlici config have changed
-    console.info('circleci config or yarn.lock file changed')
-    return
-  }
+  // const circleciChangeCommit = await getChangeCommit(join(rootDirectory, '.circleci', 'config.yml'))
+  // const yarnLockChangeCommit = await getChangeCommit(join(rootDirectory, 'yarn.lock'))
+  // if (
+  //   branchCommits.includes(yarnLockChangeCommit) ||
+  //   branchCommits.includes(circleciChangeCommit)
+  // ) {
+  //   // always run tests when yarn.lock or circlici config have changed
+  //   console.info('circleci config or yarn.lock file changed')
+  //   return
+  // }
 
   const changedPackages = await getChangedPackages(branchCommits)
   logMessage(`Found ${changedPackages.length} changed packages (${changedPackages.join(', ')})`)
@@ -65,7 +68,7 @@ async function checkIfTestShouldRun() {
       return true
     }
 
-    return dependencyGraph[packageName].map(hasChangedDependencies).some(Boolean)
+    return dependencyGraph[packageName].dependencies.map(hasChangedDependencies).some(Boolean)
   }
 
   const anyDependenciesChanged = packagesToTest.map(hasChangedDependencies).some(Boolean)
@@ -79,10 +82,10 @@ async function checkIfTestShouldRun() {
 
 async function getChangedPackages(commits: string[]): Promise<string[]> {
   const changedPackages = new Set<string>()
-  for (const pkg of Object.keys(dependencyGraph)) {
-    const changeCommit = await getChangeCommit(join(rootDirectory, 'packages', pkg))
+  for (const [name, { location }] of Object.entries(dependencyGraph)) {
+    const changeCommit = await getChangeCommit(join(rootDirectory, location))
     if (commits.includes(changeCommit)) {
-      changedPackages.add(pkg)
+      changedPackages.add(name)
     }
   }
 
