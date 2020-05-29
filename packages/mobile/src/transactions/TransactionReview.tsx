@@ -1,22 +1,17 @@
 import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
-import { WithTranslation } from 'react-i18next'
-import { StyleSheet } from 'react-native'
-import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import { TokenTransactionType } from 'src/apollo/types'
 import ExchangeConfirmationCard, {
   ExchangeConfirmationCardProps,
 } from 'src/exchange/ExchangeConfirmationCard'
-import { Namespaces, withTranslation } from 'src/i18n'
 import { SecureSendPhoneNumberMapping } from 'src/identity/reducer'
-import { navigateHome } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 import { RootState } from 'src/redux/reducers'
 import TransferConfirmationCard, {
   TransferConfirmationCardProps,
-} from 'src/send/TransferConfirmationCard'
+} from 'src/transactions/TransferConfirmationCard'
 
 interface StateProps {
   addressHasChanged: boolean
@@ -28,7 +23,7 @@ export interface ReviewProps {
 }
 
 type OwnProps = StackScreenProps<StackParamList, Screens.TransactionReview>
-type Props = WithTranslation & OwnProps & StateProps
+type Props = OwnProps & StateProps
 
 const isTransferConfirmationCardProps = (
   confirmationProps: TransferConfirmationCardProps | ExchangeConfirmationCardProps
@@ -64,40 +59,15 @@ const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
   return { addressHasChanged }
 }
 
-class TransactionReview extends React.PureComponent<Props> {
-  static navigationOptions = { header: null }
+function TransactionReview({ route, addressHasChanged }: Props) {
+  const { confirmationProps } = route.params
 
-  navigateToMain = () => {
-    navigateHome()
+  if (isTransferConfirmationCardProps(confirmationProps)) {
+    const props = { ...confirmationProps, addressHasChanged }
+    return <TransferConfirmationCard {...props} />
   }
 
-  renderCard = (
-    confirmationProps: TransferConfirmationCardProps | ExchangeConfirmationCardProps
-  ) => {
-    if (isTransferConfirmationCardProps(confirmationProps)) {
-      const props = { ...confirmationProps, addressHasChanged: this.props.addressHasChanged }
-      return <TransferConfirmationCard {...props} />
-    }
-
-    return <ExchangeConfirmationCard {...confirmationProps} />
-  }
-
-  render() {
-    const { confirmationProps } = this.props.route.params
-
-    return (
-      <SafeAreaView style={styles.container}>{this.renderCard(confirmationProps)}</SafeAreaView>
-    )
-  }
+  return <ExchangeConfirmationCard {...confirmationProps} />
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-})
-
-export default connect<StateProps, {}, OwnProps, RootState>(
-  mapStateToProps,
-  {}
-)(withTranslation(Namespaces.global)(TransactionReview))
+export default connect<StateProps, {}, OwnProps, RootState>(mapStateToProps, {})(TransactionReview)

@@ -5,8 +5,8 @@ import i18n from 'src/i18n'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { TransactionDataInput } from 'src/send/SendAmount'
-import { TransferConfirmationCardProps } from 'src/send/TransferConfirmationCard'
 import { StandbyTransaction } from 'src/transactions/reducer'
+import { TransferConfirmationCardProps } from 'src/transactions/TransferConfirmationCard'
 import { web3ForUtils } from 'src/web3/contracts'
 
 export enum Actions {
@@ -99,31 +99,31 @@ export const navigateToPaymentTransferReview = (
   let headerText = ''
   switch (type) {
     case TokenTransactionType.Sent:
-      headerText = i18n.t('sendFlow7:sentPayment')
+      headerText = i18n.t('walletFlow5:transactionHeaderSent')
       break
     case TokenTransactionType.EscrowSent:
-      headerText = i18n.t('sendFlow7:sentEscrowPayment')
+      headerText = i18n.t('walletFlow5:transactionHeaderEscrowSent')
       break
     case TokenTransactionType.Received:
-      headerText = i18n.t('receiveFlow8:receivedPayment')
+      headerText = i18n.t('walletFlow5:transactionHeaderReceived')
       break
     case TokenTransactionType.EscrowReceived:
-      headerText = i18n.t('receiveFlow8:receivedEscrowPayment')
+      headerText = i18n.t('walletFlow5:transactionHeaderEscrowReceived')
       break
     case TokenTransactionType.VerificationFee:
-      headerText = i18n.t('walletFlow5:verificationFee')
+      headerText = i18n.t('walletFlow5:transactionHeaderVerificationFee')
       break
     case TokenTransactionType.Faucet:
-      headerText = i18n.t('receiveFlow8:receivedDollars')
+      headerText = i18n.t('walletFlow5:transactionHeaderFaucet')
       break
     case TokenTransactionType.InviteSent:
-      headerText = i18n.t('inviteFlow11:inviteComplete')
+      headerText = i18n.t('walletFlow5:transactionHeaderInviteSent')
       break
     case TokenTransactionType.InviteReceived:
-      headerText = i18n.t('inviteFlow11:inviteReceived')
+      headerText = i18n.t('walletFlow5:transactionHeaderInviteReceived')
       break
     case TokenTransactionType.NetworkFee:
-      headerText = i18n.t('walletFlow5:networkFee')
+      headerText = i18n.t('walletFlow5:transactionHeaderNetworkFee')
       break
   }
 

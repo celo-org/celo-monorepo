@@ -44,7 +44,7 @@ import {
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
-import { getRecipientVerificationStatus, Recipient } from 'src/recipients/recipient'
+import { getRecipientVerificationStatus, Recipient, RecipientKind } from 'src/recipients/recipient'
 import useSelector from 'src/redux/useSelector'
 import { getRecentPayments } from 'src/send/selectors'
 import { dailyAmountRemaining, getFeeType, isPaymentLimitReached } from 'src/send/utils'
@@ -73,9 +73,15 @@ function SendAmount(props: Props) {
 
   React.useEffect(() => {
     dispatch(fetchDollarBalance())
-    if (recipient.e164PhoneNumber) {
-      dispatch(fetchAddressesAndValidate(recipient.e164PhoneNumber))
+    if (recipient.kind === RecipientKind.QrCode || recipient.kind === RecipientKind.Address) {
+      return
     }
+
+    if (!recipient.e164PhoneNumber) {
+      throw Error('Recipient phone number is required if not sending via QR Code or address')
+    }
+
+    dispatch(fetchAddressesAndValidate(recipient.e164PhoneNumber))
   }, [])
 
   const { t } = useTranslation(Namespaces.sendFlow7)
