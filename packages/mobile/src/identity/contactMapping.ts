@@ -3,6 +3,7 @@ import {
   IdentifierLookupResult,
 } from '@celo/contractkit/lib/wrappers/Attestations'
 import { isValidAddress } from '@celo/utils/src/address'
+import { isAccountConsideredVerified } from '@celo/utils/src/attestations'
 import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
 import BigNumber from 'bignumber.js'
 import { MinimalContact } from 'react-native-contacts'
@@ -81,7 +82,7 @@ function* doImportContacts() {
   yield call(updateRecipientsCache, e164NumberToRecipients, otherRecipients)
 }
 
-// Find the user's contact among those important and save useful bits
+// Find the user's own contact among those imported and save useful bits
 function* updateUserContact(e164NumberToRecipients: NumberToRecipient) {
   Logger.debug(TAG, 'Finding user contact details')
   const e164Number: string = yield select(e164NumberSelector)
@@ -109,19 +110,15 @@ function* updateRecipientsCache(
 export function* fetchAddressesAndValidateSaga({ e164Number }: FetchAddressesAndValidateAction) {
   try {
     Logger.debug(TAG + '@fetchAddressesAndValidate', `Fetching addresses for number`)
-    const oldE164NumberToAddress = yield select(e164NumberToAddressSelector)
-    const oldAddresses: string[] = oldE164NumberToAddress[e164Number] || []
+    const oldE164NumberToAddress: E164NumberToAddressType = yield select(
+      e164NumberToAddressSelector
+    )
+    const oldAddresses = oldE164NumberToAddress[e164Number] || []
 
     // Clear existing entries for those numbers so our mapping consumers know new status is pending.
     yield put(updateE164PhoneNumberAddresses({ [e164Number]: undefined }, {}))
 
-    const contractKit = yield call(getContractKit)
-    const attestationsWrapper: AttestationsWrapper = yield call([
-      contractKit.contracts,
-      contractKit.contracts.getAttestations,
-    ])
-
-    const addresses: string[] | null = yield call(getAddresses, e164Number, attestationsWrapper)
+    const addresses: string[] | null = yield call(getAddresses, e164Number)
 
     const e164NumberToAddressUpdates: E164NumberToAddressType = {}
     const addressToE164NumberUpdates: AddressToE164NumberType = {}
@@ -163,7 +160,7 @@ export function* fetchAddressesAndValidateSaga({ e164Number }: FetchAddressesAnd
   }
 }
 
-function* getAddresses(e164Number: string, attestationsWrapper: AttestationsWrapper) {
+function* getAddresses(e164Number: string) {
   let phoneHash: string
   if (USE_PHONE_NUMBER_PRIVACY) {
     const phoneHashDetails: PhoneNumberHashDetails = yield call(fetchPhoneHashPrivate, e164Number)
@@ -172,20 +169,51 @@ function* getAddresses(e164Number: string, attestationsWrapper: AttestationsWrap
     phoneHash = getPhoneHash(e164Number)
   }
 
-  // Map of identifier -> (Map of address -> AttestationStat)
-  const results: IdentifierLookupResult = yield call(
-    [attestationsWrapper, attestationsWrapper.lookupIdentifiers],
-    [phoneHash]
-  )
+  const lookupResult: IdentifierLookupResult = yield call(lookupAttestationIdentifiers, [phoneHash])
+  return getAddressesFromLookupResult(lookupResult, phoneHash)
+}
 
-  if (!results || !results[phoneHash]) {
+// Returns IdentifierLookupResult
+// which is Map of identifier -> (Map of address -> AttestationStat)
+export function* lookupAttestationIdentifiers(ids: string[]) {
+  const contractKit = yield call(getContractKit)
+  const attestationsWrapper: AttestationsWrapper = yield call([
+    contractKit.contracts,
+    contractKit.contracts.getAttestations,
+  ])
+
+  return yield call([attestationsWrapper, attestationsWrapper.lookupIdentifiers], ids)
+}
+
+// Deconstruct the lookup result and return
+// any addresess that are considered verified
+export function getAddressesFromLookupResult(
+  lookupResult: IdentifierLookupResult,
+  phoneHash: string
+) {
+  if (!lookupResult || !lookupResult[phoneHash]) {
     return null
   }
 
-  const addresses = Object.keys(results[phoneHash]!)
-    .filter(isValidNon0Address)
-    .map((a) => a.toLowerCase())
-  return addresses.length ? addresses : null
+  const addressToStats = lookupResult[phoneHash]!
+  const verifiedAddresses: string[] = []
+  for (const address of Object.keys(addressToStats)) {
+    if (!isValidNon0Address(address)) {
+      continue
+    }
+    // Check if result for given hash is considered 'verified'
+    const { isVerified } = isAccountConsideredVerified(addressToStats[address])
+    if (!isVerified) {
+      Logger.debug(
+        TAG + 'getAddressesFromLookupResult',
+        `Address ${address} has attestation stats but is not considered verified. Skipping it.`
+      )
+      continue
+    }
+    verifiedAddresses.push(address.toLowerCase())
+  }
+
+  return verifiedAddresses.length ? verifiedAddresses : null
 }
 
 const isValidNon0Address = (address: string) =>
