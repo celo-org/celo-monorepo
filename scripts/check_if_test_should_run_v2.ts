@@ -49,16 +49,16 @@ async function checkIfTestShouldRun() {
     process.exit(1)
   }
 
-  // const circleciChangeCommit = await getChangeCommit(join(rootDirectory, '.circleci', 'config.yml'))
-  // const yarnLockChangeCommit = await getChangeCommit(join(rootDirectory, 'yarn.lock'))
-  // if (
-  //   branchCommits.includes(yarnLockChangeCommit) ||
-  //   branchCommits.includes(circleciChangeCommit)
-  // ) {
-  //   // always run tests when yarn.lock or circlici config have changed
-  //   console.info('circleci config or yarn.lock file changed')
-  //   return
-  // }
+  const circleciChangeCommit = await getChangeCommit(join(rootDirectory, '.circleci', 'config.yml'))
+  const yarnLockChangeCommit = await getChangeCommit(join(rootDirectory, 'yarn.lock'))
+  if (
+    branchCommits.includes(yarnLockChangeCommit) ||
+    branchCommits.includes(circleciChangeCommit)
+  ) {
+    // always run tests when yarn.lock or circlici config have changed
+    console.info('circleci config or yarn.lock file changed')
+    return
+  }
 
   const changedPackages = await getChangedPackages(branchCommits)
   logMessage(`Found ${changedPackages.length} changed packages (${changedPackages.join(', ')})`)

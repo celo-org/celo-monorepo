@@ -44,9 +44,7 @@ const buildGraph = async (): Promise<string> => {
       execCmd('yarn --silent lerna ls --graph --all'),
       execCmd('yarn --silent lerna ls --json --all'),
     ])
-  )
-    .map(([stdout]) => stdout)
-    .map((str) => JSON.parse(str))
+  ).map(([stdout]) => JSON.parse(stdout))
 
   const dependencyGraph = parseLernaOutput(lernaGraph, dependencies)
   return JSON.stringify(dependencyGraph, null, 2)
