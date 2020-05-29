@@ -1,4 +1,4 @@
-import { unknownUserIcon } from '@celo/mobile/src/images/Images'
+const unknownUserIcon = require('@celo/mobile/src/images/unknown-user-icon.png')
 import colors from '@celo/react-components/styles/colors.v2'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import { getContactNameHash } from '@celo/utils/src/contacts'
@@ -27,12 +27,7 @@ const getNameInitial = (name: string) => name.charAt(0).toLocaleUpperCase()
 export default class ContactCircle extends React.PureComponent<Props> {
   getInitials = (): string => {
     const { name, contact } = this.props
-    return (
-      (name && getNameInitial(name)) ||
-      (contact && getContactInitial(contact)) ||
-      (name && getNameInitial(name)) ||
-      '#'
-    )
+    return (contact && getContactInitial(contact)) || (name && getNameInitial(name)) || '#'
   }
 
   renderThumbnail = () => {
