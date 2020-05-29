@@ -6,5 +6,5 @@
   "at": "a las",
   "receivedDollars": "{{CeloDollars}} Recibidos",
   "verificationMessage": "La tasa de verificación fue pagada. ¡Bienvenido a Celo!",
-  "receivedAmountFromCelo": "¡Recibiste <1></1> de Celo!"
+  "receivedAmountFromCelo": "¡Recibiste esta cantidad de Faucet!"
 }

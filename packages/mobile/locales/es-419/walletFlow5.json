@@ -107,5 +107,14 @@
   "feedItemGenericTitle": "{{nameOrNumber}}",
   "feedItemGenericTitle_noRecipientDetails": "Desconocido",
   "feedItemGoldSold": "Vendido",
-  "feedItemGoldPurchased": "Comprado"
+  "feedItemGoldPurchased": "Comprado",
+  "transactionHeaderVerificationFee": "Verificación",
+  "transactionHeaderNetworkFee": "Red",
+  "transactionHeaderFaucet": "Faucet",
+  "transactionHeaderInviteSent": "$t(inviteFlow11:inviteSent)",
+  "transactionHeaderInviteReceived": "$t(inviteFlow11:inviteReceived)",
+  "transactionHeaderSent": "Pago Enviado",
+  "transactionHeaderEscrowSent": "Escrow Pago Enviado",
+  "transactionHeaderReceived": "Pago Recibido",
+  "transactionHeaderEscrowReceived": "Escrow Pago Recibido"
 }
