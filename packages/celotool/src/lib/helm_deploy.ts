@@ -1,11 +1,13 @@
 import { entries, range } from 'lodash'
 import sleep from 'sleep-promise'
+import { AzureClusterConfig } from './azure'
 import { getKubernetesClusterRegion, switchToClusterFromEnv } from './cluster'
 import { execCmd, execCmdWithExitOnFailure } from './cmd-utils'
 import { EnvTypes, envVar, fetchEnv, fetchEnvOrFallback, isProduction } from './env-utils'
 import { ensureAuthenticatedGcloudAccount } from './gcloud_utils'
 import { generateGenesisFromEnv } from './generate_utils'
 import { getStatefulSetReplicas, scaleResource } from './kubernetes'
+import { installPrometheusIfNotExists } from './prometheus'
 import { getGenesisBlockFromGoogleStorage } from './testnet-utils'
 import { outputIncludes } from './utils'
 
@@ -211,7 +213,10 @@ export async function installCertManager() {
   )
 }
 
-export async function installAndEnableMetricsDeps(installPromToSd: boolean) {
+export async function installAndEnableMetricsDeps(
+  installPrometheus: boolean,
+  clusterConfig?: AzureClusterConfig
+) {
   const kubeStateMetricsReleaseExists = await outputIncludes(
     `helm list`,
     `kube-state-metrics`,
@@ -222,24 +227,8 @@ export async function installAndEnableMetricsDeps(installPromToSd: boolean) {
       `helm install --name kube-state-metrics stable/kube-state-metrics --set rbac.create=true`
     )
   }
-  if (installPromToSd) {
-    const kubeStateMetricsPrometheusReleaseExists = await outputIncludes(
-      `helm list`,
-      `kube-state-metrics-prometheus-to-sd`,
-      `kube-state-metrics-prometheus-to-sd exists, skipping install`
-    )
-    if (!kubeStateMetricsPrometheusReleaseExists) {
-      const promToSdParams = [
-        `--set "metricsSources.kube-state-metrics=http://kube-state-metrics.default.svc.cluster.local:8080"`,
-        `--set promtosd.scrape_interval=${fetchEnv('PROMTOSD_SCRAPE_INTERVAL')}`,
-        `--set promtosd.export_interval=${fetchEnv('PROMTOSD_EXPORT_INTERVAL')}`,
-      ]
-      await execCmdWithExitOnFailure(
-        `helm install --name kube-state-metrics-prometheus-to-sd ../helm-charts/prometheus-to-sd ${promToSdParams.join(
-          ' '
-        )}`
-      )
-    }
+  if (installPrometheus) {
+    await installPrometheusIfNotExists(clusterConfig)
   }
 }
 
