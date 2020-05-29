@@ -4,3 +4,5 @@ These resources are living, breathing documents. We encourage you to add comment
 
 1.  Submit your event to the Celo Foundation so we can help promote it
 2.  Connect with other Celo event organizers on our Discord #community channel.
+
+<PlanningDocs/>

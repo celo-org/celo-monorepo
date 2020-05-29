@@ -1,15 +1,16 @@
 import MarkdownJSX from 'markdown-to-jsx'
 import * as React from 'react'
 import { Text, View } from 'react-native'
+import PlanningDocs from 'src/experience/eventkit/PlanningDocs'
+import {
+  DesignForAll,
+  EmbodyHumility,
+  InnovatingOnMoney,
+  StrivingForBeauty,
+} from 'src/experience/eventkit/Tenent'
 import { H1, H2, H3, H4, Li, Ul } from 'src/fonts/Fonts'
 import InlineAnchor from 'src/shared/InlineAnchor'
 import { fonts, standardStyles } from 'src/styles'
-import {
-  DesignForAll,
-  StrivingForBeauty,
-  EmbodyHumility,
-  InnovatingOnMoney,
-} from './eventkit/Tenent'
 
 function P({ children }) {
   return (
@@ -45,16 +46,11 @@ const OPTIONS = {
     p: P,
     span: P,
     a: InlineAnchor,
-    DesignForAll: {
-      component: DesignForAll,
-    },
-    StrivingForBeauty: {
-      component: StrivingForBeauty,
-    },
-    EmbodyHumility: {
-      component: EmbodyHumility,
-    },
+    DesignForAll,
+    StrivingForBeauty,
+    EmbodyHumility,
     InnovatingOnMoney,
+    PlanningDocs,
   },
 }
 export default function Markdown({ source }) {
