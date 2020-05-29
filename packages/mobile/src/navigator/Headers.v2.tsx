@@ -59,12 +59,17 @@ export const emptyHeader: StackNavigationOptions = {
   headerShown: true,
   headerTitleStyle: [styles.headerTitle, componentStyles.screenHeader],
   headerTitleContainerStyle: {
-    alignItems: 'center' as 'center',
+    alignItems: 'center',
   },
   headerTitleAlign: 'center',
   cardStyle: { backgroundColor: colors.background },
   headerStyle: {
     backgroundColor: colors.light,
+    shadowRadius: 0,
+    shadowOffset: {
+      height: 0,
+      width: 0,
+    },
     ...Platform.select({
       android: {
         elevation: 0,
