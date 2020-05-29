@@ -4,21 +4,15 @@ import { Platform } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 import * as RNFS from 'react-native-fs'
 import RNGeth from 'react-native-geth'
+import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { DEFAULT_TESTNET } from 'src/config'
 import networkConfig from 'src/geth/networkConfig'
 import Logger from 'src/utils/Logger'
 import FirebaseLogUploader from 'src/utils/LogUploader'
-import { trackMeanMillisecs } from 'src/utils/time'
 
 let gethLock = false
 let gethInstance: typeof RNGeth | null = null
-
-let meanMillisecs = 0.0
-let trackCount = 0
-
-// track geth setup first time and then only one every so many events.
-const TRACK_EVERY_GETH = 100
 
 export const FailedToFetchStaticNodesError = new Error(
   'Failed to fetch static nodes from Google storage'
@@ -120,7 +114,7 @@ async function initGeth() {
     return
   }
   gethLock = true
-  const initTime = Date.now()
+  let millisecs = Date.now()
 
   try {
     if (gethInstance) {
@@ -129,22 +123,22 @@ async function initGeth() {
     }
 
     if (!(await ensureGenesisBlockWritten())) {
-      ;[meanMillisecs, trackCount] = trackMeanMillisecs(
-        initTime,
-        meanMillisecs,
-        trackCount,
-        TRACK_EVERY_GETH,
-        CustomEventNames.geth_failed_genesis_block
+      millisecs = Date.now() - millisecs
+      CeloAnalytics.track(CustomEventNames.geth_failed_genesis_block, { millisecs })
+      Logger.debug(
+        'Geth@newGeth',
+        'DEBUG ' + CustomEventNames.geth_failed_genesis_block,
+        millisecs.toString()
       )
       throw FailedToFetchGenesisBlockError
     }
     if (!(await ensureStaticNodesInitialized())) {
-      ;[meanMillisecs, trackCount] = trackMeanMillisecs(
-        initTime,
-        meanMillisecs,
-        trackCount,
-        TRACK_EVERY_GETH,
-        CustomEventNames.geth_failed_static_nodes
+      millisecs = Date.now() - millisecs
+      CeloAnalytics.track(CustomEventNames.geth_failed_static_nodes, { millisecs })
+      Logger.debug(
+        'Geth@newGeth',
+        'DEBUG ' + CustomEventNames.geth_failed_static_nodes,
+        millisecs.toString()
       )
       throw FailedToFetchStaticNodesError
     }
@@ -156,35 +150,31 @@ async function initGeth() {
       geth.subscribeNewHead()
     } catch (e) {
       const errorType = getGethErrorType(e)
+      millisecs = Date.now() - millisecs
       if (errorType === ErrorType.GethAlreadyRunning) {
-        ;[meanMillisecs, trackCount] = trackMeanMillisecs(
-          initTime,
-          meanMillisecs,
-          trackCount,
-          TRACK_EVERY_GETH,
-          CustomEventNames.geth_error_already_running
+        CeloAnalytics.track(CustomEventNames.geth_error_already_running, { millisecs })
+        Logger.debug(
+          'Geth@newGeth',
+          'DEBUG ' + CustomEventNames.geth_error_already_running,
+          millisecs.toString()
         )
         Logger.error('Geth@init/startInstance', 'Geth start reported geth already running')
         throw new Error('Geth already running, need to restart app')
       } else if (errorType === ErrorType.CorruptChainData) {
-        ;[meanMillisecs, trackCount] = trackMeanMillisecs(
-          initTime,
-          meanMillisecs,
-          trackCount,
-          TRACK_EVERY_GETH,
-          CustomEventNames.geth_error_corrupt_chain,
-          true
+        CeloAnalytics.track(CustomEventNames.geth_error_corrupt_chain, { millisecs }, true)
+        Logger.debug(
+          'Geth@newGeth',
+          'DEBUG ' + CustomEventNames.geth_error_corrupt_chain,
+          millisecs.toString()
         )
         Logger.warn('Geth@init/startInstance', 'Geth start reported chain data error')
         await attemptGethCorruptionFix(geth)
       } else {
-        ;[meanMillisecs, trackCount] = trackMeanMillisecs(
-          initTime,
-          meanMillisecs,
-          trackCount,
-          TRACK_EVERY_GETH,
-          CustomEventNames.geth_error_unexpected,
-          true
+        CeloAnalytics.track(CustomEventNames.geth_error_unexpected, { millisecs }, true)
+        Logger.debug(
+          'Geth@newGeth',
+          'DEBUG ' + CustomEventNames.geth_error_unexpected,
+          millisecs.toString()
         )
         Logger.error('Geth@init/startInstance', 'Unexpected error starting geth', e)
         throw e

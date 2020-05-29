@@ -341,7 +341,7 @@ export const trackMeanMillisecs = (
   const millisecs = Date.now() - initTime
   meanMillisecs = updateMeanMillisecs(meanMillisecs, millisecs, onceEvery)
   if (trackCount % onceEvery === 0) {
-    CeloAnalytics.track(eventName, { meanMillisecs, millisecs })
+    CeloAnalytics.track(eventName, { meanMillisecs, millisecs }, attachDeviceInfo)
   }
   trackCount += 1
   return [meanMillisecs, trackCount]

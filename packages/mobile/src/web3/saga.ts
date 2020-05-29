@@ -9,6 +9,7 @@ import { setAccountCreationTime, setPromptForno } from 'src/account/actions'
 import { getPincode } from 'src/account/saga'
 import { promptFornoIfNeededSelector } from 'src/account/selectors'
 import { showError } from 'src/alert/actions'
+import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { currentLanguageSelector } from 'src/app/reducers'
@@ -57,15 +58,17 @@ const BLOCK_CHAIN_CORRUPTION_ERROR = "Error: CONNECTION ERROR: Couldn't connect 
 const SWITCH_TO_FORNO_TIMEOUT = 15000 // if syncing takes >15 secs, suggest switch to forno
 const WEB3_MONITOR_DELAY = 100
 // track sync time first time and then only one every so many events.
-const TRACK_EVERY_SYNC = 100
+const TRACK_SAMPLING_PERIOD_SYNC = 1
 
-let meanMillisecs = 0.0
-let trackCount = 0
+// Tracking meanMilliseconds and count per analytics event that need sampling (too frequent).
+const performanceTracking = {
+  sync_complete: [0.0, 0],
+}
 
 // checks if web3 claims it is currently syncing and attempts to wait for it to complete
 export function* checkWeb3SyncProgress() {
   Logger.debug(TAG, 'checkWeb3SyncProgress', 'Checking sync progress')
-  const initTime = Date.now()
+  let initTime = Date.now()
 
   let syncLoops = 0
   while (true) {
@@ -78,17 +81,21 @@ export function* checkWeb3SyncProgress() {
 
       if (typeof syncProgress === 'boolean' && !syncProgress) {
         Logger.debug(TAG, 'checkWeb3SyncProgress', 'Sync maybe complete, checking')
-
         const latestBlock: Block = yield call(getLatestBlock)
         if (latestBlock && latestBlock.number > 0) {
-          ;[meanMillisecs, trackCount] = trackMeanMillisecs(
+          performanceTracking.sync_complete = trackMeanMillisecs(
             initTime,
-            meanMillisecs,
-            trackCount,
-            TRACK_EVERY_SYNC,
+            performanceTracking.sync_complete[0],
+            performanceTracking.sync_complete[1],
+            TRACK_SAMPLING_PERIOD_SYNC,
             CustomEventNames.sync_complete
           )
           yield put(completeWeb3Sync(latestBlock.number))
+          Logger.debug(
+            TAG,
+            'DEBUG ' + CustomEventNames.sync_complete,
+            performanceTracking.sync_complete.toString()
+          )
           Logger.debug(TAG, 'checkWeb3SyncProgress', 'Sync is complete')
           return true
         } else {
@@ -97,25 +104,21 @@ export function* checkWeb3SyncProgress() {
       } else if (typeof syncProgress === 'object') {
         yield put(updateWeb3SyncProgress(syncProgress))
       } else {
-        ;[meanMillisecs, trackCount] = trackMeanMillisecs(
-          initTime,
-          meanMillisecs,
-          trackCount,
-          TRACK_EVERY_SYNC,
-          CustomEventNames.sync_invalid_progress
-        )
+        initTime = Date.now() - initTime
+        CeloAnalytics.track(CustomEventNames.sync_invalid_progress, { initTime })
+        Logger.debug(TAG, 'DEBUG ' + CustomEventNames.sync_invalid_progress, initTime.toString())
         throw new Error('Invalid syncProgress type')
       }
       yield delay(WEB3_MONITOR_DELAY) // wait 100ms while web3 syncs then check again
       syncLoops += 1
       if (syncLoops * WEB3_MONITOR_DELAY > SWITCH_TO_FORNO_TIMEOUT) {
         if (yield select(promptFornoIfNeededSelector) && features.DATA_SAVER) {
-          ;[meanMillisecs, trackCount] = trackMeanMillisecs(
-            initTime,
-            meanMillisecs,
-            trackCount,
-            TRACK_EVERY_SYNC,
-            CustomEventNames.sync_switch_to_forno_timeout
+          initTime = Date.now() - initTime
+          CeloAnalytics.track(CustomEventNames.sync_switch_to_forno_timeout, { initTime })
+          Logger.debug(
+            TAG,
+            'DEBUG ' + CustomEventNames.sync_switch_to_forno_timeout,
+            initTime.toString()
           )
           yield put(setPromptForno(false))
           navigate(Screens.DataSaver, { promptModalVisible: true })
@@ -124,27 +127,21 @@ export function* checkWeb3SyncProgress() {
       }
     } catch (error) {
       if (error.toString().toLowerCase() === BLOCK_CHAIN_CORRUPTION_ERROR.toLowerCase()) {
-        ;[meanMillisecs, trackCount] = trackMeanMillisecs(
-          initTime,
-          meanMillisecs,
-          trackCount,
-          TRACK_EVERY_SYNC,
-          CustomEventNames.sync_blockchain_corruption,
-          true
+        initTime = Date.now() - initTime
+        CeloAnalytics.track(CustomEventNames.sync_blockchain_corruption, { initTime }, true)
+        Logger.debug(
+          TAG,
+          'DEBUG ' + CustomEventNames.sync_blockchain_corruption,
+          initTime.toString()
         )
         const deleted = yield call(deleteChainData)
         if (deleted) {
           navigateToError('corruptedChainDeleted')
         }
       } else {
-        ;[meanMillisecs, trackCount] = trackMeanMillisecs(
-          initTime,
-          meanMillisecs,
-          trackCount,
-          TRACK_EVERY_SYNC,
-          CustomEventNames.sync_unexpected_error,
-          true
-        )
+        initTime = Date.now() - initTime
+        CeloAnalytics.track(CustomEventNames.sync_unexpected_error, { initTime }, true)
+        Logger.debug(TAG, 'DEBUG ' + CustomEventNames.sync_unexpected_error, initTime.toString())
         Logger.error(TAG, 'Unexpected sync error', error)
       }
       return false
