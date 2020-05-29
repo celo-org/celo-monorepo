@@ -37,6 +37,7 @@ exports[`NumberKeypad renders correctly with decimal separator 1`] = `
       onResponderTerminate={[Function]}
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
+      testID="digit1"
     >
       <Text
         style={
@@ -72,6 +73,7 @@ exports[`NumberKeypad renders correctly with decimal separator 1`] = `
       onResponderTerminate={[Function]}
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
+      testID="digit2"
     >
       <Text
         style={
@@ -107,6 +109,7 @@ exports[`NumberKeypad renders correctly with decimal separator 1`] = `
       onResponderTerminate={[Function]}
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
+      testID="digit3"
     >
       <Text
         style={
@@ -153,6 +156,7 @@ exports[`NumberKeypad renders correctly with decimal separator 1`] = `
       onResponderTerminate={[Function]}
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
+      testID="digit4"
     >
       <Text
         style={
@@ -188,6 +192,7 @@ exports[`NumberKeypad renders correctly with decimal separator 1`] = `
       onResponderTerminate={[Function]}
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
+      testID="digit5"
     >
       <Text
         style={
@@ -223,6 +228,7 @@ exports[`NumberKeypad renders correctly with decimal separator 1`] = `
       onResponderTerminate={[Function]}
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
+      testID="digit6"
     >
       <Text
         style={
@@ -269,6 +275,7 @@ exports[`NumberKeypad renders correctly with decimal separator 1`] = `
       onResponderTerminate={[Function]}
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
+      testID="digit7"
     >
       <Text
         style={
@@ -304,6 +311,7 @@ exports[`NumberKeypad renders correctly with decimal separator 1`] = `
       onResponderTerminate={[Function]}
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
+      testID="digit8"
     >
       <Text
         style={
@@ -339,6 +347,7 @@ exports[`NumberKeypad renders correctly with decimal separator 1`] = `
       onResponderTerminate={[Function]}
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
+      testID="digit9"
     >
       <Text
         style={
@@ -385,6 +394,7 @@ exports[`NumberKeypad renders correctly with decimal separator 1`] = `
       onResponderTerminate={[Function]}
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
+      testID="digit,"
     >
       <Text
         style={
@@ -420,6 +430,7 @@ exports[`NumberKeypad renders correctly with decimal separator 1`] = `
       onResponderTerminate={[Function]}
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
+      testID="digit0"
     >
       <Text
         style={
@@ -535,6 +546,7 @@ exports[`NumberKeypad renders correctly without decimal separator 1`] = `
       onResponderTerminate={[Function]}
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
+      testID="digit1"
     >
       <Text
         style={
@@ -570,6 +582,7 @@ exports[`NumberKeypad renders correctly without decimal separator 1`] = `
       onResponderTerminate={[Function]}
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
+      testID="digit2"
     >
       <Text
         style={
@@ -605,6 +618,7 @@ exports[`NumberKeypad renders correctly without decimal separator 1`] = `
       onResponderTerminate={[Function]}
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
+      testID="digit3"
     >
       <Text
         style={
@@ -651,6 +665,7 @@ exports[`NumberKeypad renders correctly without decimal separator 1`] = `
       onResponderTerminate={[Function]}
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
+      testID="digit4"
     >
       <Text
         style={
@@ -686,6 +701,7 @@ exports[`NumberKeypad renders correctly without decimal separator 1`] = `
       onResponderTerminate={[Function]}
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
+      testID="digit5"
     >
       <Text
         style={
@@ -721,6 +737,7 @@ exports[`NumberKeypad renders correctly without decimal separator 1`] = `
       onResponderTerminate={[Function]}
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
+      testID="digit6"
     >
       <Text
         style={
@@ -767,6 +784,7 @@ exports[`NumberKeypad renders correctly without decimal separator 1`] = `
       onResponderTerminate={[Function]}
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
+      testID="digit7"
     >
       <Text
         style={
@@ -802,6 +820,7 @@ exports[`NumberKeypad renders correctly without decimal separator 1`] = `
       onResponderTerminate={[Function]}
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
+      testID="digit8"
     >
       <Text
         style={
@@ -837,6 +856,7 @@ exports[`NumberKeypad renders correctly without decimal separator 1`] = `
       onResponderTerminate={[Function]}
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
+      testID="digit9"
     >
       <Text
         style={
@@ -898,6 +918,7 @@ exports[`NumberKeypad renders correctly without decimal separator 1`] = `
       onResponderTerminate={[Function]}
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
+      testID="digit0"
     >
       <Text
         style={
