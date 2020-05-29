@@ -128,6 +128,27 @@ export enum CustomEventNames {
   backup_paste_incorrect = 'backup_paste_incorrect', // (track # of taps on "See Backup Phrase" in Backup_Verify screen)
   backup_paste_done = 'backup_paste_done', // (track # of taps on "Done" button on the Backup_Verify screen)
 
+  // Gold Buy and Sell screens
+  gold_switch_input_currency = 'gold_switch_input_currency', // when ‘switch to gold’ button pressed
+  gold_buy_continue = 'gold_buy_continue', // when ‘review’ button clicked
+  gold_buy_confirm = 'gold_buy_confirm', // when ‘buy’ button clicked
+  gold_buy_cancel = 'gold_buy_cancel', // when ‘cancel’ is clicked
+  gold_buy_edit = 'gold_buy_edit', // when ‘edit’ is clicked
+  gold_buy_error = 'gold_buy_error', // error in send flow
+  gold_sell_continue = 'gold_sell_continue', // when ‘review’ button clicked
+  gold_sell_confirm = 'gold_sell_confirm', // when ‘sell’ button clicked
+  gold_sell_cancel = 'gold_sell_cancel', // when ‘cancel’ is clicked
+  gold_sell_edit = 'gold_sell_edit', // when ‘edit’ is clicked
+  gold_sell_error = 'gold_sell_error', // error in sell flow
+
+  // Gold Home screen
+  gold_info = 'gold_info', // when the (i) next to Celo Gold price is clicked, launching education (not pictured)
+  gold_buy_start = 'gold_buy_start', // when the “Buy” button is clicked
+  gold_sell_start = 'gold_sell_start', // when the “Sell” button is clicked
+  gold_chart_switch = 'gold_chart_switch', // when another timescale is selected
+  gold_activity_select = 'gold_activity_select', // when an activity item is clicked
+  gold_activity_back = 'gold_activity_back', // when back caret is clicked from drilldown
+
   // Screens: Exchange_Tutorial, Exchange_Home, Exchange_Currency
   exchange_button = 'exchange_button', // count # of taps on the exchange button in Exchange_Home
   exchange_dollar_input = 'exchange_dollar_input', // record the input of Celo$ form field in Exchange_Currency
@@ -138,7 +159,6 @@ export enum CustomEventNames {
   currency_swap = 'currency_swap', // record # of taps on the double arrow button in Exchange_Currency
 
   // Screen: Exchange_Review
-  exchange_confirm = 'exchange_confirm', // to count the # of taps on the exchange button here)
   exchange_edit = 'exchange_edit', // to count # of times users click the edit button, change transaction)
   exchange_cancel = 'exchange_cancel', // to count # of taps on the “Cancel” in the upper left corner)
 
