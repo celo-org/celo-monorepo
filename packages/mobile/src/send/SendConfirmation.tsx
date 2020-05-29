@@ -424,12 +424,7 @@ export class SendConfirmation extends React.Component<Props, State> {
               onBlur={this.cleanInput}
             />
           </View>
-          <Modal
-            isVisible={this.state.modalVisible}
-            style={styles.modal}
-            useNativeDriver={true}
-            hideModalContentWhileAnimating={true}
-          >
+          <Modal isVisible={this.state.modalVisible} style={styles.modal}>
             <View style={styles.modalContainer}>
               <InviteOptionsModal
                 onWhatsApp={this.sendWhatsApp}

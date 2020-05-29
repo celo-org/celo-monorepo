@@ -49,11 +49,7 @@ describe('SendConfirmation', () => {
     const getWrapper = () =>
       render(
         <Provider store={store}>
-          <SendConfirmation
-            {...getMockStackScreenProps(Screens.SendConfirmation, {
-              transactionData: mockTransactionData,
-            })}
-          />
+          <SendConfirmation {...mockScreenProps} />
         </Provider>
       )
 

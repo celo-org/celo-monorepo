@@ -11,6 +11,7 @@ import { StyleSheet, Text, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import { ErrorMessages } from 'src/app/ErrorMessages'
+import AccountNumberCard from 'src/components/AccountNumberCard'
 import CodeRow, { CodeRowStatus } from 'src/components/CodeRow'
 import ErrorMessageInline from 'src/components/ErrorMessageInline'
 import Modal from 'src/components/Modal'
@@ -213,8 +214,7 @@ export class ValidateRecipientAccount extends React.Component<Props, State> {
           </View>
           <Text style={styles.modalBody}>{t('helpModal.body2')}</Text>
           <View style={styles.addressContainer}>
-            {/* Placeholder for the address card */}
-            <MenuBurgerCard length={30} />
+            <AccountNumberCard address={FULL_ADDRESS_PLACEHOLDER} />
             <Text style={styles.modalBody2}>{t('helpModal.body3')}</Text>
           </View>
           <View style={styles.modalButtonContainer}>
@@ -282,7 +282,8 @@ const styles = StyleSheet.create({
     ...fontStyles.small,
     textAlign: 'center',
     color: colors.gray4,
-    paddingVertical: 8,
+    paddingVertical: 16,
+    paddingTop: 16,
   },
   menuContainer: {
     flexDirection: 'row',
