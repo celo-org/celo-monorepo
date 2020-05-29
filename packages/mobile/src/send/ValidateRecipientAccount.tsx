@@ -300,6 +300,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
   },
   addressContainer: {
+    paddingVertical: 8,
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',

@@ -15,7 +15,7 @@ export default function AccountNumberCard({ address }: Props) {
   const addressChunks = ['0x', ...getAddressChunks(address)]
   return (
     <Card style={styles.container} rounded={true}>
-      <Text style={styles.text}>{addressChunks.slice(0, 6).join(' ')}</Text>
+      <Text style={[styles.text, styles.topText]}>{addressChunks.slice(0, 6).join(' ')}</Text>
       <Text style={[styles.text, styles.bottomText]}>{addressChunks.slice(6).join(' ')}</Text>
     </Card>
   )
@@ -23,11 +23,17 @@ export default function AccountNumberCard({ address }: Props) {
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: 32,
+    height: 62,
+    width: 235,
+    paddingHorizontal: 16,
+    justifyContent: 'center',
   },
   text: {
     ...fontStyles.small,
     color: colors.gray4,
+  },
+  topText: {
+    textAlign: 'left',
   },
   bottomText: {
     paddingTop: 4,
