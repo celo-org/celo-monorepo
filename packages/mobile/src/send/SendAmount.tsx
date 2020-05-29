@@ -199,6 +199,16 @@ function SendAmount(props: Props) {
     [recentPayments]
   )
 
+  const continueAnalyticsParams = React.useMemo(() => {
+    return {
+      method: props.route.params?.isFromScan ? 'scan' : 'search',
+      localCurrencyExchangeRate,
+      localCurrency: localCurrencyCode,
+      dollarAmount,
+      localCurrencyAmount: convertDollarsToLocalAmount(dollarAmount, localCurrencyExchangeRate),
+    }
+  }, [props.route, localCurrencyCode, localCurrencyExchangeRate, dollarAmount])
+
   const onSend = React.useCallback(() => {
     if (!isDollarBalanceSufficient) {
       dispatch(showError(ErrorMessages.NSF_TO_SEND))
@@ -230,7 +240,7 @@ function SendAmount(props: Props) {
         addressValidationType,
       })
     } else {
-      CeloAnalytics.track(CustomEventNames.send_continue)
+      CeloAnalytics.track(CustomEventNames.send_continue, continueAnalyticsParams)
       navigate(Screens.SendConfirmation, { transactionData })
     }
   }, [
@@ -251,10 +261,11 @@ function SendAmount(props: Props) {
         isPaymentRequest: true,
       })
     } else {
-      CeloAnalytics.track(CustomEventNames.request_payment_continue)
+      CeloAnalytics.track(CustomEventNames.request_continue, continueAnalyticsParams)
       navigate(Screens.PaymentRequestConfirmation, { transactionData })
     }
   }, [addressValidationType, getTransactionData])
+
   return (
     <SafeAreaView style={styles.paddedContainer}>
       <DisconnectBanner />

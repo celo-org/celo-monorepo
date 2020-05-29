@@ -193,11 +193,22 @@ const sendScreenOptions = ({ route }: { route: RouteProp<StackParamList, Screens
   const goQr = () => navigate(Screens.QRCode)
   return {
     ...emptyHeader,
-    headerLeft: () => <TopBarIconButton icon={<Times />} onPress={navigateBack} />,
+    headerLeft: () => (
+      <TopBarIconButton
+        icon={<Times />}
+        onPress={navigateBack}
+        eventName={
+          route.params?.isRequest ? CustomEventNames.send_cancel : CustomEventNames.request_cancel
+        }
+      />
+    ),
     headerLeftContainerStyle: { paddingLeft: 20 },
     headerRight: () => (
       <TopBarIconButton
         icon={<QRCodeBorderlessIcon height={32} color={colors.greenUI} />}
+        eventName={
+          route.params?.isRequest ? CustomEventNames.send_scan : CustomEventNames.request_scan
+        }
         onPress={goQr}
       />
     ),
@@ -212,7 +223,7 @@ const sendAmountScreenOptions = ({
 }) => {
   return {
     ...emptyHeader,
-    headerLeft: () => <BackButton />,
+    headerLeft: () => <BackButton eventName={CustomEventNames.send_amount_back} />,
     headerTitle: () => (
       <HeaderTitleWithBalance
         title={i18n.t(`sendFlow7:${route.params?.isRequest ? 'request' : 'send'}`)}

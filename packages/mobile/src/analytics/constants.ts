@@ -23,13 +23,26 @@ export enum CustomEventNames {
   wallet_dollar_nux = 'wallet_dollar_nux',
   send_input = 'send_input',
   transaction_details = 'transaction_details',
-  send_continue = 'send_continue',
   send_select_cancel = 'send_select_cancel',
   send_dollar_confirm = 'send_dollar_confirm',
   edit_dollar_confirm = 'edit_dollar_confirm',
   send_invite_details = 'send_invite_details',
   send_invite = 'send_invite',
   edit_send_invite = 'edit_send_invite',
+
+  send_cancel = 'send_cancel',
+  send_search = 'send_search',
+  send_scan = 'send_scan',
+  send_select_recipient = 'send_select_recipient',
+  send_amount_back = 'send_amount_back',
+  send_continue = 'send_continue',
+
+  request_cancel = 'request_cancel',
+  request_search = 'request_search',
+  request_scan = 'request_scan',
+  request_select_recipient = 'request_select_recipient',
+  request_amount_back = 'request_amount_back',
+  request_continue = 'request_continue',
 
   // Send events, separate from button tracking above
   send_dollar_transaction = 'send_dollar_transaction',
@@ -175,9 +188,6 @@ export enum CustomEventNames {
   import_wallet_submit = 'import_wallet_submit', // to count the # of times that the “Restore Celo Wallet” button is pressed
   import_wallet_cancel = 'import_wallet_cancel', // to count the # of times that the “Cancel” button is pressed
 
-  // Request Money events
-  // request_select_cancel is captured in send_select_cancel
-  request_payment_continue = 'incoming_request_payment_continue',
   request_payment_request = 'incoming_request_payment_request',
   request_payment_edit = 'incoming_request_payment_edit',
 
