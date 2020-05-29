@@ -33,7 +33,6 @@ describe('Testnet banner', () => {
       <Provider store={store}>
         <WalletHome
           refreshAllBalances={jest.fn()}
-          resetStandbyTransactions={jest.fn()}
           initializeSentryUserContext={jest.fn()}
           exitBackupFlow={jest.fn()}
           setLoading={jest.fn()}
@@ -58,7 +57,6 @@ describe('Testnet banner', () => {
       <Provider store={store}>
         <WalletHome
           refreshAllBalances={jest.fn()}
-          resetStandbyTransactions={jest.fn()}
           initializeSentryUserContext={jest.fn()}
           exitBackupFlow={jest.fn()}
           setLoading={jest.fn()}
@@ -81,7 +79,6 @@ describe('Testnet banner', () => {
       <Provider store={store}>
         <WalletHome
           refreshAllBalances={jest.fn()}
-          resetStandbyTransactions={jest.fn()}
           initializeSentryUserContext={jest.fn()}
           exitBackupFlow={jest.fn()}
           setLoading={jest.fn()}
