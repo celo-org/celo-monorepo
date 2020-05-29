@@ -99,13 +99,6 @@
       "@celo/utils"
     ]
   },
-  "@celo/phone-number-privacy": {
-    "location": "packages/phone-number-privacy",
-    "dependencies": [
-      "@celo/contractkit",
-      "@celo/utils"
-    ]
-  },
   "@celo/protocol": {
     "location": "packages/protocol",
     "dependencies": [
@@ -147,6 +140,20 @@
   "@celo/web": {
     "location": "packages/web",
     "dependencies": [
+      "@celo/utils"
+    ]
+  },
+  "@celo/phone-number-privacy-combiner": {
+    "location": "packages/phone-number-privacy/combiner",
+    "dependencies": [
+      "@celo/contractkit",
+      "@celo/utils"
+    ]
+  },
+  "@celo/phone-number-privacy-signer": {
+    "location": "packages/phone-number-privacy/signer",
+    "dependencies": [
+      "@celo/contractkit",
       "@celo/utils"
     ]
   }
