@@ -7,30 +7,22 @@ import fontStyles from '@celo/react-components/styles/fonts.v2'
 import { componentStyles } from '@celo/react-components/styles/styles'
 import { CURRENCIES, CURRENCY_ENUM } from '@celo/utils/src/currencies'
 import { StackScreenProps } from '@react-navigation/stack'
-import { TFunction } from 'i18next'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
-import {
-  Keyboard,
-  NativeSyntheticEvent,
-  StyleSheet,
-  Text,
-  TextInput,
-  TextInputKeyPressEventData,
-  View,
-} from 'react-native'
+import { StyleSheet, Text, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { TokenTransactionType } from 'src/apollo/types'
+import CommentTextInput from 'src/components/CommentTextInput'
 import CurrencyDisplay, { DisplayType, FormatType } from 'src/components/CurrencyDisplay'
 import FeeIcon from 'src/components/FeeIcon'
 import InviteOptionsModal from 'src/components/InviteOptionsModal'
 import LineItemRow from 'src/components/LineItemRow.v2'
 import Modal from 'src/components/Modal'
+import ShortenedAddress from 'src/components/ShortenedAddress'
 import TotalLineItem from 'src/components/TotalLineItem'
-import { MAX_COMMENT_LENGTH } from 'src/config'
 import { FeeType } from 'src/fees/actions'
 import CalculateFee, {
   CalculateFeeChildren,
@@ -46,7 +38,7 @@ import { getInvitationVerificationFeeInDollars } from 'src/invite/saga'
 import { navigate, navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
-import { getRecipientThumbnail, Recipient } from 'src/recipients/recipient'
+import { getDisplayName, getRecipientThumbnail } from 'src/recipients/recipient'
 import { RootState } from 'src/redux/reducers'
 import { isAppConnected } from 'src/redux/selectors'
 import { sendPaymentOrInvite } from 'src/send/actions'
@@ -80,8 +72,7 @@ interface DispatchProps {
 interface State {
   modalVisible: boolean
   buttonReset: boolean
-  reason: string
-  newReason: string
+  comment: string
 }
 
 type OwnProps = StackScreenProps<StackParamList, Screens.SendConfirmation>
@@ -92,27 +83,6 @@ const mapDispatchToProps = {
   fetchDollarBalance,
   declinePaymentRequest,
   completePaymentRequest,
-}
-
-interface DisplayNameProps {
-  recipient: Recipient
-  recipientAddress?: string | null
-  t: TFunction
-}
-
-function getDisplayName({ recipient, recipientAddress, t }: DisplayNameProps) {
-  const { displayName, e164PhoneNumber } = recipient
-  if (displayName) {
-    return displayName
-  }
-  if (e164PhoneNumber) {
-    return e164PhoneNumber
-  }
-  if (recipientAddress) {
-    return recipientAddress
-  }
-  // Rare but possible, such as when a user skips onboarding flow (in dev mode) and then views their own avatar
-  return t('global:unknown')
 }
 
 const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
@@ -145,13 +115,10 @@ const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
 }
 
 export class SendConfirmation extends React.Component<Props, State> {
-  static navigationOptions = { header: null }
-
   state = {
     modalVisible: false,
     buttonReset: false,
-    reason: '',
-    newReason: '',
+    comment: '',
   }
 
   async componentDidMount() {
@@ -179,14 +146,14 @@ export class SendConfirmation extends React.Component<Props, State> {
       recipientAddress,
       firebasePendingRequestUid,
     } = this.props.confirmationInput
-    const { reason } = this.state
+    const { comment } = this.state
 
     const timestamp = Date.now()
 
     this.props.sendPaymentOrInvite(
       amount,
       timestamp,
-      reason,
+      comment,
       recipient,
       recipientAddress,
       inviteMethod,
@@ -194,19 +161,9 @@ export class SendConfirmation extends React.Component<Props, State> {
     )
   }
 
-  onKeyDown = (e: NativeSyntheticEvent<TextInputKeyPressEventData>) => {
-    if (e.nativeEvent.key === 'Enter') {
-      Keyboard.dismiss()
-    }
-  }
-
   cleanInput = () => {
-    // Erase the "enter" keystroke from the comment
-    // if it was used to submit input
-    if (this.state.reason.slice(-1) === '\n') {
-      const reason = this.state.reason.slice(0, -1)
-      this.setState({ reason })
-    }
+    const comment = this.state.comment.trim()
+    this.setState({ comment })
   }
 
   onEditAddressClick = () => {
@@ -271,8 +228,8 @@ export class SendConfirmation extends React.Component<Props, State> {
     this.sendOrInvite(InviteBy.SMS)
   }
 
-  onReasonChanged = (reason: string) => {
-    this.setState({ reason })
+  onCommentChange = (comment: string) => {
+    this.setState({ comment })
   }
 
   renderWithAsyncFee: CalculateFeeChildren = (asyncFee) => {
@@ -388,10 +345,7 @@ export class SendConfirmation extends React.Component<Props, State> {
                 </Text>
                 {validatedRecipientAddress && (
                   <View style={styles.editContainer}>
-                    <Text style={styles.address}>{`${validatedRecipientAddress.slice(
-                      0,
-                      6
-                    )}...${validatedRecipientAddress.slice(-4)}`}</Text>
+                    <ShortenedAddress style={styles.address} address={validatedRecipientAddress} />
                     <TextButton
                       style={styles.editButton}
                       testID={'accountEditButton'}
@@ -408,19 +362,11 @@ export class SendConfirmation extends React.Component<Props, State> {
               style={styles.amount}
               amount={subtotalAmount || inviteFeeAmount}
             />
-            <TextInput
-              testID={'commentInput'}
+            <CommentTextInput
+              testID={'send'}
               style={styles.inputContainer}
-              autoFocus={true}
-              multiline={true}
-              numberOfLines={5}
-              maxLength={MAX_COMMENT_LENGTH}
-              onChangeText={this.onReasonChanged}
-              value={this.state.reason}
-              placeholder={t('addDescription')}
-              placeholderTextColor={colors.greenUI}
-              returnKeyType={'done'}
-              onKeyPress={this.onKeyDown}
+              onCommentChange={this.onCommentChange}
+              comment={this.state.comment}
               onBlur={this.cleanInput}
             />
           </View>

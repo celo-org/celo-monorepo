@@ -42,6 +42,7 @@ type Props = DispatchProps & OwnProps & WithTranslation & StateProps
 function ErrorMessageInline(props: Props) {
   const { error, displayMethod, dismissAfter, t } = props
 
+  // Want to initiate/cleanup a timer for each new error
   React.useEffect(() => {
     const timer = window.setTimeout(props.hideAlert, (dismissAfter || DISMISS_DEFAULT) * 1000)
     return () => window.clearTimeout(timer)

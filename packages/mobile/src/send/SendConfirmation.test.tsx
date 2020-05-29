@@ -55,7 +55,7 @@ describe('SendConfirmation', () => {
 
     it('updates the comment/reason', () => {
       const wrapper = getWrapper()
-      const input = wrapper.getByTestId('commentInput')
+      const input = wrapper.getByTestId('commentInput/send')
       const comment = 'A comment!'
       fireEvent.changeText(input, comment)
       expect(wrapper.queryAllByDisplayValue(comment)).toHaveLength(1)

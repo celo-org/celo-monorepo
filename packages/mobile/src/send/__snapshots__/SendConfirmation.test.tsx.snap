@@ -179,7 +179,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
                   "lineHeight": 24,
                 }
               }
-              testID="commentInput"
+              testID="commentInput/send"
               underlineColorAndroid="transparent"
               value=""
             />
@@ -1228,7 +1228,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                   "lineHeight": 24,
                 }
               }
-              testID="commentInput"
+              testID="commentInput/send"
               underlineColorAndroid="transparent"
               value=""
             />
@@ -2277,7 +2277,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                   "lineHeight": 24,
                 }
               }
-              testID="commentInput"
+              testID="commentInput/send"
               underlineColorAndroid="transparent"
               value=""
             />
@@ -3376,7 +3376,7 @@ exports[`SendConfirmation renders correctly when there are multiple user address
                   "lineHeight": 24,
                 }
               }
-              testID="commentInput"
+              testID="commentInput/send"
               underlineColorAndroid="transparent"
               value=""
             />

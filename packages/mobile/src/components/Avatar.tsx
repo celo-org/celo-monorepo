@@ -24,6 +24,7 @@ interface OwnProps {
 
 type Props = OwnProps & WithTranslation
 
+// When redesigning, consider using getDisplayName from recipient.ts
 function getDisplayName({ name, recipient, e164Number, address, t }: Props) {
   if (name) {
     return name
