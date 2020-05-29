@@ -500,6 +500,7 @@ exports[`ValidateRecipientAccount renders correctly when full validation require
                 "alignItems": "center",
                 "flexDirection": "column",
                 "justifyContent": "center",
+                "paddingVertical": 8,
               }
             }
           >
@@ -522,19 +523,27 @@ exports[`ValidateRecipientAccount renders correctly when full validation require
                     "borderRadius": 8,
                   },
                   Object {
-                    "paddingHorizontal": 32,
+                    "height": 62,
+                    "justifyContent": "center",
+                    "paddingHorizontal": 16,
+                    "width": 235,
                   },
                 ]
               }
             >
               <Text
                 style={
-                  Object {
-                    "color": "#9CA4A9",
-                    "fontFamily": "Inter-Regular",
-                    "fontSize": 14,
-                    "lineHeight": 18,
-                  }
+                  Array [
+                    Object {
+                      "color": "#9CA4A9",
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                    },
+                    Object {
+                      "textAlign": "left",
+                    },
+                  ]
                 }
               >
                 0x f1b1 d5a6 e772 8g30 9c4a
@@ -1282,6 +1291,7 @@ exports[`ValidateRecipientAccount renders correctly when partial validation requ
                 "alignItems": "center",
                 "flexDirection": "column",
                 "justifyContent": "center",
+                "paddingVertical": 8,
               }
             }
           >
@@ -1304,19 +1314,27 @@ exports[`ValidateRecipientAccount renders correctly when partial validation requ
                     "borderRadius": 8,
                   },
                   Object {
-                    "paddingHorizontal": 32,
+                    "height": 62,
+                    "justifyContent": "center",
+                    "paddingHorizontal": 16,
+                    "width": 235,
                   },
                 ]
               }
             >
               <Text
                 style={
-                  Object {
-                    "color": "#9CA4A9",
-                    "fontFamily": "Inter-Regular",
-                    "fontSize": 14,
-                    "lineHeight": 18,
-                  }
+                  Array [
+                    Object {
+                      "color": "#9CA4A9",
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                    },
+                    Object {
+                      "textAlign": "left",
+                    },
+                  ]
                 }
               >
                 0x f1b1 d5a6 e772 8g30 9c4a

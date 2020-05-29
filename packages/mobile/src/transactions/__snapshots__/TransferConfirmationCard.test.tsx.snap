@@ -375,6 +375,7 @@ exports[`TransferConfirmationCard renders correctly for received escrow transact
                   }
                 >
                   <Image
+                    source={Object {}}
                     style={
                       Array [
                         Object {
@@ -837,6 +838,7 @@ exports[`TransferConfirmationCard renders correctly for received transaction dri
                   }
                 >
                   <Image
+                    source={Object {}}
                     style={
                       Array [
                         Object {
@@ -1301,6 +1303,7 @@ exports[`TransferConfirmationCard renders correctly for sent escrow transaction 
                   }
                 >
                   <Image
+                    source={Object {}}
                     style={
                       Array [
                         Object {
@@ -1981,6 +1984,7 @@ exports[`TransferConfirmationCard renders correctly for sent transaction drilldo
                   }
                 >
                   <Image
+                    source={Object {}}
                     style={
                       Array [
                         Object {
