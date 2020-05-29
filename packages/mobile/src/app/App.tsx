@@ -45,11 +45,9 @@ BigNumber.config({
   },
 })
 
-// Enables LayoutAnimation on Android
-if (Platform.OS === 'android') {
-  // tslint:disable-next-line:no-unused-expression
-  UIManager.setLayoutAnimationEnabledExperimental &&
-    UIManager.setLayoutAnimationEnabledExperimental(true)
+// Enables LayoutAnimation on Android. Need to check if method exists before using
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
+  UIManager.setLayoutAnimationEnabledExperimental(true)
 }
 
 export class App extends React.Component {

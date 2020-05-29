@@ -1,9 +1,10 @@
+import { TOptions } from 'i18next'
 import { ErrorDisplayType } from 'src/alert/reducer'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { DefaultEventNames } from 'src/analytics/constants'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { ALERT_BANNER_DURATION } from 'src/config'
-import i18n from 'src/i18n'
+import i18n, { Namespaces } from 'src/i18n'
 
 export enum Actions {
   SHOW = 'ALERT/SHOW',
@@ -59,11 +60,11 @@ export const showError = (
   )
 }
 
-export const showErrorInline = (error: ErrorMessages, i18nOptions?: object): ShowAlertAction => ({
+export const showErrorInline = (error: ErrorMessages, i18nOptions?: TOptions): ShowAlertAction => ({
   type: Actions.SHOW,
   alertType: AlertTypes.ERROR,
   displayMethod: ErrorDisplayType.INLINE,
-  message: i18n.t(error, { ns: 'global', ...(i18nOptions || {}) }),
+  message: i18n.t(error, { ns: Namespaces.global, ...(i18nOptions || {}) }),
   underlyingError: error,
 })
 
