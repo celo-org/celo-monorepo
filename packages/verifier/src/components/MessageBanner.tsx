@@ -34,6 +34,7 @@ export class MessageBanner extends React.Component<Props> {
 
     return (
       <SmartTopAlert
+        isVisible={true}
         timestamp={Date.now()}
         text={message}
         title={title}

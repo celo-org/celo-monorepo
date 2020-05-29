@@ -34,6 +34,7 @@ export class ErrorBox extends React.Component<Props> {
 
     return (
       <SmartTopAlert
+        isVisible={true}
         timestamp={Date.now()}
         text={error && t(error)}
         onPress={clearErrorAction}

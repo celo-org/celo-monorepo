@@ -47,7 +47,9 @@ BigNumber.config({
 
 // Enables LayoutAnimation on Android
 if (Platform.OS === 'android') {
-  UIManager.setLayoutAnimationEnabledExperimental(true)
+  // tslint:disable-next-line:no-unused-expression
+  UIManager.setLayoutAnimationEnabledExperimental &&
+    UIManager.setLayoutAnimationEnabledExperimental(true)
 }
 
 export class App extends React.Component {
