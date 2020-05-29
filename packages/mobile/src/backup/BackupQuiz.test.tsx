@@ -73,38 +73,6 @@ describe('BackupQuiz', () => {
     })
   })
 
-  describe('when word is pressed', () => {
-    it('removes it from the options adds it to chosen words', async () => {
-      const mockSetBackupCompleted = jest.fn()
-      const { getByTestId, getByText } = render(
-        <Provider store={store}>
-          <BackupQuizRaw
-            {...mockScreenProps}
-            setBackupCompleted={mockSetBackupCompleted}
-            showError={jest.fn()}
-            {...getMockI18nProps()}
-          />
-        </Provider>
-      )
-
-      expect(getByTestId('selected-word-0').props.children).toEqual(1)
-
-      const words = mockMnemonic.split(' ')
-      const firstWord = words[0]
-      const secondWord = words[1]
-
-      fireEvent.press(getByText(firstWord))
-
-      await waitForElement(() =>
-        getByTestId('selected-word-0').find((node) => node.props.children === firstWord)
-      )
-
-      expect(getByTestId('selected-word-0').props.children).toEqual(firstWord)
-
-      expect(getByText(secondWord)).toBeTruthy()
-    })
-  })
-
   /**
    * Note(Rossy): Unfortunately I have to skip this test for now.
    * The test must wait for buttons to be ready, and which takes
