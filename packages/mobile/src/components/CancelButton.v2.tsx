@@ -1,6 +1,7 @@
+import colors from '@celo/react-components/styles/colors.v2'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { StyleProp, TextStyle } from 'react-native'
+import { StyleProp, StyleSheet, TextStyle } from 'react-native'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { Namespaces } from 'src/i18n'
@@ -32,8 +33,14 @@ export default function CancelButton({ eventName, onCancel, style }: Props) {
     <TopBarTextButton
       testID="CancelButton"
       onPress={onPressCancel}
-      titleStyle={style}
+      titleStyle={style ? [styles.title, style] : styles.title}
       title={t('cancel')}
     />
   )
 }
+
+const styles = StyleSheet.create({
+  title: {
+    color: colors.dark,
+  },
+})
