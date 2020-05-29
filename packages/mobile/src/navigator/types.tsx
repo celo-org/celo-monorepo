@@ -16,9 +16,7 @@ export type StackParamList = {
   [Screens.BackupComplete]: undefined
   [Screens.BackupIntroduction]: undefined
   [Screens.BackupPhrase]: undefined
-  [Screens.BackupQuiz]: {
-    mnemonic: string
-  }
+  [Screens.BackupQuiz]: undefined
   [Screens.BackupSocial]: undefined
   [Screens.BackupSocialIntro]: {
     incomingFromBackupFlow: boolean
