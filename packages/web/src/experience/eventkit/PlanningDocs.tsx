@@ -15,10 +15,7 @@ interface Doc {
 const MarryLastWordToIcon = React.memo(function _MarryLastWordToIcon({ words }: { words: string }) {
   const titleParts = words.split(' ')
   const titleEnd = (
-    <Text
-      // @ts-ignore
-      style={styles.noBreaks}
-    >
+    <Text style={styles.noBreaks}>
       {titleParts[titleParts.length - 1]} <External size={14} color={colors.dark} />
     </Text>
   )
