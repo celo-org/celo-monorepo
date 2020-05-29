@@ -321,69 +321,185 @@ exports[`ValidateRecipientAccount renders correctly when full validation require
       }
       swipeThreshold={100}
     >
-      <View
-        style={
-          Array [
-            undefined,
-            Object {
-              "backgroundColor": "#FFFFFF",
-              "borderRadius": 8,
-              "elevation": 12,
-              "margin": 8,
-              "padding": 24,
-              "shadowColor": "black",
-              "shadowOffset": Object {
-                "height": 6,
-                "width": 0,
-              },
-              "shadowOpacity": 0.3,
-              "shadowRadius": 9.600000000000001,
-            },
-          ]
-        }
-      >
-        <Text
-          style={
-            Object {
-              "color": "#2E3338",
-              "fontFamily": "Inter-SemiBold",
-              "fontSize": 19,
-              "lineHeight": 26,
-              "paddingBottom": 4,
-              "textAlign": "center",
-            }
-          }
-        >
-          helpModal.header
-        </Text>
-        <Text
-          style={
-            Object {
-              "color": "#2E3338",
-              "fontFamily": "Inter-Regular",
-              "fontSize": 16,
-              "lineHeight": 22,
-              "paddingVertical": 8,
-              "textAlign": "center",
-            }
-          }
-        >
-          helpModal.body1
-        </Text>
+      <SafeAreaView>
         <View
           style={
-            Object {
-              "alignItems": "center",
-              "flexDirection": "row",
-              "justifyContent": "center",
-              "paddingVertical": 8,
-            }
+            Array [
+              Object {
+                "backgroundColor": "#FFFFFF",
+                "elevation": 12,
+                "padding": 16,
+                "shadowColor": "black",
+                "shadowOffset": Object {
+                  "height": 6,
+                  "width": 0,
+                },
+                "shadowOpacity": 0.3,
+                "shadowRadius": 9.600000000000001,
+              },
+              Object {
+                "borderRadius": 8,
+              },
+              Array [
+                Object {
+                  "backgroundColor": "#FFFFFF",
+                  "maxHeight": "100%",
+                  "padding": 24,
+                },
+                undefined,
+              ],
+            ]
           }
         >
+          <Text
+            style={
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Inter-SemiBold",
+                "fontSize": 19,
+                "lineHeight": 26,
+                "paddingBottom": 4,
+                "textAlign": "center",
+              }
+            }
+          >
+            helpModal.header
+          </Text>
+          <Text
+            style={
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Inter-Regular",
+                "fontSize": 16,
+                "lineHeight": 22,
+                "paddingVertical": 8,
+                "textAlign": "center",
+              }
+            }
+          >
+            helpModal.body1
+          </Text>
           <View
             style={
               Object {
-                "paddingHorizontal": 8,
+                "alignItems": "center",
+                "flexDirection": "row",
+                "justifyContent": "center",
+                "paddingVertical": 8,
+              }
+            }
+          >
+            <View
+              style={
+                Object {
+                  "paddingHorizontal": 8,
+                }
+              }
+            >
+              <View
+                style={
+                  Array [
+                    Object {
+                      "alignItems": "center",
+                      "backgroundColor": "#FFFFFF",
+                      "borderRadius": 4,
+                      "elevation": 12,
+                      "justifyContent": "center",
+                      "shadowColor": "black",
+                      "shadowOffset": Object {
+                        "height": 6,
+                        "width": 0,
+                      },
+                      "shadowOpacity": 0.3,
+                      "shadowRadius": 9.600000000000001,
+                    },
+                    Object {
+                      "height": 30,
+                      "width": 30,
+                    },
+                  ]
+                }
+              >
+                <svg
+                  fill="none"
+                  height="52.5"
+                  style={Object {}}
+                  viewBox="0 0 64 64"
+                  width="52.5"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <g
+                    filter="url(#filter0_d)"
+                    style={Object {}}
+                  >
+                    <line
+                      stroke="#2E3338"
+                      strokeLinecap="round"
+                      strokeWidth="2.5"
+                      style={Object {}}
+                      x1="23.5"
+                      x2="41"
+                      y1="26.5"
+                      y2="26.5"
+                    />
+                    <line
+                      stroke="#2E3338"
+                      strokeLinecap="round"
+                      strokeWidth="2.5"
+                      style={Object {}}
+                      x1="23.5"
+                      x2="41"
+                      y1="32.75"
+                      y2="32.75"
+                    />
+                    <line
+                      stroke="#2E3338"
+                      strokeLinecap="round"
+                      strokeWidth="2.5"
+                      style={Object {}}
+                      x1="23.5"
+                      x2="41"
+                      y1="39"
+                      y2="39"
+                    />
+                  </g>
+                </svg>
+              </View>
+            </View>
+            <Text
+              style={
+                Object {
+                  "color": "#9CA4A9",
+                  "fontFamily": "Inter-Regular",
+                  "fontSize": 14,
+                  "lineHeight": 18,
+                  "paddingHorizontal": 8,
+                }
+              }
+            >
+              Menu
+            </Text>
+          </View>
+          <Text
+            style={
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Inter-Regular",
+                "fontSize": 16,
+                "lineHeight": 22,
+                "paddingVertical": 8,
+                "textAlign": "center",
+              }
+            }
+          >
+            helpModal.body2
+          </Text>
+          <View
+            style={
+              Object {
+                "alignItems": "center",
+                "flexDirection": "column",
+                "justifyContent": "center",
               }
             }
           >
@@ -391,11 +507,9 @@ exports[`ValidateRecipientAccount renders correctly when full validation require
               style={
                 Array [
                   Object {
-                    "alignItems": "center",
                     "backgroundColor": "#FFFFFF",
-                    "borderRadius": 4,
                     "elevation": 12,
-                    "justifyContent": "center",
+                    "padding": 16,
                     "shadowColor": "black",
                     "shadowOffset": Object {
                       "height": 6,
@@ -405,221 +519,104 @@ exports[`ValidateRecipientAccount renders correctly when full validation require
                     "shadowRadius": 9.600000000000001,
                   },
                   Object {
-                    "height": 30,
-                    "width": 30,
+                    "borderRadius": 8,
+                  },
+                  Object {
+                    "paddingHorizontal": 32,
                   },
                 ]
               }
             >
-              <svg
-                fill="none"
-                height="52.5"
-                style={Object {}}
-                viewBox="0 0 64 64"
-                width="52.5"
-                xmlns="http://www.w3.org/2000/svg"
+              <Text
+                style={
+                  Object {
+                    "color": "#9CA4A9",
+                    "fontFamily": "Inter-Regular",
+                    "fontSize": 14,
+                    "lineHeight": 18,
+                  }
+                }
               >
-                <g
-                  filter="url(#filter0_d)"
-                  style={Object {}}
-                >
-                  <line
-                    stroke="#2E3338"
-                    strokeLinecap="round"
-                    strokeWidth="2.5"
-                    style={Object {}}
-                    x1="23.5"
-                    x2="41"
-                    y1="26.5"
-                    y2="26.5"
-                  />
-                  <line
-                    stroke="#2E3338"
-                    strokeLinecap="round"
-                    strokeWidth="2.5"
-                    style={Object {}}
-                    x1="23.5"
-                    x2="41"
-                    y1="32.75"
-                    y2="32.75"
-                  />
-                  <line
-                    stroke="#2E3338"
-                    strokeLinecap="round"
-                    strokeWidth="2.5"
-                    style={Object {}}
-                    x1="23.5"
-                    x2="41"
-                    y1="39"
-                    y2="39"
-                  />
-                </g>
-              </svg>
+                0x f1b1 d5a6 e772 8g30 9c4a
+              </Text>
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#9CA4A9",
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                    },
+                    Object {
+                      "paddingTop": 4,
+                      "textAlign": "right",
+                    },
+                  ]
+                }
+              >
+                025k 122d 71ad 75a6 1976
+              </Text>
             </View>
-          </View>
-          <Text
-            style={
-              Object {
-                "color": "#9CA4A9",
-                "fontFamily": "Inter-Regular",
-                "fontSize": 14,
-                "lineHeight": 18,
-                "paddingHorizontal": 8,
-              }
-            }
-          >
-            Menu
-          </Text>
-        </View>
-        <Text
-          style={
-            Object {
-              "color": "#2E3338",
-              "fontFamily": "Inter-Regular",
-              "fontSize": 16,
-              "lineHeight": 22,
-              "paddingVertical": 8,
-              "textAlign": "center",
-            }
-          }
-        >
-          helpModal.body2
-        </Text>
-        <View
-          style={
-            Object {
-              "alignItems": "center",
-              "flexDirection": "column",
-              "justifyContent": "center",
-            }
-          }
-        >
-          <View
-            style={
-              Array [
-                Object {
-                  "alignItems": "center",
-                  "backgroundColor": "#FFFFFF",
-                  "borderRadius": 4,
-                  "elevation": 12,
-                  "justifyContent": "center",
-                  "shadowColor": "black",
-                  "shadowOffset": Object {
-                    "height": 6,
-                    "width": 0,
-                  },
-                  "shadowOpacity": 0.3,
-                  "shadowRadius": 9.600000000000001,
-                },
-                Object {
-                  "height": 30,
-                  "width": 30,
-                },
-              ]
-            }
-          >
-            <svg
-              fill="none"
-              height="52.5"
-              style={Object {}}
-              viewBox="0 0 64 64"
-              width="52.5"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <g
-                filter="url(#filter0_d)"
-                style={Object {}}
-              >
-                <line
-                  stroke="#2E3338"
-                  strokeLinecap="round"
-                  strokeWidth="2.5"
-                  style={Object {}}
-                  x1="23.5"
-                  x2="41"
-                  y1="26.5"
-                  y2="26.5"
-                />
-                <line
-                  stroke="#2E3338"
-                  strokeLinecap="round"
-                  strokeWidth="2.5"
-                  style={Object {}}
-                  x1="23.5"
-                  x2="41"
-                  y1="32.75"
-                  y2="32.75"
-                />
-                <line
-                  stroke="#2E3338"
-                  strokeLinecap="round"
-                  strokeWidth="2.5"
-                  style={Object {}}
-                  x1="23.5"
-                  x2="41"
-                  y1="39"
-                  y2="39"
-                />
-              </g>
-            </svg>
-          </View>
-          <Text
-            style={
-              Object {
-                "color": "#9CA4A9",
-                "fontFamily": "Inter-Regular",
-                "fontSize": 14,
-                "lineHeight": 18,
-                "paddingVertical": 8,
-                "textAlign": "center",
-              }
-            }
-          >
-            helpModal.body3
-          </Text>
-        </View>
-        <View
-          style={
-            Object {
-              "alignItems": "center",
-              "flexDirection": "row",
-              "justifyContent": "space-evenly",
-              "paddingVertical": 24,
-            }
-          }
-        >
-          <View
-            accessible={true}
-            focusable={true}
-            nativeBackgroundAndroid={
-              Object {
-                "attribute": "selectableItemBackgroundBorderless",
-                "type": "ThemeAttrAndroid",
-              }
-            }
-            onClick={[Function]}
-            onResponderGrant={[Function]}
-            onResponderMove={[Function]}
-            onResponderRelease={[Function]}
-            onResponderTerminate={[Function]}
-            onResponderTerminationRequest={[Function]}
-            onStartShouldSetResponder={[Function]}
-          >
             <Text
               style={
                 Object {
-                  "color": "#1AB775",
-                  "fontFamily": "Inter-SemiBold",
-                  "fontSize": 16,
-                  "lineHeight": 22,
+                  "color": "#9CA4A9",
+                  "fontFamily": "Inter-Regular",
+                  "fontSize": 14,
+                  "lineHeight": 18,
+                  "paddingTop": 16,
+                  "paddingVertical": 16,
+                  "textAlign": "center",
                 }
               }
             >
-              global:dismiss
+              helpModal.body3
             </Text>
           </View>
+          <View
+            style={
+              Object {
+                "alignItems": "center",
+                "flexDirection": "row",
+                "justifyContent": "space-evenly",
+                "paddingVertical": 24,
+              }
+            }
+          >
+            <View
+              accessible={true}
+              focusable={true}
+              nativeBackgroundAndroid={
+                Object {
+                  "attribute": "selectableItemBackgroundBorderless",
+                  "type": "ThemeAttrAndroid",
+                }
+              }
+              onClick={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+            >
+              <Text
+                style={
+                  Object {
+                    "color": "#1AB775",
+                    "fontFamily": "Inter-SemiBold",
+                    "fontSize": 16,
+                    "lineHeight": 22,
+                  }
+                }
+              >
+                global:dismiss
+              </Text>
+            </View>
+          </View>
         </View>
-      </View>
+      </SafeAreaView>
     </View>
   </Modal>
 </SafeAreaView>
@@ -1106,69 +1103,185 @@ exports[`ValidateRecipientAccount renders correctly when partial validation requ
       }
       swipeThreshold={100}
     >
-      <View
-        style={
-          Array [
-            undefined,
-            Object {
-              "backgroundColor": "#FFFFFF",
-              "borderRadius": 8,
-              "elevation": 12,
-              "margin": 8,
-              "padding": 24,
-              "shadowColor": "black",
-              "shadowOffset": Object {
-                "height": 6,
-                "width": 0,
-              },
-              "shadowOpacity": 0.3,
-              "shadowRadius": 9.600000000000001,
-            },
-          ]
-        }
-      >
-        <Text
-          style={
-            Object {
-              "color": "#2E3338",
-              "fontFamily": "Inter-SemiBold",
-              "fontSize": 19,
-              "lineHeight": 26,
-              "paddingBottom": 4,
-              "textAlign": "center",
-            }
-          }
-        >
-          helpModal.header
-        </Text>
-        <Text
-          style={
-            Object {
-              "color": "#2E3338",
-              "fontFamily": "Inter-Regular",
-              "fontSize": 16,
-              "lineHeight": 22,
-              "paddingVertical": 8,
-              "textAlign": "center",
-            }
-          }
-        >
-          helpModal.body1
-        </Text>
+      <SafeAreaView>
         <View
           style={
-            Object {
-              "alignItems": "center",
-              "flexDirection": "row",
-              "justifyContent": "center",
-              "paddingVertical": 8,
-            }
+            Array [
+              Object {
+                "backgroundColor": "#FFFFFF",
+                "elevation": 12,
+                "padding": 16,
+                "shadowColor": "black",
+                "shadowOffset": Object {
+                  "height": 6,
+                  "width": 0,
+                },
+                "shadowOpacity": 0.3,
+                "shadowRadius": 9.600000000000001,
+              },
+              Object {
+                "borderRadius": 8,
+              },
+              Array [
+                Object {
+                  "backgroundColor": "#FFFFFF",
+                  "maxHeight": "100%",
+                  "padding": 24,
+                },
+                undefined,
+              ],
+            ]
           }
         >
+          <Text
+            style={
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Inter-SemiBold",
+                "fontSize": 19,
+                "lineHeight": 26,
+                "paddingBottom": 4,
+                "textAlign": "center",
+              }
+            }
+          >
+            helpModal.header
+          </Text>
+          <Text
+            style={
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Inter-Regular",
+                "fontSize": 16,
+                "lineHeight": 22,
+                "paddingVertical": 8,
+                "textAlign": "center",
+              }
+            }
+          >
+            helpModal.body1
+          </Text>
           <View
             style={
               Object {
-                "paddingHorizontal": 8,
+                "alignItems": "center",
+                "flexDirection": "row",
+                "justifyContent": "center",
+                "paddingVertical": 8,
+              }
+            }
+          >
+            <View
+              style={
+                Object {
+                  "paddingHorizontal": 8,
+                }
+              }
+            >
+              <View
+                style={
+                  Array [
+                    Object {
+                      "alignItems": "center",
+                      "backgroundColor": "#FFFFFF",
+                      "borderRadius": 4,
+                      "elevation": 12,
+                      "justifyContent": "center",
+                      "shadowColor": "black",
+                      "shadowOffset": Object {
+                        "height": 6,
+                        "width": 0,
+                      },
+                      "shadowOpacity": 0.3,
+                      "shadowRadius": 9.600000000000001,
+                    },
+                    Object {
+                      "height": 30,
+                      "width": 30,
+                    },
+                  ]
+                }
+              >
+                <svg
+                  fill="none"
+                  height="52.5"
+                  style={Object {}}
+                  viewBox="0 0 64 64"
+                  width="52.5"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <g
+                    filter="url(#filter0_d)"
+                    style={Object {}}
+                  >
+                    <line
+                      stroke="#2E3338"
+                      strokeLinecap="round"
+                      strokeWidth="2.5"
+                      style={Object {}}
+                      x1="23.5"
+                      x2="41"
+                      y1="26.5"
+                      y2="26.5"
+                    />
+                    <line
+                      stroke="#2E3338"
+                      strokeLinecap="round"
+                      strokeWidth="2.5"
+                      style={Object {}}
+                      x1="23.5"
+                      x2="41"
+                      y1="32.75"
+                      y2="32.75"
+                    />
+                    <line
+                      stroke="#2E3338"
+                      strokeLinecap="round"
+                      strokeWidth="2.5"
+                      style={Object {}}
+                      x1="23.5"
+                      x2="41"
+                      y1="39"
+                      y2="39"
+                    />
+                  </g>
+                </svg>
+              </View>
+            </View>
+            <Text
+              style={
+                Object {
+                  "color": "#9CA4A9",
+                  "fontFamily": "Inter-Regular",
+                  "fontSize": 14,
+                  "lineHeight": 18,
+                  "paddingHorizontal": 8,
+                }
+              }
+            >
+              Menu
+            </Text>
+          </View>
+          <Text
+            style={
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Inter-Regular",
+                "fontSize": 16,
+                "lineHeight": 22,
+                "paddingVertical": 8,
+                "textAlign": "center",
+              }
+            }
+          >
+            helpModal.body2
+          </Text>
+          <View
+            style={
+              Object {
+                "alignItems": "center",
+                "flexDirection": "column",
+                "justifyContent": "center",
               }
             }
           >
@@ -1176,11 +1289,9 @@ exports[`ValidateRecipientAccount renders correctly when partial validation requ
               style={
                 Array [
                   Object {
-                    "alignItems": "center",
                     "backgroundColor": "#FFFFFF",
-                    "borderRadius": 4,
                     "elevation": 12,
-                    "justifyContent": "center",
+                    "padding": 16,
                     "shadowColor": "black",
                     "shadowOffset": Object {
                       "height": 6,
@@ -1190,221 +1301,104 @@ exports[`ValidateRecipientAccount renders correctly when partial validation requ
                     "shadowRadius": 9.600000000000001,
                   },
                   Object {
-                    "height": 30,
-                    "width": 30,
+                    "borderRadius": 8,
+                  },
+                  Object {
+                    "paddingHorizontal": 32,
                   },
                 ]
               }
             >
-              <svg
-                fill="none"
-                height="52.5"
-                style={Object {}}
-                viewBox="0 0 64 64"
-                width="52.5"
-                xmlns="http://www.w3.org/2000/svg"
+              <Text
+                style={
+                  Object {
+                    "color": "#9CA4A9",
+                    "fontFamily": "Inter-Regular",
+                    "fontSize": 14,
+                    "lineHeight": 18,
+                  }
+                }
               >
-                <g
-                  filter="url(#filter0_d)"
-                  style={Object {}}
-                >
-                  <line
-                    stroke="#2E3338"
-                    strokeLinecap="round"
-                    strokeWidth="2.5"
-                    style={Object {}}
-                    x1="23.5"
-                    x2="41"
-                    y1="26.5"
-                    y2="26.5"
-                  />
-                  <line
-                    stroke="#2E3338"
-                    strokeLinecap="round"
-                    strokeWidth="2.5"
-                    style={Object {}}
-                    x1="23.5"
-                    x2="41"
-                    y1="32.75"
-                    y2="32.75"
-                  />
-                  <line
-                    stroke="#2E3338"
-                    strokeLinecap="round"
-                    strokeWidth="2.5"
-                    style={Object {}}
-                    x1="23.5"
-                    x2="41"
-                    y1="39"
-                    y2="39"
-                  />
-                </g>
-              </svg>
+                0x f1b1 d5a6 e772 8g30 9c4a
+              </Text>
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#9CA4A9",
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                    },
+                    Object {
+                      "paddingTop": 4,
+                      "textAlign": "right",
+                    },
+                  ]
+                }
+              >
+                025k 122d 71ad 75a6 1976
+              </Text>
             </View>
-          </View>
-          <Text
-            style={
-              Object {
-                "color": "#9CA4A9",
-                "fontFamily": "Inter-Regular",
-                "fontSize": 14,
-                "lineHeight": 18,
-                "paddingHorizontal": 8,
-              }
-            }
-          >
-            Menu
-          </Text>
-        </View>
-        <Text
-          style={
-            Object {
-              "color": "#2E3338",
-              "fontFamily": "Inter-Regular",
-              "fontSize": 16,
-              "lineHeight": 22,
-              "paddingVertical": 8,
-              "textAlign": "center",
-            }
-          }
-        >
-          helpModal.body2
-        </Text>
-        <View
-          style={
-            Object {
-              "alignItems": "center",
-              "flexDirection": "column",
-              "justifyContent": "center",
-            }
-          }
-        >
-          <View
-            style={
-              Array [
-                Object {
-                  "alignItems": "center",
-                  "backgroundColor": "#FFFFFF",
-                  "borderRadius": 4,
-                  "elevation": 12,
-                  "justifyContent": "center",
-                  "shadowColor": "black",
-                  "shadowOffset": Object {
-                    "height": 6,
-                    "width": 0,
-                  },
-                  "shadowOpacity": 0.3,
-                  "shadowRadius": 9.600000000000001,
-                },
-                Object {
-                  "height": 30,
-                  "width": 30,
-                },
-              ]
-            }
-          >
-            <svg
-              fill="none"
-              height="52.5"
-              style={Object {}}
-              viewBox="0 0 64 64"
-              width="52.5"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <g
-                filter="url(#filter0_d)"
-                style={Object {}}
-              >
-                <line
-                  stroke="#2E3338"
-                  strokeLinecap="round"
-                  strokeWidth="2.5"
-                  style={Object {}}
-                  x1="23.5"
-                  x2="41"
-                  y1="26.5"
-                  y2="26.5"
-                />
-                <line
-                  stroke="#2E3338"
-                  strokeLinecap="round"
-                  strokeWidth="2.5"
-                  style={Object {}}
-                  x1="23.5"
-                  x2="41"
-                  y1="32.75"
-                  y2="32.75"
-                />
-                <line
-                  stroke="#2E3338"
-                  strokeLinecap="round"
-                  strokeWidth="2.5"
-                  style={Object {}}
-                  x1="23.5"
-                  x2="41"
-                  y1="39"
-                  y2="39"
-                />
-              </g>
-            </svg>
-          </View>
-          <Text
-            style={
-              Object {
-                "color": "#9CA4A9",
-                "fontFamily": "Inter-Regular",
-                "fontSize": 14,
-                "lineHeight": 18,
-                "paddingVertical": 8,
-                "textAlign": "center",
-              }
-            }
-          >
-            helpModal.body3
-          </Text>
-        </View>
-        <View
-          style={
-            Object {
-              "alignItems": "center",
-              "flexDirection": "row",
-              "justifyContent": "space-evenly",
-              "paddingVertical": 24,
-            }
-          }
-        >
-          <View
-            accessible={true}
-            focusable={true}
-            nativeBackgroundAndroid={
-              Object {
-                "attribute": "selectableItemBackgroundBorderless",
-                "type": "ThemeAttrAndroid",
-              }
-            }
-            onClick={[Function]}
-            onResponderGrant={[Function]}
-            onResponderMove={[Function]}
-            onResponderRelease={[Function]}
-            onResponderTerminate={[Function]}
-            onResponderTerminationRequest={[Function]}
-            onStartShouldSetResponder={[Function]}
-          >
             <Text
               style={
                 Object {
-                  "color": "#1AB775",
-                  "fontFamily": "Inter-SemiBold",
-                  "fontSize": 16,
-                  "lineHeight": 22,
+                  "color": "#9CA4A9",
+                  "fontFamily": "Inter-Regular",
+                  "fontSize": 14,
+                  "lineHeight": 18,
+                  "paddingTop": 16,
+                  "paddingVertical": 16,
+                  "textAlign": "center",
                 }
               }
             >
-              global:dismiss
+              helpModal.body3
             </Text>
           </View>
+          <View
+            style={
+              Object {
+                "alignItems": "center",
+                "flexDirection": "row",
+                "justifyContent": "space-evenly",
+                "paddingVertical": 24,
+              }
+            }
+          >
+            <View
+              accessible={true}
+              focusable={true}
+              nativeBackgroundAndroid={
+                Object {
+                  "attribute": "selectableItemBackgroundBorderless",
+                  "type": "ThemeAttrAndroid",
+                }
+              }
+              onClick={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+            >
+              <Text
+                style={
+                  Object {
+                    "color": "#1AB775",
+                    "fontFamily": "Inter-SemiBold",
+                    "fontSize": 16,
+                    "lineHeight": 22,
+                  }
+                }
+              >
+                global:dismiss
+              </Text>
+            </View>
+          </View>
         </View>
-      </View>
+      </SafeAreaView>
     </View>
   </Modal>
 </SafeAreaView>
