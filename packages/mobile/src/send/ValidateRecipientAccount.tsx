@@ -21,7 +21,6 @@ import InfoIcon from 'src/icons/InfoIcon.v2'
 import MenuBurgerCard from 'src/icons/MenuBurgerCard'
 import { validateRecipientAddress } from 'src/identity/actions'
 import { AddressValidationType } from 'src/identity/reducer'
-import { headerWithBackButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
@@ -74,10 +73,6 @@ const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
 }
 
 export class ValidateRecipientAccount extends React.Component<Props, State> {
-  static navigationOptions = () => ({
-    ...headerWithBackButton,
-  })
-
   state: State = {
     inputValue: '',
     singleDigitInputValueArr: [],
