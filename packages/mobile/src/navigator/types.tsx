@@ -16,9 +16,7 @@ export type StackParamList = {
   [Screens.BackupComplete]: undefined
   [Screens.BackupIntroduction]: undefined
   [Screens.BackupPhrase]: undefined
-  [Screens.BackupQuiz]: {
-    mnemonic: string
-  }
+  [Screens.BackupQuiz]: undefined
   [Screens.BackupSocial]: undefined
   [Screens.BackupSocialIntro]: {
     incomingFromBackupFlow: boolean
@@ -112,9 +110,14 @@ export type StackParamList = {
   [Screens.RegulatoryTerms]: undefined
   [Screens.Security]: undefined
   [Screens.SelectLocalCurrency]: undefined
-  [Screens.Send]: undefined
+  [Screens.Send]:
+    | {
+        isRequest?: boolean
+      }
+    | undefined
   [Screens.SendAmount]: {
     recipient: Recipient
+    isRequest?: boolean
   }
   [Screens.SendConfirmation]: {
     transactionData: TransactionDataInput

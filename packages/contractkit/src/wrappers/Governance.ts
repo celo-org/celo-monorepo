@@ -1,4 +1,10 @@
-import { ensureLeading0x, NULL_ADDRESS, trimLeading0x } from '@celo/utils/lib/address'
+import {
+  bufferToHex,
+  ensureLeading0x,
+  hexToBuffer,
+  NULL_ADDRESS,
+  trimLeading0x,
+} from '@celo/utils/lib/address'
 import { concurrentMap } from '@celo/utils/lib/async'
 import { zip } from '@celo/utils/lib/collections'
 import { fromFixed } from '@celo/utils/lib/fixidity'
@@ -8,14 +14,12 @@ import { Address } from '../base'
 import { Governance } from '../generated/Governance'
 import {
   BaseWrapper,
-  bufferToBytes,
-  bufferToString,
-  bytesToString,
+  bufferToSolidityBytes,
   identity,
   proxyCall,
   proxySend,
+  solidityBytesToString,
   stringIdentity,
-  stringToBuffer,
   toTransactionObject,
   tupleParser,
   valueToBigNumber,
@@ -67,11 +71,11 @@ export type ProposalTransaction = Pick<Transaction, 'to' | 'input' | 'value'>
 export type Proposal = ProposalTransaction[]
 
 export const proposalToParams = (proposal: Proposal, descriptionURL: string): ProposalParams => {
-  const data = proposal.map((tx) => stringToBuffer(tx.input))
+  const data = proposal.map((tx) => hexToBuffer(tx.input))
   return [
     proposal.map((tx) => tx.value),
     proposal.map((tx) => tx.to!),
-    bufferToBytes(Buffer.concat(data)),
+    bufferToSolidityBytes(Buffer.concat(data)),
     data.map((inp) => inp.length),
     descriptionURL,
   ]
@@ -107,7 +111,7 @@ export interface Votes {
 export type HotfixParams = Parameters<Governance['methods']['executeHotfix']>
 export const hotfixToParams = (proposal: Proposal, salt: Buffer): HotfixParams => {
   const p = proposalToParams(proposal, '') // no description URL for hotfixes
-  return [p[0], p[1], p[2], p[3], bufferToString(salt)]
+  return [p[0], p[1], p[2], p[3], bufferToHex(salt)]
 }
 
 export interface HotfixRecord {
@@ -274,7 +278,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     (res) => ({
       value: res[0],
       to: res[1],
-      input: bytesToString(res[2]),
+      input: solidityBytesToString(res[2]),
     })
   )
 
@@ -689,7 +693,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
    * @param hash keccak256 hash of hotfix's associated abi encoded transactions
    */
   async getHotfixRecord(hash: Buffer): Promise<HotfixRecord> {
-    const res = await this.contract.methods.getHotfixRecord(bufferToString(hash)).call()
+    const res = await this.contract.methods.getHotfixRecord(bufferToHex(hash)).call()
     return {
       approved: res[0],
       executed: res[1],
@@ -704,14 +708,14 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
    */
   isHotfixWhitelistedBy = proxyCall(
     this.contract.methods.isHotfixWhitelistedBy,
-    tupleParser(bufferToString, (s: Address) => identity<Address>(s))
+    tupleParser(bufferToHex, (s: Address) => identity<Address>(s))
   )
 
   /**
    * Returns whether a given hotfix can be passed.
    * @param hash keccak256 hash of hotfix's associated abi encoded transactions
    */
-  isHotfixPassing = proxyCall(this.contract.methods.isHotfixPassing, tupleParser(bufferToString))
+  isHotfixPassing = proxyCall(this.contract.methods.isHotfixPassing, tupleParser(bufferToHex))
 
   /**
    * Returns the number of validators required to reach a Byzantine quorum
@@ -728,7 +732,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
    */
   hotfixWhitelistValidatorTally = proxyCall(
     this.contract.methods.hotfixWhitelistValidatorTally,
-    tupleParser(bufferToString)
+    tupleParser(bufferToHex)
   )
 
   /**
@@ -738,7 +742,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   whitelistHotfix = proxySend(
     this.kit,
     this.contract.methods.whitelistHotfix,
-    tupleParser(bufferToString)
+    tupleParser(bufferToHex)
   )
 
   /**
@@ -746,21 +750,13 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
    * @param hash keccak256 hash of hotfix's associated abi encoded transactions
    * @notice Only the `approver` address will succeed in sending this transaction
    */
-  approveHotfix = proxySend(
-    this.kit,
-    this.contract.methods.approveHotfix,
-    tupleParser(bufferToString)
-  )
+  approveHotfix = proxySend(this.kit, this.contract.methods.approveHotfix, tupleParser(bufferToHex))
 
   /**
    * Marks the given hotfix prepared for current epoch if quorum of validators have whitelisted it.
    * @param hash keccak256 hash of hotfix's associated abi encoded transactions
    */
-  prepareHotfix = proxySend(
-    this.kit,
-    this.contract.methods.prepareHotfix,
-    tupleParser(bufferToString)
-  )
+  prepareHotfix = proxySend(this.kit, this.contract.methods.prepareHotfix, tupleParser(bufferToHex))
 
   /**
    * Executes a given sequence of transactions if the corresponding hash is prepared and approved.

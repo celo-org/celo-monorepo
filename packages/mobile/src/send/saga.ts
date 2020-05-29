@@ -7,9 +7,8 @@ import { CustomEventNames } from 'src/analytics/constants'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { calculateFee } from 'src/fees/saga'
 import { completePaymentRequest } from 'src/firebase/actions'
-import { features } from 'src/flags'
 import { transferGoldToken } from 'src/goldToken/actions'
-import { encryptComment } from 'src/identity/commentKey'
+import { encryptComment } from 'src/identity/commentEncryption'
 import { addressToE164NumberSelector, e164NumberToAddressSelector } from 'src/identity/reducer'
 import { InviteBy } from 'src/invite/actions'
 import { sendInvite } from 'src/invite/saga'
@@ -140,7 +139,7 @@ function* sendPayment(
 
 function* sendPaymentOrInviteSaga({
   amount,
-  reason,
+  comment,
   recipient,
   recipientAddress,
   inviteMethod,
@@ -154,13 +153,16 @@ function* sendPaymentOrInviteSaga({
       throw new Error("Can't send to recipient without valid e164 number or address")
     }
 
-    const ownAddress = yield select(currentAccountSelector)
-    const comment = features.USE_COMMENT_ENCRYPTION
-      ? yield call(encryptComment, reason, recipientAddress, ownAddress)
-      : reason
-
+    const ownAddress: string = yield select(currentAccountSelector)
     if (recipientAddress) {
-      yield call(sendPayment, recipientAddress, amount, comment, CURRENCY_ENUM.DOLLAR)
+      const encryptedComment = yield call(
+        encryptComment,
+        comment,
+        recipientAddress,
+        ownAddress,
+        true
+      )
+      yield call(sendPayment, recipientAddress, amount, encryptedComment, CURRENCY_ENUM.DOLLAR)
       CeloAnalytics.track(CustomEventNames.send_dollar_transaction)
     } else if (recipient.e164PhoneNumber) {
       yield call(

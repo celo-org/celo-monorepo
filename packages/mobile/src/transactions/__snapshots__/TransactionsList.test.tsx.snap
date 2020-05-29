@@ -388,7 +388,7 @@ exports[`ignores failed standby transactions 1`] = `
 </RCTScrollView>
 `;
 
-exports[`ignores pending standby transactions that are completed in the response and removes them 1`] = `
+exports[`ignores pending standby transactions that are completed in the response 1`] = `
 <RCTScrollView
   data={
     Array [

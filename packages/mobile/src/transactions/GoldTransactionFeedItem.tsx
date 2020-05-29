@@ -11,7 +11,7 @@ import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces } from 'src/i18n'
 import { navigateToExchangeReview } from 'src/transactions/actions'
-import { TransactionStatus } from 'src/transactions/reducer'
+import { TransactionStatus } from 'src/transactions/types'
 import { getDatetimeDisplayString } from 'src/utils/time'
 
 type Props = ExchangeItemFragment & {

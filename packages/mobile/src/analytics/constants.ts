@@ -113,6 +113,7 @@ export enum CustomEventNames {
   backup_setup_toggle_enable = 'backup_setup_toggle_enable', // (count # of slides to agree on "I wrote down account key" Switch in Backup_Phrase)
   backup_setup_toggle_disable = 'backup_setup_toggle_disable', // (count # of slides to disagree on "I wrote down account key" Switch in Backup_Phrase)
   social_backup_continue = 'social_backup_continue', // (Count # of taps on "Backup with Friends" in Backup_Phrase)
+  backup_error = 'backup_error',
 
   // Screen name: Backup_Quiz, Question_Incorrect, Backup_Confirmed
   question_select = 'question_select', // (track # of input selections on Backup_Verify screen)
