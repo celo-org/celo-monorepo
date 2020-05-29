@@ -51,6 +51,7 @@ spec:
             - --prometheus.wal-directory=/prometheus/wal
             - --stackdriver.kubernetes.location={{ .Values.gcloud.region }}
             - --stackdriver.kubernetes.cluster-name={{ .Values.cluster }}
+            - --stackdriver.metrics-prefix={{ .Values.stackdriver_metrics_prefix }}
 {{ if .Values.includeFilter }}
 {{ indent 12 (printf "- --include=%s" .Values.includeFilter) }}
 {{ end }}
@@ -60,20 +61,22 @@ spec:
           volumeMounts:
             - name: prometheus-storage-volume
               mountPath: /prometheus
+{{- if not (kindIs "invalid" .Values.gcloudServiceAccountKeyBase64) }}
             - name: prometheus-service-account-key
               mountPath: /var/secrets/google
           env:
           - name: GOOGLE_APPLICATION_CREDENTIALS
             value: /var/secrets/google/prometheus-service-account.json
+{{- end }}
       volumes:
         - name: prometheus-config-volume
           configMap:
             defaultMode: 420
             name: prometheus-server-conf
-
         - name: prometheus-storage-volume
           emptyDir: {}
-
+{{- if not (kindIs "invalid" .Values.gcloudServiceAccountKeyBase64) }}
         - name: prometheus-service-account-key
           secret:
             secretName: prometheus-service-account-key
+{{- end }}
