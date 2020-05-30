@@ -872,47 +872,49 @@ jobs:
           echo $GCLOUD_SERVICE_KEY > $GOOGLE_APPLICATION_CREDENTIALS
     - attach_workspace:
         at: ~/app
-    # - run:
-    #     name: Rebuild celotool project
-    #     no_output_timeout: 20m
-    #     command: |
-    #       set -e
-    #       yarn
-    #       yarn build
     - run:
-        name: Configure k8s cluster for the fullnode
+        name: Building monorepo
+        no_output_timeout: 20m
+        command: |
+          set -e
+          yarn
+          yarn build
+          rm .env.mnemonic .env.mnemonic.${NETWORK}
+          touch .env.mnemonic .env.mnemonic.${NETWORK}
+    - run:
+        name: Configuring k8s cluster for the fullnode
         command: |
           set -e
           gcloud container clusters --quiet --project=${GOOGLE_PROJECT_ID} --region ${GOOGLE_COMPUTE_ZONE} get-credentials ${K8S_CLUSTER}
     - run:
-        name: Install helm 2
+        name: Installing helm 2
         command: |
           curl https://raw.githubusercontent.com/helm/helm/master/scripts/get | bash
           helm init --client-only
           helm dep build packages/helm-charts/celo-fullnode
     - run:
-        name: Configure Kubernetes namespace
+        name: Configuring Kubernetes namespace
         command: |
           set -e
           NAMESPACE="circle-${CIRCLE_BUILD_NUM}"
           echo "Namespace: ${NAMESPACE}"
           kubectl create namespace ${NAMESPACE}
     - run:
-        name: Deploy lightest mode client connected to rc1
+        name: Deploying lightest mode client connected to rc1
         command: |
           set -e
           cd packages/celotool
           NAMESPACE="circle-${CIRCLE_BUILD_NUM}"
           SYNC_MODE="lightest"
-          # bin/celotooljs.sh deploy initial gke-fullnode -e rc1 --syncmode lightest --namespace ${NAMESPACE}
-          if [ -f ../../.env.${NETWORK} ]; then
-            source ../../.env.${NETWORK}
-          else
-            source ../../.env
-          fi
-          helm install ../helm-charts/celo-fullnode --name "${NETWORK}-${NAMESPACE}-${SYNC_MODE}-node" --namespace ${NAMESPACE} --set genesis.network="${NETWORK}" --set genesis.networkId="${NETWORK_ID}" --set geth.gcmode="full" --set geth.image.repository="${GETH_NODE_DOCKER_IMAGE_REPOSITORY}" --set geth.image.tag="master" --set geth.syncmode="${SYNC_MODE}" --set geth.use_static_ips="false" --set namespace="${NAMESPACE}" --set replicaCount="1" --set storage.size="10Gi" --set storage.storageClass="standard"
+          bin/celotooljs.sh deploy initial gke-fullnode -e rc1 --syncmode lightest --namespace ${NAMESPACE}
+          # if [ -f ../../.env.${NETWORK} ]; then
+          #   source ../../.env.${NETWORK}
+          # else
+          #   source ../../.env
+          # fi
+          # helm install ../helm-charts/celo-fullnode --name "${NETWORK}-${NAMESPACE}-${SYNC_MODE}-node" --namespace ${NAMESPACE} --set genesis.network="${NETWORK}" --set genesis.networkId="${NETWORK_ID}" --set geth.gcmode="full" --set geth.image.repository="${GETH_NODE_DOCKER_IMAGE_REPOSITORY}" --set geth.image.tag="master" --set geth.syncmode="${SYNC_MODE}" --set geth.use_static_ips="false" --set namespace="${NAMESPACE}" --set replicaCount="1" --set storage.size="10Gi" --set storage.storageClass="standard"
     - run:
-        name: Test lightest mode client connected to rc1
+        name: Testing lightest mode client connected to rc1
         command: |
           set -e
           cd packages/celotool
@@ -927,22 +929,22 @@ jobs:
             echo 'export LIGHTEST=FAIL' >> $BASH_ENV
           fi
     - run:
-        name: Deploy full mode client connected to rc1
+        name: Deploying full mode client connected to rc1
         command: |
           set -e
           cd packages/celotool
           NAMESPACE="circle-${CIRCLE_BUILD_NUM}"
           SYNC_MODE="full"
-          # bin/celotooljs.sh deploy initial gke-fullnode -e rc1 --syncmode full --namespace ${NAMESPACE}
-          if [ -f ../../.env.${NETWORK} ]; then
-            source ../../.env.${NETWORK}
-          else
-            source ../../.env
-          fi
-          helm install ../helm-charts/celo-fullnode --name "${NETWORK}-${NAMESPACE}-${SYNC_MODE}-node" --namespace ${NAMESPACE} --set genesis.network="${NETWORK}" --set genesis.networkId="${NETWORK_ID}" --set geth.gcmode="full" --set geth.image.repository="${GETH_NODE_DOCKER_IMAGE_REPOSITORY}" --set geth.image.tag="master" --set geth.syncmode="${SYNC_MODE}" --set geth.use_static_ips="false" --set namespace="${NAMESPACE}" --set replicaCount="1" --set storage.size="10Gi" --set storage.storageClass="standard"
+          bin/celotooljs.sh deploy initial gke-fullnode -e rc1 --syncmode full --namespace ${NAMESPACE}
+          # if [ -f ../../.env.${NETWORK} ]; then
+          #   source ../../.env.${NETWORK}
+          # else
+          #   source ../../.env
+          # fi
+          # helm install ../helm-charts/celo-fullnode --name "${NETWORK}-${NAMESPACE}-${SYNC_MODE}-node" --namespace ${NAMESPACE} --set genesis.network="${NETWORK}" --set genesis.networkId="${NETWORK_ID}" --set geth.gcmode="full" --set geth.image.repository="${GETH_NODE_DOCKER_IMAGE_REPOSITORY}" --set geth.image.tag="master" --set geth.syncmode="${SYNC_MODE}" --set geth.use_static_ips="false" --set namespace="${NAMESPACE}" --set replicaCount="1" --set storage.size="10Gi" --set storage.storageClass="standard"
 
     - run:
-        name: Test full mode client connected to rc1
+        name: Testing full mode client connected to rc1
         command: |
           set -e
           cd packages/celotool
@@ -957,22 +959,22 @@ jobs:
             echo 'export FULL=FAIL' >> $BASH_ENV
           fi
     - run:
-        name: Deploy fast mode client connected to rc1
+        name: Deploying fast mode client connected to rc1
         command: |
           set -e
           cd packages/celotool
           NAMESPACE="circle-${CIRCLE_BUILD_NUM}"
           SYNC_MODE="fast"
-          # bin/celotooljs.sh deploy initial gke-fullnode -e rc1 --syncmode fast --namespace ${NAMESPACE}
-          if [ -f ../../.env.${NETWORK} ]; then
-            source ../../.env.${NETWORK}
-          else
-            source ../../.env
-          fi
-          helm install ../helm-charts/celo-fullnode --name "${NETWORK}-${NAMESPACE}-${SYNC_MODE}-node" --namespace ${NAMESPACE} --set genesis.network="${NETWORK}" --set genesis.networkId="${NETWORK_ID}" --set geth.gcmode="full" --set geth.image.repository="${GETH_NODE_DOCKER_IMAGE_REPOSITORY}" --set geth.image.tag="master" --set geth.syncmode="${SYNC_MODE}" --set geth.use_static_ips="false" --set namespace="${NAMESPACE}" --set replicaCount="1" --set storage.size="10Gi" --set storage.storageClass="standard"
+          bin/celotooljs.sh deploy initial gke-fullnode -e rc1 --syncmode fast --namespace ${NAMESPACE}
+          # if [ -f ../../.env.${NETWORK} ]; then
+          #   source ../../.env.${NETWORK}
+          # else
+          #   source ../../.env
+          # fi
+          # helm install ../helm-charts/celo-fullnode --name "${NETWORK}-${NAMESPACE}-${SYNC_MODE}-node" --namespace ${NAMESPACE} --set genesis.network="${NETWORK}" --set genesis.networkId="${NETWORK_ID}" --set geth.gcmode="full" --set geth.image.repository="${GETH_NODE_DOCKER_IMAGE_REPOSITORY}" --set geth.image.tag="master" --set geth.syncmode="${SYNC_MODE}" --set geth.use_static_ips="false" --set namespace="${NAMESPACE}" --set replicaCount="1" --set storage.size="10Gi" --set storage.storageClass="standard"
 
     - run:
-        name: Test fast mode client connected to rc1
+        name: Testing fast mode client connected to rc1
         command: |
           set -e
           cd packages/celotool
@@ -987,7 +989,7 @@ jobs:
             echo 'export FAST=FAIL' >> $BASH_ENV
           fi
     - run:
-        name: Fail job if some mode failed
+        name: Failing job if some mode failed
         command: |
           set -e
           declare -a FAILED_MODES
@@ -995,7 +997,6 @@ jobs:
             FAILED_MODES+=("LIGHTEST")
           fi
           if [ $FULL == "FAIL" ]; then
-            FAILED_MODES="${FAILED_MODES},"
             FAILED_MODES+=("FULL")
           fi
           if [ $FAST == "FAIL" ]; then
@@ -1017,25 +1018,6 @@ jobs:
         failure_message: ':red_circle: Job $CIRCLE_JOB failed: The syncmodes $FAILED_STRING failed to sync on Mainnet'
         success_message: ':tada: Job $CIRCLE_JOB succeeded. All modes could sync successfully on Mainnet'
         #only_for_branches: master
-    # - run:
-    #     name: Deploy network
-    #     no_output_timeout: 25m
-    #     command: |
-    #       cd packages/celotool/bin
-    #       bash integration.sh ${CI_INTEGRATION_ENV}
-    # - run:
-    #     name: Deploy contracts
-    #     command: |
-    #       echo $(pwd)
-    #       cd ~/app/
-    #       source ".env.${CI_INTEGRATION_ENV}"
-    #       packages/celotool/bin/celotooljs.sh deploy initial contracts -e ${CI_INTEGRATION_ENV} --verbose 2>&1
-    # - run:
-    #     name: Deploy celostats
-    #     command: |
-    #       echo $(pwd)
-    #       cd ~/app/
-    #       packages/celotool/bin/celotooljs.sh deploy initial celostats -e ${CI_INTEGRATION_ENV} --verbose 2>&1
 
   phone-number-privacy-test:
     <<: *defaults
@@ -1107,9 +1089,9 @@ workflows:
           requires:
             - lint-checks
             - contractkit-test
-      # - integration-sync-geth-mainnet:
-      #     requires:
-      #       - lint-checks
+      - integration-sync-geth-mainnet:
+          requires:
+            - lint-checks
       - phone-number-privacy-test:
           requires:
             - lint-checks
