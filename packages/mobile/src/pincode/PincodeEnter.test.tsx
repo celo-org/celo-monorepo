@@ -7,24 +7,19 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import { Screens } from 'src/navigator/Screens'
 import PincodeEnter from 'src/pincode/PincodeEnter'
 import { isPinCorrect } from 'src/pincode/utils'
-import { createMockStore } from 'test/utils'
-import { mockNavigation } from 'test/values'
+import { createMockStore, getMockStackScreenProps } from 'test/utils'
 
-const mockRoute = {
-  name: Screens.PincodeEnter as Screens.PincodeEnter,
-  key: '1',
-  params: {
-    withVerification: true,
-    onSuccess: jest.fn(),
-  },
-}
+const mockScreenProps = getMockStackScreenProps(Screens.PincodeEnter, {
+  withVerification: true,
+  onSuccess: jest.fn(),
+})
 
 describe('PincodeEnter', () => {
   it('renders correctly', () => {
     const store = createMockStore()
     const tree = renderer.create(
       <Provider store={store}>
-        <PincodeEnter navigation={mockNavigation} route={mockRoute} />
+        <PincodeEnter {...mockScreenProps} />
       </Provider>
     )
     expect(tree).toMatchSnapshot()
@@ -37,14 +32,14 @@ describe('PincodeEnter', () => {
 
     const { getByTestId } = render(
       <Provider store={store}>
-        <PincodeEnter navigation={mockNavigation} route={mockRoute} />
+        <PincodeEnter {...mockScreenProps} />
       </Provider>
     )
     fireEvent.press(getByTestId('Pincode-Submit'))
 
     jest.useRealTimers()
     setTimeout(() => {
-      expect(mockRoute.params.onSuccess).toBeCalledWith(pin)
+      expect(mockScreenProps.route.params.onSuccess).toBeCalledWith(pin)
       done()
     })
     jest.useFakeTimers()
@@ -56,7 +51,7 @@ describe('PincodeEnter', () => {
 
     const { getByTestId } = render(
       <Provider store={store}>
-        <PincodeEnter navigation={mockNavigation} route={mockRoute} />
+        <PincodeEnter {...mockScreenProps} />
       </Provider>
     )
     fireEvent.press(getByTestId('Pincode-Submit'))

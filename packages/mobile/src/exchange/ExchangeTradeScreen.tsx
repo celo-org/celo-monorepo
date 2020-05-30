@@ -341,7 +341,8 @@ const styles = StyleSheet.create({
     ...fontStyles.small,
   },
   switchToText: {
-    ...fontStyles.label,
+    ...fontStyles.small,
+    fontSize: 13,
     textDecorationLine: 'underline',
     color: colors.gray4,
     marginTop: 4,
