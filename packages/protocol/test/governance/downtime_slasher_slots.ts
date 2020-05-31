@@ -38,7 +38,6 @@ contract('DowntimeSlasherSlots', (accounts: string[]) => {
   const validatorList = [accounts[2], accounts[3], accounts[4]]
   const groups = [accounts[0], accounts[1]]
 
-  const blocksToWaitForTesting = 350
   const slashingPenalty = 10000
   const slashingReward = 100
   const slashableDowntime = 12
@@ -70,13 +69,13 @@ contract('DowntimeSlasherSlots', (accounts: string[]) => {
     const actualSlashableDowntime = (await slasher.slashableDowntime()).toNumber()
     const epochStart = (await slasher.getEpochNumberOfBlock(startBlock)).toNumber()
     // Epoch 1 starts in the block 1
-    const blockEpochChange = epochStart * epochBlockSize
+    const blockEpochChange = epochStart * epochBlockSize + 1
 
     for (let i = startBlock; i < startBlock + actualSlashableDowntime; i += actualSlotSize) {
       await slasher.isDownForSlot(
         i,
         i < blockEpochChange ? startSignerIndex : endSignerIndex,
-        i + slotSize - 1 < blockEpochChange ? startSignerIndex : endSignerIndex
+        i + actualSlotSize - 1 < blockEpochChange ? startSignerIndex : endSignerIndex
       )
     }
   }
@@ -282,145 +281,165 @@ contract('DowntimeSlasherSlots', (accounts: string[]) => {
   // and the validator of every test, knowing what the other tests will be using.
   // Take this in count for future updates
   describe('#slash()', () => {
+    // It will have to reach this epoch to start the tests
+    // It will put us in a safe zone for testing
     let epoch: number
-    let slotAssign: any
-    const startBlockFromEpoch: number[] = Array(3)
+
     // Signed by validators 0 and 1
     const bitmapVI01 = '0x0000000000000000000000000000000000000000000000000000000000000003'
     // Signed by validator 1
     const bitmapVI1 = '0x0000000000000000000000000000000000000000000000000000000000000002'
     // Signed by validator 0
     const bitmapVI0 = '0x0000000000000000000000000000000000000000000000000000000000000001'
-    const validatorIndexEpoch: number[] = Array(3)
+    const validatorIndexInEpoch: number = 0
     const bitmapWithoutValidator: string[] = [bitmapVI1, bitmapVI0]
-    const blockSpaceBetweenTests: number = 3
 
-    async function makeBlockInfoSlashable(testBlocksInfo: {
-      startBlock: number
-      validatorIndexes: number[]
-    }) {
+    async function makeBlockInfoSlashable(startBlock: number, validatorIndexes: number[]) {
       await presetParentSealForBlocks(
-        testBlocksInfo.startBlock,
+        startBlock,
         slashableDowntime,
-        bitmapWithoutValidator[testBlocksInfo.validatorIndexes[0]],
-        bitmapWithoutValidator[testBlocksInfo.validatorIndexes[1]]
+        bitmapWithoutValidator[validatorIndexes[0]],
+        bitmapWithoutValidator[validatorIndexes[1]]
       )
       // Sign the outer limits to be 100% secure that the slots are ok
-      await presetParentSealForBlocks(testBlocksInfo.startBlock - 1, 1, bitmapVI01, bitmapVI01)
-      await presetParentSealForBlocks(
-        testBlocksInfo.startBlock + slashableDowntime,
-        1,
-        bitmapVI01,
-        bitmapVI01
-      )
-      await calculateEverySlot(
-        testBlocksInfo.startBlock,
-        testBlocksInfo.validatorIndexes[0],
-        testBlocksInfo.validatorIndexes[1]
-      )
+      await presetParentSealForBlocks(startBlock - 1, 1, bitmapVI01, bitmapVI01)
+      await presetParentSealForBlocks(startBlock + slashableDowntime, 1, bitmapVI01, bitmapVI01)
+      await calculateEverySlot(startBlock, validatorIndexes[0], validatorIndexes[1])
     }
 
+    // This before will put us in a safe zone for testing
+    // before(async () => {
+    //   epoch = 3
+    //   const blockToBeStableForTesting = epochBlockSize * 2 + slashableDowntime * 3
+    //   let blockNumber: number = 0
+    //   do {
+    //     blockNumber = await web3.eth.getBlockNumber()
+    //     await jsonRpc(web3, 'evm_mine', [])
+    //   } while (blockNumber < blockToBeStableForTesting)
+
+    //   epoch = (await slasher.getEpochNumberOfBlock(blockNumber)).toNumber()
+    // startBlockFromEpoch[2] = epoch * epochBlockSize + 1
+    // startBlockFromEpoch[1] = (epoch - 1) * epochBlockSize + 1
+    // startBlockFromEpoch[0] = (epoch - 2) * epochBlockSize + 1
+
+    // validatorIndexEpoch[2] = 0
+    // validatorIndexEpoch[1] = 0
+    // validatorIndexEpoch[0] = 1
+
+    // // SEE IMPORTANT INFO at the beginning of the #slash test group
+    // slotAssign = {
+    //   inEpoch: {
+    //     firstBlockSigned: {
+    //       startBlock: startBlockFromEpoch[2] + (blockSpaceBetweenTests + slashableDowntime),
+    //       validatorIndexes: [validatorIndexEpoch[2], validatorIndexEpoch[2]],
+    //     },
+    //     lastBlockSigned: {
+    //       startBlock: startBlockFromEpoch[2] + (blockSpaceBetweenTests + slashableDowntime) * 2,
+    //       validatorIndexes: [validatorIndexEpoch[2], validatorIndexEpoch[2]],
+    //     },
+    //     middleBlockSigned: {
+    //       startBlock: startBlockFromEpoch[2] + (blockSpaceBetweenTests + slashableDowntime) * 3,
+    //       validatorIndexes: [validatorIndexEpoch[2], validatorIndexEpoch[2]],
+    //     },
+    //     succeds: {
+    //       emit: {
+    //         startBlock: startBlockFromEpoch[2] + (blockSpaceBetweenTests + slashableDowntime) * 5,
+    //         validatorIndexes: [validatorIndexEpoch[2], validatorIndexEpoch[2]],
+    //       },
+    //       decrementsGold: {
+    //         startBlock: startBlockFromEpoch[2] + (blockSpaceBetweenTests + slashableDowntime) * 6,
+    //         validatorIndexes: [validatorIndexEpoch[2], validatorIndexEpoch[2]],
+    //       },
+    //       slashedGroup: {
+    //         startBlock: startBlockFromEpoch[2] + (blockSpaceBetweenTests + slashableDowntime) * 7,
+    //         validatorIndexes: [validatorIndexEpoch[2], validatorIndexEpoch[2]],
+    //       },
+    //       // gives two slashableDowntime spaces
+    //       slashedTwiceOncePerEpoch: {
+    //         startBlock: startBlockFromEpoch[1] + (blockSpaceBetweenTests + slashableDowntime),
+    //         validatorIndexes: [validatorIndexEpoch[1], validatorIndexEpoch[1]],
+    //       },
+    //       slashedTwiceMultiplePerEpoch: {
+    //         startBlock: startBlockFromEpoch[1] + (blockSpaceBetweenTests + slashableDowntime) * 3,
+    //         validatorIndexes: [validatorIndexEpoch[1], validatorIndexEpoch[1]],
+    //       },
+    //       slashedTwiceShareBlocks: {
+    //         startBlock: startBlockFromEpoch[1] + (blockSpaceBetweenTests + slashableDowntime) * 5,
+    //         validatorIndexes: [validatorIndexEpoch[1], validatorIndexEpoch[1]],
+    //       },
+    //     },
+    //   },
+    //   crossEpoch: {
+    //     indexChange: {
+    //       lastBlockSigned: {
+    //         startBlock: startBlockFromEpoch[1] - slotSize,
+    //         validatorIndexes: [validatorIndexEpoch[0], validatorIndexEpoch[1]],
+    //       },
+    //       succeds: {
+    //         // as the slot don't start in the same blocks, the new slots will have to be calculated
+    //         startBlock: startBlockFromEpoch[1] - slotSize - 1,
+    //         validatorIndexes: [validatorIndexEpoch[0], validatorIndexEpoch[1]],
+    //       },
+    //     },
+    //     sameIndex: {
+    //       succeds: {
+    //         startBlock: startBlockFromEpoch[2] - slotSize,
+    //         validatorIndexes: [validatorIndexEpoch[1], validatorIndexEpoch[2]],
+    //       },
+    //       fails: {
+    //         startBlock: startBlockFromEpoch[2] - slotSize - 1,
+    //         validatorIndexes: [validatorIndexEpoch[1], validatorIndexEpoch[2]],
+    //       },
+    //     },
+    //   },
+    // }
+    // })
+
     before(async () => {
+      const actualEpoch = (
+        await slasher.getEpochNumberOfBlock(await web3.eth.getBlockNumber())
+      ).toNumber()
+      // epoch 3 it will have "safe" blocks to test
+      epoch = actualEpoch > 3 ? actualEpoch : 3
+    })
+    // this beforeEach at the beginnig will wait until a new epoch is reached
+    // this way the blocks between the middle of epoch-1 and the middle of epoch
+    // will never collide (middle to middle because a lot of tests need the epoch change)
+    beforeEach(async () => {
       let blockNumber: number = 0
+      // epoch - 1 => to be in the epoch
+      const blockStableBetweenTests = (epoch - 1) * epochBlockSize
       do {
         blockNumber = await web3.eth.getBlockNumber()
         await jsonRpc(web3, 'evm_mine', [])
-      } while (blockNumber < blocksToWaitForTesting)
-      // This common variables initialization, will allow us to use the same epoch,
-      // and avoid a epoch change in the middle that could lead us to flaky tests
-      const safeStartSlashableBlock = blockNumber - slashableDowntime - 1
-      epoch = (await slasher.getEpochNumberOfBlock(safeStartSlashableBlock)).toNumber() - 1
-      startBlockFromEpoch[2] = epoch * epochBlockSize + 1
-      startBlockFromEpoch[1] = (epoch - 1) * epochBlockSize + 1
-      startBlockFromEpoch[0] = (epoch - 2) * epochBlockSize + 1
-
-      validatorIndexEpoch[2] = 0
-      validatorIndexEpoch[1] = 0
-      validatorIndexEpoch[0] = 1
-
-      // SEE IMPORTANT INFO at the beginning of the #slash test group
-      slotAssign = {
-        inEpoch: {
-          firstBlockSigned: {
-            startBlock: startBlockFromEpoch[2] + (blockSpaceBetweenTests + slashableDowntime),
-            validatorIndexes: [validatorIndexEpoch[2], validatorIndexEpoch[2]],
-          },
-          lastBlockSigned: {
-            startBlock: startBlockFromEpoch[2] + (blockSpaceBetweenTests + slashableDowntime) * 2,
-            validatorIndexes: [validatorIndexEpoch[2], validatorIndexEpoch[2]],
-          },
-          middleBlockSigned: {
-            startBlock: startBlockFromEpoch[2] + (blockSpaceBetweenTests + slashableDowntime) * 3,
-            validatorIndexes: [validatorIndexEpoch[2], validatorIndexEpoch[2]],
-          },
-          succeds: {
-            emit: {
-              startBlock: startBlockFromEpoch[2] + (blockSpaceBetweenTests + slashableDowntime) * 5,
-              validatorIndexes: [validatorIndexEpoch[2], validatorIndexEpoch[2]],
-            },
-            decrementsGold: {
-              startBlock: startBlockFromEpoch[2] + (blockSpaceBetweenTests + slashableDowntime) * 6,
-              validatorIndexes: [validatorIndexEpoch[2], validatorIndexEpoch[2]],
-            },
-            slashedGroup: {
-              startBlock: startBlockFromEpoch[2] + (blockSpaceBetweenTests + slashableDowntime) * 7,
-              validatorIndexes: [validatorIndexEpoch[2], validatorIndexEpoch[2]],
-            },
-            // gives two slashableDowntime spaces
-            slashedTwiceOncePerEpoch: {
-              startBlock: startBlockFromEpoch[1] + (blockSpaceBetweenTests + slashableDowntime),
-              validatorIndexes: [validatorIndexEpoch[1], validatorIndexEpoch[1]],
-            },
-            slashedTwiceMultiplePerEpoch: {
-              startBlock: startBlockFromEpoch[1] + (blockSpaceBetweenTests + slashableDowntime) * 3,
-              validatorIndexes: [validatorIndexEpoch[1], validatorIndexEpoch[1]],
-            },
-            slashedTwiceShareBlocks: {
-              startBlock: startBlockFromEpoch[1] + (blockSpaceBetweenTests + slashableDowntime) * 5,
-              validatorIndexes: [validatorIndexEpoch[1], validatorIndexEpoch[1]],
-            },
-          },
-        },
-        crossEpoch: {
-          indexChange: {
-            lastBlockSigned: {
-              startBlock: startBlockFromEpoch[1] - slotSize,
-              validatorIndexes: [validatorIndexEpoch[0], validatorIndexEpoch[1]],
-            },
-            succeds: {
-              // as the slot don't start in the same blocks, the new slots will have to be calculated
-              startBlock: startBlockFromEpoch[1] - slotSize - 1,
-              validatorIndexes: [validatorIndexEpoch[0], validatorIndexEpoch[1]],
-            },
-          },
-          sameIndex: {
-            succeds: {
-              startBlock: startBlockFromEpoch[2] - slotSize,
-              validatorIndexes: [validatorIndexEpoch[1], validatorIndexEpoch[2]],
-            },
-            fails: {
-              startBlock: startBlockFromEpoch[2] - slotSize - 1,
-              validatorIndexes: [validatorIndexEpoch[1], validatorIndexEpoch[2]],
-            },
-          },
-        },
-      }
+      } while (
+        blockNumber < blockStableBetweenTests ||
+        // blockNumber % epochBlockSize <= epochBlockSize * 0.5 => middle of the epoch
+        blockNumber % epochBlockSize <= epochBlockSize * 0.5
+      )
+      await slasher.setEpochSigner(epoch, validatorIndexInEpoch, validatorList[0])
+      await slasher.setNumberValidators(2)
     })
 
-    beforeEach(async () => {
-      await slasher.setEpochSigner(epoch, validatorIndexEpoch[2], validatorList[0])
-      await slasher.setEpochSigner(epoch - 1, validatorIndexEpoch[1], validatorList[0])
-      await slasher.setEpochSigner(epoch - 2, validatorIndexEpoch[0], validatorList[0])
-      await slasher.setNumberValidators(2)
+    afterEach(async () => {
+      const newEpoch = (
+        await slasher.getEpochNumberOfBlock(await web3.eth.getBlockNumber())
+      ).toNumber()
+      // this "recovers" a gap of more that 1 epoch, and avoids waiting more than an epoch
+      if (newEpoch === epoch) {
+        epoch += 1
+      } else {
+        epoch = newEpoch
+      }
     })
 
     it("fails if the slash window didn't finished yet", async () => {
       const actualBlockNumber = await web3.eth.getBlockNumber()
       await assertRevert(
         slasher.slash(
-          actualBlockNumber - 1,
-          validatorIndexEpoch[2],
-          validatorIndexEpoch[2],
+          actualBlockNumber - 3,
+          validatorIndexInEpoch,
+          validatorIndexInEpoch,
           0,
           [],
           [],
@@ -433,26 +452,22 @@ contract('DowntimeSlasherSlots', (accounts: string[]) => {
     })
     // Test boundaries
     it('fails if the first block was signed', async () => {
-      const testBlocksInfo = slotAssign.inEpoch.firstBlockSigned
+      const startBlock = (epoch - 1) * epochBlockSize + 1
       // All the other block are good
       await presetParentSealForBlocks(
-        testBlocksInfo.startBlock + 1,
+        startBlock + 1,
         slashableDowntime - 1,
-        bitmapWithoutValidator[testBlocksInfo.validatorIndexes[0]],
-        bitmapWithoutValidator[testBlocksInfo.validatorIndexes[1]]
+        bitmapWithoutValidator[validatorIndexInEpoch],
+        bitmapWithoutValidator[validatorIndexInEpoch]
       )
       // first block with everything signed
-      await presetParentSealForBlocks(testBlocksInfo.startBlock, 1, bitmapVI01, bitmapVI01)
-      await calculateEverySlot(
-        testBlocksInfo.startBlock,
-        testBlocksInfo.validatorIndexes[0],
-        testBlocksInfo.validatorIndexes[1]
-      )
+      await presetParentSealForBlocks(startBlock, 1, bitmapVI01, bitmapVI01)
+      await calculateEverySlot(startBlock, validatorIndexInEpoch, validatorIndexInEpoch)
       await assertRevert(
         slasher.slash(
-          testBlocksInfo.startBlock,
-          testBlocksInfo.validatorIndexes[0],
-          testBlocksInfo.validatorIndexes[1],
+          startBlock,
+          validatorIndexInEpoch,
+          validatorIndexInEpoch,
           0,
           [],
           [],
@@ -465,31 +480,27 @@ contract('DowntimeSlasherSlots', (accounts: string[]) => {
     })
     describe('when the last block was signed', () => {
       it('fails if it is in the same epoch', async () => {
-        const testBlocksInfo = slotAssign.inEpoch.lastBlockSigned
+        const startBlock = (epoch - 1) * epochBlockSize + 1
         // All the other block are good
         await presetParentSealForBlocks(
-          testBlocksInfo.startBlock,
+          startBlock,
           slashableDowntime - 1,
-          bitmapWithoutValidator[testBlocksInfo.validatorIndexes[0]],
-          bitmapWithoutValidator[testBlocksInfo.validatorIndexes[1]]
+          bitmapWithoutValidator[validatorIndexInEpoch],
+          bitmapWithoutValidator[validatorIndexInEpoch]
         )
         // last block with everything signed
         await presetParentSealForBlocks(
-          testBlocksInfo.startBlock + slashableDowntime - 1,
+          startBlock + slashableDowntime - 1,
           1,
           bitmapVI01,
           bitmapVI01
         )
-        await calculateEverySlot(
-          testBlocksInfo.startBlock,
-          testBlocksInfo.validatorIndexes[0],
-          testBlocksInfo.validatorIndexes[1]
-        )
+        await calculateEverySlot(startBlock, validatorIndexInEpoch, validatorIndexInEpoch)
         await assertRevert(
           slasher.slash(
-            testBlocksInfo.startBlock,
-            testBlocksInfo.validatorIndexes[0],
-            testBlocksInfo.validatorIndexes[1],
+            startBlock,
+            validatorIndexInEpoch,
+            validatorIndexInEpoch,
             0,
             [],
             [],
@@ -501,31 +512,28 @@ contract('DowntimeSlasherSlots', (accounts: string[]) => {
         )
       })
       it("fails if it didn't switched index and change the epoch", async () => {
-        const testBlocksInfo = slotAssign.crossEpoch.sameIndex.fails
+        const startBlock = (epoch - 1) * epochBlockSize + 1 - slotSize
+        await slasher.setEpochSigner(epoch - 1, validatorIndexInEpoch, validatorList[0])
         // All the other block are good
         await presetParentSealForBlocks(
-          testBlocksInfo.startBlock,
+          startBlock,
           slashableDowntime - 1,
-          bitmapWithoutValidator[testBlocksInfo.validatorIndexes[0]],
-          bitmapWithoutValidator[testBlocksInfo.validatorIndexes[1]]
+          bitmapWithoutValidator[validatorIndexInEpoch],
+          bitmapWithoutValidator[validatorIndexInEpoch]
         )
         // last block with everything signed
         await presetParentSealForBlocks(
-          testBlocksInfo.startBlock + slashableDowntime - 1,
+          startBlock + slashableDowntime - 1,
           1,
           bitmapVI01,
           bitmapVI01
         )
-        await calculateEverySlot(
-          testBlocksInfo.startBlock,
-          testBlocksInfo.validatorIndexes[0],
-          testBlocksInfo.validatorIndexes[1]
-        )
+        await calculateEverySlot(startBlock, validatorIndexInEpoch, validatorIndexInEpoch)
         await assertRevert(
           slasher.slash(
-            testBlocksInfo.startBlock,
-            testBlocksInfo.validatorIndexes[0],
-            testBlocksInfo.validatorIndexes[1],
+            startBlock,
+            validatorIndexInEpoch,
+            validatorIndexInEpoch,
             0,
             [],
             [],
@@ -537,69 +545,46 @@ contract('DowntimeSlasherSlots', (accounts: string[]) => {
         )
       })
       it('fails if it switched index', async () => {
-        const testBlocksInfo = slotAssign.crossEpoch.indexChange.lastBlockSigned
+        const startBlock = (epoch - 1) * epochBlockSize + 1 - slotSize
+        await slasher.setEpochSigner(epoch - 1, 1, validatorList[0])
         // All the blocks, changes the bitmap in the middle
         await presetParentSealForBlocks(
-          testBlocksInfo.startBlock,
+          startBlock,
           slashableDowntime - 1,
-          bitmapWithoutValidator[testBlocksInfo.validatorIndexes[0]],
-          bitmapWithoutValidator[testBlocksInfo.validatorIndexes[1]]
+          bitmapWithoutValidator[1],
+          bitmapWithoutValidator[validatorIndexInEpoch]
         )
         // last block with everything signed
         await presetParentSealForBlocks(
-          testBlocksInfo.startBlock + slashableDowntime - 1,
+          startBlock + slashableDowntime - 1,
           1,
           bitmapVI01,
           bitmapVI01
         )
-        await calculateEverySlot(
-          testBlocksInfo.startBlock,
-          testBlocksInfo.validatorIndexes[0],
-          testBlocksInfo.validatorIndexes[1]
-        )
+        await calculateEverySlot(startBlock, 1, validatorIndexInEpoch)
         await assertRevert(
-          slasher.slash(
-            testBlocksInfo.startBlock,
-            testBlocksInfo.validatorIndexes[0],
-            testBlocksInfo.validatorIndexes[1],
-            0,
-            [],
-            [],
-            [],
-            [],
-            [],
-            []
-          )
+          slasher.slash(startBlock, 1, validatorIndexInEpoch, 0, [], [], [], [], [], [])
         )
       })
     })
     it('fails if one block in the middle was signed', async () => {
-      const testBlocksInfo = slotAssign.inEpoch.middleBlockSigned
+      const startBlock = (epoch - 1) * epochBlockSize + 1
 
       // All the other block are good
       await presetParentSealForBlocks(
-        testBlocksInfo.startBlock,
+        startBlock,
         slashableDowntime,
-        bitmapWithoutValidator[testBlocksInfo.validatorIndexes[0]],
-        bitmapWithoutValidator[testBlocksInfo.validatorIndexes[1]]
+        bitmapWithoutValidator[validatorIndexInEpoch],
+        bitmapWithoutValidator[validatorIndexInEpoch]
       )
       // middle block with everything signed
-      await presetParentSealForBlocks(
-        testBlocksInfo.startBlock + slotSize,
-        1,
-        bitmapVI01,
-        bitmapVI01
-      )
-      await calculateEverySlot(
-        testBlocksInfo.startBlock,
-        testBlocksInfo.validatorIndexes[0],
-        testBlocksInfo.validatorIndexes[1]
-      )
+      await presetParentSealForBlocks(startBlock + slotSize, 1, bitmapVI01, bitmapVI01)
+      await calculateEverySlot(startBlock, validatorIndexInEpoch, validatorIndexInEpoch)
       await assertRevert(
         slasher.slash(
-          testBlocksInfo.startBlock,
-          testBlocksInfo.validatorIndexes[0],
-          testBlocksInfo.validatorIndexes[1],
+          startBlock,
+          validatorIndexInEpoch,
+          validatorIndexInEpoch,
           0,
           [],
           [],
@@ -611,31 +596,22 @@ contract('DowntimeSlasherSlots', (accounts: string[]) => {
       )
     })
     it('success with validator index change', async () => {
-      const testBlocksInfo = slotAssign.crossEpoch.indexChange.succeds
-      await makeBlockInfoSlashable(testBlocksInfo)
-      await slasher.slash(
-        testBlocksInfo.startBlock,
-        testBlocksInfo.validatorIndexes[0],
-        testBlocksInfo.validatorIndexes[1],
-        0,
-        [],
-        [],
-        [],
-        [],
-        [],
-        []
-      )
+      const startBlock = (epoch - 1) * epochBlockSize + 1 - slotSize
+      await slasher.setEpochSigner(epoch - 1, 1, validatorList[0])
+      await makeBlockInfoSlashable(startBlock, [1, validatorIndexInEpoch])
+      await slasher.slash(startBlock, 1, validatorIndexInEpoch, 0, [], [], [], [], [], [])
       const balance = await mockLockedGold.accountTotalLockedGold(validatorList[0])
       assert.equal(balance.toNumber(), 40000)
     })
     it('success with epoch change but without validator index change', async () => {
-      const testBlocksInfo = slotAssign.crossEpoch.indexChange.succeds
-      await makeBlockInfoSlashable(testBlocksInfo)
+      const startBlock = (epoch - 1) * epochBlockSize + 1 - slotSize
+      await slasher.setEpochSigner(epoch - 1, validatorIndexInEpoch, validatorList[0])
+      await makeBlockInfoSlashable(startBlock, [validatorIndexInEpoch, validatorIndexInEpoch])
 
       await slasher.slash(
-        testBlocksInfo.startBlock,
-        testBlocksInfo.validatorIndexes[0],
-        testBlocksInfo.validatorIndexes[1],
+        startBlock,
+        validatorIndexInEpoch,
+        validatorIndexInEpoch,
         0,
         [],
         [],
@@ -648,13 +624,15 @@ contract('DowntimeSlasherSlots', (accounts: string[]) => {
       assert.equal(balance.toNumber(), 40000)
     })
     describe('when succeds', () => {
-      it('should emit the corresponding event', async () => {
-        const testBlocksInfo = slotAssign.inEpoch.succeds.emit
-        await makeBlockInfoSlashable(testBlocksInfo)
-        const resp = await slasher.slash(
-          testBlocksInfo.startBlock,
-          testBlocksInfo.validatorIndexes[0],
-          testBlocksInfo.validatorIndexes[1],
+      let resp: any
+      let startBlock: number
+      beforeEach(async () => {
+        startBlock = (epoch - 1) * epochBlockSize + 1
+        await makeBlockInfoSlashable(startBlock, [validatorIndexInEpoch, validatorIndexInEpoch])
+        resp = await slasher.slash(
+          startBlock,
+          validatorIndexInEpoch,
+          validatorIndexInEpoch,
           0,
           [],
           [],
@@ -663,84 +641,40 @@ contract('DowntimeSlasherSlots', (accounts: string[]) => {
           [],
           []
         )
+      })
+      it('should emit the corresponding event', async () => {
         const log = resp.logs[0]
         assertContainSubset(log, {
           event: 'DowntimeSlashPerformed',
           args: {
             validator: validatorList[0],
-            startBlock: new BigNumber(testBlocksInfo.startBlock),
+            startBlock: new BigNumber(startBlock),
           },
         })
       })
 
       it('decrements gold when success', async () => {
-        const testBlocksInfo = slotAssign.inEpoch.succeds.decrementsGold
-        await makeBlockInfoSlashable(testBlocksInfo)
-        await slasher.slash(
-          testBlocksInfo.startBlock,
-          testBlocksInfo.validatorIndexes[0],
-          testBlocksInfo.validatorIndexes[1],
-          0,
-          [],
-          [],
-          [],
-          [],
-          [],
-          []
-        )
         const balance = await mockLockedGold.accountTotalLockedGold(validatorList[0])
         assert.equal(balance.toNumber(), 40000)
       })
       it('also slashes group', async () => {
-        const testBlocksInfo = slotAssign.inEpoch.succeds.slashedGroup
-        await makeBlockInfoSlashable(testBlocksInfo)
-        await slasher.slash(
-          testBlocksInfo.startBlock,
-          testBlocksInfo.validatorIndexes[0],
-          testBlocksInfo.validatorIndexes[1],
-          0,
-          [],
-          [],
-          [],
-          [],
-          [],
-          []
-        )
         const balance = await mockLockedGold.accountTotalLockedGold(groups[0])
         assert.equal(balance.toNumber(), 40000)
       })
       it('cannot be slashed twice in the same epoch if oncePerEpoch is true', async () => {
-        // Just to make clear that is false at the beginng (it shares slashes with other tests)
-        await slasher.setOncePerEpoch(false)
-        const testBlocksInfo = slotAssign.inEpoch.succeds.slashedTwiceOncePerEpoch
-        await makeBlockInfoSlashable(testBlocksInfo)
-        await slasher.slash(
-          testBlocksInfo.startBlock,
-          testBlocksInfo.validatorIndexes[0],
-          testBlocksInfo.validatorIndexes[1],
-          0,
-          [],
-          [],
-          [],
-          [],
-          [],
-          []
-        )
+        // Just to make sure that is was slashed
         const balance = await mockLockedGold.accountTotalLockedGold(validatorList[0])
         assert.equal(balance.toNumber(), 40000)
         await slasher.setOncePerEpoch(true)
         const res = await slasher.oncePerEpoch()
         assert.equal(res, true)
-        const newBlockInSameEpock = {
-          startBlock: testBlocksInfo.startBlock + blockSpaceBetweenTests + slashableDowntime,
-          validatorIndexes: testBlocksInfo.validatorIndexes,
-        }
-        await makeBlockInfoSlashable(newBlockInSameEpock)
+        const newStartBlock = startBlock + slashableDowntime * 2
+        await makeBlockInfoSlashable(newStartBlock, [validatorIndexInEpoch, validatorIndexInEpoch])
         await assertRevert(
           slasher.slash(
-            newBlockInSameEpock.startBlock,
-            newBlockInSameEpock.validatorIndexes[0],
-            newBlockInSameEpock.validatorIndexes[1],
+            newStartBlock,
+            validatorIndexInEpoch,
+            validatorIndexInEpoch,
             0,
             [],
             [],
@@ -752,35 +686,18 @@ contract('DowntimeSlasherSlots', (accounts: string[]) => {
         )
       })
       it('can be slashed twice in the same epoch if oncePerEpoch is false', async () => {
-        // Just to make clear that is false at the beginng
-        await slasher.setOncePerEpoch(false)
-        const testBlocksInfo = slotAssign.inEpoch.succeds.slashedTwiceMultiplePerEpoch
-        await makeBlockInfoSlashable(testBlocksInfo)
-        await slasher.slash(
-          testBlocksInfo.startBlock,
-          testBlocksInfo.validatorIndexes[0],
-          testBlocksInfo.validatorIndexes[1],
-          0,
-          [],
-          [],
-          [],
-          [],
-          [],
-          []
-        )
+        // Just to make sure that is was slashed
         const balance = await mockLockedGold.accountTotalLockedGold(validatorList[0])
         assert.equal(balance.toNumber(), 40000)
+        await slasher.setOncePerEpoch(false)
         const res = await slasher.oncePerEpoch()
         assert.equal(res, false)
-        const newBlockInSameEpock = {
-          startBlock: testBlocksInfo.startBlock + blockSpaceBetweenTests + slashableDowntime,
-          validatorIndexes: testBlocksInfo.validatorIndexes,
-        }
-        await makeBlockInfoSlashable(newBlockInSameEpock)
+        const newStartBlock = startBlock + slashableDowntime * 2
+        await makeBlockInfoSlashable(newStartBlock, [validatorIndexInEpoch, validatorIndexInEpoch])
         await slasher.slash(
-          newBlockInSameEpock.startBlock,
-          testBlocksInfo.validatorIndexes[0],
-          testBlocksInfo.validatorIndexes[1],
+          newStartBlock,
+          validatorIndexInEpoch,
+          validatorIndexInEpoch,
           0,
           [],
           [],
@@ -792,35 +709,17 @@ contract('DowntimeSlasherSlots', (accounts: string[]) => {
         const balance2nd = await mockLockedGold.accountTotalLockedGold(validatorList[0])
         assert.equal(balance2nd.toNumber(), 30000)
       })
-      it('cannot be slashed twice if it share at least a block', async () => {
-        // Just to make clear that is false at the beginng (it shares slashes with other tests)
-        await slasher.setOncePerEpoch(false)
-        const testBlocksInfo = slotAssign.inEpoch.succeds.slashedTwiceShareBlocks
-        await makeBlockInfoSlashable(testBlocksInfo)
-        await slasher.slash(
-          testBlocksInfo.startBlock,
-          testBlocksInfo.validatorIndexes[0],
-          testBlocksInfo.validatorIndexes[1],
-          0,
-          [],
-          [],
-          [],
-          [],
-          [],
-          []
-        )
+      it('cannot be slashed twice if it shares at least a block', async () => {
+        // Just to make sure that is was slashed
         const balance = await mockLockedGold.accountTotalLockedGold(validatorList[0])
         assert.equal(balance.toNumber(), 40000)
-        const newBlockInSameEpock = {
-          startBlock: testBlocksInfo.startBlock + slashableDowntime - 1,
-          validatorIndexes: testBlocksInfo.validatorIndexes,
-        }
-        await makeBlockInfoSlashable(newBlockInSameEpock)
+        const newStartBlock = startBlock + slashableDowntime - 1
+        await makeBlockInfoSlashable(newStartBlock, [validatorIndexInEpoch, validatorIndexInEpoch])
         await assertRevert(
           slasher.slash(
-            newBlockInSameEpock.startBlock,
-            newBlockInSameEpock.validatorIndexes[0],
-            newBlockInSameEpock.validatorIndexes[1],
+            startBlock,
+            validatorIndexInEpoch,
+            validatorIndexInEpoch,
             0,
             [],
             [],

@@ -125,7 +125,7 @@ contract DowntimeSlasherSlots is SlasherUtil {
     );
 
     // Epoch 1 starts in the block 1
-    uint256 lastBlockOfStartEpoch = epochNumberOfBlock(startBlock, sz).mul(sz).sub(1);
+    uint256 lastBlockOfStartEpoch = epochNumberOfBlock(startBlock, sz).mul(sz);
     assert(lastBlockOfStartEpoch >= startBlock);
     if (endBlock < lastBlockOfStartEpoch) {
       lastBlockOfStartEpoch = endBlock;
@@ -272,7 +272,7 @@ contract DowntimeSlasherSlots is SlasherUtil {
 
     SlashedInterval[] storage intervals = lastSlashedBlock[validator][startEpoch];
     // The oncePerEpoch=true validation
-    require(oncePerEpoch && intervals.length > 0, "Already slashed in that epoch");
+    require(!oncePerEpoch || intervals.length < 1, "Already slashed in that epoch");
 
     for (uint256 i = 0; i < intervals.length; i = i.add(1)) {
       require(
