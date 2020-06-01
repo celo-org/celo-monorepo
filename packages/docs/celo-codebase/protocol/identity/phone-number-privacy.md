@@ -35,4 +35,4 @@ In order to measure the quota for a given request, the PGPNP must check the quer
 ## Architecture
 ![architecture diagram](https://storage.googleapis.com/celo-website/docs/pgpnp-architecture.jpg)
 
-The hosted architecture is divided into two components, the Combiner and the Signer. Both are hosted as serverless cloud functions with public API endpoints. Both services rely upon a BLS signing library which is compiled to a Web Assembly module. The Signer also leverages a hosted PostgreSQL database for tracking quotas and an Azure Key Vault instance for managing the BLS key securely.
+The hosted architecture is divided into two components, the Combiner and the Signer. Both are hosted as serverless cloud functions with public API endpoints. Both services rely upon a [BLS signing library](https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a) which is compiled to a Web Assembly module. The Signer also leverages a hosted PostgreSQL database for tracking quotas and an Azure Key Vault instance for managing the BLS key securely.
