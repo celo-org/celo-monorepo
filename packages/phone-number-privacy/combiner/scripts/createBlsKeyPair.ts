@@ -5,7 +5,7 @@ import crypto from 'crypto'
 console.log('Creating BLS keypair...')
 
 const seed = crypto.randomBytes(32)
-const keypair = threshold.keygen(seed)
+const keypair = threshold.threshold_bls(seed)
 const privateKey = keypair.privateKey
 const publicKey = keypair.publicKey
 

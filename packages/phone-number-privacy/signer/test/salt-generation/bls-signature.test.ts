@@ -1,6 +1,6 @@
 import threshold from 'blind-threshold-bls'
 import { BLSCryptographyClient } from '../../src/bls/bls-cryptography-client'
-import config, { DEV_PRIVATE_KEY, DEV_PUBLIC_KEY } from '../../src/config'
+import config, { DEV_POLYNOMIAL, DEV_PRIVATE_KEY, DEV_PUBLIC_KEY } from '../../src/config'
 
 const USING_MOCK = config.keyVault.azureClientSecret === 'useMock'
 
@@ -33,10 +33,21 @@ describe(`BLS service computes signature`, () => {
     const blindedMsg = Buffer.from(blindedMsgResult.message).toString('base64')
 
     const actual = await BLSCryptographyClient.computeBlindedSignature(blindedMsg)
-    expect(actual).toEqual('ZeYBwDBxkWe1ZNDqiViz2MNGIT6PIW2c3pemkMcmM5gM1vaaf5RieVp+2SxR83YA')
+    expect(actual).toEqual(
+      'MAAAAAAAAADJpFrx/eDNs1Qm986trWFZpMcJNRM5W/yKoI+cxk0gBul1PNAVzw1uFpEWJx5iK4EAAAAA'
+    )
 
+    expect(
+      threshold.partialVerifyBlindSignature(
+        Buffer.from(DEV_POLYNOMIAL, 'base64'),
+        blindedMsgResult.message,
+        Buffer.from(actual, 'base64')
+      )
+    )
+
+    const combinedSignature = threshold.combine(1, Buffer.from(actual, 'base64'))
     const unblindedSignedMessage = threshold.unblind(
-      Buffer.from(actual, 'base64'),
+      combinedSignature,
       blindedMsgResult.blindingFactor
     )
     const publicKey = Buffer.from(DEV_PUBLIC_KEY, 'base64')

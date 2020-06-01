@@ -1,57 +1,44 @@
-import { AzureKeyVaultClient } from '@celo/contractkit/lib/utils/azure-key-vault-client'
-import threshold from 'blind-threshold-bls'
-import { ErrorMessages } from '../common/error-utils'
+import threshold_bls from 'blind-threshold-bls'
 import logger from '../common/logger'
-import config, { DEV_MODE, DEV_PRIVATE_KEY } from '../config'
+import config from '../config'
 
+export interface ServicePartialSignature {
+  url: string
+  signature: string
+}
+
+function flattenSigsArray(sigs: Uint8Array[]) {
+  return Uint8Array.from(sigs.reduce((a, b) => Array.from(a).concat(Array.from(b)), [] as any))
+}
 export class BLSCryptographyClient {
   /*
    * Computes the BLS signature for the blinded phone number.
    */
-  public static async computeBlindedSignature(base64BlindedMessage: string) {
-    try {
-      const privateKey = await BLSCryptographyClient.getPrivateKey()
-      const keyBuffer = Buffer.from(privateKey, 'base64')
-      const msgBuffer = Buffer.from(base64BlindedMessage, 'base64')
-
-      logger.debug('Calling theshold sign')
-      const signedMsg = threshold.signBlindedMessage(keyBuffer, msgBuffer)
-      logger.debug('Back from threshold sign, parsing results')
-
-      if (!signedMsg) {
-        throw new Error('Empty threshold sign result')
+  public static async combinePartialBlindedSignatures(
+    serviceResponses: ServicePartialSignature[],
+    blindedMessage: string
+  ): Promise<string> {
+    const polynomial = config.thresholdSignature.polynomial
+    const sigs: Uint8Array[] = []
+    for (const service of serviceResponses) {
+      const sigBuffer = Buffer.from(service.signature, 'base64')
+      try {
+        await threshold_bls.partialVerifyBlindSignature(
+          Buffer.from(polynomial, 'base64'),
+          Buffer.from(blindedMessage, 'base64'),
+          sigBuffer
+        )
+        sigs.push(sigBuffer)
+      } catch (e) {
+        logger.warn(`could not verify signature for service url ${service.url}`)
       }
-
-      return Buffer.from(signedMsg).toString('base64')
-    } catch (e) {
-      logger.error(ErrorMessages.SIGNATURE_COMPUTATION_FAILURE, e)
-      throw e
     }
-  }
-
-  private static privateKey: string
-
-  /**
-   * Get singleton privateKey
-   */
-  private static async getPrivateKey(): Promise<string> {
-    if (DEV_MODE) {
-      return DEV_PRIVATE_KEY
+    const threshold = config.thresholdSignature.threshold
+    if (sigs.length < threshold) {
+      logger.error(`not enough not enough partial signatures'${sigs.length}'/'${threshold}'`)
+      throw new Error(`not enough not enough partial signatures'${sigs.length}'/'${threshold}'`)
     }
-
-    if (BLSCryptographyClient.privateKey) {
-      return BLSCryptographyClient.privateKey
-    }
-
-    // Set environment variables for service principal auth
-    process.env.AZURE_CLIENT_ID = config.keyVault.azureClientID
-    process.env.AZURE_CLIENT_SECRET = config.keyVault.azureClientSecret
-    process.env.AZURE_TENANT_ID = config.keyVault.azureTenant
-
-    const vaultName = config.keyVault.azureVaultName
-    const keyVaultClient = new AzureKeyVaultClient(vaultName)
-    const secretName = config.keyVault.azureSecretName
-    BLSCryptographyClient.privateKey = await keyVaultClient.getSecret(secretName)
-    return BLSCryptographyClient.privateKey
+    const result = threshold_bls.combine(threshold, flattenSigsArray(sigs))
+    return Buffer.from(result).toString('base64')
   }
 }

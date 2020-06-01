@@ -18,7 +18,8 @@
     "lint": "tslint --project .",
     "test": "jest --runInBand --testPathIgnorePatterns test/end-to-end",
     "db:migrate": "NODE_ENV=development ts-node scripts/runMigrations.ts",
-    "keygen": "ts-node scripts/createBlsKeyPair.ts"
+    "keygen": "ts-node scripts/createBlsKeyPair.ts",
+    "thresholdKeygen": "ts-node scripts/createThresholdBlsKeys.ts"
   },
   "dependencies": {
     "@celo/contractkit": "0.4.5",
@@ -27,6 +28,7 @@
     "firebase-admin": "^8.10.0",
     "firebase-functions": "^3.6.0",
     "knex": "^0.20.13",
+    "node-fetch": "^2.2.0",
     "pg": "^7.18.2",
     "uuid": "^7.0.3"
   },

@@ -15,7 +15,7 @@ export class BLSCryptographyClient {
       const msgBuffer = Buffer.from(base64BlindedMessage, 'base64')
 
       logger.debug('Calling theshold sign')
-      const signedMsg = threshold.signBlindedMessage(keyBuffer, msgBuffer)
+      const signedMsg = threshold.partialSignBlindedMessage(keyBuffer, msgBuffer)
       logger.debug('Back from threshold sign, parsing results')
 
       if (!signedMsg) {
