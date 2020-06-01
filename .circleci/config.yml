@@ -879,7 +879,7 @@ jobs:
           set -e
           yarn
           yarn build
-          rm .env.mnemonic .env.mnemonic.${NETWORK}
+          rm -f .env.mnemonic .env.mnemonic.${NETWORK}
           touch .env.mnemonic .env.mnemonic.${NETWORK}
     - run:
         name: Configuring k8s cluster for the fullnode
