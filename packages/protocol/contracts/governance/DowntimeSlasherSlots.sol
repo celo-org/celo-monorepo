@@ -19,9 +19,7 @@ contract DowntimeSlasherSlots is SlasherUtil {
 
   // Accumulated ParentSealBitmap of every validator
   struct ValidatedSlot {
-    // endBlock of the slashed interval. Although this could be calculated, as the downtime interval
-    // could be changed, we store the calculated end to avoid future errors if the interval changes.
-    uint256 endBlock;
+    // uint256 endBlock;
     // Accumulated ParentSealBitmap of the Slot
     // The array will have 2 elements if the slot shares two epochs
     uint256[2] validatorsUpAccumulator;
@@ -30,20 +28,23 @@ contract DowntimeSlasherSlots is SlasherUtil {
   // For each address, associate each epoch with the last block that was slashed on that epoch
   mapping(address => mapping(uint256 => SlashedInterval[])) lastSlashedBlock;
 
-  // For each user, map of StartBlock to Accumulated ParentSealBitmap of the Slot
-  mapping(address => mapping(uint256 => ValidatedSlot)) private userValidatedSlots;
+  // For each user a map of StartBlock to a map of EndBlock to an array of accumulated ParentSealBitmap for the Slot
+  // The Accumulated ParentSealBitmap array will have 2 elements (the last different than zero) if and
+  // only if the slot shares two epochs
+  mapping(address => mapping(uint256 => mapping(uint256 => uint256[2]))) private userValidatedSlotProofs;
 
   uint256 public slashableDowntime;
   uint256 public slotSize;
   bool public oncePerEpoch;
 
-  uint256 constant MAX_SLOT_SIZE = 4320; // 4 hours (1 block/5seg)
-
   event SlashableDowntimeSet(uint256 interval);
-  event SlotSizeSet(uint256 interval);
   event OncePerEpochSet(bool oncePerEpoch);
   event DowntimeSlashPerformed(address indexed validator, uint256 indexed startBlock);
-  event SlotValidationPerformed(address indexed user, uint256 indexed startBlock);
+  event SlotValidationPerformed(
+    address indexed user,
+    uint256 indexed startBlock,
+    uint256 indexed endblock
+  );
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
@@ -51,7 +52,6 @@ contract DowntimeSlasherSlots is SlasherUtil {
    * @param _penalty Penalty for the slashed signer.
    * @param _reward Reward that the observer gets.
    * @param _slashableDowntime Slashable downtime in blocks.
-   * @param _slotSize Slot size that will be used to calculate the downtime.
    * @param _oncePerEpoch If true, the validator will only be slashed once per 
    * epoch of the StartBlock
    */
@@ -60,14 +60,12 @@ contract DowntimeSlasherSlots is SlasherUtil {
     uint256 _penalty,
     uint256 _reward,
     uint256 _slashableDowntime,
-    uint256 _slotSize,
     bool _oncePerEpoch
   ) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
     setSlashingIncentives(_penalty, _reward);
     setSlashableDowntime(_slashableDowntime);
-    setSlotSize(_slotSize);
     setOncePerEpoch(_oncePerEpoch);
   }
 
@@ -80,22 +78,6 @@ contract DowntimeSlasherSlots is SlasherUtil {
     require(interval < getEpochSize(), "Slashable downtime must be smaller than epoch size");
     slashableDowntime = interval;
     emit SlashableDowntimeSet(interval);
-  }
-
-  /**
-   * @notice Sets the slot size to be validated
-   * @param _slotSize Slot size in which the downtime validation will be divided.
-   */
-  function setSlotSize(uint256 _slotSize) public onlyOwner {
-    require(_slotSize != 0, "Slot size cannot be zero");
-    require(
-      _slotSize <= MAX_SLOT_SIZE,
-      "Slot size must be smaller than MAX_SLOT_SIZE, otherwise could lead to gas issues"
-    );
-    require(_slotSize < getEpochSize(), "Slot size must be smaller than epoch size");
-
-    slotSize = _slotSize;
-    emit SlotSizeSet(_slotSize);
   }
 
   /**
@@ -115,12 +97,26 @@ contract DowntimeSlasherSlots is SlasherUtil {
    * @dev Due to getParentSealBitmap, startBlock and the whole slot must be within 4 epochs of the
    * current head.
    */
-  function calculateSlotDowns(uint256 startBlock, uint256 endBlock) internal {
+  function calculateSlotUpBitmapAccumulators(uint256 startBlock, uint256 endBlock)
+    public
+    view
+    returns (uint256[2] memory)
+  {
     uint256 sz = getEpochSize();
-    uint256 currentBlock = block.number.sub(1);
+    // currentBlock - 1
+    uint256 lastBlockWithParentSeal = block.number.sub(2);
+    require(
+      endBlock.sub(startBlock) <= slashableDowntime,
+      "Range between block must be smaller or equal than the slashable downtime"
+    );
     // @Dev comment
     require(
-      currentBlock - startBlock <= sz.mul(4),
+      endBlock <= lastBlockWithParentSeal,
+      "end block must be smaller than current block - 1 (Requiere the ParentSealBitmap)"
+    );
+    // @Dev comment
+    require(
+      lastBlockWithParentSeal.sub(startBlock) <= sz.mul(4),
       "startBlock must be within 4 epochs of the current head."
     );
 
@@ -131,27 +127,31 @@ contract DowntimeSlasherSlots is SlasherUtil {
       lastBlockOfStartEpoch = endBlock;
     }
 
-    ValidatedSlot storage validatedSlot = userValidatedSlots[msg.sender][startBlock];
-    validatedSlot.endBlock = endBlock;
-
     // SafeMath is not used in the following loops to save gas required for conditional checks.
     // Overflow safety is guaranteed by previous checks on the values of the loop parameters.
-    uint256 accumulator;
+    uint256[2] memory accumulator;
     // 1) We want to check signers for the block,
     // so we get the parent seal bitmap for the next block
     // 2) To save gas, instead of iterating between n and lastBlockOfStartEpoch
     // and retrieving getParentSealBitmap(n+1), we shift 1 block to use n as the parent
     for (uint256 n = startBlock + 1; n <= (lastBlockOfStartEpoch + 1); n++) {
-      accumulator |= uint256(getParentSealBitmap(n));
+      accumulator[0] |= uint256(getParentSealBitmap(n));
     }
-    validatedSlot.validatorsUpAccumulator[0] = accumulator;
 
-    accumulator = 0;
-    // Same comments as the last 'for'
+    // Same comments as the last 'for', but for the second epoch
     for (uint256 n = lastBlockOfStartEpoch + 2; n <= (endBlock + 1); n++) {
-      accumulator |= uint256(getParentSealBitmap(n));
+      accumulator[1] |= uint256(getParentSealBitmap(n));
     }
-    validatedSlot.validatorsUpAccumulator[1] = accumulator;
+    return accumulator;
+  }
+
+  function generateProofOfSlotValidation(uint256 startBlock, uint256 endBlock) public {
+    userValidatedSlotProofs[msg.sender][startBlock][endBlock] = calculateSlotUpBitmapAccumulators(
+      startBlock,
+      endBlock
+    );
+
+    emit SlotValidationPerformed(msg.sender, startBlock, endBlock);
   }
 
   /**
@@ -161,15 +161,12 @@ contract DowntimeSlasherSlots is SlasherUtil {
    * @param endSignerIndex Index of the signer within the validator set as of the end block.
    * @return True if the validator signature does not appear in any block within the window.
    */
-  function isDownForSlot(uint256 startBlock, uint256 startSignerIndex, uint256 endSignerIndex)
-    public
-    returns (bool)
-  {
-    require(startBlock > 0, "startBlock must be bigger than zero");
-    uint256 currentBlock = block.number.sub(1);
-    uint256 endBlock = getEndBlockOfSlot(startBlock);
-    // Determine the dividing line between the start epoch and the end epoch.
-    require(endBlock < currentBlock, "end block must be smaller than current block");
+  function isDownForSlot(
+    uint256 startBlock,
+    uint256 endBlock,
+    uint256 startSignerIndex,
+    uint256 endSignerIndex
+  ) public view returns (bool) {
     require(
       startSignerIndex < numberValidatorsInSet(startBlock),
       "Bad validator index at start block"
@@ -184,31 +181,48 @@ contract DowntimeSlasherSlots is SlasherUtil {
       "Signers do not match"
     );
 
-    if (!slotAlreadyCalculated(startBlock)) {
-      calculateSlotDowns(startBlock, endBlock);
-      emit SlotValidationPerformed(msg.sender, startBlock);
+    if (!slotAlreadyCalculated(startBlock, endBlock)) {
+      uint256[2] memory accumulatedBitmaps = calculateSlotUpBitmapAccumulators(
+        startBlock,
+        endBlock
+      );
+      return isDownUsingUpAccumulatedBitmaps(startSignerIndex, endSignerIndex, accumulatedBitmaps);
     }
 
-    return isDownUsingCalculatedSlot(startBlock, startSignerIndex, endSignerIndex);
+    return isDownUsingCalculatedSlot(startBlock, endBlock, startSignerIndex, endSignerIndex);
   }
 
-  function slotAlreadyCalculated(uint256 startBlock) internal view returns (bool) {
-    ValidatedSlot storage validatedSlot = userValidatedSlots[msg.sender][startBlock];
+  function slotAlreadyCalculated(uint256 startBlock, uint256 endBlock)
+    internal
+    view
+    returns (bool)
+  {
+    uint256[2] memory validatorsUpAccumulator = userValidatedSlotProofs[msg
+      .sender][startBlock][endBlock];
     // It's impossible to have all the validators down in a slot
-    return
-      validatedSlot.validatorsUpAccumulator[0] != 0 ||
-      validatedSlot.validatorsUpAccumulator[1] != 0;
+    return validatorsUpAccumulator[0] != 0 || validatorsUpAccumulator[1] != 0;
   }
 
   function isDownUsingCalculatedSlot(
     uint256 startBlock,
+    uint256 endBlock,
     uint256 startSignerIndex,
     uint256 endSignerIndex
   ) internal view returns (bool) {
-    ValidatedSlot storage validatedSlot = userValidatedSlots[msg.sender][startBlock];
+    uint256[2] memory validatorsUpAccumulator = userValidatedSlotProofs[msg
+      .sender][startBlock][endBlock];
     return
-      (validatedSlot.validatorsUpAccumulator[0] & (1 << startSignerIndex) == 0) &&
-      (validatedSlot.validatorsUpAccumulator[1] & (1 << endSignerIndex) == 0);
+      isDownUsingUpAccumulatedBitmaps(startSignerIndex, endSignerIndex, validatorsUpAccumulator);
+  }
+
+  function isDownUsingUpAccumulatedBitmaps(
+    uint256 startSignerIndex,
+    uint256 endSignerIndex,
+    uint256[2] memory upAccumulatedBitmaps
+  ) internal view returns (bool) {
+    return
+      (upAccumulatedBitmaps[0] & (1 << startSignerIndex) == 0) &&
+      (upAccumulatedBitmaps[1] & (1 << endSignerIndex) == 0);
   }
 
   /**
@@ -225,25 +239,43 @@ contract DowntimeSlasherSlots is SlasherUtil {
    * @param endSignerIndex Index of the signer within the validator set as of the end block.
    * @return True if the validator signature does not appear in any block within the window.
    */
-  function isDown(uint256 startBlock, uint256 startSignerIndex, uint256 endSignerIndex)
-    public
-    view
-    returns (bool)
-  {
+  function isDown(
+    uint256 startBlock,
+    uint256[] memory startSlots,
+    uint256[] memory endSlots,
+    uint256 startSignerIndex,
+    uint256 endSignerIndex
+  ) public view returns (bool) {
+    require(startBlock > 0, "StartBlock should be bigger than 0");
+    require(startSlots.length > 0, "Requires at least one slot");
+    require(
+      startSlots.length == endSlots.length,
+      "StartSlots and EndSlots must have the same length"
+    );
     uint256 endBlock = getEndBlockForSlashing(startBlock);
     uint256 sz = getEpochSize();
     uint256 epochChangeBlock = epochNumberOfBlock(startBlock, sz).mul(sz).add(1);
     uint256 indexActualEpoch = startSignerIndex;
-    for (uint256 n = startBlock; n < endBlock; ) {
-      require(slotAlreadyCalculated(n), "Slots missing to be calculated");
-      if (n >= epochChangeBlock) {
+    uint256 lastEndSlot = startBlock.sub(1);
+    for (uint256 i = 0; i < startSlots.length; i += 1) {
+      require(slotAlreadyCalculated(startSlots[i], endSlots[i]), "Invalid slot");
+      require(
+        lastEndSlot >= startSlots[i].sub(1) && lastEndSlot <= endSlots[i],
+        "StartBlock or at least one endSlot is not in te boundaries of the next slot"
+      );
+      if (startSlots[i] >= epochChangeBlock) {
         indexActualEpoch = endSignerIndex;
       }
-      if (!isDownUsingCalculatedSlot(n, indexActualEpoch, endSignerIndex)) {
+      if (
+        !isDownUsingCalculatedSlot(startSlots[i], endSlots[i], indexActualEpoch, endSignerIndex)
+      ) {
         return false;
       }
-      n = userValidatedSlots[msg.sender][n].endBlock.add(1);
+      lastEndSlot = endSlots[i];
     }
+
+    require(lastEndSlot >= endBlock, "The slots are not covering the SlashableDowntime window");
+
     return true;
   }
 
@@ -252,13 +284,6 @@ contract DowntimeSlasherSlots is SlasherUtil {
    */
   function getEndBlockForSlashing(uint256 startBlock) internal view returns (uint256) {
     return startBlock.add(slashableDowntime).sub(1);
-  }
-
-  /**
-   * @notice Returns the end block for the slot.
-   */
-  function getEndBlockOfSlot(uint256 startBlock) internal view returns (uint256) {
-    return startBlock.add(slotSize).sub(1);
   }
 
   /**
@@ -319,6 +344,8 @@ contract DowntimeSlasherSlots is SlasherUtil {
    */
   function slash(
     uint256 startBlock,
+    uint256[] memory startSlots,
+    uint256[] memory endSlots,
     uint256 startSignerIndex,
     uint256 endSignerIndex,
     uint256 groupMembershipHistoryIndex,
@@ -329,11 +356,9 @@ contract DowntimeSlasherSlots is SlasherUtil {
     address[] memory groupElectionGreaters,
     uint256[] memory groupElectionIndices
   ) public {
-    address validator = getAccounts().signerToAccount(
-      validatorSignerAddressFromSet(startSignerIndex, startBlock)
-    );
+    address validator = getValidatorFromSigner(startSignerIndex, startBlock);
     addNewSlashIntervalToValidator(validator, startBlock);
-    require(isDown(startBlock, startSignerIndex, endSignerIndex), "Not down");
+    require(isDown(startBlock, startSlots, endSlots, startSignerIndex, endSignerIndex), "Not down");
     performSlashing(
       validator,
       msg.sender,
@@ -347,5 +372,14 @@ contract DowntimeSlasherSlots is SlasherUtil {
       groupElectionIndices
     );
     emit DowntimeSlashPerformed(validator, startBlock);
+  }
+
+  function getValidatorFromSigner(uint256 startBlock, uint256 startSignerIndex)
+    internal
+    view
+    returns (address)
+  {
+    return
+      getAccounts().signerToAccount(validatorSignerAddressFromSet(startSignerIndex, startBlock));
   }
 }
