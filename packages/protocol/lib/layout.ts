@@ -171,7 +171,7 @@ const generateStructsCompatibilityReport = (oldLayout: StorageLayoutInfo, newLay
   let compatible = true
   let errors = []
 
-  newLayout.types.keys().forEach(typeName => {
+  Object.keys(newLayout.types).forEach(typeName => {
     const newType = newLayout.types[typeName]
     const oldType = oldLayout.types[typeName]
 
