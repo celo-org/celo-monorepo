@@ -1,5 +1,5 @@
 import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
-import SectionHead from '@celo/react-components/components/SectionHead'
+import SectionHeadNew from '@celo/react-components/components/SectionHeadNew'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import { isValidAddress } from '@celo/utils/src/address'
@@ -72,7 +72,7 @@ export class RecipientPicker extends React.Component<RecipientProps> {
   )
 
   renderSectionHeader = (info: { section: SectionListData<Recipient> }) => (
-    <SectionHead text={info.section.key as string} />
+    <SectionHeadNew text={info.section.key as string} />
   )
 
   keyExtractor = (item: Recipient, index: number) => {

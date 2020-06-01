@@ -16,6 +16,11 @@
   "celoDollarAmount": "<0></0> {{CeloDollar}}",
   "celoDollarAmount_plural": "<0></0> {{CeloDollars}}",
   "groceriesRent": "Supermercado, alquiler, etc. (Opcional)",
+  "sentTo": "Enviado A",
+  "receivedFrom": "Recibido De",
+  "accountNumberLabel": "Cuenta\nNo.",
+  "commentLabel": "Mensaje",
+  "amountSent": "Cantidad Enviada",
   "fee": "Comisión",
   "securityFee": "Comisión de seguridad",
   "inviteFee": "Comisión de Invitación",
@@ -104,5 +109,6 @@
     "header": "Encuentra el número de cuenta de tu contacto",
     "body1": "Tu contacto puede encontrar su número de cuenta (también conocido como dirección) al inicio del Menú de Ajustes",
     "body2": "Los números de cuenta comienzan con \"0x\" y tienen una longitud de 42 caracteres. Se encuentran directamente debajo de la foto de perfil"
-  }
+  },
+  "transferAddressChanged": "Este contacto cambió su número de cuenta desde la transacción. Este pago fue enviado a:"
 }

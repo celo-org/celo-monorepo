@@ -30,9 +30,9 @@ import { RootState } from 'src/redux/reducers'
 import { fetchDollarBalance } from 'src/stableToken/actions'
 import { getCurrencyAddress } from 'src/tokens/saga'
 import { addStandbyTransaction, generateStandbyTransactionId } from 'src/transactions/actions'
-import { TransactionStatus } from 'src/transactions/reducer'
 import { sendAndMonitorTransaction } from 'src/transactions/saga'
 import { sendTransaction } from 'src/transactions/send'
+import { TransactionStatus } from 'src/transactions/types'
 import Logger from 'src/utils/Logger'
 import {
   addLocalAccount,

@@ -1,14 +1,14 @@
 import Touchable from '@celo/react-components/components/Touchable'
 import Backspace from '@celo/react-components/icons/Backspace'
-import { fontStyles } from '@celo/react-components/styles/fonts'
+import fontStyles from '@celo/react-components/styles/fonts.v2'
 import * as React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 
 interface Props {
-  showDecimal: boolean
   onDigitPress: (digit: number) => void
   onBackspacePress: () => void
   onDecimalPress?: () => void
+  decimalSeparator?: string
 }
 
 function DigitButton({
@@ -20,14 +20,13 @@ function DigitButton({
 }) {
   const onPress = () => onDigitPress(digit)
   return (
-    <Touchable borderless={true} onPress={onPress}>
+    <Touchable borderless={true} onPress={onPress} testID={`digit${digit}`}>
       <Text style={style.digit}>{digit}</Text>
     </Touchable>
   )
 }
 
 export default function NumberKeypad(props: Props) {
-  // TODO(Rossy) i18n the decimal
   return (
     <View style={style.container}>
       <View style={style.row}>
@@ -46,9 +45,13 @@ export default function NumberKeypad(props: Props) {
         <DigitButton digit={9} onDigitPress={props.onDigitPress} />
       </View>
       <View style={style.row}>
-        {props.showDecimal ? (
-          <Touchable borderless={true} onPress={props.onDecimalPress}>
-            <Text style={style.digit}>.</Text>
+        {props.decimalSeparator && props.onDecimalPress ? (
+          <Touchable
+            borderless={true}
+            onPress={props.onDecimalPress}
+            testID={`digit${props.decimalSeparator}`}
+          >
+            <Text style={style.digit}>{props.decimalSeparator}</Text>
           </Touchable>
         ) : (
           <View style={style.digit} />
@@ -69,19 +72,22 @@ const style = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
+    paddingHorizontal: 12,
   },
   row: {
     width: '100%',
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
+    alignItems: 'center',
   },
   digit: {
-    ...fontStyles.bodyBold,
-    width: 60,
-    padding: 15,
-    fontSize: 24,
-    lineHeight: 40,
+    ...fontStyles.regular500,
+    width: 64,
+    padding: 24,
+    fontSize: 22,
+    lineHeight: 28,
+    justifyContent: 'center',
     textAlign: 'center',
+    alignItems: 'center',
   },
 })
