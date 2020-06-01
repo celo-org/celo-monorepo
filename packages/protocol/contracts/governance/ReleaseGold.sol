@@ -426,6 +426,7 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
   /**
    * @notice Calculates remaining locked gold balance in the release schedule instance.
    *         The returned amount also includes pending withdrawals to maintain consistent releases.
+   *         Return 0 if address of caller is not an account.
    * @return The remaining locked gold of the release schedule instance.
    * @dev The returned amount may vary over time due to locked gold rewards.
    */
