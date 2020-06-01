@@ -10,21 +10,20 @@ import { connect } from 'react-redux'
 import { hideAlert, showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
-import { ErrorMessages } from 'src/app/ErrorMessages'
 import BackupPhraseContainer, {
   BackupPhraseContainerMode,
   BackupPhraseType,
 } from 'src/backup/BackupPhraseContainer'
 import CancelConfirm from 'src/backup/CancelConfirm'
-import { getStoredMnemonic } from 'src/backup/utils'
+import { getStoredMnemonic, onGetMnemonicFail } from 'src/backup/utils'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { TopBarTextButton } from 'src/navigator/TopBarButton.v2'
 import { RootState } from 'src/redux/reducers'
-import Logger from 'src/utils/Logger'
 
 const TAG = 'backup/BackupPhrase'
+
 interface State {
   mnemonic: string
   isConfirmChecked: boolean
@@ -71,16 +70,12 @@ class BackupPhrase extends React.Component<Props, State> {
     if (this.state.mnemonic) {
       return
     }
+    const mnemonic = await getStoredMnemonic()
 
-    try {
-      const mnemonic = await getStoredMnemonic()
-      if (!mnemonic) {
-        throw new Error('Mnemonic not found in key store')
-      }
+    if (mnemonic) {
       this.setState({ mnemonic })
-    } catch (e) {
-      Logger.error('BackupPhrase/retrieveMnemonic', 'Failed to retrieve mnemonic', e)
-      this.props.showError(ErrorMessages.FAILED_FETCH_MNEMONIC)
+    } else {
+      onGetMnemonicFail(this.props.showError, 'BackupPhrase')
     }
   }
 
@@ -101,9 +96,8 @@ class BackupPhrase extends React.Component<Props, State> {
   }
 
   onPressContinue = () => {
-    const { mnemonic } = this.state
     CeloAnalytics.track(CustomEventNames.backup_continue)
-    navigate(Screens.BackupQuiz, { mnemonic })
+    navigate(Screens.BackupQuiz)
   }
 
   render() {

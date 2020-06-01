@@ -32,7 +32,7 @@ export const DEV_SETTINGS_ACTIVE_INITIALLY = stringToBoolean(
 // VALUES
 export const GAS_INFLATION_FACTOR = 1.5 // Used when estimating gas for txs
 export const GAS_PRICE_INFLATION_FACTOR = 5 // Used when getting gas price, must match what Geth does
-export const BALANCE_OUT_OF_SYNC_THRESHOLD = 5 * 60 // 5 minutes
+export const BALANCE_OUT_OF_SYNC_THRESHOLD = 1 * 60 // 1 minute
 export const ALERT_BANNER_DURATION = 5000
 export const NUMBER_INPUT_MAX_DECIMALS = 2
 export const MAX_COMMENT_LENGTH = 70
