@@ -33,7 +33,7 @@ export class TxParamsNormalizer {
       txParams.gas = await this.getEstimateGas(txParams)
     }
 
-    if (!txParams.gasPrice || isEmpty(txParams.gasPrice.toString())) {
+    if (!txParams.gasPrice || isEmpty(txParams.gas.toString())) {
       txParams.gasPrice = await this.getGasPrice(txParams.feeCurrency)
     }
 
