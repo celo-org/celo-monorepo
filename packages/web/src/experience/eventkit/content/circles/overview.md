@@ -30,6 +30,6 @@ Do you love the mission of Celo and want to be more involved? Do you want to gro
 
 
 ### Branding
-Celo Circle members are not cLabs employees, contractors, or representatives. They are independent, volunteer community members who share a passion for Celo and the mission of prosperity for all. Make Celo your own!
+Celo Circle members are not cLabs or Celo Foundation employees, contractors, or representatives. They are independent, volunteer community members who share a passion for Celo and the mission of prosperity for all. Make Celo your own!
 We are creating Celo Community Branding assets to localize the Celo logo with your own Celo Circle flair.  
 What to start a local Celo Circle? Apply here
