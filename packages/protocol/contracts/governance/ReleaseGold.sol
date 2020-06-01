@@ -431,9 +431,8 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
    * @dev The returned amount may vary over time due to locked gold rewards.
    */
   function getRemainingLockedBalance() public view returns (uint256) {
-    uint256 pendingWithdrawalSum = 0;
     if (getAccounts().isAccount(address(this))) {
-      pendingWithdrawalSum = getLockedGold().getTotalPendingWithdrawals(address(this));
+      uint256 pendingWithdrawalSum = getLockedGold().getTotalPendingWithdrawals(address(this));
       return getLockedGold().getAccountTotalLockedGold(address(this)).add(pendingWithdrawalSum);
     }
     return 0;
