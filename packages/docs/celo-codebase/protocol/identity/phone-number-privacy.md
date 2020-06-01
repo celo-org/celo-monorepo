@@ -14,7 +14,7 @@ Quota is influenced by:
 - Phone number attestation count and success rate
 
 ### Matchmaking
-It's important that we tighten down the quota as much as possible to hinder potential data harvesting. To this end, we consider mutual connections between users when evaluating query threshold consumption. If two Celo users both have each other in their respective address book, then we don't count this query against the user's quota since there's a mutual connection already established. By taking into account mutual connections, we can significantly lower the quota that an average user will need.
+To hinder potential data harvesting, the lookup quotas should be kept small. However, users may want to discover which of there large set of contacts are on the Celo network. To enable that scenario, the PGPNP service offers a 'matchmaking' feature. It takes into account mutual connections between users when evaluating query consumption. If two Celo users both have each other in their respective address book, then they are informed of the connection without their quota being reduced. 
 
 ## Decentralized PGPNP
 ### Distributed Key Generation
