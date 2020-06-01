@@ -88,13 +88,14 @@ Once you publish do some manual tests, for example, after publishing `celocli`
 ```
 # Docker for an isolated environment again
 celo-monorepo $ docker run --rm -it --entrypoint bash node:10
+root@e0d56700584f:/# apt-get install lsb-release libudev-dev libusb-dev libusb-1.0-0 -y
 root@e0d56700584f:/# mkdir /tmp/tmp1 && cd /tmp/tmp1
-root@e0d56700584f:/tmp/tmp1# npm install @celo/celocli@0.0.20
+root@e0d56700584f:/tmp/tmp1# npm install @celo/celocli@0.0.48
 /tmp/tmp1# ./node_modules/.bin/celocli
 CLI Tool for transacting with the Celo protocol
 
 VERSION
-  @celo/celocli/0.0.20 linux-x64 node-v8.16.1
+  @celo/celocli/0.0.48 linux-x64 node-v8.16.1
 
 USAGE
   $ celocli [COMMAND]

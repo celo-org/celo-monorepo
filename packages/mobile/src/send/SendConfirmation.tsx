@@ -2,17 +2,15 @@ import ReviewFrame from '@celo/react-components/components/ReviewFrame'
 import ReviewHeader from '@celo/react-components/components/ReviewHeader'
 import colors from '@celo/react-components/styles/colors'
 import { CURRENCY_ENUM } from '@celo/utils/src/currencies'
-import BigNumber from 'bignumber.js'
+import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { ActivityIndicator, StyleSheet, View } from 'react-native'
 import Modal from 'react-native-modal'
 import SafeAreaView from 'react-native-safe-area-view'
-import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
-import componentWithAnalytics from 'src/analytics/wrapper'
 import { TokenTransactionType } from 'src/apollo/types'
 import InviteOptionsModal from 'src/components/InviteOptionsModal'
 import { FeeType } from 'src/fees/actions'
@@ -23,33 +21,32 @@ import CalculateFee, {
 import { getFeeDollars } from 'src/fees/selectors'
 import { completePaymentRequest, declinePaymentRequest } from 'src/firebase/actions'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
+import { AddressValidationType } from 'src/identity/reducer'
+import { getAddressValidationType, getSecureSendAddress } from 'src/identity/secureSend'
 import { InviteBy } from 'src/invite/actions'
-import { navigateBack } from 'src/navigator/NavigationService'
-import { Recipient } from 'src/recipients/recipient'
+import { navigate, navigateBack } from 'src/navigator/NavigationService'
+import { Screens } from 'src/navigator/Screens'
+import { StackParamList } from 'src/navigator/types'
 import { RootState } from 'src/redux/reducers'
 import { isAppConnected } from 'src/redux/selectors'
 import { sendPaymentOrInvite } from 'src/send/actions'
+import { TransactionDataInput } from 'src/send/SendAmount'
 import TransferReviewCard from 'src/send/TransferReviewCard'
+import { ConfirmationInput, getConfirmationInput } from 'src/send/utils'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import { fetchDollarBalance } from 'src/stableToken/actions'
 import Logger from 'src/utils/Logger'
 import { currentAccountSelector } from 'src/web3/selectors'
-
-export interface ConfirmationInput {
-  recipient: Recipient
-  amount: BigNumber
-  reason: string
-  recipientAddress?: string | null
-  type: TokenTransactionType
-  firebasePendingRequestUid?: string | null
-}
-
 interface StateProps {
   account: string | null
   isSending: boolean
   defaultCountryCode: string
   dollarBalance: string
   appConnected: boolean
+  transactionData: TransactionDataInput
+  confirmationInput: ConfirmationInput
+  addressValidationType: AddressValidationType
+  validatedRecipientAddress?: string
 }
 
 interface DispatchProps {
@@ -59,6 +56,14 @@ interface DispatchProps {
   completePaymentRequest: typeof completePaymentRequest
 }
 
+interface State {
+  modalVisible: boolean
+  buttonReset: boolean
+}
+
+type OwnProps = StackScreenProps<StackParamList, Screens.SendConfirmation>
+type Props = DispatchProps & StateProps & WithTranslation & OwnProps
+
 const mapDispatchToProps = {
   sendPaymentOrInvite,
   fetchDollarBalance,
@@ -66,24 +71,35 @@ const mapDispatchToProps = {
   completePaymentRequest,
 }
 
-const mapStateToProps = (state: RootState): StateProps => {
+const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
+  const { route } = ownProps
+  const transactionData = route.params.transactionData
+  const { e164NumberToAddress } = state.identity
+  const { secureSendPhoneNumberMapping } = state.identity
+  const confirmationInput = getConfirmationInput(
+    transactionData,
+    e164NumberToAddress,
+    secureSendPhoneNumberMapping
+  )
+  const { recipient } = transactionData
+  const addressValidationType = getAddressValidationType(recipient, secureSendPhoneNumberMapping)
+  // Undefined or null means no addresses validated through secure send
+  const validatedRecipientAddress = getSecureSendAddress(recipient, secureSendPhoneNumberMapping)
+
   return {
     account: currentAccountSelector(state),
     isSending: state.send.isSending,
     defaultCountryCode: state.account.defaultCountryCode,
     dollarBalance: state.stableToken.balance || '0',
     appConnected: isAppConnected(state),
+    transactionData,
+    confirmationInput,
+    addressValidationType,
+    validatedRecipientAddress,
   }
 }
 
-interface State {
-  modalVisible: boolean
-  buttonReset: boolean
-}
-
-type Props = NavigationInjectedProps & DispatchProps & StateProps & WithTranslation
-
-class SendConfirmation extends React.Component<Props, State> {
+export class SendConfirmation extends React.Component<Props, State> {
   static navigationOptions = { header: null }
 
   state = {
@@ -96,20 +112,11 @@ class SendConfirmation extends React.Component<Props, State> {
   }
 
   getNavParams = () => {
-    return this.props.navigation.state.params || {}
-  }
-
-  getConfirmationInput(): ConfirmationInput {
-    const confirmationInput = this.props.navigation.getParam('confirmationInput', '')
-    if (confirmationInput === '') {
-      throw new Error('Confirmation input missing')
-    }
-    confirmationInput.amount = new BigNumber(confirmationInput.amount)
-    return confirmationInput
+    return this.props.route.params
   }
 
   onSendClick = () => {
-    const { recipientAddress } = this.getConfirmationInput()
+    const { recipientAddress } = this.props.confirmationInput
     if (recipientAddress) {
       this.sendOrInvite()
     } else {
@@ -124,10 +131,13 @@ class SendConfirmation extends React.Component<Props, State> {
       recipient,
       recipientAddress,
       firebasePendingRequestUid,
-    } = this.getConfirmationInput()
+    } = this.props.confirmationInput
+
+    const timestamp = Date.now()
 
     this.props.sendPaymentOrInvite(
       amount,
+      timestamp,
       reason,
       recipient,
       recipientAddress,
@@ -136,13 +146,21 @@ class SendConfirmation extends React.Component<Props, State> {
     )
   }
 
+  onEditAddressClick = () => {
+    const { transactionData, addressValidationType } = this.props
+    navigate(Screens.ValidateRecipientIntro, {
+      transactionData,
+      addressValidationType,
+    })
+  }
+
   onEditClick = () => {
     CeloAnalytics.track(CustomEventNames.edit_dollar_confirm)
     navigateBack()
   }
 
   onCancelClick = () => {
-    const { firebasePendingRequestUid } = this.getConfirmationInput()
+    const { firebasePendingRequestUid } = this.props.confirmationInput
     if (firebasePendingRequestUid) {
       this.props.declinePaymentRequest(firebasePendingRequestUid)
     }
@@ -152,7 +170,7 @@ class SendConfirmation extends React.Component<Props, State> {
 
   renderHeader = () => {
     const { t } = this.props
-    const { type } = this.getConfirmationInput()
+    const { type } = this.props.confirmationInput
     let title
 
     if (type === TokenTransactionType.PayRequest) {
@@ -195,8 +213,15 @@ class SendConfirmation extends React.Component<Props, State> {
   }
 
   renderWithAsyncFee: CalculateFeeChildren = (asyncFee) => {
-    const { t, appConnected, isSending, dollarBalance } = this.props
-    const { amount, reason, recipient, recipientAddress, type } = this.getConfirmationInput()
+    const {
+      t,
+      appConnected,
+      isSending,
+      dollarBalance,
+      confirmationInput,
+      validatedRecipientAddress,
+    } = this.props
+    const { amount, reason, recipient, recipientAddress, type } = confirmationInput
 
     const fee = getFeeDollars(asyncFee.result)
     const amountWithFee = amount.plus(fee || 0)
@@ -246,6 +271,8 @@ class SendConfirmation extends React.Component<Props, State> {
             isLoadingFee={asyncFee.loading}
             feeError={asyncFee.error}
             type={type}
+            validatedRecipientAddress={validatedRecipientAddress}
+            onEditAddressClick={this.onEditAddressClick}
           />
           <Modal
             isVisible={this.state.modalVisible}
@@ -272,12 +299,12 @@ class SendConfirmation extends React.Component<Props, State> {
   }
 
   render() {
-    const { account } = this.props
+    const { account, confirmationInput } = this.props
     if (!account) {
       throw Error('Account is required')
     }
 
-    const { amount, reason, recipientAddress } = this.getConfirmationInput()
+    const { amount, reason, recipientAddress } = confirmationInput
 
     const feeProps: CalculateFeeProps = recipientAddress
       ? { feeType: FeeType.SEND, account, recipientAddress, amount, comment: reason }
@@ -308,9 +335,7 @@ const styles = StyleSheet.create({
   },
 })
 
-export default componentWithAnalytics(
-  connect<StateProps, DispatchProps, {}, RootState>(
-    mapStateToProps,
-    mapDispatchToProps
-  )(withTranslation(Namespaces.sendFlow7)(SendConfirmation))
-)
+export default connect<StateProps, DispatchProps, OwnProps, RootState>(
+  mapStateToProps,
+  mapDispatchToProps
+)(withTranslation(Namespaces.sendFlow7)(SendConfirmation))

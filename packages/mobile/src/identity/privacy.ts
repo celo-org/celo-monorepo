@@ -3,16 +3,24 @@ import { getPhoneHash, isE164Number, PhoneNumberUtils } from '@celo/utils/src/ph
 import crypto from 'crypto'
 import BlindThresholdBls from 'react-native-blind-threshold-bls'
 import { call, put, select } from 'redux-saga/effects'
+import { e164NumberSelector } from 'src/account/selectors'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import { PHONE_NUM_PRIVACY_PUBLIC_KEY, PHONE_NUM_PRIVACY_SERVICE } from 'src/config'
+import networkConfig from 'src/geth/networkConfig'
 import { updateE164PhoneNumberSalts } from 'src/identity/actions'
 import { e164NumberToSaltSelector, E164NumberToSaltType } from 'src/identity/reducer'
+import { navigate, navigateBack } from 'src/navigator/NavigationService'
+import { Screens } from 'src/navigator/Screens'
+import { transferStableToken } from 'src/stableToken/actions'
+import { generateStandbyTransactionId } from 'src/transactions/actions'
+import { waitForTransactionWithId } from 'src/transactions/saga'
 import Logger from 'src/utils/Logger'
 import { getContractKit } from 'src/web3/contracts'
+import { getConnectedUnlockedAccount } from 'src/web3/saga'
 import { currentAccountSelector } from 'src/web3/selectors'
 
 const TAG = 'identity/privacy'
 const SIGN_MESSAGE_ENDPOINT = '/getBlindedSalt'
+export const SALT_CHAR_LENGTH = 13
 
 export interface PhoneNumberHashDetails {
   e164Number: string
@@ -23,26 +31,7 @@ export interface PhoneNumberHashDetails {
 // Fetch and cache a phone number's salt and hash
 export function* fetchPhoneHashPrivate(e164Number: string) {
   try {
-    Logger.debug(`${TAG}@fetchPrivatePhoneHash`, 'Fetching phone hash details')
-    const saltCache: E164NumberToSaltType = yield select(e164NumberToSaltSelector)
-    const cachedSalt = saltCache[e164Number]
-
-    if (cachedSalt) {
-      Logger.debug(`${TAG}@fetchPrivatePhoneHash`, 'Salt was cached')
-      const phoneHash = getPhoneHash(e164Number, cachedSalt)
-      return { e164Number, phoneHash, salt: cachedSalt }
-    }
-
-    Logger.debug(`${TAG}@fetchPrivatePhoneHash`, 'Salt was not cached, fetching')
-    const account: string = yield select(currentAccountSelector)
-    const contractKit = yield call(getContractKit)
-    const details: PhoneNumberHashDetails = yield call(
-      getPhoneHashPrivate,
-      e164Number,
-      account,
-      contractKit
-    )
-    yield put(updateE164PhoneNumberSalts({ [e164Number]: details.salt }))
+    const details: PhoneNumberHashDetails = yield call(doFetchPhoneHashPrivate, e164Number)
     return details
   } catch (error) {
     if (error.message === ErrorMessages.SALT_QUOTA_EXCEEDED) {
@@ -50,7 +39,14 @@ export function* fetchPhoneHashPrivate(e164Number: string) {
         `${TAG}@fetchPrivatePhoneHash`,
         'Salt quota exceeded, navigating to quota purchase screen'
       )
-      // TODO nav to quota purchase screen
+      const quotaPurchaseSucess: boolean = yield call(navigateToQuotaPurchaseScreen)
+      if (quotaPurchaseSucess) {
+        // If quota purchase was successful, try lookup a second time
+        const details: PhoneNumberHashDetails = yield call(doFetchPhoneHashPrivate, e164Number)
+        return details
+      } else {
+        throw new Error(ErrorMessages.SALT_QUOTA_EXCEEDED)
+      }
     } else {
       Logger.error(`${TAG}@fetchPrivatePhoneHash`, 'Unknown error', error)
       throw new Error(ErrorMessages.SALT_FETCH_FAILURE)
@@ -58,15 +54,46 @@ export function* fetchPhoneHashPrivate(e164Number: string) {
   }
 }
 
-// Unlike the getPhoneHash in utils, this leverage the phone number
+function* doFetchPhoneHashPrivate(e164Number: string) {
+  yield call(getConnectedUnlockedAccount)
+  Logger.debug(`${TAG}@fetchPrivatePhoneHash`, 'Fetching phone hash details')
+  const saltCache: E164NumberToSaltType = yield select(e164NumberToSaltSelector)
+  const cachedSalt = saltCache[e164Number]
+
+  if (cachedSalt) {
+    Logger.debug(`${TAG}@fetchPrivatePhoneHash`, 'Salt was cached')
+    const phoneHash = getPhoneHash(e164Number, cachedSalt)
+    return { e164Number, phoneHash, salt: cachedSalt }
+  }
+
+  Logger.debug(`${TAG}@fetchPrivatePhoneHash`, 'Salt was not cached, fetching')
+  const account: string = yield select(currentAccountSelector)
+  const contractKit: ContractKit = yield call(getContractKit)
+  const selfPhoneDetails: PhoneNumberHashDetails | undefined = yield call(
+    getUserSelfPhoneHashDetails
+  )
+  const selfPhoneHash = selfPhoneDetails?.phoneHash
+  const details: PhoneNumberHashDetails = yield call(
+    getPhoneHashPrivate,
+    e164Number,
+    account,
+    contractKit,
+    selfPhoneHash
+  )
+  yield put(updateE164PhoneNumberSalts({ [e164Number]: details.salt }))
+  return details
+}
+
+// Unlike the getPhoneHash in utils, this leverages the phone number
 // privacy service to compute a secure, unique salt for the phone number
 // and then appends it before hashing.
 async function getPhoneHashPrivate(
   e164Number: string,
   account: string,
-  contractKit: ContractKit
+  contractKit: ContractKit,
+  selfPhoneHash?: string
 ): Promise<PhoneNumberHashDetails> {
-  const salt = await getPhoneNumberSalt(e164Number, account, contractKit)
+  const salt = await getPhoneNumberSalt(e164Number, account, contractKit, selfPhoneHash)
   const phoneHash = getPhoneHash(e164Number, salt)
   return {
     e164Number,
@@ -75,7 +102,12 @@ async function getPhoneHashPrivate(
   }
 }
 
-async function getPhoneNumberSalt(e164Number: string, account: string, contractKit: ContractKit) {
+async function getPhoneNumberSalt(
+  e164Number: string,
+  account: string,
+  contractKit: ContractKit,
+  selfPhoneHash?: string
+) {
   Logger.debug(`${TAG}@getPhoneNumberSalt`, 'Getting phone number salt')
 
   if (!isE164Number(e164Number)) {
@@ -83,19 +115,16 @@ async function getPhoneNumberSalt(e164Number: string, account: string, contractK
   }
 
   Logger.debug(`${TAG}@getPhoneNumberSalt`, 'Retrieving blinded message')
-  const base64BlindedMessage = await BlindThresholdBls.blindMessage(e164Number)
-  const hashedPhoneNumber = PhoneNumberUtils.getPhoneHash(e164Number)
+  const base64BlindedMessage = (await BlindThresholdBls.blindMessage(e164Number)).trim()
   const base64BlindSig = await postToSignMessage(
     base64BlindedMessage,
     account,
-    hashedPhoneNumber,
-    contractKit
+    contractKit,
+    selfPhoneHash
   )
   Logger.debug(`${TAG}@getPhoneNumberSalt`, 'Retrieving unblinded signature')
-  const base64UnblindedSig = await BlindThresholdBls.unblindMessage(
-    base64BlindSig,
-    PHONE_NUM_PRIVACY_PUBLIC_KEY
-  )
+  const { pgpnpPubKey } = networkConfig
+  const base64UnblindedSig = await BlindThresholdBls.unblindMessage(base64BlindSig, pgpnpPubKey)
   Logger.debug(`${TAG}@getPhoneNumberSalt`, 'Converting sig to salt')
   return getSaltFromThresholdSignature(base64UnblindedSig)
 }
@@ -110,19 +139,20 @@ interface SignMessageResponse {
 async function postToSignMessage(
   base64BlindedMessage: string,
   account: string,
-  hashedPhoneNumber: string,
-  contractKit: ContractKit
+  contractKit: ContractKit,
+  selfPhoneHash?: string
 ) {
   Logger.debug(`${TAG}@postToSignMessage`, `Posting to ${SIGN_MESSAGE_ENDPOINT}`)
   const body = JSON.stringify({
-    blindedQueryPhoneNumber: base64BlindedMessage.trim(),
+    blindedQueryPhoneNumber: base64BlindedMessage,
     account,
+    hashedPhoneNumber: selfPhoneHash,
   })
 
   // Sign payload using account privkey
   const authHeader = await contractKit.web3.eth.sign(body, account)
-
-  const res = await fetch(PHONE_NUM_PRIVACY_SERVICE + SIGN_MESSAGE_ENDPOINT, {
+  const { pgpnpUrl } = networkConfig
+  const res = await fetch(pgpnpUrl + SIGN_MESSAGE_ENDPOINT, {
     method: 'POST',
     headers: {
       Accept: 'application/json',
@@ -159,9 +189,74 @@ export function getSaltFromThresholdSignature(base64Sig: string) {
     throw new Error('Invalid base64Sig')
   }
 
+  // Currently uses 13 chars for a 78 bit salt
   const sigBuf = Buffer.from(base64Sig, 'base64')
   return crypto
     .createHash('sha256')
     .update(sigBuf)
-    .digest('hex')
+    .digest('base64')
+    .slice(0, SALT_CHAR_LENGTH)
+}
+
+// Get the wallet user's own phone hash details if they're cached
+// null otherwise
+export function* getUserSelfPhoneHashDetails() {
+  const e164Number: string = yield select(e164NumberSelector)
+  if (!e164Number) {
+    return undefined
+  }
+
+  const saltCache: E164NumberToSaltType = yield select(e164NumberToSaltSelector)
+  const salt = saltCache[e164Number]
+
+  if (!salt) {
+    return undefined
+  }
+
+  const details: PhoneNumberHashDetails = {
+    e164Number,
+    salt,
+    phoneHash: PhoneNumberUtils.getPhoneHash(e164Number, salt),
+  }
+
+  return details
+}
+
+function* navigateToQuotaPurchaseScreen() {
+  try {
+    yield new Promise((resolve, reject) => {
+      navigate(Screens.PhoneNumberLookupQuota, {
+        onBuy: resolve,
+        onSkip: reject,
+      })
+    })
+
+    const ownAddress: string = yield select(currentAccountSelector)
+    const txId = generateStandbyTransactionId(ownAddress)
+    yield put(
+      transferStableToken({
+        recipientAddress: ownAddress, // send payment to yourself
+        amount: '0.01', // one penny
+        comment: 'Lookup Quota Purchase',
+        txId,
+      })
+    )
+
+    const quotaPurchaseTxSuccess = yield call(waitForTransactionWithId, txId)
+    if (!quotaPurchaseTxSuccess) {
+      throw new Error('Purchase tx failed')
+    }
+
+    Logger.debug(`${TAG}@navigateToQuotaPurchaseScreen`, `Quota purchase successful`)
+    navigateBack()
+    return true
+  } catch (error) {
+    Logger.error(
+      `${TAG}@navigateToQuotaPurchaseScreen`,
+      `Quota purchase cancelled or skipped`,
+      error
+    )
+    navigateBack()
+    return false
+  }
 }

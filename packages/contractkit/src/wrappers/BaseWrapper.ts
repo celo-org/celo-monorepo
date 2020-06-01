@@ -1,4 +1,4 @@
-import { ensureLeading0x, hexToBuffer } from '@celo/utils/lib/address'
+import { bufferToHex, ensureLeading0x } from '@celo/utils/lib/address'
 import { zip } from '@celo/utils/lib/collections'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
@@ -50,19 +50,21 @@ export const valueToInt = (input: BigNumber.Value) =>
 export const valueToFrac = (numerator: BigNumber.Value, denominator: BigNumber.Value) =>
   valueToBigNumber(numerator).div(valueToBigNumber(denominator))
 
-export const stringToBuffer = hexToBuffer
-
-export const bufferToString = (buf: Buffer) => ensureLeading0x(buf.toString('hex'))
-
-type SolBytes = string | number[]
-const toBytes = (input: any): SolBytes => input
-const fromBytes = (input: SolBytes): any => input as any
-
-export const stringToBytes = (input: string) => toBytes(ensureLeading0x(input))
-
-export const bufferToBytes = (input: Buffer) => stringToBytes(bufferToString(input))
-
-export const bytesToString = (input: SolBytes): string => fromBytes(input)
+// Type of bytes in solidity gets repesented as a string of number array by typechain and web3
+// Hopefull this will improve in the future, at which point we can make improvements here
+type SolidityBytes = string | number[]
+export const stringToSolidityBytes = (input: string) => ensureLeading0x(input) as SolidityBytes
+export const bufferToSolidityBytes = (input: Buffer) => stringToSolidityBytes(bufferToHex(input))
+export const solidityBytesToString = (input: SolidityBytes): string => {
+  if (input === null || input === undefined || typeof input === 'string') {
+    return input
+  } else if (Array.isArray(input)) {
+    const hexString = input.reduce((acc, num) => acc + num.toString(16).padStart(2, '0'), '')
+    return ensureLeading0x(hexString)
+  } else {
+    throw new Error('Unexpected input type for solidity bytes')
+  }
+}
 
 type Parser<A, B> = (input: A) => B
 

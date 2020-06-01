@@ -917,6 +917,8 @@ export async function startGeth(
     'extip:127.0.0.1',
     '--allow-insecure-unlock', // geth1.9 to use http w/unlocking
     '--gcmode=archive', // Needed to retrieve historical state
+    '--istanbul.blockperiod',
+    blocktime.toString(),
   ]
 
   if (rpcport) {
@@ -964,8 +966,6 @@ export async function startGeth(
     if (validatingGasPrice) {
       gethArgs.push(`--miner.gasprice=${validatingGasPrice}`)
     }
-
-    gethArgs.push(`--istanbul.blockperiod`, blocktime.toString())
 
     if (isProxied) {
       gethArgs.push('--proxy.proxied')

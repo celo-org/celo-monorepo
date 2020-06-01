@@ -6,10 +6,12 @@ import {
   PhoneNumberUtil,
 } from 'google-libphonenumber'
 import * as Web3Utils from 'web3-utils'
+import { getIdentifierPrefix, IdentifierType } from './attestations'
 
 export interface ParsedPhoneNumber {
   e164Number: string
   displayNumber: string
+  displayNumberInternational: string
   countryCode?: number
   regionCode?: string
 }
@@ -17,6 +19,7 @@ export interface ParsedPhoneNumber {
 const phoneUtil = PhoneNumberUtil.getInstance()
 const MIN_PHONE_LENGTH = 4
 const PHONE_SALT_SEPARATOR = '__'
+const E164_REGEX = /^\+[1-9][0-9]{1,14}$/
 
 export function getCountryEmoji(
   e164PhoneNumber: string,
@@ -43,9 +46,8 @@ export const getPhoneHash = (phoneNumber: string, salt?: string): string => {
   if (!phoneNumber || !isE164Number(phoneNumber)) {
     throw Error('Attempting to hash a non-e164 number: ' + phoneNumber)
   }
-  // TODO re-enable when we turn on phone-number-privacy everywhere
-  // const prefix = getIdentifierPrefix(IdentifierType.PHONE_NUMBER)
-  const value = salt ? phoneNumber + PHONE_SALT_SEPARATOR + salt : phoneNumber
+  const prefix = getIdentifierPrefix(IdentifierType.PHONE_NUMBER)
+  const value = prefix + (salt ? phoneNumber + PHONE_SALT_SEPARATOR + salt : phoneNumber)
   return Web3Utils.soliditySha3({ type: 'string', value })
 }
 
@@ -95,6 +97,17 @@ export function getDisplayPhoneNumber(phoneNumber: string, defaultCountryCode: s
   }
 }
 
+export function getDisplayNumberInternational(e164PhoneNumber: string) {
+  const countryCode = getCountryCode(e164PhoneNumber)
+  const phoneDetails = parsePhoneNumber(e164PhoneNumber, (countryCode || '').toString())
+  if (phoneDetails) {
+    return phoneDetails.displayNumberInternational
+  } else {
+    // Fallback to input instead of showing nothing for invalid numbers
+    return e164PhoneNumber
+  }
+}
+
 export function getE164DisplayNumber(e164PhoneNumber: string) {
   const countryCode = getCountryCode(e164PhoneNumber)
   return getDisplayPhoneNumber(e164PhoneNumber, (countryCode || '').toString())
@@ -110,8 +123,7 @@ export function getE164Number(phoneNumber: string, defaultCountryCode: string) {
 }
 
 export function isE164Number(phoneNumber: string) {
-  const E164RegEx = /^\+[1-9][0-9]{1,14}$/
-  return E164RegEx.test(phoneNumber)
+  return E164_REGEX.test(phoneNumber)
 }
 
 // Actually runs through the parsing instead of using a regex
@@ -152,6 +164,10 @@ export function parsePhoneNumber(
       ? {
           e164Number: phoneUtil.format(parsedNumber, PhoneNumberFormat.E164),
           displayNumber: handleSpecialCasesForDisplay(parsedNumber, parsedCountryCode),
+          displayNumberInternational: phoneUtil.format(
+            parsedNumber,
+            PhoneNumberFormat.INTERNATIONAL
+          ),
           countryCode: parsedCountryCode,
           regionCode: parsedRegionCode,
         }

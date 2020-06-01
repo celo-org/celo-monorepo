@@ -106,7 +106,7 @@ release: {{ .Release.Name }}
     VALIDATOR_HEX_ADDRESS=$(cat /root/.celo/validator_address)
     ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --proxy.proxiedvalidatoraddress $VALIDATOR_HEX_ADDRESS --proxy.proxy --proxy.internalendpoint :30503"
     {{- end }}
-  
+
     {{ if .proxied | default false }}
     ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --proxy.proxiedvalidatoraddress $VALIDATOR_HEX_ADDRESS --proxy.proxy --proxy.internalendpoint :30503"
     {{ end }}
@@ -145,6 +145,7 @@ release: {{ .Release.Name }}
       --consoleformat=json \
       --consoleoutput=stdout \
       --verbosity={{ .Values.geth.verbosity }} \
+      --vmodule={{ .Values.geth.vmodule }} \
       --metrics \
       ${ADDITIONAL_FLAGS}
   env:
@@ -312,5 +313,16 @@ spec:
   type: {{ .service_type }}
 {{- if .load_balancer_ip }}
   loadBalancerIP: {{ .load_balancer_ip }}
+{{- end }}
+{{- end -}}
+
+{{/*
+* Specifies an env var given a dictionary, the name of the desired value, and
+* if it's optional. If optional, the env var is only given if the desired value exists in the dict.
+*/}}
+{{- define "common.env-var" -}}
+{{- if or (not .optional) (hasKey .dict .value_name) }}
+- name: {{ .name }}
+  value: "{{ (index .dict .value_name) }}"
 {{- end }}
 {{- end -}}

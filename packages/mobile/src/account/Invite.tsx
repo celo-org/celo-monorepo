@@ -1,16 +1,15 @@
 import TextInput, { TextInputProps } from '@celo/react-components/components/TextInput'
 import withTextInputLabeling from '@celo/react-components/components/WithTextInputLabeling'
 import colors from '@celo/react-components/styles/colors'
+import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { StyleSheet, View } from 'react-native'
-import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
 import { defaultCountryCodeSelector } from 'src/account/selectors'
 import { hideAlert, showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
-import { componentWithAnalytics } from 'src/analytics/wrapper'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import ContactPermission from 'src/icons/ContactPermission'
@@ -19,6 +18,7 @@ import { importContacts } from 'src/identity/actions'
 import { headerWithCancelButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { StackParamList } from 'src/navigator/types'
 import { filterRecipients, NumberToRecipient, Recipient } from 'src/recipients/recipient'
 import RecipientPicker from 'src/recipients/RecipientPicker'
 import { recipientCacheSelector } from 'src/recipients/reducer'
@@ -56,7 +56,10 @@ const mapDispatchToProps = {
   importContacts,
 }
 
-type Props = StateProps & DispatchProps & WithTranslation & NavigationInjectedProps
+type Props = StateProps &
+  DispatchProps &
+  WithTranslation &
+  StackScreenProps<StackParamList, Screens.Invite>
 
 const mapStateToProps = (state: RootState): StateProps => ({
   defaultCountryCode: defaultCountryCodeSelector(state),
@@ -184,9 +187,7 @@ const style = StyleSheet.create({
   },
 })
 
-export default componentWithAnalytics(
-  connect<StateProps, DispatchProps, {}, RootState>(
-    mapStateToProps,
-    mapDispatchToProps
-  )(withTranslation(Namespaces.sendFlow7)(Invite))
-)
+export default connect<StateProps, DispatchProps, {}, RootState>(
+  mapStateToProps,
+  mapDispatchToProps
+)(withTranslation(Namespaces.sendFlow7)(Invite))
