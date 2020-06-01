@@ -41,7 +41,7 @@ oracle:
       # maxPercentageBidAskSpread
       # minReportPriceChangeThreshold
     trades:
-      period: 300000
+      periodMs: 300000
       # dataFetchFrequency
       # minimumTrades
       # scalingRate
@@ -52,7 +52,7 @@ oracle:
     enabled: true
     prometheusPort: 9090
   allowNotCGLD: false
-  apiRequestTimeout: 5000
+  apiRequestTimeoutMs: 5000
   circuitBreakerPriceChangeThreshold: 0.25
   exchanges: BITTREX
   reportStrategy: BLOCK_BASED
@@ -61,7 +61,7 @@ oracle:
       minReportPriceChangeThreshold: 0.005 # 0.5%
       # targetMaxHeartbeatPeriodMs
     timer:
-      removeExpiredFrequency: 60000
+      removeExpiredFrequencyMs: 60000
       # removeExpiredOffsetOverride
       # removeFrequencyOverride
       # reportOffsetOverride
