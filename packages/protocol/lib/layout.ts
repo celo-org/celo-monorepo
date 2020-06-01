@@ -167,7 +167,8 @@ const compareStructDefinitions = (oldType: TypeInfo, newType: TypeInfo) => {
   }
 }
 
-const generateStructsCompatibilityReport = (oldLayout: StorageLayoutInfo, newLayout: StorageLayoutInfo) => { let compatible = true
+const generateStructsCompatibilityReport = (oldLayout: StorageLayoutInfo, newLayout: StorageLayoutInfo) => {
+  let compatible = true
   let errors = []
 
   newLayout.types.keys().forEach(typeName => {
