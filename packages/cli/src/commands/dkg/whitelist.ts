@@ -25,7 +25,6 @@ export default class DKGRegister extends BaseCommand {
 
     const dkg = new web3.eth.Contract(DKG.abi, res.flags.address)
 
-    // read the pubkey and publish it
     const participantAddress = res.flags.participantAddress
     await displayWeb3Tx('whitelist', dkg.methods.whitelist(ensureLeading0x(participantAddress)), {
       from: res.flags.from,
