@@ -7,7 +7,7 @@ import { Flags } from '../../utils/command'
 const DKG = require('./DKG.json')
 
 export default class DKGRegister extends BaseCommand {
-  static description = 'Register a public key in the DKG'
+  static description = 'Whitelist an address in the DKG'
 
   static flags = {
     ...BaseCommand.flags,
