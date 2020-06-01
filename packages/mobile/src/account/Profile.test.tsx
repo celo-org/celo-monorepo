@@ -5,13 +5,12 @@ import { Provider } from 'react-redux'
 import Profile from 'src/account/Profile'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import { createMockStore } from 'test/utils'
-import { mockNavigation } from 'test/values'
+import { createMockStore, getMockStackScreenProps } from 'test/utils'
 
 function profileFactory() {
   return (
     <Provider store={createMockStore({})}>
-      <Profile navigation={mockNavigation} />
+      <Profile {...getMockStackScreenProps(Screens.Profile)} />
     </Provider>
   )
 }

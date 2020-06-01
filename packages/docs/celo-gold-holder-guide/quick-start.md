@@ -1,6 +1,6 @@
 # Quick Start for Celo Gold Holders
 
-If you are an self-custodying holder of Celo Gold on the Celo [Mainnet](../getting-started/mainnet.md), this guide will help you access your account and do the setup necessary to earn rewards on those funds.
+If you are a self-custodying holder of Celo Gold on the Celo [Mainnet](../getting-started/mainnet.md), this guide will help you access your account and do the setup necessary to earn rewards on those funds.
 
 ## Prerequisites
 
@@ -100,11 +100,15 @@ Next, you will find the address of the `ReleaseGold` contract deployed for your 
 
 Use the mapping from this list (you can use Edit>Find in your browser):
 
-- [RC1 ReleaseGold deployments on 4/23/20 ("Wave 1")](https://gist.githubusercontent.com/timmoreton/704404484cf8f641b5464a237592a341/raw/6ad2615f219c71fe370bac84e5ac7aa1653fffac/CeloRC1ReleaseGoldWave1.json)
+- [ReleaseGold deployments on 4/23/20 ("Wave 1")](https://gist.githubusercontent.com/timmoreton/704404484cf8f641b5464a237592a341/raw/6ad2615f219c71fe370bac84e5ac7aa1653fffac/CeloRC1ReleaseGoldWave1.json)
 
-- [RC1 ReleaseGold deployments on 4/30/20 ("Wave 1b")](https://gist.githubusercontent.com/timmoreton/32d36dcc48e52a4747df8cfa8e4a4d0f/raw/1557209b59fa863cc8ed9b66e72e6111fbfe3475/CeloRC1ReleaseGoldWave1b.json)
+- [ReleaseGold deployments on 4/30/20 ("Wave 1b")](https://gist.githubusercontent.com/timmoreton/32d36dcc48e52a4747df8cfa8e4a4d0f/raw/1557209b59fa863cc8ed9b66e72e6111fbfe3475/CeloRC1ReleaseGoldWave1b.json)
 
-- [RC1 ReleaseGold deployments on 5/16/20 ("Wave 2")](https://gist.githubusercontent.com/timmoreton/27e975bbca63723e218288b1a1f9fa54/raw/d55f51fde470fe040407c02462aeb5a7adc3d57f/CeloRC1ReleaseGoldWave2.json): includes self-custodying CoinList auction participants that completed the address submission process by 5/14/20
+- [ReleaseGold deployments on 5/16/20 ("Wave 2")](https://gist.githubusercontent.com/timmoreton/27e975bbca63723e218288b1a1f9fa54/raw/d55f51fde470fe040407c02462aeb5a7adc3d57f/CeloRC1ReleaseGoldWave2.json): includes self-custodying CoinList auction participants that completed the address submission process by 5/14/20
+
+- [ReleaseGold deployments on 5/20/20 ("Wave 2b")](https://gist.githubusercontent.com/timmoreton/f22e70b8149706f738327da8ff71c7d7/raw/944458feda304c7077f2bbb3e190ec677a5ed976/CeloMainnetReleaseGoldWave2b.json): includes self-custodying CoinList auction participants that completed the address submission process by 5/16/20
+
+- [ReleaseGold deployments on 5/27/20 ("Wave 3")](https://gist.githubusercontent.com/timmoreton/40c4a4136827c00a5cc1bc9b5885136e/raw/ebf5cb3b3934e295785d52c35e3129302592bece/CeloMainnetReleaseGoldWave3.json): includes self-custodying CoinList auction participants that completed the address submission process by 5/22/20
 
 If you have more than one beneficiary address, you'll want to step through this guide for each one.
 
@@ -139,7 +143,11 @@ Otherwise, you're all set. You don't need to take any further action right now.
 
 ## Authorize Vote Signer Keys
 
-To allow you to keep your Beneficiary Ledger offline on a day-to-day basis, it’s recommended to use a seperate [Authorized Vote Signer Account](https://docs.celo.org/validator-guide/summary/detailed#authorized-vote-signers) that will vote on behalf of the beneficiary.
+To allow you to keep your Beneficiary Ledger offline on a day-to-day basis, it’s recommended to use a separate [Authorized Vote Signer Account](https://docs.celo.org/validator-guide/summary/detailed#authorized-vote-signers) that will vote on behalf of the beneficiary.
+
+{% hint style="info" %}
+A vote signer can either be another Ledger device or a cloud Hardware Security Module (HSM). Explore [this guide](../developer-resources/integrations/cloud-hsm.md) to learn more about cloud HSM setup and celocli integration.
+{% endhint %}
 
 This is a two step process. First, you create a "proof of possession" that shows that the holder of the beneficiary key also holds the vote signer key. Then, you will use that when the benficiary signs a transaction authorizing the vote signer key. This proves to the Celo network that a single entity holds both keys.
 

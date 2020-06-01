@@ -11,8 +11,8 @@ import { RootState } from 'src/redux/reducers'
 import ExchangeFeedItem from 'src/transactions/ExchangeFeedItem'
 import GoldTransactionFeedItem from 'src/transactions/GoldTransactionFeedItem'
 import NoActivity from 'src/transactions/NoActivity'
-import { TransactionStatus } from 'src/transactions/reducer'
 import TransferFeedItem from 'src/transactions/TransferFeedItem'
+import { TransactionStatus } from 'src/transactions/types'
 import Logger from 'src/utils/Logger'
 import { privateCommentKeySelector } from 'src/web3/selectors'
 
@@ -24,7 +24,7 @@ export enum FeedType {
 }
 
 interface StateProps {
-  commentKey: string | null | undefined
+  commentKey: string | null
   addressToE164Number: AddressToE164NumberType
   recipientCache: NumberToRecipient
 }
@@ -59,13 +59,8 @@ export class TransactionFeed extends React.PureComponent<Props> {
     `,
   }
 
-  renderItem = (commentKeyBuffer: Buffer | null, kind: FeedType) => ({
-    item: tx,
-  }: {
-    item: FeedItem
-    index: number
-  }) => {
-    const { addressToE164Number, recipientCache } = this.props
+  renderItem = ({ item: tx }: { item: FeedItem; index: number }) => {
+    const { addressToE164Number, recipientCache, commentKey, kind } = this.props
 
     switch (tx.__typename) {
       case 'TokenTransfer':
@@ -73,7 +68,7 @@ export class TransactionFeed extends React.PureComponent<Props> {
           <TransferFeedItem
             addressToE164Number={addressToE164Number}
             recipientCache={recipientCache}
-            commentKey={commentKeyBuffer}
+            commentKey={commentKey}
             {...tx}
           />
         )
@@ -91,23 +86,15 @@ export class TransactionFeed extends React.PureComponent<Props> {
   }
 
   render() {
-    const { kind, loading, error, data, commentKey } = this.props
+    const { kind, loading, error, data } = this.props
 
     if (error) {
       Logger.error(TAG, 'Failure while loading transaction feed', error)
       return <NoActivity kind={kind} loading={loading} error={error} />
     }
 
-    const commentKeyBuffer = commentKey ? Buffer.from(commentKey, 'hex') : null
-
     if (data && data.length > 0) {
-      return (
-        <FlatList
-          data={data}
-          keyExtractor={this.keyExtractor}
-          renderItem={this.renderItem(commentKeyBuffer, kind)}
-        />
-      )
+      return <FlatList data={data} keyExtractor={this.keyExtractor} renderItem={this.renderItem} />
     } else {
       return <NoActivity kind={kind} loading={loading} error={error} />
     }

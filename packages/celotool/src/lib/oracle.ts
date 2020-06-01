@@ -13,6 +13,7 @@ import {
   removeGenericHelmChart,
   upgradeGenericHelmChart,
 } from 'src/lib/helm_deploy'
+import { retryCmd } from 'src/lib/utils'
 import yargs from 'yargs'
 
 const helmChartPath = '../helm-charts/oracle'
@@ -171,12 +172,12 @@ async function createOracleAzureIdentityIfNotExists(
 
   // Grant the service principal permission to manage the oracle identity.
   // See: https://github.com/Azure/aad-pod-identity#6-set-permissions-for-mic
-  const [rawServicePrincipalClientId] = await execCmdWithExitOnFailure(
-    `az aks show -n ${clusterConfig.clusterName} --query servicePrincipalProfile.clientId -g ${clusterConfig.resourceGroup} -o tsv`
-  )
-  const servicePrincipalClientId = rawServicePrincipalClientId.trim()
-  await execCmdWithExitOnFailure(
-    `az role assignment create --role "Managed Identity Operator" --assignee ${servicePrincipalClientId} --scope ${identity.id}`
+  await retryCmd(
+    () =>
+      execCmdWithExitOnFailure(
+        `az role assignment create --role "Managed Identity Operator" --assignee-object-id ${identity.principalId} --scope ${identity.id}`
+      ),
+    10
   )
   // Allow the oracle identity to access the correct key vault
   await setOracleKeyVaultPolicy(clusterConfig, oracleIdentity, identity)
@@ -189,7 +190,7 @@ async function setOracleKeyVaultPolicy(
   azureIdentity: any
 ) {
   return execCmdWithExitOnFailure(
-    `az keyvault set-policy --name ${oracleIdentity.keyVaultName} --key-permissions {get,list,sign} --object-id ${azureIdentity.principalId} -g ${clusterConfig.resourceGroup}`
+    `az keyvault set-policy --name ${oracleIdentity.keyVaultName} --key-permissions get list sign --object-id ${azureIdentity.principalId} -g ${clusterConfig.resourceGroup}`
   )
 }
 

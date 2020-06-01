@@ -1,4 +1,5 @@
 import HorizontalLine from '@celo/react-components/components/HorizontalLine'
+import TextButton from '@celo/react-components/components/TextButton.v2'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import { componentStyles } from '@celo/react-components/styles/styles'
@@ -28,6 +29,8 @@ interface Props {
   type: TokenTransactionType
   e164PhoneNumber?: string
   recipient?: Recipient
+  validatedRecipientAddress?: string
+  onEditAddressClick?: () => void
 }
 
 // Content placed in a ReviewFrame
@@ -43,6 +46,8 @@ export default function TransferReviewCard({
   fee,
   isLoadingFee,
   feeError,
+  validatedRecipientAddress,
+  onEditAddressClick,
 }: Props) {
   const { t } = useTranslation(Namespaces.sendFlow7)
   const isInvite = type === TokenTransactionType.InviteSent
@@ -73,6 +78,16 @@ export default function TransferReviewCard({
   return (
     <View style={styles.container}>
       <Avatar recipient={recipient} address={address} e164Number={e164PhoneNumber} />
+      {validatedRecipientAddress && (
+        <View style={styles.editContainer}>
+          <Text>{`${validatedRecipientAddress.slice(0, 6)}...${validatedRecipientAddress.slice(
+            -4
+          )}`}</Text>
+          <TextButton testID={'accountEditButton'} onPress={onEditAddressClick}>
+            {t('edit')}
+          </TextButton>
+        </View>
+      )}
       <CurrencyDisplay type={DisplayType.Big} style={styles.amount} amount={amount} />
       <View style={styles.bottomContainer}>
         {!!comment && <Text style={styles.comment}>{comment}</Text>}
@@ -112,6 +127,9 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: 'flex-start',
     paddingBottom: 25,
+  },
+  editContainer: {
+    flexDirection: 'row',
   },
   bottomContainer: {
     marginTop: 5,
