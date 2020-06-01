@@ -749,7 +749,11 @@ exports[`transfer feed item renders correctly for received 1`] = `
           }
         >
           <Image
-            source={Object {}}
+            source={
+              Object {
+                "testUri": "../../../packages/react-components/images/unknown-user-icon.png",
+              }
+            }
             style={
               Array [
                 Object {
@@ -1031,7 +1035,11 @@ exports[`transfer feed item renders correctly for received with encrypted commen
           }
         >
           <Image
-            source={Object {}}
+            source={
+              Object {
+                "testUri": "../../../packages/react-components/images/unknown-user-icon.png",
+              }
+            }
             style={
               Array [
                 Object {
@@ -1187,7 +1195,11 @@ exports[`transfer feed item renders correctly for sent 1`] = `
           }
         >
           <Image
-            source={Object {}}
+            source={
+              Object {
+                "testUri": "../../../packages/react-components/images/unknown-user-icon.png",
+              }
+            }
             style={
               Array [
                 Object {
@@ -1463,7 +1475,11 @@ exports[`transfer feed item renders correctly for sent transaction 1`] = `
           }
         >
           <Image
-            source={Object {}}
+            source={
+              Object {
+                "testUri": "../../../packages/react-components/images/unknown-user-icon.png",
+              }
+            }
             style={
               Array [
                 Object {
@@ -1616,7 +1632,11 @@ exports[`transfer feed item renders correctly for sent with encrypted comment 1`
           }
         >
           <Image
-            source={Object {}}
+            source={
+              Object {
+                "testUri": "../../../packages/react-components/images/unknown-user-icon.png",
+              }
+            }
             style={
               Array [
                 Object {

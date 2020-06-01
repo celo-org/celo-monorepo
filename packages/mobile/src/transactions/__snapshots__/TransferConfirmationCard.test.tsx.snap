@@ -375,7 +375,11 @@ exports[`TransferConfirmationCard renders correctly for received escrow transact
                   }
                 >
                   <Image
-                    source={Object {}}
+                    source={
+                      Object {
+                        "testUri": "../../../packages/react-components/images/unknown-user-icon.png",
+                      }
+                    }
                     style={
                       Array [
                         Object {
@@ -838,7 +842,11 @@ exports[`TransferConfirmationCard renders correctly for received transaction dri
                   }
                 >
                   <Image
-                    source={Object {}}
+                    source={
+                      Object {
+                        "testUri": "../../../packages/react-components/images/unknown-user-icon.png",
+                      }
+                    }
                     style={
                       Array [
                         Object {
@@ -1303,7 +1311,11 @@ exports[`TransferConfirmationCard renders correctly for sent escrow transaction 
                   }
                 >
                   <Image
-                    source={Object {}}
+                    source={
+                      Object {
+                        "testUri": "../../../packages/react-components/images/unknown-user-icon.png",
+                      }
+                    }
                     style={
                       Array [
                         Object {
@@ -1984,7 +1996,11 @@ exports[`TransferConfirmationCard renders correctly for sent transaction drilldo
                   }
                 >
                   <Image
-                    source={Object {}}
+                    source={
+                      Object {
+                        "testUri": "../../../packages/react-components/images/unknown-user-icon.png",
+                      }
+                    }
                     style={
                       Array [
                         Object {

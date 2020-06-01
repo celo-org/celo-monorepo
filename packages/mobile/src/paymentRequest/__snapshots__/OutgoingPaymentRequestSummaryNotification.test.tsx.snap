@@ -94,7 +94,7 @@ exports[`OutgoingPaymentRequestSummaryNotification renders a number when the add
             >
               
               $
-              266000.00
+              266,000.00
             </Text>
           </Text>
           <Text
@@ -334,7 +334,7 @@ exports[`OutgoingPaymentRequestSummaryNotification renders correctly for just on
             >
               
               $
-              266000.00
+              266,000.00
             </Text>
           </Text>
           <Text

@@ -158,7 +158,11 @@ exports[`ignores failed standby transactions 1`] = `
                 }
               >
                 <Image
-                  source={Object {}}
+                  source={
+                    Object {
+                      "testUri": "../../../packages/react-components/images/unknown-user-icon.png",
+                    }
+                  }
                   style={
                     Array [
                       Object {
@@ -546,7 +550,11 @@ exports[`ignores pending standby transactions that are completed in the response
                 }
               >
                 <Image
-                  source={Object {}}
+                  source={
+                    Object {
+                      "testUri": "../../../packages/react-components/images/unknown-user-icon.png",
+                    }
+                  }
                   style={
                     Array [
                       Object {
@@ -1020,7 +1028,11 @@ exports[`renders the received data along with the standby transactions 1`] = `
                 }
               >
                 <Image
-                  source={Object {}}
+                  source={
+                    Object {
+                      "testUri": "../../../packages/react-components/images/unknown-user-icon.png",
+                    }
+                  }
                   style={
                     Array [
                       Object {
@@ -1426,7 +1438,11 @@ exports[`renders the received data along with the standby transactions 1`] = `
                 }
               >
                 <Image
-                  source={Object {}}
+                  source={
+                    Object {
+                      "testUri": "../../../packages/react-components/images/unknown-user-icon.png",
+                    }
+                  }
                   style={
                     Array [
                       Object {
