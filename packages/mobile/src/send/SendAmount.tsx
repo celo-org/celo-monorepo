@@ -56,7 +56,7 @@ export interface TransactionDataInput {
   recipient: Recipient
   amount: BigNumber
   type: TokenTransactionType
-  reason: string
+  reason?: string
   firebasePendingRequestUid?: string | null
 }
 

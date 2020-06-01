@@ -374,22 +374,25 @@ exports[`TransferConfirmationCard renders correctly for received escrow transact
                     ]
                   }
                 >
-                  <Text
+                  <Image
+                    source={
+                      Object {
+                        "testUri": "../../../packages/react-components/images/unknown-user-icon.png",
+                      }
+                    }
                     style={
                       Array [
                         Object {
-                          "color": "#FFFFFF",
-                          "fontFamily": "Hind-Medium",
-                          "fontSize": 16,
+                          "alignSelf": "center",
+                          "margin": "auto",
                         },
                         Object {
-                          "fontSize": 20,
+                          "height": 40,
+                          "width": 40,
                         },
                       ]
                     }
-                  >
-                    #
-                  </Text>
+                  />
                 </View>
               </View>
               <View
@@ -466,7 +469,7 @@ exports[`TransferConfirmationCard renders correctly for received escrow transact
                       Array [
                         Object {
                           "color": "#FFFFFF",
-                          "fontFamily": "Hind-Medium",
+                          "fontFamily": "Inter-Medium",
                           "fontSize": 16,
                         },
                         Object {
@@ -838,22 +841,25 @@ exports[`TransferConfirmationCard renders correctly for received transaction dri
                     ]
                   }
                 >
-                  <Text
+                  <Image
+                    source={
+                      Object {
+                        "testUri": "../../../packages/react-components/images/unknown-user-icon.png",
+                      }
+                    }
                     style={
                       Array [
                         Object {
-                          "color": "#FFFFFF",
-                          "fontFamily": "Hind-Medium",
-                          "fontSize": 16,
+                          "alignSelf": "center",
+                          "margin": "auto",
                         },
                         Object {
-                          "fontSize": 20,
+                          "height": 40,
+                          "width": 40,
                         },
                       ]
                     }
-                  >
-                    #
-                  </Text>
+                  />
                 </View>
               </View>
               <View
@@ -930,7 +936,7 @@ exports[`TransferConfirmationCard renders correctly for received transaction dri
                       Array [
                         Object {
                           "color": "#FFFFFF",
-                          "fontFamily": "Hind-Medium",
+                          "fontFamily": "Inter-Medium",
                           "fontSize": 16,
                         },
                         Object {
@@ -1304,22 +1310,25 @@ exports[`TransferConfirmationCard renders correctly for sent escrow transaction 
                     ]
                   }
                 >
-                  <Text
+                  <Image
+                    source={
+                      Object {
+                        "testUri": "../../../packages/react-components/images/unknown-user-icon.png",
+                      }
+                    }
                     style={
                       Array [
                         Object {
-                          "color": "#FFFFFF",
-                          "fontFamily": "Hind-Medium",
-                          "fontSize": 16,
+                          "alignSelf": "center",
+                          "margin": "auto",
                         },
                         Object {
-                          "fontSize": 20,
+                          "height": 40,
+                          "width": 40,
                         },
                       ]
                     }
-                  >
-                    #
-                  </Text>
+                  />
                 </View>
               </View>
               <View
@@ -1396,7 +1405,7 @@ exports[`TransferConfirmationCard renders correctly for sent escrow transaction 
                       Array [
                         Object {
                           "color": "#FFFFFF",
-                          "fontFamily": "Hind-Medium",
+                          "fontFamily": "Inter-Medium",
                           "fontSize": 16,
                         },
                         Object {
@@ -1986,22 +1995,25 @@ exports[`TransferConfirmationCard renders correctly for sent transaction drilldo
                     ]
                   }
                 >
-                  <Text
+                  <Image
+                    source={
+                      Object {
+                        "testUri": "../../../packages/react-components/images/unknown-user-icon.png",
+                      }
+                    }
                     style={
                       Array [
                         Object {
-                          "color": "#FFFFFF",
-                          "fontFamily": "Hind-Medium",
-                          "fontSize": 16,
+                          "alignSelf": "center",
+                          "margin": "auto",
                         },
                         Object {
-                          "fontSize": 20,
+                          "height": 40,
+                          "width": 40,
                         },
                       ]
                     }
-                  >
-                    #
-                  </Text>
+                  />
                 </View>
               </View>
               <View
@@ -2078,7 +2090,7 @@ exports[`TransferConfirmationCard renders correctly for sent transaction drilldo
                       Array [
                         Object {
                           "color": "#FFFFFF",
-                          "fontFamily": "Hind-Medium",
+                          "fontFamily": "Inter-Medium",
                           "fontSize": 16,
                         },
                         Object {
