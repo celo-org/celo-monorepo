@@ -1,16 +1,10 @@
 {
   "home": {
     "title": "Welcome to the Celo EventKit",
-    "introduction": "The EventKit is where individuals can learn, create, ideate and share experiences they create in their local communities. This Kit was designed to help Celo Community members create magical experiences that connect their communities with prosperity.",
-    "useageTitle": "How to use this guide?",
-    "useageText": "Celo events are the fuel that create magic launching the movement of prosperity worldwide. When diverse groups of people join together around a single purpose, magic happens. \n\nAre you passionate about Celo’s mission? Enjoy bringing people together? Want to cultivate a movement of prosperity? Consider organizing a Celo event.\n\nThe EventKit is a tool that will help guide you through your events. Think of it as a living, breathing document that is continuously evolving as new ideas and gifts come forward from the community. When we support each other in learning and growing we all prosper. We encourage you to add any ideas you have by making suggestions, edits and comments throughout the following documents.",
-    "importantRemember": "Important things to remember",
-    "importantRememberText": "Shared norms and behaviors are the foundation of a beautiful community. Support the effort responsibly and uphold Celo’s <0>Community Code of Conduct.</0>"
+    "introduction": "The EventKit is where individuals can learn, create, ideate and share experiences they create in their local communities. This Kit was designed to help Celo Community members create magical experiences that connect their communities with prosperity."
   },
   "flavor": {
     "title": "Celo Flavor",
     "introduction": "At Celo, prosperity is: people getting their basic needs met, people following their unique path, and people supporting one another. The focus on cultivating prosperity is what gives events the “Celo” flavor. These common characteristics, as well as the suggested event ideas below, are designed to support that intention.",
-    "introductionP2": "Celo events can look a lot of different ways. These are the commonalities they share:",
-    "introductionBullets": ""
   }
 }

@@ -30,17 +30,17 @@ export default withScreenSize<Props>(
     screen,
     currentPathName,
     routeHash,
-    isFlowing,
     distance,
+    isFlowing,
   }: Props & ScreenProps) {
     const mainContaner = isFlowing
-      ? [styles.container, { transform: [{ translateY: distance }] }]
+      ? [styles.containerFlow, { transform: [{ translateY: distance }] }]
       : styles.container
 
     const container = screen === ScreenSizes.MOBILE ? styles.mobileContainer : mainContaner
 
     return (
-      <View style={container}>
+      <View style={container} nativeID="sidebar">
         {pages.map((page) => {
           return (
             <React.Fragment key={page.href}>
@@ -145,9 +145,10 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   container: {
-    transitionProperty: 'transform',
-    transitionDuration: '200ms',
     position: 'fixed',
+  },
+  containerFlow: {
+    position: 'absolute',
   },
   iconPlaceholder: { width: COIN_SIZE },
   item: {

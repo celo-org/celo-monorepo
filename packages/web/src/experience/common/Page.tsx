@@ -29,8 +29,6 @@ export const ICONS_PATH = `${ROOT}/icons`
 export const EXCHANGE_ICONS_PATH = `${ROOT}/exchange-icons`
 export const COMPOSITION_PATH = `${ROOT}/composition`
 
-const THAW_DISTANCE = 600
-
 interface Section {
   id: string
   children: React.ReactNode
@@ -111,10 +109,11 @@ class Page extends React.Component<Props & ScreenProps, State> {
     setImmediate(() => {
       const footer = entries.find((entry) => entry.target.id === FOOTER_ID)
       if (footer) {
-        if (footer.boundingClientRect.top < THAW_DISTANCE) {
+        if (footer.isIntersecting) {
           this.setState({
             isSidebarFrozen: false,
-            distanceToTop: footer.boundingClientRect.top - THAW_DISTANCE,
+            // @ts-ignore
+            distanceToTop: footer.target.offsetTop,
           })
         } else {
           this.setState({
@@ -175,6 +174,7 @@ class Page extends React.Component<Props & ScreenProps, State> {
   componentWillUnmount = () => {
     this.observer.disconnect()
     window.removeEventListener('hashchange', this.onChangeHash)
+    window.removeEventListener('scroll', this.onChangeHash)
   }
 
   render() {
@@ -258,7 +258,7 @@ const styles = StyleSheet.create({
     zIndex: 10,
     marginBottom: HEADER_HEIGHT,
   },
-  footer: { zIndex: -10, backgroundColor: colors.white },
+  footer: { zIndex: -100, backgroundColor: colors.white, marginTop: 50 },
   childrenArea: {
     minHeight: `calc(100vh - ${HEADER_HEIGHT}px)`,
   },

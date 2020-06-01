@@ -1,11 +1,8 @@
 import * as React from 'react'
-import { View } from 'react-native'
-import { brandStyles } from 'src/experience/common/constants'
 import Page, { ROOT } from 'src/experience/eventkit/Page'
-import Markdown from 'src/experience/Markdown'
+import Section from 'src/experience/eventkit/Section'
 import { NameSpaces, useTranslation } from 'src/i18n'
 import { hashNav } from 'src/shared/menu-items'
-import { standardStyles } from 'src/styles'
 
 const sections = [
   hashNav.eventsResources.overview,
@@ -30,13 +27,5 @@ export default function Resources() {
         sections={sections}
       />
     </>
-  )
-}
-
-function Section({ content }) {
-  return (
-    <View style={[brandStyles.gap, standardStyles.elementalMarginBottom]}>
-      <Markdown source={content} />
-    </View>
   )
 }

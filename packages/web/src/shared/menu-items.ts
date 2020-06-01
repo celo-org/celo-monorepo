@@ -194,6 +194,15 @@ export const hashNav = {
     planning: 'planning',
     social: 'social-media',
   },
+  eventExamples: {
+    examples: 'examples',
+    slideDecks: 'slide-decks',
+    videos: 'videos',
+  },
+  eventCircles: {
+    overview: 'overview',
+    sponsorship: 'sponsorship',
+  },
 }
 
 export default pagePaths

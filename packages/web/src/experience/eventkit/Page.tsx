@@ -7,6 +7,9 @@ export const ROOT = menu.EVENTS_KIT.link
 export const FLAVOR_PATH = `${ROOT}/flavor`
 export const RESOURCES_PATH = `${ROOT}/resources`
 
+export const EXAMPLES_PATH = `${ROOT}/examples`
+export const CIRCLES_PATH = `${ROOT}/circles`
+
 const PAGES = [
   {
     title: 'Introduction',
@@ -42,6 +45,21 @@ const PAGES = [
       { title: 'Quick Tips', href: `${RESOURCES_PATH}#${hashNav.eventsResources.quickTips}` },
       { title: 'Planning', href: `${RESOURCES_PATH}#${hashNav.eventsResources.planning}` },
       { title: 'Social Media', href: `${RESOURCES_PATH}#${hashNav.eventsResources.social}` },
+    ],
+  },
+  {
+    title: 'Example Content',
+    href: EXAMPLES_PATH,
+    sections: [
+      { title: 'Slide Decks', href: `${EXAMPLES_PATH}#${hashNav.eventExamples.slideDecks}` },
+      { title: 'Videos', href: `${EXAMPLES_PATH}#${hashNav.eventExamples.videos}` },
+    ],
+  },
+  {
+    title: 'Celo Circles',
+    href: CIRCLES_PATH,
+    sections: [
+      { title: 'Sponsorship', href: `${CIRCLES_PATH}#${hashNav.eventCircles.sponsorship}` },
     ],
   },
 ]

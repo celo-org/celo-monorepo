@@ -1,11 +1,8 @@
 import * as React from 'react'
-import { View } from 'react-native'
-import { brandStyles } from 'src/experience/common/constants'
-import Page, { ROOT } from 'src/experience/eventkit/Page'
-import Markdown from 'src/experience/Markdown'
+import Page, { FLAVOR_PATH, ROUTE_TO_TITLE } from 'src/experience/eventkit/Page'
+import Section from 'src/experience/eventkit/Section'
 import { NameSpaces, useTranslation } from 'src/i18n'
 import { hashNav } from 'src/shared/menu-items'
-import { standardStyles } from 'src/styles'
 
 const sections = [
   hashNav.eventsFlavor.overview,
@@ -26,18 +23,10 @@ export default function Flavor() {
     <>
       <Page
         title="Home"
-        path={ROOT}
+        path={ROUTE_TO_TITLE[FLAVOR_PATH]}
         metaDescription={t('flavor.introduction')}
         sections={sections}
       />
     </>
-  )
-}
-
-function Section({ content }) {
-  return (
-    <View style={[brandStyles.gap, standardStyles.elementalMarginBottom]}>
-      <Markdown source={content} />
-    </View>
   )
 }

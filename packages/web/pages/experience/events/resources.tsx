@@ -1,3 +1,3 @@
-import resources from 'src/experience/eventkit/resources'
+import resources from 'src/experience/eventkit/ResourcesPage'
 
 export default resources
