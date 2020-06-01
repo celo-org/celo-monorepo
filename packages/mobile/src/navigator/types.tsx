@@ -121,6 +121,7 @@ export type StackParamList = {
   }
   [Screens.SendConfirmation]: {
     transactionData: TransactionDataInput
+    addressJustValidated?: boolean
   }
   [Screens.SetClock]: undefined
   [Screens.Settings]: undefined
