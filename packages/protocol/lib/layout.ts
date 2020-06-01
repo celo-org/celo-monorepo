@@ -6,9 +6,9 @@ import {
   compareStorageLayouts,
   Contract as ZContract,
   getStorageLayout,
-  StorageLayoutInfo,
   Operation,
   StorageLayoutInfo,
+<<<<<<< HEAD
 =======
 =======
   Operation,
@@ -22,6 +22,8 @@ import {
   Contract as ZContract,
   getStorageLayout,
   Operation,
+>>>>>>> Appease the linter
+=======
 >>>>>>> Appease the linter
 } from '@openzeppelin/upgrades'
 const  Web3 = require('web3')
@@ -413,7 +415,7 @@ const compareStructDefinitions = (oldType: TypeInfo, newType: TypeInfo) => {
 const generateStructsCompatibilityReport = (oldLayout: StorageLayoutInfo, newLayout: StorageLayoutInfo) => { let compatible = true
   let errors = []
 
-  for (let typeName in newLayout.types) {
+  newLayout.types.keys().forEach(typeName => {
     const newType = newLayout.types[typeName]
     const oldType = oldLayout.types[typeName]
 
@@ -424,7 +426,7 @@ const generateStructsCompatibilityReport = (oldLayout: StorageLayoutInfo, newLay
         errors = errors.concat(structReport.errors)
       }
     }
-  }
+  })
 
   return {
     compatible,
