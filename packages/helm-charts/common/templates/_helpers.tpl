@@ -159,6 +159,28 @@ release: {{ .Release.Name }}
     valueFrom:
       fieldRef:
         fieldPath: metadata.name
+{{- if .expose /* TODO: make this use IPC */ }}
+  readinessProbe:
+    exec:
+      command:
+      - /bin/sh
+      - "-c"
+      - |
+        MAX_LATEST_BLOCK_AGE_SECONDS={{ .max_latest_block_age_seconds | default 30 }}
+        LATEST_BLOCK_JSON=$(wget -q --header "Content-Type: application/json" --post-data "{\"jsonrpc\":\"2.0\",\"method\":\"eth_getBlockByNumber\",\"params\":[\"latest\", false],\"id\":67}" -O - http://localhost:8545)
+        BLOCK_TIMESTAMP_HEX=$(echo $LATEST_BLOCK_JSON | grep -o '"timestamp":"[^"]*' | grep -o '[a-fA-F0-9]*$')
+        BLOCK_TIMESTAMP=$(( 16#$BLOCK_TIMESTAMP_HEX ))
+        CURRENT_TIMESTAMP=$(date +%s)
+        BLOCK_AGE_SECONDS=$(( $CURRENT_TIMESTAMP - $BLOCK_TIMESTAMP ))
+        # if the most recent block is too old, then indicate the node is not ready
+        if [ $BLOCK_AGE_SECONDS -gt $MAX_LATEST_BLOCK_AGE_SECONDS ]; then
+          echo "Latest block too old. Age: $BLOCK_AGE_SECONDS Block JSON: $LATEST_BLOCK_JSON"
+          exit 1
+        fi
+        exit 0
+    initialDelaySeconds: 20
+    periodSeconds: 10
+{{- end }}
   ports:
   - name: discovery
     containerPort: 30303
