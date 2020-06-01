@@ -433,8 +433,9 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
     uint256 pendingWithdrawalSum = 0;
     if (getAccounts().isAccount(address(this))) {
       pendingWithdrawalSum = getLockedGold().getTotalPendingWithdrawals(address(this));
+      return getLockedGold().getAccountTotalLockedGold(address(this)).add(pendingWithdrawalSum);
     }
-    return getLockedGold().getAccountTotalLockedGold(address(this)).add(pendingWithdrawalSum);
+    return 0;
   }
 
   /**
