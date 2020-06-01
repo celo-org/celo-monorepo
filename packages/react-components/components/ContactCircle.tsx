@@ -1,10 +1,10 @@
-const unknownUserIcon = require('@celo/mobile/src/images/unknown-user-icon.png')
 import colors from '@celo/react-components/styles/colors.v2'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import { getContactNameHash } from '@celo/utils/src/contacts'
 import * as React from 'react'
 import { Image, StyleSheet, Text, View, ViewStyle } from 'react-native'
 import { MinimalContact } from 'react-native-contacts'
+const unknownUserIcon = require('@celo/react-components/images/unknown-user-icon.png')
 
 interface Props {
   style?: ViewStyle
