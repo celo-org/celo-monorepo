@@ -32,7 +32,10 @@ describe('Validator handshake tests', () => {
     await context.hooks.before()
   })
 
-  after(context.hooks.after)
+  after(async function(this: any) {
+    this.timeout(0)
+    await context.hooks.after()
+  })
 
   describe('Validator handshake', () => {
     beforeEach(async function() {
@@ -83,7 +86,7 @@ describe('Validator handshake tests', () => {
       // has the correct entry for validator 1
       const val1Info = await val1Admin.getNodeInfo()
       const val1EnodeNoPort = getEnodeNoPort(val1Info.enode)
-      const val0ValEnodeTable = await jsonRpc(val0Web3, 'istanbul_getValEnodeTable', [])
+      const val0ValEnodeTable = await jsonRpcResult(val0Web3, 'istanbul_getValEnodeTable', [])
       const val1EntryInVal0ValEnodeTable = getValEnodeTableEntry(val0ValEnodeTable, val1Address)
       assert(
         val1EntryInVal0ValEnodeTable,
@@ -111,7 +114,7 @@ describe('Validator handshake tests', () => {
       assert(val0Peer, "Could not find validator 0 in validator 1's peers")
       assert(val0Peer.network.inbound, 'Validator 0 peer to validator 1 is not inbound')
 
-      const val1ValEnodeTable = await jsonRpc(val1Web3, 'istanbul_getValEnodeTable', [])
+      const val1ValEnodeTable = await jsonRpcResult(val1Web3, 'istanbul_getValEnodeTable', [])
       const val0Address = await val0Web3.eth.getCoinbase()
 
       const entry = getValEnodeTableEntry(val1ValEnodeTable, val0Address)
@@ -159,7 +162,7 @@ describe('Validator handshake tests', () => {
       // It will still have its valEnodeTable, which will still have the old entry
       // for the proxied validator
       await restartInstance(gethConfig, gethConfig.instances[0])
-      let val0ValEnodeTable = await jsonRpc(val0Web3, 'istanbul_getValEnodeTable', [])
+      let val0ValEnodeTable = await jsonRpcResult(val0Web3, 'istanbul_getValEnodeTable', [])
       let val0ProxiedValEntry = getValEnodeTableEntry(val0ValEnodeTable, proxiedValAddress)
       assert(val0ProxiedValEntry, 'No entry in restarted validator 0 for old proxied validator')
 
@@ -168,7 +171,7 @@ describe('Validator handshake tests', () => {
       // incorrect enode, so at this point the proxy does not have any proof
       // it is on behalf of the proxied validator.
       await restartInstance(gethConfig, gethConfig.instances[proxyIndex])
-      val0ValEnodeTable = await jsonRpc(val0Web3, 'istanbul_getValEnodeTable', [])
+      val0ValEnodeTable = await jsonRpcResult(val0Web3, 'istanbul_getValEnodeTable', [])
       const val0ProxiedValEntryOld = val0ProxiedValEntry
       val0ProxiedValEntry = getValEnodeTableEntry(val0ValEnodeTable, proxiedValAddress)
       assert(
@@ -290,4 +293,8 @@ function isValidatorPeer(peers: any[], targetEnodeNoPort: string) {
     // @ts-ignore trustedNodeInfo is not in the type definition
     peer.trustedNodeInfo.includes(validatorPurpose)
   )
+}
+
+async function jsonRpcResult(...params: Parameters<typeof jsonRpc>) {
+  return (await jsonRpc(...params)).result
 }
