@@ -3,8 +3,8 @@ import {
   compareStorageLayouts,
   Contract as ZContract,
   getStorageLayout,
-  StorageLayoutInfo,
   Operation,
+  StorageLayoutInfo,
 } from '@openzeppelin/upgrades'
 const  Web3 = require('web3')
 import { Contract as Web3Contract } from 'web3-eth-contract';
@@ -170,7 +170,7 @@ const compareStructDefinitions = (oldType: TypeInfo, newType: TypeInfo) => {
 const generateStructsCompatibilityReport = (oldLayout: StorageLayoutInfo, newLayout: StorageLayoutInfo) => { let compatible = true
   let errors = []
 
-  for (let typeName in newLayout.types) {
+  newLayout.types.keys().forEach(typeName => {
     const newType = newLayout.types[typeName]
     const oldType = oldLayout.types[typeName]
 
@@ -181,7 +181,7 @@ const generateStructsCompatibilityReport = (oldLayout: StorageLayoutInfo, newLay
         errors = errors.concat(structReport.errors)
       }
     }
-  }
+  })
 
   return {
     compatible,
