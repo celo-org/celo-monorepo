@@ -1,21 +1,19 @@
-import { authenticateUser, isVerified } from '../src/common/identity'
 import { BLSCryptographyClient } from '../src/bls/bls-cryptography-client'
+import { authenticateUser } from '../src/common/identity'
+import { getTransaction } from '../src/database/database'
 import {
   getDidMatchmaking,
   incrementQueryCount,
   setDidMatchmaking,
 } from '../src/database/wrappers/account'
-import { getNumberPairContacts, setNumberPairContacts } from '../src/database/wrappers/number-pairs'
-import { getBlindedSalt, getContactMatches } from '../src/index'
+import { getBlindedSalt } from '../src/index'
 import { getRemainingQueryCount } from '../src/salt-generation/query-quota'
-import { getTransaction } from '../src/database/database'
 
 const BLS_SIGNATURE = '6546544323114343'
 
 jest.mock('../src/common/identity')
 const mockAuthenticateUser = authenticateUser as jest.Mock
 mockAuthenticateUser.mockReturnValue(true)
-const mockIsVerified = isVerified as jest.Mock
 
 jest.mock('../src/salt-generation/query-quota')
 const mockGetRemainingQueryCount = getRemainingQueryCount as jest.Mock
@@ -31,11 +29,6 @@ const mockGetDidMatchmaking = getDidMatchmaking as jest.Mock
 mockGetDidMatchmaking.mockReturnValue(false)
 const mockSetDidMatchmaking = setDidMatchmaking as jest.Mock
 mockSetDidMatchmaking.mockImplementation()
-
-jest.mock('../src/database/wrappers/number-pairs')
-const mockSetNumberPairContacts = setNumberPairContacts as jest.Mock
-mockSetNumberPairContacts.mockImplementation()
-const mockGetNumberPairContacts = getNumberPairContacts as jest.Mock
 
 jest.mock('../src/database/database')
 const mockGetTransaction = getTransaction as jest.Mock
@@ -142,136 +135,6 @@ describe(`POST /getBlindedMessageSignature endpoint`, () => {
       }
       // @ts-ignore TODO fix req type to make it a mock express req
       getBlindedSalt(req, res)
-    })
-  })
-})
-
-describe(`POST /getContactMatches endpoint`, () => {
-  describe('with valid input', () => {
-    const userPhoneNumber = '5555555555'
-    const contactPhoneNumber1 = '1234567890'
-    const contactPhoneNumbers = [contactPhoneNumber1]
-    const account = '0x78dc5D2D739606d31509C31d654056A45185ECb6'
-
-    const mockRequestData = {
-      userPhoneNumber,
-      contactPhoneNumbers,
-      account,
-    }
-    const req = { body: mockRequestData }
-    it('provides matches', () => {
-      mockGetNumberPairContacts.mockReturnValue(contactPhoneNumbers)
-      mockIsVerified.mockReturnValue(true)
-      const expected = [{ phoneNumber: contactPhoneNumber1 }]
-      const res = {
-        json(body: any) {
-          expect(body.success).toEqual(true)
-          expect(body.matchedContacts).toEqual(expected)
-        },
-      }
-      // @ts-ignore TODO fix req type to make it a mock express req
-      getContactMatches(req, res)
-    })
-    it('provides matches empty array', () => {
-      mockGetNumberPairContacts.mockReturnValue([])
-      mockIsVerified.mockReturnValue(true)
-      const res = {
-        json(body: any) {
-          expect(body.success).toEqual(true)
-          expect(body.matchedContacts).toEqual([])
-        },
-      }
-      // @ts-ignore TODO fix req type to make it a mock express req
-      getContactMatches(req, res)
-    })
-    it('rejects more than one attempt to matchmake with 403', () => {
-      mockGetDidMatchmaking.mockReturnValue(true)
-      mockIsVerified.mockReturnValue(true)
-      const res = {
-        status(status: any) {
-          expect(status).toEqual(403)
-          return {
-            json() {
-              return {}
-            },
-          }
-        },
-      }
-      // @ts-ignore TODO fix req type to make it a mock express req
-      getContactMatches(req, res)
-    })
-  })
-  describe('with invalid input', () => {
-    it('missing user number returns 400', () => {
-      const contactPhoneNumbers = ['1234567890']
-      const account = '0x78dc5D2D739606d31509C31d654056A45185ECb6'
-
-      const mockRequestData = {
-        contactPhoneNumbers,
-        account,
-      }
-      const req = { body: mockRequestData }
-
-      const res = {
-        status(status: any) {
-          expect(status).toEqual(400)
-          return {
-            json() {
-              return {}
-            },
-          }
-        },
-      }
-      // @ts-ignore TODO fix req type to make it a mock express req
-      getContactMatches(req, res)
-    })
-    it('invalid account returns 400', () => {
-      const contactPhoneNumbers = ['1234567890']
-      const userPhoneNumber = '5555555555'
-      const account = 'garbage'
-
-      const mockRequestData = {
-        contactPhoneNumbers,
-        userPhoneNumber,
-        account,
-      }
-      const req = { body: mockRequestData }
-
-      const res = {
-        status(status: any) {
-          expect(status).toEqual(400)
-          return {
-            json() {
-              return {}
-            },
-          }
-        },
-      }
-      // @ts-ignore TODO fix req type to make it a mock express req
-      getContactMatches(req, res)
-    })
-    it('missing contact phone numbers returns 400', () => {
-      const userPhoneNumber = '5555555555'
-      const account = '0x78dc5D2D739606d31509C31d654056A45185ECb6'
-
-      const mockRequestData = {
-        userPhoneNumber,
-        account,
-      }
-      const req = { body: mockRequestData }
-
-      const res = {
-        status(status: any) {
-          expect(status).toEqual(400)
-          return {
-            json() {
-              return {}
-            },
-          }
-        },
-      }
-      // @ts-ignore TODO fix req type to make it a mock express req
-      getContactMatches(req, res)
     })
   })
 })
