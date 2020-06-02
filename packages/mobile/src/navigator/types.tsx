@@ -83,6 +83,7 @@ export type StackParamList = {
   [Screens.OutgoingPaymentRequestListScreen]: undefined
   [Screens.PaymentRequestConfirmation]: {
     transactionData: TransactionDataInput
+    addressJustValidated?: boolean
   }
   [Screens.PincodeEducation]: undefined
   [Screens.PincodeEnter]: {

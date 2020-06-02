@@ -4,7 +4,6 @@ import ReviewHeader from '@celo/react-components/components/ReviewHeader'
 import TextButton from '@celo/react-components/components/TextButton.v2'
 import colors from '@celo/react-components/styles/colors.v2'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
-import { componentStyles } from '@celo/react-components/styles/styles'
 import { CURRENCIES, CURRENCY_ENUM } from '@celo/utils/src/currencies'
 import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
@@ -22,7 +21,7 @@ import InviteOptionsModal from 'src/components/InviteOptionsModal'
 import LineItemRow from 'src/components/LineItemRow.v2'
 import Modal from 'src/components/Modal'
 import ShortenedAddress from 'src/components/ShortenedAddress'
-import TotalLineItem from 'src/components/TotalLineItem'
+import TotalLineItem from 'src/components/TotalLineItem.v2'
 import { FeeType } from 'src/fees/actions'
 import CalculateFee, {
   CalculateFeeChildren,
@@ -121,7 +120,7 @@ export class SendConfirmation extends React.Component<Props, State> {
     comment: '',
   }
 
-  async componentDidMount() {
+  componentDidMount() {
     const { addressJustValidated, t } = this.props
     this.props.fetchDollarBalance()
 
@@ -292,7 +291,7 @@ export class SendConfirmation extends React.Component<Props, State> {
 
       // Replace fee lines with a fee drawer
       return (
-        <View>
+        <View style={styles.feeContainer}>
           {subtotalAmount && (
             <LineItemRow
               title={t('global:subtotal')}
@@ -364,7 +363,6 @@ export class SendConfirmation extends React.Component<Props, State> {
             />
             <CommentTextInput
               testID={'send'}
-              style={styles.inputContainer}
               onCommentChange={this.onCommentChange}
               comment={this.state.comment}
               onBlur={this.cleanInput}
@@ -415,6 +413,10 @@ const styles = StyleSheet.create({
     padding: 8,
     flexDirection: 'column',
   },
+  feeContainer: {
+    padding: 16,
+    paddingBottom: 8,
+  },
   inviteText: {
     ...fontStyles.small,
     color: colors.gray4,
@@ -462,30 +464,9 @@ const styles = StyleSheet.create({
     color: colors.gray5,
     textDecorationLine: 'underline',
   },
-  inputContainer: {
-    flex: 1,
-    // Fixed height to increase surface area for input
-    // to focus on press
-    height: 200,
-    alignSelf: 'stretch',
-    ...fontStyles.large,
-  },
-  bottomContainer: {
-    marginTop: 5,
-    flexDirection: 'column',
-    alignItems: 'stretch',
-  },
   amount: {
     paddingVertical: 8,
     ...fontStyles.largeNumber,
-  },
-  comment: {
-    ...componentStyles.paddingTop5,
-    ...fontStyles.large,
-    fontSize: 14,
-    color: colors.darkSecondary,
-    lineHeight: 18,
-    textAlign: 'center',
   },
 })
 
