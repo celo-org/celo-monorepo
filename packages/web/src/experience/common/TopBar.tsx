@@ -56,13 +56,15 @@ export default function TopBar({ current }: Props) {
               theme={NavigationTheme.LIGHT}
             />
           </View>
-          <Button
-            kind={BTN.NAV}
-            href={CeloLinks.gitHub}
-            text={t('github')}
-            target={'_blank'}
-            iconRight={<Octocat size={22} color={colors.dark} />}
-          />
+          {!isMobile && (
+            <Button
+              kind={BTN.NAV}
+              href={CeloLinks.gitHub}
+              text={t('github')}
+              target={'_blank'}
+              iconRight={<Octocat size={22} color={colors.dark} />}
+            />
+          )}
         </View>
       </View>
     </View>

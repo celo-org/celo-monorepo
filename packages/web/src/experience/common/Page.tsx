@@ -48,7 +48,6 @@ interface Props {
 interface State {
   routeHash: string
   isSidebarFrozen: boolean
-  distanceToTop: number
   isLineVisible: boolean
 }
 
@@ -56,7 +55,6 @@ class Page extends React.Component<Props & ScreenProps, State> {
   state: State = {
     routeHash: '',
     isSidebarFrozen: true,
-    distanceToTop: 0,
     isLineVisible: false,
   }
 
@@ -81,33 +79,6 @@ class Page extends React.Component<Props & ScreenProps, State> {
     } else {
       if (this.state.isLineVisible) {
         this.setState({ isLineVisible: false })
-      }
-    }
-
-    if (this.props.screen === ScreenSizes.MOBILE) {
-      return
-    }
-
-    if (this.footer.current) {
-      const el = (findNodeHandle(this.footer.current) as unknown) as Element
-      const footer = el.getClientRects()[0]
-      if (footer.top < footer.height) {
-        const documentHeight = document.body.scrollHeight
-        const windowSize = document.documentElement.clientHeight
-        const distance = documentHeight - windowSize - footer.height
-
-        if (this.state.isSidebarFrozen !== false || this.state.distanceToTop !== distance) {
-          this.setState({
-            isSidebarFrozen: false,
-            distanceToTop: distance,
-          })
-        }
-      } else {
-        if (!this.state.isSidebarFrozen) {
-          this.setState({
-            isSidebarFrozen: true,
-          })
-        }
       }
     }
   }, THROTTLE_SCROLL_MS) as (event) => void
@@ -218,8 +189,6 @@ class Page extends React.Component<Props & ScreenProps, State> {
                   pages={this.props.pages}
                   currentPathName={router.pathname}
                   routeHash={this.state.routeHash}
-                  isFlowing={!this.state.isSidebarFrozen}
-                  distance={this.state.distanceToTop}
                   onChangeRoute={moveToHash}
                 />
               )}
@@ -283,5 +252,5 @@ const styles = StyleSheet.create({
 export default withRouter(withScreenSize<Props>(Page))
 
 function moveToHash() {
-  scrollToHash(100)
+  scrollToHash(70)
 }

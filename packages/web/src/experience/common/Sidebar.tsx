@@ -4,6 +4,7 @@ import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
 import Button, { BTN } from 'src/shared/Button.3'
 import OvalCoin from 'src/shared/OvalCoin'
 import { colors } from 'src/styles'
+import { HEADER_HEIGHT } from 'src/shared/Styles'
 
 interface Section {
   title: string
@@ -20,8 +21,6 @@ interface Props {
   pages: Page[]
   currentPathName: string
   routeHash: string
-  isFlowing?: boolean
-  distance?: number
   onChangeRoute?: () => void
 }
 
@@ -31,15 +30,9 @@ export default withScreenSize<Props>(
     screen,
     currentPathName,
     routeHash,
-    distance,
-    isFlowing,
     onChangeRoute,
   }: Props & ScreenProps) {
-    const mainContaner = isFlowing
-      ? [styles.containerFlow, { transform: [{ translateY: distance }] }]
-      : styles.container
-
-    const container = screen === ScreenSizes.MOBILE ? styles.mobileContainer : mainContaner
+    const container = screen === ScreenSizes.MOBILE ? styles.mobileContainer : styles.container
 
     return (
       <View style={container} nativeID="sidebar">
@@ -154,10 +147,9 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   container: {
-    position: 'fixed',
-  },
-  containerFlow: {
-    position: 'absolute',
+    // @ts-ignore
+    position: 'sticky',
+    top: HEADER_HEIGHT + 100,
   },
   iconPlaceholder: { width: COIN_SIZE },
   item: {
