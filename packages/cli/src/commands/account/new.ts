@@ -8,8 +8,11 @@ import {
 import { privateKeyToAddress } from '@celo/utils/lib/address'
 import { flags } from '@oclif/command'
 import { toChecksumAddress } from 'ethereumjs-util'
+import * as fs from 'fs-extra'
 import { LocalCommand } from '../../base'
 import { printValueMap } from '../../utils/cli'
+
+const ETHEREUM_DERIVATION_PATH = "m/44'/60'/0'/0"
 
 export default class NewAccount extends LocalCommand {
   static description =
@@ -17,8 +20,8 @@ export default class NewAccount extends LocalCommand {
 
   static flags = {
     ...LocalCommand.flags,
-    password: flags.string({
-      description: 'Choose a password to generate the keys',
+    passwordPath: flags.string({
+      description: 'Path to a file that contains the password to generate the keys',
     }),
     indexAddress: flags.integer({
       default: 0,
@@ -39,23 +42,22 @@ export default class NewAccount extends LocalCommand {
       description:
         "Language for the mnemonic words. **WARNING**, some hardware wallets don't support other languages",
     }),
-    mnemonic: flags.string({
+    mnemonicPath: flags.string({
       description:
-        'Instead of generating a new mnemonic (seed phrases) the user can set the mnemonic to be used. It is required to set it as a string with all the words in order, separated by spaces (example: "word1 word2 word3 ... word24"). If the words are in other language than enaglish, the --language flag must be used. Should be a bip39 mnemonic',
+        'Instead of generating a new mnemonic (seed phrase), use the user-supplied mnemonic instead. Path to a file that contains all the mnemonic words separate by a space (example: "word1 word2 word3 ... word24"). If the words are a language other than English, the --language flag must be used. Only bip39 mnemonics are supported',
     }),
     derivationPath: flags.string({
-      hidden: true,
       description:
-        "Choose a different derivation Path (Celo's default is \"m/44'/52752'/0/0\"). This flags is hidden because is required only to help with specific problems (Example: A user that used in a transfer an Ethereum address and wants to recover its funds). NON technical users that don't understand the danger of changing it, SHOULDN'T use it",
+        "Choose a different derivation Path (Celo's default is \"m/44'/52752'/0'/0\"). Allows to use \"eth\" as an alias of the Ethereum derivation path (\"m/44'/60'/0'/0/\"). Recreating the same account requires knowledge of both the mnemonic and derivation path",
     }),
   }
 
   static examples = [
     'new',
-    'new --password 12341234',
+    'new --passwordPath myFolder/my_password_file',
     'new --language spanish',
-    'new --password 12341234 --language japanese --indexAddress 5',
-    'new --password 12341234 --mnemonic "word1 word2 word3 ... word24" --indexAddress 5',
+    'new --passwordPath some_folder/my_password_file --language japanese --indexAddress 5',
+    'new --passwordPath some_folder/my_password_file --mnemonicPath some_folder/my_mnemonic_file --indexAddress 5',
   ]
 
   static languageOptions(language: string): MnemonicLanguages | undefined {
@@ -67,11 +69,30 @@ export default class NewAccount extends LocalCommand {
     return undefined
   }
 
+  static sanitizeDerivationPath(derivationPath?: string) {
+    if (derivationPath) {
+      derivationPath = derivationPath.endsWith('/') ? derivationPath.slice(0, -1) : derivationPath
+    }
+    return derivationPath !== 'eth' ? derivationPath : ETHEREUM_DERIVATION_PATH
+  }
+
+  static readFile(file?: string): string | undefined {
+    if (!file) {
+      return undefined
+    }
+    if (fs.pathExistsSync(file)) {
+      return fs
+        .readFileSync(file)
+        .toString()
+        .replace(/(\r\n|\n|\r)/gm, '')
+    }
+    throw new Error(`Invalid path: ${file}`)
+  }
+
   async run() {
     const res = this.parse(NewAccount)
-    let mnemonic: string
-    if (res.flags.mnemonic) {
-      mnemonic = res.flags.mnemonic
+    let mnemonic = NewAccount.readFile(res.flags.mnemonicPath)
+    if (mnemonic) {
       if (!validateMnemonic(mnemonic, NewAccount.languageOptions(res.flags.language!))) {
         throw Error('Invalid mnemonic. Should be a bip39 mnemonic')
       }
@@ -81,12 +102,14 @@ export default class NewAccount extends LocalCommand {
         NewAccount.languageOptions(res.flags.language!)
       )
     }
+    const derivationPath = NewAccount.sanitizeDerivationPath(res.flags.derivationPath)
+    const password = NewAccount.readFile(res.flags.passwordPath)
     const keys = await generateKeys(
       mnemonic,
-      res.flags.password,
+      password,
       res.flags.indexAddress,
       undefined,
-      res.flags.derivationPath
+      derivationPath
     )
     const accountAddress = toChecksumAddress(privateKeyToAddress(keys.privateKey))
     this.log(

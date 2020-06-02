@@ -361,26 +361,31 @@ USAGE
   $ celocli account:new
 
 OPTIONS
+  --derivationPath=derivationPath
+      Choose a different derivation Path (Celo's default is "m/44'/52752'/0'/0"). Allows to use "eth" as an alias of the
+      Ethereum derivation path ("m/44'/60'/0'/0/"). Recreating the same account requires knowledge of both the mnemonic
+      and derivation path
+
   --indexAddress=indexAddress
       Choose the index address of the derivation path
 
   --language=chinese_simplified|chinese_traditional|english|french|italian|japanese|korean|spanish
       [default: english] Language for the mnemonic words. **WARNING**, some hardware wallets don't support other languages
 
-  --mnemonic=mnemonic
-      Instead of generating a new mnemonic (seed phrases) the user can set the mnemonic to be used. It is required to set
-      it as a string with all the words in order, separated by spaces (example: "word1 word2 word3 ... word24"). If the
-      words are in other language than enaglish, the --language flag must be used. Should be a bip39 mnemonic
+  --mnemonicPath=mnemonicPath
+      Instead of generating a new mnemonic (seed phrase), use the user-supplied mnemonic instead. Path to a file that
+      contains all the mnemonic words separate by a space (example: "word1 word2 word3 ... word24"). If the words are a
+      language other than English, the --language flag must be used. Only bip39 mnemonics are supported
 
-  --password=password
-      Choose a password to generate the keys
+  --passwordPath=passwordPath
+      Path to a file that contains the password to generate the keys
 
 EXAMPLES
   new
-  new --password 12341234
+  new --passwordPath myFolder/my_password_file
   new --language spanish
-  new --password 12341234 --language japanese --indexAddress 5
-  new --password 12341234 --mnemonic "word1 word2 word3 ... word24" --indexAddress 5
+  new --passwordPath some_folder/my_password_file --language japanese --indexAddress 5
+  new --passwordPath some_folder/my_password_file --mnemonicPath some_folder/my_mnemonic_file --indexAddress 5
 ```
 
 _See code: [packages/cli/src/commands/account/new.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/new.ts)_
