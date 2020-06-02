@@ -1,6 +1,6 @@
 import { expectSaga } from 'redux-saga-test-plan'
 import { select } from 'redux-saga/effects'
-import { showError } from 'src/alert/actions'
+import { showErrorInline } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import {
   Actions,
@@ -42,7 +42,7 @@ describe(watchValidateRecipientAddress, () => {
         [select(e164NumberToAddressSelector), mockE164NumberToAddress],
       ])
       .dispatch(validateAction)
-      .put(showError(ErrorMessages.ADDRESS_VALIDATION_NO_MATCH))
+      .put(showErrorInline(ErrorMessages.ADDRESS_VALIDATION_NO_MATCH))
       .run()
   })
 
@@ -78,7 +78,7 @@ describe(watchValidateRecipientAddress, () => {
         [select(e164NumberToAddressSelector), mockE164NumberToAddress],
       ])
       .dispatch(validateAction)
-      .put(showError(ErrorMessages.ADDRESS_VALIDATION_NO_MATCH))
+      .put(showErrorInline(ErrorMessages.ADDRESS_VALIDATION_NO_MATCH))
       .run()
   })
 
