@@ -10,7 +10,41 @@ import yargs from 'yargs'
 const Account: any = require('eth-lib/lib/account')
 
 export const command = 'local-testnet'
-export const describe = 'Command to run a local testnet of geth instances.'
+export const describe = `Command to run a local testnet of geth instances.
+
+Running this command will create a number of geth nodes, connect them together to form a network,
+and run smart contract migrations to initialize the core protocols. When this is complete, it will
+open a NodeJS console with some preloaded objects to facilitate interactions with the test network.
+Exiting this console will kill all running geth instances and exit.
+
+Network makeup is configured the --validators, --tx-nodes, --light-clients, and --lightest-client
+flags. These flags will add the corresponding nodes to the network.
+
+A NodeJS REPL is provided to conveniently interact with the created network. A number of global
+variables are defined with useful values including {
+  Web3 (Imported 'web3' module)
+  Admin (Imported 'web3-eth-admin' module)
+  testnet: GethRunConfig (Configuration values for the tesnet)
+  [nodeType][index] (e.g. validator0, txNode2): {
+    web3: Web3 (A web3 object connected to the node over RPC)
+    admin: Admin (An Admin object connected to the node over RPC)
+    config: GethInstanceConfig (Configuration values for the node)
+    kill(signal?: string): (Send a signal, default SIGTERM, to the node. e.g. SIGINT, SIGSTOP)
+  }
+}
+
+When the network is created without a bootnode, all nodes will be connected as follows:
+* Validator nodes are connected to all other validator nodes.
+* Transaction nodes are connected to all validators and all other transaction nodes.
+* Light clients are connected to all transaction nodes
+
+If the network is started with the --bootnode flag, a bootnode will be created and all node will be
+connected to it, rather than each other directly.
+
+By default, the celo-blockchain repository will be cloned to a temporary location and built from
+master to produce the geth binary to run for each node. The --branch flag can be used to control
+which branch is built in the cloned repository. Alternatively, a existing repository can be used
+by specifying the --local-geth flag as the path to that repository root.`
 
 interface LocalTestnetArgs {
   localgeth?: string
