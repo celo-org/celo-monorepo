@@ -183,7 +183,7 @@ class Send extends React.Component<Props, State> {
         ? CustomEventNames.request_search
         : CustomEventNames.send_search,
       {
-        searchQuery,
+        query: searchQuery,
       }
     )
     this.throttledSearch(searchQuery)
@@ -213,7 +213,7 @@ class Send extends React.Component<Props, State> {
         ? CustomEventNames.request_select_recipient
         : CustomEventNames.send_select_recipient,
       {
-        searchQuery: this.state.searchQuery,
+        query: this.state.searchQuery,
       }
     )
 

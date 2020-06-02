@@ -30,19 +30,19 @@ export enum CustomEventNames {
   send_invite = 'send_invite',
   edit_send_invite = 'edit_send_invite',
 
-  send_cancel = 'send_cancel',
-  send_search = 'send_search',
-  send_scan = 'send_scan',
-  send_select_recipient = 'send_select_recipient',
-  send_amount_back = 'send_amount_back',
-  send_continue = 'send_continue',
+  send_cancel = 'send_cancel', // when cancel is clicked after launching send flow
+  send_search = 'send_search', // when text is input into search bar
+  send_scan = 'send_scan', // when scan QR icon is selected from the send screen
+  send_select_recipient = 'send_select_recipient', // when recipient was selected
+  send_amount_back = 'send_amount_back', // back button pressed on amount screen
+  send_continue = 'send_continue', // when next button pressed on amount enter page
 
-  request_cancel = 'request_cancel',
-  request_search = 'request_search',
-  request_scan = 'request_scan',
-  request_select_recipient = 'request_select_recipient',
-  request_amount_back = 'request_amount_back',
-  request_continue = 'request_continue',
+  request_cancel = 'request_cancel', // when cancel is clicked after launching request flow
+  request_search = 'request_search', // when text is input into search bar
+  request_scan = 'request_scan', // when scan QR icon is selected from the request screen
+  request_select_recipient = 'request_select_recipient', // when recipient was selected
+  request_amount_back = 'request_amount_back', // back button pressed on amount screen
+  request_continue = 'request_continue', // when next button pressed on amount enter page
 
   // Send events, separate from button tracking above
   send_dollar_transaction = 'send_dollar_transaction',
@@ -239,22 +239,30 @@ export const PROPERTY_PATH_WHITELIST = [
   'countryCode',
   'cta',
   'currentScreen',
+  'dollarAmount',
   'dollarBalance',
   'dollarPendingBalance',
   'error',
   'exchangeInputAmount',
   'exchangeRate',
   'fullName',
+  'goldAmount',
   'goldBalance',
   'goldPendingBalance',
+  'goldToDollarExchangeRate',
+  'inputToken',
   'inviteCode',
   'isCorrect',
   'issuer',
   'label',
   'language',
+  'localCurrency',
+  'localCurrencyAmount',
+  'localCurrencyExchangeRate',
   'makerAmount',
   'makerToken',
   'makerTokenAmount',
+  'method',
   'name',
   'navigation.state.key',
   'navigation.state.routeName',
@@ -280,6 +288,7 @@ export const PROPERTY_PATH_WHITELIST = [
   'testnet',
   'timeElapsed',
   'title',
+  'to',
   'tti',
   'txId',
   'verificationIndex',

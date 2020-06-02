@@ -74,7 +74,7 @@ export class ExchangeReview extends React.Component<Props, State> {
     const makerAmount = this.getMakerAmount()
     // BEGIN: Analytics
     const isDollarToGold = inputToken === CURRENCY_ENUM.DOLLAR
-    const cGLDToCUSDExchangeRate = getRateForMakerToken(
+    const goldToDollarExchangeRate = getRateForMakerToken(
       this.props.exchangeRatePair,
       this.state.makerToken,
       CURRENCY_ENUM.DOLLAR
@@ -91,7 +91,7 @@ export class ExchangeReview extends React.Component<Props, State> {
         localCurrencyAmount,
         goldAmount,
         inputToken,
-        cGLDToCUSDExchangeRate,
+        goldToDollarExchangeRate,
       }
     )
     // END: Analytics

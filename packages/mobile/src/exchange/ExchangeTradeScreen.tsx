@@ -125,7 +125,7 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
     const inputTokenDisplayName = this.getInputTokenDisplayText()
     const inputAmount = this.getInputTokenAmount()
     // BEGIN: Analytics
-    const cGLDToCUSDExchangeRate = getRateForMakerToken(
+    const goldToDollarExchangeRate = getRateForMakerToken(
       this.props.exchangeRatePair,
       this.state.makerToken,
       CURRENCY_ENUM.DOLLAR
@@ -148,7 +148,7 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
         localCurrencyAmount,
         goldAmount,
         inputToken,
-        cGLDToCUSDExchangeRate,
+        goldToDollarExchangeRate,
       }
     )
     // END: Analytics
