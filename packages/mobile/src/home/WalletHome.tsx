@@ -37,7 +37,6 @@ import { RootState } from 'src/redux/reducers'
 import { isAppConnected } from 'src/redux/selectors'
 import { initializeSentryUserContext } from 'src/sentry/actions'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
-import { resetStandbyTransactions } from 'src/transactions/actions'
 import TransactionsList from 'src/transactions/TransactionsList'
 import { currentAccountSelector } from 'src/web3/selectors'
 
@@ -55,7 +54,6 @@ interface StateProps {
 
 interface DispatchProps {
   refreshAllBalances: typeof refreshAllBalances
-  resetStandbyTransactions: typeof resetStandbyTransactions
   initializeSentryUserContext: typeof initializeSentryUserContext
   exitBackupFlow: typeof exitBackupFlow
   setLoading: typeof setLoading
@@ -66,7 +64,6 @@ type Props = StateProps & DispatchProps & WithTranslation
 
 const mapDispatchToProps = {
   refreshAllBalances,
-  resetStandbyTransactions,
   initializeSentryUserContext,
   exitBackupFlow,
   setLoading,
@@ -113,7 +110,7 @@ export class WalletHome extends React.Component<Props> {
   }
 
   componentDidMount() {
-    this.props.resetStandbyTransactions()
+    // TODO find a better home for this, its unrelated to wallet home
     this.props.initializeSentryUserContext()
     if (SHOW_TESTNET_BANNER) {
       this.showTestnetBanner()

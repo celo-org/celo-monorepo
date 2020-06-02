@@ -298,6 +298,14 @@ export const v1Schema = {
     isValidRecipient: false,
     secureSendPhoneNumberMapping: {},
   },
+  transactions: {
+    ...v0Schema.transactions,
+    knownFeedTransactions: {},
+  },
+  account: {
+    ...v0Schema.account,
+    retryVerificationWithForno: true,
+  },
 }
 
 export function getLatestSchema(): Partial<RootState> {

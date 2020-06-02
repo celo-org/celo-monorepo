@@ -1,5 +1,6 @@
 import VerifyPhone from '@celo/react-components/icons/VerifyPhone'
 import colors from '@celo/react-components/styles/colors'
+import { StackScreenProps } from '@react-navigation/stack'
 import { throttle } from 'lodash'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
@@ -10,12 +11,12 @@ import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { estimateFee, FeeType } from 'src/fees/actions'
-import i18n, { Namespaces, withTranslation } from 'src/i18n'
+import { Namespaces, withTranslation } from 'src/i18n'
 import ContactPermission from 'src/icons/ContactPermission'
 import { importContacts } from 'src/identity/actions'
-import { headerWithCancelButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { StackParamList } from 'src/navigator/types'
 import {
   filterRecipientFactory,
   filterRecipients,
@@ -27,7 +28,6 @@ import RecipientPicker from 'src/recipients/RecipientPicker'
 import { recipientCacheSelector } from 'src/recipients/reducer'
 import { RootState } from 'src/redux/reducers'
 import { storeLatestInRecents } from 'src/send/actions'
-import { QRCodeIcon } from 'src/send/QRCodeIcon'
 import { SendCallToAction } from 'src/send/SendCallToAction'
 import { SendSearchInput } from 'src/send/SendSearchInput'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
@@ -76,7 +76,9 @@ interface DispatchProps {
   estimateFee: typeof estimateFee
 }
 
-type Props = StateProps & DispatchProps & WithTranslation
+type RouteProps = StackScreenProps<StackParamList, Screens.Send>
+
+type Props = StateProps & DispatchProps & WithTranslation & RouteProps
 
 const mapStateToProps = (state: RootState): StateProps => ({
   defaultCountryCode: state.account.defaultCountryCode,
@@ -100,12 +102,6 @@ const mapDispatchToProps = {
 type FilterType = (searchQuery: string) => Recipient[]
 
 class Send extends React.Component<Props, State> {
-  static navigationOptions = () => ({
-    ...headerWithCancelButton,
-    headerTitle: i18n.t('sendFlow7:sendOrRequest'),
-    headerRight: <QRCodeIcon />,
-  })
-
   throttledSearch: (searchQuery: string) => void
   allRecipientsFilter: FilterType
   recentRecipientsFilter: FilterType
@@ -182,11 +178,20 @@ class Send extends React.Component<Props, State> {
     this.setState({
       searchQuery,
     })
+    CeloAnalytics.track(
+      this.props.route.params?.isRequest
+        ? CustomEventNames.request_search
+        : CustomEventNames.send_search,
+      {
+        query: searchQuery,
+      }
+    )
     this.throttledSearch(searchQuery)
   }
 
   onSelectRecipient = (recipient: Recipient) => {
     this.props.hideAlert()
+    const isRequest = this.props.route.params?.isRequest ?? false
     CeloAnalytics.track(CustomEventNames.send_input, {
       selectedRecipientAddress: recipient.address,
     })
@@ -203,7 +208,16 @@ class Send extends React.Component<Props, State> {
       this.props.storeLatestInRecents(recipient)
     }
 
-    navigate(Screens.SendAmount, { recipient })
+    CeloAnalytics.track(
+      this.props.route.params?.isRequest
+        ? CustomEventNames.request_select_recipient
+        : CustomEventNames.send_select_recipient,
+      {
+        query: this.state.searchQuery,
+      }
+    )
+
+    navigate(Screens.SendAmount, { recipient, isRequest })
   }
 
   onPermissionsAccepted = async () => {
