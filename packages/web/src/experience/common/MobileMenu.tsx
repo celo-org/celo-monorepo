@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
   menu: {
     height: '100%',
     transform: [{ scaleY: 0 }],
-    transitionDuration: '200ms',
+    transitionDuration: '250ms',
     transitionProperty: 'transform',
     transformOrigin: 'top',
   },

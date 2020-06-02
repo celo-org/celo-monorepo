@@ -32,7 +32,7 @@ export const pagePaths = {
     link: '/community',
   },
   EVENTS_KIT: {
-    name: 'EventsKit',
+    name: 'EventKit',
     link: '/experience/events',
   },
   DEVELOPERS: {

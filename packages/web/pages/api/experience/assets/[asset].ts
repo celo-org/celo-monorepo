@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import getAssets, { AssetSheet } from 'server/AssetBase'
 import byMethod from 'server/byMethod'
-import getEventKit, { Sheets } from 'server/EventsKit'
+import getEventKit, { Sheets } from 'server/EventKit'
 
 const ACCEPTABLE = new Set(
   [

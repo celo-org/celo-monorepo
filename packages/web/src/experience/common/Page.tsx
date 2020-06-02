@@ -252,5 +252,5 @@ const styles = StyleSheet.create({
 export default withRouter(withScreenSize<Props>(Page))
 
 function moveToHash() {
-  scrollToHash(70)
+  scrollToHash(60)
 }
