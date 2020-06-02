@@ -2,11 +2,11 @@ import SmartTopAlert, { NotificationTypes } from '@celo/react-components/compone
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { hideAlert } from 'src/alert/actions'
-import { State as AlertState } from 'src/alert/reducer'
+import { ErrorDisplayType, State as AlertState } from 'src/alert/reducer'
 import { RootState } from 'src/redux/reducers'
 
 interface StateProps {
-  alert: AlertState
+  alert: AlertState | null
 }
 
 interface DispatchProps {
@@ -31,6 +31,7 @@ export class AlertBanner extends React.Component<Props> {
 
     return (
       <SmartTopAlert
+        isVisible={!!alert && alert.displayMethod === ErrorDisplayType.BANNER}
         timestamp={Date.now()}
         text={alert && alert.message}
         onPress={hideAlertAction}

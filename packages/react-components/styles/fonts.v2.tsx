@@ -73,6 +73,17 @@ const fontStyles = StyleSheet.create({
     fontFamily: Inter.Regular,
     color: colors.dark,
   },
+  largeNumber: {
+    lineHeight: 40,
+    fontSize: 32,
+    fontFamily: Inter.SemiBold,
+    color: colors.dark,
+  },
+  iconText: {
+    fontSize: 16,
+    fontFamily: Inter.Medium,
+    color: colors.white,
+  },
 })
 
 export default fontStyles

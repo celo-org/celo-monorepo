@@ -22,25 +22,18 @@ describe('ContactCircle', () => {
       expect(getByText('Z')).toBeTruthy()
     })
   })
-  describe('when "preferNameInitial"', () => {
+  describe('when not given a contact', () => {
     it('uses name for initial', () => {
-      const { getByText } = render(
-        <ContactCircle size={30} name={'Jerry'} contact={testContact} preferNameInitial={true} />
-      )
+      const { getByText } = render(<ContactCircle size={30} name={'Jerry'} />)
 
       expect(getByText('J')).toBeTruthy()
     })
   })
-  describe('when has image', () => {
+  describe('when has a thumbnail', () => {
     it('renders image', () => {
-      const contactWithImage = { ...testContact, hasThumbnail: true, thumbnailPath: './test.jpg' }
+      const mockThumbnnailPath = './test.jpg'
       const { getByName } = render(
-        <ContactCircle
-          size={30}
-          name={'Jerry'}
-          contact={contactWithImage}
-          preferNameInitial={true}
-        />
+        <ContactCircle size={30} name={'Jerry'} thumbnailPath={mockThumbnnailPath} />
       )
       expect(getByName('Image').props.source).toEqual({ uri: './test.jpg' })
     })
