@@ -15,7 +15,7 @@ import { colors, standardStyles } from 'src/styles'
 
 const FOOTER_ID = 'experience-footer'
 const DISTANCE_TO_HIDE_AT = 25
-const THROTTLE_SCROLL_MS = 200
+const THROTTLE_SCROLL_MS = 150
 export const ROOT = menu.BRAND.link
 
 export const LOGO_PATH = `${ROOT}/logo`
@@ -70,6 +70,47 @@ class Page extends React.Component<Props & ScreenProps, State> {
     return acc
   }, {})
 
+  scrollHandeler = throttle((event) => {
+    const scrollTop = event.target.scrollingElement.scrollTop
+    const top = scrollTop + DISTANCE_TO_HIDE_AT
+    if (top > HEADER_HEIGHT) {
+      if (!this.state.isLineVisible) {
+        this.setState({ isLineVisible: true })
+      }
+    } else {
+      if (this.state.isLineVisible) {
+        this.setState({ isLineVisible: false })
+      }
+    }
+
+    if (this.props.screen === ScreenSizes.MOBILE) {
+      return
+    }
+
+    if (this.footer.current) {
+      const el = (findNodeHandle(this.footer.current) as unknown) as Element
+      const footer = el.getClientRects()[0]
+      if (footer.top < footer.height) {
+        const documentHeight = document.body.scrollHeight
+        const windowSize = document.documentElement.clientHeight
+        const distance = documentHeight - windowSize - footer.height
+
+        if (this.state.isSidebarFrozen !== false || this.state.distanceToTop !== distance) {
+          this.setState({
+            isSidebarFrozen: false,
+            distanceToTop: distance,
+          })
+        }
+      } else {
+        if (!this.state.isSidebarFrozen) {
+          this.setState({
+            isSidebarFrozen: true,
+          })
+        }
+      }
+    }
+  }, THROTTLE_SCROLL_MS) as (event) => void
+
   onChangeHash = () => {
     this.setState({ routeHash: window.location.hash })
   }
@@ -103,27 +144,6 @@ class Page extends React.Component<Props & ScreenProps, State> {
       this.setState({ routeHash: top.id })
       window.history.replaceState({}, top.id, `${location.pathname}#${top.id}`)
     }
-    if (this.props.screen === ScreenSizes.MOBILE) {
-      return
-    }
-    setImmediate(() => {
-      const footer = entries.find((entry) => entry.target.id === FOOTER_ID)
-      if (footer) {
-        if (footer.isIntersecting) {
-          this.setState({
-            isSidebarFrozen: false,
-            // @ts-ignore
-            distanceToTop: footer.target.offsetTop,
-          })
-        } else {
-          this.setState({
-            isSidebarFrozen: true,
-          })
-        }
-      } else {
-        this.setState({ isSidebarFrozen: true })
-      }
-    })
   }
 
   createSectionObservers = () => {
@@ -131,7 +151,7 @@ class Page extends React.Component<Props & ScreenProps, State> {
       return
     }
     this.observer = new IntersectionObserver(this.updateSectionHashWhenInView, {
-      threshold: [0.1, 0.5, 0.9, 1],
+      threshold: [0, 0.1, 0.9, 1],
     })
 
     Object.keys(this.sectionRefs).forEach((id) => {
@@ -152,29 +172,19 @@ class Page extends React.Component<Props & ScreenProps, State> {
   componentDidMount = () => {
     this.createSectionObservers()
     if (this.props.screen !== ScreenSizes.MOBILE) {
-      this.setLineVisibilityViaScroll()
+      this.setScrollListener()
     }
     window.addEventListener('hashchange', this.onChangeHash, false)
   }
 
-  setLineVisibilityViaScroll = () => {
-    window.addEventListener(
-      'scroll',
-      throttle((event) => {
-        const top = event.target.scrollingElement.scrollTop + DISTANCE_TO_HIDE_AT
-        if (top > HEADER_HEIGHT) {
-          this.setState({ isLineVisible: true })
-        } else {
-          this.setState({ isLineVisible: false })
-        }
-      }, THROTTLE_SCROLL_MS)
-    )
+  setScrollListener = () => {
+    window.addEventListener('scroll', this.scrollHandeler)
   }
 
   componentWillUnmount = () => {
     this.observer.disconnect()
     window.removeEventListener('hashchange', this.onChangeHash)
-    window.removeEventListener('scroll', this.onChangeHash)
+    window.removeEventListener('scroll', this.scrollHandeler)
   }
 
   render() {

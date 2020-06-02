@@ -59,7 +59,6 @@ export default function PlanningDocs() {
     return (
       <View style={styles.grid}>
         {planningDocs.result.map((doc) => {
-          console.info(JSON.stringify(doc))
           return (
             <DocPreview key={doc.title} preview={doc.preview} uri={doc.uri} title={doc.title} />
           )

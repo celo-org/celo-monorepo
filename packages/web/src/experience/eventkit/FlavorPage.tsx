@@ -20,13 +20,11 @@ const sections = [
 export default function Flavor() {
   const { t } = useTranslation(NameSpaces.eventskit)
   return (
-    <>
-      <Page
-        title="Home"
-        path={ROUTE_TO_TITLE[FLAVOR_PATH]}
-        metaDescription={t('flavor.introduction')}
-        sections={sections}
-      />
-    </>
+    <Page
+      title="Home"
+      path={ROUTE_TO_TITLE[FLAVOR_PATH]}
+      metaDescription={t('flavor.introduction')}
+      sections={sections}
+    />
   )
 }

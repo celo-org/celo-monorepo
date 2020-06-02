@@ -59,12 +59,12 @@ const PAGES = [
     title: 'Celo Circles',
     href: CIRCLES_PATH,
     sections: [
-      { title: 'Sponsorship', href: `${CIRCLES_PATH}#${hashNav.eventCircles.sponsorship}` },
+      // { title: 'Sponsorship', href: `${CIRCLES_PATH}#${hashNav.eventCircles.sponsorship}` },
     ],
   },
 ]
 
-export const ROUTE_TO_TITLE = PAGES.reduce((mapping, page) => {
+export const ROUTE_TO_TITLE: Record<string, string> = PAGES.reduce((mapping, page) => {
   mapping[page.href] = page.title
   return mapping
 }, {})
