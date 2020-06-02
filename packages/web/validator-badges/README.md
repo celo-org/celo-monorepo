@@ -9,7 +9,7 @@ Currently, there are 7 types of validator badges:
 |Badge ID|Badge|Description|Mapped to|
 |--- |--- |--- |--- |
 |001|Stake Off - Founder Validator|Participated in the Stake Off|Validator addresses|
-|002|Stake Off - Attestation Maven|Ran reliable attestation services during the Stake Off|Validator addresses|
+|002|Stake Off - Attestation Maven|Ran reliable attestation services|Validator addresses|
 |003|Stake Off - Master Validator|Passed security audit|Validator addresses|
 |004|Genesis - Validator|Stood up Celo Mainnet|Validator addresses|
 |005|Genesis - 1st Proposer|Proposed the 1st block on Celo Mainnet|Validator Group address|
@@ -22,6 +22,6 @@ Note:
 
 ## How to Claim Your Validator Badge
 
-1. Append your Validator or Valdiator Group address (starting with `0x`) to the corresponding markdown files in this folder.
+1. Append your Validator or Valdiator Group address (starting with `0x`) to the corresponding markdown files in this current folder.
 2. Make a single pull request (PR) that contains all of your changes and is named `[Validator Badge] <your-validator-group-name>`.
 3. Validator badge PRs are reviewed once a week and once approved, your badges will be shown on the [Celo Validators Explorer](https://celo.org/validators/explore).
