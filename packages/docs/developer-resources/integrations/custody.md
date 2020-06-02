@@ -1,4 +1,4 @@
-# Custodying Celo Assets and Tracking Balances
+# Custodying Celo Assets and Monitoring Balances
 
 This section is intended for Custodians, Exchanges, and other services that intend to custody Celo assets such as Celo Dollar and Celo Gold on behalf of a user. Generally speaking, custodying Celo Gold (cGLD), the native token on the Celo network, requires understanding the various states that cGLD can exist in at any time. This is to provide useful services beyond custody such as allowing users to lock up their cGLD and vote with it. Many of these "states" are implemented as smart contracts, and involve sending cGLD from a user owned account to a contract address. Thus, in order to be able to show a user's true balance, services need to be able to observe every balance changing operation and reconcile cGLD balances from all the various contracts and states cGLD can be in.
 
@@ -75,8 +75,4 @@ Some of these may occur as events rather than transactions on the network, and t
 
 ## Useful Tools
 
-
-Since monitoring balance changing operations is important to be able to display user balances properly, it can be helpful to use a tracing or reconciling system. Several tools exist to help application developers with this process:
-
-- Tracer
-- [Celo Rosetta](https://github.com/celo-org/rosetta)
+Since monitoring balance changing operations is important to be able to display user balances properly, it can be helpful to use a tracing or reconciling system. [Celo Rosetta](https://github.com/celo-org/rosetta) is an RPC server that exposes an API to query the Celo blockchain, obtain balance changing operations, and construct airgapped transactions. With a special focus on getting balance change operations, Celo Rosetta provides an easy way to obtain changes that are not easily queryable using the celo-blockchain RPC.
