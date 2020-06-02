@@ -32,70 +32,71 @@ export const builder = (argv: yargs.Argv) => {
   return argv
     .option('local-geth', {
       type: 'string',
-      description: 'local path to celo-blockchain repository',
+      description: 'Local path to celo-blockchain repository.',
       alias: ['localGeth', 'localgeth'],
     })
     .option('keep-data', {
       type: 'boolean',
-      decription: 'keep the data directory from any previous runs',
+      decription: 'Keep the data directory from any previous runs.',
       alias: ['keepData', 'keepdata'],
     })
     .option('branch', {
       type: 'string',
-      description: 'branch name for remote celo-blockchain repository',
+      description: 'Branch name for remote celo-blockchain repository.',
     })
     .option('bootnode', {
       type: 'boolean',
-      description: 'create a bootnode if flag is specified',
+      allowNo: true,
+      description: 'Create a bootnode and connect all nodes to it instead of to each other.',
     })
     .option('validators', {
       type: 'number',
-      description: 'number of validator nodes to create',
-      default: 0,
+      description: 'Number of validator nodes to create.',
+      default: 1,
     })
     .option('proxies', {
       type: 'number',
-      description: 'number of proxy nodes to create, assigned to the first n validators',
+      description: 'Number of proxy nodes to create; assigned to the first n validators.',
       default: 0,
     })
     .option('tx-nodes', {
       type: 'number',
-      description: 'number of transaction nodes to create',
+      description: 'Number of transaction (i.e. non-validating full nodes) nodes to create.',
       default: 0,
       alias: ['txnodes', 'txNodes'],
     })
     .option('light-clients', {
       type: 'number',
-      description: 'number of light client nodes to create',
+      description: 'Number of light sync nodes to create.',
       default: 0,
       alias: ['lightClients', 'lightclients'],
     })
     .option('lightest-clients', {
       type: 'number',
-      description: 'number of transaction nodes to create',
+      description: 'Number of lightest sync nodes to create.',
       default: 0,
       alias: ['lightestClients', 'lightestclients'],
     })
     .option('migrate-to', {
       type: 'number',
-      description: 'maximum migration number to run',
+      description: 'Maximum migration number to run.',
       default: 1000,
       alias: ['migrateTo', 'migrateto'],
     })
     .option('instances', {
       type: 'string',
-      description: 'manually enter a GethInstanceConfig[] json blob to add to the config',
+      description: 'Manually enter a GethInstanceConfig[] json blob to add to the config.',
       default: '[]',
     })
     .option('genesis-override', {
       type: 'string',
-      description: 'genesis configuration overrides as a GenesisConfig JSON blob',
+      description: 'Genesis configuration overrides as a GenesisConfig JSON blob.',
       default: '{}',
       alias: ['genesisOverride', 'genesisoverride'],
     })
     .option('migration-override', {
       type: 'string',
-      description: 'migration configuration overrides as a JSON blob',
+      description: 'Migration configuration overrides as a JSON blob.',
       default: '{}',
       alias: ['migrationOverride', 'migrationoverride'],
     })
