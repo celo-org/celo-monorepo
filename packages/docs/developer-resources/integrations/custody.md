@@ -14,9 +14,7 @@ Celo Gold and Celo Dollars implement the ERC20 interface, as will any future cor
 
 ## cGLD State Machine
 
-Celo Gold as described previously can also exist in various states that represent a specific user behavior. For example, if a user wants to lock gold to either participate in consensus directly or vote, that cGLD will be sent to the `LockedGold` smart contract. To understand the high level flow, please read [this description of the various states cGLD can exist in](../../celo-codebase/protocol/proof-of-stake/locked-gold#locking-and-voting-flow). The diagram below may also help to visualize the flows between states, and the function calls required to transfer the balance from one state to another.
-
-<TODO: insert image>
+Celo Gold as described previously can also exist in various states that represent a specific user behavior. For example, if a user wants to lock gold to either participate in consensus directly or vote, that cGLD will be sent to the `LockedGold` smart contract. To understand the high level flow, please read [this description of the various states cGLD can exist in](../../celo-codebase/protocol/proof-of-stake/locked-gold#locking-and-voting-flow).
 
 ## Smart Contracts
 
