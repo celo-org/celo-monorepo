@@ -14,7 +14,7 @@ Celo Gold and Celo Dollars implement the ERC20 interface, as will any future cor
 
 ## cGLD State Machine
 
-Celo Gold as described previously can also exist in various states that represent a specific user behavior. For example, if a user wants to lock gold to either participate in consensus directly or vote, that cGLD will be sent to the `LockedGold` smart contract. To understand the high level flow, please read [this description of the various states cGLD can exist in](../../celo-codebase/protocol/proof-of-stake/locked-gold#locking-and-voting-flow).
+Celo Gold as described previously can also exist in various states that represent a specific user behavior. For example, if a user wants to lock gold to either participate in consensus directly or vote, that cGLD will be sent to the `LockedGold` smart contract. To understand the high level flow, please read [this description of the various states cGLD can exist in](../../celo-codebase/protocol/proof-of-stake/locked-gold.md#locking-and-voting-flow).
 
 ## Smart Contracts
 
@@ -26,7 +26,7 @@ The following smart contracts are helpful to understand in order to map the conc
 
 The [`createAccount`](https://github.com/celo-org/celo-monorepo/blob/master/packages/protocol/contracts/common/Accounts.sol#L103) function indexes the address as an account in storage, and is required to differentiate an arbitrary key-pair from a user-owned account in the Celo network.
 
-The `Accounts` contract also allows for the authorization of various signer keys, such as a [vote signer key](https://github.com/celo-org/celo-monorepo/blob/master/packages/protocol/contracts/common/Accounts.sol#L175). This allows for the user who owns the primary account key to authorize a separate key that can only vote on behalf of the account. This allows for the ability to custody keys in a manner corresponding to their exposure or "warmth". Eg. the primary account private key can be kept in cold storage after authorizing the signer keys, which can be in warmer environments, and potentially more exposed to the network. See the [key management guide](../../validator-guide/summary) for more details.
+The `Accounts` contract also allows for the authorization of various signer keys, such as a [vote signer key](https://github.com/celo-org/celo-monorepo/blob/master/packages/protocol/contracts/common/Accounts.sol#L175). This allows for the user who owns the primary account key to authorize a separate key that can only vote on behalf of the account. This allows for the ability to custody keys in a manner corresponding to their exposure or "warmth". Eg. the primary account private key can be kept in cold storage after authorizing the signer keys, which can be in warmer environments, and potentially more exposed to the network. See the [key management guide](../../operations-manual/key-management/detailed.md) for more details.
 
 ### LockedGold
 
@@ -51,7 +51,7 @@ The [`activate` function](https://github.com/celo-org/celo-monorepo/blob/master/
 
 ### ReleaseGold
 
-A common problem in other proof-of-stake protocols is the tension between wanting early token holders' balances to release over time to ensure long-term alignment, while also wanting them to be able to participate in consensus to increase the security of the network. To bridge both goals, many early token balances in the Celo network are released via the [`ReleaseGold`](https://github.com/celo-org/celo-monorepo/blob/master/packages/protocol/contracts/governance/ReleaseGold.sol) contract. Beneficiaries of these contracts can then participate in the proof-of-stake system by staking and voting with cGLD that has not yet been "released" for transfers. Please find more high level information about the `ReleaseGold` contract [here](../../celo-gold-holder-guide/release-gold).
+A common problem in other proof-of-stake protocols is the tension between wanting early token holders' balances to release over time to ensure long-term alignment, while also wanting them to be able to participate in consensus to increase the security of the network. To bridge both goals, many early token balances in the Celo network are released via the [`ReleaseGold`](https://github.com/celo-org/celo-monorepo/blob/master/packages/protocol/contracts/governance/ReleaseGold.sol) contract. Beneficiaries of these contracts can then participate in the proof-of-stake system by staking and voting with cGLD that has not yet been "released" for transfers. Please find more high level information about the `ReleaseGold` contract [here](../../celo-gold-holder-guide/release-gold.md).
 
 From a technical perspective, `ReleaseGold` can be thought of as a "puppet" account controlled by the "puppeteer", or the beneficiary private key corresponding to the `beneficiary` address in the contract. This beneficiary key can then authorize validator signer and vote signer keys that can then call respective functions associated with validating or voting. Most of the required function calls described above can be made by the signer keys directly to the `LockedGold` or `Election` contracts associated with the `ReleaseGold` account. However, some functions in the `ReleaseGold` contract are proxied to the underlying `LockedGold` or `Election` contracts, and have a separate function signature that can be called by the `beneficiary` address. Notably:
 
