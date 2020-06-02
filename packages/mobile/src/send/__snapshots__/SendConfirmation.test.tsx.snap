@@ -637,7 +637,14 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
         </View>
       </View>
     </RCTScrollView>
-    <View>
+    <View
+      style={
+        Object {
+          "padding": 16,
+          "paddingBottom": 8,
+        }
+      }
+    >
       <View
         style={
           Array [
@@ -834,15 +841,15 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
               Array [
                 Object {
                   "color": "#2E3338",
-                  "fontFamily": "Hind-Regular",
-                  "fontSize": 15,
-                  "lineHeight": 24,
+                  "fontFamily": "Inter-Regular",
+                  "fontSize": 16,
+                  "lineHeight": 22,
                 },
                 Object {
                   "color": "#2E3338",
-                  "fontFamily": "Hind-Bold",
+                  "fontFamily": "Inter-SemiBold",
                   "fontSize": 16,
-                  "lineHeight": 24,
+                  "lineHeight": 22,
                 },
               ]
             }
@@ -855,15 +862,15 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
             Array [
               Object {
                 "color": "#2E3338",
-                "fontFamily": "Hind-Regular",
-                "fontSize": 15,
-                "lineHeight": 24,
+                "fontFamily": "Inter-Regular",
+                "fontSize": 16,
+                "lineHeight": 22,
               },
               Object {
                 "color": "#2E3338",
-                "fontFamily": "Hind-Bold",
+                "fontFamily": "Inter-SemiBold",
                 "fontSize": 16,
-                "lineHeight": 24,
+                "lineHeight": 22,
               },
             ]
           }
@@ -913,17 +920,20 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
               Array [
                 Object {
                   "color": "#2E3338",
-                  "fontFamily": "Hind-Regular",
-                  "fontSize": 15,
-                  "lineHeight": 24,
+                  "fontFamily": "Inter-Regular",
+                  "fontSize": 16,
+                  "lineHeight": 22,
                 },
                 Object {
-                  "color": "#81868B",
+                  "color": "#9CA4A9",
+                  "fontFamily": "Inter-Regular",
+                  "fontSize": 14,
+                  "lineHeight": 18,
                 },
               ]
             }
           >
-            Celo Dollars (@
+            Celo Dollars @
              
             <Text
               numberOfLines={1}
@@ -940,7 +950,6 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
               $
               0.75
             </Text>
-            )
           </Text>
         </View>
         <Text
@@ -948,12 +957,15 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
             Array [
               Object {
                 "color": "#2E3338",
-                "fontFamily": "Hind-Regular",
-                "fontSize": 15,
-                "lineHeight": 24,
+                "fontFamily": "Inter-Regular",
+                "fontSize": 16,
+                "lineHeight": 22,
               },
               Object {
-                "color": "#81868B",
+                "color": "#9CA4A9",
+                "fontFamily": "Inter-Regular",
+                "fontSize": 14,
+                "lineHeight": 18,
               },
             ]
           }
@@ -1686,7 +1698,14 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
         </View>
       </View>
     </RCTScrollView>
-    <View>
+    <View
+      style={
+        Object {
+          "padding": 16,
+          "paddingBottom": 8,
+        }
+      }
+    >
       <View
         style={
           Array [
@@ -1883,15 +1902,15 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
               Array [
                 Object {
                   "color": "#2E3338",
-                  "fontFamily": "Hind-Regular",
-                  "fontSize": 15,
-                  "lineHeight": 24,
+                  "fontFamily": "Inter-Regular",
+                  "fontSize": 16,
+                  "lineHeight": 22,
                 },
                 Object {
                   "color": "#2E3338",
-                  "fontFamily": "Hind-Bold",
+                  "fontFamily": "Inter-SemiBold",
                   "fontSize": 16,
-                  "lineHeight": 24,
+                  "lineHeight": 22,
                 },
               ]
             }
@@ -1904,15 +1923,15 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
             Array [
               Object {
                 "color": "#2E3338",
-                "fontFamily": "Hind-Regular",
-                "fontSize": 15,
-                "lineHeight": 24,
+                "fontFamily": "Inter-Regular",
+                "fontSize": 16,
+                "lineHeight": 22,
               },
               Object {
                 "color": "#2E3338",
-                "fontFamily": "Hind-Bold",
+                "fontFamily": "Inter-SemiBold",
                 "fontSize": 16,
-                "lineHeight": 24,
+                "lineHeight": 22,
               },
             ]
           }
@@ -1962,17 +1981,20 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
               Array [
                 Object {
                   "color": "#2E3338",
-                  "fontFamily": "Hind-Regular",
-                  "fontSize": 15,
-                  "lineHeight": 24,
+                  "fontFamily": "Inter-Regular",
+                  "fontSize": 16,
+                  "lineHeight": 22,
                 },
                 Object {
-                  "color": "#81868B",
+                  "color": "#9CA4A9",
+                  "fontFamily": "Inter-Regular",
+                  "fontSize": 14,
+                  "lineHeight": 18,
                 },
               ]
             }
           >
-            Celo Dollars (@
+            Celo Dollars @
              
             <Text
               numberOfLines={1}
@@ -1989,7 +2011,6 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
               $
               0.75
             </Text>
-            )
           </Text>
         </View>
         <Text
@@ -1997,12 +2018,15 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
             Array [
               Object {
                 "color": "#2E3338",
-                "fontFamily": "Hind-Regular",
-                "fontSize": 15,
-                "lineHeight": 24,
+                "fontFamily": "Inter-Regular",
+                "fontSize": 16,
+                "lineHeight": 22,
               },
               Object {
-                "color": "#81868B",
+                "color": "#9CA4A9",
+                "fontFamily": "Inter-Regular",
+                "fontSize": 14,
+                "lineHeight": 18,
               },
             ]
           }
@@ -2735,7 +2759,14 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
         </View>
       </View>
     </RCTScrollView>
-    <View>
+    <View
+      style={
+        Object {
+          "padding": 16,
+          "paddingBottom": 8,
+        }
+      }
+    >
       <View
         style={
           Array [
@@ -2929,15 +2960,15 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
               Array [
                 Object {
                   "color": "#2E3338",
-                  "fontFamily": "Hind-Regular",
-                  "fontSize": 15,
-                  "lineHeight": 24,
+                  "fontFamily": "Inter-Regular",
+                  "fontSize": 16,
+                  "lineHeight": 22,
                 },
                 Object {
                   "color": "#2E3338",
-                  "fontFamily": "Hind-Bold",
+                  "fontFamily": "Inter-SemiBold",
                   "fontSize": 16,
-                  "lineHeight": 24,
+                  "lineHeight": 22,
                 },
               ]
             }
@@ -2950,15 +2981,15 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
             Array [
               Object {
                 "color": "#2E3338",
-                "fontFamily": "Hind-Regular",
-                "fontSize": 15,
-                "lineHeight": 24,
+                "fontFamily": "Inter-Regular",
+                "fontSize": 16,
+                "lineHeight": 22,
               },
               Object {
                 "color": "#2E3338",
-                "fontFamily": "Hind-Bold",
+                "fontFamily": "Inter-SemiBold",
                 "fontSize": 16,
-                "lineHeight": 24,
+                "lineHeight": 22,
               },
             ]
           }
@@ -3008,17 +3039,20 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
               Array [
                 Object {
                   "color": "#2E3338",
-                  "fontFamily": "Hind-Regular",
-                  "fontSize": 15,
-                  "lineHeight": 24,
+                  "fontFamily": "Inter-Regular",
+                  "fontSize": 16,
+                  "lineHeight": 22,
                 },
                 Object {
-                  "color": "#81868B",
+                  "color": "#9CA4A9",
+                  "fontFamily": "Inter-Regular",
+                  "fontSize": 14,
+                  "lineHeight": 18,
                 },
               ]
             }
           >
-            Celo Dollars (@
+            Celo Dollars @
              
             <Text
               numberOfLines={1}
@@ -3035,7 +3069,6 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
               $
               0.75
             </Text>
-            )
           </Text>
         </View>
         <Text
@@ -3043,12 +3076,15 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
             Array [
               Object {
                 "color": "#2E3338",
-                "fontFamily": "Hind-Regular",
-                "fontSize": 15,
-                "lineHeight": 24,
+                "fontFamily": "Inter-Regular",
+                "fontSize": 16,
+                "lineHeight": 22,
               },
               Object {
-                "color": "#81868B",
+                "color": "#9CA4A9",
+                "fontFamily": "Inter-Regular",
+                "fontSize": 14,
+                "lineHeight": 18,
               },
             ]
           }
@@ -3834,7 +3870,14 @@ exports[`SendConfirmation renders correctly when there are multiple user address
         </View>
       </View>
     </RCTScrollView>
-    <View>
+    <View
+      style={
+        Object {
+          "padding": 16,
+          "paddingBottom": 8,
+        }
+      }
+    >
       <View
         style={
           Array [
@@ -4031,15 +4074,15 @@ exports[`SendConfirmation renders correctly when there are multiple user address
               Array [
                 Object {
                   "color": "#2E3338",
-                  "fontFamily": "Hind-Regular",
-                  "fontSize": 15,
-                  "lineHeight": 24,
+                  "fontFamily": "Inter-Regular",
+                  "fontSize": 16,
+                  "lineHeight": 22,
                 },
                 Object {
                   "color": "#2E3338",
-                  "fontFamily": "Hind-Bold",
+                  "fontFamily": "Inter-SemiBold",
                   "fontSize": 16,
-                  "lineHeight": 24,
+                  "lineHeight": 22,
                 },
               ]
             }
@@ -4052,15 +4095,15 @@ exports[`SendConfirmation renders correctly when there are multiple user address
             Array [
               Object {
                 "color": "#2E3338",
-                "fontFamily": "Hind-Regular",
-                "fontSize": 15,
-                "lineHeight": 24,
+                "fontFamily": "Inter-Regular",
+                "fontSize": 16,
+                "lineHeight": 22,
               },
               Object {
                 "color": "#2E3338",
-                "fontFamily": "Hind-Bold",
+                "fontFamily": "Inter-SemiBold",
                 "fontSize": 16,
-                "lineHeight": 24,
+                "lineHeight": 22,
               },
             ]
           }
@@ -4110,17 +4153,20 @@ exports[`SendConfirmation renders correctly when there are multiple user address
               Array [
                 Object {
                   "color": "#2E3338",
-                  "fontFamily": "Hind-Regular",
-                  "fontSize": 15,
-                  "lineHeight": 24,
+                  "fontFamily": "Inter-Regular",
+                  "fontSize": 16,
+                  "lineHeight": 22,
                 },
                 Object {
-                  "color": "#81868B",
+                  "color": "#9CA4A9",
+                  "fontFamily": "Inter-Regular",
+                  "fontSize": 14,
+                  "lineHeight": 18,
                 },
               ]
             }
           >
-            Celo Dollars (@
+            Celo Dollars @
              
             <Text
               numberOfLines={1}
@@ -4137,7 +4183,6 @@ exports[`SendConfirmation renders correctly when there are multiple user address
               $
               0.75
             </Text>
-            )
           </Text>
         </View>
         <Text
@@ -4145,12 +4190,15 @@ exports[`SendConfirmation renders correctly when there are multiple user address
             Array [
               Object {
                 "color": "#2E3338",
-                "fontFamily": "Hind-Regular",
-                "fontSize": 15,
-                "lineHeight": 24,
+                "fontFamily": "Inter-Regular",
+                "fontSize": 16,
+                "lineHeight": 22,
               },
               Object {
-                "color": "#81868B",
+                "color": "#9CA4A9",
+                "fontFamily": "Inter-Regular",
+                "fontSize": 14,
+                "lineHeight": 18,
               },
             ]
           }
