@@ -59,7 +59,7 @@ function CustomDrawerContent(props: DrawerContentComponentProps<DrawerContentOpt
   return (
     <DrawerContentScrollView {...props}>
       <View style={styles.drawerTop}>
-        <ContactCircle thumbnailPath={contactDetails.thumbnailPath} size={64} />
+        <ContactCircle thumbnailPath={contactDetails.thumbnailPath} name={null} size={64} />
         <Text style={styles.nameLabel}>{displayName}</Text>
         <PhoneNumberWithFlag
           e164PhoneNumber={e164PhoneNumber}
