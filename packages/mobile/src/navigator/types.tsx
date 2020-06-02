@@ -97,6 +97,7 @@ export type StackParamList = {
   [Screens.PhotosEducation]: undefined
   [Screens.PhotosNUX]: undefined
   [Screens.Profile]: undefined
+  [Screens.QRNavigator]: undefined
   [Screens.QRCode]: undefined
   [Screens.QRScanner]:
     | {

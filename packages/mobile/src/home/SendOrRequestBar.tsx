@@ -22,7 +22,8 @@ export default function SendOrRequestBar() {
   }, [])
 
   const onPressQrCode = useCallback(() => {
-    navigate(Screens.QRCode)
+    // navigate(Screens.QRCode)
+    navigate(Screens.QRNavigator)
   }, [])
 
   return (
