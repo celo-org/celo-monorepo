@@ -153,10 +153,7 @@ function SendAmount(props: Props) {
   const isDollarBalanceSufficient = isAmountValid && newAccountBalance.isGreaterThanOrEqualTo(0)
 
   const reviewBtnDisabled =
-    !isAmountValid ||
-    (isRequest
-      ? recipientVerificationStatus !== RecipientVerificationStatus.VERIFIED
-      : recipientVerificationStatus === RecipientVerificationStatus.UNKNOWN)
+    !isAmountValid || recipientVerificationStatus === RecipientVerificationStatus.UNKNOWN
 
   const secureSendPhoneNumberMapping = useSelector(secureSendPhoneNumberMappingSelector)
   const addressValidationType: AddressValidationType = getAddressValidationType(
@@ -250,6 +247,8 @@ function SendAmount(props: Props) {
         addressValidationType,
         isPaymentRequest: true,
       })
+    } else if (recipientVerificationStatus !== RecipientVerificationStatus.VERIFIED) {
+      navigate(Screens.PaymentRequestUnavailable, { transactionData })
     } else {
       CeloAnalytics.track(CustomEventNames.request_payment_continue)
       navigate(Screens.PaymentRequestConfirmation, { transactionData })

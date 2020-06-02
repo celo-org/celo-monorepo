@@ -84,7 +84,7 @@ class PaymentRequestConfirmation extends React.Component<Props> {
     this.setState({ comment })
   }
 
-  cleanInput = () => {
+  onBlur = () => {
     const comment = this.state.comment.trim()
     this.setState({ comment })
   }
@@ -134,8 +134,8 @@ class PaymentRequestConfirmation extends React.Component<Props> {
   }
 
   render() {
-    const { t } = this.props
-    const { recipient, recipientAddress: requesteeAddress } = this.props.confirmationInput
+    const { t, confirmationInput } = this.props
+    const { recipient, recipientAddress: requesteeAddress } = confirmationInput
     const amount = {
       value: this.props.confirmationInput.amount,
       currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code, // Only cUSD for now
@@ -177,7 +177,7 @@ class PaymentRequestConfirmation extends React.Component<Props> {
               testID={'request'}
               onCommentChange={this.onCommentChange}
               comment={this.state.comment}
-              onBlur={this.cleanInput}
+              onBlur={this.onBlur}
             />
           </View>
         </ReviewFrame>

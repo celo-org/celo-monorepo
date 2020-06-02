@@ -159,11 +159,6 @@ export class SendConfirmation extends React.Component<Props, State> {
     )
   }
 
-  cleanInput = () => {
-    const comment = this.state.comment.trim()
-    this.setState({ comment })
-  }
-
   onEditAddressClick = () => {
     const { transactionData, addressValidationType } = this.props
     navigate(Screens.ValidateRecipientIntro, {
@@ -227,6 +222,11 @@ export class SendConfirmation extends React.Component<Props, State> {
   }
 
   onCommentChange = (comment: string) => {
+    this.setState({ comment })
+  }
+
+  onBlur = () => {
+    const comment = this.state.comment.trim()
     this.setState({ comment })
   }
 
@@ -364,7 +364,7 @@ export class SendConfirmation extends React.Component<Props, State> {
               testID={'send'}
               onCommentChange={this.onCommentChange}
               comment={this.state.comment}
-              onBlur={this.cleanInput}
+              onBlur={this.onBlur}
             />
           </View>
           <InviteOptionsModal
@@ -372,9 +372,6 @@ export class SendConfirmation extends React.Component<Props, State> {
             onWhatsApp={this.sendWhatsApp}
             onSMS={this.sendSMS}
             onCancel={this.cancelModal}
-            cancelText={t('cancel')}
-            SMSText={t('inviteFlow11:inviteWithSMS')}
-            whatsAppText={t('inviteFlow11:inviteWithWhatsapp')}
           />
         </ReviewFrame>
       </SafeAreaView>

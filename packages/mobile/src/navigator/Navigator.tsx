@@ -68,6 +68,7 @@ import { StackParamList } from 'src/navigator/types'
 import IncomingPaymentRequestListScreen from 'src/paymentRequest/IncomingPaymentRequestListScreen'
 import OutgoingPaymentRequestListScreen from 'src/paymentRequest/OutgoingPaymentRequestListScreen'
 import PaymentRequestConfirmation from 'src/paymentRequest/PaymentRequestConfirmation'
+import PaymentRequestUnavailable from 'src/paymentRequest/PaymentRequestUnavailable'
 import PincodeEducation from 'src/pincode/PincodeEducation'
 import PincodeEnter from 'src/pincode/PincodeEnter'
 import PincodeSet from 'src/pincode/PincodeSet'
@@ -227,6 +228,18 @@ const emptyWithBackButtonHeaderOption = () => ({
   headerLeft: () => <BackButton />,
 })
 
+const navigateHome = () => navigate(Screens.WalletHome)
+
+const paymentRequestUnavailableScreenOptions = ({
+  route,
+}: {
+  route: RouteProp<StackParamList, Screens.PaymentRequestUnavailable>
+}) => ({
+  ...emptyHeader,
+  headerLeft: () => <TopBarIconButton icon={<Times />} onPress={navigateHome} />,
+  headerLeftContainerStyle: { paddingLeft: 20 },
+})
+
 const sendScreens = (Navigator: typeof Stack) => (
   <>
     <Navigator.Screen name={Screens.Send} component={Send} options={sendScreenOptions} />
@@ -251,6 +264,11 @@ const sendScreens = (Navigator: typeof Stack) => (
       name={Screens.ValidateRecipientAccount}
       component={ValidateRecipientAccount}
       options={emptyWithBackButtonHeaderOption}
+    />
+    <Navigator.Screen
+      name={Screens.PaymentRequestUnavailable}
+      component={PaymentRequestUnavailable}
+      options={paymentRequestUnavailableScreenOptions}
     />
     <Navigator.Screen
       name={Screens.PaymentRequestConfirmation}

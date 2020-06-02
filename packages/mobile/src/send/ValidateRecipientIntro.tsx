@@ -133,10 +133,6 @@ const styles = StyleSheet.create({
   button: {
     paddingVertical: 16,
   },
-  qrLogo: {
-    alignSelf: 'center',
-    marginBottom: 30,
-  },
   h2: {
     ...fontStyles.h2,
     paddingVertical: 20,
