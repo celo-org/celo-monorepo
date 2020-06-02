@@ -34,7 +34,7 @@ exports[`ContactCircle renders correctly 1`] = `
         Array [
           Object {
             "color": "#FFFFFF",
-            "fontFamily": "Hind-Medium",
+            "fontFamily": "Inter-Medium",
             "fontSize": 16,
           },
           Object {

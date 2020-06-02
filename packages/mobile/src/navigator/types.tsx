@@ -118,9 +118,11 @@ export type StackParamList = {
   [Screens.SendAmount]: {
     recipient: Recipient
     isRequest?: boolean
+    isFromScan?: boolean
   }
   [Screens.SendConfirmation]: {
     transactionData: TransactionDataInput
+    addressJustValidated?: boolean
   }
   [Screens.SetClock]: undefined
   [Screens.Settings]: undefined
