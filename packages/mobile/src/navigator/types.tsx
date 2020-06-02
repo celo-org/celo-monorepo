@@ -118,6 +118,7 @@ export type StackParamList = {
   [Screens.SendAmount]: {
     recipient: Recipient
     isRequest?: boolean
+    isFromScan?: boolean
   }
   [Screens.SendConfirmation]: {
     transactionData: TransactionDataInput
