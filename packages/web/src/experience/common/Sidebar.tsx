@@ -22,6 +22,7 @@ interface Props {
   routeHash: string
   isFlowing?: boolean
   distance?: number
+  onChangeRoute?: () => void
 }
 
 export default withScreenSize<Props>(
@@ -32,6 +33,7 @@ export default withScreenSize<Props>(
     routeHash,
     distance,
     isFlowing,
+    onChangeRoute,
   }: Props & ScreenProps) {
     const mainContaner = isFlowing
       ? [styles.containerFlow, { transform: [{ translateY: distance }] }]
@@ -45,6 +47,7 @@ export default withScreenSize<Props>(
           return (
             <React.Fragment key={page.href}>
               <Link
+                onPress={onChangeRoute}
                 key={page.title}
                 kind={Kind.page}
                 href={page.href}
@@ -56,6 +59,7 @@ export default withScreenSize<Props>(
                   sections={page.sections}
                   active={isActive(page.href, currentPathName)}
                   routeHash={routeHash}
+                  onChangeRoute={onChangeRoute}
                 />
               )}
             </React.Fragment>
@@ -70,7 +74,9 @@ const SectionNav = React.memo(function SectionNav_({
   sections,
   active,
   routeHash,
+  onChangeRoute,
 }: {
+  onChangeRoute?: () => void
   sections: Section[]
   active: boolean
   routeHash: string
@@ -81,6 +87,7 @@ const SectionNav = React.memo(function SectionNav_({
         sections.map((section) => {
           return (
             <Link
+              onPress={onChangeRoute}
               key={section.title}
               kind={Kind.section}
               href={section.href}
@@ -101,6 +108,7 @@ enum Kind {
 interface LinkProps {
   kind: Kind
   active: boolean
+  onPress?: () => void
 }
 
 const COIN_SIZE = 12
@@ -117,6 +125,7 @@ const Link = React.memo(function _Link(props: LinkProps & Section) {
       }
       kind={BTN.NAV}
       href={props.href}
+      onPress={props.onPress}
       text={props.title}
       style={[styles.item, !props.active && styles.inactiveText]}
     />

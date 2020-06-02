@@ -1,4 +1,4 @@
-# Community Tenets
+## Community Tenets
 As a global community we are guided by accessible financial tools to make the world a better place. In order to do this we are guided by the Celo Community tenets. In Celo events, these tenets come alive through the content shared, community interactions, and event intentions. Every event has at least one tenet that they are upholding.
 
 <DesignForAll/>

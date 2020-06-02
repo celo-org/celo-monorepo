@@ -1,9 +1,8 @@
 import * as React from 'react'
 import Page, { CIRCLES_PATH, ROUTE_TO_TITLE } from 'src/experience/eventkit/Page'
+import Section from 'src/experience/eventkit/Section'
 import { NameSpaces, useTranslation } from 'src/i18n'
 import { hashNav } from 'src/shared/menu-items'
-
-import Section from 'src/experience/eventkit/Section'
 
 const sections = [hashNav.eventCircles.overview].map((id) => {
   return {
@@ -11,7 +10,7 @@ const sections = [hashNav.eventCircles.overview].map((id) => {
     children: <Section content={require(`src/experience/eventkit/content/circles/${id}.md`)} />,
   }
 })
-export default function Flavor() {
+export default function Ambassador() {
   const { t } = useTranslation(NameSpaces.eventskit)
   return (
     <Page

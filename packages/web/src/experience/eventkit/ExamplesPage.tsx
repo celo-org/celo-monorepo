@@ -15,7 +15,7 @@ const sections = [
   }
 })
 
-export default function Resources() {
+export default function ExamplesPage() {
   const { t } = useTranslation(NameSpaces.eventskit)
   return (
     <>

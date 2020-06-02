@@ -3,6 +3,7 @@ import { SingletonRouter, withRouter } from 'next/router'
 import * as React from 'react'
 import { findNodeHandle, ImageRequireSource, StyleSheet, View } from 'react-native'
 import MobileMenu from 'src/experience/common/MobileMenu'
+import scrollToHash from 'src/experience/common/scrollToHash'
 import Sidebar, { Page as Pages } from 'src/experience/common/Sidebar'
 import Topbar from 'src/experience/common/TopBar'
 import OpenGraph from 'src/header/OpenGraph'
@@ -219,6 +220,7 @@ class Page extends React.Component<Props & ScreenProps, State> {
                   routeHash={this.state.routeHash}
                   isFlowing={!this.state.isSidebarFrozen}
                   distance={this.state.distanceToTop}
+                  onChangeRoute={moveToHash}
                 />
               )}
             </Cell>
@@ -279,3 +281,7 @@ const styles = StyleSheet.create({
 })
 
 export default withRouter(withScreenSize<Props>(Page))
+
+function moveToHash() {
+  scrollToHash(100)
+}

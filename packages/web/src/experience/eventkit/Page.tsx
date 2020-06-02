@@ -8,7 +8,7 @@ export const FLAVOR_PATH = `${ROOT}/flavor`
 export const RESOURCES_PATH = `${ROOT}/resources`
 
 export const EXAMPLES_PATH = `${ROOT}/examples`
-export const CIRCLES_PATH = `${ROOT}/circles`
+export const CIRCLES_PATH = `${ROOT}/ambassador`
 
 const PAGES = [
   {
@@ -56,7 +56,7 @@ const PAGES = [
     ],
   },
   {
-    title: 'Celo Circles',
+    title: 'Ambasadors',
     href: CIRCLES_PATH,
     sections: [
       // { title: 'Sponsorship', href: `${CIRCLES_PATH}#${hashNav.eventCircles.sponsorship}` },

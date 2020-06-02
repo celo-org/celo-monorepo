@@ -4,7 +4,7 @@ import { ROUTE_TO_TITLE } from 'src/experience/brandkit/common/Page'
 import Sidebar, { Page } from 'src/experience/common/Sidebar'
 import Triangle, { Direction } from 'src/shared/Triangle'
 import { colors, fonts, standardStyles } from 'src/styles'
-
+import scrollToHash from './scrollToHash'
 interface Props {
   pages: Page[]
   pathname: string
@@ -34,6 +34,11 @@ export default class MobileMenu extends React.PureComponent<Props, State> {
     this.setState(({ isOpen }) => ({ isOpen: !isOpen }))
   }
 
+  goToSubSection = () => {
+    scrollToHash(50)
+    this.closeMenu()
+  }
+
   render() {
     const { pages, pathname } = this.props
     return (
@@ -46,7 +51,12 @@ export default class MobileMenu extends React.PureComponent<Props, State> {
         </TouchableOpacity>
         <View style={[styles.menu, this.state.isOpen && styles.open]}>
           <View style={styles.sideBar}>
-            <Sidebar pages={pages} currentPathName={pathname} routeHash={this.props.routeHash} />
+            <Sidebar
+              pages={pages}
+              currentPathName={pathname}
+              routeHash={this.props.routeHash}
+              onChangeRoute={this.goToSubSection}
+            />
           </View>
         </View>
       </View>
