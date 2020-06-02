@@ -2385,6 +2385,7 @@ exports[`DevelopersPage renders 1`] = `
               role="list"
               style={
                 Object {
+                  "listStyle": "disc",
                   "marginLeft": "10px",
                   "marginTop": "20px",
                   "paddingLeft": "20px",
@@ -2402,7 +2403,7 @@ exports[`DevelopersPage renders 1`] = `
                     "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                     "fontSize": "20px",
                     "lineHeight": "28px",
-                    "listStyle": "disc",
+                    "listStyle": "inherit",
                     "marginBottom": "20px",
                     "textRendering": "geometricPrecision",
                   }
@@ -2421,7 +2422,7 @@ exports[`DevelopersPage renders 1`] = `
                     "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                     "fontSize": "20px",
                     "lineHeight": "28px",
-                    "listStyle": "disc",
+                    "listStyle": "inherit",
                     "marginBottom": "20px",
                     "textRendering": "geometricPrecision",
                   }
@@ -2440,7 +2441,7 @@ exports[`DevelopersPage renders 1`] = `
                     "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                     "fontSize": "20px",
                     "lineHeight": "28px",
-                    "listStyle": "disc",
+                    "listStyle": "inherit",
                     "marginBottom": "20px",
                     "textRendering": "geometricPrecision",
                   }
@@ -2459,7 +2460,7 @@ exports[`DevelopersPage renders 1`] = `
                     "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                     "fontSize": "20px",
                     "lineHeight": "28px",
-                    "listStyle": "disc",
+                    "listStyle": "inherit",
                     "marginBottom": "20px",
                     "textRendering": "geometricPrecision",
                   }
@@ -2478,7 +2479,7 @@ exports[`DevelopersPage renders 1`] = `
                     "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                     "fontSize": "20px",
                     "lineHeight": "28px",
-                    "listStyle": "disc",
+                    "listStyle": "inherit",
                     "marginBottom": "20px",
                     "textRendering": "geometricPrecision",
                   }
@@ -2757,6 +2758,7 @@ exports[`DevelopersPage renders 1`] = `
               role="list"
               style={
                 Object {
+                  "listStyle": "disc",
                   "marginLeft": "10px",
                   "marginTop": "20px",
                   "paddingLeft": "20px",
@@ -2774,7 +2776,7 @@ exports[`DevelopersPage renders 1`] = `
                     "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                     "fontSize": "20px",
                     "lineHeight": "28px",
-                    "listStyle": "disc",
+                    "listStyle": "inherit",
                     "marginBottom": "20px",
                     "textRendering": "geometricPrecision",
                   }
@@ -2793,7 +2795,7 @@ exports[`DevelopersPage renders 1`] = `
                     "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                     "fontSize": "20px",
                     "lineHeight": "28px",
-                    "listStyle": "disc",
+                    "listStyle": "inherit",
                     "marginBottom": "20px",
                     "textRendering": "geometricPrecision",
                   }
@@ -2812,7 +2814,7 @@ exports[`DevelopersPage renders 1`] = `
                     "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                     "fontSize": "20px",
                     "lineHeight": "28px",
-                    "listStyle": "disc",
+                    "listStyle": "inherit",
                     "marginBottom": "20px",
                     "textRendering": "geometricPrecision",
                   }
@@ -3091,6 +3093,7 @@ exports[`DevelopersPage renders 1`] = `
               role="list"
               style={
                 Object {
+                  "listStyle": "disc",
                   "marginLeft": "10px",
                   "marginTop": "20px",
                   "paddingLeft": "20px",
@@ -3108,7 +3111,7 @@ exports[`DevelopersPage renders 1`] = `
                     "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                     "fontSize": "20px",
                     "lineHeight": "28px",
-                    "listStyle": "disc",
+                    "listStyle": "inherit",
                     "marginBottom": "20px",
                     "textRendering": "geometricPrecision",
                   }
@@ -3127,7 +3130,7 @@ exports[`DevelopersPage renders 1`] = `
                     "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                     "fontSize": "20px",
                     "lineHeight": "28px",
-                    "listStyle": "disc",
+                    "listStyle": "inherit",
                     "marginBottom": "20px",
                     "textRendering": "geometricPrecision",
                   }
@@ -3146,7 +3149,7 @@ exports[`DevelopersPage renders 1`] = `
                     "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
                     "fontSize": "20px",
                     "lineHeight": "28px",
-                    "listStyle": "disc",
+                    "listStyle": "inherit",
                     "marginBottom": "20px",
                     "textRendering": "geometricPrecision",
                   }

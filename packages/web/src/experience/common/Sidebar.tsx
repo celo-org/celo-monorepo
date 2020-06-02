@@ -3,8 +3,8 @@ import { StyleSheet, View } from 'react-native'
 import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
 import Button, { BTN } from 'src/shared/Button.3'
 import OvalCoin from 'src/shared/OvalCoin'
-import { colors } from 'src/styles'
 import { HEADER_HEIGHT } from 'src/shared/Styles'
+import { colors } from 'src/styles'
 
 interface Section {
   title: string
