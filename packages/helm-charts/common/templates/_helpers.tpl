@@ -132,7 +132,7 @@ release: {{ .Release.Name }}
     ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --ethstats=${HOSTNAME}@{{ .ethstats }} --etherbase=${ACCOUNT_ADDRESS}"
     {{- end }}
 
-    geth \
+    exec geth \
       --bootnodes=$(cat /root/.celo/bootnodeEnode) \
       --light.serve {{ .light_serve | default 90 }} \
       --light.maxpeers {{ .light_maxpeers | default 1000 }} \
@@ -159,13 +159,23 @@ release: {{ .Release.Name }}
     valueFrom:
       fieldRef:
         fieldPath: metadata.name
-{{- if .expose /* TODO: make this use IPC */ }}
+{{/* TODO: make this use IPC */}}
+{{- if .expose }}
   readinessProbe:
     exec:
       command:
       - /bin/sh
       - "-c"
       - |
+        # first check if it's syncing
+        SYNCING=$(wget -q --header "Content-Type: application/json" --post-data "{\"jsonrpc\":\"2.0\",\"method\":\"eth_syncing\",\"params\":[],\"id\":65}" -O - http://localhost:8545)
+        NOT_SYNCING=$(echo $SYNCING | grep -o '"result":false')
+        if [ ! $NOT_SYNCING ]; then
+          echo "Node is syncing: $SYNCING"
+          exit 1
+        fi
+
+        # then make sure that the latest block is new
         MAX_LATEST_BLOCK_AGE_SECONDS={{ .max_latest_block_age_seconds | default 30 }}
         LATEST_BLOCK_JSON=$(wget -q --header "Content-Type: application/json" --post-data "{\"jsonrpc\":\"2.0\",\"method\":\"eth_getBlockByNumber\",\"params\":[\"latest\", false],\"id\":67}" -O - http://localhost:8545)
         BLOCK_TIMESTAMP_HEX=$(echo $LATEST_BLOCK_JSON | grep -o '"timestamp":"[^"]*' | grep -o '[a-fA-F0-9]*$')
