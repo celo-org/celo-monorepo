@@ -16,7 +16,6 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
         Object {
           "backgroundColor": "#FFFFFF",
           "flex": 1,
-          "justifyContent": "space-between",
         },
         undefined,
       ]
@@ -25,7 +24,6 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
     <RCTScrollView
       contentContainerStyle={
         Object {
-          "justifyContent": "flex-start",
           "paddingVertical": 10,
         }
       }
@@ -46,10 +44,9 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
               Array [
                 Object {
                   "color": "#2E3338",
-                  "fontFamily": "Hind-Light",
-                  "fontSize": 22,
-                  "paddingBottom": 20,
-                  "textAlign": "center",
+                  "fontFamily": "Inter-Medium",
+                  "fontSize": 24,
+                  "lineHeight": 32,
                 },
                 Object {
                   "alignSelf": "center",
@@ -67,7 +64,6 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
           style={
             Object {
               "marginHorizontal": 16,
-              "marginVertical": 20,
             }
           }
         >
@@ -98,10 +94,7 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
                       "flexDirection": "row",
                       "justifyContent": "center",
                     },
-                    Object {
-                      "alignSelf": "center",
-                      "margin": "auto",
-                    },
+                    undefined,
                   ]
                 }
               >
@@ -121,25 +114,22 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
                     ]
                   }
                 >
-                  <Image
-                    source={
-                      Object {
-                        "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
-                      }
-                    }
+                  <Text
                     style={
                       Array [
                         Object {
-                          "alignSelf": "center",
-                          "margin": "auto",
+                          "color": "#FFFFFF",
+                          "fontFamily": "Inter-Medium",
+                          "fontSize": 16,
                         },
                         Object {
-                          "height": 40,
-                          "width": 40,
+                          "fontSize": 20,
                         },
                       ]
                     }
-                  />
+                  >
+                    J
+                  </Text>
                 </View>
               </View>
               <Text
@@ -276,20 +266,6 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
                 1.33
               </Text>
             </View>
-            <Text
-              style={
-                Object {
-                  "color": "#81868B",
-                  "fontFamily": "Hind-Light",
-                  "fontSize": 14,
-                  "lineHeight": 18,
-                  "paddingTop": 5,
-                  "textAlign": "center",
-                }
-              }
-            >
-              Something
-            </Text>
             <View
               style={
                 Object {
@@ -483,86 +459,57 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
         style={
           Array [
             Object {
-              "alignItems": "center",
-              "borderRadius": 3,
-              "flexDirection": "row",
-            },
-            Object {
-              "marginVertical": 10,
-            },
-            Object {
-              "marginBottom": 10,
+              "flexDirection": "column",
             },
             undefined,
-            Object {
-              "backgroundColor": "#42D689",
-            },
           ]
         }
       >
         <View
-          accessible={true}
-          focusable={true}
-          nativeBackgroundAndroid={
-            Object {
-              "attribute": "selectableItemBackground",
-              "type": "ThemeAttrAndroid",
-            }
-          }
-          onClick={[Function]}
-          onResponderGrant={[Function]}
-          onResponderMove={[Function]}
-          onResponderRelease={[Function]}
-          onResponderTerminate={[Function]}
-          onResponderTerminationRequest={[Function]}
-          onStartShouldSetResponder={[Function]}
           style={
-            Array [
-              Object {
-                "alignItems": "center",
-                "flex": 1,
-                "justifyContent": "center",
-              },
-              Object {
-                "backgroundColor": "#42D689",
-              },
-              Object {
-                "height": 50,
-              },
-              Object {
-                "borderColor": "#42D689",
-                "borderRadius": 3,
-                "borderWidth": 2,
-              },
-            ]
+            Object {
+              "borderRadius": 100,
+              "overflow": "hidden",
+            }
           }
         >
           <View
+            accessible={true}
+            focusable={true}
+            nativeBackgroundAndroid={
+              Object {
+                "attribute": "selectableItemBackground",
+                "type": "ThemeAttrAndroid",
+              }
+            }
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
             style={
               Object {
                 "alignItems": "center",
-                "flex": 1,
-                "flexDirection": "row",
-                "justifyContent": "space-between",
+                "backgroundColor": "#1AB775",
+                "flexGrow": 1,
+                "height": 48,
+                "justifyContent": "center",
+                "paddingHorizontal": 16,
+                "paddingVertical": 5,
               }
             }
           >
             <Text
               accessibilityLabel="request"
               style={
-                Array [
-                  Object {
-                    "fontFamily": "Hind-SemiBold",
-                    "fontSize": 16,
-                  },
-                  Object {
-                    "color": "#FFFFFF",
-                  },
-                  Object {
-                    "paddingLeft": 5,
-                    "paddingRight": 5,
-                  },
-                ]
+                Object {
+                  "color": "#FFFFFF",
+                  "fontFamily": "Inter-SemiBold",
+                  "fontSize": 16,
+                  "lineHeight": 22,
+                }
               }
             >
               request
@@ -574,82 +521,59 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
         style={
           Array [
             Object {
-              "alignItems": "center",
-              "borderRadius": 3,
-              "flexDirection": "row",
+              "flexDirection": "column",
             },
-            null,
-            null,
             Object {
               "marginBottom": 10,
-            },
-            Object {
-              "backgroundColor": "transparent",
             },
           ]
         }
       >
         <View
-          accessible={true}
-          focusable={true}
-          nativeBackgroundAndroid={
-            Object {
-              "attribute": "selectableItemBackground",
-              "type": "ThemeAttrAndroid",
-            }
-          }
-          onClick={[Function]}
-          onResponderGrant={[Function]}
-          onResponderMove={[Function]}
-          onResponderRelease={[Function]}
-          onResponderTerminate={[Function]}
-          onResponderTerminationRequest={[Function]}
-          onStartShouldSetResponder={[Function]}
           style={
-            Array [
-              Object {
-                "alignItems": "center",
-                "flex": 1,
-                "justifyContent": "center",
-              },
-              Object {
-                "backgroundColor": "transparent",
-              },
-              Object {
-                "height": 50,
-              },
-              Object {
-                "borderWidth": 0,
-              },
-            ]
+            Object {
+              "borderRadius": 100,
+              "overflow": "hidden",
+            }
           }
         >
           <View
+            accessible={true}
+            focusable={true}
+            nativeBackgroundAndroid={
+              Object {
+                "attribute": "selectableItemBackground",
+                "type": "ThemeAttrAndroid",
+              }
+            }
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
             style={
               Object {
                 "alignItems": "center",
-                "flex": 1,
-                "flexDirection": "row",
-                "justifyContent": "space-between",
+                "backgroundColor": "#F5F4F0",
+                "flexGrow": 1,
+                "height": 48,
+                "justifyContent": "center",
+                "paddingHorizontal": 16,
+                "paddingVertical": 5,
               }
             }
           >
             <Text
               accessibilityLabel="edit"
               style={
-                Array [
-                  Object {
-                    "fontFamily": "Hind-SemiBold",
-                    "fontSize": 16,
-                  },
-                  Object {
-                    "color": "#42D689",
-                  },
-                  Object {
-                    "paddingLeft": 5,
-                    "paddingRight": 5,
-                  },
-                ]
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Inter-SemiBold",
+                  "fontSize": 16,
+                  "lineHeight": 22,
+                }
               }
             >
               edit
