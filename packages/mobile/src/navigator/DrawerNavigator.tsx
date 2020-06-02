@@ -25,6 +25,7 @@ import {
 } from 'src/account/selectors'
 import Support from 'src/account/Support'
 import BackupIntroduction from 'src/backup/BackupIntroduction'
+import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import ExchangeHomeScreen from 'src/exchange/ExchangeHomeScreen'
 import WalletHome from 'src/home/WalletHome'
 import { Namespaces } from 'src/i18n'
@@ -35,6 +36,7 @@ import { Help } from 'src/icons/navigator/Help'
 import { Home } from 'src/icons/navigator/Home'
 import { Invite } from 'src/icons/navigator/Invite'
 import { Settings } from 'src/icons/navigator/Settings'
+import { LocalCurrencyCode } from 'src/localCurrency/consts'
 import { useDollarsToLocalAmount, useLocalCurrencySymbol } from 'src/localCurrency/hooks'
 import { Screens } from 'src/navigator/Screens'
 import useSelector from 'src/redux/useSelector'
@@ -66,6 +68,13 @@ function CustomDrawerContent(props: DrawerContentComponentProps<DrawerContentOpt
           defaultCountryCode={defaultCountryCode}
         />
         <View style={styles.border} />
+        {balance && (
+          <CurrencyDisplay
+            amount={{ value: balance, currencyCode: LocalCurrencyCode.USD }}
+            style={fontStyles.regular500}
+            showLocalAmount={true}
+          />
+        )}
         <Text style={fontStyles.regular500}>{`${symbol} ${localBalance?.toFixed(2)}`}</Text>
         <Text style={[styles.smallLabel, styles.dollarsLabel]}>{`${bigNumBalance?.toFixed(2)} ${t(
           'celoDollars'
