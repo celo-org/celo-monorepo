@@ -19,7 +19,6 @@ import CurrencyDisplay, { DisplayType, FormatType } from 'src/components/Currenc
 import FeeIcon from 'src/components/FeeIcon'
 import InviteOptionsModal from 'src/components/InviteOptionsModal'
 import LineItemRow from 'src/components/LineItemRow.v2'
-import Modal from 'src/components/Modal'
 import ShortenedAddress from 'src/components/ShortenedAddress'
 import TotalLineItem from 'src/components/TotalLineItem.v2'
 import { FeeType } from 'src/fees/actions'
@@ -368,19 +367,15 @@ export class SendConfirmation extends React.Component<Props, State> {
               onBlur={this.cleanInput}
             />
           </View>
-          <Modal isVisible={this.state.modalVisible} style={styles.modal}>
-            <View style={styles.modalContainer}>
-              <InviteOptionsModal
-                onWhatsApp={this.sendWhatsApp}
-                onSMS={this.sendSMS}
-                onCancel={this.cancelModal}
-                cancelText={t('cancel')}
-                SMSText={t('inviteFlow11:inviteWithSMS')}
-                whatsAppText={t('inviteFlow11:inviteWithWhatsapp')}
-                margin={15}
-              />
-            </View>
-          </Modal>
+          <InviteOptionsModal
+            isVisible={this.state.modalVisible}
+            onWhatsApp={this.sendWhatsApp}
+            onSMS={this.sendSMS}
+            onCancel={this.cancelModal}
+            cancelText={t('cancel')}
+            SMSText={t('inviteFlow11:inviteWithSMS')}
+            whatsAppText={t('inviteFlow11:inviteWithWhatsapp')}
+          />
         </ReviewFrame>
       </SafeAreaView>
     )
@@ -441,15 +436,6 @@ const styles = StyleSheet.create({
   },
   displayName: {
     ...fontStyles.regular500,
-  },
-  modal: {
-    flex: 1,
-    margin: 0,
-  },
-  modalContainer: {
-    justifyContent: 'flex-end',
-    alignItems: 'stretch',
-    flex: 1,
   },
   editContainer: {
     flexDirection: 'row',
