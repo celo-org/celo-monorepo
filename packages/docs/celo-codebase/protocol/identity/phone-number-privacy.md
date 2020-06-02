@@ -13,8 +13,7 @@ Quota is influenced by:
 - Transaction history
 - Phone number attestation count and success rate
 
-### Matchmaking
-It's important that we tighten down the quota as much as possible to hinder potential data harvesting. To this end, we consider mutual connections between users when evaluating query threshold consumption. If two Celo users both have each other in their respective address book, then we don't count this query against the user's quota since there's a mutual connection already established. By taking into account mutual connections, we can significantly lower the quota that an average user will need.
+The impact that these factors have on the quota are adjusted to make it prohibitively expensive to scrape large quantities of phone numbers while still allowing typical user flows to remain unaffected.
 
 ## Decentralized PGPNP
 ### Distributed Key Generation
@@ -24,7 +23,7 @@ For the sake of user privacy, no single party should have the ability to unilate
 When the user queries the phone number, the mobile application first blinds the phone number locally. After the application receives the response, it unblinds it to retrieve the salt. This blinding process preserves the privacy of the mobile number such that the PGPNP cannot tell which number it's providing a salt for; reducing risk of targeted censorship and further increasing privacy.  
 
 ### Combiner
-Due to the multi-service communication that needs to happen as part of the K of M signing, we've created a combiner service which performs the orchestration on the user's behalf. This is entirely optional to facilitate the orchestration and a given client can choose to operate their own combiner if desired. Because the combiner only receives the blinded phone number, the combiner cannot tell which number it's providing orchestrating services for. The combiner additionally validates the response from each signer to ensure a corrupt signer cannot corrupt the resulting salt.
+Due to the multi-service communication that needs to happen as part of the K of M signing, we've created a combiner service which performs the orchestration on the user's behalf. Using the cLabs operated combiner is optional and a client can choose to operate/designate a separate combiner if desired. Because the combiner only receives the blinded phone number, the combiner cannot tell which number it's providing orchestrating services for. The combiner additionally validates the response from each signer to ensure a corrupt signer cannot corrupt the resulting salt.
 
 ## Authentication
 In order to measure the quota for a given request, the PGPNP must check the querier's account information on the Celo network. To prove ownership over the account, the header of the API request contains the signed message body. When the PGPNP receives the request, it authenticates the user by recovering the message signer from the header and comparing it to the value in the message body.
