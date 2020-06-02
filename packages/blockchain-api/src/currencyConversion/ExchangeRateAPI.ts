@@ -1,8 +1,8 @@
 import { RESTDataSource } from 'apollo-datasource-rest'
 import BigNumber from 'bignumber.js'
 import { EXCHANGE_RATES_API, EXCHANGE_RATES_API_ACCESS_KEY } from '../config'
-import { CurrencyConversionArgs } from '../schema'
 import { formatDateString } from '../utils'
+import { CurrencyConversionArgs } from '../walletSchema'
 import { USD } from './consts'
 
 interface ExchangeRateApiResult {

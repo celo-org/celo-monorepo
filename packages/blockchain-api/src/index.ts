@@ -1,5 +1,5 @@
 import express from 'express'
-import { server as apolloServer } from './apolloServer'
+import { stitchedServer } from './apolloServer'
 
 declare var process: {
   env: {
@@ -26,9 +26,13 @@ app.head('/', (_req, res) => {
   res.end()
 })
 
-apolloServer.applyMiddleware({ app, path: GRAPHQL_PATH })
+stitchedServer()
+  .then((server) => {
+    server.applyMiddleware({ app, path: GRAPHQL_PATH })
 
-app.listen(PORT, INTERFACE, () => {
-  console.info(`🚀 GraphQL accessible @ http://${INTERFACE}:${PORT}${apolloServer.graphqlPath}`)
-  console.info('[Celo] Starting Server')
-})
+    app.listen(PORT, INTERFACE, () => {
+      console.info(`🚀 GraphQL accessible @ http://${INTERFACE}:${PORT}${server.graphqlPath}`)
+      console.info('[Celo] Starting Server')
+    })
+  })
+  .catch(console.error)

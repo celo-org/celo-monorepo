@@ -1,7 +1,7 @@
 import { DataSource, DataSourceConfig } from 'apollo-datasource'
 import BigNumber from 'bignumber.js'
 import { database } from '../firebase'
-import { CurrencyConversionArgs } from '../schema'
+import { CurrencyConversionArgs } from '../walletSchema'
 import { CUSD } from './consts'
 
 // Firebase stored exchange rate

@@ -1,8 +1,8 @@
 import { RESTDataSource } from 'apollo-datasource-rest'
 import BigNumber from 'bignumber.js'
 import { BLOCKSCOUT_API, FAUCET_ADDRESS, VERIFICATION_REWARDS_ADDRESS } from './config'
-import { EventArgs, EventTypes, TokenTransactionArgs, TransferEvent } from './schema'
 import { formatCommentString, getContractAddresses } from './utils'
+import { EventArgs, EventTypes, TokenTransactionArgs, TransferEvent } from './walletSchema'
 
 // to get rid of 18 extra 0s in the values
 const WEI_PER_GOLD = Math.pow(10, 18)

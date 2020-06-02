@@ -17,7 +17,7 @@
     "deploy": "./deploy.sh"
   },
   "dependencies": {
-    "@celo/contractkit": "0.3.6",
+    "@celo/contractkit": "0.4.6-dev",
     "@celo/utils": "0.1.9",
     "apollo-datasource-rest": "^0.8.1",
     "apollo-server-express": "^2.12.0",
@@ -26,6 +26,7 @@
     "express": "^4.17.1",
     "firebase-admin": "^8.10.0",
     "graphql": "^14.1.1",
+    "graphql-tools": "5.0.0",
     "utf8": "^3.0.0",
     "web3-eth-abi": "1.2.4",
     "web3": "1.2.4"
