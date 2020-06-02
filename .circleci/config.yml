@@ -944,6 +944,21 @@ jobs:
           # helm install ../helm-charts/celo-fullnode --name "${NETWORK}-${NAMESPACE}-${SYNC_MODE}-node" --namespace ${NAMESPACE} --set genesis.network="${NETWORK}" --set genesis.networkId="${NETWORK_ID}" --set geth.gcmode="full" --set geth.image.repository="${GETH_NODE_DOCKER_IMAGE_REPOSITORY}" --set geth.image.tag="master" --set geth.syncmode="${SYNC_MODE}" --set geth.use_static_ips="false" --set namespace="${NAMESPACE}" --set replicaCount="1" --set storage.size="10Gi" --set storage.storageClass="standard"
 
     - run:
+        name: Deploying fast mode client connected to rc1
+        command: |
+          set -e
+          cd packages/celotool
+          NAMESPACE="circle-${CIRCLE_BUILD_NUM}"
+          SYNC_MODE="fast"
+          bin/celotooljs.sh deploy initial gke-fullnode -e rc1 --syncmode fast --namespace ${NAMESPACE}
+          # if [ -f ../../.env.${NETWORK} ]; then
+          #   source ../../.env.${NETWORK}
+          # else
+          #   source ../../.env
+          # fi
+          # helm install ../helm-charts/celo-fullnode --name "${NETWORK}-${NAMESPACE}-${SYNC_MODE}-node" --namespace ${NAMESPACE} --set genesis.network="${NETWORK}" --set genesis.networkId="${NETWORK_ID}" --set geth.gcmode="full" --set geth.image.repository="${GETH_NODE_DOCKER_IMAGE_REPOSITORY}" --set geth.image.tag="master" --set geth.syncmode="${SYNC_MODE}" --set geth.use_static_ips="false" --set namespace="${NAMESPACE}" --set replicaCount="1" --set storage.size="10Gi" --set storage.storageClass="standard"
+
+    - run:
         name: Testing full mode client connected to rc1
         command: |
           set -e
@@ -958,20 +973,6 @@ jobs:
             echo "full mode synced FAIL"
             echo 'export FULL=FAIL' >> $BASH_ENV
           fi
-    - run:
-        name: Deploying fast mode client connected to rc1
-        command: |
-          set -e
-          cd packages/celotool
-          NAMESPACE="circle-${CIRCLE_BUILD_NUM}"
-          SYNC_MODE="fast"
-          bin/celotooljs.sh deploy initial gke-fullnode -e rc1 --syncmode fast --namespace ${NAMESPACE}
-          # if [ -f ../../.env.${NETWORK} ]; then
-          #   source ../../.env.${NETWORK}
-          # else
-          #   source ../../.env
-          # fi
-          # helm install ../helm-charts/celo-fullnode --name "${NETWORK}-${NAMESPACE}-${SYNC_MODE}-node" --namespace ${NAMESPACE} --set genesis.network="${NETWORK}" --set genesis.networkId="${NETWORK_ID}" --set geth.gcmode="full" --set geth.image.repository="${GETH_NODE_DOCKER_IMAGE_REPOSITORY}" --set geth.image.tag="master" --set geth.syncmode="${SYNC_MODE}" --set geth.use_static_ips="false" --set namespace="${NAMESPACE}" --set replicaCount="1" --set storage.size="10Gi" --set storage.storageClass="standard"
 
     - run:
         name: Testing fast mode client connected to rc1
@@ -1089,9 +1090,9 @@ workflows:
           requires:
             - lint-checks
             - contractkit-test
-      # - integration-sync-geth-mainnet:
-      #     requires:
-      #       - lint-checks
+      - integration-sync-geth-mainnet:
+          requires:
+            - lint-checks
       - phone-number-privacy-test:
           requires:
             - lint-checks
