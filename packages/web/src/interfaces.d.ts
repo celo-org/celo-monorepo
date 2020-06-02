@@ -4,7 +4,7 @@ declare module '*.json' {
 }
 
 declare module '*.md' {
-  const value: any
+  const value: string
   export default value
 }
 

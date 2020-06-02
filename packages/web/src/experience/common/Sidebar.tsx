@@ -147,7 +147,6 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   container: {
-    // @ts-ignore
     position: 'sticky',
     top: HEADER_HEIGHT + 100,
   },

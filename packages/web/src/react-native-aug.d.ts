@@ -34,7 +34,7 @@ declare module 'react-native' {
     gridTemplateColumns?: string
     isolation?: 'isolate'
     mixBlendMode?: 'multiply' | 'screen'
-    position?: 'absolute' | 'relative' | 'fixed' | 'static'
+    position?: 'absolute' | 'relative' | 'fixed' | 'static' | 'sticky'
     scrollPadding?: number
     transformOrigin?: string | number
     transitionProperty?: string

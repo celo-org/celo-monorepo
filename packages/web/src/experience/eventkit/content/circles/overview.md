@@ -4,7 +4,7 @@ Celo Ambassadors are active Celo community members who are passionate about buil
 
 Do you love the mission of Celo and want to be more involved? Do you want to increase financial inclusion in your local area? Become a Celo Ambassador.
 
-<button href="https://airtable.com/shrfUJWk1eKfFcZKb">Apply Now</button>
+<button external href="https://airtable.com/shrfUJWk1eKfFcZKb">Apply Now</button>
 
 
 ### Benefits of being a Celo Ambassador

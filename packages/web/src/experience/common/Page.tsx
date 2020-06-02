@@ -239,7 +239,7 @@ const styles = StyleSheet.create({
     zIndex: 10,
     marginBottom: HEADER_HEIGHT,
   },
-  footer: { zIndex: -100, backgroundColor: colors.white, marginTop: 50 },
+  footer: { zIndex: -10, backgroundColor: colors.white, marginTop: 50 },
   childrenArea: {
     minHeight: `calc(100vh - ${HEADER_HEIGHT}px)`,
   },

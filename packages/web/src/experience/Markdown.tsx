@@ -12,9 +12,35 @@ import { H1, H2, H3, H4, Li, Ul } from 'src/fonts/Fonts'
 import Button, { BTN } from 'src/shared/Button.3'
 import InlineAnchor from 'src/shared/InlineAnchor'
 import { fonts, standardStyles } from 'src/styles'
+import { trackOpen, Types } from './eventkit/tracking'
 
 function P({ children }) {
   return <Text style={[fonts.p, standardStyles.halfElement, styles.block]}>{children}</Text>
+}
+
+function PrimeButton({
+  children,
+  href,
+  external,
+}: {
+  children: string
+  href: string
+  external?: boolean
+}) {
+  const track = React.useCallback(() => trackOpen({ name: children, type: Types.Action }), [
+    children,
+  ])
+
+  return (
+    <Button
+      style={standardStyles.halfElement}
+      kind={BTN.PRIMARY}
+      text={children}
+      href={href}
+      onPress={track}
+      target={external ? '_blank' : ''}
+    />
+  )
 }
 
 const styles = StyleSheet.create({
@@ -60,11 +86,7 @@ const OPTIONS = {
     EmbodyHumility,
     InnovatingOnMoney,
     PlanningDocs,
-    button: {
-      component: ({ children, href }) => (
-        <Button style={standardStyles.halfElement} kind={BTN.PRIMARY} text={children} href={href} />
-      ),
-    },
+    button: PrimeButton,
   },
 }
 export default function Markdown({ source }) {

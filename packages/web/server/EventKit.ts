@@ -1,7 +1,6 @@
 import { Attachment, FieldSet, Table } from 'airtable'
-// import getConfig from 'next/config'
-import cache from './cache'
 import airtableInit from './airtable'
+import cache from './cache'
 
 const BASE_ID = 'appjKfoHvrO5SZWdd'
 

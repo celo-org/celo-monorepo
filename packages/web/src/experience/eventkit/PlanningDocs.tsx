@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useAsync } from 'react-async-hook'
 import { Image, StyleSheet, Text, View } from 'react-native'
+import { Types, trackDownload } from 'src/experience/eventkit/tracking'
 import External from 'src/icons/External'
 import AspectRatio from 'src/shared/AspectRatio'
 import { colors, fonts, standardStyles } from 'src/styles'
@@ -28,14 +29,18 @@ const MarryLastWordToIcon = React.memo(function _MarryLastWordToIcon({ words }: 
 })
 
 function DocPreview({ preview, uri, title }: Doc) {
+  const track = React.useCallback(() => trackDownload({ name: title, type: Types.PlanningDoc }), [
+    title,
+  ])
+
   return (
     <View style={styles.root}>
-      <a href={uri} target={'_blank'}>
+      <a href={uri} target={'_blank'} onClick={track}>
         <AspectRatio ratio={148 / 111} style={styles.image}>
           <Image source={preview} style={standardStyles.image} />
         </AspectRatio>
       </a>
-      <a href={uri} target={'_blank'}>
+      <a href={uri} target={'_blank'} onClick={track}>
         <Text style={fonts.h6}>
           <MarryLastWordToIcon words={title} />
         </Text>

@@ -20,4 +20,4 @@ Event requirements for sponsorship consideration:
 Microgrants are not designed for large-scale events. As a best practice, The Celo Foundation recommends collaborating with other relevant organizations to expand your local network of resources and reach a wider audience.  
 Request sponsorship in your event submission to The Celo Foundation, and we will reach out to you with next steps through the contact info you provide.
 
-<button href="https://airtable.com/shrfUJWk1eKfFcZKb">Speaker Event</button>
+<button external href="https://airtable.com/shrfUJWk1eKfFcZKb">Speaker Event</button>
