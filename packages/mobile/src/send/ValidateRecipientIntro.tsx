@@ -1,18 +1,15 @@
-import Button, { BtnTypes } from '@celo/react-components/components/Button'
 import ContactCircle from '@celo/react-components/components/ContactCircle'
-import QRCodeBorderlessIcon from '@celo/react-components/icons/QRCodeBorderless'
-import colors from '@celo/react-components/styles/colors'
-import { fontStyles } from '@celo/react-components/styles/fonts'
+import TextButton from '@celo/react-components/components/TextButton.v2'
+import colors from '@celo/react-components/styles/colors.v2'
+import fontStyles from '@celo/react-components/styles/fonts.v2'
 import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
-import { Image, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { AddressValidationType } from 'src/identity/reducer'
-import { unknownUserIcon } from 'src/images/Images'
-import { headerWithBackButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
@@ -22,14 +19,11 @@ import { TransactionDataInput } from 'src/send/SendAmount'
 import { formatDisplayName } from 'src/utils/formatting'
 
 const AVATAR_SIZE = 120
-const QR_ICON_SIZE = 24
 
 interface StateProps {
   recipient: Recipient
   transactionData: TransactionDataInput
   addressValidationType: AddressValidationType
-  displayName: string
-  displayNameCapitalized: string
   isPaymentRequest?: true
 }
 
@@ -39,11 +33,8 @@ type Props = WithTranslation & StateProps & OwnProps
 const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
   const { route } = ownProps
   const { recipient } = route.params.transactionData
-  const { displayName, displayNameCapitalized } = formatDisplayName(recipient.displayName)
   return {
     recipient,
-    displayName,
-    displayNameCapitalized,
     transactionData: route.params.transactionData,
     addressValidationType: route.params.addressValidationType,
     isPaymentRequest: route.params.isPaymentRequest,
@@ -51,10 +42,6 @@ const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
 }
 
 class ValidateRecipientIntro extends React.Component<Props> {
-  static navigationOptions = () => ({
-    ...headerWithBackButton,
-  })
-
   onPressScanCode = () => {
     navigate(Screens.QRScanner, {
       transactionData: this.props.transactionData,
@@ -73,17 +60,20 @@ class ValidateRecipientIntro extends React.Component<Props> {
   }
 
   render() {
-    const { t, recipient, displayName, displayNameCapitalized } = this.props
+    const { t, recipient } = this.props
+    const { displayName, displayNameCapitalized } = formatDisplayName(recipient.displayName)
 
     return (
       <SafeAreaView style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           <View style={styles.iconContainer}>
-            <ContactCircle size={AVATAR_SIZE} thumbnailPath={getRecipientThumbnail(recipient)}>
-              {<Image source={unknownUserIcon} style={styles.image} />}
-            </ContactCircle>
+            <ContactCircle
+              size={AVATAR_SIZE}
+              name={recipient.displayName}
+              thumbnailPath={getRecipientThumbnail(recipient)}
+            />
           </View>
-          <Text style={[styles.h1, fontStyles.bold]}>
+          <Text style={styles.h2}>
             {t('confirmAccount.header', {
               displayName,
             })}
@@ -101,22 +91,16 @@ class ValidateRecipientIntro extends React.Component<Props> {
           </Text>
         </ScrollView>
         <View style={styles.buttonContainer}>
-          <Button
-            onPress={this.onPressScanCode}
-            text={t('scanQRCode')}
-            standard={false}
-            type={BtnTypes.SECONDARY}
-            testID={'scanQRCode'}
-          >
-            {<QRCodeBorderlessIcon height={QR_ICON_SIZE} color={colors.celoGreen} />}
-          </Button>
-          <Button
+          <TextButton style={styles.button} onPress={this.onPressScanCode} testID={'scanQRCode'}>
+            {t('scanQRCode')}
+          </TextButton>
+          <TextButton
+            style={styles.button}
             onPress={this.onPressConfirmAccount}
-            text={t('confirmAccount.button')}
-            standard={false}
-            type={BtnTypes.SECONDARY}
             testID={'confirmAccountButton'}
-          />
+          >
+            {t('confirmAccount.button')}
+          </TextButton>
         </View>
       </SafeAreaView>
     )
@@ -126,12 +110,12 @@ class ValidateRecipientIntro extends React.Component<Props> {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: colors.light,
     justifyContent: 'space-between',
   },
   scrollContainer: {
     flex: 1,
-    paddingHorizontal: 30,
+    paddingHorizontal: 24,
     paddingBottom: 30,
     flexDirection: 'column',
     justifyContent: 'flex-start',
@@ -142,27 +126,25 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   buttonContainer: {
-    paddingBottom: 30,
+    paddingBottom: 60,
     flexDirection: 'column',
     alignItems: 'center',
   },
-  image: {
-    height: AVATAR_SIZE,
-    width: AVATAR_SIZE,
-    justifyContent: 'center',
-    alignItems: 'center',
+  button: {
+    paddingVertical: 16,
   },
   qrLogo: {
     alignSelf: 'center',
     marginBottom: 30,
   },
-  h1: {
-    ...fontStyles.h1,
-    paddingVertical: 15,
+  h2: {
+    ...fontStyles.h2,
+    paddingVertical: 20,
     paddingHorizontal: 5,
+    textAlign: 'center',
   },
   body: {
-    ...fontStyles.body,
+    ...fontStyles.small,
     textAlign: 'center',
     paddingBottom: 20,
   },

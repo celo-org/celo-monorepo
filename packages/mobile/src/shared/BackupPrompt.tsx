@@ -31,17 +31,15 @@ export class BackupPrompt extends React.Component<Props> {
     navigate(Screens.BackupIntroduction)
   }
 
-  isVisible = () => {
-    return this.props.backupTooLate && !this.props.doingBackupFlow && !this.props.backupCompleted
-  }
-
   render() {
     const { t } = this.props
 
-    const isVisible = this.isVisible()
+    const isVisible =
+      this.props.backupTooLate && !this.props.doingBackupFlow && !this.props.backupCompleted
 
     return (
       <SmartTopAlert
+        isVisible={isVisible}
         timestamp={Date.now()}
         text={isVisible ? t('backupPrompt') : null}
         onPress={this.goToBackup}

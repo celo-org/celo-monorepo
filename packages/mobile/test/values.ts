@@ -114,7 +114,6 @@ export const mockInvitableRecipient2: RecipientWithContact = {
 export const mockTransactionData = {
   recipient: mockInvitableRecipient2,
   amount: new BigNumber(1),
-  reason: 'Something',
   type: TokenTransactionType.Sent,
 }
 

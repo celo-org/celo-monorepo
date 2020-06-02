@@ -25,21 +25,17 @@ export class Avatar extends React.PureComponent<Props> {
       defaultCountryCode,
       iconSize,
       name,
-      children,
     } = this.props
 
     return (
       <View style={style.container}>
         <ContactCircle
-          style={style.contactCircle}
           contact={contact}
           thumbnailPath={thumbnailPath}
           name={name}
           address={address}
           size={iconSize}
-        >
-          {children || null}
-        </ContactCircle>
+        />
         <Text
           style={[fontStyles.bodySmallSemiBold, style.contactName]}
           numberOfLines={1}
@@ -73,10 +69,6 @@ const style = StyleSheet.create({
     flexDirection: 'column',
     justifyContent: 'center',
     marginBottom: 10,
-  },
-  contactCircle: {
-    alignSelf: 'center',
-    margin: 'auto',
   },
   contactName: {
     paddingTop: 6,
