@@ -6,15 +6,15 @@ To help Celo Gold holders vote for secure, mission-aligned validator groups, the
 
 Currently, there are 7 types of validator badges:
 
-|Badge ID|Badge|Mapped to|
-|--- |--- |--- |
-|001|Stake Off - Founder Validator|Validator addresses|
-|002|Stake Off - Attestation Maven|Validator addresses|
-|003|Stake Off - Master Validator|Validator addresses|
-|004|Genesis - Validator|Validator addresses|
-|005|Genesis - 1st Proposer|Validator Group address|
-|006|Genesis - 1st Transaction|Validator Group address|
-|007|Celo Foundation - Vote Recipient|Validator Group address|
+|Badge ID|Badge|Description|Mapped to|
+|--- |--- |--- |--- |
+|001|Stake Off - Founder Validator|Participated in the Stake Off|Validator addresses|
+|002|Stake Off - Attestation Maven|Ran reliable attestation services during the Stake Off|Validator addresses|
+|003|Stake Off - Master Validator|Passed security audit|Validator addresses|
+|004|Genesis - Validator|Stood up Celo Mainnet|Validator addresses|
+|005|Genesis - 1st Proposer|Proposed the 1st block on Celo Mainnet|Validator Group address|
+|006|Genesis - 1st Transaction|Sent the 1st transaction on Celo Mainnet|Validator Group address|
+|007|Celo Foundation - Vote Recipient|Currently receives Foundation votes|Validator Group address|
 
 Note:
 - If all validators in a group have Master Validator badge, then the validator group receives the Master Valdiator badge.
