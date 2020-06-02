@@ -255,22 +255,27 @@ const sendScreens = (Navigator: typeof Stack) => (
     <Navigator.Screen
       name={Screens.PaymentRequestConfirmation}
       component={PaymentRequestConfirmation}
+      options={emptyWithBackButtonHeaderOption}
     />
     <Navigator.Screen
       name={Screens.IncomingPaymentRequestListScreen}
       component={IncomingPaymentRequestListScreen}
+      options={emptyWithBackButtonHeaderOption}
     />
     <Navigator.Screen
       name={Screens.OutgoingPaymentRequestListScreen}
       component={OutgoingPaymentRequestListScreen}
+      options={emptyWithBackButtonHeaderOption}
     />
     <Navigator.Screen
       name={Screens.EscrowedPaymentListScreen}
       component={EscrowedPaymentListScreen}
+      options={emptyWithBackButtonHeaderOption}
     />
     <Navigator.Screen
       name={Screens.ReclaimPaymentConfirmationScreen}
       component={ReclaimPaymentConfirmationScreen}
+      options={emptyWithBackButtonHeaderOption}
     />
   </>
 )
