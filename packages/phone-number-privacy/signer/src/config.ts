@@ -37,18 +37,20 @@ interface Config {
   }
 }
 
+const toNum = (value: BigNumber.Value) => new BigNumber(value).toNumber()
+
 const env = process.env as any
 const config: Config = {
   server: {
-    port: env.server_port,
+    port: toNum(env.server_port),
   },
   blockchain: {
     provider: env.blockchain_provider,
   },
   salt: {
-    unverifiedQueryMax: env.salt_unverified_query_max,
-    additionalVerifiedQueryMax: env.salt_additional_verified_query_max,
-    queryPerTransaction: env.salt_query_per_transaction,
+    unverifiedQueryMax: toNum(env.salt_unverified_query_max),
+    additionalVerifiedQueryMax: toNum(env.salt_additional_verified_query_max),
+    queryPerTransaction: toNum(env.salt_query_per_transaction),
     minDollarBalance: new BigNumber(env.salt_min_dollar_balance),
   },
   db: {
@@ -65,7 +67,7 @@ const config: Config = {
     azureSecretName: env.keyvault_azure_secret_name,
   },
   attestations: {
-    numberAttestationsRequired: env.attestations_number_attestations_required,
+    numberAttestationsRequired: toNum(env.attestations_number_attestations_required),
   },
 }
 export default config

@@ -30300,7 +30300,7 @@ supertest@^3.2.0, supertest@^3.4.2:
     methods "^1.1.2"
     superagent "^3.8.3"
 
-supertest@^4.0.0:
+supertest@^4.0.0, supertest@^4.0.2:
   version "4.0.2"
   resolved "https://registry.yarnpkg.com/supertest/-/supertest-4.0.2.tgz#c2234dbdd6dc79b6f15b99c8d6577b90e4ce3f36"
   integrity sha512-1BAbvrOZsGA3YTCWqbmh14L0YEq0EGICX/nBnfkfVJn7SrxQV1I3pMYjSzG9y/7ZU2V9dWqyqk2POwxlb09duQ==
