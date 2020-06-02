@@ -238,11 +238,11 @@ exports[`DataSaver renders correctly no prompt 1`] = `
                       "lineHeight": 18,
                     },
                     Object {
-                      "color": "#2E3338",
+                      "color": "rgba(0, 0, 0, .4)",
                       "fontFamily": "Hind-SemiBold",
                       "fontSize": 16,
                       "lineHeight": 24,
-                      "paddingRight": 20,
+                      "paddingRight": 40,
                     },
                   ]
                 }
@@ -281,7 +281,6 @@ exports[`DataSaver renders correctly no prompt 1`] = `
                       "fontFamily": "Hind-SemiBold",
                       "fontSize": 16,
                       "lineHeight": 24,
-                      "paddingLeft": 20,
                     },
                   ]
                 }
@@ -443,11 +442,11 @@ exports[`DataSaver renders correctly no prompt 1`] = `
                       "lineHeight": 18,
                     },
                     Object {
-                      "color": "#2E3338",
+                      "color": "rgba(0, 0, 0, .4)",
                       "fontFamily": "Hind-SemiBold",
                       "fontSize": 16,
                       "lineHeight": 24,
-                      "paddingRight": 20,
+                      "paddingRight": 40,
                     },
                   ]
                 }
@@ -486,7 +485,6 @@ exports[`DataSaver renders correctly no prompt 1`] = `
                       "fontFamily": "Hind-SemiBold",
                       "fontSize": 16,
                       "lineHeight": 24,
-                      "paddingLeft": 20,
                     },
                   ]
                 }
@@ -740,11 +738,11 @@ exports[`DataSaver renders correctly with prompt 1`] = `
                       "lineHeight": 18,
                     },
                     Object {
-                      "color": "#2E3338",
+                      "color": "rgba(0, 0, 0, .4)",
                       "fontFamily": "Hind-SemiBold",
                       "fontSize": 16,
                       "lineHeight": 24,
-                      "paddingRight": 20,
+                      "paddingRight": 40,
                     },
                   ]
                 }
@@ -783,7 +781,6 @@ exports[`DataSaver renders correctly with prompt 1`] = `
                       "fontFamily": "Hind-SemiBold",
                       "fontSize": 16,
                       "lineHeight": 24,
-                      "paddingLeft": 20,
                     },
                   ]
                 }
@@ -945,11 +942,11 @@ exports[`DataSaver renders correctly with prompt 1`] = `
                       "lineHeight": 18,
                     },
                     Object {
-                      "color": "#2E3338",
+                      "color": "rgba(0, 0, 0, .4)",
                       "fontFamily": "Hind-SemiBold",
                       "fontSize": 16,
                       "lineHeight": 24,
-                      "paddingRight": 20,
+                      "paddingRight": 40,
                     },
                   ]
                 }
@@ -988,7 +985,6 @@ exports[`DataSaver renders correctly with prompt 1`] = `
                       "fontFamily": "Hind-SemiBold",
                       "fontSize": 16,
                       "lineHeight": 24,
-                      "paddingLeft": 20,
                     },
                   ]
                 }

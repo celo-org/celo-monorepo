@@ -46,6 +46,12 @@
     "confirmation": "I have sent each Safeguard phrase to a trusted friend.",
     "yourSafeguards": "Your Safeguards"
   },
+  "cancelDialog": {
+    "title": "Finish setting up your Account Account Key",
+    "body": "Account Keys are extremely important. Without a key, you can lose access to your wallet forever.\nYou will be blocked from sending any transactions until you finish setting up your Account Key.",
+    "action": "Complete Now",
+    "secondary": "Set Up Later"
+  },
   "backupPhrasePlaceholder":
     "horse leopard dog monkey shark tiger lemur whale squid wolf squirrel mouse lion elephant cat shrimp bear penguin deer turtle fox zebra goat giraffe"
 }

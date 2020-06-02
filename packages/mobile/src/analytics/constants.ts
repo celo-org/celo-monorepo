@@ -70,7 +70,7 @@ export enum CustomEventNames {
   redeem_invite_failed = 'redeem_invite_failed',
 
   photos_education = 'photos_education',
-  get_backup_key = 'earn_celo_gold',
+  get_backup_key = 'get_backup_key',
   earn_celo_gold = 'earn_celo_gold',
   user_restart = 'user_restart',
   pin_continue = 'pin_continue',
@@ -88,19 +88,30 @@ export enum CustomEventNames {
   invite_friends_sms = 'invite_friends_sms', // to count the # of taps on “Invite with SMS" button on Invite_Friends_Review
   invite_friends_whatsapp = 'invite_friends_whatsapp', // to count the # of taps on “Invite with WhatsApp" button on Invite_Friends_Review
 
+  backup_start = 'backup_start', // ‘set up now’ button click
+  backup_setup_info = 'backup_setup_info',
+
+  backup_quiz_backspace = 'backup_quiz_backspace', // whenever the backspace is pressed
+
+  backup_quiz_submit = 'backup_quiz_submit', // (Count # of taps on "Submit" button in Backup_Quiz)
+  backup_quiz_success = 'backup_quiz_success', // (Count # of successful Account Key confirmations Backup_Quiz)
+  backup_quiz_incorrect = 'backup_quiz_incorrect', // (Count # of failed Account Key confirmations Backup_Quiz)
+
   // Screen name: Backup_Phrase, Backup_Insist, Backup_Share, Backup_Set
-  set_backup_phrase = 'set_backup_phrase', // (count # of taps on “Set Backup Phrase” in Backup_Phrase) [we should not track the actual value of this field, just whether the user filled it out]
   set_social_backup = 'set_social_backup', // (count # of taps on "Set up Social Backup")
   delay_backup = 'delay_backup', // (Count # of taps on "Delay" button in Backup_Phrase)
   skip_backup = 'skip_backup', // (count # of taps on “Skip” button in Backup_Phrase)
   view_backup_phrase = 'view_backup_phrase', // (count # of taps on "View Backup Phrase" after already backed up)
   view_social_backup = 'view_social_backup', // (count # of taps on "View Social Backup" after already set up)
   skip_social_backup = 'skip_social_backup', // (count # of taps on "Skip Social Backup" )
-  backup_cancel = 'backup_cancel', // (count # of taps on "Cancel" button in Backup_Phrase)
+  backup_cancel = 'backup_cancel', // (count # of taps on "Cancel" button in Backup_Phrase/BackupQuiz)
+  backup_cancel_complete = 'backup_cancel_complete', // when choising to abort the cancel and continue the setup
+  backup_cancel_procrastinate = 'backup_cancel_procrastinate', // when choosing to continue cancel and delay setup
   insist_backup_phrase = 'insist_backup_phrase', // (count # of taps on “Set Backup Phrase” in Backup_Insist)
   insist_skip_backup = 'insist_skip_backup', // (count # of taps on “Do Later” in Backup_Insist)
-  whatsapp_backup = 'whatsapp_backup', // (count # of taps on “Send with Whatsapp” in Backup_Share)
   backup_continue = 'backup_continue', // (count # of taps on “Continue” button in Backup_Phrase)
+  backup_setup_toggle_enable = 'backup_setup_toggle_enable', // (count # of slides to agree on "I wrote down account key" Switch in Backup_Phrase)
+  backup_setup_toggle_disable = 'backup_setup_toggle_disable', // (count # of slides to disagree on "I wrote down account key" Switch in Backup_Phrase)
   social_backup_continue = 'social_backup_continue', // (Count # of taps on "Backup with Friends" in Backup_Phrase)
 
   // Screen name: Backup_Quiz, Question_Incorrect, Backup_Confirmed

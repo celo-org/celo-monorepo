@@ -16,6 +16,7 @@
   - [Using the Mobile Wallet](getting-started/using-the-mobile-wallet.md)
   - [Getting an Account and Funds](getting-started/faucet.md)
   - [Running a Full Node](getting-started/running-a-full-node-in-alfajores.md)
+- [Validator Setup FAQ](getting-started/validator-troubleshooting-faq.md)
 - [Glossary](GLOSSARY.md)
 
 ## Celo Gold Holder Guide
@@ -83,6 +84,7 @@
   - [Integrations](developer-resources/integrations/integrations.md)
     - [General](developer-resources/integrations/general.md)
     - [Custody](developer-resources/integrations/custody.md)
+    - [Using a Cloud HSM](developer-resources/integrations/cloud-hsm.md)
   - [Reference](developer-resources/contractkit/reference/SUMMARY.md)
     <!-- contractkit-reference-start -->
     - [Globals](developer-resources/contractkit/reference/globals.md)

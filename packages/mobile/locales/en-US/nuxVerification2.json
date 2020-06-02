@@ -14,22 +14,18 @@
   "education": {
     "header": "Verify Your Phone",
     "body1": "Next, please verify your phone number.",
-    "body2":
-      "Verifying makes it easier to send and receive with friends. You can also skip this step and return to it later.",
+    "body2": "Verifying makes it easier to send and receive with friends. You can also skip this step and return to it later.",
     "learnMore": "Learn more about phone verification",
     "start": "Start Verification",
     "skip": "Skip For Now"
   },
   "learnMore": {
     "header": "Phone Number Verification",
-    "intro":
-      "Celo Phone number verification works by associating your Celo Wallet with your phone number.",
+    "intro": "Celo Phone number verification works by associating your Celo Wallet with your phone number.",
     "section1Header": "Do I need to complete this?",
-    "section1Body":
-      "Verification is not required. However, without verifying, it is only possible to send and receive value using QR codes or addresses.",
+    "section1Body": "Verification is not required. However, without verifying, it is only possible to send and receive value using QR codes or addresses.",
     "section2Header": "Security and Privacy",
-    "section2Body":
-      "To protect your privacy, only an obfuscated version of your phone number is stored on the Celo blockchain."
+    "section2Body": "To protect your privacy, only an obfuscated version of your phone number is stored on the Celo blockchain."
   },
   "loading": {
     "verifyingNumber": "Verifying {{number}}",
@@ -41,13 +37,11 @@
   "skipModal": {
     "header": "Skip Verification?",
     "body1": "Verifying allows others to send value to your phone number.",
-    "body2":
-      "Without verification, you can still send payments, but only using Celo addresses or QR codes."
+    "body2": "Without verification, you can still send payments, but only using Celo addresses or QR codes."
   },
   "interstitial": {
     "header": "Almost Done",
-    "body1":
-      "Your text messages are on the way! Please enter your three codes as you receive them.",
+    "body1": "Your text messages are on the way! Please enter your three codes as you receive them.",
     "body2": "This may take a minute."
   },
   "input": {
@@ -63,8 +57,7 @@
   },
   "missingCodesModal": {
     "header": "Missing Codes?",
-    "body":
-      "If you haven’t received all your codes yet after 60 seconds, you can skip verification and try again later.",
+    "body": "If you haven’t received all your codes yet after 60 seconds, you can skip verification and try again later.",
     "wait": "Wait for codes",
     "skip": "Skip for now"
   },
@@ -74,6 +67,12 @@
     "body2": "You can skip verification for now and try again later.",
     "enterCodesBody": " If you already received three codes via SMS, you can still enter them.",
     "enterCodesButton": "Enter Codes"
+  },
+  "retryWithFornoModal": {
+    "header": "Retry Verification with Data Saver?",
+    "body1": "An issue has occurred while verifying your phone number. We recommend trying again with Data Saver mode enabled.",
+    "body2": "Data Saver mode allows you to communicate with the Celo Network more consistently using a trusted connection.",
+    "retryButton": "Retry with Data Saver"
   },
   "congratsVerified": "Congratulations you are now verified!",
   "notification": {
