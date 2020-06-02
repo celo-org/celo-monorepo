@@ -69,7 +69,6 @@
     "0": "{{testnet}}",
     "1": "Un recordatorio amistoso de que está utilizando la compilación de red {{testnet}} - los saldos aquí no son reales."
   },
-  "dismiss": "Ocultar",
   "dollarBalance": "<0></0> $t(global:celoDollars)",
   "feedItemExchangeTitle": "Celo Oro",
   "feedItemExchangeInfo_boughtGold": "Compró <0></0> de oro",
@@ -107,5 +106,14 @@
   "feedItemGenericTitle": "{{nameOrNumber}}",
   "feedItemGenericTitle_noRecipientDetails": "Desconocido",
   "feedItemGoldSold": "Vendido",
-  "feedItemGoldPurchased": "Comprado"
+  "feedItemGoldPurchased": "Comprado",
+  "transactionHeaderVerificationFee": "Verificación",
+  "transactionHeaderNetworkFee": "Red",
+  "transactionHeaderFaucet": "Faucet",
+  "transactionHeaderInviteSent": "$t(inviteFlow11:inviteSent)",
+  "transactionHeaderInviteReceived": "$t(inviteFlow11:inviteReceived)",
+  "transactionHeaderSent": "Pago Enviado",
+  "transactionHeaderEscrowSent": "Escrow Pago Enviado",
+  "transactionHeaderReceived": "Pago Recibido",
+  "transactionHeaderEscrowReceived": "Escrow Pago Recibido"
 }

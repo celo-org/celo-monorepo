@@ -17,6 +17,9 @@ export enum Colors {
   gray2 = '#EDEEEF',
   gray1 = '#F8F9F9',
   light = '#FFFFFF',
+  purple = '#D39CFE',
+  teal = '#7AD6FE',
+  orange = '#FEB45E',
 }
 
 export default {
@@ -37,6 +40,9 @@ export default {
   gray2: Colors.gray2,
   gray1: Colors.gray1,
   light: Colors.light,
+  teal: Colors.teal,
+  purple: Colors.purple,
+  orange: Colors.orange,
   get background() {
     return deprecationNotice('light')
   },
