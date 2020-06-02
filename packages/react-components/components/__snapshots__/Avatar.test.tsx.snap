@@ -18,10 +18,7 @@ exports[`Avatar renders correctly with address but without contact 1`] = `
           "flexDirection": "row",
           "justifyContent": "center",
         },
-        Object {
-          "alignSelf": "center",
-          "margin": "auto",
-        },
+        undefined,
       ]
     }
   >
@@ -46,7 +43,7 @@ exports[`Avatar renders correctly with address but without contact 1`] = `
           Array [
             Object {
               "color": "#FFFFFF",
-              "fontFamily": "Hind-Medium",
+              "fontFamily": "Inter-Medium",
               "fontSize": 16,
             },
             Object {
@@ -125,10 +122,7 @@ exports[`Avatar renders correctly with contact 1`] = `
           "flexDirection": "row",
           "justifyContent": "center",
         },
-        Object {
-          "alignSelf": "center",
-          "margin": "auto",
-        },
+        undefined,
       ]
     }
   >
@@ -158,8 +152,8 @@ exports[`Avatar renders correctly with contact 1`] = `
         style={
           Array [
             Object {
-              "marginLeft": "auto",
-              "marginRight": "auto",
+              "alignSelf": "center",
+              "margin": "auto",
             },
             Object {
               "borderRadius": 20,
@@ -257,10 +251,7 @@ exports[`Avatar renders correctly with number but without contact 1`] = `
           "flexDirection": "row",
           "justifyContent": "center",
         },
-        Object {
-          "alignSelf": "center",
-          "margin": "auto",
-        },
+        undefined,
       ]
     }
   >
@@ -285,7 +276,7 @@ exports[`Avatar renders correctly with number but without contact 1`] = `
           Array [
             Object {
               "color": "#FFFFFF",
-              "fontFamily": "Hind-Medium",
+              "fontFamily": "Inter-Medium",
               "fontSize": 16,
             },
             Object {
@@ -384,10 +375,7 @@ exports[`Avatar renders correctly without contact and number 1`] = `
           "flexDirection": "row",
           "justifyContent": "center",
         },
-        Object {
-          "alignSelf": "center",
-          "margin": "auto",
-        },
+        undefined,
       ]
     }
   >
@@ -412,7 +400,7 @@ exports[`Avatar renders correctly without contact and number 1`] = `
           Array [
             Object {
               "color": "#FFFFFF",
-              "fontFamily": "Hind-Medium",
+              "fontFamily": "Inter-Medium",
               "fontSize": 16,
             },
             Object {

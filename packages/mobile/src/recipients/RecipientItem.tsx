@@ -4,8 +4,7 @@ import colors from '@celo/react-components/styles/colors.v2'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import variables from '@celo/react-components/styles/variables'
 import * as React from 'react'
-import { Image, StyleSheet, Text, View } from 'react-native'
-import { unknownUserIcon } from 'src/images/Images'
+import { StyleSheet, Text, View } from 'react-native'
 import { getRecipientThumbnail, Recipient, RecipientKind } from 'src/recipients/recipient'
 
 interface Props {
@@ -34,9 +33,7 @@ class RecipientItem extends React.PureComponent<Props> {
             thumbnailPath={getRecipientThumbnail(recipient)}
             address={recipient.address}
             size={40}
-          >
-            <Image source={unknownUserIcon} style={styles.image} />
-          </ContactCircle>
+          />
           <View style={styles.contentContainer}>
             <Text numberOfLines={1} ellipsizeMode={'tail'} style={styles.name}>
               {recipient.displayName}

@@ -20,6 +20,7 @@ import { currentAccountSelector } from 'src/web3/selectors'
 
 const TAG = 'identity/privacy'
 const SIGN_MESSAGE_ENDPOINT = '/getBlindedSalt'
+export const SALT_CHAR_LENGTH = 13
 
 export interface PhoneNumberHashDetails {
   e164Number: string
@@ -68,7 +69,10 @@ function* doFetchPhoneHashPrivate(e164Number: string) {
   Logger.debug(`${TAG}@fetchPrivatePhoneHash`, 'Salt was not cached, fetching')
   const account: string = yield select(currentAccountSelector)
   const contractKit: ContractKit = yield call(getContractKit)
-  const selfPhoneHash: string | undefined = yield call(getUserSelfPhoneHash)
+  const selfPhoneDetails: PhoneNumberHashDetails | undefined = yield call(
+    getUserSelfPhoneHashDetails
+  )
+  const selfPhoneHash = selfPhoneDetails?.phoneHash
   const details: PhoneNumberHashDetails = yield call(
     getPhoneHashPrivate,
     e164Number,
@@ -191,12 +195,12 @@ export function getSaltFromThresholdSignature(base64Sig: string) {
     .createHash('sha256')
     .update(sigBuf)
     .digest('base64')
-    .slice(0, 13)
+    .slice(0, SALT_CHAR_LENGTH)
 }
 
 // Get the wallet user's own phone hash details if they're cached
 // null otherwise
-export function* getUserSelfPhoneHash() {
+export function* getUserSelfPhoneHashDetails() {
   const e164Number: string = yield select(e164NumberSelector)
   if (!e164Number) {
     return undefined
@@ -209,7 +213,13 @@ export function* getUserSelfPhoneHash() {
     return undefined
   }
 
-  return PhoneNumberUtils.getPhoneHash(e164Number, salt)
+  const details: PhoneNumberHashDetails = {
+    e164Number,
+    salt,
+    phoneHash: PhoneNumberUtils.getPhoneHash(e164Number, salt),
+  }
+
+  return details
 }
 
 function* navigateToQuotaPurchaseScreen() {

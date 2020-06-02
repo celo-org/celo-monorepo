@@ -27,10 +27,7 @@ exports[`TransferReviewCard renders correctly for invite review 1`] = `
             "flexDirection": "row",
             "justifyContent": "center",
           },
-          Object {
-            "alignSelf": "center",
-            "margin": "auto",
-          },
+          undefined,
         ]
       }
     >
@@ -50,25 +47,22 @@ exports[`TransferReviewCard renders correctly for invite review 1`] = `
           ]
         }
       >
-        <Image
-          source={
-            Object {
-              "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
-            }
-          }
+        <Text
           style={
             Array [
               Object {
-                "alignSelf": "center",
-                "margin": "auto",
+                "color": "#FFFFFF",
+                "fontFamily": "Inter-Medium",
+                "fontSize": 16,
               },
               Object {
-                "height": 40,
-                "width": 40,
+                "fontSize": 20,
               },
             ]
           }
-        />
+        >
+          W
+        </Text>
       </View>
     </View>
     <Text
@@ -632,10 +626,7 @@ exports[`TransferReviewCard renders correctly for pay request review 1`] = `
             "flexDirection": "row",
             "justifyContent": "center",
           },
-          Object {
-            "alignSelf": "center",
-            "margin": "auto",
-          },
+          undefined,
         ]
       }
     >
@@ -655,25 +646,22 @@ exports[`TransferReviewCard renders correctly for pay request review 1`] = `
           ]
         }
       >
-        <Image
-          source={
-            Object {
-              "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
-            }
-          }
+        <Text
           style={
             Array [
               Object {
-                "alignSelf": "center",
-                "margin": "auto",
+                "color": "#FFFFFF",
+                "fontFamily": "Inter-Medium",
+                "fontSize": 16,
               },
               Object {
-                "height": 40,
-                "width": 40,
+                "fontSize": 20,
               },
             ]
           }
-        />
+        >
+          M
+        </Text>
       </View>
     </View>
     <Text
@@ -1190,10 +1178,7 @@ exports[`TransferReviewCard renders correctly for send review 1`] = `
             "flexDirection": "row",
             "justifyContent": "center",
           },
-          Object {
-            "alignSelf": "center",
-            "margin": "auto",
-          },
+          undefined,
         ]
       }
     >
@@ -1213,25 +1198,22 @@ exports[`TransferReviewCard renders correctly for send review 1`] = `
           ]
         }
       >
-        <Image
-          source={
-            Object {
-              "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
-            }
-          }
+        <Text
           style={
             Array [
               Object {
-                "alignSelf": "center",
-                "margin": "auto",
+                "color": "#FFFFFF",
+                "fontFamily": "Inter-Medium",
+                "fontSize": 16,
               },
               Object {
-                "height": 40,
-                "width": 40,
+                "fontSize": 20,
               },
             ]
           }
-        />
+        >
+          W
+        </Text>
       </View>
     </View>
     <Text

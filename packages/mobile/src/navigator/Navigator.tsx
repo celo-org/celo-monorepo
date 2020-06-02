@@ -204,6 +204,7 @@ const sendScreenOptions = ({ route }: { route: RouteProp<StackParamList, Screens
     headerTitle: i18n.t(`sendFlow7:${route.params?.isRequest ? 'request' : 'send'}`),
   }
 }
+
 const sendAmountScreenOptions = ({
   route,
 }: {
@@ -220,6 +221,12 @@ const sendAmountScreenOptions = ({
     ),
   }
 }
+
+const emptyWithBackButtonHeaderOption = () => ({
+  ...emptyHeader,
+  headerLeft: () => <BackButton />,
+})
+
 const sendScreens = (Navigator: typeof Stack) => (
   <>
     <Navigator.Screen name={Screens.Send} component={Send} options={sendScreenOptions} />
@@ -230,11 +237,20 @@ const sendScreens = (Navigator: typeof Stack) => (
       component={SendAmount}
       options={sendAmountScreenOptions}
     />
-    <Navigator.Screen name={Screens.SendConfirmation} component={SendConfirmation} />
-    <Navigator.Screen name={Screens.ValidateRecipientIntro} component={ValidateRecipientIntro} />
+    <Navigator.Screen
+      name={Screens.SendConfirmation}
+      component={SendConfirmation}
+      options={emptyWithBackButtonHeaderOption}
+    />
+    <Navigator.Screen
+      name={Screens.ValidateRecipientIntro}
+      component={ValidateRecipientIntro}
+      options={emptyWithBackButtonHeaderOption}
+    />
     <Navigator.Screen
       name={Screens.ValidateRecipientAccount}
       component={ValidateRecipientAccount}
+      options={emptyWithBackButtonHeaderOption}
     />
     <Navigator.Screen
       name={Screens.PaymentRequestConfirmation}

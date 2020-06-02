@@ -16,7 +16,6 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
         Object {
           "backgroundColor": "#FFFFFF",
           "flex": 1,
-          "justifyContent": "space-between",
         },
         undefined,
       ]
@@ -25,7 +24,6 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
     <RCTScrollView
       contentContainerStyle={
         Object {
-          "justifyContent": "flex-start",
           "paddingVertical": 10,
         }
       }
@@ -46,10 +44,9 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
               Array [
                 Object {
                   "color": "#2E3338",
-                  "fontFamily": "Hind-Light",
-                  "fontSize": 22,
-                  "paddingBottom": 20,
-                  "textAlign": "center",
+                  "fontFamily": "Inter-Medium",
+                  "fontSize": 24,
+                  "lineHeight": 32,
                 },
                 Object {
                   "alignSelf": "center",
@@ -67,7 +64,6 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
           style={
             Object {
               "marginHorizontal": 16,
-              "marginVertical": 20,
             }
           }
         >
@@ -96,10 +92,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                       "flexDirection": "row",
                       "justifyContent": "center",
                     },
-                    Object {
-                      "alignSelf": "center",
-                      "margin": "auto",
-                    },
+                    undefined,
                   ]
                 }
               >
@@ -119,25 +112,22 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                     ]
                   }
                 >
-                  <Image
-                    source={
-                      Object {
-                        "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
-                      }
-                    }
+                  <Text
                     style={
                       Array [
                         Object {
-                          "alignSelf": "center",
-                          "margin": "auto",
+                          "color": "#FFFFFF",
+                          "fontFamily": "Inter-Medium",
+                          "fontSize": 16,
                         },
                         Object {
-                          "height": 40,
-                          "width": 40,
+                          "fontSize": 20,
                         },
                       ]
                     }
-                  />
+                  >
+                    M
+                  </Text>
                 </View>
               </View>
               <Text
@@ -645,86 +635,57 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
         style={
           Array [
             Object {
-              "alignItems": "center",
-              "borderRadius": 3,
-              "flexDirection": "row",
-            },
-            Object {
-              "marginVertical": 10,
-            },
-            Object {
-              "marginBottom": 10,
+              "flexDirection": "column",
             },
             undefined,
-            Object {
-              "backgroundColor": "#A3EBC6",
-            },
           ]
         }
       >
         <View
-          accessible={true}
-          focusable={false}
-          nativeBackgroundAndroid={
-            Object {
-              "attribute": "selectableItemBackground",
-              "type": "ThemeAttrAndroid",
-            }
-          }
-          onClick={[Function]}
-          onResponderGrant={[Function]}
-          onResponderMove={[Function]}
-          onResponderRelease={[Function]}
-          onResponderTerminate={[Function]}
-          onResponderTerminationRequest={[Function]}
-          onStartShouldSetResponder={[Function]}
           style={
-            Array [
-              Object {
-                "alignItems": "center",
-                "flex": 1,
-                "justifyContent": "center",
-              },
-              Object {
-                "backgroundColor": "#A3EBC6",
-              },
-              Object {
-                "height": 50,
-              },
-              Object {
-                "borderColor": "#A3EBC6",
-                "borderRadius": 3,
-                "borderWidth": 2,
-              },
-            ]
+            Object {
+              "borderRadius": 100,
+              "overflow": "hidden",
+            }
           }
         >
           <View
+            accessible={true}
+            focusable={false}
+            nativeBackgroundAndroid={
+              Object {
+                "attribute": "selectableItemBackground",
+                "type": "ThemeAttrAndroid",
+              }
+            }
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
             style={
               Object {
                 "alignItems": "center",
-                "flex": 1,
-                "flexDirection": "row",
-                "justifyContent": "space-between",
+                "backgroundColor": "#97DFC1",
+                "flexGrow": 1,
+                "height": 48,
+                "justifyContent": "center",
+                "paddingHorizontal": 16,
+                "paddingVertical": 5,
               }
             }
           >
             <Text
               accessibilityLabel="global:confirm"
               style={
-                Array [
-                  Object {
-                    "fontFamily": "Hind-SemiBold",
-                    "fontSize": 16,
-                  },
-                  Object {
-                    "color": "#FFFFFF",
-                  },
-                  Object {
-                    "paddingLeft": 5,
-                    "paddingRight": 5,
-                  },
-                ]
+                Object {
+                  "color": "#FFFFFF",
+                  "fontFamily": "Inter-SemiBold",
+                  "fontSize": 16,
+                  "lineHeight": 22,
+                }
               }
             >
               global:confirm
@@ -736,82 +697,59 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
         style={
           Array [
             Object {
-              "alignItems": "center",
-              "borderRadius": 3,
-              "flexDirection": "row",
+              "flexDirection": "column",
             },
-            null,
-            null,
             Object {
               "marginBottom": 10,
-            },
-            Object {
-              "backgroundColor": "transparent",
             },
           ]
         }
       >
         <View
-          accessible={true}
-          focusable={true}
-          nativeBackgroundAndroid={
-            Object {
-              "attribute": "selectableItemBackground",
-              "type": "ThemeAttrAndroid",
-            }
-          }
-          onClick={[Function]}
-          onResponderGrant={[Function]}
-          onResponderMove={[Function]}
-          onResponderRelease={[Function]}
-          onResponderTerminate={[Function]}
-          onResponderTerminationRequest={[Function]}
-          onStartShouldSetResponder={[Function]}
           style={
-            Array [
-              Object {
-                "alignItems": "center",
-                "flex": 1,
-                "justifyContent": "center",
-              },
-              Object {
-                "backgroundColor": "transparent",
-              },
-              Object {
-                "height": 50,
-              },
-              Object {
-                "borderWidth": 0,
-              },
-            ]
+            Object {
+              "borderRadius": 100,
+              "overflow": "hidden",
+            }
           }
         >
           <View
+            accessible={true}
+            focusable={true}
+            nativeBackgroundAndroid={
+              Object {
+                "attribute": "selectableItemBackground",
+                "type": "ThemeAttrAndroid",
+              }
+            }
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
             style={
               Object {
                 "alignItems": "center",
-                "flex": 1,
-                "flexDirection": "row",
-                "justifyContent": "space-between",
+                "backgroundColor": "#F5F4F0",
+                "flexGrow": 1,
+                "height": 48,
+                "justifyContent": "center",
+                "paddingHorizontal": 16,
+                "paddingVertical": 5,
               }
             }
           >
             <Text
               accessibilityLabel="cancel"
               style={
-                Array [
-                  Object {
-                    "fontFamily": "Hind-SemiBold",
-                    "fontSize": 16,
-                  },
-                  Object {
-                    "color": "#42D689",
-                  },
-                  Object {
-                    "paddingLeft": 5,
-                    "paddingRight": 5,
-                  },
-                ]
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Inter-SemiBold",
+                  "fontSize": 16,
+                  "lineHeight": 22,
+                }
               }
             >
               cancel
@@ -840,7 +778,6 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
         Object {
           "backgroundColor": "#FFFFFF",
           "flex": 1,
-          "justifyContent": "space-between",
         },
         undefined,
       ]
@@ -849,7 +786,6 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
     <RCTScrollView
       contentContainerStyle={
         Object {
-          "justifyContent": "flex-start",
           "paddingVertical": 10,
         }
       }
@@ -870,10 +806,9 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
               Array [
                 Object {
                   "color": "#2E3338",
-                  "fontFamily": "Hind-Light",
-                  "fontSize": 22,
-                  "paddingBottom": 20,
-                  "textAlign": "center",
+                  "fontFamily": "Inter-Medium",
+                  "fontSize": 24,
+                  "lineHeight": 32,
                 },
                 Object {
                   "alignSelf": "center",
@@ -891,7 +826,6 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
           style={
             Object {
               "marginHorizontal": 16,
-              "marginVertical": 20,
             }
           }
         >
@@ -920,10 +854,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                       "flexDirection": "row",
                       "justifyContent": "center",
                     },
-                    Object {
-                      "alignSelf": "center",
-                      "margin": "auto",
-                    },
+                    undefined,
                   ]
                 }
               >
@@ -943,25 +874,22 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                     ]
                   }
                 >
-                  <Image
-                    source={
-                      Object {
-                        "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
-                      }
-                    }
+                  <Text
                     style={
                       Array [
                         Object {
-                          "alignSelf": "center",
-                          "margin": "auto",
+                          "color": "#FFFFFF",
+                          "fontFamily": "Inter-Medium",
+                          "fontSize": 16,
                         },
                         Object {
-                          "height": 40,
-                          "width": 40,
+                          "fontSize": 20,
                         },
                       ]
                     }
-                  />
+                  >
+                    M
+                  </Text>
                 </View>
               </View>
               <Text
@@ -1469,86 +1397,57 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
         style={
           Array [
             Object {
-              "alignItems": "center",
-              "borderRadius": 3,
-              "flexDirection": "row",
-            },
-            Object {
-              "marginVertical": 10,
-            },
-            Object {
-              "marginBottom": 10,
+              "flexDirection": "column",
             },
             undefined,
-            Object {
-              "backgroundColor": "#A3EBC6",
-            },
           ]
         }
       >
         <View
-          accessible={true}
-          focusable={false}
-          nativeBackgroundAndroid={
-            Object {
-              "attribute": "selectableItemBackground",
-              "type": "ThemeAttrAndroid",
-            }
-          }
-          onClick={[Function]}
-          onResponderGrant={[Function]}
-          onResponderMove={[Function]}
-          onResponderRelease={[Function]}
-          onResponderTerminate={[Function]}
-          onResponderTerminationRequest={[Function]}
-          onStartShouldSetResponder={[Function]}
           style={
-            Array [
-              Object {
-                "alignItems": "center",
-                "flex": 1,
-                "justifyContent": "center",
-              },
-              Object {
-                "backgroundColor": "#A3EBC6",
-              },
-              Object {
-                "height": 50,
-              },
-              Object {
-                "borderColor": "#A3EBC6",
-                "borderRadius": 3,
-                "borderWidth": 2,
-              },
-            ]
+            Object {
+              "borderRadius": 100,
+              "overflow": "hidden",
+            }
           }
         >
           <View
+            accessible={true}
+            focusable={false}
+            nativeBackgroundAndroid={
+              Object {
+                "attribute": "selectableItemBackground",
+                "type": "ThemeAttrAndroid",
+              }
+            }
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
             style={
               Object {
                 "alignItems": "center",
-                "flex": 1,
-                "flexDirection": "row",
-                "justifyContent": "space-between",
+                "backgroundColor": "#97DFC1",
+                "flexGrow": 1,
+                "height": 48,
+                "justifyContent": "center",
+                "paddingHorizontal": 16,
+                "paddingVertical": 5,
               }
             }
           >
             <Text
               accessibilityLabel="global:confirm"
               style={
-                Array [
-                  Object {
-                    "fontFamily": "Hind-SemiBold",
-                    "fontSize": 16,
-                  },
-                  Object {
-                    "color": "#FFFFFF",
-                  },
-                  Object {
-                    "paddingLeft": 5,
-                    "paddingRight": 5,
-                  },
-                ]
+                Object {
+                  "color": "#FFFFFF",
+                  "fontFamily": "Inter-SemiBold",
+                  "fontSize": 16,
+                  "lineHeight": 22,
+                }
               }
             >
               global:confirm
@@ -1560,82 +1459,59 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
         style={
           Array [
             Object {
-              "alignItems": "center",
-              "borderRadius": 3,
-              "flexDirection": "row",
+              "flexDirection": "column",
             },
-            null,
-            null,
             Object {
               "marginBottom": 10,
-            },
-            Object {
-              "backgroundColor": "transparent",
             },
           ]
         }
       >
         <View
-          accessible={true}
-          focusable={true}
-          nativeBackgroundAndroid={
-            Object {
-              "attribute": "selectableItemBackground",
-              "type": "ThemeAttrAndroid",
-            }
-          }
-          onClick={[Function]}
-          onResponderGrant={[Function]}
-          onResponderMove={[Function]}
-          onResponderRelease={[Function]}
-          onResponderTerminate={[Function]}
-          onResponderTerminationRequest={[Function]}
-          onStartShouldSetResponder={[Function]}
           style={
-            Array [
-              Object {
-                "alignItems": "center",
-                "flex": 1,
-                "justifyContent": "center",
-              },
-              Object {
-                "backgroundColor": "transparent",
-              },
-              Object {
-                "height": 50,
-              },
-              Object {
-                "borderWidth": 0,
-              },
-            ]
+            Object {
+              "borderRadius": 100,
+              "overflow": "hidden",
+            }
           }
         >
           <View
+            accessible={true}
+            focusable={true}
+            nativeBackgroundAndroid={
+              Object {
+                "attribute": "selectableItemBackground",
+                "type": "ThemeAttrAndroid",
+              }
+            }
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
             style={
               Object {
                 "alignItems": "center",
-                "flex": 1,
-                "flexDirection": "row",
-                "justifyContent": "space-between",
+                "backgroundColor": "#F5F4F0",
+                "flexGrow": 1,
+                "height": 48,
+                "justifyContent": "center",
+                "paddingHorizontal": 16,
+                "paddingVertical": 5,
               }
             }
           >
             <Text
               accessibilityLabel="cancel"
               style={
-                Array [
-                  Object {
-                    "fontFamily": "Hind-SemiBold",
-                    "fontSize": 16,
-                  },
-                  Object {
-                    "color": "#42D689",
-                  },
-                  Object {
-                    "paddingLeft": 5,
-                    "paddingRight": 5,
-                  },
-                ]
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Inter-SemiBold",
+                  "fontSize": 16,
+                  "lineHeight": 22,
+                }
               }
             >
               cancel
@@ -1664,7 +1540,6 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
         Object {
           "backgroundColor": "#FFFFFF",
           "flex": 1,
-          "justifyContent": "space-between",
         },
         undefined,
       ]
@@ -1673,7 +1548,6 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
     <RCTScrollView
       contentContainerStyle={
         Object {
-          "justifyContent": "flex-start",
           "paddingVertical": 10,
         }
       }
@@ -1694,10 +1568,9 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
               Array [
                 Object {
                   "color": "#2E3338",
-                  "fontFamily": "Hind-Light",
-                  "fontSize": 22,
-                  "paddingBottom": 20,
-                  "textAlign": "center",
+                  "fontFamily": "Inter-Medium",
+                  "fontSize": 24,
+                  "lineHeight": 32,
                 },
                 Object {
                   "alignSelf": "center",
@@ -1715,7 +1588,6 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
           style={
             Object {
               "marginHorizontal": 16,
-              "marginVertical": 20,
             }
           }
         >
@@ -1744,10 +1616,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                       "flexDirection": "row",
                       "justifyContent": "center",
                     },
-                    Object {
-                      "alignSelf": "center",
-                      "margin": "auto",
-                    },
+                    undefined,
                   ]
                 }
               >
@@ -1767,25 +1636,22 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                     ]
                   }
                 >
-                  <Image
-                    source={
-                      Object {
-                        "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
-                      }
-                    }
+                  <Text
                     style={
                       Array [
                         Object {
-                          "alignSelf": "center",
-                          "margin": "auto",
+                          "color": "#FFFFFF",
+                          "fontFamily": "Inter-Medium",
+                          "fontSize": 16,
                         },
                         Object {
-                          "height": 40,
-                          "width": 40,
+                          "fontSize": 20,
                         },
                       ]
                     }
-                  />
+                  >
+                    M
+                  </Text>
                 </View>
               </View>
               <Text
@@ -2290,86 +2156,57 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
         style={
           Array [
             Object {
-              "alignItems": "center",
-              "borderRadius": 3,
-              "flexDirection": "row",
-            },
-            Object {
-              "marginVertical": 10,
-            },
-            Object {
-              "marginBottom": 10,
+              "flexDirection": "column",
             },
             undefined,
-            Object {
-              "backgroundColor": "#A3EBC6",
-            },
           ]
         }
       >
         <View
-          accessible={true}
-          focusable={false}
-          nativeBackgroundAndroid={
-            Object {
-              "attribute": "selectableItemBackground",
-              "type": "ThemeAttrAndroid",
-            }
-          }
-          onClick={[Function]}
-          onResponderGrant={[Function]}
-          onResponderMove={[Function]}
-          onResponderRelease={[Function]}
-          onResponderTerminate={[Function]}
-          onResponderTerminationRequest={[Function]}
-          onStartShouldSetResponder={[Function]}
           style={
-            Array [
-              Object {
-                "alignItems": "center",
-                "flex": 1,
-                "justifyContent": "center",
-              },
-              Object {
-                "backgroundColor": "#A3EBC6",
-              },
-              Object {
-                "height": 50,
-              },
-              Object {
-                "borderColor": "#A3EBC6",
-                "borderRadius": 3,
-                "borderWidth": 2,
-              },
-            ]
+            Object {
+              "borderRadius": 100,
+              "overflow": "hidden",
+            }
           }
         >
           <View
+            accessible={true}
+            focusable={false}
+            nativeBackgroundAndroid={
+              Object {
+                "attribute": "selectableItemBackground",
+                "type": "ThemeAttrAndroid",
+              }
+            }
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
             style={
               Object {
                 "alignItems": "center",
-                "flex": 1,
-                "flexDirection": "row",
-                "justifyContent": "space-between",
+                "backgroundColor": "#97DFC1",
+                "flexGrow": 1,
+                "height": 48,
+                "justifyContent": "center",
+                "paddingHorizontal": 16,
+                "paddingVertical": 5,
               }
             }
           >
             <Text
               accessibilityLabel="global:confirm"
               style={
-                Array [
-                  Object {
-                    "fontFamily": "Hind-SemiBold",
-                    "fontSize": 16,
-                  },
-                  Object {
-                    "color": "#FFFFFF",
-                  },
-                  Object {
-                    "paddingLeft": 5,
-                    "paddingRight": 5,
-                  },
-                ]
+                Object {
+                  "color": "#FFFFFF",
+                  "fontFamily": "Inter-SemiBold",
+                  "fontSize": 16,
+                  "lineHeight": 22,
+                }
               }
             >
               global:confirm
@@ -2381,82 +2218,59 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
         style={
           Array [
             Object {
-              "alignItems": "center",
-              "borderRadius": 3,
-              "flexDirection": "row",
+              "flexDirection": "column",
             },
-            null,
-            null,
             Object {
               "marginBottom": 10,
-            },
-            Object {
-              "backgroundColor": "transparent",
             },
           ]
         }
       >
         <View
-          accessible={true}
-          focusable={true}
-          nativeBackgroundAndroid={
-            Object {
-              "attribute": "selectableItemBackground",
-              "type": "ThemeAttrAndroid",
-            }
-          }
-          onClick={[Function]}
-          onResponderGrant={[Function]}
-          onResponderMove={[Function]}
-          onResponderRelease={[Function]}
-          onResponderTerminate={[Function]}
-          onResponderTerminationRequest={[Function]}
-          onStartShouldSetResponder={[Function]}
           style={
-            Array [
-              Object {
-                "alignItems": "center",
-                "flex": 1,
-                "justifyContent": "center",
-              },
-              Object {
-                "backgroundColor": "transparent",
-              },
-              Object {
-                "height": 50,
-              },
-              Object {
-                "borderWidth": 0,
-              },
-            ]
+            Object {
+              "borderRadius": 100,
+              "overflow": "hidden",
+            }
           }
         >
           <View
+            accessible={true}
+            focusable={true}
+            nativeBackgroundAndroid={
+              Object {
+                "attribute": "selectableItemBackground",
+                "type": "ThemeAttrAndroid",
+              }
+            }
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
             style={
               Object {
                 "alignItems": "center",
-                "flex": 1,
-                "flexDirection": "row",
-                "justifyContent": "space-between",
+                "backgroundColor": "#F5F4F0",
+                "flexGrow": 1,
+                "height": 48,
+                "justifyContent": "center",
+                "paddingHorizontal": 16,
+                "paddingVertical": 5,
               }
             }
           >
             <Text
               accessibilityLabel="cancel"
               style={
-                Array [
-                  Object {
-                    "fontFamily": "Hind-SemiBold",
-                    "fontSize": 16,
-                  },
-                  Object {
-                    "color": "#42D689",
-                  },
-                  Object {
-                    "paddingLeft": 5,
-                    "paddingRight": 5,
-                  },
-                ]
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Inter-SemiBold",
+                  "fontSize": 16,
+                  "lineHeight": 22,
+                }
               }
             >
               cancel

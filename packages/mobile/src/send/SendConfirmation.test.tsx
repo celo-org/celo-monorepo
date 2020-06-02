@@ -19,6 +19,16 @@ const TEST_FEE = new BigNumber(10000000000000000)
 
 jest.mock('src/send/saga')
 
+const storeData = {
+  fees: {
+    estimates: {
+      send: {
+        feeInWei: '1',
+      },
+    },
+  },
+}
+
 const mockedGetSendFee = getSendFee as jest.Mock
 
 const mockScreenProps = getMockStackScreenProps(Screens.SendConfirmation, {
@@ -32,6 +42,24 @@ describe('SendConfirmation', () => {
 
   beforeEach(() => {
     mockedGetSendFee.mockClear()
+  })
+
+  describe('when commenting', () => {
+    const store = createMockStore(storeData)
+    const getWrapper = () =>
+      render(
+        <Provider store={store}>
+          <SendConfirmation {...mockScreenProps} />
+        </Provider>
+      )
+
+    it('updates the comment/reason', () => {
+      const wrapper = getWrapper()
+      const input = wrapper.getByTestId('commentInput/send')
+      const comment = 'A comment!'
+      fireEvent.changeText(input, comment)
+      expect(wrapper.queryAllByDisplayValue(comment)).toHaveLength(1)
+    })
   })
 
   it('renders correctly for send payment confirmation', async () => {
