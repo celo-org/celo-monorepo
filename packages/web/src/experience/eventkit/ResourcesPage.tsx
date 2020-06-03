@@ -18,7 +18,7 @@ const sections = [
 export default function Resources() {
   return (
     <>
-      <Page title="Home" path={ROOT} metaDescription={'meta'} sections={sections} />
+      <Page title="Home" path={ROOT} sections={sections} />
     </>
   )
 }

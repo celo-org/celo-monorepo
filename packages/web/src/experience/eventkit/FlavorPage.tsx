@@ -17,12 +17,5 @@ const sections = [
   }
 })
 export default function Flavor() {
-  return (
-    <Page
-      title="Home"
-      path={ROUTE_TO_TITLE[FLAVOR_PATH]}
-      metaDescription={'todo'}
-      sections={sections}
-    />
-  )
+  return <Page title="Home" path={ROUTE_TO_TITLE[FLAVOR_PATH]} sections={sections} />
 }

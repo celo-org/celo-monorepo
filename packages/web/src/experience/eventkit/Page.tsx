@@ -1,7 +1,7 @@
 import * as React from 'react'
 import Page from 'src/experience/common/Page'
+import metaDescription from 'src/experience/eventkit/content/meta.md'
 import menu, { hashNav } from 'src/shared/menu-items'
-
 export const ROOT = menu.EVENTS_KIT.link
 
 export const FLAVOR_PATH = `${ROOT}/flavor`
@@ -14,10 +14,7 @@ const PAGES = [
   {
     title: 'Introduction',
     href: ROOT,
-    sections: [
-      { title: 'Overview', href: `${ROOT}#${hashNav.eventsIntro.overview}` },
-      { title: 'Brand Voice', href: `${ROOT}#${hashNav.eventsIntro.brandVoice}` },
-    ],
+    sections: [],
   },
   {
     title: 'Celo Flavor',
@@ -56,11 +53,9 @@ const PAGES = [
     ],
   },
   {
-    title: 'Ambasadors',
+    title: 'Ambassadors',
     href: CIRCLES_PATH,
-    sections: [
-      // { title: 'Sponsorship', href: `${CIRCLES_PATH}#${hashNav.eventCircles.sponsorship}` },
-    ],
+    sections: [],
   },
 ]
 
@@ -78,10 +73,9 @@ interface Props {
   sections: Section[]
   title: string
   path: string
-  metaDescription: string
 }
 
-export default function BrandKitPage({ sections, title, path, metaDescription }: Props) {
+export default function BrandKitPage({ sections, title, path }: Props) {
   return (
     <Page
       pages={PAGES}

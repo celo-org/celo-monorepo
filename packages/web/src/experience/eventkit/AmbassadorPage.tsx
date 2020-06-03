@@ -10,12 +10,5 @@ const sections = [hashNav.eventCircles.overview].map((id) => {
   }
 })
 export default function Ambassador() {
-  return (
-    <Page
-      title={ROUTE_TO_TITLE[CIRCLES_PATH]}
-      path={CIRCLES_PATH}
-      metaDescription={'todo'}
-      sections={sections}
-    />
-  )
+  return <Page title={ROUTE_TO_TITLE[CIRCLES_PATH]} path={CIRCLES_PATH} sections={sections} />
 }
