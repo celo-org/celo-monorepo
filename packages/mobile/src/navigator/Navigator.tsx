@@ -21,6 +21,7 @@ import { PincodeType } from 'src/account/reducer'
 import Security from 'src/account/Security'
 import Support from 'src/account/Support'
 import SupportContact from 'src/account/SupportContact'
+import { CustomEventNames } from 'src/analytics/constants'
 import AppLoading from 'src/app/AppLoading'
 import Debug from 'src/app/Debug'
 import ErrorScreen from 'src/app/ErrorScreen'
@@ -50,6 +51,7 @@ import ImportWalletSocial from 'src/import/ImportWalletSocial'
 import EnterInviteCode from 'src/invite/EnterInviteCode'
 import Language from 'src/language/Language'
 import SelectLocalCurrency from 'src/localCurrency/SelectLocalCurrency'
+import DrawerNavigator from 'src/navigator/DrawerNavigator'
 import {
   emptyHeader,
   HeaderTitleWithBalance,
@@ -62,7 +64,6 @@ import {
 } from 'src/navigator/Headers.v2'
 import { navigate, navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import TabNavigator from 'src/navigator/TabNavigator'
 import { TopBarIconButton, TopBarTextButton } from 'src/navigator/TopBarButton.v2'
 import { StackParamList } from 'src/navigator/types'
 import IncomingPaymentRequestListScreen from 'src/paymentRequest/IncomingPaymentRequestListScreen'
@@ -192,11 +193,22 @@ const sendScreenOptions = ({ route }: { route: RouteProp<StackParamList, Screens
   const goQr = () => navigate(Screens.QRCode)
   return {
     ...emptyHeader,
-    headerLeft: () => <TopBarIconButton icon={<Times />} onPress={navigateBack} />,
+    headerLeft: () => (
+      <TopBarIconButton
+        icon={<Times />}
+        onPress={navigateBack}
+        eventName={
+          route.params?.isRequest ? CustomEventNames.send_cancel : CustomEventNames.request_cancel
+        }
+      />
+    ),
     headerLeftContainerStyle: { paddingLeft: 20 },
     headerRight: () => (
       <TopBarIconButton
         icon={<QRCodeBorderlessIcon height={32} color={colors.greenUI} />}
+        eventName={
+          route.params?.isRequest ? CustomEventNames.send_scan : CustomEventNames.request_scan
+        }
         onPress={goQr}
       />
     ),
@@ -204,6 +216,7 @@ const sendScreenOptions = ({ route }: { route: RouteProp<StackParamList, Screens
     headerTitle: i18n.t(`sendFlow7:${route.params?.isRequest ? 'request' : 'send'}`),
   }
 }
+
 const sendAmountScreenOptions = ({
   route,
 }: {
@@ -211,7 +224,7 @@ const sendAmountScreenOptions = ({
 }) => {
   return {
     ...emptyHeader,
-    headerLeft: () => <BackButton />,
+    headerLeft: () => <BackButton eventName={CustomEventNames.send_amount_back} />,
     headerTitle: () => (
       <HeaderTitleWithBalance
         title={i18n.t(`sendFlow7:${route.params?.isRequest ? 'request' : 'send'}`)}
@@ -220,6 +233,12 @@ const sendAmountScreenOptions = ({
     ),
   }
 }
+
+const emptyWithBackButtonHeaderOption = () => ({
+  ...emptyHeader,
+  headerLeft: () => <BackButton />,
+})
+
 const sendScreens = (Navigator: typeof Stack) => (
   <>
     <Navigator.Screen name={Screens.Send} component={Send} options={sendScreenOptions} />
@@ -230,11 +249,20 @@ const sendScreens = (Navigator: typeof Stack) => (
       component={SendAmount}
       options={sendAmountScreenOptions}
     />
-    <Navigator.Screen name={Screens.SendConfirmation} component={SendConfirmation} />
-    <Navigator.Screen name={Screens.ValidateRecipientIntro} component={ValidateRecipientIntro} />
+    <Navigator.Screen
+      name={Screens.SendConfirmation}
+      component={SendConfirmation}
+      options={emptyWithBackButtonHeaderOption}
+    />
+    <Navigator.Screen
+      name={Screens.ValidateRecipientIntro}
+      component={ValidateRecipientIntro}
+      options={emptyWithBackButtonHeaderOption}
+    />
     <Navigator.Screen
       name={Screens.ValidateRecipientAccount}
       component={ValidateRecipientAccount}
+      options={emptyWithBackButtonHeaderOption}
     />
     <Navigator.Screen
       name={Screens.PaymentRequestConfirmation}
@@ -265,13 +293,14 @@ const exchangeTradeScreenOptions = ({
   route: RouteProp<StackParamList, Screens.ExchangeTradeScreen>
 }) => {
   const { makerToken } = route.params?.makerTokenDisplay
-  const title =
-    makerToken === CURRENCY_ENUM.DOLLAR
-      ? i18n.t('exchangeFlow9:buyGold')
-      : i18n.t('exchangeFlow9:sellGold')
+  const isDollarToGold = makerToken === CURRENCY_ENUM.DOLLAR
+  const title = isDollarToGold ? i18n.t('exchangeFlow9:buyGold') : i18n.t('exchangeFlow9:sellGold')
+  const cancelEventName = isDollarToGold
+    ? CustomEventNames.gold_buy_cancel
+    : CustomEventNames.gold_sell_cancel
   return {
     ...headerWithCancelButton,
-    headerLeft: () => <CancelButton />,
+    headerLeft: () => <CancelButton eventName={cancelEventName} />,
     headerTitle: () => <HeaderTitleWithBalance title={title} token={makerToken} />,
   }
 }
@@ -282,20 +311,25 @@ const exchangeReviewScreenOptions = ({
   route: RouteProp<StackParamList, Screens.ExchangeReview>
 }) => {
   const { makerToken } = route.params?.exchangeInput
+  const isDollarToGold = makerToken === CURRENCY_ENUM.DOLLAR
   const goExchangeHome = () => navigate(Screens.ExchangeHomeScreen)
-  const title =
-    makerToken === CURRENCY_ENUM.DOLLAR
-      ? i18n.t('exchangeFlow9:buyGold')
-      : i18n.t('exchangeFlow9:sellGold')
+  const title = isDollarToGold ? i18n.t('exchangeFlow9:buyGold') : i18n.t('exchangeFlow9:sellGold')
+  const cancelEventName = isDollarToGold
+    ? CustomEventNames.gold_buy_cancel
+    : CustomEventNames.gold_sell_cancel
+  const editEventName = isDollarToGold
+    ? CustomEventNames.gold_buy_edit
+    : CustomEventNames.gold_sell_edit
   return {
     ...headerWithCancelButton,
-    headerLeft: () => <CancelButton onCancel={goExchangeHome} />,
+    headerLeft: () => <CancelButton onCancel={goExchangeHome} eventName={cancelEventName} />,
     headerRight: () => (
       <TopBarTextButton
         title={i18n.t('global:edit')}
         testID="EditButton"
         onPress={navigateBack}
         titleStyle={{ color: colors.goldDark }}
+        eventName={editEventName}
       />
     ),
     headerTitle: () => <HeaderTitleWithBalance title={title} token={makerToken} />,
@@ -390,7 +424,9 @@ const transactionReviewOptions = ({
   const dateTimeStatus = getDatetimeDisplayString(timestamp, i18n)
   return {
     ...emptyHeader,
-    headerLeft: () => <BackButton color={colors.dark} />,
+    headerLeft: () => (
+      <BackButton color={colors.dark} eventName={CustomEventNames.gold_activity_back} />
+    ),
     headerTitle: () => <HeaderTitleWithSubtitle title={header} subTitle={dateTimeStatus} />,
   }
 }
@@ -450,7 +486,7 @@ export function AppNavigatorNew() {
     } else if (!hasSeenVerificationNux) {
       initialRoute = Screens.VerificationEducationScreen
     } else {
-      initialRoute = Screens.TabNavigator
+      initialRoute = Screens.DrawerNavigator
     }
 
     setInitialRoute(initialRoute)
@@ -468,7 +504,7 @@ export function AppNavigatorNew() {
       initialRouteName={initialRouteName}
       screenOptions={emptyHeader}
     >
-      <Stack.Screen name={Screens.TabNavigator} component={TabNavigator} options={noHeader} />
+      <Stack.Screen name={Screens.DrawerNavigator} component={DrawerNavigator} options={noHeader} />
       {commonScreens(Stack)}
       {sendScreens(Stack)}
       {nuxScreens(Stack)}

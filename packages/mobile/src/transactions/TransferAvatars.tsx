@@ -16,14 +16,11 @@ interface Props {
 export default function TransferAvatars({ type, address, recipient }: Props) {
   const userAvatar = (
     <ContactCircle
-      name={recipient?.displayName}
+      name={recipient ? recipient.displayName : null}
       address={address}
       size={AVATAR_SIZE}
       thumbnailPath={getRecipientThumbnail(recipient)}
-    >
-      {/* TODO: see if this is needed once we redesign ContactCircle/Avatar */}
-      {/* <Image source={unknownUserIcon} style={styles.image} /> */}
-    </ContactCircle>
+    />
   )
 
   const selfAvatar = <ContactCircleSelf size={AVATAR_SIZE} />

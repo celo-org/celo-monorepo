@@ -3,14 +3,13 @@ import RequestMessagingCard from '@celo/react-components/components/RequestMessa
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
-import { Image, StyleSheet, View } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import { TokenTransactionType } from 'src/apollo/types'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import { declinePaymentRequest } from 'src/firebase/actions'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { AddressValidationType } from 'src/identity/reducer'
-import { unknownUserIcon } from 'src/images/Images'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { getRecipientThumbnail, Recipient } from 'src/recipients/recipient'
@@ -27,8 +26,6 @@ interface OwnProps {
 }
 
 type Props = OwnProps & WithTranslation
-
-const AVATAR_SIZE = 40
 
 export class IncomingPaymentRequestListItem extends React.Component<Props> {
   onPay = () => {
@@ -85,13 +82,10 @@ export class IncomingPaymentRequestListItem extends React.Component<Props> {
           amount={<CurrencyDisplay amount={amount} />}
           icon={
             <ContactCircle
-              size={AVATAR_SIZE}
               address={requester.address}
               name={requester.displayName}
               thumbnailPath={getRecipientThumbnail(requester)}
-            >
-              <Image source={unknownUserIcon} style={styles.unknownUser} />
-            </ContactCircle>
+            />
           }
           callToActions={this.getCTA()}
         />
@@ -103,12 +97,6 @@ export class IncomingPaymentRequestListItem extends React.Component<Props> {
 const styles = StyleSheet.create({
   container: {
     marginBottom: 16,
-  },
-  unknownUser: {
-    height: AVATAR_SIZE,
-    width: AVATAR_SIZE,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
 })
 
