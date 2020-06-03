@@ -106,7 +106,7 @@
     "react-native-modal": "^11.5.6",
     "react-native-progress": "^4.1.2",
     "react-native-qrcode-svg": "^6.0.6",
-    "react-native-reanimated": "^1.8.0",
+    "react-native-reanimated": "^1.9.0",
     "react-native-restart-android": "^0.0.7",
     "react-native-safe-area-context": "^0.7.3",
     "react-native-safe-area-view": "^1.1.1",
