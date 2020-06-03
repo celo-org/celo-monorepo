@@ -19,14 +19,20 @@ export const builder = (argv: yargs.Argv) => {
       description: 'Namespace where deploy',
       default: '',
     })
+    .option('storageClass', {
+      type: 'string',
+      description: 'Storageclass to use for pvcs',
+      default: 'standard',
+    })
 }
 
 export interface GKEFullNodeArgv extends InitialArgv {
   syncmode: string
   namespace: string
+  storageClass: string
 }
 
 export const handler = async (argv: GKEFullNodeArgv) => {
   // await switchToClusterFromEnv(argv.celoEnv)
-  await installFullNodeChart(argv.celoEnv, argv.syncmode, argv.namespace)
+  await installFullNodeChart(argv.celoEnv, argv.syncmode, argv.namespace, argv.storageClass)
 }
