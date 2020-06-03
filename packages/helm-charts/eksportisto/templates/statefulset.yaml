@@ -40,8 +40,13 @@ spec:
         image: {{ .Values.imageRepository }}:{{ .Values.imageTag }}
         imagePullPolicy: {{ .Values.imagePullPolicy }}
         args:
+          - |
+              mkdir -p /var/config /root/.eksportisto
+              if [ "{{ .Values.sensitiveAccountsBase64 | default false }}" == "true" ]; then
+                cp -L /var/config/sensitive-accounts.json /root/.eksportisto/
+              fi
           - --nodeUri
-          - $(WEB3_PROVIDER)
+          - https://alfajores-forno.celo-testnet.org # $(WEB3_PROVIDER)
           - --datadir
           - /root/.eksportisto
         resources:
@@ -55,7 +60,7 @@ spec:
         - name: data
           mountPath: /root/.eksportisto
         {{ if .Values.sensitiveAccountsBase64 }}
-        - name: sensitiveAccounts
+        - name: config
           mountPath: /var/config
         {{ end }}
         env:
@@ -64,5 +69,7 @@ spec:
       volumes:
       - name: data
         emptyDir: {}
+      - name: config
+        configMap:
+          name: config
 
-{{ include "sensitive-acccounts-json" . }}
