@@ -1,7 +1,6 @@
 import * as React from 'react'
 import Page, { FLAVOR_PATH, ROUTE_TO_TITLE } from 'src/experience/eventkit/Page'
 import Section from 'src/experience/eventkit/Section'
-import { NameSpaces, useTranslation } from 'src/i18n'
 import { hashNav } from 'src/shared/menu-items'
 
 const sections = [
@@ -18,12 +17,11 @@ const sections = [
   }
 })
 export default function Flavor() {
-  const { t } = useTranslation(NameSpaces.eventskit)
   return (
     <Page
       title="Home"
       path={ROUTE_TO_TITLE[FLAVOR_PATH]}
-      metaDescription={t('flavor.introduction')}
+      metaDescription={'todo'}
       sections={sections}
     />
   )

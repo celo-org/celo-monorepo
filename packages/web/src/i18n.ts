@@ -27,7 +27,6 @@ export enum NameSpaces {
   download = 'download',
   dev = 'dev',
   faucet = 'faucet',
-  eventskit = 'eventskit',
   home = 'home',
   jobs = 'jobs',
   papers = 'papers',

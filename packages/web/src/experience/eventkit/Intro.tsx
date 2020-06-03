@@ -1,11 +1,7 @@
 import * as React from 'react'
-import { View } from 'react-native'
-import { brandStyles } from 'src/experience/common/constants'
 import Page, { ROOT, ROUTE_TO_TITLE } from 'src/experience/eventkit/Page'
-import Markdown from 'src/experience/Markdown'
-import { NameSpaces, useTranslation } from 'src/i18n'
 import { hashNav } from 'src/shared/menu-items'
-import { standardStyles } from 'src/styles'
+import Section from 'src/experience/eventkit/Section'
 
 const sections = [hashNav.eventsIntro.overview].map((id) => {
   return {
@@ -14,7 +10,6 @@ const sections = [hashNav.eventsIntro.overview].map((id) => {
   }
 })
 export default function Flavor() {
-  const { t } = useTranslation(NameSpaces.eventskit)
   return (
     <Page
       title={ROUTE_TO_TITLE[ROOT]}
@@ -22,13 +17,5 @@ export default function Flavor() {
       metaDescription={t('flavor.introduction')}
       sections={sections}
     />
-  )
-}
-
-function Section({ content }) {
-  return (
-    <View style={[brandStyles.gap, standardStyles.blockMarginBottomTablet]}>
-      <Markdown source={content} />
-    </View>
   )
 }

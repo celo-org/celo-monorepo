@@ -1,7 +1,6 @@
 import * as React from 'react'
 import Page, { ROOT } from 'src/experience/eventkit/Page'
 import Section from 'src/experience/eventkit/Section'
-import { NameSpaces, useTranslation } from 'src/i18n'
 import { hashNav } from 'src/shared/menu-items'
 
 const sections = [
@@ -17,15 +16,9 @@ const sections = [
 })
 
 export default function Resources() {
-  const { t } = useTranslation(NameSpaces.eventskit)
   return (
     <>
-      <Page
-        title="Home"
-        path={ROOT}
-        metaDescription={t('flavor.introduction')}
-        sections={sections}
-      />
+      <Page title="Home" path={ROOT} metaDescription={'meta'} sections={sections} />
     </>
   )
 }

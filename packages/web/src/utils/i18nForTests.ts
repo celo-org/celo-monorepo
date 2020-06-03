@@ -15,7 +15,6 @@ NextI18NextInstance.i18n.use(initReactI18next).init({
       [NameSpaces.codeofconduct]: require('public/static/locales/en/codeofconduct.json'),
       [NameSpaces.community]: require('public/static/locales/en/community.json'),
       [NameSpaces.common]: require('public/static/locales/en/common.json'),
-      [NameSpaces.eventskit]: require('public/static/locales/en/eventskit.json'),
       [NameSpaces.dev]: require('public/static/locales/en/dev.json'),
       [NameSpaces.download]: require('public/static/locales/en/download.json'),
       [NameSpaces.faucet]: require('public/static/locales/en/faucet.json'),
