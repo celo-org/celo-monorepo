@@ -295,6 +295,16 @@ class CheckBuilder {
     )
   }
 
+  hasEnoughUsd = (account: Address, value: BigNumber) => {
+    const valueInEth = this.kit.web3.utils.fromWei(value.toFixed(), 'ether')
+    return this.addCheck(`Account has at least ${valueInEth} cUSD`, () =>
+      this.kit.contracts
+        .getStableToken()
+        .then((gt) => gt.balanceOf(account))
+        .then((balance) => balance.gte(value))
+    )
+  }
+
   exceedsProposalMinDeposit = (deposit: BigNumber) =>
     this.addCheck(
       `Deposit is greater than or equal to governance proposal minDeposit`,
