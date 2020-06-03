@@ -14,7 +14,6 @@ exports[`renders correctly 1`] = `
     contentContainerStyle={
       Object {
         "flex": 1,
-        "flexDirection": "column",
         "justifyContent": "flex-start",
         "paddingHorizontal": 24,
         "paddingVertical": 32,

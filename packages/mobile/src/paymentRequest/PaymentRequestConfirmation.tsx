@@ -133,6 +133,19 @@ class PaymentRequestConfirmation extends React.Component<Props> {
     navigateBack()
   }
 
+  renderFooter = () => {
+    const amount = {
+      value: this.props.confirmationInput.amount,
+      currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code, // Only cUSD for now
+    }
+
+    return (
+      <View style={styles.feeContainer}>
+        <TotalLineItem amount={amount} />
+      </View>
+    )
+  }
+
   render() {
     const { t, confirmationInput } = this.props
     const { recipient, recipientAddress: requesteeAddress } = confirmationInput
@@ -141,17 +154,11 @@ class PaymentRequestConfirmation extends React.Component<Props> {
       currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code, // Only cUSD for now
     }
 
-    const renderFooter = () => (
-      <View style={styles.feeContainer}>
-        <TotalLineItem amount={amount} />
-      </View>
-    )
-
     return (
       <SafeAreaView style={styles.container}>
         <DisconnectBanner />
         <ReviewFrame
-          FooterComponent={renderFooter}
+          FooterComponent={this.renderFooter}
           confirmButton={{
             action: this.onConfirm,
             text: t('request'),
@@ -166,7 +173,7 @@ class PaymentRequestConfirmation extends React.Component<Props> {
                 address={requesteeAddress || ''}
               />
               <View style={styles.recipientInfoContainer}>
-                <Text style={styles.headerText}>Requesting</Text>
+                <Text style={styles.headerText}>{t('requesting')}</Text>
                 <Text style={styles.displayName}>
                   {getDisplayName({ recipient, recipientAddress: requesteeAddress, t })}
                 </Text>
@@ -191,14 +198,12 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.light,
     padding: 8,
-    flexDirection: 'column',
   },
   feeContainer: {
     padding: 16,
     paddingBottom: 8,
   },
   transferContainer: {
-    flexDirection: 'column',
     alignItems: 'flex-start',
     paddingBottom: 24,
   },
@@ -207,7 +212,6 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   recipientInfoContainer: {
-    flexDirection: 'column',
     paddingLeft: 8,
   },
   headerText: {
@@ -226,4 +230,4 @@ const styles = StyleSheet.create({
 export default connect<StateProps, DispatchProps, OwnProps, RootState>(
   mapStateToProps,
   mapDispatchToProps
-)(withTranslation(Namespaces.sendFlow7)(PaymentRequestConfirmation))
+)(withTranslation(Namespaces.paymentRequestFlow)(PaymentRequestConfirmation))

@@ -231,7 +231,6 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     padding: 16,
     justifyContent: 'space-between',
-    flexDirection: 'column',
   },
   singleDigitInputContainer: {
     flexDirection: 'row',
@@ -296,7 +295,6 @@ const styles = StyleSheet.create({
   },
   addressContainer: {
     paddingVertical: 8,
-    flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
   },

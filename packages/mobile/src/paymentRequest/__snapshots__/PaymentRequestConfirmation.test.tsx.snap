@@ -6,7 +6,6 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
     Object {
       "backgroundColor": "#FFFFFF",
       "flex": 1,
-      "flexDirection": "column",
       "padding": 8,
     }
   }
@@ -41,7 +40,6 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
             style={
               Object {
                 "alignItems": "flex-start",
-                "flexDirection": "column",
                 "paddingBottom": 24,
               }
             }
@@ -103,7 +101,6 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
               <View
                 style={
                   Object {
-                    "flexDirection": "column",
                     "paddingLeft": 8,
                   }
                 }
@@ -118,7 +115,7 @@ exports[`PaymentRequestConfirmation renders correctly for request payment confir
                     }
                   }
                 >
-                  Requesting
+                  requesting
                 </Text>
                 <Text
                   style={

@@ -6,7 +6,6 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
     Object {
       "backgroundColor": "#FFFFFF",
       "flex": 1,
-      "flexDirection": "column",
       "padding": 8,
     }
   }
@@ -41,7 +40,6 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
             style={
               Object {
                 "alignItems": "flex-start",
-                "flexDirection": "column",
                 "paddingBottom": 24,
               }
             }
@@ -103,7 +101,6 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
               <View
                 style={
                   Object {
-                    "flexDirection": "column",
                     "paddingLeft": 8,
                   }
                 }
@@ -118,7 +115,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
                     }
                   }
                 >
-                  Sending
+                  sending
                 </Text>
                 <Text
                   style={
@@ -884,7 +881,6 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
     Object {
       "backgroundColor": "#FFFFFF",
       "flex": 1,
-      "flexDirection": "column",
       "padding": 8,
     }
   }
@@ -919,7 +915,6 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
             style={
               Object {
                 "alignItems": "flex-start",
-                "flexDirection": "column",
                 "paddingBottom": 24,
               }
             }
@@ -981,7 +976,6 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
               <View
                 style={
                   Object {
-                    "flexDirection": "column",
                     "paddingLeft": 8,
                   }
                 }
@@ -996,7 +990,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                     }
                   }
                 >
-                  Sending
+                  sending
                 </Text>
                 <Text
                   style={
@@ -1762,7 +1756,6 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
     Object {
       "backgroundColor": "#FFFFFF",
       "flex": 1,
-      "flexDirection": "column",
       "padding": 8,
     }
   }
@@ -1797,7 +1790,6 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
             style={
               Object {
                 "alignItems": "flex-start",
-                "flexDirection": "column",
                 "paddingBottom": 24,
               }
             }
@@ -1859,7 +1851,6 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
               <View
                 style={
                   Object {
-                    "flexDirection": "column",
                     "paddingLeft": 8,
                   }
                 }
@@ -1874,7 +1865,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                     }
                   }
                 >
-                  Sending
+                  sending
                 </Text>
                 <Text
                   style={
@@ -2637,7 +2628,6 @@ exports[`SendConfirmation renders correctly when there are multiple user address
     Object {
       "backgroundColor": "#FFFFFF",
       "flex": 1,
-      "flexDirection": "column",
       "padding": 8,
     }
   }
@@ -2672,7 +2662,6 @@ exports[`SendConfirmation renders correctly when there are multiple user address
             style={
               Object {
                 "alignItems": "flex-start",
-                "flexDirection": "column",
                 "paddingBottom": 24,
               }
             }
@@ -2734,7 +2723,6 @@ exports[`SendConfirmation renders correctly when there are multiple user address
               <View
                 style={
                   Object {
-                    "flexDirection": "column",
                     "paddingLeft": 8,
                   }
                 }
@@ -2749,7 +2737,7 @@ exports[`SendConfirmation renders correctly when there are multiple user address
                     }
                   }
                 >
-                  Sending
+                  sending
                 </Text>
                 <Text
                   style={

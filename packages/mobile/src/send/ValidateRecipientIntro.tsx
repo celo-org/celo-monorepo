@@ -73,7 +73,7 @@ class ValidateRecipientIntro extends React.Component<Props> {
               thumbnailPath={getRecipientThumbnail(recipient)}
             />
           </View>
-          <Text style={styles.h2}>
+          <Text style={styles.validationHeader}>
             {t('confirmAccount.header', {
               displayName,
             })}
@@ -117,23 +117,20 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 24,
     paddingBottom: 30,
-    flexDirection: 'column',
     justifyContent: 'flex-start',
   },
   iconContainer: {
     paddingTop: 20,
-    flexDirection: 'column',
     alignItems: 'center',
   },
   buttonContainer: {
     paddingBottom: 60,
-    flexDirection: 'column',
     alignItems: 'center',
   },
   button: {
     paddingVertical: 16,
   },
-  h2: {
+  validationHeader: {
     ...fontStyles.h2,
     paddingVertical: 20,
     paddingHorizontal: 5,

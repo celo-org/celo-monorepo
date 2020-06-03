@@ -258,6 +258,7 @@ function SendAmount(props: Props) {
         isPaymentRequest: true,
       })
     } else if (recipientVerificationStatus !== RecipientVerificationStatus.VERIFIED) {
+      CeloAnalytics.track(CustomEventNames.request_continue, continueAnalyticsParams)
       navigate(Screens.PaymentRequestUnavailable, { transactionData })
     } else {
       CeloAnalytics.track(CustomEventNames.request_continue, continueAnalyticsParams)

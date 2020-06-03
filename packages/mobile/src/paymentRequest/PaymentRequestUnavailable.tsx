@@ -18,7 +18,7 @@ const PaymentRequestUnavailable = (props: Props) => {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <Text style={styles.h2}>
+        <Text style={styles.requestHeader}>
           {recipient.displayName === 'Mobile #'
             ? t('requestUnavailableNoDisplayNameHeader')
             : t('requestUnavailableHeader', { displayName: recipient.displayName })}
@@ -41,10 +41,9 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 24,
     paddingVertical: 32,
-    flexDirection: 'column',
     justifyContent: 'flex-start',
   },
-  h2: {
+  requestHeader: {
     ...fontStyles.h2,
     paddingVertical: 20,
     paddingHorizontal: 5,

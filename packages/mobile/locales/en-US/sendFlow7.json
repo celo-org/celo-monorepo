@@ -3,7 +3,6 @@
   "dollarsSent": "{{Dollars}} Sent",
   "to": "To",
   "send": "Send",
-  "request": "Request",
   "payment": "Payment",
   "sendOrRequest": "Send or Request",
   "recent": "Recent",
@@ -63,7 +62,6 @@
   "cameraSettings": "Settings",
   "showYourQRCode": "Show your QR code",
   "toSentOrRequestPayment": "to send or request payment",
-  "requestSent": "Request Sent",
   "reminderSent": "Reminder Sent",
   "reclaimPayment": "Reclaim Payment",
   "totalRefunded": "Total Refunded",
@@ -112,5 +110,6 @@
     "body3": "Account numbers begin with \"0x\" and are 42 characters long"
   },
   "transferAddressChanged": "This contact changed their account number since the transaction. This payment was sent to:",
-  "addressConfirmed": "Account number confirmed"
+  "addressConfirmed": "Account number confirmed",
+  "sending": "Sending"
 }

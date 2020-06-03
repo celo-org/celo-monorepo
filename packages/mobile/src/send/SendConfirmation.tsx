@@ -337,7 +337,7 @@ export class SendConfirmation extends React.Component<Props, State> {
                 address={recipientAddress || ''}
               />
               <View style={styles.recipientInfoContainer}>
-                <Text style={styles.headerText}>Sending</Text>
+                <Text style={styles.headerText}>{t('sending')}</Text>
                 <Text style={styles.displayName}>
                   {getDisplayName({ recipient, recipientAddress, t })}
                 </Text>
@@ -403,7 +403,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.light,
     padding: 8,
-    flexDirection: 'column',
   },
   feeContainer: {
     padding: 16,
@@ -415,7 +414,6 @@ const styles = StyleSheet.create({
     paddingBottom: 24,
   },
   transferContainer: {
-    flexDirection: 'column',
     alignItems: 'flex-start',
     paddingBottom: 24,
   },
@@ -424,7 +422,6 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   recipientInfoContainer: {
-    flexDirection: 'column',
     paddingLeft: 8,
   },
   headerText: {
