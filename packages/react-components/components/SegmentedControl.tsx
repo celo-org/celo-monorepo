@@ -67,15 +67,14 @@ export default function SegmentedControl({ position, values, selectedIndex = 0, 
       )}
       {values.map((value, index) => {
         const isFocused = index === selectedIndex
+        const onPress = () => handleChange(index)
         return (
           <Touchable
             key={value}
             accessibilityRole="button"
             accessibilityStates={isFocused ? ['selected'] : []}
-            // accessibilityLabel={options.tabBarAccessibilityLabel}
-            // testID={options.tabBarTestID}
-            onPress={() => handleChange(index)}
-            // onLongPress={onLongPress}
+            accessibilityLabel={value}
+            onPress={onPress}
             style={[styles.value, isFocused && styles.valueSelected]}
           >
             <View />
@@ -97,25 +96,16 @@ export default function SegmentedControl({ position, values, selectedIndex = 0, 
             }}
           >
             {values.map((value, index) => {
-              const isFocused = index === selectedIndex
               return (
                 <View key={value} style={styles.value}>
-                  <Animated.Text
-                    style={[styles.text /* , isFocused && styles.textSelected, { color } */]}
-                  >
-                    {value}
-                  </Animated.Text>
+                  <Animated.Text style={styles.text}>{value}</Animated.Text>
                 </View>
               )
             })}
           </View>
         }
       >
-        {/* Shows behind the mask, you can put anything here, such as an image */}
-        {/* <View style={{ flex: 1, height: '100%', backgroundColor: '#324376' }} />
-        <View style={{ flex: 1, height: '100%', backgroundColor: '#F5DD90' }} />
-        <View style={{ flex: 1, height: '100%', backgroundColor: '#F76C5E' }} />
-        <View style={{ flex: 1, height: '100%', backgroundColor: '#e1e1e1' }} /> */}
+        {/* Shows behind the mask, i.e. inside the text */}
         <Animated.View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: color }} />
         {selectedIndex != null && !!segmentWidth && (
           <Animated.View

@@ -2,16 +2,16 @@ import { processColor } from 'react-native'
 import Animated, { color, Extrapolate, interpolate, round } from 'react-native-reanimated'
 
 // tslint:disable: no-bitwise
-function red(c) {
+function red(c: number) {
   return (c >> 16) & 255
 }
-function green(c) {
+function green(c: number) {
   return (c >> 8) & 255
 }
-function blue(c) {
+function blue(c: number) {
   return c & 255
 }
-function opacity(c) {
+function opacity(c: number) {
   return ((c >> 24) & 255) / 255
 }
 // tslint:enable: no-bitwise

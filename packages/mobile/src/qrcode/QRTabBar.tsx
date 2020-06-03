@@ -12,14 +12,32 @@ import { useDispatch } from 'react-redux'
 import { TopBarIconButton } from 'src/navigator/TopBarButton.v2'
 import { shareQRCode, SVG } from 'src/send/actions'
 
-const HEIGHT = 24
-
 type Props = MaterialTopTabBarProps & {
   qrSvgRef: React.MutableRefObject<SVG>
 }
 
 export default function QRTabBar({ state, descriptors, navigation, position, qrSvgRef }: Props) {
   const dispatch = useDispatch()
+
+  const values = useMemo(
+    () =>
+      state.routes.map((route) => {
+        const { options } = descriptors[route.key]
+        const label = options.title !== undefined ? options.title : route.name
+        return label
+      }),
+    [state, descriptors]
+  )
+
+  const shareOpacity = Animated.interpolate(position, {
+    inputRange: [0, 0.5],
+    outputRange: [1, 0],
+  })
+
+  const color = interpolateColors(position, {
+    inputRange: [0.9, 1],
+    outputColorRange: [colors.dark, colors.white],
+  })
 
   const onPressClose = () => {
     navigation.dangerouslyGetParent()?.goBack()
@@ -43,26 +61,6 @@ export default function QRTabBar({ state, descriptors, navigation, position, qrS
       navigation.navigate(route.name)
     }
   }
-
-  const values = useMemo(
-    () =>
-      state.routes.map((route) => {
-        const { options } = descriptors[route.key]
-        const label = options.title !== undefined ? options.title : route.name
-        return label
-      }),
-    [state, descriptors]
-  )
-
-  const shareOpacity = Animated.interpolate(position, {
-    inputRange: [0, 0.5],
-    outputRange: [1, 0],
-  })
-
-  const color = interpolateColors(position, {
-    inputRange: [0.9, 1],
-    outputColorRange: [colors.dark, colors.white],
-  })
 
   return (
     <SafeAreaView style={StyleSheet.absoluteFill}>
