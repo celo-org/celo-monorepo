@@ -79,7 +79,7 @@ export async function upgradeFullNodeChart(
 ) {
   const kubeNamespace = getKubeNamespace(celoEnv, namespace)
   const releaseName = getReleaseName(celoEnv, syncmode, kubeNamespace)
-  const storageClass = getStorageClass(celoEnv, syncmode, kubeNamespace)
+  const [storageClass] = await getStorageClass(celoEnv, syncmode, kubeNamespace)
 
   if (reset) {
     await scaleResource(kubeNamespace, 'StatefulSet', `${releaseName}`, 0)
@@ -89,7 +89,7 @@ export async function upgradeFullNodeChart(
     kubeNamespace,
     releaseName,
     helmChartPath,
-    await helmParameters(celoEnv, syncmode, kubeNamespace, storageClass)
+    await helmParameters(celoEnv, syncmode, kubeNamespace, storageClass.trim())
   )
   await scaleResource(kubeNamespace, 'StatefulSet', `${releaseName}`, 1)
   return
