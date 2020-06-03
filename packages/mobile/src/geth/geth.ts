@@ -94,7 +94,7 @@ async function createNewGeth(): Promise<typeof RNGeth> {
   if (USE_FULL_NODE_DISCOVERY) {
     const nodes = await BootnodeUtils.getBootnodesAsync(DEFAULT_TESTNET)
     gethOptions.bootnodeEnodes = nodes.split(';')
-    Logger.debug('Geth@newGeth', 'Bootnodes!!!! =  ' + nodes.split(';'))
+    Logger.debug('Geth@newGeth', 'bootnodes = ' + nodes.split(';'))
   }
 
   // Setup Logging
