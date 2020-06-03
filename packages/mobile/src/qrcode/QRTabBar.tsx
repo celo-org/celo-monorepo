@@ -1,9 +1,12 @@
+import interpolateColors from '@celo/react-components/components/interpolateColors'
 import SegmentedControl from '@celo/react-components/components/SegmentedControl'
 import Share from '@celo/react-components/icons/Share'
 import Times from '@celo/react-components/icons/Times'
+import colors from '@celo/react-components/styles/colors.v2'
 import { MaterialTopTabBarProps } from '@react-navigation/material-top-tabs'
 import React, { useMemo } from 'react'
 import { StyleSheet, View } from 'react-native'
+import Animated from 'react-native-reanimated'
 import SafeAreaView from 'react-native-safe-area-view'
 import { useDispatch } from 'react-redux'
 import { TopBarIconButton } from 'src/navigator/TopBarButton.v2'
@@ -51,17 +54,31 @@ export default function QRTabBar({ state, descriptors, navigation, position, qrS
     [state, descriptors]
   )
 
+  const shareOpacity = Animated.interpolate(position, {
+    inputRange: [0, 0.5],
+    outputRange: [1, 0],
+  })
+
+  const color = interpolateColors(position, {
+    inputRange: [0.9, 1],
+    outputColorRange: [colors.dark, colors.white],
+  })
+
   return (
     <SafeAreaView style={StyleSheet.absoluteFill}>
       <View style={styles.container}>
-        <TopBarIconButton icon={<Times />} onPress={onPressClose} />
+        <View style={styles.leftContainer}>
+          <TopBarIconButton icon={<Times color={color} />} onPress={onPressClose} />
+        </View>
         <SegmentedControl
           values={values}
           selectedIndex={state.index}
           position={position}
           onChange={onChange}
         />
-        <TopBarIconButton icon={<Share />} onPress={onPressShare} />
+        <Animated.View style={[styles.rightContainer, { opacity: shareOpacity }]}>
+          <TopBarIconButton icon={<Share />} onPress={onPressShare} />
+        </Animated.View>
       </View>
     </SafeAreaView>
   )
@@ -72,6 +89,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     // backgroundColor: 'yellow',
     alignItems: 'center',
-    // flex: 1,
+    paddingVertical: 8,
+  },
+  leftContainer: {
+    width: 50,
+    // paddingHorizontal: 16,
+    alignItems: 'center',
+  },
+  rightContainer: {
+    width: 50,
+    // paddingHorizontal: 16,
+    alignItems: 'center',
   },
 })

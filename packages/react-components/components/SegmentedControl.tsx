@@ -1,6 +1,8 @@
+import interpolateColors from '@celo/react-components/components/interpolateColors'
 import Touchable from '@celo/react-components/components/Touchable'
 import colors from '@celo/react-components/styles/colors.v2'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
+import MaskedView from '@react-native-community/masked-view'
 import React from 'react'
 import { LayoutChangeEvent, StyleSheet, View } from 'react-native'
 import Animated from 'react-native-reanimated'
@@ -27,6 +29,16 @@ export default function SegmentedControl({ position, values, selectedIndex = 0, 
     outputRange: inputRange.map((i) => i * segmentWidth),
   })
 
+  const color = interpolateColors(position, {
+    inputRange: [0.5, 1],
+    outputColorRange: [colors.greenUI, colors.white],
+  })
+
+  const colorInverted = interpolateColors(position, {
+    inputRange: [0.5, 1],
+    outputColorRange: [colors.white, colors.greenUI],
+  })
+
   const onLayout = ({
     nativeEvent: {
       layout: { width },
@@ -40,7 +52,7 @@ export default function SegmentedControl({ position, values, selectedIndex = 0, 
   }
 
   return (
-    <View style={styles.container} onLayout={onLayout}>
+    <Animated.View style={[styles.container, { borderColor: color }]} onLayout={onLayout}>
       {selectedIndex != null && !!segmentWidth && (
         <Animated.View
           style={[
@@ -48,6 +60,7 @@ export default function SegmentedControl({ position, values, selectedIndex = 0, 
             {
               transform: [{ translateX }],
               width: segmentWidth,
+              backgroundColor: color,
             },
           ]}
         />
@@ -65,14 +78,59 @@ export default function SegmentedControl({ position, values, selectedIndex = 0, 
             // onLongPress={onLongPress}
             style={[styles.value, isFocused && styles.valueSelected]}
           >
-            {/* <Animated.Text style={{ opacity }}>{label}</Animated.Text> */}
-            <Animated.Text style={[styles.text, isFocused && styles.textSelected /*, { color } */]}>
-              {value}
-            </Animated.Text>
+            <View />
           </Touchable>
         )
       })}
-    </View>
+      <MaskedView
+        pointerEvents="none"
+        style={StyleSheet.absoluteFillObject}
+        maskElement={
+          <View
+            style={{
+              // Transparent background because mask is based off alpha channel.
+              backgroundColor: 'transparent',
+              flex: 1,
+              flexDirection: 'row',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          >
+            {values.map((value, index) => {
+              const isFocused = index === selectedIndex
+              return (
+                <View key={value} style={styles.value}>
+                  <Animated.Text
+                    style={[styles.text /* , isFocused && styles.textSelected, { color } */]}
+                  >
+                    {value}
+                  </Animated.Text>
+                </View>
+              )
+            })}
+          </View>
+        }
+      >
+        {/* Shows behind the mask, you can put anything here, such as an image */}
+        {/* <View style={{ flex: 1, height: '100%', backgroundColor: '#324376' }} />
+        <View style={{ flex: 1, height: '100%', backgroundColor: '#F5DD90' }} />
+        <View style={{ flex: 1, height: '100%', backgroundColor: '#F76C5E' }} />
+        <View style={{ flex: 1, height: '100%', backgroundColor: '#e1e1e1' }} /> */}
+        <Animated.View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: color }} />
+        {selectedIndex != null && !!segmentWidth && (
+          <Animated.View
+            style={[
+              styles.slider,
+              {
+                transform: [{ translateX }],
+                width: segmentWidth,
+                backgroundColor: colorInverted,
+              },
+            ]}
+          />
+        )}
+      </MaskedView>
+    </Animated.View>
   )
 }
 

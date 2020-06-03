@@ -12,6 +12,7 @@ import { SVG } from 'src/send/actions'
 const Tab = createMaterialTopTabNavigator()
 
 const width = Dimensions.get('window').width
+const initialLayout = { width }
 
 function ScannerContainer({ position, ...props }: any) {
   const index = 1
@@ -71,17 +72,22 @@ export default function QRNavigator() {
       pager={(props) => <ScrollPager {...props} />}
       style={styles.container}
       sceneContainerStyle={styles.sceneContainerStyle}
+      initialLayout={initialLayout}
     >
-      {/* <Tab.Screen name="My Code" component={HomeScreen} />
-      <Tab.Screen name="Scan" component={SettingsScreen} /> */}
       <Tab.Screen
         name={Screens.QRCode}
-        component={(props) => <QRCode {...props} qrSvgRef={qrSvgRef} />}
-      />
+        options={{ title: 'Code' }}
+        // component={(props) => <QRCode {...props} qrSvgRef={qrSvgRef} />}
+      >
+        {(props) => <QRCode {...props} qrSvgRef={qrSvgRef} />}
+      </Tab.Screen>
       <Tab.Screen
         name={Screens.QRScanner}
-        component={(props) => <ScannerContainer {...props} position={position} />}
-      />
+        options={{ title: 'Scan' }}
+        // component={(props) => <ScannerContainer {...props} position={position} />}
+      >
+        {(props) => <ScannerContainer {...props} position={position} />}
+      </Tab.Screen>
     </Tab.Navigator>
   )
 }
