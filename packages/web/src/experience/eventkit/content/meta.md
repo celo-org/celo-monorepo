@@ -1,1 +1,1 @@
-Celo EventKit Create a Celo event
+Celo EventKit: Foster global connection
