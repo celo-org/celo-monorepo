@@ -66,12 +66,7 @@ class PaymentRequestConfirmation extends React.Component<Props> {
   static navigationOptions = { header: null }
 
   onConfirm = async () => {
-    const {
-      amount,
-      reason,
-      recipient,
-      recipientAddress: requesteeAddress,
-    } = this.props.confirmationInput
+    const { amount, recipient, recipientAddress: requesteeAddress } = this.props.confirmationInput
 
     CeloAnalytics.track(CustomEventNames.request_payment_request, {
       requesteeAddress,
@@ -100,7 +95,8 @@ class PaymentRequestConfirmation extends React.Component<Props> {
       requesterE164Number: this.props.e164PhoneNumber,
       requesteeAddress,
       currency: currencyToShortMap[CURRENCY_ENUM.DOLLAR],
-      comment: reason,
+      // NOTE: Add this back in when redesigning this screen
+      comment: 'placeholder',
       status: PaymentRequestStatus.REQUESTED,
       notified: false,
     }
@@ -118,12 +114,7 @@ class PaymentRequestConfirmation extends React.Component<Props> {
 
   render() {
     const { t } = this.props
-    const {
-      amount,
-      reason,
-      recipient,
-      recipientAddress: requesteeAddress,
-    } = this.props.confirmationInput
+    const { amount, recipient, recipientAddress: requesteeAddress } = this.props.confirmationInput
 
     return (
       <SafeAreaView style={styles.container}>
@@ -141,7 +132,7 @@ class PaymentRequestConfirmation extends React.Component<Props> {
             recipient={recipient}
             address={requesteeAddress || ''}
             e164PhoneNumber={recipient.e164PhoneNumber}
-            comment={reason}
+            // comment={reason} NOTE: Add this back in when redesigning this screen
             value={amount}
             currency={CURRENCY_ENUM.DOLLAR} // User can only request in Dollars
           />

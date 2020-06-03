@@ -1,12 +1,12 @@
-import { TokenTransactionType } from 'src/apollo/types'
+import { TokenTransactionType, TransactionFeedFragment } from 'src/apollo/types'
 import { ExchangeConfirmationCardProps } from 'src/exchange/ExchangeConfirmationCard'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import i18n from 'src/i18n'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { TransactionDataInput } from 'src/send/SendAmount'
-import { TransferConfirmationCardProps } from 'src/send/TransferConfirmationCard'
-import { StandbyTransaction } from 'src/transactions/reducer'
+import { TransferConfirmationCardProps } from 'src/transactions/TransferConfirmationCard'
+import { StandbyTransaction } from 'src/transactions/types'
 import { web3ForUtils } from 'src/web3/contracts'
 
 export enum Actions {
@@ -16,68 +16,77 @@ export enum Actions {
   ADD_HASH_TO_STANDBY_TRANSACTIONS = 'TRANSACTIONS/ADD_HASH_TO_STANDBY_TRANSACTIONS',
   TRANSACTION_CONFIRMED = 'TRANSACTIONS/TRANSACTION_CONFIRMED',
   TRANSACTION_FAILED = 'TRANSACTIONS/TRANSACTION_FAILED',
+  NEW_TRANSACTIONS_IN_FEED = 'TRANSACTIONS/NEW_TRANSACTIONS_IN_FEED',
 }
 
-export interface AddStandbyTransaction {
+export interface AddStandbyTransactionAction {
   type: Actions.ADD_STANDBY_TRANSACTION
   transaction: StandbyTransaction
 }
 
-export interface RemoveStandbyTransaction {
+export interface RemoveStandbyTransactionAction {
   type: Actions.REMOVE_STANDBY_TRANSACTION
   idx: string
 }
 
-export interface ResetStandbyTransactions {
+export interface ResetStandbyTransactionsAction {
   type: Actions.RESET_STANDBY_TRANSACTIONS
 }
 
-export interface AddHashToStandbyTransaction {
+export interface AddHashToStandbyTransactionAction {
   type: Actions.ADD_HASH_TO_STANDBY_TRANSACTIONS
   idx: string
   hash: string
 }
 
-export interface TransactionConfirmed {
+export interface TransactionConfirmedAction {
   type: Actions.TRANSACTION_CONFIRMED
   txId: string
 }
 
-export interface TransactionFailed {
+export interface TransactionFailedAction {
   type: Actions.TRANSACTION_FAILED
   txId: string
 }
 
+export interface NewTransactionsInFeedAction {
+  type: Actions.NEW_TRANSACTIONS_IN_FEED
+  transactions: TransactionFeedFragment[]
+}
+
 export type ActionTypes =
-  | AddStandbyTransaction
-  | RemoveStandbyTransaction
-  | ResetStandbyTransactions
-  | AddHashToStandbyTransaction
+  | AddStandbyTransactionAction
+  | RemoveStandbyTransactionAction
+  | ResetStandbyTransactionsAction
+  | AddHashToStandbyTransactionAction
+  | NewTransactionsInFeedAction
 
 export const generateStandbyTransactionId = (recipientAddress: string) => {
   return web3ForUtils.utils.sha3(recipientAddress + String(Date.now()))
 }
 
-export const addStandbyTransaction = (transaction: StandbyTransaction): AddStandbyTransaction => ({
+export const addStandbyTransaction = (
+  transaction: StandbyTransaction
+): AddStandbyTransactionAction => ({
   type: Actions.ADD_STANDBY_TRANSACTION,
   transaction,
 })
 
-export const removeStandbyTransaction = (idx: string): RemoveStandbyTransaction => ({
+export const removeStandbyTransaction = (idx: string): RemoveStandbyTransactionAction => ({
   type: Actions.REMOVE_STANDBY_TRANSACTION,
   idx,
 })
 
-export const resetStandbyTransactions = (): ResetStandbyTransactions => ({
+export const resetStandbyTransactions = (): ResetStandbyTransactionsAction => ({
   type: Actions.RESET_STANDBY_TRANSACTIONS,
 })
 
-export const transactionConfirmed = (txId: string): TransactionConfirmed => ({
+export const transactionConfirmed = (txId: string): TransactionConfirmedAction => ({
   type: Actions.TRANSACTION_CONFIRMED,
   txId,
 })
 
-export const transactionFailed = (txId: string): TransactionFailed => ({
+export const transactionFailed = (txId: string): TransactionFailedAction => ({
   type: Actions.TRANSACTION_FAILED,
   txId,
 })
@@ -85,10 +94,17 @@ export const transactionFailed = (txId: string): TransactionFailed => ({
 export const addHashToStandbyTransaction = (
   idx: string,
   hash: string
-): AddHashToStandbyTransaction => ({
+): AddHashToStandbyTransactionAction => ({
   type: Actions.ADD_HASH_TO_STANDBY_TRANSACTIONS,
   idx,
   hash,
+})
+
+export const newTransactionsInFeed = (
+  transactions: TransactionFeedFragment[]
+): NewTransactionsInFeedAction => ({
+  type: Actions.NEW_TRANSACTIONS_IN_FEED,
+  transactions,
 })
 
 export const navigateToPaymentTransferReview = (
@@ -99,31 +115,31 @@ export const navigateToPaymentTransferReview = (
   let headerText = ''
   switch (type) {
     case TokenTransactionType.Sent:
-      headerText = i18n.t('sendFlow7:sentPayment')
+      headerText = i18n.t('walletFlow5:transactionHeaderSent')
       break
     case TokenTransactionType.EscrowSent:
-      headerText = i18n.t('sendFlow7:sentEscrowPayment')
+      headerText = i18n.t('walletFlow5:transactionHeaderEscrowSent')
       break
     case TokenTransactionType.Received:
-      headerText = i18n.t('receiveFlow8:receivedPayment')
+      headerText = i18n.t('walletFlow5:transactionHeaderReceived')
       break
     case TokenTransactionType.EscrowReceived:
-      headerText = i18n.t('receiveFlow8:receivedEscrowPayment')
+      headerText = i18n.t('walletFlow5:transactionHeaderEscrowReceived')
       break
     case TokenTransactionType.VerificationFee:
-      headerText = i18n.t('walletFlow5:verificationFee')
+      headerText = i18n.t('walletFlow5:transactionHeaderVerificationFee')
       break
     case TokenTransactionType.Faucet:
-      headerText = i18n.t('receiveFlow8:receivedDollars')
+      headerText = i18n.t('walletFlow5:transactionHeaderFaucet')
       break
     case TokenTransactionType.InviteSent:
-      headerText = i18n.t('inviteFlow11:inviteComplete')
+      headerText = i18n.t('walletFlow5:transactionHeaderInviteSent')
       break
     case TokenTransactionType.InviteReceived:
-      headerText = i18n.t('inviteFlow11:inviteReceived')
+      headerText = i18n.t('walletFlow5:transactionHeaderInviteReceived')
       break
     case TokenTransactionType.NetworkFee:
-      headerText = i18n.t('walletFlow5:networkFee')
+      headerText = i18n.t('walletFlow5:transactionHeaderNetworkFee')
       break
   }
 
