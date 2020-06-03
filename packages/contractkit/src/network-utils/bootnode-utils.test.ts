@@ -3,9 +3,9 @@ import { BootnodeUtils } from './bootnode-utils'
 const NETWORK_NAME = 'alfajores'
 
 describe(BootnodeUtils, () => {
-  describe(BootnodeUtils.getBootnodes, () => {
+  describe(BootnodeUtils.getBootnodesAsync, () => {
     it('should be able to get bootnodes', async () => {
-      const nodes = BootnodeUtils.getBootnodes(NETWORK_NAME)
+      const nodes = await BootnodeUtils.getBootnodesAsync(NETWORK_NAME)
       // Fail if genesis block is not proper JSON.
       const nodesJson = nodes.split(';')
       // Fail if genesis block is less than 100 characters.

@@ -1,4 +1,3 @@
-import { BootnodeUtils } from '@celo/contractkit'
 import {
   DEFAULT_SYNC_MODE,
   DEFAULT_TESTNET,
@@ -26,7 +25,6 @@ interface NetworkConfig {
   blockchainApiUrl: string
   pgpnpUrl: string // Phone Number Privacy service url
   pgpnpPubKey: string
-  bootnodeEnodes: string[]
 }
 
 const pgpnpUrlStaging = 'https://us-central1-celo-phone-number-privacy-stg.cloudfunctions.net'
@@ -45,7 +43,6 @@ const networkConfigs: { [testnet: string]: NetworkConfig } = {
     pgpnpUrl: pgpnpUrlStaging,
     pgpnpPubKey: pgpnpPubKeyStaging,
     peerDiscovery: USE_FULL_NODE_DISCOVERY,
-    bootnodeEnodes: BootnodeUtils.getBootnodes(Testnets.integration).split(';'),
   },
   [Testnets.alfajoresstaging]: {
     nodeDir: `.${Testnets.alfajoresstaging}`,
@@ -55,7 +52,6 @@ const networkConfigs: { [testnet: string]: NetworkConfig } = {
     pgpnpUrl: pgpnpUrlStaging,
     pgpnpPubKey: pgpnpPubKeyStaging,
     peerDiscovery: USE_FULL_NODE_DISCOVERY,
-    bootnodeEnodes: BootnodeUtils.getBootnodes(Testnets.alfajoresstaging).split(';'),
   },
   [Testnets.alfajores]: {
     nodeDir: `.${Testnets.alfajores}`,
@@ -65,7 +61,6 @@ const networkConfigs: { [testnet: string]: NetworkConfig } = {
     pgpnpUrl: pgpnpUrlProd,
     pgpnpPubKey: pgpnpPubKeyProd,
     peerDiscovery: USE_FULL_NODE_DISCOVERY,
-    bootnodeEnodes: BootnodeUtils.getBootnodes(Testnets.alfajores).split(';'),
   },
   [Testnets.pilot]: {
     nodeDir: `.${Testnets.pilot}`,
@@ -75,7 +70,6 @@ const networkConfigs: { [testnet: string]: NetworkConfig } = {
     pgpnpUrl: pgpnpUrlStaging,
     pgpnpPubKey: pgpnpPubKeyStaging,
     peerDiscovery: USE_FULL_NODE_DISCOVERY,
-    bootnodeEnodes: BootnodeUtils.getBootnodes(Testnets.pilot).split(';'),
   },
   [Testnets.pilotstaging]: {
     nodeDir: `.${Testnets.pilotstaging}`,
@@ -85,7 +79,6 @@ const networkConfigs: { [testnet: string]: NetworkConfig } = {
     pgpnpUrl: pgpnpUrlStaging,
     pgpnpPubKey: pgpnpPubKeyStaging,
     peerDiscovery: USE_FULL_NODE_DISCOVERY,
-    bootnodeEnodes: BootnodeUtils.getBootnodes(Testnets.pilotstaging).split(';'),
   },
   [Testnets.baklavastaging]: {
     nodeDir: `.${Testnets.baklavastaging}`,
@@ -95,7 +88,6 @@ const networkConfigs: { [testnet: string]: NetworkConfig } = {
     pgpnpUrl: pgpnpUrlStaging,
     pgpnpPubKey: pgpnpPubKeyStaging,
     peerDiscovery: USE_FULL_NODE_DISCOVERY,
-    bootnodeEnodes: BootnodeUtils.getBootnodes(Testnets.baklavastaging).split(';'),
   },
   [Testnets.baklava]: {
     nodeDir: `.${Testnets.baklava}`,
@@ -105,7 +97,6 @@ const networkConfigs: { [testnet: string]: NetworkConfig } = {
     pgpnpUrl: pgpnpUrlStaging,
     pgpnpPubKey: pgpnpPubKeyStaging,
     peerDiscovery: USE_FULL_NODE_DISCOVERY,
-    bootnodeEnodes: BootnodeUtils.getBootnodes(Testnets.baklava).split(';'),
   },
 }
 

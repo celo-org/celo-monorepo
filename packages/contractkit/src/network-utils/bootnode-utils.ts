@@ -14,13 +14,9 @@ export class BootnodeUtils {
    * along with the response data from Google api.
    * @param networkName Name of the network to fetch config for
    */
-  static getBootnodes(networkName: string): string {
+  static getBootnodesAsync(networkName: string): Promise<string> {
     const bucketName = BootnodesGoogleStorageBucketName
     const fileName = networkName
-    let ret = ''
-    GoogleStorageUtils.fetchFileFromGoogleStorage(bucketName, fileName)
-      .then((res) => (ret = res))
-      .catch(() => 'obligatory catch')
-    return ret
+    return GoogleStorageUtils.fetchFileFromGoogleStorage(bucketName, fileName)
   }
 }
