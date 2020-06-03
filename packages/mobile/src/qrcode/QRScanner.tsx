@@ -3,83 +3,92 @@ import QRCode from '@celo/react-components/icons/QRCode'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
 import variables from '@celo/react-components/styles/variables'
+import { useIsFocused } from '@react-navigation/native'
+import { StackScreenProps } from '@react-navigation/stack'
+import { memoize } from 'lodash'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { Platform, StyleSheet, Text, View } from 'react-native'
 import { RNCamera } from 'react-native-camera'
 import SafeAreaView from 'react-native-safe-area-view'
-import { NavigationFocusInjectedProps, withNavigationFocus } from 'react-navigation'
 import { connect } from 'react-redux'
-import { componentWithAnalytics } from 'src/analytics/wrapper'
 import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import { headerWithBackButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { StackParamList } from 'src/navigator/types'
 import NotAuthorizedView from 'src/qrcode/NotAuthorizedView'
-import { handleBarcodeDetected } from 'src/send/actions'
+import { RootState } from 'src/redux/reducers'
+import { handleBarcodeDetected, QrCode } from 'src/send/actions'
+import { TransactionDataInput } from 'src/send/SendAmount'
 import Logger from 'src/utils/Logger'
+
+interface StateProps {
+  scanIsForSecureSend?: true
+  transactionData?: TransactionDataInput
+}
 
 interface DispatchProps {
   handleBarcodeDetected: typeof handleBarcodeDetected
 }
 
-interface State {
-  isScanningEnabled: boolean
+type OwnProps = StackScreenProps<StackParamList, Screens.QRScanner> & { isFocused: boolean }
+type Props = DispatchProps & WithTranslation & StateProps & OwnProps
+
+const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
+  const { route } = ownProps
+  return {
+    scanIsForSecureSend: route.params?.scanIsForSecureSend,
+    transactionData: route.params?.transactionData,
+  }
 }
 
-type Props = DispatchProps & WithTranslation & NavigationFocusInjectedProps
+const mapDispatchToProps = {
+  handleBarcodeDetected,
+}
 
-class QRScanner extends React.Component<Props, State> {
+const QRScannerWrapper = (props: Props) => {
+  const isFocused = useIsFocused()
+  return <QRScanner {...props} isFocused={isFocused} />
+}
+
+class QRScanner extends React.Component<Props> {
   static navigationOptions = () => ({
     ...headerWithBackButton,
     headerTitle: i18n.t('sendFlow7:scanCode'),
   })
 
-  timeout: undefined | number = undefined
-
-  state = {
-    isScanningEnabled: true,
-  }
-
   camera: RNCamera | null = null
 
   // This method would be called multiple times with the same
   // QR code, so we need to catch only the first one
-  onBardCodeDetected = (rawData: any) => {
-    if (this.state.isScanningEnabled) {
-      this.setState({ isScanningEnabled: false }, () => {
-        Logger.debug('QRScanner', 'Bar code detected')
-        this.props.handleBarcodeDetected(rawData)
-      })
-      this.timeout = window.setTimeout(() => {
-        this.setState({ isScanningEnabled: true })
-      }, 1000)
-    }
-  }
+  onBarCodeDetected = memoize(
+    (qrCode: QrCode) => {
+      Logger.debug('QRScanner', 'Bar code detected')
+      const { scanIsForSecureSend, transactionData } = this.props
+      this.props.handleBarcodeDetected(qrCode, scanIsForSecureSend, transactionData)
+    },
+    (qrCode) => qrCode.data
+  )
 
   onPressShowYourCode = () => {
     navigate(Screens.QRCode)
   }
 
-  componentWillUnmount() {
-    if (this.timeout) {
-      clearTimeout(this.timeout)
-    }
-  }
-
   render() {
-    const { t } = this.props
+    const { t, scanIsForSecureSend, isFocused } = this.props
+
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.innerContainer}>
-          {(Platform.OS !== 'android' || this.props.isFocused) && (
+          {(Platform.OS !== 'android' || isFocused) && (
             <RNCamera
               ref={(ref) => {
                 this.camera = ref
               }}
               style={styles.preview}
               type={RNCamera.Constants.Type.back}
-              onBarCodeRead={this.onBardCodeDetected}
+              onBarCodeRead={this.onBarCodeDetected}
               barCodeTypes={[RNCamera.Constants.BarCodeType.qr]}
               flashMode={RNCamera.Constants.FlashMode.auto}
               captureAudio={false}
@@ -106,18 +115,20 @@ class QRScanner extends React.Component<Props, State> {
             </RNCamera>
           )}
         </View>
-        <View style={styles.footerContainer}>
-          <Button
-            onPress={this.onPressShowYourCode}
-            text={t('showYourQRCode')}
-            standard={false}
-            type={BtnTypes.SECONDARY}
-          >
-            <View style={styles.footerIcon}>
-              <QRCode />
-            </View>
-          </Button>
-        </View>
+        {!scanIsForSecureSend && (
+          <View style={styles.footerContainer}>
+            <Button
+              onPress={this.onPressShowYourCode}
+              text={t('showYourQRCode')}
+              standard={false}
+              type={BtnTypes.SECONDARY}
+            >
+              <View style={styles.footerIcon}>
+                <QRCode />
+              </View>
+            </Button>
+          </View>
+        )}
       </SafeAreaView>
     )
   }
@@ -185,11 +196,7 @@ const styles = StyleSheet.create({
   },
 })
 
-export default componentWithAnalytics(
-  withNavigationFocus(
-    // @ts-ignore
-    connect(null, {
-      handleBarcodeDetected,
-    })(withTranslation(Namespaces.sendFlow7)(QRScanner))
-  )
-)
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(withTranslation(Namespaces.sendFlow7)(QRScannerWrapper))

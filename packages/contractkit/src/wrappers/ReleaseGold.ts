@@ -1,3 +1,4 @@
+import { findAddressIndex } from '@celo/utils/lib/address'
 import {
   hashMessageWithPrefix,
   Signature,
@@ -12,7 +13,7 @@ import {
   proxyCall,
   proxySend,
   stringIdentity,
-  stringToBytes,
+  stringToSolidityBytes,
   toTransactionObject,
   tupleParser,
   valueToBigNumber,
@@ -475,7 +476,7 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
           proofOfSigningKeyPossession.v,
           proofOfSigningKeyPossession.r,
           proofOfSigningKeyPossession.s,
-          stringToBytes(pubKey)
+          stringToSolidityBytes(pubKey)
         )
       )
     } else {
@@ -523,9 +524,9 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
         proofOfSigningKeyPossession.v,
         proofOfSigningKeyPossession.r,
         proofOfSigningKeyPossession.s,
-        stringToBytes(pubKey),
-        stringToBytes(blsPublicKey),
-        stringToBytes(blsPop)
+        stringToSolidityBytes(pubKey),
+        stringToSolidityBytes(blsPublicKey),
+        stringToSolidityBytes(blsPop)
       )
     )
   }
@@ -564,7 +565,7 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
   ): Promise<CeloTransactionObject<void>> {
     const electionContract = await this.kit.contracts.getElection()
     const groups = await electionContract.getGroupsVotedForByAccount(account)
-    const index = groups.indexOf(group)
+    const index = findAddressIndex(group, groups)
     const { lesser, greater } = await electionContract.findLesserAndGreaterAfterVote(
       group,
       value.times(-1)
@@ -589,7 +590,7 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
   ): Promise<CeloTransactionObject<void>> {
     const electionContract = await this.kit.contracts.getElection()
     const groups = await electionContract.getGroupsVotedForByAccount(account)
-    const index = groups.indexOf(group)
+    const index = findAddressIndex(group, groups)
     const { lesser, greater } = await electionContract.findLesserAndGreaterAfterVote(
       group,
       value.times(-1)

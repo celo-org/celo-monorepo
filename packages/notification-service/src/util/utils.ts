@@ -45,3 +45,9 @@ export async function getContractKit(): Promise<ContractKit> {
     return contractKit
   }
 }
+
+// Flat single level array
+// TODO: remove this once we upgrade to node >= 11 which natively supports Array.prototype.flat
+export function flat<T>(arr: T[][]): T[] {
+  return ([] as T[]).concat(...arr)
+}

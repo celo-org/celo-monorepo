@@ -1,12 +1,12 @@
 import { parsePhoneNumber } from '@celo/utils/src/phoneNumbers'
 import * as fuzzysort from 'fuzzysort'
+import { TFunction } from 'i18next'
 import { MinimalContact } from 'react-native-contacts'
 import {
-  getAddressFromPhoneNumber,
-  getVerificationStatusFromPhoneNumber,
+  AddressToE164NumberType,
+  E164NumberToAddressType,
   RecipientVerificationStatus,
-} from 'src/identity/contactMapping'
-import { AddressToE164NumberType, E164NumberToAddressType } from 'src/identity/reducer'
+} from 'src/identity/reducer'
 import Logger from 'src/utils/Logger'
 
 const TAG = 'recipients/recipient'
@@ -26,10 +26,10 @@ export type Recipient =
 
 interface IRecipient {
   kind: RecipientKind
-  address?: string
   displayName: string
   displayId?: string
   e164PhoneNumber?: string
+  address?: string
 }
 
 export interface RecipientWithMobileNumber extends IRecipient {
@@ -61,41 +61,17 @@ export interface NumberToRecipient {
   [number: string]: RecipientWithContact
 }
 
-export function phoneNumberToRecipient(
-  e164Number: string,
-  address: string | null,
-  recipientCache: NumberToRecipient
-): Recipient {
-  const recipient = recipientCache[e164Number]
-  return recipient
-    ? {
-        kind: RecipientKind.Contact,
-        e164PhoneNumber: e164Number,
-        displayId: e164Number,
-        address: address || undefined,
-        phoneNumberLabel: recipient.phoneNumberLabel,
-        displayName: recipient.displayName,
-        thumbnailPath: recipient.thumbnailPath,
-        contactId: recipient.contactId,
-      }
-    : {
-        kind: RecipientKind.MobileNumber,
-        e164PhoneNumber: e164Number,
-        displayId: e164Number,
-        address: address || undefined,
-        displayName: e164Number,
-      }
+interface DisplayNameProps {
+  recipient: Recipient
+  recipientAddress?: string | null
+  t: TFunction
 }
 
 /**
  * Transforms contacts into a map of e164Number to recipients based on phone numbers from contacts.
  * If a contact has no phone numbers it won't result in any recipients.
  */
-export function contactsToRecipients(
-  contacts: MinimalContact[],
-  defaultCountryCode: string,
-  e164NumberToAddress: E164NumberToAddressType
-) {
+export function contactsToRecipients(contacts: MinimalContact[], defaultCountryCode: string) {
   try {
     //  We need a map of e164Number to recipients so we can efficiently
     //    update them later as the latest contact mappings arrive from the contact calls.
@@ -123,7 +99,6 @@ export function contactsToRecipients(
             displayId: parsedNumber.displayNumber,
             e164PhoneNumber: parsedNumber.e164Number,
             phoneNumberLabel: phoneNumber.label,
-            address: e164NumberToAddress[parsedNumber.e164Number] || undefined,
             contactId: contact.recordID,
             thumbnailPath: contact.thumbnailPath,
           }
@@ -143,23 +118,8 @@ export function contactsToRecipients(
     return { e164NumberToRecipients, otherRecipients }
   } catch (error) {
     Logger.error(TAG, 'Failed to build recipients cache', error)
-    return null
+    throw error
   }
-}
-
-export function getAddressFromRecipient(
-  recipient: Recipient,
-  e164NumberToAddress: E164NumberToAddressType
-): string | null | undefined {
-  if (recipient.kind === RecipientKind.QrCode || recipient.kind === RecipientKind.Address) {
-    return recipient.address
-  }
-
-  if (!recipient.e164PhoneNumber) {
-    throw new Error('Missing recipient e164Number')
-  }
-
-  return getAddressFromPhoneNumber(recipient.e164PhoneNumber, e164NumberToAddress)
 }
 
 export function getRecipientFromAddress(
@@ -171,6 +131,21 @@ export function getRecipientFromAddress(
   return e164PhoneNumber ? recipientCache[e164PhoneNumber] : undefined
 }
 
+export function getDisplayName({ recipient, recipientAddress, t }: DisplayNameProps) {
+  const { displayName, e164PhoneNumber } = recipient
+  if (displayName) {
+    return displayName
+  }
+  if (e164PhoneNumber) {
+    return e164PhoneNumber
+  }
+  if (recipientAddress) {
+    return recipientAddress
+  }
+  // Rare but possible, such as when a user skips onboarding flow (in dev mode) and then views their own avatar
+  return t('global:unknown')
+}
+
 export function getRecipientVerificationStatus(
   recipient: Recipient,
   e164NumberToAddress: E164NumberToAddressType
@@ -180,10 +155,19 @@ export function getRecipientVerificationStatus(
   }
 
   if (!recipient.e164PhoneNumber) {
-    throw new Error('No recipient e164Number found')
+    return RecipientVerificationStatus.UNKNOWN
   }
 
-  return getVerificationStatusFromPhoneNumber(recipient.e164PhoneNumber, e164NumberToAddress)
+  const addresses = e164NumberToAddress[recipient.e164PhoneNumber]
+  if (addresses === undefined) {
+    return RecipientVerificationStatus.UNKNOWN
+  }
+
+  if (addresses === null) {
+    return RecipientVerificationStatus.UNVERIFIED
+  }
+
+  return RecipientVerificationStatus.VERIFIED
 }
 
 export function getRecipientThumbnail(recipient?: Recipient) {

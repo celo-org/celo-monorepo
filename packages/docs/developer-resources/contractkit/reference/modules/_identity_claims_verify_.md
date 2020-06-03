@@ -52,7 +52,7 @@ ___
 
 ### `Const` verifyDomainRecord
 
-▸ **verifyDomainRecord**(`claim`: [DomainClaim](_identity_claims_claim_.md#domainclaim), `address`: string, `dnsResolver`: dnsResolverFunction): *Promise‹undefined | "Unable to verify domain claim"›*
+▸ **verifyDomainRecord**(`kit`: [ContractKit](../classes/_kit_.contractkit.md), `claim`: [DomainClaim](_identity_claims_claim_.md#domainclaim), `address`: string, `dnsResolver`: dnsResolverFunction): *Promise‹undefined | string›*
 
 *Defined in [contractkit/src/identity/claims/verify.ts:72](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/identity/claims/verify.ts#L72)*
 
@@ -63,8 +63,9 @@ It verifies if a DNS domain includes in the TXT records an entry with name
 
 Name | Type | Default |
 ------ | ------ | ------ |
+`kit` | [ContractKit](../classes/_kit_.contractkit.md) | - |
 `claim` | [DomainClaim](_identity_claims_claim_.md#domainclaim) | - |
 `address` | string | - |
 `dnsResolver` | dnsResolverFunction | resolveTxt as any |
 
-**Returns:** *Promise‹undefined | "Unable to verify domain claim"›*
+**Returns:** *Promise‹undefined | string›*

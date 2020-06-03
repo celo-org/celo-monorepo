@@ -36,10 +36,7 @@ exports[`QRCode renders correctly 1`] = `
               "flexDirection": "row",
               "justifyContent": "center",
             },
-            Object {
-              "alignSelf": "center",
-              "margin": "auto",
-            },
+            undefined,
           ]
         }
       >
@@ -59,25 +56,22 @@ exports[`QRCode renders correctly 1`] = `
             ]
           }
         >
-          <Image
-            source={
-              Object {
-                "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
-              }
-            }
+          <Text
             style={
               Array [
                 Object {
-                  "alignSelf": "center",
-                  "margin": "auto",
+                  "color": "#FFFFFF",
+                  "fontFamily": "Inter-Medium",
+                  "fontSize": 16,
                 },
                 Object {
-                  "height": 40,
-                  "width": 40,
+                  "fontSize": 20,
                 },
               ]
             }
-          />
+          >
+            J
+          </Text>
         </View>
       </View>
       <Text
@@ -104,10 +98,7 @@ exports[`QRCode renders correctly 1`] = `
       <View
         style={
           Object {
-            "alignItems": "center",
-            "alignSelf": "center",
             "flexDirection": "row",
-            "justifyContent": "center",
           }
         }
       >
@@ -116,35 +107,36 @@ exports[`QRCode renders correctly 1`] = `
             Array [
               Object {
                 "color": "#2E3338",
-                "fontFamily": "Hind-Light",
-                "fontSize": 14,
-                "textAlignVertical": "center",
+                "fontFamily": "Inter-Regular",
+                "fontSize": 16,
+                "lineHeight": 22,
               },
               Object {
                 "alignItems": "center",
-                "backgroundColor": "#EEEEEE",
-                "borderRadius": 3,
                 "justifyContent": "center",
-                "marginRight": 5,
-                "paddingLeft": 6,
-                "paddingRight": 3,
+                "marginRight": 4,
               },
             ]
           }
         >
-          🇺🇸 +1
+          🇺🇸
         </Text>
         <Text
           style={
-            Object {
-              "color": "#2E3338",
-              "fontFamily": "Hind-Light",
-              "fontSize": 14,
-              "textAlignVertical": "center",
-            }
+            Array [
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Inter-Regular",
+                "fontSize": 16,
+                "lineHeight": 22,
+              },
+              Object {
+                "color": "#9CA4A9",
+              },
+            ]
           }
         >
-          (415) 555-6666
+          +1 (415) 555-6666
         </Text>
       </View>
     </View>
@@ -203,7 +195,6 @@ exports[`QRCode renders correctly 1`] = `
       <View
         accessible={true}
         focusable={true}
-        isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackground",
@@ -323,7 +314,6 @@ exports[`QRCode renders correctly 1`] = `
       <View
         accessible={true}
         focusable={true}
-        isTVSelectable={true}
         nativeBackgroundAndroid={
           Object {
             "attribute": "selectableItemBackground",

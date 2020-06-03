@@ -6,7 +6,7 @@ If an authorized signer key is lost or compromised, the Locked Gold Account can 
 
 Because the Validator signer key is constantly in use to sign consensus messages, special care must be taken when authorizing a new Validator signer. The following steps detail the recommended procedure for rotating the validator signer of an active and elected validator:
 
-1. Create a new Validator instance as detailed in the [Deploy a Validator](../getting-started/running-a-validator-in-baklava.md#deploy-a-validator) section of the getting started documentation. When using a proxy, additionally create a new proxy and peer it with the new validator instance, as described in the same document. Wait for the new instances to sync before proceeding.
+1. Create a new Validator instance as detailed in the [Deploy a Validator](../../getting-started/running-a-validator-in-baklava.md#deploy-a-validator-machine) section of the getting started documentation. When using a proxy, additionally create a new proxy and peer it with the new validator instance, as described in the same document. Wait for the new instances to sync before proceeding.
 
   {% hint style="warning" %}
   Before proceeding to step 2 ensure there is sufficient time until the end of the epoch to complete key rotation.
@@ -17,13 +17,22 @@ Because the Validator signer key is constantly in use to sign consensus messages
   ```bash
   # With $SIGNER_TO_AUTHORIZE as the new validator signer:
 
-  # On the new validator node which contains the Locked Gold Account key
-  docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE --nousb account proof-of-possession $SIGNER_TO_AUTHORIZE $LOCKED_GOLD_ACCOUNT
-  docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE --nousb account proof-of-possession $SIGNER_TO_AUTHORIZE $LOCKED_GOLD_ACCOUNT --bls
-
-  # On a node containing your Locked Gold Account key.
-  celocli account:authorize --from $LOCKED_GOLD_ACCOUNT --role validator --signer $SIGNER_TO_AUTHORIZE --signature $SIGNER_PROOF_OF_POSSESSION --blsKey $BLS_PUBLIC_KEY --blsPop $BLS_PROOF_OF_POSSESSION
+  # On the new validator node which contains the new $SIGNER_TO_AUTHORIZE key
+  docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE --nousb account proof-of-possession $SIGNER_TO_AUTHORIZE $VALIDATOR_ACCOUNT_ADDRESS
+  docker run -v $PWD:/root/.celo --rm -it $CELO_IMAGE --nousb account proof-of-possession $SIGNER_TO_AUTHORIZE $VALIDATOR_ACCOUNT_ADDRESS --bls
   ```
+
+  1. If `VALIDATOR_ACCOUNT_ADDRESS` corresponds to a key you possess:
+    ```bash
+    # From a node with access to the key for VALIDATOR_ACCOUNT_ADDRESS
+    celocli account:authorize --from $VALIDATOR_ACCOUNT_ADDRESS --role validator --signer $SIGNER_TO_AUTHORIZE --signature 0x$SIGNER_PROOF_OF_POSSESSION --blsKey $BLS_PUBLIC_KEY --blsPop $BLS_PROOF_OF_POSSESSION
+    ```
+
+  2. If `VALIDATOR_ACCOUNT_ADDRESS` is a `ReleaseGold` contract:
+    ```bash
+    # From a node with access to the beneficiary key of VALIDATOR_ACCOUNT_ADDRESS
+    celocli releasegold:authorize --contract $VALIDATOR_ACCOUNT_ADDRESS --role validator --signer $SIGNER_TO_AUTHORIZE --signature 0x$SIGNER_PROOF_OF_POSSESSION --blsKey $BLS_PUBLIC_KEY --blsPop $BLS_PROOF_OF_POSSESSION
+    ```
 
 3. **Leave all validator and proxy nodes running** until the next epoch change. At the start the next epoch, the new Validator signer should take over participation in consensus.
 

@@ -15,6 +15,10 @@
 * [existingProvider](_providers_celo_provider_.celoprovider.md#existingprovider)
 * [wallet](_providers_celo_provider_.celoprovider.md#wallet)
 
+### Accessors
+
+* [connected](_providers_celo_provider_.celoprovider.md#connected)
+
 ### Methods
 
 * [addAccount](_providers_celo_provider_.celoprovider.md#addaccount)
@@ -22,6 +26,7 @@
 * [isLocalAccount](_providers_celo_provider_.celoprovider.md#islocalaccount)
 * [send](_providers_celo_provider_.celoprovider.md#send)
 * [stop](_providers_celo_provider_.celoprovider.md#stop)
+* [supportsSubscriptions](_providers_celo_provider_.celoprovider.md#supportssubscriptions)
 
 ## Constructors
 
@@ -36,7 +41,7 @@
 Name | Type | Default |
 ------ | ------ | ------ |
 `existingProvider` | provider | - |
-`wallet` | [Wallet](../interfaces/_wallets_wallet_.wallet.md) | new DefaultWallet() |
+`wallet` | [Wallet](../interfaces/_wallets_wallet_.wallet.md) | new LocalWallet() |
 
 **Returns:** *[CeloProvider](_providers_celo_provider_.celoprovider.md)*
 
@@ -56,13 +61,23 @@ ___
 
 *Defined in [contractkit/src/providers/celo-provider.ts:27](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/providers/celo-provider.ts#L27)*
 
+## Accessors
+
+###  connected
+
+• **get connected**(): *any*
+
+*Defined in [contractkit/src/providers/celo-provider.ts:229](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/providers/celo-provider.ts#L229)*
+
+**Returns:** *any*
+
 ## Methods
 
 ###  addAccount
 
 ▸ **addAccount**(`privateKey`: string): *void*
 
-*Defined in [contractkit/src/providers/celo-provider.ts:35](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/providers/celo-provider.ts#L35)*
+*Defined in [contractkit/src/providers/celo-provider.ts:37](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/providers/celo-provider.ts#L37)*
 
 **Parameters:**
 
@@ -78,7 +93,7 @@ ___
 
 ▸ **getAccounts**(): *Promise‹string[]›*
 
-*Defined in [contractkit/src/providers/celo-provider.ts:43](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/providers/celo-provider.ts#L43)*
+*Defined in [contractkit/src/providers/celo-provider.ts:45](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/providers/celo-provider.ts#L45)*
 
 **Returns:** *Promise‹string[]›*
 
@@ -88,7 +103,7 @@ ___
 
 ▸ **isLocalAccount**(`address?`: undefined | string): *boolean*
 
-*Defined in [contractkit/src/providers/celo-provider.ts:49](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/providers/celo-provider.ts#L49)*
+*Defined in [contractkit/src/providers/celo-provider.ts:51](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/providers/celo-provider.ts#L51)*
 
 **Parameters:**
 
@@ -104,7 +119,7 @@ ___
 
 ▸ **send**(`payload`: JsonRpcPayload, `callback`: Callback‹JsonRpcResponse›): *void*
 
-*Defined in [contractkit/src/providers/celo-provider.ts:56](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/providers/celo-provider.ts#L56)*
+*Defined in [contractkit/src/providers/celo-provider.ts:58](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/providers/celo-provider.ts#L58)*
 
 Send method as expected by web3.js
 
@@ -123,6 +138,16 @@ ___
 
 ▸ **stop**(): *void*
 
-*Defined in [contractkit/src/providers/celo-provider.ts:134](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/providers/celo-provider.ts#L134)*
+*Defined in [contractkit/src/providers/celo-provider.ts:136](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/providers/celo-provider.ts#L136)*
 
 **Returns:** *void*
+
+___
+
+###  supportsSubscriptions
+
+▸ **supportsSubscriptions**(): *any*
+
+*Defined in [contractkit/src/providers/celo-provider.ts:233](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/providers/celo-provider.ts#L233)*
+
+**Returns:** *any*

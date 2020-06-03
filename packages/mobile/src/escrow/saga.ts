@@ -21,22 +21,25 @@ import { calculateFee } from 'src/fees/saga'
 import { CURRENCY_ENUM, SHORT_CURRENCIES } from 'src/geth/consts'
 import i18n from 'src/i18n'
 import { Actions as IdentityActions, SetVerificationStatusAction } from 'src/identity/actions'
+import { addressToE164NumberSelector } from 'src/identity/reducer'
 import { NUM_ATTESTATIONS_REQUIRED, VerificationStatus } from 'src/identity/verification'
-import { Invitees } from 'src/invite/actions'
-import { inviteesSelector } from 'src/invite/reducer'
 import { TEMP_PW } from 'src/invite/saga'
 import { isValidPrivateKey } from 'src/invite/utils'
-import { navigate } from 'src/navigator/NavigationService'
-import { Screens } from 'src/navigator/Screens'
+import { navigateHome } from 'src/navigator/NavigationService'
 import { RootState } from 'src/redux/reducers'
 import { fetchDollarBalance } from 'src/stableToken/actions'
 import { getCurrencyAddress } from 'src/tokens/saga'
 import { addStandbyTransaction, generateStandbyTransactionId } from 'src/transactions/actions'
-import { TransactionStatus } from 'src/transactions/reducer'
 import { sendAndMonitorTransaction } from 'src/transactions/saga'
 import { sendTransaction } from 'src/transactions/send'
+import { TransactionStatus } from 'src/transactions/types'
 import Logger from 'src/utils/Logger'
-import { addLocalAccount, getContractKit } from 'src/web3/contracts'
+import {
+  addLocalAccount,
+  getContractKit,
+  getContractKitOutsideGenerator,
+  web3ForUtils,
+} from 'src/web3/contracts'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
 import { fornoSelector } from 'src/web3/selectors'
 import { estimateGas } from 'src/web3/utils'
@@ -49,7 +52,7 @@ function* transferStableTokenToEscrow(action: EscrowTransferPaymentAction) {
     const { phoneHash, amount, tempWalletAddress } = action
     const account: string = yield call(getConnectedUnlockedAccount)
 
-    const contractKit = getContractKit()
+    const contractKit = yield call(getContractKit)
 
     const stableToken: StableTokenWrapper = yield call([
       contractKit.contracts,
@@ -61,7 +64,7 @@ function* transferStableTokenToEscrow(action: EscrowTransferPaymentAction) {
     ])
 
     Logger.debug(TAG + '@transferToEscrow', 'Approving escrow transfer')
-    const convertedAmount = contractKit.web3.utils.toWei(amount.toString())
+    const convertedAmount = web3ForUtils.utils.toWei(amount.toString())
     const approvalTx = stableToken.approve(escrow.address, convertedAmount)
 
     yield call(sendTransaction, approvalTx.txo, account, TAG, 'approval')
@@ -110,7 +113,7 @@ function* withdrawFromEscrow() {
   try {
     Logger.debug(TAG + '@withdrawFromEscrow', 'Withdrawing escrowed payment')
 
-    const contractKit = getContractKit()
+    const contractKit = yield call(getContractKit)
 
     const escrow: EscrowWrapper = yield call([
       contractKit.contracts,
@@ -182,7 +185,7 @@ function* withdrawFromEscrow() {
 }
 
 async function createReclaimTransaction(paymentID: string) {
-  const contractKit = getContractKit()
+  const contractKit = await getContractKitOutsideGenerator()
 
   const escrow = await contractKit.contracts.getEscrow()
   return escrow.revoke(paymentID).txo
@@ -217,7 +220,7 @@ function* reclaimFromEscrow({ paymentID }: EscrowReclaimPaymentAction) {
     yield put(fetchDollarBalance())
     yield put(fetchSentEscrowPayments())
 
-    yield call(navigate, Screens.WalletHome)
+    yield call(navigateHome)
     yield put(reclaimEscrowPaymentSuccess())
   } catch (e) {
     Logger.error(TAG + '@reclaimFromEscrow', 'Error reclaiming payment from escrow', e)
@@ -247,7 +250,7 @@ function* doFetchSentPayments() {
   Logger.debug(TAG + '@doFetchSentPayments', 'Fetching valid sent escrowed payments')
 
   try {
-    const contractKit = getContractKit()
+    const contractKit = yield call(getContractKit)
 
     const escrow: EscrowWrapper = yield call([
       contractKit.contracts,
@@ -268,18 +271,19 @@ function* doFetchSentPayments() {
     const sentPaymentsRaw = yield all(
       sentPaymentIDs.map((paymentID) => call(getEscrowedPayment, escrow, paymentID))
     )
-    const tempAddresstoRecipientPhoneNumber: Invitees = yield select(inviteesSelector)
+
+    const addressToE164Number = yield select(addressToE164NumberSelector)
     const sentPayments: EscrowedPayment[] = []
     for (let i = 0; i < sentPaymentsRaw.length; i++) {
-      const id = sentPaymentIDs[i].toLowerCase()
-      const recipientPhoneNumber = tempAddresstoRecipientPhoneNumber[id]
+      const address = sentPaymentIDs[i].toLowerCase()
+      const recipientPhoneNumber = addressToE164Number[address]
       const payment = sentPaymentsRaw[i]
       if (!payment) {
         continue
       }
 
       const escrowPaymentWithRecipient: EscrowedPayment = {
-        paymentID: id,
+        paymentID: address,
         senderAddress: payment[1],
         recipientPhone: recipientPhoneNumber,
         currency: SHORT_CURRENCIES.DOLLAR, // Only dollars can be escrowed

@@ -23,7 +23,9 @@ export enum Actions {
   DISMISS_INVITE_FRIENDS = 'ACCOUNT/DISMISS_INVITE_FRIENDS',
   DISMISS_GET_VERIFIED = 'ACCOUNT/DISMISS_GET_VERIFIED',
   SET_USER_CONTACT_DETAILS = 'ACCOUNT/SET_USER_CONTACT_DETAILS',
-  SET_PROMPT_FORNO = 'GETH/SET_PROMPT_FORNO',
+  SET_PROMPT_FORNO = 'ACCOUNT/SET_PROMPT_FORNO',
+  SET_RETRY_VERIFICATION_WITH_FORNO = 'ACCOUNT/SET_RETRY_VERIFICATION_WITH_FORNO',
+  ACCEPT_TERMS = 'ACCOUNT/ACCEPT_TERMS',
 }
 
 export interface SetNameAction {
@@ -39,6 +41,10 @@ export interface SetPhoneNumberAction {
 
 export interface DevModeTriggerClickedAction {
   type: Actions.DEV_MODE_TRIGGER_CLICKED
+}
+
+export interface AcceptTermsAction {
+  type: Actions.ACCEPT_TERMS
 }
 
 export interface PhotosNUXClickedAction {
@@ -113,6 +119,11 @@ interface SetPromptFornoAction {
   promptIfNeeded: boolean
 }
 
+export interface SetRetryVerificationWithFornoAction {
+  type: Actions.SET_RETRY_VERIFICATION_WITH_FORNO
+  retry: boolean
+}
+
 export type ActionTypes =
   | SetNameAction
   | SetPhoneNumberAction
@@ -133,11 +144,18 @@ export type ActionTypes =
   | UpdateOutgoingPaymentRequestsAction
   | SetContactDetailsAction
   | SetPromptFornoAction
+  | SetRetryVerificationWithFornoAction
+  | AcceptTermsAction
 
 export function setName(name: string): SetNameAction {
   return {
     type: Actions.SET_NAME,
     name,
+  }
+}
+export function acceptTerms(): AcceptTermsAction {
+  return {
+    type: Actions.ACCEPT_TERMS,
   }
 }
 
@@ -222,6 +240,13 @@ export const dismissGetVerified = (): DismissGetVerifiedAction => ({
 export const setPromptForno = (promptIfNeeded: boolean): SetPromptFornoAction => ({
   type: Actions.SET_PROMPT_FORNO,
   promptIfNeeded,
+})
+
+export const setRetryVerificationWithForno = (
+  retry: boolean
+): SetRetryVerificationWithFornoAction => ({
+  type: Actions.SET_RETRY_VERIFICATION_WITH_FORNO,
+  retry,
 })
 
 export const setUserContactDetails = (

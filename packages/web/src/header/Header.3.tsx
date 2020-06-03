@@ -5,7 +5,7 @@ import { SingletonRouter as Router, withRouter } from 'next/router'
 import * as React from 'react'
 import { Dimensions, StyleSheet, View, ViewStyle } from 'react-native'
 import { styles as bannerStyle } from 'src/header/BlueBanner'
-import cssStyles from 'src/header/Header.3.scss'
+import Hamburger from 'src/header/Hamburger'
 import { I18nProps, withNamespaces } from 'src/i18n'
 import MediumLogo from 'src/icons/MediumLogo'
 import Octocat from 'src/icons/Octocat'
@@ -13,10 +13,10 @@ import { ScreenProps, ScreenSizes, withScreenSize } from 'src/layout/ScreenSize'
 import LogoDarkBg from 'src/logos/LogoDarkBg'
 import LogoLightBg from 'src/logos/LogoLightBg'
 import Button, { BTN } from 'src/shared/Button.3'
-import Footer from 'src/shared/Footer'
 import Hoverable from 'src/shared/Hoverable'
 import Link from 'src/shared/Link'
 import menu, { CeloLinks, MAIN_MENU } from 'src/shared/menu-items'
+import MobileMenu from 'src/shared/MobileMenu'
 import OvalCoin from 'src/shared/OvalCoin'
 import { HEADER_HEIGHT } from 'src/shared/Styles'
 import { colors } from 'src/styles'
@@ -27,11 +27,12 @@ const CookieConsent = dynamic(
 
 const menuItems = MAIN_MENU
 const DARK_PAGES = new Set([
-  menu.HOME.link,
   menu.BUILD.link,
   menu.ALLIANCE_COLLECTIVE.link,
   menu.DEVELOPERS.link,
   menu.VALIDATORS_LIST.link,
+  menu.VALIDATORS_LIST__BAKLAVA.link,
+  menu.VALIDATORS_LIST_BAKLAVASTAGING.link,
   CeloLinks.walletApp,
 ])
 
@@ -59,8 +60,6 @@ function scrollOffset() {
 function menuHidePoint() {
   return Dimensions.get('window').height - HEADER_HEIGHT - 1
 }
-
-const HAMBURGER_INNER = cssStyles['hamburger-inner']
 
 export class Header extends React.PureComponent<Props, State> {
   lastScrollOffset: number
@@ -179,7 +178,6 @@ export class Header extends React.PureComponent<Props, State> {
     const isDesktop = screen === ScreenSizes.DESKTOP
     const foreground = this.getForegroundColor()
     const background = this.state.menuFaded && isDesktop ? 'transparent' : this.getBackgroundColor()
-    const hamburger = this.state.mobileMenuActive ? colors.dark : foreground
     const isHomePage = this.props.router.pathname === menu.HOME.link
 
     return (
@@ -192,13 +190,6 @@ export class Header extends React.PureComponent<Props, State> {
           this.state.mobileMenuActive && styles.mobileMenuActive,
         ]}
       >
-        {/*
-        // @ts-ignore */}
-        <style global={true} jsx={true}>{`
-          .${HAMBURGER_INNER}, .${HAMBURGER_INNER}::before, .${HAMBURGER_INNER}::after {
-            background-color: ${hamburger} !important;
-          }
-        `}</style>
         {isHomePage && (
           <BlueBanner onVisibilityChange={this.toggleBanner} getHeight={this.setBannerHeight} />
         )}
@@ -288,7 +279,7 @@ export class Header extends React.PureComponent<Props, State> {
         {this.state.mobileMenuActive && (
           <View style={styles.menuActive}>
             <View style={styles.mobileOpenContainer}>
-              <Footer isVertical={true} currentPage={this.props.router.pathname} />
+              <MobileMenu currentPage={this.props.router.pathname} />
             </View>
           </View>
         )}
@@ -303,16 +294,11 @@ export class Header extends React.PureComponent<Props, State> {
                 },
             ]}
           >
-            <div
-              className={`${cssStyles.hamburger} ${cssStyles['hamburger--squeeze']} ${
-                this.state.mobileMenuActive ? cssStyles['is-active'] : ''
-              }`}
-              onClick={this.clickHamburger}
-            >
-              <div className={cssStyles['hamburger-box']}>
-                <div className={cssStyles['hamburger-inner']} />
-              </div>
-            </div>
+            <Hamburger
+              isOpen={this.state.mobileMenuActive}
+              onPress={this.clickHamburger}
+              color={this.getForegroundColor()}
+            />
           </View>
         )}
       </View>

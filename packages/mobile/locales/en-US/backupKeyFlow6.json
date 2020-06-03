@@ -1,54 +1,31 @@
 {
+  "headerTitle": "Account Key",
+  "introTitle": "Your Account Key",
+  "introBody": "Your Account Key is the most important part of your account.\n\nPlease find a private place to set up your key. It takes about five minutes.",
+  "introPrimaryAction": "Set Up Now",
+  "delayBackup": "Wait One Hour",
+  "postSetupTitle": "Your Account Key is Set Up",
+  "postSetupBody": "If you lose your Account Key, you will lose access to all of your Celo Dollars and Gold. Nobody, not even Celo, will be able to help you recover your account without your key. Store it in a safe place and do not share it.",
+  "postSetupCTA": "Learn about Account Keys",
   "getBackupKey": "Get Backup Key",
-  "getYourKey": "Get Your Key",
-  "viewBackupKey": "View Backup Key",
-  "setUpBackupKey": "Set Up Your Backup Key",
   "setUpSocialBackup": "Set Up Safeguards",
-  "viewSafeguards": "View Safeguards",
-  "failedFetchMnemonic": "Failed to fetch your Backup Key",
+  "failedFetchMnemonic": "Failed to fetch your Account Key",
   "backupAndRecovery": "Backup and Recovery",
-  "backupKey": "Backup Key",
+  "writeDownKey": "Write down your key",
+  "backupKey": "Account Key",
   "yourBackupKey": "Your Backup Key",
-  "delayBackup": "Dismiss for an hour",
   "backupKeyNotification": "Without a Backup Key, you may lose access to your wallet.",
-  "backupKeyIntro": {
-    "0":
-      "Your Backup Key is the one and only key to your Celo Wallet. With this key, you can access your funds anytime, anywhere.",
-    "1": "KEEP THIS KEY SAFE AND PRIVATE.",
-    "2": "Congrats, you’ve sucessfully retrieved your Backup Key! A reminder, ",
-    "3": "KEEP THIS KEY SAFE.",
-    "4": "For more security set up Safeguards for your wallet.",
-    "5":
-      "You’ve also set up Safeguards! You’ll be able to restore your account with the help of the two friends. ",
-    "6": "KEEP YOUR SAFEGUARDS SECRET",
-    "7": "Now, we'll set up your key so you, and only you, can access your funds anytime, anywhere."
-  },
-  "backupSkipText": {
-    "0": "Without a Backup Key, you can lose access to your wallet ",
-    "1": "forever."
-  },
-  "backupRecovery": "Share your Backup Key with only one other person who you completely trust.",
-  "securityTip": "If you lose your backup key, you will lose access to your Celo Dollars and Gold.",
   "backupKeySummary":
-    "Please write down your Backup Key. If your phone is stolen or lost, you will need the Backup Key to access your Celo Wallet.",
-  "bothBackupsDone": {
-    "0": "Congratulations!",
-    "1":
-      "You're all done! If you would like to review your recovery secrets, you can always return here later."
-  },
-  "dontLoseIt":
-    "Please do not lose this key. It is critical that you maintain this in a safe place, as this is the only way to unlock your wallet should you lose your phone.",
+    "Find a private place and write down your Account Key. Please store it somewhere safe. Do not save it in your phone.",
   "backupPrompt":
     "For the security of your funds, your account is frozen until you get your Backup Key",
   "copied": "Key copied to clipboard",
-  "savedConfirmation": "I have saved my Backup Key.",
-  "confirmBackupKey": "Confirm Your Backup Key",
-  "backupQuizInfo":
-    "Please verify your Backup Key by selecting the words below in the correct order.",
-  "backupQuizWordCount": "Word {{index}} of {{total}}",
-  "invalidBackupPhrase": "Invalid Backup Key",
+  "moreInfo": "More Info",
+  "savedConfirmation": "Yes, I have written down my key.",
+  "backupQuizWordCount": "What's the <0>{{ordinal}}</0> word of your Account Key?",
   "importBackupFailed": "Importing Wallet Failed",
-  "backupQuizFailed": "Incorrect Backup Key, please try again",
+  "backupQuizFailed": "The Account Key you entered is incorrect. Please try again.",
+  "invalidBackupPhrase": "Invalid Account Key",
   "backupComplete": {
     "header": "Backup Complete",
     "0": "Success!",
@@ -68,6 +45,12 @@
       "Share each phrase below with a friend. Be sure to send only one phrase to each person.",
     "confirmation": "I have sent each Safeguard phrase to a trusted friend.",
     "yourSafeguards": "Your Safeguards"
+  },
+  "cancelDialog": {
+    "title": "Finish setting up your Account Account Key",
+    "body": "Account Keys are extremely important. Without a key, you can lose access to your wallet forever.\nYou will be blocked from sending any transactions until you finish setting up your Account Key.",
+    "action": "Complete Now",
+    "secondary": "Set Up Later"
   },
   "backupPhrasePlaceholder":
     "horse leopard dog monkey shark tiger lemur whale squid wolf squirrel mouse lion elephant cat shrimp bear penguin deer turtle fox zebra goat giraffe"

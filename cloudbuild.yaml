@@ -50,6 +50,15 @@ steps:
   ]
   waitFor: ['-']
 
+- id: "docker:metadata-crawler"
+  name: gcr.io/kaniko-project/executor:v0.16.0
+  args: [
+    "--dockerfile=dockerfiles/metadata-crawler/Dockerfile",
+    "--cache=true",
+    "--destination=gcr.io/$PROJECT_ID/celo-monorepo:metadata-crawler-$COMMIT_SHA"
+  ]
+  waitFor: ['-']
+
 options:
  machineType: 'N1_HIGHCPU_8'
 

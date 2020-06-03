@@ -38,8 +38,8 @@ const DefaultConfig = {
   blockchainParameters: {
     gasForNonGoldCurrencies: 50000,
     minimumClientVersion: {
-      major: 0,
-      minor: 9,
+      major: 1,
+      minor: 0,
       patch: 0,
     },
     deploymentBlockGasLimit: 20000000,
@@ -52,21 +52,21 @@ const DefaultConfig = {
   downtimeSlasher: {
     reward: '10000000000000000000', // 10 cGLD
     penalty: '100000000000000000000', // 100 cGLD
-    // slashableDowntime: (12 * HOUR) / 5, // ~12 hours
+    // slashableDowntime: (8 * HOUR) / 5, // ~8 hours
     slashableDowntime: (12 * MINUTE) / 5, // ~12 hours
   },
   election: {
     minElectableValidators: '22',
     maxElectableValidators: '100',
-    maxVotesPerAccount: 100,
+    maxVotesPerAccount: 10,
     electabilityThreshold: 1 / 1000,
     frozen: false,
   },
   epochRewards: {
     targetVotingYieldParameters: {
-      initial: 0.00016, // (x + 1) ^ 365 = 1.06
+      initial: 0, // Change to (x + 1) ^ 365 = 1.06 once mainnet activated.
       max: 0.0005, // (x + 1) ^ 365 = 1.20
-      adjustmentFactor: 0, // Change to 1 / 3650 once mainnet activated
+      adjustmentFactor: 0, // Change to 1 / 3650 once mainnet activated.
     },
     rewardsMultiplierParameters: {
       max: 2,
@@ -80,7 +80,6 @@ const DefaultConfig = {
     targetVotingGoldFraction: 1 / 2,
     maxValidatorEpochPayment: '205479452054794520547', // (75,000 / 365) * 10 ^ 18
     communityRewardFraction: 1 / 4,
-    // TODO(asa): Must be set before RC1
     carbonOffsettingPartner: '0x0000000000000000000000000000000000000000',
     carbonOffsettingFraction: 1 / 1000,
     frozen: false,
@@ -93,7 +92,7 @@ const DefaultConfig = {
     frozen: false,
   },
   gasPriceMinimum: {
-    minimumFloor: 1000000000,
+    minimumFloor: 100000000,
     targetDensity: 1 / 2,
     adjustmentSpeed: 1 / 2,
   },
@@ -116,15 +115,20 @@ const DefaultConfig = {
     skipTransferOwnership: true,
   },
   governanceApproverMultiSig: {
-    // 2/4 multsig
+    // 3/9 multsig, with 5/9 to make multisig changes.
     signatories: [
-      '0x32830A3f65DF98aFCFA18bAd35009Aa51163D606',
-      '0x7c593219ad21e172c1fdc6bfdc359699fa428adb',
-      '0x31af68f73fb93815b3eB9a6FA76e63113De5f733',
-      '0x47fE4b9fFDB9712fC5793B1b5E86d96a4664cf02',
+      '0xBE0c3B35Ec3f759D9A67c4B7c539b0D5b52A4642',
+      '0xD6d48412dA0804CF88258bfDf5AaFcBe5FEd7ecC',
+      '0xFD74A4b05F12B9aB6020CB202aDE1BBa4Bc99aba',
+      '0x114a0f28f20a6cF1AD428C396f78248d0E76724e',
+      '0xC631Eb5dE231000f96F4973ca8516d487108b2BF',
+      '0xc85639289d4bbb5f90e380a0f4db6b77a2f777bf',
+      '0x92AD020Cde6A4e566770C603ae8315a9d7252740',
+      '0xba4862643d476acbc13276bd73daca7b27bf567c',
+      '0xe5bD469Ad2d2A160604e38ad123828B7754aa23b',
     ],
-    numRequiredConfirmations: 2,
-    numInternalRequiredConfirmations: 2,
+    numRequiredConfirmations: 3,
+    numInternalRequiredConfirmations: 5,
     useMultiSig: true,
   },
   lockedGold: {
@@ -140,20 +144,23 @@ const DefaultConfig = {
     predeployedProxyAddress: '0x000000000000000000000000000000000000ce10',
   },
   reserve: {
-    tobinTaxStalenessThreshold: HOUR, // 1 hour
-    tobinTax: toFixed(0.005).toFixed(), // 0.5%
-    tobinTaxReserveRatio: toFixed(2).toFixed(), // 2
+    tobinTaxStalenessThreshold: 100 * YEAR, // Tobin tax turned off to start
+    tobinTax: toFixed(0).toFixed(), // Tobin tax turned off to start
+    tobinTaxReserveRatio: toFixed(0).toFixed(), // Tobin tax turned off to start
     dailySpendingRatio: toFixed(0.05).toFixed(), // 5%
     spenders: [],
-    otherAddresses: ['0xd0a57D8acFe9979d33933d8A52971E6DC9E2DbF0'],
+    otherAddresses: [
+      '0x246f4599eFD3fA67AC44335Ed5e749E518Ffd8bB',
+      '0x298FbD6dad2Fc2cB56d7E37d8aCad8Bf07324f67',
+    ],
     assetAllocationSymbols: ['cGLD', 'BTC', 'ETH', 'DAI'],
     assetAllocationWeights: [0.5, 0.3, 0.15, 0.05],
   },
   reserveSpenderMultiSig: {
     // 2/2 multsig
     signatories: [
-      '0x49eFFA2ceF5FccA5540f421d6b28e76184cc0fDF',
-      '0x4550F1576fAC966Ac8b9F42e1D5D66D3A14dD8D3',
+      '0x21E7082D7b0Bc12BF65296CF859E09Fe529d366d',
+      '0xbf4D39e774F438B6f8B8d7e56f26Fd2409F6ACF2',
     ],
     numRequiredConfirmations: 2,
     numInternalRequiredConfirmations: 2,
@@ -166,65 +173,62 @@ const DefaultConfig = {
     inflationRate: 1,
     inflationPeriod: 1.5 * YEAR,
     initialBalances: {
-      addresses: [],
-      values: [],
+      addresses: ['0xc471776eA02705004C451959129bF09423B56526'],
+      values: ['5000000000000000000000000'],
     },
-    oracles: [],
-    frozen: false,
+    oracles: [
+      '0x0aee051be85ba9c7c1bc635fb76b52039341ab26',
+      '0xd3405621f6cdcd95519a79d37f91c78e7c79cefa',
+      '0xe037f31121f3a96c0cc49d0cf55b2f5d6deff19e',
+      '0x12bad172b47287a754048f0d294221a499d1690f',
+      '0xacad5b2913e21ccc073b80e431fec651cd8231c6',
+      '0xfe9925e6ae9c4cd50ae471b90766aaef37ad307e',
+      '0x641c6466dae2c0b1f1f4f9c547bc3f54f4744a1d',
+      '0x75becd8e400552bac29cbe0534d8c7d6cba49979',
+      '0x223ab67272891dd352194be61597042ecf9c272a',
+      '0xca9ae47493f763a7166ab8310686b197984964b4',
+      '0xB93Fe7906ea4221b3fbe23412D18Ab1B07FE2F71',
+      '0x8d25D74E43789079Ef3C6B965c3D22b63A1233aC',
+      '0xCD88Cc79342a7cFE78E91FAa173eC87704bDcA9a',
+      '0x5091110175318A2A8aF88309D1648c1D84d31B29',
+      '0xBBd6e54Af7A5722f42461C6313F37Bd50729F195',
+    ],
+    frozen: true,
   },
   transferWhitelist: {
+    // Whitelist genesis block addresses.
     addresses: [
-      '0x49eFFA2ceF5FccA5540f421d6b28e76184cc0fDF',
-      '0x4550F1576fAC966Ac8b9F42e1D5D66D3A14dD8D3',
-      '0xd0a57D8acFe9979d33933d8A52971E6DC9E2DbF0',
-      '0x36940810BfDB329B31e38d3e97aFD673081B497C',
-      '0xfCf982bb4015852e706100B14E21f947a5Bb718E',
-      '0xe90bB6dE0996D41cb0A843A06839EEf38c6E5456',
-      '0xbA8761304CEc7bE0f83C6F8Fa7EBBa3eE0b6Ae97',
-      '0xb566bB6D1850A345FA39EF38fefaC4E892348d51',
-      '0xDb39DBE5abE42466F122b24c44518b1089ef8fC8',
-      '0x671D520ae3E89Ea5383A5d7162bCed79FD25CdEe',
-      '0x469be98FE71AFf8F6e7f64F9b732e28A03596B5C',
-      '0x8f55CE88b4F62F22c663f5A539414dcCeF969c32',
-      '0xF607d4dd519B4bc963C9c48E8650E67C51DbC35b',
-      '0x515033209a0A29034DC3F037cC72a6014b902341',
-      '0x6E36F0D3cF12aa592FF88D03938584562c9239cA',
-      '0x0583BC2C09BA66e2f3a656f100d4c1F6ff502cb7',
-      '0x093e9756B8e53fb656615C8aFEC5A02bb07a7466',
-      '0x0DF3BdC3DacdDb111C8fee5202C12E0C7F7f8BCE',
-      '0x1794Ba1E0e8633199C82BB68F3De83e1356B2052',
-      '0x1a95c5B20b2E01b6108095a0135bDA395EB8D7E5',
-      '0x278ffF514F407a95904Bc44a1919B3Efab0c56B4',
-      '0x308B01FA9CB4926266adDfa8E482f56Fb8326e16',
-      '0x3398c769Ae877a1D9d8B9baAe369EBaeDB2eaC25',
-      '0x37C1D40495bce6e95b7139d3af4Cb34821fB6627',
-      '0x385BF28009c53DD819690A57C48C2944C46bC620',
-      '0x40d0e20402742dB53Cb1981BA12d66Db804CF1a2',
-      '0x4CB9ef592D2aA41D54Fd5698BCbB3b8B0524fae7',
-      '0x523EC2a0085A8Dfcf18AE640f59262e8Caa54A50',
-      '0x59375F9160276B8EFE3f15B207dC01451E3e1f21',
-      '0x5f03c997fe82ca4bF0B588c99bA2dAaeBe82DcE3',
-      '0x6797E630E3dae8B76A97803606b3630fAf374745',
-      '0x782FD27FB84eb0c115F96ea5D9b12CdaB4cf79ac',
-      '0x81250109ce510287f2C7c485bbfD90519b0e1633',
-      '0x86eF089baAA1E77fe61A30aFBABb7f89a11655FB',
-      '0x9fb8A270Fa10CD52f85628315efC53065eAd48b6',
-      '0xa11fcF0F8E0Be0A5Ad0181239D910C126E3Bfc2d',
-      '0xa554718a49dF008434f447dE61799168617883Ec',
-      '0xa9FF8E054DD575aa8FDf960f6a5108b685469D56',
-      '0xac510cA27793E987Eb72ca6e44B5cf42E694710B',
-      '0xB31056Aa58f6E7775Fa991f321C181F3aF333D42',
-      '0xC0E14BDD2244e595BbF415Bb7011a44b39192c49',
-      '0xCE7dfcA4dB4Cf970b4Bd8FDbA33754e09C51cC98',
-      '0xCEa3eF8e187490A9d85A1849D98412E5D27D1Bb3',
-      '0xd25811D3c30D8c16837Fd192b5Ff29eAeBc9Ebd9',
-      '0xD6561EcE2D9f844a4beBf3D3606457612B9fF60b',
-      '0xe0F3feEAac44ac55954FEF3f1DA3c3A7e71539F5',
-      '0xeA4252D285Ca6c74EeC1Fb5B5735C1E522A9414B',
-      '0xF3C3e5C13d2ed106F17293D1DA6EFCbb4E50A7A1',
-      '0xF4314cb9046bECe6AA54bb9533155434d0c76909',
-      '0xf8CD95dEa7Bb63cC094f2BD12e5080B7A1408f4F',
-      '0xFcC245C3b20A1f9176417b120062eE2E9B656f9c',
+      '0x11901cf7eEae1E2644995FB2E47Ce46bC7F33246',
+      '0xC1cDA18694F5B86cFB80c1B4f8Cc046B0d7E6326',
+      '0xa5d40D93b01AfBafec84E20018Aff427628F645E',
+      '0x8d485780E84E23437f8F6938D96B964645529127',
+      '0x5F857c501b73ddFA804234f1f1418D6f75554076',
+      '0xaa9064F57F8d7de4b3e08c35561E21Afd6341390',
+      '0x7FA26b50b3e9a2eC8AD1850a4c4FBBF94D806E95',
+      '0x08960Ce6b58BE32FBc6aC1489d04364B4f7dC216',
+      '0x77B68B2e7091D4F242a8Af89F200Af941433C6d8',
+      '0x75Bb69C002C43f5a26a2A620518775795Fd45ecf',
+      '0x19992AE48914a178Bf138665CffDD8CD79b99513',
+      '0xE23a4c6615669526Ab58E9c37088bee4eD2b2dEE',
+      '0xDe22679dCA843B424FD0BBd70A22D5F5a4B94fe4',
+      '0x743D80810fe10c5C3346D2940997cC9647035B13',
+      '0x8e1c4355307F1A59E7eD4Ae057c51368b9338C38',
+      '0x417fe63186C388812e342c85FF87187Dc584C630',
+      '0xF5720c180a6Fa14ECcE82FB1bB060A39E93A263c',
+      '0xB80d1e7F9CEbe4b5E1B1Acf037d3a44871105041',
+      '0xf8ed78A113cD2a34dF451Ba3D540FFAE66829AA0',
+      '0x9033ff75af27222c8f36a148800c7331581933F3',
+      '0x8A07541C2eF161F4e3f8de7c7894718dA26626B2',
+      '0xB2fe7AFe178335CEc3564d7671EEbD7634C626B0',
+      '0xc471776eA02705004C451959129bF09423B56526',
+      '0xeF283eca68DE87E051D427b4be152A7403110647',
+      '0x7cf091C954ed7E9304452d31fd59999505Ddcb7a',
+      '0xa5d2944C32a8D7b284fF0b84c20fDcc46937Cf64',
+      '0xFC89C17525f08F2Bc9bA8cb77BcF05055B1F7059',
+      '0x3Fa7C646599F3174380BD9a7B6efCde90b5d129d',
+      '0x989e1a3B344A43911e02cCC609D469fbc15AB1F1',
+      '0xAe1d640648009DbE0Aa4485d3BfBB68C37710924',
+      '0x1B6C64779F42BA6B54C853Ab70171aCd81b072F7',
     ],
     registryIds: [
       web3.utils.soliditySha3(CeloContractName.Governance),
@@ -288,7 +292,8 @@ const NetworkConfigs = {
     },
     reserve: {
       initialBalance: 100000000,
-      otherAddresses: ['0x7457d5E02197480Db681D3fdF256c7acA21bDc12'], // Add an arbitrary "otherReserveAddress" so that reserve spending can be tested.
+      // Add an arbitrary "otherReserveAddress" so that reserve spending can be tested.
+      otherAddresses: ['0x7457d5E02197480Db681D3fdF256c7acA21bDc12'],
     },
     reserveSpenderMultiSig: {
       signatories: [network.from],

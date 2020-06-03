@@ -9,7 +9,7 @@ import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import BigNumber from 'bignumber.js'
 import chalk from 'chalk'
 import { BaseCommand } from '../base'
-import { printValueMap } from './cli'
+import { printValueMapRecursive } from './cli'
 
 export interface CommandCheck {
   name: string
@@ -91,10 +91,12 @@ class CheckBuilder {
     }
   }
 
-  withGovernance<A>(f: (accounts: GovernanceWrapper) => A): () => Promise<Resolve<A>> {
+  withGovernance<A>(
+    f: (governance: GovernanceWrapper, signer: Address, account: Address, ctx: CheckBuilder) => A
+  ): () => Promise<Resolve<A>> {
     return async () => {
       const governance = await this.kit.contracts.getGovernance()
-      return f(governance) as Resolve<A>
+      return f(governance, '', '', this) as Resolve<A>
     }
   }
 
@@ -133,8 +135,8 @@ class CheckBuilder {
       this.withGovernance(async (g) => {
         const match = (await g.getProposalStage(proposalID)) === stage
         if (!match) {
-          const waitTimes = await g.timeUntilStages(proposalID)
-          printValueMap({ waitTimes })
+          const timeUntilStages = await g.timeUntilStages(proposalID)
+          printValueMapRecursive({ timeUntilStages })
         }
         return match
       })
@@ -148,13 +150,13 @@ class CheckBuilder {
 
   hotfixIsPassing = (hash: Buffer) =>
     this.addCheck(
-      `Hotfix ${hash} is whitelisted by quorum of validators`,
+      `Hotfix 0x${hash.toString('hex')} is whitelisted by quorum of validators`,
       this.withGovernance((g) => g.isHotfixPassing(hash))
     )
 
   hotfixNotExecuted = (hash: Buffer) =>
     this.addCheck(
-      `Hotfix ${hash} is not already executed`,
+      `Hotfix 0x${hash.toString('hex')} is not already executed`,
       this.withGovernance(async (g) => !(await g.getHotfixRecord(hash)).executed)
     )
 
@@ -299,6 +301,12 @@ class CheckBuilder {
       this.withGovernance(async (g) => deposit.gte(await g.minDeposit()))
     )
 
+  hasRefundedDeposits = (account: Address) =>
+    this.addCheck(
+      `${account} has refunded governance deposits`,
+      this.withGovernance(async (g) => !(await g.getRefundedDeposits(account)).isZero())
+    )
+
   hasEnoughLockedGold = (value: BigNumber) => {
     const valueInEth = this.kit.web3.utils.fromWei(value.toFixed(), 'ether')
     return this.addCheck(
@@ -323,11 +331,14 @@ class CheckBuilder {
     const valueInEth = this.kit.web3.utils.fromWei(value.toFixed(), 'ether')
     return this.addCheck(
       `Account has at least ${valueInEth} non-voting Locked Gold over requirement`,
-      this.withLockedGold(async (l, _signer, account, v) =>
-        value
-          .plus(await v.getAccountLockedGoldRequirement(account))
-          .isLessThanOrEqualTo(await l.getAccountNonvotingLockedGold(account))
-      )
+      this.withLockedGold(async (l, _signer, account, v) => {
+        const requirement = await v.getAccountLockedGoldRequirement(account)
+        return (
+          (requirement.eq(0) ||
+            value.plus(requirement).lte(await l.getAccountTotalLockedGold(account))) &&
+          value.lte(await l.getAccountNonvotingLockedGold(account))
+        )
+      })
     )
   }
 

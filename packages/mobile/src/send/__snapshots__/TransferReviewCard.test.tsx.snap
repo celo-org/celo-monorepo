@@ -27,10 +27,7 @@ exports[`TransferReviewCard renders correctly for invite review 1`] = `
             "flexDirection": "row",
             "justifyContent": "center",
           },
-          Object {
-            "alignSelf": "center",
-            "margin": "auto",
-          },
+          undefined,
         ]
       }
     >
@@ -50,25 +47,22 @@ exports[`TransferReviewCard renders correctly for invite review 1`] = `
           ]
         }
       >
-        <Image
-          source={
-            Object {
-              "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
-            }
-          }
+        <Text
           style={
             Array [
               Object {
-                "alignSelf": "center",
-                "margin": "auto",
+                "color": "#FFFFFF",
+                "fontFamily": "Inter-Medium",
+                "fontSize": 16,
               },
               Object {
-                "height": 40,
-                "width": 40,
+                "fontSize": 20,
               },
             ]
           }
-        />
+        >
+          W
+        </Text>
       </View>
     </View>
     <Text
@@ -385,7 +379,6 @@ exports[`TransferReviewCard renders correctly for invite review 1`] = `
               "top": 10,
             }
           }
-          isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackgroundBorderless",
@@ -633,10 +626,7 @@ exports[`TransferReviewCard renders correctly for pay request review 1`] = `
             "flexDirection": "row",
             "justifyContent": "center",
           },
-          Object {
-            "alignSelf": "center",
-            "margin": "auto",
-          },
+          undefined,
         ]
       }
     >
@@ -656,25 +646,22 @@ exports[`TransferReviewCard renders correctly for pay request review 1`] = `
           ]
         }
       >
-        <Image
-          source={
-            Object {
-              "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
-            }
-          }
+        <Text
           style={
             Array [
               Object {
-                "alignSelf": "center",
-                "margin": "auto",
+                "color": "#FFFFFF",
+                "fontFamily": "Inter-Medium",
+                "fontSize": 16,
               },
               Object {
-                "height": 40,
-                "width": 40,
+                "fontSize": 20,
               },
             ]
           }
-        />
+        >
+          M
+        </Text>
       </View>
     </View>
     <Text
@@ -701,10 +688,7 @@ exports[`TransferReviewCard renders correctly for pay request review 1`] = `
     <View
       style={
         Object {
-          "alignItems": "center",
-          "alignSelf": "center",
           "flexDirection": "row",
-          "justifyContent": "center",
         }
       }
     >
@@ -713,35 +697,36 @@ exports[`TransferReviewCard renders correctly for pay request review 1`] = `
           Array [
             Object {
               "color": "#2E3338",
-              "fontFamily": "Hind-Light",
-              "fontSize": 14,
-              "textAlignVertical": "center",
+              "fontFamily": "Inter-Regular",
+              "fontSize": 16,
+              "lineHeight": 22,
             },
             Object {
               "alignItems": "center",
-              "backgroundColor": "#EEEEEE",
-              "borderRadius": 3,
               "justifyContent": "center",
-              "marginRight": 5,
-              "paddingLeft": 6,
-              "paddingRight": 3,
+              "marginRight": 4,
             },
           ]
         }
       >
-        🇺🇸 +1
+        🇺🇸
       </Text>
       <Text
         style={
-          Object {
-            "color": "#2E3338",
-            "fontFamily": "Hind-Light",
-            "fontSize": 14,
-            "textAlignVertical": "center",
-          }
+          Array [
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Inter-Regular",
+              "fontSize": 16,
+              "lineHeight": 22,
+            },
+            Object {
+              "color": "#9CA4A9",
+            },
+          ]
         }
       >
-        (415) 555-0000
+        +1 (415) 555-0000
       </Text>
     </View>
   </View>
@@ -946,7 +931,6 @@ exports[`TransferReviewCard renders correctly for pay request review 1`] = `
               "top": 10,
             }
           }
-          isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackgroundBorderless",
@@ -1194,10 +1178,7 @@ exports[`TransferReviewCard renders correctly for send review 1`] = `
             "flexDirection": "row",
             "justifyContent": "center",
           },
-          Object {
-            "alignSelf": "center",
-            "margin": "auto",
-          },
+          undefined,
         ]
       }
     >
@@ -1217,25 +1198,22 @@ exports[`TransferReviewCard renders correctly for send review 1`] = `
           ]
         }
       >
-        <Image
-          source={
-            Object {
-              "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
-            }
-          }
+        <Text
           style={
             Array [
               Object {
-                "alignSelf": "center",
-                "margin": "auto",
+                "color": "#FFFFFF",
+                "fontFamily": "Inter-Medium",
+                "fontSize": 16,
               },
               Object {
-                "height": 40,
-                "width": 40,
+                "fontSize": 20,
               },
             ]
           }
-        />
+        >
+          W
+        </Text>
       </View>
     </View>
     <Text
@@ -1485,7 +1463,6 @@ exports[`TransferReviewCard renders correctly for send review 1`] = `
               "top": 10,
             }
           }
-          isTVSelectable={true}
           nativeBackgroundAndroid={
             Object {
               "attribute": "selectableItemBackgroundBorderless",

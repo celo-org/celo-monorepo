@@ -5,6 +5,7 @@ import {
   pubToAddress,
   toChecksumAddress,
 } from 'ethereumjs-util'
+import * as Web3Utils from 'web3-utils'
 
 const HEX_REGEX = /^0x[0-9A-F]*$/i
 
@@ -20,9 +21,16 @@ export const trimLeading0x = (input: string) => (input.startsWith('0x') ? input.
 
 export const ensureLeading0x = (input: string) => (input.startsWith('0x') ? input : `0x${input}`)
 
-export const isHexString = (imput: string) => HEX_REGEX.test(imput)
+// Turns '0xce10ce10ce10ce10ce10ce10ce10ce10ce10ce10'
+// into ['ce10','ce10','ce10','ce10','ce10','ce10','ce10','ce10','ce10','ce10']
+export const getAddressChunks = (input: string): string[] =>
+  trimLeading0x(input).match(/.{1,4}/g) || []
+
+export const isHexString = (input: string) => HEX_REGEX.test(input)
 
 export const hexToBuffer = (input: string) => Buffer.from(trimLeading0x(input), 'hex')
+
+export const bufferToHex = (buf: Buffer) => ensureLeading0x(buf.toString('hex'))
 
 export const privateKeyToAddress = (privateKey: string) =>
   toChecksumAddress(ensureLeading0x(privateToAddress(hexToBuffer(privateKey)).toString('hex')))
@@ -36,7 +44,9 @@ export const publicKeyToAddress = (publicKey: string) =>
 export const isValidPrivateKey = (privateKey: string) =>
   privateKey.startsWith('0x') && isValidPrivate(hexToBuffer(privateKey))
 
-export { isValidAddress, isValidChecksumAddress, toChecksumAddress } from 'ethereumjs-util'
+export { isValidChecksumAddress, toChecksumAddress } from 'ethereumjs-util'
+
+export const isValidAddress = (input: string): boolean => Web3Utils.isAddress(input)
 
 export const NULL_ADDRESS = '0x0000000000000000000000000000000000000000'
 

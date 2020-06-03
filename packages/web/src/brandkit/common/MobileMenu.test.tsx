@@ -1,9 +1,9 @@
 import { getByTitle, render } from '@testing-library/react'
 import * as React from 'react'
 import { onPress } from 'src/_page-tests/test-utils'
-import MobileMenu from './MobileMenu'
+import MobileMenu from 'src/brandkit/common/MobileMenu'
 
-describe(MobileMenu, () => {
+describe('Brandkit MobileMenu', () => {
   describe('when pressed', () => {
     it('shifts from open to closed', () => {
       const { getByTestId } = render(

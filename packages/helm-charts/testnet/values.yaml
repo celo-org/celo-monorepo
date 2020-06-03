@@ -13,45 +13,28 @@ bootnode:
     repository: us.gcr.io/celo-testnet/geth-all
     tag: fc254b550a4993956ac7aa3fcd8dd4db63b8c9d2
 
+celotool:
+  image:
+    repository: gcr.io/celo-testnet/celo-monorepo
+    tag: celotool-dc5e5dfa07231a4ff4664816a95eae606293eae9
+
+genesis:
+  networkId: 1110
+  network: testnet
+  useGenesisFileBase64: true
+  genesisFileBase64: ""
+
 geth:
   image:
     repository: us.gcr.io/celo-testnet/geth
     tag: fc254b550a4993956ac7aa3fcd8dd4db63b8c9d2
-  tx:
-    # transaction nodes
-    replicaCount: 1
-    service:
-      type: LoadBalancer
-  miner:
-    # miner nodes
-    replicaCount: 1
-    service:
-      type: ClusterIP
-  genesis:
-    # geth genesis block
-    difficulty: '0x0400'
-    gasLimit: '0x8000000'
-    networkId: 1101
-  account:
-    gethtx1:
-      nodeKey: 7034905448d5f8d90dd15acdf4c36652d705ff6d1a70af8265ced1f7f201ee27
-      nodeId: 1182aa8c9dbb96cd1aa71b74e2b6b481085971e08b210bab3b64c39d54876d4b1370f3f2c3cc3c0f52806a0e5772aa3fe937b4ceda8b97c5bf647a34170555e4
-    gethtx2:
-      nodeKey: b21502da328692d956a9e2e23665ce21782f635e32d499ad278a11bc66a3164e
-      nodeId: b1d8deee4e5f4faf9b7e8e7fbd5e19545632d9023ff10de55e2e7a37464c52d1d6fb3ac8cb011757558b37309b83d915de19ef86eb27fe13209cc02d0098ee1f
-    gethtx3:
-      nodeKey: 50e26f1571fd17f0ba4d314e2757d752421c18eb88a8404191dddb868790c2a6
-      nodeId: 7f8b950b57ef0189637375e1aab3c6cc089501063089242ccdfb3982045025feeb64fdf343b08f2534372f5d636fa6804150c14e40bc2d395057a834c6be3932
-    gethtx4:
-      nodeKey: 99bdd1b54289864505a622a6cc946b281d1cb7ff9ff0171130f4f13477c8b63f
-      nodeId: bdfd59ddf34656cf8e0076367517281b68816b2a241f154f58c6178ce9d59e3031d294f406dd7799b9f3b5425e5ab592700a81f8a59918a5e209a8826204f40f
-    gethblockscouttx:
-      nodeKey: 30e1a9d386eb6e8bd78207e2b8231fc59c63b2fd15726957d3348462de2e3205
-
-monorepo:
-  image:
-    repository: gcr.io/celo-testnet/celo-monorepo
-    tag: df0efafe7732b15bb62bad5fb769f33218fdf1fc
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "500m"
+    limits:
+      memory: "2Gi"
+      cpu: "4"
 
 gethexporter:
   image:
@@ -63,11 +46,6 @@ promtosd:
     repository: gcr.io/google-containers/prometheus-to-sd
     tag: v0.3.2
   port: 6060
-
-blockchain_backup:
-  image:
-    repository: celohq/gcloud-kubectl
-    tag: latest
 
 blockscout:
   image:

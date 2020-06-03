@@ -3,7 +3,6 @@ import { connect } from 'react-redux'
 import { photosNUXCompleted } from 'src/account/actions'
 import Education from 'src/account/Education'
 import { CustomEventNames } from 'src/analytics/constants'
-import { componentWithAnalytics } from 'src/analytics/wrapper'
 import { addressBook, bigPhoneAvatar, cameraUpload } from 'src/images/Images'
 import { navigateHome } from 'src/navigator/NavigationService'
 
@@ -47,6 +46,4 @@ export class PhotosEducation extends React.Component<Props> {
   }
 }
 
-export default componentWithAnalytics(
-  connect<{}, DispatchProps>(null, { photosNUXCompleted })(PhotosEducation)
-)
+export default connect<{}, DispatchProps>(null, { photosNUXCompleted })(PhotosEducation)

@@ -12,6 +12,7 @@ export enum Actions {
   COMPLETE_WEB3_SYNC = 'WEB3/COMPLETE_WEB3_SYNC',
   REQUEST_SYNC_PROGRESS = 'WEB3/REQUEST_SYNC_PROGRESS',
   UPDATE_WEB3_SYNC_PROGRESS = 'WEB3/UPDATE_WEB3_SYNC_PROGRESS',
+  SET_CONTRACT_KIT_READY = 'WEB3/SET_CONTRACT_KIT_READY',
 }
 
 export interface SetAccountAction {
@@ -53,6 +54,11 @@ export interface UpdateWeb3SyncProgressAction {
   }
 }
 
+export interface SetContractKitReadyAction {
+  type: Actions.SET_CONTRACT_KIT_READY
+  ready: boolean
+}
+
 export type ActionTypes =
   | SetAccountAction
   | SetAccountInWeb3KeystoreAction
@@ -61,6 +67,7 @@ export type ActionTypes =
   | SetCommentKeyAction
   | CompleteWeb3SyncAction
   | UpdateWeb3SyncProgressAction
+  | SetContractKitReadyAction
 
 export const setAccount = (address: string): SetAccountAction => {
   CeloAnalytics.track(DefaultEventNames.accountSet)
@@ -90,6 +97,14 @@ export const setFornoMode = (fornoMode: boolean): SetIsFornoAction => {
     fornoMode,
   }
 }
+
+export const setContractKitReady = (ready: boolean): SetContractKitReadyAction => {
+  return {
+    type: Actions.SET_CONTRACT_KIT_READY,
+    ready,
+  }
+}
+
 export const setPrivateCommentKey = (commentKey: string): SetCommentKeyAction => {
   return {
     type: Actions.SET_COMMENT_KEY,

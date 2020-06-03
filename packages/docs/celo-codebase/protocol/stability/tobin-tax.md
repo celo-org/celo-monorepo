@@ -1,11 +1,5 @@
 # Tobin Tax
 
-If the Celo reserve becomes under-collateralized, a small tax is levied on Celo Gold transfers. This fee is transferred to the `Reserve` smart contract. There is no gas charged for this transfer. This fee is currently set to `0.5%`, and is governable.
+If the Celo reserve ratio falls below `tobinTaxReserveRatio`, a small fee is levied on Celo Gold transfers to discourage further depletion of Celo Gold collateral. This fee is transferred to the `Reserve` smart contract. There is no gas charged for this transfer. The `tobinTaxReserveRatio` and the `tobinTax` are initially set to `200%` and `0.5%` respectively and are governable.
 
-The reserve is considered collateralized if its holding of Celo Gold are greater than or equal to the value \(in Celo Gold\) of the Celo Dollar supply, i.e.:
-
-```
-ReserveBalance >= CeloDollarSupply * ExchangeRate
-```
-
-where `ExchangeRate` comes from the [price oracle](oracles.md) in the `SortedOracles` smart contract.
+The total Celo reserve value, expressed in Celo Gold units, is approximated on-chain by dividing the reserve Celo Gold balance by the Celo Gold target asset allocation weight. The Celo reserve ratio is then computed by dividing the total reserve value by the value of Celo Dollar supply expressed in Celo Gold units.

@@ -6,6 +6,8 @@ import { StableTokenWrapper } from '@celo/contractkit/lib/wrappers/StableTokenWr
 import BigNumber from 'bignumber.js'
 import { all, call, put, select, spawn, takeEvery, takeLatest } from 'redux-saga/effects'
 import { showError } from 'src/alert/actions'
+import CeloAnalytics from 'src/analytics/CeloAnalytics'
+import { CustomEventNames } from 'src/analytics/constants'
 import { TokenTransactionType } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import {
@@ -18,15 +20,17 @@ import {
 } from 'src/exchange/actions'
 import { ExchangeRatePair, exchangeRatePairSelector } from 'src/exchange/reducer'
 import { CURRENCY_ENUM } from 'src/geth/consts'
+import { navigate } from 'src/navigator/NavigationService'
+import { Screens } from 'src/navigator/Screens'
 import { convertToContractDecimals } from 'src/tokens/saga'
 import {
   addStandbyTransaction,
   generateStandbyTransactionId,
   removeStandbyTransaction,
 } from 'src/transactions/actions'
-import { TransactionStatus } from 'src/transactions/reducer'
 import { sendAndMonitorTransaction } from 'src/transactions/saga'
 import { sendTransaction } from 'src/transactions/send'
+import { TransactionStatus } from 'src/transactions/types'
 import { getRateForMakerToken, getTakerAmount } from 'src/utils/currencyExchange'
 import { roundDown } from 'src/utils/formatting'
 import Logger from 'src/utils/Logger'
@@ -46,7 +50,7 @@ export function* doFetchTobinTax({ makerAmount, makerToken }: FetchTobinTaxActio
     if (makerToken === CURRENCY_ENUM.GOLD) {
       yield call(getConnectedAccount)
 
-      const contractKit = getContractKit()
+      const contractKit = yield call(getContractKit)
       const reserve: ReserveWrapper = yield call([
         contractKit.contracts,
         contractKit.contracts.getReserve,
@@ -104,7 +108,7 @@ export function* doFetchExchangeRate(action: FetchExchangeRateAction) {
         ? makerAmountInWei
         : LARGE_DOLLARS_SELL_AMOUNT_IN_WEI
 
-    const contractKit = getContractKit()
+    const contractKit = yield call(getContractKit)
 
     const exchange: ExchangeWrapper = yield call([
       contractKit.contracts,
@@ -146,6 +150,7 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
   Logger.debug(TAG, `Exchanging ${makerAmount.toString()} of token ${makerToken}`)
   let txId: string | null = null
   try {
+    navigate(Screens.ExchangeHomeScreen) // Must navigate to final screen before getting unlocked account which prompts pin
     const account: string = yield call(getConnectedUnlockedAccount)
     const exchangeRatePair: ExchangeRatePair = yield select(exchangeRatePairSelector)
     const exchangeRate = getRateForMakerToken(exchangeRatePair, makerToken)
@@ -160,7 +165,7 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
 
     txId = yield createStandbyTx(makerToken, makerAmount, exchangeRate, account)
 
-    const contractKit = getContractKit()
+    const contractKit = yield call(getContractKit)
 
     const goldTokenContract: GoldTokenWrapper = yield call([
       contractKit.contracts,
@@ -261,6 +266,14 @@ export function* exchangeGoldAndStableTokens(action: ExchangeTokensAction) {
     yield call(sendAndMonitorTransaction, txId, tx, account)
   } catch (error) {
     Logger.error(TAG, 'Error doing exchange', error)
+    const isDollarToGold = makerToken === CURRENCY_ENUM.DOLLAR
+
+    CeloAnalytics.track(
+      isDollarToGold ? CustomEventNames.gold_buy_error : CustomEventNames.gold_sell_error,
+      {
+        error,
+      }
+    )
     if (txId) {
       yield put(removeStandbyTransaction(txId))
     }
@@ -305,7 +318,6 @@ export function* watchFetchExchangeRate() {
 }
 
 export function* watchExchangeTokens() {
-  // @ts-ignore saga doesn't seem to understand the action with multiple params?
   yield takeEvery(Actions.EXCHANGE_TOKENS, exchangeGoldAndStableTokens)
 }
 

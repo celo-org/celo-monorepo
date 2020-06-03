@@ -45,10 +45,14 @@ interface WipeProps {
 }
 
 const Wipe = React.memo(function _Wipe({ text }: WipeProps) {
+  const { isMobile } = useScreenSize()
   return (
     <View>
       <View key={`hide-${text}`} style={[styles.mask, styles.hide]} />
-      <Text key={text} style={[fonts.legal, textStyles.italic, styles.textFadeIn]}>
+      <Text
+        key={text}
+        style={[fonts.legal, isMobile && textStyles.center, textStyles.italic, styles.textFadeIn]}
+      >
         "{text}"
       </Text>
       <View key={`reveal-${text}`} style={[styles.mask, styles.reveal]} />
@@ -118,5 +122,6 @@ const styles = StyleSheet.create({
   },
   container: {
     marginBottom: 20,
+    overflow: 'hidden',
   },
 })

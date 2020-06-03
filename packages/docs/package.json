@@ -13,12 +13,15 @@
     "gitbook-plugin-theme-default": "^1.0.7"
   },
   "devDependencies": {
-    "gitbook-cli": "^2.3.2"
+    "gitbook-cli": "^2.3.2",
+    "remark-cli": "^8.0.0",
+    "remark-validate-links": "^10.0.0"
   },
   "scripts": {
     "build": "gitbook install && gitbook build",
+    "lint": "remark -qf -u validate-links --ignore-pattern developer-resources/contractkit/reference --ignore-pattern _book .",
     "preview": "gitbook install && gitbook serve"
   },
   "author": "",
-  "license": "ISC"
+  "license": "Apache-2.0"
 }
