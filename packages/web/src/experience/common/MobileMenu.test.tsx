@@ -1,7 +1,7 @@
 import { getByTitle, render } from '@testing-library/react'
 import * as React from 'react'
-import MobileMenu from 'src/experience/common/MobileMenu'
 import { onPress } from 'src/_page-tests/test-utils'
+import MobileMenu from 'src/experience/common/MobileMenu'
 
 describe('Brandkit MobileMenu', () => {
   describe('when pressed', () => {

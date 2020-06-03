@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { StyleSheet, View, StyleProp, ViewStyle } from 'react-native'
+import { StyleProp, StyleSheet, View, ViewStyle } from 'react-native'
 import Button, { BTN } from 'src/shared/Button.3'
 import OvalCoin from 'src/shared/OvalCoin'
 import { colors, textStyles } from 'src/styles'

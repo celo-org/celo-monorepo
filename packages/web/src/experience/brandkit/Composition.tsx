@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Image, StyleSheet, Text, View } from 'react-native'
-import exampleImage from 'src/experience/brandkit/images/aroundPhone.png'
 import Page, { COMPOSITION_PATH } from 'src/experience/brandkit/common/Page'
+import exampleImage from 'src/experience/brandkit/images/aroundPhone.png'
 import { brandStyles } from 'src/experience/common/constants'
 import PageHeadline from 'src/experience/common/PageHeadline'
 import { H2, H4 } from 'src/fonts/Fonts'

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useAsync } from 'react-async-hook'
 import { Image, StyleSheet, Text, View } from 'react-native'
-import { Types, trackDownload } from 'src/experience/eventkit/tracking'
+import { trackDownload, Types } from 'src/experience/eventkit/tracking'
 import External from 'src/icons/External'
 import AspectRatio from 'src/shared/AspectRatio'
 import { colors, fonts, standardStyles } from 'src/styles'
