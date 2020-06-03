@@ -42,7 +42,7 @@ function getDisplayName({ name, recipient, e164Number, address, t }: Props) {
   return t('global:unknown')
 }
 
-function getE164Number(e164Number?: string, recipient?: Recipient) {
+export function getE164Number(e164Number?: string, recipient?: Recipient) {
   return e164Number || (recipient && recipient.e164PhoneNumber)
 }
 

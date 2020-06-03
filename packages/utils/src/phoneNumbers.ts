@@ -39,7 +39,7 @@ export function getCountryEmoji(
   const userCountryArray = countries.filter((c: any) => c.alpha2 === regionCode)
   const country = userCountryArray.length > 0 ? userCountryArray[0] : undefined
 
-  return (country ? country.emoji : '') + ` +${countryCode}`
+  return country ? country.emoji : ''
 }
 
 export const getPhoneHash = (phoneNumber: string, salt?: string): string => {
