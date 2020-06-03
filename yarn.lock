@@ -5562,13 +5562,6 @@
     "@types/node" "*"
     form-data "^2.5.0"
 
-"@types/markdown-to-jsx@^6.11.0":
-  version "6.11.0"
-  resolved "https://registry.yarnpkg.com/@types/markdown-to-jsx/-/markdown-to-jsx-6.11.0.tgz#a19e458a9415763859f2c92c4c5b07a80bea8c14"
-  integrity sha512-OFFHQ3LK+g8lSfwdqjXBbrGFdgH/MYXhzIYSOJ5xapT++eEhRx7wOfY3xxtktVtQyQtsB7Wljs7IDGgKfurm2A==
-  dependencies:
-    "@types/react" "*"
-
 "@types/mathjs@^4.4.1":
   version "4.4.1"
   resolved "https://registry.yarnpkg.com/@types/mathjs/-/mathjs-4.4.1.tgz#ce876a823848486f3675f8573e93f2d282feba19"
@@ -15422,13 +15415,6 @@ from@^0.1.7, from@~0:
   resolved "https://registry.yarnpkg.com/from/-/from-0.1.7.tgz#83c60afc58b9c56997007ed1a768b3ab303a44fe"
   integrity sha1-g8YK/Fi5xWmXAH7Rp2izqzA6RP4=
 
-front-matter@^4.0.1:
-  version "4.0.1"
-  resolved "https://registry.yarnpkg.com/front-matter/-/front-matter-4.0.1.tgz#5fde892d19b6ec548b73693818dd94e57b1df163"
-  integrity sha512-Kbm520Nf8Ir1IAdZg2CyXXszDCRsA0NbY25JJFgC9XWOcYyYIngRPk9M7RVpR478sGQfC9hS1Fxwaz58tVJbLw==
-  dependencies:
-    js-yaml "^3.13.1"
-
 fs-capacitor@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/fs-capacitor/-/fs-capacitor-2.0.0.tgz#6cbafaa39313eebf9c49ecff8795aadc08337fc5"
@@ -21528,14 +21514,6 @@ markdown-table@^2.0.0:
   dependencies:
     repeat-string "^1.0.0"
 
-markdown-to-jsx@^6.11.4:
-  version "6.11.4"
-  resolved "https://registry.yarnpkg.com/markdown-to-jsx/-/markdown-to-jsx-6.11.4.tgz#b4528b1ab668aef7fe61c1535c27e837819392c5"
-  integrity sha512-3lRCD5Sh+tfA52iGgfs/XZiw33f7fFX9Bn55aNnVNUd2GzLDkOWyKYYD8Yju2B1Vn+feiEdgJs8T6Tg0xNokPw==
-  dependencies:
-    prop-types "^15.6.2"
-    unquote "^1.1.0"
-
 marked-terminal@^3.3.0:
   version "3.3.0"
   resolved "https://registry.yarnpkg.com/marked-terminal/-/marked-terminal-3.3.0.tgz#25ce0c0299285998c7636beaefc87055341ba1bd"
@@ -26579,11 +26557,6 @@ react-async-hook@^3.4.0:
   version "3.4.0"
   resolved "https://registry.yarnpkg.com/react-async-hook/-/react-async-hook-3.4.0.tgz#0ed584a1edd85ea632eeb18ad4185cf5aea05fdd"
   integrity sha512-LAX8FH/sem4FtTXK66CGXIT51UVT8HdvUxs0PpSYX++sNA6PLwMXaslYrGd844FXgJF+VEoASPftp5q0P+PutA==
-
-react-async-hook@^3.6.1:
-  version "3.6.1"
-  resolved "https://registry.yarnpkg.com/react-async-hook/-/react-async-hook-3.6.1.tgz#aed3e492d87319392865c83ed7cef3609e2a7fef"
-  integrity sha512-YWBB2feVQF79t5u2raMPHlZ8975Jds+guCvkWVC4kRLDlSCouLsYpQm4DGSqPeHvoHYVVcDfqNayLZAXQmnxnw==
 
 react-async-script@^1.1.1:
   version "1.1.1"
@@ -32193,7 +32166,7 @@ unpipe@1.0.0, unpipe@~1.0.0:
   resolved "https://registry.yarnpkg.com/unpipe/-/unpipe-1.0.0.tgz#b2bf4ee8514aae6165b4817829d21b2ef49904ec"
   integrity sha1-sr9O6FFKrmFltIF4KdIbLvSZBOw=
 
-unquote@^1.1.0, unquote@~1.1.1:
+unquote@~1.1.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/unquote/-/unquote-1.1.1.tgz#8fded7324ec6e88a0ff8b905e7c098cdc086d544"
   integrity sha1-j97XMk7G6IoP+LkF58CYzcCG1UQ=
