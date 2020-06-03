@@ -17,6 +17,14 @@ and run smart contract migrations to initialize the core protocols. When this is
 open a NodeJS console with some preloaded objects to facilitate interactions with the test network.
 Exiting this console will kill all running geth instances and exit.
 
+Examples:
+* local-testnet
+* local-testnet --local-geth ~/code/celo-blockchain
+* local-testnet --validators 5 --proxies 3 --bootnode
+* local-testnet --tx-nodes 2 --light-clients 3
+* local-testnet --migrate-to 19 --migration-override '{ "lockedGold": { "unlockingPeriod": 30 } }'
+* local-testnet --no-migrate --genesis-override '{ "blockTime": 3, "epoch": 50 }'
+
 Network makeup is configured the --validators, --tx-nodes, --light-clients, and --lightest-client
 flags. These flags will add the corresponding nodes to the network.
 
@@ -33,9 +41,12 @@ variables are defined with useful values including {
   }
 }
 
+Tip: Export NODE_OPTIONS="--experimental-repl-await" in your terminal to natively use await.
+
 When the network is created without a bootnode, all nodes will be connected as follows:
-* Validator nodes are connected to all other validator nodes.
-* Transaction nodes are connected to all validators and all other transaction nodes.
+* Proxy nodes are connected to their validators, other proxies and unproxied validators.
+* Unproxied validator nodes are connected to all other proxies and unproxied validators.
+* Transaction nodes are connected to proxies and unproxied validators and other transaction nodes.
 * Light clients are connected to all transaction nodes
 
 If the network is started with the --bootnode flag, a bootnode will be created and all node will be
@@ -56,7 +67,8 @@ interface LocalTestnetArgs {
   txnodes: number
   lightclients: number
   lightestclients: number
-  migrateto: number
+  migrate: boolean
+  migrateTo: number
   instances: string
   genesisOverride: string
   migrationOverride: string
@@ -111,10 +123,15 @@ export const builder = (argv: yargs.Argv) => {
       default: 0,
       alias: ['lightestClients', 'lightestclients'],
     })
+    .option('migrate', {
+      type: 'boolean',
+      description: 'Whether migrations should be run.',
+      default: true,
+      allowNo: true,
+    })
     .option('migrate-to', {
       type: 'number',
-      description: 'Maximum migration number to run.',
-      default: 1000,
+      description: 'Maximum migration number to run. Defaults to running all migrations.',
       alias: ['migrateTo', 'migrateto'],
     })
     .option('instances', {
@@ -311,6 +328,9 @@ async function connectNodes(configs: GethInstanceConfig[]) {
 
   // Connect light clients to tx nodes.
   const lightClients = configs.filter((config) => ['light', 'lightest'].includes(config.syncmode))
+  if (lightClients.length > 0 && txNodeEnodes.length === 0) {
+    throw new Error('connecting light clients to the network requires at least one tx-node')
+  }
   await Promise.all(lightClients.map((lightClient) => connectToEnodes(lightClient, txNodeEnodes)))
 }
 
@@ -322,13 +342,14 @@ export const handler = async (argv: LocalTestnetArgs) => {
     networkId: 1101,
     runPath: '/tmp/e2e',
     keepData: argv.keepdata,
-    migrateTo: argv.migrateto,
+    migrate: argv.migrate,
+    migrateTo: argv.migrate ? argv.migrateTo : undefined,
     instances: populateConnectionInfo([
-      ...bootnodeConfigs(argv.bootnode ? 1 : 0),
       ...validatorConfigs(argv.validators, argv.proxies),
       ...txNodeConfigs(argv.txnodes),
       ...lightClientConfigs(argv.lightclients),
       ...lightestClientConfigs(argv.lightestclients),
+      ...bootnodeConfigs(argv.bootnode ? 1 : 0),
       ...JSON.parse(argv.instances),
     ]),
     repository: {
