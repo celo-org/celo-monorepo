@@ -61,14 +61,13 @@ export default function QRScanner({ route }: Props) {
   const { scanIsForSecureSend, transactionData } = route.params || {}
 
   const onBarCodeDetected = useCallback(
-    () =>
-      memoize(
-        (qrCode: QrCode) => {
-          Logger.debug('QRScanner', 'Bar code detected')
-          dispatch(handleBarcodeDetected(qrCode, scanIsForSecureSend, transactionData))
-        },
-        (qrCode) => qrCode.data
-      ),
+    memoize(
+      (qrCode: QrCode) => {
+        Logger.debug('QRScanner', 'Bar code detected')
+        dispatch(handleBarcodeDetected(qrCode, scanIsForSecureSend, transactionData))
+      },
+      (qrCode) => qrCode.data
+    ),
     [scanIsForSecureSend, transactionData]
   )
 
@@ -89,12 +88,12 @@ export default function QRScanner({ route }: Props) {
           androidCameraPermissionOptions={null}
           notAuthorizedView={<NotAuthorizedView />}
         >
-          <View
+          {/* <View
             style={{
               ...StyleSheet.absoluteFillObject,
               backgroundColor: '#555',
             }}
-          />
+          /> */}
           <SeeThroughOverlay />
           <Text style={[styles.infoText, { marginBottom: inset.bottom }]}>
             {t('cameraScanInfo')}
