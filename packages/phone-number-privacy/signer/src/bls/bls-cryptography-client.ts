@@ -1,5 +1,5 @@
 import { AzureKeyVaultClient } from '@celo/contractkit/lib/utils/azure-key-vault-client'
-import threshold from 'blind-threshold-bls'
+import threshold_bls from 'blind-threshold-bls'
 import { ErrorMessages } from '../common/error-utils'
 import logger from '../common/logger'
 import config, { DEV_MODE, DEV_PRIVATE_KEY } from '../config'
@@ -15,7 +15,7 @@ export class BLSCryptographyClient {
       const msgBuffer = Buffer.from(base64BlindedMessage, 'base64')
 
       logger.debug('Calling theshold sign')
-      const signedMsg = threshold.partialSignBlindedMessage(keyBuffer, msgBuffer)
+      const signedMsg = threshold_bls.partialSignBlindedMessage(keyBuffer, msgBuffer)
       logger.debug('Back from threshold sign, parsing results')
 
       if (!signedMsg) {

@@ -1,4 +1,4 @@
-import threshold from 'blind-threshold-bls'
+import threshold_bls from 'blind-threshold-bls'
 import {
   BLSCryptographyClient,
   ServicePartialSignature,
@@ -55,11 +55,11 @@ describe(`BLS service computes signature`, () => {
 
     const message = Buffer.from('hello world')
     const userSeed = new Uint8Array(32)
-    for (let i = 0; i < 31; i++) {
+    for (let i = 0; i < userSeed.length - 1; i++) {
       userSeed[i] = i
     }
 
-    const blindedMsgResult = threshold.blind(message, userSeed)
+    const blindedMsgResult = threshold_bls.blind(message, userSeed)
     const blindedMsg = Buffer.from(blindedMsgResult.message).toString('base64')
 
     const actual = await BLSCryptographyClient.combinePartialBlindedSignatures(
@@ -68,12 +68,12 @@ describe(`BLS service computes signature`, () => {
     )
     expect(actual).toEqual('16RcENpbLgq5pIkcPWdgnMofeLqSyuUVin9h4jof9/I8GRsmt5iRxjWAkpftKPWA')
 
-    const unblindedSignedMessage = threshold.unblind(
+    const unblindedSignedMessage = threshold_bls.unblind(
       Buffer.from(actual, 'base64'),
       blindedMsgResult.blindingFactor
     )
     const publicKey = Buffer.from(PUBLIC_KEY, 'base64')
-    expect(threshold.verify(publicKey, message, unblindedSignedMessage))
+    expect(threshold_bls.verify(publicKey, message, unblindedSignedMessage))
   })
   it('provides blinded signature if one failure if still above threshold', async () => {
     const signatures: ServicePartialSignature[] = [
@@ -97,11 +97,11 @@ describe(`BLS service computes signature`, () => {
 
     const message = Buffer.from('hello world')
     const userSeed = new Uint8Array(32)
-    for (let i = 0; i < 31; i++) {
+    for (let i = 0; i < userSeed.length - 1; i++) {
       userSeed[i] = i
     }
 
-    const blindedMsgResult = threshold.blind(message, userSeed)
+    const blindedMsgResult = threshold_bls.blind(message, userSeed)
     const blindedMsg = Buffer.from(blindedMsgResult.message).toString('base64')
 
     const actual = await BLSCryptographyClient.combinePartialBlindedSignatures(
@@ -110,12 +110,12 @@ describe(`BLS service computes signature`, () => {
     )
     expect(actual).toEqual('16RcENpbLgq5pIkcPWdgnMofeLqSyuUVin9h4jof9/I8GRsmt5iRxjWAkpftKPWA')
 
-    const unblindedSignedMessage = threshold.unblind(
+    const unblindedSignedMessage = threshold_bls.unblind(
       Buffer.from(actual, 'base64'),
       blindedMsgResult.blindingFactor
     )
     const publicKey = Buffer.from(PUBLIC_KEY, 'base64')
-    expect(threshold.verify(publicKey, message, unblindedSignedMessage))
+    expect(threshold_bls.verify(publicKey, message, unblindedSignedMessage))
   })
   it('throws error if does not meet threshold signatures', async () => {
     const signatures: ServicePartialSignature[] = [
@@ -135,17 +135,17 @@ describe(`BLS service computes signature`, () => {
 
     const message = Buffer.from('hello world')
     const userSeed = new Uint8Array(32)
-    for (let i = 0; i < 31; i++) {
+    for (let i = 0; i < userSeed.length - 1; i++) {
       userSeed[i] = i
     }
 
-    const blindedMsgResult = threshold.blind(message, userSeed)
+    const blindedMsgResult = threshold_bls.blind(message, userSeed)
     const blindedMsg = Buffer.from(blindedMsgResult.message).toString('base64')
 
     try {
       await BLSCryptographyClient.combinePartialBlindedSignatures(signatures, blindedMsg)
     } catch (e) {
-      expect(e.message).toContain('not enough not enough partial signatures')
+      expect(e.message.includes('Not enough not enough partial signatures'))
     }
   })
 })

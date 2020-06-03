@@ -1,4 +1,5 @@
 import threshold_bls from 'blind-threshold-bls'
+import { ErrorMessages } from '../common/error-utils'
 import logger from '../common/logger'
 import config from '../config'
 
@@ -8,7 +9,7 @@ export interface ServicePartialSignature {
 }
 
 function flattenSigsArray(sigs: Uint8Array[]) {
-  return Uint8Array.from(sigs.reduce((a, b) => Array.from(a).concat(Array.from(b)), [] as any))
+  return Uint8Array.from(sigs.reduce((a, b) => a.concat(Array.from(b)), [] as any))
 }
 export class BLSCryptographyClient {
   /*
@@ -20,8 +21,8 @@ export class BLSCryptographyClient {
   ): Promise<string> {
     const polynomial = config.thresholdSignature.polynomial
     const sigs: Uint8Array[] = []
-    for (const service of serviceResponses) {
-      const sigBuffer = Buffer.from(service.signature, 'base64')
+    for (const serviceResponse of serviceResponses) {
+      const sigBuffer = Buffer.from(serviceResponse.signature, 'base64')
       try {
         await threshold_bls.partialVerifyBlindSignature(
           Buffer.from(polynomial, 'base64'),
@@ -30,13 +31,17 @@ export class BLSCryptographyClient {
         )
         sigs.push(sigBuffer)
       } catch (e) {
-        logger.warn(`could not verify signature for service url ${service.url}`)
+        logger.error(
+          `${ErrorMessages.VERIFY_PARITAL_SIGNATURE_ERROR} 
+          Failed to verify signature for ${serviceResponse.url}`,
+          e
+        )
       }
     }
     const threshold = config.thresholdSignature.threshold
     if (sigs.length < threshold) {
-      logger.error(`not enough not enough partial signatures'${sigs.length}'/'${threshold}'`)
-      throw new Error(`not enough not enough partial signatures'${sigs.length}'/'${threshold}'`)
+      logger.error(`${ErrorMessages.NOT_ENOUGH_PARTIAL_SIGNATURES} ${sigs.length}/${threshold}`)
+      throw new Error(`${ErrorMessages.NOT_ENOUGH_PARTIAL_SIGNATURES} ${sigs.length}/${threshold}`)
     }
     const result = threshold_bls.combine(threshold, flattenSigsArray(sigs))
     return Buffer.from(result).toString('base64')
