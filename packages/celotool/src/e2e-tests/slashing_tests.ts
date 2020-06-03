@@ -197,6 +197,7 @@ describe('slashing tests', function(this: any) {
     it('slash for downtime', async function(this: any) {
       this.timeout(0) // Disable test timeout
       const slasher = await kit._web3Contracts.getDowntimeSlasher()
+      const slashableDowntime = new BigNumber(await slasher.methods.slashableDowntime().call())
       const blockNumber = await web3.eth.getBlockNumber()
       await waitForBlock(web3, blockNumber + 20)
 
@@ -213,9 +214,24 @@ describe('slashing tests', function(this: any) {
       const history = await validatorsContract.methods.getMembershipHistory(signer).call()
       const historyIndex = history[0].length - 1
 
+      const slotSize = slashableDowntime.dividedToIntegerBy(2).toNumber()
+      const startSlots = [blockNumber + 12, blockNumber + 12 + slotSize]
+      const endSlots = [
+        startSlots[0] + slotSize - 1,
+        startSlots[0] + slashableDowntime.toNumber() - 1, // this will cover an odd windows
+      ]
+
+      for (let i = 0; i < startSlots.length; i += 1) {
+        await slasher.methods
+          .generateProofOfSlotValidation(startSlots[i], endSlots[i])
+          .send({ from: validator, gas: 5000000 })
+      }
+
       await slasher.methods
         .slash(
           blockNumber + 12,
+          startSlots,
+          endSlots,
           4,
           4,
           historyIndex,

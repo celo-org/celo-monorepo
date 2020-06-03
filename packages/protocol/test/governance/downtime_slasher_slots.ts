@@ -207,47 +207,6 @@ contract('DowntimeSlasherSlots', (accounts: string[]) => {
     })
   })
 
-  // describe('#isDownForSlot()', () => {
-  //   let blockNumber: number
-  //   let startBlock: number
-  //   let changeBlock: number
-  //   const validatorIndex = 0
-  //   // Signed by validator indexes 0 and 1
-  //   const bitmapVI01 = '0x0000000000000000000000000000000000000000000000000000000000000003'
-  //   // Signed by validator index 1
-  //   const bitmapVI1 = '0x0000000000000000000000000000000000000000000000000000000000000002'
-  //   // Signed by validator index 0
-  //   const bitmapVI0 = '0x0000000000000000000000000000000000000000000000000000000000000001'
-
-  //   before(async () => {
-  //     let bn: number = 0
-  //     do {
-  //       bn = await web3.eth.getBlockNumber()
-  //       await jsonRpc(web3, 'evm_mine', [])
-  //     } while (bn < blocksToWaitForTesting)
-  //   })
-  //   beforeEach(async () => {
-  //     blockNumber = await web3.eth.getBlockNumber()
-  //     startBlock = blockNumber - 50
-  //     const epoch = (await slasher.getEpochNumberOfBlock(blockNumber)).toNumber()
-  //     await slasher.setEpochSigner(epoch, validatorIndex, validator)
-  //     await slasher.setEpochSigner(epoch - 1, validatorIndex, validator)
-  //     await slasher.setEpochSigner(epoch - 2, 1, validator)
-  //     await slasher.setEpochSigner(epoch + 1, validatorIndex, validator)
-  //     await slasher.setNumberValidators(2)
-  //     // when epoch-2 changes to epoch-1, the validator to be slashed is down, but our signer number changes
-  //     // another validator is up around the epoch change
-  //     // changeBlock = getFirstBlockNumberForEpoch(epoch - 1) - 3
-  //     // async function prepareBlock(bn) {
-  //     //   const parentEpoch = (await slasher.getEpochNumberOfBlock(bn - 1)).toNumber()
-  //     //   await slasher.setParentSealBitmap(bn, parentEpoch === epoch - 2 ? bitmap3 : bitmap2)
-  //     // }
-  //     // for (let i = 0; i < 7; i++) {
-  //     //   await prepareBlock(changeBlock + i)
-  //     // }
-  //   })
-  // })
-
   describe('#slash()', () => {
     // It will put us in a "safe" zone for testing
     let epoch: number

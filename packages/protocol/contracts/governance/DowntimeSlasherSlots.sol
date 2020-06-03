@@ -17,14 +17,6 @@ contract DowntimeSlasherSlots is SlasherUtil {
     uint256 endBlock;
   }
 
-  // Accumulated ParentSealBitmap of every validator
-  struct ValidatedSlot {
-    // uint256 endBlock;
-    // Accumulated ParentSealBitmap of the Slot
-    // The array will have 2 elements if the slot shares two epochs
-    uint256[2] validatorsUpAccumulator;
-  }
-
   // For each address, associate each epoch with the last block that was slashed on that epoch
   mapping(address => mapping(uint256 => SlashedInterval[])) lastSlashedBlock;
 
