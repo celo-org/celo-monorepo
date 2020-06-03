@@ -8,6 +8,7 @@ import SafeAreaView from 'react-native-safe-area-view'
 import SettingsItem from 'src/account/SettingsItem'
 import { FAQ_LINK, FORUM_LINK } from 'src/config'
 import i18n, { Namespaces } from 'src/i18n'
+import DrawerTopBar from 'src/navigator/DrawerTopBar'
 import { headerWithBackButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -23,6 +24,7 @@ const Support = () => {
   const { t } = useTranslation(Namespaces.accountScreen10)
   return (
     <SafeAreaView style={styles.container}>
+      <DrawerTopBar />
       <View style={styles.containerList}>
         <SettingsItem
           testID="WebFAQLink"
