@@ -178,6 +178,14 @@ class Send extends React.Component<Props, State> {
     this.setState({
       searchQuery,
     })
+    CeloAnalytics.track(
+      this.props.route.params?.isRequest
+        ? CustomEventNames.request_search
+        : CustomEventNames.send_search,
+      {
+        query: searchQuery,
+      }
+    )
     this.throttledSearch(searchQuery)
   }
 
@@ -199,6 +207,15 @@ class Send extends React.Component<Props, State> {
     ) {
       this.props.storeLatestInRecents(recipient)
     }
+
+    CeloAnalytics.track(
+      this.props.route.params?.isRequest
+        ? CustomEventNames.request_select_recipient
+        : CustomEventNames.send_select_recipient,
+      {
+        query: this.state.searchQuery,
+      }
+    )
 
     navigate(Screens.SendAmount, { recipient, isRequest })
   }
