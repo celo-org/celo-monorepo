@@ -265,7 +265,24 @@ describe('slashing tests', function(this: any) {
       const validator = (await kit.web3.eth.getAccounts())[0]
       await kit.web3.eth.personal.unlockAccount(validator, '', 1000000)
 
-      const tx = await slasher.slashEndSignerIndex(blockNumber + 12, 4)
+      const slashableDowntime = await slasher.slashableDowntime()
+
+      const slotSize = Math.floor(slashableDowntime / 2)
+      const startSlots = [blockNumber + 12, blockNumber + 12 + slotSize]
+      const endSlots = [
+        startSlots[0] + slotSize - 1,
+        startSlots[0] + slashableDowntime - 1, // this will cover an odd windows
+      ]
+
+      for (let i = 0; i < startSlots.length; i += 1) {
+        const proofTxResult = await slasher
+          .generateProofOfSlotValidation(startSlots[i], endSlots[i])
+          .send({ from: validator, gas: 5000000 })
+        const proofTxRcpt = await proofTxResult.waitReceipt()
+        assert.equal(proofTxRcpt.status, true)
+      }
+
+      const tx = await slasher.slashEndSignerIndex(blockNumber + 12, 4, startSlots, endSlots)
       const txResult = await tx.send({ from: validator, gas: 5000000 })
       const txRcpt = await txResult.waitReceipt()
       assert.equal(txRcpt.status, true)

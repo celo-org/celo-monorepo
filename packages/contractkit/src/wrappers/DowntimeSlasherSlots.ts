@@ -6,6 +6,7 @@ import {
   BaseWrapper,
   CeloTransactionObject,
   proxyCall,
+  proxySend,
   toTransactionObject,
   valueToBigNumber,
   valueToInt,
@@ -113,7 +114,10 @@ export class DowntimeSlasherSlotsWrapper extends BaseWrapper<DowntimeSlasherSlot
    * the second element, the accumulator of the other epoch.
    * Otherwise, the second element will be zero.
    */
-  generateProofOfSlotValidation = proxyCall(this.contract.methods.generateProofOfSlotValidation)
+  generateProofOfSlotValidation = proxySend(
+    this.kit,
+    this.contract.methods.generateProofOfSlotValidation
+  )
 
   /**
    * @notice Shows if the user already called the generateProofOfSlotValidation for
@@ -178,37 +182,6 @@ export class DowntimeSlasherSlotsWrapper extends BaseWrapper<DowntimeSlasherSlot
   }
 
   /**
-   * Tests if the given validator or signer has been down.
-   * @param validatorOrSignerAddress Address of the validator account or signer.
-   * @param startBlock First block of the downtime, undefined if using endBlock.
-   * @param endBlock Last block of the downtime. Determined from startBlock or grandparent of latest block if not provided.
-   * @param calculateSlots Default: true. Flag to force the Slot calculations. If it's false, require to have the
-   * slots precalculated, otherwise won't validate
-   */
-  async isValidatorDownGeneratingProofs(
-    validatorOrSignerAddress: Address,
-    startBlock: number | undefined,
-    endBlock: number | undefined,
-    slotSize: number
-  ) {
-    const window = await this.getSlashableDowntimeWindow(startBlock, endBlock)
-
-    const slotsArrays = await this.generateProofs(window, slotSize)
-    const startSignerIndex = await this.getValidatorSignerIndex(
-      validatorOrSignerAddress,
-      window.start
-    )
-    const endSignerIndex = await this.getValidatorSignerIndex(validatorOrSignerAddress, window.end)
-    return this.isDown(
-      window.start,
-      slotsArrays.startSlots,
-      slotsArrays.endSlots,
-      startSignerIndex,
-      endSignerIndex
-    )
-  }
-
-  /**
    * Determines the validator signer given an account or signer address and block number.
    * @param validatorOrSignerAddress Address of the validator account or signer.
    * @param blockNumber Block at which to determine the signer index.
@@ -236,11 +209,8 @@ export class DowntimeSlasherSlotsWrapper extends BaseWrapper<DowntimeSlasherSlot
    * @param validator Validator account or signer to slash for downtime.
    * @param startBlock First block of the downtime, undefined if using endBlock.
    * @param endBlock Last block of the downtime. Determined from startBlock or grandparent of latest block if not provided.
-   * @param calculateSlots Default: true. Flag to force the Slot calculations. If it's false,
-   * require to have the slots precalculated, otherwise won't validate
-   * @param calculateSlotsAsync Default: true. If 'calculatedSlots' set, will wait the
-   * previous Slot response (this would save gas if one slot was not down). Otherwise will
-   * trigger every slot at the same time (will save time).
+   * @param startSlots Array of the block numbers of the slot's start
+   * @param endSlots Array of the block numbers of the slot's end
    */
   async slashValidator(
     validatorOrSignerAddress: Address,
@@ -260,38 +230,10 @@ export class DowntimeSlasherSlotsWrapper extends BaseWrapper<DowntimeSlasherSlot
 
   /**
    * Slash a Validator for downtime.
-   * @param validator Validator account or signer to slash for downtime.
-   * @param startBlock First block of the downtime, undefined if using endBlock.
-   * @param endBlock Last block of the downtime. Determined from startBlock or grandparent of latest block if not provided.
-   * @param calculateSlots Default: true. Flag to force the Slot calculations. If it's false,
-   * require to have the slots precalculated, otherwise won't validate
-   * @param calculateSlotsAsync Default: true. If 'calculatedSlots' set, will wait the
-   * previous Slot response (this would save gas if one slot was not down). Otherwise will
-   * trigger every slot at the same time (will save time).
-   */
-  async slashValidatorGeneratingProofs(
-    validatorOrSignerAddress: Address,
-    startBlock: number | undefined,
-    endBlock: number | undefined,
-    slotSize: number
-  ): Promise<CeloTransactionObject<void>> {
-    const window = await this.getSlashableDowntimeWindow(startBlock, endBlock)
-    return this.slashEndSignerIndexGeneratingProofs(
-      window.end,
-      await this.getValidatorSignerIndex(validatorOrSignerAddress, window.end),
-      slotSize
-    )
-  }
-
-  /**
-   * Slash a Validator for downtime.
    * @param startBlock First block of the downtime.
    * @param startSignerIndex Validator index at the first block.
-   * @param calculateSlots Default: true. Flag to force the Slot calculations. If it's false,
-   * require to have the slots precalculated, otherwise won't validate
-   * @param calculateSlotsAsync Default: true. If 'calculatedSlots' set, will wait the
-   * previous Slot response (this would save gas if one slot was not down). Otherwise will
-   * trigger every slot at the same time (will save time).
+   * @param startSlots Array of the block numbers of the slot's start
+   * @param endSlots Array of the block numbers of the slot's end
    */
   async slashStartSignerIndex(
     startBlock: number,
@@ -316,43 +258,10 @@ export class DowntimeSlasherSlotsWrapper extends BaseWrapper<DowntimeSlasherSlot
 
   /**
    * Slash a Validator for downtime.
-   * @param startBlock First block of the downtime.
-   * @param startSignerIndex Validator index at the first block.
-   * @param calculateSlots Default: true. Flag to force the Slot calculations. If it's false,
-   * require to have the slots precalculated, otherwise won't validate
-   * @param calculateSlotsAsync Default: true. If 'calculatedSlots' set, will wait the
-   * previous Slot response (this would save gas if one slot was not down). Otherwise will
-   * trigger every slot at the same time (will save time).
-   */
-  async slashStartSignerIndexGeneratingProofs(
-    startBlock: number,
-    startSignerIndex: number,
-    slotSize: number
-  ): Promise<CeloTransactionObject<void>> {
-    const election = await this.kit.contracts.getElection()
-    const validators = await this.kit.contracts.getValidators()
-    const signer = await election.validatorSignerAddressFromSet(startSignerIndex, startBlock)
-    const startEpoch = await this.kit.getEpochNumberOfBlock(startBlock)
-    // Follows DowntimeSlasher.getEndBlock()
-    const window = await this.getSlashableDowntimeWindow(startBlock)
-    const endEpoch = await this.kit.getEpochNumberOfBlock(window.end)
-    const endSignerIndex =
-      startEpoch === endEpoch
-        ? startSignerIndex
-        : findAddressIndex(signer, await election.getValidatorSigners(window.end))
-    const validator = await validators.getValidatorFromSigner(signer)
-    return this.slashGeneratingProofs(validator, window, slotSize, startSignerIndex, endSignerIndex)
-  }
-
-  /**
-   * Slash a Validator for downtime.
    * @param endBlock The last block of the downtime to slash for.
    * @param endSignerIndex Validator index at the last block.
-   * @param calculateSlots Default: true. Flag to force the Slot calculations. If it's false,
-   * require to have the slots precalculated, otherwise won't validate
-   * @param calculateSlotsAsync Default: true. If 'calculatedSlots' set, will wait the
-   * previous Slot response (this would save gas if one slot was not down). Otherwise will
-   * trigger every slot at the same time (will save time).
+   * @param startSlots Array of the block numbers of the slot's start
+   * @param endSlots Array of the block numbers of the slot's end
    */
   async slashEndSignerIndex(
     endBlock: number,
@@ -377,42 +286,6 @@ export class DowntimeSlasherSlotsWrapper extends BaseWrapper<DowntimeSlasherSlot
       slashableWindow,
       startSlots,
       endSlots,
-      startSignerIndex,
-      endSignerIndex
-    )
-  }
-
-  /**
-   * Slash a Validator for downtime.
-   * @param endBlock The last block of the downtime to slash for.
-   * @param endSignerIndex Validator index at the last block.
-   * @param calculateSlots Default: true. Flag to force the Slot calculations. If it's false,
-   * require to have the slots precalculated, otherwise won't validate
-   * @param calculateSlotsAsync Default: true. If 'calculatedSlots' set, will wait the
-   * previous Slot response (this would save gas if one slot was not down). Otherwise will
-   * trigger every slot at the same time (will save time).
-   */
-  async slashEndSignerIndexGeneratingProofs(
-    endBlock: number,
-    endSignerIndex: number,
-    slotSize: number
-  ): Promise<CeloTransactionObject<void>> {
-    const election = await this.kit.contracts.getElection()
-    const validators = await this.kit.contracts.getValidators()
-    const signer = await election.validatorSignerAddressFromSet(endSignerIndex, endBlock)
-    const endEpoch = await this.kit.getEpochNumberOfBlock(endBlock)
-    // Reverses DowntimeSlasher.getEndBlock()
-    const slashableWindow = await this.getSlashableDowntimeWindow(undefined, endBlock)
-    const startEpoch = await this.kit.getEpochNumberOfBlock(slashableWindow.start)
-    const startSignerIndex =
-      startEpoch === endEpoch
-        ? endSignerIndex
-        : findAddressIndex(signer, await election.getValidatorSigners(slashableWindow.start))
-    const validator = await validators.getValidatorFromSigner(signer)
-    return this.slashGeneratingProofs(
-      validator,
-      slashableWindow,
-      slotSize,
       startSignerIndex,
       endSignerIndex
     )
@@ -468,46 +341,6 @@ export class DowntimeSlasherSlotsWrapper extends BaseWrapper<DowntimeSlasherSlot
         slashGroup.greaters,
         slashGroup.indices
       )
-    )
-  }
-
-  private async generateProofs(
-    slashableWindow: DowntimeWindow,
-    slotSize: number
-  ): Promise<{ startSlots: number[]; endSlots: number[] }> {
-    const startSlots: number[] = []
-    const endSlots: number[] = []
-
-    if (slotSize <= 1) {
-      throw new Error('Slot size must be bigger than 1')
-    }
-    for (let i = slashableWindow.start; i < slashableWindow.end; i += slotSize) {
-      const start = i
-      const end = i + slotSize - 1 > slashableWindow.end ? slashableWindow.end : i + slotSize - 1
-      startSlots.push(start)
-      endSlots.push(end)
-      await this.contract.methods.generateProofOfSlotValidation(start, end).send()
-    }
-
-    return { startSlots, endSlots }
-  }
-
-  private async slashGeneratingProofs(
-    validator: Validator,
-    slashableWindow: DowntimeWindow,
-    slotSize: number,
-    startSignerIndex: number,
-    endSignerIndex: number
-  ): Promise<CeloTransactionObject<void>> {
-    const slotArrays = await this.generateProofs(slashableWindow, slotSize)
-
-    return this.slash(
-      validator,
-      slashableWindow,
-      slotArrays.startSlots,
-      slotArrays.endSlots,
-      startSignerIndex,
-      endSignerIndex
     )
   }
 
