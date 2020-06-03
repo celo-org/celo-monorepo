@@ -35,6 +35,7 @@ export type StackParamList = {
   }
   [Screens.Debug]: undefined
   [Screens.DollarEducation]: undefined
+  [Screens.DrawerNavigator]: undefined
   [Screens.EditProfile]: undefined
   [Screens.EnterInviteCode]: undefined
   [Screens.ErrorScreen]: {
@@ -77,7 +78,7 @@ export type StackParamList = {
   }
   [Screens.JoinCelo]: undefined
   [Screens.Language]: {
-    nextScreen?: Screens.Account
+    nextScreen?: keyof StackParamList
   }
   [Screens.Licenses]: undefined
   [Screens.OutgoingPaymentRequestListScreen]: undefined
@@ -122,6 +123,7 @@ export type StackParamList = {
   [Screens.SendAmount]: {
     recipient: Recipient
     isRequest?: boolean
+    isFromScan?: boolean
   }
   [Screens.SendConfirmation]: {
     transactionData: TransactionDataInput
@@ -132,7 +134,6 @@ export type StackParamList = {
   [Screens.Support]: undefined
   [Screens.SupportContact]: undefined
   [Screens.Sync]: undefined
-  [Screens.TabNavigator]: undefined
   [Screens.TransactionReview]: {
     reviewProps: ReviewProps
     confirmationProps: TransferConfirmationCardProps | ExchangeConfirmationCardProps
