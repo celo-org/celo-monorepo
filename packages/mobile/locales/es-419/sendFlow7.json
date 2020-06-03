@@ -15,13 +15,18 @@
   "amount": "Monto",
   "celoDollarAmount": "<0></0> {{CeloDollar}}",
   "celoDollarAmount_plural": "<0></0> {{CeloDollars}}",
-  "groceriesRent": "Supermercado, alquiler, etc. (Opcional)",
+  "addDescription": "Agregar descripción",
+  "sentTo": "Enviado A",
+  "receivedFrom": "Recibido De",
+  "accountNumberLabel": "Cuenta\nNo.",
+  "commentLabel": "Mensaje",
+  "amountSent": "Cantidad Enviada",
   "fee": "Comisión",
   "securityFee": "Comisión de seguridad",
   "inviteFee": "Comisión de Invitación",
   "feeEducation": "Enviar pagos y hacer cambios incluye una pequeña comisión de seguridad y mantenimiento.",
   "learnMore": "Saber más",
-  "inviteMoneyEscrow": "Mantendremos este dinero seguro hasta que tu amigo cree una cuenta de Celo",
+  "inviteMoneyEscrow": "Invitaremos a este contacto y mantendremos seguros sus fondos hasta que verifiquen su cuenta.",
   "reviewPayment": "Revisar pago",
   "requestPayment": "Solicitud pago",
   "continue": "Continuar",
@@ -88,21 +93,24 @@
   },
   "secureSendExplanation": {
     "body1": "{{e164Number}} tiene multipes cuentas asociadas. {{displayName}} puede haber creado una nueva cuenta de Celo, perdido su teléfono o su cuenta puede haber sido interceptada o comprometida.",
-    "body2": "Antes de realizar transacciones, debes confirmar la cuenta de {{displayName}}. Puedes realizar esto escaneando el código QR o confirmado su número de cuenta directamente"
+    "body2": "Puedes realizar esto escaneando el código QR o confirmado su número de cuenta directamente antes de realizar transacciones"
   },
   "confirmAccountNumber": {
     "title": "Confirma el número de cuenta",
-    "body1Partial": "Por favor solicita a {{displayName}} los últimos cuatro dígitos de su número de cuenta e ingrésalos ",
-    "body1Full": "Por favor solicita a {{displayName}} su número de cuenta e ingrésalo",
-    "body2Partial": "Por razones de seguridad, por favor no utilices mensajes de texto (SMS). Se recomienda altamente preguntar en persona o por teléfono",
+    "bodyPartial": "Por favor solicita a {{displayName}} los últimos cuatro dígitos de su número de cuenta. Por razones de seguridad, preguntar en persona o por teléfono.",
+    "body1Full": "Por favor solicita a {{displayName}} su número de cuenta",
     "body2Full": "Por razones de seguridad, por favor no utilices mensajes de texto (SMS). Se recomienda altamente preguntar en persona o por teléfono a través de WhastApp, Messenger o por correo electrónico",
-    "help": "Ayude a {{displayName}} a encontrar su número de cuenta"
+    "help": "Ayude a encontrar su número de cuenta",
+    "submit": "Enviar"
   },
-  "accountInputHeaderA": "4 Últimos Dígitos del Número de Cuenta",
-  "accountInputHeaderB": "NÚMERO DE CUENTA",
+  "accountInputHeaderPartial": "4 Últimos Dígitos",
+  "accountInputHeaderFull": "Número de Cuenta",
   "helpModal": {
     "header": "Encuentra el número de cuenta de tu contacto",
     "body1": "Tu contacto puede encontrar su número de cuenta (también conocido como dirección) al inicio del Menú de Ajustes",
-    "body2": "Los números de cuenta comienzan con \"0x\" y tienen una longitud de 42 caracteres. Se encuentran directamente debajo de la foto de perfil"
-  }
+    "body2": "Se encuentran directamente debajo de la foto de perfil",
+    "body3": "Los números de cuenta comienzan con 0x, contienen solo números y letras y tienen 42 caracteres. Haz click en el siguiente enlace para obtener ayuda"
+  },
+  "transferAddressChanged": "Este contacto cambió su número de cuenta desde la transacción. Este pago fue enviado a:",
+  "addressConfirmed": "Número de cuenta confirmado"
 }

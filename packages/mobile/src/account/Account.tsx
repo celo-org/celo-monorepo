@@ -22,6 +22,7 @@ import { FAQ_LINK, TOS_LINK } from 'src/config'
 import { features } from 'src/flags'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { revokeVerification } from 'src/identity/actions'
+import DrawerTopBar from 'src/navigator/DrawerTopBar'
 import { headerWithBackButton } from 'src/navigator/Headers'
 import { navigateProtected } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -127,11 +128,11 @@ export class Account extends React.Component<Props, State> {
   }
 
   goToSecurity = () => {
-    navigateProtected(Screens.Security, { nextScreen: Screens.Account })
+    navigateProtected(Screens.Security)
   }
 
   goToAnalytics = () => {
-    this.props.navigation.navigate(Screens.Analytics, { nextScreen: Screens.Account })
+    this.props.navigation.navigate(Screens.Analytics)
   }
 
   goToDataSaver = () => {
@@ -240,6 +241,7 @@ export class Account extends React.Component<Props, State> {
     return (
       <ScrollView style={style.scrollView}>
         <SafeAreaView>
+          <DrawerTopBar />
           <View style={style.accountProfile}>
             {/* TouchableNoFeedback doesn't work here for some reason */}
             <TouchableOpacity onPress={this.onPressAvatar}>

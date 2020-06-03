@@ -132,8 +132,7 @@ export default function Footer() {
         mobileStyle={standardStyles.blockMarginMobile}
       >
         <Cell span={Spans.full} style={isMobile ? standardStyles.centered : styles.toes}>
-          <Lazy once={true}>
-            {' '}
+          <Lazy unmountIfInvisible={true}>
             <ChangeStory />
           </Lazy>
           <Text style={[fonts.legal, styles.copyright, isMobile && textStyles.center]}>
