@@ -16,7 +16,6 @@
 * [AttestationStat](../interfaces/_wrappers_attestations_.attestationstat.md)
 * [AttestationStateForIssuer](../interfaces/_wrappers_attestations_.attestationstateforissuer.md)
 * [AttestationsConfig](../interfaces/_wrappers_attestations_.attestationsconfig.md)
-* [AttestationsStatus](../interfaces/_wrappers_attestations_.attestationsstatus.md)
 * [AttestationsToken](../interfaces/_wrappers_attestations_.attestationstoken.md)
 * [UnselectedRequest](../interfaces/_wrappers_attestations_.unselectedrequest.md)
 
@@ -30,4 +29,4 @@
 
 Ƭ **IdentifierLookupResult**: *Record‹string, Record‹[Address](_base_.md#address), [AttestationStat](../interfaces/_wrappers_attestations_.attestationstat.md) | undefined› | undefined›*
 
-*Defined in [contractkit/src/wrappers/Attestations.ts:82](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L82)*
+*Defined in [contractkit/src/wrappers/Attestations.ts:72](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Attestations.ts#L72)*

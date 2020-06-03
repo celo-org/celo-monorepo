@@ -1,24 +1,20 @@
-import { decryptComment as decryptCommentRaw } from '@celo/utils/src/commentEncryption'
 import { TFunction } from 'i18next'
 import * as _ from 'lodash'
-import { TokenTransactionType } from 'src/apollo/types'
+import { TokenTransactionType, UserTransactionsQuery } from 'src/apollo/types'
 import { DEFAULT_TESTNET } from 'src/config'
-import { features } from 'src/flags'
+import { decryptComment } from 'src/identity/commentEncryption'
 import { AddressToE164NumberType } from 'src/identity/reducer'
 import { NumberToRecipient } from 'src/recipients/recipient'
+import { KnownFeedTransactionsType } from 'src/transactions/reducer'
+import { isPresent } from 'src/utils/typescript'
 
-export function decryptComment(
-  comment: string | null | undefined,
-  commentKey: Buffer | null,
+export function getDecryptedTransferFeedComment(
+  comment: string | null,
+  commentKey: string | null,
   type: TokenTransactionType
 ) {
-  return comment && commentKey && features.USE_COMMENT_ENCRYPTION
-    ? decryptCommentRaw(
-        comment,
-        commentKey,
-        type === TokenTransactionType.Sent || type === TokenTransactionType.EscrowSent
-      ).comment
-    : comment
+  const { comment: decryptedComment } = decryptComment(comment, commentKey, isTokenTxTypeSent(type))
+  return decryptedComment
 }
 
 export function getTransferFeedParams(
@@ -28,12 +24,12 @@ export function getTransferFeedParams(
   address: string,
   addressToE164Number: AddressToE164NumberType,
   rawComment: string | null,
-  commentKey: Buffer | null
+  commentKey: string | null
 ) {
   const e164PhoneNumber = addressToE164Number[address]
   const recipient = e164PhoneNumber ? recipientCache[e164PhoneNumber] : undefined
   const nameOrNumber = recipient ? recipient.displayName : e164PhoneNumber
-  const comment = decryptComment(rawComment, commentKey, type)
+  const comment = getDecryptedTransferFeedComment(rawComment, commentKey, type)
 
   let title, info
 
@@ -117,4 +113,20 @@ export function getTransferFeedParams(
     }
   }
   return { title, info, recipient }
+}
+
+export function getTxsFromUserTxQuery(data: UserTransactionsQuery | undefined) {
+  return data?.tokenTransactions?.edges.map((edge) => edge.node).filter(isPresent) ?? []
+}
+
+export function getNewTxsFromUserTxQuery(
+  data: UserTransactionsQuery | undefined,
+  knownFeedTxs: KnownFeedTransactionsType
+) {
+  const txFragments = getTxsFromUserTxQuery(data)
+  return txFragments.filter((tx) => !knownFeedTxs[tx.hash])
+}
+
+export function isTokenTxTypeSent(type: TokenTransactionType) {
+  return type === TokenTransactionType.Sent || type === TokenTransactionType.EscrowSent
 }
