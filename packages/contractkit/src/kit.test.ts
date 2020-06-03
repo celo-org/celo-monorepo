@@ -77,6 +77,7 @@ describe('kit.sendTransactionObject()', () => {
       gas: 555,
       feeCurrency: 'XXX',
       from: '0xAAFFF',
+      gasPrice: '0',
     })
   })
 })
