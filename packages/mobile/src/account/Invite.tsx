@@ -15,6 +15,7 @@ import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import ContactPermission from 'src/icons/ContactPermission'
 import Search from 'src/icons/Search'
 import { importContacts } from 'src/identity/actions'
+import DrawerTopBar from 'src/navigator/DrawerTopBar'
 import { headerWithCancelButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -154,6 +155,7 @@ class Invite extends React.Component<Props, State> {
       // Intentionally not using SafeAreaView here as RecipientPicker
       // needs fullscreen rendering
       <View style={style.container}>
+        <DrawerTopBar />
         <View style={style.textInputContainer}>
           <InviteSearchInput
             value={this.state.searchQuery}

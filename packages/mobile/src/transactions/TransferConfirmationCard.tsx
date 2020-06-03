@@ -21,8 +21,6 @@ import TransferAvatars from 'src/transactions/TransferAvatars'
 import UserSection from 'src/transactions/UserSection'
 import { navigateToURI } from 'src/utils/linking'
 
-const AVATAR_SIZE = 40
-
 export interface TransferConfirmationCardProps {
   address?: string
   comment?: string | null
@@ -85,9 +83,8 @@ function InviteSentContent({
         e164PhoneNumber={e164PhoneNumber}
         avatar={
           <ContactCircle
-            name={recipient?.displayName}
+            name={recipient ? recipient.displayName : null}
             address={address}
-            size={AVATAR_SIZE}
             thumbnailPath={getRecipientThumbnail(recipient)}
           />
         }
@@ -119,9 +116,8 @@ function InviteReceivedContent({
         e164PhoneNumber={e164PhoneNumber}
         avatar={
           <ContactCircle
-            name={recipient?.displayName}
+            name={recipient ? recipient.displayName : null}
             address={address}
-            size={AVATAR_SIZE}
             thumbnailPath={getRecipientThumbnail(recipient)}
           />
         }

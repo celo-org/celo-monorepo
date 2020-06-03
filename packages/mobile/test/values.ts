@@ -8,6 +8,7 @@ import { EscrowedPayment } from 'src/escrow/actions'
 import { SHORT_CURRENCIES } from 'src/geth/consts'
 import { AddressToE164NumberType, E164NumberToAddressType } from 'src/identity/reducer'
 import { AttestationCode } from 'src/identity/verification'
+import { StackParamList } from 'src/navigator/types'
 import {
   RecipientKind,
   RecipientWithContact,
@@ -114,7 +115,6 @@ export const mockInvitableRecipient2: RecipientWithContact = {
 export const mockTransactionData = {
   recipient: mockInvitableRecipient2,
   amount: new BigNumber(1),
-  reason: 'Something',
   type: TokenTransactionType.Sent,
 }
 
@@ -162,7 +162,7 @@ export const mockRecipientWithPhoneNumber: RecipientWithMobileNumber = {
   e164PhoneNumber: mockE164Number,
 }
 
-export const mockNavigation: StackNavigationProp<any, any> = ({
+export const mockNavigation: StackNavigationProp<StackParamList, any> = ({
   navigate: jest.fn(),
   reset: jest.fn(),
   goBack: jest.fn(),
@@ -172,7 +172,7 @@ export const mockNavigation: StackNavigationProp<any, any> = ({
   isFocused: jest.fn(),
   addListener: jest.fn(),
   removeListener: jest.fn(),
-} as unknown) as StackNavigationProp<any, any>
+} as unknown) as StackNavigationProp<StackParamList, any>
 
 export const mockAddressToE164Number: AddressToE164NumberType = {
   [mockAccount]: mockE164Number,
