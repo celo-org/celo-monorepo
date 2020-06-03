@@ -30,7 +30,7 @@ Do you love the mission of Celo and want to be more involved? Do you want to inc
 * Build relationships with local organizations and communities that could benefit from Celo
 * Organize local or virtual community events that are tied to one of Celo’s 4 community tenets: Designing for all, Innovating on Money, Striving for Beauty, Embodying Humility
 * Activate their own ideas for spreading the word about Celo
-* Be active on [Discord](https://chat.celo.org) - welcome new members, answer/field questions, help create online environment reflective of community values
+* Be active on [Discord](https://chat.celo.org) - Welcome new members, answer/field questions, help create online environment reflective of community values
 
 
 ### Branding
