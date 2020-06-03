@@ -12,7 +12,6 @@ const initializeArgs = async (_: string): Promise<any[]> => {
     config.downtimeSlasherSlots.penalty,
     config.downtimeSlasherSlots.reward,
     config.downtimeSlasherSlots.slashableDowntime,
-    config.downtimeSlasherSlots.slotSize,
     config.downtimeSlasherSlots.oncePerEpoch,
   ]
 }

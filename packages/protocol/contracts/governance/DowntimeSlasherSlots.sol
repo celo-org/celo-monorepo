@@ -94,6 +94,17 @@ contract DowntimeSlasherSlots is SlasherUtil {
   }
 
   /**
+   * @notice Function that will calculate the accumulated (OR) of the up bitmap for an especific
+   * Slot (startBlock, endBlock) for all the signers.
+   * If in the middle of the Slot, it changes the Epoch, will
+   * calculate one accumulator for the interval [startBlock, epochEndBlock] and 
+   * the other for the interval [nextEpochStartBlock, endBlock]
+   * @param startBlock First block of the downtime slot.
+   * @param endBlock Last block of the downtime slot.
+   * @return up bitmaps accumulators for every signer in the Slot. If in the middle of the Slot
+   * the epoch change occurs, the first element will have the accumulator of the first epoch, and
+   * the second element, the accumulator of the other epoch.
+   * Otherwise, the second element will be zero.
    * @dev Due to getParentSealBitmap, startBlock and the whole slot must be within 4 epochs of the
    * current head.
    */
@@ -145,18 +156,41 @@ contract DowntimeSlasherSlots is SlasherUtil {
     return accumulator;
   }
 
-  function generateProofOfSlotValidation(uint256 startBlock, uint256 endBlock) public {
-    userValidatedSlotProofs[msg.sender][startBlock][endBlock] = calculateSlotUpBitmapAccumulators(
-      startBlock,
-      endBlock
-    );
+  /**
+   * @notice Function that will calculate the accumulated (OR) of the up bitmap for an especific
+   * Slot (startBlock, endBlock) and SAVE it to have a proof that this was already calculated.
+   * If in the middle of the Slot, it changes the Epoch, will calculate one accumulator for the
+   * interval [startBlock, epochEndBlock] and the other for 
+   * the interval [nextEpochStartBlock, endBlock]
+   * If the Slot was calculated before, won't calculate anything and will return the last proof
+   * @param startBlock First block of the downtime slot.
+   * @param endBlock Last block of the downtime slot.
+   * @return up bitmaps accumulators for every signer in the Slot. If in the middle of the Slot
+   * the epoch change occurs, the first element will have the accumulator of the first epoch, and
+   * the second element, the accumulator of the other epoch.
+   * Otherwise, the second element will be zero.
+   */
+  function generateProofOfSlotValidation(uint256 startBlock, uint256 endBlock)
+    public
+    returns (uint256[2] memory)
+  {
+    if (slotAlreadyCalculated(startBlock, endBlock)) {
+      return userValidatedSlotProofs[msg.sender][startBlock][endBlock];
+    }
+    uint256[2] memory accumulators = calculateSlotUpBitmapAccumulators(startBlock, endBlock);
+    userValidatedSlotProofs[msg.sender][startBlock][endBlock] = accumulators;
 
     emit SlotValidationPerformed(msg.sender, startBlock, endBlock);
+
+    return accumulators;
   }
 
   /**
    * @notice Test if a validator has been down for an specific slot of blocks.
-   * @param startBlock First block of the downtime. Last block will be computed from this.
+   * If the user already has called the method "generateProofOfSlotValidation", for
+   * the same Slot (startBlock, endBlock), it will use those accumulators
+   * @param startBlock First block of the downtime.
+   * @param endBlock Last block of the downtime slot.
    * @param startSignerIndex Index of the signer within the validator set as of the start block.
    * @param endSignerIndex Index of the signer within the validator set as of the end block.
    * @return True if the validator signature does not appear in any block within the window.
@@ -192,17 +226,24 @@ contract DowntimeSlasherSlots is SlasherUtil {
     return isDownUsingCalculatedSlot(startBlock, endBlock, startSignerIndex, endSignerIndex);
   }
 
-  function slotAlreadyCalculated(uint256 startBlock, uint256 endBlock)
-    internal
-    view
-    returns (bool)
-  {
+  /**
+   * @notice Shows if the user already called the generateProofOfSlotValidation for
+   * the specific slot
+   * @param startBlock First block of a calculated downtime Slot.
+   * @param endBlock Last block of the calculated downtime Slot.
+   * @return True if the user already called the generateProofOfSlotValidation for
+   * the specific slot
+   */
+  function slotAlreadyCalculated(uint256 startBlock, uint256 endBlock) public view returns (bool) {
     uint256[2] memory validatorsUpAccumulator = userValidatedSlotProofs[msg
       .sender][startBlock][endBlock];
     // It's impossible to have all the validators down in a slot
     return validatorsUpAccumulator[0] != 0 || validatorsUpAccumulator[1] != 0;
   }
 
+  /**
+   * @notice Validast is the signer was down for the specific Slot
+   */
   function isDownUsingCalculatedSlot(
     uint256 startBlock,
     uint256 endBlock,
@@ -215,6 +256,9 @@ contract DowntimeSlasherSlots is SlasherUtil {
       isDownUsingUpAccumulatedBitmaps(startSignerIndex, endSignerIndex, validatorsUpAccumulator);
   }
 
+  /**
+   * @notice Validates if the signerIndexes are down in both up bitmaps accumulators
+   */
   function isDownUsingUpAccumulatedBitmaps(
     uint256 startSignerIndex,
     uint256 endSignerIndex,
@@ -226,15 +270,17 @@ contract DowntimeSlasherSlots is SlasherUtil {
   }
 
   /**
-   * @notice Test if a validator has been down for an specific chain of slots. This required to
-   * have all the slot that cover the slashableDowntime previously calculated.
-   * The startBlock has to be the first block of a Slot_1, if the slot is valid, will get the  
-   * Slot that STARTS at "lastBlockOf(Slot_1) + 1" and then will repeat the same process
-   * until it covers the slashableDowntime.
-   * If the "lastBlockOf(Slot_n) + 1" falls in the middle of a Slot, that Slot won't be
-   * take in count.
+   * @notice Test if a validator has been down for an specific chain of slots.
+   * Requires to:
+   *   - previously called 'generateProofOfSlotValidation' for every pair
+   * (startSlots(i), endSlots(i))
+   *   - startBlock is included in the inital slot interval [startSlots(0), endSlots(0)]
+   *   - endSlots(i) is included in the interval [startSlots(i+1) - 1, endSlots(i+1)]
+   *   - (startBlock, startBlock+SlashableDowntime) be covered by (startSlots(0), endSlots(n))
    * @param startBlock First block of a calculated downtime Slot.
    * Last block will be computed from this.
+   * @param startSlots List of blocks that starts a previously validated slot.
+   * @param endSlots List of blocks that ends a previously validated slot.
    * @param startSignerIndex Index of the signer within the validator set as of the start block.
    * @param endSignerIndex Index of the signer within the validator set as of the end block.
    * @return True if the validator signature does not appear in any block within the window.
@@ -272,6 +318,10 @@ contract DowntimeSlasherSlots is SlasherUtil {
         return false;
       }
       lastEndSlot = endSlots[i];
+      // Could be covered with less slots
+      if (lastEndSlot >= endBlock) {
+        return true;
+      }
     }
 
     require(lastEndSlot >= endBlock, "The slots are not covering the SlashableDowntime window");
@@ -287,8 +337,10 @@ contract DowntimeSlasherSlots is SlasherUtil {
   }
 
   /**
-   * Add to the validator a new SlashedInterval if the validator was not already
-   * slashed by a previous interval that contains al least a block of the new interval
+   * @notice Add to the validator a new SlashedInterval if the validator was not already
+   * slashed by a previous interval that contains al least a block of the new interval.
+   * If the oncePerEpoch flag is set, won't allow two slashes in the same epoch for the same
+   * validator 
    */
   function addNewSlashIntervalToValidator(address validator, uint256 startBlock) internal {
     uint256 endBlock = getEndBlockForSlashing(startBlock);
@@ -322,7 +374,7 @@ contract DowntimeSlasherSlots is SlasherUtil {
 
   /**
    * @notice Requires that `isDown` returns true and that the account corresponding to
-   * `signer` has not already been slashed for downtime for the a previous interval of
+   * `signer` has not already been slashed for downtime for a previous interval of
    * blocks that includes at least one block of the new downtime interval.
    * If so, fetches the `account` associated with `signer` and the group that
    * `signer` was a member of during the corresponding epoch.
@@ -330,7 +382,15 @@ contract DowntimeSlasherSlots is SlasherUtil {
    * Calls `Validators.removeSlashedMember` to remove the validator from its
    * current group if it is a member of one.
    * Finally, stores that (account, epochNumber) has been slashed.
+   * Requires to:
+   *   - previously called 'generateProofOfSlotValidation' for every pair
+   * (startSlots(i), endSlots(i))
+   *   - startBlock is included in the inital slot interval [startSlots(0), endSlots(0)]
+   *   - endSlots(i) is included in the interval [startSlots(i+1) - 1, endSlots(i+1)]
+   *   - (startBlock, startBlock+SlashableDowntime) be covered by (startSlots(0), endSlots(n))
    * @param startBlock First block of the downtime.
+   * @param startSlots List of blocks that starts a previously validated slot.
+   * @param endSlots List of blocks that ends a previously validated slot.
    * @param startSignerIndex Validator index at the first block.
    * @param endSignerIndex Validator index at the last block.
    * @param groupMembershipHistoryIndex Group membership index from where
@@ -374,7 +434,7 @@ contract DowntimeSlasherSlots is SlasherUtil {
     emit DowntimeSlashPerformed(validator, startBlock);
   }
 
-  function getValidatorFromSigner(uint256 startBlock, uint256 startSignerIndex)
+  function getValidatorFromSigner(uint256 startSignerIndex, uint256 startBlock)
     internal
     view
     returns (address)

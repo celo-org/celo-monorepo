@@ -284,7 +284,7 @@ export function deploymentForContractWithCustomRegistryId<ContractInstance exten
   then?: (contract: ContractInstance, web3: Web3, networkName: string) => void
 ) {
   const Contract = artifacts.require(name)
-  const proxyName = registryId + 'Proxy'
+  const proxyName = name + 'Proxy'
   const ContractProxy = artifacts.require(proxyName)
   return (deployer: any, networkName: string, _accounts: string[]) => {
     console.log('Deploying', name)
