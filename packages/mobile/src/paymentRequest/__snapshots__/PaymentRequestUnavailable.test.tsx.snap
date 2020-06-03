@@ -16,68 +16,12 @@ exports[`renders correctly 1`] = `
         "flex": 1,
         "flexDirection": "column",
         "justifyContent": "flex-start",
-        "paddingBottom": 30,
         "paddingHorizontal": 24,
+        "paddingVertical": 32,
       }
     }
   >
     <View>
-      <View
-        style={
-          Object {
-            "alignItems": "center",
-            "flexDirection": "column",
-            "paddingTop": 20,
-          }
-        }
-      >
-        <View
-          style={
-            Array [
-              Object {
-                "alignItems": "center",
-                "flexDirection": "row",
-                "justifyContent": "center",
-              },
-              undefined,
-            ]
-          }
-        >
-          <View
-            style={
-              Array [
-                Object {
-                  "alignItems": "center",
-                  "justifyContent": "center",
-                },
-                Object {
-                  "backgroundColor": "#7AD6FE",
-                  "borderRadius": 60,
-                  "height": 120,
-                  "width": 120,
-                },
-              ]
-            }
-          >
-            <Text
-              style={
-                Array [
-                  Object {
-                    "color": "#FFFFFF",
-                    "fontFamily": "Inter-Medium",
-                    "fontSize": 16,
-                  },
-                  Object {
-                    "fontSize": 60,
-                  },
-                ]
-              }
-            >
-              J
-            </Text>
-          </View>
-        </View>
-      </View>
       <Text
         style={
           Object {
