@@ -87,16 +87,20 @@
   },
   "confirmAccount": {
     "header": "Por favor confirma la cuenta de {{displayName}}",
+    "headerNoDisplayName": "Por favor confirme la cuenta de su contacto",
     "button": "Confirma el número de cuenta"
   },
   "secureSendExplanation": {
-    "body1": "{{e164Number}} tiene multipes cuentas asociadas. {{displayName}} puede haber creado una nueva cuenta de Celo, perdido su teléfono o su cuenta puede haber sido interceptada o comprometida.",
+    "body1": "{{e164PhoneNumber}} tiene multipes cuentas asociadas. {{displayName}} puede haber creado una nueva cuenta de Celo, perdido su teléfono o su cuenta puede haber sido interceptada o comprometida.",
+    "body1NoDisplayName": "Su contacto tiene varias cuentas asociadas. Su contacto podría haber creado una nueva cuenta de Celo, o podría haber perdido su teléfono o haber comprometido su cuenta.",
     "body2": "Puedes realizar esto escaneando el código QR o confirmado su número de cuenta directamente antes de realizar transacciones"
   },
   "confirmAccountNumber": {
     "title": "Confirma el número de cuenta",
     "bodyPartial": "Por favor solicita a {{displayName}} los últimos cuatro dígitos de su número de cuenta. Por razones de seguridad, preguntar en persona o por teléfono.",
+    "bodyPartialNoDisplayName": "Solicite a su contacto los últimos cuatro dígitos de su número de cuenta. Es más seguro hacerlo en persona o por teléfono.",
     "body1Full": "Por favor solicita a {{displayName}} su número de cuenta",
+    "body1FullNoDisplayName": "Solicite a su contacto su número de cuenta.",
     "body2Full": "Por razones de seguridad, por favor no utilices mensajes de texto (SMS). Se recomienda altamente preguntar en persona o por teléfono a través de WhastApp, Messenger o por correo electrónico",
     "help": "Ayude a encontrar su número de cuenta",
     "submit": "Enviar"

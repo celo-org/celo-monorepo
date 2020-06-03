@@ -24,7 +24,9 @@ const PaymentRequestUnavailable = (props: Props) => {
             : t('requestUnavailableHeader', { displayName: recipient.displayName })}
         </Text>
         <Text style={styles.body}>
-          {t('requestUnavailableBody', { e164PhoneNumber: recipient.e164PhoneNumber })}
+          {recipient.e164PhoneNumber
+            ? t('requestUnavailableBody', { e164PhoneNumber: recipient.e164PhoneNumber })
+            : t('requestUnavailableNoNumberBody')}
         </Text>
       </ScrollView>
     </SafeAreaView>
