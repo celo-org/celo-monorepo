@@ -112,7 +112,7 @@ commands:
           name: Create cached node_modules (if necessary)
           command: |
             if [ ! -e ~/.tmp/node_modules.tgz ]; then 
-              tar -c node_modules/ packages/*/node_modules/ | gzip --fast > ~/.tmp/node_modules.tgz
+              tar -c node_modules/ packages/*/node_modules/ packages/phone-number-privacy/*/node_modules/ | gzip --fast > ~/.tmp/node_modules.tgz
             fi
       - save_cache:
           name: Save cached node_modules
@@ -339,7 +339,7 @@ jobs:
           command: ./scripts/ci_check_dependency_graph_changed.sh
       - run:
           name: Check if the test should run
-          command: ./scripts/ci_check_if_test_should_run_v2.sh mobile
+          command: ./scripts/ci_check_if_test_should_run_v2.sh @celo/mobile
 
       - run:
           name: Configure environment variables
@@ -481,7 +481,7 @@ jobs:
       - run:
           name: Check if the test should run
           command: |
-            ./scripts/ci_check_if_test_should_run_v2.sh mobile
+            ./scripts/ci_check_if_test_should_run_v2.sh @celo/mobile
 
       - run:
           name: Ensure translations are not missing
@@ -523,7 +523,7 @@ jobs:
       - run:
           name: Check if the test should run
           command: |
-            ./scripts/ci_check_if_test_should_run_v2.sh verification-pool-api
+            ./scripts/ci_check_if_test_should_run_v2.sh @celo/verification-pool-api
 
       - run:
           name: jest tests
@@ -535,13 +535,14 @@ jobs:
 
   protocol-test:
     <<: *defaults
+    resource_class: large
     steps:
       - attach_workspace:
           at: ~/app
       - run:
           name: Check if the test should run
           command: |
-            ./scripts/ci_check_if_test_should_run_v2.sh protocol
+            ./scripts/ci_check_if_test_should_run_v2.sh @celo/protocol
       - run:
           name: test
           # Flaky tests - run them twice
@@ -556,7 +557,7 @@ jobs:
       - run:
           name: Check if the test should run
           command: |
-            ./scripts/ci_check_if_test_should_run_v2.sh protocol
+            ./scripts/ci_check_if_test_should_run_v2.sh @celo/protocol
       - run:
           name: test
           # Flaky tests - run them twice
@@ -576,7 +577,7 @@ jobs:
       - run:
           name: Check if the test should run
           command: |
-            ./scripts/ci_check_if_test_should_run_v2.sh contractkit
+            ./scripts/ci_check_if_test_should_run_v2.sh @celo/contractkit
       - run:
           name: Generate DevChain
           command: |
@@ -602,7 +603,7 @@ jobs:
       - run:
           name: Check if the test should run
           command: |
-            ./scripts/ci_check_if_test_should_run_v2.sh cli
+            ./scripts/ci_check_if_test_should_run_v2.sh @celo/celocli
       - run:
           name: Generate DevChain
           command: |
@@ -643,7 +644,7 @@ jobs:
       - run:
           name: Check if the test should run
           command: |
-            ./scripts/ci_check_if_test_should_run_v2.sh typescript
+            ./scripts/ci_check_if_test_should_run_v2.sh @celo/typescript
       - run:
           name: Install and test the npm package
           command: |
@@ -661,7 +662,7 @@ jobs:
       - run:
           name: Check if the test should run
           command: |
-            ./scripts/ci_check_if_test_should_run_v2.sh utils
+            ./scripts/ci_check_if_test_should_run_v2.sh @celo/utils
       - run:
           name: Install and test the npm package
           command: |
@@ -680,7 +681,7 @@ jobs:
       - run:
           name: Check if the test should run
           command: |
-            ./scripts/ci_check_if_test_should_run_v2.sh celotool
+            ./scripts/ci_check_if_test_should_run_v2.sh @celo/celotool
       - run:
           name: Run test
           no_output_timeout: 20m
@@ -698,7 +699,7 @@ jobs:
       - run:
           name: Check if the test should run
           command: |
-            ./scripts/ci_check_if_test_should_run_v2.sh celotool
+            ./scripts/ci_check_if_test_should_run_v2.sh @celo/celotool
       - run:
           name: Run test
           no_output_timeout: 20m
@@ -716,7 +717,7 @@ jobs:
       - run:
           name: Check if the test should run
           command: |
-            ./scripts/ci_check_if_test_should_run_v2.sh celotool
+            ./scripts/ci_check_if_test_should_run_v2.sh @celo/celotool
       - run:
           name: Run test
           no_output_timeout: 20m
@@ -734,7 +735,7 @@ jobs:
       - run:
           name: Check if the test should run
           command: |
-            ./scripts/ci_check_if_test_should_run_v2.sh celotool
+            ./scripts/ci_check_if_test_should_run_v2.sh @celo/celotool
       - run:
           name: Run test
           no_output_timeout: 20m
@@ -752,7 +753,7 @@ jobs:
       - run:
           name: Check if the test should run
           command: |
-            ./scripts/ci_check_if_test_should_run_v2.sh celotool
+            ./scripts/ci_check_if_test_should_run_v2.sh @celo/celotool
       - run:
           name: Run test
           command: |
@@ -769,7 +770,7 @@ jobs:
       - run:
           name: Check if the test should run
           command: |
-            ./scripts/ci_check_if_test_should_run_v2.sh celotool
+            ./scripts/ci_check_if_test_should_run_v2.sh @celo/celotool
       - run:
           name: Run test
           command: |
@@ -787,7 +788,7 @@ jobs:
       - run:
           name: Check if the test should run
           command: |
-            ./scripts/ci_check_if_test_should_run_v2.sh web
+            ./scripts/ci_check_if_test_should_run_v2.sh @celo/web
       - run: mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
       - run: cd packages/web && ./circle_deploy.sh
 
@@ -799,7 +800,7 @@ jobs:
       - run:
           name: Check if the test should run
           command: |
-            ./scripts/ci_check_if_test_should_run_v2.sh typescript
+            ./scripts/ci_check_if_test_should_run_v2.sh @celo/typescript
       - run:
           name: Installing npm package - @celo/typescript
           command: yarn add @celo/typescript
@@ -812,7 +813,7 @@ jobs:
       - run:
           name: Check if the test should run
           command: |
-            ./scripts/ci_check_if_test_should_run_v2.sh utils
+            ./scripts/ci_check_if_test_should_run_v2.sh @celo/utils
       - run:
           name: Installing npm package - @celo/utils
           command: yarn add @celo/utils
@@ -825,7 +826,7 @@ jobs:
       - run:
           name: Check if the test should run
           command: |
-            ./scripts/ci_check_if_test_should_run_v2.sh contractkit
+            ./scripts/ci_check_if_test_should_run_v2.sh @celo/contractkit
       - run:
           name: Installing npm package - @celo/contractkit
           command: |
@@ -841,7 +842,7 @@ jobs:
       - run:
           name: Check if the test should run
           command: |
-            ./scripts/ci_check_if_test_should_run_v2.sh cli
+            ./scripts/ci_check_if_test_should_run_v2.sh @celo/celocli
       - run:
           name: Installing npm package - @celo/celocli
           command: npm install @celo/celocli
@@ -857,10 +858,13 @@ jobs:
       - run:
           name: Check if the test should run
           command: |
-            ./scripts/ci_check_if_test_should_run_v2.sh phone-number-privacy
+            ./scripts/ci_check_if_test_should_run_v2.sh @celo/phone-number-privacy-signer,@celo/phone-number-privacy-combiner
       - run:
-          name: Run Tests
-          command: yarn --cwd=packages/phone-number-privacy test
+          name: Run Tests for combiner
+          command: yarn --cwd=packages/phone-number-privacy/combiner test
+      - run:
+          name: Run Tests for signer
+          command: yarn --cwd=packages/phone-number-privacy/signer test
 
 workflows:
   version: 2

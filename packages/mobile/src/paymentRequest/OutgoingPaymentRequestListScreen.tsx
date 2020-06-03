@@ -1,7 +1,6 @@
 import React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { View } from 'react-native'
-import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
 import { getOutgoingPaymentRequests } from 'src/account/selectors'
 import { PaymentRequest } from 'src/account/types'
@@ -43,7 +42,7 @@ const mapStateToProps = (state: RootState): StateProps => ({
   addressToE164Number: state.identity.addressToE164Number,
 })
 
-type Props = NavigationInjectedProps & WithTranslation & StateProps & DispatchProps
+type Props = WithTranslation & StateProps & DispatchProps
 
 export const listItemRenderer = (params: {
   recipientCache: NumberToRecipient

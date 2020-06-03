@@ -15,13 +15,18 @@
   "amount": "Amount",
   "celoDollarAmount": "<0></0> {{CeloDollar}}",
   "celoDollarAmount_plural": "<0></0> {{CeloDollars}}",
-  "groceriesRent": "Groceries, rent, etc. (Optional)",
+  "addDescription": "Add description",
+  "sentTo": "Sent To",
+  "receivedFrom": "Received From",
+  "accountNumberLabel": "Account\nNo.",
+  "commentLabel": "Message",
+  "amountSent": "Amount Sent",
   "fee": "Fee",
   "securityFee": "Security Fee",
   "inviteFee": "Invitation Fee",
   "feeEducation": "Sending payments and making exchanges include a small fee for service security and maintenance.",
   "learnMore": "Learn More",
-  "inviteMoneyEscrow": "We’ll keep this money safe until your friend creates a Celo account",
+  "inviteMoneyEscrow": "We’ll invite this contact and keep their funds safe until they verifiy their account.",
   "reviewPayment": "Review Payment",
   "requestPayment": "Request Payment",
   "continue": "Continue",
@@ -50,6 +55,7 @@
   "QRCode": "QR Code",
   "shareCodeImage": "Share Code Image",
   "scanCode": "Scan Code",
+  "scanQRCode": "Scan QR Code",
   "writeStorageNeededForQrDownload": "Storage write permission is needed for downloading the QR code",
   "cameraScanInfo": "Scan code by placing it in the box",
   "cameraNotAuthorizedTitle": "Enable Camera",
@@ -80,5 +86,31 @@
     "header": "Syncing Contacts",
     "progress": "{{current}} of {{total}}",
     "importing": "Importing..."
-  }
+  },
+  "confirmAccount": {
+    "header": "Please confirm {{displayName}}'s account",
+    "button": "Confirm Account Number"
+  },
+  "secureSendExplanation": {
+    "body1": "{{e164Number}} has multiple accounts associated with it. {{displayName}} could have created a new Celo account, or may have lost their phone or had their account compromised.",
+    "body2": "You must scan their QR code or confirm their account number before transacting."
+  },
+  "confirmAccountNumber": {
+    "title": "Confirm Account Number",
+    "bodyPartial": "Please ask {{displayName}} for the last four digits of their account number. It's safest to do this in person or by phone.",
+    "body1Full": "Please ask {{displayName}} for their account number.",
+    "body2Full": "We strongly recommend asking in person or over the phone, through WhatsApp or Messenger, or by email. For security, please do not use text messaging (SMS).",
+    "help": "Help locating an account number",
+    "submit": "Submit"
+  },
+  "accountInputHeaderPartial": "Last 4 Digits",
+  "accountInputHeaderFull": "Account Number",
+  "helpModal": {
+    "header": "Locating an Account Number",
+    "body1": "Account numbers (also known as addresses) are located in the menu. From the Home screen, open the menu by tapping the icon in the top left corner.",
+    "body2": "The account number is near the bottom of the menu.",
+    "body3": "Account numbers begin with \"0x\" and are 42 characters long"
+  },
+  "transferAddressChanged": "This contact changed their account number since the transaction. This payment was sent to:",
+  "addressConfirmed": "Account number confirmed"
 }

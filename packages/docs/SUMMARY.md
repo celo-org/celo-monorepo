@@ -6,15 +6,17 @@
 ## Getting Started
 
 - [Choosing a Network](getting-started/choosing-a-network.md)
-- [Mainnet Release Candidate 1](getting-started/rc1.md)
-  - [Running a Validator](getting-started/running-a-validator-in-rc1.md)
-  - [Running a Full Node](getting-started/running-a-full-node-in-rc1.md)
+- [Mainnet](getting-started/mainnet.md)
+  - [Running a Validator](getting-started/running-a-validator-in-mainnet.md)
+  - [Running a Full Node](getting-started/running-a-full-node-in-mainnet.md)
 - [Baklava Testnet](getting-started/baklava-testnet.md)
   - [Running a Validator](getting-started/running-a-validator-in-baklava.md)
   - [Running a Full Node](getting-started/running-a-full-node-in-baklava.md)
 - [Alfajores Testnet](getting-started/alfajores-testnet.md)
   - [Using the Mobile Wallet](getting-started/using-the-mobile-wallet.md)
   - [Getting an Account and Funds](getting-started/faucet.md)
+  - [Running a Full Node](getting-started/running-a-full-node-in-alfajores.md)
+- [Validator Setup FAQ](getting-started/validator-troubleshooting-faq.md)
 - [Glossary](GLOSSARY.md)
 
 ## Celo Gold Holder Guide
@@ -29,10 +31,11 @@
 - [Key Management](operations-manual/key-management/summary.md)
   - [Detailed Role Descriptions](operations-manual/key-management/detailed.md)
   - [Validator Signer Key Rotation](operations-manual/key-management/key-rotation.md)
-- [Celo Foundation Voting Policy](operations-manual/celo-foundation-voting-policy.md)
 - [Securing Celo Nodes and Services](operations-manual/securing-nodes-and-services.md)
+- [Monitoring](operations-manual/monitoring.md)
 - [Upgrading a Node](operations-manual/node-upgrades.md)
 - [Validator Explorer](operations-manual/validator-explorer.md)
+- [Celo Foundation Voting Policy](operations-manual/celo-foundation-voting-policy.md)
 
 ## Developer Guide
 - [Quick Start](developer-resources/start.md)
@@ -81,6 +84,7 @@
   - [Integrations](developer-resources/integrations/integrations.md)
     - [General](developer-resources/integrations/general.md)
     - [Custody](developer-resources/integrations/custody.md)
+    - [Using a Cloud HSM](developer-resources/integrations/cloud-hsm.md)
   - [Reference](developer-resources/contractkit/reference/SUMMARY.md)
     <!-- contractkit-reference-start -->
     - [Globals](developer-resources/contractkit/reference/globals.md)
@@ -230,6 +234,8 @@
       - [ProposalRecord](developer-resources/contractkit/reference/interfaces/_wrappers_governance_.proposalrecord.md)
       - [ProposalStageDurations](developer-resources/contractkit/reference/interfaces/_wrappers_governance_.proposalstagedurations.md)
       - [UpvoteRecord](developer-resources/contractkit/reference/interfaces/_wrappers_governance_.upvoterecord.md)
+      - [VoteRecord](developer-resources/contractkit/reference/interfaces/_wrappers_governance_.voterecord.md)
+      - [Voter](developer-resources/contractkit/reference/interfaces/_wrappers_governance_.voter.md)
       - [Votes](developer-resources/contractkit/reference/interfaces/_wrappers_governance_.votes.md)
       - [wrappers/LockedGold](developer-resources/contractkit/reference/modules/_wrappers_lockedgold_.md)
       - [LockedGoldWrapper](developer-resources/contractkit/reference/classes/_wrappers_lockedgold_.lockedgoldwrapper.md)
@@ -366,6 +372,8 @@
       - [ProposalRecord](developer-resources/contractkit/reference/interfaces/_wrappers_governance_.proposalrecord.md)
       - [ProposalStageDurations](developer-resources/contractkit/reference/interfaces/_wrappers_governance_.proposalstagedurations.md)
       - [UpvoteRecord](developer-resources/contractkit/reference/interfaces/_wrappers_governance_.upvoterecord.md)
+      - [VoteRecord](developer-resources/contractkit/reference/interfaces/_wrappers_governance_.voterecord.md)
+      - [Voter](developer-resources/contractkit/reference/interfaces/_wrappers_governance_.voter.md)
       - [Votes](developer-resources/contractkit/reference/interfaces/_wrappers_governance_.votes.md)
       - [AccountSlashed](developer-resources/contractkit/reference/interfaces/_wrappers_lockedgold_.accountslashed.md)
       - [LockedGoldConfig](developer-resources/contractkit/reference/interfaces/_wrappers_lockedgold_.lockedgoldconfig.md)
@@ -465,4 +473,4 @@
 
 - [Alfajores Testnet Disclaimer](important-information/alfajores-testnet-disclaimer.md)
 - [Baklava Testnet Disclaimer](important-information/baklava-testnet-disclaimer.md)
-- [Release Candidate Network Disclaimer](important-information/rc-network-disclaimer.md)
+- [Mainnet Disclaimer](important-information/mainnet-network-disclaimer.md)

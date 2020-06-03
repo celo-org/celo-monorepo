@@ -15,7 +15,7 @@ import {
 } from 'src/identity/reducer'
 import { sendDollar } from 'src/images/Images'
 import { navigate } from 'src/navigator/NavigationService'
-import { Stacks } from 'src/navigator/Screens'
+import { Screens } from 'src/navigator/Screens'
 import SummaryNotification from 'src/notifications/SummaryNotification'
 import { listItemRenderer } from 'src/paymentRequest/OutgoingPaymentRequestListScreen'
 import PaymentRequestNotificationInner from 'src/paymentRequest/PaymentRequestNotificationInner'
@@ -51,7 +51,7 @@ const mapStateToProps = (state: RootState): StateProps => ({
 export class OutgoingPaymentRequestSummaryNotification extends React.Component<Props> {
   onReview = () => {
     CeloAnalytics.track(CustomEventNames.outgoing_request_payment_review)
-    navigate(Stacks.OutgoingRequestStack)
+    navigate(Screens.OutgoingPaymentRequestListScreen)
   }
 
   itemRenderer = (item: PaymentRequest) => {
@@ -59,7 +59,7 @@ export class OutgoingPaymentRequestSummaryNotification extends React.Component<P
       <PaymentRequestNotificationInner
         key={item.uid}
         amount={item.amount}
-        requesterRecipient={getSenderFromPaymentRequest(
+        recipient={getSenderFromPaymentRequest(
           item,
           this.props.addressToE164Number,
           this.props.recipientCache
@@ -81,7 +81,8 @@ export class OutgoingPaymentRequestSummaryNotification extends React.Component<P
     ) : (
       <SummaryNotification<PaymentRequest>
         items={requests}
-        title={t('outgoingPaymentRequests')}
+        title={t('outgoingPaymentRequestsSummaryTitle', { count: requests.length })}
+        detailsI18nKey="walletFlow5:outgoingPaymentRequestsSummaryDetails"
         icon={<Image source={sendDollar} style={styles.image} resizeMode="contain" />}
         onReview={this.onReview}
         itemRenderer={this.itemRenderer}

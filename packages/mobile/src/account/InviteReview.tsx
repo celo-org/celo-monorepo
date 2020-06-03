@@ -3,17 +3,16 @@ import ReviewFrame from '@celo/react-components/components/ReviewFrame'
 import ReviewHeader from '@celo/react-components/components/ReviewHeader'
 import colors from '@celo/react-components/styles/colors'
 import { CURRENCY_ENUM } from '@celo/utils/src/currencies'
+import { StackScreenProps } from '@react-navigation/stack'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { ActivityIndicator, StyleSheet, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
-import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
 import { hideAlert, showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
-import componentWithAnalytics from 'src/analytics/wrapper'
 import { TokenTransactionType } from 'src/apollo/types'
 import { FeeType } from 'src/fees/actions'
 import CalculateFee from 'src/fees/CalculateFee'
@@ -25,7 +24,8 @@ import WhatsAppLogo from 'src/icons/WhatsAppLogo'
 import { InviteBy, sendInvite } from 'src/invite/actions'
 import { getInvitationVerificationFeeInDollars } from 'src/invite/saga'
 import { navigateBack } from 'src/navigator/NavigationService'
-import { Recipient } from 'src/recipients/recipient'
+import { Screens } from 'src/navigator/Screens'
+import { StackParamList } from 'src/navigator/types'
 import { RootState } from 'src/redux/reducers'
 import TransferReviewCard from 'src/send/TransferReviewCard'
 import { fetchDollarBalance } from 'src/stableToken/actions'
@@ -34,8 +34,6 @@ import { currentAccountSelector } from 'src/web3/selectors'
 interface State {
   amountIsValid: boolean
 }
-
-type Props = StateProps & DispatchProps & NavigationInjectedProps & WithTranslation
 
 interface StateProps {
   account: string | null
@@ -49,6 +47,10 @@ interface DispatchProps {
   showError: typeof showError
   hideAlert: typeof hideAlert
 }
+
+type OwnProps = StackScreenProps<StackParamList, Screens.InviteReview>
+
+type Props = StateProps & DispatchProps & WithTranslation & OwnProps
 
 const mapStateToProps = (state: RootState): StateProps => ({
   account: currentAccountSelector(state),
@@ -77,8 +79,8 @@ export class InviteReview extends React.Component<Props, State> {
     this.checkIfEnoughFundsAreAvailable()
   }
 
-  getRecipient = (): Recipient => {
-    const recipient = this.props.navigation.getParam('recipient')
+  getRecipient = () => {
+    const recipient = this.props.route.params.recipient
     if (!recipient) {
       throw new Error('Recipient expected')
     }
@@ -220,9 +222,7 @@ const style = StyleSheet.create({
   },
 })
 
-export default componentWithAnalytics(
-  connect<StateProps, DispatchProps, {}, RootState>(
-    mapStateToProps,
-    mapDispatchToProps
-  )(withTranslation(Namespaces.inviteFlow11)(InviteReview))
-)
+export default connect<StateProps, DispatchProps, OwnProps, RootState>(
+  mapStateToProps,
+  mapDispatchToProps
+)(withTranslation(Namespaces.inviteFlow11)(InviteReview))

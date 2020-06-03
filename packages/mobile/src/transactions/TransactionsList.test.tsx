@@ -10,9 +10,9 @@ import {
   UserTransactionsQuery,
 } from 'src/apollo/types'
 import { CURRENCY_ENUM } from 'src/geth/consts'
-import { StandbyTransaction, TransactionStatus } from 'src/transactions/reducer'
 import { TransactionFeed } from 'src/transactions/TransactionFeed'
 import TransactionsList, { TRANSACTIONS_QUERY } from 'src/transactions/TransactionsList'
+import { StandbyTransaction, TransactionStatus } from 'src/transactions/types'
 import { createMockStore } from 'test/utils'
 
 jest.unmock('react-apollo')
@@ -276,7 +276,7 @@ it('renders the received data along with the standby transactions', async () => 
   expect(toJSON()).toMatchSnapshot()
 })
 
-it('ignores pending standby transactions that are completed in the response and removes them', async () => {
+it('ignores pending standby transactions that are completed in the response', async () => {
   const store = createMockStore({
     transactions: { standbyTransactions: pendingStandbyTransactions },
   })
@@ -294,11 +294,6 @@ it('ignores pending standby transactions that are completed in the response and 
   const feed = await waitForElement(() => getByType(TransactionFeed))
   expect(feed.props.data.length).toEqual(2)
   expect(toJSON()).toMatchSnapshot()
-
-  expect(store.getActions()).toEqual([
-    { type: 'HOME/REFRESH_BALANCES' },
-    { type: 'TRANSACTIONS/REMOVE_STANDBY_TRANSACTION', idx: 'a-standby-tx-id' },
-  ])
 })
 
 it('ignores failed standby transactions', async () => {

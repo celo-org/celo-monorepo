@@ -2,25 +2,25 @@ import ReviewFrame from '@celo/react-components/components/ReviewFrame'
 import ReviewHeader from '@celo/react-components/components/ReviewHeader'
 import colors from '@celo/react-components/styles/colors'
 import { CURRENCY_ENUM } from '@celo/utils/src/currencies'
-import BigNumber from 'bignumber.js'
+import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { StyleSheet } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
-import { NavigationInjectedProps } from 'react-navigation'
 import { connect } from 'react-redux'
 import { PaymentRequestStatus } from 'src/account/types'
 import { showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
-import componentWithAnalytics from 'src/analytics/wrapper'
 import { writePaymentRequest } from 'src/firebase/actions'
 import { currencyToShortMap } from 'src/geth/consts'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { navigateBack } from 'src/navigator/NavigationService'
+import { Screens } from 'src/navigator/Screens'
+import { StackParamList } from 'src/navigator/types'
 import PaymentRequestReviewCard from 'src/paymentRequest/PaymentRequestReviewCard'
-import { Recipient } from 'src/recipients/recipient'
 import { RootState } from 'src/redux/reducers'
+import { ConfirmationInput, getConfirmationInput } from 'src/send/utils'
 import DisconnectBanner from 'src/shared/DisconnectBanner'
 import Logger from 'src/utils/Logger'
 import { currentAccountSelector } from 'src/web3/selectors'
@@ -28,16 +28,10 @@ import { currentAccountSelector } from 'src/web3/selectors'
 // @ts-ignore
 const TAG = 'paymentRequest/confirmation'
 
-export interface ConfirmationInput {
-  recipient: Recipient
-  amount: BigNumber
-  reason: string
-  recipientAddress: string
-}
-
 interface StateProps {
   e164PhoneNumber: string
   account: string | null
+  confirmationInput: ConfirmationInput
 }
 
 interface DispatchProps {
@@ -47,33 +41,32 @@ interface DispatchProps {
 
 const mapDispatchToProps = { showError, writePaymentRequest }
 
-const mapStateToProps = (state: RootState): StateProps => {
+const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
+  const { route } = ownProps
+  const transactionData = route.params.transactionData
+  const { e164NumberToAddress } = state.identity
+  const { secureSendPhoneNumberMapping } = state.identity
+  const confirmationInput = getConfirmationInput(
+    transactionData,
+    e164NumberToAddress,
+    secureSendPhoneNumberMapping
+  )
   return {
+    confirmationInput,
     e164PhoneNumber: state.account.e164PhoneNumber,
     account: currentAccountSelector(state),
   }
 }
 
-type Props = NavigationInjectedProps & DispatchProps & StateProps & WithTranslation
+type OwnProps = StackScreenProps<StackParamList, Screens.PaymentRequestConfirmation>
+
+type Props = DispatchProps & StateProps & WithTranslation & OwnProps
 
 class PaymentRequestConfirmation extends React.Component<Props> {
   static navigationOptions = { header: null }
 
-  getConfirmationInput(): ConfirmationInput {
-    const confirmationInput = this.props.navigation.getParam('confirmationInput', '')
-    if (confirmationInput === '') {
-      throw new Error('Confirmation input missing')
-    }
-    return confirmationInput
-  }
-
   onConfirm = async () => {
-    const {
-      amount,
-      reason,
-      recipient,
-      recipientAddress: requesteeAddress,
-    } = this.getConfirmationInput()
+    const { amount, recipient, recipientAddress: requesteeAddress } = this.props.confirmationInput
 
     CeloAnalytics.track(CustomEventNames.request_payment_request, {
       requesteeAddress,
@@ -89,6 +82,10 @@ class PaymentRequestConfirmation extends React.Component<Props> {
       throw new Error("Can't request without a valid account")
     }
 
+    if (!requesteeAddress) {
+      throw new Error('Error passing through the requestee address')
+    }
+
     const paymentInfo = {
       amount: amount.toString(),
       // TODO: discuss if sending address would be better
@@ -98,7 +95,8 @@ class PaymentRequestConfirmation extends React.Component<Props> {
       requesterE164Number: this.props.e164PhoneNumber,
       requesteeAddress,
       currency: currencyToShortMap[CURRENCY_ENUM.DOLLAR],
-      comment: reason,
+      // NOTE: Add this back in when redesigning this screen
+      comment: 'placeholder',
       status: PaymentRequestStatus.REQUESTED,
       notified: false,
     }
@@ -116,12 +114,7 @@ class PaymentRequestConfirmation extends React.Component<Props> {
 
   render() {
     const { t } = this.props
-    const {
-      amount,
-      reason,
-      recipient,
-      recipientAddress: requesteeAddress,
-    } = this.getConfirmationInput()
+    const { amount, recipient, recipientAddress: requesteeAddress } = this.props.confirmationInput
 
     return (
       <SafeAreaView style={styles.container}>
@@ -139,7 +132,7 @@ class PaymentRequestConfirmation extends React.Component<Props> {
             recipient={recipient}
             address={requesteeAddress || ''}
             e164PhoneNumber={recipient.e164PhoneNumber}
-            comment={reason}
+            // comment={reason} NOTE: Add this back in when redesigning this screen
             value={amount}
             currency={CURRENCY_ENUM.DOLLAR} // User can only request in Dollars
           />
@@ -157,9 +150,7 @@ const styles = StyleSheet.create({
   },
 })
 
-export default componentWithAnalytics(
-  connect<StateProps, DispatchProps, {}, RootState>(
-    mapStateToProps,
-    mapDispatchToProps
-  )(withTranslation(Namespaces.sendFlow7)(PaymentRequestConfirmation))
-)
+export default connect<StateProps, DispatchProps, OwnProps, RootState>(
+  mapStateToProps,
+  mapDispatchToProps
+)(withTranslation(Namespaces.sendFlow7)(PaymentRequestConfirmation))

@@ -1,11 +1,14 @@
 /* Shared mock values to facilitate testing */
+import { StackNavigationProp } from '@react-navigation/stack'
 import BigNumber from 'bignumber.js'
 import { MinimalContact } from 'react-native-contacts'
 import { NotificationTypes, PaymentRequest, PaymentRequestStatus } from 'src/account/types'
+import { TokenTransactionType } from 'src/apollo/types'
 import { EscrowedPayment } from 'src/escrow/actions'
 import { SHORT_CURRENCIES } from 'src/geth/consts'
 import { AddressToE164NumberType, E164NumberToAddressType } from 'src/identity/reducer'
 import { AttestationCode } from 'src/identity/verification'
+import { StackParamList } from 'src/navigator/types'
 import {
   RecipientKind,
   RecipientWithContact,
@@ -24,22 +27,20 @@ export const mockMnemonicShard1 =
 export const mockMnemonicShard2 =
   'celo old unable wash wrong need fluid hammer coach reveal plastic trust lake'
 
-export const mockPrivateDEK = Buffer.from(
-  '41e8e8593108eeedcbded883b8af34d2f028710355c57f4c10a056b72486aa04',
-  'hex'
-)
+export const mockPrivateDEK = '41e8e8593108eeedcbded883b8af34d2f028710355c57f4c10a056b72486aa04'
 export const mockPublicDEK = '02c9cacca8c5c5ebb24dc6080a933f6d52a072136a069083438293d71da36049dc'
-export const mockPrivateDEK2 = Buffer.from(
-  '855c5f9d5fc53962537eaf9a0f3ea40a7bc7e57a119e8473fffef24be20bffff',
-  'hex'
-)
+export const mockPrivateDEK2 = '855c5f9d5fc53962537eaf9a0f3ea40a7bc7e57a119e8473fffef24be20bffff'
 export const mockPublicDEK2 = '024c158e98449d9ca4dddeaa12c2432a5e7d38a48a53299fd22c51daf8d409957a'
 
 export const mockContractAddress = '0x000000000000000000000000000000000000CE10'
 export const mockE164Number = '+14155550000'
+export const mockDisplayNumber = '(415) 555-0000'
 export const mockE164NumberHash =
   '0xefbc804cdddcb76544e1dd2c25e9624edae290d175ccd20538e5cae06c7dbe9e'
-export const mockDisplayNumber = '(415) 555-0000'
+export const mockE164NumberSalt = 'piWqRHHYWtfg9'
+export const mockE164NumberHashWithSalt =
+  '0xf6429456331dedf8bd32b5e3a578e5bc589a28d012724dcd3e0a4b1be67bb454'
+
 export const mockE164Number2 = '+12095559790'
 export const mockDisplayNumber2 = '(209) 555-9790'
 export const mockComment = 'Rent request for June, it is already late!!!'
@@ -47,18 +48,20 @@ export const mockCountryCode = '+1'
 
 export const mockQrCodeData = `{"address":"${mockAccount}","e164PhoneNumber":"${mockE164Number}","displayName":"${mockName}"}`
 
-const mockNameInvite = 'Jane Doe'
-const mockName2Invite = 'George Bogart'
-const mockE164NumberInvite = '+13105550000'
-const mockDisplayNumberInvite = '13105550000'
-const mockE164Number2Invite = '+21255550000'
-const mockDisplayNumber2Invite = '21255550000'
-const mockAccountInvite = '0x9335BaFcE54cAa0D6690d1D4DA6406568b52488F'
-const mockAccountInvitePrivKey =
+export const mockNameInvite = 'Jane Doe'
+export const mockName2Invite = 'George Bogart'
+export const mockE164NumberInvite = '+13105550000'
+export const mockDisplayNumberInvite = '13105550000'
+export const mockE164Number2Invite = '+21255550000'
+export const mockDisplayNumber2Invite = '21255550000'
+export const mockAccountInvite = '0x9335BaFcE54cAa0D6690d1D4DA6406568b52488F'
+export const mockAccountInvitePrivKey =
   '0xe59c12feb5ea13dabcc068a28d1d521a26e39464faa7bbcc01f43b8340e92fa6'
-const mockAccount2Invite = '0x8e1Df47B7064D005Ef071a89D0D7dc8634BC8A9C'
-const mockAccountInvite2PrivKey =
+export const mockAccount2Invite = '0x8e1Df47B7064D005Ef071a89D0D7dc8634BC8A9C'
+export const mockAccountInvite2PrivKey =
   '0xb33eac631fd3a415f3738649db8cad57da78b99ec92cd8f77b76b5dae2ebdf27'
+
+export const mockQrCodeData2 = `{"address":"${mockAccount2Invite}","e164PhoneNumber":"${mockE164Number2Invite}","displayName":"${mockName2Invite}"}`
 
 export const mockInviteDetails = {
   timestamp: 1588200517518,
@@ -91,7 +94,7 @@ export const mockInviteDetails3 = {
   inviteLink: 'http://celo.page.link/PARAMS',
 }
 
-const mockInvitableRecipient: RecipientWithContact = {
+export const mockInvitableRecipient: RecipientWithContact = {
   kind: RecipientKind.Contact,
   displayName: mockName,
   displayId: '14155550000',
@@ -100,7 +103,7 @@ const mockInvitableRecipient: RecipientWithContact = {
   phoneNumberLabel: 'phoneNumLabel',
 }
 
-const mockInvitableRecipient2: RecipientWithContact = {
+export const mockInvitableRecipient2: RecipientWithContact = {
   kind: RecipientKind.Contact,
   displayName: mockNameInvite,
   displayId: mockDisplayNumberInvite,
@@ -109,7 +112,13 @@ const mockInvitableRecipient2: RecipientWithContact = {
   phoneNumberLabel: 'phoneNumLabel',
 }
 
-const mockInvitableRecipient3: RecipientWithContact = {
+export const mockTransactionData = {
+  recipient: mockInvitableRecipient2,
+  amount: new BigNumber(1),
+  type: TokenTransactionType.Sent,
+}
+
+export const mockInvitableRecipient3: RecipientWithContact = {
   kind: RecipientKind.Contact,
   displayName: mockName2Invite,
   displayId: mockDisplayNumber2Invite,
@@ -153,34 +162,17 @@ export const mockRecipientWithPhoneNumber: RecipientWithMobileNumber = {
   e164PhoneNumber: mockE164Number,
 }
 
-export const mockNavigation = {
-  state: {
-    params: { recipient: mockRecipient },
-    index: 0,
-    routes: [],
-    isTransitioning: false,
-    key: 'key',
-    routeName: 'routeName',
-  },
-  dispatch: jest.fn(),
-  goBack: jest.fn(),
-  dismiss: jest.fn(),
+export const mockNavigation: StackNavigationProp<StackParamList, any> = ({
   navigate: jest.fn(),
-  openDrawer: jest.fn(),
-  closeDrawer: jest.fn(),
-  toggleDrawer: jest.fn(),
-  getParam: jest.fn(() => mockRecipient),
+  reset: jest.fn(),
+  goBack: jest.fn(),
   setParams: jest.fn(),
-  addListener: jest.fn(),
-  push: jest.fn(),
-  replace: jest.fn(),
-  pop: jest.fn(),
-  popToTop: jest.fn(),
+  dispatch: jest.fn(),
+  setOptions: jest.fn(),
   isFocused: jest.fn(),
-  dangerouslyGetParent: jest.fn(),
-  emit: jest.fn(),
-  isFirstRouteInParent: jest.fn(),
-}
+  addListener: jest.fn(),
+  removeListener: jest.fn(),
+} as unknown) as StackNavigationProp<StackParamList, any>
 
 export const mockAddressToE164Number: AddressToE164NumberType = {
   [mockAccount]: mockE164Number,
