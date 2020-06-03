@@ -159,5 +159,13 @@
   "addressValidationFullOwnAddress": "Please enter your contact's account number, not your own. Press the link below for help",
   "addressValidationPartialOwnAddress": "Please enter the last 4 digits of your contact's account number, not your own. Press the link below for help",
   "helpFindAccount": "Help your contact find their account number",
-  "close": "Close"
+  "close": "Close",
+  "home": "Home",
+  "accountKey": "Account Key",
+  "addAndWithdraw": "Add and Withdraw",
+  "invite": "Invite",
+  "settings": "Settings",
+  "help": "Help",
+  "dismiss": "Dismiss",
+  "review": "Review"
 }

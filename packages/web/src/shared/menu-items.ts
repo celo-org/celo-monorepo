@@ -172,9 +172,6 @@ export const hashNav = {
     overview: 'overview',
   },
   brandTypography: { overview: 'overview', scale: 'type-scale' },
-  eventsIntro: {
-    overview: 'overview',
-  },
 }
 
 export default pagePaths

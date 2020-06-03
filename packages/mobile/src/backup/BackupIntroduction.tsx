@@ -16,6 +16,7 @@ import DelayButton from 'src/backup/DelayButton'
 import { useAccountKey } from 'src/backup/utils'
 import { Namespaces } from 'src/i18n'
 import Logo from 'src/icons/Logo.v2'
+import DrawerTopBar from 'src/navigator/DrawerTopBar'
 import { drawerHeader } from 'src/navigator/Headers.v2'
 import { navigateProtected } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -54,7 +55,7 @@ class BackupIntroduction extends React.Component<Props> {
   }
 
   onPressBackup = () => {
-    CeloAnalytics.track(CustomEventNames.set_backup_phrase)
+    CeloAnalytics.track(CustomEventNames.backup_start)
     navigateProtected(Screens.BackupPhrase)
   }
 
@@ -62,6 +63,7 @@ class BackupIntroduction extends React.Component<Props> {
     const { backupCompleted } = this.props
     return (
       <SafeAreaView style={styles.container}>
+        <DrawerTopBar />
         {backupCompleted ? (
           <AccountKeyPostSetup />
         ) : (

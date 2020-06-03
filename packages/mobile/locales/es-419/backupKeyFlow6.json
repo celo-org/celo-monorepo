@@ -45,6 +45,12 @@
     "confirmation": "He enviado cada una de las salvaguardas a un amigo de confianza.",
     "yourSafeguards": "Sus salvaguardas"
   },
+  "cancelDialog": {
+    "title": "Termine de configurar su Clave de Cuenta",
+    "body": "Las claves de la cuenta son extremadamente importantes. Sin una llave, puedes perder el acceso a tu billetera para siempre. Estarás bloqueado para enviar cualquier transacción hasta que termines de configurar tu Clave de Cuenta",
+    "action": "Completar ahora",
+    "secondary": "Establecer más tarde"
+  },
   "backupPhrasePlaceholder":
     "caballo leopardo perro mono tiburón tigre lémur ballena calamar lobo ardilla ratón león elefante gato langostino oso pingüino ciervo tortuga zorro cebra cabra jirafa"
 }

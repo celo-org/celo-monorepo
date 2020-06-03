@@ -69,7 +69,6 @@
     "0": "{{testnet}}",
     "1": "A friendly reminder you're using the {{testnet}} network build - the balances are not real"
   },
-  "dismiss": "Dismiss",
   "dollarBalance": "<0></0> $t(global:celoDollars)",
   "feedItemExchangeTitle": "Celo Gold",
   "feedItemExchangeInfo_boughtGold": "Bought <0></0> Gold",
@@ -107,5 +106,14 @@
   "feedItemGenericTitle": "{{nameOrNumber}}",
   "feedItemGenericTitle_noRecipientDetails": "Unknown",
   "feedItemGoldSold": "Sold",
-  "feedItemGoldPurchased": "Purchased"
+  "feedItemGoldPurchased": "Purchased",
+  "transactionHeaderVerificationFee": "Verification",
+  "transactionHeaderNetworkFee": "Network",
+  "transactionHeaderFaucet": "Faucet",
+  "transactionHeaderInviteSent": "$t(inviteFlow11:inviteSent)",
+  "transactionHeaderInviteReceived": "$t(inviteFlow11:inviteReceived)",
+  "transactionHeaderSent": "Payment Sent",
+  "transactionHeaderEscrowSent": "Escrow Payment Sent",
+  "transactionHeaderReceived": "Payment Received",
+  "transactionHeaderEscrowReceived": "Escrow Payment Received"
 }

@@ -144,3 +144,32 @@ OPTIONS
 ```
 
 _See code: [packages/cli/src/commands/dkg/start.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/dkg/start.ts)_
+
+### Whitelist
+
+Whitelist an address in the DKG
+
+```
+USAGE
+  $ celocli dkg:whitelist
+
+OPTIONS
+  --address=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) DKG Contract Address
+  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d     (required) Address of the sender
+
+  --ledgerAddresses=ledgerAddresses                     [default: 1] If --useLedger is set, this will get the first N
+                                                        addresses for local signing
+
+  --ledgerConfirmAddress                                Set it to ask confirmation for the address of the transaction
+                                                        from the ledger
+
+  --ledgerCustomAddresses=ledgerCustomAddresses         [default: [0]] If --useLedger is set, this will get the array of
+                                                        index addresses for local signing. Example
+                                                        --ledgerCustomAddresses "[4,99]"
+
+  --participantAddress=participantAddress               (required) Address of the participant to whitelist
+
+  --useLedger                                           Set it to use a ledger wallet
+```
+
+_See code: [packages/cli/src/commands/dkg/whitelist.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/dkg/whitelist.ts)_
