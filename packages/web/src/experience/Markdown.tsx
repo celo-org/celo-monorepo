@@ -63,7 +63,7 @@ const OPTIONS = {
       },
     },
     h3: ({ children }) => (
-      <View style={standardStyles.elementalMarginTop}>
+      <View style={standardStyles.blockMarginTopTablet}>
         <H3>{children}</H3>
       </View>
     ),
