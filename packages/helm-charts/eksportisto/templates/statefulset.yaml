@@ -54,9 +54,15 @@ spec:
         volumeMounts:
         - name: data
           mountPath: /root/.eksportisto
+        {{ if .Values.sensitiveAccountsBase64 }}
+        - name: sensitiveAccounts
+          mountPath: /var/config
+        {{ end }}
         env:
         - name: WEB3_PROVIDER
           value: {{ .Values.web3Provider }}
       volumes:
       - name: data
         emptyDir: {}
+
+{{ include "sensitive-acccounts-json" . }}
