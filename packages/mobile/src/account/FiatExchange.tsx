@@ -1,15 +1,17 @@
 import colors from '@celo/react-components/styles/colors'
+import colorsV2 from '@celo/react-components/styles/colors.v2'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { ActivityIndicator, StyleSheet } from 'react-native'
+import SafeAreaView from 'react-native-safe-area-view'
 import { WebView } from 'react-native-webview'
 import { connect } from 'react-redux'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
-import i18n, { Namespaces, withTranslation } from 'src/i18n'
+import { Namespaces, withTranslation } from 'src/i18n'
 import { LocalCurrencyCode } from 'src/localCurrency/consts'
 import { getLocalCurrencyCode } from 'src/localCurrency/selectors'
-import { headerWithBackButton } from 'src/navigator/Headers'
+import DrawerTopBar from 'src/navigator/DrawerTopBar'
 import { RootState } from 'src/redux/reducers'
 
 interface State {
@@ -51,11 +53,6 @@ async function signMoonpayUrl(account: string, localCurrencyCode: LocalCurrencyC
 }
 
 class FiatExchange extends React.Component<Props, State> {
-  static navigationOptions = () => ({
-    ...headerWithBackButton,
-    headerTitle: i18n.t('accountScreen10:addFunds'),
-  })
-
   state: State = {
     signedUrl: '',
   }
@@ -80,16 +77,26 @@ class FiatExchange extends React.Component<Props, State> {
   }
 
   render() {
-    return this.state.signedUrl === '' ? (
-      <ActivityIndicator size="large" color={colors.celoGreen} />
-    ) : (
-      <WebView style={styles.exchangeWebView} source={{ uri: this.state.signedUrl }} />
+    return (
+      <SafeAreaView style={styles.background}>
+        <DrawerTopBar />
+        {this.state.signedUrl === '' ? (
+          <ActivityIndicator size="large" color={colors.celoGreen} />
+        ) : (
+          <WebView style={styles.exchangeWebView} source={{ uri: this.state.signedUrl }} />
+        )}
+      </SafeAreaView>
     )
   }
 }
 
 const styles = StyleSheet.create({
   exchangeWebView: {},
+  background: {
+    backgroundColor: colorsV2.background,
+    flex: 1,
+    justifyContent: 'space-between',
+  },
 })
 
 export default connect<StateProps, {}, {}, RootState>(mapStateToProps)(

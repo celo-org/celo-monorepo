@@ -71,7 +71,7 @@ exports[`ExchangeTradeScreen renders correctly 1`] = `
                   "color": "#9CA4A9",
                   "fontFamily": "Inter-Regular",
                   "fontSize": 13,
-                  "lineHeight": 16,
+                  "lineHeight": 18,
                   "marginTop": 4,
                   "textDecorationLine": "underline",
                 }
@@ -261,7 +261,7 @@ exports[`ExchangeTradeScreen renders correctly 1`] = `
             }
           }
         >
-          undefined:review
+          global:review
         </Text>
       </View>
     </View>

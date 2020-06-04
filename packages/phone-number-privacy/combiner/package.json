@@ -1,0 +1,44 @@
+{
+  "name": "@celo/phone-number-privacy-combiner",
+  "version": "1.0.0",
+  "description": "Orchestrates and combines threshold signatures for use in PGPNP",
+  "author": "Celo",
+  "license": "Apache-2.0",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "yarn build && firebase serve --only functions",
+    "deploy:staging": "yarn build && firebase deploy --only functions --project celo-phone-number-privacy-stg",
+    "deploy:prod": "yarn build && firebase deploy --only functions --project celo-phone-number-privacy",
+    "config:get:staging": "firebase functions:config:get --project celo-phone-number-privacy-stg",
+    "config:get:prod": "firebase functions:config:get --project celo-phone-number-privacy",
+    "config:set:staging": "firebase functions:config:set --project celo-phone-number-privacy-stg",
+    "config:set:prod": "firebase functions:config:set --project celo-phone-number-privacy",
+    "clean": "tsc -b . --clean",
+    "build": "tsc -b .",
+    "lint": "tslint --project .",
+    "test": "jest --runInBand --testPathIgnorePatterns test/end-to-end",
+    "db:migrate": "NODE_ENV=development ts-node scripts/runMigrations.ts",
+    "keygen:single": "ts-node scripts/createBlsKeyPair.ts",
+    "keygen:threshold": "ts-node scripts/createThresholdBlsKeys.ts"
+  },
+  "dependencies": {
+    "@celo/contractkit": "0.4.5",
+    "@celo/utils": "0.1.13",
+    "blind-threshold-bls": "https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a",
+    "firebase-admin": "^8.10.0",
+    "firebase-functions": "^3.6.0",
+    "knex": "^0.20.13",
+    "node-fetch": "^2.6.0",
+    "pg": "^7.18.2",
+    "uuid": "^7.0.3"
+  },
+  "devDependencies": {
+    "@types/btoa": "^1.2.3",
+    "@types/uuid": "^7.0.3",
+    "dotenv": "^8.2.0",
+    "firebase-functions-test": "^0.2.0"
+  },
+  "engines": {
+    "node": "10"
+  }
+}

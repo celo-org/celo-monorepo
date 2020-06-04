@@ -19,7 +19,7 @@ import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 import NotAuthorizedView from 'src/qrcode/NotAuthorizedView'
 import { RootState } from 'src/redux/reducers'
-import { handleBarcodeDetected } from 'src/send/actions'
+import { handleBarcodeDetected, QrCode } from 'src/send/actions'
 import { TransactionDataInput } from 'src/send/SendAmount'
 import Logger from 'src/utils/Logger'
 
@@ -62,11 +62,14 @@ class QRScanner extends React.Component<Props> {
 
   // This method would be called multiple times with the same
   // QR code, so we need to catch only the first one
-  onBarCodeDetected = (rawData: any) => {
-    const { scanIsForSecureSend, transactionData } = this.props
-    Logger.debug('QRScanner', 'Bar code detected')
-    this.props.handleBarcodeDetected(rawData, scanIsForSecureSend, transactionData)
-  }
+  onBarCodeDetected = memoize(
+    (qrCode: QrCode) => {
+      Logger.debug('QRScanner', 'Bar code detected')
+      const { scanIsForSecureSend, transactionData } = this.props
+      this.props.handleBarcodeDetected(qrCode, scanIsForSecureSend, transactionData)
+    },
+    (qrCode) => qrCode.data
+  )
 
   onPressShowYourCode = () => {
     navigate(Screens.QRCode)
@@ -85,7 +88,7 @@ class QRScanner extends React.Component<Props> {
               }}
               style={styles.preview}
               type={RNCamera.Constants.Type.back}
-              onBarCodeRead={memoize(this.onBarCodeDetected, (qr) => qr.data)}
+              onBarCodeRead={this.onBarCodeDetected}
               barCodeTypes={[RNCamera.Constants.BarCodeType.qr]}
               flashMode={RNCamera.Constants.FlashMode.auto}
               captureAudio={false}

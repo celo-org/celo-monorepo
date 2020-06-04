@@ -15,6 +15,8 @@ import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import { hideAlert, showError } from 'src/alert/actions'
 import { errorSelector } from 'src/alert/reducer'
+import CeloAnalytics from 'src/analytics/CeloAnalytics'
+import { CustomEventNames } from 'src/analytics/constants'
 import { MoneyAmount } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import CurrencyDisplay from 'src/components/CurrencyDisplay'
@@ -26,6 +28,7 @@ import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { LocalCurrencyCode } from 'src/localCurrency/consts'
 import {
+  convertDollarsToLocalAmount,
   convertDollarsToMaxSupportedPrecision,
   convertLocalAmountToDollars,
 } from 'src/localCurrency/convert'
@@ -120,13 +123,42 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
   goToReview = () => {
     const { inputToken } = this.state
     const inputTokenDisplayName = this.getInputTokenDisplayText()
+    const inputAmount = this.getInputTokenAmount()
+    // BEGIN: Analytics
+    const goldToDollarExchangeRate = getRateForMakerToken(
+      this.props.exchangeRatePair,
+      this.state.makerToken,
+      CURRENCY_ENUM.DOLLAR
+    )
+    const goldAmount = this.isDollarToGold()
+      ? this.getOppositeInputTokenAmount(inputAmount)
+      : inputAmount
+    const dollarsAmount = this.isDollarToGold()
+      ? inputAmount
+      : this.getOppositeInputTokenAmount(inputAmount)
+    const localCurrencyAmount = convertDollarsToLocalAmount(
+      dollarsAmount,
+      this.props.localCurrencyExchangeRate
+    )
+    CeloAnalytics.track(
+      this.isDollarToGold()
+        ? CustomEventNames.gold_buy_continue
+        : CustomEventNames.gold_sell_continue,
+      {
+        localCurrencyAmount,
+        goldAmount,
+        inputToken,
+        goldToDollarExchangeRate,
+      }
+    )
+    // END: Analytics
     navigate(Screens.ExchangeReview, {
       exchangeInput: {
         makerToken: this.state.makerToken,
         makerTokenBalance: this.state.makerTokenAvailableBalance,
         inputToken,
         inputTokenDisplayName,
-        inputAmount: this.getInputTokenAmount(),
+        inputAmount,
       },
     })
   }
@@ -220,7 +252,11 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
   }
 
   switchInputToken = () => {
-    this.setState({ inputToken: this.getOppositeInputToken() }, () => {
+    const inputToken = this.getOppositeInputToken()
+    CeloAnalytics.track(CustomEventNames.gold_switch_input_currency, {
+      to: inputToken,
+    })
+    this.setState({ inputToken }, () => {
       this.updateError()
     })
   }
@@ -297,7 +333,7 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
         </KeyboardAwareScrollView>
         <Button
           onPress={this.goToReview}
-          text={t(`${Namespaces.walletFlow5}:review`)}
+          text={t(`global:review`)}
           accessibilityLabel={t('continue')}
           disabled={this.isExchangeInvalid()}
           type={BtnTypes.TERTIARY}
@@ -341,7 +377,8 @@ const styles = StyleSheet.create({
     ...fontStyles.small,
   },
   switchToText: {
-    ...fontStyles.label,
+    ...fontStyles.small,
+    fontSize: 13,
     textDecorationLine: 'underline',
     color: colors.gray4,
     marginTop: 4,

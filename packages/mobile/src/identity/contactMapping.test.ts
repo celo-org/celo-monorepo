@@ -1,3 +1,4 @@
+import { IdentifierLookupResult } from '@celo/contractkit/lib/wrappers/Attestations'
 import { expectSaga } from 'redux-saga-test-plan'
 import { throwError } from 'redux-saga-test-plan/providers'
 import { call, select } from 'redux-saga/effects'
@@ -74,8 +75,8 @@ describe('Fetch Addresses Saga', () => {
       [mockE164Number]: [mockAccount.toLowerCase()],
     }
 
-    const mockPhoneNumberLookup = {
-      [mockE164NumberHash]: { [mockAccount]: { complete: 3, total: 3 } },
+    const mockPhoneNumberLookup: IdentifierLookupResult = {
+      [mockE164NumberHash]: { [mockAccount]: { completed: 3, total: 3 } },
     }
 
     const mockAttestationsWrapper = {
@@ -112,10 +113,10 @@ describe('Fetch Addresses Saga', () => {
   it('requires SecureSend with partial verification when a new adddress is added and last 4 digits are unique', async () => {
     const contractKit = await getContractKitOutsideGenerator()
 
-    const mockPhoneNumberLookup = {
+    const mockPhoneNumberLookup: IdentifierLookupResult = {
       [mockE164NumberHash]: {
-        [mockAccount]: { complete: 3, total: 3 },
-        [mockAccount2]: { complete: 3, total: 3 },
+        [mockAccount]: { completed: 3, total: 3 },
+        [mockAccount2]: { completed: 3, total: 3 },
       },
     }
 
@@ -155,10 +156,10 @@ describe('Fetch Addresses Saga', () => {
   it('requires SecureSend with full verification when a new adddress is added and last 4 digits are not unique', async () => {
     const contractKit = await getContractKitOutsideGenerator()
 
-    const mockPhoneNumberLookup = {
+    const mockPhoneNumberLookup: IdentifierLookupResult = {
       [mockE164NumberHash]: {
-        [mockAccount]: { complete: 3, total: 3 },
-        [mockAccountInvite]: { complete: 3, total: 3 },
+        [mockAccount]: { completed: 3, total: 3 },
+        [mockAccountInvite]: { completed: 3, total: 3 },
       },
     }
 

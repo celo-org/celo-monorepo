@@ -11,6 +11,7 @@ import { getIdentifierPrefix, IdentifierType } from './attestations'
 export interface ParsedPhoneNumber {
   e164Number: string
   displayNumber: string
+  displayNumberInternational: string
   countryCode?: number
   regionCode?: string
 }
@@ -18,6 +19,7 @@ export interface ParsedPhoneNumber {
 const phoneUtil = PhoneNumberUtil.getInstance()
 const MIN_PHONE_LENGTH = 4
 const PHONE_SALT_SEPARATOR = '__'
+const E164_REGEX = /^\+[1-9][0-9]{1,14}$/
 
 export function getCountryEmoji(
   e164PhoneNumber: string,
@@ -37,7 +39,7 @@ export function getCountryEmoji(
   const userCountryArray = countries.filter((c: any) => c.alpha2 === regionCode)
   const country = userCountryArray.length > 0 ? userCountryArray[0] : undefined
 
-  return (country ? country.emoji : '') + ` +${countryCode}`
+  return country ? country.emoji : ''
 }
 
 export const getPhoneHash = (phoneNumber: string, salt?: string): string => {
@@ -95,6 +97,17 @@ export function getDisplayPhoneNumber(phoneNumber: string, defaultCountryCode: s
   }
 }
 
+export function getDisplayNumberInternational(e164PhoneNumber: string) {
+  const countryCode = getCountryCode(e164PhoneNumber)
+  const phoneDetails = parsePhoneNumber(e164PhoneNumber, (countryCode || '').toString())
+  if (phoneDetails) {
+    return phoneDetails.displayNumberInternational
+  } else {
+    // Fallback to input instead of showing nothing for invalid numbers
+    return e164PhoneNumber
+  }
+}
+
 export function getE164DisplayNumber(e164PhoneNumber: string) {
   const countryCode = getCountryCode(e164PhoneNumber)
   return getDisplayPhoneNumber(e164PhoneNumber, (countryCode || '').toString())
@@ -110,8 +123,7 @@ export function getE164Number(phoneNumber: string, defaultCountryCode: string) {
 }
 
 export function isE164Number(phoneNumber: string) {
-  const E164RegEx = /^\+[1-9][0-9]{1,14}$/
-  return E164RegEx.test(phoneNumber)
+  return E164_REGEX.test(phoneNumber)
 }
 
 // Actually runs through the parsing instead of using a regex
@@ -152,6 +164,10 @@ export function parsePhoneNumber(
       ? {
           e164Number: phoneUtil.format(parsedNumber, PhoneNumberFormat.E164),
           displayNumber: handleSpecialCasesForDisplay(parsedNumber, parsedCountryCode),
+          displayNumberInternational: phoneUtil.format(
+            parsedNumber,
+            PhoneNumberFormat.INTERNATIONAL
+          ),
           countryCode: parsedCountryCode,
           regionCode: parsedRegionCode,
         }
