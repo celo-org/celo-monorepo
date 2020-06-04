@@ -8,7 +8,7 @@ reference:
   android_config: &android_config
     working_directory: *workspace
     macos:
-      xcode: "10.2.1"
+      xcode: "11.3.1"
     shell: /bin/bash --login -eo pipefail
     environment:
       TERM: dumb
@@ -22,14 +22,6 @@ defaults: &defaults
   environment:
     # To avoid ENOMEM problem when running node
     NODE_OPTIONS: "--max-old-space-size=4096"
-
-android-defaults: &android-defaults
-  <<: *defaults
-  docker:
-    - image: circleci/android:api-28-node
-  environment:
-    _JAVA_OPTIONS: "-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
-    GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.configureondemand=true"
 
 e2e-defaults: &e2e-defaults
   <<: *defaults
@@ -262,7 +254,9 @@ jobs:
             #   yarn postinstall
             # fi
             yarn || yarn
-            yarn build || yarn build
+            yarn build \
+              --scope @celo/mobile \
+              --include-filtered-dependencies
       - save_cache:
           key: yarn-v4-macos-{{ .Branch }}-{{ checksum "yarn.lock" }}
           paths:
@@ -273,7 +267,7 @@ jobs:
           name: Install some extra dependencies the app needs
           command: HOMEBREW_NO_AUTO_UPDATE=1 brew install pidcat watchman
       - restore_cache:
-          key: yarn-v3-{{ arch }}-{{ .Branch }}-{{ checksum "packages/mobile/android/build.gradle" }}-{{ checksum "packages/mobile/android/settings.gradle" }}-{{ checksum "packages/mobile/android/app/build.gradle" }}-{{ checksum "packages/mobile/.env.test" }}
+          key: yarn-v4-{{ arch }}-{{ .Branch }}-{{ checksum "packages/mobile/android/build.gradle" }}-{{ checksum "packages/mobile/android/settings.gradle" }}-{{ checksum "packages/mobile/android/app/build.gradle" }}-{{ checksum "packages/mobile/.env.test" }}
       - run:
           name: Make sure there's only one adb # This is probably a brew bug
           command: cp /usr/local/share/android-sdk/platform-tools/adb /usr/local/bin/adb
@@ -287,7 +281,7 @@ jobs:
           path: packages/mobile/e2e/artifacts
           destination: mobile/e2e/artifacts
       - save_cache:
-          key: yarn-v3-{{ arch }}-{{ .Branch }}-{{ checksum "packages/mobile/android/build.gradle" }}-{{ checksum "packages/mobile/android/settings.gradle" }}-{{ checksum "packages/mobile/android/app/build.gradle" }}-{{ checksum "packages/mobile/.env.test" }}
+          key: yarn-v4-{{ arch }}-{{ .Branch }}-{{ checksum "packages/mobile/android/build.gradle" }}-{{ checksum "packages/mobile/android/settings.gradle" }}-{{ checksum "packages/mobile/android/app/build.gradle" }}-{{ checksum "packages/mobile/.env.test" }}
           paths:
             - ~/src/packages/mobile/android/app/build/outputs/apk/
             - ~/.gradle/
