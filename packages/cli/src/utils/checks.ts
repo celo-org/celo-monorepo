@@ -120,22 +120,22 @@ class CheckBuilder {
   isApprover = (account: Address) =>
     this.addCheck(
       `${account} is approver address`,
-      this.withGovernance(async (g) => eqAddress(await g.getApprover(), account))
+      this.withGovernance(async (governance) => eqAddress(await governance.getApprover(), account))
     )
 
   proposalExists = (proposalID: string) =>
     this.addCheck(
       `${proposalID} is an existing proposal`,
-      this.withGovernance((g) => g.proposalExists(proposalID))
+      this.withGovernance((governance) => governance.proposalExists(proposalID))
     )
 
   proposalInStage = (proposalID: string, stage: keyof typeof ProposalStage) =>
     this.addCheck(
       `${proposalID} is in stage ${stage}`,
-      this.withGovernance(async (g) => {
-        const match = (await g.getProposalStage(proposalID)) === stage
+      this.withGovernance(async (governance) => {
+        const match = (await governance.getProposalStage(proposalID)) === stage
         if (!match) {
-          const timeUntilStages = await g.timeUntilStages(proposalID)
+          const timeUntilStages = await governance.timeUntilStages(proposalID)
           printValueMapRecursive({ timeUntilStages })
         }
         return match
@@ -145,19 +145,19 @@ class CheckBuilder {
   proposalIsPassing = (proposalID: string) =>
     this.addCheck(
       `Proposal ${proposalID} is passing corresponding constitutional quorum`,
-      this.withGovernance((g) => g.isProposalPassing(proposalID))
+      this.withGovernance((governance) => governance.isProposalPassing(proposalID))
     )
 
   hotfixIsPassing = (hash: Buffer) =>
     this.addCheck(
       `Hotfix 0x${hash.toString('hex')} is whitelisted by quorum of validators`,
-      this.withGovernance((g) => g.isHotfixPassing(hash))
+      this.withGovernance((governance) => governance.isHotfixPassing(hash))
     )
 
   hotfixNotExecuted = (hash: Buffer) =>
     this.addCheck(
       `Hotfix 0x${hash.toString('hex')} is not already executed`,
-      this.withGovernance(async (g) => !(await g.getHotfixRecord(hash)).executed)
+      this.withGovernance(async (governance) => !(await governance.getHotfixRecord(hash)).executed)
     )
 
   canSign = (account: Address) =>
@@ -175,8 +175,8 @@ class CheckBuilder {
   canSignValidatorTxs = () =>
     this.addCheck(
       'Signer can sign Validator Txs',
-      this.withAccounts((lg) =>
-        lg
+      this.withAccounts((accounts) =>
+        accounts
           .validatorSignerToAccount(this.signer!)
           .then(() => true)
           .catch(() => false)
@@ -186,76 +186,83 @@ class CheckBuilder {
   signerAccountIsValidator = () =>
     this.addCheck(
       `Signer account is Validator`,
-      this.withValidators((v, _s, account) => v.isValidator(account))
+      this.withValidators((validators, _s, account) => validators.isValidator(account))
     )
 
   signerAccountIsValidatorGroup = () =>
     this.addCheck(
       `Signer account is ValidatorGroup`,
-      this.withValidators((v, _s, account) => v.isValidatorGroup(account))
+      this.withValidators((validators, _s, account) => validators.isValidatorGroup(account))
     )
 
   isValidator = (account: Address) =>
     this.addCheck(
       `${account} is Validator`,
-      this.withValidators((v) => v.isValidator(account))
+      this.withValidators((validators) => validators.isValidator(account))
     )
 
   isValidatorGroup = (account: Address) =>
     this.addCheck(
       `${account} is ValidatorGroup`,
-      this.withValidators((v) => v.isValidatorGroup(account))
+      this.withValidators((validators) => validators.isValidatorGroup(account))
     )
 
   isNotValidator = () =>
     this.addCheck(
       `${this.signer!} is not a registered Validator`,
-      this.withValidators((v, _signer, account) => negate(v.isValidator(account)))
+      this.withValidators((validators, _signer, account) => negate(validators.isValidator(account)))
     )
 
   isNotValidatorGroup = () =>
     this.addCheck(
       `${this.signer!} is not a registered ValidatorGroup`,
-      this.withValidators((v, _signer, account) => negate(v.isValidatorGroup(account)))
+      this.withValidators((validators, _signer, account) =>
+        negate(validators.isValidatorGroup(account))
+      )
     )
 
   signerMeetsValidatorBalanceRequirements = () =>
     this.addCheck(
       `Signer's account has enough locked gold for registration`,
-      this.withValidators((v, _signer, account) => v.meetsValidatorBalanceRequirements(account))
+      this.withValidators((validators, _signer, account) =>
+        validators.meetsValidatorBalanceRequirements(account)
+      )
     )
 
   signerMeetsValidatorGroupBalanceRequirements = () =>
     this.addCheck(
       `Signer's account has enough locked gold for group registration`,
-      this.withValidators((v, _signer, account) =>
-        v.meetsValidatorGroupBalanceRequirements(account)
+      this.withValidators((validators, _signer, account) =>
+        validators.meetsValidatorGroupBalanceRequirements(account)
       )
     )
 
   meetsValidatorBalanceRequirements = (account: Address) =>
     this.addCheck(
       `${account} has enough locked gold for registration`,
-      this.withValidators((v) => v.meetsValidatorBalanceRequirements(account))
+      this.withValidators((validators) => validators.meetsValidatorBalanceRequirements(account))
     )
 
   meetsValidatorGroupBalanceRequirements = (account: Address) =>
     this.addCheck(
       `${account} has enough locked gold for group registration`,
-      this.withValidators((v) => v.meetsValidatorGroupBalanceRequirements(account))
+      this.withValidators((validators) =>
+        validators.meetsValidatorGroupBalanceRequirements(account)
+      )
     )
 
   isNotAccount = (address: Address) =>
     this.addCheck(
       `${address} is not a registered Account`,
-      this.withAccounts((accs) => negate(accs.isAccount(address)))
+      this.withAccounts((accounts) => negate(accounts.isAccount(address)))
     )
 
   isSignerOrAccount = () =>
     this.addCheck(
       `${this.signer!} is Signer or registered Account`,
-      this.withAccounts(async (accs) => {
-        const res = (await accs.isAccount(this.signer!)) || (await accs.isSigner(this.signer!))
+      this.withAccounts(async (accounts) => {
+        const res =
+          (await accounts.isAccount(this.signer!)) || (await accounts.isSigner(this.signer!))
         return res
       })
     )
@@ -263,8 +270,8 @@ class CheckBuilder {
   isVoteSignerOrAccount = () =>
     this.addCheck(
       `${this.signer!} is vote signer or registered account`,
-      this.withAccounts(async (accs) => {
-        return accs.voteSignerToAccount(this.signer!).then(
+      this.withAccounts(async (accounts) => {
+        return accounts.voteSignerToAccount(this.signer!).then(
           (addr) => !eqAddress(addr, NULL_ADDRESS),
           () => false
         )
@@ -274,14 +281,14 @@ class CheckBuilder {
   isAccount = (address: Address) =>
     this.addCheck(
       `${address} is a registered Account`,
-      this.withAccounts((accs) => accs.isAccount(address)),
+      this.withAccounts((accounts) => accounts.isAccount(address)),
       `${address} is not registered as an account. Try running account:register`
     )
 
   isNotVoting = (address: Address) =>
     this.addCheck(
       `${address} is not currently voting on a governance proposal`,
-      this.withGovernance((gov) => negate(gov.isVoting(address))),
+      this.withGovernance((governance) => negate(governance.isVoting(address))),
       `${address} is currently voting in governance. Revoke your upvotes or wait for the referendum to end.`
     )
 
@@ -290,7 +297,17 @@ class CheckBuilder {
     return this.addCheck(`Account has at least ${valueInEth} cGLD`, () =>
       this.kit.contracts
         .getGoldToken()
-        .then((gt) => gt.balanceOf(account))
+        .then((goldToken) => goldToken.balanceOf(account))
+        .then((balance) => balance.gte(value))
+    )
+  }
+
+  hasEnoughUsd = (account: Address, value: BigNumber) => {
+    const valueInEth = this.kit.web3.utils.fromWei(value.toFixed(), 'ether')
+    return this.addCheck(`Account has at least ${valueInEth} cUSD`, () =>
+      this.kit.contracts
+        .getStableToken()
+        .then((stableToken) => stableToken.balanceOf(account))
         .then((balance) => balance.gte(value))
     )
   }
@@ -298,21 +315,23 @@ class CheckBuilder {
   exceedsProposalMinDeposit = (deposit: BigNumber) =>
     this.addCheck(
       `Deposit is greater than or equal to governance proposal minDeposit`,
-      this.withGovernance(async (g) => deposit.gte(await g.minDeposit()))
+      this.withGovernance(async (governance) => deposit.gte(await governance.minDeposit()))
     )
 
   hasRefundedDeposits = (account: Address) =>
     this.addCheck(
       `${account} has refunded governance deposits`,
-      this.withGovernance(async (g) => !(await g.getRefundedDeposits(account)).isZero())
+      this.withGovernance(
+        async (governance) => !(await governance.getRefundedDeposits(account)).isZero()
+      )
     )
 
   hasEnoughLockedGold = (value: BigNumber) => {
     const valueInEth = this.kit.web3.utils.fromWei(value.toFixed(), 'ether')
     return this.addCheck(
       `Account has at least ${valueInEth} Locked Gold`,
-      this.withLockedGold(async (l, _signer, account) =>
-        value.isLessThanOrEqualTo(await l.getAccountTotalLockedGold(account))
+      this.withLockedGold(async (lockedGold, _signer, account) =>
+        value.isLessThanOrEqualTo(await lockedGold.getAccountTotalLockedGold(account))
       )
     )
   }
@@ -321,8 +340,8 @@ class CheckBuilder {
     const valueInEth = this.kit.web3.utils.fromWei(value.toFixed(), 'ether')
     return this.addCheck(
       `Account has at least ${valueInEth} non-voting Locked Gold`,
-      this.withLockedGold(async (l, _signer, account) =>
-        value.isLessThanOrEqualTo(await l.getAccountNonvotingLockedGold(account))
+      this.withLockedGold(async (lockedGold, _signer, account) =>
+        value.isLessThanOrEqualTo(await lockedGold.getAccountNonvotingLockedGold(account))
       )
     )
   }
@@ -331,23 +350,26 @@ class CheckBuilder {
     const valueInEth = this.kit.web3.utils.fromWei(value.toFixed(), 'ether')
     return this.addCheck(
       `Account has at least ${valueInEth} non-voting Locked Gold over requirement`,
-      this.withLockedGold(async (l, _signer, account, v) =>
-        value
-          .plus(await v.getAccountLockedGoldRequirement(account))
-          .isLessThanOrEqualTo(await l.getAccountNonvotingLockedGold(account))
-      )
+      this.withLockedGold(async (lockedGold, _signer, account, validators) => {
+        const requirement = await validators.getAccountLockedGoldRequirement(account)
+        return (
+          (requirement.eq(0) ||
+            value.plus(requirement).lte(await lockedGold.getAccountTotalLockedGold(account))) &&
+          value.lte(await lockedGold.getAccountNonvotingLockedGold(account))
+        )
+      })
     )
   }
 
   isNotValidatorGroupMember = () => {
     return this.addCheck(
       `Account isn't a member of a validator group`,
-      this.withValidators(async (v, _signer, account) => {
-        const { affiliation } = await v.getValidator(account)
+      this.withValidators(async (validators, _signer, account) => {
+        const { affiliation } = await validators.getValidator(account)
         if (!affiliation || eqAddress(affiliation, NULL_ADDRESS)) {
           return true
         }
-        const { members } = await v.getValidatorGroup(affiliation!)
+        const { members } = await validators.getValidatorGroup(affiliation!)
         return !members.includes(account)
       })
     )
@@ -356,11 +378,11 @@ class CheckBuilder {
   validatorDeregisterDurationPassed = () => {
     return this.addCheck(
       `Enough time has passed since the account was removed from a validator group`,
-      this.withValidators(async (v, _signer, account) => {
-        const { lastRemovedFromGroupTimestamp } = await v.getValidatorMembershipHistoryExtraData(
-          account
-        )
-        const { duration } = await v.getValidatorLockedGoldRequirements()
+      this.withValidators(async (validators, _signer, account) => {
+        const {
+          lastRemovedFromGroupTimestamp,
+        } = await validators.getValidatorMembershipHistoryExtraData(account)
+        const { duration } = await validators.getValidatorLockedGoldRequirements()
         return duration.toNumber() + lastRemovedFromGroupTimestamp < Date.now() / 1000
       })
     )
@@ -369,9 +391,9 @@ class CheckBuilder {
   resetSlashingmultiplierPeriodPassed = () => {
     return this.addCheck(
       `Enough time has passed since the last halving of the slashing multiplier`,
-      this.withValidators(async (v, _signer, account) => {
-        const { lastSlashed } = await v.getValidatorGroup(account)
-        const duration = await v.getSlashingMultiplierResetPeriod()
+      this.withValidators(async (validators, _signer, account) => {
+        const { lastSlashed } = await validators.getValidatorGroup(account)
+        const duration = await validators.getSlashingMultiplierResetPeriod()
         return duration.toNumber() + lastSlashed.toNumber() < Date.now() / 1000
       })
     )
@@ -380,8 +402,8 @@ class CheckBuilder {
   hasACommissionUpdateQueued = () =>
     this.addCheck(
       "There's a commision update queued",
-      this.withValidators(async (v, _signer, account) => {
-        const vg = await v.getValidatorGroup(account)
+      this.withValidators(async (validators, _signer, account) => {
+        const vg = await validators.getValidatorGroup(account)
         return !vg.nextCommissionBlock.eq(0)
       })
     )
@@ -389,9 +411,9 @@ class CheckBuilder {
   hasCommissionUpdateDelayPassed = () =>
     this.addCheck(
       'The Commission update delay has already passed',
-      this.withValidators(async (v, _signer, account, ctx) => {
+      this.withValidators(async (validators, _signer, account, ctx) => {
         const blockNumber = await ctx.web3.eth.getBlockNumber()
-        const vg = await v.getValidatorGroup(account)
+        const vg = await validators.getValidatorGroup(account)
         return vg.nextCommissionBlock.lte(blockNumber)
       })
     )

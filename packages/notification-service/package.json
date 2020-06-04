@@ -24,7 +24,7 @@
     "express": "^4.17.1",
     "firebase-admin": "^8.10.0",
     "i18next": "^19.0.2",
-    "node-fetch": "^2.2.0",
+    "node-fetch": "^2.6.0",
     "utf8": "^3.0.0",
     "web3": "1.2.4",
     "web3-eth-abi": "1.2.4",

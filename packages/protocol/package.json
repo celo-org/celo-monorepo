@@ -60,7 +60,7 @@
     "lodash": "^4.17.14",
     "mathjs": "^5.0.4",
     "mocha": "^7.1.1",
-    "node-fetch": "^2.3.0",
+    "node-fetch": "^2.6.0",
     "openzeppelin-solidity": "^2.5.0",
     "prompts": "^2.0.1",
     "solhint": "^2.3.1",
