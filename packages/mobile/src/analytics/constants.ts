@@ -23,13 +23,27 @@ export enum CustomEventNames {
   wallet_dollar_nux = 'wallet_dollar_nux',
   send_input = 'send_input',
   transaction_details = 'transaction_details',
-  send_continue = 'send_continue',
   send_select_cancel = 'send_select_cancel',
   send_dollar_confirm = 'send_dollar_confirm',
   edit_dollar_confirm = 'edit_dollar_confirm',
   send_invite_details = 'send_invite_details',
   send_invite = 'send_invite',
   edit_send_invite = 'edit_send_invite',
+
+  send_cancel = 'send_cancel', // when cancel is clicked after launching send flow
+  send_search = 'send_search', // when text is input into search bar
+  send_scan = 'send_scan', // when scan QR icon is selected from the send screen
+  send_select_recipient = 'send_select_recipient', // when recipient was selected
+  send_amount_back = 'send_amount_back', // back button pressed on amount screen
+  send_continue = 'send_continue', // when next button pressed on amount enter page
+
+  request_cancel = 'request_cancel', // when cancel is clicked after launching request flow
+  request_search = 'request_search', // when text is input into search bar
+  request_scan = 'request_scan', // when scan QR icon is selected from the request screen
+  request_select_recipient = 'request_select_recipient', // when recipient was selected
+  request_amount_back = 'request_amount_back', // back button pressed on amount screen
+  request_continue = 'request_continue', // when next button pressed on amount enter page
+  request_unavailable = 'request_unavailable', // when request attempted to unverified user
 
   // Send events, separate from button tracking above
   send_dollar_transaction = 'send_dollar_transaction',
@@ -104,13 +118,16 @@ export enum CustomEventNames {
   view_backup_phrase = 'view_backup_phrase', // (count # of taps on "View Backup Phrase" after already backed up)
   view_social_backup = 'view_social_backup', // (count # of taps on "View Social Backup" after already set up)
   skip_social_backup = 'skip_social_backup', // (count # of taps on "Skip Social Backup" )
-  backup_cancel = 'backup_cancel', // (count # of taps on "Cancel" button in Backup_Phrase)
+  backup_cancel = 'backup_cancel', // (count # of taps on "Cancel" button in Backup_Phrase/BackupQuiz)
+  backup_cancel_complete = 'backup_cancel_complete', // when choising to abort the cancel and continue the setup
+  backup_cancel_procrastinate = 'backup_cancel_procrastinate', // when choosing to continue cancel and delay setup
   insist_backup_phrase = 'insist_backup_phrase', // (count # of taps on “Set Backup Phrase” in Backup_Insist)
   insist_skip_backup = 'insist_skip_backup', // (count # of taps on “Do Later” in Backup_Insist)
   backup_continue = 'backup_continue', // (count # of taps on “Continue” button in Backup_Phrase)
   backup_setup_toggle_enable = 'backup_setup_toggle_enable', // (count # of slides to agree on "I wrote down account key" Switch in Backup_Phrase)
   backup_setup_toggle_disable = 'backup_setup_toggle_disable', // (count # of slides to disagree on "I wrote down account key" Switch in Backup_Phrase)
   social_backup_continue = 'social_backup_continue', // (Count # of taps on "Backup with Friends" in Backup_Phrase)
+  backup_error = 'backup_error',
 
   // Screen name: Backup_Quiz, Question_Incorrect, Backup_Confirmed
   question_select = 'question_select', // (track # of input selections on Backup_Verify screen)
@@ -126,6 +143,27 @@ export enum CustomEventNames {
   backup_paste_incorrect = 'backup_paste_incorrect', // (track # of taps on "See Backup Phrase" in Backup_Verify screen)
   backup_paste_done = 'backup_paste_done', // (track # of taps on "Done" button on the Backup_Verify screen)
 
+  // Gold Buy and Sell screens
+  gold_switch_input_currency = 'gold_switch_input_currency', // when ‘switch to gold’ button pressed
+  gold_buy_continue = 'gold_buy_continue', // when ‘review’ button clicked
+  gold_buy_confirm = 'gold_buy_confirm', // when ‘buy’ button clicked
+  gold_buy_cancel = 'gold_buy_cancel', // when ‘cancel’ is clicked
+  gold_buy_edit = 'gold_buy_edit', // when ‘edit’ is clicked
+  gold_buy_error = 'gold_buy_error', // error in send flow
+  gold_sell_continue = 'gold_sell_continue', // when ‘review’ button clicked
+  gold_sell_confirm = 'gold_sell_confirm', // when ‘sell’ button clicked
+  gold_sell_cancel = 'gold_sell_cancel', // when ‘cancel’ is clicked
+  gold_sell_edit = 'gold_sell_edit', // when ‘edit’ is clicked
+  gold_sell_error = 'gold_sell_error', // error in sell flow
+
+  // Gold Home screen
+  gold_info = 'gold_info', // when the (i) next to Celo Gold price is clicked, launching education (not pictured)
+  gold_buy_start = 'gold_buy_start', // when the “Buy” button is clicked
+  gold_sell_start = 'gold_sell_start', // when the “Sell” button is clicked
+  gold_chart_switch = 'gold_chart_switch', // when another timescale is selected
+  gold_activity_select = 'gold_activity_select', // when an activity item is clicked
+  gold_activity_back = 'gold_activity_back', // when back caret is clicked from drilldown
+
   // Screens: Exchange_Tutorial, Exchange_Home, Exchange_Currency
   exchange_button = 'exchange_button', // count # of taps on the exchange button in Exchange_Home
   exchange_dollar_input = 'exchange_dollar_input', // record the input of Celo$ form field in Exchange_Currency
@@ -136,7 +174,6 @@ export enum CustomEventNames {
   currency_swap = 'currency_swap', // record # of taps on the double arrow button in Exchange_Currency
 
   // Screen: Exchange_Review
-  exchange_confirm = 'exchange_confirm', // to count the # of taps on the exchange button here)
   exchange_edit = 'exchange_edit', // to count # of times users click the edit button, change transaction)
   exchange_cancel = 'exchange_cancel', // to count # of taps on the “Cancel” in the upper left corner)
 
@@ -153,9 +190,6 @@ export enum CustomEventNames {
   import_wallet_submit = 'import_wallet_submit', // to count the # of times that the “Restore Celo Wallet” button is pressed
   import_wallet_cancel = 'import_wallet_cancel', // to count the # of times that the “Cancel” button is pressed
 
-  // Request Money events
-  // request_select_cancel is captured in send_select_cancel
-  request_payment_continue = 'incoming_request_payment_continue',
   request_payment_request = 'incoming_request_payment_request',
   request_payment_edit = 'incoming_request_payment_edit',
 
@@ -207,22 +241,30 @@ export const PROPERTY_PATH_WHITELIST = [
   'countryCode',
   'cta',
   'currentScreen',
+  'dollarAmount',
   'dollarBalance',
   'dollarPendingBalance',
   'error',
   'exchangeInputAmount',
   'exchangeRate',
   'fullName',
+  'goldAmount',
   'goldBalance',
   'goldPendingBalance',
+  'goldToDollarExchangeRate',
+  'inputToken',
   'inviteCode',
   'isCorrect',
   'issuer',
   'label',
   'language',
+  'localCurrency',
+  'localCurrencyAmount',
+  'localCurrencyExchangeRate',
   'makerAmount',
   'makerToken',
   'makerTokenAmount',
+  'method',
   'name',
   'navigation.state.key',
   'navigation.state.routeName',
@@ -248,6 +290,7 @@ export const PROPERTY_PATH_WHITELIST = [
   'testnet',
   'timeElapsed',
   'title',
+  'to',
   'tti',
   'txId',
   'verificationIndex',

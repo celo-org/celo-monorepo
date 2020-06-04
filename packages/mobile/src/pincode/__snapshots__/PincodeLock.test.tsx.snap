@@ -118,7 +118,11 @@ exports[`PincodeLock renders correctly 1`] = `
             onResponderTerminate={[Function]}
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
+<<<<<<< HEAD
             testID="1"
+=======
+            testID="digit1"
+>>>>>>> master
           >
             <Text
               style={
@@ -154,7 +158,11 @@ exports[`PincodeLock renders correctly 1`] = `
             onResponderTerminate={[Function]}
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
+<<<<<<< HEAD
             testID="2"
+=======
+            testID="digit2"
+>>>>>>> master
           >
             <Text
               style={
@@ -190,7 +198,11 @@ exports[`PincodeLock renders correctly 1`] = `
             onResponderTerminate={[Function]}
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
+<<<<<<< HEAD
             testID="3"
+=======
+            testID="digit3"
+>>>>>>> master
           >
             <Text
               style={
@@ -237,7 +249,11 @@ exports[`PincodeLock renders correctly 1`] = `
             onResponderTerminate={[Function]}
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
+<<<<<<< HEAD
             testID="4"
+=======
+            testID="digit4"
+>>>>>>> master
           >
             <Text
               style={
@@ -273,7 +289,11 @@ exports[`PincodeLock renders correctly 1`] = `
             onResponderTerminate={[Function]}
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
+<<<<<<< HEAD
             testID="5"
+=======
+            testID="digit5"
+>>>>>>> master
           >
             <Text
               style={
@@ -309,7 +329,11 @@ exports[`PincodeLock renders correctly 1`] = `
             onResponderTerminate={[Function]}
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
+<<<<<<< HEAD
             testID="6"
+=======
+            testID="digit6"
+>>>>>>> master
           >
             <Text
               style={
@@ -356,7 +380,11 @@ exports[`PincodeLock renders correctly 1`] = `
             onResponderTerminate={[Function]}
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
+<<<<<<< HEAD
             testID="7"
+=======
+            testID="digit7"
+>>>>>>> master
           >
             <Text
               style={
@@ -392,7 +420,11 @@ exports[`PincodeLock renders correctly 1`] = `
             onResponderTerminate={[Function]}
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
+<<<<<<< HEAD
             testID="8"
+=======
+            testID="digit8"
+>>>>>>> master
           >
             <Text
               style={
@@ -428,7 +460,11 @@ exports[`PincodeLock renders correctly 1`] = `
             onResponderTerminate={[Function]}
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
+<<<<<<< HEAD
             testID="9"
+=======
+            testID="digit9"
+>>>>>>> master
           >
             <Text
               style={
@@ -490,7 +526,11 @@ exports[`PincodeLock renders correctly 1`] = `
             onResponderTerminate={[Function]}
             onResponderTerminationRequest={[Function]}
             onStartShouldSetResponder={[Function]}
+<<<<<<< HEAD
             testID="0"
+=======
+            testID="digit0"
+>>>>>>> master
           >
             <Text
               style={

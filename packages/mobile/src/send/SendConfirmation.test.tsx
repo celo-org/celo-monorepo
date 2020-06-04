@@ -119,6 +119,29 @@ describe('SendConfirmation', () => {
     expect(tree).toMatchSnapshot()
   })
 
+  it('updates the comment/reason', () => {
+    const store = createMockStore({
+      fees: {
+        estimates: {
+          send: {
+            feeInWei: '1',
+          },
+        },
+      },
+    })
+
+    const tree = render(
+      <Provider store={store}>
+        <SendConfirmation {...mockScreenProps} />
+      </Provider>
+    )
+
+    const input = tree.getByTestId('commentInput/send')
+    const comment = 'A comment!'
+    fireEvent.changeText(input, comment)
+    expect(tree.queryAllByDisplayValue(comment)).toHaveLength(1)
+  })
+
   it('navigates to ValidateRecipientIntro when "edit" button is pressed', async () => {
     const mockE164NumberToAddress: E164NumberToAddressType = {
       [mockE164NumberInvite]: [mockAccountInvite, mockAccount2Invite],
