@@ -928,67 +928,67 @@ jobs:
             echo "lightest mode synced FAIL"
             echo 'export LIGHTEST=FAIL' >> $BASH_ENV
           fi
-    - run:
-        name: Deploying full mode client connected to rc1
-        command: |
-          set -e
-          cd packages/celotool
-          NAMESPACE="circle-${CIRCLE_BUILD_NUM}"
-          SYNC_MODE="full"
-          bin/celotooljs.sh deploy initial gke-fullnode -e rc1 --syncmode full --namespace ${NAMESPACE} --storageClass ssd
-          # if [ -f ../../.env.${NETWORK} ]; then
-          #   source ../../.env.${NETWORK}
-          # else
-          #   source ../../.env
-          # fi
-          # helm install ../helm-charts/celo-fullnode --name "${NETWORK}-${NAMESPACE}-${SYNC_MODE}-node" --namespace ${NAMESPACE} --set genesis.network="${NETWORK}" --set genesis.networkId="${NETWORK_ID}" --set geth.gcmode="full" --set geth.image.repository="${GETH_NODE_DOCKER_IMAGE_REPOSITORY}" --set geth.image.tag="master" --set geth.syncmode="${SYNC_MODE}" --set geth.use_static_ips="false" --set namespace="${NAMESPACE}" --set replicaCount="1" --set storage.size="10Gi" --set storage.storageClass="ssd"
+    # - run:
+    #     name: Deploying full mode client connected to rc1
+    #     command: |
+    #       set -e
+    #       cd packages/celotool
+    #       NAMESPACE="circle-${CIRCLE_BUILD_NUM}"
+    #       SYNC_MODE="full"
+    #       bin/celotooljs.sh deploy initial gke-fullnode -e rc1 --syncmode full --namespace ${NAMESPACE} --storageClass ssd
+    #       # if [ -f ../../.env.${NETWORK} ]; then
+    #       #   source ../../.env.${NETWORK}
+    #       # else
+    #       #   source ../../.env
+    #       # fi
+    #       # helm install ../helm-charts/celo-fullnode --name "${NETWORK}-${NAMESPACE}-${SYNC_MODE}-node" --namespace ${NAMESPACE} --set genesis.network="${NETWORK}" --set genesis.networkId="${NETWORK_ID}" --set geth.gcmode="full" --set geth.image.repository="${GETH_NODE_DOCKER_IMAGE_REPOSITORY}" --set geth.image.tag="master" --set geth.syncmode="${SYNC_MODE}" --set geth.use_static_ips="false" --set namespace="${NAMESPACE}" --set replicaCount="1" --set storage.size="10Gi" --set storage.storageClass="ssd"
 
-    - run:
-        name: Deploying fast mode client connected to rc1
-        command: |
-          set -e
-          cd packages/celotool
-          NAMESPACE="circle-${CIRCLE_BUILD_NUM}"
-          SYNC_MODE="fast"
-          bin/celotooljs.sh deploy initial gke-fullnode -e rc1 --syncmode fast --namespace ${NAMESPACE} --storageClass ssd
-          # if [ -f ../../.env.${NETWORK} ]; then
-          #   source ../../.env.${NETWORK}
-          # else
-          #   source ../../.env
-          # fi
-          # helm install ../helm-charts/celo-fullnode --name "${NETWORK}-${NAMESPACE}-${SYNC_MODE}-node" --namespace ${NAMESPACE} --set genesis.network="${NETWORK}" --set genesis.networkId="${NETWORK_ID}" --set geth.gcmode="full" --set geth.image.repository="${GETH_NODE_DOCKER_IMAGE_REPOSITORY}" --set geth.image.tag="master" --set geth.syncmode="${SYNC_MODE}" --set geth.use_static_ips="false" --set namespace="${NAMESPACE}" --set replicaCount="1" --set storage.size="10Gi" --set storage.storageClass="ssd"
+    # - run:
+    #     name: Deploying fast mode client connected to rc1
+    #     command: |
+    #       set -e
+    #       cd packages/celotool
+    #       NAMESPACE="circle-${CIRCLE_BUILD_NUM}"
+    #       SYNC_MODE="fast"
+    #       bin/celotooljs.sh deploy initial gke-fullnode -e rc1 --syncmode fast --namespace ${NAMESPACE} --storageClass ssd
+    #       # if [ -f ../../.env.${NETWORK} ]; then
+    #       #   source ../../.env.${NETWORK}
+    #       # else
+    #       #   source ../../.env
+    #       # fi
+    #       # helm install ../helm-charts/celo-fullnode --name "${NETWORK}-${NAMESPACE}-${SYNC_MODE}-node" --namespace ${NAMESPACE} --set genesis.network="${NETWORK}" --set genesis.networkId="${NETWORK_ID}" --set geth.gcmode="full" --set geth.image.repository="${GETH_NODE_DOCKER_IMAGE_REPOSITORY}" --set geth.image.tag="master" --set geth.syncmode="${SYNC_MODE}" --set geth.use_static_ips="false" --set namespace="${NAMESPACE}" --set replicaCount="1" --set storage.size="10Gi" --set storage.storageClass="ssd"
 
-    - run:
-        name: Testing full mode client connected to rc1
-        command: |
-          set -e
-          cd packages/celotool
-          NAMESPACE="circle-${CIRCLE_BUILD_NUM}"
-          set +e
-          scripts/test_sync.sh rc1 full ${NAMESPACE}
-          if [ $? -eq 0 ]; then
-            echo "full mode synced OK"
-            echo 'export FULL=OK' >> $BASH_ENV
-          else
-            echo "full mode synced FAIL"
-            echo 'export FULL=FAIL' >> $BASH_ENV
-          fi
+    # - run:
+    #     name: Testing full mode client connected to rc1
+    #     command: |
+    #       set -e
+    #       cd packages/celotool
+    #       NAMESPACE="circle-${CIRCLE_BUILD_NUM}"
+    #       set +e
+    #       scripts/test_sync.sh rc1 full ${NAMESPACE}
+    #       if [ $? -eq 0 ]; then
+    #         echo "full mode synced OK"
+    #         echo 'export FULL=OK' >> $BASH_ENV
+    #       else
+    #         echo "full mode synced FAIL"
+    #         echo 'export FULL=FAIL' >> $BASH_ENV
+    #       fi
 
-    - run:
-        name: Testing fast mode client connected to rc1
-        command: |
-          set -e
-          cd packages/celotool
-          NAMESPACE="circle-${CIRCLE_BUILD_NUM}"
-          set +e
-          scripts/test_sync.sh rc1 fast ${NAMESPACE}
-          if [ $? -eq 0 ]; then
-            echo "fast mode synced OK"
-            echo 'export FAST=OK' >> $BASH_ENV
-          else
-            echo "fast mode synced FAIL"
-            echo 'export FAST=FAIL' >> $BASH_ENV
-          fi
+    # - run:
+    #     name: Testing fast mode client connected to rc1
+    #     command: |
+    #       set -e
+    #       cd packages/celotool
+    #       NAMESPACE="circle-${CIRCLE_BUILD_NUM}"
+    #       set +e
+    #       scripts/test_sync.sh rc1 fast ${NAMESPACE}
+    #       if [ $? -eq 0 ]; then
+    #         echo "fast mode synced OK"
+    #         echo 'export FAST=OK' >> $BASH_ENV
+    #       else
+    #         echo "fast mode synced FAIL"
+    #         echo 'export FAST=FAIL' >> $BASH_ENV
+    #       fi
     - run:
         name: Failing job if some mode failed
         command: |
