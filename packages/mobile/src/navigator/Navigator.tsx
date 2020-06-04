@@ -188,7 +188,7 @@ const nuxScreens = (Navigator: typeof Stack) => (
 )
 
 const sendScreenOptions = ({ route }: { route: RouteProp<StackParamList, Screens.Send> }) => {
-  const goQr = () => navigate(Screens.QRCode)
+  const goQr = () => navigate(Screens.QRNavigator)
   return {
     ...emptyHeader,
     headerLeft: () => <TopBarIconButton icon={<Times />} onPress={navigateBack} />,

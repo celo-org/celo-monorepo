@@ -12,12 +12,12 @@ import { Defs, Mask, Rect, Svg } from 'react-native-svg'
 import { useDispatch } from 'react-redux'
 import { Namespaces } from 'src/i18n'
 import { Screens } from 'src/navigator/Screens'
-import { StackParamList } from 'src/navigator/types'
+import { QRTabParamList } from 'src/navigator/types'
 import NotAuthorizedView from 'src/qrcode/NotAuthorizedView'
 import { handleBarcodeDetected, QrCode } from 'src/send/actions'
 import Logger from 'src/utils/Logger'
 
-type Props = StackScreenProps<StackParamList, Screens.QRScanner>
+type Props = StackScreenProps<QRTabParamList, Screens.QRScanner>
 
 const SeeThroughOverlay = () => {
   const { width, height } = variables
