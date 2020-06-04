@@ -648,37 +648,6 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
               "overflow": "hidden",
             }
           }
-<<<<<<< HEAD
-          onClick={[Function]}
-          onResponderGrant={[Function]}
-          onResponderMove={[Function]}
-          onResponderRelease={[Function]}
-          onResponderTerminate={[Function]}
-          onResponderTerminationRequest={[Function]}
-          onStartShouldSetResponder={[Function]}
-          style={
-            Array [
-              Object {
-                "alignItems": "center",
-                "flex": 1,
-                "justifyContent": "center",
-              },
-              Object {
-                "backgroundColor": "#A3EBC6",
-              },
-              Object {
-                "height": 50,
-              },
-              Object {
-                "borderColor": "#A3EBC6",
-                "borderRadius": 3,
-                "borderWidth": 2,
-              },
-            ]
-          }
-          testID="ConfirmButton"
-=======
->>>>>>> master
         >
           <View
             accessible={true}
@@ -707,6 +676,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                 "paddingVertical": 5,
               }
             }
+            testID="ConfirmButton"
           >
             <Text
               accessibilityLabel="global:confirm"
@@ -1441,37 +1411,6 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
               "overflow": "hidden",
             }
           }
-<<<<<<< HEAD
-          onClick={[Function]}
-          onResponderGrant={[Function]}
-          onResponderMove={[Function]}
-          onResponderRelease={[Function]}
-          onResponderTerminate={[Function]}
-          onResponderTerminationRequest={[Function]}
-          onStartShouldSetResponder={[Function]}
-          style={
-            Array [
-              Object {
-                "alignItems": "center",
-                "flex": 1,
-                "justifyContent": "center",
-              },
-              Object {
-                "backgroundColor": "#A3EBC6",
-              },
-              Object {
-                "height": 50,
-              },
-              Object {
-                "borderColor": "#A3EBC6",
-                "borderRadius": 3,
-                "borderWidth": 2,
-              },
-            ]
-          }
-          testID="ConfirmButton"
-=======
->>>>>>> master
         >
           <View
             accessible={true}
@@ -1500,6 +1439,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                 "paddingVertical": 5,
               }
             }
+            testID="ConfirmButton"
           >
             <Text
               accessibilityLabel="global:confirm"
@@ -2231,37 +2171,6 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
               "overflow": "hidden",
             }
           }
-<<<<<<< HEAD
-          onClick={[Function]}
-          onResponderGrant={[Function]}
-          onResponderMove={[Function]}
-          onResponderRelease={[Function]}
-          onResponderTerminate={[Function]}
-          onResponderTerminationRequest={[Function]}
-          onStartShouldSetResponder={[Function]}
-          style={
-            Array [
-              Object {
-                "alignItems": "center",
-                "flex": 1,
-                "justifyContent": "center",
-              },
-              Object {
-                "backgroundColor": "#A3EBC6",
-              },
-              Object {
-                "height": 50,
-              },
-              Object {
-                "borderColor": "#A3EBC6",
-                "borderRadius": 3,
-                "borderWidth": 2,
-              },
-            ]
-          }
-          testID="ConfirmButton"
-=======
->>>>>>> master
         >
           <View
             accessible={true}
@@ -2290,6 +2199,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                 "paddingVertical": 5,
               }
             }
+            testID="ConfirmButton"
           >
             <Text
               accessibilityLabel="global:confirm"
