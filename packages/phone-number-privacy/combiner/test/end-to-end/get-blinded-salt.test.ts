@@ -4,8 +4,8 @@ import { normalizeAddressWith0x, privateKeyToAddress } from '@celo/utils/lib/add
 import { serializeSignature, signMessage } from '@celo/utils/lib/signatureUtils'
 import 'isomorphic-fetch'
 import Web3 from 'web3'
+import { getBlindedPhoneNumber } from '../../../common/test/utils'
 import config from '../../src/config'
-import { getBlindedPhoneNumber } from '../utils'
 
 require('dotenv').config()
 
