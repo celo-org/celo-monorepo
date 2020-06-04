@@ -21,7 +21,6 @@ export function Language() {
 
   const onSelectAnswer = (language: string, code: string) => {
     CeloAnalytics.track(CustomEventNames.language_select, { language, selectedAnswer: code })
-    dispatch(setLanguage(code))
     setAnswer(code)
   }
 
@@ -31,7 +30,9 @@ export function Language() {
       nextScreen,
       selectedAnswer,
     })
+    dispatch(setLanguage(selectedAnswer))
     navigation.navigate(nextScreen)
+    dispatch(setLanguage(selectedAnswer))
   }
 
   return (

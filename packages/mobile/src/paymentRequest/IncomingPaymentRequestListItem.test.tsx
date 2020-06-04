@@ -49,7 +49,6 @@ describe('IncomingPaymentRequestListItem', () => {
     const props = {
       id: 1,
       amount: new BigNumber(1),
-      comment: 'Something',
       requester: mockInvitableRecipient2,
       addressValidationType: AddressValidationType.FULL,
     }
@@ -76,7 +75,6 @@ describe('IncomingPaymentRequestListItem', () => {
     const props = {
       id: 1,
       amount: new BigNumber(1),
-      comment: 'Something',
       requester: mockInvitableRecipient2,
       addressValidationType: AddressValidationType.NONE,
     }
