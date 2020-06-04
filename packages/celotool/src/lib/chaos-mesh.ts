@@ -1,5 +1,7 @@
 import { makeHelmParameters } from 'src/lib/helm_deploy'
-import { execCmdWithExitOnFailure, outputIncludes } from './utils'
+import { execCmdWithExitOnFailure } from './cmd-utils'
+import { outputIncludes } from './utils'
+
 
 export function helmReleaseName(celoEnv: string) {
   return celoEnv + '-chaos-mesh'

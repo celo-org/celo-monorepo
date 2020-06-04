@@ -19,13 +19,7 @@ import { Admin } from 'web3-eth-admin'
 import { spawnCmd, spawnCmdWithExitOnFailure } from './cmd-utils'
 import { convertToContractDecimals } from './contract-utils'
 import { envVar, fetchEnv, isVmBased } from './env-utils'
-import {
-  AccountType,
-  generateGenesis,
-  generatePrivateKey,
-  privateKeyToPublicKey,
-  Validator,
-} from './generate_utils'
+import { AccountType, generateGenesis, generatePrivateKey, privateKeyToPublicKey, Validator } from './generate_utils'
 import { retrieveClusterIPAddress, retrieveIPAddress } from './helm_deploy'
 import { GethInstanceConfig } from './interfaces/geth-instance-config'
 import { GethRunConfig } from './interfaces/geth-run-config'
@@ -514,12 +508,14 @@ export const simulateClient = async (
     const sendTransactionTime = Date.now()
 
     // randomly choose which token to use
-    const transferGold = Boolean(Math.round(Math.random()))
+    // const transferGold = Boolean(Math.round(Math.random()))
+    const transferGold = true
     const transferFn = transferGold ? transferCeloGold : transferCeloDollars
     baseLogMessage.tokenName = transferGold ? 'cGLD' : 'cUSD'
 
     // randomly choose which gas currency to use
-    const feeCurrencyGold = Boolean(Math.round(Math.random()))
+    // const feeCurrencyGold = Boolean(Math.round(Math.random()))
+    const feeCurrencyGold = true
 
     let feeCurrency
     if (!feeCurrencyGold) {

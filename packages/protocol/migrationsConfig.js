@@ -193,7 +193,7 @@ const DefaultConfig = {
       '0x5091110175318A2A8aF88309D1648c1D84d31B29',
       '0xBBd6e54Af7A5722f42461C6313F37Bd50729F195',
     ],
-    frozen: true,
+    frozen: false,
   },
   transferWhitelist: {
     // Whitelist genesis block addresses.
@@ -371,6 +371,7 @@ const NetworkConfigs = {
         '0xB9E0b0B8fdA1001392c8fFd19f6B7ad5286589F2',
         '0x44740e3eedfD3a2A2e7662de9165a6E20bBcC72C',
         '0x7a2cb0438e7B9801C29B39Ff94439aFf930CDf9F',
+        '0xF4314cb9046bECe6AA54bb9533155434d0c76909',
       ],
     },
     validators: {
