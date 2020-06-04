@@ -1,5 +1,4 @@
 import { trimLeading0x } from '@celo/utils/src/address'
-import { InterceptedMethods } from '../../providers/celo-provider'
 import { RpcCaller } from '../../utils/rpc-caller'
 import { decodeSig, RLPEncodedTx } from '../../utils/signing-utils'
 import { Signer } from './signer'
@@ -43,7 +42,7 @@ export class RpcSigner implements Signer {
     if (tx.from! !== this.account) {
       throw new Error(`RpcSigner cannot sign tx with 'from' ${tx.from}`)
     }
-    const response = await this.rpc.call(InterceptedMethods.signTransaction, [tx])
+    const response = await this.rpc.call('eth_signTransaction', [tx])
     if (response.error) {
       throw new Error(`RpcSigner signTransaction failed with ${response.error}`)
     } else {
@@ -52,7 +51,7 @@ export class RpcSigner implements Signer {
   }
 
   async signPersonalMessage(data: string): Promise<{ v: number; r: Buffer; s: Buffer }> {
-    const response = await this.rpc.call(InterceptedMethods.sign, [data])
+    const response = await this.rpc.call('eth_sign', [data])
     if (response.error) {
       throw new Error(`RpcSigner signPersonalMessage failed with ${response.error}`)
     } else {

@@ -36,6 +36,10 @@ function getWeb3(fornoMode: boolean): Web3 {
 
 export function* getWallet() {
   yield call(waitForGethConnectivity)
+  if (!gethWallet.isSetupFinished()) {
+    yield call([gethWallet, gethWallet.init])
+    Logger.debug(`getWallet`, `Initialized wallet with accounts: ${gethWallet.getAccounts()}`)
+  }
   return gethWallet
 }
 
