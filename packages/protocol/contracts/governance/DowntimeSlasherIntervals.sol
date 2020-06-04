@@ -21,6 +21,8 @@ contract DowntimeSlasherIntervals is SlasherUtil {
   mapping(address => mapping(uint256 => SlashedInterval[])) epochSlashedIntervals;
 
   // For each user a map of StartBlock to a map of EndBlock to an accumulated ParentSealBitmap for the Interval
+  // Maps start block -> end block -> bitmap
+  // Intervals are not allowed to cross epoch boundaries.
   mapping(address => mapping(uint256 => mapping(uint256 => uint256))) private userIntervalValidationProof;
 
   uint256 public slashableDowntime;
@@ -164,25 +166,22 @@ contract DowntimeSlasherIntervals is SlasherUtil {
    * Both startBlock and endBlock should be part of the same epoch
    * @param startBlock First block of the interval.
    * @param endBlock Last block of the Interval.
-   * @param startSignerIndex Index of the signer within the validator set as of the start block.
+   * @param signerIndex Index of the signer within the validator set.
    * @return True if the validator signature does not appear in any block within the window.
    */
-  function wasDownForInterval(uint256 startBlock, uint256 endBlock, uint256 startSignerIndex)
+  function wasDownForInterval(uint256 startBlock, uint256 endBlock, uint256 signerIndex)
     public
     view
     returns (bool)
   {
-    require(
-      startSignerIndex < numberValidatorsInSet(startBlock),
-      "Bad validator index at start block"
-    );
+    require(signerIndex < numberValidatorsInSet(startBlock), "Bad validator index at start block");
 
     if (!intervalProofAlreadyCalculated(startBlock, endBlock)) {
       uint256 accumulatedBitmap = getBitmapForInterval(startBlock, endBlock);
-      return wasDownUsingIntervalBitmap(startSignerIndex, accumulatedBitmap);
+      return wasDownUsingIntervalBitmap(signerIndex, accumulatedBitmap);
     }
 
-    return wasDownUsingIntervalProof(startBlock, endBlock, startSignerIndex);
+    return wasDownUsingIntervalProof(startBlock, endBlock, signerIndex);
   }
 
   /**
@@ -215,7 +214,7 @@ contract DowntimeSlasherIntervals is SlasherUtil {
   }
 
   /**
-   * @notice Validates if the signerIndexes are down in both up interval bitmaps
+   * @notice Validates if the signerIndex is down in both up interval bitmaps
    */
   function wasDownUsingIntervalBitmap(uint256 signerIndex, uint256 intervalBitmap)
     internal
