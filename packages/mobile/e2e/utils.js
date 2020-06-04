@@ -64,7 +64,7 @@ export async function enterPinUi() {
 
   for (const digit of DEFAULT_PIN) {
     //await expect(element(by.text(digit))).toBeVisible()
-    await element(by.id(digit)).tap()
+    await element(by.id(`digit${digit}`)).tap()
   }
 
   await element(by.id('Pincode-Submit')).tap()
