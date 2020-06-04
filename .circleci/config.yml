@@ -873,6 +873,7 @@ jobs:
       - run:
           name: Certora dependencies
           command: |
+            echo "export PATH=$PATH:~/.local/bin" >> $BASH_ENV
             sudo apt-get update || sudo apt-get update
             sudo apt-get install -y software-properties-common
             sudo apt-get install python3-pip
