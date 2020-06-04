@@ -1,5 +1,5 @@
 import SimpleMessagingCard from '@celo/react-components/components/SimpleMessagingCard'
-import colors from '@celo/react-components/styles/colors'
+import progressDotsStyle from '@celo/react-components/styles/progressDots'
 import variables from '@celo/react-components/styles/variables'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
@@ -254,7 +254,11 @@ export class NotificationBox extends React.Component<Props, State> {
           return (
             <View
               key={i}
-              style={this.state.currentIndex === i ? styles.circleActive : styles.circlePassive}
+              style={
+                this.state.currentIndex === i
+                  ? progressDotsStyle.circleActive
+                  : progressDotsStyle.circlePassive
+              }
             />
           )
         })}
@@ -300,15 +304,6 @@ export class NotificationBox extends React.Component<Props, State> {
   }
 }
 
-const PROGRESS_CIRCLE_PASSIVE_SIZE = 6
-const PROGRESS_CIRCLE_ACTIVE_SIZE = 8
-
-const circle = {
-  flex: 0,
-  borderRadius: 8,
-  marginHorizontal: 5,
-}
-
 const styles = StyleSheet.create({
   body: {
     maxWidth: variables.width,
@@ -325,19 +320,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingBottom: variables.contentPadding,
     alignItems: 'center',
-  },
-  circle,
-  circlePassive: {
-    ...circle,
-    backgroundColor: colors.inactive,
-    height: PROGRESS_CIRCLE_PASSIVE_SIZE,
-    width: PROGRESS_CIRCLE_PASSIVE_SIZE,
-  },
-  circleActive: {
-    ...circle,
-    backgroundColor: colors.celoGreen,
-    height: PROGRESS_CIRCLE_ACTIVE_SIZE,
-    width: PROGRESS_CIRCLE_ACTIVE_SIZE,
   },
 })
 

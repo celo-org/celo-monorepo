@@ -31,6 +31,7 @@ export class GoldEducation extends React.Component<Props> {
     const stepInfo = [
       {
         image: shinyGold,
+        title: 'What is Celo Gold?',
         text: 'celoLikeGold',
         cancelEvent: CustomEventNames.gold_cancel1,
         screenName: 'Gold_Nux_1',
@@ -53,8 +54,7 @@ export class GoldEducation extends React.Component<Props> {
         stepInfo={stepInfo}
         onFinish={this.goToExchange}
         onFinishAlternate={this.goToWalletHome}
-        buttonText={'exchangeGold'}
-        linkText={'backToWallet'}
+        buttonText={'done'}
       />
     )
   }
