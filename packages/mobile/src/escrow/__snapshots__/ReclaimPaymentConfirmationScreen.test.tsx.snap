@@ -154,10 +154,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
               <View
                 style={
                   Object {
-                    "alignItems": "center",
-                    "alignSelf": "center",
                     "flexDirection": "row",
-                    "justifyContent": "center",
                   }
                 }
               >
@@ -166,35 +163,36 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly 1`] = `
                     Array [
                       Object {
                         "color": "#2E3338",
-                        "fontFamily": "Hind-Light",
-                        "fontSize": 14,
-                        "textAlignVertical": "center",
+                        "fontFamily": "Inter-Regular",
+                        "fontSize": 16,
+                        "lineHeight": 22,
                       },
                       Object {
                         "alignItems": "center",
-                        "backgroundColor": "#EEEEEE",
-                        "borderRadius": 3,
                         "justifyContent": "center",
-                        "marginRight": 5,
-                        "paddingLeft": 6,
-                        "paddingRight": 3,
+                        "marginRight": 4,
                       },
                     ]
                   }
                 >
-                  🇺🇸 +1
+                  🇺🇸
                 </Text>
                 <Text
                   style={
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-Light",
-                      "fontSize": 14,
-                      "textAlignVertical": "center",
-                    }
+                    Array [
+                      Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Inter-Regular",
+                        "fontSize": 16,
+                        "lineHeight": 22,
+                      },
+                      Object {
+                        "color": "#9CA4A9",
+                      },
+                    ]
                   }
                 >
-                  (415) 555-0000
+                  +1 (415) 555-0000
                 </Text>
               </View>
             </View>
@@ -918,10 +916,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
               <View
                 style={
                   Object {
-                    "alignItems": "center",
-                    "alignSelf": "center",
                     "flexDirection": "row",
-                    "justifyContent": "center",
                   }
                 }
               >
@@ -930,35 +925,36 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                     Array [
                       Object {
                         "color": "#2E3338",
-                        "fontFamily": "Hind-Light",
-                        "fontSize": 14,
-                        "textAlignVertical": "center",
+                        "fontFamily": "Inter-Regular",
+                        "fontSize": 16,
+                        "lineHeight": 22,
                       },
                       Object {
                         "alignItems": "center",
-                        "backgroundColor": "#EEEEEE",
-                        "borderRadius": 3,
                         "justifyContent": "center",
-                        "marginRight": 5,
-                        "paddingLeft": 6,
-                        "paddingRight": 3,
+                        "marginRight": 4,
                       },
                     ]
                   }
                 >
-                  🇺🇸 +1
+                  🇺🇸
                 </Text>
                 <Text
                   style={
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-Light",
-                      "fontSize": 14,
-                      "textAlignVertical": "center",
-                    }
+                    Array [
+                      Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Inter-Regular",
+                        "fontSize": 16,
+                        "lineHeight": 22,
+                      },
+                      Object {
+                        "color": "#9CA4A9",
+                      },
+                    ]
                   }
                 >
-                  (415) 555-0000
+                  +1 (415) 555-0000
                 </Text>
               </View>
             </View>
@@ -1682,10 +1678,7 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
               <View
                 style={
                   Object {
-                    "alignItems": "center",
-                    "alignSelf": "center",
                     "flexDirection": "row",
-                    "justifyContent": "center",
                   }
                 }
               >
@@ -1694,35 +1687,36 @@ exports[`ReclaimPaymentConfirmationScreen renders correctly when fee calculation
                     Array [
                       Object {
                         "color": "#2E3338",
-                        "fontFamily": "Hind-Light",
-                        "fontSize": 14,
-                        "textAlignVertical": "center",
+                        "fontFamily": "Inter-Regular",
+                        "fontSize": 16,
+                        "lineHeight": 22,
                       },
                       Object {
                         "alignItems": "center",
-                        "backgroundColor": "#EEEEEE",
-                        "borderRadius": 3,
                         "justifyContent": "center",
-                        "marginRight": 5,
-                        "paddingLeft": 6,
-                        "paddingRight": 3,
+                        "marginRight": 4,
                       },
                     ]
                   }
                 >
-                  🇺🇸 +1
+                  🇺🇸
                 </Text>
                 <Text
                   style={
-                    Object {
-                      "color": "#2E3338",
-                      "fontFamily": "Hind-Light",
-                      "fontSize": 14,
-                      "textAlignVertical": "center",
-                    }
+                    Array [
+                      Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Inter-Regular",
+                        "fontSize": 16,
+                        "lineHeight": 22,
+                      },
+                      Object {
+                        "color": "#9CA4A9",
+                      },
+                    ]
                   }
                 >
-                  (415) 555-0000
+                  +1 (415) 555-0000
                 </Text>
               </View>
             </View>

@@ -9,11 +9,14 @@ import { WithTranslation } from 'react-i18next'
 import { StyleSheet, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
+import CeloAnalytics from 'src/analytics/CeloAnalytics'
+import { CustomEventNames } from 'src/analytics/constants'
 import { fetchExchangeRate } from 'src/exchange/actions'
 import CeloGoldHistoryChart from 'src/exchange/CeloGoldHistoryChart'
 import CeloGoldOverview from 'src/exchange/CeloGoldOverview'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces, withTranslation } from 'src/i18n'
+import DrawerTopBar from 'src/navigator/DrawerTopBar'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 import { RootState } from 'src/redux/reducers'
@@ -47,6 +50,7 @@ export class ExchangeHomeScreen extends React.Component<Props> {
   }
 
   goToBuyGold = () => {
+    CeloAnalytics.track(CustomEventNames.gold_buy_start)
     this.props.navigation.navigate(Screens.ExchangeTradeScreen, {
       makerTokenDisplay: {
         makerToken: CURRENCY_ENUM.DOLLAR,
@@ -56,6 +60,7 @@ export class ExchangeHomeScreen extends React.Component<Props> {
   }
 
   goToBuyDollars = () => {
+    CeloAnalytics.track(CustomEventNames.gold_sell_start)
     this.props.navigation.navigate(Screens.ExchangeTradeScreen, {
       makerTokenDisplay: {
         makerToken: CURRENCY_ENUM.GOLD,
@@ -70,6 +75,7 @@ export class ExchangeHomeScreen extends React.Component<Props> {
 
     return (
       <SafeAreaView style={styles.background}>
+        <DrawerTopBar />
         <ScrollContainer heading={t('global:gold')} testID="ExchangeScrollView">
           <DisconnectBanner />
           <CeloGoldHistoryChart />
