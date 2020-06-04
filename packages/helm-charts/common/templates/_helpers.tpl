@@ -138,6 +138,7 @@ release: {{ .Release.Name }}
       --light.maxpeers {{ .light_maxpeers | default 1000 }} \
       --maxpeers {{ .maxpeers | default 1100 }} \
       --networkid=${NETWORK_ID} \
+      --istanbul.blockperiod={{ .Values.geth.blocktime }} \
       --nousb \
       --syncmode={{ .syncmode | default .Values.geth.syncmode }} \
       --gcmode={{ .gcmode | default .Values.geth.gcmode }} \

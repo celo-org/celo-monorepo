@@ -1,11 +1,7 @@
 import { getBlockscoutUrl } from 'src/lib/endpoints'
 import { envVar, fetchEnv } from 'src/lib/env-utils'
 import { getEnodesWithExternalIPAddresses } from 'src/lib/geth'
-import {
-  installGenericHelmChart,
-  removeGenericHelmChart,
-  upgradeGenericHelmChart,
-} from 'src/lib/helm_deploy'
+import { installGenericHelmChart, removeGenericHelmChart, upgradeGenericHelmChart } from 'src/lib/helm_deploy'
 import { getGenesisBlockFromGoogleStorage } from 'src/lib/testnet-utils'
 
 export async function installHelmChart(
@@ -65,6 +61,7 @@ async function helmParameters(
     `--set geth.image.repository=${fetchEnv(envVar.GETH_NODE_DOCKER_IMAGE_REPOSITORY)}`,
     `--set geth.image.tag=${fetchEnv(envVar.GETH_NODE_DOCKER_IMAGE_TAG)}`,
     `--set geth.networkID=${fetchEnv(envVar.NETWORK_ID)}`,
+    `--set geth.blocktime=${fetchEnv(envVar.BLOCK_TIME)}`,
     `--set geth.staticNodes="${staticNodesJsonB64}"`,
     `--set geth.verbosity=${fetchEnv('GETH_VERBOSITY')}`,
     `--set mnemonic="${fetchEnv(envVar.MNEMONIC)}"`,

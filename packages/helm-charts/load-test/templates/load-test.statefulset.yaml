@@ -94,6 +94,7 @@ spec:
           --rpcapi=eth,web3,debug,admin,personal,net \
           --rpcvhosts=* \
           --networkid={{ .Values.geth.networkID }} \
+          --istanbul.blockperiod={{ .Values.geth.blocktime }} \
           --nodekey=/root/.celo/pkey \
           --syncmode=ultralight \
           --consoleformat=json \

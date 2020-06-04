@@ -16,6 +16,7 @@ geth:
   debug: false
   ping_ip_from_packet: false
   in_memory_discovery_table: false
+  blocktime: 5
   syncmode: full
   gcmode: full
   verbosity: 2
