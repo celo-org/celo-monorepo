@@ -1,5 +1,6 @@
 import { parsePhoneNumber } from '@celo/utils/src/phoneNumbers'
 import * as fuzzysort from 'fuzzysort'
+import { TFunction } from 'i18next'
 import { MinimalContact } from 'react-native-contacts'
 import {
   AddressToE164NumberType,
@@ -58,6 +59,12 @@ export interface RecipientWithAddress extends IRecipient {
 
 export interface NumberToRecipient {
   [number: string]: RecipientWithContact
+}
+
+interface DisplayNameProps {
+  recipient: Recipient
+  recipientAddress?: string | null
+  t: TFunction
 }
 
 /**
@@ -122,6 +129,21 @@ export function getRecipientFromAddress(
 ) {
   const e164PhoneNumber = addressToE164Number[address]
   return e164PhoneNumber ? recipientCache[e164PhoneNumber] : undefined
+}
+
+export function getDisplayName({ recipient, recipientAddress, t }: DisplayNameProps) {
+  const { displayName, e164PhoneNumber } = recipient
+  if (displayName) {
+    return displayName
+  }
+  if (e164PhoneNumber) {
+    return e164PhoneNumber
+  }
+  if (recipientAddress) {
+    return recipientAddress
+  }
+  // Rare but possible, such as when a user skips onboarding flow (in dev mode) and then views their own avatar
+  return t('global:unknown')
 }
 
 export function getRecipientVerificationStatus(
