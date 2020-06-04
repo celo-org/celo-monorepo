@@ -6,7 +6,7 @@ import {
   setDidMatchmaking,
 } from '../src/database/wrappers/account'
 import { getNumberPairContacts, setNumberPairContacts } from '../src/database/wrappers/number-pairs'
-import { getBlindedSalt, getContactMatches } from '../src/index'
+import { getDistributedBlindedSalt, getContactMatches } from '../src/index'
 import { getRemainingQueryCount } from '../src/salt-generation/query-quota'
 import { getTransaction } from '../src/database/database'
 
@@ -21,7 +21,7 @@ jest.mock('../src/salt-generation/query-quota')
 const mockGetRemainingQueryCount = getRemainingQueryCount as jest.Mock
 
 jest.mock('../src/bls/bls-cryptography-client')
-const mockComputeBlindedSignature = BLSCryptographyClient.computeBlindedSignature as jest.Mock
+const mockComputeBlindedSignature = BLSCryptographyClient.combinePartialBlindedSignatures as jest.Mock
 mockComputeBlindedSignature.mockResolvedValue(BLS_SIGNATURE)
 
 jest.mock('../src/database/wrappers/account')
@@ -43,7 +43,7 @@ mockGetTransaction.mockReturnValue({})
 
 // TODO the failures are nested in the res structure as a deep equality which does not fail
 // the full test
-describe(`POST /getBlindedMessageSignature endpoint`, () => {
+describe(`POST /getDistributedBlindedSalt endpoint`, () => {
   describe('with valid input', () => {
     const blindedQueryPhoneNumber = '+5555555555'
     const hashedPhoneNumber = '0x5f6e88c3f724b3a09d3194c0514426494955eff7127c29654e48a361a19b4b96'
@@ -65,7 +65,7 @@ describe(`POST /getBlindedMessageSignature endpoint`, () => {
         },
       }
       // @ts-ignore TODO fix req type to make it a mock express req
-      getBlindedSalt(req, res)
+      getDistributedBlindedSalt(req, res)
     })
     it('returns 403 on query count 0', () => {
       mockGetRemainingQueryCount.mockReturnValue(0)
@@ -80,7 +80,7 @@ describe(`POST /getBlindedMessageSignature endpoint`, () => {
         },
       }
       // @ts-ignore TODO fix req type to make it a mock express req
-      getBlindedSalt(req, res)
+      getDistributedBlindedSalt(req, res)
     })
     it('returns 500 on bls error', () => {
       mockGetRemainingQueryCount.mockReturnValue(10)
@@ -95,7 +95,7 @@ describe(`POST /getBlindedMessageSignature endpoint`, () => {
         },
       }
       // @ts-ignore TODO fix req type to make it a mock express req
-      getBlindedSalt(req, res)
+      getDistributedBlindedSalt(req, res)
     })
   })
   describe('with invalid input', () => {
@@ -119,7 +119,7 @@ describe(`POST /getBlindedMessageSignature endpoint`, () => {
         },
       }
       // @ts-ignore TODO fix req type to make it a mock express req
-      getBlindedSalt(req, res)
+      getDistributedBlindedSalt(req, res)
     })
     it('invalid hashedPhoneNumber returns 400', () => {
       const blindedQueryPhoneNumber = '+5555555555'
@@ -141,7 +141,7 @@ describe(`POST /getBlindedMessageSignature endpoint`, () => {
         },
       }
       // @ts-ignore TODO fix req type to make it a mock express req
-      getBlindedSalt(req, res)
+      getDistributedBlindedSalt(req, res)
     })
   })
 })
