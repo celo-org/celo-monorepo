@@ -42,7 +42,7 @@ spec:
       - name: generate-keys
         image: {{ .Values.celotool.image.repository }}:{{ .Values.celotool.image.tag }}
         imagePullPolicy: {{ .Values.imagePullPolicy }}
-      - args:
+        args:
         - |
           [[ $REPLICA_NAME =~ -([0-9]+)$ ]] || exit 1
           RID=${BASH_REMATCH[1]}
@@ -58,7 +58,7 @@ spec:
 
           celotooljs.sh generate prepare-load-test \
             --mnemonic "$MNEMONIC" \
-            --threads {{ .Values.threads | default "1" } \
+            --threads {{ .Values.threads | default "1" }} \
             --index $RID
         command:
         - bash
@@ -85,7 +85,7 @@ spec:
         - "-c"
         - |
           for thread in $(seq 0 {{ sub .Values.threads 1 | default "0" }}); do
-            geth account import --password /root/.celo/account/accountSecret /root/.celo/pkey$thread || true
+            geth account import --nousb --password /root/.celo/account/accountSecret /root/.celo/pkey$thread || true
           done
         volumeMounts:
         - name: data
@@ -110,10 +110,11 @@ spec:
           PASSWORD=$(cat /root/.celo/account/accountSecret)
 
           geth \
+          --nousb \
           --rpc \
           --rpcapi=eth,web3,debug,admin,personal,net \
           --allow-insecure-unlock \
-          --bootnode=enode://$(cat /root/.celo/bootnodeEnode) \
+          --bootnodes=enode://$(cat /root/.celo/bootnodeEnode) \
           --rpcvhosts=* \
           --networkid={{ $.Values.geth.networkID }} \
           --nodekey=/root/.celo/pkey{{ $index }} \

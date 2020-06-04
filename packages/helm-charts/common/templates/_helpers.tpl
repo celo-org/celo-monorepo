@@ -48,7 +48,7 @@ release: {{ .Release.Name }}
   - -c
   args:
   - |
-      mkdir -p /var/geth /root/celo
+      mkdir -p /var/geth /root/.celo
       if [ "{{ .Values.genesis.useGenesisFileBase64 | default false }}" == "true" ]; then
         cp -L /var/geth/genesis.json /root/.celo/
       else
