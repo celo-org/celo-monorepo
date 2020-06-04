@@ -2,8 +2,9 @@ import ContactCircle from '@celo/react-components/components/ContactCircle'
 import Touchable from '@celo/react-components/components/Touchable'
 import colors from '@celo/react-components/styles/colors.v2'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
+import variables from '@celo/react-components/styles/variables'
 import * as React from 'react'
-import { Text, View } from 'react-native'
+import { StyleSheet, Text, View } from 'react-native'
 import { getRecipientThumbnail, Recipient, RecipientKind } from 'src/recipients/recipient'
 
 interface Props {
