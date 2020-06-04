@@ -6,5 +6,12 @@
   "requestPaid": "Request Paid",
   "paymentRequestUpdateFailed": "Cannot update payment request",
   "incomingPaymentRequestNotificationTitle": "{{name}} requested",
-  "outgoingPaymentRequestNotificationTitle": "Waiting for {{name}}"
+  "outgoingPaymentRequestNotificationTitle": "Waiting for {{name}}",
+  "requestUnavailableHeader": "{{displayName}}'s account is unverified",
+  "requestUnavailableNoDisplayNameHeader": "Your contact's account is unverified",
+  "requestUnavailableBody": "The number {{e164PhoneNumber}} doesn't have an account or hasn't verified it yet. Requests can only be sent to verified numbers.",
+  "requestUnavailableNoNumberBody": "Your contact doesn't have an account or hasn't verified it yet. Requests can only be sent to verified numbers.",
+  "requesting": "Requesting",
+  "request": "Request",
+  "requestSent": "Request Sent"
 }

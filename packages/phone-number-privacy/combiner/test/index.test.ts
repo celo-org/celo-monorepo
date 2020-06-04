@@ -1,5 +1,6 @@
-import { authenticateUser, isVerified } from '../src/common/identity'
 import { BLSCryptographyClient } from '../src/bls/bls-cryptography-client'
+import { authenticateUser, isVerified } from '../src/common/identity'
+import { getTransaction } from '../src/database/database'
 import {
   getDidMatchmaking,
   incrementQueryCount,
@@ -8,7 +9,6 @@ import {
 import { getNumberPairContacts, setNumberPairContacts } from '../src/database/wrappers/number-pairs'
 import { getDistributedBlindedSalt, getContactMatches } from '../src/index'
 import { getRemainingQueryCount } from '../src/salt-generation/query-quota'
-import { getTransaction } from '../src/database/database'
 
 const BLS_SIGNATURE = '6546544323114343'
 
