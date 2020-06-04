@@ -362,9 +362,9 @@ USAGE
 
 OPTIONS
   --derivationPath=derivationPath
-      Choose a different derivation Path (Celo's default is "m/44'/52752'/0'/0"). Allows to use "eth" as an alias of the
-      Ethereum derivation path ("m/44'/60'/0'/0/"). Recreating the same account requires knowledge of both the mnemonic
-      and derivation path
+      Choose a different derivation Path (Celo's default is "m/44'/52752'/0'/0"). Use "eth" as an alias of the Ethereum
+      derivation path ("m/44'/60'/0'/0/"). Recreating the same account requires knowledge of the mnemonic, passphrase (if
+      any), and the derivation path
 
   --indexAddress=indexAddress
       Choose the index address of the derivation path
@@ -374,18 +374,20 @@ OPTIONS
 
   --mnemonicPath=mnemonicPath
       Instead of generating a new mnemonic (seed phrase), use the user-supplied mnemonic instead. Path to a file that
-      contains all the mnemonic words separate by a space (example: "word1 word2 word3 ... word24"). If the words are a
-      language other than English, the --language flag must be used. Only bip39 mnemonics are supported
+      contains all the mnemonic words separated by a space (example: "word1 word2 word3 ... word24"). If the words are a
+      language other than English, the --language flag must be used. Only BIP39 mnemonics are supported
 
-  --passwordPath=passwordPath
-      Path to a file that contains the password to generate the keys
+  --passphrasePath=passphrasePath
+      Path to a file that contains the BIP39 passphrase to combine with the mnemonic specified using the mnemonicPath flag
+      and the index specified using the indexAddress flag. Every passphrase generates a different private key and wallet
+      address.
 
 EXAMPLES
   new
-  new --passwordPath myFolder/my_password_file
+  new --passphrasePath myFolder/my_passphrase_file
   new --language spanish
-  new --passwordPath some_folder/my_password_file --language japanese --indexAddress 5
-  new --passwordPath some_folder/my_password_file --mnemonicPath some_folder/my_mnemonic_file --indexAddress 5
+  new --passphrasePath some_folder/my_passphrase_file --language japanese --indexAddress 5
+  new --passphrasePath some_folder/my_passphrase_file --mnemonicPath some_folder/my_mnemonic_file --indexAddress 5
 ```
 
 _See code: [packages/cli/src/commands/account/new.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/new.ts)_

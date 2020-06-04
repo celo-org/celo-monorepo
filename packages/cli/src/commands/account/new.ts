@@ -20,8 +20,9 @@ export default class NewAccount extends LocalCommand {
 
   static flags = {
     ...LocalCommand.flags,
-    passwordPath: flags.string({
-      description: 'Path to a file that contains the password to generate the keys',
+    passphrasePath: flags.string({
+      description:
+        'Path to a file that contains the BIP39 passphrase to combine with the mnemonic specified using the mnemonicPath flag and the index specified using the indexAddress flag. Every passphrase generates a different private key and wallet address.',
     }),
     indexAddress: flags.integer({
       default: 0,
@@ -44,20 +45,20 @@ export default class NewAccount extends LocalCommand {
     }),
     mnemonicPath: flags.string({
       description:
-        'Instead of generating a new mnemonic (seed phrase), use the user-supplied mnemonic instead. Path to a file that contains all the mnemonic words separate by a space (example: "word1 word2 word3 ... word24"). If the words are a language other than English, the --language flag must be used. Only bip39 mnemonics are supported',
+        'Instead of generating a new mnemonic (seed phrase), use the user-supplied mnemonic instead. Path to a file that contains all the mnemonic words separated by a space (example: "word1 word2 word3 ... word24"). If the words are a language other than English, the --language flag must be used. Only BIP39 mnemonics are supported',
     }),
     derivationPath: flags.string({
       description:
-        "Choose a different derivation Path (Celo's default is \"m/44'/52752'/0'/0\"). Allows to use \"eth\" as an alias of the Ethereum derivation path (\"m/44'/60'/0'/0/\"). Recreating the same account requires knowledge of both the mnemonic and derivation path",
+        "Choose a different derivation Path (Celo's default is \"m/44'/52752'/0'/0\"). Use \"eth\" as an alias of the Ethereum derivation path (\"m/44'/60'/0'/0/\"). Recreating the same account requires knowledge of the mnemonic, passphrase (if any), and the derivation path",
     }),
   }
 
   static examples = [
     'new',
-    'new --passwordPath myFolder/my_password_file',
+    'new --passphrasePath myFolder/my_passphrase_file',
     'new --language spanish',
-    'new --passwordPath some_folder/my_password_file --language japanese --indexAddress 5',
-    'new --passwordPath some_folder/my_password_file --mnemonicPath some_folder/my_mnemonic_file --indexAddress 5',
+    'new --passphrasePath some_folder/my_passphrase_file --language japanese --indexAddress 5',
+    'new --passphrasePath some_folder/my_passphrase_file --mnemonicPath some_folder/my_mnemonic_file --indexAddress 5',
   ]
 
   static languageOptions(language: string): MnemonicLanguages | undefined {
@@ -103,10 +104,10 @@ export default class NewAccount extends LocalCommand {
       )
     }
     const derivationPath = NewAccount.sanitizeDerivationPath(res.flags.derivationPath)
-    const password = NewAccount.readFile(res.flags.passwordPath)
+    const passphrase = NewAccount.readFile(res.flags.passphrasePath)
     const keys = await generateKeys(
       mnemonic,
-      password,
+      passphrase,
       res.flags.indexAddress,
       undefined,
       derivationPath
