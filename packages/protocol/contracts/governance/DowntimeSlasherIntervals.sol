@@ -263,7 +263,7 @@ contract DowntimeSlasherIntervals is SlasherUtil {
     for (uint256 i = 0; i < startIntervals.length; i += 1) {
       require(
         intervalProofAlreadyCalculated(startIntervals[i], endIntervals[i]),
-        "Invalid interval"
+        "Interval has not been calculated"
       );
       require(
         lastIntervalEnd >= startIntervals[i].sub(1) && lastIntervalEnd <= endIntervals[i],
