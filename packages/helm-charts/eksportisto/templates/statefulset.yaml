@@ -50,7 +50,7 @@ spec:
         image: {{ .Values.imageRepository }}:{{ .Values.imageTag }}
         imagePullPolicy: {{ .Values.imagePullPolicy }}
         args:
-          - "-nodeUri=https://alfajores-forno.celo-testnet.org" # $(WEB3_PROVIDER)
+          - "-nodeUri={{ .Values.web3Provider }}"
           - "-datadir=/root/.eksportisto"
           - "-sensitiveAccounts=/root/.eksportisto/sensitive-accounts.json"
         resources:
@@ -65,9 +65,6 @@ spec:
           mountPath: /root/.eksportisto
         - name: config
           mountPath: /var/config
-        env:
-        - name: WEB3_PROVIDER
-          value: {{ .Values.web3Provider }}
       volumes:
       - name: data
         emptyDir: {}
