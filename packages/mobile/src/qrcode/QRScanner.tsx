@@ -1,12 +1,11 @@
 import colors from '@celo/react-components/styles/colors.v2'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import variables from '@celo/react-components/styles/variables'
-import { useIsFocused } from '@react-navigation/native'
 import { StackScreenProps } from '@react-navigation/stack'
 import { memoize } from 'lodash'
 import React, { useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
-import { StatusBar, StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, Text } from 'react-native'
 import { RNCamera } from 'react-native-camera'
 import { useSafeArea } from 'react-native-safe-area-view'
 import { Defs, Mask, Rect, Svg } from 'react-native-svg'
@@ -18,9 +17,7 @@ import NotAuthorizedView from 'src/qrcode/NotAuthorizedView'
 import { handleBarcodeDetected, QrCode } from 'src/send/actions'
 import Logger from 'src/utils/Logger'
 
-type Props = StackScreenProps<StackParamList, Screens.QRScanner> & {
-  enableCamera: boolean
-}
+type Props = StackScreenProps<StackParamList, Screens.QRScanner>
 
 const SeeThroughOverlay = () => {
   const { width, height } = variables
@@ -28,13 +25,11 @@ const SeeThroughOverlay = () => {
   const margin = 40
   const centerBoxSize = width - margin * 2
   const centerBoxBorderRadius = 8
+
+  // TODO(jeanregisser): Investigate why the mask is pixelated on iOS.
+  // It's visible on the rounded corners but since they are small, I'm ignoring it for now.
   return (
-    <Svg
-      height={height}
-      width={width}
-      viewBox={`0 0 ${width} ${height}`}
-      // transform={[{ scale: 0.5 }]}
-    >
+    <Svg height={height} width={width} viewBox={`0 0 ${width} ${height}`}>
       <Defs>
         <Mask id="mask" x="0" y="0" height="100%" width="100%">
           <Rect height="100%" width="100%" fill="#fff" />
@@ -54,10 +49,9 @@ const SeeThroughOverlay = () => {
   )
 }
 
-export default function QRScanner({ route, enableCamera }: Props) {
+export default function QRScanner({ route }: Props) {
   const dispatch = useDispatch()
   const { t } = useTranslation(Namespaces.sendFlow7)
-  const isFocused = useIsFocused()
   const inset = useSafeArea()
 
   const { scanIsForSecureSend, transactionData } = route.params || {}
@@ -74,47 +68,28 @@ export default function QRScanner({ route, enableCamera }: Props) {
   )
 
   return (
-    <View style={styles.container}>
-      {isFocused && <StatusBar barStyle="light-content" />}
-      {enableCamera && (
-        <RNCamera
-          style={styles.camera}
-          type={RNCamera.Constants.Type.back}
-          onBarCodeRead={onBarCodeDetected}
-          barCodeTypes={[RNCamera.Constants.BarCodeType.qr]}
-          flashMode={RNCamera.Constants.FlashMode.auto}
-          captureAudio={false}
-          autoFocus={RNCamera.Constants.AutoFocus.on}
-          // Passing null here since we want the default system message
-          // @ts-ignore
-          androidCameraPermissionOptions={null}
-          notAuthorizedView={<NotAuthorizedView />}
-        >
-          {/* <View
-            style={{
-              ...StyleSheet.absoluteFillObject,
-              backgroundColor: '#555',
-            }}
-          /> */}
-          <SeeThroughOverlay />
-          <Text style={[styles.infoText, { marginBottom: inset.bottom }]}>
-            {t('cameraScanInfo')}
-          </Text>
-        </RNCamera>
-      )}
-    </View>
+    <RNCamera
+      style={styles.camera}
+      type={RNCamera.Constants.Type.back}
+      onBarCodeRead={onBarCodeDetected}
+      barCodeTypes={[RNCamera.Constants.BarCodeType.qr]}
+      flashMode={RNCamera.Constants.FlashMode.auto}
+      captureAudio={false}
+      autoFocus={RNCamera.Constants.AutoFocus.on}
+      // Passing null here since we want the default system message
+      // @ts-ignore
+      androidCameraPermissionOptions={null}
+      notAuthorizedView={<NotAuthorizedView />}
+    >
+      <SeeThroughOverlay />
+      <Text style={[styles.infoText, { marginBottom: inset.bottom }]}>{t('cameraScanInfo')}</Text>
+    </RNCamera>
   )
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
   camera: {
     flex: 1,
-    // justifyContent: 'flex-end',
-    // alignItems: 'center',
-    // backgroundColor: 'green',
   },
   infoBox: {
     paddingVertical: 9,

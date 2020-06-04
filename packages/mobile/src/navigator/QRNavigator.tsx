@@ -3,10 +3,9 @@ import {
   MaterialTopTabBarProps,
 } from '@react-navigation/material-top-tabs'
 import { useIsFocused } from '@react-navigation/native'
-import * as React from 'react'
-import { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { useAsync } from 'react-async-hook'
-import { Dimensions, Platform, StyleSheet } from 'react-native'
+import { Dimensions, Platform, StatusBar, StyleSheet } from 'react-native'
 import { check, PERMISSIONS, RESULTS } from 'react-native-permissions'
 import Animated, { call, greaterThan, onChange } from 'react-native-reanimated'
 import { ScrollPager } from 'react-native-tab-view'
@@ -15,16 +14,19 @@ import QRCode from 'src/qrcode/QRCode'
 import QRScanner from 'src/qrcode/QRScanner'
 import QRTabBar from 'src/qrcode/QRTabBar'
 import { SVG } from 'src/send/actions'
+import { ExtractProps } from 'src/utils/typescript'
 
 const Tab = createMaterialTopTabNavigator()
 
 const width = Dimensions.get('window').width
 const initialLayout = { width }
 
-function ScannerContainer({ position, ...props }: any) {
-  const index = 1
-  const length = 2
+type AnimatedScannerSceneProps = ExtractProps<typeof QRScanner> & {
+  position: Animated.Value<number>
+}
 
+// Component doing our custom transition for the QR scanner
+function AnimatedScannerScene({ position, ...props }: AnimatedScannerSceneProps) {
   const isFocused = useIsFocused()
   const [wasFocused, setWasFocused] = useState(isFocused)
   const [isPartiallyVisible, setIsPartiallyVisible] = useState(false)
@@ -46,38 +48,33 @@ function ScannerContainer({ position, ...props }: any) {
       onChange(
         greaterThan(position, 0),
         call([position], ([value]) => {
-          // console.log('==value', value)
           setIsPartiallyVisible(value > 0)
         })
       ),
     [position]
   )
 
-  const opacity = Animated.interpolate(position, {
-    inputRange: [0, 1],
-    outputRange: [0, 1],
-  })
+  const animatedStyle = useMemo(() => {
+    const opacity = Animated.interpolate(position, {
+      inputRange: [0, 1],
+      outputRange: [0, 1],
+      extrapolate: Animated.Extrapolate.CLAMP,
+    })
 
-  const inputRange = Array.from({ length }, (_, i) => i)
-  const translateOutputRange = inputRange.map((i) => {
-    return width * (index - i) * -1
-  })
+    const translateX = Animated.interpolate(position, {
+      inputRange: [0, 1],
+      outputRange: [-width, 0],
+      extrapolate: Animated.Extrapolate.CLAMP,
+    })
 
-  // const translateX = Animated.interpolate(position, {
-  //   inputRange: [0, 1, 2],
-  //   outputRange: [0.7, 1, 0.7],
-  // })
+    const scale = Animated.interpolate(position, {
+      inputRange: [0, 1],
+      outputRange: [0.7, 1],
+      extrapolate: Animated.Extrapolate.CLAMP,
+    })
 
-  const translateX = Animated.interpolate(position, {
-    inputRange,
-    outputRange: translateOutputRange,
-    extrapolate: Animated.Extrapolate.CLAMP,
-  })
-
-  const scale = Animated.interpolate(position, {
-    inputRange: [0, 1, 2],
-    outputRange: [0.7, 1, 1],
-  })
+    return { flex: 1, opacity, transform: [{ translateX, scale }] }
+  }, [position])
 
   // This only enables the camera when necessary.
   // There a special treatment for when we haven't asked the user for camera permission yet.
@@ -88,14 +85,15 @@ function ScannerContainer({ position, ...props }: any) {
   const enableCamera = isFocused || (isPartiallyVisible && (hasAskedCameraPermission || wasFocused))
 
   return (
-    <Animated.View style={{ flex: 1, opacity, transform: [{ translateX, scale }] }}>
-      <QRScanner {...props} enableCamera={enableCamera} />
+    <Animated.View style={animatedStyle}>
+      {isFocused && <StatusBar barStyle="light-content" />}
+      {enableCamera && <QRScanner {...props} />}
     </Animated.View>
   )
 }
 
 // Use ScrollPager on iOS as it gives a better native feeling
-const pager: React.ComponentProps<typeof Tab.Navigator>['pager'] =
+const pager: ExtractProps<typeof Tab.Navigator>['pager'] =
   Platform.OS === 'ios' ? (props) => <ScrollPager {...props} /> : undefined
 
 export default function QRNavigator() {
@@ -119,7 +117,7 @@ export default function QRNavigator() {
         {(props) => <QRCode {...props} qrSvgRef={qrSvgRef} />}
       </Tab.Screen>
       <Tab.Screen name={Screens.QRScanner} options={{ title: 'Scan' }}>
-        {(props) => <ScannerContainer {...props} position={position} />}
+        {(props) => <AnimatedScannerScene {...props} position={position} />}
       </Tab.Screen>
     </Tab.Navigator>
   )
