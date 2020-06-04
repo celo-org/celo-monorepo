@@ -1,6 +1,6 @@
-import threshold from 'blind-threshold-bls'
+import threshold_bls from 'blind-threshold-bls'
 import { BLSCryptographyClient } from '../../src/bls/bls-cryptography-client'
-import config, { DEV_PRIVATE_KEY, DEV_PUBLIC_KEY } from '../../src/config'
+import config, { DEV_POLYNOMIAL, DEV_PRIVATE_KEY, DEV_PUBLIC_KEY } from '../../src/config'
 
 const USING_MOCK = config.keyVault.azureClientSecret === 'useMock'
 
@@ -25,21 +25,32 @@ describe(`BLS service computes signature`, () => {
   it('provides blinded signature', async () => {
     const message = Buffer.from('hello world')
     const userSeed = new Uint8Array(32)
-    for (let i = 0; i < 31; i++) {
+    for (let i = 0; i < userSeed.length - 1; i++) {
       userSeed[i] = i
     }
 
-    const blindedMsgResult = threshold.blind(message, userSeed)
+    const blindedMsgResult = threshold_bls.blind(message, userSeed)
     const blindedMsg = Buffer.from(blindedMsgResult.message).toString('base64')
 
     const actual = await BLSCryptographyClient.computeBlindedSignature(blindedMsg)
-    expect(actual).toEqual('ZeYBwDBxkWe1ZNDqiViz2MNGIT6PIW2c3pemkMcmM5gM1vaaf5RieVp+2SxR83YA')
+    expect(actual).toEqual(
+      'MAAAAAAAAADJpFrx/eDNs1Qm986trWFZpMcJNRM5W/yKoI+cxk0gBul1PNAVzw1uFpEWJx5iK4EAAAAA'
+    )
 
-    const unblindedSignedMessage = threshold.unblind(
-      Buffer.from(actual, 'base64'),
+    expect(
+      threshold_bls.partialVerifyBlindSignature(
+        Buffer.from(DEV_POLYNOMIAL, 'base64'),
+        blindedMsgResult.message,
+        Buffer.from(actual, 'base64')
+      )
+    )
+
+    const combinedSignature = threshold_bls.combine(1, Buffer.from(actual, 'base64'))
+    const unblindedSignedMessage = threshold_bls.unblind(
+      combinedSignature,
       blindedMsgResult.blindingFactor
     )
     const publicKey = Buffer.from(DEV_PUBLIC_KEY, 'base64')
-    expect(threshold.verify(publicKey, message, unblindedSignedMessage))
+    expect(threshold_bls.verify(publicKey, message, unblindedSignedMessage))
   })
 })
