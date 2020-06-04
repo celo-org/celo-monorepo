@@ -4,7 +4,7 @@ import { newAccounts } from './generated/Accounts'
 import { newAttestations } from './generated/Attestations'
 import { newBlockchainParameters } from './generated/BlockchainParameters'
 import { newDoubleSigningSlasher } from './generated/DoubleSigningSlasher'
-import { newDowntimeSlasherSlots } from './generated/DowntimeSlasherSlots'
+import { newDowntimeSlasherIntervals } from './generated/DowntimeSlasherIntervals'
 import { newElection } from './generated/Election'
 import { newEpochRewards } from './generated/EpochRewards'
 import { newEscrow } from './generated/Escrow'
@@ -33,7 +33,7 @@ export const ContractFactories = {
   [CeloContract.Attestations]: newAttestations,
   [CeloContract.BlockchainParameters]: newBlockchainParameters,
   [CeloContract.DoubleSigningSlasher]: newDoubleSigningSlasher,
-  [CeloContract.DowntimeSlasher]: newDowntimeSlasherSlots,
+  [CeloContract.DowntimeSlasher]: newDowntimeSlasherIntervals,
   [CeloContract.Election]: newElection,
   [CeloContract.EpochRewards]: newEpochRewards,
   [CeloContract.Escrow]: newEscrow,

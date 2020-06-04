@@ -2,7 +2,7 @@
   "downtimeSlasher": {
     "slashableDowntime": 60
   },
-  "downtimeSlasherSlots": {
+  "DowntimeSlasherIntervals": {
     "slashableDowntime": 60,
     "slotSize": 30
   },

@@ -10,28 +10,28 @@ import {
   MockValidatorsInstance,
   RegistryContract,
   RegistryInstance,
-  TestDowntimeSlasherSlotsContract,
-  TestDowntimeSlasherSlotsInstance,
+  TestDowntimeSlasherIntervalsContract,
+  TestDowntimeSlasherIntervalsInstance,
 } from 'types'
 
 const Accounts: AccountsContract = artifacts.require('Accounts')
 const MockValidators: MockValidatorsContract = artifacts.require('MockValidators')
-const DowntimeSlasherSlots: TestDowntimeSlasherSlotsContract = artifacts.require(
-  'TestDowntimeSlasherSlots'
+const DowntimeSlasherIntervals: TestDowntimeSlasherIntervalsContract = artifacts.require(
+  'TestDowntimeSlasherIntervals'
 )
 const MockLockedGold: MockLockedGoldContract = artifacts.require('MockLockedGold')
 const Registry: RegistryContract = artifacts.require('Registry')
 
 // @ts-ignore
 // TODO(mcortesi): Use BN
-DowntimeSlasherSlots.numberFormat = 'BigNumber'
+DowntimeSlasherIntervals.numberFormat = 'BigNumber'
 
-contract('DowntimeSlasherSlots', (accounts: string[]) => {
+contract('DowntimeSlasherIntervals', (accounts: string[]) => {
   let accountsInstance: AccountsInstance
   let validators: MockValidatorsInstance
   let registry: RegistryInstance
   let mockLockedGold: MockLockedGoldInstance
-  let slasher: TestDowntimeSlasherSlotsInstance
+  let slasher: TestDowntimeSlasherIntervalsInstance
   let epochBlockSize: number
 
   const nonOwner = accounts[1]
@@ -41,7 +41,7 @@ contract('DowntimeSlasherSlots', (accounts: string[]) => {
   const slashingPenalty = 10000
   const slashingReward = 100
   const slashableDowntime = 12
-  const slotSize = 4
+  const intervalSize = 4
   // Defaults to false, otherwise testing it requires to wait for epochs for every test that slashes
   const oncePerEpoch = false
 
@@ -67,11 +67,20 @@ contract('DowntimeSlasherSlots', (accounts: string[]) => {
     const endSlots: number[] = []
     const actualSlashableDowntime = (await slasher.slashableDowntime()).toNumber()
 
-    for (let i = startBlock; i < startBlock + actualSlashableDowntime; i += slotSize) {
-      const endBlockForSlot = i + slotSize - 1
+    const epochStart = (await slasher.getEpochNumberOfBlock(startBlock)).toNumber()
+    // Epoch 1 starts in the block 1
+    const blockEpochChange = (epochStart - 1) * epochBlockSize + 1
+    for (let i = startBlock; i < startBlock + actualSlashableDowntime; ) {
+      let endBlockForSlot = i + intervalSize - 1
+      // avoids crossing the epoch
+      endBlockForSlot =
+        endBlockForSlot >= blockEpochChange && i < blockEpochChange
+          ? blockEpochChange - 1
+          : endBlockForSlot
       startSlots.push(i)
       endSlots.push(endBlockForSlot)
-      await slasher.generateProofOfSlotValidation(i, endBlockForSlot)
+      await slasher.generateProofOfIntervalValidation(i, endBlockForSlot)
+      i = endBlockForSlot + 1
     }
 
     return { startSlots, endSlots }
@@ -79,7 +88,7 @@ contract('DowntimeSlasherSlots', (accounts: string[]) => {
 
   async function generateProofs(startSlots: number[], endSlots: number[]) {
     for (let i = 0; i < startSlots.length; i += 1) {
-      await slasher.generateProofOfSlotValidation(startSlots[i], endSlots[i])
+      await slasher.generateProofOfIntervalValidation(startSlots[i], endSlots[i])
     }
   }
 
@@ -89,7 +98,7 @@ contract('DowntimeSlasherSlots', (accounts: string[]) => {
     mockLockedGold = await MockLockedGold.new()
     registry = await Registry.new()
     validators = await MockValidators.new()
-    slasher = await DowntimeSlasherSlots.new()
+    slasher = await DowntimeSlasherIntervals.new()
     epochBlockSize = (await slasher.getEpochSize()).toNumber()
     await accountsInstance.initialize(registry.address)
     await registry.setAddressFor(CeloContractName.Accounts, accountsInstance.address)
@@ -279,9 +288,8 @@ contract('DowntimeSlasherSlots', (accounts: string[]) => {
       const startBlock = actualBlockNumber - 3
       await assertRevert(
         slasher.slash(
-          startBlock,
-          [startBlock, startBlock + slotSize],
-          [startBlock + slotSize - 1, startBlock + 2 * slotSize - 1],
+          [startBlock, startBlock + intervalSize],
+          [startBlock + intervalSize - 1, startBlock + 2 * intervalSize - 1],
           validatorIndexInEpoch,
           validatorIndexInEpoch,
           0,
@@ -309,7 +317,6 @@ contract('DowntimeSlasherSlots', (accounts: string[]) => {
       const slotArrays = await calculateEverySlot(startBlock)
       await assertRevert(
         slasher.slash(
-          startBlock,
           slotArrays.startSlots,
           slotArrays.endSlots,
           validatorIndexInEpoch,
@@ -344,7 +351,6 @@ contract('DowntimeSlasherSlots', (accounts: string[]) => {
         const slotArrays = await calculateEverySlot(startBlock)
         await assertRevert(
           slasher.slash(
-            startBlock,
             slotArrays.startSlots,
             slotArrays.endSlots,
             validatorIndexInEpoch,
@@ -360,7 +366,7 @@ contract('DowntimeSlasherSlots', (accounts: string[]) => {
         )
       })
       it("fails if it didn't switched index and change the epoch", async () => {
-        const startBlock = (epoch - 1) * epochBlockSize + 1 - slotSize
+        const startBlock = (epoch - 1) * epochBlockSize + 1 - intervalSize
         await slasher.setEpochSigner(epoch - 1, validatorIndexInEpoch, validatorList[0])
         // All the other block are good
         await presetParentSealForBlocks(
@@ -379,7 +385,6 @@ contract('DowntimeSlasherSlots', (accounts: string[]) => {
         const slotArrays = await calculateEverySlot(startBlock)
         await assertRevert(
           slasher.slash(
-            startBlock,
             slotArrays.startSlots,
             slotArrays.endSlots,
             validatorIndexInEpoch,
@@ -395,7 +400,7 @@ contract('DowntimeSlasherSlots', (accounts: string[]) => {
         )
       })
       it('fails if it switched index', async () => {
-        const startBlock = (epoch - 1) * epochBlockSize + 1 - slotSize
+        const startBlock = (epoch - 1) * epochBlockSize + 1 - intervalSize
         await slasher.setEpochSigner(epoch - 1, 1, validatorList[0])
         // All the blocks, changes the bitmap in the middle
         await presetParentSealForBlocks(
@@ -414,7 +419,6 @@ contract('DowntimeSlasherSlots', (accounts: string[]) => {
         const slotArrays = await calculateEverySlot(startBlock)
         await assertRevert(
           slasher.slash(
-            startBlock,
             slotArrays.startSlots,
             slotArrays.endSlots,
             1,
@@ -441,11 +445,10 @@ contract('DowntimeSlasherSlots', (accounts: string[]) => {
         bitmapWithoutValidator[validatorIndexInEpoch]
       )
       // middle block with everything signed
-      await presetParentSealForBlocks(startBlock + slotSize, 1, bitmapVI01, bitmapVI01)
+      await presetParentSealForBlocks(startBlock + intervalSize, 1, bitmapVI01, bitmapVI01)
       const slotArrays = await calculateEverySlot(startBlock)
       await assertRevert(
         slasher.slash(
-          startBlock,
           slotArrays.startSlots,
           slotArrays.endSlots,
           validatorIndexInEpoch,
@@ -474,11 +477,10 @@ contract('DowntimeSlasherSlots', (accounts: string[]) => {
       describe('when the slots cover the SlashableDowntime window', () => {
         describe('with an epoch change in the middle', () => {
           it('success with validator index change', async () => {
-            startBlock = (epoch - 1) * epochBlockSize + 1 - slotSize
+            startBlock = (epoch - 1) * epochBlockSize + 1 - intervalSize
             await slasher.setEpochSigner(epoch - 1, 1, validatorList[0])
             const slotArrays = await makeBlockInfoSlashable(startBlock, [1, validatorIndexInEpoch])
             await slasher.slash(
-              startBlock,
               slotArrays.startSlots,
               slotArrays.endSlots,
               1,
@@ -495,7 +497,7 @@ contract('DowntimeSlasherSlots', (accounts: string[]) => {
             assert.equal(balance.toNumber(), 40000)
           })
           it('success without validator index change', async () => {
-            startBlock = (epoch - 1) * epochBlockSize + 1 - slotSize
+            startBlock = (epoch - 1) * epochBlockSize + 1 - intervalSize
             await slasher.setEpochSigner(epoch - 1, validatorIndexInEpoch, validatorList[0])
             const slotArrays = await makeBlockInfoSlashable(startBlock, [
               validatorIndexInEpoch,
@@ -503,7 +505,6 @@ contract('DowntimeSlasherSlots', (accounts: string[]) => {
             ])
 
             await slasher.slash(
-              startBlock,
               slotArrays.startSlots,
               slotArrays.endSlots,
               validatorIndexInEpoch,
@@ -525,7 +526,6 @@ contract('DowntimeSlasherSlots', (accounts: string[]) => {
           const endSlots = [startBlock + slashableDowntime - 3, startBlock + slashableDowntime - 1]
           await generateProofs(startSlots, endSlots)
           await slasher.slash(
-            startBlock,
             startSlots,
             endSlots,
             validatorIndexInEpoch,
@@ -542,11 +542,9 @@ contract('DowntimeSlasherSlots', (accounts: string[]) => {
           assert.equal(balance.toNumber(), 40000)
         })
         it('success if slots cover more than the SlashableDowntime window', async () => {
-          const startSlots = [startBlock - slotSize, startBlock + slotSize]
-          const endSlots = [startBlock + slotSize - 1, startBlock + slashableDowntime + 3]
+          const startSlots = [startBlock, startBlock + intervalSize]
+          const endSlots = [startBlock + intervalSize - 1, startBlock + slashableDowntime + 3]
 
-          // need to cover with validator downtime those that exceeds
-          await slasher.setEpochSigner(epoch - 1, validatorIndexInEpoch, validatorList[0])
           for (let i = 0; i < startSlots.length; i += 1) {
             await presetParentSealForBlocks(
               startSlots[i],
@@ -557,7 +555,6 @@ contract('DowntimeSlasherSlots', (accounts: string[]) => {
           }
           await generateProofs(startSlots, endSlots)
           await slasher.slash(
-            startBlock,
             startSlots,
             endSlots,
             validatorIndexInEpoch,
@@ -574,10 +571,10 @@ contract('DowntimeSlasherSlots', (accounts: string[]) => {
           assert.equal(balance.toNumber(), 40000)
         })
         it('fails if endSlot(i) is not between [startSlot(i+1)-1, endSlot(i+1)]', async () => {
-          const startSlots = [startBlock, startBlock + slotSize * 2, startBlock + slotSize]
+          const startSlots = [startBlock, startBlock + intervalSize * 2, startBlock + intervalSize]
           const endSlots = [
-            startSlots[0] + slotSize - 1,
-            startSlots[1] + slotSize - 1,
+            startSlots[0] + intervalSize - 1,
+            startSlots[1] + intervalSize - 1,
             startBlock + slashableDowntime - 1,
           ]
           // the window is covered with slot(0) and slot(2), but it breaks the "chain"
@@ -593,7 +590,6 @@ contract('DowntimeSlasherSlots', (accounts: string[]) => {
           await generateProofs(startSlots, endSlots)
           await assertRevert(
             slasher.slash(
-              startBlock,
               startSlots,
               endSlots,
               validatorIndexInEpoch,
@@ -610,10 +606,10 @@ contract('DowntimeSlasherSlots', (accounts: string[]) => {
         })
       })
       it("fails if the slots don't cover the SlashableDowntime window", async () => {
-        const startSlots = [startBlock, startBlock + slotSize]
+        const startSlots = [startBlock, startBlock + intervalSize]
         const endSlots = [
-          startSlots[0] + slotSize - 1,
-          startSlots[1] + slotSize - 1,
+          startSlots[0] + intervalSize - 1,
+          startSlots[1] + intervalSize - 1,
           startBlock + slashableDowntime - 1,
         ]
         for (let i = 0; i < startSlots.length; i += 1) {
@@ -627,7 +623,6 @@ contract('DowntimeSlasherSlots', (accounts: string[]) => {
         await generateProofs(startSlots, endSlots)
         await assertRevert(
           slasher.slash(
-            startBlock,
             startSlots,
             endSlots,
             validatorIndexInEpoch,
@@ -653,7 +648,6 @@ contract('DowntimeSlasherSlots', (accounts: string[]) => {
           validatorIndexInEpoch,
         ])
         resp = await slasher.slash(
-          startBlock,
           slotArrays.startSlots,
           slotArrays.endSlots,
           validatorIndexInEpoch,
@@ -700,7 +694,6 @@ contract('DowntimeSlasherSlots', (accounts: string[]) => {
         ])
         await assertRevert(
           slasher.slash(
-            newStartBlock,
             slotArrays.startSlots,
             slotArrays.endSlots,
             validatorIndexInEpoch,
@@ -728,7 +721,6 @@ contract('DowntimeSlasherSlots', (accounts: string[]) => {
           validatorIndexInEpoch,
         ])
         await slasher.slash(
-          newStartBlock,
           slotArrays.startSlots,
           slotArrays.endSlots,
           validatorIndexInEpoch,
@@ -755,7 +747,6 @@ contract('DowntimeSlasherSlots', (accounts: string[]) => {
         ])
         await assertRevert(
           slasher.slash(
-            startBlock,
             slotArrays.startSlots,
             slotArrays.endSlots,
             validatorIndexInEpoch,

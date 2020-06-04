@@ -13,7 +13,7 @@ import { estimateGas } from './utils/web3-utils'
 import { Wallet } from './wallets/wallet'
 import { Web3ContractCache } from './web3-contract-cache'
 import { AttestationsConfig } from './wrappers/Attestations'
-import { DowntimeSlasherSlotsConfig } from './wrappers/DowntimeSlasherSlots'
+import { DowntimeSlasherIntervalsConfig } from './wrappers/DowntimeSlasherIntervals'
 import { ElectionConfig } from './wrappers/Election'
 import { ExchangeConfig } from './wrappers/Exchange'
 import { GasPriceMinimumConfig } from './wrappers/GasPriceMinimum'
@@ -69,7 +69,7 @@ export interface NetworkConfig {
   reserve: ReserveConfig
   stableToken: StableTokenConfig
   validators: ValidatorsConfig
-  downtimeSlasher: DowntimeSlasherSlotsConfig
+  downtimeSlasher: DowntimeSlasherIntervalsConfig
 }
 
 export interface KitOptions {

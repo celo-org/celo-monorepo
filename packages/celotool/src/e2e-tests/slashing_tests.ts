@@ -223,13 +223,12 @@ describe('slashing tests', function(this: any) {
 
       for (let i = 0; i < startSlots.length; i += 1) {
         await slasher.methods
-          .generateProofOfSlotValidation(startSlots[i], endSlots[i])
+          .generateProofOfIntervalValidation(startSlots[i], endSlots[i])
           .send({ from: validator, gas: 5000000 })
       }
 
       await slasher.methods
         .slash(
-          blockNumber + 12,
           startSlots,
           endSlots,
           4,
@@ -276,13 +275,13 @@ describe('slashing tests', function(this: any) {
 
       for (let i = 0; i < startSlots.length; i += 1) {
         const proofTxResult = await slasher
-          .generateProofOfSlotValidation(startSlots[i], endSlots[i])
+          .generateProofOfIntervalValidation(startSlots[i], endSlots[i])
           .send({ from: validator, gas: 5000000 })
         const proofTxRcpt = await proofTxResult.waitReceipt()
         assert.equal(proofTxRcpt.status, true)
       }
 
-      const tx = await slasher.slashEndSignerIndex(blockNumber + 12, 4, startSlots, endSlots)
+      const tx = await slasher.slashValidator(validator, startSlots, endSlots)
       const txResult = await tx.send({ from: validator, gas: 5000000 })
       const txRcpt = await txResult.waitReceipt()
       assert.equal(txRcpt.status, true)

@@ -76,7 +76,7 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
       // BlockchainParameters ownership transitioned to governance in a follow-up script.
       // 'BlockchainParameters',
       'DoubleSigningSlasher',
-      'DowntimeSlasherSlots',
+      'DowntimeSlasherIntervals',
       'Election',
       'EpochRewards',
       'Escrow',
