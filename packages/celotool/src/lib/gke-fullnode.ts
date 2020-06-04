@@ -28,7 +28,8 @@ export async function installFullNodeChart(
   celoEnv: string,
   syncmode: string,
   namespace: string,
-  storageClass: string
+  storageClass: string,
+  tag: string,
 ) {
   const kubeNamespace = getKubeNamespace(celoEnv, namespace)
   const releaseName = getReleaseName(celoEnv, syncmode, kubeNamespace)
@@ -38,7 +39,7 @@ export async function installFullNodeChart(
     kubeNamespace,
     releaseName,
     helmChartPath,
-    await helmParameters(celoEnv, syncmode, kubeNamespace, storageClass)
+    await helmParameters(celoEnv, syncmode, kubeNamespace, storageClass, tag)
   )
 }
 
@@ -46,15 +47,17 @@ function helmParameters(
   celoEnv: string,
   syncmode: string,
   kubeNamespace: string,
-  storageClass: string
+  storageClass: string,
+  tag: string,
 ) {
+  const gethTag = (!!tag)? tag : fetchEnv(envVar.GETH_NODE_DOCKER_IMAGE_TAG)
   return [
     `--set namespace=${kubeNamespace}`,
     `--set replicaCount=1`,
     `--set storage.size=10Gi`,
     `--set storage.storageClass=${storageClass}`,
     `--set geth.image.repository=${fetchEnv(envVar.GETH_NODE_DOCKER_IMAGE_REPOSITORY)}`,
-    `--set geth.image.tag=${fetchEnv(envVar.GETH_NODE_DOCKER_IMAGE_TAG)}`,
+    `--set geth.image.tag=${gethTag}`,
     `--set genesis.networkId=${fetchEnv(envVar.NETWORK_ID)}`,
     `--set genesis.network=${celoEnv}`,
     `--set geth.use_static_ips=false`,
@@ -75,6 +78,7 @@ export async function upgradeFullNodeChart(
   celoEnv: string,
   syncmode: string,
   namespace: string,
+  tag: string,
   reset: boolean = false
 ) {
   const kubeNamespace = getKubeNamespace(celoEnv, namespace)
@@ -89,7 +93,7 @@ export async function upgradeFullNodeChart(
     kubeNamespace,
     releaseName,
     helmChartPath,
-    await helmParameters(celoEnv, syncmode, kubeNamespace, storageClass.trim())
+    await helmParameters(celoEnv, syncmode, kubeNamespace, storageClass.trim(), tag)
   )
   await scaleResource(kubeNamespace, 'StatefulSet', `${releaseName}`, 1)
   return

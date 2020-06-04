@@ -18,5 +18,5 @@ type GKEFullNodeUpgradeArgv = GKEFullNodeArgv & { reset: boolean }
 
 export const handler = async (argv: GKEFullNodeUpgradeArgv) => {
   // await switchToClusterFromEnv(argv.celoEnv)
-  await upgradeFullNodeChart(argv.celoEnv, argv.syncmode, argv.namespace, argv.reset)
+  await upgradeFullNodeChart(argv.celoEnv, argv.syncmode, argv.namespace, argv.gethTag, argv.reset)
 }

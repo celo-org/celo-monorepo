@@ -24,15 +24,32 @@ export const builder = (argv: yargs.Argv) => {
       description: 'Storageclass to use for pvcs',
       default: 'standard',
     })
+    .option('storageClass', {
+      type: 'string',
+      description: 'Storageclass to use for pvcs',
+      default: 'standard',
+    })
+    .option('gethTag', {
+      type: 'string',
+      description: 'Celo Blockchain image tag to use',
+      default: '',
+    })
 }
 
 export interface GKEFullNodeArgv extends InitialArgv {
   syncmode: string
   namespace: string
   storageClass: string
+  gethTag: string
 }
 
 export const handler = async (argv: GKEFullNodeArgv) => {
   // await switchToClusterFromEnv(argv.celoEnv)
-  await installFullNodeChart(argv.celoEnv, argv.syncmode, argv.namespace, argv.storageClass)
+  await installFullNodeChart(
+    argv.celoEnv,
+    argv.syncmode,
+    argv.namespace,
+    argv.storageClass,
+    argv.gethTag
+  )
 }
