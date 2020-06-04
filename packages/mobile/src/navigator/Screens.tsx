@@ -29,6 +29,7 @@ export enum Screens {
   ImportWallet = 'ImportWallet',
   ImportWalletEmpty = 'ImportWalletEmpty',
   ImportWalletSocial = 'ImportWalletSocial',
+  ImportContacts = 'ImportContactsScreen',
   IncomingPaymentRequestListScreen = 'IncomingPaymentRequestListScreen',
   Invite = 'Invite',
   InviteReview = 'InviteReview',
