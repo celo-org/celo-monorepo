@@ -1005,20 +1005,28 @@ jobs:
           fi
           if [ ${#FAILED_MODES[@]} -eq 0 ]; then
             echo "All modes could sync"
+            RESULT="SUCCESS"
           else
             printf -v FAILED_STRING '%s,' "${FAILED_MODES[@]}"
             FAILED_STRING="${FAILED_STRING%,}"
             FAILED_STRING="${FAILED_STRING%,}"
             echo "$FAILED_STRING failed"
             echo "export FAILED_STRING=${FAILED_STRING}" >> $BASH_ENV
-            exit 1
+            RESULT="FAILURE"
+            # exit 1
           fi
-    - slack/status:
-        fail_only: false
-        mentions: 'Javier Cortejoso'
-        failure_message: ':red_circle: Job $CIRCLE_JOB failed: The syncmodes $FAILED_STRING failed to sync on Mainnet'
-        success_message: ':tada: Job $CIRCLE_JOB succeeded. All modes could sync successfully on Mainnet'
-        #only_for_branches: master
+          echo "export RESULT=${RESULT}" >> $BASH_ENV
+    - run:
+        name: Victorops notification
+        command: |
+          cd packages/celotool/scripts
+          bash notify_victorops.sh $RESULT $FAILED_STRING
+    # - slack/status:
+    #     fail_only: false
+    #     mentions: 'Javier Cortejoso'
+    #     failure_message: ':red_circle: Job $CIRCLE_JOB failed: The syncmodes $FAILED_STRING failed to sync on Mainnet'
+    #     success_message: ':tada: Job $CIRCLE_JOB succeeded. All modes could sync successfully on Mainnet'
+    #     #only_for_branches: master
 
   phone-number-privacy-test:
     <<: *defaults
