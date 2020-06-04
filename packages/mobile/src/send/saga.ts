@@ -147,7 +147,7 @@ function* sendPaymentOrInviteSaga({
 }: SendPaymentOrInviteAction) {
   try {
     recipientAddress
-      ? CeloAnalytics.track(CustomEventNames.send_dollar_confirm)
+      ? CeloAnalytics.track(CustomEventNames.send_confirm, {})
       : CeloAnalytics.track(CustomEventNames.send_invite)
     if (!recipient || (!recipient.e164PhoneNumber && !recipient.address)) {
       throw new Error("Can't send to recipient without valid e164 number or address")
@@ -180,6 +180,9 @@ function* sendPaymentOrInviteSaga({
     navigateHome()
     yield put(sendPaymentOrInviteSuccess())
   } catch (e) {
+    recipientAddress
+      ? CeloAnalytics.track(CustomEventNames.send_error, { error: e })
+      : CeloAnalytics.track(CustomEventNames.invite_error, { error: e })
     yield put(showError(ErrorMessages.SEND_PAYMENT_FAILED))
     yield put(sendPaymentOrInviteFailure())
   }

@@ -24,7 +24,6 @@ export enum CustomEventNames {
   send_input = 'send_input',
   transaction_details = 'transaction_details',
   send_select_cancel = 'send_select_cancel',
-  send_dollar_confirm = 'send_dollar_confirm',
   edit_dollar_confirm = 'edit_dollar_confirm',
   send_invite_details = 'send_invite_details',
   send_invite = 'send_invite',
@@ -36,6 +35,11 @@ export enum CustomEventNames {
   send_select_recipient = 'send_select_recipient', // when recipient was selected
   send_amount_back = 'send_amount_back', // back button pressed on amount screen
   send_continue = 'send_continue', // when next button pressed on amount enter page
+  send_confirm_back = 'send_confirm_back', // when back button pressed on send confirmation screen
+  send_confirm = 'send_confirm', // when send button pressed on send confirmation screen
+  send_error = 'send_error', // when there is an error sending a transaction
+
+  invite_error = 'invite_error', // when there is an error sending an invite
 
   request_cancel = 'request_cancel', // when cancel is clicked after launching request flow
   request_search = 'request_search', // when text is input into search bar
@@ -44,6 +48,9 @@ export enum CustomEventNames {
   request_amount_back = 'request_amount_back', // back button pressed on amount screen
   request_continue = 'request_continue', // when next button pressed on amount enter page
   request_unavailable = 'request_unavailable', // when request attempted to unverified user
+  request_confirm_back = 'request_confirm_back', // when back button pressed on request confirmation screen
+  request_confirm = 'request_confirm', // when request button pressed on request confirmation screen
+  request_error = 'request_error', // when there is an error requesting a transaction
 
   // Send events, separate from button tracking above
   send_dollar_transaction = 'send_dollar_transaction',
