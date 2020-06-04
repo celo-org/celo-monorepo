@@ -6,8 +6,8 @@ import { AddressValidationType } from 'src/identity/reducer'
 import { Screens } from 'src/navigator/Screens'
 import { Recipient } from 'src/recipients/recipient'
 import { TransactionDataInput } from 'src/send/SendAmount'
-import { TransferConfirmationCardProps } from 'src/send/TransferConfirmationCard'
 import { ReviewProps } from 'src/transactions/TransactionReview'
+import { TransferConfirmationCardProps } from 'src/transactions/TransferConfirmationCard'
 
 // tslint:disable-next-line
 export type StackParamList = {
@@ -16,9 +16,7 @@ export type StackParamList = {
   [Screens.BackupComplete]: undefined
   [Screens.BackupIntroduction]: undefined
   [Screens.BackupPhrase]: undefined
-  [Screens.BackupQuiz]: {
-    mnemonic: string
-  }
+  [Screens.BackupQuiz]: undefined
   [Screens.BackupSocial]: undefined
   [Screens.BackupSocialIntro]: {
     incomingFromBackupFlow: boolean
@@ -37,6 +35,7 @@ export type StackParamList = {
   }
   [Screens.Debug]: undefined
   [Screens.DollarEducation]: undefined
+  [Screens.DrawerNavigator]: undefined
   [Screens.EditProfile]: undefined
   [Screens.EnterInviteCode]: undefined
   [Screens.ErrorScreen]: {
@@ -72,6 +71,7 @@ export type StackParamList = {
     backupPhrase: string
   }
   [Screens.ImportWalletSocial]: undefined
+  [Screens.ImportContacts]: undefined
   [Screens.IncomingPaymentRequestListScreen]: undefined
   [Screens.Invite]: undefined
   [Screens.InviteReview]: {
@@ -79,7 +79,7 @@ export type StackParamList = {
   }
   [Screens.JoinCelo]: undefined
   [Screens.Language]: {
-    nextScreen?: Screens.Account
+    nextScreen?: keyof StackParamList
   }
   [Screens.Licenses]: undefined
   [Screens.OutgoingPaymentRequestListScreen]: undefined
@@ -112,19 +112,25 @@ export type StackParamList = {
   [Screens.RegulatoryTerms]: undefined
   [Screens.Security]: undefined
   [Screens.SelectLocalCurrency]: undefined
-  [Screens.Send]: undefined
+  [Screens.Send]:
+    | {
+        isRequest?: boolean
+      }
+    | undefined
   [Screens.SendAmount]: {
     recipient: Recipient
+    isRequest?: boolean
+    isFromScan?: boolean
   }
   [Screens.SendConfirmation]: {
     transactionData: TransactionDataInput
+    addressJustValidated?: boolean
   }
   [Screens.SetClock]: undefined
   [Screens.Settings]: undefined
   [Screens.Support]: undefined
   [Screens.SupportContact]: undefined
   [Screens.Sync]: undefined
-  [Screens.TabNavigator]: undefined
   [Screens.TransactionReview]: {
     reviewProps: ReviewProps
     confirmationProps: TransferConfirmationCardProps | ExchangeConfirmationCardProps

@@ -3,7 +3,7 @@ import RewardIcon from '@celo/react-components/icons/RewardIcon'
 import * as React from 'react'
 import { Image, StyleSheet, View } from 'react-native'
 import { TokenTransactionType } from 'src/apollo/types'
-import { coinsIcon, unknownUserIcon } from 'src/images/Images'
+import { coinsIcon } from 'src/images/Images'
 import { getRecipientThumbnail, Recipient } from 'src/recipients/recipient'
 
 const AVATAR_SIZE = 40
@@ -40,11 +40,10 @@ export default function TransferFeedIcon(props: Props) {
       return (
         <ContactCircle
           address={address}
+          name={recipient ? recipient.displayName : null}
           size={AVATAR_SIZE}
           thumbnailPath={getRecipientThumbnail(recipient)}
-        >
-          {<Image source={unknownUserIcon} style={styles.image} />}
-        </ContactCircle>
+        />
       )
     }
   }

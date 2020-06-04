@@ -23,7 +23,7 @@
     "js-yaml": "^3.13.1",
     "lodash": "^4.17.14",
     "moment": "^2.22.1",
-    "node-fetch": "^2.2.0",
+    "node-fetch": "^2.6.0",
     "prompts": "1.2.0",
     "read-last-lines": "^1.7.2",
     "sleep-promise": "^8.0.1",

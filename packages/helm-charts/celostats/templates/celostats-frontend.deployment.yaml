@@ -31,6 +31,8 @@ spec:
           value: https://{{ .Release.Namespace }}-celostats-server.{{ .Values.domain.name }}.org
         - name: BLOCKSCOUT_URL
           value: https://{{ .Release.Namespace }}-blockscout.{{ .Values.domain.name }}.org
+        - name: SUBMENU_BLOCKSCOUT
+          value: https://{{ .Release.Namespace }}-blockscout.{{ .Values.domain.name }}.org
         - name: GRAPHQL_BLOCKSCOUT_URL
           value: https://{{ .Release.Namespace }}-blockscout.{{ .Values.domain.name }}.org/graphiql
         command:

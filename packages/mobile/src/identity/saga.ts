@@ -7,17 +7,19 @@ import {
   takeLatest,
   takeLeading,
 } from 'redux-saga/effects'
-import { showError } from 'src/alert/actions'
+import { showErrorInline } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import {
   Actions,
   ValidateRecipientAddressAction,
   validateRecipientAddressSuccess,
 } from 'src/identity/actions'
+import { checkTxsForIdentityMetadata } from 'src/identity/commentEncryption'
 import { doImportContactsWrapper, fetchAddressesAndValidateSaga } from 'src/identity/contactMapping'
 import { e164NumberToAddressSelector } from 'src/identity/reducer'
 import { validateAndReturnMatch } from 'src/identity/secureSend'
 import { revokeVerification, startVerification } from 'src/identity/verification'
+import { Actions as TransactionActions } from 'src/transactions/actions'
 import Logger from 'src/utils/Logger'
 import { currentAccountSelector } from 'src/web3/selectors'
 
@@ -54,9 +56,9 @@ export function* validateRecipientAddressSaga({
   } catch (error) {
     Logger.error(TAG, 'validateRecipientAddressSaga/Address validation error: ', error)
     if (Object.values(ErrorMessages).includes(error.message)) {
-      yield put(showError(error.message))
+      yield put(showErrorInline(error.message))
     } else {
-      yield put(showError(ErrorMessages.ADDRESS_VALIDATION_ERROR))
+      yield put(showErrorInline(ErrorMessages.ADDRESS_VALIDATION_ERROR))
     }
   }
 }
@@ -74,12 +76,17 @@ export function* watchValidateRecipientAddress() {
   yield takeLatest(Actions.VALIDATE_RECIPIENT_ADDRESS, validateRecipientAddressSaga)
 }
 
+function* watchNewFeedTransactions() {
+  yield takeEvery(TransactionActions.NEW_TRANSACTIONS_IN_FEED, checkTxsForIdentityMetadata)
+}
+
 export function* identitySaga() {
   Logger.debug(TAG, 'Initializing identity sagas')
   try {
     yield spawn(watchVerification)
     yield spawn(watchContactMapping)
     yield spawn(watchValidateRecipientAddress)
+    yield spawn(watchNewFeedTransactions)
   } catch (error) {
     Logger.error(TAG, 'Error initializing identity sagas', error)
   } finally {

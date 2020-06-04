@@ -8,7 +8,7 @@ import {
   proxyCall,
   proxySend,
   stringIdentity,
-  stringToBytes,
+  stringToSolidityBytes,
   toTransactionObject,
   tupleParser,
   valueToBigNumber,
@@ -38,7 +38,7 @@ export class MultiSigWrapper extends BaseWrapper<MultiSig> {
     txObject: TransactionObject<any>,
     value: string = '0'
   ) {
-    const data = stringToBytes(txObject.encodeABI())
+    const data = stringToSolidityBytes(txObject.encodeABI())
     const transactionCount = await this.contract.methods.getTransactionCount(true, true).call()
     let transactionId
     for (transactionId = Number(transactionCount) - 1; transactionId >= 0; transactionId--) {
