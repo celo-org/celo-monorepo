@@ -13,6 +13,7 @@ USAGE
   $ celocli transfer:dollars
 
 OPTIONS
+  --comment=comment                                  Transfer comment
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the sender
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
@@ -47,6 +48,7 @@ USAGE
   $ celocli transfer:gold
 
 OPTIONS
+  --comment=comment                                  Transfer comment
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the sender
 
   --ledgerAddresses=ledgerAddresses                  [default: 1] If --useLedger is set, this will get the first N
