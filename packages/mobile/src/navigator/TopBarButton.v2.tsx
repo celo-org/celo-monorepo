@@ -4,23 +4,33 @@ import fontStyles from '@celo/react-components/styles/fonts.v2'
 import variables from '@celo/react-components/styles/variables'
 import * as React from 'react'
 import { StyleProp, StyleSheet, Text, TextStyle } from 'react-native'
+import CeloAnalytics from 'src/analytics/CeloAnalytics'
+import { CustomEventNames } from 'src/analytics/constants'
 
 interface CommonProps {
   disabled?: boolean
   testID?: string
   onPress: () => void
+  eventName?: CustomEventNames
 }
 
 type WrapperProps = CommonProps & {
   children: JSX.Element
 }
 
-function Wrapper({ onPress, disabled, testID, children }: WrapperProps) {
+function Wrapper({ eventName, onPress, disabled, testID, children }: WrapperProps) {
+  const onPressLocal = React.useCallback(() => {
+    if (eventName) {
+      CeloAnalytics.track(eventName)
+    }
+    onPress()
+  }, [onPress, eventName])
+
   return (
     <Touchable
       disabled={disabled}
       testID={testID}
-      onPress={onPress}
+      onPress={onPressLocal}
       borderless={true}
       hitSlop={variables.iconHitslop}
     >
