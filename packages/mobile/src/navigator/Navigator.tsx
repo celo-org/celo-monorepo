@@ -66,6 +66,7 @@ import { navigate, navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { TopBarIconButton, TopBarTextButton } from 'src/navigator/TopBarButton.v2'
 import { StackParamList } from 'src/navigator/types'
+import ImportContactsScreen from 'src/onboarding/contacts/ImportContactsScreen'
 import IncomingPaymentRequestListScreen from 'src/paymentRequest/IncomingPaymentRequestListScreen'
 import OutgoingPaymentRequestListScreen from 'src/paymentRequest/OutgoingPaymentRequestListScreen'
 import PaymentRequestConfirmation from 'src/paymentRequest/PaymentRequestConfirmation'
@@ -185,6 +186,11 @@ const nuxScreens = (Navigator: typeof Stack) => (
     <Navigator.Screen
       name={Screens.ImportWalletEmpty}
       component={ImportWalletEmpty}
+      options={nuxNavigationOptions}
+    />
+    <Navigator.Screen
+      name={Screens.ImportContacts}
+      component={ImportContactsScreen}
       options={nuxNavigationOptions}
     />
   </>
