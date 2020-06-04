@@ -1,4 +1,7 @@
-import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs'
+import {
+  createMaterialTopTabNavigator,
+  MaterialTopTabBarProps,
+} from '@react-navigation/material-top-tabs'
 import { useIsFocused } from '@react-navigation/native'
 import * as React from 'react'
 import { useEffect, useState } from 'react'
@@ -91,39 +94,31 @@ function ScannerContainer({ position, ...props }: any) {
   )
 }
 
+// Use ScrollPager on iOS as it gives a better native feeling
+const pager: React.ComponentProps<typeof Tab.Navigator>['pager'] =
+  Platform.OS === 'ios' ? (props) => <ScrollPager {...props} /> : undefined
+
 export default function QRNavigator() {
   const position = React.useRef(new Animated.Value(0)).current
   const qrSvgRef = React.useRef<SVG>()
 
-  // const opacity = Animated.interpolate(position, {
-  //   inputRange: [0, 0.5, 1],
-  //   outputRange: [1, 0.5, 0.8],
-  // })
-  // const sceneContainerStyle = { opacity: 0.5 }
+  const tabBar = (props: MaterialTopTabBarProps) => <QRTabBar {...props} qrSvgRef={qrSvgRef} />
 
   return (
     <Tab.Navigator
       position={position}
-      tabBar={(props) => <QRTabBar {...props} qrSvgRef={qrSvgRef} />}
+      tabBar={tabBar}
       // Trick to position the tabs floating on top
       tabBarPosition="bottom"
-      pager={(props) => <ScrollPager {...props} />}
+      pager={pager}
       style={styles.container}
       sceneContainerStyle={styles.sceneContainerStyle}
       initialLayout={initialLayout}
     >
-      <Tab.Screen
-        name={Screens.QRCode}
-        options={{ title: 'Code' }}
-        // component={(props) => <QRCode {...props} qrSvgRef={qrSvgRef} />}
-      >
+      <Tab.Screen name={Screens.QRCode} options={{ title: 'My Code' }}>
         {(props) => <QRCode {...props} qrSvgRef={qrSvgRef} />}
       </Tab.Screen>
-      <Tab.Screen
-        name={Screens.QRScanner}
-        options={{ title: 'Scan' }}
-        // component={(props) => <ScannerContainer {...props} position={position} />}
-      >
+      <Tab.Screen name={Screens.QRScanner} options={{ title: 'Scan' }}>
         {(props) => <ScannerContainer {...props} position={position} />}
       </Tab.Screen>
     </Tab.Navigator>
