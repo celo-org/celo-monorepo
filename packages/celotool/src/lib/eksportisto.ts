@@ -31,7 +31,7 @@ export async function removeHelmRelease(celoEnv: string) {
 
 function fetchSensitiveAccounts() {
   return JSON.stringify({
-    "0x123": "https://example.com"
+    "0x456f41406B32c45D59E539e4BBA3D7898c3584dA": "https://example.com"
   })
 }
 
