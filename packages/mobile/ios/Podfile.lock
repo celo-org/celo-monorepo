@@ -134,6 +134,8 @@ PODS:
     - nanopb/encode (= 0.3.9011)
   - nanopb/decode (0.3.9011)
   - nanopb/encode (0.3.9011)
+  - Permission-Camera (2.1.5):
+    - RNPermissions
   - PromisesObjC (1.2.8)
   - Protobuf (3.11.4)
   - RCTRequired (0.62.2)
@@ -450,7 +452,9 @@ PODS:
     - React
   - RNLocalize (1.4.0):
     - React
-  - RNReanimated (1.8.0):
+  - RNPermissions (2.1.5):
+    - React
+  - RNReanimated (1.9.0):
     - React
   - RNScreens (2.7.0):
     - React
@@ -487,6 +491,7 @@ DEPENDENCIES:
   - glog (from `../../../node_modules/react-native/third-party-podspecs/glog.podspec`)
   - lottie-ios (from `../../../node_modules/lottie-ios`)
   - lottie-react-native (from `../../../node_modules/lottie-react-native`)
+  - Permission-Camera (from `../../../node_modules/react-native-permissions/ios/Camera.podspec`)
   - RCTRequired (from `../../../node_modules/react-native/Libraries/RCTRequired`)
   - RCTTypeSafety (from `../../../node_modules/react-native/Libraries/TypeSafety`)
   - React (from `../../../node_modules/react-native/`)
@@ -541,6 +546,7 @@ DEPENDENCIES:
   - RNFS (from `../../../node_modules/react-native-fs`)
   - RNGestureHandler (from `../../../node_modules/react-native-gesture-handler`)
   - RNLocalize (from `../../../node_modules/react-native-localize`)
+  - RNPermissions (from `../../../node_modules/react-native-permissions`)
   - RNReanimated (from `../../../node_modules/react-native-reanimated`)
   - RNScreens (from `../../../node_modules/react-native-screens`)
   - RNSecureKeyStore (from `../../../node_modules/react-native-secure-key-store/ios`)
@@ -597,6 +603,8 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/lottie-ios"
   lottie-react-native:
     :path: "../../../node_modules/lottie-react-native"
+  Permission-Camera:
+    :path: "../../../node_modules/react-native-permissions/ios/Camera.podspec"
   RCTRequired:
     :path: "../../../node_modules/react-native/Libraries/RCTRequired"
   RCTTypeSafety:
@@ -699,6 +707,8 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/react-native-gesture-handler"
   RNLocalize:
     :path: "../../../node_modules/react-native-localize"
+  RNPermissions:
+    :path: "../../../node_modules/react-native-permissions"
   RNReanimated:
     :path: "../../../node_modules/react-native-reanimated"
   RNScreens:
@@ -745,6 +755,7 @@ SPEC CHECKSUMS:
   lottie-ios: 48fac6be217c76937e36e340e2d09cf7b10b7f5f
   lottie-react-native: 2a1a82bb326ae51331a5520de0cf706733c6db69
   nanopb: 18003b5e52dab79db540fe93fe9579f399bd1ccd
+  Permission-Camera: afad27bf90337684d4a86f3825112d648c8c4d3b
   PromisesObjC: c119f3cd559f50b7ae681fa59dc1acd19173b7e6
   Protobuf: 176220c526ad8bd09ab1fb40a978eac3fef665f7
   RCTRequired: cec6a34b3ac8a9915c37e7e4ad3aa74726ce4035
@@ -798,7 +809,8 @@ SPEC CHECKSUMS:
   RNFS: 2bd9eb49dc82fa9676382f0585b992c424cd59df
   RNGestureHandler: 8f09cd560f8d533eb36da5a6c5a843af9f056b38
   RNLocalize: b6df30cc25ae736d37874f9bce13351db2f56796
-  RNReanimated: 955cf4068714003d2f1a6e2bae3fb1118f359aff
+  RNPermissions: ad71dd4f767ec254f2cd57592fbee02afee75467
+  RNReanimated: b5ccb50650ba06f6e749c7c329a1bc3ae0c88b43
   RNScreens: cf198f915f8a2bf163de94ca9f5bfc8d326c3706
   RNSecureKeyStore: f1ad870e53806453039f650720d2845c678d89c8
   RNSentry: 370623102247ebea20191b5fb549ecc7a275b324
@@ -809,6 +821,6 @@ SPEC CHECKSUMS:
   Toast: 91b396c56ee72a5790816f40d3a94dd357abc196
   Yoga: 3ebccbdd559724312790e7742142d062476b698e
 
-PODFILE CHECKSUM: a53eb8d81d4e617f0eadb2910945831841c0ac1d
+PODFILE CHECKSUM: 4420332ded564922d9eeea3416145aa39a255938
 
 COCOAPODS: 1.9.1

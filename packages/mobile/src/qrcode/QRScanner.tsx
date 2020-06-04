@@ -6,7 +6,7 @@ import { StackScreenProps } from '@react-navigation/stack'
 import { memoize } from 'lodash'
 import React, { useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Platform, StatusBar, StyleSheet, Text, View } from 'react-native'
+import { StatusBar, StyleSheet, Text, View } from 'react-native'
 import { RNCamera } from 'react-native-camera'
 import { useSafeArea } from 'react-native-safe-area-view'
 import { Defs, Mask, Rect, Svg } from 'react-native-svg'
@@ -18,7 +18,9 @@ import NotAuthorizedView from 'src/qrcode/NotAuthorizedView'
 import { handleBarcodeDetected, QrCode } from 'src/send/actions'
 import Logger from 'src/utils/Logger'
 
-type Props = StackScreenProps<StackParamList, Screens.QRScanner>
+type Props = StackScreenProps<StackParamList, Screens.QRScanner> & {
+  enableCamera: boolean
+}
 
 const SeeThroughOverlay = () => {
   const { width, height } = variables
@@ -52,7 +54,7 @@ const SeeThroughOverlay = () => {
   )
 }
 
-export default function QRScanner({ route }: Props) {
+export default function QRScanner({ route, enableCamera }: Props) {
   const dispatch = useDispatch()
   const { t } = useTranslation(Namespaces.sendFlow7)
   const isFocused = useIsFocused()
@@ -74,7 +76,7 @@ export default function QRScanner({ route }: Props) {
   return (
     <View style={styles.container}>
       {isFocused && <StatusBar barStyle="light-content" />}
-      {(Platform.OS !== 'android' || isFocused) && (
+      {enableCamera && (
         <RNCamera
           style={styles.camera}
           type={RNCamera.Constants.Type.back}
