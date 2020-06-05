@@ -71,6 +71,7 @@ export type StackParamList = {
     backupPhrase: string
   }
   [Screens.ImportWalletSocial]: undefined
+  [Screens.ImportContacts]: undefined
   [Screens.IncomingPaymentRequestListScreen]: undefined
   [Screens.Invite]: undefined
   [Screens.InviteReview]: {
@@ -82,8 +83,12 @@ export type StackParamList = {
   }
   [Screens.Licenses]: undefined
   [Screens.OutgoingPaymentRequestListScreen]: undefined
+  [Screens.PaymentRequestUnavailable]: {
+    transactionData: TransactionDataInput
+  }
   [Screens.PaymentRequestConfirmation]: {
     transactionData: TransactionDataInput
+    addressJustValidated?: boolean
   }
   [Screens.PincodeEducation]: undefined
   [Screens.PincodeEnter]: {

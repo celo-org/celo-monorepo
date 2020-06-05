@@ -42,7 +42,7 @@ spec:
         - |
           /var/www/scripts/set-env-variables.js /var/www/app
           ngsw-config /var/www/app/ /var/www/ngsw-config.json
-          nginx -g "daemon off;"
+          exec nginx -g "daemon off;"
         ports:
         - name: http
           containerPort: 80
