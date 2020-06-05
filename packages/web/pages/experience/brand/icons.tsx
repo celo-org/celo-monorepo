@@ -1,3 +1,3 @@
-import IconsPage from 'src/brandkit/IconsPage'
+import IconsPage from 'src/experience/brandkit/IconsPage'
 
 export default IconsPage

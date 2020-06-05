@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as renderer from 'react-test-renderer'
-import { IconData } from 'src/brandkit/IconsPage'
+import { IconData } from 'src/experience/brandkit/IconsPage'
 import Icons from '../../../pages/experience/brand/icons'
 
 const ICONS: IconData[] = [
