@@ -12,6 +12,9 @@ export enum ErrorMessages {
   DUPLICATE_REQUEST_TO_MATCHMAKE = 'CELO_PNP_ERR_08 Attempt to request >1 matchmaking',
   UNVERIFIED_USER_ATTEMPT_TO_MATCHMAKE = 'CELO_PNP_ERR_09 Unverified user attempting to matchmake',
   UNAUTHENTICATED_USER = 'CELO_PNP_ERR_10 Missing or invalid authentication header',
+  VERIFY_PARITAL_SIGNATURE_ERROR = 'CELO_PNP_ERR_11 BLS partial signature verification Failure',
+  NOT_ENOUGH_PARTIAL_SIGNATURES = 'CELO_PNP_ERR_12 Not enough partial signatures',
+  SIGNER_RETURN_ERROR = 'CELO_PNP_ERR_13 Signer return error',
 }
 
 export function respondWithError(res: Response, statusCode: number, error: ErrorMessages) {

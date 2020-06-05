@@ -1,11 +1,11 @@
 // tslint:disable: no-console
-import threshold from 'blind-threshold-bls'
+import threshold_bls from 'blind-threshold-bls'
 import crypto from 'crypto'
 
 console.log('Creating BLS keypair...')
 
 const seed = crypto.randomBytes(32)
-const keypair = threshold.keygen(seed)
+const keypair = threshold_bls.keygen(seed)
 const privateKey = keypair.privateKey
 const publicKey = keypair.publicKey
 

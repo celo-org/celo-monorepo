@@ -18,12 +18,9 @@ packages/protocol/scripts/**/*.js
 packages/protocol/migrations/**/*.js
 packages/protocol/test/**/*.js
 
-packages/verification-pool-api/contracts/*.ts
-
 packages/web/.next
 
 # prettier eats Latex underscore escapting and doesn't seem to have an option to disable
 packages/docs/celo-codebase/protocol/proof-of-stake/epoch-rewards.md
 
 packages/mobile/android/app/build
-packages/verifier/android/app/build
