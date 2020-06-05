@@ -64,11 +64,13 @@ class ImportContactScreen extends React.Component<Props, State> {
   }
 
   onPressConnect = () => {
+    // TODO analytics
     this.props.importContacts(this.state.isFindMeSwitchChecked)
   }
 
   onPressSkip = () => {
     // TODO cancel import
+    // TODO analytics
     this.onFinish()
   }
 
