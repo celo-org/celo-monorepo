@@ -4,7 +4,7 @@ import colors from '@celo/react-components/styles/colors.v2'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import MaskedView from '@react-native-community/masked-view'
 import React from 'react'
-import { LayoutChangeEvent, StyleSheet, View } from 'react-native'
+import { LayoutChangeEvent, StyleSheet, Text, View } from 'react-native'
 import Animated from 'react-native-reanimated'
 
 const HEIGHT = 24
@@ -29,6 +29,8 @@ export default function SegmentedControl({ position, values, selectedIndex = 0, 
     outputRange: inputRange.map((i) => i * segmentWidth),
   })
 
+  // TODO: color should be dependant on the style for the value
+  // here it's assuming value at index 0 is green and index 1 (or above) is white
   const color = interpolateColors(position, {
     inputRange: [0.5, 1],
     outputColorRange: [colors.greenUI, colors.white],
@@ -36,7 +38,7 @@ export default function SegmentedControl({ position, values, selectedIndex = 0, 
 
   const colorInverted = interpolateColors(position, {
     inputRange: [0.5, 1],
-    outputColorRange: [colors.white, colors.greenUI],
+    outputColorRange: [colors.white, colors.dark],
   })
 
   const onLayout = ({
@@ -46,7 +48,6 @@ export default function SegmentedControl({ position, values, selectedIndex = 0, 
   }: LayoutChangeEvent) => {
     const newSegmentWidth = values.length ? width / values.length : 0
     if (newSegmentWidth !== segmentWidth) {
-      // animation.setValue(newSegmentWidth * (selectedIndex || 0))
       setSegmentWidth(newSegmentWidth)
     }
   }
@@ -75,7 +76,7 @@ export default function SegmentedControl({ position, values, selectedIndex = 0, 
             accessibilityStates={isFocused ? ['selected'] : []}
             accessibilityLabel={value}
             onPress={onPress}
-            style={[styles.value, isFocused && styles.valueSelected]}
+            style={styles.value}
           >
             <View />
           </Touchable>
@@ -85,20 +86,11 @@ export default function SegmentedControl({ position, values, selectedIndex = 0, 
         pointerEvents="none"
         style={StyleSheet.absoluteFillObject}
         maskElement={
-          <View
-            style={{
-              // Transparent background because mask is based off alpha channel.
-              backgroundColor: 'transparent',
-              flex: 1,
-              flexDirection: 'row',
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}
-          >
+          <View style={styles.maskedContainer}>
             {values.map((value, index) => {
               return (
                 <View key={value} style={styles.value}>
-                  <Animated.Text style={styles.text}>{value}</Animated.Text>
+                  <Text style={styles.text}>{value}</Text>
                 </View>
               )
             })}
@@ -133,7 +125,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.greenUI,
     overflow: 'hidden',
-    //
     marginHorizontal: 30,
   },
   slider: {
@@ -144,20 +135,22 @@ const styles = StyleSheet.create({
     left: 0,
     backgroundColor: colors.greenUI,
   },
+  maskedContainer: {
+    // Transparent background because mask is based off alpha channel.
+    backgroundColor: 'transparent',
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   value: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  valueSelected: {
-    // backgroundColor: colors.greenUI,
-  },
   text: {
     ...fontStyles.small600,
     fontSize: 12,
     color: colors.greenUI,
-  },
-  textSelected: {
-    color: colors.white,
   },
 })
