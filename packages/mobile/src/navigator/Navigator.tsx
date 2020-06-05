@@ -1,5 +1,5 @@
 import colors from '@celo/react-components/styles/colors.v2'
-import { RouteProp } from '@react-navigation/core'
+import { NavigationProp, RouteProp } from '@react-navigation/core'
 import { createStackNavigator } from '@react-navigation/stack'
 import * as React from 'react'
 import SplashScreen from 'react-native-splash-screen'
@@ -8,7 +8,6 @@ import AccountKeyEducation from 'src/account/AccountKeyEducation'
 import Analytics from 'src/account/Analytics'
 import DataSaver from 'src/account/DataSaver'
 import EditProfile from 'src/account/EditProfile'
-import FiatExchange from 'src/account/FiatExchange'
 import GoldEducation from 'src/account/GoldEducation'
 import Invite from 'src/account/Invite'
 import InviteReview from 'src/account/InviteReview'
@@ -31,6 +30,7 @@ import BackupSocial from 'src/backup/BackupSocial'
 import BackupSocialIntro from 'src/backup/BackupSocialIntro'
 import BackButton from 'src/components/BackButton.v2'
 import CancelButton from 'src/components/CancelButton.v2'
+import CurrencyDisplay from 'src/components/CurrencyDisplay'
 import DappKitAccountScreen from 'src/dappkit/DappKitAccountScreen'
 import DappKitSignTxScreen from 'src/dappkit/DappKitSignTxScreen'
 import DappKitTxDataScreen from 'src/dappkit/DappKitTxDataScreen'
@@ -39,8 +39,12 @@ import ReclaimPaymentConfirmationScreen from 'src/escrow/ReclaimPaymentConfirmat
 import ExchangeReview from 'src/exchange/ExchangeReview'
 import ExchangeTradeScreen from 'src/exchange/ExchangeTradeScreen'
 import FeeExchangeEducation from 'src/exchange/FeeExchangeEducation'
-import { CURRENCY_ENUM } from 'src/geth/consts'
+import FiatExchangeAmount from 'src/fiatExchanges/FiatExchangeAmount'
+import FiatExchangeOptions from 'src/fiatExchanges/FiatExchangeOptions'
+import MoonPay from 'src/fiatExchanges/MoonPay'
+import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import i18n from 'src/i18n'
+import QuestionIcon from 'src/icons/QuestionIcon'
 import PhoneNumberLookupQuotaScreen from 'src/identity/PhoneNumberLookupQuotaScreen'
 import ImportWallet from 'src/import/ImportWallet'
 import ImportWalletEmpty from 'src/import/ImportWalletEmpty'
@@ -60,10 +64,10 @@ import {
   nuxNavigationOptions,
   nuxNavigationOptionsNoBackButton,
 } from 'src/navigator/Headers.v2'
-import { navigateBack, navigateToExchangeHome } from 'src/navigator/NavigationService'
+import { navigate, navigateBack, navigateToExchangeHome } from 'src/navigator/NavigationService'
 import QRNavigator from 'src/navigator/QRNavigator'
 import { Screens } from 'src/navigator/Screens'
-import { TopBarTextButton } from 'src/navigator/TopBarButton.v2'
+import { TopBarIconButton, TopBarTextButton } from 'src/navigator/TopBarButton.v2'
 import { StackParamList } from 'src/navigator/types'
 import ImportContactsScreen from 'src/onboarding/contacts/ImportContactsScreen'
 import OnboardingSuccessScreen from 'src/onboarding/success/OnboardingSuccessScreen'
@@ -358,6 +362,64 @@ const backupScreens = (Navigator: typeof Stack) => (
   </>
 )
 
+const fiatExchangesAmountScreenOptions = ({
+  route,
+}: {
+  route: RouteProp<StackParamList, Screens.FiatExchangeAmount>
+}) => {
+  return {
+    ...emptyHeader,
+    headerLeft: () => <BackButton eventName={CustomEventNames.send_amount_back} />,
+    headerTitle: () => (
+      <HeaderTitleWithBalance
+        title={i18n.t(`fiatExchangeFlow:${route.params?.isAddFunds ? 'add_funds' : 'cash_out'}`)}
+        token={CURRENCY_ENUM.DOLLAR}
+      />
+    ),
+  }
+}
+
+const fiatExchangesOptionsScreenOptions = ({
+  route,
+  navigation,
+}: {
+  route: RouteProp<StackParamList, Screens.FiatExchangeOptions>
+  navigation: NavigationProp<StackParamList, Screens.FiatExchangeOptions>
+}) => {
+  function showExplanation() {
+    navigation.setParams({ isExplanationOpen: true })
+  }
+  const amount = (
+    <CurrencyDisplay
+      amount={{ value: route.params.amount, currencyCode: CURRENCIES[CURRENCY_ENUM.DOLLAR].code }}
+    />
+  )
+  return {
+    ...emptyHeader,
+    headerLeft: () => <BackButton eventName={CustomEventNames.send_amount_back} />,
+    headerTitle: () => (
+      <HeaderTitleWithSubtitle
+        title={amount}
+        subTitle={i18n.t(`fiatExchangeFlow:${route.params?.isAddFunds ? 'add_funds' : 'cash_out'}`)}
+      />
+    ),
+    headerRight: () => (
+      <TopBarIconButton icon={<QuestionIcon color={colors.greenUI} />} onPress={showExplanation} />
+    ),
+    headerRightContainerStyle: { paddingRight: 16 },
+  }
+}
+
+const fiatExchangesProviderWebViewScreenOptions = () => {
+  const navigateToFiatExchange = () => navigate(Screens.FiatExchange)
+  return {
+    ...emptyHeader,
+    headerLeft: () => (
+      <TopBarTextButton title={i18n.t('global:done')} onPress={navigateToFiatExchange} />
+    ),
+  }
+}
+
 const settingsScreens = (Navigator: typeof Stack) => (
   <>
     <Navigator.Screen options={noHeader} name={Screens.Account} component={Account} />
@@ -392,9 +454,19 @@ const settingsScreens = (Navigator: typeof Stack) => (
       component={SupportContact}
     />
     <Navigator.Screen
-      options={headerWithBackButton}
-      name={Screens.FiatExchange}
-      component={FiatExchange}
+      options={fiatExchangesAmountScreenOptions}
+      name={Screens.FiatExchangeAmount}
+      component={FiatExchangeAmount}
+    />
+    <Navigator.Screen
+      options={fiatExchangesOptionsScreenOptions}
+      name={Screens.FiatExchangeOptions}
+      component={FiatExchangeOptions}
+    />
+    <Navigator.Screen
+      options={fiatExchangesProviderWebViewScreenOptions}
+      name={Screens.MoonPay}
+      component={MoonPay}
     />
   </>
 )

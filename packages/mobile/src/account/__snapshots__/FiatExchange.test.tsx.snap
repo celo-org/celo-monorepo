@@ -6,7 +6,6 @@ exports[`FiatExchange renders correctly 1`] = `
     Object {
       "backgroundColor": "#FFFFFF",
       "flex": 1,
-      "justifyContent": "space-between",
     }
   }
 >
@@ -85,11 +84,139 @@ exports[`FiatExchange renders correctly 1`] = `
       }
     />
   </View>
-  <ActivityIndicator
-    animating={true}
-    color="#42D689"
-    hidesWhenStopped={true}
-    size="large"
+  <View
+    style={
+      Object {
+        "height": 200,
+      }
+    }
   />
+  <View
+    style={
+      Object {
+        "alignItems": "center",
+        "borderBottomColor": "#EDEEEF",
+        "borderBottomWidth": 1,
+        "height": 112,
+        "justifyContent": "flex-end",
+        "marginLeft": 16,
+        "paddingRight": 16,
+        "paddingVertical": 16,
+      }
+    }
+  >
+    <Text
+      style={
+        Object {
+          "color": "#2E3338",
+          "fontFamily": "Inter-SemiBold",
+          "fontSize": 19,
+          "lineHeight": 26,
+          "marginBottom": 4,
+        }
+      }
+    >
+      global:currentBalance
+    </Text>
+    <Text
+      numberOfLines={1}
+      style={
+        Array [
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Inter-Regular",
+            "fontSize": 18,
+            "lineHeight": 24,
+            "marginBottom": 2,
+          },
+          Object {
+            "color": "#2E3338",
+          },
+        ]
+      }
+    >
+      
+      $
+      0.00
+    </Text>
+    <Text
+      style={
+        Object {
+          "color": "#9CA4A9",
+          "fontFamily": "Inter-Regular",
+          "fontSize": 14,
+          "lineHeight": 18,
+        }
+      }
+    >
+      <Text
+        numberOfLines={1}
+        style={
+          Array [
+            undefined,
+            Object {
+              "color": undefined,
+            },
+          ]
+        }
+      >
+        
+        0.00
+      </Text>
+       
+      Celo Dollars
+    </Text>
+  </View>
+  <View>
+    <View
+      style={
+        Object {
+          "backgroundColor": "#FFFFFF",
+        }
+      }
+    >
+      <View
+        accessible={true}
+        focusable={true}
+        nativeBackgroundAndroid={
+          Object {
+            "attribute": "selectableItemBackgroundBorderless",
+            "type": "ThemeAttrAndroid",
+          }
+        }
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+      >
+        <View
+          style={
+            Object {
+              "borderBottomColor": "#EDEEEF",
+              "borderBottomWidth": 1,
+              "marginLeft": 16,
+              "paddingVertical": 16,
+            }
+          }
+        >
+          <Text
+            style={
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Inter-Regular",
+                "fontSize": 16,
+                "lineHeight": 22,
+              }
+            }
+          >
+            fiatExchangeFlow:add_funds
+          </Text>
+        </View>
+      </View>
+    </View>
+  </View>
 </SafeAreaView>
 `;

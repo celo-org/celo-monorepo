@@ -305,7 +305,7 @@ export class ExchangeTradeScreen extends React.Component<Props, State> {
               keyboardType={'decimal-pad'}
               onChangeText={this.onChangeExchangeAmount}
               value={this.getInputValue()}
-              placeholderTextColor={'#BDBDBD'}
+              placeholderTextColor={colors.gray3}
               placeholder={'0'}
               style={styles.currencyInput}
               testID="ExchangeInput"

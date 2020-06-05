@@ -826,7 +826,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
             testID="ConfirmButton"
           >
             <Text
-              accessibilityLabel="send"
+              accessibilityLabel="global:send"
               style={
                 Object {
                   "color": "#FFFFFF",
@@ -836,7 +836,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
                 }
               }
             >
-              send
+              global:send
             </Text>
           </View>
         </View>
@@ -1672,7 +1672,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
             testID="ConfirmButton"
           >
             <Text
-              accessibilityLabel="send"
+              accessibilityLabel="global:send"
               style={
                 Object {
                   "color": "#FFFFFF",
@@ -1682,7 +1682,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                 }
               }
             >
-              send
+              global:send
             </Text>
           </View>
         </View>
@@ -2515,7 +2515,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
             testID="ConfirmButton"
           >
             <Text
-              accessibilityLabel="send"
+              accessibilityLabel="global:send"
               style={
                 Object {
                   "color": "#FFFFFF",
@@ -2525,7 +2525,7 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                 }
               }
             >
-              send
+              global:send
             </Text>
           </View>
         </View>
@@ -3422,7 +3422,7 @@ exports[`SendConfirmation renders correctly when there are multiple user address
             testID="ConfirmButton"
           >
             <Text
-              accessibilityLabel="send"
+              accessibilityLabel="global:send"
               style={
                 Object {
                   "color": "#FFFFFF",
@@ -3432,7 +3432,7 @@ exports[`SendConfirmation renders correctly when there are multiple user address
                 }
               }
             >
-              send
+              global:send
             </Text>
           </View>
         </View>
