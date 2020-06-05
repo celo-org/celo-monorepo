@@ -3,7 +3,7 @@ import * as React from 'react'
 import Animated from 'react-native-reanimated'
 import { fireEvent, render } from 'react-native-testing-library'
 
-jest.mock('react-native-reanimated', () => jest.requireActual('react-native-reanimated/mock'))
+jest.mock('react-native-reanimated', () => require('react-native-reanimated/mock'))
 
 describe(SegmentedControl, () => {
   it('renders correctly', () => {
