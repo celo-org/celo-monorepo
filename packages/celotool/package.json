@@ -6,7 +6,6 @@
   "author": "Celo",
   "license": "Apache-2.0",
   "dependencies": {
-    "@celo/verification-pool-api": "^1.0.0",
     "@celo/utils": "0.1.15-dev",
     "@celo/contractkit": "0.4.6-dev",
     "@google-cloud/monitoring": "0.7.1",
