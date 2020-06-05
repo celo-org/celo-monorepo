@@ -3,12 +3,14 @@ import {
   MaterialTopTabBarProps,
 } from '@react-navigation/material-top-tabs'
 import { useIsFocused } from '@react-navigation/native'
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useAsync } from 'react-async-hook'
+import { useTranslation } from 'react-i18next'
 import { Dimensions, Platform, StatusBar, StyleSheet } from 'react-native'
 import { check, PERMISSIONS, RESULTS } from 'react-native-permissions'
 import Animated, { call, greaterThan, onChange } from 'react-native-reanimated'
 import { ScrollPager } from 'react-native-tab-view'
+import { Namespaces } from 'src/i18n'
 import { Screens } from 'src/navigator/Screens'
 import QRCode from 'src/qrcode/QRCode'
 import QRScanner from 'src/qrcode/QRScanner'
@@ -97,8 +99,9 @@ const pager: ExtractProps<typeof Tab.Navigator>['pager'] =
   Platform.OS === 'ios' ? (props) => <ScrollPager {...props} /> : undefined
 
 export default function QRNavigator() {
-  const position = React.useRef(new Animated.Value(0)).current
-  const qrSvgRef = React.useRef<SVG>()
+  const position = useRef(new Animated.Value(0)).current
+  const qrSvgRef = useRef<SVG>()
+  const { t } = useTranslation(Namespaces.sendFlow7)
 
   const tabBar = (props: MaterialTopTabBarProps) => <QRTabBar {...props} qrSvgRef={qrSvgRef} />
 
@@ -113,10 +116,10 @@ export default function QRNavigator() {
       sceneContainerStyle={styles.sceneContainerStyle}
       initialLayout={initialLayout}
     >
-      <Tab.Screen name={Screens.QRCode} options={{ title: 'My Code' }}>
+      <Tab.Screen name={Screens.QRCode} options={{ title: t('myCode') }}>
         {(props) => <QRCode {...props} qrSvgRef={qrSvgRef} />}
       </Tab.Screen>
-      <Tab.Screen name={Screens.QRScanner} options={{ title: 'Scan' }}>
+      <Tab.Screen name={Screens.QRScanner} options={{ title: t('scanCode') }}>
         {(props) => <AnimatedScannerScene {...props} position={position} />}
       </Tab.Screen>
     </Tab.Navigator>
