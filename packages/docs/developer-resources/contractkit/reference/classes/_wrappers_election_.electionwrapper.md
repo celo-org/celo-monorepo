@@ -43,6 +43,7 @@ Contract for voting for validators and managing validator groups.
 * [getElectedValidators](_wrappers_election_.electionwrapper.md#getelectedvalidators)
 * [getEligibleValidatorGroupsVotes](_wrappers_election_.electionwrapper.md#geteligiblevalidatorgroupsvotes)
 * [getGroupVoterRewards](_wrappers_election_.electionwrapper.md#getgroupvoterrewards)
+* [getPastEvents](_wrappers_election_.electionwrapper.md#getpastevents)
 * [getTotalVotesForGroup](_wrappers_election_.electionwrapper.md#gettotalvotesforgroup)
 * [getValidatorGroupVotes](_wrappers_election_.electionwrapper.md#getvalidatorgroupvotes)
 * [getValidatorGroupsVotes](_wrappers_election_.electionwrapper.md#getvalidatorgroupsvotes)
@@ -501,6 +502,27 @@ Name | Type | Description |
 `epochNumber` | number | The epoch to retrieve GroupVoterRewards at.  |
 
 **Returns:** *Promise‹[GroupVoterReward](../interfaces/_wrappers_election_.groupvoterreward.md)[]›*
+
+___
+
+###  getPastEvents
+
+▸ **getPastEvents**(`event`: string, `options`: PastEventOptions): *Promise‹EventLog[]›*
+
+*Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[getPastEvents](_wrappers_basewrapper_.basewrapper.md#getpastevents)*
+
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:29](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L29)*
+
+Contract getPastEvents
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`event` | string |
+`options` | PastEventOptions |
+
+**Returns:** *Promise‹EventLog[]›*
 
 ___
 

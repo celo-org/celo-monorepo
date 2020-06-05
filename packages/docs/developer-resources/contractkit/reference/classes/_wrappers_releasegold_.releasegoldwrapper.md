@@ -59,6 +59,7 @@ Contract for handling an instance of a ReleaseGold contract.
 * [authorizeValidatorSigner](_wrappers_releasegold_.releasegoldwrapper.md#authorizevalidatorsigner)
 * [authorizeValidatorSignerAndBls](_wrappers_releasegold_.releasegoldwrapper.md#authorizevalidatorsignerandbls)
 * [authorizeVoteSigner](_wrappers_releasegold_.releasegoldwrapper.md#authorizevotesigner)
+* [getPastEvents](_wrappers_releasegold_.releasegoldwrapper.md#getpastevents)
 * [getReleaseSchedule](_wrappers_releasegold_.releasegoldwrapper.md#getreleaseschedule)
 * [getReleasedBalanceAtRevoke](_wrappers_releasegold_.releasegoldwrapper.md#getreleasedbalanceatrevoke)
 * [getRevocationInfo](_wrappers_releasegold_.releasegoldwrapper.md#getrevocationinfo)
@@ -845,6 +846,27 @@ Name | Type | Description |
 **Returns:** *Promise‹[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹void››*
 
 A CeloTransactionObject
+
+___
+
+###  getPastEvents
+
+▸ **getPastEvents**(`event`: string, `options`: PastEventOptions): *Promise‹EventLog[]›*
+
+*Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[getPastEvents](_wrappers_basewrapper_.basewrapper.md#getpastevents)*
+
+*Defined in [contractkit/src/wrappers/BaseWrapper.ts:29](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/BaseWrapper.ts#L29)*
+
+Contract getPastEvents
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`event` | string |
+`options` | PastEventOptions |
+
+**Returns:** *Promise‹EventLog[]›*
 
 ___
 
