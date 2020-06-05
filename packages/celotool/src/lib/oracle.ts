@@ -33,6 +33,14 @@ export enum OracleAzureContext {
 }
 
 /**
+ * Contains information needed when using Azure HSM signing
+ */
+interface OracleAzureHsmIdentity {
+  identityName: string
+  keyVaultName: string
+}
+
+/**
  * Represents the identity of a single oracle
  */
 interface OracleIdentity {
@@ -40,8 +48,7 @@ interface OracleIdentity {
   // Used if generating oracle clients from a mnemonic
   privateKey?: string,
   // Used if using Azure HSM signing
-  azureKeyVaultName?: string
-  azureIdentityName?: string
+  azureHsmIdentity?: OracleAzureHsmIdentity
 }
 
 /**
@@ -130,7 +137,8 @@ export async function removeHelmRelease(celoEnv: string, context: OracleAzureCon
   await removeOracleRBACHelmRelease(celoEnv)
   const oracleConfig = getOracleConfig(context)
   for (const identity of oracleConfig.identities) {
-    if (identity.azureKeyVaultName) {
+    // If the identity is using Azure HSM signing, clean it up too
+    if (identity.azureHsmIdentity) {
       await deleteOracleAzureIdentity(context, identity)
     }
   }
@@ -158,6 +166,10 @@ async function helmParameters(celoEnv: string, context: OracleAzureContext, useF
   ].concat(await oracleIdentityHelmParameters(context, oracleConfig))
 }
 
+/**
+ * Returns an array of helm command line parameters for the oracle identities.
+ * Supports both private key and Azure HSM signing.
+ */
 async function oracleIdentityHelmParameters(
   context: OracleAzureContext,
   oracleConfig: OracleConfig
@@ -171,19 +183,18 @@ async function oracleIdentityHelmParameters(
     // An oracle identity can specify either a private key or some information
     // about an Azure Key Vault that houses an HSM with the address provided.
     // We provide the appropriate parameters for both of those types of identities.
-    if (oracleIdentity.azureKeyVaultName && oracleIdentity.azureIdentityName) {
+    if (oracleIdentity.azureHsmIdentity) {
       const azureIdentity = await createOracleAzureIdentityIfNotExists(context, oracleIdentity)
       params = params.concat([
         `${prefix}.azure.id=${azureIdentity.id}`,
         `${prefix}.azure.clientId=${azureIdentity.clientId}`,
-        `${prefix}.azure.keyVaultName=${oracleIdentity.azureKeyVaultName}`,
+        `${prefix}.azure.keyVaultName=${oracleIdentity.azureHsmIdentity.keyVaultName}`,
       ])
     } else if (oracleIdentity.privateKey) {
       params.push(`${prefix}.privateKey=${oracleIdentity.privateKey}`)
     } else {
       throw Error(`Incomplete oracle identity: ${oracleIdentity}`)
     }
-
   }
   return params
 }
@@ -197,7 +208,7 @@ async function createOracleAzureIdentityIfNotExists(
   oracleIdentity: OracleIdentity
 ) {
   const clusterConfig = getAzureClusterConfig(context)
-  const identity = await createIdentityIfNotExists(clusterConfig, oracleIdentity.azureIdentityName!)
+  const identity = await createIdentityIfNotExists(clusterConfig, oracleIdentity.azureHsmIdentity!.identityName!)
 
   // Grant the service principal permission to manage the oracle identity.
   // See: https://github.com/Azure/aad-pod-identity#6-set-permissions-for-mic
@@ -219,7 +230,7 @@ async function setOracleKeyVaultPolicy(
   azureIdentity: any
 ) {
   return execCmdWithExitOnFailure(
-    `az keyvault set-policy --name ${oracleIdentity.azureKeyVaultName} --key-permissions get list sign --object-id ${azureIdentity.principalId} -g ${clusterConfig.resourceGroup}`
+    `az keyvault set-policy --name ${oracleIdentity.azureHsmIdentity!.keyVaultName} --key-permissions get list sign --object-id ${azureIdentity.principalId} -g ${clusterConfig.resourceGroup}`
   )
 }
 
@@ -232,16 +243,16 @@ async function deleteOracleAzureIdentity(
 ) {
   const clusterConfig = getAzureClusterConfig(context)
   await deleteOracleKeyVaultPolicy(clusterConfig, oracleIdentity)
-  return deleteIdentity(clusterConfig, oracleIdentity.azureIdentityName!)
+  return deleteIdentity(clusterConfig, oracleIdentity.azureHsmIdentity!.identityName)
 }
 
 async function deleteOracleKeyVaultPolicy(
   clusterConfig: AzureClusterConfig,
   oracleIdentity: OracleIdentity
 ) {
-  const azureIdentity = await getIdentity(clusterConfig, oracleIdentity.azureIdentityName!)
+  const azureIdentity = await getIdentity(clusterConfig, oracleIdentity.azureHsmIdentity!.identityName)
   return execCmdWithExitOnFailure(
-    `az keyvault delete-policy --name ${oracleIdentity.azureKeyVaultName} --object-id ${azureIdentity.principalId} -g ${clusterConfig.resourceGroup}`
+    `az keyvault delete-policy --name ${oracleIdentity.azureHsmIdentity!.keyVaultName} --object-id ${azureIdentity.principalId} -g ${clusterConfig.resourceGroup}`
   )
 }
 
@@ -285,16 +296,18 @@ function getAzureHsmOracleIdentities(addressAzureKeyVaults: string): OracleIdent
   const identityStrings = addressAzureKeyVaults.split(',')
   const identities = []
   for (const identityStr of identityStrings) {
-    const [address, azureKeyVaultName] = identityStr.split(':')
-    if (!address || !azureKeyVaultName) {
+    const [address, keyVaultName] = identityStr.split(':')
+    if (!address || !keyVaultName) {
       throw Error(
-        `Address or key vault name is invalid. Address: ${address} Key Vault Name: ${azureKeyVaultName}`
+        `Address or key vault name is invalid. Address: ${address} Key Vault Name: ${keyVaultName}`
       )
     }
     identities.push({
-      azureIdentityName: getOracleAzureIdentityName(azureKeyVaultName, address),
       address,
-      azureKeyVaultName,
+      azureHsmIdentity: {
+        identityName: getOracleAzureIdentityName(keyVaultName, address),
+        keyVaultName,
+      }
     })
   }
   return identities
