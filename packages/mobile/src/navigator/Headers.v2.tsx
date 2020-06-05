@@ -73,6 +73,7 @@ export const emptyHeader: StackNavigationOptions = {
     ...Platform.select({
       android: {
         elevation: 0,
+        backgroundColor: 'transparent',
       },
       ios: {
         borderBottomWidth: 0,

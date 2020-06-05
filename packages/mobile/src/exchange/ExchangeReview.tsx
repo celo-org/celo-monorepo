@@ -19,6 +19,8 @@ import { exchangeTokens, fetchExchangeRate, fetchTobinTax } from 'src/exchange/a
 import { ExchangeRatePair } from 'src/exchange/reducer'
 import { CURRENCIES, CURRENCY_ENUM } from 'src/geth/consts'
 import { Namespaces, withTranslation } from 'src/i18n'
+import { convertDollarsToLocalAmount } from 'src/localCurrency/convert'
+import { getLocalCurrencyExchangeRate } from 'src/localCurrency/selectors'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 import { RootState } from 'src/redux/reducers'
@@ -31,6 +33,7 @@ interface StateProps {
   tobinTax: string
   fee: string
   appConnected: boolean
+  localCurrencyExchangeRate: string | null | undefined
 }
 
 interface DispatchProps {
@@ -55,6 +58,7 @@ const mapStateToProps = (state: RootState): StateProps => ({
   tobinTax: state.exchange.tobinTax || '0',
   fee: '0',
   appConnected: isAppConnected(state),
+  localCurrencyExchangeRate: getLocalCurrencyExchangeRate(state),
 })
 
 export class ExchangeReview extends React.Component<Props, State> {
@@ -66,13 +70,32 @@ export class ExchangeReview extends React.Component<Props, State> {
   }
 
   onPressConfirm = () => {
-    const makerToken = this.state.makerToken
+    const { makerToken, inputToken, inputAmount } = this.state
     const makerAmount = this.getMakerAmount()
+    // BEGIN: Analytics
+    const isDollarToGold = inputToken === CURRENCY_ENUM.DOLLAR
+    const goldToDollarExchangeRate = getRateForMakerToken(
+      this.props.exchangeRatePair,
+      this.state.makerToken,
+      CURRENCY_ENUM.DOLLAR
+    )
+    const goldAmount = isDollarToGold ? makerAmount : inputAmount
+    const dollarsAmount = isDollarToGold ? inputAmount : makerAmount
+    const localCurrencyAmount = convertDollarsToLocalAmount(
+      dollarsAmount,
+      this.props.localCurrencyExchangeRate
+    )
+    CeloAnalytics.track(
+      isDollarToGold ? CustomEventNames.gold_buy_confirm : CustomEventNames.gold_sell_confirm,
+      {
+        localCurrencyAmount,
+        goldAmount,
+        inputToken,
+        goldToDollarExchangeRate,
+      }
+    )
+    // END: Analytics
     this.props.exchangeTokens(makerToken, makerAmount)
-    CeloAnalytics.track(CustomEventNames.exchange_confirm, {
-      makerToken,
-      makerAmount,
-    })
   }
 
   getExchangePropertiesFromNavProps() {
