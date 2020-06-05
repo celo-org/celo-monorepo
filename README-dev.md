@@ -37,7 +37,7 @@ Prefer appending a `-dev` suffix to the version number to ensure an internal dep
 
 > Note: Publishing breaking changes requires an increment to the minor version number for `0.` releases. Once `1.0.0` is pusblished breaking changes are generally prohibited outside the rare major version release. Read the [semver specification](https://semver.org/) for more information.
 
-> Note: Services deployed to App Engine must only depend on published NPM packages. These packages are `verification-pool-api`, `blockchain-api` and `notification-service`.
+> Note: Services deployed to App Engine must only depend on published NPM packages. These packages are `blockchain-api` and `notification-service`.
 
 ### Checkout the commit to be published and verify version numbers
 

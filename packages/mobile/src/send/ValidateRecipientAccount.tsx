@@ -125,9 +125,9 @@ export class ValidateRecipientAccount extends React.Component<Props, State> {
       return (
         <View>
           <Text style={styles.body}>
-            {t('confirmAccountNumber.body1Full', {
-              displayName,
-            })}
+            {displayName === 'Mobile #'
+              ? t('confirmAccountNumber.body1FullNoDisplayName')
+              : t('confirmAccountNumber.body1Full', { displayName })}
           </Text>
           <Text style={styles.body}>{t('confirmAccountNumber.body2Full')}</Text>
           <Text style={styles.codeHeader}>{t('accountInputHeaderFull')}</Text>
@@ -158,9 +158,9 @@ export class ValidateRecipientAccount extends React.Component<Props, State> {
     return (
       <View>
         <Text style={styles.body}>
-          {t('confirmAccountNumber.bodyPartial', {
-            displayName,
-          })}
+          {displayName === 'Mobile #'
+            ? t('confirmAccountNumber.bodyPartialNoDisplayName')
+            : t('confirmAccountNumber.bodyPartial', { displayName })}
         </Text>
         <Text style={styles.codeHeader}>{t('accountInputHeaderPartial')}</Text>
         <View style={styles.singleDigitInputContainer}>{singleDigitInputComponentArr}</View>
@@ -231,7 +231,6 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     padding: 16,
     justifyContent: 'space-between',
-    flexDirection: 'column',
   },
   singleDigitInputContainer: {
     flexDirection: 'row',
@@ -296,7 +295,6 @@ const styles = StyleSheet.create({
   },
   addressContainer: {
     paddingVertical: 8,
-    flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
   },

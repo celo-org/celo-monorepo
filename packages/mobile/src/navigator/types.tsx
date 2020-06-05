@@ -35,6 +35,7 @@ export type StackParamList = {
   }
   [Screens.Debug]: undefined
   [Screens.DollarEducation]: undefined
+  [Screens.DrawerNavigator]: undefined
   [Screens.EditProfile]: undefined
   [Screens.EnterInviteCode]: undefined
   [Screens.ErrorScreen]: {
@@ -70,6 +71,7 @@ export type StackParamList = {
     backupPhrase: string
   }
   [Screens.ImportWalletSocial]: undefined
+  [Screens.ImportContacts]: undefined
   [Screens.IncomingPaymentRequestListScreen]: undefined
   [Screens.Invite]: undefined
   [Screens.InviteReview]: {
@@ -77,12 +79,16 @@ export type StackParamList = {
   }
   [Screens.JoinCelo]: undefined
   [Screens.Language]: {
-    nextScreen?: Screens.Account
+    nextScreen?: keyof StackParamList
   }
   [Screens.Licenses]: undefined
   [Screens.OutgoingPaymentRequestListScreen]: undefined
+  [Screens.PaymentRequestUnavailable]: {
+    transactionData: TransactionDataInput
+  }
   [Screens.PaymentRequestConfirmation]: {
     transactionData: TransactionDataInput
+    addressJustValidated?: boolean
   }
   [Screens.PincodeEducation]: undefined
   [Screens.PincodeEnter]: {
@@ -129,7 +135,6 @@ export type StackParamList = {
   [Screens.Support]: undefined
   [Screens.SupportContact]: undefined
   [Screens.Sync]: undefined
-  [Screens.TabNavigator]: undefined
   [Screens.TransactionReview]: {
     reviewProps: ReviewProps
     confirmationProps: TransferConfirmationCardProps | ExchangeConfirmationCardProps

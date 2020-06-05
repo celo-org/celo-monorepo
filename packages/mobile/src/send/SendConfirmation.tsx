@@ -4,7 +4,6 @@ import ReviewHeader from '@celo/react-components/components/ReviewHeader'
 import TextButton from '@celo/react-components/components/TextButton.v2'
 import colors from '@celo/react-components/styles/colors.v2'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
-import { componentStyles } from '@celo/react-components/styles/styles'
 import { CURRENCIES, CURRENCY_ENUM } from '@celo/utils/src/currencies'
 import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
@@ -20,9 +19,8 @@ import CurrencyDisplay, { DisplayType, FormatType } from 'src/components/Currenc
 import FeeIcon from 'src/components/FeeIcon'
 import InviteOptionsModal from 'src/components/InviteOptionsModal'
 import LineItemRow from 'src/components/LineItemRow.v2'
-import Modal from 'src/components/Modal'
 import ShortenedAddress from 'src/components/ShortenedAddress'
-import TotalLineItem from 'src/components/TotalLineItem'
+import TotalLineItem from 'src/components/TotalLineItem.v2'
 import { FeeType } from 'src/fees/actions'
 import CalculateFee, {
   CalculateFeeChildren,
@@ -121,7 +119,7 @@ export class SendConfirmation extends React.Component<Props, State> {
     comment: '',
   }
 
-  async componentDidMount() {
+  componentDidMount() {
     const { addressJustValidated, t } = this.props
     this.props.fetchDollarBalance()
 
@@ -159,11 +157,6 @@ export class SendConfirmation extends React.Component<Props, State> {
       inviteMethod,
       firebasePendingRequestUid
     )
-  }
-
-  cleanInput = () => {
-    const comment = this.state.comment.trim()
-    this.setState({ comment })
   }
 
   onEditAddressClick = () => {
@@ -232,6 +225,11 @@ export class SendConfirmation extends React.Component<Props, State> {
     this.setState({ comment })
   }
 
+  onBlur = () => {
+    const comment = this.state.comment.trim()
+    this.setState({ comment })
+  }
+
   renderWithAsyncFee: CalculateFeeChildren = (asyncFee) => {
     const {
       t,
@@ -292,7 +290,7 @@ export class SendConfirmation extends React.Component<Props, State> {
 
       // Replace fee lines with a fee drawer
       return (
-        <View>
+        <View style={styles.feeContainer}>
           {subtotalAmount && (
             <LineItemRow
               title={t('global:subtotal')}
@@ -339,7 +337,7 @@ export class SendConfirmation extends React.Component<Props, State> {
                 address={recipientAddress || ''}
               />
               <View style={styles.recipientInfoContainer}>
-                <Text style={styles.headerText}>Sending</Text>
+                <Text style={styles.headerText}>{t('sending')}</Text>
                 <Text style={styles.displayName}>
                   {getDisplayName({ recipient, recipientAddress, t })}
                 </Text>
@@ -364,25 +362,17 @@ export class SendConfirmation extends React.Component<Props, State> {
             />
             <CommentTextInput
               testID={'send'}
-              style={styles.inputContainer}
               onCommentChange={this.onCommentChange}
               comment={this.state.comment}
-              onBlur={this.cleanInput}
+              onBlur={this.onBlur}
             />
           </View>
-          <Modal isVisible={this.state.modalVisible} style={styles.modal}>
-            <View style={styles.modalContainer}>
-              <InviteOptionsModal
-                onWhatsApp={this.sendWhatsApp}
-                onSMS={this.sendSMS}
-                onCancel={this.cancelModal}
-                cancelText={t('cancel')}
-                SMSText={t('inviteFlow11:inviteWithSMS')}
-                whatsAppText={t('inviteFlow11:inviteWithWhatsapp')}
-                margin={15}
-              />
-            </View>
-          </Modal>
+          <InviteOptionsModal
+            isVisible={this.state.modalVisible}
+            onWhatsApp={this.sendWhatsApp}
+            onSMS={this.sendSMS}
+            onCancel={this.cancelModal}
+          />
         </ReviewFrame>
       </SafeAreaView>
     )
@@ -413,7 +403,10 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.light,
     padding: 8,
-    flexDirection: 'column',
+  },
+  feeContainer: {
+    padding: 16,
+    paddingBottom: 8,
   },
   inviteText: {
     ...fontStyles.small,
@@ -421,7 +414,6 @@ const styles = StyleSheet.create({
     paddingBottom: 24,
   },
   transferContainer: {
-    flexDirection: 'column',
     alignItems: 'flex-start',
     paddingBottom: 24,
   },
@@ -430,7 +422,6 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   recipientInfoContainer: {
-    flexDirection: 'column',
     paddingLeft: 8,
   },
   headerText: {
@@ -439,15 +430,6 @@ const styles = StyleSheet.create({
   },
   displayName: {
     ...fontStyles.regular500,
-  },
-  modal: {
-    flex: 1,
-    margin: 0,
-  },
-  modalContainer: {
-    justifyContent: 'flex-end',
-    alignItems: 'stretch',
-    flex: 1,
   },
   editContainer: {
     flexDirection: 'row',
@@ -462,30 +444,9 @@ const styles = StyleSheet.create({
     color: colors.gray5,
     textDecorationLine: 'underline',
   },
-  inputContainer: {
-    flex: 1,
-    // Fixed height to increase surface area for input
-    // to focus on press
-    height: 200,
-    alignSelf: 'stretch',
-    ...fontStyles.large,
-  },
-  bottomContainer: {
-    marginTop: 5,
-    flexDirection: 'column',
-    alignItems: 'stretch',
-  },
   amount: {
     paddingVertical: 8,
     ...fontStyles.largeNumber,
-  },
-  comment: {
-    ...componentStyles.paddingTop5,
-    ...fontStyles.large,
-    fontSize: 14,
-    color: colors.darkSecondary,
-    lineHeight: 18,
-    textAlign: 'center',
   },
 })
 
