@@ -267,7 +267,7 @@ const styles = StyleSheet.create({
   },
   loader: {
     width: CHART_WIDTH,
-    height: CHART_HEIGHT + 35,
+    height: CHART_HEIGHT + 37.5,
     alignItems: 'center',
     justifyContent: 'center',
   },
