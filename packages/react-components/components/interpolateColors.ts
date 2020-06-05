@@ -1,3 +1,6 @@
+// Backported from https://github.com/software-mansion/react-native-reanimated/commit/94850e611def87aa6b72dc79dcc453a3a30acace
+// TODO: delete this once it reaches a released version of react-native-reanimated
+
 import { processColor } from 'react-native'
 import Animated, { color, Extrapolate, interpolate, round } from 'react-native-reanimated'
 
@@ -36,8 +39,6 @@ export default function interpolateColors(
 ) {
   const { inputRange, outputColorRange } = options
   const colors = outputColorRange.map(processColor)
-
-  console.log('==colors', colors)
 
   const r = round(
     interpolate(animationValue, {
