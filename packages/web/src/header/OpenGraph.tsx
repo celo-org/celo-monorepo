@@ -1,9 +1,10 @@
 import getConfig from 'next/config'
 import Head from 'next/head'
 import * as React from 'react'
+import { ImageRequireSource } from 'react-native'
 interface Props {
   description: string
-  image?: string
+  image?: ImageRequireSource
   title: string
   path: string
 }
