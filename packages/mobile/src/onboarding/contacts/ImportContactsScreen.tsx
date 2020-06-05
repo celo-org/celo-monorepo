@@ -1,6 +1,7 @@
 import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button.v2'
 import Switch from '@celo/react-components/components/Switch.v2'
 import TextButton from '@celo/react-components/components/TextButton.v2'
+import Checkmark from '@celo/react-components/icons/Checkmark'
 import colors from '@celo/react-components/styles/colors'
 import colorsV2 from '@celo/react-components/styles/colors.v2'
 import fontStyles from '@celo/react-components/styles/fonts'
@@ -10,18 +11,35 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import { Namespaces, withTranslation } from 'src/i18n'
+import LoadingSpinner from 'src/icons/LoadingSpinner'
 import { importContacts } from 'src/identity/actions'
+import { ImportContactsStatus } from 'src/identity/contactMapping'
+import { ContactMatch } from 'src/identity/matchmaking'
+import { ImportContactProgress } from 'src/identity/reducer'
 import { nuxNavigationOptions } from 'src/navigator/Headers'
 import { navigateHome } from 'src/navigator/NavigationService'
+import { RootState } from 'src/redux/reducers'
+
+interface StateProps {
+  importContactsProgress: ImportContactProgress
+  matchedContacts: ContactMatch[]
+}
 
 interface DispatchProps {
   importContacts: typeof importContacts
 }
 
-type Props = WithTranslation & DispatchProps
+type Props = StateProps & DispatchProps & WithTranslation
 
 interface State {
   isFindMeSwitchChecked: boolean
+}
+
+const mapStateToProps = (state: RootState): StateProps => {
+  return {
+    importContactsProgress: state.identity.importContactsProgress,
+    matchedContacts: state.identity.matchedContacts,
+  }
 }
 
 const mapDispatchToProps = {
@@ -35,15 +53,23 @@ class ImportContactScreen extends React.Component<Props, State> {
     isFindMeSwitchChecked: true,
   }
 
+  componentDidUpdate(prevProps: Props) {
+    if (
+      prevProps.importContactsProgress.status !== ImportContactsStatus.Done &&
+      this.props.importContactsProgress.status === ImportContactsStatus.Done
+    ) {
+      // Set timeout to leave checkmark in place for a little while
+      setTimeout(this.onFinish, 1500)
+    }
+  }
+
   onPressConnect = () => {
-    // TODO do matchmaking if isFindMeSwitchChecked
-    this.props.importContacts()
+    this.props.importContacts(this.state.isFindMeSwitchChecked)
   }
 
   onPressSkip = () => {
-    // TODO update state to not come back here
-    // TODO show some interstitial before home?
-    navigateHome()
+    // TODO cancel import
+    this.onFinish()
   }
 
   onToggleFindMeSwitch = (value: boolean) => {
@@ -52,29 +78,84 @@ class ImportContactScreen extends React.Component<Props, State> {
     })
   }
 
+  onFinish = () => {
+    // TODO update state to not come back here
+    navigateHome()
+  }
+
+  renderImportStatus = () => {
+    const { t, importContactsProgress, matchedContacts } = this.props
+    const { status, total } = importContactsProgress
+    const matchesFound = matchedContacts.length > 0
+
+    if (status === ImportContactsStatus.Done) {
+      return (
+        <View style={styles.statusContainer}>
+          <Checkmark />
+          {matchesFound ? (
+            <>
+              <Text style={styles.h1Status}>
+                {t('contacts.syncing.successHeader', { matches: matchedContacts.length })}
+              </Text>
+              <Text style={styles.h2Status}>{t('contacts.syncing.successStatus')}</Text>
+            </>
+          ) : (
+            <Text style={styles.h1Status}>{t('contacts.syncing.successStatus')}</Text>
+          )}
+        </View>
+      )
+    }
+
+    let h2Text: string
+    if (status === ImportContactsStatus.Processing) {
+      h2Text = 'contacts.syncing.loadingStatus1'
+    } else if (status === ImportContactsStatus.Matchmaking) {
+      h2Text = 'contacts.syncing.loadingStatus2'
+    } else {
+      h2Text = 'contacts.syncing.loadingStatus0'
+    }
+    return (
+      <View style={styles.statusContainer}>
+        <LoadingSpinner />
+        <Text style={styles.h1Status}>{t('contacts.syncing.loadingHeader')}</Text>
+        <Text style={styles.h2Status}>{t(h2Text, { total })}</Text>
+      </View>
+    )
+  }
+
   render() {
     const { isFindMeSwitchChecked } = this.state
-    const { t } = this.props
+    const { t, importContactsProgress } = this.props
+    const { status } = importContactsProgress
     return (
       <SafeAreaView style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
-          <Text style={styles.h1} testID="ImportContactsScreenHeader">
-            {t('contacts.header')}
-          </Text>
-          <Text style={styles.body}>{t('contacts.body')}</Text>
-          <View style={styles.switchContainer}>
-            <Switch value={isFindMeSwitchChecked} onValueChange={this.onToggleFindMeSwitch} />
-            <Text style={styles.switchText}>{t('contacts.findSwitch')}</Text>
-          </View>
-          <Button
-            onPress={this.onPressConnect}
-            text={t('global:connect')}
-            size={BtnSizes.MEDIUM}
-            type={BtnTypes.SECONDARY}
-          />
+          {status === ImportContactsStatus.Stopped && (
+            <>
+              <Text style={styles.h1} testID="ImportContactsScreenHeader">
+                {t('contacts.header')}
+              </Text>
+              <Text style={styles.body}>{t('contacts.body')}</Text>
+              <View style={styles.switchContainer}>
+                <Switch value={isFindMeSwitchChecked} onValueChange={this.onToggleFindMeSwitch} />
+                <Text style={styles.switchText}>{t('contacts.findSwitch')}</Text>
+              </View>
+              <Button
+                onPress={this.onPressConnect}
+                text={t('global:connect')}
+                size={BtnSizes.MEDIUM}
+                type={BtnTypes.SECONDARY}
+              />
+            </>
+          )}
+          {status > ImportContactsStatus.Stopped && this.renderImportStatus()}
         </ScrollView>
         <View style={styles.bottomButtonContainer}>
-          <TextButton onPress={this.onPressSkip} style={styles.bottomButtonText}>
+          <TextButton
+            onPress={this.onPressSkip}
+            style={styles.bottomButtonText}
+            testID="ImportContactsScreenSkipButton"
+          >
             {t('global:skip')}
           </TextButton>
         </View>
@@ -100,6 +181,16 @@ const styles = StyleSheet.create({
     marginTop: 20,
     textAlign: 'left',
   },
+  h1Status: {
+    ...fontStyles.h1,
+    marginTop: 20,
+    paddingBottom: 10,
+    color: colorsV2.greenBrand,
+  },
+  h2Status: {
+    ...fontStyles.h2,
+    color: colorsV2.greenFaint,
+  },
   body: {
     ...fontStyles.bodyLarge,
   },
@@ -121,9 +212,12 @@ const styles = StyleSheet.create({
   bottomButtonText: {
     color: colorsV2.gray5,
   },
+  statusContainer: {
+    alignItems: 'center',
+  },
 })
 
-export default connect<{}, DispatchProps>(
-  null,
+export default connect<StateProps, DispatchProps, {}, RootState>(
+  mapStateToProps,
   mapDispatchToProps
 )(withTranslation(Namespaces.onboarding)(ImportContactScreen))

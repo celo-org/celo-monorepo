@@ -1,4 +1,6 @@
 import { E164Number } from '@celo/utils/src/io'
+import { ImportContactsStatus } from 'src/identity/contactMapping'
+import { ContactMatch } from 'src/identity/matchmaking'
 import {
   AddressToE164NumberType,
   AddressValidationType,
@@ -22,10 +24,10 @@ export enum Actions {
   UPDATE_E164_PHONE_NUMBER_SALT = 'IDENTITY/UPDATE_E164_PHONE_NUMBER_SALT',
   FETCH_ADDRESSES_AND_VALIDATION_STATUS = 'IDENTITY/FETCH_ADDRESSES_AND_VALIDATION_STATUS',
   IMPORT_CONTACTS = 'IDENTITY/IMPORT_CONTACTS',
-  UPDATE_IMPORT_SYNC_PROGRESS = 'IDENTITY/UPDATE_IMPORT_SYNC_PROGRESS',
-  INCREMENT_IMPORT_SYNC_PROGRESS = 'IDENTITY/INCREMENT_IMPORT_SYNC_PROGRESS',
+  UPDATE_IMPORT_CONTACT_PROGRESS = 'IDENTITY/UPDATE_IMPORT_CONTACT_PROGRESS',
   END_IMPORT_CONTACTS = 'IDENTITY/END_IMPORT_CONTACTS',
   DENY_IMPORT_CONTACTS = 'IDENTITY/DENY_IMPORT_CONTACTS',
+  ADD_CONTACT_MATCHES = 'IDENTITY/ADD_CONTACT_MATCHES',
   VALIDATE_RECIPIENT_ADDRESS = 'SEND/VALIDATE_RECIPIENT_ADDRESS',
   VALIDATE_RECIPIENT_ADDRESS_SUCCESS = 'SEND/VALIDATE_RECIPIENT_ADDRESS_SUCCESS',
   REQUIRE_SECURE_SEND = 'SEND/REQUIRE_SECURE_SEND',
@@ -91,17 +93,14 @@ export interface FetchAddressesAndValidateAction {
 
 export interface ImportContactsAction {
   type: Actions.IMPORT_CONTACTS
+  doMatchmaking: boolean
 }
 
-export interface UpdateImportSyncProgress {
-  type: Actions.UPDATE_IMPORT_SYNC_PROGRESS
-  current: number
-  total: number
-}
-
-export interface IncrementImportSyncProgress {
-  type: Actions.INCREMENT_IMPORT_SYNC_PROGRESS
-  increment: number
+export interface UpdateImportContactProgress {
+  type: Actions.UPDATE_IMPORT_CONTACT_PROGRESS
+  status?: ImportContactsStatus
+  current?: number
+  total?: number
 }
 
 export interface EndImportContactsAction {
@@ -111,6 +110,11 @@ export interface EndImportContactsAction {
 
 export interface DenyImportContactsAction {
   type: Actions.DENY_IMPORT_CONTACTS
+}
+
+export interface AddContactMatchesAction {
+  type: Actions.ADD_CONTACT_MATCHES
+  matches: ContactMatch[]
 }
 
 export interface ValidateRecipientAddressAction {
@@ -144,10 +148,10 @@ export type ActionTypes =
   | UpdateE164PhoneNumberAddressesAction
   | UpdateE164PhoneNumberSaltAction
   | ImportContactsAction
-  | UpdateImportSyncProgress
-  | IncrementImportSyncProgress
+  | UpdateImportContactProgress
   | EndImportContactsAction
   | DenyImportContactsAction
+  | AddContactMatchesAction
   | ValidateRecipientAddressAction
   | ValidateRecipientAddressSuccessAction
   | RequireSecureSendAction
@@ -220,22 +224,20 @@ export const updateE164PhoneNumberSalts = (
   e164NumberToSalt,
 })
 
-export const importContacts = (): ImportContactsAction => ({
+export const importContacts = (doMatchmaking: boolean = false): ImportContactsAction => ({
   type: Actions.IMPORT_CONTACTS,
+  doMatchmaking,
 })
 
-export const updateImportSyncProgress = (
-  current: number,
-  total: number
-): UpdateImportSyncProgress => ({
-  type: Actions.UPDATE_IMPORT_SYNC_PROGRESS,
+export const updateImportContactsProgress = (
+  status?: ImportContactsStatus,
+  current?: number,
+  total?: number
+): UpdateImportContactProgress => ({
+  type: Actions.UPDATE_IMPORT_CONTACT_PROGRESS,
+  status,
   current,
   total,
-})
-
-export const incrementImportSyncProgress = (increment: number): IncrementImportSyncProgress => ({
-  type: Actions.INCREMENT_IMPORT_SYNC_PROGRESS,
-  increment,
 })
 
 export const endImportContacts = (success: boolean): EndImportContactsAction => ({
@@ -245,6 +247,11 @@ export const endImportContacts = (success: boolean): EndImportContactsAction => 
 
 export const denyImportContacts = (): DenyImportContactsAction => ({
   type: Actions.DENY_IMPORT_CONTACTS,
+})
+
+export const addContactsMatches = (matches: ContactMatch[]): AddContactMatchesAction => ({
+  type: Actions.ADD_CONTACT_MATCHES,
+  matches,
 })
 
 export const validateRecipientAddress = (

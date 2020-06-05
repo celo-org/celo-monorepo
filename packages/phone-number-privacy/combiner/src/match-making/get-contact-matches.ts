@@ -5,7 +5,6 @@ import {
   hasValidAccountParam,
   hasValidContractPhoneNumbersParam,
   hasValidUserPhoneNumberParam,
-  isBodyReasonablySized,
 } from '../common/input-validation'
 import logger from '../common/logger'
 import { getDidMatchmaking, setDidMatchmaking } from '../database/wrappers/account'
@@ -50,7 +49,8 @@ function isValidGetContactMatchesInput(requestBody: any): boolean {
   return (
     hasValidAccountParam(requestBody) &&
     hasValidUserPhoneNumberParam(requestBody) &&
-    hasValidContractPhoneNumbersParam(requestBody) &&
-    isBodyReasonablySized(requestBody)
+    hasValidContractPhoneNumbersParam(requestBody)
+    // TODO find way to check content body size without RE-JSONifying it
+    // isBodyReasonablySized(requestBody)
   )
 }

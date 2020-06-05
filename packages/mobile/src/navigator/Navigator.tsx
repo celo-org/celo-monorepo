@@ -500,6 +500,11 @@ export function AppNavigatorNew() {
       acceptedTerms,
     } = mapStateToProps(store.getState())
 
+    //TODO
+    setInitialRoute(Screens.ImportContacts)
+    SplashScreen.hide()
+    return
+
     let initialRoute: Screens | undefined
 
     if (!language) {

@@ -7,6 +7,7 @@ import { e164NumberSelector } from 'src/account/selectors'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import networkConfig from 'src/geth/networkConfig'
 import { updateE164PhoneNumberSalts } from 'src/identity/actions'
+import { postToPGPNP } from 'src/identity/pgpnp'
 import { e164NumberToSaltSelector, E164NumberToSaltType } from 'src/identity/reducer'
 import { navigate, navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -142,43 +143,19 @@ async function postToSignMessage(
   contractKit: ContractKit,
   selfPhoneHash?: string
 ) {
-  Logger.debug(`${TAG}@postToSignMessage`, `Posting to ${SIGN_MESSAGE_ENDPOINT}`)
   const body = JSON.stringify({
     blindedQueryPhoneNumber: base64BlindedMessage,
     account,
     hashedPhoneNumber: selfPhoneHash,
   })
 
-  // Sign payload using account privkey
-  const authHeader = await contractKit.web3.eth.sign(body, account)
-  const { pgpnpUrl } = networkConfig
-  const res = await fetch(pgpnpUrl + SIGN_MESSAGE_ENDPOINT, {
-    method: 'POST',
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-      Authorization: authHeader,
-    },
+  const response = await postToPGPNP<SignMessageResponse>(
+    account,
+    contractKit,
     body,
-  })
-
-  if (!res.ok) {
-    handleSignMessageFailure(res)
-  }
-
-  Logger.debug(`${TAG}@postToSignMessage`, 'Response ok. Parsing.')
-  const signResponse = (await res.json()) as SignMessageResponse
-  return signResponse.signature
-}
-
-function handleSignMessageFailure(res: Response) {
-  Logger.error(`${TAG}@handleSignMessageFailure`, `Response not okay. Status ${res.status}`)
-  switch (res.status) {
-    case 403:
-      throw new Error(ErrorMessages.SALT_QUOTA_EXCEEDED)
-    default:
-      throw new Error('Failure getting blinded sig')
-  }
+    SIGN_MESSAGE_ENDPOINT
+  )
+  return response.signature
 }
 
 // This is the algorithm that creates a salt from the unblinded message signatures
