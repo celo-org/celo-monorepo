@@ -15,9 +15,5 @@ const sections = [
 })
 
 export default function ExamplesPage() {
-  return (
-    <>
-      <Page title={ROUTE_TO_TITLE[EXAMPLES_PATH]} path={EXAMPLES_PATH} sections={sections} />
-    </>
-  )
+  return <Page title={ROUTE_TO_TITLE[EXAMPLES_PATH]} path={EXAMPLES_PATH} sections={sections} />
 }
