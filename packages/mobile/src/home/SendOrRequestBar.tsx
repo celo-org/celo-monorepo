@@ -31,7 +31,7 @@ export default function SendOrRequestBar() {
       <Button
         style={[styles.button, styles.requestButton]}
         size={BtnSizes.SMALL}
-        text={t('request')}
+        text={t('paymentRequestFlow:request')}
         onPress={onPressRequest}
       />
       <Touchable borderless={true} onPress={onPressQrCode}>
