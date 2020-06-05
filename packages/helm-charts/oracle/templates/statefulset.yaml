@@ -81,8 +81,13 @@ spec:
             [[ $REPLICA_NAME =~ -([0-9]+)$ ]] || exit 1
             RID=${BASH_REMATCH[1]}
 
-            # Get the correct key vault name
-            AZURE_KEY_VAULT_NAMES={{- range $index, $identity := .Values.oracle.identities -}}{{ $identity.azure.keyVaultName }},{{- end }}
+            # Set the private key path. If Azure HSM signing is specified,
+            # it will take precedence.
+            export PRIVATE_KEY_PATH="/private-keys/private-key-$RID"
+
+            # Get the correct key vault name. If this oracle's identity is not
+            # using Azure HSM signing, the key vault name will be empty and ignored
+            AZURE_KEY_VAULT_NAMES={{- range $index, $identity := .Values.oracle.identities -}}{{ $identity.azure.keyVaultName | default "" }},{{- end }}
             export AZURE_KEY_VAULT_NAME=`echo -n $AZURE_KEY_VAULT_NAMES | cut -d ',' -f $((RID + 1))`
 
             # Get the correct oracle account address
@@ -130,3 +135,11 @@ spec:
             - "{{ .Values.oracle.metrics.prometheusPort }}"
           initialDelaySeconds: 10
           periodSeconds: 5
+        volumeMounts:
+        - name: private-key-volume
+          readOnly: true
+          mountPath: "/private-keys"
+      volumes:
+        - name: private-key-volume
+          secret:
+            secretName: pkey-secret
