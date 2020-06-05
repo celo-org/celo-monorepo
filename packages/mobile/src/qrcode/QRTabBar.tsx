@@ -30,7 +30,7 @@ export default function QRTabBar({ state, descriptors, navigation, position, qrS
   )
 
   const shareOpacity = Animated.interpolate(position, {
-    inputRange: [0, 0.5],
+    inputRange: [0, 0.1],
     outputRange: [1, 0],
   })
 
@@ -74,7 +74,10 @@ export default function QRTabBar({ state, descriptors, navigation, position, qrS
           position={position}
           onChange={onChange}
         />
-        <Animated.View style={[styles.rightContainer, { opacity: shareOpacity }]}>
+        <Animated.View
+          style={[styles.rightContainer, { opacity: shareOpacity }]}
+          pointerEvents={state.index > 0 ? 'none' : undefined}
+        >
           <TopBarIconButton icon={<Share />} onPress={onPressShare} />
         </Animated.View>
       </View>
@@ -85,18 +88,15 @@ export default function QRTabBar({ state, descriptors, navigation, position, qrS
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    // backgroundColor: 'yellow',
     alignItems: 'center',
     paddingVertical: 8,
   },
   leftContainer: {
     width: 50,
-    // paddingHorizontal: 16,
     alignItems: 'center',
   },
   rightContainer: {
     width: 50,
-    // paddingHorizontal: 16,
     alignItems: 'center',
   },
 })
