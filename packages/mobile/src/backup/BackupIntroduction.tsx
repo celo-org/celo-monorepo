@@ -18,7 +18,7 @@ import { Namespaces } from 'src/i18n'
 import Logo from 'src/icons/Logo.v2'
 import DrawerTopBar from 'src/navigator/DrawerTopBar'
 import { drawerHeader } from 'src/navigator/Headers.v2'
-import { navigateProtected } from 'src/navigator/NavigationService'
+import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
 
@@ -56,7 +56,7 @@ class BackupIntroduction extends React.Component<Props> {
 
   onPressBackup = () => {
     CeloAnalytics.track(CustomEventNames.backup_start)
-    navigateProtected(Screens.BackupPhrase)
+    navigate(Screens.AccountKeyEducation)
   }
 
   render() {

@@ -53,5 +53,23 @@
     "secondary": "Set Up Later"
   },
   "backupPhrasePlaceholder":
-    "horse leopard dog monkey shark tiger lemur whale squid wolf squirrel mouse lion elephant cat shrimp bear penguin deer turtle fox zebra goat giraffe"
+    "horse leopard dog monkey shark tiger lemur whale squid wolf squirrel mouse lion elephant cat shrimp bear penguin deer turtle fox zebra goat giraffe",
+  "guide": [
+    {
+      "title": "Your Account Key is a special kind of password",
+      "text": "Your Account Key is the one and only way to access your account."
+    },
+    {
+      "title": "Without your key, you can lose access forever",
+      "text": "If you lose your phone, you must have your key to get your account back. Nobody, not even Celo, will be able to recover your funds without it."
+    },
+    {
+      "title": "Write it down",
+      "text": "Write down your Account Key and store it in a safe place. Do not save it in your phone."
+    },
+    {
+      "title": "Keep your key private",
+      "text": "Anyone with your key will have access to your account and all of its funds. Don’t share it with others."
+    }
+  ]
 }

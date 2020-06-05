@@ -6,6 +6,7 @@ import { createStackNavigator } from '@react-navigation/stack'
 import * as React from 'react'
 import SplashScreen from 'react-native-splash-screen'
 import Account from 'src/account/Account'
+import AccountKeyEducation from 'src/account/AccountKeyEducation'
 import Analytics from 'src/account/Analytics'
 import DataSaver from 'src/account/DataSaver'
 import DollarEducation from 'src/account/DollarEducation'
@@ -363,6 +364,11 @@ const backupScreens = (Navigator: typeof Stack) => (
       name={Screens.BackupIntroduction}
       component={BackupIntroduction}
       options={navOptionsForAccount}
+    />
+    <Navigator.Screen
+      name={Screens.AccountKeyEducation}
+      component={AccountKeyEducation}
+      options={noHeader}
     />
     <Navigator.Screen
       name={Screens.BackupPhrase}

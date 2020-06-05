@@ -1,6 +1,7 @@
 export enum Screens {
   AppLoading = 'AppLoading',
   Account = 'Account',
+  AccountKeyEducation = 'AccountKeyEducation',
   Analytics = 'Analytics',
   BackupComplete = 'BackupComplete',
   BackupIntroduction = 'BackupIntroduction',

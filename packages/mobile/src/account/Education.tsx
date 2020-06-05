@@ -2,12 +2,10 @@ import Button, { BtnTypes } from '@celo/react-components/components/Button.v2'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import progressDots from '@celo/react-components/styles/progressDots'
 import * as React from 'react'
-import { WithTranslation } from 'react-i18next'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import Swiper from 'react-native-swiper'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
-import { Namespaces, withTranslation } from 'src/i18n'
 import { placeholder } from 'src/images/Images'
 
 export const CTA_CIRCLE_SIZE = 5
@@ -24,17 +22,14 @@ interface EducationStep {
   screenName: string
 }
 
-interface CustomizedProps {
+interface Props {
   stepInfo: EducationStep[]
   buttonText: string
-  linkText?: string
   onFinish: () => void
-  onFinishAlternate?: () => void
+  lastStepButtonType?: BtnTypes
 }
 
-type Props = WithTranslation & CustomizedProps
-
-class Education extends React.Component<Props, State> {
+export default class Education extends React.Component<Props, State> {
   state = {
     step: 0,
   }
@@ -52,7 +47,6 @@ class Education extends React.Component<Props, State> {
   }
 
   setStep = (step: number) => {
-    console.warn('HELLO')
     this.setState({ step })
   }
 
@@ -61,13 +55,11 @@ class Education extends React.Component<Props, State> {
   }
 
   render() {
-    const { t, stepInfo, onFinish, buttonText } = this.props
+    const { stepInfo, onFinish, buttonText, lastStepButtonType } = this.props
 
     const isLastStep = this.state.step === stepInfo.length - 1
     return (
       <View style={style.container}>
-        {/* 
-        // @ts-ignore */}
         <Swiper
           ref={this.swiper}
           onIndexChanged={this.setStep}
@@ -75,21 +67,21 @@ class Education extends React.Component<Props, State> {
           dotStyle={progressDots.circlePassive}
           activeDotStyle={progressDots.circleActive}
         >
-          {stepInfo.map((v: any, i: any) => {
-            const imgSrc = v.image ? v.image : placeholder
+          {stepInfo.map((step: EducationStep, i: number) => {
+            const imgSrc = step.image ? step.image : placeholder
             return (
               <View style={style.swipedContent} key={i}>
                 <Image source={imgSrc} style={style.bodyImage} resizeMode="contain" />
-                <Text style={style.heading}>{t(v.title)}</Text>
-                <Text style={style.bodyText}>{t(v.text)}</Text>
+                <Text style={style.heading}>{step.title}</Text>
+                <Text style={style.bodyText}>{step.text}</Text>
               </View>
             )
           })}
         </Swiper>
         <Button
           onPress={isLastStep ? onFinish : this.nextStep}
-          text={t(isLastStep ? buttonText : 'next')}
-          type={BtnTypes.SECONDARY}
+          text={isLastStep ? buttonText : 'next'}
+          type={lastStepButtonType ? lastStepButtonType : BtnTypes.SECONDARY}
         />
       </View>
     )
@@ -126,5 +118,3 @@ const style = StyleSheet.create({
     paddingHorizontal: 24,
   },
 })
-
-export default withTranslation(Namespaces.nuxCurrencyPhoto4)(Education)

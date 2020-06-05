@@ -1,3 +1,4 @@
+import { BtnTypes } from '@celo/react-components/components/Button.v2'
 import * as React from 'react'
 import { connect } from 'react-redux'
 import Education from 'src/account/Education'
@@ -31,7 +32,6 @@ export class GoldEducation extends React.Component<Props> {
     const stepInfo = [
       {
         image: shinyGold,
-        title: 'What is Celo Gold?',
         text: 'celoLikeGold',
         cancelEvent: CustomEventNames.gold_cancel1,
         screenName: 'Gold_Nux_1',
@@ -53,7 +53,7 @@ export class GoldEducation extends React.Component<Props> {
       <Education
         stepInfo={stepInfo}
         onFinish={this.goToExchange}
-        onFinishAlternate={this.goToWalletHome}
+        lastStepButtonType={BtnTypes.TERTIARY}
         buttonText={'done'}
       />
     )
