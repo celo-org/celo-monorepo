@@ -1,5 +1,4 @@
 import colors from '@celo/react-components/styles/colors.v2'
-import fontStyles from '@celo/react-components/styles/fonts.v2'
 import variables from '@celo/react-components/styles/variables'
 import BigNumber from 'bignumber.js'
 import _ from 'lodash'
@@ -19,7 +18,6 @@ import { getLocalCurrencyDisplayValue } from 'src/utils/formatting'
 import { formatFeedDate } from 'src/utils/time'
 import { VictoryGroup, VictoryLine, VictoryScatter } from 'victory-native'
 
-const CHART_POINTS_NUMBER = 60
 const CHART_WIDTH = variables.width
 const CHART_HEIGHT = 180
 const CHART_MIN_VERTICAL_RANGE = 0.1 // one cent
@@ -33,7 +31,7 @@ interface OwnProps {
 type Props = WithTranslation & OwnProps
 
 // ChartAwareSvgText draws text on the chart with avareness of its edges.
-// Example: we want to draw some text at {x:10,y:10}(coordinates of the center).
+// Example: we want to draw some text at {x:10,y:10} (coordinates of the center).
 // The text width is 33px and if draw it right away it will be cuted by the chart edges.
 // The component will adjust coordinates to {x: (textWidthInPixels/2), y: 10}
 function ChartAwareSvgText({
@@ -80,6 +78,7 @@ function ChartAwareSvgText({
       onLayout={onLayout}
       fill={colors.gray4}
       fontSize="14"
+      fontFamily="Hind-Regular"
       x={adjustedX}
       y={y}
       textAnchor="middle"
@@ -171,11 +170,7 @@ function Loader() {
   )
 }
 
-function CeloGoldHistoryChart({ t, testID, i18n }: Props) {
-  const calculateGroup = useCallback((er) => {
-    return Math.floor(er.timestamp / (range / CHART_POINTS_NUMBER))
-  }, [])
-
+function CeloGoldHistoryChart({ testID, i18n }: Props) {
   // We hardcode localCurrencyCode to null, hence the chart will always show cGLD to cUSD no matter what.
   // TODO: revert this back to `useLocalCurrencyCode()` when we have history data for cGDL to Local Currency.
   const localCurrencyCode = null
@@ -184,35 +179,23 @@ function CeloGoldHistoryChart({ t, testID, i18n }: Props) {
       getLocalCurrencyDisplayValue(amount, localCurrencyCode || LocalCurrencyCode.USD, true),
     [localCurrencyCode]
   )
-  const exchangeRate = useExchangeRate()
-  const goldToDollars = useCallback((amount) => goldToDollarAmount(amount, exchangeRate), [
-    exchangeRate,
+  const currentExchangeRate = useExchangeRate()
+  const goldToDollars = useCallback((amount) => goldToDollarAmount(amount, currentExchangeRate), [
+    currentExchangeRate,
   ])
   const localExchangeRate = useSelector(getLocalCurrencyExchangeRate)
   const dollarsToLocal = useCallback(
     (amount) => convertDollarsToLocalAmount(amount, localCurrencyCode ? localExchangeRate : 1),
     [localExchangeRate]
   )
-  const [range] = useState(30 * 24 * 60 * 60 * 1000) // 30 days
   const exchangeHistory = useSelector(exchangeHistorySelector)
 
-  if (!exchangeHistory.celoGoldExchangeRates.length) {
+  if (!exchangeHistory.aggregatedExchangeRates?.length) {
     return <Loader />
   }
 
-  const groupedExchangeHistory = _.groupBy(exchangeHistory.celoGoldExchangeRates, calculateGroup)
-  const latestExchangeRate =
-    exchangeHistory.celoGoldExchangeRates[exchangeHistory.celoGoldExchangeRates.length - 1]
-  const latestGroup = calculateGroup(latestExchangeRate)
-  const chartData = _.range(
-    Math.min(CHART_POINTS_NUMBER - 1, Object.keys(groupedExchangeHistory).length),
-    0,
-    -1
-  ).map((i) => {
-    const group = groupedExchangeHistory[latestGroup - i + 1]
-    const localAmount = dollarsToLocal(
-      group ? _.meanBy(group, (er) => parseFloat(er.exchangeRate)) : 0
-    )
+  const chartData = exchangeHistory.aggregatedExchangeRates.map((exchangeRate) => {
+    const localAmount = dollarsToLocal(exchangeRate.exchangeRate)
     return {
       amount: localAmount ? localAmount.toNumber() : 0,
       displayValue: localAmount ? displayLocalCurrency(localAmount) : '',
@@ -231,11 +214,6 @@ function CeloGoldHistoryChart({ t, testID, i18n }: Props) {
     amount: currentGoldRateInLocalCurrency.toNumber(),
     displayValue: displayLocalCurrency(currentGoldRateInLocalCurrency),
   })
-  const rateChange = currentGoldRateInLocalCurrency.minus(oldestGoldRateInLocalCurrency)
-  const rateChangeInPercentage = currentGoldRateInLocalCurrency
-    .div(oldestGoldRateInLocalCurrency)
-    .minus(1)
-    .multipliedBy(100)
   const RenderPoint = renderPointOnChart(chartData, CHART_WIDTH)
 
   const values = chartData.map((el) => el.amount)
@@ -250,23 +228,10 @@ function CeloGoldHistoryChart({ t, testID, i18n }: Props) {
       x: [0, chartData.length - 1] as [number, number],
     }
   }
-  const rateWentUp = rateChange.gt(0)
+  const latestExchangeRate = _.last(exchangeHistory.aggregatedExchangeRates)!
 
   return (
     <View style={styles.container} testID={testID}>
-      <View style={styles.goldPrice}>
-        <View>
-          <Text style={styles.goldPriceTitle}>{t('goldPrice')}</Text>
-        </View>
-        <View style={styles.goldPriceValues}>
-          <Text style={styles.goldPriceCurrentValue}>
-            {displayLocalCurrency(currentGoldRateInLocalCurrency)}
-          </Text>
-          <Text style={rateWentUp ? styles.goldPriceWentUp : styles.goldPriceWentDown}>
-            {rateWentUp ? '▴' : '▾'} {rateChangeInPercentage.toFormat(2)}%
-          </Text>
-        </View>
-      </View>
       <VictoryGroup
         domainPadding={CHART_DOMAIN_PADDING}
         singleQuadrantDomainPadding={false}
@@ -288,7 +253,7 @@ function CeloGoldHistoryChart({ t, testID, i18n }: Props) {
       </VictoryGroup>
       <View style={styles.range}>
         <Text style={styles.timeframe}>
-          {formatFeedDate(latestExchangeRate.timestamp - range, i18n)}
+          {formatFeedDate(latestExchangeRate.timestamp - exchangeHistory.range, i18n)}
         </Text>
         <Text style={styles.timeframe}>{formatFeedDate(latestExchangeRate.timestamp, i18n)}</Text>
       </View>
@@ -300,30 +265,9 @@ const styles = StyleSheet.create({
   container: {
     marginBottom: 0,
   },
-  goldPrice: {
-    padding: variables.contentPadding,
-  },
-  goldPriceTitle: {
-    ...fontStyles.h2,
-    marginBottom: 8,
-  },
-  goldPriceValues: { flexDirection: 'row', alignItems: 'flex-end' },
-  goldPriceCurrentValue: {
-    ...fontStyles.mediumNumber,
-  },
-  goldPriceWentUp: {
-    ...fontStyles.regular,
-    color: colors.greenUI,
-  },
-  goldPriceWentDown: {
-    ...fontStyles.regular,
-    marginBottom: 2, // vertically align with the current price
-    marginLeft: 4,
-    color: colors.warning,
-  },
   loader: {
     width: CHART_WIDTH,
-    height: CHART_HEIGHT + 130,
+    height: CHART_HEIGHT + 35,
     alignItems: 'center',
     justifyContent: 'center',
   },

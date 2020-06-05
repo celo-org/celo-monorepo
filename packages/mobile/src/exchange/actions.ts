@@ -42,6 +42,7 @@ export interface ExchangeTokensAction {
 
 export interface UpdateCeloGoldExchangeRateHistory {
   type: Actions.UPDATE_CELO_GOLD_EXCHANGE_RATE_HISTORY
+  timestamp: number
   exchangeRates: ExchangeRate[]
 }
 
@@ -71,10 +72,12 @@ export const setTobinTax = (tobinTax: string): SetTobinTaxAction => ({
 })
 
 export const updateCeloGoldExchangeRateHistory = (
-  exchangeRates: ExchangeRate[]
+  exchangeRates: ExchangeRate[],
+  timestamp: number
 ): UpdateCeloGoldExchangeRateHistory => ({
   type: Actions.UPDATE_CELO_GOLD_EXCHANGE_RATE_HISTORY,
   exchangeRates,
+  timestamp,
 })
 
 export const exchangeTokens = (

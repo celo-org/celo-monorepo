@@ -287,7 +287,8 @@ export function* subscribeToCeloGoldExchangeRateHistory() {
   try {
     while (true) {
       const exchangeRates = yield take(chan)
-      yield put(updateCeloGoldExchangeRateHistory(exchangeRates))
+      const now = Date.now()
+      yield put(updateCeloGoldExchangeRateHistory(exchangeRates, now))
     }
   } catch (error) {
     Logger.error(`${TAG}@subscribeToCeloGoldExchangeRateHistory`, error)
