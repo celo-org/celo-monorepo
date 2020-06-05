@@ -8,15 +8,8 @@ import { Namespaces } from 'src/i18n'
 import { sendBetweenPhones, sendFee, stabilityScale } from 'src/images/Images'
 import { navigateProtected } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import { setEducationCompleted } from 'src/stableToken/actions'
 
-interface DispatchProps {
-  setEducationCompleted: typeof setEducationCompleted
-}
-
-type Props = DispatchProps
-
-export default function AccountKeyEducation({}: Props) {
+export default function AccountKeyEducation() {
   const onComplete = React.useCallback(() => {
     CeloAnalytics.track(CustomEventNames.backup_error) // TODO the right event
     navigateProtected(Screens.BackupPhrase)
@@ -29,13 +22,13 @@ export default function AccountKeyEducation({}: Props) {
     <Education
       stepInfo={steps}
       onFinish={onComplete}
-      buttonText={t('understand')}
-      lastStepButtonType={BtnTypes.PRIMARY}
+      finalButtonText={t('completeEducation')}
+      buttonText={t('global:next')}
+      finalButtonType={BtnTypes.PRIMARY}
     />
   )
 }
 
-// TODO event and screen names
 function useSteps() {
   const { t } = useTranslation(Namespaces.backupKeyFlow6)
   return React.useMemo(
@@ -43,29 +36,33 @@ function useSteps() {
       [
         {
           image: stabilityScale,
-          cancelEvent: CustomEventNames.dollar_cancel1,
-          screenName: 'Dollar_Nux_1',
+          cancelEvent: CustomEventNames.backup_educate_1_cancel,
+          progressEvent: CustomEventNames.backup_educate_1_next,
+          screenName: 'AccountKeyEducation',
         },
         {
           image: sendFee,
-          cancelEvent: CustomEventNames.dollar_cancel2,
-          screenName: 'Dollar_Nux_2',
+          cancelEvent: CustomEventNames.backup_educate_2_cancel,
+          progressEvent: CustomEventNames.backup_educate_2_next,
+          screenName: 'AccountKeyEducation',
         },
         {
           image: sendBetweenPhones,
-          cancelEvent: CustomEventNames.dollar_cancel3,
-          screenName: 'Dollar_Nux_3',
+          cancelEvent: CustomEventNames.backup_educate_3_cancel,
+          progressEvent: CustomEventNames.backup_educate_3_next,
+          screenName: 'AccountKeyEducation',
         },
         {
           image: sendBetweenPhones,
-          cancelEvent: CustomEventNames.dollar_cancel3,
-          screenName: 'Dollar_Nux_4',
+          cancelEvent: CustomEventNames.backup_educate_4_cancel,
+          progressEvent: CustomEventNames.backup_educate_4_next,
+          screenName: 'AccountKeyEducation',
         },
       ].map((step, index) => {
         return {
           ...step,
-          title: t(`guide.${0}.title`),
-          text: t(`guide.${0}.text`),
+          title: t(`guide.${index}.title`),
+          text: t(`guide.${index}.text`),
         }
       }),
     []

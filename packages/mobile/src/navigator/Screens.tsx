@@ -14,7 +14,6 @@ export enum Screens {
   DappKitTxDataScreen = 'DappKitTxDataScreen',
   DataSaver = 'DataSaver',
   Debug = 'Debug',
-  DollarEducation = 'DollarEducation',
   DrawerNavigator = 'DrawerNavigator',
   EditProfile = 'EditProfile',
   EnterInviteCode = 'EnterInviteCode',

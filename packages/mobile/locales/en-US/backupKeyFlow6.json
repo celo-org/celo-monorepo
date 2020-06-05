@@ -12,6 +12,7 @@
   "failedFetchMnemonic": "Failed to fetch your Account Key",
   "backupAndRecovery": "Backup and Recovery",
   "writeDownKey": "Write down your key",
+  "completeEducation": "I Understand",
   "backupKey": "Account Key",
   "yourBackupKey": "Your Backup Key",
   "backupKeyNotification": "Without a Backup Key, you may lose access to your wallet.",

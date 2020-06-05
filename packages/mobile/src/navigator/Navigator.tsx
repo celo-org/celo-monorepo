@@ -9,14 +9,12 @@ import Account from 'src/account/Account'
 import AccountKeyEducation from 'src/account/AccountKeyEducation'
 import Analytics from 'src/account/Analytics'
 import DataSaver from 'src/account/DataSaver'
-import DollarEducation from 'src/account/DollarEducation'
 import EditProfile from 'src/account/EditProfile'
 import FiatExchange from 'src/account/FiatExchange'
 import GoldEducation from 'src/account/GoldEducation'
 import Invite from 'src/account/Invite'
 import InviteReview from 'src/account/InviteReview'
 import Licenses from 'src/account/Licenses'
-import PhotosEducation from 'src/account/PhotosEducation'
 import Profile from 'src/account/Profile'
 import { PincodeType } from 'src/account/reducer'
 import Security from 'src/account/Security'
@@ -446,13 +444,11 @@ const transactionReviewOptions = ({
 const generalScreens = (Navigator: typeof Stack) => (
   <>
     <Navigator.Screen name={Screens.SetClock} component={SetClock} />
-    <Navigator.Screen name={Screens.DollarEducation} component={DollarEducation} />
     <Navigator.Screen
       name={Screens.TransactionReview}
       component={TransactionReview}
       options={transactionReviewOptions}
     />
-    <Navigator.Screen name={Screens.PhotosEducation} component={PhotosEducation} />
     <Navigator.Screen name={Screens.GoldEducation} component={GoldEducation} />
     <Navigator.Screen name={Screens.FeeEducation} component={FeeEducation} />
   </>

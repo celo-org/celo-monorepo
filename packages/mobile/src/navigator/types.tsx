@@ -35,7 +35,6 @@ export type StackParamList = {
     promptModalVisible: boolean
   }
   [Screens.Debug]: undefined
-  [Screens.DollarEducation]: undefined
   [Screens.DrawerNavigator]: undefined
   [Screens.EditProfile]: undefined
   [Screens.EnterInviteCode]: undefined

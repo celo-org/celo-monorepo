@@ -11,9 +11,24 @@ export enum CustomEventNames {
   gold_cancel1 = 'gold_cancel1',
   gold_cancel2 = 'gold_cancel2',
   gold_cancel3 = 'gold_cancel3',
+  gold_educate_1_next = 'gold_educate_1_next', // next button on 1st edu screen
+  gold_educate_2_next = 'gold_educate_2_next', // next button on 2nd edu screen
+  gold_educate_3_next = 'gold_educate_3_next', // next button on 3rd edu screen
+
   photo_education_cancel1 = 'photo_education_cancel1',
   photo_education_cancel2 = 'photo_education_cancel2',
   photo_education_cancel3 = 'photo_education_cancel3',
+
+  backup_educate_1_next = 'backup_educate_1_next', // next button on 1st edu screen
+  backup_educate_2_next = 'backup_educate_2_next', // next button on 2nd edu screen
+  backup_educate_3_next = 'backup_educate_3_next', // next button on 3rd edu screen
+  backup_educate_4_next = 'backup_educate_4_next', // next button on 4th edu screen
+
+  backup_educate_1_cancel = 'backup_educate_1_cancel', // cancel button on 1st edu screen
+  backup_educate_2_cancel = 'backup_educate_2_cancel', // cancel button on 2nd edu screen
+  backup_educate_3_cancel = 'backup_educate_3_cancel', // cancel button on 3rd edu screen
+  backup_educate_4_cancel = 'backup_educate_4_cancel', // cancel button on 4th edu screen
+
   exchange_gold_nux = 'exchange_gold_nux',
   wallet_gold_nux = 'wallet_gold_nux',
   dollar_cancel1 = 'dollar_cancel1',

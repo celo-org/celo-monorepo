@@ -2,14 +2,14 @@ import * as React from 'react'
 import 'react-native'
 import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
-import DollarEducation from 'src/account/DollarEducation'
+import AccountKeyEducation from 'src/account/AccountKeyEducation'
 import { createMockStore } from 'test/utils'
 
-describe('DollarEducation', () => {
+describe('AccountKeyEducation', () => {
   it('renders correctly', () => {
     const tree = renderer.create(
       <Provider store={createMockStore({})}>
-        <DollarEducation />
+        <AccountKeyEducation />
       </Provider>
     )
     expect(tree).toMatchSnapshot()

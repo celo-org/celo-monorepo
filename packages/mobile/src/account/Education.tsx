@@ -1,32 +1,38 @@
 import Button, { BtnTypes } from '@celo/react-components/components/Button.v2'
+import BackChevron from '@celo/react-components/icons/BackChevron.v2'
+import Times from '@celo/react-components/icons/Times'
+import colors from '@celo/react-components/styles/colors'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import progressDots from '@celo/react-components/styles/progressDots'
 import * as React from 'react'
-import { Image, StyleSheet, Text, View } from 'react-native'
+import { Image, ImageSourcePropType, StyleSheet, Text, View } from 'react-native'
+import SafeAreaView from 'react-native-safe-area-view'
 import Swiper from 'react-native-swiper'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { placeholder } from 'src/images/Images'
-
-export const CTA_CIRCLE_SIZE = 5
+import { navigateBack } from 'src/navigator/NavigationService'
+import { TopBarIconButton } from 'src/navigator/TopBarButton.v2'
 
 interface State {
   step: number
 }
 
 interface EducationStep {
-  image: any
-  title?: string
+  image: ImageSourcePropType | null
+  title: string
   text: string
   cancelEvent: CustomEventNames
+  progressEvent: CustomEventNames
   screenName: string
 }
 
 interface Props {
   stepInfo: EducationStep[]
   buttonText: string
+  finalButtonText: string
   onFinish: () => void
-  lastStepButtonType?: BtnTypes
+  finalButtonType?: BtnTypes
 }
 
 export default class Education extends React.Component<Props, State> {
@@ -43,7 +49,11 @@ export default class Education extends React.Component<Props, State> {
         screen: currentStepInfo.screenName,
       })
     }
-    this.swiper?.current?.scrollBy(-1, true)
+    if (this.state.step === 0) {
+      navigateBack()
+    } else {
+      this.swiper?.current?.scrollBy(-1, true)
+    }
   }
 
   setStep = (step: number) => {
@@ -51,44 +61,57 @@ export default class Education extends React.Component<Props, State> {
   }
 
   nextStep = () => {
+    const currentStepInfo = this.props.stepInfo[this.state.step]
+    CeloAnalytics.track(currentStepInfo.progressEvent)
     this.swiper?.current?.scrollBy(1, true)
   }
 
   render() {
-    const { stepInfo, onFinish, buttonText, lastStepButtonType } = this.props
+    const { stepInfo, onFinish, buttonText, finalButtonType, finalButtonText } = this.props
 
     const isLastStep = this.state.step === stepInfo.length - 1
     return (
-      <View style={style.container}>
-        <Swiper
-          ref={this.swiper}
-          onIndexChanged={this.setStep}
-          loop={false}
-          dotStyle={progressDots.circlePassive}
-          activeDotStyle={progressDots.circleActive}
-        >
-          {stepInfo.map((step: EducationStep, i: number) => {
-            const imgSrc = step.image ? step.image : placeholder
-            return (
-              <View style={style.swipedContent} key={i}>
-                <Image source={imgSrc} style={style.bodyImage} resizeMode="contain" />
-                <Text style={style.heading}>{step.title}</Text>
-                <Text style={style.bodyText}>{step.text}</Text>
-              </View>
-            )
-          })}
-        </Swiper>
-        <Button
-          onPress={isLastStep ? onFinish : this.nextStep}
-          text={isLastStep ? buttonText : 'next'}
-          type={lastStepButtonType ? lastStepButtonType : BtnTypes.SECONDARY}
-        />
-      </View>
+      <SafeAreaView style={styles.root}>
+        <View style={styles.top}>
+          <TopBarIconButton
+            onPress={this.goBack}
+            icon={this.state.step === 0 ? <Times /> : <BackChevron color={colors.dark} />}
+          />
+        </View>
+        <View style={styles.container}>
+          <Swiper
+            ref={this.swiper}
+            onIndexChanged={this.setStep}
+            loop={false}
+            dotStyle={progressDots.circlePassive}
+            activeDotStyle={progressDots.circleActive}
+          >
+            {stepInfo.map((step: EducationStep, i: number) => {
+              const imgSrc = step.image ? step.image : placeholder
+              return (
+                <View style={styles.swipedContent} key={i}>
+                  <Image source={imgSrc} style={styles.bodyImage} resizeMode="contain" />
+                  <Text style={styles.heading}>{step.title}</Text>
+                  <Text style={styles.bodyText}>{step.text}</Text>
+                </View>
+              )
+            })}
+          </Swiper>
+          <Button
+            onPress={isLastStep ? onFinish : this.nextStep}
+            text={isLastStep ? finalButtonText : buttonText}
+            type={isLastStep && finalButtonType ? finalButtonType : BtnTypes.SECONDARY}
+          />
+        </View>
+      </SafeAreaView>
     )
   }
 }
 
-const style = StyleSheet.create({
+const styles = StyleSheet.create({
+  root: {
+    flex: 1,
+  },
   container: {
     flex: 1,
     alignItems: 'center',
@@ -116,5 +139,11 @@ const style = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: 24,
     paddingHorizontal: 24,
+  },
+  top: {
+    paddingLeft: 24,
+    paddingVertical: 16,
+    flexDirection: 'row',
+    width: '100%',
   },
 })
