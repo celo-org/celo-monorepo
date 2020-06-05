@@ -66,9 +66,11 @@ import { navigate, navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { TopBarIconButton, TopBarTextButton } from 'src/navigator/TopBarButton.v2'
 import { StackParamList } from 'src/navigator/types'
+import ImportContactsScreen from 'src/onboarding/contacts/ImportContactsScreen'
 import IncomingPaymentRequestListScreen from 'src/paymentRequest/IncomingPaymentRequestListScreen'
 import OutgoingPaymentRequestListScreen from 'src/paymentRequest/OutgoingPaymentRequestListScreen'
 import PaymentRequestConfirmation from 'src/paymentRequest/PaymentRequestConfirmation'
+import PaymentRequestUnavailable from 'src/paymentRequest/PaymentRequestUnavailable'
 import PincodeEducation from 'src/pincode/PincodeEducation'
 import PincodeEnter from 'src/pincode/PincodeEnter'
 import PincodeSet from 'src/pincode/PincodeSet'
@@ -186,6 +188,11 @@ const nuxScreens = (Navigator: typeof Stack) => (
       component={ImportWalletEmpty}
       options={nuxNavigationOptions}
     />
+    <Navigator.Screen
+      name={Screens.ImportContacts}
+      component={ImportContactsScreen}
+      options={nuxNavigationOptions}
+    />
   </>
 )
 
@@ -239,6 +246,18 @@ const emptyWithBackButtonHeaderOption = () => ({
   headerLeft: () => <BackButton />,
 })
 
+const navigateHome = () => navigate(Screens.WalletHome)
+
+const paymentRequestUnavailableScreenOptions = ({
+  route,
+}: {
+  route: RouteProp<StackParamList, Screens.PaymentRequestUnavailable>
+}) => ({
+  ...emptyHeader,
+  headerLeft: () => <TopBarIconButton icon={<Times />} onPress={navigateHome} />,
+  headerLeftContainerStyle: { paddingLeft: 20 },
+})
+
 const sendScreens = (Navigator: typeof Stack) => (
   <>
     <Navigator.Screen name={Screens.Send} component={Send} options={sendScreenOptions} />
@@ -265,24 +284,34 @@ const sendScreens = (Navigator: typeof Stack) => (
       options={emptyWithBackButtonHeaderOption}
     />
     <Navigator.Screen
+      name={Screens.PaymentRequestUnavailable}
+      component={PaymentRequestUnavailable}
+      options={paymentRequestUnavailableScreenOptions}
+    />
+    <Navigator.Screen
       name={Screens.PaymentRequestConfirmation}
       component={PaymentRequestConfirmation}
+      options={emptyWithBackButtonHeaderOption}
     />
     <Navigator.Screen
       name={Screens.IncomingPaymentRequestListScreen}
       component={IncomingPaymentRequestListScreen}
+      options={emptyWithBackButtonHeaderOption}
     />
     <Navigator.Screen
       name={Screens.OutgoingPaymentRequestListScreen}
       component={OutgoingPaymentRequestListScreen}
+      options={emptyWithBackButtonHeaderOption}
     />
     <Navigator.Screen
       name={Screens.EscrowedPaymentListScreen}
       component={EscrowedPaymentListScreen}
+      options={emptyWithBackButtonHeaderOption}
     />
     <Navigator.Screen
       name={Screens.ReclaimPaymentConfirmationScreen}
       component={ReclaimPaymentConfirmationScreen}
+      options={emptyWithBackButtonHeaderOption}
     />
   </>
 )
