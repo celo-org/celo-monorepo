@@ -3,7 +3,6 @@
   "dollarsSent": "{{Dollars}} Sent",
   "to": "To",
   "send": "Send",
-  "request": "Request",
   "payment": "Payment",
   "sendOrRequest": "Send or Request",
   "recent": "Recent",
@@ -15,13 +14,18 @@
   "amount": "Amount",
   "celoDollarAmount": "<0></0> {{CeloDollar}}",
   "celoDollarAmount_plural": "<0></0> {{CeloDollars}}",
-  "groceriesRent": "Groceries, rent, etc. (Optional)",
+  "addDescription": "Add description",
+  "sentTo": "Sent To",
+  "receivedFrom": "Received From",
+  "accountNumberLabel": "Account\nNo.",
+  "commentLabel": "Message",
+  "amountSent": "Amount Sent",
   "fee": "Fee",
   "securityFee": "Security Fee",
   "inviteFee": "Invitation Fee",
   "feeEducation": "Sending payments and making exchanges include a small fee for service security and maintenance.",
   "learnMore": "Learn More",
-  "inviteMoneyEscrow": "We’ll keep this money safe until your friend creates a Celo account",
+  "inviteMoneyEscrow": "We’ll invite this contact and keep their funds safe until they verifiy their account.",
   "reviewPayment": "Review Payment",
   "requestPayment": "Request Payment",
   "continue": "Continue",
@@ -58,7 +62,6 @@
   "cameraSettings": "Settings",
   "showYourQRCode": "Show your QR code",
   "toSentOrRequestPayment": "to send or request payment",
-  "requestSent": "Request Sent",
   "reminderSent": "Reminder Sent",
   "reclaimPayment": "Reclaim Payment",
   "totalRefunded": "Total Refunded",
@@ -84,25 +87,33 @@
   },
   "confirmAccount": {
     "header": "Please confirm {{displayName}}'s account",
+    "headerNoDisplayName": "Please confirm your contact's account",
     "button": "Confirm Account Number"
   },
   "secureSendExplanation": {
-    "body1": "{{e164Number}} has multiple accounts associated with it. {{displayName}} could have created a new Celo account, or may have lost their phone or had their account compromised.",
-    "body2": "Before transacting, you must confirm {{displayName}}'s account. You can do this by scanning their QR code or confirming their account number with them."
+    "body1": "{{e164PhoneNumber}} has multiple accounts associated with it. {{displayName}} could have created a new Celo account, or may have lost their phone or had their account compromised.",
+    "body1NoDisplayName": "Your contact has multiple accounts associated with it. Your contact could have created a new Celo account, or may have lost their phone or had their account compromised.",
+    "body2": "You must scan their QR code or confirm their account number before transacting."
   },
   "confirmAccountNumber": {
     "title": "Confirm Account Number",
-    "body1Partial": "Please ask {{displayName}} for the last four digits of their account number and enter it below.",
-    "body1Full": "Please ask {{displayName}} for their account number and enter it below.",
-    "body2Partial": "For security, please do not use text messaging (SMS). We strongly recommend asking in person or over the phone.",
-    "body2Full": "For security, please do not use text messaging (SMS). We strongly recommend asking in person or over the phone, through WhatsApp or Messenger, or by email.",
-    "help": "Help {{displayName}} find their account number"
+    "bodyPartial": "Please ask {{displayName}} for the last four digits of their account number. It's safest to do this in person or by phone.",
+    "bodyPartialNoDisplayName": "Please ask your contact for the last four digits of their account number. It's safest to do this in person or by phone.",
+    "body1Full": "Please ask {{displayName}} for their account number.",
+    "body1FullNoDisplayName": "Please ask your contact for their account number.",
+    "body2Full": "We strongly recommend asking in person or over the phone, through WhatsApp or Messenger, or by email. For security, please do not use text messaging (SMS).",
+    "help": "Help locating an account number",
+    "submit": "Submit"
   },
-  "accountInputHeaderA": "LAST 4 DIGITS OF ACCOUNT NUMBER",
-  "accountInputHeaderB": "ACCOUNT NUMBER",
+  "accountInputHeaderPartial": "Last 4 Digits",
+  "accountInputHeaderFull": "Account Number",
   "helpModal": {
-    "header": "Find your contact's account number",
-    "body1": "Your contact can find their account number (also known as an address) at the top of the Settings menu.",
-    "body2": "Account numbers begin with “0x” and are 42 characters long. They appear directly beneath the profile photo."
-  }
+    "header": "Locating an Account Number",
+    "body1": "Account numbers (also known as addresses) are located in the menu. From the Home screen, open the menu by tapping the icon in the top left corner.",
+    "body2": "The account number is near the bottom of the menu.",
+    "body3": "Account numbers begin with \"0x\" and are 42 characters long"
+  },
+  "transferAddressChanged": "This contact changed their account number since the transaction. This payment was sent to:",
+  "addressConfirmed": "Account number confirmed",
+  "sending": "Sending"
 }

@@ -1,10 +1,10 @@
 import * as React from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { ROUTE_TO_TITLE } from 'src/experience/brandkit/common/Page'
+import scrollToHash from 'src/experience/common/scrollToHash'
 import Sidebar, { Page } from 'src/experience/common/Sidebar'
 import Triangle, { Direction } from 'src/shared/Triangle'
 import { colors, fonts, standardStyles } from 'src/styles'
-import scrollToHash from './scrollToHash'
 interface Props {
   pages: Page[]
   pathname: string

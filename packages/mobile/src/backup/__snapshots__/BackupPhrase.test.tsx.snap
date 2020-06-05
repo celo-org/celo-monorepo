@@ -245,3 +245,77 @@ exports[`renders correctly with backup not completed 1`] = `
   </View>
 </SafeAreaView>
 `;
+
+exports[`still renders when mneumonic doesnt show up 1`] = `
+<SafeAreaView
+  style={
+    Object {
+      "backgroundColor": "#FFFFFF",
+      "flex": 1,
+      "justifyContent": "space-between",
+      "padding": 16,
+    }
+  }
+>
+  <RCTScrollView
+    contentContainerStyle={
+      Object {
+        "flexGrow": 1,
+        "paddingBottom": 16,
+      }
+    }
+  >
+    <View>
+      <View>
+        <View
+          style={
+            Object {
+              "flexDirection": "row",
+              "justifyContent": "space-between",
+              "paddingHorizontal": 2,
+            }
+          }
+        >
+          <Text
+            style={
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Inter-Medium",
+                "fontSize": 16,
+                "lineHeight": 22,
+              }
+            }
+          >
+            backupKey
+          </Text>
+        </View>
+        <View
+          style={
+            Object {
+              "alignContent": "center",
+              "backgroundColor": "#FFF9EE",
+              "borderRadius": 4,
+              "justifyContent": "center",
+              "marginTop": 16,
+              "padding": 16,
+            }
+          }
+        />
+      </View>
+      <Text
+        style={
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Inter-Regular",
+            "fontSize": 16,
+            "lineHeight": 22,
+            "marginTop": 16,
+          }
+        }
+      >
+        backupKeySummary
+      </Text>
+    </View>
+  </RCTScrollView>
+</SafeAreaView>
+`;

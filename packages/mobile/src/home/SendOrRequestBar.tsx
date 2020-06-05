@@ -14,13 +14,11 @@ export default function SendOrRequestBar() {
   const { t } = useTranslation(Namespaces.sendFlow7)
 
   const onPressSend = useCallback(() => {
-    // TODO: use new send flow
-    navigate(Screens.Send)
+    navigate(Screens.Send, { isRequest: false })
   }, [])
 
   const onPressRequest = useCallback(() => {
-    // TODO: use new request flow
-    navigate(Screens.Send)
+    navigate(Screens.Send, { isRequest: true })
   }, [])
 
   const onPressQrCode = useCallback(() => {
@@ -33,7 +31,7 @@ export default function SendOrRequestBar() {
       <Button
         style={[styles.button, styles.requestButton]}
         size={BtnSizes.SMALL}
-        text={t('request')}
+        text={t('paymentRequestFlow:request')}
         onPress={onPressRequest}
       />
       <Touchable borderless={true} onPress={onPressQrCode}>

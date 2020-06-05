@@ -31,7 +31,7 @@ spec:
           set -euo pipefail
           NAT_FLAG=""
           [[ "$IP_ADDRESS" != "none" ]] && NAT_FLAG="--nat=extip:$IP_ADDRESS"
-          /usr/local/bin/bootnode --nodekey=/etc/bootnode/node.key --verbosity=5 ${NAT_FLAG} --networkid=${NETWORK_ID} --ping-ip-from-packet={{ .Values.geth.ping_ip_from_packet }}
+          exec /usr/local/bin/bootnode --nodekey=/etc/bootnode/node.key --verbosity=5 ${NAT_FLAG} --networkid=${NETWORK_ID} --ping-ip-from-packet={{ .Values.geth.ping_ip_from_packet }}
         env:
         - name: IP_ADDRESS
           value: {{ default "none" .Values.geth.bootnodeIpAddress }}

@@ -1,9 +1,10 @@
 import { expectSaga } from 'redux-saga-test-plan'
 import { select } from 'redux-saga/effects'
+import { showErrorInline } from 'src/alert/actions'
+import { ErrorMessages } from 'src/app/ErrorMessages'
 import {
   Actions,
   ValidateRecipientAddressAction,
-  validateRecipientAddressFailure,
   validateRecipientAddressSuccess,
 } from 'src/identity/actions'
 import { AddressValidationType, e164NumberToAddressSelector } from 'src/identity/reducer'
@@ -11,6 +12,7 @@ import { watchValidateRecipientAddress } from 'src/identity/saga'
 import { currentAccountSelector } from 'src/web3/selectors'
 import {
   mockAccount,
+  mockAccount2,
   mockAccountInvite,
   mockE164NumberInvite,
   mockE164NumberToAddress,
@@ -29,7 +31,7 @@ describe(watchValidateRecipientAddress, () => {
   it('full validation fails if the inputted address does not belong to the recipient', async () => {
     const validateAction: ValidateRecipientAddressAction = {
       type: Actions.VALIDATE_RECIPIENT_ADDRESS,
-      userInputOfFullAddressOrLastFourDigits: mockAccount,
+      userInputOfFullAddressOrLastFourDigits: mockAccount2,
       addressValidationType: AddressValidationType.FULL,
       recipient: mockInvitableRecipient2,
     }
@@ -40,7 +42,7 @@ describe(watchValidateRecipientAddress, () => {
         [select(e164NumberToAddressSelector), mockE164NumberToAddress],
       ])
       .dispatch(validateAction)
-      .put(validateRecipientAddressFailure())
+      .put(showErrorInline(ErrorMessages.ADDRESS_VALIDATION_NO_MATCH))
       .run()
   })
 
@@ -65,7 +67,7 @@ describe(watchValidateRecipientAddress, () => {
   it('partial validation fails if the inputted address does not belong to the recipient', async () => {
     const validateAction: ValidateRecipientAddressAction = {
       type: Actions.VALIDATE_RECIPIENT_ADDRESS,
-      userInputOfFullAddressOrLastFourDigits: mockAccount.slice(-4),
+      userInputOfFullAddressOrLastFourDigits: mockAccount2.slice(-4),
       addressValidationType: AddressValidationType.PARTIAL,
       recipient: mockInvitableRecipient2,
     }
@@ -76,7 +78,7 @@ describe(watchValidateRecipientAddress, () => {
         [select(e164NumberToAddressSelector), mockE164NumberToAddress],
       ])
       .dispatch(validateAction)
-      .put(validateRecipientAddressFailure())
+      .put(showErrorInline(ErrorMessages.ADDRESS_VALIDATION_NO_MATCH))
       .run()
   })
 

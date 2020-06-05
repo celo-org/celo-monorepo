@@ -160,16 +160,20 @@ exports[`ignores failed standby transactions 1`] = `
                 <Image
                   source={
                     Object {
-                      "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
+                      "testUri": "../../../packages/react-components/images/unknown-user-icon.png",
                     }
                   }
                   style={
-                    Object {
-                      "alignItems": "center",
-                      "height": 40,
-                      "justifyContent": "center",
-                      "width": 40,
-                    }
+                    Array [
+                      Object {
+                        "alignSelf": "center",
+                        "margin": "auto",
+                      },
+                      Object {
+                        "height": 40,
+                        "width": 40,
+                      },
+                    ]
                   }
                 />
               </View>
@@ -388,7 +392,7 @@ exports[`ignores failed standby transactions 1`] = `
 </RCTScrollView>
 `;
 
-exports[`ignores pending standby transactions that are completed in the response and removes them 1`] = `
+exports[`ignores pending standby transactions that are completed in the response 1`] = `
 <RCTScrollView
   data={
     Array [
@@ -548,16 +552,20 @@ exports[`ignores pending standby transactions that are completed in the response
                 <Image
                   source={
                     Object {
-                      "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
+                      "testUri": "../../../packages/react-components/images/unknown-user-icon.png",
                     }
                   }
                   style={
-                    Object {
-                      "alignItems": "center",
-                      "height": 40,
-                      "justifyContent": "center",
-                      "width": 40,
-                    }
+                    Array [
+                      Object {
+                        "alignSelf": "center",
+                        "margin": "auto",
+                      },
+                      Object {
+                        "height": 40,
+                        "width": 40,
+                      },
+                    ]
                   }
                 />
               </View>
@@ -1022,16 +1030,20 @@ exports[`renders the received data along with the standby transactions 1`] = `
                 <Image
                   source={
                     Object {
-                      "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
+                      "testUri": "../../../packages/react-components/images/unknown-user-icon.png",
                     }
                   }
                   style={
-                    Object {
-                      "alignItems": "center",
-                      "height": 40,
-                      "justifyContent": "center",
-                      "width": 40,
-                    }
+                    Array [
+                      Object {
+                        "alignSelf": "center",
+                        "margin": "auto",
+                      },
+                      Object {
+                        "height": 40,
+                        "width": 40,
+                      },
+                    ]
                   }
                 />
               </View>
@@ -1428,16 +1440,20 @@ exports[`renders the received data along with the standby transactions 1`] = `
                 <Image
                   source={
                     Object {
-                      "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
+                      "testUri": "../../../packages/react-components/images/unknown-user-icon.png",
                     }
                   }
                   style={
-                    Object {
-                      "alignItems": "center",
-                      "height": 40,
-                      "justifyContent": "center",
-                      "width": 40,
-                    }
+                    Array [
+                      Object {
+                        "alignSelf": "center",
+                        "margin": "auto",
+                      },
+                      Object {
+                        "height": 40,
+                        "width": 40,
+                      },
+                    ]
                   }
                 />
               </View>

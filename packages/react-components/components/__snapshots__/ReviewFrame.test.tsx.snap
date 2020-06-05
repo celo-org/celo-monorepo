@@ -7,7 +7,6 @@ exports[`ReviewFrame renders correctly 1`] = `
       Object {
         "backgroundColor": "#FFFFFF",
         "flex": 1,
-        "justifyContent": "space-between",
       },
       undefined,
     ]
@@ -16,7 +15,6 @@ exports[`ReviewFrame renders correctly 1`] = `
   <RCTScrollView
     contentContainerStyle={
       Object {
-        "justifyContent": "flex-start",
         "paddingVertical": 10,
       }
     }
@@ -26,7 +24,6 @@ exports[`ReviewFrame renders correctly 1`] = `
         style={
           Object {
             "marginHorizontal": 16,
-            "marginVertical": 20,
           }
         }
       />
