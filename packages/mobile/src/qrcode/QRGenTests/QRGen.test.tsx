@@ -21,13 +21,13 @@ describe('QRCode', () => {
         svgRef={{ current: null }}
       />
     )
-    expect(onErrorMock.mock.calls.length).toBe(2)
+    expect(onErrorMock).toBeCalledTimes(1)
   })
 
   it('does not call onError in case if value is fine', () => {
     const onErrorMock = jest.fn()
     renderer.create(<QRCode value="123" onError={onErrorMock} svgRef={{ current: null }} />)
-    expect(onErrorMock.mock.calls.length).toBe(0)
+    expect(onErrorMock).not.toHaveBeenCalled()
   })
 })
 
