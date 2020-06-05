@@ -138,8 +138,8 @@ class BackupPhrase extends React.Component<Props, State> {
 function HeaderRight() {
   const { t } = useTranslation(Namespaces.backupKeyFlow6)
   const onMoreInfoPressed = () => {
-    // TODO: Implement this
     CeloAnalytics.track(CustomEventNames.backup_setup_info)
+    navigate(Screens.AccountKeyEducation)
   }
   return <TopBarTextButton onPress={onMoreInfoPressed} title={t('moreInfo')} />
 }

@@ -20,6 +20,7 @@ export default function AccountKeyEducation() {
 
   return (
     <Education
+      isClosable={true}
       stepInfo={steps}
       onFinish={onComplete}
       finalButtonText={t('completeEducation')}

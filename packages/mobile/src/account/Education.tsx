@@ -28,6 +28,7 @@ interface EducationStep {
 }
 
 interface Props {
+  isClosable: boolean
   stepInfo: EducationStep[]
   buttonText: string
   finalButtonText: string
@@ -67,16 +68,25 @@ export default class Education extends React.Component<Props, State> {
   }
 
   render() {
-    const { stepInfo, onFinish, buttonText, finalButtonType, finalButtonText } = this.props
+    const {
+      stepInfo,
+      onFinish,
+      buttonText,
+      finalButtonType,
+      finalButtonText,
+      isClosable,
+    } = this.props
 
     const isLastStep = this.state.step === stepInfo.length - 1
     return (
       <SafeAreaView style={styles.root}>
         <View style={styles.top}>
-          <TopBarIconButton
-            onPress={this.goBack}
-            icon={this.state.step === 0 ? <Times /> : <BackChevron color={colors.dark} />}
-          />
+          {isClosable && (
+            <TopBarIconButton
+              onPress={this.goBack}
+              icon={this.state.step === 0 ? <Times /> : <BackChevron color={colors.dark} />}
+            />
+          )}
         </View>
         <View style={styles.container}>
           <Swiper

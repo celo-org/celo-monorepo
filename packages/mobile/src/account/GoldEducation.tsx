@@ -1,34 +1,45 @@
 import { BtnTypes } from '@celo/react-components/components/Button.v2'
+import { navigate } from '@react-navigation/compat/lib/typescript/src/NavigationActions'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import Education from 'src/account/Education'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { setEducationCompleted } from 'src/goldToken/actions'
 import { Namespaces } from 'src/i18n'
 import { exchangeIcon, goldValue, shinyGold } from 'src/images/Images'
-import { navigate } from 'src/navigator/NavigationService'
+import { navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { RootState } from 'src/redux/reducers'
 
-interface DispatchProps {
-  setEducationCompleted: typeof setEducationCompleted
-}
-type Props = DispatchProps
-
-export default function GoldEducation(props: Props) {
+export default function GoldEducation() {
   const { t } = useTranslation(Namespaces.global)
+
   const dispatch = useDispatch()
+
+  const isCeloEducationComplete = useSelector<RootState, boolean>(
+    (state) => state.goldToken.educationCompleted
+  )
+
   const goToExchange = React.useCallback(() => {
-    dispatch(props.setEducationCompleted())
     CeloAnalytics.track(CustomEventNames.exchange_gold_nux)
-    navigate(Screens.ExchangeHomeScreen)
-  }, [props.setEducationCompleted])
+
+    // TODO should Education.Guides just be full screen modals? it would solve the issue that by design they should pop up and the issue of navigation.
+    if (isCeloEducationComplete) {
+      navigateBack()
+    } else {
+      navigate(Screens.ExchangeTradeScreen)
+    }
+
+    dispatch(setEducationCompleted())
+  }, [])
 
   const stepInfo = useStep()
 
   return (
     <Education
+      isClosable={isCeloEducationComplete}
       stepInfo={stepInfo}
       onFinish={goToExchange}
       finalButtonType={BtnTypes.TERTIARY}
