@@ -261,7 +261,7 @@ exports[`ExchangeTradeScreen renders correctly 1`] = `
             }
           }
         >
-          undefined:review
+          global:review
         </Text>
       </View>
     </View>

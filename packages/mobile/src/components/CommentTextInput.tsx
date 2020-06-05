@@ -1,12 +1,12 @@
 import colors from '@celo/react-components/styles/colors.v2'
+import fontStyles from '@celo/react-components/styles/fonts.v2'
 import * as React from 'react'
 import {
   Keyboard,
   NativeSyntheticEvent,
-  StyleProp,
+  StyleSheet,
   TextInput,
   TextInputKeyPressEventData,
-  TextStyle,
 } from 'react-native'
 import { MAX_COMMENT_LENGTH } from 'src/config'
 import i18n, { Namespaces } from 'src/i18n'
@@ -14,18 +14,11 @@ import i18n, { Namespaces } from 'src/i18n'
 interface Props {
   testID?: string
   comment: string
-  style: StyleProp<TextStyle>
   onCommentChange: (comment: string) => void
   onBlur: () => void
 }
 
-export default function CommentTextInput({
-  testID,
-  onCommentChange,
-  comment,
-  onBlur,
-  style,
-}: Props) {
+export default function CommentTextInput({ testID, onCommentChange, comment, onBlur }: Props) {
   const onKeyPress = (e: NativeSyntheticEvent<TextInputKeyPressEventData>) => {
     if (e.nativeEvent.key === 'Enter') {
       Keyboard.dismiss()
@@ -35,7 +28,7 @@ export default function CommentTextInput({
   return (
     <TextInput
       testID={`commentInput/${testID}`}
-      style={style}
+      style={styles.inputContainer}
       autoFocus={true}
       multiline={true}
       numberOfLines={5}
@@ -50,3 +43,14 @@ export default function CommentTextInput({
     />
   )
 }
+
+const styles = StyleSheet.create({
+  inputContainer: {
+    flex: 1,
+    // Fixed height to increase surface area for input
+    // to focus on press
+    height: 200,
+    alignSelf: 'stretch',
+    ...fontStyles.large,
+  },
+})
