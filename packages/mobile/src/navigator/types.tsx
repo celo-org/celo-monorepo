@@ -11,8 +11,8 @@ import { TransferConfirmationCardProps } from 'src/transactions/TransferConfirma
 
 // Typed nested navigator params
 type NestedNavigatorParams<ParamList> = {
-  [K in keyof ParamList]: ParamList[K] extends undefined
-    ? { screen: K; params?: undefined }
+  [K in keyof ParamList]: undefined extends ParamList[K]
+    ? { screen: K; params?: ParamList[K] }
     : { screen: K; params: ParamList[K] }
 }[keyof ParamList]
 
