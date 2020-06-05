@@ -221,6 +221,7 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
         role="list"
         style={
           Object {
+            "listStyle": "disc",
             "marginTop": "20px",
             "paddingLeft": "20px",
           }
@@ -425,6 +426,7 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
             style={
               Object {
                 "display": "inline-flex",
+                "listStyle": "disc",
                 "marginTop": "20px",
                 "paddingLeft": "20px",
               }
@@ -495,6 +497,7 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
             style={
               Object {
                 "display": "inline-flex",
+                "listStyle": "disc",
                 "marginTop": "20px",
                 "paddingLeft": "20px",
               }
@@ -717,6 +720,7 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
             style={
               Object {
                 "display": "inline-flex",
+                "listStyle": "disc",
                 "marginTop": "20px",
                 "paddingLeft": "20px",
               }
@@ -922,6 +926,7 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
             style={
               Object {
                 "display": "inline-flex",
+                "listStyle": "disc",
                 "marginTop": "20px",
                 "paddingLeft": "20px",
               }
@@ -972,6 +977,7 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
             style={
               Object {
                 "display": "inline-flex",
+                "listStyle": "disc",
                 "marginTop": "20px",
                 "paddingLeft": "20px",
               }
@@ -1174,6 +1180,7 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
             style={
               Object {
                 "display": "inline-flex",
+                "listStyle": "disc",
                 "marginTop": "20px",
                 "paddingLeft": "20px",
               }
@@ -1300,6 +1307,7 @@ YOUR PARTICIPATION IN TGCSO IS ENTIRELY VOLUNTARY, BUT IF YOU ARE PARTICIPATING 
             style={
               Object {
                 "display": "inline-flex",
+                "listStyle": "disc",
                 "marginTop": "20px",
                 "paddingLeft": "20px",
               }
