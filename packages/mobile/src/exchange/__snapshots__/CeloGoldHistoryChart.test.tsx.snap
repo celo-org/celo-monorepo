@@ -61,7 +61,7 @@ exports[`renders properly 1`] = `
         </g>
         <text
           fill="#9CA4A9"
-          fontFamily="Hind-Regular"
+          fontFamily="Inter-Regular"
           fontSize="14"
           onLayout={[Function]}
           textAnchor="middle"
@@ -80,7 +80,7 @@ exports[`renders properly 1`] = `
         </g>
         <text
           fill="#9CA4A9"
-          fontFamily="Hind-Regular"
+          fontFamily="Inter-Regular"
           fontSize="14"
           onLayout={[Function]}
           textAnchor="middle"
@@ -245,7 +245,7 @@ exports[`renders while update is in progress 1`] = `
         </g>
         <text
           fill="#9CA4A9"
-          fontFamily="Hind-Regular"
+          fontFamily="Inter-Regular"
           fontSize="14"
           onLayout={[Function]}
           textAnchor="middle"
@@ -264,7 +264,7 @@ exports[`renders while update is in progress 1`] = `
         </g>
         <text
           fill="#9CA4A9"
-          fontFamily="Hind-Regular"
+          fontFamily="Inter-Regular"
           fontSize="14"
           onLayout={[Function]}
           textAnchor="middle"
@@ -373,7 +373,7 @@ exports[`renders without history 1`] = `
   style={
     Object {
       "alignItems": "center",
-      "height": 215,
+      "height": 217.5,
       "justifyContent": "center",
       "width": 750,
     }

@@ -78,7 +78,7 @@ function ChartAwareSvgText({
       onLayout={onLayout}
       fill={colors.gray4}
       fontSize="14"
-      fontFamily="Hind-Regular"
+      fontFamily="Inter-Regular"
       x={adjustedX}
       y={y}
       textAnchor="middle"
