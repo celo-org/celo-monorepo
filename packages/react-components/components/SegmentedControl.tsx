@@ -66,22 +66,6 @@ export default function SegmentedControl({ position, values, selectedIndex = 0, 
           ]}
         />
       )}
-      {values.map((value, index) => {
-        const isFocused = index === selectedIndex
-        const onPress = () => handleChange(index)
-        return (
-          <Touchable
-            key={value}
-            accessibilityRole="button"
-            accessibilityStates={isFocused ? ['selected'] : []}
-            accessibilityLabel={value}
-            onPress={onPress}
-            style={styles.value}
-          >
-            <View />
-          </Touchable>
-        )
-      })}
       <MaskedView
         pointerEvents="none"
         style={StyleSheet.absoluteFillObject}
@@ -112,6 +96,22 @@ export default function SegmentedControl({ position, values, selectedIndex = 0, 
           />
         )}
       </MaskedView>
+      {values.map((value, index) => {
+        const isFocused = index === selectedIndex
+        const onPress = () => handleChange(index)
+        return (
+          <Touchable
+            key={value}
+            accessibilityRole="button"
+            accessibilityStates={isFocused ? ['selected'] : []}
+            accessibilityLabel={value}
+            onPress={onPress}
+            style={styles.value}
+          >
+            <View />
+          </Touchable>
+        )
+      })}
     </Animated.View>
   )
 }
