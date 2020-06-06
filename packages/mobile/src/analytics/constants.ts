@@ -24,7 +24,6 @@ export enum CustomEventNames {
   send_input = 'send_input',
   transaction_details = 'transaction_details',
   send_select_cancel = 'send_select_cancel',
-  edit_dollar_confirm = 'edit_dollar_confirm',
   send_invite_details = 'send_invite_details',
   send_invite = 'send_invite',
   edit_send_invite = 'edit_send_invite',

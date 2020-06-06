@@ -85,7 +85,11 @@ export class ValidateRecipientAccount extends React.Component<Props, State> {
       if (isPaymentRequest) {
         navigate(Screens.PaymentRequestConfirmation, { transactionData })
       } else {
-        navigate(Screens.SendConfirmation, { transactionData, addressJustValidated: true })
+        navigate(Screens.SendConfirmation, {
+          transactionData,
+          addressJustValidated: true,
+          isFromScan: this.props.route.params?.isFromScan,
+        })
       }
     }
   }

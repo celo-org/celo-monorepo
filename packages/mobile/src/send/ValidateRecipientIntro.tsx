@@ -55,6 +55,7 @@ class ValidateRecipientIntro extends React.Component<Props> {
       transactionData,
       addressValidationType,
       isPaymentRequest,
+      isFromScan: this.props.route.params?.isFromScan,
     })
   }
 

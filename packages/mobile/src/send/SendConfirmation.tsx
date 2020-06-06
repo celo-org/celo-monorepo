@@ -33,7 +33,10 @@ import { AddressValidationType } from 'src/identity/reducer'
 import { getAddressValidationType, getSecureSendAddress } from 'src/identity/secureSend'
 import { InviteBy } from 'src/invite/actions'
 import { getInvitationVerificationFeeInDollars } from 'src/invite/saga'
-import { navigate, navigateBack } from 'src/navigator/NavigationService'
+import { LocalCurrencyCode } from 'src/localCurrency/consts'
+import { convertDollarsToLocalAmount } from 'src/localCurrency/convert'
+import { getLocalCurrencyCode, getLocalCurrencyExchangeRate } from 'src/localCurrency/selectors'
+import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 import { getDisplayName, getRecipientThumbnail } from 'src/recipients/recipient'
@@ -58,6 +61,8 @@ interface StateProps {
   addressValidationType: AddressValidationType
   validatedRecipientAddress?: string
   addressJustValidated?: boolean
+  localCurrencyCode: LocalCurrencyCode
+  localCurrencyExchangeRate?: string | null
 }
 
 interface DispatchProps {
@@ -97,6 +102,8 @@ const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
   const addressValidationType = getAddressValidationType(recipient, secureSendPhoneNumberMapping)
   // Undefined or null means no addresses ever validated through secure send
   const validatedRecipientAddress = getSecureSendAddress(recipient, secureSendPhoneNumberMapping)
+  const localCurrencyCode = getLocalCurrencyCode(state)
+  const localCurrencyExchangeRate = getLocalCurrencyExchangeRate(state)
 
   return {
     account: currentAccountSelector(state),
@@ -109,6 +116,8 @@ const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
     addressValidationType,
     validatedRecipientAddress,
     addressJustValidated,
+    localCurrencyCode,
+    localCurrencyExchangeRate,
   }
 }
 
@@ -148,6 +157,18 @@ export class SendConfirmation extends React.Component<Props, State> {
 
     const timestamp = Date.now()
 
+    CeloAnalytics.track(CustomEventNames.send_confirm, {
+      method: this.props.route.params?.isFromScan ? 'scan' : 'search',
+      localCurrencyExchangeRate: this.props.localCurrencyExchangeRate,
+      localCurrency: this.props.localCurrencyCode,
+      dollarAmount: amount,
+      localCurrencyAmount: convertDollarsToLocalAmount(
+        amount,
+        this.props.localCurrencyExchangeRate
+      ),
+      isInvite: !recipientAddress,
+    })
+
     this.props.sendPaymentOrInvite(
       amount,
       timestamp,
@@ -165,20 +186,6 @@ export class SendConfirmation extends React.Component<Props, State> {
       transactionData,
       addressValidationType,
     })
-  }
-
-  onEditClick = () => {
-    CeloAnalytics.track(CustomEventNames.edit_dollar_confirm)
-    navigateBack()
-  }
-
-  onCancelClick = () => {
-    const { firebasePendingRequestUid } = this.props.confirmationInput
-    if (firebasePendingRequestUid) {
-      this.props.declinePaymentRequest(firebasePendingRequestUid)
-    }
-    Logger.showMessage(this.props.t('paymentRequestFlow:requestDeclined'))
-    navigateBack()
   }
 
   renderHeader = () => {

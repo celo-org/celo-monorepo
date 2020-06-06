@@ -235,10 +235,14 @@ function SendAmount(props: Props) {
       navigate(Screens.ValidateRecipientIntro, {
         transactionData,
         addressValidationType,
+        isFromScan: props.route.params?.isFromScan,
       })
     } else {
       CeloAnalytics.track(CustomEventNames.send_continue, continueAnalyticsParams)
-      navigate(Screens.SendConfirmation, { transactionData })
+      navigate(Screens.SendConfirmation, {
+        transactionData,
+        isFromScan: props.route.params?.isFromScan,
+      })
     }
   }, [
     recipientVerificationStatus,

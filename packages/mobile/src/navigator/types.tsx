@@ -129,6 +129,7 @@ export type StackParamList = {
   [Screens.SendConfirmation]: {
     transactionData: TransactionDataInput
     addressJustValidated?: boolean
+    isFromScan?: boolean
   }
   [Screens.SetClock]: undefined
   [Screens.Settings]: undefined
@@ -144,11 +145,13 @@ export type StackParamList = {
     transactionData: TransactionDataInput
     addressValidationType: AddressValidationType
     isPaymentRequest?: true
+    isFromScan?: boolean
   }
   [Screens.ValidateRecipientAccount]: {
     transactionData: TransactionDataInput
     addressValidationType: AddressValidationType
     isPaymentRequest?: true
+    isFromScan?: boolean
   }
   [Screens.VerificationEducationScreen]: undefined
   [Screens.VerificationInputScreen]: undefined
