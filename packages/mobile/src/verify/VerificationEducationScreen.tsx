@@ -14,7 +14,7 @@ import { connect } from 'react-redux'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { setHasSeenVerificationNux } from 'src/identity/actions'
 import { nuxNavigationOptions } from 'src/navigator/Headers'
-import { navigate } from 'src/navigator/NavigationService'
+import { navigate, navigateHome } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 
 interface DispatchProps {
@@ -57,7 +57,7 @@ class VerificationEducationScreen extends React.Component<Props, State> {
 
   onPressSkipConfirm = () => {
     this.props.setHasSeenVerificationNux(true)
-    navigate(Screens.ImportContacts)
+    navigateHome()
   }
 
   render() {

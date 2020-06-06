@@ -37,7 +37,7 @@ const allRecipients = { ...e164NumberRecipients, ...otherRecipients }
 
 describe('Import Contacts Saga', () => {
   it('imports contacts and creates contact mappings correctly', async () => {
-    await expectSaga(doImportContactsWrapper)
+    await expectSaga(doImportContactsWrapper, { doMatchmaking: false })
       .provide([
         [call(getConnectedAccount), null],
         [call(getAllContacts), mockContactList],
@@ -55,7 +55,7 @@ describe('Import Contacts Saga', () => {
   })
 
   it('shows errors correctly', async () => {
-    await expectSaga(doImportContactsWrapper)
+    await expectSaga(doImportContactsWrapper, { doMatchmaking: false })
       .provide([
         [call(getConnectedAccount), null],
         [call(getAllContacts), throwError(new Error('fake error'))],

@@ -11,13 +11,14 @@ const TAG = 'identity/privacy'
 export async function postToPGPNP<ResponseType>(
   account: string,
   contractKit: ContractKit,
-  body: any,
+  body: object,
   endpoint: string
 ) {
   Logger.debug(`${TAG}@postToPGPNP`, `Posting to ${endpoint}`)
 
   // Sign payload using account privkey
-  const authHeader = await contractKit.web3.eth.sign(body, account)
+  const bodyString = JSON.stringify(body)
+  const authHeader = await contractKit.web3.eth.sign(bodyString, account)
   const { pgpnpUrl } = networkConfig
   const res = await fetch(pgpnpUrl + endpoint, {
     method: 'POST',
@@ -26,7 +27,7 @@ export async function postToPGPNP<ResponseType>(
       'Content-Type': 'application/json',
       Authorization: authHeader,
     },
-    body,
+    body: bodyString,
   })
 
   if (!res.ok) {
@@ -44,6 +45,6 @@ function handlePGPNPFailure(res: Response) {
     case 403:
       throw new Error(ErrorMessages.SALT_QUOTA_EXCEEDED)
     default:
-      throw new Error('Failure getting blinded sig')
+      throw new Error('Unknown failure')
   }
 }

@@ -1,14 +1,13 @@
 import { ContractKit } from '@celo/contractkit'
 import crypto from 'crypto'
-import { call, put, select } from 'redux-saga/effects'
-import { e164NumberSelector } from 'src/account/selectors'
+import { call, put } from 'redux-saga/effects'
 import { addContactsMatches } from 'src/identity/actions'
 import { postToPGPNP } from 'src/identity/pgpnp'
+import { getUserSelfPhoneHashDetails, PhoneNumberHashDetails } from 'src/identity/privacy'
 import { NumberToRecipient } from 'src/recipients/recipient'
 import Logger from 'src/utils/Logger'
 import { getContractKit } from 'src/web3/contracts'
 import { getConnectedUnlockedAccount } from 'src/web3/saga'
-import { currentAccountSelector } from 'src/web3/selectors'
 
 const TAG = 'identity/matchmaking'
 const MATCHMAKING_ENDPOINT = '/getContactMatches'
@@ -23,21 +22,28 @@ export interface ContactMatch {
 
 // Uses the PGPNP service to find mutual matches between Celo users
 export function* fetchContactMatches(e164NumberToRecipients: NumberToRecipient) {
-  yield call(getConnectedUnlockedAccount)
+  const account: string = yield call(getConnectedUnlockedAccount)
   Logger.debug(TAG, 'Starting contact matchmaking')
-  const e164Number: string = yield select(e164NumberSelector)
-  const account: string = yield select(currentAccountSelector)
   const contractKit: ContractKit = yield call(getContractKit)
+  const selfPhoneDetails: PhoneNumberHashDetails | undefined = yield call(
+    getUserSelfPhoneHashDetails
+  )
 
-  const selfHash = hashNumber(e164Number)
-  const hashToE164Number = getContactNumberHashes(e164NumberToRecipients)
+  if (!selfPhoneDetails) {
+    Logger.warn(TAG, 'User must be verified with cached phone hash details')
+    return
+  }
+
+  const selfPhoneNumObfuscated = obfuscateNumberForMatchmaking(selfPhoneDetails.e164Number)
+  const obfucsatedNumToE164Number = getContactNumsObfuscated(e164NumberToRecipients)
 
   const matchHashes: string[] = yield call(
     postToMatchmaking,
     account,
     contractKit,
-    selfHash,
-    Object.keys(hashToE164Number)
+    selfPhoneNumObfuscated,
+    selfPhoneDetails.phoneHash,
+    Object.keys(obfucsatedNumToE164Number)
   )
 
   if (!matchHashes || !matchHashes.length) {
@@ -45,26 +51,37 @@ export function* fetchContactMatches(e164NumberToRecipients: NumberToRecipient) 
     return
   }
 
-  const matches = getMatchedContacts(e164NumberToRecipients, hashToE164Number, matchHashes)
+  const matches = getMatchedContacts(e164NumberToRecipients, obfucsatedNumToE164Number, matchHashes)
   yield put(addContactsMatches(matches))
 }
 
-function getContactNumberHashes(e164NumberToRecipients: NumberToRecipient) {
+function getContactNumsObfuscated(e164NumberToRecipients: NumberToRecipient) {
   const hashes: Record<string, string> = {}
   for (const e164Number of Object.keys(e164NumberToRecipients)) {
     // TODO For large contact lists, would be faster to these hashes
     // in a native module.
-    const hash = hashNumber(e164Number)
+    const hash = obfuscateNumberForMatchmaking(e164Number)
     hashes[hash] = e164Number
   }
   return hashes
 }
 
-function hashNumber(e164Number: string) {
+// Hashes the phone number using a static salt
+// This is different than the phone + unique salt hashing that
+// we use for numbers getting verified and going on chain
+// Matchmaking doesn't support per-number salts yet
+export function obfuscateNumberForMatchmaking(e164Number: string) {
   return crypto
     .createHash('sha256')
     .update(e164Number + SALT)
     .digest('base64')
+}
+
+interface MatchmakingRequest {
+  account: string
+  userPhoneNumber: string
+  contactPhoneNumbers: string[]
+  hashedPhoneNumber: string
 }
 
 interface MatchmakingResponse {
@@ -77,14 +94,16 @@ interface MatchmakingResponse {
 async function postToMatchmaking(
   account: string,
   contractKit: ContractKit,
+  selfPhoneNumObfuscated: string,
   selfPhoneHash: string,
-  contactHashes: string[]
+  contactNumsObfuscated: string[]
 ) {
-  const body = JSON.stringify({
+  const body: MatchmakingRequest = {
     account,
-    userPhoneNumber: selfPhoneHash,
-    contactPhoneNumbers: contactHashes,
-  })
+    userPhoneNumber: selfPhoneNumObfuscated,
+    contactPhoneNumbers: contactNumsObfuscated,
+    hashedPhoneNumber: selfPhoneHash,
+  }
 
   const response = await postToPGPNP<MatchmakingResponse>(
     account,
@@ -97,12 +116,12 @@ async function postToMatchmaking(
 
 function getMatchedContacts(
   e164NumberToRecipients: NumberToRecipient,
-  hashToE164Number: Record<string, string>,
+  obfucsatedNumToE164Number: Record<string, string>,
   matchHashes: string[]
 ) {
   const matches: ContactMatch[] = []
   for (const match of matchHashes) {
-    const e164Number = hashToE164Number[match]
+    const e164Number = obfucsatedNumToE164Number[match]
     if (!e164Number) {
       throw new Error('Number missing in hash map, should never happen')
     }

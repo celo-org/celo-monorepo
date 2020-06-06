@@ -146,7 +146,7 @@ class ImportContactScreen extends React.Component<Props, State> {
     return (
       <SafeAreaView style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
-          {status === ImportContactsStatus.Stopped && (
+          {status <= ImportContactsStatus.Stopped && (
             <>
               <Text style={styles.h1} testID="ImportContactsScreenHeader">
                 {t('contacts.header')}

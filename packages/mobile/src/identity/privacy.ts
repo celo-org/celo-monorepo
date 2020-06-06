@@ -56,7 +56,7 @@ export function* fetchPhoneHashPrivate(e164Number: string) {
 }
 
 function* doFetchPhoneHashPrivate(e164Number: string) {
-  yield call(getConnectedUnlockedAccount)
+  const account: string = yield call(getConnectedUnlockedAccount)
   Logger.debug(`${TAG}@fetchPrivatePhoneHash`, 'Fetching phone hash details')
   const saltCache: E164NumberToSaltType = yield select(e164NumberToSaltSelector)
   const cachedSalt = saltCache[e164Number]
@@ -68,7 +68,6 @@ function* doFetchPhoneHashPrivate(e164Number: string) {
   }
 
   Logger.debug(`${TAG}@fetchPrivatePhoneHash`, 'Salt was not cached, fetching')
-  const account: string = yield select(currentAccountSelector)
   const contractKit: ContractKit = yield call(getContractKit)
   const selfPhoneDetails: PhoneNumberHashDetails | undefined = yield call(
     getUserSelfPhoneHashDetails
@@ -130,6 +129,12 @@ async function getPhoneNumberSalt(
   return getSaltFromThresholdSignature(base64UnblindedSig)
 }
 
+interface SignMessageRequest {
+  account: string
+  blindedQueryPhoneNumber: string
+  hashedPhoneNumber?: string
+}
+
 interface SignMessageResponse {
   success: boolean
   signature: string
@@ -143,11 +148,11 @@ async function postToSignMessage(
   contractKit: ContractKit,
   selfPhoneHash?: string
 ) {
-  const body = JSON.stringify({
-    blindedQueryPhoneNumber: base64BlindedMessage,
+  const body: SignMessageRequest = {
     account,
+    blindedQueryPhoneNumber: base64BlindedMessage,
     hashedPhoneNumber: selfPhoneHash,
-  })
+  }
 
   const response = await postToPGPNP<SignMessageResponse>(
     account,

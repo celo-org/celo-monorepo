@@ -9,7 +9,7 @@
       "loadingStatus1": "Processing {{total}} contacts",
       "loadingStatus2": "Finding matches",
       "successHeader": "You have {{matches}} friends on Celo",
-      "successStatus": "You’re all synced"
+      "successStatus": "You're all synced"
     }
   }
 }

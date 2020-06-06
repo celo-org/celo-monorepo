@@ -87,26 +87,25 @@ export function* doImportContactsWrapper({ doMatchmaking }: ImportContactsAction
 function* doImportContacts(doMatchmaking: boolean) {
   const hasGivenContactPermission: boolean = yield call(checkContactsPermission)
   if (!hasGivenContactPermission) {
-    return Logger.warn(TAG, 'Contact permissions denied. Skipping import.')
+    Logger.warn(TAG, 'Contact permissions denied. Skipping import.')
+    return true
   }
 
   yield put(updateImportContactsProgress(ImportContactsStatus.Importing))
-  //TODO
-  yield delay(5000)
 
   const contacts: MinimalContact[] = yield call(getAllContacts)
   if (!contacts || !contacts.length) {
-    return Logger.warn(TAG, 'Empty contacts list. Skipping import.')
+    Logger.warn(TAG, 'Empty contacts list. Skipping import.')
+    return true
   }
 
   yield put(updateImportContactsProgress(ImportContactsStatus.Processing, 0, contacts.length))
-  //TODO
-  yield delay(5000)
 
   const defaultCountryCode: string = yield select(defaultCountryCodeSelector)
   const recipients = contactsToRecipients(contacts, defaultCountryCode)
   if (!recipients) {
-    return Logger.warn(TAG, 'No recipients found')
+    Logger.warn(TAG, 'No recipients found')
+    return true
   }
   const { e164NumberToRecipients, otherRecipients } = recipients
 
@@ -114,13 +113,11 @@ function* doImportContacts(doMatchmaking: boolean) {
   yield call(updateRecipientsCache, e164NumberToRecipients, otherRecipients)
 
   if (!doMatchmaking) {
-    return
+    return true
   }
 
   yield put(updateImportContactsProgress(ImportContactsStatus.Matchmaking))
   yield call(fetchContactMatches, e164NumberToRecipients)
-  //TODO
-  yield delay(5000)
   return true
 }
 
