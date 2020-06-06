@@ -16,7 +16,6 @@ Contract for voting for validators and managing validator groups.
 
 ### Properties
 
-* [_activate](_wrappers_election_.electionwrapper.md#_activate)
 * [electabilityThreshold](_wrappers_election_.electionwrapper.md#electabilitythreshold)
 * [events](_wrappers_election_.electionwrapper.md#events)
 * [getCurrentValidatorSigners](_wrappers_election_.electionwrapper.md#getcurrentvalidatorsigners)
@@ -78,24 +77,6 @@ Name | Type |
 **Returns:** *[ElectionWrapper](_wrappers_election_.electionwrapper.md)*
 
 ## Properties
-
-###  _activate
-
-• **_activate**: *function* = proxySend(this.kit, this.contract.methods.activate)
-
-*Defined in [contractkit/src/wrappers/Election.ts:321](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Election.ts#L321)*
-
-#### Type declaration:
-
-▸ (...`args`: InputArgs): *[CeloTransactionObject](_wrappers_basewrapper_.celotransactionobject.md)‹Output›*
-
-**Parameters:**
-
-Name | Type |
------- | ------ |
-`...args` | InputArgs |
-
-___
 
 ###  electabilityThreshold
 

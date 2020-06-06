@@ -32,6 +32,7 @@ export function Language() {
     })
     dispatch(setLanguage(selectedAnswer))
     navigation.navigate(nextScreen)
+    dispatch(setLanguage(selectedAnswer))
   }
 
   return (

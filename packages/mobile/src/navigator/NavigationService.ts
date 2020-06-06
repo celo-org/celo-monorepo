@@ -127,7 +127,7 @@ export function navigateBack(params?: object) {
 export function navigateHome(params?: object) {
   navigationRef.current?.reset({
     index: 0,
-    routes: [{ name: Screens.TabNavigator, params }],
+    routes: [{ name: Screens.DrawerNavigator, params }],
   })
 }
 

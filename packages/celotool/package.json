@@ -6,7 +6,6 @@
   "author": "Celo",
   "license": "Apache-2.0",
   "dependencies": {
-    "@celo/verification-pool-api": "^1.0.0",
     "@celo/utils": "0.1.15-dev",
     "@celo/contractkit": "0.4.6-dev",
     "@google-cloud/monitoring": "0.7.1",
@@ -23,7 +22,7 @@
     "js-yaml": "^3.13.1",
     "lodash": "^4.17.14",
     "moment": "^2.22.1",
-    "node-fetch": "^2.2.0",
+    "node-fetch": "^2.6.0",
     "prompts": "1.2.0",
     "read-last-lines": "^1.7.2",
     "sleep-promise": "^8.0.1",

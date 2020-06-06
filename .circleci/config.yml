@@ -514,25 +514,6 @@ jobs:
           name: Upload to CodeCov
           command: yarn codecov -F mobile
 
-  verification-pool-api:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: ~/app
-
-      - run:
-          name: Check if the test should run
-          command: |
-            ./scripts/ci_check_if_test_should_run_v2.sh @celo/verification-pool-api
-
-      - run:
-          name: jest tests
-          command: |
-            mkdir -p test-results/jest
-            yarn --cwd packages/verification-pool-api test
-          environment:
-            JEST_JUNIT_OUTPUT: test-results/jest/junit.xml
-
   protocol-test:
     <<: *defaults
     resource_class: large
@@ -887,9 +868,6 @@ workflows:
           requires:
             - lint-checks
       - end-to-end-mobile-test-ios
-      - verification-pool-api:
-          requires:
-            - lint-checks
       - protocol-test:
           requires:
             - lint-checks
