@@ -33,7 +33,7 @@ mockSetDidMatchmaking.mockImplementation()
 
 jest.mock('../src/database/database')
 const mockGetTransaction = getTransaction as jest.Mock
-mockGetTransaction.mockReturnValue({ rollback: jest.fn() })
+mockGetTransaction.mockReturnValue({ commit: jest.fn(), rollback: jest.fn() })
 
 describe(`POST /getBlindedMessageSignature endpoint`, () => {
   describe('with valid input', () => {
