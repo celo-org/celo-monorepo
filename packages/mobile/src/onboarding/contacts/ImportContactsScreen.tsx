@@ -10,15 +10,19 @@ import { WithTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
+import CeloAnalytics from 'src/analytics/CeloAnalytics'
+import { CustomEventNames } from 'src/analytics/constants'
 import { Namespaces, withTranslation } from 'src/i18n'
 import LoadingSpinner from 'src/icons/LoadingSpinner'
-import { importContacts } from 'src/identity/actions'
+import { cancelImportContacts, denyImportContacts, importContacts } from 'src/identity/actions'
 import { ImportContactsStatus } from 'src/identity/contactMapping'
 import { ContactMatch } from 'src/identity/matchmaking'
 import { ImportContactProgress } from 'src/identity/reducer'
 import { nuxNavigationOptions } from 'src/navigator/Headers'
-import { navigateHome } from 'src/navigator/NavigationService'
+import { navigate } from 'src/navigator/NavigationService'
+import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
+import { requestContactsPermission } from 'src/utils/permissions'
 
 interface StateProps {
   importContactsProgress: ImportContactProgress
@@ -27,6 +31,8 @@ interface StateProps {
 
 interface DispatchProps {
   importContacts: typeof importContacts
+  cancelImportContacts: typeof cancelImportContacts
+  denyImportContacts: typeof denyImportContacts
 }
 
 type Props = StateProps & DispatchProps & WithTranslation
@@ -44,6 +50,8 @@ const mapStateToProps = (state: RootState): StateProps => {
 
 const mapDispatchToProps = {
   importContacts,
+  cancelImportContacts,
+  denyImportContacts,
 }
 
 class ImportContactScreen extends React.Component<Props, State> {
@@ -63,14 +71,21 @@ class ImportContactScreen extends React.Component<Props, State> {
     }
   }
 
-  onPressConnect = () => {
-    // TODO analytics
-    this.props.importContacts(this.state.isFindMeSwitchChecked)
+  onPressConnect = async () => {
+    CeloAnalytics.track(CustomEventNames.import_contacts)
+    const hasGivenContactPermission = await requestContactsPermission()
+    if (hasGivenContactPermission) {
+      this.props.importContacts(this.state.isFindMeSwitchChecked)
+    }
   }
 
   onPressSkip = () => {
-    // TODO cancel import
-    // TODO analytics
+    this.props.cancelImportContacts()
+    // TODO strictly speaking we should set up a separate action/reducer/state to track if
+    // this screen has been seen before but since nothing else uses denyImport atm, using that
+    // for convinience
+    this.props.denyImportContacts()
+    CeloAnalytics.track(CustomEventNames.import_contacts_skip)
     this.onFinish()
   }
 
@@ -81,8 +96,7 @@ class ImportContactScreen extends React.Component<Props, State> {
   }
 
   onFinish = () => {
-    // TODO update state to not come back here
-    navigateHome()
+    navigate(Screens.OnboardingSuccessScreen)
   }
 
   renderImportStatus = () => {

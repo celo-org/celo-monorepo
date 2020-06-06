@@ -25,6 +25,7 @@ export enum Actions {
   FETCH_ADDRESSES_AND_VALIDATION_STATUS = 'IDENTITY/FETCH_ADDRESSES_AND_VALIDATION_STATUS',
   IMPORT_CONTACTS = 'IDENTITY/IMPORT_CONTACTS',
   UPDATE_IMPORT_CONTACT_PROGRESS = 'IDENTITY/UPDATE_IMPORT_CONTACT_PROGRESS',
+  CANCEL_IMPORT_CONTACTS = 'IDENTITY/CANCEL_IMPORT_CONTACTS',
   END_IMPORT_CONTACTS = 'IDENTITY/END_IMPORT_CONTACTS',
   DENY_IMPORT_CONTACTS = 'IDENTITY/DENY_IMPORT_CONTACTS',
   ADD_CONTACT_MATCHES = 'IDENTITY/ADD_CONTACT_MATCHES',
@@ -101,6 +102,10 @@ export interface UpdateImportContactProgress {
   status?: ImportContactsStatus
   current?: number
   total?: number
+}
+
+export interface CancelImportContactsAction {
+  type: Actions.CANCEL_IMPORT_CONTACTS
 }
 
 export interface EndImportContactsAction {
@@ -238,6 +243,10 @@ export const updateImportContactsProgress = (
   status,
   current,
   total,
+})
+
+export const cancelImportContacts = (): CancelImportContactsAction => ({
+  type: Actions.CANCEL_IMPORT_CONTACTS,
 })
 
 export const endImportContacts = (success: boolean): EndImportContactsAction => ({

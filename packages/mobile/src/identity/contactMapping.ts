@@ -7,13 +7,14 @@ import { isAccountConsideredVerified } from '@celo/utils/src/attestations'
 import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
 import BigNumber from 'bignumber.js'
 import { MinimalContact } from 'react-native-contacts'
-import { call, delay, put, select } from 'redux-saga/effects'
+import { call, delay, put, race, select, take } from 'redux-saga/effects'
 import { setUserContactDetails } from 'src/account/actions'
 import { defaultCountryCodeSelector, e164NumberSelector } from 'src/account/selectors'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { USE_PHONE_NUMBER_PRIVACY } from 'src/config'
 import {
+  Actions,
   endImportContacts,
   FetchAddressesAndValidateAction,
   ImportContactsAction,
@@ -42,6 +43,7 @@ import { getConnectedAccount } from 'src/web3/saga'
 import { currentAccountSelector } from 'src/web3/selectors'
 
 const TAG = 'identity/contactMapping'
+export const IMPORT_CONTACTS_TIMEOUT = 2 * 60 * 1000 // 2 minutes
 
 export enum ImportContactsStatus {
   Failed = -1,
@@ -58,7 +60,20 @@ export function* doImportContactsWrapper({ doMatchmaking }: ImportContactsAction
   try {
     Logger.debug(TAG, 'Importing user contacts')
 
-    yield call(doImportContacts, doMatchmaking)
+    const { result, cancel, timeout } = yield race({
+      result: call(doImportContacts, doMatchmaking),
+      cancel: take(Actions.CANCEL_IMPORT_CONTACTS),
+      timeout: delay(IMPORT_CONTACTS_TIMEOUT),
+    })
+
+    if (result === true) {
+      Logger.debug(TAG, 'Import Contacts completed successfully')
+    } else if (cancel) {
+      Logger.debug(TAG, 'Import Contacts cancelled')
+    } else if (timeout) {
+      Logger.debug(TAG, 'Import Contacts timed out')
+      throw new Error('Import Contacts timed out')
+    }
 
     Logger.debug(TAG, 'Done importing user contacts')
     yield put(endImportContacts(true))
@@ -70,9 +85,8 @@ export function* doImportContactsWrapper({ doMatchmaking }: ImportContactsAction
 }
 
 function* doImportContacts(doMatchmaking: boolean) {
-  const result: boolean = yield call(checkContactsPermission)
-
-  if (!result) {
+  const hasGivenContactPermission: boolean = yield call(checkContactsPermission)
+  if (!hasGivenContactPermission) {
     return Logger.warn(TAG, 'Contact permissions denied. Skipping import.')
   }
 
@@ -107,6 +121,7 @@ function* doImportContacts(doMatchmaking: boolean) {
   yield call(fetchContactMatches, e164NumberToRecipients)
   //TODO
   yield delay(5000)
+  return true
 }
 
 // Find the user's own contact among those imported and save useful bits

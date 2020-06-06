@@ -67,7 +67,7 @@ class VerificationLoadingScreen extends React.Component<Props> {
 
   componentDidUpdate() {
     if (this.props.verificationStatus === VerificationStatus.Done) {
-      navigate(Screens.VerificationSuccessScreen)
+      navigate(Screens.OnboardingSuccessScreen)
     } else if (this.props.verificationStatus === VerificationStatus.RevealingNumber) {
       navigate(Screens.VerificationInterstitialScreen)
     }

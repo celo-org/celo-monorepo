@@ -134,7 +134,7 @@ class VerificationInputScreen extends React.Component<Props, State> {
     Logger.debug(TAG + '@finishVerification', 'Verification finished, navigating to next screen.')
     this.setState({ didFinish: true })
     this.props.hideAlert()
-    navigate(Screens.VerificationSuccessScreen)
+    navigate(Screens.ImportContacts)
   }
 
   onCancel = () => {

@@ -59,6 +59,7 @@ export interface State {
   // Note: Do not access values in this directly, use the `getAddressFromPhoneNumber` helper in contactMapping
   e164NumberToAddress: E164NumberToAddressType
   e164NumberToSalt: E164NumberToSaltType
+  // Has the user already been asked for contacts permission
   askedContactsPermission: boolean
   importContactsProgress: ImportContactProgress
   // Contacts found during the matchmaking process
@@ -154,6 +155,7 @@ export const reducer = (
     case Actions.IMPORT_CONTACTS:
       return {
         ...state,
+        askedContactsPermission: true,
         importContactsProgress: { status: ImportContactsStatus.Prepping, current: 0, total: 0 },
       }
     case Actions.UPDATE_IMPORT_CONTACT_PROGRESS:
@@ -170,7 +172,6 @@ export const reducer = (
       const { success } = action
       return {
         ...state,
-        askedContactsPermission: true,
         importContactsProgress: {
           ...state.importContactsProgress,
           status: success ? ImportContactsStatus.Done : ImportContactsStatus.Failed,

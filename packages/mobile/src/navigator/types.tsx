@@ -155,6 +155,6 @@ export type StackParamList = {
   [Screens.VerificationInterstitialScreen]: undefined
   [Screens.VerificationLearnMoreScreen]: undefined
   [Screens.VerificationLoadingScreen]: undefined
-  [Screens.VerificationSuccessScreen]: undefined
+  [Screens.OnboardingSuccessScreen]: undefined
   [Screens.WalletHome]: undefined
 }
