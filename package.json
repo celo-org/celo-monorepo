@@ -91,6 +91,7 @@
     "randomatic": "^3.1.1",
     "logkitty": "^0.7.1",
     "minimist": "^1.2.5",
-    "npm": "^6.14.5"
+    "npm": "^6.14.5",
+    "websocket-extensions": "^0.1.4"
   }
 }
