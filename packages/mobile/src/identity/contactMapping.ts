@@ -43,7 +43,7 @@ import { getConnectedAccount } from 'src/web3/saga'
 import { currentAccountSelector } from 'src/web3/selectors'
 
 const TAG = 'identity/contactMapping'
-export const IMPORT_CONTACTS_TIMEOUT = 2 * 60 * 1000 // 2 minutes
+export const IMPORT_CONTACTS_TIMEOUT = 1 * 60 * 1000 // 1 minute
 
 export enum ImportContactsStatus {
   Failed = -1,

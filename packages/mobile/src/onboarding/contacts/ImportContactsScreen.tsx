@@ -100,8 +100,11 @@ class ImportContactScreen extends React.Component<Props, State> {
   }
 
   renderImportStatus = () => {
-    const { t, importContactsProgress, matchedContacts } = this.props
-    const { status, total } = importContactsProgress
+    const {
+      t,
+      importContactsProgress: { status, total },
+      matchedContacts,
+    } = this.props
     const matchesFound = matchedContacts.length > 0
 
     if (status === ImportContactsStatus.Done) {
@@ -141,8 +144,10 @@ class ImportContactScreen extends React.Component<Props, State> {
 
   render() {
     const { isFindMeSwitchChecked } = this.state
-    const { t, importContactsProgress } = this.props
-    const { status } = importContactsProgress
+    const {
+      t,
+      importContactsProgress: { status },
+    } = this.props
     return (
       <SafeAreaView style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
