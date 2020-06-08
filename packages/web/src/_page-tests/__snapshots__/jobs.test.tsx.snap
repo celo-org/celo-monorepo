@@ -4802,7 +4802,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
               }
             }
           >
-            Applying distributed authority and decision-making with our Teal org design
+            Applying distributed authority and decision-making with a Teal org design
           </div>
         </div>
       </div>
@@ -4903,7 +4903,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
               }
             }
           >
-            The Berlin office practicing Holocracy by going over project tensions
+            Celo contributors in Berlin practicing Holocracy by going over project tensions
           </div>
         </div>
       </div>
@@ -4957,7 +4957,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
               style={
                 Object {
                   "display": "block",
-                  "paddingBottom": "133.125%",
+                  "paddingBottom": "133.33333333333334%",
                   "width": "100%",
                 }
               }
@@ -5024,7 +5024,7 @@ exports[`JoinJobsPage with jobs renders 1`] = `
               }
             }
           >
-            Retreat focusing on self, team, and organizational evolution
+            Celo retreat focusing on self, team, and ecosystem evolution
           </div>
         </div>
       </div>
@@ -12123,7 +12123,7 @@ exports[`JoinJobsPage without jobs renders 1`] = `
               }
             }
           >
-            Applying distributed authority and decision-making with our Teal org design
+            Applying distributed authority and decision-making with a Teal org design
           </div>
         </div>
       </div>
@@ -12224,7 +12224,7 @@ exports[`JoinJobsPage without jobs renders 1`] = `
               }
             }
           >
-            The Berlin office practicing Holocracy by going over project tensions
+            Celo contributors in Berlin practicing Holocracy by going over project tensions
           </div>
         </div>
       </div>
@@ -12278,7 +12278,7 @@ exports[`JoinJobsPage without jobs renders 1`] = `
               style={
                 Object {
                   "display": "block",
-                  "paddingBottom": "133.125%",
+                  "paddingBottom": "133.33333333333334%",
                   "width": "100%",
                 }
               }
@@ -12345,7 +12345,7 @@ exports[`JoinJobsPage without jobs renders 1`] = `
               }
             }
           >
-            Retreat focusing on self, team, and organizational evolution
+            Celo retreat focusing on self, team, and ecosystem evolution
           </div>
         </div>
       </div>

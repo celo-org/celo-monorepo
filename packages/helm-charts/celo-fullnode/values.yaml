@@ -67,8 +67,10 @@ geth:
   - 1.2.3.4
   - 5.6.7.8
   service_type: LoadBalancer
+  expose_rpc_externally: false
   azure_mixed_protocols: true
   use_static_ips: true
+  readiness_probe_max_block_age_seconds: 30
   updateStrategy:
     type: RollingUpdate
     rollingUpdate:

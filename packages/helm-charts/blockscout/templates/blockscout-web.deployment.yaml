@@ -32,7 +32,7 @@ spec:
         args:
         - |
            sleep 5
-           mix cmd --app block_scout_web mix phx.server | sed 's/^iex(1)> //'
+           exec mix cmd --app block_scout_web mix phx.server | sed 's/^iex(1)> //'
         ports:
         - name: http
           containerPort: 4000
@@ -46,7 +46,6 @@ spec:
         - name: DISABLE_INDEXER
           value: "true"
 {{ include "celo.blockscout-env-vars" .  | indent 8 }}
-{{ include "celo.prom-to-sd-container" (dict "Values" .Values "Release" .Release "Chart" .Chart "component" "blockscout" "metricsPort" "4000" "containerNameLabel" "blockscout-web") | indent 6 }}
 {{ include "celo.blockscout-db-sidecar" .  | indent 6 }}
     {{- with .Values.nodeSelector }}
       nodeSelector:
