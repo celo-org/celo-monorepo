@@ -1,31 +1,27 @@
 import { BtnTypes } from '@celo/react-components/components/Button.v2'
-import { navigate } from '@react-navigation/compat/lib/typescript/src/NavigationActions'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import Education from 'src/account/Education'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { setEducationCompleted } from 'src/goldToken/actions'
 import { Namespaces } from 'src/i18n'
 import { exchangeIcon, goldValue, shinyGold } from 'src/images/Images'
-import { navigateBack } from 'src/navigator/NavigationService'
+import { navigate, navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import { RootState } from 'src/redux/reducers'
+import useSelector from 'src/redux/useSelector'
 
 export default function GoldEducation() {
   const { t } = useTranslation(Namespaces.global)
 
   const dispatch = useDispatch()
 
-  const isCeloEducationComplete = useSelector<RootState, boolean>(
-    (state) => state.goldToken.educationCompleted
-  )
+  const isCeloEducationComplete = useSelector((state) => state.goldToken.educationCompleted)
 
-  const goToExchange = React.useCallback(() => {
+  const goToExchange = () => {
     CeloAnalytics.track(CustomEventNames.exchange_gold_nux)
 
-    // TODO should Education.Guides just be full screen modals? it would solve the issue that by design they should pop up and the issue of navigation.
     if (isCeloEducationComplete) {
       navigateBack()
     } else {
@@ -33,7 +29,7 @@ export default function GoldEducation() {
     }
 
     dispatch(setEducationCompleted())
-  }, [])
+  }
 
   const stepInfo = useStep()
 

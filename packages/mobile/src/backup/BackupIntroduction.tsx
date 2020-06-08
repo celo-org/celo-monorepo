@@ -105,10 +105,14 @@ function AccountKeyPostSetup() {
         <Text style={styles.postSetupBody}>{t('postSetupBody')}</Text>
       </View>
       <View style={styles.postSetupCTA}>
-        <TextButton>{t('postSetupCTA')}</TextButton>
+        <TextButton onPress={goToAccountKeyGuide}>{t('postSetupCTA')}</TextButton>
       </View>
     </ScrollView>
   )
+}
+
+function goToAccountKeyGuide() {
+  navigate(Screens.AccountKeyEducation, { nextScreen: Screens.BackupIntroduction })
 }
 
 const styles = StyleSheet.create({

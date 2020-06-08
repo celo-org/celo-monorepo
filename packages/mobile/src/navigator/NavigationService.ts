@@ -47,6 +47,24 @@ export const replace: SafeNavigate = (...args) => {
     })
 }
 
+// for when a screen should be pushed onto stack even if it already exists in it.
+export const pushToStack: SafeNavigate = (...args) => {
+  const [routeName, params] = args
+  ensureNavigator()
+    .then(() => {
+      Logger.debug(`${TAG}@replace`, `Dispatch ${routeName}`)
+      navigationRef.current?.dispatch(
+        StackActions.push({
+          routeName,
+          params,
+        })
+      )
+    })
+    .catch((reason) => {
+      Logger.error(`${TAG}@replace`, `Navigation failure: ${reason}`)
+    })
+}
+
 export function navigate<RouteName extends keyof StackParamList>(
   ...args: undefined extends StackParamList[RouteName]
     ? [RouteName] | [RouteName, StackParamList[RouteName]]

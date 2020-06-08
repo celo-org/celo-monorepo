@@ -62,20 +62,20 @@ export default class Education extends React.Component<Props, State> {
   }
 
   nextStep = () => {
+    const isLastStep = this.state.step === this.props.stepInfo.length - 1
     const currentStepInfo = this.props.stepInfo[this.state.step]
     CeloAnalytics.track(currentStepInfo.progressEvent)
-    this.swiper?.current?.scrollBy(1, true)
+
+    if (isLastStep) {
+      this.props.onFinish()
+      this.swiper?.current?.scrollTo(0)
+    } else {
+      this.swiper?.current?.scrollBy(1, true)
+    }
   }
 
   render() {
-    const {
-      stepInfo,
-      onFinish,
-      buttonText,
-      finalButtonType,
-      finalButtonText,
-      isClosable,
-    } = this.props
+    const { stepInfo, buttonText, finalButtonType, finalButtonText, isClosable } = this.props
 
     const isLastStep = this.state.step === stepInfo.length - 1
     return (
@@ -108,7 +108,7 @@ export default class Education extends React.Component<Props, State> {
             })}
           </Swiper>
           <Button
-            onPress={isLastStep ? onFinish : this.nextStep}
+            onPress={this.nextStep}
             text={isLastStep ? finalButtonText : buttonText}
             type={isLastStep && finalButtonType ? finalButtonType : BtnTypes.SECONDARY}
           />

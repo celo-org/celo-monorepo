@@ -15,7 +15,11 @@ export type StackParamList = {
   [Screens.Analytics]: undefined
   [Screens.BackupComplete]: undefined
   [Screens.BackupIntroduction]: undefined
-  [Screens.AccountKeyEducation]: undefined
+  [Screens.AccountKeyEducation]:
+    | undefined
+    | {
+        nextScreen: keyof StackParamList
+      }
   [Screens.BackupPhrase]: undefined
   [Screens.BackupQuiz]: undefined
   [Screens.BackupSocial]: undefined
