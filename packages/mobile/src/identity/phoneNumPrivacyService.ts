@@ -5,7 +5,7 @@ import { ErrorMessages } from 'src/app/ErrorMessages'
 import networkConfig from 'src/geth/networkConfig'
 import Logger from 'src/utils/Logger'
 
-const TAG = 'identity/privacy'
+const TAG = 'identity/phoneNumPrivacyService'
 
 export async function postToPhoneNumPrivacyService<ResponseType>(
   account: string,
@@ -39,7 +39,7 @@ export async function postToPhoneNumPrivacyService<ResponseType>(
 }
 
 function handleFailure(res: Response) {
-  Logger.error(`${TAG}@handlePGPNPFailure`, `Response not okay. Status ${res.status}`)
+  Logger.error(`${TAG}@handleFailure`, `Response not okay. Status ${res.status}`)
   switch (res.status) {
     case 403:
       throw new Error(ErrorMessages.SALT_QUOTA_EXCEEDED)

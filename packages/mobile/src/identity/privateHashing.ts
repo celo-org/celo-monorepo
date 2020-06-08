@@ -19,7 +19,7 @@ import { getContractKit } from 'src/web3/contracts'
 import { getConnectedUnlockedAccount } from 'src/web3/saga'
 import { currentAccountSelector } from 'src/web3/selectors'
 
-const TAG = 'identity/privacy'
+const TAG = 'identity/privateHashing'
 const SIGN_MESSAGE_ENDPOINT = '/getBlindedSalt'
 export const SALT_CHAR_LENGTH = 13
 
