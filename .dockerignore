@@ -8,7 +8,6 @@ dockerfiles
 .vscode
 
 # not docker packages
-packages/analytics
 packages/blockchain-api
 packages/docs
 packages/faucet
