@@ -508,14 +508,14 @@ export const simulateClient = async (
     const sendTransactionTime = Date.now()
 
     // randomly choose which token to use
-    // const transferGold = Boolean(Math.round(Math.random()))
-    const transferGold = true
+    const transferGold = Boolean(Math.round(Math.random()))
+    // const transferGold = true
     const transferFn = transferGold ? transferCeloGold : transferCeloDollars
     baseLogMessage.tokenName = transferGold ? 'cGLD' : 'cUSD'
 
     // randomly choose which gas currency to use
-    // const feeCurrencyGold = Boolean(Math.round(Math.random()))
-    const feeCurrencyGold = true
+    const feeCurrencyGold = Boolean(Math.round(Math.random()))
+    // const feeCurrencyGold = true
 
     let feeCurrency
     if (!feeCurrencyGold) {

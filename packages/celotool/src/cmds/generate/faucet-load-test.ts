@@ -125,7 +125,7 @@ export const handler = async (argv: CeloEnvArgv & FaucetLoadTest) => {
       } else {
         await goldToken.transfer(address, goldAmount.toFixed()).send()
       }
-      // await stableToken.transfer(address, stableTokenAmount.toFixed()).send()
+      await stableToken.transfer(address, stableTokenAmount.toFixed()).send()
     }
   }
 }
