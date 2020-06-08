@@ -59,6 +59,7 @@ interface AttesationServiceRevealRequest {
   phoneNumber: string
   issuer: string
   salt?: string
+  smsRetrieverAppSig?: string
 }
 
 export interface UnselectedRequest {
@@ -186,7 +187,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   )
 
   /**
-   * Returns the attestation stats of a phone number/account pair
+   * Returns the attestation stats of a identifer/account pair
    * @param identifier Attestation identifier (e.g. phone hash)
    * @param account Address of the account
    */
@@ -198,6 +199,30 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     undefined,
     (stat) => ({ completed: valueToInt(stat[0]), total: valueToInt(stat[1]) })
   )
+
+  /**
+   * Returns the verified status of an identifier/account pair indicating whether the attestation
+   * stats for a given pair are completed beyond a certain threshold of confidence (aka "verified")
+   * @param identifier Attestation identifier (e.g. phone hash)
+   * @param account Address of the account
+   * @param numAttestationsRequired Optional number of attestations required.  Will default to
+   *  hardcoded value if absent.
+   * @param attestationThreshold Optional threshold for fraction attestations completed. Will
+   *  default to hardcoded value if absent.
+   */
+  async getVerifiedStatus(
+    identifier: string,
+    account: Address,
+    numAttestationsRequired?: number,
+    attestationThreshold?: number
+  ) {
+    const attestationStats = await this.getAttestationStat(identifier, account)
+    return AttestationUtils.isAccountConsideredVerified(
+      attestationStats,
+      numAttestationsRequired,
+      attestationThreshold
+    )
+  }
 
   /**
    * Calculates the amount of StableToken required to request Attestations
@@ -428,13 +453,15 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     account: Address,
     issuer: Address,
     serviceURL: string,
-    salt?: string
+    salt?: string,
+    smsRetrieverAppSig?: string
   ) {
     const body: AttesationServiceRevealRequest = {
       account,
       phoneNumber,
       issuer,
       salt,
+      smsRetrieverAppSig,
     }
     return fetch(serviceURL + '/attestations', {
       method: 'POST',

@@ -1,28 +1,28 @@
-import Button, { BtnTypes } from '@celo/react-components/components/Button'
-import Switch from '@celo/react-components/components/Switch'
-import colors from '@celo/react-components/styles/colors'
-import { fontStyles } from '@celo/react-components/styles/fonts'
+import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Button.v2'
+import Switch from '@celo/react-components/components/Switch.v2'
+import colors from '@celo/react-components/styles/colors.v2'
+import fontStyles from '@celo/react-components/styles/fonts.v2'
 import * as React from 'react'
-import { WithTranslation } from 'react-i18next'
+import { useTranslation, WithTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import { hideAlert, showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
-import componentWithAnalytics from 'src/analytics/wrapper'
-import { ErrorMessages } from 'src/app/ErrorMessages'
 import BackupPhraseContainer, {
   BackupPhraseContainerMode,
   BackupPhraseType,
 } from 'src/backup/BackupPhraseContainer'
-import { getStoredMnemonic } from 'src/backup/utils'
-import { Namespaces, withTranslation } from 'src/i18n'
-import { headerWithBackButton } from 'src/navigator/Headers'
+import CancelConfirm from 'src/backup/CancelConfirm'
+import { getStoredMnemonic, onGetMnemonicFail } from 'src/backup/utils'
+import i18n, { Namespaces, withTranslation } from 'src/i18n'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { TopBarTextButton } from 'src/navigator/TopBarButton.v2'
 import { RootState } from 'src/redux/reducers'
-import Logger from 'src/utils/Logger'
+
+const TAG = 'backup/BackupPhrase'
 
 interface State {
   mnemonic: string
@@ -46,12 +46,13 @@ const mapStateToProps = (state: RootState): StateProps => {
   }
 }
 
-class BackupPhrase extends React.Component<Props, State> {
-  // TODO(Rossy): Show modal when cancelling if backup flow incomplete
-  static navigationOptions = () => ({
-    ...headerWithBackButton,
-  })
+export const navOptionsForBackupPhrase = {
+  headerLeft: () => <CancelConfirm screen={TAG} />,
+  headerTitle: i18n.t(`${Namespaces.backupKeyFlow6}:headerTitle`),
+  headerRight: () => <HeaderRight />,
+}
 
+class BackupPhrase extends React.Component<Props, State> {
   state = {
     mnemonic: '',
     isConfirmChecked: false,
@@ -69,16 +70,12 @@ class BackupPhrase extends React.Component<Props, State> {
     if (this.state.mnemonic) {
       return
     }
+    const mnemonic = await getStoredMnemonic()
 
-    try {
-      const mnemonic = await getStoredMnemonic()
-      if (!mnemonic) {
-        throw new Error('Mnemonic not found in key store')
-      }
+    if (mnemonic) {
       this.setState({ mnemonic })
-    } catch (e) {
-      Logger.error('BackupPhrase/retrieveMnemonic', 'Failed to retrieve mnemonic', e)
-      this.props.showError(ErrorMessages.FAILED_FETCH_MNEMONIC)
+    } else {
+      onGetMnemonicFail(this.props.showError, 'BackupPhrase')
     }
   }
 
@@ -86,12 +83,21 @@ class BackupPhrase extends React.Component<Props, State> {
     this.setState({
       isConfirmChecked: value,
     })
+
+    CeloAnalytics.track(
+      value
+        ? CustomEventNames.backup_setup_toggle_enable
+        : CustomEventNames.backup_setup_toggle_disable
+    )
+  }
+
+  onPressConfirmArea = () => {
+    this.onPressConfirmSwitch(!this.state.isConfirmChecked)
   }
 
   onPressContinue = () => {
-    const { mnemonic } = this.state
     CeloAnalytics.track(CustomEventNames.backup_continue)
-    navigate(Screens.BackupQuiz, { mnemonic })
+    navigate(Screens.BackupQuiz)
   }
 
   render() {
@@ -100,77 +106,72 @@ class BackupPhrase extends React.Component<Props, State> {
     return (
       <SafeAreaView style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
-          <View>
-            <Text style={fontStyles.h1}>{t('yourBackupKey')}</Text>
-            <Text style={styles.body}>{t('backupKeySummary')}</Text>
-            <BackupPhraseContainer
-              value={mnemonic}
-              showCopy={true}
-              mode={BackupPhraseContainerMode.READONLY}
-              type={BackupPhraseType.BACKUP_KEY}
-            />
-            <Text style={styles.tipText}>
-              <Text style={[styles.tipText, fontStyles.bold]}>{t('global:warning')}</Text>
-              {t('securityTip')}
-            </Text>
-          </View>
+          <BackupPhraseContainer
+            value={mnemonic}
+            mode={BackupPhraseContainerMode.READONLY}
+            type={BackupPhraseType.BACKUP_KEY}
+          />
+          <Text style={styles.body}>{t('backupKeySummary')}</Text>
         </ScrollView>
         {!backupCompleted && (
-          <View>
+          <>
             <View style={styles.confirmationSwitchContainer}>
               <Switch value={isConfirmChecked} onValueChange={this.onPressConfirmSwitch} />
-              <Text style={styles.confirmationSwitchLabel}>{t('savedConfirmation')}</Text>
+              <Text onPress={this.onPressConfirmArea} style={styles.confirmationSwitchLabel}>
+                {t('savedConfirmation')}
+              </Text>
             </View>
             <Button
               disabled={!isConfirmChecked}
               onPress={this.onPressContinue}
               text={t('global:continue')}
-              standard={false}
-              type={BtnTypes.PRIMARY}
+              size={BtnSizes.FULL}
+              type={BtnTypes.SECONDARY}
             />
-          </View>
+          </>
         )}
       </SafeAreaView>
     )
   }
 }
 
+function HeaderRight() {
+  const { t } = useTranslation(Namespaces.backupKeyFlow6)
+  const onMoreInfoPressed = () => {
+    // TODO: Implement this
+    CeloAnalytics.track(CustomEventNames.backup_setup_info)
+  }
+  return <TopBarTextButton onPress={onMoreInfoPressed} title={t('moreInfo')} />
+}
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: colors.light,
     justifyContent: 'space-between',
+    padding: 16,
   },
   scrollContainer: {
     flexGrow: 1,
-    paddingHorizontal: 20,
-    paddingBottom: 20,
+    paddingBottom: 16,
   },
   body: {
-    ...fontStyles.body,
-    marginBottom: 20,
-  },
-  tipText: {
-    ...fontStyles.bodySmall,
-    color: colors.darkSecondary,
-    marginTop: 25,
-    marginHorizontal: 3,
+    ...fontStyles.regular,
+    marginTop: 16,
   },
   confirmationSwitchContainer: {
-    paddingHorizontal: 20,
-    paddingVertical: 20,
+    marginVertical: 16,
     flexDirection: 'row',
+    alignItems: 'center',
   },
   confirmationSwitchLabel: {
-    ...fontStyles.body,
-    ...fontStyles.semiBold,
-    paddingTop: 3,
-    paddingLeft: 10,
+    flex: 1,
+    ...fontStyles.regular,
+    paddingLeft: 8,
   },
 })
 
-export default componentWithAnalytics(
-  connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, { showError, hideAlert })(
-    withTranslation(Namespaces.backupKeyFlow6)(BackupPhrase)
-  )
-)
+export default connect<StateProps, DispatchProps, {}, RootState>(mapStateToProps, {
+  showError,
+  hideAlert,
+})(withTranslation(Namespaces.backupKeyFlow6)(BackupPhrase))

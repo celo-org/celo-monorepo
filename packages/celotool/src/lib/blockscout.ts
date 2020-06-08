@@ -1,7 +1,8 @@
 import fs from 'fs'
+import { execCmdWithExitOnFailure } from './cmd-utils'
 import { envVar, fetchEnv, fetchEnvOrFallback, isVmBased } from './env-utils'
 import { installGenericHelmChart, removeGenericHelmChart } from './helm_deploy'
-import { execCmdWithExitOnFailure, outputIncludes } from './utils'
+import { outputIncludes } from './utils'
 import { getInternalTxNodeLoadBalancerIP } from './vm-testnet-utils'
 
 export function getInstanceName(celoEnv: string) {

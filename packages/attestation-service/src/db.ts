@@ -63,13 +63,13 @@ export async function getAttestationTable() {
 }
 
 export async function existingAttestationRequestRecord(
-  phoneNumber: string,
+  identifier: string,
   account: string,
   issuer: string,
   options: FindOptions = {}
 ): Promise<AttestationModel | null> {
   return (await getAttestationTable()).findOne({
-    where: { phoneNumber, account, issuer },
+    where: { identifier, account, issuer },
     ...options,
   })
 }

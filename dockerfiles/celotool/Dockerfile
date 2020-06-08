@@ -1,9 +1,6 @@
 FROM node:10
 WORKDIR /celo-monorepo
 
-RUN apt-get update -y
-RUN apt-get install lsb-release libudev-dev libusb-dev libusb-1.0-0 -y
-
 # Needed for gsutil
 RUN apt-get update && \
   apt-get install -y lsb-release && \
@@ -23,7 +20,6 @@ COPY packages/dev-utils/package.json packages/dev-utils/
 COPY packages/typescript/package.json packages/typescript/
 COPY packages/contractkit/package.json packages/contractkit/
 COPY packages/protocol/package.json packages/protocol/
-COPY packages/verification-pool-api/package.json packages/verification-pool-api/
 COPY packages/celotool/package.json packages/celotool/
 
 RUN yarn install --network-timeout 100000 --frozen-lockfile && yarn cache clean
@@ -33,7 +29,6 @@ COPY packages/dev-utils packages/dev-utils/
 COPY packages/typescript packages/typescript/
 COPY packages/contractkit packages/contractkit/
 COPY packages/protocol packages/protocol/
-COPY packages/verification-pool-api packages/verification-pool-api/
 COPY packages/celotool packages/celotool/
 
 RUN yarn build

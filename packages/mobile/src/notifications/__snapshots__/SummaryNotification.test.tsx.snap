@@ -1,36 +1,45 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`PaymentsSummaryNotification renders correctly 1`] = `
-<View>
-  <View
-    style={
+exports[`SummaryNotification renders correctly 1`] = `
+<View
+  style={
+    Array [
+      Object {
+        "backgroundColor": "#FFFFFF",
+        "elevation": 12,
+        "padding": 16,
+        "shadowColor": "black",
+        "shadowOffset": Object {
+          "height": 6,
+          "width": 0,
+        },
+        "shadowOpacity": 0.3,
+        "shadowRadius": 9.600000000000001,
+      },
+      Object {
+        "borderRadius": 8,
+      },
       Array [
         Object {
-          "backgroundColor": "#FFFFFF",
-          "flexDirection": "row",
-          "justifyContent": "space-between",
-          "padding": 16,
-          "width": "100%",
+          "height": 144,
         },
-        Object {
-          "elevation": 2,
-          "shadowColor": "black",
-          "shadowOffset": Object {
-            "height": 1,
-            "width": 0,
-          },
-          "shadowOpacity": 0.3,
-          "shadowRadius": 1.6,
-        },
-      ]
+        Object {},
+      ],
+    ]
+  }
+>
+  <View
+    style={
+      Object {
+        "flex": 1,
+        "flexDirection": "row",
+      }
     }
   >
     <View
       style={
         Object {
-          "alignItems": "center",
-          "flexDirection": "column",
-          "paddingRight": 16,
+          "width": 40,
         }
       }
     >
@@ -41,6 +50,7 @@ exports[`PaymentsSummaryNotification renders correctly 1`] = `
         Object {
           "flex": 1,
           "justifyContent": "space-between",
+          "marginLeft": 16,
         }
       }
     >
@@ -48,86 +58,68 @@ exports[`PaymentsSummaryNotification renders correctly 1`] = `
         style={
           Object {
             "color": "#2E3338",
-            "fontFamily": "Hind-Bold",
+            "fontFamily": "Inter-Medium",
+            "fontSize": 16,
+            "lineHeight": 22,
+            "marginBottom": 4,
+          }
+        }
+        testID="undefined/Title"
+      >
+        Test
+      </Text>
+      <Text
+        numberOfLines={3}
+        style={
+          Object {
+            "color": "#81868B",
+            "flex": 1,
+            "fontFamily": "Inter-Regular",
             "fontSize": 14,
             "lineHeight": 18,
           }
         }
-      >
-        Test
-      </Text>
+        testID="undefined/Details"
+      />
       <View
         style={
           Object {
-            "justifyContent": "space-between",
-            "minHeight": 60,
+            "flexDirection": "row",
           }
         }
+        testID="undefined/CallToActions"
       >
         <View
-          style={
+          accessible={true}
+          focusable={true}
+          nativeBackgroundAndroid={
             Object {
-              "flexDirection": "row",
-              "marginTop": 5,
+              "attribute": "selectableItemBackgroundBorderless",
+              "type": "ThemeAttrAndroid",
             }
           }
+          onClick={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+          testID="undefined/CallToActions/viewAll/Button"
         >
-          <View
+          <Text
             style={
               Object {
-                "flex": 1,
+                "color": "#1AB775",
+                "fontFamily": "Inter-SemiBold",
+                "fontSize": 14,
+                "lineHeight": 16,
+                "marginRight": 24,
               }
             }
           >
-            <Text>
-              test-a
-            </Text>
-          </View>
-        </View>
-        <View
-          style={
-            Object {
-              "flexDirection": "row",
-              "marginTop": 5,
-            }
-          }
-        >
-          <View
-            accessible={true}
-            focusable={true}
-            isTVSelectable={true}
-            nativeBackgroundAndroid={
-              Object {
-                "attribute": "selectableItemBackgroundBorderless",
-                "type": "ThemeAttrAndroid",
-              }
-            }
-            onClick={[Function]}
-            onResponderGrant={[Function]}
-            onResponderMove={[Function]}
-            onResponderRelease={[Function]}
-            onResponderTerminate={[Function]}
-            onResponderTerminationRequest={[Function]}
-            onStartShouldSetResponder={[Function]}
-          >
-            <Text
-              style={
-                Array [
-                  Object {
-                    "color": "#42D689",
-                    "fontFamily": "Hind-SemiBold",
-                    "fontSize": 14,
-                    "lineHeight": 18,
-                  },
-                  Object {
-                    "paddingEnd": 15,
-                  },
-                ]
-              }
-            >
-              walletFlow5:review
-            </Text>
-          </View>
+            viewAll
+          </Text>
         </View>
       </View>
     </View>

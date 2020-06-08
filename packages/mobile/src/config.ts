@@ -32,7 +32,7 @@ export const DEV_SETTINGS_ACTIVE_INITIALLY = stringToBoolean(
 // VALUES
 export const GAS_INFLATION_FACTOR = 1.5 // Used when estimating gas for txs
 export const GAS_PRICE_INFLATION_FACTOR = 5 // Used when getting gas price, must match what Geth does
-export const BALANCE_OUT_OF_SYNC_THRESHOLD = 5 * 60 // 5 minutes
+export const BALANCE_OUT_OF_SYNC_THRESHOLD = 1 * 60 // 1 minute
 export const ALERT_BANNER_DURATION = 5000
 export const NUMBER_INPUT_MAX_DECIMALS = 2
 export const MAX_COMMENT_LENGTH = 70
@@ -44,6 +44,8 @@ export const GOLD_TRANSACTION_MIN_AMOUNT = 0.001
 export const ESCROW_PAYMENT_EXPIRY_SECONDS = 86400 // 1 days
 // We need to fallback to `integration` for testing under jest where react-native-config is undefined.
 export const DEFAULT_TESTNET = Config.DEFAULT_TESTNET || 'integration'
+export const DAILY_PAYMENT_LIMIT_CUSD = 500
+export const SMS_RETRIEVER_APP_SIGNATURE = Config.SMS_RETRIEVER_APP_SIGNATURE
 
 // LINKS
 export const CELO_VERIFIER_DOWNLOAD_LINK = 'https://celo.org/rewards'
@@ -55,11 +57,6 @@ export const FAQ_LINK = 'https://celo.org/faq'
 export const FORUM_LINK = 'https://forum.celo.org/c/support'
 export const CELO_SUPPORT_EMAIL_ADDRESS = 'support@celo.org'
 export const DEFAULT_FORNO_URL = `https://${DEFAULT_TESTNET}-forno.celo-testnet.org`
-// TODO configure per envrionment
-export const PHONE_NUM_PRIVACY_SERVICE =
-  'https://us-central1-celo-phone-number-privacy-stg.cloudfunctions.net'
-export const PHONE_NUM_PRIVACY_PUBLIC_KEY =
-  'B+gJTCmTrf9t3X7YQ2F4xekSzd5xg5bdzcJ8NPefby3mScelg5172zl1GgIO9boADEwE67j6M55GwouQwaG5jDZ5tHa2eNtfC7oLIsevuUmzrXVDry9cmsalB0BHX0EA'
 
 // FEATURE FLAGS
 export const FIREBASE_ENABLED = stringToBoolean(Config.FIREBASE_ENABLED || 'true')
@@ -73,7 +70,7 @@ export const DEFAULT_SYNC_MODE: GethSyncMode = Config.DEFAULT_SYNC_MODE
   ? new BigNumber(Config.DEFAULT_SYNC_MODE).toNumber()
   : GethSyncMode.Lightest
 // TODO Remove when feature is stable
-export const USE_PHONE_NUMBER_PRIVACY = false
+export const USE_PHONE_NUMBER_PRIVACY = true
 
 // SECRETS
 export const SEGMENT_API_KEY = keyOrUndefined(secretsFile, Config.SECRETS_KEY, 'SEGMENT_API_KEY')

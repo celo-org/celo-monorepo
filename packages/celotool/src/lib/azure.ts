@@ -1,15 +1,38 @@
-import { createNamespaceIfNotExists } from './cluster'
-import { doCheckOrPromptIfStagingOrProduction, envVar, fetchEnv } from './env-utils'
-import { installAndEnableMetricsDeps, redeployTiller } from './helm_deploy'
-import { execCmd, execCmdWithExitOnFailure, outputIncludes } from './utils'
+import { createNamespaceIfNotExists } from 'src/lib/cluster'
+import { execCmd, execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
+import { doCheckOrPromptIfStagingOrProduction } from 'src/lib/env-utils'
+import { installAndEnableMetricsDeps, redeployTiller } from 'src/lib/helm_deploy'
+import { outputIncludes } from 'src/lib/utils'
 
-// switchToClusterFromEnv configures kubectl to connect to the AKS cluster
-export async function switchToClusterFromEnv(
+/**
+ * Basic info for an AKS cluster
+ */
+export interface AzureClusterConfig {
+  tenantId: string
+  resourceGroup: string
+  clusterName: string
+  subscriptionId: string
+}
+
+// switchToCluster configures kubectl to connect to the AKS cluster
+export async function switchToCluster(
   celoEnv: string,
+  clusterConfig: AzureClusterConfig,
   checkOrPromptIfStagingOrProduction = true
 ) {
   if (checkOrPromptIfStagingOrProduction) {
     await doCheckOrPromptIfStagingOrProduction()
+  }
+
+  // Azure subscription switch
+  let currentTenantId = null
+  try {
+    ;[currentTenantId] = await execCmd('az account show --query tenantId -o tsv')
+  } catch (error) {
+    console.info('No azure account subscription currently set')
+  }
+  if (currentTenantId === null || currentTenantId.trim() !== clusterConfig.tenantId) {
+    await execCmdWithExitOnFailure(`az account set --subscription ${clusterConfig.subscriptionId}`)
   }
 
   let currentCluster = null
@@ -19,26 +42,26 @@ export async function switchToClusterFromEnv(
     console.info('No cluster currently set')
   }
 
-  if (currentCluster === null || currentCluster.trim() !== clusterName()) {
+  if (currentCluster === null || currentCluster.trim() !== clusterConfig.clusterName) {
     // If a context is edited for some reason (eg switching default namespace),
     // a warning and prompt is shown asking if the existing context should be
     // overwritten. To avoid this, --overwrite-existing force overwrites.
     await execCmdWithExitOnFailure(
-      `az aks get-credentials --resource-group ${resourceGroup()} --name ${clusterName()} --subscription ${subscriptionId()} --overwrite-existing`
+      `az aks get-credentials --resource-group ${clusterConfig.resourceGroup} --name ${clusterConfig.clusterName} --subscription ${clusterConfig.subscriptionId} --overwrite-existing`
     )
   }
-  await setupCluster(celoEnv)
+  await setupCluster(celoEnv, clusterConfig)
 }
 
 // setupCluster is idempotent-- it will only make changes that have not been made
 // before. Therefore, it's safe to be called for a cluster that's been fully set up before
-async function setupCluster(celoEnv: string) {
+async function setupCluster(celoEnv: string, clusterConfig: AzureClusterConfig) {
   await createNamespaceIfNotExists(celoEnv)
 
   console.info('Performing any cluster setup that needs to be done...')
 
   await redeployTiller()
-  await installAndEnableMetricsDeps(false)
+  await installAndEnableMetricsDeps(true, clusterConfig)
   await installAADPodIdentity()
 }
 
@@ -62,22 +85,54 @@ async function installAADPodIdentity() {
 
 // createIdentityIfNotExists creates an identity if it doesn't already exist.
 // Returns an object including basic info on the identity.
-export async function createIdentityIfNotExists(identityName: string) {
+export async function createIdentityIfNotExists(
+  clusterConfig: AzureClusterConfig,
+  identityName: string
+) {
   // This command is idempotent-- if the identity exists, the existing one is given
   const [results] = await execCmdWithExitOnFailure(
-    `az identity create -n ${identityName} -g ${resourceGroup()} -o json`
+    `az identity create -n ${identityName} -g ${clusterConfig.resourceGroup} -o json`
   )
   return JSON.parse(results)
 }
 
-export function resourceGroup() {
-  return fetchEnv(envVar.AZURE_KUBERNETES_RESOURCE_GROUP)
+/**
+ * deleteIdentity gets basic info on an existing identity
+ */
+export function deleteIdentity(clusterConfig: AzureClusterConfig, identityName: string) {
+  return execCmdWithExitOnFailure(
+    `az identity delete -n ${identityName} -g ${clusterConfig.resourceGroup} -o json`
+  )
 }
 
-export function clusterName() {
-  return fetchEnv(envVar.AZURE_KUBERNETES_CLUSTER_NAME)
+/**
+ * getIdentity gets basic info on an existing identity
+ */
+export async function getIdentity(clusterConfig: AzureClusterConfig, identityName: string) {
+  const [results] = await execCmdWithExitOnFailure(
+    `az identity show -n ${identityName} -g ${clusterConfig.resourceGroup} -o json`
+  )
+  return JSON.parse(results)
 }
 
-export function subscriptionId() {
-  return fetchEnv(envVar.AZURE_SUBSCRIPTION_ID)
+export async function getAKSNodeResourceGroup(clusterConfig: AzureClusterConfig) {
+  const [nodeResourceGroup] = await execCmdWithExitOnFailure(
+    `az aks show --name ${clusterConfig.clusterName} --resource-group ${clusterConfig.resourceGroup} --query nodeResourceGroup -o tsv`
+  )
+  return nodeResourceGroup.trim()
+}
+
+export async function registerStaticIP(name: string, resourceGroupIP: string) {
+  console.info(`Registering IP address ${name} on ${resourceGroupIP}`)
+  const [address] = await execCmdWithExitOnFailure(
+    `az network public-ip create --resource-group ${resourceGroupIP} --name ${name} --allocation-method Static --sku Standard --query publicIp.ipAddress -o tsv`
+  )
+  return address.trim()
+}
+
+export async function deallocateStaticIP(name: string, resourceGroupIP: string) {
+  console.info(`Deallocating IP address ${name} on ${resourceGroupIP}`)
+  return execCmdWithExitOnFailure(
+    `az network public-ip delete --resource-group ${resourceGroupIP} --name ${name}`
+  )
 }

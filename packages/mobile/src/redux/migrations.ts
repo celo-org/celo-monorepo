@@ -13,4 +13,32 @@ export const migrations = {
       },
     }
   },
+  1: (state: any) => {
+    const invitees = Object.entries(state.invite.invitees).map(([address, e164Number]) => ({
+      timestamp: Date.now(),
+      e164Number,
+      tempWalletAddress: address,
+      tempWalletPrivateKey: 'fakePrivateKey',
+      tempWalletRedeemed: false,
+      inviteCode: 'fakeInviteCode',
+      inviteLink: 'fakeInviteLink',
+    }))
+
+    return {
+      ...state,
+      invite: {
+        ...state.invite,
+        invitees,
+      },
+    }
+  },
+  2: (state: any) => {
+    return {
+      ...state,
+      app: {
+        ...state.app,
+        numberVerified: false,
+      },
+    }
+  },
 }

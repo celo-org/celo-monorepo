@@ -1,7 +1,7 @@
 {
   "name": "@celo/celocli",
   "description": "CLI Tool for transacting with the Celo protocol",
-  "version": "0.0.48-dev",
+  "version": "0.0.49-dev",
   "author": "Celo",
   "license": "Apache-2.0",
   "repository": "celo-org/celo-monorepo",
@@ -31,13 +31,15 @@
     "test": "TZ=UTC jest --runInBand"
   },
   "dependencies": {
-    "@celo/contractkit": "0.4.3-dev",
-    "@celo/utils": "0.1.14-dev",
+    "@celo/contractkit": "0.4.6-dev",
+    "@celo/utils": "0.1.15-dev",
     "@ledgerhq/hw-transport-node-hid": "^5.11.0",
     "@oclif/command": "^1",
     "@oclif/config": "^1",
+    "@oclif/plugin-autocomplete": "^0.1.5",
     "@oclif/plugin-help": "^2",
     "@types/command-exists": "^1.2.0",
+    "@oclif/plugin-warn-if-update-available": "^1.7.0",
     "bip32": "2.0.5",
     "bip39": "3.0.2",
     "bls12377js": "https://github.com/celo-org/bls12377js#cb38a4cfb643c778619d79b20ca3e5283a2122a6",
@@ -70,7 +72,7 @@
     "@types/node": "^10",
     "globby": "^8",
     "prettier": "1.19.1",
-    "typescript": "^3.7.3"
+    "typescript": "^3.8.3"
   },
   "files": [
     "README.md",
@@ -113,12 +115,21 @@
       },
       "releasegold": {
         "description": "View and manage Release Gold contracts"
+      },
+      "dkg": {
+        "description": "Publish your locally computed DKG results to the blockchain"
       }
     },
     "bin": "celocli",
     "plugins": [
-      "@oclif/plugin-help"
+      "@oclif/plugin-help",
+      "@oclif/plugin-autocomplete",
+      "@oclif/plugin-warn-if-update-available"
     ],
+    "warn-if-update-available": {
+      "timeoutInDays": 1,
+      "message": "<%= config.name %> update available from <%= chalk.greenBright(config.version) %> to <%= chalk.greenBright(latest) %>."
+    },
     "repositoryPrefix": "https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/<%- commandPath %>"
   }
 }

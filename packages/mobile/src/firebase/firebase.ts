@@ -1,10 +1,10 @@
 import firebase, { ReactNativeFirebase } from '@react-native-firebase/app'
+import '@react-native-firebase/auth'
 import '@react-native-firebase/database'
 import '@react-native-firebase/messaging'
 // We can't combine the 2 imports otherwise it only imports the type and fails at runtime
 // tslint:disable-next-line: no-duplicate-imports
 import { FirebaseMessagingTypes } from '@react-native-firebase/messaging'
-import * as Sentry from '@sentry/react-native'
 import DeviceInfo from 'react-native-device-info'
 import { eventChannel, EventChannel } from 'redux-saga'
 import { call, put, select, spawn, take } from 'redux-saga/effects'
@@ -15,29 +15,31 @@ import { currentLanguageSelector } from 'src/app/reducers'
 import { FIREBASE_ENABLED } from 'src/config'
 import { WritePaymentRequest } from 'src/firebase/actions'
 import { handleNotification } from 'src/firebase/notifications'
-import { navigate } from 'src/navigator/NavigationService'
-import { Screens } from 'src/navigator/Screens'
+import { navigateHome } from 'src/navigator/NavigationService'
 import Logger from 'src/utils/Logger'
 
 const TAG = 'firebase/firebase'
 
+interface NotificationChannelEvent {
+  message: FirebaseMessagingTypes.RemoteMessage
+  stateType: NotificationReceiveState
+}
+
 // only exported for testing
-export function* watchFirebaseNotificationChannel(
-  channel: EventChannel<{
-    message: FirebaseMessagingTypes.RemoteMessage
-    stateType: NotificationReceiveState
-  }>
-) {
+export function* watchFirebaseNotificationChannel(channel: EventChannel<NotificationChannelEvent>) {
   try {
-    Logger.info(`${TAG}/watchFirebaseNotificationChannel`, 'Started channel watching')
+    Logger.debug(`${TAG}/watchFirebaseNotificationChannel`, 'Started channel watching')
     while (true) {
-      const data = yield take(channel)
-      if (!data) {
-        Logger.info(`${TAG}/watchFirebaseNotificationChannel`, 'Data in channel was empty')
+      const event: NotificationChannelEvent = yield take(channel)
+      if (!event) {
+        Logger.debug(`${TAG}/watchFirebaseNotificationChannel`, 'Data in channel was empty')
         continue
       }
-      Logger.info(`${TAG}/watchFirebaseNotificationChannel`, 'Notification received in the channel')
-      yield call(handleNotification, data.message, data.stateType)
+      Logger.debug(
+        `${TAG}/watchFirebaseNotificationChannel`,
+        'Notification received in the channel'
+      )
+      yield call(handleNotification, event.message, event.stateType)
     }
   } catch (error) {
     Logger.error(
@@ -46,7 +48,7 @@ export function* watchFirebaseNotificationChannel(
       error
     )
   } finally {
-    Logger.info(`${TAG}/watchFirebaseNotificationChannel`, 'Notification channel terminated')
+    Logger.debug(`${TAG}/watchFirebaseNotificationChannel`, 'Notification channel terminated')
   }
 }
 
@@ -102,10 +104,7 @@ export function* initializeCloudMessaging(app: ReactNativeFirebase.Module, addre
   })
 
   // Listen for notification messages while the app is open
-  const channelOnNotification: EventChannel<{
-    message: FirebaseMessagingTypes.RemoteMessage
-    stateType: NotificationReceiveState
-  }> = eventChannel((emitter) => {
+  const channelOnNotification: EventChannel<NotificationChannelEvent> = eventChannel((emitter) => {
     const unsuscribe = () => {
       Logger.info(TAG, 'Notification channel closed, reseting callbacks. This is likely an error.')
       app.messaging().onMessage(() => null)
@@ -143,9 +142,7 @@ export function* initializeCloudMessaging(app: ReactNativeFirebase.Module, addre
 
   app.messaging().setBackgroundMessageHandler((remoteMessage) => {
     Logger.info(TAG, 'received Notification while app in Background')
-    Sentry.captureMessage(
-      `Received Unknown RNFirebaseBackgroundMessage ${JSON.stringify(remoteMessage)}`
-    )
+    // Nothing to do while app is in background
     return Promise.resolve() // need to return a resolved promise so native code releases the JS context
   })
 }
@@ -173,7 +170,7 @@ export function* paymentRequestWriter({ paymentInfo }: WritePaymentRequest) {
     const pendingRequestRef = firebase.database().ref(`pendingRequests`)
     yield call(() => pendingRequestRef.push(paymentInfo))
 
-    navigate(Screens.WalletHome)
+    navigateHome()
   } catch (error) {
     Logger.error(TAG, 'Failed to write payment request to Firebase DB', error)
     yield put(showError(ErrorMessages.PAYMENT_REQUEST_FAILED))

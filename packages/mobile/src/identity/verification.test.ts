@@ -24,7 +24,7 @@ import {
   VERIFICATION_TIMEOUT,
   VerificationStatus,
 } from 'src/identity/verification'
-import { getContractKit } from 'src/web3/contracts'
+import { getContractKitOutsideGenerator } from 'src/web3/contracts'
 import { getConnectedAccount, getConnectedUnlockedAccount } from 'src/web3/saga'
 import { privateCommentKeySelector } from 'src/web3/selectors'
 import { sleep } from 'test/utils'
@@ -106,11 +106,21 @@ const mockActionableAttestations: ActionableAttestation[] = [
 ]
 
 const mockAttestationsWrapperVerified = {
-  getAttestationStat: jest.fn(() => ({ completed: 3, total: 3 })),
+  getVerifiedStatus: jest.fn(() => ({
+    isVerified: true,
+    numAttestationsRemaining: 0,
+    total: 3,
+    completed: 3,
+  })),
 }
 
 const mockAttestationsWrapperUnverified = {
-  getAttestationStat: jest.fn(() => ({ completed: 0, total: 0 })),
+  getVerifiedStatus: jest.fn(() => ({
+    isVerified: false,
+    numAttestationsRemaining: 3,
+    total: 0,
+    completed: 0,
+  })),
   getActionableAttestations: jest
     .fn()
     .mockImplementationOnce(() => [])
@@ -128,7 +138,12 @@ const mockAttestationsWrapperUnverified = {
 
 const mockAttestationsWrapperPartlyVerified = {
   ...mockAttestationsWrapperUnverified,
-  getAttestationStat: jest.fn(() => ({ completed: 2, total: 3 })),
+  getVerifiedStatus: jest.fn(() => ({
+    isVerified: false,
+    numAttestationsRemaining: 1,
+    total: 3,
+    completed: 2,
+  })),
   getActionableAttestations: jest.fn(() => mockActionableAttestations),
 }
 
@@ -182,7 +197,7 @@ describe('Start Verification Saga', () => {
 
 describe('Do Verification Saga', () => {
   it('succeeds for unverified users', async () => {
-    const contractKit = getContractKit()
+    const contractKit = await getContractKitOutsideGenerator()
     await expectSaga(doVerificationFlow)
       .provide([
         [call(getConnectedUnlockedAccount), mockAccount],
@@ -192,7 +207,7 @@ describe('Do Verification Saga', () => {
           call(fetchPhoneHashPrivate, mockE164Number),
           { phoneHash: mockE164NumberHash, e164Number: mockE164Number },
         ],
-        [select(privateCommentKeySelector), mockPrivateDEK.toString('hex')],
+        [select(privateCommentKeySelector), mockPrivateDEK],
         [
           call([contractKit.contracts, contractKit.contracts.getAttestations]),
           mockAttestationsWrapperUnverified,
@@ -215,12 +230,11 @@ describe('Do Verification Saga', () => {
   })
 
   it('succeeds for partly verified users', async () => {
+    const contractKit = await getContractKitOutsideGenerator()
     // @ts-ignore Jest mock
-    getContractKit().contracts.getAttestations.mockReturnValue(
-      mockAttestationsWrapperPartlyVerified
-    )
+    contractKit.contracts.getAttestations.mockReturnValue(mockAttestationsWrapperPartlyVerified)
     // @ts-ignore Jest mock
-    getContractKit().contracts.getAccounts.mockReturnValue(mockAccountsWrapper)
+    contractKit.contracts.getAccounts.mockReturnValue(mockAccountsWrapper)
 
     await expectSaga(doVerificationFlow)
       .provide([
@@ -230,7 +244,7 @@ describe('Do Verification Saga', () => {
           call(fetchPhoneHashPrivate, mockE164Number),
           { phoneHash: mockE164NumberHash, e164Number: mockE164Number },
         ],
-        [select(privateCommentKeySelector), mockPrivateDEK.toString('hex')],
+        [select(privateCommentKeySelector), mockPrivateDEK],
         [select(attestationCodesSelector), attestationCodes],
       ])
       .put(completeAttestationCode())
@@ -241,7 +255,7 @@ describe('Do Verification Saga', () => {
   })
 
   it('succeeds for verified users', async () => {
-    const contractKit = getContractKit()
+    const contractKit = await getContractKitOutsideGenerator()
     await expectSaga(doVerificationFlow)
       .provide([
         [call(getConnectedUnlockedAccount), mockAccount],
@@ -250,7 +264,7 @@ describe('Do Verification Saga', () => {
           call(fetchPhoneHashPrivate, mockE164Number),
           { phoneHash: mockE164NumberHash, e164Number: mockE164Number },
         ],
-        [select(privateCommentKeySelector), mockPrivateDEK.toString('hex')],
+        [select(privateCommentKeySelector), mockPrivateDEK],
         [
           call([contractKit.contracts, contractKit.contracts.getAttestations]),
           mockAttestationsWrapperVerified,
@@ -263,7 +277,7 @@ describe('Do Verification Saga', () => {
   })
 
   it('shows error on unexpected failure', async () => {
-    const contractKit = getContractKit()
+    const contractKit = await getContractKitOutsideGenerator()
     await expectSaga(doVerificationFlow)
       .provide([
         [call(getConnectedUnlockedAccount), mockAccount],
@@ -272,7 +286,7 @@ describe('Do Verification Saga', () => {
           call(fetchPhoneHashPrivate, mockE164Number),
           { phoneHash: mockE164NumberHash, e164Number: mockE164Number },
         ],
-        [select(privateCommentKeySelector), mockPrivateDEK.toString('hex')],
+        [select(privateCommentKeySelector), mockPrivateDEK],
         [
           call([contractKit.contracts, contractKit.contracts.getAttestations]),
           mockAttestationsWrapperUnverified,
@@ -292,7 +306,7 @@ describe('Do Verification Saga', () => {
         throw new Error('Reveal error')
       }),
     }
-    const contractKit = getContractKit()
+    const contractKit = await getContractKitOutsideGenerator()
 
     await expectSaga(doVerificationFlow)
       .provide([
@@ -302,7 +316,7 @@ describe('Do Verification Saga', () => {
           call(fetchPhoneHashPrivate, mockE164Number),
           { phoneHash: mockE164NumberHash, e164Number: mockE164Number },
         ],
-        [select(privateCommentKeySelector), mockPrivateDEK.toString('hex')],
+        [select(privateCommentKeySelector), mockPrivateDEK],
         [
           call([contractKit.contracts, contractKit.contracts.getAttestations]),
           mockAttestationsWrapperRevealFailure,

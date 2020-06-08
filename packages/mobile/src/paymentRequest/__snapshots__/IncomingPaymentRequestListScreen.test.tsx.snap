@@ -61,58 +61,116 @@ exports[`IncomingPaymentRequestListScreen renders correctly with requests 1`] = 
                 Array [
                   Object {
                     "backgroundColor": "#FFFFFF",
-                    "width": "100%",
-                  },
-                  Object {
-                    "elevation": 2,
+                    "elevation": 12,
+                    "padding": 16,
                     "shadowColor": "black",
                     "shadowOffset": Object {
-                      "height": 1,
+                      "height": 6,
                       "width": 0,
                     },
                     "shadowOpacity": 0.3,
-                    "shadowRadius": 1.6,
+                    "shadowRadius": 9.600000000000001,
                   },
+                  Object {
+                    "borderRadius": 8,
+                  },
+                  Array [
+                    Object {
+                      "height": 144,
+                    },
+                    Object {},
+                  ],
                 ]
               }
+              testID="IncomingPaymentRequestNotification/7363bvby2ba8270273"
             >
               <View
-                accessible={true}
-                focusable={true}
-                isTVSelectable={true}
-                nativeBackgroundAndroid={
-                  Object {
-                    "attribute": "selectableItemBackground",
-                    "type": "ThemeAttrAndroid",
-                  }
-                }
-                onClick={[Function]}
-                onResponderGrant={[Function]}
-                onResponderMove={[Function]}
-                onResponderRelease={[Function]}
-                onResponderTerminate={[Function]}
-                onResponderTerminationRequest={[Function]}
-                onStartShouldSetResponder={[Function]}
                 style={
                   Object {
-                    "padding": 16,
+                    "flex": 1,
+                    "flexDirection": "row",
                   }
                 }
               >
                 <View
                   style={
                     Object {
-                      "flexDirection": "row",
-                      "justifyContent": "space-between",
+                      "flex": 1,
+                      "marginRight": 16,
                     }
                   }
                 >
-                  <View
+                  <Text
+                    numberOfLines={2}
                     style={
                       Object {
-                        "alignItems": "center",
-                        "paddingRight": 16,
+                        "color": "#9CA4A9",
+                        "fontFamily": "Inter-Regular",
+                        "fontSize": 13,
+                        "lineHeight": 16,
+                        "marginBottom": 4,
                       }
+                    }
+                    testID="IncomingPaymentRequestNotification/7363bvby2ba8270273/Title"
+                  >
+                    incomingPaymentRequestNotificationTitle
+                  </Text>
+                  <Text
+                    numberOfLines={1}
+                    style={
+                      Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Inter-SemiBold",
+                        "fontSize": 24,
+                        "lineHeight": 28,
+                        "marginBottom": 2,
+                      }
+                    }
+                    testID="IncomingPaymentRequestNotification/7363bvby2ba8270273/Amount"
+                  >
+                    <Text
+                      numberOfLines={1}
+                      style={
+                        Array [
+                          undefined,
+                          Object {
+                            "color": undefined,
+                          },
+                        ]
+                      }
+                    >
+                      
+                      $
+                      26.60
+                    </Text>
+                  </Text>
+                  <Text
+                    style={
+                      Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Inter-Regular",
+                        "fontSize": 14,
+                        "lineHeight": 18,
+                      }
+                    }
+                    testID="IncomingPaymentRequestNotification/7363bvby2ba8270273/Details"
+                  >
+                    Just the best
+                  </Text>
+                </View>
+                <View
+                  style={Object {}}
+                >
+                  <View
+                    style={
+                      Array [
+                        Object {
+                          "alignItems": "center",
+                          "flexDirection": "row",
+                          "justifyContent": "center",
+                        },
+                        undefined,
+                      ]
                     }
                   >
                     <View
@@ -120,189 +178,108 @@ exports[`IncomingPaymentRequestListScreen renders correctly with requests 1`] = 
                         Array [
                           Object {
                             "alignItems": "center",
-                            "flexDirection": "row",
                             "justifyContent": "center",
                           },
-                          undefined,
+                          Object {
+                            "backgroundColor": "#7AD6FE",
+                            "borderRadius": 20,
+                            "height": 40,
+                            "width": 40,
+                          },
                         ]
                       }
                     >
-                      <View
+                      <Text
                         style={
                           Array [
                             Object {
-                              "alignItems": "center",
-                              "justifyContent": "center",
+                              "color": "#FFFFFF",
+                              "fontFamily": "Inter-Medium",
+                              "fontSize": 16,
                             },
                             Object {
-                              "backgroundColor": "#7AD6FE",
-                              "borderRadius": 20,
-                              "height": 40,
-                              "width": 40,
+                              "fontSize": 20,
                             },
                           ]
                         }
                       >
-                        <Image
-                          source={
-                            Object {
-                              "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
-                            }
-                          }
-                          style={
-                            Object {
-                              "alignItems": "center",
-                              "height": 40,
-                              "justifyContent": "center",
-                              "width": 40,
-                            }
-                          }
-                        />
-                      </View>
+                        +
+                      </Text>
                     </View>
                   </View>
-                  <View
+                </View>
+              </View>
+              <View
+                style={
+                  Object {
+                    "flexDirection": "row",
+                  }
+                }
+                testID="IncomingPaymentRequestNotification/7363bvby2ba8270273/CallToActions"
+              >
+                <View
+                  accessible={true}
+                  focusable={true}
+                  nativeBackgroundAndroid={
+                    Object {
+                      "attribute": "selectableItemBackgroundBorderless",
+                      "type": "ThemeAttrAndroid",
+                    }
+                  }
+                  onClick={[Function]}
+                  onResponderGrant={[Function]}
+                  onResponderMove={[Function]}
+                  onResponderRelease={[Function]}
+                  onResponderTerminate={[Function]}
+                  onResponderTerminationRequest={[Function]}
+                  onStartShouldSetResponder={[Function]}
+                  testID="IncomingPaymentRequestNotification/7363bvby2ba8270273/CallToActions/global:send/Button"
+                >
+                  <Text
                     style={
                       Object {
-                        "flex": 1,
-                        "justifyContent": "space-between",
+                        "color": "#1AB775",
+                        "fontFamily": "Inter-SemiBold",
+                        "fontSize": 14,
+                        "lineHeight": 16,
+                        "marginRight": 24,
                       }
                     }
                   >
-                    <Text
-                      style={
-                        Object {
-                          "color": "#2E3338",
-                          "fontFamily": "Hind-SemiBold",
-                          "fontSize": 14,
-                          "lineHeight": 18,
-                        }
+                    global:send
+                  </Text>
+                </View>
+                <View
+                  accessible={true}
+                  focusable={true}
+                  nativeBackgroundAndroid={
+                    Object {
+                      "attribute": "selectableItemBackgroundBorderless",
+                      "type": "ThemeAttrAndroid",
+                    }
+                  }
+                  onClick={[Function]}
+                  onResponderGrant={[Function]}
+                  onResponderMove={[Function]}
+                  onResponderRelease={[Function]}
+                  onResponderTerminate={[Function]}
+                  onResponderTerminationRequest={[Function]}
+                  onStartShouldSetResponder={[Function]}
+                  testID="IncomingPaymentRequestNotification/7363bvby2ba8270273/CallToActions/global:decline/Button"
+                >
+                  <Text
+                    style={
+                      Object {
+                        "color": "#1AB775",
+                        "fontFamily": "Inter-SemiBold",
+                        "fontSize": 14,
+                        "lineHeight": 16,
+                        "marginRight": 24,
                       }
-                      testID="IncomingPaymentRequestNotification/7363bvby2ba8270273/Title"
-                    >
-                      +1555-867-5309
-                       requested
-                       
-                      <Text
-                        numberOfLines={1}
-                        style={
-                          Array [
-                            undefined,
-                            Object {
-                              "color": undefined,
-                            },
-                          ]
-                        }
-                      >
-                        
-                        $
-                        26.60
-                      </Text>
-                    </Text>
-                    <View
-                      style={
-                        Object {
-                          "justifyContent": "space-between",
-                          "minHeight": 60,
-                          "paddingTop": 2,
-                        }
-                      }
-                    >
-                      <Text
-                        style={
-                          Object {
-                            "color": "#2E3338",
-                            "fontFamily": "Hind-Regular",
-                            "fontSize": 14,
-                            "lineHeight": 18,
-                          }
-                        }
-                      >
-                        Just the best
-                      </Text>
-                      <View
-                        style={
-                          Object {
-                            "flexDirection": "row",
-                            "marginTop": 12,
-                          }
-                        }
-                      >
-                        <View
-                          accessible={true}
-                          focusable={true}
-                          isTVSelectable={true}
-                          nativeBackgroundAndroid={
-                            Object {
-                              "attribute": "selectableItemBackgroundBorderless",
-                              "type": "ThemeAttrAndroid",
-                            }
-                          }
-                          onClick={[Function]}
-                          onResponderGrant={[Function]}
-                          onResponderMove={[Function]}
-                          onResponderRelease={[Function]}
-                          onResponderTerminate={[Function]}
-                          onResponderTerminationRequest={[Function]}
-                          onStartShouldSetResponder={[Function]}
-                        >
-                          <Text
-                            style={
-                              Array [
-                                Object {
-                                  "color": "#42D689",
-                                  "fontFamily": "Hind-SemiBold",
-                                  "fontSize": 14,
-                                  "lineHeight": 18,
-                                },
-                                Object {
-                                  "paddingEnd": 15,
-                                },
-                              ]
-                            }
-                          >
-                            global:pay
-                          </Text>
-                        </View>
-                        <View
-                          accessible={true}
-                          focusable={true}
-                          isTVSelectable={true}
-                          nativeBackgroundAndroid={
-                            Object {
-                              "attribute": "selectableItemBackgroundBorderless",
-                              "type": "ThemeAttrAndroid",
-                            }
-                          }
-                          onClick={[Function]}
-                          onResponderGrant={[Function]}
-                          onResponderMove={[Function]}
-                          onResponderRelease={[Function]}
-                          onResponderTerminate={[Function]}
-                          onResponderTerminationRequest={[Function]}
-                          onStartShouldSetResponder={[Function]}
-                        >
-                          <Text
-                            style={
-                              Array [
-                                Object {
-                                  "color": "#42D689",
-                                  "fontFamily": "Hind-SemiBold",
-                                  "fontSize": 14,
-                                  "lineHeight": 18,
-                                },
-                                Object {
-                                  "paddingEnd": 15,
-                                },
-                              ]
-                            }
-                          >
-                            global:decline
-                          </Text>
-                        </View>
-                      </View>
-                    </View>
-                  </View>
+                    }
+                  >
+                    global:decline
+                  </Text>
                 </View>
               </View>
             </View>
@@ -321,58 +298,116 @@ exports[`IncomingPaymentRequestListScreen renders correctly with requests 1`] = 
                 Array [
                   Object {
                     "backgroundColor": "#FFFFFF",
-                    "width": "100%",
-                  },
-                  Object {
-                    "elevation": 2,
+                    "elevation": 12,
+                    "padding": 16,
                     "shadowColor": "black",
                     "shadowOffset": Object {
-                      "height": 1,
+                      "height": 6,
                       "width": 0,
                     },
                     "shadowOpacity": 0.3,
-                    "shadowRadius": 1.6,
+                    "shadowRadius": 9.600000000000001,
                   },
+                  Object {
+                    "borderRadius": 8,
+                  },
+                  Array [
+                    Object {
+                      "height": 144,
+                    },
+                    Object {},
+                  ],
                 ]
               }
+              testID="IncomingPaymentRequestNotification/7363bvby2ba8270273"
             >
               <View
-                accessible={true}
-                focusable={true}
-                isTVSelectable={true}
-                nativeBackgroundAndroid={
-                  Object {
-                    "attribute": "selectableItemBackground",
-                    "type": "ThemeAttrAndroid",
-                  }
-                }
-                onClick={[Function]}
-                onResponderGrant={[Function]}
-                onResponderMove={[Function]}
-                onResponderRelease={[Function]}
-                onResponderTerminate={[Function]}
-                onResponderTerminationRequest={[Function]}
-                onStartShouldSetResponder={[Function]}
                 style={
                   Object {
-                    "padding": 16,
+                    "flex": 1,
+                    "flexDirection": "row",
                   }
                 }
               >
                 <View
                   style={
                     Object {
-                      "flexDirection": "row",
-                      "justifyContent": "space-between",
+                      "flex": 1,
+                      "marginRight": 16,
                     }
                   }
                 >
-                  <View
+                  <Text
+                    numberOfLines={2}
                     style={
                       Object {
-                        "alignItems": "center",
-                        "paddingRight": 16,
+                        "color": "#9CA4A9",
+                        "fontFamily": "Inter-Regular",
+                        "fontSize": 13,
+                        "lineHeight": 16,
+                        "marginBottom": 4,
                       }
+                    }
+                    testID="IncomingPaymentRequestNotification/7363bvby2ba8270273/Title"
+                  >
+                    incomingPaymentRequestNotificationTitle
+                  </Text>
+                  <Text
+                    numberOfLines={1}
+                    style={
+                      Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Inter-SemiBold",
+                        "fontSize": 24,
+                        "lineHeight": 28,
+                        "marginBottom": 2,
+                      }
+                    }
+                    testID="IncomingPaymentRequestNotification/7363bvby2ba8270273/Amount"
+                  >
+                    <Text
+                      numberOfLines={1}
+                      style={
+                        Array [
+                          undefined,
+                          Object {
+                            "color": undefined,
+                          },
+                        ]
+                      }
+                    >
+                      
+                      $
+                      135.66
+                    </Text>
+                  </Text>
+                  <Text
+                    style={
+                      Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Inter-Regular",
+                        "fontSize": 14,
+                        "lineHeight": 18,
+                      }
+                    }
+                    testID="IncomingPaymentRequestNotification/7363bvby2ba8270273/Details"
+                  >
+                    Just the best for the best. Thanos & Zeus Gods of ultimate Power
+                  </Text>
+                </View>
+                <View
+                  style={Object {}}
+                >
+                  <View
+                    style={
+                      Array [
+                        Object {
+                          "alignItems": "center",
+                          "flexDirection": "row",
+                          "justifyContent": "center",
+                        },
+                        undefined,
+                      ]
                     }
                   >
                     <View
@@ -380,189 +415,108 @@ exports[`IncomingPaymentRequestListScreen renders correctly with requests 1`] = 
                         Array [
                           Object {
                             "alignItems": "center",
-                            "flexDirection": "row",
                             "justifyContent": "center",
                           },
-                          undefined,
+                          Object {
+                            "backgroundColor": "#7AD6FE",
+                            "borderRadius": 20,
+                            "height": 40,
+                            "width": 40,
+                          },
                         ]
                       }
                     >
-                      <View
+                      <Text
                         style={
                           Array [
                             Object {
-                              "alignItems": "center",
-                              "justifyContent": "center",
+                              "color": "#FFFFFF",
+                              "fontFamily": "Inter-Medium",
+                              "fontSize": 16,
                             },
                             Object {
-                              "backgroundColor": "#7AD6FE",
-                              "borderRadius": 20,
-                              "height": 40,
-                              "width": 40,
+                              "fontSize": 20,
                             },
                           ]
                         }
                       >
-                        <Image
-                          source={
-                            Object {
-                              "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
-                            }
-                          }
-                          style={
-                            Object {
-                              "alignItems": "center",
-                              "height": 40,
-                              "justifyContent": "center",
-                              "width": 40,
-                            }
-                          }
-                        />
-                      </View>
+                        +
+                      </Text>
                     </View>
                   </View>
-                  <View
+                </View>
+              </View>
+              <View
+                style={
+                  Object {
+                    "flexDirection": "row",
+                  }
+                }
+                testID="IncomingPaymentRequestNotification/7363bvby2ba8270273/CallToActions"
+              >
+                <View
+                  accessible={true}
+                  focusable={true}
+                  nativeBackgroundAndroid={
+                    Object {
+                      "attribute": "selectableItemBackgroundBorderless",
+                      "type": "ThemeAttrAndroid",
+                    }
+                  }
+                  onClick={[Function]}
+                  onResponderGrant={[Function]}
+                  onResponderMove={[Function]}
+                  onResponderRelease={[Function]}
+                  onResponderTerminate={[Function]}
+                  onResponderTerminationRequest={[Function]}
+                  onStartShouldSetResponder={[Function]}
+                  testID="IncomingPaymentRequestNotification/7363bvby2ba8270273/CallToActions/global:send/Button"
+                >
+                  <Text
                     style={
                       Object {
-                        "flex": 1,
-                        "justifyContent": "space-between",
+                        "color": "#1AB775",
+                        "fontFamily": "Inter-SemiBold",
+                        "fontSize": 14,
+                        "lineHeight": 16,
+                        "marginRight": 24,
                       }
                     }
                   >
-                    <Text
-                      style={
-                        Object {
-                          "color": "#2E3338",
-                          "fontFamily": "Hind-SemiBold",
-                          "fontSize": 14,
-                          "lineHeight": 18,
-                        }
+                    global:send
+                  </Text>
+                </View>
+                <View
+                  accessible={true}
+                  focusable={true}
+                  nativeBackgroundAndroid={
+                    Object {
+                      "attribute": "selectableItemBackgroundBorderless",
+                      "type": "ThemeAttrAndroid",
+                    }
+                  }
+                  onClick={[Function]}
+                  onResponderGrant={[Function]}
+                  onResponderMove={[Function]}
+                  onResponderRelease={[Function]}
+                  onResponderTerminate={[Function]}
+                  onResponderTerminationRequest={[Function]}
+                  onStartShouldSetResponder={[Function]}
+                  testID="IncomingPaymentRequestNotification/7363bvby2ba8270273/CallToActions/global:decline/Button"
+                >
+                  <Text
+                    style={
+                      Object {
+                        "color": "#1AB775",
+                        "fontFamily": "Inter-SemiBold",
+                        "fontSize": 14,
+                        "lineHeight": 16,
+                        "marginRight": 24,
                       }
-                      testID="IncomingPaymentRequestNotification/7363bvby2ba8270273/Title"
-                    >
-                      +14155550000
-                       requested
-                       
-                      <Text
-                        numberOfLines={1}
-                        style={
-                          Array [
-                            undefined,
-                            Object {
-                              "color": undefined,
-                            },
-                          ]
-                        }
-                      >
-                        
-                        $
-                        135.66
-                      </Text>
-                    </Text>
-                    <View
-                      style={
-                        Object {
-                          "justifyContent": "space-between",
-                          "minHeight": 60,
-                          "paddingTop": 2,
-                        }
-                      }
-                    >
-                      <Text
-                        style={
-                          Object {
-                            "color": "#2E3338",
-                            "fontFamily": "Hind-Regular",
-                            "fontSize": 14,
-                            "lineHeight": 18,
-                          }
-                        }
-                      >
-                        Just the best for the best. Thanos & Zeus Gods of ultimate Power
-                      </Text>
-                      <View
-                        style={
-                          Object {
-                            "flexDirection": "row",
-                            "marginTop": 12,
-                          }
-                        }
-                      >
-                        <View
-                          accessible={true}
-                          focusable={true}
-                          isTVSelectable={true}
-                          nativeBackgroundAndroid={
-                            Object {
-                              "attribute": "selectableItemBackgroundBorderless",
-                              "type": "ThemeAttrAndroid",
-                            }
-                          }
-                          onClick={[Function]}
-                          onResponderGrant={[Function]}
-                          onResponderMove={[Function]}
-                          onResponderRelease={[Function]}
-                          onResponderTerminate={[Function]}
-                          onResponderTerminationRequest={[Function]}
-                          onStartShouldSetResponder={[Function]}
-                        >
-                          <Text
-                            style={
-                              Array [
-                                Object {
-                                  "color": "#42D689",
-                                  "fontFamily": "Hind-SemiBold",
-                                  "fontSize": 14,
-                                  "lineHeight": 18,
-                                },
-                                Object {
-                                  "paddingEnd": 15,
-                                },
-                              ]
-                            }
-                          >
-                            global:pay
-                          </Text>
-                        </View>
-                        <View
-                          accessible={true}
-                          focusable={true}
-                          isTVSelectable={true}
-                          nativeBackgroundAndroid={
-                            Object {
-                              "attribute": "selectableItemBackgroundBorderless",
-                              "type": "ThemeAttrAndroid",
-                            }
-                          }
-                          onClick={[Function]}
-                          onResponderGrant={[Function]}
-                          onResponderMove={[Function]}
-                          onResponderRelease={[Function]}
-                          onResponderTerminate={[Function]}
-                          onResponderTerminationRequest={[Function]}
-                          onStartShouldSetResponder={[Function]}
-                        >
-                          <Text
-                            style={
-                              Array [
-                                Object {
-                                  "color": "#42D689",
-                                  "fontFamily": "Hind-SemiBold",
-                                  "fontSize": 14,
-                                  "lineHeight": 18,
-                                },
-                                Object {
-                                  "paddingEnd": 15,
-                                },
-                              ]
-                            }
-                          >
-                            global:decline
-                          </Text>
-                        </View>
-                      </View>
-                    </View>
-                  </View>
+                    }
+                  >
+                    global:decline
+                  </Text>
                 </View>
               </View>
             </View>
@@ -581,58 +535,116 @@ exports[`IncomingPaymentRequestListScreen renders correctly with requests 1`] = 
                 Array [
                   Object {
                     "backgroundColor": "#FFFFFF",
-                    "width": "100%",
-                  },
-                  Object {
-                    "elevation": 2,
+                    "elevation": 12,
+                    "padding": 16,
                     "shadowColor": "black",
                     "shadowOffset": Object {
-                      "height": 1,
+                      "height": 6,
                       "width": 0,
                     },
                     "shadowOpacity": 0.3,
-                    "shadowRadius": 1.6,
+                    "shadowRadius": 9.600000000000001,
                   },
+                  Object {
+                    "borderRadius": 8,
+                  },
+                  Array [
+                    Object {
+                      "height": 144,
+                    },
+                    Object {},
+                  ],
                 ]
               }
+              testID="IncomingPaymentRequestNotification/7363bvby2ba8270273"
             >
               <View
-                accessible={true}
-                focusable={true}
-                isTVSelectable={true}
-                nativeBackgroundAndroid={
-                  Object {
-                    "attribute": "selectableItemBackground",
-                    "type": "ThemeAttrAndroid",
-                  }
-                }
-                onClick={[Function]}
-                onResponderGrant={[Function]}
-                onResponderMove={[Function]}
-                onResponderRelease={[Function]}
-                onResponderTerminate={[Function]}
-                onResponderTerminationRequest={[Function]}
-                onStartShouldSetResponder={[Function]}
                 style={
                   Object {
-                    "padding": 16,
+                    "flex": 1,
+                    "flexDirection": "row",
                   }
                 }
               >
                 <View
                   style={
                     Object {
-                      "flexDirection": "row",
-                      "justifyContent": "space-between",
+                      "flex": 1,
+                      "marginRight": 16,
                     }
                   }
                 >
-                  <View
+                  <Text
+                    numberOfLines={2}
                     style={
                       Object {
-                        "alignItems": "center",
-                        "paddingRight": 16,
+                        "color": "#9CA4A9",
+                        "fontFamily": "Inter-Regular",
+                        "fontSize": 13,
+                        "lineHeight": 16,
+                        "marginBottom": 4,
                       }
+                    }
+                    testID="IncomingPaymentRequestNotification/7363bvby2ba8270273/Title"
+                  >
+                    incomingPaymentRequestNotificationTitle
+                  </Text>
+                  <Text
+                    numberOfLines={1}
+                    style={
+                      Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Inter-SemiBold",
+                        "fontSize": 24,
+                        "lineHeight": 28,
+                        "marginBottom": 2,
+                      }
+                    }
+                    testID="IncomingPaymentRequestNotification/7363bvby2ba8270273/Amount"
+                  >
+                    <Text
+                      numberOfLines={1}
+                      style={
+                        Array [
+                          undefined,
+                          Object {
+                            "color": undefined,
+                          },
+                        ]
+                      }
+                    >
+                      
+                      $
+                      1.33
+                    </Text>
+                  </Text>
+                  <Text
+                    style={
+                      Object {
+                        "color": "#2E3338",
+                        "fontFamily": "Inter-Regular",
+                        "fontSize": 14,
+                        "lineHeight": 18,
+                      }
+                    }
+                    testID="IncomingPaymentRequestNotification/7363bvby2ba8270273/Details"
+                  >
+                    Just the best but less
+                  </Text>
+                </View>
+                <View
+                  style={Object {}}
+                >
+                  <View
+                    style={
+                      Array [
+                        Object {
+                          "alignItems": "center",
+                          "flexDirection": "row",
+                          "justifyContent": "center",
+                        },
+                        undefined,
+                      ]
                     }
                   >
                     <View
@@ -640,189 +652,108 @@ exports[`IncomingPaymentRequestListScreen renders correctly with requests 1`] = 
                         Array [
                           Object {
                             "alignItems": "center",
-                            "flexDirection": "row",
                             "justifyContent": "center",
                           },
-                          undefined,
+                          Object {
+                            "backgroundColor": "#7AD6FE",
+                            "borderRadius": 20,
+                            "height": 40,
+                            "width": 40,
+                          },
                         ]
                       }
                     >
-                      <View
+                      <Text
                         style={
                           Array [
                             Object {
-                              "alignItems": "center",
-                              "justifyContent": "center",
+                              "color": "#FFFFFF",
+                              "fontFamily": "Inter-Medium",
+                              "fontSize": 16,
                             },
                             Object {
-                              "backgroundColor": "#7AD6FE",
-                              "borderRadius": 20,
-                              "height": 40,
-                              "width": 40,
+                              "fontSize": 20,
                             },
                           ]
                         }
                       >
-                        <Image
-                          source={
-                            Object {
-                              "testUri": "../../../packages/mobile/src/images/unknown-user-icon.png",
-                            }
-                          }
-                          style={
-                            Object {
-                              "alignItems": "center",
-                              "height": 40,
-                              "justifyContent": "center",
-                              "width": 40,
-                            }
-                          }
-                        />
-                      </View>
+                        +
+                      </Text>
                     </View>
                   </View>
-                  <View
+                </View>
+              </View>
+              <View
+                style={
+                  Object {
+                    "flexDirection": "row",
+                  }
+                }
+                testID="IncomingPaymentRequestNotification/7363bvby2ba8270273/CallToActions"
+              >
+                <View
+                  accessible={true}
+                  focusable={true}
+                  nativeBackgroundAndroid={
+                    Object {
+                      "attribute": "selectableItemBackgroundBorderless",
+                      "type": "ThemeAttrAndroid",
+                    }
+                  }
+                  onClick={[Function]}
+                  onResponderGrant={[Function]}
+                  onResponderMove={[Function]}
+                  onResponderRelease={[Function]}
+                  onResponderTerminate={[Function]}
+                  onResponderTerminationRequest={[Function]}
+                  onStartShouldSetResponder={[Function]}
+                  testID="IncomingPaymentRequestNotification/7363bvby2ba8270273/CallToActions/global:send/Button"
+                >
+                  <Text
                     style={
                       Object {
-                        "flex": 1,
-                        "justifyContent": "space-between",
+                        "color": "#1AB775",
+                        "fontFamily": "Inter-SemiBold",
+                        "fontSize": 14,
+                        "lineHeight": 16,
+                        "marginRight": 24,
                       }
                     }
                   >
-                    <Text
-                      style={
-                        Object {
-                          "color": "#2E3338",
-                          "fontFamily": "Hind-SemiBold",
-                          "fontSize": 14,
-                          "lineHeight": 18,
-                        }
+                    global:send
+                  </Text>
+                </View>
+                <View
+                  accessible={true}
+                  focusable={true}
+                  nativeBackgroundAndroid={
+                    Object {
+                      "attribute": "selectableItemBackgroundBorderless",
+                      "type": "ThemeAttrAndroid",
+                    }
+                  }
+                  onClick={[Function]}
+                  onResponderGrant={[Function]}
+                  onResponderMove={[Function]}
+                  onResponderRelease={[Function]}
+                  onResponderTerminate={[Function]}
+                  onResponderTerminationRequest={[Function]}
+                  onStartShouldSetResponder={[Function]}
+                  testID="IncomingPaymentRequestNotification/7363bvby2ba8270273/CallToActions/global:decline/Button"
+                >
+                  <Text
+                    style={
+                      Object {
+                        "color": "#1AB775",
+                        "fontFamily": "Inter-SemiBold",
+                        "fontSize": 14,
+                        "lineHeight": 16,
+                        "marginRight": 24,
                       }
-                      testID="IncomingPaymentRequestNotification/7363bvby2ba8270273/Title"
-                    >
-                      +14155550000
-                       requested
-                       
-                      <Text
-                        numberOfLines={1}
-                        style={
-                          Array [
-                            undefined,
-                            Object {
-                              "color": undefined,
-                            },
-                          ]
-                        }
-                      >
-                        
-                        $
-                        1.33
-                      </Text>
-                    </Text>
-                    <View
-                      style={
-                        Object {
-                          "justifyContent": "space-between",
-                          "minHeight": 60,
-                          "paddingTop": 2,
-                        }
-                      }
-                    >
-                      <Text
-                        style={
-                          Object {
-                            "color": "#2E3338",
-                            "fontFamily": "Hind-Regular",
-                            "fontSize": 14,
-                            "lineHeight": 18,
-                          }
-                        }
-                      >
-                        Just the best but less
-                      </Text>
-                      <View
-                        style={
-                          Object {
-                            "flexDirection": "row",
-                            "marginTop": 12,
-                          }
-                        }
-                      >
-                        <View
-                          accessible={true}
-                          focusable={true}
-                          isTVSelectable={true}
-                          nativeBackgroundAndroid={
-                            Object {
-                              "attribute": "selectableItemBackgroundBorderless",
-                              "type": "ThemeAttrAndroid",
-                            }
-                          }
-                          onClick={[Function]}
-                          onResponderGrant={[Function]}
-                          onResponderMove={[Function]}
-                          onResponderRelease={[Function]}
-                          onResponderTerminate={[Function]}
-                          onResponderTerminationRequest={[Function]}
-                          onStartShouldSetResponder={[Function]}
-                        >
-                          <Text
-                            style={
-                              Array [
-                                Object {
-                                  "color": "#42D689",
-                                  "fontFamily": "Hind-SemiBold",
-                                  "fontSize": 14,
-                                  "lineHeight": 18,
-                                },
-                                Object {
-                                  "paddingEnd": 15,
-                                },
-                              ]
-                            }
-                          >
-                            global:pay
-                          </Text>
-                        </View>
-                        <View
-                          accessible={true}
-                          focusable={true}
-                          isTVSelectable={true}
-                          nativeBackgroundAndroid={
-                            Object {
-                              "attribute": "selectableItemBackgroundBorderless",
-                              "type": "ThemeAttrAndroid",
-                            }
-                          }
-                          onClick={[Function]}
-                          onResponderGrant={[Function]}
-                          onResponderMove={[Function]}
-                          onResponderRelease={[Function]}
-                          onResponderTerminate={[Function]}
-                          onResponderTerminationRequest={[Function]}
-                          onStartShouldSetResponder={[Function]}
-                        >
-                          <Text
-                            style={
-                              Array [
-                                Object {
-                                  "color": "#42D689",
-                                  "fontFamily": "Hind-SemiBold",
-                                  "fontSize": 14,
-                                  "lineHeight": 18,
-                                },
-                                Object {
-                                  "paddingEnd": 15,
-                                },
-                              ]
-                            }
-                          >
-                            global:decline
-                          </Text>
-                        </View>
-                      </View>
-                    </View>
-                  </View>
+                    }
+                  >
+                    global:decline
+                  </Text>
                 </View>
               </View>
             </View>

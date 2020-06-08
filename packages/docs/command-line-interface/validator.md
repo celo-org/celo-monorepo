@@ -30,6 +30,8 @@ OPTIONS
 
   --useLedger                                        Set it to use a ledger wallet
 
+  --yes                                              Answer yes to prompt
+
 EXAMPLE
   affiliate --from 0x47e172f6cfb6c7d01c1574fa3e2be7cc73269d95 0x97f7333c51897469e8d98e7af8653aab468050a3
 ```

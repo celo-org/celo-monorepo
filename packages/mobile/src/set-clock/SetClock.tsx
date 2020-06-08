@@ -1,17 +1,14 @@
-const moment = require('moment')
-
 import Button, { BtnTypes } from '@celo/react-components/components/Button'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
+import { format } from 'date-fns'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { Image, Platform, StyleSheet, Text, View } from 'react-native'
 import * as AndroidOpenSettings from 'react-native-android-open-settings'
-import { componentWithAnalytics } from 'src/analytics/wrapper'
 import { Namespaces, withTranslation } from 'src/i18n'
 import clockIcon from 'src/images/clock-icon.png'
-import { navigate } from 'src/navigator/NavigationService'
-import { Screens } from 'src/navigator/Screens'
+import { navigateHome } from 'src/navigator/NavigationService'
 import { getLocalTimezone, getRemoteTime } from 'src/utils/time'
 
 export class SetClock extends React.Component<WithTranslation> {
@@ -22,7 +19,7 @@ export class SetClock extends React.Component<WithTranslation> {
       return AndroidOpenSettings.dateSettings()
     } else {
       // TODO: Implement Date Setting on iOS
-      navigate(Screens.WalletHome)
+      navigateHome()
     }
   }
 
@@ -34,7 +31,7 @@ export class SetClock extends React.Component<WithTranslation> {
         <View style={style.header}>
           <Image source={clockIcon} style={style.clockImage} resizeMode="contain" />
           <Text style={[fontStyles.h1, style.time]} testID="SetClockTitle">
-            {moment(getRemoteTime()).format('l, LT')}
+            {format(getRemoteTime(), 'Pp')}
           </Text>
           <Text style={fontStyles.body} testID="SetClockTitle">
             ({getLocalTimezone()})
@@ -88,4 +85,4 @@ const style = StyleSheet.create({
   },
 })
 
-export default componentWithAnalytics(withTranslation(Namespaces.global)(SetClock))
+export default withTranslation(Namespaces.global)(SetClock)

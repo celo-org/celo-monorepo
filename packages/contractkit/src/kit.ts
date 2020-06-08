@@ -121,6 +121,7 @@ export class ContractKit {
     const goldBalance = await goldToken.balanceOf(address)
     const lockedBalance = await lockedGold.getAccountTotalLockedGold(address)
     const dollarBalance = await stableToken.balanceOf(address)
+    const converted = await exchange.quoteUsdSell(dollarBalance)
     let pending = new BigNumber(0)
     try {
       pending = await lockedGold.getPendingWithdrawalsTotalValue(address)
@@ -133,7 +134,7 @@ export class ContractKit {
       usd: dollarBalance,
       total: goldBalance
         .plus(lockedBalance)
-        .plus(await exchange.quoteUsdSell(dollarBalance))
+        .plus(converted)
         .plus(pending),
       pending,
     }
@@ -338,10 +339,6 @@ export class ContractKit {
       from: this.config.from,
       feeCurrency: this.config.feeCurrency,
       gasPrice: this.config.gasPrice,
-    }
-
-    if (this.config.feeCurrency) {
-      defaultTx.feeCurrency = this.config.feeCurrency
     }
 
     return {

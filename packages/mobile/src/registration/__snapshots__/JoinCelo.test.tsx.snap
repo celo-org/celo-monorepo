@@ -287,7 +287,7 @@ exports[`JoinCeloScreen renders correctly 1`] = `
                     "padding": 8,
                   }
                 }
-                testID="CountryNameField"
+                testID="CountryNameFieldTextInput"
                 underlineColorAndroid="transparent"
                 value="Canadá"
               />
@@ -330,7 +330,7 @@ exports[`JoinCeloScreen renders correctly 1`] = `
                 "width": 60,
               }
             }
-            testID="contryCodeText"
+            testID="countryCodeText"
           >
             +1
           </Text>
@@ -414,7 +414,6 @@ exports[`JoinCeloScreen renders correctly 1`] = `
     <View
       accessible={true}
       focusable={true}
-      isTVSelectable={true}
       nativeBackgroundAndroid={
         Object {
           "attribute": "selectableItemBackground",
@@ -770,7 +769,7 @@ exports[`JoinCeloScreen renders with an error 1`] = `
                     "padding": 8,
                   }
                 }
-                testID="CountryNameField"
+                testID="CountryNameFieldTextInput"
                 underlineColorAndroid="transparent"
                 value="Canadá"
               />
@@ -813,7 +812,7 @@ exports[`JoinCeloScreen renders with an error 1`] = `
                 "width": 60,
               }
             }
-            testID="contryCodeText"
+            testID="countryCodeText"
           >
             +1
           </Text>
@@ -897,7 +896,6 @@ exports[`JoinCeloScreen renders with an error 1`] = `
     <View
       accessible={true}
       focusable={true}
-      isTVSelectable={true}
       nativeBackgroundAndroid={
         Object {
           "attribute": "selectableItemBackground",

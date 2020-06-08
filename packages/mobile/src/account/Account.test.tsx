@@ -3,7 +3,8 @@ import 'react-native'
 import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
 import Account from 'src/account/Account'
-import { createMockStore } from 'test/utils'
+import { Screens } from 'src/navigator/Screens'
+import { createMockStore, getMockStackScreenProps } from 'test/utils'
 
 describe('Account', () => {
   beforeAll(() => {
@@ -17,7 +18,7 @@ describe('Account', () => {
   it('renders correctly', () => {
     const tree = renderer.create(
       <Provider store={createMockStore({})}>
-        <Account />
+        <Account {...getMockStackScreenProps(Screens.Account)} />
       </Provider>
     )
     expect(tree).toMatchSnapshot()
@@ -32,7 +33,7 @@ describe('Account', () => {
           },
         })}
       >
-        <Account />
+        <Account {...getMockStackScreenProps(Screens.Account)} />
       </Provider>
     )
     expect(tree).toMatchSnapshot()
