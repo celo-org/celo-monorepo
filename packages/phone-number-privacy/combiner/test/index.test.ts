@@ -10,7 +10,7 @@ import { getNumberPairContacts, setNumberPairContacts } from '../src/database/wr
 import { getDistributedBlindedSalt, getContactMatches } from '../src/index'
 import { getRemainingQueryCount } from '../src/salt-generation/query-quota'
 
-const BLS_SIGNATURE = '6546544323114343'
+const BLS_SIGNATURE = '0Uj+qoAu7ASMVvm6hvcUGx2eO/cmNdyEgGn0mSoZH8/dujrC1++SZ1N6IP6v2I8A'
 
 jest.mock('../src/common/identity')
 const mockAuthenticateUser = authenticateUser as jest.Mock
