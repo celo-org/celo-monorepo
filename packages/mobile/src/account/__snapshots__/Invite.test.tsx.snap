@@ -11,13 +11,19 @@ exports[`Invite renders correctly with no recipients 1`] = `
 >
   <View
     style={
-      Object {
-        "alignItems": "center",
-        "backgroundColor": "#FFFFFF",
-        "flexDirection": "row",
-        "height": 62,
-        "justifyContent": "space-between",
-      }
+      Array [
+        Object {
+          "alignItems": "center",
+          "backgroundColor": "#FFFFFF",
+          "flexDirection": "row",
+          "height": 62,
+          "justifyContent": "space-between",
+        },
+        Object {
+          "borderBottomColor": "#EDEEEF",
+          "borderBottomWidth": 0,
+        },
+      ]
     }
   >
     <View
@@ -319,13 +325,19 @@ exports[`Invite renders correctly with recipients 1`] = `
 >
   <View
     style={
-      Object {
-        "alignItems": "center",
-        "backgroundColor": "#FFFFFF",
-        "flexDirection": "row",
-        "height": 62,
-        "justifyContent": "space-between",
-      }
+      Array [
+        Object {
+          "alignItems": "center",
+          "backgroundColor": "#FFFFFF",
+          "flexDirection": "row",
+          "height": 62,
+          "justifyContent": "space-between",
+        },
+        Object {
+          "borderBottomColor": "#EDEEEF",
+          "borderBottomWidth": 0,
+        },
+      ]
     }
   >
     <View

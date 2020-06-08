@@ -12,13 +12,19 @@ exports[`Testnet banner Renders when connected with backup complete 1`] = `
 >
   <View
     style={
-      Object {
-        "alignItems": "center",
-        "backgroundColor": "#FFFFFF",
-        "flexDirection": "row",
-        "height": 62,
-        "justifyContent": "space-between",
-      }
+      Array [
+        Object {
+          "alignItems": "center",
+          "backgroundColor": "#FFFFFF",
+          "flexDirection": "row",
+          "height": 62,
+          "justifyContent": "space-between",
+        },
+        Object {
+          "borderBottomColor": "#EDEEEF",
+          "borderBottomWidth": 0,
+        },
+      ]
     }
   >
     <View
@@ -424,13 +430,19 @@ exports[`Testnet banner Renders when disconnected 1`] = `
 >
   <View
     style={
-      Object {
-        "alignItems": "center",
-        "backgroundColor": "#FFFFFF",
-        "flexDirection": "row",
-        "height": 62,
-        "justifyContent": "space-between",
-      }
+      Array [
+        Object {
+          "alignItems": "center",
+          "backgroundColor": "#FFFFFF",
+          "flexDirection": "row",
+          "height": 62,
+          "justifyContent": "space-between",
+        },
+        Object {
+          "borderBottomColor": "#EDEEEF",
+          "borderBottomWidth": 0,
+        },
+      ]
     }
   >
     <View
@@ -836,13 +848,19 @@ exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
 >
   <View
     style={
-      Object {
-        "alignItems": "center",
-        "backgroundColor": "#FFFFFF",
-        "flexDirection": "row",
-        "height": 62,
-        "justifyContent": "space-between",
-      }
+      Array [
+        Object {
+          "alignItems": "center",
+          "backgroundColor": "#FFFFFF",
+          "flexDirection": "row",
+          "height": 62,
+          "justifyContent": "space-between",
+        },
+        Object {
+          "borderBottomColor": "#EDEEEF",
+          "borderBottomWidth": 0,
+        },
+      ]
     }
   >
     <View

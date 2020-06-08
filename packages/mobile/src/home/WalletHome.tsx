@@ -5,7 +5,6 @@ import _ from 'lodash'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import {
-  // Animated,
   NativeScrollEvent,
   NativeSyntheticEvent,
   RefreshControl,

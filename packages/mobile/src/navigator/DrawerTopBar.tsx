@@ -3,12 +3,15 @@ import colors from '@celo/react-components/styles/colors.v2'
 import { useNavigation } from '@react-navigation/native'
 import * as React from 'react'
 import { StyleSheet, TouchableOpacity, View } from 'react-native'
-import Animated, { cond, greaterThan } from 'react-native-reanimated'
+import Animated from 'react-native-reanimated'
 
 interface Props {
   middleElement?: React.ReactNode
   scrollPosition?: Animated.Value<number>
 }
+
+// Test mocks would not work if import these together with Animated
+const { cond, greaterThan } = Animated
 
 function DrawerTopBar({ middleElement, scrollPosition }: Props) {
   const navigation = useNavigation()
