@@ -32,8 +32,12 @@ class WalletAnalytics extends CeloAnalytics {
     super.trackSubEvent(eventName, subEventName, eventProperties)
   }
 
-  stopTracking(eventName: EventNames, eventProperties: object = {}) {
-    super.stopTracking(eventName, eventProperties)
+  stopTracking(
+    eventName: EventNames,
+    eventProperties: object = {},
+    attachDeviceInfo: boolean = false
+  ) {
+    super.stopTracking(eventName, eventProperties, attachDeviceInfo)
   }
 }
 

@@ -127,7 +127,7 @@ class CeloAnalytics {
 
   // Used with trackSubEvent and endTracking to track durations for
   // processes with multiple steps. For one-off events, use track method
-  // Event properties will reflect latest value provided
+  // Duplicate event properties will reflect latest value provided
   startTracking(eventName: string, eventProperties = {}) {
     this.activeEvents.set(
       eventName,
@@ -149,7 +149,7 @@ class CeloAnalytics {
   }
 
   // See startTracking
-  stopTracking(eventName: string, eventProperties = {}) {
+  stopTracking(eventName: string, eventProperties = {}, attachDeviceInfo = false) {
     if (!this.activeEvents.has(eventName)) {
       return
     }
@@ -177,7 +177,7 @@ class CeloAnalytics {
       subEvents.get('__endTracking__')!.timestamp - subEvents.get('__startTracking__')!.timestamp
     this.activeEvents.delete(eventName)
 
-    this.track(eventName, { ...eventPropsSuperSet, ...durations })
+    this.track(eventName, { ...eventPropsSuperSet, ...durations }, attachDeviceInfo)
   }
 
   page(page: string, eventProperties: {}) {

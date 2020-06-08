@@ -118,7 +118,7 @@ class PaymentRequestConfirmation extends React.Component<Props> {
       notified: false,
     }
 
-    CeloAnalytics.track(CustomEventNames.request_confirm, { address: requesteeAddress })
+    CeloAnalytics.track(CustomEventNames.request_confirm, { requesteeAddress })
     this.props.writePaymentRequest(paymentInfo)
     Logger.showMessage(t('requestSent'))
   }

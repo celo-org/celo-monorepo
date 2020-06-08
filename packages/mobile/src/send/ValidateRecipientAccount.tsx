@@ -105,7 +105,6 @@ export class ValidateRecipientAccount extends React.Component<Props, State> {
         : singleDigitInputValueArr.join('')
 
     CeloAnalytics.track(CustomEventNames.send_secure_submit, {
-      method: 'manual',
       validationType: addressValidationType === AddressValidationType.FULL ? 'full' : 'partial',
       address: inputToValidate,
     })
