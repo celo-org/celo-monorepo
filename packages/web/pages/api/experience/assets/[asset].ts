@@ -1,11 +1,15 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import getAssets, { AssetSheet } from 'server/AssetBase'
 import byMethod from 'server/byMethod'
+import getEventKit, { Sheets } from 'server/EventKit'
 
 const ACCEPTABLE = new Set(
-  [AssetSheet.Icons, AssetSheet.Illustrations, AssetSheet.AbstractGraphics].map((type) =>
-    type.toLowerCase()
-  )
+  [
+    AssetSheet.Icons,
+    AssetSheet.Illustrations,
+    AssetSheet.AbstractGraphics,
+    Sheets.Planning,
+  ].map((type) => type.toLowerCase())
 )
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
@@ -16,10 +20,17 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     .join(' ')
 
   if (!ACCEPTABLE.has(type)) {
-    throw new Error('Invalid param; must be one of icons, illustrations, or abstract-graphics')
+    throw new Error(
+      'Invalid param; must be one of icons, illustrations, or abstract-graphics, or planning'
+    )
   }
-  const assets = await getAssets(type as AssetSheet)
-  res.json(assets)
+  if (type === Sheets.Planning.toLowerCase()) {
+    const docs = await getEventKit(Sheets.Planning)
+    res.json(docs)
+  } else {
+    const assets = await getAssets(type as AssetSheet)
+    res.json(assets)
+  }
 }
 
 export default byMethod({ getHandler: get })
