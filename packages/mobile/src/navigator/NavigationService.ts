@@ -52,7 +52,7 @@ export const pushToStack: SafeNavigate = (...args) => {
   const [routeName, params] = args
   ensureNavigator()
     .then(() => {
-      Logger.debug(`${TAG}@replace`, `Dispatch ${routeName}`)
+      Logger.debug(`${TAG}@pushToStack`, `Dispatch ${routeName}`)
       navigationRef.current?.dispatch(
         StackActions.push({
           routeName,
@@ -61,7 +61,7 @@ export const pushToStack: SafeNavigate = (...args) => {
       )
     })
     .catch((reason) => {
-      Logger.error(`${TAG}@replace`, `Navigation failure: ${reason}`)
+      Logger.error(`${TAG}@pushToStack`, `Navigation failure: ${reason}`)
     })
 }
 
@@ -128,6 +128,14 @@ export const navigateProtected: SafeNavigate = (...args) => {
     .catch((error) => {
       Logger.error(`${TAG}@navigateProtected`, 'PIN ensure error', error)
     })
+}
+
+export function navigateToExchangeHome() {
+  if (store.getState().goldToken.educationCompleted) {
+    navigate(Screens.ExchangeHomeScreen)
+  } else {
+    navigate(Screens.GoldEducation)
+  }
 }
 
 export function navigateBack(params?: object) {

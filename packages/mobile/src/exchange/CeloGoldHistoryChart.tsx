@@ -10,6 +10,7 @@ import { Circle, G, Line, Text as SvgText } from 'react-native-svg'
 import { useExchangeRate } from 'src/exchange/hooks'
 import { exchangeHistorySelector } from 'src/exchange/reducer'
 import { Namespaces, withTranslation } from 'src/i18n'
+import InfoIcon from 'src/icons/InfoIcon.v2'
 import { LocalCurrencyCode } from 'src/localCurrency/consts'
 import { convertDollarsToLocalAmount } from 'src/localCurrency/convert'
 import { getLocalCurrencyExchangeRate } from 'src/localCurrency/selectors'
@@ -18,6 +19,9 @@ import { goldToDollarAmount } from 'src/utils/currencyExchange'
 import { getLocalCurrencyDisplayValue } from 'src/utils/formatting'
 import { formatFeedDate } from 'src/utils/time'
 import { VictoryGroup, VictoryLine, VictoryScatter } from 'victory-native'
+import Touchable from '@celo/react-components/components/Touchable'
+import { navigate } from 'src/navigator/NavigationService'
+import { Screens } from 'src/navigator/Screens'
 
 const CHART_POINTS_NUMBER = 60
 const CHART_WIDTH = variables.width
@@ -171,6 +175,10 @@ function Loader() {
   )
 }
 
+function navigateToGuide() {
+  navigate(Screens.GoldEducation)
+}
+
 function CeloGoldHistoryChart({ t, testID, i18n }: Props) {
   const calculateGroup = useCallback((er) => {
     return Math.floor(er.timestamp / (range / CHART_POINTS_NUMBER))
@@ -255,8 +263,11 @@ function CeloGoldHistoryChart({ t, testID, i18n }: Props) {
   return (
     <View style={styles.container} testID={testID}>
       <View style={styles.goldPrice}>
-        <View>
+        <View style={styles.goldPriceTitleArea}>
           <Text style={styles.goldPriceTitle}>{t('goldPrice')}</Text>
+          <Touchable onPress={navigateToGuide} hitSlop={variables.iconHitslop}>
+            <InfoIcon size={14} />
+          </Touchable>
         </View>
         <View style={styles.goldPriceValues}>
           <Text style={styles.goldPriceCurrentValue}>
@@ -305,6 +316,11 @@ const styles = StyleSheet.create({
   },
   goldPriceTitle: {
     ...fontStyles.h2,
+    marginRight: 8,
+  },
+  goldPriceTitleArea: {
+    flexDirection: 'row',
+    alignItems: 'center',
     marginBottom: 8,
   },
   goldPriceValues: { flexDirection: 'row', alignItems: 'flex-end' },

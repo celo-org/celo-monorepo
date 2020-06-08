@@ -40,6 +40,8 @@ import { Screens } from 'src/navigator/Screens'
 import useSelector from 'src/redux/useSelector'
 import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
 import { currentAccountSelector } from 'src/web3/selectors'
+import AccountKeyEducation from 'src/account/AccountKeyEducation'
+import GoldEducation from 'src/account/GoldEducation'
 
 const Drawer = createDrawerNavigator()
 
@@ -96,6 +98,8 @@ function CustomDrawerContent(props: DrawerContentComponentProps<DrawerContentOpt
 
 export default function DrawerNavigator() {
   const { t } = useTranslation(Namespaces.global)
+  const isCeloEducationComplete = useSelector((state) => state.goldToken.educationCompleted)
+
   const drawerContent = (props: DrawerContentComponentProps<DrawerContentOptions>) => (
     <CustomDrawerContent {...props} />
   )
@@ -116,8 +120,8 @@ export default function DrawerNavigator() {
         options={{ title: t('home'), drawerIcon: Home }}
       />
       <Drawer.Screen
-        name={Screens.ExchangeHomeScreen}
-        component={ExchangeHomeScreen}
+        name={isCeloEducationComplete ? Screens.ExchangeHomeScreen : Screens.GoldEducation}
+        component={isCeloEducationComplete ? ExchangeHomeScreen : GoldEducation}
         options={{ title: t('celoGold'), drawerIcon: Gold }}
       />
       <Drawer.Screen

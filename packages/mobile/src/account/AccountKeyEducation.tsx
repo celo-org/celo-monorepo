@@ -43,19 +43,19 @@ function useSteps() {
     () =>
       [
         {
-          image: stabilityScale,
+          image: null,
           cancelEvent: CustomEventNames.backup_educate_1_cancel,
           progressEvent: CustomEventNames.backup_educate_1_next,
           screenName: 'AccountKeyEducation',
         },
         {
-          image: sendFee,
+          image: null,
           cancelEvent: CustomEventNames.backup_educate_2_cancel,
           progressEvent: CustomEventNames.backup_educate_2_next,
           screenName: 'AccountKeyEducation',
         },
         {
-          image: sendBetweenPhones,
+          image: null,
           cancelEvent: CustomEventNames.backup_educate_3_cancel,
           progressEvent: CustomEventNames.backup_educate_3_next,
           screenName: 'AccountKeyEducation',

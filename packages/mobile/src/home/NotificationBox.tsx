@@ -200,15 +200,13 @@ export class NotificationBox extends React.Component<Props, State> {
           {
             text: t('exchange'),
             onPress: () => {
-              this.props.setGoldEducationCompleted()
               CeloAnalytics.track(CustomEventNames.celogold_notification_confirm)
-              navigate(Screens.ExchangeHomeScreen)
+              navigate(Screens.GoldEducation)
             },
           },
           {
             text: t('maybeLater'),
             onPress: () => {
-              this.props.setGoldEducationCompleted()
               CeloAnalytics.track(CustomEventNames.celogold_notification_dismiss)
             },
           },

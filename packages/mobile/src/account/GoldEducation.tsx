@@ -25,7 +25,7 @@ export default function GoldEducation() {
     if (isCeloEducationComplete) {
       navigateBack()
     } else {
-      navigate(Screens.ExchangeTradeScreen)
+      navigate(Screens.ExchangeHomeScreen)
     }
 
     dispatch(setEducationCompleted())

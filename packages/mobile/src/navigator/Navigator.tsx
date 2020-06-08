@@ -61,7 +61,7 @@ import {
   nuxNavigationOptions,
   nuxNavigationOptionsNoBackButton,
 } from 'src/navigator/Headers.v2'
-import { navigate, navigateBack } from 'src/navigator/NavigationService'
+import { navigate, navigateBack, navigateToExchangeHome } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { TopBarIconButton, TopBarTextButton } from 'src/navigator/TopBarButton.v2'
 import { StackParamList } from 'src/navigator/types'
@@ -317,7 +317,6 @@ const exchangeReviewScreenOptions = ({
 }) => {
   const { makerToken } = route.params?.exchangeInput
   const isDollarToGold = makerToken === CURRENCY_ENUM.DOLLAR
-  const goExchangeHome = () => navigate(Screens.ExchangeHomeScreen)
   const title = isDollarToGold ? i18n.t('exchangeFlow9:buyGold') : i18n.t('exchangeFlow9:sellGold')
   const cancelEventName = isDollarToGold
     ? CustomEventNames.gold_buy_cancel
@@ -327,7 +326,9 @@ const exchangeReviewScreenOptions = ({
     : CustomEventNames.gold_sell_edit
   return {
     ...headerWithCancelButton,
-    headerLeft: () => <CancelButton onCancel={goExchangeHome} eventName={cancelEventName} />,
+    headerLeft: () => (
+      <CancelButton onCancel={navigateToExchangeHome} eventName={cancelEventName} />
+    ),
     headerRight: () => (
       <TopBarTextButton
         title={i18n.t('global:edit')}
