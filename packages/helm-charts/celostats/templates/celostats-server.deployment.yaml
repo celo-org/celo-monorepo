@@ -42,7 +42,7 @@ spec:
         - |
           sed -i "s%###NETWORK_NAME###%{{ .Values.celostats.network_name }}%g" /celostats-server/dist/js/netstats.min.js
           sed -i "s%###BLOCKSCOUT_URL###%{{ .Values.celostats.blockscout_url }}%g" /celostats-server/dist/js/netstats.min.js
-          npm start
+          exec npm start
         ports:
         - name: http
           containerPort: 3000

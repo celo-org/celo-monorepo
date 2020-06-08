@@ -109,7 +109,7 @@ spec:
           ACCOUNT_ADDRESS=$(awk 'NR=={{ add $index 1 }}' /root/.celo/address)
           PASSWORD=$(cat /root/.celo/account/accountSecret)
 
-          geth \
+          exec geth \
           --nousb \
           --rpc \
           --rpcapi=eth,web3,debug,admin,personal,net \
@@ -152,7 +152,7 @@ spec:
             # Send the txs to the next load test client
             RECIPIENT_INDEX=$(( ($RID + 1) % {{ .Values.replicas }} ))
 
-            celotooljs.sh geth simulate-client \
+            exec celotooljs.sh geth simulate-client \
               --index $RID \
               --recipient-index $RECIPIENT_INDEX \
               --delay {{ .Values.delay }} \

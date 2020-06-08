@@ -1,99 +1,57 @@
-import Button, { BtnTypes } from '@celo/react-components/components/Button'
-import colors from '@celo/react-components/styles/colors'
-import { componentStyles } from '@celo/react-components/styles/styles'
+import TextButton from '@celo/react-components/components/TextButton.v2'
+import colors from '@celo/react-components/styles/colors.v2'
 import * as React from 'react'
-import { ActivityIndicator, StyleSheet, View } from 'react-native'
+import { useTranslation } from 'react-i18next'
+import { StyleSheet, View } from 'react-native'
+import Modal from 'src/components/Modal'
+import { Namespaces } from 'src/i18n'
 import SmsIcon from 'src/icons/SmsIcon'
 import WhatsAppLogo from 'src/icons/WhatsAppLogo'
 
 interface Props {
+  isVisible: boolean
   onCancel: () => void
   onWhatsApp: () => void
   onSMS: () => void
-  cancelText: string
-  whatsAppText: string
-  SMSText: string
-  margin?: number
 }
 
-interface State {
-  inviteConfirmed: boolean
-}
+const InviteOptionsModal = ({ onCancel, onWhatsApp, onSMS, isVisible }: Props) => {
+  const { t } = useTranslation(Namespaces.inviteFlow11)
 
-class InviteOptionsModal extends React.PureComponent<Props, State> {
-  static defaultProps = {
-    margin: 0,
-  }
-
-  state = {
-    inviteConfirmed: false,
-  }
-
-  render() {
-    const { onCancel, onWhatsApp, onSMS, cancelText, whatsAppText, SMSText, margin } = this.props
-
-    return (
-      <View style={[componentStyles.bottomContainer, style.modal]}>
-        <View style={{ height: margin }} />
-        <Button
-          onPress={onSMS}
-          text={SMSText}
-          accessibilityLabel={SMSText}
-          standard={false}
-          type={BtnTypes.TERTIARY}
-          disabled={this.state.inviteConfirmed}
-        >
-          <SmsIcon />
-        </Button>
-        <View style={{ height: margin }} />
-        <Button
-          onPress={onWhatsApp}
-          text={whatsAppText}
-          accessibilityLabel={whatsAppText}
-          standard={false}
-          type={BtnTypes.TERTIARY}
-          disabled={this.state.inviteConfirmed}
-        >
-          <WhatsAppLogo />
-        </Button>
-        <View style={{ height: margin }} />
-        <Button
-          onPress={onCancel}
-          text={cancelText}
-          accessibilityLabel={cancelText}
-          standard={false}
-          type={BtnTypes.SECONDARY}
-          disabled={this.state.inviteConfirmed}
-        />
-        <View style={{ height: margin }} />
-        {this.state.inviteConfirmed && (
-          <View style={style.loadingIcon}>
-            <ActivityIndicator size="large" color={colors.celoGreen} />
-          </View>
-        )}
+  return (
+    <Modal isVisible={isVisible} style={styles.container}>
+      <View style={styles.buttonContainer}>
+        <SmsIcon />
+        <TextButton style={styles.buttonText} onPress={onSMS}>
+          {t('inviteWithSMS')}
+        </TextButton>
       </View>
-    )
-  }
+      <View style={styles.buttonContainer}>
+        <WhatsAppLogo />
+        <TextButton style={styles.buttonText} onPress={onWhatsApp}>
+          {t('inviteWithWhatsapp')}
+        </TextButton>
+      </View>
+      <View style={styles.buttonContainer}>
+        <TextButton onPress={onCancel}>{t('global:cancel')}</TextButton>
+      </View>
+    </Modal>
+  )
 }
 
-const style = StyleSheet.create({
-  containerButton: {
-    flex: 1,
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: colors.white,
+  },
+  buttonContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  loadingIcon: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    top: 0,
-    bottom: 0,
-    alignItems: 'center',
     justifyContent: 'center',
+    paddingVertical: 8,
   },
-  modal: {
-    backgroundColor: colors.white,
+  buttonText: {
+    paddingLeft: 8,
+    color: colors.dark,
   },
 })
 
