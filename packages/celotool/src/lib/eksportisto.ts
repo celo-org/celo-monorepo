@@ -29,6 +29,10 @@ export async function removeHelmRelease(celoEnv: string) {
   await execCmdWithExitOnFailure(`helm del --purge ${celoEnv}-eksportisto-${suffix}`)
 }
 
+function fetchSensitiveAccounts() {
+  return JSON.stringify({})
+}
+
 async function helmParameters(celoEnv: string) {
   const suffix = fetchEnvOrFallback(envVar.EKSPORTISTO_SUFFIX, '1')
   const params = [
@@ -37,6 +41,7 @@ async function helmParameters(celoEnv: string) {
     `--set imageRepository="${fetchEnv(envVar.EKSPORTISTO_DOCKER_IMAGE_REPOSITORY)}"`,
     `--set imageTag="${fetchEnv(envVar.EKSPORTISTO_DOCKER_IMAGE_TAG)}"`,
     `--set deploymentSuffix=${suffix}`,
+    `--set sensitiveAccountsBase64=${Buffer.from(fetchSensitiveAccounts()).toString('base64').trim()}`
   ]
   if (isVmBased()) {
     params.push(

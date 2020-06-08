@@ -30,6 +30,4 @@
 /packages/transaction-metrics-exporter @nambrot
 /packages/typescript/ @cmcewen
 /packages/utils/ @jmrossy
-/packages/verification-pool-api/ @jmrossy @nambrot
-/packages/verifier/ @jmrossy @cmcewen
 /packages/web/ @cmcewen @aaronmgdr
