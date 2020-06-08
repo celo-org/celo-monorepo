@@ -69,7 +69,7 @@ export function transformMatrixIntoPath(cellSize: number, matrix: any) {
 }
 
 interface QRProps {
-  value?: string
+  value: string
   size?: number
   color?: string
   backgroundColor?: string
@@ -82,7 +82,7 @@ interface QRProps {
  * A simple component for displaying QR Code using svg
  */
 function QRCode({
-  value = 'This is a QR Code.',
+  value,
   size = 100,
   color = 'black',
   backgroundColor = 'white',
