@@ -24,9 +24,11 @@ describe('Fetch contact matches', () => {
     mockFetch.mockResponseOnce(
       JSON.stringify({
         success: true,
-        matchedContacts: {
-          phonNumber: 'Fox23FU+SCdDPhk2I2h4e2UC63lyOWMygxc4wTAXu9w=',
-        },
+        matchedContacts: [
+          {
+            phoneNumber: 'Fox23FU+SCdDPhk2I2h4e2UC63lyOWMygxc4wTAXu9w=',
+          },
+        ],
       })
     )
 
