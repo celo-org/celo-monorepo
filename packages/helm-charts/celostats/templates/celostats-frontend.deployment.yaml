@@ -31,6 +31,8 @@ spec:
           value: https://{{ .Release.Namespace }}-celostats-server.{{ .Values.domain.name }}.org
         - name: BLOCKSCOUT_URL
           value: https://{{ .Release.Namespace }}-blockscout.{{ .Values.domain.name }}.org
+        - name: SUBMENU_BLOCKSCOUT
+          value: https://{{ .Release.Namespace }}-blockscout.{{ .Values.domain.name }}.org
         - name: GRAPHQL_BLOCKSCOUT_URL
           value: https://{{ .Release.Namespace }}-blockscout.{{ .Values.domain.name }}.org/graphiql
         command:
@@ -40,7 +42,7 @@ spec:
         - |
           /var/www/scripts/set-env-variables.js /var/www/app
           ngsw-config /var/www/app/ /var/www/ngsw-config.json
-          nginx -g "daemon off;"
+          exec nginx -g "daemon off;"
         ports:
         - name: http
           containerPort: 80

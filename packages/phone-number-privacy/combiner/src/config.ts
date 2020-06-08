@@ -7,9 +7,14 @@ export const DEV_MODE =
   process.env.NODE_ENV !== 'production' || process.env.FUNCTIONS_EMULATOR === 'true'
 
 export const DEV_PUBLIC_KEY =
-  'B+gJTCmTrf9t3X7YQ2F4xekSzd5xg5bdzcJ8NPefby3mScelg5172zl1GgIO9boADEwE67j6M55GwouQwaG5jDZ5tHa2eNtfC7oLIsevuUmzrXVDry9cmsalB0BHX0EA'
-export const DEV_PRIVATE_KEY = '1DNeOAuBYhR9BIKKChUOatB1Ha6cK/sG9p7XT2tjYQ8='
+  'T4u+jDHnBnWoe+c6JQ1Q47a0p2SCTbLb6DblnS0tnpzkebgP63T0RyAaYRCRmBsAE6421jwKcVRzVypCsmILPpHQ6MErykqoQ3WuCHd38PTIRWoolrmT1Wh8Z5dw6S6A'
+export const DEV_PRIVATE_KEY = 'AAAAAGq0qzUlgXAYOb7IDBvUiktHC/IaDAdkwnF4TzLRkQAN'
+export const DEV_POLYNOMIAL =
+  'AQAAAAAAAABPi76MMecGdah75zolDVDjtrSnZIJNstvoNuWdLS2enOR5uA/rdPRHIBphEJGYGwATrjbWPApxVHNXKkKyYgs+kdDowSvKSqhDda4Id3fw9MhFaiiWuZPVaHxnl3DpLoA='
 
+export interface PgpnpServices {
+  url: string
+}
 interface Config {
   blockchain: {
     provider: string
@@ -35,6 +40,11 @@ interface Config {
   }
   attestations: {
     numberAttestationsRequired: number
+  }
+  pgpnpServices: PgpnpServices[]
+  thresholdSignature: {
+    threshold: number
+    polynomial: string
   }
 }
 
@@ -68,6 +78,18 @@ if (DEV_MODE) {
     attestations: {
       numberAttestationsRequired: 3,
     },
+    pgpnpServices: [
+      // {
+      //   url: 'https://us-central1-celo-phone-number-privacy-stg.cloudfunctions.net',
+      // },
+      {
+        url: 'http://localhost:3000',
+      },
+    ],
+    thresholdSignature: {
+      threshold: 1,
+      polynomial: DEV_POLYNOMIAL,
+    },
   }
 } else {
   const functionConfig = functions.config()
@@ -96,6 +118,11 @@ if (DEV_MODE) {
     },
     attestations: {
       numberAttestationsRequired: functionConfig.attestations.number_attestations_required,
+    },
+    pgpnpServices: [],
+    thresholdSignature: {
+      threshold: functionConfig.threshold_signature.threshold_signature_threshold,
+      polynomial: functionConfig.threshold_signature.threshold_polynomial,
     },
   }
 }

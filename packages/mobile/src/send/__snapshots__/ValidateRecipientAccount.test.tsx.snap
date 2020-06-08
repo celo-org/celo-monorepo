@@ -15,206 +15,233 @@ exports[`ValidateRecipientAccount renders correctly when full validation require
       Object {
         "flexGrow": 1,
         "justifyContent": "space-between",
-        "padding": 20,
-        "paddingTop": 40,
+        "padding": 16,
       }
     }
     keyboardShouldPersistTaps="always"
   >
     <View>
       <View>
+        <Text
+          style={
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Inter-SemiBold",
+              "fontSize": 19,
+              "lineHeight": 26,
+              "paddingVertical": 16,
+            }
+          }
+        >
+          confirmAccountNumber.title
+        </Text>
         <View>
-          <Text
-            style={
-              Object {
-                "color": "#2E3338",
-                "fontFamily": "Hind-Regular",
-                "fontSize": 16,
-                "lineHeight": 24,
-                "paddingBottom": 15,
-                "textAlign": "center",
-              }
-            }
-          >
-            confirmAccountNumber.body1Full
-          </Text>
-          <Text
-            style={
-              Object {
-                "color": "#2E3338",
-                "fontFamily": "Hind-Regular",
-                "fontSize": 16,
-                "lineHeight": 24,
-                "paddingBottom": 15,
-                "textAlign": "center",
-              }
-            }
-          >
-            confirmAccountNumber.body2Full
-          </Text>
-          <Text
-            style={
-              Object {
-                "color": "#2E3338",
-                "fontFamily": "Hind-SemiBold",
-                "fontSize": 16,
-                "lineHeight": 24,
-                "marginTop": 20,
-                "textAlign": "center",
-              }
-            }
-          >
-            accountInputHeaderB
-          </Text>
-          <View
-            style={
-              Array [
-                Object {
-                  "alignItems": "center",
-                  "flex": 1,
-                  "flexDirection": "row",
-                  "justifyContent": "center",
-                },
-                Object {
-                  "backgroundColor": "#FFF",
-                  "borderColor": "#D1D5D8",
-                  "borderRadius": 3,
-                  "borderWidth": 1,
-                  "flex": 0,
-                  "height": 50,
-                  "marginVertical": 5,
-                },
-              ]
-            }
-          >
-            <TextInput
-              allowFontScaling={true}
-              onBlur={[Function]}
-              onChangeText={[Function]}
-              onFocus={[Function]}
-              placeholder="0xf1b1d5a6e7728g309c4a025k122d71ad75a61976"
-              rejectResponderTermination={true}
-              shouldShowClipboard={[Function]}
+          <View>
+            <Text
               style={
                 Object {
-                  "backgroundColor": "#FFFFFF",
-                  "borderColor": "#D1D5D8",
-                  "borderRadius": 3,
-                  "flex": 1,
-                  "fontFamily": "Hind-Regular",
-                  "padding": 8,
+                  "color": "#2E3338",
+                  "fontFamily": "Inter-Regular",
+                  "fontSize": 16,
+                  "lineHeight": 22,
+                  "paddingBottom": 16,
                 }
               }
-              underlineColorAndroid="transparent"
-              value=""
-            />
+            >
+              confirmAccountNumber.body1Full
+            </Text>
+            <Text
+              style={
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Inter-Regular",
+                  "fontSize": 16,
+                  "lineHeight": 22,
+                  "paddingBottom": 16,
+                }
+              }
+            >
+              confirmAccountNumber.body2Full
+            </Text>
+            <Text
+              style={
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Inter-SemiBold",
+                  "fontSize": 14,
+                  "lineHeight": 18,
+                  "paddingVertical": 8,
+                }
+              }
+            >
+              accountInputHeaderFull
+            </Text>
+            <View
+              style={
+                Array [
+                  Object {
+                    "alignItems": "center",
+                    "flex": 1,
+                    "flexDirection": "row",
+                    "justifyContent": "center",
+                  },
+                  Object {
+                    "backgroundColor": "#FFF",
+                    "borderColor": "#D1D5D8",
+                    "borderRadius": 3,
+                    "borderWidth": 1,
+                    "flex": 0,
+                    "height": 50,
+                    "marginVertical": 5,
+                  },
+                ]
+              }
+            >
+              <TextInput
+                allowFontScaling={true}
+                onBlur={[Function]}
+                onChangeText={[Function]}
+                onFocus={[Function]}
+                placeholder="0xf1b1d5a6e7728g309c4a025k122d71ad75a61976"
+                rejectResponderTermination={true}
+                shouldShowClipboard={[Function]}
+                style={
+                  Object {
+                    "backgroundColor": "#FFFFFF",
+                    "borderColor": "#D1D5D8",
+                    "borderRadius": 3,
+                    "flex": 1,
+                    "fontFamily": "Hind-Regular",
+                    "padding": 8,
+                  }
+                }
+                underlineColorAndroid="transparent"
+                value=""
+              />
+            </View>
           </View>
         </View>
-      </View>
-      <Text
-        onPress={[Function]}
-        style={
-          Object {
-            "color": "#2E3338",
-            "fontFamily": "Hind-Regular",
-            "fontSize": 14,
-            "lineHeight": 18,
-            "marginBottom": 10,
-            "marginTop": 20,
-            "textAlign": "center",
-            "textDecorationLine": "underline",
+        <View
+          style={
+            Object {
+              "height": 64,
+            }
           }
-        }
-      >
-        confirmAccountNumber.help
-      </Text>
-    </View>
-  </RCTScrollView>
-  <View
-    style={
-      Array [
-        Object {
-          "alignItems": "center",
-          "borderRadius": 3,
-          "flexDirection": "row",
-        },
-        null,
-        null,
-        undefined,
-        Object {
-          "backgroundColor": "#42D689",
-        },
-      ]
-    }
-  >
-    <View
-      accessible={true}
-      focusable={true}
-      nativeBackgroundAndroid={
-        Object {
-          "attribute": "selectableItemBackground",
-          "type": "ThemeAttrAndroid",
-        }
-      }
-      onClick={[Function]}
-      onResponderGrant={[Function]}
-      onResponderMove={[Function]}
-      onResponderRelease={[Function]}
-      onResponderTerminate={[Function]}
-      onResponderTerminationRequest={[Function]}
-      onStartShouldSetResponder={[Function]}
-      style={
-        Array [
-          Object {
-            "alignItems": "center",
-            "flex": 1,
-            "justifyContent": "center",
-          },
-          Object {
-            "backgroundColor": "#42D689",
-          },
-          Object {
-            "height": 50,
-          },
-          Object {
-            "borderWidth": 0,
-          },
-        ]
-      }
-      testID="ConfirmAccountButton"
-    >
-      <View
-        style={
-          Object {
-            "alignItems": "center",
-            "flex": 1,
-            "flexDirection": "row",
-            "justifyContent": "space-between",
-          }
-        }
-      >
-        <Text
+        />
+        <View
           style={
             Array [
               Object {
-                "fontFamily": "Hind-SemiBold",
-                "fontSize": 16,
+                "flexDirection": "row",
               },
               Object {
-                "color": "#FFFFFF",
-              },
-              Object {
-                "paddingLeft": 5,
-                "paddingRight": 5,
+                "paddingVertical": 16,
               },
             ]
           }
         >
-          confirmAccount.button
+          <View
+            style={
+              Object {
+                "borderRadius": 100,
+                "overflow": "hidden",
+              }
+            }
+          >
+            <View
+              accessible={true}
+              focusable={true}
+              nativeBackgroundAndroid={
+                Object {
+                  "attribute": "selectableItemBackground",
+                  "type": "ThemeAttrAndroid",
+                }
+              }
+              onClick={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                Object {
+                  "alignItems": "center",
+                  "backgroundColor": "#1AB775",
+                  "height": 48,
+                  "justifyContent": "center",
+                  "minWidth": 98,
+                  "paddingHorizontal": 16,
+                  "paddingVertical": 5,
+                }
+              }
+              testID="ConfirmAccountButton"
+            >
+              <Text
+                style={
+                  Object {
+                    "color": "#FFFFFF",
+                    "fontFamily": "Inter-SemiBold",
+                    "fontSize": 16,
+                    "lineHeight": 22,
+                  }
+                }
+              >
+                confirmAccountNumber.submit
+              </Text>
+            </View>
+          </View>
+        </View>
+      </View>
+      <View
+        style={
+          Object {
+            "alignItems": "center",
+            "flexDirection": "row",
+          }
+        }
+      >
+        <svg
+          fill="none"
+          height="16"
+          style={Object {}}
+          viewBox="0 0 16 16"
+          width="16"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <circle
+            cx="8"
+            cy="8"
+            r="7"
+            stroke="#2E3338"
+            stroke-width="1.25"
+            style={Object {}}
+          />
+          <path
+            d="M8 12V7M8 6V5"
+            stroke="#2E3338"
+            stroke-width="1.25"
+            style={Object {}}
+          />
+        </svg>
+        <Text
+          onPress={[Function]}
+          style={
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Inter-Regular",
+              "fontSize": 14,
+              "lineHeight": 18,
+              "paddingLeft": 8,
+              "textDecorationLine": "underline",
+            }
+          }
+        >
+          confirmAccountNumber.help
         </Text>
       </View>
     </View>
-  </View>
+  </RCTScrollView>
   <Modal
     animationType="none"
     hardwareAccelerated={false}
@@ -293,108 +320,310 @@ exports[`ValidateRecipientAccount renders correctly when full validation require
       }
       swipeThreshold={100}
     >
-      <View
-        style={
-          Object {
-            "backgroundColor": "#FFFFFF",
-            "borderRadius": 4,
-            "marginHorizontal": 10,
-            "padding": 20,
-          }
-        }
-      >
-        <Text
-          style={
-            Object {
-              "color": "#2E3338",
-              "fontFamily": "Hind-Bold",
-              "fontSize": 18,
-              "marginVertical": 15,
-              "textAlign": "center",
-            }
-          }
-        >
-          helpModal.header
-        </Text>
-        <Text
-          style={
-            Object {
-              "color": "#2E3338",
-              "fontFamily": "Hind-Regular",
-              "fontSize": 16,
-              "lineHeight": 24,
-              "paddingBottom": 15,
-              "textAlign": "center",
-            }
-          }
-        >
-          helpModal.body1
-        </Text>
-        <Text
-          style={
-            Object {
-              "color": "#2E3338",
-              "fontFamily": "Hind-Regular",
-              "fontSize": 16,
-              "lineHeight": 24,
-              "paddingBottom": 15,
-              "textAlign": "center",
-            }
-          }
-        >
-          helpModal.body2
-        </Text>
+      <SafeAreaView>
         <View
           style={
-            Object {
-              "alignItems": "center",
-              "flexDirection": "row",
-              "justifyContent": "space-evenly",
-              "marginTop": 25,
-            }
+            Array [
+              Object {
+                "backgroundColor": "#FFFFFF",
+                "elevation": 12,
+                "padding": 16,
+                "shadowColor": "black",
+                "shadowOffset": Object {
+                  "height": 6,
+                  "width": 0,
+                },
+                "shadowOpacity": 0.3,
+                "shadowRadius": 9.600000000000001,
+              },
+              Object {
+                "borderRadius": 8,
+              },
+              Array [
+                Object {
+                  "backgroundColor": "#FFFFFF",
+                  "maxHeight": "100%",
+                  "padding": 24,
+                },
+                undefined,
+              ],
+            ]
           }
         >
-          <View
-            accessible={true}
-            focusable={true}
-            nativeBackgroundAndroid={
+          <Text
+            style={
               Object {
-                "attribute": "selectableItemBackgroundBorderless",
-                "type": "ThemeAttrAndroid",
+                "color": "#2E3338",
+                "fontFamily": "Inter-SemiBold",
+                "fontSize": 19,
+                "lineHeight": 26,
+                "paddingBottom": 4,
+                "textAlign": "center",
               }
             }
-            onClick={[Function]}
-            onResponderGrant={[Function]}
-            onResponderMove={[Function]}
-            onResponderRelease={[Function]}
-            onResponderTerminate={[Function]}
-            onResponderTerminationRequest={[Function]}
-            onStartShouldSetResponder={[Function]}
           >
+            helpModal.header
+          </Text>
+          <Text
+            style={
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Inter-Regular",
+                "fontSize": 16,
+                "lineHeight": 22,
+                "paddingVertical": 8,
+                "textAlign": "center",
+              }
+            }
+          >
+            helpModal.body1
+          </Text>
+          <View
+            style={
+              Object {
+                "alignItems": "center",
+                "flexDirection": "row",
+                "justifyContent": "center",
+                "paddingVertical": 8,
+              }
+            }
+          >
+            <View
+              style={
+                Object {
+                  "paddingHorizontal": 8,
+                }
+              }
+            >
+              <View
+                style={
+                  Array [
+                    Object {
+                      "alignItems": "center",
+                      "backgroundColor": "#FFFFFF",
+                      "borderRadius": 4,
+                      "elevation": 12,
+                      "justifyContent": "center",
+                      "shadowColor": "black",
+                      "shadowOffset": Object {
+                        "height": 6,
+                        "width": 0,
+                      },
+                      "shadowOpacity": 0.3,
+                      "shadowRadius": 9.600000000000001,
+                    },
+                    Object {
+                      "height": 30,
+                      "width": 30,
+                    },
+                  ]
+                }
+              >
+                <svg
+                  fill="none"
+                  height="52.5"
+                  style={Object {}}
+                  viewBox="0 0 64 64"
+                  width="52.5"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <g
+                    filter="url(#filter0_d)"
+                    style={Object {}}
+                  >
+                    <line
+                      stroke="#2E3338"
+                      strokeLinecap="round"
+                      strokeWidth="2.5"
+                      style={Object {}}
+                      x1="23.5"
+                      x2="41"
+                      y1="26.5"
+                      y2="26.5"
+                    />
+                    <line
+                      stroke="#2E3338"
+                      strokeLinecap="round"
+                      strokeWidth="2.5"
+                      style={Object {}}
+                      x1="23.5"
+                      x2="41"
+                      y1="32.75"
+                      y2="32.75"
+                    />
+                    <line
+                      stroke="#2E3338"
+                      strokeLinecap="round"
+                      strokeWidth="2.5"
+                      style={Object {}}
+                      x1="23.5"
+                      x2="41"
+                      y1="39"
+                      y2="39"
+                    />
+                  </g>
+                </svg>
+              </View>
+            </View>
             <Text
+              style={
+                Object {
+                  "color": "#9CA4A9",
+                  "fontFamily": "Inter-Regular",
+                  "fontSize": 14,
+                  "lineHeight": 18,
+                  "paddingHorizontal": 8,
+                }
+              }
+            >
+              Menu
+            </Text>
+          </View>
+          <Text
+            style={
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Inter-Regular",
+                "fontSize": 16,
+                "lineHeight": 22,
+                "paddingVertical": 8,
+                "textAlign": "center",
+              }
+            }
+          >
+            helpModal.body2
+          </Text>
+          <View
+            style={
+              Object {
+                "alignItems": "center",
+                "justifyContent": "center",
+                "paddingVertical": 8,
+              }
+            }
+          >
+            <View
               style={
                 Array [
                   Object {
-                    "color": "#42D689",
-                    "fontFamily": "Hind-SemiBold",
-                    "fontSize": 14,
-                    "lineHeight": 18,
+                    "backgroundColor": "#FFFFFF",
+                    "elevation": 12,
+                    "padding": 16,
+                    "shadowColor": "black",
+                    "shadowOffset": Object {
+                      "height": 6,
+                      "width": 0,
+                    },
+                    "shadowOpacity": 0.3,
+                    "shadowRadius": 9.600000000000001,
                   },
                   Object {
-                    "color": "#2E3338",
-                    "fontFamily": "Hind-SemiBold",
-                    "fontSize": 16,
-                    "lineHeight": 24,
-                    "paddingRight": 20,
+                    "borderRadius": 8,
+                  },
+                  Object {
+                    "height": 62,
+                    "justifyContent": "center",
+                    "paddingHorizontal": 16,
+                    "width": 235,
                   },
                 ]
               }
             >
-              global:close
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#9CA4A9",
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                    },
+                    Object {
+                      "textAlign": "left",
+                    },
+                  ]
+                }
+              >
+                0x f1b1 d5a6 e772 8g30 9c4a
+              </Text>
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#9CA4A9",
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                    },
+                    Object {
+                      "paddingTop": 4,
+                      "textAlign": "right",
+                    },
+                  ]
+                }
+              >
+                025k 122d 71ad 75a6 1976
+              </Text>
+            </View>
+            <Text
+              style={
+                Object {
+                  "color": "#9CA4A9",
+                  "fontFamily": "Inter-Regular",
+                  "fontSize": 14,
+                  "lineHeight": 18,
+                  "paddingTop": 16,
+                  "paddingVertical": 16,
+                  "textAlign": "center",
+                }
+              }
+            >
+              helpModal.body3
             </Text>
           </View>
+          <View
+            style={
+              Object {
+                "alignItems": "center",
+                "flexDirection": "row",
+                "justifyContent": "space-evenly",
+                "paddingVertical": 24,
+              }
+            }
+          >
+            <View
+              accessible={true}
+              focusable={true}
+              nativeBackgroundAndroid={
+                Object {
+                  "attribute": "selectableItemBackgroundBorderless",
+                  "type": "ThemeAttrAndroid",
+                }
+              }
+              onClick={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+            >
+              <Text
+                style={
+                  Object {
+                    "color": "#1AB775",
+                    "fontFamily": "Inter-SemiBold",
+                    "fontSize": 16,
+                    "lineHeight": 22,
+                  }
+                }
+              >
+                global:dismiss
+              </Text>
+            </View>
+          </View>
         </View>
-      </View>
+      </SafeAreaView>
     </View>
   </Modal>
 </SafeAreaView>
@@ -415,351 +644,393 @@ exports[`ValidateRecipientAccount renders correctly when partial validation requ
       Object {
         "flexGrow": 1,
         "justifyContent": "space-between",
-        "padding": 20,
-        "paddingTop": 40,
+        "padding": 16,
       }
     }
     keyboardShouldPersistTaps="always"
   >
     <View>
       <View>
+        <Text
+          style={
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Inter-SemiBold",
+              "fontSize": 19,
+              "lineHeight": 26,
+              "paddingVertical": 16,
+            }
+          }
+        >
+          confirmAccountNumber.title
+        </Text>
         <View>
-          <Text
-            style={
-              Object {
-                "color": "#2E3338",
-                "fontFamily": "Hind-Regular",
-                "fontSize": 16,
-                "lineHeight": 24,
-                "paddingBottom": 15,
-                "textAlign": "center",
-              }
-            }
-          >
-            confirmAccountNumber.body1Partial
-          </Text>
-          <Text
-            style={
-              Object {
-                "color": "#2E3338",
-                "fontFamily": "Hind-Regular",
-                "fontSize": 16,
-                "lineHeight": 24,
-                "paddingBottom": 15,
-                "textAlign": "center",
-              }
-            }
-          >
-            confirmAccountNumber.body2Partial
-          </Text>
-          <Text
-            style={
-              Object {
-                "color": "#2E3338",
-                "fontFamily": "Hind-SemiBold",
-                "fontSize": 16,
-                "lineHeight": 24,
-                "marginTop": 20,
-                "textAlign": "center",
-              }
-            }
-          >
-            accountInputHeaderA
-          </Text>
-          <View
-            style={
-              Object {
-                "flexDirection": "row",
-                "justifyContent": "space-between",
-                "paddingHorizontal": 20,
-                "paddingRight": 10,
-                "paddingVertical": 10,
-              }
-            }
-          >
-            <View
+          <View>
+            <Text
               style={
-                Array [
-                  Object {
-                    "alignItems": "center",
-                    "flex": 1,
-                    "flexDirection": "row",
-                    "justifyContent": "center",
-                  },
-                  Object {
-                    "backgroundColor": "#FFF",
-                    "borderColor": "#D1D5D8",
-                    "borderRadius": 3,
-                    "borderWidth": 1,
-                    "flex": 0,
-                    "height": 50,
-                    "marginVertical": 5,
-                    "width": 50,
-                  },
-                ]
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Inter-Regular",
+                  "fontSize": 16,
+                  "lineHeight": 22,
+                  "paddingBottom": 16,
+                }
               }
             >
-              <TextInput
-                allowFontScaling={true}
-                maxLength={1}
-                onBlur={[Function]}
-                onChangeText={[Function]}
-                onFocus={[Function]}
-                placeholder="k"
-                rejectResponderTermination={true}
-                style={
-                  Object {
-                    "backgroundColor": "#FFFFFF",
-                    "borderColor": "#D1D5D8",
-                    "borderRadius": 3,
-                    "flex": 1,
-                    "fontFamily": "Hind-Regular",
-                    "padding": 8,
-                  }
-                }
-                underlineColorAndroid="transparent"
-                value=""
-              />
-            </View>
-            <View
+              confirmAccountNumber.bodyPartial
+            </Text>
+            <Text
               style={
-                Array [
-                  Object {
-                    "alignItems": "center",
-                    "flex": 1,
-                    "flexDirection": "row",
-                    "justifyContent": "center",
-                  },
-                  Object {
-                    "backgroundColor": "#FFF",
-                    "borderColor": "#D1D5D8",
-                    "borderRadius": 3,
-                    "borderWidth": 1,
-                    "flex": 0,
-                    "height": 50,
-                    "marginVertical": 5,
-                    "width": 50,
-                  },
-                ]
+                Object {
+                  "color": "#2E3338",
+                  "fontFamily": "Inter-SemiBold",
+                  "fontSize": 14,
+                  "lineHeight": 18,
+                  "paddingVertical": 8,
+                }
               }
             >
-              <TextInput
-                allowFontScaling={true}
-                maxLength={1}
-                onBlur={[Function]}
-                onChangeText={[Function]}
-                onFocus={[Function]}
-                placeholder="0"
-                rejectResponderTermination={true}
-                style={
-                  Object {
-                    "backgroundColor": "#FFFFFF",
-                    "borderColor": "#D1D5D8",
-                    "borderRadius": 3,
-                    "flex": 1,
-                    "fontFamily": "Hind-Regular",
-                    "padding": 8,
-                  }
-                }
-                underlineColorAndroid="transparent"
-                value=""
-              />
-            </View>
+              accountInputHeaderPartial
+            </Text>
             <View
               style={
-                Array [
-                  Object {
-                    "alignItems": "center",
-                    "flex": 1,
-                    "flexDirection": "row",
-                    "justifyContent": "center",
-                  },
-                  Object {
-                    "backgroundColor": "#FFF",
-                    "borderColor": "#D1D5D8",
-                    "borderRadius": 3,
-                    "borderWidth": 1,
-                    "flex": 0,
-                    "height": 50,
-                    "marginVertical": 5,
-                    "width": 50,
-                  },
-                ]
+                Object {
+                  "flexDirection": "row",
+                }
               }
             >
-              <TextInput
-                allowFontScaling={true}
-                maxLength={1}
-                onBlur={[Function]}
-                onChangeText={[Function]}
-                onFocus={[Function]}
-                placeholder="F"
-                rejectResponderTermination={true}
+              <View
                 style={
                   Object {
-                    "backgroundColor": "#FFFFFF",
-                    "borderColor": "#D1D5D8",
-                    "borderRadius": 3,
-                    "flex": 1,
-                    "fontFamily": "Hind-Regular",
-                    "padding": 8,
+                    "paddingRight": 8,
                   }
                 }
-                underlineColorAndroid="transparent"
-                value=""
-              />
-            </View>
-            <View
-              style={
-                Array [
-                  Object {
-                    "alignItems": "center",
-                    "flex": 1,
-                    "flexDirection": "row",
-                    "justifyContent": "center",
-                  },
-                  Object {
-                    "backgroundColor": "#FFF",
-                    "borderColor": "#D1D5D8",
-                    "borderRadius": 3,
-                    "borderWidth": 1,
-                    "flex": 0,
-                    "height": 50,
-                    "marginVertical": 5,
-                    "width": 50,
-                  },
-                ]
-              }
-            >
-              <TextInput
-                allowFontScaling={true}
-                maxLength={1}
-                onBlur={[Function]}
-                onChangeText={[Function]}
-                onFocus={[Function]}
-                placeholder="4"
-                rejectResponderTermination={true}
+              >
+                <View
+                  style={
+                    Array [
+                      Object {
+                        "alignItems": "center",
+                        "flex": 1,
+                        "flexDirection": "row",
+                        "justifyContent": "center",
+                      },
+                      Object {
+                        "backgroundColor": "#FFF",
+                        "borderColor": "#D1D5D8",
+                        "borderRadius": 3,
+                        "borderWidth": 1,
+                        "flex": 0,
+                        "height": 50,
+                        "marginVertical": 5,
+                        "width": 50,
+                      },
+                    ]
+                  }
+                >
+                  <TextInput
+                    allowFontScaling={true}
+                    maxLength={1}
+                    onBlur={[Function]}
+                    onChangeText={[Function]}
+                    onFocus={[Function]}
+                    placeholder="k"
+                    rejectResponderTermination={true}
+                    style={
+                      Object {
+                        "backgroundColor": "#FFFFFF",
+                        "borderColor": "#D1D5D8",
+                        "borderRadius": 3,
+                        "flex": 1,
+                        "fontFamily": "Hind-Regular",
+                        "padding": 8,
+                      }
+                    }
+                    underlineColorAndroid="transparent"
+                    value=""
+                  />
+                </View>
+              </View>
+              <View
                 style={
                   Object {
-                    "backgroundColor": "#FFFFFF",
-                    "borderColor": "#D1D5D8",
-                    "borderRadius": 3,
-                    "flex": 1,
-                    "fontFamily": "Hind-Regular",
-                    "padding": 8,
+                    "paddingRight": 8,
                   }
                 }
-                underlineColorAndroid="transparent"
-                value=""
-              />
+              >
+                <View
+                  style={
+                    Array [
+                      Object {
+                        "alignItems": "center",
+                        "flex": 1,
+                        "flexDirection": "row",
+                        "justifyContent": "center",
+                      },
+                      Object {
+                        "backgroundColor": "#FFF",
+                        "borderColor": "#D1D5D8",
+                        "borderRadius": 3,
+                        "borderWidth": 1,
+                        "flex": 0,
+                        "height": 50,
+                        "marginVertical": 5,
+                        "width": 50,
+                      },
+                    ]
+                  }
+                >
+                  <TextInput
+                    allowFontScaling={true}
+                    maxLength={1}
+                    onBlur={[Function]}
+                    onChangeText={[Function]}
+                    onFocus={[Function]}
+                    placeholder="0"
+                    rejectResponderTermination={true}
+                    style={
+                      Object {
+                        "backgroundColor": "#FFFFFF",
+                        "borderColor": "#D1D5D8",
+                        "borderRadius": 3,
+                        "flex": 1,
+                        "fontFamily": "Hind-Regular",
+                        "padding": 8,
+                      }
+                    }
+                    underlineColorAndroid="transparent"
+                    value=""
+                  />
+                </View>
+              </View>
+              <View
+                style={
+                  Object {
+                    "paddingRight": 8,
+                  }
+                }
+              >
+                <View
+                  style={
+                    Array [
+                      Object {
+                        "alignItems": "center",
+                        "flex": 1,
+                        "flexDirection": "row",
+                        "justifyContent": "center",
+                      },
+                      Object {
+                        "backgroundColor": "#FFF",
+                        "borderColor": "#D1D5D8",
+                        "borderRadius": 3,
+                        "borderWidth": 1,
+                        "flex": 0,
+                        "height": 50,
+                        "marginVertical": 5,
+                        "width": 50,
+                      },
+                    ]
+                  }
+                >
+                  <TextInput
+                    allowFontScaling={true}
+                    maxLength={1}
+                    onBlur={[Function]}
+                    onChangeText={[Function]}
+                    onFocus={[Function]}
+                    placeholder="F"
+                    rejectResponderTermination={true}
+                    style={
+                      Object {
+                        "backgroundColor": "#FFFFFF",
+                        "borderColor": "#D1D5D8",
+                        "borderRadius": 3,
+                        "flex": 1,
+                        "fontFamily": "Hind-Regular",
+                        "padding": 8,
+                      }
+                    }
+                    underlineColorAndroid="transparent"
+                    value=""
+                  />
+                </View>
+              </View>
+              <View
+                style={
+                  Object {
+                    "paddingRight": 8,
+                  }
+                }
+              >
+                <View
+                  style={
+                    Array [
+                      Object {
+                        "alignItems": "center",
+                        "flex": 1,
+                        "flexDirection": "row",
+                        "justifyContent": "center",
+                      },
+                      Object {
+                        "backgroundColor": "#FFF",
+                        "borderColor": "#D1D5D8",
+                        "borderRadius": 3,
+                        "borderWidth": 1,
+                        "flex": 0,
+                        "height": 50,
+                        "marginVertical": 5,
+                        "width": 50,
+                      },
+                    ]
+                  }
+                >
+                  <TextInput
+                    allowFontScaling={true}
+                    maxLength={1}
+                    onBlur={[Function]}
+                    onChangeText={[Function]}
+                    onFocus={[Function]}
+                    placeholder="4"
+                    rejectResponderTermination={true}
+                    style={
+                      Object {
+                        "backgroundColor": "#FFFFFF",
+                        "borderColor": "#D1D5D8",
+                        "borderRadius": 3,
+                        "flex": 1,
+                        "fontFamily": "Hind-Regular",
+                        "padding": 8,
+                      }
+                    }
+                    underlineColorAndroid="transparent"
+                    value=""
+                  />
+                </View>
+              </View>
             </View>
           </View>
         </View>
-      </View>
-      <Text
-        onPress={[Function]}
-        style={
-          Object {
-            "color": "#2E3338",
-            "fontFamily": "Hind-Regular",
-            "fontSize": 14,
-            "lineHeight": 18,
-            "marginBottom": 10,
-            "marginTop": 20,
-            "textAlign": "center",
-            "textDecorationLine": "underline",
+        <View
+          style={
+            Object {
+              "height": 64,
+            }
           }
-        }
-      >
-        confirmAccountNumber.help
-      </Text>
-    </View>
-  </RCTScrollView>
-  <View
-    style={
-      Array [
-        Object {
-          "alignItems": "center",
-          "borderRadius": 3,
-          "flexDirection": "row",
-        },
-        null,
-        null,
-        undefined,
-        Object {
-          "backgroundColor": "#42D689",
-        },
-      ]
-    }
-  >
-    <View
-      accessible={true}
-      focusable={true}
-      nativeBackgroundAndroid={
-        Object {
-          "attribute": "selectableItemBackground",
-          "type": "ThemeAttrAndroid",
-        }
-      }
-      onClick={[Function]}
-      onResponderGrant={[Function]}
-      onResponderMove={[Function]}
-      onResponderRelease={[Function]}
-      onResponderTerminate={[Function]}
-      onResponderTerminationRequest={[Function]}
-      onStartShouldSetResponder={[Function]}
-      style={
-        Array [
-          Object {
-            "alignItems": "center",
-            "flex": 1,
-            "justifyContent": "center",
-          },
-          Object {
-            "backgroundColor": "#42D689",
-          },
-          Object {
-            "height": 50,
-          },
-          Object {
-            "borderWidth": 0,
-          },
-        ]
-      }
-      testID="ConfirmAccountButton"
-    >
-      <View
-        style={
-          Object {
-            "alignItems": "center",
-            "flex": 1,
-            "flexDirection": "row",
-            "justifyContent": "space-between",
-          }
-        }
-      >
-        <Text
+        />
+        <View
           style={
             Array [
               Object {
-                "fontFamily": "Hind-SemiBold",
-                "fontSize": 16,
+                "flexDirection": "row",
               },
               Object {
-                "color": "#FFFFFF",
-              },
-              Object {
-                "paddingLeft": 5,
-                "paddingRight": 5,
+                "paddingVertical": 16,
               },
             ]
           }
         >
-          confirmAccount.button
+          <View
+            style={
+              Object {
+                "borderRadius": 100,
+                "overflow": "hidden",
+              }
+            }
+          >
+            <View
+              accessible={true}
+              focusable={true}
+              nativeBackgroundAndroid={
+                Object {
+                  "attribute": "selectableItemBackground",
+                  "type": "ThemeAttrAndroid",
+                }
+              }
+              onClick={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                Object {
+                  "alignItems": "center",
+                  "backgroundColor": "#1AB775",
+                  "height": 48,
+                  "justifyContent": "center",
+                  "minWidth": 98,
+                  "paddingHorizontal": 16,
+                  "paddingVertical": 5,
+                }
+              }
+              testID="ConfirmAccountButton"
+            >
+              <Text
+                style={
+                  Object {
+                    "color": "#FFFFFF",
+                    "fontFamily": "Inter-SemiBold",
+                    "fontSize": 16,
+                    "lineHeight": 22,
+                  }
+                }
+              >
+                confirmAccountNumber.submit
+              </Text>
+            </View>
+          </View>
+        </View>
+      </View>
+      <View
+        style={
+          Object {
+            "alignItems": "center",
+            "flexDirection": "row",
+          }
+        }
+      >
+        <svg
+          fill="none"
+          height="16"
+          style={Object {}}
+          viewBox="0 0 16 16"
+          width="16"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <circle
+            cx="8"
+            cy="8"
+            r="7"
+            stroke="#2E3338"
+            stroke-width="1.25"
+            style={Object {}}
+          />
+          <path
+            d="M8 12V7M8 6V5"
+            stroke="#2E3338"
+            stroke-width="1.25"
+            style={Object {}}
+          />
+        </svg>
+        <Text
+          onPress={[Function]}
+          style={
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Inter-Regular",
+              "fontSize": 14,
+              "lineHeight": 18,
+              "paddingLeft": 8,
+              "textDecorationLine": "underline",
+            }
+          }
+        >
+          confirmAccountNumber.help
         </Text>
       </View>
     </View>
-  </View>
+  </RCTScrollView>
   <Modal
     animationType="none"
     hardwareAccelerated={false}
@@ -838,108 +1109,310 @@ exports[`ValidateRecipientAccount renders correctly when partial validation requ
       }
       swipeThreshold={100}
     >
-      <View
-        style={
-          Object {
-            "backgroundColor": "#FFFFFF",
-            "borderRadius": 4,
-            "marginHorizontal": 10,
-            "padding": 20,
-          }
-        }
-      >
-        <Text
-          style={
-            Object {
-              "color": "#2E3338",
-              "fontFamily": "Hind-Bold",
-              "fontSize": 18,
-              "marginVertical": 15,
-              "textAlign": "center",
-            }
-          }
-        >
-          helpModal.header
-        </Text>
-        <Text
-          style={
-            Object {
-              "color": "#2E3338",
-              "fontFamily": "Hind-Regular",
-              "fontSize": 16,
-              "lineHeight": 24,
-              "paddingBottom": 15,
-              "textAlign": "center",
-            }
-          }
-        >
-          helpModal.body1
-        </Text>
-        <Text
-          style={
-            Object {
-              "color": "#2E3338",
-              "fontFamily": "Hind-Regular",
-              "fontSize": 16,
-              "lineHeight": 24,
-              "paddingBottom": 15,
-              "textAlign": "center",
-            }
-          }
-        >
-          helpModal.body2
-        </Text>
+      <SafeAreaView>
         <View
           style={
-            Object {
-              "alignItems": "center",
-              "flexDirection": "row",
-              "justifyContent": "space-evenly",
-              "marginTop": 25,
-            }
+            Array [
+              Object {
+                "backgroundColor": "#FFFFFF",
+                "elevation": 12,
+                "padding": 16,
+                "shadowColor": "black",
+                "shadowOffset": Object {
+                  "height": 6,
+                  "width": 0,
+                },
+                "shadowOpacity": 0.3,
+                "shadowRadius": 9.600000000000001,
+              },
+              Object {
+                "borderRadius": 8,
+              },
+              Array [
+                Object {
+                  "backgroundColor": "#FFFFFF",
+                  "maxHeight": "100%",
+                  "padding": 24,
+                },
+                undefined,
+              ],
+            ]
           }
         >
-          <View
-            accessible={true}
-            focusable={true}
-            nativeBackgroundAndroid={
+          <Text
+            style={
               Object {
-                "attribute": "selectableItemBackgroundBorderless",
-                "type": "ThemeAttrAndroid",
+                "color": "#2E3338",
+                "fontFamily": "Inter-SemiBold",
+                "fontSize": 19,
+                "lineHeight": 26,
+                "paddingBottom": 4,
+                "textAlign": "center",
               }
             }
-            onClick={[Function]}
-            onResponderGrant={[Function]}
-            onResponderMove={[Function]}
-            onResponderRelease={[Function]}
-            onResponderTerminate={[Function]}
-            onResponderTerminationRequest={[Function]}
-            onStartShouldSetResponder={[Function]}
           >
+            helpModal.header
+          </Text>
+          <Text
+            style={
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Inter-Regular",
+                "fontSize": 16,
+                "lineHeight": 22,
+                "paddingVertical": 8,
+                "textAlign": "center",
+              }
+            }
+          >
+            helpModal.body1
+          </Text>
+          <View
+            style={
+              Object {
+                "alignItems": "center",
+                "flexDirection": "row",
+                "justifyContent": "center",
+                "paddingVertical": 8,
+              }
+            }
+          >
+            <View
+              style={
+                Object {
+                  "paddingHorizontal": 8,
+                }
+              }
+            >
+              <View
+                style={
+                  Array [
+                    Object {
+                      "alignItems": "center",
+                      "backgroundColor": "#FFFFFF",
+                      "borderRadius": 4,
+                      "elevation": 12,
+                      "justifyContent": "center",
+                      "shadowColor": "black",
+                      "shadowOffset": Object {
+                        "height": 6,
+                        "width": 0,
+                      },
+                      "shadowOpacity": 0.3,
+                      "shadowRadius": 9.600000000000001,
+                    },
+                    Object {
+                      "height": 30,
+                      "width": 30,
+                    },
+                  ]
+                }
+              >
+                <svg
+                  fill="none"
+                  height="52.5"
+                  style={Object {}}
+                  viewBox="0 0 64 64"
+                  width="52.5"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <g
+                    filter="url(#filter0_d)"
+                    style={Object {}}
+                  >
+                    <line
+                      stroke="#2E3338"
+                      strokeLinecap="round"
+                      strokeWidth="2.5"
+                      style={Object {}}
+                      x1="23.5"
+                      x2="41"
+                      y1="26.5"
+                      y2="26.5"
+                    />
+                    <line
+                      stroke="#2E3338"
+                      strokeLinecap="round"
+                      strokeWidth="2.5"
+                      style={Object {}}
+                      x1="23.5"
+                      x2="41"
+                      y1="32.75"
+                      y2="32.75"
+                    />
+                    <line
+                      stroke="#2E3338"
+                      strokeLinecap="round"
+                      strokeWidth="2.5"
+                      style={Object {}}
+                      x1="23.5"
+                      x2="41"
+                      y1="39"
+                      y2="39"
+                    />
+                  </g>
+                </svg>
+              </View>
+            </View>
             <Text
+              style={
+                Object {
+                  "color": "#9CA4A9",
+                  "fontFamily": "Inter-Regular",
+                  "fontSize": 14,
+                  "lineHeight": 18,
+                  "paddingHorizontal": 8,
+                }
+              }
+            >
+              Menu
+            </Text>
+          </View>
+          <Text
+            style={
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Inter-Regular",
+                "fontSize": 16,
+                "lineHeight": 22,
+                "paddingVertical": 8,
+                "textAlign": "center",
+              }
+            }
+          >
+            helpModal.body2
+          </Text>
+          <View
+            style={
+              Object {
+                "alignItems": "center",
+                "justifyContent": "center",
+                "paddingVertical": 8,
+              }
+            }
+          >
+            <View
               style={
                 Array [
                   Object {
-                    "color": "#42D689",
-                    "fontFamily": "Hind-SemiBold",
-                    "fontSize": 14,
-                    "lineHeight": 18,
+                    "backgroundColor": "#FFFFFF",
+                    "elevation": 12,
+                    "padding": 16,
+                    "shadowColor": "black",
+                    "shadowOffset": Object {
+                      "height": 6,
+                      "width": 0,
+                    },
+                    "shadowOpacity": 0.3,
+                    "shadowRadius": 9.600000000000001,
                   },
                   Object {
-                    "color": "#2E3338",
-                    "fontFamily": "Hind-SemiBold",
-                    "fontSize": 16,
-                    "lineHeight": 24,
-                    "paddingRight": 20,
+                    "borderRadius": 8,
+                  },
+                  Object {
+                    "height": 62,
+                    "justifyContent": "center",
+                    "paddingHorizontal": 16,
+                    "width": 235,
                   },
                 ]
               }
             >
-              global:close
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#9CA4A9",
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                    },
+                    Object {
+                      "textAlign": "left",
+                    },
+                  ]
+                }
+              >
+                0x f1b1 d5a6 e772 8g30 9c4a
+              </Text>
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#9CA4A9",
+                      "fontFamily": "Inter-Regular",
+                      "fontSize": 14,
+                      "lineHeight": 18,
+                    },
+                    Object {
+                      "paddingTop": 4,
+                      "textAlign": "right",
+                    },
+                  ]
+                }
+              >
+                025k 122d 71ad 75a6 1976
+              </Text>
+            </View>
+            <Text
+              style={
+                Object {
+                  "color": "#9CA4A9",
+                  "fontFamily": "Inter-Regular",
+                  "fontSize": 14,
+                  "lineHeight": 18,
+                  "paddingTop": 16,
+                  "paddingVertical": 16,
+                  "textAlign": "center",
+                }
+              }
+            >
+              helpModal.body3
             </Text>
           </View>
+          <View
+            style={
+              Object {
+                "alignItems": "center",
+                "flexDirection": "row",
+                "justifyContent": "space-evenly",
+                "paddingVertical": 24,
+              }
+            }
+          >
+            <View
+              accessible={true}
+              focusable={true}
+              nativeBackgroundAndroid={
+                Object {
+                  "attribute": "selectableItemBackgroundBorderless",
+                  "type": "ThemeAttrAndroid",
+                }
+              }
+              onClick={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+            >
+              <Text
+                style={
+                  Object {
+                    "color": "#1AB775",
+                    "fontFamily": "Inter-SemiBold",
+                    "fontSize": 16,
+                    "lineHeight": 22,
+                  }
+                }
+              >
+                global:dismiss
+              </Text>
+            </View>
+          </View>
         </View>
-      </View>
+      </SafeAreaView>
     </View>
   </Modal>
 </SafeAreaView>

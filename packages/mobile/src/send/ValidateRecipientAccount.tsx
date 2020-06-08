@@ -1,22 +1,26 @@
-import Button, { BtnTypes } from '@celo/react-components/components/Button'
+import Button, { BtnTypes } from '@celo/react-components/components/Button.v2'
 import KeyboardAwareScrollView from '@celo/react-components/components/KeyboardAwareScrollView'
 import KeyboardSpacer from '@celo/react-components/components/KeyboardSpacer'
-import TextButton from '@celo/react-components/components/TextButton'
-import colors from '@celo/react-components/styles/colors'
-import fontStyles from '@celo/react-components/styles/fonts'
+import TextButton from '@celo/react-components/components/TextButton.v2'
+import colors from '@celo/react-components/styles/colors.v2'
+import fontStyles from '@celo/react-components/styles/fonts.v2'
 import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
-import Modal from 'react-native-modal'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
+import { ErrorMessages } from 'src/app/ErrorMessages'
+import AccountNumberCard from 'src/components/AccountNumberCard'
 import CodeRow, { CodeRowStatus } from 'src/components/CodeRow'
+import ErrorMessageInline from 'src/components/ErrorMessageInline'
+import Modal from 'src/components/Modal'
 import { SingleDigitInput } from 'src/components/SingleDigitInput'
-import i18n, { Namespaces, withTranslation } from 'src/i18n'
+import { Namespaces, withTranslation } from 'src/i18n'
+import InfoIcon from 'src/icons/InfoIcon.v2'
+import MenuBurgerCard from 'src/icons/MenuBurgerCard'
 import { validateRecipientAddress } from 'src/identity/actions'
 import { AddressValidationType } from 'src/identity/reducer'
-import { headerWithBackButton } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
@@ -32,7 +36,8 @@ interface StateProps {
   transactionData: TransactionDataInput
   addressValidationType: AddressValidationType
   isValidRecipient: boolean
-  isPaymentRequest: true | undefined
+  isPaymentRequest?: true
+  error?: ErrorMessages | null
 }
 
 interface State {
@@ -56,21 +61,18 @@ const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
   const { route } = ownProps
   const transactionData = route.params.transactionData
   const { recipient } = transactionData
+  const error = state.alert ? state.alert.underlyingError : null
   return {
     recipient,
     transactionData,
     isValidRecipient: state.identity.isValidRecipient,
     isPaymentRequest: route.params.isPaymentRequest,
     addressValidationType: route.params.addressValidationType,
+    error,
   }
 }
 
 export class ValidateRecipientAccount extends React.Component<Props, State> {
-  static navigationOptions = () => ({
-    ...headerWithBackButton,
-    headerTitle: i18n.t('sendFlow7:confirmAccountNumber.title'),
-  })
-
   state: State = {
     inputValue: '',
     singleDigitInputValueArr: [],
@@ -83,7 +85,7 @@ export class ValidateRecipientAccount extends React.Component<Props, State> {
       if (isPaymentRequest) {
         navigate(Screens.PaymentRequestConfirmation, { transactionData })
       } else {
-        navigate(Screens.SendConfirmation, { transactionData })
+        navigate(Screens.SendConfirmation, { transactionData, addressJustValidated: true })
       }
     }
   }
@@ -123,16 +125,12 @@ export class ValidateRecipientAccount extends React.Component<Props, State> {
       return (
         <View>
           <Text style={styles.body}>
-            {t('confirmAccountNumber.body1Full', {
-              displayName,
-            })}
+            {displayName === 'Mobile #'
+              ? t('confirmAccountNumber.body1FullNoDisplayName')
+              : t('confirmAccountNumber.body1Full', { displayName })}
           </Text>
-          <Text style={styles.body}>
-            {t('confirmAccountNumber.body2Full', {
-              displayName,
-            })}
-          </Text>
-          <Text style={styles.codeHeader}>{t('accountInputHeaderB')}</Text>
+          <Text style={styles.body}>{t('confirmAccountNumber.body2Full')}</Text>
+          <Text style={styles.codeHeader}>{t('accountInputHeaderFull')}</Text>
           <CodeRow
             status={CodeRowStatus.INPUTTING}
             inputValue={inputValue}
@@ -146,36 +144,32 @@ export class ValidateRecipientAccount extends React.Component<Props, State> {
 
     const singleDigitInputComponentArr = PARTIAL_ADDRESS_PLACEHOLDER.map(
       (placeholderValue, index) => (
-        <SingleDigitInput
-          key={placeholderValue}
-          inputValue={singleDigitInputValueArr[index]}
-          inputPlaceholder={placeholderValue}
-          // tslint:disable-next-line:jsx-no-lambda
-          onInputChange={(value) => this.onSingleDigitInputChange(value, index)}
-        />
+        <View style={styles.singleDigitInputWrapper} key={placeholderValue}>
+          <SingleDigitInput
+            inputValue={singleDigitInputValueArr[index]}
+            inputPlaceholder={placeholderValue}
+            // tslint:disable-next-line:jsx-no-lambda
+            onInputChange={(value) => this.onSingleDigitInputChange(value, index)}
+          />
+        </View>
       )
     )
 
     return (
       <View>
         <Text style={styles.body}>
-          {t('confirmAccountNumber.body1Partial', {
-            displayName,
-          })}
+          {displayName === 'Mobile #'
+            ? t('confirmAccountNumber.bodyPartialNoDisplayName')
+            : t('confirmAccountNumber.bodyPartial', { displayName })}
         </Text>
-        <Text style={styles.body}>
-          {t('confirmAccountNumber.body2Partial', {
-            displayName,
-          })}
-        </Text>
-        <Text style={styles.codeHeader}>{t('accountInputHeaderA')}</Text>
+        <Text style={styles.codeHeader}>{t('accountInputHeaderPartial')}</Text>
         <View style={styles.singleDigitInputContainer}>{singleDigitInputComponentArr}</View>
       </View>
     )
   }
 
   render = () => {
-    const { t, recipient } = this.props
+    const { t, recipient, error } = this.props
     const { displayName } = recipient
 
     return (
@@ -184,29 +178,42 @@ export class ValidateRecipientAccount extends React.Component<Props, State> {
           contentContainerStyle={styles.scrollContainer}
           keyboardShouldPersistTaps={'always'}
         >
-          <View>{this.renderInstructionsAndInputField()}</View>
-          <Text onPress={this.toggleModal} style={styles.askHelpText}>
-            {t('confirmAccountNumber.help', { displayName })}
-          </Text>
+          <View>
+            <Text style={styles.h2}>{t('confirmAccountNumber.title')}</Text>
+            <View>{this.renderInstructionsAndInputField()}</View>
+            <ErrorMessageInline error={error} />
+            <Button
+              style={styles.button}
+              onPress={this.onPressConfirm}
+              text={t('confirmAccountNumber.submit')}
+              type={BtnTypes.PRIMARY}
+              testID="ConfirmAccountButton"
+            />
+          </View>
+          <View style={styles.helpContainer}>
+            <InfoIcon />
+            <Text onPress={this.toggleModal} style={styles.askHelpText}>
+              {t('confirmAccountNumber.help', { displayName })}
+            </Text>
+          </View>
         </KeyboardAwareScrollView>
-        <Button
-          onPress={this.onPressConfirm}
-          text={t('confirmAccount.button')}
-          standard={false}
-          type={BtnTypes.PRIMARY}
-          testID="ConfirmAccountButton"
-        />
         <KeyboardSpacer />
         <Modal isVisible={this.state.isModalVisible}>
-          <View style={styles.modalContainer}>
-            <Text style={styles.modalHeader}>{t('helpModal.header')}</Text>
-            <Text style={styles.body}>{t('helpModal.body1')}</Text>
-            <Text style={styles.body}>{t('helpModal.body2')}</Text>
-            <View style={styles.modalButtonsContainer}>
-              <TextButton onPress={this.toggleModal} style={styles.modalCancelText}>
-                {t('global:close')}
-              </TextButton>
+          <Text style={styles.modalHeader}>{t('helpModal.header')}</Text>
+          <Text style={styles.modalBody}>{t('helpModal.body1')}</Text>
+          <View style={styles.menuContainer}>
+            <View style={styles.menuCardContainer}>
+              <MenuBurgerCard length={30} />
             </View>
+            <Text style={styles.menuText}>Menu</Text>
+          </View>
+          <Text style={styles.modalBody}>{t('helpModal.body2')}</Text>
+          <View style={styles.addressContainer}>
+            <AccountNumberCard address={FULL_ADDRESS_PLACEHOLDER} />
+            <Text style={styles.modalBody2}>{t('helpModal.body3')}</Text>
+          </View>
+          <View style={styles.modalButtonContainer}>
+            <TextButton onPress={this.toggleModal}>{t('global:dismiss')}</TextButton>
           </View>
         </Modal>
       </SafeAreaView>
@@ -217,81 +224,85 @@ export class ValidateRecipientAccount extends React.Component<Props, State> {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: colors.light,
     justifyContent: 'space-between',
   },
   scrollContainer: {
     flexGrow: 1,
-    padding: 20,
-    paddingTop: 40,
+    padding: 16,
     justifyContent: 'space-between',
   },
   singleDigitInputContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    paddingRight: 10,
+  },
+  singleDigitInputWrapper: {
+    paddingRight: 8,
   },
   codeHeader: {
-    ...fontStyles.body,
-    ...fontStyles.semiBold,
-    marginTop: 20,
-    textAlign: 'center',
+    ...fontStyles.small600,
+    paddingVertical: 8,
   },
-  h1: {
-    ...fontStyles.h1,
-    marginTop: 20,
-    flex: 1,
-    justifyContent: 'center',
+  h2: {
+    ...fontStyles.h2,
+    paddingVertical: 16,
   },
-  codeInputSpinner: {
-    backgroundColor: '#FFF',
-    position: 'absolute',
-    top: 5,
-    right: 3,
-    padding: 10,
+  button: {
+    paddingVertical: 16,
   },
-  checkmarkContainer: {
-    backgroundColor: colors.darkLightest,
-    position: 'absolute',
-    top: 3,
-    right: 3,
-    padding: 10,
+  helpContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   askHelpText: {
-    ...fontStyles.bodySmall,
-    marginTop: 20,
-    marginBottom: 10,
+    ...fontStyles.small,
+    paddingLeft: 8,
     textDecorationLine: 'underline',
-    textAlign: 'center',
   },
   body: {
-    ...fontStyles.body,
-    textAlign: 'center',
-    paddingBottom: 15,
+    ...fontStyles.regular,
+    paddingBottom: 16,
   },
-  modalContainer: {
-    backgroundColor: colors.background,
-    padding: 20,
-    marginHorizontal: 10,
-    borderRadius: 4,
+  modalBody: {
+    ...fontStyles.regular,
+    textAlign: 'center',
+    paddingVertical: 8,
   },
   modalHeader: {
     ...fontStyles.h2,
-    ...fontStyles.bold,
-    marginVertical: 15,
+    textAlign: 'center',
+    paddingBottom: 4,
   },
-  modalButtonsContainer: {
-    marginTop: 25,
+  modalBody2: {
+    ...fontStyles.small,
+    textAlign: 'center',
+    color: colors.gray4,
+    paddingVertical: 16,
+    paddingTop: 16,
+  },
+  menuContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 8,
+  },
+  menuCardContainer: {
+    paddingHorizontal: 8,
+  },
+  menuText: {
+    ...fontStyles.small,
+    color: colors.gray4,
+    paddingHorizontal: 8,
+  },
+  addressContainer: {
+    paddingVertical: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalButtonContainer: {
+    paddingVertical: 24,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-evenly',
-  },
-  modalCancelText: {
-    ...fontStyles.body,
-    ...fontStyles.semiBold,
-    paddingRight: 20,
   },
 })
 

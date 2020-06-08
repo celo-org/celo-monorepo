@@ -1,4 +1,4 @@
-import { Request, Response } from 'firebase-functions'
+import { Request, Response } from 'express'
 import { BLSCryptographyClient } from '../bls/bls-cryptography-client'
 import { ErrorMessages, respondWithError } from '../common/error-utils'
 import { authenticateUser } from '../common/identity'
@@ -14,6 +14,7 @@ import { incrementQueryCount } from '../database/wrappers/account'
 import { getRemainingQueryCount } from './query-quota'
 
 export async function handleGetBlindedMessageForSalt(request: Request, response: Response) {
+  logger.info('Begin getBlindedSalt request')
   let trx
   try {
     trx = await getTransaction()
@@ -31,6 +32,7 @@ export async function handleGetBlindedMessageForSalt(request: Request, response:
       request.body.hashedPhoneNumber
     )
     if (remainingQueryCount <= 0) {
+      logger.debug('rolling back db transaction due to no remaining query count')
       trx.rollback()
       respondWithError(response, 403, ErrorMessages.EXCEEDED_QUOTA)
       return
@@ -39,10 +41,13 @@ export async function handleGetBlindedMessageForSalt(request: Request, response:
       request.body.blindedQueryPhoneNumber
     )
     await incrementQueryCount(request.body.account, trx)
+    logger.debug('committing db transactions for salt retrieval data')
+    await trx.commit()
     response.json({ success: true, signature })
   } catch (error) {
     logger.error('Failed to getSalt', error)
     if (trx) {
+      logger.debug('rolling back db transaction')
       trx.rollback()
     }
     respondWithError(response, 500, ErrorMessages.UNKNOWN_ERROR)
