@@ -7,7 +7,7 @@ import variables from '@celo/react-components/styles/variables'
 import { useNavigation } from '@react-navigation/native'
 import { StackScreenProps } from '@react-navigation/stack'
 import BigNumber from 'bignumber.js'
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import Animated from 'react-native-reanimated'
@@ -39,13 +39,12 @@ type OwnProps = StackScreenProps<StackParamList, Screens.ExchangeHomeScreen>
 type Props = OwnProps
 
 function ExchangeHomeScreen(_props: Props) {
-  const animatedValue = useRef(new Animated.Value(0)).current
+  const scrollPosition = useRef(new Animated.Value(0)).current
   const navigation = useNavigation()
   const { t } = useTranslation(Namespaces.exchangeFlow9)
   const dollarBalance = useSelector((state) => state.stableToken.balance)
   const goldBalance = useSelector((state) => state.goldToken.balance)
   const dispatch = useDispatch()
-  const [isScrolled, setIsScrolled] = useState(false)
 
   // TODO: revert this back to `useLocalCurrencyCode()` when we have history data for cGDL to Local Currency.
   const localCurrencyCode = null
@@ -87,9 +86,9 @@ function ExchangeHomeScreen(_props: Props) {
     dispatch(fetchExchangeRate())
   }, [])
 
-  const headerOpacity = useCallback(
+  const headerOpacity = useMemo(
     () => ({
-      opacity: animatedValue.interpolate({
+      opacity: scrollPosition.interpolate({
         inputRange: [0, 100],
         outputRange: [0, 1],
         extrapolate: Animated.Extrapolate.CLAMP,
@@ -119,34 +118,23 @@ function ExchangeHomeScreen(_props: Props) {
   }, [dollarBalance])
 
   const onScroll = useCallback(
-    Animated.event(
-      [
-        {
-          nativeEvent: {
-            contentOffset: {
-              y: (y: Animated.Node<number>) =>
-                Animated.block([
-                  Animated.set(animatedValue, y),
-                  Animated.call([y], ([offsetY]) => {
-                    setIsScrolled(offsetY > 0)
-                  }),
-                ]),
-            },
+    Animated.event([
+      {
+        nativeEvent: {
+          contentOffset: {
+            y: scrollPosition,
           },
         },
-      ],
-      {
-        useNativeDriver: true,
-      }
-    ),
+      },
+    ]),
     []
   )
   return (
     <SafeAreaView style={styles.background}>
       <DrawerTopBar
-        showBottomBorder={isScrolled}
+        scrollPosition={scrollPosition}
         middleElement={
-          <Animated.View style={[styles.header, headerOpacity()]}>
+          <Animated.View style={[styles.header, headerOpacity]}>
             {currentGoldRateInLocalCurrency && (
               <Text style={styles.goldPriceCurrentValueHeader}>
                 {getLocalCurrencyDisplayValue(

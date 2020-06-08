@@ -19,7 +19,7 @@ export interface State {
   exchangeRatePair: ExchangeRatePair | null
   tobinTax: string | null
   history: {
-    // TODO this should be remove once we have aggreagation on
+    // TODO this should be remove once we have aggregation on
     // blockchain api side
     celoGoldExchangeRates: ExchangeRate[]
     aggregatedExchangeRates: ExchangeRate[]

@@ -5,7 +5,7 @@ import _ from 'lodash'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import {
-  Animated,
+  // Animated,
   NativeScrollEvent,
   NativeSyntheticEvent,
   RefreshControl,
@@ -14,6 +14,7 @@ import {
   SectionListData,
   StyleSheet,
 } from 'react-native'
+import Animated from 'react-native-reanimated'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import { showMessage } from 'src/alert/actions'
@@ -55,9 +56,6 @@ interface DispatchProps {
 }
 
 type Props = StateProps & DispatchProps & WithTranslation
-interface State {
-  isScrolled: boolean
-}
 
 const mapDispatchToProps = {
   refreshAllBalances,
@@ -78,18 +76,15 @@ const mapStateToProps = (state: RootState): StateProps => ({
 
 const AnimatedSectionList = Animated.createAnimatedComponent(SectionList)
 
-export class WalletHome extends React.Component<Props, State> {
-  state = {
-    isScrolled: false,
-  }
+export class WalletHome extends React.Component<Props> {
+  scrollPosition: Animated.Value<number>
   onScroll: (event: NativeSyntheticEvent<NativeScrollEvent>) => void
 
   constructor(props: Props) {
     super(props)
 
-    this.onScroll = (event) => {
-      this.setState({ isScrolled: event.nativeEvent.contentOffset.y > 0 })
-    }
+    this.scrollPosition = new Animated.Value(0)
+    this.onScroll = Animated.event([{ nativeEvent: { contentOffset: { y: this.scrollPosition } } }])
   }
 
   onRefresh = async () => {
@@ -127,7 +122,6 @@ export class WalletHome extends React.Component<Props, State> {
 
   render() {
     const { t, activeNotificationCount, callToActNotification } = this.props
-    const { isScrolled } = this.state
 
     const refresh: React.ReactElement<RefreshControlProps> = (
       <RefreshControl
@@ -156,7 +150,7 @@ export class WalletHome extends React.Component<Props, State> {
 
     return (
       <SafeAreaView style={styles.container}>
-        <DrawerTopBar middleElement={<Logo />} showBottomBorder={isScrolled} />
+        <DrawerTopBar middleElement={<Logo />} scrollPosition={this.scrollPosition} />
         <AnimatedSectionList
           scrollEventThrottle={50}
           onScroll={this.onScroll}

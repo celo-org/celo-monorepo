@@ -3,20 +3,25 @@ import colors from '@celo/react-components/styles/colors.v2'
 import { useNavigation } from '@react-navigation/native'
 import * as React from 'react'
 import { StyleSheet, TouchableOpacity, View } from 'react-native'
+import Animated, { cond, greaterThan } from 'react-native-reanimated'
 
 interface Props {
   middleElement?: React.ReactNode
-  showBottomBorder?: boolean
+  scrollPosition?: Animated.Value<number>
 }
 
-function DrawerTopBar({ middleElement, showBottomBorder }: Props) {
+function DrawerTopBar({ middleElement, scrollPosition }: Props) {
   const navigation = useNavigation()
+  const borderBottom = React.useMemo(
+    () => ({
+      borderBottomColor: colors.gray2,
+      borderBottomWidth: cond(greaterThan(scrollPosition ?? new Animated.Value(0), 0), 1, 0),
+    }),
+    [scrollPosition]
+  )
+
   return (
-    <View
-      style={
-        showBottomBorder ? { ...styles.container, ...styles.withBorderBottom } : styles.container
-      }
-    >
+    <Animated.View style={[styles.container, borderBottom]}>
       {/*
       // @ts-ignore Only used in a drawer */}
       <TouchableOpacity style={styles.hamburger} onPress={navigation.toggleDrawer}>
@@ -24,7 +29,7 @@ function DrawerTopBar({ middleElement, showBottomBorder }: Props) {
       </TouchableOpacity>
       {middleElement}
       <View style={styles.spacer} />
-    </View>
+    </Animated.View>
   )
 }
 
