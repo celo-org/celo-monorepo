@@ -37,6 +37,7 @@ export enum CustomEventNames {
   send_confirm_back = 'send_confirm_back', // when back button pressed on send confirmation screen
   send_confirm = 'send_confirm', // when send button pressed on send confirmation screen
   send_error = 'send_error', // when there is an error sending a transaction
+  send_complete = 'send_complete', // when a send or invite transaction has successfully completed
 
   invite_error = 'invite_error', // when there is an error sending an invite
 
@@ -261,6 +262,7 @@ export const PROPERTY_PATH_WHITELIST = [
   'inputToken',
   'inviteCode',
   'isCorrect',
+  'isInvite',
   'issuer',
   'label',
   'language',
