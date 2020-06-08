@@ -2,7 +2,7 @@ import { Attachment, FieldSet, Table } from 'airtable'
 import airtableInit from './airtable'
 import cache from './cache'
 
-const BASE_ID = 'appjKfoHvrO5SZWdd'
+const AIRTABLE_BASE_ID = 'appjKfoHvrO5SZWdd'
 
 interface Fields extends FieldSet {
   Name: string
@@ -38,7 +38,7 @@ async function fetchAssets(sheet: Sheets) {
 }
 
 function getAirtable(sheet: Sheets): Table<Fields> {
-  return airtableInit(BASE_ID)(sheet) as Table<Fields>
+  return airtableInit(AIRTABLE_BASE_ID)(sheet) as Table<Fields>
 }
 
 const TERMS_SIGNED = 'Terms=1'

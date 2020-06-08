@@ -7,7 +7,7 @@ import {
   EmbodyHumility,
   InnovatingOnMoney,
   StrivingForBeauty,
-} from 'src/experience/eventkit/Tenent'
+} from 'src/experience/eventkit/Tenents'
 import { H1, H2, H3, H4, Li, Ul } from 'src/fonts/Fonts'
 import Button, { BTN } from 'src/shared/Button.3'
 import InlineAnchor from 'src/shared/InlineAnchor'
