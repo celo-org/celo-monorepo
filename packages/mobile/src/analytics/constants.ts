@@ -62,6 +62,14 @@ export enum CustomEventNames {
   request_confirm = 'request_confirm', // when request button pressed on request confirmation screen
   request_error = 'request_error', // when there is an error requesting a transaction
 
+  incoming_request_payment_decline = 'incoming_request_payment_decline',
+  incoming_request_payment_pay = 'incoming_request_payment_pay',
+  incoming_request_payment_review = 'incoming_request_payment_review',
+
+  outgoing_request_payment_review = 'outgoing_request_payment_review',
+  outgoing_request_payment_remind = 'outgoing_request_payment_remind',
+  outgoing_request_payment_cancel = 'outgoing_request_payment_cancel',
+
   // Send events, separate from button tracking above
   send_dollar_transaction = 'send_dollar_transaction',
   send_dollar_transaction_confirmed = 'send_dollar_transaction_confirmed',
@@ -206,17 +214,6 @@ export enum CustomEventNames {
   import_phrase_input = 'import_phrase_input', // to record the # of times a value is inputted here [we should not track the actual value of this field, just whether the user filled it out]
   import_wallet_submit = 'import_wallet_submit', // to count the # of times that the “Restore Celo Wallet” button is pressed
   import_wallet_cancel = 'import_wallet_cancel', // to count the # of times that the “Cancel” button is pressed
-
-  request_payment_request = 'incoming_request_payment_request',
-  request_payment_edit = 'incoming_request_payment_edit',
-
-  incoming_request_payment_decline = 'incoming_request_payment_decline',
-  incoming_request_payment_pay = 'incoming_request_payment_pay',
-  incoming_request_payment_review = 'incoming_request_payment_review',
-
-  outgoing_request_payment_review = 'outgoing_request_payment_review',
-  outgoing_request_payment_remind = 'outgoing_request_payment_remind',
-  outgoing_request_payment_cancel = 'outgoing_request_payment_cancel',
 
   // Escrowed payments
   escrowed_payment_review = 'escrowed_payment_review',

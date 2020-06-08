@@ -198,6 +198,10 @@ const nuxScreens = (Navigator: typeof Stack) => (
 
 const sendScreenOptions = ({ route }: { route: RouteProp<StackParamList, Screens.Send> }) => {
   const goQr = () => navigate(Screens.QRCode)
+  const title = route.params?.isRequest
+    ? i18n.t('paymentRequestFlow:request')
+    : i18n.t('sendFlow7:send')
+
   return {
     ...emptyHeader,
     headerLeft: () => (
@@ -220,7 +224,7 @@ const sendScreenOptions = ({ route }: { route: RouteProp<StackParamList, Screens
       />
     ),
     headerRightContainerStyle: { paddingRight: 16 },
-    headerTitle: i18n.t(`sendFlow7:${route.params?.isRequest ? 'request' : 'send'}`),
+    headerTitle: title,
   }
 }
 
@@ -229,15 +233,14 @@ const sendAmountScreenOptions = ({
 }: {
   route: RouteProp<StackParamList, Screens.SendAmount>
 }) => {
+  const title = route.params?.isRequest
+    ? i18n.t('paymentRequestFlow:request')
+    : i18n.t('sendFlow7:send')
+
   return {
     ...emptyHeader,
     headerLeft: () => <BackButton eventName={CustomEventNames.send_amount_back} />,
-    headerTitle: () => (
-      <HeaderTitleWithBalance
-        title={i18n.t(`sendFlow7:${route.params?.isRequest ? 'request' : 'send'}`)}
-        token={CURRENCY_ENUM.DOLLAR}
-      />
-    ),
+    headerTitle: () => <HeaderTitleWithBalance title={title} token={CURRENCY_ENUM.DOLLAR} />,
   }
 }
 
@@ -258,7 +261,7 @@ const sendConfirmationScreenOptions = () => ({
 
 const paymentConfirmationScreenOptions = () => ({
   ...emptyHeader,
-  headerLeft: () => <BackButton eventName={CustomEventNames.send_confirm_back} />,
+  headerLeft: () => <BackButton eventName={CustomEventNames.request_confirm_back} />,
 })
 
 const emptyWithBackButtonHeaderOption = () => ({

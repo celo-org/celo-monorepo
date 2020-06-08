@@ -19,7 +19,6 @@ import TotalLineItem from 'src/components/TotalLineItem.v2'
 import { writePaymentRequest } from 'src/firebase/actions'
 import { currencyToShortMap } from 'src/geth/consts'
 import { Namespaces, withTranslation } from 'src/i18n'
-import { navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 import { getDisplayName, getRecipientThumbnail } from 'src/recipients/recipient'
@@ -91,11 +90,6 @@ class PaymentRequestConfirmation extends React.Component<Props> {
 
   onConfirm = async () => {
     const { amount, recipient, recipientAddress: requesteeAddress } = this.props.confirmationInput
-
-    CeloAnalytics.track(CustomEventNames.request_payment_request, {
-      requesteeAddress,
-    })
-
     const { t } = this.props
     if (!recipient || (!recipient.e164PhoneNumber && !recipient.address)) {
       throw new Error("Can't request from recipient without valid e164 number or a wallet address")
@@ -124,13 +118,9 @@ class PaymentRequestConfirmation extends React.Component<Props> {
       notified: false,
     }
 
+    CeloAnalytics.track(CustomEventNames.request_confirm, { address: requesteeAddress })
     this.props.writePaymentRequest(paymentInfo)
     Logger.showMessage(t('requestSent'))
-  }
-
-  onPressEdit = () => {
-    CeloAnalytics.track(CustomEventNames.request_payment_edit)
-    navigateBack()
   }
 
   renderFooter = () => {
