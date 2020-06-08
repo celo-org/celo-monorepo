@@ -1,0 +1,56 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders correctly 1`] = `
+<View
+  style={
+    Object {
+      "backgroundColor": "#FFFFFF",
+      "flex": 1,
+      "justifyContent": "space-between",
+    }
+  }
+>
+  <RCTScrollView
+    contentContainerStyle={
+      Object {
+        "flex": 1,
+        "justifyContent": "flex-start",
+        "paddingHorizontal": 24,
+        "paddingVertical": 32,
+      }
+    }
+  >
+    <View>
+      <Text
+        style={
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Inter-SemiBold",
+            "fontSize": 19,
+            "lineHeight": 26,
+            "paddingHorizontal": 5,
+            "paddingVertical": 20,
+            "textAlign": "center",
+          }
+        }
+      >
+        requestUnavailableHeader
+      </Text>
+      <Text
+        style={
+          Object {
+            "color": "#2E3338",
+            "fontFamily": "Inter-Regular",
+            "fontSize": 16,
+            "lineHeight": 22,
+            "paddingBottom": 20,
+            "textAlign": "center",
+          }
+        }
+      >
+        requestUnavailableBody
+      </Text>
+    </View>
+  </RCTScrollView>
+</View>
+`;
