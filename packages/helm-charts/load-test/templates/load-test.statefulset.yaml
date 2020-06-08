@@ -85,7 +85,7 @@ spec:
         - "-c"
         - |
           for thread in $(seq 0 {{ sub .Values.threads 1 | default "0" }}); do
-            geth account import --nousb --password /root/.celo/account/accountSecret /root/.celo/pkey$thread || true
+            geth --nousb account import --password /root/.celo/account/accountSecret /root/.celo/pkey$thread || true
           done
         volumeMounts:
         - name: data
