@@ -1,13 +1,10 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Education renders correctly 1`] = `
-<View
+<SafeAreaView
   style={
     Object {
-      "alignItems": "center",
-      "backgroundColor": "white",
       "flex": 1,
-      "justifyContent": "center",
     }
   }
 >
@@ -15,110 +12,115 @@ exports[`Education renders correctly 1`] = `
     style={
       Object {
         "flexDirection": "row",
-        "justifyContent": "flex-start",
-        "margin": 0,
-        "padding": 20,
+        "paddingLeft": 24,
+        "paddingVertical": 16,
         "width": "100%",
       }
     }
   >
     <View
-      style={
+      accessible={true}
+      focusable={true}
+      hitSlop={
         Object {
-          "flex": 0,
+          "bottom": 10,
+          "left": 10,
+          "right": 10,
+          "top": 10,
         }
       }
-    >
-      <View
-        accessible={true}
-        focusable={true}
-        nativeBackgroundAndroid={
-          Object {
-            "attribute": "selectableItemBackgroundBorderless",
-            "type": "ThemeAttrAndroid",
-          }
+      nativeBackgroundAndroid={
+        Object {
+          "attribute": "selectableItemBackgroundBorderless",
+          "type": "ThemeAttrAndroid",
         }
-        onClick={[Function]}
-        onResponderGrant={[Function]}
-        onResponderMove={[Function]}
-        onResponderRelease={[Function]}
-        onResponderTerminate={[Function]}
-        onResponderTerminationRequest={[Function]}
-        onStartShouldSetResponder={[Function]}
-        testID="Education-goback"
+      }
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+    >
+      <svg
+        height={16}
+        style={Object {}}
+        viewBox="0 0 16 16"
+        width={16}
+        xmlns="http://www.w3.org/2000/svg"
       >
-        <Text
-          style={
-            Object {
-              "color": "#42D689",
-              "fontFamily": "Hind-SemiBold",
-              "fontSize": 14,
-              "lineHeight": 22,
-            }
-          }
-        >
-           
-          cancel
-        </Text>
-      </View>
+        <path
+          d="M13.9999 2.00146L1.99994 14.0015"
+          stroke="#2E3338"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          style={Object {}}
+        />
+        <path
+          d="M1.99994 2.00146L13.9999 14.0015"
+          stroke="#2E3338"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          style={Object {}}
+        />
+      </svg>
     </View>
   </View>
   <View
     style={
       Object {
         "alignItems": "center",
-        "flex": 8,
+        "backgroundColor": "white",
+        "flex": 1,
+        "justifyContent": "center",
+        "paddingBottom": 24,
       }
     }
   >
     <Swiper
       activeDotStyle={
         Object {
-          "backgroundColor": "#D1D5D8",
+          "backgroundColor": "#2E3338",
           "borderRadius": 8,
           "flex": 0,
-          "height": 12,
-          "width": 12,
-        }
-      }
-      containerStyle={
-        Object {
-          "alignItems": "center",
+          "height": 8,
+          "marginHorizontal": 5,
+          "width": 8,
         }
       }
       dotStyle={
         Object {
-          "backgroundColor": "#D1D5D8",
+          "backgroundColor": "#9CA4A9",
           "borderRadius": 8,
           "flex": 0,
-          "height": 8,
-          "width": 8,
+          "height": 6,
+          "marginHorizontal": 5,
+          "width": 6,
         }
       }
       loop={false}
       onIndexChanged={[Function]}
-      showsButtons={false}
-      showsPagination={true}
-      style={
-        Object {
-          "alignItems": "center",
-          "flex": 1,
-          "width": 750,
-        }
-      }
     >
       <View
         style={
           Object {
             "flex": 1,
             "justifyContent": "center",
-            "marginBottom": 60,
+            "marginBottom": 24,
+            "paddingHorizontal": 24,
           }
         }
       >
         <Image
           resizeMode="contain"
-          source="./test.jpg"
+          source={
+            Object {
+              "testUri": "../../../packages/mobile/src/images/placeholder.png",
+            }
+          }
           style={
             Object {
               "alignSelf": "center",
@@ -129,65 +131,50 @@ exports[`Education renders correctly 1`] = `
         />
         <Text
           style={
-            Array [
-              Object {
-                "color": "#2E3338",
-                "fontFamily": "Hind-Light",
-                "fontSize": 22,
-                "paddingBottom": 20,
-                "textAlign": "center",
-              },
-              Object {
-                "color": "#81868B",
-                "paddingHorizontal": 20,
-                "paddingTop": 30,
-              },
-            ]
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Inter-SemiBold",
+              "fontSize": 19,
+              "lineHeight": 26,
+              "marginTop": 24,
+              "textAlign": "center",
+            }
           }
         >
           Step 1
         </Text>
+        <Text
+          style={
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Inter-Regular",
+              "fontSize": 16,
+              "lineHeight": 22,
+              "paddingTop": 16,
+              "textAlign": "center",
+            }
+          }
+        >
+          The Journey Begins
+        </Text>
       </View>
     </Swiper>
-  </View>
-  <View
-    style={
-      Object {
-        "alignSelf": "stretch",
-        "flex": 2,
-        "justifyContent": "flex-end",
-      }
-    }
-  >
     <View
       style={
-        Object {
-          "flexDirection": "row",
-        }
+        Array [
+          Object {
+            "flexDirection": "row",
+          },
+          undefined,
+        ]
       }
     >
       <View
         style={
-          Array [
-            Object {
-              "alignItems": "center",
-              "borderRadius": 3,
-              "flexDirection": "row",
-            },
-            Object {
-              "marginVertical": 10,
-            },
-            Object {
-              "marginBottom": 10,
-            },
-            Object {
-              "flex": 1,
-              "paddingHorizontal": 20,
-            },
-            Object {
-              "backgroundColor": "#42D689",
-            },
-          ]
+          Object {
+            "borderRadius": 100,
+            "overflow": "hidden",
+          }
         }
       >
         <View
@@ -207,59 +194,32 @@ exports[`Education renders correctly 1`] = `
           onResponderTerminationRequest={[Function]}
           onStartShouldSetResponder={[Function]}
           style={
-            Array [
-              Object {
-                "alignItems": "center",
-                "flex": 1,
-                "justifyContent": "center",
-              },
-              Object {
-                "backgroundColor": "#42D689",
-              },
-              Object {
-                "height": 50,
-              },
-              Object {
-                "borderColor": "#42D689",
-                "borderRadius": 3,
-                "borderWidth": 2,
-              },
-            ]
+            Object {
+              "alignItems": "center",
+              "backgroundColor": "#F5F4F0",
+              "height": 48,
+              "justifyContent": "center",
+              "minWidth": 98,
+              "paddingHorizontal": 16,
+              "paddingVertical": 5,
+            }
           }
         >
-          <View
+          <Text
             style={
               Object {
-                "alignItems": "center",
-                "flex": 1,
-                "flexDirection": "row",
-                "justifyContent": "space-between",
+                "color": "#2E3338",
+                "fontFamily": "Inter-SemiBold",
+                "fontSize": 16,
+                "lineHeight": 22,
               }
             }
           >
-            <Text
-              style={
-                Array [
-                  Object {
-                    "fontFamily": "Hind-SemiBold",
-                    "fontSize": 16,
-                  },
-                  Object {
-                    "color": "#FFFFFF",
-                  },
-                  Object {
-                    "paddingLeft": 5,
-                    "paddingRight": 5,
-                  },
-                ]
-              }
-            >
-              Test
-            </Text>
-          </View>
+            Done
+          </Text>
         </View>
       </View>
     </View>
   </View>
-</View>
+</SafeAreaView>
 `;

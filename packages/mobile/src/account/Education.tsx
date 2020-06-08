@@ -27,7 +27,7 @@ interface EducationStep {
   screenName: string
 }
 
-interface Props {
+export interface Props {
   isClosable: boolean
   stepInfo: EducationStep[]
   buttonText: string

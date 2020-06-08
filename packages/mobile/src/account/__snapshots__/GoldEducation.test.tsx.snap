@@ -1,13 +1,10 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`GoldEducation renders correctly 1`] = `
-<View
+<SafeAreaView
   style={
     Object {
-      "alignItems": "center",
-      "backgroundColor": "white",
       "flex": 1,
-      "justifyContent": "center",
     }
   }
 >
@@ -15,104 +12,54 @@ exports[`GoldEducation renders correctly 1`] = `
     style={
       Object {
         "flexDirection": "row",
-        "justifyContent": "flex-start",
-        "margin": 0,
-        "padding": 20,
+        "paddingLeft": 24,
+        "paddingVertical": 16,
         "width": "100%",
       }
     }
-  >
-    <View
-      style={
-        Object {
-          "flex": 0,
-        }
-      }
-    >
-      <View
-        accessible={true}
-        focusable={true}
-        nativeBackgroundAndroid={
-          Object {
-            "attribute": "selectableItemBackgroundBorderless",
-            "type": "ThemeAttrAndroid",
-          }
-        }
-        onClick={[Function]}
-        onResponderGrant={[Function]}
-        onResponderMove={[Function]}
-        onResponderRelease={[Function]}
-        onResponderTerminate={[Function]}
-        onResponderTerminationRequest={[Function]}
-        onStartShouldSetResponder={[Function]}
-        testID="Education-goback"
-      >
-        <Text
-          style={
-            Object {
-              "color": "#42D689",
-              "fontFamily": "Hind-SemiBold",
-              "fontSize": 14,
-              "lineHeight": 22,
-            }
-          }
-        >
-           
-          cancel
-        </Text>
-      </View>
-    </View>
-  </View>
+  />
   <View
     style={
       Object {
         "alignItems": "center",
-        "flex": 8,
+        "backgroundColor": "white",
+        "flex": 1,
+        "justifyContent": "center",
+        "paddingBottom": 24,
       }
     }
   >
     <Swiper
       activeDotStyle={
         Object {
-          "backgroundColor": "#D1D5D8",
+          "backgroundColor": "#2E3338",
           "borderRadius": 8,
           "flex": 0,
-          "height": 12,
-          "width": 12,
-        }
-      }
-      containerStyle={
-        Object {
-          "alignItems": "center",
+          "height": 8,
+          "marginHorizontal": 5,
+          "width": 8,
         }
       }
       dotStyle={
         Object {
-          "backgroundColor": "#D1D5D8",
+          "backgroundColor": "#9CA4A9",
           "borderRadius": 8,
           "flex": 0,
-          "height": 8,
-          "width": 8,
+          "height": 6,
+          "marginHorizontal": 5,
+          "width": 6,
         }
       }
       loop={false}
       onIndexChanged={[Function]}
-      showsButtons={false}
-      showsPagination={true}
-      style={
-        Object {
-          "alignItems": "center",
-          "flex": 1,
-          "width": 750,
-        }
-      }
     >
       <View
         style={
           Object {
             "flex": 1,
             "justifyContent": "center",
-            "marginBottom": 60,
+            "marginBottom": 24,
+            "paddingHorizontal": 24,
           }
         }
       >
@@ -133,23 +80,31 @@ exports[`GoldEducation renders correctly 1`] = `
         />
         <Text
           style={
-            Array [
-              Object {
-                "color": "#2E3338",
-                "fontFamily": "Hind-Light",
-                "fontSize": 22,
-                "paddingBottom": 20,
-                "textAlign": "center",
-              },
-              Object {
-                "color": "#81868B",
-                "paddingHorizontal": 20,
-                "paddingTop": 30,
-              },
-            ]
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Inter-SemiBold",
+              "fontSize": 19,
+              "lineHeight": 26,
+              "marginTop": 24,
+              "textAlign": "center",
+            }
           }
         >
-          celoLikeGold
+          steps.0.title
+        </Text>
+        <Text
+          style={
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Inter-Regular",
+              "fontSize": 16,
+              "lineHeight": 22,
+              "paddingTop": 16,
+              "textAlign": "center",
+            }
+          }
+        >
+          steps.0.text
         </Text>
       </View>
       <View
@@ -157,7 +112,8 @@ exports[`GoldEducation renders correctly 1`] = `
           Object {
             "flex": 1,
             "justifyContent": "center",
-            "marginBottom": 60,
+            "marginBottom": 24,
+            "paddingHorizontal": 24,
           }
         }
       >
@@ -178,23 +134,31 @@ exports[`GoldEducation renders correctly 1`] = `
         />
         <Text
           style={
-            Array [
-              Object {
-                "color": "#2E3338",
-                "fontFamily": "Hind-Light",
-                "fontSize": 22,
-                "paddingBottom": 20,
-                "textAlign": "center",
-              },
-              Object {
-                "color": "#81868B",
-                "paddingHorizontal": 20,
-                "paddingTop": 30,
-              },
-            ]
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Inter-SemiBold",
+              "fontSize": 19,
+              "lineHeight": 26,
+              "marginTop": 24,
+              "textAlign": "center",
+            }
           }
         >
-          goldFluctuates
+          steps.1.title
+        </Text>
+        <Text
+          style={
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Inter-Regular",
+              "fontSize": 16,
+              "lineHeight": 22,
+              "paddingTop": 16,
+              "textAlign": "center",
+            }
+          }
+        >
+          steps.1.text
         </Text>
       </View>
       <View
@@ -202,7 +166,8 @@ exports[`GoldEducation renders correctly 1`] = `
           Object {
             "flex": 1,
             "justifyContent": "center",
-            "marginBottom": 60,
+            "marginBottom": 24,
+            "paddingHorizontal": 24,
           }
         }
       >
@@ -223,35 +188,95 @@ exports[`GoldEducation renders correctly 1`] = `
         />
         <Text
           style={
-            Array [
-              Object {
-                "color": "#2E3338",
-                "fontFamily": "Hind-Light",
-                "fontSize": 22,
-                "paddingBottom": 20,
-                "textAlign": "center",
-              },
-              Object {
-                "color": "#81868B",
-                "paddingHorizontal": 20,
-                "paddingTop": 30,
-              },
-            ]
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Inter-SemiBold",
+              "fontSize": 19,
+              "lineHeight": 26,
+              "marginTop": 24,
+              "textAlign": "center",
+            }
           }
         >
-          exchange
+          steps.2.title
+        </Text>
+        <Text
+          style={
+            Object {
+              "color": "#2E3338",
+              "fontFamily": "Inter-Regular",
+              "fontSize": 16,
+              "lineHeight": 22,
+              "paddingTop": 16,
+              "textAlign": "center",
+            }
+          }
+        >
+          steps.2.text
         </Text>
       </View>
     </Swiper>
-  </View>
-  <View
-    style={
-      Object {
-        "alignSelf": "stretch",
-        "flex": 2,
-        "justifyContent": "flex-end",
+    <View
+      style={
+        Array [
+          Object {
+            "flexDirection": "row",
+          },
+          undefined,
+        ]
       }
-    }
-  />
-</View>
+    >
+      <View
+        style={
+          Object {
+            "borderRadius": 100,
+            "overflow": "hidden",
+          }
+        }
+      >
+        <View
+          accessible={true}
+          focusable={true}
+          nativeBackgroundAndroid={
+            Object {
+              "attribute": "selectableItemBackground",
+              "type": "ThemeAttrAndroid",
+            }
+          }
+          onClick={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+          style={
+            Object {
+              "alignItems": "center",
+              "backgroundColor": "#F5F4F0",
+              "height": 48,
+              "justifyContent": "center",
+              "minWidth": 98,
+              "paddingHorizontal": 16,
+              "paddingVertical": 5,
+            }
+          }
+        >
+          <Text
+            style={
+              Object {
+                "color": "#2E3338",
+                "fontFamily": "Inter-SemiBold",
+                "fontSize": 16,
+                "lineHeight": 22,
+              }
+            }
+          >
+            global:next
+          </Text>
+        </View>
+      </View>
+    </View>
+  </View>
+</SafeAreaView>
 `;

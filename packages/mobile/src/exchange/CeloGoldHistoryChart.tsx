@@ -1,3 +1,4 @@
+import Touchable from '@celo/react-components/components/Touchable'
 import colors from '@celo/react-components/styles/colors.v2'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import variables from '@celo/react-components/styles/variables'
@@ -14,14 +15,13 @@ import InfoIcon from 'src/icons/InfoIcon.v2'
 import { LocalCurrencyCode } from 'src/localCurrency/consts'
 import { convertDollarsToLocalAmount } from 'src/localCurrency/convert'
 import { getLocalCurrencyExchangeRate } from 'src/localCurrency/selectors'
+import { navigate } from 'src/navigator/NavigationService'
+import { Screens } from 'src/navigator/Screens'
 import useSelector from 'src/redux/useSelector'
 import { goldToDollarAmount } from 'src/utils/currencyExchange'
 import { getLocalCurrencyDisplayValue } from 'src/utils/formatting'
 import { formatFeedDate } from 'src/utils/time'
 import { VictoryGroup, VictoryLine, VictoryScatter } from 'victory-native'
-import Touchable from '@celo/react-components/components/Touchable'
-import { navigate } from 'src/navigator/NavigationService'
-import { Screens } from 'src/navigator/Screens'
 
 const CHART_POINTS_NUMBER = 60
 const CHART_WIDTH = variables.width

@@ -16,6 +16,7 @@ import { StyleSheet, Text, View } from 'react-native'
 import deviceInfoModule from 'react-native-device-info'
 import Account from 'src/account/Account'
 import FiatExchange from 'src/account/FiatExchange'
+import GoldEducation from 'src/account/GoldEducation'
 import { default as InviteScreen } from 'src/account/Invite'
 import {
   defaultCountryCodeSelector,
@@ -40,8 +41,6 @@ import { Screens } from 'src/navigator/Screens'
 import useSelector from 'src/redux/useSelector'
 import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
 import { currentAccountSelector } from 'src/web3/selectors'
-import AccountKeyEducation from 'src/account/AccountKeyEducation'
-import GoldEducation from 'src/account/GoldEducation'
 
 const Drawer = createDrawerNavigator()
 
