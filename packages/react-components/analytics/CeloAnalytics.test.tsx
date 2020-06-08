@@ -36,17 +36,24 @@ it('tracks events with subEvents correctly', () => {
   Date.now = jest.fn(() => 1000)
   c.startTracking('mockEvent')
   Date.now = jest.fn(() => 2000)
-  c.trackSubEvent('mockEvent', 'step1')
+  c.trackSubEvent('mockEvent', 'step1', { prop1: 'value1' })
   Date.now = jest.fn(() => 3500)
-  c.trackSubEvent('mockEvent', 'step2')
+  c.trackSubEvent('mockEvent', 'step2', { prop2: 'value2' })
   Date.now = jest.fn(() => 4000)
   c.stopTracking('mockEvent')
 
-  expect(c.track).toHaveBeenCalledWith('mockEvent', {
-    step1: 1000,
-    step2: 1500,
-    __totalTime__: 3000,
-  })
+  expect(c.track).toHaveBeenCalledWith(
+    'mockEvent',
+    {
+      step1: 1000,
+      step2: 1500,
+      __endTracking__: 500,
+      __totalTime__: 3000,
+      prop1: 'value1',
+      prop2: 'value2',
+    },
+    false
+  )
 
   c.track = defaultTrackMethod
   Date.now = defaultDateNow
