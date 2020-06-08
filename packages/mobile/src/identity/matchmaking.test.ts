@@ -3,7 +3,7 @@ import { expectSaga } from 'redux-saga-test-plan'
 import { call } from 'redux-saga/effects'
 import { addContactsMatches } from 'src/identity/actions'
 import { fetchContactMatches, obfuscateNumberForMatchmaking } from 'src/identity/matchmaking'
-import { getUserSelfPhoneHashDetails, PhoneNumberHashDetails } from 'src/identity/privacy'
+import { getUserSelfPhoneHashDetails, PhoneNumberHashDetails } from 'src/identity/privateHashing'
 import { NumberToRecipient, RecipientKind } from 'src/recipients/recipient'
 import { getConnectedUnlockedAccount } from 'src/web3/saga'
 import {
@@ -57,12 +57,9 @@ describe('Fetch contact matches', () => {
       salt: mockE164NumberSalt,
     }
 
-    const expectedMatches = [
-      {
-        contactId: 'contactId2',
-        e164Number: mockE164Number2,
-      },
-    ]
+    const expectedMatches = {
+      [mockE164Number2]: { contactId: 'contactId2' },
+    }
 
     await expectSaga(fetchContactMatches, e164NumberToRecipients)
       .provide([

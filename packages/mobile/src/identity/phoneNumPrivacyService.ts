@@ -1,5 +1,4 @@
-// Utilities for interacting with the PGPNP service
-// PGPNP == Pretty Good Phone Number Privacy
+// Utilities for interacting with the Phone Number Privacy Service service (aka PGPNP)
 
 import { ContractKit } from '@celo/contractkit'
 import { ErrorMessages } from 'src/app/ErrorMessages'
@@ -8,7 +7,7 @@ import Logger from 'src/utils/Logger'
 
 const TAG = 'identity/privacy'
 
-export async function postToPGPNP<ResponseType>(
+export async function postToPhoneNumPrivacyService<ResponseType>(
   account: string,
   contractKit: ContractKit,
   body: object,
@@ -31,7 +30,7 @@ export async function postToPGPNP<ResponseType>(
   })
 
   if (!res.ok) {
-    handlePGPNPFailure(res)
+    handleFailure(res)
   }
 
   Logger.debug(`${TAG}@postToPGPNP`, 'Response ok. Parsing.')
@@ -39,7 +38,7 @@ export async function postToPGPNP<ResponseType>(
   return response as ResponseType
 }
 
-function handlePGPNPFailure(res: Response) {
+function handleFailure(res: Response) {
   Logger.error(`${TAG}@handlePGPNPFailure`, `Response not okay. Status ${res.status}`)
   switch (res.status) {
     case 403:

@@ -23,7 +23,7 @@ import {
   updateImportContactsProgress,
 } from 'src/identity/actions'
 import { fetchContactMatches } from 'src/identity/matchmaking'
-import { fetchPhoneHashPrivate, PhoneNumberHashDetails } from 'src/identity/privacy'
+import { fetchPhoneHashPrivate, PhoneNumberHashDetails } from 'src/identity/privateHashing'
 import {
   AddressToE164NumberType,
   AddressValidationType,
@@ -33,6 +33,7 @@ import {
   secureSendPhoneNumberMappingSelector,
 } from 'src/identity/reducer'
 import { checkIfValidationRequired } from 'src/identity/secureSend'
+import { ImportContactsStatus } from 'src/identity/types'
 import { setRecipientCache } from 'src/recipients/actions'
 import { contactsToRecipients, NumberToRecipient } from 'src/recipients/recipient'
 import { getAllContacts } from 'src/utils/contacts'
@@ -44,16 +45,6 @@ import { currentAccountSelector } from 'src/web3/selectors'
 
 const TAG = 'identity/contactMapping'
 export const IMPORT_CONTACTS_TIMEOUT = 1 * 60 * 1000 // 1 minute
-
-export enum ImportContactsStatus {
-  Failed = -1,
-  Stopped = 0,
-  Prepping = 1,
-  Importing = 2,
-  Processing = 3,
-  Matchmaking = 4,
-  Done = 5,
-}
 
 export function* doImportContactsWrapper({ doMatchmaking }: ImportContactsAction) {
   yield call(getConnectedAccount)

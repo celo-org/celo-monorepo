@@ -2,8 +2,9 @@ import { ContractKit } from '@celo/contractkit'
 import crypto from 'crypto'
 import { call, put } from 'redux-saga/effects'
 import { addContactsMatches } from 'src/identity/actions'
-import { postToPGPNP } from 'src/identity/pgpnp'
-import { getUserSelfPhoneHashDetails, PhoneNumberHashDetails } from 'src/identity/privacy'
+import { postToPhoneNumPrivacyService } from 'src/identity/phoneNumPrivacyService'
+import { getUserSelfPhoneHashDetails, PhoneNumberHashDetails } from 'src/identity/privateHashing'
+import { ContactMatches } from 'src/identity/types'
 import { NumberToRecipient } from 'src/recipients/recipient'
 import Logger from 'src/utils/Logger'
 import { getContractKit } from 'src/web3/contracts'
@@ -15,12 +16,7 @@ const MATCHMAKING_ENDPOINT = '/getContactMatches'
 // But for now numbers are simply hashed using this static salt
 const SALT = '__celo__'
 
-export interface ContactMatch {
-  e164Number: string
-  contactId: string
-}
-
-// Uses the PGPNP service to find mutual matches between Celo users
+// Uses the phone number privacy service to find mutual matches between Celo users
 export function* fetchContactMatches(e164NumberToRecipients: NumberToRecipient) {
   const account: string = yield call(getConnectedUnlockedAccount)
   Logger.debug(TAG, 'Starting contact matchmaking')
@@ -105,7 +101,7 @@ async function postToMatchmaking(
     hashedPhoneNumber: selfPhoneHash,
   }
 
-  const response = await postToPGPNP<MatchmakingResponse>(
+  const response = await postToPhoneNumPrivacyService<MatchmakingResponse>(
     account,
     contractKit,
     body,
@@ -119,7 +115,7 @@ function getMatchedContacts(
   obfucsatedNumToE164Number: Record<string, string>,
   matchHashes: string[]
 ) {
-  const matches: ContactMatch[] = []
+  const matches: ContactMatches = {}
   for (const match of matchHashes) {
     const e164Number = obfucsatedNumToE164Number[match]
     if (!e164Number) {
@@ -131,7 +127,7 @@ function getMatchedContacts(
       throw new Error('Recipient missing in recipient map, should never happen')
     }
 
-    matches.push({ e164Number, contactId: recipient.contactId })
+    matches[e164Number] = { contactId: recipient.contactId }
   }
   return matches
 }

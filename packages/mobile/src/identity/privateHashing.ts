@@ -7,7 +7,7 @@ import { e164NumberSelector } from 'src/account/selectors'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import networkConfig from 'src/geth/networkConfig'
 import { updateE164PhoneNumberSalts } from 'src/identity/actions'
-import { postToPGPNP } from 'src/identity/pgpnp'
+import { postToPhoneNumPrivacyService } from 'src/identity/phoneNumPrivacyService'
 import { e164NumberToSaltSelector, E164NumberToSaltType } from 'src/identity/reducer'
 import { navigate, navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -154,7 +154,7 @@ async function postToSignMessage(
     hashedPhoneNumber: selfPhoneHash,
   }
 
-  const response = await postToPGPNP<SignMessageResponse>(
+  const response = await postToPhoneNumPrivacyService<SignMessageResponse>(
     account,
     contractKit,
     body,

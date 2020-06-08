@@ -1,13 +1,12 @@
 import { E164Number } from '@celo/utils/src/io'
-import { ImportContactsStatus } from 'src/identity/contactMapping'
-import { ContactMatch } from 'src/identity/matchmaking'
 import {
   AddressToE164NumberType,
   AddressValidationType,
   E164NumberToAddressType,
   E164NumberToSaltType,
 } from 'src/identity/reducer'
-import { AttestationCode, CodeInputType, VerificationStatus } from 'src/identity/verification'
+import { ContactMatches, ImportContactsStatus, VerificationStatus } from 'src/identity/types'
+import { AttestationCode, CodeInputType } from 'src/identity/verification'
 import { Recipient } from 'src/recipients/recipient'
 
 export enum Actions {
@@ -119,7 +118,7 @@ export interface DenyImportContactsAction {
 
 export interface AddContactMatchesAction {
   type: Actions.ADD_CONTACT_MATCHES
-  matches: ContactMatch[]
+  matches: ContactMatches
 }
 
 export interface ValidateRecipientAddressAction {
@@ -258,7 +257,7 @@ export const denyImportContacts = (): DenyImportContactsAction => ({
   type: Actions.DENY_IMPORT_CONTACTS,
 })
 
-export const addContactsMatches = (matches: ContactMatch[]): AddContactMatchesAction => ({
+export const addContactsMatches = (matches: ContactMatches): AddContactMatchesAction => ({
   type: Actions.ADD_CONTACT_MATCHES,
   matches,
 })

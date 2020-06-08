@@ -15,9 +15,8 @@ import { CustomEventNames } from 'src/analytics/constants'
 import { Namespaces, withTranslation } from 'src/i18n'
 import LoadingSpinner from 'src/icons/LoadingSpinner'
 import { cancelImportContacts, denyImportContacts, importContacts } from 'src/identity/actions'
-import { ImportContactsStatus } from 'src/identity/contactMapping'
-import { ContactMatch } from 'src/identity/matchmaking'
 import { ImportContactProgress } from 'src/identity/reducer'
+import { ContactMatches, ImportContactsStatus } from 'src/identity/types'
 import { nuxNavigationOptions } from 'src/navigator/Headers'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -26,7 +25,7 @@ import { requestContactsPermission } from 'src/utils/permissions'
 
 interface StateProps {
   importContactsProgress: ImportContactProgress
-  matchedContacts: ContactMatch[]
+  matchedContacts: ContactMatches
 }
 
 interface DispatchProps {
@@ -105,16 +104,16 @@ class ImportContactScreen extends React.Component<Props, State> {
       importContactsProgress: { status, total },
       matchedContacts,
     } = this.props
-    const matchesFound = matchedContacts.length > 0
+    const matchesFound = Object.keys(matchedContacts).length
 
     if (status === ImportContactsStatus.Done) {
       return (
         <View style={styles.statusContainer}>
           <Checkmark />
-          {matchesFound ? (
+          {matchesFound > 0 ? (
             <>
               <Text style={styles.h1Status}>
-                {t('contacts.syncing.successHeader', { matches: matchedContacts.length })}
+                {t('contacts.syncing.successHeader', { matches: matchesFound })}
               </Text>
               <Text style={styles.h2Status}>{t('contacts.syncing.successStatus')}</Text>
             </>

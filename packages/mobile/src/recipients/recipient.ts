@@ -2,11 +2,8 @@ import { parsePhoneNumber } from '@celo/utils/src/phoneNumbers'
 import * as fuzzysort from 'fuzzysort'
 import { TFunction } from 'i18next'
 import { MinimalContact } from 'react-native-contacts'
-import {
-  AddressToE164NumberType,
-  E164NumberToAddressType,
-  RecipientVerificationStatus,
-} from 'src/identity/reducer'
+import { AddressToE164NumberType, E164NumberToAddressType } from 'src/identity/reducer'
+import { RecipientVerificationStatus } from 'src/identity/types'
 import Logger from 'src/utils/Logger'
 
 const TAG = 'recipients/recipient'

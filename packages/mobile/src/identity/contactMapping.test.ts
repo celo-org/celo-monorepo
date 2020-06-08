@@ -8,7 +8,7 @@ import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { requireSecureSend, updateE164PhoneNumberAddresses } from 'src/identity/actions'
 import { doImportContactsWrapper, fetchAddressesAndValidateSaga } from 'src/identity/contactMapping'
-import { fetchPhoneHashPrivate } from 'src/identity/privacy'
+import { fetchPhoneHashPrivate } from 'src/identity/privateHashing'
 import {
   AddressValidationType,
   e164NumberToAddressSelector,

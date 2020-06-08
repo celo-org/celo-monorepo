@@ -21,11 +21,11 @@ import DevSkipButton from 'src/components/DevSkipButton'
 import { Namespaces, withTranslation } from 'src/i18n'
 import LoadingSpinner from 'src/icons/LoadingSpinner'
 import { cancelVerification, receiveAttestationMessage } from 'src/identity/actions'
+import { VerificationStatus } from 'src/identity/types'
 import {
   AttestationCode,
   CodeInputType,
   NUM_ATTESTATIONS_REQUIRED,
-  VerificationStatus,
 } from 'src/identity/verification'
 import { navigate, navigateHome } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'

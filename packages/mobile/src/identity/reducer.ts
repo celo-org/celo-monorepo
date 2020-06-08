@@ -1,20 +1,13 @@
 import dotProp from 'dot-prop-immutable'
 import { RehydrateAction } from 'redux-persist'
 import { Actions, ActionTypes } from 'src/identity/actions'
-import { ImportContactsStatus } from 'src/identity/contactMapping'
-import { ContactMatch } from 'src/identity/matchmaking'
-import { AttestationCode, VerificationStatus } from 'src/identity/verification'
+import { ContactMatches, ImportContactsStatus, VerificationStatus } from 'src/identity/types'
+import { AttestationCode } from 'src/identity/verification'
 import { getRehydratePayload, REHYDRATE } from 'src/redux/persist-helper'
 import { RootState } from 'src/redux/reducers'
 
 export const ATTESTATION_CODE_PLACEHOLDER = 'ATTESTATION_CODE_PLACEHOLDER'
 export const ATTESTATION_ISSUER_PLACEHOLDER = 'ATTESTATION_ISSUER_PLACEHOLDER'
-
-export enum RecipientVerificationStatus {
-  UNVERIFIED = 0,
-  VERIFIED = 1,
-  UNKNOWN = 2,
-}
 
 export interface AddressToE164NumberType {
   [address: string]: string | null
@@ -63,7 +56,7 @@ export interface State {
   askedContactsPermission: boolean
   importContactsProgress: ImportContactProgress
   // Contacts found during the matchmaking process
-  matchedContacts: ContactMatch[]
+  matchedContacts: ContactMatches
   isValidRecipient: boolean
   secureSendPhoneNumberMapping: SecureSendPhoneNumberMapping
 }
@@ -72,18 +65,18 @@ const initialState: State = {
   attestationCodes: [],
   acceptedAttestationCodes: [],
   numCompleteAttestations: 0,
-  verificationStatus: 0,
+  verificationStatus: VerificationStatus.Stopped,
   hasSeenVerificationNux: false,
   addressToE164Number: {},
   e164NumberToAddress: {},
   e164NumberToSalt: {},
   askedContactsPermission: false,
   importContactsProgress: {
-    status: 0,
+    status: ImportContactsStatus.Stopped,
     current: 0,
     total: 0,
   },
-  matchedContacts: [],
+  matchedContacts: {},
   isValidRecipient: false,
   secureSendPhoneNumberMapping: {},
 }
@@ -185,7 +178,7 @@ export const reducer = (
     case Actions.ADD_CONTACT_MATCHES:
       return {
         ...state,
-        matchedContacts: [...state.matchedContacts, ...action.matches],
+        matchedContacts: { ...state.matchedContacts, ...action.matches },
       }
     case Actions.VALIDATE_RECIPIENT_ADDRESS:
       return {

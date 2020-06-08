@@ -2,7 +2,7 @@ import * as React from 'react'
 import 'react-native'
 import { Provider } from 'react-redux'
 import * as renderer from 'react-test-renderer'
-import { VerificationStatus } from 'src/identity/verification'
+import { VerificationStatus } from 'src/identity/types'
 import VerificationLoadingScreen from 'src/verify/VerificationLoadingScreen'
 import { createMockStore } from 'test/utils'
 

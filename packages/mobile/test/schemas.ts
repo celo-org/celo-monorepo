@@ -300,7 +300,7 @@ export const v1Schema = {
       current: 0,
       total: 0,
     },
-    matchedContacts: [],
+    matchedContacts: {},
     isValidRecipient: false,
     secureSendPhoneNumberMapping: {},
   },
