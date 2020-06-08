@@ -96,7 +96,8 @@ export function contactsToRecipients(contacts: MinimalContact[], defaultCountryC
             displayId: parsedNumber.displayNumber,
             e164PhoneNumber: parsedNumber.e164Number,
             phoneNumberLabel: phoneNumber.label,
-            contactId: contact.recordID,
+            // @ts-ignore TODO Minimal contact type is incorrect, on android it returns id
+            contactId: contact.recordID || contact.id,
             thumbnailPath: contact.thumbnailPath,
           }
         } else {
@@ -105,7 +106,8 @@ export function contactsToRecipients(contacts: MinimalContact[], defaultCountryC
             displayName: contact.displayName,
             displayId: phoneNumber.number,
             phoneNumberLabel: phoneNumber.label,
-            contactId: contact.recordID,
+            // @ts-ignore TODO Minimal contact type is incorrect, on android it returns id
+            contactId: contact.recordID || contact.id,
             thumbnailPath: contact.thumbnailPath,
           }
         }

@@ -107,7 +107,7 @@ async function postToMatchmaking(
     body,
     MATCHMAKING_ENDPOINT
   )
-  return Object.values(response.matchedContacts)
+  return response.matchedContacts.map((match) => match.phoneNumber)
 }
 
 function getMatchedContacts(

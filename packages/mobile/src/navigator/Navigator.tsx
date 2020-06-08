@@ -142,10 +142,6 @@ const verificationScreens = (Navigator: typeof Stack) => {
         name={Screens.VerificationInputScreen}
         component={VerificationInputScreen}
       />
-      <Navigator.Screen
-        name={Screens.OnboardingSuccessScreen}
-        component={OnboardingSuccessScreen}
-      />
     </>
   )
 }
@@ -193,6 +189,7 @@ const nuxScreens = (Navigator: typeof Stack) => (
       component={ImportContactsScreen}
       options={nuxNavigationOptions}
     />
+    <Navigator.Screen name={Screens.OnboardingSuccessScreen} component={OnboardingSuccessScreen} />
   </>
 )
 
@@ -499,7 +496,6 @@ export function AppNavigatorNew() {
       redeemComplete,
       account,
       hasSeenVerificationNux,
-      askedContactsPermission,
     } = mapStateToProps(store.getState())
 
     let initialRoute: Screens | undefined
@@ -516,8 +512,6 @@ export function AppNavigatorNew() {
       initialRoute = Screens.EnterInviteCode
     } else if (!hasSeenVerificationNux) {
       initialRoute = Screens.VerificationEducationScreen
-    } else if (!askedContactsPermission) {
-      initialRoute = Screens.ImportContacts
     } else {
       initialRoute = Screens.DrawerNavigator
     }
