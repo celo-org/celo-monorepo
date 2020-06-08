@@ -8,8 +8,10 @@ import fontStyles from '@celo/react-components/styles/fonts.v2'
 import * as React from 'react'
 import { StyleSheet } from 'react-native'
 
-export default function TextButton({ style, ...rest }: Props) {
-  return <BorderlessButton {...rest} style={style ? [styles.text, style] : styles.text} />
+export default function TextButton({ style, ...passThroughProps }: Props) {
+  return (
+    <BorderlessButton {...passThroughProps} style={style ? [styles.text, style] : styles.text} />
+  )
 }
 
 const styles = StyleSheet.create({

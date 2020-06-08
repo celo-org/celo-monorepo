@@ -8,9 +8,9 @@ export type Props = Omit<TouchableProps, 'style'> & {
 
 // unstyled Touchable Text, good for making other Text Buttons such as TopBarButton
 export default function BoarderlessButton(props: Props) {
-  const { style, children, ...rest } = props
+  const { style, children, ...passThroughProps } = props
   return (
-    <Touchable {...rest} borderless={true}>
+    <Touchable {...passThroughProps} borderless={true}>
       <Text style={style}>{children}</Text>
     </Touchable>
   )

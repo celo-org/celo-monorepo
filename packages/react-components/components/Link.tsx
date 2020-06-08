@@ -12,9 +12,9 @@ type Props = Omit<TouchableProps, 'style'> & {
 }
 
 export default function Link(props: Props) {
-  const { style: customStyle, children, ...rest } = props
+  const { style: customStyle, children, ...passThroughProps } = props
   return (
-    <Touchable {...rest} borderless={true}>
+    <Touchable {...passThroughProps} borderless={true}>
       <Text style={[styles.text, customStyle]}>{children}</Text>
     </Touchable>
   )
