@@ -1,24 +1,25 @@
 import * as React from 'react'
 import { fireEvent, render, waitForElement } from 'react-native-testing-library'
 import { Provider } from 'react-redux'
-import * as renderer from 'react-test-renderer'
 import BackupQuiz, { BackupQuiz as BackupQuizRaw } from 'src/backup/BackupQuiz'
 import { Screens } from 'src/navigator/Screens'
-import { createMockStore, getMockI18nProps } from 'test/utils'
-import { mockMnemonic, mockNavigation } from 'test/values'
+import { createMockStore, getMockI18nProps, getMockStackScreenProps } from 'test/utils'
+import { mockMnemonic } from 'test/values'
 
 jest.mock('lodash', () => ({
   ...jest.requireActual('lodash'),
   shuffle: jest.fn((array) => array),
 }))
 
-const mockRoute = {
-  name: Screens.BackupQuiz as Screens.BackupQuiz,
-  key: '1',
-  params: {
-    mnemonic: mockMnemonic,
-  },
-}
+jest.mock('react-native-secure-key-store', () => {
+  return {
+    get: async () => {
+      return mockMnemonic
+    },
+  }
+})
+
+const mockScreenProps = getMockStackScreenProps(Screens.BackupQuiz)
 
 describe('BackupQuiz', () => {
   const store = createMockStore()
@@ -28,13 +29,48 @@ describe('BackupQuiz', () => {
     jest.useRealTimers()
   })
 
-  it('renders correctly', () => {
-    const tree = renderer.create(
+  it('renders correctly', async () => {
+    const { getByTestId, toJSON } = render(
       <Provider store={store}>
-        <BackupQuiz navigation={mockNavigation} route={mockRoute} />
+        <BackupQuiz {...mockScreenProps} />
       </Provider>
     )
-    expect(tree).toMatchSnapshot()
+    await waitForElement(() => getByTestId('selected-word-0'))
+    expect(toJSON()).toMatchSnapshot()
+  })
+
+  describe('when word is pressed', () => {
+    it('removes it from the options adds it to chosen words', async () => {
+      const mockSetBackupCompleted = jest.fn()
+      const { getByTestId, getByText } = render(
+        <Provider store={store}>
+          <BackupQuizRaw
+            {...getMockStackScreenProps(Screens.BackupQuiz)}
+            setBackupCompleted={mockSetBackupCompleted}
+            showError={jest.fn()}
+            {...getMockI18nProps()}
+          />
+        </Provider>
+      )
+
+      await waitForElement(() => getByTestId('selected-word-0'))
+
+      expect(getByTestId('selected-word-0').props.children).toEqual(1)
+
+      const words = mockMnemonic.split(' ')
+      const firstWord = words[0]
+      const secondWord = words[1]
+
+      fireEvent.press(getByText(firstWord))
+
+      await waitForElement(() =>
+        getByTestId('selected-word-0').find((node) => node.props.children === firstWord)
+      )
+
+      expect(getByTestId('selected-word-0').props.children).toEqual(firstWord)
+
+      expect(getByText(secondWord)).toBeTruthy()
+    })
   })
 
   /**
@@ -48,8 +84,7 @@ describe('BackupQuiz', () => {
     const { getByText, getByTestId } = render(
       <Provider store={store}>
         <BackupQuizRaw
-          navigation={mockNavigation}
-          route={mockRoute}
+          {...mockScreenProps}
           setBackupCompleted={mockSetBackupCompleted}
           showError={jest.fn()}
           {...getMockI18nProps()}

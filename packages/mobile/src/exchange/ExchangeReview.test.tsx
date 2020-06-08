@@ -6,8 +6,7 @@ import ExchangeReview from 'src/exchange/ExchangeReview'
 import { ExchangeRatePair } from 'src/exchange/reducer'
 import { CURRENCY_ENUM } from 'src/geth/consts'
 import { Screens } from 'src/navigator/Screens'
-import { createMockStore } from 'test/utils'
-import { mockNavigation } from 'test/values'
+import { createMockStore, getMockStackScreenProps } from 'test/utils'
 
 const exchangeRatePair: ExchangeRatePair = { goldMaker: '0.11', dollarMaker: '10' }
 
@@ -27,25 +26,21 @@ const store = createMockStore({
   },
 })
 
-const mockRoute = {
-  name: Screens.ExchangeReview as Screens.ExchangeReview,
-  key: '1',
-  params: {
-    exchangeInput: {
-      makerToken: CURRENCY_ENUM.GOLD,
-      makerTokenBalance: '20',
-      inputToken: CURRENCY_ENUM.GOLD,
-      inputTokenDisplayName: 'gold',
-      inputAmount: new BigNumber(10),
-    },
+const mockScreenProps = getMockStackScreenProps(Screens.ExchangeReview, {
+  exchangeInput: {
+    makerToken: CURRENCY_ENUM.GOLD,
+    makerTokenBalance: '20',
+    inputToken: CURRENCY_ENUM.GOLD,
+    inputTokenDisplayName: 'gold',
+    inputAmount: new BigNumber(10),
   },
-}
+})
 
 describe('ExchangeReview', () => {
   it('renders correctly', () => {
     const tree = renderer.create(
       <Provider store={store}>
-        <ExchangeReview navigation={mockNavigation} route={mockRoute} />
+        <ExchangeReview {...mockScreenProps} />
       </Provider>
     )
     expect(tree).toMatchSnapshot()

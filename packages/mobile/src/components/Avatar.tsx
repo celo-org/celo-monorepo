@@ -7,11 +7,9 @@
 import { Avatar as BaseAvatar } from '@celo/react-components/components/Avatar'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
-import { Image, StyleSheet } from 'react-native'
 import { useSelector } from 'react-redux'
 import { defaultCountryCodeSelector } from 'src/account/selectors'
 import { Namespaces, withTranslation } from 'src/i18n'
-import { unknownUserIcon } from 'src/images/Images'
 import { getRecipientThumbnail, Recipient } from 'src/recipients/recipient'
 
 const DEFAULT_ICON_SIZE = 40
@@ -26,6 +24,7 @@ interface OwnProps {
 
 type Props = OwnProps & WithTranslation
 
+// When redesigning, consider using getDisplayName from recipient.ts
 function getDisplayName({ name, recipient, e164Number, address, t }: Props) {
   if (name) {
     return name
@@ -43,7 +42,7 @@ function getDisplayName({ name, recipient, e164Number, address, t }: Props) {
   return t('global:unknown')
 }
 
-function getE164Number(e164Number?: string, recipient?: Recipient) {
+export function getE164Number(e164Number?: string, recipient?: Recipient) {
   return e164Number || (recipient && recipient.e164PhoneNumber)
 }
 
@@ -59,20 +58,8 @@ export function Avatar(props: Props) {
       e164Number={getE164Number(e164Number, recipient)}
       iconSize={iconSize}
       thumbnailPath={getRecipientThumbnail(recipient)}
-    >
-      <Image
-        source={unknownUserIcon}
-        style={[style.defaultIcon, { height: iconSize, width: iconSize }]}
-      />
-    </BaseAvatar>
+    />
   )
 }
-
-const style = StyleSheet.create({
-  defaultIcon: {
-    alignSelf: 'center',
-    margin: 'auto',
-  },
-})
 
 export default withTranslation(Namespaces.sendFlow7)(Avatar)

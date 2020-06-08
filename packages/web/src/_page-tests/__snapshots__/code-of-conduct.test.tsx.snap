@@ -635,6 +635,7 @@ This Code of Conduct and its related procedures also applies to unacceptable beh
         role="list"
         style={
           Object {
+            "listStyle": "disc",
             "marginTop": "20px",
             "paddingLeft": "20px",
           }
@@ -651,7 +652,7 @@ This Code of Conduct and its related procedures also applies to unacceptable beh
               "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
               "fontSize": "20px",
               "lineHeight": "28px",
-              "listStyle": "disc",
+              "listStyle": "inherit",
               "marginBottom": "20px",
               "textRendering": "geometricPrecision",
             }
@@ -670,7 +671,7 @@ This Code of Conduct and its related procedures also applies to unacceptable beh
               "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
               "fontSize": "20px",
               "lineHeight": "28px",
-              "listStyle": "disc",
+              "listStyle": "inherit",
               "marginBottom": "20px",
               "textRendering": "geometricPrecision",
             }
@@ -689,7 +690,7 @@ This Code of Conduct and its related procedures also applies to unacceptable beh
               "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
               "fontSize": "20px",
               "lineHeight": "28px",
-              "listStyle": "disc",
+              "listStyle": "inherit",
               "marginBottom": "20px",
               "textRendering": "geometricPrecision",
             }
@@ -708,7 +709,7 @@ This Code of Conduct and its related procedures also applies to unacceptable beh
               "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
               "fontSize": "20px",
               "lineHeight": "28px",
-              "listStyle": "disc",
+              "listStyle": "inherit",
               "marginBottom": "20px",
               "textRendering": "geometricPrecision",
             }
@@ -727,7 +728,7 @@ This Code of Conduct and its related procedures also applies to unacceptable beh
               "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
               "fontSize": "20px",
               "lineHeight": "28px",
-              "listStyle": "disc",
+              "listStyle": "inherit",
               "marginBottom": "20px",
               "textRendering": "geometricPrecision",
             }
@@ -836,6 +837,7 @@ This Code of Conduct and its related procedures also applies to unacceptable beh
         role="list"
         style={
           Object {
+            "listStyle": "disc",
             "marginTop": "20px",
             "paddingLeft": "20px",
           }
@@ -852,7 +854,7 @@ This Code of Conduct and its related procedures also applies to unacceptable beh
               "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
               "fontSize": "20px",
               "lineHeight": "28px",
-              "listStyle": "disc",
+              "listStyle": "inherit",
               "marginBottom": "20px",
               "textRendering": "geometricPrecision",
             }
@@ -871,7 +873,7 @@ This Code of Conduct and its related procedures also applies to unacceptable beh
               "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
               "fontSize": "20px",
               "lineHeight": "28px",
-              "listStyle": "disc",
+              "listStyle": "inherit",
               "marginBottom": "20px",
               "textRendering": "geometricPrecision",
             }
@@ -890,7 +892,7 @@ This Code of Conduct and its related procedures also applies to unacceptable beh
               "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
               "fontSize": "20px",
               "lineHeight": "28px",
-              "listStyle": "disc",
+              "listStyle": "inherit",
               "marginBottom": "20px",
               "textRendering": "geometricPrecision",
             }
@@ -909,7 +911,7 @@ This Code of Conduct and its related procedures also applies to unacceptable beh
               "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
               "fontSize": "20px",
               "lineHeight": "28px",
-              "listStyle": "disc",
+              "listStyle": "inherit",
               "marginBottom": "20px",
               "textRendering": "geometricPrecision",
             }
@@ -928,7 +930,7 @@ This Code of Conduct and its related procedures also applies to unacceptable beh
               "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
               "fontSize": "20px",
               "lineHeight": "28px",
-              "listStyle": "disc",
+              "listStyle": "inherit",
               "marginBottom": "20px",
               "textRendering": "geometricPrecision",
             }
@@ -947,7 +949,7 @@ This Code of Conduct and its related procedures also applies to unacceptable beh
               "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
               "fontSize": "20px",
               "lineHeight": "28px",
-              "listStyle": "disc",
+              "listStyle": "inherit",
               "marginBottom": "20px",
               "textRendering": "geometricPrecision",
             }
@@ -966,7 +968,7 @@ This Code of Conduct and its related procedures also applies to unacceptable beh
               "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
               "fontSize": "20px",
               "lineHeight": "28px",
-              "listStyle": "disc",
+              "listStyle": "inherit",
               "marginBottom": "20px",
               "textRendering": "geometricPrecision",
             }
@@ -985,7 +987,7 @@ This Code of Conduct and its related procedures also applies to unacceptable beh
               "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
               "fontSize": "20px",
               "lineHeight": "28px",
-              "listStyle": "disc",
+              "listStyle": "inherit",
               "marginBottom": "20px",
               "textRendering": "geometricPrecision",
             }
@@ -1004,7 +1006,7 @@ This Code of Conduct and its related procedures also applies to unacceptable beh
               "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
               "fontSize": "20px",
               "lineHeight": "28px",
-              "listStyle": "disc",
+              "listStyle": "inherit",
               "marginBottom": "20px",
               "textRendering": "geometricPrecision",
             }
@@ -1023,7 +1025,7 @@ This Code of Conduct and its related procedures also applies to unacceptable beh
               "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
               "fontSize": "20px",
               "lineHeight": "28px",
-              "listStyle": "disc",
+              "listStyle": "inherit",
               "marginBottom": "20px",
               "textRendering": "geometricPrecision",
             }
@@ -1042,7 +1044,7 @@ This Code of Conduct and its related procedures also applies to unacceptable beh
               "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
               "fontSize": "20px",
               "lineHeight": "28px",
-              "listStyle": "disc",
+              "listStyle": "inherit",
               "marginBottom": "20px",
               "textRendering": "geometricPrecision",
             }

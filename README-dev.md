@@ -37,7 +37,7 @@ Prefer appending a `-dev` suffix to the version number to ensure an internal dep
 
 > Note: Publishing breaking changes requires an increment to the minor version number for `0.` releases. Once `1.0.0` is pusblished breaking changes are generally prohibited outside the rare major version release. Read the [semver specification](https://semver.org/) for more information.
 
-> Note: Services deployed to App Engine must only depend on published NPM packages. These packages are `verification-pool-api`, `blockchain-api` and `notification-service`.
+> Note: Services deployed to App Engine must only depend on published NPM packages. These packages are `blockchain-api` and `notification-service`.
 
 ### Checkout the commit to be published and verify version numbers
 
@@ -88,13 +88,14 @@ Once you publish do some manual tests, for example, after publishing `celocli`
 ```
 # Docker for an isolated environment again
 celo-monorepo $ docker run --rm -it --entrypoint bash node:10
+root@e0d56700584f:/# apt-get install lsb-release libudev-dev libusb-dev libusb-1.0-0 -y
 root@e0d56700584f:/# mkdir /tmp/tmp1 && cd /tmp/tmp1
-root@e0d56700584f:/tmp/tmp1# npm install @celo/celocli@0.0.20
+root@e0d56700584f:/tmp/tmp1# npm install @celo/celocli@0.0.48
 /tmp/tmp1# ./node_modules/.bin/celocli
 CLI Tool for transacting with the Celo protocol
 
 VERSION
-  @celo/celocli/0.0.20 linux-x64 node-v8.16.1
+  @celo/celocli/0.0.48 linux-x64 node-v8.16.1
 
 USAGE
   $ celocli [COMMAND]

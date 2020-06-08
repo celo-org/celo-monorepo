@@ -1,0 +1,74 @@
+apiVersion: apps/v1beta2
+kind: StatefulSet
+metadata:
+  name: {{ .Values.environment }}-eksportisto-{{ .Values.deploymentSuffix }}
+  labels:
+    app: eksportisto
+    chart: eksportisto
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    component: eksportisto
+spec:
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1Gi
+  podManagementPolicy: Parallel
+  replicas: 1
+  selector:
+    matchLabels:
+      app: eksportisto
+      release: {{ .Release.Name }}
+      component: eksportisto
+  template:
+    metadata:
+      labels:
+        app: eksportisto
+        release: {{ .Release.Name }}
+        component: eksportisto
+      annotations:
+        prometheus.io/path: /metrics
+        prometheus.io/port: "8080"
+        prometheus.io/scrape: "true"
+    spec:
+      initContainers:
+      - name: init-sensitive-accounts
+        image: alpine
+        imagePullPolicy: {{ .Values.imagePullPolicy }}
+        command: ['cp', '-L', '/var/config/sensitive-accounts.json', '/root/.eksportisto/']
+        volumeMounts:
+        - name: data
+          mountPath: /root/.eksportisto
+        - name: config
+          mountPath: /var/config
+      containers:
+      - name: eksportisto-{{ .Values.deploymentSuffix }}
+        image: {{ .Values.imageRepository }}:{{ .Values.imageTag }}
+        imagePullPolicy: {{ .Values.imagePullPolicy }}
+        args:
+          - "-nodeUri={{ .Values.web3Provider }}"
+          - "-datadir=/root/.eksportisto"
+          - "-sensitiveAccounts=/root/.eksportisto/sensitive-accounts.json"
+        resources:
+          requests:
+            memory: 100Mi
+            cpu: 1700m
+        ports:
+        - name: prometheus
+          containerPort: 8080
+        volumeMounts:
+        - name: data
+          mountPath: /root/.eksportisto
+        - name: config
+          mountPath: /var/config
+      volumes:
+      - name: data
+        emptyDir: {}
+      - name: config
+        configMap:
+          name: config
+

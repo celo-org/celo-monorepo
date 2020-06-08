@@ -7,6 +7,7 @@ import nuxCurrencyPhoto4 from '@celo/mobile/locales/es-419/nuxCurrencyPhoto4.jso
 import nuxNamePin1 from '@celo/mobile/locales/es-419/nuxNamePin1.json'
 import nuxRestoreWallet3 from '@celo/mobile/locales/es-419/nuxRestoreWallet3.json'
 import nuxVerification2 from '@celo/mobile/locales/es-419/nuxVerification2.json'
+import onboarding from '@celo/mobile/locales/es-419/onboarding.json'
 import paymentRequestFlow from '@celo/mobile/locales/es-419/paymentRequestFlow.json'
 import receiveFlow8 from '@celo/mobile/locales/es-419/receiveFlow8.json'
 import sendFlow7 from '@celo/mobile/locales/es-419/sendFlow7.json'
@@ -26,4 +27,5 @@ export default {
   receiveFlow8,
   sendFlow7,
   walletFlow5,
+  onboarding,
 }
