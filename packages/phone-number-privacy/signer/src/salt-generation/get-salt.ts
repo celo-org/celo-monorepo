@@ -1,4 +1,4 @@
-import { Request, Response } from 'firebase-functions'
+import { Request, Response } from 'express'
 import { BLSCryptographyClient } from '../bls/bls-cryptography-client'
 import { ErrorMessages, respondWithError } from '../common/error-utils'
 import { authenticateUser } from '../common/identity'
@@ -14,6 +14,7 @@ import { incrementQueryCount } from '../database/wrappers/account'
 import { getRemainingQueryCount } from './query-quota'
 
 export async function handleGetBlindedMessageForSalt(request: Request, response: Response) {
+  logger.info('Begin getBlindedSalt request')
   let trx
   try {
     trx = await getTransaction()
