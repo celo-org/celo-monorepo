@@ -2,7 +2,6 @@ import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Bu
 import Switch from '@celo/react-components/components/Switch.v2'
 import TextButton from '@celo/react-components/components/TextButton.v2'
 import Checkmark from '@celo/react-components/icons/Checkmark'
-import colors from '@celo/react-components/styles/colors'
 import colorsV2 from '@celo/react-components/styles/colors.v2'
 import fontStyles from '@celo/react-components/styles/fonts'
 import * as React from 'react'
@@ -60,13 +59,22 @@ class ImportContactScreen extends React.Component<Props, State> {
     isFindMeSwitchChecked: true,
   }
 
+  onFinishTimeout: number | null = null
+
   componentDidUpdate(prevProps: Props) {
     if (
       prevProps.importContactsProgress.status !== ImportContactsStatus.Done &&
       this.props.importContactsProgress.status === ImportContactsStatus.Done
     ) {
       // Set timeout to leave checkmark in place for a little while
-      setTimeout(this.onFinish, 1500)
+      // @ts-ignore setTimeout is incorrectly picking up the Node typings instead of RN's typings
+      this.onFinishTimeout = setTimeout(this.onFinish, 1500)
+    }
+  }
+
+  componentWillUnmount() {
+    if (this.onFinishTimeout) {
+      clearTimeout(this.onFinishTimeout)
     }
   }
 
@@ -188,7 +196,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'space-between',
-    backgroundColor: colors.background,
+    backgroundColor: colorsV2.background,
   },
   scrollContainer: {
     flex: 1,

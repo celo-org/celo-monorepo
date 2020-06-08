@@ -1,17 +1,13 @@
 import colors from '@celo/react-components/styles/colors'
-import React, { useCallback } from 'react'
+import React from 'react'
 import { StyleSheet, View } from 'react-native'
 import DancingRings from 'src/icons/DancingRings'
 import { navigateHome } from 'src/navigator/NavigationService'
 
 function OnboardingSuccessScreen() {
-  const onAnimationFinish = useCallback(() => {
-    navigateHome()
-  }, [])
-
   return (
     <View style={styles.container}>
-      <DancingRings onAnimationFinish={onAnimationFinish} />
+      <DancingRings onAnimationFinish={navigateHome} />
     </View>
   )
 }
