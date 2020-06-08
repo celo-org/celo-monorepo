@@ -3,20 +3,18 @@ import colors from '@celo/react-components/styles/colors.v2'
 import { useNavigation } from '@react-navigation/native'
 import * as React from 'react'
 import { StyleSheet, TouchableOpacity, View } from 'react-native'
-import Animated from 'react-native-reanimated'
+import Animated, { cond, greaterThan } from 'react-native-reanimated'
 
 interface Props {
   middleElement?: React.ReactNode
   scrollPosition?: Animated.Value<number>
 }
 
-// Test mocks would not work if import these together with Animated
-const { cond, greaterThan } = Animated
-
 function DrawerTopBar({ middleElement, scrollPosition }: Props) {
   const navigation = useNavigation()
-  const borderBottom = React.useMemo(
+  const viewStyle = React.useMemo(
     () => ({
+      ...styles.container,
       borderBottomColor: colors.gray2,
       borderBottomWidth: cond(greaterThan(scrollPosition ?? new Animated.Value(0), 0), 1, 0),
     }),
@@ -24,7 +22,7 @@ function DrawerTopBar({ middleElement, scrollPosition }: Props) {
   )
 
   return (
-    <Animated.View style={[styles.container, borderBottom]}>
+    <Animated.View style={viewStyle}>
       {/*
       // @ts-ignore Only used in a drawer */}
       <TouchableOpacity style={styles.hamburger} onPress={navigation.toggleDrawer}>

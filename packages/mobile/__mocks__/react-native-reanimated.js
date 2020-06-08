@@ -1,1 +1,1 @@
-export default jest.requireActual('react-native-reanimated/mock')
+module.exports = require('react-native-reanimated/mock')

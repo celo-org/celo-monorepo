@@ -151,7 +151,7 @@ export class WalletHome extends React.Component<Props> {
       <SafeAreaView style={styles.container}>
         <DrawerTopBar middleElement={<Logo />} scrollPosition={this.scrollPosition} />
         <AnimatedSectionList
-          scrollEventThrottle={50}
+          scrollEventThrottle={16}
           onScroll={this.onScroll}
           refreshControl={refresh}
           onRefresh={this.onRefresh}

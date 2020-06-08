@@ -4,7 +4,6 @@ import SectionHead from '@celo/react-components/components/SectionHeadGold'
 import colors from '@celo/react-components/styles/colors.v2'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import variables from '@celo/react-components/styles/variables'
-import { useNavigation } from '@react-navigation/native'
 import { StackScreenProps } from '@react-navigation/stack'
 import BigNumber from 'bignumber.js'
 import React, { useCallback, useEffect, useMemo, useRef } from 'react'
@@ -34,13 +33,10 @@ import TransactionsList from 'src/transactions/TransactionsList'
 import { goldToDollarAmount } from 'src/utils/currencyExchange'
 import { getLocalCurrencyDisplayValue } from 'src/utils/formatting'
 
-type OwnProps = StackScreenProps<StackParamList, Screens.ExchangeHomeScreen>
+type Props = StackScreenProps<StackParamList, Screens.ExchangeHomeScreen>
 
-type Props = OwnProps
-
-function ExchangeHomeScreen(_props: Props) {
+function ExchangeHomeScreen({ navigation }: Props) {
   const scrollPosition = useRef(new Animated.Value(0)).current
-  const navigation = useNavigation()
   const { t } = useTranslation(Namespaces.exchangeFlow9)
   const dollarBalance = useSelector((state) => state.stableToken.balance)
   const goldBalance = useSelector((state) => state.goldToken.balance)
@@ -155,7 +151,7 @@ function ExchangeHomeScreen(_props: Props) {
         }
       />
       <Animated.ScrollView
-        scrollEventThrottle={50}
+        scrollEventThrottle={16}
         onScroll={onScroll}
         // style={styles.background}
         testID="ExchangeScrollView"
