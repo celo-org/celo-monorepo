@@ -1,23 +1,10 @@
-import {
-  ensureLeading0x,
-  privateKeyToAddress,
-} from '@celo/utils/src/address'
-import {
-  AzureClusterConfig,
-  createIdentityIfNotExists,
-  deleteIdentity,
-  getIdentity,
-  switchToCluster,
-} from 'src/lib/azure'
+import { ensureLeading0x, privateKeyToAddress } from '@celo/utils/src/address'
+import { AzureClusterConfig, createIdentityIfNotExists, deleteIdentity, getIdentity, switchToCluster } from 'src/lib/azure'
 import { execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
 import { getFornoUrl, getFullNodeWebSocketRpcInternalUrl } from 'src/lib/endpoints'
 import { addCeloEnvMiddleware, envVar, fetchEnv, fetchEnvOrFallback } from 'src/lib/env-utils'
 import { AccountType, getPrivateKeysFor } from 'src/lib/generate_utils'
-import {
-  installGenericHelmChart,
-  removeGenericHelmChart,
-  upgradeGenericHelmChart,
-} from 'src/lib/helm_deploy'
+import { installGenericHelmChart, removeGenericHelmChart, upgradeGenericHelmChart } from 'src/lib/helm_deploy'
 import { retryCmd } from 'src/lib/utils'
 import yargs from 'yargs'
 
@@ -191,7 +178,12 @@ async function oracleIdentityHelmParameters(
         `${prefix}.azure.keyVaultName=${oracleIdentity.azureHsmIdentity.keyVaultName}`,
       ])
     } else if (oracleIdentity.privateKey) {
-      params.push(`${prefix}.privateKey=${oracleIdentity.privateKey}`)
+      params = params.concat([
+        `${prefix}.privateKey=${oracleIdentity.privateKey}`,
+        `${prefix}.azure.id=`,
+        `${prefix}.azure.clientId=`,
+        `${prefix}.azure.keyVaultName=`,
+      ])
     } else {
       throw Error(`Incomplete oracle identity: ${oracleIdentity}`)
     }
