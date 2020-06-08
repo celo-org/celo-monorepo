@@ -182,6 +182,7 @@ export class SendConfirmation extends React.Component<Props, State> {
 
   onEditAddressClick = () => {
     const { transactionData, addressValidationType } = this.props
+    CeloAnalytics.track(CustomEventNames.send_secure_edit)
     navigate(Screens.ValidateRecipientIntro, {
       transactionData,
       addressValidationType,

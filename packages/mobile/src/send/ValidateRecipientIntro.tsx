@@ -8,6 +8,8 @@ import { WithTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
+import CeloAnalytics from 'src/analytics/CeloAnalytics'
+import { CustomEventNames } from 'src/analytics/constants'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { AddressValidationType } from 'src/identity/reducer'
 import { navigate } from 'src/navigator/NavigationService'
@@ -42,6 +44,7 @@ const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
 
 class ValidateRecipientIntro extends React.Component<Props> {
   onPressScanCode = () => {
+    CeloAnalytics.track(CustomEventNames.send_secure_start, { method: 'scan' })
     navigate(Screens.QRScanner, {
       transactionData: this.props.transactionData,
       scanIsForSecureSend: true,
@@ -51,6 +54,7 @@ class ValidateRecipientIntro extends React.Component<Props> {
   onPressConfirmAccount = () => {
     const { addressValidationType, transactionData, isPaymentRequest } = this.props
 
+    CeloAnalytics.track(CustomEventNames.send_secure_start, { method: 'manual' })
     navigate(Screens.ValidateRecipientAccount, {
       transactionData,
       addressValidationType,

@@ -241,6 +241,16 @@ const sendAmountScreenOptions = ({
   }
 }
 
+const validateRecipientIntroScreenOptions = () => ({
+  ...emptyHeader,
+  headerLeft: () => <CancelButton eventName={CustomEventNames.send_secure_cancel} />,
+})
+
+const validateRecipientAccountScreenOptions = () => ({
+  ...emptyHeader,
+  headerLeft: () => <BackButton eventName={CustomEventNames.send_secure_back} />,
+})
+
 const sendConfirmationScreenOptions = () => ({
   ...emptyHeader,
   headerLeft: () => <BackButton eventName={CustomEventNames.send_confirm_back} />,
@@ -286,12 +296,12 @@ const sendScreens = (Navigator: typeof Stack) => (
     <Navigator.Screen
       name={Screens.ValidateRecipientIntro}
       component={ValidateRecipientIntro}
-      options={emptyWithBackButtonHeaderOption}
+      options={validateRecipientIntroScreenOptions}
     />
     <Navigator.Screen
       name={Screens.ValidateRecipientAccount}
       component={ValidateRecipientAccount}
-      options={emptyWithBackButtonHeaderOption}
+      options={validateRecipientAccountScreenOptions}
     />
     <Navigator.Screen
       name={Screens.PaymentRequestUnavailable}

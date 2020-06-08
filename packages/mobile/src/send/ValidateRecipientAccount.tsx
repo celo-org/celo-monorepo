@@ -10,6 +10,8 @@ import { WithTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
+import CeloAnalytics from 'src/analytics/CeloAnalytics'
+import { CustomEventNames } from 'src/analytics/constants'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import AccountNumberCard from 'src/components/AccountNumberCard'
 import CodeRow, { CodeRowStatus } from 'src/components/CodeRow'
@@ -101,6 +103,13 @@ export class ValidateRecipientAccount extends React.Component<Props, State> {
       addressValidationType === AddressValidationType.FULL
         ? inputValue
         : singleDigitInputValueArr.join('')
+
+    CeloAnalytics.track(CustomEventNames.send_secure_submit, {
+      method: 'manual',
+      validationType: addressValidationType === AddressValidationType.FULL ? 'full' : 'partial',
+      address: inputToValidate,
+    })
+
     this.props.validateRecipientAddress(inputToValidate, addressValidationType, recipient)
   }
 
@@ -115,6 +124,14 @@ export class ValidateRecipientAccount extends React.Component<Props, State> {
   }
 
   toggleModal = () => {
+    const validationType =
+      this.props.addressValidationType === AddressValidationType.FULL ? 'full' : 'partial'
+    if (this.state.isModalVisible) {
+      CeloAnalytics.track(CustomEventNames.send_secure_info, { validationType })
+    } else {
+      CeloAnalytics.track(CustomEventNames.send_secure_info_dismissed, { validationType })
+    }
+
     this.setState({ isModalVisible: !this.state.isModalVisible })
   }
 

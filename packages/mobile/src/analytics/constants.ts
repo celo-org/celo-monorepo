@@ -39,6 +39,16 @@ export enum CustomEventNames {
   send_error = 'send_error', // when there is an error sending a transaction
   send_complete = 'send_complete', // when a send or invite transaction has successfully completed
 
+  send_secure_start = 'send_secure_start', // when either secure send scan or manual confirm button pressed
+  send_secure_cancel = 'send_secure_cancel', // when secure send flow is canceled
+  send_secure_back = 'send_secure_back', // when back button is pressed during secure send
+  send_secure_submit = 'send_secure_submit', // when an account is submitted for validation
+  send_secure_success = 'send_secure_success', // when an account has been validated
+  send_secure_incorrect = 'send_secure_incorrect', // when there's been an error validating the account
+  send_secure_info = 'send_secure_info', // when "help" button is pressed
+  send_secure_info_dismissed = 'send_secure_info_dismissed', // when "help" button is dismissed
+  send_secure_edit = 'send_secure_edit', // when "edit" address button is pressed to manually initate secure send flow
+
   invite_error = 'invite_error', // when there is an error sending an invite
 
   request_cancel = 'request_cancel', // when cancel is clicked after launching request flow
@@ -301,6 +311,7 @@ export const PROPERTY_PATH_WHITELIST = [
   'to',
   'tti',
   'txId',
+  'validationType',
   'verificationIndex',
   'verificationsRemaining',
 ]
