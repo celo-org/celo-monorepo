@@ -8,6 +8,7 @@
 
 ### Properties
 
+* [approver](_wrappers_governance_.governanceconfig.md#approver)
 * [concurrentProposals](_wrappers_governance_.governanceconfig.md#concurrentproposals)
 * [dequeueFrequency](_wrappers_governance_.governanceconfig.md#dequeuefrequency)
 * [minDeposit](_wrappers_governance_.governanceconfig.md#mindeposit)
@@ -16,6 +17,14 @@
 * [stageDurations](_wrappers_governance_.governanceconfig.md#stagedurations)
 
 ## Properties
+
+###  approver
+
+• **approver**: *[Address](../modules/_base_.md#address)*
+
+*Defined in [contractkit/src/wrappers/Governance.ts:59](https://github.com/celo-org/celo-monorepo/blob/master/packages/contractkit/src/wrappers/Governance.ts#L59)*
+
+___
 
 ###  concurrentProposals
 
