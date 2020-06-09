@@ -859,7 +859,7 @@ jobs:
         command: |
           set -e
           yarn
-          yarn build
+          yarn --cwd packages/celotool build
           rm -f .env.mnemonic .env.mnemonic.${NETWORK}
           touch .env.mnemonic .env.mnemonic.${NETWORK}
     - run:
