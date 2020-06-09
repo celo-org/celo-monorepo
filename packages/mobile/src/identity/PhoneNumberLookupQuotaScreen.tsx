@@ -9,18 +9,34 @@ import React, { useEffect, useState } from 'react'
 import { useTranslation, WithTranslation } from 'react-i18next'
 import { BackHandler, StyleSheet, Text, View } from 'react-native'
 import SafeAreaView from 'react-native-safe-area-view'
+import { useSelector } from 'react-redux'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
+import { ErrorMessages } from 'src/app/ErrorMessages'
+import ErrorMessageInline from 'src/components/ErrorMessageInline'
 import { Namespaces } from 'src/i18n'
 import LoadingSpinner from 'src/icons/LoadingSpinner'
+import { LOOKUP_PURCHASE_FEE } from 'src/identity/privateHashing'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
+import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
 
 type Props = WithTranslation & StackScreenProps<StackParamList, Screens.PhoneNumberLookupQuota>
 
+function isUserBalanceSufficient(userBalance: string | null) {
+  if (!userBalance || Number(userBalance) < LOOKUP_PURCHASE_FEE) {
+    return false
+  }
+
+  return true
+}
+
 function PhoneNumberLookupQuotaScreen(props: Props) {
   const [isSending, setIsSending] = useState(false)
+  const userBalance = useSelector(stableTokenBalanceSelector)
   const { t } = useTranslation(Namespaces.nuxVerification2)
+
+  const userBalanceIsSufficient = isUserBalanceSufficient(userBalance)
 
   const onSkip = () => {
     CeloAnalytics.track(CustomEventNames.phone_number_quota_purchase_skip)
@@ -55,9 +71,10 @@ function PhoneNumberLookupQuotaScreen(props: Props) {
         <View style={styles.spinnerContainer}>{isSending && <LoadingSpinner />}</View>
       </KeyboardAwareScrollView>
       <View>
+        <ErrorMessageInline error={userBalanceIsSufficient ? null : ErrorMessages.NSF_TO_SEND} />
         <Button
           onPress={onBuy}
-          disabled={isSending}
+          disabled={!userBalanceIsSufficient || isSending}
           text={t('quotaLookup.cta')}
           standard={false}
           type={BtnTypes.PRIMARY}
