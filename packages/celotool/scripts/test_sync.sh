@@ -123,7 +123,13 @@ test_syn_syncing() {
 
 #kubectl port-forward -n $namespace ${network}-${namespace}-${syncmode}-node-0 8545 & >/dev/null 2>&1
 # Lets wait until pod starts
-while [[ $(kubectl get pods -n ${namespace} "${node_pod}" -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}') != "True" ]]; do echo "waiting for pod" && sleep 10; done
+sleeped=0
+while [[ $(kubectl get pods -n ${namespace} "${node_pod}" -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}') != "True" ]] && [[ $sleeped -le 300 ]]; do
+  echo "waiting for pod"
+  sleep 10
+  sleeped=$((sleeped+60))
+done
+check_pod_status
 sleep 60
 
 check_synced_false
