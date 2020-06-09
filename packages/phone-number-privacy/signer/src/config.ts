@@ -44,32 +44,32 @@ const toNum = (value: BigNumber.Value) => new BigNumber(value).toNumber()
 const env = process.env as any
 const config: Config = {
   server: {
-    port: toNum(env.server_port),
+    port: toNum(env.SERVER_PORT),
   },
   blockchain: {
-    provider: env.blockchain_provider,
+    provider: env.BLOCKCHAIN_PROVIDER,
   },
   salt: {
-    unverifiedQueryMax: toNum(env.salt_unverified_query_max),
-    additionalVerifiedQueryMax: toNum(env.salt_additional_verified_query_max),
-    queryPerTransaction: toNum(env.salt_query_per_transaction),
-    minDollarBalance: new BigNumber(env.salt_min_dollar_balance),
+    unverifiedQueryMax: toNum(env.SALT_UNVERIFIED_QUERY_MAX),
+    additionalVerifiedQueryMax: toNum(env.SALT_ADDITIONAL_VERIFIED_QUERY_MAX),
+    queryPerTransaction: toNum(env.SALT_QUERY_PER_TRANSACTION),
+    minDollarBalance: new BigNumber(env.SALT_MIN_DOLLAR_BALANCE),
   },
   db: {
-    user: env.db_username,
-    password: env.db_password,
-    database: env.db_database,
-    host: env.db_host,
+    user: env.DB_USERNAME,
+    password: env.DB_PASSWORD,
+    database: env.DB_DATABASE,
+    host: env.DB_HOST,
   },
   keyVault: {
-    azureClientID: env.keyvault_azure_client_id,
-    azureClientSecret: env.keyvault_azure_client_secret,
-    azureTenant: env.keyvault_azure_tenant,
-    azureVaultName: env.keyvault_azure_vault_name,
-    azureSecretName: env.keyvault_azure_secret_name,
+    azureClientID: env.KEYVAULT_AZURE_CLIENT_ID,
+    azureClientSecret: env.KEYVAULT_AZURE_CLIENT_SECRET,
+    azureTenant: env.KEYVAULT_AZURE_TENANT,
+    azureVaultName: env.KEYVAULT_AZURE_VAULT_NAME,
+    azureSecretName: env.KEYVAULT_AZURE_SECRET_NAME,
   },
   attestations: {
-    numberAttestationsRequired: toNum(env.attestations_number_attestations_required),
+    numberAttestationsRequired: toNum(env.ATTESTATIONS_NUMBER_ATTESTATIONS_REQUIRED),
   },
 }
 export default config
