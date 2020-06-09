@@ -53,5 +53,23 @@
     "secondary": "Establecer más tarde"
   },
   "backupPhrasePlaceholder":
-    "caballo leopardo perro mono tiburón tigre lémur ballena calamar lobo ardilla ratón león elefante gato langostino oso pingüino ciervo tortuga zorro cebra cabra jirafa"
+    "caballo leopardo perro mono tiburón tigre lémur ballena calamar lobo ardilla ratón león elefante gato langostino oso pingüino ciervo tortuga zorro cebra cabra jirafa",
+  "guides": [
+    {
+      "title": "La clave de su cuenta es un tipo especial de contraseña",
+      "text": "La clave de su cuenta es la única manera de acceder a su cuenta"
+    },
+    {
+      "title": "Sin tu llave, puedes perder el acceso para siempre",
+      "text": "Si pierde su teléfono, debe tener la llave para recuperar su cuenta. Nadie, ni siquiera Celo, podrá recuperar sus fondos sin ella"
+    },
+    {
+      "title": "Escríbelo",
+      "text": "Escriba su clave de cuenta y guárdela en un lugar seguro. No la guardes en tu teléfono."
+    },
+    {
+      "title": "Mantenga su llave en privado",
+      "text": "Cualquiera con su llave tendrá acceso a su cuenta y a todos sus fondos. No lo comparta con otros"
+    }
+  ]
 }
