@@ -121,6 +121,20 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
     res.redirect('https://forum.celo.org/t/the-great-celo-stake-off-the-details/136')
   })
 
+  // Redirects for OpenPGP Web Key Directory https://gnupg.org/blog/20161027-hosting-a-web-key-directory.html.
+  ;['/.well-known/openpgpkey/hu/:userId', '/.well-known/openpgpkey/celo.org/hu/:userId'].forEach(
+    (path) => {
+      server.get(path, (req, res) => {
+        res.redirect('/.well-known/openpgpkey/clabs.co/hu/' + req.params['userId'] ?? '')
+      })
+    }
+  )
+  ;['/.well-known/openpgpkey/policy', '/.well-known/openpgpkey/celo.org/policy'].forEach((path) => {
+    server.get(path, (_, res) => {
+      res.redirect('/.well-known/openpgpkey/clabs.co/policy')
+    })
+  })
+
   server.use(bodyParser.json())
   server.use(nextI18NextMiddleware(nextI18next))
 
