@@ -14,17 +14,17 @@ You can use the following environment variables to configure the Phone Number Pr
 - `DB_PASSWORD` - DB configuration: The DB password.
 - `DB_DATABASE` DB configuration: The DB database name.
 
-Currently, the service only supports a key maintained in Azure Key Vault (AKV).  You can set the following environment variables to configure the AKV connection.
+Currently, the service only supports a key maintained in Azure Key Vault (AKV).  You can set the following environment variables to configure the AKV connection.  These values are generated when creating a service principal account (see [Configuring your Key Vault](https://www.npmjs.com/package/@azure/keyvault-keys#configuring-your-key-vault))
 
-- `KEYVAULT_AZURE_CLIENT_ID` - Azure KeyVault configuration: Client id.
-- `KEYVAULT_AZURE_CLIENT_SECRET` - Azure KeyVault configuration: Client secret.
-- `KEYVAULT_AZURE_TENANT` - Azure KeyVault configuration: Tenant.
-- `KEYVAULT_AZURE_VAULT_NAME` - Azure KeyVault configuration: Vault name.
-- `KEYVAULT_AZURE_SECRET_NAME` - Azure KeyVault configuration: Secret name.
+- `KEYVAULT_AZURE_CLIENT_ID` - The clientId of the service principal account that has [Get, List] access to secrets.
+- `KEYVAULT_AZURE_CLIENT_SECRET` - The client Secret of the same service principal account.
+- `KEYVAULT_AZURE_TENANT` - The tenant that the service principal is a member of.
+- `KEYVAULT_AZURE_VAULT_NAME` - The name of your Azure Key Vault.
+- `KEYVAULT_AZURE_SECRET_NAME` - The name of the secret that holds your BLS key.
 
 ## Operations
 
 - `yarn db:migrate` - run to migrate the DB tables.
 - `yarn start` - run to start the service
 
-Logs will be prefixed with `CELO_PNP_ERROR_XX`.  You can see a full list of them in [error.utils.ts](https://github.com/celo-org/celo-monorepo/blob/master/packages/phone-number-privacy/signer/src/common/error-utils.ts).
+Error logs will be prefixed with `CELO_PNP_ERROR_XX`.  You can see a full list of them in [error.utils.ts](https://github.com/celo-org/celo-monorepo/blob/master/packages/phone-number-privacy/signer/src/common/error-utils.ts).
