@@ -32,7 +32,7 @@ spec:
         args:
         - |
            sleep 5
-           mix cmd --app block_scout_web mix phx.server | sed 's/^iex(1)> //'
+           exec mix cmd --app block_scout_web mix phx.server | sed 's/^iex(1)> //'
         ports:
         - name: http
           containerPort: 4000
