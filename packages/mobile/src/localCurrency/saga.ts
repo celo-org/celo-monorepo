@@ -1,5 +1,6 @@
 import BigNumber from 'bignumber.js'
 import gql from 'graphql-tag'
+import { REHYDRATE } from 'redux-persist'
 import { call, put, select, spawn, take, takeLatest } from 'redux-saga/effects'
 import { apolloClient } from 'src/apollo'
 import { ExchangeRateQuery, ExchangeRateQueryVariables } from 'src/apollo/types'
@@ -57,7 +58,7 @@ export function* watchFetchCurrentRate() {
 
 export function* watchSelectPreferredCurrency() {
   while (true) {
-    yield take(Actions.SELECT_PREFERRED_CURRENCY)
+    yield take([Actions.SELECT_PREFERRED_CURRENCY, REHYDRATE])
     yield put(fetchCurrentRate())
   }
 }
