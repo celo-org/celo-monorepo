@@ -1,7 +1,11 @@
 import { ensureLeading0x, privateKeyToAddress } from '@celo/utils/src/address'
 import { AzureClusterConfig, createIdentityIfNotExists, deleteIdentity, getIdentity, switchToCluster } from 'src/lib/azure'
 import { execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
-import { getFornoUrl, getFullNodeWebSocketRpcInternalUrl } from 'src/lib/endpoints'
+import {
+  getFornoUrl,
+  getFullNodeHttpRpcInternalUrl,
+  getFullNodeWebSocketRpcInternalUrl,
+} from 'src/lib/endpoints'
 import { addCeloEnvMiddleware, envVar, fetchEnv, fetchEnvOrFallback } from 'src/lib/env-utils'
 import { AccountType, getPrivateKeysFor } from 'src/lib/generate_utils'
 import { installGenericHelmChart, removeGenericHelmChart, upgradeGenericHelmChart } from 'src/lib/helm_deploy'
@@ -136,9 +140,11 @@ async function helmParameters(celoEnv: string, context: OracleAzureContext, useF
 
   const kubeAuthTokenName = await rbacAuthTokenName(celoEnv)
   const replicas = oracleConfig.identities.length
-  const rpcProviderUrl = useForno
+  const httpRpcProviderUrl = useForno
     ? getFornoUrl(celoEnv)
-    : getFullNodeWebSocketRpcInternalUrl(celoEnv)
+    : getFullNodeHttpRpcInternalUrl(celoEnv)
+  // TODO: let forno support websockets
+  const wsRpcProviderUrl = getFullNodeWebSocketRpcInternalUrl(celoEnv)
   return [
     `--set environment.name=${celoEnv}`,
     `--set image.repository=${fetchEnv(envVar.ORACLE_DOCKER_IMAGE_REPOSITORY)}`,
@@ -147,9 +153,11 @@ async function helmParameters(celoEnv: string, context: OracleAzureContext, useF
     `--set oracle.azureHsm.initTryCount=5`,
     `--set oracle.azureHsm.initMaxRetryBackoffMs=30000`,
     `--set oracle.replicas=${replicas}`,
-    `--set oracle.rpcProviderUrl=${rpcProviderUrl}`,
+    `--set oracle.rpcProviderUrls.http=${httpRpcProviderUrl}`,
+    `--set oracle.rpcProviderUrls.ws=${wsRpcProviderUrl}`,
     `--set oracle.metrics.enabled=true`,
     `--set oracle.metrics.prometheusPort=9090`,
+    `--set oracle.unusedOracleAddresses=${fetchEnvOrFallback(envVar.ORACLE_UNUSED_ORACLE_ADDRESSES, '')}`
   ].concat(await oracleIdentityHelmParameters(context, oracleConfig))
 }
 
@@ -178,12 +186,7 @@ async function oracleIdentityHelmParameters(
         `${prefix}.azure.keyVaultName=${oracleIdentity.azureHsmIdentity.keyVaultName}`,
       ])
     } else if (oracleIdentity.privateKey) {
-      params = params.concat([
-        `${prefix}.privateKey=${oracleIdentity.privateKey}`,
-        `${prefix}.azure.id=`,
-        `${prefix}.azure.clientId=`,
-        `${prefix}.azure.keyVaultName=`,
-      ])
+      params.push(`${prefix}.privateKey=${oracleIdentity.privateKey}`)
     } else {
       throw Error(`Incomplete oracle identity: ${oracleIdentity}`)
     }

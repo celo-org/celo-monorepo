@@ -87,7 +87,7 @@ spec:
 
             # Get the correct key vault name. If this oracle's identity is not
             # using Azure HSM signing, the key vault name will be empty and ignored
-            AZURE_KEY_VAULT_NAMES={{- range $index, $identity := .Values.oracle.identities -}}{{ $identity.azure.keyVaultName | default "" }},{{- end }}
+            AZURE_KEY_VAULT_NAMES={{- range $index, $identity := .Values.oracle.identities -}}{{- if (hasKey $identity "azure" ) -}}{{ $identity.azure.keyVaultName | default "" }}{{- end }},{{- end }}
             export AZURE_KEY_VAULT_NAME=`echo -n $AZURE_KEY_VAULT_NAMES | cut -d ',' -f $((RID + 1))`
 
             # Get the correct oracle account address
@@ -110,6 +110,8 @@ spec:
 {{ include "common.env-var" (dict "name" "CIRCUIT_BREAKER_PRICE_CHANGE_THRESHOLD" "dict" .Values.oracle "value_name" "circuitBreakerPriceChangeThreshold") | indent 8 }}
 {{ include "common.env-var" (dict "name" "DATA_FETCH_FREQUENCY" "dict" .Values.oracle.aggregation.trades "value_name" "dataFetchFrequency" "optional" true) | indent 8 }}
 {{ include "common.env-var" (dict "name" "EXCHANGES" "dict" .Values.oracle "value_name" "exchanges") | indent 8 }}
+{{ include "common.env-var" (dict "name" "HTTP_RPC_PROVIDER_URL" "dict" .Values.oracle.rpcProviderUrls "value_name" "http") | indent 8 }}
+{{ include "common.env-var" (dict "name" "MAX_BLOCK_TIMESTAMP_AGE_MS" "dict" .Values.oracle "value_name" "maxBlockTimestampAgeMs" "optional" true) | indent 8 }}
 {{ include "common.env-var" (dict "name" "METRICS" "dict" .Values.oracle.metrics "value_name" "enabled") | indent 8 }}
 {{ include "common.env-var" (dict "name" "MID_AGGREGATION_ASK_MAX_PERCENTAGE_DEVIATION" "dict" .Values.oracle.aggregation.mid "value_name" "askMaxPercentageDeviation" "optional" true) | indent 8 }}
 {{ include "common.env-var" (dict "name" "MID_AGGREGATION_BID_MAX_PERCENTAGE_DEVIATION" "dict" .Values.oracle.aggregation.mid "value_name" "bidMaxPercentageDeviation" "optional" true) | indent 8 }}
@@ -117,6 +119,8 @@ spec:
 {{ include "common.env-var" (dict "name" "MID_AGGREGATION_MAX_PERCENTAGE_BID_ASK_SPREAD" "dict" .Values.oracle.aggregation.mid "value_name" "maxPercentageBidAskSpread" "optional" true) | indent 8 }}
 {{ include "common.env-var" (dict "name" "MIN_REPORT_PRICE_CHANGE_THRESHOLD" "dict" .Values.oracle.reporter.blockBased "value_name" "minReportPriceChangeThreshold" "optional" true) | indent 8 }}
 {{ include "common.env-var" (dict "name" "MINIMUM_DATA" "dict" .Values.oracle.aggregation.trades "value_name" "minimumTrades" "optional" true) | indent 8 }}
+{{ include "common.env-var" (dict "name" "OVERRIDE_INDEX" "dict" .Values.oracle "value_name" "overrideIndex" "optional" true) | indent 8 }}
+{{ include "common.env-var" (dict "name" "OVERRIDE_ORACLE_COUNT" "dict" .Values.oracle "value_name" "overrideOracleCount" "optional" true) | indent 8 }}
 {{ include "common.env-var" (dict "name" "PRIVATE_KEY_PATH" "dict" .Values.oracle "value_name" "privateKeyPath" "optional" true) | indent 8 }}
 {{ include "common.env-var" (dict "name" "PROMETHEUS_PORT" "dict" .Values.oracle.metrics "value_name" "prometheusPort") | indent 8 }}
 {{ include "common.env-var" (dict "name" "QUOTE_CURRENCY" "dict" .Values.oracle "value_name" "quoteCurrency" "optional" true) | indent 8 }}
@@ -125,9 +129,10 @@ spec:
 {{ include "common.env-var" (dict "name" "REPORT_FREQUENCY_OVERRIDE" "dict" .Values.oracle.reporter.timer "value_name" "removeFrequencyOverride" "optional" true) | indent 8 }}
 {{ include "common.env-var" (dict "name" "REPORT_OFFSET_OVERRIDE" "dict" .Values.oracle.reporter.timer "value_name" "reportOffsetOverride" "optional" true) | indent 8 }}
 {{ include "common.env-var" (dict "name" "REPORT_STRATEGY" "dict" .Values.oracle "value_name" "reportStrategy") | indent 8 }}
-{{ include "common.env-var" (dict "name" "RPC_PROVIDER_URL" "dict" .Values.oracle "value_name" "rpcProviderUrl") | indent 8 }}
 {{ include "common.env-var" (dict "name" "TARGET_MAX_HEARTBEAT_PERIOD_MS" "dict" .Values.oracle.reporter.blockBased "value_name" "targetMaxHeartbeatPeriodMs" "optional" true) | indent 8 }}
 {{ include "common.env-var" (dict "name" "TOKEN" "dict" .Values.oracle "value_name" "token" "optional" true) | indent 8 }}
+{{ include "common.env-var" (dict "name" "UNUSED_ORACLE_ADDRESSES" "dict" .Values.oracle "value_name" "unusedOracleAddresses") | indent 8 }}
+{{ include "common.env-var" (dict "name" "WS_RPC_PROVIDER_URL" "dict" .Values.oracle.rpcProviderUrls "value_name" "ws") | indent 8 }}
         readinessProbe:
           exec:
             command:

@@ -17,7 +17,9 @@ kubectl:
 
 oracle:
   replicas: 2
-  rpcProviderUrl: https://alfajoresstaging-forno.celo-testnet.org
+  rpcProviderUrls:
+    ws: wss://alfajoresstaging-forno.celo-testnet.org
+    http: https://alfajoresstaging-forno.celo-testnet.org
   identities:
   - address: 0x0000000000000000000000000000000000000000
     privateKey: 0x000
@@ -68,3 +70,7 @@ oracle:
       # removeFrequencyOverride
       # reportOffsetOverride
   # privateKeyPath
+  # unusedOracleAddresses
+  # overrideIndex
+  # overrideOracleCount
+  # maxBlockTimestampAgeMs
