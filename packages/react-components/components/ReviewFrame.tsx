@@ -2,7 +2,7 @@ import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Bu
 import CircleButton from '@celo/react-components/components/CircleButton'
 import colors from '@celo/react-components/styles/colors.v2'
 import * as React from 'react'
-import { ActivityIndicator, ScrollView, StyleSheet, View, ViewProps } from 'react-native'
+import { ScrollView, StyleSheet, View, ViewProps } from 'react-native'
 
 interface ButtonProps {
   text: string
@@ -51,13 +51,8 @@ class ReviewFrame extends React.PureComponent<Props, State> {
           {confirmButton && (
             <Button
               onPress={this.onConfirm}
-              text={
-                isSending ? (
-                  <ActivityIndicator size="small" color={colors.celoGreen} />
-                ) : (
-                  confirmButton.text
-                )
-              }
+              text={confirmButton.text}
+              showLoading={isSending}
               accessibilityLabel={confirmButton.text}
               type={BtnTypes.PRIMARY}
               size={BtnSizes.FULL}
