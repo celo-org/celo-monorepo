@@ -997,11 +997,11 @@ jobs:
             # exit 1
           fi
           echo "export RESULT=${RESULT}" >> $BASH_ENV
-    - run:
-        name: Victorops notification
-        command: |
-          cd packages/celotool/scripts
-          bash notify_victorops.sh $RESULT $FAILED_STRING
+    # - run:
+    #     name: Victorops notification
+    #     command: |
+    #       cd packages/celotool/scripts
+    #       bash notify_victorops.sh $RESULT $FAILED_STRING
     # - slack/status:
     #     fail_only: false
     #     mentions: 'Javier Cortejoso'
