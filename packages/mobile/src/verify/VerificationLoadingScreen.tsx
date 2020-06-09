@@ -3,6 +3,7 @@ import SearchUser from '@celo/react-components/icons/SearchUser'
 import VerificationTexts from '@celo/react-components/icons/VerificationTexts'
 import colors from '@celo/react-components/styles/colors'
 import { fontStyles } from '@celo/react-components/styles/fonts'
+import { StackScreenProps } from '@react-navigation/stack'
 import * as React from 'react'
 import { WithTranslation } from 'react-i18next'
 import { BackHandler, ScrollView, StyleSheet, Text, View } from 'react-native'
@@ -15,9 +16,10 @@ import DevSkipButton from 'src/components/DevSkipButton'
 import { Namespaces, withTranslation } from 'src/i18n'
 import LoadingSpinner from 'src/icons/LoadingSpinner'
 import { cancelVerification, startVerification } from 'src/identity/actions'
-import { VerificationStatus } from 'src/identity/verification'
+import { VerificationStatus } from 'src/identity/types'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { StackParamList } from 'src/navigator/types'
 import { RootState } from 'src/redux/reducers'
 import Logger from 'src/utils/Logger'
 import { VerificationFailedModal } from 'src/verify/VerificationFailedModal'
@@ -39,7 +41,10 @@ interface DispatchProps {
   toggleFornoMode: typeof toggleFornoMode
 }
 
-type Props = StateProps & DispatchProps & WithTranslation
+type Props = StateProps &
+  DispatchProps &
+  WithTranslation &
+  StackScreenProps<StackParamList, Screens.VerificationLoadingScreen>
 
 const mapDispatchToProps = {
   startVerification,
@@ -65,11 +70,11 @@ class VerificationLoadingScreen extends React.Component<Props> {
     this.props.startVerification()
   }
 
-  componentDidUpdate() {
-    if (this.props.verificationStatus === VerificationStatus.Done) {
-      navigate(Screens.VerificationSuccessScreen)
-    } else if (this.props.verificationStatus === VerificationStatus.RevealingNumber) {
+  componentDidUpdate(prevProps: Props) {
+    if (this.didVerificationStatusChange(prevProps, VerificationStatus.RevealingNumber)) {
       navigate(Screens.VerificationInterstitialScreen)
+    } else if (this.didVerificationStatusChange(prevProps, VerificationStatus.Done)) {
+      navigate(Screens.ImportContacts)
     }
   }
 
@@ -87,6 +92,14 @@ class VerificationLoadingScreen extends React.Component<Props> {
     Logger.debug(TAG + '@onCancel', 'Cancelled, going back to education screen')
     this.props.cancelVerification()
     navigate(Screens.VerificationEducationScreen)
+  }
+
+  didVerificationStatusChange = (prevProps: Props, status: VerificationStatus) => {
+    return (
+      prevProps.verificationStatus !== status &&
+      this.props.verificationStatus === status &&
+      this.props.navigation.isFocused
+    )
   }
 
   render() {
