@@ -11,21 +11,37 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import Modal from 'react-native-modal'
 import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
+import { ErrorMessages } from 'src/app/ErrorMessages'
+import ErrorMessageInline from 'src/components/ErrorMessageInline'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { setHasSeenVerificationNux } from 'src/identity/actions'
+import { isUserBalanceSufficient } from 'src/identity/PhoneNumberLookupQuotaScreen'
+import { INVITE_FEE } from 'src/invite/saga'
 import { nuxNavigationOptions } from 'src/navigator/Headers'
 import { navigate, navigateHome } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { RootState } from 'src/redux/reducers'
+
+// Open to better suggestions for estimates
+const VERIFICATION_FEE_ESTIMATE = Number(INVITE_FEE) * 0.9
 
 interface DispatchProps {
   setHasSeenVerificationNux: typeof setHasSeenVerificationNux
 }
 
-type Props = WithTranslation & DispatchProps
+interface StateProps {
+  userBalance: string | null
+}
+
+type Props = WithTranslation & DispatchProps & StateProps
 
 interface State {
   isModalVisible: boolean
 }
+
+const mapStateToProps = (state: RootState): StateProps => ({
+  userBalance: state.stableToken.balance,
+})
 
 const mapDispatchToProps = {
   setHasSeenVerificationNux,
@@ -74,8 +90,16 @@ class VerificationEducationScreen extends React.Component<Props, State> {
           <Link onPress={this.onPressLearnMore}>{t('education.learnMore')}</Link>
         </ScrollView>
         <>
+          <ErrorMessageInline
+            error={
+              isUserBalanceSufficient(this.props.userBalance, VERIFICATION_FEE_ESTIMATE)
+                ? null
+                : ErrorMessages.INSUFFICIENT_BALANCE
+            }
+          />
           <Button
             text={t('education.start')}
+            disabled={!isUserBalanceSufficient(this.props.userBalance, VERIFICATION_FEE_ESTIMATE)}
             onPress={this.onPressStart}
             standard={false}
             type={BtnTypes.PRIMARY}
@@ -163,7 +187,7 @@ const styles = StyleSheet.create({
   },
 })
 
-export default connect<{}, DispatchProps>(
-  null,
+export default connect<StateProps, DispatchProps, {}, RootState>(
+  mapStateToProps,
   mapDispatchToProps
 )(withTranslation(Namespaces.nuxVerification2)(VerificationEducationScreen))

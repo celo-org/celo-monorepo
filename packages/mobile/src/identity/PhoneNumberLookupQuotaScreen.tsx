@@ -23,8 +23,8 @@ import { stableTokenBalanceSelector } from 'src/stableToken/reducer'
 
 type Props = WithTranslation & StackScreenProps<StackParamList, Screens.PhoneNumberLookupQuota>
 
-function isUserBalanceSufficient(userBalance: string | null) {
-  if (!userBalance || Number(userBalance) < LOOKUP_PURCHASE_FEE) {
+export function isUserBalanceSufficient(userBalance: string | null, estimatedFee: number) {
+  if (!userBalance || Number(userBalance) < estimatedFee) {
     return false
   }
 
@@ -36,7 +36,7 @@ function PhoneNumberLookupQuotaScreen(props: Props) {
   const userBalance = useSelector(stableTokenBalanceSelector)
   const { t } = useTranslation(Namespaces.nuxVerification2)
 
-  const userBalanceIsSufficient = isUserBalanceSufficient(userBalance)
+  const userBalanceIsSufficient = isUserBalanceSufficient(userBalance, LOOKUP_PURCHASE_FEE)
 
   const onSkip = () => {
     CeloAnalytics.track(CustomEventNames.phone_number_quota_purchase_skip)
@@ -71,7 +71,9 @@ function PhoneNumberLookupQuotaScreen(props: Props) {
         <View style={styles.spinnerContainer}>{isSending && <LoadingSpinner />}</View>
       </KeyboardAwareScrollView>
       <View>
-        <ErrorMessageInline error={userBalanceIsSufficient ? null : ErrorMessages.NSF_TO_SEND} />
+        <ErrorMessageInline
+          error={userBalanceIsSufficient ? null : ErrorMessages.INSUFFICIENT_BALANCE}
+        />
         <Button
           onPress={onBuy}
           disabled={!userBalanceIsSufficient || isSending}

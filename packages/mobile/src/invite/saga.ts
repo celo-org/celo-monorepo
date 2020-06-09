@@ -56,7 +56,7 @@ import { fornoSelector } from 'src/web3/selectors'
 const TAG = 'invite/saga'
 export const TEMP_PW = 'ce10'
 export const REDEEM_INVITE_TIMEOUT = 2 * 60 * 1000 // 2 minutes
-const INVITE_FEE = '0.25'
+export const INVITE_FEE = '0.25'
 
 export async function getInviteTxGas(
   account: string,
