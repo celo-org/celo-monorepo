@@ -122,16 +122,22 @@ function wwwRedirect(req: express.Request, res: express.Response, nextAction: ()
   })
 
   // Redirects for OpenPGP Web Key Directory https://gnupg.org/blog/20161027-hosting-a-web-key-directory.html.
-  ;['/.well-known/openpgpkey/hu/:userId', '/.well-known/openpgpkey/celo.org/hu/:userId'].forEach(
-    (path) => {
-      server.get(path, (req, res) => {
-        res.redirect('/.well-known/openpgpkey/clabs.co/hu/' + req.params['userId'] ?? '')
-      })
-    }
-  )
-  ;['/.well-known/openpgpkey/policy', '/.well-known/openpgpkey/celo.org/policy'].forEach((path) => {
+  ;[
+    '/.well-known/openpgpkey/hu/:userId',
+    '/.well-known/openpgpkey/celo.org/hu/:userId',
+    '/.well-known/openpgpkey/clabs.co/hu/:userId',
+  ].forEach((path) => {
+    server.get(path, (req, res) => {
+      res.redirect(301, '/openpgpkey/clabs.co/hu/' + req.params['userId'] ?? '')
+    })
+  })
+  ;[
+    '/.well-known/openpgpkey/policy',
+    '/.well-known/openpgpkey/celo.org/policy',
+    '/.well-known/openpgpkey/clabs.co/policy',
+  ].forEach((path) => {
     server.get(path, (_, res) => {
-      res.redirect('/.well-known/openpgpkey/clabs.co/policy')
+      res.redirect(301, '/openpgpkey/clabs.co/policy')
     })
   })
 
