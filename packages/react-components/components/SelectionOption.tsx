@@ -43,9 +43,6 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderColor: colors.gray2,
   },
-  textContainer: {
-    flex: 1,
-  },
   text: {
     ...fontStyles.regular,
     flex: 1,
