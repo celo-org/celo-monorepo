@@ -279,6 +279,7 @@ export const PROPERTY_PATH_WHITELIST = [
   'previousScreen',
   'query',
   'recipientAddress',
+  'recipientKind',
   'requesteeAddress',
   'requestIndex',
   'rootTag',

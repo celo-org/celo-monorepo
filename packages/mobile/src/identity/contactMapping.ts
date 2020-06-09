@@ -10,7 +10,7 @@ import { MinimalContact } from 'react-native-contacts'
 import { call, delay, put, race, select, take } from 'redux-saga/effects'
 import { setUserContactDetails } from 'src/account/actions'
 import { defaultCountryCodeSelector, e164NumberSelector } from 'src/account/selectors'
-import { showError } from 'src/alert/actions'
+import { showErrorMessageOrFallback } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { USE_PHONE_NUMBER_PRIVACY } from 'src/config'
 import {
@@ -70,7 +70,7 @@ export function* doImportContactsWrapper({ doMatchmaking }: ImportContactsAction
     yield put(endImportContacts(true))
   } catch (error) {
     Logger.error(TAG, 'Error importing user contacts', error)
-    yield put(showError(ErrorMessages.IMPORT_CONTACTS_FAILED))
+    yield call(showErrorMessageOrFallback, error, ErrorMessages.IMPORT_CONTACTS_FAILED)
     yield put(endImportContacts(false))
   }
 }
@@ -182,11 +182,7 @@ export function* fetchAddressesAndValidateSaga({ e164Number }: FetchAddressesAnd
     )
   } catch (error) {
     Logger.error(TAG + '@fetchAddressesAndValidateSaga', `Error fetching addresses`, error)
-    if (error.message in ErrorMessages) {
-      yield put(showError(error.message))
-    } else {
-      yield put(showError(ErrorMessages.ADDRESS_LOOKUP_FAILURE))
-    }
+    yield call(showErrorMessageOrFallback, error, ErrorMessages.ADDRESS_LOOKUP_FAILURE)
   }
 }
 

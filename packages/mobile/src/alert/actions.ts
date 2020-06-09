@@ -1,4 +1,5 @@
 import { TOptions } from 'i18next'
+import { put } from 'redux-saga/effects'
 import { ErrorDisplayType } from 'src/alert/reducer'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { DefaultEventNames } from 'src/analytics/constants'
@@ -59,6 +60,16 @@ export const showErrorInline = (error: ErrorMessages, i18nOptions?: TOptions): S
   message: i18n.t(error, { ns: Namespaces.global, ...(i18nOptions || {}) }),
   underlyingError: error,
 })
+
+// Useful for showing a more specific error if its a documented one, with
+// a fallback to something more generic
+export function* showErrorMessageOrFallback(error: any, fallback: ErrorMessages) {
+  if (error && Object.values(ErrorMessages).includes(error.message)) {
+    yield put(showError(error.message))
+  } else {
+    yield put(showError(fallback))
+  }
+}
 
 const showAlert = (
   alertType: AlertTypes,

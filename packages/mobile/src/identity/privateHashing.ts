@@ -154,13 +154,20 @@ async function postToSignMessage(
     hashedPhoneNumber: selfPhoneHash,
   }
 
-  const response = await postToPhoneNumPrivacyService<SignMessageResponse>(
-    account,
-    contractKit,
-    body,
-    SIGN_MESSAGE_ENDPOINT
-  )
-  return response.signature
+  try {
+    const response = await postToPhoneNumPrivacyService<SignMessageResponse>(
+      account,
+      contractKit,
+      body,
+      SIGN_MESSAGE_ENDPOINT
+    )
+    return response.signature
+  } catch (error) {
+    if (error.message === ErrorMessages.PGPNP_QUOTA_ERROR) {
+      throw new Error(ErrorMessages.SALT_QUOTA_EXCEEDED)
+    }
+    throw error
+  }
 }
 
 // This is the algorithm that creates a salt from the unblinded message signatures

@@ -88,9 +88,6 @@ class ImportContactScreen extends React.Component<Props, State> {
 
   onPressSkip = () => {
     this.props.cancelImportContacts()
-    // TODO strictly speaking we should set up a separate action/reducer/state to track if
-    // this screen has been seen before but since nothing else uses denyImport atm, using that
-    // for convinience
     this.props.denyImportContacts()
     CeloAnalytics.track(CustomEventNames.import_contacts_skip)
     this.onFinish()
@@ -155,6 +152,9 @@ class ImportContactScreen extends React.Component<Props, State> {
       t,
       importContactsProgress: { status },
     } = this.props
+
+    const isSkipHidden = status === ImportContactsStatus.Done
+
     return (
       <SafeAreaView style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -178,8 +178,9 @@ class ImportContactScreen extends React.Component<Props, State> {
           )}
           {status > ImportContactsStatus.Stopped && this.renderImportStatus()}
         </ScrollView>
-        <View style={styles.bottomButtonContainer}>
+        <View style={[styles.bottomButtonContainer, isSkipHidden ? styles.invisible : undefined]}>
           <TextButton
+            disabled={isSkipHidden}
             onPress={this.onPressSkip}
             style={styles.bottomButtonText}
             testID="ImportContactsScreenSkipButton"
@@ -242,6 +243,9 @@ const styles = StyleSheet.create({
   },
   statusContainer: {
     alignItems: 'center',
+  },
+  invisible: {
+    opacity: 0,
   },
 })
 

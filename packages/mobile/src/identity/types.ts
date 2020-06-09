@@ -25,6 +25,7 @@ export enum ImportContactsStatus {
   Done = 5,
 }
 
+// Contacts that have been matched during the onboarding matchmaking process
 export interface ContactMatches {
   [e164Number: string]: { contactId: string }
 }
