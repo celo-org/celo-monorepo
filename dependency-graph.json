@@ -24,8 +24,7 @@
       "@celo/contractkit",
       "@celo/dev-utils",
       "@celo/protocol",
-      "@celo/utils",
-      "@celo/verification-pool-api"
+      "@celo/utils"
     ]
   },
   "@celo/celocli": {
@@ -113,13 +112,6 @@
       "@celo/utils"
     ]
   },
-  "@celo/transaction-metrics-exporter": {
-    "location": "packages/transaction-metrics-exporter",
-    "dependencies": [
-      "@celo/contractkit",
-      "@celo/utils"
-    ]
-  },
   "@celo/typescript": {
     "location": "packages/typescript",
     "dependencies": []
@@ -128,13 +120,6 @@
     "location": "packages/utils",
     "dependencies": [
       "@celo/typescript"
-    ]
-  },
-  "@celo/verification-pool-api": {
-    "location": "packages/verification-pool-api",
-    "dependencies": [
-      "@celo/contractkit",
-      "@celo/utils"
     ]
   },
   "@celo/web": {

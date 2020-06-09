@@ -190,13 +190,19 @@ exports[`OutgoingPaymentRequestSummaryNotification renders a number when the add
         >
           <Text
             style={
-              Object {
-                "color": "#1AB775",
-                "fontFamily": "Inter-SemiBold",
-                "fontSize": 14,
-                "lineHeight": 16,
-                "marginRight": 24,
-              }
+              Array [
+                Object {
+                  "color": "#1AB775",
+                  "fontFamily": "Inter-SemiBold",
+                  "fontSize": 16,
+                  "lineHeight": 22,
+                },
+                Object {
+                  "fontSize": 14,
+                  "lineHeight": 16,
+                  "marginRight": 24,
+                },
+              ]
             }
           >
             global:remind
@@ -222,13 +228,19 @@ exports[`OutgoingPaymentRequestSummaryNotification renders a number when the add
         >
           <Text
             style={
-              Object {
-                "color": "#1AB775",
-                "fontFamily": "Inter-SemiBold",
-                "fontSize": 14,
-                "lineHeight": 16,
-                "marginRight": 24,
-              }
+              Array [
+                Object {
+                  "color": "#1AB775",
+                  "fontFamily": "Inter-SemiBold",
+                  "fontSize": 16,
+                  "lineHeight": 22,
+                },
+                Object {
+                  "fontSize": 14,
+                  "lineHeight": 16,
+                  "marginRight": 24,
+                },
+              ]
             }
           >
             global:cancel
@@ -430,13 +442,19 @@ exports[`OutgoingPaymentRequestSummaryNotification renders correctly for just on
         >
           <Text
             style={
-              Object {
-                "color": "#1AB775",
-                "fontFamily": "Inter-SemiBold",
-                "fontSize": 14,
-                "lineHeight": 16,
-                "marginRight": 24,
-              }
+              Array [
+                Object {
+                  "color": "#1AB775",
+                  "fontFamily": "Inter-SemiBold",
+                  "fontSize": 16,
+                  "lineHeight": 22,
+                },
+                Object {
+                  "fontSize": 14,
+                  "lineHeight": 16,
+                  "marginRight": 24,
+                },
+              ]
             }
           >
             global:remind
@@ -462,13 +480,19 @@ exports[`OutgoingPaymentRequestSummaryNotification renders correctly for just on
         >
           <Text
             style={
-              Object {
-                "color": "#1AB775",
-                "fontFamily": "Inter-SemiBold",
-                "fontSize": 14,
-                "lineHeight": 16,
-                "marginRight": 24,
-              }
+              Array [
+                Object {
+                  "color": "#1AB775",
+                  "fontFamily": "Inter-SemiBold",
+                  "fontSize": 16,
+                  "lineHeight": 22,
+                },
+                Object {
+                  "fontSize": 14,
+                  "lineHeight": 16,
+                  "marginRight": 24,
+                },
+              ]
             }
           >
             global:cancel
@@ -602,13 +626,19 @@ exports[`OutgoingPaymentRequestSummaryNotification renders correctly for multipl
         >
           <Text
             style={
-              Object {
-                "color": "#1AB775",
-                "fontFamily": "Inter-SemiBold",
-                "fontSize": 14,
-                "lineHeight": 16,
-                "marginRight": 24,
-              }
+              Array [
+                Object {
+                  "color": "#1AB775",
+                  "fontFamily": "Inter-SemiBold",
+                  "fontSize": 16,
+                  "lineHeight": 22,
+                },
+                Object {
+                  "fontSize": 14,
+                  "lineHeight": 16,
+                  "marginRight": 24,
+                },
+              ]
             }
           >
             viewAll

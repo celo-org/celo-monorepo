@@ -2,11 +2,8 @@ import { parsePhoneNumber } from '@celo/utils/src/phoneNumbers'
 import * as fuzzysort from 'fuzzysort'
 import { TFunction } from 'i18next'
 import { MinimalContact } from 'react-native-contacts'
-import {
-  AddressToE164NumberType,
-  E164NumberToAddressType,
-  RecipientVerificationStatus,
-} from 'src/identity/reducer'
+import { AddressToE164NumberType, E164NumberToAddressType } from 'src/identity/reducer'
+import { RecipientVerificationStatus } from 'src/identity/types'
 import Logger from 'src/utils/Logger'
 
 const TAG = 'recipients/recipient'
@@ -99,7 +96,8 @@ export function contactsToRecipients(contacts: MinimalContact[], defaultCountryC
             displayId: parsedNumber.displayNumber,
             e164PhoneNumber: parsedNumber.e164Number,
             phoneNumberLabel: phoneNumber.label,
-            contactId: contact.recordID,
+            // @ts-ignore TODO Minimal contact type is incorrect, on android it returns id
+            contactId: contact.recordID || contact.id,
             thumbnailPath: contact.thumbnailPath,
           }
         } else {
@@ -108,7 +106,8 @@ export function contactsToRecipients(contacts: MinimalContact[], defaultCountryC
             displayName: contact.displayName,
             displayId: phoneNumber.number,
             phoneNumberLabel: phoneNumber.label,
-            contactId: contact.recordID,
+            // @ts-ignore TODO Minimal contact type is incorrect, on android it returns id
+            contactId: contact.recordID || contact.id,
             thumbnailPath: contact.thumbnailPath,
           }
         }

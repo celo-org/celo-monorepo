@@ -27,10 +27,10 @@ import { fetchAddressesAndValidate } from 'src/identity/actions'
 import {
   AddressValidationType,
   e164NumberToAddressSelector,
-  RecipientVerificationStatus,
   secureSendPhoneNumberMappingSelector,
 } from 'src/identity/reducer'
 import { getAddressValidationType } from 'src/identity/secureSend'
+import { RecipientVerificationStatus } from 'src/identity/types'
 import {
   convertDollarsToLocalAmount,
   convertDollarsToMaxSupportedPrecision,
