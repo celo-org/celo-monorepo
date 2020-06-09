@@ -19,6 +19,10 @@ export const pagePaths = {
     name: 'BrandKit',
     link: '/experience/brand',
   },
+  BRAND_POLICY: {
+    name: 'Brand Policy',
+    link: '/brand-policy',
+  },
   BUILD: {
     name: 'Validators',
     link: '/validators',
