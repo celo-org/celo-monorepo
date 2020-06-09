@@ -172,6 +172,7 @@ exports[`ImportContactsScreen renders correctly 1`] = `
       onResponderTerminate={[Function]}
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
+      testID="ImportContactsScreenSkipButton"
     >
       <Text
         style={
