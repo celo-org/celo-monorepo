@@ -16,7 +16,7 @@ describe('QRCode', () => {
   it('renders correctly', () => {
     const tree = renderer.create(
       <Provider store={store}>
-        <QRCode />
+        <QRCode qrSvgRef={{ current: null }} />
       </Provider>
     )
 

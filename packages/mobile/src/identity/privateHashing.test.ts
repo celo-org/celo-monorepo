@@ -3,10 +3,9 @@ import { expectSaga } from 'redux-saga-test-plan'
 import { call, select } from 'redux-saga/effects'
 import { e164NumberSelector } from 'src/account/selectors'
 import { updateE164PhoneNumberSalts } from 'src/identity/actions'
-import { fetchPhoneHashPrivate, getSaltFromThresholdSignature } from 'src/identity/privacy'
+import { fetchPhoneHashPrivate, getSaltFromThresholdSignature } from 'src/identity/privateHashing'
 import { e164NumberToSaltSelector } from 'src/identity/reducer'
 import { getConnectedUnlockedAccount } from 'src/web3/saga'
-import { currentAccountSelector } from 'src/web3/selectors'
 import { mockAccount, mockE164Number, mockE164Number2 } from 'test/values'
 
 jest.mock('react-native-blind-threshold-bls', () => ({
@@ -23,7 +22,7 @@ describe('Fetch phone hash details', () => {
   it('retrieves salts correctly', async () => {
     mockFetch.mockResponseOnce(
       JSON.stringify({
-        success: false,
+        success: true,
         signature: '0Uj+qoAu7ASMVvm6hvcUGx2eO/cmNdyEgGn0mSoZH8/dujrC1++SZ1N6IP6v2I8A',
       })
     )
@@ -35,7 +34,6 @@ describe('Fetch phone hash details', () => {
         [call(getConnectedUnlockedAccount), mockAccount],
         [select(e164NumberSelector), mockE164Number2],
         [select(e164NumberToSaltSelector), {}],
-        [select(currentAccountSelector), mockAccount],
       ])
       .put(
         updateE164PhoneNumberSalts({

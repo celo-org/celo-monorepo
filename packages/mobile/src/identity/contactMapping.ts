@@ -7,19 +7,23 @@ import { isAccountConsideredVerified } from '@celo/utils/src/attestations'
 import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
 import BigNumber from 'bignumber.js'
 import { MinimalContact } from 'react-native-contacts'
-import { call, put, select } from 'redux-saga/effects'
+import { call, delay, put, race, select, take } from 'redux-saga/effects'
 import { setUserContactDetails } from 'src/account/actions'
 import { defaultCountryCodeSelector, e164NumberSelector } from 'src/account/selectors'
 import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { USE_PHONE_NUMBER_PRIVACY } from 'src/config'
 import {
+  Actions,
   endImportContacts,
   FetchAddressesAndValidateAction,
+  ImportContactsAction,
   requireSecureSend,
   updateE164PhoneNumberAddresses,
+  updateImportContactsProgress,
 } from 'src/identity/actions'
-import { fetchPhoneHashPrivate, PhoneNumberHashDetails } from 'src/identity/privacy'
+import { fetchContactMatches } from 'src/identity/matchmaking'
+import { fetchPhoneHashPrivate, PhoneNumberHashDetails } from 'src/identity/privateHashing'
 import {
   AddressToE164NumberType,
   AddressValidationType,
@@ -29,6 +33,7 @@ import {
   secureSendPhoneNumberMappingSelector,
 } from 'src/identity/reducer'
 import { checkIfValidationRequired } from 'src/identity/secureSend'
+import { ImportContactsStatus } from 'src/identity/types'
 import { setRecipientCache } from 'src/recipients/actions'
 import { contactsToRecipients, NumberToRecipient } from 'src/recipients/recipient'
 import { getAllContacts } from 'src/utils/contacts'
@@ -39,13 +44,27 @@ import { getConnectedAccount } from 'src/web3/saga'
 import { currentAccountSelector } from 'src/web3/selectors'
 
 const TAG = 'identity/contactMapping'
+export const IMPORT_CONTACTS_TIMEOUT = 1 * 60 * 1000 // 1 minute
 
-export function* doImportContactsWrapper() {
+export function* doImportContactsWrapper({ doMatchmaking }: ImportContactsAction) {
   yield call(getConnectedAccount)
   try {
     Logger.debug(TAG, 'Importing user contacts')
 
-    yield call(doImportContacts)
+    const { result, cancel, timeout } = yield race({
+      result: call(doImportContacts, doMatchmaking),
+      cancel: take(Actions.CANCEL_IMPORT_CONTACTS),
+      timeout: delay(IMPORT_CONTACTS_TIMEOUT),
+    })
+
+    if (result === true) {
+      Logger.debug(TAG, 'Import Contacts completed successfully')
+    } else if (cancel) {
+      Logger.debug(TAG, 'Import Contacts cancelled')
+    } else if (timeout) {
+      Logger.debug(TAG, 'Import Contacts timed out')
+      throw new Error('Import Contacts timed out')
+    }
 
     Logger.debug(TAG, 'Done importing user contacts')
     yield put(endImportContacts(true))
@@ -56,30 +75,41 @@ export function* doImportContactsWrapper() {
   }
 }
 
-function* doImportContacts() {
-  const result: boolean = yield call(checkContactsPermission)
-
-  if (!result) {
-    return Logger.warn(TAG, 'Contact permissions denied. Skipping import.')
+function* doImportContacts(doMatchmaking: boolean) {
+  const hasGivenContactPermission: boolean = yield call(checkContactsPermission)
+  if (!hasGivenContactPermission) {
+    Logger.warn(TAG, 'Contact permissions denied. Skipping import.')
+    return true
   }
+
+  yield put(updateImportContactsProgress(ImportContactsStatus.Importing))
 
   const contacts: MinimalContact[] = yield call(getAllContacts)
   if (!contacts || !contacts.length) {
-    return Logger.warn(TAG, 'Empty contacts list. Skipping import.')
+    Logger.warn(TAG, 'Empty contacts list. Skipping import.')
+    return true
   }
+
+  yield put(updateImportContactsProgress(ImportContactsStatus.Processing, 0, contacts.length))
 
   const defaultCountryCode: string = yield select(defaultCountryCodeSelector)
   const recipients = contactsToRecipients(contacts, defaultCountryCode)
   if (!recipients) {
-    return Logger.warn(TAG, 'No recipients found')
+    Logger.warn(TAG, 'No recipients found')
+    return true
   }
   const { e164NumberToRecipients, otherRecipients } = recipients
 
   yield call(updateUserContact, e164NumberToRecipients)
-
-  // We call this here before we've refreshed the contact mapping
-  // so that users can see a recipients list asap
   yield call(updateRecipientsCache, e164NumberToRecipients, otherRecipients)
+
+  if (!doMatchmaking) {
+    return true
+  }
+
+  yield put(updateImportContactsProgress(ImportContactsStatus.Matchmaking))
+  yield call(fetchContactMatches, e164NumberToRecipients)
+  return true
 }
 
 // Find the user's own contact among those imported and save useful bits
