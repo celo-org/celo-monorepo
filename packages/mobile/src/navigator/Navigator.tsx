@@ -67,6 +67,7 @@ import { Screens } from 'src/navigator/Screens'
 import { TopBarIconButton, TopBarTextButton } from 'src/navigator/TopBarButton.v2'
 import { StackParamList } from 'src/navigator/types'
 import ImportContactsScreen from 'src/onboarding/contacts/ImportContactsScreen'
+import OnboardingSuccessScreen from 'src/onboarding/success/OnboardingSuccessScreen'
 import IncomingPaymentRequestListScreen from 'src/paymentRequest/IncomingPaymentRequestListScreen'
 import OutgoingPaymentRequestListScreen from 'src/paymentRequest/OutgoingPaymentRequestListScreen'
 import PaymentRequestConfirmation from 'src/paymentRequest/PaymentRequestConfirmation'
@@ -94,7 +95,6 @@ import VerificationInputScreen from 'src/verify/VerificationInputScreen'
 import VerificationInterstitialScreen from 'src/verify/VerificationInterstitialScreen'
 import VerificationLearnMoreScreen from 'src/verify/VerificationLearnMoreScreen'
 import VerificationLoadingScreen from 'src/verify/VerificationLoadingScreen'
-import VerificationSuccessScreen from 'src/verify/VerificationSuccessScreen'
 
 const Stack = createStackNavigator<StackParamList>()
 
@@ -141,10 +141,6 @@ const verificationScreens = (Navigator: typeof Stack) => {
       <Navigator.Screen
         name={Screens.VerificationInputScreen}
         component={VerificationInputScreen}
-      />
-      <Navigator.Screen
-        name={Screens.VerificationSuccessScreen}
-        component={VerificationSuccessScreen}
       />
     </>
   )
@@ -193,6 +189,7 @@ const nuxScreens = (Navigator: typeof Stack) => (
       component={ImportContactsScreen}
       options={nuxNavigationOptions}
     />
+    <Navigator.Screen name={Screens.OnboardingSuccessScreen} component={OnboardingSuccessScreen} />
   </>
 )
 
@@ -479,11 +476,12 @@ const mapStateToProps = (state: RootState) => {
   return {
     language: state.app.language,
     e164Number: state.account.e164PhoneNumber,
+    acceptedTerms: state.account.acceptedTerms,
     pincodeType: state.account.pincodeType,
     redeemComplete: state.invite.redeemComplete,
     account: state.web3.account,
     hasSeenVerificationNux: state.identity.hasSeenVerificationNux,
-    acceptedTerms: state.account.acceptedTerms,
+    askedContactsPermission: state.identity.askedContactsPermission,
   }
 }
 
@@ -493,11 +491,11 @@ export function AppNavigatorNew() {
     const {
       language,
       e164Number,
+      acceptedTerms,
       pincodeType,
       redeemComplete,
       account,
       hasSeenVerificationNux,
-      acceptedTerms,
     } = mapStateToProps(store.getState())
 
     let initialRoute: Screens | undefined

@@ -1,3 +1,4 @@
+import request from 'supertest'
 import { BLSCryptographyClient } from '../src/bls/bls-cryptography-client'
 import { authenticateUser } from '../src/common/identity'
 import { getTransaction } from '../src/database/database'
@@ -6,10 +7,10 @@ import {
   incrementQueryCount,
   setDidMatchmaking,
 } from '../src/database/wrappers/account'
-import { getBlindedSalt } from '../src/index'
 import { getRemainingQueryCount } from '../src/salt-generation/query-quota'
+import { app } from '../src/server'
 
-const BLS_SIGNATURE = '6546544323114343'
+const BLS_SIGNATURE = '0Uj+qoAu7ASMVvm6hvcUGx2eO/cmNdyEgGn0mSoZH8/dujrC1++SZ1N6IP6v2I8A'
 
 jest.mock('../src/common/identity')
 const mockAuthenticateUser = authenticateUser as jest.Mock
@@ -32,10 +33,8 @@ mockSetDidMatchmaking.mockImplementation()
 
 jest.mock('../src/database/database')
 const mockGetTransaction = getTransaction as jest.Mock
-mockGetTransaction.mockReturnValue({})
+mockGetTransaction.mockReturnValue({ commit: jest.fn(), rollback: jest.fn() })
 
-// TODO the failures are nested in the res structure as a deep equality which does not fail
-// the full test
 describe(`POST /getBlindedMessageSignature endpoint`, () => {
   describe('with valid input', () => {
     const blindedQueryPhoneNumber = '+5555555555'
@@ -47,52 +46,44 @@ describe(`POST /getBlindedMessageSignature endpoint`, () => {
       hashedPhoneNumber,
       account,
     }
-    const req = { body: mockRequestData }
 
-    it('provides signature', () => {
+    it('provides signature', (done) => {
       mockGetRemainingQueryCount.mockReturnValue(10)
-      const res = {
-        json(body: any) {
-          expect(body.success).toEqual(true)
-          expect(body.signature).toEqual(BLS_SIGNATURE)
-        },
-      }
-      // @ts-ignore TODO fix req type to make it a mock express req
-      getBlindedSalt(req, res)
+      request(app)
+        .post('/getBlindedSalt')
+        .send(mockRequestData)
+        .expect('Content-Type', /json/)
+        .expect(
+          200,
+          {
+            success: true,
+            signature: BLS_SIGNATURE,
+          },
+          done
+        )
     })
-    it('returns 403 on query count 0', () => {
+    it('returns 403 on query count 0', (done) => {
       mockGetRemainingQueryCount.mockReturnValue(0)
-      const res = {
-        json() {
-          return {}
-        },
-        status: (status: any) => {
-          expect(status).toEqual(403)
-          // tslint:disable-next-line: no-empty
-          return { json: () => {} }
-        },
-      }
-      // @ts-ignore TODO fix req type to make it a mock express req
-      getBlindedSalt(req, res)
+      request(app)
+        .post('/getBlindedSalt')
+        .send(mockRequestData)
+        .expect('Content-Type', /json/)
+        .expect(403, done)
     })
-    it('returns 500 on bls error', () => {
+    it('returns 500 on bls error', (done) => {
       mockGetRemainingQueryCount.mockReturnValue(10)
       mockComputeBlindedSignature.mockImplementation(() => {
         throw Error()
       })
-      const res = {
-        status: (status: any) => {
-          expect(status).toEqual(500)
-          // tslint:disable-next-line: no-empty
-          return { json: () => {} }
-        },
-      }
-      // @ts-ignore TODO fix req type to make it a mock express req
-      getBlindedSalt(req, res)
+      request(app)
+        .post('/getBlindedSalt')
+        .send(mockRequestData)
+        .expect('Content-Type', /json/)
+        .expect(500, done)
     })
   })
   describe('with invalid input', () => {
-    it('invalid address returns 400', () => {
+    it('invalid address returns 400', (done) => {
       const blindedQueryPhoneNumber = '+5555555555'
       const hashedPhoneNumber = '0x5f6e88c3f724b3a09d3194c0514426494955eff7127c29654e48a361a19b4b96'
       const account = 'd31509C31d654056A45185ECb6'
@@ -102,19 +93,14 @@ describe(`POST /getBlindedMessageSignature endpoint`, () => {
         hashedPhoneNumber,
         account,
       }
-      const req = { body: mockRequestData }
 
-      const res = {
-        status: (status: any) => {
-          expect(status).toEqual(400)
-          // tslint:disable-next-line: no-empty
-          return { json: () => {} }
-        },
-      }
-      // @ts-ignore TODO fix req type to make it a mock express req
-      getBlindedSalt(req, res)
+      request(app)
+        .post('/getBlindedSalt')
+        .send(mockRequestData)
+        .expect(400, done)
     })
-    it('invalid hashedPhoneNumber returns 400', () => {
+
+    it('invalid hashedPhoneNumber returns 400', (done) => {
       const blindedQueryPhoneNumber = '+5555555555'
       const hashedPhoneNumber = '+1234567890'
       const account = '0x78dc5D2D739606d31509C31d654056A45185ECb6'
@@ -124,17 +110,11 @@ describe(`POST /getBlindedMessageSignature endpoint`, () => {
         hashedPhoneNumber,
         account,
       }
-      const req = { body: mockRequestData }
 
-      const res = {
-        status: (status: any) => {
-          expect(status).toEqual(400)
-          // tslint:disable-next-line: no-empty
-          return { json: () => {} }
-        },
-      }
-      // @ts-ignore TODO fix req type to make it a mock express req
-      getBlindedSalt(req, res)
+      request(app)
+        .post('/getBlindedSalt')
+        .send(mockRequestData)
+        .expect(400, done)
     })
   })
 })

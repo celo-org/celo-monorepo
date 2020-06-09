@@ -35,7 +35,7 @@
     "bunyan-gke-stackdriver": "0.1.2",
     "bunyan-debug-stream": "2.0.0",
     "debug": "^4.1.1",
-    "dotenv": "8.0.0",
+    "dotenv": "^8.2.0",
     "eth-lib": "^0.2.8",
     "io-ts": "2.0.1",
     "fp-ts":"2.1.1",
@@ -57,7 +57,7 @@
   "devDependencies": {
     "@celo/protocol": "1.0.0",
     "@types/bunyan": "1.8.4",
-    "@types/dotenv": "4.0.3",
+    "@types/dotenv": "^8.2.0",
     "@types/debug": "^4.1.5",
     "@types/express-rate-limit": "^5.0.0",
     "ts-node": "8.3.0",
