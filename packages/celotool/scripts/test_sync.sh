@@ -22,6 +22,13 @@ fi
 forno_url=https://${network}-forno.$CLUSTER_DOMAIN_NAME.org
 node_pod="${network}-${namespace}-${syncmode}-node-0"
 
+check_pod_status() {
+  if kubectl get pods -n ${namespace} "${node_pod}" | grep -v Running; then
+    echo "The pod ${node_pod} failed."
+    exit 1
+  fi
+}
+
 check_synced_false() {
   local syncstatus=$(kubectl -n ${namespace} exec -it ${node_pod} -- geth attach --exec 'eth.syncing' | $aliassed -r "s/\x1B\[([0-9]{1,3}(;[0-9]{1,2})?)?[mGK]//g" | tr -d '\r')
   if [ "${syncstatus}" == "false" ]; then
@@ -47,6 +54,7 @@ test_sync_blocknumber() {
   local tries=max_tries
   while [ "${synced}" != "true" ] && [ "${syncing}" == "true" ]; do
     sleep $loop_time
+    check_pod_status
     current=$(kubectl -n ${namespace} exec -it ${node_pod} -- geth attach --exec 'eth.blockNumber' | $aliassed -r "s/\x1B\[([0-9]{1,3}(;[0-9]{1,2})?)?[mGK]//g")
     current=${current//[$'\t\r\n ']}
     if (( current >= target )); then
@@ -89,6 +97,7 @@ test_syn_syncing() {
   while [ "$synced" != "true" ] && [ "$syncing" == "true" ]; do
     echo "Sleeping ${loop_time}"
     sleep $loop_time
+    check_pod_status
     check_synced_false
     current=$(kubectl -n "${namespace}" exec -it "${node_pod}" -- geth attach --exec 'eth.syncing' | grep currentBlock | cut -d' ' -f4 | tr -d ',' | $aliassed -r "s/\x1B\[([0-9]{1,3}(;[0-9]{1,2})?)?[mGK]//g")
     current=${current//[$'\t\r\n ']}
