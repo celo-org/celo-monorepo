@@ -4,7 +4,7 @@ import { FlatList, StyleSheet } from 'react-native'
 import { useDispatch } from 'react-redux'
 import i18n from 'src/i18n'
 import { selectPreferredCurrency } from 'src/localCurrency/actions'
-import { LOCAL_CURRENCY_CODES, LocalCurrencyCode } from 'src/localCurrency/consts'
+import { LocalCurrencyCode, LOCAL_CURRENCY_CODES } from 'src/localCurrency/consts'
 import { useLocalCurrencyCode } from 'src/localCurrency/hooks'
 import { headerWithBackButton } from 'src/navigator/Headers'
 import { navigateBack } from 'src/navigator/NavigationService'
@@ -34,9 +34,9 @@ function SelectLocalCurrency() {
   const renderItem = useCallback(
     ({ item: code }) => (
       <SelectionOption
-        word={code}
-        onSelectAnswer={onSelect}
-        selected={code === selectedCurrencyCode}
+        text={code}
+        onSelect={onSelect}
+        isSelected={code === selectedCurrencyCode}
         data={code}
       />
     ),
