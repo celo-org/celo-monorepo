@@ -42,7 +42,7 @@ interface DispatchProps {
 
 interface StateProps {
   account: string | null
-  e164PhoneNumber: string
+  e164PhoneNumber: string | null
   devModeActive: boolean
   analyticsEnabled: boolean
   numberVerified: boolean
@@ -83,11 +83,7 @@ export class Account extends React.Component<Props, State> {
   static navigationOptions = headerWithBackButton
 
   state: State = {
-    version: '',
-  }
-
-  async componentDidMount() {
-    this.setState({ version: DeviceInfo.getVersion() })
+    version: DeviceInfo.getVersion(),
   }
 
   goToProfile = () => {
@@ -161,7 +157,7 @@ export class Account extends React.Component<Props, State> {
   }
 
   revokeNumberVerification = async () => {
-    if (!isE164Number(this.props.e164PhoneNumber)) {
+    if (this.props.e164PhoneNumber && !isE164Number(this.props.e164PhoneNumber)) {
       Logger.showMessage('Cannot revoke verificaton: number invalid')
       return
     }

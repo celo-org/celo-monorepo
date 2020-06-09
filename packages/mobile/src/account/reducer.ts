@@ -7,9 +7,9 @@ import { getRehydratePayload, REHYDRATE, RehydrateAction } from 'src/redux/persi
 import { getRemoteTime } from 'src/utils/time'
 
 export interface State {
-  name: string
-  e164PhoneNumber: string
-  defaultCountryCode: string
+  name: string | null
+  e164PhoneNumber: string | null
+  defaultCountryCode: string | null
   contactDetails: UserContactDetails
   devModeActive: boolean
   devModeClickCount: number
@@ -42,9 +42,9 @@ export interface UserContactDetails {
 }
 
 export const initialState = {
-  name: '',
-  e164PhoneNumber: '',
-  defaultCountryCode: '',
+  name: null,
+  e164PhoneNumber: null,
+  defaultCountryCode: null,
   contactDetails: {
     contactId: null,
     thumbnailPath: null,

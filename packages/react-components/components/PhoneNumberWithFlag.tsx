@@ -6,7 +6,7 @@ import { StyleSheet, Text, View } from 'react-native'
 
 interface Props {
   e164PhoneNumber: string
-  defaultCountryCode: string
+  defaultCountryCode?: string
 }
 
 export class PhoneNumberWithFlag extends React.PureComponent<Props> {

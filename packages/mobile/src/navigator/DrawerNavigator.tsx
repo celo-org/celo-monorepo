@@ -61,10 +61,12 @@ function CustomDrawerContent(props: DrawerContentComponentProps<DrawerContentOpt
       <View style={styles.drawerTop}>
         <ContactCircle thumbnailPath={contactDetails.thumbnailPath} name={null} size={64} />
         <Text style={styles.nameLabel}>{displayName}</Text>
-        <PhoneNumberWithFlag
-          e164PhoneNumber={e164PhoneNumber}
-          defaultCountryCode={defaultCountryCode}
-        />
+        {e164PhoneNumber && (
+          <PhoneNumberWithFlag
+            e164PhoneNumber={e164PhoneNumber}
+            defaultCountryCode={defaultCountryCode ? defaultCountryCode : undefined}
+          />
+        )}
         <View style={styles.border} />
         <Text style={fontStyles.regular500}>{`${symbol} ${localBalance?.toFixed(2)}`}</Text>
         <Text style={[styles.smallLabel, styles.dollarsLabel]}>{`${bigNumBalance?.toFixed(2)} ${t(

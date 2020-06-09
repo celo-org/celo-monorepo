@@ -18,12 +18,18 @@ export function getRecipientFromPaymentRequest(
       kind: RecipientKind.Contact,
       address: paymentRequest.requesterAddress,
     }
-  } else {
+  } else if (paymentRequest.requesterE164Number) {
     return {
       kind: RecipientKind.MobileNumber,
       address: paymentRequest.requesterAddress,
       displayName: paymentRequest.requesterE164Number || paymentRequest.requesterAddress,
       e164PhoneNumber: paymentRequest.requesterE164Number,
+    }
+  } else {
+    return {
+      kind: RecipientKind.Address,
+      address: paymentRequest.requesterAddress,
+      displayName: paymentRequest.requesterAddress,
     }
   }
 }

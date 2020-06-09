@@ -28,7 +28,7 @@ import { toggleFornoMode } from 'src/web3/actions'
 const TAG = 'VerificationLoadingScreen'
 
 interface StateProps {
-  e164Number: string
+  e164Number: string | null
   verificationStatus: VerificationStatus
   retryWithForno: boolean
   fornoMode: boolean

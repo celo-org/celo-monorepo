@@ -8,7 +8,7 @@ import { MinimalContact } from 'react-native-contacts'
 export interface Props {
   name: string
   iconSize: number
-  defaultCountryCode: string
+  defaultCountryCode?: string
   contact?: MinimalContact
   address?: string
   e164Number?: string

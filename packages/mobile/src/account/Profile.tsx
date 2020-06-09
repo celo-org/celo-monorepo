@@ -15,7 +15,7 @@ import { Screens } from 'src/navigator/Screens'
 import { RootState } from 'src/redux/reducers'
 
 interface StateProps {
-  name: string
+  name: string | null
   userContact: UserContactDetails
 }
 

@@ -47,7 +47,7 @@ export class Debug extends React.Component<RootState, State> {
     })
   }
 
-  onClickText = (...text: string[]) => {
+  onClickText = (...text: Array<string | null>) => {
     return () => {
       Logger.showMessage('Copied to Clipboard')
       Clipboard.setString(text.join(', '))
@@ -61,7 +61,7 @@ export class Debug extends React.Component<RootState, State> {
   render() {
     const { reactNativeLogs, gethLogs, latestBlockNumber } = this.state
     const pincodeType = this.props.account.pincodeType
-    const address = currentAccountSelector(this.props) || ''
+    const address = currentAccountSelector(this.props)
     const phoneNumber = this.props.account.e164PhoneNumber
     const version = DeviceInfo.getVersion()
     const buildNumber = DeviceInfo.getBuildNumber()

@@ -60,8 +60,8 @@ interface State {
 }
 
 interface StateProps {
-  defaultCountryCode: string
-  e164PhoneNumber: string
+  defaultCountryCode: string | null
+  e164PhoneNumber: string | null
   numberVerified: boolean
   devModeActive: boolean
   recentRecipients: Recipient[]

@@ -3,9 +3,9 @@ import CountryData from 'country-data'
 import { createSelector } from 'reselect'
 import { e164NumberSelector } from 'src/account/selectors'
 import {
-  LOCAL_CURRENCY_CODES,
   LocalCurrencyCode,
   LocalCurrencySymbol,
+  LOCAL_CURRENCY_CODES,
 } from 'src/localCurrency/consts'
 import { RootState } from 'src/redux/reducers'
 
@@ -26,7 +26,7 @@ const getDefaultLocalCurrencyCode = createSelector(
     // but the problem is some Android versions don't make it possible to select the appropriate language/country
     // from the device settings.
     // So here we use the country of the phone number
-    const countryCurrencies = getCountryCurrencies(e164PhoneNumber)
+    const countryCurrencies = e164PhoneNumber ? getCountryCurrencies(e164PhoneNumber) : []
     const supportedCurrenciesSet = new Set(LOCAL_CURRENCY_CODES)
 
     for (const countryCurrency of countryCurrencies) {

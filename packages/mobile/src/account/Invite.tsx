@@ -41,7 +41,7 @@ interface Section {
 }
 
 interface StateProps {
-  defaultCountryCode: string
+  defaultCountryCode: string | null
   recipientCache: NumberToRecipient
 }
 

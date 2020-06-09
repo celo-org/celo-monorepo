@@ -15,7 +15,7 @@ import DrawerTopBar from 'src/navigator/DrawerTopBar'
 import { RootState } from 'src/redux/reducers'
 
 interface State {
-  signedUrl: string
+  signedUrl: string | null
 }
 
 interface StateProps {
@@ -54,7 +54,7 @@ async function signMoonpayUrl(account: string, localCurrencyCode: LocalCurrencyC
 
 class FiatExchange extends React.Component<Props, State> {
   state: State = {
-    signedUrl: '',
+    signedUrl: null,
   }
 
   updateMoonpayUrl = async () => {
@@ -80,7 +80,7 @@ class FiatExchange extends React.Component<Props, State> {
     return (
       <SafeAreaView style={styles.background}>
         <DrawerTopBar />
-        {this.state.signedUrl === '' ? (
+        {!this.state.signedUrl ? (
           <ActivityIndicator size="large" color={colors.celoGreen} />
         ) : (
           <WebView style={styles.exchangeWebView} source={{ uri: this.state.signedUrl }} />

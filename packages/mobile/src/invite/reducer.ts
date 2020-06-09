@@ -8,7 +8,7 @@ export interface State {
   isSkippingInvite: boolean
   invitees: InviteDetails[]
   redeemComplete: boolean
-  redeemedInviteCode: string
+  redeemedInviteCode: string | null
 }
 
 export const initialState: State = {
@@ -17,7 +17,7 @@ export const initialState: State = {
   isSkippingInvite: false,
   invitees: [],
   redeemComplete: false,
-  redeemedInviteCode: '',
+  redeemedInviteCode: null,
 }
 
 export const inviteReducer = (
