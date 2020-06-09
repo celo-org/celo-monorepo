@@ -2,18 +2,18 @@ import { CeloTransactionObject } from '@celo/contractkit'
 import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
 import {
   ActionableAttestation,
-  AttestationsStatus,
   AttestationsWrapper,
   UnselectedRequest,
 } from '@celo/contractkit/lib/wrappers/Attestations'
-import { eqAddress } from '@celo/utils/src/address'
+import { eqAddress, hexToBuffer } from '@celo/utils/src/address'
 import { retryAsync } from '@celo/utils/src/async'
-import { extractAttestationCodeFromMessage } from '@celo/utils/src/attestations'
+import { AttestationsStatus, extractAttestationCodeFromMessage } from '@celo/utils/src/attestations'
 import { compressedPubKey } from '@celo/utils/src/commentEncryption'
 import { getPhoneHash } from '@celo/utils/src/phoneNumbers'
 import { Platform } from 'react-native'
 import { Task } from 'redux-saga'
 import { all, call, delay, fork, put, race, select, take, takeEvery } from 'redux-saga/effects'
+import { setRetryVerificationWithForno } from 'src/account/actions'
 import { e164NumberSelector } from 'src/account/selectors'
 import { showError, showMessage } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
@@ -31,9 +31,10 @@ import {
   resetVerification,
   setVerificationStatus,
 } from 'src/identity/actions'
-import { fetchPhoneHashPrivate, PhoneNumberHashDetails } from 'src/identity/privacy'
+import { fetchPhoneHashPrivate, PhoneNumberHashDetails } from 'src/identity/privateHashing'
 import { acceptedAttestationCodesSelector, attestationCodesSelector } from 'src/identity/reducer'
 import { startAutoSmsRetrieval } from 'src/identity/smsRetrieval'
+import { VerificationStatus } from 'src/identity/types'
 import { sendTransaction } from 'src/transactions/send'
 import Logger from 'src/utils/Logger'
 import { getContractKit } from 'src/web3/contracts'
@@ -44,17 +45,6 @@ const TAG = 'identity/verification'
 
 export const NUM_ATTESTATIONS_REQUIRED = 3
 export const VERIFICATION_TIMEOUT = 5 * 60 * 1000 // 5 minutes
-
-export enum VerificationStatus {
-  Failed = -1,
-  Stopped = 0,
-  Prepping = 1,
-  GettingStatus = 2,
-  RequestingAttestations = 3,
-  RevealingNumber = 4,
-  RevealAttemptFailed = 5,
-  Done = 6,
-}
 
 export enum CodeInputType {
   AUTOMATIC = 'automatic',
@@ -120,7 +110,7 @@ export function* doVerificationFlow() {
       }
     }
     const privDataKey = yield select(privateCommentKeySelector)
-    const dataKey = compressedPubKey(Buffer.from(privDataKey, 'hex'))
+    const dataKey = compressedPubKey(hexToBuffer(privDataKey))
 
     const contractKit = yield call(getContractKit)
 
@@ -221,6 +211,10 @@ export function* requestAndRetrieveAttestations(
     account
   )
 
+  // Any verification failure past this point will be after sending a tx
+  // so do not prompt forno retry as these failures are not always
+  // light client related, and account may have insufficient balance
+  yield put(setRetryVerificationWithForno(false))
   while (attestations.length < attestationsRemaining) {
     // Request any additional attestations beyond the original set
     yield call(

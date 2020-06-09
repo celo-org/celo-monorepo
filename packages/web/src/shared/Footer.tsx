@@ -31,6 +31,7 @@ const ecoFundLink = `${menu.COMMUNITY.link}#${hashNav.connect.fund}`
 const RESOURCE_MENU = [
   menu.CODE_OF_CONDUCT,
   { name: 'Events', link: eventsLink },
+  menu.EVENTS_KIT,
   menu.BRAND,
   { name: 'Ecosystem Fund', link: ecoFundLink },
 ]
@@ -131,8 +132,7 @@ export default function Footer() {
         mobileStyle={standardStyles.blockMarginMobile}
       >
         <Cell span={Spans.full} style={isMobile ? standardStyles.centered : styles.toes}>
-          <Lazy once={true}>
-            {' '}
+          <Lazy unmountIfInvisible={true}>
             <ChangeStory />
           </Lazy>
           <Text style={[fonts.legal, styles.copyright, isMobile && textStyles.center]}>

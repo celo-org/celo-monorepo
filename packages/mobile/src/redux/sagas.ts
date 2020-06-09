@@ -19,6 +19,7 @@ import { networkInfoSaga } from 'src/networkInfo/saga'
 import { sendSaga } from 'src/send/saga'
 import { sentrySaga } from 'src/sentry/saga'
 import { stableTokenSaga } from 'src/stableToken/saga'
+import { transactionSaga } from 'src/transactions/saga'
 import Logger from 'src/utils/Logger'
 import { web3Saga } from 'src/web3/saga'
 
@@ -34,9 +35,11 @@ const loggerBlacklist = [
   'IDENTITY/UPDATE_E164_PHONE_NUMBER_ADDRESSES',
   'IDENTITY/UPDATE_E164_PHONE_NUMBER_SALT',
   'IDENTITY/FETCH_PHONE_ADDRESSES',
+  'IDENTITY/ADD_CONTACT_MATCHES',
   'INVITE/REDEEM_INVITE',
   'INVITE/STORE_INVITEE_DATA',
   'EXCHANGE/UPDATE_CELO_GOLD_EXCHANGE_RATE_HISTORY', // Not private, just noisy
+  'TRANSACTIONS/NEW_TRANSACTIONS_IN_FEED',
 ]
 
 function* loggerSaga() {
@@ -72,6 +75,7 @@ export function* rootSaga() {
   yield spawn(stableTokenSaga)
   yield spawn(sendSaga)
   yield spawn(exchangeSaga)
+  yield spawn(transactionSaga)
   yield spawn(homeSaga)
   yield spawn(escrowSaga)
   yield spawn(firebaseSaga)

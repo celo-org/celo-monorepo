@@ -1,3 +1,4 @@
+import { IdentifierLookupResult } from '@celo/contractkit/lib/wrappers/Attestations'
 import { expectSaga } from 'redux-saga-test-plan'
 import { throwError } from 'redux-saga-test-plan/providers'
 import { call, select } from 'redux-saga/effects'
@@ -7,7 +8,7 @@ import { showError } from 'src/alert/actions'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import { requireSecureSend, updateE164PhoneNumberAddresses } from 'src/identity/actions'
 import { doImportContactsWrapper, fetchAddressesAndValidateSaga } from 'src/identity/contactMapping'
-import { fetchPhoneHashPrivate } from 'src/identity/privacy'
+import { fetchPhoneHashPrivate } from 'src/identity/privateHashing'
 import {
   AddressValidationType,
   e164NumberToAddressSelector,
@@ -36,7 +37,7 @@ const allRecipients = { ...e164NumberRecipients, ...otherRecipients }
 
 describe('Import Contacts Saga', () => {
   it('imports contacts and creates contact mappings correctly', async () => {
-    await expectSaga(doImportContactsWrapper)
+    await expectSaga(doImportContactsWrapper, { doMatchmaking: false })
       .provide([
         [call(getConnectedAccount), null],
         [call(getAllContacts), mockContactList],
@@ -54,7 +55,7 @@ describe('Import Contacts Saga', () => {
   })
 
   it('shows errors correctly', async () => {
-    await expectSaga(doImportContactsWrapper)
+    await expectSaga(doImportContactsWrapper, { doMatchmaking: false })
       .provide([
         [call(getConnectedAccount), null],
         [call(getAllContacts), throwError(new Error('fake error'))],
@@ -74,8 +75,8 @@ describe('Fetch Addresses Saga', () => {
       [mockE164Number]: [mockAccount.toLowerCase()],
     }
 
-    const mockPhoneNumberLookup = {
-      [mockE164NumberHash]: { [mockAccount]: { complete: 3, total: 3 } },
+    const mockPhoneNumberLookup: IdentifierLookupResult = {
+      [mockE164NumberHash]: { [mockAccount]: { completed: 3, total: 3 } },
     }
 
     const mockAttestationsWrapper = {
@@ -112,10 +113,10 @@ describe('Fetch Addresses Saga', () => {
   it('requires SecureSend with partial verification when a new adddress is added and last 4 digits are unique', async () => {
     const contractKit = await getContractKitOutsideGenerator()
 
-    const mockPhoneNumberLookup = {
+    const mockPhoneNumberLookup: IdentifierLookupResult = {
       [mockE164NumberHash]: {
-        [mockAccount]: { complete: 3, total: 3 },
-        [mockAccount2]: { complete: 3, total: 3 },
+        [mockAccount]: { completed: 3, total: 3 },
+        [mockAccount2]: { completed: 3, total: 3 },
       },
     }
 
@@ -155,10 +156,10 @@ describe('Fetch Addresses Saga', () => {
   it('requires SecureSend with full verification when a new adddress is added and last 4 digits are not unique', async () => {
     const contractKit = await getContractKitOutsideGenerator()
 
-    const mockPhoneNumberLookup = {
+    const mockPhoneNumberLookup: IdentifierLookupResult = {
       [mockE164NumberHash]: {
-        [mockAccount]: { complete: 3, total: 3 },
-        [mockAccountInvite]: { complete: 3, total: 3 },
+        [mockAccount]: { completed: 3, total: 3 },
+        [mockAccountInvite]: { completed: 3, total: 3 },
       },
     }
 

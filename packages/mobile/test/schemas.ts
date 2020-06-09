@@ -295,8 +295,22 @@ export const v1Schema = {
   ...v0Schema,
   identity: {
     ...v0Schema.identity,
+    importContactsProgress: {
+      status: 0,
+      current: 0,
+      total: 0,
+    },
+    matchedContacts: {},
     isValidRecipient: false,
     secureSendPhoneNumberMapping: {},
+  },
+  transactions: {
+    ...v0Schema.transactions,
+    knownFeedTransactions: {},
+  },
+  account: {
+    ...v0Schema.account,
+    retryVerificationWithForno: true,
   },
 }
 

@@ -1,0 +1,15 @@
+{
+  "contacts": {
+    "header": "Connect Contacts",
+    "body": "Adding your contacts makes it easy to send and request payments with your friends. Connecting does not send invites to your contacts.",
+    "findSwitch": "Allow contacts to find you",
+    "syncing": {
+      "loadingHeader": "Syncing contacts...",
+      "loadingStatus0": "Importing",
+      "loadingStatus1": "Processing {{total}} contacts",
+      "loadingStatus2": "Finding matches",
+      "successHeader": "You have {{matches}} friends on Celo",
+      "successStatus": "You're all synced"
+    }
+  }
+}

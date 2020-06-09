@@ -8,7 +8,7 @@ import {
   proxyCall,
   proxySend,
   stringIdentity,
-  stringToBytes,
+  stringToSolidityBytes,
   toTransactionObject,
   tupleParser,
   valueToBigNumber,
@@ -33,8 +33,12 @@ export class MultiSigWrapper extends BaseWrapper<MultiSig> {
    * Otherwise, submits the `txObject` to the multisig and add confirmation.
    * @param index The index of the pending withdrawal to withdraw.
    */
-  async submitOrConfirmTransaction(destination: string, txObject: TransactionObject<any>) {
-    const data = stringToBytes(txObject.encodeABI())
+  async submitOrConfirmTransaction(
+    destination: string,
+    txObject: TransactionObject<any>,
+    value: string = '0'
+  ) {
+    const data = stringToSolidityBytes(txObject.encodeABI())
     const transactionCount = await this.contract.methods.getTransactionCount(true, true).call()
     let transactionId
     for (transactionId = Number(transactionCount) - 1; transactionId >= 0; transactionId--) {
@@ -42,7 +46,8 @@ export class MultiSigWrapper extends BaseWrapper<MultiSig> {
       if (
         transaction.data === data &&
         transaction.destination === destination &&
-        transaction.value === '0'
+        transaction.value === value &&
+        !transaction.executed
       ) {
         return toTransactionObject(
           this.kit,
@@ -52,7 +57,7 @@ export class MultiSigWrapper extends BaseWrapper<MultiSig> {
     }
     return toTransactionObject(
       this.kit,
-      this.contract.methods.submitTransaction(destination, 0, data)
+      this.contract.methods.submitTransaction(destination, value, data)
     )
   }
 

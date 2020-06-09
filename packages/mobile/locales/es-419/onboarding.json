@@ -1,0 +1,15 @@
+{
+  "contacts": {
+    "header": "Conectar Contactos",
+    "body": "Agregar sus contactos hace que sea fácil enviar y solicitar pagos con sus amigos. La conexión no envía invitaciones a sus contactos.",
+    "findSwitch": "Permita que los contactos lo encuentren",
+    "syncing": {
+      "loadingHeader": "Sincronizando contactos...",
+      "loadingStatus0": "Importando",
+      "loadingStatus1": "Procesando {{total}} contactos",
+      "loadingStatus2": "Encontrar coincidencias",
+      "successHeader": "Tienes {{matches}} amigos en Celo",
+      "successStatus": "Todos estas sincronizados"
+    }
+  }
+}

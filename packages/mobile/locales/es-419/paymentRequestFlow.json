@@ -6,5 +6,12 @@
   "requestPaid": "Solicitud Pagada",
   "paymentRequestUpdateFailed": "No se pudo actualizar el pedido de pago",
   "incomingPaymentRequestNotificationTitle": "{{name}} solicitado",
-  "outgoingPaymentRequestNotificationTitle": "Esperando a {{name}}"
+  "outgoingPaymentRequestNotificationTitle": "Esperando a {{name}}",
+  "requestUnavailableHeader": "La cuenta de {{displayName}} no está verificada",
+  "requestUnavailableNoDisplayNameHeader": "La cuenta de tu contacto no está verificada",
+  "requestUnavailableBody": "El número {{e164PhoneNumber}} no tiene una cuenta o aún no lo ha verificado. Las solicitudes solo se pueden enviar a números verificados",
+  "requestUnavailableNoNumberBody": "Su contacto no tiene una cuenta o aún no la ha verificado. Las solicitudes solo se pueden enviar a números verificados.",
+  "requesting": "Solicitando",
+  "request": "Solicitud",
+  "requestSent": "Solicitud Enviada"
 }
