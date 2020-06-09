@@ -12,19 +12,15 @@ exports[`Testnet banner Renders when connected with backup complete 1`] = `
 >
   <View
     style={
-      Array [
-        Object {
-          "alignItems": "center",
-          "backgroundColor": "#FFFFFF",
-          "flexDirection": "row",
-          "height": 62,
-          "justifyContent": "space-between",
-        },
-        Object {
-          "borderBottomColor": "#EDEEEF",
-          "borderBottomWidth": 0,
-        },
-      ]
+      Object {
+        "alignItems": "center",
+        "backgroundColor": "#FFFFFF",
+        "borderBottomColor": "#EDEEEF",
+        "borderBottomWidth": 0,
+        "flexDirection": "row",
+        "height": 62,
+        "justifyContent": "space-between",
+      }
     }
   >
     <View
@@ -152,7 +148,7 @@ exports[`Testnet banner Renders when connected with backup complete 1`] = `
     }
     refreshing={false}
     renderItem={[Function]}
-    scrollEventThrottle={50}
+    scrollEventThrottle={16}
     stickyHeaderIndices={Array []}
     style={
       Object {
@@ -430,19 +426,15 @@ exports[`Testnet banner Renders when disconnected 1`] = `
 >
   <View
     style={
-      Array [
-        Object {
-          "alignItems": "center",
-          "backgroundColor": "#FFFFFF",
-          "flexDirection": "row",
-          "height": 62,
-          "justifyContent": "space-between",
-        },
-        Object {
-          "borderBottomColor": "#EDEEEF",
-          "borderBottomWidth": 0,
-        },
-      ]
+      Object {
+        "alignItems": "center",
+        "backgroundColor": "#FFFFFF",
+        "borderBottomColor": "#EDEEEF",
+        "borderBottomWidth": 0,
+        "flexDirection": "row",
+        "height": 62,
+        "justifyContent": "space-between",
+      }
     }
   >
     <View
@@ -570,7 +562,7 @@ exports[`Testnet banner Renders when disconnected 1`] = `
     }
     refreshing={false}
     renderItem={[Function]}
-    scrollEventThrottle={50}
+    scrollEventThrottle={16}
     stickyHeaderIndices={Array []}
     style={
       Object {
@@ -848,19 +840,15 @@ exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
 >
   <View
     style={
-      Array [
-        Object {
-          "alignItems": "center",
-          "backgroundColor": "#FFFFFF",
-          "flexDirection": "row",
-          "height": 62,
-          "justifyContent": "space-between",
-        },
-        Object {
-          "borderBottomColor": "#EDEEEF",
-          "borderBottomWidth": 0,
-        },
-      ]
+      Object {
+        "alignItems": "center",
+        "backgroundColor": "#FFFFFF",
+        "borderBottomColor": "#EDEEEF",
+        "borderBottomWidth": 0,
+        "flexDirection": "row",
+        "height": 62,
+        "justifyContent": "space-between",
+      }
     }
   >
     <View
@@ -988,7 +976,7 @@ exports[`Testnet banner Shows testnet banner for 5 seconds 1`] = `
     }
     refreshing={false}
     renderItem={[Function]}
-    scrollEventThrottle={50}
+    scrollEventThrottle={16}
     stickyHeaderIndices={Array []}
     style={
       Object {

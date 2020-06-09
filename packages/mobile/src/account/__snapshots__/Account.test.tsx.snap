@@ -13,19 +13,15 @@ exports[`Account renders correctly 1`] = `
     <SafeAreaView>
       <View
         style={
-          Array [
-            Object {
-              "alignItems": "center",
-              "backgroundColor": "#FFFFFF",
-              "flexDirection": "row",
-              "height": 62,
-              "justifyContent": "space-between",
-            },
-            Object {
-              "borderBottomColor": "#EDEEEF",
-              "borderBottomWidth": 0,
-            },
-          ]
+          Object {
+            "alignItems": "center",
+            "backgroundColor": "#FFFFFF",
+            "borderBottomColor": "#EDEEEF",
+            "borderBottomWidth": 0,
+            "flexDirection": "row",
+            "height": 62,
+            "justifyContent": "space-between",
+          }
         }
       >
         <View
@@ -1178,19 +1174,15 @@ exports[`Account renders correctly when dev mode active 1`] = `
     <SafeAreaView>
       <View
         style={
-          Array [
-            Object {
-              "alignItems": "center",
-              "backgroundColor": "#FFFFFF",
-              "flexDirection": "row",
-              "height": 62,
-              "justifyContent": "space-between",
-            },
-            Object {
-              "borderBottomColor": "#EDEEEF",
-              "borderBottomWidth": 0,
-            },
-          ]
+          Object {
+            "alignItems": "center",
+            "backgroundColor": "#FFFFFF",
+            "borderBottomColor": "#EDEEEF",
+            "borderBottomWidth": 0,
+            "flexDirection": "row",
+            "height": 62,
+            "justifyContent": "space-between",
+          }
         }
       >
         <View

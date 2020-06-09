@@ -6,7 +6,7 @@ import fontStyles from '@celo/react-components/styles/fonts.v2'
 import variables from '@celo/react-components/styles/variables'
 import { StackScreenProps } from '@react-navigation/stack'
 import BigNumber from 'bignumber.js'
-import React, { useCallback, useEffect, useMemo, useRef } from 'react'
+import React, { useEffect, useMemo, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import Animated from 'react-native-reanimated'
@@ -36,30 +36,71 @@ import { getLocalCurrencyDisplayValue } from 'src/utils/formatting'
 type Props = StackScreenProps<StackParamList, Screens.ExchangeHomeScreen>
 
 function ExchangeHomeScreen({ navigation }: Props) {
+  function dollarsToLocal(amount: BigNumber.Value) {
+    return convertDollarsToLocalAmount(amount, localCurrencyCode ? localExchangeRate : 1)
+  }
+
+  function displayLocalCurrency(amount: BigNumber.Value) {
+    return getLocalCurrencyDisplayValue(amount, localCurrencyCode || LocalCurrencyCode.USD, true)
+  }
+
+  function goToBuyGold() {
+    CeloAnalytics.track(CustomEventNames.gold_buy_start)
+    navigation.navigate(Screens.ExchangeTradeScreen, {
+      makerTokenDisplay: {
+        makerToken: CURRENCY_ENUM.DOLLAR,
+        makerTokenBalance: dollarBalance || '0',
+      },
+    })
+  }
+
+  function goToBuyDollars() {
+    CeloAnalytics.track(CustomEventNames.gold_sell_start)
+    navigation.navigate(Screens.ExchangeTradeScreen, {
+      makerTokenDisplay: {
+        makerToken: CURRENCY_ENUM.GOLD,
+        makerTokenBalance: goldBalance || '0',
+      },
+    })
+  }
+
   const scrollPosition = useRef(new Animated.Value(0)).current
+  const onScroll = Animated.event([
+    {
+      nativeEvent: {
+        contentOffset: {
+          y: scrollPosition,
+        },
+      },
+    },
+  ])
+  const headerOpacity = useMemo(
+    () => ({
+      opacity: scrollPosition.interpolate({
+        inputRange: [0, 100],
+        outputRange: [0, 1],
+        extrapolate: Animated.Extrapolate.CLAMP,
+      }),
+    }),
+    []
+  )
+
+  const dispatch = useDispatch()
+  useEffect(() => {
+    dispatch(fetchExchangeRate())
+  }, [])
+
   const { t } = useTranslation(Namespaces.exchangeFlow9)
   const dollarBalance = useSelector((state) => state.stableToken.balance)
   const goldBalance = useSelector((state) => state.goldToken.balance)
-  const dispatch = useDispatch()
 
   // TODO: revert this back to `useLocalCurrencyCode()` when we have history data for cGDL to Local Currency.
   const localCurrencyCode = null
   const localExchangeRate = useSelector(getLocalCurrencyExchangeRate)
   const currentExchangeRate = useExchangeRate()
-  const goldToDollars = useCallback((amount) => goldToDollarAmount(amount, currentExchangeRate), [
-    currentExchangeRate,
-  ])
-  const dollarsToLocal = useCallback(
-    (amount) => convertDollarsToLocalAmount(amount, localCurrencyCode ? localExchangeRate : 1),
-    [localExchangeRate]
-  )
-  const displayLocalCurrency = useCallback(
-    (amount: BigNumber.Value) =>
-      getLocalCurrencyDisplayValue(amount, localCurrencyCode || LocalCurrencyCode.USD, true),
-    [localCurrencyCode]
-  )
 
-  const currentGoldRateInLocalCurrency = dollarsToLocal(goldToDollars(1))
+  const perOneGoldInDollars = goldToDollarAmount(1, currentExchangeRate)
+  const currentGoldRateInLocalCurrency = perOneGoldInDollars && dollarsToLocal(perOneGoldInDollars)
   let rateChangeInPercentage, rateWentUp
   const exchangeHistory = useSelector(exchangeHistorySelector)
   if (exchangeHistory.aggregatedExchangeRates.length) {
@@ -78,53 +119,6 @@ function ExchangeHomeScreen({ navigation }: Props) {
 
   const hasGold = new BigNumber(goldBalance || 0).isGreaterThan(0)
 
-  useEffect(() => {
-    dispatch(fetchExchangeRate())
-  }, [])
-
-  const headerOpacity = useMemo(
-    () => ({
-      opacity: scrollPosition.interpolate({
-        inputRange: [0, 100],
-        outputRange: [0, 1],
-        extrapolate: Animated.Extrapolate.CLAMP,
-      }),
-    }),
-    []
-  )
-
-  const goToBuyGold = useCallback(() => {
-    CeloAnalytics.track(CustomEventNames.gold_buy_start)
-    navigation.navigate(Screens.ExchangeTradeScreen, {
-      makerTokenDisplay: {
-        makerToken: CURRENCY_ENUM.DOLLAR,
-        makerTokenBalance: dollarBalance || '0',
-      },
-    })
-  }, [dollarBalance])
-
-  const goToBuyDollars = useCallback(() => {
-    CeloAnalytics.track(CustomEventNames.gold_sell_start)
-    navigation.navigate(Screens.ExchangeTradeScreen, {
-      makerTokenDisplay: {
-        makerToken: CURRENCY_ENUM.GOLD,
-        makerTokenBalance: goldBalance || '0',
-      },
-    })
-  }, [dollarBalance])
-
-  const onScroll = useCallback(
-    Animated.event([
-      {
-        nativeEvent: {
-          contentOffset: {
-            y: scrollPosition,
-          },
-        },
-      },
-    ]),
-    []
-  )
   return (
     <SafeAreaView style={styles.background}>
       <DrawerTopBar
