@@ -13,12 +13,14 @@ import { PaymentRequestStatus } from 'src/account/types'
 import { showError } from 'src/alert/actions'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
+import BackButton from 'src/components/BackButton.v2'
 import CommentTextInput from 'src/components/CommentTextInput'
 import CurrencyDisplay, { DisplayType } from 'src/components/CurrencyDisplay'
 import TotalLineItem from 'src/components/TotalLineItem.v2'
 import { writePaymentRequest } from 'src/firebase/actions'
 import { currencyToShortMap } from 'src/geth/consts'
 import { Namespaces, withTranslation } from 'src/i18n'
+import { emptyHeader } from 'src/navigator/Headers.v2'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
 import { getDisplayName, getRecipientThumbnail } from 'src/recipients/recipient'
@@ -66,6 +68,11 @@ const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
 type OwnProps = StackScreenProps<StackParamList, Screens.PaymentRequestConfirmation>
 
 type Props = DispatchProps & StateProps & WithTranslation & OwnProps
+
+export const paymentConfirmationScreenNavOptions = () => ({
+  ...emptyHeader,
+  headerLeft: () => <BackButton eventName={CustomEventNames.request_confirm_back} />,
+})
 
 class PaymentRequestConfirmation extends React.Component<Props> {
   state = {

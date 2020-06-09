@@ -14,6 +14,7 @@ import { connect } from 'react-redux'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { TokenTransactionType } from 'src/apollo/types'
+import BackButton from 'src/components/BackButton.v2'
 import CommentTextInput from 'src/components/CommentTextInput'
 import CurrencyDisplay, { DisplayType, FormatType } from 'src/components/CurrencyDisplay'
 import FeeIcon from 'src/components/FeeIcon'
@@ -36,6 +37,7 @@ import { getInvitationVerificationFeeInDollars } from 'src/invite/saga'
 import { LocalCurrencyCode } from 'src/localCurrency/consts'
 import { convertDollarsToLocalAmount } from 'src/localCurrency/convert'
 import { getLocalCurrencyCode, getLocalCurrencyExchangeRate } from 'src/localCurrency/selectors'
+import { emptyHeader } from 'src/navigator/Headers.v2'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
@@ -120,6 +122,11 @@ const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
     localCurrencyExchangeRate,
   }
 }
+
+export const sendConfirmationScreenNavOptions = () => ({
+  ...emptyHeader,
+  headerLeft: () => <BackButton eventName={CustomEventNames.send_confirm_back} />,
+})
 
 export class SendConfirmation extends React.Component<Props, State> {
   state = {

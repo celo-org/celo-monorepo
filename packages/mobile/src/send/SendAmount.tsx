@@ -2,7 +2,9 @@ import Button, { BtnSizes, BtnTypes } from '@celo/react-components/components/Bu
 import NumberKeypad from '@celo/react-components/components/NumberKeypad'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import variables from '@celo/react-components/styles/variables'
+import { CURRENCY_ENUM } from '@celo/utils/src/currencies'
 import { parseInputAmount } from '@celo/utils/src/parsing'
+import { RouteProp } from '@react-navigation/native'
 import { StackScreenProps } from '@react-navigation/stack'
 import BigNumber from 'bignumber.js'
 import * as React from 'react'
@@ -16,13 +18,14 @@ import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { TokenTransactionType } from 'src/apollo/types'
 import { ErrorMessages } from 'src/app/ErrorMessages'
+import BackButton from 'src/components/BackButton.v2'
 import {
   DAILY_PAYMENT_LIMIT_CUSD,
   DOLLAR_TRANSACTION_MIN_AMOUNT,
   NUMBER_INPUT_MAX_DECIMALS,
 } from 'src/config'
 import { getFeeEstimateDollars } from 'src/fees/selectors'
-import { Namespaces } from 'src/i18n'
+import i18n, { Namespaces } from 'src/i18n'
 import { fetchAddressesAndValidate } from 'src/identity/actions'
 import {
   AddressValidationType,
@@ -41,6 +44,7 @@ import {
   getLocalCurrencyExchangeRate,
   getLocalCurrencySymbol,
 } from 'src/localCurrency/selectors'
+import { emptyHeader, HeaderTitleWithBalance } from 'src/navigator/Headers.v2'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
@@ -64,6 +68,22 @@ type RouteProps = StackScreenProps<StackParamList, Screens.SendAmount>
 type Props = RouteProps
 
 const { decimalSeparator } = getNumberFormatSettings()
+
+export const sendAmountScreenNavOptions = ({
+  route,
+}: {
+  route: RouteProp<StackParamList, Screens.SendAmount>
+}) => {
+  const title = route.params?.isRequest
+    ? i18n.t('paymentRequestFlow:request')
+    : i18n.t('sendFlow7:send')
+
+  return {
+    ...emptyHeader,
+    headerLeft: () => <BackButton eventName={CustomEventNames.send_amount_back} />,
+    headerTitle: () => <HeaderTitleWithBalance title={title} token={CURRENCY_ENUM.DOLLAR} />,
+  }
+}
 
 function SendAmount(props: Props) {
   const dispatch = useDispatch()

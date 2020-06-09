@@ -10,8 +10,10 @@ import SafeAreaView from 'react-native-safe-area-view'
 import { connect } from 'react-redux'
 import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
+import CancelButton from 'src/components/CancelButton.v2'
 import { Namespaces, withTranslation } from 'src/i18n'
 import { AddressValidationType } from 'src/identity/reducer'
+import { emptyHeader } from 'src/navigator/Headers.v2'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
@@ -41,6 +43,11 @@ const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
     isPaymentRequest: route.params.isPaymentRequest,
   }
 }
+
+export const validateRecipientIntroScreenNavOptions = () => ({
+  ...emptyHeader,
+  headerLeft: () => <CancelButton eventName={CustomEventNames.send_secure_cancel} />,
+})
 
 class ValidateRecipientIntro extends React.Component<Props> {
   onPressScanCode = () => {

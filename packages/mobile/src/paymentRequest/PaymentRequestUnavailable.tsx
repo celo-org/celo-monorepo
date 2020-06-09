@@ -1,3 +1,4 @@
+import Times from '@celo/react-components/icons/Times'
 import colors from '@celo/react-components/styles/colors.v2'
 import fontStyles from '@celo/react-components/styles/fonts.v2'
 import { StackScreenProps } from '@react-navigation/stack'
@@ -5,11 +6,22 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { SafeAreaView, ScrollView, StyleSheet, Text } from 'react-native'
 import { Namespaces } from 'src/i18n'
+import { emptyHeader } from 'src/navigator/Headers.v2'
+import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
+import { TopBarIconButton } from 'src/navigator/TopBarButton.v2'
 import { StackParamList } from 'src/navigator/types'
 
 type RouteProps = StackScreenProps<StackParamList, Screens.PaymentRequestUnavailable>
 type Props = RouteProps
+
+const navigateHome = () => navigate(Screens.WalletHome)
+
+export const paymentRequestUnavailableScreenNavOptions = () => ({
+  ...emptyHeader,
+  headerLeft: () => <TopBarIconButton icon={<Times />} onPress={navigateHome} />,
+  headerLeftContainerStyle: { paddingLeft: 20 },
+})
 
 const PaymentRequestUnavailable = (props: Props) => {
   const { t } = useTranslation(Namespaces.paymentRequestFlow)

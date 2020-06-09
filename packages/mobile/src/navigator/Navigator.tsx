@@ -1,5 +1,3 @@
-import QRCodeBorderlessIcon from '@celo/react-components/icons/QRCodeBorderless'
-import Times from '@celo/react-components/icons/Times'
 import colors from '@celo/react-components/styles/colors.v2'
 import { RouteProp } from '@react-navigation/core'
 import { createStackNavigator } from '@react-navigation/stack'
@@ -64,13 +62,17 @@ import {
 } from 'src/navigator/Headers.v2'
 import { navigate, navigateBack } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
-import { TopBarIconButton, TopBarTextButton } from 'src/navigator/TopBarButton.v2'
+import { TopBarTextButton } from 'src/navigator/TopBarButton.v2'
 import { StackParamList } from 'src/navigator/types'
 import ImportContactsScreen from 'src/onboarding/contacts/ImportContactsScreen'
 import IncomingPaymentRequestListScreen from 'src/paymentRequest/IncomingPaymentRequestListScreen'
 import OutgoingPaymentRequestListScreen from 'src/paymentRequest/OutgoingPaymentRequestListScreen'
-import PaymentRequestConfirmation from 'src/paymentRequest/PaymentRequestConfirmation'
-import PaymentRequestUnavailable from 'src/paymentRequest/PaymentRequestUnavailable'
+import PaymentRequestConfirmation, {
+  paymentConfirmationScreenNavOptions,
+} from 'src/paymentRequest/PaymentRequestConfirmation'
+import PaymentRequestUnavailable, {
+  paymentRequestUnavailableScreenNavOptions,
+} from 'src/paymentRequest/PaymentRequestUnavailable'
 import PincodeEducation from 'src/pincode/PincodeEducation'
 import PincodeEnter from 'src/pincode/PincodeEnter'
 import PincodeSet from 'src/pincode/PincodeSet'
@@ -81,11 +83,15 @@ import { store } from 'src/redux/store'
 import JoinCelo from 'src/registration/JoinCelo'
 import RegulatoryTerms from 'src/registration/RegulatoryTerms'
 import FeeEducation from 'src/send/FeeEducation'
-import Send from 'src/send/Send'
-import SendAmount from 'src/send/SendAmount'
-import SendConfirmation from 'src/send/SendConfirmation'
-import ValidateRecipientAccount from 'src/send/ValidateRecipientAccount'
-import ValidateRecipientIntro from 'src/send/ValidateRecipientIntro'
+import Send, { sendScreenNavOptions } from 'src/send/Send'
+import SendAmount, { sendAmountScreenNavOptions } from 'src/send/SendAmount'
+import SendConfirmation, { sendConfirmationScreenNavOptions } from 'src/send/SendConfirmation'
+import ValidateRecipientAccount, {
+  validateRecipientAccountScreenNavOptions,
+} from 'src/send/ValidateRecipientAccount'
+import ValidateRecipientIntro, {
+  validateRecipientIntroScreenNavOptions,
+} from 'src/send/ValidateRecipientIntro'
 import SetClock from 'src/set-clock/SetClock'
 import TransactionReview from 'src/transactions/TransactionReview'
 import { getDatetimeDisplayString } from 'src/utils/time'
@@ -196,125 +202,45 @@ const nuxScreens = (Navigator: typeof Stack) => (
   </>
 )
 
-const sendScreenOptions = ({ route }: { route: RouteProp<StackParamList, Screens.Send> }) => {
-  const goQr = () => navigate(Screens.QRCode)
-  const title = route.params?.isRequest
-    ? i18n.t('paymentRequestFlow:request')
-    : i18n.t('sendFlow7:send')
-
-  return {
-    ...emptyHeader,
-    headerLeft: () => (
-      <TopBarIconButton
-        icon={<Times />}
-        onPress={navigateBack}
-        eventName={
-          route.params?.isRequest ? CustomEventNames.send_cancel : CustomEventNames.request_cancel
-        }
-      />
-    ),
-    headerLeftContainerStyle: { paddingLeft: 20 },
-    headerRight: () => (
-      <TopBarIconButton
-        icon={<QRCodeBorderlessIcon height={32} color={colors.greenUI} />}
-        eventName={
-          route.params?.isRequest ? CustomEventNames.send_scan : CustomEventNames.request_scan
-        }
-        onPress={goQr}
-      />
-    ),
-    headerRightContainerStyle: { paddingRight: 16 },
-    headerTitle: title,
-  }
-}
-
-const sendAmountScreenOptions = ({
-  route,
-}: {
-  route: RouteProp<StackParamList, Screens.SendAmount>
-}) => {
-  const title = route.params?.isRequest
-    ? i18n.t('paymentRequestFlow:request')
-    : i18n.t('sendFlow7:send')
-
-  return {
-    ...emptyHeader,
-    headerLeft: () => <BackButton eventName={CustomEventNames.send_amount_back} />,
-    headerTitle: () => <HeaderTitleWithBalance title={title} token={CURRENCY_ENUM.DOLLAR} />,
-  }
-}
-
-const validateRecipientIntroScreenOptions = () => ({
-  ...emptyHeader,
-  headerLeft: () => <CancelButton eventName={CustomEventNames.send_secure_cancel} />,
-})
-
-const validateRecipientAccountScreenOptions = () => ({
-  ...emptyHeader,
-  headerLeft: () => <BackButton eventName={CustomEventNames.send_secure_back} />,
-})
-
-const sendConfirmationScreenOptions = () => ({
-  ...emptyHeader,
-  headerLeft: () => <BackButton eventName={CustomEventNames.send_confirm_back} />,
-})
-
-const paymentConfirmationScreenOptions = () => ({
-  ...emptyHeader,
-  headerLeft: () => <BackButton eventName={CustomEventNames.request_confirm_back} />,
-})
-
 const emptyWithBackButtonHeaderOption = () => ({
   ...emptyHeader,
   headerLeft: () => <BackButton />,
 })
 
-const navigateHome = () => navigate(Screens.WalletHome)
-
-const paymentRequestUnavailableScreenOptions = ({
-  route,
-}: {
-  route: RouteProp<StackParamList, Screens.PaymentRequestUnavailable>
-}) => ({
-  ...emptyHeader,
-  headerLeft: () => <TopBarIconButton icon={<Times />} onPress={navigateHome} />,
-  headerLeftContainerStyle: { paddingLeft: 20 },
-})
-
 const sendScreens = (Navigator: typeof Stack) => (
   <>
-    <Navigator.Screen name={Screens.Send} component={Send} options={sendScreenOptions} />
+    <Navigator.Screen name={Screens.Send} component={Send} options={sendScreenNavOptions} />
     <Navigator.Screen name={Screens.QRScanner} component={QRScanner} />
     <Navigator.Screen name={Screens.QRCode} component={QRCode} />
     <Navigator.Screen
       name={Screens.SendAmount}
       component={SendAmount}
-      options={sendAmountScreenOptions}
+      options={sendAmountScreenNavOptions}
     />
     <Navigator.Screen
       name={Screens.SendConfirmation}
       component={SendConfirmation}
-      options={sendConfirmationScreenOptions}
+      options={sendConfirmationScreenNavOptions}
     />
     <Navigator.Screen
       name={Screens.ValidateRecipientIntro}
       component={ValidateRecipientIntro}
-      options={validateRecipientIntroScreenOptions}
+      options={validateRecipientIntroScreenNavOptions}
     />
     <Navigator.Screen
       name={Screens.ValidateRecipientAccount}
       component={ValidateRecipientAccount}
-      options={validateRecipientAccountScreenOptions}
+      options={validateRecipientAccountScreenNavOptions}
     />
     <Navigator.Screen
       name={Screens.PaymentRequestUnavailable}
       component={PaymentRequestUnavailable}
-      options={paymentRequestUnavailableScreenOptions}
+      options={paymentRequestUnavailableScreenNavOptions}
     />
     <Navigator.Screen
       name={Screens.PaymentRequestConfirmation}
       component={PaymentRequestConfirmation}
-      options={paymentConfirmationScreenOptions}
+      options={paymentConfirmationScreenNavOptions}
     />
     <Navigator.Screen
       name={Screens.IncomingPaymentRequestListScreen}

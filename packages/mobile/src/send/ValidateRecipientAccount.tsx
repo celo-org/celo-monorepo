@@ -14,6 +14,7 @@ import CeloAnalytics from 'src/analytics/CeloAnalytics'
 import { CustomEventNames } from 'src/analytics/constants'
 import { ErrorMessages } from 'src/app/ErrorMessages'
 import AccountNumberCard from 'src/components/AccountNumberCard'
+import BackButton from 'src/components/BackButton.v2'
 import CodeRow, { CodeRowStatus } from 'src/components/CodeRow'
 import ErrorMessageInline from 'src/components/ErrorMessageInline'
 import Modal from 'src/components/Modal'
@@ -23,6 +24,7 @@ import InfoIcon from 'src/icons/InfoIcon.v2'
 import MenuBurgerCard from 'src/icons/MenuBurgerCard'
 import { validateRecipientAddress } from 'src/identity/actions'
 import { AddressValidationType } from 'src/identity/reducer'
+import { emptyHeader } from 'src/navigator/Headers.v2'
 import { navigate } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
 import { StackParamList } from 'src/navigator/types'
@@ -73,6 +75,11 @@ const mapStateToProps = (state: RootState, ownProps: OwnProps): StateProps => {
     error,
   }
 }
+
+export const validateRecipientAccountScreenNavOptions = () => ({
+  ...emptyHeader,
+  headerLeft: () => <BackButton eventName={CustomEventNames.send_secure_back} />,
+})
 
 export class ValidateRecipientAccount extends React.Component<Props, State> {
   state: State = {
