@@ -12,7 +12,6 @@ const initializeArgs = async (_: string): Promise<any[]> => {
     config.DowntimeSlasherIntervals.penalty,
     config.DowntimeSlasherIntervals.reward,
     config.DowntimeSlasherIntervals.slashableDowntime,
-    config.DowntimeSlasherIntervals.oncePerEpoch,
   ]
 }
 

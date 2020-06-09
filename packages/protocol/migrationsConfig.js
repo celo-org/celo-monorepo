@@ -56,7 +56,6 @@ const DefaultConfig = {
     reward: '10000000000000000000', // 10 cGLD
     penalty: '100000000000000000000', // 100 cGLD
     slashableDowntime: (8 * HOUR) / 5, // ~8 hours
-    oncePerEpoch: true,
   },
   election: {
     minElectableValidators: '22',

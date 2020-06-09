@@ -214,25 +214,40 @@ describe('slashing tests', function(this: any) {
       const history = await validatorsContract.methods.getMembershipHistory(signer).call()
       const historyIndex = history[0].length - 1
 
-      const slotSize = slashableDowntime.dividedToIntegerBy(2).toNumber()
-      const startSlots = [blockNumber + 12, blockNumber + 12 + slotSize]
-      const endSlots = [
-        startSlots[0] + slotSize - 1,
-        startSlots[0] + slashableDowntime.toNumber() - 1, // this will cover an odd windows
-      ]
+      const slotSize = slashableDowntime.dividedToIntegerBy(3).toNumber()
 
-      for (let i = 0; i < startSlots.length; i += 1) {
+      const startBlocks: number[] = []
+      const endBlocks: number[] = []
+
+      const startBlock = blockNumber + 12
+      const endBlock = startBlock + slashableDowntime.toNumber() - 1
+      const epochStart = new BigNumber(
+        await slasher.methods.getEpochNumberOfBlock(startBlock).call()
+      ).toNumber()
+      const epochBlockSize = new BigNumber(await slasher.methods.getEpochSize().call()).toNumber()
+
+      const blockEpochChange = epochStart * epochBlockSize + 1
+      for (let i = startBlock; i <= endBlock; ) {
+        let endBlockForSlot = i + slotSize - 1
+        endBlockForSlot = endBlockForSlot > endBlock ? endBlock : endBlockForSlot
+        // avoids crossing the epoch
+        endBlockForSlot =
+          endBlockForSlot >= blockEpochChange && i < blockEpochChange
+            ? blockEpochChange - 1
+            : endBlockForSlot
+        startBlocks.push(i)
+        endBlocks.push(endBlockForSlot)
         await slasher.methods
-          .generateProofOfIntervalValidation(startSlots[i], endSlots[i])
+          .setBitmapForInterval(i, endBlockForSlot)
           .send({ from: validator, gas: 5000000 })
+        i = endBlockForSlot + 1
       }
 
       await slasher.methods
         .slash(
-          startSlots,
-          endSlots,
-          4,
-          4,
+          startBlocks,
+          endBlocks,
+          [4, 4],
           historyIndex,
           [],
           [],
@@ -275,10 +290,36 @@ describe('slashing tests', function(this: any) {
 
       for (let i = 0; i < startSlots.length; i += 1) {
         const proofTxResult = await slasher
-          .generateProofOfIntervalValidation(startSlots[i], endSlots[i])
+          .setBitmapForInterval(startSlots[i], endSlots[i])
           .send({ from: validator, gas: 5000000 })
         const proofTxRcpt = await proofTxResult.waitReceipt()
         assert.equal(proofTxRcpt.status, true)
+      }
+
+      const startBlocks: number[] = []
+      const endBlocks: number[] = []
+
+      const startBlock = blockNumber + 12
+      const endBlock = startBlock + slashableDowntime - 1
+      const epochBlockSize = (await slasher.getEpochSize()).toNumber()
+      const epochStart =
+        new BigNumber(startBlock - 1).dividedToIntegerBy(epochBlockSize).toNumber() + 1
+
+      const blockEpochChange = epochStart * epochBlockSize + 1
+      for (let i = startBlock; i <= endBlock; ) {
+        let endBlockForSlot = i + slotSize - 1
+        endBlockForSlot = endBlockForSlot > endBlock ? endBlock : endBlockForSlot
+        // avoids crossing the epoch
+        endBlockForSlot =
+          endBlockForSlot >= blockEpochChange && i < blockEpochChange
+            ? blockEpochChange - 1
+            : endBlockForSlot
+        startBlocks.push(i)
+        endBlocks.push(endBlockForSlot)
+        await slasher
+          .setBitmapForInterval(i, endBlockForSlot)
+          .send({ from: validator, gas: 5000000 })
+        i = endBlockForSlot + 1
       }
 
       const tx = await slasher.slashValidator(validator, startSlots, endSlots)
