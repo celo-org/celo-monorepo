@@ -1,13 +1,15 @@
 {
   "contacts": {
-    "header": "Connect Contacts",
-    "body": "Adding your contacts makes it easy to send and request payments with your friends. Connecting does not send invites to your contacts.",
-    "findSwitch": "Allow contacts to find you",
+    "header": "Conectar Contactos",
+    "body": "Agregar sus contactos hace que sea fácil enviar y solicitar pagos con sus amigos. La conexión no envía invitaciones a sus contactos.",
+    "findSwitch": "Permita que los contactos lo encuentren",
     "syncing": {
-      "loading1": "Syncing contacts...",
-      "loading2": "<0></0> of <1></1> contacts",
-      "success1": "You have <0></0> friends on Celo",
-      "success2": "You’re all synced"
+      "loadingHeader": "Sincronizando contactos...",
+      "loadingStatus0": "Importando",
+      "loadingStatus1": "Procesando {{total}} contactos",
+      "loadingStatus2": "Encontrar coincidencias",
+      "successHeader": "Tienes {{matches}} amigos en Celo",
+      "successStatus": "Todos estas sincronizados"
     }
   }
 }
