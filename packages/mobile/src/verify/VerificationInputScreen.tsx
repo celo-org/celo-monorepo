@@ -21,11 +21,11 @@ import DevSkipButton from 'src/components/DevSkipButton'
 import { Namespaces, withTranslation } from 'src/i18n'
 import LoadingSpinner from 'src/icons/LoadingSpinner'
 import { cancelVerification, receiveAttestationMessage } from 'src/identity/actions'
+import { VerificationStatus } from 'src/identity/types'
 import {
   AttestationCode,
   CodeInputType,
   NUM_ATTESTATIONS_REQUIRED,
-  VerificationStatus,
 } from 'src/identity/verification'
 import { navigate, navigateHome } from 'src/navigator/NavigationService'
 import { Screens } from 'src/navigator/Screens'
@@ -57,7 +57,6 @@ interface State {
   codeSubmittingStatuses: boolean[]
   isModalVisible: boolean
   isTipVisible: boolean
-  didFinish: boolean
 }
 
 const mapDispatchToProps = {
@@ -89,7 +88,6 @@ class VerificationInputScreen extends React.Component<Props, State> {
     codeSubmittingStatuses: [],
     isModalVisible: false,
     isTipVisible: false,
-    didFinish: false,
   }
 
   componentDidMount() {
@@ -102,8 +100,8 @@ class VerificationInputScreen extends React.Component<Props, State> {
     }, 1000)
   }
 
-  componentDidUpdate() {
-    if (this.isVerificationComplete()) {
+  componentDidUpdate(prevProps: Props) {
+    if (this.isVerificationComplete(prevProps)) {
       return this.finishVerification()
     }
     if (this.isCodeRejected() && this.isAnyCodeSubmitting()) {
@@ -115,8 +113,11 @@ class VerificationInputScreen extends React.Component<Props, State> {
     clearInterval(this.interval)
   }
 
-  isVerificationComplete = () => {
-    return this.props.numCompleteAttestations >= NUM_ATTESTATIONS_REQUIRED && !this.state.didFinish
+  isVerificationComplete = (prevProps: Props) => {
+    return (
+      prevProps.numCompleteAttestations < NUM_ATTESTATIONS_REQUIRED &&
+      this.props.numCompleteAttestations >= NUM_ATTESTATIONS_REQUIRED
+    )
   }
 
   isCodeRejected = () => {
@@ -132,9 +133,8 @@ class VerificationInputScreen extends React.Component<Props, State> {
 
   finishVerification = () => {
     Logger.debug(TAG + '@finishVerification', 'Verification finished, navigating to next screen.')
-    this.setState({ didFinish: true })
     this.props.hideAlert()
-    navigate(Screens.VerificationSuccessScreen)
+    navigate(Screens.ImportContacts)
   }
 
   onCancel = () => {

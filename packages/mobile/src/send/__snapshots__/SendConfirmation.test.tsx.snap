@@ -334,13 +334,18 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
                     >
                       <Text
                         style={
-                          Object {
-                            "color": "#2E3338",
-                            "fontFamily": "Inter-SemiBold",
-                            "fontSize": 16,
-                            "lineHeight": 22,
-                            "paddingLeft": 8,
-                          }
+                          Array [
+                            Object {
+                              "color": "#1AB775",
+                              "fontFamily": "Inter-SemiBold",
+                              "fontSize": 16,
+                              "lineHeight": 22,
+                            },
+                            Object {
+                              "color": "#2E3338",
+                              "paddingLeft": 8,
+                            },
+                          ]
                         }
                       >
                         inviteWithSMS
@@ -390,13 +395,18 @@ exports[`SendConfirmation renders correctly for send payment confirmation 1`] = 
                     >
                       <Text
                         style={
-                          Object {
-                            "color": "#2E3338",
-                            "fontFamily": "Inter-SemiBold",
-                            "fontSize": 16,
-                            "lineHeight": 22,
-                            "paddingLeft": 8,
-                          }
+                          Array [
+                            Object {
+                              "color": "#1AB775",
+                              "fontFamily": "Inter-SemiBold",
+                              "fontSize": 16,
+                              "lineHeight": 22,
+                            },
+                            Object {
+                              "color": "#2E3338",
+                              "paddingLeft": 8,
+                            },
+                          ]
                         }
                       >
                         inviteWithWhatsapp
@@ -1209,13 +1219,18 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                     >
                       <Text
                         style={
-                          Object {
-                            "color": "#2E3338",
-                            "fontFamily": "Inter-SemiBold",
-                            "fontSize": 16,
-                            "lineHeight": 22,
-                            "paddingLeft": 8,
-                          }
+                          Array [
+                            Object {
+                              "color": "#1AB775",
+                              "fontFamily": "Inter-SemiBold",
+                              "fontSize": 16,
+                              "lineHeight": 22,
+                            },
+                            Object {
+                              "color": "#2E3338",
+                              "paddingLeft": 8,
+                            },
+                          ]
                         }
                       >
                         inviteWithSMS
@@ -1265,13 +1280,18 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                     >
                       <Text
                         style={
-                          Object {
-                            "color": "#2E3338",
-                            "fontFamily": "Inter-SemiBold",
-                            "fontSize": 16,
-                            "lineHeight": 22,
-                            "paddingLeft": 8,
-                          }
+                          Array [
+                            Object {
+                              "color": "#1AB775",
+                              "fontFamily": "Inter-SemiBold",
+                              "fontSize": 16,
+                              "lineHeight": 22,
+                            },
+                            Object {
+                              "color": "#2E3338",
+                              "paddingLeft": 8,
+                            },
+                          ]
                         }
                       >
                         inviteWithWhatsapp
@@ -2084,13 +2104,18 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                     >
                       <Text
                         style={
-                          Object {
-                            "color": "#2E3338",
-                            "fontFamily": "Inter-SemiBold",
-                            "fontSize": 16,
-                            "lineHeight": 22,
-                            "paddingLeft": 8,
-                          }
+                          Array [
+                            Object {
+                              "color": "#1AB775",
+                              "fontFamily": "Inter-SemiBold",
+                              "fontSize": 16,
+                              "lineHeight": 22,
+                            },
+                            Object {
+                              "color": "#2E3338",
+                              "paddingLeft": 8,
+                            },
+                          ]
                         }
                       >
                         inviteWithSMS
@@ -2140,13 +2165,18 @@ exports[`SendConfirmation renders correctly for send payment confirmation when f
                     >
                       <Text
                         style={
-                          Object {
-                            "color": "#2E3338",
-                            "fontFamily": "Inter-SemiBold",
-                            "fontSize": 16,
-                            "lineHeight": 22,
-                            "paddingLeft": 8,
-                          }
+                          Array [
+                            Object {
+                              "color": "#1AB775",
+                              "fontFamily": "Inter-SemiBold",
+                              "fontSize": 16,
+                              "lineHeight": 22,
+                            },
+                            Object {
+                              "color": "#2E3338",
+                              "paddingLeft": 8,
+                            },
+                          ]
                         }
                       >
                         inviteWithWhatsapp
@@ -2791,13 +2821,21 @@ exports[`SendConfirmation renders correctly when there are multiple user address
                   >
                     <Text
                       style={
-                        Object {
-                          "color": "#81868B",
-                          "fontFamily": "Inter-Regular",
-                          "fontSize": 14,
-                          "lineHeight": 18,
-                          "textDecorationLine": "underline",
-                        }
+                        Array [
+                          Object {
+                            "color": "#1AB775",
+                            "fontFamily": "Inter-SemiBold",
+                            "fontSize": 16,
+                            "lineHeight": 22,
+                          },
+                          Object {
+                            "color": "#81868B",
+                            "fontFamily": "Inter-Regular",
+                            "fontSize": 14,
+                            "lineHeight": 18,
+                            "textDecorationLine": "underline",
+                          },
+                        ]
                       }
                     >
                       edit
@@ -3009,13 +3047,18 @@ exports[`SendConfirmation renders correctly when there are multiple user address
                     >
                       <Text
                         style={
-                          Object {
-                            "color": "#2E3338",
-                            "fontFamily": "Inter-SemiBold",
-                            "fontSize": 16,
-                            "lineHeight": 22,
-                            "paddingLeft": 8,
-                          }
+                          Array [
+                            Object {
+                              "color": "#1AB775",
+                              "fontFamily": "Inter-SemiBold",
+                              "fontSize": 16,
+                              "lineHeight": 22,
+                            },
+                            Object {
+                              "color": "#2E3338",
+                              "paddingLeft": 8,
+                            },
+                          ]
                         }
                       >
                         inviteWithSMS
@@ -3065,13 +3108,18 @@ exports[`SendConfirmation renders correctly when there are multiple user address
                     >
                       <Text
                         style={
-                          Object {
-                            "color": "#2E3338",
-                            "fontFamily": "Inter-SemiBold",
-                            "fontSize": 16,
-                            "lineHeight": 22,
-                            "paddingLeft": 8,
-                          }
+                          Array [
+                            Object {
+                              "color": "#1AB775",
+                              "fontFamily": "Inter-SemiBold",
+                              "fontSize": 16,
+                              "lineHeight": 22,
+                            },
+                            Object {
+                              "color": "#2E3338",
+                              "paddingLeft": 8,
+                            },
+                          ]
                         }
                       >
                         inviteWithWhatsapp

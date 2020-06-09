@@ -4,15 +4,29 @@ import { authenticateUser, isVerified } from '../common/identity'
 import {
   hasValidAccountParam,
   hasValidContractPhoneNumbersParam,
+  hasValidPhoneNumberHash,
   hasValidUserPhoneNumberParam,
-  isBodyReasonablySized,
 } from '../common/input-validation'
 import logger from '../common/logger'
 import { getDidMatchmaking, setDidMatchmaking } from '../database/wrappers/account'
 import { getNumberPairContacts, setNumberPairContacts } from '../database/wrappers/number-pairs'
 
+interface GetContactMatchesRequest {
+  account: string
+  userPhoneNumber: string
+  contactPhoneNumbers: string[]
+  hashedPhoneNumber: string
+}
+
+interface ContactMatch {
+  phoneNumber: string
+}
+
 // TODO (amyslawson) consider pagination or streaming of contacts?
-export async function handleGetContactMatches(request: Request, response: Response) {
+export async function handleGetContactMatches(
+  request: Request<{}, {}, GetContactMatchesRequest>,
+  response: Response
+) {
   try {
     if (!isValidGetContactMatchesInput(request.body)) {
       respondWithError(response, 400, ErrorMessages.INVALID_INPUT)
@@ -22,19 +36,22 @@ export async function handleGetContactMatches(request: Request, response: Respon
       respondWithError(response, 401, ErrorMessages.UNAUTHENTICATED_USER)
       return
     }
-    if (!(await isVerified(request.body.account, request.body.userPhoneNumber))) {
+
+    const { account, userPhoneNumber, contactPhoneNumbers, hashedPhoneNumber } = request.body
+
+    if (!(await isVerified(account, hashedPhoneNumber))) {
       respondWithError(response, 403, ErrorMessages.UNVERIFIED_USER_ATTEMPT_TO_MATCHMAKE)
       return
     }
-    if (await getDidMatchmaking(request.body.account)) {
+    if (await getDidMatchmaking(account)) {
       respondWithError(response, 403, ErrorMessages.DUPLICATE_REQUEST_TO_MATCHMAKE)
       return
     }
     const matchedContacts: ContactMatch[] = (
-      await getNumberPairContacts(request.body.userPhoneNumber, request.body.contactPhoneNumbers)
+      await getNumberPairContacts(userPhoneNumber, contactPhoneNumbers)
     ).map((numberPair) => ({ phoneNumber: numberPair }))
-    await setNumberPairContacts(request.body.userPhoneNumber, request.body.contactPhoneNumbers)
-    await setDidMatchmaking(request.body.account)
+    await setNumberPairContacts(userPhoneNumber, contactPhoneNumbers)
+    await setDidMatchmaking(account)
     response.json({ success: true, matchedContacts })
   } catch (e) {
     logger.error('Failed to getContactMatches', e)
@@ -42,15 +59,13 @@ export async function handleGetContactMatches(request: Request, response: Respon
   }
 }
 
-interface ContactMatch {
-  phoneNumber: string
-}
-
-function isValidGetContactMatchesInput(requestBody: any): boolean {
+function isValidGetContactMatchesInput(requestBody: GetContactMatchesRequest): boolean {
   return (
     hasValidAccountParam(requestBody) &&
     hasValidUserPhoneNumberParam(requestBody) &&
     hasValidContractPhoneNumbersParam(requestBody) &&
-    isBodyReasonablySized(requestBody)
+    hasValidPhoneNumberHash(requestBody)
+    // TODO find way to check content body size without RE-JSONifying it
+    // isBodyReasonablySized(requestBody)
   )
 }

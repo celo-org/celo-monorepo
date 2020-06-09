@@ -304,6 +304,12 @@ export const v1Schema = {
   },
   identity: {
     ...v0Schema.identity,
+    importContactsProgress: {
+      status: 0,
+      current: 0,
+      total: 0,
+    },
+    matchedContacts: {},
     isValidRecipient: false,
     secureSendPhoneNumberMapping: {},
   },
