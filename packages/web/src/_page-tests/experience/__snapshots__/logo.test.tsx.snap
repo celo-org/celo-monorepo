@@ -289,6 +289,86 @@ exports[`Experience/Logo renders 1`] = `
                   className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
                   data-focusable={true}
                   dir="auto"
+                  href="/experience/events"
+                  onClick={[Function]}
+                  onMouseEnter={[Function]}
+                  role="link"
+                  style={
+                    Object {
+                      "WebkitAlignItems": "center",
+                      "WebkitBoxAlign": "center",
+                      "WebkitBoxFlex": 0,
+                      "WebkitBoxPack": "center",
+                      "WebkitFlexGrow": 0,
+                      "WebkitJustifyContent": "center",
+                      "alignItems": "center",
+                      "backgroundColor": "rgba(0,0,0,0.00)",
+                      "borderBottomColor": "rgba(0,0,0,0.00)",
+                      "borderLeftColor": "rgba(0,0,0,0.00)",
+                      "borderRightColor": "rgba(0,0,0,0.00)",
+                      "borderTopColor": "rgba(0,0,0,0.00)",
+                      "color": "rgba(129,134,139,1.00)",
+                      "cursor": "pointer",
+                      "display": "inline-flex",
+                      "flexGrow": 0,
+                      "fontFamily": "Jost, futura-pt, futura, sans-serif",
+                      "fontSize": "16px",
+                      "fontWeight": "500",
+                      "justifyContent": "center",
+                      "lineHeight": "16px",
+                      "msFlexAlign": "center",
+                      "msFlexPack": "center",
+                      "msFlexPositive": 0,
+                      "opacity": 1,
+                      "outlineColor": "transparent",
+                      "textAlign": "center",
+                      "textRendering": "geometricPrecision",
+                      "width": "fit-content",
+                    }
+                  }
+                >
+                  EventKit
+                </a>
+              </div>
+            </div>
+            <div
+              className="css-view-1dbjc4n"
+              style={
+                Object {
+                  "WebkitAlignItems": "center",
+                  "WebkitBoxAlign": "center",
+                  "WebkitBoxDirection": "normal",
+                  "WebkitBoxOrient": "vertical",
+                  "WebkitBoxPack": "center",
+                  "WebkitFlexDirection": "column",
+                  "WebkitJustifyContent": "center",
+                  "alignItems": "center",
+                  "flexDirection": "column",
+                  "justifyContent": "center",
+                  "marginBottom": "0px",
+                  "marginLeft": "15px",
+                  "marginRight": "15px",
+                  "msFlexAlign": "center",
+                  "msFlexDirection": "column",
+                  "msFlexPack": "center",
+                  "position": "relative",
+                }
+              }
+            >
+              <div
+                className="css-view-1dbjc4n"
+                onClick={[Function]}
+                onMouseDown={[Function]}
+                onMouseEnter={[Function]}
+                onMouseLeave={[Function]}
+                onMouseUp={[Function]}
+                onResponderGrant={[Function]}
+                onResponderRelease={[Function]}
+              >
+                <a
+                  className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+                  data-focusable={true}
+                  dir="auto"
                   href="/experience/brand"
                   onClick={[Function]}
                   onMouseEnter={[Function]}
@@ -7403,6 +7483,60 @@ exports[`Experience/Logo renders 1`] = `
                   target="_blank"
                 >
                   Events
+                </a>
+              </div>
+            </div>
+            <div
+              className="css-view-1dbjc4n"
+              style={
+                Object {
+                  "marginBottom": "8px",
+                  "marginTop": "8px",
+                }
+              }
+            >
+              <div
+                className="css-view-1dbjc4n"
+                onClick={[Function]}
+                onMouseDown={[Function]}
+                onMouseEnter={[Function]}
+                onMouseLeave={[Function]}
+                onMouseUp={[Function]}
+                onResponderGrant={[Function]}
+                onResponderRelease={[Function]}
+                style={
+                  Object {
+                    "display": "inline",
+                  }
+                }
+              >
+                <a
+                  className="css-reset-4rbku5 css-cursor-18t94o4 css-text-901oao"
+                  data-focusable={true}
+                  dir="auto"
+                  href="/experience/events"
+                  onClick={[Function]}
+                  onMouseEnter={[Function]}
+                  rel=" noopener noreferrer"
+                  role="link"
+                  style={
+                    Object {
+                      "WebkitTextDecorationStyle": "solid",
+                      "color": "rgba(46,51,56,1.00)",
+                      "cursor": "pointer",
+                      "display": "inline",
+                      "fontFamily": "EB Garamond, eb-garamond, Garamond, serif",
+                      "fontSize": "16px",
+                      "lineHeight": "20px",
+                      "opacity": 1,
+                      "textDecoration": "none",
+                      "textDecorationStyle": "solid",
+                      "textRendering": "geometricPrecision",
+                    }
+                  }
+                  target="_blank"
+                >
+                  EventKit
                 </a>
               </div>
             </div>
