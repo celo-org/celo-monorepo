@@ -103,6 +103,7 @@ describe('Transfer Works', () => {
 
     await element(by.id('ImportWalletBackupKeyInputField')).tap()
     await element(by.id('ImportWalletBackupKeyInputField')).replaceText(SAMPLE_BACKUP_KEY)
+    await element(by.id('ImportWalletBackupKeyInputField')).tapReturnKey()
 
     await sleep(4000)
 
