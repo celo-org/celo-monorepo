@@ -193,7 +193,7 @@ contract DowntimeSlasherIntervals is SlasherUtil {
           require(
             getValidatorFromSigner(signerIndices[signerIndicesIndex], startBlocks[i].sub(1)) ==
               getValidatorFromSigner(signerIndices[signerIndicesIndex.add(1)], startBlocks[i]),
-            "indices doyo e not point to the same validator"
+            "indices do not point to the same validator"
           );
           signerIndicesIndex = signerIndicesIndex.add(1);
         }
