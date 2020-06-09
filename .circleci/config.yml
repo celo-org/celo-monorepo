@@ -1079,9 +1079,9 @@ workflows:
           requires:
             - lint-checks
             - contractkit-test
-      # - integration-sync-geth-mainnet:
-      #     requires:
-      #       - lint-checks
+      - integration-sync-geth-mainnet:
+          requires:
+            - lint-checks
       - phone-number-privacy-test:
           requires:
             - lint-checks
