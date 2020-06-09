@@ -207,13 +207,6 @@ contract DowntimeSlasherIntervals is SlasherUtil {
   }
 
   /**
-   * @notice Returns the end block for the interval required for slashing.
-   */
-  function getEndBlockForSlashing(uint256 startBlock) internal view returns (uint256) {
-    return startBlock.add(slashableDowntime).sub(1);
-  }
-
-  /**
    * @notice Add to the validator a new slashedInterval if the validator was not already
    * slashed in the same epoch of the startBlock or by a previous interval that contains al 
    * least a block of the new interval
