@@ -69,3 +69,10 @@ export async function enterPinUi() {
 
   await element(by.id('Pincode-Submit')).tap()
 }
+
+export async function inputNumberKeypad(amount) {
+  const amountStr = '' + amount
+  for (const digit of amountStr) {
+    await element(by.id(`digit${digit}`)).tap()
+  }
+}

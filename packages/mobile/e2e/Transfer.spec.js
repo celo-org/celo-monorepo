@@ -1,4 +1,4 @@
-import { skipTo, sleep, enterPinUi } from './utils'
+import { skipTo, sleep, enterPinUi, inputNumberKeypad } from './utils'
 
 const ENABLE_CONTACT_IMPORT = false
 
@@ -130,17 +130,13 @@ describe('Transfer Works', () => {
   })
 
   it('Wallet Home', async () => {
-    await waitFor(element(by.id('DollarBalance')))
-      .toBeVisible()
-      .withTimeout(10000)
-
-    await waitFor(element(by.id('GoldBalance')))
+    await waitFor(element(by.id('SendOrRequestBar')))
       .toBeVisible()
       .withTimeout(10000)
   })
 
   it('Wallet Home->Send', async () => {
-    await element(by.id('SendNavigator').withDescendant(by.id('SendNavigator'))).tap()
+    await element(by.id('SendOrRequestBar/SendButton')).tap()
 
     await waitFor(element(by.id('RecipientPicker')))
       .toBeVisible()
@@ -153,36 +149,28 @@ describe('Transfer Works', () => {
   })
 
   it('Send -> SendAmount', async () => {
-    await waitFor(element(by.id('AmountInput')))
+    await waitFor(element(by.id('Review')))
       .toBeVisible()
       .withTimeout(10000)
 
-    await element(by.id('AmountInput')).replaceText(AMOUNT_TO_SEND)
-    await sleep(2000)
-
-    await element(by.id('CommentInput')).replaceText(RANDOM_COMMENT)
-    await sleep(2000)
-
-    // TODO(erdal): make sure gas fees are estimated here?
-    await element(by.id('Send')).tap()
+    await inputNumberKeypad(AMOUNT_TO_SEND)
+    await element(by.id('Review')).tap()
   })
 
   it('SendAmount -> SendConfirmation', async () => {
-    await waitFor(element(by.id('Comment')))
+    await waitFor(element(by.id('commentInput/send')))
       .toBeVisible()
       .withTimeout(10000)
 
-    await expect(element(by.id('Comment'))).toHaveText(RANDOM_COMMENT)
+    await element(by.id('commentInput/send')).replaceText(RANDOM_COMMENT)
 
     await element(by.id('ConfirmButton')).tap()
   })
 
-  it('SendConfirmation -> Home', async () => {
-    await waitFor(element(by.id('DollarBalance')))
-      .toBeVisible()
-      .withTimeout(10000)
+  // TODO(erdal): implement Request path
 
-    await waitFor(element(by.id('GoldBalance')))
+  it('SendConfirmation -> Home', async () => {
+    await waitFor(element(by.id('SendOrRequestBar')))
       .toBeVisible()
       .withTimeout(10000)
 
