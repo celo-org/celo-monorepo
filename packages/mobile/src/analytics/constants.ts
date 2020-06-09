@@ -58,6 +58,7 @@ export enum CustomEventNames {
   request_select_recipient = 'request_select_recipient', // when recipient was selected
   request_amount_back = 'request_amount_back', // back button pressed on amount screen
   request_continue = 'request_continue', // when next button pressed on amount enter page
+  request_unavailable = 'request_unavailable', // when request attempted to unverified user
 
   // Send events, separate from button tracking above
   send_dollar_transaction = 'send_dollar_transaction',
