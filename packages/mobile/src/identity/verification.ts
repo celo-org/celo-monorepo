@@ -91,6 +91,7 @@ export function* startVerification() {
 
 export function* doVerificationFlow() {
   try {
+    CeloAnalytics.track(CustomEventNames.verification_start)
     yield put(setVerificationStatus(VerificationStatus.Prepping))
     const account: string = yield call(getConnectedUnlockedAccount)
     const e164Number: string = yield select(e164NumberSelector)
